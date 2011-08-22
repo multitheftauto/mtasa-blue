@@ -606,7 +606,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxSetShaderValue", CLuaFunctionDefs::dxSetShaderValue );
     CLuaCFunctions::AddFunction ( "dxSetRenderTarget", CLuaFunctionDefs::dxSetRenderTarget );
     CLuaCFunctions::AddFunction ( "dxUpdateScreenSource", CLuaFunctionDefs::dxUpdateScreenSource );
-
+    CLuaCFunctions::AddFunction ( "dxGetStatus", CLuaFunctionDefs::dxGetStatus );
+    CLuaCFunctions::AddFunction ( "dxSetTestMode", CLuaFunctionDefs::dxSetTestMode );
 
     // Audio funcs
     CLuaCFunctions::AddFunction ( "playSoundFrontEnd", CLuaFunctionDefs::PlaySoundFrontEnd );

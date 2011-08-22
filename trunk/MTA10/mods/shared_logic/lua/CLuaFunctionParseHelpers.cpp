@@ -145,6 +145,12 @@ IMPLEMENT_ENUM_BEGIN( eCGUIType )
     ADD_ENUM ( CGUI_COMBOBOX,       "gui-combobox" )
 IMPLEMENT_ENUM_END( "gui-type" )
 
+IMPLEMENT_ENUM_BEGIN( eDxTestMode )
+    ADD_ENUM ( DX_TEST_MODE_NONE,           "none" )
+    ADD_ENUM ( DX_TEST_MODE_NO_MEM,         "no_mem" )
+    ADD_ENUM ( DX_TEST_MODE_LOW_MEM,        "low_mem" )
+    ADD_ENUM ( DX_TEST_MODE_NO_SHADER,      "no_shader" )
+IMPLEMENT_ENUM_END( "dx-test-mode" )
 
 //
 // Get best guess at name of userdata type

@@ -51,8 +51,25 @@ void CRenderItemManager::OnDeviceCreate ( IDirect3DDevice9* pDevice, float fView
 
     m_pRenderWare = CCore::GetSingleton ().GetGame ()->GetRenderWare ();
     m_pRenderWare->InitWorldTextureWatch ( StaticWatchCallback );
-}
 
+    // Get some stats
+    m_strVideoCardName = GetWMIVideoAdapterName ();
+    m_iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize () / 1024;
+    if ( m_iVideoCardMemoryKBTotal == 0 )
+        m_iVideoCardMemoryKBTotal = 64 * 1024;
+    m_iVideoCardMemoryKBForMTATotal = ( m_iVideoCardMemoryKBTotal - ( 64 * 1024 ) ) * 4 / 5;
+    m_iVideoCardMemoryKBForMTATotal = Max ( 0, m_iVideoCardMemoryKBForMTATotal );
+
+    D3DCAPS9 caps;
+    pDevice->GetDeviceCaps ( &caps );
+    int iMinor = caps.PixelShaderVersion & 0xFF;
+    int iMajor = ( caps.PixelShaderVersion & 0xFF00 ) >> 8;
+    m_strVideoCardPSVersion = SString ( "%d", iMajor );
+    if ( iMinor )
+        m_strVideoCardPSVersion += SString ( ".%d", iMinor );
+
+    UpdateMemoryUsage ();
+}
 
 ////////////////////////////////////////////////////////////////
 //
@@ -79,6 +96,8 @@ void CRenderItemManager::OnResetDevice ( void )
 {
     for ( std::set < CRenderItem* >::iterator iter = m_CreatedItemList.begin () ; iter != m_CreatedItemList.end () ; iter++ )
         (*iter)->OnResetDevice ();
+
+    UpdateMemoryUsage ();
 }
 
 
@@ -100,6 +119,8 @@ CTextureItem* CRenderItemManager::CreateTexture ( const SString& strFullFilePath
         return NULL;
     }
 
+    UpdateMemoryUsage ();
+
     return pTextureItem;
 }
 
@@ -113,6 +134,9 @@ CTextureItem* CRenderItemManager::CreateTexture ( const SString& strFullFilePath
 ////////////////////////////////////////////////////////////////
 CRenderTargetItem* CRenderItemManager::CreateRenderTarget ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel )
 {
+    if ( !CanCreateRenderItem ( CRenderTargetItem::GetClassId () ) )
+        return NULL;
+
     CRenderTargetItem* pRenderTargetItem = new CRenderTargetItem ();
     pRenderTargetItem->PostConstruct ( this, uiSizeX, uiSizeY, bWithAlphaChannel );
 
@@ -121,6 +145,8 @@ CRenderTargetItem* CRenderItemManager::CreateRenderTarget ( uint uiSizeX, uint u
         SAFE_RELEASE ( pRenderTargetItem );
         return NULL;
     }
+
+    UpdateMemoryUsage ();
 
     return pRenderTargetItem;
 }
@@ -135,6 +161,9 @@ CRenderTargetItem* CRenderItemManager::CreateRenderTarget ( uint uiSizeX, uint u
 ////////////////////////////////////////////////////////////////
 CScreenSourceItem* CRenderItemManager::CreateScreenSource ( uint uiSizeX, uint uiSizeY )
 {
+    if ( !CanCreateRenderItem ( CScreenSourceItem::GetClassId () ) )
+        return NULL;
+
     CScreenSourceItem* pScreenSourceItem = new CScreenSourceItem ();
     pScreenSourceItem->PostConstruct ( this, uiSizeX, uiSizeY );
 
@@ -143,6 +172,8 @@ CScreenSourceItem* CRenderItemManager::CreateScreenSource ( uint uiSizeX, uint u
         SAFE_RELEASE ( pScreenSourceItem );
         return NULL;
     }
+
+    UpdateMemoryUsage ();
 
     return pScreenSourceItem;
 }
@@ -157,6 +188,9 @@ CScreenSourceItem* CRenderItemManager::CreateScreenSource ( uint uiSizeX, uint u
 ////////////////////////////////////////////////////////////////
 CShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, bool bDebug )
 {
+    if ( !CanCreateRenderItem ( CShaderItem::GetClassId () ) )
+        return NULL;
+
     strOutStatus = "";
 
     CShaderItem* pShaderItem = new CShaderItem ();
@@ -181,6 +215,9 @@ CShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, 
 ////////////////////////////////////////////////////////////////
 CDxFontItem* CRenderItemManager::CreateDxFont ( const SString& strFullFilePath, uint uiSize, bool bBold )
 {
+    if ( !CanCreateRenderItem ( CDxFontItem::GetClassId () ) )
+        return NULL;
+
     CDxFontItem* pDxFontItem = new CDxFontItem ();
     pDxFontItem->PostConstruct ( this, strFullFilePath, uiSize, bBold );
 
@@ -189,6 +226,8 @@ CDxFontItem* CRenderItemManager::CreateDxFont ( const SString& strFullFilePath, 
         SAFE_RELEASE ( pDxFontItem );
         return NULL;
     }
+
+    UpdateMemoryUsage ();
 
     return pDxFontItem;
 }
@@ -203,6 +242,9 @@ CDxFontItem* CRenderItemManager::CreateDxFont ( const SString& strFullFilePath, 
 ////////////////////////////////////////////////////////////////
 CGuiFontItem* CRenderItemManager::CreateGuiFont ( const SString& strFullFilePath, const SString& strFontName, uint uiSize )
 {
+    if ( !CanCreateRenderItem ( CGuiFontItem::GetClassId () ) )
+        return NULL;
+
     CGuiFontItem* pGuiFontItem = new CGuiFontItem ();
     pGuiFontItem->PostConstruct ( this, strFullFilePath, strFontName, uiSize );
 
@@ -211,6 +253,8 @@ CGuiFontItem* CRenderItemManager::CreateGuiFont ( const SString& strFullFilePath
         SAFE_RELEASE ( pGuiFontItem );
         return NULL;
     }
+
+    UpdateMemoryUsage ();
 
     return pGuiFontItem;
 }
@@ -263,6 +307,8 @@ void CRenderItemManager::NotifyDestructRenderItem ( CRenderItem* pItem )
     else
     if ( CShaderItem* pShaderItem = DynamicCast < CShaderItem > ( pItem ) )
         RemoveShaderItemFromWatchLists ( pShaderItem );
+
+    UpdateMemoryUsage ();
 }
 
 
@@ -707,4 +753,322 @@ void CRenderItemManager::WatchCallback ( CSHADERDUMMY* pShaderItem, CD3DDUMMY* p
 void CRenderItemManager::StaticWatchCallback ( CSHADERDUMMY* pShaderItem, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld )
 {
     ( ( CRenderItemManager* ) CGraphics::GetSingleton ().GetRenderItemManager () )->WatchCallback ( pShaderItem, pD3DDataNew, pD3DDataOld );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::CanCreateRenderItem
+//
+//
+//
+////////////////////////////////////////////////////////////////
+bool CRenderItemManager::CanCreateRenderItem ( ClassId classId )
+{
+    // none:        Don't create font or rendertarget if no memory
+    // no_mem:      Don't create font or rendertarget
+    // low_mem:     Don't create font or rendertarget randomly
+    // no_shader:   Don't validate any shaders
+
+    if ( classId == CRenderTargetItem::GetClassId () || classId == CGuiFontItem::GetClassId () || classId == CDxFontItem::GetClassId () )
+    {
+        if ( m_iMemoryKBFreeForMTA <= 0 )
+            return false;
+
+        if ( m_TestMode == DX_TEST_MODE_NO_MEM )
+            return false;
+
+        if ( m_TestMode == DX_TEST_MODE_LOW_MEM )
+        {
+            if ( ( rand () % 1000 ) > 750 )
+                return false;
+        }
+    }
+    else
+    if ( classId == CShaderItem::GetClassId ()  )
+    {
+        if ( m_TestMode == DX_TEST_MODE_NO_SHADER )
+            return false;
+    }
+    return true;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::SetTestMode
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::SetTestMode ( eDxTestMode testMode )
+{
+    m_TestMode = testMode;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::UpdateMemoryUsage
+//
+// Should be called when a render item is created/destroyed or changes
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::UpdateMemoryUsage ( void )
+{
+    m_iTextureMemoryKBUsed = 0;
+    m_iRenderTargetMemoryKBUsed = 0;
+    m_iFontMemoryKBUsed = 0;
+    for ( std::set < CRenderItem* >::iterator iter = m_CreatedItemList.begin () ; iter != m_CreatedItemList.end () ; iter++ )
+    {
+        CRenderItem* pRenderItem = *iter;
+        int iMemoryKBUsed = pRenderItem->GetVideoMemoryKBUsed ();
+
+        if ( pRenderItem->IsA ( CFileTextureItem::GetClassId () ) )
+            m_iTextureMemoryKBUsed += iMemoryKBUsed;
+        else
+        if ( pRenderItem->IsA ( CRenderTargetItem::GetClassId () ) || pRenderItem->IsA ( CScreenSourceItem::GetClassId () ) )
+            m_iRenderTargetMemoryKBUsed += iMemoryKBUsed;
+        else
+        if ( pRenderItem->IsA ( CGuiFontItem::GetClassId () ) || pRenderItem->IsA ( CDxFontItem::GetClassId () ) )
+            m_iFontMemoryKBUsed += iMemoryKBUsed;
+    }
+
+    m_iMemoryKBFreeForMTA = m_iVideoCardMemoryKBForMTATotal;
+    m_iMemoryKBFreeForMTA -= m_iFontMemoryKBUsed / 2;
+    m_iMemoryKBFreeForMTA -= m_iTextureMemoryKBUsed / 4;
+    m_iMemoryKBFreeForMTA -= m_iRenderTargetMemoryKBUsed;
+    m_iMemoryKBFreeForMTA = Max ( 0, m_iMemoryKBFreeForMTA );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::GetDxStatus
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
+{
+    outStatus.testMode = m_TestMode;
+
+    // Copy hardware settings
+    outStatus.videoCard.strName = m_strVideoCardName;
+    outStatus.videoCard.iInstalledMemoryKB = m_iVideoCardMemoryKBTotal;
+    outStatus.videoCard.strPSVersion = m_strVideoCardPSVersion;
+
+    // Memory usage
+    outStatus.videoMemoryKB.iFreeForMTA = m_iMemoryKBFreeForMTA;
+    outStatus.videoMemoryKB.iUsedByFonts = m_iFontMemoryKBUsed;
+    outStatus.videoMemoryKB.iUsedByTextures = m_iTextureMemoryKBUsed;
+    outStatus.videoMemoryKB.iUsedByRenderTargets = m_iRenderTargetMemoryKBUsed;
+
+    // Option settings
+    CGameSettings* gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
+    outStatus.settings.bWindowed = false;
+    outStatus.settings.iFXQuality = gameSettings->GetFXQuality(); ;
+    outStatus.settings.iDrawDistance = ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f * 100;
+    outStatus.settings.bVolumetricShadows = false;
+    outStatus.settings.iStreamingMemory = 0;
+
+    CVARS_GET ( "streaming_memory",     outStatus.settings.iStreamingMemory );
+    CVARS_GET ( "display_windowed",     outStatus.settings.bWindowed );
+    CVARS_GET ( "volumetric_shadows",   outStatus.settings.bVolumetricShadows );
+
+    // Modify if using test mode
+    if ( m_TestMode == DX_TEST_MODE_NO_MEM )
+        outStatus.videoMemoryKB.iFreeForMTA = 0;
+
+    if ( m_TestMode == DX_TEST_MODE_LOW_MEM )
+        outStatus.videoMemoryKB.iFreeForMTA = 1;
+
+    if ( m_TestMode == DX_TEST_MODE_NO_SHADER )
+        outStatus.videoCard.strPSVersion = "0";
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::GetBitsPerPixel
+//
+// Returns bits per pixel for a given D3D format
+//
+////////////////////////////////////////////////////////////////
+int CRenderItemManager::GetBitsPerPixel ( D3DFORMAT Format )
+{
+	switch ( Format )
+	{
+	    case D3DFMT_A8R8G8B8:
+	    case D3DFMT_X8R8G8B8:
+	    case D3DFMT_Q8W8V8U8:
+	    case D3DFMT_X8L8V8U8:
+	    case D3DFMT_A2B10G10R10:
+	    case D3DFMT_V16U16:
+	    case D3DFMT_G16R16:
+	    case D3DFMT_D24X4S4:
+	    case D3DFMT_D32:
+	    case D3DFMT_D24X8:
+	    case D3DFMT_D24S8:
+		    return 32;
+
+	    case D3DFMT_R8G8B8:
+		    return 24;
+
+	    case D3DFMT_X1R5G5B5:
+	    case D3DFMT_R5G6B5:
+	    case D3DFMT_A1R5G5B5:
+	    case D3DFMT_D16:
+	    case D3DFMT_A8L8:
+	    case D3DFMT_V8U8:
+	    case D3DFMT_L6V5U5:
+	    case D3DFMT_D16_LOCKABLE:
+	    case D3DFMT_D15S1:
+	    case D3DFMT_A8P8:
+	    case D3DFMT_A8R3G3B2:	
+	    case D3DFMT_X4R4G4B4:
+	    case D3DFMT_A4R4G4B4:
+		    return 16;
+
+	    case D3DFMT_R3G3B2:
+	    case D3DFMT_A4L4:
+	    case D3DFMT_P8:	
+	    case D3DFMT_A8:
+	    case D3DFMT_L8:	
+	    case D3DFMT_DXT2:
+	    case D3DFMT_DXT3:
+	    case D3DFMT_DXT4:
+	    case D3DFMT_DXT5:
+		    return 8;
+
+	    case D3DFMT_DXT1:
+		    return 4;
+
+	    default:
+		    return 32;  // unknown - guess at 32
+	}
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::CalcD3DResourceMemoryKBUsage
+//
+// Calculate how much video memory a D3D resource will take
+//
+////////////////////////////////////////////////////////////////
+int CRenderItemManager::CalcD3DResourceMemoryKBUsage ( IDirect3DResource9* pD3DResource )
+{
+    D3DRESOURCETYPE type = pD3DResource->GetType ();
+
+    if ( type == D3DRTYPE_SURFACE )
+        return CalcD3DSurfaceMemoryKBUsage ( (IDirect3DSurface9*)pD3DResource );
+
+    if ( type == D3DRTYPE_TEXTURE )
+        return CalcD3DTextureMemoryKBUsage ( (IDirect3DTexture9*)pD3DResource );
+
+    if ( type == D3DRTYPE_VOLUMETEXTURE )
+        return CalcD3DVolumeTextureMemoryKBUsage ( (IDirect3DVolumeTexture9*)pD3DResource );
+
+    if ( type == D3DRTYPE_CUBETEXTURE )
+        return CalcD3DCubeTextureMemoryKBUsage ( (IDirect3DCubeTexture9*)pD3DResource );
+
+    return 0;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::CalcD3DSurfaceMemoryKBUsage
+//
+//
+//
+////////////////////////////////////////////////////////////////
+int CRenderItemManager::CalcD3DSurfaceMemoryKBUsage ( IDirect3DSurface9* pD3DSurface )
+{
+    D3DSURFACE_DESC surfaceDesc;
+    pD3DSurface->GetDesc ( &surfaceDesc );
+
+    int iBitsPerPixel = GetBitsPerPixel ( surfaceDesc.Format );
+    int iMemoryUsed = surfaceDesc.Width * surfaceDesc.Height / 8 * iBitsPerPixel;
+
+    return iMemoryUsed / 1024;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::CalcD3DTextureMemoryKBUsage
+//
+//
+//
+////////////////////////////////////////////////////////////////
+int CRenderItemManager::CalcD3DTextureMemoryKBUsage ( IDirect3DTexture9* pD3DTexture )
+{
+    int iMemoryUsed = 0;
+
+    // Calc memory usage
+    int iLevelCount = pD3DTexture->GetLevelCount ();
+    for ( int i = 0 ; i < iLevelCount ; i++ )
+    {
+        D3DSURFACE_DESC surfaceDesc;
+        pD3DTexture->GetLevelDesc ( i, &surfaceDesc );
+
+        int iBitsPerPixel = GetBitsPerPixel ( surfaceDesc.Format );
+        iMemoryUsed += surfaceDesc.Width * surfaceDesc.Height / 8 * iBitsPerPixel;
+    }
+
+    return iMemoryUsed / 1024;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::CalcD3DVolumeTextureMemoryKBUsage
+//
+//
+//
+////////////////////////////////////////////////////////////////
+int CRenderItemManager::CalcD3DVolumeTextureMemoryKBUsage ( IDirect3DVolumeTexture9* pD3DVolumeTexture )
+{
+    int iMemoryUsed = 0;
+
+    // Calc memory usage
+    int iLevelCount = pD3DVolumeTexture->GetLevelCount ();
+    for ( int i = 0 ; i < iLevelCount ; i++ )
+    {
+        D3DVOLUME_DESC volumeDesc;
+        pD3DVolumeTexture->GetLevelDesc ( i, &volumeDesc );
+
+        int iBitsPerPixel = GetBitsPerPixel ( volumeDesc.Format );
+        iMemoryUsed += volumeDesc.Width * volumeDesc.Height * volumeDesc.Depth / 8 * iBitsPerPixel;
+    }
+
+    return iMemoryUsed / 1024;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::CalcD3DCubeTextureMemoryKBUsage
+//
+//
+//
+////////////////////////////////////////////////////////////////
+int CRenderItemManager::CalcD3DCubeTextureMemoryKBUsage ( IDirect3DCubeTexture9* pD3DCubeTexture )
+{
+    int iMemoryUsed = 0;
+
+    // Calc memory usage
+    int iLevelCount = pD3DCubeTexture->GetLevelCount ();
+    for ( int i = 0 ; i < iLevelCount ; i++ )
+    {
+        D3DSURFACE_DESC surfaceDesc;
+        pD3DCubeTexture->GetLevelDesc ( i, &surfaceDesc );
+
+        int iBitsPerPixel = GetBitsPerPixel ( surfaceDesc.Format );
+        iMemoryUsed += surfaceDesc.Width * surfaceDesc.Height / 8 * iBitsPerPixel;
+    }
+
+    return iMemoryUsed * 6 / 1024;
 }

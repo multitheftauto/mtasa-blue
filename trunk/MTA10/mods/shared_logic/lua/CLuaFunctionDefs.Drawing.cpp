@@ -758,3 +758,102 @@ int CLuaFunctionDefs::dxCreateFont ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::dxSetTestMode ( lua_State* luaVM )
+{
+//  bool dxSetTestMode( string testMode )
+    eDxTestMode testMode;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( testMode, DX_TEST_MODE_NONE );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pCore->GetGraphics ()->GetRenderItemManager ()->SetTestMode ( testMode );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxTestMode", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxGetStatus ( lua_State* luaVM )
+{
+//  table dxGetStatus()
+
+    CScriptArgReader argStream ( luaVM );
+
+    if ( !argStream.HasErrors () )
+    {
+        SDxStatus dxStatus;
+        g_pCore->GetGraphics ()->GetRenderItemManager ()->GetDxStatus ( dxStatus );
+
+        lua_createtable ( luaVM, 0, 13 );
+
+        lua_pushstring ( luaVM, "TestMode" );
+        lua_pushstring ( luaVM, EnumToString ( dxStatus.testMode ) );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "VideoCardName" );
+        lua_pushstring ( luaVM, dxStatus.videoCard.strName );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "VideoCardRAM" );
+        lua_pushnumber ( luaVM, dxStatus.videoCard.iInstalledMemoryKB / 1024 );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "VideoCardPSVersion" );
+        lua_pushstring ( luaVM, dxStatus.videoCard.strPSVersion );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "VideoMemoryAvailibleForMTA" );
+        lua_pushnumber ( luaVM, dxStatus.videoMemoryKB.iFreeForMTA / 1024 );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "VideoMemoryUsedByFonts" );
+        lua_pushnumber ( luaVM, dxStatus.videoMemoryKB.iUsedByFonts / 1024 );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "VideoMemoryUsedByTextures" );
+        lua_pushnumber ( luaVM, dxStatus.videoMemoryKB.iUsedByTextures / 1024 );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "VideoMemoryUsedByRenderTargets" );
+        lua_pushnumber ( luaVM, dxStatus.videoMemoryKB.iUsedByRenderTargets / 1024 );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "SettingWindowed" );
+        lua_pushboolean ( luaVM, dxStatus.settings.bWindowed );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "SettingFXQuality" );
+        lua_pushnumber ( luaVM, dxStatus.settings.iFXQuality );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "SettingDrawDistance" );
+        lua_pushnumber ( luaVM, dxStatus.settings.iDrawDistance );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "SettingVolumetricShadows" );
+        lua_pushboolean ( luaVM, dxStatus.settings.bVolumetricShadows );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "SettingStreamingVideoMemoryForGTA" );
+        lua_pushnumber ( luaVM, dxStatus.settings.iStreamingMemory );
+        lua_settable   ( luaVM, -3 );
+
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxGetStatus", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

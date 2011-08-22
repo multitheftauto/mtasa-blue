@@ -99,6 +99,18 @@ void CDxFontItem::CreateUnderlyingData ( uint uiSize, bool bBold )
     FONT_PROPERTIES sFontProps;
     if ( GetFontProperties ( LPCTSTR ( m_strFullFilePath.c_str () ), &sFontProps ) )
         CCore::GetSingleton ().GetGraphics()->LoadAdditionalDXFont ( m_strFullFilePath, sFontProps.csName, static_cast < int > ( std::floor ( uiSize * 1.75f ) ), bBold, &m_pFntNormal );
+
+    if ( !m_pFntNormal )
+        return;
+
+    // Memory usage - complete guess
+    int iCharHeight = CCore::GetSingleton ().GetGraphics ()->GetDXFontHeight ( 1, m_pFntNormal );
+    int iCharWidth = CCore::GetSingleton ().GetGraphics ()->GetDXTextExtent ( "A", 1, m_pFntNormal );
+    int iNumChars = 256;
+    int iBodgeFactor = 1;
+    int iBPP = 32;
+    int iMemoryUsed = iCharHeight * iCharWidth * iBPP / 8 * iNumChars * iBodgeFactor;
+    m_iMemoryKBUsed = iMemoryUsed / 1024;
 }
 
 

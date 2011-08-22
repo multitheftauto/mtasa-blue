@@ -42,6 +42,9 @@ public:
     virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, float fOrderPriority );
     virtual bool                RemoveShaderItemFromWorldTexture    ( CShaderItem* pShaderItem, const SString& strTextureNameMatch );
     virtual void                GetVisibleTextureNames              ( std::vector < SString >& outNameList, const SString& strTextureNameMatch, ushort usModelID );
+    virtual eDxTestMode         GetTestMode                         ( void )                    { return m_TestMode; }
+    virtual void                SetTestMode                         ( eDxTestMode testMode );
+    virtual void                GetDxStatus                         ( SDxStatus& outStatus );
 
     // CRenderItemManager
     void                        NotifyContructRenderItem            ( CRenderItem* pItem );
@@ -54,6 +57,15 @@ public:
     void                        RemoveShaderItemFromWatchLists      ( CShaderItem* pShaderItem );
     void                        WatchCallback                       ( CSHADERDUMMY* pShaderItem, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld );
     static void                 StaticWatchCallback                 ( CSHADERDUMMY* pShaderItem, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld );
+    void                        UpdateMemoryUsage                   ( void );
+    bool                        CanCreateRenderItem                 ( ClassId classId );
+
+    static int                  GetBitsPerPixel                     ( D3DFORMAT Format );
+    static int                  CalcD3DResourceMemoryKBUsage        ( IDirect3DResource9* pD3DResource );
+    static int                  CalcD3DSurfaceMemoryKBUsage         ( IDirect3DSurface9* pD3DSurface );
+    static int                  CalcD3DTextureMemoryKBUsage         ( IDirect3DTexture9* pD3DTexture );
+    static int                  CalcD3DVolumeTextureMemoryKBUsage   ( IDirect3DVolumeTexture9* pD3DVolumeTexture );
+    static int                  CalcD3DCubeTextureMemoryKBUsage     ( IDirect3DCubeTexture9* pD3DCubeTexture );
 
     IDirect3DDevice9*                           m_pDevice;
 protected:
@@ -71,4 +83,14 @@ protected:
     // Shaders applied to world textures
     std::map < CD3DDUMMY*, CSHADERDUMMY* >      m_D3DDataShaderMap;
     class CRenderWare*                          m_pRenderWare;
+
+    eDxTestMode                                 m_TestMode;
+    SString                                     m_strVideoCardName;
+    int                                         m_iVideoCardMemoryKBTotal;
+    int                                         m_iVideoCardMemoryKBForMTATotal;
+    SString                                     m_strVideoCardPSVersion;
+    int                                         m_iTextureMemoryKBUsed;
+    int                                         m_iRenderTargetMemoryKBUsed;
+    int                                         m_iFontMemoryKBUsed;
+    int                                         m_iMemoryKBFreeForMTA;
 };

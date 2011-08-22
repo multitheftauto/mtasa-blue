@@ -501,6 +501,8 @@ public:
     LUA_DECLARE ( dxSetShaderValue );
     LUA_DECLARE ( dxSetRenderTarget );
     LUA_DECLARE ( dxUpdateScreenSource );
+    LUA_DECLARE ( dxGetStatus );
+    LUA_DECLARE ( dxSetTestMode );
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them

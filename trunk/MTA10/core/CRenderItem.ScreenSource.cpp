@@ -119,6 +119,8 @@ void CScreenSourceItem::CreateUnderlyingData ( void )
 
     // Clear incase it gets used before first copy
     m_pDevice->ColorFill( m_pD3DRenderTargetSurface, NULL, 0x00000000 );
+
+    m_iMemoryKBUsed = CRenderItemManager::CalcD3DResourceMemoryKBUsage ( m_pD3DRenderTargetSurface );
 }
 
 
