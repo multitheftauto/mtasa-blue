@@ -12,9 +12,11 @@
 
 namespace SharedUtil
 {
+    struct SQueryWMIResult : public std::vector < std::vector < SString > >
+    {
+    };
+
+    bool        QueryWMI                        ( SQueryWMIResult& outResult, const SString& strQuery, const SString& strKeys );
     SString     GetWMIOSVersion                 ( void );
-    long long   GetWMIVideoAdapterMemorySize    ( void );
-    SString     GetWMIVideoAdapterName          ( void );
-    uint        GetMinStreamingMemory           ( void );
-    uint        GetMaxStreamingMemory           ( void );
+    long long   GetWMIVideoAdapterMemorySize    ( const SString& strDisplay );
 }

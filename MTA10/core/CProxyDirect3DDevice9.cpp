@@ -30,12 +30,40 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
     // Get CDirect3DData pointer.
     m_pData = CDirect3DData::GetSingletonPtr ( );
 
-    // Call event handler
-    CDirect3DEvents9::OnDirect3DDeviceCreate ( pDevice );
-
     m_bCaptureState = true;
     g_pDeviceState = &DeviceState;
     pDevice->GetDeviceCaps ( &g_pDeviceState->DeviceCaps );
+
+    //
+    // Get video card installed memory
+    //
+    D3DDEVICE_CREATION_PARAMETERS creationParameters;
+    m_pDevice->GetCreationParameters ( &creationParameters );
+    int iAdapter = creationParameters.AdapterOrdinal;
+
+    IDirect3D9* pD3D9 = NULL;
+    m_pDevice->GetDirect3D ( &pD3D9 );
+
+    D3DADAPTER_IDENTIFIER9 adaptIdent;
+    ZeroMemory( &adaptIdent, sizeof( D3DADAPTER_IDENTIFIER9 ) );
+    pD3D9->GetAdapterIdentifier( iAdapter, 0, &adaptIdent );
+    SString strVideoCardName = adaptIdent.Description;
+
+    int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize ( adaptIdent.DeviceName ) / 1024;
+
+    // Just incase, fallback to using texture memory stats
+    if ( iVideoCardMemoryKBTotal < 16 )
+        iVideoCardMemoryKBTotal = m_pDevice->GetAvailableTextureMem () / 1024;
+
+    g_pDeviceState->AdapterState.InstalledMemoryKB = iVideoCardMemoryKBTotal;
+
+    //
+    // Get video card name
+    //
+    STRNCPY( g_pDeviceState->AdapterState.Name, adaptIdent.Description, sizeof ( g_pDeviceState->AdapterState.Name ) );
+
+    // Call event handler
+    CDirect3DEvents9::OnDirect3DDeviceCreate ( pDevice );
 }
 
 CProxyDirect3DDevice9::~CProxyDirect3DDevice9 ( )

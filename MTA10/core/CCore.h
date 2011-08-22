@@ -203,6 +203,9 @@ public:
     void                    ApplyFrameRateLimit             ( uint uiOverrideRate = -1 );
     void                    EnsureFrameRateLimitApplied     ( void );
 
+    uint                    GetMinStreamingMemory           ( void );
+    uint                    GetMaxStreamingMemory           ( void );
+
     SString                 GetConnectCommandFromURI        ( const char* szURI );  
     void                    GetConnectParametersFromURI     ( const char* szURI, std::string &strHost, unsigned short &usPort, std::string &strNick, std::string &strPassword );
     bool                    bScreenShot;

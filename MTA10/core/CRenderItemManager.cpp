@@ -53,10 +53,9 @@ void CRenderItemManager::OnDeviceCreate ( IDirect3DDevice9* pDevice, float fView
     m_pRenderWare->InitWorldTextureWatch ( StaticWatchCallback );
 
     // Get some stats
-    m_strVideoCardName = GetWMIVideoAdapterName ();
-    m_iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize () / 1024;
-    if ( m_iVideoCardMemoryKBTotal == 0 )
-        m_iVideoCardMemoryKBTotal = 64 * 1024;
+    m_strVideoCardName = g_pDeviceState->AdapterState.Name;
+    m_iVideoCardMemoryKBTotal = g_pDeviceState->AdapterState.InstalledMemoryKB;
+
     m_iVideoCardMemoryKBForMTATotal = ( m_iVideoCardMemoryKBTotal - ( 64 * 1024 ) ) * 4 / 5;
     m_iVideoCardMemoryKBForMTATotal = Max ( 0, m_iVideoCardMemoryKBForMTATotal );
 
