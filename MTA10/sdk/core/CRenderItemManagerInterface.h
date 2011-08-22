@@ -30,6 +30,45 @@ class CRenderItemManager;
 class CD3DDUMMY;
 class CSHADERDUMMY;
 
+
+enum eDxTestMode
+{
+    DX_TEST_MODE_NONE,
+    DX_TEST_MODE_NO_MEM,
+    DX_TEST_MODE_LOW_MEM,
+    DX_TEST_MODE_NO_SHADER,
+};
+
+struct SDxStatus
+{
+    eDxTestMode     testMode;
+
+    struct
+    {
+        SString         strName;
+        int             iInstalledMemoryKB;
+        SString         strPSVersion;
+    } videoCard;
+
+    struct
+    {
+        int             iFreeForMTA;
+        int             iUsedByFonts;
+        int             iUsedByTextures;
+        int             iUsedByRenderTargets;
+    } videoMemoryKB;
+
+    struct
+    {
+        bool            bWindowed;
+        int             iFXQuality;
+        int             iDrawDistance;
+        bool            bVolumetricShadows;
+        int             iStreamingMemory;
+    } settings;
+};
+
+
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 //
@@ -62,6 +101,9 @@ public:
     virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, float fOrderPriority ) = 0;
     virtual bool                RemoveShaderItemFromWorldTexture    ( CShaderItem* pShaderItem, const SString& strTextureNameMatch ) = 0;
     virtual void                GetVisibleTextureNames              ( std::vector < SString >& outNameList, const SString& strTextureNameMatch, ushort usModelID ) = 0;
+    virtual eDxTestMode         GetTestMode                         ( void ) = 0;
+    virtual void                SetTestMode                         ( eDxTestMode testMode ) = 0;
+    virtual void                GetDxStatus                         ( SDxStatus& outStatus ) = 0;
 };
 
 
@@ -122,10 +164,12 @@ class CRenderItem
     virtual bool    IsValid                 ( void ) = 0;
     virtual void    OnLostDevice            ( void ) = 0;
     virtual void    OnResetDevice           ( void ) = 0;
+    int             GetVideoMemoryKBUsed    ( void ) { return m_iMemoryKBUsed; }
 
     CRenderItemManager* m_pManager;
     IDirect3DDevice9*   m_pDevice;
     int                 m_iRefCount;
+    int                 m_iMemoryKBUsed;
 };
 
 

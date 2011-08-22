@@ -22,6 +22,7 @@ DECLARE_ENUM( TrafficLight::EState );
 DECLARE_ENUM( CEasingCurve::eType );
 DECLARE_ENUM( eAmbientSoundType )
 DECLARE_ENUM( eCGUIType );
+DECLARE_ENUM( eDxTestMode )
 
 enum eDXHorizontalAlign
 {

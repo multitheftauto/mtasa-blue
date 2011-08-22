@@ -23,7 +23,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include <core/VideoCard.h>
 #include <net/SyncStructures.h>
 
 using SharedUtil::CalcMTASAPath;
@@ -295,7 +294,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     // Give a default value for the streaming memory
     if ( g_pCore->GetCVars()->Exists ( "streaming_memory" ) == false )
-        g_pCore->GetCVars()->Set ( "streaming_memory", GetMaxStreamingMemory(g_pCore->GetGraphics()->GetDevice()) );
+        g_pCore->GetCVars()->Set ( "streaming_memory", GetMaxStreamingMemory () );
 }
 
 
@@ -755,13 +754,22 @@ void CClientGame::DoPulsePostFrame ( void )
             pGraphics->DrawText ( uiWidth - 5, uiPosY, 0x80ffffff, 1, "*" );
         }
 
+        // Draw notice text if dx test mode is enabled
+        if ( g_pCore->GetGraphics ()->GetRenderItemManager ()->GetTestMode () )
+        {
+            CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
+            unsigned int uiHeight = pGraphics->GetViewportHeight ();
+            unsigned int uiWidth = pGraphics->GetViewportWidth ();
+            unsigned int uiPosY = uiHeight - 30;
+            pGraphics->DrawText ( uiWidth - 155, uiPosY, 0x40ffffff, 1, "dx test mode enabled" );
+        }
 
         // Adjust the streaming memory limit.
         unsigned int uiStreamingMemory;
         g_pCore->GetCVars()->Get ( "streaming_memory", uiStreamingMemory );
-        uiStreamingMemory = SharedUtil::Clamp ( GetMinStreamingMemory(g_pCore->GetGraphics()->GetDevice()),
+        uiStreamingMemory = SharedUtil::Clamp ( GetMinStreamingMemory (),
                                                 uiStreamingMemory,
-                                                GetMaxStreamingMemory(g_pCore->GetGraphics()->GetDevice()) );
+                                                GetMaxStreamingMemory () );
         g_pCore->GetCVars()->Set ( "streaming_memory", uiStreamingMemory );
 
         int iStreamingMemoryBytes = static_cast<int>(uiStreamingMemory) * 1024 * 1024;

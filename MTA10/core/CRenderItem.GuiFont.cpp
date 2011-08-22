@@ -112,6 +112,15 @@ void CGuiFontItem::CreateUnderlyingData ( const SString& strFullFilePath, const 
 
     if ( !m_pFntCEGUI )
         return;
+
+    // Memory usage - complete guess
+    int iCharHeight = m_pFntCEGUI->GetFontHeight ( 1 );
+    int iCharWidth = m_pFntCEGUI->GetTextExtent ( "A", 1 );
+    int iNumChars = 256;
+    int iBodgeFactor = 4;
+    int iBPP = 32;
+    int iMemoryUsed = iCharHeight * iCharWidth * iBPP / 8 * iNumChars * iBodgeFactor;
+    m_iMemoryKBUsed = iMemoryUsed / 1024;
 }
 
 

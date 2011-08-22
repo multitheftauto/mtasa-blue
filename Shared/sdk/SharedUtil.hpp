@@ -21,3 +21,4 @@
 #include "SharedUtil.Game.hpp"
 #include "SharedUtil.Math.hpp"
 #include "SharedUtil.Hash.hpp"
+#include "SharedUtil.SysInfo.hpp"

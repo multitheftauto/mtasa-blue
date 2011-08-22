@@ -117,6 +117,9 @@ void CFileTextureItem::CreateUnderlyingData ( const SString& strFilename )
 
     m_uiSizeX = imageInfo.Width;
     m_uiSizeY = imageInfo.Height;
+
+    // Calc memory usage
+    m_iMemoryKBUsed = CRenderItemManager::CalcD3DResourceMemoryKBUsage ( m_pD3DTexture );
 }
 
 
