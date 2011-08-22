@@ -48,6 +48,9 @@ void CMessageLoopHook::ApplyHook ( HWND hFocusWindow )
 
         // Subclass the window procedure.
         m_HookedWindowProc = SubclassWindow ( hFocusWindow, ProcessMessage );
+
+        // Enable Unicode (UTF-16) characters in WM_CHAR messages
+        SetWindowLongW ( hFocusWindow, GWL_WNDPROC, GetWindowLong ( hFocusWindow, GWL_WNDPROC ) );
     }
 }
 
@@ -245,12 +248,12 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                 m_LastScanCode = (BYTE)((lParam >> 16) & 0x000F);
                 GetKeyboardState( m_LastKeyboardState );
             }
-
-            if ( uMsg == WM_CHAR )
+            // If it was a question mark character, we may have an unprocessed unicode character
+            if ( uMsg == WM_CHAR && wParam == 0x3F )
             {
                 wchar_t* wcsUnicode = new wchar_t[1];
                 ToUnicodeEx ( m_LastVirtualKeyCode, m_LastScanCode, m_LastKeyboardState, wcsUnicode, 1, 0, GetKeyboardLayout(0) );
-                wParam = wcsUnicode[0] ? (WPARAM)wcsUnicode[0] : wParam;
+                wParam = (WPARAM)wcsUnicode[0];
                 delete wcsUnicode;
             }
 
@@ -319,13 +322,13 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 
 
                 // Call GTA's window procedure.
-                return CallWindowProc ( pThis->m_HookedWindowProc, hwnd, uMsg, wParam, lParam );
+                return CallWindowProcW ( pThis->m_HookedWindowProc, hwnd, uMsg, wParam, lParam );
             }
         }
     }
 
     // Tell windows to handle this message.
-    return DefWindowProc ( hwnd, uMsg, wParam, lParam );
+    return DefWindowProcW ( hwnd, uMsg, wParam, lParam );
 }
 
 
