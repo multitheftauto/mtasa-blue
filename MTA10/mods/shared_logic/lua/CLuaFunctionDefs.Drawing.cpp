@@ -812,7 +812,7 @@ int CLuaFunctionDefs::dxGetStatus ( lua_State* luaVM )
         lua_pushstring ( luaVM, dxStatus.videoCard.strPSVersion );
         lua_settable   ( luaVM, -3 );
 
-        lua_pushstring ( luaVM, "VideoMemoryAvailibleForMTA" );
+        lua_pushstring ( luaVM, "VideoMemoryFreeForMTA" );
         lua_pushnumber ( luaVM, dxStatus.videoMemoryKB.iFreeForMTA / 1024 );
         lua_settable   ( luaVM, -3 );
 
