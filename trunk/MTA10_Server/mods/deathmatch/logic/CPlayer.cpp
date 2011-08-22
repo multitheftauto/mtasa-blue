@@ -689,7 +689,8 @@ void CPlayer::UpdateOthersNearList ( void )
 void CPlayer::SetVoiceBroadcastTo( CElement* pElement )
 {
     m_lstBroadcastList.clear();
-    m_lstBroadcastList.push_back ( pElement );
+    if ( pElement )
+        m_lstBroadcastList.push_back ( pElement );
 }
 
 void CPlayer::SetVoiceBroadcastTo( const std::list < CElement* >& lstElements )
@@ -700,7 +701,8 @@ void CPlayer::SetVoiceBroadcastTo( const std::list < CElement* >& lstElements )
 void CPlayer::SetVoiceIgnoredElement( CElement* pElement )
 {
     m_lstIgnoredList.clear();
-    m_lstIgnoredList.push_back ( pElement );
+    if ( pElement )
+        m_lstIgnoredList.push_back ( pElement );
 }
 
 void CPlayer::SetVoiceIgnoredList( const std::list < CElement* >& lstElements )

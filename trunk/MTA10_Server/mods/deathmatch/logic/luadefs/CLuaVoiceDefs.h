@@ -22,6 +22,7 @@ public:
     static void     LoadFunctions                       ( void );
     static int      IsVoiceEnabled                      ( lua_State* luaVM );
     static int      SetPlayerVoiceBroadcastTo           ( lua_State* luaVM );
+    static int      setPlayerVoiceIgnoreFrom            ( lua_State* luaVM );
 };
 
 #endif
