@@ -4063,7 +4063,6 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateLabel ( CLuaMain& LuaMai
     CGUIElement *pElement = m_pGUI->CreateLabel ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
     pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
     pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
-    pElement->SetProperty ( "RiseOnClick", "False" );
 
     // register to the gui manager
     CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
