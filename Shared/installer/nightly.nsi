@@ -47,6 +47,7 @@ Var RedistInstalled
 
 ;ReserveFile "${NSISDIR}\Plugins\InstallOptions.dll"
 
+!define MAJOR_MINOR_VER "1.1"
 
 !ifdef CLIENT_SETUP
 	!define PRODUCT_NAME "MTA:SA 1.1"
@@ -81,8 +82,9 @@ Var RedistInstalled
 
 ; Welcome page
 !define MUI_WELCOMEPAGE_TITLE_3LINES
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of $(^Name)\n\n It is recommended that you close all other applications before starting Setup. This will make it possible to update relevant system files without having to reboot your computer.\n\n[Admin access will be requested for Vista and up]\n\nClick Next to continue."
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation or update of $(^Name)\n\n\It is recommended that you close all other applications before starting Setup.\n\n[Admin access will be requested for Vista and up]\n\nClick Next to continue."
 !define MUI_PAGE_CUSTOMFUNCTION_PRE "WelcomePreProc"
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW "WelcomeShowProc"
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE "WelcomeLeaveProc"
 !insertmacro MUI_PAGE_WELCOME
 
@@ -91,11 +93,12 @@ Var RedistInstalled
 !insertmacro MUI_PAGE_LICENSE					"eula.txt"
 
 ; Components page
-!define MUI_PAGE_CUSTOMFUNCTION_SHOW "ComponetsShowProc"
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW "ComponentsShowProc"
 !insertmacro MUI_PAGE_COMPONENTS
 
 ; Game directory page
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW "DirectoryShowProc"
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE "DirectoryLeaveProc"
 !define MUI_DIRECTORYPAGE_VARIABLE				$INSTDIR
 !insertmacro MUI_PAGE_DIRECTORY
 
@@ -291,6 +294,8 @@ Function .onInstSuccess
 			CreateShortCut "$DESKTOP\MTA San Andreas 1.1.lnk" "$INSTDIR\Multi Theft Auto.exe" \
 				"" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
 				"" "Play Multi Theft Auto: San Andreas 1.1"
+			AccessControl::GrantOnFile "$DESKTOP\MTA San Andreas 1.1.lnk" "(BU)" "FullAccess"
+
 			skip4:
 		!endif
 	${EndIf}
@@ -333,6 +338,18 @@ ShowUnInstDetails show
 			Abort
 DontInstallRedist:
 			SetShellVarContext all
+
+			#############################################################
+			# Show that upgrade is catered for
+            Push $INSTDIR 
+            Call GetInstallType
+            Pop $0
+            Pop $1
+            ${If} $0 == "upgrade"
+                DetailPrint "Performing in-place upgrade..."
+                Sleep 1000
+            ${EndIf}
+			#############################################################
 
 			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path" $GTA_DIR
 			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\1.1" "Last Install Location" $INSTDIR
@@ -1323,6 +1340,10 @@ Function "WelcomePreProc"
 	${EndIf}
 FunctionEnd
 
+Function "WelcomeShowProc"
+    BringToFront
+FunctionEnd
+
 Function "WelcomeLeaveProc"
 	HideWindow
 	; Maybe switch to admin after welcome window
@@ -1340,10 +1361,11 @@ Function "LicenseShowProc"
 		Call ResizeMainWindow
 	${Endif}
 	Call HideBackButton
+    BringToFront
 FunctionEnd
 
 
-Function "ComponetsShowProc"
+Function "ComponentsShowProc"
 	${If} $COMPONENTS_EXPAND_STATUS != 1
 		StrCpy $COMPONENTS_EXPAND_STATUS 1
 		IntOp $RESIZE_X 0 + ${EXPAND_DIALOG_X}
@@ -1364,3 +1386,78 @@ Function "DirectoryShowProc"
 		Call ResizeMainWindow
 	${Endif}
 FunctionEnd
+
+
+
+;****************************************************************
+;
+; Determine if install/upgrade  this version/previous version
+;
+;****************************************************************
+
+; In <stack> = install path
+; Out <stack> = "new" - New install
+;          "upgrade" - In place copy with same Major.Minor
+;          "overwrite" - In place copy different Major.Minor
+;     <stack> = "Maj.Min"
+Function GetInstallType
+    Pop $0
+    Call GetVersionAtLocation
+    StrCpy $1 $0 3  # First 3 chars
+
+    ${If} $1 == "0.0"
+        StrCpy $2 "new"
+    ${ElseIf} $1 == ${MAJOR_MINOR_VER}
+        StrCpy $2 "upgrade"
+    ${Else}
+        StrCpy $2 "overwrite"
+    ${EndIf}
+    Push $1
+    Push $2
+FunctionEnd
+
+
+; In $0 = install path
+; Out $0 = "1.1.0.3306"
+;          "0.0.0.0" if no file
+Function GetVersionAtLocation
+	; Check installed version at this location
+	StrCpy $5 "$0\MTA\core.dll"
+
+	ClearErrors
+	GetDLLVersion $5 $R0 $R1
+	IfErrors 0 cont
+        IntOp $R0 0 + 0x00000000
+        IntOp $R1 0 + 0x00000000
+        IfFileExists $5 cont
+            IntOp $R0 0 + 0x00000000
+            IntOp $R1 0 + 0x00000000
+    cont:
+	IntOp $R2 $R0 >> 16
+	IntOp $R2 $R2 & 0x0000FFFF ; $R2 now contains major version
+	IntOp $R3 $R0 & 0x0000FFFF ; $R3 now contains minor version
+	IntOp $R4 $R1 >> 16
+	IntOp $R4 $R4 & 0x0000FFFF ; $R4 now contains release
+	IntOp $R5 $R1 & 0x0000FFFF ; $R5 now contains build
+	StrCpy $0 "$R2.$R3.$R4.$R5" ; $0 now contains string like "1.2.0.192"
+FunctionEnd
+
+
+Function "DirectoryLeaveProc"
+	Push $INSTDIR 
+	Call GetInstallType
+	Pop $0
+	Pop $1
+
+	${If} $0 == "overwrite"
+        MessageBox MB_YESNO|MB_ICONQUESTION|MB_TOPMOST|MB_SETFOREGROUND \
+            "A different major version of MTA ($1) already exists at that path.$\n$\n\
+            MTA is designed for different major versions to be installed in different paths. \
+            Are you sure you want to overwrite MTA $1 at \
+            $INSTDIR ?" \
+            IDYES cont
+            Abort
+        cont:
+	${Endif}
+FunctionEnd
+
