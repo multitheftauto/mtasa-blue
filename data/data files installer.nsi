@@ -1,3 +1,5 @@
+!addincludedir "NSIS dirs\Include"
+!addplugindir "NSIS dirs\Plugins"
 !include nsDialogs.nsh
 !include LogicLib.nsh
 !include Sections.nsh
@@ -18,7 +20,7 @@ Var Install_Dir
 ; Don't forget to update the BUILD_NUMBER
 ; ###########################################################################################################
 !define FILES_ROOT "."
-!define BUILD_NUMBER "2883"
+!define BUILD_NUMBER "3046"
 !define PRODUCT_VERSION "Data-r${BUILD_NUMBER}"
 !define INSTALL_OUTPUT "mtasa-1.1-data-r${BUILD_NUMBER}.exe"
 ; ###########################################################################################################
@@ -70,20 +72,22 @@ FunctionEnd
 Function .onInit
 	Call DoRightsElevation
 
-	ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location" ; start of fix for #3743
-	${If} $Install_Dir == '' 
-		strcpy $INSTDIR "$PROGRAMFILES\MTA San Andreas 1.1"
-	${Else} 
-		strcpy $INSTDIR $Install_Dir
-	${EndIf} ; end of fix for #3743
-
+	; Try to find previously saved MTA:SA install path
+	ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\1.1" "Last Install Location"
+	${If} $Install_Dir == "" 
+		ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location"
+	${EndIf}
+	${If} $Install_Dir == "" 
+		strcpy $Install_Dir "$PROGRAMFILES\MTA San Andreas 1.1"
+	${EndIf}
+	strcpy $INSTDIR $Install_Dir
 	
 	InitPluginsDir
 	;File /oname=$PLUGINSDIR\serialdialog.ini "serialdialog.ini"
 FunctionEnd
 
 Function .onInstSuccess
-	WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location" $INSTDIR
+	WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\1.1" "Last Install Location" $INSTDIR
 
 	;UAC::Unload ;Must call unload!
 FunctionEnd
@@ -97,13 +101,13 @@ InstType /NOCUSTOM
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 OutFile "${INSTALL_OUTPUT}"
 
-InstallDirRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location"
+InstallDirRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\1.1" "Last Install Location"
 ShowInstDetails show
 
 Section "Data files" SEC01
 	SectionIn 1 RO ; section is required
 
-	WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location" $INSTDIR
+	WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\1.1" "Last Install Location" $INSTDIR
 
 	SetOverwrite on
 
@@ -118,12 +122,6 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\bass_ac3.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
-	;File "${FILES_ROOT}\MTA San Andreas\mta\matroska.ax"
-	;File "${FILES_ROOT}\MTA San Andreas\mta\mkunicode.dll"
-	;File "${FILES_ROOT}\MTA San Andreas\mta\mkzlib.dll"
-	;File "${FILES_ROOT}\MTA San Andreas\mta\vorbis.ax"
-	;File "${FILES_ROOT}\MTA San Andreas\mta\xv.ax"
-	;File "${FILES_ROOT}\MTA San Andreas\mta\xvidcore.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 
 	SetOutPath "$INSTDIR\skins\Classic"
@@ -165,15 +163,6 @@ Section "Data files" SEC01
 	SetOutPath "$INSTDIR\MTA\cgui\images\serverbrowser"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\serverbrowser\*.png"
 
-	;SetOutPath "$INSTDIR\MTA\data"
-	;File "${FILES_ROOT}\MTA San Andreas\mta\data\*.png"
-	;;File "${FILES_ROOT}\MTA San Andreas\mta\data\menu.mkv"
-	;File "${FILES_ROOT}\MTA San Andreas\mta\data\pixel.psh"
-	;File "${FILES_ROOT}\MTA San Andreas\mta\data\scene.x"
-	;File "${FILES_ROOT}\MTA San Andreas\mta\data\vertex.vsh"
-
-	;SetOutPath "$INSTDIR\MTA\data\textures"
-	;File "${FILES_ROOT}\MTA San Andreas\mta\data\textures\*.png"
 
 SectionEnd
 
