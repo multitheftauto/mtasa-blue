@@ -3699,22 +3699,29 @@ void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
                 pMovedEntity = NULL;
         }
     }
-
-    eExplosionType Type = static_cast < eExplosionType > ( explosionType.data.uiType );
-    
-    CLuaArguments Arguments;
-    Arguments.PushNumber ( position.data.vecPosition.fX );
-    Arguments.PushNumber ( position.data.vecPosition.fY );
-    Arguments.PushNumber ( position.data.vecPosition.fZ );
-    Arguments.PushNumber ( Type );
     bool bCancelExplosion = false;
-    if ( pCreator )
+    // Make sure the player isn't the same as the local player due to client/server desync of the dimension property
+    if ( pCreator != g_pClientGame->m_pPlayerManager->GetLocalPlayer () )
+        // Cancel if the dimensions don't match.
+        bCancelExplosion = pCreator->GetDimension() != g_pClientGame->m_pPlayerManager->GetLocalPlayer ()->GetDimension();
+    
+    eExplosionType Type = static_cast < eExplosionType > ( explosionType.data.uiType );
+    // Hop the event if we have already cancelled earlier.
+    if ( bCancelExplosion == false )
     {
-        bCancelExplosion = !pCreator->CallEvent ( "onClientExplosion", Arguments, true );
-    }
-    else
-    {
-        bCancelExplosion = !g_pClientGame->GetRootEntity ()->CallEvent ( "onClientExplosion", Arguments, false );
+        CLuaArguments Arguments;
+        Arguments.PushNumber ( position.data.vecPosition.fX );
+        Arguments.PushNumber ( position.data.vecPosition.fY );
+        Arguments.PushNumber ( position.data.vecPosition.fZ );
+        Arguments.PushNumber ( Type );
+        if ( pCreator )
+        {
+            bCancelExplosion = !pCreator->CallEvent ( "onClientExplosion", Arguments, true );
+        }
+        else
+        {
+            bCancelExplosion = !g_pClientGame->GetRootEntity ()->CallEvent ( "onClientExplosion", Arguments, false );
+        }
     }
 
     // Is it a vehicle explosion?
