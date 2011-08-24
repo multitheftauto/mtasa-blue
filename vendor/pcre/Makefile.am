@@ -60,7 +60,7 @@ if WITH_PCRE_CPP
 endif
 
 # The Libtool libraries to install.  We'll add to this later.
-lib_LTLIBRARIES =
+noinst_LTLIBRARIES =
 
 # Unit tests you want to run when people type 'make check'.
 # TESTS is for binary unit tests, check_SCRIPTS for script-based tests
@@ -160,7 +160,7 @@ endif # WITH_REBUILD_CHARTABLES
 
 
 ## The main pcre library
-lib_LTLIBRARIES += libpcre.la
+noinst_LTLIBRARIES += libpcre.la
 libpcre_la_SOURCES = \
   pcre_compile.c \
   pcre_config.c \
@@ -198,7 +198,7 @@ libpcre_la_LDFLAGS = $(EXTRA_LIBPCRE_LDFLAGS)
 CLEANFILES += pcre_chartables.c
 
 ## A version of the main pcre library that has a posix re API.
-lib_LTLIBRARIES += libpcreposix.la
+noinst_LTLIBRARIES += libpcreposix.la
 libpcreposix_la_SOURCES = \
   pcreposix.c
 libpcreposix_la_LDFLAGS = $(EXTRA_LIBPCREPOSIX_LDFLAGS)
@@ -207,7 +207,7 @@ libpcreposix_la_LIBADD = libpcre.la
 ## There's a C++ library as well.
 if WITH_PCRE_CPP
 
-lib_LTLIBRARIES += libpcrecpp.la
+noinst_LTLIBRARIES += libpcrecpp.la
 libpcrecpp_la_SOURCES = \
   pcrecpp_internal.h \
   pcrecpp.cc \
