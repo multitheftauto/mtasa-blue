@@ -1029,6 +1029,7 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 	}
 	*/
     #define BLANK_LINE_COMMENT_MAGIC "##BLANK-LINE##"
+    bool bUseBlankLineMagic = true;
 
 	char* buf = new char[ length+1 ];
 	buf[0] = 0;
@@ -1043,7 +1044,10 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 	const char* p = buf;
 
     bool bInComment = false;
+    bool bInTag = false;
     bool bEmptyLine = false;
+    int iNewLineCount = 0;
+    bool bOnlyWhiteSpaceChars = false;
 
 	buf[length] = 0;
 	while( *p ) {
@@ -1051,8 +1055,8 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 
  		if ( *p == 0xa || *p == 0xd )
         {
-           if ( bEmptyLine && !bInComment )
-                data.append( "<!--" BLANK_LINE_COMMENT_MAGIC "-->" );
+            if ( bEmptyLine && !bInTag && !bInComment && bUseBlankLineMagic )
+                iNewLineCount++;
             bEmptyLine = true;
         }
 
@@ -1094,8 +1098,34 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 		else {
             if ( strncmp ( p, "<!--", 4 ) == 0 )
                 bInComment = true;     // Entering comment
+            else
             if ( strncmp ( p, "-->", 3 ) == 0 )
                 bInComment = false;     // Leaving comment
+
+            if ( strncmp ( p, "<", 1 ) == 0 )
+            {
+                bInTag = true;     // Entering tag
+                // If preceeding text contains only white space, save the blank lines as comments
+                if ( bOnlyWhiteSpaceChars )
+                {
+                    for ( int i = 0 ; i < iNewLineCount ; i++ )
+                    {
+                        data.append( "<!--" BLANK_LINE_COMMENT_MAGIC "-->" );
+                    }
+                    bOnlyWhiteSpaceChars = false;
+                    iNewLineCount = 0;
+                }
+            }
+            else
+            if ( strncmp ( p, ">", 1 ) == 0 )
+            {
+                bInTag = false;     // Leaving tag
+                // Start of possible white space area containing blank lines
+                bOnlyWhiteSpaceChars = true;
+                iNewLineCount = 0;
+            }
+            else
+                bOnlyWhiteSpaceChars = false;
 
             bEmptyLine = false;
 			++p;
