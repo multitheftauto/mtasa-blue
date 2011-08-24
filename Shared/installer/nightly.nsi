@@ -375,8 +375,30 @@ DontInstallRedist:
 			# Make some keys in HKLM read write accessible by all users
 			AccessControl::GrantOnRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All" "(BU)" "FullAccess"
 
+			SetOutPath "$INSTDIR\MTA"
+			File "${FILES_ROOT}\MTA San Andreas\mta\cgui.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\core.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\xmll.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\game_sa.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\multiplayer_sa.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\netc.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\loader.dll"
 
             !ifndef LIGHTBUILD
+
+				File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_42.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\D3DCompiler_42.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\bass.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\basswma.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\bassmidi.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\bassflac.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\bass_aac.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\bass_ac3.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
+
                 SetOutPath "$INSTDIR\skins\Classic"
                 File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"
                 File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.lnf.xml"
@@ -388,41 +410,20 @@ DontInstallRedist:
                 File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.lnf.xml"
                 File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.png"
                 File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.xml"                
-            !endif
-            
-			File "${FILES_ROOT}\MTA San Andreas\mta\cgui.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\core.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\xmll.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\game_sa.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\multiplayer_sa.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\netc.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\loader.dll"
-
-			!ifndef LIGHTBUILD
-				File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_42.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\bass.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\basswma.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\bassmidi.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\bassflac.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\bass_aac.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\bass_ac3.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 
 				SetOutPath "$INSTDIR\MTA\cgui"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Falagard.xsd"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Font.xsd"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\GUIScheme.xsd"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Imageset.xsd"
+				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\pricedown.ttf"
+				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sabankgothic.ttf"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sagothic.ttf"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\saheader.ttf"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.dat"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.tga"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.ttf"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sabankgothic.ttf"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\pricedown.ttf"
+                File "${FILES_ROOT}\MTA San Andreas\mta\cgui\unifont-5.1.20080907.ttf"
 
 				SetOutPath "$INSTDIR\MTA\cgui\images"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\*.png"
@@ -433,6 +434,9 @@ DontInstallRedist:
 
 				SetOutPath "$INSTDIR\MTA\cgui\images\transferset"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\transferset\*.png"
+	
+                SetOutPath "$INSTDIR\MTA\cgui\images\serverbrowser"
+                File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\serverbrowser\*.png"
 
 			!endif
 
@@ -520,9 +524,19 @@ DontInstallRedist:
 	!ifndef LIGHTBUILD
 		Section "Core resources" SEC06
 		SectionIn 1 2 RO ; section is required
-			SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+			SetOutPath "$INSTDIR\server\mods\deathmatch\resources\"
+            File "${SERVER_FILES_ROOT}\mods\deathmatch\resources\Directory layout readme.txt"
+
+			SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[admin]"
 			SetOverwrite ifnewer
-			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\required\*.zip"
+			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[admin]\admin.zip"
+			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[admin]\runcode.zip"
+			SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gameplay]"
+			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gameplay]\*.zip"
+			SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[managers]"
+			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[managers]\*.zip"
+			SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[web]"
+			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[web]\*.zip"
 		SectionEnd
 	!endif
 
@@ -530,206 +544,75 @@ DontInstallRedist:
 		SectionGroup "Optional Resources" SEC07
 			Section "AMX Emulation package"
 			SectionIn 1 2
-				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[amx]"
 				SetOverwrite ifnewer
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\amx"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[amx]\amx"
 			SectionEnd
 			Section "Assault Gamemode"
 			SectionIn 1 2
-				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[assault]"
 				SetOverwrite ifnewer
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\assault.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\as-area51.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\as-cliff.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\as-dam.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\as-docks.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\as-heist.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\as-sharks.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\as-ship.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\as-supermarket.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[assault]\*.zip"
 			SectionEnd
 			Section "Briefcase Race Gamemode"
 			SectionIn 1 2
-				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[briefcaserace]"
 				SetOverwrite ifnewer
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\briefcaserace.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\briefcase.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\easytext.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\br-sf.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\br-sf-autoteams.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\br-sf-teams.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[briefcaserace]\*.zip"
 			SectionEnd
 			Section "Classic Deathmatch Gamemode"
 			SectionIn 1 2
-				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[cdm]"
 				SetOverwrite ifnewer
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\cdm.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\cdm-ls.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[cdm]\*.zip"
 			SectionEnd
 			Section "Capture the Flag Gamemode"
 			SectionIn 1 2
-				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[ctf]"
 				SetOverwrite ifnewer
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctf.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctf-bombsite.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctf-canals.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctf-csitaly.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctf-goldcove.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctf-hideout_z.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctf-hydrastrike.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctf-sewer.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctf-tbd.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[ctf]\*.zip"
 			SectionEnd
 			Section "Capture the Vehicle Gamemode"
 			SectionIn 1 2
-				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[ctv]"
 				SetOverwrite ifnewer
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctv.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctv-ls.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctv-smalltownrumble.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[ctv]\*.zip"
 			SectionEnd
 			Section "Deathmatch Gamemode"
 			SectionIn 1 2
-				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[deathmatch]"
 				SetOverwrite ifnewer
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\deathmatch.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\tdm.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\dm-canals.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\dm-arena1.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\dm-smallville.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\dm-port69.zip"
-			SectionEnd
-			Section "Element browser Utility"
-			SectionIn 1 2
-				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
-				SetOverwrite ifnewer
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\elementbrowser.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[deathmatch]\*.zip"
 			SectionEnd
 			Section "Fallout Gamemode"
 			SectionIn 1 2
-				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[fallout]"
 				SetOverwrite ifnewer
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\fallout.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[fallout]\*.zip"
 			SectionEnd
 			Section "Hay Gamemode"
 			SectionIn 1 2
-				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[hay]"
 				SetOverwrite ifnewer
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\hay.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[hay]\*.zip"
 			SectionEnd
 			Section "Race Gamemode"
 			SectionIn 1 2
-				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[race]"
 				SetOverwrite ifnewer
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-10laphotring.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-3lapdirtring.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-5lap8track.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-airportdogfight.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-airportspeedway.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-apacheassault.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-awalkinthepark.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-badlandsblastaround.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-bandito.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-bayareacircuit.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-bloodring.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-blowthedam.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-boatingblastaround.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-bobcatblastaround.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-break.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-chiliadclimb.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-chrmleasy.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-chrmlhard.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-degenerationofx.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-desertdogfight.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-destructionderby.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-dockbikes.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-docksideblastaround.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-drift.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-driftcity.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-dunebuggy.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-errand.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-farewellmylove.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-farm2city.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-findthecock.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-freeroam.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-highnoon.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-homeinthehills.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-hotroute.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-hydrarace.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-island.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-justanotherbikerace.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-longwayround.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-lsairport.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-lstrenches.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-lvsprint.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-midairmayhem.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-miniputt.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-monsterblastaround.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-mx_sky.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-offroadblastaround.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-predatorzone.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-quarryrun.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-rcairwar.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-rcwarz.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-runway69.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-rustlerrampage.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-sandking.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-santosdrive.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-seadragon.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-seahunter.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-searustler.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-sewers.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-sfbynight.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-smugglersrun.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-sparrowstorm.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-specialdelivery.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-speedforweed.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-squalorace.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-stunt.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-suburbanspeedway.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-superhydrarace.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-technicalitch.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-thepanopticon.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-vinewoodblastaround.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-wuzimu.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\mapratings.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race_delay_indicator.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race_nos.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race_racewar.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race_toptimes.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race_traffic_sensor.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race_voicepack.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[race]\*.zip"
 			SectionEnd
 			Section "Stealth Gamemode"
 			SectionIn 1 2
-				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[stealth]"
 				SetOverwrite ifnewer
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\stealth.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-carrier.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-chinatown.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-church.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-coookiepirates.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-dra-park.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-factory.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-junkyard.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-ritzy.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-sewers.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-shopping.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-terminal.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-thebunker.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[stealth]\*.zip"
 			SectionEnd
 			Section "Team Deathmatch Arena Gamemode"
 		SectionIn 1 2
-			SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+			SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[tdm]"
 			SetOverwrite ifnewer
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\tdma.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\tdma-damwars.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\tdma-gridlock.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\tdma-medieval.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\tdma-nomansland.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\tdma-tbd.zip"
-				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\tdma-vinewood.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[tdm]\*.zip"
 		SectionEnd
 		SectionGroupEnd
 	!endif
@@ -737,9 +620,9 @@ DontInstallRedist:
 	!ifdef INCLUDE_EDITOR
 		Section "Editor" SEC08
 			SectionIn 1 2
-			SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+			SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[editor]"
 			SetOverwrite ifnewer
-			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\editor\*.zip"
+            File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[editor]\*.zip"
 		SectionEnd
 	!endif
 
