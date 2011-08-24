@@ -108,7 +108,8 @@ MultiLineEditbox::MultiLineEditbox(const String& type, const String& name) :
 	addMultiLineEditboxProperties();
 
 	// we always need a terminating \n
-	d_text.append(1, '\n');
+	d_text_raw.append(1, '\n');
+    d_text = d_text_raw.bidify ();
 }
 
 
@@ -1217,8 +1218,10 @@ void MultiLineEditbox::handleNewLine(uint sysKeys)
 		// if there is room
 		if (d_text.length() - 1 < d_maxTextLen)
 		{
-			d_text.insert(getCaratIndex(), 1, 0x0a);
+			d_text_raw.insert(getCaratIndex(), 1, 0x0a);
+            d_text = d_text_raw.bidify ();
 			d_caratPos++;
+
 
 			WindowEventArgs args(this);
 			onTextChanged(args);
@@ -1323,7 +1326,9 @@ void MultiLineEditbox::onMouseTripleClicked(MouseEventArgs& e)
 		// erroneous situation and select up to end at end of text.
 		if (paraEnd == String::npos)
 		{
-			d_text.append(1, '\n');
+	        d_text_raw.append(1, '\n');
+            d_text = d_text_raw.bidify ();
+
 			paraEnd = d_text.length() - 1;
 		}
 
@@ -1512,7 +1517,10 @@ void MultiLineEditbox::onTextChanged(WindowEventArgs& e)
 {
     // ensure last character is a new line
     if ((d_text.length() == 0) || (d_text[d_text.length() - 1] != '\n'))
-        d_text.append(1, '\n');
+    {
+    	d_text_raw.append(1, '\n');
+        d_text = d_text_raw.bidify ();
+    }
 
     // clear selection
     clearSelection();
