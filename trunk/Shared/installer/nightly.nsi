@@ -82,7 +82,7 @@ Var RedistInstalled
 
 ; Welcome page
 !define MUI_WELCOMEPAGE_TITLE_3LINES
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation or update of $(^Name)\n\n\It is recommended that you close all other applications before starting Setup.\n\n[Admin access will be requested for Vista and up]\n\nClick Next to continue."
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation or update of $(^Name)\n\nIt is recommended that you close all other applications before starting Setup.\n\n[Admin access will be requested for Vista and up]\n\nClick Next to continue."
 !define MUI_PAGE_CUSTOMFUNCTION_PRE "WelcomePreProc"
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW "WelcomeShowProc"
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE "WelcomeLeaveProc"
