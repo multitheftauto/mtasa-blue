@@ -3701,7 +3701,7 @@ void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
     }
     bool bCancelExplosion = false;
     // Make sure the player isn't the same as the local player due to client/server desync of the dimension property
-    if ( pCreator != g_pClientGame->m_pPlayerManager->GetLocalPlayer () )
+    if ( pCreator && pCreator != g_pClientGame->m_pPlayerManager->GetLocalPlayer () )
         // Cancel if the dimensions don't match.
         bCancelExplosion = pCreator->GetDimension() != g_pClientGame->m_pPlayerManager->GetLocalPlayer ()->GetDimension();
     
