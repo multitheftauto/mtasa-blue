@@ -2833,7 +2833,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         //pEntry->SetMonetary ( handling.data.uiMonetary );
                         //pEntry->SetHeadLight ( (CHandlingEntry::eLightType)handling.data.ucHeadLight );
                         //pEntry->SetTailLight ( (CHandlingEntry::eLightType)handling.data.ucTailLight );
-                        pEntry->SetAnimGroup ( handling.data.ucAnimGroup );
+                        //pEntry->SetAnimGroup ( handling.data.ucAnimGroup );
                         pVehicle->ApplyHandling();
                     }
 
