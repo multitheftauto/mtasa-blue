@@ -169,32 +169,35 @@ CObjectSA::~CObjectSA( )
         DWORD dwInterface = (DWORD)this->GetInterface();
         if ( dwInterface )
         {       
-            CWorldSA * world = (CWorldSA *)pGame->GetWorld();
-            world->Remove(this->GetInterface());
-        
-            DWORD dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
-            _asm    
+            if ( (DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable )
             {
-                mov     ecx, dwInterface
-                push    1           //delete too
-                call    dwFunc
-            }
+                CWorldSA * world = (CWorldSA *)pGame->GetWorld();
+                world->Remove(this->GetInterface());
+            
+                DWORD dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
+                _asm    
+                {
+                    mov     ecx, dwInterface
+                    push    1           //delete too
+                    call    dwFunc
+                }
         
 #ifdef MTA_USE_BUILDINGS_AS_OBJECTS
-            DWORD dwModelID = this->internalInterface->m_nModelIndex;
-            // REMOVE ref to colstore thingy
-            dwFunc = 0x4107D0;
-            _asm
-            {
-                mov     eax, dwModelID
-                mov     eax, 0xA9B0C8[eax*4]
-                mov     eax, [eax+20]
-                movzx   eax, byte ptr [eax+40]
-                push    eax
-                call    dwFunc
-                add     esp, 4
-            }
+                DWORD dwModelID = this->internalInterface->m_nModelIndex;
+                // REMOVE ref to colstore thingy
+                dwFunc = 0x4107D0;
+                _asm
+                {
+                    mov     eax, dwModelID
+                    mov     eax, 0xA9B0C8[eax*4]
+                    mov     eax, [eax+20]
+                    movzx   eax, byte ptr [eax+40]
+                    push    eax
+                    call    dwFunc
+                    add     esp, 4
+                }
 #endif
+            }
         }
 
         this->BeingDeleted = true;
