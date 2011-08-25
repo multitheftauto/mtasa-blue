@@ -141,6 +141,7 @@ CPlayerPedSA::~CPlayerPedSA ( void )
         {
             CWorldSA * world = (CWorldSA *)pGame->GetWorld();
             world->Remove ( m_pInterface );
+            world->RemoveReferencesToDeletedObject ( m_pInterface );
         
             DWORD dwThis = (DWORD) m_pInterface;
             DWORD dwFunc = m_pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
