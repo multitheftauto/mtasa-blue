@@ -531,6 +531,8 @@ DontInstallRedist:
 			SetOverwrite ifnewer
 			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[admin]\admin.zip"
 			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[admin]\runcode.zip"
+			SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[play]"
+			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[play]\*.zip"
 			SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gameplay]"
 			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gameplay]\*.zip"
 			SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[managers]"
