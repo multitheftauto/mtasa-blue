@@ -67,7 +67,7 @@ void CHandlingRPCs::SetVehicleHandling ( CClientEntity* pSource, NetBitStreamInt
         //pEntry->SetMonetary ( handling.data.uiMonetary );
         //pEntry->SetHeadLight ( (CHandlingEntry::eLightType)handling.data.ucHeadLight );
         //pEntry->SetTailLight ( (CHandlingEntry::eLightType)handling.data.ucTailLight );
-        pEntry->SetAnimGroup ( handling.data.ucAnimGroup );
+        //pEntry->SetAnimGroup ( handling.data.ucAnimGroup );
         
         Vehicle.ApplyHandling();
     }
@@ -289,7 +289,7 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
 
                 case HANDLING_ANIMGROUP:
                     bitStream.Read ( ucChar );
-                    pHandlingEntry->SetAnimGroup ( ucChar );
+                    //pHandlingEntry->SetAnimGroup ( ucChar );
                     break;
             }
 
