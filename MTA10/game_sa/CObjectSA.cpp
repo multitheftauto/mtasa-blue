@@ -171,6 +171,7 @@ CObjectSA::~CObjectSA( )
         {       
             CWorldSA * world = (CWorldSA *)pGame->GetWorld();
             world->Remove(this->GetInterface());
+            world->RemoveReferencesToDeletedObject ( m_pInterface );
         
             DWORD dwThis = (DWORD)this->GetInterface();
             DWORD dwFunc = this->GetInterface()->vtbl->Remove;
