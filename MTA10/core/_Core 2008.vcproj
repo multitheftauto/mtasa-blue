@@ -82,7 +82,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="strmiids.lib libv2.lib zlibd_2008.lib libpng2008d.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9d.lib winmm.lib Imagehlp.lib ws2_32.lib gdi32.lib Userenv.lib"
 				ShowProgress="0"
-				OutputFile="C:\Program Files\MTA San Andreas 1.1\mta\core_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.2\mta\core_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib"
@@ -184,7 +184,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="strmiids.lib libv2.lib zlib_2008.lib libpng2008.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib"
-				OutputFile="C:\Program Files\MTA San Andreas 1.1\MTA\core.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.2\MTA\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib"
@@ -720,38 +720,6 @@
 					>
 				</File>
 			</Filter>
-			<Filter
-				Name="core"
-				>
-				<File
-					RelativePath="..\sdk\core\VideoCard.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Nightly|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -1141,10 +1109,6 @@
 					</File>
 					<File
 						RelativePath="..\sdk\core\CSetCursorPosHookInterface.h"
-						>
-					</File>
-					<File
-						RelativePath="..\sdk\core\VideoCard.h"
 						>
 					</File>
 				</Filter>
