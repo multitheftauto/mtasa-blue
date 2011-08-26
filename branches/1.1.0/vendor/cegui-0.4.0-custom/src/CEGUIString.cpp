@@ -141,6 +141,10 @@ utf8* String::build_utf8_buff(void) const
 //Get the bidirectional version of the string
 String String::bidify(void) const
 {
+#ifdef DETECT_ARRAY_ISSUES
+    doBidiTest ();
+#endif
+
     String tmp = *this;
     doBidi(tmp.ptr(), length(), true, true);
     return tmp;
