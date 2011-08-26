@@ -21,7 +21,8 @@ Var CreateSMShortcuts
 Var CreateDesktopIcon
 Var RedistInstalled
 
-!define GUID "{D4B44B22-8B64-4939-90E2-C0635D6CA80D}"
+; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\GDFImp.gdf.xml
+!define GUID "{D37BCD9D-382E-4270-83AB-94CD39F16E1D}"
 
 !define MAJOR_VER "1"
 !define MINOR_VER "2"
