@@ -74,7 +74,7 @@
 				LinkLibraryDependencies="false"
 				AdditionalDependencies="libv2.lib lua5.1d.lib libspeexd.lib bass.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib ws2_32.lib zlibd_2008.lib Iphlpapi.lib"
 				ShowProgress="0"
-				OutputFile="C:\Program Files\MTA San Andreas 1.1\mods\deathmatch\Client_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.2\mods\deathmatch\Client_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../vendor/libspeex;../../../vendor/bass/lib;../../../vendor/lua/lib;../../../vendor/libv2/lib;../../../vendor/zlib/lib"
@@ -166,7 +166,7 @@
 				LinkLibraryDependencies="false"
 				AdditionalOptions="/FIXED:NO"
 				AdditionalDependencies="libv2.lib lua5.1.lib libspeex.lib bass.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib wsock32.lib zlib_2008.lib"
-				OutputFile="C:\Program Files\MTA San Andreas 1.1\mods\deathmatch\Client.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.2\mods\deathmatch\Client.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../vendor/libspeex;../../../vendor/bass/lib;../../../vendor/lua/lib;../../../vendor/libv2/lib;../../../vendor/zlib/lib"
@@ -1254,38 +1254,6 @@
 				</Filter>
 			</Filter>
 			<Filter
-				Name="core"
-				>
-				<File
-					RelativePath="..\..\sdk\core\VideoCard.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Nightly|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-				</File>
-			</Filter>
-			<Filter
 				Name="utils"
 				>
 				<Filter
@@ -2050,14 +2018,6 @@
 						>
 					</File>
 				</Filter>
-			</Filter>
-			<Filter
-				Name="core"
-				>
-				<File
-					RelativePath="..\..\sdk\core\VideoCard.h"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="utils"
