@@ -23,6 +23,13 @@ Var RedistInstalled
 
 !define GUID "{D4B44B22-8B64-4939-90E2-C0635D6CA80D}"
 
+!define MAJOR_VER "1"
+!define MINOR_VER "2"
+!define MAINT_VER "0"
+!define 0.0 "${MAJOR_VER}.${MINOR_VER}"
+!define 0.0.0 "${MAJOR_VER}.${MINOR_VER}.${MAINT_VER}"
+
+
 ; ###########################################################################################################
 !ifndef FILES_ROOT
 	!define LIGHTBUILD    ; enable LIGHTBUILD for nightly
@@ -31,15 +38,15 @@ Var RedistInstalled
 	!define FILES_MODULE_SDK "Install files builder/output/development/publicsdk"
 	!define CLIENT_SETUP
 	!define INCLUDE_SERVER
-	!define INSTALL_OUTPUT "mtasa-1.1.0-unstable-00000-0-000-nsis.exe"
-	!define PRODUCT_VERSION "v1.1.0-unstable-00000-0-000"
+	!define INSTALL_OUTPUT "mtasa-${0.0.0}-unstable-00000-0-000-nsis.exe"
+	!define PRODUCT_VERSION "v${0.0.0}-unstable-00000-0-000"
 !endif
 !ifndef LIGHTBUILD
 	!define INCLUDE_DEVELOPMENT
 	!define INCLUDE_EDITOR
 !endif
 !ifndef PRODUCT_VERSION
-	!define PRODUCT_VERSION "v1.1.0"
+	!define PRODUCT_VERSION "v${0.0.0}"
 !endif
 !define EXPAND_DIALOG_X 134
 !define EXPAND_DIALOG_Y 60
@@ -47,23 +54,21 @@ Var RedistInstalled
 
 ;ReserveFile "${NSISDIR}\Plugins\InstallOptions.dll"
 
-!define MAJOR_MINOR_VER "1.1"
-
 !ifdef CLIENT_SETUP
-	!define PRODUCT_NAME "MTA:SA 1.1"
+	!define PRODUCT_NAME "MTA:SA ${0.0}"
 	!define PRODUCT_NAME_NO_VER "MTA:SA"
 !else
-	!define PRODUCT_NAME "MTA:SA Server 1.1"
+	!define PRODUCT_NAME "MTA:SA Server ${0.0}"
 	!define PRODUCT_NAME_NO_VER "MTA:SA Server"
 !endif
 
 !define PRODUCT_PUBLISHER "Multi Theft Auto"
 !define PRODUCT_WEB_SITE "http://www.multitheftauto.com"
 !ifdef CLIENT_SETUP
-	!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\Multi Theft Auto 1.1.exe"
+	!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\Multi Theft Auto ${0.0}.exe"
 	!define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !else
-	!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\MTA Server 1.1.exe"
+	!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\MTA Server ${0.0}.exe"
 	!define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME} Server"
 !endif
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -148,10 +153,10 @@ LangString DESC_SectionGroupClient ${LANG_ENGLISH}  "The client is the program y
 Function LaunchLink
 	!ifdef CLIENT_SETUP
 		SetOutPath "$INSTDIR"
-		!insertmacro UAC_AsUser_ExecShell "open" "Multi Theft Auto 1.1.exe" "" "" ""
+		!insertmacro UAC_AsUser_ExecShell "open" "Multi Theft Auto ${0.0}.exe" "" "" ""
 	!else
 		SetOutPath "$INSTDIR\Server"
-		!insertmacro UAC_AsUser_ExecShell "open" "MTA Server 1.1.exe" "" "" ""
+		!insertmacro UAC_AsUser_ExecShell "open" "MTA Server ${0.0}.exe" "" "" ""
 	!endif
 FunctionEnd
 
@@ -164,14 +169,14 @@ Function .onInit
 	; Remove old shortcuts put in rand(user,admin) startmenu by previous installers (shortcuts now go in all users)
 	SetShellVarContext current
 	; Delete shortcuts
-	Delete "$SMPROGRAMS\\MTA San Andreas 1.1\MTA San Andreas.lnk"
-	Delete "$SMPROGRAMS\\MTA San Andreas 1.1\Uninstall MTA San Andreas.lnk"
-	Delete "$DESKTOP\MTA San Andreas 1.1.lnk"
+	Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA San Andreas.lnk"
+	Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas.lnk"
+	Delete "$DESKTOP\MTA San Andreas ${0.0}.lnk"
 
 	; Delete shortcuts
-	Delete "$SMPROGRAMS\\MTA San Andreas 1.1\MTA Server.lnk"
-	Delete "$SMPROGRAMS\\MTA San Andreas 1.1\Uninstall MTA San Andreas Server.lnk"
-	RmDir /r "$SMPROGRAMS\\MTA San Andreas 1.1"
+	Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA Server.lnk"
+	Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas Server.lnk"
+	RmDir /r "$SMPROGRAMS\\MTA San Andreas ${0.0}"
 	; #############################################
 
 	SetShellVarContext all
@@ -187,12 +192,12 @@ DontInstallVC9Redist:
 PostVC90Check:
 	
 	; Try to find previously saved MTA:SA install path
-	ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\1.1" "Last Install Location"
+	ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location"
 	${If} $Install_Dir == "" 
-		ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location"
+		ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}" "Last Install Location"
 	${EndIf}
 	${If} $Install_Dir == "" 
-		strcpy $Install_Dir "$PROGRAMFILES\MTA San Andreas 1.1"
+		strcpy $Install_Dir "$PROGRAMFILES\MTA San Andreas ${0.0}"
 	${EndIf}
 	strcpy $INSTDIR $Install_Dir
 
@@ -217,7 +222,7 @@ PostVC90Check:
 			${EndIf}
 		${EndIf}
 		${If} $2 == "" 
-			ReadRegStr $2 HKCU "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "GTA:SA Path Backup"
+			ReadRegStr $2 HKCU "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}" "GTA:SA Path Backup"
 		${EndIf}
 
 		; Remove exe name from path
@@ -240,7 +245,7 @@ Function .onInstSuccess
 
 	!ifdef CLIENT_SETUP
 		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path" $GTA_DIR
-		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\1.1" "Last Install Location" $INSTDIR
+		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location" $INSTDIR
 
 		; Add the protocol handler
 		WriteRegStr HKCR "mtasa" "" "URL:MTA San Andreas Protocol"
@@ -251,37 +256,37 @@ Function .onInstSuccess
 	
 	; Start menu items
 	${If} $CreateSMShortcuts == 1
-		CreateDirectory "$SMPROGRAMS\MTA San Andreas 1.1"
+		CreateDirectory "$SMPROGRAMS\MTA San Andreas ${0.0}"
 
 		!ifdef CLIENT_SETUP
 			IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip1
 			SetOutPath "$INSTDIR"
-			Delete "$SMPROGRAMS\\MTA San Andreas 1.1\Play MTA San Andreas.lnk"
-			CreateShortCut "$SMPROGRAMS\\MTA San Andreas 1.1\MTA San Andreas.lnk" "$INSTDIR\Multi Theft Auto.exe" \
+			Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Play MTA San Andreas.lnk"
+			CreateShortCut "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA San Andreas.lnk" "$INSTDIR\Multi Theft Auto.exe" \
 				"" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
-				"" "Play Multi Theft Auto: San Andreas 1.1"
+				"" "Play Multi Theft Auto: San Andreas ${0.0}"
 			skip1:
 		!endif
 		
 		IfFileExists "$INSTDIR\Server\MTA Server.exe" 0 skip2
 		SetOutPath "$INSTDIR\Server"
-		CreateShortCut "$SMPROGRAMS\\MTA San Andreas 1.1\MTA Server.lnk" "$INSTDIR\Server\MTA Server.exe" \
+		CreateShortCut "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA Server.lnk" "$INSTDIR\Server\MTA Server.exe" \
 			"" "$INSTDIR\Server\MTA Server.exe" 2 SW_SHOWNORMAL \
-			"" "Run the Multi Theft Auto: San Andreas 1.1 Server"
+			"" "Run the Multi Theft Auto: San Andreas ${0.0} Server"
 		skip2:
 		
 		!ifdef CLIENT_SETUP
 			IfFileExists "$INSTDIR\Uninstall.exe" 0 skip3
 			SetOutPath "$INSTDIR"
-			CreateShortCut "$SMPROGRAMS\\MTA San Andreas 1.1\Uninstall MTA San Andreas.lnk" "$INSTDIR\Uninstall.exe" \
+			CreateShortCut "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas.lnk" "$INSTDIR\Uninstall.exe" \
 				"" "$INSTDIR\Uninstall.exe" 0 SW_SHOWNORMAL \
-				"" "Uninstall Multi Theft Auto: San Andreas 1.1"
+				"" "Uninstall Multi Theft Auto: San Andreas ${0.0}"
 		!else
 			IfFileExists "$INSTDIR\server\Uninstall.exe" 0 skip3
 			SetOutPath "$INSTDIR"
-			CreateShortCut "$SMPROGRAMS\\MTA San Andreas 1.1\Uninstall MTA San Andreas Server.lnk" "$INSTDIR\server\Uninstall.exe" \
+			CreateShortCut "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas Server.lnk" "$INSTDIR\server\Uninstall.exe" \
 				"" "$INSTDIR\Server\Uninstall.exe" 0 SW_SHOWNORMAL \
-				"" "Uninstall Multi Theft Auto: San Andreas 1.1"
+				"" "Uninstall Multi Theft Auto: San Andreas ${0.0}"
 		!endif
 		skip3:
 	${EndIf}
@@ -290,11 +295,11 @@ Function .onInstSuccess
 		!ifdef CLIENT_SETUP
 			IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip4
 			SetOutPath "$INSTDIR"
-			Delete "$DESKTOP\Play MTA San Andreas 1.1.lnk"
-			CreateShortCut "$DESKTOP\MTA San Andreas 1.1.lnk" "$INSTDIR\Multi Theft Auto.exe" \
+			Delete "$DESKTOP\Play MTA San Andreas ${0.0}.lnk"
+			CreateShortCut "$DESKTOP\MTA San Andreas ${0.0}.lnk" "$INSTDIR\Multi Theft Auto.exe" \
 				"" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
-				"" "Play Multi Theft Auto: San Andreas 1.1"
-			AccessControl::GrantOnFile "$DESKTOP\MTA San Andreas 1.1.lnk" "(BU)" "FullAccess"
+				"" "Play Multi Theft Auto: San Andreas ${0.0}"
+			AccessControl::GrantOnFile "$DESKTOP\MTA San Andreas ${0.0}.lnk" "(BU)" "FullAccess"
 
 			skip4:
 		!endif
@@ -319,11 +324,11 @@ Name "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 !ifdef CLIENT_SETUP
 	OutFile "${INSTALL_OUTPUT}"
 !else
-	OutFile "MTA Server 1.1 Setup.exe"
+	OutFile "MTA Server ${0.0} Setup.exe"
 !endif
 
 ;InstallDir "$PROGRAMfiles San Andreas"
-InstallDirRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\1.1" "Last Install Location"
+InstallDirRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location"
 ShowInstDetails show
 ShowUnInstDetails show
 
@@ -352,11 +357,11 @@ DontInstallRedist:
 			#############################################################
 
 			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path" $GTA_DIR
-			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\1.1" "Last Install Location" $INSTDIR
+			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location" $INSTDIR
 
 			# Create fixed path data directories
 			CreateDirectory "$APPDATA\MTA San Andreas All\Common"
-			CreateDirectory "$APPDATA\MTA San Andreas All\1.1"
+			CreateDirectory "$APPDATA\MTA San Andreas All\${0.0}"
 
 			SetOutPath "$INSTDIR\MTA"
 			SetOverwrite on
@@ -768,22 +773,22 @@ Section Uninstall
 		Delete "$INSTDIR\MTA\*.ax"
 		Delete "$INSTDIR\MTA\*.txt"
 
-		RmDir /r "$APPDATA\MTA San Andreas All\1.1"
+		RmDir /r "$APPDATA\MTA San Andreas All\${0.0}"
 		; TODO if $APPDATA\MTA San Andreas All\Common is the only one left, delete it
 
 		DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
 		DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
-		DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1"
-		DeleteRegKey HKCU "SOFTWARE\Multi Theft Auto: San Andreas 1.1"
-		DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\1.1"
+		DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}"
+		DeleteRegKey HKCU "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}"
+		DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}"
 		; TODO if HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common is the only one left, delete it
 		
 		${GameExplorer_RemoveGame} ${GUID}
 		
 		; Delete client shortcuts
-		Delete "$SMPROGRAMS\\MTA San Andreas 1.1\MTA San Andreas.lnk"
-		Delete "$SMPROGRAMS\\MTA San Andreas 1.1\Uninstall MTA San Andreas.lnk"
-        Delete "$DESKTOP\MTA San Andreas 1.1.lnk"
+		Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA San Andreas.lnk"
+		Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas.lnk"
+        Delete "$DESKTOP\MTA San Andreas ${0.0}.lnk"
 
 	!else
 		RmDir /r "$INSTDIR\server" ; for server only install
@@ -792,9 +797,9 @@ Section Uninstall
 	RmDir "$INSTDIR" ; fix for #3898
 
 	; Delete server shortcuts
-	Delete "$SMPROGRAMS\\MTA San Andreas 1.1\MTA Server.lnk"
-	Delete "$SMPROGRAMS\\MTA San Andreas 1.1\Uninstall MTA San Andreas Server.lnk"
-	RmDir /r "$SMPROGRAMS\\MTA San Andreas 1.1"
+	Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA Server.lnk"
+	Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas Server.lnk"
+	RmDir /r "$SMPROGRAMS\\MTA San Andreas ${0.0}"
 	
 	SetAutoClose true
 SectionEnd
@@ -1292,7 +1297,7 @@ Function GetInstallType
 
     ${If} $1 == "0.0"
         StrCpy $2 "new"
-    ${ElseIf} $1 == ${MAJOR_MINOR_VER}
+    ${ElseIf} $1 == ${0.0}
         StrCpy $2 "upgrade"
     ${Else}
         StrCpy $2 "overwrite"
