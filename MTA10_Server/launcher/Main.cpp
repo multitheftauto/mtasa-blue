@@ -11,6 +11,7 @@
 *****************************************************************************/
 
 #include "CDynamicLibrary.h"
+#include "../version.h"
 #include <cstdio>
 #include <iostream>
 
@@ -62,6 +63,7 @@ int main ( int argc, char* argv [] )
         if ( strcmp ( argv[1], "/?" ) == 0 || strcmp ( argv[1], "--help" ) == 0 || strcmp ( argv[1], "-h" ) == 0 )
         {
             printf ( "Usage: %s [OPTION]\n\n", szLaunchFile ? szLaunchFile : "mtaserver" );
+            printf ( "  -v                   Shows the program version\n" );
             printf ( "  -s                   Run server in silent mode\n" );
 #ifndef WIN32
             printf ( "  -d                   Run server daemonized\n" );
@@ -74,6 +76,12 @@ int main ( int argc, char* argv [] )
             printf ( "  --port [PORT]        Set port\n" );
             printf ( "  --httpport [PORT]    Set http port\n" );
             printf ( "  --maxplayers [max]   Set maxplayers\n" );
+            printf ( "  --novoice            Disable voice communication\n" );
+            return 1;
+        }
+        else if ( strcmp ( argv[1], "--version" ) == 0 || strcmp ( argv[1], "-v" ) == 0 )
+        {
+            printf ( MTA_DM_FULL_STRING " v" MTA_DM_BUILDTAG_LONG "\n" );
             return 1;
         }
     }
