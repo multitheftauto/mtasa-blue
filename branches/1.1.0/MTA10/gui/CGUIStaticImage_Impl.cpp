@@ -109,7 +109,11 @@ bool CGUIStaticImage_Impl::LoadFromTexture ( CGUITexture* pTexture )
 
     // Create an imageset
     if ( !m_pImageset )
+    {
+	    while ( m_pImagesetManager->isImagesetPresent( szUnique ) )
+            m_pGUI->GetUniqueName ( szUnique );
         m_pImageset = m_pImagesetManager->createImageset ( szUnique, pCEGUITexture, true );
+    }
 
     // Get an unique identifier for CEGUI for the image
     m_pGUI->GetUniqueName ( szUnique );
