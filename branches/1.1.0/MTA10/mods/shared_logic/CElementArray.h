@@ -30,7 +30,7 @@ public:
 
 private:
     static CClientEntity*       m_Elements [MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS];
-    static CStack < ElementID, MAX_CLIENT_ELEMENTS > m_ClientStack;
+    static CStack < ElementID, MAX_CLIENT_ELEMENTS - 2 > m_ClientStack;
 };
 
 #endif

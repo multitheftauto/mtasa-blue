@@ -27,7 +27,7 @@ public:
     static CElement*            GetElement          ( ElementID ID );
 
 private:
-    static CStack < ElementID, MAX_SERVER_ELEMENTS > m_UniqueIDs;
+    static CStack < ElementID, MAX_SERVER_ELEMENTS - 2 > m_UniqueIDs;
     static CElement*            m_Elements [MAX_SERVER_ELEMENTS];
 };
 
