@@ -168,6 +168,13 @@ void CRPCFunctions::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInterf
                     return;
             }
 
+            // Hack fix - It looks like only SET_PLAYER_TEAM handles (pSource == NULL)
+            if ( pSource == NULL )
+            {
+                if ( ucFunctionID != SET_PLAYER_TEAM )
+                    return;
+            }
+
             (pElementHandler->Callback) ( pSource, bitStream );
         }
     }
