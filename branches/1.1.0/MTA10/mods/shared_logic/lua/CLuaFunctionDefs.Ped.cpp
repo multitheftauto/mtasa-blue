@@ -1617,7 +1617,7 @@ int CLuaFunctionDefs::SetPedAnimationProgress( lua_State* luaVM )
             if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) szAnimName = lua_tostring ( luaVM, 2 );
             if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER ) fProgress = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
 
-            if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( *pEntity, szAnimName, fProgress ) );
+            if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( *pEntity, szAnimName, fProgress ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

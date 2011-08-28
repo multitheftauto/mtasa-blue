@@ -509,7 +509,12 @@ void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptionInfo
                     strModuleName = "unknown";
 
                 SString strMTAVersionFull = SString ( "%s.%s", MTA_DM_BUILDTAG_LONG, *GetApplicationSetting ( "mta-version-ext" ).SplitRight ( ".", NULL, -2 ) );
-                SString strSerialPart = GetApplicationSetting ( "serial" ).substr ( 0, 8 );
+                SString strSerialPart = GetApplicationSetting ( "serial" ).substr ( 0, 5 );
+                uint uiServerIP = GetApplicationSettingInt ( "last-server-ip" );
+                uint uiServerPort = GetApplicationSettingInt ( "last-server-port" );
+                int uiServerTime = GetApplicationSettingInt ( "last-server-time" );
+                int uiServerDuration = _time32 ( NULL ) - uiServerTime;
+                uiServerDuration = Clamp ( 0, uiServerDuration + 1, 0xfff );
 
                 // Get path to mta dir
                 SString strPathCode;
@@ -534,12 +539,15 @@ void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptionInfo
                     }
                 }
 
-                SString strFilename ( "mta\\dumps\\client_%s_%s_%08x_%x_%s_%s_%04d%02d%02d_%02d%02d.dmp",
+                SString strFilename ( "mta\\dumps\\client_%s_%s_%08x_%x_%s_%08X_%04X_%03X_%s_%04d%02d%02d_%02d%02d.dmp",
                                              strMTAVersionFull.c_str (),
                                              strModuleName.c_str (),
                                              pExceptionInformation->GetAddressModuleOffset (),
                                              pExceptionInformation->GetCode () & 0xffff,
                                              strPathCode.c_str (),
+                                             uiServerIP,
+                                             uiServerPort,
+                                             uiServerDuration,
                                              strSerialPart.c_str (),
                                              SystemTime.wYear,
                                              SystemTime.wMonth,

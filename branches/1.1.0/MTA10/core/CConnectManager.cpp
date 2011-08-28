@@ -339,6 +339,10 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                 //Set the current server info and Add the ASE Offset to the Query port)
                 CCore::GetSingleton().SetCurrentServer ( g_pConnectManager->m_Address, g_pConnectManager->m_usPort + 123 );
 
+                SetApplicationSettingInt ( "last-server-ip", g_pConnectManager->m_Address.s_addr );
+                SetApplicationSettingInt ( "last-server-port", g_pConnectManager->m_usPort );
+                SetApplicationSettingInt ( "last-server-time", _time32 ( NULL ) );
+
                 // Kevuwk: Forced the config to save here so that the IP/Port isn't lost on crash
                 CCore::GetSingleton ().SaveConfig ();
 
