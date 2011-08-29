@@ -90,23 +90,12 @@ void CClientSoundManager::DoPulse ( void )
 
     UpdateDistanceStreaming ( vecPosition );
 
-    BASS_3DVECTOR pos ( vecCameraPosition.fX, vecCameraPosition.fY, vecCameraPosition.fZ );
-    BASS_3DVECTOR vel ( vecVelocity.fX, vecVelocity.fY, vecVelocity.fZ );
-    BASS_3DVECTOR front ( vecFront.fX, vecFront.fY, vecFront.fZ );
-    BASS_3DVECTOR top ( 0, 0, -1 );
-
-    // Update the listener position
-    BASS_Set3DPosition ( &pos, &vel, &front, &top );
-
     // Update volume position and velocity from all sounds
     list < CClientSound* > ::iterator iter = m_Sounds.begin ();
     for ( ; iter != m_Sounds.end () ; ++iter )
     {
         (*iter)->Process3D ( vecPosition, vecCameraPosition, vecLookAt );
     }
-
-    // Apply the 3D changes
-    BASS_Apply3D ();
 }
 
 void CClientSoundManager::SetDimension ( unsigned short usDimension )
