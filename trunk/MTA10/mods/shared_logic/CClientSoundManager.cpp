@@ -227,8 +227,11 @@ void CClientSoundManager::UpdateDistanceStreaming ( const CVector& vecListenerPo
         {
             if ( CClientSound* pSound = DynamicCast < CClientSound > ( *iter ) )
             {
-                // Add to consider map
-                considerMap.insert ( pSound );
+                if ( pSound->IsSound3D() )
+                {
+                    // Add to consider map
+                    considerMap.insert ( pSound );
+                }
             }
         }
     }
