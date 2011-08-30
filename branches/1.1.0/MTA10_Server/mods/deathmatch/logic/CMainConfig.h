@@ -143,6 +143,7 @@ private:
     SString                         m_strIdFile;
     bool                            m_bNetworkEncryptionEnabled;
     SString                         m_strBandwidthReductionMode;
+    std::map < SString, SString >   m_TransientSettings;
 };
 
 #endif

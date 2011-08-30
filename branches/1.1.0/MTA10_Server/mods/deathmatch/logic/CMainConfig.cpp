@@ -784,6 +784,14 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
         //
         if ( GetString ( m_pRootNode, strName, strValue ) )
             return true;
+
+        // or transient settings
+        if ( SString* pstrValue = MapFind ( m_TransientSettings, strName ) )
+        {
+            strValue = *pstrValue;
+            return true;
+        }
+
     }
 
     return false;
@@ -863,6 +871,13 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
             }
             return true;
         }
+    }
+    else
+    if ( strName == "bandwidth_debug" )
+    {
+        // Transient settings go in their own map, so they don't get saved
+        MapSet ( m_TransientSettings, "bandwidth_debug", strValue );
+        return true;
     }
 
 

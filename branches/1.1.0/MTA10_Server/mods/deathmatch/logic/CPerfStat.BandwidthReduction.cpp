@@ -131,8 +131,8 @@ void CPerfStatBandwidthReductionImpl::RecordStats ( void )
 {
     for ( uint i = 0 ; i < ZONE_MAX ; i++ )
     {
-        m_Stats5Sec.puresync.uiSentPacketsByZone [ i ]    = g_pStats->puresync.uiSentPacketsByZone[i]    - m_PrevStats.puresync.uiSentPacketsByZone[i];
-        m_Stats5Sec.puresync.uiSkippedPacketsByZone [ i ] = g_pStats->puresync.uiSkippedPacketsByZone[i] - m_PrevStats.puresync.uiSkippedPacketsByZone[i];
+        m_Stats5Sec.puresync.llSentPacketsByZone [ i ]    = g_pStats->puresync.llSentPacketsByZone[i]    - m_PrevStats.puresync.llSentPacketsByZone[i];
+        m_Stats5Sec.puresync.llSkippedPacketsByZone [ i ] = g_pStats->puresync.llSkippedPacketsByZone[i] - m_PrevStats.puresync.llSkippedPacketsByZone[i];
     }
     m_PrevStats = *g_pStats;
     m_StatsTotal = *g_pStats;
@@ -171,7 +171,7 @@ void CPerfStatBandwidthReductionImpl::GetStats ( CPerfStatResult* pResult, const
     pResult->AddColumn ( "Since start.Pure sync packets skipped" );
 
 
-    int iTotals[4] = { 0, 0, 0, 0 };
+    long long llTotals[4] = { 0, 0, 0, 0 };
     const char* szDesc[4] = { "Very near, or in FOV", "Near, just out of FOV", "Near, way out of FOV", "Far" };
 
     for ( uint i = 0 ; i < ZONE_MAX ; i++ )
@@ -180,15 +180,15 @@ void CPerfStatBandwidthReductionImpl::GetStats ( CPerfStatResult* pResult, const
 
         int c = 0;
         row[c++] = SString ( "%d - %s", i, szDesc[i] );
-        row[c++] = SString ( "%d", m_Stats5Sec.puresync.uiSentPacketsByZone[i] );
-        row[c++] = SString ( "%d", m_Stats5Sec.puresync.uiSkippedPacketsByZone[i] );
-        row[c++] = SString ( "%d", m_StatsTotal.puresync.uiSentPacketsByZone[i] );
-        row[c++] = SString ( "%d", m_StatsTotal.puresync.uiSkippedPacketsByZone[i] );
+        row[c++] = SString ( "%lld", m_Stats5Sec.puresync.llSentPacketsByZone[i] );
+        row[c++] = SString ( "%lld", m_Stats5Sec.puresync.llSkippedPacketsByZone[i] );
+        row[c++] = SString ( "%lld", m_StatsTotal.puresync.llSentPacketsByZone[i] );
+        row[c++] = SString ( "%lld", m_StatsTotal.puresync.llSkippedPacketsByZone[i] );
 
-        iTotals[0] += m_Stats5Sec.puresync.uiSentPacketsByZone[i];
-        iTotals[1] += m_Stats5Sec.puresync.uiSkippedPacketsByZone[i];
-        iTotals[2] += m_StatsTotal.puresync.uiSentPacketsByZone[i];
-        iTotals[3] += m_StatsTotal.puresync.uiSkippedPacketsByZone[i];
+        llTotals[0] += m_Stats5Sec.puresync.llSentPacketsByZone[i];
+        llTotals[1] += m_Stats5Sec.puresync.llSkippedPacketsByZone[i];
+        llTotals[2] += m_StatsTotal.puresync.llSentPacketsByZone[i];
+        llTotals[3] += m_StatsTotal.puresync.llSkippedPacketsByZone[i];
     }
 
     {
@@ -197,22 +197,28 @@ void CPerfStatBandwidthReductionImpl::GetStats ( CPerfStatResult* pResult, const
 
         int c = 0;
         row[c++] = "Total";
-        row[c++] = SString ( "%d", iTotals[0] );
-        row[c++] = SString ( "%d", iTotals[1] );
-        row[c++] = SString ( "%d", iTotals[2] );
-        row[c++] = SString ( "%d", iTotals[3] );
+        row[c++] = SString ( "%lld", llTotals[0] );
+        row[c++] = SString ( "%lld", llTotals[1] );
+        row[c++] = SString ( "%lld", llTotals[2] );
+        row[c++] = SString ( "%lld", llTotals[3] );
     }
 
     {
         SString* row = pResult->AddRow ();
 
-        int iPercent5Sec = ( iTotals[1] ) * 100 / Max ( 1, iTotals[0] + iTotals[1] );
-        int iPercentAll  = ( iTotals[3] ) * 100 / Max ( 1, iTotals[2] + iTotals[3] );
+        double dSentPackets5Sec    = static_cast < double > ( llTotals[0] );
+        double dSkippedPackets5Sec = static_cast < double > ( llTotals[1] );
+        double dSentPacketsAll    = static_cast < double > ( llTotals[2] );
+        double dSkippedPacketsAll = static_cast < double > ( llTotals[3] );
+
+        double dPercent5Sec = 100 * dSkippedPackets5Sec / Max ( 1.0, dSentPackets5Sec + dSkippedPackets5Sec );
+        double dPercentAll  = 100 * dSkippedPacketsAll / Max ( 1.0, dSentPacketsAll + dSkippedPacketsAll );
+
         int c = 0;
         row[c++] = "Reduction percent";
-        row[c++] = SString ( "%d%%", -iPercent5Sec );
+        row[c++] = SString ( "%0.0f%%", -dPercent5Sec );
         row[c++] = "";
-        row[c++] = SString ( "%d%%", -iPercentAll );
+        row[c++] = SString ( "%0.0f%%", -dPercentAll );
         row[c++] = "";
     }
 }
