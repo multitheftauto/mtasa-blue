@@ -71,7 +71,9 @@ public:
 
     void                    Unlink                  ( void ) {};
 
-    bool                    IsSoundStopped          ( void )                            { return m_pAudio == NULL; }                                          
+    bool                    IsSoundStopped          ( void )                            { return m_pAudio == NULL; }
+
+    bool                    IsSound3D               ( void )                            { return m_b3D; }
 
 protected:
     void                    Process3D               ( const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt );
