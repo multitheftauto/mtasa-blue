@@ -381,39 +381,6 @@ CObject* CPoolsSA::AddObject ( DWORD dwModelID )
     return pObject;
 }
 
-CObject* CPoolsSA::AddObject ( DWORD* pGameInterface )
-{
-    DEBUG_TRACE("CObject* CPoolsSA::AddObject ( DWORD* pGameInterface )");
-
-    CObjectSA* pObject = NULL;
-
-    if ( m_objectPool.ulCount < MAX_OBJECTS )
-    {
-        CObjectSAInterface* pInterface = reinterpret_cast < CObjectSAInterface* > ( pGameInterface );
-        if ( pInterface )
-        {
-            // Make sure that it's not already in the objects pool
-            objectPool_t::mapType::iterator iter = m_objectPool.map.find ( pInterface );
-            if ( iter != m_objectPool.map.end () )
-            {
-                pObject = (*iter).second;
-            }
-            else
-            {
-                // Create it
-                pObject = new CObjectSA ( pInterface );
-                if ( ! AddObjectToPool ( pObject ) )
-                {
-                    delete pObject;
-                    pObject = NULL;
-                }
-            }
-        }
-    }
-
-    return pObject;
-}
-
 void CPoolsSA::RemoveObject ( unsigned long ulID, bool )
 {
     DEBUG_TRACE("void CPoolsSA::RemoveObject ( unsigned long ulID, bool )");

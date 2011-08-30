@@ -67,7 +67,6 @@ public:
 
     // Objects pool
     CObject*                AddObject           ( DWORD dwModelID );
-    CObject*                AddObject           ( DWORD* pGameInterface );
 private:
     bool                    AddObjectToPool     ( CObjectSA* pObject );
 public:

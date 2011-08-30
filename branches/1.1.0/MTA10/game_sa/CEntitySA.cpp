@@ -20,6 +20,18 @@ extern CGameSA * pGame;
 
 unsigned long CEntitySA::FUNC_CClumpModelInfo__GetFrameFromId;
 unsigned long CEntitySA::FUNC_RwFrameGetLTM;
+
+CEntitySA::CEntitySA ( void )
+{
+    // Set these variables to a constant state
+    m_pInterface = NULL;
+    internalID = 0;
+    BeingDeleted = false;
+    DoNotRemoveFromGame = false;
+    m_pStoredPointer = NULL;
+    m_ulArrayID = 0;
+}
+
 /*VOID CEntitySA::SetModelAlpha ( int iAlpha )
 {
     this->internalInterface->ModelClump->SetAlpha(iAlpha);
