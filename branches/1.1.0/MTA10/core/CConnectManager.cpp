@@ -93,6 +93,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     m_strPassword = szPassword;
     m_Address.s_addr = 0;
     m_usPort = usPort;
+    m_bSave = true;
 
     m_strLastHost = m_strHost;
     m_usLastPort = m_usPort;
