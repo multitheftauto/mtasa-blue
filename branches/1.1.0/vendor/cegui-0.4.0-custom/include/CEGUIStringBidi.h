@@ -221,7 +221,7 @@ shape_node shapetypes[] = {
  * max: the maximum level found in this line (should be unsigned char)
  * count: line size in wchar_t
  */
-void flipThisRun(UTF32Array from, const UCharArray const level, const int max, const int count)
+void flipThisRun(UTF32Array from, const UCharArray level, const int max, const int count)
 {
    int i, j, rcount, tlevel;
    CHARTYPE temp;
@@ -250,7 +250,7 @@ void flipThisRun(UTF32Array from, const UCharArray const level, const int max, c
 /*
  * Finds the index of a run with level equals tlevel
  */
-int findIndexOfRun(const UCharArray const level , int start, int count, int tlevel)
+int findIndexOfRun(const UCharArray level , int start, int count, int tlevel)
 {
    int i;
    for(i=start; i<count; i++)
@@ -263,7 +263,7 @@ int findIndexOfRun(const UCharArray const level , int start, int count, int tlev
    return count;
 }
 
-unsigned char GetParagraphLevel(const UTF32Array const &  const line, int count)
+unsigned char GetParagraphLevel(const UTF32Array &  line, int count)
 {
 	int i;
 	for( i=0; i<count ; i++)
