@@ -152,35 +152,29 @@ HSTREAM CBassAudio::ConvertFileToMono(const SString& strPath)
 
 void CALLBACK DownloadSync ( HSYNC handle, DWORD channel, DWORD data, void* user )
 {
-    CBassAudio* pClientSound = static_cast <CBassAudio*> ( user );
+    CBassAudio* pBassAudio = static_cast <CBassAudio*> ( user );
 
-    pClientSound->m_pVars->criticalSection.Lock ();
-    pClientSound->m_pVars->onClientSoundFinishedDownloadQueue.push_back ( pClientSound->GetLength () );
-    pClientSound->m_pVars->criticalSection.Unlock ();
+    pBassAudio->m_pVars->criticalSection.Lock ();
+    pBassAudio->m_pVars->onClientSoundFinishedDownloadQueue.push_back ( pBassAudio->GetLength () );
+    pBassAudio->m_pVars->criticalSection.Unlock ();
 }
 
 // get stream title from metadata and send it as event
 void CALLBACK MetaSync( HSYNC handle, DWORD channel, DWORD data, void *user )
 {
-    CBassAudio* pClientSound = static_cast <CBassAudio*> ( user );
+    CBassAudio* pBassAudio = static_cast <CBassAudio*> ( user );
 
-    pClientSound->m_pVars->criticalSection.Lock ();
-    DWORD pSound = pClientSound->m_pVars->pSound;
-    pClientSound->m_pVars->criticalSection.Unlock ();
+    pBassAudio->m_pVars->criticalSection.Lock ();
+    DWORD pSound = pBassAudio->m_pVars->pSound;
+    pBassAudio->m_pVars->criticalSection.Unlock ();
 
     SString strMeta = BASS_ChannelGetTags( pSound, BASS_TAG_META );
-    SString strStreamTitle;
-    if ( !strMeta.empty () )// got Shoutcast metadata
-    {
-        int startPos = strMeta.find("=");
-        strStreamTitle = strMeta.substr(startPos + 2,strMeta.find(";") - startPos - 3);
-    }
 
-    if ( !strStreamTitle.empty () )
+    if ( !strMeta.empty () )
     {
-    	pClientSound->m_pVars->criticalSection.Lock ();
-    	pClientSound->m_pVars->onClientSoundChangedMetaQueue.push_back ( strStreamTitle );
-    	pClientSound->m_pVars->criticalSection.Unlock ();
+    	pBassAudio->m_pVars->criticalSection.Lock ();
+    	pBassAudio->m_pVars->onClientSoundChangedMetaQueue.push_back ( strMeta );
+    	pBassAudio->m_pVars->criticalSection.Unlock ();
 	}
 }
 
@@ -313,7 +307,7 @@ double CBassAudio::GetLength ( void )
 // Streams only
 SString CBassAudio::GetMetaTags( const SString& strFormat )
 {
-    SString strMetaTags = "";
+    SString strMetaTags;
     if ( strFormat == "streamName" )
         strMetaTags = m_strStreamName;
     else
@@ -321,8 +315,18 @@ SString CBassAudio::GetMetaTags( const SString& strFormat )
         strMetaTags = m_strStreamTitle;
     else
     if ( m_pSound )
+    {
         strMetaTags = TAGS_Read( m_pSound, strFormat );
 
+        if ( strMetaTags == "" )
+        {
+            // Try using data from from shoutcast meta
+            SString* pstrResult = MapFind ( m_ConvertedTagMap, strFormat );
+            if ( pstrResult )
+                strMetaTags = *pstrResult;
+        }
+
+    }
     return strMetaTags;
 }
 
@@ -511,9 +515,78 @@ void CBassAudio::ServiceVars ( void )
     // Handle onClientSoundChangedMeta queue
     while ( !onClientSoundChangedMetaQueue.empty () )
     {
-        m_strStreamTitle = onClientSoundChangedMetaQueue.front ();
+        SString strMeta = onClientSoundChangedMetaQueue.front ();
+        ParseShoutcastMeta ( strMeta );
         AddQueuedEvent ( SOUND_EVENT_CHANGED_META, m_strStreamTitle );
         onClientSoundChangedMetaQueue.pop_front ();
+    }
+}
+
+//
+// Extract and map data from a shoutcast meta string
+//
+void CBassAudio::ParseShoutcastMeta ( const SString& strMeta )
+{
+    // Get title
+    int startPos = strMeta.find ( "=" );
+    SString strStreamTitle = strMeta.SubStr ( startPos + 2, strMeta.find ( ";" ) - startPos - 3 );
+
+    if ( !strStreamTitle.empty () )
+        m_strStreamTitle = strStreamTitle;
+
+    // Get url
+    startPos = strMeta.find ( "=" , startPos + 1 );
+    SString strStreamUrl = strMeta.SubStr ( startPos + 2, strMeta.find ( ";", startPos ) - startPos - 3 );
+
+    // Extract info from url
+    CArgMap shoutcastInfo;
+    shoutcastInfo.SetEscapeCharacter ( '%' );
+    shoutcastInfo.SetFromString ( strStreamUrl );
+
+    // Convert from shoutcast identifiers to map of tags
+    static const char* convList[] = {
+                        // Mapable
+                        "%ARTI", "artist",
+                        "%TITL", "title",
+                        "%ALBM", "album",
+
+                        // Mapable, but possibly don't exist
+                        "%GNRE", "genre",
+                        "%YEAR", "year",
+                        "%CMNT", "comment",
+                        "%TRCK", "track",
+                        "%COMP", "composer",
+                        "%COPY", "copyright",
+                        "%SUBT", "subtitle",
+                        "%AART", "albumartist",
+
+                        // Not mapabale
+                        "%DURATION", "duration",
+                        "%SONGTYPE", "songtype",
+                        "%OVERLAY", "overlay",
+                        "%BUYCD", "buycd",
+                        "%WEBSITE", "website",
+                        "%PICTURE", "picture",
+                   };
+
+    std::vector < SString > shoutcastKeyList;
+    shoutcastInfo.GetKeys ( shoutcastKeyList );
+
+    // For each shoutcast pair
+    for ( std::vector < SString >::iterator iter = shoutcastKeyList.begin () ; iter != shoutcastKeyList.end () ; ++iter )
+    {
+        const SString& strKey = *iter;
+        SString strValue = shoutcastInfo.Get ( strKey );
+
+        // Find %TAG match
+        for ( uint i = 0 ; i < NUMELMS( convList ) - 1 ; i += 2 )
+        {
+            if ( strKey == convList[ i + 1 ] )
+            {
+                MapSet ( m_ConvertedTagMap, convList[ i ], strValue );
+                break;
+            }
+        }
     }
 }
 

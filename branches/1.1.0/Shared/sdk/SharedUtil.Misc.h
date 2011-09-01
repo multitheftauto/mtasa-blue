@@ -641,8 +641,10 @@ namespace SharedUtil
         SString                             m_strArgSep;
         SString                             m_strPartsSep;
         SString                             m_strDisallowedChars;
+        char                                m_cEscapeCharacter;
     public:
                     CArgMap             ( const SString& strArgSep = "=", const SString& strPartsSep = "&", const SString& strExtraDisallowedChars = "" );
+        void        SetEscapeCharacter  ( char cEscapeCharacter );
         void        Merge               ( const CArgMap& other, bool bAllowMultiValues = false );
         void        SetFromString       ( const SString& strLine, bool bAllowMultiValues = false );
         void        MergeFromString     ( const SString& strLine, bool bAllowMultiValues = false );

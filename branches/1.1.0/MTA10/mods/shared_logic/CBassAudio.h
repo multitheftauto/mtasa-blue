@@ -68,6 +68,7 @@ public:
     void                    DoPulse                 ( const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt );
     void                    AddQueuedEvent          ( eSoundEventType type, const SString& strString, double dNumber = 0.0, bool bBool = false );
     bool                    GetQueuedEvent          ( SSoundEventInfo& info );
+    void                    ParseShoutcastMeta      ( const SString& strMeta );
 
 protected:
     HSTREAM                 ConvertFileToMono       ( const SString& strPath );
@@ -106,6 +107,7 @@ private:
     // Info
     SString                 m_strStreamName;
     SString                 m_strStreamTitle;
+    std::map < SString, SString > m_ConvertedTagMap;
 
     std::list < SSoundEventInfo > m_EventQueue;
 };

@@ -401,24 +401,17 @@ float CClientSound::GetMaxDistance ( void )
 SString CClientSound::GetMetaTags( const SString& strFormat )
 {
     SString strMetaTags = "";
-    if ( strFormat == "streamName" )
-        strMetaTags = m_strStreamName;
-    else if ( strFormat == "streamTitle" )
-        strMetaTags = m_strStreamTitle;
+    if ( m_pAudio )
+    {
+        strMetaTags = m_pAudio->GetMetaTags ( strFormat );
+        m_SavedTags[ strFormat ] = strMetaTags;
+    }
     else
     {
-        if ( m_pAudio )
-        {
-            strMetaTags = m_pAudio->GetMetaTags ( strFormat );
-            m_SavedTags[ strFormat ] = strMetaTags;
-        }
-        else
-        {
-            // Search previously found tags for this stream when it is not active
-            // This may not be such a good idea btw
-            if ( SString* pstrMetaTags = MapFind ( m_SavedTags, strFormat ) )
-                strMetaTags = *pstrMetaTags;
-        }
+        // Search previously found tags for this stream when it is not active
+        // This may not be such a good idea btw
+        if ( SString* pstrMetaTags = MapFind ( m_SavedTags, strFormat ) )
+            strMetaTags = *pstrMetaTags;
     }
 
     return strMetaTags;

@@ -991,6 +991,12 @@ namespace SharedUtil
         , m_strPartsSep ( strPartsSep )
     {
         m_strDisallowedChars = strExtraDisallowedChars + m_strArgSep + m_strPartsSep;
+        m_cEscapeCharacter = '#';
+    }
+
+    void CArgMap::SetEscapeCharacter ( char cEscapeCharacter )
+    {
+        m_cEscapeCharacter = cEscapeCharacter;
     }
 
     void CArgMap::Merge ( const CArgMap& other, bool bAllowMultiValues )
@@ -1051,12 +1057,12 @@ namespace SharedUtil
 
     SString CArgMap::Escape ( const SString& strIn ) const
     {
-        return EscapeString ( strIn, m_strDisallowedChars );
+        return EscapeString ( strIn, m_strDisallowedChars, m_cEscapeCharacter );
     } 
 
     SString CArgMap::Unescape ( const SString& strIn ) const
     {
-        return UnescapeString ( strIn );
+        return UnescapeString ( strIn, m_cEscapeCharacter );
     } 
 
 
