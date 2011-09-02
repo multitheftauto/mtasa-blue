@@ -144,7 +144,6 @@ CObjectSA::CObjectSA( DWORD dwModel )
         this->DoNotRemoveFromGame = FALSE;
         MemPutFast < BYTE > ( dwObjectPtr + 316, 6 );
         m_pInterface->bStreamingDontDelete = true;
-        m_pInterface->bDontStream = true;
     }
     else
     {
@@ -200,8 +199,6 @@ CObjectSA::~CObjectSA( )
                 }
 #endif
             }
-            else
-                OutputDebugString("CRASH!!!!");
         }
 
         this->BeingDeleted = true;

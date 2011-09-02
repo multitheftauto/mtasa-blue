@@ -110,6 +110,7 @@ CPlayerPedSA::CPlayerPedSA ( CPlayerPedSAInterface * pPlayer )
     this->SetType ( PLAYER_PED );
 
     m_bIsLocal = true;
+    DoNotRemoveFromGame = true;
     m_pData = GetPlayerPedInterface ()->pPlayerData;
     m_pWanted = NULL;
 

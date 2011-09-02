@@ -41,6 +41,7 @@ Var RedistInstalled
 	!define INCLUDE_SERVER
 	!define INSTALL_OUTPUT "mtasa-${0.0.0}-unstable-00000-0-000-nsis.exe"
 	!define PRODUCT_VERSION "v${0.0.0}-unstable-00000-0-000"
+	!define REVISION "0000"
 !endif
 !ifndef LIGHTBUILD
 	!define INCLUDE_DEVELOPMENT
@@ -88,7 +89,10 @@ Var RedistInstalled
 
 ; Welcome page
 !define MUI_WELCOMEPAGE_TITLE_3LINES
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation or update of $(^Name)\n\nIt is recommended that you close all other applications before starting Setup.\n\n[Admin access will be requested for Vista and up]\n\nClick Next to continue."
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation or update of $(^Name) (r${REVISION})\n\n\
+It is recommended that you close all other applications before starting Setup.\n\n\
+[Admin access will be requested for Vista and up]\n\n\
+Click Next to continue."
 !define MUI_PAGE_CUSTOMFUNCTION_PRE "WelcomePreProc"
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW "WelcomeShowProc"
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE "WelcomeLeaveProc"
@@ -115,6 +119,7 @@ Var RedistInstalled
 	!define MUI_DIRECTORYPAGE_TEXT_DESTINATION		"Grand Theft Auto: San Andreas folder"
 	!define MUI_DIRECTORYPAGE_TEXT_TOP				"Please select your Grand Theft Auto: San Andreas folder.$\n$\nYou MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n$\nClick Install to begin installing."
 	!define MUI_DIRECTORYPAGE_VARIABLE				$GTA_DIR
+    !define MUI_PAGE_CUSTOMFUNCTION_LEAVE           "GTADirectoryLeaveProc"
 	!insertmacro MUI_PAGE_DIRECTORY
 !endif
 
@@ -236,6 +241,11 @@ PostVC90Check:
 		; Store result 
 		strcpy $GTA_DIR $MODIFIED_STR
 	!endif
+
+    ; Default to standard path if nothing defined
+	${If} $GTA_DIR == "" 
+		strcpy $GTA_DIR "$PROGRAMFILES\Rockstar Games\GTA San Andreas\"
+	${EndIf}
 
 	InitPluginsDir
 	;File /oname=$PLUGINSDIR\serialdialog.ini "serialdialog.ini"
@@ -1341,14 +1351,36 @@ Function "DirectoryLeaveProc"
 	Pop $1
 
 	${If} $0 == "overwrite"
-        MessageBox MB_YESNO|MB_ICONQUESTION|MB_TOPMOST|MB_SETFOREGROUND \
+        MessageBox MB_OKCANCEL|MB_ICONQUESTION|MB_TOPMOST|MB_SETFOREGROUND \
             "A different major version of MTA ($1) already exists at that path.$\n$\n\
-            MTA is designed for different major versions to be installed in different paths. \
+            MTA is designed for major versions to be installed in different paths.$\n \
             Are you sure you want to overwrite MTA $1 at \
             $INSTDIR ?" \
-            IDYES cont
+            IDOK cont
             Abort
         cont:
 	${Endif}
 FunctionEnd
 
+
+Function "GTADirectoryLeaveProc"
+
+    ; Directory must exist
+    IfFileExists "$GTA_DIR\*.*" hasdir
+        MessageBox MB_ICONEXCLAMATION|MB_TOPMOST|MB_SETFOREGROUND \
+            "The selected directory does not exist.$\n$\n\
+            Please select the GTA:SA install directory"
+            Abort
+    hasdir:
+
+    ; data subdirectory should exist
+    IfFileExists "$GTA_DIR\data\*.*" cont
+        MessageBox MB_OKCANCEL|MB_ICONQUESTION|MB_TOPMOST|MB_SETFOREGROUND \
+            "Could not find GTA:SA installed at $GTA_DIR $\n$\n\
+            Are you sure you want to continue ?" \
+            IDOK cont1
+            Abort
+        cont1:
+    cont:
+
+FunctionEnd

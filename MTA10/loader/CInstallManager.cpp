@@ -29,6 +29,7 @@ namespace
         SetApplicationSetting ( "os-version",       GetOSVersion () );
         SetApplicationSetting ( "real-os-version",  GetRealOSVersion () );
         SetApplicationSetting ( "is-admin",         IsUserAdmin () ? "1" : "0" );
+        SetApplicationSettingInt ( "last-server-ip", 0 );
     }
 
     // Comms between 'Admin' and 'User' processes

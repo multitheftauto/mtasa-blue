@@ -54,8 +54,14 @@ namespace CEGUI
         RawDataContainer rawXMLData;
         System::getSingleton().getResourceProvider()->loadRawDataContainer(filename, rawXMLData, resourceGroup);
 
+        // Copy data and make sure buffer does not end with a whitespace character
+        CBuffer buffer ( rawXMLData.getDataPtr (), rawXMLData.getSize () );
+        CBufferWriteStream stream ( buffer );
+        stream.Seek ( stream.GetSize () );
+        stream.Write ( (uchar)0 );
+
         TiXmlDocument doc;
-        doc.Parse((const char*)rawXMLData.getDataPtr());
+        doc.Parse((const char*)buffer.GetData());
 
         const TiXmlElement* currElement = doc.RootElement();
 

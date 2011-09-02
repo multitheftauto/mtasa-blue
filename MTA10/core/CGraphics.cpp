@@ -530,15 +530,9 @@ void CGraphics::DrawTextureQueued ( float fX, float fY,
                                  unsigned long ulColor,
                                  bool bPostGUI )
 {
-    // If material is a shader, use its current instance
-    if ( CShaderItem* pShaderItem = DynamicCast < CShaderItem >( pMaterial ) )
-    {
-        pMaterial = pShaderItem->m_pShaderInstance;
-    }
 
     // Set up a queue item
     sDrawQueueItem Item;
-    Item.eType = QUEUE_TEXTURE;
     Item.Texture.fX = fX;
     Item.Texture.fY = fY;
     Item.Texture.fWidth = fWidth;
@@ -548,14 +542,26 @@ void CGraphics::DrawTextureQueued ( float fX, float fY,
     Item.Texture.fSizeU = fSizeU;
     Item.Texture.fSizeV = fSizeV;
     Item.Texture.bRelativeUV = bRelativeUV;
-    Item.Texture.pMaterial = pMaterial;
     Item.Texture.fRotation = fRotation;
     Item.Texture.fRotCenOffX = fRotCenOffX;
     Item.Texture.fRotCenOffY = fRotCenOffY;
     Item.Texture.ulColor = ulColor;
 
+    if ( CShaderItem* pShaderItem = DynamicCast < CShaderItem >( pMaterial ) )
+    {
+        // If material is a shader, use its current instance
+        Item.Texture.pMaterial = pShaderItem->m_pShaderInstance;
+        Item.eType = QUEUE_SHADER;
+    }
+    else
+    {
+        // Otherwise material must be a texture
+        Item.Texture.pMaterial = pMaterial;
+        Item.eType = QUEUE_TEXTURE;
+    }
+
     // Keep material valid while in the queue
-    AddQueueRef ( pMaterial );
+    AddQueueRef ( Item.Texture.pMaterial );
 
     // Add it to the queue
     AddQueueItem ( Item, bPostGUI );
@@ -863,15 +869,6 @@ void CGraphics::DrawPostGUIQueue ( void )
 
 void CGraphics::HandleDrawQueueModeChange ( uint curMode, uint newMode )
 {
-    // Changing to...
-    if ( newMode == 'spri' )
-    {
-        // ...sprite mode
-        m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND );
-        m_pDevice->SetSamplerState ( 0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP );
-        m_pDevice->SetSamplerState ( 0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP );
-    }
-
     // Changing from...
     if ( curMode == 'spri' )
     {
@@ -883,6 +880,15 @@ void CGraphics::HandleDrawQueueModeChange ( uint curMode, uint newMode )
     {
         // ...tile mode
         m_pTileBatcher->Flush ();
+    }
+
+    // Changing to...
+    if ( newMode == 'spri' )
+    {
+        // ...sprite mode
+        m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND );
+        m_pDevice->SetSamplerState ( 0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP );
+        m_pDevice->SetSamplerState ( 0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP );
     }
 }
 
@@ -903,7 +909,7 @@ void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )
 
             // Determine new mode
             uint newMode;
-            if ( item.eType == QUEUE_TEXTURE )                                 newMode = 'tile';
+            if ( item.eType == QUEUE_SHADER )                                   newMode = 'tile';
             else if ( item.eType == QUEUE_LINE || item.eType == QUEUE_LINE3D )  newMode = 'misc';
             else                                                                newMode = 'spri';
 
@@ -1010,6 +1016,34 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
         }
         case QUEUE_TEXTURE:
         {
+            if ( CTextureItem* pTexture = DynamicCast < CTextureItem > ( Item.Texture.pMaterial ) )
+            {
+                const sDrawQueueTexture& t = Item.Texture;
+                RECT cutImagePos;
+                const float fSurfaceWidth  = pTexture->m_uiSurfaceSizeX;
+                const float fSurfaceHeight = pTexture->m_uiSurfaceSizeY;
+                const float fFileWidth     = Item.Texture.pMaterial->m_uiSizeX;
+                const float fFileHeight    = Item.Texture.pMaterial->m_uiSizeY;
+                cutImagePos.left    = ( Item.Texture.fU )                       * ( Item.Texture.bRelativeUV ? fSurfaceWidth  : fSurfaceWidth  / fFileWidth );
+                cutImagePos.top     = ( Item.Texture.fV )                       * ( Item.Texture.bRelativeUV ? fSurfaceHeight : fSurfaceHeight / fFileHeight );
+                cutImagePos.right   = ( Item.Texture.fU + Item.Texture.fSizeU ) * ( Item.Texture.bRelativeUV ? fSurfaceWidth  : fSurfaceWidth  / fFileWidth );
+                cutImagePos.bottom  = ( Item.Texture.fV + Item.Texture.fSizeV ) * ( Item.Texture.bRelativeUV ? fSurfaceHeight : fSurfaceHeight / fFileHeight );
+                const float fCutWidth  = cutImagePos.right - cutImagePos.left;
+                const float fCutHeight = cutImagePos.bottom - cutImagePos.top;
+                const D3DXVECTOR2 scaling         ( Item.Texture.fWidth / fCutWidth, Item.Texture.fHeight / fCutHeight );
+                const D3DXVECTOR2 rotationCenter  ( Item.Texture.fWidth * 0.5f + Item.Texture.fRotCenOffX, Item.Texture.fHeight * 0.5f + Item.Texture.fRotCenOffY );
+                const D3DXVECTOR2 position        ( Item.Texture.fX, Item.Texture.fY );
+                const float fRotationRad  = Item.Texture.fRotation * (6.2832f/360.f);
+                D3DXMATRIX matrix;
+                D3DXMatrixTransformation2D  ( &matrix, NULL, 0.0f, &scaling, &rotationCenter, fRotationRad, &position );
+                m_pDXSprite->SetTransform ( &matrix );
+                m_pDXSprite->Draw ( (IDirect3DTexture9*)pTexture->m_pD3DTexture, &cutImagePos, NULL, NULL, Item.Texture.ulColor );
+            }
+            RemoveQueueRef ( Item.Texture.pMaterial );
+            break;
+        }
+        case QUEUE_SHADER:
+        {
             const sDrawQueueTexture& t = Item.Texture;
             float fU1 = t.fU;
             float fV1 = t.fV;
@@ -1069,7 +1103,7 @@ void CGraphics::ClearDrawQueue ( std::vector < sDrawQueueItem >& Queue )
     for ( std::vector < sDrawQueueItem >::const_iterator iter = Queue.begin () ; iter != Queue.end (); iter++ )
     {
         const sDrawQueueItem& item = *iter;
-        if ( item.eType == QUEUE_TEXTURE )
+        if ( item.eType == QUEUE_TEXTURE || item.eType == QUEUE_SHADER )
             RemoveQueueRef ( item.Texture.pMaterial );
     }
     Queue.clear ();

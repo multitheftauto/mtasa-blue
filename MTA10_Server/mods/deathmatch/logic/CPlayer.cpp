@@ -568,8 +568,8 @@ bool CPlayer::IsTimeForFarSync ( void )
         // Calc stats
         int iNumPackets = m_FarPlayerList.size ();
         int iNumSkipped = ( iNumPackets * iSlowSyncRate - iNumPackets * 1000 ) / 1000;
-        g_pStats->puresync.uiSentPacketsByZone [ ZONE3 ] += iNumPackets;
-        g_pStats->puresync.uiSkippedPacketsByZone [ ZONE3 ] += iNumSkipped;
+        g_pStats->puresync.llSentPacketsByZone [ ZONE3 ] += iNumPackets;
+        g_pStats->puresync.llSkippedPacketsByZone [ ZONE3 ] += iNumSkipped;
         return true;
     }
     return false;
@@ -850,14 +850,13 @@ bool CPlayer::IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo
 
     if ( llNextUpdateTime > llTimeNow )
     {
-        g_pStats->puresync.uiSkippedPacketsByZone[ iZone ]++;
+        g_pStats->puresync.llSkippedPacketsByZone[ iZone ]++;
         return false;
     }
 
     nearInfo.llLastUpdateTime = llTimeNow;
 
-    STATS_COUNTER_INC( puresync.uiSentPacketsByZone[ iZone ] );
-    g_pStats->puresync.uiSentPacketsByZone[ iZone ]++;
+    g_pStats->puresync.llSentPacketsByZone[ iZone ]++;
     return true;
 }
 

@@ -43,7 +43,6 @@ public:
     virtual void        Write                       ( const double& input ) = 0;
     virtual void        Write                       ( const char* input, int numberOfBytes ) = 0;
     virtual void        Write                       ( const ISyncStructure* syncStruct ) = 0;
-    virtual void        Write                       ( const ElementID& ID ) = 0;
 
 public:    // Use char functions only when they will be 0 most times
     virtual void        WriteCompressed             ( const unsigned char& input ) = 0;
@@ -90,7 +89,6 @@ public:
     virtual bool        Read                        ( double& output ) = 0;
     virtual bool        Read                        ( char* output, int numberOfBytes ) = 0;
     virtual bool        Read                        ( ISyncStructure* syncStruct ) = 0;
-    virtual bool        Read                        ( ElementID& ID ) = 0;
 
 public:    // Use char functions only when they will be 0 most times
     virtual bool        ReadCompressed              ( unsigned char& output ) = 0;
@@ -199,6 +197,36 @@ public:
 
         // Read the characters
         return ReadStringCharacters ( result, usLength );
+    }
+
+    #ifdef MTA_CLIENT
+        #define MAX_ELEMENTS    MAX_CLIENT_ELEMENTS
+    #else
+        #define MAX_ELEMENTS    MAX_SERVER_ELEMENTS
+    #endif
+
+    // Write an element ID
+    void Write(const ElementID& ID)
+    {
+        static const unsigned int bitcount = NumberOfSignificantBits < ( MAX_ELEMENTS - 1 ) >::COUNT;
+        const unsigned int& IDref = ID.Value ();
+        WriteBits ( reinterpret_cast < const unsigned char* > ( &IDref ), bitcount );
+    }
+
+    // Read an element ID
+    bool Read(ElementID& ID)
+    {
+        static const unsigned int bitcount = NumberOfSignificantBits < ( MAX_ELEMENTS - 1 ) > ::COUNT;
+        unsigned int& IDref = ID.Value ();
+        IDref = 0;
+        bool bResult = ReadBits ( reinterpret_cast < unsigned char* > ( &IDref ), bitcount );
+
+        // If max value, change to INVALID_ELEMENT_ID
+        static const unsigned int maxValue = ( 1 << bitcount ) - 1;
+        if ( IDref == maxValue )
+            IDref = INVALID_ELEMENT_ID;
+
+        return bResult;
     }
 
     virtual unsigned short Version                  ( void ) const = 0;
