@@ -173,7 +173,6 @@ CObjectSA::~CObjectSA( )
             {
                 CWorldSA * world = (CWorldSA *)pGame->GetWorld();
                 world->Remove(this->GetInterface());
-                world->RemoveReferencesToDeletedObject(this->GetInterface());
             
                 DWORD dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
                 _asm    
