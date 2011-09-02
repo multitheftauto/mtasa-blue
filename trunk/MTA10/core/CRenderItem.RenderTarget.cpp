@@ -23,6 +23,8 @@ void CRenderTargetItem::PostConstruct ( CRenderItemManager* pManager, uint uiSiz
     Super::PostConstruct ( pManager );
     m_uiSizeX = uiSizeX;
     m_uiSizeY = uiSizeY;
+    m_uiSurfaceSizeX = uiSizeX;
+    m_uiSurfaceSizeY = uiSizeY;
     m_bWithAlphaChannel = bWithAlphaChannel;
 
     // Initial creation of d3d data
@@ -144,10 +146,16 @@ void CRenderTargetItem::CreateUnderlyingData ( void )
     // Get the render target surface here for convenience
     ((IDirect3DTexture9*)m_pD3DTexture)->GetSurfaceLevel ( 0, &m_pD3DRenderTargetSurface );
 
+    // Update surface size, although it probably will be unchanged
+    D3DSURFACE_DESC desc;
+    m_pD3DRenderTargetSurface->GetDesc ( &desc );
+    m_uiSurfaceSizeX = desc.Width;
+    m_uiSurfaceSizeY = desc.Height;
+
     // Clear incase it gets used before first copy
     m_pDevice->ColorFill( m_pD3DRenderTargetSurface, NULL, 0x00000000 );
 
-    // Update memort used
+    // Update memory used
     m_iMemoryKBUsed = CRenderItemManager::CalcD3DResourceMemoryKBUsage ( m_pD3DRenderTargetSurface ) + CRenderItemManager::CalcD3DResourceMemoryKBUsage ( m_pD3DZStencilSurface );
 }
 

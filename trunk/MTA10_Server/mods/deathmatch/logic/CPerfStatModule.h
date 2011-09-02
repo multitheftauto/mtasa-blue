@@ -18,25 +18,12 @@ struct SStatData
     ZERO_ON_NEW
 
     struct {
-        uint uiSentPacketsByZone [ ZONE_MAX ];
-        uint uiSkippedPacketsByZone [ ZONE_MAX ];
+        long long llSentPacketsByZone [ ZONE_MAX ];
+        long long llSkippedPacketsByZone [ ZONE_MAX ];
     } puresync;
 };
 
 extern SStatData* g_pStats;
-
-#define RECORD_STATS 1
-
-//
-// Stats macros
-//
-#if RECORD_STATS
-    #define STATS_COUNTER_INC( var )    g_pStats->var++
-#else
-    #define STATS_COUNTER_INC( var )    
-#endif
-
-
 
 
 //

@@ -257,6 +257,9 @@ DWORD RETURN_CrashFix_Misc19b_US =                          0x7F0C20;
 DWORD RETURN_CrashFix_Misc19b_EU =                          0x7F0C60;
 DWORD RETURN_CrashFix_Misc19b_BOTH =                        0;
 
+#define HOOKPOS_CrashFix_Misc20                              0x54F3B0
+DWORD RETURN_CrashFix_Misc20 =                               0x54F3B6;
+
 
 #define HOOKPOS_VehColCB                                    0x04C838D
 DWORD RETURN_VehColCB =                                     0x04C83AA;
@@ -415,6 +418,7 @@ void HOOK_CrashFix_Misc16 ();
 void HOOK_CrashFix_Misc17 ();
 void HOOK_CrashFix_Misc18 ();
 void HOOK_CrashFix_Misc19 ();
+void HOOK_CrashFix_Misc20 ();
 void HOOK_VehColCB ();
 void HOOK_VehCol ();
 void HOOK_isVehDriveTypeNotRWD ();
@@ -578,6 +582,7 @@ void CMultiplayerSA::InitHooks()
     }
     HookInstall(HOOKPOS_CrashFix_Misc16, (DWORD)HOOK_CrashFix_Misc16, 6 );
     HookInstall(HOOKPOS_CrashFix_Misc18, (DWORD)HOOK_CrashFix_Misc18, 7 );
+    HookInstall(HOOKPOS_CrashFix_Misc20, (DWORD)HOOK_CrashFix_Misc20, 6 );
 
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29 );
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9 );
@@ -5441,6 +5446,33 @@ void _declspec(naked) HOOK_CrashFix_Misc19 ()
     }
 }
 
+
+// Handle CPlaceable::RemoveMatrix having wrong data
+// hooked at 54F3B0 6 bytes
+void _declspec(naked) HOOK_CrashFix_Misc20 ()
+{
+#if TEST_CRASH_FIXES
+    SIMULATE_ERROR_BEGIN( 10 )
+        _asm
+        {
+            mov     ecx, 0
+        }
+    SIMULATE_ERROR_END
+#endif
+    _asm
+    {
+        cmp     ecx, 0
+        je      cont        // Skip much code if ecx is zero
+
+        // continue standard path
+        sub     esp, 10h 
+        mov     eax, [ecx+14h] 
+        jmp     RETURN_CrashFix_Misc20      // 54F3B6
+
+    cont:
+        retn
+    }
+}
 
 
 

@@ -32,6 +32,57 @@
 #include <wchar.h>
 #endif
 
+
+////////////////////////////////////////////////////
+//
+// Detect array boundary issue
+//
+////////////////////////////////////////////////////
+#ifdef MTA_DEBUG
+    //#define DETECT_ARRAY_ISSUES
+#endif
+
+#ifdef DETECT_ARRAY_ISSUES
+
+    template < class T >
+    class CBoundedArray
+    {
+    public:
+       T* m_data;
+       int m_size;
+
+        CBoundedArray ( T* data, int size )
+        {
+            m_data = data;
+            m_size = size;
+        }
+
+        T operator[]( int index ) const
+        {
+            assert ( index >= 0 && index < m_size );
+            return m_data[index];
+        }
+
+        T& operator[]( int index )
+        {
+            assert ( index >= 0 && index < m_size );
+            return m_data[index];
+        }
+    };
+
+
+    typedef CBoundedArray < uchar > UCharArray;
+    typedef CBoundedArray < CEGUI::utf32 > UTF32Array;
+
+#else
+
+    typedef uchar*          UCharArray;
+    typedef CEGUI::utf32*   UTF32Array;
+
+#endif
+
+
+
 /*
  * Datatype Extension Macros
  */
@@ -98,7 +149,7 @@ enum
 
 
 /* function declarations */
-int findIndexOfRun(unsigned char* level , int start, int count, int tlevel);
+int findIndexOfRun(UCharArray level , int start, int count, int tlevel);
 unsigned char getType(CHARTYPE ch);
 unsigned char getCAPRtl(CHARTYPE ch);
 void doMirror(CHARTYPE* ch);
@@ -170,7 +221,7 @@ shape_node shapetypes[] = {
  * max: the maximum level found in this line (should be unsigned char)
  * count: line size in wchar_t
  */
-void flipThisRun(BLOCKTYPE &from, unsigned char* level, int max, int count)
+void flipThisRun(UTF32Array from, const UCharArray level, const int max, const int count)
 {
    int i, j, rcount, tlevel;
    CHARTYPE temp;
@@ -182,7 +233,7 @@ void flipThisRun(BLOCKTYPE &from, unsigned char* level, int max, int count)
       tlevel = max;
       i = j = findIndexOfRun(level, i, count, max);
       /* find the end of the run */
-      while((tlevel <= level[i]) && (i < count))
+      while((i < count) && (tlevel <= level[i]))    // Swapped expressions to fix a crash
       {
 	 i++;
       }
@@ -199,7 +250,7 @@ void flipThisRun(BLOCKTYPE &from, unsigned char* level, int max, int count)
 /*
  * Finds the index of a run with level equals tlevel
  */
-int findIndexOfRun(unsigned char* level , int start, int count, int tlevel)
+int findIndexOfRun(const UCharArray level , int start, int count, int tlevel)
 {
    int i;
    for(i=start; i<count; i++)
@@ -212,7 +263,7 @@ int findIndexOfRun(unsigned char* level , int start, int count, int tlevel)
    return count;
 }
 
-unsigned char GetParagraphLevel(BLOCKTYPE &line, int count)
+unsigned char GetParagraphLevel(const UTF32Array &  line, int count)
 {
 	int i;
 	for( i=0; i<count ; i++)
@@ -846,7 +897,7 @@ unsigned char getType(CHARTYPE ch)
  * from: start bidi at this index
  * count: number of characters in line
  */
-int doShape(BLOCKTYPE line, CHARTYPE* to, int from, int count)
+int doShape(const UTF32Array line, UTF32Array to, int from, int count)
 {
 	int i, j, ligFlag;
 	unsigned char prevTemp, nextTemp;
@@ -972,18 +1023,27 @@ int doShape(BLOCKTYPE line, CHARTYPE* to, int from, int count)
 /* Rule (X1), (X2), (X3), (X4), (X5), (X6), (X7), (X8), (X9) 
  * returns the length of the string without explicit marks
  */
-int doTypes(BLOCKTYPE line, unsigned char paragraphLevel, unsigned char* types,
-			 unsigned char* levels, int count, int fX)
+int doTypes(UTF32Array  line, unsigned char paragraphLevel, UCharArray  types,
+			 UCharArray levels, int count, int fX)
 {
   
   unsigned char tempType;
   unsigned char currentEmbedding = paragraphLevel;
   unsigned char currentOverride = ON;
   int i, j;
+#ifdef DETECT_ARRAY_ISSUES
+  unsigned char _levelStack[MAX_STACK+2];
+  unsigned char _overrideStack[MAX_STACK+2];
+    UCharArray levelStack (_levelStack, MAX_STACK+2 );
+    UCharArray overrideStack (_overrideStack, MAX_STACK+2 );
+#else
   unsigned char levelStack[MAX_STACK+2];
   unsigned char overrideStack[MAX_STACK+2];
+#endif
+
   int stackTop = 0;
-  
+
+
   if(fX)
     {
       for( i=0, j=0; i<count; i++)
@@ -1085,19 +1145,22 @@ int doTypes(BLOCKTYPE line, unsigned char paragraphLevel, unsigned char* types,
 	    types[i] = tempType;
 	  }
       }
+    dassert( j >= 0 && j <= count );
   return j;
 }
 
 /* Rule (W3) */
-void doALtoR(unsigned char* types, int count)
+void doALtoR(UCharArray types, int count)
 {
-  int i=0;
-  for(; i<count; i++)
+    int i=0;
+    for(; i<count; i++)
     {
-      if(types[i] == AL)
-	types[i] = R;
+        if(types[i] == AL)
+            types[i] = R;
     }
 }
+
+
 
 /*
  * The Main Bidi Function, and the only function that should
@@ -1106,14 +1169,18 @@ void doALtoR(unsigned char* types, int count)
  * line: a buffer of size count containing text to apply
  * the Bidirectional algorithm to.
  */
-int doBidi(BLOCKTYPE line, int count, bool applyShape, bool reorderCombining)
+#ifdef DETECT_ARRAY_ISSUES
+int doBidi(BLOCKTYPE const _line, int count, const bool applyShape, const bool reorderCombining)
 {
-   unsigned char* types;
-   unsigned char* levels;
+    UTF32Array line (_line, count + 1 );
+#else
+int doBidi(BLOCKTYPE const line, int count, const bool applyShape, const bool reorderCombining)
+{
+#endif
+
    unsigned char paragraphLevel;
    unsigned char tempType, tempTypeSec;
    int i, j, imax, fX, fAL, fET, fNSM;
-   CHARTYPE* shapeTo;
 
 
 	fX = fAL = fET = fNSM = 0;
@@ -1146,10 +1213,23 @@ int doBidi(BLOCKTYPE line, int count, bool applyShape, bool reorderCombining)
 		return 0;
 
    /* Initialize types, levels */
-   types = (unsigned char*)malloc(sizeof(unsigned char) * count);
-   levels = (unsigned char*)malloc(sizeof(unsigned char) * count);
+#ifdef DETECT_ARRAY_ISSUES
+   unsigned char* _types = (unsigned char*)malloc(sizeof(unsigned char) * count);
+   unsigned char* _levels = (unsigned char*)malloc(sizeof(unsigned char) * count);
+    UCharArray types( _types, count );
+    UCharArray levels( _levels, count );
+   CHARTYPE* _shapeTo;
+   if(applyShape)
+	   _shapeTo = (CHARTYPE*)malloc(sizeof(CHARTYPE) * count);
+
+    UTF32Array shapeTo ( _shapeTo, count );
+#else
+   unsigned char* types = (unsigned char*)malloc(sizeof(unsigned char) * count);
+   unsigned char* levels = (unsigned char*)malloc(sizeof(unsigned char) * count);
+   CHARTYPE* shapeTo;
    if(applyShape)
 	   shapeTo = (CHARTYPE*)malloc(sizeof(CHARTYPE) * count);
+#endif
 
    /* Rule (P1)  NOT IMPLEMENTED
     * P1. Split the text into separate paragraphs. A paragraph separator is
@@ -1187,7 +1267,7 @@ int doBidi(BLOCKTYPE line, int count, bool applyShape, bool reorderCombining)
     * Here, they're converted to BN.
     */
 
-   count = doTypes(line, paragraphLevel, types, levels, count, fX);
+    count = doTypes(line, paragraphLevel, types, levels, count, fX);
    GETCHAR(line, count) = 0;
 
 
@@ -1197,46 +1277,46 @@ int doBidi(BLOCKTYPE line, int count, bool applyShape, bool reorderCombining)
     * is at the start of the level run, it will get the type of sor.
     */
 	
-   if(fNSM)
-     {
-       if(types[0] == NSM)
-	 types[0] = paragraphLevel;
-       
-       for(i=1; i<count; i++)
-	 {
-	   if(types[i] == NSM)
-	     types[i] = types[i-1];
-	   /* Is this a safe assumption? 
-	    * I assumed the previous, IS a character.
-	    */
-	 }
-     }
+    if(fNSM)
+    {
+        if(types[0] == NSM)
+            types[0] = paragraphLevel;
+
+        for(i=1; i<count; i++)
+        {
+            if(types[i] == NSM)
+                types[i] = types[i-1];
+                /* Is this a safe assumption? 
+                * I assumed the previous, IS a character.
+                */
+        }
+    }
    
    /* Rule (W2)
     * W2. Search backwards from each instance of a European number until the
     * first strong type (R, L, AL, or sor) is found.  If an AL is found,
     * change the type of the European number to Arabic number.
     */
-   for(i=0; i<count; i++)
-     {
-       if(types[i] == EN)
-	 {
-	   tempType = levels[i];
-	   j=i;
-	   while(--j >= 0 && levels[j] == tempType)
-	     {
-	       if(types[j] == AL)
-		 {
-		   types[i] = AN;
-		   break;
-		 }
-	       else if(types[j] == R || types[j] == L)
-		 {
-		   break;
-		 }
-	     }
-	 }
-     }
+    for(i=0; i<count; i++)
+    {
+        if(types[i] == EN)
+        {
+            tempType = levels[i];
+            j=i;
+            while(--j >= 0 && levels[j] == tempType)
+            {
+                if(types[j] == AL)
+                {
+                    types[i] = AN;
+                    break;
+                }
+                else if(types[j] == R || types[j] == L)
+                {
+                    break;
+                }
+            }
+        }
+    }
 
    /* Rule (W3)
     * W3. Change all ALs to R.
@@ -1251,20 +1331,20 @@ int doBidi(BLOCKTYPE line, int count, bool applyShape, bool reorderCombining)
     * to a European number. A single common separator between two numbers
     * of the same type changes to that type.
     */
-   for( i=0; i<(count-1); i++)
-     {
-       if(types[i] == ES)
-	 {
-	   if(types[i-1] == EN && types[i+1] == EN)
-	     types[i] = EN;
-	 }else if(types[i] == CS)
-	   {
-	     if(types[i-1] == EN && types[i+1] == EN)
-	       types[i] = EN;
-	     else if(types[i-1] == AN && types[i+1] == AN)
-	       types[i] = AN;
-	   }
-     }
+    for( i=1; i<(count-1); i++) // Changed i=0 to 1=i to fix crash
+    {
+        if(types[i] == ES)
+        {
+            if(types[i-1] == EN && types[i+1] == EN)
+                types[i] = EN;
+        }else if(types[i] == CS)
+        {
+            if(types[i-1] == EN && types[i+1] == EN)
+                types[i] = EN;
+            else if(types[i-1] == AN && types[i+1] == AN)
+                types[i] = AN;
+        }
+    }
    
    /* Rule (W5)
     * W5. A sequence of European terminators adjacent to European numbers
@@ -1272,48 +1352,48 @@ int doBidi(BLOCKTYPE line, int count, bool applyShape, bool reorderCombining)
     *
     * Optimization: lots here... else ifs need rearrangement
     */
-   if(fET)
-     {
-       for(i=0; i<count; i++)
-	 {
-	   if(types[i] == ET)
-	     {
-	       if(types[i-1] == EN)
-		 {
-		   types[i] = EN;
-		   continue;
-		 }else if(types[i+1] == EN)
-		   {
-		     types[i] = EN;
-		     continue;
-		   }else if(types[i+1] == ET)
-		     {
-		       j=i;
-		       while(j <count && types[j] == ET)
-			 {
-			   j++;
-			 }
-		       if(types[j] == EN)
-			 types[i] = EN;
-		     }
-	     }
-	 }
-     }
+    if(fET)
+    {
+        for(i=1; i<count-1; i++)    // Brought in at boths ends to fix crash
+        {
+            if(types[i] == ET)
+            {
+                if(types[i-1] == EN)
+                {
+                    types[i] = EN;
+                    continue;
+                }else if(types[i+1] == EN)
+                {
+                    types[i] = EN;
+                    continue;
+                }else if(types[i+1] == ET)
+                {
+                    j=i;
+                    while(j <count - 1 && types[j] == ET)    // Added '- 1' to fix crash
+                    {
+                        j++;
+                    }
+                    if(types[j] == EN)
+                        types[i] = EN;
+                }
+            }
+        }
+    }
    
    /* Rule (W6)
     * W6. Otherwise, separators and terminators change to Other Neutral:
     */
-   for(i=0; i<count; i++)
-     {
-       switch(types[i])
-	 {
-	 case ES:
-	 case ET:
-	 case CS:
-	   types[i] = ON;
-	   break;
-	 }
-     }
+    for(i=0; i<count; i++)
+    {
+        switch(types[i])
+        {
+            case ES:
+            case ET:
+            case CS:
+                types[i] = ON;
+            break;
+        }
+    }
    
    /* Rule (W7)
     * W7. Search backwards from each instance of a European number until
@@ -1321,27 +1401,27 @@ int doBidi(BLOCKTYPE line, int count, bool applyShape, bool reorderCombining)
     * then change the type of the European number to L.
     */
 	
-   for(i=0; i<count; i++)
-     {
-       if(types[i] == EN)
-	 {
-	   tempType = levels[i];
-	   j=i;
-	   while(--j >= 0 && levels[j] == tempType)
-	     {
-	       if(types[j] == L)
-		 {
-		   types[i] = L;
-		   break;
-		 }
-	       else if(types[j] == R || types[j] == AL)
-		 {
-		   break;
-		 }
-	       
-	     }
-	 }
-     }
+    for(i=0; i<count; i++)
+    {
+        if(types[i] == EN)
+        {
+            tempType = levels[i];
+            j=i;
+            while(--j >= 0 && levels[j] == tempType)
+            {
+                if(types[j] == L)
+                {
+                    types[i] = L;
+                    break;
+                }
+                else if(types[j] == R || types[j] == AL)
+                {
+                    break;
+                }
+
+            }
+        }
+    }
    
 	
    /* Rule (N1)
@@ -1350,90 +1430,97 @@ int doBidi(BLOCKTYPE line, int count, bool applyShape, bool reorderCombining)
     * and Arabic numbers are treated as though they were R.
     */
    tempType = paragraphLevel;
-   for(i=0; i<count; i++)
-     {
-       if(types[i] == ON)
-	 {
-	   if(types[i-1] == R || types[i-1] == EN || types[i-1] == AN)
-	     tempType = R;
-	   else
-	     tempType = L;
-	   j=i;
-	   
-	   while(j < count)
-	     {
-	       tempTypeSec = types[j];
-	       if(tempTypeSec == ON)
-		 j++;
-	       else
-		 break;
-	     }
-	   if(j == count)
-	     tempTypeSec = odd(paragraphLevel) ? R : L;
-	   
-	   
-	   if(((tempTypeSec == L || tempTypeSec == LRE) && (tempType == L)) ||
-	      (((tempTypeSec == R) || (tempTypeSec == EN) || (tempTypeSec == AN)) && (tempType == R)))
-	     {
-	       while(i<j)
-		 {
-		   types[i++] = tempType;
-		 }
-	     }else
-	       i = j;
-	   
-	 }
-     }
+   tempTypeSec = 0;         // Added to fix uninitialized value
+    for(i=0; i<count; i++)
+    {
+        if(types[i] == ON)
+        {
+            if ( i > 0 )    // Added to fix a crash
+            {
+                if(types[i-1] == R || types[i-1] == EN || types[i-1] == AN)
+                    tempType = R;
+                else
+                    tempType = L;
+            }
+            else                    // Added for test
+                tempType = L;       // Added for test
+
+            j=i;
+
+            while(j < count)
+            {
+                tempTypeSec = types[j];
+                if(tempTypeSec == ON)
+                    j++;
+                else
+                break;
+            }
+            if(j == count)
+                tempTypeSec = odd(paragraphLevel) ? R : L;
+
+
+            if(((tempTypeSec == L || tempTypeSec == LRE) && (tempType == L)) ||
+            (((tempTypeSec == R) || (tempTypeSec == EN) || (tempTypeSec == AN)) && (tempType == R)))
+            {
+                while(i<j)
+                {
+                    types[i++] = tempType;
+                }
+            }else
+                i = j;
+
+        }
+    }
 
    /* Rule (N2)
     * N2. Any remaining neutrals take the embedding direction.
     */
-   for(i=0; i<count; i++)
-     {
-       if(types[i] == ON)
-	 {
-	   if((levels[i] % 2) == 0)
-	     types[i] = L;
-	   else
-	     types[i] = R;
-	 }
-     }
+    for(i=0; i<count; i++)
+    {
+        if(types[i] == ON)
+        {
+            if((levels[i] % 2) == 0)
+                types[i] = L;
+            else
+                types[i] = R;
+        }
+    }
 
    /* Rule (I1)
     * I1. For all characters with an even (left-to-right) embedding
     * direction, those of type R go up one level and those of type AN or
     * EN go up two levels.
     */
-   for(i=0; i<count; i++)
-     {
-       if((levels[i] % 2) == 0)
-	 {
-	   if(types[i] == R)
-	     levels[i] += 1;
-	   else if((types[i] == AN) || (types[i] == EN))
-	     levels[i] += 2;
-	 }else
-	   {
-	     if((types[i] == L) ||
-		(types[i] == EN) ||
-		(types[i] == AN))
-	       levels[i] += 1;
-	   }
-     }
+    for(i=0; i<count; i++)
+    {
+        if((levels[i] % 2) == 0)
+        {
+            if(types[i] == R)
+                levels[i] += 1;
+            else if((types[i] == AN) || (types[i] == EN))
+                levels[i] += 2;
+        }else
+        {
+            if((types[i] == L) ||
+                (types[i] == EN) ||
+                (types[i] == AN))
+                levels[i] += 1;
+        }
+    }
    
    /* Rule (I2)
     * I2. For all characters with an odd (right-to-left) embedding direction,
     * those of type L, EN or AN go up one level.
     */
 
-   for(i=0; i<count; i++)
-   {
-      if((levels[i] % 2) == 1)
-      {
-	 if(types[i] == L || types[i] == EN || types[i] == AN)
-	    levels[i] += 1;
-      }
-   }
+    for(i=0; i<count; i++)
+    {
+        if((levels[i] % 2) == 1)
+        {
+            if(types[i] == L || types[i] == EN || types[i] == AN)
+                levels[i] += 1;
+        }
+    }
 
    /* Rule (L1)
     * L1. On each line, reset the embedding level of the following characters
@@ -1447,38 +1534,38 @@ int doBidi(BLOCKTYPE line, int count, bool applyShape, bool reorderCombining)
     * modified by the previous phase. 
     */
 
-   j=count-1;
-   while(j>0 && (GetType(GETCHAR(line, j)) == WS))
-     {
-       j--;
-     }
-   if(j < (count-1))
-     {
-       for(j++; j<count; j++)
-	 levels[j] = paragraphLevel;
-     }
-   
-   for(i=0; i<count; i++)
-     {
-       tempType = GetType(GETCHAR(line, i));
-       if(tempType == WS)
-      {
-	j=i;
-	while((++j < count) && ((tempType == WS) || (tempType == RLE)) )
-	  {
-	    tempType = GetType(line[j]);
-	  }
-	
-	if(GetType(GETCHAR(line, j)) == B || GetType(GETCHAR(line, j)) == S)
-	  {
-	    for(j--; j>=i ; j--)
-	      {
-		levels[j] = paragraphLevel;
-	      }
-	  }
-      }else if(tempType == B || tempType == S)
-	levels[i] = paragraphLevel;
-   }
+    j=count-1;
+    while(j>0 && (GetType(GETCHAR(line, j)) == WS))
+    {
+        j--;
+    }
+    if(j < (count-1))
+    {
+        for(j++; j<count; j++)
+            levels[j] = paragraphLevel;
+    }
+
+    for(i=0; i<count; i++)
+    {
+        tempType = GetType(GETCHAR(line, i));
+        if(tempType == WS)
+        {
+            j=i;
+            while((++j < count) && ((tempType == WS) || (tempType == RLE)) )
+            {
+                tempType = GetType(line[j]);
+            }
+
+            if(GetType(GETCHAR(line, j)) == B || GetType(GETCHAR(line, j)) == S)
+            {
+                for(j--; j>=i ; j--)
+                {
+                    levels[j] = paragraphLevel;
+                }
+            }
+        }else if(tempType == B || tempType == S)
+            levels[i] = paragraphLevel;
+    }
    
    /* Rule (L4)
     * L4. A character that possesses the mirrored property as specified by
@@ -1486,11 +1573,11 @@ int doBidi(BLOCKTYPE line, int count, bool applyShape, bool reorderCombining)
     * resolved directionality of that character is R.
     */
    /* Note: this is implemented before L2 for efficiency */
-   for(i=0; i<count; i++)
-     {
-       if((levels[i] % 2) == 1)
-	 doMirror(&GETCHAR(line, i));
-     }
+    for(i=0; i<count; i++)
+    {
+        if((levels[i] % 2) == 1)
+            doMirror(&GETCHAR(line, i));
+    }
    
    /* Rule (L3)
     * L3. Combining marks applied to a right-to-left base character will at
@@ -1502,64 +1589,68 @@ int doBidi(BLOCKTYPE line, int count, bool applyShape, bool reorderCombining)
 	* odd level.
     */
 
-   if(fNSM && reorderCombining)
-   {
-     CHARTYPE temp;
-     int it;
-     for(i=1; i<count; i++)     // Changed 0 to 1 to fix a crash - Don't know if there will be other consequences
-       {
-	 if(GetType(GETCHAR(line, i)) == NSM && odd(levels[i]))
-	   {
-	     j=i;
-	     while((++j < count) && (GetType(GETCHAR(line, j)) == NSM));
-	     j--; i--;
-	     for(it=j; j>i; i++, j--)
-	       {
-		 temp = GETCHAR(line, i);
-		 GETCHAR(line, i) = GETCHAR(line, j);
-		 GETCHAR(line, j) = temp;
-	       }
-	     i=it+1;
-	   }
-       }
-   }
+    if(fNSM && reorderCombining)
+    {
+        CHARTYPE temp;
+        int it;
+        for(i=1; i<count; i++)     // Changed 0 to 1 to fix a crash - Don't know if there will be other consequences
+        {
+            if(GetType(GETCHAR(line, i)) == NSM && odd(levels[i]))
+            {
+                j=i;
+                while((++j < count) && (GetType(GETCHAR(line, j)) == NSM));
+                j--; i--;
+                for(it=j; j>i; i++, j--)
+                {
+                    temp = GETCHAR(line, i);
+                    GETCHAR(line, i) = GETCHAR(line, j);
+                    GETCHAR(line, j) = temp;
+                }
+                i=it+1;
+            }
+        }
+    }
    
    /* Shaping 
     * Shaping is Applied to each run of levels separately....
     */
    
-   if(applyShape)
-     {
-       
-       for(i=0; i<count; i++)
-	 {
-	   shapeTo[i] = GETCHAR(line, i);
-	 }
-       
-       j=i=0;
-       while(j < count)
-	 {
-	   if(GetType(GETCHAR(line, j)) == AL)
-	     {
-	       if(j<count && j >= i )
-		 {
-		   tempType = levels[j];
-		   i=j;
-		   while((i++ < count) && (levels[i] == tempType));
-		   doShape(line, shapeTo, j, i);
-		   j=i;
-		   tempType = levels[j];
-		   
-		 }
-	     }
-	   j++;
-	 }
-       for(i=0; i<count; i++)
-	 {
-	   GETCHAR(line, i) = shapeTo[i];
-	 }
-       free(shapeTo);		
-     }
+    if(applyShape)
+    {
+
+        for(i=0; i<count; i++)
+        {
+            shapeTo[i] = GETCHAR(line, i);
+        }
+
+        j=i=0;
+        while(j < count)
+        {
+            if(GetType(GETCHAR(line, j)) == AL)
+            {
+                if(j<count && j >= i )
+                {
+                    tempType = levels[j];
+                    i=j;
+                    while((i++ < count - 1) && (levels[i] == tempType));    // Changed 'count' to 'count-1' to fix a crash
+                    doShape(line, shapeTo, j, i);
+                    j=i;
+                    //tempType = levels[j];    // Removed to fix a crash (It doesn't look used anyway)
+
+                }
+            }
+            j++;
+        }
+        for(i=0; i<count; i++)
+        {
+            GETCHAR(line, i) = shapeTo[i];
+        }
+#ifdef DETECT_ARRAY_ISSUES
+        free(_shapeTo);		
+#else
+        free(shapeTo);		
+#endif
+    }
       
    /* Rule (L2)
     * L2. From the highest level found in the text to the lowest odd level on
@@ -1568,28 +1659,33 @@ int doBidi(BLOCKTYPE line, int count, bool applyShape, bool reorderCombining)
     * level or higher
     */
    /* we flip the character string and leave the level array */
-   imax = 0;
-   i=0;
-   tempType = levels[0];
-   while(i < count)
-     {
-       if(levels[i] > tempType)
-	 {
-	   tempType = levels[i];
-	   imax=i;
-	 }
-       i++;
-     }
-   /* maximum level in tempType, its index in imax. */
-   while(tempType > 0)		/* loop from highest level to the least odd, */
-     {				/* which i assume is 1 */
-       flipThisRun(line, levels, tempType, count);
-       tempType--;						
-     }
+    imax = 0;
+    i=0;
+    tempType = levels[0];
+    while(i < count)
+    {
+        if(levels[i] > tempType)
+        {
+            tempType = levels[i];
+            imax=i;
+        }
+        i++;
+    }
+    /* maximum level in tempType, its index in imax. */
+    while(tempType > 0)		/* loop from highest level to the least odd, */
+    {				/* which i assume is 1 */
+        flipThisRun(line, levels, tempType, count);
+        tempType--;						
+    }
    
-   free(types);
-   free(levels);
-   
+#ifdef DETECT_ARRAY_ISSUES
+    free(_types);
+    free(_levels);
+#else
+    free(types);
+    free(levels);
+#endif
+
    return count;
 }
 
@@ -1956,5 +2052,52 @@ void doMirror(CHARTYPE* ch)
       }
   }
 }
+
+
+#ifdef DETECT_ARRAY_ISSUES
+
+////////////////////////////////////////////////////
+//
+// Stress test doBidi function
+//
+////////////////////////////////////////////////////
+void doBidiTest ( void )
+{
+    std::vector < CEGUI::utf32 > buffer;
+    buffer.resize ( 1000 );
+    CEGUI::utf32* ptr = &buffer[0];
+
+    for ( uint i = 0 ; i < 100 ; i++ )
+    {
+        uint uiSize = rand () % 64;
+
+        for ( uint s = 0 ; s < uiSize ; s++ )
+        {
+            ptr[s] = ( rand () << 16 ) + rand ();
+
+            uint mask = 0xffffffff;
+            switch ( rand() % 5 )
+            {
+                case 0:
+                    mask = 0x7f;  break;
+                case 1:
+                    mask = 0xff;  break;
+                case 2:
+                    mask = 0x7ff;  break;
+                case 3:
+                    mask = 0x1fff;  break;
+                case 4:
+                    mask = 0xffffffff;  break;
+                default:
+                    mask = 0xffffffff;  break;
+            };
+            ptr[s] &= mask;
+        }
+
+        doBidi(ptr, uiSize, true, true);
+    }
+}
+
+#endif
 
 #endif

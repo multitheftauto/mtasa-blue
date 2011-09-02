@@ -333,6 +333,8 @@ class CTextureItem : public CMaterialItem
                     CTextureItem            ( void ) : ClassInit ( this ) {}
 
     IDirect3DBaseTexture9*  m_pD3DTexture;
+    uint                    m_uiSurfaceSizeX;
+    uint                    m_uiSurfaceSizeY;
 };
 
 

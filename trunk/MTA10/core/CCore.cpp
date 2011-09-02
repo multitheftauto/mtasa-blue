@@ -1289,6 +1289,9 @@ void CCore::Quit ( bool bInstantly )
 {
     if ( bInstantly )
     {
+        // Show that we are quiting (for the crash dump filename)
+        SetApplicationSettingInt ( "last-server-ip", 1 );
+
         // Destroy the client
         CModManager::GetSingleton ().Unload ();
 

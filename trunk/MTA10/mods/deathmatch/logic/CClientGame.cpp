@@ -635,7 +635,7 @@ void CClientGame::DoPulsePreFrame ( void )
 {   
     if ( m_Status == CClientGame::STATUS_JOINED )
     {
-        if ( m_pVoiceRecorder->IsEnabled() )
+        if ( m_pVoiceRecorder && m_pVoiceRecorder->IsEnabled() )
         {
             m_pVoiceRecorder->DoPulse();
         }

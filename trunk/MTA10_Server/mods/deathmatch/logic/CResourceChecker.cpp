@@ -247,6 +247,10 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
     if ( strFileContents.length () == 0 )
         return;
 
+    // Don't check compiled scripts
+    if ( strFileContents[0] == 0x1b )
+        return;
+
     // Process
     if ( strFileContents.length () > 1000000 )
         CLogger::LogPrintf ( "Please wait...\n" );
@@ -308,14 +312,19 @@ void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const stri
     // If it's not a UTF8 script, does it contain foreign language characters that should be upgraded?
     if ( !bUTF8 )
     {
-        std::string strUTFScript = UTF16ToMbUTF8(ANSIToUTF16( strLuaSource ));
+        std::wstring strUTF16Script = ANSIToUTF16 ( strLuaSource );
+        std::string strUTFScript = UTF16ToMbUTF8 ( strUTF16Script );
         if ( strLuaSource.length () != strUTFScript.size() )
         {
             // In-place upgrade...
             if ( strMode == "Upgrade" )
             {
-                // Convert our script to ANSI, appending a BOM at the beginning
-                strLuaSource = "\xEF\xBB\xBF" + strUTFScript;
+                // Upgrade only if there is no problem ( setlocale() issue? )
+                if ( strUTF16Script != L"?" )
+                {
+                    // Convert our script to ANSI, appending a BOM at the beginning
+                    strLuaSource = "\xEF\xBB\xBF" + strUTFScript;
+                }
             }
             if ( strMode == "Warnings" )
             {

@@ -116,6 +116,7 @@ public:
     void                        AddSampleAtTime         ( time_t tTime, long long llGameRecv, long long llGameSent, long long llHttpSent );
     void                        LoadStats               ( void );
     void                        SaveStats               ( void );
+    void                        AddDebugInfo            ( const SString& strMessage );
 
     long long                   m_llNextRecordTime;
     long long                   m_llNextSaveTime;
@@ -366,6 +367,24 @@ void CPerfStatBandwidthUsageImpl::DoPulse ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// CPerfStatBandwidthUsageImpl::AddDebugInfo
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CPerfStatBandwidthUsageImpl::AddDebugInfo ( const SString& strMessage )
+{
+    SString strValue;
+    g_pGame->GetConfig ()->GetSetting ( "bandwidth_debug", strValue );
+    if ( atoi ( strValue ) )
+    {
+        FileAppend ( "bandwidth_debug.log", GetLocalTimeString () + " - " + strMessage );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CPerfStatBandwidthUsageImpl::RecordStats
 //
 //
@@ -379,7 +398,6 @@ void CPerfStatBandwidthUsageImpl::RecordStats ( void )
 
     long long llDeltaGameBytesSent = Max < long long > ( 0LL, liveStats.runningTotal [ NS_ACTUAL_BYTES_SENT ] - m_PrevLiveStats.runningTotal [ NS_ACTUAL_BYTES_SENT ] );
     long long llDeltaGameBytesRecv = Max < long long > ( 0LL, liveStats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] - m_PrevLiveStats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] );
-
     m_PrevLiveStats = liveStats;
 
     long long llHttpTotalBytesSent = EHS::StaticGetTotalBytesSent ();
@@ -407,6 +425,27 @@ void CPerfStatBandwidthUsageImpl::AddSampleAtTime ( time_t tTime, long long llGa
     uiNowIndexList [ BWSTAT_INDEX_HOURS ]  = Clamp ( 0, tmp->tm_hour,     NUM_HOUR_STATS  - 1 );
     uiNowIndexList [ BWSTAT_INDEX_DAYS ]   = Clamp ( 0, tmp->tm_mday - 1, NUM_DAY_STATS   - 1 );
     uiNowIndexList [ BWSTAT_INDEX_MONTHS ] = Clamp ( 0, tmp->tm_mon,      NUM_MONTH_STATS - 1 );
+
+    AddDebugInfo ( SString ( "%lld %d:%d:%d (%d-%d-%d) -> (%d-%d-%d)  Hour [S:%lld R:%lld H:%lld]  Delta [S:%lld R:%lld H:%lld]\n"
+                                    , tTime
+                                    , tmp->tm_hour
+                                    , tmp->tm_mday - 1
+                                    , tmp->tm_mon
+                                    , m_History [ BWSTAT_INDEX_HOURS ].nowIndex
+                                    , m_History [ BWSTAT_INDEX_DAYS ].nowIndex
+                                    , m_History [ BWSTAT_INDEX_MONTHS ].nowIndex
+
+                                    , uiNowIndexList [ BWSTAT_INDEX_HOURS ]
+                                    , uiNowIndexList [ BWSTAT_INDEX_DAYS ]
+                                    , uiNowIndexList [ BWSTAT_INDEX_MONTHS ]
+                                    , m_History[ BWSTAT_INDEX_HOURS ].itemList [ uiNowIndexList [ BWSTAT_INDEX_HOURS ] ].llGameRecv
+                                    , m_History[ BWSTAT_INDEX_HOURS ].itemList [ uiNowIndexList [ BWSTAT_INDEX_HOURS ] ].llGameSent
+                                    , m_History[ BWSTAT_INDEX_HOURS ].itemList [ uiNowIndexList [ BWSTAT_INDEX_HOURS ] ].llHttpSent
+                                    , llGameRecv
+                                    , llGameSent
+                                    , llHttpSent
+                            ) );
+
 
     for ( uint i = 0 ; i < m_History.size () ; i++ )
     {

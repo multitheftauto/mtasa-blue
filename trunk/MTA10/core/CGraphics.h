@@ -194,6 +194,7 @@ private:
         QUEUE_RECT,
         QUEUE_CIRCLE,
         QUEUE_TEXTURE,
+        QUEUE_SHADER,
     };
 
     struct sDrawQueueLine

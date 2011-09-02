@@ -97,7 +97,9 @@ void CTileBatcher::Flush ( void )
 
         // Save state
         LPDIRECT3DSTATEBLOCK9   m_pDeviceState = NULL;
+#if 0   // Creating a state block here may not be necessary
         m_pDevice->CreateStateBlock ( D3DSBT_ALL, &m_pDeviceState );
+#endif
 
         // Set states
         m_pDevice->SetRenderState ( D3DRS_ZENABLE, D3DZB_FALSE );

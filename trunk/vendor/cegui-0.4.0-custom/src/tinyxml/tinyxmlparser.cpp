@@ -606,7 +606,9 @@ const char* TiXmlBase::ReadText(	const char* p,
 			}
 		}
 	}
-	return p + strlen( endTag );
+	if ( p ) 
+		p += strlen( endTag );
+	return p;
 }
 
 #ifdef TIXML_USE_STL
@@ -1065,8 +1067,12 @@ const char* TiXmlElement::Parse( const char* p, TiXmlParsingData* data, TiXmlEnc
 			// elements -- read the end tag, and return.
 			++p;
 			p = ReadValue( p, data, encoding );		// Note this is an Element method, and will set the error if one happens.
-			if ( !p || !*p )
+			if ( !p || !*p ) {
+				// We were looking for the end tag, but found nothing.
+				// Fix for [ 1663758 ] Failure to report error on bad XML
+				if ( document ) document->SetError( TIXML_ERROR_READING_END_TAG, p, data, encoding );
 				return 0;
+			}
 
 			// We should find the end tag now
 			if ( StringEqual( p, endTag.c_str(), false, encoding ) )
@@ -1362,6 +1368,13 @@ const char* TiXmlAttribute::Parse( const char* p, TiXmlParsingData* data, TiXmlE
 				&& !IsWhiteSpace( *p ) && *p != '\n' && *p != '\r'	// whitespace
 				&& *p != '/' && *p != '>' )						// tag end
 		{
+			if ( *p == '\'' || *p == '\"' ) {
+				// [ 1451649 ] Attribute values with trailing quotes not handled correctly
+				// We did not have an opening quote but seem to have a 
+				// closing one. Give up and throw an error.
+				if ( document ) document->SetError( TIXML_ERROR_READING_ATTRIBUTES, p, data, encoding );
+				return 0;
+			}
 			value += *p;
 			++p;
 		}
