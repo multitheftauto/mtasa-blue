@@ -1016,28 +1016,29 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
         }
         case QUEUE_TEXTURE:
         {
-            const sDrawQueueTexture& t = Item.Texture;
-            RECT cutImagePos;
-            const float fSurfaceWidth  = Item.Texture.pMaterial->m_uiSizeX;
-            const float fSurfaceHeight = Item.Texture.pMaterial->m_uiSizeY;
-            const float fFileWidth     = Item.Texture.pMaterial->m_uiSizeX;
-            const float fFileHeight    = Item.Texture.pMaterial->m_uiSizeY;
-            cutImagePos.left    = ( Item.Texture.fU )                       * ( Item.Texture.bRelativeUV ? fSurfaceWidth  : fSurfaceWidth  / fFileWidth );
-            cutImagePos.top     = ( Item.Texture.fV )                       * ( Item.Texture.bRelativeUV ? fSurfaceHeight : fSurfaceHeight / fFileHeight );
-            cutImagePos.right   = ( Item.Texture.fU + Item.Texture.fSizeU ) * ( Item.Texture.bRelativeUV ? fSurfaceWidth  : fSurfaceWidth  / fFileWidth );
-            cutImagePos.bottom  = ( Item.Texture.fV + Item.Texture.fSizeV ) * ( Item.Texture.bRelativeUV ? fSurfaceHeight : fSurfaceHeight / fFileHeight );
-            const float fCutWidth  = cutImagePos.right - cutImagePos.left;
-            const float fCutHeight = cutImagePos.bottom - cutImagePos.top;
-            const D3DXVECTOR2 scaling         ( Item.Texture.fWidth / fCutWidth, Item.Texture.fHeight / fCutHeight );
-            const D3DXVECTOR2 rotationCenter  ( Item.Texture.fWidth * 0.5f + Item.Texture.fRotCenOffX, Item.Texture.fHeight * 0.5f + Item.Texture.fRotCenOffY );
-            const D3DXVECTOR2 position        ( Item.Texture.fX, Item.Texture.fY );
-            const float fRotationRad  = Item.Texture.fRotation * (6.2832f/360.f);
-            D3DXMATRIX matrix;
-            D3DXMatrixTransformation2D  ( &matrix, NULL, 0.0f, &scaling, &rotationCenter, fRotationRad, &position );
-            m_pDXSprite->SetTransform ( &matrix );
-            CTextureItem* pTexture = DynamicCast < CTextureItem > ( Item.Texture.pMaterial );
-            if ( pTexture )
+            if ( CTextureItem* pTexture = DynamicCast < CTextureItem > ( Item.Texture.pMaterial ) )
+            {
+                const sDrawQueueTexture& t = Item.Texture;
+                RECT cutImagePos;
+                const float fSurfaceWidth  = pTexture->m_uiSurfaceSizeX;
+                const float fSurfaceHeight = pTexture->m_uiSurfaceSizeY;
+                const float fFileWidth     = Item.Texture.pMaterial->m_uiSizeX;
+                const float fFileHeight    = Item.Texture.pMaterial->m_uiSizeY;
+                cutImagePos.left    = ( Item.Texture.fU )                       * ( Item.Texture.bRelativeUV ? fSurfaceWidth  : fSurfaceWidth  / fFileWidth );
+                cutImagePos.top     = ( Item.Texture.fV )                       * ( Item.Texture.bRelativeUV ? fSurfaceHeight : fSurfaceHeight / fFileHeight );
+                cutImagePos.right   = ( Item.Texture.fU + Item.Texture.fSizeU ) * ( Item.Texture.bRelativeUV ? fSurfaceWidth  : fSurfaceWidth  / fFileWidth );
+                cutImagePos.bottom  = ( Item.Texture.fV + Item.Texture.fSizeV ) * ( Item.Texture.bRelativeUV ? fSurfaceHeight : fSurfaceHeight / fFileHeight );
+                const float fCutWidth  = cutImagePos.right - cutImagePos.left;
+                const float fCutHeight = cutImagePos.bottom - cutImagePos.top;
+                const D3DXVECTOR2 scaling         ( Item.Texture.fWidth / fCutWidth, Item.Texture.fHeight / fCutHeight );
+                const D3DXVECTOR2 rotationCenter  ( Item.Texture.fWidth * 0.5f + Item.Texture.fRotCenOffX, Item.Texture.fHeight * 0.5f + Item.Texture.fRotCenOffY );
+                const D3DXVECTOR2 position        ( Item.Texture.fX, Item.Texture.fY );
+                const float fRotationRad  = Item.Texture.fRotation * (6.2832f/360.f);
+                D3DXMATRIX matrix;
+                D3DXMatrixTransformation2D  ( &matrix, NULL, 0.0f, &scaling, &rotationCenter, fRotationRad, &position );
+                m_pDXSprite->SetTransform ( &matrix );
                 m_pDXSprite->Draw ( (IDirect3DTexture9*)pTexture->m_pD3DTexture, &cutImagePos, NULL, NULL, Item.Texture.ulColor );
+            }
             RemoveQueueRef ( Item.Texture.pMaterial );
             break;
         }

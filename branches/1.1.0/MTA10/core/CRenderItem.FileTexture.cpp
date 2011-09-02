@@ -95,6 +95,11 @@ void CFileTextureItem::CreateUnderlyingData ( const SString& strFilename )
     if ( FAILED ( D3DXGetImageInfoFromFile( strFilename, &imageInfo ) ) )
         return;
 
+    m_uiSizeX = imageInfo.Width;
+    m_uiSizeY = imageInfo.Height;
+    m_uiSurfaceSizeX = imageInfo.Width;
+    m_uiSurfaceSizeY = imageInfo.Height;
+
     if ( imageInfo.ResourceType == D3DRTYPE_VOLUMETEXTURE )
     {
         // It's a volume texture!
@@ -113,10 +118,13 @@ void CFileTextureItem::CreateUnderlyingData ( const SString& strFilename )
         // It's none of the above!
         if ( FAILED( D3DXCreateTextureFromFile ( m_pDevice, strFilename, (IDirect3DTexture9**)&m_pD3DTexture ) ) )
             return;
-    }
 
-    m_uiSizeX = imageInfo.Width;
-    m_uiSizeY = imageInfo.Height;
+        // Update surface size if it's a normal texture
+        D3DSURFACE_DESC desc;
+        ((IDirect3DTexture9*)m_pD3DTexture)->GetLevelDesc ( 0, &desc );
+        m_uiSurfaceSizeX = desc.Width;
+        m_uiSurfaceSizeY = desc.Height;
+    }
 
     // Calc memory usage
     m_iMemoryKBUsed = CRenderItemManager::CalcD3DResourceMemoryKBUsage ( m_pD3DTexture );
