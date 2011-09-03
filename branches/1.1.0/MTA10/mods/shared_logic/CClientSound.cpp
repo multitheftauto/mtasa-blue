@@ -331,7 +331,13 @@ void CClientSound::SetPosition ( const CVector& vecPosition )
 
 void CClientSound::GetPosition ( CVector& vecPosition ) const
 {
-    vecPosition = m_vecPosition;
+    if ( m_pAttachedToEntity )
+    {
+        m_pAttachedToEntity->GetPosition( vecPosition );
+        vecPosition += m_vecAttachedPosition;
+    }
+    else
+        vecPosition = m_vecPosition;
 }
 
 void CClientSound::SetVelocity ( const CVector& vecVelocity )
@@ -456,10 +462,6 @@ bool CClientSound::IsFxEffectEnabled ( uint uiFxEffect )
 ////////////////////////////////////////////////////////////
 void CClientSound::Process3D ( const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt )
 {
-    // If the sound isn't active, we don't need to process it
-    if ( !m_pAudio )
-        return;
-
     // Update 3D things if required
     if ( m_b3D )
     {
@@ -467,12 +469,19 @@ void CClientSound::Process3D ( const CVector& vecPlayerPosition, const CVector& 
         CClientEntity* pAttachedToEntity = GetAttachedTo ();
         if ( pAttachedToEntity )
         {
+            GetPosition( m_vecPosition );
             DoAttaching ();
             CVector vecVelocity;
             if ( CStaticFunctionDefinitions::GetElementVelocity ( *pAttachedToEntity, vecVelocity ) )
                 SetVelocity ( vecVelocity );
+            // Update our spatial data position
+            UpdateSpatialData ();
         }
     }
+    // If the sound isn't active, we don't need to process it
+    // Moved after 3D updating as the streamer didn't know the position changed if a sound isn't streamed in when attached.
+    if ( !m_pAudio )
+        return;
 
     m_pAudio->DoPulse ( vecPlayerPosition, vecCameraPosition, vecLookAt );
 
