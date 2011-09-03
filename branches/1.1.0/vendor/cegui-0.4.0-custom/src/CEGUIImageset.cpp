@@ -207,6 +207,10 @@ void Imageset::draw(const Rect& source_rect, const Rect& dest_rect, float z, con
 	// check if rect was totally clipped
 	if (final_rect.getWidth() != 0)
 	{
+        // Check for somthing that shouldn't happen but does
+        if ( !d_texture )
+            return;
+
 		float x_scale = 1.0f / (float)d_texture->getWidth();
 		float y_scale = 1.0f / (float)d_texture->getHeight();
 
