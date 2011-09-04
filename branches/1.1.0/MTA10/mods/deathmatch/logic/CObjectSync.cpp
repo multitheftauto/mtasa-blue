@@ -13,6 +13,8 @@
 #include "StdInc.h"
 #include "net/SyncStructures.h"
 
+#ifdef WITH_OBJECT_SYNC
+
 using std::list;
 
 #define OBJECT_SYNC_RATE 500
@@ -269,3 +271,5 @@ void CObjectSync::WriteObjectInformation ( NetBitStreamInterface* pBitStream, CD
         pObject->m_LastSyncedData.fHealth = health.data.fValue;
     }
 }
+
+#endif
