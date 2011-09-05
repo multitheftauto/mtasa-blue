@@ -1765,12 +1765,12 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
     pPlayer->UpdateOthersNearList ();
 
     // Use this players near list for sending packets
-    std::map < CPlayer*, SNearInfo >& nearList = pPlayer->GetNearPlayerList ();
+    std::map < CPlayer*, int >& nearList = pPlayer->GetNearPlayerList ();
 
-    for ( std::map < CPlayer*, SNearInfo > ::iterator it = nearList.begin (); it != nearList.end (); )
+    for ( std::map < CPlayer*, int > ::iterator it = nearList.begin (); it != nearList.end (); )
     {
         CPlayer* pSendPlayer = it->first;
-        int& iCount = it->second.iCount;
+        int& iCount = it->second;
         if ( --iCount < 1 )
         {
             // Remove player from near list (Has to be not near for 5 calls to get removed (The delay ensures timely updates of players moving far away))

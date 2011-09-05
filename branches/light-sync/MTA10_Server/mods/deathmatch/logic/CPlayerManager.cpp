@@ -312,15 +312,6 @@ void CPlayerManager::ResetAll ( void )
 
 void CPlayerManager::AddToList ( CPlayer* pPlayer )
 {
-    for ( std::list < CPlayer* > ::const_iterator iter = m_Players.begin () ; iter != m_Players.end (); iter++ )
-    {
-        // Add other players to near/far lists
-        pPlayer->AddPlayerToDistLists ( *iter );
-
-        // Add to other players near/far lists
-        (*iter)->AddPlayerToDistLists ( pPlayer );
-    }
-
     m_Players.push_back ( pPlayer );
 }
 
@@ -328,8 +319,4 @@ void CPlayerManager::AddToList ( CPlayer* pPlayer )
 void CPlayerManager::RemoveFromList ( CPlayer* pPlayer )
 {
     m_Players.remove ( pPlayer );
-
-    // Remove from other players near/far lists
-    for ( std::list < CPlayer* > ::const_iterator iter = m_Players.begin () ; iter != m_Players.end (); iter++ )
-        (*iter)->RemovePlayerFromDistLists ( pPlayer );
 }

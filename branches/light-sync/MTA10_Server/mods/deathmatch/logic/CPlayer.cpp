@@ -583,6 +583,75 @@ bool CPlayer::GetWeaponCorrect ( void )
     return m_uiWeaponIncorrectCount == 0;
 }
 
+void CPlayer::SetVoiceBroadcastTo( CElement* pElement )
+{
+    m_lstBroadcastList.clear();
+    if ( pElement )
+        m_lstBroadcastList.push_back ( pElement );
+}
+
+void CPlayer::SetVoiceBroadcastTo( const std::list < CElement* >& lstElements )
+{
+    m_lstBroadcastList = lstElements;
+}
+
+void CPlayer::SetVoiceIgnoredElement( CElement* pElement )
+{
+    m_lstIgnoredList.clear();
+    if ( pElement )
+        m_lstIgnoredList.push_back ( pElement );
+}
+
+void CPlayer::SetVoiceIgnoredList( const std::list < CElement* >& lstElements )
+{
+    m_lstIgnoredList = lstElements;
+}
+
+bool CPlayer::IsPlayerIgnoringElement( CElement* pElement )
+{
+    // For each ignored element
+    for ( list < CElement* > ::const_iterator iter = m_lstIgnoredList.begin () ; iter != m_lstIgnoredList.end () ; ++iter )
+    {
+        CElement* pIgnoredElement = *iter;
+        if ( IS_TEAM ( pIgnoredElement ) )
+        {
+            // Check team
+            CTeam* pTeam = static_cast < CTeam* > ( pIgnoredElement );
+            // If the broadcast-to player is in the ignored team
+            list < CPlayer* > ::const_iterator iter = pTeam->PlayersBegin ();
+            for ( ; iter != pTeam->PlayersEnd (); iter++ )
+            {
+                if ( *iter == pElement )
+                    return true;
+            }
+        }
+        else if ( IS_PLAYER( pIgnoredElement ) )
+        {
+            // Check player
+            if ( pIgnoredElement == pElement )
+                return true;
+        }
+        else
+        {
+            // Check element decendants
+            if ( pIgnoredElement->IsMyChild ( pElement , true ) )
+                return true;
+        }
+    }
+    return false;
+}
+
+
+//
+// Save rough camera position and rotation for later
+//
+void CPlayer::SetCameraOrientation ( const CVector& vecPosition, const CVector& vecFwd )
+{
+    m_vecCamPosition = vecPosition;
+    m_vecCamFwd = vecFwd;
+}
+
+
 // Put this player in other players nearlist, if errm... the player is near, enough
 void CPlayer::UpdateOthersNearList ( void )
 {
@@ -653,244 +722,9 @@ void CPlayer::UpdateOthersNearList ( void )
                 if ( ( vecPlayerPosition - vecOtherPlayerPos ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE ||
                      ( vecCameraPosition - vecOtherPlayerPos ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE )
                 {
-                    // Check dimension matches
-                    if ( m_usDimension == pOtherPlayer->GetDimension () )
-                        pOtherPlayer->RefreshNearPlayer ( this );
+                    pOtherPlayer->AddNearPlayer ( this );
                 }
             }
         }
     }
-}
-
-void CPlayer::SetVoiceBroadcastTo( CElement* pElement )
-{
-    m_lstBroadcastList.clear();
-    if ( pElement )
-        m_lstBroadcastList.push_back ( pElement );
-}
-
-void CPlayer::SetVoiceBroadcastTo( const std::list < CElement* >& lstElements )
-{
-    m_lstBroadcastList = lstElements;
-}
-
-void CPlayer::SetVoiceIgnoredElement( CElement* pElement )
-{
-    m_lstIgnoredList.clear();
-    if ( pElement )
-        m_lstIgnoredList.push_back ( pElement );
-}
-
-void CPlayer::SetVoiceIgnoredList( const std::list < CElement* >& lstElements )
-{
-    m_lstIgnoredList = lstElements;
-}
-
-bool CPlayer::IsPlayerIgnoringElement( CElement* pElement )
-{
-    // For each ignored element
-    for ( list < CElement* > ::const_iterator iter = m_lstIgnoredList.begin () ; iter != m_lstIgnoredList.end () ; ++iter )
-    {
-        CElement* pIgnoredElement = *iter;
-        if ( IS_TEAM ( pIgnoredElement ) )
-        {
-            // Check team
-            CTeam* pTeam = static_cast < CTeam* > ( pIgnoredElement );
-            // If the broadcast-to player is in the ignored team
-            list < CPlayer* > ::const_iterator iter = pTeam->PlayersBegin ();
-            for ( ; iter != pTeam->PlayersEnd (); iter++ )
-            {
-                if ( *iter == pElement )
-                    return true;
-            }
-        }
-        else if ( IS_PLAYER( pIgnoredElement ) )
-        {
-            // Check player
-            if ( pIgnoredElement == pElement )
-                return true;
-        }
-        else
-        {
-            // Check element decendants
-            if ( pIgnoredElement->IsMyChild ( pElement , true ) )
-                return true;
-        }
-    }
-    return false;
-}
-
-
-//
-// Save rough camera position and rotation for later
-//
-void CPlayer::SetCameraOrientation ( const CVector& vecPosition, const CVector& vecFwd )
-{
-    m_vecCamPosition = vecPosition;
-    m_vecCamFwd = vecFwd;
-}
-
-
-//
-// Ensure other player stays in the near list
-//
-void CPlayer::RefreshNearPlayer ( CPlayer* pOther )
-{
-    SNearInfo* pInfo = MapFind ( m_NearPlayerList, pOther );
-    if ( !pInfo )
-    {
-        // Move from far list
-        MovePlayerToNearList ( pOther );
-        pInfo = MapFind ( m_NearPlayerList, pOther );
-    }
-    pInfo->iCount = 5;
-}
-
-
-void CPlayer::AddPlayerToDistLists ( CPlayer* pOther )
-{
-    dassert ( !MapContains ( m_NearPlayerList, pOther ) && !MapContains ( m_FarPlayerList, pOther ) );
-    SNearInfo info = { 0, 0 };
-    MapSet ( m_NearPlayerList, pOther, info );
-}
-
-void CPlayer::RemovePlayerFromDistLists ( CPlayer* pOther )
-{
-    dassert ( MapContains ( m_NearPlayerList, pOther ) || MapContains ( m_FarPlayerList, pOther ) );
-    MapRemove ( m_NearPlayerList, pOther );
-    MapRemove ( m_FarPlayerList, pOther );
-}
-
-void CPlayer::MovePlayerToNearList ( CPlayer* pOther )
-{
-    dassert ( !MapContains ( m_NearPlayerList, pOther ) && MapContains ( m_FarPlayerList, pOther ) );
-    SNearInfo* pInfo = MapFind ( m_FarPlayerList, pOther );
-    MapSet ( m_NearPlayerList, pOther, *pInfo );
-    MapRemove ( m_FarPlayerList, pOther );
-}
-
-void CPlayer::MovePlayerToFarList ( CPlayer* pOther )
-{
-    dassert ( MapContains ( m_NearPlayerList, pOther ) && !MapContains ( m_FarPlayerList, pOther ) );
-    SNearInfo* pInfo = MapFind ( m_NearPlayerList, pOther );
-    MapSet ( m_FarPlayerList, pOther, *pInfo );
-    MapRemove ( m_NearPlayerList, pOther );
-}
-
-
-//
-// Dynamically increase the interval between near sync updates depending on stuffs
-//
-bool CPlayer::IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo )
-{
-    int iZone = GetSyncZone ( pOther );
-
-    int iUpdateInterval = g_pBandwidthSettings->ZoneUpdateIntervals [ iZone ];
-
-#if MTA_DEBUG
-    if ( m_iLastZoneDebug != iZone )
-    {
-        // Calc direction from our camera to the other player
-        const CVector& vecOtherPosition = pOther->GetPosition ();
-        CVector vecDirToOther = pOther->GetPosition () - m_vecCamPosition;
-
-        // Get distance
-        float fDistSq = vecDirToOther.LengthSquared ();
-
-        // Get angle between camera direction and direction to other
-        vecDirToOther.Normalize ();
-        float fDot = m_vecCamFwd.DotProduct ( &vecDirToOther );
-
-        OutputDebugLine ( SString ( "Dist:%1.0f  Dot:%0.3f  %s SyncTo %s zone changing: %d -> %d [Interval:%d] CamPos:%1.0f,%1.0f,%1.0f  CamFwd:%1.2f,%1.2f,%1.2f "
-                ,sqrtf ( fDistSq )
-                ,fDot
-                ,pOther->GetNick ()
-                ,GetNick ()
-                ,m_iLastZoneDebug
-                ,iZone
-                ,iUpdateInterval
-                ,m_vecCamPosition.fX
-                ,m_vecCamPosition.fY
-                ,m_vecCamPosition.fZ
-                ,m_vecCamFwd.fX
-                ,m_vecCamFwd.fY
-                ,m_vecCamFwd.fZ
-            ) );
-
-        m_iLastZoneDebug = iZone;
-    }
-#endif
-
-    long long llTimeNow = GetModuleTickCount64 ();
-    long long llNextUpdateTime = nearInfo.llLastUpdateTime + iUpdateInterval;
-
-    if ( llNextUpdateTime > llTimeNow )
-    {
-        g_pStats->puresync.llSkippedPacketsByZone[ iZone ]++;
-        return false;
-    }
-
-    nearInfo.llLastUpdateTime = llTimeNow;
-
-    g_pStats->puresync.llSentPacketsByZone[ iZone ]++;
-    return true;
-}
-
-
-//
-// Deduce what zone the other player is in
-//
-int CPlayer::GetSyncZone ( CPlayer* pOther )
-{
-    int iZone = 0;
-
-    // Calc direction from our camera to the other player
-    const CVector& vecOtherPosition = pOther->GetPosition ();
-    CVector vecDirToOther = vecOtherPosition - m_vecCamPosition;
-
-    // See if in distance zone 0
-    float fDistSq = vecDirToOther.LengthSquared ();
-    if ( fDistSq < g_pBandwidthSettings->fZone0RadiusSq )
-    {
-        iZone = 0;
-    }
-    else
-    {
-        // Get angle between camera direction and direction to other
-        vecDirToOther.Normalize ();
-        float fDot = m_vecCamFwd.DotProduct ( &vecDirToOther );
-        //  1=0 deg   0=90 deg  -1=180 deg
-        if ( fDot > g_pBandwidthSettings->fZone1Dot )
-        {
-            iZone = 0;
-        }
-        else
-        if ( fDot > g_pBandwidthSettings->fZone2Dot )
-        {
-            iZone = 1;
-        }
-        else
-            iZone = 2;
-    }
-
-
-    // See if zone could be lowered
-    if ( g_pBandwidthSettings->iMaxZoneIfOtherCanSee < iZone )
-    {
-        // Test if other can see us
-        const CVector& vecOtherCamPosition = pOther->GetCamPosition ();
-        const CVector& vecOtherCamFwd = pOther->GetCamFwd ();
-
-        // Calc direction from other camera to our player
-        CVector vecDirToHere = m_vecPosition - vecOtherCamPosition;
-
-        // Get angle between camera direction and direction to here
-        vecDirToHere.Normalize ();
-        float fDot = vecOtherCamFwd.DotProduct ( &vecDirToHere );
-        //  1=0 deg   0=90 deg  -1=180 deg
-        if ( fDot > 0.643 ) // 100 deg fov  [cos ( DEG2RAD( 100 ) * 0.5f )]
-            iZone = g_pBandwidthSettings->iMaxZoneIfOtherCanSee;
-    }
-
-    return iZone;
 }

@@ -225,13 +225,8 @@ public:
     bool                                        GetWeaponCorrect            ( void );
 
     void                                        UpdateOthersNearList        ( void );
-    void                                        RefreshNearPlayer           ( CPlayer* pOther );
-    std::map < CPlayer*, SNearInfo >&           GetNearPlayerList           ( void )                        { return m_NearPlayerList; }
-    std::map < CPlayer*, SNearInfo >&           GetFarPlayerList            ( void )                        { return m_FarPlayerList; }
-    void                                        AddPlayerToDistLists        ( CPlayer* pOther );
-    void                                        RemovePlayerFromDistLists   ( CPlayer* pOther );
-    void                                        MovePlayerToNearList        ( CPlayer* pOther );
-    void                                        MovePlayerToFarList         ( CPlayer* pOther );
+    void                                        AddNearPlayer               ( CPlayer* other )              { m_NearPlayerList [ other ] = 5; }
+    std::map < CPlayer*, int >&                 GetNearPlayerList           ( void )                        { return m_NearPlayerList; }
 
 public:
     struct SLightweightSyncData
@@ -378,8 +373,7 @@ private:
 
     uint                                        m_uiWeaponIncorrectCount;
 
-    std::map < CPlayer*, SNearInfo >            m_NearPlayerList;
-    std::map < CPlayer*, SNearInfo >            m_FarPlayerList;
+    std::map < CPlayer*, int >                  m_NearPlayerList;
     long long                                   m_llNearListUpdateTime;
 
     CVector                                     m_vecCamPosition;
