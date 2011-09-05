@@ -90,8 +90,6 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
     m_ucBlurLevel = 36; // Default
 
-    m_llNextFarSyncTime = 0;
-
     // Sync stuff
     m_bSyncingVelocity = false;
     m_uiPuresyncPackets = 0;
@@ -553,28 +551,6 @@ void CPlayer::RemoveNametagOverrideColor ( void )
     m_ucNametagB = 255;
     m_bNametagColorOverridden = false;
 }
-
-
-// Is it time to send a pure sync to every other player ?
-bool CPlayer::IsTimeForFarSync ( void )
-{
-    long long llTime = GetTickCount64_ ();
-    if ( llTime > m_llNextFarSyncTime )
-    {
-        int iSlowSyncRate = g_pBandwidthSettings->ZoneUpdateIntervals [ ZONE3 ];
-        m_llNextFarSyncTime = llTime + iSlowSyncRate;
-        m_llNextFarSyncTime += rand () % ( 1 + iSlowSyncRate / 10 );   // Extra bit to help distribute the load
-
-        // Calc stats
-        int iNumPackets = m_FarPlayerList.size ();
-        int iNumSkipped = ( iNumPackets * iSlowSyncRate - iNumPackets * 1000 ) / 1000;
-        g_pStats->puresync.llSentPacketsByZone [ ZONE3 ] += iNumPackets;
-        g_pStats->puresync.llSkippedPacketsByZone [ ZONE3 ] += iNumSkipped;
-        return true;
-    }
-    return false;
-}
-
 
 // Note: The return value must be consumed before m_AnnounceValues is next modified
 const std::string& CPlayer::GetAnnounceValue ( const string& strKey ) const

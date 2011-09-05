@@ -720,6 +720,14 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="core"
+				>
+			</Filter>
+			<Filter
+				Name="utils"
+				>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -1698,6 +1706,14 @@
 				</File>
 				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Math.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Math.hpp"
 					>
 				</File>
 				<File

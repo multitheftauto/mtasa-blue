@@ -28,8 +28,6 @@ class CPlayer;
 #include "CObject.h"
 #include "packets/CPacket.h"
 
-#define DISTANCE_FOR_SLOW_SYNCRATE  320
-
 class CKeyBinds;
 class CPlayerCamera;
 
@@ -210,8 +208,6 @@ public:
     inline unsigned char                        GetBlurLevel                ( void )                        { return m_ucBlurLevel; }
     inline void                                 SetBlurLevel                ( unsigned char ucBlurLevel )   { m_ucBlurLevel = ucBlurLevel; }
 
-    bool                                        IsTimeForFarSync            ( void );
-
     // Sync stuff
     inline void                                 SetSyncingVelocity          ( bool bSyncing )               { m_bSyncingVelocity = bSyncing; }
     inline bool                                 IsSyncingVelocity           ( void ) const                  { return m_bSyncingVelocity; }
@@ -237,6 +233,35 @@ public:
     void                                        MovePlayerToNearList        ( CPlayer* pOther );
     void                                        MovePlayerToFarList         ( CPlayer* pOther );
 
+public:
+    struct SLightweightSyncData
+    {
+        SLightweightSyncData ()
+        {
+            health.uiContext = 0;
+            health.bSync = false;
+            vehicleHealth.uiContext = 0;
+            vehicleHealth.bSync = false;
+        }
+
+        struct
+        {
+            float           fLastHealth;
+            float           fLastArmor;
+            bool            bSync;
+            unsigned int    uiContext;
+        } health;
+
+        struct
+        {
+            CVehicle*       lastVehicle;
+            float           fLastHealth;
+            bool            bSync;
+            unsigned int    uiContext;
+        } vehicleHealth;
+    };
+    SLightweightSyncData&                       GetLightweightSyncData      ( void ) { return m_lightweightSyncData; }
+
     eVoiceState                                 GetVoiceState               ( void )                      { return m_VoiceState; }
     void                                        SetVoiceState               ( eVoiceState State )         { m_VoiceState = State; }
 
@@ -259,7 +284,10 @@ public:
     const CVector&                              GetCamFwd                   ( void )            { return m_vecCamFwd; };
 
 
+
 private:
+    SLightweightSyncData                        m_lightweightSyncData;
+
     void                                        WriteCameraModePacket       ( void );
     void                                        WriteCameraPositionPacket   ( void );
 
@@ -334,8 +362,6 @@ private:
     std::string                                 m_strCommunityID;
 
     unsigned char                               m_ucBlurLevel;
-
-    long long                                   m_llNextFarSyncTime;       
 
     // Voice
     eVoiceState                                 m_VoiceState;

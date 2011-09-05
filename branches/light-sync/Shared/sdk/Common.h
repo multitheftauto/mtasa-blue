@@ -82,3 +82,6 @@ private:
 #else
 #define _DECLSPEC_EX extern "C" 
 #endif
+
+// Maximum number of players that can be packed in a single lightweight puresync packet
+#define LIGHTSYNC_MAX_PLAYERS               32
