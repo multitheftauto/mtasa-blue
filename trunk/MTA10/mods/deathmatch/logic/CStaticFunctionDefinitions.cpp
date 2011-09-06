@@ -718,6 +718,7 @@ bool CStaticFunctionDefinitions::IsElementSyncer ( CClientEntity& Entity, bool &
                 bIsSyncer = m_pClientGame->GetUnoccupiedVehicleSync()->Exists ( Vehicle );
             break;
         }
+#ifdef WITH_OBJECT_SYNC
         case CCLIENTOBJECT:
         {
             CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( &Entity );
@@ -725,6 +726,7 @@ bool CStaticFunctionDefinitions::IsElementSyncer ( CClientEntity& Entity, bool &
                 bIsSyncer = m_pClientGame->GetObjectSync ()->Exists ( pObject );
             break;
         }
+#endif
         default: return false;
     }
     return true;
@@ -3078,7 +3080,11 @@ CClientObject* CStaticFunctionDefinitions::CreateObject ( CResource& Resource, u
 {
     if ( CClientObjectManager::IsValidModel ( usModelID ) )
     {
+#ifdef WITH_OBJECT_SYNC
         CClientObject* pObject = new CDeathmatchObject ( m_pManager, m_pMovingObjectsManager, m_pClientGame->GetObjectSync (), INVALID_ELEMENT_ID, usModelID );
+#else
+        CClientObject* pObject = new CDeathmatchObject ( m_pManager, m_pMovingObjectsManager, INVALID_ELEMENT_ID, usModelID );
+#endif
         if ( pObject )
         {
             pObject->SetParent ( Resource.GetResourceDynamicEntity () );

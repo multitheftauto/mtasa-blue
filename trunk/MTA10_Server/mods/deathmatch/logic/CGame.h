@@ -186,7 +186,9 @@ public:
     inline CTeamManager*            GetTeamManager              ( void )        { return m_pTeamManager; }
     inline CUnoccupiedVehicleSync*  GetUnoccupiedVehicleSync    ( void )        { return m_pUnoccupiedVehicleSync; }
     inline CPedSync*                GetPedSync                  ( void )        { return m_pPedSync; }
+#ifdef WITH_OBJECT_SYNC
     inline CObjectSync*             GetObjectSync               ( void )        { return m_pObjectSync; }
+#endif
     inline CConsole*                GetConsole                  ( void )        { return m_pConsole; }
     inline CRegistryManager*        GetRegistryManager          ( void )        { return m_pRegistryManager; }
     inline CRegistry*               GetRegistry                 ( void )        { return m_pRegistry; }
@@ -374,7 +376,9 @@ private:
     CConsole*                       m_pConsole;
     CUnoccupiedVehicleSync*         m_pUnoccupiedVehicleSync;
     CPedSync*                       m_pPedSync;
+#ifdef WITH_OBJECT_SYNC
     CObjectSync*                    m_pObjectSync;
+#endif
     CMarkerManager*                 m_pMarkerManager;
     CClock*                         m_pClock;
     CBanManager*                    m_pBanManager;
