@@ -18,10 +18,7 @@ bool CElementRPCPacket::Write ( NetBitStreamInterface& BitStream ) const
     BitStream.Write ( m_ucActionID );
 
     // Write the source element.
-    if ( m_pSourceElement != NULL )
-        BitStream.Write ( m_pSourceElement->GetID () );
-    else
-        BitStream.Write ( ElementID(INVALID_ELEMENT_ID) );
+    BitStream.Write ( m_pSourceElement->GetID () );
 
     // Copy each byte from the bitstream we have to this one
     unsigned char ucTemp;

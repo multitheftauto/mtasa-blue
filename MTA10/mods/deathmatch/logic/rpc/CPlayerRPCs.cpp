@@ -24,6 +24,7 @@ void CPlayerRPCs::LoadFunctions ( void )
     AddHandler ( REMOVE_PLAYER_NAMETAG_COLOR, RemovePlayerNametagColor, "RemovePlayerNametagColor" );
     AddHandler ( SET_PLAYER_NAMETAG_COLOR, SetPlayerNametagColor, "SetPlayerNametagColor" );
     AddHandler ( SET_PLAYER_NAMETAG_SHOWING, SetPlayerNametagShowing, "SetPlayerNametagShowing" ); 
+    AddHandler ( SET_PLAYER_TEAM, SetPlayerTeam, "SetPlayerTeam" );
 }
 
 
@@ -166,6 +167,20 @@ void CPlayerRPCs::SetPlayerNametagShowing ( CClientEntity* pSource, NetBitStream
         if ( pPlayer )
         {
             pPlayer->SetNametagShowing ( ( ucShowing == 1 ) );
+        }
+    }
+}
+
+void CPlayerRPCs::SetPlayerTeam ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+{
+    ElementID TeamID;
+    if ( bitStream.Read ( TeamID ) )
+    {
+        CClientTeam* pTeam = m_pTeamManager->GetTeam ( TeamID );
+        CClientPlayer* pPlayer = m_pPlayerManager->Get ( pSource->GetID () );
+        if ( pPlayer )
+        {
+            pPlayer->SetTeam ( pTeam, true );
         }
     }
 }
