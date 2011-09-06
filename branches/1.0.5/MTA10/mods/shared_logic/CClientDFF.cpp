@@ -43,6 +43,9 @@ bool CClientDFF::LoadDFF ( const char* szFile, unsigned short usCollisionModel )
     // We can't have two clumps loaded.
     if ( !m_pLoadedClump )
     {
+        if ( !g_pCore->GetNetwork ()->CheckFile ( "dff", szFile ) )
+            return false;
+
         // Attempt loading it
         m_pLoadedClump = g_pGame->GetRenderWare ()->ReadDFF ( szFile, usCollisionModel );
 
