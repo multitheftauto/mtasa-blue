@@ -190,9 +190,10 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
         return true;
     else if ( g_pClientGame->GetPedSync ()->ProcessPacket ( ucPacketID, bitStream ) )
         return true;
+#ifdef WITH_OBJECT_SYNC
     else if ( g_pClientGame->GetObjectSync ()->ProcessPacket ( ucPacketID, bitStream ) )
         return true;
-
+#endif
     return false;
 }
 
@@ -2473,7 +2474,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         }
 
                         // Create the object and put it at its position
+#ifdef WITH_OBJECT_SYNC
                         CDeathmatchObject* pObject = new CDeathmatchObject ( g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, g_pClientGame->m_pObjectSync, EntityID, usObjectID );
+#else
+                        CDeathmatchObject* pObject = new CDeathmatchObject ( g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, EntityID, usObjectID );
+#endif
                         pEntity = pObject;
                         if ( pObject )
                         {

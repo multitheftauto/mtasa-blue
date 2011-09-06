@@ -237,7 +237,9 @@ public:
 
     inline CUnoccupiedVehicleSync*      GetUnoccupiedVehicleSync        ( void )        { return m_pUnoccupiedVehicleSync; }
     inline CPedSync*                    GetPedSync                      ( void )        { return m_pPedSync; }
+#ifdef WITH_OBJECT_SYNC
     inline CObjectSync*                 GetObjectSync                   ( void )        { return m_pObjectSync; }
+#endif
 
     inline CElementDeleter*             GetElementDeleter               ( void )        { return &m_ElementDeleter; }
 
@@ -474,7 +476,9 @@ private:
     CRPCFunctions*                      m_pRPCFunctions;
     CUnoccupiedVehicleSync*             m_pUnoccupiedVehicleSync;
     CPedSync*                           m_pPedSync;
+#ifdef WITH_OBJECT_SYNC
     CObjectSync*                        m_pObjectSync;
+#endif
     CMovingObjectsManager*              m_pMovingObjectsManager;
     CNametags*                          m_pNametags;
     CNetAPI*                            m_pNetAPI;

@@ -102,7 +102,9 @@ CGame::CGame ( void )
     m_pLanBroadcast = NULL;
     m_pPedSync = NULL;
     m_pWaterManager = NULL;
+#ifdef WITH_OBJECT_SYNC
     m_pObjectSync = NULL;
+#endif
 
     m_bInteriorSoundsEnabled = true;
     m_bOverrideRainLevel = false;
@@ -210,7 +212,9 @@ CGame::~CGame ( void )
     m_ElementDeleter.DoDeleteAll ();
     SAFE_DELETE ( m_pUnoccupiedVehicleSync );
     SAFE_DELETE ( m_pPedSync );
+#ifdef WITH_OBJECT_SYNC
     SAFE_DELETE ( m_pObjectSync );
+#endif
     SAFE_DELETE ( m_pConsole );
     SAFE_DELETE ( m_pMapManager );
     SAFE_DELETE ( m_pLuaManager );
@@ -337,7 +341,9 @@ void CGame::DoPulse ( void )
     m_pMapManager->DoPulse ();
     m_pUnoccupiedVehicleSync->DoPulse ();
     m_pPedSync->DoPulse ();
+#ifdef WITH_OBJECT_SYNC
     m_pObjectSync->DoPulse ();
+#endif
     m_pBanManager->DoPulse ();
     m_pAccountManager->DoPulse ();
     m_pRegistryManager->DoPulse ();
@@ -584,7 +590,9 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pResourceManager->Refresh();
     m_pUnoccupiedVehicleSync = new CUnoccupiedVehicleSync ( m_pPlayerManager, m_pVehicleManager );
     m_pPedSync = new CPedSync ( m_pPlayerManager, m_pPedManager );
+#ifdef WITH_OBJECT_SYNC
     m_pObjectSync = new CObjectSync ( m_pPlayerManager, m_pObjectManager );
+#endif
     // Must be created before all clients
     m_pConsoleClient = new CConsoleClient ( m_pConsole );
 
@@ -1042,11 +1050,12 @@ bool CGame::ProcessPacket ( CPacket& Packet )
     {
         return true;
     }
+#ifdef WITH_OBJECT_SYNC
     else if ( m_pObjectSync->ProcessPacket ( Packet ) )
     {
         return true;
     }
-
+#endif
     return false;
 }
 

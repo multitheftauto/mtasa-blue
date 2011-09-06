@@ -1649,6 +1649,7 @@ bool CStaticFunctionDefinitions::SetElementSyncer ( CElement* pElement, CPlayer*
             return true;
             break;
         }
+#ifdef WITH_OBJECT_SYNC
         case CElement::OBJECT:
         {
             CObject* pObject = static_cast < CObject* > ( pElement );
@@ -1657,6 +1658,7 @@ bool CStaticFunctionDefinitions::SetElementSyncer ( CElement* pElement, CPlayer*
             return true;
             break;
         }
+#endif
         default: return false;
     }
     return false;

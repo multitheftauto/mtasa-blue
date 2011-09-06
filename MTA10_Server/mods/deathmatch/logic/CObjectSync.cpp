@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 
+#ifdef WITH_OBJECT_SYNC
+
 #define SYNC_RATE 500
 #define MAX_PLAYER_SYNC_DISTANCE 100.0f
 
@@ -232,3 +234,5 @@ void CObjectSync::Packet_ObjectSync ( CObjectSyncPacket& Packet )
         m_pPlayerManager->BroadcastOnlyJoined ( Packet, pPlayer );
     }
 }
+
+#endif

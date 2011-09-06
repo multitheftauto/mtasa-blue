@@ -189,7 +189,9 @@ CClientGame::CClientGame ( bool bLocalPlay )
     // Our management classes
     m_pUnoccupiedVehicleSync = new CUnoccupiedVehicleSync ( m_pVehicleManager );
     m_pPedSync = new CPedSync ( m_pPedManager );
+#ifdef WITH_OBJECT_SYNC
     m_pObjectSync = new CObjectSync ( m_pObjectManager );
+#endif
     m_pNametags = new CNametags ( m_pManager );
     m_pRadarMap = new CRadarMap ( m_pManager );
 
@@ -390,7 +392,9 @@ CClientGame::~CClientGame ( void )
     delete m_pRPCFunctions;
     delete m_pUnoccupiedVehicleSync;
     delete m_pPedSync;
+#ifdef WITH_OBJECT_SYNC
     delete m_pObjectSync;
+#endif
     delete m_pBlendedWeather;
     m_pBlendedWeather = NULL;
     delete m_pMovingObjectsManager;
@@ -927,7 +931,9 @@ void CClientGame::DoPulses ( void )
     m_pNetAPI->DoPulse ();
     m_pUnoccupiedVehicleSync->DoPulse ();
     m_pPedSync->DoPulse ();
+#ifdef WITH_OBJECT_SYNC
     m_pObjectSync->DoPulse ();
+#endif
     m_pLuaManager->DoPulse ();
 
     #ifdef MTA_DEBUG

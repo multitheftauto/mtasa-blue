@@ -16,6 +16,8 @@
 #include <CClientCommon.h>
 #include "CDeathmatchObject.h"
 
+#ifdef WITH_OBJECT_SYNC
+
 class CObjectSync
 {
 public:
@@ -46,5 +48,7 @@ private:
     CMappedList < CDeathmatchObject* > m_List;
     unsigned long                   m_ulLastSyncTime;
 };
+
+#endif
 
 #endif
