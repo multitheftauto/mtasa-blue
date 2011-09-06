@@ -727,37 +727,6 @@ bool CGraphics::DestroyStandardDXFonts ( void )
     return true;
 }
 
-IDirect3DTexture9* CGraphics::CreateTexture ( DWORD* dwBitMap, unsigned int uiWidth, unsigned int uiHeight )
-{
-    IDirect3DTexture9* texture = NULL;
-    D3DXCreateTexture ( m_pDevice, uiWidth, uiHeight, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &texture );
-
-    D3DLOCKED_RECT lRect;
-    texture->LockRect ( 0, &lRect, 0, 0 );
-
-    BYTE* pTexture;
-    pTexture = static_cast < BYTE* > ( lRect.pBits );
-
-    DWORD color, pitch;
-    pitch = lRect.Pitch;
-    for ( UINT c = 0; c < uiHeight; c++ )
-    {
-        for ( UINT r = 0; r < uiWidth; r++ )
-        {
-            color = dwBitMap[uiWidth*c+r];
-            pTexture[r*4+c*pitch+0] = static_cast < BYTE > ( color );
-            pTexture[r*4+c*pitch+1] = static_cast < BYTE > ( color >> 8 );
-            pTexture[r*4+c*pitch+2] = static_cast < BYTE > ( color >> 16 );
-            pTexture[r*4+c*pitch+3] = static_cast < BYTE > ( color >> 24 );
-        }
-    }
-
-    lRect.pBits = pTexture;
-
-    texture->UnlockRect ( 0 );
-    return texture;
-}
-
 IDirect3DTexture9* CGraphics::LoadTexture ( const char* szFile )
 {
     IDirect3DTexture9* texture = NULL;
@@ -773,7 +742,7 @@ IDirect3DTexture9* CGraphics::LoadTexture ( const char* szFile, unsigned int uiW
 }
 
 extern CCore* g_pCore;
-void CGraphics::DrawTexture ( IDirect3DTexture9* texture, float fX, float fY, float fScaleX, float fScaleY, float fRotation, float fCenterX, float fCenterY, unsigned char ucAlpha )
+void CGraphics::DrawTexture ( IDirect3DTexture9* texture, float fX, float fY, float fScaleX, float fScaleY, float fRotation, float fCenterX, float fCenterY, DWORD dwColor )
 {
     if ( !texture )
         return;
@@ -786,7 +755,7 @@ void CGraphics::DrawTexture ( IDirect3DTexture9* texture, float fX, float fY, fl
     D3DXVECTOR2 position ( fX - ( float ) textureDesc.Width * fScaleX * fCenterX, fY - ( float ) textureDesc.Height * fScaleY * fCenterY );
     D3DXMatrixTransformation2D ( &matrix, NULL, NULL, &scaling, &rotationCenter, fRotation * 6.2832f / 360.f, &position );
     m_pDXSprite->SetTransform ( &matrix );
-    m_pDXSprite->Draw ( texture, NULL, NULL, NULL, D3DCOLOR_ARGB ( ucAlpha, 255, 255, 255 ) );
+    m_pDXSprite->Draw ( texture, NULL, NULL, NULL, dwColor );
     m_pDXSprite->End ();
 }
 
