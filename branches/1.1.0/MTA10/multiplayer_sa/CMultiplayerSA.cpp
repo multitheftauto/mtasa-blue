@@ -1270,12 +1270,6 @@ void CMultiplayerSA::InitHooks()
     // Stop the loading of ambient traffic models and textures
     // by skipping CStreaming::StreamVehiclesAndPeds() and CStreaming::StreamZoneModels()
     MemPut < BYTE > ( 0x40E7DF, 0xEB );
-
-    // Fix peds turning into huge triangles sometimes by stopping the matrix cache getting filled with (apparently) unused pointer data
-    if ( version == VERSION_US_10 )
-        MemSet ( (void *)0x7CD62A, 0x90, 5 );
-    else if ( version == VERSION_EU_10 )
-        MemSet ( (void *)0x7CD66A, 0x90, 5 );
 }
 
 
