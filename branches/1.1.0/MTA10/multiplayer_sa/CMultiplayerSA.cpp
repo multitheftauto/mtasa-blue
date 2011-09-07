@@ -260,6 +260,20 @@ DWORD RETURN_CrashFix_Misc19b_BOTH =                        0;
 #define HOOKPOS_CrashFix_Misc20                              0x54F3B0
 DWORD RETURN_CrashFix_Misc20 =                               0x54F3B6;
 
+#define HOOKPOS_CrashFix_Misc21                              0x648EF6
+DWORD RETURN_CrashFix_Misc21 =                               0x648EFC;
+
+#define HOOKPOS_CrashFix_Misc22                              0x4CEF08
+DWORD RETURN_CrashFix_Misc22 =                               0x4CEF25;
+
+#define HOOKPOS_CrashFix_Misc23                              0x6E3D10
+DWORD RETURN_CrashFix_Misc23 =                               0x6E3D17;
+
+#define HOOKPOS_CrashFix_Misc24_US                          0x7F0DC8
+#define HOOKPOS_CrashFix_Misc24_EU                          0x7F0E08
+DWORD RETURN_CrashFix_Misc24_US =                           0x7F0DCE;
+DWORD RETURN_CrashFix_Misc24_EU =                           0x7F0E0E;
+DWORD RETURN_CrashFix_Misc24_BOTH =                         0;
 
 #define HOOKPOS_VehColCB                                    0x04C838D
 DWORD RETURN_VehColCB =                                     0x04C83AA;
@@ -419,6 +433,10 @@ void HOOK_CrashFix_Misc17 ();
 void HOOK_CrashFix_Misc18 ();
 void HOOK_CrashFix_Misc19 ();
 void HOOK_CrashFix_Misc20 ();
+void HOOK_CrashFix_Misc21 ();
+void HOOK_CrashFix_Misc22 ();
+void HOOK_CrashFix_Misc23 ();
+void HOOK_CrashFix_Misc24 ();
 void HOOK_VehColCB ();
 void HOOK_VehCol ();
 void HOOK_isVehDriveTypeNotRWD ();
@@ -563,26 +581,33 @@ void CMultiplayerSA::InitHooks()
         HookInstall(HOOKPOS_FreezeFix_Misc15_US, (DWORD)HOOK_FreezeFix_Misc15, 6 );
         HookInstall(HOOKPOS_CrashFix_Misc17_US, (DWORD)HOOK_CrashFix_Misc17, 6 );
         HookInstall(HOOKPOS_CrashFix_Misc19_US, (DWORD)HOOK_CrashFix_Misc19, 6 );
+        HookInstall(HOOKPOS_CrashFix_Misc24_US, (DWORD)HOOK_CrashFix_Misc24, 6 );
         RETURN_FreezeFix_Misc15_BOTH = RETURN_FreezeFix_Misc15_US;
         RETURN_CrashFix_Misc17a_BOTH = RETURN_CrashFix_Misc17a_US;
         RETURN_CrashFix_Misc17b_BOTH = RETURN_CrashFix_Misc17b_US;
         RETURN_CrashFix_Misc19a_BOTH = RETURN_CrashFix_Misc19a_US;
         RETURN_CrashFix_Misc19b_BOTH = RETURN_CrashFix_Misc19b_US;
+        RETURN_CrashFix_Misc24_BOTH = RETURN_CrashFix_Misc24_US;
     }
     if ( version == VERSION_EU_10 )
     {
         HookInstall(HOOKPOS_FreezeFix_Misc15_EU, (DWORD)HOOK_FreezeFix_Misc15, 6 );
         HookInstall(HOOKPOS_CrashFix_Misc17_EU, (DWORD)HOOK_CrashFix_Misc17, 6 );
         HookInstall(HOOKPOS_CrashFix_Misc19_EU, (DWORD)HOOK_CrashFix_Misc19, 6 );
+        HookInstall(HOOKPOS_CrashFix_Misc24_EU, (DWORD)HOOK_CrashFix_Misc24, 6 );
         RETURN_FreezeFix_Misc15_BOTH = RETURN_FreezeFix_Misc15_EU;
         RETURN_CrashFix_Misc17a_BOTH = RETURN_CrashFix_Misc17a_EU;
         RETURN_CrashFix_Misc17b_BOTH = RETURN_CrashFix_Misc17b_EU;
         RETURN_CrashFix_Misc19a_BOTH = RETURN_CrashFix_Misc19a_EU;
         RETURN_CrashFix_Misc19b_BOTH = RETURN_CrashFix_Misc19b_EU;
+        RETURN_CrashFix_Misc24_BOTH = RETURN_CrashFix_Misc24_EU;
     }
     HookInstall(HOOKPOS_CrashFix_Misc16, (DWORD)HOOK_CrashFix_Misc16, 6 );
     HookInstall(HOOKPOS_CrashFix_Misc18, (DWORD)HOOK_CrashFix_Misc18, 7 );
     HookInstall(HOOKPOS_CrashFix_Misc20, (DWORD)HOOK_CrashFix_Misc20, 6 );
+    HookInstall(HOOKPOS_CrashFix_Misc21, (DWORD)HOOK_CrashFix_Misc21, 6 );
+    HookInstall(HOOKPOS_CrashFix_Misc22, (DWORD)HOOK_CrashFix_Misc22, 6 );
+    HookInstall(HOOKPOS_CrashFix_Misc23, (DWORD)HOOK_CrashFix_Misc23, 7 );
 
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29 );
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9 );
@@ -5269,7 +5294,7 @@ void _declspec(naked) HOOK_CrashFix_Misc13 ()
     _asm
     {
         // Hooked from 0x4D464E  6 bytes
-        cmp     eax, 0x480
+        cmp     eax, 0x2480
         jb      cont  // Skip much code if eax is less than 0x480 (invalid anim)
 
         mov     al, byte ptr [eax+0Ah] 
@@ -5471,6 +5496,144 @@ void _declspec(naked) HOOK_CrashFix_Misc20 ()
 
     cont:
         retn
+    }
+}
+
+
+// Handle CTaskSimpleCarFallOut::FinishAnimFallOutCB having wrong data
+// hooked at 648EF6 6 bytes
+void _declspec(naked) HOOK_CrashFix_Misc21 ()
+{
+#if TEST_CRASH_FIXES
+    SIMULATE_ERROR_BEGIN( 10 )
+        _asm
+        {
+            mov     ecx, 0x10
+        }
+    SIMULATE_ERROR_END
+#endif
+
+    _asm
+    {
+        cmp     ecx, 0x480
+        jb      cont  // Skip much code if ecx is low
+
+        // continue standard path
+        mov     edx, [ecx+590h]
+        jmp     RETURN_CrashFix_Misc21  // 648EFC
+
+    cont:
+        retn
+    }
+}
+
+
+
+// Handle CAnimBlendAssociation::Init having wrong data
+// hooked at 4CEF08 6 bytes
+void _declspec(naked) HOOK_CrashFix_Misc22 ()
+{
+    _asm
+    {
+        mov         edx,dword ptr [edi+0Ch] 
+    }
+
+#if TEST_CRASH_FIXES
+    SIMULATE_ERROR_BEGIN( 10 )
+        _asm
+        {
+            mov     edx, 0x10
+        }
+    SIMULATE_ERROR_END
+#endif
+
+    _asm
+    {
+        cmp     edx, 0x480
+        jb      altcode  // Fill output with zeros if edx is low
+
+        // do standard code
+    lp1:
+        mov         edx,dword ptr [edi+0Ch] 
+        mov         edx,dword ptr [edx+eax*4] 
+        mov         ebx,dword ptr [esi+10h] 
+        mov         dword ptr [ebx+ecx+10h],edx 
+        mov         edx,dword ptr [esi+10h] 
+        mov         dword ptr [edx+ecx+14h],esi 
+        movsx       edx,word ptr [esi+0Ch] 
+        inc         eax  
+        add         ecx,18h 
+        cmp         eax,edx 
+        jl          lp1 
+        jmp     RETURN_CrashFix_Misc22  // 4CEF25
+
+        // do alternate code
+    altcode:
+        mov     edx,0
+        mov         ebx,dword ptr [esi+10h] 
+        mov         dword ptr [ebx+ecx+10h],edx 
+        mov         dword ptr [ebx+ecx+14h],edx 
+        movsx       edx,word ptr [esi+0Ch] 
+        inc         eax  
+        add         ecx,18h 
+        cmp         eax,edx 
+        jl          altcode 
+        jmp     RETURN_CrashFix_Misc22  // 4CEF25
+    }
+}
+
+
+// Handle CVehicleAnimGroup::ComputeAnimDoorOffsets having wrong door index
+// hooked at 6E3D10 7 bytes
+void _declspec(naked) HOOK_CrashFix_Misc23 ()
+{
+#if TEST_CRASH_FIXES
+    SIMULATE_ERROR_BEGIN( 10 )
+        _asm
+        {
+            mov     edx,0xffff0000
+            mov     [esp+8], edx
+        }
+    SIMULATE_ERROR_END
+#endif
+
+    _asm
+    {
+        // Ensure door index is reasonable
+        mov     edx, [esp+8]
+        cmp     edx,16
+        jb      ok
+
+        // zero if out of range
+        mov     edx,0
+        mov     [esp+8], edx
+
+    ok:
+        // continue standard path
+        mov     edx, [esp+8]
+        lea     eax, [edx+edx*2]
+        jmp     RETURN_CrashFix_Misc23  // 6E3D17
+    }
+}
+
+
+// Handle _RwFrameForAllChildren being called with NULL
+// hooked at 7F0DC8/7F0E08 6 bytes
+void _declspec(naked) HOOK_CrashFix_Misc24 ()
+{
+    _asm
+    {
+        cmp     ebp, 0x480
+        jb      cont  // Skip code if ebp is low
+
+        // continue standard path
+        mov     eax, [ebp+98h]
+        jmp     RETURN_CrashFix_Misc24_BOTH  // 7F0DCE/7F0E0E
+
+    cont:
+        mov     ebp, 0
+        mov     eax, 0
+        jmp     RETURN_CrashFix_Misc24_BOTH  // 7F0DCE/7F0E0E
     }
 }
 
