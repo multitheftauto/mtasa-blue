@@ -978,10 +978,9 @@ void CMultiplayerSA::InitHooks()
     MemSet ( (LPVOID)0x6B0BC2, 0xEB, 1 );
 
     // DISABLE CPOPULATION::UPDATE - DOES NOT prevent vehicles - only on-foot peds
-    /*  
     MemPut < BYTE > ( 0x616650, 0xC3 );
-    MemPut < BYTE > ( 0xA43088, 1 );
-    */
+    // This sets the 'Replay Is Playing' flag
+    MemPutFast < BYTE > ( 0xA43088, 1 );
 
     // SORT OF HACK to make peds always walk around, even when in free-camera mode (in the editor)
     MemPut < BYTE > ( 0x53C017, 0x90 );
@@ -1295,6 +1294,19 @@ void CMultiplayerSA::InitHooks()
     // Stop the loading of ambient traffic models and textures
     // by skipping CStreaming::StreamVehiclesAndPeds() and CStreaming::StreamZoneModels()
     MemPut < BYTE > ( 0x40E7DF, 0xEB );
+
+    // Disable CReplay::Update
+    MemPut < BYTE > ( 0x460500, 0xC3 );
+    // Disable CInterestingEvents::ScanForNearbyEntities
+    MemPut < BYTE > ( 0x605A30, 0xC3 );
+    // Disable CGangWars::Update
+    MemPut < BYTE > ( 0x446610, 0xC3 );
+    // Disable CConversations::Update
+    MemPut < BYTE > ( 0x43C590, 0xC3 );
+    // Disable CPedToPlayerConversations::Update
+    MemPut < BYTE > ( 0x43B0F0, 0xC3 );
+    // Disable CCarCtrl::RemoveCarsIfThePoolGetsFull
+    MemPut < BYTE > ( 0x4322B0, 0xC3 );
 }
 
 
