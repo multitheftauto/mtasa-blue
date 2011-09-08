@@ -978,9 +978,9 @@ void CMultiplayerSA::InitHooks()
     MemSet ( (LPVOID)0x6B0BC2, 0xEB, 1 );
 
     // DISABLE CPOPULATION::UPDATE - DOES NOT prevent vehicles - only on-foot peds
-    MemPut < BYTE > ( 0x616650, 0xC3 );
+    //MemPut < BYTE > ( 0x616650, 0xC3 );    Problem - Stops streetlamps being turned into collidable objects when streamed in
     // This sets the 'Replay Is Playing' flag
-    MemPutFast < BYTE > ( 0xA43088, 1 );
+    //MemPutFast < BYTE > ( 0xA43088, 1 );   Problem - Stops streetlamps being turned into collidable objects when streamed in
 
     // SORT OF HACK to make peds always walk around, even when in free-camera mode (in the editor)
     MemPut < BYTE > ( 0x53C017, 0x90 );
@@ -1294,6 +1294,13 @@ void CMultiplayerSA::InitHooks()
     // Stop the loading of ambient traffic models and textures
     // by skipping CStreaming::StreamVehiclesAndPeds() and CStreaming::StreamZoneModels()
     MemPut < BYTE > ( 0x40E7DF, 0xEB );
+
+
+    // Disable CPopulation::ManagePed
+    MemPut < BYTE > ( 0x611FC0, 0xC3 );
+    // Stop CPopulation::Update after ManagePopulation call
+    MemPut < BYTE > ( 0x616698, 0x5E );
+    MemPut < BYTE > ( 0x616699, 0xC3 );
 
     // Disable CReplay::Update
     MemPut < BYTE > ( 0x460500, 0xC3 );
