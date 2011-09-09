@@ -1314,6 +1314,11 @@ void CMultiplayerSA::InitHooks()
     MemPut < BYTE > ( 0x43B0F0, 0xC3 );
     // Disable CCarCtrl::RemoveCarsIfThePoolGetsFull
     MemPut < BYTE > ( 0x4322B0, 0xC3 );
+    // Disable CStreaming::StreamVehiclesAndPeds_Always
+    MemPut < BYTE > ( 0x40B650, 0xC3 );
+
+    // Double the size of CPlaceable matrix array to fix a crash after CMatrixLinkList::AddToList1
+    MemPut < int > ( 0x54F3A1, 1800 );
 }
 
 
