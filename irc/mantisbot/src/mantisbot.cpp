@@ -89,6 +89,25 @@ static inline void Split(const std::string& str, std::vector<std::string>& dest,
   }
 }
 
+static bool CheckForEvgeniz(IRCClient* irc, const IRCMessage* msg_)
+{
+    const IRCMessagePrivmsg* msg = static_cast < const IRCMessagePrivmsg* > ( msg_ );
+    std::string text = msg->GetText ().GetText();
+    const char* keyword = "evgeniz sucks";
+    if ( text.length() >= strlen(keyword) && !strncasecmp(text.c_str(), keyword, strlen(keyword)) )
+    {
+        std::string reason = "";
+        if ( text.length() >= strlen(keyword)+2+strlen("because") &&
+             !strncasecmp ( text.c_str()+strlen(keyword), " because ", strlen(" because ") ) )
+        {
+            reason = text.c_str() + strlen(keyword) + strlen(" because ");
+        }
+        irc->Send ( IRCMessageKick ( msg->GetDest(), IRCUser("EvgeniZ"), reason ) );
+        return true;
+    }
+    return false;
+}
+
 /* Bot callbacks */
 static int do_ping(IRCClient* irc, const IRCUser* source, const IRCMessage* _msg)
 {
@@ -121,7 +140,8 @@ static int do_privmsg(IRCClient* irc, const IRCUser* source, const IRCMessage* _
 
   if (msg && msg->GetDest().GetType() == IRCUSER_CHANNEL)
   {
-    CommandHandler::Instance()->Handle(source, &msg->GetDest(), msg->GetText().GetText());
+    if ( !CheckForEvgeniz(irc, _msg) )
+      CommandHandler::Instance()->Handle(source, &msg->GetDest(), msg->GetText().GetText());
   }
 }
 /* */
