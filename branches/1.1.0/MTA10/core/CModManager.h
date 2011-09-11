@@ -18,6 +18,22 @@
 #include "CSingleton.h"
 #include <windows.h>
 
+enum EDumpFileNameParts
+{
+    DUMP_PART_SIDE,
+    DUMP_PART_VERSION,
+    DUMP_PART_MODULE,
+    DUMP_PART_OFFSET,
+    DUMP_PART_CODE,
+    DUMP_PART_PATH,
+    DUMP_PART_IP,
+    DUMP_PART_PORT,
+    DUMP_PART_DURATION,
+    DUMP_PART_ID,
+    DUMP_PART_DATE,
+    DUMP_PART_TIME,
+};
+
 #ifdef MTA_DEBUG
     #define CMODMANAGER_CLIENTDLL "client_d.dll"
 #else
