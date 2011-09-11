@@ -17,6 +17,7 @@ using std::list;
 
 extern CClientGame * g_pClientGame;
 
+#ifdef WITH_OBJECT_SYNC
 CDeathmatchObject::CDeathmatchObject ( CClientManager* pManager, CMovingObjectsManager* pMovingObjectsManager, CObjectSync* pObjectSync, ElementID ID, unsigned short usModel ) : ClassInit ( this ), CClientObject ( pManager, ID, usModel )
 {
     m_pMovingObjectsManager = pMovingObjectsManager;
@@ -34,6 +35,22 @@ CDeathmatchObject::~CDeathmatchObject ( void )
         m_pObjectSync->RemoveObject ( this );
     }
 }
+
+#else
+
+CDeathmatchObject::CDeathmatchObject ( CClientManager* pManager, CMovingObjectsManager* pMovingObjectsManager, ElementID ID, unsigned short usModel ) : ClassInit ( this ), CClientObject ( pManager, ID, usModel )
+{
+    m_pMovingObjectsManager = pMovingObjectsManager;
+    m_pMoveAnimation = NULL;
+}
+
+
+CDeathmatchObject::~CDeathmatchObject ( void )
+{
+    _StopMovement ( true );
+}
+#endif
+
 
 
 void CDeathmatchObject::StartMovement ( const CPositionRotationAnimation& a_rMoveAnimation )

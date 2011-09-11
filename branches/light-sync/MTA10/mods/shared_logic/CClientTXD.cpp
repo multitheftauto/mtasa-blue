@@ -46,6 +46,9 @@ bool CClientTXD::LoadTXD ( const char* szFile, bool bFilteringEnabled )
     // Are we not already loaded?
     if ( m_Textures.empty () )
     {
+        if ( !g_pCore->GetNetwork ()->CheckFile ( "txd", szFile ) )
+            return false;
+
         // Try to load it
         RwTexDictionary* pTXD = g_pGame->GetRenderWare ()->ReadTXD ( szFile );
         if ( pTXD )

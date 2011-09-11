@@ -88,14 +88,13 @@ void CClientSoundManager::DoPulse ( void )
         vecPosition = vecCameraPosition;
     }
 
-    UpdateDistanceStreaming ( vecPosition );
-
     // Update volume position and velocity from all sounds
     list < CClientSound* > ::iterator iter = m_Sounds.begin ();
     for ( ; iter != m_Sounds.end () ; ++iter )
     {
         (*iter)->Process3D ( vecPosition, vecCameraPosition, vecLookAt );
     }
+    UpdateDistanceStreaming ( vecPosition );
 }
 
 void CClientSoundManager::SetDimension ( unsigned short usDimension )

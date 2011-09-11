@@ -264,6 +264,10 @@ size_t Font::drawText(const String& text, const Rect& draw_area, float z, const 
 	size_t thisCount;
 	size_t lineCount = 0;
 
+    // Check for something that shouldn't happen but does
+    if ( !this )
+        return 0;
+
 	float	y_base = draw_area.d_top + getBaseline(y_scale);
 
 	Rect tmpDrawArea(

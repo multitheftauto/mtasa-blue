@@ -80,10 +80,9 @@ public:
     float               GetDXTextExtent         ( const char * szText, float fScale = 1.0f, ID3DXFont * pDXFont = NULL );
 
     // Textures
-    IDirect3DTexture9*  CreateTexture           ( DWORD* dwBitMap, unsigned int uiWidth, unsigned int uiHeight );
     IDirect3DTexture9*  LoadTexture             ( const char* szFile );
     IDirect3DTexture9*  LoadTexture             ( const char* szFile, unsigned int uiWidth, unsigned int uiHeight );
-    void                DrawTexture             ( IDirect3DTexture9* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, float fRotation = 0.0f, float fCenterX = 0.0f, float fCenterY = 0.0f, unsigned char ucAlpha = 255 );
+    void                DrawTexture             ( IDirect3DTexture9* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, float fRotation = 0.0f, float fCenterX = 0.0f, float fCenterY = 0.0f, DWORD dwColor = 0xFFFFFFFF );
 
     // Interface functions
     void                SetCursorPosition       ( int iX, int iY, DWORD Flags );
