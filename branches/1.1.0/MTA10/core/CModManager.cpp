@@ -539,6 +539,7 @@ void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptionInfo
                     }
                 }
 
+                // Ensure filename parts match up with EDumpFileNameParts
                 SString strFilename ( "mta\\dumps\\client_%s_%s_%08x_%x_%s_%08X_%04X_%03X_%s_%04d%02d%02d_%02d%02d.dmp",
                                              strMTAVersionFull.c_str (),
                                              strModuleName.c_str (),
@@ -556,11 +557,28 @@ void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptionInfo
                                              SystemTime.wMinute
                                            );
 
+                SString strPathFilename = CalcMTASAPath ( strFilename );
+
                 // Copy the file
-                CopyFile ( CalcMTASAPath ( "mta\\core.dmp" ), CalcMTASAPath ( strFilename ), false );
+                CopyFile ( CalcMTASAPath ( "mta\\core.dmp" ), strPathFilename, false );
 
                 // For the dump uploader
-                SetApplicationSetting ( "diagnostics", "last-dump-save", CalcMTASAPath ( strFilename ) );
+                SetApplicationSetting ( "diagnostics", "last-dump-extra", "none" );
+                SetApplicationSetting ( "diagnostics", "last-dump-save", strPathFilename );
+
+                // Try to append pool sizes info to dump file
+                SetApplicationSetting ( "diagnostics", "last-dump-extra", "try-pools" );
+                CBuffer poolInfo;
+                GetPoolInfo ( poolInfo );
+                AppendToDumpFile ( strPathFilename, poolInfo, 'POLs', 'POLe' );
+                SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-pools" );
+
+                // Try to append d3d state info to dump file
+                SetApplicationSetting ( "diagnostics", "last-dump-extra", "try-d3d" );
+                CBuffer d3dInfo;
+                GetD3DInfo ( d3dInfo );
+                AppendToDumpFile ( strPathFilename, d3dInfo, 'D3Ds', 'D3De' );
+                SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-d3d" );
             }
         }
 
@@ -568,6 +586,7 @@ void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptionInfo
         FreeLibrary ( hDll );
     }
 }
+
 
 void CModManager::RunErrorTool ( CExceptionInformation* pExceptionInformation )
 {
@@ -703,3 +722,219 @@ void CModManager::VerifyAndAddEntry ( const char* szModFolderPath, const char* s
     }
 }
 
+
+//
+// Add extra data to the dump file and hope visual studio doesn't mind
+//
+void CModManager::AppendToDumpFile ( const SString& strPathFilename, const CBuffer& dataBuffer, DWORD dwMagicStart, DWORD dwMagicEnd )
+{
+    CBuffer output;
+    CBufferWriteStream stream ( output );
+    // 4 bytes zero
+    stream.Write ( (DWORD)0 );
+    // 4 bytes magic
+    stream.Write ( dwMagicStart );
+    // 4 bytes size of data
+    stream.Write ( dataBuffer.GetSize () );
+    // n bytes data
+    stream.WriteBytes ( dataBuffer.GetData (), dataBuffer.GetSize () );
+    // 4 bytes size of data
+    stream.Write ( dataBuffer.GetSize () );
+    // 4 bytes magic
+    stream.Write ( dwMagicEnd );
+    // 4 bytes zero
+    stream.Write ( (DWORD)0 );
+    FileAppend ( strPathFilename, output.GetData (), output.GetSize () );
+}
+
+
+//
+// Helper crap for GetPoolInfo
+//
+namespace
+{
+    #define CLASS_CBuildingPool                 0xb74498
+    #define CLASS_CPedPool                      0xb74490
+    #define CLASS_CObjectPool                   0xb7449c
+    #define CLASS_CDummyPool                    0xb744a0
+    #define CLASS_CVehiclePool                  0xb74494
+    #define CLASS_CColModelPool                 0xb744a4
+    #define CLASS_CTaskPool                     0xb744a8
+    #define CLASS_CEventPool                    0xb744ac
+    #define CLASS_CTaskAllocatorPool            0xb744bc
+    #define CLASS_CPedIntelligencePool          0xb744c0
+    #define CLASS_CPedAttractorPool             0xb744c4
+    #define CLASS_CEntryInfoNodePool            0xb7448c
+    #define CLASS_CNodeRoutePool                0xb744b8
+    #define CLASS_CPatrolRoutePool              0xb744b4
+    #define CLASS_CPointRoutePool               0xb744b0
+    #define CLASS_CPtrNodeDoubleLinkPool        0xB74488
+    #define CLASS_CPtrNodeSingleLinkPool        0xB74484
+
+    #define FUNC_CBuildingPool_GetNoOfUsedSpaces                0x550620
+    #define FUNC_CPedPool_GetNoOfUsedSpaces                     0x5504A0
+    #define FUNC_CObjectPool_GetNoOfUsedSpaces                  0x54F6B0
+    #define FUNC_CDummyPool_GetNoOfUsedSpaces                   0x5507A0
+    #define FUNC_CVehiclePool_GetNoOfUsedSpaces                 0x42CCF0
+    #define FUNC_CColModelPool_GetNoOfUsedSpaces                0x550870
+    #define FUNC_CTaskPool_GetNoOfUsedSpaces                    0x550940
+    #define FUNC_CEventPool_GetNoOfUsedSpaces                   0x550A10
+    #define FUNC_CTaskAllocatorPool_GetNoOfUsedSpaces           0x550d50
+    #define FUNC_CPedIntelligencePool_GetNoOfUsedSpaces         0x550E20
+    #define FUNC_CPedAttractorPool_GetNoOfUsedSpaces            0x550ef0
+    #define FUNC_CEntryInfoNodePool_GetNoOfUsedSpaces           0x5503d0
+    #define FUNC_CNodeRoutePool_GetNoOfUsedSpaces               0x550c80
+    #define FUNC_CPatrolRoutePool_GetNoOfUsedSpaces             0x550bb0
+    #define FUNC_CPointRoutePool_GetNoOfUsedSpaces              0x550ae0
+    #define FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces       0x550230
+    #define FUNC_CPtrNodeDoubleLinkPool_GetNoOfUsedSpaces       0x550300
+
+    int GetPoolCapacity ( ePools pool )
+    {
+        DWORD iPtr = NULL;
+        DWORD cPtr = NULL;
+        switch ( pool )
+        {
+            case BUILDING_POOL:             iPtr = 0x55105F; break;
+            case PED_POOL:                  iPtr = 0x550FF2; break;
+            case OBJECT_POOL:               iPtr = 0x551097; break;
+            case DUMMY_POOL:                iPtr = 0x5510CF; break;
+            case VEHICLE_POOL:              cPtr = 0x55102A; break;
+            case COL_MODEL_POOL:            iPtr = 0x551107; break;
+            case TASK_POOL:                 iPtr = 0x55113F; break;
+            case EVENT_POOL:                iPtr = 0x551177; break;
+            case TASK_ALLOCATOR_POOL:       cPtr = 0x55124E; break;
+            case PED_INTELLIGENCE_POOL:     iPtr = 0x551283; break;
+            case PED_ATTRACTOR_POOL:        cPtr = 0x5512BC; break;
+            case ENTRY_INFO_NODE_POOL:      iPtr = 0x550FBA; break;
+            case NODE_ROUTE_POOL:           cPtr = 0x551219; break;
+            case PATROL_ROUTE_POOL:         cPtr = 0x5511E4; break;
+            case POINT_ROUTE_POOL:          cPtr = 0x5511AF; break;
+            case POINTER_DOUBLE_LINK_POOL:  iPtr = 0x550F82; break;
+            case POINTER_SINGLE_LINK_POOL:  iPtr = 0x550F46; break;
+        }
+        if ( iPtr )
+            return *(int*)iPtr;
+
+        if ( cPtr )
+            return *(char*)cPtr;
+
+        return 0;
+    }
+
+    int GetNumberOfUsedSpaces ( ePools pool )
+    {
+        DWORD dwFunc = NULL;
+        DWORD dwThis = NULL;
+        switch ( pool )
+        {
+            case BUILDING_POOL: dwFunc = FUNC_CBuildingPool_GetNoOfUsedSpaces; dwThis = CLASS_CBuildingPool; break;
+            case PED_POOL: dwFunc = FUNC_CPedPool_GetNoOfUsedSpaces; dwThis = CLASS_CPedPool; break;
+            case OBJECT_POOL: dwFunc = FUNC_CObjectPool_GetNoOfUsedSpaces; dwThis = CLASS_CObjectPool; break;
+            case DUMMY_POOL: dwFunc = FUNC_CDummyPool_GetNoOfUsedSpaces; dwThis = CLASS_CDummyPool; break;
+            case VEHICLE_POOL: dwFunc = FUNC_CVehiclePool_GetNoOfUsedSpaces; dwThis = CLASS_CVehiclePool; break;
+            case COL_MODEL_POOL: dwFunc = FUNC_CColModelPool_GetNoOfUsedSpaces; dwThis = CLASS_CColModelPool; break;
+            case TASK_POOL: dwFunc = FUNC_CTaskPool_GetNoOfUsedSpaces; dwThis = CLASS_CTaskPool; break;
+            case EVENT_POOL: dwFunc = FUNC_CEventPool_GetNoOfUsedSpaces; dwThis = CLASS_CEventPool; break;
+            case TASK_ALLOCATOR_POOL: dwFunc = FUNC_CTaskAllocatorPool_GetNoOfUsedSpaces; dwThis = CLASS_CTaskAllocatorPool; break;
+            case PED_INTELLIGENCE_POOL: dwFunc = FUNC_CPedIntelligencePool_GetNoOfUsedSpaces; dwThis = CLASS_CPedIntelligencePool; break;
+            case PED_ATTRACTOR_POOL: dwFunc = FUNC_CPedAttractorPool_GetNoOfUsedSpaces; dwThis = CLASS_CPedAttractorPool; break;
+            case ENTRY_INFO_NODE_POOL: dwFunc = FUNC_CEntryInfoNodePool_GetNoOfUsedSpaces; dwThis = CLASS_CEntryInfoNodePool; break;
+            case NODE_ROUTE_POOL: dwFunc = FUNC_CNodeRoutePool_GetNoOfUsedSpaces; dwThis = CLASS_CNodeRoutePool; break;
+            case PATROL_ROUTE_POOL: dwFunc = FUNC_CPatrolRoutePool_GetNoOfUsedSpaces; dwThis = CLASS_CPatrolRoutePool; break;
+            case POINT_ROUTE_POOL: dwFunc = FUNC_CPointRoutePool_GetNoOfUsedSpaces; dwThis = CLASS_CPointRoutePool; break;
+            case POINTER_DOUBLE_LINK_POOL: dwFunc = FUNC_CPtrNodeDoubleLinkPool_GetNoOfUsedSpaces; dwThis = CLASS_CPtrNodeDoubleLinkPool; break;
+            case POINTER_SINGLE_LINK_POOL: dwFunc = FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces; dwThis = CLASS_CPtrNodeSingleLinkPool; break;
+            default: return -1;
+        }
+
+        int iOut = -2;
+        if ( *(DWORD *)dwThis != NULL )
+        {
+            _asm
+            {
+                mov     ecx, dwThis
+                mov     ecx, [ecx]
+                call    dwFunc
+                mov     iOut, eax
+
+            }
+        }
+
+        return iOut;
+    }
+}
+
+
+//
+// Grab the state of the memory pools
+//
+void CModManager::GetPoolInfo ( CBuffer& buffer )
+{
+    CBufferWriteStream stream ( buffer );
+
+    // Write PoolInfo version
+    stream.Write ( 1 );
+
+    // Write number of pools we have info on
+    stream.Write ( MAX_POOLS );
+
+    // For each pool
+    for ( int i = 0; i < MAX_POOLS ; i++ )
+    {
+        int iCapacity = GetPoolCapacity ( (ePools)i );
+        int iUsedSpaces = GetNumberOfUsedSpaces ( (ePools)i );
+        // Write pool info
+        stream.Write ( i );
+        stream.Write ( iCapacity );
+        stream.Write ( iUsedSpaces );
+    }
+
+    // TODO - Get usage info for other arrays such as CMatrixLinkList
+}
+
+
+//
+// Grab the state of D3D
+//
+void CModManager::GetD3DInfo ( CBuffer& buffer )
+{
+    CBufferWriteStream stream ( buffer );
+
+    // Write D3DInfo version
+    stream.Write ( 1 );
+
+    // Quit if device state pointer is not valid
+    if ( !g_pDeviceState )
+        return;
+
+    // Write D3D call type
+    stream.Write ( g_pDeviceState->CallState.callType );
+
+    // Only record state if crash was inside D3D
+    if ( g_pDeviceState->CallState.callType == CProxyDirect3DDevice9::SCallState::NONE )
+        return;
+
+    // Write D3D call args
+    stream.Write ( g_pDeviceState->CallState.uiNumArgs );
+    for ( uint i = 0; i < g_pDeviceState->CallState.uiNumArgs ; i++ )
+        stream.Write ( g_pDeviceState->CallState.args[i] );
+
+    // Try to get CRenderWare pointer
+    CCore* pCore = CCore::GetSingletonPtr ();
+    CGame* pGame = pCore ? pCore->GetGame () : NULL;
+    CRenderWare* pRenderWare = pGame->GetRenderWare ();
+    // Write on how we got on with doing that
+    stream.Write ( (uchar)( pCore ? 1 : 0 ) );
+    stream.Write ( (uchar)( pGame ? 1 : 0 ) );
+    stream.Write ( (uchar)( pRenderWare ? 1 : 0 ) );
+
+    // Write last used texture D3D pointer
+    stream.Write ( (uint)g_pDeviceState->TextureState[0].Texture );
+
+    // Write last used texture name
+    SString strTextureName = "no name";
+    if ( pRenderWare )
+        strTextureName = pRenderWare->GetTextureName ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
+    stream.WriteString ( strTextureName );
+}

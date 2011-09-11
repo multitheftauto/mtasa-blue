@@ -68,6 +68,9 @@ public:
     static void         DumpCoreLog             ( CExceptionInformation* pExceptionInformation );
     static void         DumpMiniDump            ( _EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation );
     static void         RunErrorTool            ( CExceptionInformation* pExceptionInformation );
+    static void         AppendToDumpFile        ( const SString& strPathFilename, const CBuffer& dataBuffer, DWORD dwMagicStart, DWORD dwMagicEnd );
+    static void         GetPoolInfo             ( CBuffer& buffer );
+    static void         GetD3DInfo              ( CBuffer& buffer );
 
 private:
     void                InitializeModList       ( const char* szModFolderPath );
