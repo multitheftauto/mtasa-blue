@@ -54,8 +54,6 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 #endif
 
     SString strMTASAPath = PathJoin ( GetLaunchPath (), "mta" );
-    SetDllDirectory( strMTASAPath );
-    SetCurrentDirectory ( strMTASAPath );
     SString strLoaderDllPathFilename = PathJoin ( strMTASAPath, strLoaderDllFilename );
 
     // Load loader dll
