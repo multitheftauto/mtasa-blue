@@ -275,6 +275,12 @@ DWORD RETURN_CrashFix_Misc24_US =                           0x7F0DCE;
 DWORD RETURN_CrashFix_Misc24_EU =                           0x7F0E0E;
 DWORD RETURN_CrashFix_Misc24_BOTH =                         0;
 
+#define HOOKPOS_CheckAnimMatrix_US                          0x7C5A5C
+#define HOOKPOS_CheckAnimMatrix_EU                          0x7C5A9C
+DWORD RETURN_CheckAnimMatrix_US =                           0x7C5A61;
+DWORD RETURN_CheckAnimMatrix_EU =                           0x7C5AA1;
+DWORD RETURN_CheckAnimMatrix_BOTH =                         0;
+
 #define HOOKPOS_VehColCB                                    0x04C838D
 DWORD RETURN_VehColCB =                                     0x04C83AA;
 
@@ -437,6 +443,7 @@ void HOOK_CrashFix_Misc21 ();
 void HOOK_CrashFix_Misc22 ();
 void HOOK_CrashFix_Misc23 ();
 void HOOK_CrashFix_Misc24 ();
+void HOOK_CheckAnimMatrix ();
 void HOOK_VehColCB ();
 void HOOK_VehCol ();
 void HOOK_isVehDriveTypeNotRWD ();
@@ -582,12 +589,14 @@ void CMultiplayerSA::InitHooks()
         HookInstall(HOOKPOS_CrashFix_Misc17_US, (DWORD)HOOK_CrashFix_Misc17, 6 );
         HookInstall(HOOKPOS_CrashFix_Misc19_US, (DWORD)HOOK_CrashFix_Misc19, 6 );
         HookInstall(HOOKPOS_CrashFix_Misc24_US, (DWORD)HOOK_CrashFix_Misc24, 6 );
+        HookInstall(HOOKPOS_CheckAnimMatrix_US, (DWORD)HOOK_CheckAnimMatrix, 5 );
         RETURN_FreezeFix_Misc15_BOTH = RETURN_FreezeFix_Misc15_US;
         RETURN_CrashFix_Misc17a_BOTH = RETURN_CrashFix_Misc17a_US;
         RETURN_CrashFix_Misc17b_BOTH = RETURN_CrashFix_Misc17b_US;
         RETURN_CrashFix_Misc19a_BOTH = RETURN_CrashFix_Misc19a_US;
         RETURN_CrashFix_Misc19b_BOTH = RETURN_CrashFix_Misc19b_US;
         RETURN_CrashFix_Misc24_BOTH = RETURN_CrashFix_Misc24_US;
+        RETURN_CheckAnimMatrix_BOTH = RETURN_CheckAnimMatrix_US;
     }
     if ( version == VERSION_EU_10 )
     {
@@ -595,12 +604,14 @@ void CMultiplayerSA::InitHooks()
         HookInstall(HOOKPOS_CrashFix_Misc17_EU, (DWORD)HOOK_CrashFix_Misc17, 6 );
         HookInstall(HOOKPOS_CrashFix_Misc19_EU, (DWORD)HOOK_CrashFix_Misc19, 6 );
         HookInstall(HOOKPOS_CrashFix_Misc24_EU, (DWORD)HOOK_CrashFix_Misc24, 6 );
+        HookInstall(HOOKPOS_CheckAnimMatrix_EU, (DWORD)HOOK_CheckAnimMatrix, 5 );
         RETURN_FreezeFix_Misc15_BOTH = RETURN_FreezeFix_Misc15_EU;
         RETURN_CrashFix_Misc17a_BOTH = RETURN_CrashFix_Misc17a_EU;
         RETURN_CrashFix_Misc17b_BOTH = RETURN_CrashFix_Misc17b_EU;
         RETURN_CrashFix_Misc19a_BOTH = RETURN_CrashFix_Misc19a_EU;
         RETURN_CrashFix_Misc19b_BOTH = RETURN_CrashFix_Misc19b_EU;
         RETURN_CrashFix_Misc24_BOTH = RETURN_CrashFix_Misc24_EU;
+        RETURN_CheckAnimMatrix_BOTH = RETURN_CheckAnimMatrix_EU;
     }
     HookInstall(HOOKPOS_CrashFix_Misc16, (DWORD)HOOK_CrashFix_Misc16, 6 );
     HookInstall(HOOKPOS_CrashFix_Misc18, (DWORD)HOOK_CrashFix_Misc18, 7 );
@@ -5658,6 +5669,53 @@ void _declspec(naked) HOOK_CrashFix_Misc24 ()
         mov     ebp, 0
         mov     eax, 0
         jmp     RETURN_CrashFix_Misc24_BOTH  // 7F0DCE/7F0E0E
+    }
+}
+
+
+// If matrix looks bad, fix it
+void _cdecl CheckMatrix ( float* pMatrix )
+{
+    if ( abs ( pMatrix[0] ) < 1.1f )
+        return;
+
+    float scale = 0.0f;
+
+    pMatrix[0] = scale;
+    pMatrix[1] = 0;
+    pMatrix[2] = 0;
+
+    pMatrix[4] = 0;
+    pMatrix[5] = scale;
+    pMatrix[6] = 0;
+
+    pMatrix[7] = 0;
+    pMatrix[8] = 0;
+    pMatrix[10] = scale;
+
+    pMatrix[12] = 0;
+    pMatrix[13] = 0;
+    pMatrix[14] = 1;
+}
+
+// hooked at 7C5A5C/7C5A9C 5 bytes
+void _declspec(naked) HOOK_CheckAnimMatrix ()
+{
+    _asm
+    {
+        // Replaced code
+        lea     ecx, [esp+054h]
+        pushad
+
+        // Verify matrix
+        push ecx
+        call CheckMatrix
+        add esp, 4
+
+        popad
+        // continue standard path
+        push    eax
+        jmp     RETURN_CheckAnimMatrix_BOTH      // 7C5A61/7C5AA1
     }
 }
 
