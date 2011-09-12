@@ -1808,55 +1808,115 @@ void CNetAPI::RPC ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream, 
 
 void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream )
 {
-    // Read out the sync time context. See CClientEntity for documentation on that.
     unsigned char ucSyncTimeContext = 0;
+    unsigned short usLatency;
+    bool bReadHealth;
+    bool bReadPosition;
+    bool bReadVehicleHealth;
+    SPlayerHealthSync health;
+    SPlayerArmorSync armor;
+    SLowPrecisionVehicleHealthSync vehicleHealth;
+    SLowPrecisionPositionSync pos;
+    // Read out the sync time context. See CClientEntity for documentation on that.
     if ( !BitStream.Read ( ucSyncTimeContext ) )
+    {
+#ifdef MTA_DEBUG
+        g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Context Error 1." );
+#endif
         return;
+    }
+    if ( !BitStream.ReadCompressed ( usLatency ) )
+    {
+#ifdef MTA_DEBUG
+        g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Latency Error." );
+#endif
+        return;
+    }
+    if ( !BitStream.ReadBit ( bReadHealth ) )
+    {
+#ifdef MTA_DEBUG
+        g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Health Error 1.");
+#endif
+        return;
+    }
+    if ( bReadHealth )
+    {
+        if ( !BitStream.Read ( &health ) )
+        {
+#ifdef MTA_DEBUG
+            g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Health Error 2." );
+#endif
+            return;
+        }
+        if ( !BitStream.Read ( &armor ) )
+        {
+#ifdef MTA_DEBUG
+            g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Armor Error." );
+#endif
+            return;
+        }
+    }
+    if ( !BitStream.ReadBit ( bReadPosition ) )
+    {
+#ifdef MTA_DEBUG
+        g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Position Error 1." );
+#endif
+        return;
+    }
+    if ( bReadPosition )
+    {
+        if ( !BitStream.Read ( &pos ) )
+        {
+#ifdef MTA_DEBUG
+            g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Position Error 2." );
+#endif
+            return;
+        }
+        if ( !BitStream.ReadBit ( bReadVehicleHealth ) )
+        {
+#ifdef MTA_DEBUG
+            g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Vehicle Health Error 1." );
+#endif
+            return;
+        }
+        if ( bReadVehicleHealth )
+        {
+            if ( !BitStream.Read ( &vehicleHealth ) )
+            {
+#ifdef MTA_DEBUG
+                g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Vehicle Health Error 2." );
+#endif
+                return;
+            }
+        }
+    }
 
     // Only update the sync if this packet is from the same context.
     if ( !pPlayer->CanUpdateSync ( ucSyncTimeContext ) )
     {
 #ifdef MTA_DEBUG
-        g_pCore->GetConsole ()->Printf ( "ignoring lightweight sync: %u", ucSyncTimeContext );
+        g_pCore->GetConsole ()->Printf ( "ignoring lightweight sync: %u Invalid Sync Context", ucSyncTimeContext );
 #endif
         return;
     }
 
     // Read out the time it took for the packet to go from the remote client to the server and to us
-    unsigned short usLatency;
-    if ( !BitStream.ReadCompressed ( usLatency ) )
-        return;
+
     pPlayer->SetLatency ( usLatency + g_pNet->GetPing () );
     pPlayer->SetPing ( usLatency );
 
     // Check if we must read health
-    bool bReadHealth;
-    if ( !BitStream.ReadBit ( bReadHealth ) )
-        return;
     if ( bReadHealth )
     {
-        SPlayerHealthSync health;
-        if ( !BitStream.Read ( &health ) )
-            return;
         pPlayer->SetHealth ( health.data.fValue );
         pPlayer->LockHealth ( health.data.fValue );
 
-        SPlayerArmorSync armor;
-        if ( !BitStream.Read ( &armor ) )
-            return;
         pPlayer->SetArmor ( armor.data.fValue );
         pPlayer->LockArmor ( armor.data.fValue );
     }
 
-    // Check if we must read position
-    bool bReadPosition;
-    if ( !BitStream.ReadBit ( bReadPosition ) )
-        return;
     if ( bReadPosition )
     {
-        SLowPrecisionPositionSync pos;
-        if ( !BitStream.Read ( &pos ) )
-            return;
         pPlayer->SetPosition ( pos.data.vecPosition );
         pPlayer->SetLastPuresyncPosition ( pos.data.vecPosition );
 
@@ -1874,22 +1934,15 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
                     if ( IS_PLAYER(pPassenger) )
                     {
                         CClientPlayer* pPassengerPlayer = static_cast < CClientPlayer* > ( pPassenger );
-                        pPassengerPlayer->SetLastPuresyncPosition ( pos.data.vecPosition );
+                        pPassengerPlayer->SetLastPuresyncTime ( CClientTime::GetTime () );
+                        pPassengerPlayer->SetLastPuresyncPosition ( pos.data.vecPosition ); // Not sure if needs doing or just unrequired.
                     }
                 }
             }
 
-            // Check if we must read the vehicle health
-            bool bReadVehicleHealth;
-            if ( !BitStream.ReadBit ( bReadVehicleHealth ) )
-                return;
+
             if ( bReadVehicleHealth )
-            {
-                SLowPrecisionVehicleHealthSync health;
-                if ( !BitStream.Read ( &health ) )
-                    return;
-                pVehicle->SetHealth ( health.data.fValue );
-            }
+                pVehicle->SetHealth ( vehicleHealth.data.fValue );
         }
     }
 
