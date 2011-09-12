@@ -100,6 +100,8 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
     m_llNearListUpdateTime = 0;
 
+    m_vecLastLightSyncPosition = CVector ( 0, 0, 0 );
+
     // Add us to the manager
     pPlayerManager->AddToList ( this );
     m_iLastZoneDebug = 0;
