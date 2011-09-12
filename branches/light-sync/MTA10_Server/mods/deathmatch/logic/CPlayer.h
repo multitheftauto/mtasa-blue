@@ -255,7 +255,11 @@ public:
             unsigned int    uiContext;
         } vehicleHealth;
     };
-    SLightweightSyncData&                       GetLightweightSyncData      ( void ) { return m_lightweightSyncData; }
+    SLightweightSyncData&                       GetLightweightSyncData      ( void )                      { return m_lightweightSyncData; }
+
+    const CVector                               GetLastLightSyncPosition    ( void )                      { return m_vecLastLightSyncPosition; }
+    void                                        SetLastLightSyncPosition    ( CVector vecPosition )       { m_vecLastLightSyncPosition = vecPosition; }
+
 
     eVoiceState                                 GetVoiceState               ( void )                      { return m_VoiceState; }
     void                                        SetVoiceState               ( eVoiceState State )         { m_VoiceState = State; }
@@ -379,6 +383,8 @@ private:
     CVector                                     m_vecCamPosition;
     CVector                                     m_vecCamFwd;
     int                                         m_iLastZoneDebug;
+
+    CVector                                     m_vecLastLightSyncPosition;
 };
 
 #endif
