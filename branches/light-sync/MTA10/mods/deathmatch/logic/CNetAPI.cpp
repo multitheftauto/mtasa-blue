@@ -1935,7 +1935,7 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
                     {
                         CClientPlayer* pPassengerPlayer = static_cast < CClientPlayer* > ( pPassenger );
                         pPassengerPlayer->SetLastPuresyncTime ( CClientTime::GetTime () );
-                        pPassengerPlayer->SetLastPuresyncPosition ( pos.data.vecPosition ); // Not sure if needs doing or just unrequired.
+                        pPassengerPlayer->SetLastPuresyncPosition ( pos.data.vecPosition );
                     }
                 }
             }
