@@ -1806,16 +1806,17 @@ int CLuaFunctionDefs::GUIGridListGetSelectedCount ( lua_State* luaVM )
 int CLuaFunctionDefs::GUIGridListSetSelectedItem ( lua_State* luaVM )
 {
 //  bool guiGridListSetSelectedItem ( element gridList, int rowIndex, int columnIndex )
-    CClientGUIElement* guiGridlist; int rowIndex; int columnIndex;
+    CClientGUIElement* guiGridlist; int rowIndex; int columnIndex; bool bReset;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData < CGUIGridList > ( guiGridlist );
     argStream.ReadNumber ( rowIndex );
     argStream.ReadNumber ( columnIndex );
+    argStream.ReadBool ( bReset, true );
 
     if ( !argStream.HasErrors () )
     {
-        CStaticFunctionDefinitions::GUIGridListSetSelectedItem ( *guiGridlist, rowIndex, columnIndex, true );
+        CStaticFunctionDefinitions::GUIGridListSetSelectedItem ( *guiGridlist, rowIndex, columnIndex, bReset );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
