@@ -44,6 +44,7 @@ public:
 
     virtual bool                            GetNetworkStatistics            ( NetStatistics* pDest, NetServerPlayerID* pPlayerID = NULL ) = 0;
     virtual const SPacketStat*              GetPacketStats                  ( void ) = 0;
+    virtual bool                            GetBandwidthStatistics          ( SBandwidthStatistics* pDest ) = 0;
 
     virtual int                             GetPing                         ( NetServerPlayerID& playerID ) = 0;
 
