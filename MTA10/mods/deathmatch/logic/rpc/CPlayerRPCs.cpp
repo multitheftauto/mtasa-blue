@@ -173,11 +173,11 @@ void CPlayerRPCs::SetPlayerNametagShowing ( CClientEntity* pSource, NetBitStream
 
 void CPlayerRPCs::SetPlayerTeam ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID TeamID;
-    if ( bitStream.Read ( TeamID ) )
+    ElementID PlayerID;
+    if ( bitStream.Read ( PlayerID ) )
     {
-        CClientTeam* pTeam = m_pTeamManager->GetTeam ( TeamID );
-        CClientPlayer* pPlayer = m_pPlayerManager->Get ( pSource->GetID () );
+        CClientTeam* pTeam = m_pTeamManager->GetTeam ( pSource->GetID() );
+        CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
         if ( pPlayer )
         {
             pPlayer->SetTeam ( pTeam, true );
