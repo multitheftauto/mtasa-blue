@@ -34,7 +34,7 @@ bool CLightsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         CPlayer::SLightweightSyncData& data = pPlayer->GetLightweightSyncData ();
 
         CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
-        bSyncPosition = ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 ) && (pPlayer->GetLastLightSyncPosition() - pPlayer->GetPosition()).Length() > 0.001f;
+        bSyncPosition = ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 );
 
         BitStream.Write ( pPlayer->GetID () );
         BitStream.Write ( (unsigned char)pPlayer->GetSyncTimeContext () );
