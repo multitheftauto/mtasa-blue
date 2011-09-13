@@ -1820,72 +1820,54 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
     // Read out the sync time context. See CClientEntity for documentation on that.
     if ( !BitStream.Read ( ucSyncTimeContext ) )
     {
-#ifdef MTA_DEBUG
         g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Context Error 1." );
-#endif
         return;
     }
     if ( !BitStream.ReadCompressed ( usLatency ) )
     {
-#ifdef MTA_DEBUG
         g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Latency Error." );
-#endif
         return;
     }
     if ( !BitStream.ReadBit ( bReadHealth ) )
     {
-#ifdef MTA_DEBUG
         g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Health Error 1.");
-#endif
         return;
     }
     if ( bReadHealth )
     {
         if ( !BitStream.Read ( &health ) )
         {
-#ifdef MTA_DEBUG
             g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Health Error 2." );
-#endif
             return;
         }
         if ( !BitStream.Read ( &armor ) )
         {
-#ifdef MTA_DEBUG
             g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Armor Error." );
-#endif
             return;
         }
     }
     if ( !BitStream.ReadBit ( bReadPosition ) )
     {
-#ifdef MTA_DEBUG
         g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Position Error 1." );
-#endif
         return;
     }
     if ( bReadPosition )
     {
         if ( !BitStream.Read ( &pos ) )
         {
-#ifdef MTA_DEBUG
             g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Position Error 2." );
-#endif
             return;
         }
         if ( !BitStream.ReadBit ( bReadVehicleHealth ) )
         {
-#ifdef MTA_DEBUG
             g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Vehicle Health Error 1." );
-#endif
             return;
         }
         if ( bReadVehicleHealth )
         {
             if ( !BitStream.Read ( &vehicleHealth ) )
             {
-#ifdef MTA_DEBUG
                 g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Vehicle Health Error 2." );
-#endif
                 return;
             }
         }
@@ -1894,9 +1876,7 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
     // Only update the sync if this packet is from the same context.
     if ( !pPlayer->CanUpdateSync ( ucSyncTimeContext ) )
     {
-#ifdef MTA_DEBUG
         g_pCore->GetConsole ()->Printf ( "ignoring lightweight sync: %u Invalid Sync Context", ucSyncTimeContext );
-#endif
         return;
     }
 
