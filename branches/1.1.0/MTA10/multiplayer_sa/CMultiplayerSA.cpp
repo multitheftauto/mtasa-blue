@@ -5106,6 +5106,29 @@ void _declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList ()
 #define TEST_CRASH_FIXES 0
 
 
+//
+// Support for crash stats
+//
+void OnCrashAverted ( uint uiId );
+
+void _cdecl CrashAverted ( DWORD id )
+{
+    OnCrashAverted ( id );
+}
+
+#define CRASH_AVERTED(id) \
+    } \
+    _asm pushad \
+    _asm mov eax, id \
+    _asm push eax \
+    _asm call CrashAverted \
+    _asm add esp, 4 \
+    _asm popad \
+    _asm \
+    {
+
+
+
 void _declspec(naked) HOOK_CrashFix_Misc1 ()
 {
     _asm
@@ -5118,8 +5141,10 @@ void _declspec(naked) HOOK_CrashFix_Misc1 ()
         mov     eax,dword ptr ds:[008D12CCh] 
         mov     ecx,dword ptr [eax+esi]     // If [eax+esi] is 0, it causes a crash
         test    ecx,ecx
+        jne     cont
+        CRASH_AVERTED( 1 )
     cont:
-        jmp     RETURN_CrashFix_Misc1
+        jmp     RETURN_CrashFix_Misc1   // 0x5D9A74
     }
 }
 
@@ -5136,6 +5161,7 @@ void _declspec(naked) HOOK_CrashFix_Misc2 ()
         mov     cl,byte ptr [esi+429h]
         jmp     RETURN_CrashFix_Misc2a
     cont:
+        CRASH_AVERTED( 2 )
         jmp     RETURN_CrashFix_Misc2b
     }
 }
@@ -5152,6 +5178,7 @@ void _declspec(naked) HOOK_CrashFix_Misc3 ()
         mov     edx,dword ptr [ecx+384h]
         jmp     RETURN_CrashFix_Misc3
     cont:
+        CRASH_AVERTED( 3 )
         jmp     CPlayerPed__ProcessControl_Abort
     }
 }
@@ -5170,6 +5197,7 @@ void _declspec(naked) HOOK_CrashFix_Misc4 ()
         add     edx, ebp  
         jmp     RETURN_CrashFix_Misc4a
     cont:
+        CRASH_AVERTED( 4 )
         jmp     RETURN_CrashFix_Misc4b
     }
 }
@@ -5188,6 +5216,7 @@ void _declspec(naked) HOOK_CrashFix_Misc5 ()
         mov     edi, dword ptr [ecx*4+0A9B0C8h]
         jmp     RETURN_CrashFix_Misc5a  // 005DF950
     cont:
+        CRASH_AVERTED( 5 )
         pop edi
         jmp     RETURN_CrashFix_Misc5b  // 005DFCC4
     }
@@ -5207,6 +5236,7 @@ void _declspec(naked) HOOK_CrashFix_Misc6 ()
         test    eax, eax
         jmp     RETURN_CrashFix_Misc6a  // 004D1755
     cont:
+        CRASH_AVERTED( 6 )
         jmp     RETURN_CrashFix_Misc6b  // 004D1A44
     }
 }
@@ -5225,6 +5255,7 @@ void _declspec(naked) HOOK_CrashFix_Misc7 ()
         test    esi, esi
         jmp     RETURN_CrashFix_Misc7a  // 417BFD
     cont:
+        CRASH_AVERTED( 7 )
         jmp     RETURN_CrashFix_Misc7b  // 417BFF
     }
 }
@@ -5243,6 +5274,7 @@ void _declspec(naked) HOOK_CrashFix_Misc8 ()
         test    ecx, ecx 
         jmp     RETURN_CrashFix_Misc8a  // 734862
     cont:
+        CRASH_AVERTED( 8 )
         jmp     RETURN_CrashFix_Misc8b  // 734871
     }
 }
@@ -5261,6 +5293,7 @@ void _declspec(naked) HOOK_CrashFix_Misc9 ()
         test    ah, 1
         jmp     RETURN_CrashFix_Misc9a  // 738B6A
     cont:
+        CRASH_AVERTED( 9 )
         jmp     RETURN_CrashFix_Misc9b  // 73983A
     }
 }
@@ -5279,6 +5312,7 @@ void _declspec(naked) HOOK_CrashFix_Misc10 ()
         mov     dword ptr [esp], edx
         jmp     RETURN_CrashFix_Misc10a  // 533504
     cont:
+        CRASH_AVERTED( 10 )
         mov     ecx, dword ptr [esp+1Ch]
         mov     dword ptr [ecx],0
         mov     dword ptr [ecx+4],0
@@ -5301,6 +5335,7 @@ void _declspec(naked) HOOK_CrashFix_Misc11 ()
         test    eax, eax 
         jmp     RETURN_CrashFix_Misc11a  // 4D2C67
     cont:
+        CRASH_AVERTED( 11 )
         jmp     RETURN_CrashFix_Misc11b  // 4D2E03
     }
 }
@@ -5319,6 +5354,7 @@ void _declspec(naked) HOOK_CrashFix_Misc12 ()
         test    al, al 
         jmp     RETURN_CrashFix_Misc12a  // 4D41CA
     cont:
+        CRASH_AVERTED( 12 )
         jmp     RETURN_CrashFix_Misc12b  // 4D4222
     }
 }
@@ -5336,6 +5372,7 @@ void _declspec(naked) HOOK_CrashFix_Misc13 ()
         shr     al, 5
         jmp     RETURN_CrashFix_Misc13a  // 4D4654
     cont:
+        CRASH_AVERTED( 13 )
         jmp     RETURN_CrashFix_Misc13b  // 4D478c
     }
 }
@@ -5353,6 +5390,7 @@ void _declspec(naked) HOOK_CrashFix_Misc14 ()
         sub     esp, 0D4h
         jmp     RETURN_CrashFix_Misc14  // 4DD4BB
     cont:
+        CRASH_AVERTED( 14 )
         add     esp, 12
         retn    12
     }
@@ -5424,6 +5462,7 @@ void _declspec(naked) HOOK_CrashFix_Misc16 ()
         jmp     RETURN_CrashFix_Misc16  // 5E581B
 
     cont:
+        CRASH_AVERTED( 16 )
         add     esp, 96
         retn
     }
@@ -5444,6 +5483,7 @@ void _declspec(naked) HOOK_CrashFix_Misc17 ()
         jmp     RETURN_CrashFix_Misc17a_BOTH  // 7F1214/7F1254
 
     cont:
+        CRASH_AVERTED( 17 )
         jmp     RETURN_CrashFix_Misc17b_BOTH  // 7F1236/7F1276
     }
 }
@@ -5473,6 +5513,7 @@ void _declspec(naked) HOOK_CrashFix_Misc18 ()
         jmp     RETURN_CrashFix_Misc18  // 4C7DB4
 
     cont:
+        CRASH_AVERTED( 18 )
         mov         edx,0 
         mov         eax,dword ptr [esp+10h]
         mov         dword ptr [eax],edx 
@@ -5500,6 +5541,7 @@ void _declspec(naked) HOOK_CrashFix_Misc19 ()
         jmp     RETURN_CrashFix_Misc19a_BOTH  // 7F0BFD/7F0C3D
 
     cont:
+        CRASH_AVERTED( 19 )
         mov         edx,dword ptr [ecx+98h] 
         test        edx,edx
         jmp     RETURN_CrashFix_Misc19b_BOTH  // 7F0C20/7F0C60
@@ -5530,6 +5572,7 @@ void _declspec(naked) HOOK_CrashFix_Misc20 ()
         jmp     RETURN_CrashFix_Misc20      // 54F3B6
 
     cont:
+        CRASH_AVERTED( 20 )
         retn
     }
 }
@@ -5558,6 +5601,7 @@ void _declspec(naked) HOOK_CrashFix_Misc21 ()
         jmp     RETURN_CrashFix_Misc21  // 648EFC
 
     cont:
+        CRASH_AVERTED( 21 )
         retn
     }
 }
@@ -5604,6 +5648,7 @@ void _declspec(naked) HOOK_CrashFix_Misc22 ()
 
         // do alternate code
     altcode:
+        CRASH_AVERTED( 22 )
         mov     edx,0
         mov         ebx,dword ptr [esi+10h] 
         mov         dword ptr [ebx+ecx+10h],edx 
@@ -5642,6 +5687,7 @@ void _declspec(naked) HOOK_CrashFix_Misc23 ()
         // zero if out of range
         mov     edx,0
         mov     [esp+8], edx
+        CRASH_AVERTED( 23 )
 
     ok:
         // continue standard path
@@ -5666,6 +5712,7 @@ void _declspec(naked) HOOK_CrashFix_Misc24 ()
         jmp     RETURN_CrashFix_Misc24_BOTH  // 7F0DCE/7F0E0E
 
     cont:
+        CRASH_AVERTED( 24 )
         mov     ebp, 0
         mov     eax, 0
         jmp     RETURN_CrashFix_Misc24_BOTH  // 7F0DCE/7F0E0E

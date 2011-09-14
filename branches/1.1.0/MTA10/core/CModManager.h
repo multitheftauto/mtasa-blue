@@ -18,22 +18,6 @@
 #include "CSingleton.h"
 #include <windows.h>
 
-enum EDumpFileNameParts
-{
-    DUMP_PART_SIDE,
-    DUMP_PART_VERSION,
-    DUMP_PART_MODULE,
-    DUMP_PART_OFFSET,
-    DUMP_PART_CODE,
-    DUMP_PART_PATH,
-    DUMP_PART_IP,
-    DUMP_PART_PORT,
-    DUMP_PART_DURATION,
-    DUMP_PART_ID,
-    DUMP_PART_DATE,
-    DUMP_PART_TIME,
-};
-
 #ifdef MTA_DEBUG
     #define CMODMANAGER_CLIENTDLL "client_d.dll"
 #else
@@ -63,14 +47,6 @@ public:
     CClientBase*        GetCurrentMod           ( void );
 
     void                RefreshMods             ( void );
-
-    static long WINAPI  HandleExceptionGlobal   ( _EXCEPTION_POINTERS* pException );
-    static void         DumpCoreLog             ( CExceptionInformation* pExceptionInformation );
-    static void         DumpMiniDump            ( _EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation );
-    static void         RunErrorTool            ( CExceptionInformation* pExceptionInformation );
-    static void         AppendToDumpFile        ( const SString& strPathFilename, const CBuffer& dataBuffer, DWORD dwMagicStart, DWORD dwMagicEnd );
-    static void         GetPoolInfo             ( CBuffer& buffer );
-    static void         GetD3DInfo              ( CBuffer& buffer );
 
 private:
     void                InitializeModList       ( const char* szModFolderPath );
