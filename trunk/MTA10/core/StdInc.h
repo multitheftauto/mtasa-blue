@@ -58,7 +58,6 @@
 #include "CCommandFuncs.h"
 #include "CExceptionInformation_Impl.h"
 #include "tracking/CHTTPClient.h"
-#include "UtilityMacros.h"
 #include "CJoystickManager.h"
 #include "CVideoModeManager.h"
 #include "CServerCache.h"
