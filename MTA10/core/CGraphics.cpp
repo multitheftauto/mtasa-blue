@@ -15,6 +15,8 @@
 
 #include "StdInc.h"
 #include "CTileBatcher.h"
+#include "CLine3DBatcher.h"
+extern CCore* g_pCore;
 
 using namespace std;
 
@@ -42,6 +44,8 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
 
     m_pRenderItemManager = new CRenderItemManager ();
     m_pTileBatcher = new CTileBatcher ();
+    m_pLine3DBatcherPreGUI = new CLine3DBatcher ( true );
+    m_pLine3DBatcherPostGUI = new CLine3DBatcher ( false );
     m_bSetRenderTargetEnabled = false;
 }
 
@@ -55,6 +59,8 @@ CGraphics::~CGraphics ( void )
 
     SAFE_DELETE ( m_pRenderItemManager );
     SAFE_DELETE ( m_pTileBatcher );
+    SAFE_DELETE ( m_pLine3DBatcherPreGUI );
+    SAFE_DELETE ( m_pLine3DBatcherPostGUI );
 }
 
 
@@ -223,17 +229,7 @@ void CGraphics::DrawLine ( float fX1, float fY1, float fX2, float fY2, unsigned 
 
 void CGraphics::DrawLine3D ( const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth )
 {
-    BeginSingleDrawing ();
-
-    m_pGUI->GetRenderingLibrary ()->DrawLine3D (
-        D3DXVECTOR3 ( vecBegin.fX, vecBegin.fY, vecBegin.fZ ),
-        D3DXVECTOR3 ( vecEnd.fX, vecEnd.fY, vecEnd.fZ ),
-        fWidth / 75.0f,
-        NULL,
-        ulColor
-    );
-
-    EndSingleDrawing ();
+    DrawLine3DQueued ( vecBegin, vecEnd, fWidth, ulColor, true );
 }
 
 
@@ -482,20 +478,14 @@ void CGraphics::DrawLine3DQueued ( const CVector& vecBegin,
                                    unsigned long ulColor,
                                    bool bPostGUI )
 {
-    // Set up a queue item
-    sDrawQueueItem Item;
-    Item.eType = QUEUE_LINE3D;
-    Item.Line3D.fX1 = vecBegin.fX;
-    Item.Line3D.fY1 = vecBegin.fY;
-    Item.Line3D.fZ1 = vecBegin.fZ;
-    Item.Line3D.fX2 = vecEnd.fX;
-    Item.Line3D.fY2 = vecEnd.fY;
-    Item.Line3D.fZ2 = vecEnd.fZ;
-    Item.Line3D.fWidth = fWidth;
-    Item.Line3D.ulColor = ulColor;
+    if ( g_pCore->IsWindowMinimized () )
+        return;
 
     // Add it to the queue
-    AddQueueItem ( Item, bPostGUI );
+    if ( bPostGUI )
+        m_pLine3DBatcherPostGUI->AddLine3D ( vecBegin, vecEnd, fWidth, ulColor ); 
+    else
+        m_pLine3DBatcherPreGUI->AddLine3D ( vecBegin, vecEnd, fWidth, ulColor ); 
 }
 
 
@@ -741,7 +731,6 @@ IDirect3DTexture9* CGraphics::LoadTexture ( const char* szFile, unsigned int uiW
     return texture;
 }
 
-extern CCore* g_pCore;
 void CGraphics::DrawTexture ( IDirect3DTexture9* texture, float fX, float fY, float fScaleX, float fScaleY, float fRotation, float fCenterX, float fCenterY, DWORD dwColor )
 {
     if ( !texture )
@@ -774,6 +763,8 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
     D3DXCreateTextureFromFileInMemory ( pDevice, g_szPixel, sizeof ( g_szPixel ), &m_pDXPixelTexture );
 
     m_pTileBatcher->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pLine3DBatcherPreGUI->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pLine3DBatcherPostGUI->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
     m_pRenderItemManager->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
 }
 
@@ -823,6 +814,7 @@ void CGraphics::OnDeviceRestore ( IDirect3DDevice9 * pDevice )
 
 void CGraphics::DrawPreGUIQueue ( void )
 {
+    m_pLine3DBatcherPreGUI->Flush ();
     DrawQueue ( m_PreGUIQueue );
 }
 
@@ -830,6 +822,7 @@ void CGraphics::DrawPreGUIQueue ( void )
 void CGraphics::DrawPostGUIQueue ( void )
 {
     DrawQueue ( m_PostGUIQueue );
+    m_pLine3DBatcherPostGUI->Flush ();
 
     // Both queues should be empty now, and there should be no outstanding refs
     assert ( m_PreGUIQueue.empty () && m_iDebugQueueRefs == 0 );
@@ -879,7 +872,7 @@ void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )
             // Determine new mode
             uint newMode;
             if ( item.eType == QUEUE_SHADER )                                   newMode = 'tile';
-            else if ( item.eType == QUEUE_LINE || item.eType == QUEUE_LINE3D )  newMode = 'misc';
+            else if ( item.eType == QUEUE_LINE )                                newMode = 'misc';
             else                                                                newMode = 'spri';
 
             // Switching mode ?
@@ -945,18 +938,6 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
                 m_pLineInterface->Draw ( List, 2, Item.Line.ulColor );
             }
 
-            break;
-        }
-        // 3D Line type?
-        case QUEUE_LINE3D:
-        {
-            m_pGUI->GetRenderingLibrary ()->DrawLine3D (
-                D3DXVECTOR3 ( Item.Line3D.fX1, Item.Line3D.fY1, Item.Line3D.fZ1 ),
-                D3DXVECTOR3 ( Item.Line3D.fX2, Item.Line3D.fY2, Item.Line3D.fZ2 ),
-                Item.Line3D.fWidth / 75.0f,
-                NULL,
-                Item.Line3D.ulColor
-            );
             break;
         }
         // Rectangle type?

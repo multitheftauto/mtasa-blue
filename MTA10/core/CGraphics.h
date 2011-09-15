@@ -25,6 +25,7 @@ class CGraphics;
 #include <CRenderItemManager.h>
 
 class CTileBatcher;
+class CLine3DBatcher;
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
 
@@ -159,6 +160,8 @@ private:
 
     CRenderItemManager* m_pRenderItemManager;
     CTileBatcher*       m_pTileBatcher;
+    CLine3DBatcher*     m_pLine3DBatcherPreGUI;
+    CLine3DBatcher*     m_pLine3DBatcherPostGUI;
     bool                m_bSetRenderTargetEnabled;
 
     // Fonts
@@ -188,7 +191,6 @@ private:
     enum eDrawQueueType
     {
         QUEUE_LINE,
-        QUEUE_LINE3D,
         QUEUE_TEXT,
         QUEUE_RECT,
         QUEUE_CIRCLE,
@@ -202,18 +204,6 @@ private:
         float           fY1;
         float           fX2;
         float           fY2;
-        float           fWidth;
-        unsigned long   ulColor;
-    };
-
-    struct sDrawQueueLine3D
-    {
-        float           fX1;
-        float           fY1;
-        float           fZ1;
-        float           fX2;
-        float           fY2;
-        float           fZ2;
         float           fWidth;
         unsigned long   ulColor;
     };
@@ -275,7 +265,6 @@ private:
         union
         {
             sDrawQueueLine          Line;
-            sDrawQueueLine3D        Line3D;
             sDrawQueueText          Text;
             sDrawQueueRect          Rect;
             sDrawQueueCircle        Circle;
