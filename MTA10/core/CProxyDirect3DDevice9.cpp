@@ -645,12 +645,19 @@ FLOAT   CProxyDirect3DDevice9::GetNPatchMode                  ( VOID )
 
 HRESULT CProxyDirect3DDevice9::DrawPrimitive                  ( D3DPRIMITIVETYPE PrimitiveType,UINT StartVertex,UINT PrimitiveCount )
 {
-    return CDirect3DEvents9::OnDrawPrimitive ( m_pDevice, PrimitiveType, StartVertex, PrimitiveCount );
+    SetCallType ( SCallState::DRAW_PRIMITIVE, 3, PrimitiveType, StartVertex, PrimitiveCount );
+    HRESULT hr = CDirect3DEvents9::OnDrawPrimitive ( m_pDevice, PrimitiveType, StartVertex, PrimitiveCount );
+    SetCallType ( SCallState::NONE );
+    return hr;
 }
+
 
 HRESULT CProxyDirect3DDevice9::DrawIndexedPrimitive           ( D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount )
 {
-    return CDirect3DEvents9::OnDrawIndexedPrimitive ( m_pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+    SetCallType ( SCallState::DRAW_INDEXED_PRIMITIVE, 6, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+    HRESULT hr = CDirect3DEvents9::OnDrawIndexedPrimitive ( m_pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+    SetCallType ( SCallState::NONE );
+    return hr;
 }
 
 HRESULT CProxyDirect3DDevice9::DrawPrimitiveUP                ( D3DPRIMITIVETYPE PrimitiveType,UINT PrimitiveCount,CONST void* pVertexStreamZeroData,UINT VertexStreamZeroStride )
@@ -844,4 +851,18 @@ HRESULT CProxyDirect3DDevice9::CreateQuery                    ( D3DQUERYTYPE Typ
     return m_pDevice->CreateQuery ( Type, ppQuery );
 }
 
+// For debugging
+void CProxyDirect3DDevice9::SetCallType ( SCallState::eD3DCallType callType, uint uiNumArgs, ... )
+{
+    DeviceState.CallState.callType = callType;
+    DeviceState.CallState.uiNumArgs = uiNumArgs;
+    if ( uiNumArgs )
+    {
+        va_list vl;
+        va_start(vl,uiNumArgs);
+        for ( uint i = 0 ; i < uiNumArgs && i < NUMELMS( DeviceState.CallState.args ) ; i++ )
+            DeviceState.CallState.args[i] = va_arg ( vl, int );
+        va_end(vl);
+    }
+}
 

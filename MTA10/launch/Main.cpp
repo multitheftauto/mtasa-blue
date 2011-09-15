@@ -53,7 +53,8 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     SString strLoaderDllFilename = "loader.dll";
 #endif
 
-    SString strLoaderDllPathFilename = PathJoin ( GetLaunchPath (), "mta", strLoaderDllFilename );
+    SString strMTASAPath = PathJoin ( GetLaunchPath (), "mta" );
+    SString strLoaderDllPathFilename = PathJoin ( strMTASAPath, strLoaderDllFilename );
 
     // Load loader dll
     HMODULE hModule = LoadLibrary ( strLoaderDllPathFilename );
@@ -71,9 +72,10 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     }
     else
     {
-        SString strMessage ( "Could not find loader dll at: '%s'", *strLoaderDllPathFilename );
-        AddReportLog ( 5710, strMessage );
-        BrowseToSolution ( "loaded-dll-missing", true, false, false, strMessage );
+        SString strError = GetSystemErrorMessage ( GetLastError () );
+        SString strMessage ( "Failed to load: '%s'\n\n%s", *strLoaderDllPathFilename, *strError );
+        AddReportLog ( 5711, strMessage );
+        BrowseToSolution ( "loader-dll-missing", true, false, false, strMessage );
         iReturnCode = 1;
     }
 

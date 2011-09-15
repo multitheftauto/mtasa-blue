@@ -12,6 +12,7 @@
 #include <StdInc.h>
 
 static std::vector < CLuaCFunction* > m_sFunctions;
+static std::map < lua_CFunction, CLuaCFunction* > ms_Functions;
 
 CLuaCFunction::CLuaCFunction ( const char* szName, lua_CFunction f, bool bRestricted )
 {
@@ -30,6 +31,7 @@ CLuaCFunction* CLuaCFunctions::AddFunction ( const char* szName, lua_CFunction f
     // Create it, add to list and return
     pFunction = new CLuaCFunction ( szName, f, bRestricted );
     m_sFunctions.push_back ( pFunction );
+    MapSet ( ms_Functions, f, pFunction );
     return pFunction;
 }
 
@@ -48,6 +50,12 @@ CLuaCFunction* CLuaCFunctions::GetFunction ( const char* szName, lua_CFunction f
     }
 
     return NULL;
+}
+
+
+CLuaCFunction* CLuaCFunctions::GetFunction ( lua_CFunction f )
+{
+    return MapFindRef ( ms_Functions, f );
 }
 
 

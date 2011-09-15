@@ -128,6 +128,8 @@ public:
     virtual void                    OnPreHUDRender                  ( void ) = 0;
     virtual uint                    GetMinStreamingMemory           ( void ) = 0;
     virtual uint                    GetMaxStreamingMemory           ( void ) = 0;
+    virtual void                    OnCrashAverted                  ( uint uiId ) = 0;
+    virtual void                    LogEvent                        ( const char* szType, const char* szContext, const char* szBody ) = 0;
 };
 
 #endif
