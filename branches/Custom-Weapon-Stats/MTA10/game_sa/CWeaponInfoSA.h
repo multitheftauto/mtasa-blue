@@ -102,6 +102,8 @@ public:
     void                        SetDamagePerHit ( short sDamagePerHit )     { GetInterface()->m_nDamage = sDamagePerHit; };
     float                       GetAccuracy ( void )                        { return internalInterface->m_fAccuracy; };
     void                        SetAccuracy ( float fAccuracy )             { internalInterface->m_fAccuracy = fAccuracy; };
+    short                       GetMaximumClipAmmo ( void )                 { return internalInterface->m_nAmmo; };
+    void                        SetMaximumClipAmmo ( short sAccuracy )      { internalInterface->m_nAmmo = sAccuracy; };
     // projectile/areaeffect only
     float                       GetFiringSpeed( void )                      { return GetInterface()->m_fSpeed; };
     void                        SetFiringSpeed ( float fFiringSpeed )       { GetInterface()->m_fSpeed = fFiringSpeed; };

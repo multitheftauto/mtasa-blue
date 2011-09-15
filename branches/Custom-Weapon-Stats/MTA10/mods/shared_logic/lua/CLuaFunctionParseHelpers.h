@@ -23,6 +23,8 @@ DECLARE_ENUM( CEasingCurve::eType );
 DECLARE_ENUM( eAmbientSoundType )
 DECLARE_ENUM( eCGUIType );
 DECLARE_ENUM( eDxTestMode )
+DECLARE_ENUM( eWeaponType )
+DECLARE_ENUM( eWeaponProperty )
 
 enum eDXHorizontalAlign
 {

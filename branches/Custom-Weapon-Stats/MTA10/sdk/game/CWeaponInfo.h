@@ -141,6 +141,11 @@ enum eWeaponType
     // Added by us
     WEAPONTYPE_TANK_GRENADE,
 };
+enum eWeaponStats
+{
+    WEAPONTYPE_MIN = WEAPONTYPE_GRENADE,
+    WEAPONTYPE_MAX = WEAPONTYPE_EXTINGUISHER,
+};
 
 // VERY MUCH VC, NEEDS TO BE UPDATED
 enum eWeaponModel
@@ -230,6 +235,8 @@ public:
     virtual void                        SetDamagePerHit         ( short sDamagePerHit )=0;
     virtual float                       GetAccuracy             ( void ) = 0;
     virtual void                        SetAccuracy             ( float fAccuracy ) = 0;
+    virtual short                       GetMaximumClipAmmo      ( void ) = 0;
+    virtual void                        SetMaximumClipAmmo      ( short sAccuracy ) = 0;
     // projectile/areaeffect only
     virtual float                       GetFiringSpeed          ( void )=0;
     virtual void                        SetFiringSpeed          ( float fFiringSpeed )=0;

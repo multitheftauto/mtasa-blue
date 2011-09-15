@@ -1395,6 +1395,7 @@ enum eWeaponProperty
     WEAPON_LIFE_SPAN,
     WEAPON_FIRING_SPEED,
     WEAPON_SPREAD,
+    WEAPON_MAX_CLIP_AMMO,
 };
 
 #endif
