@@ -645,8 +645,8 @@ void CMultiplayerSA::InitHooks()
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
 
-    // Increase double link limit from 3200 ro 4000
-    MemPut < int > ( 0x00550F82, 4000 );
+    // Increase double link limit from 3200 ro 8000
+    MemPut < int > ( 0x00550F82, 8000 );
 
 
     // Disable GTA being able to call CAudio::StopRadio ()
