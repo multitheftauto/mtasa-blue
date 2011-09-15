@@ -5777,7 +5777,11 @@ bool CStaticFunctionDefinitions::AttachTrailerToVehicle ( CVehicle* pVehicle, CV
         {
             // Attach them
             if ( !pVehicle->SetTowedVehicle ( pTrailer ) || !pTrailer->SetTowedByVehicle ( pVehicle ) )
+            {
+                pVehicle->SetTowedVehicle ( NULL );
+                pTrailer->SetTowedByVehicle ( NULL );
                 return false;
+            }
 
             // Tell everyone to attach them
             CVehicleTrailerPacket AttachPacket ( pVehicle, pTrailer, true );

@@ -141,6 +141,10 @@ public:
     inline void                     SetEnabled                  ( bool bEnabled )                       { return m_pCollision->SetEnabled( bEnabled ); }
     inline bool                     IsEnabled                   ( void )                                { return m_pCollision->IsEnabled(); }
 
+    inline void                     SetDoneDelayHack            ( bool bDone )                          { m_bDoneDelayHack = bDone; }
+    inline bool                     HasDoneDelayHack            ( void )                                { return m_bDoneDelayHack; }
+
+
 private:
     void                            Callback_OnCollision        ( CColShape& Shape, CElement& Element );
     void                            Callback_OnLeave            ( CColShape& Shape, CElement& Element );
@@ -165,6 +169,7 @@ private:
     CColSphere*                     m_pCollision;
 
     bool                            m_bSpawned;
+    bool                            m_bDoneDelayHack;
 };
 
 #endif

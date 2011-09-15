@@ -55,3 +55,23 @@ void CLuaDefs::Initialize ( CClientGame* pClientGame,
     m_pColModelManager = m_pManager->GetColModelManager ();
     m_pRegisteredCommands = pClientGame->GetRegisteredCommands ();
 }
+
+
+int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
+{
+    // Grab the function name we're calling.
+    CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( f );
+    if ( pFunction )
+    {
+        // Get the resource name
+        SString strScriptName;
+        if ( CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine ( luaVM ) )
+            strScriptName = pLuaMain->GetScriptNamePointer ();
+
+        // Record for the crash dump file
+        g_pCore->LogEvent ( "LuaCFunction", strScriptName, pFunction->GetFunctionName () );
+    }
+
+    // Everything is allowed on the client
+    return true;
+}

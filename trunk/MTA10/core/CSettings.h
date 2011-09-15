@@ -176,6 +176,9 @@ protected:
     CGUILabel*          m_pSingleDownloadLabelInfo;
     CGUILabel*          m_pSingleDownloadLabel;
     CGUIComboBox*       m_pSingleDownloadCombo;
+    CGUILabel*          m_pDebugSettingLabelInfo;
+    CGUILabel*          m_pDebugSettingLabel;
+    CGUIComboBox*       m_pDebugSettingCombo;
     CGUILabel*          m_pUpdateBuildTypeLabelInfo;
     CGUILabel*          m_pUpdateBuildTypeLabel;
     CGUIComboBox*       m_pUpdateBuildTypeCombo;

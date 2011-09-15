@@ -404,6 +404,19 @@ public:
         int InstalledMemoryKB;
     };
 
+    struct SCallState
+    {
+        enum eD3DCallType
+        {
+            NONE,
+            DRAW_PRIMITIVE,
+            DRAW_INDEXED_PRIMITIVE,
+        };
+        eD3DCallType callType;
+        uint uiNumArgs;
+        int args [ 10 ];
+    };
+
     struct SD3DDeviceState
     {
         SD3DDeviceState ()
@@ -425,6 +438,7 @@ public:
         D3DCAPS9                        DeviceCaps;
         SD3DVertexDeclState             VertexDeclState;
         SAdapterState                   AdapterState;
+        SCallState                      CallState;
 
         struct
         {
@@ -436,6 +450,9 @@ public:
 
     bool                m_bCaptureState;
     SD3DDeviceState     DeviceState;
+
+    // Debugging
+    void                SetCallType     ( SCallState::eD3DCallType callType, uint uiNumArgs = 0, ... );
 };
 
 extern CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState;

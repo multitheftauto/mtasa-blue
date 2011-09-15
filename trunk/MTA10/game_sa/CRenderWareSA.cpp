@@ -1088,7 +1088,8 @@ STexInfo* CRenderWareSA::CreateTexInfo ( ushort usTxdId, const SString& strTextu
 
     // Add to lookup maps
     SString strUniqueKey ( "%d_%s", pTexInfo->usTxdId, *pTexInfo->strTextureName );
-    assert ( !MapContains ( m_UniqueTexInfoMap, strUniqueKey ) );
+    if ( MapContains ( m_UniqueTexInfoMap, strUniqueKey ) )
+        AddReportLog ( 5132, SString ( "CreateTexInfo duplicate %s", *strUniqueKey ) );
     MapSet ( m_UniqueTexInfoMap, strUniqueKey, pTexInfo );
 
 	// This assert fails when using engine txd replace functions - TODO find out why
@@ -1109,7 +1110,8 @@ void CRenderWareSA::OnDestroyTexInfo ( STexInfo* pTexInfo )
 {
     // Remove from lookup maps
     SString strUniqueKey ( "%d_%s", pTexInfo->usTxdId, *pTexInfo->strTextureName );
-    assert ( MapContains ( m_UniqueTexInfoMap, strUniqueKey ) );
+    if ( !MapContains ( m_UniqueTexInfoMap, strUniqueKey ) )
+        AddReportLog ( 5133, SString ( "OnDestroyTexInfo missing %s", *strUniqueKey ) );
     MapRemove ( m_UniqueTexInfoMap, strUniqueKey );
 
 	// This assert fails when using engine txd replace functions - TODO find out why

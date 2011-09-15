@@ -62,3 +62,4 @@
 #include "CJoystickManager.h"
 #include "CVideoModeManager.h"
 #include "CServerCache.h"
+#include "CCrashDumpWriter.h"

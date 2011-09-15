@@ -395,6 +395,15 @@ namespace
         SString strName;
         SString strValue;
         std::map < SString, SString > attributeMap;
+        SString GetAttribute ( const SString& strName ) const
+        {
+            const SString* pValue = MapFind ( attributeMap, strName );
+            return pValue ? *pValue : "";
+        }
+        void SetAttribute ( const SString& strName, const SString& strValue )
+        {
+            MapSet ( attributeMap, strName, strValue );
+        }
     };
 
     // A list of subnodes and their attributes

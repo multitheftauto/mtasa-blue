@@ -568,7 +568,7 @@ void CVehicle::SetUpgrades ( CVehicleUpgrades* pUpgrades )
 
 bool CVehicle::SetTowedVehicle ( CVehicle* pVehicle )
 {
-    if ( m_pTowedVehicle && pVehicle )
+    if ( m_pTowedVehicle )
     {
         m_pTowedVehicle->m_pTowedByVehicle = NULL;
         m_pTowedVehicle = NULL;
@@ -595,7 +595,7 @@ bool CVehicle::SetTowedVehicle ( CVehicle* pVehicle )
 
 bool CVehicle::SetTowedByVehicle ( CVehicle* pVehicle )
 {
-    if ( m_pTowedByVehicle && pVehicle )
+    if ( m_pTowedByVehicle )
     {
         m_pTowedByVehicle->m_pTowedVehicle = NULL;
         m_pTowedByVehicle = NULL;

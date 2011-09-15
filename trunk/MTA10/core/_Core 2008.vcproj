@@ -389,6 +389,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CCrashDumpWriter.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CCredits.cpp"
 				>
 			</File>
@@ -775,6 +779,10 @@
 			</File>
 			<File
 				RelativePath=".\CCore.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CCrashDumpWriter.h"
 				>
 			</File>
 			<File

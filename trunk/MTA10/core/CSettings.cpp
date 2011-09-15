@@ -856,6 +856,26 @@ CSettings::CSettings ( void )
     m_pSingleDownloadLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
 
+    // Debug setting
+    m_pDebugSettingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Debug setting:" ) );
+    m_pDebugSettingLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pDebugSettingLabel->AutoSize ( m_pDebugSettingLabel->GetText ().c_str () );
+
+    m_pDebugSettingCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pDebugSettingCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pDebugSettingCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pDebugSettingCombo->AddItem ( "Default" )->SetData ( (void*)0 );
+    m_pDebugSettingCombo->AddItem ( "#6323 Network" )->SetData ( (void*)1 );
+    m_pDebugSettingCombo->SetReadOnly ( true );
+
+    m_pDebugSettingLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Select default always.\n(This setting is not saved)" ) );
+    m_pDebugSettingLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
+    m_pDebugSettingLabelInfo->SetFont ( "default-bold-small" );
+    m_pDebugSettingLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 40-4;
+
+    m_pDebugSettingCombo->SetText ( "Default" );
+    SetApplicationSetting ( "diagnostics", "debug-setting", "none" );
 
     // Auto updater section label
     m_pAdvancedUpdaterLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Auto updater" ) );
@@ -2358,6 +2378,16 @@ void CSettings::SaveData ( void )
     {
         int iSelected = ( int ) pSelected->GetData();
         CVARS_SET ( "single_download", iSelected );
+    }
+
+    // Debug setting
+    if ( CGUIListItem* pSelected = m_pDebugSettingCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        SString strDebugSetting = "none";
+        if ( iSelected == 1 )
+            strDebugSetting = "net";    // #6323 Network
+        SetApplicationSetting ( "diagnostics", "debug-setting", strDebugSetting );
     }
 
     // Update build type

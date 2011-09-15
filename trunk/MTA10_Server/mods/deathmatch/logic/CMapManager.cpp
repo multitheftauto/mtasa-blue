@@ -642,9 +642,11 @@ void CMapManager::DoPickupRespawning ( void )
         if ( pPickup->IsEnabled () == false )
         {
             // Allow time for the element to be at least sent client side before allowing collisions otherwise it's possible to get a collision before the pickup is created. DO NOT WANT! - Caz
-            if ( ulCurrentTime >= ( ulCreationTime + 100 ) )
+            if ( ulCurrentTime >= ( ulCreationTime + 100 ) && pPickup->HasDoneDelayHack() == false )
             {
-                pPickup->SetEnabled( true );
+                // make sure we only happen once.
+                pPickup->SetDoneDelayHack ( true );
+                pPickup->SetEnabled ( true );
             }
         }
 
