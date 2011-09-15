@@ -37,31 +37,17 @@ public:
                         ~CGraphics              ( void );
 
     // DirectX misc. functions
-    void                BeginDrawing            ( void );
-    void                EndDrawing              ( void );
-
-    inline void         SetRenderTarget         ( IDirect3DSurface9 * pSurface )    { m_pRenderTarget = pSurface; }
-
     inline IDirect3DDevice9 *   GetDevice       ( void )            { return m_pDevice; };
-
-    void                BeginSingleDrawing      ( void );
-    void                EndSingleDrawing        ( void );
 
     // Transformation functions
     void                CalcWorldCoors          ( CVector * vecScreen, CVector * vecWorld );
     void                CalcScreenCoors         ( CVector * vecWorld, CVector * vecScreen );
 
     // DirectX drawing functions
-    void                Draw3DBox               ( float fX, float fY, float fZ, float fL, float fW, float fH, DWORD dwColor, bool bWireframe = false );
     void                DrawText                ( int iLeft, int iTop, int iRight, int iBottom, unsigned long dwColor, const char* wszText, float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont * pDXFont = NULL );
     void                DrawText                ( int iX, int iY, unsigned long dwColor, float fScale, const char * szText, ... );
-    void                DrawText2DA             ( int uiX, int uiY, unsigned long ulColor, float fScale, const char* szDisplayText, ... );
-    void                DrawText3DA             ( float fX, float fY, float fZ, unsigned long ulColor, float fScale, const char* szDisplayText, ... );
-    void                DrawLine                ( float fX1, float fY1, float fX2, float fY2, unsigned long ulColor );
     void                DrawLine3D              ( const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f );
     void                DrawRectangle           ( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor );
-
-    void                Render3DSprite          ( float fX, float fY, float fZ, float fScale, unsigned long ulColor );
 
     unsigned int        GetViewportWidth        ( void );
     unsigned int        GetViewportHeight       ( void );
@@ -147,14 +133,10 @@ private:
 
     CLocalGUI*          m_pGUI;
 
-    bool                m_bIsDrawing;
     int                 m_iDebugQueueRefs;
 
     LPD3DXSPRITE        m_pDXSprite;
     IDirect3DTexture9 * m_pDXPixelTexture;
-
-    IDirect3DSurface9 * m_pRenderTarget;
-    IDirect3DSurface9 * m_pOriginalTarget;
 
     IDirect3DDevice9 *  m_pDevice;
 
@@ -169,20 +151,6 @@ private:
     ID3DXFont*          m_pBigDXFonts [ NUM_FONTS ];
 
     std::vector < SString > m_FontResourceNames;
-
-    /*
-    ID3DXFont *         m_pDXDefaultFont;
-    ID3DXFont *         m_pDXDefaultBoldFont;
-    ID3DXFont *         m_pDXClearFont;
-    ID3DXFont *         m_pDXArialFont;
-    ID3DXFont *         m_pDXSansFont;
-    ID3DXFont *         m_pDXPricedownFont;
-    ID3DXFont *         m_pDXBankGothicFont;
-    ID3DXFont *         m_pDXDiplomaFont;
-    ID3DXFont *         m_pDXBeckettFont;
-
-    ID3DXFont *         m_pDXBigDefaultFont;
-    */
 
     // ******* Drawing queue code ***********
     // Used by client scripts to draw DX stuff. Rather than drawing immediately,

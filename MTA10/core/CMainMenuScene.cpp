@@ -11,7 +11,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-
+#if 0
 using namespace std;
 
 #include <libv2/libv2.h>
@@ -2173,3 +2173,4 @@ bool CMainMenuScene::SetVideoEnabled ( bool bEnabled )
     return bResult;
 }
 */
+#endif

@@ -10,6 +10,7 @@
 *
 *****************************************************************************/
 
+#if 0
 class CMainMenuScene;
 
 #ifndef __CMAINMENUSCENE_H
@@ -71,4 +72,5 @@ private:
     std::vector < bool >                 pbMeshTextures;
 };
 
+#endif
 #endif

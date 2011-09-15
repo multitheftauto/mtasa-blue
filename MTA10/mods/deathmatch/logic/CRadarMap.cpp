@@ -70,7 +70,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     CreateMarkerTextures ();
 
     // Create the text display for the mode text
-    m_pModeText = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
+    m_pModeText = new CClientTextDisplay ( m_pManager->GetDisplayManager () );
     m_pModeText->SetCaption ( "Current Mode: Free Move" );
     m_pModeText->SetColor ( SColorRGBA ( 255, 255, 255, 200 ) );
     m_pModeText->SetPosition ( CVector ( 0.50f, 0.92f, 0 ) );
@@ -122,7 +122,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     const SBindableKey *bkAttachRadar = cbAttachRadar->boundKey;
 
     // Create the text displays for the help text
-    m_pHelpTextZooming = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
+    m_pHelpTextZooming = new CClientTextDisplay ( m_pManager->GetDisplayManager () );
     m_pHelpTextZooming->SetCaption ( SString("Press %s/%s to zoom in/out.", bkZoomIn->szKey, bkZoomOut->szKey).c_str () );
     m_pHelpTextZooming->SetColor( SColorRGBA ( 255, 255, 255, 255 ) );
     m_pHelpTextZooming->SetPosition ( CVector ( 0.50f, 0.05f, 0 ) );
@@ -130,7 +130,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     m_pHelpTextZooming->SetScale ( 1.0f );
     m_pHelpTextZooming->SetVisible ( false );
 
-    m_pHelpTextMovement = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
+    m_pHelpTextMovement = new CClientTextDisplay ( m_pManager->GetDisplayManager () );
     m_pHelpTextMovement->SetCaption ( SString("Press %s, %s, %s, %s to navigate the map.", bkMoveNorth->szKey, bkMoveEast->szKey, bkMoveSouth->szKey, bkMoveWest->szKey).c_str() );
     m_pHelpTextMovement->SetColor( SColorRGBA ( 255, 255, 255, 255 ) );
     m_pHelpTextMovement->SetPosition ( CVector ( 0.50f, 0.08f, 0 ) );
@@ -138,7 +138,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     m_pHelpTextMovement->SetScale ( 1.0f );
     m_pHelpTextMovement->SetVisible ( false );
 
-    m_pHelpTextAttachment = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
+    m_pHelpTextAttachment = new CClientTextDisplay ( m_pManager->GetDisplayManager () );
     m_pHelpTextAttachment->SetCaption ( SString("Press %s to change mode.", bkAttachRadar->szKey).c_str() );
     m_pHelpTextAttachment->SetColor( SColorRGBA ( 255, 255, 255, 255 ) );
     m_pHelpTextAttachment->SetPosition ( CVector ( 0.50f, 0.11f, 0 ) );

@@ -26,7 +26,7 @@ class CClientTextDisplay: public CClientDisplay
     friend class CClientDisplayManager;
 
 public:
-                                CClientTextDisplay      ( CClientDisplayManager* pDisplayManager, int ID, bool bIs3DTex );
+                                CClientTextDisplay      ( CClientDisplayManager* pDisplayManager, int ID = 0xFFFFFFFF );
                                 ~CClientTextDisplay     ( void );
 
     inline eDisplayType         GetType                 ( void )                                { return DISPLAY_TEXT; }
@@ -54,7 +54,6 @@ public:
     static void                 SetGlobalScale          ( float fScale )                        { m_fGlobalScale = fScale; }
 private:
     char*                       m_szCaption;
-    bool                        m_bIs3DText;
     float                       m_fScale;
 
     unsigned long               m_ulFormat;
