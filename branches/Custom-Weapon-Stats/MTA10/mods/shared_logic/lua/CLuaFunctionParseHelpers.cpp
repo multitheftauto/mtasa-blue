@@ -189,6 +189,9 @@ IMPLEMENT_ENUM_BEGIN( eWeaponProperty )
     ADD_ENUM ( WEAPON_FIRING_SPEED,             "firing_speed" )
     ADD_ENUM ( WEAPON_SPREAD,                   "spread" )
     ADD_ENUM ( WEAPON_MAX_CLIP_AMMO,            "maximum_clip_ammo" )
+    ADD_ENUM ( WEAPON_MOVE_SPEED,               "move_speed" )
+    ADD_ENUM ( WEAPON_FLAGS,                    "flags" )
+    ADD_ENUM ( WEAPON_ANIM_GROUP,               "anim_group" )
 IMPLEMENT_ENUM_END( "weapon-property" )
 
 

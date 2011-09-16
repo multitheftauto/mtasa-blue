@@ -1388,7 +1388,8 @@ enum eHandlingProperty
 };
 enum eWeaponProperty
 {
-    WEAPON_WEAPON_RANGE = 1,
+    WEAPON_INVALID_PROPERTY = 0,
+    WEAPON_WEAPON_RANGE,
     WEAPON_TARGET_RANGE,
     WEAPON_ACCURACY,
     WEAPON_DAMAGE,
@@ -1396,6 +1397,9 @@ enum eWeaponProperty
     WEAPON_FIRING_SPEED,
     WEAPON_SPREAD,
     WEAPON_MAX_CLIP_AMMO,
+    WEAPON_MOVE_SPEED,
+    WEAPON_FLAGS,
+    WEAPON_ANIM_GROUP,
 };
 
 #endif

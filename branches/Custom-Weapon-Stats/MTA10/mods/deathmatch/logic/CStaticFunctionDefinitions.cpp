@@ -6595,6 +6595,9 @@ bool CStaticFunctionDefinitions::GetEntryHandling ( CHandlingEntry* pEntry, eHan
 
 bool CStaticFunctionDefinitions::SetPedWeaponInfo ( CClientPed& ped, eWeaponProperty eProperty, eWeaponType eWeapon, float fData )
 {
+    if ( eProperty == WEAPON_INVALID_PROPERTY )
+        return false;
+
     CWeapon* pWeapon = ped.GetWeapon ( eWeapon );
     if ( pWeapon )
     {
@@ -6633,6 +6636,11 @@ bool CStaticFunctionDefinitions::SetPedWeaponInfo ( CClientPed& ped, eWeaponProp
                     pWeaponInfo->SetFiringSpeed ( fData );
                     break;
                 }
+                case WEAPON_MOVE_SPEED:
+                {
+                    pWeaponInfo->SetMoveSpeed ( fData );
+                    break;
+                }
                 default:
                     return false;
             }
@@ -6647,6 +6655,9 @@ bool CStaticFunctionDefinitions::SetPedWeaponInfo ( CClientPed& ped, eWeaponProp
 
 bool CStaticFunctionDefinitions::SetPedWeaponInfo ( CClientPed& ped, eWeaponProperty eProperty, eWeaponType eWeapon, short sData )
 {
+    if ( eProperty == WEAPON_INVALID_PROPERTY )
+        return false;
+
     CWeapon* pWeapon = ped.GetWeapon ( eWeapon );
     if ( pWeapon )
     {
@@ -6665,6 +6676,19 @@ bool CStaticFunctionDefinitions::SetPedWeaponInfo ( CClientPed& ped, eWeaponProp
                     pWeaponInfo->SetMaximumClipAmmo ( sData );
                     break;
                 }
+                case WEAPON_FLAGS:
+                {
+                    if ( pWeaponInfo->IsFlagSet ( sData ) )
+                        pWeaponInfo->ClearFlag ( sData );
+                    else
+                        pWeaponInfo->SetFlag ( sData );
+                    break;
+                }
+                case WEAPON_ANIM_GROUP:
+                {
+                    pWeaponInfo->SetAnimGroup ( sData );
+                    break;
+                }
                 default:
                     return false;
             }
@@ -6680,6 +6704,9 @@ bool CStaticFunctionDefinitions::SetPedWeaponInfo ( CClientPed& ped, eWeaponProp
 
 bool CStaticFunctionDefinitions::GetPedWeaponInfo ( CClientPed& ped, eWeaponProperty eProperty, eWeaponType eWeapon, float & fData )
 {
+    if ( eProperty == WEAPON_INVALID_PROPERTY )
+        return false;
+
     CWeapon* pWeapon = ped.GetWeapon ( eWeapon );
     if ( pWeapon )
     {
@@ -6711,6 +6738,17 @@ bool CStaticFunctionDefinitions::GetPedWeaponInfo ( CClientPed& ped, eWeaponProp
                 case WEAPON_LIFE_SPAN:
                 {
                     fData = pWeaponInfo->GetLifeSpan ( );
+                    break;
+                }
+                case WEAPON_FIRING_SPEED:
+                {
+                    fData = pWeaponInfo->GetFiringSpeed ( );
+                    break;
+                }
+                case WEAPON_MOVE_SPEED:
+                {
+                    fData = pWeaponInfo->GetMoveSpeed ( );
+                    break;
                 }
                 default:
                     return false;
@@ -6727,6 +6765,9 @@ bool CStaticFunctionDefinitions::GetPedWeaponInfo ( CClientPed& ped, eWeaponProp
 
 bool CStaticFunctionDefinitions::GetPedWeaponInfo ( CClientPed& ped, eWeaponProperty eProperty, eWeaponType eWeapon, short & sData )
 {
+    if ( eProperty == WEAPON_INVALID_PROPERTY )
+        return false;
+
     CWeapon* pWeapon = ped.GetWeapon ( eWeapon );
     if ( pWeapon )
     {
@@ -6743,6 +6784,11 @@ bool CStaticFunctionDefinitions::GetPedWeaponInfo ( CClientPed& ped, eWeaponProp
                 case WEAPON_MAX_CLIP_AMMO:
                 {
                     sData = pWeaponInfo->GetMaximumClipAmmo ( );
+                    break;
+                }
+                case WEAPON_ANIM_GROUP:
+                {
+                    sData = pWeaponInfo->GetAnimGroup ( );
                     break;
                 }
                 default:
