@@ -341,7 +341,7 @@ void CCrashDumpWriter::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptio
                 // Try to append dx info to dump file
                 SetApplicationSetting ( "diagnostics", "last-dump-extra", "try-misc" );
                 CBuffer dxInfo;
-                GetMiscInfo ( dxInfo );
+                GetDxInfo ( dxInfo );
                 AppendToDumpFile ( strPathFilename, dxInfo, 'DXIs', 'DXIe' );
                 SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-misc" );
 
@@ -709,7 +709,7 @@ void CCrashDumpWriter::GetDxInfo ( CBuffer& buffer )
     CBufferWriteStream stream ( buffer );
 
     // Write info version
-    stream.Write ( 1 );
+    stream.Write ( 2 );
 
     // video card name etc..
     SDxStatus status;
