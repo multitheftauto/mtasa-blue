@@ -37,17 +37,22 @@ int CLuaFunctionDefs::PlaySound ( lua_State* luaVM )
                 else
                     bIsURL = true;
 
-                bool bLoop = false;
-                if ( lua_istype ( luaVM, 2, LUA_TBOOLEAN ) )
+                // ParseResourcePathInput changes pResource in some cases e.g. an invalid resource URL - crun playSound( ":myNotRunningResource/music/track.mp3" )
+                // Fixes #6507 - Caz
+                if ( pResource )
                 {
-                    bLoop = ( lua_toboolean ( luaVM, 2 ) ) ? true : false;
-                }
+                    bool bLoop = false;
+                    if ( lua_istype ( luaVM, 2, LUA_TBOOLEAN ) )
+                    {
+                        bLoop = ( lua_toboolean ( luaVM, 2 ) ) ? true : false;
+                    }
 
-                CClientSound* pSound = CStaticFunctionDefinitions::PlaySound ( pResource, strSound, bIsURL, bLoop );
-                if ( pSound )
-                {
-                    lua_pushelement ( luaVM, pSound );
-                    return 1;
+                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound ( pResource, strSound, bIsURL, bLoop );
+                    if ( pSound )
+                    {
+                        lua_pushelement ( luaVM, pSound );
+                        return 1;
+                    }
                 }
             }
         }
@@ -86,17 +91,22 @@ int CLuaFunctionDefs::PlaySound3D ( lua_State* luaVM )
                 else
                     bIsURL = true;
 
-                bool bLoop = false;
-                if ( lua_istype ( luaVM, 5, LUA_TBOOLEAN ) )
+                // ParseResourcePathInput changes pResource in some cases e.g. an invalid resource URL - crun playSound( ":myNotRunningResource/music/track.mp3" )
+                // Fixes #6507 - Caz
+                if ( pResource )
                 {
-                    bLoop = ( lua_toboolean ( luaVM, 5 ) ) ? true : false;
-                }
+                    bool bLoop = false;
+                    if ( lua_istype ( luaVM, 5, LUA_TBOOLEAN ) )
+                    {
+                        bLoop = ( lua_toboolean ( luaVM, 5 ) ) ? true : false;
+                    }
 
-                CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D ( pResource, strSound, bIsURL, vecPosition, bLoop );
-                if ( pSound )
-                {
-                    lua_pushelement ( luaVM, pSound );
-                    return 1;
+                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D ( pResource, strSound, bIsURL, vecPosition, bLoop );
+                    if ( pSound )
+                    {
+                        lua_pushelement ( luaVM, pSound );
+                        return 1;
+                    }
                 }
             }
         }
