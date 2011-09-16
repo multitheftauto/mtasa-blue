@@ -238,6 +238,10 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
     // Any shader for this texture ?
     CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
 
+    // Don't apply if a vertex shader is already being used
+    if ( g_pDeviceState->VertexShader )
+        pShaderItem = NULL;
+
     if ( !pShaderItem )
     {
         // No shader for this texture
@@ -298,6 +302,10 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
 {
     // Any shader for this texture ?
     CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
+
+    // Don't apply if a vertex shader is already being used
+    if ( g_pDeviceState->VertexShader )
+        pShaderItem = NULL;
 
     if ( !pShaderItem )
     {

@@ -434,6 +434,8 @@ public:
         SD3DLightEnableState            LightEnableState[8];
 
         IDirect3DVertexDeclaration9*    VertexDeclaration;
+        IDirect3DVertexShader9*         VertexShader;
+        IDirect3DPixelShader9*          PixelShader;
         IDirect3DIndexBuffer9*          IndexBufferData;
         D3DLIGHT9                       Lights[8];
         D3DMATERIAL9                    Material;
@@ -450,7 +452,6 @@ public:
         }                               VertexStreams[16];
     };
 
-    bool                m_bCaptureState;
     SD3DDeviceState     DeviceState;
 
     // Debugging
