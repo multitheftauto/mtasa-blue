@@ -50,6 +50,7 @@ protected:
 
     bool                            ReplaceObjectModel      ( unsigned short usModel );
     bool                            ReplaceVehicleModel     ( unsigned short usModel );
+    bool                            ReplaceWeaponModel      ( unsigned short usModel );
 
     class CClientDFFManager*        m_pDFFManager;
 

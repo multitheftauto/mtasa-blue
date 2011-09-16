@@ -117,6 +117,9 @@ class CRenderWareSA : public CRenderWare
     // Replaces a CClumpModelInfo (or CVehicleModelInfo, since its just for vehicles) clump with a new clump
     void                ReplaceVehicleModel         ( RpClump * pNew, unsigned short usModelID );
 
+    // Replaces a CClumpModelInfo clump with a new clump
+    void                ReplaceWeaponModel         ( RpClump * pNew, unsigned short usModelID );
+
     // Replaces dynamic parts of the vehicle (models that have two different versions: 'ok' and 'dam'), such as doors
     // szName should be without the part suffix (e.g. 'door_lf' or 'door_rf', and not 'door_lf_dummy')
     bool                ReplacePartModels           ( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szName );
