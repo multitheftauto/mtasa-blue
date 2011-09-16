@@ -92,9 +92,15 @@ bool CClientDFF::ReplaceModel ( unsigned short usModel )
         }
 
         // Is it a vehicle model?
-        if ( CClientVehicleManager::IsValidModel ( usModel ) )
+        else if ( CClientVehicleManager::IsValidModel ( usModel ) )
         {
             return ReplaceVehicleModel ( usModel );
+        }
+
+        else
+        {
+            // Weapon model replacement - Figure out how to reload weapons here!
+            return true;
         }
     }
 
