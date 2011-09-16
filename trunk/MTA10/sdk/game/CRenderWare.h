@@ -42,6 +42,7 @@ class CRenderWare {
     virtual void                AddAllAtomics               ( RpClump * pDst, RpClump * pSrc ) = 0;
     virtual void                ReplaceVehicleModel         ( RpClump * pNew, unsigned short usModelID ) = 0;
     virtual void                ReplaceWeaponModel          ( RpClump * pNew, unsigned short usModelID ) = 0;
+    virtual void                ReplacePedModel             ( RpClump * pNew, unsigned short usModelID ) = 0;
     virtual bool                ReplacePartModels           ( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szName ) = 0;
     virtual void                InitWorldTextureWatch       ( PFN_WATCH_CALLBACK pfnWatchCallback ) = 0;
     virtual bool                AddWorldTextureWatch        ( CSHADERDUMMY* pShaderData, const char* strMatch, float fOrderPriority ) = 0;
