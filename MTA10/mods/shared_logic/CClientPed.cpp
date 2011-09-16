@@ -913,6 +913,7 @@ bool CClientPed::SetModel ( unsigned long ulModel )
                 // Request the model
                 if ( m_pRequester->Request ( static_cast < unsigned short > ( ulModel ), this ) )
                 {
+                    m_pModelInfo->MakeCustomModel ( );
                     // Change the model immediately if it was loaded
                     _ChangeModel ();
                 }
@@ -3494,6 +3495,7 @@ void CClientPed::StreamIn ( bool bInstantly )
     // Request it
     if ( !m_pPlayerPed && m_pRequester->Request ( static_cast < unsigned short > ( m_ulModel ), this ) )
     {
+        m_pModelInfo->MakeCustomModel ( );
         // If it was loaded, create it immediately.
         _CreateModel ();
     }

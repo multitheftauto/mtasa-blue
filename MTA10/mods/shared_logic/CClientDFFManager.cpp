@@ -87,7 +87,8 @@ bool CClientDFFManager::IsReplacableModel ( unsigned short usModel )
 {
     // Either a vehicle model or an object model
     return CClientObjectManager::IsValidModel ( usModel ) ||
-           CClientVehicleManager::IsValidModel ( usModel );
+           CClientVehicleManager::IsValidModel ( usModel ) ||
+           CClientPlayerManager::IsValidModel ( usModel );
 }
 
 
