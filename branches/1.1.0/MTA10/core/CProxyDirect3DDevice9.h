@@ -415,6 +415,8 @@ public:
         eD3DCallType callType;
         uint uiNumArgs;
         int args [ 10 ];
+        SString strShaderName;
+        bool bShaderRequiresNormals;
     };
 
     struct SD3DDeviceState
