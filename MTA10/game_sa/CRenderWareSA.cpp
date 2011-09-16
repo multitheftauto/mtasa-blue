@@ -582,7 +582,24 @@ void CRenderWareSA::ReplaceVehicleModel ( RpClump * pNew, unsigned short usModel
         }
     }
 }
+// Replaces a weapon model
+void CRenderWareSA::ReplaceWeaponModel ( RpClump * pNew, unsigned short usModelID )
+{
+    // get the modelinfo array
+    DWORD *pPool = ( DWORD* ) ARRAY_ModelInfo;
 
+    DWORD dwFunc = FUNC_LoadWeaponModel;
+    DWORD dwThis = pPool[usModelID];
+    if ( dwThis && pNew != (RpClump *)((CBaseModelInfoSAInterface *)dwThis)->pRwObject )
+    {
+        __asm
+        {
+            mov     ecx, dwThis
+            push    pNew
+            call    dwFunc
+        }
+    }
+}
 // Reads and parses a COL3 file
 CColModel * CRenderWareSA::ReadCOL ( const char * szCOLFile )
 {
