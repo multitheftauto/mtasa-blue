@@ -483,7 +483,7 @@ public:
     // Standard server functions
     static unsigned int         GetMaxPlayers                       ( void );
     static bool                 SetMaxPlayers                       ( unsigned int uiMax );
-    static bool                 OutputChatBox                       ( const char* szText, CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded );
+    static bool                 OutputChatBox                       ( const char* szText, CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded, CLuaMain* pLuaMain );
     static bool                 OutputConsole                       ( const char* szText, CElement* pElement );
     static bool                 SetServerPassword                   ( const SString& strPassword, bool bSave );
 

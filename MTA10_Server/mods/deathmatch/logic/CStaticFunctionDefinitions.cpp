@@ -8321,20 +8321,33 @@ bool CStaticFunctionDefinitions::SetMaxPlayers ( unsigned int uiMax )
     return true;
 }
 
-bool CStaticFunctionDefinitions::OutputChatBox ( const char* szText, CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded )
+
+bool CStaticFunctionDefinitions::OutputChatBox ( const char* szText, CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded, CLuaMain* pLuaMain )
 {
     assert ( pElement );
     assert ( szText );
-    RUN_CHILDREN OutputChatBox ( szText, *iter, ucRed, ucGreen, ucBlue, bColorCoded );
+
+    RUN_CHILDREN OutputChatBox ( szText, *iter, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain );
 
     if ( IS_PLAYER ( pElement ) )
     {
         CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
         pPlayer->Send ( CChatEchoPacket ( szText, ucRed, ucGreen, ucBlue, bColorCoded ) );
     }
-
+    
+    if ( pElement == m_pMapManager->GetRootElement() )
+    {
+        CResource* pResource = pLuaMain->GetResource ();
+        CLuaArguments Arguments;
+        Arguments.PushString ( szText );
+        if ( pResource )
+            Arguments.PushResource ( pResource );
+        m_pMapManager->GetRootElement()->CallEvent ( "onChatMessage", Arguments );
+    }
+    
     return true;
 }
+
 
 
 bool CStaticFunctionDefinitions::OutputConsole ( const char* szText, CElement* pElement )
