@@ -434,6 +434,9 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
         // Convert to wstring        
         Item.strText = MbUTF8ToUTF16(szText);
 
+        // Keep font valid while in the queue incase it's a custom font
+        AddQueueRef ( Item.Text.pDXFont );
+
         // Add it to the queue
         AddQueueItem ( Item, bPostGUI );
     }
@@ -783,6 +786,7 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
             D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, NULL );
             m_pDXSprite->SetTransform ( &matrix );        
             Item.Text.pDXFont->DrawTextW ( m_pDXSprite, Item.strText.c_str (), -1, &rect, Item.Text.ulFormat, Item.Text.ulColor );
+            RemoveQueueRef ( Item.Text.pDXFont );
             break;
         }
         case QUEUE_TEXTURE:
@@ -876,6 +880,9 @@ void CGraphics::ClearDrawQueue ( std::vector < sDrawQueueItem >& Queue )
         const sDrawQueueItem& item = *iter;
         if ( item.eType == QUEUE_TEXTURE || item.eType == QUEUE_SHADER )
             RemoveQueueRef ( item.Texture.pMaterial );
+        else
+        if ( item.eType == QUEUE_TEXT )
+            RemoveQueueRef ( item.Text.pDXFont );
     }
     Queue.clear ();
 }
@@ -895,6 +902,19 @@ void CGraphics::RemoveQueueRef ( CRenderItem* pRenderItem )
     pRenderItem->Release ();
     m_iDebugQueueRefs--;    // For debugging
 }
+
+void CGraphics::AddQueueRef ( IUnknown* pUnknown )
+{
+    pUnknown->AddRef ();
+    m_iDebugQueueRefs++;    // For debugging
+}
+
+void CGraphics::RemoveQueueRef ( IUnknown* pUnknown )
+{
+    pUnknown->Release ();
+    m_iDebugQueueRefs--;    // For debugging
+}
+
 
 // Entering or leaving a section where the rendertarget can be changed from script
 void CGraphics::EnableSetRenderTarget ( bool bEnable )

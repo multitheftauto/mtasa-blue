@@ -3,8 +3,8 @@
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        core/CCrashDumpWriter.cpp
-*  PURPOSE:     Game mod loading manager
-*  DEVELOPERS:  Christian Myhre Lundheim <>
+*  PURPOSE:
+*  DEVELOPERS:
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -337,6 +337,20 @@ void CCrashDumpWriter::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptio
                 GetLogInfo ( logInfo );
                 AppendToDumpFile ( strPathFilename, logInfo, 'LOGs', 'LOGe' );
                 SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-log" );
+
+                // Try to append dx info to dump file
+                SetApplicationSetting ( "diagnostics", "last-dump-extra", "try-misc" );
+                CBuffer dxInfo;
+                GetDxInfo ( dxInfo );
+                AppendToDumpFile ( strPathFilename, dxInfo, 'DXIs', 'DXIe' );
+                SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-misc" );
+
+                // Try to append misc info to dump file
+                SetApplicationSetting ( "diagnostics", "last-dump-extra", "try-misc" );
+                CBuffer miscInfo;
+                GetMiscInfo ( miscInfo );
+                AppendToDumpFile ( strPathFilename, miscInfo, 'MSCs', 'MSCe' );
+                SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-misc" );
             }
         }
 
@@ -580,7 +594,7 @@ void CCrashDumpWriter::GetD3DInfo ( CBuffer& buffer )
     CBufferWriteStream stream ( buffer );
 
     // Write D3DInfo version
-    stream.Write ( 1 );
+    stream.Write ( 2 );
 
     // Quit if device state pointer is not valid
     if ( !g_pDeviceState )
@@ -615,6 +629,12 @@ void CCrashDumpWriter::GetD3DInfo ( CBuffer& buffer )
     if ( pRenderWare )
         strTextureName = pRenderWare->GetTextureName ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
     stream.WriteString ( strTextureName );
+
+    // Write shader name if being used
+    stream.WriteString ( g_pDeviceState->CallState.strShaderName );
+    stream.Write ( g_pDeviceState->CallState.bShaderRequiresNormals );
+
+    // TODO - Vertex state and vertex/index buffer if readable
 }
 
 
@@ -673,4 +693,65 @@ void CCrashDumpWriter::GetLogInfo ( CBuffer& buffer )
         stream.WriteString ( iter->strContext );
         stream.WriteString ( iter->strBody );
     }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CCrashDumpWriter::GetDxInfo
+//
+// Static function
+// Grab our dx datum
+//
+///////////////////////////////////////////////////////////////
+void CCrashDumpWriter::GetDxInfo ( CBuffer& buffer )
+{
+    CBufferWriteStream stream ( buffer );
+
+    // Write info version
+    stream.Write ( 2 );
+
+    // video card name etc..
+    SDxStatus status;
+    CGraphics::GetSingleton ().GetRenderItemManager ()->GetDxStatus ( status );
+
+    stream.Write ( status.testMode );
+
+    stream.WriteString ( status.videoCard.strName );
+    stream.Write ( status.videoCard.iInstalledMemoryKB );
+    stream.WriteString ( status.videoCard.strPSVersion );
+
+    stream.Write ( status.videoMemoryKB.iFreeForMTA );
+    stream.Write ( status.videoMemoryKB.iUsedByFonts );
+    stream.Write ( status.videoMemoryKB.iUsedByTextures );
+    stream.Write ( status.videoMemoryKB.iUsedByRenderTargets );
+
+    stream.Write ( status.settings.bWindowed );
+    stream.Write ( status.settings.iFXQuality );
+    stream.Write ( status.settings.iDrawDistance );
+    stream.Write ( status.settings.bVolumetricShadows );
+    stream.Write ( status.settings.iStreamingMemory );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CCrashDumpWriter::GetMiscInfo
+//
+// Static function
+// Grab various bits 'n' bobs
+//
+///////////////////////////////////////////////////////////////
+void CCrashDumpWriter::GetMiscInfo ( CBuffer& buffer )
+{
+    CBufferWriteStream stream ( buffer );
+
+    // Write info version
+    stream.Write ( 1 );
+
+    // US/Euro gta_sa.exe
+    unsigned char ucA = *reinterpret_cast < unsigned char* > ( 0x748ADD );
+    unsigned char ucB = *reinterpret_cast < unsigned char* > ( 0x748ADE );
+    stream.Write ( ucA );
+    stream.Write ( ucB );
 }

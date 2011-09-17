@@ -242,6 +242,7 @@ class CEffectWrap : public CRenderItem
     D3DXHANDLE      m_hFirstTexture;
     bool            m_bRequiresNormals;
     uint            m_uiSaveStateFlags;
+    SString         m_strName;
 };
 
 CEffectWrap* NewEffectWrap ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
