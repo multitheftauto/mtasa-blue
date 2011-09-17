@@ -13,7 +13,7 @@
 #include "StdInc.h"
 #include "CProxyDirect3DVertexBuffer.h"
 #include "CAdditionalVertexStreamManager.h"
-
+#include "CVertexStreamBoundingBoxManager.h"
 
 /////////////////////////////////////////////////////////////
 //
@@ -38,6 +38,7 @@ CProxyDirect3DVertexBuffer::CProxyDirect3DVertexBuffer ( IDirect3DDevice9* InD3D
 CProxyDirect3DVertexBuffer::~CProxyDirect3DVertexBuffer ( void )
 {
     CAdditionalVertexStreamManager::GetSingleton ()->OnVertexBufferDestroy ( m_pOriginal );
+    CVertexStreamBoundingBoxManager::GetSingleton ()->OnVertexBufferDestroy ( m_pOriginal );
 }
 
 
@@ -95,6 +96,9 @@ ULONG CProxyDirect3DVertexBuffer::Release ( void )
 HRESULT CProxyDirect3DVertexBuffer::Lock ( UINT OffsetToLock, UINT SizeToLock, void** ppbData, DWORD Flags )
 {
     if ( ( Flags & D3DLOCK_READONLY ) == 0 )
+    {
         CAdditionalVertexStreamManager::GetSingleton ()->OnVertexBufferRangeInvalidated ( m_pOriginal, OffsetToLock, SizeToLock );
+        CVertexStreamBoundingBoxManager::GetSingleton ()->OnVertexBufferRangeInvalidated ( m_pOriginal, OffsetToLock, SizeToLock );
+    }
     return m_pOriginal->Lock ( OffsetToLock, SizeToLock, ppbData, Flags );
 }
