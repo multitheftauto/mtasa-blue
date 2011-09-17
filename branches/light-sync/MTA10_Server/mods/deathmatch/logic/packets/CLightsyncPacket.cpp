@@ -40,7 +40,7 @@ bool CLightsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         if ( bSyncPosition == false )
         {
             CVector vecPosition = pPlayer->GetPosition();
-            CLogger::LogPrintf ( "LS: Player %s: light sync comparison failed x:%f, y:%f, z:%f, distance:%f\n", pPlayer->GetName(), vecPosition.fX, vecPosition.fY, vecPosition.fZ, fDistance );
+            CLogger::LogPrintf ( "LS: Player %s: light sync comparison failed x:%f, y:%f, z:%f, distance:%f\n", pPlayer->GetNick (), vecPosition.fX, vecPosition.fY, vecPosition.fZ, fDistance );
         }
 
         BitStream.Write ( pPlayer->GetID () );
@@ -77,7 +77,7 @@ bool CLightsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                 BitStream.Write ( &health );
             }
             pPlayer->SetLastLightSyncPosition ( pos.data.vecPosition );
-            CLogger::LogPrintf ( "LS: Player %s: light sync position saved as x:%f, y:%f, z:%f\n", pPlayer->GetName(), pos.data.vecPosition.fX, pos.data.vecPosition.fY, pos.data.vecPosition.fZ );
+            CLogger::LogPrintf ( "LS: Player %s: light sync position saved as x:%f, y:%f, z:%f\n", pPlayer->GetNick (), pos.data.vecPosition.fX, pos.data.vecPosition.fY, pos.data.vecPosition.fZ );
         }
     }
 
