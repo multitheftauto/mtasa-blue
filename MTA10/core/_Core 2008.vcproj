@@ -661,6 +661,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CVertexStreamBoundingBoxManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CVideoModeManager.cpp"
 				>
 			</File>
@@ -999,6 +1003,10 @@
 			</File>
 			<File
 				RelativePath=".\CVersionUpdater.Util.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CVertexStreamBoundingBoxManager.h"
 				>
 			</File>
 			<File

@@ -185,7 +185,7 @@ CScreenSourceItem* CRenderItemManager::CreateScreenSource ( uint uiSizeX, uint u
 // Create a D3DX effect from .fx file
 //
 ////////////////////////////////////////////////////////////////
-CShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, bool bDebug )
+CShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug )
 {
     if ( !CanCreateRenderItem ( CShaderItem::GetClassId () ) )
         return NULL;
@@ -193,7 +193,7 @@ CShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, 
     strOutStatus = "";
 
     CShaderItem* pShaderItem = new CShaderItem ();
-    pShaderItem->PostConstruct ( this, strFullFilePath, strRootPath, strOutStatus, fPriority, bDebug );
+    pShaderItem->PostConstruct ( this, strFullFilePath, strRootPath, strOutStatus, fPriority, fMaxDistance, bDebug );
 
     if ( !pShaderItem->IsValid () )
     {

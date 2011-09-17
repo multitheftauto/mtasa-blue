@@ -28,7 +28,7 @@ public:
     CClientDxFont*          CreateDxFont                ( const SString& strFullFilePath, uint uiSize, bool bBold );
     CClientGuiFont*         CreateGuiFont               ( const SString& strFullFilePath, const SString& strUniqueName, uint uiSize );
     CClientTexture*         CreateTexture               ( const SString& strFullFilePath );
-    CClientShader*          CreateShader                ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, bool bDebug );
+    CClientShader*          CreateShader                ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug );
     CClientRenderTarget*    CreateRenderTarget          ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel );
     CClientScreenSource*    CreateScreenSource          ( uint uiSizeX, uint uiSizeY );
     CClientTexture*         FindAutoTexture             ( const SString& strFullFilePath, const SString& strUniqueName );

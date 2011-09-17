@@ -85,7 +85,7 @@ public:
     virtual CDxFontItem*        CreateDxFont                        ( const SString& strFullFilePath, uint uiSize, bool bBold ) = 0;
     virtual CGuiFontItem*       CreateGuiFont                       ( const SString& strFullFilePath, const SString& strFontName, uint uiSize ) = 0;
     virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath ) = 0;
-    virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, bool bDebug ) = 0;
+    virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug ) = 0;
     virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel ) = 0;
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY ) = 0;
     virtual void                ReleaseRenderItem                   ( CRenderItem* pItem ) = 0;
@@ -270,7 +270,7 @@ class CShaderItem : public CMaterialItem
 {
     DECLARE_CLASS( CShaderItem, CMaterialItem )
                     CShaderItem             ( void ) : ClassInit ( this ) {}
-    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, float fPriority, bool bDebug );
+    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug );
     virtual void    PreDestruct             ( void );
     virtual bool    IsValid                 ( void );
     virtual void    OnLostDevice            ( void );
@@ -285,6 +285,7 @@ class CShaderItem : public CMaterialItem
 
     CEffectWrap*        m_pEffectWrap;
     float               m_fPriority;
+    float               m_fMaxDistanceSq;
 
     // This is used as the current render material
     // If the shader wants to change a parameter, and the instance is refed by something else, then the shader must clone a new instance for itself
