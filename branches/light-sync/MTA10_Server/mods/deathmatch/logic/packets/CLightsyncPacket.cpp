@@ -35,7 +35,7 @@ bool CLightsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 
         float fDistance = ( pPlayer->GetLastLightSyncPosition() - pPlayer->GetPosition() ).Length();
         CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
-        bSyncPosition = ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 ) && ( fDistance > 0.001f );
+        bSyncPosition = ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 ) && ( fDistance > 0.0001f );
 
         if ( bSyncPosition == false )
         {
@@ -76,7 +76,7 @@ bool CLightsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                 health.data.fValue = pVehicle->GetHealth ();
                 BitStream.Write ( &health );
             }
-            pPlayer->SetLastLightSyncPosition ( pos.data.vecPosition );
+            pPlayer->SetLastLightSyncPosition ( pPlayer->GetPosition () );
             CLogger::LogPrintf ( "LS: Player %s: light sync position saved as x:%f, y:%f, z:%f\n", pPlayer->GetNick (), pos.data.vecPosition.fX, pos.data.vecPosition.fY, pos.data.vecPosition.fZ );
         }
     }
