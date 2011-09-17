@@ -656,6 +656,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderWareSA.ShaderSupport.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CRestartSA.cpp"
 				>
 			</File>
@@ -1154,6 +1158,10 @@
 			</File>
 			<File
 				RelativePath=".\CRenderWareSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderWareSA.ShaderSupport.h"
 				>
 			</File>
 			<File
