@@ -44,6 +44,8 @@ public:
     static void         GetD3DInfo              ( CBuffer& buffer );
     static void         GetCrashAvertedStats    ( CBuffer& buffer );
     static void         GetLogInfo              ( CBuffer& buffer );
+    static void         GetDxInfo               ( CBuffer& buffer );
+    static void         GetMiscInfo             ( CBuffer& buffer );
     static void         OnCrashAverted          ( uint uiId );
     static void         LogEvent                ( const char* szType, const char* szContext, const char* szBody );
 };

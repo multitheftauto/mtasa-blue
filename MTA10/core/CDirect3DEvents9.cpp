@@ -240,6 +240,10 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
     // Any shader for this texture ?
     CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
 
+    // Don't apply if a vertex shader is already being used
+    if ( g_pDeviceState->VertexShader )
+        pShaderItem = NULL;
+
     if ( !pShaderItem )
     {
         // No shader for this texture
@@ -249,6 +253,10 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
     {
         // Yes shader for this texture
         CShaderInstance* pShaderInstance = pShaderItem->m_pShaderInstance;
+
+        // Save some debugging info
+        g_pDeviceState->CallState.strShaderName = pShaderInstance->m_pEffectWrap->m_strName;
+        g_pDeviceState->CallState.bShaderRequiresNormals = pShaderInstance->m_pEffectWrap->m_bRequiresNormals;
 
         // Apply custom parameters
         pShaderInstance->ApplyShaderParameters ();
@@ -279,6 +287,7 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
             pDevice->SetPixelShader( NULL );
         }
 
+        g_pDeviceState->CallState.strShaderName = "";
         return D3D_OK;
     }
 }
@@ -295,6 +304,10 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
 {
     // Any shader for this texture ?
     CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
+
+    // Don't apply if a vertex shader is already being used
+    if ( g_pDeviceState->VertexShader )
+        pShaderItem = NULL;
 
     if ( pShaderItem && pShaderItem->m_fMaxDistanceSq > 0 )
     {
@@ -315,6 +328,10 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
     {
         // Yes shader for this texture
         CShaderInstance* pShaderInstance = pShaderItem->m_pShaderInstance;
+
+        // Save some debugging info
+        g_pDeviceState->CallState.strShaderName = pShaderInstance->m_pEffectWrap->m_strName;
+        g_pDeviceState->CallState.bShaderRequiresNormals = pShaderInstance->m_pEffectWrap->m_bRequiresNormals;
 
         // Add normal stream if shader wants it
         if ( pShaderInstance->m_pEffectWrap->m_bRequiresNormals )
@@ -355,6 +372,7 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
         // Unset additional vertex stream
         CAdditionalVertexStreamManager::GetSingleton ()->MaybeUnsetAdditionalVertexStream ();
 
+        g_pDeviceState->CallState.strShaderName = "";
         return D3D_OK;
     }
 }

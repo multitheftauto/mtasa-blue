@@ -259,6 +259,8 @@ private:
     void                                ClearDrawQueue          ( std::vector < sDrawQueueItem >& Queue );
     void                                AddQueueRef             ( CRenderItem* pRenderItem );
     void                                RemoveQueueRef          ( CRenderItem* pRenderItem );
+    void                                AddQueueRef             ( IUnknown* pUnknown );
+    void                                RemoveQueueRef          ( IUnknown* pUnknown );
 
     // Drawing types
     struct ID3DXLine*                   m_pLineInterface;

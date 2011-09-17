@@ -577,6 +577,8 @@ void CEffectWrapImpl::PostConstruct ( CRenderItemManager* pManager, const SStrin
 {
     Super::PostConstruct ( pManager );
 
+    m_strName = ExtractFilename ( strFilename );
+
     // Initialise static data if needed
     InitMaps ();
 

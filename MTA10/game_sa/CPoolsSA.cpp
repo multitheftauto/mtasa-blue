@@ -1056,7 +1056,7 @@ int CPoolsSA::GetPoolDefaultCapacity ( ePools pool )
         case NODE_ROUTE_POOL:           return 64;
         case PATROL_ROUTE_POOL:         return 32;
         case POINT_ROUTE_POOL:          return 64;
-        case POINTER_DOUBLE_LINK_POOL:  return 3200;         // Modded to 4000   @ CMultiplayerSA.cpp
+        case POINTER_DOUBLE_LINK_POOL:  return 3200;         // Modded to 8000   @ CMultiplayerSA.cpp
         case POINTER_SINGLE_LINK_POOL:  return 70000;
     }
     return 0;
