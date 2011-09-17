@@ -18,8 +18,10 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-void CShaderItem::PostConstruct ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug )
+void CShaderItem::PostConstruct ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, float fPriority, bool bDebug )
 {
+    m_fPriority = fPriority;
+
     Super::PostConstruct ( pManager );
 
     // Initial creation of d3d data

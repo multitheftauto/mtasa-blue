@@ -185,7 +185,7 @@ CScreenSourceItem* CRenderItemManager::CreateScreenSource ( uint uiSizeX, uint u
 // Create a D3DX effect from .fx file
 //
 ////////////////////////////////////////////////////////////////
-CShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, bool bDebug )
+CShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, bool bDebug )
 {
     if ( !CanCreateRenderItem ( CShaderItem::GetClassId () ) )
         return NULL;
@@ -193,7 +193,7 @@ CShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, 
     strOutStatus = "";
 
     CShaderItem* pShaderItem = new CShaderItem ();
-    pShaderItem->PostConstruct ( this, strFullFilePath, strRootPath, strOutStatus, bDebug );
+    pShaderItem->PostConstruct ( this, strFullFilePath, strRootPath, strOutStatus, fPriority, bDebug );
 
     if ( !pShaderItem->IsValid () )
     {
@@ -668,15 +668,12 @@ void CRenderItemManager::GetVisibleTextureNames ( std::vector < SString >& outNa
 // Add an association between the shader item and a world texture match
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::ApplyShaderItemToWorldTexture ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, float fOrderPriority )
+bool CRenderItemManager::ApplyShaderItemToWorldTexture ( CShaderItem* pShaderItem, const SString& strTextureNameMatch )
 {
     assert ( pShaderItem );
 
-    // Remove any existing match
-    RemoveShaderItemFromWorldTexture ( pShaderItem, strTextureNameMatch );
-
     // Add new match at the end
-    return m_pRenderWare->AddWorldTextureWatch ( (CSHADERDUMMY*)pShaderItem, strTextureNameMatch, fOrderPriority );
+    return m_pRenderWare->AddWorldTextureWatch ( (CSHADERDUMMY*)pShaderItem, strTextureNameMatch, pShaderItem->m_fPriority );
 }
 
 

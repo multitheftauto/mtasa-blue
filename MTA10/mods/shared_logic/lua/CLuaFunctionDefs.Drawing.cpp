@@ -435,11 +435,12 @@ int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxCreateShader ( lua_State* luaVM )
 {
-//  element dxCreateShader( string filepath [, bool debug] )
-    SString strFilePath; bool bDebug;
+//  element dxCreateShader( string filepath [, float priority = 0, bool debug = false ] )
+    SString strFilePath; float fPriority; bool bDebug;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strFilePath );
+    argStream.ReadNumber ( fPriority, 0.0f );
     argStream.ReadBool ( bDebug, false );
 
     if ( !argStream.HasErrors () )
@@ -456,7 +457,7 @@ int CLuaFunctionDefs::dxCreateShader ( lua_State* luaVM )
                 {
                     SString strRootPath = strPath.Left ( strPath.length () - strMetaPath.length () );
                     SString strStatus;
-                    CClientShader* pShader = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateShader ( strPath, strRootPath, strStatus, bDebug );
+                    CClientShader* pShader = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateShader ( strPath, strRootPath, strStatus, fPriority, bDebug );
                     if ( pShader )
                     {
                         // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **

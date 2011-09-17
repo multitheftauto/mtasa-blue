@@ -139,10 +139,10 @@ CClientTexture* CClientRenderElementManager::CreateTexture ( const SString& strF
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientShader* CClientRenderElementManager::CreateShader ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, bool bDebug )
+CClientShader* CClientRenderElementManager::CreateShader ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, bool bDebug )
 {
     // Create the item
-    CShaderItem* pShaderItem = m_pRenderItemManager->CreateShader ( strFullFilePath, strRootPath, strOutStatus, bDebug );
+    CShaderItem* pShaderItem = m_pRenderItemManager->CreateShader ( strFullFilePath, strRootPath, strOutStatus, fPriority, bDebug );
 
     // Check create worked
     if ( !pShaderItem )

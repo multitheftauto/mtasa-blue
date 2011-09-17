@@ -45,7 +45,7 @@ class CRenderWare {
     virtual void                ReplacePedModel             ( RpClump * pNew, unsigned short usModelID ) = 0;
     virtual bool                ReplacePartModels           ( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szName ) = 0;
     virtual void                InitWorldTextureWatch       ( PFN_WATCH_CALLBACK pfnWatchCallback ) = 0;
-    virtual bool                AddWorldTextureWatch        ( CSHADERDUMMY* pShaderData, const char* strMatch, float fOrderPriority ) = 0;
+    virtual bool                AddWorldTextureWatch        ( CSHADERDUMMY* pShaderData, const char* strMatch, float fShaderPriority ) = 0;
     virtual void                RemoveWorldTextureWatch     ( CSHADERDUMMY* pShaderData, const char* strMatch ) = 0;
     virtual void                RemoveWorldTextureWatchByContext ( CSHADERDUMMY* pShaderData ) = 0;
     virtual void                PulseWorldTextureWatch      ( void ) = 0;
