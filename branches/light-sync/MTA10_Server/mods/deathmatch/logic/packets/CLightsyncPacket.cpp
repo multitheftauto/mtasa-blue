@@ -33,8 +33,15 @@ bool CLightsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         CPlayer* pPlayer = *iter;
         CPlayer::SLightweightSyncData& data = pPlayer->GetLightweightSyncData ();
 
+        float fDistance = ( pPlayer->GetLastLightSyncPosition() - pPlayer->GetPosition() ).Length();
         CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
-        bSyncPosition = ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 ) && ( ( pPlayer->GetLastLightSyncPosition() - pPlayer->GetPosition() ).Length() > 0.001f );
+        bSyncPosition = ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 ) && ( fDistance > 0.001f );
+
+        if ( bSyncPosition == false )
+        {
+            CVector vecPosition = pPlayer->GetPosition();
+            CLogger::LogPrintf ( "LS: Player %s: light sync comparison failed x:%f, y:%f, z:%f, distance:%f\n", pPlayer->GetName(), vecPosition.fX, vecPosition.fY, vecPosition.fZ, fDistance );
+        }
 
         BitStream.Write ( pPlayer->GetID () );
         BitStream.Write ( (unsigned char)pPlayer->GetSyncTimeContext () );
@@ -70,6 +77,7 @@ bool CLightsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                 BitStream.Write ( &health );
             }
             pPlayer->SetLastLightSyncPosition ( pos.data.vecPosition );
+            CLogger::LogPrintf ( "LS: Player %s: light sync position saved as x:%f, y:%f, z:%f\n", pPlayer->GetName(), pos.data.vecPosition.fX, pos.data.vecPosition.fY, pos.data.vecPosition.fZ );
         }
     }
 
