@@ -9960,7 +9960,7 @@ int CLuaFunctionDefinitions::GetValidPedModels ( lua_State* luaVM )
 {
     int iIndex = 0;
     lua_newtable ( luaVM );
-    for( int i = 0; i < 289; i++)
+    for( int i = 0; i <= 312; i++)
     {
         if ( CPlayerManager::IsValidPlayerModel(i) )
         {
