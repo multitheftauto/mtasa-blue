@@ -246,6 +246,27 @@ BOOL CModelInfoSA::IsVehicle ( )
     return m_dwModelID >= 400 && m_dwModelID <= 611;
 }   
 
+bool CModelInfoSA::IsPlayerModel ( )
+{
+    return ( m_dwModelID == 0 ||
+             m_dwModelID == 1 ||
+             m_dwModelID == 2 ||
+             m_dwModelID == 7 ||
+             (m_dwModelID >= 9 &&
+             m_dwModelID != 208 &&
+             m_dwModelID != 149 &&
+             m_dwModelID != 119 &&
+             m_dwModelID != 86 &&
+             m_dwModelID != 74 &&
+             m_dwModelID != 65 &&
+             m_dwModelID != 42 &&
+             m_dwModelID <= 272) ||
+             (m_dwModelID >= 274 &&
+             m_dwModelID <= 288) ||
+             (m_dwModelID >= 290 &&
+             m_dwModelID <= 312 ) );
+}
+
 BOOL CModelInfoSA::IsUpgrade ( void )
 {
     return m_dwModelID >= 1000 && m_dwModelID <= 1193;
@@ -862,6 +883,15 @@ void CModelInfoSA::SetCustomModel ( RpClump* pClump )
         if ( IsVehicle () )
         {
             pGame->GetRenderWare ()->ReplaceVehicleModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
+        }
+        else if ( m_dwModelID >= 331 && m_dwModelID <= 369 )
+        {
+            // We are a weapon.
+            pGame->GetRenderWare ()->ReplaceWeaponModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
+        }
+        else if ( IsPlayerModel ( ) )
+        {
+            pGame->GetRenderWare ()->ReplacePedModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
         }
         else
         {
