@@ -35,7 +35,7 @@ public:
     void SetRange ( const uint uiStart, const uint uiLength, const CBox& boundingBox )
     {
         const uint64 key = MakeKey ( uiStart, uiLength );
-        SItem item = { 0, 0, boundingBox };
+        SItem item = { uiStart, uiLength, boundingBox };
         MapSet ( itemMap, key, item );
     }
 
