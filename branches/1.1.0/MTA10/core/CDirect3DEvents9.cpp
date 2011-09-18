@@ -17,6 +17,7 @@
 #include "profiler/SharedUtil.Profiler.h"
 #include "CProxyDirect3DVertexBuffer.h"
 #include "CAdditionalVertexStreamManager.h"
+#include "CVertexStreamBoundingBoxManager.h"
 
 #include <stdexcept>
 
@@ -34,6 +35,7 @@ void CDirect3DEvents9::OnDirect3DDeviceCreate  ( IDirect3DDevice9 *pDevice )
     CCore::GetSingleton ( ).InitGUI ( pDevice );
 
     CAdditionalVertexStreamManager::GetSingleton ()->OnDeviceCreate ( pDevice );
+    CVertexStreamBoundingBoxManager::GetSingleton ()->OnDeviceCreate ( pDevice );
 
     // Create all our fonts n stuff
     CGraphics::GetSingleton ().OnDeviceCreate ( pDevice );
@@ -306,6 +308,16 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
     // Don't apply if a vertex shader is already being used
     if ( g_pDeviceState->VertexShader )
         pShaderItem = NULL;
+
+    if ( pShaderItem && pShaderItem->m_fMaxDistanceSq > 0 )
+    {
+        // If shader has a max distance, check this vertex range bounding box
+        float fDistanceSq = CVertexStreamBoundingBoxManager::GetSingleton ()->GetDistanceSqToGeometry ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+
+        // If distance was obtained and vertices are too far away, don't apply the shader
+        if ( fDistanceSq > 0 && fDistanceSq > pShaderItem->m_fMaxDistanceSq )
+            pShaderItem = NULL;
+    }
 
     if ( !pShaderItem )
     {

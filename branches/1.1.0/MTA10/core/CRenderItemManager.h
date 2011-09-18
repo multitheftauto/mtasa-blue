@@ -26,7 +26,7 @@ public:
     virtual CDxFontItem*        CreateDxFont                        ( const SString& strFullFilePath, uint uiSize, bool bBold );
     virtual CGuiFontItem*       CreateGuiFont                       ( const SString& strFullFilePath, const SString& strFontName, uint uiSize );
     virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath );
-    virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, bool bDebug );
+    virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug );
     virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel );
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY );
     virtual void                ReleaseRenderItem                   ( CRenderItem* pItem );
@@ -39,7 +39,7 @@ public:
     virtual void                UpdateBackBufferCopy                ( void );
     virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem );
     virtual CShaderItem*        GetAppliedShaderForD3DData          ( CD3DDUMMY* pD3DData );
-    virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, float fOrderPriority );
+    virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch );
     virtual bool                RemoveShaderItemFromWorldTexture    ( CShaderItem* pShaderItem, const SString& strTextureNameMatch );
     virtual void                GetVisibleTextureNames              ( std::vector < SString >& outNameList, const SString& strTextureNameMatch, ushort usModelID );
     virtual eDxTestMode         GetTestMode                         ( void )                    { return m_TestMode; }

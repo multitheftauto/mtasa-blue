@@ -481,17 +481,16 @@ int CLuaFunctionDefs::EngineReplaceVehiclePart ( lua_State* luaVM )
 
 int CLuaFunctionDefs::EngineApplyShaderToWorldTexture ( lua_State* luaVM )
 {
-//  bool engineApplyShaderToWorldTexture ( element shader, string textureName, float orderPriority )
-    CClientShader* pShader; SString strTextureNameMatch; float fOrderPriority;
+//  bool engineApplyShaderToWorldTexture ( element shader, string textureName  )
+    CClientShader* pShader; SString strTextureNameMatch;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pShader );
     argStream.ReadString ( strTextureNameMatch );
-    argStream.ReadNumber ( fOrderPriority, 0 );
 
     if ( !argStream.HasErrors () )
     {
-        bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->ApplyShaderItemToWorldTexture ( pShader->GetShaderItem (), strTextureNameMatch, fOrderPriority );
+        bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->ApplyShaderItemToWorldTexture ( pShader->GetShaderItem (), strTextureNameMatch );
         lua_pushboolean ( luaVM, bResult );
         return 1;
     }

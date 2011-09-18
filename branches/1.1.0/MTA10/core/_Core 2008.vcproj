@@ -477,6 +477,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CLine3DBatcher.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CLogger.cpp"
 				>
 			</File>
@@ -654,6 +658,10 @@
 			</File>
 			<File
 				RelativePath=".\CVersionUpdater.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CVertexStreamBoundingBoxManager.cpp"
 				>
 			</File>
 			<File
@@ -874,6 +882,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CLine3DBatcher.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CLogger.h"
 				>
 			</File>
@@ -999,6 +1011,10 @@
 			</File>
 			<File
 				RelativePath=".\CVersionUpdater.Util.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CVertexStreamBoundingBoxManager.h"
 				>
 			</File>
 			<File
