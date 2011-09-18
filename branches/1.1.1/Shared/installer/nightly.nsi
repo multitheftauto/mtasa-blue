@@ -25,7 +25,7 @@ Var RedistInstalled
 
 !define MAJOR_VER "1"
 !define MINOR_VER "1"
-!define MAINT_VER "0"
+!define MAINT_VER "1"
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
 !define 0.0.0 "${MAJOR_VER}.${MINOR_VER}.${MAINT_VER}"
 
@@ -88,7 +88,7 @@ Var RedistInstalled
 
 ; Welcome page
 !define MUI_WELCOMEPAGE_TITLE_3LINES
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation or update of $(^Name) (r${REVISION})\n\n\
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation or update of $(^Name)\n\n\
 It is recommended that you close all other applications before starting Setup.\n\n\
 [Admin access will be requested for Vista and up]\n\n\
 Click Next to continue."
