@@ -3333,8 +3333,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 pEntity->SetInterior ( ucInterior );
                 pEntity->SetDimension ( usDimension );
                 if ( bIsAttached )
-                    pEntity->SetAttachedOffsets ( attachedPosition.data.vecPosition,
-                                                  attachedRotation.data.vecRotation );
+                {
+                    CVector vecRotationRadians = attachedRotation.data.vecRotation;
+                    ConvertDegreesToRadians ( vecRotationRadians );
+                    pEntity->SetAttachedOffsets ( attachedPosition.data.vecPosition, vecRotationRadians );
+                }
                 pEntity->SetSyncTimeContext ( ucSyncTimeContext );
                 pEntity->GetCustomDataPointer ()->Copy ( pCustomData );
 
