@@ -2,7 +2,12 @@ Changelog for Multi Theft Auto
 
 Multi Theft Auto : San Andreas - 1.1.1
 ======================================
+Goal: Interim bugfix release
 
+- 0004457: [General] Replace weapon models (Cazomino05) - resolved.
+- 0005770: [Client] [Request] Ped skins model replacement (Cazomino05) - resolved.
+- 0006465: [Server] getPedWeapon serverside messes up (Cazomino05) - resolved.
+- 0006504: [Server] getValidPedModels returns incomplete table (Cazomino05) - resolved.
 - 0006507: [Client] Crash when trying to play sound from the resource that is not running (Cazomino05) - resolved.
 - 0006414: [Client] Severe graphical problems (ccw) - resolved.
 - 0006427: [Server] pickups created by map file do respawn immediately (Cazomino05) - resolved.
