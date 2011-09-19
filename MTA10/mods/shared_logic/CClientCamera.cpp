@@ -14,7 +14,13 @@
 
 #include <StdInc.h>
 
+// Very hacky
+//#include "../deathmatch/logic/CClientGame.h"
+
 #define PI_2 6.283185307179586476925286766559f
+#ifndef PI
+#define PI 3.1415926535897932384626433832795f
+#endif
 
 CClientCamera::CClientCamera ( CClientManager* pManager ) : ClassInit ( this ), CClientEntity ( INVALID_ELEMENT_ID )
 {

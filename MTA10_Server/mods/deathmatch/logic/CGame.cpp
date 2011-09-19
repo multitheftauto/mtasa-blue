@@ -348,7 +348,7 @@ void CGame::DoPulse ( void )
     m_pAccountManager->DoPulse ();
     m_pRegistryManager->DoPulse ();
     m_pACLManager->DoPulse ();
-    
+	
     // Handle the traffic light sync
     if (m_bTrafficLightsLocked == false)
     {
@@ -1351,7 +1351,6 @@ void CGame::AddBuiltInEvents ( void )
 
     // Other events
     m_Events.AddEvent ( "onSettingChange", "setting, oldValue, newValue", NULL, false );
-    m_Events.AddEvent ( "onChatMessage", "message, element", NULL, false );
 }
 
 void CGame::ProcessTrafficLights ( unsigned long ulCurrentTime )

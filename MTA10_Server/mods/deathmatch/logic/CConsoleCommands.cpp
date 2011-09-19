@@ -497,12 +497,6 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szArguments, CClien
 
                                 // Broadcast the message to all clients
                                 pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( CChatEchoPacket ( strEcho, ucR, ucG, ucB, true ) );
-
-                                // Call onChatMessage if players chat message was delivered
-                                CLuaArguments Arguments2;
-                                Arguments2.PushString ( szArguments );
-                                Arguments2.PushElement ( pPlayer );
-                                static_cast < CPlayer* > ( pClient )->CallEvent ( "onChatMessage", Arguments2 );
                             }
 
                             break;
@@ -627,11 +621,6 @@ bool CConsoleCommands::TeamSay ( CConsole* pConsole, const char* szArguments, CC
                                 {
                                     (*iter)->Send ( CChatEchoPacket ( strEcho, ucRed, ucGreen, ucBlue, true ) );
                                 }
-                                // Call onChatMessage if players chat message was delivered
-                                CLuaArguments Arguments2;
-                                Arguments2.PushString ( szArguments );
-                                Arguments2.PushElement ( pTeam );
-                                static_cast < CPlayer* > ( pClient )->CallEvent ( "onChatMessage", Arguments2 );
                             }
 
                             // Success
@@ -1031,13 +1020,6 @@ bool CConsoleCommands::Me ( CConsole* pConsole, const char* szArguments, CClient
 
                             // Broadcast the message to all clients
                             pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( CChatEchoPacket ( strEcho, CHATCOLOR_ME ) );
-
-                            // Call onChatMessage if players chat message was delivered
-                            CPlayer * pPlayer = static_cast < CPlayer* > ( pClient );
-                            CLuaArguments Arguments2;
-                            Arguments2.PushString ( szArguments );
-                            Arguments2.PushElement ( pPlayer );
-                            static_cast < CPlayer* > ( pClient )->CallEvent ( "onChatMessage", Arguments2 );
                         }
                     }
 

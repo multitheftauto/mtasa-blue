@@ -3742,9 +3742,7 @@ bool CStaticFunctionDefinitions::TakeWeapon ( CElement* pElement, unsigned char 
         if ( IS_PED ( pElement ) )
         {
             CPed* pPed = static_cast < CPed* > ( pElement );
-            unsigned char ucWeaponSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
-            // Just because it's the same slot doesn't mean it's the same weapon -_- - Caz
-            if ( pPed->IsSpawned () && pPed->GetWeapon ( ucWeaponSlot ) && pPed->GetWeaponType ( ucWeaponSlot ) == ucWeaponID  )
+            if ( pPed->IsSpawned () )
             {
                 CBitStream BitStream;
 
@@ -3760,6 +3758,7 @@ bool CStaticFunctionDefinitions::TakeWeapon ( CElement* pElement, unsigned char 
 
                 m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pPed, TAKE_WEAPON, *BitStream.pBitStream ) );
 
+                unsigned char ucWeaponSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
                 if ( usAmmo < 9999 )
                 {
                     unsigned short usTotalAmmo = pPed->GetWeaponTotalAmmo ( ucWeaponSlot );
@@ -7890,8 +7889,8 @@ bool CStaticFunctionDefinitions::SetPlayerTeam ( CPlayer* pPlayer, CTeam* pTeam 
 
         // Tell everyone his new team
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( pTeam->GetID ( ) );
-        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pPlayer, SET_PLAYER_TEAM, *BitStream.pBitStream ) );
+        BitStream.pBitStream->Write ( pPlayer->GetID () );
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pTeam, SET_PLAYER_TEAM, *BitStream.pBitStream ) );
 
         return true;
     }
@@ -8321,33 +8320,20 @@ bool CStaticFunctionDefinitions::SetMaxPlayers ( unsigned int uiMax )
     return true;
 }
 
-
-bool CStaticFunctionDefinitions::OutputChatBox ( const char* szText, CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded, CLuaMain* pLuaMain )
+bool CStaticFunctionDefinitions::OutputChatBox ( const char* szText, CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded )
 {
     assert ( pElement );
     assert ( szText );
-
-    RUN_CHILDREN OutputChatBox ( szText, *iter, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain );
+    RUN_CHILDREN OutputChatBox ( szText, *iter, ucRed, ucGreen, ucBlue, bColorCoded );
 
     if ( IS_PLAYER ( pElement ) )
     {
         CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
         pPlayer->Send ( CChatEchoPacket ( szText, ucRed, ucGreen, ucBlue, bColorCoded ) );
     }
-    
-    if ( pElement == m_pMapManager->GetRootElement() )
-    {
-        CResource* pResource = pLuaMain->GetResource ();
-        CLuaArguments Arguments;
-        Arguments.PushString ( szText );
-        if ( pResource )
-            Arguments.PushResource ( pResource );
-        m_pMapManager->GetRootElement()->CallEvent ( "onChatMessage", Arguments );
-    }
-    
+
     return true;
 }
-
 
 
 bool CStaticFunctionDefinitions::OutputConsole ( const char* szText, CElement* pElement )

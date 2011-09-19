@@ -27,6 +27,8 @@ class CClientRadarMarker;
 
 #include <game/CMarker.h>
 
+#define MAP_MARKER_WIDTH 19
+#define MAP_MARKER_HEIGHT 20
 #define RADAR_MARKER_LIMIT 63
 
 
@@ -34,6 +36,15 @@ class CClientRadarMarker : public CClientEntity
 {
     DECLARE_CLASS( CClientRadarMarker, CClientEntity )
     friend class CClientRadarMarkerManager;
+
+public:
+    enum EMapMarkerState
+    {
+        MAP_MARKER_SQUARE,
+        MAP_MARKER_TRIANGLE_UP,
+        MAP_MARKER_TRIANGLE_DOWN,
+        MAP_MARKER_OTHER,
+    };
 
 public:
                                         CClientRadarMarker              ( class CClientManager* pManager, ElementID ID, short usOrdering = 0, unsigned short usVisibleDistance = 16383 );
@@ -62,6 +73,10 @@ public:
     inline bool                         IsVisible                       ( void ) const                  { return  m_pMarker != NULL; };
     void                                SetVisible                      ( bool bVisible );
 
+    inline IDirect3DTexture9*           GetMapMarkerImage               ( void )                        { return m_pMapMarkerImage; };
+    inline EMapMarkerState              GetMapMarkerState               ( void )                        { return m_eMapMarkerState; };
+    void                                SetMapMarkerState               ( EMapMarkerState eMapMarkerState );
+
     void                                SetDimension                    ( unsigned short usDimension );
     void                                RelateDimension                 ( unsigned short usDimension );
 
@@ -72,6 +87,11 @@ public:
     inline void                         SetVisibleDistance              ( unsigned short usVisibleDistance ) { m_usVisibleDistance = usVisibleDistance; }
 
     bool                                IsInVisibleDistance             ( void );
+
+private:
+    void                                GetSquareTexture                ( DWORD dwBitMap[] );
+    void                                GetUpTriangleTexture            ( DWORD dwBitMap[] );
+    void                                GetDownTriangleTexture          ( DWORD dwBitMap[] );
 
 private:
     bool                                Create                          ( void );
@@ -88,6 +108,9 @@ private:
     unsigned short                      m_usScale;
     SColor                              m_Color;
     unsigned long                       m_ulSprite;
+
+    IDirect3DTexture9*                  m_pMapMarkerImage;
+    EMapMarkerState                     m_eMapMarkerState;
 
     bool                                m_bIsVisible;
     short                               m_sOrdering;

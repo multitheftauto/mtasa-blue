@@ -71,8 +71,3 @@
 #else
     #define dassert(_Expression)     ((void)0)
 #endif
-
-#define SAFE_DELETE(p) { if(p) { delete (p); (p)=NULL; } }
-#define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }
-
-#define PI (3.14159265358979323846f)

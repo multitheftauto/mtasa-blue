@@ -247,7 +247,7 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
     if ( !pShaderItem )
     {
         // No shader for this texture
-        return pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
+        return DrawPrimitiveGuarded ( pDevice, PrimitiveType, StartVertex, PrimitiveCount );
     }
     else
     {
@@ -275,7 +275,7 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
         for ( uint uiPass = 0 ; uiPass < uiNumPasses ; uiPass++ )
         {
             pD3DEffect->BeginPass ( uiPass );
-            pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
+            DrawPrimitiveGuarded ( pDevice, PrimitiveType, StartVertex, PrimitiveCount );
             pD3DEffect->EndPass ();
         }
         pD3DEffect->End ();
@@ -322,7 +322,7 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
     if ( !pShaderItem )
     {
         // No shader for this texture
-        return pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+        return DrawIndexedPrimitiveGuarded ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
     }
     else
     {
@@ -357,7 +357,7 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
         for ( uint uiPass = 0 ; uiPass < uiNumPasses ; uiPass++ )
         {
             pD3DEffect->BeginPass ( uiPass );
-            pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+            DrawIndexedPrimitiveGuarded ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
             pD3DEffect->EndPass ();
         }
         pD3DEffect->End ();
@@ -375,6 +375,50 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
         g_pDeviceState->CallState.strShaderName = "";
         return D3D_OK;
     }
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// DrawPrimitiveGuarded
+//
+// Catch access violations
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::DrawPrimitiveGuarded ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,UINT StartVertex,UINT PrimitiveCount )
+{
+    HRESULT hr = D3D_OK;
+    __try
+    {
+        hr = pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
+    }
+    __except( GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION )
+    {
+        CCore::GetSingleton ().OnCrashAverted ( 100 );
+    }
+    return hr;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// DrawIndexedPrimitiveGuarded
+//
+// Catch access violations
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount )
+{
+    HRESULT hr = D3D_OK;
+    __try
+    {
+        hr = pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+    }
+    __except( GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION )
+    {
+        CCore::GetSingleton ().OnCrashAverted ( 101 );
+    }
+    return hr;
 }
 
 

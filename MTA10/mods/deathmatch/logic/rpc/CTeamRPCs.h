@@ -23,6 +23,7 @@ public:
     DECLARE_ELEMENT_RPC ( RemoveTeam );
     DECLARE_ELEMENT_RPC ( SetTeamName );
     DECLARE_ELEMENT_RPC ( SetTeamColor );
+    DECLARE_ELEMENT_RPC ( SetPlayerTeam );
     DECLARE_ELEMENT_RPC ( SetTeamFriendlyFire );
 };
 

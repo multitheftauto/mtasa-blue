@@ -22,6 +22,10 @@ class CQuat;
 
 #define EPSILON         0.001
 
+#ifndef PI
+#define PI (float)3.14159265358979323846264338327950
+#endif
+
 class CQuat
 {
 public:

@@ -3333,8 +3333,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 pEntity->SetInterior ( ucInterior );
                 pEntity->SetDimension ( usDimension );
                 if ( bIsAttached )
-                    pEntity->SetAttachedOffsets ( attachedPosition.data.vecPosition,
-                                                  attachedRotation.data.vecRotation );
+                {
+                    CVector vecRotationRadians = attachedRotation.data.vecRotation;
+                    ConvertDegreesToRadians ( vecRotationRadians );
+                    pEntity->SetAttachedOffsets ( attachedPosition.data.vecPosition, vecRotationRadians );
+                }
                 pEntity->SetSyncTimeContext ( ucSyncTimeContext );
                 pEntity->GetCustomDataPointer ()->Copy ( pCustomData );
 
@@ -3595,7 +3598,7 @@ void CPacketHandler::Packet_TextItem( NetBitStreamInterface& bitStream )
                 if ( !pTextDisplay )
                 {
                     // Create it
-                    pTextDisplay = new CClientTextDisplay ( g_pClientGame->m_pDisplayManager, ulID );
+                    pTextDisplay = new CClientTextDisplay ( g_pClientGame->m_pDisplayManager, ulID, false );
                 }
 
                 // Set the text properties

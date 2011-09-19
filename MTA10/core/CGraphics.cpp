@@ -36,6 +36,10 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
     m_pLineInterface = NULL;
     m_pDXSprite = NULL;
 
+    m_pRenderTarget = NULL;
+    m_pOriginalTarget = NULL;
+
+    m_bIsDrawing = false;
     m_iDebugQueueRefs = 0;
 
     m_pRenderItemManager = new CRenderItemManager ();
@@ -59,6 +63,41 @@ CGraphics::~CGraphics ( void )
     SAFE_DELETE ( m_pLine3DBatcherPostGUI );
 }
 
+
+void CGraphics::BeginDrawing ( void )
+{
+    if ( !m_bIsDrawing )
+    {
+        m_pGUI->GetRenderingLibrary ()->UTIL_CaptureDeviceState ( );
+        m_pGUI->GetRenderingLibrary ()->BeginDrawing ();
+        
+        if ( m_pRenderTarget ) {
+            // Set the render target we want
+            HRESULT x = m_pDevice->SetRenderTarget ( 0, m_pRenderTarget );
+            assert ( x == D3D_OK );
+
+            // Clear the buffer
+            m_pDevice->Clear ( 0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, D3DCOLOR_XRGB(0,0,0), 1, 0 );
+        } else
+            m_pDevice->SetRenderTarget ( 0, m_pOriginalTarget );
+
+        m_bIsDrawing = true;
+    }
+}
+
+void CGraphics::EndDrawing ( void )
+{
+    if ( m_bIsDrawing )
+    {
+        if ( m_pRenderTarget ) {
+            // Set the render target back to the original one
+            m_pDevice->SetRenderTarget ( 0, m_pOriginalTarget );
+        }
+        m_pGUI->GetRenderingLibrary ()->EndDrawing ();
+        m_pGUI->GetRenderingLibrary ()->UTIL_RestoreDeviceState ( );
+        m_bIsDrawing = false;
+    }
+}
 
 void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, LPD3DXFONT pDXFont )
 {   
@@ -111,6 +150,80 @@ void CGraphics::DrawText ( int iX, int iY, unsigned long dwColor, float fScale, 
     va_end ( ap );
 
     DrawText ( iX, iY, iX, iY, dwColor, szBuffer, fScale, fScale, DT_NOCLIP );
+}
+
+
+void CGraphics::DrawText2DA ( int uiX, int uiY, unsigned long ulColor, float fScale, const char* szDisplayText, ... )
+{
+    char szBuffer [ 1024 ];
+    va_list ap;
+    va_start ( ap, szDisplayText );
+    VSNPRINTF ( szBuffer, 1024, szDisplayText, ap );
+    va_end ( ap );
+
+    // Start drawing
+    BeginSingleDrawing ();
+
+    // Draw the text
+    m_pGUI->GetRenderingLibrary ()->DrawText2D ( static_cast < float > ( uiX ), static_cast < float > ( uiY ), ulColor, szBuffer, fScale );
+
+    // End drawing
+    EndSingleDrawing ();
+}
+
+
+void CGraphics::DrawText3DA ( float fX, float fY, float fZ, unsigned long ulColor, float fScale, const char* szDisplayText, ... )
+{
+    char szBuffer [ 1024 ];
+    va_list ap;
+    va_start ( ap, szDisplayText );
+    VSNPRINTF ( szBuffer, 1024, szDisplayText, ap );
+    va_end ( ap );
+
+    // Initialize ViewMatrix
+    D3DMATRIX ViewMatrix;
+    memset ( &ViewMatrix, 0, sizeof ( D3DMATRIX ) );
+
+    // Get the view matrix for billboarding calculation by DrawText3D.
+    CDirect3DData::GetSingleton ( ).GetTransform ( D3DTS_VIEW, &ViewMatrix );
+    //assert ( 0 ); // StoreTransform uses a pretty significant amount of processing
+
+    // Start drawing
+    BeginSingleDrawing ( );
+
+    // Draw this text.
+    m_pGUI->GetRenderingLibrary ( )->DrawText3D ( fX,
+                                                  fY,
+                                                  fZ,
+                                                  &ViewMatrix,
+                                                  ulColor, 
+                                                  szBuffer, 
+                                                  fScale );
+    // End drawing
+    EndSingleDrawing ( );
+}
+
+
+void CGraphics::Draw3DBox ( float fX, float fY, float fZ, float fL, float fW, float fH, DWORD dwColor, bool bWireframe )
+{
+    BeginSingleDrawing ( );
+
+    m_pGUI->GetRenderingLibrary ()->Render3DBox ( fX, fY, fZ, fL, fW, fH, dwColor, bWireframe );
+
+    EndSingleDrawing ( );
+}
+
+
+void CGraphics::DrawLine ( float fX1, float fY1, float fX2, float fY2, unsigned long ulColor )
+{
+   // Start drawing
+    BeginSingleDrawing ( );
+
+    // Draw the line
+    m_pGUI->GetRenderingLibrary ()->DrawLine ( D3DXVECTOR3 ( fX1, fY1, 0 ), D3DXVECTOR3 ( fX2, fY2, 0 ), ulColor );
+
+    // End drawing
+    EndSingleDrawing ( );
 }
 
 
@@ -180,6 +293,28 @@ void CGraphics::CalcScreenCoors ( CVector * vecWorld, CVector * vecScreen )
     float fRecip = 1.0f / vecScreen->fZ;
     vecScreen->fX *= fRecip * (*dwLenX);
     vecScreen->fY *= fRecip * (*dwLenY);
+}
+
+
+void CGraphics::Render3DSprite ( float fX, float fY, float fZ, float fScale, unsigned long ulColor )
+{
+    // Initialize ViewMatrix
+    D3DXMATRIX ViewMatrix;
+    memset ( &ViewMatrix, 0, sizeof ( D3DXMATRIX ) );
+
+    // Get the view matrix for billboarding calculation by DrawText3D.
+    CDirect3DData::GetSingleton ( ).GetTransform ( D3DTS_VIEW, &ViewMatrix );
+    //assert ( 0 ); // StoreTransform uses a pretty significant amount of processing
+
+    // Begin drawing
+    BeginSingleDrawing ();
+
+    // Render it
+    D3DXVECTOR3 vec(fX, fY, fZ);
+    m_pGUI->GetRenderingLibrary ()->Render3DSprite ( NULL, 1.0f, &vec, &ViewMatrix, ulColor );
+
+    // End drawing
+    EndSingleDrawing ();
 }
 
 
@@ -274,6 +409,39 @@ eFontType CGraphics::GetFontType ( const char* szFontName )
     if ( !stricmp ( szFontName, "diploma" ) )       return FONT_DIPLOMA;
     if ( !stricmp ( szFontName, "beckett" ) )       return FONT_BECKETT;
     return FONT_DEFAULT;
+}
+
+
+void CGraphics::BeginSingleDrawing ( void )
+{
+    // This function is used to determine if we need to capture the device state and begin drawing or not
+    // and must be called before ANY drawing inside this class. This function will capture the device states
+    // only if they aren't already captured through a BeginDrawing () call made by the client if it's going
+    // to do multiple operations (thus saving the time it takes to do this).
+
+    // We might consider doing a BeginDrawing () before any call to a client function and EndDrawing ()
+    // after, in other words we don't have to worry about the states not getting restored back to GTA.
+    // - ChrML
+
+    // Start drawing?
+    if ( !m_bIsDrawing )
+    {
+        m_pGUI->GetRenderingLibrary ( )->UTIL_CaptureDeviceState ( );
+        m_pGUI->GetRenderingLibrary ()->BeginDrawing ();
+    }
+}
+
+
+void CGraphics::EndSingleDrawing ( void )
+{
+    // See comment in BeginSingleDrawing ()
+
+    // End drawing?
+    if ( !m_bIsDrawing )
+    {
+        m_pGUI->GetRenderingLibrary ()->EndDrawing ();
+        m_pGUI->GetRenderingLibrary ( )->UTIL_RestoreDeviceState ( );
+    }
 }
 
 
@@ -552,6 +720,37 @@ bool CGraphics::DestroyStandardDXFonts ( void )
     return true;
 }
 
+IDirect3DTexture9* CGraphics::CreateTexture ( DWORD* dwBitMap, unsigned int uiWidth, unsigned int uiHeight )
+{
+    IDirect3DTexture9* texture = NULL;
+    D3DXCreateTexture ( m_pDevice, uiWidth, uiHeight, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &texture );
+
+    D3DLOCKED_RECT lRect;
+    texture->LockRect ( 0, &lRect, 0, 0 );
+
+    BYTE* pTexture;
+    pTexture = static_cast < BYTE* > ( lRect.pBits );
+
+    DWORD color, pitch;
+    pitch = lRect.Pitch;
+    for ( UINT c = 0; c < uiHeight; c++ )
+    {
+        for ( UINT r = 0; r < uiWidth; r++ )
+        {
+            color = dwBitMap[uiWidth*c+r];
+            pTexture[r*4+c*pitch+0] = static_cast < BYTE > ( color );
+            pTexture[r*4+c*pitch+1] = static_cast < BYTE > ( color >> 8 );
+            pTexture[r*4+c*pitch+2] = static_cast < BYTE > ( color >> 16 );
+            pTexture[r*4+c*pitch+3] = static_cast < BYTE > ( color >> 24 );
+        }
+    }
+
+    lRect.pBits = pTexture;
+
+    texture->UnlockRect ( 0 );
+    return texture;
+}
+
 IDirect3DTexture9* CGraphics::LoadTexture ( const char* szFile )
 {
     IDirect3DTexture9* texture = NULL;
@@ -566,7 +765,7 @@ IDirect3DTexture9* CGraphics::LoadTexture ( const char* szFile, unsigned int uiW
     return texture;
 }
 
-void CGraphics::DrawTexture ( IDirect3DTexture9* texture, float fX, float fY, float fScaleX, float fScaleY, float fRotation, float fCenterX, float fCenterY, DWORD dwColor )
+void CGraphics::DrawTexture ( IDirect3DTexture9* texture, float fX, float fY, float fScaleX, float fScaleY, float fRotation, float fCenterX, float fCenterY, unsigned char ucAlpha )
 {
     if ( !texture )
         return;
@@ -579,7 +778,7 @@ void CGraphics::DrawTexture ( IDirect3DTexture9* texture, float fX, float fY, fl
     D3DXVECTOR2 position ( fX - ( float ) textureDesc.Width * fScaleX * fCenterX, fY - ( float ) textureDesc.Height * fScaleY * fCenterY );
     D3DXMatrixTransformation2D ( &matrix, NULL, NULL, &scaling, &rotationCenter, fRotation * 6.2832f / 360.f, &position );
     m_pDXSprite->SetTransform ( &matrix );
-    m_pDXSprite->Draw ( texture, NULL, NULL, NULL, dwColor );
+    m_pDXSprite->Draw ( texture, NULL, NULL, NULL, D3DCOLOR_ARGB ( ucAlpha, 255, 255, 255 ) );
     m_pDXSprite->End ();
 }
 
@@ -590,8 +789,8 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
     LoadStandardDXFonts ();
 
     // Get the original render target
-    //assert ( !m_pOriginalTarget );
-    //assert ( m_pDevice->GetRenderTarget ( 0, &m_pOriginalTarget ) == D3D_OK );
+    assert ( !m_pOriginalTarget );
+    assert ( m_pDevice->GetRenderTarget ( 0, &m_pOriginalTarget ) == D3D_OK );
 
     // Create drawing devices
     D3DXCreateLine ( pDevice, &m_pLineInterface );
@@ -606,6 +805,9 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
 
 void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
 {
+    assert ( m_pOriginalTarget );
+    SAFE_RELEASE ( m_pOriginalTarget );
+
     for ( int i = 0; i < NUM_FONTS; i++ )
     {
         if( m_pDXFonts[i] ) m_pDXFonts[i]->OnLostDevice ();
@@ -624,6 +826,10 @@ void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
 
 void CGraphics::OnDeviceRestore ( IDirect3DDevice9 * pDevice )
 {
+    // Get the original render target
+    assert ( !m_pOriginalTarget );
+    assert ( m_pDevice->GetRenderTarget ( 0, &m_pOriginalTarget ) == D3D_OK );
+
     for ( int i = 0; i < NUM_FONTS; i++ )
     {
         if( m_pDXFonts[i] ) m_pDXFonts[i]->OnResetDevice ();
@@ -688,6 +894,8 @@ void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )
     // Items to draw?
     if ( Queue.size () > 0 )
     {
+        BeginSingleDrawing ();
+
         // Loop through it
         int curMode = 0;
         std::vector < sDrawQueueItem >::iterator iter = Queue.begin ();
@@ -714,6 +922,8 @@ void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )
 
         // Mode clean up
         HandleDrawQueueModeChange ( curMode, 0 );
+
+        EndSingleDrawing ();
 
         // Clear the list
         Queue.clear ();

@@ -21,12 +21,11 @@ Var CreateSMShortcuts
 Var CreateDesktopIcon
 Var RedistInstalled
 
-; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\GDFImp.gdf.xml
-!define GUID "{D37BCD9D-382E-4270-83AB-94CD39F16E1D}"
+!define GUID "{D4B44B22-8B64-4939-90E2-C0635D6CA80D}"
 
 !define MAJOR_VER "1"
-!define MINOR_VER "2"
-!define MAINT_VER "0"
+!define MINOR_VER "1"
+!define MAINT_VER "1"
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
 !define 0.0.0 "${MAJOR_VER}.${MINOR_VER}.${MAINT_VER}"
 
@@ -89,7 +88,7 @@ Var RedistInstalled
 
 ; Welcome page
 !define MUI_WELCOMEPAGE_TITLE_3LINES
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation or update of $(^Name) (r${REVISION})\n\n\
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation or update of $(^Name)\n\n\
 It is recommended that you close all other applications before starting Setup.\n\n\
 [Admin access will be requested for Vista and up]\n\n\
 Click Next to continue."

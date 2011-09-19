@@ -27,7 +27,6 @@ public:
     bool                        GetPort                         ( unsigned short& usPort )     { usPort = m_usPort; return m_bPort; }
     bool                        GetHTTPPort                     ( unsigned short& usHTTPPort ) { usHTTPPort = m_usHTTPPort; return m_bHTTPPort; }
     bool                        GetMaxPlayers                   ( unsigned int& uiMaxPlayers ) { uiMaxPlayers = m_uiMaxPlayers; return m_bMaxPlayers; }
-    bool                        IsVoiceDisabled                 ( bool& bDisabled )            { bDisabled = m_bDisableVoice; return m_bNoVoice; }
 
 private:
     bool                        m_bMainConfig;
@@ -35,14 +34,12 @@ private:
     bool                        m_bPort;
     bool                        m_bHTTPPort;
     bool                        m_bMaxPlayers;
-    bool                        m_bNoVoice;
 
     std::string                 m_strMainConfig;
     std::string                 m_strIP;
     unsigned short              m_usPort;
     unsigned short              m_usHTTPPort;
     unsigned int                m_uiMaxPlayers;
-    bool                        m_bDisableVoice;
 };
 
 #endif

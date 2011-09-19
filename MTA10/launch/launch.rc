@@ -74,8 +74,8 @@ IDI_ICON1               ICON                    "resource\\mtaicon.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,0,0
- PRODUCTVERSION 1,2,0,0
+ FILEVERSION 1,1,0,0
+ PRODUCTVERSION 1,1,0,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -92,10 +92,10 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Multi Theft Auto"
             VALUE "FileDescription", "Multi Theft Auto Launcher"
-            VALUE "FileVersion", "1.2.0.0"
+            VALUE "FileVersion", "1.1.0.0"
             VALUE "LegalCopyright", "(C) 2003 - 2011 Multi Theft Auto"
             VALUE "ProductName", "MTA San Andreas"
-            VALUE "ProductVersion", "1.2.0.0"
+            VALUE "ProductVersion", "1.1.0.0"
         END
     END
     BLOCK "VarFileInfo"

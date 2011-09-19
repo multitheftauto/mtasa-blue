@@ -48,10 +48,6 @@ public:
 
 protected:
     void                                InternalSetRadarEnabled             ( bool bEnabled );
-
-    void                                CreateMarkerTextures                ( void );
-    IDirect3DTexture9*                  GetMarkerTexture                    ( CClientRadarMarker* pMarker, float fLocalZ, float* pfScale, SColor* pColor );
-
 public:
 
     inline bool                         IsAttachedToLocalPlayer             ( void ) const                  { return m_bIsAttachedToLocal; };
@@ -88,8 +84,8 @@ private:
     class CClientRadarAreaManager*      m_pRadarAreaManager;
 
     IDirect3DTexture9*                  m_pRadarImage;
+
     IDirect3DTexture9*                  m_pLocalPlayerBlip;
-    std::vector < IDirect3DTexture9* >  m_MarkerTextureList;
 
     unsigned int                        m_uiHeight;
     unsigned int                        m_uiWidth;

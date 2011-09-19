@@ -181,6 +181,30 @@ void CLocalGUI::CreateObjects ( IUnknown* pDevice )
     FileTranslator.GetCurrentWorkingDirectory ( WorkingDirectory );
     GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
     SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
+    
+    // Create graphical wrapper object.
+    WriteDebugEvent ( "Creating renderer wrapper..." );
+    m_pRendererLibrary = new CD3DMGEng ( reinterpret_cast < LPDIRECT3DDEVICE9 > ( pDevice ) );
+
+    // And lot it's fonts
+    WriteDebugEvent ( "Loading font texture..." );
+    if ( m_pRendererLibrary->LoadFontTextureFromFile ( "cgui\\sans.tga" ) )
+    {
+        WriteDebugEvent ( "Font texture load successful!" );
+    }
+    else
+    {
+        WriteDebugEvent ( "Font texture load failure!" );
+    }
+
+    if ( m_pRendererLibrary->LoadFontInfoFromFile ( "cgui\\sans.dat" ) )
+    {
+        WriteDebugEvent ( "Font data load successful!" );
+    }
+    else
+    {
+        WriteDebugEvent ( "Font data load failure!" );
+    }
 
     CreateWindows ( false );
 
@@ -204,7 +228,14 @@ void CLocalGUI::DestroyObjects ( void )
     DestroyWindows ();
 
     // Destroy and NULL all elements
+    SAFE_DELETE ( m_pRendererLibrary );
     SAFE_DELETE ( m_pLabelVersionTag );
+}
+
+
+CD3DMGEng* CLocalGUI::GetRenderingLibrary ( void )
+{
+    return m_pRendererLibrary;
 }
 
 
@@ -312,6 +343,16 @@ void CLocalGUI::Invalidate ( void )
     {
         WriteDebugEvent ( "WARNING: CLocalGUI::Invalidate() called, but CLocalGUI::CreateObjects() isn't!" );
     }
+
+    // Invalidate the renderer library
+    if ( m_pRendererLibrary )
+    {
+        m_pRendererLibrary->OnInvalidateDevice ( );
+    }
+    else
+    {
+        WriteDebugEvent ( "WARNING: CLocalGUI::Invalidate() called, but CLocalGUI::CreateObjects() isn't!" );
+    }
 }
 
 
@@ -337,6 +378,16 @@ void CLocalGUI::Restore ( void )
 
         // Restore the GUI
         pGUI->Restore ();
+
+        // Restore our renderer.
+        if ( m_pRendererLibrary )
+        {
+            m_pRendererLibrary->OnRestoreDevice ( );
+        }
+        else
+        {
+            WriteDebugEvent ( "WARNING: CLocalGUI::Restore() called, but CLocalGUI::CreateObjects() isn't!" );
+        }
 
         // Restore the current directory to default.
         SetCurrentDirectory ( szCurDir );

@@ -18,15 +18,6 @@
 using SharedUtil::CalcMTASAPath;
 using std::list;
 
-enum
-{
-    MARKER_SQUARE_INDEX         = 0,
-    MARKER_UP_TRIANGLE_INDEX    = 1,
-    MARKER_DOWN_TRIANGLE_INDEX  = 2,
-    MARKER_FIRST_SPRITE_INDEX   = 3,
-    MARKER_LAST_SPRITE_INDEX    = MARKER_FIRST_SPRITE_INDEX + RADAR_MARKER_LIMIT - 1,
-};
-
 CRadarMap::CRadarMap ( CClientManager* pManager )
 {
     // Setup our managers
@@ -66,11 +57,8 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     m_pRadarImage = g_pCore->GetGraphics()->LoadTexture ( CalcMTASAPath("MTA\\cgui\\images\\radar.jpg"), RADAR_TEXTURE_WIDTH, RADAR_TEXTURE_HEIGHT );
     m_pLocalPlayerBlip = g_pCore->GetGraphics()->LoadTexture ( CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png")  );
 
-    // Create the marker textures
-    CreateMarkerTextures ();
-
     // Create the text display for the mode text
-    m_pModeText = new CClientTextDisplay ( m_pManager->GetDisplayManager () );
+    m_pModeText = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
     m_pModeText->SetCaption ( "Current Mode: Free Move" );
     m_pModeText->SetColor ( SColorRGBA ( 255, 255, 255, 200 ) );
     m_pModeText->SetPosition ( CVector ( 0.50f, 0.92f, 0 ) );
@@ -122,7 +110,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     const SBindableKey *bkAttachRadar = cbAttachRadar->boundKey;
 
     // Create the text displays for the help text
-    m_pHelpTextZooming = new CClientTextDisplay ( m_pManager->GetDisplayManager () );
+    m_pHelpTextZooming = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
     m_pHelpTextZooming->SetCaption ( SString("Press %s/%s to zoom in/out.", bkZoomIn->szKey, bkZoomOut->szKey).c_str () );
     m_pHelpTextZooming->SetColor( SColorRGBA ( 255, 255, 255, 255 ) );
     m_pHelpTextZooming->SetPosition ( CVector ( 0.50f, 0.05f, 0 ) );
@@ -130,7 +118,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     m_pHelpTextZooming->SetScale ( 1.0f );
     m_pHelpTextZooming->SetVisible ( false );
 
-    m_pHelpTextMovement = new CClientTextDisplay ( m_pManager->GetDisplayManager () );
+    m_pHelpTextMovement = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
     m_pHelpTextMovement->SetCaption ( SString("Press %s, %s, %s, %s to navigate the map.", bkMoveNorth->szKey, bkMoveEast->szKey, bkMoveSouth->szKey, bkMoveWest->szKey).c_str() );
     m_pHelpTextMovement->SetColor( SColorRGBA ( 255, 255, 255, 255 ) );
     m_pHelpTextMovement->SetPosition ( CVector ( 0.50f, 0.08f, 0 ) );
@@ -138,7 +126,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     m_pHelpTextMovement->SetScale ( 1.0f );
     m_pHelpTextMovement->SetVisible ( false );
 
-    m_pHelpTextAttachment = new CClientTextDisplay ( m_pManager->GetDisplayManager () );
+    m_pHelpTextAttachment = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
     m_pHelpTextAttachment->SetCaption ( SString("Press %s to change mode.", bkAttachRadar->szKey).c_str() );
     m_pHelpTextAttachment->SetColor( SColorRGBA ( 255, 255, 255, 255 ) );
     m_pHelpTextAttachment->SetPosition ( CVector ( 0.50f, 0.11f, 0 ) );
@@ -156,12 +144,6 @@ CRadarMap::~CRadarMap ( void )
 
     if ( m_pLocalPlayerBlip )
         m_pLocalPlayerBlip->Release();
-
-    for ( uint i = 0 ; i < m_MarkerTextureList.size () ; i++ )
-        if ( m_MarkerTextureList[i] )
-            m_MarkerTextureList[i]->Release ();
-
-    m_MarkerTextureList.clear ();
 
     // Don't need to delete the help texts as those are destroyed by the display manager
 }
@@ -212,76 +194,6 @@ void CRadarMap::DoPulse ( void )
 }
 
 
-//
-// Precreate all the textures for the radar map markers
-//
-void CRadarMap::CreateMarkerTextures ( void )
-{
-    assert ( m_MarkerTextureList.empty () );
-    SString strRadarSetDirectory = CalcMTASAPath ( "MTA\\cgui\\images\\radarset\\" );
-
-    // Load the 3 shapes
-    const char* shapeFileNames[] = { "square.png", "up.png", "down.png" };
-    for ( uint i = 0 ; i < NUMELMS( shapeFileNames ) ; i++ )
-        m_MarkerTextureList.push_back ( g_pCore->GetGraphics()->LoadTexture ( PathJoin ( strRadarSetDirectory, shapeFileNames[i] ) ) );
-
-    assert ( m_MarkerTextureList.size () == MARKER_FIRST_SPRITE_INDEX );
-
-    // Load the icons
-    for ( uint i = 0 ; i < RADAR_MARKER_LIMIT ; i++ )
-        m_MarkerTextureList.push_back ( g_pCore->GetGraphics()->LoadTexture ( PathJoin ( strRadarSetDirectory, SString ( "%02u.png", i + 1 ) ) ) );
-
-    assert ( m_MarkerTextureList.size () == MARKER_LAST_SPRITE_INDEX + 1 );
-}
-
-
-//
-// Get a texture for a marker, including scale and color
-//
-IDirect3DTexture9* CRadarMap::GetMarkerTexture ( CClientRadarMarker* pMarker, float fLocalZ, float* pfScale, SColor* pColor )
-{
-    float fScale = pMarker->GetScale ();
-    ulong ulSprite = pMarker->GetSprite ();
-    SColor color = pMarker->GetColor ();
-
-    // Make list index
-    uint uiListIndex = 0;
-
-    if ( ulSprite )
-    {
-        // ulSprite >= 1 and <= 63
-        // Remap to texture list index
-        uiListIndex = ulSprite - 1 + MARKER_FIRST_SPRITE_INDEX;
-        color = SColorARGB ( 255, 255, 255, 255 );
-        fScale = 1;
-    }
-    else
-    {
-        // ulSprite == 0 so draw a square or triangle depending on relative z position
-        CVector vecMarker;
-        pMarker->GetPosition ( vecMarker );
-
-        if ( fLocalZ > vecMarker.fZ + 4.0f )
-            uiListIndex = MARKER_DOWN_TRIANGLE_INDEX;   // We're higher than this marker, so draw the arrow pointing down
-        else
-        if ( fLocalZ < vecMarker.fZ - 4.0f )
-            uiListIndex = MARKER_UP_TRIANGLE_INDEX;     // We're lower than this entity, so draw the arrow pointing up
-        else
-            uiListIndex = MARKER_SQUARE_INDEX;          // We're at the same level so draw a square
-
-        fScale /= 4;
-    }
-
-    *pfScale = fScale;
-    *pColor = color;
-
-    if ( uiListIndex >= m_MarkerTextureList.size () )
-        return NULL;
-
-    return m_MarkerTextureList [ uiListIndex ];
-}
-
-
 void CRadarMap::DoRender ( void )
 {
     // If our radar image exists
@@ -293,7 +205,7 @@ void CRadarMap::DoRender ( void )
                                                              m_fMapSize / RADAR_TEXTURE_WIDTH,
                                                              m_fMapSize / RADAR_TEXTURE_HEIGHT,
                                                              0.0f, 0.0f, 0.0f,
-                                                             SColorARGB ( m_iRadarAlpha, 255, 255, 255 ) );
+                                                             m_iRadarAlpha );
 
         // Grab the info for the local player blip
         CVector2D vecLocalPos;
@@ -350,15 +262,115 @@ void CRadarMap::DoRender ( void )
             if ( (*markerIter)->IsVisible () && (*markerIter)->GetDimension() == usDimension )
             {
                 // Grab the marker image and calculate the position to put it on the screen
-                float fScale = 1;
-                SColor color;
-                IDirect3DTexture9* pTexture = GetMarkerTexture ( *markerIter, vecLocal.fZ, &fScale, &color );
+                CVector2D vecPos;
+                IDirect3DTexture9* pImage = (*markerIter)->GetMapMarkerImage ();
 
-                if ( pTexture )
+                // Scale the marker to the right size
+                float fScale = (*markerIter)->GetScale ();
+
+                switch ( (*markerIter)->GetMapMarkerState () )
                 {
-                    CVector2D vecPos;
-                    CalculateEntityOnScreenPosition ( *markerIter, vecPos );
-                    g_pCore->GetGraphics()->DrawTexture ( pTexture, vecPos.fX, vecPos.fY, fScale, fScale, 0.0f, 0.5f, 0.5f, color );
+                    case CClientRadarMarker::MAP_MARKER_SQUARE:
+                    {
+                        fScale = fScale / 5.0f;
+                        break;
+                    }
+                    case CClientRadarMarker::MAP_MARKER_TRIANGLE_UP:
+                    {
+                        fScale = fScale / 4.0f;
+                        break;
+                    }
+                    case CClientRadarMarker::MAP_MARKER_TRIANGLE_DOWN:
+                    {
+                        fScale = fScale / 4.0f;
+                        break;
+                    }
+                    default:
+                    {
+                        fScale = 1.0f;
+                        break;
+                    }
+                }
+
+                CalculateEntityOnScreenPosition ( *markerIter, vecPos );
+
+                // If it is a picture icon not a blip
+                if ( (*markerIter)->GetSprite () != 0 )
+                {
+                    // If the picture exists
+                    if ( pImage )
+                    {
+                        // Set the size, position etc and show it here
+                        g_pCore->GetGraphics()->DrawTexture ( pImage, vecPos.fX, vecPos.fY, fScale, fScale, 0.0f, 0.5f, 0.5f );
+                    }
+                    else
+                    {
+                        // The image has not yet been created, let's create it
+                        (*markerIter)->SetSprite ( (*markerIter)->GetSprite () );
+
+                        // Retrieve the newly created image from the marker element
+                        pImage = (*markerIter)->GetMapMarkerImage ();
+
+                        // Set the size, position etc and show it here
+                        g_pCore->GetGraphics()->DrawTexture ( pImage, vecPos.fX, vecPos.fY, fScale, fScale, 0.0f, 0.5f, 0.5f );
+                    }
+                }
+                else
+                {
+                    // If the radar blip hasn't been created
+                    if ( !pImage )
+                    {
+                        // Create it and set it to a square blip
+                        (*markerIter)->SetMapMarkerState ( CClientRadarMarker::MAP_MARKER_SQUARE );
+                    }
+
+                    CVector vecMarker;
+                    (*markerIter)->GetPosition ( vecMarker );
+
+                    CClientRadarMarker::EMapMarkerState eMapMarkerState = (*markerIter)->GetMapMarkerState ();
+
+                    // We're higher than this marker, so draw the arrow pointing down
+                    if ( vecLocal.fZ > vecMarker.fZ + 4.0f )
+                    {
+                        // If this is not the right blip
+                        if ( eMapMarkerState != CClientRadarMarker::MAP_MARKER_TRIANGLE_DOWN )
+                        {
+                            // Set it to the right blip
+                            (*markerIter)->SetMapMarkerState ( CClientRadarMarker::MAP_MARKER_TRIANGLE_DOWN );
+                        }
+                    }
+
+                    // We're lower than this entity, so draw the arrow pointing up
+                    else if ( vecLocal.fZ < vecMarker.fZ - 4.0f )
+                    {
+                        // If this is not the right blip
+                        if ( eMapMarkerState != CClientRadarMarker::MAP_MARKER_TRIANGLE_UP )
+                        {
+                            // Set it to the right blip
+                            (*markerIter)->SetMapMarkerState ( CClientRadarMarker::MAP_MARKER_TRIANGLE_UP );
+                        }
+                    }
+
+                    // We're at the same level so draw a square
+                    else
+                    {
+                        // If this is not the right blip
+                        if ( eMapMarkerState != CClientRadarMarker::MAP_MARKER_SQUARE )
+                        {
+                            // Set it to the right blip
+                            (*markerIter)->SetMapMarkerState ( CClientRadarMarker::MAP_MARKER_SQUARE );
+                        }
+                    }
+
+                    // Grab the image pointer
+                    pImage = (*markerIter)->GetMapMarkerImage ();
+
+                    // If the image exists
+                    if ( pImage )
+                    {
+                        // Set the size, position etc and show it here
+                        g_pCore->GetGraphics()->DrawTexture ( pImage, vecPos.fX, vecPos.fY, fScale, fScale, 0.0f, 0.5f, 0.5f );
+                    }
                 }
             }
         }

@@ -18,6 +18,10 @@
 #ifndef __UTILS_H
 #define __UTILS_H
 
+#ifndef PI
+#define PI 3.14159265358979323846264338327950f
+#endif
+
 
 // Vector math
 inline float DistanceBetweenPoints2D ( const CVector& vecPosition1, const CVector& vecPosition2 )

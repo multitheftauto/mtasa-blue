@@ -789,7 +789,7 @@ int CLuaFunctionDefinitions::GetPedWeapon ( lua_State* luaVM )
             CWeapon* pWeapon = pPed->GetWeapon ( ucSlot );
             if ( pWeapon )
             {
-                unsigned char ucWeapon = pWeapon->ucType;
+				unsigned char ucWeapon = pWeapon->ucType;
                 lua_pushnumber ( luaVM, ucWeapon );
                 return 1;
             }
@@ -3159,7 +3159,7 @@ int CLuaFunctionDefinitions::TakeWeapon ( lua_State* luaVM )
         unsigned char ucWeaponID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
         unsigned short usAmmo = 9999;
         if ( iArgument3 != LUA_TNONE )
-            usAmmo = static_cast < unsigned short > ( lua_tonumber ( luaVM, 3 ) );    
+            usAmmo = static_cast < unsigned short > ( lua_tonumber ( luaVM, 3 ) );	
 
         if ( pElement )
         {
@@ -9124,14 +9124,12 @@ int CLuaFunctionDefinitions::SetMaxPlayers ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::OutputChatBox ( lua_State* luaVM )
 {
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
     // Read out optional element and color arguments
     CElement* pElement = m_pRootElement;
     unsigned char ucRed = 235;
     unsigned char ucGreen = 221;
     unsigned char ucBlue = 178;
     bool bColorCoded = false;
-            
     int iArgument2 = lua_type ( luaVM, 2 );
     if ( iArgument2 == LUA_TLIGHTUSERDATA )
     {
@@ -9171,7 +9169,7 @@ int CLuaFunctionDefinitions::OutputChatBox ( lua_State* luaVM )
         const char* szChat = lua_tostring ( luaVM, 1 );
 
         // Do it
-        if ( CStaticFunctionDefinitions::OutputChatBox ( szChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain ) )
+        if ( CStaticFunctionDefinitions::OutputChatBox ( szChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
@@ -9179,7 +9177,7 @@ int CLuaFunctionDefinitions::OutputChatBox ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "outputChatBox" );
-    
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -9962,7 +9960,7 @@ int CLuaFunctionDefinitions::GetValidPedModels ( lua_State* luaVM )
 {
     int iIndex = 0;
     lua_newtable ( luaVM );
-    for( int i = 0; i <= 312; i++)
+    for( int i = 0; i < 289; i++)
     {
         if ( CPlayerManager::IsValidPlayerModel(i) )
         {
@@ -10219,7 +10217,7 @@ int CLuaFunctionDefinitions::RemoveRuleValue ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetPlayerAnnounceValue ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
          lua_type ( luaVM, 2 ) == LUA_TSTRING )
     {
         CElement* pElement = lua_toelement ( luaVM, 1 );
@@ -10242,7 +10240,7 @@ int CLuaFunctionDefinitions::GetPlayerAnnounceValue ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetPlayerAnnounceValue ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
          lua_type ( luaVM, 2 ) == LUA_TSTRING &&
          lua_type ( luaVM, 3 ) == LUA_TSTRING )
     {

@@ -154,15 +154,27 @@ void CRPCFunctions::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInterf
             // Grab the source entity.
             ElementID ID;
             bitStream.Read ( ID );
-            CClientEntity* pSource = CElementIDs::GetElement ( ID );
+            CClientEntity* pSource = NULL;
+            if ( ID != INVALID_ELEMENT_ID )
+            {
+                pSource = CElementIDs::GetElement ( ID );
+#ifdef MTA_DEBUG
+                if ( pSource == NULL )
+                {
+                    OutputDebugLine ( "CRPCFunctions::ProcessPacket - FIXME" );
+                    CLogger::ErrorPrintf ( "CRPCFunctions::ProcessPacket - FIXME" );
+                }
+                // assert ( pSource != NULL );
+#endif
+                if ( pSource == NULL )
+                    return;
+            }
+
+            // Hack fix - It looks like only SET_PLAYER_TEAM handles (pSource == NULL)
             if ( pSource == NULL )
             {
-#ifdef MTA_DEBUG
-                SString strMessage ( "CRPCFunctions::ProcessPacket - FIXME (%s)", pElementHandler->szName );
-                OutputDebugLine ( strMessage );
-                CLogger::ErrorPrintf ( "%s", *strMessage );
-#endif
-                return;
+                if ( ucFunctionID != SET_PLAYER_TEAM )
+                    return;
             }
 
             (pElementHandler->Callback) ( pSource, bitStream );

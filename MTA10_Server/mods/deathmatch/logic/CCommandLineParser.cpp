@@ -21,7 +21,6 @@ CCommandLineParser::CCommandLineParser ( void )
     m_bPort = false;
     m_bHTTPPort = false;
     m_bMaxPlayers = false;
-    m_bNoVoice = false;
 }
 
 
@@ -72,11 +71,6 @@ bool CCommandLineParser::Parse ( int iArgumentCount, char* szArguments [] )
                 m_bMaxPlayers = true;
                 m_uiMaxPlayers = (unsigned int) atoi ( szArguments [ iIndex ] );
             }
-        }
-        else if ( stricmp ( szArguments [ iIndex ], "--novoice" ) == 0 )
-        {
-            m_bNoVoice = true;
-            m_bDisableVoice = true;
         }
 
         // We can't disable HTTP because then downloading resource files doesn't work

@@ -28,7 +28,6 @@ public:
     DECLARE_ELEMENT_RPC ( SetPlayerNametagColor );
     DECLARE_ELEMENT_RPC ( RemovePlayerNametagColor );
     DECLARE_ELEMENT_RPC ( SetPlayerNametagShowing );      
-    DECLARE_ELEMENT_RPC ( SetPlayerTeam );      
 };
 
 #endif
