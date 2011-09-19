@@ -449,9 +449,6 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
 
         bitStream.Read ( szReason, iSize );
 
-        // Run it through the character filter
-        StripUnwantedCharacters ( szReason, ' ' );
-
         // Display the error
         if ( strcmp(szReason,"Disconnected: Incorrect password") == 0 ) // Slight hack - if invalid password reason show Info box instead.
             g_pCore->ShowServerInfo ( 2 );
