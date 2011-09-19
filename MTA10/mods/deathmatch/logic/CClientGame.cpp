@@ -4474,10 +4474,6 @@ void CClientGame::ResetMapInfo ( void )
     // Money
     SetMoney ( 0 );
 
-    // Water
-    g_pGame->GetWaterManager ()->SetWaterLevel ( (CVector *)NULL, 0.0f, NULL, true );
-    g_pGame->GetWaterManager ()->SetWaveLevel ( 0.0f );
-
     // Weather
     m_pBlendedWeather->SetWeather ( 0 );
 
@@ -4504,6 +4500,9 @@ void CClientGame::ResetMapInfo ( void )
 
     // Water-colour
     g_pMultiplayer->ResetWater ( );
+
+	// Water
+    g_pGame->GetWaterManager ()->Reset ();
 
     // Re-enable interior sounds
     g_pMultiplayer->SetInteriorSoundsEnabled ( true );
