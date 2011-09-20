@@ -164,10 +164,26 @@ void CClientDFF::InternalRestoreModel ( unsigned short usModel )
     // Is this an object ID?
     else if ( CClientObjectManager::IsValidModel ( usModel ) )
     {
+        if ( CClientPedManager::IsValidWeaponModel ( usModel ) )
+        {
+            // Stream the weapon of that model out so we have no
+            // loaded when we do the restore. The streamer will
+            // eventually stream them back in with async loading.
+            m_pManager->GetPedManager ()->RestreamWeapon ( usModel );
+
+        }
         // Stream the objects of that model out so we have no
         // loaded when we do the restore. The streamer will
         // eventually stream them back in with async loading.
         m_pManager->GetObjectManager ()->RestreamObjects ( usModel );
+    }
+    // Is this an ped ID?
+    else if ( CClientPlayerManager::IsValidModel ( usModel ) )
+    {
+        // Stream the ped of that model out so we have no
+        // loaded when we do the restore. The streamer will
+        // eventually stream them back in with async loading.
+        m_pManager->GetPedManager ()->RestreamPeds ( usModel );
     }
     else
         return;

@@ -41,6 +41,13 @@ public:
     std::vector < CClientPed* > ::const_iterator  StreamedBegin     ( void ) { return m_StreamedIn.begin (); };
     std::vector < CClientPed* > ::const_iterator  StreamedEnd       ( void ) { return m_StreamedIn.end (); };
 
+    static unsigned short           GetWeaponSlotFromModel          ( DWORD dwModelID );
+    static bool                     IsValidWeaponModel              ( DWORD dwModelID );
+
+    void                            RestreamPeds                    ( unsigned short usModel );
+    void                            RestreamWeapon                  ( unsigned short usModel );
+
+
 protected:
                                     CClientPedManager               ( class CClientManager* pManager );
                                     ~CClientPedManager              ( void );
