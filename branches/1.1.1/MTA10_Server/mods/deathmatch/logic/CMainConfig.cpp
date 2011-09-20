@@ -732,6 +732,14 @@ unsigned short CMainConfig::GetHTTPPort ( void )
     return m_usHTTPPort;
 }
 
+bool CMainConfig::IsVoiceEnabled ( void )
+{
+    bool bDisabled;
+    if ( m_pCommandLineParser && m_pCommandLineParser->IsVoiceDisabled ( bDisabled ) )
+        return !bDisabled;
+    return m_bVoiceEnabled;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 //

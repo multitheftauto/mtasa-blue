@@ -52,7 +52,7 @@ public:
     inline const std::string&       GetPassword                     ( void )        { return m_strPassword; };
     bool                            SetPassword                     ( const char* szPassword, bool bSave );
 
-    bool                            IsVoiceEnabled                  ( void )        { return m_bVoiceEnabled; };
+    bool                            IsVoiceEnabled                  ( void );
     unsigned int                    GetVoiceSampleRate              ( void )        { return m_uiVoiceSampleRate; };
     unsigned int                    GetVoiceQuality                 ( void )        { return m_ucVoiceQuality; };
     unsigned int                    GetVoiceBitrate                 ( void )        { return m_uiVoiceBitrate; };
