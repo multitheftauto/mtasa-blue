@@ -232,6 +232,10 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
 
         SetArmor ( 0.0f );
     }
+    m_eStoredWeaponID = (eWeaponType)0;
+    m_dwStoredAmmo = 0;
+    m_dwStoredClipAmmo = 0;
+    m_bStoredCurrentWeapon = false;
 }
 
 
@@ -894,7 +898,7 @@ void CClientPed::SetTargetTarget ( unsigned long ulDelay, const CVector& vecSour
 }
 
 
-bool CClientPed::SetModel ( unsigned long ulModel )
+bool CClientPed::SetModel ( unsigned long ulModel, bool bTemp )
 {
     // Valid model?
     if ( CClientPlayerManager::IsValidModel ( ulModel ) )
@@ -902,6 +906,9 @@ bool CClientPed::SetModel ( unsigned long ulModel )
         // Different model from what we have now?
         if ( m_ulModel != ulModel )
         {
+            if ( bTemp )
+                m_ulStoredModel = m_ulModel;
+
             // Set the model we're changing to
             m_ulModel = ulModel;
             m_pModelInfo = g_pGame->GetModelInfo ( ulModel );
@@ -2764,6 +2771,35 @@ void CClientPed::StreamedInPulse ( void )
             // Update our streaming position
             UpdateStreamPosition ( vecPosition );
         }
+        // Fix for unloading ped models which are currently streamed in (DO NOT REMOVE or players will not reset to the default models!)
+        if ( m_ulStoredModel > 0 && m_ulModel == 0 )
+        {
+            // Make sure the scripter hasn't fixed this himself as well by changing from CJ back. (unlikely but who knows).
+            if ( m_ulModel == 0 )
+            {
+                // Give him back his previous model
+                SetModel ( m_ulStoredModel );
+            }
+            // Reset the stored model
+            m_ulStoredModel = 0;
+        }
+        // Fix for unloading weapon models which are currently streamed in (DO NOT REMOVE or weapons will not reset to the default models!)
+        if ( m_eStoredWeaponID > 0 )
+        {
+            // Give our Weapon back after deleting to reload the model
+            CWeapon * pWeapon = GiveWeapon ( m_eStoredWeaponID, m_dwStoredAmmo );
+
+            // Reset our states
+            pWeapon->SetAmmoInClip ( m_dwStoredClipAmmo );
+            if ( m_bStoredCurrentWeapon )
+                pWeapon->SetAsCurrentWeapon ( );
+
+            // Reset for next time.
+            m_eStoredWeaponID = (eWeaponType)0;
+            m_dwStoredAmmo = 0;
+            m_dwStoredClipAmmo = 0;
+            m_bStoredCurrentWeapon = false;
+        }
     }
 }
 
@@ -3518,6 +3554,22 @@ void CClientPed::StreamOut ( void )
     }
 }
 
+void CClientPed::StreamOutWeaponForABit ( eWeaponSlot eSlot )
+{
+    // Get the Weapon
+    CWeapon * pWeapon = GetWeapon ( eSlot );
+    if ( pWeapon )
+    {
+        // Store our states i.e. clip Ammo, Ammo, type and if it's the current weapon
+        m_dwStoredClipAmmo = pWeapon->GetAmmoInClip ( );
+        m_dwStoredAmmo = pWeapon->GetAmmoTotal ( );
+        m_eStoredWeaponID = pWeapon->GetType();
+        m_bStoredCurrentWeapon = GetCurrentWeaponType () == m_eStoredWeaponID;
+
+        // Remove it
+        pWeapon->Remove ();
+    }
+}
 
 void CClientPed::InternalWarpIntoVehicle ( CVehicle* pGameVehicle )
 {
