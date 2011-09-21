@@ -61,6 +61,21 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
     //
     STRNCPY( g_pDeviceState->AdapterState.Name, adaptIdent.Description, sizeof ( g_pDeviceState->AdapterState.Name ) );
 
+    //
+    // Get max anisotropic setting
+    //
+    g_pDeviceState->AdapterState.MaxAnisotropicSetting = 0;
+
+    // Make sure device can do anisotropic minification and trilinear filtering
+    if ( ( g_pDeviceState->DeviceCaps.TextureFilterCaps & D3DPTFILTERCAPS_MINFANISOTROPIC )
+         && ( g_pDeviceState->DeviceCaps.TextureFilterCaps & D3DPTFILTERCAPS_MIPFLINEAR ) )
+    {
+        int iLevel = Max < int > ( 1, g_pDeviceState->DeviceCaps.MaxAnisotropy );
+        // Convert level 1/2/4/8/16 into setting 0/1/2/3/4
+        while ( iLevel >>= 1 )
+            g_pDeviceState->AdapterState.MaxAnisotropicSetting++;
+    }
+
     // Call event handler
     CDirect3DEvents9::OnDirect3DDeviceCreate ( pDevice );
 }

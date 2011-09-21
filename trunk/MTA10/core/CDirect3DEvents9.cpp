@@ -25,6 +25,7 @@
 static IDirect3DSurface9*  ms_pSaveLockSurface  = NULL;
 static int                 ms_bSaveStarted      = 0;
 static long long           ms_LastSaveTime      = 0;
+static uint                ms_RequiredAnisotropicLevel = 1;
 
 
 void CDirect3DEvents9::OnDirect3DDeviceCreate  ( IDirect3DDevice9 *pDevice )
@@ -154,6 +155,11 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     
     // End the scene that we started.
     pDevice->EndScene ();
+
+    // Update incase settings changed
+    int iAnisotropic;
+    CVARS_GET ( "anisotropic", iAnisotropic );
+    ms_RequiredAnisotropicLevel = 1 << iAnisotropic;
     
     // Tidyup after last screenshot
     if ( ms_bSaveStarted )
@@ -302,6 +308,15 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
 /////////////////////////////////////////////////////////////
 HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount )
 {
+    // Apply anisotropic filtering if required
+    if ( ms_RequiredAnisotropicLevel > 1 )
+    {
+        pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC );
+        pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
+        if ( ms_RequiredAnisotropicLevel > g_pDeviceState->SamplerState[0].MAXANISOTROPY )
+            pDevice->SetSamplerState ( 0, D3DSAMP_MAXANISOTROPY, ms_RequiredAnisotropicLevel );
+    }
+
     // Any shader for this texture ?
     CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
 

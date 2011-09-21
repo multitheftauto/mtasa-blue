@@ -42,6 +42,23 @@ extern SBindableKey g_bkKeys[];
 
 CSettings::CSettings ( void )
 {
+    m_iMaxAnisotropic = g_pDeviceState->AdapterState.MaxAnisotropicSetting;
+    m_pWindow = NULL;
+    CreateGUI ();
+}
+
+
+CSettings::~CSettings ( void )
+{
+    DestroyGUI ();
+}
+
+
+void CSettings::CreateGUI ( void )
+{
+    if ( m_pWindow )
+        DestroyGUI ();
+
     CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabCommunity, *pTabInterface, *pTabAdvanced;
     CGUI *pManager = g_pCore->GetGUI ();
 
@@ -555,6 +572,29 @@ CSettings::CSettings ( void )
     m_pCheckBoxVolumetricShadows->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY + 2.0f ) );
     m_pCheckBoxVolumetricShadows->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
+    m_pAnisotropicLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Anisotropic filtering:" ) );
+    m_pAnisotropicLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
+    m_pAnisotropicLabel->GetPosition ( vecTemp, false );
+    m_pAnisotropicLabel->AutoSize ( "Anisotropic filtering:" );
+
+    m_pAnisotropic = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
+    m_pAnisotropic->SetPosition ( CVector2D ( vecTemp.fX + 86 + 44, vecTemp.fY ) );
+    m_pAnisotropic->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pAnisotropic->SetProperty ( "StepSize", SString ( "%1.2f", 1 / (float)m_iMaxAnisotropic ) );
+
+    m_pAnisotropicValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Off") );
+    m_pAnisotropicValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 256.0f + 44, vecTemp.fY ) );
+    m_pAnisotropicValueLabel->AutoSize ( "100x" );
+
+    if ( m_iMaxAnisotropic < 1 )
+    {
+        // Hide if system can't do anisotropic filtering
+        m_pFXQualityLabel->GetPosition ( vecTemp, false );
+        m_pAnisotropicLabel->SetVisible ( false );
+        m_pAnisotropic->SetVisible ( false );
+        m_pAnisotropicValueLabel->SetVisible ( false );
+    }
+
     m_pAntiAliasingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Anti-aliasing:" ) );
     m_pAntiAliasingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pAntiAliasingLabel->GetPosition ( vecTemp, false );
@@ -926,6 +966,7 @@ CSettings::CSettings ( void )
     m_pAudioVoiceVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnVoiceVolumeChanged, this ) );
     m_pDrawDistance->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnDrawDistanceChanged, this ) );
     m_pBrightness->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnBrightnessChanged, this ) );
+    m_pAnisotropic->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnAnisotropicChanged, this ) );
     m_pMouseSensitivity->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnMouseSensitivityChanged, this ) );
     m_pComboFxQuality->SetSelectionHandler ( GUI_CALLBACK( &CSettings::OnFxQualityChanged, this ) );
     m_pCheckBoxVolumetricShadows->SetClickHandler ( GUI_CALLBACK( &CSettings::OnVolumetricShadowsClick, this ) );
@@ -943,12 +984,13 @@ CSettings::CSettings ( void )
 }
 
 
-CSettings::~CSettings ( void )
+void CSettings::DestroyGUI ( void )
 {
     // Destroy
     delete m_pButtonCancel;
     delete m_pButtonOK;
     delete m_pWindow;
+    m_pWindow = NULL;
 }
 
 
@@ -1064,6 +1106,11 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     m_pCheckBoxDisableAero->SetSelected ( GetApplicationSettingInt ( "aero-enabled" ) ? false : true );
     m_pDrawDistance->SetScrollPosition ( ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f );
     m_pBrightness->SetScrollPosition ( ( float )gameSettings->GetBrightness () / 384 );
+
+    // Anisotropic filtering
+    int iAnisotropic;
+    CVARS_GET ( "anisotropic", iAnisotropic );
+    m_pAnisotropic->SetScrollPosition ( iAnisotropic / ( float )m_iMaxAnisotropic );
 
     int FxQuality = gameSettings->GetFXQuality();
     if ( FxQuality == 0 ) m_pComboFxQuality->SetText ( "Low" );
@@ -1271,6 +1318,7 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
     gameSettings->SetFXQuality ( 2 );
     gameSettings->SetAntiAliasing ( 1, true );
     CVARS_SET ("aspect_ratio", ASPECT_RATIO_AUTO );
+    CVARS_SET ("anisotropic", 0 );
     CVARS_SET ("volumetric_shadows", false );
     // change
     bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( 0, false, false );
@@ -1849,6 +1897,10 @@ void CSettings::SetVisible ( bool bVisible )
     // Load the config file if the dialog is shown
     if ( bVisible )
     {
+#ifdef MTA_DEBUG
+        if ( ( GetAsyncKeyState ( VK_CONTROL ) & 0x8000 ) != 0 )
+            CreateGUI ();   // Recreate GUI (for adjusting layout with edit and continue)
+#endif
         m_pWindow->BringToFront ();
         m_pWindow->Activate ();
         LoadData ();
@@ -2067,6 +2119,11 @@ void CSettings::LoadData ( void )
     m_pCheckBoxDisableAero->SetSelected ( GetApplicationSettingInt ( "aero-enabled" ) ? false : true );
     m_pDrawDistance->SetScrollPosition ( ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f );
     m_pBrightness->SetScrollPosition ( ( float )gameSettings->GetBrightness () / 384 );
+
+    // Anisotropic filtering
+    int iAnisotropic;
+    CVARS_GET ( "anisotropic", iAnisotropic );
+    m_pAnisotropic->SetScrollPosition ( iAnisotropic / ( float )m_iMaxAnisotropic );
 
     int FxQuality = gameSettings->GetFXQuality();
     if ( FxQuality == 0 ) m_pComboFxQuality->SetText ( "Low" );
@@ -2328,6 +2385,10 @@ void CSettings::SaveData ( void )
 
     // Update Aero override setting. This need to be a registry setting as it's done in the launcher
     SetApplicationSettingInt ( "aero-enabled", m_pCheckBoxDisableAero->GetSelected() ? 0 : 1 );
+
+    // Anisotropic filtering
+    int iAnisotropic = Min < int > ( m_iMaxAnisotropic, ( m_pAnisotropic->GetScrollPosition () ) * ( m_iMaxAnisotropic + 1 ) );
+    CVARS_SET( "anisotropic", iAnisotropic );
 
     // Visual FX Quality
     if ( CGUIListItem* pQualitySelected = m_pComboFxQuality->GetSelectedItem () )
@@ -2813,6 +2874,20 @@ bool CSettings::OnBrightnessChanged ( CGUIElement* pElement )
     int iBrightness = ( m_pBrightness->GetScrollPosition () ) * 100;
 
     m_pBrightnessValueLabel->SetText ( SString("%i%%", iBrightness).c_str() );
+    return true;
+}
+
+bool CSettings::OnAnisotropicChanged ( CGUIElement* pElement )
+{
+    int iAnisotropic = Min < int > ( m_iMaxAnisotropic, ( m_pAnisotropic->GetScrollPosition () ) * ( m_iMaxAnisotropic + 1 ) );
+
+    SString strLabel;
+    if ( iAnisotropic > 0 )
+        strLabel = SString ( "%ix", 1 << iAnisotropic );
+    else
+        strLabel = "Off";
+
+    m_pAnisotropicValueLabel->SetText ( strLabel );
     return true;
 }
 
