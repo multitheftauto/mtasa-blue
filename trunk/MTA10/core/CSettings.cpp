@@ -494,12 +494,12 @@ void CSettings::CreateGUI ( void )
     m_pComboResolution->SetReadOnly ( true );
 
     m_pCheckBoxWindowed = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Windowed", true ) );
-    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY - 3.0f ) );
+    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY - 3.0f ) );
     m_pCheckBoxWindowed->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     float fPosY =  vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Full Screen Minimize", true ) );
-    m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, fPosY + 13.0f ) );
+    m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, fPosY + 13.0f ) );
     m_pCheckBoxMinimize->SetSize ( CVector2D ( 224.0f, 16.0f ) );
     if ( !GetVideoModeManager ()->IsMultiMonitor () )
     {
@@ -508,7 +508,7 @@ void CSettings::CreateGUI ( void )
     }
 
     m_pCheckBoxDisableAero = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Disable Aero Desktop", true ) );
-    m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY + 29.0f ) );
+    m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 29.0f ) );
     m_pCheckBoxDisableAero->SetSize ( CVector2D ( 224.0f, 16.0f ) );
     if ( GetApplicationSetting ( "os-version" ) < "6.1" || GetApplicationSettingInt ( "aero-changeable" ) == 0 )
     {
@@ -517,7 +517,7 @@ void CSettings::CreateGUI ( void )
     }
 
     m_pCheckBoxMipMapping = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Mip Mapping", true ) );
-    m_pCheckBoxMipMapping->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY + 45.0f ) );
+    m_pCheckBoxMipMapping->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 45.0f ) );
     m_pCheckBoxMipMapping->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 #ifndef MIP_MAPPING_SETTING_APPEARS_TO_DO_SOMETHING
     m_pCheckBoxMipMapping->SetVisible ( false );
@@ -569,8 +569,12 @@ void CSettings::CreateGUI ( void )
     m_pComboFxQuality->SetReadOnly ( true );
 
     m_pCheckBoxVolumetricShadows = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Volumetric Shadows", true ) );
-    m_pCheckBoxVolumetricShadows->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY + 2.0f ) );
+    m_pCheckBoxVolumetricShadows->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 2.0f ) );
     m_pCheckBoxVolumetricShadows->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
+    m_pCheckBoxGrass = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Grass effect", true ) );
+    m_pCheckBoxGrass->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 22.0f ) );
+    m_pCheckBoxGrass->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pAnisotropicLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Anisotropic filtering:" ) );
     m_pAnisotropicLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
@@ -1138,6 +1142,12 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     m_pCheckBoxVolumetricShadows->SetSelected ( bVolumetricShadowsEnabled );
     m_pCheckBoxVolumetricShadows->SetEnabled ( FxQuality != 0 );
 
+    // Grass
+    bool bGrassEnabled;
+    CVARS_GET ( "grass", bGrassEnabled );
+    m_pCheckBoxGrass->SetSelected ( bGrassEnabled );
+    m_pCheckBoxGrass->SetEnabled ( FxQuality != 0 );
+
     VideoMode           vidModemInfo;
     int                 vidMode, numVidModes;
 
@@ -1320,6 +1330,8 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
     CVARS_SET ("aspect_ratio", ASPECT_RATIO_AUTO );
     CVARS_SET ("anisotropic", 0 );
     CVARS_SET ("volumetric_shadows", false );
+    CVARS_SET ( "grass", true );
+
     // change
     bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( 0, false, false );
 
@@ -2151,6 +2163,12 @@ void CSettings::LoadData ( void )
 	m_pCheckBoxVolumetricShadows->SetSelected ( bVolumetricShadowsEnabled );
 	m_pCheckBoxVolumetricShadows->SetEnabled ( FxQuality != 0 );
 
+    // Grass
+    bool bGrassEnabled;
+    CVARS_GET ( "grass", bGrassEnabled );
+    m_pCheckBoxGrass->SetSelected ( bGrassEnabled );
+    m_pCheckBoxGrass->SetEnabled ( FxQuality != 0 );
+
     VideoMode           vidModemInfo;
     int                 vidMode, numVidModes;
 
@@ -2408,6 +2426,11 @@ void CSettings::SaveData ( void )
     bool bVolumetricShadowsEnabled = m_pCheckBoxVolumetricShadows->GetSelected ();
     CVARS_SET ( "volumetric_shadows", bVolumetricShadowsEnabled );
 	gameSettings->SetVolumetricShadowsEnabled ( bVolumetricShadowsEnabled );
+
+    // Grass
+    bool bGrassEnabled = m_pCheckBoxGrass->GetSelected ();
+    CVARS_SET ( "grass", bGrassEnabled );
+	gameSettings->SetGrassEnabled ( bGrassEnabled );
 
     // Async loading
     if ( CGUIListItem* pSelected = m_pAsyncCombo->GetSelectedItem () )
@@ -3051,9 +3074,13 @@ bool CSettings::OnFxQualityChanged ( CGUIElement* pElement )
     {
         m_pCheckBoxVolumetricShadows->SetSelected ( false );
         m_pCheckBoxVolumetricShadows->SetEnabled ( false );
+        m_pCheckBoxGrass->SetEnabled ( false );
     }
     else
+    {
         m_pCheckBoxVolumetricShadows->SetEnabled ( true );
+        m_pCheckBoxGrass->SetEnabled ( true );
+    }
         
     return true;
 }
