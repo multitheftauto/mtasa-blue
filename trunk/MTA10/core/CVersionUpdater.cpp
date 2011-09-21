@@ -702,7 +702,13 @@ void CVersionUpdater::ResetEverything ()
 ///////////////////////////////////////////////////////////////
 bool CVersionUpdater::IsBusy ( void )
 {
-    return m_Stack.size () || ( m_CurrentProgram.IsValid () );
+    if ( m_Stack.size () || ( m_CurrentProgram.IsValid () ) )
+        return true;
+    if ( GetQuestionBox ().IsVisible () )
+        return true;
+    if ( CCore::GetSingleton ().WillRequestNewNickOnStart() )
+        return true;
+    return false;
 }
 
 
