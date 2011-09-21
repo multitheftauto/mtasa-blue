@@ -229,6 +229,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "volumetric_shadows",         0 );                            // Enable volumetric shadows
     DEFAULT ( "aspect_ratio",               0 );                            // Display aspect ratio
     DEFAULT ( "anisotropic",                0 );                            // Anisotropic filtering
+    DEFAULT ( "grass",                      1 );                            // Enable grass
 
     // We will default this one at CClientGame.cpp, because we need a valid direct3d device to give a proper default value.
 #if 0
