@@ -402,6 +402,7 @@ public:
     {
         char Name[128];
         int InstalledMemoryKB;
+        int MaxAnisotropicSetting;
     };
 
     struct SCallState

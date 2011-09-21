@@ -127,6 +127,9 @@ public:
     virtual eAspectRatio    GetAspectRatio          ( void ) = 0;
     virtual void            SetAspectRatio          ( eAspectRatio aspectRatio ) = 0;
 
+    virtual bool            IsGrassEnabled          ( void ) = 0;
+    virtual void            SetGrassEnabled         ( bool bEnable ) = 0;
+
     virtual void            Save                    ( void ) = 0;
 };
 
