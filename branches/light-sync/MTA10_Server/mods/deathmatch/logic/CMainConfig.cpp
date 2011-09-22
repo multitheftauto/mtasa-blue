@@ -609,6 +609,8 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "ase", CConsoleCommands::Ase, false );
     RegisterCommand ( "openports", CConsoleCommands::OpenPortsTest, false );
 
+    RegisterCommand ( "checkls", CConsoleCommands::CheckLightSync, false );
+
     return true;
 }
 

@@ -1928,3 +1928,21 @@ bool CConsoleCommands::OpenPortsTest ( CConsole* pConsole, const char* szArgumen
     }
     return false;
 }
+
+bool CConsoleCommands::CheckLightSync ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    if ( pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    {
+        if ( szArguments && szArguments[0] )
+        {
+            CLightsyncManager* pLightSyncManager = g_pGame->GetLightSyncManager ( );
+            if ( pLightSyncManager->FindPlayer ( szArguments ) )
+            {
+                pEchoClient->SendConsole ( SString ( "Player %s Found.", szArguments ) );
+                return true;
+            }
+            pEchoClient->SendConsole ( SString ( "Player not Found.", szArguments ) );
+        }
+    }
+    return false;
+}

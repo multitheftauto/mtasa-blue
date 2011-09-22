@@ -30,6 +30,21 @@ void CLightsyncManager::RegisterPlayer ( CPlayer* pPlayer )
     m_Queue.push_back ( entry );
 }
 
+CPlayer* CLightsyncManager::FindPlayer ( const char* szArguments )
+{    
+    for ( std::list<SEntry>::iterator iter = m_Queue.begin();
+          iter != m_Queue.end (); )
+    {
+        SEntry& entry = *iter;
+        if ( strcmp ( entry.pPlayer->GetNick ( ), szArguments ) == 0 )
+        {
+            return entry.pPlayer;
+        }
+
+         ++iter;
+    }
+    return NULL;
+}
 
 void CLightsyncManager::UnregisterPlayer ( CPlayer* pPlayer )
 {

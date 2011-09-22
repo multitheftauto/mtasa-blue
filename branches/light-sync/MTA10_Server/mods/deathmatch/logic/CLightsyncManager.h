@@ -34,6 +34,7 @@ public:
 
     void            RegisterPlayer          ( CPlayer* pPlayer );
     void            UnregisterPlayer        ( CPlayer* pPlayer );
+    CPlayer*        FindPlayer              ( const char* szArguments );
 
 private:
     enum EEntryType
