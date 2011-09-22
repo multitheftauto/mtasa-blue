@@ -164,9 +164,6 @@ void CLightsyncManager::DoPulse ()
                     pPlayer->Send ( packet );
 
                 RegisterPlayer ( pPlayer );
-                pPlayer->SetLastLightSyncPosition ( pPlayer->GetPosition () );
-                CVector vecPos = pPlayer->GetPosition ();
-                CLogger::LogPrintf ( "LS: Player %s: light sync position saved as x:%f, y:%f, z:%f\n", pPlayer->GetNick (), vecPos.fX, vecPos.fY, vecPos.fZ );
                 break;
             }
 

@@ -35,20 +35,12 @@ bool CLightsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 
         float fDistance = DistanceBetweenPoints3D ( pPlayer->GetPosition(), pPlayer->GetLastLightSyncPosition() );
         CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
-        bSyncPosition = ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 ) && ( fDistance > 0.001f );
+        //bSyncPosition = ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 ) && ( fDistance > 0.001f );
+        bSyncPosition = ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 );
         if ( pPlayer->GetLastLightSyncPosition ( ) == CVector ( 3000, 3000, 3000 ) )
         {
             // If we don't have a previous lightsync position... create one
             bSyncPosition = true;
-        }
-
-        if ( bSyncPosition == false )
-        {
-            if ( pPlayer->GetOccupiedVehicleSeat () == 0 )
-            {
-                CVector vecPosition = pPlayer->GetPosition();
-                CLogger::LogPrintf ( "LS: Player %s: light sync comparison failed x:%f, y:%f, z:%f, distance:%f\n", pPlayer->GetNick (), vecPosition.fX, vecPosition.fY, vecPosition.fZ, fDistance );
-            }
         }
 
         BitStream.Write ( pPlayer->GetID () );
