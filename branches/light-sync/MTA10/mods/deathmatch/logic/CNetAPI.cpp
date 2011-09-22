@@ -56,6 +56,8 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
                     // Read out and apply the lightsync data
                     ReadLightweightSync ( pPlayer, BitStream );
                 }
+                else
+                    g_pCore->GetConsole ()->Print ( "Player not found." );
             }
             return true;
         }
@@ -1816,7 +1818,7 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
     SPlayerHealthSync health;
     SPlayerArmorSync armor;
     SLowPrecisionVehicleHealthSync vehicleHealth;
-    SLowPrecisionPositionSync pos;
+    SPositionSync pos;
     // Read out the sync time context. See CClientEntity for documentation on that.
     if ( !BitStream.Read ( ucSyncTimeContext ) )
     {
@@ -1853,6 +1855,7 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
     }
     if ( bReadPosition )
     {
+        g_pCore->GetConsole ()->Printf ( "reading position sync for: %s", pPlayer->GetName() );
         if ( !BitStream.Read ( &pos ) )
         {
             g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Position Error 2." );
