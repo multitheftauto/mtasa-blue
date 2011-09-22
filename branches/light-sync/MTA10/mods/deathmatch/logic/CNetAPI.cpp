@@ -1855,7 +1855,7 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
     }
     if ( bReadPosition )
     {
-        g_pCore->GetConsole ()->Printf ( "reading position sync for: %s", pPlayer->GetName() );
+        g_pCore->GetConsole ()->Printf ( "reading position sync for: %s", pPlayer->GetNick() );
         if ( !BitStream.Read ( &pos ) )
         {
             g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Position Error 2." );

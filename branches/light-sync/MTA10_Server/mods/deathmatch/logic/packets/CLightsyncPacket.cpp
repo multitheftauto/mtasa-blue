@@ -84,8 +84,6 @@ bool CLightsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                 health.data.fValue = pVehicle->GetHealth ();
                 BitStream.Write ( &health );
             }
-            pPlayer->SetLastLightSyncPosition ( pPlayer->GetPosition () );
-            CLogger::LogPrintf ( "LS: Player %s: light sync position saved as x:%f, y:%f, z:%f\n", pPlayer->GetNick (), pos.data.vecPosition.fX, pos.data.vecPosition.fY, pos.data.vecPosition.fZ );
         }
     }
 
