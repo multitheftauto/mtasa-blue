@@ -92,7 +92,12 @@ void CClientSoundManager::DoPulse ( void )
     list < CClientSound* > ::iterator iter = m_Sounds.begin ();
     for ( ; iter != m_Sounds.end () ; ++iter )
     {
-        (*iter)->Process3D ( vecPosition, vecCameraPosition, vecLookAt );
+        CClientSound* pSound = *iter;
+        pSound->Process3D ( vecPosition, vecCameraPosition, vecLookAt );
+
+        // Delete sound if finished
+        if ( pSound->IsFinished () )
+            g_pClientGame->GetElementDeleter()->Delete ( pSound );
     }
     UpdateDistanceStreaming ( vecPosition );
 }
