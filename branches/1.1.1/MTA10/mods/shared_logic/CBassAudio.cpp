@@ -113,6 +113,7 @@ bool CBassAudio::BeginLoadingMedia ( void )
 
         BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_FREQ, &m_fDefaultFrequency );
         m_bPendingPlay = true;
+        SetFinishedCallbacks ();
         OutputDebugLine ( "sound loaded" );
     }
 
@@ -209,6 +210,7 @@ void CBassAudio::CompleteStreamConnect ( HSTREAM pSound )
 
         // Set a Callback function for download finished or connection closed prematurely
         BASS_ChannelSetSync ( pSound, BASS_SYNC_DOWNLOAD, 0, &DownloadSync, this );
+        SetFinishedCallbacks ();
 
         // get the broadcast name
         const char* szIcy;
@@ -251,6 +253,42 @@ void CBassAudio::CompleteStreamConnect ( HSTREAM pSound )
     AddQueuedEvent ( SOUND_EVENT_STREAM_RESULT, m_strStreamName, GetLength (), pSound ? true : false );
 }
 
+
+//
+// Finish detection
+//
+void CALLBACK EndSync ( HSYNC handle, DWORD channel, DWORD data, void* user )
+{
+    CBassAudio* pBassAudio = static_cast <CBassAudio*> ( user );
+    pBassAudio->bEndSync = true;
+}
+
+void CALLBACK FreeSync ( HSYNC handle, DWORD channel, DWORD data, void* user )
+{
+    CBassAudio* pBassAudio = static_cast <CBassAudio*> ( user );
+    pBassAudio->bFreeSync = true;
+}
+
+
+void CBassAudio::SetFinishedCallbacks ( void )
+{
+    BASS_ChannelSetSync ( m_pSound, BASS_SYNC_END, 0, &EndSync, this );
+    BASS_ChannelSetSync ( m_pSound, BASS_SYNC_FREE, 0, &FreeSync, this );
+}
+
+
+//
+// CBassAudio::IsFinished
+//
+bool CBassAudio::IsFinished ( void )
+{
+    // Sound is determined finished if BASS has freed the sound handle
+    if ( bFreeSync )
+        return true;
+    return false;
+}
+
+
 //
 //
 // Lake of sets
@@ -274,7 +312,10 @@ void CBassAudio::SetPlayPosition ( double dPosition )
     // Only relevant for non-streams, which are always ready if valid
     if ( m_pSound )
     {
-        BASS_ChannelSetPosition( m_pSound, BASS_ChannelSeconds2Bytes( m_pSound, dPosition ), BASS_POS_BYTE );
+        // Make sure position is in range
+        QWORD bytePosition = BASS_ChannelSeconds2Bytes( m_pSound, dPosition );
+        QWORD byteLength = BASS_ChannelGetLength( m_pSound, BASS_POS_BYTE );
+        BASS_ChannelSetPosition( m_pSound, Clamp < QWORD > ( 0, bytePosition, byteLength - 1 ), BASS_POS_BYTE );
     }
 }
 

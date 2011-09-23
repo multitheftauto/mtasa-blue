@@ -213,9 +213,12 @@ void CLuaMain::InstructionCountHook ( lua_State* luaVM, lua_Debug* pDebug )
         {
             // Print it in the console
             CLogger::ErrorPrintf ( "Infinite/too long execution (%s)\n", pLuaMain->GetScriptNamePointer () );
-
+            
+            SString strAbortInf = "Aborting; infinite running script in ";
+            strAbortInf += pLuaMain->GetScriptNamePointer ();
+            
             // Error out
-            lua_pushstring ( luaVM, "Aborting; infinite running script" );
+            lua_pushstring ( luaVM, strAbortInf );
             lua_error ( luaVM );
         }
     }
