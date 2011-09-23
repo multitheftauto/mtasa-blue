@@ -100,11 +100,11 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
     m_llNearListUpdateTime = 0;
 
-    m_vecLastLightSyncPosition = CVector ( 3000, 3000, 3000 );
-
     // Add us to the manager
     pPlayerManager->AddToList ( this );
     m_iLastZoneDebug = 0;
+
+    m_bPositionHasChanged = false;
 }
 
 
@@ -729,4 +729,20 @@ void CPlayer::UpdateOthersNearList ( void )
             }
         }
     }
+}
+//
+// Here to add player specific information to SetPosition
+// - Light sync: Added m_bPositionHasChanged so ls knows the last synced values
+//
+void CPlayer::SetPosition ( const CVector &vecPosition )
+{
+    if ( vecPosition != m_vecPosition )
+    {
+        // Light Sync
+        SetSyncLightPosition ( true );
+    }
+    // Copied from CElement.
+    m_vecLastPosition = m_vecPosition;
+    m_vecPosition = vecPosition;
+    UpdateSpatialData ();
 }

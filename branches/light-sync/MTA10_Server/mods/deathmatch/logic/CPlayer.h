@@ -229,6 +229,10 @@ public:
     std::map < CPlayer*, int >&                 GetNearPlayerList           ( void )                        { return m_NearPlayerList; }
 
 public:
+
+    //
+    // Light Sync
+    //
     struct SLightweightSyncData
     {
         SLightweightSyncData ()
@@ -237,6 +241,7 @@ public:
             health.bSync = false;
             vehicleHealth.uiContext = 0;
             vehicleHealth.bSync = false;
+            m_bSyncPosition = false;
         }
 
         struct
@@ -254,12 +259,18 @@ public:
             bool            bSync;
             unsigned int    uiContext;
         } vehicleHealth;
+
+        bool m_bSyncPosition;
     };
     SLightweightSyncData&                       GetLightweightSyncData      ( void )                      { return m_lightweightSyncData; }
 
-    const CVector                               GetLastLightSyncPosition    ( void )                      { return m_vecLastLightSyncPosition; }
-    void                                        SetLastLightSyncPosition    ( CVector vecPosition )       { m_vecLastLightSyncPosition = vecPosition; }
+    void                                        SetPosition                 ( const CVector &vecPosition );
+    bool                                        GetSyncLightPosition        ( void )                        { return m_bPositionHasChanged; }
+    void                                        SetSyncLightPosition        ( bool bPositionHasChanged )    { m_bPositionHasChanged = bPositionHasChanged; }
 
+    //
+    // End Light Sync
+    //
 
     eVoiceState                                 GetVoiceState               ( void )                      { return m_VoiceState; }
     void                                        SetVoiceState               ( eVoiceState State )         { m_VoiceState = State; }
@@ -384,7 +395,7 @@ private:
     CVector                                     m_vecCamFwd;
     int                                         m_iLastZoneDebug;
 
-    CVector                                     m_vecLastLightSyncPosition;
+    bool                                        m_bPositionHasChanged;
 };
 
 #endif

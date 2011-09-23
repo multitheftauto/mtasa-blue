@@ -32,16 +32,15 @@ bool CLightsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     {
         CPlayer* pPlayer = *iter;
         CPlayer::SLightweightSyncData& data = pPlayer->GetLightweightSyncData ();
-
-        float fDistance = DistanceBetweenPoints3D ( pPlayer->GetPosition(), pPlayer->GetLastLightSyncPosition() );
         CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
-        //bSyncPosition = ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 ) && ( fDistance > 0.001f );
-        bSyncPosition = ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 );
-        if ( pPlayer->GetLastLightSyncPosition ( ) == CVector ( 3000, 3000, 3000 ) )
+
+        // trick to reduce delay between position syncing by making sure the values always match.
+        if ( data.m_bSyncPosition == false && pPlayer->GetSyncLightPosition ( ) == true )
         {
-            // If we don't have a previous lightsync position... create one
-            bSyncPosition = true;
+            pPlayer->SetSyncLightPosition ( true );
+            data.m_bSyncPosition = true;
         }
+        bSyncPosition = ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 ) && data.m_bSyncPosition;
 
         BitStream.Write ( pPlayer->GetID () );
         BitStream.Write ( (unsigned char)pPlayer->GetSyncTimeContext () );
@@ -64,7 +63,7 @@ bool CLightsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.WriteBit ( bSyncPosition );
         if ( bSyncPosition )
         {
-            SPositionSync pos;
+            SLowPrecisionPositionSync pos;
             pos.data.vecPosition = pPlayer->GetPosition ();
             BitStream.Write ( &pos );
 

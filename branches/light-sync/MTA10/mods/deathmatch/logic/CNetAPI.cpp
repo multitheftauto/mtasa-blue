@@ -1818,7 +1818,7 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
     SPlayerHealthSync health;
     SPlayerArmorSync armor;
     SLowPrecisionVehicleHealthSync vehicleHealth;
-    SPositionSync pos;
+    SLowPrecisionPositionSync pos;
     // Read out the sync time context. See CClientEntity for documentation on that.
     if ( !BitStream.Read ( ucSyncTimeContext ) )
     {
