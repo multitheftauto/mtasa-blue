@@ -35,11 +35,8 @@ bool CLightsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
 
         // trick to reduce delay between position syncing by making sure the values always match.
-        if ( data.m_bSyncPosition == false && pPlayer->GetSyncLightPosition ( ) == true )
-        {
-            pPlayer->SetSyncLightPosition ( true );
-            data.m_bSyncPosition = true;
-        }
+        data.m_bSyncPosition = data.m_bSyncPosition || pPlayer->HasPositionChanged();
+
         bSyncPosition = ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 ) && data.m_bSyncPosition;
 
         BitStream.Write ( pPlayer->GetID () );

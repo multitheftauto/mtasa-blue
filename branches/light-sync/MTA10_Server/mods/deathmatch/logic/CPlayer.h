@@ -265,8 +265,8 @@ public:
     SLightweightSyncData&                       GetLightweightSyncData      ( void )                      { return m_lightweightSyncData; }
 
     void                                        SetPosition                 ( const CVector &vecPosition );
-    bool                                        GetSyncLightPosition        ( void )                        { return m_bPositionHasChanged; }
-    void                                        SetSyncLightPosition        ( bool bPositionHasChanged )    { m_bPositionHasChanged = bPositionHasChanged; }
+    bool                                        HasPositionChanged          ( void )                        { return m_bPositionHasChanged; }
+    void                                        MarkPositionAsChanged       ( bool bPositionHasChanged )    { m_bPositionHasChanged = bPositionHasChanged; }
 
     //
     // End Light Sync

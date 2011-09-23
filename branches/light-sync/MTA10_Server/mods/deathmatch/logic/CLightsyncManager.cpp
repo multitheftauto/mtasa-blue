@@ -152,8 +152,8 @@ void CLightsyncManager::DoPulse ()
                             }
                             
                             // Copy the pPlayer's sync bool to the light sync data.
-                            currentData.m_bSyncPosition = pPlayer->GetSyncLightPosition ( );
-                            pPlayer->SetSyncLightPosition ( false );
+                            currentData.m_bSyncPosition = pPlayer->HasPositionChanged ( );
+                            pPlayer->MarkPositionAsChanged ( false );
 
                             if ( packet.Count () == LIGHTSYNC_MAX_PLAYERS )
                             {

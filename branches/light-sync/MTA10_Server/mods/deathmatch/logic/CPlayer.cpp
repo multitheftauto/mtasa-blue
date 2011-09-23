@@ -736,13 +736,10 @@ void CPlayer::UpdateOthersNearList ( void )
 //
 void CPlayer::SetPosition ( const CVector &vecPosition )
 {
-    if ( vecPosition != m_vecPosition )
+    if ( ( vecPosition - m_vecPosition ).Length() > 0.001f )
     {
         // Light Sync
-        SetSyncLightPosition ( true );
+        MarkPositionAsChanged ( true );
     }
-    // Copied from CElement.
-    m_vecLastPosition = m_vecPosition;
-    m_vecPosition = vecPosition;
-    UpdateSpatialData ();
+    CElement::SetPosition ( vecPosition );
 }
