@@ -190,7 +190,7 @@ private:
     class CDummy*           m_pResourceElement;
     class CDummy*           m_pResourceDynamicElementRoot;
 
-    list<CInfoValue *>      m_infoValues;
+    list<CInfoValue>        m_infoValues;
     list<CIncludedResources *>  m_includedResources; // we store them here temporarily, then read them once all the resources are loaded
     list<CResourceFile *>   m_resourceFiles;
     list<CResource *>       m_dependents; // resources that have "included" or loaded this one

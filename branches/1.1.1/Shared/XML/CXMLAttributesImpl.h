@@ -30,6 +30,7 @@ public:
 
     class CXMLAttribute*            Create                      ( const char* szName );
     class CXMLAttribute*            Create                      ( const class CXMLAttribute& Copy );
+    bool                            Delete                      ( const char* szName );
     void                            DeleteAll                   ( void );
 
     TiXmlElement&                   GetNode                     ( void );
