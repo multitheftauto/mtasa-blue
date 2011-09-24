@@ -807,6 +807,10 @@ void CPlayer::MovePlayerToFarList ( CPlayer* pOther )
 //
 bool CPlayer::IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo )
 {
+    // Get correct camera position when dead
+    if ( m_bIsDead )
+        GetCamera ()->GetPosition ( m_vecCamPosition );
+
     int iZone = GetSyncZone ( pOther );
 
     int iUpdateInterval = g_pBandwidthSettings->ZoneUpdateIntervals [ iZone ];
