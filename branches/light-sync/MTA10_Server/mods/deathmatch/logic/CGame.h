@@ -64,10 +64,6 @@ class CGame;
 
 #include "CLightsyncManager.h"
 
-#ifdef MTA_VOICE
-#include "../../../Voice/VoiceServerAPI.h"
-#endif
-
 // Forward declarations
 class ASE;
 class CAccessControlListManager;

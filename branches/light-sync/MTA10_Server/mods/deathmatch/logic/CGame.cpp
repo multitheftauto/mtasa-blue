@@ -1767,30 +1767,67 @@ void CGame::Packet_PlayerTimeout ( CPlayerTimeoutPacket& Packet )
 // Relay this (pure sync) packet to all the other players using distance rules
 void CGame::RelayPlayerPuresync ( CPacket& Packet )
 {
+    UpdateModuleTickCount64 ();
+
     // Make a list of players to send this packet to
     std::vector < CPlayer* > sendList;
 
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
-    // Insert into other players near list if appropriate
-    pPlayer->UpdateOthersNearList ();
 
-    // Use this players near list for sending packets
-    std::map < CPlayer*, int >& nearList = pPlayer->GetNearPlayerList ();
-
-    for ( std::map < CPlayer*, int > ::iterator it = nearList.begin (); it != nearList.end (); )
+    //
+    // Process far sync (only if light sync is not active)
+    //
+    if ( pPlayer->IsTimeForFarSync () )
     {
-        CPlayer* pSendPlayer = it->first;
-        int& iCount = it->second;
-        if ( --iCount < 1 )
+        long long llTickCountNow = GetModuleTickCount64 ();
+        // Use this players far list
+        std::map < CPlayer*, SNearInfo >& farList = pPlayer->GetFarPlayerList ();
+
+        // For each far player
+        for ( std::map < CPlayer*, SNearInfo > ::iterator it = farList.begin (); it != farList.end (); ++it )
         {
-            // Remove player from near list (Has to be not near for 5 calls to get removed (The delay ensures timely updates of players moving far away))
-            nearList.erase ( it++ );
+            CPlayer* pSendPlayer = it->first;
+            SNearInfo& nearInfo = it->second;
+
+            nearInfo.llLastUpdateTime = llTickCountNow;
+            sendList.push_back ( pSendPlayer );
         }
-        else
+    }
+
+    //
+    // Process near sync
+    //
+    {
+        // Insert into other players near list if appropriate
+        pPlayer->UpdateOthersNearList ();
+
+        // Use this players near list for sending packets
+        std::map < CPlayer*, SNearInfo >& nearList = pPlayer->GetNearPlayerList ();
+
+        // Array for holding players that need moving to the far list
+        std::vector < CPlayer* > moveToFarListList;
+
+        // For each near player
+        for ( std::map < CPlayer*, SNearInfo > ::iterator it = nearList.begin (); it != nearList.end (); ++it )
         {
-            if ( pSendPlayer->GetDimension() == pPlayer->GetDimension() )
-                pSendPlayer->Send ( Packet );
-            it++;
+            CPlayer* pSendPlayer = it->first;
+            SNearInfo& nearInfo = it->second;
+            if ( --nearInfo.iCount < 1 )
+            {
+                // Remove player from near list (Has to be not near for 5 calls to get removed (The delay ensures timely updates of players moving far away))
+                moveToFarListList.push_back ( pSendPlayer );
+            }
+            else
+            {
+                if ( pSendPlayer->IsTimeToReceiveNearSyncFrom ( pPlayer, nearInfo ) )
+                    sendList.push_back ( pSendPlayer );
+            }
+        }
+
+        // Do pending near->far list moves
+        for ( std::vector < CPlayer* > ::const_iterator iter = moveToFarListList.begin (); iter != moveToFarListList.end (); ++iter )
+        {
+            pPlayer->MovePlayerToFarList ( *iter );
         }
     }
 

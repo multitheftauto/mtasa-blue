@@ -208,6 +208,8 @@ public:
     inline unsigned char                        GetBlurLevel                ( void )                        { return m_ucBlurLevel; }
     inline void                                 SetBlurLevel                ( unsigned char ucBlurLevel )   { m_ucBlurLevel = ucBlurLevel; }
 
+    bool                                        IsTimeForFarSync            ( void );
+
     // Sync stuff
     inline void                                 SetSyncingVelocity          ( bool bSyncing )               { m_bSyncingVelocity = bSyncing; }
     inline bool                                 IsSyncingVelocity           ( void ) const                  { return m_bSyncingVelocity; }
@@ -225,8 +227,13 @@ public:
     bool                                        GetWeaponCorrect            ( void );
 
     void                                        UpdateOthersNearList        ( void );
-    void                                        AddNearPlayer               ( CPlayer* other )              { m_NearPlayerList [ other ] = 5; }
-    std::map < CPlayer*, int >&                 GetNearPlayerList           ( void )                        { return m_NearPlayerList; }
+    void                                        RefreshNearPlayer           ( CPlayer* pOther );
+    std::map < CPlayer*, SNearInfo >&           GetNearPlayerList           ( void )                        { return m_NearPlayerList; }
+    std::map < CPlayer*, SNearInfo >&           GetFarPlayerList            ( void )                        { return m_FarPlayerList; }
+    void                                        AddPlayerToDistLists        ( CPlayer* pOther );
+    void                                        RemovePlayerFromDistLists   ( CPlayer* pOther );
+    void                                        MovePlayerToNearList        ( CPlayer* pOther );
+    void                                        MovePlayerToFarList         ( CPlayer* pOther );
 
 public:
 
@@ -373,6 +380,8 @@ private:
 
     unsigned char                               m_ucBlurLevel;
 
+    long long                                   m_llNextFarSyncTime;       
+
     // Voice
     eVoiceState                                 m_VoiceState;
     std::list < CElement* >                     m_lstBroadcastList;
@@ -388,7 +397,8 @@ private:
 
     uint                                        m_uiWeaponIncorrectCount;
 
-    std::map < CPlayer*, int >                  m_NearPlayerList;
+    std::map < CPlayer*, SNearInfo >            m_NearPlayerList;
+    std::map < CPlayer*, SNearInfo >            m_FarPlayerList;
     long long                                   m_llNearListUpdateTime;
 
     CVector                                     m_vecCamPosition;

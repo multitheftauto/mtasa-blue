@@ -890,6 +890,17 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
         MapSet ( m_TransientSettings, "bandwidth_debug", strValue );
         return true;
     }
+    else
+    if ( strName == "lightsync" )
+    {
+        if ( strValue == "0" || strValue == "1" )
+        {
+            // Transient settings go in their own map, so they don't get saved
+            MapSet ( m_TransientSettings, "lightsync", strValue );
+            g_pBandwidthSettings->bLightSyncEnabled = atoi ( strValue );
+            return true;
+        }
+    }
 
 
     //
