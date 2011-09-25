@@ -44,6 +44,42 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
 {
     switch ( bytePacketID )
     { 
+        case PACKET_ID_LIGHTSYNC:
+        {
+            ElementID PlayerID;
+            while ( BitStream.Read ( PlayerID ) == true )
+            {
+                // Grab the player
+                CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
+                if ( pPlayer )
+                {
+                    // Read out and apply the lightsync data
+                    ReadLightweightSync ( pPlayer, BitStream );
+                }
+                else
+                    g_pCore->GetConsole ()->Print ( "Player not found." );
+            }
+            return true;
+        }
+
+        case PACKET_ID_VEHICLE_RESYNC:
+        {
+            // Read out the vehicle ID
+            ElementID VehicleID;
+            if ( BitStream.Read ( VehicleID ) )
+            {
+                // Grab the vehicle
+                CClientVehicle* pVehicle = m_pVehicleManager->Get ( VehicleID );
+                if ( pVehicle )
+                {
+                    // Read out and apply the resync data
+                    ReadVehicleResync ( pVehicle, BitStream );
+                }
+            }
+
+            return true;
+        }
+
         case PACKET_ID_PLAYER_PURESYNC:
         {
             // Read out the player ID
@@ -1770,4 +1806,165 @@ void CNetAPI::RPC ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream, 
         g_pNet->SendPacket ( PACKET_ID_RPC, pRPCBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED, packetOrdering );
         g_pNet->DeallocateNetBitStream ( pRPCBitStream );
     }
+}
+
+void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream )
+{
+    unsigned char ucSyncTimeContext = 0;
+    unsigned short usLatency;
+    bool bReadHealth;
+    bool bReadPosition;
+    bool bReadVehicleHealth;
+    SPlayerHealthSync health;
+    SPlayerArmorSync armor;
+    SLowPrecisionVehicleHealthSync vehicleHealth;
+    SLowPrecisionPositionSync pos;
+    // Read out the sync time context. See CClientEntity for documentation on that.
+    if ( !BitStream.Read ( ucSyncTimeContext ) )
+    {
+        g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Context Error 1." );
+        return;
+    }
+    if ( !BitStream.ReadCompressed ( usLatency ) )
+    {
+        g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Latency Error." );
+        return;
+    }
+    if ( !BitStream.ReadBit ( bReadHealth ) )
+    {
+        g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Health Error 1.");
+        return;
+    }
+    if ( bReadHealth )
+    {
+        if ( !BitStream.Read ( &health ) )
+        {
+            g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Health Error 2." );
+            return;
+        }
+        if ( !BitStream.Read ( &armor ) )
+        {
+            g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Armor Error." );
+            return;
+        }
+    }
+    if ( !BitStream.ReadBit ( bReadPosition ) )
+    {
+        g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Position Error 1." );
+        return;
+    }
+    if ( bReadPosition )
+    {
+        g_pCore->GetConsole ()->Printf ( "reading position sync for: %s", pPlayer->GetNick() );
+        if ( !BitStream.Read ( &pos ) )
+        {
+            g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Position Error 2." );
+            return;
+        }
+        if ( !BitStream.ReadBit ( bReadVehicleHealth ) )
+        {
+            g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Vehicle Health Error 1." );
+            return;
+        }
+        if ( bReadVehicleHealth )
+        {
+            if ( !BitStream.Read ( &vehicleHealth ) )
+            {
+                g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Vehicle Health Error 2." );
+                return;
+            }
+        }
+    }
+
+    // Only update the sync if this packet is from the same context.
+    if ( !pPlayer->CanUpdateSync ( ucSyncTimeContext ) )
+    {
+        g_pCore->GetConsole ()->Printf ( "ignoring lightweight sync: %u Invalid Sync Context", ucSyncTimeContext );
+        return;
+    }
+
+    // Read out the time it took for the packet to go from the remote client to the server and to us
+
+    pPlayer->SetLatency ( usLatency + g_pNet->GetPing () );
+    pPlayer->SetPing ( usLatency );
+
+    // Check if we must read health
+    if ( bReadHealth )
+    {
+        pPlayer->SetHealth ( health.data.fValue );
+        pPlayer->LockHealth ( health.data.fValue );
+
+        pPlayer->SetArmor ( armor.data.fValue );
+        pPlayer->LockArmor ( armor.data.fValue );
+    }
+
+    if ( bReadPosition )
+    {
+        pPlayer->SetPosition ( pos.data.vecPosition );
+        pPlayer->SetLastPuresyncPosition ( pos.data.vecPosition );
+
+        CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
+        if ( pVehicle )
+        {
+            pVehicle->SetPosition ( pos.data.vecPosition );
+            // Update all the vehicle passengers
+            for ( unsigned int i = 0; i < 8; ++i )
+            {
+                CClientPed* pPassenger = pVehicle->GetOccupant ( i );
+                if ( pPassenger && pPassenger != pPlayer )
+                {
+                    pPassenger->SetPosition ( pos.data.vecPosition );
+                    if ( IS_PLAYER(pPassenger) )
+                    {
+                        CClientPlayer* pPassengerPlayer = static_cast < CClientPlayer* > ( pPassenger );
+                        pPassengerPlayer->SetLastPuresyncTime ( CClientTime::GetTime () );
+                        pPassengerPlayer->SetLastPuresyncPosition ( pos.data.vecPosition );
+                    }
+                }
+            }
+
+
+            if ( bReadVehicleHealth )
+                pVehicle->SetHealth ( vehicleHealth.data.fValue );
+        }
+    }
+
+    pPlayer->SetLastPuresyncTime ( CClientTime::GetTime () );
+    pPlayer->IncrementPlayerSync ();
+}
+
+void CNetAPI::ReadVehicleResync ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream )
+{
+    // Read out vehicle position and rotation
+    SPositionSync position ( false );
+    if ( !BitStream.Read ( &position ) )
+        return;
+
+    SRotationDegreesSync rotation;
+    if ( !BitStream.Read ( &rotation ) )
+        return;
+
+    // Read out the movespeed
+    SVelocitySync velocity;
+    if ( !BitStream.Read ( &velocity ) )
+        return;
+
+    // Read out the turnspeed
+    SVelocitySync turnSpeed;
+    if ( !BitStream.Read ( &turnSpeed ) )
+        return;
+
+    // Read out the vehicle health
+    SVehicleHealthSync health;
+    if ( !BitStream.Read ( &health ) )
+        return;
+    pVehicle->SetHealth ( health.data.fValue );
+
+    // Set the target position and rotation
+    pVehicle->SetPosition ( position.data.vecPosition );
+    pVehicle->SetRotationDegrees ( rotation.data.vecRotation );
+
+    // Apply the correct move and turnspeed
+    pVehicle->SetMoveSpeed ( velocity.data.vecVelocity );
+    pVehicle->SetTurnSpeed ( turnSpeed.data.vecVelocity );
 }

@@ -28,8 +28,6 @@ class CPlayer;
 #include "CObject.h"
 #include "packets/CPacket.h"
 
-#define DISTANCE_FOR_SLOW_SYNCRATE  320
-
 class CKeyBinds;
 class CPlayerCamera;
 
@@ -237,6 +235,50 @@ public:
     void                                        MovePlayerToNearList        ( CPlayer* pOther );
     void                                        MovePlayerToFarList         ( CPlayer* pOther );
 
+public:
+
+    //
+    // Light Sync
+    //
+    struct SLightweightSyncData
+    {
+        SLightweightSyncData ()
+        {
+            health.uiContext = 0;
+            health.bSync = false;
+            vehicleHealth.uiContext = 0;
+            vehicleHealth.bSync = false;
+            m_bSyncPosition = false;
+        }
+
+        struct
+        {
+            float           fLastHealth;
+            float           fLastArmor;
+            bool            bSync;
+            unsigned int    uiContext;
+        } health;
+
+        struct
+        {
+            CVehicle*       lastVehicle;
+            float           fLastHealth;
+            bool            bSync;
+            unsigned int    uiContext;
+        } vehicleHealth;
+
+        bool m_bSyncPosition;
+    };
+    SLightweightSyncData&                       GetLightweightSyncData      ( void )                      { return m_lightweightSyncData; }
+
+    void                                        SetPosition                 ( const CVector &vecPosition );
+    long long                                   GetPositionLastChanged      ( void )                        { return m_llLastPositionHasChanged; }
+    void                                        MarkPositionAsChanged       ( void )                        { m_llLastPositionHasChanged = GetTickCount64_ (); }
+
+    //
+    // End Light Sync
+    //
+
     eVoiceState                                 GetVoiceState               ( void )                      { return m_VoiceState; }
     void                                        SetVoiceState               ( eVoiceState State )         { m_VoiceState = State; }
 
@@ -260,6 +302,8 @@ public:
 
 
 private:
+    SLightweightSyncData                        m_lightweightSyncData;
+
     void                                        WriteCameraModePacket       ( void );
     void                                        WriteCameraPositionPacket   ( void );
 
@@ -359,6 +403,8 @@ private:
     CVector                                     m_vecCamPosition;
     CVector                                     m_vecCamFwd;
     int                                         m_iLastZoneDebug;
+
+    long long                                   m_llLastPositionHasChanged;
 };
 
 #endif
