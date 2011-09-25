@@ -15,6 +15,8 @@
 
 #include "StdInc.h"
 #include "CTileBatcher.h"
+#include "CLine3DBatcher.h"
+extern CCore* g_pCore;
 
 using namespace std;
 
@@ -34,14 +36,12 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
     m_pLineInterface = NULL;
     m_pDXSprite = NULL;
 
-    m_pRenderTarget = NULL;
-    m_pOriginalTarget = NULL;
-
-    m_bIsDrawing = false;
     m_iDebugQueueRefs = 0;
 
     m_pRenderItemManager = new CRenderItemManager ();
     m_pTileBatcher = new CTileBatcher ();
+    m_pLine3DBatcherPreGUI = new CLine3DBatcher ( true );
+    m_pLine3DBatcherPostGUI = new CLine3DBatcher ( false );
     m_bSetRenderTargetEnabled = false;
 }
 
@@ -55,43 +55,10 @@ CGraphics::~CGraphics ( void )
 
     SAFE_DELETE ( m_pRenderItemManager );
     SAFE_DELETE ( m_pTileBatcher );
+    SAFE_DELETE ( m_pLine3DBatcherPreGUI );
+    SAFE_DELETE ( m_pLine3DBatcherPostGUI );
 }
 
-
-void CGraphics::BeginDrawing ( void )
-{
-    if ( !m_bIsDrawing )
-    {
-        m_pGUI->GetRenderingLibrary ()->UTIL_CaptureDeviceState ( );
-        m_pGUI->GetRenderingLibrary ()->BeginDrawing ();
-        
-        if ( m_pRenderTarget ) {
-            // Set the render target we want
-            HRESULT x = m_pDevice->SetRenderTarget ( 0, m_pRenderTarget );
-            assert ( x == D3D_OK );
-
-            // Clear the buffer
-            m_pDevice->Clear ( 0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, D3DCOLOR_XRGB(0,0,0), 1, 0 );
-        } else
-            m_pDevice->SetRenderTarget ( 0, m_pOriginalTarget );
-
-        m_bIsDrawing = true;
-    }
-}
-
-void CGraphics::EndDrawing ( void )
-{
-    if ( m_bIsDrawing )
-    {
-        if ( m_pRenderTarget ) {
-            // Set the render target back to the original one
-            m_pDevice->SetRenderTarget ( 0, m_pOriginalTarget );
-        }
-        m_pGUI->GetRenderingLibrary ()->EndDrawing ();
-        m_pGUI->GetRenderingLibrary ()->UTIL_RestoreDeviceState ( );
-        m_bIsDrawing = false;
-    }
-}
 
 void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, LPD3DXFONT pDXFont )
 {   
@@ -147,93 +114,9 @@ void CGraphics::DrawText ( int iX, int iY, unsigned long dwColor, float fScale, 
 }
 
 
-void CGraphics::DrawText2DA ( int uiX, int uiY, unsigned long ulColor, float fScale, const char* szDisplayText, ... )
-{
-    char szBuffer [ 1024 ];
-    va_list ap;
-    va_start ( ap, szDisplayText );
-    VSNPRINTF ( szBuffer, 1024, szDisplayText, ap );
-    va_end ( ap );
-
-    // Start drawing
-    BeginSingleDrawing ();
-
-    // Draw the text
-    m_pGUI->GetRenderingLibrary ()->DrawText2D ( static_cast < float > ( uiX ), static_cast < float > ( uiY ), ulColor, szBuffer, fScale );
-
-    // End drawing
-    EndSingleDrawing ();
-}
-
-
-void CGraphics::DrawText3DA ( float fX, float fY, float fZ, unsigned long ulColor, float fScale, const char* szDisplayText, ... )
-{
-    char szBuffer [ 1024 ];
-    va_list ap;
-    va_start ( ap, szDisplayText );
-    VSNPRINTF ( szBuffer, 1024, szDisplayText, ap );
-    va_end ( ap );
-
-    // Initialize ViewMatrix
-    D3DMATRIX ViewMatrix;
-    memset ( &ViewMatrix, 0, sizeof ( D3DMATRIX ) );
-
-    // Get the view matrix for billboarding calculation by DrawText3D.
-    CDirect3DData::GetSingleton ( ).GetTransform ( D3DTS_VIEW, &ViewMatrix );
-    //assert ( 0 ); // StoreTransform uses a pretty significant amount of processing
-
-    // Start drawing
-    BeginSingleDrawing ( );
-
-    // Draw this text.
-    m_pGUI->GetRenderingLibrary ( )->DrawText3D ( fX,
-                                                  fY,
-                                                  fZ,
-                                                  &ViewMatrix,
-                                                  ulColor, 
-                                                  szBuffer, 
-                                                  fScale );
-    // End drawing
-    EndSingleDrawing ( );
-}
-
-
-void CGraphics::Draw3DBox ( float fX, float fY, float fZ, float fL, float fW, float fH, DWORD dwColor, bool bWireframe )
-{
-    BeginSingleDrawing ( );
-
-    m_pGUI->GetRenderingLibrary ()->Render3DBox ( fX, fY, fZ, fL, fW, fH, dwColor, bWireframe );
-
-    EndSingleDrawing ( );
-}
-
-
-void CGraphics::DrawLine ( float fX1, float fY1, float fX2, float fY2, unsigned long ulColor )
-{
-   // Start drawing
-    BeginSingleDrawing ( );
-
-    // Draw the line
-    m_pGUI->GetRenderingLibrary ()->DrawLine ( D3DXVECTOR3 ( fX1, fY1, 0 ), D3DXVECTOR3 ( fX2, fY2, 0 ), ulColor );
-
-    // End drawing
-    EndSingleDrawing ( );
-}
-
-
 void CGraphics::DrawLine3D ( const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth )
 {
-    BeginSingleDrawing ();
-
-    m_pGUI->GetRenderingLibrary ()->DrawLine3D (
-        D3DXVECTOR3 ( vecBegin.fX, vecBegin.fY, vecBegin.fZ ),
-        D3DXVECTOR3 ( vecEnd.fX, vecEnd.fY, vecEnd.fZ ),
-        fWidth / 75.0f,
-        NULL,
-        ulColor
-    );
-
-    EndSingleDrawing ();
+    DrawLine3DQueued ( vecBegin, vecEnd, fWidth, ulColor, true );
 }
 
 
@@ -297,28 +180,6 @@ void CGraphics::CalcScreenCoors ( CVector * vecWorld, CVector * vecScreen )
     float fRecip = 1.0f / vecScreen->fZ;
     vecScreen->fX *= fRecip * (*dwLenX);
     vecScreen->fY *= fRecip * (*dwLenY);
-}
-
-
-void CGraphics::Render3DSprite ( float fX, float fY, float fZ, float fScale, unsigned long ulColor )
-{
-    // Initialize ViewMatrix
-    D3DXMATRIX ViewMatrix;
-    memset ( &ViewMatrix, 0, sizeof ( D3DXMATRIX ) );
-
-    // Get the view matrix for billboarding calculation by DrawText3D.
-    CDirect3DData::GetSingleton ( ).GetTransform ( D3DTS_VIEW, &ViewMatrix );
-    //assert ( 0 ); // StoreTransform uses a pretty significant amount of processing
-
-    // Begin drawing
-    BeginSingleDrawing ();
-
-    // Render it
-    D3DXVECTOR3 vec(fX, fY, fZ);
-    m_pGUI->GetRenderingLibrary ()->Render3DSprite ( NULL, 1.0f, &vec, &ViewMatrix, ulColor );
-
-    // End drawing
-    EndSingleDrawing ();
 }
 
 
@@ -416,39 +277,6 @@ eFontType CGraphics::GetFontType ( const char* szFontName )
 }
 
 
-void CGraphics::BeginSingleDrawing ( void )
-{
-    // This function is used to determine if we need to capture the device state and begin drawing or not
-    // and must be called before ANY drawing inside this class. This function will capture the device states
-    // only if they aren't already captured through a BeginDrawing () call made by the client if it's going
-    // to do multiple operations (thus saving the time it takes to do this).
-
-    // We might consider doing a BeginDrawing () before any call to a client function and EndDrawing ()
-    // after, in other words we don't have to worry about the states not getting restored back to GTA.
-    // - ChrML
-
-    // Start drawing?
-    if ( !m_bIsDrawing )
-    {
-        m_pGUI->GetRenderingLibrary ( )->UTIL_CaptureDeviceState ( );
-        m_pGUI->GetRenderingLibrary ()->BeginDrawing ();
-    }
-}
-
-
-void CGraphics::EndSingleDrawing ( void )
-{
-    // See comment in BeginSingleDrawing ()
-
-    // End drawing?
-    if ( !m_bIsDrawing )
-    {
-        m_pGUI->GetRenderingLibrary ()->EndDrawing ();
-        m_pGUI->GetRenderingLibrary ( )->UTIL_RestoreDeviceState ( );
-    }
-}
-
-
 void CGraphics::SetCursorPosition ( int iX, int iY, DWORD Flags )
 {
     m_pDevice->SetCursorPosition ( iX, iY, Flags );
@@ -482,20 +310,14 @@ void CGraphics::DrawLine3DQueued ( const CVector& vecBegin,
                                    unsigned long ulColor,
                                    bool bPostGUI )
 {
-    // Set up a queue item
-    sDrawQueueItem Item;
-    Item.eType = QUEUE_LINE3D;
-    Item.Line3D.fX1 = vecBegin.fX;
-    Item.Line3D.fY1 = vecBegin.fY;
-    Item.Line3D.fZ1 = vecBegin.fZ;
-    Item.Line3D.fX2 = vecEnd.fX;
-    Item.Line3D.fY2 = vecEnd.fY;
-    Item.Line3D.fZ2 = vecEnd.fZ;
-    Item.Line3D.fWidth = fWidth;
-    Item.Line3D.ulColor = ulColor;
+    if ( g_pCore->IsWindowMinimized () )
+        return;
 
     // Add it to the queue
-    AddQueueItem ( Item, bPostGUI );
+    if ( bPostGUI )
+        m_pLine3DBatcherPostGUI->AddLine3D ( vecBegin, vecEnd, fWidth, ulColor ); 
+    else
+        m_pLine3DBatcherPreGUI->AddLine3D ( vecBegin, vecEnd, fWidth, ulColor ); 
 }
 
 
@@ -611,6 +433,9 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
 
         // Convert to wstring        
         Item.strText = MbUTF8ToUTF16(szText);
+
+        // Keep font valid while in the queue incase it's a custom font
+        AddQueueRef ( Item.Text.pDXFont );
 
         // Add it to the queue
         AddQueueItem ( Item, bPostGUI );
@@ -741,7 +566,6 @@ IDirect3DTexture9* CGraphics::LoadTexture ( const char* szFile, unsigned int uiW
     return texture;
 }
 
-extern CCore* g_pCore;
 void CGraphics::DrawTexture ( IDirect3DTexture9* texture, float fX, float fY, float fScaleX, float fScaleY, float fRotation, float fCenterX, float fCenterY, DWORD dwColor )
 {
     if ( !texture )
@@ -766,23 +590,22 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
     LoadStandardDXFonts ();
 
     // Get the original render target
-    assert ( !m_pOriginalTarget );
-    assert ( m_pDevice->GetRenderTarget ( 0, &m_pOriginalTarget ) == D3D_OK );
+    //assert ( !m_pOriginalTarget );
+    //assert ( m_pDevice->GetRenderTarget ( 0, &m_pOriginalTarget ) == D3D_OK );
 
     // Create drawing devices
     D3DXCreateLine ( pDevice, &m_pLineInterface );
     D3DXCreateTextureFromFileInMemory ( pDevice, g_szPixel, sizeof ( g_szPixel ), &m_pDXPixelTexture );
 
     m_pTileBatcher->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pLine3DBatcherPreGUI->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pLine3DBatcherPostGUI->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
     m_pRenderItemManager->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
 }
 
 
 void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
 {
-    assert ( m_pOriginalTarget );
-    SAFE_RELEASE ( m_pOriginalTarget );
-
     for ( int i = 0; i < NUM_FONTS; i++ )
     {
         if( m_pDXFonts[i] ) m_pDXFonts[i]->OnLostDevice ();
@@ -801,10 +624,6 @@ void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
 
 void CGraphics::OnDeviceRestore ( IDirect3DDevice9 * pDevice )
 {
-    // Get the original render target
-    assert ( !m_pOriginalTarget );
-    assert ( m_pDevice->GetRenderTarget ( 0, &m_pOriginalTarget ) == D3D_OK );
-
     for ( int i = 0; i < NUM_FONTS; i++ )
     {
         if( m_pDXFonts[i] ) m_pDXFonts[i]->OnResetDevice ();
@@ -823,6 +642,7 @@ void CGraphics::OnDeviceRestore ( IDirect3DDevice9 * pDevice )
 
 void CGraphics::DrawPreGUIQueue ( void )
 {
+    m_pLine3DBatcherPreGUI->Flush ();
     DrawQueue ( m_PreGUIQueue );
 }
 
@@ -830,6 +650,7 @@ void CGraphics::DrawPreGUIQueue ( void )
 void CGraphics::DrawPostGUIQueue ( void )
 {
     DrawQueue ( m_PostGUIQueue );
+    m_pLine3DBatcherPostGUI->Flush ();
 
     // Both queues should be empty now, and there should be no outstanding refs
     assert ( m_PreGUIQueue.empty () && m_iDebugQueueRefs == 0 );
@@ -867,8 +688,6 @@ void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )
     // Items to draw?
     if ( Queue.size () > 0 )
     {
-        BeginSingleDrawing ();
-
         // Loop through it
         int curMode = 0;
         std::vector < sDrawQueueItem >::iterator iter = Queue.begin ();
@@ -879,7 +698,7 @@ void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )
             // Determine new mode
             uint newMode;
             if ( item.eType == QUEUE_SHADER )                                   newMode = 'tile';
-            else if ( item.eType == QUEUE_LINE || item.eType == QUEUE_LINE3D )  newMode = 'misc';
+            else if ( item.eType == QUEUE_LINE )                                newMode = 'misc';
             else                                                                newMode = 'spri';
 
             // Switching mode ?
@@ -895,8 +714,6 @@ void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )
 
         // Mode clean up
         HandleDrawQueueModeChange ( curMode, 0 );
-
-        EndSingleDrawing ();
 
         // Clear the list
         Queue.clear ();
@@ -947,18 +764,6 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
 
             break;
         }
-        // 3D Line type?
-        case QUEUE_LINE3D:
-        {
-            m_pGUI->GetRenderingLibrary ()->DrawLine3D (
-                D3DXVECTOR3 ( Item.Line3D.fX1, Item.Line3D.fY1, Item.Line3D.fZ1 ),
-                D3DXVECTOR3 ( Item.Line3D.fX2, Item.Line3D.fY2, Item.Line3D.fZ2 ),
-                Item.Line3D.fWidth / 75.0f,
-                NULL,
-                Item.Line3D.ulColor
-            );
-            break;
-        }
         // Rectangle type?
         case QUEUE_RECT:
         {
@@ -981,6 +786,7 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
             D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, NULL );
             m_pDXSprite->SetTransform ( &matrix );        
             Item.Text.pDXFont->DrawTextW ( m_pDXSprite, Item.strText.c_str (), -1, &rect, Item.Text.ulFormat, Item.Text.ulColor );
+            RemoveQueueRef ( Item.Text.pDXFont );
             break;
         }
         case QUEUE_TEXTURE:
@@ -1074,6 +880,9 @@ void CGraphics::ClearDrawQueue ( std::vector < sDrawQueueItem >& Queue )
         const sDrawQueueItem& item = *iter;
         if ( item.eType == QUEUE_TEXTURE || item.eType == QUEUE_SHADER )
             RemoveQueueRef ( item.Texture.pMaterial );
+        else
+        if ( item.eType == QUEUE_TEXT )
+            RemoveQueueRef ( item.Text.pDXFont );
     }
     Queue.clear ();
 }
@@ -1093,6 +902,19 @@ void CGraphics::RemoveQueueRef ( CRenderItem* pRenderItem )
     pRenderItem->Release ();
     m_iDebugQueueRefs--;    // For debugging
 }
+
+void CGraphics::AddQueueRef ( IUnknown* pUnknown )
+{
+    pUnknown->AddRef ();
+    m_iDebugQueueRefs++;    // For debugging
+}
+
+void CGraphics::RemoveQueueRef ( IUnknown* pUnknown )
+{
+    pUnknown->Release ();
+    m_iDebugQueueRefs--;    // For debugging
+}
+
 
 // Entering or leaving a section where the rendertarget can be changed from script
 void CGraphics::EnableSetRenderTarget ( bool bEnable )

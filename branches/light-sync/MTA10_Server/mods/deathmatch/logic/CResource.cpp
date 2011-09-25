@@ -235,10 +235,11 @@ bool CResource::Load ( void )
                     CXMLAttributes * attributes = & ( info->GetAttributes () );
                     if ( attributes )
                     {
+                        m_infoValues.clear ();  // Clear info values to prevent duplicates
                         for ( unsigned int i = 0; i < attributes->Count(); i++ )
                         {
                             CXMLAttribute * attribute = attributes->Get ( i );
-                            m_infoValues.push_back ( new CInfoValue ( attribute->GetName (), attribute->GetValue() ) );
+                            m_infoValues.push_back ( CInfoValue ( attribute->GetName (), attribute->GetValue() ) );
                         }
 
                         CXMLAttribute * version = attributes->Find ( "major" );
@@ -451,12 +452,12 @@ void CResource::TidyUp ( void )
 bool CResource::GetInfoValue ( const char * szKey, std::string& strValue )
 {
     // Loop through all the infovalues looking for the matching key. Return the value.
-    list < CInfoValue* > ::iterator iterr = m_infoValues.begin ();
+    list < CInfoValue > ::iterator iterr = m_infoValues.begin ();
     for ( ; iterr != m_infoValues.end (); iterr++ )
     {
-        if ( stricmp ( (*iterr)->GetName ().c_str (), szKey ) == 0 )
+        if ( stricmp ( (*iterr).GetName ().c_str (), szKey ) == 0 )
         {
-            strValue = (*iterr)->GetValue ();
+            strValue = (*iterr).GetValue ();
             return true;
         }
     }
@@ -467,33 +468,34 @@ bool CResource::GetInfoValue ( const char * szKey, std::string& strValue )
 
 void CResource::SetInfoValue ( const char * szKey, const char * szValue )
 {
+    bool bFoundExisting = false;
+
     // Try to find an existing value with a matching key
-    CInfoValue* pValue = 0;
-    list < CInfoValue* > ::iterator iter = m_infoValues.begin ();
+    list < CInfoValue > ::iterator iter = m_infoValues.begin ();
     for ( ; iter != m_infoValues.end (); iter++ )
     {
         // If the key matches, set the value and return
-        pValue = *iter;
-        if ( stricmp ( pValue->GetName ().c_str (), szKey ) == 0 )
+        if ( stricmp ( (*iter).GetName ().c_str (), szKey ) == 0 )
         {
             if ( !szValue )
-            {
-                delete pValue;
                 iter = m_infoValues.erase ( iter );
-            }
             else
-                pValue->SetValue ( szValue );
-            return;
+                (*iter).SetValue ( szValue );
+
+            bFoundExisting = true;
+            break;
         }
     }
 
-    // There was no matching key.
-    if ( !szValue )         // If we were going to delete the key, we are done at this point
+    // If there was no match and we were going to delete the key, we are done
+    if ( !bFoundExisting && !szValue )
         return;
 
     // If we were going to set a new value, create a new key and add it to our list
-    pValue = new CInfoValue ( szKey, szValue );
-    m_infoValues.push_back ( pValue );
+    if ( !bFoundExisting )
+    {
+        m_infoValues.push_back ( CInfoValue ( szKey, szValue ) );
+    }
 
     // Save to xml
     std::string strPath;
@@ -510,23 +512,24 @@ void CResource::SetInfoValue ( const char * szKey, const char * szValue )
                 CXMLNode* pRootNode = metaFile->GetRootNode ();
                 if ( pRootNode )
                 {
-                    // Create a new map subnode
+                    // Get info attributes
                     CXMLNode* pInfoNode = pRootNode->FindSubNode ( "info" );
-                    if ( pInfoNode )
+                    if ( !pInfoNode )
+                        pInfoNode = pRootNode->CreateSubNode ( "info" );
+
+                    if ( !szValue )
                     {
-                        CXMLAttribute* pAttr = pInfoNode->GetAttributes ().Find ( szKey );
-                        if ( pAttr ) pAttr->SetValue ( szValue );
-                        else pInfoNode->GetAttributes ().Create ( szKey )->SetValue ( szValue );
-                        // Success, write and destroy XML
+                        // Delete existing
+                        pInfoNode->GetAttributes ().Delete ( szKey );
                     }
                     else
                     {
-                        pInfoNode = pRootNode->CreateSubNode ( "info" );
-                        if ( pInfoNode )
-                        {
-                            pInfoNode->GetAttributes ().Create ( szKey )->SetValue ( szValue );
-                        }
+                        // Update/add 
+                        CXMLAttribute* pAttr = pInfoNode->GetAttributes ().Find ( szKey );
+                        if ( pAttr ) pAttr->SetValue ( szValue );
+                        else pInfoNode->GetAttributes ().Create ( szKey )->SetValue ( szValue );
                     }
+
                     metaFile->Write ();
                 }
             }

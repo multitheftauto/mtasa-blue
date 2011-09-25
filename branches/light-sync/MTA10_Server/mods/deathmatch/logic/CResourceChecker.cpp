@@ -11,6 +11,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include <clocale>
 
 
 ///////////////////////////////////////////////////////////////
@@ -310,10 +311,12 @@ void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const stri
     }
 
     // If it's not a UTF8 script, does it contain foreign language characters that should be upgraded?
-    if ( !bUTF8 )
+    if ( !bUTF8 && GetUTF8Confidence ( (unsigned char*)&strLuaSource.at ( 0 ), strLuaSource.length() ) < 80 )
     {
         std::wstring strUTF16Script = ANSIToUTF16 ( strLuaSource );
+        std::setlocale(LC_CTYPE,""); // Temporarilly use locales to read the script
         std::string strUTFScript = UTF16ToMbUTF8 ( strUTF16Script );
+        std::setlocale(LC_CTYPE,"C");
         if ( strLuaSource.length () != strUTFScript.size() )
         {
             // In-place upgrade...

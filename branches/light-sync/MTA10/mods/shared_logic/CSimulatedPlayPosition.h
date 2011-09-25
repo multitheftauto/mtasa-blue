@@ -107,6 +107,16 @@ public:
         return dNewPosition;
     }
 
+    ///////////////////////////////////////////////////////
+    // Check if play position has reached the end
+    bool IsFinished ( void )
+    {
+        if ( !m_bLoop && m_dLength > 0 )
+            return GetPlayPositionNow () == m_dLength;
+        return false;
+    }
+
+
     // Magical code from the internete
     double mod(double x, double y) { return x - y * floor(x / y); }
 };

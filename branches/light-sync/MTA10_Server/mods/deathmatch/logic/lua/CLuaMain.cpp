@@ -17,9 +17,7 @@
 
 #include "StdInc.h"
 
-#ifndef WIN32
 #include <clocale>
-#endif
 
 static CLuaManager* m_pLuaManager;
 
@@ -213,9 +211,12 @@ void CLuaMain::InstructionCountHook ( lua_State* luaVM, lua_Debug* pDebug )
         {
             // Print it in the console
             CLogger::ErrorPrintf ( "Infinite/too long execution (%s)\n", pLuaMain->GetScriptNamePointer () );
-
+            
+            SString strAbortInf = "Aborting; infinite running script in ";
+            strAbortInf += pLuaMain->GetScriptNamePointer ();
+            
             // Error out
-            lua_pushstring ( luaVM, "Aborting; infinite running script" );
+            lua_pushstring ( luaVM, strAbortInf );
             lua_error ( luaVM );
         }
     }
@@ -280,7 +281,9 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
         if ( !bUTF8 && ( uiSize < 5 || cpBuffer[0] != 27 || cpBuffer[1] != 'L' || cpBuffer[2] != 'u' || cpBuffer[3] != 'a' || cpBuffer[4] != 'Q' ) )
         {
             std::string strBuffer = std::string(cpBuffer, uiSize);
+            std::setlocale(LC_CTYPE,""); // Temporarilly use locales to read the script
             strUTFScript = UTF16ToMbUTF8(ANSIToUTF16( strBuffer ));
+            std::setlocale(LC_CTYPE,"C");
             if ( uiSize != strUTFScript.size() )
             {
                 uiSize = strUTFScript.size();

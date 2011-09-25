@@ -22,40 +22,7 @@
 #include "Common.h"
 #include <windows.h>
 #include <stdio.h>
-
-
-//
-// STexInfo and SShadInfo are used for mapping GTA world textures to shaders
-//
-struct STexInfo;
-struct SShadInfo
-{
-    SShadInfo ( const SString& strMatch, CSHADERDUMMY* pShaderData, float fOrderPriority )
-        : strMatch ( strMatch.ToLower () )
-        , pShaderData ( pShaderData )
-        , fOrderPriority ( fOrderPriority )
-    {
-    }
-    const SString           strMatch;           // Always lower case
-    CSHADERDUMMY* const     pShaderData;
-    const float             fOrderPriority;
-    std::set < STexInfo* >  associatedTexInfoMap;
-};
-
-struct STexInfo
-{
-    STexInfo ( ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData )
-        : usTxdId ( usTxdId )
-        , strTextureName ( strTextureName.ToLower () )
-        , pD3DData ( pD3DData )
-        , pAssociatedShadInfo ( NULL )
-    {
-    }
-    const ushort            usTxdId;
-    const SString           strTextureName;     // Always lower case
-    CD3DDUMMY* const        pD3DData;
-    SShadInfo*              pAssociatedShadInfo;
-};
+#include "CRenderWareSA.ShaderSupport.h"
 
 
 class CRenderWareSA : public CRenderWare
@@ -117,13 +84,18 @@ class CRenderWareSA : public CRenderWare
     // Replaces a CClumpModelInfo (or CVehicleModelInfo, since its just for vehicles) clump with a new clump
     void                ReplaceVehicleModel         ( RpClump * pNew, unsigned short usModelID );
 
+    // Replaces a CClumpModelInfo clump with a new clump
+    void                ReplaceWeaponModel         ( RpClump * pNew, unsigned short usModelID );
+
+    void                ReplacePedModel            ( RpClump * pNew, unsigned short usModelID );
+
     // Replaces dynamic parts of the vehicle (models that have two different versions: 'ok' and 'dam'), such as doors
     // szName should be without the part suffix (e.g. 'door_lf' or 'door_rf', and not 'door_lf_dummy')
     bool                ReplacePartModels           ( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szName );
 
     ushort              GetTXDIDForModelID          ( ushort usModelID );
     void                InitWorldTextureWatch       ( PFN_WATCH_CALLBACK pfnWatchCallback );
-    bool                AddWorldTextureWatch        ( CSHADERDUMMY* pShaderData, const char* szMatch, float fOrderPriority );
+    bool                AddWorldTextureWatch        ( CSHADERDUMMY* pShaderData, const char* szMatch, float fShaderPriority );
     void                RemoveWorldTextureWatch     ( CSHADERDUMMY* pShaderData, const char* szMatch );
     void                RemoveWorldTextureWatchByContext ( CSHADERDUMMY* pShaderData );
     void                PulseWorldTextureWatch      ( void );
@@ -136,23 +108,26 @@ private:
     static short        CTxdStore_GetTxdRefcount    ( unsigned short usTxdID );
     static bool         ListContainsNamedTexture    ( std::list < RwTexture* >& list, const char* szTexName );
     static bool         StaticGetTextureCB          ( RwTexture* texture, std::vector < RwTexture* >* pTextureList );
-    void                AddActiveTexture            ( ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData );
-    void                RemoveTxdActiveTextures     ( ushort usTxdId );
-    void                FindNewAssociationForTexInfo( STexInfo* pTexInfo );
+
+    void                InitTextureWatchHooks       ( void );
+    void                StreamingAddedTexture       ( ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData );
+    void                StreamingRemovedTxd         ( ushort usTxdId );
     STexInfo*           CreateTexInfo               ( ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData );
     void                OnDestroyTexInfo            ( STexInfo* pTexInfo );
-    SShadInfo*          CreateShadInfo              ( CSHADERDUMMY* pShaderData, const SString& strTextureName, float fOrderPriority );
+    SShadInfo*          GetShadInfo                 ( CSHADERDUMMY* pShaderData, bool bAddIfRequired, float fPriority );
     void                OnDestroyShadInfo           ( SShadInfo* pShadInfo );
     void                MakeAssociation             ( SShadInfo* pShadInfo, STexInfo* pTexInfo );
     void                BreakAssociation            ( SShadInfo* pShadInfo, STexInfo* pTexInfo );
+    void                UpdateAssociationForTexInfo ( STexInfo* pTexInfo );
+    bool                IsFirstShadInfoHigherOrSamePriority ( SShadInfo* pShadInfoA, SShadInfo* pShadInfoB );
 
     // Watched world textures
-    std::list < SShadInfo >                 m_ShadInfoList;
     std::list < STexInfo >                  m_TexInfoList;
 
     std::map < SString, STexInfo* >         m_UniqueTexInfoMap;
     std::map < CD3DDUMMY*, STexInfo* >      m_D3DDataTexInfoMap;
-    std::map < SString, SShadInfo* >        m_UniqueShadInfoMap;
+
+    std::map < CSHADERDUMMY*, SShadInfo* >  m_ShadInfoMap;
     std::multimap < float, SShadInfo* >     m_orderMap;
 
     PFN_WATCH_CALLBACK                      m_pfnWatchCallback;

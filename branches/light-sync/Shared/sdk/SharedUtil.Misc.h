@@ -324,6 +324,26 @@ namespace SharedUtil
         return &it->second;
     }
 
+    // Find value reference in collection
+    template < class T, class V, class TR, class T2 >
+    V MapFindRef ( std::map < T, V, TR >& collection, const T2& key )
+    {
+        typename std::map < T, V, TR > ::iterator it = collection.find ( key );
+        if ( it == collection.end () )
+            return NULL;
+        return it->second;
+    }
+
+    // Find value reference in const collection
+    template < class T, class V, class TR, class T2 >
+    const V MapFindRef ( const std::map < T, V, TR >& collection, const T2& key )
+    {
+        typename std::map < T, V, TR > ::const_iterator it = collection.find ( key );
+        if ( it == collection.end () )
+            return NULL;
+        return it->second;
+    }
+
 
     //
     // std::multimap helpers

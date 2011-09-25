@@ -152,7 +152,7 @@ public:
     bool                             DeletePoly        ( CWaterPoly* pPoly );
 
     bool                             GetWaterLevel     ( CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown );
-    bool                             SetWaterLevel     ( CVector* pvecPosition, float fLevel, void* pChangeSource = NULL, bool bSkipCustom = false );
+    bool                             SetWaterLevel     ( CVector* pvecPosition, float fLevel, void* pChangeSource = NULL );
     bool                             SetWaterLevel     ( CWaterPoly* pPoly, float fLevel, void* pChangeSource = NULL );
     float                            GetWaveLevel      ();
     void                             SetWaveLevel      ( float fWaveLevel );

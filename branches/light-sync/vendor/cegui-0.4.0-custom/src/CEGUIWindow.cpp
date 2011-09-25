@@ -898,6 +898,9 @@ void Window::setClippedByParent(bool setting)
 *************************************************************************/
 void Window::setText(const String& text, bool bidify)
 {
+    if ( d_font )
+        d_font->processStringForGlyphs ( text ); // Refresh our glyph set if there are new characters
+
     d_text_raw = text;
     if ( !bidify )
     {

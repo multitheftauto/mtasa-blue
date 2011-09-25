@@ -389,6 +389,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CCrashDumpWriter.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CCredits.cpp"
 				>
 			</File>
@@ -470,6 +474,10 @@
 			</File>
 			<File
 				RelativePath="CLanguageLocale.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CLine3DBatcher.cpp"
 				>
 			</File>
 			<File
@@ -653,6 +661,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CVertexStreamBoundingBoxManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CVideoModeManager.cpp"
 				>
 			</File>
@@ -692,14 +704,6 @@
 				RelativePath=".\xfire.cpp"
 				>
 			</File>
-			<Filter
-				Name="d3d"
-				>
-				<File
-					RelativePath=".\d3d\CD3DMGE_D3D9.cpp"
-					>
-				</File>
-			</Filter>
 			<Filter
 				Name="tracking"
 				>
@@ -783,6 +787,10 @@
 			</File>
 			<File
 				RelativePath=".\CCore.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CCrashDumpWriter.h"
 				>
 			</File>
 			<File
@@ -871,6 +879,10 @@
 			</File>
 			<File
 				RelativePath=".\CLanguageLocale.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CLine3DBatcher.h"
 				>
 			</File>
 			<File
@@ -1002,6 +1014,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CVertexStreamBoundingBoxManager.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CVideoModeManager.h"
 				>
 			</File>
@@ -1011,10 +1027,6 @@
 			</File>
 			<File
 				RelativePath=".\StdInc.h"
-				>
-			</File>
-			<File
-				RelativePath=".\UtilityMacros.h"
 				>
 			</File>
 			<File

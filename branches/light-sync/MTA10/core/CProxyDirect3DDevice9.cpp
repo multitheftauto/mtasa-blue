@@ -30,7 +30,6 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
     // Get CDirect3DData pointer.
     m_pData = CDirect3DData::GetSingletonPtr ( );
 
-    m_bCaptureState = true;
     g_pDeviceState = &DeviceState;
     pDevice->GetDeviceCaps ( &g_pDeviceState->DeviceCaps );
 
@@ -61,6 +60,21 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
     // Get video card name
     //
     STRNCPY( g_pDeviceState->AdapterState.Name, adaptIdent.Description, sizeof ( g_pDeviceState->AdapterState.Name ) );
+
+    //
+    // Get max anisotropic setting
+    //
+    g_pDeviceState->AdapterState.MaxAnisotropicSetting = 0;
+
+    // Make sure device can do anisotropic minification and trilinear filtering
+    if ( ( g_pDeviceState->DeviceCaps.TextureFilterCaps & D3DPTFILTERCAPS_MINFANISOTROPIC )
+         && ( g_pDeviceState->DeviceCaps.TextureFilterCaps & D3DPTFILTERCAPS_MIPFLINEAR ) )
+    {
+        int iLevel = Max < int > ( 1, g_pDeviceState->DeviceCaps.MaxAnisotropy );
+        // Convert level 1/2/4/8/16 into setting 0/1/2/3/4
+        while ( iLevel >>= 1 )
+            g_pDeviceState->AdapterState.MaxAnisotropicSetting++;
+    }
 
     // Call event handler
     CDirect3DEvents9::OnDirect3DDeviceCreate ( pDevice );
@@ -429,9 +443,8 @@ HRESULT CProxyDirect3DDevice9::SetTransform                   ( D3DTRANSFORMSTAT
     // Store the matrix
     m_pData->StoreTransform ( State, pMatrix );
 
-    if ( m_bCaptureState )
-        if ( State < NUMELMS( DeviceState.TransformState.Raw ) )
-            DeviceState.TransformState.Raw[State] = *pMatrix;
+    if ( State < NUMELMS( DeviceState.TransformState.Raw ) )
+        DeviceState.TransformState.Raw[State] = *pMatrix;
 
     // Call original
     return m_pDevice->SetTransform ( State, pMatrix );
@@ -463,8 +476,7 @@ HRESULT CProxyDirect3DDevice9::GetViewport                    ( D3DVIEWPORT9* pV
 
 HRESULT CProxyDirect3DDevice9::SetMaterial                    ( CONST D3DMATERIAL9* pMaterial )
 {
-    if ( m_bCaptureState )
-        DeviceState.Material = *pMaterial;
+    DeviceState.Material = *pMaterial;
     return m_pDevice->SetMaterial ( pMaterial );
 }
 
@@ -475,9 +487,8 @@ HRESULT CProxyDirect3DDevice9::GetMaterial                    ( D3DMATERIAL9* pM
 
 HRESULT CProxyDirect3DDevice9::SetLight                       ( DWORD Index,CONST D3DLIGHT9* pLight )
 {
-    if ( m_bCaptureState )
-        if ( Index < NUMELMS( DeviceState.Lights ) )
-            DeviceState.Lights[Index] = *pLight;
+    if ( Index < NUMELMS( DeviceState.Lights ) )
+        DeviceState.Lights[Index] = *pLight;
     return m_pDevice->SetLight ( Index, pLight );
 }
 
@@ -488,9 +499,8 @@ HRESULT CProxyDirect3DDevice9::GetLight                       ( DWORD Index,D3DL
 
 HRESULT CProxyDirect3DDevice9::LightEnable                    ( DWORD Index,BOOL Enable )
 {
-    if ( m_bCaptureState )
-        if ( Index < NUMELMS( DeviceState.LightEnableState ) )
-            DeviceState.LightEnableState[Index].Enable = Enable;
+    if ( Index < NUMELMS( DeviceState.LightEnableState ) )
+        DeviceState.LightEnableState[Index].Enable = Enable;
     return m_pDevice->LightEnable ( Index, Enable );
 }
 
@@ -511,9 +521,8 @@ HRESULT CProxyDirect3DDevice9::GetClipPlane                   ( DWORD Index,floa
 
 HRESULT CProxyDirect3DDevice9::SetRenderState                 ( D3DRENDERSTATETYPE State,DWORD Value )
 {
-    if ( m_bCaptureState )
-        if ( State< NUMELMS( DeviceState.RenderState.Raw ) )
-            DeviceState.RenderState.Raw[State] = Value;
+    if ( State< NUMELMS( DeviceState.RenderState.Raw ) )
+        DeviceState.RenderState.Raw[State] = Value;
     return m_pDevice->SetRenderState ( State, Value );
 }
 
@@ -554,9 +563,8 @@ HRESULT CProxyDirect3DDevice9::GetTexture                     ( DWORD Stage,IDir
 
 HRESULT CProxyDirect3DDevice9::SetTexture                     ( DWORD Stage,IDirect3DBaseTexture9* pTexture )
 {
-    if ( m_bCaptureState )
-        if ( Stage < NUMELMS( DeviceState.TextureState ) )
-            DeviceState.TextureState[Stage].Texture = pTexture;
+    if ( Stage < NUMELMS( DeviceState.TextureState ) )
+        DeviceState.TextureState[Stage].Texture = pTexture;
     return m_pDevice->SetTexture ( Stage, pTexture );
 }
 
@@ -567,10 +575,9 @@ HRESULT CProxyDirect3DDevice9::GetTextureStageState           ( DWORD Stage,D3DT
 
 HRESULT CProxyDirect3DDevice9::SetTextureStageState           ( DWORD Stage,D3DTEXTURESTAGESTATETYPE Type,DWORD Value )
 {
-    if ( m_bCaptureState )
-        if ( Stage < NUMELMS( DeviceState.StageState ) )
-            if ( Type < NUMELMS( DeviceState.StageState[Stage].Raw ) )
-                DeviceState.StageState[Stage].Raw[Type] = Value;
+    if ( Stage < NUMELMS( DeviceState.StageState ) )
+        if ( Type < NUMELMS( DeviceState.StageState[Stage].Raw ) )
+            DeviceState.StageState[Stage].Raw[Type] = Value;
     return m_pDevice->SetTextureStageState ( Stage, Type, Value );
 }
 
@@ -581,10 +588,9 @@ HRESULT CProxyDirect3DDevice9::GetSamplerState                ( DWORD Sampler,D3
 
 HRESULT CProxyDirect3DDevice9::SetSamplerState                ( DWORD Sampler,D3DSAMPLERSTATETYPE Type,DWORD Value )
 {
-    if ( m_bCaptureState )
-        if ( Sampler < NUMELMS( DeviceState.SamplerState ) )
-            if ( Type < NUMELMS( DeviceState.SamplerState[Sampler].Raw ) )
-                DeviceState.SamplerState[Sampler].Raw[Type] = Value;
+    if ( Sampler < NUMELMS( DeviceState.SamplerState ) )
+        if ( Type < NUMELMS( DeviceState.SamplerState[Sampler].Raw ) )
+            DeviceState.SamplerState[Sampler].Raw[Type] = Value;
     return m_pDevice->SetSamplerState ( Sampler, Type, Value );
 }
 
@@ -645,12 +651,19 @@ FLOAT   CProxyDirect3DDevice9::GetNPatchMode                  ( VOID )
 
 HRESULT CProxyDirect3DDevice9::DrawPrimitive                  ( D3DPRIMITIVETYPE PrimitiveType,UINT StartVertex,UINT PrimitiveCount )
 {
-    return CDirect3DEvents9::OnDrawPrimitive ( m_pDevice, PrimitiveType, StartVertex, PrimitiveCount );
+    SetCallType ( SCallState::DRAW_PRIMITIVE, 3, PrimitiveType, StartVertex, PrimitiveCount );
+    HRESULT hr = CDirect3DEvents9::OnDrawPrimitive ( m_pDevice, PrimitiveType, StartVertex, PrimitiveCount );
+    SetCallType ( SCallState::NONE );
+    return hr;
 }
+
 
 HRESULT CProxyDirect3DDevice9::DrawIndexedPrimitive           ( D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount )
 {
-    return CDirect3DEvents9::OnDrawIndexedPrimitive ( m_pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+    SetCallType ( SCallState::DRAW_INDEXED_PRIMITIVE, 6, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+    HRESULT hr = CDirect3DEvents9::OnDrawIndexedPrimitive ( m_pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+    SetCallType ( SCallState::NONE );
+    return hr;
 }
 
 HRESULT CProxyDirect3DDevice9::DrawPrimitiveUP                ( D3DPRIMITIVETYPE PrimitiveType,UINT PrimitiveCount,CONST void* pVertexStreamZeroData,UINT VertexStreamZeroStride )
@@ -675,8 +688,7 @@ HRESULT CProxyDirect3DDevice9::CreateVertexDeclaration        ( CONST D3DVERTEXE
 
 HRESULT CProxyDirect3DDevice9::SetVertexDeclaration           ( IDirect3DVertexDeclaration9* pDecl )
 {
-    if ( m_bCaptureState )
-        DeviceState.VertexDeclaration = pDecl;
+    DeviceState.VertexDeclaration = pDecl;
     return m_pDevice->SetVertexDeclaration ( pDecl );
 }
 
@@ -702,6 +714,7 @@ HRESULT CProxyDirect3DDevice9::CreateVertexShader             ( CONST DWORD* pFu
 
 HRESULT CProxyDirect3DDevice9::SetVertexShader                ( IDirect3DVertexShader9* pShader )
 {
+    DeviceState.VertexShader = pShader;
     return m_pDevice->SetVertexShader ( pShader );
 }
 
@@ -742,13 +755,12 @@ HRESULT CProxyDirect3DDevice9::GetVertexShaderConstantB       ( UINT StartRegist
 
 HRESULT CProxyDirect3DDevice9::SetStreamSource                ( UINT StreamNumber,IDirect3DVertexBuffer9* pStreamData,UINT OffsetInBytes,UINT Stride )
 {
-    if ( m_bCaptureState )
-        if ( StreamNumber < NUMELMS( DeviceState.VertexStreams ) )
-        {
-            DeviceState.VertexStreams[StreamNumber].StreamData = pStreamData;
-            DeviceState.VertexStreams[StreamNumber].StreamOffset = OffsetInBytes;
-            DeviceState.VertexStreams[StreamNumber].StreamStride = Stride;
-        }
+    if ( StreamNumber < NUMELMS( DeviceState.VertexStreams ) )
+    {
+        DeviceState.VertexStreams[StreamNumber].StreamData = pStreamData;
+        DeviceState.VertexStreams[StreamNumber].StreamOffset = OffsetInBytes;
+        DeviceState.VertexStreams[StreamNumber].StreamStride = Stride;
+    }
     return CDirect3DEvents9::SetStreamSource ( m_pDevice, StreamNumber, pStreamData, OffsetInBytes, Stride );
 }
 
@@ -769,8 +781,7 @@ HRESULT CProxyDirect3DDevice9::GetStreamSourceFreq            ( UINT StreamNumbe
 
 HRESULT CProxyDirect3DDevice9::SetIndices                     ( IDirect3DIndexBuffer9* pIndexData )
 {
-    if ( m_bCaptureState )
-        DeviceState.IndexBufferData = pIndexData;
+    DeviceState.IndexBufferData = pIndexData;
     return m_pDevice->SetIndices ( pIndexData );
 }
 
@@ -786,6 +797,7 @@ HRESULT CProxyDirect3DDevice9::CreatePixelShader              ( CONST DWORD* pFu
 
 HRESULT CProxyDirect3DDevice9::SetPixelShader                 ( IDirect3DPixelShader9* pShader )
 {
+    DeviceState.PixelShader = pShader;
     return m_pDevice->SetPixelShader ( pShader );
 }
 
@@ -844,4 +856,18 @@ HRESULT CProxyDirect3DDevice9::CreateQuery                    ( D3DQUERYTYPE Typ
     return m_pDevice->CreateQuery ( Type, ppQuery );
 }
 
+// For debugging
+void CProxyDirect3DDevice9::SetCallType ( SCallState::eD3DCallType callType, uint uiNumArgs, ... )
+{
+    DeviceState.CallState.callType = callType;
+    DeviceState.CallState.uiNumArgs = uiNumArgs;
+    if ( uiNumArgs )
+    {
+        va_list vl;
+        va_start(vl,uiNumArgs);
+        for ( uint i = 0 ; i < uiNumArgs && i < NUMELMS( DeviceState.CallState.args ) ; i++ )
+            DeviceState.CallState.args[i] = va_arg ( vl, int );
+        va_end(vl);
+    }
+}
 

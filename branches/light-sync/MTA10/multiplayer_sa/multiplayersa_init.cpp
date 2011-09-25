@@ -60,3 +60,8 @@ void OnPreHUDRender ( void )
 {
     g_pCore->OnPreHUDRender ();  
 }
+
+void OnCrashAverted ( uint uiId )
+{
+    g_pCore->OnCrashAverted ( uiId );  
+}

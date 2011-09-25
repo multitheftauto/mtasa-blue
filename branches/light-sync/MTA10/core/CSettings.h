@@ -94,6 +94,9 @@ public:
                         CSettings               ( void );
                         ~CSettings              ( void );
 
+    void                CreateGUI               ( void );
+    void                DestroyGUI              ( void );
+
     bool                ProcessMessage          ( UINT uMsg, WPARAM wParam, LPARAM lParam );
 
     void                Update                  ( void );
@@ -149,12 +152,16 @@ protected:
     CGUIComboBox*       m_pComboAspectRatio;
     CGUILabel*          m_pAspectRatioLabel;
 	CGUICheckBox*       m_pCheckBoxVolumetricShadows;
+	CGUICheckBox*       m_pCheckBoxGrass;
     CGUILabel*          m_pDrawDistanceLabel;
     CGUIScrollBar*      m_pDrawDistance;
     CGUILabel*          m_pDrawDistanceValueLabel;
     CGUILabel*          m_pBrightnessLabel;
     CGUIScrollBar*      m_pBrightness;
     CGUILabel*          m_pBrightnessValueLabel;
+    CGUILabel*          m_pAnisotropicLabel;
+    CGUIScrollBar*      m_pAnisotropic;
+    CGUILabel*          m_pAnisotropicValueLabel;
     CGUIComboBox*       m_pComboAntiAliasing;
     CGUILabel*          m_pAntiAliasingLabel;
     CGUILabel*          m_pMapAlphaLabel;
@@ -176,6 +183,9 @@ protected:
     CGUILabel*          m_pSingleDownloadLabelInfo;
     CGUILabel*          m_pSingleDownloadLabel;
     CGUIComboBox*       m_pSingleDownloadCombo;
+    CGUILabel*          m_pDebugSettingLabelInfo;
+    CGUILabel*          m_pDebugSettingLabel;
+    CGUIComboBox*       m_pDebugSettingCombo;
     CGUILabel*          m_pUpdateBuildTypeLabelInfo;
     CGUILabel*          m_pUpdateBuildTypeLabel;
     CGUIComboBox*       m_pUpdateBuildTypeCombo;
@@ -278,6 +288,7 @@ protected:
     bool                OnRegisterButtonClick   ( CGUIElement* pElement );
     bool                OnDrawDistanceChanged   ( CGUIElement* pElement );
     bool                OnBrightnessChanged     ( CGUIElement* pElement );
+    bool                OnAnisotropicChanged     ( CGUIElement* pElement );
     bool                OnStreamingMemoryChanged( CGUIElement* pElement );
     bool                OnMapAlphaChanged       ( CGUIElement* pElement );
     bool                OnRadioVolumeChanged    ( CGUIElement* pElement );
@@ -333,6 +344,7 @@ private:
 
     DWORD               m_dwFrameCount;
     bool                m_bShownVolumetricShadowsWarning;
+    int                 m_iMaxAnisotropic;
 
     std::list < SKeyBindSection *> m_pKeyBindSections;
 

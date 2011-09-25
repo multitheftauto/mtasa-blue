@@ -201,7 +201,7 @@ public:
     void                    OnDeviceCreate                      ( IDirect3DDevice9* pDevice );
     bool                    MaybeSetAdditionalVertexStream      ( D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount );
     void                    MaybeUnsetAdditionalVertexStream    ( void );
-    void                    OnVertexBufferDestroy               ( IDirect3DVertexBuffer9* pStreamData11 );
+    void                    OnVertexBufferDestroy               ( IDirect3DVertexBuffer9* pStreamData1 );
     void                    OnVertexBufferRangeInvalidated      ( IDirect3DVertexBuffer9* pStreamData, uint Offset, uint Size );
 
     static CAdditionalVertexStreamManager* GetSingleton         ( void );

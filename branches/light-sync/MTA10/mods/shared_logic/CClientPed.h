@@ -189,7 +189,7 @@ public:
     inline void                 SetVehicleInOutState        ( int iState )                              { m_iVehicleInOutState = iState; };
 
     inline unsigned long        GetModel                    ( void )                                    { return m_ulModel; };
-    bool                        SetModel                    ( unsigned long ulModel );
+    bool                        SetModel                    ( unsigned long ulModel, bool bTemp = false );
 
     bool                        GetCanBeKnockedOffBike      ( void );
     void                        SetCanBeKnockedOffBike      ( bool bCanBeKnockedOffBike );
@@ -298,6 +298,8 @@ public:
     // streamer func. Perhaps use SetNeverStreamOut, but need something to reset that.
     void                        StreamIn                    ( bool bInstantly );
     void                        StreamOut                   ( void );
+
+    void                        StreamOutWeaponForABit      ( eWeaponSlot eSlot );
 
     bool                        SetHasJetPack               ( bool bHasJetPack );
     bool                        HasJetPack                  ( void );
@@ -596,6 +598,13 @@ public:
         bool                bHadOriginSource;
         CVector             vecOriginSourceLastPosition;
     } m_interp;
+
+    // Hacks for player model replacement and weapon model replacement respectively
+    unsigned long               m_ulStoredModel;
+    DWORD                       m_dwStoredAmmo;
+    DWORD                       m_dwStoredClipAmmo;
+    bool                        m_bStoredCurrentWeapon;
+    eWeaponType                 m_eStoredWeaponID;
 };
 
 #endif

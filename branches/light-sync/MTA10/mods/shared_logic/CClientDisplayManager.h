@@ -34,7 +34,6 @@ public:
     CClientDisplay*                 Get                             ( unsigned long ulID );
 
     void                            DrawText2D                      ( const char* szCaption, const CVector& vecPosition, float fScale = 1.0f, RGBA rgbaColor = 0xFFFFFFFF );
-    void                            DrawText3D                      ( const char* szCaption, const CVector& vecPosition, float fScale = 1.0f, RGBA rgbaColor = 0xFFFFFFFF );
 
     void                            RemoveAll                       ( void );
 

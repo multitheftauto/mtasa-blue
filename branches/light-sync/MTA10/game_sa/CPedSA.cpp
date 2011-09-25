@@ -373,12 +373,14 @@ CWeapon * CPedSA::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
         if ( pInfo )
         {
             int iModel = pInfo->GetModel();
+
             if ( iModel )
             {
                 CModelInfo * pWeaponModel = pGame->GetModelInfo ( iModel );
                 if ( pWeaponModel )
                 {
                     pWeaponModel->Request ( true, true );
+                    pWeaponModel->MakeCustomModel ();
                 }
             }
             // If the weapon is satchels, load the detonator too

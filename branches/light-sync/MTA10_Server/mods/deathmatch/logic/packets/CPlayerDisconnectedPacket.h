@@ -30,7 +30,7 @@ public:
     inline void             SetReason                   ( const char* szReason )    { strncpy ( m_szReason, szReason, sizeof ( m_szReason ) ); };
 
 private:
-    char                    m_szReason [256];
+    char                    m_szReason [512];
 };
 
 #endif

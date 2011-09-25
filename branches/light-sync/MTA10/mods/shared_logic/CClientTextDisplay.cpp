@@ -17,11 +17,9 @@ using std::list;
 
 float CClientTextDisplay::m_fGlobalScale = 1.0f;
 
-CClientTextDisplay::CClientTextDisplay ( CClientDisplayManager* pDisplayManager, int ID, bool bIs3DText ): CClientDisplay ( pDisplayManager, ID )
+CClientTextDisplay::CClientTextDisplay ( CClientDisplayManager* pDisplayManager, int ID ): CClientDisplay ( pDisplayManager, ID )
 {
     // Init
-    m_bIs3DText = bIs3DText;
-
     m_szCaption = NULL;
     m_fScale = 1;
     m_ulFormat = 0;
@@ -86,25 +84,18 @@ void CClientTextDisplay::Render ( void )
     if ( m_bVisible && m_szCaption )
     {
         // Render
-        if ( m_bIs3DText )
-        {
-            g_pCore->GetGraphics ()->DrawText3DA ( m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ, m_Color, m_fScale * m_fGlobalScale, "%s", m_szCaption );
-        }
-        else
-        {           
-            CVector2D vecResolution = g_pCore->GetGUI ()->GetResolution ();
-            unsigned int uiX = unsigned int ( m_vecPosition.fX * vecResolution.fX );
-            unsigned int uiY = unsigned int ( m_vecPosition.fY * vecResolution.fY );
-            if ( m_ulFormat & DT_BOTTOM )
-                m_ulFormat |= DT_SINGLELINE;
+        CVector2D vecResolution = g_pCore->GetGUI ()->GetResolution ();
+        unsigned int uiX = unsigned int ( m_vecPosition.fX * vecResolution.fX );
+        unsigned int uiY = unsigned int ( m_vecPosition.fY * vecResolution.fY );
+        if ( m_ulFormat & DT_BOTTOM )
+            m_ulFormat |= DT_SINGLELINE;
 
-            unsigned int uiShadowOffset = Max ( 1, (int)(m_fScale * m_fGlobalScale) );
-            SColorRGBA rgbaShadowColor ( 0, 0, 0, m_Color.A * m_ucShadowAlpha / 255 );
+        unsigned int uiShadowOffset = Max ( 1, (int)(m_fScale * m_fGlobalScale) );
+        SColorRGBA rgbaShadowColor ( 0, 0, 0, m_Color.A * m_ucShadowAlpha / 255 );
 
-            if ( rgbaShadowColor.A > 0 )
-                g_pCore->GetGraphics ()->DrawText ( uiX + uiShadowOffset, uiY + uiShadowOffset, uiX + uiShadowOffset, uiY + uiShadowOffset, rgbaShadowColor, m_szCaption, m_fScale * m_fGlobalScale, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );        
-            g_pCore->GetGraphics ()->DrawText ( uiX, uiY, uiX, uiY, m_Color, m_szCaption, m_fScale * m_fGlobalScale, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );        
-        }
+        if ( rgbaShadowColor.A > 0 )
+            g_pCore->GetGraphics ()->DrawText ( uiX + uiShadowOffset, uiY + uiShadowOffset, uiX + uiShadowOffset, uiY + uiShadowOffset, rgbaShadowColor, m_szCaption, m_fScale * m_fGlobalScale, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );        
+        g_pCore->GetGraphics ()->DrawText ( uiX, uiY, uiX, uiY, m_Color, m_szCaption, m_fScale * m_fGlobalScale, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );        
     }
 }
 

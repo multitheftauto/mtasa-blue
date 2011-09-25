@@ -92,9 +92,15 @@ bool CClientDFF::ReplaceModel ( unsigned short usModel )
         }
 
         // Is it a vehicle model?
-        if ( CClientVehicleManager::IsValidModel ( usModel ) )
+        else if ( CClientVehicleManager::IsValidModel ( usModel ) )
         {
             return ReplaceVehicleModel ( usModel );
+        }
+
+        else
+        {
+            // Weapon model replacement - Figure out how to reload weapons here!
+            return ReplaceWeaponModel ( usModel );
         }
     }
 
@@ -158,10 +164,26 @@ void CClientDFF::InternalRestoreModel ( unsigned short usModel )
     // Is this an object ID?
     else if ( CClientObjectManager::IsValidModel ( usModel ) )
     {
+        if ( CClientPedManager::IsValidWeaponModel ( usModel ) )
+        {
+            // Stream the weapon of that model out so we have no
+            // loaded when we do the restore. The streamer will
+            // eventually stream them back in with async loading.
+            m_pManager->GetPedManager ()->RestreamWeapon ( usModel );
+
+        }
         // Stream the objects of that model out so we have no
         // loaded when we do the restore. The streamer will
         // eventually stream them back in with async loading.
         m_pManager->GetObjectManager ()->RestreamObjects ( usModel );
+    }
+    // Is this an ped ID?
+    else if ( CClientPlayerManager::IsValidModel ( usModel ) )
+    {
+        // Stream the ped of that model out so we have no
+        // loaded when we do the restore. The streamer will
+        // eventually stream them back in with async loading.
+        m_pManager->GetPedManager ()->RestreamPeds ( usModel );
     }
     else
         return;
@@ -173,7 +195,7 @@ void CClientDFF::InternalRestoreModel ( unsigned short usModel )
 
 bool CClientDFF::ReplaceObjectModel ( unsigned short usModel )
 {
-    // Stream out all the vehicle models with matching ID.
+    // Stream out all the object models with matching ID.
     // Streamer will stream them back in async after a frame
     // or so.
     m_pManager->GetObjectManager ()->RestreamObjects ( usModel );
@@ -183,13 +205,50 @@ bool CClientDFF::ReplaceObjectModel ( unsigned short usModel )
     CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModel );
     pModelInfo->SetCustomModel ( m_pLoadedClump );
 
-    // Remember that we've replaced that vehicle model
+    // Remember that we've replaced that object model
     m_Replaced.push_back ( usModel );
 
     // Success
     return true;
 }
 
+bool CClientDFF::ReplaceWeaponModel ( unsigned short usModel )
+{
+    // Stream out all the weapon models with matching ID.
+    // Streamer will stream them back in async after a frame
+    // or so.
+    m_pManager->GetObjectManager ()->RestreamObjects ( usModel );
+    g_pGame->GetModelInfo ( usModel )->RestreamIPL ();
+
+    // Grab the model info for that model and replace the model
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModel );
+    pModelInfo->SetCustomModel ( m_pLoadedClump );
+
+    // Remember that we've replaced that weapon model
+    m_Replaced.push_back ( usModel );
+
+    // Success
+    return true;
+}
+
+bool CClientDFF::ReplacePedModel ( unsigned short usModel )
+{
+    // Stream out all the weapon models with matching ID.
+    // Streamer will stream them back in async after a frame
+    // or so.
+    m_pManager->GetObjectManager ()->RestreamObjects ( usModel );
+    g_pGame->GetModelInfo ( usModel )->RestreamIPL ();
+
+    // Grab the model info for that model and replace the model
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModel );
+    pModelInfo->SetCustomModel ( m_pLoadedClump );
+
+    // Remember that we've replaced that weapon model
+    m_Replaced.push_back ( usModel );
+
+    // Success
+    return true;
+}
 
 bool CClientDFF::ReplaceVehicleModel ( unsigned short usModel )
 {

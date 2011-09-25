@@ -64,6 +64,7 @@ public:
     void                    SetMaxDistance          ( float fDistance );
     void                    SetFxEffects            ( int* pEnabledEffects, uint iNumElements );
     SString                 GetMetaTags             ( const SString& strFormat );
+    bool                    IsFinished              ( void );
 
     void                    DoPulse                 ( const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt );
     void                    AddQueuedEvent          ( eSoundEventType type, const SString& strString, double dNumber = 0.0, bool bBool = false );
@@ -76,11 +77,14 @@ protected:
     void                    CompleteStreamConnect   ( HSTREAM pSound );
     void                    ApplyFxEffects          ( void );
     void                    ServiceVars             ( void );
+    void                    SetFinishedCallbacks    ( void );
 
     void                    Process3D               ( const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt );
 
 public:
     SSoundThreadVariables*  m_pVars;
+    bool                    bEndSync;
+    bool                    bFreeSync;
 
 private:
     const bool              m_bStream;

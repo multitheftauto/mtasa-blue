@@ -18,8 +18,11 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-void CShaderItem::PostConstruct ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug )
+void CShaderItem::PostConstruct ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug )
 {
+    m_fPriority = fPriority;
+    m_fMaxDistanceSq = fMaxDistance * fMaxDistance;
+
     Super::PostConstruct ( pManager );
 
     // Initial creation of d3d data

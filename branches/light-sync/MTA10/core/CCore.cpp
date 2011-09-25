@@ -598,6 +598,7 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "async_loading",    iVal ); m_pGame->SetAsyncLoadingFromSettings ( iVal == 1, iVal == 2 );
     CVARS_GET ( "volumetric_shadows", bval ); m_pGame->GetSettings ()->SetVolumetricShadowsEnabled ( bval );
     CVARS_GET ( "aspect_ratio",     iVal ); m_pGame->GetSettings ()->SetAspectRatio ( (eAspectRatio)iVal );
+    CVARS_GET ( "grass",            bval ); m_pGame->GetSettings ()->SetGrassEnabled ( bval );
 }
 
 void CCore::ApplyCommunityState ( void )
@@ -1742,18 +1743,13 @@ void CCore::EnsureFrameRateLimitApplied ( void )
 //
 void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 {
-    // Non frame rate limit stuff
-    if ( IsWindowMinimized () )
-        m_iUnminimizeFrameCounter = 4;     // Tell script we have unminimized after a short delay
-
-
     // Frame rate limit stuff starts here
     m_bDoneFrameRateLimit = true;
 
     uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
 
     if ( uiUseRate < 1 )
-        return;
+        return DoReliablePulse ();
 
     // Calc required time in ms between frames
     const double dTargetTimeToUse = 1000.0 / uiUseRate;
@@ -1789,6 +1785,23 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
     m_dPrevOverrun = Clamp ( dTargetTimeToUse * -0.9f, m_dPrevOverrun, dTargetTimeToUse * 0.1f );
 
     m_dLastTimeMs = dTimeMs;
+
+    DoReliablePulse ();
+}
+
+
+//
+// DoReliablePulse
+//
+// This is called once a frame even if minimized
+//
+void CCore::DoReliablePulse ( void )
+{
+    // Non frame rate limit stuff
+    if ( IsWindowMinimized () )
+        m_iUnminimizeFrameCounter = 4;     // Tell script we have unminimized after a short delay
+
+    UpdateModuleTickCount64 ();
 }
 
 
@@ -1870,4 +1883,22 @@ uint CCore::GetMaxStreamingMemory ( void )
 {
     uint iMemoryMB = g_pDeviceState->AdapterState.InstalledMemoryKB / 1024;
     return Max < uint > ( 64, iMemoryMB );
+}
+
+
+//
+// OnCrashAverted
+// 
+void CCore::OnCrashAverted ( uint uiId )
+{
+    CCrashDumpWriter::OnCrashAverted ( uiId );
+}
+
+
+//
+// LogEvent
+// 
+void CCore::LogEvent ( const char* szType, const char* szContext, const char* szBody )
+{
+    CCrashDumpWriter::LogEvent ( szType, szContext, szBody );
 }
