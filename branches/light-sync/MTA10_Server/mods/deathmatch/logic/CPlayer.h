@@ -265,8 +265,8 @@ public:
     SLightweightSyncData&                       GetLightweightSyncData      ( void )                      { return m_lightweightSyncData; }
 
     void                                        SetPosition                 ( const CVector &vecPosition );
-    bool                                        HasPositionChanged          ( void )                        { return m_bPositionHasChanged; }
-    void                                        MarkPositionAsChanged       ( bool bPositionHasChanged )    { m_bPositionHasChanged = bPositionHasChanged; }
+    long long                                   GetPositionLastChanged      ( void )                        { return m_llLastPositionHasChanged; }
+    void                                        MarkPositionAsChanged       ( void )                        { m_llLastPositionHasChanged = GetTickCount64_ (); }
 
     //
     // End Light Sync
@@ -395,7 +395,7 @@ private:
     CVector                                     m_vecCamFwd;
     int                                         m_iLastZoneDebug;
 
-    bool                                        m_bPositionHasChanged;
+    long long                                   m_llLastPositionHasChanged;
 };
 
 #endif

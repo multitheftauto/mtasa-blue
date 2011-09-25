@@ -104,7 +104,7 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     pPlayerManager->AddToList ( this );
     m_iLastZoneDebug = 0;
 
-    m_bPositionHasChanged = false;
+    m_llLastPositionHasChanged = 0;
 }
 
 
@@ -739,7 +739,7 @@ void CPlayer::SetPosition ( const CVector &vecPosition )
     if ( ( vecPosition - m_vecPosition ).Length() > 0.001f )
     {
         // Light Sync
-        MarkPositionAsChanged ( true );
+        MarkPositionAsChanged ( );
     }
     CElement::SetPosition ( vecPosition );
 }
