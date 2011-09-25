@@ -380,6 +380,8 @@ void CGame::DoPulse ( void )
     if ( m_pOpenPortsTester )
         m_pOpenPortsTester->Poll ();
 
+    m_lightsyncManager.DoPulse ();
+
     // Unlock the critical section again
     Unlock();
 }
@@ -1182,6 +1184,9 @@ void CGame::InitialDataStream ( CPlayer& Player )
             m_pAccountManager->LogIn ( &Player, &Player, pAccount, true );
         }
     }
+
+    // Register them on the lightweight sync manager.
+    m_lightsyncManager.RegisterPlayer ( &Player );
 }
 
 void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSayInConsole, const char* szKickReason, const char* szResponsiblePlayer )
@@ -1249,6 +1254,9 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
 
     // Delete it, don't unlink yet, we could be inside the player-manager's iteration
     m_ElementDeleter.Delete ( &Player, false );
+
+    // Unregister them from the lightweight sync manager
+    m_lightsyncManager.UnregisterPlayer ( &Player );
 }
 
 
@@ -1767,7 +1775,7 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
 
     //
-    // Process far sync
+    // Process far sync (only if light sync is not active)
     //
     if ( pPlayer->IsTimeForFarSync () )
     {

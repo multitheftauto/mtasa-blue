@@ -105,6 +105,8 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     // Add us to the manager
     pPlayerManager->AddToList ( this );
     m_iLastZoneDebug = 0;
+
+    m_llLastPositionHasChanged = 0;
 }
 
 
@@ -565,6 +567,10 @@ bool CPlayer::IsTimeForFarSync ( void )
         m_llNextFarSyncTime = llTime + iSlowSyncRate;
         m_llNextFarSyncTime += rand () % ( 1 + iSlowSyncRate / 10 );   // Extra bit to help distribute the load
 
+        // No far sync if light sync is enabled
+        if ( g_pBandwidthSettings->bLightSyncEnabled )
+            return false;
+
         // Calc stats
         int iNumPackets = m_FarPlayerList.size ();
         int iNumSkipped = ( iNumPackets * iSlowSyncRate - iNumPackets * 1000 ) / 1000;
@@ -921,4 +927,18 @@ int CPlayer::GetSyncZone ( CPlayer* pOther )
     }
 
     return iZone;
+}
+
+//
+// Here to add player specific information to SetPosition
+// - Light sync: Added m_bPositionHasChanged so ls knows the last synced values
+//
+void CPlayer::SetPosition ( const CVector &vecPosition )
+{
+    if ( ( vecPosition - m_vecPosition ).Length() > 0.001f )
+    {
+        // Light Sync
+        MarkPositionAsChanged ( );
+    }
+    CElement::SetPosition ( vecPosition );
 }

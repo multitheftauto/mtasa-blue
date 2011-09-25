@@ -1713,6 +1713,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Math.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Math.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.Misc.h"
 					>
 				</File>

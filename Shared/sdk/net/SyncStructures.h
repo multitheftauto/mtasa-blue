@@ -195,6 +195,11 @@ struct SVehicleHealthSync : public SFloatAsBitsSync < 12 >
     SVehicleHealthSync () : SFloatAsBitsSync<12> ( 0.f, 2000.0f, true ) {}
 };
 
+struct SLowPrecisionVehicleHealthSync : public SFloatAsBitsSync < 8 >
+{
+    SLowPrecisionVehicleHealthSync () : SFloatAsBitsSync<8> ( 0.0f, 2000.0f, true ) {}
+};
+
 struct SObjectHealthSync : public SFloatAsBitsSync < 11 >
 {
     SObjectHealthSync () : SFloatAsBitsSync<11> ( 0.f, 1000.0f, true ) {}
@@ -318,6 +323,45 @@ private:
     bool m_bUseFloats;
 };
 
+// Low precision positions:
+// - Write X and Y components bound to [-8192, 8192], with a max error of 0.25 units.
+// - Write Z bound to [-110, 1938], with a max error of 1 unit.
+struct SLowPrecisionPositionSync : public ISyncStructure
+{
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        unsigned short usX;
+        unsigned short usY;
+        unsigned short usZ;
+
+        if ( !bitStream.Read ( usX ) || !bitStream.Read ( usY ) || !bitStream.ReadBits ( reinterpret_cast<char *>(&usZ), 11 ) )
+            return false;
+        data.vecPosition.fX = 16384.0f * (usX / 65535.0f) - 8192.0f;
+        data.vecPosition.fY = 16384.0f * (usY / 65535.0f) - 8192.0f;
+        data.vecPosition.fZ = static_cast < float > ( usZ ) - 110.0f;
+        return true;
+    }
+
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        float fX = SharedUtil::Clamp ( -8192.0f, data.vecPosition.fX, 8192.0f );
+        float fY = SharedUtil::Clamp ( -8192.0f, data.vecPosition.fY, 8192.0f );
+        float fZ = SharedUtil::Clamp ( -110.0f, data.vecPosition.fZ, 2048.0f - 110.0f );
+
+        unsigned short usX = static_cast < unsigned short > ( ((fX + 8192.0f) / 16384.0f) * 65535.0f );
+        unsigned short usY = static_cast < unsigned short > ( ((fY + 8192.0f) / 16384.0f) * 65535.0f );
+        unsigned short usZ = static_cast < unsigned short > ( fZ + 110.0f );
+
+        bitStream.Write ( usX );
+        bitStream.Write ( usY );
+        bitStream.WriteBits ( reinterpret_cast<const char*>(&usZ), 11 );
+    }
+
+    struct
+    {
+        CVector vecPosition;
+    } data;
+};
 
 //////////////////////////////////////////
 //                                      //
