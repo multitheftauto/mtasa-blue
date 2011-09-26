@@ -77,6 +77,23 @@ struct SStreamBoundsInfo
 
 struct SCurrentStateInfo2
 {
+private:
+    SCurrentStateInfo2 ( const SCurrentStateInfo2& other );
+    SCurrentStateInfo2& operator= ( const SCurrentStateInfo2& other );
+public:
+
+    SCurrentStateInfo2 ( void )
+    {
+        memset( this, 0, sizeof(*this) );
+    }
+
+    ~SCurrentStateInfo2 ( void )
+    {
+        SAFE_RELEASE( stream.pStreamData );
+        SAFE_RELEASE( pIndexData );
+        SAFE_RELEASE( decl.pVertexDeclaration );
+    }
+
     // Info to DrawIndexPrimitive
     struct
     {
@@ -96,6 +113,8 @@ struct SCurrentStateInfo2
         UINT                            Stride;
         WORD                            elementOffset;
     } stream;
+
+    IDirect3DIndexBuffer9*         pIndexData;
 
     struct
     {
@@ -125,12 +144,12 @@ public:
     static CVertexStreamBoundingBoxManager* GetSingleton         ( void );
 protected:
     float                   CalcDistanceSq                      ( const SCurrentStateInfo2& state, const CBox& boundingBox );
-    bool                    CheckCanDoThis                      ( SCurrentStateInfo2& current );
-    bool                    GetVertexStreamBoundingBox          ( const SCurrentStateInfo2& state, CBox& outBoundingBox );
-    bool                    ComputeVertexStreamBoundingBox      ( const SCurrentStateInfo2& current, uint ReadOffsetStart, uint ReadSize, CBox& outBoundingBox );
+    bool                    CheckCanDoThis                      ( SCurrentStateInfo2& state );
+    bool                    GetVertexStreamBoundingBox          ( SCurrentStateInfo2& state, CBox& outBoundingBox );
+    bool                    ComputeVertexStreamBoundingBox      ( SCurrentStateInfo2& state, uint ReadOffsetStart, uint ReadSize, CBox& outBoundingBox );
 
     SStreamBoundsInfo*      GetStreamBoundsInfo                 ( IDirect3DVertexBuffer9* pStreamData );
-    SStreamBoundsInfo*      CreateStreamBoundsInfo              ( const SCurrentStateInfo2& current );
+    SStreamBoundsInfo*      CreateStreamBoundsInfo              ( const SCurrentStateInfo2& state );
 
     IDirect3DDevice9*                           m_pDevice;
     std::map < void*, SStreamBoundsInfo >       m_StreamBoundsInfoMap;
