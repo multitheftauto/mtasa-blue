@@ -13,6 +13,7 @@
 #include "StdInc.h"
 
 #include <stdexcept>
+CProxyDirect3DDevice9* g_pProxyDevice = NULL;
 CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState = NULL;
 
 // Proxy constructor and destructor.
@@ -30,6 +31,7 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
     // Get CDirect3DData pointer.
     m_pData = CDirect3DData::GetSingletonPtr ( );
 
+    g_pProxyDevice = this;
     g_pDeviceState = &DeviceState;
     pDevice->GetDeviceCaps ( &g_pDeviceState->DeviceCaps );
 
@@ -84,6 +86,7 @@ CProxyDirect3DDevice9::~CProxyDirect3DDevice9 ( )
 {
     WriteDebugEvent ( "CProxyDirect3DDevice9::~CProxyDirect3DDevice9" );
     g_pDeviceState = NULL;
+    g_pProxyDevice = NULL;
 }
 
 /*** IUnknown methods ***/

@@ -159,6 +159,23 @@ struct SAdditionalStreamInfo
 
 struct SCurrentStateInfo
 {
+private:
+    SCurrentStateInfo ( const SCurrentStateInfo& other );
+    SCurrentStateInfo& operator= ( const SCurrentStateInfo& other );
+public:
+
+    SCurrentStateInfo ( void )
+    {
+        memset( this, 0, sizeof(*this) );
+    }
+
+    ~SCurrentStateInfo ( void )
+    {
+        SAFE_RELEASE( stream1.pStreamData );
+        SAFE_RELEASE( pIndexData );
+        SAFE_RELEASE( decl.pVertexDeclaration );
+    }
+
     // Info to DrawIndexPrimitive
     struct
     {
@@ -177,6 +194,8 @@ struct SCurrentStateInfo
         UINT                            OffsetInBytes;
         UINT                            Stride;
     } stream1;
+
+    IDirect3DIndexBuffer9*         pIndexData;
 
     struct
     {
@@ -206,12 +225,12 @@ public:
 
     static CAdditionalVertexStreamManager* GetSingleton         ( void );
 protected:
-    void                    SetAdditionalVertexStream           ( const SCurrentStateInfo& renderState );
-    bool                    UpdateCurrentStateInfo              ( SCurrentStateInfo& current );
-    bool                    UpdateAdditionalStreamContent       ( const SCurrentStateInfo& current, SAdditionalStreamInfo* pAdditionalStreamInfo, uint ReadOffsetStart, uint ReadSize, uint WriteOffsetStart, uint WriteSize );
-    bool                    CheckCanDoThis                      ( const SCurrentStateInfo& current );
+    void                    SetAdditionalVertexStream           ( SCurrentStateInfo& renderState );
+    bool                    UpdateCurrentStateInfo              ( SCurrentStateInfo& state );
+    bool                    UpdateAdditionalStreamContent       ( SCurrentStateInfo& state, SAdditionalStreamInfo* pAdditionalStreamInfo, uint ReadOffsetStart, uint ReadSize, uint WriteOffsetStart, uint WriteSize );
+    bool                    CheckCanDoThis                      ( const SCurrentStateInfo& state );
     SAdditionalStreamInfo*  GetAdditionalStreamInfo             ( IDirect3DVertexBuffer9* pStreamData1 );
-    SAdditionalStreamInfo*  CreateAdditionalStreamInfo          ( const SCurrentStateInfo& current );
+    SAdditionalStreamInfo*  CreateAdditionalStreamInfo          ( const SCurrentStateInfo& state );
 
 
     IDirect3DDevice9*                           m_pDevice;

@@ -102,7 +102,6 @@ bool CAdditionalVertexStreamManager::MaybeSetAdditionalVertexStream ( D3DPRIMITI
 {
     // Cache info
     SCurrentStateInfo state;
-    memset ( &state, 0, sizeof ( state ) );
 
     // Save call arguments
     state.args.PrimitiveType = PrimitiveType;
@@ -131,7 +130,7 @@ bool CAdditionalVertexStreamManager::MaybeSetAdditionalVertexStream ( D3DPRIMITI
 //
 //
 ///////////////////////////////////////////////////////////////
-void CAdditionalVertexStreamManager::SetAdditionalVertexStream ( const SCurrentStateInfo& state )
+void CAdditionalVertexStreamManager::SetAdditionalVertexStream ( SCurrentStateInfo& state )
 {
     HRESULT hr;
 
@@ -169,7 +168,7 @@ void CAdditionalVertexStreamManager::SetAdditionalVertexStream ( const SCurrentS
     hr = m_pDevice->GetVertexDeclaration ( &m_pOldVertexDeclaration );
 
     // Set declaration
-    hr = m_pDevice->SetVertexDeclaration ( pAdditionalInfo->pVertexDeclaration );
+    hr = g_pProxyDevice->SetVertexDeclaration ( pAdditionalInfo->pVertexDeclaration );
 
     // Set additional stream
     uint OffsetInBytes = ConvertPTSize ( state.stream1.OffsetInBytes );
@@ -190,8 +189,8 @@ void CAdditionalVertexStreamManager::MaybeUnsetAdditionalVertexStream ( void )
     if ( m_pOldVertexDeclaration )
     {
         // Set prev declaration
-        hr = m_pDevice->SetVertexDeclaration ( m_pOldVertexDeclaration );
-        m_pOldVertexDeclaration = NULL;
+        hr = g_pProxyDevice->SetVertexDeclaration ( m_pOldVertexDeclaration );
+        SAFE_RELEASE( m_pOldVertexDeclaration );
 
         // Unset additional stream
         hr = m_pDevice->SetStreamSource ( 2, NULL, 0, 0 );
@@ -206,7 +205,7 @@ void CAdditionalVertexStreamManager::MaybeUnsetAdditionalVertexStream ( void )
 // Generate data in the additional stream
 //
 /////////////////////////////////////////////////////////////
-bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent ( const SCurrentStateInfo& state, SAdditionalStreamInfo* pAdditionalInfo, uint ReadOffsetStart, uint ReadSize, uint WriteOffsetStart, uint WriteSize )
+bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent ( SCurrentStateInfo& state, SAdditionalStreamInfo* pAdditionalInfo, uint ReadOffsetStart, uint ReadSize, uint WriteOffsetStart, uint WriteSize )
 {
     //HRESULT hr;
     IDirect3DVertexBuffer9* pStreamDataPT = state.stream1.pStreamData;
@@ -236,13 +235,12 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent ( const SCurr
     // Compute dest bytes
     {
         // Get index buffer
-        IDirect3DIndexBuffer9 *pIndexData = NULL;
-        if ( FAILED( m_pDevice->GetIndices( &pIndexData ) ) )
+        if ( FAILED( m_pDevice->GetIndices( &state.pIndexData ) ) )
             return false;
 
         // Get index buffer desc
         D3DINDEXBUFFER_DESC IndexBufferDesc;
-        pIndexData->GetDesc ( &IndexBufferDesc );
+        state.pIndexData->GetDesc ( &IndexBufferDesc );
 
         uint numIndices = state.args.primCount + 2;
         uint step = 1;
@@ -259,10 +257,10 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent ( const SCurr
         uchar* pIndexArrayBytes = &indexArray[0];
         {
             void* pIndexBytes = NULL;
-            if ( FAILED( pIndexData->Lock ( state.args.startIndex*2, numIndices*2, &pIndexBytes, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY ) ) )
+            if ( FAILED( state.pIndexData->Lock ( state.args.startIndex*2, numIndices*2, &pIndexBytes, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY ) ) )
                 return false;
             memcpy ( pIndexArrayBytes, pIndexBytes, numIndices*2 );
-            pIndexData->Unlock ();
+            state.pIndexData->Unlock ();
         }
 
         // Calc normals

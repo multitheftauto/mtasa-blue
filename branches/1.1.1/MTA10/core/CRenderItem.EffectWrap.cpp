@@ -1535,6 +1535,7 @@ void CEffectWrapImpl::ApplyMappedHandles ( void )
                     }
                 }
             }
+            SAFE_RELEASE( pVertexDeclaration );
         }
     }
 

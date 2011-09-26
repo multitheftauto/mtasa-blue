@@ -459,6 +459,7 @@ public:
     void                SetCallType     ( SCallState::eD3DCallType callType, uint uiNumArgs = 0, ... );
 };
 
+extern CProxyDirect3DDevice9* g_pProxyDevice;
 extern CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState;
 
 
