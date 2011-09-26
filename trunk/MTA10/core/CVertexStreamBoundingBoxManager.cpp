@@ -104,7 +104,6 @@ float CVertexStreamBoundingBoxManager::GetDistanceSqToGeometry ( D3DPRIMITIVETYP
 {
     // Cache info
     SCurrentStateInfo2 state;
-    memset ( &state, 0, sizeof ( state ) );
 
     // Save call arguments
     state.args.PrimitiveType = PrimitiveType;
@@ -170,7 +169,7 @@ float CVertexStreamBoundingBoxManager::CalcDistanceSq ( const SCurrentStateInfo2
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CVertexStreamBoundingBoxManager::GetVertexStreamBoundingBox ( const SCurrentStateInfo2& state, CBox& outBoundingBox )
+bool CVertexStreamBoundingBoxManager::GetVertexStreamBoundingBox ( SCurrentStateInfo2& state, CBox& outBoundingBox )
 {
     // Get boundsinfo for this vertex buffer
     SStreamBoundsInfo* pStreamBoundsInfo = GetStreamBoundsInfo ( state.stream.pStreamData );
@@ -206,7 +205,7 @@ bool CVertexStreamBoundingBoxManager::GetVertexStreamBoundingBox ( const SCurren
 // Measure used vertices
 //
 /////////////////////////////////////////////////////////////
-bool CVertexStreamBoundingBoxManager::ComputeVertexStreamBoundingBox ( const SCurrentStateInfo2& state, uint ReadOffsetStart, uint ReadSize, CBox& outBoundingBox )
+bool CVertexStreamBoundingBoxManager::ComputeVertexStreamBoundingBox ( SCurrentStateInfo2& state, uint ReadOffsetStart, uint ReadSize, CBox& outBoundingBox )
 {
     IDirect3DVertexBuffer9* pStreamDataPT = state.stream.pStreamData;
 
@@ -234,14 +233,13 @@ bool CVertexStreamBoundingBoxManager::ComputeVertexStreamBoundingBox ( const SCu
 
     // Compute bounds
     {
-        // Get index buffer
-        IDirect3DIndexBuffer9 *pIndexData = NULL;
-        if ( FAILED( m_pDevice->GetIndices( &pIndexData ) ) )
+        // Get index data
+        if ( FAILED( m_pDevice->GetIndices( &state.pIndexData ) ) )
             return false;
 
         // Get index buffer desc
         D3DINDEXBUFFER_DESC IndexBufferDesc;
-        pIndexData->GetDesc ( &IndexBufferDesc );
+        state.pIndexData->GetDesc ( &IndexBufferDesc );
 
         uint numIndices = state.args.primCount + 2;
         uint step = 1;
@@ -258,10 +256,10 @@ bool CVertexStreamBoundingBoxManager::ComputeVertexStreamBoundingBox ( const SCu
         uchar* pIndexArrayBytes = &indexArray[0];
         {
             void* pIndexBytes = NULL;
-            if ( FAILED( pIndexData->Lock ( state.args.startIndex*2, numIndices*2, &pIndexBytes, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY ) ) )
+            if ( FAILED( state.pIndexData->Lock ( state.args.startIndex*2, numIndices*2, &pIndexBytes, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY ) ) )
                 return false;
             memcpy ( pIndexArrayBytes, pIndexBytes, numIndices*2 );
-            pIndexData->Unlock ();
+            state.pIndexData->Unlock ();
         }
 
         CVector& vecMin = outBoundingBox.vecMin;
