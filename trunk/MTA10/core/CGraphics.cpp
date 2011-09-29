@@ -552,34 +552,24 @@ bool CGraphics::DestroyStandardDXFonts ( void )
     return true;
 }
 
-IDirect3DTexture9* CGraphics::LoadTexture ( const char* szFile )
+void CGraphics::DrawTexture ( CTextureItem* pTexture, float fX, float fY, float fScaleX, float fScaleY, float fRotation, float fCenterX, float fCenterY, DWORD dwColor )
 {
-    IDirect3DTexture9* texture = NULL;
-    D3DXCreateTextureFromFile ( m_pDevice, szFile, &texture );
-    return texture;
-}
-
-IDirect3DTexture9* CGraphics::LoadTexture ( const char* szFile, unsigned int uiWidth, unsigned int uiHeight )
-{
-    IDirect3DTexture9* texture = NULL;
-    D3DXCreateTextureFromFileEx ( m_pDevice, szFile, uiWidth, uiHeight, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, NULL, NULL, &texture );
-    return texture;
-}
-
-void CGraphics::DrawTexture ( IDirect3DTexture9* texture, float fX, float fY, float fScaleX, float fScaleY, float fRotation, float fCenterX, float fCenterY, DWORD dwColor )
-{
-    if ( !texture )
+    if ( !pTexture )
         return;
+
+    const float fSurfaceWidth  = pTexture->m_uiSurfaceSizeX;
+    const float fSurfaceHeight = pTexture->m_uiSurfaceSizeY;
+    const float fFileWidth     = pTexture->m_uiSizeX;
+    const float fFileHeight    = pTexture->m_uiSizeY;
+
     m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
-    D3DSURFACE_DESC textureDesc;
-    texture->GetLevelDesc( 0, &textureDesc );
     D3DXMATRIX matrix;
-    D3DXVECTOR2 scaling ( fScaleX, fScaleY );
-    D3DXVECTOR2 rotationCenter  ( ( float ) textureDesc.Width * fCenterX, ( float ) textureDesc.Height * fCenterY );
-    D3DXVECTOR2 position ( fX - ( float ) textureDesc.Width * fScaleX * fCenterX, fY - ( float ) textureDesc.Height * fScaleY * fCenterY );
+    D3DXVECTOR2 scaling ( fScaleX * fFileWidth / fSurfaceWidth, fScaleY * fFileHeight / fSurfaceHeight );
+    D3DXVECTOR2 rotationCenter  ( fFileWidth * fScaleX * fCenterX, fFileHeight * fScaleX * fCenterY );
+    D3DXVECTOR2 position ( fX - fFileWidth * fScaleX * fCenterX, fY - fFileHeight * fScaleY * fCenterY );
     D3DXMatrixTransformation2D ( &matrix, NULL, NULL, &scaling, &rotationCenter, fRotation * 6.2832f / 360.f, &position );
     m_pDXSprite->SetTransform ( &matrix );
-    m_pDXSprite->Draw ( texture, NULL, NULL, NULL, dwColor );
+    m_pDXSprite->Draw ( (IDirect3DTexture9*)pTexture->m_pD3DTexture, NULL, NULL, NULL, dwColor );
     m_pDXSprite->End ();
 }
 
@@ -588,10 +578,6 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
     m_pDevice = pDevice;
 
     LoadStandardDXFonts ();
-
-    // Get the original render target
-    //assert ( !m_pOriginalTarget );
-    //assert ( m_pDevice->GetRenderTarget ( 0, &m_pOriginalTarget ) == D3D_OK );
 
     // Create drawing devices
     D3DXCreateLine ( pDevice, &m_pLineInterface );

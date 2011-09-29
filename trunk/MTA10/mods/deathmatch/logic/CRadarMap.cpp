@@ -63,8 +63,8 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     SetupMapVariables ();
 
     // Create the radar and local player blip images
-    m_pRadarImage = g_pCore->GetGraphics()->LoadTexture ( CalcMTASAPath("MTA\\cgui\\images\\radar.jpg"), RADAR_TEXTURE_WIDTH, RADAR_TEXTURE_HEIGHT );
-    m_pLocalPlayerBlip = g_pCore->GetGraphics()->LoadTexture ( CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png")  );
+    m_pRadarImage = g_pCore->GetGraphics()->GetRenderItemManager ()->CreateTexture ( CalcMTASAPath("MTA\\cgui\\images\\radar.jpg") );
+    m_pLocalPlayerBlip = g_pCore->GetGraphics()->GetRenderItemManager ()->CreateTexture ( CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png") );
 
     // Create the marker textures
     CreateMarkerTextures ();
@@ -152,14 +152,14 @@ CRadarMap::~CRadarMap ( void )
 {
     // Delete our images
     if ( m_pRadarImage )
-        m_pRadarImage->Release();
+        m_pRadarImage->ReleaseRenderItem();
 
     if ( m_pLocalPlayerBlip )
-        m_pLocalPlayerBlip->Release();
+        m_pLocalPlayerBlip->ReleaseRenderItem();
 
     for ( uint i = 0 ; i < m_MarkerTextureList.size () ; i++ )
         if ( m_MarkerTextureList[i] )
-            m_MarkerTextureList[i]->Release ();
+            m_MarkerTextureList[i]->ReleaseRenderItem ();
 
     m_MarkerTextureList.clear ();
 
@@ -223,13 +223,19 @@ void CRadarMap::CreateMarkerTextures ( void )
     // Load the 3 shapes
     const char* shapeFileNames[] = { "square.png", "up.png", "down.png" };
     for ( uint i = 0 ; i < NUMELMS( shapeFileNames ) ; i++ )
-        m_MarkerTextureList.push_back ( g_pCore->GetGraphics()->LoadTexture ( PathJoin ( strRadarSetDirectory, shapeFileNames[i] ) ) );
+    {
+        CTextureItem* pTextureItem = g_pCore->GetGraphics()->GetRenderItemManager ()->CreateTexture ( PathJoin ( strRadarSetDirectory, shapeFileNames[i] ) );
+        m_MarkerTextureList.push_back ( pTextureItem );
+    }
 
     assert ( m_MarkerTextureList.size () == MARKER_FIRST_SPRITE_INDEX );
 
     // Load the icons
     for ( uint i = 0 ; i < RADAR_MARKER_LIMIT ; i++ )
-        m_MarkerTextureList.push_back ( g_pCore->GetGraphics()->LoadTexture ( PathJoin ( strRadarSetDirectory, SString ( "%02u.png", i + 1 ) ) ) );
+    {
+        CTextureItem* pTextureItem = g_pCore->GetGraphics()->GetRenderItemManager ()->CreateTexture ( PathJoin ( strRadarSetDirectory, SString ( "%02u.png", i + 1 ) ) );
+        m_MarkerTextureList.push_back ( pTextureItem );
+    }
 
     assert ( m_MarkerTextureList.size () == MARKER_LAST_SPRITE_INDEX + 1 );
 }
@@ -238,7 +244,7 @@ void CRadarMap::CreateMarkerTextures ( void )
 //
 // Get a texture for a marker, including scale and color
 //
-IDirect3DTexture9* CRadarMap::GetMarkerTexture ( CClientRadarMarker* pMarker, float fLocalZ, float* pfScale, SColor* pColor )
+CTextureItem* CRadarMap::GetMarkerTexture ( CClientRadarMarker* pMarker, float fLocalZ, float* pfScale, SColor* pColor )
 {
     float fScale = pMarker->GetScale ();
     ulong ulSprite = pMarker->GetSprite ();
@@ -352,7 +358,7 @@ void CRadarMap::DoRender ( void )
                 // Grab the marker image and calculate the position to put it on the screen
                 float fScale = 1;
                 SColor color;
-                IDirect3DTexture9* pTexture = GetMarkerTexture ( *markerIter, vecLocal.fZ, &fScale, &color );
+                CTextureItem* pTexture = GetMarkerTexture ( *markerIter, vecLocal.fZ, &fScale, &color );
 
                 if ( pTexture )
                 {
