@@ -103,52 +103,56 @@ void CLightsyncManager::DoPulse ()
                     CPlayer* pCurrent = it->first;
                     dassert ( pPlayer != pCurrent );
 
-                    CPlayer::SLightweightSyncData& currentData = pCurrent->GetLightweightSyncData ();
-                    packet.AddPlayer ( pCurrent );
-
-                    // Calculate the delta sync
-                    if ( fabs(currentData.health.fLastHealth - pCurrent->GetHealth()) > LIGHTSYNC_HEALTH_THRESHOLD ||
-                         fabs(currentData.health.fLastArmor - pCurrent->GetArmor()) > LIGHTSYNC_HEALTH_THRESHOLD )
+                    // Only send if he isn't network troubled.
+                    if ( pCurrent->UhOhNetworkTrouble ( ) == false )
                     {
-                        currentData.health.fLastHealth = pCurrent->GetHealth ();
-                        currentData.health.fLastArmor = pCurrent->GetArmor ();
-                        currentData.health.bSync = true;
-                        currentData.health.uiContext++;
+                        CPlayer::SLightweightSyncData& currentData = pCurrent->GetLightweightSyncData ();
+                        packet.AddPlayer ( pCurrent );
 
-                        // Generate the health marker
-                        SEntry marker;
-                        marker.ullTime = 0;
-                        marker.pPlayer = pCurrent;
-                        marker.eType = DELTA_MARKER_HEALTH;
-                        marker.uiContext = currentData.health.uiContext;
-                        m_Queue.push_back ( marker );
-                    }
-
-                    CVehicle* pVehicle = pCurrent->GetOccupiedVehicle ();
-                    if ( pVehicle && pCurrent->GetOccupiedVehicleSeat() == 0 )
-                    {
-                        if ( currentData.vehicleHealth.lastVehicle != pVehicle ||
-                             fabs(currentData.vehicleHealth.fLastHealth - pVehicle->GetHealth ()) > LIGHTSYNC_VEHICLE_HEALTH_THRESHOLD )
+                        // Calculate the delta sync
+                        if ( fabs(currentData.health.fLastHealth - pCurrent->GetHealth()) > LIGHTSYNC_HEALTH_THRESHOLD ||
+                             fabs(currentData.health.fLastArmor - pCurrent->GetArmor()) > LIGHTSYNC_HEALTH_THRESHOLD )
                         {
-                            currentData.vehicleHealth.fLastHealth = pVehicle->GetHealth ();
-                            currentData.vehicleHealth.lastVehicle = pVehicle;
-                            currentData.vehicleHealth.bSync = true;
-                            currentData.vehicleHealth.uiContext++;
+                            currentData.health.fLastHealth = pCurrent->GetHealth ();
+                            currentData.health.fLastArmor = pCurrent->GetArmor ();
+                            currentData.health.bSync = true;
+                            currentData.health.uiContext++;
 
-                            // Generate the vehicle health marker
+                            // Generate the health marker
                             SEntry marker;
                             marker.ullTime = 0;
                             marker.pPlayer = pCurrent;
-                            marker.eType = DELTA_MARKER_VEHICLE_HEALTH;
-                            marker.uiContext = currentData.vehicleHealth.uiContext;
+                            marker.eType = DELTA_MARKER_HEALTH;
+                            marker.uiContext = currentData.health.uiContext;
                             m_Queue.push_back ( marker );
                         }
-                    }
 
-                    if ( packet.Count () == LIGHTSYNC_MAX_PLAYERS )
-                    {
-                        pPlayer->Send ( packet );
-                        packet.Reset ();
+                        CVehicle* pVehicle = pCurrent->GetOccupiedVehicle ();
+                        if ( pVehicle && pCurrent->GetOccupiedVehicleSeat() == 0 )
+                        {
+                            if ( currentData.vehicleHealth.lastVehicle != pVehicle ||
+                                 fabs(currentData.vehicleHealth.fLastHealth - pVehicle->GetHealth ()) > LIGHTSYNC_VEHICLE_HEALTH_THRESHOLD )
+                            {
+                                currentData.vehicleHealth.fLastHealth = pVehicle->GetHealth ();
+                                currentData.vehicleHealth.lastVehicle = pVehicle;
+                                currentData.vehicleHealth.bSync = true;
+                                currentData.vehicleHealth.uiContext++;
+
+                                // Generate the vehicle health marker
+                                SEntry marker;
+                                marker.ullTime = 0;
+                                marker.pPlayer = pCurrent;
+                                marker.eType = DELTA_MARKER_VEHICLE_HEALTH;
+                                marker.uiContext = currentData.vehicleHealth.uiContext;
+                                m_Queue.push_back ( marker );
+                            }
+                        }
+
+                        if ( packet.Count () == LIGHTSYNC_MAX_PLAYERS )
+                        {
+                            pPlayer->Send ( packet );
+                            packet.Reset ();
+                        }
                     }
                 }
 
