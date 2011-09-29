@@ -96,8 +96,6 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_bSyncingVelocity = false;
     m_uiPuresyncPackets = 0;
 
-    m_ulLastReceivedSyncTime = 0;
-
     m_uiWeaponIncorrectCount = 0;
 
     m_llNearListUpdateTime = 0;

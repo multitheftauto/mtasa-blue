@@ -1471,7 +1471,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                     if ( strcmp ( szIP, szTempIP ) == 0 )
                     {
                         // Two players could have the same IP, so see if the old player appears inactive before quitting them
-                        if ( pTempPlayer->GetTicksSinceLastReceivedSync () > 5000 )
+                        if ( pTempPlayer->UhOhNetworkTrouble () )
                         {
                             pTempPlayer->Send ( CPlayerDisconnectedPacket ( SString ( "Supplanted by %s from %s", szNick, szIP ) ) );
                             QuitPlayer ( *pTempPlayer, CClient::QUIT_QUIT );
@@ -3106,6 +3106,8 @@ void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
     if ( pPlayer && pPlayer->IsJoined () )
     {
+        pPlayer->NotifyReceivedSync ();
+
         // This might need to be time-contexted
         CPlayerCamera * pCamera = pPlayer->GetCamera ();
 
