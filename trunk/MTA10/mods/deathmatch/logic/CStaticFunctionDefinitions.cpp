@@ -4254,6 +4254,10 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateTab ( CLuaMain& LuaMain,
     if ( !pParent ) return NULL;
 
     CGUIElement *pGUIParent = pParent->GetCGUIElement ();
+
+    // Make sure the parent element is a TabPanel
+    if ( pGUIParent->GetType () != CGUI_TABPANEL ) return NULL;
+
     CGUIElement *pTab = static_cast < CGUITabPanel* > ( pGUIParent ) -> CreateTab ( szCaption );
     CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pTab );
     pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
