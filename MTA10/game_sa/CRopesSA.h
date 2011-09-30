@@ -20,7 +20,7 @@
 class CRopesSA : public CRopes
 {
 public:
-    int     CreateRopeForSwatPed        ( const CVector & vecPosition );
+    int     CreateRopeForSwatPed        ( const CVector & vecPosition, DWORD dwDuration = 4000 );
 };
 
 #endif
