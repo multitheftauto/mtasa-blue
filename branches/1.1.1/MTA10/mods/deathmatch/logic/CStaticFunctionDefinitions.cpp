@@ -5579,6 +5579,11 @@ bool CStaticFunctionDefinitions::GetCloudsEnabled ( )
     return g_pClientGame->GetCloudsEnabled ();
 }
 
+bool CStaticFunctionDefinitions::CreateSWATRope ( CVector vecPosition, DWORD dwDuration )
+{
+    g_pGame->GetRopes ()->CreateRopeForSwatPed ( vecPosition, dwDuration );
+    return true;
+}
 
 bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments )
 {

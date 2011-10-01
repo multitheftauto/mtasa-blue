@@ -1729,3 +1729,29 @@ int CLuaFunctionDefs::ResetSunSize ( lua_State* luaVM )
     lua_pushboolean ( luaVM, true );
     return 1;
 }
+
+int CLuaFunctionDefs::CreateSWATRope ( lua_State* luaVM )
+{
+    CVector vecPosition;
+    DWORD dwDuration = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadNumber ( dwDuration, 4000 );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Returns a Rope ID?
+        if ( CStaticFunctionDefinitions::CreateSWATRope ( vecPosition, dwDuration ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "CreateSWATRope", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
