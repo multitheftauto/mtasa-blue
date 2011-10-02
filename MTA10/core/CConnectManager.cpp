@@ -113,7 +113,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     // Set encryption option
     int iVar;
     CVARS_GET ( "network_encryption", iVar );
-    pNet->SetEncryptionEnabled ( iVar );
+    pNet->SetEncryptionEnabled ( iVar != 0 );
 
     // Try to start a network to connect
     if ( !pNet->StartNetwork ( m_strHost.c_str (), m_usPort ) )
@@ -241,28 +241,28 @@ void CConnectManager::DoPulse ( void )
                 SString strError;
                 switch ( ucError )
                 {
-                    case ID_RSA_PUBLIC_KEY_MISMATCH:
+                    case RID_RSA_PUBLIC_KEY_MISMATCH:
                         strError = "Disconnected: unknown protocol error";  // encryption key mismatch
                         break;
-                    case ID_REMOTE_DISCONNECTION_NOTIFICATION:
+                    case RID_REMOTE_DISCONNECTION_NOTIFICATION:
                         strError = "Disconnected: disconnected remotely";
                         break;
-                    case ID_REMOTE_CONNECTION_LOST:
+                    case RID_REMOTE_CONNECTION_LOST:
                         strError = "Disconnected: connection lost remotely";
                         break;
-                    case ID_CONNECTION_BANNED:
+                    case RID_CONNECTION_BANNED:
                         strError = "Disconnected: you are banned from this server";
                         break;
-                    case ID_NO_FREE_INCOMING_CONNECTIONS:
+                    case RID_NO_FREE_INCOMING_CONNECTIONS:
                         CServerInfo::GetSingletonPtr()->Show ( eWindowTypes::SERVER_INFO_QUEUE, m_strHost.c_str(), m_usPort, m_strPassword.c_str() );
                         break;
-                    case ID_DISCONNECTION_NOTIFICATION:
+                    case RID_DISCONNECTION_NOTIFICATION:
                         strError = "Disconnected: disconnected";
                         break;
-                    case ID_CONNECTION_LOST:
+                    case RID_CONNECTION_LOST:
                         strError = "Disconnected: connection lost";
                         break;
-                    case ID_INVALID_PASSWORD:
+                    case RID_INVALID_PASSWORD:
                         CServerInfo::GetSingletonPtr()->Show ( eWindowTypes::SERVER_INFO_PASSWORD, m_strHost.c_str(), m_usPort, m_strPassword.c_str() );
                         break;
                     default:
