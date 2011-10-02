@@ -471,6 +471,8 @@ public:
 
     SString                 m_strWarnings;
     bool                    m_bVerboseWarnings;
+    bool                    m_bSkipUnusedParameters;
+    std::set < D3DXHANDLE >  m_ReferencedParameterMap;
 
     std::vector < SStateVar > renderStateVarList;
     std::vector < SStateVar > stageStateVarList;
@@ -498,13 +500,310 @@ CEffectWrap* NewEffectWrap ( CRenderItemManager* pManager, const SString& strFil
 
 namespace
 {
+
+    //
+    // Fast [0-9a-Z_] check
+    //
+    class CIsWordChar
+    {
+        bool _IsWordChar ( char c )
+        {
+            return ( c >= '0' && c <= '9' )
+                    || ( c >= 'a' && c <= 'z' )
+                    || ( c >= 'A' && c <= 'Z' )
+                    || ( c == '_' );
+        }
+
+        bool pWordCharList [ 256 ];
+    public:
+
+        CIsWordChar ( void )
+        {
+            for ( uint i = 0 ; i < 256 ; i++ )
+                pWordCharList [ i ] = _IsWordChar ( i );
+        }
+
+        bool IsWordChar ( char c ) const
+        {
+            return pWordCharList [ c ];
+        }
+
+    } IsWordChar;
+
+
+    /////////////////////////////////////////////////////
+    //
+    // SWordHitCount
+    //
+    /////////////////////////////////////////////////////
+    struct SWordHitCount
+    {
+        std::map < SString, int > wordCountMap;
+
+        void AddWordCount ( const SString& strWord, int iCount )
+        {
+            int* pCount = MapFind ( wordCountMap, strWord );
+            if ( !pCount )
+            {
+                MapSet ( wordCountMap, strWord, 0 );
+                pCount = MapFind ( wordCountMap, strWord );
+            }
+            (*pCount) += iCount;
+        }
+
+        int GetWordCount ( const SString& strWord ) const
+        {
+            const int* pCount = MapFind ( wordCountMap, strWord );
+            return pCount ? *pCount : 0;
+        }
+
+        void Merge ( const SWordHitCount& other )
+        {
+            for ( std::map < SString, int >::const_iterator iter = other.wordCountMap.begin () ; iter != other.wordCountMap.end () ; ++iter )
+                AddWordCount ( iter->first, iter->second );
+        }
+    };
+
+
+    /////////////////////////////////////////////////////
+    //
+    // SScope
+    //
+    /////////////////////////////////////////////////////
+    struct SScope
+    {
+        SString strName;
+        SWordHitCount wordHitCount;
+    };
+
+
+    /////////////////////////////////////////////////////
+    //
+    // SScopeList
+    //
+    /////////////////////////////////////////////////////
+    struct SScopeList
+    {
+        std::map < SString, SScope > scopeMap;
+
+        // GetScope
+        SScope& GetScope ( const SString& strName )
+        {
+            SScope* pScope = MapFind ( scopeMap, strName );
+            if ( !pScope )
+            {
+                MapSet ( scopeMap, strName, SScope () );
+                pScope = MapFind ( scopeMap, strName );
+                pScope->strName = strName;
+            }
+            return *pScope;
+        }
+    };
+
+
+    /////////////////////////////////////////////////////
+    //
+    // SReachableScopeList
+    //
+    /////////////////////////////////////////////////////
+    struct SReachableScopeList
+    {
+        std::set < SString > mergedScopeNamesMap;
+        SWordHitCount mergedWordHitCount;
+
+        bool AlreadyMergedScope ( const SScope& scope ) const
+        {
+            return MapContains ( mergedScopeNamesMap, scope.strName );
+        }
+
+        void MergeScope ( const SScope& scope )
+        {
+            mergedScopeNamesMap.insert ( scope.strName );
+            return mergedWordHitCount.Merge ( scope.wordHitCount );
+        }
+
+        int GetReferencedWordCount ( const SString& strName ) const
+        {
+            return mergedWordHitCount.GetWordCount ( strName );
+        }
+    };
+
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Helper class which checks if parameters declared in an .fx file are actually used.
+    // Hideous and unmaintainable, so let's hope it never needs fixing.
+    //
+    ////////////////////////////////////////////////////////////////////////////////////
+    class CReferenceResolver
+    {
+        SScopeList scopeList;
+        SReachableScopeList reachableScopeList;
+    public:
+
+        void AddTextBuffer ( const char* pBuffer, uint uiLength )
+        {
+            SString strPrevWord;
+            SString strLastWordOutsideParentheses;
+            SString strCurrentScope = "global";
+            int iInCurlyBraces = 0;
+            int iInParentheses = 0;
+            bool bInSemantic = false;
+            const char* pWordStart = NULL;
+            bool bInWord = false;
+            while ( char c = GetNextValidChar ( pBuffer ) )
+            {
+                bool bNewInWord = IsWordChar.IsWordChar ( c );
+                if ( bNewInWord != bInWord )
+                {
+                    bInWord = bNewInWord;
+                    if ( bNewInWord )
+                        pWordStart = pBuffer - 1;
+                    else
+                    {
+                        // Skip words starting with a digit
+                        if ( !isdigit ( *pWordStart ) )
+                        {
+                            // Increment count for this word
+                            uint uiWordLength = ( pBuffer - pWordStart - 1 );
+                            std::string strWord ( pWordStart, uiWordLength );
+
+                            if ( iInParentheses == 0 && !bInSemantic )
+                            {
+                                strPrevWord = strLastWordOutsideParentheses;
+                                strLastWordOutsideParentheses = strWord;
+                            }
+
+                            AddWordToScope ( strCurrentScope, strWord );
+
+                            // Make sure technique gets auto-referenced
+                            if ( strPrevWord == "technique" )
+                                AddWordToScope ( strCurrentScope, strWord );
+                        }
+                    }
+                }
+
+                if ( c == ':' )
+                {
+                    // Check if next punctuation is {
+                    const char* pBuffer2 = pBuffer;
+                    while ( char c = GetNextValidChar ( pBuffer2 ) )
+                    {
+                        if ( !IsWordChar.IsWordChar ( c ) && c != ' ' && c != '\n' &&  c != '\r' )
+                        {
+                            if ( c == '{' )
+                                bInSemantic = true;
+                            break;
+                        }
+                    }
+                }
+                else
+                if ( c == '(' )
+                    iInParentheses++;
+                else
+                if ( c == ')' )
+                    iInParentheses--;
+                else
+                if ( c == '{' )
+                {
+                    bInSemantic = false;
+                    if ( iInCurlyBraces++ == 0 )
+                    {
+                        strCurrentScope = strLastWordOutsideParentheses;
+                        if ( strLastWordOutsideParentheses == "sampler_state" ) // Use sampler name
+                            strCurrentScope = strPrevWord;
+                    }
+                }
+                else
+                if ( c == '}' )
+                {
+                    if ( --iInCurlyBraces == 0 )
+                        strCurrentScope = "global";
+                }
+            }
+        }
+
+        // Get next character skipping comments
+        char GetNextValidChar ( const char*& pBuffer )
+        {
+            char c = *pBuffer++;
+
+            // Skip line comments
+            if ( c == '/' && *pBuffer == '/' )
+                while ( c && c != '\n' && c != '\r' )
+                    c = *pBuffer++;
+
+            // Skip block comments
+            if ( c == '/' && *pBuffer == '*' )
+            {
+                c = *pBuffer++;
+                c = *pBuffer++;
+                while ( c && ( c != '*' || *pBuffer != '/' ) )
+                    c = *pBuffer++;
+                if ( c )
+                    c = *pBuffer++;
+                if ( c )
+                    c = *pBuffer++;
+            }
+            return c;
+        }
+
+        void AddWordToScope ( const SString& strCurrentScope, const std::string& strWord )
+        {
+            OutputDebugLine ( SString ( "AddWordToScope: '%s'  '%s'", *strCurrentScope, strWord.c_str () ) );
+            scopeList.GetScope ( strCurrentScope ).wordHitCount.AddWordCount ( strWord, 1 );
+        }
+
+        // Find all words that are mentioned at least twice in a reachable scope
+        void ResolveReferencedWords ( void )
+        {
+            // Resolve all reachable scopes
+            reachableScopeList = SReachableScopeList ();
+            reachableScopeList.MergeScope ( scopeList.GetScope ( "global" ) );
+
+            bool bAgain = true;
+            while ( bAgain )
+            {
+                bAgain = false;
+
+                // For each scope
+                for ( std::map < SString, SScope >::iterator iter = scopeList.scopeMap.begin () ; iter != scopeList.scopeMap.end () ; ++iter )
+                {
+                    const SScope& scope = iter->second;
+                    // Check if this scope is already reachable
+                    if ( reachableScopeList.AlreadyMergedScope ( scope ) )
+                        continue;
+
+                    if ( reachableScopeList.GetReferencedWordCount ( scope.strName ) > 1 )
+                    {
+                        OutputDebugLine ( SString ( "Found ref to scope '%s'", *scope.strName ) );
+                        reachableScopeList.MergeScope ( scope );
+                        bAgain = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        bool IsWordReferenced ( const SString& strWord ) const
+        {
+            return reachableScopeList.GetReferencedWordCount ( strWord ) > 1;
+        }
+    };
+
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    //
     // Helper class for D3DXCreateEffectFromFile() to ensure includes are correctly found and don't go outside the resource directory
+    //
+    ////////////////////////////////////////////////////////////////////////////////////
     class CIncludeManager : public ID3DXInclude
     {
         SString m_strRootPath;
         SString m_strCurrentPath;
     public:
         SString m_strReport;
+        CReferenceResolver m_ReferenceResolver;
 
         CIncludeManager::CIncludeManager( const SString& strRootPath, const SString& strCurrentPath )
         {
@@ -551,7 +850,11 @@ namespace
             *pBytes = uiSize;
 
             if ( !m_strReport.ContainsI ( strPathFilename ) )
+            {
                 m_strReport += SString ( "[Loaded '%s' (%d bytes)]", *strPathFilename, uiSize );
+                buffer.push_back ( 0 );
+                m_ReferenceResolver.AddTextBuffer ( &buffer[0], uiSize );
+            }
 
             return S_OK;
         }
@@ -576,6 +879,8 @@ namespace
 void CEffectWrapImpl::PostConstruct ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug )
 {
     Super::PostConstruct ( pManager );
+
+    m_strName = ExtractFilename ( strFilename );
 
     // Initialise static data if needed
     InitMaps ();
@@ -759,6 +1064,23 @@ void CEffectWrapImpl::CreateUnderlyingData ( const SString& strFilename, const S
 
     // Optimization
     m_uiSaveStateFlags = D3DXFX_DONOTSAVESHADERSTATE;     // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
+
+    IncludeManager.m_ReferenceResolver.ResolveReferencedWords ();
+
+    // Make a map of referenced parameters
+    for ( uint i = 0 ; i < EffectDesc.Parameters ; i++ )
+    {
+        D3DXHANDLE hParameter = m_pD3DEffect->GetParameter ( NULL, i );
+        if ( !hParameter )
+            break;
+        D3DXPARAMETER_DESC ParameterDesc;
+        m_pD3DEffect->GetParameterDesc( hParameter, &ParameterDesc );
+
+        if ( IncludeManager.m_ReferenceResolver.IsWordReferenced ( ParameterDesc.Name ) )
+            MapInsert ( m_ReferencedParameterMap, hParameter );
+        else
+            OutputDebugLine ( SString ( "Skipping unrefed parameter '%s'", ParameterDesc.Name ) );
+    }
 }
 
 
@@ -1213,6 +1535,7 @@ void CEffectWrapImpl::ApplyMappedHandles ( void )
                     }
                 }
             }
+            SAFE_RELEASE( pVertexDeclaration );
         }
     }
 
@@ -1243,9 +1566,10 @@ void CEffectWrapImpl::ApplyMappedHandles ( void )
 ////////////////////////////////////////////////////////////////
 void CEffectWrapImpl::ReadParameterHandles ( void )
 {
-    // Add parameter handles
     D3DXEFFECT_DESC EffectDesc;
     m_pD3DEffect->GetDesc( &EffectDesc );
+
+    // Search for custom flags first
     for ( uint i = 0 ; i < EffectDesc.Parameters ; i++ )
     {
         D3DXHANDLE hParameter = m_pD3DEffect->GetParameter ( NULL, i );
@@ -1256,6 +1580,24 @@ void CEffectWrapImpl::ReadParameterHandles ( void )
 
         // See if this parameter is 'special'
         if ( TryParseSpecialParameter ( hParameter, ParameterDesc ) )
+            continue;
+    }
+
+    // Add parameter handles
+    for ( uint i = 0 ; i < EffectDesc.Parameters ; i++ )
+    {
+        D3DXHANDLE hParameter = m_pD3DEffect->GetParameter ( NULL, i );
+        if ( !hParameter )
+            break;
+        D3DXPARAMETER_DESC ParameterDesc;
+        m_pD3DEffect->GetParameterDesc( hParameter, &ParameterDesc );
+
+        // See if this parameter is 'special'
+        if ( TryParseSpecialParameter ( hParameter, ParameterDesc ) )
+            continue;
+
+        // Check if parameter is used
+        if ( m_bSkipUnusedParameters && !MapContains ( m_ReferencedParameterMap, hParameter ) )
             continue;
 
         // See if this parameter wants to be mapped to a D3D register
@@ -1304,6 +1646,17 @@ bool CEffectWrapImpl::TryParseSpecialParameter ( D3DXHANDLE hParameter, const D3
                     m_bRequiresNormals = false;
                 else
                     m_strWarnings += SString ( "Unknown value for createNormals '%s'\n", *strAnnotValue );
+            }
+            else
+            if ( strAnnotName == "skipUnusedParameters" )
+            {
+                if ( strAnnotValue == "yes" )
+                    m_bSkipUnusedParameters = true;
+                else
+                if ( strAnnotValue == "no" )
+                    m_bSkipUnusedParameters = false;
+                else
+                    m_strWarnings += SString ( "Unknown value for skipUnusedParameters '%s'\n", *strAnnotValue );
             }
             else
             {

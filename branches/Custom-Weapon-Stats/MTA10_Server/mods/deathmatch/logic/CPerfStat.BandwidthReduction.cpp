@@ -132,8 +132,14 @@ void CPerfStatBandwidthReductionImpl::RecordStats ( void )
     for ( uint i = 0 ; i < ZONE_MAX ; i++ )
     {
         m_Stats5Sec.puresync.llSentPacketsByZone [ i ]    = g_pStats->puresync.llSentPacketsByZone[i]    - m_PrevStats.puresync.llSentPacketsByZone[i];
+        m_Stats5Sec.puresync.llSentBytesByZone [ i ]      = g_pStats->puresync.llSentBytesByZone[i]      - m_PrevStats.puresync.llSentBytesByZone[i];
         m_Stats5Sec.puresync.llSkippedPacketsByZone [ i ] = g_pStats->puresync.llSkippedPacketsByZone[i] - m_PrevStats.puresync.llSkippedPacketsByZone[i];
+        m_Stats5Sec.puresync.llSkippedBytesByZone [ i ]   = g_pStats->puresync.llSkippedBytesByZone[i]   - m_PrevStats.puresync.llSkippedBytesByZone[i];
     }
+    m_Stats5Sec.lightsync.llLightSyncPacketsSent    = g_pStats->lightsync.llLightSyncPacketsSent   - m_PrevStats.lightsync.llLightSyncPacketsSent;
+    m_Stats5Sec.lightsync.llLightSyncBytesSent      = g_pStats->lightsync.llLightSyncBytesSent     - m_PrevStats.lightsync.llLightSyncBytesSent;
+    m_Stats5Sec.lightsync.llPureSyncPacketsSkipped  = g_pStats->lightsync.llPureSyncPacketsSkipped - m_PrevStats.lightsync.llPureSyncPacketsSkipped;
+    m_Stats5Sec.lightsync.llPureSyncBytesSkipped    = g_pStats->lightsync.llPureSyncBytesSkipped   - m_PrevStats.lightsync.llPureSyncBytesSkipped;
     m_PrevStats = *g_pStats;
     m_StatsTotal = *g_pStats;
 }
@@ -165,60 +171,128 @@ void CPerfStatBandwidthReductionImpl::GetStats ( CPerfStatResult* pResult, const
 
     // Add columns
     pResult->AddColumn ( "Zone" );
-    pResult->AddColumn ( "Last 5 seconds.Pure sync packets sent" );
-    pResult->AddColumn ( "Last 5 seconds.Pure sync packets skipped" );
-    pResult->AddColumn ( "Since start.Pure sync packets sent" );
-    pResult->AddColumn ( "Since start.Pure sync packets skipped" );
+    pResult->AddColumn ( "Last 5 seconds - pure/light sync.Bytes sent" );
+    pResult->AddColumn ( "Last 5 seconds - pure/light sync.Bytes skipped" );
+    pResult->AddColumn ( "Last 5 seconds - pure/light sync.Packets sent" );
+    pResult->AddColumn ( "Last 5 seconds - pure/light sync.Packets skipped" );
+
+    pResult->AddColumn ( "Since start - pure/light sync.Bytes sent" );
+    pResult->AddColumn ( "Since start - pure/light sync.Bytes skipped" );
+    pResult->AddColumn ( "Since start - pure/light sync.Packets sent" );
+    pResult->AddColumn ( "Since start - pure/light sync.Packets skipped" );
 
 
-    long long llTotals[4] = { 0, 0, 0, 0 };
-    const char* szDesc[4] = { "Very near, or in FOV", "Near, just out of FOV", "Near, way out of FOV", "Far" };
+    long long llTotals[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    //const char* szDesc[4] = { "Very near, or in FOV", "Near, just out of FOV", "Near, way out of FOV", "Far" };
+    const char* szDesc[4] = { "Very near/in FOV", "Near/close FOV", "Near/out FOV", "Far" };
 
+    // Add puresync skipping zones
     for ( uint i = 0 ; i < ZONE_MAX ; i++ )
     {
         SString* row = pResult->AddRow ();
 
         int c = 0;
-        row[c++] = SString ( "%d - %s", i, szDesc[i] );
+        row[c++] = SString ( "%d) %s", i, szDesc[i] );
+        row[c++] = CPerfStatManager::GetScaledByteString ( m_Stats5Sec.puresync.llSentBytesByZone[i] );
+        row[c++] = CPerfStatManager::GetScaledByteString ( m_Stats5Sec.puresync.llSkippedBytesByZone[i] );
         row[c++] = SString ( "%lld", m_Stats5Sec.puresync.llSentPacketsByZone[i] );
         row[c++] = SString ( "%lld", m_Stats5Sec.puresync.llSkippedPacketsByZone[i] );
+
+        row[c++] = CPerfStatManager::GetScaledByteString ( m_StatsTotal.puresync.llSentBytesByZone[i] );
+        row[c++] = CPerfStatManager::GetScaledByteString ( m_StatsTotal.puresync.llSkippedBytesByZone[i] );
         row[c++] = SString ( "%lld", m_StatsTotal.puresync.llSentPacketsByZone[i] );
         row[c++] = SString ( "%lld", m_StatsTotal.puresync.llSkippedPacketsByZone[i] );
 
-        llTotals[0] += m_Stats5Sec.puresync.llSentPacketsByZone[i];
-        llTotals[1] += m_Stats5Sec.puresync.llSkippedPacketsByZone[i];
-        llTotals[2] += m_StatsTotal.puresync.llSentPacketsByZone[i];
-        llTotals[3] += m_StatsTotal.puresync.llSkippedPacketsByZone[i];
+        llTotals[0] += m_Stats5Sec.puresync.llSentBytesByZone[i];
+        llTotals[1] += m_Stats5Sec.puresync.llSkippedBytesByZone[i];
+        llTotals[2] += m_Stats5Sec.puresync.llSentPacketsByZone[i];
+        llTotals[3] += m_Stats5Sec.puresync.llSkippedPacketsByZone[i];
+
+        llTotals[4] += m_StatsTotal.puresync.llSentBytesByZone[i];
+        llTotals[5] += m_StatsTotal.puresync.llSkippedBytesByZone[i];
+        llTotals[6] += m_StatsTotal.puresync.llSentPacketsByZone[i];
+        llTotals[7] += m_StatsTotal.puresync.llSkippedPacketsByZone[i];
     }
 
+    // Add lightsync row
     {
+        SString* row = pResult->AddRow ();
+
+        int c = 0;
+        row[c++] = "Light sync";
+        row[c++] = CPerfStatManager::GetScaledByteString ( m_Stats5Sec.lightsync.llLightSyncBytesSent );
+        row[c++] = CPerfStatManager::GetScaledByteString ( m_Stats5Sec.lightsync.llPureSyncBytesSkipped );
+        row[c++] = SString ( "%lld", m_Stats5Sec.lightsync.llLightSyncPacketsSent );
+        row[c++] = SString ( "%lld", m_Stats5Sec.lightsync.llPureSyncPacketsSkipped );
+
+        row[c++] = CPerfStatManager::GetScaledByteString ( m_StatsTotal.lightsync.llLightSyncBytesSent );
+        row[c++] = CPerfStatManager::GetScaledByteString ( m_StatsTotal.lightsync.llPureSyncBytesSkipped );
+        row[c++] = SString ( "%lld", m_StatsTotal.lightsync.llLightSyncPacketsSent );
+        row[c++] = SString ( "%lld", m_StatsTotal.lightsync.llPureSyncPacketsSkipped );
+
+        llTotals[0] += m_Stats5Sec.lightsync.llLightSyncBytesSent;
+        llTotals[1] += m_Stats5Sec.lightsync.llPureSyncBytesSkipped;
+        llTotals[2] += m_Stats5Sec.lightsync.llLightSyncPacketsSent;
+        llTotals[3] += m_Stats5Sec.lightsync.llPureSyncPacketsSkipped;
+
+        llTotals[4] += m_StatsTotal.lightsync.llLightSyncBytesSent;
+        llTotals[5] += m_StatsTotal.lightsync.llPureSyncBytesSkipped;
+        llTotals[6] += m_StatsTotal.lightsync.llLightSyncPacketsSent;
+        llTotals[7] += m_StatsTotal.lightsync.llPureSyncPacketsSkipped;
+    }
+
+    // Add total
+    {
+        pResult->AddRow ();
         pResult->AddRow ();
         SString* row = pResult->AddRow ();
 
         int c = 0;
         row[c++] = "Total";
-        row[c++] = SString ( "%lld", llTotals[0] );
-        row[c++] = SString ( "%lld", llTotals[1] );
+        row[c++] = CPerfStatManager::GetScaledByteString ( llTotals[0] );
+        row[c++] = CPerfStatManager::GetScaledByteString ( llTotals[1] );
         row[c++] = SString ( "%lld", llTotals[2] );
         row[c++] = SString ( "%lld", llTotals[3] );
+
+        row[c++] = CPerfStatManager::GetScaledByteString ( llTotals[4] );
+        row[c++] = CPerfStatManager::GetScaledByteString ( llTotals[5] );
+        row[c++] = SString ( "%lld", llTotals[6] );
+        row[c++] = SString ( "%lld", llTotals[7] );
     }
 
+    // Add reduction
     {
+        pResult->AddRow ();
         SString* row = pResult->AddRow ();
 
-        double dSentPackets5Sec    = static_cast < double > ( llTotals[0] );
-        double dSkippedPackets5Sec = static_cast < double > ( llTotals[1] );
-        double dSentPacketsAll    = static_cast < double > ( llTotals[2] );
-        double dSkippedPacketsAll = static_cast < double > ( llTotals[3] );
+        double dBytesSent5Sec      = static_cast < double > ( llTotals[0] );
+        double dBytesSkipped5Sec   = static_cast < double > ( llTotals[1] );
+        double dPacketsSent5Sec    = static_cast < double > ( llTotals[2] );
+        double dPacketsSkipped5Sec = static_cast < double > ( llTotals[3] );
 
-        double dPercent5Sec = 100 * dSkippedPackets5Sec / Max ( 1.0, dSentPackets5Sec + dSkippedPackets5Sec );
-        double dPercentAll  = 100 * dSkippedPacketsAll / Max ( 1.0, dSentPacketsAll + dSkippedPacketsAll );
+        double dBytesSentAll       = static_cast < double > ( llTotals[4] );
+        double dBytesSkippedAll    = static_cast < double > ( llTotals[5] );
+        double dPacketsSentAll     = static_cast < double > ( llTotals[6] );
+        double dPacketsSkippedAll  = static_cast < double > ( llTotals[7] );
+
+        double dBytesPercent5Sec   = 100 * dBytesSkipped5Sec / Max ( 1.0, dBytesSent5Sec + dBytesSkipped5Sec );
+        double dPacketsPercent5Sec = 100 * dPacketsSkipped5Sec / Max ( 1.0, dPacketsSent5Sec + dPacketsSkipped5Sec );
+
+        double dBytesPercentAll    = 100 * dBytesSkippedAll / Max ( 1.0, dBytesSentAll + dBytesSkippedAll );
+        double dPacketsPercentAll  = 100 * dPacketsSkippedAll / Max ( 1.0, dPacketsSentAll + dPacketsSkippedAll );
 
         int c = 0;
         row[c++] = "Reduction percent";
-        row[c++] = SString ( "%0.0f%%", -dPercent5Sec );
+        row[c++] = SString ( "%0.0f%%", -dBytesPercent5Sec );
         row[c++] = "";
-        row[c++] = SString ( "%0.0f%%", -dPercentAll );
+        row[c++] = SString ( "%0.0f%%", -dPacketsPercent5Sec );
         row[c++] = "";
+        row[c++] = SString ( "%0.0f%%", -dBytesPercentAll );
+        row[c++] = "";
+        row[c++] = SString ( "%0.0f%%", -dPacketsPercentAll );
+        row[c++] = "";
+
+        pResult->AddRow ();
+        pResult->AddRow ();
     }
 }

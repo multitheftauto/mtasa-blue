@@ -114,6 +114,15 @@ bool CClientSound::Create ( void )
     // Get and save length
     m_dLength = m_pAudio->GetLength ();
 
+    // Save the length in the resource incase we need it another time
+#if 0
+    // TODO
+    //   Storing the length of previouly loaded files in the resource will help the client avoid
+    //   loading far away sounds, just to get the length.
+    //   (The length is required to simulate the finish time of streamed out sounds)
+    this->GetResource ()->SetAudioFileLength ( m_strPath, m_dLength );
+#endif
+
     // Transfer dynamic state
     m_pAudio->SetVolume ( m_fVolume );
     m_pAudio->SetPlaybackSpeed ( m_fPlaybackSpeed );
@@ -283,13 +292,29 @@ double CClientSound::GetPlayPosition ( void )
     return 0;
 }
 
-double CClientSound::GetLength ( void )
+//
+// Set bAvoidLoad to true to try to avoid any initial load that may be required
+//
+double CClientSound::GetLength ( bool bAvoidLoad )
 {
-    if ( !m_bDoneCreate && !m_bStream )
+    if ( m_dLength == 0 && !m_bDoneCreate && !m_bStream )
     {
-        // If never loaded, do a create and destroy to get the length
-        Create ();
-        Destroy ();
+        // Not loaded by this entity yet
+
+#if 0       // TODO
+        if ( bAvoidLoad )
+        {
+            // Caller wants to avoid loading the file to find out the length,
+            // so see if resouce has already loaded the file
+            m_dLength == this->GetResource ()->GetAudioFileLength ( m_strPath );
+        }
+#endif
+        // If needed, do a create and destroy to get the length
+        if ( m_dLength == 0 )
+        {
+            Create ();
+            Destroy ();
+        }
     }
     return m_dLength;
 }
@@ -428,7 +453,7 @@ SString CClientSound::GetMetaTags( const SString& strFormat )
 //
 // CClientSound::SetFxEffect
 //
-// TODO and test
+//
 //
 ////////////////////////////////////////////////////////////
 bool CClientSound::SetFxEffect ( uint uiFxEffect, bool bEnable )
@@ -518,4 +543,30 @@ void CClientSound::Process3D ( const CVector& vecPlayerPosition, const CVector& 
             OutputDebugLine ( SString ( "onClientSoundStream %d %f %s", eventInfo.bBool, eventInfo.dNumber, *eventInfo.strString ) );
         }
     }
+}
+
+
+////////////////////////////////////////////////////////////
+//
+// CClientSound::IsFinished
+//
+//
+////////////////////////////////////////////////////////////
+bool CClientSound::IsFinished ( void )
+{
+    if ( m_pAudio )
+        return m_pAudio->IsFinished ();
+
+    // For 3D non-streamed non-looped sounds, check if simulated position has reached the end
+    if ( m_b3D && !m_bStream && !m_bLoop )
+    {
+        // SimulatedPlayPosition needs the correct length. Try to get the length without loading the file
+        if ( m_dLength == 0 )
+            GetLength ( true );
+
+        m_SimulatedPlayPosition.SetLength ( m_dLength );
+        return m_SimulatedPlayPosition.IsFinished ();
+    }
+
+    return false;
 }

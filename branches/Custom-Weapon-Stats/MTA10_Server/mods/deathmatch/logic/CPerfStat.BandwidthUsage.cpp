@@ -121,7 +121,7 @@ public:
     long long                   m_llNextRecordTime;
     long long                   m_llNextSaveTime;
     SString                     m_strCategoryName;
-    NetStatistics               m_PrevLiveStats;
+    SBandwidthStatistics        m_PrevLiveStats;
     long long                   m_llPrevHttpTotalBytesSent;
     std::vector < SNetStatHistoryType > m_History;
 };
@@ -393,11 +393,12 @@ void CPerfStatBandwidthUsageImpl::AddDebugInfo ( const SString& strMessage )
 void CPerfStatBandwidthUsageImpl::RecordStats ( void )
 {
     // Sample new stats and calc the delta
-    NetStatistics liveStats;
-    g_pNetServer->GetNetworkStatistics ( &liveStats );
+    SBandwidthStatistics liveStats;
+    if ( !g_pNetServer->GetBandwidthStatistics ( &liveStats ) )
+        return;
 
-    long long llDeltaGameBytesSent = Max < long long > ( 0LL, liveStats.runningTotal [ NS_ACTUAL_BYTES_SENT ] - m_PrevLiveStats.runningTotal [ NS_ACTUAL_BYTES_SENT ] );
-    long long llDeltaGameBytesRecv = Max < long long > ( 0LL, liveStats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] - m_PrevLiveStats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] );
+    long long llDeltaGameBytesSent = Max < long long > ( 0LL, liveStats.llOutgoingUDPByteCount - m_PrevLiveStats.llOutgoingUDPByteCount );
+    long long llDeltaGameBytesRecv = Max < long long > ( 0LL, liveStats.llIncomingUDPByteCount - m_PrevLiveStats.llIncomingUDPByteCount );
     m_PrevLiveStats = liveStats;
 
     long long llHttpTotalBytesSent = EHS::StaticGetTotalBytesSent ();
@@ -484,31 +485,6 @@ void CPerfStatBandwidthUsageImpl::AddSampleAtTime ( time_t tTime, long long llGa
             }
         }
     }
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// CPerfStatBandwidthUsageImpl::GetScaledBandwidthString
-//
-//
-//
-///////////////////////////////////////////////////////////////
-SString GetScaledBandwidthString ( long long Amount )
-{
-    if ( Amount > 1024LL * 1024 * 1024 * 1024 )
-        return SString ( "%.2f TB", Amount / ( 1024.0 * 1024 * 1024 * 1024 ) );
-
-    if ( Amount > 1024LL * 1024 * 1024 )
-        return SString ( "%.2f GB", Amount / ( 1024.0 * 1024 * 1024 ) );
-
-    if ( Amount > 1024 * 1024 )
-        return SString ( "%.2f MB", Amount / ( 1024.0 * 1024 ) );
-
-    if ( Amount > 1024 )
-        return SString ( "%.2f KB", Amount / ( 1024.0 ) );
-
-    return SString ( "%d", Amount );
 }
 
 
@@ -610,12 +586,12 @@ void CPerfStatBandwidthUsageImpl::GetStats ( CPerfStatResult* pResult, const std
 
                 if ( !bTotalsOnly )
                 {
-                    row[c++] = GetScaledBandwidthString ( item.llGameRecv );
-                    row[c++] = GetScaledBandwidthString ( item.llGameSent );
-                    row[c++] = GetScaledBandwidthString ( item.llHttpSent );
+                    row[c++] = CPerfStatManager::GetScaledByteString ( item.llGameRecv );
+                    row[c++] = CPerfStatManager::GetScaledByteString ( item.llGameSent );
+                    row[c++] = CPerfStatManager::GetScaledByteString ( item.llHttpSent );
                 }
                 else
-                    row[c++] = GetScaledBandwidthString ( item.llGameRecv + item.llGameSent + item.llHttpSent );
+                    row[c++] = CPerfStatManager::GetScaledByteString ( item.llGameRecv + item.llGameSent + item.llHttpSent );
             }
             else
             {

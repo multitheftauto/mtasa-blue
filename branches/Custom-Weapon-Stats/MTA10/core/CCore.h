@@ -202,6 +202,7 @@ public:
     void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1 );
     void                    ApplyFrameRateLimit             ( uint uiOverrideRate = -1 );
     void                    EnsureFrameRateLimitApplied     ( void );
+    void                    DoReliablePulse                 ( void );
 
     uint                    GetMinStreamingMemory           ( void );
     uint                    GetMaxStreamingMemory           ( void );
@@ -213,6 +214,7 @@ public:
     const char *            GetCommandLineOption            ( const char* szOption );
     const char *            GetCommandLineArgs              ( void ) { return m_szCommandLineArgs; }
     void                    RequestNewNickOnStart           ( void ) { m_bWaitToSetNick = true; };
+    bool                    WillRequestNewNickOnStart       ( void ) { return m_bWaitToSetNick; };
 
     //XFire
     SString                 UpdateXfire                     ( void );
@@ -221,6 +223,8 @@ public:
 
     void                    OnPreHUDRender                  ( void );
     void                    OnDeviceRestore                 ( void );
+    void                    OnCrashAverted                  ( uint uiId );
+    void                    LogEvent                        ( const char* szType, const char* szContext, const char* szBody );
 
 private:
     // Core devices.

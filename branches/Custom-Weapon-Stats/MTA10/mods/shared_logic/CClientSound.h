@@ -44,7 +44,7 @@ public:
     void                    SetPlayPosition         ( double dPosition );
     double                  GetPlayPosition         ( void );
 
-    double                  GetLength               ( void );
+    double                  GetLength               ( bool bAvoidLoad = false );
 
     void                    SetVolume               ( float fVolume, bool bStore = true );
     float                   GetVolume               ( void );
@@ -72,6 +72,7 @@ public:
     void                    Unlink                  ( void ) {};
 
     bool                    IsSoundStopped          ( void )                            { return m_pAudio == NULL; }
+    bool                    IsFinished              ( void );
 
     bool                    IsSound3D               ( void )                            { return m_b3D; }
 

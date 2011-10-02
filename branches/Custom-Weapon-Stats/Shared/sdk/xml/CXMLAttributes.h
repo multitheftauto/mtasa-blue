@@ -27,6 +27,7 @@ public:
 
     virtual CXMLAttribute*              Create          ( const char* szName ) = 0;
     virtual CXMLAttribute*              Create          ( const CXMLAttribute& Copy ) = 0;
+    virtual bool                        Delete          ( const char* szName ) = 0;
     virtual void                        DeleteAll       ( void ) = 0;
 
     virtual std::list < CXMLAttribute* >::iterator

@@ -677,6 +677,8 @@ public:
     String	OnGlyphDrawn ( unsigned long ulGlyph ) const;
 
     String	cleanGlyphCache ( String strCache ) const;
+
+    void	processStringForGlyphs ( String strText ) const;
     
     void    extendFontGlyphs (const String glyph_set) const;
 

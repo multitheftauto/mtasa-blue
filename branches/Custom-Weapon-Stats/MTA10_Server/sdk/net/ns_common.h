@@ -98,5 +98,11 @@ struct NetStatistics
     int encryptionStatus;
 };
 
+struct SBandwidthStatistics
+{
+    long long llOutgoingUDPByteCount;
+    long long llIncomingUDPByteCount;
+};
+
 #endif
 

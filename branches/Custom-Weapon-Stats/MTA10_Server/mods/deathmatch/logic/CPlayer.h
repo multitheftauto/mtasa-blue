@@ -28,8 +28,6 @@ class CPlayer;
 #include "CObject.h"
 #include "packets/CPacket.h"
 
-#define DISTANCE_FOR_SLOW_SYNCRATE  320
-
 class CKeyBinds;
 class CPlayerCamera;
 
@@ -123,7 +121,7 @@ public:
     inline time_t                               GetNickChangeTime           ( void )                        { return m_tNickChange; };
     inline void                                 SetNickChangeTime           ( time_t tNickChange )          { m_tNickChange = tNickChange; };
 
-    void                                        Send                        ( const CPacket& Packet );
+    uint                                        Send                        ( const CPacket& Packet );
     void                                        SendEcho                    ( const char* szEcho );
     void                                        SendConsole                 ( const char* szEcho );
 
@@ -218,8 +216,8 @@ public:
     inline void                                 IncrementPuresync           ( void )                        { m_uiPuresyncPackets++; }
     inline unsigned int                         GetPuresyncCount            ( void ) const                  { return m_uiPuresyncPackets; }
 
-    void                                        NotifyReceivedSync        ( void )                        { m_ulLastReceivedSyncTime = GetTickCount32 (); }
-    unsigned long                               GetTicksSinceLastReceivedSync ( void ) const              { return GetTickCount32 () - m_ulLastReceivedSyncTime; }
+    void                                        NotifyReceivedSync          ( void )                        { m_lastReceivedSyncTime = CTickCount::Now (); }
+    bool                                        UhOhNetworkTrouble          ( void )                        { return ( CTickCount::Now () - m_lastReceivedSyncTime ).ToLongLong () > 5000; }
 
     const std::string&                          GetAnnounceValue            ( const std::string& strKey ) const;
     void                                        SetAnnounceValue            ( const std::string& strKey, const std::string& strValue );
@@ -236,6 +234,50 @@ public:
     void                                        RemovePlayerFromDistLists   ( CPlayer* pOther );
     void                                        MovePlayerToNearList        ( CPlayer* pOther );
     void                                        MovePlayerToFarList         ( CPlayer* pOther );
+
+public:
+
+    //
+    // Light Sync
+    //
+    struct SLightweightSyncData
+    {
+        SLightweightSyncData ()
+        {
+            health.uiContext = 0;
+            health.bSync = false;
+            vehicleHealth.uiContext = 0;
+            vehicleHealth.bSync = false;
+            m_bSyncPosition = false;
+        }
+
+        struct
+        {
+            float           fLastHealth;
+            float           fLastArmor;
+            bool            bSync;
+            unsigned int    uiContext;
+        } health;
+
+        struct
+        {
+            CVehicle*       lastVehicle;
+            float           fLastHealth;
+            bool            bSync;
+            unsigned int    uiContext;
+        } vehicleHealth;
+
+        bool m_bSyncPosition;
+    };
+    SLightweightSyncData&                       GetLightweightSyncData      ( void )                      { return m_lightweightSyncData; }
+
+    void                                        SetPosition                 ( const CVector &vecPosition );
+    long long                                   GetPositionLastChanged      ( void )                        { return m_llLastPositionHasChanged; }
+    void                                        MarkPositionAsChanged       ( void )                        { m_llLastPositionHasChanged = GetTickCount64_ (); }
+
+    //
+    // End Light Sync
+    //
 
     eVoiceState                                 GetVoiceState               ( void )                      { return m_VoiceState; }
     void                                        SetVoiceState               ( eVoiceState State )         { m_VoiceState = State; }
@@ -255,11 +297,14 @@ public:
     void                                        SetCameraOrientation        ( const CVector& vecPosition, const CVector& vecFwd );
     bool                                        IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo );
     int                                         GetSyncZone                 ( CPlayer* pOther );
+    int                                         GetApproxPureSyncPacketSize ( void );
     const CVector&                              GetCamPosition              ( void )            { return m_vecCamPosition; };
     const CVector&                              GetCamFwd                   ( void )            { return m_vecCamFwd; };
 
 
 private:
+    SLightweightSyncData                        m_lightweightSyncData;
+
     void                                        WriteCameraModePacket       ( void );
     void                                        WriteCameraPositionPacket   ( void );
 
@@ -346,7 +391,7 @@ private:
     bool                                        m_bSyncingVelocity;
     unsigned int                                m_uiPuresyncPackets;
 
-    unsigned long                               m_ulLastReceivedSyncTime;
+    CTickCount                                  m_lastReceivedSyncTime;
 
     std::map < std::string, std::string >       m_AnnounceValues;
 
@@ -359,6 +404,8 @@ private:
     CVector                                     m_vecCamPosition;
     CVector                                     m_vecCamFwd;
     int                                         m_iLastZoneDebug;
+
+    long long                                   m_llLastPositionHasChanged;
 };
 
 #endif

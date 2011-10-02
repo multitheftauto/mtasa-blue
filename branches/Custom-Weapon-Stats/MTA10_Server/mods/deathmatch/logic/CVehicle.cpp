@@ -489,7 +489,12 @@ bool CVehicle::SetOccupant ( CPed* pPed, unsigned int uiSeat )
     if ( !bAlreadySetting )
     {
         // Set the Player
-        m_pOccupants [uiSeat] = pPed;
+        if ( m_pOccupants [uiSeat] != pPed )
+        {
+            if ( uiSeat == 0 && m_pOccupants[0] && IS_PLAYER(m_pOccupants[0]) )
+                g_pGame->GetPlayerManager()->BroadcastOnlyJoined ( CVehicleResyncPacket(this) );
+            m_pOccupants [uiSeat] = pPed;
+        }
 
         // Make sure the Player record is up to date
         if ( pPed )
@@ -568,7 +573,7 @@ void CVehicle::SetUpgrades ( CVehicleUpgrades* pUpgrades )
 
 bool CVehicle::SetTowedVehicle ( CVehicle* pVehicle )
 {
-    if ( m_pTowedVehicle && pVehicle )
+    if ( m_pTowedVehicle )
     {
         m_pTowedVehicle->m_pTowedByVehicle = NULL;
         m_pTowedVehicle = NULL;
@@ -595,7 +600,7 @@ bool CVehicle::SetTowedVehicle ( CVehicle* pVehicle )
 
 bool CVehicle::SetTowedByVehicle ( CVehicle* pVehicle )
 {
-    if ( m_pTowedByVehicle && pVehicle )
+    if ( m_pTowedByVehicle )
     {
         m_pTowedByVehicle->m_pTowedVehicle = NULL;
         m_pTowedByVehicle = NULL;

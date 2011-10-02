@@ -713,6 +713,7 @@ public:
     LUA_DECLARE ( SetSunSize );
     LUA_DECLARE ( ResetSunSize );
     LUA_DECLARE ( SetAircraftMaxHeight );
+    LUA_DECLARE ( CreateSWATRope );
 
     // Input functions
     LUA_DECLARE ( BindKey );

@@ -491,7 +491,8 @@ void CMainMenu::Update ( void )
         {
             float fProgress = ((*it)->image->GetAlpha()-CORE_MTA_NORMAL_ALPHA)/(CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
 		    // Let's work out what the target progress should be by working out the time passed
-		    fProgress = fProgress - ((float)ulTimePassed/CORE_MTA_ANIMATION_TIME)*(CORE_MTA_HOVER_ALPHA-CORE_MTA_NORMAL_ALPHA);
+            // Min of 0.5 progress fixes occasional graphical glitchekal
+		    fProgress = fProgress - Min ( 0.5f, ((float)ulTimePassed/CORE_MTA_ANIMATION_TIME)*(CORE_MTA_HOVER_ALPHA-CORE_MTA_NORMAL_ALPHA) );
             if ( SetItemHoverProgress ( (*it), fProgress, false ) )
             {
                 std::set<sMenuItem*>::iterator itToErase = it++;

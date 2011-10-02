@@ -380,3 +380,18 @@ void CSettingsSA::SetAspectRatio ( eAspectRatio aspectRatio )
 
     MemPutFast < float > ( 0xC3EFA4, fValue );
 }
+
+////////////////////////////////////////////////
+//
+// Grass
+//
+////////////////////////////////////////////////
+bool CSettingsSA::IsGrassEnabled ( void )
+{
+    return *(BYTE*)0x05DBAED == 0x85;
+}
+
+void CSettingsSA::SetGrassEnabled ( bool bEnable )
+{
+    MemPutFast < BYTE > ( 0x05DBAED, bEnable ? 0x85 : 0x33 );
+}

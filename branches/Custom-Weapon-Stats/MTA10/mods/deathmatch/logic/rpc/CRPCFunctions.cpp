@@ -136,6 +136,7 @@ void CRPCFunctions::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInterf
         SRPCHandler* pHandler = &m_RPCHandlers [ ucFunctionID ];
         if ( pHandler->Callback != NULL )
         {
+            g_pCore->LogEvent ( "RPC", "", pHandler->szName );
             if ( m_bShowRPCs )
                 g_pCore->GetConsole ()->Printf ( "* rpc: %s", pHandler->szName );
             (pHandler->Callback) ( bitStream );
@@ -146,6 +147,7 @@ void CRPCFunctions::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInterf
         SElementRPCHandler* pElementHandler = &m_ElementRPCHandlers [ ucFunctionID ];
         if ( pElementHandler->Callback != NULL )
         {
+            g_pCore->LogEvent ( "Element RPC", "", pElementHandler->szName );
             if ( m_bShowRPCs )
                 g_pCore->GetConsole ()->Printf ( "* element-rpc: %s", pElementHandler->szName );
 

@@ -34,7 +34,7 @@ CLuaManager::CLuaManager ( CClientGame* pClientGame )
 
     // Load the C functions
     LoadCFunctions ();
-    //lua_registerPreCallHook ( DummyPreCall );
+    lua_registerPreCallHook ( CLuaDefs::CanUseFunction );
 }
 
 
@@ -921,6 +921,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setSunSize", CLuaFunctionDefs::SetSunSize );
     CLuaCFunctions::AddFunction ( "resetSunSize", CLuaFunctionDefs::ResetSunSize );
     CLuaCFunctions::AddFunction ( "setAircraftMaxHeight", CLuaFunctionDefs::SetAircraftMaxHeight );
+    CLuaCFunctions::AddFunction ( "createSWATRope", CLuaFunctionDefs::CreateSWATRope );
 
     // Input functions
     CLuaCFunctions::AddFunction ( "bindKey", CLuaFunctionDefs::BindKey );

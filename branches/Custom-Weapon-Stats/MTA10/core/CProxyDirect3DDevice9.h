@@ -402,6 +402,22 @@ public:
     {
         char Name[128];
         int InstalledMemoryKB;
+        int MaxAnisotropicSetting;
+    };
+
+    struct SCallState
+    {
+        enum eD3DCallType
+        {
+            NONE,
+            DRAW_PRIMITIVE,
+            DRAW_INDEXED_PRIMITIVE,
+        };
+        eD3DCallType callType;
+        uint uiNumArgs;
+        int args [ 10 ];
+        SString strShaderName;
+        bool bShaderRequiresNormals;
     };
 
     struct SD3DDeviceState
@@ -419,12 +435,15 @@ public:
         SD3DLightEnableState            LightEnableState[8];
 
         IDirect3DVertexDeclaration9*    VertexDeclaration;
+        IDirect3DVertexShader9*         VertexShader;
+        IDirect3DPixelShader9*          PixelShader;
         IDirect3DIndexBuffer9*          IndexBufferData;
         D3DLIGHT9                       Lights[8];
         D3DMATERIAL9                    Material;
         D3DCAPS9                        DeviceCaps;
         SD3DVertexDeclState             VertexDeclState;
         SAdapterState                   AdapterState;
+        SCallState                      CallState;
 
         struct
         {
@@ -434,10 +453,13 @@ public:
         }                               VertexStreams[16];
     };
 
-    bool                m_bCaptureState;
     SD3DDeviceState     DeviceState;
+
+    // Debugging
+    void                SetCallType     ( SCallState::eD3DCallType callType, uint uiNumArgs = 0, ... );
 };
 
+extern CProxyDirect3DDevice9* g_pProxyDevice;
 extern CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState;
 
 

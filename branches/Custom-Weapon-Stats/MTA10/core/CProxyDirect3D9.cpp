@@ -131,12 +131,7 @@ HRESULT    CProxyDirect3D9::CheckDeviceFormatConversion ( UINT Adapter, D3DDEVTY
 
 HRESULT    CProxyDirect3D9::GetDeviceCaps               ( UINT Adapter, D3DDEVTYPE DeviceType, D3DCAPS9* pCaps )
 {   
-    HRESULT hResult;
-
-    hResult = m_pDevice->GetDeviceCaps ( Adapter, DeviceType, pCaps );
-	pCaps->VertexShaderVersion = 0;
-	pCaps->PixelShaderVersion = 0;
-    return hResult;
+    return m_pDevice->GetDeviceCaps ( Adapter, DeviceType, pCaps );
 }
 
 HMONITOR   CProxyDirect3D9::GetAdapterMonitor           ( UINT Adapter )

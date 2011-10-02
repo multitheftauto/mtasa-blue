@@ -702,7 +702,13 @@ void CVersionUpdater::ResetEverything ()
 ///////////////////////////////////////////////////////////////
 bool CVersionUpdater::IsBusy ( void )
 {
-    return m_Stack.size () || ( m_CurrentProgram.IsValid () );
+    if ( m_Stack.size () || ( m_CurrentProgram.IsValid () ) )
+        return true;
+    if ( GetQuestionBox ().IsVisible () )
+        return true;
+    if ( CCore::GetSingleton ().WillRequestNewNickOnStart() )
+        return true;
+    return false;
 }
 
 
@@ -2497,25 +2503,26 @@ void CVersionUpdater::_UseCrashDumpPostContent ( void )
     // Extract module and address from filename
     std::vector < SString > parts;
     strPathFilename.Split ( "_", parts );
-    if ( parts.size () > 7 )
+    if ( parts.size () > DUMP_PART_TIME )
     {
-        SString strModuleAndOffset = parts[2] + "_" + parts[3];
-        SString strDateAndTime = parts[6] + "_" + parts[7];
+        SString strVersionAndModuleAndOffset = parts[DUMP_PART_VERSION] + "_" + parts[DUMP_PART_MODULE] + "_" + parts[DUMP_PART_OFFSET];
+        SString strDateAndTime = parts[DUMP_PART_DATE] + "_" + parts[DUMP_PART_TIME];
         strDateAndTime.Split ( ".", &strDateAndTime, NULL );
 
         // Check history for duplicates
         CDataInfoSet& history = m_VarConfig.crashdump_history;
         int iDuplicates = 0;
         for ( uint i = 0 ; i < history.size () ; i++ )
-            if ( strModuleAndOffset == history[i].strName )
+            if ( strVersionAndModuleAndOffset == history[i].GetAttribute ( "tag" ) )
                 iDuplicates++;
 
         // Add to history
         if ( iDuplicates <= m_MasterConfig.crashdump.iDuplicates )
         {
             SDataInfoItem item;
-            item.strName = strModuleAndOffset;
-            item.strValue = strDateAndTime;
+            item.strName = "dump";
+            item.SetAttribute( "tag", strVersionAndModuleAndOffset );
+            item.SetAttribute( "date", strDateAndTime );
             history.push_back ( item );
         }
         else
@@ -2526,7 +2533,7 @@ void CVersionUpdater::_UseCrashDumpPostContent ( void )
         {
             SDataInfoItem& a = history[i];
             SDataInfoItem& b = history[i+1];
-            if ( a.strValue > b.strValue )
+            if ( a.GetAttribute ( "date" ) > b.GetAttribute ( "date" ) )
             {
                 std::swap ( a, b );
                 i = Max ( i - 2, -1 );

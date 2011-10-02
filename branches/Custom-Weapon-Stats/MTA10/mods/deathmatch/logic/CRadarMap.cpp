@@ -63,14 +63,14 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     SetupMapVariables ();
 
     // Create the radar and local player blip images
-    m_pRadarImage = g_pCore->GetGraphics()->LoadTexture ( CalcMTASAPath("MTA\\cgui\\images\\radar.jpg"), RADAR_TEXTURE_WIDTH, RADAR_TEXTURE_HEIGHT );
-    m_pLocalPlayerBlip = g_pCore->GetGraphics()->LoadTexture ( CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png")  );
+    m_pRadarImage = g_pCore->GetGraphics()->GetRenderItemManager ()->CreateTexture ( CalcMTASAPath("MTA\\cgui\\images\\radar.jpg") );
+    m_pLocalPlayerBlip = g_pCore->GetGraphics()->GetRenderItemManager ()->CreateTexture ( CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png") );
 
     // Create the marker textures
     CreateMarkerTextures ();
 
     // Create the text display for the mode text
-    m_pModeText = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
+    m_pModeText = new CClientTextDisplay ( m_pManager->GetDisplayManager () );
     m_pModeText->SetCaption ( "Current Mode: Free Move" );
     m_pModeText->SetColor ( SColorRGBA ( 255, 255, 255, 200 ) );
     m_pModeText->SetPosition ( CVector ( 0.50f, 0.92f, 0 ) );
@@ -122,7 +122,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     const SBindableKey *bkAttachRadar = cbAttachRadar->boundKey;
 
     // Create the text displays for the help text
-    m_pHelpTextZooming = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
+    m_pHelpTextZooming = new CClientTextDisplay ( m_pManager->GetDisplayManager () );
     m_pHelpTextZooming->SetCaption ( SString("Press %s/%s to zoom in/out.", bkZoomIn->szKey, bkZoomOut->szKey).c_str () );
     m_pHelpTextZooming->SetColor( SColorRGBA ( 255, 255, 255, 255 ) );
     m_pHelpTextZooming->SetPosition ( CVector ( 0.50f, 0.05f, 0 ) );
@@ -130,7 +130,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     m_pHelpTextZooming->SetScale ( 1.0f );
     m_pHelpTextZooming->SetVisible ( false );
 
-    m_pHelpTextMovement = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
+    m_pHelpTextMovement = new CClientTextDisplay ( m_pManager->GetDisplayManager () );
     m_pHelpTextMovement->SetCaption ( SString("Press %s, %s, %s, %s to navigate the map.", bkMoveNorth->szKey, bkMoveEast->szKey, bkMoveSouth->szKey, bkMoveWest->szKey).c_str() );
     m_pHelpTextMovement->SetColor( SColorRGBA ( 255, 255, 255, 255 ) );
     m_pHelpTextMovement->SetPosition ( CVector ( 0.50f, 0.08f, 0 ) );
@@ -138,7 +138,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     m_pHelpTextMovement->SetScale ( 1.0f );
     m_pHelpTextMovement->SetVisible ( false );
 
-    m_pHelpTextAttachment = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
+    m_pHelpTextAttachment = new CClientTextDisplay ( m_pManager->GetDisplayManager () );
     m_pHelpTextAttachment->SetCaption ( SString("Press %s to change mode.", bkAttachRadar->szKey).c_str() );
     m_pHelpTextAttachment->SetColor( SColorRGBA ( 255, 255, 255, 255 ) );
     m_pHelpTextAttachment->SetPosition ( CVector ( 0.50f, 0.11f, 0 ) );
@@ -152,14 +152,14 @@ CRadarMap::~CRadarMap ( void )
 {
     // Delete our images
     if ( m_pRadarImage )
-        m_pRadarImage->Release();
+        m_pRadarImage->ReleaseRenderItem();
 
     if ( m_pLocalPlayerBlip )
-        m_pLocalPlayerBlip->Release();
+        m_pLocalPlayerBlip->ReleaseRenderItem();
 
     for ( uint i = 0 ; i < m_MarkerTextureList.size () ; i++ )
         if ( m_MarkerTextureList[i] )
-            m_MarkerTextureList[i]->Release ();
+            m_MarkerTextureList[i]->ReleaseRenderItem ();
 
     m_MarkerTextureList.clear ();
 
@@ -223,13 +223,19 @@ void CRadarMap::CreateMarkerTextures ( void )
     // Load the 3 shapes
     const char* shapeFileNames[] = { "square.png", "up.png", "down.png" };
     for ( uint i = 0 ; i < NUMELMS( shapeFileNames ) ; i++ )
-        m_MarkerTextureList.push_back ( g_pCore->GetGraphics()->LoadTexture ( PathJoin ( strRadarSetDirectory, shapeFileNames[i] ) ) );
+    {
+        CTextureItem* pTextureItem = g_pCore->GetGraphics()->GetRenderItemManager ()->CreateTexture ( PathJoin ( strRadarSetDirectory, shapeFileNames[i] ) );
+        m_MarkerTextureList.push_back ( pTextureItem );
+    }
 
     assert ( m_MarkerTextureList.size () == MARKER_FIRST_SPRITE_INDEX );
 
     // Load the icons
     for ( uint i = 0 ; i < RADAR_MARKER_LIMIT ; i++ )
-        m_MarkerTextureList.push_back ( g_pCore->GetGraphics()->LoadTexture ( PathJoin ( strRadarSetDirectory, SString ( "%02u.png", i + 1 ) ) ) );
+    {
+        CTextureItem* pTextureItem = g_pCore->GetGraphics()->GetRenderItemManager ()->CreateTexture ( PathJoin ( strRadarSetDirectory, SString ( "%02u.png", i + 1 ) ) );
+        m_MarkerTextureList.push_back ( pTextureItem );
+    }
 
     assert ( m_MarkerTextureList.size () == MARKER_LAST_SPRITE_INDEX + 1 );
 }
@@ -238,7 +244,7 @@ void CRadarMap::CreateMarkerTextures ( void )
 //
 // Get a texture for a marker, including scale and color
 //
-IDirect3DTexture9* CRadarMap::GetMarkerTexture ( CClientRadarMarker* pMarker, float fLocalZ, float* pfScale, SColor* pColor )
+CTextureItem* CRadarMap::GetMarkerTexture ( CClientRadarMarker* pMarker, float fLocalZ, float* pfScale, SColor* pColor )
 {
     float fScale = pMarker->GetScale ();
     ulong ulSprite = pMarker->GetSprite ();
@@ -352,7 +358,7 @@ void CRadarMap::DoRender ( void )
                 // Grab the marker image and calculate the position to put it on the screen
                 float fScale = 1;
                 SColor color;
-                IDirect3DTexture9* pTexture = GetMarkerTexture ( *markerIter, vecLocal.fZ, &fScale, &color );
+                CTextureItem* pTexture = GetMarkerTexture ( *markerIter, vecLocal.fZ, &fScale, &color );
 
                 if ( pTexture )
                 {

@@ -567,6 +567,7 @@ bool CGameSA::VerifySADataFileNames ()
            !strcmp ( *(char **)0x5BD839, "DATA" ) &&
            !strcmp ( *(char **)0x5BD84C, "HANDLING.CFG" ) &&
            !strcmp ( *(char **)0x5BEEE8, "DATA\\melee.dat" ) &&
+           !strcmp ( *(char **)0x4D563E, "ANIM\\PED.IFP" ) &&
            !strcmp ( *(char **)0x5B925B, "DATA\\OBJECT.DAT" ) &&
            !strcmp ( *(char **)0x55D0FC, "data\\surface.dat" ) &&
            !strcmp ( *(char **)0x55F2BB, "data\\surfaud.dat" ) &&

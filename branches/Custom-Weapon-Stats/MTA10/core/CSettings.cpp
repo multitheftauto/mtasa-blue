@@ -42,6 +42,23 @@ extern SBindableKey g_bkKeys[];
 
 CSettings::CSettings ( void )
 {
+    m_iMaxAnisotropic = g_pDeviceState->AdapterState.MaxAnisotropicSetting;
+    m_pWindow = NULL;
+    CreateGUI ();
+}
+
+
+CSettings::~CSettings ( void )
+{
+    DestroyGUI ();
+}
+
+
+void CSettings::CreateGUI ( void )
+{
+    if ( m_pWindow )
+        DestroyGUI ();
+
     CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabCommunity, *pTabInterface, *pTabAdvanced;
     CGUI *pManager = g_pCore->GetGUI ();
 
@@ -108,61 +125,46 @@ CSettings::CSettings ( void )
     /**
      *  Controls tab
      **/
-    // Toggles
-    //Create everything under a scrollpane
-#if 0   // Keep this puppy handy 'case we need it again
-    CGUIScrollPane* m_pControlsScrollPane = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( pTabControls ) ); 
-    m_pControlsScrollPane->SetProperty ( "ContentPaneAutoSized", "False" );
-    m_pControlsScrollPane->SetProperty( "ContentArea", "l:0.000000 t:0.000000 r:0.000000 b:395.000000" ); //Defines the height of hte content
-    m_pControlsScrollPane->SetPosition ( CVector2D ( 0.0f, 0.0f ), true );
-    m_pControlsScrollPane->SetSize ( CVector2D ( 1.0f, 1.0f ), true );
-    m_pControlsScrollPane->SetVerticalScrollStepSize ( 0.15f );
-    m_pControlsScrollPane->SetVerticalScrollBar ( true );
-    CGUIElement* pControlsPane = m_pControlsScrollPane;
-#else
-    CGUIElement* pControlsPane = pTabControls;
-#endif
-
     //Mouse Options
-    m_pControlsMouseLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Mouse options" ) );
+    m_pControlsMouseLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Mouse options" ) );
     m_pControlsMouseLabel->SetPosition ( CVector2D ( 11, 13 ) );
     m_pControlsMouseLabel->AutoSize ( "Mouse options  " );
     m_pControlsMouseLabel->SetFont ( "default-bold-small" );
 
-    m_pInvertMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pControlsPane, "Invert mouse vertically", true ) );
+    m_pInvertMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, "Invert mouse vertically", true ) );
     m_pInvertMouse->SetPosition ( CVector2D ( 11, 31 ) );
     m_pInvertMouse->GetPosition ( vecTemp, false );
     m_pInvertMouse->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
-    m_pSteerWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pControlsPane, "Steer with mouse", true ) );
+    m_pSteerWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, "Steer with mouse", true ) );
     m_pSteerWithMouse->SetPosition ( CVector2D ( vecTemp.fX + 320, vecTemp.fY ) );
 
-    m_pLabelMouseSensitivity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Mouse sensitivity:" ) );
+    m_pLabelMouseSensitivity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Mouse sensitivity:" ) );
     m_pLabelMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16.0f ) );
     m_pLabelMouseSensitivity->GetPosition ( vecTemp, false );
     m_pLabelMouseSensitivity->AutoSize ( "Mouse sensitivity:" );
 
-    m_pMouseSensitivity = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pControlsPane ) );
+    m_pMouseSensitivity = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabControls ) );
     m_pMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY ) );
     m_pMouseSensitivity->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pMouseSensitivity->SetProperty ( "StepSize", "0.01" );
 
-    m_pLabelMouseSensitivityValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "0%") );
+    m_pLabelMouseSensitivityValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "0%") );
     m_pLabelMouseSensitivityValue->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY ) );
     m_pLabelMouseSensitivityValue->AutoSize ( "100%" );
 
-    m_pFlyWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pControlsPane, "Fly with mouse", true ) );
+    m_pFlyWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, "Fly with mouse", true ) );
     m_pFlyWithMouse->SetPosition ( CVector2D ( vecTemp.fX + 320, vecTemp.fY ) );
     m_pFlyWithMouse->GetPosition ( vecTemp, false );
 
     //Joypad options
-    m_pControlsJoypadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Joypad options" ) );
+    m_pControlsJoypadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Joypad options" ) );
     m_pControlsJoypadLabel->SetPosition ( CVector2D ( 11, 83 ) );
     m_pControlsJoypadLabel->AutoSize ( "Joypad options  " );
     m_pControlsJoypadLabel->SetFont ( "default-bold-small" );
 
     //Create a mini-scrollpane for the radio buttons (only way to group them together)
-    m_pControlsInputTypePane = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( pControlsPane ) ); 
+    m_pControlsInputTypePane = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( pTabControls ) ); 
     m_pControlsInputTypePane->SetProperty ( "ContentPaneAutoSized", "False" );
     m_pControlsInputTypePane->SetPosition ( CVector2D ( 0, 101 ) );
     m_pControlsInputTypePane->SetSize ( CVector2D ( 1.0f, 0.27f ), true );
@@ -184,43 +186,43 @@ CSettings::CSettings ( void )
 
         CJoystickManagerInterface* JoyMan = GetJoystickManager ();
 
-        m_pJoypadName = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane ) );
+        m_pJoypadName = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls ) );
         m_pJoypadName->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
         m_pJoypadName->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
 
-        m_pJoypadUnderline = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane ) );
+        m_pJoypadUnderline = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls ) );
         m_pJoypadUnderline->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
         m_pJoypadUnderline->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
 
-        m_pEditDeadzone = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pControlsPane ) );
+        m_pEditDeadzone = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabControls ) );
         m_pEditDeadzone->SetPosition ( CVector2D ( 10, 175 ) );
         m_pEditDeadzone->SetSize ( CVector2D ( 45.0f, 24.0f ) );
         m_pEditDeadzone->SetMaxLength ( 3 );
         m_pEditDeadzone->SetTextChangedHandler ( GUI_CALLBACK ( &CSettings::OnJoypadTextChanged, this ) );
 
-        m_pEditSaturation = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pControlsPane ) );
+        m_pEditSaturation = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabControls ) );
         m_pEditSaturation->SetPosition ( CVector2D ( 10, 206 ) );
         m_pEditSaturation->SetSize ( CVector2D ( 45.0f, 24.0f ) );
         m_pEditSaturation->SetMaxLength ( 3 );
         m_pEditSaturation->SetTextChangedHandler ( GUI_CALLBACK ( &CSettings::OnJoypadTextChanged, this ) );
 
-        CGUILabel* pLabelDeadZone = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Dead Zone" ) );
+        CGUILabel* pLabelDeadZone = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Dead Zone" ) );
         pLabelDeadZone->SetPosition ( m_pEditDeadzone->GetPosition () + CVector2D ( 52.f, -1.f ) );
         pLabelDeadZone->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelDeadZone->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
 
-        CGUILabel* pLabelSaturation = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Saturation" ) );
+        CGUILabel* pLabelSaturation = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Saturation" ) );
         pLabelSaturation->SetPosition ( m_pEditSaturation->GetPosition () + CVector2D ( 52.f, -1.f ) );
         pLabelSaturation->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelSaturation->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
 
-        CGUIButton*  pJoyDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pControlsPane, "Load defaults" ) );
+        CGUIButton*  pJoyDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabControls, "Load defaults" ) );
         pJoyDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnJoypadDefaultClick, this ) );
         pJoyDefButton->SetPosition ( CVector2D ( 402, 365 ) );
 
         pJoyDefButton->SetZOrderingEnabled ( false );
 
-        CGUILabel* pLabelHelp = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Use the 'Binds' tab for joypad buttons." ) );
+        CGUILabel* pLabelHelp = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Use the 'Binds' tab for joypad buttons." ) );
         pLabelHelp->SetPosition ( CVector2D ( 10, 282 ) );
         pLabelHelp->SetSize ( CVector2D ( 250.0f, 24.0f ) );
         pLabelHelp->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
@@ -243,7 +245,7 @@ CSettings::CSettings ( void )
         {
             CVector2D vecPos = vecPosList[i];
 
-            CGUIButton* pButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pControlsPane ) );
+            CGUIButton* pButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabControls ) );
             pButton->SetPosition ( vecPos );
             pButton->SetPosition ( pButton->GetPosition() + CVector2D ( 10, 0 ) );
             pButton->SetSize ( CVector2D ( 48.0f, 24.0f ) );
@@ -251,7 +253,7 @@ CSettings::CSettings ( void )
             pButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnAxisSelectClick, this ) );
             pButton->SetZOrderingEnabled ( false );
 
-            CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane ) );
+            CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls ) );
             pLabel->SetPosition ( vecPos + CVector2D ( 0, -26 ) );
             pLabel->SetPosition ( pLabel->GetPosition() - CVector2D ( 10, 0 ));
             pLabel->SetSize ( CVector2D ( 88.0f, 24.0f ) );
@@ -263,13 +265,13 @@ CSettings::CSettings ( void )
             m_pJoypadButtons.push_back ( pButton );
         }
 
-        CGUILabel* pLabelLeft = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Left Stick" ) );
+        CGUILabel* pLabelLeft = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Left Stick" ) );
         pLabelLeft->SetPosition ( CVector2D ( 221, 189 ) );
         pLabelLeft->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelLeft->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
         pLabelLeft->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
 
-        CGUILabel* pLabelRight = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Right Stick" ) );
+        CGUILabel* pLabelRight = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Right Stick" ) );
         pLabelRight->SetPosition ( CVector2D ( 410, 189 ) );
         pLabelRight->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelRight->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
@@ -477,12 +479,12 @@ CSettings::CSettings ( void )
     m_pComboResolution->SetReadOnly ( true );
 
     m_pCheckBoxWindowed = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Windowed", true ) );
-    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY - 3.0f ) );
+    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY - 3.0f ) );
     m_pCheckBoxWindowed->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     float fPosY =  vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Full Screen Minimize", true ) );
-    m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, fPosY + 13.0f ) );
+    m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, fPosY + 13.0f ) );
     m_pCheckBoxMinimize->SetSize ( CVector2D ( 224.0f, 16.0f ) );
     if ( !GetVideoModeManager ()->IsMultiMonitor () )
     {
@@ -491,7 +493,7 @@ CSettings::CSettings ( void )
     }
 
     m_pCheckBoxDisableAero = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Disable Aero Desktop", true ) );
-    m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY + 29.0f ) );
+    m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 29.0f ) );
     m_pCheckBoxDisableAero->SetSize ( CVector2D ( 224.0f, 16.0f ) );
     if ( GetApplicationSetting ( "os-version" ) < "6.1" || GetApplicationSettingInt ( "aero-changeable" ) == 0 )
     {
@@ -500,7 +502,7 @@ CSettings::CSettings ( void )
     }
 
     m_pCheckBoxMipMapping = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Mip Mapping", true ) );
-    m_pCheckBoxMipMapping->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY + 45.0f ) );
+    m_pCheckBoxMipMapping->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 45.0f ) );
     m_pCheckBoxMipMapping->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 #ifndef MIP_MAPPING_SETTING_APPEARS_TO_DO_SOMETHING
     m_pCheckBoxMipMapping->SetVisible ( false );
@@ -552,8 +554,35 @@ CSettings::CSettings ( void )
     m_pComboFxQuality->SetReadOnly ( true );
 
     m_pCheckBoxVolumetricShadows = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Volumetric Shadows", true ) );
-    m_pCheckBoxVolumetricShadows->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY + 2.0f ) );
+    m_pCheckBoxVolumetricShadows->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 2.0f ) );
     m_pCheckBoxVolumetricShadows->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
+    m_pCheckBoxGrass = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Grass effect", true ) );
+    m_pCheckBoxGrass->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 22.0f ) );
+    m_pCheckBoxGrass->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
+    m_pAnisotropicLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Anisotropic filtering:" ) );
+    m_pAnisotropicLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
+    m_pAnisotropicLabel->GetPosition ( vecTemp, false );
+    m_pAnisotropicLabel->AutoSize ( "Anisotropic filtering:" );
+
+    m_pAnisotropic = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
+    m_pAnisotropic->SetPosition ( CVector2D ( vecTemp.fX + 86 + 44, vecTemp.fY ) );
+    m_pAnisotropic->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pAnisotropic->SetProperty ( "StepSize", SString ( "%1.2f", 1 / (float)m_iMaxAnisotropic ) );
+
+    m_pAnisotropicValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Off") );
+    m_pAnisotropicValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 256.0f + 44, vecTemp.fY ) );
+    m_pAnisotropicValueLabel->AutoSize ( "100x" );
+
+    if ( m_iMaxAnisotropic < 1 )
+    {
+        // Hide if system can't do anisotropic filtering
+        m_pFXQualityLabel->GetPosition ( vecTemp, false );
+        m_pAnisotropicLabel->SetVisible ( false );
+        m_pAnisotropic->SetVisible ( false );
+        m_pAnisotropicValueLabel->SetVisible ( false );
+    }
 
     m_pAntiAliasingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Anti-aliasing:" ) );
     m_pAntiAliasingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
@@ -856,6 +885,44 @@ CSettings::CSettings ( void )
     m_pSingleDownloadLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
 
+    // Network encryption setting
+    m_pNetworkEncryptionLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Network encryption:" ) );
+    m_pNetworkEncryptionLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pNetworkEncryptionLabel->AutoSize ( m_pNetworkEncryptionLabel->GetText ().c_str () );
+
+    m_pNetworkEncryptionCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pNetworkEncryptionCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pNetworkEncryptionCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pNetworkEncryptionCombo->AddItem ( "Off" )->SetData ( (void*)0 );
+    m_pNetworkEncryptionCombo->AddItem ( "Default" )->SetData ( (void*)1 );
+    m_pNetworkEncryptionCombo->SetReadOnly ( true );
+
+    m_pNetworkEncryptionLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Some ISPs may have\ntrouble with encryption" ) );
+    m_pNetworkEncryptionLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
+    m_pNetworkEncryptionLabelInfo->SetFont ( "default-bold-small" );
+    m_pNetworkEncryptionLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 40-4;
+
+    // Debug setting
+    m_pDebugSettingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Debug setting:" ) );
+    m_pDebugSettingLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pDebugSettingLabel->AutoSize ( m_pDebugSettingLabel->GetText ().c_str () );
+
+    m_pDebugSettingCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pDebugSettingCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pDebugSettingCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pDebugSettingCombo->AddItem ( "Default" )->SetData ( (void*)0 );
+    m_pDebugSettingCombo->AddItem ( "#6323 Network" )->SetData ( (void*)1 );
+    m_pDebugSettingCombo->SetReadOnly ( true );
+
+    m_pDebugSettingLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Select default always.\n(This setting is not saved)" ) );
+    m_pDebugSettingLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
+    m_pDebugSettingLabelInfo->SetFont ( "default-bold-small" );
+    m_pDebugSettingLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 40-4;
+
+    m_pDebugSettingCombo->SetText ( "Default" );
+    SetApplicationSetting ( "diagnostics", "debug-setting", "none" );
 
     // Auto updater section label
     m_pAdvancedUpdaterLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Auto updater" ) );
@@ -906,6 +973,7 @@ CSettings::CSettings ( void )
     m_pAudioVoiceVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnVoiceVolumeChanged, this ) );
     m_pDrawDistance->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnDrawDistanceChanged, this ) );
     m_pBrightness->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnBrightnessChanged, this ) );
+    m_pAnisotropic->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnAnisotropicChanged, this ) );
     m_pMouseSensitivity->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnMouseSensitivityChanged, this ) );
     m_pComboFxQuality->SetSelectionHandler ( GUI_CALLBACK( &CSettings::OnFxQualityChanged, this ) );
     m_pCheckBoxVolumetricShadows->SetClickHandler ( GUI_CALLBACK( &CSettings::OnVolumetricShadowsClick, this ) );
@@ -923,12 +991,13 @@ CSettings::CSettings ( void )
 }
 
 
-CSettings::~CSettings ( void )
+void CSettings::DestroyGUI ( void )
 {
     // Destroy
     delete m_pButtonCancel;
     delete m_pButtonOK;
     delete m_pWindow;
+    m_pWindow = NULL;
 }
 
 
@@ -1045,6 +1114,11 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     m_pDrawDistance->SetScrollPosition ( ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f );
     m_pBrightness->SetScrollPosition ( ( float )gameSettings->GetBrightness () / 384 );
 
+    // Anisotropic filtering
+    int iAnisotropic;
+    CVARS_GET ( "anisotropic", iAnisotropic );
+    m_pAnisotropic->SetScrollPosition ( iAnisotropic / ( float )m_iMaxAnisotropic );
+
     int FxQuality = gameSettings->GetFXQuality();
     if ( FxQuality == 0 ) m_pComboFxQuality->SetText ( "Low" );
     else if ( FxQuality == 1 ) m_pComboFxQuality->SetText ( "Medium" );
@@ -1070,6 +1144,12 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     CVARS_GET("volumetric_shadows", bVolumetricShadowsEnabled);
     m_pCheckBoxVolumetricShadows->SetSelected ( bVolumetricShadowsEnabled );
     m_pCheckBoxVolumetricShadows->SetEnabled ( FxQuality != 0 );
+
+    // Grass
+    bool bGrassEnabled;
+    CVARS_GET ( "grass", bGrassEnabled );
+    m_pCheckBoxGrass->SetSelected ( bGrassEnabled );
+    m_pCheckBoxGrass->SetEnabled ( FxQuality != 0 );
 
     VideoMode           vidModemInfo;
     int                 vidMode, numVidModes;
@@ -1251,7 +1331,10 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
     gameSettings->SetFXQuality ( 2 );
     gameSettings->SetAntiAliasing ( 1, true );
     CVARS_SET ("aspect_ratio", ASPECT_RATIO_AUTO );
+    CVARS_SET ("anisotropic", 0 );
     CVARS_SET ("volumetric_shadows", false );
+    CVARS_SET ( "grass", true );
+
     // change
     bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( 0, false, false );
 
@@ -1829,6 +1912,10 @@ void CSettings::SetVisible ( bool bVisible )
     // Load the config file if the dialog is shown
     if ( bVisible )
     {
+#ifdef MTA_DEBUG
+        if ( ( GetAsyncKeyState ( VK_CONTROL ) & 0x8000 ) != 0 )
+            CreateGUI ();   // Recreate GUI (for adjusting layout with edit and continue)
+#endif
         m_pWindow->BringToFront ();
         m_pWindow->Activate ();
         LoadData ();
@@ -2048,6 +2135,11 @@ void CSettings::LoadData ( void )
     m_pDrawDistance->SetScrollPosition ( ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f );
     m_pBrightness->SetScrollPosition ( ( float )gameSettings->GetBrightness () / 384 );
 
+    // Anisotropic filtering
+    int iAnisotropic;
+    CVARS_GET ( "anisotropic", iAnisotropic );
+    m_pAnisotropic->SetScrollPosition ( iAnisotropic / ( float )m_iMaxAnisotropic );
+
     int FxQuality = gameSettings->GetFXQuality();
     if ( FxQuality == 0 ) m_pComboFxQuality->SetText ( "Low" );
     else if ( FxQuality == 1 ) m_pComboFxQuality->SetText ( "Medium" );
@@ -2073,6 +2165,12 @@ void CSettings::LoadData ( void )
     CVARS_GET("volumetric_shadows", bVolumetricShadowsEnabled);
 	m_pCheckBoxVolumetricShadows->SetSelected ( bVolumetricShadowsEnabled );
 	m_pCheckBoxVolumetricShadows->SetEnabled ( FxQuality != 0 );
+
+    // Grass
+    bool bGrassEnabled;
+    CVARS_GET ( "grass", bGrassEnabled );
+    m_pCheckBoxGrass->SetSelected ( bGrassEnabled );
+    m_pCheckBoxGrass->SetEnabled ( FxQuality != 0 );
 
     VideoMode           vidModemInfo;
     int                 vidMode, numVidModes;
@@ -2140,6 +2238,11 @@ void CSettings::LoadData ( void )
     CVARS_GET ( "single_download", iVar );
     if ( iVar == 0 ) m_pSingleDownloadCombo->SetText ( "Default" );
     else if ( iVar == 1 ) m_pSingleDownloadCombo->SetText ( "On" );
+
+    // Network encryption
+    CVARS_GET ( "network_encryption", iVar );
+    if ( iVar == 0 ) m_pNetworkEncryptionCombo->SetText ( "Off" );
+    else if ( iVar == 1 ) m_pNetworkEncryptionCombo->SetText ( "Default" );
 
     // Update build type
     CVARS_GET ( "update_build_type", iVar );
@@ -2309,6 +2412,10 @@ void CSettings::SaveData ( void )
     // Update Aero override setting. This need to be a registry setting as it's done in the launcher
     SetApplicationSettingInt ( "aero-enabled", m_pCheckBoxDisableAero->GetSelected() ? 0 : 1 );
 
+    // Anisotropic filtering
+    int iAnisotropic = Min < int > ( m_iMaxAnisotropic, ( m_pAnisotropic->GetScrollPosition () ) * ( m_iMaxAnisotropic + 1 ) );
+    CVARS_SET( "anisotropic", iAnisotropic );
+
     // Visual FX Quality
     if ( CGUIListItem* pQualitySelected = m_pComboFxQuality->GetSelectedItem () )
     {
@@ -2327,6 +2434,11 @@ void CSettings::SaveData ( void )
     bool bVolumetricShadowsEnabled = m_pCheckBoxVolumetricShadows->GetSelected ();
     CVARS_SET ( "volumetric_shadows", bVolumetricShadowsEnabled );
 	gameSettings->SetVolumetricShadowsEnabled ( bVolumetricShadowsEnabled );
+
+    // Grass
+    bool bGrassEnabled = m_pCheckBoxGrass->GetSelected ();
+    CVARS_SET ( "grass", bGrassEnabled );
+	gameSettings->SetGrassEnabled ( bGrassEnabled );
 
     // Async loading
     if ( CGUIListItem* pSelected = m_pAsyncCombo->GetSelectedItem () )
@@ -2360,6 +2472,23 @@ void CSettings::SaveData ( void )
         CVARS_SET ( "single_download", iSelected );
     }
 
+    // Network encryption
+    if ( CGUIListItem* pSelected = m_pNetworkEncryptionCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "network_encryption", iSelected );
+    }
+
+    // Debug setting
+    if ( CGUIListItem* pSelected = m_pDebugSettingCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        SString strDebugSetting = "none";
+        if ( iSelected == 1 )
+            strDebugSetting = "net";    // #6323 Network
+        SetApplicationSetting ( "diagnostics", "debug-setting", strDebugSetting );
+    }
+
     // Update build type
     if ( CGUIListItem* pSelected = m_pUpdateBuildTypeCombo->GetSelectedItem () )
     {
@@ -2389,11 +2518,6 @@ void CSettings::SaveData ( void )
 
     strVar = m_pChatScaleX->GetText () + " " + m_pChatScaleY->GetText ();
     CVARS_SET ( "chat_scale", strVar );
-
-    // Test error reporter
-    if ( m_pChatLines->GetText () == "crashme" )
-        *((int*)NULL) = 0;      
-
     CVARS_SET ( "chat_lines", m_pChatLines->GetText () );
     CVARS_SET ( "chat_width", m_pChatWidth->GetText () );
     CVARS_SET ( "chat_css_style_text", m_pChatCssText->GetSelected () );
@@ -2786,6 +2910,20 @@ bool CSettings::OnBrightnessChanged ( CGUIElement* pElement )
     return true;
 }
 
+bool CSettings::OnAnisotropicChanged ( CGUIElement* pElement )
+{
+    int iAnisotropic = Min < int > ( m_iMaxAnisotropic, ( m_pAnisotropic->GetScrollPosition () ) * ( m_iMaxAnisotropic + 1 ) );
+
+    SString strLabel;
+    if ( iAnisotropic > 0 )
+        strLabel = SString ( "%ix", 1 << iAnisotropic );
+    else
+        strLabel = "Off";
+
+    m_pAnisotropicValueLabel->SetText ( strLabel );
+    return true;
+}
+
 bool CSettings::OnStreamingMemoryChanged ( CGUIElement* pElement )
 {
     float fPos = m_pStreamingMemory->GetScrollPosition ();
@@ -2946,9 +3084,13 @@ bool CSettings::OnFxQualityChanged ( CGUIElement* pElement )
     {
         m_pCheckBoxVolumetricShadows->SetSelected ( false );
         m_pCheckBoxVolumetricShadows->SetEnabled ( false );
+        m_pCheckBoxGrass->SetEnabled ( false );
     }
     else
+    {
         m_pCheckBoxVolumetricShadows->SetEnabled ( true );
+        m_pCheckBoxGrass->SetEnabled ( true );
+    }
         
     return true;
 }

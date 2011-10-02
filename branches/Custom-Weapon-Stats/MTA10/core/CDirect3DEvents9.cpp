@@ -17,6 +17,7 @@
 #include "profiler/SharedUtil.Profiler.h"
 #include "CProxyDirect3DVertexBuffer.h"
 #include "CAdditionalVertexStreamManager.h"
+#include "CVertexStreamBoundingBoxManager.h"
 
 #include <stdexcept>
 
@@ -24,6 +25,7 @@
 static IDirect3DSurface9*  ms_pSaveLockSurface  = NULL;
 static int                 ms_bSaveStarted      = 0;
 static long long           ms_LastSaveTime      = 0;
+static uint                ms_RequiredAnisotropicLevel = 1;
 
 
 void CDirect3DEvents9::OnDirect3DDeviceCreate  ( IDirect3DDevice9 *pDevice )
@@ -34,6 +36,7 @@ void CDirect3DEvents9::OnDirect3DDeviceCreate  ( IDirect3DDevice9 *pDevice )
     CCore::GetSingleton ( ).InitGUI ( pDevice );
 
     CAdditionalVertexStreamManager::GetSingleton ()->OnDeviceCreate ( pDevice );
+    CVertexStreamBoundingBoxManager::GetSingleton ()->OnDeviceCreate ( pDevice );
 
     // Create all our fonts n stuff
     CGraphics::GetSingleton ().OnDeviceCreate ( pDevice );
@@ -152,6 +155,11 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     
     // End the scene that we started.
     pDevice->EndScene ();
+
+    // Update incase settings changed
+    int iAnisotropic;
+    CVARS_GET ( "anisotropic", iAnisotropic );
+    ms_RequiredAnisotropicLevel = 1 << iAnisotropic;
     
     // Tidyup after last screenshot
     if ( ms_bSaveStarted )
@@ -238,15 +246,23 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
     // Any shader for this texture ?
     CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
 
+    // Don't apply if a vertex shader is already being used
+    if ( g_pDeviceState->VertexShader )
+        pShaderItem = NULL;
+
     if ( !pShaderItem )
     {
         // No shader for this texture
-        return pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
+        return DrawPrimitiveGuarded ( pDevice, PrimitiveType, StartVertex, PrimitiveCount );
     }
     else
     {
         // Yes shader for this texture
         CShaderInstance* pShaderInstance = pShaderItem->m_pShaderInstance;
+
+        // Save some debugging info
+        g_pDeviceState->CallState.strShaderName = pShaderInstance->m_pEffectWrap->m_strName;
+        g_pDeviceState->CallState.bShaderRequiresNormals = pShaderInstance->m_pEffectWrap->m_bRequiresNormals;
 
         // Apply custom parameters
         pShaderInstance->ApplyShaderParameters ();
@@ -265,7 +281,7 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
         for ( uint uiPass = 0 ; uiPass < uiNumPasses ; uiPass++ )
         {
             pD3DEffect->BeginPass ( uiPass );
-            pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
+            DrawPrimitiveGuarded ( pDevice, PrimitiveType, StartVertex, PrimitiveCount );
             pD3DEffect->EndPass ();
         }
         pD3DEffect->End ();
@@ -277,6 +293,7 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
             pDevice->SetPixelShader( NULL );
         }
 
+        g_pDeviceState->CallState.strShaderName = "";
         return D3D_OK;
     }
 }
@@ -291,18 +308,45 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
 /////////////////////////////////////////////////////////////
 HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount )
 {
+    // Apply anisotropic filtering if required
+    if ( ms_RequiredAnisotropicLevel > 1 )
+    {
+        pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC );
+        pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
+        if ( ms_RequiredAnisotropicLevel > g_pDeviceState->SamplerState[0].MAXANISOTROPY )
+            pDevice->SetSamplerState ( 0, D3DSAMP_MAXANISOTROPY, ms_RequiredAnisotropicLevel );
+    }
+
     // Any shader for this texture ?
     CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
+
+    // Don't apply if a vertex shader is already being used
+    if ( g_pDeviceState->VertexShader )
+        pShaderItem = NULL;
+
+    if ( pShaderItem && pShaderItem->m_fMaxDistanceSq > 0 )
+    {
+        // If shader has a max distance, check this vertex range bounding box
+        float fDistanceSq = CVertexStreamBoundingBoxManager::GetSingleton ()->GetDistanceSqToGeometry ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+
+        // If distance was obtained and vertices are too far away, don't apply the shader
+        if ( fDistanceSq > 0 && fDistanceSq > pShaderItem->m_fMaxDistanceSq )
+            pShaderItem = NULL;
+    }
 
     if ( !pShaderItem )
     {
         // No shader for this texture
-        return pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+        return DrawIndexedPrimitiveGuarded ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
     }
     else
     {
         // Yes shader for this texture
         CShaderInstance* pShaderInstance = pShaderItem->m_pShaderInstance;
+
+        // Save some debugging info
+        g_pDeviceState->CallState.strShaderName = pShaderInstance->m_pEffectWrap->m_strName;
+        g_pDeviceState->CallState.bShaderRequiresNormals = pShaderInstance->m_pEffectWrap->m_bRequiresNormals;
 
         // Add normal stream if shader wants it
         if ( pShaderInstance->m_pEffectWrap->m_bRequiresNormals )
@@ -328,7 +372,7 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
         for ( uint uiPass = 0 ; uiPass < uiNumPasses ; uiPass++ )
         {
             pD3DEffect->BeginPass ( uiPass );
-            pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+            DrawIndexedPrimitiveGuarded ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
             pD3DEffect->EndPass ();
         }
         pD3DEffect->End ();
@@ -343,8 +387,53 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
         // Unset additional vertex stream
         CAdditionalVertexStreamManager::GetSingleton ()->MaybeUnsetAdditionalVertexStream ();
 
+        g_pDeviceState->CallState.strShaderName = "";
         return D3D_OK;
     }
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// DrawPrimitiveGuarded
+//
+// Catch access violations
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::DrawPrimitiveGuarded ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,UINT StartVertex,UINT PrimitiveCount )
+{
+    HRESULT hr = D3D_OK;
+    __try
+    {
+        hr = pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
+    }
+    __except( GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION )
+    {
+        CCore::GetSingleton ().OnCrashAverted ( 100 );
+    }
+    return hr;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// DrawIndexedPrimitiveGuarded
+//
+// Catch access violations
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount )
+{
+    HRESULT hr = D3D_OK;
+    __try
+    {
+        hr = pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+    }
+    __except( GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION )
+    {
+        CCore::GetSingleton ().OnCrashAverted ( 101 );
+    }
+    return hr;
 }
 
 
