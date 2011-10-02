@@ -1099,28 +1099,28 @@ void CClientGame::DoPulses ( void )
                 SString strError;
                 switch ( ucError )
                 {
-                    case ID_RSA_PUBLIC_KEY_MISMATCH:
+                    case RID_RSA_PUBLIC_KEY_MISMATCH:
                         strError = "Disconnected: unknown protocol error.";  // encryption key mismatch
                         break;
-                    case ID_REMOTE_DISCONNECTION_NOTIFICATION:
+                    case RID_REMOTE_DISCONNECTION_NOTIFICATION:
                         strError = "Disconnected: disconnected remotely.";
                         break;
-                    case ID_REMOTE_CONNECTION_LOST:
+                    case RID_REMOTE_CONNECTION_LOST:
                         strError = "Disconnected: connection lost remotely.";
                         break;
-                    case ID_CONNECTION_BANNED:
+                    case RID_CONNECTION_BANNED:
                         strError = "Disconnected: you are banned from this server.";
                         break;
-                    case ID_NO_FREE_INCOMING_CONNECTIONS:
+                    case RID_NO_FREE_INCOMING_CONNECTIONS:
                         strError = "Disconnected: the server is currently full.";
                         break;
-                    case ID_DISCONNECTION_NOTIFICATION:
+                    case RID_DISCONNECTION_NOTIFICATION:
                         strError = "Disconnected: disconnected from the server.";
                         break;
-                    case ID_CONNECTION_LOST:
+                    case RID_CONNECTION_LOST:
                         strError = "Disconnected: connection to the server was lost.";
                         break;
-                    case ID_INVALID_PASSWORD:
+                    case RID_INVALID_PASSWORD:
                         strError = "Disconnected: invalid password specified.";
                         break;
                     default:
