@@ -490,31 +490,6 @@ void CPerfStatBandwidthUsageImpl::AddSampleAtTime ( time_t tTime, long long llGa
 
 ///////////////////////////////////////////////////////////////
 //
-// CPerfStatBandwidthUsageImpl::GetScaledBandwidthString
-//
-//
-//
-///////////////////////////////////////////////////////////////
-SString GetScaledBandwidthString ( long long Amount )
-{
-    if ( Amount > 1024LL * 1024 * 1024 * 1024 )
-        return SString ( "%.2f TB", Amount / ( 1024.0 * 1024 * 1024 * 1024 ) );
-
-    if ( Amount > 1024LL * 1024 * 1024 )
-        return SString ( "%.2f GB", Amount / ( 1024.0 * 1024 * 1024 ) );
-
-    if ( Amount > 1024 * 1024 )
-        return SString ( "%.2f MB", Amount / ( 1024.0 * 1024 ) );
-
-    if ( Amount > 1024 )
-        return SString ( "%.2f KB", Amount / ( 1024.0 ) );
-
-    return SString ( "%d", Amount );
-}
-
-
-///////////////////////////////////////////////////////////////
-//
 // CPerfStatBandwidthUsageImpl::GetStats
 //
 //
@@ -611,12 +586,12 @@ void CPerfStatBandwidthUsageImpl::GetStats ( CPerfStatResult* pResult, const std
 
                 if ( !bTotalsOnly )
                 {
-                    row[c++] = GetScaledBandwidthString ( item.llGameRecv );
-                    row[c++] = GetScaledBandwidthString ( item.llGameSent );
-                    row[c++] = GetScaledBandwidthString ( item.llHttpSent );
+                    row[c++] = CPerfStatManager::GetScaledByteString ( item.llGameRecv );
+                    row[c++] = CPerfStatManager::GetScaledByteString ( item.llGameSent );
+                    row[c++] = CPerfStatManager::GetScaledByteString ( item.llHttpSent );
                 }
                 else
-                    row[c++] = GetScaledBandwidthString ( item.llGameRecv + item.llGameSent + item.llHttpSent );
+                    row[c++] = CPerfStatManager::GetScaledByteString ( item.llGameRecv + item.llGameSent + item.llHttpSent );
             }
             else
             {

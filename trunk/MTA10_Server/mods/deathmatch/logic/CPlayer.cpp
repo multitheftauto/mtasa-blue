@@ -203,7 +203,7 @@ char* CPlayer::GetSourceIP ( char* pBuffer )
 }
 
 // TODO [28-Feb-2009] packetOrdering is currently always PACKET_ORDERING_GAME
-void CPlayer::Send ( const CPacket& Packet )
+uint CPlayer::Send ( const CPacket& Packet )
 {
     // Use the flags to determine how to send it
     NetServerPacketReliability Reliability;
@@ -240,6 +240,7 @@ void CPlayer::Send ( const CPacket& Packet )
         packetPriority = PACKET_PRIORITY_LOW;
     }
 
+    uint uiBitsSent = 0;
     // Allocate a bitstream for it
     NetBitStreamInterface* pBitStream = g_pNetServer->AllocateNetServerBitStream ( GetBitStreamVersion () );
     if ( pBitStream )
@@ -247,12 +248,14 @@ void CPlayer::Send ( const CPacket& Packet )
         // Write the content to it and send it
         if ( Packet.Write ( *pBitStream ) )
         {
+            uiBitsSent = pBitStream->GetNumberOfBitsUsed ();
             g_pNetServer->SendPacket ( Packet.GetPacketID (), m_PlayerSocket, pBitStream, FALSE, packetPriority, Reliability, PACKET_ORDERING_GAME );
         }
 
         // Destroy the bitstream
         g_pNetServer->DeallocateNetServerBitStream ( pBitStream );
     }
+    return uiBitsSent;
 }
 
 
@@ -567,13 +570,21 @@ bool CPlayer::IsTimeForFarSync ( void )
 
         // No far sync if light sync is enabled
         if ( g_pBandwidthSettings->bLightSyncEnabled )
-            return false;
+        {
+            // Add stats
+            int iNumPackets = m_FarPlayerList.size ();
+            g_pStats->lightsync.llPureSyncPacketsSkipped += iNumPackets;
+            g_pStats->lightsync.llPureSyncBytesSkipped += iNumPackets * GetApproxPureSyncPacketSize ();
+            return false;   // No far sync if light sync is enabled
+        }
 
-        // Calc stats
+        // Add stats
         int iNumPackets = m_FarPlayerList.size ();
         int iNumSkipped = ( iNumPackets * iSlowSyncRate - iNumPackets * 1000 ) / 1000;
         g_pStats->puresync.llSentPacketsByZone [ ZONE3 ] += iNumPackets;
+        g_pStats->puresync.llSentBytesByZone [ ZONE3 ] += iNumPackets * GetApproxPureSyncPacketSize ();
         g_pStats->puresync.llSkippedPacketsByZone [ ZONE3 ] += iNumSkipped;
+        g_pStats->puresync.llSkippedBytesByZone [ ZONE3 ] += iNumSkipped * GetApproxPureSyncPacketSize ();
         return true;
     }
     return false;
@@ -859,13 +870,25 @@ bool CPlayer::IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo
     if ( llNextUpdateTime > llTimeNow )
     {
         g_pStats->puresync.llSkippedPacketsByZone[ iZone ]++;
+        g_pStats->puresync.llSkippedBytesByZone[ iZone ] += GetApproxPureSyncPacketSize ();
         return false;
     }
 
     nearInfo.llLastUpdateTime = llTimeNow;
 
     g_pStats->puresync.llSentPacketsByZone[ iZone ]++;
+    g_pStats->puresync.llSentBytesByZone[ iZone ] += GetApproxPureSyncPacketSize ();
     return true;
+}
+
+
+//
+// Get the size pure sync packet will be for stats only
+//
+int CPlayer::GetApproxPureSyncPacketSize ( void )
+{
+    // vehicle passenger=15/driver=52, ped with weapon=34/no weapon=30
+    return m_pVehicle ? ( m_uiVehicleSeat ? 15 : 52 ) : ( m_ucWeaponSlot ? 34 : 30 );
 }
 
 

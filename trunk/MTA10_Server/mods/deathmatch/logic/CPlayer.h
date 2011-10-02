@@ -121,7 +121,7 @@ public:
     inline time_t                               GetNickChangeTime           ( void )                        { return m_tNickChange; };
     inline void                                 SetNickChangeTime           ( time_t tNickChange )          { m_tNickChange = tNickChange; };
 
-    void                                        Send                        ( const CPacket& Packet );
+    uint                                        Send                        ( const CPacket& Packet );
     void                                        SendEcho                    ( const char* szEcho );
     void                                        SendConsole                 ( const char* szEcho );
 
@@ -297,6 +297,7 @@ public:
     void                                        SetCameraOrientation        ( const CVector& vecPosition, const CVector& vecFwd );
     bool                                        IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo );
     int                                         GetSyncZone                 ( CPlayer* pOther );
+    int                                         GetApproxPureSyncPacketSize ( void );
     const CVector&                              GetCamPosition              ( void )            { return m_vecCamPosition; };
     const CVector&                              GetCamFwd                   ( void )            { return m_vecCamFwd; };
 
