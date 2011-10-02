@@ -102,6 +102,8 @@ class CZoneNames;
 class CLanBroadcast;
 class CWaterManager;
 
+class CWeaponStatManager;
+
 // Packet forward declarations
 class CCommandPacket;
 class CCustomDataPacket;
@@ -400,7 +402,9 @@ private:
     CLanBroadcast*                  m_pLanBroadcast;
     CWaterManager*                  m_pWaterManager;
 
+    CWeaponStatManager*             m_pWeaponStatsManager;
     CSerialManager                  m_SerialManager;
+
 
     char*                       m_szCurrentFileName;
 

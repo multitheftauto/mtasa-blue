@@ -252,6 +252,8 @@
 #include "CZoneNames.h"
 #include "TaskNames.h"
 #include "Utils.h"
+#include "CWeaponStat.h"
+#include "CWeaponStatManager.h"
 
 #include "CStaticFunctionDefinitions.h"
 
