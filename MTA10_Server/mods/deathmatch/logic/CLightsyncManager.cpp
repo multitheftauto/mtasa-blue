@@ -79,6 +79,10 @@ void CLightsyncManager::DoPulse ()
     if ( g_pBandwidthSettings->bLightSyncEnabled == false )
         return;
 
+    // For counting stats
+    long iPacketsSent = 0;
+    long iBitsSent = 0;
+
     CPlayerManager* pManager = g_pGame->GetPlayerManager();
     while ( m_Queue.size() > 0 && m_Queue.front().ullTime <= GetTickCount64_ () )
     {
@@ -150,14 +154,18 @@ void CLightsyncManager::DoPulse ()
 
                         if ( packet.Count () == LIGHTSYNC_MAX_PLAYERS )
                         {
-                            pPlayer->Send ( packet );
+                            iBitsSent += pPlayer->Send ( packet );
+                            iPacketsSent++;
                             packet.Reset ();
                         }
                     }
                 }
 
                 if ( packet.Count () > 0 )
-                    pPlayer->Send ( packet );
+                {
+                    iBitsSent += pPlayer->Send ( packet );
+                    iPacketsSent++;
+                }
 
                 RegisterPlayer ( pPlayer );
                 break;
@@ -180,4 +188,8 @@ void CLightsyncManager::DoPulse ()
             }
         }
     }
+
+    // Update stats
+    g_pStats->lightsync.llLightSyncPacketsSent += iPacketsSent;
+    g_pStats->lightsync.llLightSyncBytesSent += iBitsSent / 8;
 }
