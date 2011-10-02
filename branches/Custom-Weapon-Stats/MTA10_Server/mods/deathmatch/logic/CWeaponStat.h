@@ -83,10 +83,17 @@ public:
         //
         
         void                        SetFlag                 ( DWORD flag )                  { tWeaponStats.m_nFlags |= flag; }
+        // DO NOT USE.
+        void                        SetFlags                ( int iFlags )                  { tWeaponStats.m_nFlags = iFlags; }
+        // END
         void                        ClearFlag               ( DWORD flag )                  { tWeaponStats.m_nFlags &= ~flag; }
         bool                        IsFlagSet               ( DWORD flag )                  { return ((tWeaponStats.m_nFlags & flag) > 0 ? true : false); }
 
-        eWeaponModel                GetModel()                                              { return (eWeaponModel)tWeaponStats.m_modelId; }
+        eWeaponModel                GetModel                ( void )                        { return (eWeaponModel)tWeaponStats.m_modelId; }
+        void                        SetModel                ( int iModel )                  { tWeaponStats.m_modelId = (int)iModel; }
+
+        eWeaponModel                GetModel2               ( void )                        { return (eWeaponModel)tWeaponStats.m_modelId2; }
+        void                        SetModel2               ( int iModel )                  { tWeaponStats.m_modelId2 = (int)iModel; }
 
         sWeaponStats *              GetInterface            ( void )                        { return &tWeaponStats; };
 
@@ -136,11 +143,51 @@ public:
 
         float                       GetRequiredStatLevel    ( void )                        { return static_cast < float > ( tWeaponStats.m_nReqStatLevel ); }
         void                        SetRequiredStatLevel    ( float fStatLevel )            { tWeaponStats.m_nReqStatLevel = static_cast < int > ( fStatLevel ); }
+        void                        SetRequiredStatLevel    ( int iStatLevel )              { tWeaponStats.m_nReqStatLevel = iStatLevel; }
 
         DWORD                       GetAnimGroup            ( void )                        { return tWeaponStats.m_animGroup; }
         void                        SetAnimGroup            ( DWORD dwAnimGroup )           { tWeaponStats.m_animGroup = dwAnimGroup; }
 
-        eFireType                   GetFireType             ( void )                        { return tWeaponStats.m_eFireType; }
+        eFireType                   GetFireType             ( void )                        { return tWeaponStats.m_eFireType; }        
+        void                        SetFireType             ( eFireType type )              { tWeaponStats.m_eFireType = type; }
+
+        // Floats
+        float                       GetWeaponAnimLoopStart      ( void )                     { return tWeaponStats.m_animLoopStart; }
+        void                        SetWeaponAnimLoopStart      ( float animLoopStart )      { tWeaponStats.m_animLoopStart = animLoopStart; }
+
+        float                       GetWeaponAnimLoopStop       ( void )                     { return tWeaponStats.m_animLoopEnd; }
+        void                        SetWeaponAnimLoopStop       ( float animLoopEnd )        { tWeaponStats.m_animLoopEnd = animLoopEnd; }
+
+        float                       GetWeaponAnimLoopFireTime   ( void )                     { return tWeaponStats.m_animFireTime; }
+        void                        SetWeaponAnimLoopFireTime   ( float animFireTime )       { tWeaponStats.m_animFireTime = animFireTime; }
+
+        float                       GetWeaponAnim2LoopStart     ( void )                     { return tWeaponStats.m_anim2LoopStart; }
+        void                        SetWeaponAnim2LoopStart     ( float anim2LoopStart )     { tWeaponStats.m_anim2LoopStart = anim2LoopStart; }
+
+        float                       GetWeaponAnim2LoopStop      ( void )                     { return tWeaponStats.m_anim2LoopEnd; }
+        void                        SetWeaponAnim2LoopStop      ( float anim2LoopEnd )       { tWeaponStats.m_anim2LoopEnd = anim2LoopEnd; }
+
+        float                       GetWeaponAnim2LoopFireTime  ( void )                     { return tWeaponStats.m_anim2FireTime; }
+        void                        SetWeaponAnim2LoopFireTime  ( float anim2FireTime )      { tWeaponStats.m_anim2FireTime = anim2FireTime; }
+
+        float                       GetWeaponAnimBreakoutTime   ( void )                     { return tWeaponStats.m_animBreakoutTime; }
+        void                        SetWeaponAnimBreakoutTime   ( float animBreakoutTime )   { tWeaponStats.m_animBreakoutTime = animBreakoutTime; }
+
+        float                       GetWeaponSpeed              ( void )                     { return tWeaponStats.m_fSpeed; }
+        void                        SetWeaponSpeed              ( float fSpeed )             { tWeaponStats.m_fSpeed = fSpeed; }
+
+        float                       GetWeaponRadius             ( void )                     { return tWeaponStats.m_fRadius; }
+        void                        SetWeaponRadius             ( float fRadius )            { tWeaponStats.m_fRadius = fRadius; }
+        
+        // Ints
+        short                       GetAimOffsetIndex           ( void )                     { return tWeaponStats.m_nAimOffsetIndex; }    
+        void                        SetAimOffsetIndex           ( short sIndex )             { tWeaponStats.m_nAimOffsetIndex = sIndex; }    
+
+        BYTE                        GetDefaultCombo          ( void )                        { return tWeaponStats.m_defaultCombo; }
+        void                        SetDefaultCombo          ( BYTE defaultCombo )           { tWeaponStats.m_defaultCombo = defaultCombo; }
+
+        BYTE                        GetCombosAvailable       ( void )                        { return tWeaponStats.m_nCombosAvailable; }
+        void                        SetCombosAvailable       ( BYTE nCombosAvailable )       { tWeaponStats.m_nCombosAvailable = nCombosAvailable; }
 
 private:
         eWeaponType weaponType;

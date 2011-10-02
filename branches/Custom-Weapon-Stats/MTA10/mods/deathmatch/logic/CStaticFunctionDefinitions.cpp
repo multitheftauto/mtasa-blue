@@ -6750,6 +6750,51 @@ bool CStaticFunctionDefinitions::GetPedWeaponInfo ( CClientPed& ped, eWeaponProp
                     fData = pWeaponInfo->GetMoveSpeed ( );
                     break;
                 }
+                case WEAPON_SPREAD:
+                {
+                    fData = pWeaponInfo->GetSpread ( );
+                    break;
+                }
+                case WEAPON_ANIM_LOOP_START:
+                {
+                    fData = pWeaponInfo->GetWeaponAnimLoopStart ( );
+                    break;
+                }
+                case WEAPON_ANIM_LOOP_STOP:
+                {
+                    fData = pWeaponInfo->GetWeaponAnimLoopStop ( );
+                    break;
+                }
+                case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+                {
+                    fData = pWeaponInfo->GetWeaponAnimLoopFireTime ( );
+                    break;
+                }
+                case WEAPON_ANIM2_LOOP_START:
+                {
+                    fData = pWeaponInfo->GetWeaponAnim2LoopStart ( );
+                    break;
+                }
+                case WEAPON_ANIM2_LOOP_STOP:
+                {
+                    fData = pWeaponInfo->GetWeaponAnim2LoopStop ( );
+                    break;
+                }
+                case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+                {
+                    fData = pWeaponInfo->GetWeaponAnim2LoopFireTime ( );
+                    break;
+                }
+                case WEAPON_ANIM_BREAKOUT_TIME:
+                {
+                    fData = pWeaponInfo->GetWeaponAnimBreakoutTime ( );
+                    break;
+                }
+                case WEAPON_RADIUS:
+                {
+                    fData = pWeaponInfo->GetWeaponRadius ( );
+                    break;
+                }
                 default:
                     return false;
             }
@@ -6789,6 +6834,88 @@ bool CStaticFunctionDefinitions::GetPedWeaponInfo ( CClientPed& ped, eWeaponProp
                 case WEAPON_ANIM_GROUP:
                 {
                     sData = pWeaponInfo->GetAnimGroup ( );
+                    break;
+                }
+                case WEAPON_FLAGS:
+                {
+                    sData = pWeaponInfo->GetFlags ( );
+                    break;
+                }
+                case WEAPON_FIRETYPE:
+                {
+                    sData = pWeaponInfo->GetFireType ( );
+                    break;
+                }
+                case WEAPON_MODEL:
+                {
+                    sData = pWeaponInfo->GetModel ( );
+                    break;
+                }
+                case WEAPON_MODEL2:
+                {
+                    sData = pWeaponInfo->GetModel2 ( );
+                    break;
+                }
+                case WEAPON_SLOT:
+                {
+                    sData = pWeaponInfo->GetSlot ( );
+                    break;
+                }
+                case WEAPON_AIM_OFFSET:
+                {
+                    sData = pWeaponInfo->GetAimOffsetIndex ( );
+                    break;
+                }
+                case WEAPON_SKILL_LEVEL:
+                {
+                    sData = pWeaponInfo->GetSkill ( );
+                    break;
+                }
+                case WEAPON_REQ_SKILL_LEVEL:
+                {
+                    sData = pWeaponInfo->GetRequiredStatLevel ( );
+                    break;
+                }
+                case WEAPON_DEFAULT_COMBO:
+                {
+                    sData = pWeaponInfo->GetDefaultCombo ( );
+                    break;
+                }
+                case WEAPON_COMBOS_AVAILABLE:
+                {
+                    sData = pWeaponInfo->GetCombosAvailable ( );
+                    break;
+                }
+                    
+                default:
+                    return false;
+            }
+        }
+        else
+            return false;
+    }
+    else
+        return false;
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetPedWeaponInfo ( CClientPed& ped, eWeaponProperty eProperty, eWeaponType eWeapon, CVector & vecData )
+{
+    if ( eProperty == WEAPON_INVALID_PROPERTY )
+        return false;
+
+    CWeapon* pWeapon = ped.GetWeapon ( eWeapon );
+    if ( pWeapon )
+    {
+        CWeaponInfo* pWeaponInfo = pWeapon->GetInfo();
+        if ( pWeaponInfo )
+        {
+            switch ( eProperty )
+            {
+                case WEAPON_FIRE_OFFSET:
+                {
+                    vecData = *pWeaponInfo->GetFireOffset ( );
                     break;
                 }
                 default:

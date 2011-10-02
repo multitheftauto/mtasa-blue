@@ -181,17 +181,47 @@ IMPLEMENT_ENUM_BEGIN( eWeaponType )
 IMPLEMENT_ENUM_END( "weapon-type" )
 
 IMPLEMENT_ENUM_BEGIN( eWeaponProperty )
-    ADD_ENUM ( WEAPON_WEAPON_RANGE,             "weapon_range" )
-    ADD_ENUM ( WEAPON_TARGET_RANGE,             "target_range" )
-    ADD_ENUM ( WEAPON_ACCURACY,                 "accuracy" )
-    ADD_ENUM ( WEAPON_DAMAGE,                   "damage" )
-    ADD_ENUM ( WEAPON_LIFE_SPAN,                "life_span" )
-    ADD_ENUM ( WEAPON_FIRING_SPEED,             "firing_speed" )
-    ADD_ENUM ( WEAPON_SPREAD,                   "spread" )
-    ADD_ENUM ( WEAPON_MAX_CLIP_AMMO,            "maximum_clip_ammo" )
-    ADD_ENUM ( WEAPON_MOVE_SPEED,               "move_speed" )
-    ADD_ENUM ( WEAPON_FLAGS,                    "flags" )
-    ADD_ENUM ( WEAPON_ANIM_GROUP,               "anim_group" )
+    ADD_ENUM ( WEAPON_WEAPON_RANGE,                     "weapon_range" )
+    ADD_ENUM ( WEAPON_TARGET_RANGE,                     "target_range" )
+    ADD_ENUM ( WEAPON_ACCURACY,                         "accuracy" )
+    ADD_ENUM ( WEAPON_DAMAGE,                           "damage" )
+    ADD_ENUM ( WEAPON_LIFE_SPAN,                        "life_span" )
+    ADD_ENUM ( WEAPON_FIRING_SPEED,                     "firing_speed" )
+    ADD_ENUM ( WEAPON_SPREAD,                           "spread" )
+    ADD_ENUM ( WEAPON_MAX_CLIP_AMMO,                    "maximum_clip_ammo" )
+    ADD_ENUM ( WEAPON_MOVE_SPEED,                       "move_speed" )
+    ADD_ENUM ( WEAPON_FLAGS,                            "flags" )
+    ADD_ENUM ( WEAPON_ANIM_GROUP,                       "anim_group" )
+
+    // Set is Disabled >= FIRETYPE - Move above WEAPON_TYPE_SET_DISABLED to re-enable and move it above here to make it less confusing.
+    ADD_ENUM ( WEAPON_FIRETYPE,                         "fire_type" )
+
+    ADD_ENUM ( WEAPON_MODEL,                            "model" )
+    ADD_ENUM ( WEAPON_MODEL2,                           "model2" ) 
+    
+    ADD_ENUM ( WEAPON_SLOT,                             "weapon_slot" ) 
+
+    ADD_ENUM ( WEAPON_FIRE_OFFSET,                      "fire_offset" ) 
+    
+    ADD_ENUM ( WEAPON_SKILL_LEVEL,                      "skill_level" ) 
+    ADD_ENUM ( WEAPON_REQ_SKILL_LEVEL,                  "required_skill_level" ) 
+
+    ADD_ENUM ( WEAPON_ANIM_LOOP_START,                  "anim_loop_start" ) 
+    ADD_ENUM ( WEAPON_ANIM_LOOP_STOP,                   "anim_loop_stop" ) 
+    ADD_ENUM ( WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME,    "anim_loop_bullet_fire" ) 
+
+    ADD_ENUM ( WEAPON_ANIM2_LOOP_START,                 "anim2_loop_start" ) 
+    ADD_ENUM ( WEAPON_ANIM2_LOOP_STOP,                  "anim2_loop_stop" ) 
+    ADD_ENUM ( WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME,   "anim2_loop_bullet_fire" ) 
+
+    ADD_ENUM ( WEAPON_ANIM_BREAKOUT_TIME,               "anim_breakout_time" ) 
+    
+    ADD_ENUM ( WEAPON_RADIUS,                           "radius" ) 
+    
+    ADD_ENUM ( WEAPON_AIM_OFFSET,                       "aim_offset" ) 
+
+    ADD_ENUM ( WEAPON_DEFAULT_COMBO,                    "default_combo" ) 
+    ADD_ENUM ( WEAPON_COMBOS_AVAILABLE,                 "combos_available" ) 
 IMPLEMENT_ENUM_END( "weapon-property" )
 
 

@@ -144,6 +144,7 @@ public:
     static bool                         IsPedInVehicle                      ( CClientPed& Ped, bool & bInVehicle );
     static bool                         GetPedWeaponInfo                    ( CClientPed& ped, eWeaponProperty eProperty, eWeaponType eWeapon, float & fData );
     static bool                         GetPedWeaponInfo                    ( CClientPed& ped, eWeaponProperty eProperty, eWeaponType eWeapon, short & sData );
+    static bool                         GetPedWeaponInfo                    ( CClientPed& ped, eWeaponProperty eProperty, eWeaponType eWeapon, CVector & vecData );
 
     static bool                         SetPedWeaponSlot                    ( CClientEntity& Entity, int iSlot );
     static bool                         SetPedRotation                      ( CClientEntity& Entity, float fRotation );

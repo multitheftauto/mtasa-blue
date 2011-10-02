@@ -150,6 +150,7 @@ enum eWeaponStats
 // VERY MUCH VC, NEEDS TO BE UPDATED
 enum eWeaponModel
 {
+    WEAPONMODEL_NONE=-1,
     WEAPONMODEL_CELLPHONE=258,
     WEAPONMODEL_BRASSKNUCKLE,
     WEAPONMODEL_SCREWDRIVER,
@@ -225,6 +226,7 @@ class CWeaponInfo
 {
 public:
     virtual eWeaponModel                GetModel                ( void )=0;
+    virtual eWeaponModel                GetModel2               ( void )=0;
 
     virtual float                       GetWeaponRange          ( void )=0;
     virtual void                        SetWeaponRange          ( float fRange )=0;
@@ -276,11 +278,28 @@ public:
     virtual void                        SetFlag                 ( DWORD flag ) = 0;
     virtual void                        ClearFlag               ( DWORD flag ) = 0;
     virtual bool                        IsFlagSet               ( DWORD flag ) = 0;
+    virtual short                       GetFlags                ( void ) = 0;
 
     virtual DWORD                       GetAnimGroup            ( void ) = 0;
     virtual void                        SetAnimGroup            ( DWORD dwAnimGroup ) = 0;
 
     virtual eFireType                   GetFireType             ( void ) = 0;
+
+    virtual float                       GetWeaponAnimLoopStart  ( void ) = 0;
+    virtual float                       GetWeaponAnimLoopStop   ( void ) = 0;
+    virtual float                       GetWeaponAnimLoopFireTime( void ) = 0;
+
+    virtual float                       GetWeaponAnim2LoopStart  ( void ) = 0;
+    virtual float                       GetWeaponAnim2LoopStop   ( void ) = 0;
+    virtual float                       GetWeaponAnim2LoopFireTime( void ) = 0;
+
+    virtual float                       GetWeaponAnimBreakoutTime( void ) = 0;
+
+    virtual float                       GetWeaponRadius          ( void ) = 0;
+
+    virtual short                       GetAimOffsetIndex        ( void ) = 0;
+    virtual BYTE                        GetDefaultCombo          ( void ) = 0;
+    virtual BYTE                        GetCombosAvailable       ( void ) = 0;
 };
 
 #endif

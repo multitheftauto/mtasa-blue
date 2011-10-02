@@ -1852,6 +1852,15 @@ int CLuaFunctionDefs::GetPedWeaponInfo ( lua_State* luaVM )
             case WEAPON_LIFE_SPAN:
             case WEAPON_SPREAD:
             case WEAPON_MOVE_SPEED:
+            // Get only
+            case WEAPON_ANIM_LOOP_START:
+            case WEAPON_ANIM_LOOP_STOP:
+            case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+            case WEAPON_ANIM2_LOOP_START:
+            case WEAPON_ANIM2_LOOP_STOP:
+            case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+            case WEAPON_ANIM_BREAKOUT_TIME:
+            case WEAPON_RADIUS:
             {
                 float fWeaponInfo = 0.0f;
 
@@ -1864,7 +1873,17 @@ int CLuaFunctionDefs::GetPedWeaponInfo ( lua_State* luaVM )
             }
             case WEAPON_DAMAGE:
             case WEAPON_MAX_CLIP_AMMO:
+            case WEAPON_FLAGS:
             case WEAPON_ANIM_GROUP:
+            case WEAPON_FIRETYPE:
+            case WEAPON_MODEL:
+            case WEAPON_MODEL2:
+            case WEAPON_SLOT:
+            case WEAPON_AIM_OFFSET:
+            case WEAPON_SKILL_LEVEL:
+            case WEAPON_REQ_SKILL_LEVEL:
+            case WEAPON_DEFAULT_COMBO:
+            case WEAPON_COMBOS_AVAILABLE:
             {
                 short sWeaponInfo = 0;
 
@@ -1872,6 +1891,19 @@ int CLuaFunctionDefs::GetPedWeaponInfo ( lua_State* luaVM )
                 {
                     lua_pushinteger ( luaVM, sWeaponInfo );
                     return 1;
+                }
+                break;
+            }
+            case WEAPON_FIRE_OFFSET:
+            {
+                CVector vecWeaponInfo;
+
+                if ( CStaticFunctionDefinitions::GetPedWeaponInfo ( *pPed, eProp, eWep, vecWeaponInfo ) )
+                {
+                    lua_pushnumber ( luaVM, vecWeaponInfo.fX );
+                    lua_pushnumber ( luaVM, vecWeaponInfo.fY );
+                    lua_pushnumber ( luaVM, vecWeaponInfo.fZ );
+                    return 3;
                 }
                 break;
             }
