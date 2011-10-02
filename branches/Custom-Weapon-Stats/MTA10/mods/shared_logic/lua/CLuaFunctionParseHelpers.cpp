@@ -224,6 +224,11 @@ IMPLEMENT_ENUM_BEGIN( eWeaponProperty )
     ADD_ENUM ( WEAPON_COMBOS_AVAILABLE,                 "combos_available" ) 
 IMPLEMENT_ENUM_END( "weapon-property" )
 
+IMPLEMENT_ENUM_BEGIN( eWeaponSkill )
+ADD_ENUM ( WEAPONSKILL_POOR,                            "poor" )
+ADD_ENUM ( WEAPONSKILL_STD,                             "std" )
+ADD_ENUM ( WEAPONSKILL_PRO,                             "pro" )
+IMPLEMENT_ENUM_END( "weapon-skill" )
 
 //
 // Get best guess at name of userdata type

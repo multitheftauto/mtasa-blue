@@ -142,9 +142,9 @@ public:
     static bool                         GetPedWeaponMuzzlePosition          ( CClientPed& Ped, CVector& vecPosition );
     static bool                         IsPedOnFire                         ( CClientPed& Ped, bool & bOnFire );
     static bool                         IsPedInVehicle                      ( CClientPed& Ped, bool & bInVehicle );
-    static bool                         GetPedWeaponInfo                    ( CClientPed& ped, eWeaponProperty eProperty, eWeaponType eWeapon, float & fData );
-    static bool                         GetPedWeaponInfo                    ( CClientPed& ped, eWeaponProperty eProperty, eWeaponType eWeapon, short & sData );
-    static bool                         GetPedWeaponInfo                    ( CClientPed& ped, eWeaponProperty eProperty, eWeaponType eWeapon, CVector & vecData );
+    static bool                         GetWeaponProperty                   ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float & fData );
+    static bool                         GetWeaponProperty                   ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData );
+    static bool                         GetWeaponProperty                   ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector & vecData );
 
     static bool                         SetPedWeaponSlot                    ( CClientEntity& Entity, int iSlot );
     static bool                         SetPedRotation                      ( CClientEntity& Entity, float fRotation );
@@ -163,8 +163,8 @@ public:
     static bool                         SetPedCameraRotation                ( CClientEntity& Entity, float fRotation );
     static bool                         SetPedAimTarget                     ( CClientEntity& Entity, CVector & vecTarget );
     static bool                         SetPedOnFire                        ( CClientEntity& Entity, bool bOnFire );
-    static bool                         SetPedWeaponInfo                    ( CClientPed& ped, eWeaponProperty eProperty, eWeaponType eWeapon, float fData );
-    static bool                         SetPedWeaponInfo                    ( CClientPed& ped, eWeaponProperty eProperty, eWeaponType eWeapon, short sData );
+    static bool                         SetWeaponProperty                   ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float fData );
+    static bool                         SetWeaponProperty                   ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short sData );
 
     // Extra Clothes functions
     static bool                         GetBodyPartName                     ( unsigned char ucID, char* szName );

@@ -6593,108 +6593,96 @@ bool CStaticFunctionDefinitions::GetEntryHandling ( CHandlingEntry* pEntry, eHan
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetPedWeaponInfo ( CClientPed& ped, eWeaponProperty eProperty, eWeaponType eWeapon, float fData )
+bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float fData )
 {
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;
 
-    CWeapon* pWeapon = ped.GetWeapon ( eWeapon );
-    if ( pWeapon )
+    CWeaponInfo* pWeaponInfo = g_pGame->GetWeaponInfo( eWeapon, eSkillLevel );
+    if ( pWeaponInfo )
     {
-        CWeaponInfo* pWeaponInfo = pWeapon->GetInfo();
-        if ( pWeaponInfo )
+        switch ( eProperty )
         {
-            switch ( eProperty )
+            case WEAPON_WEAPON_RANGE:
             {
-                case WEAPON_WEAPON_RANGE:
-                {
-                    pWeaponInfo->SetWeaponRange ( fData );
-                    break;
-                }
-                case WEAPON_TARGET_RANGE:
-                {
-                    pWeaponInfo->SetTargetRange ( fData );
-                    break;
-                }
-                case WEAPON_ACCURACY:
-                {
-                    pWeaponInfo->SetAccuracy ( fData );
-                    break;
-                }
-                case WEAPON_DAMAGE:
-                {
-                    pWeaponInfo->SetDamagePerHit ( fData );
-                    break;
-                }
-                case WEAPON_LIFE_SPAN:
-                {
-                    pWeaponInfo->SetLifeSpan ( fData );
-                    break;
-                }
-                case WEAPON_FIRING_SPEED:
-                {
-                    pWeaponInfo->SetFiringSpeed ( fData );
-                    break;
-                }
-                case WEAPON_MOVE_SPEED:
-                {
-                    pWeaponInfo->SetMoveSpeed ( fData );
-                    break;
-                }
-                default:
-                    return false;
+                pWeaponInfo->SetWeaponRange ( fData );
+                break;
             }
+            case WEAPON_TARGET_RANGE:
+            {
+                pWeaponInfo->SetTargetRange ( fData );
+                break;
+            }
+            case WEAPON_ACCURACY:
+            {
+                pWeaponInfo->SetAccuracy ( fData );
+                break;
+            }
+            case WEAPON_DAMAGE:
+            {
+                pWeaponInfo->SetDamagePerHit ( fData );
+                break;
+            }
+            case WEAPON_LIFE_SPAN:
+            {
+                pWeaponInfo->SetLifeSpan ( fData );
+                break;
+            }
+            case WEAPON_FIRING_SPEED:
+            {
+                pWeaponInfo->SetFiringSpeed ( fData );
+                break;
+            }
+            case WEAPON_MOVE_SPEED:
+            {
+                pWeaponInfo->SetMoveSpeed ( fData );
+                break;
+            }
+            default:
+                return false;
         }
-        else
-            return false;
     }
-   else
+    else
         return false;
    return true;
 }
 
-bool CStaticFunctionDefinitions::SetPedWeaponInfo ( CClientPed& ped, eWeaponProperty eProperty, eWeaponType eWeapon, short sData )
+bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short sData )
 {
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;
 
-    CWeapon* pWeapon = ped.GetWeapon ( eWeapon );
-    if ( pWeapon )
+    CWeaponInfo* pWeaponInfo = g_pGame->GetWeaponInfo( eWeapon, eSkillLevel );
+    if ( pWeaponInfo )
     {
-        CWeaponInfo* pWeaponInfo = pWeapon->GetInfo();
-        if ( pWeaponInfo )
+        switch ( eProperty )
         {
-            switch ( eProperty )
+            case WEAPON_DAMAGE:
             {
-                case WEAPON_DAMAGE:
-                {
-                    pWeaponInfo->SetDamagePerHit ( sData );
-                    break;
-                }
-                case WEAPON_MAX_CLIP_AMMO:
-                {
-                    pWeaponInfo->SetMaximumClipAmmo ( sData );
-                    break;
-                }
-                case WEAPON_FLAGS:
-                {
-                    if ( pWeaponInfo->IsFlagSet ( sData ) )
-                        pWeaponInfo->ClearFlag ( sData );
-                    else
-                        pWeaponInfo->SetFlag ( sData );
-                    break;
-                }
-                case WEAPON_ANIM_GROUP:
-                {
-                    pWeaponInfo->SetAnimGroup ( sData );
-                    break;
-                }
-                default:
-                    return false;
+                pWeaponInfo->SetDamagePerHit ( sData );
+                break;
             }
+            case WEAPON_MAX_CLIP_AMMO:
+            {
+                pWeaponInfo->SetMaximumClipAmmo ( sData );
+                break;
+            }
+            case WEAPON_FLAGS:
+            {
+                if ( pWeaponInfo->IsFlagSet ( sData ) )
+                    pWeaponInfo->ClearFlag ( sData );
+                else
+                    pWeaponInfo->SetFlag ( sData );
+                break;
+            }
+            case WEAPON_ANIM_GROUP:
+            {
+                pWeaponInfo->SetAnimGroup ( sData );
+                break;
+            }
+            default:
+                return false;
         }
-        else
-            return false;
     }
     else
         return false;
@@ -6702,105 +6690,100 @@ bool CStaticFunctionDefinitions::SetPedWeaponInfo ( CClientPed& ped, eWeaponProp
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetPedWeaponInfo ( CClientPed& ped, eWeaponProperty eProperty, eWeaponType eWeapon, float & fData )
+bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float & fData )
 {
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;
 
-    CWeapon* pWeapon = ped.GetWeapon ( eWeapon );
-    if ( pWeapon )
+
+    CWeaponInfo* pWeaponInfo = g_pGame->GetWeaponInfo( eWeapon, eSkillLevel );
+    if ( pWeaponInfo )
     {
-        CWeaponInfo* pWeaponInfo = pWeapon->GetInfo();
-        if ( pWeaponInfo )
+        switch ( eProperty )
         {
-            switch ( eProperty )
+            case WEAPON_WEAPON_RANGE:
             {
-                case WEAPON_WEAPON_RANGE:
-                {
-                    fData = pWeaponInfo->GetWeaponRange ( );
-                    break;
-                }
-                case WEAPON_TARGET_RANGE:
-                {
-                    fData = pWeaponInfo->GetTargetRange ( );
-                    break;
-                }
-                case WEAPON_ACCURACY:
-                {
-                    fData = pWeaponInfo->GetAccuracy ( );
-                    break;
-                }
-                case WEAPON_DAMAGE:
-                {
-                    fData = pWeaponInfo->GetDamagePerHit ( );
-                    break;
-                }
-                case WEAPON_LIFE_SPAN:
-                {
-                    fData = pWeaponInfo->GetLifeSpan ( );
-                    break;
-                }
-                case WEAPON_FIRING_SPEED:
-                {
-                    fData = pWeaponInfo->GetFiringSpeed ( );
-                    break;
-                }
-                case WEAPON_MOVE_SPEED:
-                {
-                    fData = pWeaponInfo->GetMoveSpeed ( );
-                    break;
-                }
-                case WEAPON_SPREAD:
-                {
-                    fData = pWeaponInfo->GetSpread ( );
-                    break;
-                }
-                case WEAPON_ANIM_LOOP_START:
-                {
-                    fData = pWeaponInfo->GetWeaponAnimLoopStart ( );
-                    break;
-                }
-                case WEAPON_ANIM_LOOP_STOP:
-                {
-                    fData = pWeaponInfo->GetWeaponAnimLoopStop ( );
-                    break;
-                }
-                case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
-                {
-                    fData = pWeaponInfo->GetWeaponAnimLoopFireTime ( );
-                    break;
-                }
-                case WEAPON_ANIM2_LOOP_START:
-                {
-                    fData = pWeaponInfo->GetWeaponAnim2LoopStart ( );
-                    break;
-                }
-                case WEAPON_ANIM2_LOOP_STOP:
-                {
-                    fData = pWeaponInfo->GetWeaponAnim2LoopStop ( );
-                    break;
-                }
-                case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
-                {
-                    fData = pWeaponInfo->GetWeaponAnim2LoopFireTime ( );
-                    break;
-                }
-                case WEAPON_ANIM_BREAKOUT_TIME:
-                {
-                    fData = pWeaponInfo->GetWeaponAnimBreakoutTime ( );
-                    break;
-                }
-                case WEAPON_RADIUS:
-                {
-                    fData = pWeaponInfo->GetWeaponRadius ( );
-                    break;
-                }
-                default:
-                    return false;
+                fData = pWeaponInfo->GetWeaponRange ( );
+                break;
             }
+            case WEAPON_TARGET_RANGE:
+            {
+                fData = pWeaponInfo->GetTargetRange ( );
+                break;
+            }
+            case WEAPON_ACCURACY:
+            {
+                fData = pWeaponInfo->GetAccuracy ( );
+                break;
+            }
+            case WEAPON_DAMAGE:
+            {
+                fData = pWeaponInfo->GetDamagePerHit ( );
+                break;
+            }
+            case WEAPON_LIFE_SPAN:
+            {
+                fData = pWeaponInfo->GetLifeSpan ( );
+                break;
+            }
+            case WEAPON_FIRING_SPEED:
+            {
+                fData = pWeaponInfo->GetFiringSpeed ( );
+                break;
+            }
+            case WEAPON_MOVE_SPEED:
+            {
+                fData = pWeaponInfo->GetMoveSpeed ( );
+                break;
+            }
+            case WEAPON_SPREAD:
+            {
+                fData = pWeaponInfo->GetSpread ( );
+                break;
+            }
+            case WEAPON_ANIM_LOOP_START:
+            {
+                fData = pWeaponInfo->GetWeaponAnimLoopStart ( );
+                break;
+            }
+            case WEAPON_ANIM_LOOP_STOP:
+            {
+                fData = pWeaponInfo->GetWeaponAnimLoopStop ( );
+                break;
+            }
+            case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+            {
+                fData = pWeaponInfo->GetWeaponAnimLoopFireTime ( );
+                break;
+            }
+            case WEAPON_ANIM2_LOOP_START:
+            {
+                fData = pWeaponInfo->GetWeaponAnim2LoopStart ( );
+                break;
+            }
+            case WEAPON_ANIM2_LOOP_STOP:
+            {
+                fData = pWeaponInfo->GetWeaponAnim2LoopStop ( );
+                break;
+            }
+            case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+            {
+                fData = pWeaponInfo->GetWeaponAnim2LoopFireTime ( );
+                break;
+            }
+            case WEAPON_ANIM_BREAKOUT_TIME:
+            {
+                fData = pWeaponInfo->GetWeaponAnimBreakoutTime ( );
+                break;
+            }
+            case WEAPON_RADIUS:
+            {
+                fData = pWeaponInfo->GetWeaponRadius ( );
+                break;
+            }
+            default:
+                return false;
         }
-        else
-            return false;
     }
     else
         return false;
@@ -6808,91 +6791,86 @@ bool CStaticFunctionDefinitions::GetPedWeaponInfo ( CClientPed& ped, eWeaponProp
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetPedWeaponInfo ( CClientPed& ped, eWeaponProperty eProperty, eWeaponType eWeapon, short & sData )
+bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData )
 {
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;
 
-    CWeapon* pWeapon = ped.GetWeapon ( eWeapon );
-    if ( pWeapon )
+
+    CWeaponInfo* pWeaponInfo = g_pGame->GetWeaponInfo( eWeapon, eSkillLevel );
+    if ( pWeaponInfo )
     {
-        CWeaponInfo* pWeaponInfo = pWeapon->GetInfo();
-        if ( pWeaponInfo )
+        switch ( eProperty )
         {
-            switch ( eProperty )
+            case WEAPON_DAMAGE:
             {
-                case WEAPON_DAMAGE:
-                {
-                    sData = pWeaponInfo->GetDamagePerHit ( );
-                    break;
-                }
-                case WEAPON_MAX_CLIP_AMMO:
-                {
-                    sData = pWeaponInfo->GetMaximumClipAmmo ( );
-                    break;
-                }
-                case WEAPON_ANIM_GROUP:
-                {
-                    sData = pWeaponInfo->GetAnimGroup ( );
-                    break;
-                }
-                case WEAPON_FLAGS:
-                {
-                    sData = pWeaponInfo->GetFlags ( );
-                    break;
-                }
-                case WEAPON_FIRETYPE:
-                {
-                    sData = pWeaponInfo->GetFireType ( );
-                    break;
-                }
-                case WEAPON_MODEL:
-                {
-                    sData = pWeaponInfo->GetModel ( );
-                    break;
-                }
-                case WEAPON_MODEL2:
-                {
-                    sData = pWeaponInfo->GetModel2 ( );
-                    break;
-                }
-                case WEAPON_SLOT:
-                {
-                    sData = pWeaponInfo->GetSlot ( );
-                    break;
-                }
-                case WEAPON_AIM_OFFSET:
-                {
-                    sData = pWeaponInfo->GetAimOffsetIndex ( );
-                    break;
-                }
-                case WEAPON_SKILL_LEVEL:
-                {
-                    sData = pWeaponInfo->GetSkill ( );
-                    break;
-                }
-                case WEAPON_REQ_SKILL_LEVEL:
-                {
-                    sData = pWeaponInfo->GetRequiredStatLevel ( );
-                    break;
-                }
-                case WEAPON_DEFAULT_COMBO:
-                {
-                    sData = pWeaponInfo->GetDefaultCombo ( );
-                    break;
-                }
-                case WEAPON_COMBOS_AVAILABLE:
-                {
-                    sData = pWeaponInfo->GetCombosAvailable ( );
-                    break;
-                }
-                    
-                default:
-                    return false;
+                sData = pWeaponInfo->GetDamagePerHit ( );
+                break;
             }
+            case WEAPON_MAX_CLIP_AMMO:
+            {
+                sData = pWeaponInfo->GetMaximumClipAmmo ( );
+                break;
+            }
+            case WEAPON_ANIM_GROUP:
+            {
+                sData = pWeaponInfo->GetAnimGroup ( );
+                break;
+            }
+            case WEAPON_FLAGS:
+            {
+                sData = pWeaponInfo->GetFlags ( );
+                break;
+            }
+            case WEAPON_FIRETYPE:
+            {
+                sData = pWeaponInfo->GetFireType ( );
+                break;
+            }
+            case WEAPON_MODEL:
+            {
+                sData = pWeaponInfo->GetModel ( );
+                break;
+            }
+            case WEAPON_MODEL2:
+            {
+                sData = pWeaponInfo->GetModel2 ( );
+                break;
+            }
+            case WEAPON_SLOT:
+            {
+                sData = pWeaponInfo->GetSlot ( );
+                break;
+            }
+            case WEAPON_AIM_OFFSET:
+            {
+                sData = pWeaponInfo->GetAimOffsetIndex ( );
+                break;
+            }
+            case WEAPON_SKILL_LEVEL:
+            {
+                sData = pWeaponInfo->GetSkill ( );
+                break;
+            }
+            case WEAPON_REQ_SKILL_LEVEL:
+            {
+                sData = pWeaponInfo->GetRequiredStatLevel ( );
+                break;
+            }
+            case WEAPON_DEFAULT_COMBO:
+            {
+                sData = pWeaponInfo->GetDefaultCombo ( );
+                break;
+            }
+            case WEAPON_COMBOS_AVAILABLE:
+            {
+                sData = pWeaponInfo->GetCombosAvailable ( );
+                break;
+            }
+                
+            default:
+                return false;
         }
-        else
-            return false;
     }
     else
         return false;
@@ -6900,30 +6878,24 @@ bool CStaticFunctionDefinitions::GetPedWeaponInfo ( CClientPed& ped, eWeaponProp
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetPedWeaponInfo ( CClientPed& ped, eWeaponProperty eProperty, eWeaponType eWeapon, CVector & vecData )
+bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector & vecData )
 {
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;
 
-    CWeapon* pWeapon = ped.GetWeapon ( eWeapon );
-    if ( pWeapon )
+    CWeaponInfo* pWeaponInfo = g_pGame->GetWeaponInfo( eWeapon, eSkillLevel );
+    if ( pWeaponInfo )
     {
-        CWeaponInfo* pWeaponInfo = pWeapon->GetInfo();
-        if ( pWeaponInfo )
+        switch ( eProperty )
         {
-            switch ( eProperty )
+            case WEAPON_FIRE_OFFSET:
             {
-                case WEAPON_FIRE_OFFSET:
-                {
-                    vecData = *pWeaponInfo->GetFireOffset ( );
-                    break;
-                }
-                default:
-                    return false;
+                vecData = *pWeaponInfo->GetFireOffset ( );
+                break;
             }
+            default:
+                return false;
         }
-        else
-            return false;
     }
     else
         return false;
