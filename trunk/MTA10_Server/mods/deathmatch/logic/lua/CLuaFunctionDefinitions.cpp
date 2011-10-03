@@ -1855,24 +1855,22 @@ int CLuaFunctionDefinitions::GetDeadPlayers ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefinitions::GetPlayerIdleTimes ( lua_State* luaVM )
+int CLuaFunctionDefinitions::GetPlayerIdleTime ( lua_State* luaVM )
 {
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
-        // Create a new table
-        lua_newtable ( luaVM );
-
-        // Add all player idle times to it. Use playerElement as a table key
-        list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-        for ( ; iter != m_pPlayerManager->IterEnd () ; iter++ )
+        CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
+        if ( pPlayer )
         {
-            lua_pushelement ( luaVM, *iter );
-            lua_pushnumber ( luaVM, static_cast <double> ( GetTickCount64_ () - (*iter)->GetPositionLastChanged () ) );
-            lua_settable ( luaVM, -3 );
+            lua_pushnumber ( luaVM, static_cast <double> ( GetTickCount64_ () - pPlayer->GetPositionLastChanged () ) );
+            return 1;
         }
-        return 1;
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPlayerIdleTime", "player", 1 );
     }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getPlayerIdleTime" );
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }
