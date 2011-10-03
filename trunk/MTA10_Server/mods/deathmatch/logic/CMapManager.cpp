@@ -763,7 +763,7 @@ void CMapManager::DoVehicleRespawning ( void )
         if ( pVehicle->GetRespawnEnabled () )
         {
             // Did we get deserted?
-            bool bDeserted = ( !pVehicle->GetFirstOccupant () && !pVehicle->GetSyncer () );
+            bool bDeserted = ( !pVehicle->GetFirstOccupant () );
 
             // Grab when it blew and when it was last not touched
             ulBlowTime = pVehicle->GetBlowTime ();
