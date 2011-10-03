@@ -1855,6 +1855,29 @@ int CLuaFunctionDefinitions::GetDeadPlayers ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetPlayerIdleTimes ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        // Create a new table
+        lua_newtable ( luaVM );
+
+        // Add all player idle times to it. Use playerElement as a table key
+        list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
+        for ( ; iter != m_pPlayerManager->IterEnd () ; iter++ )
+        {
+            lua_pushelement ( luaVM, *iter );
+            lua_pushnumber ( luaVM, static_cast <double> ( GetTickCount64_ () - (*iter)->GetPositionLastChanged () ) );
+            lua_settable ( luaVM, -3 );
+        }
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::IsPlayerScoreboardForced ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )

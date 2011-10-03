@@ -253,6 +253,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPlayerWantedLevel", CLuaFunctionDefinitions::GetPlayerWantedLevel );
     CLuaCFunctions::AddFunction ( "getAlivePlayers", CLuaFunctionDefinitions::GetAlivePlayers );
     CLuaCFunctions::AddFunction ( "getDeadPlayers", CLuaFunctionDefinitions::GetDeadPlayers );
+    CLuaCFunctions::AddFunction ( "getPlayerIdleTimes", CLuaFunctionDefinitions::GetPlayerIdleTimes );
     CLuaCFunctions::AddFunction ( "isPlayerScoreboardForced", CLuaFunctionDefinitions::IsPlayerScoreboardForced );
     CLuaCFunctions::AddFunction ( "isPlayerMapForced", CLuaFunctionDefinitions::IsPlayerMapForced );
     CLuaCFunctions::AddFunction ( "getPlayerNametagText", CLuaFunctionDefinitions::GetPlayerNametagText );
