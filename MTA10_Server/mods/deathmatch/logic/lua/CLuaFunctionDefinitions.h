@@ -81,7 +81,7 @@ public:
     static int      GetPlayerWantedLevel                ( lua_State* luaVM );
     static int      GetAlivePlayers                     ( lua_State* luaVM );
     static int      GetDeadPlayers                      ( lua_State* luaVM );
-    static int      GetPlayerIdleTimes                  ( lua_State* luaVM );
+    static int      GetPlayerIdleTime                   ( lua_State* luaVM );
     static int      IsPlayerScoreboardForced            ( lua_State* luaVM );
     static int      IsPlayerMapForced                   ( lua_State* luaVM );
     static int      GetPlayerNametagText                ( lua_State* luaVM );
