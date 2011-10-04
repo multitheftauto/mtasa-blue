@@ -39,8 +39,10 @@ public:
     virtual void        InitiateManualCheck                 ( void );
     virtual void        GetAseServerList                    ( std::vector < SString >& outResult );
     virtual void        InitiateSidegradeLaunch             ( const SString& strVersion, const SString& strHost, ushort usPort, const SString& strName, const SString& strPassword );
-    virtual void        GetBlockedVersionMap                ( std::map < SString, int >& outBlockedVersionMap );
+    virtual void        GetBrowseVersionMaps                ( std::map < SString, int >& outBlockedVersionMap, std::map < SString, int >& outAllowedVersionMap );
     virtual void        GetNewsSettings                     ( SString& strOutOldestPost, uint& uiOutMaxHistoryLength );
+    virtual const SString&  GetDebugFilterString            ( void );
+
 
     // CVersionUpdater functions
     bool                EnsureLoadedConfigFromXML           ( void );
@@ -56,7 +58,7 @@ public:
     void                ResetEverything                     ( void );
     CReportWrap*        GetReportWrap                       ( void );
     static std::vector < SString > MakeServerList           ( const CDataInfoSet& infoMap );
-    void                UpdateTroubleURL                    ( void );
+    void                PostChangeMasterConfig              ( void );
     void                OnPossibleConfigProblem             ( void );
 
     // Commands
@@ -273,6 +275,9 @@ bool CVersionUpdater::EnsureLoadedConfigFromXML ( void )
         XMLAccess.GetSubNodeValue ( "version.interval",             m_MasterConfig.version.interval );
         XMLAccess.GetSubNodeValue ( "report.serverlist",            m_MasterConfig.report.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "report.interval",              m_MasterConfig.report.interval );
+        XMLAccess.GetSubNodeValue ( "report.filter2",               m_MasterConfig.report.strFilter );
+        XMLAccess.GetSubNodeValue ( "report.minsize",               m_MasterConfig.report.iMinSize );
+        XMLAccess.GetSubNodeValue ( "report.maxsize",               m_MasterConfig.report.iMaxSize );
         XMLAccess.GetSubNodeValue ( "crashdump.serverlist",         m_MasterConfig.crashdump.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "crashdump.duplicates",         m_MasterConfig.crashdump.iDuplicates );
         XMLAccess.GetSubNodeValue ( "crashdump.maxhistorylength",   m_MasterConfig.crashdump.iMaxHistoryLength );
@@ -281,12 +286,14 @@ bool CVersionUpdater::EnsureLoadedConfigFromXML ( void )
         XMLAccess.GetSubNodeValue ( "ase.serverlist",               m_MasterConfig.ase.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "sidegrade.serverlist",         m_MasterConfig.sidegrade.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "sidegrade.nobrowselist",       m_MasterConfig.sidegrade.nobrowseInfoMap );
+        XMLAccess.GetSubNodeValue ( "sidegrade.onlybrowselist",     m_MasterConfig.sidegrade.onlybrowseInfoMap );
         XMLAccess.GetSubNodeValue ( "news.serverlist",              m_MasterConfig.news.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "news.interval",                m_MasterConfig.news.interval );
         XMLAccess.GetSubNodeValue ( "news.oldestpost",              m_MasterConfig.news.strOldestPost );
         XMLAccess.GetSubNodeValue ( "news.maxhistorylength",        m_MasterConfig.news.iMaxHistoryLength );
+        XMLAccess.GetSubNodeValue ( "misc.debug.filter2",           m_MasterConfig.misc.debug.strFilter );
 
-        UpdateTroubleURL ();
+        PostChangeMasterConfig ();
     }
 
     return true;
@@ -335,6 +342,9 @@ bool CVersionUpdater::SaveConfigToXML ( void )
         XMLAccess.SetSubNodeValue ( "version.interval",             m_MasterConfig.version.interval );
         XMLAccess.SetSubNodeValue ( "report.serverlist",            m_MasterConfig.report.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "report.interval",              m_MasterConfig.report.interval );
+        XMLAccess.SetSubNodeValue ( "report.filter2",               m_MasterConfig.report.strFilter );
+        XMLAccess.SetSubNodeValue ( "report.minsize",               m_MasterConfig.report.iMinSize );
+        XMLAccess.SetSubNodeValue ( "report.maxsize",               m_MasterConfig.report.iMaxSize );
         XMLAccess.SetSubNodeValue ( "crashdump.serverlist",         m_MasterConfig.crashdump.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "crashdump.duplicates",         m_MasterConfig.crashdump.iDuplicates );
         XMLAccess.SetSubNodeValue ( "crashdump.maxhistorylength",   m_MasterConfig.crashdump.iMaxHistoryLength );
@@ -343,10 +353,12 @@ bool CVersionUpdater::SaveConfigToXML ( void )
         XMLAccess.SetSubNodeValue ( "ase.serverlist",               m_MasterConfig.ase.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "sidegrade.serverlist",         m_MasterConfig.sidegrade.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "sidegrade.nobrowselist",       m_MasterConfig.sidegrade.nobrowseInfoMap );
+        XMLAccess.SetSubNodeValue ( "sidegrade.onlybrowselist",     m_MasterConfig.sidegrade.onlybrowseInfoMap );
         XMLAccess.SetSubNodeValue ( "news.serverlist",              m_MasterConfig.news.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "news.interval",                m_MasterConfig.news.interval );
         XMLAccess.SetSubNodeValue ( "news.oldestpost",              m_MasterConfig.news.strOldestPost );
         XMLAccess.SetSubNodeValue ( "news.maxhistorylength",        m_MasterConfig.news.iMaxHistoryLength );
+        XMLAccess.SetSubNodeValue ( "misc.debug.filter2",           m_MasterConfig.misc.debug.strFilter );
     }
 
     return true;
@@ -636,38 +648,81 @@ void CVersionUpdater::GetAseServerList ( std::vector < SString >& outResult )
 
 ///////////////////////////////////////////////////////////////
 //
-// CVersionUpdater::GetBlockedVersionMap
+// CVersionUpdater::GetBrowseVersionMaps
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::GetBlockedVersionMap ( std::map < SString, int >& outBlockedVersionMap )
+void CVersionUpdater::GetBrowseVersionMaps ( std::map < SString, int >& outBlockedVersionMap, std::map < SString, int >& outAllowedVersionMap )
 {
     EnsureLoadedConfigFromXML ();
 
     outBlockedVersionMap.clear ();
+    outAllowedVersionMap.clear ();
 
     //
-    // Find list for our version
+    // Blocked - Find list for our version
     //
-    const CDataInfoSet& dataInfoSet = m_MasterConfig.sidegrade.nobrowseInfoMap;
-    for ( uint i = 0 ; i < dataInfoSet.size () ; i++ )
     {
-        const SDataInfoItem& line = dataInfoSet[i];
-        const SString* pstrVersion = MapFind ( line.attributeMap, "version" );
-        if ( pstrVersion && *pstrVersion == MTA_DM_ASE_VERSION )
+        const CDataInfoSet& dataInfoSet = m_MasterConfig.sidegrade.nobrowseInfoMap;
+        for ( uint i = 0 ; i < dataInfoSet.size () ; i++ )
         {
-            std::vector < SString > blockedVersionList;
-            line.strValue.Split ( ";", blockedVersionList );
-
-            for ( uint i = 0 ; i < blockedVersionList.size () ; i++ )
+            const SDataInfoItem& line = dataInfoSet[i];
+            const SString* pstrVersion = MapFind ( line.attributeMap, "version" );
+            if ( pstrVersion && *pstrVersion == MTA_DM_ASE_VERSION )
             {
-                outBlockedVersionMap[ blockedVersionList[i] ] = 1;
-            }
+                // Found list for our version
+                std::vector < SString > blockedVersionList;
+                line.strValue.Split ( ";", blockedVersionList );
 
-            break;
+                for ( uint i = 0 ; i < blockedVersionList.size () ; i++ )
+                {
+                    outBlockedVersionMap[ blockedVersionList[i] ] = 1;
+                }
+
+                break;
+            }
         }
     }
+
+    //
+    // Allowed - Find list for our version
+    //
+    {
+        const CDataInfoSet& dataInfoSet = m_MasterConfig.sidegrade.onlybrowseInfoMap;
+        for ( uint i = 0 ; i < dataInfoSet.size () ; i++ )
+        {
+            const SDataInfoItem& line = dataInfoSet[i];
+            const SString* pstrVersion = MapFind ( line.attributeMap, "version" );
+            if ( pstrVersion && *pstrVersion == MTA_DM_ASE_VERSION )
+            {
+                // Found list for our version
+                std::vector < SString > allowedVersionList;
+                line.strValue.Split ( ";", allowedVersionList );
+
+                for ( uint i = 0 ; i < allowedVersionList.size () ; i++ )
+                {
+                    outAllowedVersionMap[ allowedVersionList[i] ] = 1;
+                }
+
+                break;
+            }
+        }
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::GetDebugFilterString
+//
+//
+//
+///////////////////////////////////////////////////////////////
+const SString& CVersionUpdater::GetDebugFilterString ( void )
+{
+    EnsureLoadedConfigFromXML ();
+    return m_MasterConfig.misc.debug.strFilter;
 }
 
 
@@ -1997,8 +2052,8 @@ void CVersionUpdater::_ProcessPatchFileQuery ( void )
     if ( m_JobInfo.strStatus == "" )
         OnPossibleConfigProblem ();
 
-    // Maybe modify report settings
-    if ( strReportSettingsFilter.length () )
+    // Modify report settings if data here, and none in master config
+    if ( !strReportSettingsFilter.empty () && m_MasterConfig.report.strFilter.empty () )
     {
         SString strReportSettings = SString ( "filter2@%s;min@%s;max@%s", strReportSettingsFilter.c_str (), strReportSettingsMin.c_str (), strReportSettingsMax.c_str () ); 
         GetReportWrap ()->SetSettings ( strReportSettings );
@@ -2059,6 +2114,9 @@ void CVersionUpdater::_ProcessMasterFetch ( void )
     XMLAccess.GetSubNodeValue ( "version.interval",             newMasterConfig.version.interval );
     XMLAccess.GetSubNodeValue ( "report.serverlist",            newMasterConfig.report.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "report.interval",              newMasterConfig.report.interval );
+    XMLAccess.GetSubNodeValue ( "report.filter2",               newMasterConfig.report.strFilter );
+    XMLAccess.GetSubNodeValue ( "report.minsize",               newMasterConfig.report.iMinSize );
+    XMLAccess.GetSubNodeValue ( "report.maxsize",               newMasterConfig.report.iMaxSize );
     XMLAccess.GetSubNodeValue ( "crashdump.serverlist",         newMasterConfig.crashdump.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "crashdump.duplicates",         newMasterConfig.crashdump.iDuplicates );
     XMLAccess.GetSubNodeValue ( "crashdump.maxhistorylength",   newMasterConfig.crashdump.iMaxHistoryLength );
@@ -2067,10 +2125,12 @@ void CVersionUpdater::_ProcessMasterFetch ( void )
     XMLAccess.GetSubNodeValue ( "ase.serverlist",               newMasterConfig.ase.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "sidegrade.serverlist",         newMasterConfig.sidegrade.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "sidegrade.nobrowselist",       newMasterConfig.sidegrade.nobrowseInfoMap );
+    XMLAccess.GetSubNodeValue ( "sidegrade.onlybrowselist",     newMasterConfig.sidegrade.onlybrowseInfoMap );
     XMLAccess.GetSubNodeValue ( "news.serverlist",              newMasterConfig.news.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "news.interval",                newMasterConfig.news.interval );
     XMLAccess.GetSubNodeValue ( "news.oldestpost",              newMasterConfig.news.strOldestPost );
     XMLAccess.GetSubNodeValue ( "news.maxhistorylength",        newMasterConfig.news.iMaxHistoryLength );
+    XMLAccess.GetSubNodeValue ( "misc.debug.filter2",           newMasterConfig.misc.debug.strFilter );
 
     if ( newMasterConfig.IsValid () )
     {
@@ -2078,7 +2138,7 @@ void CVersionUpdater::_ProcessMasterFetch ( void )
             m_VarConfig = SUpdaterVarConfig ();
 
         m_MasterConfig = newMasterConfig;
-        UpdateTroubleURL ();
+        PostChangeMasterConfig ();
         m_ConditionMap.SetCondition ( "ProcessResponse", "ok" );
     }
 }
@@ -2086,16 +2146,27 @@ void CVersionUpdater::_ProcessMasterFetch ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CVersionUpdater::UpdateTroubleURL
+// CVersionUpdater::PostChangeMasterConfig
 //
-// Select a valid server incase there is trouble
+// Transfer certain settings from the master config
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::UpdateTroubleURL ( void )
+void CVersionUpdater::PostChangeMasterConfig ( void )
 {
+    // Update trouble url for far away modules
     std::vector < SString > serverList = MakeServerList ( m_MasterConfig.trouble.serverInfoMap );
     if ( serverList.size () && serverList[0].length () > 4 )
         SetApplicationSetting ( "trouble-url", serverList[0] );
+
+    // Update debug filter for far away modules
+    SetApplicationSetting ( "debugfilter", m_MasterConfig.misc.debug.strFilter  );
+
+    // Maybe modify report settings
+    if ( !m_MasterConfig.report.strFilter.empty () )
+    {
+        SString strReportSettings = SString ( "filter2@%s;min@%d;max@%d", *m_MasterConfig.report.strFilter, m_MasterConfig.report.iMinSize, m_MasterConfig.report.iMaxSize ); 
+        GetReportWrap ()->SetSettings ( strReportSettings );
+    }
 }
 
 

@@ -1898,7 +1898,18 @@ void CCore::OnCrashAverted ( uint uiId )
 //
 // LogEvent
 // 
-void CCore::LogEvent ( const char* szType, const char* szContext, const char* szBody )
+void CCore::LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody )
 {
-    CCrashDumpWriter::LogEvent ( szType, szContext, szBody );
+    if ( GetDebugIdEnabled ( uiDebugId ) )
+        CCrashDumpWriter::LogEvent ( szType, szContext, szBody );
+}
+
+
+//
+// GetDebugIdEnabled
+// 
+bool CCore::GetDebugIdEnabled ( uint uiDebugId )
+{
+    static CFilterMap debugIdFilterMap ( GetVersionUpdater ()->GetDebugFilterString () );
+    return !debugIdFilterMap.IsFiltered ( uiDebugId );
 }
