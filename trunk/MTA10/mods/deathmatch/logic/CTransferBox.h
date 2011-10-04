@@ -33,7 +33,7 @@ public:
     void                                Show                                    ( void );
     void                                Hide                                    ( void );
 
-    void                                SetInfo                                 ( double dDownloadSizeNow );
+    void                                SetInfo                                 ( double dDownloadSizeNow, const char* szMessage = NULL );
 
     void                                DoPulse                                 ( void );
 

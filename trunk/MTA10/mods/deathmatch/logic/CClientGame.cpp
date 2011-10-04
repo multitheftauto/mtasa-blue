@@ -4982,7 +4982,7 @@ void CClientGame::NotifyBigPacketProgress ( unsigned long ulBytesReceived, unsig
     }
 
     m_pBigPacketTransferBox->DoPulse ();
-    m_pBigPacketTransferBox->SetInfo ( Min ( ulTotalSize, ulBytesReceived ) );
+    m_pBigPacketTransferBox->SetInfo ( Min ( ulTotalSize, ulBytesReceived ), "Map download progress:" );
 }
 
 bool CClientGame::SetGlitchEnabled ( unsigned char ucGlitch, bool bEnabled )
