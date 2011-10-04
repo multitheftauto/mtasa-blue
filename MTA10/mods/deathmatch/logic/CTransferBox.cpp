@@ -100,13 +100,13 @@ void CTransferBox::Hide ( void )
     m_dTotalSize = 0;
 }
 
-void CTransferBox::SetInfo ( double dDownloadSizeNow )
+void CTransferBox::SetInfo ( double dDownloadSizeNow, const char* szMessage )
 {
     // Convert to reasonable units
     SString strDownloadSizeNow   = GetDataUnit ( static_cast < unsigned long long > ( dDownloadSizeNow ) );
     SString strDownloadSizeTotal = GetDataUnit ( static_cast < unsigned long long > ( m_dTotalSize ) );
 
-    SString strBuffer ( "Download Progress: %s of %s", strDownloadSizeNow.c_str (), strDownloadSizeTotal.c_str () );
+    SString strBuffer ( "%s %s of %s", szMessage ? szMessage : "Download Progress:", strDownloadSizeNow.c_str (), strDownloadSizeTotal.c_str () );
     m_pWindow->SetText ( strBuffer );
 
     m_pProgress->SetProgress ( static_cast < float > (dDownloadSizeNow / m_dTotalSize) );
