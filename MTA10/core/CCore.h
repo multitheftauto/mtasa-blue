@@ -224,7 +224,8 @@ public:
     void                    OnPreHUDRender                  ( void );
     void                    OnDeviceRestore                 ( void );
     void                    OnCrashAverted                  ( uint uiId );
-    void                    LogEvent                        ( const char* szType, const char* szContext, const char* szBody );
+    void                    LogEvent                        ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody );
+    bool                    GetDebugIdEnabled               ( uint uiDebugId );
 
 private:
     // Core devices.

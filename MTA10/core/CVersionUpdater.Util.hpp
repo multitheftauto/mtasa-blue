@@ -576,85 +576,6 @@ namespace
 
     ///////////////////////////////////////////////////////////////
     //
-    // CFilterMap
-    //
-    // Change "+all,-{1000~2006},+2003,-{2050},-2611,-{3120},-{4002~4100},+{4010~4020}"
-    // into a map which can be queried using IsFiltered()
-    //
-    ///////////////////////////////////////////////////////////////
-    class CFilterMap
-    {
-    public:
-        CFilterMap ( const SString& strFilterDesc )
-        {
-            SetAll ( '+' );
-            AddString ( strFilterDesc );
-        }
-
-        bool IsFiltered ( int iValue )
-        {
-            if ( MapContains ( idMap, iValue ) )
-                return cDefaultType == '+';
-            return cDefaultType == '-';
-        }
-
-    protected:
-        void AddString ( const SString& strFilterDesc )
-        {
-            std::vector < SString > partList;
-            strFilterDesc.Split ( ",", partList );
-            for ( uint i = 0; i < partList.size () ; i++ )
-            {
-                const SString& part = partList [ i ];
-                char cType = part.Left ( 1 )[0];
-
-                SString strRest = part.Right ( part.length () - 1 );
-                strRest = strRest.Replace ( "{", "" ).Replace ( "}", "" );
-
-                SString strFrom, strTo;
-                strRest.Split ( "~", &strFrom, &strTo );
-
-                if ( strFrom == "all" )
-                    SetAll ( cType );
-                else
-                if ( strTo.empty () )
-                    AddSingle ( cType, atoi ( strFrom ) );
-                else
-                {
-                    const int iTo = atoi ( strTo );
-                    for ( int i = atoi ( strFrom ) ; i <= iTo ; i++ )
-                        AddSingle ( cType, i );
-                } 
-            }
-        }
-
-        void AddSingle ( char cType, int iValue )
-        {
-            if ( cType != cDefaultType )
-            {
-                // Add
-                MapSet ( idMap, iValue, true );
-            }
-            else
-            {
-                // Remove
-                MapRemove ( idMap, iValue );
-            }
-        }
-
-        void SetAll ( char cType )
-        {
-            idMap.clear ();
-            cDefaultType = cType;
-        }
-
-        std::map < uint, bool >     idMap;
-        char                        cDefaultType;
-    };
-
-
-    ///////////////////////////////////////////////////////////////
-    //
     // CReportWrap
     //
     // gawd knows
@@ -808,6 +729,9 @@ namespace
         struct {
             CDataInfoSet    serverInfoMap;
             CTimeSpan       interval;
+            SString         strFilter;
+            CValueInt       iMinSize;
+            CValueInt       iMaxSize;
         } report;
 
         struct {
@@ -831,6 +755,7 @@ namespace
         struct {
             CDataInfoSet    serverInfoMap;
             CDataInfoSet    nobrowseInfoMap;
+            CDataInfoSet    onlybrowseInfoMap;
         } sidegrade;
 
         struct {
@@ -839,6 +764,12 @@ namespace
             SString         strOldestPost;
             CValueInt       iMaxHistoryLength;
         } news;
+
+        struct {
+            struct {
+                SString         strFilter;
+            } debug;
+        } misc;
 
         bool IsValid () const
         {
