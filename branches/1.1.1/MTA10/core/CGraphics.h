@@ -49,6 +49,9 @@ public:
     void                DrawLine3D              ( const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f );
     void                DrawRectangle           ( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor );
 
+    void                BeginDrawBatch          ( void );
+    void                EndDrawBatch            ( void );
+
     unsigned int        GetViewportWidth        ( void );
     unsigned int        GetViewportHeight       ( void );
 
@@ -132,6 +135,7 @@ private:
     CLocalGUI*          m_pGUI;
 
     int                 m_iDebugQueueRefs;
+    int                 m_iDrawBatchRefCount;
 
     LPD3DXSPRITE        m_pDXSprite;
     IDirect3DTexture9 * m_pDXPixelTexture;

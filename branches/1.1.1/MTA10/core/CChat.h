@@ -131,6 +131,59 @@ public:
     std::vector < CChatLine >   m_ExtraLines;
 };
 
+
+//
+// SDrawListLineItem
+//
+struct SDrawListLineItem
+{
+    uint        uiLine;
+    CVector2D   vecPosition;
+    uchar       ucAlpha;
+
+    bool operator!= ( const SDrawListLineItem& other ) const
+    {
+        return !operator==( other );
+    }
+    bool operator== ( const SDrawListLineItem& other ) const
+    {
+        return uiLine == other.uiLine
+          && vecPosition == other.vecPosition
+          && ucAlpha == other.ucAlpha;
+    }
+};
+
+
+//
+// SDrawList - Used to store a snapshot of what the chatbox is currently rendering
+//
+struct SDrawList
+{
+    CRect2D                             renderBounds;
+    bool                                bShadow;
+    std::vector < SDrawListLineItem >   lineItemList;
+
+    bool operator!= ( const SDrawList& other ) const
+    {
+        return !operator==( other );
+    }
+    bool operator== ( const SDrawList& other ) const
+    {
+        if ( lineItemList.size () != other.lineItemList.size ()
+          || bShadow != other.bShadow
+          || renderBounds != other.renderBounds )
+            return false;
+
+        for ( uint i = 0 ; i < lineItemList.size () ; i++ )
+            if ( lineItemList[i] != other.lineItemList[i] )
+                return false;
+
+        return true;
+    }
+};
+
+
+
 class CChat
 {
     friend class CChatLine;
@@ -142,7 +195,7 @@ public:
                                 CChat                   ( CGUI* pManager, const CVector2D & vecPosition );
                                 ~CChat                  ( void );
 
-    virtual void                Draw                    ( void );
+    virtual void                Draw                    ( bool bUseCacheTexture );
     virtual void                Output                  ( const char* szText, bool bColorCoded = true );
     virtual void                Outputf                 ( bool bColorCoded, const char* szFormat, ... );
     void                        Clear                   ( void );
@@ -184,6 +237,8 @@ private:
 protected:
     void                        UpdateGUI               ( void );
     void                        UpdateSmoothScroll      ( float* pfPixelScroll, int *piLineScroll );
+    void                        DrawDrawList            ( const SDrawList& drawList, const CVector2D& topLeftOffset = CVector2D ( 0, 0 ) );
+    void                        GetDrawList             ( SDrawList& outDrawList );
 
     CChatLine                   m_Lines [ CHAT_MAX_LINES ];     // Circular buffer
     int                         m_iScrollState;                 // 1 up, 0 stop, -1 down 
@@ -235,6 +290,9 @@ protected:
 
     bool                        m_bCanChangeWidth;
     int                         m_iCVarsRevision;
+
+    SDrawList                   m_PrevDrawList;
+    CRenderTargetItem*          m_pCacheTexture;
 };
 
 #endif

@@ -74,7 +74,7 @@ CDebugView::CDebugView ( CGUI * pManager, const CVector2D & vecPosition ) : CCha
 }
 
 
-void CDebugView::Draw ( void )
+void CDebugView::Draw ( bool bUseCacheTexture )
 {
     // Are we visible?
     if ( !m_bVisible )
@@ -91,7 +91,7 @@ void CDebugView::Draw ( void )
     m_vecBackgroundPosition = vecPosition * vecResolution - CVector2D ( 0, height );
     m_pBackground->SetPosition ( m_vecBackgroundPosition );
 
-    CChat::Draw ();
+    CChat::Draw ( bUseCacheTexture );
     g_pChat = pChat;
 }
 
