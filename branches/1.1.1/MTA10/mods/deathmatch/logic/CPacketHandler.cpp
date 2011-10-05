@@ -3598,7 +3598,7 @@ void CPacketHandler::Packet_TextItem( NetBitStreamInterface& bitStream )
                 if ( !pTextDisplay )
                 {
                     // Create it
-                    pTextDisplay = new CClientTextDisplay ( g_pClientGame->m_pDisplayManager, ulID, false );
+                    pTextDisplay = new CClientTextDisplay ( g_pClientGame->m_pDisplayManager, ulID );
                 }
 
                 // Set the text properties

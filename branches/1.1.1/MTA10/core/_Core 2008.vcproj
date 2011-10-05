@@ -705,14 +705,6 @@
 				>
 			</File>
 			<Filter
-				Name="d3d"
-				>
-				<File
-					RelativePath=".\d3d\CD3DMGE_D3D9.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="tracking"
 				>
 				<File
@@ -1027,10 +1019,6 @@
 			</File>
 			<File
 				RelativePath=".\StdInc.h"
-				>
-			</File>
-			<File
-				RelativePath=".\UtilityMacros.h"
 				>
 			</File>
 			<File

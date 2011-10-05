@@ -260,9 +260,6 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
             // Lead the message through the keybinds message processor
             g_pCore->GetKeyBinds ()->ProcessMessage ( hwnd, uMsg, wParam, lParam );
 
-            // Lead the message through main menu scene, so any scenes can be aborted
-            CMainMenuScene::GetSingletonPtr ()->ProcessMessage ( hwnd, uMsg, wParam, lParam );
-
             bool bProcessed = false, bClientProcessed = false;          
 
             // Check and see if the GUI should process this message

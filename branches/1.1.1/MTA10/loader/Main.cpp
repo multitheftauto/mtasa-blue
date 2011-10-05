@@ -301,6 +301,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     // Basic check for some essential files
     //
     const char* dataFilesFiles [] = { "\\MTA\\cgui\\images\\background_logo.png"
+                                     ,"\\MTA\\cgui\\images\\radarset\\up.png"
                                      ,"\\MTA\\D3DX9_42.dll"
                                      ,"\\MTA\\D3DCompiler_42.dll"
                                      ,"\\MTA\\bass.dll"};

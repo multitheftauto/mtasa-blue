@@ -23,12 +23,6 @@
 #include "CCommon.h"
 #include "CPad.h"
 
-#ifndef PI
-#define PI 3.14159265358979323846264338327950
-#endif
-
-#define SAFE_DELETE(p) { if(p) { delete (p); (p)=NULL; } }
-
 bool            CheckNickProvided           ( const char* szNick );
 float           DistanceBetweenPoints2D     ( const CVector& vecPosition1, const CVector& vecPosition2 );
 float           DistanceBetweenPoints3D     ( const CVector& vecPosition1, const CVector& vecPosition2 );
