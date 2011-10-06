@@ -275,6 +275,7 @@ public:
     virtual float                       GetRequiredStatLevel    ( void )=0;
     virtual void                        SetRequiredStatLevel    ( float fStatLevel )=0;
 
+    virtual void                        SetFlags                ( int flags ) = 0;
     virtual void                        SetFlag                 ( DWORD flag ) = 0;
     virtual void                        ClearFlag               ( DWORD flag ) = 0;
     virtual bool                        IsFlagSet               ( DWORD flag ) = 0;
@@ -286,14 +287,19 @@ public:
     virtual eFireType                   GetFireType             ( void ) = 0;
 
     virtual float                       GetWeaponAnimLoopStart  ( void ) = 0;
+
     virtual float                       GetWeaponAnimLoopStop   ( void ) = 0;
+
     virtual float                       GetWeaponAnimLoopFireTime( void ) = 0;
+    virtual void                        SetWeaponAnimLoopFireTime( float animFireTime ) = 0;
 
     virtual float                       GetWeaponAnim2LoopStart  ( void ) = 0;
+
     virtual float                       GetWeaponAnim2LoopStop   ( void ) = 0;
+
     virtual float                       GetWeaponAnim2LoopFireTime( void ) = 0;
 
-    virtual float                       GetWeaponAnimBreakoutTime( void ) = 0;
+    virtual float                       GetWeaponAnimBreakoutTime ( void ) = 0;
 
     virtual float                       GetWeaponRadius          ( void ) = 0;
 

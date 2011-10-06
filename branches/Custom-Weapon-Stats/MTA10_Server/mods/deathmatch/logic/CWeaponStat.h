@@ -88,6 +88,7 @@ public:
         // END
         void                        ClearFlag               ( DWORD flag )                  { tWeaponStats.m_nFlags &= ~flag; }
         bool                        IsFlagSet               ( DWORD flag )                  { return ((tWeaponStats.m_nFlags & flag) > 0 ? true : false); }
+        int                         GetFlags                ( void )                        { return tWeaponStats.m_nFlags; }
 
         eWeaponModel                GetModel                ( void )                        { return (eWeaponModel)tWeaponStats.m_modelId; }
         void                        SetModel                ( int iModel )                  { tWeaponStats.m_modelId = (int)iModel; }

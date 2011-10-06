@@ -90,6 +90,9 @@ public:
     };
 
     // stolen from R*'s CPedIK :)
+    // DO NOT USE.
+    void                        SetFlags                    ( int iFlags )                  { internalInterface->m_nFlags = iFlags; }
+    // END
     void                        SetFlag                     ( DWORD flag )                  { internalInterface->m_nFlags |= flag; }
     void                        ClearFlag                   ( DWORD flag )                  { internalInterface->m_nFlags &= ~flag; }
     bool                        IsFlagSet                   ( DWORD flag )                  { return ((internalInterface->m_nFlags & flag) > 0 ? true : false); }
@@ -155,11 +158,12 @@ public:
     // Floats
     float                       GetWeaponAnimLoopStart      ( void )                        { return internalInterface->m_animLoopStart; }
     float                       GetWeaponAnimLoopStop       ( void )                        { return internalInterface->m_animLoopEnd; }
-    float                       GetWeaponAnimLoopFireTime   ( void )                       { return internalInterface->m_animFireTime; }
+    float                       GetWeaponAnimLoopFireTime   ( void )                        { return internalInterface->m_animFireTime; }
+    void                        SetWeaponAnimLoopFireTime   ( float animFireTime )          { internalInterface->m_animFireTime = animFireTime; }
 
     float                       GetWeaponAnim2LoopStart     ( void )                        { return internalInterface->m_anim2LoopStart; }
     float                       GetWeaponAnim2LoopStop      ( void )                        { return internalInterface->m_anim2LoopEnd; }
-    float                       GetWeaponAnim2LoopFireTime  ( void )                       { return internalInterface->m_anim2FireTime; }
+    float                       GetWeaponAnim2LoopFireTime  ( void )                        { return internalInterface->m_anim2FireTime; }
 
     float                       GetWeaponAnimBreakoutTime   ( void )                        { return internalInterface->m_animBreakoutTime; }
 

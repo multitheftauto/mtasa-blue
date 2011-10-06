@@ -16,9 +16,9 @@ CWeaponStatManager::CWeaponStatManager ( )
     Init();
     CWeaponStat* pWeaponStat = NULL;
     // Make our list nicer by starting at the non-skill weapons so we don't have duplicates of STD weapon skill
-    for ( int i = NUM_WeaponInfosOtherSkill + 1; i < NUM_WeaponInfosStdSkill; i++)
+    for ( int i = 0; i <= WEAPONTYPE_EXTINGUISHER; i++)
     {
-        eWeaponType weaponType = (eWeaponType) (WEAPONTYPE_PISTOL + i);
+        eWeaponType weaponType = (eWeaponType) (WEAPONTYPE_COUNTRYRIFLE + i);
         // Storage for Original weapon data ( for resetting )
         pWeaponStat = new CWeaponStat ( weaponType, WEAPONSKILL_STD );
         m_OriginalWeaponData.push_back ( pWeaponStat );
@@ -72,7 +72,9 @@ CWeaponStat* CWeaponStatManager::GetWeaponStats ( eWeaponType type, eWeaponSkill
 {
     for ( std::list < CWeaponStat* >::iterator iter = m_OriginalWeaponData.begin (); iter != m_OriginalWeaponData.end ();iter++ )
     {
-        if ( (*iter)->GetWeaponSkillLevel() == skill && (*iter)->GetWeaponType () == type )
+        if ( ( (*iter)->GetWeaponSkillLevel() == skill || 
+            ( type > WEAPONTYPE_PISTOL && type < WEAPONTYPE_TEC9 ) ) && 
+            (*iter)->GetWeaponType () == type )
         {
             return (*iter);
         }
@@ -83,7 +85,8 @@ CWeaponStat* CWeaponStatManager::GetOriginalWeaponStats ( eWeaponType type, eWea
 {
     for ( std::list < CWeaponStat* >::iterator iter = m_OriginalWeaponData.begin (); iter != m_OriginalWeaponData.end ();iter++ )
     {
-        if ( (*iter)->GetWeaponSkillLevel() == skill && (*iter)->GetWeaponType () == type )
+        if ( ( (*iter)->GetWeaponSkillLevel() == skill || type > WEAPONTYPE_TEC9 ) && 
+            (*iter)->GetWeaponType () == type )
         {
             return (*iter);
         }

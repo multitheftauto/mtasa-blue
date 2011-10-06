@@ -2084,4 +2084,73 @@ struct SHeatHazeSync : public ISyncStructure
     } data;
 };
 
+//////////////////////////////////////////
+//                                      //
+//             Weapon Stats             //
+//                                      //
+//////////////////////////////////////////
+struct sWeaponPropertySync : public ISyncStructure
+{
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        if (
+            bitStream.Read     ( data.weaponType ) &&
+            bitStream.Read     ( data.fTargetRange ) &&
+            bitStream.Read     ( data.fWeaponRange ) &&
+            bitStream.Read     ( data.nFlags ) &&
+            bitStream.Read     ( data.dwAnimGroup ) &&
+            bitStream.Read     ( data.nAmmo ) &&
+            bitStream.Read     ( data.nDamage ) &&
+            bitStream.Read     ( data.fAccuracy ) &&
+            bitStream.Read     ( data.fMoveSpeed ) &&
+            bitStream.Read     ( data.fSpeed ) &&
+            bitStream.Read     ( data.fRadius ) &&
+            bitStream.Read     ( data.fLifeSpan ) &&
+            bitStream.Read     ( data.fSpread )
+            )
+            return true;
+
+        return false;
+    }
+
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.Write    ( data.weaponType );
+        bitStream.Write    ( data.fTargetRange );
+        bitStream.Write    ( data.fWeaponRange );
+        bitStream.Write    ( data.nFlags );
+        bitStream.Write    ( data.dwAnimGroup );
+        bitStream.Write    ( data.nAmmo );
+        bitStream.Write    ( data.nDamage );
+        bitStream.Write    ( data.fAccuracy );
+        bitStream.Write    ( data.fMoveSpeed );
+        bitStream.Write    ( data.fSpeed );
+        bitStream.Write    ( data.fRadius );
+        bitStream.Write    ( data.fLifeSpan );
+        bitStream.Write    ( data.fSpread );
+    }
+
+    struct
+    {
+        int         weaponType;
+        FLOAT       fTargetRange;     // max targeting range
+        FLOAT       fWeaponRange;     // absolute gun range / default melee attack range
+
+        int         nFlags;           // flags defining characteristics
+
+        DWORD       dwAnimGroup;
+
+        short       nAmmo;                // ammo in one clip
+        short       nDamage;              // damage inflicted per hit
+
+        FLOAT       fAccuracy;            // modify accuracy of weapon
+        FLOAT       fMoveSpeed;           // how fast can move with weapon
+
+        FLOAT       fSpeed;               // speed of projectile
+        FLOAT       fRadius;              // radius affected
+        FLOAT       fLifeSpan;            // time taken for shot to dissipate
+        FLOAT       fSpread;              // angle inside which shots are created
+    } data;
+};
+
 #pragma pack(pop)

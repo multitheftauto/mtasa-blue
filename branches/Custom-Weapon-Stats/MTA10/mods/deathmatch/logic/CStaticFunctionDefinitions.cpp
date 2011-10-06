@@ -6647,6 +6647,11 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
                 pWeaponInfo->SetMoveSpeed ( fData );
                 break;
             }
+            case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+            {
+                pWeaponInfo->SetWeaponAnimLoopFireTime ( fData );
+                break;
+            }
             default:
                 return false;
         }

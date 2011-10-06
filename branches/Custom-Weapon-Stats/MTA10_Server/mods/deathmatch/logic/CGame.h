@@ -221,6 +221,7 @@ public:
     inline CSerialManager*          GetSerialManager            ( void )        { return &m_SerialManager; }
     inline CWaterManager*           GetWaterManager             ( void )        { return m_pWaterManager; }
     inline CLightsyncManager*       GetLightSyncManager         ( void )        { return &m_lightsyncManager; }
+    inline CWeaponStatManager*      GetWeaponStatManager        ( void )        { return m_pWeaponStatsManager; }
 
     void                        JoinPlayer                  ( CPlayer& Player );
     void                        InitialDataStream           ( CPlayer& Player );
