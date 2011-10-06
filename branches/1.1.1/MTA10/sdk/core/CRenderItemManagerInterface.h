@@ -165,12 +165,14 @@ class CRenderItem
     virtual void    OnLostDevice            ( void ) = 0;
     virtual void    OnResetDevice           ( void ) = 0;
     int             GetVideoMemoryKBUsed    ( void ) { return m_iMemoryKBUsed; }
+    int             GetRevision             ( void ) { return m_iRevision; }
     void            ReleaseRenderItem       ( void ) { ((CRenderItemManagerInterface*)m_pManager)->ReleaseRenderItem ( this ); }
 
     CRenderItemManager* m_pManager;
     IDirect3DDevice9*   m_pDevice;
     int                 m_iRefCount;
     int                 m_iMemoryKBUsed;
+    int                 m_iRevision;
 };
 
 

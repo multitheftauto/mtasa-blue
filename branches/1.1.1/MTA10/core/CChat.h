@@ -293,6 +293,7 @@ protected:
 
     SDrawList                   m_PrevDrawList;
     CRenderTargetItem*          m_pCacheTexture;
+    int                         m_iCacheTextureRevision;
 };
 
 #endif

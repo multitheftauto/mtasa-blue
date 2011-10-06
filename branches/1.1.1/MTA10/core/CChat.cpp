@@ -53,6 +53,7 @@ CChat::CChat ( CGUI* pManager, const CVector2D & vecPosition )
     m_fBackgroundAlpha = 0.0f;
     m_fInputBackgroundAlpha = 0.f;
     m_pCacheTexture = NULL;
+    m_iCacheTextureRevision = 0;
 
     // Background area
     m_pBackground = m_pManager->CreateStaticImage ();
@@ -211,7 +212,7 @@ void CChat::Draw ( bool bUseCacheTexture )
     if ( !m_pCacheTexture )
     {
         m_pCacheTexture = pGraphics->GetRenderItemManager ()->CreateRenderTarget ( chatSize.fX, chatSize.fY, true, true );
-        m_PrevDrawList.lineItemList.clear ();   // Make sure changed test will fail
+        m_iCacheTextureRevision = -1;   // Make sure the graphics will be updated
     }
 
     // If we can't get a rendertarget for some reason, just render the text directly to the screen
@@ -221,10 +222,11 @@ void CChat::Draw ( bool bUseCacheTexture )
         return;
     }
 
-    // If draw list has changed, update the cache texture
-    if ( m_PrevDrawList != drawList )
+    // Update the cached graphics if the draw list has changed, or the render target has been recreated
+    if ( m_PrevDrawList != drawList || m_pCacheTexture->GetRevision () != m_iCacheTextureRevision )
     {
         m_PrevDrawList = drawList;
+        m_iCacheTextureRevision = m_pCacheTexture->GetRevision ();
 
         pGraphics->EnableSetRenderTarget ( true );
         pGraphics->GetRenderItemManager ()->SetRenderTarget ( m_pCacheTexture, true );
