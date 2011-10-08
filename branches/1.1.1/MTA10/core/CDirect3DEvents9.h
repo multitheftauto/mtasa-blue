@@ -35,6 +35,8 @@ class CDirect3DEvents9
     static HRESULT      DrawIndexedPrimitiveGuarded ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount );
     static HRESULT      CreateVertexBuffer          ( IDirect3DDevice9 *pDevice, UINT Length,DWORD Usage,DWORD FVF,D3DPOOL Pool,IDirect3DVertexBuffer9** ppVertexBuffer,HANDLE* pSharedHandle );
     static HRESULT      SetStreamSource             ( IDirect3DDevice9 *pDevice, UINT StreamNumber,IDirect3DVertexBuffer9* pStreamData,UINT OffsetInBytes,UINT Stride );
+    static HRESULT      CreateVertexDeclaration     ( IDirect3DDevice9 *pDevice, CONST D3DVERTEXELEMENT9* pVertexElements, IDirect3DVertexDeclaration9** ppDecl );
+    static HRESULT      SetVertexDeclaration        ( IDirect3DDevice9 *pDevice, IDirect3DVertexDeclaration9* pDecl );
 };
 
 #endif

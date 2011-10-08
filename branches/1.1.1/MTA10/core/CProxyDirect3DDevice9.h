@@ -389,6 +389,12 @@ public:
 
     struct SD3DVertexDeclState
     {
+        SD3DVertexDeclState ( void )
+        {
+            memset ( this, 0, sizeof ( *this ) );
+        }
+
+        bool bUsesStreamAtIndex[2];
         DWORD Position;
         DWORD PositionT;
         DWORD Normal;
@@ -454,6 +460,7 @@ public:
     };
 
     SD3DDeviceState     DeviceState;
+    std::map < IDirect3DVertexDeclaration9*, SD3DVertexDeclState > m_VertexDeclMap;
 
     // Debugging
     void                SetCallType     ( SCallState::eD3DCallType callType, uint uiNumArgs = 0, ... );

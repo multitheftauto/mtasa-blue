@@ -557,6 +557,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CProxyDirect3DVertexDeclaration.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CProxyDirectInput8.cpp"
 				>
 			</File>
@@ -935,6 +939,10 @@
 			</File>
 			<File
 				RelativePath=".\CProxyDirect3DVertexBuffer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CProxyDirect3DVertexDeclaration.h"
 				>
 			</File>
 			<File
