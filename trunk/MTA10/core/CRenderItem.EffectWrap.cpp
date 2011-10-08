@@ -1509,36 +1509,6 @@ void CEffectWrapImpl::ApplyMappedHandles ( void )
     //
     // VertexDeclState
     //
-    if ( !vertexDeclStateVarList.empty () )
-    {
-        // Hackily update the state here
-        CProxyDirect3DDevice9::SD3DVertexDeclState& vertexDeclState = g_pDeviceState->VertexDeclState;
-        memset ( &vertexDeclState, 0, sizeof ( vertexDeclState ) );
-        IDirect3DVertexDeclaration9* pVertexDeclaration = NULL;
-        if ( SUCCEEDED( m_pDevice->GetVertexDeclaration ( &pVertexDeclaration ) ) )
-        {
-            D3DVERTEXELEMENT9               elements[MAXD3DDECLLENGTH];
-            UINT                            numElements;
-            if ( SUCCEEDED( pVertexDeclaration->GetDeclaration ( elements, &numElements ) ) )
-            {
-                for ( uint i = 0 ; i < numElements - 1 ; i++ )
-                {
-                    switch ( elements [ i ].Usage + elements [ i ].UsageIndex * 16 )
-                    {
-                        case D3DDECLUSAGE_POSITION:         vertexDeclState.Position = 1;   break;
-                        case D3DDECLUSAGE_POSITIONT:        vertexDeclState.PositionT = 1;  break;
-                        case D3DDECLUSAGE_NORMAL:           vertexDeclState.Normal = 1;     break;
-                        case D3DDECLUSAGE_COLOR:            vertexDeclState.Color0 = 1;     break;
-                        case D3DDECLUSAGE_COLOR + 16:       vertexDeclState.Color1 = 1;     break;
-                        case D3DDECLUSAGE_TEXCOORD:         vertexDeclState.TexCoord0 = 1;  break;
-                        case D3DDECLUSAGE_TEXCOORD + 16:    vertexDeclState.TexCoord1 = 1;  break;
-                    }
-                }
-            }
-            SAFE_RELEASE( pVertexDeclaration );
-        }
-    }
-
     for ( uint i = 0 ; i < vertexDeclStateVarList.size () ; i++ )
     {
         const SStateVar& var = vertexDeclStateVarList[i];
