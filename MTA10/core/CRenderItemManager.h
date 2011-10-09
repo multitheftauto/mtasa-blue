@@ -27,7 +27,7 @@ public:
     virtual CGuiFontItem*       CreateGuiFont                       ( const SString& strFullFilePath, const SString& strFontName, uint uiSize );
     virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath );
     virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug );
-    virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel );
+    virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false );
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY );
     virtual void                ReleaseRenderItem                   ( CRenderItem* pItem );
     virtual bool                SetShaderValue                      ( CShaderItem* pItem, const SString& strName, CTextureItem* pTextureItem );

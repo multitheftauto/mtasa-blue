@@ -131,9 +131,9 @@ CTextureItem* CRenderItemManager::CreateTexture ( const SString& strFullFilePath
 //
 //
 ////////////////////////////////////////////////////////////////
-CRenderTargetItem* CRenderItemManager::CreateRenderTarget ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel )
+CRenderTargetItem* CRenderItemManager::CreateRenderTarget ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce )
 {
-    if ( !CanCreateRenderItem ( CRenderTargetItem::GetClassId () ) )
+    if ( !bForce && !CanCreateRenderItem ( CRenderTargetItem::GetClassId () ) )
         return NULL;
 
     CRenderTargetItem* pRenderTargetItem = new CRenderTargetItem ();
