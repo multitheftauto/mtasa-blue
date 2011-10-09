@@ -26,6 +26,7 @@
 static IDirect3DSurface9*  ms_pSaveLockSurface  = NULL;
 static int                 ms_bSaveStarted      = 0;
 static long long           ms_LastSaveTime      = 0;
+// Other variables
 static uint                ms_RequiredAnisotropicLevel = 1;
 
 

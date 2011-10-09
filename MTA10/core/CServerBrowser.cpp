@@ -752,7 +752,7 @@ bool CServerBrowser::CanBrowseVersion ( const SString& strVersion )
         return false;
 
     // If not in allow list then no (unless allow list is empty)
-    if ( !m_allowedVersionMap.empty () && MapContains ( m_allowedVersionMap, strVersion ) )
+    if ( !m_allowedVersionMap.empty () && !MapContains ( m_allowedVersionMap, strVersion ) )
         return false;
 
     // otherwise yes
