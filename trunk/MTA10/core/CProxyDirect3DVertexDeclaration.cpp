@@ -75,7 +75,7 @@ CProxyDirect3DVertexDeclaration::~CProxyDirect3DVertexDeclaration ( void )
 //
 // CProxyDirect3DVertexDeclaration::QueryInterface
 //
-// Used to find the pointer to the real vertex buffer when setting streams
+// Used to find the pointer to the real interface
 //
 /////////////////////////////////////////////////////////////
 HRESULT CProxyDirect3DVertexDeclaration::QueryInterface ( REFIID riid, void** ppvObj )
