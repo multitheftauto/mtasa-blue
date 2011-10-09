@@ -232,14 +232,18 @@ void CChat::Draw ( bool bUseCacheTexture )
         pGraphics->GetRenderItemManager ()->SetRenderTarget ( m_pCacheTexture, true );
 
         // Draw new stuff
+        pGraphics->SetBlendMode ( EBlendMode::MODULATE_ADD );
         DrawDrawList ( drawList );
+        pGraphics->SetBlendMode ( EBlendMode::BLEND );
 
         pGraphics->GetRenderItemManager ()->RestoreDefaultRenderTarget ();
         pGraphics->EnableSetRenderTarget ( false );
     }
 
     // Draw the cache texture
+    pGraphics->SetBlendMode ( EBlendMode::ADD );
     pGraphics->DrawTexture ( m_pCacheTexture, chatTopLeft.fX, chatTopLeft.fY );
+    pGraphics->SetBlendMode ( EBlendMode::BLEND );
 }
 
 

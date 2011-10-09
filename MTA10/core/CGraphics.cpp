@@ -38,6 +38,8 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
 
     m_iDebugQueueRefs = 0;
     m_iDrawBatchRefCount = 0;
+    m_BlendMode = EBlendMode::BLEND;
+    m_BatchBlendMode = EBlendMode::BLEND;
 
     m_pRenderItemManager = new CRenderItemManager ();
     m_pTileBatcher = new CTileBatcher ();
@@ -97,7 +99,7 @@ void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, uns
             // Convert to UTF16
             std::wstring strText = MbUTF8ToUTF16(szText);
 
-            pDXFont->DrawTextW ( m_pDXSprite, strText.c_str(), -1, &rect, ulFormat, ulColor );
+            pDXFont->DrawTextW ( m_pDXSprite, strText.c_str(), -1, &rect, ulFormat, ModifyColorForBlendMode ( ulColor ) );
         EndDrawBatch ();
     }        
 }
@@ -130,9 +132,35 @@ void CGraphics::DrawRectangle ( float fX, float fY, float fWidth, float fHeight,
     D3DXVECTOR2 position ( fX, fY );
     D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, &position );
     m_pDXSprite->SetTransform ( &matrix );
-    m_pDXSprite->Draw ( m_pDXPixelTexture, NULL, NULL, NULL, ulColor );
+    m_pDXSprite->Draw ( m_pDXPixelTexture, NULL, NULL, NULL, ModifyColorForBlendMode ( ulColor ) );
     EndDrawBatch ();
 }
+
+
+//
+// Set current blend mode
+// 
+void CGraphics::SetBlendMode ( EBlendModeType blendMode )
+{
+    m_BlendMode = blendMode;
+}
+
+
+//
+// Modify diffuse color if blend mode requires it
+// 
+SColor CGraphics::ModifyColorForBlendMode ( SColor color )
+{
+    if ( m_BlendMode == EBlendMode::MODULATE_ADD )
+    {
+        // Apply modulation to diffuse color also
+        color.R = color.R * color.A / 256;
+        color.G = color.G * color.A / 256;
+        color.B = color.B * color.A / 256;
+    }
+    return color;
+}
+
 
 //
 // BeginDrawBatch
@@ -142,8 +170,111 @@ void CGraphics::DrawRectangle ( float fX, float fY, float fWidth, float fHeight,
 //
 void CGraphics::BeginDrawBatch ( void )
 {
+    if ( m_BlendMode != m_BatchBlendMode )
+    {
+        if ( m_iDrawBatchRefCount > 0 )
+        {
+            // Flush if changing blend mode
+            m_iDrawBatchRefCount = 1;
+            EndDrawBatch ();
+        }
+        m_BatchBlendMode = m_BlendMode;
+    }
+
     if ( m_iDrawBatchRefCount++ == 0 )
-        m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE | D3DXSPRITE_DO_NOT_ADDREF_TEXTURE );
+    {
+        if ( m_BlendMode == EBlendMode::BLEND )
+        {
+            // Draw NonPM texture
+            m_pDevice->SetRenderState ( D3DRS_ZENABLE,          D3DZB_FALSE );
+            m_pDevice->SetRenderState ( D3DRS_CULLMODE,         D3DCULL_NONE );
+            m_pDevice->SetRenderState ( D3DRS_SHADEMODE,        D3DSHADE_GOURAUD );
+            m_pDevice->SetRenderState ( D3DRS_ALPHABLENDENABLE, TRUE );
+            m_pDevice->SetRenderState ( D3DRS_SRCBLEND,         D3DBLEND_SRCALPHA );
+            m_pDevice->SetRenderState ( D3DRS_DESTBLEND,        D3DBLEND_INVSRCALPHA );
+            m_pDevice->SetRenderState ( D3DRS_ALPHATESTENABLE,  TRUE );
+            m_pDevice->SetRenderState ( D3DRS_ALPHAREF,         0x01 );
+            m_pDevice->SetRenderState ( D3DRS_ALPHAFUNC,        D3DCMP_GREATEREQUAL );
+            m_pDevice->SetRenderState ( D3DRS_LIGHTING,         FALSE);
+
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLOROP,        D3DTOP_MODULATE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLORARG1,      D3DTA_DIFFUSE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLORARG2,      D3DTA_TEXTURE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAOP,        D3DTOP_MODULATE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAARG1,      D3DTA_DIFFUSE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAARG2,      D3DTA_TEXTURE );
+
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_COLOROP,        D3DTOP_DISABLE );
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_ALPHAOP,        D3DTOP_DISABLE );
+        }
+        else
+        if ( m_BlendMode == EBlendMode::MODULATE_ADD )
+        {
+            // Draw NonPM texture as PM texture
+            m_pDevice->SetRenderState ( D3DRS_ZENABLE,          D3DZB_FALSE );
+            m_pDevice->SetRenderState ( D3DRS_CULLMODE,         D3DCULL_NONE );
+            m_pDevice->SetRenderState ( D3DRS_SHADEMODE,        D3DSHADE_GOURAUD );
+            m_pDevice->SetRenderState ( D3DRS_ALPHABLENDENABLE, TRUE );
+            m_pDevice->SetRenderState ( D3DRS_SRCBLEND,         D3DBLEND_ONE );
+            m_pDevice->SetRenderState ( D3DRS_DESTBLEND,        D3DBLEND_INVSRCALPHA );
+            m_pDevice->SetRenderState ( D3DRS_ALPHATESTENABLE,  TRUE );
+            m_pDevice->SetRenderState ( D3DRS_ALPHAREF,         0x01 );
+            m_pDevice->SetRenderState ( D3DRS_ALPHAFUNC,        D3DCMP_GREATEREQUAL );
+            m_pDevice->SetRenderState ( D3DRS_LIGHTING,         FALSE);
+            m_pDevice->SetRenderState ( D3DRS_TEXTUREFACTOR,    0 );
+
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
+
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_COLOROP,   D3DTOP_BLENDCURRENTALPHA );
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_COLORARG1, D3DTA_CURRENT );
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_COLORARG2, D3DTA_TFACTOR );
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_ALPHAOP,   D3DTOP_SELECTARG1 );
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_ALPHAARG1, D3DTA_CURRENT );
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
+
+            m_pDevice->SetTextureStageState ( 2, D3DTSS_COLOROP, D3DTOP_DISABLE );
+            m_pDevice->SetTextureStageState ( 2, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
+
+        }
+        else
+        if ( m_BlendMode == EBlendMode::ADD )
+        {
+            // Draw PM texture
+            m_pDevice->SetRenderState ( D3DRS_ZENABLE,          D3DZB_FALSE );
+            m_pDevice->SetRenderState ( D3DRS_CULLMODE,         D3DCULL_NONE );
+            m_pDevice->SetRenderState ( D3DRS_SHADEMODE,        D3DSHADE_GOURAUD );
+            m_pDevice->SetRenderState ( D3DRS_ALPHABLENDENABLE, TRUE );
+            m_pDevice->SetRenderState ( D3DRS_SRCBLEND,         D3DBLEND_ONE );
+            m_pDevice->SetRenderState ( D3DRS_DESTBLEND,        D3DBLEND_INVSRCALPHA );
+            m_pDevice->SetRenderState ( D3DRS_ALPHATESTENABLE,  TRUE );
+            m_pDevice->SetRenderState ( D3DRS_ALPHAREF,         0x01 );
+            m_pDevice->SetRenderState ( D3DRS_ALPHAFUNC,        D3DCMP_GREATEREQUAL );
+            m_pDevice->SetRenderState ( D3DRS_LIGHTING,         FALSE );
+
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
+
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_COLOROP, D3DTOP_DISABLE );
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
+
+        }
+        else
+            assert ( 0 );
+
+        m_pDXSprite->Begin ( D3DXSPRITE_SORT_TEXTURE | D3DXSPRITE_DO_NOT_ADDREF_TEXTURE
+                | D3DXSPRITE_DONOTSAVESTATE
+                | D3DXSPRITE_DONOTMODIFY_RENDERSTATE
+            );
+    }
 }
 
 //
@@ -153,6 +284,7 @@ void CGraphics::EndDrawBatch ( void )
 {
     if ( --m_iDrawBatchRefCount == 0 )
         m_pDXSprite->End ();
+    m_iDrawBatchRefCount = Max ( 0, m_iDrawBatchRefCount );
 }
 
 
@@ -591,7 +723,7 @@ void CGraphics::DrawTexture ( CTextureItem* pTexture, float fX, float fY, float 
     D3DXVECTOR2 position ( fX - fFileWidth * fScaleX * fCenterX, fY - fFileHeight * fScaleY * fCenterY );
     D3DXMatrixTransformation2D ( &matrix, NULL, NULL, &scaling, &rotationCenter, fRotation * 6.2832f / 360.f, &position );
     m_pDXSprite->SetTransform ( &matrix );
-    m_pDXSprite->Draw ( (IDirect3DTexture9*)pTexture->m_pD3DTexture, NULL, NULL, NULL, dwColor );
+    m_pDXSprite->Draw ( (IDirect3DTexture9*)pTexture->m_pD3DTexture, NULL, NULL, NULL, ModifyColorForBlendMode ( dwColor ) );
     EndDrawBatch ();
 }
 
