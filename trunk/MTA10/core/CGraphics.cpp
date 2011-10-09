@@ -37,6 +37,7 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
     m_pDXSprite = NULL;
 
     m_iDebugQueueRefs = 0;
+    m_iDrawBatchRefCount = 0;
 
     m_pRenderItemManager = new CRenderItemManager ();
     m_pTileBatcher = new CTileBatcher ();
@@ -89,7 +90,7 @@ void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, uns
         D3DXVECTOR2 scalingCentre ( 0.5f, 0.5f );
         D3DXVECTOR2 scaling ( fScaleX, fScaleY );
 
-        m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
+        BeginDrawBatch ();
             D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, NULL );
             m_pDXSprite->SetTransform ( &matrix );  
             
@@ -97,7 +98,7 @@ void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, uns
             std::wstring strText = MbUTF8ToUTF16(szText);
 
             pDXFont->DrawTextW ( m_pDXSprite, strText.c_str(), -1, &rect, ulFormat, ulColor );
-        m_pDXSprite->End ();
+        EndDrawBatch ();
     }        
 }
 
@@ -122,7 +123,7 @@ void CGraphics::DrawLine3D ( const CVector& vecBegin, const CVector& vecEnd, uns
 
 void CGraphics::DrawRectangle ( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor )
 {      
-    m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
+    BeginDrawBatch ();
     D3DXMATRIX matrix;
     D3DXVECTOR2 scalingCentre ( 0.5f, 0.5f );
     D3DXVECTOR2 scaling ( fWidth, fHeight );
@@ -130,7 +131,28 @@ void CGraphics::DrawRectangle ( float fX, float fY, float fWidth, float fHeight,
     D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, &position );
     m_pDXSprite->SetTransform ( &matrix );
     m_pDXSprite->Draw ( m_pDXPixelTexture, NULL, NULL, NULL, ulColor );
-    m_pDXSprite->End ();
+    EndDrawBatch ();
+}
+
+//
+// BeginDrawBatch
+//
+// Slightly speed up successive uses of DXSprite.
+// Matching EndDrawBatch() must be called otherwise end of world.
+//
+void CGraphics::BeginDrawBatch ( void )
+{
+    if ( m_iDrawBatchRefCount++ == 0 )
+        m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE | D3DXSPRITE_DO_NOT_ADDREF_TEXTURE );
+}
+
+//
+// EndDrawBatch
+//
+void CGraphics::EndDrawBatch ( void )
+{
+    if ( --m_iDrawBatchRefCount == 0 )
+        m_pDXSprite->End ();
 }
 
 
@@ -562,7 +584,7 @@ void CGraphics::DrawTexture ( CTextureItem* pTexture, float fX, float fY, float 
     const float fFileWidth     = pTexture->m_uiSizeX;
     const float fFileHeight    = pTexture->m_uiSizeY;
 
-    m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
+    BeginDrawBatch ();
     D3DXMATRIX matrix;
     D3DXVECTOR2 scaling ( fScaleX * fFileWidth / fSurfaceWidth, fScaleY * fFileHeight / fSurfaceHeight );
     D3DXVECTOR2 rotationCenter  ( fFileWidth * fScaleX * fCenterX, fFileHeight * fScaleX * fCenterY );
@@ -570,7 +592,7 @@ void CGraphics::DrawTexture ( CTextureItem* pTexture, float fX, float fY, float 
     D3DXMatrixTransformation2D ( &matrix, NULL, NULL, &scaling, &rotationCenter, fRotation * 6.2832f / 360.f, &position );
     m_pDXSprite->SetTransform ( &matrix );
     m_pDXSprite->Draw ( (IDirect3DTexture9*)pTexture->m_pD3DTexture, NULL, NULL, NULL, dwColor );
-    m_pDXSprite->End ();
+    EndDrawBatch ();
 }
 
 void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )

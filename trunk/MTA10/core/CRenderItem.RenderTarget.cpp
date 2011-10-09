@@ -157,6 +157,9 @@ void CRenderTargetItem::CreateUnderlyingData ( void )
 
     // Update memory used
     m_iMemoryKBUsed = CRenderItemManager::CalcD3DResourceMemoryKBUsage ( m_pD3DRenderTargetSurface ) + CRenderItemManager::CalcD3DResourceMemoryKBUsage ( m_pD3DZStencilSurface );
+
+    // Update revision counter
+    m_iRevision++;
 }
 
 
