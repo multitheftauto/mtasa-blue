@@ -3,8 +3,8 @@
 *  PROJECT:     Multi Theft Auto v1.0
 *               (Shared logic for modifications)
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CWeaponStatManager.h
-*  PURPOSE:     Header file for custom weapon stats.
+*  FILE:        game_sa/CWeaponStatManagerSA.h
+*  PURPOSE:     header file for the custom weapon stats manager.
 *  DEVELOPERS:  Cazomino05 < Cazomino05@gmail.com >
 *
 *****************************************************************************/

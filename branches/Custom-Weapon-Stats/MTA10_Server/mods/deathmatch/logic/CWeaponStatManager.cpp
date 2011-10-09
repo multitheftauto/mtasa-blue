@@ -4,7 +4,7 @@
 *               (Shared logic for modifications)
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        mods/deathmatch/logic/CWeaponStatManager.h
-*  PURPOSE:     source file for custom weapon stats.
+*  PURPOSE:     source file for the custom weapon stats manager.
 *  DEVELOPERS:  Cazomino05 < Cazomino05@gmail.com >
 *
 *****************************************************************************/

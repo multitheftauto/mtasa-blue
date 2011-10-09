@@ -2,15 +2,16 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/CWaterManager.h
-*  PURPOSE:     Water interface
+*  FILE:        sdk/game/CWeaponStat.h
+*  PURPOSE:     Weapon Stat Manager interface
+*  DEVELOPERS:  Cazomino05 < Cazomino05@gmail.com >
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
 
-#ifndef __CWEAPONSTATSA_H
-#define __CWEAPONSTATSA_H
+#ifndef __CWEAPONSTAT_H
+#define __CWEAPONSTAT_H
 
 class CWeaponStat
 {

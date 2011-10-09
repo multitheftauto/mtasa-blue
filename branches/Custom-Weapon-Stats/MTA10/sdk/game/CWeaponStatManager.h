@@ -2,8 +2,9 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/CWaterManager.h
-*  PURPOSE:     Water interface
+*  FILE:        sdk/game/CWeaponStatManager.h
+*  PURPOSE:     Weapon Stat Manager Interface
+*  DEVELOPERS:  Cazomino05 < Cazomino05@gmail.com >
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

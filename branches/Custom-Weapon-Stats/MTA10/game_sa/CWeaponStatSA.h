@@ -3,14 +3,14 @@
 *  PROJECT:     Multi Theft Auto v1.0
 *               (Shared logic for modifications)
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CWeaponStat.h
+*  FILE:        game_sa/CWeaponStatSA.h
 *  PURPOSE:     Source file for custom weapon stats.
 *  DEVELOPERS:  Cazomino05 < Cazomino05@gmail.com >
 *
 *****************************************************************************/
 
-#ifndef __CWEAPONSTAT_H
-#define __CWEAPONSTAT_H
+#ifndef __CWEAPONSTATSA_H
+#define __CWEAPONSTATSA_H
 #include "CWeaponInfoSA.h"
 class CWeaponStatSA : public CWeaponStat
 {
