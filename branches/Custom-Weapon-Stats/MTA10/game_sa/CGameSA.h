@@ -148,6 +148,7 @@ public:
     inline CRopes                   * GetRopes ()                { return m_pRopes; }
     inline CFx                      * GetFx ()                   { return m_pFx; }
     inline CWaterManager            * GetWaterManager ()         { return m_pWaterManager; }
+    inline CWeaponStatManager       * GetWeaponStatsManager()    { return m_pWeaponStatsManager; }
 
     CWeaponInfo             * GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill=WEAPONSKILL_STD);
     CModelInfo              * GetModelInfo( DWORD dwModelID );
@@ -248,6 +249,7 @@ private:
     CRopes                  * m_pRopes;
     CFx                     * m_pFx;
     CWaterManager           * m_pWaterManager;
+    CWeaponStatManager      * m_pWeaponStatsManager;
 
     CPad                        * m_pPad;
     CTheCarGenerators           * m_pTheCarGenerators;

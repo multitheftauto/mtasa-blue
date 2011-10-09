@@ -68,6 +68,7 @@ typedef void ( InRenderer ) ( void );
 #include "CTheCarGenerators.h"
 #include "CVisibilityPlugins.h"
 #include "CWaterManager.h"
+#include "CWeaponStatManager.h"
 #include "CWeather.h"
 #include "CWeaponInfo.h"
 #include "CWorld.h"
