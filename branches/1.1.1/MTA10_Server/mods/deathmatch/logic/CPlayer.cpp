@@ -622,6 +622,7 @@ bool CPlayer::GetWeaponCorrect ( void )
     return m_uiWeaponIncorrectCount == 0;
 }
 
+
 // Put this player in other players nearlist, if errm... the player is near, enough
 void CPlayer::UpdateOthersNearList ( void )
 {
