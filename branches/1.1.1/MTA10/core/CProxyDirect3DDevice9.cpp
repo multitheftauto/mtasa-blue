@@ -61,7 +61,7 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
     //
     // Get video card name
     //
-    STRNCPY( g_pDeviceState->AdapterState.Name, adaptIdent.Description, sizeof ( g_pDeviceState->AdapterState.Name ) );
+    g_pDeviceState->AdapterState.Name = adaptIdent.Description;
 
     //
     // Get max anisotropic setting

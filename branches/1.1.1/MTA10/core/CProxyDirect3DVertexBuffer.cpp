@@ -46,7 +46,7 @@ CProxyDirect3DVertexBuffer::~CProxyDirect3DVertexBuffer ( void )
 //
 // CProxyDirect3DVertexBuffer::QueryInterface
 //
-// Used to find the pointer to the real vertex buffer when setting streams
+// Used to find the pointer to the real interface
 //
 /////////////////////////////////////////////////////////////
 HRESULT CProxyDirect3DVertexBuffer::QueryInterface ( REFIID riid, void** ppvObj )
@@ -88,7 +88,7 @@ ULONG CProxyDirect3DVertexBuffer::Release ( void )
 
 /////////////////////////////////////////////////////////////
 //
-// CProxyDirect3DVertexBuffer::LockRect
+// CProxyDirect3DVertexBuffer::Lock
 //
 // If lock is writable, tell manager that range content will change
 //

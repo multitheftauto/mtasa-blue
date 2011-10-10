@@ -29,6 +29,18 @@ class CLine3DBatcher;
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
 
+namespace EBlendMode
+{
+    enum EBlendModeType
+    {
+        BLEND = 100,            // Alpha blend
+        ADD = 1000,             // Color add                          (used for making composite textures with a premultiplied source)
+        MODULATE_ADD = 10000,   // Modulate color with alpha then add (used for making composite textures with a non-premultiplied source)
+    };
+}
+
+using EBlendMode::EBlendModeType;
+
 class CGraphics : public CGraphicsInterface, public CSingleton < CGraphics >
 {
     friend class CDirect3DEvents9;
@@ -49,6 +61,8 @@ public:
     void                DrawLine3D              ( const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f );
     void                DrawRectangle           ( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor );
 
+    void                SetBlendMode            ( EBlendModeType blendMode = EBlendMode::BLEND );
+    SColor              ModifyColorForBlendMode ( SColor color );
     void                BeginDrawBatch          ( void );
     void                EndDrawBatch            ( void );
 
@@ -136,6 +150,8 @@ private:
 
     int                 m_iDebugQueueRefs;
     int                 m_iDrawBatchRefCount;
+    EBlendModeType      m_BlendMode;
+    EBlendModeType      m_BatchBlendMode;
 
     LPD3DXSPRITE        m_pDXSprite;
     IDirect3DTexture9 * m_pDXPixelTexture;

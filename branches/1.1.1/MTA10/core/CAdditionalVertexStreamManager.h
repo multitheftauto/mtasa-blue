@@ -166,7 +166,7 @@ public:
 
     SCurrentStateInfo ( void )
     {
-        memset( this, 0, sizeof(*this) );
+        ZERO_POD_STRUCT( this );
     }
 
     ~SCurrentStateInfo ( void )

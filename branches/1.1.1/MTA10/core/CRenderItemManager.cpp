@@ -53,7 +53,7 @@ void CRenderItemManager::OnDeviceCreate ( IDirect3DDevice9* pDevice, float fView
     m_pRenderWare->InitWorldTextureWatch ( StaticWatchCallback );
 
     // Get some stats
-    m_strVideoCardName = g_pDeviceState->AdapterState.Name;
+    m_strVideoCardName = (const char*)g_pDeviceState->AdapterState.Name;
     m_iVideoCardMemoryKBTotal = g_pDeviceState->AdapterState.InstalledMemoryKB;
 
     m_iVideoCardMemoryKBForMTATotal = ( m_iVideoCardMemoryKBTotal - ( 64 * 1024 ) ) * 4 / 5;
