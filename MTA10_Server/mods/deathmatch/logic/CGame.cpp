@@ -1439,6 +1439,10 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
         CPlayer* pPlayer = m_pPlayerManager->Create ( Packet.GetSourceSocket () );
         if ( pPlayer )
         {
+            // Set the bitstream version number for this connection
+            pPlayer->SetBitStreamVersion ( Packet.GetBitStreamVersion () );
+            g_pNetServer->SetClientBitStreamVersion ( Packet.GetSourceSocket (), Packet.GetBitStreamVersion () );
+
             // Get the serial number from the packet source
             NetServerPlayerID p = Packet.GetSourceSocket ();
             SString strSerial        = p.GetSerial ();
@@ -1494,13 +1498,9 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 pPlayer->SetNick ( szNick );
                                 pPlayer->SetGameVersion ( Packet.GetGameVersion () );
                                 pPlayer->SetMTAVersion ( Packet.GetMTAVersion () );
-                                pPlayer->SetBitStreamVersion ( Packet.GetBitStreamVersion () );
                                 pPlayer->SetSerialUser ( Packet.GetSerialUser () );
                                 pPlayer->SetSerial ( strSerial );
                                 pPlayer->SetPlayerVersion ( strPlayerVersion );
-
-                                // Set the bitstream version number for this connection
-                                g_pNetServer->SetClientBitStreamVersion ( Packet.GetSourceSocket (), Packet.GetBitStreamVersion () );
 
                                 // Check if client must update
                                 if ( GetConfig ()->IsBelowMinimumClient ( pPlayer->GetPlayerVersion () ) )
