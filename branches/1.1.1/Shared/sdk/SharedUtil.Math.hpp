@@ -4,7 +4,7 @@
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        SharedUtil.Math.hpp
 *  PURPOSE:
-*  DEVELOPERS:  Alberto Alonso <rydencillo@gmail.com>
+*  DEVELOPERS:
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

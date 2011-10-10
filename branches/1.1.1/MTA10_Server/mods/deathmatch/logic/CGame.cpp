@@ -380,6 +380,8 @@ void CGame::DoPulse ( void )
     if ( m_pOpenPortsTester )
         m_pOpenPortsTester->Poll ();
 
+    m_lightsyncManager.DoPulse ();
+
     // Unlock the critical section again
     Unlock();
 }
@@ -1182,6 +1184,10 @@ void CGame::InitialDataStream ( CPlayer& Player )
             m_pAccountManager->LogIn ( &Player, &Player, pAccount, true );
         }
     }
+
+    // Register them on the lightweight sync manager.
+    if ( Player.GetBitStreamVersion () >= 0x1a )
+        m_lightsyncManager.RegisterPlayer ( &Player );
 }
 
 void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSayInConsole, const char* szKickReason, const char* szResponsiblePlayer )
@@ -1249,6 +1255,9 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
 
     // Delete it, don't unlink yet, we could be inside the player-manager's iteration
     m_ElementDeleter.Delete ( &Player, false );
+
+    // Unregister them from the lightweight sync manager
+    m_lightsyncManager.UnregisterPlayer ( &Player );
 }
 
 
@@ -1466,7 +1475,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                     if ( strcmp ( szIP, szTempIP ) == 0 )
                     {
                         // Two players could have the same IP, so see if the old player appears inactive before quitting them
-                        if ( pTempPlayer->GetTicksSinceLastReceivedSync () > 5000 )
+                        if ( pTempPlayer->UhOhNetworkTrouble () )
                         {
                             pTempPlayer->Send ( CPlayerDisconnectedPacket ( SString ( "Supplanted by %s from %s", szNick, szIP ) ) );
                             QuitPlayer ( *pTempPlayer, CClient::QUIT_QUIT );
@@ -1766,7 +1775,7 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
 
     //
-    // Process far sync
+    // Process far sync (only if light sync is not active)
     //
     if ( pPlayer->IsTimeForFarSync () )
     {
@@ -3097,6 +3106,8 @@ void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
     if ( pPlayer && pPlayer->IsJoined () )
     {
+        pPlayer->NotifyReceivedSync ();
+
         // This might need to be time-contexted
         CPlayerCamera * pCamera = pPlayer->GetCamera ();
 

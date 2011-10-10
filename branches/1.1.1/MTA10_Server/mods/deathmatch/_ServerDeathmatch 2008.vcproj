@@ -569,6 +569,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CLightsyncManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CLogger.cpp"
 					>
 				</File>
@@ -928,6 +932,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CLightsyncPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CLuaEventPacket.cpp"
 						>
 					</File>
@@ -1081,6 +1089,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CVehiclePuresyncPacket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CVehicleResyncPacket.cpp"
 						>
 					</File>
 					<File
@@ -1446,6 +1458,10 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl"
 			>
+			<File
+				RelativePath=".\logic\CLightsyncManager.h"
+				>
+			</File>
 			<File
 				RelativePath=".\Config.h"
 				>
@@ -2021,6 +2037,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CLightsyncPacket.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CLuaEventPacket.h"
 						>
 					</File>
@@ -2190,6 +2210,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CVehiclePuresyncPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CVehicleResyncPacket.h"
 						>
 					</File>
 					<File

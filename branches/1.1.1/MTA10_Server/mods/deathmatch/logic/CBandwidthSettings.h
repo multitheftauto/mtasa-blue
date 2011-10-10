@@ -25,6 +25,7 @@ public:
     CBandwidthSettings ( void )
     {
         SetNone ();
+        EnableLightSync ( false );      // Lightsync default off for now
     }
 
     void SetNone ( void )
@@ -66,6 +67,11 @@ public:
         UpdateCachedValues ();
     }
 
+    void EnableLightSync ( bool bEnable )
+    {
+        bLightSyncEnabled = bEnable;
+    }
+
     void UpdateCachedValues ( void )
     {
         fZone1Dot = cos ( fZone1Angle / 180.f * PI * 0.5f );
@@ -82,6 +88,7 @@ public:
     float fZone0RadiusSq;
     int ZoneUpdateIntervals [ ZONE_MAX ];   // First is always 0, next is Zone1 interval then Zone2 and Zone3
     int iMaxZoneIfOtherCanSee;
+    bool bLightSyncEnabled;
 };
 
 extern CBandwidthSettings* g_pBandwidthSettings;

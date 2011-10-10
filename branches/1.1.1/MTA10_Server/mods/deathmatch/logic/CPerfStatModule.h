@@ -19,8 +19,17 @@ struct SStatData
 
     struct {
         long long llSentPacketsByZone [ ZONE_MAX ];
+        long long llSentBytesByZone [ ZONE_MAX ];
         long long llSkippedPacketsByZone [ ZONE_MAX ];
+        long long llSkippedBytesByZone [ ZONE_MAX ];
     } puresync;
+
+    struct {
+        long long llPureSyncPacketsSkipped;
+        long long llPureSyncBytesSkipped;
+        long long llLightSyncPacketsSent;
+        long long llLightSyncBytesSent;
+    } lightsync;
 };
 
 extern SStatData* g_pStats;

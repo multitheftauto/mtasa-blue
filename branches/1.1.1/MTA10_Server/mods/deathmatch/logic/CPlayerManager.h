@@ -49,7 +49,7 @@ public:
     inline std::list < CPlayer* > ::const_iterator  IterGet                     ( CPlayer* pPlayer );
     inline std::list < CPlayer* > ::const_iterator  IterGet                     ( ElementID PlayerID );
 
-    void                                        BroadcastOnlyJoined             ( const CPacket& Packet, CPlayer* pSkip = NULL );
+    void                                        BroadcastOnlyJoined             ( const CPacket& Packet, CPlayer* pSkip = NULL, ushort usMinBitStreamVersion = 0 );
 
     static void                                 Broadcast                       ( const CPacket& Packet, const std::set < CPlayer* >& sendList );
     static void                                 Broadcast                       ( const CPacket& Packet, const std::list < CPlayer* >& sendList );

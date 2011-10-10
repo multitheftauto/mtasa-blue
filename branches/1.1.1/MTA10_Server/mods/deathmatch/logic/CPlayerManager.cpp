@@ -162,7 +162,7 @@ list < CPlayer* > ::const_iterator CPlayerManager::IterGet ( ElementID PlayerID 
 
 
 // TODO [28-Feb-2009] packetOrdering is currently always PACKET_ORDERING_GAME
-void CPlayerManager::BroadcastOnlyJoined ( const CPacket& Packet, CPlayer* pSkip )
+void CPlayerManager::BroadcastOnlyJoined ( const CPacket& Packet, CPlayer* pSkip, ushort usMinBitStreamVersion )
 {
     // Make a list of players to send this packet to
     std::vector < CPlayer* > sendList;
@@ -172,7 +172,7 @@ void CPlayerManager::BroadcastOnlyJoined ( const CPacket& Packet, CPlayer* pSkip
     for ( ; iter != m_Players.end (); iter++ )
     {
         CPlayer* pPlayer = *iter;
-        if ( pPlayer != pSkip && pPlayer->IsJoined () )
+        if ( pPlayer != pSkip && pPlayer->IsJoined () && pPlayer->GetBitStreamVersion () >= usMinBitStreamVersion )
         {
             sendList.push_back ( pPlayer );
         }
