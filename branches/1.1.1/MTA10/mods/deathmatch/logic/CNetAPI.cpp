@@ -1878,7 +1878,6 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
     // Only update the sync if this packet is from the same context.
     if ( !pPlayer->CanUpdateSync ( ucSyncTimeContext ) )
     {
-        g_pCore->GetConsole ()->Printf ( "ignoring lightweight sync: %u Invalid Sync Context", ucSyncTimeContext );
         return;
     }
 
