@@ -21,9 +21,6 @@
 #include <CClientTextDisplay.h>
 #include <gui/CGUI.h>
 
-#define RADAR_TEXTURE_WIDTH 1152
-#define RADAR_TEXTURE_HEIGHT 1152
-
 class CRadarMap
 {
 public:
