@@ -695,7 +695,13 @@ void CPlayer::UpdateOthersNearList ( void )
                 {
                     // Check dimension matches
                     if ( m_usDimension == pOtherPlayer->GetDimension () )
+                    {
                         pOtherPlayer->RefreshNearPlayer ( this );
+
+                        // Lightsync needs it the other way round (for spectating)
+                        if ( g_pBandwidthSettings->bLightSyncEnabled )
+                            this->RefreshNearPlayer ( pOtherPlayer );
+                    }
                 }
             }
         }

@@ -296,8 +296,8 @@ void CRadarMap::DoRender ( void )
 
         g_pCore->GetGraphics()->DrawTexture ( m_pRadarImage, static_cast < float > ( m_iMapMinX ),
                                                              static_cast < float > ( m_iMapMinY ),
-                                                             m_fMapSize / RADAR_TEXTURE_WIDTH,
-                                                             m_fMapSize / RADAR_TEXTURE_HEIGHT,
+                                                             m_fMapSize / m_pRadarImage->m_uiSizeX,
+                                                             m_fMapSize / m_pRadarImage->m_uiSizeY,
                                                              0.0f, 0.0f, 0.0f,
                                                              SColorARGB ( m_iRadarAlpha, 255, 255, 255 ) );
 
