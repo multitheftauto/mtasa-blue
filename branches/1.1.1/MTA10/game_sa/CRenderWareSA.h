@@ -120,6 +120,7 @@ private:
     void                BreakAssociation            ( SShadInfo* pShadInfo, STexInfo* pTexInfo );
     void                UpdateAssociationForTexInfo ( STexInfo* pTexInfo );
     bool                IsFirstShadInfoHigherOrSamePriority ( SShadInfo* pShadInfoA, SShadInfo* pShadInfoB );
+    void                FlushPendingAssociations    ( void );
 
     // Watched world textures
     std::list < STexInfo >                  m_TexInfoList;
@@ -128,7 +129,10 @@ private:
     std::map < CD3DDUMMY*, STexInfo* >      m_D3DDataTexInfoMap;
 
     std::map < CSHADERDUMMY*, SShadInfo* >  m_ShadInfoMap;
-    std::multimap < float, SShadInfo* >     m_orderMap;
+    std::multimap < float, SShadInfo* >     m_OrderMap;
+
+    std::set < STexInfo* >                  m_PendingTexInfoMap;
+    std::set < SShadInfo* >                 m_PendingShadInfoMap;
 
     PFN_WATCH_CALLBACK                      m_pfnWatchCallback;
 };
