@@ -1855,7 +1855,6 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
     }
     if ( bReadPosition )
     {
-        g_pCore->GetConsole ()->Printf ( "reading position sync for: %s", pPlayer->GetNick() );
         if ( !BitStream.Read ( &pos ) )
         {
             g_pCore->GetConsole ()->Print ( "ignoring lightweight sync: Position Error 2." );
@@ -1879,7 +1878,6 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
     // Only update the sync if this packet is from the same context.
     if ( !pPlayer->CanUpdateSync ( ucSyncTimeContext ) )
     {
-        g_pCore->GetConsole ()->Printf ( "ignoring lightweight sync: %u Invalid Sync Context", ucSyncTimeContext );
         return;
     }
 
