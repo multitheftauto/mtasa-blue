@@ -25,11 +25,11 @@ public:
     CBandwidthSettings ( void )
     {
         SetNone ();
-        EnableLightSync ( true );
     }
 
     void SetNone ( void )
     {
+        EnableLightSync ( false );
         fZone0Radius = 50;
         fZone1Angle = 135;
         fZone2Angle = 225;
@@ -43,6 +43,7 @@ public:
 
     void SetMedium ( void )
     {
+        EnableLightSync ( true );
         fZone0Radius = 50;
         fZone1Angle = 135;
         fZone2Angle = 225;
@@ -56,6 +57,7 @@ public:
 
     void SetMaximum ( void )
     {
+        EnableLightSync ( true );
         fZone0Radius = 20;
         fZone1Angle = 115;
         fZone2Angle = 185;
