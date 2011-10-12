@@ -14,19 +14,6 @@ class CClientEntity;
 #ifndef __CCLIENTSPATIALDATABASE_H
 #define __CCLIENTSPATIALDATABASE_H
 
-// Debugging flags
-#ifdef MTA_DEBUG
-    //#define SPATIAL_DATABASE_TESTS
-    //#define SPATIAL_DATABASE_DEBUG_OUTPUTA
-    //#define SPATIAL_DATABASE_DEBUG_OUTPUTB
-    //#define SPATIAL_DATABASE_DEBUG_OUTPUTC
-#else
-    //#define SPATIAL_DATABASE_TESTS
-    //#define SPATIAL_DATABASE_DEBUG_OUTPUTA
-    //#define SPATIAL_DATABASE_DEBUG_OUTPUTB
-    //#define SPATIAL_DATABASE_DEBUG_OUTPUTC
-#endif
-
 // Bounding sphere z position for 2d objects
 #define SPATIAL_2D_Z    0
 
