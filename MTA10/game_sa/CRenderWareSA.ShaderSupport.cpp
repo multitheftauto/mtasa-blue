@@ -133,6 +133,8 @@ void CRenderWareSA::InitTextureWatchHooks ( void )
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::PulseWorldTextureWatch ( void )
 {
+    FlushPendingAssociations ();
+
     // Go through ms_txdStreamEventList
     for ( std::vector < STxdStreamEvent >::const_iterator iter = ms_txdStreamEventList.begin () ; iter != ms_txdStreamEventList.end () ; ++iter )
     {
@@ -250,6 +252,8 @@ void CRenderWareSA::InitWorldTextureWatch ( PFN_WATCH_CALLBACK pfnWatchCallback 
 ////////////////////////////////////////////////////////////////
 bool CRenderWareSA::AddWorldTextureWatch ( CSHADERDUMMY* pShaderData, const char* szMatch, float fShaderPriority )
 {
+    FlushPendingAssociations ();
+
     // Get info for this shader
     SShadInfo* pShadInfo = GetShadInfo ( pShaderData, true, fShaderPriority );
 
@@ -317,21 +321,14 @@ void CRenderWareSA::RemoveWorldTextureWatch ( CSHADERDUMMY* pShaderData, const c
         pShadInfo->matchTypeList.clear ();
     }
 
-    // Validate existing associations
+    // Add to list of texinfos that will need updating
     std::set < STexInfo* > associatedTexInfoMap = pShadInfo->associatedTexInfoMap;
     for ( std::set < STexInfo* > ::iterator iter = associatedTexInfoMap.begin () ; iter != associatedTexInfoMap.end () ; ++iter )
     {
-        UpdateAssociationForTexInfo ( *iter );
+        m_PendingTexInfoMap.insert ( *iter );
     }
 
-    if ( pShadInfo->associatedTexInfoMap.empty () )
-    {
-        OnDestroyShadInfo ( pShadInfo );
-    }
-    else
-    {
-        assert ( szMatch );
-    }
+    m_PendingShadInfoMap.insert ( pShadInfo );
 }
 
 
@@ -367,7 +364,7 @@ void CRenderWareSA::UpdateAssociationForTexInfo ( STexInfo* pTexInfo )
     }
 
     // Stepping backwards will bias high priority shaders, and if the priorty is the same, bias the latest additions
-    for ( std::multimap < float, SShadInfo* > ::reverse_iterator iter = m_orderMap.rbegin () ; iter != m_orderMap.rend () ; ++iter )
+    for ( std::multimap < float, SShadInfo* > ::reverse_iterator iter = m_OrderMap.rbegin () ; iter != m_OrderMap.rend () ; ++iter )
     {
         SShadInfo* pShadInfo = iter->second;
         if ( pShadInfo->IsAdditiveMatch ( pTexInfo->strTextureName ) )
@@ -452,7 +449,7 @@ bool CRenderWareSA::IsFirstShadInfoHigherOrSamePriority ( SShadInfo* pShadInfoA,
         return false;
 
     // Check age
-    for ( std::multimap < float, SShadInfo* > ::reverse_iterator iter = m_orderMap.rbegin () ; iter != m_orderMap.rend () ; ++iter )
+    for ( std::multimap < float, SShadInfo* > ::reverse_iterator iter = m_OrderMap.rbegin () ; iter != m_OrderMap.rend () ; ++iter )
     {
         if ( iter->second == pShadInfoA )
             return true;    // A is latest addition
@@ -461,6 +458,36 @@ bool CRenderWareSA::IsFirstShadInfoHigherOrSamePriority ( SShadInfo* pShadInfoA,
     }
     assert ( 0 );
     return false;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::FlushPendingAssociations
+//
+// Process pending lists
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::FlushPendingAssociations ( void )
+{
+    if ( m_PendingTexInfoMap.empty () )
+        return;
+
+    // Process pending texinfos
+    for ( std::set < STexInfo* > ::iterator iter = m_PendingTexInfoMap.begin () ; iter != m_PendingTexInfoMap.end () ; ++iter )
+        UpdateAssociationForTexInfo ( *iter );
+
+    m_PendingTexInfoMap.clear ();
+
+    // Check if any pending shadinfos are now empty
+    for ( std::set < SShadInfo* > ::iterator iter = m_PendingShadInfoMap.begin () ; iter != m_PendingShadInfoMap.end () ; ++iter )
+    {
+        SShadInfo* pShadInfo = *iter;
+        if ( pShadInfo->associatedTexInfoMap.empty () )
+            OnDestroyShadInfo ( pShadInfo );
+    }
+
+    m_PendingShadInfoMap.clear ();
 }
 
 
@@ -529,7 +556,7 @@ SShadInfo* CRenderWareSA::GetShadInfo ( CSHADERDUMMY* pShaderData, bool bAddIfRe
         pShadInfo = MapFindRef ( m_ShadInfoMap, pShaderData );
 
         // Add to order map
-        MapInsert ( m_orderMap, pShadInfo->fOrderPriority, pShadInfo );
+        MapInsert ( m_OrderMap, pShadInfo->fOrderPriority, pShadInfo );
     }
 
     return pShadInfo;
@@ -550,10 +577,10 @@ void CRenderWareSA::OnDestroyShadInfo ( SShadInfo* pShadInfo )
     MapRemove ( m_ShadInfoMap, pShadInfo->pShaderData );
 
     //  Remove from order map
-    for ( std::multimap < float, SShadInfo* > ::iterator iter = m_orderMap.begin () ; iter != m_orderMap.end () ; )
+    for ( std::multimap < float, SShadInfo* > ::iterator iter = m_OrderMap.begin () ; iter != m_OrderMap.end () ; )
     {
         if ( iter->second == pShadInfo )
-            m_orderMap.erase ( iter++ );
+            m_OrderMap.erase ( iter++ );
         else
             ++iter;
     }
