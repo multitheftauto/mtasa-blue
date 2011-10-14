@@ -572,9 +572,13 @@ bool CPlayer::IsTimeForFarSync ( void )
         if ( g_pBandwidthSettings->bLightSyncEnabled )
         {
             // Add stats
+            // Record all far sync bytes/packets that would have been sent/skipped as skipped
             int iNumPackets = m_FarPlayerList.size ();
-            g_pStats->lightsync.llPureSyncPacketsSkipped += iNumPackets;
-            g_pStats->lightsync.llPureSyncBytesSkipped += iNumPackets * GetApproxPureSyncPacketSize ();
+            int iNumSkipped = ( iNumPackets * iSlowSyncRate - iNumPackets * 1000 ) / 1000;
+            g_pStats->lightsync.llSyncPacketsSkipped += iNumPackets;
+            g_pStats->lightsync.llSyncBytesSkipped += iNumPackets * GetApproxPureSyncPacketSize ();
+            g_pStats->lightsync.llSyncPacketsSkipped += iNumSkipped;
+            g_pStats->lightsync.llSyncBytesSkipped += iNumSkipped * GetApproxPureSyncPacketSize ();
             return false;   // No far sync if light sync is enabled
         }
 

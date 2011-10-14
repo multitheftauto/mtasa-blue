@@ -136,10 +136,12 @@ void CPerfStatBandwidthReductionImpl::RecordStats ( void )
         m_Stats5Sec.puresync.llSkippedPacketsByZone [ i ] = g_pStats->puresync.llSkippedPacketsByZone[i] - m_PrevStats.puresync.llSkippedPacketsByZone[i];
         m_Stats5Sec.puresync.llSkippedBytesByZone [ i ]   = g_pStats->puresync.llSkippedBytesByZone[i]   - m_PrevStats.puresync.llSkippedBytesByZone[i];
     }
+    g_pStats->lightsync.llSyncPacketsSkipped = Max ( 0LL, g_pStats->lightsync.llSyncPacketsSkipped );
+    g_pStats->lightsync.llSyncBytesSkipped   = Max ( 0LL, g_pStats->lightsync.llSyncBytesSkipped );
     m_Stats5Sec.lightsync.llLightSyncPacketsSent    = g_pStats->lightsync.llLightSyncPacketsSent   - m_PrevStats.lightsync.llLightSyncPacketsSent;
     m_Stats5Sec.lightsync.llLightSyncBytesSent      = g_pStats->lightsync.llLightSyncBytesSent     - m_PrevStats.lightsync.llLightSyncBytesSent;
-    m_Stats5Sec.lightsync.llPureSyncPacketsSkipped  = g_pStats->lightsync.llPureSyncPacketsSkipped - m_PrevStats.lightsync.llPureSyncPacketsSkipped;
-    m_Stats5Sec.lightsync.llPureSyncBytesSkipped    = g_pStats->lightsync.llPureSyncBytesSkipped   - m_PrevStats.lightsync.llPureSyncBytesSkipped;
+    m_Stats5Sec.lightsync.llSyncPacketsSkipped      = g_pStats->lightsync.llSyncPacketsSkipped     - m_PrevStats.lightsync.llSyncPacketsSkipped;
+    m_Stats5Sec.lightsync.llSyncBytesSkipped        = g_pStats->lightsync.llSyncBytesSkipped       - m_PrevStats.lightsync.llSyncBytesSkipped;
     m_PrevStats = *g_pStats;
     m_StatsTotal = *g_pStats;
 }
@@ -221,24 +223,24 @@ void CPerfStatBandwidthReductionImpl::GetStats ( CPerfStatResult* pResult, const
         int c = 0;
         row[c++] = "Light sync";
         row[c++] = CPerfStatManager::GetScaledByteString ( m_Stats5Sec.lightsync.llLightSyncBytesSent );
-        row[c++] = CPerfStatManager::GetScaledByteString ( m_Stats5Sec.lightsync.llPureSyncBytesSkipped );
+        row[c++] = CPerfStatManager::GetScaledByteString ( m_Stats5Sec.lightsync.llSyncBytesSkipped );
         row[c++] = SString ( "%lld", m_Stats5Sec.lightsync.llLightSyncPacketsSent );
-        row[c++] = SString ( "%lld", m_Stats5Sec.lightsync.llPureSyncPacketsSkipped );
+        row[c++] = SString ( "%lld", m_Stats5Sec.lightsync.llSyncPacketsSkipped );
 
         row[c++] = CPerfStatManager::GetScaledByteString ( m_StatsTotal.lightsync.llLightSyncBytesSent );
-        row[c++] = CPerfStatManager::GetScaledByteString ( m_StatsTotal.lightsync.llPureSyncBytesSkipped );
+        row[c++] = CPerfStatManager::GetScaledByteString ( m_StatsTotal.lightsync.llSyncBytesSkipped );
         row[c++] = SString ( "%lld", m_StatsTotal.lightsync.llLightSyncPacketsSent );
-        row[c++] = SString ( "%lld", m_StatsTotal.lightsync.llPureSyncPacketsSkipped );
+        row[c++] = SString ( "%lld", m_StatsTotal.lightsync.llSyncPacketsSkipped );
 
         llTotals[0] += m_Stats5Sec.lightsync.llLightSyncBytesSent;
-        llTotals[1] += m_Stats5Sec.lightsync.llPureSyncBytesSkipped;
+        llTotals[1] += m_Stats5Sec.lightsync.llSyncBytesSkipped;
         llTotals[2] += m_Stats5Sec.lightsync.llLightSyncPacketsSent;
-        llTotals[3] += m_Stats5Sec.lightsync.llPureSyncPacketsSkipped;
+        llTotals[3] += m_Stats5Sec.lightsync.llSyncPacketsSkipped;
 
         llTotals[4] += m_StatsTotal.lightsync.llLightSyncBytesSent;
-        llTotals[5] += m_StatsTotal.lightsync.llPureSyncBytesSkipped;
+        llTotals[5] += m_StatsTotal.lightsync.llSyncBytesSkipped;
         llTotals[6] += m_StatsTotal.lightsync.llLightSyncPacketsSent;
-        llTotals[7] += m_StatsTotal.lightsync.llPureSyncPacketsSkipped;
+        llTotals[7] += m_StatsTotal.lightsync.llSyncPacketsSkipped;
     }
 
     // Add total
