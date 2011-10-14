@@ -43,7 +43,7 @@ public:
 
     void SetMedium ( void )
     {
-        EnableLightSync ( true );
+        EnableLightSync ( false );
         fZone0Radius = 50;
         fZone1Angle = 135;
         fZone2Angle = 225;
