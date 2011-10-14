@@ -25,8 +25,8 @@ struct SStatData
     } puresync;
 
     struct {
-        long long llPureSyncPacketsSkipped;
-        long long llPureSyncBytesSkipped;
+        long long llSyncPacketsSkipped;
+        long long llSyncBytesSkipped;
         long long llLightSyncPacketsSent;
         long long llLightSyncBytesSent;
     } lightsync;
