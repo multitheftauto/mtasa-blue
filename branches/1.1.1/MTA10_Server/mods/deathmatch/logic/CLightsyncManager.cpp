@@ -192,4 +192,8 @@ void CLightsyncManager::DoPulse ()
     // Update stats
     g_pStats->lightsync.llLightSyncPacketsSent += iPacketsSent;
     g_pStats->lightsync.llLightSyncBytesSent += iBitsSent / 8;
+
+    // Subtract lightsync usage from skipped accumulators
+    g_pStats->lightsync.llSyncPacketsSkipped -= iPacketsSent;
+    g_pStats->lightsync.llSyncBytesSkipped -= iBitsSent / 8;
 }
