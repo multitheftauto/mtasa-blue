@@ -35,9 +35,9 @@ class CMainConfig: public CXMLConfig
 public:
                                     CMainConfig                     ( CConsole* pConsole, class CLuaManager* pLuaMain );
 
-    bool                            Load                            ( const char* szFileName = NULL );
+    bool                            Load                            ( void );
     bool                            LoadExtended                    ( void );
-    bool                            Save                            ( const char* szFileName = NULL );
+    bool                            Save                            ( void );
 
     inline const std::string&       GetServerName                   ( void )        { return m_strServerName; };
     std::string                     GetServerIP                     ( void );

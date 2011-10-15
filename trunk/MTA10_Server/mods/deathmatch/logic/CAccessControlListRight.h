@@ -17,8 +17,6 @@ class CAccessControlListRight;
 
 #define MAX_ACL_RIGHT_NAME_LENGTH 256
 
-void OnACLChange ();
-
 class CAccessControlListRight
 {
 public:
@@ -32,16 +30,18 @@ public:
 
 public:
                                                 CAccessControlListRight     ( const char* szRightName, ERightType eRightType, bool bAccess, class CAccessControlListManager* pACLManager );
-    virtual                                     ~CAccessControlListRight    ( void )            { OnACLChange (); }
+    virtual                                     ~CAccessControlListRight    ( void )            { OnChange (); }
 
     inline const char*                          GetRightName                ( void )            { return m_szRightName; };
     inline unsigned int                         GetRightNameHash            ( void )            { return m_uiNameHash; };
     inline ERightType                           GetRightType                ( void )            { return m_eRightType; };
 
     inline bool                                 GetRightAccess              ( void )            { return m_bAccess; };
-    inline void                                 SetRightAccess              ( bool bAccess)     { m_bAccess = bAccess; OnACLChange (); };
+    inline void                                 SetRightAccess              ( bool bAccess)     { m_bAccess = bAccess; OnChange (); };
 
 private:
+    void                                        OnChange                    ( void );
+
     char                                        m_szRightName               [ MAX_ACL_RIGHT_NAME_LENGTH ];
     unsigned int                                m_uiNameHash;
     ERightType                                  m_eRightType;

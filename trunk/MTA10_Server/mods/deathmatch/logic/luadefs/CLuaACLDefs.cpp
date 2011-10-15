@@ -61,7 +61,7 @@ void CLuaACLDefs::LoadFunctions ( void )
 int CLuaACLDefs::aclReload ( lua_State* luaVM )
 {
     // Just reload the XML file
-    bool bSuccess = m_pACLManager->Load ( m_pMainConfig->GetAccessControlListFile ().c_str () );
+    bool bSuccess = m_pACLManager->Load ();
 
     // Return whether we succeeded or not
     lua_pushboolean ( luaVM, bSuccess );
@@ -72,7 +72,7 @@ int CLuaACLDefs::aclReload ( lua_State* luaVM )
 int CLuaACLDefs::aclSave ( lua_State* luaVM )
 {
     // Just save the XML file
-    bool bSuccess = m_pACLManager->Save ( m_pMainConfig->GetAccessControlListFile ().c_str () );
+    bool bSuccess = m_pACLManager->Save ();
 
     // Return whether we succeeded or not
     lua_pushboolean ( luaVM, bSuccess );

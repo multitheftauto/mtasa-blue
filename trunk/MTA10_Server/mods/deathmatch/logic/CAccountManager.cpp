@@ -293,7 +293,7 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
 }
 
 
-bool CAccountManager::Load( const char* szFileName )
+bool CAccountManager::Load( void )
 {
     //Create a registry result
     CRegistryResult result;
@@ -420,7 +420,7 @@ bool CAccountManager::Save ( CAccount* pAccount, SString* pStrError )
     return bOk;
 }
 
-bool CAccountManager::Save ( const char* szFileName )
+bool CAccountManager::Save ( void )
 {
     // Attempted save now
     m_bChangedSinceSaved = false;
@@ -865,7 +865,7 @@ void CAccountManager::SmartLoad ()
     }
     else
         //else load our internal.db
-        Load( "" );
+        Load ();
 
 }
 
