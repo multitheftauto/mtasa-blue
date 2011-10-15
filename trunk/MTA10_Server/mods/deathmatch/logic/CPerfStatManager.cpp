@@ -74,6 +74,7 @@ CPerfStatManagerImpl::CPerfStatManagerImpl ( void )
     AddModule ( CPerfStatSqliteTiming::GetSingleton () );
     AddModule ( CPerfStatBandwidthReduction::GetSingleton () );
     AddModule ( CPerfStatBandwidthUsage::GetSingleton () );
+    AddModule ( CPerfStatServerInfo::GetSingleton () );
 }
 
 
@@ -260,4 +261,44 @@ SString CPerfStatManager::GetScaledByteString ( long long Amount )
         return SString ( "%.2f KB", Amount / ( 1024.0 ) );
 
     return SString ( "%d", Amount );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CPerfStatManager::GetPerSecond
+//
+// Calculate per second rate
+//
+///////////////////////////////////////////////////////////////
+long long CPerfStatManager::GetPerSecond ( long long llValue, long long llDeltaTickCount )
+{
+    return ( llValue * 1000LL + ( llDeltaTickCount / 2 ) ) / llDeltaTickCount;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CPerfStatManager::ToPerSecond
+//
+// Calculate per second rate in-place
+//
+///////////////////////////////////////////////////////////////
+void CPerfStatManager::ToPerSecond ( long long& llValue, long long llDeltaTickCount )
+{
+    llValue = ( llValue * 1000LL + ( llDeltaTickCount / 2 ) ) / llDeltaTickCount;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CPerfStatManager::GetPerSecondString
+//
+// Calculate per second rate with slightly better precision
+//
+///////////////////////////////////////////////////////////////
+SString CPerfStatManager::GetPerSecondString ( long long llValue, double dDeltaTickCount )
+{
+    double dValue = llValue * 1000 / dDeltaTickCount;
+    return SString ( dValue < 5 ? "%1.1f" : "%1.0f", dValue );
 }

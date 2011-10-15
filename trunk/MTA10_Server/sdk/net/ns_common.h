@@ -102,6 +102,8 @@ struct SBandwidthStatistics
 {
     long long llOutgoingUDPByteCount;
     long long llIncomingUDPByteCount;
+    long long llOutgoingUDPPacketCount;
+    long long llIncomingUDPPacketCount;
 };
 
 #endif

@@ -748,6 +748,19 @@ bool CMainConfig::IsVoiceEnabled ( void )
 // Fetch any single setting from the server config
 //
 //////////////////////////////////////////////////////////////////////
+SString CMainConfig::GetSetting ( const SString& strName )
+{
+    SString strValue;
+    GetSetting ( strName, strValue );
+    return strValue;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+//
+// Fetch any single setting from the server config
+//
+//////////////////////////////////////////////////////////////////////
 bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
 {
     //
@@ -901,7 +914,18 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
             return true;
         }
     }
-
+    else
+    if ( strName == "lslimit" )
+    {
+        int iLimit = atoi ( strValue );
+        if ( iLimit > 0 )
+        {
+            // Transient settings go in their own map, so they don't get saved
+            MapSet ( m_TransientSettings, "lslimit", strValue );
+            g_pBandwidthSettings->iLightSyncPlrsPerFrame = iLimit;
+            return true;
+        }
+    }
 
     //
     // Everything else is read only, so can't be set
