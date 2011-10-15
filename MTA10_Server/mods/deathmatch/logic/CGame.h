@@ -323,6 +323,8 @@ public:
 
     bool                        IsServerFullyUp             ( void )        { return m_bServerFullyUp; }
 
+    ushort                      GetServerFPS                ( void )        { return m_usFPS; }
+
 private:
     void                        AddBuiltInEvents            ( void );
     void                        RelayPlayerPuresync         ( class CPacket& Packet );

@@ -245,3 +245,20 @@ public:
 
     static CPerfStatBandwidthReduction*  GetSingleton      ( void );
 };
+
+
+//
+// CPerfStatServerInfo
+//
+class CPerfStatServerInfo : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    // CPerfStatServerInfo
+
+    static CPerfStatServerInfo*  GetSingleton      ( void );
+};
