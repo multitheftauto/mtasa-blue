@@ -39,6 +39,8 @@ public:
     inline list < CAccessControlListRight* >  ::const_iterator  IterEnd     ( void ) { return m_Rights.end (); };
 
 private:
+    void                                        OnChange                    ( void );
+
     char                                        m_szACLName                 [ MAX_ACL_NAME_LENGTH ];
     list < CAccessControlListRight* >           m_Rights;
 

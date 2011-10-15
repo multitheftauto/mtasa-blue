@@ -30,8 +30,8 @@ public:
     virtual                                     ~CAccessControlListManager  ( void );
 
     void                                        DoPulse                     ( void );
-    bool                                        Load                        ( const char* szFilename );
-    bool                                        Save                        ( const char* szFilename );
+    bool                                        Load                        ( void );
+    bool                                        Save                        ( void );
 
     class CAccessControlListGroup*              GetGroup                    ( const char* szGroupName );
     class CAccessControlList*                   GetACL                      ( const char* szACLName );
@@ -64,8 +64,10 @@ public:
     static const char*                          ExtractRightName            ( const char* szRightName,
                                                                               CAccessControlListRight::ERightType& eType );
 
+    void                                        OnChange                    ( void );
+
 private:
-    void                                        ClearCache                  ( void );
+    void                                        ClearReadCache              ( void );
     bool                                        InternalCanObjectUseRight   ( const char* szObjectName, CAccessControlListGroupObject::EObjectType, const char* szRightName, CAccessControlListRight::ERightType eRightType, bool bDefaultAccessRight );
     void                                        RemoveACLDependencies       ( class CAccessControlList* pACL );
 
@@ -77,8 +79,12 @@ private:
     CXMLFile*                                   m_pXML;
     CXMLNode*                                   m_pRootNode;
 
-    long long                                   m_llLastTimeCacheCleared;
-    std::map < SString, bool >                  m_ACLCacheMap;
+    bool                                        m_bReadCacheDirty;
+    long long                                   m_llLastTimeReadCacheCleared;
+    std::map < SString, bool >                  m_ReadCacheMap;
+
+    bool                                        m_bNeedsSave;
+    CElapsedTime                                m_AutoSaveTimer;
 };
 
 #endif

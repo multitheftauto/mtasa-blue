@@ -438,18 +438,20 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     {
         strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "mtaserver.conf" );
     }
+    m_pMainConfig->SetFileName ( strBuffer );
 
     m_pResourceDownloader = new CResourceDownloader();
 
     // Load the main config base
-    if ( !m_pMainConfig->Load ( strBuffer ) )
+    if ( !m_pMainConfig->Load () )
         return false;
 
     // Let the main config handle selecting settings from the command line where appropriate
     m_pMainConfig->SetCommandLineParser ( &m_CommandLineParser );
 
+    // Read some settings
+    m_pACLManager->SetFileName ( m_pMainConfig->GetAccessControlListFile ().c_str () );
     const SString strServerIP = m_pMainConfig->GetServerIP ();
-
     unsigned short usServerPort = m_pMainConfig->GetServerPort ();
     unsigned int uiMaxPlayers = m_pMainConfig->GetMaxPlayers ();
 
@@ -670,7 +672,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     }
 
     // Load the ACL's
-    if ( !m_pACLManager->Load ( const_cast < char* > ( m_pMainConfig->GetAccessControlListFile ().c_str () ) ) )
+    if ( !m_pACLManager->Load () )
         return false;
 
     // Load the registry

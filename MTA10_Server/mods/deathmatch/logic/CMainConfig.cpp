@@ -58,10 +58,8 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
 }
 
 
-bool CMainConfig::Load ( const char* szFilename )
+bool CMainConfig::Load ( void )
 {
-    assert ( szFilename );
-
     // Eventually destroy the previously loaded xml
     if ( m_pFile )
     {
@@ -70,7 +68,7 @@ bool CMainConfig::Load ( const char* szFilename )
     }
 
     // Load the XML
-    m_pFile = g_pServerInterface->GetXML ()->CreateXML ( szFilename );
+    m_pFile = g_pServerInterface->GetXML ()->CreateXML ( GetFileName ().c_str () );
     if ( !m_pFile )
     {
         CLogger::ErrorPrintf ( "Error loading config file\n" );
@@ -616,13 +614,15 @@ bool CMainConfig::LoadExtended ( void )
 }
 
 
-bool CMainConfig::Save ( const char* szFilename )
+bool CMainConfig::Save ( void )
 {
     // If we have a file
     if ( m_pFile && m_pRootNode )
     {
         // Save it
-        return m_pFile->Write ();
+        if ( m_pFile->Write () )
+            return true;
+        CLogger::ErrorPrintf ( "Error saving '%s'\n", GetFileName ().c_str () );
     }
 
     // No file

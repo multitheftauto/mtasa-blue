@@ -35,7 +35,7 @@ CAccessControlListGroup::~CAccessControlListGroup ( void )
 
     m_Objects.clear ();
     m_ObjectsById.clear ();
-    OnACLChange ();
+    OnChange ();
 }
 
 
@@ -53,7 +53,7 @@ CAccessControlListGroupObject* CAccessControlListGroup::AddObject ( const char* 
     m_Objects.push_back ( pObject );
     m_ObjectsById.insert ( ObjectMap::value_type ( pObject->GetObjectHashId(), pObject ) );
 
-    OnACLChange ();
+    OnChange ();
     return pObject;
 }
 
@@ -115,7 +115,7 @@ bool CAccessControlListGroup::RemoveObject ( const char* szObjectName, CAccessCo
         m_Objects.remove ( iter->second );
         m_ObjectsById.erase( iter );
 
-        OnACLChange ();
+        OnChange ();
         return true;
     }
 
@@ -128,7 +128,7 @@ bool CAccessControlListGroup::AddACL ( CAccessControlList* pACL )
     if ( !IsACLPresent ( pACL ) )
     {
         m_ACLs.push_back ( pACL );
-        OnACLChange ();
+        OnChange ();
         return true;
     }
 
@@ -169,7 +169,7 @@ CAccessControlList* CAccessControlListGroup::GetACL ( const char* szACLName )
 void CAccessControlListGroup::RemoveACL ( class CAccessControlList* pACL )
 {
     m_ACLs.remove ( pACL );
-    OnACLChange ();
+    OnChange ();
 }
 
 
@@ -229,4 +229,14 @@ void CAccessControlListGroup::WriteToXMLNode ( CXMLNode* pNode )
         pAttribute = pObjectNode->GetAttributes ().Create ( "name" );
         pAttribute->SetValue ( szObjectType );
     }
+}
+
+void CAccessControlListGroup::OnChange ( void )
+{
+    g_pGame->GetACLManager ()->OnChange ();
+}
+
+void CAccessControlListRight::OnChange ( void )
+{
+    g_pGame->GetACLManager ()->OnChange ();
 }
