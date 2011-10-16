@@ -75,6 +75,7 @@ CPerfStatManagerImpl::CPerfStatManagerImpl ( void )
     AddModule ( CPerfStatBandwidthReduction::GetSingleton () );
     AddModule ( CPerfStatBandwidthUsage::GetSingleton () );
     AddModule ( CPerfStatServerInfo::GetSingleton () );
+    AddModule ( CPerfStatServerTiming::GetSingleton () );
 }
 
 

@@ -28,6 +28,22 @@ CPlayerManager::~CPlayerManager ( void )
 
 void CPlayerManager::DoPulse ( void )
 {
+    // TODO: Low Priorityy: No need to do this every frame. Could be done every minute or so.
+    // Remove any players that have been connected for very long (90 sec) but hasn't reached the verifying step
+    for ( list < CPlayer* > ::const_iterator iter = m_Players.begin () ; iter != m_Players.end (); iter++ )
+    {
+        if ( (*iter)->GetStatus () == STATUS_CONNECTED && GetTime () > (*iter)->GetTimeConnected () + 90000 )
+        {
+            // Tell the console he timed out due during connect
+            char szIP [64];
+            CLogger::LogPrintf ( "INFO: %s (%s) timed out during connect\n", (*iter)->GetNick (), (*iter)->GetSourceIP ( szIP ) );
+
+            // Remove him
+            delete *iter;
+            break;
+        }
+    }
+
     list < CPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
