@@ -100,7 +100,15 @@ bool CServer::IsFinished ()
     return false;
 }
 
-bool CServer::PendingWorkToDo ()
+bool CServer::PendingWorkToDo ( int& iSleepMs )
 {
-    return g_pNetServer->GetPendingPacketCount () > 0;
+    if ( m_pGame && g_pNetServer )
+    {
+        if ( g_pNetServer->GetPendingPacketCount () > 0 )
+        {
+            iSleepMs = m_pGame->GetConfig ()->GetPendingWorkToDoSleepTime ();
+            return true;
+        }
+    }
+    return false;
 }
