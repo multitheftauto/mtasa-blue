@@ -308,79 +308,63 @@ void CGame::DoPulse ( void )
     }
     m_usFrames++;
 
+    CLOCK_SET_SECTION( "CGame::DoPulse" );
+    CLOCK_CALL1( g_pNetServer->GetHTTPDownloadManager()->ProcessQueuedFiles(); );
 
-    //_asm int 3
-    g_pNetServer->GetHTTPDownloadManager()->ProcessQueuedFiles();
-
-    // TODO: Low Priorityy: No need to do this every frame. Could be done every minute or so.
-    // Remove any players that have been connected for very long (90 sec) but hasn't reached the verifying step
-    list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-    for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
-    {
-        if ( (*iter)->GetStatus () == STATUS_CONNECTED && GetTime () > (*iter)->GetTimeConnected () + 90000 )
-        {
-            // Tell the console he timed out due during connect
-            char szIP [64];
-            CLogger::LogPrintf ( "INFO: %s (%s) timed out during connect\n", (*iter)->GetNick (), (*iter)->GetSourceIP ( szIP ) );
-
-            // Remove him
-            delete *iter;
-            break;
-        }
-    }
-
-    m_pPlayerManager->DoPulse ();
+    CLOCK_CALL1( m_pPlayerManager->DoPulse (); );
 
     // Pulse the net interface
-    g_pNetServer->DoPulse ();
+    CLOCK_CALL1( g_pNetServer->DoPulse (); );
 
     if ( m_pLanBroadcast )
-        m_pLanBroadcast->DoPulse();
+    {
+        CLOCK_CALL1( m_pLanBroadcast->DoPulse(); );
+    }
 
     // Pulse our stuff
-    m_pMapManager->DoPulse ();
-    m_pUnoccupiedVehicleSync->DoPulse ();
-    m_pPedSync->DoPulse ();
+    CLOCK_CALL1( m_pMapManager->DoPulse (); );
+    CLOCK_CALL1( m_pUnoccupiedVehicleSync->DoPulse (); );
+    CLOCK_CALL1( m_pPedSync->DoPulse (); );
 #ifdef WITH_OBJECT_SYNC
-    m_pObjectSync->DoPulse ();
+    CLOCK_CALL1( m_pObjectSync->DoPulse (); );
 #endif
-    m_pBanManager->DoPulse ();
-    m_pAccountManager->DoPulse ();
-    m_pRegistryManager->DoPulse ();
-    m_pACLManager->DoPulse ();
+    CLOCK_CALL1( m_pBanManager->DoPulse (); );
+    CLOCK_CALL1( m_pAccountManager->DoPulse (); );
+    CLOCK_CALL1( m_pRegistryManager->DoPulse (); );
+    CLOCK_CALL1( m_pACLManager->DoPulse (); );
     
     // Handle the traffic light sync
     if (m_bTrafficLightsLocked == false)
     {
-        ProcessTrafficLights (ulCurrentTime);
+        CLOCK_CALL1( ProcessTrafficLights (ulCurrentTime); );
     }
 
     // Pulse ASE
     if ( m_pASE )
     {
-        m_pASE->DoPulse ();
+        CLOCK_CALL1( m_pASE->DoPulse (); );
     }
 
     // Pulse the scripting system
     if ( m_pLuaManager )
     {
-        m_pLuaManager->DoPulse ();
+        CLOCK_CALL1( m_pLuaManager->DoPulse (); );
     }
 
     // Process our resource stop/restart queue
-    m_pResourceManager->ProcessQueue ();
+    CLOCK_CALL1( m_pResourceManager->ProcessQueue (); );
 
     // Delete all items requested
-    m_ElementDeleter.DoDeleteAll ();
+    CLOCK_CALL1( m_ElementDeleter.DoDeleteAll (); );
 
-    CPerfStatManager::GetSingleton ()->DoPulse ();
+    CLOCK_CALL1( CPerfStatManager::GetSingleton ()->DoPulse (); );
 
     PulseMasterServerAnnounce ();
 
     if ( m_pOpenPortsTester )
         m_pOpenPortsTester->Poll ();
 
-    m_lightsyncManager.DoPulse ();
+    CLOCK_CALL1( m_lightsyncManager.DoPulse (); );
 
     // Unlock the critical section again
     Unlock();
