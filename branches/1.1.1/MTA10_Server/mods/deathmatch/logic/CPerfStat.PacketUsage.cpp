@@ -270,8 +270,8 @@ void CPerfStatPacketUsageImpl::GetStats ( CPerfStatResult* pResult, const std::m
         row[c++] = SString ( "%d", i ) + strPacketDesc.Left ( 2 ).ToUpper () + strPacketDesc.SubStr ( 2 );
         if ( statInDelta.iCount )
         {
-            row[c++] = SString ( "%d", statInDelta.iCount / 5 );
-            row[c++] = SString ( "%d", statInDelta.iTotalBytes / 5 );
+            row[c++] = SString ( "%d", ( statInDelta.iCount + 4 ) / 5 );
+            row[c++] = CPerfStatManager::GetScaledByteString ( ( statInDelta.iTotalBytes + 4 ) / 5 );
             row[c++] = SString ( "%2.2f%%", statInDelta.totalTime / 50000.f );   // Number of microseconds in sample period ( 5sec * 1000000 ) into percent ( * 100 )
         }
         else
@@ -283,8 +283,8 @@ void CPerfStatPacketUsageImpl::GetStats ( CPerfStatResult* pResult, const std::m
 
         if ( statOutDelta.iCount )
         {
-            row[c++] = SString ( "%d", statOutDelta.iCount / 5 );
-            row[c++] = SString ( "%d", statOutDelta.iTotalBytes / 5 );
+            row[c++] = SString ( "%d", ( statOutDelta.iCount + 4 ) / 5 );
+            row[c++] = CPerfStatManager::GetScaledByteString ( ( statOutDelta.iTotalBytes + 4 ) / 5 );
             //row[c++] = SString ( "%2.2f%%", statOutDelta.totalTime / 50000.f );
             row[c++] = "n/a";
         }

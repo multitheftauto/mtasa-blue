@@ -33,7 +33,7 @@ CAccessControlList::~CAccessControlList ( void )
     }
 
     m_Rights.clear ();
-    OnACLChange ();
+    OnChange ();
 }
 
 
@@ -45,7 +45,7 @@ CAccessControlListRight* CAccessControlList::AddRight ( const char* szRightName,
     {
         pRight = new CAccessControlListRight ( szRightName, eRightType, bAccess, m_pACLManager );
         m_Rights.push_back ( pRight );
-        OnACLChange ();
+        OnChange ();
     }
 
     return pRight;
@@ -81,7 +81,7 @@ bool CAccessControlList::RemoveRight ( const char* szRightName, CAccessControlLi
         {
             m_Rights.remove ( pACLRight );
             delete pACLRight;
-            OnACLChange ();
+            OnChange ();
             return true;
         }
     }
@@ -151,3 +151,8 @@ void CAccessControlList::WriteToXMLNode ( CXMLNode* pNode )
     }
 }
 
+
+void CAccessControlList::OnChange ( void )
+{
+    g_pGame->GetACLManager ()->OnChange ();
+}

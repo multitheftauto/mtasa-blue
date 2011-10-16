@@ -657,6 +657,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CPerfStat.ServerInfo.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CPerfStat.SqliteTiming.cpp"
 					>
 				</File>

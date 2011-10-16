@@ -35,9 +35,9 @@ class CMainConfig: public CXMLConfig
 public:
                                     CMainConfig                     ( CConsole* pConsole, class CLuaManager* pLuaMain );
 
-    bool                            Load                            ( const char* szFileName = NULL );
+    bool                            Load                            ( void );
     bool                            LoadExtended                    ( void );
-    bool                            Save                            ( const char* szFileName = NULL );
+    bool                            Save                            ( void );
 
     inline const std::string&       GetServerName                   ( void )        { return m_strServerName; };
     std::string                     GetServerIP                     ( void );
@@ -89,6 +89,7 @@ public:
     inline unsigned short           GetFPSLimit                     ( void )        { return m_usFPSLimit; };
     bool                            SetFPSLimit                     ( unsigned short usFPS, bool bSave );
 
+    SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
     bool                            SetSetting                      ( const SString& configSetting, const SString& strValue, bool bSave );
 

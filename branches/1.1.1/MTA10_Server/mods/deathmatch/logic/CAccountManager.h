@@ -32,10 +32,10 @@ public:
 
     void                        DoPulse                     ( void );
 
-    bool                        Load                        ( const char* szFileName = NULL );
+    bool                        Load                        ( void );
     bool                        Load                        ( CXMLNode* pParent );
     bool                        LoadSetting                 ( CXMLNode* pNode );
-    bool                        Save                        ( const char* szFileName = NULL );
+    bool                        Save                        ( void );
     bool                        Save                        ( CXMLNode* pParent );
     bool                        Save                        ( CAccount* pParent, SString* pStrError = NULL );
     bool                        SaveSettings                ( void );

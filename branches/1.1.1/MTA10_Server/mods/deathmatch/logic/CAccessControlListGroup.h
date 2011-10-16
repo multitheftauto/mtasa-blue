@@ -89,6 +89,8 @@ public:
     void                                            WriteToXMLNode              ( CXMLNode* pNode );
 
 private:
+    void                                            OnChange                    ( void );
+
     typedef std::list < class CAccessControlList* >
                                                     ACLsList;
 

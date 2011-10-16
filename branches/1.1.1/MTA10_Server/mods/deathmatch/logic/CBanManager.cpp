@@ -18,7 +18,7 @@
 
 CBanManager::CBanManager ( void )
 {
-    m_strPath = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "banlist.xml" );
+    m_strPath = g_pServerInterface->GetModManager ()->GetAbsolutePath ( FILENAME_BANLIST );
     m_tUpdate = 0;
     m_bAllowSave = false;
 }
@@ -474,7 +474,8 @@ void CBanManager::SaveBanList ( void )
             }
 
             // Write the XML file
-            pFile->Write ();
+            if ( !pFile->Write () )
+                CLogger::ErrorPrintf ( "Error saving '%s'\n", FILENAME_BANLIST );
         }
 
         // Delete the file pointer
