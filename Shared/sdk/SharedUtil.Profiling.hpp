@@ -132,8 +132,8 @@ namespace SharedUtil
             assert ( iUnclockIdx != iClockIdx + 1 );
             {
                 // keep iClockIdx and iUnclockIdx - remove items inbetween
-                std::vector<SFrameEvent> ::const_iterator first = eventList.begin () + iClockIdx + 1;
-                std::vector<SFrameEvent> ::const_iterator last  = eventList.begin () + iUnclockIdx;
+                std::vector<SFrameEvent> ::iterator first = eventList.begin () + iClockIdx + 1;
+                std::vector<SFrameEvent> ::iterator last  = eventList.begin () + iUnclockIdx;
                 eventList.erase( first, last );
             }
         }
@@ -184,11 +184,11 @@ namespace SharedUtil
     //
     ////////////////////////////////////////////////
     CStatEvents::CStatEvents ( void )
-        : m_ItemBuffer ( 0 )
+        : m_bEnabled ( false )
+        , m_ItemBuffer ( 0 )
         , m_BufferPos ( 0 )
         , m_BufferPosMax ( 0 )
         , m_BufferPosMaxUsing ( 0 )
-        , m_bEnabled ( false )
     {
         ClearBuffer ( true );
     }
