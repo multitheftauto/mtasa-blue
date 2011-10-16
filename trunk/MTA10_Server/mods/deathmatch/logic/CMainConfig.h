@@ -88,6 +88,7 @@ public:
 
     inline unsigned short           GetFPSLimit                     ( void )        { return m_usFPSLimit; };
     bool                            SetFPSLimit                     ( unsigned short usFPS, bool bSave );
+    int                             GetPendingWorkToDoSleepTime     ( void )        { return m_iPendingWorkToDoSleepTime; };
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
@@ -144,6 +145,7 @@ private:
     SString                         m_strIdFile;
     bool                            m_bNetworkEncryptionEnabled;
     SString                         m_strBandwidthReductionMode;
+    int                             m_iPendingWorkToDoSleepTime;
     std::map < SString, SString >   m_TransientSettings;
 };
 
