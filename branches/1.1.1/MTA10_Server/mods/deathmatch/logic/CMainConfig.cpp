@@ -55,6 +55,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_bVoiceEnabled = false;
     m_uiVoiceBitrate = 0;
     m_strBandwidthReductionMode = "medium";
+    m_iPendingWorkToDoSleepTime = 10;
 }
 
 
@@ -282,7 +283,7 @@ bool CMainConfig::Load ( void )
     else
     {
         if ( iResult != DOESNT_EXIST )
-            CLogger::ErrorPrintf ( "Sample rate must be between 0 and 2, defaulting to %u\n", m_uiVoiceSampleRate );
+            CLogger::ErrorPrintf ( "voice_samplerate rate must be between 0 and 2, defaulting to %u\n", m_uiVoiceSampleRate );
     }
 
     // Grab the Quality for Voice
@@ -294,7 +295,7 @@ bool CMainConfig::Load ( void )
     else
     {
         if ( iResult != DOESNT_EXIST )
-            CLogger::ErrorPrintf ( "Quality must be between 0 and 10, defaulting to %u\n", m_ucVoiceQuality );
+            CLogger::ErrorPrintf ( "voice_quality must be between 0 and 10, defaulting to %u\n", m_ucVoiceQuality );
     }
 
     // Grab the bitrate for Voice [optional]
@@ -350,6 +351,10 @@ bool CMainConfig::Load ( void )
     // bandwidth_reduction
     GetString ( m_pRootNode, "bandwidth_reduction", m_strBandwidthReductionMode );
     ApplyBandwidthReductionMode ();
+
+    // busy_sleep_time
+    GetInteger ( m_pRootNode, "busy_sleep_time", m_iPendingWorkToDoSleepTime );
+    m_iPendingWorkToDoSleepTime = Clamp ( 0, m_iPendingWorkToDoSleepTime, 10 );
 
     return true;
 }
@@ -802,6 +807,12 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
         return true;
     }
     else
+    if ( strName == "busy_sleep_time" )
+    {
+        strValue = SString ( "%d", m_iPendingWorkToDoSleepTime );
+        return true;
+    }
+    else
     {
         //
         // Everything else is read only, so can be fetched directly from the XML data
@@ -891,6 +902,21 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
             if ( bSave )
             {
                 SetString ( m_pRootNode, "bandwidth_reduction", m_strBandwidthReductionMode );
+                Save ();
+            }
+            return true;
+        }
+    }
+    else
+    if ( strName == "busy_sleep_time" )
+    {
+        int iSleepMs = atoi ( strValue );
+        if ( iSleepMs >= 0 && iSleepMs <= 10 )
+        {
+            m_iPendingWorkToDoSleepTime = iSleepMs;
+            if ( bSave )
+            {
+                SetString ( m_pRootNode, "busy_sleep_time", SString ( "%d", m_iPendingWorkToDoSleepTime ) );
                 Save ();
             }
             return true;

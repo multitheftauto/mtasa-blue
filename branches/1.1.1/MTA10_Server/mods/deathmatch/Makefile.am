@@ -103,6 +103,8 @@ LOGIC = \
 ./logic/CPerfStat.LuaMemory.cpp \
 ./logic/CPerfStat.LuaTiming.cpp \
 ./logic/CPerfStat.PacketUsage.cpp \
+./logic/CPerfStat.ServerInfo.cpp \
+./logic/CPerfStat.ServerTiming.cpp \
 ./logic/CPerfStat.SqliteTiming.cpp \
 ./logic/CPerfStatManager.cpp \
 ./logic/CPerPlayerEntity.cpp \

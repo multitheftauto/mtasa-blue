@@ -1737,6 +1737,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Profiling.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Profiling.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.SysInfo.h"
 					>
 				</File>

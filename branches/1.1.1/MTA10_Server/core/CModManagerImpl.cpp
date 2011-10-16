@@ -157,11 +157,11 @@ bool CModManagerImpl::IsFinished ( void )
     return true;
 }
 
-bool CModManagerImpl::PendingWorkToDo ( void )
+bool CModManagerImpl::PendingWorkToDo ( int& iSleepMs )
 {
     if ( m_pBase )
     {
-        return m_pBase->PendingWorkToDo ();
+        return m_pBase->PendingWorkToDo ( iSleepMs );
     }
 
     return false;

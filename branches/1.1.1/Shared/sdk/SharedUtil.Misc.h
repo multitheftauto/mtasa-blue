@@ -344,6 +344,19 @@ namespace SharedUtil
         return it->second;
     }
 
+    // Find or add a value in collection
+    template < class T, class V, class TR, class T2 >
+    V& MapGet ( std::map < T, V, TR >& collection, const T2& key )
+    {
+        typename std::map < T, V, TR > ::iterator it = collection.find ( key );
+        if ( it == collection.end () )
+        {
+            collection[key] = V ();
+            it = collection.find ( key );
+        }
+        return it->second;
+    }
+
 
     //
     // std::multimap helpers

@@ -420,11 +420,11 @@ void CServerImpl::MainLoop ( void )
         }
 
         // Limit the pulses to avoid heavy CPU usage
-
-#if 0	// TODO - Test and measure: Reduction of latency and increase of cpu usage
-        if ( m_pModManager->PendingWorkToDo () == false )
-#endif
-        	Sleep ( 10 );
+        int iSleepMs;
+        if ( m_pModManager->PendingWorkToDo ( iSleepMs ) )
+            Sleep ( Clamp ( 0, iSleepMs, 10 ) );
+        else
+            Sleep ( 10 );
     }
 
 #ifdef WIN32
