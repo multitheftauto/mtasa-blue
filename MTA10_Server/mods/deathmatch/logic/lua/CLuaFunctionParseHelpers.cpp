@@ -110,3 +110,40 @@ SString GetUserDataClassName ( void* ptr, lua_State* luaVM )
 
     return "";
 }
+
+//
+// Read next as resource or resource name.  Result output as string
+//
+void MixedReadResourceString ( CScriptArgReader& argStream, SString& strOutResourceName )
+{
+    if ( !argStream.NextIsString () )
+    {
+        CResource* pResource;
+        argStream.ReadUserData ( pResource );
+        if ( pResource )
+            strOutResourceName = pResource->GetName ();
+    }
+    else
+        argStream.ReadString ( strOutResourceName );
+}
+
+
+//
+// Read next as resource or resource name.  Result output as resource
+//
+void MixedReadResourceString ( CScriptArgReader& argStream, CResource*& pOutResource )
+{
+    if ( !argStream.NextIsString () )
+    {
+        argStream.ReadUserData ( pOutResource );
+    }
+    else
+    {
+        SString strResourceName;
+        argStream.ReadString ( strResourceName );
+        pOutResource = g_pGame->GetResourceManager ()->GetResource ( strResourceName );
+
+        if ( !pOutResource )
+            argStream.SetTypeError ( "resource", argStream.m_iIndex - 1 );
+    }
+}

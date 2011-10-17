@@ -158,4 +158,7 @@ bool CheckWrappedUserDataType ( CElement*& pElement, SString& strErrorExpectedTy
     return false;
 }
 
+class CScriptArgReader;
 SString GetUserDataClassName ( void* ptr, lua_State* luaVM );
+void MixedReadResourceString ( CScriptArgReader& argStream, SString& strOutResourceName );
+void MixedReadResourceString ( CScriptArgReader& argStream, CResource*& pOutResource );

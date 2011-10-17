@@ -96,8 +96,14 @@ public:
     CResource*                  GetResourceFromLuaState         ( struct lua_State* luaVM );
     bool                        Install                         ( char * szURL, char * szName );
 
-    CResource*                  CreateResource                  ( char* szResourceName );
-    CResource*                  CopyResource                    ( CResource* pSourceResource, const char* szNewResourceName );
+    CResource*                  CreateResource                  ( const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus );
+    CResource*                  CopyResource                    ( CResource* pSourceResource, const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus );
+    CResource*                  RenameResource                  ( CResource* pSourceResource, const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus );
+    bool                        DeleteResource                  ( const SString& strResourceName, SString& strOutStatus );
+
+    SString                     GetResourceTrashDir             ( void );
+    bool                        MoveDirToTrash                  ( const SString& strPathDirName );
+    SString                     GetResourceOrganizationalPath   ( CResource* pResource );
 
     static bool                 ParseResourcePathInput          ( std::string strInput, CResource*& pResource, std::string* pstrPath, std::string* pstrMetaPath );
 
