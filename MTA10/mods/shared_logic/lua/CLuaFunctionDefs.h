@@ -805,6 +805,10 @@ public:
 
     LUA_DECLARE ( GetVersion );
 
+    // JSON funcs
+    LUA_DECLARE ( toJSON );
+    LUA_DECLARE ( fromJSON );
+
     // UTF functions
     LUA_DECLARE ( UtfLen );
     LUA_DECLARE ( UtfSeek );
