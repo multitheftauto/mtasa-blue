@@ -1023,6 +1023,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "utfChar", CLuaFunctionDefs::UtfChar );
     CLuaCFunctions::AddFunction ( "utfCode", CLuaFunctionDefs::UtfCode );
 
+    // JSON funcs
+    CLuaCFunctions::AddFunction ( "toJSON", CLuaFunctionDefs::toJSON );
+    CLuaCFunctions::AddFunction ( "fromJSON", CLuaFunctionDefs::fromJSON );
+
     // Luadef definitions
     CLuaFileDefs::LoadFunctions ();
     CLuaFxDefs::LoadFunctions ();

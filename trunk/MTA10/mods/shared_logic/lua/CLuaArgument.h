@@ -22,6 +22,7 @@ extern "C"
 }
 #include <net/bitstream.h>
 #include <string>
+#include "json.h"
 
 class CClientEntity;
 class CLuaArguments;
@@ -53,6 +54,7 @@ public:
     void                    Read                ( void* pUserData );
     void                    Read                ( CClientEntity* pElement );
     void                    ReadElementID       ( ElementID ID );
+    void                    ReadUserData        ( void* pUserData );
 
     void                    Push                ( lua_State* luaVM, std::map < CLuaArguments*, int > * pKnownTables = NULL ) const;
 
@@ -66,6 +68,9 @@ public:
 
     bool                    ReadFromBitStream   ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
     bool                    WriteToBitStream    ( NetBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL ) const;
+    json_object*            WriteToJSONObject   ( bool bSerialize = false, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL );
+    bool                    ReadFromJSONObject  ( json_object* object, std::vector < CLuaArguments* > * pKnownTables = NULL );
+    char *                  WriteToString       ( char * szBuffer, int length );
 
 private:
     void                    LogUnableToPacketize    ( const char* szMessage ) const;
