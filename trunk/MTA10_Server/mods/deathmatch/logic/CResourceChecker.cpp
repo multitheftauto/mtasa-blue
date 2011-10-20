@@ -13,6 +13,33 @@
 #include "StdInc.h"
 #include <clocale>
 
+namespace
+{
+    //
+    // Minimum version requirments for functions/events
+    //
+
+    struct SVersionItem
+    {
+        SString functionName;
+        SString minMtaVersion;      
+    };
+
+    SVersionItem clientFunctionInitList[] = {
+                                         { "createSWATRope",        "1.1.1-9.03250" },
+                                         { "getPlayerIdleTime",     "1.2.0-5.03261" },
+                                         { "toJSON",                "1.2.0-5.03307" },
+                                         { "fromJSON",              "1.2.0-5.03307" },
+                                        };
+
+    SVersionItem serverFunctionInitList[] = {
+                                         { "onChatMessage",         "1.2.0-5.03190" },
+                                         { "copyResource",          "1.2.0-5.03306" },
+                                         { "renameResource",        "1.2.0-5.03306" },
+                                         { "deleteResource",        "1.2.0-5.03306" },
+                                        };
+}
+
 
 ///////////////////////////////////////////////////////////////
 //
@@ -23,6 +50,8 @@
 ///////////////////////////////////////////////////////////////
 void CResourceChecker::CheckResourceForIssues( CResource* pResource, const string& strResourceZip )
 {
+    m_strReqClientVersion = "";
+    m_strReqServerVersion = "";
     m_ulDeprecatedWarningCount = 0;
     m_upgradedFullPathList.clear ();
 
@@ -37,7 +66,31 @@ void CResourceChecker::CheckResourceForIssues( CResource* pResource, const strin
             string strPath;
             if ( pResource->GetFilePath ( pResourceFile->GetName(), strPath ) )
             {
-                CheckFileForIssues ( strPath, pResourceFile->GetName(), pResource->GetName (), pResourceFile->GetType () == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT );
+                CResourceFile::eResourceType type = pResourceFile->GetType ();
+
+                bool bScript;
+                bool bClient;
+                if ( type == CResourceFile::RESOURCE_FILE_TYPE_SCRIPT )
+                {
+                    bScript = true;
+                    bClient = false;
+                }
+                else
+                if ( type == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT )
+                {
+                    bScript = true;
+                    bClient = true;
+                }
+                else
+                if ( type == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE )
+                {
+                    bScript = false;
+                    bClient = true;
+                }
+                else
+                    continue;
+
+                CheckFileForIssues ( strPath, pResourceFile->GetName(), pResource->GetName (), bScript, bClient );
             }
         }
     }
@@ -102,23 +155,25 @@ void CResourceChecker::CheckResourceForIssues( CResource* pResource, const strin
 // Check one file for any issues that may need to be logged at the server.
 //
 ///////////////////////////////////////////////////////////////
-void CResourceChecker::CheckFileForIssues ( const string& strPath, const string& strFileName, const string& strResourceName, bool bClientScript )
+void CResourceChecker::CheckFileForIssues ( const string& strPath, const string& strFileName, const string& strResourceName, bool bScript, bool bClient )
 {
-    const char* szExt   = strPath.c_str () + max<long>( 0, strPath.length () - 4 );
+    if ( bScript )
+    {
+        CheckLuaFileForIssues( strPath, strFileName, strResourceName, bClient );
+    }
+    else
+    {
+        const char* szExt = strPath.c_str () + max < long > ( 0, strPath.length () - 4 );
 
-    if ( stricmp ( szExt, ".PNG" ) == 0 )
-    {
-        CheckPngFileForIssues( strPath, strFileName, strResourceName );
-    }
-    else
-    if ( stricmp ( szExt, ".TXD" ) == 0 || stricmp ( szExt, ".DFF" ) == 0 )
-    {
-        CheckRwFileForIssues( strPath, strFileName, strResourceName );
-    }
-    else
-    if ( stricmp ( szExt, ".LUA" ) == 0 )
-    {
-        CheckLuaFileForIssues( strPath, strFileName, strResourceName, bClientScript );
+        if ( stricmp ( szExt, ".PNG" ) == 0 )
+        {
+            CheckPngFileForIssues( strPath, strFileName, strResourceName );
+        }
+        else
+        if ( stricmp ( szExt, ".TXD" ) == 0 || stricmp ( szExt, ".DFF" ) == 0 )
+        {
+            CheckRwFileForIssues( strPath, strFileName, strResourceName );
+        }
     }
 }
 
@@ -218,39 +273,15 @@ void CResourceChecker::CheckRwFileForIssues ( const string& strPath, const strin
 void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const string& strFileName, const string& strResourceName, bool bClientScript )
 {
     // Load the original file into a string
-    string strFileContents;
+    SString strFileContents;
 
     // Open the file
-    if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
-    {
-        // Get the file size,
-        unsigned long ulLength = 0;
-        fseek( pFile, 0, SEEK_END );
-        ulLength = ftell( pFile );
-        fseek( pFile, 0, SEEK_SET );
-
-        // Load file into a buffer
-        char* pBuffer  = new char[ ulLength + 1 ];
-        memset ( pBuffer, 0, ulLength + 1 );
-        pBuffer[ ulLength ] = 0;
-
-        if ( fread ( pBuffer, 1, ulLength, pFile ) == ulLength )
-        {
-            // assign to the string
-            strFileContents.assign ( pBuffer, ulLength );
-        }
-
-        // Clean up
-        fclose ( pFile );
-        delete [] pBuffer;
-    }
-
+    FileLoad ( strPath, strFileContents );
     if ( strFileContents.length () == 0 )
         return;
 
     // Don't check compiled scripts
-    if ( strFileContents[0] == 0x1b )
-        return;
+    bool bCompiledScript = ( strFileContents[0] == 0x1b );
 
     // Process
     if ( strFileContents.length () > 1000000 )
@@ -263,7 +294,7 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
     }
     else
     // ..or do an upgrade
-    if ( m_bUpgradeScripts == true )
+    if ( m_bUpgradeScripts == true && !bCompiledScript )
     {
         string strNewFileContents;
         CheckLuaSourceForIssues ( strFileContents, strFileName, bClientScript, "Upgrade", &strNewFileContents );
@@ -302,6 +333,7 @@ void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const stri
     map < string, long > doneWarningMap;
     long lLineNumber = 1;
     bool bUTF8 = false;
+    bool bCompiledScript = ( strLuaSource[0] == 0x1b );
 
     // Check if this is a UTF-8 script
     if ( strLuaSource.length() > 2 )
@@ -311,7 +343,7 @@ void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const stri
     }
 
     // If it's not a UTF8 script, does it contain foreign language characters that should be upgraded?
-    if ( !bUTF8 && GetUTF8Confidence ( (unsigned char*)&strLuaSource.at ( 0 ), strLuaSource.length() ) < 80 )
+    if ( !bCompiledScript && !bUTF8 && GetUTF8Confidence ( (unsigned char*)&strLuaSource.at ( 0 ), strLuaSource.length() ) < 80 )
     {
         std::wstring strUTF16Script = ANSIToUTF16 ( strLuaSource );
 #ifdef WIN32
@@ -379,7 +411,9 @@ void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const stri
             if ( doneWarningMap.find ( strIdentifierName ) == doneWarningMap.end () )
             {
                 doneWarningMap[strIdentifierName] = 1;
-                IssueLuaFunctionNameWarnings ( strIdentifierName, strFileName, bClientScript, lLineNumber );
+                if ( !bCompiledScript )
+                    IssueLuaFunctionNameWarnings ( strIdentifierName, strFileName, bClientScript, lLineNumber );
+                CheckVersionRequirements ( strIdentifierName, bClientScript );
             }
         }
     }
@@ -762,6 +796,41 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
 
 ///////////////////////////////////////////////////////////////
 //
+// CResourceChecker::CheckVersionRequirements
+//
+// Update m_strReqClientVersion or m_strReqServerVersion with the version requirement for the
+// supplied identifier
+//
+///////////////////////////////////////////////////////////////
+void CResourceChecker::CheckVersionRequirements ( const string& strIdentifierName, bool bClientScript )
+{
+    static map < SString, SString > clientFunctionMap;
+    static map < SString, SString > serverFunctionMap;
+
+    if ( clientFunctionMap.empty () )
+    {
+        for ( uint i = 0 ; i < NUMELMS( clientFunctionInitList ) ; i++ )
+            MapSet ( clientFunctionMap, clientFunctionInitList[i].functionName, clientFunctionInitList[i].minMtaVersion );
+
+        for ( uint i = 0 ; i < NUMELMS( serverFunctionInitList ) ; i++ )
+            MapSet ( serverFunctionMap, serverFunctionInitList[i].functionName, serverFunctionInitList[i].minMtaVersion );
+    }
+
+    const std::map < SString, SString >& functionMap = bClientScript ? clientFunctionMap : serverFunctionMap;
+    SString& strReqMtaVersion                        = bClientScript ? m_strReqClientVersion : m_strReqServerVersion;
+
+    const SString* pResult = MapFind ( functionMap, strIdentifierName );
+    if ( pResult )
+    {
+        const SString& strResult = *pResult;
+        if ( strResult > strReqMtaVersion )
+            strReqMtaVersion = strResult;
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CResourceChecker::RenameBackupFile
 //
 // Rename a file for backup purposes. Creates a unique name if required.
@@ -967,13 +1036,15 @@ int CResourceChecker::ReplaceFilesInZIP( const string& strOrigZip, const string&
 //
 // CResourceChecker::LogUpgradeWarnings
 //
-//
+// Also calculates version requirements these days
 //
 ///////////////////////////////////////////////////////////////
-void CResourceChecker::LogUpgradeWarnings ( CResource* pResource, const string& strResourceZip )
+void CResourceChecker::LogUpgradeWarnings ( CResource* pResource, const string& strResourceZip, SString& strOutReqClientVersion, SString& strOutReqServerVersion )
 {
     m_bUpgradeScripts = false;
     CheckResourceForIssues( pResource, strResourceZip );
+    strOutReqClientVersion = m_strReqClientVersion;
+    strOutReqServerVersion = m_strReqServerVersion;
 }
 
 

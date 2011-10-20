@@ -1144,3 +1144,64 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
     }
     return false;
 }
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CResourceManager::ApplyMinClientRequirement
+//
+// If resource has a client version requirement, add it to the list
+//
+/////////////////////////////////////////////////////////////////////////////
+void CResourceManager::ApplyMinClientRequirement ( CResource* pResource, const SString& strMinClientRequirement )
+{
+    if ( !strMinClientRequirement.empty () )
+    {
+        MapSet ( m_MinClientRequirementMap, pResource, strMinClientRequirement );
+        ReevaluateMinClientRequirement ();
+    }
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CResourceManager::RemoveMinClientRequirement
+//
+// Remove any previous client version requirement associated with the resource
+//
+/////////////////////////////////////////////////////////////////////////////
+void CResourceManager::RemoveMinClientRequirement ( CResource* pResource )
+{
+    if ( MapContains ( m_MinClientRequirementMap, pResource ) )
+    {
+        MapRemove ( m_MinClientRequirementMap, pResource );
+        ReevaluateMinClientRequirement ();
+    }
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CResourceManager::ReevaluateMinClientRequirement
+//
+// Recalculate highest client version requirement from all running resources
+//  and get the config to apply it
+//
+/////////////////////////////////////////////////////////////////////////////
+void CResourceManager::ReevaluateMinClientRequirement ( void )
+{
+    // Calc highest requirement
+    SString strMinClientRequirement;
+    for ( std::map < CResource*, SString >::iterator iter = m_MinClientRequirementMap.begin () ; iter != m_MinClientRequirementMap.end () ; ++iter )
+        if ( iter->second > strMinClientRequirement )
+            strMinClientRequirement = iter->second;
+
+    // Apply
+    SString strBefore = g_pGame->GetConfig ()->GetMinimumClientVersion ();
+    g_pGame->GetConfig ()->SetMinimumClientVersionOverride ( strMinClientRequirement );
+    SString strAfter = g_pGame->GetConfig ()->GetMinimumClientVersion ();
+
+    // Log change
+    if ( strBefore != strAfter && !strAfter.empty () )
+        CLogger::LogPrintf ( SString ( "Server minclientversion is now %s\n", *strAfter ) );
+}

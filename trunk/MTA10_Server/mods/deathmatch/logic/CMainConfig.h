@@ -78,9 +78,10 @@ public:
     inline bool                     GetSerialVerificationEnabled    ( void )        { return m_bVerifySerials; };
     bool                            IsDisableAC                     ( const char* szTagAC )     { return MapContains ( m_DisableACMap, szTagAC ); };
     bool                            IsEnableDiagnostic              ( const char* szTag )       { return MapContains ( m_EnableDiagnosticMap, szTag ); };
-    bool                            IsBelowMinimumClient            ( const char* szVersion )   { return m_strMinClientVersion.length () && m_strMinClientVersion > szVersion; }
+    bool                            IsBelowMinimumClient            ( const char* szVersion )   { return GetMinimumClientVersion () > szVersion; }
     bool                            IsBelowRecommendedClient        ( const char* szVersion )   { return m_strRecommendedClientVersion.length () && m_strRecommendedClientVersion > szVersion; }
-    const SString&                  GetMinimumClientVersion         ( void )                    { return m_strMinClientVersion; }
+    void                            SetMinimumClientVersionOverride ( const SString& strOverride ) { m_strMinClientVersionOverride = strOverride; }
+    const SString&                  GetMinimumClientVersion         ( void )                    { return m_strMinClientVersionOverride > m_strMinClientVersion ? m_strMinClientVersionOverride : m_strMinClientVersion; }
     const SString&                  GetRecommendedClientVersion     ( void )                    { return m_strRecommendedClientVersion; }
     inline bool                     IsAutoLoginEnabled              ( )                         { return m_bAutoLogin; }
     const SString&                  GetIdFile                       ( void )                    { return m_strIdFile; }
@@ -141,6 +142,7 @@ private:
     std::map < SString, int >       m_EnableDiagnosticMap;
     SString                         m_strMinClientVersion;
     SString                         m_strRecommendedClientVersion;
+    SString                         m_strMinClientVersionOverride;
     bool                            m_bAutoLogin;
     SString                         m_strIdFile;
     bool                            m_bNetworkEncryptionEnabled;

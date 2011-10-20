@@ -229,7 +229,7 @@ bool CConsoleCommands::StartResource ( CConsole* pConsole, const char* szArgumen
                     }
                     else
                     {
-                        strResponse = SString ( "start: Resource '%s' start was requested", szArguments );
+                        strResponse = SString ( "start: Resource '%s' start was requested (%s)", szArguments, resource->GetFailureReason ().c_str () );
                     }
                 }
                 else
