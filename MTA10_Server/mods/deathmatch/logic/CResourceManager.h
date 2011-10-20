@@ -113,6 +113,10 @@ public:
     void                        AddResourceToLists              ( CResource* pResource );
     void                        RemoveResourceFromLists         ( CResource* pResource );
 
+    void                        ApplyMinClientRequirement       ( CResource* pResource, const SString& strMinClientRequirement );
+    void                        RemoveMinClientRequirement      ( CResource* pResource );
+    void                        ReevaluateMinClientRequirement  ( void );
+
 private:
     char                        m_szResourceDirectory[260];
     CMappedList < CResource* >  m_resources;
@@ -127,6 +131,8 @@ private:
     std::map < SString, CResource* >        m_NameResourceMap;
 
     list<sResourceQueue>        m_resourceQueue;
+
+    std::map < CResource*, SString >        m_MinClientRequirementMap;
 };
 
 #endif

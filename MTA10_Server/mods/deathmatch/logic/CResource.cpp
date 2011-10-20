@@ -208,6 +208,20 @@ bool CResource::Load ( void )
                 if ( pNodeSettings )
                     m_pNodeSettings = pNodeSettings->CopyNode ( NULL );
 
+                // Find the client and server version requirements
+                m_strMinClientReqFromConfig = "";
+                m_strMinServerReqFromConfig = "";
+                CXMLNode * pNodeMinMtaVersion = root->FindSubNode ( "min_mta_version", 0 );
+                if ( pNodeMinMtaVersion )
+                {
+                    if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "server" ) )
+                        m_strMinServerReqFromConfig = pAttr->GetValue ();
+                    if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "client" ) )
+                        m_strMinClientReqFromConfig = pAttr->GetValue ();
+                    if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "both" ) )
+                        m_strMinServerReqFromConfig = m_strMinClientReqFromConfig = pAttr->GetValue ();
+                }
+
                 // disabled for now
                 /*
                 CXMLNode * update = root->FindSubNode ( "update", 0 );
@@ -613,7 +627,32 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         if ( !m_bDoneUpgradeWarnings )
         {
             m_bDoneUpgradeWarnings = true;
-            CResourceChecker ().LogUpgradeWarnings ( this, m_strResourceZip );
+            CResourceChecker ().LogUpgradeWarnings ( this, m_strResourceZip, m_strMinClientReqCalculated, m_strMinServerReqCalculated );
+        }
+
+        // Check this server can run this resource
+        SString strServerVersion = CStaticFunctionDefinitions::GetVersionSortable ();
+        if ( m_strMinServerReqFromConfig > strServerVersion )
+        {
+            m_strFailureReason = SString ( "Couldn't start resource %s as this server version is too low (%s required)\n", m_strResourceName.c_str (), *m_strMinServerReqFromConfig );
+            CLogger::LogPrint ( m_strFailureReason );
+            return false;
+        }
+
+        // This should not happen
+        if ( m_strMinServerReqCalculated > strServerVersion )
+        {
+            m_strFailureReason = SString ( "Couldn't start resource %s as server has come back from the future\n", m_strResourceName.c_str () );
+            CLogger::LogPrint ( m_strFailureReason );
+            return false;
+        }
+
+        // If calculated version is higher than declared version, then refuse to run
+        if ( m_strMinClientReqCalculated > m_strMinClientReqFromConfig || m_strMinServerReqCalculated > m_strMinServerReqFromConfig )
+        {
+            m_strFailureReason = SString ( "Not starting resource %s as <min_mta_version> section in the meta.xml is incorrect or missing (expected at least client [%s], server [%s])\n", m_strResourceName.c_str (), *m_strMinClientReqCalculated, *m_strMinServerReqCalculated );
+            CLogger::LogPrint ( m_strFailureReason );
+            return false;
         }
 
         m_bStarting = true;
@@ -791,6 +830,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         m_bClientFiles = bClientFiles;
 
         m_bHasStarted = true;
+        m_resourceManager->ApplyMinClientRequirement ( this, m_strMinClientReqFromConfig );
 
         // Broadcast new resourceelement that is loaded and tell the players that a new resource was started
         g_pGame->GetMapManager()->BroadcastElements ( m_pResourceElement, true );
@@ -824,6 +864,7 @@ bool CResource::Stop ( bool bStopManually )
     // If we're loaded and active
     if ( !m_bStopping && m_bLoaded && m_bActive && ( !m_bStartedManually || bStopManually ) )
     {
+        m_resourceManager->RemoveMinClientRequirement ( this );
         m_bHasStarted = false;
         m_bStopping = true;
 
