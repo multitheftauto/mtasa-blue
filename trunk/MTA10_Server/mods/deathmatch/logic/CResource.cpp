@@ -630,6 +630,14 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
             CResourceChecker ().LogUpgradeWarnings ( this, m_strResourceZip, m_strMinClientReqCalculated, m_strMinServerReqCalculated );
         }
 
+        // Check declared version strings are valid
+        if ( !IsValidVersionString ( m_strMinServerReqFromConfig ) || !IsValidVersionString ( m_strMinClientReqFromConfig ) )
+        {
+            m_strFailureReason = SString ( "Not starting resource %s as <min_mta_version> section in the meta.xml contains invalid version strings\n", m_strResourceName.c_str () );
+            CLogger::LogPrint ( m_strFailureReason );
+            return false;
+        }
+
         // Check this server can run this resource
         SString strServerVersion = CStaticFunctionDefinitions::GetVersionSortable ();
         if ( m_strMinServerReqFromConfig > strServerVersion )
