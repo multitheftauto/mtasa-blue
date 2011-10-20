@@ -280,8 +280,8 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
     if ( strFileContents.length () == 0 )
         return;
 
-    // Don't check compiled scripts
-    bool bCompiledScript = ( strFileContents[0] == 0x1b );
+    // Check if a compiled script
+    bool bCompiledScript = ( strncmp ( "\x1B\x4C\x75\x61", strFileContents, 4 ) == 0 );
 
     // Process
     if ( strFileContents.length () > 1000000 )
@@ -290,14 +290,14 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
     // Ouput warnings...
     if ( m_bUpgradeScripts == false )
     {
-        CheckLuaSourceForIssues ( strFileContents, strFileName, bClientScript, "Warnings" );
+        CheckLuaSourceForIssues ( strFileContents, strFileName, bClientScript, bCompiledScript, "Warnings" );
     }
     else
-    // ..or do an upgrade
+    // ..or do an upgrade (if not compiled)
     if ( m_bUpgradeScripts == true && !bCompiledScript )
     {
         string strNewFileContents;
-        CheckLuaSourceForIssues ( strFileContents, strFileName, bClientScript, "Upgrade", &strNewFileContents );
+        CheckLuaSourceForIssues ( strFileContents, strFileName, bClientScript, bCompiledScript, "Upgrade", &strNewFileContents );
 
         // Has contents changed?
         if ( strNewFileContents.length () > 0 && strNewFileContents != strFileContents )
@@ -328,12 +328,11 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
 // Note: Ignores quotes
 //
 ///////////////////////////////////////////////////////////////
-void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const string& strFileName, bool bClientScript, const string& strMode, string* pstrOutResult )
+void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const string& strFileName, bool bClientScript, bool bCompiledScript, const string& strMode, string* pstrOutResult )
 {
     map < string, long > doneWarningMap;
     long lLineNumber = 1;
     bool bUTF8 = false;
-    bool bCompiledScript = ( strLuaSource[0] == 0x1b );
 
     // Check if this is a UTF-8 script
     if ( strLuaSource.length() > 2 )
@@ -390,6 +389,8 @@ void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const stri
         // In-place upgrade...
         if ( strMode == "Upgrade" )
         {
+            assert ( !bCompiledScript );
+
             string strUpgraded;
             if ( UpgradeLuaFunctionName( strIdentifierName, bClientScript, strUpgraded ) )
             {
@@ -411,7 +412,7 @@ void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const stri
             if ( doneWarningMap.find ( strIdentifierName ) == doneWarningMap.end () )
             {
                 doneWarningMap[strIdentifierName] = 1;
-                if ( !bCompiledScript )
+                if ( !bCompiledScript ) // Don't issue deprecated function warnings if the script is compiled, because we can't upgrade it
                     IssueLuaFunctionNameWarnings ( strIdentifierName, strFileName, bClientScript, lLineNumber );
                 CheckVersionRequirements ( strIdentifierName, bClientScript );
             }
