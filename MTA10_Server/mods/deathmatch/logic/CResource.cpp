@@ -611,6 +611,62 @@ void CResource::ApplyUpgradeModifications ( void )
 }
 
 
+//
+// Output deprecated function usage and version issues
+//
+void CResource::LogUpgradeWarnings ( void )
+{
+    CResourceChecker ().LogUpgradeWarnings ( this, m_strResourceZip, m_strMinClientReqCalculated, m_strMinServerReqCalculated, m_strMinClientReason, m_strMinServerReason );
+    SString strStatus;
+    if ( !GetCompatibilityStatus ( strStatus ) )
+    {
+        SString strReason = SString ( "WARNING: %s will not start as %s\n", m_strResourceName.c_str (), *strStatus );
+        CLogger::LogPrint ( strReason );
+    }
+}
+
+
+//
+// Determine outcome of version rules
+//
+bool CResource::GetCompatibilityStatus ( SString& strOutStatus )
+{
+    // Check declared version strings are valid
+    if ( !IsValidVersionString ( m_strMinServerReqFromConfig ) || !IsValidVersionString ( m_strMinClientReqFromConfig ) )
+    {
+        strOutStatus = "<min_mta_version> section in the meta.xml contains invalid version strings";
+        return false;
+    }
+
+    // Check this server can run this resource
+    SString strServerVersion = CStaticFunctionDefinitions::GetVersionSortable ();
+    if ( m_strMinServerReqFromConfig > strServerVersion )
+    {
+        strOutStatus = SString ( "this server version is too low (%s required)", *m_strMinServerReqFromConfig );
+        return false;
+    }
+
+    // This should not happen
+    if ( m_strMinServerReqCalculated > strServerVersion )
+    {
+        strOutStatus = "server has come back from the future";
+        return false;
+    }
+
+    // Check if calculated version is higher than declared version
+    if ( m_strMinClientReqCalculated > m_strMinClientReqFromConfig || m_strMinServerReqCalculated > m_strMinServerReqFromConfig )
+    {
+        strOutStatus = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
+        if ( !m_strMinClientReqCalculated.empty () )
+            strOutStatus += SString ( "client %s because of '%s')", *m_strMinClientReqCalculated, *m_strMinClientReason );
+        else
+            strOutStatus += SString ( "server %s because of '%s')", *m_strMinServerReqCalculated, *m_strMinServerReason );
+        return false;
+    }
+    return true;
+}
+
+
 bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, bool bStartIncludedResources, bool bConfigs, bool bMaps, bool bScripts, bool bHTML, bool bClientConfigs, bool bClientScripts, bool bClientFiles )
 {
     if ( m_bLoaded && !m_bActive )
@@ -627,38 +683,13 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         if ( !m_bDoneUpgradeWarnings )
         {
             m_bDoneUpgradeWarnings = true;
-            CResourceChecker ().LogUpgradeWarnings ( this, m_strResourceZip, m_strMinClientReqCalculated, m_strMinServerReqCalculated );
+            CResourceChecker ().LogUpgradeWarnings ( this, m_strResourceZip, m_strMinClientReqCalculated, m_strMinServerReqCalculated, m_strMinClientReason, m_strMinServerReason );
         }
 
-        // Check declared version strings are valid
-        if ( !IsValidVersionString ( m_strMinServerReqFromConfig ) || !IsValidVersionString ( m_strMinClientReqFromConfig ) )
+        SString strStatus;
+        if ( !GetCompatibilityStatus ( strStatus ) )
         {
-            m_strFailureReason = SString ( "Not starting resource %s as <min_mta_version> section in the meta.xml contains invalid version strings\n", m_strResourceName.c_str () );
-            CLogger::LogPrint ( m_strFailureReason );
-            return false;
-        }
-
-        // Check this server can run this resource
-        SString strServerVersion = CStaticFunctionDefinitions::GetVersionSortable ();
-        if ( m_strMinServerReqFromConfig > strServerVersion )
-        {
-            m_strFailureReason = SString ( "Couldn't start resource %s as this server version is too low (%s required)\n", m_strResourceName.c_str (), *m_strMinServerReqFromConfig );
-            CLogger::LogPrint ( m_strFailureReason );
-            return false;
-        }
-
-        // This should not happen
-        if ( m_strMinServerReqCalculated > strServerVersion )
-        {
-            m_strFailureReason = SString ( "Couldn't start resource %s as server has come back from the future\n", m_strResourceName.c_str () );
-            CLogger::LogPrint ( m_strFailureReason );
-            return false;
-        }
-
-        // If calculated version is higher than declared version, then refuse to run
-        if ( m_strMinClientReqCalculated > m_strMinClientReqFromConfig || m_strMinServerReqCalculated > m_strMinServerReqFromConfig )
-        {
-            m_strFailureReason = SString ( "Not starting resource %s as <min_mta_version> section in the meta.xml is incorrect or missing (expected at least client [%s], server [%s])\n", m_strResourceName.c_str (), *m_strMinClientReqCalculated, *m_strMinServerReqCalculated );
+            m_strFailureReason = SString ( "Not starting resource %s as %s\n", m_strResourceName.c_str (), *strStatus );
             CLogger::LogPrint ( m_strFailureReason );
             return false;
         }
