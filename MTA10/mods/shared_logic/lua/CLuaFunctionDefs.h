@@ -499,6 +499,7 @@ public:
     LUA_DECLARE ( dxCreateScreenSource );
     LUA_DECLARE ( dxGetMaterialSize );
     LUA_DECLARE ( dxSetShaderValue );
+    LUA_DECLARE ( dxSetShaderTessellation );
     LUA_DECLARE ( dxSetRenderTarget );
     LUA_DECLARE ( dxUpdateScreenSource );
     LUA_DECLARE ( dxGetStatus );

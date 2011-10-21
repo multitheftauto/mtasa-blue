@@ -30,6 +30,7 @@ namespace
                                          { "getPlayerIdleTime",         "1.2" },
                                          { "toJSON",                    "1.2" },
                                          { "fromJSON",                  "1.2" },
+                                         { "dxSetShaderTessellation",   "1.2" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {

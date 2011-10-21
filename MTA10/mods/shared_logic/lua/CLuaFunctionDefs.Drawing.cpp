@@ -603,7 +603,7 @@ int CLuaFunctionDefs::dxSetShaderValue ( lua_State* luaVM )
             CClientTexture* pTexture;
             if ( argStream.ReadUserData ( pTexture ) )
             {
-                bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->SetShaderValue ( pShader->GetShaderItem (), strName, pTexture->GetTextureItem () );
+                bool bResult = pShader->GetShaderItem ()->SetValue ( strName, pTexture->GetTextureItem () );
                 lua_pushboolean ( luaVM, bResult );
                 return 1;
             }
@@ -615,7 +615,7 @@ int CLuaFunctionDefs::dxSetShaderValue ( lua_State* luaVM )
             bool bValue;
             if ( argStream.ReadBool ( bValue ) )
             {
-                bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->SetShaderValue ( pShader->GetShaderItem (), strName, bValue );
+                bool bResult = pShader->GetShaderItem ()->SetValue ( strName, bValue );
                 lua_pushboolean ( luaVM, bResult );
                 return 1;
             }
@@ -633,7 +633,7 @@ int CLuaFunctionDefs::dxSetShaderValue ( lua_State* luaVM )
                 if ( iArgument != LUA_TNUMBER && iArgument != LUA_TSTRING )
                     break;
             }
-            bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->SetShaderValue ( pShader->GetShaderItem (), strName, fBuffer, i + 1 );
+            bool bResult = pShader->GetShaderItem ()->SetValue ( strName, fBuffer, i + 1 );
             lua_pushboolean ( luaVM, bResult );
             return 1;
         }
@@ -651,6 +651,31 @@ int CLuaFunctionDefs::dxSetShaderValue ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetShaderValue", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxSetShaderTessellation ( lua_State* luaVM )
+{
+//  bool dxSetShaderTessellation( element shader, int tessellationX, int tessellationY )
+    CClientShader* pShader; uint uiTessellationX; uint uiTessellationY;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pShader );
+    argStream.ReadNumber ( uiTessellationX );
+    argStream.ReadNumber ( uiTessellationY );
+
+    if ( !argStream.HasErrors () )
+    {
+        pShader->GetShaderItem ()->SetTessellation ( uiTessellationX, uiTessellationY );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetShaderTessellation", *argStream.GetErrorMessage () ) );
 
     // error: bad arguments
     lua_pushboolean ( luaVM, false );

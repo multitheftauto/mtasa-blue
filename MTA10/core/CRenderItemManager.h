@@ -29,10 +29,6 @@ public:
     virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug );
     virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false );
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY );
-    virtual void                ReleaseRenderItem                   ( CRenderItem* pItem );
-    virtual bool                SetShaderValue                      ( CShaderItem* pItem, const SString& strName, CTextureItem* pTextureItem );
-    virtual bool                SetShaderValue                      ( CShaderItem* pItem, const SString& strName, bool bValue );
-    virtual bool                SetShaderValue                      ( CShaderItem* pItem, const SString& strName, const float* pfValues, uint uiCount );
     virtual bool                SetRenderTarget                     ( CRenderTargetItem* pItem, bool bClear );
     virtual bool                SaveDefaultRenderTarget             ( void );
     virtual bool                RestoreDefaultRenderTarget          ( void );

@@ -261,19 +261,6 @@ CGuiFontItem* CRenderItemManager::CreateGuiFont ( const SString& strFullFilePath
 
 ////////////////////////////////////////////////////////////////
 //
-// CRenderItemManager::ReleaseRenderItem
-//
-// Decrement reference count on a render item, and delete if necessary
-//
-////////////////////////////////////////////////////////////////
-void CRenderItemManager::ReleaseRenderItem ( CRenderItem* pItem )
-{
-    SAFE_RELEASE ( pItem );
-}
-
-
-////////////////////////////////////////////////////////////////
-//
 // CRenderItemManager::NotifyContructRenderItem
 //
 // Add to managers list
@@ -309,53 +296,6 @@ void CRenderItemManager::NotifyDestructRenderItem ( CRenderItem* pItem )
 
     UpdateMemoryUsage ();
 }
-
-
-
-//
-//
-// Shaders
-//
-//
-
-////////////////////////////////////////////////////////////////
-//
-// CRenderItemManager::SetShaderValue
-//
-// Set one texture
-//
-////////////////////////////////////////////////////////////////
-bool CRenderItemManager::SetShaderValue ( CShaderItem* pShaderItem, const SString& strName, CTextureItem* pTextureItem )
-{
-    return pShaderItem->SetValue ( strName, pTextureItem );
-}
-
-
-////////////////////////////////////////////////////////////////
-//
-// CRenderItemManager::SetShaderValue
-//
-// Set one bool
-//
-////////////////////////////////////////////////////////////////
-bool CRenderItemManager::SetShaderValue ( CShaderItem* pShaderItem, const SString& strName, bool bValue )
-{
-    return pShaderItem->SetValue ( strName, bValue );
-}
-
-
-////////////////////////////////////////////////////////////////
-//
-// CRenderItemManager::SetShaderValue
-//
-// Set up to 16 floats
-//
-////////////////////////////////////////////////////////////////
-bool CRenderItemManager::SetShaderValue ( CShaderItem* pShaderItem, const SString& strName, const float* pfValues, uint uiCount )
-{
-    return pShaderItem->SetValue ( strName, pfValues, uiCount );
-}
-
 
 
 //
@@ -460,11 +400,7 @@ void CRenderItemManager::UpdateBackBufferCopySize ( void )
     if ( !m_pBackBufferCopy || m_pBackBufferCopy->m_uiSizeX != uiSizeX || m_pBackBufferCopy->m_uiSizeY != uiSizeY )
     {
         // Delete old one if it exists
-        if ( m_pBackBufferCopy )
-        {
-            ReleaseRenderItem ( m_pBackBufferCopy );
-            m_pBackBufferCopy = NULL;
-        }
+        SAFE_RELEASE( m_pBackBufferCopy );
 
         // Try to create new one if needed
         if ( uiSizeX > 0 )
