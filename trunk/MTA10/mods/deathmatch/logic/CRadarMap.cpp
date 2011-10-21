@@ -151,15 +151,11 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
 CRadarMap::~CRadarMap ( void )
 {
     // Delete our images
-    if ( m_pRadarImage )
-        m_pRadarImage->ReleaseRenderItem();
-
-    if ( m_pLocalPlayerBlip )
-        m_pLocalPlayerBlip->ReleaseRenderItem();
+    SAFE_RELEASE( m_pRadarImage );
+    SAFE_RELEASE( m_pLocalPlayerBlip );
 
     for ( uint i = 0 ; i < m_MarkerTextureList.size () ; i++ )
-        if ( m_MarkerTextureList[i] )
-            m_MarkerTextureList[i]->ReleaseRenderItem ();
+        SAFE_RELEASE( m_MarkerTextureList[i] );
 
     m_MarkerTextureList.clear ();
 
