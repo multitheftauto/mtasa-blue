@@ -74,7 +74,8 @@ public:
     std::list < CResource* > ::const_iterator  IterEnd          ( void )            { return m_resources.end (); };
 
     bool                        Refresh                         ( bool bRefreshAll = false );
-    void                        Upgrade                         ( void );
+    void                        UpgradeAll                      ( void );
+    void                        CheckAll                        ( void );
     inline unsigned int         GetResourceLoadedCount          ( void )            { return m_uiResourceLoadedCount; }
     inline unsigned int         GetResourceFailedCount          ( void )            { return m_uiResourceFailedCount; }
     void                        OnPlayerJoin                    ( CPlayer& Player );
@@ -96,8 +97,14 @@ public:
     CResource*                  GetResourceFromLuaState         ( struct lua_State* luaVM );
     bool                        Install                         ( char * szURL, char * szName );
 
-    CResource*                  CreateResource                  ( char* szResourceName );
-    CResource*                  CopyResource                    ( CResource* pSourceResource, const char* szNewResourceName );
+    CResource*                  CreateResource                  ( const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus );
+    CResource*                  CopyResource                    ( CResource* pSourceResource, const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus );
+    CResource*                  RenameResource                  ( CResource* pSourceResource, const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus );
+    bool                        DeleteResource                  ( const SString& strResourceName, SString& strOutStatus );
+
+    SString                     GetResourceTrashDir             ( void );
+    bool                        MoveDirToTrash                  ( const SString& strPathDirName );
+    SString                     GetResourceOrganizationalPath   ( CResource* pResource );
 
     static bool                 ParseResourcePathInput          ( std::string strInput, CResource*& pResource, std::string* pstrPath, std::string* pstrMetaPath );
 
@@ -106,6 +113,10 @@ public:
 
     void                        AddResourceToLists              ( CResource* pResource );
     void                        RemoveResourceFromLists         ( CResource* pResource );
+
+    void                        ApplyMinClientRequirement       ( CResource* pResource, const SString& strMinClientRequirement );
+    void                        RemoveMinClientRequirement      ( CResource* pResource );
+    void                        ReevaluateMinClientRequirement  ( void );
 
 private:
     char                        m_szResourceDirectory[260];
@@ -121,6 +132,8 @@ private:
     std::map < SString, CResource* >        m_NameResourceMap;
 
     list<sResourceQueue>        m_resourceQueue;
+
+    std::map < CResource*, SString >        m_MinClientRequirementMap;
 };
 
 #endif

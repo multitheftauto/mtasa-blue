@@ -1164,10 +1164,19 @@ void CGame::InitialDataStream ( CPlayer& Player )
     {
         char szIP [ 25 ];
         Player.GetSourceIP ( szIP );
+        std::string strPlayerSerial = Player.GetSerial();
         CAccount* pAccount = m_pAccountManager->Get ( Player.GetNick (), szIP );
         if ( pAccount )
         {
-            m_pAccountManager->LogIn ( &Player, &Player, pAccount, true );
+            if ( !pAccount->GetClient ( ) )
+            {
+                m_pAccountManager->LogIn ( &Player, &Player, pAccount, true );
+            }
+            else
+            {
+                CLogger::AuthPrintf ( "LOGIN: %s failed to login in as '%s' (IP: %s  Serial: %s) due to the account already being in use.\n", Player.GetNick (), pAccount->GetName ().c_str (), szIP, strPlayerSerial.c_str () );
+                Player.SendEcho ( "auto-login: You could not login because your account is already in use." );
+            }
         }
     }
 

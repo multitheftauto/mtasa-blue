@@ -700,15 +700,7 @@ void Font::drawTextLine(const String& text, const Vector3& position, const Rect&
 	size_t char_count = text.length();
 	CodepointMap::const_iterator	pos, end = d_cp_map.end();
 
-    String strNewGlyphs = cleanGlyphCache(d_glyphset);  //Purge unused glyphs
-	for (size_t c = 0; c < char_count; ++c)
-	{
-        strNewGlyphs += OnGlyphDrawn(text[c]);
-    }
-    if ( strNewGlyphs != d_glyphset )
-    {
-        const_cast<Font*>( this )->defineFontGlyphs(strNewGlyphs);
-    }
+    processStringForGlyphs ( text ); // Refresh our glyph set if there are new characters
 
 	for (size_t c = 0; c < char_count; ++c)
 	{
@@ -752,16 +744,7 @@ void Font::drawTextLineJustified(const String& text, const Rect& draw_area, cons
 	float shared_lost_space = 0.0;
 	if (space_count > 0) shared_lost_space = lost_space / (float)space_count;
 
-    //First ensure our glyphs are loaded
-    String strNewGlyphs = cleanGlyphCache(d_glyphset);  //Purge unused glyphs
-	for (size_t c = 0; c < char_count; ++c)
-	{
-        strNewGlyphs += OnGlyphDrawn(text[c]);
-    }
-    if ( strNewGlyphs != d_glyphset )
-    {
-        const_cast<Font*>( this )->defineFontGlyphs(strNewGlyphs);
-    }
+    processStringForGlyphs ( text ); // Refresh our glyph set if there are new characters
     
     for (c = 0; c < char_count; ++c)
 	{
@@ -1445,6 +1428,24 @@ String Font::cleanGlyphCache ( String strCache ) const
     }
 
     return strNewCache;
+}
+
+void Font::processStringForGlyphs ( String text ) const
+{
+    if ( d_glyphset.empty() )
+        return;
+
+	size_t char_count = text.length();
+
+    String strNewGlyphs = cleanGlyphCache(d_glyphset);  //Purge unused glyphs
+	for (size_t c = 0; c < char_count; ++c)
+	{
+        strNewGlyphs += OnGlyphDrawn(text[c]);
+    }
+    if ( strNewGlyphs != d_glyphset )
+    {
+        const_cast<Font*>( this )->defineFontGlyphs(strNewGlyphs);
+    }
 }
 
 

@@ -27,6 +27,13 @@ struct SPDTVertex
         buf->v = fV; \
         buf++;
 
+#define WRITE_QUAD_INDICES(buf,row0,row1) \
+        *buf++ = (row0); \
+        *buf++ = (row0) + 1; \
+        *buf++ = (row1); \
+        *buf++ = (row1); \
+        *buf++ = (row0) + 1; \
+        *buf++ = (row1) + 1;
 
 //
 // Batches draws using the same material
@@ -50,8 +57,9 @@ public:
                                       float fRotCenOffY,
                                       unsigned long ulColor );
 
-        void    SetCurrentMaterial ( CMaterialItem* pMaterial );
+        void    SetCurrentMaterial  ( CMaterialItem* pMaterial );
         void    OnChangingRenderTarget ( uint uiNewViewportSizeX, uint uiNewViewportSizeY );
+        void    UpdateMatrices      ( float fViewportSizeX, float fViewportSizeY );
 
 protected:
     IDirect3DDevice9*           m_pDevice;
@@ -59,6 +67,7 @@ protected:
     float                       m_fCurrentRotation;
     float                       m_fCurrentRotCenX;
     float                       m_fCurrentRotCenY;
+    std::vector < WORD >        m_Indices;
     std::vector < SPDTVertex >  m_Vertices;
     D3DXMATRIX                  m_MatView;
     D3DXMATRIX                  m_MatProjection;

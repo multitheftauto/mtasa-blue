@@ -62,10 +62,8 @@ bool SharedUtil::FileLoad ( const SString& strFilename, SString& strBuffer, int 
     if ( !FileLoad ( strFilename, buffer, iMaxSize ) )
         return false;
     if ( buffer.size () )
-    {
-        buffer.push_back ( 0 );
-        strBuffer = SString ( &buffer.at ( 0 ), buffer.size () );
-    }
+        strBuffer = std::string ( &buffer.at ( 0 ), buffer.size () );
+
     return true;
 }
 

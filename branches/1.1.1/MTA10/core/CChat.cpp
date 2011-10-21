@@ -205,8 +205,7 @@ void CChat::Draw ( bool bUseCacheTexture )
     // Validate rendertarget
     if ( m_pCacheTexture && ( chatSize.fX != m_pCacheTexture->m_uiSizeX || chatSize.fY != m_pCacheTexture->m_uiSizeY ) )
     {
-        m_pCacheTexture->ReleaseRenderItem();
-        m_pCacheTexture = NULL;
+        SAFE_RELEASE( m_pCacheTexture );
     }
     // Create rendertarget if required
     if ( !m_pCacheTexture )

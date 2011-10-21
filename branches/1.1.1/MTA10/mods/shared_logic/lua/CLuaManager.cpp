@@ -604,6 +604,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxCreateScreenSource", CLuaFunctionDefs::dxCreateScreenSource );
     CLuaCFunctions::AddFunction ( "dxGetMaterialSize", CLuaFunctionDefs::dxGetMaterialSize );
     CLuaCFunctions::AddFunction ( "dxSetShaderValue", CLuaFunctionDefs::dxSetShaderValue );
+    CLuaCFunctions::AddFunction ( "dxSetShaderTessellation", CLuaFunctionDefs::dxSetShaderTessellation );
     CLuaCFunctions::AddFunction ( "dxSetRenderTarget", CLuaFunctionDefs::dxSetRenderTarget );
     CLuaCFunctions::AddFunction ( "dxUpdateScreenSource", CLuaFunctionDefs::dxUpdateScreenSource );
     CLuaCFunctions::AddFunction ( "dxGetStatus", CLuaFunctionDefs::dxGetStatus );
@@ -1022,6 +1023,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "utfSub", CLuaFunctionDefs::UtfSub );
     CLuaCFunctions::AddFunction ( "utfChar", CLuaFunctionDefs::UtfChar );
     CLuaCFunctions::AddFunction ( "utfCode", CLuaFunctionDefs::UtfCode );
+
+    // JSON funcs
+    CLuaCFunctions::AddFunction ( "toJSON", CLuaFunctionDefs::toJSON );
+    CLuaCFunctions::AddFunction ( "fromJSON", CLuaFunctionDefs::fromJSON );
 
     // Luadef definitions
     CLuaFileDefs::LoadFunctions ();

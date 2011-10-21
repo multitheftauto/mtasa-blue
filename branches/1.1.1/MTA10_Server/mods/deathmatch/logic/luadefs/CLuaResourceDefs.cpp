@@ -21,6 +21,8 @@ void CLuaResourceDefs::LoadFunctions ( void )
     // Create/edit functions
     CLuaCFunctions::AddFunction ( "createResource", CLuaResourceDefs::createResource );
     CLuaCFunctions::AddFunction ( "copyResource", CLuaResourceDefs::copyResource );
+    CLuaCFunctions::AddFunction ( "renameResource", CLuaResourceDefs::renameResource );
+    CLuaCFunctions::AddFunction ( "deleteResource", CLuaResourceDefs::deleteResource );
 
     CLuaCFunctions::AddFunction ( "addResourceMap", CLuaResourceDefs::addResourceMap );
     CLuaCFunctions::AddFunction ( "addResourceConfig", CLuaResourceDefs::addResourceConfig );
@@ -62,20 +64,29 @@ void CLuaResourceDefs::LoadFunctions ( void )
 
 int CLuaResourceDefs::createResource ( lua_State* luaVM )
 {
-    // Verify the arguments
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+//  resource createResource ( string toName[, string organizationalDir ] )
+    SString strNewResourceName; SString strNewOrganizationalPath;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strNewResourceName );
+    argStream.ReadString ( strNewOrganizationalPath, "" );
+
+    if ( !argStream.HasErrors () )
     {
-        // Grab the resource string and try to create it
-        const char* szResource = lua_tostring ( luaVM, 1 );
-        CResource* pResource = m_pResourceManager->CreateResource ( (char*) szResource );
-        if ( pResource )
+        SString strStatus;
+        CResource* pNewResource = m_pResourceManager->CreateResource ( strNewResourceName, strNewOrganizationalPath, strStatus );
+
+        if ( !strStatus.empty () )
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "createResource: %s", *strStatus ) );
+
+        if ( pNewResource )
         {
-            lua_pushresource ( luaVM, pResource );
+            lua_pushresource ( luaVM, pNewResource );
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "createResource" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createResource", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -84,23 +95,89 @@ int CLuaResourceDefs::createResource ( lua_State* luaVM )
 
 int CLuaResourceDefs::copyResource ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-         lua_type ( luaVM, 2 ) == LUA_TSTRING )
+//  resource copyResource ( mixed fromResource, string toName[, string organizationalDir ] )
+    CResource* pResource; SString strNewResourceName; SString strNewOrganizationalPath;
+
+    CScriptArgReader argStream ( luaVM );
+    MixedReadResourceString ( argStream, pResource );
+    argStream.ReadString ( strNewResourceName );
+    argStream.ReadString ( strNewOrganizationalPath, "" );
+
+    if ( !argStream.HasErrors () )
     {
-        CResource* pResource = lua_toresource ( luaVM, 1 );
-        if ( pResource )
+        SString strStatus;
+        CResource* pNewResource = m_pResourceManager->CopyResource ( pResource, strNewResourceName, strNewOrganizationalPath, strStatus );
+
+        if ( !strStatus.empty () )
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "copyResource: %s", *strStatus ) );
+
+        if ( pNewResource )
         {
-            const char* szResource = lua_tostring ( luaVM, 2 );
-            CResource* pNewResource = m_pResourceManager->CopyResource ( pResource, szResource );
-            if ( pNewResource )
-            {
-                lua_pushresource ( luaVM, pNewResource );
-                return 1;
-            }
+            lua_pushresource ( luaVM, pNewResource );
+            return 1;
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "copyResource" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "copyResource", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaResourceDefs::renameResource ( lua_State* luaVM )
+{
+//  resource renameResource ( mixed fromResource, string newName[, string organizationalDir ] )
+    CResource* pResource; SString strNewResourceName; SString strNewOrganizationalPath;
+
+    CScriptArgReader argStream ( luaVM );
+    MixedReadResourceString ( argStream, pResource );
+    argStream.ReadString ( strNewResourceName );
+    argStream.ReadString ( strNewOrganizationalPath, "" );
+
+    if ( !argStream.HasErrors () )
+    {
+        SString strStatus;
+        CResource* pNewResource = m_pResourceManager->RenameResource ( pResource, strNewResourceName, strNewOrganizationalPath, strStatus );
+
+        if ( !strStatus.empty () )
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "renameResource: %s", *strStatus ) );
+
+        if ( pNewResource )
+        {
+            lua_pushresource ( luaVM, pNewResource );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "renameResource", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaResourceDefs::deleteResource ( lua_State* luaVM )
+{
+//  bool deleteResource ( mixed resource )
+    SString strResourceName;
+
+    CScriptArgReader argStream ( luaVM );
+    MixedReadResourceString ( argStream, strResourceName );
+
+    if ( !argStream.HasErrors () )
+    {
+        SString strStatus;
+        bool bResult = m_pResourceManager->DeleteResource ( strResourceName, strStatus );
+
+        if ( !strStatus.empty () )
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "deleteResource: %s", *strStatus ) );
+
+        lua_pushboolean ( luaVM, bResult );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "deleteResource", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;

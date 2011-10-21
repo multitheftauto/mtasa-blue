@@ -208,6 +208,20 @@ bool CResource::Load ( void )
                 if ( pNodeSettings )
                     m_pNodeSettings = pNodeSettings->CopyNode ( NULL );
 
+                // Find the client and server version requirements
+                m_strMinClientReqFromConfig = "";
+                m_strMinServerReqFromConfig = "";
+                CXMLNode * pNodeMinMtaVersion = root->FindSubNode ( "min_mta_version", 0 );
+                if ( pNodeMinMtaVersion )
+                {
+                    if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "server" ) )
+                        m_strMinServerReqFromConfig = pAttr->GetValue ();
+                    if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "client" ) )
+                        m_strMinClientReqFromConfig = pAttr->GetValue ();
+                    if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "both" ) )
+                        m_strMinServerReqFromConfig = m_strMinClientReqFromConfig = pAttr->GetValue ();
+                }
+
                 // disabled for now
                 /*
                 CXMLNode * update = root->FindSubNode ( "update", 0 );
@@ -597,6 +611,77 @@ void CResource::ApplyUpgradeModifications ( void )
 }
 
 
+//
+// Output deprecated function usage and version issues
+//
+void CResource::LogUpgradeWarnings ( void )
+{
+    CResourceChecker ().LogUpgradeWarnings ( this, m_strResourceZip, m_strMinClientReqCalculated, m_strMinServerReqCalculated, m_strMinClientReason, m_strMinServerReason );
+    SString strStatus;
+    if ( !GetCompatibilityStatus ( strStatus ) )
+    {
+        SString strReason = SString ( "WARNING: %s will not start as %s\n", m_strResourceName.c_str (), *strStatus );
+        CLogger::LogPrint ( strReason );
+    }
+}
+
+
+//
+// Determine outcome of version rules
+//
+bool CResource::GetCompatibilityStatus ( SString& strOutStatus )
+{
+    // Check declared version strings are valid
+    if ( !IsValidVersionString ( m_strMinServerReqFromConfig ) || !IsValidVersionString ( m_strMinClientReqFromConfig ) )
+    {
+        strOutStatus = "<min_mta_version> section in the meta.xml contains invalid version strings";
+        return false;
+    }
+
+    // Check this server can run this resource
+    SString strServerVersion = CStaticFunctionDefinitions::GetVersionSortable ();
+    if ( m_strMinServerReqFromConfig > strServerVersion )
+    {
+        strOutStatus = SString ( "this server version is too low (%s required)", *m_strMinServerReqFromConfig );
+        return false;
+    }
+
+    // This should not happen
+    if ( m_strMinServerReqCalculated > strServerVersion )
+    {
+        strOutStatus = "server has come back from the future";
+        return false;
+    }
+
+    // Check if calculated version is higher than declared version
+    if ( m_strMinClientReqCalculated > m_strMinClientReqFromConfig || m_strMinServerReqCalculated > m_strMinServerReqFromConfig )
+    {
+        strOutStatus = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
+        if ( !m_strMinClientReqCalculated.empty () )
+            strOutStatus += SString ( "client %s because of '%s')", *m_strMinClientReqCalculated, *m_strMinClientReason );
+        else
+            strOutStatus += SString ( "server %s because of '%s')", *m_strMinServerReqCalculated, *m_strMinServerReason );
+        return false;
+    }
+
+    // See if any connected client are below min requirements
+    {
+        uint uiNumIncompatiblePlayers = 0;
+        for ( std::list < CPlayer* > ::const_iterator iter = g_pGame->GetPlayerManager ()->IterBegin () ; iter != g_pGame->GetPlayerManager ()->IterEnd () ; iter++ )
+            if ( m_strMinClientReqFromConfig > (*iter)->GetPlayerVersion () )
+                uiNumIncompatiblePlayers++;
+
+        if ( uiNumIncompatiblePlayers > 0 )
+        {
+            strOutStatus += SString ( "%d connected player(s) below required client version %s", uiNumIncompatiblePlayers, *m_strMinClientReqFromConfig );
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
 bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, bool bStartIncludedResources, bool bConfigs, bool bMaps, bool bScripts, bool bHTML, bool bClientConfigs, bool bClientScripts, bool bClientFiles )
 {
     if ( m_bLoaded && !m_bActive )
@@ -613,7 +698,16 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         if ( !m_bDoneUpgradeWarnings )
         {
             m_bDoneUpgradeWarnings = true;
-            CResourceChecker ().LogUpgradeWarnings ( this, m_strResourceZip );
+            CResourceChecker ().LogUpgradeWarnings ( this, m_strResourceZip, m_strMinClientReqCalculated, m_strMinServerReqCalculated, m_strMinClientReason, m_strMinServerReason );
+        }
+
+        // MTA version check
+        SString strStatus;
+        if ( !GetCompatibilityStatus ( strStatus ) )
+        {
+            m_strFailureReason = SString ( "Not starting resource %s as %s\n", m_strResourceName.c_str (), *strStatus );
+            CLogger::LogPrint ( m_strFailureReason );
+            return false;
         }
 
         m_bStarting = true;
@@ -791,6 +885,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         m_bClientFiles = bClientFiles;
 
         m_bHasStarted = true;
+        m_resourceManager->ApplyMinClientRequirement ( this, m_strMinClientReqFromConfig );
 
         // Broadcast new resourceelement that is loaded and tell the players that a new resource was started
         g_pGame->GetMapManager()->BroadcastElements ( m_pResourceElement, true );
@@ -824,6 +919,7 @@ bool CResource::Stop ( bool bStopManually )
     // If we're loaded and active
     if ( !m_bStopping && m_bLoaded && m_bActive && ( !m_bStartedManually || bStopManually ) )
     {
+        m_resourceManager->RemoveMinClientRequirement ( this );
         m_bHasStarted = false;
         m_bStopping = true;
 
