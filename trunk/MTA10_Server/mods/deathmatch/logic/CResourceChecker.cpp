@@ -648,14 +648,14 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
         hashClient["setObjectStatic"]           = "Replaced|setElementFrozen";
 
         // Camera
-        hashClient["getCameraPosition"]         = "Replaced|getCameraMatrix";
-        hashClient["getCameraRotation"]         = "Removed|Please manually update this.  Refer to the wiki for details";
-        hashClient["setCameraLookAt"]           = "Removed|Please manually update this.  Refer to the wiki for details";
-        hashClient["setCameraPosition"]         = "Removed|Please manually update this.  Refer to the wiki for details";
-        hashClient["getCameraFixedModeTarget"]  = "Removed|Please manually update this.  Refer to the wiki for details";
-        hashClient["toggleCameraFixedMode"]     = "Removed|Please manually update this.  Refer to the wiki for details";
-        hashClient["rotateCameraRight"]         = "Removed|Please manually update this.  Refer to the wiki for details";
-        hashClient["rotateCameraUp"]            = "Removed|Please manually update this.  Refer to the wiki for details";
+        //hashClient["getCameraPosition"]         = "Replaced|getCameraMatrix";
+        //hashClient["getCameraRotation"]         = "Removed|Please manually update this.  Refer to the wiki for details";
+        //hashClient["setCameraLookAt"]           = "Removed|Please manually update this.  Refer to the wiki for details";
+        //hashClient["setCameraPosition"]         = "Removed|Please manually update this.  Refer to the wiki for details";
+        //hashClient["getCameraFixedModeTarget"]  = "Removed|Please manually update this.  Refer to the wiki for details";
+        //hashClient["toggleCameraFixedMode"]     = "Removed|Please manually update this.  Refer to the wiki for details";
+        //hashClient["rotateCameraRight"]         = "Removed|Please manually update this.  Refer to the wiki for details";
+        //hashClient["rotateCameraUp"]            = "Removed|Please manually update this.  Refer to the wiki for details";
         // Edit
         hashClient["guiEditSetCaratIndex"]      = "Replaced|guiEditSetCaretIndex";
 
@@ -724,11 +724,11 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
         hashClient["setVehicleFrozen"]          = "Replaced|setElementFrozen";
 
         // Camera
-        hashServer["getCameraPosition"]         = "Replaced|getCameraMatrix";
-        hashServer["setCameraPosition"]         = "Removed|Please manually update this.  Refer to the wiki for details";
-        hashServer["setCameraLookAt"]           = "Removed|Please manually update this.  Refer to the wiki for details";
-        hashServer["setCameraMode"]             = "Removed|Please manually update this.  Refer to the wiki for details";
-        hashServer["getCameraMode"]             = "Removed|Please manually update this.  Refer to the wiki for details";
+        //hashServer["getCameraPosition"]         = "Replaced|getCameraMatrix";
+        //hashServer["setCameraPosition"]         = "Removed|Please manually update this.  Refer to the wiki for details";
+        //hashServer["setCameraLookAt"]           = "Removed|Please manually update this.  Refer to the wiki for details";
+        //hashServer["setCameraMode"]             = "Removed|Please manually update this.  Refer to the wiki for details";
+        //hashServer["getCameraMode"]             = "Removed|Please manually update this.  Refer to the wiki for details";
         // Player
         hashServer["getPlayerOccupiedVehicle"]  = "Replaced|getPedOccupiedVehicle";
         hashServer["getPlayerOccupiedVehicleSeat"] = "Replaced|getPedOccupiedVehicleSeat";
@@ -809,11 +809,16 @@ void CResourceChecker::CheckVersionRequirements ( const string& strIdentifierNam
     {
         // This identifier has a version requirement
         const SString& strResult = *pResult;
-        // Is the new requirement higher than the current?
-        if ( strResult > strReqMtaVersion )
+
+        // Is the new requirement relevant for this MTA generation
+        if ( strResult > CStaticFunctionDefinitions::GetVersionSortable ().Left ( 3 ) )
         {
-            strReqMtaVersion = strResult;
-            strReqMtaReason = strIdentifierName;
+            // Is the new requirement higher than the current?
+            if ( strResult > strReqMtaVersion )
+            {
+                strReqMtaVersion = strResult;
+                strReqMtaReason = strIdentifierName;
+            }
         }
     }
 }
