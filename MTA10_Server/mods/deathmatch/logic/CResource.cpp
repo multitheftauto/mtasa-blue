@@ -663,6 +663,21 @@ bool CResource::GetCompatibilityStatus ( SString& strOutStatus )
             strOutStatus += SString ( "server %s because of '%s')", *m_strMinServerReqCalculated, *m_strMinServerReason );
         return false;
     }
+
+    // See if any connected client are below min requirements
+    {
+        uint uiNumIncompatiblePlayers = 0;
+        for ( std::list < CPlayer* > ::const_iterator iter = g_pGame->GetPlayerManager ()->IterBegin () ; iter != g_pGame->GetPlayerManager ()->IterEnd () ; iter++ )
+            if ( m_strMinClientReqFromConfig > (*iter)->GetPlayerVersion () )
+                uiNumIncompatiblePlayers++;
+
+        if ( uiNumIncompatiblePlayers > 0 )
+        {
+            strOutStatus += SString ( "%d connected player(s) below required client version %s", uiNumIncompatiblePlayers, *m_strMinClientReqFromConfig );
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -686,6 +701,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
             CResourceChecker ().LogUpgradeWarnings ( this, m_strResourceZip, m_strMinClientReqCalculated, m_strMinServerReqCalculated, m_strMinClientReason, m_strMinServerReason );
         }
 
+        // MTA version check
         SString strStatus;
         if ( !GetCompatibilityStatus ( strStatus ) )
         {
