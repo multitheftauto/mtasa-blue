@@ -212,14 +212,18 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
     return true;
 }
 
-void CResourceManager::Upgrade ( void )
+void CResourceManager::UpgradeAll ( void )
 {
     // Modify source files if needed
     for ( list < CResource* > ::const_iterator iter = m_resources.begin () ; iter != m_resources.end (); iter++ )
         (*iter)->ApplyUpgradeModifications ();
+}
 
-    // Refresh everything
-    Refresh ( true );
+void CResourceManager::CheckAll ( void )
+{
+    // Check all resources for deprecated functions and MTA version issues
+    for ( list < CResource* > ::const_iterator iter = m_resources.begin () ; iter != m_resources.end (); iter++ )
+        (*iter)->LogUpgradeWarnings ();
 }
 
 char * CResourceManager::GetResourceDirectory ( void )

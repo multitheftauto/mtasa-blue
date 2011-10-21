@@ -439,7 +439,22 @@ bool CConsoleCommands::InstallResource ( CConsole* pConsole, const char* szArgum
 
 bool CConsoleCommands::UpgradeResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    g_pGame->GetResourceManager()->Upgrade();
+    // To work on remote clients, 'upgrade' needs ACL entry + console capture
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
+        return false;
+    g_pGame->GetResourceManager ()->UpgradeAll ();
+    pEchoClient->SendEcho ( "Upgrade completed. Refreshing all resources..." );
+    g_pGame->GetResourceManager ()->Refresh ( true );
+    return true;
+}
+
+bool CConsoleCommands::CheckAllResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    // To work on remote clients, 'checkall' needs ACL entry + console capture
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
+        return false;
+    g_pGame->GetResourceManager ()->CheckAll ();
+    pEchoClient->SendEcho ( "Check completed" );
     return true;
 }
 
