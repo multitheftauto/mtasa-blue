@@ -398,7 +398,7 @@ bool CAccountManager::Save ( CAccount* pAccount, SString* pStrError )
     //Create a registry result
     CRegistryResult result;
     //Select ID From Accounts Where Name=strName
-    m_pSaveFile->Query ( &result, "SELECT id FROM accounts WHERE name=?", SQLITE_TEXT, strName.c_str() );
+    m_pSaveFile->Query ( &result, "SELECT id FROM accounts WHERE name=? LIMIT 1", SQLITE_TEXT, strName.c_str() );
 
     //Check for results
     if ( result.nRows > 0 ) {
@@ -749,7 +749,7 @@ CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, const char* s
     CRegistryResult result;
 
     //Select the value and type from the database where the user is our user and the key is the required key
-    m_pSaveFile->Query ( &result, "SELECT value,type from userdata where userid=? and key=?", SQLITE_INTEGER, iUserID, SQLITE_TEXT, szKey );
+    m_pSaveFile->Query ( &result, "SELECT value,type from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID, SQLITE_TEXT, szKey );
 
     //Store the returned amount of rows
     int iResults = result.nRows;
@@ -795,7 +795,7 @@ bool CAccountManager::SetAccountData( CAccount* pAccount, const char* szKey, con
     CRegistryResult result;
 
     //Select the key and value from the database where the user is our user and the key is the required key
-    m_pSaveFile->Query ( &result, "SELECT id,userid from userdata where userid=? and key=?", SQLITE_INTEGER, iUserID, SQLITE_TEXT, strKey.c_str () );
+    m_pSaveFile->Query ( &result, "SELECT id,userid from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID, SQLITE_TEXT, strKey.c_str () );
 
     //If there is a key with this value update it otherwise insert it
     if ( result.nRows > 0 )
@@ -820,7 +820,7 @@ bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAcco
     SString strValue;
 
     //Select the key and value from the database where the user is our from account
-    m_pSaveFile->Query ( &result, "SELECT key,value,type from userdata where userid=?", SQLITE_INTEGER, iUserID );
+    m_pSaveFile->Query ( &result, "SELECT key,value,type from userdata where userid=? LIMIT 1", SQLITE_INTEGER, iUserID );
 
     //Store the returned amount of rows
     int iResults = result.nRows;
@@ -836,7 +836,7 @@ bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAcco
             strValue = (char *)result.Data[i][1].pVal;
             int iType = result.Data[i][2].nVal;
             //Select the id and userid where the user is the to account and the key is strKey
-            m_pSaveFile->Query ( &subResult, "SELECT id,userid from userdata where userid=? and key=?", SQLITE_INTEGER, iUserID, SQLITE_TEXT, strKey.c_str () );
+            m_pSaveFile->Query ( &subResult, "SELECT id,userid from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID, SQLITE_TEXT, strKey.c_str () );
             //If there is a key with this value update it otherwise insert it and store the return value in bRetVal
             if ( subResult.nRows > 0 )
                 m_pSaveFile->Query ( "UPDATE userdata SET value=?, type=? WHERE userid=? AND key=?", SQLITE_TEXT, strValue.c_str (), SQLITE_INTEGER, iType, SQLITE_INTEGER, pToAccount->GetID (), SQLITE_TEXT, strKey.c_str () );
