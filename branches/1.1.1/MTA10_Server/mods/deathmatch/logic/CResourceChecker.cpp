@@ -27,7 +27,6 @@ namespace
 
     SVersionItem clientFunctionInitList[] = {
                                          { "createSWATRope",            "1.1.1-9.03250" },
-                                         { "getPlayerIdleTime",         "1.1.1-9.03316" },
                                          { "toJSON",                    "1.1.1-9.03316" },
                                          { "fromJSON",                  "1.1.1-9.03316" },
                                          { "dxSetShaderTessellation",   "1.1.1-9.03316" },
@@ -35,6 +34,7 @@ namespace
 
     SVersionItem serverFunctionInitList[] = {
                                          { "onChatMessage",             "1.1.1-9.03316" },
+                                         { "getPlayerIdleTime",         "1.1.1-9.03316" },
                                          { "copyResource",              "1.1.1-9.03316" },
                                          { "renameResource",            "1.1.1-9.03316" },
                                          { "deleteResource",            "1.1.1-9.03316" },

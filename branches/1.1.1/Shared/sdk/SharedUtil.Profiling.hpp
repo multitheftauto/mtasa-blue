@@ -227,7 +227,7 @@ namespace SharedUtil
             // Grow quickly, shrink slowly
             m_BufferPosMax = Max ( m_BufferPos * 2, m_BufferPosMax * 1000 / 1001 );
             m_BufferPosMax = Clamp ( 10000, m_BufferPosMax, 1000000 );
-            if ( m_BufferPosMax != m_ItemBufferArray.size () )
+            if ( m_BufferPosMax != (int)m_ItemBufferArray.size () )
                 m_ItemBufferArray.resize ( m_BufferPosMax );
         }
 
