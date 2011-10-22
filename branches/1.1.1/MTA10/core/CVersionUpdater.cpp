@@ -2164,7 +2164,7 @@ void CVersionUpdater::PostChangeMasterConfig ( void )
     // Maybe modify report settings
     if ( !m_MasterConfig.report.strFilter.empty () )
     {
-        SString strReportSettings = SString ( "filter2@%s;min@%d;max@%d", *m_MasterConfig.report.strFilter, m_MasterConfig.report.iMinSize, m_MasterConfig.report.iMaxSize ); 
+        SString strReportSettings = SString ( "filter2@%s;min@%d;max@%d", *m_MasterConfig.report.strFilter, (int)m_MasterConfig.report.iMinSize, (int)m_MasterConfig.report.iMaxSize ); 
         GetReportWrap ()->SetSettings ( strReportSettings );
     }
 }
