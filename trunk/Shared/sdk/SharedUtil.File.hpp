@@ -559,7 +559,6 @@ SString SharedUtil::ExtractBeforeExtention ( const SString& strPathFilename )
 }
 
 
-#ifdef WIN32
 SString SharedUtil::MakeUniquePath ( const SString& strPathFilename )
 {
     SString strBeforeUniqueChar, strAfterUniqueChar;
@@ -581,10 +580,13 @@ SString SharedUtil::MakeUniquePath ( const SString& strPathFilename )
 
     SString strTest = strPathFilename;
     int iCount = 1;
+#ifdef WIN32
     while ( GetFileAttributes ( strTest ) != INVALID_FILE_ATTRIBUTES )
+#else
+    while ( DirectoryExists ( strTest ) || FileExists ( strTest ) )
+#endif
     {
         strTest = SString ( "%s_%d%s", strBeforeUniqueChar.c_str (), iCount++, strAfterUniqueChar.c_str () );
     }
     return strTest;
 }
-#endif

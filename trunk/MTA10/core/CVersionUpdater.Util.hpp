@@ -622,6 +622,8 @@ namespace
             m_ArgMap.Get ( "filter2", strFilter, GetBuildAge () < 30 ? "+all" : "-all" );
             m_ArgMap.Get ( "min", iMinSize, DEFAULT_MIN_SIZE );
             m_ArgMap.Get ( "max", iMaxSize, DEFAULT_MAX_SIZE );
+            iMinSize = 11;      // To fix parse bug in previous builds
+            iMaxSize = 4001;
             SaveReportSettings ();
         }
 
