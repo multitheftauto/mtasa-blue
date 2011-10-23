@@ -255,7 +255,6 @@ utf8_wcstombs (const std::wstring & wstr)
     {
         // Slower but any size
         char utf8 [6];
-        int un = 0;
         std::string str;
 
         for (unsigned int i = 0; i<size ; ++i) {

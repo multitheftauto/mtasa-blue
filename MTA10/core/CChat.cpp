@@ -202,8 +202,11 @@ void CChat::Draw ( bool bUseCacheTexture )
 
     CGraphics* pGraphics = CGraphics::GetSingletonPtr ();
 
+    static CVector2D ms_RenderTargetChatSize(0,0);
+    static int ms_iReportCount = 0;
+
     // Validate rendertarget
-    if ( m_pCacheTexture && ( chatSize.fX != m_pCacheTexture->m_uiSizeX || chatSize.fY != m_pCacheTexture->m_uiSizeY ) )
+    if ( m_pCacheTexture && chatSize != ms_RenderTargetChatSize )
     {
         SAFE_RELEASE( m_pCacheTexture );
     }
@@ -211,6 +214,24 @@ void CChat::Draw ( bool bUseCacheTexture )
     if ( !m_pCacheTexture )
     {
         m_pCacheTexture = pGraphics->GetRenderItemManager ()->CreateRenderTarget ( chatSize.fX, chatSize.fY, true, true );
+        if ( m_pCacheTexture )
+            ms_RenderTargetChatSize = chatSize;
+
+        // Log render target size created
+        if ( ms_iReportCount < 5 )
+        {
+            ms_iReportCount++;
+            SString strAdapterName = g_pDeviceState->AdapterState.Name;
+            if ( m_pCacheTexture )
+                AddReportLog ( 6531, SString ( "Chat rt req:%2.0f %2.0f   size:%d %d   surface:%d %d  card:%s"
+                                        ,chatSize.fX, chatSize.fY
+                                        ,m_pCacheTexture->m_uiSizeX, m_pCacheTexture->m_uiSizeY
+                                        ,m_pCacheTexture->m_uiSurfaceSizeX, m_pCacheTexture->m_uiSurfaceSizeY
+                                        ,*strAdapterName
+                                        ) );
+            else
+                AddReportLog ( 6532, SString ( "Chat rt req:%2.0f %2.0f  got: fail  card:%s", chatSize.fX, chatSize.fY, *strAdapterName ) );
+        }
         m_iCacheTextureRevision = -1;   // Make sure the graphics will be updated
     }
 
