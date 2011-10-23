@@ -146,8 +146,6 @@ String String::bidify(void) const
 #endif
 
     String tmp = *this;
-    int pos = 0;
-    tmp.find ( '\n', pos )
     doBidi(tmp.ptr(), length(), true, true);
     return tmp;
 }
