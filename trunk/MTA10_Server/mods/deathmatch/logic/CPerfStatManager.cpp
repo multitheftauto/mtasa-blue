@@ -76,6 +76,7 @@ CPerfStatManagerImpl::CPerfStatManagerImpl ( void )
     AddModule ( CPerfStatBandwidthUsage::GetSingleton () );
     AddModule ( CPerfStatServerInfo::GetSingleton () );
     AddModule ( CPerfStatServerTiming::GetSingleton () );
+    AddModule ( CPerfStatFunctionTiming::GetSingleton () );
 }
 
 
@@ -262,6 +263,31 @@ SString CPerfStatManager::GetScaledByteString ( long long Amount )
         return SString ( "%.2f KB", Amount / ( 1024.0 ) );
 
     return SString ( "%d", Amount );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CPerfStatManager::GetScaledBitString
+//
+//
+//
+///////////////////////////////////////////////////////////////
+SString CPerfStatManager::GetScaledBitString ( long long Amount )
+{
+    if ( Amount > 1024LL * 1024 * 1024 * 1024 )
+        return SString ( "%.2f Tbit", Amount / ( 1024.0 * 1024 * 1024 * 1024 ) );
+
+    if ( Amount > 1024LL * 1024 * 1024 )
+        return SString ( "%.2f Gbit", Amount / ( 1024.0 * 1024 * 1024 ) );
+
+    if ( Amount > 1024 * 1024 )
+        return SString ( "%.2f Mbit", Amount / ( 1024.0 * 1024 ) );
+
+    if ( Amount > 1024 )
+        return SString ( "%.2f kbit", Amount / ( 1024.0 ) );
+
+    return SString ( "%d bit", Amount );
 }
 
 

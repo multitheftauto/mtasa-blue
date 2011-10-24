@@ -37,6 +37,13 @@ void lua_registerPreCallHook ( lua_PreCallHook f )
     pPreCallHook = f;
 }
 
+lua_PostCallHook pPostCallHook = NULL;
+void lua_registerPostCallHook ( lua_PostCallHook f )
+{
+    pPostCallHook = f;
+}
+
+
 /*
 ** {======================================================
 ** Error-recovery functions
@@ -326,7 +333,12 @@ int luaD_precall (lua_State *L, StkId func, int nresults) {
     if ( pPreCallHook )
         allowed = pPreCallHook ( *curr_func(L)->c.f, L );
     if ( allowed )
+    {
         n = (*curr_func(L)->c.f)(L);  /* do the actual call */
+        // MTA Specific
+        if ( pPostCallHook )
+            pPostCallHook ( *curr_func(L)->c.f, L );
+    }
     lua_lock(L);
     if (n < 0)  /* yielding? */
       return PCRYIELD;

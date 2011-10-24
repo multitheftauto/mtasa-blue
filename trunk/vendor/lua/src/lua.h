@@ -56,6 +56,8 @@ typedef int (*lua_CFunction) (lua_State *L);
 */
 typedef int (*lua_PreCallHook) ( lua_CFunction f, lua_State* L );
 void lua_registerPreCallHook ( lua_PreCallHook f );
+typedef void (*lua_PostCallHook) ( lua_CFunction f, lua_State* L );
+void lua_registerPostCallHook ( lua_PostCallHook f );
 
 /*
 ** functions that read/write blocks when loading/dumping Lua chunks

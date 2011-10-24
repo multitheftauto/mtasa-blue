@@ -13,6 +13,20 @@
 
 #include "StdInc.h"
 
+namespace
+{
+    // For timing C function calls from Lua
+    struct STimingFunction
+    {
+        STimingFunction ( lua_CFunction f, CLuaCFunction* pFunction, TIMEUS startTime ) : f ( f ), pFunction ( pFunction ), startTime ( startTime ) {}
+        lua_CFunction f;
+        CLuaCFunction* pFunction;
+        TIMEUS startTime;
+    };
+    std::list < STimingFunction >   ms_TimingFunctionStack;
+    bool                            ms_bRegisterdPostCallHook = false;
+}
+
 CElementDeleter* CLuaDefs::m_pElementDeleter = NULL;
 CBlipManager* CLuaDefs::m_pBlipManager = NULL;
 CHandlingManager*  CLuaDefs::m_pHandlingManager = NULL;
@@ -110,10 +124,58 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
     CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( f );
     if ( pFunction )
     {
-        return static_cast < bool > ( CLuaDefs::CanUseFunction (
-            pFunction->GetName ().c_str (), luaVM, pFunction->IsRestricted () ) );
+        // If it's not one of lua's functions, see if we allow it
+        if ( !CLuaDefs::CanUseFunction ( pFunction->GetName ().c_str (), luaVM, pFunction->IsRestricted () ) )
+            return false;
+
+        // Check if function timing is active
+        if ( g_pStats->bFunctionTimingActive )
+        {
+            // Check if hook needs applying
+            if ( !ms_bRegisterdPostCallHook )
+            {
+                OutputDebugLine ( "Registering PostCallHook" );
+                ms_bRegisterdPostCallHook = true;
+                lua_registerPostCallHook ( CLuaDefs::DidUseFunction );                
+            }
+            // Start to time the function
+            ms_TimingFunctionStack.push_back ( STimingFunction( f, pFunction, GetTimeUs() ) );
+        }
+        return true;
     }
 
     // It's one of lua's functions, allow this
     return true;
+}
+
+
+//
+// Called after a Lua function if post call hook has been installed
+//
+void CLuaDefs::DidUseFunction ( lua_CFunction f, lua_State* luaVM )
+{
+    if ( !ms_TimingFunctionStack.empty () )
+    {
+        // Check if the function used was being timed
+        const STimingFunction& info = ms_TimingFunctionStack.back ();
+        if ( info.f == f )
+        {
+            // Finish the timing
+            TIMEUS elapsedTime = GetTimeUs() - info.startTime;
+            // Record timing over a threshold
+            if ( elapsedTime > 1000 )
+                CPerfStatFunctionTiming::GetSingleton ()->UpdateTiming ( info.pFunction->GetName ().c_str (), elapsedTime );
+
+            ms_TimingFunctionStack.pop_back ();
+        }
+    }
+
+    // Check if we should remove the hook
+    if ( !g_pStats->bFunctionTimingActive && ms_TimingFunctionStack.empty () )
+    {
+        OutputDebugLine ( "Removing PostCallHook" );
+        assert ( ms_bRegisterdPostCallHook );
+        ms_bRegisterdPostCallHook = false;
+        lua_registerPostCallHook ( NULL );                
+    }
 }
