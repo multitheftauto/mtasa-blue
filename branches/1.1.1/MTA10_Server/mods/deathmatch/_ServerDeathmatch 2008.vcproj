@@ -641,6 +641,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CPerfStat.FunctionTiming.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CPerfStat.LibMemory.cpp"
 					>
 				</File>

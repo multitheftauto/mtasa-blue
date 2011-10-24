@@ -15,6 +15,28 @@
 
 DECLARE_ENUM( ePacketID );
 IMPLEMENT_ENUM_BEGIN( ePacketID )
+    ADD_ENUM1( PACKET_ID_SERVER_JOIN )
+    ADD_ENUM1( PACKET_ID_SERVER_JOIN_DATA )
+    ADD_ENUM1( PACKET_ID_SERVER_JOIN_COMPLETE )
+    ADD_ENUM1( PACKET_ID_PLAYER_JOIN )
+    ADD_ENUM1( PACKET_ID_PLAYER_JOINDATA )
+    ADD_ENUM1( PACKET_ID_PLAYER_QUIT )
+    ADD_ENUM1( PACKET_ID_PLAYER_TIMEOUT )
+    ADD_ENUM1( PACKET_ID_MOD_NAME )
+    ADD_ENUM1( PACKET_ID_PACKET_PROGRESS )
+    ADD_ENUM1( PACKET_ID_MTA_RESERVED_03 )
+    ADD_ENUM1( PACKET_ID_MTA_RESERVED_04 )
+    ADD_ENUM1( PACKET_ID_MTA_RESERVED_05 )
+    ADD_ENUM1( PACKET_ID_MTA_RESERVED_06 )
+    ADD_ENUM1( PACKET_ID_MTA_RESERVED_07 )
+    ADD_ENUM1( PACKET_ID_MTA_RESERVED_08 )
+    ADD_ENUM1( PACKET_ID_MTA_RESERVED_09 )
+    ADD_ENUM1( PACKET_ID_MTA_RESERVED_10 )
+    ADD_ENUM1( PACKET_ID_MTA_RESERVED_11 )
+    ADD_ENUM1( PACKET_ID_MTA_RESERVED_12 )
+    ADD_ENUM1( PACKET_ID_MTA_RESERVED_13 )
+    ADD_ENUM1( PACKET_ID_MTA_RESERVED_14 )
+    ADD_ENUM1( PACKET_ID_MTA_RESERVED_15 )
     ADD_ENUM1( PACKET_ID_SERVER_JOINEDGAME )
     ADD_ENUM1( PACKET_ID_SERVER_DISCONNECTED )
     ADD_ENUM1( PACKET_ID_RPC )
@@ -62,10 +84,12 @@ IMPLEMENT_ENUM_BEGIN( ePacketID )
     ADD_ENUM1( PACKET_ID_PLAYER_RCON_MUTE )
     ADD_ENUM1( PACKET_ID_PLAYER_RCON_FREEZE )
     ADD_ENUM1( PACKET_ID_VOICE_DATA )
+    ADD_ENUM1( PACKET_ID_VOICE_END )
     ADD_ENUM1( PACKET_ID_CHEAT_CHALLENGEMEMORY )
     ADD_ENUM1( PACKET_ID_CHEAT_RETURN )
     ADD_ENUM1( PACKET_ID_MAP_LIST )
     ADD_ENUM1( PACKET_ID_LUA )
+    ADD_ENUM1( PACKET_ID_LUA_ELEMENT_RPC )
     ADD_ENUM1( PACKET_ID_TEXT_ITEM )
     ADD_ENUM1( PACKET_ID_SCOREBOARD )
     ADD_ENUM1( PACKET_ID_TEAMS )
@@ -74,10 +98,14 @@ IMPLEMENT_ENUM_BEGIN( ePacketID )
     ADD_ENUM1( PACKET_ID_RESOURCE_STOP )
     ADD_ENUM1( PACKET_ID_CUSTOM_DATA )
     ADD_ENUM1( PACKET_ID_CAMERA_SYNC )
+    ADD_ENUM1( PACKET_ID_OBJECT_STARTSYNC )
+    ADD_ENUM1( PACKET_ID_OBJECT_STOPSYNC )
+    ADD_ENUM1( PACKET_ID_OBJECT_SYNC )
     ADD_ENUM1( PACKET_ID_UPDATE_INFO )
     ADD_ENUM1( PACKET_ID_DISCONNECT_MESSAGE )
     ADD_ENUM1( PACKET_ID_PLAYER_TRANSGRESSION )
     ADD_ENUM1( PACKET_ID_PLAYER_DIAGNOSTIC )
+    ADD_ENUM1( PACKET_ID_PLAYER_MODINFO )
     ADD_ENUM1( PACKET_ID_LIGHTSYNC )
     ADD_ENUM1( PACKET_ID_VEHICLE_RESYNC )
 IMPLEMENT_ENUM_END( "ePacketID" )
@@ -110,6 +138,7 @@ public:
     SString                     m_strCategoryName;
     SPacketStat                 m_PrevPacketStats [ 2 ] [ 256 ];
     SPacketStat                 m_PacketStats [ 2 ] [ 256 ];
+    long long                   m_ShownPacketStats [ 256 ];
 };
 
 
@@ -235,6 +264,7 @@ void CPerfStatPacketUsageImpl::GetStats ( CPerfStatResult* pResult, const std::m
     pResult->AddColumn ( "Outgoing.bytes/sec" );
     pResult->AddColumn ( "Outgoing.cpu" );
 
+    long long llTickCountNow = CTickCount::Now ().ToLongLong ();
     // Fill rows
     for ( uint i = 0 ; i < 256 ; i++ )
     {
@@ -259,7 +289,15 @@ void CPerfStatPacketUsageImpl::GetStats ( CPerfStatResult* pResult, const std::m
         }
 
         if ( !statInDelta.iCount && !statOutDelta.iCount )
-            continue;
+        {
+            // Once displayed, keep a row displayed for at least 20 seconds
+            if ( llTickCountNow - m_ShownPacketStats[i] > 20000 )
+                continue;
+        }
+        else
+        {
+            m_ShownPacketStats[i] = llTickCountNow;
+        }
 
         // Add row
         SString* row = pResult->AddRow ();

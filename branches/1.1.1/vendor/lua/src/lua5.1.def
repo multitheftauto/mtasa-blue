@@ -53,6 +53,7 @@ EXPORTS
   lua_close
   lua_getmainstate
   lua_registerPreCallHook
+  lua_registerPostCallHook
   lua_call
   lua_concat
   lua_createtable
