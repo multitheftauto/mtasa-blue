@@ -30,6 +30,8 @@ struct SStatData
         long long llLightSyncPacketsSent;
         long long llLightSyncBytesSent;
     } lightsync;
+
+    bool bFunctionTimingActive;
 };
 
 extern SStatData* g_pStats;
@@ -276,4 +278,22 @@ public:
     virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
 
     static CPerfStatServerTiming*  GetSingleton        ( void );
+};
+
+
+//
+// CPerfStatFunctionTiming
+//
+class CPerfStatFunctionTiming : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    // CPerfStatFunctionTiming
+    virtual void                UpdateTiming        ( const char* szFunctionName, TIMEUS timeUs ) = 0;
+
+    static CPerfStatFunctionTiming*  GetSingleton        ( void );
 };
