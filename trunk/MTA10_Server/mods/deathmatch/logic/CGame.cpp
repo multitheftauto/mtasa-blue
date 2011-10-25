@@ -3077,8 +3077,6 @@ void CGame::Packet_Voice_Data ( CVoiceDataPacket& Packet )
 
 void CGame::Packet_Voice_End ( CVoiceEndPacket& Packet )
 {
-    unsigned short usDataLength = 0;
-
     if ( m_pMainConfig->IsVoiceEnabled() ) // Shouldn't really be receiving voice packets at all if voice is disabled
     {
         CPlayer* pPlayer = Packet.GetSourcePlayer();

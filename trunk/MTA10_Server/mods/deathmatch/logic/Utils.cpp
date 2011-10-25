@@ -726,8 +726,8 @@ void ReadCameraOrientation ( const CVector& vecBasePosition, NetBitStreamInterfa
     BitStream.ReadBit ( bUseAbsolutePosition );
 
     // Read table look up index for num of bits
-    char idx = 0;
-    BitStream.ReadBits ( &idx, 2 );
+    uchar idx = 0;
+    BitStream.ReadBits ( (char*)&idx, 2 );
 
     const uint uiNumBits = bitCountTable[idx].uiNumBits;
     const float fRange = bitCountTable[idx].fRange;
