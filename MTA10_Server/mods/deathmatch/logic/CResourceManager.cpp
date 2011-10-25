@@ -842,7 +842,7 @@ CResource* CResourceManager::CreateResource ( const SString& strNewResourceName,
     else
     {
         // If we got the rootnode created, write the XML
-        CXMLNode* pRootNode = pXML->CreateRootNode ( "meta" );
+        pXML->CreateRootNode ( "meta" );
         if ( !pXML->Write () )
         {
             delete pXML;
