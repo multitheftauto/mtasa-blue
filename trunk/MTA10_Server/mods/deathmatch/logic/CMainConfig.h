@@ -86,6 +86,7 @@ public:
     inline bool                     IsAutoLoginEnabled              ( )                         { return m_bAutoLogin; }
     const SString&                  GetIdFile                       ( void )                    { return m_strIdFile; }
     bool                            GetNetworkEncryptionEnabled     ( void )                    { return m_bNetworkEncryptionEnabled; }
+    const SString&                  GetDatabasesPath                ( void )                    { return m_strDatabasesPath; }
 
     inline unsigned short           GetFPSLimit                     ( void )        { return m_usFPSLimit; };
     bool                            SetFPSLimit                     ( unsigned short usFPS, bool bSave );
@@ -145,6 +146,7 @@ private:
     SString                         m_strMinClientVersionOverride;
     bool                            m_bAutoLogin;
     SString                         m_strIdFile;
+    SString                         m_strDatabasesPath;
     bool                            m_bNetworkEncryptionEnabled;
     SString                         m_strBandwidthReductionMode;
     int                             m_iPendingWorkToDoSleepTime;

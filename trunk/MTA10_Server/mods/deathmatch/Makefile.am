@@ -67,6 +67,10 @@ LOGIC = \
 ./logic/CConsoleCommands.cpp \
 ./logic/CCustomData.cpp \
 ./logic/CDummy.cpp \
+./logic/CDatabaseConnectionSqlite.cpp \
+./logic/CDatabaseJobQueue.cpp \
+./logic/CDatabaseManager.cpp \
+./logic/CDatabaseTypeSqlite.cpp \
 ./logic/CDynamicLibrary.cpp \
 ./logic/CElement.cpp \
 ./logic/CElementDeleter.cpp \

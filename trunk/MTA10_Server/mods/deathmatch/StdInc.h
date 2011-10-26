@@ -255,6 +255,7 @@
 #include "CZoneNames.h"
 #include "TaskNames.h"
 #include "Utils.h"
+#include "CDatabaseManager.h"
 
 #include "CStaticFunctionDefinitions.h"
 

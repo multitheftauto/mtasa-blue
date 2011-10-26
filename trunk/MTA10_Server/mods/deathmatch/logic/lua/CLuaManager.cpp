@@ -652,6 +652,12 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPlayerAnnounceValue", CLuaFunctionDefinitions::GetPlayerAnnounceValue );
     CLuaCFunctions::AddFunction ( "setPlayerAnnounceValue", CLuaFunctionDefinitions::SetPlayerAnnounceValue );
 
+    // Database funcs
+    CLuaCFunctions::AddFunction ( "dbConnect", CLuaFunctionDefinitions::DbConnect );
+    CLuaCFunctions::AddFunction ( "dbQuery", CLuaFunctionDefinitions::DbQuery );
+    CLuaCFunctions::AddFunction ( "dbFree", CLuaFunctionDefinitions::DbFree );
+    CLuaCFunctions::AddFunction ( "dbPoll", CLuaFunctionDefinitions::DbPoll );
+
     // Registry functions
     CLuaCFunctions::AddFunction ( "executeSQLCreateTable", CLuaFunctionDefinitions::ExecuteSQLCreateTable );
     CLuaCFunctions::AddFunction ( "executeSQLDropTable", CLuaFunctionDefinitions::ExecuteSQLDropTable );

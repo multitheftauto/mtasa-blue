@@ -61,6 +61,7 @@ void                    lua_pushtextitem        ( lua_State* luaVM, class CTextI
 void                    lua_pushtimer           ( lua_State* luaVM, class CLuaTimer* pTimer );
 void                    lua_pushxmlnode         ( lua_State* luaVM, class CXMLNode* pNode );
 void                    lua_pushban             ( lua_State* luaVM, class CBan* pBan );
+void                    lua_pushquery           ( lua_State* luaVM, class CDatabaseQueryWrap* pQuery );
 
 // Include the RPC functions enum
 #include "net/rpc_enums.h"
