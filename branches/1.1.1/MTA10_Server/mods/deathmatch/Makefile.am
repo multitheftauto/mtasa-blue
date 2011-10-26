@@ -67,6 +67,10 @@ LOGIC = \
 ./logic/CConsoleCommands.cpp \
 ./logic/CCustomData.cpp \
 ./logic/CDummy.cpp \
+./logic/CDatabaseConnectionSqlite.cpp \
+./logic/CDatabaseJobQueue.cpp \
+./logic/CDatabaseManager.cpp \
+./logic/CDatabaseTypeSqlite.cpp \
 ./logic/CDynamicLibrary.cpp \
 ./logic/CElement.cpp \
 ./logic/CElementDeleter.cpp \
@@ -99,6 +103,7 @@ LOGIC = \
 ./logic/CPedSync.cpp \
 ./logic/CPerfStat.BandwidthReduction.cpp \
 ./logic/CPerfStat.BandwidthUsage.cpp \
+./logic/CPerfStat.FunctionTiming.cpp \
 ./logic/CPerfStat.LibMemory.cpp \
 ./logic/CPerfStat.LuaMemory.cpp \
 ./logic/CPerfStat.LuaTiming.cpp \
