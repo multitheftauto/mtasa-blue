@@ -466,6 +466,12 @@ public:
     static int      GetPlayerAnnounceValue              ( lua_State* luaVM );
     static int      SetPlayerAnnounceValue              ( lua_State* luaVM );
 
+    // Database funcs
+    static int      DbConnect                           ( lua_State* luaVM );
+    static int      DbQuery                             ( lua_State* luaVM );
+    static int      DbFree                              ( lua_State* luaVM );
+    static int      DbPoll                              ( lua_State* luaVM );
+
     // Registry funcs
     static int      ExecuteSQLCreateTable               ( lua_State* luaVM );
     static int      ExecuteSQLDropTable                 ( lua_State* luaVM );

@@ -78,6 +78,7 @@ public:
         COLSHAPE,
         SCRIPTFILE,
         WATER,
+        DATABASE_CONNECTION,
         UNKNOWN,
     };
 

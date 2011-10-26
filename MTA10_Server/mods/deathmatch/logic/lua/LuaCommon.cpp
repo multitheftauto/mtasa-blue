@@ -323,3 +323,9 @@ void lua_pushban ( lua_State* luaVM, CBan* pBan )
 {
     lua_pushlightuserdata ( luaVM, pBan );
 }
+
+
+void lua_pushquery ( lua_State* luaVM, CDatabaseQueryWrap* pQuery )
+{
+    lua_pushlightuserdata ( luaVM, pQuery );
+}

@@ -1,0 +1,57 @@
+/*****************************************************************************
+*
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        mods/deathmatch/logic/CDatabaseType.h
+*  PURPOSE:     Generic database and connection
+*
+*  Multi Theft Auto is available from http://www.multitheftauto.com/
+*
+*****************************************************************************/
+
+class CDatabaseConnection;
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseType
+//
+// Creates connections to required database type
+//
+///////////////////////////////////////////////////////////////
+class CDatabaseType
+{
+public:
+    virtual                         ~CDatabaseType              ( void ) {}
+   
+    virtual SString                 GetDataSourceTag            ( void ) = 0;
+    virtual CDatabaseConnection*    Connect                     ( const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strDriverOptions ) = 0;
+    virtual void                    NotifyConnectionDeleted     ( CDatabaseConnection* pConnection ) = 0;
+};
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseConnection
+//
+// Routes queries and parses results
+//
+///////////////////////////////////////////////////////////////
+class CDatabaseConnection
+{
+public:
+    virtual                 ~CDatabaseConnection    ( void ) {}
+
+    // CDatabaseConnection
+    virtual bool            IsValid                 ( void ) = 0;
+    virtual const SString&  GetLastErrorMessage     ( void ) = 0;
+    virtual void            AddRef                  ( void ) = 0;
+    virtual void            Release                 ( void ) = 0;
+    virtual bool            Query                   ( const SString& strQuery, CRegistryResult& registryResult ) = 0;
+};
+
+
+//
+// Create interfaces for sqlite
+//
+CDatabaseType*          NewDatabaseTypeSqlite       ( void );
+CDatabaseConnection*    NewDatabaseConnectionSqlite ( CDatabaseType* pManager, const SString& strPath, const SString& strOptions );

@@ -342,6 +342,16 @@ bool CMainConfig::Load ( void )
         m_strAccessControlListFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "acl.xml" );
     }
 
+    // Grab the global databases path
+    if ( GetString ( m_pRootNode, "global_databases_path", strBuffer, 1, 255 ) != IS_SUCCESS )
+        strBuffer = "databases";
+    if ( !IsValidFilePath ( strBuffer.c_str () ) )
+    {
+        CLogger::ErrorPrintf ( "global_databases_path is not valid. Defaulting to 'databases'\n" );
+        strBuffer = "databases";
+    }
+    m_strDatabasesPath = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
+
     GetBoolean ( m_pRootNode, "autologin", m_bAutoLogin );
 
     // networkencryption - Encryption for Server <-> client communications

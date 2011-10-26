@@ -85,6 +85,7 @@ CGame::CGame ( void )
     m_pBanManager = NULL;
     m_pTeamManager = NULL;
     m_pMainConfig = NULL;
+    m_pDatabaseManager = NULL;
     m_pRegistryManager = NULL;
     m_pRegistry = NULL;
     m_pAccountManager = NULL;
@@ -238,6 +239,7 @@ CGame::~CGame ( void )
     m_pRegistry = NULL;
     SAFE_DELETE ( m_pAccountManager );
     SAFE_DELETE ( m_pRegistryManager );
+    SAFE_DELETE ( m_pDatabaseManager );
     SAFE_DELETE ( m_pRegisteredCommands );
     SAFE_DELETE ( m_pPedManager );
     SAFE_DELETE ( m_pHTTPD );
@@ -441,6 +443,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     // Create the account manager
     strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "internal.db" );
+    m_pDatabaseManager = NewDatabaseManager ();
     m_pRegistryManager = new CRegistryManager ();
     m_pAccountManager = new CAccountManager ( NULL, strBuffer );
 

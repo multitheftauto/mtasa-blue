@@ -54,6 +54,7 @@ inline eEntityType GetClassType ( CColShape* )      { return CElement::COLSHAPE;
 inline eEntityType GetClassType ( CDummy* )         { return CElement::DUMMY; }
 inline eEntityType GetClassType ( CScriptFile* )    { return CElement::SCRIPTFILE; }
 inline eEntityType GetClassType ( CWater* )         { return CElement::WATER; }
+inline eEntityType GetClassType ( class CDatabaseConnectionElement* )  { return CElement::DATABASE_CONNECTION; }
 
 
 // class -> class name
@@ -71,11 +72,13 @@ inline SString GetClassTypeName ( CColShape* )      { return "colshape"; }
 inline SString GetClassTypeName ( CDummy* )         { return "dummy"; }
 inline SString GetClassTypeName ( CScriptFile* )    { return "scriptfile"; }
 inline SString GetClassTypeName ( CWater* )         { return "water"; }
+inline SString GetClassTypeName ( CDatabaseConnectionElement* )  { return "db-connection"; }
 
 inline SString GetClassTypeName ( CResource* )      { return "resource-data"; }
 inline SString GetClassTypeName ( CXMLNode* )       { return "xml-node"; }
 inline SString GetClassTypeName ( CLuaTimer* )      { return "lua-timer"; }
 inline SString GetClassTypeName ( CAccount* )       { return "account"; }
+inline SString GetClassTypeName ( CDatabaseQueryWrap* ) { return "db-query"; }
 
 
 
@@ -129,6 +132,19 @@ CAccount* UserDataCast ( CAccount*, void* ptr, lua_State* luaVM )
     if ( g_pGame->GetAccountManager ()->Exists ( pAccount ) )
         return pAccount;
     return NULL;
+}
+
+
+//
+// CDatabaseQueryWrap from userdata
+//
+template < class T >
+CDatabaseQueryWrap* UserDataCast ( CDatabaseQueryWrap*, void* ptr, lua_State* )
+{
+    CDatabaseQueryWrap* pQuery = reinterpret_cast < CDatabaseQueryWrap* > ( ptr );
+    if ( !g_pGame->GetDatabaseManager ()->IsValidQuery ( (SJobHandle)pQuery ) )
+        pQuery = NULL;
+    return pQuery;
 }
 
 

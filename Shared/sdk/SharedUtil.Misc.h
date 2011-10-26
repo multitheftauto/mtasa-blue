@@ -433,6 +433,24 @@ namespace SharedUtil
         return true;
     }
 
+    // Remove value from collection. Returns number of pairs removed
+    template < class T, class V, class TR, class V2 >
+    uint MapRemoveByValue ( std::map < T, V, TR >& collection, const V2& value )
+    {
+        uint uiCount = 0;
+        typename std::map < T, V, TR > ::iterator it = collection.begin ();
+        for ( ; it != collection.end () ; )
+        {
+            if ( it->second == value )
+            {
+                uiCount++;
+                collection.erase ( it++ );
+            }
+            else
+                ++it;
+        }
+        return uiCount;
+    }
 
 
     //
