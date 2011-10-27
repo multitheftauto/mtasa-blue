@@ -78,7 +78,7 @@ inline SString GetClassTypeName ( CResource* )      { return "resource-data"; }
 inline SString GetClassTypeName ( CXMLNode* )       { return "xml-node"; }
 inline SString GetClassTypeName ( CLuaTimer* )      { return "lua-timer"; }
 inline SString GetClassTypeName ( CAccount* )       { return "account"; }
-inline SString GetClassTypeName ( CDatabaseQueryWrap* ) { return "db-query"; }
+inline SString GetClassTypeName ( CDbJobData* )     { return "db-query"; }
 
 
 
@@ -136,15 +136,12 @@ CAccount* UserDataCast ( CAccount*, void* ptr, lua_State* luaVM )
 
 
 //
-// CDatabaseQueryWrap from userdata
+// CDbJobData from userdata
 //
 template < class T >
-CDatabaseQueryWrap* UserDataCast ( CDatabaseQueryWrap*, void* ptr, lua_State* )
+CDbJobData* UserDataCast ( CDbJobData*, void* ptr, lua_State* )
 {
-    CDatabaseQueryWrap* pQuery = reinterpret_cast < CDatabaseQueryWrap* > ( ptr );
-    if ( !g_pGame->GetDatabaseManager ()->IsValidQuery ( (SJobHandle)pQuery ) )
-        pQuery = NULL;
-    return pQuery;
+    return g_pGame->GetDatabaseManager ()->GetQueryFromId ( reinterpret_cast < SDbJobId > ( ptr ) );
 }
 
 

@@ -285,7 +285,11 @@ void CPerfStatFunctionTimingImpl::GetStats ( CPerfStatResult* pResult, const std
         row[c++] = strFunctionName;
 
         if ( !bHas5s )
-            row[c++] = row[c++] = row[c++] = "-";
+        {
+            row[c++] = "-";
+            row[c++] = "-";
+            row[c++] = "-";
+        }
         else
         {
             row[c++] = SString ( "%u", prev5s.uiNumCalls );

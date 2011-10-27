@@ -10,21 +10,76 @@
 *****************************************************************************/
 
 typedef uint SConnectionHandle;
-typedef uint SJobHandle;
+typedef uint SDbJobId;
 #define INVALID_DB_HANDLE (0)
 
-enum EResultStatus
+namespace EJobResult
 {
-    STATUS_SUCCESS,
-    STATUS_FAIL,
+    enum EJobResultType
+    {
+        NONE,
+        SUCCESS,
+        FAIL,
+    };
 };
 
-struct SQueryResult
+namespace EJobCommand
 {
-    EResultStatus       status;
-    SString             strReason;
-    SConnectionHandle   connectionHandle;
-    CRegistryResult     registryResult;
+    enum EJobCommandType
+    {
+        NONE,
+        CONNECT,
+        DISCONNECT,
+        QUERY,
+    };
+};
+
+namespace EJobStage
+{
+    enum EJobStageType
+    {
+        NONE,
+        COMMAND_QUEUE,
+        PROCCESSING,
+        RESULT,
+        FINISHED,
+    };
+};
+
+using EJobCommand::EJobCommandType;
+using EJobResult::EJobResultType;
+using EJobStage::EJobStageType;
+
+
+//
+// All data realating to a database job
+//
+class CDbJobData
+{
+public:
+    ZERO_ON_NEW
+
+                CDbJobData      ( SDbJobId id ) : id ( id ) {}
+    SDbJobId    GetId           ( void ) { return id; }
+
+    EJobStageType       stage;
+    SDbJobId            id;
+    class CLuaCallback* pLuaCallback;
+
+    struct
+    {
+        EJobCommandType     type;
+        SConnectionHandle   connectionHandle;
+        SString             strData;
+    } command;
+
+    struct
+    {
+        EJobResultType      status;
+        SString             strReason;
+        SConnectionHandle   connectionHandle;
+        CRegistryResult     registryResult;
+    } result;
 };
 
 
@@ -34,9 +89,9 @@ struct SQueryResult
 //
 //   How it works:
 //
-//    Connect ->     \
-//    Query* ->         -> DatabaseManager -> JobQueue -> DatabaseType -> DatabaseConnection
-//    Disconnect ->  /
+//    Connect ->     |
+//    Query* ->      | -> DatabaseManager -> JobQueue -> DatabaseType -> DatabaseConnection
+//    Disconnect ->  |
 //
 ///////////////////////////////////////////////////////////////
 class CDatabaseManager
@@ -44,12 +99,13 @@ class CDatabaseManager
 public:
     virtual                         ~CDatabaseManager       ( void ) {}
 
+    virtual void                    DoPulse                 ( void ) = 0;
     virtual SConnectionHandle       Connect                 ( const SString& strType, const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions ) = 0;
     virtual bool                    Disconnect              ( SConnectionHandle hConnection ) = 0;
-    virtual SJobHandle              QueryStart              ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs ) = 0;
-    virtual bool                    QueryPoll               ( SQueryResult& result, SJobHandle hQuery, ulong ulTimeout ) = 0;
-    virtual bool                    QueryFree               ( SJobHandle hQuery ) = 0;
-    virtual bool                    IsValidQuery            ( SJobHandle hQuery ) = 0;
+    virtual CDbJobData*             QueryStart              ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs ) = 0;
+    virtual bool                    QueryPoll               ( CDbJobData* pJobData, ulong ulTimeout ) = 0;
+    virtual bool                    QueryFree               ( CDbJobData* pJobData ) = 0;
+    virtual CDbJobData*             GetQueryFromId          ( SDbJobId id ) = 0;
     virtual const SString&          GetLastErrorMessage     ( void ) = 0;
 };
 

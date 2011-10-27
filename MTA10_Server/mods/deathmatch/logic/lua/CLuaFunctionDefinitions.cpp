@@ -10472,25 +10472,39 @@ int CLuaFunctionDefinitions::DbConnect ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::DbQuery ( lua_State* luaVM )
 {
-//  handle dbQuery ( element connection, string query, ... )
-    CDatabaseConnectionElement* pElement; SString strQuery; CLuaArguments Args;
+//  handle dbQuery ( [ function callbackFunction, ] element connection, string query, ... )
+    CLuaFunctionRef iLuaFunction; CDatabaseConnectionElement* pElement; SString strQuery; CLuaArguments Args;
 
     CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsFunction () )
+        argStream.ReadFunction ( iLuaFunction );
     argStream.ReadUserData ( pElement );
     argStream.ReadString ( strQuery );
     argStream.ReadLuaArguments ( Args );
+    argStream.ReadFunctionComplete ();
 
     if ( !argStream.HasErrors () )
     {
-        // CDatabaseQueryWrap wraps a job handle so argstream can parse it
-        CDatabaseQueryWrap* pQuery = (CDatabaseQueryWrap*)g_pGame->GetDatabaseManager ()->QueryStart ( pElement->GetConnectionHandle (), strQuery, &Args );
-        if ( !pQuery )
+        // Start async query
+        CDbJobData* pJobData = g_pGame->GetDatabaseManager ()->QueryStart ( pElement->GetConnectionHandle (), strQuery, &Args );
+        if ( !pJobData )
         {
             m_pScriptDebugging->LogWarning ( luaVM, "dbQuery failed; %s", *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
             lua_pushboolean ( luaVM, false );
             return 1;
         }
-        lua_pushquery ( luaVM, pQuery );
+        // Make callback function if required
+        if ( VERIFY_FUNCTION( iLuaFunction ) )
+        {
+            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+            if ( pLuaMain )
+            {
+                CLuaArguments Arguments;
+                Arguments.PushUserData ( reinterpret_cast < void* > ( pJobData->GetId () ) );
+                pJobData->pLuaCallback = new CLuaCallback ( pLuaMain, iLuaFunction, Arguments );
+            }
+        }
+        lua_pushquery ( luaVM, pJobData );
         return 1;
     }
     else
@@ -10504,14 +10518,14 @@ int CLuaFunctionDefinitions::DbQuery ( lua_State* luaVM )
 int CLuaFunctionDefinitions::DbFree ( lua_State* luaVM )
 {
 //  bool dbFree ( handle query )
-    CDatabaseQueryWrap* pQuery;
+    CDbJobData* pJobData;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pQuery );
+    argStream.ReadUserData ( pJobData );
 
     if ( !argStream.HasErrors () )
     {
-        bool bResult = g_pGame->GetDatabaseManager ()->QueryFree ( (SJobHandle)pQuery );
+        bool bResult = g_pGame->GetDatabaseManager ()->QueryFree ( pJobData );
         lua_pushboolean ( luaVM, bResult );
         return 1;
     }
@@ -10526,30 +10540,29 @@ int CLuaFunctionDefinitions::DbFree ( lua_State* luaVM )
 int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
 {
 //  table dbPoll ( handle query, int timeout )
-    CDatabaseQueryWrap* pQuery; uint uiTimeout;
+    CDbJobData* pJobData; uint uiTimeout;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pQuery );
+    argStream.ReadUserData ( pJobData );
     argStream.ReadNumber ( uiTimeout );
 
     if ( !argStream.HasErrors () )
     {
-        SQueryResult queryResult;
-        if ( !g_pGame->GetDatabaseManager ()->QueryPoll ( queryResult, (SJobHandle)pQuery, uiTimeout ) )
+        if ( !g_pGame->GetDatabaseManager ()->QueryPoll ( pJobData, uiTimeout ) )
         {
             // Not ready yet
             lua_pushnil ( luaVM );
             return 1;
         }
 
-        if ( queryResult.status == STATUS_FAIL )
+        if ( pJobData->result.status == EJobResult::FAIL )
         {
             m_pScriptDebugging->LogWarning ( luaVM, "dbPoll failed; %s", *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
             lua_pushboolean ( luaVM, false );
             return 1;
         }
 
-        const CRegistryResult& Result = queryResult.registryResult;
+        const CRegistryResult& Result = pJobData->result.registryResult;
 
         // Make table!
         lua_newtable ( luaVM );

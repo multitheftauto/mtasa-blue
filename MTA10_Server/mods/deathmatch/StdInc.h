@@ -130,6 +130,7 @@
 #include "lua/CLuaArgument.h"
 #include "lua/CLuaCFunctions.h"
 #include "lua/CLuaArguments.h"
+#include "lua/CLuaCallback.h"
 
 // Shared includes
 #include "TInterpolation.h"
@@ -255,7 +256,6 @@
 #include "CZoneNames.h"
 #include "TaskNames.h"
 #include "Utils.h"
-#include "CDatabaseManager.h"
 
 #include "CStaticFunctionDefinitions.h"
 
