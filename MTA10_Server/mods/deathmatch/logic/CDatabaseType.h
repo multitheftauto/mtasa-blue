@@ -55,3 +55,9 @@ public:
 //
 CDatabaseType*          NewDatabaseTypeSqlite       ( void );
 CDatabaseConnection*    NewDatabaseConnectionSqlite ( CDatabaseType* pManager, const SString& strPath, const SString& strOptions );
+
+//
+// Create interfaces for mysql
+//
+CDatabaseType*          NewDatabaseTypeMySql        ( void );
+CDatabaseConnection*    NewDatabaseConnectionMySql  ( CDatabaseType* pManager, const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions );
