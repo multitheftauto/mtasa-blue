@@ -9,12 +9,6 @@
 *
 *****************************************************************************/
 
-enum EJobType
-{
-    JOBTYPE_CONNECT,
-    JOBTYPE_DISCONNECT,
-    JOBTYPE_QUERY,
-};
 
 ///////////////////////////////////////////////////////////////
 //
@@ -28,12 +22,12 @@ class CDatabaseJobQueue
 public:
     virtual                     ~CDatabaseJobQueue          ( void ) {}
 
-    virtual SJobHandle          AddCommand                  ( EJobType jobType, SConnectionHandle connectionHandle, const SString& strData ) = 0;
-    virtual bool                PollCommand                 ( SQueryResult& queryResult, SJobHandle jobHandle ) = 0;
-    virtual bool                IgnoreCommandResult         ( SJobHandle jobHandle ) = 0;
+    virtual void                DoPulse                     ( void ) = 0;
+    virtual CDbJobData*         AddCommand                  ( EJobCommandType jobType, SConnectionHandle connectionHandle, const SString& strData ) = 0;
+    virtual bool                PollCommand                 ( CDbJobData* pJobData ) = 0;
+    virtual bool                FreeCommand                 ( CDbJobData* pJobData ) = 0;
+    virtual CDbJobData*         FindCommandFromId           ( SDbJobId id ) = 0;
     virtual void                IgnoreConnectionResults     ( SConnectionHandle connectionHandle ) = 0;
-
-    static bool                 IsValidJobHandleRange       ( SJobHandle jobHandle );
 };
 
 CDatabaseJobQueue* NewDatabaseJobQueue ( void );

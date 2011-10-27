@@ -248,3 +248,64 @@ bool CDatabaseConnectionSqlite::Query ( const SString& strQuery, CRegistryResult
     return true;
 }
 
+
+///////////////////////////////////////////////////////////////
+//
+// InsertQueryArgumentsSqlite
+//
+// Insert arguments and apply sqlite escapement
+//
+///////////////////////////////////////////////////////////////
+SString InsertQueryArgumentsSqlite ( const SString& strQuery, CLuaArguments* pArgs )
+{
+    SString strParsedQuery;
+
+    // Walk through the query and replace the variable placeholders with the actual variables
+    unsigned int uiLen = strQuery.length ();
+    unsigned int a = 0, type = 0;
+    const char *szContent = NULL;
+    char szBuffer[32] = {0};
+    for ( unsigned int i = 0; i < uiLen; i++ )
+    {
+        if ( strQuery.at(i) == SQL_VARIABLE_PLACEHOLDER ) {
+            // If the placeholder is found, replace it with the variable
+            CLuaArgument *pArgument = (*pArgs)[a++];
+
+            // Check the type of the argument and convert it to a string we can process
+            if ( pArgument ) {
+                type = pArgument->GetType ();
+                if ( type == LUA_TBOOLEAN ) {
+                    szContent = ( pArgument->GetBoolean() ) ? "true" : "false";
+                } else if ( type == LUA_TNUMBER ) {
+                    snprintf ( szBuffer, 31, "%f", pArgument->GetNumber () );
+                    szContent = szBuffer;
+                } else if ( type == LUA_TSTRING ) {
+                    szContent = pArgument->GetString ().c_str ();
+
+                    // If we have a string, add a quote at the beginning too
+                    strParsedQuery += '\'';
+                }
+            }
+
+            // Copy the string into the query, and escape the single quotes as well
+            if ( szContent ) {
+                for ( unsigned int k = 0; k < strlen ( szContent ); k++ ) {
+                    if ( szContent[k] == '\'' )
+                        strParsedQuery += '\'';
+                    strParsedQuery += szContent[k];
+                }
+                // If we have a string, add a quote at the end too
+                if ( type == LUA_TSTRING ) strParsedQuery += '\'';
+            } else {
+                // If we don't have any content, put just output 2 quotes to indicate an empty variable
+                strParsedQuery += "\'\'";
+            }
+
+        } else {
+            // If we found a normal character, copy it into the destination buffer
+            strParsedQuery += strQuery[i];
+        }
+    }
+
+    return strParsedQuery;
+}

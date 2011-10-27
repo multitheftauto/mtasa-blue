@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CDatabaseJobQueue.h"
+SString InsertQueryArgumentsSqlite ( const SString& strQuery, CLuaArguments* pArgs );
 
 
 ///////////////////////////////////////////////////////////////
@@ -27,17 +28,17 @@ public:
     virtual                         ~CDatabaseManagerImpl       ( void );
 
     // CDatabaseManager
+    virtual void                    DoPulse                     ( void );
     virtual SConnectionHandle       Connect                     ( const SString& strType, const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions );
     virtual bool                    Disconnect                  ( SConnectionHandle hConnection );
-    virtual SJobHandle              QueryStart                  ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
-    virtual bool                    QueryPoll                   ( SQueryResult& result, SJobHandle hQuery, ulong ulTimeout );
-    virtual bool                    QueryFree                   ( SJobHandle hQuery );
-    virtual bool                    IsValidQuery                ( SJobHandle hQuery );
+    virtual CDbJobData*             QueryStart                  ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
+    virtual bool                    QueryPoll                   ( CDbJobData* pJobData, ulong ulTimeout );
+    virtual bool                    QueryFree                   ( CDbJobData* pJobData );
+    virtual CDbJobData*             GetQueryFromId              ( SDbJobId id );
     virtual const SString&          GetLastErrorMessage         ( void )                    { return m_strLastErrorMessage; }
 
     // CDatabaseManagerImpl
     SString                         InsertQueryArguments        ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
-    SString                         InsertQueryArgumentsSqlite  ( const SString& strQuery, CLuaArguments* pArgs );
     void                            ClearLastErrorMessage       ( void )                    { m_strLastErrorMessage.clear (); }
     void                            SetLastErrorMessage         ( const SString& strMsg )   { m_strLastErrorMessage = strMsg; }
 
@@ -84,6 +85,19 @@ CDatabaseManagerImpl::~CDatabaseManagerImpl ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// CDatabaseManagerImpl::DoPulse
+//
+// Check if any callback functions are due
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseManagerImpl::DoPulse ( void )
+{
+    m_JobQueue->DoPulse ();
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CDatabaseManagerImpl::DatabaseConnect
 //
 // strType is one of the supported database types i.e. "sqlite"
@@ -96,25 +110,24 @@ uint CDatabaseManagerImpl::Connect ( const SString& strType, const SString& strH
     SString strCombo = strType + "\1" + strHost + "\1" + strUsername + "\1" + strPassword + "\1" + strOptions;
 
     // Start connect
-    SJobHandle jobHandle = m_JobQueue->AddCommand ( JOBTYPE_CONNECT, 0, strCombo );
+    CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::CONNECT, 0, strCombo );
 
     // Complete connect
-    SQueryResult result;
-    while ( !m_JobQueue->PollCommand ( result, jobHandle ) )
+    while ( !m_JobQueue->PollCommand ( pJobData ) )
     {
         Sleep ( 1 );
     }
 
     // Check for problems
-    if ( result.status == STATUS_FAIL )
+    if ( pJobData->result.status == EJobResult::FAIL )
     {
-        SetLastErrorMessage ( result.strReason );
+        SetLastErrorMessage ( pJobData->result.strReason );
         return INVALID_DB_HANDLE;
     }
 
     // Process result
-    MapSet ( m_ConnectionTypeMap, result.connectionHandle, strType );
-    return result.connectionHandle;
+    MapSet ( m_ConnectionTypeMap, pJobData->result.connectionHandle, strType );
+    return pJobData->result.connectionHandle;
 }
 
 
@@ -137,23 +150,22 @@ bool CDatabaseManagerImpl::Disconnect ( uint hConnection )
     }
 
     // Start disconnect
-    SJobHandle jobHandle = m_JobQueue->AddCommand ( JOBTYPE_DISCONNECT, hConnection, "" );
+    CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::DISCONNECT, hConnection, "" );
 
     // Complete disconnect
-    SQueryResult result;
-    while ( !m_JobQueue->PollCommand ( result, jobHandle ) )
+    while ( !m_JobQueue->PollCommand ( pJobData ) )
         Sleep ( 1 );
 
     // Check for problems
-    if ( result.status == STATUS_FAIL )
+    if ( pJobData->result.status == EJobResult::FAIL )
     {
-        SetLastErrorMessage ( result.strReason );
+        SetLastErrorMessage ( pJobData->result.strReason );
         return false;
     }
 
     // Remove connection refs
-    MapRemove ( m_ConnectionTypeMap, result.connectionHandle );
-    m_JobQueue->IgnoreConnectionResults ( result.connectionHandle );
+    MapRemove ( m_ConnectionTypeMap, hConnection );
+    m_JobQueue->IgnoreConnectionResults ( hConnection );
     return true;
 }
 
@@ -165,7 +177,7 @@ bool CDatabaseManagerImpl::Disconnect ( uint hConnection )
 //
 //
 ///////////////////////////////////////////////////////////////
-SJobHandle CDatabaseManagerImpl::QueryStart ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs )
+CDbJobData* CDatabaseManagerImpl::QueryStart ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs )
 {
     ClearLastErrorMessage ();
 
@@ -180,7 +192,7 @@ SJobHandle CDatabaseManagerImpl::QueryStart ( SConnectionHandle hConnection, con
     SString strEscapedQuery = InsertQueryArguments ( hConnection, strQuery, pArgs );
 
     // Start query
-    SJobHandle jobHandle = m_JobQueue->AddCommand ( JOBTYPE_QUERY, hConnection, strEscapedQuery );
+    CDbJobData* jobHandle = m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
     return jobHandle;
 }
 
@@ -194,16 +206,16 @@ SJobHandle CDatabaseManagerImpl::QueryStart ( SConnectionHandle hConnection, con
 // ulTimeout = -1  -  Wait 49.7 days if not ready
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseManagerImpl::QueryPoll ( SQueryResult& result, SJobHandle hQuery, ulong ulTimeout )
+bool CDatabaseManagerImpl::QueryPoll ( CDbJobData* pJobData, ulong ulTimeout )
 {
     ClearLastErrorMessage ();
 
     while ( true )
     {
-        if ( m_JobQueue->PollCommand ( result, hQuery ) )
+        if ( m_JobQueue->PollCommand ( pJobData ) )
         {
-            if ( result.status == STATUS_FAIL )
-                SetLastErrorMessage ( result.strReason );
+            if ( pJobData->result.status == EJobResult::FAIL )
+                SetLastErrorMessage ( pJobData->result.strReason );
             return true;
         }
 
@@ -224,23 +236,23 @@ bool CDatabaseManagerImpl::QueryPoll ( SQueryResult& result, SJobHandle hQuery, 
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseManagerImpl::QueryFree ( SJobHandle hQuery )
+bool CDatabaseManagerImpl::QueryFree ( CDbJobData* pJobData )
 {
     ClearLastErrorMessage ();
-    return m_JobQueue->IgnoreCommandResult ( hQuery );
+    return m_JobQueue->FreeCommand ( pJobData );
 }
 
 
 ///////////////////////////////////////////////////////////////
 //
-// CDatabaseManagerImpl::IsValidQuery
+// CDatabaseManagerImpl::GetQueryFromId
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseManagerImpl::IsValidQuery ( SJobHandle hQuery )
+CDbJobData* CDatabaseManagerImpl::GetQueryFromId ( SDbJobId id )
 {
-    return CDatabaseJobQueue::IsValidJobHandleRange ( hQuery );
+    return m_JobQueue->FindCommandFromId ( id );
 }
 
 
@@ -268,66 +280,4 @@ SString CDatabaseManagerImpl::InsertQueryArguments ( SConnectionHandle hConnecti
     // 'Helpful' error message
     CLogger::ErrorPrintf ( "DatabaseManager internal error #1" );
     return "";
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// CDatabaseManagerImpl::InsertQueryArgumentsSqlite
-//
-// Insert arguments and apply sqlite escapement
-//
-///////////////////////////////////////////////////////////////
-SString CDatabaseManagerImpl::InsertQueryArgumentsSqlite ( const SString& strQuery, CLuaArguments* pArgs )
-{
-    SString strParsedQuery;
-
-    // Walk through the query and replace the variable placeholders with the actual variables
-    unsigned int uiLen = strQuery.length ();
-    unsigned int a = 0, type = 0;
-    const char *szContent = NULL;
-    char szBuffer[32] = {0};
-    for ( unsigned int i = 0; i < uiLen; i++ )
-    {
-        if ( strQuery.at(i) == SQL_VARIABLE_PLACEHOLDER ) {
-            // If the placeholder is found, replace it with the variable
-            CLuaArgument *pArgument = (*pArgs)[a++];
-
-            // Check the type of the argument and convert it to a string we can process
-            if ( pArgument ) {
-                type = pArgument->GetType ();
-                if ( type == LUA_TBOOLEAN ) {
-                    szContent = ( pArgument->GetBoolean() ) ? "true" : "false";
-                } else if ( type == LUA_TNUMBER ) {
-                    snprintf ( szBuffer, 31, "%f", pArgument->GetNumber () );
-                    szContent = szBuffer;
-                } else if ( type == LUA_TSTRING ) {
-                    szContent = pArgument->GetString ().c_str ();
-
-                    // If we have a string, add a quote at the beginning too
-                    strParsedQuery += '\'';
-                }
-            }
-
-            // Copy the string into the query, and escape the single quotes as well
-            if ( szContent ) {
-                for ( unsigned int k = 0; k < strlen ( szContent ); k++ ) {
-                    if ( szContent[k] == '\'' )
-                        strParsedQuery += '\'';
-                    strParsedQuery += szContent[k];
-                }
-                // If we have a string, add a quote at the end too
-                if ( type == LUA_TSTRING ) strParsedQuery += '\'';
-            } else {
-                // If we don't have any content, put just output 2 quotes to indicate an empty variable
-                strParsedQuery += "\'\'";
-            }
-
-        } else {
-            // If we found a normal character, copy it into the destination buffer
-            strParsedQuery += strQuery[i];
-        }
-    }
-
-    return strParsedQuery;
 }

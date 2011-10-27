@@ -38,6 +38,10 @@ namespace
                                          { "copyResource",              "1.1.1-9.03316" },
                                          { "renameResource",            "1.1.1-9.03316" },
                                          { "deleteResource",            "1.1.1-9.03316" },
+                                         { "dbConnect",                 "1.1.1-9.03328" },
+                                         { "dbQuery",                   "1.1.1-9.03328" },
+                                         { "dbPoll",                    "1.1.1-9.03328" },
+                                         { "dbFree",                    "1.1.1-9.03328" },
                                         };
 }
 

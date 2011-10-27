@@ -47,25 +47,6 @@ namespace
             pthread_cancel ( handle );
         }
     };
-
-    // Used by other thread
-    struct SCommandQueueItem
-    {
-        EJobType    jobType;
-        SJobHandle  jobHandle;
-        SConnectionHandle connectionHandle;
-        SString     strData;
-    };
-
-    // Used by other thread
-    struct SResultQueueItem
-    {
-        EResultStatus   status;
-        SString         strReason;
-        SJobHandle      jobHandle;
-        SConnectionHandle connectionHandle;
-        CRegistryResult registryResult;
-    };
 }
 
 
@@ -83,34 +64,38 @@ public:
     virtual                     ~CDatabaseJobQueueImpl      ( void );
 
     // Main thread functions
-    virtual SJobHandle          AddCommand                  ( EJobType jobType, SConnectionHandle connectionHandle, const SString& strData );
-    virtual bool                PollCommand                 ( SQueryResult& queryResult, SJobHandle jobHandle );
-    virtual bool                IgnoreCommandResult         ( SJobHandle jobHandle );
+    virtual void                DoPulse                     ( void );
+    virtual CDbJobData*         AddCommand                  ( EJobCommandType jobType, SConnectionHandle connectionHandle, const SString& strData );
+    virtual bool                PollCommand                 ( CDbJobData* pJobData );
+    virtual bool                FreeCommand                 ( CDbJobData* pJobData );
+    virtual CDbJobData*         FindCommandFromId           ( SDbJobId id );
     virtual void                IgnoreConnectionResults     ( SConnectionHandle connectionHandle );
 
 protected:
     void                        StopThread                  ( void );
-    SJobHandle                  GetNextJobHandle            ( void );
-    void                        UnuseJobHandle              ( SJobHandle jobHandle );
+    CDbJobData*                 GetNewJobData               ( void );
+    void                        RemoveUnwantedResults       ( void );
+    void                        IgnoreJobResults            ( CDbJobData* pJobData );
 
     // Other thread functions
     static void*                StaticThreadProc            ( void* pContext );
     void*                       ThreadProc                  ( void );
-    void                        ProcessCommand              ( SResultQueueItem& result, const SCommandQueueItem& command );
-    void                        ProcessConnect              ( SResultQueueItem& result, const SCommandQueueItem& command );
-    void                        ProcessDisconnect           ( SResultQueueItem& result, const SCommandQueueItem& command );
-    void                        ProcessQuery                ( SResultQueueItem& result, const SCommandQueueItem& command );
+    void                        ProcessCommand              ( CDbJobData* pJobData );
+    void                        ProcessConnect              ( CDbJobData* pJobData );
+    void                        ProcessDisconnect           ( CDbJobData* pJobData );
+    void                        ProcessQuery                ( CDbJobData* pJobData );
     uint                        MakeHandleForConnection     ( CDatabaseConnection* pConnection );
     CDatabaseConnection*        GetConnectionFromHandle     ( SConnectionHandle connectionHandle );
     void                        RemoveHandleForConnection   ( SConnectionHandle connectionHandle, CDatabaseConnection* pConnection );
     SConnectionHandle           GetNextConnectionHandle     ( void );
 
     // Main thread variables
-    SJobHandle                      m_JobHandleCounter;
-    CThreadHandle*                  m_pServiceThreadHandle;
-    std::set < SJobHandle >         m_ActiveJobHandles;
-    std::set < SJobHandle >         m_IgnoreResultList;
-    uint                            m_uiJobHighCount;
+    SDbJobId                            m_JobHandleCounter;
+    CThreadHandle*                      m_pServiceThreadHandle;
+    std::map < SDbJobId, CDbJobData* >  m_ActiveJobHandles;
+    std::set < CDbJobData* >            m_IgnoreResultList;
+    std::set < CDbJobData* >            m_FinishedList;         // Result has been used, will be deleted next pulse
+    uint                                m_uiJobHighCount;
 
     // Other thread variables
     SConnectionHandle                                       m_ConnectionHandleCounter;
@@ -119,11 +104,14 @@ protected:
     uint                                                    m_uiConnectionHighCount;
 
     // Shared variables
-    bool                                        m_bTerminateThread;
-    bool                                        m_bThreadTerminated;
-    std::list < SCommandQueueItem >             m_CommandQueue;
-    std::list < SResultQueueItem >              m_ResultQueue;
-    CCriticalSection                            m_CS;
+    struct
+    {
+        bool                                        m_bTerminateThread;
+        bool                                        m_bThreadTerminated;
+        std::list < CDbJobData* >                   m_CommandQueue;
+        std::list < CDbJobData* >                   m_ResultQueue;
+        CCriticalSection                            m_CS;
+    } shared;
 };
 
 
@@ -187,11 +175,11 @@ CDatabaseJobQueueImpl::~CDatabaseJobQueueImpl ( void )
 void CDatabaseJobQueueImpl::StopThread ( void )
 {
     // Stop the job queue processing thread
-    this->m_bTerminateThread = true;
+    shared.m_bTerminateThread = true;
 
     for ( uint i = 0 ; i < 5000 ; i += 15 )
     {
-        if ( this->m_bThreadTerminated )
+        if ( shared.m_bThreadTerminated )
             return;
 
         Sleep ( 15 );
@@ -204,26 +192,12 @@ void CDatabaseJobQueueImpl::StopThread ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CDatabaseJobQueue::IsValidJobHandleRange
-//
-// Static function
-// Returns false if job handle can never be correct
-//
-///////////////////////////////////////////////////////////////
-bool CDatabaseJobQueue::IsValidJobHandleRange ( SJobHandle jobHandle )
-{
-    return jobHandle >= 0x00100000 && jobHandle <= 0x001FFFFF;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
 // CDatabaseJobQueueImpl::GetNextJobHandle
 //
-// Return next free handle within correct range
+// Return a new job data object
 //
 ///////////////////////////////////////////////////////////////
-SJobHandle CDatabaseJobQueueImpl::GetNextJobHandle ( void )
+CDbJobData* CDatabaseJobQueueImpl::GetNewJobData ( void )
 {
     do
     {
@@ -241,23 +215,9 @@ SJobHandle CDatabaseJobQueueImpl::GetNextJobHandle ( void )
         CLogger::LogPrintf ( "Notice: There are now %d job handles\n", m_ActiveJobHandles.size () );
     }
 
-    SJobHandle jobHandle = m_JobHandleCounter;
-    MapInsert ( m_ActiveJobHandles, jobHandle );
-    return jobHandle;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// CDatabaseJobQueueImpl::UnuseJobHandle
-//
-// When finished with
-//
-///////////////////////////////////////////////////////////////
-void CDatabaseJobQueueImpl::UnuseJobHandle ( SJobHandle jobHandle )
-{
-    MapRemove ( m_ActiveJobHandles, jobHandle );
-    MapRemove ( m_IgnoreResultList, jobHandle );
+    CDbJobData* pJobData = new CDbJobData ( m_JobHandleCounter );
+    MapSet ( m_ActiveJobHandles, pJobData->GetId (), pJobData );
+    return pJobData;
 }
 
 
@@ -269,23 +229,106 @@ void CDatabaseJobQueueImpl::UnuseJobHandle ( SJobHandle jobHandle )
 // Can't fail
 //
 ///////////////////////////////////////////////////////////////
-SJobHandle CDatabaseJobQueueImpl::AddCommand ( EJobType jobType, SConnectionHandle connectionHandle, const SString& strData )
+CDbJobData* CDatabaseJobQueueImpl::AddCommand ( EJobCommandType jobType, SConnectionHandle connectionHandle, const SString& strData )
 {
-    SJobHandle jobHandle = GetNextJobHandle ();
-
     // Create command
-    SCommandQueueItem command;
-    command.jobHandle = jobHandle;
-    command.jobType = jobType;
-    command.connectionHandle = connectionHandle;
-    command.strData = strData;
+    CDbJobData* pJobData = GetNewJobData ();
+    pJobData->command.type = jobType;
+    pJobData->command.connectionHandle = connectionHandle;
+    pJobData->command.strData = strData;
 
     // Add to queue
-    this->m_CS.Lock ();
-    this->m_CommandQueue.push_back ( command );
-    this->m_CS.Unlock ();
+    shared.m_CS.Lock ();
+    pJobData->stage = EJobStage::COMMAND_QUEUE;
+    shared.m_CommandQueue.push_back ( pJobData );
+    shared.m_CS.Unlock ();
 
-    return jobHandle;
+    return pJobData;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseJobQueueImpl::DoPulse
+//
+// Check if any callback functions are due
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseJobQueueImpl::DoPulse ( void )
+{
+again:
+    shared.m_CS.Lock ();
+
+    // Delete finished
+    for ( std::set < CDbJobData* >::iterator iter = m_FinishedList.begin () ; iter != m_FinishedList.end () ; )
+    {
+        CDbJobData* pJobData = *iter;
+        m_FinishedList.erase ( iter++ );
+        // Check not refed
+        assert ( !ListContains ( shared.m_CommandQueue, pJobData ) );
+        assert ( !ListContains ( shared.m_ResultQueue, pJobData ) );
+        assert ( !MapContains ( m_IgnoreResultList, pJobData ) );
+        assert ( !MapContains ( m_FinishedList, pJobData ) );
+
+        assert ( MapContains ( m_ActiveJobHandles, pJobData->GetId () ) );
+        MapRemove ( m_ActiveJobHandles, pJobData->GetId () );
+        SAFE_DELETE( pJobData->pLuaCallback );
+        SAFE_DELETE( pJobData );
+    }
+
+    // Remove ignored
+    RemoveUnwantedResults ();
+
+    // Do pending callbacks
+    for ( std::list < CDbJobData* >::iterator iter = shared.m_ResultQueue.begin () ; iter != shared.m_ResultQueue.end () ; ++iter )
+    {
+        CDbJobData* pJobData = *iter;
+        if ( pJobData->pLuaCallback )
+        {
+            CLuaCallback* pLuaCallback = pJobData->pLuaCallback;
+            pJobData->pLuaCallback = NULL;
+            shared.m_CS.Unlock ();
+
+            pLuaCallback->Call ();
+            SAFE_DELETE( pLuaCallback );
+
+            // Redo from the top ensure everything is consistant
+            goto again;
+        }
+    }
+
+    shared.m_CS.Unlock ();
+
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseJobQueueImpl::RemoveUnwantedResults
+//
+// Check result queue items for match with ignore list items.
+// * Must be called from inside a locked section *
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseJobQueueImpl::RemoveUnwantedResults ( void )
+{
+    if ( m_IgnoreResultList.empty () )
+        return;
+
+    for ( std::list < CDbJobData* >::iterator iter = shared.m_ResultQueue.begin () ; iter != shared.m_ResultQueue.end () ; )
+    {
+        CDbJobData* pJobData = *iter;
+        if ( MapContains ( m_IgnoreResultList, pJobData ) )
+        {
+            // Found result to ignore, remove from result and ignore lists, add to finished list
+            iter = shared.m_ResultQueue.erase ( iter );
+            MapRemove ( m_IgnoreResultList, pJobData );
+            pJobData->stage = EJobStage::FINISHED;
+            MapInsert ( m_FinishedList, pJobData );
+        }
+        else
+            ++iter;
+    }
 }
 
 
@@ -297,55 +340,28 @@ SJobHandle CDatabaseJobQueueImpl::AddCommand ( EJobType jobType, SConnectionHand
 // Returns false if result not ready.
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseJobQueueImpl::PollCommand ( SQueryResult& queryResult, SJobHandle jobHandle )
+bool CDatabaseJobQueueImpl::PollCommand ( CDbJobData* pJobData )
 {
-    // Set result defaults
-    queryResult.connectionHandle = INVALID_DB_HANDLE;
-    queryResult.status = STATUS_FAIL;
+    shared.m_CS.Lock ();
 
-    // Check job handle is valid
-    if ( !MapContains ( m_ActiveJobHandles, jobHandle ) )
-    {
-        queryResult.strReason = "Invalid query handle";
-        return true;
-    }
+    // Remove ignored before checking
+    RemoveUnwantedResults ();
 
-    this->m_CS.Lock ();
-
-    // Take the opportunity to do a little housekeeping and remove unwanted results
-    if ( !m_IgnoreResultList.empty () )
-    {
-        for ( std::list < SResultQueueItem >::iterator iter = this->m_ResultQueue.begin () ; iter != this->m_ResultQueue.end () ; )
-        {
-            if ( MapContains ( m_IgnoreResultList, iter->jobHandle ) )
-            {
-                // Found result. Remove from the queue
-                UnuseJobHandle ( iter->jobHandle );
-                iter = this->m_ResultQueue.erase ( iter );
-            }
-            else
-                ++iter;
-        }
-    }
-
-    // Now find result with the required job handle
+    // Find result with the required job handle
     bool bFound = false;
-    for ( std::list < SResultQueueItem >::iterator iter = this->m_ResultQueue.begin () ; iter != this->m_ResultQueue.end () ; ++iter )
+    for ( std::list < CDbJobData* >::iterator iter = shared.m_ResultQueue.begin () ; iter != shared.m_ResultQueue.end () ; ++iter )
     {
-        if ( iter->jobHandle == jobHandle )
+        if ( pJobData == *iter )
         {
-            // Found result. Copy and remove from the queue
-            UnuseJobHandle ( jobHandle );
-            queryResult.status = iter->status;
-            queryResult.strReason = iter->strReason;
-            queryResult.connectionHandle = iter->connectionHandle;
-            queryResult.registryResult = iter->registryResult;
-            this->m_ResultQueue.erase ( iter );
+            // Found result. Remove from the result queue and flag return value
+            shared.m_ResultQueue.erase ( iter );
+            pJobData->stage = EJobStage::FINISHED;
+            MapInsert ( m_FinishedList, pJobData );
             bFound = true;
             break;
         }
     }
-    this->m_CS.Unlock ();
+    shared.m_CS.Unlock ();
 
     return bFound;
 }
@@ -353,22 +369,54 @@ bool CDatabaseJobQueueImpl::PollCommand ( SQueryResult& queryResult, SJobHandle 
 
 ///////////////////////////////////////////////////////////////
 //
-// CDatabaseJobQueueImpl::IgnoreCommandResult
+// CDatabaseJobQueueImpl::FreeCommand
 //
 // Throw away result when this job is done
 // Returns false if jobHandle not correct
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseJobQueueImpl::IgnoreCommandResult ( SJobHandle jobHandle )
+bool CDatabaseJobQueueImpl::FreeCommand ( CDbJobData* pJobData )
 {
-    if ( !MapContains ( m_ActiveJobHandles, jobHandle ) )
-        return false;       // Invalid query handle
+    if ( !MapContains ( m_ActiveJobHandles, pJobData->GetId () ) )
+    {
+        CLogger::ErrorPrintf ( "FreeCommand: Serious problem #1 here\n" );
+        return false;
+    }
 
-    if ( MapContains ( m_IgnoreResultList, jobHandle ) )
+    if ( MapContains ( m_IgnoreResultList, pJobData ) )
         return false;       // Already ignoring query handle
 
-    MapInsert ( m_IgnoreResultList, jobHandle );
+    // if in command or result queue, then put in ignore result list
+    bool bFound;
+    shared.m_CS.Lock ();
+
+    bFound = ListContains ( shared.m_CommandQueue, pJobData ) || ListContains ( shared.m_ResultQueue, pJobData );
+
+    shared.m_CS.Unlock ();
+
+    if ( !bFound )
+    {
+        // Must be in finished list
+        if ( !MapContains ( m_FinishedList, pJobData ) )
+            CLogger::ErrorPrintf ( "FreeCommand: Serious problem #2 here\n" );
+        return false; 
+    }
+
+    IgnoreJobResults ( pJobData );
     return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseJobQueueImpl::FindCommandFromId
+//
+// Find job data with matching id
+//
+///////////////////////////////////////////////////////////////
+CDbJobData* CDatabaseJobQueueImpl::FindCommandFromId ( SDbJobId id )
+{
+    return MapFindRef ( m_ActiveJobHandles, id );
 }
 
 
@@ -381,20 +429,35 @@ bool CDatabaseJobQueueImpl::IgnoreCommandResult ( SJobHandle jobHandle )
 ///////////////////////////////////////////////////////////////
 void CDatabaseJobQueueImpl::IgnoreConnectionResults ( SConnectionHandle connectionHandle )
 {
-    this->m_CS.Lock ();
+    shared.m_CS.Lock ();
 
-    // All active jobhandles will either be in m_CommandQueue or m_ResultQueue
-    for ( std::list < SCommandQueueItem >::iterator iter = this->m_CommandQueue.begin () ; iter != this->m_CommandQueue.end () ; ++iter )
-        if ( iter->connectionHandle == connectionHandle )
-            MapInsert ( m_IgnoreResultList, iter->jobHandle );
+    // All active jobhandles will either be in m_CommandQueue or m_ResultQueue or m_FinishedList
+    for ( std::list < CDbJobData* >::iterator iter = shared.m_CommandQueue.begin () ; iter != shared.m_CommandQueue.end () ; ++iter )
+        if ( (*iter)->command.connectionHandle == connectionHandle )
+            IgnoreJobResults ( *iter );
 
-    for ( std::list < SResultQueueItem >::iterator iter = this->m_ResultQueue.begin () ; iter != this->m_ResultQueue.end () ; ++iter )
-        if ( iter->connectionHandle == connectionHandle )
-            MapInsert ( m_IgnoreResultList, iter->jobHandle );
+    for ( std::list < CDbJobData* >::iterator iter = shared.m_ResultQueue.begin () ; iter != shared.m_ResultQueue.end () ; ++iter )
+        if ( (*iter)->command.connectionHandle == connectionHandle )
+            IgnoreJobResults ( *iter );
 
-    this->m_CS.Unlock ();
+    shared.m_CS.Unlock ();
 }
 
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseJobQueueImpl::IgnoreJobResult
+//
+// Throw away the result for this job
+// * Assumed job data is in either m_CommandQueue or m_ResultQueue *
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseJobQueueImpl::IgnoreJobResults ( CDbJobData* pJobData )
+{
+    // Callback won't be needed now
+    SAFE_DELETE( pJobData->pLuaCallback );
+    MapInsert ( m_IgnoreResultList, pJobData );
+}
 
 
 //
@@ -429,38 +492,39 @@ void* CDatabaseJobQueueImpl::StaticThreadProc ( void* pContext )
 ///////////////////////////////////////////////////////////////
 void* CDatabaseJobQueueImpl::ThreadProc ( void )
 {
-    while ( !m_bTerminateThread )
+    while ( !shared.m_bTerminateThread )
     {
         // TODO: Use wait instead of sleep
         Sleep ( 1 );
 
         // Is there a waiting command?
-        m_CS.Lock ();
-        if ( !m_CommandQueue.empty () )
+        shared.m_CS.Lock ();
+        if ( !shared.m_CommandQueue.empty () )
         {
             // Get next command
-            SCommandQueueItem command = m_CommandQueue.front ();
-            m_CS.Unlock ();
+            CDbJobData* pJobData = shared.m_CommandQueue.front ();
+            pJobData->stage = EJobStage::PROCCESSING;
+            shared.m_CS.Unlock ();
 
             // Process command
-            SResultQueueItem result;
-            ProcessCommand ( result, command );
+            ProcessCommand ( pJobData );
 
             // Store result
-            m_CS.Lock ();
-            // Check command has not been cancelled
-            if ( !m_CommandQueue.empty () && command.jobHandle == m_CommandQueue.front ().jobHandle )
+            shared.m_CS.Lock ();
+            // Check command has not been cancelled (this should not be possible)
+            if ( !shared.m_CommandQueue.empty () && pJobData == shared.m_CommandQueue.front () )
             {
                 // Remove command
-                m_CommandQueue.pop_front ();
+                shared.m_CommandQueue.pop_front ();
                 // Add result
-                m_ResultQueue.push_back ( result );
+                pJobData->stage = EJobStage::RESULT;
+                shared.m_ResultQueue.push_back ( pJobData );
             }
         }
-        m_CS.Unlock ();
+        shared.m_CS.Unlock ();
     }
 
-    m_bThreadTerminated = true;
+    shared.m_bThreadTerminated = true;
     return NULL;
 }
 
@@ -472,16 +536,16 @@ void* CDatabaseJobQueueImpl::ThreadProc ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseJobQueueImpl::ProcessCommand ( SResultQueueItem& result, const SCommandQueueItem& command )
+void CDatabaseJobQueueImpl::ProcessCommand ( CDbJobData* pJobData )
 {
-    if ( command.jobType == JOBTYPE_CONNECT )
-        ProcessConnect ( result, command );
+    if ( pJobData->command.type == EJobCommand::CONNECT )
+        ProcessConnect ( pJobData );
     else
-    if ( command.jobType == JOBTYPE_DISCONNECT )
-        ProcessDisconnect ( result, command );
+    if ( pJobData->command.type == EJobCommand::DISCONNECT )
+        ProcessDisconnect ( pJobData );
     else
-    if ( command.jobType == JOBTYPE_QUERY )
-        ProcessQuery ( result, command );
+    if ( pJobData->command.type == EJobCommand::QUERY )
+        ProcessQuery ( pJobData );
 }
 
 
@@ -492,26 +556,23 @@ void CDatabaseJobQueueImpl::ProcessCommand ( SResultQueueItem& result, const SCo
 //
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseJobQueueImpl::ProcessConnect ( SResultQueueItem& result, const SCommandQueueItem& command )
+void CDatabaseJobQueueImpl::ProcessConnect ( CDbJobData* pJobData )
 {
-    // Set default result
-    result.jobHandle = command.jobHandle;
-    result.connectionHandle = INVALID_DB_HANDLE;
-    result.status = STATUS_FAIL;
-
     // Determine which type manager to use
     std::vector < SString > parts;
-    command.strData.Split ( "\1", parts );
+    pJobData->command.strData.Split ( "\1", parts );
     if ( parts.size () < 5 )
     {
-        result.strReason = "Internal Error (JobQueueServer:ProcessConnect #1)";
+        pJobData->result.status = EJobResult::FAIL;
+        pJobData->result.strReason = "Internal Error (JobQueueServer:ProcessConnect #1)";
         return;
     }
 
     CDatabaseType* pTypeManager = MapFindRef ( m_DatabaseTypeMap, parts[0] );
     if ( !pTypeManager )
     {
-        result.strReason = "Not valid type";
+        pJobData->result.status = EJobResult::FAIL;
+        pJobData->result.strReason = "Not valid type";
         return;
     }
 
@@ -519,13 +580,14 @@ void CDatabaseJobQueueImpl::ProcessConnect ( SResultQueueItem& result, const SCo
     CDatabaseConnection* pConnection = pTypeManager->Connect ( parts[1], parts[2], parts[3], parts[4] );
     if ( !pConnection )
     {
-        result.strReason = "Could not connect";
+        pJobData->result.status = EJobResult::FAIL;
+        pJobData->result.strReason = "Could not connect";
         return;
     }
 
     if ( !pConnection->IsValid () )
     {
-        result.strReason = pConnection->GetLastErrorMessage ();
+        pJobData->result.strReason = pConnection->GetLastErrorMessage ();
         pConnection->Release ();
         return;
     }
@@ -534,8 +596,8 @@ void CDatabaseJobQueueImpl::ProcessConnect ( SResultQueueItem& result, const SCo
     SConnectionHandle connectionHandle = MakeHandleForConnection ( pConnection );
 
     // Set result
-    result.status = STATUS_SUCCESS;
-    result.connectionHandle = connectionHandle;
+    pJobData->result.status = EJobResult::SUCCESS;
+    pJobData->result.connectionHandle = connectionHandle;
 }
 
 
@@ -546,28 +608,24 @@ void CDatabaseJobQueueImpl::ProcessConnect ( SResultQueueItem& result, const SCo
 //
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseJobQueueImpl::ProcessDisconnect ( SResultQueueItem& result, const SCommandQueueItem& command )
+void CDatabaseJobQueueImpl::ProcessDisconnect ( CDbJobData* pJobData )
 {
-    // Set default result
-    result.jobHandle = command.jobHandle;
-    result.connectionHandle = INVALID_DB_HANDLE;
-    result.status = STATUS_FAIL;
-
     // CDatabaseConnection* from handle
-    CDatabaseConnection* pConnection = GetConnectionFromHandle ( command.connectionHandle );
+    CDatabaseConnection* pConnection = GetConnectionFromHandle ( pJobData->command.connectionHandle );
     if ( !pConnection )
     {
-        result.strReason = "Invalid connection";
+        pJobData->result.status = EJobResult::FAIL;
+        pJobData->result.strReason = "Invalid connection";
         return;
     }
 
     // And disconnect
-    RemoveHandleForConnection ( command.connectionHandle, pConnection );
+    RemoveHandleForConnection ( pJobData->command.connectionHandle, pConnection );
     pConnection->Release ();
     pConnection = NULL;
 
     // Set result
-    result.status = STATUS_SUCCESS;
+    pJobData->result.status = EJobResult::SUCCESS;
 }
 
 
@@ -578,30 +636,27 @@ void CDatabaseJobQueueImpl::ProcessDisconnect ( SResultQueueItem& result, const 
 //
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseJobQueueImpl::ProcessQuery ( SResultQueueItem& result, const SCommandQueueItem& command )
+void CDatabaseJobQueueImpl::ProcessQuery ( CDbJobData* pJobData )
 {
-    // Set default result
-    result.jobHandle = command.jobHandle;
-    result.connectionHandle = INVALID_DB_HANDLE;
-    result.status = STATUS_FAIL;
-
     // CDatabaseConnection* from handle
-    CDatabaseConnection* pConnection = GetConnectionFromHandle ( command.connectionHandle );
+    CDatabaseConnection* pConnection = GetConnectionFromHandle ( pJobData->command.connectionHandle );
     if ( !pConnection )
     {
-        result.strReason = "Invalid connection";
+        pJobData->result.status = EJobResult::FAIL;
+        pJobData->result.strReason = "Invalid connection";
         return;
     }
 
     // And query
-    if ( !pConnection->Query ( command.strData, result.registryResult ) )
+    if ( !pConnection->Query ( pJobData->command.strData, pJobData->result.registryResult ) )
     {
-        result.strReason = "Query failed";
+        pJobData->result.status = EJobResult::FAIL;
+        pJobData->result.strReason = pConnection->GetLastErrorMessage ();
         return;
     }
 
     // Set result
-    result.status = STATUS_SUCCESS;
+    pJobData->result.status = EJobResult::SUCCESS;
 }
 
 
@@ -671,6 +726,8 @@ CDatabaseConnection* CDatabaseJobQueueImpl::GetConnectionFromHandle ( SConnectio
 ///////////////////////////////////////////////////////////////
 void CDatabaseJobQueueImpl::RemoveHandleForConnection ( SConnectionHandle connectionHandle, CDatabaseConnection* pConnection )
 {
-    assert ( MapContains ( m_HandleConnectionMap, connectionHandle ) );
+    if ( !MapContains ( m_HandleConnectionMap, connectionHandle ) )
+        CLogger::ErrorPrintf ( "RemoveHandleForConnection: Serious problem here\n" );
+
     MapRemove ( m_HandleConnectionMap, connectionHandle );
 }

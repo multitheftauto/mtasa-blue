@@ -353,6 +353,8 @@ void CGame::DoPulse ( void )
         CLOCK_CALL1( m_pLuaManager->DoPulse (); );
     }
 
+    CLOCK_CALL1( m_pDatabaseManager->DoPulse (); );
+
     // Process our resource stop/restart queue
     CLOCK_CALL1( m_pResourceManager->ProcessQueue (); );
 
