@@ -139,6 +139,10 @@ CDatabaseJobQueueImpl::CDatabaseJobQueueImpl ( void )
     CDatabaseType* pDatabaseTypeSqlite = NewDatabaseTypeSqlite ();
     MapSet ( m_DatabaseTypeMap, pDatabaseTypeSqlite->GetDataSourceTag (), pDatabaseTypeSqlite );
 
+    // Add known database types
+    CDatabaseType* pDatabaseTypeMySql = NewDatabaseTypeMySql ();
+    MapSet ( m_DatabaseTypeMap, pDatabaseTypeMySql->GetDataSourceTag (), pDatabaseTypeMySql );
+
     // Start the job queue processing thread
     m_pServiceThreadHandle = new CThreadHandle ( CDatabaseJobQueueImpl::StaticThreadProc, this );
 }

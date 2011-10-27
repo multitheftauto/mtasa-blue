@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CDatabaseJobQueue.h"
 SString InsertQueryArgumentsSqlite ( const SString& strQuery, CLuaArguments* pArgs );
+SString InsertQueryArgumentsMySql ( const SString& strQuery, CLuaArguments* pArgs );
 
 
 ///////////////////////////////////////////////////////////////
@@ -275,7 +276,9 @@ SString CDatabaseManagerImpl::InsertQueryArguments ( SConnectionHandle hConnecti
 
     if ( strType == "sqlite" )
         return InsertQueryArgumentsSqlite ( strQuery, pArgs );
-    // Other types here
+    else
+    if ( strType == "mysql" )
+        return InsertQueryArgumentsMySql ( strQuery, pArgs );
 
     // 'Helpful' error message
     CLogger::ErrorPrintf ( "DatabaseManager internal error #1" );
