@@ -33,6 +33,8 @@
 #include "../CScriptDebugging.h"
 #include "../CTeamManager.h"
 #include "../CVehicleManager.h"
+#include "../CRegistry.h"
+#include "../CDatabaseManager.h"
 
 
 // Used by script handlers to verify elements

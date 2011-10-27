@@ -2293,6 +2293,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\lua\CLuaCallback.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\lua\CLuaCFunctions.h"
 						>
 					</File>

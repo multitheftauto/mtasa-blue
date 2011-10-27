@@ -325,7 +325,7 @@ void lua_pushban ( lua_State* luaVM, CBan* pBan )
 }
 
 
-void lua_pushquery ( lua_State* luaVM, CDatabaseQueryWrap* pQuery )
+void lua_pushquery ( lua_State* luaVM, CDbJobData* pJobData )
 {
-    lua_pushlightuserdata ( luaVM, pQuery );
+    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pJobData->GetId () ) );
 }
