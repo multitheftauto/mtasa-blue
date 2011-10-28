@@ -11,6 +11,7 @@ INCLUDES += -I$(srcdir)/../../../vendor/pme/
 INCLUDES += -I$(srcdir)/../../../vendor/json-c/
 INCLUDES += -I$(srcdir)/../../../vendor/bob_withers/
 INCLUDES += -I$(srcdir)/../../../vendor/bochs/
+INCLUDES += -I/usr/include/mysql
 INCLUDES += -I$(srcdir)/../../../Shared/animation/
 INCLUDES += -I$(ZIPDIR)/
 INCLUDES += -I$(LUADIR)/src
@@ -287,7 +288,8 @@ deathmatch_la_LIBADD = \
 	$(LUABDIR)/src/liblua.la \
 	$(top_builddir)/vendor/json-c/libjson.la \
 	$(SPARSEHASH_LIBS) \
-	$(SQLITE3_LIBS)
+	$(SQLITE3_LIBS) \
+    -lmysqlclient
 
 deathmatch_la_LDFLAGS = \
 	-module -avoid-version

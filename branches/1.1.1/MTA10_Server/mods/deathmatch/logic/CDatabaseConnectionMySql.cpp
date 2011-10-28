@@ -195,7 +195,6 @@ void CDatabaseConnectionMySql::SetLastErrorMessage ( const SString& strMessage, 
 ///////////////////////////////////////////////////////////////
 bool CDatabaseConnectionMySql::Query ( const SString& strQuery, CRegistryResult& registryResult )
 {
-    const char* szQuery = strQuery;
     CRegistryResult* pResult = &registryResult;
 
     int status = mysql_real_query ( m_handle, strQuery, static_cast < unsigned long > ( strQuery.length () ) );
@@ -228,7 +227,7 @@ bool CDatabaseConnectionMySql::Query ( const SString& strQuery, CRegistryResult&
     pResult->nRows = 0;
     pResult->Data.clear ();
     MYSQL_ROW inRow;
-    while ( inRow = mysql_fetch_row ( res ) )
+    while ( ( inRow = mysql_fetch_row ( res ) ) )
     {
         ulong* inLengths = mysql_fetch_lengths ( res );
 
