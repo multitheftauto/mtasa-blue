@@ -243,6 +243,9 @@ bool CDatabaseConnectionMySql::Query ( const SString& strQuery, CRegistryResult&
             char* inData = inRow[i];
             ulong inLength = inLengths[i];
 
+            if ( !inData )
+                cell.nType = SQLITE_NULL;
+
             switch ( cell.nType )
             {
                 case SQLITE_NULL:
