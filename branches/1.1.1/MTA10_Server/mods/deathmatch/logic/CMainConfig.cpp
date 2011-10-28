@@ -344,11 +344,11 @@ bool CMainConfig::Load ( void )
 
     // Grab the global databases path
     if ( GetString ( m_pRootNode, "global_databases_path", strBuffer, 1, 255 ) != IS_SUCCESS )
-        strBuffer = "databases";
+        strBuffer = "databases/global";
     if ( !IsValidFilePath ( strBuffer.c_str () ) )
     {
-        CLogger::ErrorPrintf ( "global_databases_path is not valid. Defaulting to 'databases'\n" );
-        strBuffer = "databases";
+        CLogger::ErrorPrintf ( "global_databases_path is not valid. Defaulting to 'databases/global'\n" );
+        strBuffer = "databases/global";
     }
     m_strDatabasesPath = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
 
