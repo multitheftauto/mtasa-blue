@@ -11,6 +11,7 @@ INCLUDES += -I$(srcdir)/../../../vendor/pme/
 INCLUDES += -I$(srcdir)/../../../vendor/json-c/
 INCLUDES += -I$(srcdir)/../../../vendor/bob_withers/
 INCLUDES += -I$(srcdir)/../../../vendor/bochs/
+INCLUDES += -I$(srcdir)/../../../vendor/mysql/include/
 INCLUDES += -I$(srcdir)/../../../Shared/animation/
 INCLUDES += -I$(ZIPDIR)/
 INCLUDES += -I$(LUADIR)/src
