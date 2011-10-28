@@ -512,6 +512,7 @@ DontInstallRedist:
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\pthreadVC2.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\sqlite3.dll"
+		File "${SERVER_FILES_ROOT}\mods\deathmatch\libmysql.dll"
 		
 		;Only overwrite the following files if previous versions were bugged and explicitly need replacing
 		!insertmacro FileIfMD5 "${SERVER_FILES_ROOT}\mods\deathmatch\editor_acl.xml" "711185d8f4ebb355542053ce408b82b3"
@@ -770,6 +771,7 @@ Section Uninstall
 			Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
 			Delete "$INSTDIR\server\mods\deathmatch\pthreadVC2.dll"
 			Delete "$INSTDIR\server\mods\deathmatch\sqlite3.dll"
+			Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
 		!endif
 
 		Delete "$INSTDIR\Multi Theft Auto.exe"
