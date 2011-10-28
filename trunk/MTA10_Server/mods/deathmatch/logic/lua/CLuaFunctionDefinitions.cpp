@@ -10604,8 +10604,6 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
             for ( int j = 0; j < Result.nColumns; j++ )
             {
                 const CRegistryResultCell& cell = Result.Data[i][j];
-                if ( cell.nType == SQLITE_NULL )
-                    continue;
 
                 // Push the column name
                 lua_pushlstring ( luaVM, Result.ColNames[j].c_str (), Result.ColNames[j].size () );
@@ -10624,7 +10622,7 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
                         lua_pushlstring ( luaVM, (char *)cell.pVal, cell.nLength - 1 );
                         break;
                     default:
-                        lua_pushnil ( luaVM );
+                        lua_pushboolean ( luaVM, false );
                 }
                 lua_settable ( luaVM, -3 );
             }
