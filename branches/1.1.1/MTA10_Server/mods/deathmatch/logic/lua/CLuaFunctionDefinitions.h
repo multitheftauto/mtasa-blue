@@ -467,6 +467,7 @@ public:
 
     // Database funcs
     static int      DbConnect                           ( lua_State* luaVM );
+    static int      DbExec                              ( lua_State* luaVM );
     static int      DbQuery                             ( lua_State* luaVM );
     static int      DbFree                              ( lua_State* luaVM );
     static int      DbPoll                              ( lua_State* luaVM );

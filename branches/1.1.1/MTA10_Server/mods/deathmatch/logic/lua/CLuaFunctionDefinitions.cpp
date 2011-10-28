@@ -10385,7 +10385,7 @@ int CLuaFunctionDefinitions::DbConnect ( lua_State* luaVM )
                         lua_pushboolean ( luaVM, false );
                         return 1;
                     }
-                    strHost = PathJoin ( g_pGame->GetConfig ()->GetDatabasesPath (), strHost );
+                    strHost = PathJoin ( g_pGame->GetConfig ()->GetGlobalDatabasesPath (), strHost );
                 }
                 else
                 {
@@ -10492,6 +10492,36 @@ int CLuaFunctionDefinitions::DbQuery ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::DbExec ( lua_State* luaVM )
+{
+//  bool dbExec ( element connection, string query, ... )
+    CDatabaseConnectionElement* pElement; SString strQuery; CLuaArguments Args;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadString ( strQuery );
+    argStream.ReadLuaArguments ( Args );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Start async query
+        if ( !g_pGame->GetDatabaseManager ()->Exec ( pElement->GetConnectionHandle (), strQuery, &Args ) )
+        {
+            m_pScriptDebugging->LogWarning ( luaVM, "dbExec failed; %s", *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dbExec", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::DbFree ( lua_State* luaVM )
 {
 //  bool dbFree ( handle query )
@@ -10551,8 +10581,6 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
             for ( int j = 0; j < Result.nColumns; j++ )
             {
                 const CRegistryResultCell& cell = Result.Data[i][j];
-                if ( cell.nType == SQLITE_NULL )
-                    continue;
 
                 // Push the column name
                 lua_pushlstring ( luaVM, Result.ColNames[j].c_str (), Result.ColNames[j].size () );
@@ -10571,7 +10599,7 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
                         lua_pushlstring ( luaVM, (char *)cell.pVal, cell.nLength - 1 );
                         break;
                     default:
-                        lua_pushnil ( luaVM );
+                        lua_pushboolean ( luaVM, false );
                 }
                 lua_settable ( luaVM, -3 );
             }

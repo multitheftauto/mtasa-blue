@@ -32,6 +32,8 @@ struct SStatData
     } lightsync;
 
     bool bFunctionTimingActive;
+    int iDbJobDataCount;
+    int iDbConnectionCount;
 };
 
 extern SStatData* g_pStats;

@@ -653,6 +653,7 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Database funcs
     CLuaCFunctions::AddFunction ( "dbConnect", CLuaFunctionDefinitions::DbConnect );
+    CLuaCFunctions::AddFunction ( "dbExec", CLuaFunctionDefinitions::DbExec );
     CLuaCFunctions::AddFunction ( "dbQuery", CLuaFunctionDefinitions::DbQuery );
     CLuaCFunctions::AddFunction ( "dbFree", CLuaFunctionDefinitions::DbFree );
     CLuaCFunctions::AddFunction ( "dbPoll", CLuaFunctionDefinitions::DbPoll );
