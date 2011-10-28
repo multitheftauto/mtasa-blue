@@ -117,11 +117,11 @@ void CDatabaseTypeMySql::NotifyConnectionDeleted ( CDatabaseConnection* pConnect
 CDatabaseConnection* CDatabaseTypeMySql::Connect ( const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions )
 {
     // Parse options
-    int bShareConnection = true;
+    int bShareConnection = false;
     {
         CArgMap argMap ( "=", ";" );
         argMap.SetFromString ( strOptions );
-        argMap.Get ( "share", bShareConnection, 1 );
+        argMap.Get ( "share", bShareConnection, 0 );
     }
 
     CDatabaseConnection* pConnection = NULL;
