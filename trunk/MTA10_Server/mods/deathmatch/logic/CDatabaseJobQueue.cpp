@@ -95,13 +95,15 @@ protected:
     std::map < SDbJobId, CDbJobData* >  m_ActiveJobHandles;
     std::set < CDbJobData* >            m_IgnoreResultList;
     std::set < CDbJobData* >            m_FinishedList;         // Result has been used, will be deleted next pulse
-    uint                                m_uiJobHighCount;
+    uint                                m_uiJobCountWarnThresh;
+    uint                                m_uiJobCount10sMin;
+    CElapsedTime                        m_JobCountElpasedTime;
 
     // Other thread variables
     SConnectionHandle                                       m_ConnectionHandleCounter;
     std::map < SConnectionHandle, CDatabaseConnection* >    m_HandleConnectionMap;
     std::map < SString, CDatabaseType* >                    m_DatabaseTypeMap;
-    uint                                                    m_uiConnectionHighCount;
+    uint                                                    m_uiConnectionCountWarnThresh;
 
     // Shared variables
     struct
@@ -132,8 +134,8 @@ CDatabaseJobQueue* NewDatabaseJobQueue ( void )
 //
 ///////////////////////////////////////////////////////////////
 CDatabaseJobQueueImpl::CDatabaseJobQueueImpl ( void )
-    : m_uiJobHighCount ( 10 )
-    , m_uiConnectionHighCount ( 10 )
+    : m_uiJobCountWarnThresh ( 10 )
+    , m_uiConnectionCountWarnThresh ( 10 )
 {
     // Add known database types
     CDatabaseType* pDatabaseTypeSqlite = NewDatabaseTypeSqlite ();
@@ -212,13 +214,7 @@ CDbJobData* CDatabaseJobQueueImpl::GetNewJobData ( void )
     }
     while ( MapContains ( m_ActiveJobHandles, m_JobHandleCounter ) );
 
-    // Keep track of number of job handles
-    if ( m_ActiveJobHandles.size () > m_uiJobHighCount )
-    {
-        m_uiJobHighCount = m_ActiveJobHandles.size () * 2;
-        CLogger::LogPrintf ( "Notice: There are now %d job handles\n", m_ActiveJobHandles.size () );
-    }
-
+    g_pStats->iDbJobDataCount++;
     CDbJobData* pJobData = new CDbJobData ( m_JobHandleCounter );
     MapSet ( m_ActiveJobHandles, pJobData->GetId (), pJobData );
     return pJobData;
@@ -278,6 +274,7 @@ again:
         MapRemove ( m_ActiveJobHandles, pJobData->GetId () );
         SAFE_DELETE( pJobData->pLuaCallback );
         SAFE_DELETE( pJobData );
+        g_pStats->iDbJobDataCount--;
     }
 
     // Remove ignored
@@ -303,6 +300,18 @@ again:
 
     shared.m_CS.Unlock ();
 
+    // Determine min query count over 10 seconds
+    if ( m_JobCountElpasedTime.Get () > 10000 )
+    {
+        if ( m_uiJobCount10sMin > m_uiJobCountWarnThresh )
+        {
+            m_uiJobCountWarnThresh = m_uiJobCount10sMin * 2;
+            CLogger::LogPrintf ( "Notice: There are now %d job handles\n", m_uiJobCount10sMin );
+        }
+        m_JobCountElpasedTime.Reset ();
+        m_uiJobCount10sMin = m_ActiveJobHandles.size ();
+    }
+    m_uiJobCount10sMin = Min ( m_uiJobCount10sMin, m_ActiveJobHandles.size () );
 }
 
 
@@ -683,9 +692,9 @@ SConnectionHandle CDatabaseJobQueueImpl::GetNextConnectionHandle ( void )
     while ( MapContains ( m_HandleConnectionMap, m_ConnectionHandleCounter ) );
 
     // Keep track of number of database connections
-    if ( m_HandleConnectionMap.size () > m_uiConnectionHighCount )
+    if ( m_HandleConnectionMap.size () > m_uiConnectionCountWarnThresh )
     {
-        m_uiConnectionHighCount = m_HandleConnectionMap.size () * 2;
+        m_uiConnectionCountWarnThresh = m_HandleConnectionMap.size () * 2;
         CLogger::LogPrintf ( "Notice: There are now %d database connections\n", m_HandleConnectionMap.size () );
     }
 

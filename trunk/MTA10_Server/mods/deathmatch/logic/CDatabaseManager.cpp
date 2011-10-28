@@ -13,6 +13,8 @@
 #include "CDatabaseJobQueue.h"
 SString InsertQueryArgumentsSqlite ( const SString& strQuery, CLuaArguments* pArgs );
 SString InsertQueryArgumentsMySql ( const SString& strQuery, CLuaArguments* pArgs );
+SString InsertQueryArgumentsSqlite ( const char* szQuery, va_list vl );
+SString InsertQueryArgumentsMySql ( const char* szQuery, va_list vl );
 
 
 ///////////////////////////////////////////////////////////////
@@ -32,7 +34,10 @@ public:
     virtual void                    DoPulse                     ( void );
     virtual SConnectionHandle       Connect                     ( const SString& strType, const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions );
     virtual bool                    Disconnect                  ( SConnectionHandle hConnection );
+    virtual bool                    Exec                        ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
+    virtual bool                    Execf                       ( SConnectionHandle hConnection, const char* szQuery, ... );
     virtual CDbJobData*             QueryStart                  ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
+    virtual CDbJobData*             QueryStartf                 ( SConnectionHandle hConnection, const char* szQuery, ... );
     virtual bool                    QueryPoll                   ( CDbJobData* pJobData, ulong ulTimeout );
     virtual bool                    QueryFree                   ( CDbJobData* pJobData );
     virtual CDbJobData*             GetQueryFromId              ( SDbJobId id );
@@ -40,6 +45,7 @@ public:
 
     // CDatabaseManagerImpl
     SString                         InsertQueryArguments        ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
+    SString                         InsertQueryArguments        ( SConnectionHandle hConnection, const char* szQuery, va_list vl );
     void                            ClearLastErrorMessage       ( void )                    { m_strLastErrorMessage.clear (); }
     void                            SetLastErrorMessage         ( const SString& strMsg )   { m_strLastErrorMessage = strMsg; }
 
@@ -80,6 +86,11 @@ CDatabaseManagerImpl::CDatabaseManagerImpl ( void )
 ///////////////////////////////////////////////////////////////
 CDatabaseManagerImpl::~CDatabaseManagerImpl ( void )
 {
+    // Disconnect all active connections
+    std::map < SConnectionHandle, SString > connectionTypeMapCopy = m_ConnectionTypeMap;
+    for ( std::map < SConnectionHandle, SString >::iterator iter = connectionTypeMapCopy.begin () ; iter != connectionTypeMapCopy.end () ; iter++ )
+            Disconnect ( iter->first );
+
     SAFE_DELETE ( m_JobQueue );
 }
 
@@ -173,9 +184,72 @@ bool CDatabaseManagerImpl::Disconnect ( uint hConnection )
 
 ///////////////////////////////////////////////////////////////
 //
+// CDatabaseManagerImpl::Exec
+//
+// Start a query and ignore the result
+//
+///////////////////////////////////////////////////////////////
+bool CDatabaseManagerImpl::Exec ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs )
+{
+    ClearLastErrorMessage ();
+
+    // Check connection
+    if ( !MapContains ( m_ConnectionTypeMap, hConnection ) )
+    {
+        SetLastErrorMessage ( "Invalid connection" );
+        return false;
+    }
+
+    // Insert arguments with correct escapement
+    SString strEscapedQuery = InsertQueryArguments ( hConnection, strQuery, pArgs );
+
+    // Start query
+    CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
+
+    // Ignore result
+    m_JobQueue->FreeCommand ( pJobData );
+    return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseManagerImpl::Execf
+//
+//
+//
+///////////////////////////////////////////////////////////////
+bool CDatabaseManagerImpl::Execf ( SConnectionHandle hConnection, const char* szQuery, ... )
+{
+    va_list vl;
+    va_start ( vl, szQuery );
+
+    ClearLastErrorMessage ();
+
+    // Check connection
+    if ( !MapContains ( m_ConnectionTypeMap, hConnection ) )
+    {
+        SetLastErrorMessage ( "Invalid connection" );
+        return false;
+    }
+
+    // Insert arguments with correct escapement
+    SString strEscapedQuery = InsertQueryArguments ( hConnection, szQuery, vl );
+
+    // Start query
+    CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
+
+    // Ignore result
+    m_JobQueue->FreeCommand ( pJobData );
+    return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CDatabaseManagerImpl::QueryStart
 //
-//
+// Start a query
 //
 ///////////////////////////////////////////////////////////////
 CDbJobData* CDatabaseManagerImpl::QueryStart ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs )
@@ -186,15 +260,43 @@ CDbJobData* CDatabaseManagerImpl::QueryStart ( SConnectionHandle hConnection, co
     if ( !MapContains ( m_ConnectionTypeMap, hConnection ) )
     {
         SetLastErrorMessage ( "Invalid connection" );
-        return INVALID_DB_HANDLE;
+        return NULL;
     }
 
     // Insert arguments with correct escapement
     SString strEscapedQuery = InsertQueryArguments ( hConnection, strQuery, pArgs );
 
     // Start query
-    CDbJobData* jobHandle = m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
-    return jobHandle;
+    return m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseManagerImpl::QueryStartf
+//
+//
+//
+///////////////////////////////////////////////////////////////
+CDbJobData* CDatabaseManagerImpl::QueryStartf ( SConnectionHandle hConnection, const char* szQuery, ... )
+{
+    va_list vl;
+    va_start ( vl, szQuery );
+
+    ClearLastErrorMessage ();
+
+    // Check connection
+    if ( !MapContains ( m_ConnectionTypeMap, hConnection ) )
+    {
+        SetLastErrorMessage ( "Invalid connection" );
+        return NULL;
+    }
+
+    // Insert arguments with correct escapement
+    SString strEscapedQuery = InsertQueryArguments ( hConnection, szQuery, vl );
+
+    // Start query
+    return m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
 }
 
 
@@ -282,5 +384,30 @@ SString CDatabaseManagerImpl::InsertQueryArguments ( SConnectionHandle hConnecti
 
     // 'Helpful' error message
     CLogger::ErrorPrintf ( "DatabaseManager internal error #1" );
+    return "";
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseManagerImpl::InsertQueryArguments
+//
+// Insert arguments and apply correct escapement for the connection type
+//
+///////////////////////////////////////////////////////////////
+SString CDatabaseManagerImpl::InsertQueryArguments ( SConnectionHandle hConnection, const char* szQuery, va_list vl )
+{
+    // Determine connection type
+    SString* pstrType = MapFind ( m_ConnectionTypeMap, hConnection );
+    SString strType = pstrType ? *pstrType : "";
+
+    if ( strType == "sqlite" )
+        return InsertQueryArgumentsSqlite ( szQuery, vl );
+    else
+    if ( strType == "mysql" )
+        return InsertQueryArgumentsMySql ( szQuery, vl );
+
+    // 'Helpful' error message
+    CLogger::ErrorPrintf ( "DatabaseManager internal error #2" );
     return "";
 }

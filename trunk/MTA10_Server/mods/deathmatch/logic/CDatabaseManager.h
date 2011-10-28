@@ -9,8 +9,9 @@
 *
 *****************************************************************************/
 
-typedef uint SConnectionHandle;
+typedef uint SDbConnectionId;
 typedef uint SDbJobId;
+typedef SDbConnectionId SConnectionHandle;
 #define INVALID_DB_HANDLE (0)
 
 namespace EJobResult
@@ -100,9 +101,12 @@ public:
     virtual                         ~CDatabaseManager       ( void ) {}
 
     virtual void                    DoPulse                 ( void ) = 0;
-    virtual SConnectionHandle       Connect                 ( const SString& strType, const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions ) = 0;
+    virtual SConnectionHandle       Connect                 ( const SString& strType, const SString& strHost, const SString& strUsername = "", const SString& strPassword = "", const SString& strOptions = "" ) = 0;
     virtual bool                    Disconnect              ( SConnectionHandle hConnection ) = 0;
+    virtual bool                    Exec                    ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs ) = 0;
+    virtual bool                    Execf                   ( SConnectionHandle hConnection, const char* szQuery, ... ) = 0;
     virtual CDbJobData*             QueryStart              ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs ) = 0;
+    virtual CDbJobData*             QueryStartf             ( SConnectionHandle hConnection, const char* szQuery, ... ) = 0;
     virtual bool                    QueryPoll               ( CDbJobData* pJobData, ulong ulTimeout ) = 0;
     virtual bool                    QueryFree               ( CDbJobData* pJobData ) = 0;
     virtual CDbJobData*             GetQueryFromId          ( SDbJobId id ) = 0;

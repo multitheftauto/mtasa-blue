@@ -350,7 +350,17 @@ bool CMainConfig::Load ( void )
         CLogger::ErrorPrintf ( "global_databases_path is not valid. Defaulting to 'databases/global'\n" );
         strBuffer = "databases/global";
     }
-    m_strDatabasesPath = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
+    m_strGlobalDatabasesPath = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
+
+    // Grab the system databases path
+    if ( GetString ( m_pRootNode, "system_databases_path", strBuffer, 1, 255 ) != IS_SUCCESS )
+        strBuffer = "databases/system";
+    if ( !IsValidFilePath ( strBuffer.c_str () ) )
+    {
+        CLogger::ErrorPrintf ( "system_databases_path is not valid. Defaulting to 'databases/system'\n" );
+        strBuffer = "databases/system";
+    }
+    m_strSystemDatabasesPath = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
 
     GetBoolean ( m_pRootNode, "autologin", m_bAutoLogin );
 
