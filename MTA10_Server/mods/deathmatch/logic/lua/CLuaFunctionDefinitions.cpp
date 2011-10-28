@@ -10408,7 +10408,7 @@ int CLuaFunctionDefinitions::DbConnect ( lua_State* luaVM )
                         lua_pushboolean ( luaVM, false );
                         return 1;
                     }
-                    strHost = PathJoin ( g_pGame->GetConfig ()->GetDatabasesPath (), strHost );
+                    strHost = PathJoin ( g_pGame->GetConfig ()->GetGlobalDatabasesPath (), strHost );
                 }
                 else
                 {
@@ -10509,6 +10509,36 @@ int CLuaFunctionDefinitions::DbQuery ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dbQuery", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::DbExec ( lua_State* luaVM )
+{
+//  bool dbExec ( element connection, string query, ... )
+    CDatabaseConnectionElement* pElement; SString strQuery; CLuaArguments Args;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadString ( strQuery );
+    argStream.ReadLuaArguments ( Args );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Start async query
+        if ( !g_pGame->GetDatabaseManager ()->Exec ( pElement->GetConnectionHandle (), strQuery, &Args ) )
+        {
+            m_pScriptDebugging->LogWarning ( luaVM, "dbExec failed; %s", *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dbExec", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;

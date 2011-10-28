@@ -47,7 +47,7 @@ namespace
         BWSTAT_INDEX_COUNT,
     };
 
-    #define BW_STATS_TABLE_NAME     "`_perfstats_bandwidth_usage`"
+    #define BW_STATS_TABLE_NAME     "`perfstats_bandwidth_usage`"
 
     SString BWStatIndexNameList[] = {
                                         "Special",
@@ -124,6 +124,7 @@ public:
     SBandwidthStatistics        m_PrevLiveStats;
     long long                   m_llPrevHttpTotalBytesSent;
     std::vector < SNetStatHistoryType > m_History;
+    SDbConnectionId             m_DatabaseConnection;
 };
 
 
@@ -154,6 +155,8 @@ CPerfStatBandwidthUsage* CPerfStatBandwidthUsage::GetSingleton ()
 CPerfStatBandwidthUsageImpl::CPerfStatBandwidthUsageImpl ( void )
 {
     m_strCategoryName = "Bandwidth usage";
+    SString strDatabaseFilename = PathJoin ( g_pGame->GetConfig ()->GetSystemDatabasesPath (), "stats.db" );
+    m_DatabaseConnection = g_pGame->GetDatabaseManager ()->Connect ( "sqlite", strDatabaseFilename );
     LoadStats ();
 }
 
@@ -168,6 +171,7 @@ CPerfStatBandwidthUsageImpl::CPerfStatBandwidthUsageImpl ( void )
 CPerfStatBandwidthUsageImpl::~CPerfStatBandwidthUsageImpl ( void )
 {
     SaveStats ();
+    g_pGame->GetDatabaseManager ()->Disconnect ( m_DatabaseConnection );
 }
 
 ///////////////////////////////////////////////////////////////
@@ -219,12 +223,17 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
     }
 
     //
-    // Fetch table from registry
+    // Fetch table from database
     //
-    CRegistry* pRegistry = g_pGame->GetRegistry ();
+    CDatabaseManager* pDatabaseManager = g_pGame->GetDatabaseManager ();
 
-    CRegistryResult result;
-    pRegistry->Query ( &result, "SELECT `type`,`idx`,`GameRecv`,`GameSent`,`HttpSent` from " BW_STATS_TABLE_NAME );
+    CDbJobData* pJobData = pDatabaseManager->QueryStartf ( m_DatabaseConnection, "SELECT `type`,`idx`,`GameRecv`,`GameSent`,`HttpSent` from " BW_STATS_TABLE_NAME );
+    pDatabaseManager->QueryPoll ( pJobData, -1 );
+    CRegistryResult result = pJobData->result.registryResult;
+
+    // If data set is empty, try loading old data
+    if ( result.nRows == 0 )
+        g_pGame->GetRegistry ()->Query ( &result, "SELECT `type`,`idx`,`GameRecv`,`GameSent`,`HttpSent` from `_perfstats_bandwidth_usage`" );
 
     if ( result.nRows > 0 && result.nColumns >= 5 )
     {
@@ -278,9 +287,9 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
     //
     // (Re)create table to ensure it's in sync with what we have
     //
-    pRegistry->Query ( "DROP TABLE " BW_STATS_TABLE_NAME );
-    pRegistry->Query ( "CREATE TABLE IF NOT EXISTS " BW_STATS_TABLE_NAME " (`type` TEXT,`idx` INT, `GameRecv` REAL, `GameSent` REAL, `HttpSent` REAL)" );
-    pRegistry->Query ( "CREATE INDEX IF NOT EXISTS IDX_BW_STATS_TYPE_IDX on " BW_STATS_TABLE_NAME "(`type`,`idx`)" );
+    pDatabaseManager->Execf ( m_DatabaseConnection, "DROP TABLE " BW_STATS_TABLE_NAME );
+    pDatabaseManager->Execf ( m_DatabaseConnection, "CREATE TABLE IF NOT EXISTS " BW_STATS_TABLE_NAME " (`type` TEXT,`idx` INT, `GameRecv` REAL, `GameSent` REAL, `HttpSent` REAL)" );
+    pDatabaseManager->Execf ( m_DatabaseConnection, "CREATE INDEX IF NOT EXISTS IDX_BW_STATS_TYPE_IDX on " BW_STATS_TABLE_NAME "(`type`,`idx`)" );
 
     for ( uint t = 0 ; t < m_History.size () ; t++ )
     {
@@ -288,7 +297,8 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
 
         for ( uint r = 0 ; r < type.itemList.size () ; r++ )
         {
-            pRegistry->Query ( "INSERT INTO " BW_STATS_TABLE_NAME " (`type`,`idx`,`GameRecv`,`GameSent`,`HttpSent`) VALUES (?,?,?,?,?)"
+            pDatabaseManager->Execf ( m_DatabaseConnection, 
+                                                "INSERT INTO " BW_STATS_TABLE_NAME " (`type`,`idx`,`GameRecv`,`GameSent`,`HttpSent`) VALUES (?,?,?,?,?)"
                                                 , SQLITE_TEXT, *BWStatIndexToName ( t )
                                                 , SQLITE_INTEGER, r
                                                 , SQLITE_FLOAT, (float)type.itemList [ r ].llGameRecv
@@ -309,7 +319,7 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
 ///////////////////////////////////////////////////////////////
 void CPerfStatBandwidthUsageImpl::SaveStats ( void )
 {
-    CRegistry* pRegistry = g_pGame->GetRegistry ();
+    CDatabaseManager* pDatabaseManager = g_pGame->GetDatabaseManager ();
 
     for ( uint t = 0 ; t < m_History.size () ; t++ )
     {
@@ -321,7 +331,8 @@ void CPerfStatBandwidthUsageImpl::SaveStats ( void )
             if ( type.itemList [ r ].bDirty )
             {
                 type.itemList [ r ].bDirty = false;
-                pRegistry->Query ( "UPDATE " BW_STATS_TABLE_NAME " SET `GameRecv`=?,`GameSent`=?,`HttpSent`=? WHERE `type`=? AND `idx`=?"
+                pDatabaseManager->Execf ( m_DatabaseConnection,
+                                                        "UPDATE " BW_STATS_TABLE_NAME " SET `GameRecv`=?,`GameSent`=?,`HttpSent`=? WHERE `type`=? AND `idx`=?"
                                                         , SQLITE_FLOAT, (float)type.itemList [ r ].llGameRecv
                                                         , SQLITE_FLOAT, (float)type.itemList [ r ].llGameSent
                                                         , SQLITE_FLOAT, (float)type.itemList [ r ].llHttpSent

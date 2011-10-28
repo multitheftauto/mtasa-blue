@@ -64,6 +64,7 @@ CDatabaseConnectionSqlite::CDatabaseConnectionSqlite ( CDatabaseType* pManager, 
     : m_iRefCount ( 1 )
     , m_pManager ( pManager )
 {
+    g_pStats->iDbConnectionCount++;
     MakeSureDirExists ( strPath );
     if ( sqlite3_open ( strPath, &m_handle ) )
     {
@@ -89,6 +90,7 @@ CDatabaseConnectionSqlite::~CDatabaseConnectionSqlite ( void )
         sqlite3_close ( m_handle );
 
     m_pManager->NotifyConnectionDeleted ( this );
+    g_pStats->iDbConnectionCount--;
 }
 
 
@@ -251,9 +253,28 @@ bool CDatabaseConnectionSqlite::Query ( const SString& strQuery, CRegistryResult
 
 ///////////////////////////////////////////////////////////////
 //
+// SqliteEscape
+//
+// Apply Sqlite escapement to a string
+//
+///////////////////////////////////////////////////////////////
+static void SqliteEscape ( SString& strOutput, const char* szContent, uint uiLength )
+{
+    for ( uint i = 0 ; i < uiLength ; i++ )
+    {
+        const char c = szContent[i];
+        if ( c == '\'' )
+            strOutput += '\'';
+        strOutput += c;
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // InsertQueryArgumentsSqlite
 //
-// Insert arguments and apply sqlite escapement
+// Insert arguments and apply Sqlite escapement
 //
 ///////////////////////////////////////////////////////////////
 SString InsertQueryArgumentsSqlite ( const SString& strQuery, CLuaArguments* pArgs )
@@ -262,50 +283,113 @@ SString InsertQueryArgumentsSqlite ( const SString& strQuery, CLuaArguments* pAr
 
     // Walk through the query and replace the variable placeholders with the actual variables
     unsigned int uiLen = strQuery.length ();
-    unsigned int a = 0, type = 0;
-    const char *szContent = NULL;
-    char szBuffer[32] = {0};
-    for ( unsigned int i = 0; i < uiLen; i++ )
+    unsigned int a = 0;
+    for ( unsigned int i = 0 ; i < uiLen ; i++ )
     {
-        if ( strQuery.at(i) == SQL_VARIABLE_PLACEHOLDER ) {
-            // If the placeholder is found, replace it with the variable
-            CLuaArgument *pArgument = (*pArgs)[a++];
-
-            // Check the type of the argument and convert it to a string we can process
-            if ( pArgument ) {
-                type = pArgument->GetType ();
-                if ( type == LUA_TBOOLEAN ) {
-                    szContent = ( pArgument->GetBoolean() ) ? "true" : "false";
-                } else if ( type == LUA_TNUMBER ) {
-                    snprintf ( szBuffer, 31, "%f", pArgument->GetNumber () );
-                    szContent = szBuffer;
-                } else if ( type == LUA_TSTRING ) {
-                    szContent = pArgument->GetString ().c_str ();
-
-                    // If we have a string, add a quote at the beginning too
-                    strParsedQuery += '\'';
-                }
-            }
-
-            // Copy the string into the query, and escape the single quotes as well
-            if ( szContent ) {
-                for ( unsigned int k = 0; k < strlen ( szContent ); k++ ) {
-                    if ( szContent[k] == '\'' )
-                        strParsedQuery += '\'';
-                    strParsedQuery += szContent[k];
-                }
-                // If we have a string, add a quote at the end too
-                if ( type == LUA_TSTRING ) strParsedQuery += '\'';
-            } else {
-                // If we don't have any content, put just output 2 quotes to indicate an empty variable
-                strParsedQuery += "\'\'";
-            }
-
-        } else {
+        if ( strQuery[i] != SQL_VARIABLE_PLACEHOLDER )
+        {
             // If we found a normal character, copy it into the destination buffer
             strParsedQuery += strQuery[i];
         }
+        else
+        {
+            // If the placeholder is found, replace it with the variable
+            CLuaArgument* pArgument = (*pArgs)[a++];
+
+            // Check the type of the argument and convert it to a string we can process
+            uint type = pArgument ? pArgument->GetType () : LUA_TNONE;
+            if ( type == LUA_TBOOLEAN )
+            {
+                strParsedQuery += ( pArgument->GetBoolean() ) ? "1" : "0";
+            }
+            else
+            if ( type == LUA_TNUMBER )
+            {
+                strParsedQuery += SString ( "%f", pArgument->GetNumber () );
+            }
+            else
+            if ( type == LUA_TSTRING )
+            {
+                // Copy the string into the query, and escape '
+                strParsedQuery += '\'';
+                SqliteEscape ( strParsedQuery, pArgument->GetString ().c_str (), pArgument->GetString ().length () );
+                strParsedQuery += '\'';
+            }
+            else
+            {
+                // If we don't have any content, put just output 2 quotes to indicate an empty variable
+                strParsedQuery += "\'\'";
+            }
+        }
     }
 
+    return strParsedQuery;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// InsertQueryArgumentsSqlite
+//
+// Insert arguments and apply Sqlite escapement
+//
+///////////////////////////////////////////////////////////////
+SString InsertQueryArgumentsSqlite ( const char* szQuery, va_list vl )
+{
+    SString strParsedQuery;
+    for ( unsigned int i = 0 ; i < strlen ( szQuery ) ; i++ )
+    {
+        if ( szQuery[i] != SQL_VARIABLE_PLACEHOLDER )
+        {
+            strParsedQuery += szQuery[i];
+        }
+        else
+        {
+            switch ( va_arg( vl, int ) )
+            {
+                case SQLITE_INTEGER:
+                {
+                    int iValue = va_arg( vl, int );
+                    strParsedQuery += SString ( "%d", iValue );
+                }
+                break;
+
+                case SQLITE_FLOAT:
+                {
+                    double fValue = va_arg( vl, double );
+                    strParsedQuery += SString ( "%f", fValue );
+                }
+                break;
+
+                case SQLITE_TEXT:
+                {
+                    const char* szValue = va_arg( vl, const char* );
+                    assert ( szValue );
+                    strParsedQuery += '\'';
+                    SqliteEscape ( strParsedQuery, szValue, strlen ( szValue ) );
+                    strParsedQuery += '\'';
+                }
+                break;
+
+                case SQLITE_BLOB:
+                {
+                    strParsedQuery += "CANT_DO_BLOBS_M8";
+                }
+                break;
+
+                case SQLITE_NULL:
+                {
+                    strParsedQuery += "NULL";
+                }
+                break;
+
+                default:
+                    // someone passed a value without specifying its type
+                    assert ( 0 );
+                    break;
+            }
+        }
+    }
+    va_end ( vl );
     return strParsedQuery;
 }
