@@ -26,7 +26,7 @@ Var Install_Dir
 ; Don't forget to update the BUILD_NUMBER
 ; ###########################################################################################################
 !define FILES_ROOT "."
-!define BUILD_NUMBER "3113"
+!define BUILD_NUMBER "3333"
 !define PRODUCT_VERSION "Data-r${BUILD_NUMBER}"
 !define INSTALL_OUTPUT "mtasa-${0.0}-data-r${BUILD_NUMBER}.exe"
 ; ###########################################################################################################
@@ -152,8 +152,6 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sabankgothic.ttf"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sagothic.ttf"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\saheader.ttf"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.dat"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.tga"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.ttf"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\unifont-5.1.20080907.ttf"
 
@@ -170,6 +168,9 @@ Section "Data files" SEC01
 	SetOutPath "$INSTDIR\MTA\cgui\images\serverbrowser"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\serverbrowser\*.png"
 
+	SetOutPath "$INSTDIR\server\mods\deathmatch"
+	File "${FILES_ROOT}\MTA San Andreas\server\mods\deathmatch\libmysql.dll"
+	File "${FILES_ROOT}\MTA San Andreas\server\mods\deathmatch\pthreadVC2.dll"
 
 SectionEnd
 
