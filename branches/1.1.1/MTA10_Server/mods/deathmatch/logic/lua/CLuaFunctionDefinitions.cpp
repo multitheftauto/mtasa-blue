@@ -10566,7 +10566,9 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
         {
             m_pScriptDebugging->LogWarning ( luaVM, "dbPoll failed; %s", *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
             lua_pushboolean ( luaVM, false );
-            return 1;
+            lua_pushnumber ( luaVM, pJobData->result.strErrorCode );
+            lua_pushstring ( luaVM, pJobData->result.strReason );
+            return 3;
         }
 
         const CRegistryResult& Result = pJobData->result.registryResult;
@@ -10605,7 +10607,8 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
             }
             lua_pop ( luaVM, 1 );                               // pop the inner table
         }
-        return 1;
+        lua_pushnumber ( luaVM, pJobData->result.uiNumAffectedRows );
+        return 2;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dbPoll", *argStream.GetErrorMessage () ) );

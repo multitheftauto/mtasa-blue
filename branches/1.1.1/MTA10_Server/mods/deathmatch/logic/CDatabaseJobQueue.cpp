@@ -600,6 +600,7 @@ void CDatabaseJobQueueImpl::ProcessConnect ( CDbJobData* pJobData )
 
     if ( !pConnection->IsValid () )
     {
+        pJobData->result.status = EJobResult::FAIL;
         pJobData->result.strReason = pConnection->GetLastErrorMessage ();
         pConnection->Release ();
         return;
@@ -665,11 +666,13 @@ void CDatabaseJobQueueImpl::ProcessQuery ( CDbJobData* pJobData )
     {
         pJobData->result.status = EJobResult::FAIL;
         pJobData->result.strReason = pConnection->GetLastErrorMessage ();
+        pJobData->result.strErrorCode = pConnection->GetLastErrorCode ();
         return;
     }
 
     // Set result
     pJobData->result.status = EJobResult::SUCCESS;
+    pJobData->result.uiNumAffectedRows = pConnection->GetNumAffectedRows ();
 }
 
 
