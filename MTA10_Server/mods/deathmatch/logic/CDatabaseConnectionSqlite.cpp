@@ -29,18 +29,22 @@ public:
     // CDatabaseConnection
     virtual bool            IsValid                 ( void );
     virtual const SString&  GetLastErrorMessage     ( void );
+    virtual uint            GetLastErrorCode        ( void );
+    virtual uint            GetNumAffectedRows      ( void );
     virtual void            AddRef                  ( void );
     virtual void            Release                 ( void );
     virtual bool            Query                   ( const SString& strQuery, CRegistryResult& registryResult );
 
     // CDatabaseConnectionSqlite
-    void                    SetLastErrorMessage     ( const SString& strMessage, const SString& strQuery );
+    void                    SetLastError            ( uint uiCode, const SString& strMessage );
 
     int                     m_iRefCount;
     CDatabaseType*          m_pManager;
     sqlite3*                m_handle;
     bool                    m_bOpened;
     SString                 m_strLastErrorMessage;
+    uint                    m_uiLastErrorCode;
+    uint                    m_uiNumAffectedRows;
 };
 
 
@@ -68,7 +72,7 @@ CDatabaseConnectionSqlite::CDatabaseConnectionSqlite ( CDatabaseType* pManager, 
     MakeSureDirExists ( strPath );
     if ( sqlite3_open ( strPath, &m_handle ) )
     {
-        SetLastErrorMessage ( "Could not open SQLite3 database", sqlite3_errmsg ( m_handle ) );
+        SetLastError ( sqlite3_errcode ( m_handle ), sqlite3_errmsg ( m_handle ) );
     }
     else
     {
@@ -152,13 +156,40 @@ const SString& CDatabaseConnectionSqlite::GetLastErrorMessage ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CDatabaseConnectionSqlite::SetLastErrorMessage
+// CDatabaseConnectionSqlite::GetLastErrorMessage
+//
+// Only valid when IsValid() or Query() returns false
+//
+///////////////////////////////////////////////////////////////
+uint CDatabaseConnectionSqlite::GetLastErrorCode ( void )
+{
+    return m_uiLastErrorCode;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseConnectionSqlite::GetNumAffectedRows
+//
+// Only valid when Query() returns true
+//
+///////////////////////////////////////////////////////////////
+uint CDatabaseConnectionSqlite::GetNumAffectedRows ( void )
+{
+    return m_uiNumAffectedRows;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseConnectionSqlite::SetLastError
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseConnectionSqlite::SetLastErrorMessage ( const SString& strMessage, const SString& strQuery )
+void CDatabaseConnectionSqlite::SetLastError ( uint uiCode, const SString& strMessage )
 {
+    m_uiLastErrorCode = uiCode;
     m_strLastErrorMessage = strMessage;
 }
 
@@ -180,7 +211,7 @@ bool CDatabaseConnectionSqlite::Query ( const SString& strQuery, CRegistryResult
     sqlite3_stmt* pStmt;
     if ( sqlite3_prepare ( m_handle, szQuery, strlen ( szQuery ) + 1, &pStmt, NULL ) != SQLITE_OK )
     {
-        SetLastErrorMessage ( sqlite3_errmsg ( m_handle ), szQuery );
+        SetLastError ( sqlite3_errcode ( m_handle ), sqlite3_errmsg ( m_handle ) );
         return false;
     }
 
@@ -239,13 +270,16 @@ bool CDatabaseConnectionSqlite::Query ( const SString& strQuery, CRegistryResult
     // Did we leave the fetching loop because of an error?
     if ( status != SQLITE_DONE )
     {
-        SetLastErrorMessage ( sqlite3_errmsg ( m_handle ), szQuery );
+        SetLastError ( sqlite3_errcode ( m_handle ), sqlite3_errmsg ( m_handle ) );
         sqlite3_finalize ( pStmt );
         return false;
     }
 
     // All done
     sqlite3_finalize ( pStmt );
+
+    // Number of affects rows/num of rows like MySql
+    m_uiNumAffectedRows = pResult->nRows ? pResult->nRows : sqlite3_changes ( m_handle );
 
     return true;
 }

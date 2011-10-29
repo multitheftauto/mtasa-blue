@@ -30,12 +30,14 @@ public:
     // CDatabaseConnection
     virtual bool            IsValid                 ( void );
     virtual const SString&  GetLastErrorMessage     ( void );
+    virtual uint            GetLastErrorCode        ( void );
+    virtual uint            GetNumAffectedRows      ( void );
     virtual void            AddRef                  ( void );
     virtual void            Release                 ( void );
     virtual bool            Query                   ( const SString& strQuery, CRegistryResult& registryResult );
 
     // CDatabaseConnectionMySql
-    void                    SetLastErrorMessage     ( const SString& strMessage, const SString& strQuery );
+    void                    SetLastError            ( uint uiCode, const SString& strMessage );
     int                     ConvertToSqliteType     ( enum_field_types type );
 
     int                     m_iRefCount;
@@ -43,6 +45,8 @@ public:
     MYSQL*                  m_handle;
     bool                    m_bOpened;
     SString                 m_strLastErrorMessage;
+    uint                    m_uiLastErrorCode;
+    uint                    m_uiNumAffectedRows;
 };
 
 
@@ -90,7 +94,7 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql ( CDatabaseType* pManager, co
             m_bOpened = true;
         else
         {
-            SetLastErrorMessage ( "Error on connect", mysql_error ( m_handle ) );
+            SetLastError ( mysql_errno( m_handle ), mysql_error ( m_handle ) );
         }
     }
 }
@@ -174,14 +178,41 @@ const SString& CDatabaseConnectionMySql::GetLastErrorMessage ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CDatabaseConnectionMySql::SetLastErrorMessage
+// CDatabaseConnectionMySql::GetLastErrorCode
+//
+// Only valid when IsValid() or Query() returns false
+//
+///////////////////////////////////////////////////////////////
+uint CDatabaseConnectionMySql::GetLastErrorCode ( void )
+{
+    return m_uiLastErrorCode;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseConnectionMySql::SetLastError
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseConnectionMySql::SetLastErrorMessage ( const SString& strMessage, const SString& strQuery )
+void CDatabaseConnectionMySql::SetLastError ( uint uiCode, const SString& strMessage )
 {
+    m_uiLastErrorCode = uiCode;
     m_strLastErrorMessage = strMessage;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseConnectionMySql::GetNumAffectedRows
+//
+// Only valid when Query() returns true
+//
+///////////////////////////////////////////////////////////////
+uint CDatabaseConnectionMySql::GetNumAffectedRows ( void )
+{
+    return m_uiNumAffectedRows;
 }
 
 
@@ -200,11 +231,14 @@ bool CDatabaseConnectionMySql::Query ( const SString& strQuery, CRegistryResult&
     int status = mysql_real_query ( m_handle, strQuery, static_cast < unsigned long > ( strQuery.length () ) );
     if ( status )
     {
-        SetLastErrorMessage ( mysql_error ( m_handle ), strQuery );
+        SetLastError ( mysql_errno( m_handle ), mysql_error ( m_handle ) );
         return false;
     }
 
+
     MYSQL_RES* res = mysql_store_result ( m_handle );
+
+    m_uiNumAffectedRows = mysql_affected_rows ( m_handle );
 
     if ( !res )
     {
