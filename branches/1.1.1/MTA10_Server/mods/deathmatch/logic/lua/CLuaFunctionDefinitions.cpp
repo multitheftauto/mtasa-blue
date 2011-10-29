@@ -10449,12 +10449,24 @@ int CLuaFunctionDefinitions::DbConnect ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::DbQuery ( lua_State* luaVM )
 {
-//  handle dbQuery ( [ function callbackFunction, ] element connection, string query, ... )
-    CLuaFunctionRef iLuaFunction; CDatabaseConnectionElement* pElement; SString strQuery; CLuaArguments Args;
+//  handle dbQuery ( [ function callbackFunction, [ table callbackArguments, ] ] element connection, string query, ... )
+    CLuaFunctionRef iLuaFunction; CLuaArguments callbackArgs; CDatabaseConnectionElement* pElement; SString strQuery; CLuaArguments Args;
 
     CScriptArgReader argStream ( luaVM );
     if ( argStream.NextIsFunction () )
+    {
         argStream.ReadFunction ( iLuaFunction );
+        if ( argStream.NextIsTable () )
+        {
+            lua_pushnil ( luaVM );      // Loop through our table, beginning at the first key
+            while ( lua_next ( luaVM, argStream.m_iIndex ) != 0 )
+            {
+                callbackArgs.ReadArgument ( luaVM, -1 );    // Ignore the index at -2, and just read the value
+                lua_pop ( luaVM, 1 );                       // Remove the item and keep the key for the next iteration
+            }
+            argStream.m_iIndex++;
+        }
+    }
     argStream.ReadUserData ( pElement );
     argStream.ReadString ( strQuery );
     argStream.ReadLuaArguments ( Args );
@@ -10478,6 +10490,7 @@ int CLuaFunctionDefinitions::DbQuery ( lua_State* luaVM )
             {
                 CLuaArguments Arguments;
                 Arguments.PushUserData ( reinterpret_cast < void* > ( pJobData->GetId () ) );
+                Arguments.PushArguments ( callbackArgs );
                 pJobData->pLuaCallback = new CLuaCallback ( pLuaMain, iLuaFunction, Arguments );
             }
         }
