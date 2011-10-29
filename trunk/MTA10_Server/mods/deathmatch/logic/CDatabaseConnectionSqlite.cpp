@@ -327,6 +327,11 @@ SString InsertQueryArgumentsSqlite ( const SString& strQuery, CLuaArguments* pAr
         }
         else
         {
+            // Use ?? for unquoted strings
+            bool bUnquotedStrings = strQuery[i+1] == SQL_VARIABLE_PLACEHOLDER;
+            if ( bUnquotedStrings )
+                i++;
+
             // If the placeholder is found, replace it with the variable
             CLuaArgument* pArgument = (*pArgs)[a++];
 
@@ -345,9 +350,9 @@ SString InsertQueryArgumentsSqlite ( const SString& strQuery, CLuaArguments* pAr
             if ( type == LUA_TSTRING )
             {
                 // Copy the string into the query, and escape '
-                strParsedQuery += '\'';
+                if ( !bUnquotedStrings ) strParsedQuery += '\'';
                 SqliteEscape ( strParsedQuery, pArgument->GetString ().c_str (), pArgument->GetString ().length () );
-                strParsedQuery += '\'';
+                if ( !bUnquotedStrings ) strParsedQuery += '\'';
             }
             else
             {
@@ -379,6 +384,11 @@ SString InsertQueryArgumentsSqlite ( const char* szQuery, va_list vl )
         }
         else
         {
+            // Use ?? for unquoted strings
+            bool bUnquotedStrings = szQuery[i+1] == SQL_VARIABLE_PLACEHOLDER;
+            if ( bUnquotedStrings )
+                i++;
+
             switch ( va_arg( vl, int ) )
             {
                 case SQLITE_INTEGER:
@@ -399,9 +409,9 @@ SString InsertQueryArgumentsSqlite ( const char* szQuery, va_list vl )
                 {
                     const char* szValue = va_arg( vl, const char* );
                     assert ( szValue );
-                    strParsedQuery += '\'';
+                    if ( !bUnquotedStrings ) strParsedQuery += '\'';
                     SqliteEscape ( strParsedQuery, szValue, strlen ( szValue ) );
-                    strParsedQuery += '\'';
+                    if ( !bUnquotedStrings ) strParsedQuery += '\'';
                 }
                 break;
 
