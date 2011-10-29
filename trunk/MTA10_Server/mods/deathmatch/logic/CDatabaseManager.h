@@ -77,8 +77,10 @@ public:
     struct
     {
         EJobResultType      status;
+        uint                strErrorCode;
         SString             strReason;
         SConnectionHandle   connectionHandle;
+        uint                uiNumAffectedRows;
         CRegistryResult     registryResult;
     } result;
 };
