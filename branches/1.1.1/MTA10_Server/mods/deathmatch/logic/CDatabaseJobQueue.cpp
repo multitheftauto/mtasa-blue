@@ -507,15 +507,12 @@ void* CDatabaseJobQueueImpl::ThreadProc ( void )
 {
     while ( !shared.m_bTerminateThread )
     {
+        // TODO: Use wait instead of sleep
+        Sleep ( 1 );
+
         // Is there a waiting command?
         shared.m_CS.Lock ();
-        if ( shared.m_CommandQueue.empty () )
-        {
-            shared.m_CS.Unlock ();
-            // TODO: Use wait instead of sleep
-            Sleep ( 1 );
-        }
-        else
+        if ( !shared.m_CommandQueue.empty () )
         {
             // Get next command
             CDbJobData* pJobData = shared.m_CommandQueue.front ();
@@ -536,8 +533,8 @@ void* CDatabaseJobQueueImpl::ThreadProc ( void )
                 pJobData->stage = EJobStage::RESULT;
                 shared.m_ResultQueue.push_back ( pJobData );
             }
-            shared.m_CS.Unlock ();
         }
+        shared.m_CS.Unlock ();
     }
 
     shared.m_bThreadTerminated = true;
