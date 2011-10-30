@@ -35,9 +35,13 @@ public:
     virtual void            AddRef                  ( void );
     virtual void            Release                 ( void );
     virtual bool            Query                   ( const SString& strQuery, CRegistryResult& registryResult );
+    virtual void            Flush                   ( void );
 
     // CDatabaseConnectionMySql
     void                    SetLastError            ( uint uiCode, const SString& strMessage );
+    bool                    QueryInternal           ( const SString& strQuery, CRegistryResult& registryResult );
+    void                    BeginAutomaticTransaction ( void );
+    void                    EndAutomaticTransaction ( void );
     int                     ConvertToSqliteType     ( enum_field_types type );
 
     int                     m_iRefCount;
@@ -47,6 +51,9 @@ public:
     SString                 m_strLastErrorMessage;
     uint                    m_uiLastErrorCode;
     uint                    m_uiNumAffectedRows;
+    int                     m_bAutomaticTransactionsEnabled;
+    bool                    m_bInAutomaticTransaction;
+    CTickCount              m_AutomaticTransactionStartTime;
 };
 
 
@@ -70,6 +77,13 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql ( CDatabaseType* pManager, co
     : m_iRefCount ( 1 )
     , m_pManager ( pManager )
 {
+    g_pStats->iDbConnectionCount++;
+
+    // Parse options string
+    CArgMap optionsMap ( "=", ";" );
+    optionsMap.SetFromString ( strOptions );
+    optionsMap.Get ( "batch", m_bAutomaticTransactionsEnabled, 1 );
+
     SString strHostname;
     SString strDatabaseName;
     int iPort = 0;
@@ -117,6 +131,7 @@ CDatabaseConnectionMySql::~CDatabaseConnectionMySql ( void )
     }
 
     m_pManager->NotifyConnectionDeleted ( this );
+    g_pStats->iDbConnectionCount--;
 }
 
 
@@ -220,11 +235,25 @@ uint CDatabaseConnectionMySql::GetNumAffectedRows ( void )
 //
 // CDatabaseConnectionMySql::Query
 //
+//
+//
+///////////////////////////////////////////////////////////////
+bool CDatabaseConnectionMySql::Query ( const SString& strQuery, CRegistryResult& registryResult )
+{
+    BeginAutomaticTransaction ();
+    return QueryInternal ( strQuery, registryResult );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseConnectionMySql::QueryInternal
+//
 // Return false on error
 // Return true with datum in registryResult on success
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseConnectionMySql::Query ( const SString& strQuery, CRegistryResult& registryResult )
+bool CDatabaseConnectionMySql::QueryInternal ( const SString& strQuery, CRegistryResult& registryResult )
 {
     CRegistryResult* pResult = &registryResult;
 
@@ -313,6 +342,62 @@ bool CDatabaseConnectionMySql::Query ( const SString& strQuery, CRegistryResult&
     }
 
     return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseConnectionMySql::BeginAutomaticTransaction
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseConnectionMySql::BeginAutomaticTransaction ( void )
+{
+    if ( m_bInAutomaticTransaction )
+    {
+        // If it's been a little while since this transaction was started, consider renewing it
+        if ( ( CTickCount::Now () - m_AutomaticTransactionStartTime ).ToLongLong () > 500 )
+            EndAutomaticTransaction ();
+    }
+    if ( !m_bInAutomaticTransaction && m_bAutomaticTransactionsEnabled )
+    {
+        m_bInAutomaticTransaction = true;
+        m_AutomaticTransactionStartTime = CTickCount::Now ();
+        CRegistryResult dummy;
+        QueryInternal ( "SET autocommit = 0", dummy );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseConnectionMySql::EndAutomaticTransaction
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseConnectionMySql::EndAutomaticTransaction ( void )
+{
+    if ( m_bInAutomaticTransaction )
+    {
+        m_bInAutomaticTransaction = false;
+        CRegistryResult dummy;
+        QueryInternal ( "SET autocommit = 1", dummy );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseConnectionMySql::Flush
+//
+// Flush caches
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseConnectionMySql::Flush ( void )
+{
+    EndAutomaticTransaction ();
 }
 
 
