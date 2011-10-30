@@ -49,6 +49,7 @@ public:
     virtual void            AddRef                  ( void ) = 0;
     virtual void            Release                 ( void ) = 0;
     virtual bool            Query                   ( const SString& strQuery, CRegistryResult& registryResult ) = 0;
+    virtual void            Flush                   ( void ) = 0;
 };
 
 

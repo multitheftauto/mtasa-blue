@@ -34,9 +34,13 @@ public:
     virtual void            AddRef                  ( void );
     virtual void            Release                 ( void );
     virtual bool            Query                   ( const SString& strQuery, CRegistryResult& registryResult );
+    virtual void            Flush                   ( void );
 
     // CDatabaseConnectionSqlite
     void                    SetLastError            ( uint uiCode, const SString& strMessage );
+    bool                    QueryInternal           ( const SString& strQuery, CRegistryResult& registryResult );
+    void                    BeginAutomaticTransaction ( void );
+    void                    EndAutomaticTransaction ( void );
 
     int                     m_iRefCount;
     CDatabaseType*          m_pManager;
@@ -45,6 +49,9 @@ public:
     SString                 m_strLastErrorMessage;
     uint                    m_uiLastErrorCode;
     uint                    m_uiNumAffectedRows;
+    int                     m_bAutomaticTransactionsEnabled;
+    bool                    m_bInAutomaticTransaction;
+    CTickCount              m_AutomaticTransactionStartTime;
 };
 
 
@@ -69,6 +76,12 @@ CDatabaseConnectionSqlite::CDatabaseConnectionSqlite ( CDatabaseType* pManager, 
     , m_pManager ( pManager )
 {
     g_pStats->iDbConnectionCount++;
+
+    // Parse options string
+    CArgMap optionsMap ( "=", ";" );
+    optionsMap.SetFromString ( strOptions );
+    optionsMap.Get ( "batch", m_bAutomaticTransactionsEnabled, 1 );
+
     MakeSureDirExists ( strPath );
     if ( sqlite3_open ( strPath, &m_handle ) )
     {
@@ -169,19 +182,6 @@ uint CDatabaseConnectionSqlite::GetLastErrorCode ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CDatabaseConnectionSqlite::GetNumAffectedRows
-//
-// Only valid when Query() returns true
-//
-///////////////////////////////////////////////////////////////
-uint CDatabaseConnectionSqlite::GetNumAffectedRows ( void )
-{
-    return m_uiNumAffectedRows;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
 // CDatabaseConnectionSqlite::SetLastError
 //
 //
@@ -196,13 +196,40 @@ void CDatabaseConnectionSqlite::SetLastError ( uint uiCode, const SString& strMe
 
 ///////////////////////////////////////////////////////////////
 //
+// CDatabaseConnectionSqlite::GetNumAffectedRows
+//
+// Only valid when Query() returns true
+//
+///////////////////////////////////////////////////////////////
+uint CDatabaseConnectionSqlite::GetNumAffectedRows ( void )
+{
+    return m_uiNumAffectedRows;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CDatabaseConnectionSqlite::Query
+//
+//
+//
+///////////////////////////////////////////////////////////////
+bool CDatabaseConnectionSqlite::Query ( const SString& strQuery, CRegistryResult& registryResult )
+{
+    BeginAutomaticTransaction ();
+    return QueryInternal ( strQuery, registryResult );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseConnectionSqlite::QueryInternal
 //
 // Return false on error
 // Return true with datum in registryResult on success
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseConnectionSqlite::Query ( const SString& strQuery, CRegistryResult& registryResult )
+bool CDatabaseConnectionSqlite::QueryInternal ( const SString& strQuery, CRegistryResult& registryResult )
 {
     const char* szQuery = strQuery;
     CRegistryResult* pResult = &registryResult;
@@ -282,6 +309,62 @@ bool CDatabaseConnectionSqlite::Query ( const SString& strQuery, CRegistryResult
     m_uiNumAffectedRows = pResult->nRows ? pResult->nRows : sqlite3_changes ( m_handle );
 
     return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseConnectionSqlite::BeginAutomaticTransaction
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseConnectionSqlite::BeginAutomaticTransaction ( void )
+{
+    if ( m_bInAutomaticTransaction )
+    {
+        // If it's been a little while since this transaction was started, consider renewing it
+        if ( ( CTickCount::Now () - m_AutomaticTransactionStartTime ).ToLongLong () > 500 )
+            EndAutomaticTransaction ();
+    }
+    if ( !m_bInAutomaticTransaction && m_bAutomaticTransactionsEnabled )
+    {
+        m_bInAutomaticTransaction = true;
+        m_AutomaticTransactionStartTime = CTickCount::Now ();
+        CRegistryResult dummy;
+        QueryInternal ( "BEGIN TRANSACTION", dummy );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseConnectionSqlite::EndAutomaticTransaction
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseConnectionSqlite::EndAutomaticTransaction ( void )
+{
+    if ( m_bInAutomaticTransaction )
+    {
+        m_bInAutomaticTransaction = false;
+        CRegistryResult dummy;
+        QueryInternal ( "END TRANSACTION", dummy );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseConnectionSqlite::Flush
+//
+// Flush caches
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseConnectionSqlite::Flush ( void )
+{
+    EndAutomaticTransaction ();
 }
 
 

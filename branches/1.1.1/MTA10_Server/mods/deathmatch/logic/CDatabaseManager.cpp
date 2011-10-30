@@ -38,7 +38,7 @@ public:
     virtual bool                    Execf                       ( SConnectionHandle hConnection, const char* szQuery, ... );
     virtual CDbJobData*             QueryStart                  ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
     virtual CDbJobData*             QueryStartf                 ( SConnectionHandle hConnection, const char* szQuery, ... );
-    virtual bool                    QueryPoll                   ( CDbJobData* pJobData, ulong ulTimeout );
+    virtual bool                    QueryPoll                   ( CDbJobData* pJobData, uint ulTimeout );
     virtual bool                    QueryFree                   ( CDbJobData* pJobData );
     virtual CDbJobData*             GetQueryFromId              ( SDbJobId id );
     virtual const SString&          GetLastErrorMessage         ( void )                    { return m_strLastErrorMessage; }
@@ -125,10 +125,7 @@ uint CDatabaseManagerImpl::Connect ( const SString& strType, const SString& strH
     CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::CONNECT, 0, strCombo );
 
     // Complete connect
-    while ( !m_JobQueue->PollCommand ( pJobData ) )
-    {
-        Sleep ( 1 );
-    }
+    m_JobQueue->PollCommand ( pJobData, -1 );
 
     // Check for problems
     if ( pJobData->result.status == EJobResult::FAIL )
@@ -165,8 +162,7 @@ bool CDatabaseManagerImpl::Disconnect ( uint hConnection )
     CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::DISCONNECT, hConnection, "" );
 
     // Complete disconnect
-    while ( !m_JobQueue->PollCommand ( pJobData ) )
-        Sleep ( 1 );
+    m_JobQueue->PollCommand ( pJobData, -1 );
 
     // Check for problems
     if ( pJobData->result.status == EJobResult::FAIL )
@@ -306,28 +302,20 @@ CDbJobData* CDatabaseManagerImpl::QueryStartf ( SConnectionHandle hConnection, c
 //
 // ulTimeout = 0   -  No wait if not ready
 // ulTimeout > 0   -  Wait(ms) if not ready
-// ulTimeout = -1  -  Wait 49.7 days if not ready
+// ulTimeout = -1  -  Wait infinity+1 if not ready
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseManagerImpl::QueryPoll ( CDbJobData* pJobData, ulong ulTimeout )
+bool CDatabaseManagerImpl::QueryPoll ( CDbJobData* pJobData, uint ulTimeout )
 {
     ClearLastErrorMessage ();
 
-    while ( true )
+    if ( m_JobQueue->PollCommand ( pJobData, ulTimeout ) )
     {
-        if ( m_JobQueue->PollCommand ( pJobData ) )
-        {
-            if ( pJobData->result.status == EJobResult::FAIL )
-                SetLastErrorMessage ( pJobData->result.strReason );
-            return true;
-        }
-
-        if ( ulTimeout == 0 )
-            break;
-
-        ulTimeout--;
-        Sleep ( 1 );
+        if ( pJobData->result.status == EJobResult::FAIL )
+            SetLastErrorMessage ( pJobData->result.strReason );
+        return true;
     }
+
     return false;
 }
 
