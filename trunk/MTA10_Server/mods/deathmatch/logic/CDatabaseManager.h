@@ -109,7 +109,7 @@ public:
     virtual bool                    Execf                   ( SConnectionHandle hConnection, const char* szQuery, ... ) = 0;
     virtual CDbJobData*             QueryStart              ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs ) = 0;
     virtual CDbJobData*             QueryStartf             ( SConnectionHandle hConnection, const char* szQuery, ... ) = 0;
-    virtual bool                    QueryPoll               ( CDbJobData* pJobData, ulong ulTimeout ) = 0;
+    virtual bool                    QueryPoll               ( CDbJobData* pJobData, uint ulTimeout ) = 0;
     virtual bool                    QueryFree               ( CDbJobData* pJobData ) = 0;
     virtual CDbJobData*             GetQueryFromId          ( SDbJobId id ) = 0;
     virtual const SString&          GetLastErrorMessage     ( void ) = 0;
