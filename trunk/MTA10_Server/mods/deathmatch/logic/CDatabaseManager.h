@@ -32,6 +32,7 @@ namespace EJobCommand
         CONNECT,
         DISCONNECT,
         QUERY,
+        FLUSH,
     };
 };
 

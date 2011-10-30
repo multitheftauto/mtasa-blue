@@ -146,6 +146,7 @@ protected:
     void                        ProcessConnect              ( CDbJobData* pJobData );
     void                        ProcessDisconnect           ( CDbJobData* pJobData );
     void                        ProcessQuery                ( CDbJobData* pJobData );
+    void                        ProcessFlush                ( CDbJobData* pJobData );
     uint                        MakeHandleForConnection     ( CDatabaseConnection* pConnection );
     CDatabaseConnection*        GetConnectionFromHandle     ( SConnectionHandle connectionHandle );
     void                        RemoveHandleForConnection   ( SConnectionHandle connectionHandle, CDatabaseConnection* pConnection );
@@ -160,6 +161,7 @@ protected:
     uint                                m_uiJobCountWarnThresh;
     uint                                m_uiJobCount10sMin;
     CElapsedTime                        m_JobCountElpasedTime;
+    std::set < SConnectionHandle >      m_PendingFlushMap;
 
     // Other thread variables
     SConnectionHandle                                       m_ConnectionHandleCounter;
@@ -296,6 +298,10 @@ CDbJobData* CDatabaseJobQueueImpl::GetNewJobData ( void )
 ///////////////////////////////////////////////////////////////
 CDbJobData* CDatabaseJobQueueImpl::AddCommand ( EJobCommandType jobType, SConnectionHandle connectionHandle, const SString& strData )
 {
+    // Add connection handle to the flush todo list
+    if ( jobType == EJobCommand::QUERY )
+        MapInsert ( m_PendingFlushMap, connectionHandle );
+
     // Create command
     CDbJobData* pJobData = GetNewJobData ();
     pJobData->command.type = jobType;
@@ -322,6 +328,15 @@ CDbJobData* CDatabaseJobQueueImpl::AddCommand ( EJobCommandType jobType, SConnec
 ///////////////////////////////////////////////////////////////
 void CDatabaseJobQueueImpl::DoPulse ( void )
 {
+    // Check if any connection needs a flush
+    while ( m_PendingFlushMap.size () )
+    {
+        SConnectionHandle connectionHandle = *m_PendingFlushMap.begin ();
+        MapRemove ( m_PendingFlushMap, connectionHandle );
+        CDbJobData* pJobData = AddCommand ( EJobCommand::FLUSH, connectionHandle, "" );
+        FreeCommand ( pJobData );
+    }
+
 again:
     shared.m_Mutex.Lock ();
 
@@ -643,6 +658,9 @@ void CDatabaseJobQueueImpl::ProcessCommand ( CDbJobData* pJobData )
     else
     if ( pJobData->command.type == EJobCommand::QUERY )
         ProcessQuery ( pJobData );
+    else
+    if ( pJobData->command.type == EJobCommand::FLUSH )
+        ProcessFlush ( pJobData );
 }
 
 
@@ -757,6 +775,29 @@ void CDatabaseJobQueueImpl::ProcessQuery ( CDbJobData* pJobData )
     // Set result
     pJobData->result.status = EJobResult::SUCCESS;
     pJobData->result.uiNumAffectedRows = pConnection->GetNumAffectedRows ();
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseJobQueueImpl::ProcessFlush ()
+//
+// Tell the connection to flush cached data
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseJobQueueImpl::ProcessFlush ( CDbJobData* pJobData )
+{
+    CDatabaseConnection* pConnection = GetConnectionFromHandle ( pJobData->command.connectionHandle );
+    if ( !pConnection )
+    {
+        pJobData->result.status = EJobResult::FAIL;
+        pJobData->result.strReason = "Invalid connection";
+        return;
+    }
+
+    // Do flush
+    pConnection->Flush ();
+    pJobData->result.status = EJobResult::SUCCESS;
 }
 
 
