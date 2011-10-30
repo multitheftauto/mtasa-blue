@@ -10,6 +10,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include <sys/timeb.h>
 #include "CDatabaseType.h"
 #include "CDatabaseJobQueue.h"
 
@@ -47,6 +48,67 @@ namespace
             pthread_cancel ( handle );
         }
     };
+
+
+    //
+    // Mutex with wait
+    //
+    class CComboMutex
+    {
+        pthread_mutex_t     mutex;
+        pthread_cond_t      cond;
+    public:
+        CComboMutex ( void )
+        {
+            pthread_mutex_init ( &mutex, NULL );
+            pthread_cond_init ( &cond, NULL );
+        }
+
+        ~CComboMutex ( void )
+        {
+            pthread_mutex_destroy ( &mutex );
+            pthread_cond_destroy ( &cond );
+        }
+
+        void Lock ( void )
+        {
+            pthread_mutex_lock ( &mutex );
+        }
+
+        void Unlock ( void )
+        {
+            pthread_mutex_unlock ( &mutex );
+        }
+
+        // unlock - wait for signal - lock
+        void Wait ( uint uiTimeout )
+        {
+            // Handle the different timeout requirements
+            if ( uiTimeout == 0 )
+                return;
+            if ( uiTimeout == -1 )
+                pthread_cond_wait ( &cond, &mutex );
+            else
+            {
+                _timeb timeb;
+                _ftime(&timeb);
+                ulong uiSec = static_cast < ulong > ( timeb.time );
+                ulong uiMs = timeb.millitm;
+                uiMs += uiTimeout;
+                uiSec += uiMs / 1000;
+                uiMs %= 1000;
+                timespec t;
+                t.tv_sec = uiSec;
+                t.tv_nsec = uiMs * 1000000;
+                pthread_cond_timedwait ( &cond, &mutex, &t );
+            }
+        }
+
+        void Signal ( void )
+        {
+            pthread_cond_signal ( &cond );
+        }
+    };
 }
 
 
@@ -66,7 +128,7 @@ public:
     // Main thread functions
     virtual void                DoPulse                     ( void );
     virtual CDbJobData*         AddCommand                  ( EJobCommandType jobType, SConnectionHandle connectionHandle, const SString& strData );
-    virtual bool                PollCommand                 ( CDbJobData* pJobData );
+    virtual bool                PollCommand                 ( CDbJobData* pJobData, uint uiTimeout );
     virtual bool                FreeCommand                 ( CDbJobData* pJobData );
     virtual CDbJobData*         FindCommandFromId           ( SDbJobId id );
     virtual void                IgnoreConnectionResults     ( SConnectionHandle connectionHandle );
@@ -112,7 +174,7 @@ protected:
         bool                                        m_bThreadTerminated;
         std::list < CDbJobData* >                   m_CommandQueue;
         std::list < CDbJobData* >                   m_ResultQueue;
-        CCriticalSection                            m_CS;
+        CComboMutex                                 m_Mutex;
     } shared;
 };
 
@@ -181,7 +243,10 @@ CDatabaseJobQueueImpl::~CDatabaseJobQueueImpl ( void )
 void CDatabaseJobQueueImpl::StopThread ( void )
 {
     // Stop the job queue processing thread
+    shared.m_Mutex.Lock ();
     shared.m_bTerminateThread = true;
+    shared.m_Mutex.Signal ();
+    shared.m_Mutex.Unlock ();
 
     for ( uint i = 0 ; i < 5000 ; i += 15 )
     {
@@ -238,10 +303,11 @@ CDbJobData* CDatabaseJobQueueImpl::AddCommand ( EJobCommandType jobType, SConnec
     pJobData->command.strData = strData;
 
     // Add to queue
-    shared.m_CS.Lock ();
+    shared.m_Mutex.Lock ();
     pJobData->stage = EJobStage::COMMAND_QUEUE;
     shared.m_CommandQueue.push_back ( pJobData );
-    shared.m_CS.Unlock ();
+    shared.m_Mutex.Signal ();
+    shared.m_Mutex.Unlock ();
 
     return pJobData;
 }
@@ -257,7 +323,7 @@ CDbJobData* CDatabaseJobQueueImpl::AddCommand ( EJobCommandType jobType, SConnec
 void CDatabaseJobQueueImpl::DoPulse ( void )
 {
 again:
-    shared.m_CS.Lock ();
+    shared.m_Mutex.Lock ();
 
     // Delete finished
     for ( std::set < CDbJobData* >::iterator iter = m_FinishedList.begin () ; iter != m_FinishedList.end () ; )
@@ -288,17 +354,17 @@ again:
         {
             CLuaCallback* pLuaCallback = pJobData->pLuaCallback;
             pJobData->pLuaCallback = NULL;
-            shared.m_CS.Unlock ();
+            shared.m_Mutex.Unlock ();
 
             pLuaCallback->Call ();
             SAFE_DELETE( pLuaCallback );
 
-            // Redo from the top ensure everything is consistant
+            // Redo from the top ensure everything is consistent
             goto again;
         }
     }
 
-    shared.m_CS.Unlock ();
+    shared.m_Mutex.Unlock ();
 
     // Determine min query count over 10 seconds
     if ( m_JobCountElpasedTime.Get () > 10000 )
@@ -353,28 +419,45 @@ void CDatabaseJobQueueImpl::RemoveUnwantedResults ( void )
 // Returns false if result not ready.
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseJobQueueImpl::PollCommand ( CDbJobData* pJobData )
+bool CDatabaseJobQueueImpl::PollCommand ( CDbJobData* pJobData, uint uiTimeout )
 {
-    shared.m_CS.Lock ();
-
-    // Remove ignored before checking
-    RemoveUnwantedResults ();
-
-    // Find result with the required job handle
     bool bFound = false;
-    for ( std::list < CDbJobData* >::iterator iter = shared.m_ResultQueue.begin () ; iter != shared.m_ResultQueue.end () ; ++iter )
+
+    shared.m_Mutex.Lock ();
+    while ( true )
     {
-        if ( pJobData == *iter )
+        // Remove ignored before checking
+        RemoveUnwantedResults ();
+
+        // Find result with the required job handle
+        for ( std::list < CDbJobData* >::iterator iter = shared.m_ResultQueue.begin () ; iter != shared.m_ResultQueue.end () ; ++iter )
         {
-            // Found result. Remove from the result queue and flag return value
-            shared.m_ResultQueue.erase ( iter );
-            pJobData->stage = EJobStage::FINISHED;
-            MapInsert ( m_FinishedList, pJobData );
-            bFound = true;
+            if ( pJobData == *iter )
+            {
+                // Found result. Remove from the result queue and flag return value
+                shared.m_ResultQueue.erase ( iter );
+                pJobData->stage = EJobStage::FINISHED;
+                MapInsert ( m_FinishedList, pJobData );
+                bFound = true;
+                break;
+            }
+        }
+
+        if ( bFound || uiTimeout == 0 )
+        {
+            shared.m_Mutex.Unlock ();
             break;
         }
+
+        shared.m_Mutex.Wait ( uiTimeout );
+
+        // If not infinite, break after next check
+        if ( uiTimeout != -1 )
+            uiTimeout = 0;
     }
-    shared.m_CS.Unlock ();
+
+    // Make sure if wait was infinite, we have a result
+    assert ( uiTimeout != -1 || bFound );
 
     return bFound;
 }
@@ -401,11 +484,11 @@ bool CDatabaseJobQueueImpl::FreeCommand ( CDbJobData* pJobData )
 
     // if in command or result queue, then put in ignore result list
     bool bFound;
-    shared.m_CS.Lock ();
+    shared.m_Mutex.Lock ();
 
     bFound = ListContains ( shared.m_CommandQueue, pJobData ) || ListContains ( shared.m_ResultQueue, pJobData );
 
-    shared.m_CS.Unlock ();
+    shared.m_Mutex.Unlock ();
 
     if ( !bFound )
     {
@@ -442,7 +525,7 @@ CDbJobData* CDatabaseJobQueueImpl::FindCommandFromId ( SDbJobId id )
 ///////////////////////////////////////////////////////////////
 void CDatabaseJobQueueImpl::IgnoreConnectionResults ( SConnectionHandle connectionHandle )
 {
-    shared.m_CS.Lock ();
+    shared.m_Mutex.Lock ();
 
     // All active jobhandles will either be in m_CommandQueue or m_ResultQueue or m_FinishedList
     for ( std::list < CDbJobData* >::iterator iter = shared.m_CommandQueue.begin () ; iter != shared.m_CommandQueue.end () ; ++iter )
@@ -453,7 +536,7 @@ void CDatabaseJobQueueImpl::IgnoreConnectionResults ( SConnectionHandle connecti
         if ( (*iter)->command.connectionHandle == connectionHandle )
             IgnoreJobResults ( *iter );
 
-    shared.m_CS.Unlock ();
+    shared.m_Mutex.Unlock ();
 }
 
 
@@ -505,25 +588,26 @@ void* CDatabaseJobQueueImpl::StaticThreadProc ( void* pContext )
 ///////////////////////////////////////////////////////////////
 void* CDatabaseJobQueueImpl::ThreadProc ( void )
 {
+    shared.m_Mutex.Lock ();
     while ( !shared.m_bTerminateThread )
     {
-        // TODO: Use wait instead of sleep
-        Sleep ( 1 );
-
         // Is there a waiting command?
-        shared.m_CS.Lock ();
-        if ( !shared.m_CommandQueue.empty () )
+        if ( shared.m_CommandQueue.empty () )
+        {
+            shared.m_Mutex.Wait ( -1 );
+        }
+        else
         {
             // Get next command
             CDbJobData* pJobData = shared.m_CommandQueue.front ();
             pJobData->stage = EJobStage::PROCCESSING;
-            shared.m_CS.Unlock ();
+            shared.m_Mutex.Unlock ();
 
             // Process command
             ProcessCommand ( pJobData );
 
             // Store result
-            shared.m_CS.Lock ();
+            shared.m_Mutex.Lock ();
             // Check command has not been cancelled (this should not be possible)
             if ( !shared.m_CommandQueue.empty () && pJobData == shared.m_CommandQueue.front () )
             {
@@ -533,8 +617,8 @@ void* CDatabaseJobQueueImpl::ThreadProc ( void )
                 pJobData->stage = EJobStage::RESULT;
                 shared.m_ResultQueue.push_back ( pJobData );
             }
+            shared.m_Mutex.Signal ();
         }
-        shared.m_CS.Unlock ();
     }
 
     shared.m_bThreadTerminated = true;
