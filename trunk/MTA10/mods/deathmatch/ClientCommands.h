@@ -84,4 +84,7 @@ void COMMAND_ShowSyncData           ( const char* szCmdLine );
     void COMMAND_Debug4             ( const char* szCmdLine );
 #endif
 
+    // Commands enabled when development mode in on
+    void COMMAND_ShowCollision      ( const char* szCmdLine );
+
 #endif

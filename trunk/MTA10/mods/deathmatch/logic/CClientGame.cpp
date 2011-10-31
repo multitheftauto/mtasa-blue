@@ -5072,7 +5072,7 @@ void CClientGame::InitVoice( bool bEnabled, unsigned int uiServerSampleRate, uns
 //
 void CClientGame::DebugElementRender ( void )
 {
-    if ( g_pCore->GetGraphics ()->GetRenderItemManager ()->GetTestMode () != DX_TEST_MODE_SHOW_COL )
+    if ( !GetDevelopmentMode () || !GetShowCollision () )
         return;
 
     CVector vecCameraPos;

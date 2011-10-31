@@ -1013,6 +1013,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getNetworkUsageData", CLuaFunctionDefs::GetNetworkUsageData );
     CLuaCFunctions::AddFunction ( "getNetworkStats", CLuaFunctionDefs::GetNetworkStats );
     CLuaCFunctions::AddFunction ( "getPerformanceStats", CLuaFunctionDefs::GetPerformanceStats );
+    CLuaCFunctions::AddFunction ( "setDevelopmentMode", CLuaFunctionDefs::SetDevelopmentMode );
+    CLuaCFunctions::AddFunction ( "getDevelopmentMode", CLuaFunctionDefs::GetDevelopmentMode );
 
     // Version functions
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefs::GetVersion );

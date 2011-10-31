@@ -30,6 +30,8 @@ namespace
                                          { "toJSON",                    "1.1.1-9.03316" },
                                          { "fromJSON",                  "1.1.1-9.03316" },
                                          { "dxSetShaderTessellation",   "1.1.1-9.03316" },
+                                         { "setDevelopmentMode",        "1.1.1-9.03355" },
+                                         { "getDevelopmentMode",        "1.1.1-9.03355" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
