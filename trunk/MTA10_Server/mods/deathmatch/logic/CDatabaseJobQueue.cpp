@@ -86,20 +86,30 @@ namespace
             // Handle the different timeout requirements
             if ( uiTimeout == 0 )
                 return;
-            if ( uiTimeout == -1 )
+            if ( uiTimeout == (uint)-1 )
                 pthread_cond_wait ( &cond, &mutex );
             else
             {
+                // Get time now
+                struct timeval tv;
+#ifdef WIN32
                 _timeb timeb;
                 _ftime(&timeb);
-                ulong uiSec = static_cast < ulong > ( timeb.time );
-                ulong uiMs = timeb.millitm;
-                uiMs += uiTimeout;
-                uiSec += uiMs / 1000;
-                uiMs %= 1000;
+                tv.tv_sec = static_cast < ulong > ( timeb.time );
+                tv.tv_usec = timeb.millitm * 1000;
+#else
+                gettimeofday ( &tv , NULL );
+#endif
+                // Add the timeout length
+                tv.tv_sec += uiTimeout / 1000;
+                tv.tv_usec += ( uiTimeout % 1000 ) * 1000;
+                // Carry over seconds
+                tv.tv_sec += tv.tv_usec / 1000000;
+                tv.tv_usec %= 1000000;
+                // Convert to timespec
                 timespec t;
-                t.tv_sec = uiSec;
-                t.tv_nsec = uiMs * 1000000;
+                t.tv_sec = tv.tv_sec;
+                t.tv_nsec = tv.tv_usec * 1000;
                 pthread_cond_timedwait ( &cond, &mutex, &t );
             }
         }
@@ -467,12 +477,12 @@ bool CDatabaseJobQueueImpl::PollCommand ( CDbJobData* pJobData, uint uiTimeout )
         shared.m_Mutex.Wait ( uiTimeout );
 
         // If not infinite, break after next check
-        if ( uiTimeout != -1 )
+        if ( uiTimeout != (uint)-1 )
             uiTimeout = 0;
     }
 
     // Make sure if wait was infinite, we have a result
-    assert ( uiTimeout != -1 || bFound );
+    assert ( uiTimeout != (uint)-1 || bFound );
 
     return bFound;
 }
