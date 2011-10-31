@@ -297,6 +297,8 @@ public:
     virtual CSphere                             GetWorldBoundingSphere      ( void );
     virtual void                                UpdateSpatialData           ( void );
 
+    virtual void                                DebugRender                 ( const CVector& vecPosition, float fDrawRadius ) {}
+
     float                                       GetDistanceBetweenBoundingSpheres   ( CClientEntity* pOther );
 
 public:

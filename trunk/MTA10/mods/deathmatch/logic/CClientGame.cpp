@@ -666,6 +666,8 @@ void CClientGame::DoPulsePreHUDRender ( bool bDidUnminimize, bool bDidRecreateRe
 
     // Disallow scripted dxSetRenderTarget
     g_pCore->GetGraphics ()->EnableSetRenderTarget ( false );
+
+    DebugElementRender ();
 }
 
 void CClientGame::DoPulsePostFrame ( void )
@@ -5062,5 +5064,30 @@ void CClientGame::InitVoice( bool bEnabled, unsigned int uiServerSampleRate, uns
     if ( m_pVoiceRecorder )
     {
         m_pVoiceRecorder -> Init ( bEnabled, uiServerSampleRate, ucQuality, uiBitrate );
+    }
+}
+
+//
+// If debug render mode is on, allow each element in range to draw some stuff
+//
+void CClientGame::DebugElementRender ( void )
+{
+    if ( g_pCore->GetGraphics ()->GetRenderItemManager ()->GetTestMode () != DX_TEST_MODE_SHOW_COL )
+        return;
+
+    CVector vecCameraPos;
+    m_pCamera->GetPosition ( vecCameraPos );
+    float fDrawRadius = 200.f;
+
+    // Get all entities within range
+    CClientEntityResult result;
+    GetClientSpatialDatabase()->SphereQuery ( result, CSphere ( vecCameraPos, fDrawRadius ) );
+ 
+    // For each entity found
+    for ( CClientEntityResult::const_iterator it = result.begin () ; it != result.end (); ++it )
+    {
+        CClientEntity* pEntity = *it;
+        if ( pEntity->GetParent () )
+            pEntity->DebugRender ( vecCameraPos, fDrawRadius );
     }
 }

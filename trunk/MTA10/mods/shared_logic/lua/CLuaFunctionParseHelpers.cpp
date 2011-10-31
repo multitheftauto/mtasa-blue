@@ -150,6 +150,7 @@ IMPLEMENT_ENUM_BEGIN( eDxTestMode )
     ADD_ENUM ( DX_TEST_MODE_NO_MEM,         "no_mem" )
     ADD_ENUM ( DX_TEST_MODE_LOW_MEM,        "low_mem" )
     ADD_ENUM ( DX_TEST_MODE_NO_SHADER,      "no_shader" )
+    ADD_ENUM ( DX_TEST_MODE_SHOW_COL,       "show_col" )
 IMPLEMENT_ENUM_END( "dx-test-mode" )
 
 //
