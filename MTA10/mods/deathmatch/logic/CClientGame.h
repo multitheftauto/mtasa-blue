@@ -154,7 +154,7 @@ public:
         QUIT_BAN,
         QUIT_CONNECTION_DESYNC,
         QUIT_TIMEOUT,
-    };   
+    };
     enum 
     {
         GLITCH_QUICKRELOAD,
@@ -173,6 +173,7 @@ public:
     };
 
 public:
+    ZERO_ON_NEW
                                         CClientGame                     ( bool bLocalPlay = false );
                                         ~CClientGame                    ( void );
 
@@ -347,6 +348,11 @@ public:
     void                                NotifyBigPacketProgress         ( unsigned long ulBytesReceived, unsigned long ulTotalSize );
     bool                                IsDownloadingBigPacket          ( ) const                       { return m_bReceivingBigPacket; }
     bool                                IsBeingDeleted                  ( void )                        { return m_bBeingDeleted; }
+
+    void                                SetDevelopmentMode              ( bool bEnable )                { m_bDevelopmentMode = bEnable; } 
+    bool                                GetDevelopmentMode              ( void )                        { return m_bDevelopmentMode; } 
+    void                                SetShowCollision                ( bool bEnable )                { m_bShowCollision = bEnable; } 
+    bool                                GetShowCollision                ( void )                        { return m_bShowCollision; } 
 
 private:
 
@@ -618,6 +624,8 @@ private:
     bool                                m_bDoPaintballs;
     bool                                m_bShowInterpolation;
     #endif
+    bool                                m_bDevelopmentMode;
+    bool                                m_bShowCollision;
 
     // Debug class. Empty in release.
 public:

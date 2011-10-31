@@ -522,7 +522,9 @@ public:
     LUA_DECLARE ( Dereference );
     LUA_DECLARE ( GetColorFromString );
     LUA_DECLARE ( GetValidPedModels );
-    
+    LUA_DECLARE ( SetDevelopmentMode );
+    LUA_DECLARE ( GetDevelopmentMode );
+
     // GUI funcs
     LUA_DECLARE ( GUIGetInputEnabled );
     LUA_DECLARE ( GUIGetInputMode );
