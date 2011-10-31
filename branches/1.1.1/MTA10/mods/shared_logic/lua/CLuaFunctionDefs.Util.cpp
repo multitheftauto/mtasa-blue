@@ -914,3 +914,34 @@ int CLuaFunctionDefs::GetPerformanceStats ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::SetDevelopmentMode ( lua_State* luaVM )
+{
+//  bool setDevelopmentMode ( bool enable )
+    bool bEnable;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadBool ( bEnable );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pClientGame->SetDevelopmentMode ( bEnable );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setDevelopmentMode", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GetDevelopmentMode ( lua_State* luaVM )
+{
+//  bool getDevelopmentMode ()
+    bool bResult = g_pClientGame->GetDevelopmentMode ();
+    lua_pushboolean ( luaVM, bResult );
+    return 1;
+}

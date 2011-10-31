@@ -87,6 +87,9 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     g_pCore->GetKeyBinds ()->AddControlFunction ( "radio_next", CClientGame::HandleRadioNext );
     g_pCore->GetKeyBinds ()->AddControlFunction ( "radio_previous", CClientGame::HandleRadioPrevious );
 
+    // Development mode
+    g_pCore->GetCommands ()->Add ( "showcol",                   "(Development mode) shows the colshapes",               COMMAND_ShowCollision );
+
 #ifdef MTA_DEBUG
     g_pCore->GetCommands ()->Add ( "showsync",          "show sync data",                                   COMMAND_ShowSyncData );
     //g_pCore->GetCommands ()->Add ( "dumpall",           "dump internals (comment)",                           COMMAND_DumpPlayers );
