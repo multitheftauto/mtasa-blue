@@ -829,7 +829,7 @@ CResource* CResourceManager::CreateResource ( const SString& strNewResourceName,
     }
 
     // Create destination folder
-    MakeSureDirExists( strDstResourceLocation );
+    MakeSureDirExists( strDstResourceLocation + "/" );
 
     // Create an empty meta file for that resource
     SString strMetaPath = PathJoin ( strDstResourceLocation, "meta.xml" );
