@@ -22,6 +22,7 @@
 class CPerfStatServerTimingImpl : public CPerfStatServerTiming
 {
 public:
+    ZERO_ON_NEW
                                 CPerfStatServerTimingImpl  ( void );
     virtual                     ~CPerfStatServerTimingImpl ( void );
 
@@ -70,8 +71,6 @@ CPerfStatServerTiming* CPerfStatServerTiming::GetSingleton ()
 CPerfStatServerTimingImpl::CPerfStatServerTimingImpl ( void )
 {
     m_strCategoryName = "Server timing";
-    m_LastTickCount = 0;
-    m_bIsActive = false;
 }
 
 

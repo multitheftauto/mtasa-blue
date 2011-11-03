@@ -113,6 +113,7 @@ namespace
 class CPerfStatLuaTimingImpl : public CPerfStatLuaTiming
 {
 public:
+    ZERO_ON_NEW
                                 CPerfStatLuaTimingImpl  ( void );
     virtual                     ~CPerfStatLuaTimingImpl ( void );
 
@@ -165,8 +166,6 @@ CPerfStatLuaTiming* CPerfStatLuaTiming::GetSingleton ()
 CPerfStatLuaTimingImpl::CPerfStatLuaTimingImpl ( void )
 {
     m_strCategoryName = "Lua timing";
-    m_LastTickCount = 0;
-    m_SecondCounter = 0;
 }
 
 

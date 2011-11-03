@@ -13,6 +13,9 @@
 
 namespace
 {
+    //
+    // CPerfStatFunctionTiming helpers
+    //
     struct STiming
     {
         uint uiNumCalls;
@@ -27,6 +30,41 @@ namespace
         int iPrevIndex;
         STiming history[12];
     };
+
+
+    //
+    // Keep track of a set of values over a period of time
+    //
+    class CValueHistory
+    {
+    public:
+        std::map < int, CTickCount > historyMap;
+
+        void AddValue ( int iValue )
+        {
+            MapSet ( historyMap, iValue, CTickCount::Now () );
+        }
+
+        void RemoveOlderThan ( int iValue )
+        {
+            CTickCount now = CTickCount::Now ();
+            for ( std::map < int, CTickCount >::iterator iter = historyMap.begin () ; iter != historyMap.end () ; )
+            {
+                if ( ( now - iter->second ).ToLongLong () > iValue )
+                    historyMap.erase ( iter++ );
+                else
+                    ++iter;
+            }
+        }
+
+        int GetLowestValue ( int iDefault )
+        {
+            if ( historyMap.empty () )
+                return iDefault;
+            return historyMap.begin()->first;
+        }
+    };
+
 }
 
 
@@ -40,6 +78,7 @@ namespace
 class CPerfStatFunctionTimingImpl : public CPerfStatFunctionTiming
 {
 public:
+    ZERO_ON_NEW
                                 CPerfStatFunctionTimingImpl  ( void );
     virtual                     ~CPerfStatFunctionTimingImpl ( void );
 
@@ -57,6 +96,8 @@ public:
     SString                                     m_strCategoryName;
     CElapsedTime                                m_TimeSinceLastViewed;
     bool                                        m_bIsActive;
+    CValueHistory                               m_PeakUsRequiredHistory;
+    TIMEUS                                      m_PeakUsThresh;
 
     CElapsedTime                                m_TimeSinceUpdate;
     std::map < SString, SFunctionTimingInfo >   m_TimingMap;
@@ -90,7 +131,6 @@ CPerfStatFunctionTiming* CPerfStatFunctionTiming::GetSingleton ()
 CPerfStatFunctionTimingImpl::CPerfStatFunctionTimingImpl ( void )
 {
     m_strCategoryName = "Function timing";
-    m_bIsActive = false;
 }
 
 
@@ -176,6 +216,12 @@ void CPerfStatFunctionTimingImpl::DoPulse ( void )
                 ++iter;
         }
     }
+
+    //
+    // Update PeakUs threshold
+    //
+    m_PeakUsRequiredHistory.RemoveOlderThan ( 10000 );
+    m_PeakUsThresh = m_PeakUsRequiredHistory.GetLowestValue ( 50000 );
 }
 
 
@@ -208,8 +254,8 @@ void CPerfStatFunctionTimingImpl::UpdateTiming ( const char* szFunctionName, TIM
     if ( !m_bIsActive )
         return;
 
-    // Ignore any single calls under 50ms
-    if ( timeUs < 50000 )
+    // Ignore any single calls over lowest threshold from any viewer
+    if ( timeUs < m_PeakUsThresh )
         return;
 
     float fTimeMs = timeUs * ( 1 / 1000.f );
@@ -238,6 +284,10 @@ void CPerfStatFunctionTimingImpl::GetStats ( CPerfStatResult* pResult, const std
     // Set option flags
     //
     bool bHelp = MapContains ( optionMap, "h" );
+    int iPeakMsThresh = optionMap.empty () ? 0 : atoi ( optionMap.begin ()->first );
+    if ( iPeakMsThresh < 1 )
+        iPeakMsThresh = 50000;
+    m_PeakUsRequiredHistory.AddValue ( iPeakMsThresh * 1000 );
 
     //
     // Process help
@@ -245,7 +295,8 @@ void CPerfStatFunctionTimingImpl::GetStats ( CPerfStatResult* pResult, const std
     if ( bHelp )
     {
         pResult->AddColumn ( "Function timings help" );
-        pResult->AddRow ()[0] ="Option h - This help";
+        pResult->AddRow ()[0] = "Option h - This help";
+        pResult->AddRow ()[0] = "1-50 - Peak Ms threshold (defaults to 50)";
         return;
     }
 
@@ -277,6 +328,14 @@ void CPerfStatFunctionTimingImpl::GetStats ( CPerfStatResult* pResult, const std
         bool bHas60s = prev60s.uiNumCalls > 0;
 
         if ( !bHas5s && !bHas60s )
+            continue;
+
+        // Filter peak threshold for this viewer
+        if ( prev5s.fPeakMs < iPeakMsThresh && prev60s.fPeakMs < iPeakMsThresh )
+            continue;
+
+        // Apply filter
+        if ( strFilter != "" && strFunctionName.find ( strFilter ) == SString::npos )
             continue;
 
         // Add row
