@@ -647,6 +647,8 @@ void* CDatabaseJobQueueImpl::ThreadProc ( void )
     }
 
     shared.m_bThreadTerminated = true;
+    shared.m_Mutex.Unlock ();
+
     return NULL;
 }
 

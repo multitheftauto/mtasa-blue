@@ -177,6 +177,77 @@ bool CClientVariables::Exists ( const std::string& strVariable )
 }
 
 
+// Clamp int variable
+void CClientVariables::ClampValue ( const std::string& strVariable, int iMinValue, int iMaxValue  )
+{
+    int iTemp;
+    CVARS_GET ( strVariable, iTemp );
+    iTemp = Clamp ( iMinValue, iTemp, iMaxValue );
+    CVARS_SET ( strVariable, iTemp );
+}
+
+
+// Clamp float variable
+void CClientVariables::ClampValue ( const std::string& strVariable, float fMinValue, float fMaxValue  )
+{
+    float fTemp;
+    CVARS_GET ( strVariable, fTemp );
+    fTemp = Clamp ( fMinValue, fTemp, fMaxValue );
+    CVARS_SET ( strVariable, fTemp );
+}
+
+
+// Clamp CColor variable
+void CClientVariables::ClampValue ( const std::string& strVariable, CColor minValue, CColor maxValue  )
+{
+    CColor temp;
+    CVARS_GET ( strVariable, temp );
+    temp.R = Clamp ( minValue.R, temp.R, maxValue.R );
+    temp.G = Clamp ( minValue.G, temp.G, maxValue.G );
+    temp.B = Clamp ( minValue.B, temp.B, maxValue.B );
+    temp.A = Clamp ( minValue.A, temp.A, maxValue.A );
+    CVARS_SET ( strVariable, temp );
+}
+
+
+// Clamp CVector2D variable
+void CClientVariables::ClampValue ( const std::string& strVariable, CVector2D minValue, CVector2D maxValue  )
+{
+    CVector2D temp;
+    CVARS_GET ( strVariable, temp );
+    temp.fX = Clamp ( minValue.fX, temp.fX, maxValue.fX );
+    temp.fY = Clamp ( minValue.fY, temp.fY, maxValue.fY );
+    CVARS_SET ( strVariable, temp );
+}
+
+
+// Ensure CVars are within reasonable limits
+void CClientVariables::ValidateValues ( void )
+{
+    uint uiViewportWidth = CCore::GetSingleton().GetGraphics ()->GetViewportWidth ();
+    uint uiViewportHeight = CCore::GetSingleton().GetGraphics ()->GetViewportHeight ();
+
+    ClampValue ( "console_pos",             CVector2D ( 0, 0 ),         CVector2D ( uiViewportWidth - 32, uiViewportHeight - 32 ) );
+    ClampValue ( "console_size",            CVector2D ( 50, 50 ),       CVector2D ( uiViewportWidth - 32, uiViewportHeight - 32 ) );
+    ClampValue ( "fps_limit",               0,                          100 );
+    ClampValue ( "chat_font",               0,                          3 );
+    ClampValue ( "chat_lines",              3,                          62 );
+    ClampValue ( "chat_color",              CColor (0,0,0,0),           CColor (255,255,255,255) );
+    ClampValue ( "chat_text_color",         CColor (0,0,0,128),         CColor (255,255,255,255) );
+    ClampValue ( "chat_input_color",        CColor (0,0,0,0),           CColor (255,255,255,255) );
+    ClampValue ( "chat_input_prefix_color", CColor (0,0,0,128),         CColor (255,255,255,255) );
+    ClampValue ( "chat_input_text_color",   CColor (0,0,0,128),         CColor (255,255,255,255) );
+    ClampValue ( "chat_scale",              CVector2D ( 0.5f, 0.5f ),   CVector2D ( 3, 3 ) );
+    ClampValue ( "chat_width",              0.5f,                       4.f );
+    ClampValue ( "chat_line_life",          1000,                       120000000 );
+    ClampValue ( "chat_line_fade_out",      1000,                       30000000 );
+    ClampValue ( "text_scale",              0.8f,                       3.0f );
+    ClampValue ( "mtavolume",               0.0f,                       1.0f );
+    ClampValue ( "voicevolume",             0.0f,                       1.0f );
+    ClampValue ( "mapalpha",                0,                          255 );
+}
+
+
 void CClientVariables::LoadDefaults ( void )
 {
     #define DEFAULT(__x,__y)    if(!Exists(__x)) \
@@ -203,6 +274,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "chat_font",                  0 );                            // chatbox font type
     DEFAULT ( "chat_lines",                 7 );                            // chatbox lines
     DEFAULT ( "chat_color",                 CColor (0,0,128,100) );         // chatbox color
+    DEFAULT ( "chat_text_color",            CColor (172,213,254,255) );     // chatbox text color
     DEFAULT ( "chat_input_color",           CColor (0,0,191,110) );         // chatbox input color
     DEFAULT ( "chat_input_prefix_color",    CColor (172,213,254,255) );     // chatbox prefix input color
     DEFAULT ( "chat_input_text_color",      CColor (172,213,254,255) );     // chatbox text input color

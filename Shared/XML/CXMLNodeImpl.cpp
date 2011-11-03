@@ -482,12 +482,8 @@ void CXMLNodeImpl::RemoveAllFromList ( void )
 
 bool CXMLNodeImpl::StringToLong ( const char* szString, long& lValue )
 {
-    // Convert to string
-    char szBuffer [33];
-    assert ( strlen ( szString ) < 32 );
     char* pEnd;
-    strcpy ( szBuffer, szString );
-    lValue = strtol ( szBuffer, &pEnd, 0 );
+    lValue = strtol ( szString, &pEnd, 0 );
 
 #ifndef WIN32
     if ( ERANGE == errno )
@@ -495,7 +491,7 @@ bool CXMLNodeImpl::StringToLong ( const char* szString, long& lValue )
         return false;
     }
     else
-    if ( pEnd == szBuffer )
+    if ( pEnd == szString )
     {
         return false;
     }
