@@ -55,6 +55,7 @@ namespace
 class CPerfStatLuaMemoryImpl : public CPerfStatLuaMemory
 {
 public:
+    ZERO_ON_NEW
                                 CPerfStatLuaMemoryImpl  ( void );
     virtual                     ~CPerfStatLuaMemoryImpl ( void );
 

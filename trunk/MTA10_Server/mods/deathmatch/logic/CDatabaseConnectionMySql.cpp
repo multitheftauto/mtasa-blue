@@ -51,6 +51,7 @@ public:
     SString                 m_strLastErrorMessage;
     uint                    m_uiLastErrorCode;
     uint                    m_uiNumAffectedRows;
+    int                     m_bAutomaticReconnect;
     int                     m_bAutomaticTransactionsEnabled;
     bool                    m_bInAutomaticTransaction;
     CTickCount              m_AutomaticTransactionStartTime;
@@ -82,6 +83,7 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql ( CDatabaseType* pManager, co
     // Parse options string
     CArgMap optionsMap ( "=", ";" );
     optionsMap.SetFromString ( strOptions );
+    optionsMap.Get ( "autoreconnect", m_bAutomaticReconnect, 1 );
     optionsMap.Get ( "batch", m_bAutomaticTransactionsEnabled, 1 );
 
     SString strHostname;
@@ -101,7 +103,7 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql ( CDatabaseType* pManager, co
     m_handle = mysql_init ( NULL );
     if ( m_handle )
     {
-        my_bool reconnect = false;
+        my_bool reconnect = m_bAutomaticReconnect;
         mysql_options ( m_handle, MYSQL_OPT_RECONNECT, &reconnect );
 
         if ( mysql_real_connect ( m_handle, strHostname, strUsername, strPassword, strDatabaseName, iPort, strUnixSocket, ulClientFlags ) )
