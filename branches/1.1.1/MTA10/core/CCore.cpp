@@ -1043,6 +1043,9 @@ void CCore::DoPostFramePulse ( )
     {
         bFirstPulse = false;
 
+        // Validate CVARS
+        CClientVariables::GetSingleton().ValidateValues ();
+
         // Apply all settings
         ApplyConsoleSettings ();
         ApplyGameSettings ();

@@ -54,6 +54,7 @@ CChat::CChat ( CGUI* pManager, const CVector2D & vecPosition )
     m_fInputBackgroundAlpha = 0.f;
     m_pCacheTexture = NULL;
     m_iCacheTextureRevision = 0;
+    m_iReportCount = 0;
 
     // Background area
     m_pBackground = m_pManager->CreateStaticImage ();
@@ -202,35 +203,35 @@ void CChat::Draw ( bool bUseCacheTexture )
 
     CGraphics* pGraphics = CGraphics::GetSingletonPtr ();
 
-    static CVector2D ms_RenderTargetChatSize(0,0);
-    static int ms_iReportCount = 0;
-
     // Validate rendertarget
-    if ( m_pCacheTexture && chatSize != ms_RenderTargetChatSize )
+    if ( m_pCacheTexture && chatSize != m_RenderTargetChatSize )
     {
         SAFE_RELEASE( m_pCacheTexture );
     }
     // Create rendertarget if required
-    if ( !m_pCacheTexture )
+    if ( !m_pCacheTexture && ( CTickCount::Now () - m_lastRenderTargetCreationFail ).ToLongLong () > 60000 )
     {
-        m_pCacheTexture = pGraphics->GetRenderItemManager ()->CreateRenderTarget ( chatSize.fX, chatSize.fY, true, true );
+        // Make sure render target size is reasonable
+        int iRenderTargetSizeX = Clamp < int > ( 8, chatSize.fX, pGraphics->GetViewportWidth () );
+        int iRenderTargetSizeY = Clamp < int > ( 8, chatSize.fY, pGraphics->GetViewportHeight () );
+        m_pCacheTexture = pGraphics->GetRenderItemManager ()->CreateRenderTarget ( iRenderTargetSizeX, iRenderTargetSizeY, true, true );
         if ( m_pCacheTexture )
-            ms_RenderTargetChatSize = chatSize;
-
-        // Log render target size created
-        if ( ms_iReportCount < 5 )
+            m_RenderTargetChatSize = chatSize;
+        else
         {
-            ms_iReportCount++;
-            SString strAdapterName = g_pDeviceState->AdapterState.Name;
-            if ( m_pCacheTexture )
-                AddReportLog ( 6531, SString ( "Chat rt req:%2.0f %2.0f   size:%d %d   surface:%d %d  card:%s"
+            m_lastRenderTargetCreationFail = CTickCount::Now ();
+
+            // Maybe log render target creation fail
+            if ( m_iReportCount < 5 )
+            {
+                m_iReportCount++;
+                SString strAdapterName = g_pDeviceState->AdapterState.Name;
+                AddReportLog ( 6532, SString ( "Chat rt chatSize:%2.0f %2.0f   rtsize:%d %d   card:%s"
                                         ,chatSize.fX, chatSize.fY
-                                        ,m_pCacheTexture->m_uiSizeX, m_pCacheTexture->m_uiSizeY
-                                        ,m_pCacheTexture->m_uiSurfaceSizeX, m_pCacheTexture->m_uiSurfaceSizeY
+                                        ,iRenderTargetSizeX, iRenderTargetSizeY
                                         ,*strAdapterName
                                         ) );
-            else
-                AddReportLog ( 6532, SString ( "Chat rt req:%2.0f %2.0f  got: fail  card:%s", chatSize.fX, chatSize.fY, *strAdapterName ) );
+            }
         }
         m_iCacheTextureRevision = -1;   // Make sure the graphics will be updated
     }
@@ -723,6 +724,8 @@ void CChat::UpdateGUI ( void )
         m_vecBackgroundPosition.fX,
         m_vecBackgroundPosition.fY + m_vecBackgroundSize.fY
     );
+    if ( m_vecInputPosition.fY > g_pCore->GetGraphics ()->GetViewportHeight () - 16 )
+        SetNumLines ( Max < int > ( 3, m_uiNumLines - 1 ) );
     m_vecInputSize = CalcInputSize ();
     if ( m_pInput )
     {

@@ -294,6 +294,10 @@ protected:
     SDrawList                   m_PrevDrawList;
     CRenderTargetItem*          m_pCacheTexture;
     int                         m_iCacheTextureRevision;
+
+    CVector2D                   m_RenderTargetChatSize;
+    int                         m_iReportCount;
+    CTickCount                  m_lastRenderTargetCreationFail;
 };
 
 #endif
