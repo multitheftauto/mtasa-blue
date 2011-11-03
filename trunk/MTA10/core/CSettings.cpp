@@ -2065,6 +2065,9 @@ void CSettings::OnLoginStateChange ( bool bResult )
 
 void CSettings::LoadData ( void )
 {
+    // Ensure CVARS ranges ok
+    CClientVariables::GetSingleton().ValidateValues ();
+
     std::string strVar;
     bool bVar;
 
@@ -2537,6 +2540,9 @@ void CSettings::SaveData ( void )
     unsigned int value = SharedUtil::Lerp ( min, fPos, max );
     CVARS_SET ( "streaming_memory", value );
 
+    // Ensure CVARS ranges ok
+    CClientVariables::GetSingleton().ValidateValues ();
+
     // Save the config here
     CCore::GetSingleton ().SaveConfig ();
     // Save the single player settings (e.g. video mode, volume)
@@ -2747,18 +2753,11 @@ void CSettings::LoadChatColorFromString ( ChatColorType eType, const string& str
 
 int CSettings::GetMilliseconds ( CGUIEdit* pEdit )
 {
-    float fValue;
-    stringstream ss ( pEdit->GetText () );
-    try
-    {
-        ss >> fValue;
-        fValue *= 1000;
-        return ( int ) fValue;
-    }
-    catch(...)
-    {
-        return 0;
-    }
+    // Note to anyone listening: stringstream does not handle out of range numbers well
+    double dValue = strtol ( pEdit->GetText ().c_str (), NULL, 0 );
+    dValue *= 1000;
+    dValue = Clamp < double > ( INT_MIN, dValue, INT_MAX );
+    return static_cast < int > ( dValue );
 }
 
 void CSettings::SetMilliseconds ( CGUIEdit* pEdit, int iValue )
