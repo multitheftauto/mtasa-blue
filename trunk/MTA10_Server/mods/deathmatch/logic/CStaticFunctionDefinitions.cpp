@@ -7890,7 +7890,7 @@ bool CStaticFunctionDefinitions::SetPlayerTeam ( CPlayer* pPlayer, CTeam* pTeam 
 
         // Tell everyone his new team
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( pTeam->GetID ( ) );
+        BitStream.pBitStream->Write ( pTeam ? pTeam->GetID ( ) : INVALID_ELEMENT_ID );
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pPlayer, SET_PLAYER_TEAM, *BitStream.pBitStream ) );
 
         return true;
