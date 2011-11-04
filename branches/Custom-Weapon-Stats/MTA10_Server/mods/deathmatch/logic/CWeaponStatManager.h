@@ -83,14 +83,16 @@ public:
     CWeaponStat*                GetWeaponStats                  ( eWeaponType type, eWeaponSkill skill = WEAPONSKILL_STD );
     CWeaponStat*                GetOriginalWeaponStats          ( eWeaponType type, eWeaponSkill skill = WEAPONSKILL_STD );
     void                        Init                            ( void );
-    bool                        LoadDefault                     ( CWeaponStat* pDest, eWeaponType weaponType );
+    bool                        LoadDefault                     ( CWeaponStat* pDest, eWeaponType weaponType, eWeaponSkill skill = WEAPONSKILL_STD );
 
 
 private:
 
     std::list<CWeaponStat*>                                     m_OriginalWeaponData;
     std::list<CWeaponStat*>                                     m_WeaponData;
-    static sWeaponInfo                                          OriginalWeaponData [ WEAPONTYPE_MAX+1 ];
+    static sWeaponInfo                                          OriginalPoorWeaponData [ WEAPONTYPE_MAX+1 ];
+    static sWeaponInfo                                          OriginalNormalWeaponData [ WEAPONTYPE_MAX+1 ];
+    static sWeaponInfo                                          OriginalHitmanWeaponData [ WEAPONTYPE_MAX+1 ];
 
 };
 

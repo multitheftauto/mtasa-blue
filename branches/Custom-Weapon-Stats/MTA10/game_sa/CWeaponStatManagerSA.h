@@ -74,24 +74,26 @@ struct sWeaponInfo
 };
 
 #define WEAPON_STAT_MAX 112
-
 class CWeaponStatManagerSA : public CWeaponStatManager
 {
 public:
                                 CWeaponStatManagerSA            ( void );
                                 ~CWeaponStatManagerSA           ( void );
-    CWeaponStatSA*              GetWeaponStats                  ( eWeaponType type, eWeaponSkill skill = WEAPONSKILL_STD );
-    CWeaponStatSA*              GetOriginalWeaponStats          ( eWeaponType type, eWeaponSkill skill = WEAPONSKILL_STD );
+    CWeaponStat*                GetWeaponStats                  ( eWeaponType type, eWeaponSkill skill = WEAPONSKILL_STD );
+    CWeaponStat*                GetOriginalWeaponStats          ( eWeaponType type, eWeaponSkill skill = WEAPONSKILL_STD );
     void                        Init                            ( void );
-    bool                        LoadDefault                     ( CWeaponStat* pDest, eWeaponType weaponType );
+    bool                        LoadDefault                     ( CWeaponStat* pDest, eWeaponType weaponType, eWeaponSkill skill = WEAPONSKILL_STD );
     void                        CreateWeaponStat                ( CWeaponInfo* pInterface, eWeaponType weaponType, eWeaponSkill weaponSkill );
 
 
 private:
+    bool                        LoadDefaultInternal             ( CWeaponStatSA* pDest, eWeaponType weaponType, eWeaponSkill skill = WEAPONSKILL_STD );
 
-    std::list<CWeaponStatSA*>                                     m_OriginalWeaponData;
-    std::list<CWeaponStatSA*>                                     m_WeaponData;
-    static sWeaponInfo                                          OriginalWeaponData [ WEAPONTYPE_MAX+1 ];
+    std::list<CWeaponStat*>                                     m_OriginalWeaponData;
+    std::list<CWeaponStat*>                                     m_WeaponData;
+    static sWeaponInfo                                          OriginalPoorWeaponData [ WEAPONTYPE_MAX+1 ];
+    static sWeaponInfo                                          OriginalNormalWeaponData [ WEAPONTYPE_MAX+1 ];
+    static sWeaponInfo                                          OriginalHitmanWeaponData [ WEAPONTYPE_MAX+1 ];
 
 };
 

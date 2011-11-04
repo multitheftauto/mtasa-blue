@@ -1958,3 +1958,131 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::GetOriginalWeaponProperty ( lua_State* luaVM )
+{
+    eWeaponSkill eWepSkill = eWeaponSkill::WEAPONSKILL_STD;
+    eWeaponType eWep = eWeaponType::WEAPONTYPE_UNARMED;
+    eWeaponProperty eProp = eWeaponProperty::WEAPON_INVALID_PROPERTY;
+
+    CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsEnumString ( eWep ) )
+    {
+        argStream.ReadEnumString ( eWep );
+    }
+    else
+    {
+        int iTemp = 0;
+        argStream.ReadNumber ( iTemp );
+        if ( iTemp >= WEAPONTYPE_MIN && iTemp <= WEAPONTYPE_MAX )
+        {
+            eWep = (eWeaponType) iTemp;
+        }
+        else
+        {
+            // Failed
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponInfo", "invalid weapon type at argument 1" ) );
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
+    }
+    if ( argStream.NextIsEnumString ( eWepSkill ) )
+    {
+        argStream.ReadEnumString ( eWepSkill );
+    }
+    else
+    {
+        int iTemp = 0;
+        argStream.ReadNumber ( iTemp );
+        if ( iTemp >= WEAPONSKILL_POOR && iTemp <= WEAPONSKILL_PRO )
+        {
+            eWepSkill = (eWeaponSkill) iTemp;
+        }
+        else
+        {
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponInfo", "invalid skill type at argument 2" ) );
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
+    }
+    argStream.ReadEnumString ( eProp );
+    if ( !argStream.HasErrors () )
+    {
+        switch ( eProp )
+        {
+        case WEAPON_WEAPON_RANGE:
+        case WEAPON_TARGET_RANGE:
+        case WEAPON_ACCURACY:
+        case WEAPON_FIRING_SPEED:
+        case WEAPON_LIFE_SPAN:
+        case WEAPON_SPREAD:
+        case WEAPON_MOVE_SPEED:
+            // Get only
+        case WEAPON_ANIM_LOOP_START:
+        case WEAPON_ANIM_LOOP_STOP:
+        case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+        case WEAPON_ANIM2_LOOP_START:
+        case WEAPON_ANIM2_LOOP_STOP:
+        case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+        case WEAPON_ANIM_BREAKOUT_TIME:
+        case WEAPON_RADIUS:
+            {
+                float fWeaponInfo = 0.0f;
+
+                if ( CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eProp, eWep, eWepSkill, fWeaponInfo ) )
+                {
+                    lua_pushnumber ( luaVM, fWeaponInfo );
+                    return 1;
+                }
+                break;
+            }
+        case WEAPON_DAMAGE:
+        case WEAPON_MAX_CLIP_AMMO:
+        case WEAPON_FLAGS:
+        case WEAPON_ANIM_GROUP:
+        case WEAPON_FIRETYPE:
+        case WEAPON_MODEL:
+        case WEAPON_MODEL2:
+        case WEAPON_SLOT:
+        case WEAPON_AIM_OFFSET:
+        case WEAPON_SKILL_LEVEL:
+        case WEAPON_REQ_SKILL_LEVEL:
+        case WEAPON_DEFAULT_COMBO:
+        case WEAPON_COMBOS_AVAILABLE:
+            {
+                short sWeaponInfo = 0;
+
+                if ( CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eProp, eWep, eWepSkill, sWeaponInfo ) )
+                {
+                    lua_pushinteger ( luaVM, sWeaponInfo );
+                    return 1;
+                }
+                break;
+            }
+        case WEAPON_FIRE_OFFSET:
+            {
+                CVector vecWeaponInfo;
+
+                if ( CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eProp, eWep, eWepSkill, vecWeaponInfo ) )
+                {
+                    lua_pushnumber ( luaVM, vecWeaponInfo.fX );
+                    lua_pushnumber ( luaVM, vecWeaponInfo.fY );
+                    lua_pushnumber ( luaVM, vecWeaponInfo.fZ );
+                    return 3;
+                }
+                break;
+            }
+        default:
+            {
+                break;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponInfo", *argStream.GetErrorMessage () ) );
+
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

@@ -20,7 +20,7 @@ public:
     virtual CWeaponStat*                GetWeaponStats                  ( eWeaponType type, eWeaponSkill skill = WEAPONSKILL_STD ) = 0;
     virtual CWeaponStat*                GetOriginalWeaponStats          ( eWeaponType type, eWeaponSkill skill = WEAPONSKILL_STD ) = 0;
     virtual void                        Init                            ( void ) = 0;
-    virtual bool                        LoadDefault                     ( CWeaponStat* pDest, eWeaponType weaponType ) = 0;
+    virtual bool                        LoadDefault                     ( CWeaponStat* pDest, eWeaponType weaponType, eWeaponSkill skill = WEAPONSKILL_STD  ) = 0;
     virtual void                        CreateWeaponStat                ( CWeaponInfo* pInterface, eWeaponType weaponType, eWeaponSkill weaponSkill ) = 0;
 
 };

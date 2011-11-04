@@ -148,7 +148,7 @@ public:
     inline CRopes                   * GetRopes ()                { return m_pRopes; }
     inline CFx                      * GetFx ()                   { return m_pFx; }
     inline CWaterManager            * GetWaterManager ()         { return m_pWaterManager; }
-    inline CWeaponStatManager       * GetWeaponStatsManager()    { return m_pWeaponStatsManager; }
+    inline CWeaponStatManager       * GetWeaponStatManager()     { return m_pWeaponStatsManager; }
 
     CWeaponInfo             * GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill=WEAPONSKILL_STD);
     CModelInfo              * GetModelInfo( DWORD dwModelID );

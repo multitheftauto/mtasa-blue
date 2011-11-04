@@ -231,6 +231,7 @@ public:
     LUA_DECLARE ( GetPedCameraRotation );
     LUA_DECLARE ( IsPedOnFire );
     LUA_DECLARE ( GetWeaponProperty );
+    LUA_DECLARE ( GetOriginalWeaponProperty );
 
     LUA_DECLARE ( SetPedRotation );
     LUA_DECLARE ( SetPedCanBeKnockedOffBike );

@@ -14,7 +14,7 @@
 CWeaponStatSA::CWeaponStatSA ( eWeaponType weaponType, eWeaponSkill skillLevel )
 {
     // For Data Storage and won't apply changes.
-    this->pWeaponStats = NULL;
+    this->pWeaponStats = new CWeaponInfoSAInterface();
     this->weaponType = weaponType;
     this->skillLevel = skillLevel;
 }
