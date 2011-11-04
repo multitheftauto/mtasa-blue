@@ -139,6 +139,8 @@ public:
     static int      GetPedOccupiedVehicle               ( lua_State* luaVM );
     static int      GetPedOccupiedVehicleSeat           ( lua_State* luaVM );
     static int      IsPedInVehicle                      ( lua_State* luaVM );
+    static int      GetWeaponProperty                   ( lua_State* luaVM );
+    static int      GetOriginalWeaponProperty           ( lua_State* luaVM );
 
     // Player set functions
     static int      SetPedArmor                         ( lua_State* luaVM );    
@@ -163,6 +165,7 @@ public:
     static int      SetPedHeadless                      ( lua_State* luaVM );
     static int      SetPedFrozen                        ( lua_State* luaVM );
     static int      reloadPedWeapon                     ( lua_State* luaVM );
+    static int      SetWeaponProperty                   ( lua_State* luaVM );
 
     // Weapon give/take functions
     static int      GiveWeapon                          ( lua_State* luaVM );

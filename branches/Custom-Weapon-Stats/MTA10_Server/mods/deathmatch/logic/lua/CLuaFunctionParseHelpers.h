@@ -17,6 +17,9 @@ DECLARE_ENUM( eLuaType );
 DECLARE_ENUM( TrafficLight::EColor );
 DECLARE_ENUM( TrafficLight::EState );
 DECLARE_ENUM( CEasingCurve::eType );
+DECLARE_ENUM( eWeaponType )
+DECLARE_ENUM( eWeaponProperty )
+DECLARE_ENUM( eWeaponSkill )
 
 enum eHudComponent
 {

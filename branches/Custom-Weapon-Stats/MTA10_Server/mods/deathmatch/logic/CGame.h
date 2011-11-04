@@ -25,6 +25,7 @@ class CGame;
 #ifndef __CGAME_H
 #define __CGAME_H
 
+#include "CCommon.h"
 #include <net/CNetServer.h>
 #include "CClient.h"
 #include "CEvents.h"
