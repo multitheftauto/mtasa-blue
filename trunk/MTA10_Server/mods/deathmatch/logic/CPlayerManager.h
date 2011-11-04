@@ -46,8 +46,6 @@ public:
 
     inline std::list < CPlayer* > ::const_iterator  IterBegin                   ( void )                                            { return m_Players.begin (); };
     inline std::list < CPlayer* > ::const_iterator  IterEnd                     ( void )                                            { return m_Players.end (); };
-    inline std::list < CPlayer* > ::const_iterator  IterGet                     ( CPlayer* pPlayer );
-    inline std::list < CPlayer* > ::const_iterator  IterGet                     ( ElementID PlayerID );
 
     void                                        BroadcastOnlyJoined             ( const CPacket& Packet, CPlayer* pSkip = NULL );
 
@@ -66,6 +64,7 @@ private:
     class CScriptDebugging*                     m_pScriptDebugging;
 
     CMappedList < CPlayer* >                    m_Players;
+    std::map < NetServerPlayerID, CPlayer* >    m_SocketPlayerMap;
 };
 
 #endif

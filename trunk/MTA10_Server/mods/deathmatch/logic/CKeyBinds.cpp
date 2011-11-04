@@ -66,33 +66,29 @@ CKeyBinds::~CKeyBinds ( void )
 
 SBindableKey* CKeyBinds::GetBindableFromKey ( const char* szKey )
 {
-    SBindableKey* temp = NULL;
-    for ( int i = 0 ; *g_bkKeys [ i ].szKey != 0 ; i++ )
-    {
-        temp = &g_bkKeys [ i ];
-        if ( !stricmp ( temp->szKey, szKey ) )
-        {
-            return temp;
-        }
-    }
+    // Map for faster lookup
+    static std::map < SString, SBindableKey* > bindableKeyMap;
 
-    return NULL;
+    // Init map if required
+    if ( bindableKeyMap.empty () )
+        for ( int i = 0 ; *g_bkKeys [ i ].szKey != 0 ; i++ )
+            MapSet ( bindableKeyMap, SStringX ( g_bkKeys [ i ].szKey ).ToLower (), &g_bkKeys [ i ] );
+
+    return MapFindRef ( bindableKeyMap, SStringX ( szKey ).ToLower () );
 }
 
 
 SBindableGTAControl* CKeyBinds::GetBindableFromControl ( const char* szControl )
 {
-    SBindableGTAControl* temp = NULL;
-    for ( int i = 0 ; *g_bcControls [ i ].szControl != 0 ; i++ )
-    {
-        temp = &g_bcControls [ i ];
-        if ( !stricmp ( temp->szControl, szControl ) )
-        {
-            return temp;
-        }
-    }
+    // Map for faster lookup
+    static std::map < SString, SBindableGTAControl* > bindableControlMap;
 
-    return NULL;
+    // Init map if required
+    if ( bindableControlMap.empty () )
+        for ( int i = 0 ; *g_bcControls [ i ].szControl != 0 ; i++ )
+            MapSet ( bindableControlMap, SStringX ( g_bcControls [ i ].szControl ).ToLower (), &g_bcControls [ i ] );
+
+    return MapFindRef ( bindableControlMap, SStringX ( szControl ).ToLower () );
 }
 
 
