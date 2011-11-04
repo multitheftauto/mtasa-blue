@@ -89,6 +89,7 @@ void CRPCFunctions::ProcessPacket ( NetServerPlayerID& Socket, NetBitStreamInter
 
 void CRPCFunctions::PlayerInGameNotice ( NetBitStreamInterface & bitStream )
 {
+    CLOCK( "NetServerPulse::RPC", "PlayerInGameNotice" );
     // Already ingame? Protocol error
     if ( m_pSourcePlayer->IsIngame () )
     {
@@ -99,10 +100,12 @@ void CRPCFunctions::PlayerInGameNotice ( NetBitStreamInterface & bitStream )
         // Join him to the game
         g_pGame->JoinPlayer ( *m_pSourcePlayer );
     }
+    UNCLOCK( "NetServerPulse::RPC", "PlayerInGameNotice" );
 }
 
 void CRPCFunctions::InitialDataStream ( NetBitStreamInterface & bitStream )
 {
+    CLOCK( "NetServerPulse::RPC", "InitialDataStream" );
     // Already sent initial stuff? Protocol error
     if ( m_pSourcePlayer->IsJoined () )
     {
@@ -113,11 +116,13 @@ void CRPCFunctions::InitialDataStream ( NetBitStreamInterface & bitStream )
         // Send him the initial stuff
         g_pGame->InitialDataStream ( *m_pSourcePlayer );
     }
+    UNCLOCK( "NetServerPulse::RPC", "InitialDataStream" );
 }
 
 
 void CRPCFunctions::PlayerTarget ( NetBitStreamInterface & bitStream )
 {
+    CLOCK( "NetServerPulse::RPC", "PlayerTarget" );
     if ( m_pSourcePlayer->IsJoined () )
     {
         ElementID TargetID;
@@ -134,11 +139,13 @@ void CRPCFunctions::PlayerTarget ( NetBitStreamInterface & bitStream )
 
         m_pSourcePlayer->CallEvent ( "onPlayerTarget", Arguments );
     }
+    UNCLOCK( "NetServerPulse::RPC", "PlayerTarget" );
 }
 
 
 void CRPCFunctions::PlayerWeapon ( NetBitStreamInterface & bitStream )
 {
+    CLOCK( "NetServerPulse::RPC", "PlayerWeapon" );
     if ( m_pSourcePlayer->IsJoined () && m_pSourcePlayer->IsSpawned () )
     {
         SWeaponSlotSync slot;
@@ -179,11 +186,14 @@ void CRPCFunctions::PlayerWeapon ( NetBitStreamInterface & bitStream )
                 CStaticFunctionDefinitions::GiveWeapon( m_pSourcePlayer, 40, 1, true );
         }
     }
+    UNCLOCK( "NetServerPulse::RPC", "PlayerWeapon" );
 }
 
 
 void CRPCFunctions::KeyBind ( NetBitStreamInterface & bitStream )
 {
+    CLOCK( "NetServerPulse::RPC", "KeyBind" );
+
     unsigned char ucType;
     bool bHitState = false;
     if ( bitStream.ReadBit () == true )
@@ -201,21 +211,19 @@ void CRPCFunctions::KeyBind ( NetBitStreamInterface & bitStream )
 
         m_pSourcePlayer->GetKeyBinds ()->ProcessKey ( szKey, bHitState, ( eKeyBindType ) ucType );
     }
+
+    UNCLOCK( "NetServerPulse::RPC", "KeyBind" );
 }
 
 
 void CRPCFunctions::CursorEvent ( NetBitStreamInterface & bitStream )
 {
-    SMouseButtonSync button;
-    unsigned char ucButton;
+    CLOCK( "NetServerPulse::RPC", "CursorEvent" );
 
-    CVector2D vecCursorPosition;
+    SMouseButtonSync button;
     unsigned short usX;
     unsigned short usY;
-
     SPositionSync position ( false );
-    CVector vecPosition;
-
     bool bHasCollisionElement;
     ElementID elementID;
 
@@ -226,74 +234,73 @@ void CRPCFunctions::CursorEvent ( NetBitStreamInterface & bitStream )
          bitStream.ReadBit ( bHasCollisionElement ) &&
          ( !bHasCollisionElement || bitStream.Read ( elementID ) ) )
     {
-        ucButton = button.data.ucButton;
-        vecCursorPosition.fX = static_cast < float > ( usX );
-        vecCursorPosition.fY = static_cast < float > ( usY );
-        vecPosition = position.data.vecPosition;
+        unsigned char ucButton = button.data.ucButton;
+        CVector2D vecCursorPosition ( static_cast < float > ( usX ), static_cast < float > ( usY ) );
+        CVector vecPosition = position.data.vecPosition;
         if ( !bHasCollisionElement )
             elementID = INVALID_ELEMENT_ID;
-    }
-    else
-        return;
 
-    if ( m_pSourcePlayer->IsJoined () )
-    {
-        // Get the button and state
-        const char* szButton = NULL;
-        const char* szState = NULL;
-        switch ( ucButton )
+        if ( m_pSourcePlayer->IsJoined () )
         {
-            case 0: szButton = "left"; szState = "down";
-                break;
-            case 1: szButton = "left"; szState = "up";
-                break;
-            case 2: szButton = "middle"; szState = "down";
-                break;
-            case 3: szButton = "middle"; szState = "up";
-                break;
-            case 4: szButton = "right"; szState = "down";
-                break;
-            case 5: szButton = "right"; szState = "up";
-                break;
-        }
-        if ( szButton && szState )
-        {
-            CElement* pElement = CElementIDs::GetElement ( elementID );
-            if ( pElement )
+            // Get the button and state
+            const char* szButton = NULL;
+            const char* szState = NULL;
+            switch ( ucButton )
             {
-                // Call the onElementClicked event
+                case 0: szButton = "left"; szState = "down";
+                    break;
+                case 1: szButton = "left"; szState = "up";
+                    break;
+                case 2: szButton = "middle"; szState = "down";
+                    break;
+                case 3: szButton = "middle"; szState = "up";
+                    break;
+                case 4: szButton = "right"; szState = "down";
+                    break;
+                case 5: szButton = "right"; szState = "up";
+                    break;
+            }
+            if ( szButton && szState )
+            {
+                CElement* pElement = CElementIDs::GetElement ( elementID );
+                if ( pElement )
+                {
+                    // Call the onElementClicked event
+                    CLuaArguments Arguments;
+                    Arguments.PushString ( szButton );
+                    Arguments.PushString ( szState );
+                    Arguments.PushElement ( m_pSourcePlayer );
+                    Arguments.PushNumber ( vecPosition.fX );
+                    Arguments.PushNumber ( vecPosition.fY );
+                    Arguments.PushNumber ( vecPosition.fZ );
+                    pElement->CallEvent ( "onElementClicked", Arguments );
+                }
+                // Call the onPlayerClick event
                 CLuaArguments Arguments;
                 Arguments.PushString ( szButton );
                 Arguments.PushString ( szState );
-                Arguments.PushElement ( m_pSourcePlayer );
+                if ( pElement )
+                    Arguments.PushElement ( pElement );
+                else
+                    Arguments.PushNil ();
                 Arguments.PushNumber ( vecPosition.fX );
                 Arguments.PushNumber ( vecPosition.fY );
                 Arguments.PushNumber ( vecPosition.fZ );
-                pElement->CallEvent ( "onElementClicked", Arguments );
-            }
-            // Call the onPlayerClick event
-            CLuaArguments Arguments;
-            Arguments.PushString ( szButton );
-            Arguments.PushString ( szState );
-            if ( pElement )
-                Arguments.PushElement ( pElement );
-            else
-                Arguments.PushNil ();
-            Arguments.PushNumber ( vecPosition.fX );
-            Arguments.PushNumber ( vecPosition.fY );
-            Arguments.PushNumber ( vecPosition.fZ );
-            Arguments.PushNumber ( vecCursorPosition.fX );
-            Arguments.PushNumber ( vecCursorPosition.fY );
-            m_pSourcePlayer->CallEvent ( "onPlayerClick", Arguments );
+                Arguments.PushNumber ( vecCursorPosition.fX );
+                Arguments.PushNumber ( vecCursorPosition.fY );
+                m_pSourcePlayer->CallEvent ( "onPlayerClick", Arguments );
 
-            // TODO: iterate server-side element managers for the click events, eg: colshapes
+                // TODO: iterate server-side element managers for the click events, eg: colshapes
+            }
         }
     }
+    UNCLOCK( "NetServerPulse::RPC", "CursorEvent" );
 }
 
 
 void CRPCFunctions::RequestStealthKill ( NetBitStreamInterface & bitStream )
 {
+    CLOCK( "NetServerPulse::RPC", "RequestStealthKill" );
     ElementID ID;
     bitStream.Read ( ID );
     CElement * pElement = CElementIDs::GetElement ( ID );
@@ -336,4 +343,5 @@ void CRPCFunctions::RequestStealthKill ( NetBitStreamInterface & bitStream )
             }
         }
     }
+    UNCLOCK( "NetServerPulse::RPC", "RequestStealthKill" );
 }
