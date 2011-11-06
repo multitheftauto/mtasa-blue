@@ -334,7 +334,7 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
         {
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
 
-            CVehicle* pTemp = m_pVehicleManager->Create ( pVehicle->GetModel (), pElement->GetParentEntity () );
+            CVehicle* pTemp = m_pVehicleManager->Create ( pVehicle->GetModel (), pVehicle->GetVariant(), pVehicle->GetVariant2(), pElement->GetParentEntity () );
             if ( pTemp )
             {
                 CVector vecRotationDegrees;
@@ -3856,12 +3856,12 @@ bool CStaticFunctionDefinitions::SetWeaponAmmo ( CElement* pElement, unsigned ch
 }
 
 
-CVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, char* szRegPlate, bool bDirection )
+CVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, char* szRegPlate, bool bDirection, unsigned char ucVariant, unsigned char ucVariant2 )
 {
-    if ( CVehicleManager::IsValidModel ( usModel ) )
+    if ( CVehicleManager::IsValidModel ( usModel ) && ucVariant <= 5 && ucVariant <= 5 )
     {
         //CVehicle* pVehicle = m_pVehicleManager->Create ( usModel, m_pMapManager->GetRootElement () );
-        CVehicle* pVehicle = m_pVehicleManager->Create ( usModel, pResource->GetDynamicElementRoot() );
+        CVehicle* pVehicle = m_pVehicleManager->Create ( usModel, ucVariant, ucVariant2, pResource->GetDynamicElementRoot() );
         if ( pVehicle )
         {
             pVehicle->SetPosition ( vecPosition );

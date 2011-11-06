@@ -50,7 +50,7 @@ public:
 
     
     // Vehicles pool
-    CVehicle*               AddVehicle          ( eVehicleTypes eVehicleType );
+    CVehicle*               AddVehicle          ( eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2 );
     CVehicle*               AddVehicle          ( DWORD* pGameInterface );
 private:
     bool                    AddVehicleToPool    ( CVehicleSA* pVehicle );

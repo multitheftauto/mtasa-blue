@@ -65,7 +65,7 @@ class CPools
 {
 public:
     // Vehicles pool
-    virtual CVehicle*       AddVehicle              ( eVehicleTypes eVehicleType ) = 0;
+    virtual CVehicle*       AddVehicle              ( eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2 ) = 0;
     virtual CVehicle*       AddVehicle              ( DWORD* pGameInterface ) = 0;
     virtual void            RemoveVehicle           ( CVehicle* pVehicle, bool bDelete = true ) = 0;
     virtual void            RemoveVehicle           ( unsigned long ulID, bool bDelete = true ) = 0;

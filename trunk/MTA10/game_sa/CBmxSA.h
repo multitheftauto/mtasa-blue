@@ -26,7 +26,7 @@ class CBmxSA : public virtual CBmx, public virtual CBikeSA
 private:
 public:
                                 CBmxSA( CBmxSAInterface * bmx );
-                                CBmxSA( eVehicleTypes dwModelID );
+                                CBmxSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 );
 
     virtual                     ~CBmxSA ( void ) {};
 };

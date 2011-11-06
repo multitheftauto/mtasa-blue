@@ -29,7 +29,7 @@ public:
     CBikeSA (  ){};
 
     CBikeSA( CBikeSAInterface * bike );
-    CBikeSA( eVehicleTypes dwModelID );
+    CBikeSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 );
 
     //void                    PlaceOnRoadProperly ( void );
 };

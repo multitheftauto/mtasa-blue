@@ -99,10 +99,10 @@ CVehicleManager::~CVehicleManager ( void )
 }
 
 
-CVehicle* CVehicleManager::Create ( unsigned short usModel, CElement* pParent, CXMLNode* pNode )
+CVehicle* CVehicleManager::Create ( unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2, CElement* pParent, CXMLNode* pNode )
 {
     // Create the vehicle
-    CVehicle* pVehicle = new CVehicle ( this, pParent, pNode, usModel );
+    CVehicle* pVehicle = new CVehicle ( this, pParent, pNode, usModel, ucVariant, ucVariant2 );
 
     // Invalid vehicle id?
     if ( pVehicle->GetID () == INVALID_ELEMENT_ID )
@@ -119,7 +119,7 @@ CVehicle* CVehicleManager::Create ( unsigned short usModel, CElement* pParent, C
 CVehicle* CVehicleManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents )
 {
     // Create the vehicle
-    CVehicle* pVehicle = new CVehicle ( this, pParent, &Node, 400 );
+    CVehicle* pVehicle = new CVehicle ( this, pParent, &Node, 400, rand() % 5, rand() % 5 );
 
     // Verify the vehicle id and load the data from xml
     if ( pVehicle->GetID () == INVALID_ELEMENT_ID ||

@@ -161,6 +161,11 @@ class CVehicleSA;
 #define HANDLING_NOS_Flag                       0x00080000
 #define	HANDLING_Hydraulics_Flag                0x00020000
 
+#define VAR_CVehicle_Variation1                 0x8A6458
+#define VAR_CVehicle_Variation2                 0x8A6459
+
+
+
 typedef struct
 {
     short sX;               // x coordinate times 8
@@ -518,7 +523,7 @@ private:
 public:
                                 CVehicleSA                      ();
                                 CVehicleSA                      ( CVehicleSAInterface * vehicleInterface );
-                                CVehicleSA                      ( eVehicleTypes dwModelID );
+                                CVehicleSA                      ( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 );
                                 ~CVehicleSA                     ();
     void                        Init                            ( void );
 

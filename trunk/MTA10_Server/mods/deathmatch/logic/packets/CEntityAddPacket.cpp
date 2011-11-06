@@ -324,6 +324,12 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     memcpy ( damage.data.ucPanelStates, pVehicle->m_ucPanelStates, MAX_PANELS );
                     memcpy ( damage.data.ucLightStates, pVehicle->m_ucLightStates, MAX_LIGHTS );
                     BitStream.Write ( &damage );
+                    
+                    unsigned char ucVariant = pVehicle->GetVariant();
+                    BitStream.Write ( ucVariant );
+
+                    unsigned char ucVariant2 = pVehicle->GetVariant2();
+                    BitStream.Write ( ucVariant2 );
 
                     // If the vehicle has a turret, send its position too
                     unsigned short usModel = pVehicle->GetModel ();

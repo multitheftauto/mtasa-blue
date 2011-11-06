@@ -2652,8 +2652,22 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         return;
                     }
 
+                    unsigned char ucVariant = 5;
+                    if ( !bitStream.Read ( ucVariant ) )
+                    {
+                        RaiseProtocolError ( 42 );
+                        return;
+                    }
+
+                    unsigned char ucVariant2 = 5;
+                    if ( !bitStream.Read ( ucVariant2 ) )
+                    {
+                        RaiseProtocolError ( 42 );
+                        return;
+                    }
+
                     // Create it
-                    CDeathmatchVehicle* pVehicle = new CDeathmatchVehicle ( g_pClientGame->m_pManager, g_pClientGame->m_pUnoccupiedVehicleSync, EntityID, usModel );
+                    CDeathmatchVehicle* pVehicle = new CDeathmatchVehicle ( g_pClientGame->m_pManager, g_pClientGame->m_pUnoccupiedVehicleSync, EntityID, usModel, ucVariant, ucVariant2 );
                     pEntity = pVehicle;
                     if ( !pVehicle )
                     {

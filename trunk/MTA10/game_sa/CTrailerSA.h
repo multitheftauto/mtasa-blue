@@ -27,7 +27,7 @@ class CTrailerSA : public virtual CTrailer, public virtual CAutomobileSA
 private:
 public:
                                 CTrailerSA( CTrailerSAInterface * trailer );
-                                CTrailerSA( eVehicleTypes dwModelID );
+                                CTrailerSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 );
 
     virtual                     ~CTrailerSA ( void ) {}
 };
