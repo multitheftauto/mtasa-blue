@@ -4401,25 +4401,25 @@ bool CStaticFunctionDefinitions::SetWeaponAmmo ( CElement* pElement, unsigned ch
 
 CVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, char* szRegPlate, bool bDirection, unsigned char ucVariant, unsigned char ucVariant2 )
 {
-    if ( CVehicleManager::IsValidModel ( usModel ) && (ucVariant <= 5 || ucVariant == 255) && (ucVariant2 <= 5 || ucVariant2 == 255) )
+    if ( CVehicleManager::IsValidModel ( usModel ) && ( ucVariant <= 5 || ucVariant == 255 ) && ( ucVariant2 <= 5 || ucVariant2 == 255 ) )
     {
 
         unsigned char ucVariation = ucVariant;
         unsigned char ucVariation2 = ucVariant2;
-        srand ( GetTickCount32() );
+        srand ( GetTickCount32 ( ) );
         // 6 values (-1 to 5)
         if ( ucVariant == 255 )
-            ucVariation = (rand() % 6) - 1;
+            ucVariation = ( rand() % 6 ) - 1;
         if ( ucVariant2 == 255 )
-            ucVariation2 = (rand() % 6) - 1;
+            ucVariation2 = ( rand() % 6 ) - 1;
 
         // Don't spawn a slamvan without a steering wheel
         if ( usModel == 535 && 
-            (ucVariation2 >= 2 || ucVariation2 == 255) &&
-            (ucVariation >= 2 || ucVariation == 255) )
+            ( ucVariation2 >= 2 || ucVariation2 == 255 ) &&
+            ( ucVariation >= 2 || ucVariation == 255 ) )
         {
             ucVariation2 = 0;
-            ucVariation = rand() % 1;
+            ucVariation = rand ( ) % 1;
         }
 
         //CVehicle* pVehicle = m_pVehicleManager->Create ( usModel, m_pMapManager->GetRootElement () );
