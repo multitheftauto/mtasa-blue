@@ -118,14 +118,27 @@ CGameSA::CGameSA()
 
     // Extra weapon types for skills (WEAPONSKILL_POOR,WEAPONSKILL_PRO,WEAPONSKILL_SPECIAL)
     int index;
+    eWeaponSkill weaponSkill = eWeaponSkill::WEAPONSKILL_POOR;
     for ( int skill = 0; skill < 3 ; skill++ )
     {
+        //STD is created first, then it creates "extra weapon types" (poor, pro, special?) but in the enum 1 = STD which meant the STD weapon skill contained pro info
+        if ( skill >= 1 )
+        {
+            if ( skill == 1 )
+            {
+                weaponSkill = eWeaponSkill::WEAPONSKILL_PRO;
+            }
+            if ( skill == 2 )
+            {
+                weaponSkill = eWeaponSkill::WEAPONSKILL_SPECIAL;
+            }
+        }
         for ( int i = 0; i < NUM_WeaponInfosOtherSkill; i++ )
         {
             eWeaponType weaponType = (eWeaponType)(WEAPONTYPE_PISTOL + i);
             index = NUM_WeaponInfosStdSkill + skill*NUM_WeaponInfosOtherSkill + i;
             WeaponInfos[index] = new CWeaponInfoSA( (CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + index*CLASSSIZE_WeaponInfo), weaponType );
-            m_pWeaponStatsManager->CreateWeaponStat ( WeaponInfos[index], weaponType, (eWeaponSkill)skill );
+            m_pWeaponStatsManager->CreateWeaponStat ( WeaponInfos[index], weaponType, weaponSkill );
         }
     }
 

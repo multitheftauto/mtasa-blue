@@ -68,7 +68,7 @@ struct sWeaponStats
 class CWeaponStat
 {
 public:
-                                CWeaponStat                 ( void ){};
+                                CWeaponStat                 ( void );
                                 CWeaponStat                 ( eWeaponType weaponType, eWeaponSkill skillLevel );
                                 ~CWeaponStat                ( void );
 
@@ -190,10 +190,14 @@ public:
         BYTE                        GetCombosAvailable       ( void )                        { return tWeaponStats.m_nCombosAvailable; }
         void                        SetCombosAvailable       ( BYTE nCombosAvailable )       { tWeaponStats.m_nCombosAvailable = nCombosAvailable; }
 
+        void                        SetChanged               ( bool bChanged )                        { m_bChanged = bChanged; }
+        bool                        HasChanged               ( void )                                 { return m_bChanged; }
+
 private:
-        eWeaponType weaponType;
-        eWeaponSkill skillLevel;
-        sWeaponStats tWeaponStats;
+        eWeaponType                 weaponType;
+        eWeaponSkill                skillLevel;
+        sWeaponStats                tWeaponStats;
+        bool                        m_bChanged;
 
 
 };

@@ -208,5 +208,7 @@ enum eRPCFunctions
 
     SET_AIRCRAFT_MAXHEIGHT,
 
+    SET_WEAPON_PROPERTY,
+
     NUM_RPC_FUNCS
 };

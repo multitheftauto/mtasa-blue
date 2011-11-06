@@ -16,11 +16,15 @@ sWeaponInfo CWeaponStatManagerSA::OriginalHitmanWeaponData [ WEAPONTYPE_MAX+1 ];
 CWeaponStatManagerSA::CWeaponStatManagerSA ( )
 {
     Init();
+    InitLists ();
+}
+void CWeaponStatManagerSA::InitLists ( )
+{
     CWeaponStatSA* pWeaponStat = NULL;
     // Make our list nicer by starting at the non-skill weapons so we don't have duplicates of STD weapon skill
     for ( int i = 0; i <= WEAPONTYPE_EXTINGUISHER; i++)
     {
-        eWeaponType weaponType = (eWeaponType) (WEAPONTYPE_COUNTRYRIFLE + i);
+        eWeaponType weaponType = (eWeaponType) (WEAPONTYPE_PISTOL + i);
         // Storage for Original weapon data ( for resetting )
         pWeaponStat = new CWeaponStatSA ( weaponType, WEAPONSKILL_STD );
         m_OriginalWeaponData.push_back ( pWeaponStat );
@@ -41,6 +45,28 @@ CWeaponStatManagerSA::CWeaponStatManagerSA ( )
         }
     }
 }
+// Don't call me for now seems to screw up rejoining
+void CWeaponStatManagerSA::ResetLists ( )
+{
+    return;
+    if ( m_WeaponData.size() == 0 )
+        return;
+
+    CWeaponStat* pWeaponStat = NULL;
+    // Make our list nicer by starting at the non-skill weapons so we don't have duplicates of STD weapon skill
+    for ( std::list < CWeaponStat* >::iterator iter = m_WeaponData.begin (); iter != m_WeaponData.end ();iter++ )
+    {
+        if ( (*iter) )
+        {
+            pWeaponStat = (*iter);
+            eWeaponType WeaponType = pWeaponStat->GetWeaponType();
+            if ( WeaponType >= WEAPONTYPE_PISTOL && WeaponType <= WEAPONTYPE_EXTINGUISHER )
+            {
+                LoadDefault( pWeaponStat, WeaponType, pWeaponStat->GetWeaponSkillLevel() );
+            }
+        }
+    }
+}
 
 CWeaponStatManagerSA::~CWeaponStatManagerSA ( )
 {
@@ -58,19 +84,22 @@ CWeaponStatManagerSA::~CWeaponStatManagerSA ( )
 }
 void CWeaponStatManagerSA::CreateWeaponStat ( CWeaponInfo* pInterface, eWeaponType weaponType, eWeaponSkill weaponSkill )
 {
-    CWeaponStatSA* pWeaponStat = NULL;
+    if ( weaponType >= WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_EXTINGUISHER )
+    {
+        CWeaponStatSA* pWeaponStat = NULL;
 
-    // Storage for new weapon data ( for script use )
-    pWeaponStat = new CWeaponStatSA ( ((CWeaponInfoSA*)(pInterface)), weaponType, WEAPONSKILL_STD );
-    m_WeaponData.push_back ( pWeaponStat );
+        // Storage for new weapon data ( for script use )
+        pWeaponStat = new CWeaponStatSA ( ((CWeaponInfoSA*)(pInterface)), weaponType, weaponSkill );
+        m_WeaponData.push_back ( pWeaponStat );
+        LoadDefaultInternal( pWeaponStat, weaponType, weaponSkill );
+    }
 }
 
 CWeaponStat* CWeaponStatManagerSA::GetWeaponStats ( eWeaponType type, eWeaponSkill skill )
 {
     for ( std::list < CWeaponStat* >::iterator iter = m_WeaponData.begin (); iter != m_WeaponData.end ();iter++ )
     {
-        if ( ( (*iter)->GetWeaponSkillLevel() == skill || 
-            ( type > WEAPONTYPE_PISTOL && type < WEAPONTYPE_TEC9 ) ) && 
+        if ( ( (*iter)->GetWeaponSkillLevel() == skill || type > WEAPONTYPE_TEC9 ) && 
             (*iter)->GetWeaponType () == type )
         {
             return (*iter);
@@ -95,64 +124,61 @@ void CWeaponStatManagerSA::Init ( void )
     // Load SA Defaults
     // Script to Dump:
     // Script bugs:
-    // - floats mishandling i.e. 1f which will cause a compile failure
     // - 
     /*
-    props = {
-        "weapon_range","target_range","accuracy",
-        "damage","life_span","firing_speed",
-        "spread","maximum_clip_ammo",
-        "move_speed","flags","anim_group",
-        "fire_type","model","model2",
-        "weapon_slot","fire_offset","skill_level",
-        "required_skill_level","anim_loop_start","anim_loop_stop",
-        "anim_loop_bullet_fire","anim2_loop_start",
-        "anim2_loop_stop","anim2_loop_bullet_fire",
-        "anim_breakout_time","radius","aim_offset",
-        "default_combo","combos_available"
-    }
     count = 22
+    statid = 3
     addCommandHandler("dump", function ()
-	    hFile = fileOpen ( "dump.txt" )
-	    fileSetPos(hFile, fileGetSize ( hFile ))
-	    i = count
-	    fileWrite(hFile, "// " .. i .. " - " .. getWeaponNameFromID( i ) )
-	    fileWrite(hFile, "\r\n")
-	    for k,v in ipairs(props) do
-		    outputChatBox(v)
-		    fileWrite(hFile, Dump(v))
+	    while (count < 33) do
+		    hFile = fileOpen ( "dump.txt" )
+		    fileSetPos(hFile, fileGetSize ( hFile ))
+		    i = count
+		    fileWrite(hFile, "// " .. i .. " - " .. getWeaponNameFromID( i ) .. " Stat: " .. statid )
 		    fileWrite(hFile, "\r\n")
+		    for k,v in ipairs(props) do
+			    outputChatBox(v)
+			    fileWrite(hFile, Dump(v))
+			    fileWrite(hFile, "\r\n")
+		    end
+		    fileClose(hFile)
+		    count = count + 1
 	    end
-	    fileClose(hFile)
-	    count = count + 1
     end)
-
+    function Array()
+        if (statid == 3) then
+            return "OriginalHitmanData["
+        elseif ( statid == 2 ) then
+            return "OriginalGangsterData["
+        else
+            return "OriginalWeaponData["
+        end
+    end
     function Dump(strInfo)
 	    i = count
 	    -- Special case for Vectors
 	    if ( strInfo == "fire_offset") then
-		    fx, fy, fz = getPedWeaponInfo(getLocalPlayer(), i, strInfo)
-		    return "OriginalNormalWeaponData[" .. i .. "]." .. strInfo .. " = CVector ( " .. floatify ( fx ) .. ", " .. floatify ( fy ) .. ", " .. floatify ( fz ) .. " );"
+		    fx, fy, fz = getWeaponProperty(i, statid, strInfo)
+		    return Array() .. i .. "]." .. strInfo .. " = CVector ( " .. floatify ( fx ) .. ", " .. floatify ( fy ) .. ", " .. floatify ( fz ) .. " );"
 	    end
 	    -- Avoids compile errors ( Cannot convert from x to y )
 	    if ( strInfo == "skill_level" ) then
-		    return "OriginalNormalWeaponData[" .. i .. "]." .. strInfo .. " = (eWeaponSkill) " .. getPedWeaponInfo(getLocalPlayer(), i, strInfo) .. ";"
+		    return Array() .. i .. "]." .. strInfo .. " = (eWeaponSkill) " .. getWeaponProperty(i, statid, strInfo) .. ";"
 	    end
 
 	    if ( strInfo == "weapon_slot" ) then
-		    return "OriginalNormalWeaponData[" .. i .. "]." .. strInfo .. " = (eWeaponSlot) " .. getPedWeaponInfo(getLocalPlayer(), i, strInfo) .. ";"
+		    return Array() .. i .. "]." .. strInfo .. " = (eWeaponSlot) " .. getWeaponProperty(i, statid, strInfo) .. ";"
 	    end
 
 	    if ( strInfo == "fire_type" ) then
-		    return "OriginalNormalWeaponData[" .. i .. "]." .. strInfo .. " = (eFireType) " .. getPedWeaponInfo(getLocalPlayer(), i, strInfo) .. ";"
+		    return Array() .. i .. "]." .. strInfo .. " = (eFireType) " .. getWeaponProperty(i, statid, strInfo) .. ";"
 	    end
 	    -- end
 	    -- Avoids Conversion from Double to float warnings.
 	    if ( strInfo == "weapon_range" or strInfo == "target_range" or strInfo == "accuracy" or strInfo == "move_speed" or strInfo == "anim_loop_start" or strInfo == "anim_loop_stop" or strInfo == "anim_loop_bullet_fire" or strInfo == "anim2_loop_start" or strInfo == "anim2_loop_stop" or strInfo == "anim2_loop_bullet_fire" or strInfo == "anim_breakout_time" or strInfo == "firing_speed" or strInfo == "radius" or strInfo == "life_span" or strInfo == "spread") then
-		    return "OriginalNormalWeaponData[" .. i .. "]." .. strInfo .. " = " .. floatify ( getPedWeaponInfo(getLocalPlayer(), i, strInfo) ) .. ";"
+		    return Array() .. i .. "]." .. strInfo .. " = " .. floatify ( getWeaponProperty(i, statid, strInfo) ) .. ";"
 	    end
 	    -- Default
-	    return "OriginalNormalWeaponData[" .. i .. "]." .. strInfo .. " = " .. getPedWeaponInfo(getLocalPlayer(), i, strInfo) .. ";"
+	    return Array() .. i .. "]." .. strInfo .. " = " .. getWeaponProperty(i, statid, strInfo) .. ";"
     end
     -- Avoids conversion from Double to float warnings.
     function floatify ( fVal )
@@ -1526,7 +1552,7 @@ bool CWeaponStatManagerSA::LoadDefault ( CWeaponStat* pDest, eWeaponType weaponT
         if ( iVal >= 22 && iVal <= 42 )
         {
 
-            switch (weaponSkill)
+            switch ( weaponSkill )
             {
                 case WEAPONSKILL_POOR:
                 {
@@ -1559,6 +1585,7 @@ bool CWeaponStatManagerSA::LoadDefault ( CWeaponStat* pDest, eWeaponType weaponT
                     pDest->SetAimOffsetIndex ( OriginalPoorWeaponData[iVal].aim_offset );
                     pDest->SetDefaultCombo ( OriginalPoorWeaponData[iVal].default_combo );
                     pDest->SetCombosAvailable ( OriginalPoorWeaponData[iVal].combos_available );
+                    break;
                 }
                 case WEAPONSKILL_PRO:
                 {
@@ -1591,6 +1618,7 @@ bool CWeaponStatManagerSA::LoadDefault ( CWeaponStat* pDest, eWeaponType weaponT
                     pDest->SetAimOffsetIndex ( OriginalHitmanWeaponData[iVal].aim_offset );
                     pDest->SetDefaultCombo ( OriginalHitmanWeaponData[iVal].default_combo );
                     pDest->SetCombosAvailable ( OriginalHitmanWeaponData[iVal].combos_available );
+                    break;
                 }
                 case WEAPONSKILL_STD:
                 {
@@ -1623,6 +1651,7 @@ bool CWeaponStatManagerSA::LoadDefault ( CWeaponStat* pDest, eWeaponType weaponT
                     pDest->SetAimOffsetIndex ( OriginalNormalWeaponData[iVal].aim_offset );
                     pDest->SetDefaultCombo ( OriginalNormalWeaponData[iVal].default_combo );
                     pDest->SetCombosAvailable ( OriginalNormalWeaponData[iVal].combos_available );
+                    break;
                 }
             }
         }
@@ -1637,8 +1666,7 @@ bool CWeaponStatManagerSA::LoadDefaultInternal ( CWeaponStatSA* pDest, eWeaponTy
         int iVal = (int)weaponType;
         if ( iVal >= 22 && iVal <= 42 )
         {
-
-            switch (weaponSkill)
+            switch ( weaponSkill )
             {
             case WEAPONSKILL_POOR:
                 {
@@ -1671,6 +1699,7 @@ bool CWeaponStatManagerSA::LoadDefaultInternal ( CWeaponStatSA* pDest, eWeaponTy
                     pDest->SetAimOffsetIndex ( OriginalPoorWeaponData[iVal].aim_offset );
                     pDest->SetDefaultCombo ( OriginalPoorWeaponData[iVal].default_combo );
                     pDest->SetCombosAvailable ( OriginalPoorWeaponData[iVal].combos_available );
+                    break;
                 }
             case WEAPONSKILL_PRO:
                 {
@@ -1703,6 +1732,7 @@ bool CWeaponStatManagerSA::LoadDefaultInternal ( CWeaponStatSA* pDest, eWeaponTy
                     pDest->SetAimOffsetIndex ( OriginalHitmanWeaponData[iVal].aim_offset );
                     pDest->SetDefaultCombo ( OriginalHitmanWeaponData[iVal].default_combo );
                     pDest->SetCombosAvailable ( OriginalHitmanWeaponData[iVal].combos_available );
+                    break;
                 }
             case WEAPONSKILL_STD:
                 {
@@ -1735,6 +1765,7 @@ bool CWeaponStatManagerSA::LoadDefaultInternal ( CWeaponStatSA* pDest, eWeaponTy
                     pDest->SetAimOffsetIndex ( OriginalNormalWeaponData[iVal].aim_offset );
                     pDest->SetDefaultCombo ( OriginalNormalWeaponData[iVal].default_combo );
                     pDest->SetCombosAvailable ( OriginalNormalWeaponData[iVal].combos_available );
+                    break;
                 }
             }
         }

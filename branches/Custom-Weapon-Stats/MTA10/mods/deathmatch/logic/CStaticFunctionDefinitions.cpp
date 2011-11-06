@@ -6607,7 +6607,7 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;
 
-    CWeaponInfo* pWeaponInfo = g_pGame->GetWeaponInfo( eWeapon, eSkillLevel );
+    CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( eWeapon, eSkillLevel );
     if ( pWeaponInfo )
     {
         switch ( eProperty )
@@ -6666,7 +6666,7 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;
 
-    CWeaponInfo* pWeaponInfo = g_pGame->GetWeaponInfo( eWeapon, eSkillLevel );
+    CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( eWeapon, eSkillLevel );
     if ( pWeaponInfo )
     {
         switch ( eProperty )
@@ -6710,7 +6710,7 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, 
         return false;
 
 
-    CWeaponInfo* pWeaponInfo = g_pGame->GetWeaponInfo( eWeapon, eSkillLevel );
+    CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( eWeapon, eSkillLevel );
     if ( pWeaponInfo )
     {
         switch ( eProperty )
@@ -6811,7 +6811,7 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, 
         return false;
 
 
-    CWeaponInfo* pWeaponInfo = g_pGame->GetWeaponInfo( eWeapon, eSkillLevel );
+    CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( eWeapon, eSkillLevel );
     if ( pWeaponInfo )
     {
         switch ( eProperty )
@@ -6897,7 +6897,7 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, 
     if ( eProperty == WEAPON_INVALID_PROPERTY )
         return false;
 
-    CWeaponInfo* pWeaponInfo = g_pGame->GetWeaponInfo( eWeapon, eSkillLevel );
+    CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( eWeapon, eSkillLevel );
     if ( pWeaponInfo )
     {
         switch ( eProperty )

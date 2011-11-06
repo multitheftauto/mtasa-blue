@@ -15,6 +15,11 @@ CWeaponStat::CWeaponStat ( eWeaponType weaponType, eWeaponSkill skillLevel )
 {
     this->weaponType = weaponType;
     this->skillLevel = skillLevel;
+    this->m_bChanged = false;
+}
+CWeaponStat::CWeaponStat ( )
+{
+    this->m_bChanged = false;
 }
 CWeaponStat::~CWeaponStat ( )
 {

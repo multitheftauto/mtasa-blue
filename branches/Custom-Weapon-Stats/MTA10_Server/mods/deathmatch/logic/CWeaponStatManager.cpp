@@ -20,7 +20,7 @@ CWeaponStatManager::CWeaponStatManager ( )
     // Make our list nicer by starting at the non-skill weapons so we don't have duplicates of STD weapon skill
     for ( int i = 0; i <= WEAPONTYPE_EXTINGUISHER; i++)
     {
-        eWeaponType weaponType = (eWeaponType) (WEAPONTYPE_COUNTRYRIFLE + i);
+        eWeaponType weaponType = (eWeaponType) (WEAPONTYPE_PISTOL + i);
         // Storage for Original weapon data ( for resetting )
         pWeaponStat = new CWeaponStat ( weaponType, WEAPONSKILL_STD );
         m_OriginalWeaponData.push_back ( pWeaponStat );
@@ -38,18 +38,19 @@ CWeaponStatManager::CWeaponStatManager ( )
     {
         for ( int i = 0; i < NUM_WeaponInfosOtherSkill; i++ )
         {
+            eWeaponSkill weaponSkill = (eWeaponSkill) skill;
             eWeaponType weaponType = (eWeaponType) (WEAPONTYPE_PISTOL + i);
             // Storage for Original weapon data ( for resetting )
-            pWeaponStat = new CWeaponStat ( weaponType, (eWeaponSkill)skill );
+            pWeaponStat = new CWeaponStat ( weaponType, weaponSkill );
             m_OriginalWeaponData.push_back ( pWeaponStat );
             // Store our defaults for this weapon.
-            LoadDefault ( pWeaponStat, weaponType, (eWeaponSkill)skill );
+            LoadDefault ( pWeaponStat, weaponType, weaponSkill );
 
             // Storage for new weapon data ( for script use )
-            pWeaponStat = new CWeaponStat ( weaponType, (eWeaponSkill)skill );
+            pWeaponStat = new CWeaponStat ( weaponType, weaponSkill );
             m_WeaponData.push_back ( pWeaponStat );
             // Store our defaults for this weapon.
-            LoadDefault ( pWeaponStat, weaponType, (eWeaponSkill)skill );
+            LoadDefault ( pWeaponStat, weaponType, weaponSkill );
         }
     }
 }
@@ -74,8 +75,7 @@ CWeaponStat* CWeaponStatManager::GetWeaponStats ( eWeaponType type, eWeaponSkill
 {
     for ( std::list < CWeaponStat* >::iterator iter = m_WeaponData.begin (); iter != m_WeaponData.end ();iter++ )
     {
-        if ( ( (*iter)->GetWeaponSkillLevel() == skill || 
-            ( type > WEAPONTYPE_PISTOL && type < WEAPONTYPE_TEC9 ) ) && 
+        if ( ( (*iter)->GetWeaponSkillLevel() == skill || type > WEAPONTYPE_TEC9 ) && 
             (*iter)->GetWeaponType () == type )
         {
             return (*iter);
@@ -1531,6 +1531,7 @@ bool CWeaponStatManager::LoadDefault ( CWeaponStat* pDest, eWeaponType weaponTyp
             {
             case WEAPONSKILL_POOR:
                 {
+                    pDest->SetWeaponSkillLevel( weaponSkill );
                     pDest->SetWeaponRange ( OriginalPoorWeaponData[iVal].weapon_range );
                     pDest->SetTargetRange ( OriginalPoorWeaponData[iVal].target_range );
                     pDest->SetAccuracy ( OriginalPoorWeaponData[iVal].accuracy );
@@ -1560,9 +1561,11 @@ bool CWeaponStatManager::LoadDefault ( CWeaponStat* pDest, eWeaponType weaponTyp
                     pDest->SetAimOffsetIndex ( OriginalPoorWeaponData[iVal].aim_offset );
                     pDest->SetDefaultCombo ( OriginalPoorWeaponData[iVal].default_combo );
                     pDest->SetCombosAvailable ( OriginalPoorWeaponData[iVal].combos_available );
+                    break;
                 }
             case WEAPONSKILL_PRO:
                 {
+                    pDest->SetWeaponSkillLevel( weaponSkill );
                     pDest->SetWeaponRange ( OriginalHitmanWeaponData[iVal].weapon_range );
                     pDest->SetTargetRange ( OriginalHitmanWeaponData[iVal].target_range );
                     pDest->SetAccuracy ( OriginalHitmanWeaponData[iVal].accuracy );
@@ -1592,9 +1595,11 @@ bool CWeaponStatManager::LoadDefault ( CWeaponStat* pDest, eWeaponType weaponTyp
                     pDest->SetAimOffsetIndex ( OriginalHitmanWeaponData[iVal].aim_offset );
                     pDest->SetDefaultCombo ( OriginalHitmanWeaponData[iVal].default_combo );
                     pDest->SetCombosAvailable ( OriginalHitmanWeaponData[iVal].combos_available );
+                    break;
                 }
             case WEAPONSKILL_STD:
                 {
+                    pDest->SetWeaponSkillLevel( weaponSkill );
                     pDest->SetWeaponRange ( OriginalNormalWeaponData[iVal].weapon_range );
                     pDest->SetTargetRange ( OriginalNormalWeaponData[iVal].target_range );
                     pDest->SetAccuracy ( OriginalNormalWeaponData[iVal].accuracy );
@@ -1624,6 +1629,7 @@ bool CWeaponStatManager::LoadDefault ( CWeaponStat* pDest, eWeaponType weaponTyp
                     pDest->SetAimOffsetIndex ( OriginalNormalWeaponData[iVal].aim_offset );
                     pDest->SetDefaultCombo ( OriginalNormalWeaponData[iVal].default_combo );
                     pDest->SetCombosAvailable ( OriginalNormalWeaponData[iVal].combos_available );
+                    break;
                 }
             }
         }

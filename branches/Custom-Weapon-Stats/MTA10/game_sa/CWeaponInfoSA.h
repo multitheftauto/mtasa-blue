@@ -119,7 +119,7 @@ public:
     void                        SetAccuracy                 ( float fAccuracy )             { internalInterface->m_fAccuracy = fAccuracy; };
 
     short                       GetMaximumClipAmmo          ( void )                        { return internalInterface->m_nAmmo; };
-    void                        SetMaximumClipAmmo          ( short sAccuracy )             { internalInterface->m_nAmmo = sAccuracy; };
+    void                        SetMaximumClipAmmo          ( short sAmmo )                 { internalInterface->m_nAmmo = sAmmo; };
 
     float                       GetMoveSpeed                ( void )                        { return internalInterface->m_fMoveSpeed; };
     void                        SetMoveSpeed                ( float fMoveSpeed )            { internalInterface->m_fMoveSpeed = fMoveSpeed; };

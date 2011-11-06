@@ -864,6 +864,7 @@ int CLuaFunctionDefinitions::GetWeaponProperty ( lua_State* luaVM )
         case WEAPON_SPREAD:
         case WEAPON_MOVE_SPEED:
             // Get only
+        case WEAPON_REQ_SKILL_LEVEL:
         case WEAPON_ANIM_LOOP_START:
         case WEAPON_ANIM_LOOP_STOP:
         case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
@@ -892,7 +893,6 @@ int CLuaFunctionDefinitions::GetWeaponProperty ( lua_State* luaVM )
         case WEAPON_SLOT:
         case WEAPON_AIM_OFFSET:
         case WEAPON_SKILL_LEVEL:
-        case WEAPON_REQ_SKILL_LEVEL:
         case WEAPON_DEFAULT_COMBO:
         case WEAPON_COMBOS_AVAILABLE:
             {
@@ -992,6 +992,7 @@ int CLuaFunctionDefinitions::GetOriginalWeaponProperty ( lua_State* luaVM )
         case WEAPON_SPREAD:
         case WEAPON_MOVE_SPEED:
             // Get only
+        case WEAPON_REQ_SKILL_LEVEL:
         case WEAPON_ANIM_LOOP_START:
         case WEAPON_ANIM_LOOP_STOP:
         case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
@@ -1020,7 +1021,6 @@ int CLuaFunctionDefinitions::GetOriginalWeaponProperty ( lua_State* luaVM )
         case WEAPON_SLOT:
         case WEAPON_AIM_OFFSET:
         case WEAPON_SKILL_LEVEL:
-        case WEAPON_REQ_SKILL_LEVEL:
         case WEAPON_DEFAULT_COMBO:
         case WEAPON_COMBOS_AVAILABLE:
             {

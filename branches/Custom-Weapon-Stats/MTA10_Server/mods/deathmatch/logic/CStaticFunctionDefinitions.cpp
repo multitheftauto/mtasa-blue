@@ -2015,11 +2015,6 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
                 pWeaponInfo->SetAccuracy ( fData );
                 break;
             }
-        case WEAPON_DAMAGE:
-            {
-                pWeaponInfo->SetDamagePerHit ( fData );
-                break;
-            }
         case WEAPON_LIFE_SPAN:
             {
                 pWeaponInfo->SetLifeSpan ( fData );
@@ -2046,6 +2041,16 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
     }
     else
         return false;
+
+    pWeaponInfo->SetChanged( true );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eWeapon ) );
+    BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eProperty ) );
+    BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eSkillLevel ) );
+    BitStream.pBitStream->Write ( fData );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WEAPON_PROPERTY, *BitStream.pBitStream ) );
+
     return true;
 }
 
@@ -2088,6 +2093,15 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
     }
     else
         return false;
+
+    pWeaponInfo->SetChanged( true );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eWeapon ) );
+    BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eProperty ) );
+    BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eSkillLevel ) );
+    BitStream.pBitStream->Write ( sData );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WEAPON_PROPERTY, *BitStream.pBitStream ) );
 
     return true;
 }
@@ -2141,6 +2155,11 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, 
         case WEAPON_SPREAD:
             {
                 fData = pWeaponInfo->GetSpread ( );
+                break;
+            }
+        case WEAPON_REQ_SKILL_LEVEL:
+            {
+                fData = pWeaponInfo->GetRequiredStatLevel ( );
                 break;
             }
         case WEAPON_ANIM_LOOP_START:
@@ -2216,7 +2235,7 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, 
             }
         case WEAPON_ANIM_GROUP:
             {
-                sData = pWeaponInfo->GetAnimGroup ( );
+                sData = (short)pWeaponInfo->GetAnimGroup ( );
                 break;
             }
         case WEAPON_FLAGS:
@@ -2252,11 +2271,6 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, 
         case WEAPON_SKILL_LEVEL:
             {
                 sData = pWeaponInfo->GetSkill ( );
-                break;
-            }
-        case WEAPON_REQ_SKILL_LEVEL:
-            {
-                sData = pWeaponInfo->GetRequiredStatLevel ( );
                 break;
             }
         case WEAPON_DEFAULT_COMBO:
@@ -2357,6 +2371,11 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty ePr
                 fData = pWeaponInfo->GetSpread ( );
                 break;
             }
+        case WEAPON_REQ_SKILL_LEVEL:
+            {
+                fData = pWeaponInfo->GetRequiredStatLevel ( );
+                break;
+            }
         case WEAPON_ANIM_LOOP_START:
             {
                 fData = pWeaponInfo->GetWeaponAnimLoopStart ( );
@@ -2430,7 +2449,7 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty ePr
             }
         case WEAPON_ANIM_GROUP:
             {
-                sData = pWeaponInfo->GetAnimGroup ( );
+                sData = (short)pWeaponInfo->GetAnimGroup ( );
                 break;
             }
         case WEAPON_FLAGS:
@@ -2466,11 +2485,6 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty ePr
         case WEAPON_SKILL_LEVEL:
             {
                 sData = pWeaponInfo->GetSkill ( );
-                break;
-            }
-        case WEAPON_REQ_SKILL_LEVEL:
-            {
-                sData = pWeaponInfo->GetRequiredStatLevel ( );
                 break;
             }
         case WEAPON_DEFAULT_COMBO:

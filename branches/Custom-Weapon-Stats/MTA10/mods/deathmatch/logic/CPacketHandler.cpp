@@ -2164,23 +2164,53 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 
     for (int i = 0;i <= WEAPONTYPE_EXTINGUISHER - WEAPONTYPE_PISTOL;i++)
     {
+        bool bReadWeaponInfo = true;
         sWeaponPropertySync weaponProperty;
-        bitStream.Read( &weaponProperty );
-        CWeaponInfo * pWeaponInfo = g_pGame->GetWeaponInfo( (eWeaponType)weaponProperty.data.weaponType );
-        pWeaponInfo->SetTargetRange     ( weaponProperty.data.fTargetRange );
-        pWeaponInfo->SetWeaponRange     ( weaponProperty.data.fWeaponRange );
-        pWeaponInfo->SetFlags           ( weaponProperty.data.nFlags );
-        pWeaponInfo->SetAnimGroup       ( weaponProperty.data.dwAnimGroup );
-        pWeaponInfo->SetMaximumClipAmmo ( weaponProperty.data.nAmmo );
-        pWeaponInfo->SetDamagePerHit    ( weaponProperty.data.nDamage );
-        pWeaponInfo->SetMoveSpeed       ( weaponProperty.data.fMoveSpeed );
-        pWeaponInfo->SetFiringSpeed     ( weaponProperty.data.fSpeed );
-        pWeaponInfo->SetRadius          ( weaponProperty.data.fRadius );
-        pWeaponInfo->SetLifeSpan        ( weaponProperty.data.fLifeSpan );
-        pWeaponInfo->SetSpread          ( weaponProperty.data.fSpread );
-        pWeaponInfo->SetAccuracy        ( weaponProperty.data.fAccuracy );
+        bitStream.ReadBit( bReadWeaponInfo );
+        if ( bReadWeaponInfo )
+        {
+            bitStream.Read( &weaponProperty );
+            CWeaponStat * pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( (eWeaponType)weaponProperty.data.weaponType );
+            pWeaponInfo->SetAnimGroup       ( weaponProperty.data.dwAnimGroup );
+            pWeaponInfo->SetAccuracy        ( weaponProperty.data.fAccuracy );
+            pWeaponInfo->SetLifeSpan        ( weaponProperty.data.fLifeSpan );
+            pWeaponInfo->SetMoveSpeed       ( weaponProperty.data.fMoveSpeed );
+            pWeaponInfo->SetRadius          ( weaponProperty.data.fRadius );
+            pWeaponInfo->SetFiringSpeed     ( weaponProperty.data.fSpeed );
+            pWeaponInfo->SetSpread          ( weaponProperty.data.fSpread );
+            pWeaponInfo->SetTargetRange     ( weaponProperty.data.fTargetRange );
+            pWeaponInfo->SetWeaponRange     ( weaponProperty.data.fWeaponRange );
+            pWeaponInfo->SetMaximumClipAmmo ( weaponProperty.data.nAmmo );
+            pWeaponInfo->SetDamagePerHit    ( weaponProperty.data.nDamage );
+            pWeaponInfo->SetFlags           ( weaponProperty.data.nFlags );
+        }
     }
-
+    for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_M4;i++)
+    {
+        bool bReadWeaponInfo = true;
+        sWeaponPropertySync weaponProperty;
+        bitStream.ReadBit( bReadWeaponInfo );
+        if ( bReadWeaponInfo )
+        {
+            for (int j = 0; j <= 2;j++)
+            {
+                bitStream.Read( &weaponProperty );
+                CWeaponStat * pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( (eWeaponType)weaponProperty.data.weaponType, (eWeaponSkill)j );
+                pWeaponInfo->SetAnimGroup       ( weaponProperty.data.dwAnimGroup );
+                pWeaponInfo->SetAccuracy        ( weaponProperty.data.fAccuracy );
+                pWeaponInfo->SetLifeSpan        ( weaponProperty.data.fLifeSpan );
+                pWeaponInfo->SetMoveSpeed       ( weaponProperty.data.fMoveSpeed );
+                pWeaponInfo->SetRadius          ( weaponProperty.data.fRadius );
+                pWeaponInfo->SetFiringSpeed     ( weaponProperty.data.fSpeed );
+                pWeaponInfo->SetSpread          ( weaponProperty.data.fSpread );
+                pWeaponInfo->SetTargetRange     ( weaponProperty.data.fTargetRange );
+                pWeaponInfo->SetWeaponRange     ( weaponProperty.data.fWeaponRange );
+                pWeaponInfo->SetMaximumClipAmmo ( weaponProperty.data.nAmmo );
+                pWeaponInfo->SetDamagePerHit    ( weaponProperty.data.nDamage );
+                pWeaponInfo->SetFlags           ( weaponProperty.data.nFlags );
+            }
+        }
+    }
 }
 
 
