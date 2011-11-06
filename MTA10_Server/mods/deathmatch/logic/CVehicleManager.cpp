@@ -119,6 +119,7 @@ CVehicle* CVehicleManager::Create ( unsigned short usModel, unsigned char ucVari
 CVehicle* CVehicleManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents )
 {
     // Create the vehicle
+    srand ( GetTickCount32() );
     CVehicle* pVehicle = new CVehicle ( this, pParent, &Node, 400, rand() % 5, rand() % 5 );
 
     // Verify the vehicle id and load the data from xml
