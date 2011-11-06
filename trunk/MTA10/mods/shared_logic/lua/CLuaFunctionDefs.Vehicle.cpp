@@ -1160,8 +1160,8 @@ int CLuaFunctionDefs::CreateVehicle ( lua_State* luaVM )
         // Grab the rotation parameters
         CVector vecRotation;
         const char* szRegPlate = NULL;
-        unsigned char ucVariant = 5;
-        unsigned char ucVariant2 = 5;
+        unsigned char ucVariant = 255;
+        unsigned char ucVariant2 = 255;
         int iArgument5 = lua_type ( luaVM, 5 );
         if ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING )
         {
@@ -1177,17 +1177,21 @@ int CLuaFunctionDefs::CreateVehicle ( lua_State* luaVM )
                 {
                     vecRotation.fZ = static_cast < float > ( atof ( lua_tostring ( luaVM, 7 ) ) );
 
-                    if ( lua_type ( luaVM, 8 ) == LUA_TSTRING )
+                    int iArgument8 = lua_type ( luaVM, 8 );
+                    if ( iArgument8 == LUA_TSTRING || iArgument8 == LUA_TBOOLEAN )
                     {
-                        szRegPlate = lua_tostring ( luaVM, 8 );
+                        if ( iArgument8 == LUA_TSTRING )
+                        {
+                            szRegPlate = lua_tostring ( luaVM, 8 );
+                        }
                         int iArgument9 = lua_type ( luaVM, 9 );
                         if ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING )
                         {
-                            ucVariant = static_cast < DWORD > ( atoi ( lua_tostring ( luaVM, 9 ) ) );
+                            ucVariant = static_cast < unsigned char > ( atoi ( lua_tostring ( luaVM, 9 ) ) );
                             int iArgument10 = lua_type ( luaVM, 10 );
                             if ( iArgument10 == LUA_TNUMBER || iArgument10 == LUA_TSTRING )
                             {
-                                ucVariant2 = static_cast < DWORD > ( atoi ( lua_tostring ( luaVM, 10 ) ) );
+                                ucVariant2 = static_cast < unsigned char > ( atoi ( lua_tostring ( luaVM, 10 ) ) );
                             }
                         }
                     }
