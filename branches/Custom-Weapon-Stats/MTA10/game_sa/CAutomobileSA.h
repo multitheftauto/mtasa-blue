@@ -177,7 +177,7 @@ private:
 
     CDoorSA                 * door[MAX_DOORS];
 public:
-                            CAutomobileSA( eVehicleTypes dwModelID );
+                            CAutomobileSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 );
                             CAutomobileSA( CAutomobileSAInterface * automobile );
                             ~CAutomobileSA ( void );
 

@@ -16,7 +16,7 @@
 
 extern CGame * g_pGame;
 
-CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel ) : CElement ( pParent, pNode )
+CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2 ) : CElement ( pParent, pNode )
 {
     // Init
     m_pVehicleManager = pVehicleManager;
@@ -75,6 +75,8 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_bHeliSearchLightVisible = false;
     m_bCollisionsEnabled = true;
     m_bHandlingChanged = false;
+    m_ucVariant = ucVariant;
+    m_ucVariant2 = ucVariant2;
 
     // Initialize the occupied Players
     for ( int i = 0; i < MAX_VEHICLE_SEATS; i++ )

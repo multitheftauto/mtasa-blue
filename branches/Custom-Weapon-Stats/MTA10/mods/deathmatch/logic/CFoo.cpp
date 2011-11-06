@@ -476,7 +476,7 @@ void CFoo::Test ( const char* szString )
         {
             g_pGame->GetModelInfo ( i )->AddRef ( true );
 
-            CVehicle* pVehicle = g_pGame->GetPools ()->AddVehicle ( (eVehicleTypes)i );
+            CVehicle* pVehicle = g_pGame->GetPools ()->AddVehicle ( (eVehicleTypes)i, 5, 5 );
             DWORD* dw2 = (DWORD*)(((DWORD)pVehicle->GetVehicleInterface ()) + 0xE1 * 4 );
             DWORD dw = *dw2;
             dw = dw + 4;

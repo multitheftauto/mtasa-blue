@@ -29,7 +29,7 @@ private:
 //  CBoatSAInterface        * internalInterface;
 public:
     CPlaneSA( CPlaneSAInterface * plane );
-    CPlaneSA( eVehicleTypes dwModelID );
+    CPlaneSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 );
 };
 
 #endif

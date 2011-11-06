@@ -28,7 +28,7 @@ private:
 //  CBoatSAInterface        * internalInterface;
 public:
     CMonsterTruckSA( CMonsterTruckSAInterface * monstertruck );
-    CMonsterTruckSA( eVehicleTypes dwModelID );
+    CMonsterTruckSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 );
 };
 
 #endif

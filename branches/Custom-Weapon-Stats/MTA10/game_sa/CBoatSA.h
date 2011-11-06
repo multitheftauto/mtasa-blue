@@ -27,7 +27,7 @@ private:
 //  CBoatSAInterface        * internalInterface;
 public:
                                 CBoatSA( CBoatSAInterface * boat );
-                                CBoatSA( eVehicleTypes dwModelID );
+                                CBoatSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 );
 
     virtual                     ~CBoatSA ( void ) {};
 };

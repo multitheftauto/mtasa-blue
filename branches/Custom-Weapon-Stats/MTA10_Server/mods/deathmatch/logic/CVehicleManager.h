@@ -33,7 +33,7 @@ public:
                                         CVehicleManager             ( void );
                                         ~CVehicleManager            ( void );
 
-    CVehicle*                           Create                      ( unsigned short usModel, CElement* pParent, CXMLNode* pNode = NULL );
+    CVehicle*                           Create                      ( unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2, CElement* pParent, CXMLNode* pNode = NULL );
     CVehicle*                           CreateFromXML               ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents );
     void                                DeleteAll                   ( void );
 

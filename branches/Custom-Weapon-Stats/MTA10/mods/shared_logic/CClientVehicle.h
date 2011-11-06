@@ -96,7 +96,7 @@ class CClientVehicle : public CClientStreamElement
 
 protected: // Use CDeathmatchVehicle constructor for now. Will get removed later when this class is
            // cleaned up.
-                                CClientVehicle          ( CClientManager* pManager, ElementID ID, unsigned short usModel );
+                                CClientVehicle          ( CClientManager* pManager, ElementID ID, unsigned short usModel, unsigned char ucVariation, unsigned char ucVariation2 );
 
 public:
                                 ~CClientVehicle         ( void );
@@ -542,6 +542,9 @@ protected:
     SColor                      m_HeadLightColor;
 
     bool                        m_bHasCustomHandling;
+
+    unsigned char               m_ucVariation;
+    unsigned char               m_ucVariation2;
 
 public:
     CClientPlayer *             m_pLastSyncer;

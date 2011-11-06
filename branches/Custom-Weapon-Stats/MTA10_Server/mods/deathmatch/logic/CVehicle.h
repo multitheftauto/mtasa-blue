@@ -119,7 +119,7 @@ class CVehicle : public CElement
     friend class CPlayer;
 
 public:
-                                    CVehicle                ( class CVehicleManager* pVehicleManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel );
+                                    CVehicle                ( class CVehicleManager* pVehicleManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2 );
                                     ~CVehicle               ( void );
 
     bool                            IsEntity                ( void )                        { return true; }
@@ -132,6 +132,9 @@ public:
     inline unsigned short           GetModel            ( void )                        { return m_usModel; };
     void                            SetModel            ( unsigned short usModel );
     bool                            HasValidModel       ( void );
+
+    inline unsigned char            GetVariant              ( void )                        { return m_ucVariant; };
+    inline unsigned char            GetVariant2             ( void )                        { return m_ucVariant2; };
 
     eVehicleType                    GetVehicleType          ( void )                        { return m_eVehicleType; };
 
@@ -365,6 +368,9 @@ private:
 
     CHandlingEntry*                 m_pHandlingEntry;
     bool                            m_bHandlingChanged;
+
+    unsigned char                   m_ucVariant;
+    unsigned char                   m_ucVariant2;
 
 public: // 'Safe' variables (that have no need for accessors)
     bool                            m_bDamageProof;

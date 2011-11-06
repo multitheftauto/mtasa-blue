@@ -104,14 +104,14 @@ inline bool CPoolsSA::AddVehicleToPool ( CVehicleSA* pVehicle )
     return true;
 }
 
-CVehicle* CPoolsSA::AddVehicle ( eVehicleTypes eVehicleType )
+CVehicle* CPoolsSA::AddVehicle ( eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2 )
 {
     DEBUG_TRACE("CVehicle* CPoolsSA::AddVehicle ( eVehicleTypes eVehicleType )");
     CVehicleSA* pVehicle = NULL;
 
     if ( m_vehiclePool.ulCount < MAX_VEHICLES )
     {
-        pVehicle = new CVehicleSA ( eVehicleType );
+        pVehicle = new CVehicleSA ( eVehicleType, ucVariation, ucVariation2 );
         if ( ! AddVehicleToPool ( pVehicle ) )
         {
             delete pVehicle;

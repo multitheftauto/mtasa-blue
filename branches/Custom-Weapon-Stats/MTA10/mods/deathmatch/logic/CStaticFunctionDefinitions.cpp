@@ -2329,11 +2329,11 @@ bool CStaticFunctionDefinitions::GetTrainSpeed ( CClientVehicle& Vehicle, float&
 }
 
 
-CClientVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate )
+CClientVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2 )
 {
-    if ( CClientVehicleManager::IsValidModel ( usModel ) )
+    if ( CClientVehicleManager::IsValidModel ( usModel ) && ucVariant <= 5 && ucVariant <= 5 )
     {
-        CClientVehicle* pVehicle = new CDeathmatchVehicle ( m_pManager, NULL, INVALID_ELEMENT_ID, usModel );
+        CClientVehicle* pVehicle = new CDeathmatchVehicle ( m_pManager, NULL, INVALID_ELEMENT_ID, usModel, ucVariant, ucVariant2 );
         if ( pVehicle )
         {
             pVehicle->SetParent ( Resource.GetResourceDynamicEntity() );

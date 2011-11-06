@@ -177,7 +177,7 @@ public:
 
 
     // Vehicle get funcs
-    static CClientVehicle*              CreateVehicle                       ( CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate = NULL );
+    static CClientVehicle*              CreateVehicle                       ( CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate = NULL, unsigned char ucVariant = 5, unsigned char ucVariant2 = 5 );
     static bool                         GetVehicleModelFromName             ( const char* szName, unsigned short& usModel );
     static bool                         GetVehicleUpgradeSlotName           ( unsigned char ucSlot, char* szName, unsigned short len );
     static bool                         GetVehicleUpgradeSlotName           ( unsigned short usUpgrade, char* szName, unsigned short len );
