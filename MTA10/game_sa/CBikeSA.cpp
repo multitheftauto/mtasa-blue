@@ -18,7 +18,7 @@ CBikeSA::CBikeSA( CBikeSAInterface * bike )
     this->m_pInterface = bike;
 }
 
-CBikeSA::CBikeSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )
+CBikeSA::CBikeSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 ):CVehicleSA( dwModelID, ucVariation, ucVariation2 )
 {
     DEBUG_TRACE("CBikeSA::CBikeSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )");
     /*if(this->internalInterface)

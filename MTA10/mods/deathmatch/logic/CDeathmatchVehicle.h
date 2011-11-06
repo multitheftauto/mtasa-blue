@@ -20,7 +20,7 @@ class CDeathmatchVehicle : public CClientVehicle
 {
     DECLARE_CLASS( CDeathmatchVehicle, CClientVehicle )
 public:
-                                    CDeathmatchVehicle              ( CClientManager* pManager, class CUnoccupiedVehicleSync* pUnoccupiedVehicleSync, ElementID ID, unsigned short usVehicleModel  );
+                                    CDeathmatchVehicle              ( CClientManager* pManager, class CUnoccupiedVehicleSync* pUnoccupiedVehicleSync, ElementID ID, unsigned short usVehicleModel, unsigned char ucVariant, unsigned char ucVariant2 );
                                     ~CDeathmatchVehicle             ( void );
 
     inline bool                     IsSyncing                       ( void )                    { return m_bIsSyncing; };

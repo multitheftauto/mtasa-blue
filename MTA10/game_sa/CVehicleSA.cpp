@@ -28,7 +28,7 @@ CVehicleSA::CVehicleSA ()
 /**
  *\todo ASAP: Remove all the VC specific (SCM) function calls propperly
  */
-CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )
+CVehicleSA::CVehicleSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 )
     : m_ucAlpha ( 255 ), m_bIsDerailable ( true ), m_vecGravity ( 0.0f, 0.0f, -1.0f ), m_HeadLightColor ( SColorRGBA ( 255, 255, 255, 255 ) )
 {
     DEBUG_TRACE("CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )");
@@ -41,7 +41,10 @@ CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )
 
     DWORD dwReturn = 0;
 
-    // Is it a train?
+    // Set Variation 1 before creation.
+    MemSetFast( (void *)VAR_CVehicle_Variation1, ucVariation, 1 );
+    MemSetFast( (void *)VAR_CVehicle_Variation2, ucVariation2, 1 );
+
     DWORD dwFunc = FUNC_CCarCtrlCreateCarForScript;
     _asm
     {

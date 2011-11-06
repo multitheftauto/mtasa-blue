@@ -34,7 +34,7 @@ extern CClientGame* g_pClientGame;
 #define VEHICLE_INTERPOLATION_WARP_THRESHOLD            15
 #define VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED  1.8f
 
-CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigned short usModel ) : ClassInit ( this ), CClientStreamElement ( pManager->GetVehicleStreamer (), ID )
+CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigned short usModel, unsigned char ucVariation, unsigned char ucVariation2 ) : ClassInit ( this ), CClientStreamElement ( pManager->GetVehicleStreamer (), ID )
 {
     CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientVehicle" ), &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink, &m_pTowedVehicle, &m_pTowedByVehicle, &m_pPickedUpWinchEntity, &m_pLastSyncer, NULL );
 
@@ -136,6 +136,8 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bHeliSearchLightVisible = false;
     m_fHeliRotorSpeed = 0.0f;
     m_bHasCustomHandling = false;
+    m_ucVariation = ucVariation;
+    m_ucVariation2 = ucVariation2;
 
 #ifdef MTA_DEBUG
     m_pLastSyncer = NULL;
@@ -2177,8 +2179,8 @@ void CClientVehicle::Create ( void )
             m_pVehicle = g_pGame->GetPools ()->AddTrain ( &m_Matrix.vPos, dwModels, 1, m_bTrainDirection );
         }
         else
-        {
-            m_pVehicle = g_pGame->GetPools ()->AddVehicle ( static_cast < eVehicleTypes > ( m_usModel ) );
+        {            
+            m_pVehicle = g_pGame->GetPools ()->AddVehicle ( static_cast < eVehicleTypes > ( m_usModel ), m_ucVariation, m_ucVariation2 );
         }
 
         // Failed. Remove our reference to the vehicle model and return

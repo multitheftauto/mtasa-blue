@@ -3082,7 +3082,7 @@ void CClientGame::UpdateMimics ( void )
 
                     if ( pMimicVehicle == NULL )
                     {
-                        pMimicVehicle = new CDeathmatchVehicle ( m_pManager, m_pUnoccupiedVehicleSync, INVALID_ELEMENT_ID, uiModel );
+                        pMimicVehicle = new CDeathmatchVehicle ( m_pManager, m_pUnoccupiedVehicleSync, INVALID_ELEMENT_ID, uiModel, 0, 0 );
                         pMimicVehicle->SetPosition ( vecPosition );
 
                         unsigned short * usUpgrades = pVehicle->GetUpgrades ()->GetSlotStates ();
@@ -3137,7 +3137,7 @@ void CClientGame::UpdateMimics ( void )
 
                         if ( !pMimicTrailer )
                         {
-                            pMimicTrailer = new CDeathmatchVehicle ( m_pManager, m_pUnoccupiedVehicleSync, static_cast < ElementID > ( 450 + uiMimicIndex + uiTrailerLoop ), uiModel );
+                            pMimicTrailer = new CDeathmatchVehicle ( m_pManager, m_pUnoccupiedVehicleSync, static_cast < ElementID > ( 450 + uiMimicIndex + uiTrailerLoop ), uiModel, 0, 0 );
                             pMimicVehicle->SetTowedVehicle ( pMimicTrailer );
                         }
 

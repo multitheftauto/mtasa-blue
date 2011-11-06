@@ -19,7 +19,7 @@ CQuadBikeSA::CQuadBikeSA( CQuadBikeSAInterface * quadbike ):CAutomobileSA( quadb
     this->m_pInterface = quadbike;
 }
 
-CQuadBikeSA::CQuadBikeSA( eVehicleTypes dwModelID ):CAutomobileSA( dwModelID )
+CQuadBikeSA::CQuadBikeSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 ):CAutomobileSA( dwModelID, ucVariation, ucVariation2 )
 {
     DEBUG_TRACE("CQuadBikeSA::CQuadBikeSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )");
 }

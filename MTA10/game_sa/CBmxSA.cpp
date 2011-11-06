@@ -18,7 +18,7 @@ CBmxSA::CBmxSA( CBmxSAInterface * bmx )
     this->m_pInterface = bmx;
 }
 
-CBmxSA::CBmxSA( eVehicleTypes dwModelID ):CBikeSA( dwModelID )
+CBmxSA::CBmxSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 ):CBikeSA( dwModelID, ucVariation, ucVariation2 )
 {
     DEBUG_TRACE("CBmxSA::CBmxSA( eVehicleTypes dwModelID ):CBikeSA( dwModelID )");
 }
