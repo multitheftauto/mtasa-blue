@@ -37,27 +37,51 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
     m_pSaveFile->CreateTable ( "userdata", "id INTEGER PRIMARY KEY, userid INTEGER, key TEXT, value TEXT, type INTEGER", true );
     m_pSaveFile->CreateTable ( "settings", "id INTEGER PRIMARY KEY, key TEXT, value INTEGER", true );
 
-    // Remove old indexes
+    // Check if unique index on accounts exists
+    CRegistryResult result;
+	m_pSaveFile->Query ( &result, "SELECT name FROM sqlite_master WHERE type='index' AND name='IDX_ACCOUNTS_NAME_U'" );
+    if ( result.nRows == 0 )
+    {
+        // Need to add unique index on accounts
+        CLogger::LogPrint ( "Updating accounts table...\n" );
+
+        // Make sure we have a non-unique index to speed up the duplication removal
+	    m_pSaveFile->Query ( "CREATE INDEX IF NOT EXISTS IDX_ACCOUNTS_NAME on accounts(name)" );
+        // Remove any duplicate name entries
+	    m_pSaveFile->Query ( "DELETE FROM accounts WHERE rowid in "
+						                                " (SELECT A.rowid"
+						                                " FROM accounts A, accounts B"
+						                                " WHERE A.rowid > B.rowid AND A.name = B.name)" );
+        // Remove non-unique index
+        m_pSaveFile->Query ( "DROP INDEX IF EXISTS IDX_ACCOUNTS_NAME" );
+        // Add unique index
+	    m_pSaveFile->Query ( "CREATE UNIQUE INDEX IF NOT EXISTS IDX_ACCOUNTS_NAME_U on accounts(name)" );
+    }
+
+    // Check if unique index on userdata exists
+	m_pSaveFile->Query ( &result, "SELECT name FROM sqlite_master WHERE type='index' AND name='IDX_USERDATA_USERID_KEY_U'" );
+    if ( result.nRows == 0 )
+    {
+        // Need to add unique index on userdata
+        CLogger::LogPrint ( "Updating userdata table...\n" );
+
+        // Make sure we have a non-unique index to speed up the duplication removal
+	    m_pSaveFile->Query ( "CREATE INDEX IF NOT EXISTS IDX_USERDATA_USERID_KEY on userdata(userid,key)" );
+        // Remove any duplicate userid+key entries
+	    m_pSaveFile->Query ( "DELETE FROM userdata WHERE rowid in "
+						                                " (SELECT A.rowid"
+						                                " FROM userdata A, userdata B"
+						                                " WHERE A.rowid > B.rowid AND A.userid = B.userid AND A.key = B.key)" );
+        // Remove non-unique index
+        m_pSaveFile->Query ( "DROP INDEX IF EXISTS IDX_USERDATA_USERID_KEY" );
+        // Add unique index
+	    m_pSaveFile->Query ( "CREATE UNIQUE INDEX IF NOT EXISTS IDX_USERDATA_USERID_KEY_U on userdata(userid,key)" );
+    }
+    
+    // Ensure old indexes are removed
     m_pSaveFile->Query ( "DROP INDEX IF EXISTS IDX_ACCOUNTS_NAME" );
     m_pSaveFile->Query ( "DROP INDEX IF EXISTS IDX_USERDATA_USERID" );
     m_pSaveFile->Query ( "DROP INDEX IF EXISTS IDX_USERDATA_USERID_KEY" );
-
-    // Add unique index in accounts
-	m_pSaveFile->Query ( "DELETE FROM accounts WHERE rowid in "
-						                            " (SELECT A.rowid"
-						                            " FROM accounts A, accounts B"
-						                            " WHERE A.rowid > B.rowid AND A.name = B.name)" ); // Remove any duplicate name entries
-	m_pSaveFile->Query ( "CREATE UNIQUE INDEX IF NOT EXISTS IDX_ACCOUNTS_NAME_U on accounts(name)" );
-
-    // Add unique index in userdata
-	m_pSaveFile->Query ( "DELETE FROM userdata WHERE rowid in "
-						                            " (SELECT A.rowid"
-						                            " FROM userdata A, userdata B"
-						                            " WHERE A.rowid > B.rowid AND A.userid = B.userid AND A.key = B.key)" ); // Remove any duplicate userid+key entries
-	m_pSaveFile->Query ( "CREATE UNIQUE INDEX IF NOT EXISTS IDX_USERDATA_USERID_KEY_U on userdata(userid,key)" );
-
-    //Create a new RegistryResult
-    CRegistryResult result;
 
     //Pull our settings
     m_pSaveFile->Query ( &result, "SELECT key, value from settings" );

@@ -3308,6 +3308,15 @@ void CGame::HandleBackup ( void )
     if ( iBackupInterval == 0 || iBackupAmount == 0 )
         return;
 
+    // Check if brand new installation
+    CModManager* pModManager = g_pServerInterface->GetModManager ();
+    if ( !DirectoryExists ( m_pMainConfig->GetSystemDatabasesPath () ) &&
+         !FileExists ( m_pMainConfig->GetLogFile () ) &&
+         !FileExists ( pModManager->GetAbsolutePath ( "internal.db" ) ) )
+    {
+        return;
+    }
+
     // Determine date now
     time_t secondsNow = time ( NULL );
 
@@ -3352,19 +3361,21 @@ void CGame::HandleBackup ( void )
     strftime ( outstr, sizeof ( outstr ), "%Y-%m-%d", tmp );
     SString strDateNow = outstr;
     SString strBackupZip = PathJoin ( strBackupPath, strDateNow + ".zip" );
+    SString strTempZip = PathJoin ( strBackupPath, strDateNow + "_temp.zip" );
 
     if ( FileExists ( strBackupZip ) )
         return;     // Can't do backup as target file already exists
 
     MkDir ( strBackupPath );
 
-    CZipMaker zipMaker ( strBackupZip );
+    // Delete previous temp zip if any
+    FileDelete ( strTempZip );
+
+    CZipMaker zipMaker ( strTempZip );
     if ( !zipMaker.IsValid () )
         return;     // Can't do backup as can't create target zip
 
     CLogger::LogPrintfNoStamp ( "Please wait...\n" );
-
-    CModManager* pModManager = g_pServerInterface->GetModManager ();
 
     // Backup config files
     zipMaker.InsertFile ( pModManager->GetAbsolutePath ( "mtaserver.conf" ),        PathJoin ( "config", "mtaserver.conf" ) );
@@ -3384,6 +3395,9 @@ void CGame::HandleBackup ( void )
     zipMaker.InsertFile ( pModManager->GetAbsolutePath ( "registry.db" ),           PathJoin ( "databases", "other", "registry.db" ) );
 
     zipMaker.Close ();
+
+    // Rename temp file to final name
+    FileRename ( strTempZip, strBackupZip );
 
     // Remove backups over min required
     while ( fileList.size () >= iBackupAmount )

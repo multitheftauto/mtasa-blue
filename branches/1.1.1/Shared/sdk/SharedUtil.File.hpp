@@ -339,7 +339,7 @@ bool SharedUtil::DelTree ( const SString& strPath, const SString& strInsideHere 
 }
 #endif
 
-#ifdef WIN32
+
 ///////////////////////////////////////////////////////////////
 //
 // MkDir
@@ -351,10 +351,10 @@ bool SharedUtil::DelTree ( const SString& strPath, const SString& strInsideHere 
 bool SharedUtil::MkDir ( const SString& strInPath, bool bTree )
 {
     SString strPath = PathConform ( strInPath );
-    MakeSureDirExists ( strPath + "\\" );
-    return FindFiles ( strPath, false, true ).size () > 0;
+    MakeSureDirExists ( strPath + PATH_SEPERATOR );
+    return DirectoryExists ( strPath );
 }
-#endif
+
 
 ///////////////////////////////////////////////////////////////
 //
