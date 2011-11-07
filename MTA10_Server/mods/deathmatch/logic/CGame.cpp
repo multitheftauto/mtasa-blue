@@ -3361,13 +3361,17 @@ void CGame::HandleBackup ( void )
     strftime ( outstr, sizeof ( outstr ), "%Y-%m-%d", tmp );
     SString strDateNow = outstr;
     SString strBackupZip = PathJoin ( strBackupPath, strDateNow + ".zip" );
+    SString strTempZip = PathJoin ( strBackupPath, strDateNow + "_temp.zip" );
 
     if ( FileExists ( strBackupZip ) )
         return;     // Can't do backup as target file already exists
 
     MkDir ( strBackupPath );
 
-    CZipMaker zipMaker ( strBackupZip );
+    // Delete previous temp zip if any
+    FileDelete ( strTempZip );
+
+    CZipMaker zipMaker ( strTempZip );
     if ( !zipMaker.IsValid () )
         return;     // Can't do backup as can't create target zip
 
@@ -3391,6 +3395,9 @@ void CGame::HandleBackup ( void )
     zipMaker.InsertFile ( pModManager->GetAbsolutePath ( "registry.db" ),           PathJoin ( "databases", "other", "registry.db" ) );
 
     zipMaker.Close ();
+
+    // Rename temp file to final name
+    FileRename ( strTempZip, strBackupZip );
 
     // Remove backups over min required
     while ( fileList.size () >= iBackupAmount )
