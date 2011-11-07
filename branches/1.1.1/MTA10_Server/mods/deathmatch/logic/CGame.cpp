@@ -437,6 +437,9 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Let the main config handle selecting settings from the command line where appropriate
     m_pMainConfig->SetCommandLineParser ( &m_CommandLineParser );
 
+    // Do basic backup
+    HandleBackup ();
+
     // Read some settings
     m_pACLManager->SetFileName ( m_pMainConfig->GetAccessControlListFile ().c_str () );
     const SString strServerIP = m_pMainConfig->GetServerIP ();
@@ -3290,4 +3293,103 @@ void CGame::SetCloudsEnabled ( bool bEnabled )
 bool CGame::GetCloudsEnabled ( void )
 {
     return m_bCloudsEnabled;
+}
+
+
+//
+// Handle basic backup of databases and config files
+//
+void CGame::HandleBackup ( void )
+{
+    // Get backup vars
+    SString strBackupPath = PathConform ( m_pMainConfig->GetBackupPath () ).TrimEnd ( PATH_SEPERATOR );
+    int iBackupInterval = m_pMainConfig->GetBackupInterval ();
+    int iBackupAmount = m_pMainConfig->GetBackupAmount ();
+    if ( iBackupInterval == 0 || iBackupAmount == 0 )
+        return;
+
+    // Determine date now
+    time_t secondsNow = time ( NULL );
+
+    // Determine last backup date
+    std::vector < SString > fileList = FindFiles ( strBackupPath + "/", true, false );
+
+    // Check each file name is a valid backup name
+    for ( uint f = 0 ; f < fileList.size () ; f++ )
+    {
+        SString strName = fileList[f];
+        const SString strCheck = "0000-00-00.zip";
+        for ( uint i = 0 ; i < Min ( strCheck.length (), strName.length () ) ; i++ )
+            if ( !isdigit( strName[i] ) || !isdigit( strCheck[i] ) )
+                if ( strName[i] != strCheck[i] )
+                {
+                    ListRemoveIndex ( fileList, f-- );
+                    break;
+                }
+    }
+
+    // Alpha sort
+    std::sort ( fileList.rbegin (), fileList.rend () );
+
+    // Check date of last backup
+    if ( !fileList.empty () )
+    {
+        SString strNewest = fileList.front ();
+        tm timeinfo;
+        memset ( &timeinfo, 0, sizeof ( timeinfo ) );
+        timeinfo.tm_year    = atoi ( strNewest.SubStr ( 0, 4 ) ) - 1900;
+        timeinfo.tm_mon     = atoi ( strNewest.SubStr ( 5, 2 ) ) - 1;
+        timeinfo.tm_mday    = atoi ( strNewest.SubStr ( 8, 2 ) );
+
+        time_t timeSinceBackup = secondsNow - mktime ( &timeinfo );
+        if ( timeSinceBackup < iBackupInterval * 86400L )
+            return;     // No backup required
+    }
+
+    // Make target file name
+    tm* tmp = gmtime ( &secondsNow );
+    char outstr[200] = { 0 };
+    strftime ( outstr, sizeof ( outstr ), "%Y-%m-%d", tmp );
+    SString strDateNow = outstr;
+    SString strBackupZip = PathJoin ( strBackupPath, strDateNow + ".zip" );
+
+    if ( FileExists ( strBackupZip ) )
+        return;     // Can't do backup as target file already exists
+
+    MkDir ( strBackupPath );
+
+    CZipMaker zipMaker ( strBackupZip );
+    if ( !zipMaker.IsValid () )
+        return;     // Can't do backup as can't create target zip
+
+    CLogger::LogPrintfNoStamp ( "Please wait...\n" );
+
+    CModManager* pModManager = g_pServerInterface->GetModManager ();
+
+    // Backup config files
+    zipMaker.InsertFile ( pModManager->GetAbsolutePath ( "mtaserver.conf" ),        PathJoin ( "config", "mtaserver.conf" ) );
+    zipMaker.InsertFile ( m_pMainConfig->GetAccessControlListFile (),               PathJoin ( "config", "acl.xml" ) );
+    zipMaker.InsertFile ( pModManager->GetAbsolutePath ( FILENAME_BANLIST ),        PathJoin ( "config", "banlist.xml" ) );
+    zipMaker.InsertFile ( pModManager->GetAbsolutePath ( "editor.conf" ),           PathJoin ( "config", "editor.conf" ) );
+    zipMaker.InsertFile ( pModManager->GetAbsolutePath ( "editor_acl.xml" ),        PathJoin ( "config", "editor_acl.xml" ) );
+    zipMaker.InsertFile ( pModManager->GetAbsolutePath ( "local.conf" ),            PathJoin ( "config", "local.conf" ) );
+    zipMaker.InsertFile ( m_pMainConfig->GetIdFile (),                              PathJoin ( "config", "server-id.keys" ) );
+    zipMaker.InsertFile ( pModManager->GetAbsolutePath ( FILENAME_SETTINGS ),       PathJoin ( "config", "settings.xml" ) );
+    zipMaker.InsertFile ( pModManager->GetAbsolutePath ( "vehiclecolors.conf" ),    PathJoin ( "config", "vehiclecolors.conf" ) );
+
+    // Backup database files
+    zipMaker.InsertDirectoryTree ( m_pMainConfig->GetGlobalDatabasesPath (),        PathJoin ( "databases", "global" ) );
+    zipMaker.InsertDirectoryTree ( m_pMainConfig->GetSystemDatabasesPath (),        PathJoin ( "databases", "system" ) );
+    zipMaker.InsertFile ( pModManager->GetAbsolutePath ( "internal.db" ),           PathJoin ( "databases", "other", "internal.db" ) );
+    zipMaker.InsertFile ( pModManager->GetAbsolutePath ( "registry.db" ),           PathJoin ( "databases", "other", "registry.db" ) );
+
+    zipMaker.Close ();
+
+    // Remove backups over min required
+    while ( fileList.size () >= iBackupAmount )
+    {
+        SString strOldest = fileList.back ();
+        FileDelete ( PathJoin ( strBackupPath, strOldest ) );
+        fileList.pop_back ();
+    }
 }

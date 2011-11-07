@@ -56,6 +56,8 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_uiVoiceBitrate = 0;
     m_strBandwidthReductionMode = "medium";
     m_iPendingWorkToDoSleepTime = 10;
+    m_iBackupInterval = 3;
+    m_iBackupAmount = 5;
 }
 
 
@@ -345,7 +347,7 @@ bool CMainConfig::Load ( void )
     // Grab the global databases path
     if ( GetString ( m_pRootNode, "global_databases_path", strBuffer, 1, 255 ) != IS_SUCCESS )
         strBuffer = "databases/global";
-    if ( !IsValidFilePath ( strBuffer.c_str () ) )
+    if ( !IsValidFilePath ( strBuffer.c_str () ) || strBuffer.empty () )
     {
         CLogger::ErrorPrintf ( "global_databases_path is not valid. Defaulting to 'databases/global'\n" );
         strBuffer = "databases/global";
@@ -355,12 +357,30 @@ bool CMainConfig::Load ( void )
     // Grab the system databases path
     if ( GetString ( m_pRootNode, "system_databases_path", strBuffer, 1, 255 ) != IS_SUCCESS )
         strBuffer = "databases/system";
-    if ( !IsValidFilePath ( strBuffer.c_str () ) )
+    if ( !IsValidFilePath ( strBuffer.c_str () ) || strBuffer.empty () )
     {
         CLogger::ErrorPrintf ( "system_databases_path is not valid. Defaulting to 'databases/system'\n" );
         strBuffer = "databases/system";
     }
     m_strSystemDatabasesPath = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
+
+    // Grab the backup path
+    if ( GetString ( m_pRootNode, "backup_path", strBuffer, 1, 255 ) != IS_SUCCESS )
+        strBuffer = "backups";
+    if ( !IsValidFilePath ( strBuffer.c_str () ) || strBuffer.empty () )
+    {
+        CLogger::ErrorPrintf ( "backup_path is not valid. Defaulting to 'backups'\n" );
+        strBuffer = "backups";
+    }
+    m_strBackupPath = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
+
+    // Grab the backup interval
+    GetInteger ( m_pRootNode, "backup_interval", m_iBackupInterval );
+    m_iBackupInterval = Clamp ( 0, m_iBackupInterval, 30 );
+
+    // Grab the backup count
+    GetInteger ( m_pRootNode, "backup_copies", m_iBackupAmount );
+    m_iBackupAmount = Clamp ( 0, m_iBackupAmount, 100 );
 
     GetBoolean ( m_pRootNode, "autologin", m_bAutoLogin );
 

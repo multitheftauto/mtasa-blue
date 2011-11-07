@@ -403,6 +403,18 @@ namespace SharedUtil
             }
     }
 
+    // Returns true if the pair is in the collection
+    template < class T, class V, class TR, class T2, class V2 >
+    bool MapContainsPair ( std::multimap < T, V, TR >& collection, const T2& key, const V2& value )
+    {
+        typedef typename std::multimap < T, V, TR > ::iterator iter_t;
+        std::pair < iter_t, iter_t > itp = collection.equal_range ( key );
+        for ( iter_t it = itp.first ; it != itp.second ; ++it )
+            if ( it->second == value )
+                return true;
+        return false;
+    }
+
 
     //
     // std::set helpers

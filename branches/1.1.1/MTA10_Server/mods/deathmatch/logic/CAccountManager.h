@@ -21,6 +21,63 @@ class CAccountManager;
 
 
 //
+// CMappedList with additional name->account mapping
+//
+class CMappedAccountList : protected CMappedList < CAccount* >
+{
+public:
+    typedef CMappedList < CAccount* > Super;
+
+    // CMappedList functions
+    bool Contains ( CAccount* item ) const { return Super::Contains ( item ); }
+    std::list < CAccount* >::iterator               begin ( void )      { return Super::begin (); }
+    std::list < CAccount* >::iterator               end ( void )        { return Super::end (); }
+
+    void push_back ( CAccount* item )
+    {
+        assert ( !MapContainsPair( m_NameAccountMap, item->GetName (), item ) );
+        MapInsert( m_NameAccountMap, item->GetName (), item );
+        Super::push_back ( item );
+        assert ( m_NameAccountMap.size () == m_List.size () && m_List.size () == m_Map.size () );
+    }
+
+    void remove ( CAccount* item )
+    {
+        MapRemovePair( m_NameAccountMap, item->GetName (), item );
+        Super::remove ( item );
+        assert ( m_NameAccountMap.size () == m_List.size () && m_List.size () == m_Map.size () );
+    }
+
+    void clear ( void )
+    {
+        assert ( m_NameAccountMap.size () == m_List.size () && m_List.size () == m_Map.size () );
+        m_NameAccountMap.clear ();
+        Super::clear ();
+    }
+
+    // Account functions
+    void FindAccountMatches ( std::vector < CAccount* >* pOutResults, const SString& strName )
+    {
+        MultiFind ( m_NameAccountMap, strName, pOutResults );
+    }
+
+    void ChangingName ( CAccount* pAccount, const SString& strOldName, const SString& strNewName )
+    {
+        if ( MapContainsPair ( m_NameAccountMap, strOldName, pAccount ) )
+        {
+            MapRemovePair ( m_NameAccountMap, strOldName, pAccount );
+            assert ( !MapContainsPair ( m_NameAccountMap, strNewName, pAccount ) );
+            MapInsert( m_NameAccountMap, strNewName, pAccount );
+        }
+    }
+
+protected:
+    std::multimap < SString, CAccount* > m_NameAccountMap;
+};
+
+
+
+//
 // CAccountManager
 //
 class CAccountManager: public CXMLConfig
@@ -65,6 +122,7 @@ protected:
     void                        RemoveFromList              ( CAccount* pAccount );
 
     void                        MarkAsChanged               ( CAccount* pAccount );
+    void                        ChangingName                ( CAccount* pAccount, const SString& strOldName, const SString& strNewName );
     void                        ClearSQLDatabase            ( void );
 public:
     void                        RemoveAll                   ( void );
@@ -73,7 +131,7 @@ public:
     inline list < CAccount* > ::const_iterator  IterEnd     ( void )                    { return m_List.end (); };
 
 protected:
-    CMappedList < CAccount* >   m_List;
+    CMappedAccountList          m_List;
     bool                        m_bRemoveFromList;
 
     bool                        m_bAutoLogin;

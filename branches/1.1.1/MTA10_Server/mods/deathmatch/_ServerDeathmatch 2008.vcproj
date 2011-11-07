@@ -1332,6 +1332,10 @@
 					RelativePath=".\utils\CTCPImpl.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\utils\CZipMaker.cpp"
+					>
+				</File>
 				<Filter
 					Name="zip"
 					>
@@ -1508,6 +1512,10 @@
 			</File>
 			<File
 				RelativePath="CServer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\utils\CZipMaker.h"
 				>
 			</File>
 			<File
