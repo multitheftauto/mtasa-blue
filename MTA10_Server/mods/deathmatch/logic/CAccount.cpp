@@ -62,6 +62,8 @@ void CAccount::SetName ( const std::string& strName )
 {
     if ( m_strName != strName )
     {
+        m_pManager->ChangingName ( this, m_strName, strName );
+
         m_strName = strName;
 
         if ( !m_strName.empty () )

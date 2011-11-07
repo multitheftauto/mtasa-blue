@@ -37,10 +37,24 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
     m_pSaveFile->CreateTable ( "userdata", "id INTEGER PRIMARY KEY, userid INTEGER, key TEXT, value TEXT, type INTEGER", true );
     m_pSaveFile->CreateTable ( "settings", "id INTEGER PRIMARY KEY, key TEXT, value INTEGER", true );
 
-    // Select/update speed up: Add index for popular WHERE uses
-    m_pSaveFile->Query ( "CREATE INDEX IF NOT EXISTS IDX_ACCOUNTS_NAME on accounts(name)" );
-    m_pSaveFile->Query ( "CREATE INDEX IF NOT EXISTS IDX_USERDATA_USERID on userdata(userid)" );
-    m_pSaveFile->Query ( "CREATE INDEX IF NOT EXISTS IDX_USERDATA_USERID_KEY on userdata(userid,key)" );
+    // Remove old indexes
+    m_pSaveFile->Query ( "DROP INDEX IF EXISTS IDX_ACCOUNTS_NAME" );
+    m_pSaveFile->Query ( "DROP INDEX IF EXISTS IDX_USERDATA_USERID" );
+    m_pSaveFile->Query ( "DROP INDEX IF EXISTS IDX_USERDATA_USERID_KEY" );
+
+    // Add unique index in accounts
+	m_pSaveFile->Query ( "DELETE FROM accounts WHERE rowid in "
+						                            " (SELECT A.rowid"
+						                            " FROM accounts A, accounts B"
+						                            " WHERE A.rowid > B.rowid AND A.name = B.name)" ); // Remove any duplicate name entries
+	m_pSaveFile->Query ( "CREATE UNIQUE INDEX IF NOT EXISTS IDX_ACCOUNTS_NAME_U on accounts(name)" );
+
+    // Add unique index in userdata
+	m_pSaveFile->Query ( "DELETE FROM userdata WHERE rowid in "
+						                            " (SELECT A.rowid"
+						                            " FROM userdata A, userdata B"
+						                            " WHERE A.rowid > B.rowid AND A.userid = B.userid AND A.key = B.key)" ); // Remove any duplicate userid+key entries
+	m_pSaveFile->Query ( "CREATE UNIQUE INDEX IF NOT EXISTS IDX_USERDATA_USERID_KEY_U on userdata(userid,key)" );
 
     //Create a new RegistryResult
     CRegistryResult result;
@@ -469,17 +483,14 @@ CAccount* CAccountManager::Get ( const char* szName, bool bRegistered )
 {
     if ( szName && szName [ 0 ] )
     {
-        unsigned int uiHash = HashString ( szName );
-        list < CAccount* > ::const_iterator iter = m_List.begin ();
-        for ( ; iter != m_List.end () ; iter++ )
+        std::vector < CAccount* > results;
+        m_List.FindAccountMatches ( &results, szName );
+        for ( uint i = 0 ; i < results.size () ; i++ )
         {
-            CAccount* pAccount = *iter;
+            CAccount* pAccount = results[i];
             if ( pAccount->IsRegistered () == bRegistered )
             {
-                if ( pAccount->GetNameHash() == uiHash && pAccount->GetName () == szName )
-                {
-                    return pAccount;
-                }
+                return pAccount;
             }
         }
     }
@@ -491,19 +502,16 @@ CAccount* CAccountManager::Get ( const char* szName, const char* szIP )
 {
     if ( szName && szName [ 0 ] && szIP && szIP [ 0 ] )
     {
-        unsigned int uiHash = HashString ( szName );
-        list < CAccount* > ::const_iterator iter = m_List.begin ();
-        for ( ; iter != m_List.end () ; iter++ )
+        std::vector < CAccount* > results;
+        m_List.FindAccountMatches ( &results, szName );
+        for ( uint i = 0 ; i < results.size () ; i++ )
         {
-            CAccount* pAccount = *iter;
+            CAccount* pAccount = results[i];
             if ( pAccount->IsRegistered () )
             {
-                if ( pAccount->GetNameHash() == uiHash && pAccount->GetName () == szName )
+                if ( pAccount->GetIP ().compare ( szIP ) == 0 )
                 {
-                    if ( pAccount->GetIP ().compare ( szIP ) == 0 )
-                    {
-                        return pAccount;
-                    }
+                    return pAccount;
                 }
             }
         }
@@ -524,6 +532,11 @@ void CAccountManager::RemoveFromList ( CAccount* pAccount )
     {
         m_List.remove ( pAccount );
     }
+}
+
+void CAccountManager::ChangingName ( CAccount* pAccount, const SString& strOldName, const SString& strNewName )
+{
+    m_List.ChangingName ( pAccount, strOldName, strNewName );
 }
 
 void CAccountManager::MarkAsChanged ( CAccount* pAccount )
@@ -787,7 +800,7 @@ bool CAccountManager::SetAccountData( CAccount* pAccount, const char* szKey, con
     //Does the user want to delete the data?
     if ( strValue == "false" && iType == LUA_TBOOLEAN )
     {
-        m_pSaveFile->Query ( "DELETE FROM userdata WHERE key=? AND userid=?", SQLITE_TEXT, strKey.c_str (), SQLITE_INTEGER, iUserID );
+        m_pSaveFile->Query ( "DELETE FROM userdata WHERE userid=? AND key=?", SQLITE_INTEGER, iUserID, SQLITE_TEXT, strKey.c_str () );
         return true;
     }
 
