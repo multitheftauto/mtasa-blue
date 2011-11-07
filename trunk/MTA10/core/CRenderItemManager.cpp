@@ -107,10 +107,10 @@ void CRenderItemManager::OnResetDevice ( void )
 // TODO: Make underlying data for textures shared
 //
 ////////////////////////////////////////////////////////////////
-CTextureItem* CRenderItemManager::CreateTexture ( const SString& strFullFilePath )
+CTextureItem* CRenderItemManager::CreateTexture ( const SString& strFullFilePath, bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format )
 {
     CFileTextureItem* pTextureItem = new CFileTextureItem ();
-    pTextureItem->PostConstruct ( this, strFullFilePath );
+    pTextureItem->PostConstruct ( this, strFullFilePath, bMipMaps, uiSizeX, uiSizeY, format );
 
     if ( !pTextureItem->IsValid () )
     {
