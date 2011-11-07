@@ -180,8 +180,6 @@ inline bool IsVisibleCharacter ( unsigned char c )
     return c >= 32 && c <= 126;
 }
 
-bool            FileCopy                    ( const char* szPathNameSrc, const char* szPathDst );
-
 inline SString SQLEscape ( const SString& strEscapeString, bool bSingleQuotes, bool bDoubleQuotes )
 {
     SString strParsedQuery = "";

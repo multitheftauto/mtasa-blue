@@ -88,6 +88,9 @@ public:
     bool                            GetNetworkEncryptionEnabled     ( void )                    { return m_bNetworkEncryptionEnabled; }
     const SString&                  GetGlobalDatabasesPath          ( void )                    { return m_strGlobalDatabasesPath; }
     const SString&                  GetSystemDatabasesPath          ( void )                    { return m_strSystemDatabasesPath; }
+    const SString&                  GetBackupPath                   ( void )                    { return m_strBackupPath; }
+    int                             GetBackupInterval               ( void )                    { return m_iBackupInterval; }
+    int                             GetBackupAmount                 ( void )                    { return m_iBackupAmount; }
 
     inline unsigned short           GetFPSLimit                     ( void )        { return m_usFPSLimit; };
     bool                            SetFPSLimit                     ( unsigned short usFPS, bool bSave );
@@ -149,6 +152,9 @@ private:
     SString                         m_strIdFile;
     SString                         m_strGlobalDatabasesPath;
     SString                         m_strSystemDatabasesPath;
+    SString                         m_strBackupPath;
+    int                             m_iBackupInterval;
+    int                             m_iBackupAmount;
     bool                            m_bNetworkEncryptionEnabled;
     SString                         m_strBandwidthReductionMode;
     int                             m_iPendingWorkToDoSleepTime;

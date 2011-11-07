@@ -326,6 +326,7 @@ public:
     bool                        IsServerFullyUp             ( void )        { return m_bServerFullyUp; }
 
     ushort                      GetServerFPS                ( void )        { return m_usFPS; }
+    void                        HandleBackup                ( void );
 
 private:
     void                        AddBuiltInEvents            ( void );

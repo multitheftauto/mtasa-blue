@@ -275,6 +275,7 @@
 #include "utils/CTCPServerSocketImpl.h"
 #include "utils/CTCPSocket.h"
 #include "utils/CTCPSocketImpl.h"
+#include "utils/CZipMaker.h"
 #include <base64.h>
 
 // Module includes
