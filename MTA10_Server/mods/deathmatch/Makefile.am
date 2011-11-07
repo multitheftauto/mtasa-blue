@@ -28,6 +28,7 @@ UTILS = \
 	./utils/CHTTPResponse.cpp \
 	./utils/CTCPClientSocketImpl.cpp \
 	./utils/CTCPImpl.cpp \
+	./utils/CZipMaker.cpp \
 	$(srcdir)/../../../vendor/bob_withers/base64.cpp \
 	$(srcdir)/../../../vendor/bochs/bochs_internal/crc32.cpp \
 	$(ZIPDIR)/ioapi.c \

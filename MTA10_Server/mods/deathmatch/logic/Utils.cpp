@@ -887,36 +887,6 @@ const char* HTMLEscapeString ( const char *szSource )
 }
 
 
-// Copies a single file.
-bool FileCopy ( const char* szPathNameSrc, const char* szPathDst )
-{
-    FILE* fhSrc = fopen ( szPathNameSrc, "rb" );
-    if ( !fhSrc )
-    {
-        return false;
-    }
-
-    FILE* fhDst = fopen ( szPathDst, "wb" );
-    if ( !fhDst )
-    {
-        fclose ( fhSrc );
-        return false;
-    }
-
-    char cBuffer[16384];
-    while ( true )
-    {
-        size_t dataLength = fread ( cBuffer, 1, 16384, fhSrc );
-        if ( dataLength == 0 )
-            break;
-        fwrite ( cBuffer, 1, dataLength, fhDst );
-    }
-
-    fclose ( fhSrc );
-    fclose ( fhDst );
-    return true;
-}
-
 eEulerRotationOrder    EulerRotationOrderFromString(const char* szString)
 {
     // We don't provide a conversion for EULER_MINUS_ZYZ since it's only meant to be used internally, not via scripts
