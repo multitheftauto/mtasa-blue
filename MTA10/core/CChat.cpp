@@ -724,8 +724,12 @@ void CChat::UpdateGUI ( void )
         m_vecBackgroundPosition.fX,
         m_vecBackgroundPosition.fY + m_vecBackgroundSize.fY
     );
-    if ( m_vecInputPosition.fY > g_pCore->GetGraphics ()->GetViewportHeight () - 16 )
-        SetNumLines ( Max < int > ( 3, m_uiNumLines - 1 ) );
+
+    // Make sure there is enough room for all the lines
+    uint uiMaxNumLines = g_pCore->GetGraphics ()->GetViewportHeight () / Max ( 1.f, CChat::GetFontHeight ( m_vecScale.fY ) ) - 3;
+    if ( m_uiNumLines > uiMaxNumLines )
+        SetNumLines ( uiMaxNumLines );
+
     m_vecInputSize = CalcInputSize ();
     if ( m_pInput )
     {
