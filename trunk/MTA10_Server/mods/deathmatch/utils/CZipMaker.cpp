@@ -80,8 +80,6 @@ bool CZipMaker::InsertFile ( const SString& strInSrc, const SString& strInDest )
     SString strSrc = PathConform ( strInSrc );
     SString strDest = PathConform ( strInDest );
 
-    MakeDirectoriesToFile ( strDest );
-
     std::vector < char > buffer;
     if ( !FileLoad ( strSrc, buffer ) )
         return false;
@@ -125,72 +123,6 @@ bool CZipMaker::InsertDirectoryTree ( const SString& strInSrc, const SString& st
 
 ///////////////////////////////////////////////////////////////
 //
-// CZipMaker::MakeDirectoriesToFile
-//
-//
-//
-///////////////////////////////////////////////////////////////
-bool CZipMaker::MakeDirectoriesToFile ( const SString& strDest )
-{
-    std::vector < SString > parts;
-    strDest.Split ( PATH_SEPERATOR, parts );
-    for ( uint i = 1 ; i < parts.size () ; i++ )
-    {
-        SString strDirToMake = strDest.Join ( PATH_SEPERATOR, parts, 0, i );
-        MakeDirectory ( strDirToMake );
-    }
-    return true;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// CZipMaker::MakeDirectory
-//
-// Returns false if failed
-//
-///////////////////////////////////////////////////////////////
-bool CZipMaker::MakeDirectory ( const SString& strDirToMake )
-{
-	zip_fileinfo zfi;
-	
-	zfi.internal_fa = 0;
-#ifdef WIN32
-	zfi.external_fa = FILE_ATTRIBUTE_DIRECTORY;
-#else
-	zfi.external_fa = S_IFDIR;
-#endif
-
-    time_t secondsNow = time ( NULL );
-    tm* tmp = gmtime ( &secondsNow );
-
-	zfi.dosDate = 0;
-	zfi.tmz_date.tm_year = tmp->tm_year + 1900;
-	zfi.tmz_date.tm_mon = tmp->tm_mon;
-	zfi.tmz_date.tm_mday = tmp->tm_mday;
-	zfi.tmz_date.tm_hour = tmp->tm_hour;
-	zfi.tmz_date.tm_min = tmp->tm_min;
-	zfi.tmz_date.tm_sec = tmp->tm_sec;
-
-    int iResult = zipOpenNewFileInZip ( m_uzFile, 
-										strDirToMake,
-										&zfi, 
-										NULL, 
-										0,
-										NULL,
-										0, 
-										NULL,
-										Z_DEFLATED,
-										Z_DEFAULT_COMPRESSION );
-		
-    zipCloseFileInZip ( m_uzFile );
-
-    return iResult == ZIP_OK;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
 // CZipMaker::AddFile
 //
 //
@@ -202,11 +134,7 @@ bool CZipMaker::AddFile ( const SString& strDest, const std::vector < char >& bu
 	zip_fileinfo zfi;
 
 	zfi.internal_fa = 0;
-#ifdef WIN32
-	zfi.external_fa = FILE_ATTRIBUTE_NORMAL;
-#else
-	zfi.external_fa = S_IFREG;
-#endif
+	zfi.external_fa = 0;
 	
 	// save file time
     time_t secondsNow = time ( NULL );
