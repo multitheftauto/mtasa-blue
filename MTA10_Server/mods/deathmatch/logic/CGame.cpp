@@ -3308,6 +3308,15 @@ void CGame::HandleBackup ( void )
     if ( iBackupInterval == 0 || iBackupAmount == 0 )
         return;
 
+    // Check if brand new installation
+    CModManager* pModManager = g_pServerInterface->GetModManager ();
+    if ( !DirectoryExists ( m_pMainConfig->GetSystemDatabasesPath () ) &&
+         !FileExists ( m_pMainConfig->GetLogFile () ) &&
+         !FileExists ( pModManager->GetAbsolutePath ( "internal.db" ) ) )
+    {
+        return;
+    }
+
     // Determine date now
     time_t secondsNow = time ( NULL );
 
@@ -3363,8 +3372,6 @@ void CGame::HandleBackup ( void )
         return;     // Can't do backup as can't create target zip
 
     CLogger::LogPrintfNoStamp ( "Please wait...\n" );
-
-    CModManager* pModManager = g_pServerInterface->GetModManager ();
 
     // Backup config files
     zipMaker.InsertFile ( pModManager->GetAbsolutePath ( "mtaserver.conf" ),        PathJoin ( "config", "mtaserver.conf" ) );

@@ -20,8 +20,6 @@ public:
     bool        InsertDirectoryTree     ( const SString& strSrc, const SString& strDest );
 
 protected:
-    bool        MakeDirectoriesToFile   ( const SString& strDest );
-    bool        MakeDirectory           ( const SString& strDirToMake );
     bool        AddFile                 ( const SString& strDest, const std::vector < char >& buffer );
 
 	void*       m_uzFile;
