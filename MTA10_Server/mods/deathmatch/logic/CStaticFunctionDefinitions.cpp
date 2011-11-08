@@ -1541,7 +1541,11 @@ bool CStaticFunctionDefinitions::SetElementModel ( CElement* pElement, unsigned 
             CPed * pPed = static_cast < CPed* > ( pElement );
             if ( pPed->GetModel () == usModel ) return false;
             if ( !CPlayerManager::IsValidPlayerModel ( usModel ) ) return false;
-            pPed->SetModel ( usModel );
+            CLuaArguments Arguments;
+            Arguments.PushNumber ( pPed->GetModel() ); // Get the old model
+            pPed->SetModel ( usModel ); // Set the new model
+            Arguments.PushNumber ( usModel ); // Get the new model
+            pPed->CallEvent ( "onElementModelChange", Arguments, false );
             break;
         }
         case CElement::VEHICLE:
@@ -1549,7 +1553,11 @@ bool CStaticFunctionDefinitions::SetElementModel ( CElement* pElement, unsigned 
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
             if ( pVehicle->GetModel () == usModel ) return false;
             if ( !CVehicleManager::IsValidModel ( usModel ) ) return false;
-            pVehicle->SetModel ( usModel );
+            CLuaArguments Arguments;
+            Arguments.PushNumber ( pVehicle->GetModel () ); // Get the old model
+            pVehicle->SetModel ( usModel ); // Set the new model
+            Arguments.PushNumber ( usModel ); // Get the new model
+            pVehicle->CallEvent ( "onElementModelChange", Arguments, false );
 
             // Check for any passengers above the max seat list
             unsigned char ucMaxPassengers = pVehicle->GetMaxPassengers ();
@@ -1574,7 +1582,11 @@ bool CStaticFunctionDefinitions::SetElementModel ( CElement* pElement, unsigned 
             CObject * pObject = static_cast < CObject* > ( pElement );
             if ( pObject->GetModel () == usModel ) return false;
             if ( !CObjectManager::IsValidModel ( usModel ) ) return false;
-            pObject->SetModel ( usModel );
+			CLuaArguments Arguments;
+            Arguments.PushNumber ( pObject->GetModel () ); // Get the old model
+            pObject->SetModel ( usModel ); // Set the new model
+            Arguments.PushNumber ( usModel ); // Get the new model
+            pObject->CallEvent ( "onElementModelChange", Arguments, false );
             break;
         }
         default: return false;
