@@ -1207,6 +1207,7 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "time",              "shows the time",                   CCommandFuncs::Time );
     m_pCommands->Add ( "showhud",           "shows the hud",                    CCommandFuncs::HUD );
     m_pCommands->Add ( "binds",             "shows all the binds",              CCommandFuncs::Binds );
+    m_pCommands->Add ( "serial",            "shows your serial",                CCommandFuncs::Serial );
 
 #if 0
     m_pCommands->Add ( "vid",               "changes the video settings (id)",  CCommandFuncs::Vid );
