@@ -435,7 +435,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isPedFrozen", CLuaFunctionDefs::IsPedFrozen );
     CLuaCFunctions::AddFunction ( "isPedFootBloodEnabled", CLuaFunctionDefs::IsPedFootBloodEnabled );
     CLuaCFunctions::AddFunction ( "getPedCameraRotation", CLuaFunctionDefs::GetPedCameraRotation );
-    CLuaCFunctions::AddFunction ( "isPedDead", CLuaFunctionDefs::IsPedDead );
 
     CLuaCFunctions::AddFunction ( "setPedWeaponSlot", CLuaFunctionDefs::SetPedWeaponSlot );
     CLuaCFunctions::AddFunction ( "setPedRotation", CLuaFunctionDefs::SetPedRotation );

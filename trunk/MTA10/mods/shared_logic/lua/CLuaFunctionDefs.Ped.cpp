@@ -1159,30 +1159,6 @@ int CLuaFunctionDefs::IsPedOnFire ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::IsPedDead ( lua_State* luaVM )
-{
-    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )
-    {
-        CClientPed * pPed = lua_toped ( luaVM, 1 );
-        if ( pPed )
-        {
-            bool bDead;
-			if ( CStaticFunctionDefinitions::IsPedDead ( *pPed, bDead ) )
-            {
-                lua_pushboolean ( luaVM, bDead );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "isPedDead", "ped", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "isPedDead" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
 int CLuaFunctionDefs::SetPedOnFire ( lua_State* luaVM )
 {
     if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )

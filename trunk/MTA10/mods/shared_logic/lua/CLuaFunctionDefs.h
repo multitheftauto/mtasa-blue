@@ -230,7 +230,6 @@ public:
     LUA_DECLARE ( IsPedFootBloodEnabled );
     LUA_DECLARE ( GetPedCameraRotation );
     LUA_DECLARE ( IsPedOnFire );
-    LUA_DECLARE ( IsPedDead );
 
     LUA_DECLARE ( SetPedRotation );
     LUA_DECLARE ( SetPedCanBeKnockedOffBike );
