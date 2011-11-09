@@ -9,7 +9,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-
+#include "CRenderItem.EffectCloner.h"
 
 enum EStateGroup
 {
@@ -498,376 +498,6 @@ CEffectWrap* NewEffectWrap ( CRenderItemManager* pManager, const SString& strFil
 }
 
 
-namespace
-{
-
-    //
-    // Fast [0-9a-Z_] check
-    //
-    class CIsWordChar
-    {
-        bool _IsWordChar ( char c )
-        {
-            return ( c >= '0' && c <= '9' )
-                    || ( c >= 'a' && c <= 'z' )
-                    || ( c >= 'A' && c <= 'Z' )
-                    || ( c == '_' );
-        }
-
-        bool pWordCharList [ 256 ];
-    public:
-
-        CIsWordChar ( void )
-        {
-            for ( uint i = 0 ; i < 256 ; i++ )
-                pWordCharList [ i ] = _IsWordChar ( i );
-        }
-
-        bool IsWordChar ( char c ) const
-        {
-            return pWordCharList [ c ];
-        }
-
-    } IsWordChar;
-
-
-    /////////////////////////////////////////////////////
-    //
-    // SWordHitCount
-    //
-    /////////////////////////////////////////////////////
-    struct SWordHitCount
-    {
-        std::map < SString, int > wordCountMap;
-
-        void AddWordCount ( const SString& strWord, int iCount )
-        {
-            int* pCount = MapFind ( wordCountMap, strWord );
-            if ( !pCount )
-            {
-                MapSet ( wordCountMap, strWord, 0 );
-                pCount = MapFind ( wordCountMap, strWord );
-            }
-            (*pCount) += iCount;
-        }
-
-        int GetWordCount ( const SString& strWord ) const
-        {
-            const int* pCount = MapFind ( wordCountMap, strWord );
-            return pCount ? *pCount : 0;
-        }
-
-        void Merge ( const SWordHitCount& other )
-        {
-            for ( std::map < SString, int >::const_iterator iter = other.wordCountMap.begin () ; iter != other.wordCountMap.end () ; ++iter )
-                AddWordCount ( iter->first, iter->second );
-        }
-    };
-
-
-    /////////////////////////////////////////////////////
-    //
-    // SScope
-    //
-    /////////////////////////////////////////////////////
-    struct SScope
-    {
-        SString strName;
-        SWordHitCount wordHitCount;
-    };
-
-
-    /////////////////////////////////////////////////////
-    //
-    // SScopeList
-    //
-    /////////////////////////////////////////////////////
-    struct SScopeList
-    {
-        std::map < SString, SScope > scopeMap;
-
-        // GetScope
-        SScope& GetScope ( const SString& strName )
-        {
-            SScope* pScope = MapFind ( scopeMap, strName );
-            if ( !pScope )
-            {
-                MapSet ( scopeMap, strName, SScope () );
-                pScope = MapFind ( scopeMap, strName );
-                pScope->strName = strName;
-            }
-            return *pScope;
-        }
-    };
-
-
-    /////////////////////////////////////////////////////
-    //
-    // SReachableScopeList
-    //
-    /////////////////////////////////////////////////////
-    struct SReachableScopeList
-    {
-        std::set < SString > mergedScopeNamesMap;
-        SWordHitCount mergedWordHitCount;
-
-        bool AlreadyMergedScope ( const SScope& scope ) const
-        {
-            return MapContains ( mergedScopeNamesMap, scope.strName );
-        }
-
-        void MergeScope ( const SScope& scope )
-        {
-            mergedScopeNamesMap.insert ( scope.strName );
-            return mergedWordHitCount.Merge ( scope.wordHitCount );
-        }
-
-        int GetReferencedWordCount ( const SString& strName ) const
-        {
-            return mergedWordHitCount.GetWordCount ( strName );
-        }
-    };
-
-
-    ////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Helper class which checks if parameters declared in an .fx file are actually used.
-    // Hideous and unmaintainable, so let's hope it never needs fixing.
-    //
-    ////////////////////////////////////////////////////////////////////////////////////
-    class CReferenceResolver
-    {
-        SScopeList scopeList;
-        SReachableScopeList reachableScopeList;
-    public:
-
-        void AddTextBuffer ( const char* pBuffer, uint uiLength )
-        {
-            SString strPrevWord;
-            SString strLastWordOutsideParentheses;
-            SString strCurrentScope = "global";
-            int iInCurlyBraces = 0;
-            int iInParentheses = 0;
-            bool bInSemantic = false;
-            const char* pWordStart = NULL;
-            bool bInWord = false;
-            while ( char c = GetNextValidChar ( pBuffer ) )
-            {
-                bool bNewInWord = IsWordChar.IsWordChar ( c );
-                if ( bNewInWord != bInWord )
-                {
-                    bInWord = bNewInWord;
-                    if ( bNewInWord )
-                        pWordStart = pBuffer - 1;
-                    else
-                    {
-                        // Skip words starting with a digit
-                        if ( !isdigit ( *pWordStart ) )
-                        {
-                            // Increment count for this word
-                            uint uiWordLength = ( pBuffer - pWordStart - 1 );
-                            std::string strWord ( pWordStart, uiWordLength );
-
-                            if ( iInParentheses == 0 && !bInSemantic )
-                            {
-                                strPrevWord = strLastWordOutsideParentheses;
-                                strLastWordOutsideParentheses = strWord;
-                            }
-
-                            AddWordToScope ( strCurrentScope, strWord );
-
-                            // Make sure technique gets auto-referenced
-                            if ( strPrevWord == "technique" )
-                                AddWordToScope ( strCurrentScope, strWord );
-                        }
-                    }
-                }
-
-                if ( c == ':' )
-                {
-                    // Check if next punctuation is {
-                    const char* pBuffer2 = pBuffer;
-                    while ( char c = GetNextValidChar ( pBuffer2 ) )
-                    {
-                        if ( !IsWordChar.IsWordChar ( c ) && c != ' ' && c != '\n' &&  c != '\r' )
-                        {
-                            if ( c == '{' )
-                                bInSemantic = true;
-                            break;
-                        }
-                    }
-                }
-                else
-                if ( c == '(' )
-                    iInParentheses++;
-                else
-                if ( c == ')' )
-                    iInParentheses--;
-                else
-                if ( c == '{' )
-                {
-                    bInSemantic = false;
-                    if ( iInCurlyBraces++ == 0 )
-                    {
-                        strCurrentScope = strLastWordOutsideParentheses;
-                        if ( strLastWordOutsideParentheses == "sampler_state" ) // Use sampler name
-                            strCurrentScope = strPrevWord;
-                    }
-                }
-                else
-                if ( c == '}' )
-                {
-                    if ( --iInCurlyBraces == 0 )
-                        strCurrentScope = "global";
-                }
-            }
-        }
-
-        // Get next character skipping comments
-        char GetNextValidChar ( const char*& pBuffer )
-        {
-            char c = *pBuffer++;
-
-            // Skip line comments
-            if ( c == '/' && *pBuffer == '/' )
-                while ( c && c != '\n' && c != '\r' )
-                    c = *pBuffer++;
-
-            // Skip block comments
-            if ( c == '/' && *pBuffer == '*' )
-            {
-                c = *pBuffer++;
-                c = *pBuffer++;
-                while ( c && ( c != '*' || *pBuffer != '/' ) )
-                    c = *pBuffer++;
-                if ( c )
-                    c = *pBuffer++;
-                if ( c )
-                    c = *pBuffer++;
-            }
-            return c;
-        }
-
-        void AddWordToScope ( const SString& strCurrentScope, const std::string& strWord )
-        {
-            OutputDebugLine ( SString ( "AddWordToScope: '%s'  '%s'", *strCurrentScope, strWord.c_str () ) );
-            scopeList.GetScope ( strCurrentScope ).wordHitCount.AddWordCount ( strWord, 1 );
-        }
-
-        // Find all words that are mentioned at least twice in a reachable scope
-        void ResolveReferencedWords ( void )
-        {
-            // Resolve all reachable scopes
-            reachableScopeList = SReachableScopeList ();
-            reachableScopeList.MergeScope ( scopeList.GetScope ( "global" ) );
-
-            bool bAgain = true;
-            while ( bAgain )
-            {
-                bAgain = false;
-
-                // For each scope
-                for ( std::map < SString, SScope >::iterator iter = scopeList.scopeMap.begin () ; iter != scopeList.scopeMap.end () ; ++iter )
-                {
-                    const SScope& scope = iter->second;
-                    // Check if this scope is already reachable
-                    if ( reachableScopeList.AlreadyMergedScope ( scope ) )
-                        continue;
-
-                    if ( reachableScopeList.GetReferencedWordCount ( scope.strName ) > 1 )
-                    {
-                        OutputDebugLine ( SString ( "Found ref to scope '%s'", *scope.strName ) );
-                        reachableScopeList.MergeScope ( scope );
-                        bAgain = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        bool IsWordReferenced ( const SString& strWord ) const
-        {
-            return reachableScopeList.GetReferencedWordCount ( strWord ) > 1;
-        }
-    };
-
-
-    ////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Helper class for D3DXCreateEffectFromFile() to ensure includes are correctly found and don't go outside the resource directory
-    //
-    ////////////////////////////////////////////////////////////////////////////////////
-    class CIncludeManager : public ID3DXInclude
-    {
-        SString m_strRootPath;
-        SString m_strCurrentPath;
-    public:
-        SString m_strReport;
-        CReferenceResolver m_ReferenceResolver;
-
-        CIncludeManager::CIncludeManager( const SString& strRootPath, const SString& strCurrentPath )
-        {
-            m_strRootPath = strRootPath;
-            m_strCurrentPath = strCurrentPath;
-        }
-
-        STDMETHOD(Open)(D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes)
-        {
-            SString strPathFilename = PathConform ( pFileName );
-
-            // Prepend file name with m_strRootPath + m_strCurrentPath, unless it starts with a PATH_SEPERATOR, then just prepend m_strRootPath
-            if ( strPathFilename.Left ( 1 ) == PATH_SEPERATOR )
-                strPathFilename = PathJoin ( m_strRootPath, strPathFilename );
-            else
-                strPathFilename = PathJoin ( m_strRootPath, m_strCurrentPath, strPathFilename );
-
-            // Check for illegal characters
-            if ( strPathFilename.Contains ( ".." ) )
-            {
-                SString strMsg ( "[CIncludeManager: Illegal path %s]", *strPathFilename );
-                m_strReport += strMsg;
-                OutputDebugLine ( strMsg );
-                return E_FAIL;
-            }
-
-            // Load file
-            std::vector < char > buffer;
-            if ( !FileLoad ( strPathFilename, buffer ) )
-            {
-                SString strMsg ( "[CIncludeManager: Can't find %s]", *strPathFilename );
-                m_strReport += strMsg;
-                OutputDebugLine ( strMsg );
-                return E_FAIL;
-            }
-
-            // Allocate memory for file contents
-            uint uiSize = buffer.size ();
-            BYTE* pData = static_cast < BYTE* > ( malloc ( uiSize ) );
-            memcpy( pData, &buffer[0], uiSize );
-
-            // Set result
-            *ppData = pData;
-            *pBytes = uiSize;
-
-            if ( !m_strReport.ContainsI ( strPathFilename ) )
-            {
-                m_strReport += SString ( "[Loaded '%s' (%d bytes)]", *strPathFilename, uiSize );
-                buffer.push_back ( 0 );
-                m_ReferenceResolver.AddTextBuffer ( &buffer[0], uiSize );
-            }
-
-            return S_OK;
-        }
-
-        STDMETHOD(Close)(LPCVOID pData)
-        {
-            // Free memory allocated for file contents
-            delete pData;
-            return S_OK;
-        }
-    };
-}
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -954,120 +584,20 @@ void CEffectWrapImpl::CreateUnderlyingData ( const SString& strFilename, const S
 {
     assert ( !m_pD3DEffect );
 
-    // Compile effect
-    DWORD dwFlags = 0;      // D3DXSHADER_PARTIALPRECISION, D3DXSHADER_DEBUG, D3DXFX_NOT_CLONEABLE;
-    if ( bDebug )
-        dwFlags |= D3DXSHADER_DEBUG;
-    else
-        dwFlags |= D3DXFX_NOT_CLONEABLE;
-
-    SString strMetaPath = strFilename.Right ( strFilename.length () - strRootPath.length () );
-    CIncludeManager IncludeManager ( strRootPath, ExtractPath ( strMetaPath ) );
-    LPD3DXBUFFER pBufferErrors = NULL;
-    HRESULT hr = D3DXCreateEffectFromFile( m_pDevice, ExtractFilename ( strMetaPath ), NULL, &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors );            
-
-    // Handle compile errors
-    strOutStatus = "";
-    if( pBufferErrors != NULL )
-    {
-        strOutStatus = SStringX ( (CHAR*)pBufferErrors->GetBufferPointer() ).TrimEnd ( "\n" );
-
-        // Error messages sometimes contain the current directory. Remove that here.
-        SString strCurrentDirectory = SharedUtil::GetCurrentDirectory ();
-        strOutStatus = strOutStatus.ReplaceI ( strCurrentDirectory + "\\", "" );
-        strOutStatus = strOutStatus.ReplaceI ( strCurrentDirectory, "" );
-    }
-    SAFE_RELEASE( pBufferErrors );
-
-    if( !m_pD3DEffect )
-    {
-        if ( strOutStatus.empty () )
-            strOutStatus = SString ( "[D3DXCreateEffectFromFile failed (%08x)%s]", hr, *IncludeManager.m_strReport );
-        return;
-    }
-
-    // Find first valid technique
-    D3DXHANDLE hTechnique = NULL;
-    D3DXEFFECT_DESC EffectDesc;
-    m_pD3DEffect->GetDesc ( &EffectDesc );
-
-    for ( uint uiAttempt = 0 ; true ; uiAttempt++ )
-    {
-        SString strProblemInfo = "";
-        for ( uint i = 0 ; i < EffectDesc.Techniques ; i++ )
-        {
-            D3DXHANDLE hTemp = m_pD3DEffect->GetTechnique ( i );
-            HRESULT hr = m_pD3DEffect->ValidateTechnique ( hTemp );
-            if ( SUCCEEDED( hr ) )
-            {
-                hTechnique = hTemp;
-                break;
-            }
-
-            // Update problem string
-            D3DXTECHNIQUE_DESC TechniqueDesc;
-            m_pD3DEffect->GetTechniqueDesc( hTemp, &TechniqueDesc );
-            strProblemInfo += SString ( "['%s' (%d/%d) failed (%08x)]", TechniqueDesc.Name, i, EffectDesc.Techniques, hr );
-        }
-
-        // Found valid technique
-        if ( hTechnique )
-            break;
-
-        // Error if can't find a valid technique after 2nd attempt
-        if ( uiAttempt > 0 )
-        {
-            strOutStatus = SString ( "No valid technique; [Techniques:%d %s]%s", EffectDesc.Techniques, *strProblemInfo, *IncludeManager.m_strReport );
-            SAFE_RELEASE ( m_pD3DEffect );
-            return;
-        }
-
-        // Try resetting samplers if 1st attempt failed
-        LPDIRECT3DDEVICE9 pDevice;
-        m_pD3DEffect->GetDevice ( &pDevice );
-        for ( uint i = 0 ; i < 16 ; i++ )
-        {
-            pDevice->SetSamplerState ( i, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
-            pDevice->SetSamplerState ( i, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
-            pDevice->SetSamplerState ( i, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
-        }
-    }
-
-
-    // Set technique
-    m_pD3DEffect->SetTechnique( hTechnique );
-
-    // Inform user of technique name
-    D3DXTECHNIQUE_DESC TechniqueDesc;
-    m_pD3DEffect->GetTechniqueDesc( hTechnique, &TechniqueDesc );
-    strOutStatus = TechniqueDesc.Name;
-
-    if ( bDebug )
-    {
-        // Disassemble effect
-        LPD3DXBUFFER pDisassembly = NULL;
-        if ( SUCCEEDED( D3DXDisassembleEffect( m_pD3DEffect, false, &pDisassembly ) ) && pDisassembly )
-        {
-            LPVOID pData = pDisassembly->GetBufferPointer();
-            DWORD Size = pDisassembly->GetBufferSize();
-
-            if( pData && Size )
-            {
-                SString strDisassemblyContents;
-                strDisassemblyContents.assign ( (const char*)pData, Size - 1 );
-                FileSave ( strFilename + ".dis", strDisassemblyContents );
-            }
-
-            SAFE_RELEASE( pDisassembly );
-        }
-    }
-
     // Optimization
     m_uiSaveStateFlags = D3DXFX_DONOTSAVESHADERSTATE;     // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
 
-    IncludeManager.m_ReferenceResolver.ResolveReferencedWords ();
+    // Fetch compiled D3DEffect
+    m_pD3DEffect = m_pManager->GetEffectCloner ()->CreateD3DEffect ( strFilename, strRootPath, strOutStatus, bDebug );
 
-    // Make a map of referenced parameters
+    if ( !m_pD3DEffect )
+        return;
+
+    D3DXEFFECT_DESC EffectDesc;
+    m_pD3DEffect->GetDesc ( &EffectDesc );
+    D3DXHANDLE hTechnique = m_pD3DEffect->GetCurrentTechnique ();
+
+    // Make a map of referenced parameter handles
     for ( uint i = 0 ; i < EffectDesc.Parameters ; i++ )
     {
         D3DXHANDLE hParameter = m_pD3DEffect->GetParameter ( NULL, i );
@@ -1076,10 +606,8 @@ void CEffectWrapImpl::CreateUnderlyingData ( const SString& strFilename, const S
         D3DXPARAMETER_DESC ParameterDesc;
         m_pD3DEffect->GetParameterDesc( hParameter, &ParameterDesc );
 
-        if ( IncludeManager.m_ReferenceResolver.IsWordReferenced ( ParameterDesc.Name ) )
+        if ( m_pD3DEffect->IsParameterUsed ( hParameter, hTechnique ) )
             MapInsert ( m_ReferencedParameterMap, hParameter );
-        else
-            OutputDebugLine ( SString ( "Skipping unrefed parameter '%s'", ParameterDesc.Name ) );
     }
 }
 
@@ -1093,7 +621,11 @@ void CEffectWrapImpl::CreateUnderlyingData ( const SString& strFilename, const S
 ////////////////////////////////////////////////////////////////
 void CEffectWrapImpl::ReleaseUnderlyingData ( void )
 {
-    SAFE_RELEASE ( m_pD3DEffect );
+    if ( m_pD3DEffect )
+    {
+        m_pManager->GetEffectCloner ()->ReleaseD3DEffect ( m_pD3DEffect );
+        m_pD3DEffect = NULL;
+    }
 }
 
 

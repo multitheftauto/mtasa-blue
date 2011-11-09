@@ -29,6 +29,7 @@ class CScreenSourceItem;
 class CRenderItemManager;
 class CD3DDUMMY;
 class CSHADERDUMMY;
+class CEffectCloner;
 
 #define RDEFAULT            ((uint) -1)
 
@@ -111,6 +112,7 @@ public:
     virtual eDxTestMode         GetTestMode                         ( void ) = 0;
     virtual void                SetTestMode                         ( eDxTestMode testMode ) = 0;
     virtual void                GetDxStatus                         ( SDxStatus& outStatus ) = 0;
+    virtual CEffectCloner*      GetEffectCloner                     ( void ) = 0;
 };
 
 
@@ -145,6 +147,7 @@ enum eRenderItemClassTypes
     CLASS_CGuiFontItem,
     CLASS_CMaterialItem,
     CLASS_CEffectWrap,
+    CLASS_CEffectTemplate,
     CLASS_CShaderItem,
     CLASS_CShaderInstance,
     CLASS_CTextureItem,
@@ -167,7 +170,7 @@ class CRenderItem
     virtual void    PostConstruct           ( CRenderItemManager* pManager );
     virtual void    PreDestruct             ( void );
     virtual void    Release                 ( void );
-    void            AddRef                  ( void );
+    virtual void    AddRef                  ( void );
     virtual bool    IsValid                 ( void ) = 0;
     virtual void    OnLostDevice            ( void ) = 0;
     virtual void    OnResetDevice           ( void ) = 0;

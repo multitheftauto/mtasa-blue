@@ -41,6 +41,7 @@ public:
     virtual eDxTestMode         GetTestMode                         ( void )                    { return m_TestMode; }
     virtual void                SetTestMode                         ( eDxTestMode testMode );
     virtual void                GetDxStatus                         ( SDxStatus& outStatus );
+    virtual CEffectCloner*      GetEffectCloner                     ( void )                    { return m_pEffectCloner; }
 
     // CRenderItemManager
     void                        NotifyContructRenderItem            ( CRenderItem* pItem );
@@ -79,6 +80,7 @@ protected:
     // Shaders applied to world textures
     std::map < CD3DDUMMY*, CSHADERDUMMY* >      m_D3DDataShaderMap;
     class CRenderWare*                          m_pRenderWare;
+    CEffectCloner*                              m_pEffectCloner;
 
     eDxTestMode                                 m_TestMode;
     SString                                     m_strVideoCardName;

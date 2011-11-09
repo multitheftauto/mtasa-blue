@@ -85,9 +85,9 @@ namespace SharedUtil
         long long   ToLongLong      ( void ) const      { return m_llTicks; }
 
         // Static functions
-        static CTickCount Now ( void )
+        static CTickCount Now ( bool bUseModuleTickCount = false )
         {
-            return CTickCount ( GetTickCount64_ () );
+            return CTickCount ( bUseModuleTickCount ? GetModuleTickCount64 () : GetTickCount64_ () );
         }
     };
 

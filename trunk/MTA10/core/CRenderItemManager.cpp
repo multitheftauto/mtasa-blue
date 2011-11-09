@@ -10,6 +10,7 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include "CRenderItem.EffectCloner.h"
 
 
 ////////////////////////////////////////////////////////////////
@@ -21,6 +22,7 @@
 ////////////////////////////////////////////////////////////////
 CRenderItemManager::CRenderItemManager ( void )
 {
+    m_pEffectCloner = NewEffectCloner ( this );
 }
 
 
@@ -33,6 +35,7 @@ CRenderItemManager::CRenderItemManager ( void )
 ////////////////////////////////////////////////////////////////
 CRenderItemManager::~CRenderItemManager ( void )
 {
+    SAFE_DELETE( m_pEffectCloner );
 }
 
 
@@ -319,6 +322,9 @@ void CRenderItemManager::UpdateBackBufferCopy ( void )
     // and this
     m_PrevFrameTextureUsage = m_FrameTextureUsage;
     m_FrameTextureUsage.clear ();
+
+    // and this
+    m_pEffectCloner->DoPulse ();
 
 
     //
