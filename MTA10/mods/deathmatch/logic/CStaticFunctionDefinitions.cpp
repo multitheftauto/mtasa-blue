@@ -1559,12 +1559,6 @@ bool CStaticFunctionDefinitions::IsPedOnFire ( CClientPed & Ped, bool & bOnFire 
     return true;
 }
 
-bool CStaticFunctionDefinitions::IsPedDead ( CClientPed & Ped, bool & bDead )
-{
-    bDead = Ped.IsDead ();
-    return true;
-}
-
 bool CStaticFunctionDefinitions::IsPedInVehicle ( CClientPed & Ped, bool & bInVehicle )
 {
     bInVehicle = ( Ped.GetRealOccupiedVehicle () != NULL );

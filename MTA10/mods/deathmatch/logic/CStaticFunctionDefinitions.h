@@ -142,7 +142,6 @@ public:
     static bool                         GetPedWeaponMuzzlePosition          ( CClientPed& Ped, CVector& vecPosition );
     static bool                         IsPedOnFire                         ( CClientPed& Ped, bool & bOnFire );
     static bool                         IsPedInVehicle                      ( CClientPed& Ped, bool & bInVehicle );
-    static bool                         IsPedDead                         ( CClientPed& Ped, bool & bDead );
 
     static bool                         SetPedWeaponSlot                    ( CClientEntity& Entity, int iSlot );
     static bool                         SetPedRotation                      ( CClientEntity& Entity, float fRotation );
