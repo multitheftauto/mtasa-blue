@@ -26,71 +26,69 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
     m_bLoadXML = false;
     m_iAccounts = 1;
 
-    //Create our database
-    m_pSaveFile = g_pGame->GetRegistryManager ()->OpenRegistry ( "" );
-
     //Load internal.db
-    m_pSaveFile->Load ( strBuffer );
+    m_pDatabaseManager = g_pGame->GetDatabaseManager ();
+    m_hDbConnection = m_pDatabaseManager->Connect ( "sqlite", strBuffer );
 
     //Create all our tables (Don't echo the results)
-    m_pSaveFile->CreateTable ( "accounts", "id INTEGER PRIMARY KEY, name TEXT, password TEXT, ip TEXT, serial TEXT", true );
-    m_pSaveFile->CreateTable ( "userdata", "id INTEGER PRIMARY KEY, userid INTEGER, key TEXT, value TEXT, type INTEGER", true );
-    m_pSaveFile->CreateTable ( "settings", "id INTEGER PRIMARY KEY, key TEXT, value INTEGER", true );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS accounts (id INTEGER PRIMARY KEY, name TEXT, password TEXT, ip TEXT, serial TEXT)" );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS userdata (id INTEGER PRIMARY KEY, userid INTEGER, key TEXT, value TEXT, type INTEGER)" );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY, key TEXT, value INTEGER)" );
 
     // Check if unique index on accounts exists
     CRegistryResult result;
-	m_pSaveFile->Query ( &result, "SELECT name FROM sqlite_master WHERE type='index' AND name='IDX_ACCOUNTS_NAME_U'" );
+	m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT name FROM sqlite_master WHERE type='index' AND name='IDX_ACCOUNTS_NAME_U'" );
     if ( result.nRows == 0 )
     {
         // Need to add unique index on accounts
-        CLogger::LogPrint ( "Updating accounts table...\n" );
+        CLogger::LogPrintNoStamp ( "Updating accounts table...\n" );
 
         // Make sure we have a non-unique index to speed up the duplication removal
-	    m_pSaveFile->Query ( "CREATE INDEX IF NOT EXISTS IDX_ACCOUNTS_NAME on accounts(name)" );
+	    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE INDEX IF NOT EXISTS IDX_ACCOUNTS_NAME on accounts(name)" );
         // Remove any duplicate name entries
-	    m_pSaveFile->Query ( "DELETE FROM accounts WHERE rowid in "
+	    m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM accounts WHERE rowid in "
 						                                " (SELECT A.rowid"
 						                                " FROM accounts A, accounts B"
 						                                " WHERE A.rowid > B.rowid AND A.name = B.name)" );
         // Remove non-unique index
-        m_pSaveFile->Query ( "DROP INDEX IF EXISTS IDX_ACCOUNTS_NAME" );
+        m_pDatabaseManager->Execf ( m_hDbConnection, "DROP INDEX IF EXISTS IDX_ACCOUNTS_NAME" );
         // Add unique index
-	    m_pSaveFile->Query ( "CREATE UNIQUE INDEX IF NOT EXISTS IDX_ACCOUNTS_NAME_U on accounts(name)" );
+	    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE UNIQUE INDEX IF NOT EXISTS IDX_ACCOUNTS_NAME_U on accounts(name)" );
     }
 
     // Check if unique index on userdata exists
-	m_pSaveFile->Query ( &result, "SELECT name FROM sqlite_master WHERE type='index' AND name='IDX_USERDATA_USERID_KEY_U'" );
+	m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT name FROM sqlite_master WHERE type='index' AND name='IDX_USERDATA_USERID_KEY_U'" );
     if ( result.nRows == 0 )
     {
         // Need to add unique index on userdata
-        CLogger::LogPrint ( "Updating userdata table...\n" );
+        CLogger::LogPrintNoStamp ( "Updating userdata table...\n" );
 
         // Make sure we have a non-unique index to speed up the duplication removal
-	    m_pSaveFile->Query ( "CREATE INDEX IF NOT EXISTS IDX_USERDATA_USERID_KEY on userdata(userid,key)" );
+	    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE INDEX IF NOT EXISTS IDX_USERDATA_USERID_KEY on userdata(userid,key)" );
         // Remove any duplicate userid+key entries
-	    m_pSaveFile->Query ( "DELETE FROM userdata WHERE rowid in "
+	    m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM userdata WHERE rowid in "
 						                                " (SELECT A.rowid"
 						                                " FROM userdata A, userdata B"
 						                                " WHERE A.rowid > B.rowid AND A.userid = B.userid AND A.key = B.key)" );
         // Remove non-unique index
-        m_pSaveFile->Query ( "DROP INDEX IF EXISTS IDX_USERDATA_USERID_KEY" );
+        m_pDatabaseManager->Execf ( m_hDbConnection, "DROP INDEX IF EXISTS IDX_USERDATA_USERID_KEY" );
         // Add unique index
-	    m_pSaveFile->Query ( "CREATE UNIQUE INDEX IF NOT EXISTS IDX_USERDATA_USERID_KEY_U on userdata(userid,key)" );
+	    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE UNIQUE INDEX IF NOT EXISTS IDX_USERDATA_USERID_KEY_U on userdata(userid,key)" );
     }
     
     // Ensure old indexes are removed
-    m_pSaveFile->Query ( "DROP INDEX IF EXISTS IDX_ACCOUNTS_NAME" );
-    m_pSaveFile->Query ( "DROP INDEX IF EXISTS IDX_USERDATA_USERID" );
-    m_pSaveFile->Query ( "DROP INDEX IF EXISTS IDX_USERDATA_USERID_KEY" );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "DROP INDEX IF EXISTS IDX_ACCOUNTS_NAME" );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "DROP INDEX IF EXISTS IDX_USERDATA_USERID" );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "DROP INDEX IF EXISTS IDX_USERDATA_USERID_KEY" );
 
     //Pull our settings
-    m_pSaveFile->Query ( &result, "SELECT key, value from settings" );
+    m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT key, value from settings" );
 
     //Did we get any results
     if ( result.nRows == 0 )
     {
         //Set our settings and clear the accounts/userdata tables just in case
-        m_pSaveFile->Query ( "INSERT INTO settings (key, value) VALUES(?,?)", SQLITE_TEXT, "XMLParsed", SQLITE_INTEGER, 0 );
+        m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO settings (key, value) VALUES(?,?)", SQLITE_TEXT, "XMLParsed", SQLITE_INTEGER, 0 );
         //Tell the Server to load the xml file rather than the SQL
         m_bLoadXML = true;
     }
@@ -117,7 +115,7 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
         if ( bLoadXMLMissing )
         {
             //Insert it
-            m_pSaveFile->Query ( "INSERT INTO settings (key, value) VALUES(?,?)", SQLITE_TEXT, "XMLParsed", SQLITE_INTEGER, 0 );
+            m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO settings (key, value) VALUES(?,?)", SQLITE_TEXT, "XMLParsed", SQLITE_INTEGER, 0 );
             //Tell the Server to load the xml file rather than the SQL
             m_bLoadXML = true;
         }
@@ -130,8 +128,8 @@ void CAccountManager::ClearSQLDatabase ( void )
 {    
     //No settings file or server owner wants to reload from the accounts file
     //Clear the accounts and userdata tables
-    m_pSaveFile->Query ( "DELETE from accounts" );
-    m_pSaveFile->Query ( "DELETE from userdata");
+    m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE from accounts" );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE from userdata");
 }
 
 CAccountManager::~CAccountManager ( void )
@@ -139,7 +137,7 @@ CAccountManager::~CAccountManager ( void )
     //Save everything
     Save ();
     //Delete our save file
-    g_pGame->GetRegistryManager ()->CloseRegistry ( m_pSaveFile );
+    m_pDatabaseManager->Disconnect ( m_hDbConnection );
     RemoveAll ();
 }
 
@@ -189,7 +187,7 @@ bool CAccountManager::ConvertXMLToSQL ( const char* szFileName )
                 if ( FileExists ( szFileName ) )
                     CLogger::LogPrint ( "Conversion Failed: 'accounts.xml' failed to load.\n" );
                 //Add Console to the SQL Database (You don't need to create an account since the server takes care of that (Have to do this here or Console may be created after other accounts if the owner uses addaccount too early)
-                m_pSaveFile->Query ( "INSERT INTO accounts (name, password) VALUES(?,?)", SQLITE_TEXT, "Console", SQLITE_TEXT, "" );
+                m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO accounts (name, password) VALUES(?,?)", SQLITE_TEXT, "Console", SQLITE_TEXT, "" );
                 ++m_iAccounts;
             }
         }
@@ -240,14 +238,14 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
                                 if ( pAttribute )
                                 {
                                     //Insert the entry into the accounts database
-                                    m_pSaveFile->Query ( "INSERT INTO accounts (name, ip, serial, password) VALUES(?,?,?,?)", SQLITE_TEXT, strName.c_str(), SQLITE_TEXT, strIP.c_str(), SQLITE_TEXT, pAttribute->GetValue ().c_str(), SQLITE_TEXT, strPassword.c_str() );
+                                    m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO accounts (name, ip, serial, password) VALUES(?,?,?,?)", SQLITE_TEXT, strName.c_str(), SQLITE_TEXT, strIP.c_str(), SQLITE_TEXT, pAttribute->GetValue ().c_str(), SQLITE_TEXT, strPassword.c_str() );
                                     pAccount = new CAccount ( this, true, strName, strPassword, strIP, m_iAccounts++, pAttribute->GetValue () );
                                 
                                 }
                                 else
                                 {
                                     //Insert the entry into the accounts database
-                                    m_pSaveFile->Query ( "INSERT INTO accounts (name, ip, password) VALUES(?,?,?)", SQLITE_TEXT, strName.c_str(), SQLITE_TEXT, strIP.c_str(), SQLITE_TEXT, strPassword.c_str() );
+                                    m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO accounts (name, ip, password) VALUES(?,?,?)", SQLITE_TEXT, strName.c_str(), SQLITE_TEXT, strIP.c_str(), SQLITE_TEXT, strPassword.c_str() );
                                     pAccount = new CAccount ( this, true, strName, strPassword, strIP, m_iAccounts++ );
                                 }
 
@@ -291,13 +289,13 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
                                 if ( pAttribute )
                                 {
                                     //Insert the entry into the accounts database
-                                    m_pSaveFile->Query ( "INSERT INTO accounts (name, password, serial) VALUES(?,?,?)", SQLITE_TEXT, strName.c_str(), SQLITE_TEXT, strPassword.c_str(), SQLITE_TEXT, pAttribute->GetValue().c_str() );
+                                    m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO accounts (name, password, serial) VALUES(?,?,?)", SQLITE_TEXT, strName.c_str(), SQLITE_TEXT, strPassword.c_str(), SQLITE_TEXT, pAttribute->GetValue().c_str() );
                                     pAccount = new CAccount ( this, true, strName, strPassword, "", m_iAccounts++, pAttribute->GetValue () );
                                 }
                                 else
                                 {
                                     //Insert the entry into the accounts database
-                                    m_pSaveFile->Query ( "INSERT INTO accounts (name, password) VALUES(?,?)", SQLITE_TEXT, strName.c_str(), SQLITE_TEXT, strPassword.c_str() );
+                                    m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO accounts (name, password) VALUES(?,?)", SQLITE_TEXT, strName.c_str(), SQLITE_TEXT, strPassword.c_str() );
                                     pAccount = new CAccount ( this, true, strName, strPassword, "", m_iAccounts++, "" );
                                 }
                             }
@@ -307,7 +305,7 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
                             if ( strName == "Console" )
                             {
                                 //Add Console to the SQL Database (You don't need to create an account since the server takes care of that
-                                m_pSaveFile->Query ( "INSERT INTO accounts (name, password) VALUES(?,?)", SQLITE_TEXT, "Console", SQLITE_TEXT, "" );
+                                m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO accounts (name, password) VALUES(?,?)", SQLITE_TEXT, "Console", SQLITE_TEXT, "" );
                                 ++m_iAccounts;
                             }
                         }
@@ -336,7 +334,7 @@ bool CAccountManager::Load( void )
     //Create a registry result
     CRegistryResult result;
     //Select all our required information from the accounts database
-    m_pSaveFile->Query( &result, "SELECT id,name,password,ip,serial from accounts" );
+    m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT id,name,password,ip,serial from accounts" );
 
     //Work out how many rows we have
     int iResults = result.nRows;
@@ -366,8 +364,8 @@ bool CAccountManager::Load( void )
             // If name gone doolally or account with this name already exists, remove account
             if ( strName.length () > 256 || Get ( strName, true ) )
             {
-                m_pSaveFile->Query ( "DELETE FROM accounts WHERE id=?", SQLITE_INTEGER, iUserID );
-                m_pSaveFile->Query ( "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID );
+                m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM accounts WHERE id=?", SQLITE_INTEGER, iUserID );
+                m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID );
                 bNeedsVacuum = true;
                 CLogger::LogPrintf ( "Removed duplicate or damaged account for %s\n", strName.substr ( 0, 64 ).c_str() );
                 continue;
@@ -402,7 +400,7 @@ bool CAccountManager::Load( void )
         m_iAccounts = Max ( m_iAccounts, iUserID );
     }
     if ( bNeedsVacuum )
-        m_pSaveFile->Query ( "VACUUM" );
+        m_pDatabaseManager->Execf ( m_hDbConnection, "VACUUM" );
     return true;
 }
 
@@ -424,82 +422,76 @@ bool CAccountManager::LoadSetting ( CXMLNode* pNode )
     return true;
 }
 
-bool CAccountManager::Save ( CAccount* pAccount, SString* pStrError )
-{
-    bool bOk = true;
 
+void CAccountManager::Save ( CAccount* pAccount )
+{
     SString strName = pAccount->GetName();
     SString strPassword = pAccount->GetPassword();
     SString strIP = pAccount->GetIP();
     SString strSerial = pAccount->GetSerial();
 
-    //Create a registry result
-    CRegistryResult result;
-    //Select ID From Accounts Where Name=strName
-    m_pSaveFile->Query ( &result, "SELECT id FROM accounts WHERE name=? LIMIT 1", SQLITE_TEXT, strName.c_str() );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT OR IGNORE INTO accounts (name, ip, serial, password) VALUES(?,?,?,?)", SQLITE_TEXT, strName.c_str (), SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str () );
 
-    //Check for results
-    if ( result.nRows > 0 ) {
-        //If we have a serial update that as well
-        if ( strSerial != "" )
-            bOk &= m_pSaveFile->Query ( "UPDATE accounts SET ip=?, serial=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
-        else
-            //If we don't have a serial then IP and password will suffice
-            bOk &= m_pSaveFile->Query ( "UPDATE accounts SET ip=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
-    }
+    if ( strSerial != "" )
+        m_pDatabaseManager->QueryWithCallbackf ( m_hDbConnection, StaticDbCallback, this, "UPDATE accounts SET ip=?, serial=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
     else
-        //No entries so it isn't in the database therefore Insert it
-        bOk &= m_pSaveFile->Query ( "INSERT INTO accounts (name, ip, serial, password) VALUES(?,?,?,?)", SQLITE_TEXT, strName.c_str (), SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str () );
+        //If we don't have a serial then IP and password will suffice
+        m_pDatabaseManager->QueryWithCallbackf ( m_hDbConnection, StaticDbCallback, this, "UPDATE accounts SET ip=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+
     //Set changed since saved to false
     pAccount->SetChanged( false );
-
-    if ( !bOk && pStrError )
-        *pStrError = SString ( "%s (CAccountManager::Save)", m_pSaveFile->GetLastError ().c_str () );
-    return bOk;
 }
+
 
 bool CAccountManager::Save ( void )
 {
     // Attempted save now
     m_bChangedSinceSaved = false;
-    m_llLastTimeSaved = GetTickCount64_ ();
 
     list < CAccount* > ::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end () ; iter++ )
-    {
         if ( (*iter)->IsRegistered () && (*iter)->HasChanged() )
-        {
-            CAccount * pAccount = (*iter);
-            SString strError;
-            if ( !Save ( pAccount, &strError ) )
-                CLogger::LogPrintf ( "ERROR: While saving account '%s': %s.\n", pAccount->GetName ().c_str (), *strError );
-        }
-    }
-
-    //Get the time took to save
-    long long llDeltaTime = GetTickCount64_ () - m_llLastTimeSaved;
-    //Greater than five seconds?
-    if ( llDeltaTime > 5000 )
-        //Echo the time taken
-        CLogger::LogPrintf ( "INFO: Took %lld seconds to save accounts Database.\n", llDeltaTime / 1000 );
+            Save ( *iter );
 
     return true;
 }
 
 
-
 bool CAccountManager::SaveSettings ()
 {
     //Update our XML Load SQL entry
-    m_pSaveFile->Query ( "UPDATE settings SET value=? WHERE key=?", SQLITE_INTEGER, 1, SQLITE_TEXT, "XMLParsed" );
-
+    m_pDatabaseManager->Execf ( m_hDbConnection, "UPDATE settings SET value=? WHERE key=?", SQLITE_INTEGER, 1, SQLITE_TEXT, "XMLParsed" );
     return true;
 }
 
 
 bool CAccountManager::IntegrityCheck ()
 {
-    return m_pSaveFile->IntegrityCheck ();
+    CRegistryResult result;
+    //Select all our required information from the accounts database
+    bool bOk = m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "PRAGMA integrity_check(3)" );
+
+    // Get result as a string
+    SString strResult;
+    if ( result.nRows && result.nColumns )
+    {
+        CRegistryResultCell& cell = result.Data[0][0];
+        if ( cell.nType == SQLITE_TEXT )
+            strResult = std::string ( (const char *)cell.pVal, cell.nLength - 1 );
+    }
+
+    // Process result
+    if ( !bOk || !strResult.BeginsWithI ( "ok" ) )
+    {
+        CLogger::ErrorPrintf ( "%s", *strResult );
+        CLogger::ErrorPrintf ( "%s\n", *m_pDatabaseManager->GetLastErrorMessage () );
+        CLogger::ErrorPrintf ( "Errors were encountered loading '%s' database\n", *ExtractFilename ( PathConform ( "internal.db" ) ) );
+        CLogger::ErrorPrintf ( "Maybe now is the perfect time to panic.\n" );
+        CLogger::ErrorPrintf ( "See - http://wiki.multitheftauto.com/wiki/fixdb\n" );
+        CLogger::ErrorPrintf ( "************************\n" );
+        return false;
+    }
+    return true;
 }
 
 
@@ -786,7 +778,7 @@ CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, const char* s
     CRegistryResult result;
 
     //Select the value and type from the database where the user is our user and the key is the required key
-    m_pSaveFile->Query ( &result, "SELECT value,type from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID, SQLITE_TEXT, szKey );
+    m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT value,type from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID, SQLITE_TEXT, szKey );
 
     //Store the returned amount of rows
     int iResults = result.nRows;
@@ -824,24 +816,13 @@ bool CAccountManager::SetAccountData( CAccount* pAccount, const char* szKey, con
     //Does the user want to delete the data?
     if ( strValue == "false" && iType == LUA_TBOOLEAN )
     {
-        m_pSaveFile->Query ( "DELETE FROM userdata WHERE userid=? AND key=?", SQLITE_INTEGER, iUserID, SQLITE_TEXT, strKey.c_str () );
+        m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM userdata WHERE userid=? AND key=?", SQLITE_INTEGER, iUserID, SQLITE_TEXT, strKey.c_str () );
         return true;
     }
 
-    //create a new registry result for the query return
-    CRegistryResult result;
-
-    //Select the key and value from the database where the user is our user and the key is the required key
-    m_pSaveFile->Query ( &result, "SELECT id,userid from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID, SQLITE_TEXT, strKey.c_str () );
-
-    //If there is a key with this value update it otherwise insert it
-    if ( result.nRows > 0 )
-        return m_pSaveFile->Query ( "UPDATE userdata SET value=?, type=? WHERE userid=? AND key=?", SQLITE_TEXT, strValue.c_str (), SQLITE_INTEGER, iType, SQLITE_INTEGER, iUserID, SQLITE_TEXT, strKey.c_str () );
-    else
-        return m_pSaveFile->Query ( "INSERT INTO userdata (userid, key, value, type) VALUES(?,?,?,?)", SQLITE_INTEGER, pAccount->GetID (), SQLITE_TEXT, strKey.c_str (), SQLITE_TEXT, strValue.c_str (), SQLITE_INTEGER, iType );
-   
-    //Return false as nothing has changed
-    return false;
+    m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT OR IGNORE INTO userdata (userid, key, value, type) VALUES(?,?,?,?)", SQLITE_INTEGER, pAccount->GetID (), SQLITE_TEXT, strKey.c_str (), SQLITE_TEXT, strValue.c_str (), SQLITE_INTEGER, iType );
+    m_pDatabaseManager->QueryWithCallbackf ( m_hDbConnection, StaticDbCallback, this, "UPDATE userdata SET value=?, type=? WHERE userid=? AND key=?", SQLITE_TEXT, strValue.c_str (), SQLITE_INTEGER, iType, SQLITE_INTEGER, iUserID, SQLITE_TEXT, strKey.c_str () );
+    return true;
 }
 
 bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAccount )
@@ -851,13 +832,12 @@ bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAcco
     //create a new registry result for the from account query return value
     CRegistryResult result;
     //create a new registry result for the to account query return value
-    CRegistryResult subResult;
     //initialize key and value strings
     SString strKey;
     SString strValue;
 
     //Select the key and value from the database where the user is our from account
-    m_pSaveFile->Query ( &result, "SELECT key,value,type from userdata where userid=? LIMIT 1", SQLITE_INTEGER, iUserID );
+    m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT key,value,type from userdata where userid=? LIMIT 1", SQLITE_INTEGER, iUserID );
 
     //Store the returned amount of rows
     int iResults = result.nRows;
@@ -873,12 +853,13 @@ bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAcco
             strValue = (char *)result.Data[i][1].pVal;
             int iType = result.Data[i][2].nVal;
             //Select the id and userid where the user is the to account and the key is strKey
-            m_pSaveFile->Query ( &subResult, "SELECT id,userid from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID, SQLITE_TEXT, strKey.c_str () );
+            CRegistryResult subResult;
+            m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &subResult, "SELECT id,userid from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID, SQLITE_TEXT, strKey.c_str () );
             //If there is a key with this value update it otherwise insert it and store the return value in bRetVal
             if ( subResult.nRows > 0 )
-                m_pSaveFile->Query ( "UPDATE userdata SET value=?, type=? WHERE userid=? AND key=?", SQLITE_TEXT, strValue.c_str (), SQLITE_INTEGER, iType, SQLITE_INTEGER, pToAccount->GetID (), SQLITE_TEXT, strKey.c_str () );
+                m_pDatabaseManager->Execf ( m_hDbConnection, "UPDATE userdata SET value=?, type=? WHERE userid=? AND key=?", SQLITE_TEXT, strValue.c_str (), SQLITE_INTEGER, iType, SQLITE_INTEGER, pToAccount->GetID (), SQLITE_TEXT, strKey.c_str () );
             else
-                m_pSaveFile->Query ( "INSERT INTO userdata (userid, key, value, type) VALUES(?,?,?,?)", SQLITE_INTEGER, pToAccount->GetID (), SQLITE_TEXT, strKey.c_str (), SQLITE_TEXT, strValue.c_str (), SQLITE_INTEGER, iType );
+                m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO userdata (userid, key, value, type) VALUES(?,?,?,?)", SQLITE_INTEGER, pToAccount->GetID (), SQLITE_TEXT, strKey.c_str (), SQLITE_TEXT, strValue.c_str (), SQLITE_INTEGER, iType );
 
         }
     }
@@ -913,15 +894,45 @@ void CAccountManager::Register( CAccount* pAccount )
         //Give the Account an ID
         pAccount->SetID( ++m_iAccounts );
         //Force a save for this account
-        SString strError;
-        if ( !Save ( pAccount, &strError ) )
-            CLogger::LogPrintf ( "ERROR: While saving account '%s': %s.\n", pAccount->GetName ().c_str (), *strError );
+        Save ( pAccount );
     }
 }
 
 void CAccountManager::RemoveAccount ( CAccount* pAccount )
 {
     int iUserID = pAccount->GetID();
-    m_pSaveFile->Query ( "DELETE FROM accounts WHERE id=?", SQLITE_INTEGER, iUserID );
-    m_pSaveFile->Query ( "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM accounts WHERE id=?", SQLITE_INTEGER, iUserID );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID );
+}
+
+
+//
+// Callback for some database queries.
+//    This is only done to check for (and report) errors
+//
+void CAccountManager::StaticDbCallback ( CDbJobData* pJobData, void* pContext )
+{
+    if ( pJobData->stage == EJobStage::RESULT )
+        ((CAccountManager*)pContext)->DbCallback ( pJobData );
+#ifdef MTA_DEBUG
+    else
+        CLogger::LogPrintf ( "DEBUGINFO: StaticDbCallback stage was %d for '%s'\n", pJobData->stage, *pJobData->command.strData );
+#endif
+}
+
+void CAccountManager::DbCallback ( CDbJobData* pJobData )
+{
+    if ( m_pDatabaseManager->QueryPoll ( pJobData, 0 ) )
+    {
+        if ( pJobData->result.status == EJobResult::FAIL ) 
+            CLogger::LogPrintf ( "ERROR: While updating account with '%s': %s.\n", *pJobData->command.strData, *pJobData->result.strReason );
+#ifdef MTA_DEBUG
+        else
+            CLogger::LogPrintf ( "DEBUGINFO: Query completed: '%s'\n", *pJobData->command.strData );
+#endif
+    }
+    else
+    {
+        CLogger::LogPrintf ( "ERROR: Something worrying happened in DbCallback '%s': %s.\n", *pJobData->command.strData, *pJobData->result.strReason );
+    }
 }

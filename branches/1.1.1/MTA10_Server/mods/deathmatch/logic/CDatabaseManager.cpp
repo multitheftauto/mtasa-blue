@@ -42,6 +42,8 @@ public:
     virtual bool                    QueryFree                   ( CDbJobData* pJobData );
     virtual CDbJobData*             GetQueryFromId              ( SDbJobId id );
     virtual const SString&          GetLastErrorMessage         ( void )                    { return m_strLastErrorMessage; }
+    virtual bool                    QueryWithResultf            ( SConnectionHandle hConnection, CRegistryResult* pResult, const char* szQuery, ... );
+    virtual bool                    QueryWithCallbackf          ( SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const char* szQuery, ... );
 
     // CDatabaseManagerImpl
     SString                         InsertQueryArguments        ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
@@ -293,6 +295,86 @@ CDbJobData* CDatabaseManagerImpl::QueryStartf ( SConnectionHandle hConnection, c
 
     // Start query
     return m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseManagerImpl::QueryWithResultf
+//
+// Start a query and wait for the result
+//
+///////////////////////////////////////////////////////////////
+bool CDatabaseManagerImpl::QueryWithResultf ( SConnectionHandle hConnection, CRegistryResult* pResult, const char* szQuery, ... )
+{
+    va_list vl;
+    va_start ( vl, szQuery );
+
+    ClearLastErrorMessage ();
+
+    // Check connection
+    if ( !MapContains ( m_ConnectionTypeMap, hConnection ) )
+    {
+        SetLastErrorMessage ( "Invalid connection" );
+        return false;
+    }
+
+    // Insert arguments with correct escapement
+    SString strEscapedQuery = InsertQueryArguments ( hConnection, szQuery, vl );
+
+    // Start query
+    CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
+
+    // Wait for result
+    QueryPoll ( pJobData, -1 );
+
+    // Process result
+    if ( pJobData->result.status == EJobResult::FAIL )
+    {
+        if ( pResult )
+            *pResult = CRegistryResult ();
+        return false;
+    }
+    else
+    {
+        if ( pResult )
+            *pResult = pJobData->result.registryResult;
+        return true;
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseManagerImpl::QueryWithCallbackf
+//
+// Start a query and direct the result through a callback
+//
+///////////////////////////////////////////////////////////////
+bool CDatabaseManagerImpl::QueryWithCallbackf ( SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const char* szQuery, ... )
+{
+    va_list vl;
+    va_start ( vl, szQuery );
+
+    ClearLastErrorMessage ();
+
+    // Check connection
+    if ( !MapContains ( m_ConnectionTypeMap, hConnection ) )
+    {
+        SetLastErrorMessage ( "Invalid connection" );
+        return NULL;
+    }
+
+    // Insert arguments with correct escapement
+    SString strEscapedQuery = InsertQueryArguments ( hConnection, szQuery, vl );
+
+    // Start query
+    CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
+
+    // Set callback vars
+    pJobData->SetCallback ( pfnDbResult, pCallbackContext );
+
+    return true;
 }
 
 

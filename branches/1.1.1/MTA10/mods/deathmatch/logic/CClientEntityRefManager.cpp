@@ -86,9 +86,6 @@ void CClientEntityRefManager::RemoveEntityRefs ( const char* szDebugInfo, ... )
 ///////////////////////////////////////////////////////////////
 void CClientEntityRefManager::OnEntityDelete ( CClientEntity* pEntity )
 {
-#ifdef MTA_DEBUG
-    OutputDebugLine ( SString ( "ms_EntityRefList.size: %d", ms_EntityRefList.size () ) );
-#endif
     std::set < CClientEntity** > ::iterator iter = ms_EntityRefList.begin ();
     for ( ; iter != ms_EntityRefList.end () ; ++iter )
     {

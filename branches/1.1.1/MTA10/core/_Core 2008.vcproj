@@ -589,6 +589,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderItem.EffectCloner.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.EffectTemplate.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CRenderItem.EffectWrap.cpp"
 				>
 			</File>
@@ -959,6 +967,10 @@
 			</File>
 			<File
 				RelativePath=".\CQuickConnect.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.EffectCloner.h"
 				>
 			</File>
 			<File

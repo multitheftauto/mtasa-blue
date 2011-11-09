@@ -590,3 +590,9 @@ SString SharedUtil::MakeUniquePath ( const SString& strPathFilename )
     }
     return strTest;
 }
+
+// Conform a path string for sorting
+SString SharedUtil::ConformPathForSorting ( const SString& strPathFilename )
+{
+    return PathConform ( strPathFilename ).ToLower ();
+}
