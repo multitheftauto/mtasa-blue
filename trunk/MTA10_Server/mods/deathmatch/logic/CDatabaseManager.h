@@ -52,6 +52,7 @@ using EJobCommand::EJobCommandType;
 using EJobResult::EJobResultType;
 using EJobStage::EJobStageType;
 
+typedef void (*PFN_DBRESULT)  ( CDbJobData* pJobData, void* pContext );
 
 //
 // All data realating to a database job
@@ -63,10 +64,12 @@ public:
 
                 CDbJobData      ( SDbJobId id ) : id ( id ) {}
     SDbJobId    GetId           ( void ) { return id; }
+    void        SetCallback     ( PFN_DBRESULT pfnInDbResult, void* pInCallbackContext ) { pfnDbResultCallback = pfnInDbResult; pCallbackContext = pInCallbackContext; }
 
     EJobStageType       stage;
     SDbJobId            id;
-    class CLuaCallback* pLuaCallback;
+    PFN_DBRESULT        pfnDbResultCallback;
+    void*               pCallbackContext;
 
     struct
     {
@@ -114,6 +117,8 @@ public:
     virtual bool                    QueryFree               ( CDbJobData* pJobData ) = 0;
     virtual CDbJobData*             GetQueryFromId          ( SDbJobId id ) = 0;
     virtual const SString&          GetLastErrorMessage     ( void ) = 0;
+    virtual bool                    QueryWithResultf        ( SConnectionHandle hConnection, CRegistryResult* pResult, const char* szQuery, ... ) = 0;
+    virtual bool                    QueryWithCallbackf      ( SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const char* szQuery, ... ) = 0;
 };
 
 CDatabaseManager* NewDatabaseManager ( void );
