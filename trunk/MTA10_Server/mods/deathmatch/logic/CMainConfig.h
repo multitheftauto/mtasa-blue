@@ -76,7 +76,7 @@ public:
     inline bool                     GetAutoUpdateIncludedResourcesEnabled   ( void )        { return m_bAutoUpdateIncludedResources; };
     inline bool                     GetDontBroadcastLan             ( void )        { return m_bDontBroadcastLan; };
     inline bool                     GetSerialVerificationEnabled    ( void )        { return m_bVerifySerials; };
-    bool                            IsDisableAC                     ( const char* szTagAC )     { return MapContains ( m_DisableACMap, szTagAC ); };
+    bool                            IsDisableAC                     ( const char* szTagAC )     { return MapContains ( m_DisableComboACMap, szTagAC ); };
     bool                            IsEnableDiagnostic              ( const char* szTag )       { return MapContains ( m_EnableDiagnosticMap, szTag ); };
     bool                            IsBelowMinimumClient            ( const char* szVersion )   { return GetMinimumClientVersion () > szVersion; }
     bool                            IsBelowRecommendedClient        ( const char* szVersion )   { return m_strRecommendedClientVersion.length () && m_strRecommendedClientVersion > szVersion; }
@@ -143,8 +143,8 @@ private:
     bool                            m_bVerifySerials;
     unsigned short                  m_usFPSLimit;
     bool                            m_bDontBroadcastLan;
-    std::map < SString, int >       m_DisableACMap;
-    std::map < SString, int >       m_EnableDiagnosticMap;
+    std::set < SString >            m_DisableComboACMap;
+    std::set < SString >            m_EnableDiagnosticMap;
     SString                         m_strMinClientVersion;
     SString                         m_strRecommendedClientVersion;
     SString                         m_strMinClientVersionOverride;

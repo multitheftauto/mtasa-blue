@@ -203,15 +203,39 @@ bool CMainConfig::Load ( void )
     GetInteger ( m_pRootNode, "hideac", iHideAC );
 
     {
-        SString strDisbaleAC;
-        GetString ( m_pRootNode, "disableac", strDisbaleAC );
-        std::vector < SString > tagACList;
-        strDisbaleAC.Split ( ",", tagACList );
-        for ( std::vector < SString >::iterator it = tagACList.begin () ; it != tagACList.end () ; ++it )
-            if ( isdigit(***it) )
-                MapSet ( m_DisableACMap, *it, 1 );
+        std::set < SString > disableACMap;
+        std::set < SString > enableSDMap;
 
-        g_pNetServer->ResetStub ( 'delu', *strDisbaleAC, m_iEnableClientChecks, iHideAC );
+        {
+            SString strDisableAC;
+            GetString ( m_pRootNode, "disableac", strDisableAC );
+            std::vector < SString > tagACList;
+            strDisableAC.Split ( ",", tagACList );
+            for ( std::vector < SString >::iterator it = tagACList.begin () ; it != tagACList.end () ; ++it )
+                if ( isdigit(***it) )
+                {
+                    MapInsert ( disableACMap, *it );
+                    MapInsert ( m_DisableComboACMap, *it );
+                }
+        }
+
+        // Add support for SD #12 (defaults to disabled)
+        MapInsert ( m_DisableComboACMap, "12" );
+
+        {
+            SString strEnableSD;
+            GetString ( m_pRootNode, "enablesd", strEnableSD );
+            std::vector < SString > tagSDList;
+            strEnableSD.Split ( ",", tagSDList );
+            for ( std::vector < SString >::iterator it = tagSDList.begin () ; it != tagSDList.end () ; ++it )
+                if ( isdigit(***it) )
+                {
+                    MapInsert ( enableSDMap, *it );
+                    MapRemove ( m_DisableComboACMap, *it );
+                }
+        }
+
+        g_pNetServer->ResetStub ( 'delu', &m_DisableComboACMap, &disableACMap, &enableSDMap, m_iEnableClientChecks, iHideAC );
     }
 
     {
@@ -221,7 +245,7 @@ bool CMainConfig::Load ( void )
         strEnable.Split ( ",", tagList );
         for ( std::vector < SString >::iterator it = tagList.begin () ; it != tagList.end () ; ++it )
             if ( (*it).length () )
-                MapSet ( m_EnableDiagnosticMap, *it, 1 );
+                MapInsert ( m_EnableDiagnosticMap, *it );
     }
 
     // ASE
