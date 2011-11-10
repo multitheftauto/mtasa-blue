@@ -686,7 +686,7 @@ void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable,
     if ( strlen ( szName ) > MAX_CUSTOMDATA_NAME_LENGTH )
     {
         // Don't allow it to be set if the name is too long
-        CLogger::ErrorPrintf ( "Custom data name too long (%s)", *SStringX ( szName ).Left ( MAX_CUSTOMDATA_NAME_LENGTH + 1 ) );
+        CLogger::ErrorPrintf ( "Custom data name too long (%s)\n", *SStringX ( szName ).Left ( MAX_CUSTOMDATA_NAME_LENGTH + 1 ) );
         return;
     }
 

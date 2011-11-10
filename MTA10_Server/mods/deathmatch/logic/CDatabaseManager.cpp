@@ -453,7 +453,7 @@ SString CDatabaseManagerImpl::InsertQueryArguments ( SConnectionHandle hConnecti
         return InsertQueryArgumentsMySql ( strQuery, pArgs );
 
     // 'Helpful' error message
-    CLogger::ErrorPrintf ( "DatabaseManager internal error #1" );
+    CLogger::ErrorPrintf ( "DatabaseManager internal error #1\n" );
     return "";
 }
 
