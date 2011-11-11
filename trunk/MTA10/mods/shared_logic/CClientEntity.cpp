@@ -256,31 +256,23 @@ CClientEntity* CClientEntity::AddChild ( CClientEntity* pChild )
 }
 
 
+// Also returns true if the element is the same
 bool CClientEntity::IsMyChild ( CClientEntity* pEntity, bool bRecursive )
 {
-    // Since VERIFY_ELEMENT is calling us, the pEntity argument could be NULL
-    if ( pEntity == NULL ) return false;
+    return pEntity && pEntity->IsMyParent ( this, bRecursive );
+}
 
+
+// Also returns true if the element is the same
+bool CClientEntity::IsMyParent ( CClientEntity* pEntity, bool bRecursive )
+{
     // Is he us?
     if ( pEntity == this )
         return true;
 
-    // Is he our child directly?
-    CChildListType ::const_iterator iter = m_Children.begin ();
-    for ( ; iter != m_Children.end (); iter++ )
-    {
-        // Return true if this is our child. If not check if he's one of our children's children if we were asked to do a recursive search.
-        if ( *iter == pEntity )
-        {
-            return true;
-        }
-        else if ( bRecursive && (*iter)->IsMyChild ( pEntity, true ) )
-        {
-            return true;
-        }
-    }
+    if ( bRecursive && pEntity && m_pParent && m_pParent->IsMyParent ( pEntity, true ) )
+        return true;
 
-    // He's not under us
     return false;
 }
 

@@ -276,31 +276,23 @@ void CElement::GetChildren ( lua_State* pLua )
 }
 
 
+// Also returns true if the element is the same
 bool CElement::IsMyChild ( CElement* pElement, bool bRecursive )
 {
-    // Since VERIFY_ELEMENT is calling us, the pEntity argument could be NULL
-    if ( pElement == NULL ) return false;
+    return pElement && pElement->IsMyParent ( this, bRecursive );
+}
 
+
+// Also returns true if the element is the same
+bool CElement::IsMyParent ( CElement* pElement, bool bRecursive )
+{
     // Is he us?
     if ( pElement == this )
         return true;
 
-    // Is he our child directly?
-    CChildListType ::const_iterator iter = m_Children.begin ();
-    for ( ; iter != m_Children.end (); iter++ )
-    {
-        // Return true if this is our child. If not check if he's one of our children's children if we were asked to do a recursive search.
-        if ( *iter == pElement )
-        {
-            return true;
-        }
-        else if ( bRecursive && (*iter)->IsMyChild ( pElement, true ) )
-        {
-            return true;
-        }
-    }
+    if ( bRecursive && pElement && m_pParent && m_pParent->IsMyParent ( pElement, true ) )
+        return true;
 
-    // He's not under us
     return false;
 }
 
@@ -469,7 +461,9 @@ void CElement::ReadCustomData ( CLuaMain* pLuaMain, CEvents* pEvents )
             CLuaArguments args;
             if ( !args.ReadFromJSONString ( pAttribute->GetValue ().c_str() ) )
                 args.PushString ( pAttribute->GetValue ().c_str () );
-            SetCustomData ( pAttribute->GetName ().c_str (), *args[0], pLuaMain );
+
+            // Don't trigger onElementDataChanged event
+            SetCustomData ( pAttribute->GetName ().c_str (), *args[0], pLuaMain, true, NULL, false );
         }
     }
 }
@@ -680,7 +674,7 @@ bool CElement::GetCustomDataBool ( const char* szName, bool& bOut, bool bInherit
 }
 
 
-void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized, CPlayer* pClient )
+void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized, CPlayer* pClient, bool bTriggerEvent )
 {
     assert ( szName );
     if ( strlen ( szName ) > MAX_CUSTOMDATA_NAME_LENGTH )
@@ -701,12 +695,15 @@ void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable,
     // Set the new data
     m_pCustomData->Set ( szName, Variable, pLuaMain, bSynchronized );
 
-    // Trigger the onElementDataChange event on us
-    CLuaArguments Arguments;
-    Arguments.PushString ( szName );
-    Arguments.PushArgument ( oldVariable );
-    Arguments.PushArgument ( Variable );
-    CallEvent ( "onElementDataChange", Arguments, pClient );
+    if ( bTriggerEvent )
+    {
+        // Trigger the onElementDataChange event on us
+        CLuaArguments Arguments;
+        Arguments.PushString ( szName );
+        Arguments.PushArgument ( oldVariable );
+        Arguments.PushArgument ( Variable );
+        CallEvent ( "onElementDataChange", Arguments, pClient );
+    }
 }
 
 
