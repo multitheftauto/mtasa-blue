@@ -3304,8 +3304,8 @@ void CGame::HandleBackup ( void )
     // Get backup vars
     SString strBackupPath = PathConform ( m_pMainConfig->GetBackupPath () ).TrimEnd ( PATH_SEPERATOR );
     int iBackupInterval = m_pMainConfig->GetBackupInterval ();
-    uint uiBackupAmount = m_pMainConfig->GetBackupAmount ();
-    if ( iBackupInterval == 0 || uiBackupAmount == 0 )
+    int iBackupAmount = m_pMainConfig->GetBackupAmount ();
+    if ( iBackupInterval == 0 || iBackupAmount == 0 )
         return;
 
     // Check if brand new installation
@@ -3400,7 +3400,7 @@ void CGame::HandleBackup ( void )
     FileRename ( strTempZip, strBackupZip );
 
     // Remove backups over min required
-    while ( fileList.size () >= uiBackupAmount )
+    while ( fileList.size () >= iBackupAmount )
     {
         SString strOldest = fileList.back ();
         FileDelete ( PathJoin ( strBackupPath, strOldest ) );
