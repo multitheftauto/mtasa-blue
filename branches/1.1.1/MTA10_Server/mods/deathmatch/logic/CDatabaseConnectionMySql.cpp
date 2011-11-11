@@ -43,6 +43,7 @@ public:
     void                    BeginAutomaticTransaction ( void );
     void                    EndAutomaticTransaction ( void );
     int                     ConvertToSqliteType     ( enum_field_types type );
+    void                    CheckMySQLConnection    ( void );
 
     int                     m_iRefCount;
     CDatabaseType*          m_pManager;
@@ -257,6 +258,8 @@ bool CDatabaseConnectionMySql::Query ( const SString& strQuery, CRegistryResult&
 ///////////////////////////////////////////////////////////////
 bool CDatabaseConnectionMySql::QueryInternal ( const SString& strQuery, CRegistryResult& registryResult )
 {
+    CheckMySQLConnection ( );
+
     CRegistryResult* pResult = &registryResult;
 
     int status = mysql_real_query ( m_handle, strQuery, static_cast < unsigned long > ( strQuery.length () ) );
@@ -436,6 +439,19 @@ int CDatabaseConnectionMySql::ConvertToSqliteType ( enum_field_types type )
         default:
             return SQLITE_TEXT;
     };
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseConnectionMySql::CheckMySQLConnection
+//
+// Ensure our connection reconnects when it disconnects by pinging every so often.
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseConnectionMySql::CheckMySQLConnection ( void )
+{
+    mysql_ping ( m_handle );
 }
 
 
