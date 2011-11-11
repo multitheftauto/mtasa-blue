@@ -177,6 +177,7 @@ public:
     CClientEntity*                              SetParent               ( CClientEntity* pParent );
     CClientEntity*                              AddChild                ( CClientEntity* pChild );
     bool                                        IsMyChild               ( CClientEntity* pEntity, bool bRecursive );
+    bool                                        IsMyParent              ( CClientEntity* pEntity, bool bRecursive );
     inline bool                                 IsBeingDeleted          ( void )                    { return m_bBeingDeleted; }
     inline void                                 SetBeingDeleted         ( bool bBeingDeleted )      { m_bBeingDeleted = bBeingDeleted; }
     void                                        ClearChildren           ( void );

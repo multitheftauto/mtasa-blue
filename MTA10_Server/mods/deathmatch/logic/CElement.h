@@ -105,6 +105,7 @@ public:
     void                                        FindAllChildrenByType       ( const char* szType, lua_State* pLua );
     void                                        GetChildren                 ( lua_State* pLua );
     bool                                        IsMyChild                   ( CElement* pElement, bool bRecursive );
+    bool                                        IsMyParent                  ( CElement* pElement, bool bRecursive );
     void                                        ClearChildren               ( void );
     void                                        GetDescendants              ( std::vector < CElement* >& outResult, bool bIncludeThis  );
     void                                        GetDescendantsByType        ( std::vector < CElement* >& outResult, bool bIncludeThis, int type );
@@ -131,7 +132,7 @@ public:
     bool                                        GetCustomDataInt            ( const char* szName, int& iOut, bool bInheritData );
     bool                                        GetCustomDataFloat          ( const char* szName, float& fOut, bool bInheritData );
     bool                                        GetCustomDataBool           ( const char* szName, bool& bOut, bool bInheritData );
-    void                                        SetCustomData               ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized = true, CPlayer* pClient = NULL );
+    void                                        SetCustomData               ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized = true, CPlayer* pClient = NULL, bool bTriggerEvent = true );
     bool                                        DeleteCustomData            ( const char* szName, bool bRecursive );
     void                                        DeleteAllCustomData         ( CLuaMain* pLuaMain, bool bRecursive );
 
