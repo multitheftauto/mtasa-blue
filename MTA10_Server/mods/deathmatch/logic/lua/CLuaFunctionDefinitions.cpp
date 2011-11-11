@@ -10486,21 +10486,6 @@ int CLuaFunctionDefinitions::DbConnect ( lua_State* luaVM )
 }
 
 
-//
-// Handle directing the callback for DbQuery
-//
-static void DbQueryCallback ( CDbJobData* pJobData, void* pContext )
-{
-    CLuaCallback* pLuaCallback = (CLuaCallback*)pContext;
-    if ( pJobData->stage == EJobStage::RESULT )
-    {
-        if ( pLuaCallback )
-            pLuaCallback->Call ();
-    }
-    SAFE_DELETE( pLuaCallback );
-}
-
-
 int CLuaFunctionDefinitions::DbQuery ( lua_State* luaVM )
 {
 //  handle dbQuery ( [ function callbackFunction, [ table callbackArguments, ] ] element connection, string query, ... )
@@ -10545,7 +10530,7 @@ int CLuaFunctionDefinitions::DbQuery ( lua_State* luaVM )
                 CLuaArguments Arguments;
                 Arguments.PushUserData ( reinterpret_cast < void* > ( pJobData->GetId () ) );
                 Arguments.PushArguments ( callbackArgs );
-                pJobData->SetCallback ( DbQueryCallback, new CLuaCallback ( pLuaMain, iLuaFunction, Arguments ) );
+                pJobData->pLuaCallback = new CLuaCallback ( pLuaMain, iLuaFunction, Arguments );
             }
         }
         lua_pushquery ( luaVM, pJobData );
