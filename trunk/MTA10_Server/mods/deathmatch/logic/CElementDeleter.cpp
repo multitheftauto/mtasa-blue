@@ -16,7 +16,7 @@
 
 extern CGame * g_pGame;
 
-void CElementDeleter::Delete ( class CElement* pElement, bool bUnlink )
+void CElementDeleter::Delete ( class CElement* pElement, bool bUnlink, bool bUpdatePerPlayerEntities )
 {
     if ( pElement && !IsBeingDeleted ( pElement ) )
     {
@@ -33,7 +33,7 @@ void CElementDeleter::Delete ( class CElement* pElement, bool bUnlink )
         // Flag it as being deleted and unlink it from the tree/managers
         pElement->SetIsBeingDeleted ( true );
         pElement->ClearChildren ();
-        pElement->SetParentObject ( NULL );
+        pElement->SetParentObject ( NULL, bUpdatePerPlayerEntities );
 
         if ( bUnlink )
             pElement->Unlink ();
@@ -55,14 +55,5 @@ void CElementDeleter::Unreference ( CElement* pElement )
 
 bool CElementDeleter::IsBeingDeleted ( CElement* pElement )
 {
-    list < CElement* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        if ( pElement == *iter )
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return ListContains ( m_List, pElement );
 }
