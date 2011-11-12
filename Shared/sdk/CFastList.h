@@ -102,7 +102,7 @@ public:
     {
         if ( uint uiIndex = GetItemIndex ( item ) )
         {
-            MapType::iterator it = orderedMap.find ( uiIndex );
+            typename MapType::iterator it = orderedMap.find ( uiIndex );
             dassert ( it != orderedMap.end () );
             dassert ( it->second == item );
             orderedMap.erase ( it );
@@ -117,7 +117,7 @@ protected:
         uiNextFrontIndex = UINT_MAX / 2 - 1;
         uiNextBackIndex = UINT_MAX / 2;
         MapType newMap;
-        for ( MapType::iterator iter = orderedMap.begin () ; iter != orderedMap.end () ; ++iter )
+        for ( typename MapType::iterator iter = orderedMap.begin () ; iter != orderedMap.end () ; ++iter )
         {
             T item = iter->second;
             newMap[ uiNextBackIndex ] = item;
