@@ -51,7 +51,7 @@ typedef unsigned long       DWORD;      //  32      32      64
 #include <set>
 #include <deque>
 #include <algorithm>
-#include <limits>
+#include <limits.h>
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
