@@ -352,6 +352,7 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Vehicle get funcs
     CLuaCFunctions::AddFunction ( "getVehicleType", CLuaFunctionDefinitions::GetVehicleType );
+    CLuaCFunctions::AddFunction ( "getVehicleVariant", CLuaFunctionDefinitions::GetVehicleVariant );
     CLuaCFunctions::AddFunction ( "getVehicleColor", CLuaFunctionDefinitions::GetVehicleColor );
     CLuaCFunctions::AddFunction ( "getVehicleModelFromName", CLuaFunctionDefinitions::GetVehicleModelFromName );
     CLuaCFunctions::AddFunction ( "getVehicleLandingGearDown", CLuaFunctionDefinitions::GetVehicleLandingGearDown );

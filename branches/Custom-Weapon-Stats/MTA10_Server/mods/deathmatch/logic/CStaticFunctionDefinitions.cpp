@@ -4406,21 +4406,8 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource* pResource, unsi
 
         unsigned char ucVariation = ucVariant;
         unsigned char ucVariation2 = ucVariant2;
-        srand ( GetTickCount32 ( ) );
-        // 6 values (-1 to 5)
-        if ( ucVariant == 255 )
-            ucVariation = ( rand() % 6 ) - 1;
-        if ( ucVariant2 == 255 )
-            ucVariation2 = ( rand() % 6 ) - 1;
-
-        // Don't spawn a slamvan without a steering wheel
-        if ( usModel == 535 && 
-            ( ucVariation2 >= 2 || ucVariation2 == 255 ) &&
-            ( ucVariation >= 2 || ucVariation == 255 ) )
-        {
-            ucVariation2 = 0;
-            ucVariation = rand ( ) % 1;
-        }
+        if ( ucVariant2 == 255 && ucVariant == 255 )
+            CVehicleManager::GetRandomVariation ( usModel, ucVariation, ucVariation2 );
 
         //CVehicle* pVehicle = m_pVehicleManager->Create ( usModel, m_pMapManager->GetRootElement () );
         CVehicle* pVehicle = m_pVehicleManager->Create ( usModel, ucVariation, ucVariation2, pResource->GetDynamicElementRoot() );
@@ -4449,6 +4436,14 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource* pResource, unsi
     }
 
     return NULL;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleVariant ( CVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2 )
+{
+    assert ( pVehicle );
+    ucVariant = pVehicle->GetVariant ();
+    ucVariant2 = pVehicle->GetVariant2 ();
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetVehicleColor ( CVehicle* pVehicle, CVehicleColor& color )

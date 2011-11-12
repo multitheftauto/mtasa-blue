@@ -193,6 +193,7 @@ public:
     static bool                         IsVehicleBlown                      ( CClientVehicle& Vehicle, bool& bBlown );
     static bool                         GetVehicleHeadLightColor            ( CClientVehicle& Vehicle, SColor& outColor );
     static bool                         GetVehicleCurrentGear               ( CClientVehicle& Vehicle, unsigned short& currentGear );
+    static bool                         GetVehicleVariant                   ( CClientVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2 );
 
     // Vehicle set functions
     static bool                         FixVehicle                          ( CClientEntity& Entity );

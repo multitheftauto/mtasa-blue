@@ -89,6 +89,32 @@ int CLuaFunctionDefs::SetVehicleTaxiLightOn ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetVehicleVariant ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            unsigned char ucVariant = -1;
+            unsigned char ucVariant2 = -1;
+            if ( CStaticFunctionDefinitions::GetVehicleVariant ( pVehicle, ucVariant, ucVariant2 ) )
+            {
+                lua_pushnumber ( luaVM, ucVariant );
+                lua_pushnumber ( luaVM, ucVariant2 );
+                return 2;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleVariant", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleVariant" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::GetVehicleColor ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )

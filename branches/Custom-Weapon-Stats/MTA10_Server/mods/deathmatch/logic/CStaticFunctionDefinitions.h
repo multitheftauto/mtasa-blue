@@ -227,6 +227,7 @@ public:
     static CVehicle*            CreateVehicle                       ( CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, char* szRegPlate = NULL, bool bDirection = false, unsigned char ucVariant = 5, unsigned char ucVariant2 = 5 );
 
     // Vehicle get functions
+    static bool                 GetVehicleVariant                   ( CVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2 );
     static bool                 GetVehicleColor                     ( CVehicle* pVehicle, CVehicleColor& color );
     static bool                 GetVehicleModelFromName             ( const char* szName, unsigned short& usID );
     static bool                 GetVehicleMaxPassengers             ( CVehicle* pVehicle, unsigned char& ucMaxPassengers );

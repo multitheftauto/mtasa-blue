@@ -179,6 +179,7 @@ public:
 
     // Vehicle get functions
     static int      GetVehicleType                      ( lua_State* luaVM );
+    static int      GetVehicleVariant                   ( lua_State* luaVM );
     static int      GetVehicleColor                     ( lua_State* luaVM );
     static int      GetVehicleModelFromName             ( lua_State* luaVM );
     static int      GetVehicleLandingGearDown           ( lua_State* luaVM );
