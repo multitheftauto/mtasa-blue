@@ -464,7 +464,7 @@ bool CAccountManager::Save ( void )
     m_bChangedSinceSaved = false;
     m_llLastTimeSaved = GetTickCount64_ ();
 
-    list < CAccount* > ::const_iterator iter = m_List.begin ();
+    CMappedAccountList::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end () ; iter++ )
     {
         if ( (*iter)->IsRegistered () && (*iter)->HasChanged() )
@@ -546,7 +546,7 @@ CAccount* CAccountManager::Get ( const char* szName, const char* szIP )
 
 bool CAccountManager::Exists ( CAccount* pAccount )
 {
-    return m_List.Contains ( pAccount );
+    return m_List.contains ( pAccount );
 }
 
 
@@ -576,7 +576,7 @@ void CAccountManager::MarkAsChanged ( CAccount* pAccount )
 void CAccountManager::RemoveAll ( void )
 {
     m_bRemoveFromList = false;
-    list < CAccount* > ::const_iterator iter = m_List.begin ();
+    CMappedAccountList::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end () ; iter++ )
     {
         delete *iter;

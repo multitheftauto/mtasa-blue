@@ -52,14 +52,20 @@ CElementGroup::~CElementGroup()
     }
 
     // Delete all the elements
-    CElementDeleter * deleter = g_pGame->GetElementDeleter();
-    CElement * pElement = NULL;
-    for ( iter = m_elements.begin (); iter != m_elements.end (); iter++ )
+    if ( !m_elements.empty () )
     {
-        pElement = *iter;
-        pElement->SetElementGroup ( NULL );
-        pElement->DeleteAllEvents ();
-        deleter->Delete ( pElement );
+        CElementDeleter * deleter = g_pGame->GetElementDeleter();
+        CElement * pElement = NULL;
+        for ( iter = m_elements.begin (); iter != m_elements.end (); iter++ )
+        {
+            pElement = *iter;
+            pElement->SetElementGroup ( NULL );
+            pElement->DeleteAllEvents ();
+            deleter->Delete ( pElement, true, false );
+        }
+
+        // Do this at the end for speed
+        g_pGame->GetMapManager ()->GetRootElement ()->UpdatePerPlayerEntities ();
     }
 }
 

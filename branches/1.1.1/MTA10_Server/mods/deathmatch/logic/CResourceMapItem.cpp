@@ -318,7 +318,7 @@ void CResourceMapItem::LinkupElements ( void )
         }
     }
 
-    list < CObject* > ::const_iterator iterObjects = m_pObjectManager->IterBegin ();
+    CObjectListType::const_iterator iterObjects = m_pObjectManager->IterBegin ();
     for ( ; iterObjects != m_pObjectManager->IterEnd (); iterObjects++ )
     {
         CObject* pObject = *iterObjects;

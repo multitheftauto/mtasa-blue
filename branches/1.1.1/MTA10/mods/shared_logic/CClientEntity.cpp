@@ -27,9 +27,6 @@ int CClientEntity::iCount = 0;
 
 CClientEntity::CClientEntity ( ElementID ID )
         : ClassInit ( this )
-        , m_FromRootNode ( this )
-        , m_ChildrenNode ( this )
-        , m_Children ( &CClientEntity::m_ChildrenNode )
 {
     #ifdef MTA_DEBUG
         ++iCount;
@@ -180,10 +177,6 @@ CClientEntity::~CClientEntity ( void )
 
     // Ensure nothing has inadvertently set a parent
     assert ( m_pParent == NULL );
-
-    // Ensure intrusive list nodes have been isolated
-    assert ( m_FromRootNode.m_pOuterItem == this && !m_FromRootNode.m_pPrev && !m_FromRootNode.m_pNext );
-    assert ( m_ChildrenNode.m_pOuterItem == this && !m_ChildrenNode.m_pPrev && !m_ChildrenNode.m_pNext );
 
     if ( !g_pClientGame->IsBeingDeleted () )
         CClientEntityRefManager::OnEntityDelete ( this );
@@ -1280,7 +1273,7 @@ RpClump * CClientEntity::GetClump ( void )
 
 
 // Entities from root optimization for getElementsByType
-typedef CIntrusiveListExt < CClientEntity, &CClientEntity::m_FromRootNode > CFromRootListType;
+typedef CFastList < CClientEntity > CFromRootListType;
 typedef google::dense_hash_map < unsigned int, CFromRootListType > t_mapEntitiesFromRoot;
 static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
 static bool                     ms_bEntitiesFromRootInitialized = false;

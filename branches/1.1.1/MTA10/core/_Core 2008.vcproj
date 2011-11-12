@@ -1637,6 +1637,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\CFastList.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\CMatrix.h"
 					>
 				</File>
