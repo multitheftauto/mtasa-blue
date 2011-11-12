@@ -103,6 +103,8 @@ CDatabaseConnectionSqlite::CDatabaseConnectionSqlite ( CDatabaseType* pManager, 
 ///////////////////////////////////////////////////////////////
 CDatabaseConnectionSqlite::~CDatabaseConnectionSqlite ( void )
 {
+    Flush ();
+
     if ( m_bOpened )
         sqlite3_close ( m_handle );
 
