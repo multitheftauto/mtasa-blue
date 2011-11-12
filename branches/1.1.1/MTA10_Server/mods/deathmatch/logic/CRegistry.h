@@ -96,6 +96,24 @@ struct CRegistryResultCell
                                         delete [] pVal;
                                 }
 
+                                CRegistryResultCell& CRegistryResultCell::operator = ( const CRegistryResultCell& cell )
+                                {
+                                    if ( pVal )
+                                        delete [] pVal;
+
+                                    nType = cell.nType;
+                                    nLength = cell.nLength;
+                                    nVal = cell.nVal;
+                                    fVal = cell.fVal;
+                                    pVal = NULL;
+                                    if ( (nType == SQLITE_BLOB || nType == SQLITE_TEXT) && cell.pVal && nLength > 0 )
+                                    {
+                                        pVal = new unsigned char [ nLength ];
+                                        memcpy ( pVal, cell.pVal, nLength );
+                                    }
+                                    return *this;
+                                }
+
     int                         nType;      // Type identifier, SQLITE_*
     int                         nLength;    // Length in bytes if nType == SQLITE_BLOB or SQLITE_TEXT
                                             //    (includes zero terminator if TEXT)

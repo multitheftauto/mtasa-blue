@@ -18,6 +18,7 @@ class CAccountManager;
 
 #include "CAccount.h"
 #include "CXMLConfig.h"
+typedef uint SDbConnectionId;
 
 
 //
@@ -96,7 +97,8 @@ public:
     bool                        LoadSetting                 ( CXMLNode* pNode );
     bool                        Save                        ( void );
     bool                        Save                        ( CXMLNode* pParent );
-    bool                        Save                        ( CAccount* pParent, SString* pStrError = NULL );
+    void                        Save                        ( CAccount* pParent );
+
     bool                        SaveSettings                ( void );
     bool                        IntegrityCheck              ( void );
 
@@ -128,6 +130,8 @@ protected:
     void                        ClearSQLDatabase            ( void );
 public:
     void                        RemoveAll                   ( void );
+    static void                 StaticDbCallback            ( CDbJobData* pJobData, void* pContext );
+    void                        DbCallback                  ( CDbJobData* pJobData );
 
     CMappedAccountList::const_iterator  IterBegin           ( void )                    { return m_List.begin (); };
     CMappedAccountList::const_iterator  IterEnd             ( void )                    { return m_List.end (); };
@@ -141,7 +145,8 @@ protected:
     bool                        m_bChangedSinceSaved;
     long long                   m_llLastTimeSaved;
     CConnectHistory             m_AccountProtect;
-    CRegistry*                  m_pSaveFile;
+    SDbConnectionId             m_hDbConnection;
+    CDatabaseManager*           m_pDatabaseManager;
     bool                        m_bLoadXML;
     int                         m_iAccounts;
 };

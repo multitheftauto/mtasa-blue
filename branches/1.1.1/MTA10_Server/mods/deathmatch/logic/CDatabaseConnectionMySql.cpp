@@ -126,6 +126,8 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql ( CDatabaseType* pManager, co
 ///////////////////////////////////////////////////////////////
 CDatabaseConnectionMySql::~CDatabaseConnectionMySql ( void )
 {
+    Flush ();
+
     if ( m_handle != NULL )
     {
         mysql_close ( m_handle );
