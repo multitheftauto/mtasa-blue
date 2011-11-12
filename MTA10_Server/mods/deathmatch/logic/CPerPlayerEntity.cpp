@@ -74,6 +74,9 @@ void CPerPlayerEntity::OnReferencedSubtreeRemove ( CElement* pElement )
 
 void CPerPlayerEntity::UpdatePerPlayer ( void )
 {
+    if ( m_PlayersAdded.empty () && m_PlayersRemoved.empty () )    // This check reduces cpu usage when loading large maps (due to recursion)
+        return;
+
     // Remove entries that match in both added and removed lists
     RemoveIdenticalEntries ( m_PlayersAdded, m_PlayersRemoved );
 
@@ -308,7 +311,9 @@ void CPerPlayerEntity::AddPlayersBelow ( CElement* pElement, list < CPlayer* >& 
     CChildListType ::const_iterator iterChildren = pElement->IterBegin ();
     for ( ; iterChildren != pElement->IterEnd (); iterChildren++ )
     {
-        AddPlayersBelow ( *iterChildren, Added );
+        CElement* pElement = *iterChildren;
+        if ( pElement->CountChildren () || IS_PLAYER ( pElement ) )    // This check reduces cpu usage when loading large maps (due to recursion)
+            AddPlayersBelow ( pElement, Added );
     }
 }
 
@@ -335,7 +340,9 @@ void CPerPlayerEntity::RemovePlayersBelow ( CElement* pElement, list < CPlayer* 
     CChildListType ::const_iterator iterChildren = pElement->IterBegin ();
     for ( ; iterChildren != pElement->IterEnd (); iterChildren++ )
     {
-        RemovePlayersBelow ( *iterChildren, Removed );
+        CElement* pElement = *iterChildren;
+        if ( pElement->CountChildren () || IS_PLAYER ( pElement ) )    // This check reduces cpu usage when unloading large maps (due to recursion)
+            RemovePlayersBelow ( pElement, Removed );
     }
 }
 

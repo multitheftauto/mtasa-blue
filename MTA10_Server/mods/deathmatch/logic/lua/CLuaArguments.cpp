@@ -754,6 +754,17 @@ json_object * CLuaArguments::WriteTableToJSONObject ( bool bSerialize, std::map 
 
 bool CLuaArguments::ReadFromJSONString ( const char* szJSON )
 {
+    // Fast isJSON check: Check first non-white space character is '['
+    for ( const char* ptr = szJSON ; true ; )
+    {
+        char c = *ptr++;
+        if ( c == '[' )
+            break;
+        if ( isspace( c ) )
+            continue;
+        return false;
+    }
+
     json_object* object = json_tokener_parse ( szJSON );
     if ( !is_error(object) )
     {

@@ -24,9 +24,6 @@ extern CGame* g_pGame;
 #endif
 
 CElement::CElement ( CElement* pParent, CXMLNode* pNode )
-        : m_FromRootNode ( this )
-        , m_ChildrenNode ( this )
-        , m_Children ( &CElement::m_ChildrenNode )
 {
     // Allocate us an unique ID
     m_ID = CElementIDs::PopUniqueID ( this );
@@ -137,10 +134,6 @@ CElement::~CElement ( void )
 
     // Ensure nothing has inadvertently set a parent
     assert ( m_pParent == NULL );
-
-    // Ensure intrusive list nodes have been isolated
-    assert ( m_FromRootNode.m_pOuterItem == this && !m_FromRootNode.m_pPrev && !m_FromRootNode.m_pNext );
-    assert ( m_ChildrenNode.m_pOuterItem == this && !m_ChildrenNode.m_pPrev && !m_ChildrenNode.m_pNext );
 
     CElementRefManager::OnElementDelete ( this );
 }
@@ -303,12 +296,19 @@ void CElement::ClearChildren ( void )
     assert ( m_pParent != this );
 
     // Process our children - Move up to our parent
-    while ( m_Children.size () )
-        (*m_Children.begin())->SetParentObject ( m_pParent );
+    if ( !m_Children.empty  () )    // This check reduces cpu usage when unloading large maps (due to recursion)
+    {
+        while ( !m_Children.empty () )
+            (*m_Children.begin())->SetParentObject ( m_pParent, false );
+
+        // Do this at the end for speed
+        if ( CElement* pRoot = GetRootElement () )
+            pRoot->UpdatePerPlayerEntities ();
+    }
 }
 
 
-CElement* CElement::SetParentObject ( CElement* pParent )
+CElement* CElement::SetParentObject ( CElement* pParent, bool bUpdatePerPlayerEntities )
 {
     // Different parent?
     if ( pParent != m_pParent )
@@ -361,7 +361,8 @@ CElement* CElement::SetParentObject ( CElement* pParent )
         }
 
         // Update all per-player references from the root and down
-        pRoot->UpdatePerPlayerEntities ();
+        if ( bUpdatePerPlayerEntities )
+            pRoot->UpdatePerPlayerEntities ();
     }
 
     return pParent;
@@ -811,10 +812,13 @@ bool CElement::LoadFromCustomData ( CLuaMain* pLuaMain, CEvents* pEvents )
 void CElement::OnSubtreeAdd ( CElement* pElement )
 {
     // Call the event on the elements that references us
-    list < CPerPlayerEntity* > ::const_iterator iter = m_ElementReferenced.begin ();
-    for ( ; iter != m_ElementReferenced.end (); iter++ )
+    if ( !m_ElementReferenced.empty () )    // This check reduces cpu usage when loading large maps (due to recursion)
     {
-        (*iter)->OnReferencedSubtreeAdd ( pElement );
+        list < CPerPlayerEntity* > ::const_iterator iter = m_ElementReferenced.begin ();
+        for ( ; iter != m_ElementReferenced.end (); iter++ )
+        {
+            (*iter)->OnReferencedSubtreeAdd ( pElement );
+        }
     }
 
     // Call the event on our parent
@@ -828,10 +832,13 @@ void CElement::OnSubtreeAdd ( CElement* pElement )
 void CElement::OnSubtreeRemove ( CElement* pElement )
 {
     // Call the event on the elements that references us
-    list < CPerPlayerEntity* > ::const_iterator iter = m_ElementReferenced.begin ();
-    for ( ; iter != m_ElementReferenced.end (); iter++ )
+    if ( !m_ElementReferenced.empty () )    // This check reduces cpu usage when unloading large maps (due to recursion)
     {
-        (*iter)->OnReferencedSubtreeRemove ( pElement );
+        list < CPerPlayerEntity* > ::const_iterator iter = m_ElementReferenced.begin ();
+        for ( ; iter != m_ElementReferenced.end (); iter++ )
+        {
+            (*iter)->OnReferencedSubtreeRemove ( pElement );
+        }
     }
 
     // Call the event on our parent
@@ -1204,7 +1211,7 @@ bool CElement::CanUpdateSync ( unsigned char ucRemote )
 
 
 // Entities from root optimization for getElementsByType
-typedef CIntrusiveListExt < CElement, &CElement::m_FromRootNode > CFromRootListType;
+typedef CFastList < CElement > CFromRootListType;
 typedef google::dense_hash_map < unsigned int, CFromRootListType > t_mapEntitiesFromRoot;
 static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
 static bool                     ms_bEntitiesFromRootInitialized = false;

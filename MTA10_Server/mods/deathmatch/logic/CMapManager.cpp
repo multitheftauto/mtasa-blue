@@ -137,7 +137,7 @@ void CMapManager::BroadcastMapInformation ( void )
     }
 
     // Add the objects to the packet
-    list < CObject* > ::const_iterator iterObjects = m_pObjectManager->IterBegin ();
+    CObjectListType::const_iterator iterObjects = m_pObjectManager->IterBegin ();
     for ( ; iterObjects != m_pObjectManager->IterEnd (); iterObjects++ )
     {
         EntityPacket.Add ( *iterObjects );
@@ -213,7 +213,7 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
     }
 
     // Add the objects to the packet
-    list < CObject* > ::const_iterator iterObjects = m_pObjectManager->IterBegin ();
+    CObjectListType::const_iterator iterObjects = m_pObjectManager->IterBegin ();
     for ( ; iterObjects != m_pObjectManager->IterEnd (); iterObjects++ )
     {
         EntityPacket.Add ( *iterObjects );
@@ -961,7 +961,7 @@ void CMapManager::LinkupElements ( void )
         }
     }
 
-    list < CObject* > ::const_iterator iterObjects = m_pObjectManager->IterBegin ();
+    CObjectListType::const_iterator iterObjects = m_pObjectManager->IterBegin ();
     for ( ; iterObjects != m_pObjectManager->IterEnd (); iterObjects++ )
     {
         CObject* pObject = *iterObjects;

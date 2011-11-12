@@ -22,14 +22,14 @@ class CElementDeleter
 public:
     inline                          ~CElementDeleter        ( void )        { DoDeleteAll (); };
 
-    void                            Delete                  ( class CElement* pElement, bool bUnlink = true );
+    void                            Delete                  ( class CElement* pElement, bool bUnlink = true, bool bUpdatePerPlayerEntities = true );
     void                            DoDeleteAll             ( void );
 
     bool                            IsBeingDeleted          ( class CElement* pElement );
     void                            Unreference             ( CElement* pElement );
 
 private:
-    std::list < class CElement* >   m_List;
+    CElementListType                m_List;
 };
 
 #endif

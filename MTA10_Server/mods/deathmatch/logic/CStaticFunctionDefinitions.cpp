@@ -278,7 +278,7 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
     {
         // Copy the current children list (prevents a continuous loop)
         std::list < CElement* > copyList;
-        for ( CChildListType ::iterator iter = pElement->IterBegin (); iter != pElement->IterEnd (); iter++ )
+        for ( CChildListType ::const_iterator iter = pElement->IterBegin (); iter != pElement->IterEnd (); iter++ )
         {
             copyList.push_back ( *iter );
         }
@@ -9351,7 +9351,7 @@ CAccount* CStaticFunctionDefinitions::GetAccount ( const char* szName, const cha
 bool CStaticFunctionDefinitions::GetAccounts ( CLuaMain* pLuaMain )
 {
     lua_State* pLua = pLuaMain->GetVM();
-    list < CAccount* > ::const_iterator iter = m_pAccountManager->IterBegin();
+    CMappedAccountList::const_iterator iter = m_pAccountManager->IterBegin();
     unsigned int uiIndex = 0;
     const char* szGuest =  "guest";
     const char* szHTTPGuest = "http_guest";

@@ -21,36 +21,38 @@ class CAccountManager;
 
 
 //
-// CMappedList with additional name->account mapping
+// CFastList with additional name->account mapping
 //
-class CMappedAccountList : protected CMappedList < CAccount* >
+class CMappedAccountList : protected CFastList < CAccount >
 {
 public:
-    typedef CMappedList < CAccount* > Super;
+    typedef CFastList < CAccount > Super;
+    typedef CFastList < CAccount >::iterator        iterator;
+    typedef CFastList < CAccount >::const_iterator  const_iterator;
 
     // CMappedList functions
-    bool Contains ( CAccount* item ) const { return Super::Contains ( item ); }
-    std::list < CAccount* >::iterator               begin ( void )      { return Super::begin (); }
-    std::list < CAccount* >::iterator               end ( void )        { return Super::end (); }
+    bool        contains ( CAccount* item ) const   { return Super::contains ( item ); }
+    iterator    begin ( void )                      { return Super::begin (); }
+    iterator    end ( void )                        { return Super::end (); }
 
     void push_back ( CAccount* item )
     {
         assert ( !MapContainsPair( m_NameAccountMap, item->GetName (), item ) );
         MapInsert( m_NameAccountMap, item->GetName (), item );
         Super::push_back ( item );
-        assert ( m_NameAccountMap.size () == m_List.size () && m_List.size () == m_Map.size () );
+        assert ( m_NameAccountMap.size () == size () );
     }
 
     void remove ( CAccount* item )
     {
         MapRemovePair( m_NameAccountMap, item->GetName (), item );
         Super::remove ( item );
-        assert ( m_NameAccountMap.size () == m_List.size () && m_List.size () == m_Map.size () );
+        assert ( m_NameAccountMap.size () == size () );
     }
 
     void clear ( void )
     {
-        assert ( m_NameAccountMap.size () == m_List.size () && m_List.size () == m_Map.size () );
+        assert ( m_NameAccountMap.size () == size () );
         m_NameAccountMap.clear ();
         Super::clear ();
     }
@@ -118,7 +120,7 @@ public:
     void                        Register                    ( CAccount* pAccount );
     void                        RemoveAccount               ( CAccount* pAccount );
 protected:
-    inline void                 AddToList                   ( CAccount* pAccount )      { m_List.push_back ( pAccount ); }
+    void                        AddToList                   ( CAccount* pAccount )      { m_List.push_back ( pAccount ); }
     void                        RemoveFromList              ( CAccount* pAccount );
 
     void                        MarkAsChanged               ( CAccount* pAccount );
@@ -127,8 +129,8 @@ protected:
 public:
     void                        RemoveAll                   ( void );
 
-    inline list < CAccount* > ::const_iterator  IterBegin   ( void )                    { return m_List.begin (); };
-    inline list < CAccount* > ::const_iterator  IterEnd     ( void )                    { return m_List.end (); };
+    CMappedAccountList::const_iterator  IterBegin           ( void )                    { return m_List.begin (); };
+    CMappedAccountList::const_iterator  IterEnd             ( void )                    { return m_List.end (); };
 
 protected:
     CMappedAccountList          m_List;
