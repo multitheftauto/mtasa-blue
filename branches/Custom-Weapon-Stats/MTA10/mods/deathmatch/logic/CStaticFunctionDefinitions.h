@@ -166,8 +166,6 @@ public:
     static bool                         SetPedCameraRotation                ( CClientEntity& Entity, float fRotation );
     static bool                         SetPedAimTarget                     ( CClientEntity& Entity, CVector & vecTarget );
     static bool                         SetPedOnFire                        ( CClientEntity& Entity, bool bOnFire );
-    static bool                         SetWeaponProperty                   ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float fData );
-    static bool                         SetWeaponProperty                   ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short sData );
 
     // Extra Clothes functions
     static bool                         GetBodyPartName                     ( unsigned char ucID, char* szName );

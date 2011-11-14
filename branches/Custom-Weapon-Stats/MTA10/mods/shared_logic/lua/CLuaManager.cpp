@@ -452,7 +452,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPedFootBloodEnabled", CLuaFunctionDefs::SetPedFootBloodEnabled );
     CLuaCFunctions::AddFunction ( "setPedCameraRotation", CLuaFunctionDefs::SetPedCameraRotation );
     CLuaCFunctions::AddFunction ( "setPedAimTarget", CLuaFunctionDefs::SetPedAimTarget );
-    CLuaCFunctions::AddFunction ( "setWeaponProperty", CLuaFunctionDefs::SetWeaponProperty );
     CLuaCFunctions::AddFunction ( "getWeaponProperty", CLuaFunctionDefs::GetWeaponProperty );
     CLuaCFunctions::AddFunction ( "getOriginalWeaponProperty", CLuaFunctionDefs::GetOriginalWeaponProperty );
 

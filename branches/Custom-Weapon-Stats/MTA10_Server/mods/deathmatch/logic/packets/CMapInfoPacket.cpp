@@ -260,13 +260,8 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
         CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager ()->GetWeaponStats( (eWeaponType)i );
         BitStream.WriteBit ( true );
         WeaponProperty.data.weaponType = (int)pWeaponStat->GetWeaponType();
-        WeaponProperty.data.dwAnimGroup = pWeaponStat->GetAnimGroup();
         WeaponProperty.data.fAccuracy = pWeaponStat->GetAccuracy();
-        WeaponProperty.data.fLifeSpan = pWeaponStat->GetLifeSpan();
         WeaponProperty.data.fMoveSpeed = pWeaponStat->GetMoveSpeed();
-        WeaponProperty.data.fRadius = pWeaponStat->GetRadius();
-        WeaponProperty.data.fSpeed = pWeaponStat->GetFiringSpeed();
-        WeaponProperty.data.fSpread = pWeaponStat->GetSpread();
         WeaponProperty.data.fTargetRange = pWeaponStat->GetTargetRange();
         WeaponProperty.data.fWeaponRange = pWeaponStat->GetWeaponRange();
         WeaponProperty.data.nAmmo = pWeaponStat->GetMaximumClipAmmo();
@@ -284,13 +279,8 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
         {
             CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager ()->GetWeaponStats( (eWeaponType)i, (eWeaponSkill)j );
             WeaponProperty.data.weaponType = (int)pWeaponStat->GetWeaponType();
-            WeaponProperty.data.dwAnimGroup = pWeaponStat->GetAnimGroup();
             WeaponProperty.data.fAccuracy = pWeaponStat->GetAccuracy();
-            WeaponProperty.data.fLifeSpan = pWeaponStat->GetLifeSpan();
             WeaponProperty.data.fMoveSpeed = pWeaponStat->GetMoveSpeed();
-            WeaponProperty.data.fRadius = pWeaponStat->GetRadius();
-            WeaponProperty.data.fSpeed = pWeaponStat->GetFiringSpeed();
-            WeaponProperty.data.fSpread = pWeaponStat->GetSpread();
             WeaponProperty.data.fTargetRange = pWeaponStat->GetTargetRange();
             WeaponProperty.data.fWeaponRange = pWeaponStat->GetWeaponRange();
             WeaponProperty.data.nAmmo = pWeaponStat->GetMaximumClipAmmo();

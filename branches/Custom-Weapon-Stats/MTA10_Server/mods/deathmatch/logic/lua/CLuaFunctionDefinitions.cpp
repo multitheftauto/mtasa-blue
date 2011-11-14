@@ -750,9 +750,6 @@ int CLuaFunctionDefinitions::SetWeaponProperty ( lua_State* luaVM )
         case WEAPON_WEAPON_RANGE:
         case WEAPON_TARGET_RANGE:
         case WEAPON_ACCURACY:
-        case WEAPON_FIRING_SPEED:
-        case WEAPON_LIFE_SPAN:
-        case WEAPON_SPREAD:
         case WEAPON_MOVE_SPEED:
             {
                 float fWeaponInfo = 0.0f;
@@ -772,7 +769,6 @@ int CLuaFunctionDefinitions::SetWeaponProperty ( lua_State* luaVM )
         case WEAPON_DAMAGE:
         case WEAPON_MAX_CLIP_AMMO:
         case WEAPON_FLAGS:
-        case WEAPON_ANIM_GROUP:
             {
                 short sWeaponInfo = 0;
                 argStream.ReadNumber ( sWeaponInfo );

@@ -2171,13 +2171,8 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
         {
             bitStream.Read( &weaponProperty );
             CWeaponStat * pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( (eWeaponType)weaponProperty.data.weaponType );
-            pWeaponInfo->SetAnimGroup       ( weaponProperty.data.dwAnimGroup );
             pWeaponInfo->SetAccuracy        ( weaponProperty.data.fAccuracy );
-            pWeaponInfo->SetLifeSpan        ( weaponProperty.data.fLifeSpan );
             pWeaponInfo->SetMoveSpeed       ( weaponProperty.data.fMoveSpeed );
-            pWeaponInfo->SetRadius          ( weaponProperty.data.fRadius );
-            pWeaponInfo->SetFiringSpeed     ( weaponProperty.data.fSpeed );
-            pWeaponInfo->SetSpread          ( weaponProperty.data.fSpread );
             pWeaponInfo->SetTargetRange     ( weaponProperty.data.fTargetRange );
             pWeaponInfo->SetWeaponRange     ( weaponProperty.data.fWeaponRange );
             pWeaponInfo->SetMaximumClipAmmo ( weaponProperty.data.nAmmo );
@@ -2196,13 +2191,8 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
             {
                 bitStream.Read( &weaponProperty );
                 CWeaponStat * pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( (eWeaponType)weaponProperty.data.weaponType, (eWeaponSkill)j );
-                pWeaponInfo->SetAnimGroup       ( weaponProperty.data.dwAnimGroup );
                 pWeaponInfo->SetAccuracy        ( weaponProperty.data.fAccuracy );
-                pWeaponInfo->SetLifeSpan        ( weaponProperty.data.fLifeSpan );
                 pWeaponInfo->SetMoveSpeed       ( weaponProperty.data.fMoveSpeed );
-                pWeaponInfo->SetRadius          ( weaponProperty.data.fRadius );
-                pWeaponInfo->SetFiringSpeed     ( weaponProperty.data.fSpeed );
-                pWeaponInfo->SetSpread          ( weaponProperty.data.fSpread );
                 pWeaponInfo->SetTargetRange     ( weaponProperty.data.fTargetRange );
                 pWeaponInfo->SetWeaponRange     ( weaponProperty.data.fWeaponRange );
                 pWeaponInfo->SetMaximumClipAmmo ( weaponProperty.data.nAmmo );

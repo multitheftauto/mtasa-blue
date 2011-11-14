@@ -2015,24 +2015,9 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
                 pWeaponInfo->SetAccuracy ( fData );
                 break;
             }
-        case WEAPON_LIFE_SPAN:
-            {
-                pWeaponInfo->SetLifeSpan ( fData );
-                break;
-            }
-        case WEAPON_FIRING_SPEED:
-            {
-                pWeaponInfo->SetFiringSpeed ( fData );
-                break;
-            }
         case WEAPON_MOVE_SPEED:
             {
                 pWeaponInfo->SetMoveSpeed ( fData );
-                break;
-            }
-        case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
-            {
-                pWeaponInfo->SetWeaponAnimLoopFireTime ( fData );
                 break;
             }
         default:
@@ -2080,11 +2065,6 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
                     pWeaponInfo->ClearFlag ( sData );
                 else
                     pWeaponInfo->SetFlag ( sData );
-                break;
-            }
-        case WEAPON_ANIM_GROUP:
-            {
-                pWeaponInfo->SetAnimGroup ( sData );
                 break;
             }
         default:

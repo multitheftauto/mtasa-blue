@@ -185,13 +185,13 @@ IMPLEMENT_ENUM_BEGIN( eWeaponProperty )
     ADD_ENUM ( WEAPON_TARGET_RANGE,                     "target_range" )
     ADD_ENUM ( WEAPON_ACCURACY,                         "accuracy" )
     ADD_ENUM ( WEAPON_DAMAGE,                           "damage" )
-    ADD_ENUM ( WEAPON_LIFE_SPAN,                        "life_span" )
-    ADD_ENUM ( WEAPON_FIRING_SPEED,                     "firing_speed" )
-    ADD_ENUM ( WEAPON_SPREAD,                           "spread" )
+    ADD_ENUM ( WEAPON_LIFE_SPAN,                        "life_span" ) // Disabled for release
+    ADD_ENUM ( WEAPON_FIRING_SPEED,                     "firing_speed" ) // Disabled for release
+    ADD_ENUM ( WEAPON_SPREAD,                           "spread" ) // Disabled for release
     ADD_ENUM ( WEAPON_MAX_CLIP_AMMO,                    "maximum_clip_ammo" )
     ADD_ENUM ( WEAPON_MOVE_SPEED,                       "move_speed" )
     ADD_ENUM ( WEAPON_FLAGS,                            "flags" )
-    ADD_ENUM ( WEAPON_ANIM_GROUP,                       "anim_group" )
+    ADD_ENUM ( WEAPON_ANIM_GROUP,                       "anim_group" ) // Disabled for release
 
     // Set is Disabled >= FIRETYPE - Move above WEAPON_TYPE_SET_DISABLED to re-enable and move it above here to make it less confusing.
     ADD_ENUM ( WEAPON_FIRETYPE,                         "fire_type" )
