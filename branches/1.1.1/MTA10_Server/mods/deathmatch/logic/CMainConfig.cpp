@@ -212,7 +212,7 @@ bool CMainConfig::Load ( void )
             std::vector < SString > tagACList;
             strDisableAC.Split ( ",", tagACList );
             for ( std::vector < SString >::iterator it = tagACList.begin () ; it != tagACList.end () ; ++it )
-                if ( isdigit(***it) )
+                if ( isdigit((uchar)***it) )
                 {
                     MapInsert ( disableACMap, *it );
                     MapInsert ( m_DisableComboACMap, *it );
@@ -228,7 +228,7 @@ bool CMainConfig::Load ( void )
             std::vector < SString > tagSDList;
             strEnableSD.Split ( ",", tagSDList );
             for ( std::vector < SString >::iterator it = tagSDList.begin () ; it != tagSDList.end () ; ++it )
-                if ( isdigit(***it) )
+                if ( isdigit((uchar)***it) )
                 {
                     MapInsert ( enableSDMap, *it );
                     MapRemove ( m_DisableComboACMap, *it );

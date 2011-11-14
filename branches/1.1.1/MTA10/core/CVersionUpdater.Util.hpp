@@ -278,7 +278,7 @@ namespace
             // Get first 6 non-digit delimited digits
             for ( uint i = 0 ; i < strDate.length () ; i++ )
             {
-                bool bIsDigit = isdigit ( strDate[i] ) != 0;
+                bool bIsDigit = isdigit ( (uchar)strDate[i] ) != 0;
                 if ( bIsDigit && !bWasDigit )
                     numbers.push_back ( atoi ( &strDate[i] ) );
                 bWasDigit = bIsDigit;

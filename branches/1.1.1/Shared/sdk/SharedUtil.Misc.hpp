@@ -913,8 +913,8 @@ bool SharedUtil::IsValidVersionString ( const SString& strVersion )
     uint uiLength = Min ( strCheck.length (), strVersion.length () );
     for ( unsigned int i = 0 ; i < uiLength ; i++ )
     {
-        char c = strVersion[i];
-        char d = strCheck[i];
+        uchar c = strVersion[i];
+        uchar d = strCheck[i];
         if ( !isdigit( c ) || !isdigit( d ) )
             if ( c != d )
                 return false;

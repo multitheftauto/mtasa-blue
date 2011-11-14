@@ -3329,7 +3329,7 @@ void CGame::HandleBackup ( void )
         SString strName = fileList[f];
         const SString strCheck = "0000-00-00.zip";
         for ( uint i = 0 ; i < Min ( strCheck.length (), strName.length () ) ; i++ )
-            if ( !isdigit( strName[i] ) || !isdigit( strCheck[i] ) )
+            if ( !isdigit( (uchar)strName[i] ) || !isdigit( (uchar)strCheck[i] ) )
                 if ( strName[i] != strCheck[i] )
                 {
                     ListRemoveIndex ( fileList, f-- );

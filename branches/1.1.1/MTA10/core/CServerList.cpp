@@ -446,7 +446,7 @@ bool ReadString ( std::string &strRead, const char * szBuffer, unsigned int &i, 
     if ( i <= nLength )
     {
         unsigned char len = szBuffer[i];
-        if ( i + len <= nLength )
+        if ( i + len <= nLength && len > 0 )
         {
             const char *ptr = &szBuffer[i + 1];
             i += len;
