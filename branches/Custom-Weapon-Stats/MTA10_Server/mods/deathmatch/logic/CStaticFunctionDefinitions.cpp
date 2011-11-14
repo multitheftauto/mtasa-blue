@@ -2002,22 +2002,34 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
         {
         case WEAPON_WEAPON_RANGE:
             {
-                pWeaponInfo->SetWeaponRange ( fData );
+                if ( fData >= 0 && fData <= 350 )
+                    pWeaponInfo->SetWeaponRange ( fData );
+                else
+                    return false;
                 break;
             }
         case WEAPON_TARGET_RANGE:
             {
-                pWeaponInfo->SetTargetRange ( fData );
+                if ( fData >= 0 && fData <= 300 )
+                    pWeaponInfo->SetTargetRange ( fData );
+                else
+                    return false;
                 break;
             }
         case WEAPON_ACCURACY:
             {
-                pWeaponInfo->SetAccuracy ( fData );
+                if ( fData >= 0 && fData <= 10000 )
+                    pWeaponInfo->SetAccuracy ( fData );
+                else
+                    return false;
                 break;
             }
         case WEAPON_MOVE_SPEED:
             {
-                pWeaponInfo->SetMoveSpeed ( fData );
+                if ( fData >= -1 && fData <= 100 )
+                    pWeaponInfo->SetMoveSpeed ( fData );
+                else
+                    return false;
                 break;
             }
         default:
@@ -2051,12 +2063,18 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
         {
         case WEAPON_DAMAGE:
             {
-                pWeaponInfo->SetDamagePerHit ( sData );
+                if ( sData >= 0 && sData <= 10000 )
+                    pWeaponInfo->SetDamagePerHit ( sData );
+                else
+                    return false;
                 break;
             }
         case WEAPON_MAX_CLIP_AMMO:
             {
-                pWeaponInfo->SetMaximumClipAmmo ( sData );
+                if ( sData >= 0 && sData <= 1000 )
+                    pWeaponInfo->SetMaximumClipAmmo ( sData );
+                else
+                    return false;
                 break;
             }
         case WEAPON_FLAGS:
