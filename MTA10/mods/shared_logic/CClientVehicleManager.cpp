@@ -55,6 +55,8 @@ unsigned long g_ulVehicleAttributes [] = {
   0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
+unsigned char g_ucVariants [212];
+
 CClientVehicleManager::CClientVehicleManager ( CClientManager* pManager )
 {
     assert ( NUMELMS ( g_ucMaxPassengers ) == 212 );
@@ -63,6 +65,235 @@ CClientVehicleManager::CClientVehicleManager ( CClientManager* pManager )
     // Initialize members
     m_pManager = pManager;
     m_bCanRemoveFromList = true;
+    int iVehicleID = 0;
+    for ( int i = 0; i <= 212; i++ )
+    {
+        g_ucVariants[i] = 255;
+        iVehicleID = i + 400;
+        switch ( iVehicleID )
+        {
+            case 416:
+            {
+                g_ucVariants[i] = 1;
+            }
+            case 435:
+            {
+                g_ucVariants[i] = 5;
+            }
+            case 450:
+            {
+                g_ucVariants[i] = 0;
+            }
+            case 607:
+            {
+                g_ucVariants[i] = 2;
+            }
+            case 485:
+            {
+                g_ucVariants[i] = 2;
+            }
+            case 433:
+            {
+                g_ucVariants[i] = 1;
+            }
+            case 499:
+            {
+                g_ucVariants[i] = 3;
+            }
+            case 581:
+            {
+                g_ucVariants[i] = 4;
+            }
+            case 424:
+            {
+                g_ucVariants[i] = 1;
+            }
+            case 504:
+            {
+                g_ucVariants[i] = 5;
+            }
+            case 422:
+            {
+                g_ucVariants[i] = 1;
+            }
+            case 482:
+            {
+                g_ucVariants[i] = 0;
+            }
+            case 457:
+            {
+                g_ucVariants[i] = 5;
+            }
+            case 483:
+            {
+                g_ucVariants[i] = 1;
+            }
+            case 415:
+            {
+                g_ucVariants[i] = 1;
+            }
+            case 437:
+            {
+                g_ucVariants[i] = 1;
+            }
+            case 472:
+            {
+                g_ucVariants[i] = 2;
+            }
+            case 521:
+            {
+                g_ucVariants[i] = 4;
+            }
+            case 407:
+            {
+                g_ucVariants[i] = 2;
+            }
+            case 455:
+            {
+                g_ucVariants[i] = 2;
+            }
+            case 434:
+            {
+                g_ucVariants[i] = 0;
+            }
+            case 502:
+            {
+                g_ucVariants[i] = 5;
+            }
+            case 503:
+            {
+                g_ucVariants[i] = 5;
+            }
+            case 571:
+            {
+                g_ucVariants[i] = 1;
+            }
+            case 595:
+            {
+                g_ucVariants[i] = 1;
+            }
+            case 484:
+            {
+                g_ucVariants[i] = 0;
+            }
+            case 500:
+            {
+                g_ucVariants[i] = 1;
+            }
+            case 556:
+            {
+                g_ucVariants[i] = 2;
+            }
+            case 557:
+            {
+                g_ucVariants[i] = 1;
+            }
+            case 423:
+            {
+                g_ucVariants[i] = 1;
+            }
+            case 414:
+            {
+                g_ucVariants[i] = 3;
+            }
+            case 522:
+            {
+                g_ucVariants[i] = 4;
+            }
+            case 470:
+            {
+                g_ucVariants[i] = 2;
+            }
+            case 404:
+            {
+                g_ucVariants[i] = 0;
+            }
+            case 600:
+            {
+                g_ucVariants[i] = 1;
+            }
+            case 413:
+            {
+                g_ucVariants[i] = 0;
+            }
+            case 453:
+            {
+                g_ucVariants[i] = 1;
+            }
+            case 442:
+            {
+                g_ucVariants[i] = 2;
+            }
+            case 440:
+            {
+                g_ucVariants[i] = 5;
+            }
+            case 543:
+            {
+                g_ucVariants[i] = 3;
+            }
+            case 605:
+            {
+                g_ucVariants[i] = 3;
+            }
+            case 428:
+            {
+                g_ucVariants[i] = 1;
+            }
+            case 535:
+            {
+                g_ucVariants[i] = 1;
+            }
+            case 439:
+            {
+                g_ucVariants[i] = 2;
+            }
+            case 506:
+            {
+                g_ucVariants[i] = 0;
+            }
+            case 601:
+            {
+                g_ucVariants[i] = 3;
+            }
+            case 459:
+            {
+                g_ucVariants[i] = 0;
+            }
+            case 449:
+            {
+                g_ucVariants[i] = 3;
+            }
+            case 408:
+            {
+                g_ucVariants[i] = 0;
+            }
+            case 583:
+            {
+                g_ucVariants[i] = 1;
+            }
+            case 552:
+            {
+                g_ucVariants[i] = 1;
+            }
+            case 478:
+            {
+                g_ucVariants[i] = 2;
+            }
+            case 555:
+            {
+                g_ucVariants[i] = 0;
+            }
+            case 456:
+            {
+                g_ucVariants[i] = 3;
+            }
+            case 477:
+            {
+                g_ucVariants[i] = 0;
+            }
+        }
+    }
 }
 
 
@@ -237,6 +468,41 @@ unsigned char CClientVehicleManager::GetMaxPassengerCount ( unsigned long ulMode
     return 0xFF;
 }
 
+void CClientVehicleManager::GetRandomVariation ( unsigned long ulModel, unsigned char &ucVariant, unsigned char &ucVariant2 )
+{
+    srand ( GetTickCount32() );
+    ucVariant = 255;
+    ucVariant2 = 255;
+    // Valid model?
+    if ( IsValidModel( ulModel ) && g_ucVariants[ ulModel - 400 ] != 255 )
+    {
+        if ( ulModel == 581 || ulModel == 457 || ulModel == 512 || ulModel == 522 )
+        {
+            unsigned char ucVariants = g_ucVariants [ulModel - 400];
+            unsigned char ucVariantsHalf = ucVariants / 2;
+            // e.g. 581 ( BF400 )
+            // first 3 properties are Exhaust
+            // last 2 are fairings.
+
+
+            ucVariant = ( rand ( ) % 4 ) - 1;
+
+            ucVariant2 = ( rand ( ) % 3 );
+            ucVariant2 += 3;
+            return;
+        }
+        else if ( ulModel == 535 )
+        {
+            // Slamvan has steering wheel "extras" we want one of those so default cannot be an option.
+            ucVariant = rand ( ) % g_ucVariants [ulModel - 400];
+            return;
+        }
+        // e.g. ( rand () % ( 5 + 1 ) ) - 1
+        // Can generate 6 then minus 1 = 5
+        // Can generate 0 then minus 1 = -1 (255) (default model with nothing)
+        ucVariant = ( rand ( ) % (g_ucVariants [ulModel - 400] + 1) ) - 1;
+    }
+}
 
 unsigned char CClientVehicleManager::ConvertIndexToGameSeat ( unsigned long ulModel, unsigned char ucIndex )
 {
