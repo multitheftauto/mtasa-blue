@@ -25,6 +25,7 @@ class CGame;
 #ifndef __CGAME_H
 #define __CGAME_H
 
+#include "CCommon.h"
 #include <net/CNetServer.h>
 #include "CClient.h"
 #include "CEvents.h"
@@ -106,6 +107,8 @@ class CVehicleManager;
 class CZoneNames;
 class CLanBroadcast;
 class CWaterManager;
+
+class CWeaponStatManager;
 
 // Packet forward declarations
 class CCommandPacket;
@@ -221,6 +224,7 @@ public:
     inline CSerialManager*          GetSerialManager            ( void )        { return &m_SerialManager; }
     inline CWaterManager*           GetWaterManager             ( void )        { return m_pWaterManager; }
     inline CLightsyncManager*       GetLightSyncManager         ( void )        { return &m_lightsyncManager; }
+    inline CWeaponStatManager*      GetWeaponStatManager        ( void )        { return m_pWeaponStatsManager; }
 
     void                        JoinPlayer                  ( CPlayer& Player );
     void                        InitialDataStream           ( CPlayer& Player );
@@ -411,7 +415,9 @@ private:
     CLanBroadcast*                  m_pLanBroadcast;
     CWaterManager*                  m_pWaterManager;
 
+    CWeaponStatManager*             m_pWeaponStatsManager;
     CSerialManager                  m_SerialManager;
+
 
     char*                       m_szCurrentFileName;
 

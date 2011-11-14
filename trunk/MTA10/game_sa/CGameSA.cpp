@@ -106,19 +106,39 @@ CGameSA::CGameSA()
     this->m_pRopes                  = new CRopesSA;
     this->m_pFx                     = new CFxSA ( (CFxSAInterface *)CLASS_CFx );
     this->m_pWaterManager           = new CWaterManagerSA ();
+    this->m_pWeaponStatsManager     = new CWeaponStatManagerSA ();
 
     // Normal weapon types (WEAPONSKILL_STD)
     for ( int i = 0; i < NUM_WeaponInfosStdSkill; i++)
-        WeaponInfos[i] = new CWeaponInfoSA((CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + i*CLASSSIZE_WeaponInfo), (eWeaponType)(WEAPONTYPE_PISTOL + i));
+    {
+        eWeaponType weaponType = (eWeaponType)(WEAPONTYPE_PISTOL + i);
+        WeaponInfos[i] = new CWeaponInfoSA( (CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + i*CLASSSIZE_WeaponInfo), weaponType );
+        m_pWeaponStatsManager->CreateWeaponStat ( WeaponInfos[i], weaponType, WEAPONSKILL_STD );
+    }
 
     // Extra weapon types for skills (WEAPONSKILL_POOR,WEAPONSKILL_PRO,WEAPONSKILL_SPECIAL)
     int index;
+    eWeaponSkill weaponSkill = eWeaponSkill::WEAPONSKILL_POOR;
     for ( int skill = 0; skill < 3 ; skill++ )
     {
+        //STD is created first, then it creates "extra weapon types" (poor, pro, special?) but in the enum 1 = STD which meant the STD weapon skill contained pro info
+        if ( skill >= 1 )
+        {
+            if ( skill == 1 )
+            {
+                weaponSkill = eWeaponSkill::WEAPONSKILL_PRO;
+            }
+            if ( skill == 2 )
+            {
+                weaponSkill = eWeaponSkill::WEAPONSKILL_SPECIAL;
+            }
+        }
         for ( int i = 0; i < NUM_WeaponInfosOtherSkill; i++ )
         {
+            eWeaponType weaponType = (eWeaponType)(WEAPONTYPE_PISTOL + i);
             index = NUM_WeaponInfosStdSkill + skill*NUM_WeaponInfosOtherSkill + i;
-            WeaponInfos[index] = new CWeaponInfoSA((CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + index*CLASSSIZE_WeaponInfo), (eWeaponType)(WEAPONTYPE_PISTOL + i));
+            WeaponInfos[index] = new CWeaponInfoSA( (CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + index*CLASSSIZE_WeaponInfo), weaponType );
+            m_pWeaponStatsManager->CreateWeaponStat ( WeaponInfos[index], weaponType, weaponSkill );
         }
     }
 

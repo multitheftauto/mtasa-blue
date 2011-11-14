@@ -103,6 +103,7 @@ CGame::CGame ( void )
     m_pLanBroadcast = NULL;
     m_pPedSync = NULL;
     m_pWaterManager = NULL;
+    m_pWeaponStatsManager = NULL;
 #ifdef WITH_OBJECT_SYNC
     m_pObjectSync = NULL;
 #endif
@@ -252,6 +253,7 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pResourceDownloader );
     SAFE_DELETE ( m_pRPCFunctions );
     SAFE_DELETE ( m_pWaterManager );
+    SAFE_DELETE ( m_pWeaponStatsManager );
     SAFE_DELETE ( m_pOpenPortsTester );
 
     // Clear our global pointer
@@ -408,6 +410,9 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pMainConfig = new CMainConfig ( m_pConsole, m_pLuaManager );
     m_pRPCFunctions = new CRPCFunctions;
     m_pWaterManager = new CWaterManager;
+
+    m_pWeaponStatsManager = new CWeaponStatManager();
+
 
     // Parse the commandline
     if ( !m_CommandLineParser.Parse ( iArgumentCount, szArguments ) )

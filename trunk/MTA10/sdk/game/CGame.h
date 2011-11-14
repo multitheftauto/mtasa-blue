@@ -68,6 +68,7 @@ typedef void ( InRenderer ) ( void );
 #include "CTheCarGenerators.h"
 #include "CVisibilityPlugins.h"
 #include "CWaterManager.h"
+#include "CWeaponStatManager.h"
 #include "CWeather.h"
 #include "CWeaponInfo.h"
 #include "CWorld.h"
@@ -128,6 +129,7 @@ public:
     virtual CRopes              * GetRopes () = 0;
     virtual CFx                 * GetFx () = 0;
     virtual CWaterManager       * GetWaterManager () = 0;
+    virtual CWeaponStatManager  * GetWeaponStatManager () = 0;
     
     virtual CWeaponInfo         * GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill=WEAPONSKILL_STD)=0;
     virtual CModelInfo          * GetModelInfo(DWORD dwModelID)=0;

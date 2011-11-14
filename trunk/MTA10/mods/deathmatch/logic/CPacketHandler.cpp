@@ -2167,6 +2167,46 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
         return;
     
     g_pGame->GetWorld ()->SetAircraftMaxHeight ( fAircraftMaxHeight );
+
+    for (int i = 0;i <= WEAPONTYPE_EXTINGUISHER - WEAPONTYPE_PISTOL;i++)
+    {
+        bool bReadWeaponInfo = true;
+        sWeaponPropertySync weaponProperty;
+        bitStream.ReadBit( bReadWeaponInfo );
+        if ( bReadWeaponInfo )
+        {
+            bitStream.Read( &weaponProperty );
+            CWeaponStat * pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( (eWeaponType)weaponProperty.data.weaponType );
+            pWeaponInfo->SetAccuracy        ( weaponProperty.data.fAccuracy );
+            pWeaponInfo->SetMoveSpeed       ( weaponProperty.data.fMoveSpeed );
+            pWeaponInfo->SetTargetRange     ( weaponProperty.data.fTargetRange );
+            pWeaponInfo->SetWeaponRange     ( weaponProperty.data.fWeaponRange );
+            pWeaponInfo->SetMaximumClipAmmo ( weaponProperty.data.nAmmo );
+            pWeaponInfo->SetDamagePerHit    ( weaponProperty.data.nDamage );
+            pWeaponInfo->SetFlags           ( weaponProperty.data.nFlags );
+        }
+    }
+    for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_M4;i++)
+    {
+        bool bReadWeaponInfo = true;
+        sWeaponPropertySync weaponProperty;
+        bitStream.ReadBit( bReadWeaponInfo );
+        if ( bReadWeaponInfo )
+        {
+            for (int j = 0; j <= 2;j++)
+            {
+                bitStream.Read( &weaponProperty );
+                CWeaponStat * pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( (eWeaponType)weaponProperty.data.weaponType, (eWeaponSkill)j );
+                pWeaponInfo->SetAccuracy        ( weaponProperty.data.fAccuracy );
+                pWeaponInfo->SetMoveSpeed       ( weaponProperty.data.fMoveSpeed );
+                pWeaponInfo->SetTargetRange     ( weaponProperty.data.fTargetRange );
+                pWeaponInfo->SetWeaponRange     ( weaponProperty.data.fWeaponRange );
+                pWeaponInfo->SetMaximumClipAmmo ( weaponProperty.data.nAmmo );
+                pWeaponInfo->SetDamagePerHit    ( weaponProperty.data.nDamage );
+                pWeaponInfo->SetFlags           ( weaponProperty.data.nFlags );
+            }
+        }
+    }
 }
 
 
@@ -2858,7 +2898,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         //pEntry->SetAnimGroup ( handling.data.ucAnimGroup );
                         pVehicle->ApplyHandling();
                     }
-
+                 
                     // Set the matrix
                     pVehicle->SetPosition ( position.data.vecPosition );
                     pVehicle->SetRotationDegrees ( rotationDegrees.data.vecRotation );
