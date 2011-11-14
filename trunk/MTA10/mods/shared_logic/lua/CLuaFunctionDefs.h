@@ -260,6 +260,7 @@ public:
     LUA_DECLARE ( CreateVehicle );
 
     LUA_DECLARE ( GetVehicleType );
+    LUA_DECLARE ( GetVehicleVariant );
     LUA_DECLARE ( GetVehicleColor );
     LUA_DECLARE ( GetModel );
     LUA_DECLARE ( GetVehicleModelFromName );
