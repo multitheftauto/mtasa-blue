@@ -256,6 +256,8 @@
 #include "CZoneNames.h"
 #include "TaskNames.h"
 #include "Utils.h"
+#include "logic/CWeaponStat.h"
+#include "logic/CWeaponStatManager.h"
 
 #include "CStaticFunctionDefinitions.h"
 

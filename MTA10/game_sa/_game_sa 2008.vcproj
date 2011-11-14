@@ -736,6 +736,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CWeaponStatManagerSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CWeaponStatSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CWeatherSA.cpp"
 				>
 			</File>
@@ -1238,6 +1246,14 @@
 			</File>
 			<File
 				RelativePath="CWeaponSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CWeaponStatManagerSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CWeaponStatSA.h"
 				>
 			</File>
 			<File

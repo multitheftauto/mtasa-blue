@@ -254,5 +254,41 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
 
     BitStream.Write ( m_fAircraftMaxHeight );
 
+    for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_EXTINGUISHER;i++)
+    {
+        sWeaponPropertySync WeaponProperty;
+        CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager ()->GetWeaponStats( (eWeaponType)i );
+        BitStream.WriteBit ( true );
+        WeaponProperty.data.weaponType = (int)pWeaponStat->GetWeaponType();
+        WeaponProperty.data.fAccuracy = pWeaponStat->GetAccuracy();
+        WeaponProperty.data.fMoveSpeed = pWeaponStat->GetMoveSpeed();
+        WeaponProperty.data.fTargetRange = pWeaponStat->GetTargetRange();
+        WeaponProperty.data.fWeaponRange = pWeaponStat->GetWeaponRange();
+        WeaponProperty.data.nAmmo = pWeaponStat->GetMaximumClipAmmo();
+        WeaponProperty.data.nDamage = pWeaponStat->GetDamagePerHit();
+        WeaponProperty.data.nFlags = pWeaponStat->GetFlags();
+        BitStream.Write( &WeaponProperty );
+    }
+
+    for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_M4;i++)
+    {
+        sWeaponPropertySync WeaponProperty;
+        CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager ()->GetWeaponStats( (eWeaponType)i );
+        BitStream.WriteBit ( true );
+        for (int j = 0; j <= 2;j++)
+        {
+            CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager ()->GetWeaponStats( (eWeaponType)i, (eWeaponSkill)j );
+            WeaponProperty.data.weaponType = (int)pWeaponStat->GetWeaponType();
+            WeaponProperty.data.fAccuracy = pWeaponStat->GetAccuracy();
+            WeaponProperty.data.fMoveSpeed = pWeaponStat->GetMoveSpeed();
+            WeaponProperty.data.fTargetRange = pWeaponStat->GetTargetRange();
+            WeaponProperty.data.fWeaponRange = pWeaponStat->GetWeaponRange();
+            WeaponProperty.data.nAmmo = pWeaponStat->GetMaximumClipAmmo();
+            WeaponProperty.data.nDamage = pWeaponStat->GetDamagePerHit();
+            WeaponProperty.data.nFlags = pWeaponStat->GetFlags();
+            BitStream.Write( &WeaponProperty );
+        }
+    }
+
     return true;
 }

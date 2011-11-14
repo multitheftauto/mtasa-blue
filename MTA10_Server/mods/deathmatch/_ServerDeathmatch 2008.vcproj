@@ -893,6 +893,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CWeaponStat.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CWeaponStatManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CWhoWas.cpp"
 					>
 				</File>
@@ -2007,6 +2015,14 @@
 				</File>
 				<File
 					RelativePath=".\logic\CWeaponNames.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CWeaponStat.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CWeaponStatManager.h"
 					>
 				</File>
 				<File

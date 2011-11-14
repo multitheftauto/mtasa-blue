@@ -2084,4 +2084,56 @@ struct SHeatHazeSync : public ISyncStructure
     } data;
 };
 
+//////////////////////////////////////////
+//                                      //
+//             Weapon Stats             //
+//                                      //
+//////////////////////////////////////////
+struct sWeaponPropertySync : public ISyncStructure
+{
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        if (
+            bitStream.Read     ( data.weaponType ) &&
+            bitStream.Read     ( data.fTargetRange ) &&
+            bitStream.Read     ( data.fWeaponRange ) &&
+            bitStream.Read     ( data.nFlags ) &&
+            bitStream.Read     ( data.nAmmo ) &&
+            bitStream.Read     ( data.nDamage ) &&
+            bitStream.Read     ( data.fAccuracy ) &&
+            bitStream.Read     ( data.fMoveSpeed )
+            )
+            return true;
+
+        return false;
+    }
+
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.Write    ( data.weaponType );
+        bitStream.Write    ( data.fTargetRange );
+        bitStream.Write    ( data.fWeaponRange );
+        bitStream.Write    ( data.nFlags );
+        bitStream.Write    ( data.nAmmo );
+        bitStream.Write    ( data.nDamage );
+        bitStream.Write    ( data.fAccuracy );
+        bitStream.Write    ( data.fMoveSpeed );
+    }
+
+    struct
+    {
+        int         weaponType;
+        FLOAT       fTargetRange;         // max targeting range
+        FLOAT       fWeaponRange;         // absolute gun range / default melee attack range
+
+        int         nFlags;               // flags defining characteristics
+
+        short       nAmmo;                // ammo in one clip
+        short       nDamage;              // damage inflicted per hit
+
+        FLOAT       fAccuracy;            // modify accuracy of weapon
+        FLOAT       fMoveSpeed;           // how fast can move with weapon
+    } data;
+};
+
 #pragma pack(pop)

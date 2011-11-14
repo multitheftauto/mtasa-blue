@@ -53,6 +53,7 @@ void CWorldRPCs::LoadFunctions ( void )
     AddHandler ( RESET_WIND_VELOCITY, ResetWindVelocity, "ResetWindVelocity" );
     AddHandler ( RESET_FAR_CLIP_DISTANCE, ResetFarClipDistance, "ResetFarClipDistance" );
     AddHandler ( RESET_FOG_DISTANCE, ResetFogDistance, "ResetFogDistance" );
+    AddHandler ( SET_WEAPON_PROPERTY, SetWeaponProperty, "SetWeaponProperty");
 }
 
 
@@ -380,4 +381,89 @@ void CWorldRPCs::ResetFarClipDistance ( NetBitStreamInterface& bitStream )
 void CWorldRPCs::ResetFogDistance ( NetBitStreamInterface& bitStream )
 {
     g_pMultiplayer->RestoreFogDistance ( );
+}
+
+void CWorldRPCs::SetWeaponProperty ( NetBitStreamInterface& bitStream )
+{
+    unsigned char ucWeapon = 0;
+    unsigned char ucProperty = 0;
+    unsigned char ucWeaponSkill = 0;
+    float fData = 0.0f;
+    short sData = 0.0f;
+    if ( bitStream.Read ( ucWeapon ) && bitStream.Read ( ucProperty ) && bitStream.Read ( ucWeaponSkill ) )
+    {
+        CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( static_cast < eWeaponType > ( ucWeapon ), static_cast < eWeaponSkill > ( ucWeaponSkill ) );
+        switch ( ucProperty )
+        {
+            case WEAPON_WEAPON_RANGE:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetWeaponRange ( fData );
+                    break;
+                }
+            case WEAPON_TARGET_RANGE:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetTargetRange ( fData );
+                    break;
+                }
+            case WEAPON_ACCURACY:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetAccuracy ( fData );
+                    break;
+                }
+            case WEAPON_LIFE_SPAN:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetLifeSpan ( fData );
+                    break;
+                }
+            case WEAPON_FIRING_SPEED:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetFiringSpeed ( fData );
+                    break;
+                }
+            case WEAPON_MOVE_SPEED:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetMoveSpeed ( fData );
+                    break;
+                }
+            case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetWeaponAnimLoopFireTime ( fData );
+                    break;
+                }
+            case WEAPON_DAMAGE:
+                {
+                    bitStream.Read ( sData );
+                    pWeaponInfo->SetDamagePerHit ( sData );
+                    break;
+                }
+            case WEAPON_MAX_CLIP_AMMO:
+                {
+                    bitStream.Read ( sData );
+                    pWeaponInfo->SetMaximumClipAmmo ( sData );
+                    break;
+                }
+            case WEAPON_FLAGS:
+                {
+                    bitStream.Read ( sData );
+                    if ( pWeaponInfo->IsFlagSet ( sData ) )
+                        pWeaponInfo->ClearFlag ( sData );
+                    else
+                        pWeaponInfo->SetFlag ( sData );
+                    break;
+                }
+            case WEAPON_ANIM_GROUP:
+                {
+                    bitStream.Read ( sData );
+                    pWeaponInfo->SetAnimGroup ( sData );
+                    break;
+                }
+        }
+    }
 }

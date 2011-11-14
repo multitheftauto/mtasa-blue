@@ -58,6 +58,7 @@ public:
     DECLARE_RPC ( ResetWindVelocity );
     DECLARE_RPC ( ResetFarClipDistance );
     DECLARE_RPC ( ResetFogDistance );
+    DECLARE_RPC ( SetWeaponProperty );
 };
 
 #endif
