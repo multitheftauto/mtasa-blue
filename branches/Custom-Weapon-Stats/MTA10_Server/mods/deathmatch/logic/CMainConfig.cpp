@@ -55,13 +55,14 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_bVoiceEnabled = false;
     m_uiVoiceBitrate = 0;
     m_strBandwidthReductionMode = "medium";
+    m_iPendingWorkToDoSleepTime = 10;
+    m_iBackupInterval = 3;
+    m_iBackupAmount = 5;
 }
 
 
-bool CMainConfig::Load ( const char* szFilename )
+bool CMainConfig::Load ( void )
 {
-    assert ( szFilename );
-
     // Eventually destroy the previously loaded xml
     if ( m_pFile )
     {
@@ -70,7 +71,7 @@ bool CMainConfig::Load ( const char* szFilename )
     }
 
     // Load the XML
-    m_pFile = g_pServerInterface->GetXML ()->CreateXML ( szFilename );
+    m_pFile = g_pServerInterface->GetXML ()->CreateXML ( GetFileName ().c_str () );
     if ( !m_pFile )
     {
         CLogger::ErrorPrintf ( "Error loading config file\n" );
@@ -202,15 +203,39 @@ bool CMainConfig::Load ( const char* szFilename )
     GetInteger ( m_pRootNode, "hideac", iHideAC );
 
     {
-        SString strDisbaleAC;
-        GetString ( m_pRootNode, "disableac", strDisbaleAC );
-        std::vector < SString > tagACList;
-        strDisbaleAC.Split ( ",", tagACList );
-        for ( std::vector < SString >::iterator it = tagACList.begin () ; it != tagACList.end () ; ++it )
-            if ( isdigit(***it) )
-                MapSet ( m_DisableACMap, *it, 1 );
+        std::set < SString > disableACMap;
+        std::set < SString > enableSDMap;
 
-        g_pNetServer->ResetStub ( 'delu', *strDisbaleAC, m_iEnableClientChecks, iHideAC );
+        {
+            SString strDisableAC;
+            GetString ( m_pRootNode, "disableac", strDisableAC );
+            std::vector < SString > tagACList;
+            strDisableAC.Split ( ",", tagACList );
+            for ( std::vector < SString >::iterator it = tagACList.begin () ; it != tagACList.end () ; ++it )
+                if ( isdigit(***it) )
+                {
+                    MapInsert ( disableACMap, *it );
+                    MapInsert ( m_DisableComboACMap, *it );
+                }
+        }
+
+        // Add support for SD #12 (defaults to disabled)
+        MapInsert ( m_DisableComboACMap, "12" );
+
+        {
+            SString strEnableSD;
+            GetString ( m_pRootNode, "enablesd", strEnableSD );
+            std::vector < SString > tagSDList;
+            strEnableSD.Split ( ",", tagSDList );
+            for ( std::vector < SString >::iterator it = tagSDList.begin () ; it != tagSDList.end () ; ++it )
+                if ( isdigit(***it) )
+                {
+                    MapInsert ( enableSDMap, *it );
+                    MapRemove ( m_DisableComboACMap, *it );
+                }
+        }
+
+        g_pNetServer->ResetStub ( 'delu', &m_DisableComboACMap, &disableACMap, &enableSDMap, m_iEnableClientChecks, iHideAC );
     }
 
     {
@@ -220,7 +245,7 @@ bool CMainConfig::Load ( const char* szFilename )
         strEnable.Split ( ",", tagList );
         for ( std::vector < SString >::iterator it = tagList.begin () ; it != tagList.end () ; ++it )
             if ( (*it).length () )
-                MapSet ( m_EnableDiagnosticMap, *it, 1 );
+                MapInsert ( m_EnableDiagnosticMap, *it );
     }
 
     // ASE
@@ -284,7 +309,7 @@ bool CMainConfig::Load ( const char* szFilename )
     else
     {
         if ( iResult != DOESNT_EXIST )
-            CLogger::ErrorPrintf ( "Sample rate must be between 0 and 2, defaulting to %u\n", m_uiVoiceSampleRate );
+            CLogger::ErrorPrintf ( "voice_samplerate rate must be between 0 and 2, defaulting to %u\n", m_uiVoiceSampleRate );
     }
 
     // Grab the Quality for Voice
@@ -296,7 +321,7 @@ bool CMainConfig::Load ( const char* szFilename )
     else
     {
         if ( iResult != DOESNT_EXIST )
-            CLogger::ErrorPrintf ( "Quality must be between 0 and 10, defaulting to %u\n", m_ucVoiceQuality );
+            CLogger::ErrorPrintf ( "voice_quality must be between 0 and 10, defaulting to %u\n", m_ucVoiceQuality );
     }
 
     // Grab the bitrate for Voice [optional]
@@ -343,6 +368,44 @@ bool CMainConfig::Load ( const char* szFilename )
         m_strAccessControlListFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "acl.xml" );
     }
 
+    // Grab the global databases path
+    if ( GetString ( m_pRootNode, "global_databases_path", strBuffer, 1, 255 ) != IS_SUCCESS )
+        strBuffer = "databases/global";
+    if ( !IsValidFilePath ( strBuffer.c_str () ) || strBuffer.empty () )
+    {
+        CLogger::ErrorPrintf ( "global_databases_path is not valid. Defaulting to 'databases/global'\n" );
+        strBuffer = "databases/global";
+    }
+    m_strGlobalDatabasesPath = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
+
+    // Grab the system databases path
+    if ( GetString ( m_pRootNode, "system_databases_path", strBuffer, 1, 255 ) != IS_SUCCESS )
+        strBuffer = "databases/system";
+    if ( !IsValidFilePath ( strBuffer.c_str () ) || strBuffer.empty () )
+    {
+        CLogger::ErrorPrintf ( "system_databases_path is not valid. Defaulting to 'databases/system'\n" );
+        strBuffer = "databases/system";
+    }
+    m_strSystemDatabasesPath = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
+
+    // Grab the backup path
+    if ( GetString ( m_pRootNode, "backup_path", strBuffer, 1, 255 ) != IS_SUCCESS )
+        strBuffer = "backups";
+    if ( !IsValidFilePath ( strBuffer.c_str () ) || strBuffer.empty () )
+    {
+        CLogger::ErrorPrintf ( "backup_path is not valid. Defaulting to 'backups'\n" );
+        strBuffer = "backups";
+    }
+    m_strBackupPath = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
+
+    // Grab the backup interval
+    GetInteger ( m_pRootNode, "backup_interval", m_iBackupInterval );
+    m_iBackupInterval = Clamp ( 0, m_iBackupInterval, 30 );
+
+    // Grab the backup count
+    GetInteger ( m_pRootNode, "backup_copies", m_iBackupAmount );
+    m_iBackupAmount = Clamp ( 0, m_iBackupAmount, 100 );
+
     GetBoolean ( m_pRootNode, "autologin", m_bAutoLogin );
 
     // networkencryption - Encryption for Server <-> client communications
@@ -352,6 +415,10 @@ bool CMainConfig::Load ( const char* szFilename )
     // bandwidth_reduction
     GetString ( m_pRootNode, "bandwidth_reduction", m_strBandwidthReductionMode );
     ApplyBandwidthReductionMode ();
+
+    // busy_sleep_time
+    GetInteger ( m_pRootNode, "busy_sleep_time", m_iPendingWorkToDoSleepTime );
+    m_iPendingWorkToDoSleepTime = Clamp ( 0, m_iPendingWorkToDoSleepTime, 10 );
 
     return true;
 }
@@ -571,6 +638,7 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "info", CConsoleCommands::ResourceInfo, false );
     RegisterCommand ( "install", CConsoleCommands::InstallResource, false );
     RegisterCommand ( "upgrade", CConsoleCommands::UpgradeResources, false );
+    RegisterCommand ( "checkall", CConsoleCommands::CheckAllResources, false );
 
     RegisterCommand ( "say", CConsoleCommands::Say, false );
     RegisterCommand ( "teamsay", CConsoleCommands::TeamSay, false );
@@ -616,13 +684,15 @@ bool CMainConfig::LoadExtended ( void )
 }
 
 
-bool CMainConfig::Save ( const char* szFilename )
+bool CMainConfig::Save ( void )
 {
     // If we have a file
     if ( m_pFile && m_pRootNode )
     {
         // Save it
-        return m_pFile->Write ();
+        if ( m_pFile->Write () )
+            return true;
+        CLogger::ErrorPrintf ( "Error saving '%s'\n", GetFileName ().c_str () );
     }
 
     // No file
@@ -748,6 +818,19 @@ bool CMainConfig::IsVoiceEnabled ( void )
 // Fetch any single setting from the server config
 //
 //////////////////////////////////////////////////////////////////////
+SString CMainConfig::GetSetting ( const SString& strName )
+{
+    SString strValue;
+    GetSetting ( strName, strValue );
+    return strValue;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+//
+// Fetch any single setting from the server config
+//
+//////////////////////////////////////////////////////////////////////
 bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
 {
     //
@@ -786,6 +869,12 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
     if ( strName == "bandwidth_reduction" )
     {
         strValue = m_strBandwidthReductionMode;
+        return true;
+    }
+    else
+    if ( strName == "busy_sleep_time" )
+    {
+        strValue = SString ( "%d", m_iPendingWorkToDoSleepTime );
         return true;
     }
     else
@@ -884,6 +973,21 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
         }
     }
     else
+    if ( strName == "busy_sleep_time" )
+    {
+        int iSleepMs = atoi ( strValue );
+        if ( iSleepMs >= 0 && iSleepMs <= 10 )
+        {
+            m_iPendingWorkToDoSleepTime = iSleepMs;
+            if ( bSave )
+            {
+                SetString ( m_pRootNode, "busy_sleep_time", SString ( "%d", m_iPendingWorkToDoSleepTime ) );
+                Save ();
+            }
+            return true;
+        }
+    }
+    else
     if ( strName == "bandwidth_debug" )
     {
         // Transient settings go in their own map, so they don't get saved
@@ -901,7 +1005,18 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
             return true;
         }
     }
-
+    else
+    if ( strName == "lslimit" )
+    {
+        int iLimit = atoi ( strValue );
+        if ( iLimit > 0 )
+        {
+            // Transient settings go in their own map, so they don't get saved
+            MapSet ( m_TransientSettings, "lslimit", strValue );
+            g_pBandwidthSettings->iLightSyncPlrsPerFrame = iLimit;
+            return true;
+        }
+    }
 
     //
     // Everything else is read only, so can't be set

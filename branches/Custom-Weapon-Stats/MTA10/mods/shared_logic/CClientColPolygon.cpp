@@ -116,3 +116,52 @@ CSphere CClientColPolygon::GetWorldBoundingSphere ( void )
     sphere.fRadius        = m_fRadius;
     return sphere;
 }
+
+
+//
+// Draw wireframe polygon
+//
+void CClientColPolygon::DebugRender ( const CVector& vecPosition, float fDrawRadius )
+{
+    const uint uiNumPoints = m_Points.size();
+
+    SColorARGB color ( 128, 255, 255, 0 );
+    float fLineWidth = 4.f + pow ( m_fRadius, 0.5f );
+    CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
+
+    // Don't draw a few end slices to show it goes on for ever
+    int iSkipEndSlices = 4;
+
+    // Calc required detail level
+    uint uiNumSlices = Max ( 2 + iSkipEndSlices * 2, Round ( sqrt ( fDrawRadius * 2.0f ) * 2.0f ) );
+
+    // Draw Slices
+    {
+        for ( uint s = iSkipEndSlices ; s < uiNumSlices - iSkipEndSlices ; s++ )
+        {
+            float fZ = vecPosition.fZ - fDrawRadius + fDrawRadius * 2.0f * ( s / (float)( uiNumSlices - 1 ) );
+            fZ += 4;    // Extra bit so a slice is on the same Z coord as the camera
+            for ( uint i = 0 ; i < uiNumPoints ; i++ )
+            {
+                const CVector2D& vecPointBegin = m_Points [ i ];
+                const CVector2D& vecPointEnd = m_Points [ ( i + 1 ) % uiNumPoints ];
+
+                CVector vecBegin ( vecPointBegin.fX, vecPointBegin.fY, fZ );
+                CVector vecEnd ( vecPointEnd.fX, vecPointEnd.fY, fZ );
+                pGraphics->DrawLine3DQueued ( vecBegin, vecEnd, fLineWidth, color, false );
+            }
+        }
+    }
+
+    // Draw lines from bottom to top
+    {
+        for ( uint i = 0 ; i < uiNumPoints ; i++ )
+        {
+            const CVector2D& vecPoint = m_Points [ i ];
+
+            CVector vecBegin ( vecPoint.fX, vecPoint.fY, vecPosition.fZ - fDrawRadius );
+            CVector vecEnd ( vecPoint.fX, vecPoint.fY, vecPosition.fZ + fDrawRadius );
+            pGraphics->DrawLine3DQueued ( vecBegin, vecEnd, fLineWidth, color, false );
+        }
+    }
+}

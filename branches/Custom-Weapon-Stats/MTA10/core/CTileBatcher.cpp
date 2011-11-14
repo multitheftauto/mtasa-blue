@@ -49,12 +49,7 @@ void CTileBatcher::OnDeviceCreate ( IDirect3DDevice9* pDevice, float fViewportSi
     m_pDevice = pDevice;
 
     // Cache matrices
-    D3DXMatrixIdentity ( &m_MatView );
-
-    D3DXMATRIX Mat1, Mat2;
-    D3DXMatrixTranslation ( &Mat1, -fViewportSizeX / 2.0f - 0.5f, -fViewportSizeY / 2.0f - 0.5f, 0.0f );
-    D3DXMatrixScaling ( &Mat2, 2.0f / fViewportSizeX, -2.0f / fViewportSizeY, 1.0f );
-    D3DXMatrixMultiply ( &m_MatProjection, &Mat1, &Mat2 );
+    UpdateMatrices ( fViewportSizeX, fViewportSizeY );
 }
 
 
@@ -71,12 +66,42 @@ void CTileBatcher::OnChangingRenderTarget ( uint uiNewViewportSizeX, uint uiNewV
     Flush ();
 
     // Make new projection transform
-    float fViewportSizeX = uiNewViewportSizeX;
-    float fViewportSizeY = uiNewViewportSizeY;
-    D3DXMATRIX Mat1, Mat2;
-    D3DXMatrixTranslation ( &Mat1, -fViewportSizeX / 2.0f - 0.5f, -fViewportSizeY / 2.0f - 0.5f, 0.0f );
-    D3DXMatrixScaling ( &Mat2, 2.0f / fViewportSizeX, -2.0f / fViewportSizeY, 1.0f );
-    D3DXMatrixMultiply ( &m_MatProjection, &Mat1, &Mat2 );
+    UpdateMatrices ( uiNewViewportSizeX, uiNewViewportSizeY );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CTileBatcher::UpdateMatrices
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CTileBatcher::UpdateMatrices ( float fViewportSizeX, float fViewportSizeY)
+{
+    D3DXMatrixIdentity ( &m_MatView );
+    D3DXMatrixIdentity ( &m_MatProjection );
+
+    // Make projection 3D friendly, so shaders can alter the z coord for fancy effects
+    float fFarPlane = 1000;
+    float fNearPlane = 10;
+    float Q = fFarPlane / ( fFarPlane - fNearPlane );
+    float fAdjustZFactor = 20.f;
+    float rcpSizeX = 2.0f / fViewportSizeX;
+    float rcpSizeY = -2.0f / fViewportSizeY;
+    rcpSizeX *= fAdjustZFactor;
+    rcpSizeY *= fAdjustZFactor;
+
+    m_MatProjection.m[0][0] = rcpSizeX;
+    m_MatProjection.m[1][1] = rcpSizeY;
+    m_MatProjection.m[2][2] = Q;
+    m_MatProjection.m[2][3] = 1;
+    m_MatProjection.m[3][0] = ( -fViewportSizeX / 2.0f - 0.5f ) * rcpSizeX;
+    m_MatProjection.m[3][1] = ( -fViewportSizeY / 2.0f - 0.5f ) * rcpSizeY;
+    m_MatProjection.m[3][2] = -Q * fNearPlane;
+    m_MatProjection.m[3][3] = 0;
+
+    m_MatView.m[3][2] = fAdjustZFactor;
 }
 
 
@@ -146,7 +171,9 @@ void CTileBatcher::Flush ( void )
         m_pDevice->SetTransform ( D3DTS_PROJECTION, &m_MatProjection );
 
         // Set vertex stream
-        uint PrimitiveCount                 = m_Vertices.size () / 3;
+        uint PrimitiveCount                 = m_Indices.size () / 3;
+        const void* pIndexData              = &m_Indices[0];
+        uint NumVertices                    = m_Indices.size ();
         const void* pVertexStreamZeroData   = &m_Vertices[0];
         uint VertexStreamZeroStride         = sizeof(SPDTVertex);
         m_pDevice->SetFVF ( SPDTVertex::FVF );
@@ -156,7 +183,7 @@ void CTileBatcher::Flush ( void )
         {
             // Draw using texture
             m_pDevice->SetTexture( 0, pTextureItem->m_pD3DTexture );
-            m_pDevice->DrawPrimitiveUP ( D3DPT_TRIANGLELIST, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride );
+            m_pDevice->DrawIndexedPrimitiveUP( D3DPT_TRIANGLELIST, 0, NumVertices, PrimitiveCount, pIndexData, D3DFMT_INDEX16, pVertexStreamZeroData, VertexStreamZeroStride );
         }
         else
         if ( CShaderInstance* pShaderInstance = DynamicCast < CShaderInstance > ( m_pCurrentMaterial ) )
@@ -179,7 +206,7 @@ void CTileBatcher::Flush ( void )
             for ( uint uiPass = 0 ; uiPass < uiNumPasses ; uiPass++ )
             {
                 pD3DEffect->BeginPass ( uiPass );
-                m_pDevice->DrawPrimitiveUP ( D3DPT_TRIANGLELIST, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride );
+                m_pDevice->DrawIndexedPrimitiveUP( D3DPT_TRIANGLELIST, 0, NumVertices, PrimitiveCount, pIndexData, D3DFMT_INDEX16, pVertexStreamZeroData, VertexStreamZeroStride );
                 pD3DEffect->EndPass ();
             }
             pD3DEffect->End ();
@@ -193,6 +220,7 @@ void CTileBatcher::Flush ( void )
         }
 
         // Clean up
+        m_Indices.clear ();
         m_Vertices.clear ();
         SetCurrentMaterial ( NULL );
         m_fCurrentRotation = 0;
@@ -247,8 +275,32 @@ void CTileBatcher::AddTile ( float fX1, float fY1,
                               float fRotCenOffY,
                               unsigned long ulColor )
 {
+    // Get tessellation setting from shader
+    uint uiTessellationX = 1;
+    uint uiTessellationY = 1;
+    if ( CShaderInstance* pShaderInstance = DynamicCast < CShaderInstance > ( pMaterial ) )
+    {
+        // Validate tessellation range (ensure x*y < 65536)
+        uiTessellationX = Clamp < uint > ( 1, pShaderInstance->m_uiTessellationX, 4000 );
+        uiTessellationY = Clamp < uint > ( 1, pShaderInstance->m_uiTessellationY, 4000 );
 
-    // TODO - Optimize these checks
+        uint uiNumVertices = ( uiTessellationX + 1 ) * ( uiTessellationY + 1 );
+
+        if ( uiNumVertices > 65535 )
+        {
+            uint div = uiNumVertices / 6553 + 1;
+
+            if ( uiTessellationX > uiTessellationY )
+                uiTessellationX = uiTessellationX / div * 10;
+            else
+                uiTessellationY = uiTessellationY / div * 10;
+        }
+    }
+
+    // Calc number of vertices to add
+    uint uiNumVertices = ( uiTessellationX + 1 ) * ( uiTessellationY + 1 );
+
+    // Calc position of rotation center
     float fRotCenX = fRotCenOffX + ( fX1 + fX2 ) * 0.5f;
     float fRotCenY = fRotCenOffY + ( fY1 + fY2 ) * 0.5f;
 
@@ -256,7 +308,9 @@ void CTileBatcher::AddTile ( float fX1, float fY1,
     if ( pMaterial != m_pCurrentMaterial
             || fRotation != m_fCurrentRotation
             || fRotCenX != m_fCurrentRotCenX
-            || fRotCenY != m_fCurrentRotCenY )
+            || fRotCenY != m_fCurrentRotCenY
+            || uiNumVertices + m_Vertices.size () > 65535
+            )
     {
         Flush ();
         SetCurrentMaterial ( pMaterial );
@@ -265,18 +319,72 @@ void CTileBatcher::AddTile ( float fX1, float fY1,
         m_fCurrentRotCenY = fRotCenY;
     }
 
-    // TODO - Add tessellation option
+    // Do quicker things if tessellation is not required
+    if ( uiTessellationX == 1 && uiTessellationY == 1 )
+    {
+        // Make room for 4 more vertices
+        m_Vertices.resize ( m_Vertices.size () + 4 );
+        SPDTVertex* pVBuffer = &m_Vertices[m_Vertices.size () - 4];
+    
+        // Fill vertex data
+        WRITE_PDT_VERTEX( pVBuffer, fX1, fY1, 0, ulColor, fU1 , fV1 );
+        WRITE_PDT_VERTEX( pVBuffer, fX2, fY1, 0, ulColor, fU2 , fV1 );
+        WRITE_PDT_VERTEX( pVBuffer, fX1, fY2, 0, ulColor, fU1 , fV2 );
+        WRITE_PDT_VERTEX( pVBuffer, fX2, fY2, 0, ulColor, fU2 , fV2 );
 
-    // Make room for 6 more vertices
-    m_Vertices.resize ( m_Vertices.size () + 6 );
-    SPDTVertex* pBuffer = &m_Vertices[m_Vertices.size () - 6];
+        // Make room for 6 more indices
+        uint uiBaseIndex = m_Indices.size ();
+        m_Indices.resize ( m_Indices.size () + 6 );
+        WORD* pIBuffer = &m_Indices[m_Indices.size () - 6];
 
-    // Fill vertex data
-    WRITE_PDT_VERTEX( pBuffer, fX1, fY1, 0, ulColor, fU1 , fV1 );
-    WRITE_PDT_VERTEX( pBuffer, fX2, fY1, 0, ulColor, fU2 , fV1 );
-    WRITE_PDT_VERTEX( pBuffer, fX1, fY2, 0, ulColor, fU1 , fV2 );
+        WRITE_QUAD_INDICES( pIBuffer, uiBaseIndex, uiBaseIndex + 2 );
+        return;
+    }
 
-    WRITE_PDT_VERTEX( pBuffer, fX2, fY1, 0, ulColor, fU2 , fV1 );
-    WRITE_PDT_VERTEX( pBuffer, fX2, fY2, 0, ulColor, fU2 , fV2 );
-    WRITE_PDT_VERTEX( pBuffer, fX1, fY2, 0, ulColor, fU1 , fV2 );
+    // Write out the vertices
+    {
+        // Make room for vertices
+        m_Vertices.resize ( m_Vertices.size () + uiNumVertices );
+        SPDTVertex* pVBuffer = &m_Vertices[m_Vertices.size () - uiNumVertices];
+
+        float fStepX = ( fX2 - fX1 ) / (float)uiTessellationX;
+        float fStepY = ( fY2 - fY1 ) / (float)uiTessellationY;
+
+        float fStepU = ( fU2 - fU1 ) / (float)uiTessellationX;
+        float fStepV = ( fV2 - fV1 ) / (float)uiTessellationY;
+
+        for ( uint y = 0 ; y < uiTessellationY + 1 ; y++ )
+        {
+            float fY = fY1 + fStepY * y;
+            float fV = fV1 + fStepV * y;
+
+            for ( uint x = 0 ; x < uiTessellationX + 1 ; x++ )
+            {
+                float fX = fX1 + fStepX * x;
+                float fU = fU1 + fStepU * x;
+
+                WRITE_PDT_VERTEX( pVBuffer, fX, fY, 0, ulColor, fU, fV );
+            }
+        }
+    }
+
+    // Write out the indices
+    {
+        uint uiNumIndices = uiTessellationX * uiTessellationY * 6;
+
+        // Make room for indices
+        m_Indices.resize ( m_Indices.size () + uiNumIndices );
+        WORD* pIBuffer = &m_Indices[m_Indices.size () - uiNumIndices];
+
+        for ( uint y = 0 ; y < uiTessellationY ; y++ )
+        {
+            uint uiRow0Base = y * ( uiTessellationX + 1 );
+            uint uiRow1Base = ( y + 1 ) * ( uiTessellationX + 1 );
+
+            for ( uint x = 0 ; x < uiTessellationX ; x++ )
+            {
+                WRITE_QUAD_INDICES( pIBuffer, uiRow0Base + x, uiRow1Base + x );
+            }
+        }
+    }
 }

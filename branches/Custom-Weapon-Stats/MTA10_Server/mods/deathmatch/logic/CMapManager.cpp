@@ -137,7 +137,7 @@ void CMapManager::BroadcastMapInformation ( void )
     }
 
     // Add the objects to the packet
-    list < CObject* > ::const_iterator iterObjects = m_pObjectManager->IterBegin ();
+    CObjectListType::const_iterator iterObjects = m_pObjectManager->IterBegin ();
     for ( ; iterObjects != m_pObjectManager->IterEnd (); iterObjects++ )
     {
         EntityPacket.Add ( *iterObjects );
@@ -213,7 +213,7 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
     }
 
     // Add the objects to the packet
-    list < CObject* > ::const_iterator iterObjects = m_pObjectManager->IterBegin ();
+    CObjectListType::const_iterator iterObjects = m_pObjectManager->IterBegin ();
     for ( ; iterObjects != m_pObjectManager->IterEnd (); iterObjects++ )
     {
         EntityPacket.Add ( *iterObjects );
@@ -763,7 +763,7 @@ void CMapManager::DoVehicleRespawning ( void )
         if ( pVehicle->GetRespawnEnabled () )
         {
             // Did we get deserted?
-            bool bDeserted = ( !pVehicle->GetFirstOccupant () && !pVehicle->GetSyncer () );
+            bool bDeserted = ( !pVehicle->GetFirstOccupant () );
 
             // Grab when it blew and when it was last not touched
             ulBlowTime = pVehicle->GetBlowTime ();
@@ -961,7 +961,7 @@ void CMapManager::LinkupElements ( void )
         }
     }
 
-    list < CObject* > ::const_iterator iterObjects = m_pObjectManager->IterBegin ();
+    CObjectListType::const_iterator iterObjects = m_pObjectManager->IterBegin ();
     for ( ; iterObjects != m_pObjectManager->IterEnd (); iterObjects++ )
     {
         CObject* pObject = *iterObjects;

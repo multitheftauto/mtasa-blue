@@ -27,9 +27,6 @@ int CClientEntity::iCount = 0;
 
 CClientEntity::CClientEntity ( ElementID ID )
         : ClassInit ( this )
-        , m_FromRootNode ( this )
-        , m_ChildrenNode ( this )
-        , m_Children ( &CClientEntity::m_ChildrenNode )
 {
     #ifdef MTA_DEBUG
         ++iCount;
@@ -181,10 +178,6 @@ CClientEntity::~CClientEntity ( void )
     // Ensure nothing has inadvertently set a parent
     assert ( m_pParent == NULL );
 
-    // Ensure intrusive list nodes have been isolated
-    assert ( m_FromRootNode.m_pOuterItem == this && !m_FromRootNode.m_pPrev && !m_FromRootNode.m_pNext );
-    assert ( m_ChildrenNode.m_pOuterItem == this && !m_ChildrenNode.m_pPrev && !m_ChildrenNode.m_pNext );
-
     if ( !g_pClientGame->IsBeingDeleted () )
         CClientEntityRefManager::OnEntityDelete ( this );
 }
@@ -256,31 +249,23 @@ CClientEntity* CClientEntity::AddChild ( CClientEntity* pChild )
 }
 
 
+// Also returns true if the element is the same
 bool CClientEntity::IsMyChild ( CClientEntity* pEntity, bool bRecursive )
 {
-    // Since VERIFY_ELEMENT is calling us, the pEntity argument could be NULL
-    if ( pEntity == NULL ) return false;
+    return pEntity && pEntity->IsMyParent ( this, bRecursive );
+}
 
+
+// Also returns true if the element is the same
+bool CClientEntity::IsMyParent ( CClientEntity* pEntity, bool bRecursive )
+{
     // Is he us?
     if ( pEntity == this )
         return true;
 
-    // Is he our child directly?
-    CChildListType ::const_iterator iter = m_Children.begin ();
-    for ( ; iter != m_Children.end (); iter++ )
-    {
-        // Return true if this is our child. If not check if he's one of our children's children if we were asked to do a recursive search.
-        if ( *iter == pEntity )
-        {
-            return true;
-        }
-        else if ( bRecursive && (*iter)->IsMyChild ( pEntity, true ) )
-        {
-            return true;
-        }
-    }
+    if ( bRecursive && pEntity && m_pParent && m_pParent->IsMyParent ( pEntity, true ) )
+        return true;
 
-    // He's not under us
     return false;
 }
 
@@ -1280,7 +1265,7 @@ RpClump * CClientEntity::GetClump ( void )
 
 
 // Entities from root optimization for getElementsByType
-typedef CIntrusiveListExt < CClientEntity, &CClientEntity::m_FromRootNode > CFromRootListType;
+typedef CFastList < CClientEntity > CFromRootListType;
 typedef google::dense_hash_map < unsigned int, CFromRootListType > t_mapEntitiesFromRoot;
 static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
 static bool                     ms_bEntitiesFromRootInitialized = false;

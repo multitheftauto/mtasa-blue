@@ -47,6 +47,13 @@ public:
         return ((left.m_uiBinaryAddress != right.m_uiBinaryAddress) || (left.m_usPort != right.m_usPort));
     };
 
+    friend inline bool operator < ( const NetServerPlayerID& left, const NetServerPlayerID& right )
+    {
+        return left.m_uiBinaryAddress < right.m_uiBinaryAddress
+               || ( left.m_uiBinaryAddress == right.m_uiBinaryAddress && left.m_usPort < right.m_usPort );
+    } 
+
+
     inline unsigned long    GetBinaryAddress    ( void ) const                      { return m_uiBinaryAddress; };
     inline unsigned short   GetPort             ( void ) const                      { return m_usPort; };
     

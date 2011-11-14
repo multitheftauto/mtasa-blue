@@ -55,6 +55,7 @@ namespace
 class CPerfStatLuaMemoryImpl : public CPerfStatLuaMemory
 {
 public:
+    ZERO_ON_NEW
                                 CPerfStatLuaMemoryImpl  ( void );
     virtual                     ~CPerfStatLuaMemoryImpl ( void );
 
@@ -266,6 +267,8 @@ void CPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CPerfStatResult* pResult, const
     pResult->AddColumn ( "Elements" );
     pResult->AddColumn ( "TextDisplays" );
     pResult->AddColumn ( "TextItems" );
+    pResult->AddColumn ( "DB Queries" );
+    pResult->AddColumn ( "DB Connections" );
 
     // Calc totals
     if ( strFilter == "" )
@@ -296,6 +299,11 @@ void CPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CPerfStatResult* pResult, const
 
         row[c++] = SString ( "%d KB", calcedCurrent );
         row[c++] = SString ( "%d KB", calcedMax );
+
+        // Some extra 'all VM' things
+        c += 6;
+        row[c++] = !g_pStats->iDbJobDataCount ? "-" : SString ( "%d", g_pStats->iDbJobDataCount );
+        row[c++] = !g_pStats->iDbConnectionCount ? "-" : SString ( "%d", g_pStats->iDbConnectionCount );
     }
 
     // For each VM

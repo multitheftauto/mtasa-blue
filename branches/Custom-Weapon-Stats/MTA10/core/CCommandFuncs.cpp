@@ -441,3 +441,13 @@ void CCommandFuncs::Test ( const char* szParameters )
     CCore::GetSingleton ().GetNetwork ()->ResetStub ( 'test', szParameters, szBuffer );
     CCore::GetSingleton ().GetConsole ()->Print ( szBuffer );
 }
+
+void CCommandFuncs::Serial ( const char* szParameters )
+{
+    // Get our serial
+    char szSerial [ 64 ];
+    g_pCore->GetNetwork ()->GetSerial (szSerial, sizeof ( szSerial ));
+
+    // Print it
+    CCore::GetSingleton ().GetConsole ()->Printf ( "* Your serial is: %s", szSerial );
+}

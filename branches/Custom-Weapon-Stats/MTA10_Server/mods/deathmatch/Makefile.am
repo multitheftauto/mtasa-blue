@@ -11,6 +11,7 @@ INCLUDES += -I$(srcdir)/../../../vendor/pme/
 INCLUDES += -I$(srcdir)/../../../vendor/json-c/
 INCLUDES += -I$(srcdir)/../../../vendor/bob_withers/
 INCLUDES += -I$(srcdir)/../../../vendor/bochs/
+INCLUDES += -I/usr/include/mysql
 INCLUDES += -I$(srcdir)/../../../Shared/animation/
 INCLUDES += -I$(ZIPDIR)/
 INCLUDES += -I$(LUADIR)/src
@@ -27,6 +28,7 @@ UTILS = \
 	./utils/CHTTPResponse.cpp \
 	./utils/CTCPClientSocketImpl.cpp \
 	./utils/CTCPImpl.cpp \
+	./utils/CZipMaker.cpp \
 	$(srcdir)/../../../vendor/bob_withers/base64.cpp \
 	$(srcdir)/../../../vendor/bochs/bochs_internal/crc32.cpp \
 	$(ZIPDIR)/ioapi.c \
@@ -67,6 +69,12 @@ LOGIC = \
 ./logic/CConsoleCommands.cpp \
 ./logic/CCustomData.cpp \
 ./logic/CDummy.cpp \
+./logic/CDatabaseConnectionMySql.cpp \
+./logic/CDatabaseConnectionSqlite.cpp \
+./logic/CDatabaseJobQueue.cpp \
+./logic/CDatabaseManager.cpp \
+./logic/CDatabaseTypeMySql.cpp \
+./logic/CDatabaseTypeSqlite.cpp \
 ./logic/CDynamicLibrary.cpp \
 ./logic/CElement.cpp \
 ./logic/CElementDeleter.cpp \
@@ -99,10 +107,13 @@ LOGIC = \
 ./logic/CPedSync.cpp \
 ./logic/CPerfStat.BandwidthReduction.cpp \
 ./logic/CPerfStat.BandwidthUsage.cpp \
+./logic/CPerfStat.FunctionTiming.cpp \
 ./logic/CPerfStat.LibMemory.cpp \
 ./logic/CPerfStat.LuaMemory.cpp \
 ./logic/CPerfStat.LuaTiming.cpp \
 ./logic/CPerfStat.PacketUsage.cpp \
+./logic/CPerfStat.ServerInfo.cpp \
+./logic/CPerfStat.ServerTiming.cpp \
 ./logic/CPerfStat.SqliteTiming.cpp \
 ./logic/CPerfStatManager.cpp \
 ./logic/CPerPlayerEntity.cpp \
@@ -278,7 +289,8 @@ deathmatch_la_LIBADD = \
 	$(LUABDIR)/src/liblua.la \
 	$(top_builddir)/vendor/json-c/libjson.la \
 	$(SPARSEHASH_LIBS) \
-	$(SQLITE3_LIBS)
+	$(SQLITE3_LIBS) \
+    -lmysqlclient
 
 deathmatch_la_LDFLAGS = \
 	-module -avoid-version

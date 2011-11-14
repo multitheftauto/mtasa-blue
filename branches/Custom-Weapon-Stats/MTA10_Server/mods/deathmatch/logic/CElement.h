@@ -48,7 +48,8 @@
 #define IS_TEAM(element)     ((element)->GetType()==CElement::TEAM)
 #define IS_WATER(element)    ((element)->GetType()==CElement::WATER)
 
-typedef CIntrusiveList < class CElement > CChildListType;
+typedef CFastList < class CElement > CChildListType;
+typedef CFastList < class CElement > CElementListType;
 
 class CElement
 {
@@ -78,6 +79,7 @@ public:
         COLSHAPE,
         SCRIPTFILE,
         WATER,
+        DATABASE_CONNECTION,
         UNKNOWN,
     };
 
@@ -104,6 +106,7 @@ public:
     void                                        FindAllChildrenByType       ( const char* szType, lua_State* pLua );
     void                                        GetChildren                 ( lua_State* pLua );
     bool                                        IsMyChild                   ( CElement* pElement, bool bRecursive );
+    bool                                        IsMyParent                  ( CElement* pElement, bool bRecursive );
     void                                        ClearChildren               ( void );
     void                                        GetDescendants              ( std::vector < CElement* >& outResult, bool bIncludeThis  );
     void                                        GetDescendantsByType        ( std::vector < CElement* >& outResult, bool bIncludeThis, int type );
@@ -113,7 +116,7 @@ public:
     inline CElement*                            GetParentEntity             ( void )                        { return m_pParent; };
     inline CXMLNode*                            GetXMLNode                  ( void )                        { return m_pXMLNode; };
 
-    CElement*                                   SetParentObject             ( CElement* pParent );
+    CElement*                                   SetParentObject             ( CElement* pParent, bool bUpdatePerPlayerEntities = true );
     void                                        SetXMLNode                  ( CXMLNode* pNode );
 
     bool                                        AddEvent                    ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated );
@@ -130,7 +133,7 @@ public:
     bool                                        GetCustomDataInt            ( const char* szName, int& iOut, bool bInheritData );
     bool                                        GetCustomDataFloat          ( const char* szName, float& fOut, bool bInheritData );
     bool                                        GetCustomDataBool           ( const char* szName, bool& bOut, bool bInheritData );
-    void                                        SetCustomData               ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized = true, CPlayer* pClient = NULL );
+    void                                        SetCustomData               ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized = true, CPlayer* pClient = NULL, bool bTriggerEvent = true );
     bool                                        DeleteCustomData            ( const char* szName, bool bRecursive );
     void                                        DeleteAllCustomData         ( CLuaMain* pLuaMain, bool bRecursive );
 
@@ -229,10 +232,6 @@ protected:
     void                                        CallEventNoParent           ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller = NULL );
     void                                        CallParentEvent             ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller = NULL );
 
-public:
-    CIntrusiveListNode < CElement >             m_FromRootNode;     // Our node entry in the 'EntitiesFromRoot' list
-protected:
-    CIntrusiveListNode < CElement >             m_ChildrenNode;     // Our node entry in the parent object m_Children list
 
     CMapEventManager*                           m_pEventManager;
     CCustomData*                                m_pCustomData;

@@ -119,7 +119,8 @@ protected:
     bool                OnMouseClick            ( CGUIMouseEventArgs Args );
     bool                OnMouseDoubleClick      ( CGUIMouseEventArgs Args );
 
-    void                CreateHistoryList               ( void );
+    void                CreateHistoryList       ( void );
+    bool                CanBrowseVersion        ( const SString& strVersion );
 
     int                 m_iSelectedServer[ SERVER_BROWSER_TYPE_COUNT ];
 
@@ -247,6 +248,7 @@ private:
     ServerBrowserType       m_PrevServerBrowserType;
 
     std::map < SString, int > m_blockedVersionMap;
+    std::map < SString, int > m_allowedVersionMap;
 
 	CGUIWindow* 			m_pQuickConnectHelpWindow;
 	bool 					m_bFocusTextEdit;

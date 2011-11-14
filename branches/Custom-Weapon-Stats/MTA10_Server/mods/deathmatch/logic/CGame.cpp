@@ -85,6 +85,7 @@ CGame::CGame ( void )
     m_pBanManager = NULL;
     m_pTeamManager = NULL;
     m_pMainConfig = NULL;
+    m_pDatabaseManager = NULL;
     m_pRegistryManager = NULL;
     m_pRegistry = NULL;
     m_pAccountManager = NULL;
@@ -239,6 +240,7 @@ CGame::~CGame ( void )
     m_pRegistry = NULL;
     SAFE_DELETE ( m_pAccountManager );
     SAFE_DELETE ( m_pRegistryManager );
+    SAFE_DELETE ( m_pDatabaseManager );
     SAFE_DELETE ( m_pRegisteredCommands );
     SAFE_DELETE ( m_pPedManager );
     SAFE_DELETE ( m_pHTTPD );
@@ -310,79 +312,65 @@ void CGame::DoPulse ( void )
     }
     m_usFrames++;
 
+    CLOCK_SET_SECTION( "CGame::DoPulse" );
+    CLOCK_CALL1( g_pNetServer->GetHTTPDownloadManager()->ProcessQueuedFiles(); );
 
-    //_asm int 3
-    g_pNetServer->GetHTTPDownloadManager()->ProcessQueuedFiles();
-
-    // TODO: Low Priorityy: No need to do this every frame. Could be done every minute or so.
-    // Remove any players that have been connected for very long (90 sec) but hasn't reached the verifying step
-    list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-    for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
-    {
-        if ( (*iter)->GetStatus () == STATUS_CONNECTED && GetTime () > (*iter)->GetTimeConnected () + 90000 )
-        {
-            // Tell the console he timed out due during connect
-            char szIP [64];
-            CLogger::LogPrintf ( "INFO: %s (%s) timed out during connect\n", (*iter)->GetNick (), (*iter)->GetSourceIP ( szIP ) );
-
-            // Remove him
-            delete *iter;
-            break;
-        }
-    }
-
-    m_pPlayerManager->DoPulse ();
+    CLOCK_CALL1( m_pPlayerManager->DoPulse (); );
 
     // Pulse the net interface
-    g_pNetServer->DoPulse ();
+    CLOCK_CALL1( g_pNetServer->DoPulse (); );
 
     if ( m_pLanBroadcast )
-        m_pLanBroadcast->DoPulse();
+    {
+        CLOCK_CALL1( m_pLanBroadcast->DoPulse(); );
+    }
 
     // Pulse our stuff
-    m_pMapManager->DoPulse ();
-    m_pUnoccupiedVehicleSync->DoPulse ();
-    m_pPedSync->DoPulse ();
+    CLOCK_CALL1( m_pMapManager->DoPulse (); );
+    CLOCK_CALL1( m_pUnoccupiedVehicleSync->DoPulse (); );
+    CLOCK_CALL1( m_pPedSync->DoPulse (); );
 #ifdef WITH_OBJECT_SYNC
-    m_pObjectSync->DoPulse ();
+    CLOCK_CALL1( m_pObjectSync->DoPulse (); );
 #endif
-    m_pBanManager->DoPulse ();
-    m_pAccountManager->DoPulse ();
-    m_pRegistryManager->DoPulse ();
-    m_pACLManager->DoPulse ();
+    CLOCK_CALL1( m_pBanManager->DoPulse (); );
+    CLOCK_CALL1( m_pAccountManager->DoPulse (); );
+    CLOCK_CALL1( m_pRegistryManager->DoPulse (); );
+    CLOCK_CALL1( m_pACLManager->DoPulse (); );
     
     // Handle the traffic light sync
     if (m_bTrafficLightsLocked == false)
     {
-        ProcessTrafficLights (ulCurrentTime);
+        CLOCK_CALL1( ProcessTrafficLights (ulCurrentTime); );
     }
 
     // Pulse ASE
     if ( m_pASE )
     {
-        m_pASE->DoPulse ();
+        CLOCK_CALL1( m_pASE->DoPulse (); );
     }
 
     // Pulse the scripting system
     if ( m_pLuaManager )
     {
-        m_pLuaManager->DoPulse ();
+        CLOCK_CALL1( m_pLuaManager->DoPulse (); );
     }
 
+    CLOCK_CALL1( m_pDatabaseManager->DoPulse (); );
+
     // Process our resource stop/restart queue
-    m_pResourceManager->ProcessQueue ();
+    CLOCK_CALL1( m_pResourceManager->ProcessQueue (); );
 
     // Delete all items requested
-    m_ElementDeleter.DoDeleteAll ();
+    CLOCK_CALL1( m_ElementDeleter.DoDeleteAll (); );
 
-    CPerfStatManager::GetSingleton ()->DoPulse ();
+    CLOCK_CALL1( CPerfStatManager::GetSingleton ()->DoPulse (); );
 
     PulseMasterServerAnnounce ();
 
     if ( m_pOpenPortsTester )
         m_pOpenPortsTester->Poll ();
 
-    m_lightsyncManager.DoPulse ();
+    CLOCK_CALL1( m_lightsyncManager.DoPulse (); );
 
     // Unlock the critical section again
     Unlock();
@@ -443,23 +431,29 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     {
         strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "mtaserver.conf" );
     }
+    m_pMainConfig->SetFileName ( strBuffer );
 
     m_pResourceDownloader = new CResourceDownloader();
 
     // Load the main config base
-    if ( !m_pMainConfig->Load ( strBuffer ) )
+    if ( !m_pMainConfig->Load () )
         return false;
 
     // Let the main config handle selecting settings from the command line where appropriate
     m_pMainConfig->SetCommandLineParser ( &m_CommandLineParser );
 
-    const SString strServerIP = m_pMainConfig->GetServerIP ();
+    // Do basic backup
+    HandleBackup ();
 
+    // Read some settings
+    m_pACLManager->SetFileName ( m_pMainConfig->GetAccessControlListFile ().c_str () );
+    const SString strServerIP = m_pMainConfig->GetServerIP ();
     unsigned short usServerPort = m_pMainConfig->GetServerPort ();
     unsigned int uiMaxPlayers = m_pMainConfig->GetMaxPlayers ();
 
     // Create the account manager
     strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "internal.db" );
+    m_pDatabaseManager = NewDatabaseManager ();
     m_pRegistryManager = new CRegistryManager ();
     m_pAccountManager = new CAccountManager ( NULL, strBuffer );
 
@@ -675,7 +669,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     }
 
     // Load the ACL's
-    if ( !m_pACLManager->Load ( const_cast < char* > ( m_pMainConfig->GetAccessControlListFile ().c_str () ) ) )
+    if ( !m_pACLManager->Load () )
         return false;
 
     // Load the registry
@@ -1183,10 +1177,19 @@ void CGame::InitialDataStream ( CPlayer& Player )
     {
         char szIP [ 25 ];
         Player.GetSourceIP ( szIP );
+        std::string strPlayerSerial = Player.GetSerial();
         CAccount* pAccount = m_pAccountManager->Get ( Player.GetNick (), szIP );
         if ( pAccount )
         {
-            m_pAccountManager->LogIn ( &Player, &Player, pAccount, true );
+            if ( !pAccount->GetClient ( ) )
+            {
+                m_pAccountManager->LogIn ( &Player, &Player, pAccount, true );
+            }
+            else
+            {
+                CLogger::AuthPrintf ( "LOGIN: %s failed to login in as '%s' (IP: %s  Serial: %s) due to the account already being in use.\n", Player.GetNick (), pAccount->GetName ().c_str (), szIP, strPlayerSerial.c_str () );
+                Player.SendEcho ( "auto-login: You could not login because your account is already in use." );
+            }
         }
     }
 
@@ -1331,6 +1334,7 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onElementDestroy", "", NULL, false );
     m_Events.AddEvent ( "onElementStartSync", "newSyncer", NULL, false );
     m_Events.AddEvent ( "onElementStopSync", "oldSyncer", NULL, false );
+    m_Events.AddEvent ( "onElementModelChange", "oldModel, newModel", NULL, false );
 
     // Radar area events
 
@@ -1444,6 +1448,10 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
         CPlayer* pPlayer = m_pPlayerManager->Create ( Packet.GetSourceSocket () );
         if ( pPlayer )
         {
+            // Set the bitstream version number for this connection
+            pPlayer->SetBitStreamVersion ( Packet.GetBitStreamVersion () );
+            g_pNetServer->SetClientBitStreamVersion ( Packet.GetSourceSocket (), Packet.GetBitStreamVersion () );
+
             // Get the serial number from the packet source
             NetServerPlayerID p = Packet.GetSourceSocket ();
             SString strSerial        = p.GetSerial ();
@@ -1499,13 +1507,9 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 pPlayer->SetNick ( szNick );
                                 pPlayer->SetGameVersion ( Packet.GetGameVersion () );
                                 pPlayer->SetMTAVersion ( Packet.GetMTAVersion () );
-                                pPlayer->SetBitStreamVersion ( Packet.GetBitStreamVersion () );
                                 pPlayer->SetSerialUser ( Packet.GetSerialUser () );
                                 pPlayer->SetSerial ( strSerial );
                                 pPlayer->SetPlayerVersion ( strPlayerVersion );
-
-                                // Set the bitstream version number for this connection
-                                g_pNetServer->SetClientBitStreamVersion ( Packet.GetSourceSocket (), Packet.GetBitStreamVersion () );
 
                                 // Check if client must update
                                 if ( GetConfig ()->IsBelowMinimumClient ( pPlayer->GetPlayerVersion () ) )
@@ -3087,8 +3091,6 @@ void CGame::Packet_Voice_Data ( CVoiceDataPacket& Packet )
 
 void CGame::Packet_Voice_End ( CVoiceEndPacket& Packet )
 {
-    unsigned short usDataLength = 0;
-
     if ( m_pMainConfig->IsVoiceEnabled() ) // Shouldn't really be receiving voice packets at all if voice is disabled
     {
         CPlayer* pPlayer = Packet.GetSourcePlayer();
@@ -3297,4 +3299,117 @@ void CGame::SetCloudsEnabled ( bool bEnabled )
 bool CGame::GetCloudsEnabled ( void )
 {
     return m_bCloudsEnabled;
+}
+
+
+//
+// Handle basic backup of databases and config files
+//
+void CGame::HandleBackup ( void )
+{
+    // Get backup vars
+    SString strBackupPath = PathConform ( m_pMainConfig->GetBackupPath () ).TrimEnd ( PATH_SEPERATOR );
+    int iBackupInterval = m_pMainConfig->GetBackupInterval ();
+    uint uiBackupAmount = m_pMainConfig->GetBackupAmount ();
+    if ( iBackupInterval == 0 || uiBackupAmount == 0 )
+        return;
+
+    // Check if brand new installation
+    CModManager* pModManager = g_pServerInterface->GetModManager ();
+    if ( !DirectoryExists ( m_pMainConfig->GetSystemDatabasesPath () ) &&
+         !FileExists ( m_pMainConfig->GetLogFile () ) &&
+         !FileExists ( pModManager->GetAbsolutePath ( "internal.db" ) ) )
+    {
+        return;
+    }
+
+    // Determine date now
+    time_t secondsNow = time ( NULL );
+
+    // Determine last backup date
+    std::vector < SString > fileList = FindFiles ( strBackupPath + "/", true, false );
+
+    // Check each file name is a valid backup name
+    for ( uint f = 0 ; f < fileList.size () ; f++ )
+    {
+        SString strName = fileList[f];
+        const SString strCheck = "0000-00-00.zip";
+        for ( uint i = 0 ; i < Min ( strCheck.length (), strName.length () ) ; i++ )
+            if ( !isdigit( strName[i] ) || !isdigit( strCheck[i] ) )
+                if ( strName[i] != strCheck[i] )
+                {
+                    ListRemoveIndex ( fileList, f-- );
+                    break;
+                }
+    }
+
+    // Alpha sort
+    std::sort ( fileList.rbegin (), fileList.rend () );
+
+    // Check date of last backup
+    if ( !fileList.empty () )
+    {
+        SString strNewest = fileList.front ();
+        tm timeinfo;
+        memset ( &timeinfo, 0, sizeof ( timeinfo ) );
+        timeinfo.tm_year    = atoi ( strNewest.SubStr ( 0, 4 ) ) - 1900;
+        timeinfo.tm_mon     = atoi ( strNewest.SubStr ( 5, 2 ) ) - 1;
+        timeinfo.tm_mday    = atoi ( strNewest.SubStr ( 8, 2 ) );
+
+        time_t timeSinceBackup = secondsNow - mktime ( &timeinfo );
+        if ( timeSinceBackup < iBackupInterval * 86400L )
+            return;     // No backup required
+    }
+
+    // Make target file name
+    tm* tmp = gmtime ( &secondsNow );
+    char outstr[200] = { 0 };
+    strftime ( outstr, sizeof ( outstr ), "%Y-%m-%d", tmp );
+    SString strDateNow = outstr;
+    SString strBackupZip = PathJoin ( strBackupPath, strDateNow + ".zip" );
+    SString strTempZip = PathJoin ( strBackupPath, strDateNow + "_temp.zip" );
+
+    if ( FileExists ( strBackupZip ) )
+        return;     // Can't do backup as target file already exists
+
+    MkDir ( strBackupPath );
+
+    // Delete previous temp zip if any
+    FileDelete ( strTempZip );
+
+    CZipMaker zipMaker ( strTempZip );
+    if ( !zipMaker.IsValid () )
+        return;     // Can't do backup as can't create target zip
+
+    CLogger::LogPrintfNoStamp ( "Please wait...\n" );
+
+    // Backup config files
+    zipMaker.InsertFile ( pModManager->GetAbsolutePath ( "mtaserver.conf" ),        PathJoin ( "config", "mtaserver.conf" ) );
+    zipMaker.InsertFile ( m_pMainConfig->GetAccessControlListFile (),               PathJoin ( "config", "acl.xml" ) );
+    zipMaker.InsertFile ( pModManager->GetAbsolutePath ( FILENAME_BANLIST ),        PathJoin ( "config", "banlist.xml" ) );
+    zipMaker.InsertFile ( pModManager->GetAbsolutePath ( "editor.conf" ),           PathJoin ( "config", "editor.conf" ) );
+    zipMaker.InsertFile ( pModManager->GetAbsolutePath ( "editor_acl.xml" ),        PathJoin ( "config", "editor_acl.xml" ) );
+    zipMaker.InsertFile ( pModManager->GetAbsolutePath ( "local.conf" ),            PathJoin ( "config", "local.conf" ) );
+    zipMaker.InsertFile ( m_pMainConfig->GetIdFile (),                              PathJoin ( "config", "server-id.keys" ) );
+    zipMaker.InsertFile ( pModManager->GetAbsolutePath ( FILENAME_SETTINGS ),       PathJoin ( "config", "settings.xml" ) );
+    zipMaker.InsertFile ( pModManager->GetAbsolutePath ( "vehiclecolors.conf" ),    PathJoin ( "config", "vehiclecolors.conf" ) );
+
+    // Backup database files
+    zipMaker.InsertDirectoryTree ( m_pMainConfig->GetGlobalDatabasesPath (),        PathJoin ( "databases", "global" ) );
+    zipMaker.InsertDirectoryTree ( m_pMainConfig->GetSystemDatabasesPath (),        PathJoin ( "databases", "system" ) );
+    zipMaker.InsertFile ( pModManager->GetAbsolutePath ( "internal.db" ),           PathJoin ( "databases", "other", "internal.db" ) );
+    zipMaker.InsertFile ( pModManager->GetAbsolutePath ( "registry.db" ),           PathJoin ( "databases", "other", "registry.db" ) );
+
+    zipMaker.Close ();
+
+    // Rename temp file to final name
+    FileRename ( strTempZip, strBackupZip );
+
+    // Remove backups over min required
+    while ( fileList.size () >= uiBackupAmount )
+    {
+        SString strOldest = fileList.back ();
+        FileDelete ( PathJoin ( strBackupPath, strOldest ) );
+        fileList.pop_back ();
+    }
 }

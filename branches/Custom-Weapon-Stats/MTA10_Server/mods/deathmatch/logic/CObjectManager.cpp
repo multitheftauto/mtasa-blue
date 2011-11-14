@@ -140,7 +140,7 @@ void CObjectManager::DeleteAll ( void )
 {
     // Delete all objects, make sure they dont remove themselves from our list (would make this damn slow)
     m_bRemoveFromList = false;
-    list < CObject* > ::const_iterator iter = m_List.begin ();
+    CObjectListType::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end (); iter++ )
     {
         delete *iter;
@@ -155,7 +155,7 @@ void CObjectManager::DeleteAll ( void )
 bool CObjectManager::Exists ( CObject* pObject )
 {
     // Find the object in the list
-    list < CObject* > ::const_iterator iter = m_List.begin ();
+    CObjectListType::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end (); iter++ )
     {
         if ( *iter == pObject )

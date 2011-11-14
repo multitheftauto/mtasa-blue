@@ -246,6 +246,26 @@ bool CShaderItem::SetValue ( const SString& strName, const float* pfValues, uint
 
 ////////////////////////////////////////////////////////////////
 //
+// CShaderItem::SetTessellation
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CShaderItem::SetTessellation ( uint uiTessellationX, uint uiTessellationY )
+{
+    // Check if value is changing
+    if ( uiTessellationX != m_pShaderInstance->m_uiTessellationX || uiTessellationY != m_pShaderInstance->m_uiTessellationY )
+    {
+        // Check if we need a new shader instance
+        MaybeRenewShaderInstance ();
+        m_pShaderInstance->m_uiTessellationX = uiTessellationX;
+        m_pShaderInstance->m_uiTessellationY = uiTessellationY;
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // CShaderItem::MaybeRenewShaderInstance
 //
 // If current instance is in use by something else (i.e. in draw queue), we must create a new instance before changing parameter values

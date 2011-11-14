@@ -295,5 +295,6 @@ void CClientRenderElementManager::Remove ( CClientRenderElement* pElement )
         m_uiStatsTextureCount--;
 
     // Release render item
-    m_pRenderItemManager->ReleaseRenderItem ( pElement->GetRenderItem () );
+    CRenderItem* pRenderItem = pElement->GetRenderItem ();
+    SAFE_RELEASE( pRenderItem );
 }

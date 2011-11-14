@@ -62,10 +62,8 @@ bool SharedUtil::FileLoad ( const SString& strFilename, SString& strBuffer, int 
     if ( !FileLoad ( strFilename, buffer, iMaxSize ) )
         return false;
     if ( buffer.size () )
-    {
-        buffer.push_back ( 0 );
-        strBuffer = SString ( &buffer.at ( 0 ), buffer.size () );
-    }
+        strBuffer = std::string ( &buffer.at ( 0 ), buffer.size () );
+
     return true;
 }
 
@@ -341,7 +339,7 @@ bool SharedUtil::DelTree ( const SString& strPath, const SString& strInsideHere 
 }
 #endif
 
-#ifdef WIN32
+
 ///////////////////////////////////////////////////////////////
 //
 // MkDir
@@ -353,10 +351,10 @@ bool SharedUtil::DelTree ( const SString& strPath, const SString& strInsideHere 
 bool SharedUtil::MkDir ( const SString& strInPath, bool bTree )
 {
     SString strPath = PathConform ( strInPath );
-    MakeSureDirExists ( strPath + "\\" );
-    return FindFiles ( strPath, false, true ).size () > 0;
+    MakeSureDirExists ( strPath + PATH_SEPERATOR );
+    return DirectoryExists ( strPath );
 }
-#endif
+
 
 ///////////////////////////////////////////////////////////////
 //
@@ -561,7 +559,6 @@ SString SharedUtil::ExtractBeforeExtention ( const SString& strPathFilename )
 }
 
 
-#ifdef WIN32
 SString SharedUtil::MakeUniquePath ( const SString& strPathFilename )
 {
     SString strBeforeUniqueChar, strAfterUniqueChar;
@@ -583,10 +580,19 @@ SString SharedUtil::MakeUniquePath ( const SString& strPathFilename )
 
     SString strTest = strPathFilename;
     int iCount = 1;
+#ifdef WIN32
     while ( GetFileAttributes ( strTest ) != INVALID_FILE_ATTRIBUTES )
+#else
+    while ( DirectoryExists ( strTest ) || FileExists ( strTest ) )
+#endif
     {
         strTest = SString ( "%s_%d%s", strBeforeUniqueChar.c_str (), iCount++, strAfterUniqueChar.c_str () );
     }
     return strTest;
 }
-#endif
+
+// Conform a path string for sorting
+SString SharedUtil::ConformPathForSorting ( const SString& strPathFilename )
+{
+    return PathConform ( strPathFilename ).ToLower ();
+}

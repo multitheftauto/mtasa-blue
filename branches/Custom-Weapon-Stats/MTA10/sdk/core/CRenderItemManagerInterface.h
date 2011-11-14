@@ -29,7 +29,19 @@ class CScreenSourceItem;
 class CRenderItemManager;
 class CD3DDUMMY;
 class CSHADERDUMMY;
+class CEffectCloner;
 
+#define RDEFAULT            ((uint) -1)
+
+enum ERenderFormat
+{
+    RFORMAT_UNKNOWN,
+    RFORMAT_DXT1                 = '1TXD',
+    RFORMAT_DXT2                 = '2TXD',
+    RFORMAT_DXT3                 = '3TXD',
+    RFORMAT_DXT4                 = '4TXD',
+    RFORMAT_DXT5                 = '5TXD',
+};
 
 enum eDxTestMode
 {
@@ -84,14 +96,10 @@ public:
     // CRenderItemManagerInterface
     virtual CDxFontItem*        CreateDxFont                        ( const SString& strFullFilePath, uint uiSize, bool bBold ) = 0;
     virtual CGuiFontItem*       CreateGuiFont                       ( const SString& strFullFilePath, const SString& strFontName, uint uiSize ) = 0;
-    virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath ) = 0;
+    virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN ) = 0;
     virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug ) = 0;
-    virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel ) = 0;
+    virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false ) = 0;
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY ) = 0;
-    virtual void                ReleaseRenderItem                   ( CRenderItem* pItem ) = 0;
-    virtual bool                SetShaderValue                      ( CShaderItem* pItem, const SString& strName, CTextureItem* pTextureItem ) = 0;
-    virtual bool                SetShaderValue                      ( CShaderItem* pItem, const SString& strName, bool bValue ) = 0;
-    virtual bool                SetShaderValue                      ( CShaderItem* pItem, const SString& strName, const float* pfValues, uint uiCount ) = 0;
     virtual bool                SetRenderTarget                     ( CRenderTargetItem* pItem, bool bClear ) = 0;
     virtual bool                SaveDefaultRenderTarget             ( void ) = 0;
     virtual bool                RestoreDefaultRenderTarget          ( void ) = 0;
@@ -104,6 +112,7 @@ public:
     virtual eDxTestMode         GetTestMode                         ( void ) = 0;
     virtual void                SetTestMode                         ( eDxTestMode testMode ) = 0;
     virtual void                GetDxStatus                         ( SDxStatus& outStatus ) = 0;
+    virtual CEffectCloner*      GetEffectCloner                     ( void ) = 0;
 };
 
 
@@ -138,6 +147,7 @@ enum eRenderItemClassTypes
     CLASS_CGuiFontItem,
     CLASS_CMaterialItem,
     CLASS_CEffectWrap,
+    CLASS_CEffectTemplate,
     CLASS_CShaderItem,
     CLASS_CShaderInstance,
     CLASS_CTextureItem,
@@ -159,18 +169,19 @@ class CRenderItem
     virtual         ~CRenderItem            ( void );
     virtual void    PostConstruct           ( CRenderItemManager* pManager );
     virtual void    PreDestruct             ( void );
-    void            Release                 ( void );
-    void            AddRef                  ( void );
+    virtual void    Release                 ( void );
+    virtual void    AddRef                  ( void );
     virtual bool    IsValid                 ( void ) = 0;
     virtual void    OnLostDevice            ( void ) = 0;
     virtual void    OnResetDevice           ( void ) = 0;
     int             GetVideoMemoryKBUsed    ( void ) { return m_iMemoryKBUsed; }
-    void            ReleaseRenderItem       ( void ) { ((CRenderItemManagerInterface*)m_pManager)->ReleaseRenderItem ( this ); }
+    int             GetRevision             ( void ) { return m_iRevision; }
 
     CRenderItemManager* m_pManager;
     IDirect3DDevice9*   m_pDevice;
     int                 m_iRefCount;
     int                 m_iMemoryKBUsed;
+    int                 m_iRevision;
 };
 
 
@@ -279,11 +290,12 @@ class CShaderItem : public CMaterialItem
     virtual void    OnResetDevice           ( void );
     void            CreateUnderlyingData    ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
     void            ReleaseUnderlyingData   ( void );
-    bool            SetValue                ( const SString& strName, CTextureItem* pTextureItem );
-    bool            SetValue                ( const SString& strName, bool bValue );
-    bool            SetValue                ( const SString& strName, const float* pfValues, uint uiCount );
+    virtual bool    SetValue                ( const SString& strName, CTextureItem* pTextureItem );
+    virtual bool    SetValue                ( const SString& strName, bool bValue );
+    virtual bool    SetValue                ( const SString& strName, const float* pfValues, uint uiCount );
     void            MaybeRenewShaderInstance ( void );
     void            RenewShaderInstance     ( void );
+    virtual void    SetTessellation         ( uint uiTessellationX, uint uiTessellationY );
 
     CEffectWrap*        m_pEffectWrap;
     float               m_fPriority;
@@ -322,6 +334,8 @@ class CShaderInstance : public CMaterialItem
     void            ApplyShaderParameters   ( void );
 
     CEffectWrap*        m_pEffectWrap;
+    uint                m_uiTessellationX;
+    uint                m_uiTessellationY;
     std::map < D3DXHANDLE, SShaderValue > m_currentSetValues;
 };
 
@@ -351,12 +365,12 @@ class CFileTextureItem : public CTextureItem
 {
     DECLARE_CLASS( CFileTextureItem, CTextureItem )
                     CFileTextureItem        ( void ) : ClassInit ( this ) {}
-    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename );
+    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN );
     virtual void    PreDestruct             ( void );
     virtual bool    IsValid                 ( void );
     virtual void    OnLostDevice            ( void );
     virtual void    OnResetDevice           ( void );
-    void            CreateUnderlyingData    ( const SString& strFilename );
+    void            CreateUnderlyingData    ( const SString& strFilename, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN );
     void            ReleaseUnderlyingData   ( void );
 };
 

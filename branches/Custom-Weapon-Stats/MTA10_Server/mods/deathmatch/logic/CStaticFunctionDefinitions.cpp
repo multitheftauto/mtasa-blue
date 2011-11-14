@@ -278,7 +278,7 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
     {
         // Copy the current children list (prevents a continuous loop)
         std::list < CElement* > copyList;
-        for ( CChildListType ::iterator iter = pElement->IterBegin (); iter != pElement->IterEnd (); iter++ )
+        for ( CChildListType ::const_iterator iter = pElement->IterBegin (); iter != pElement->IterEnd (); iter++ )
         {
             copyList.push_back ( *iter );
         }
@@ -1541,7 +1541,11 @@ bool CStaticFunctionDefinitions::SetElementModel ( CElement* pElement, unsigned 
             CPed * pPed = static_cast < CPed* > ( pElement );
             if ( pPed->GetModel () == usModel ) return false;
             if ( !CPlayerManager::IsValidPlayerModel ( usModel ) ) return false;
-            pPed->SetModel ( usModel );
+            CLuaArguments Arguments;
+            Arguments.PushNumber ( pPed->GetModel() ); // Get the old model
+            pPed->SetModel ( usModel ); // Set the new model
+            Arguments.PushNumber ( usModel ); // Get the new model
+            pPed->CallEvent ( "onElementModelChange", Arguments, false );
             break;
         }
         case CElement::VEHICLE:
@@ -1549,7 +1553,11 @@ bool CStaticFunctionDefinitions::SetElementModel ( CElement* pElement, unsigned 
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
             if ( pVehicle->GetModel () == usModel ) return false;
             if ( !CVehicleManager::IsValidModel ( usModel ) ) return false;
-            pVehicle->SetModel ( usModel );
+            CLuaArguments Arguments;
+            Arguments.PushNumber ( pVehicle->GetModel () ); // Get the old model
+            pVehicle->SetModel ( usModel ); // Set the new model
+            Arguments.PushNumber ( usModel ); // Get the new model
+            pVehicle->CallEvent ( "onElementModelChange", Arguments, false );
 
             // Check for any passengers above the max seat list
             unsigned char ucMaxPassengers = pVehicle->GetMaxPassengers ();
@@ -1574,7 +1582,11 @@ bool CStaticFunctionDefinitions::SetElementModel ( CElement* pElement, unsigned 
             CObject * pObject = static_cast < CObject* > ( pElement );
             if ( pObject->GetModel () == usModel ) return false;
             if ( !CObjectManager::IsValidModel ( usModel ) ) return false;
-            pObject->SetModel ( usModel );
+			CLuaArguments Arguments;
+            Arguments.PushNumber ( pObject->GetModel () ); // Get the old model
+            pObject->SetModel ( usModel ); // Set the new model
+            Arguments.PushNumber ( usModel ); // Get the new model
+            pObject->CallEvent ( "onElementModelChange", Arguments, false );
             break;
         }
         default: return false;
@@ -4404,8 +4416,21 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource* pResource, unsi
 
         unsigned char ucVariation = ucVariant;
         unsigned char ucVariation2 = ucVariant2;
-        if ( ucVariant2 == 255 && ucVariant == 255 )
-            CVehicleManager::GetRandomVariation ( usModel, ucVariation, ucVariation2 );
+        srand ( GetTickCount32 ( ) );
+        // 6 values (-1 to 5)
+        if ( ucVariant == 255 )
+            ucVariation = ( rand() % 6 ) - 1;
+        if ( ucVariant2 == 255 )
+            ucVariation2 = ( rand() % 6 ) - 1;
+
+        // Don't spawn a slamvan without a steering wheel
+        if ( usModel == 535 && 
+            ( ucVariation2 >= 2 || ucVariation2 == 255 ) &&
+            ( ucVariation >= 2 || ucVariation == 255 ) )
+        {
+            ucVariation2 = 0;
+            ucVariation = rand ( ) % 1;
+        }
 
         //CVehicle* pVehicle = m_pVehicleManager->Create ( usModel, m_pMapManager->GetRootElement () );
         CVehicle* pVehicle = m_pVehicleManager->Create ( usModel, ucVariation, ucVariation2, pResource->GetDynamicElementRoot() );
@@ -8445,7 +8470,7 @@ bool CStaticFunctionDefinitions::SetPlayerTeam ( CPlayer* pPlayer, CTeam* pTeam 
 
         // Tell everyone his new team
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( pTeam->GetID ( ) );
+        BitStream.pBitStream->Write ( pTeam ? pTeam->GetID ( ) : INVALID_ELEMENT_ID );
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pPlayer, SET_PLAYER_TEAM, *BitStream.pBitStream ) );
 
         return true;
@@ -9875,7 +9900,7 @@ CAccount* CStaticFunctionDefinitions::GetAccount ( const char* szName, const cha
 bool CStaticFunctionDefinitions::GetAccounts ( CLuaMain* pLuaMain )
 {
     lua_State* pLua = pLuaMain->GetVM();
-    list < CAccount* > ::const_iterator iter = m_pAccountManager->IterBegin();
+    CMappedAccountList::const_iterator iter = m_pAccountManager->IterBegin();
     unsigned int uiIndex = 0;
     const char* szGuest =  "guest";
     const char* szHTTPGuest = "http_guest";
@@ -10520,12 +10545,12 @@ CXMLNode* CStaticFunctionDefinitions::AddResourceMap ( CResource* pResource, con
                             }
                             else
                             {
-                                CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Unable to alter meta file", strMapName.c_str(), pResource->GetName ().c_str () );
+                                CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Unable to alter meta file\n", strMapName.c_str(), pResource->GetName ().c_str () );
                             }
                         }
                         else
                         {
-                            CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Unable to write XML", strMapName.c_str(), pResource->GetName ().c_str () );
+                            CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Unable to write XML\n", strMapName.c_str(), pResource->GetName ().c_str () );
                         }
 
                         // Destroy the XML if we failed
@@ -10533,16 +10558,16 @@ CXMLNode* CStaticFunctionDefinitions::AddResourceMap ( CResource* pResource, con
                     }
                 }
                 else
-                    CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; File already exists in resource", strMapName.c_str(), pResource->GetName ().c_str () );
+                    CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; File already exists in resource\n", strMapName.c_str(), pResource->GetName ().c_str () );
             }
             else
-                CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Resource is in a zip file", strMapName.c_str(), pResource->GetName ().c_str () );
+                CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Resource is in a zip file\n", strMapName.c_str(), pResource->GetName ().c_str () );
         }
         else
-            CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Resource is in use", strMapName.c_str(), pResource->GetName ().c_str () );
+            CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Resource is in use\n", strMapName.c_str(), pResource->GetName ().c_str () );
     }
     else
-        CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Resource is not loaded", strMapName.c_str(), pResource->GetName ().c_str () );
+        CLogger::ErrorPrintf ( "Unable to add map %s to resource %s; Resource is not loaded\n", strMapName.c_str(), pResource->GetName ().c_str () );
 
     // Failed
     return NULL;
@@ -10580,31 +10605,31 @@ CXMLNode* CStaticFunctionDefinitions::AddResourceConfig ( CResource* pResource, 
                             }
                             else
                             {
-                                CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Unable to alter meta file", strConfigName.c_str(), pResource->GetName ().c_str () );
+                                CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Unable to alter meta file\n", strConfigName.c_str(), pResource->GetName ().c_str () );
                             }
                         }
                         else
                         {
-                            CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Unable to write XML", strConfigName.c_str(), pResource->GetName ().c_str () );
+                            CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Unable to write XML\n", strConfigName.c_str(), pResource->GetName ().c_str () );
                         }
 
                         // Destroy the XML if we failed
                         pLUA->DestroyXML ( pXML );
                     }
                     else
-                        CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Unable to create XML", strConfigName.c_str(), pResource->GetName ().c_str () );
+                        CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Unable to create XML\n", strConfigName.c_str(), pResource->GetName ().c_str () );
                 }
                 else
-                    CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; File already exists in resource", strConfigName.c_str(), pResource->GetName ().c_str () );
+                    CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; File already exists in resource\n", strConfigName.c_str(), pResource->GetName ().c_str () );
             }
             else
-                CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Resource is in a zip file", strConfigName.c_str(), pResource->GetName ().c_str () );
+                CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Resource is in a zip file\n", strConfigName.c_str(), pResource->GetName ().c_str () );
         }
         else
-            CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Resource is in use", strConfigName.c_str(), pResource->GetName ().c_str () );
+            CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Resource is in use\n", strConfigName.c_str(), pResource->GetName ().c_str () );
     }
     else
-        CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Resource is not loaded", strConfigName.c_str(), pResource->GetName ().c_str () );
+        CLogger::ErrorPrintf ( "Unable to add config %s to resource %s; Resource is not loaded\n", strConfigName.c_str(), pResource->GetName ().c_str () );
 
     // Failed
     return NULL;
@@ -10636,19 +10661,19 @@ bool CStaticFunctionDefinitions::RemoveResourceFile ( CResource* pResource, cons
                         return true;
                     }
                     else
-                        CLogger::ErrorPrintf ( "Unable to remove file %s from resource %s; File does not exist", szFilename, pResource->GetName ().c_str () );
+                        CLogger::ErrorPrintf ( "Unable to remove file %s from resource %s; File does not exist\n", szFilename, pResource->GetName ().c_str () );
                 }
                 else
-                    CLogger::ErrorPrintf ( "Unable to remove file %s from resource %s; Bad filename", szFilenameUnmodified, pResource->GetName ().c_str () );
+                    CLogger::ErrorPrintf ( "Unable to remove file %s from resource %s; Bad filename\n", szFilenameUnmodified, pResource->GetName ().c_str () );
             }
             else
-                CLogger::ErrorPrintf ( "Unable to remove file %s from resource %s; Resource is in a zip file", szFilenameUnmodified, pResource->GetName ().c_str () );
+                CLogger::ErrorPrintf ( "Unable to remove file %s from resource %s; Resource is in a zip file\n", szFilenameUnmodified, pResource->GetName ().c_str () );
         }
         else
-            CLogger::ErrorPrintf ( "Unable to remove file %s from resource %s; Resource is in use", szFilenameUnmodified, pResource->GetName ().c_str () );
+            CLogger::ErrorPrintf ( "Unable to remove file %s from resource %s; Resource is in use\n", szFilenameUnmodified, pResource->GetName ().c_str () );
     }
     else
-        CLogger::ErrorPrintf ( "Unable to remove file %s from resource %s; Resource is not loaded", szFilenameUnmodified, pResource->GetName ().c_str () );
+        CLogger::ErrorPrintf ( "Unable to remove file %s from resource %s; Resource is not loaded\n", szFilenameUnmodified, pResource->GetName ().c_str () );
 
     // Failed
     return false;

@@ -18,6 +18,7 @@
 #include "CProxyDirect3DVertexBuffer.h"
 #include "CAdditionalVertexStreamManager.h"
 #include "CVertexStreamBoundingBoxManager.h"
+#include "CProxyDirect3DVertexDeclaration.h"
 
 #include <stdexcept>
 
@@ -25,6 +26,7 @@
 static IDirect3DSurface9*  ms_pSaveLockSurface  = NULL;
 static int                 ms_bSaveStarted      = 0;
 static long long           ms_LastSaveTime      = 0;
+// Other variables
 static uint                ms_RequiredAnisotropicLevel = 1;
 
 
@@ -395,6 +397,49 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
 
 /////////////////////////////////////////////////////////////
 //
+// AreVertexStreamsAreBigEnough
+//
+// Occasionally, GTA tries to draw water/clouds/something with a vertex buffer that is
+// too small (which causes problems for some graphics drivers).
+//
+// This function checks the sizes are valid
+//
+/////////////////////////////////////////////////////////////
+bool AreVertexStreamsAreBigEnough ( IDirect3DDevice9* pDevice, WORD viMinBased, WORD viMaxBased )
+{
+    // Check each stream used
+    for ( uint i = 0 ; i < NUMELMS( g_pDeviceState->VertexDeclState.bUsesStreamAtIndex ) ; i++ )
+    {
+        if ( g_pDeviceState->VertexDeclState.bUsesStreamAtIndex[i] )
+        {
+            IDirect3DVertexBuffer9* pStreamData = NULL;
+            UINT StreamOffset;
+            UINT StreamStride;
+            pDevice->GetStreamSource ( i, &pStreamData, &StreamOffset, &StreamStride );
+
+            if ( pStreamData )
+            {
+                D3DVERTEXBUFFER_DESC VertexBufferDesc;
+                pStreamData->GetDesc ( &VertexBufferDesc );
+                SAFE_RELEASE( pStreamData );
+
+                uint ReadOffsetStart = viMinBased * StreamStride + StreamOffset;
+                uint ReadOffsetSize = ( viMaxBased - viMinBased ) * StreamStride;
+
+                uint MinSizeVertexBufferShouldBe = ReadOffsetStart + ReadOffsetSize;
+
+                // Check vertex buffer is big enough to do the draw
+                if ( VertexBufferDesc.Size < MinSizeVertexBufferShouldBe )
+                    return false;
+            }
+        }
+    }
+    return true;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
 // DrawPrimitiveGuarded
 //
 // Catch access violations
@@ -403,6 +448,21 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
 HRESULT CDirect3DEvents9::DrawPrimitiveGuarded ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,UINT StartVertex,UINT PrimitiveCount )
 {
     HRESULT hr = D3D_OK;
+
+    // Check vertices used will be within the supplied vertex buffer bounds
+    if ( PrimitiveType == D3DPT_TRIANGLELIST || PrimitiveType == D3DPT_TRIANGLESTRIP )
+    {
+        UINT NumVertices = PrimitiveCount + 2;
+        if ( PrimitiveType == D3DPT_TRIANGLELIST )
+            NumVertices = PrimitiveCount * 3;
+
+        WORD viMinBased = StartVertex;
+        WORD viMaxBased = NumVertices + StartVertex;
+
+        if ( !AreVertexStreamsAreBigEnough ( pDevice, viMinBased, viMaxBased ) )
+            return hr;
+    }
+
     __try
     {
         hr = pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
@@ -425,6 +485,14 @@ HRESULT CDirect3DEvents9::DrawPrimitiveGuarded ( IDirect3DDevice9 *pDevice, D3DP
 HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount )
 {
     HRESULT hr = D3D_OK;
+
+    // Check vertices used will be within the supplied vertex buffer bounds
+    WORD viMinBased = MinVertexIndex + BaseVertexIndex;
+    WORD viMaxBased = MinVertexIndex + NumVertices + BaseVertexIndex;
+
+    if ( !AreVertexStreamsAreBigEnough ( pDevice, viMinBased, viMaxBased ) )
+        return hr;
+
     __try
     {
         hr = pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
@@ -483,4 +551,55 @@ HRESULT CDirect3DEvents9::SetStreamSource(IDirect3DDevice9 *pDevice, UINT Stream
     }
 
 	return pDevice->SetStreamSource( StreamNumber, pStreamData, OffsetInBytes, Stride );
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::CreateVertexDeclaration
+//
+// Creates a proxy object for the new vertex declaration
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::CreateVertexDeclaration ( IDirect3DDevice9 *pDevice, CONST D3DVERTEXELEMENT9* pVertexElements, IDirect3DVertexDeclaration9** ppDecl )
+{
+    HRESULT hr;
+
+    hr = pDevice->CreateVertexDeclaration ( pVertexElements, ppDecl );
+    if ( FAILED(hr) )
+        return hr;
+
+    // Create proxy
+	*ppDecl = new CProxyDirect3DVertexDeclaration ( pDevice, *ppDecl, pVertexElements );
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::SetVertexDeclaration
+//
+// Ensures the correct object gets sent to D3D
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::SetVertexDeclaration ( IDirect3DDevice9 *pDevice, IDirect3DVertexDeclaration9* pDecl )
+{
+	if( pDecl )
+	{
+        // See if it's a proxy
+	    CProxyDirect3DVertexDeclaration* pProxy = NULL;
+        pDecl->QueryInterface ( CProxyDirect3DVertexDeclaration_GUID, (void**)&pProxy );
+
+        // If so, use the original vertex declaration
+        if ( pProxy )
+        {
+            pDecl = pProxy->GetOriginal ();
+
+            // Update state info
+            CProxyDirect3DDevice9::SD3DVertexDeclState* pInfo = MapFind ( g_pProxyDevice->m_VertexDeclMap, pProxy );
+            if ( pInfo )
+                g_pDeviceState->VertexDeclState = *pInfo;
+        }
+    }
+
+    return pDevice->SetVertexDeclaration ( pDecl );
 }

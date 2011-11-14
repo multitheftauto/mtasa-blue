@@ -496,7 +496,10 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
     }
 
     SString strACInfo;
+    SString strSDInfo;
     bitStream.ReadString ( strACInfo );
+    if ( bitStream.Version () >= 0x20 )
+        bitStream.ReadString ( strSDInfo );
 
     // Grab the flags
     bool bJustJoined;
@@ -510,14 +513,17 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
     {
         SString strVerifyFiles = "Undisclosed";
         SString strDisabledAC = "Undisclosed";
+        SString strEnabledSD = "Undisclosed";
         if ( !strACInfo.empty () )
         {
             strVerifyFiles = strACInfo.SplitLeft ( "," );
             strDisabledAC = strACInfo.SplitRight ( "," );
+            strEnabledSD = strSDInfo;
             strVerifyFiles = strVerifyFiles == "-1" ? "All" : strVerifyFiles;
             strDisabledAC = strDisabledAC == "" ? "None" : strDisabledAC;
+            strEnabledSD = strEnabledSD == "" ? "None" : strEnabledSD;
         }
-        g_pCore->GetConsole ()->Print ( SString ( "Server AC info: Verify client files: %s  Disabled AC: %s", *strVerifyFiles, *strDisabledAC ) );
+        g_pCore->GetConsole ()->Print ( SString ( "Server AC info: Verify client files: %s  Disabled AC: %s  Enabled SD: %s", *strVerifyFiles, *strDisabledAC, *strEnabledSD ) );
     }
 
     // While there are bytes left, parse player list items

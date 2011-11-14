@@ -666,6 +666,8 @@ void CClientGame::DoPulsePreHUDRender ( bool bDidUnminimize, bool bDidRecreateRe
 
     // Disallow scripted dxSetRenderTarget
     g_pCore->GetGraphics ()->EnableSetRenderTarget ( false );
+
+    DebugElementRender ();
 }
 
 void CClientGame::DoPulsePostFrame ( void )
@@ -772,12 +774,13 @@ void CClientGame::DoPulsePostFrame ( void )
         }
 
         // Adjust the streaming memory limit.
-        unsigned int uiStreamingMemory;
-        g_pCore->GetCVars()->Get ( "streaming_memory", uiStreamingMemory );
-        uiStreamingMemory = SharedUtil::Clamp ( g_pCore->GetMinStreamingMemory (),
-                                                uiStreamingMemory,
+        unsigned int uiStreamingMemoryPrev;
+        g_pCore->GetCVars()->Get ( "streaming_memory", uiStreamingMemoryPrev );
+        uint uiStreamingMemory = SharedUtil::Clamp ( g_pCore->GetMinStreamingMemory (),
+                                                uiStreamingMemoryPrev,
                                                 g_pCore->GetMaxStreamingMemory () );
-        g_pCore->GetCVars()->Set ( "streaming_memory", uiStreamingMemory );
+        if ( uiStreamingMemory != uiStreamingMemoryPrev )
+            g_pCore->GetCVars()->Set ( "streaming_memory", uiStreamingMemory );
 
         int iStreamingMemoryBytes = static_cast<int>(uiStreamingMemory) * 1024 * 1024;
         if ( g_pMultiplayer->GetLimits()->GetStreamingMemory() != iStreamingMemoryBytes )
@@ -4982,7 +4985,7 @@ void CClientGame::NotifyBigPacketProgress ( unsigned long ulBytesReceived, unsig
     }
 
     m_pBigPacketTransferBox->DoPulse ();
-    m_pBigPacketTransferBox->SetInfo ( Min ( ulTotalSize, ulBytesReceived ) );
+    m_pBigPacketTransferBox->SetInfo ( Min ( ulTotalSize, ulBytesReceived ), "Map download progress:" );
 }
 
 bool CClientGame::SetGlitchEnabled ( unsigned char ucGlitch, bool bEnabled )
@@ -5061,5 +5064,30 @@ void CClientGame::InitVoice( bool bEnabled, unsigned int uiServerSampleRate, uns
     if ( m_pVoiceRecorder )
     {
         m_pVoiceRecorder -> Init ( bEnabled, uiServerSampleRate, ucQuality, uiBitrate );
+    }
+}
+
+//
+// If debug render mode is on, allow each element in range to draw some stuff
+//
+void CClientGame::DebugElementRender ( void )
+{
+    if ( !GetDevelopmentMode () || !GetShowCollision () )
+        return;
+
+    CVector vecCameraPos;
+    m_pCamera->GetPosition ( vecCameraPos );
+    float fDrawRadius = 200.f;
+
+    // Get all entities within range
+    CClientEntityResult result;
+    GetClientSpatialDatabase()->SphereQuery ( result, CSphere ( vecCameraPos, fDrawRadius ) );
+ 
+    // For each entity found
+    for ( CClientEntityResult::const_iterator it = result.begin () ; it != result.end (); ++it )
+    {
+        CClientEntity* pEntity = *it;
+        if ( pEntity->GetParent () )
+            pEntity->DebugRender ( vecCameraPos, fDrawRadius );
     }
 }

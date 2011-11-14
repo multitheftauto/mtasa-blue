@@ -25,14 +25,10 @@ public:
     // CRenderItemManagerInterface
     virtual CDxFontItem*        CreateDxFont                        ( const SString& strFullFilePath, uint uiSize, bool bBold );
     virtual CGuiFontItem*       CreateGuiFont                       ( const SString& strFullFilePath, const SString& strFontName, uint uiSize );
-    virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath );
+    virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN );
     virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug );
-    virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel );
+    virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false );
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY );
-    virtual void                ReleaseRenderItem                   ( CRenderItem* pItem );
-    virtual bool                SetShaderValue                      ( CShaderItem* pItem, const SString& strName, CTextureItem* pTextureItem );
-    virtual bool                SetShaderValue                      ( CShaderItem* pItem, const SString& strName, bool bValue );
-    virtual bool                SetShaderValue                      ( CShaderItem* pItem, const SString& strName, const float* pfValues, uint uiCount );
     virtual bool                SetRenderTarget                     ( CRenderTargetItem* pItem, bool bClear );
     virtual bool                SaveDefaultRenderTarget             ( void );
     virtual bool                RestoreDefaultRenderTarget          ( void );
@@ -45,6 +41,7 @@ public:
     virtual eDxTestMode         GetTestMode                         ( void )                    { return m_TestMode; }
     virtual void                SetTestMode                         ( eDxTestMode testMode );
     virtual void                GetDxStatus                         ( SDxStatus& outStatus );
+    virtual CEffectCloner*      GetEffectCloner                     ( void )                    { return m_pEffectCloner; }
 
     // CRenderItemManager
     void                        NotifyContructRenderItem            ( CRenderItem* pItem );
@@ -83,6 +80,7 @@ protected:
     // Shaders applied to world textures
     std::map < CD3DDUMMY*, CSHADERDUMMY* >      m_D3DDataShaderMap;
     class CRenderWare*                          m_pRenderWare;
+    CEffectCloner*                              m_pEffectCloner;
 
     eDxTestMode                                 m_TestMode;
     SString                                     m_strVideoCardName;

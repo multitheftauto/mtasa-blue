@@ -81,6 +81,7 @@ public:
     static int      GetPlayerWantedLevel                ( lua_State* luaVM );
     static int      GetAlivePlayers                     ( lua_State* luaVM );
     static int      GetDeadPlayers                      ( lua_State* luaVM );
+    static int      GetPlayerIdleTime                   ( lua_State* luaVM );
     static int      IsPlayerScoreboardForced            ( lua_State* luaVM );
     static int      IsPlayerMapForced                   ( lua_State* luaVM );
     static int      GetPlayerNametagText                ( lua_State* luaVM );
@@ -468,6 +469,13 @@ public:
     static int      RemoveRuleValue                     ( lua_State* luaVM );
     static int      GetPlayerAnnounceValue              ( lua_State* luaVM );
     static int      SetPlayerAnnounceValue              ( lua_State* luaVM );
+
+    // Database funcs
+    static int      DbConnect                           ( lua_State* luaVM );
+    static int      DbExec                              ( lua_State* luaVM );
+    static int      DbQuery                             ( lua_State* luaVM );
+    static int      DbFree                              ( lua_State* luaVM );
+    static int      DbPoll                              ( lua_State* luaVM );
 
     // Registry funcs
     static int      ExecuteSQLCreateTable               ( lua_State* luaVM );

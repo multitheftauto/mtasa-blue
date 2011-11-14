@@ -503,6 +503,7 @@ public:
     LUA_DECLARE ( dxCreateScreenSource );
     LUA_DECLARE ( dxGetMaterialSize );
     LUA_DECLARE ( dxSetShaderValue );
+    LUA_DECLARE ( dxSetShaderTessellation );
     LUA_DECLARE ( dxSetRenderTarget );
     LUA_DECLARE ( dxUpdateScreenSource );
     LUA_DECLARE ( dxGetStatus );
@@ -525,7 +526,9 @@ public:
     LUA_DECLARE ( Dereference );
     LUA_DECLARE ( GetColorFromString );
     LUA_DECLARE ( GetValidPedModels );
-    
+    LUA_DECLARE ( SetDevelopmentMode );
+    LUA_DECLARE ( GetDevelopmentMode );
+
     // GUI funcs
     LUA_DECLARE ( GUIGetInputEnabled );
     LUA_DECLARE ( GUIGetInputMode );
@@ -808,6 +811,10 @@ public:
     LUA_DECLARE ( GetPerformanceStats );
 
     LUA_DECLARE ( GetVersion );
+
+    // JSON funcs
+    LUA_DECLARE ( toJSON );
+    LUA_DECLARE ( fromJSON );
 
     // UTF functions
     LUA_DECLARE ( UtfLen );

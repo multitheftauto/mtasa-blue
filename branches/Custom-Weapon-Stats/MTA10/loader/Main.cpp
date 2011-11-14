@@ -304,7 +304,8 @@ int DoLaunchGame ( LPSTR lpCmdLine )
                                      ,"\\MTA\\cgui\\images\\radarset\\up.png"
                                      ,"\\MTA\\D3DX9_42.dll"
                                      ,"\\MTA\\D3DCompiler_42.dll"
-                                     ,"\\MTA\\bass.dll"};
+                                     ,"\\MTA\\bass.dll"
+                                     ,"\\server\\mods\\deathmatch\\libmysql.dll"};
 
     for ( uint i = 0 ; i < NUMELMS( dataFilesFiles ) ; i++ )
     {

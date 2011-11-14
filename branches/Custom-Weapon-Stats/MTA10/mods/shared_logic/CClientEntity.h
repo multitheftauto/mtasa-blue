@@ -88,7 +88,7 @@ class CLuaArgument;
 class CLuaArguments;
 class CLuaMain;
 class CMapEventManager;
-typedef CIntrusiveList < class CClientEntity > CChildListType;
+typedef CFastList < class CClientEntity > CChildListType;
 
 enum eCClientEntityClassTypes
 {
@@ -177,6 +177,7 @@ public:
     CClientEntity*                              SetParent               ( CClientEntity* pParent );
     CClientEntity*                              AddChild                ( CClientEntity* pChild );
     bool                                        IsMyChild               ( CClientEntity* pEntity, bool bRecursive );
+    bool                                        IsMyParent              ( CClientEntity* pEntity, bool bRecursive );
     inline bool                                 IsBeingDeleted          ( void )                    { return m_bBeingDeleted; }
     inline void                                 SetBeingDeleted         ( bool bBeingDeleted )      { m_bBeingDeleted = bBeingDeleted; }
     void                                        ClearChildren           ( void );
@@ -297,13 +298,11 @@ public:
     virtual CSphere                             GetWorldBoundingSphere      ( void );
     virtual void                                UpdateSpatialData           ( void );
 
+    virtual void                                DebugRender                 ( const CVector& vecPosition, float fDrawRadius ) {}
+
     float                                       GetDistanceBetweenBoundingSpheres   ( CClientEntity* pOther );
 
-public:
-    CIntrusiveListNode < CClientEntity >        m_FromRootNode;     // Our node entry in the 'EntitiesFromRoot' list
 protected:
-    CIntrusiveListNode < CClientEntity >        m_ChildrenNode;     // Our node entry in the parent object m_Children list
-
     CClientManager*                             m_pManager;
     CClientEntity*                              m_pParent;
     CChildListType                              m_Children;

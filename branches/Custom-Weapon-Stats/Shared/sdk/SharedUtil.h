@@ -51,7 +51,7 @@ typedef unsigned long       DWORD;      //  32      32      64
 #include <set>
 #include <deque>
 #include <algorithm>
-#include <limits>
+#include <limits.h>
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -68,6 +68,8 @@ typedef unsigned long       DWORD;      //  32      32      64
 #include "SharedUtil.ClassIdent.h"
 #include "SharedUtil.Hash.h"
 #include "SharedUtil.SysInfo.h"
+#include "SharedUtil.Profiling.h"
+#include "CFastList.h"
 
 #ifdef _MSC_VER
 #define snprintf _snprintf

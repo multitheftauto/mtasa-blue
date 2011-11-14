@@ -1025,3 +1025,10 @@ void COMMAND_Debug4 ( const char* szCmdLine )
     return;
 }
 #endif
+
+
+void COMMAND_ShowCollision ( const char* szCmdLine )
+{
+    g_pClientGame->SetShowCollision ( !g_pClientGame->GetShowCollision () );
+    return;
+}

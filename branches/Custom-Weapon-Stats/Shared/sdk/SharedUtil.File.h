@@ -66,6 +66,7 @@ namespace SharedUtil
     SString         GetWindowsDirectory             ( void );
     std::vector < SString > FindFiles               ( const SString& strMatch, bool bFiles, bool bDirectories );
     SString         MakeUniquePath                  ( const SString& strPathFilename );
+    SString         ConformPathForSorting           ( const SString& strPathFilename );
 
     SString         GetSystemLocalAppDataPath       ( void );
     SString         GetSystemCommonAppDataPath      ( void );

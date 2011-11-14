@@ -27,6 +27,8 @@ public:
     // Create/edit functions
     static int      createResource                      ( lua_State* luaVM );
     static int      copyResource                        ( lua_State* luaVM );
+    static int      renameResource                      ( lua_State* luaVM );
+    static int      deleteResource                      ( lua_State* luaVM );
 
     static int      addResourceMap                      ( lua_State* luaVM );
     static int      addResourceConfig                   ( lua_State* luaVM );

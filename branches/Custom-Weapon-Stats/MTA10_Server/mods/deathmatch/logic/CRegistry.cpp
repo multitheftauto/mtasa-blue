@@ -388,6 +388,10 @@ bool CRegistry::Query ( CRegistryResult* pResult, const char* szQuery, ... )
 
 bool CRegistry::Query ( CRegistryResult* pResult, const char* szQuery, va_list vl )
 {
+    // Clear result
+    if ( pResult )
+        *pResult = CRegistryResult ();
+
     if ( m_bOpened == false )
 	{
         SetLastErrorMessage ( "SQLite3 was not opened, cannot perform query!", szQuery );

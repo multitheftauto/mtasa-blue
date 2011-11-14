@@ -557,6 +557,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CProxyDirect3DVertexDeclaration.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CProxyDirectInput8.cpp"
 				>
 			</File>
@@ -582,6 +586,14 @@
 			</File>
 			<File
 				RelativePath=".\CRenderItem.DxFont.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.EffectCloner.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.EffectTemplate.cpp"
 				>
 			</File>
 			<File
@@ -938,6 +950,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CProxyDirect3DVertexDeclaration.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CProxyDirectInput8.h"
 				>
 			</File>
@@ -951,6 +967,10 @@
 			</File>
 			<File
 				RelativePath=".\CQuickConnect.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.EffectCloner.h"
 				>
 			</File>
 			<File
@@ -1617,6 +1637,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\CFastList.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\CMatrix.h"
 					>
 				</File>
@@ -1726,6 +1750,14 @@
 				</File>
 				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.Misc.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Profiling.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Profiling.hpp"
 					>
 				</File>
 				<File

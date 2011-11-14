@@ -63,7 +63,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     SetupMapVariables ();
 
     // Create the radar and local player blip images
-    m_pRadarImage = g_pCore->GetGraphics()->GetRenderItemManager ()->CreateTexture ( CalcMTASAPath("MTA\\cgui\\images\\radar.jpg") );
+    m_pRadarImage = g_pCore->GetGraphics()->GetRenderItemManager ()->CreateTexture ( CalcMTASAPath("MTA\\cgui\\images\\radar.jpg"), true, 1024, 1024, RFORMAT_DXT1 );
     m_pLocalPlayerBlip = g_pCore->GetGraphics()->GetRenderItemManager ()->CreateTexture ( CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png") );
 
     // Create the marker textures
@@ -151,15 +151,11 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
 CRadarMap::~CRadarMap ( void )
 {
     // Delete our images
-    if ( m_pRadarImage )
-        m_pRadarImage->ReleaseRenderItem();
-
-    if ( m_pLocalPlayerBlip )
-        m_pLocalPlayerBlip->ReleaseRenderItem();
+    SAFE_RELEASE( m_pRadarImage );
+    SAFE_RELEASE( m_pLocalPlayerBlip );
 
     for ( uint i = 0 ; i < m_MarkerTextureList.size () ; i++ )
-        if ( m_MarkerTextureList[i] )
-            m_MarkerTextureList[i]->ReleaseRenderItem ();
+        SAFE_RELEASE( m_MarkerTextureList[i] );
 
     m_MarkerTextureList.clear ();
 
@@ -296,8 +292,8 @@ void CRadarMap::DoRender ( void )
 
         g_pCore->GetGraphics()->DrawTexture ( m_pRadarImage, static_cast < float > ( m_iMapMinX ),
                                                              static_cast < float > ( m_iMapMinY ),
-                                                             m_fMapSize / RADAR_TEXTURE_WIDTH,
-                                                             m_fMapSize / RADAR_TEXTURE_HEIGHT,
+                                                             m_fMapSize / m_pRadarImage->m_uiSizeX,
+                                                             m_fMapSize / m_pRadarImage->m_uiSizeY,
                                                              0.0f, 0.0f, 0.0f,
                                                              SColorARGB ( m_iRadarAlpha, 255, 255, 255 ) );
 

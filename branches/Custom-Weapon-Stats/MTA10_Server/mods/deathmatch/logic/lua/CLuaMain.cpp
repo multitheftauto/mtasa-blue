@@ -281,9 +281,14 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
         if ( !bUTF8 && ( uiSize < 5 || cpBuffer[0] != 27 || cpBuffer[1] != 'L' || cpBuffer[2] != 'u' || cpBuffer[3] != 'a' || cpBuffer[4] != 'Q' ) )
         {
             std::string strBuffer = std::string(cpBuffer, uiSize);
+#ifdef WIN32
             std::setlocale(LC_CTYPE,""); // Temporarilly use locales to read the script
             strUTFScript = UTF16ToMbUTF8(ANSIToUTF16( strBuffer ));
             std::setlocale(LC_CTYPE,"C");
+#else
+            strUTFScript = UTF16ToMbUTF8(ANSIToUTF16( strBuffer ));
+#endif
+
             if ( uiSize != strUTFScript.size() )
             {
                 uiSize = strUTFScript.size();

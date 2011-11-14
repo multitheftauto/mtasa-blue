@@ -253,6 +253,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPlayerWantedLevel", CLuaFunctionDefinitions::GetPlayerWantedLevel );
     CLuaCFunctions::AddFunction ( "getAlivePlayers", CLuaFunctionDefinitions::GetAlivePlayers );
     CLuaCFunctions::AddFunction ( "getDeadPlayers", CLuaFunctionDefinitions::GetDeadPlayers );
+    CLuaCFunctions::AddFunction ( "getPlayerIdleTime", CLuaFunctionDefinitions::GetPlayerIdleTime );
     CLuaCFunctions::AddFunction ( "isPlayerScoreboardForced", CLuaFunctionDefinitions::IsPlayerScoreboardForced );
     CLuaCFunctions::AddFunction ( "isPlayerMapForced", CLuaFunctionDefinitions::IsPlayerMapForced );
     CLuaCFunctions::AddFunction ( "getPlayerNametagText", CLuaFunctionDefinitions::GetPlayerNametagText );
@@ -654,6 +655,13 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "removeRuleValue", CLuaFunctionDefinitions::RemoveRuleValue );
     CLuaCFunctions::AddFunction ( "getPlayerAnnounceValue", CLuaFunctionDefinitions::GetPlayerAnnounceValue );
     CLuaCFunctions::AddFunction ( "setPlayerAnnounceValue", CLuaFunctionDefinitions::SetPlayerAnnounceValue );
+
+    // Database funcs
+    CLuaCFunctions::AddFunction ( "dbConnect", CLuaFunctionDefinitions::DbConnect );
+    CLuaCFunctions::AddFunction ( "dbExec", CLuaFunctionDefinitions::DbExec );
+    CLuaCFunctions::AddFunction ( "dbQuery", CLuaFunctionDefinitions::DbQuery );
+    CLuaCFunctions::AddFunction ( "dbFree", CLuaFunctionDefinitions::DbFree );
+    CLuaCFunctions::AddFunction ( "dbPoll", CLuaFunctionDefinitions::DbPoll );
 
     // Registry functions
     CLuaCFunctions::AddFunction ( "executeSQLCreateTable", CLuaFunctionDefinitions::ExecuteSQLCreateTable );

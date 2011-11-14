@@ -212,14 +212,18 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
     return true;
 }
 
-void CResourceManager::Upgrade ( void )
+void CResourceManager::UpgradeAll ( void )
 {
     // Modify source files if needed
     for ( list < CResource* > ::const_iterator iter = m_resources.begin () ; iter != m_resources.end (); iter++ )
         (*iter)->ApplyUpgradeModifications ();
+}
 
-    // Refresh everything
-    Refresh ( true );
+void CResourceManager::CheckAll ( void )
+{
+    // Check all resources for deprecated functions and MTA version issues
+    for ( list < CResource* > ::const_iterator iter = m_resources.begin () ; iter != m_resources.end (); iter++ )
+        (*iter)->LogUpgradeWarnings ();
 }
 
 char * CResourceManager::GetResourceDirectory ( void )
@@ -806,30 +810,43 @@ bool CResourceManager::Install ( char * szURL, char * szName )
 }
 
 
-CResource* CResourceManager::CreateResource ( char* szResourceName )
+/////////////////////////////////
+//
+// CreateResource
+//
+/////////////////////////////////
+CResource* CResourceManager::CreateResource ( const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus )
 {
+    // Calculate destination location
+    SString strDstAbsPath          = PathJoin ( g_pServerInterface->GetServerModPath (), "resources", strNewOrganizationalPath );
+    SString strDstResourceLocation = PathJoin ( strDstAbsPath, strNewResourceName );
+
     // Does the resource name already exist?
-    if ( GetResource ( szResourceName ) != NULL )
+    if ( GetResource ( strNewResourceName ) != NULL )
+    {
+        CLogger::LogPrintf ( "CreateResource - Could not create '%s' as the resource already exists\n", *strNewResourceName );
         return NULL;
+    }
 
-    // Make a string with the full path to the resource directory
-    SString strAbsPath = PathJoin ( g_pServerInterface->GetServerModPath (), "resources" );
-    SString strResourceDirectoryPath = PathJoin ( strAbsPath, szResourceName );
-
-    // Create that folder. Return if we failed
-    if ( mymkdir ( strResourceDirectoryPath ) != 0 )
-        return NULL;
+    // Create destination folder
+    MakeSureDirExists( strDstResourceLocation + "/" );
 
     // Create an empty meta file for that resource
-    SString strMetaPath = PathJoin ( strResourceDirectoryPath, "meta.xml" );
+    SString strMetaPath = PathJoin ( strDstResourceLocation, "meta.xml" );
     CXMLFile* pXML = g_pServerInterface->GetXML ()->CreateXML ( strMetaPath );
-    if ( pXML )
+    if ( !pXML )
+    {
+        CLogger::LogPrintf ( "CreateResource - Could not create '%s'\n", *strMetaPath );
+        return NULL;
+    }
+    else
     {
         // If we got the rootnode created, write the XML
-        CXMLNode* pRootNode = pXML->CreateRootNode ( "meta" );
-        if ( !pRootNode || !pXML->Write () )
+        pXML->CreateRootNode ( "meta" );
+        if ( !pXML->Write () )
         {
             delete pXML;
+            CLogger::LogPrintf ( "CreateResource - Could not save '%s'\n", *strMetaPath );
             return NULL;
         }
 
@@ -839,22 +856,252 @@ CResource* CResourceManager::CreateResource ( char* szResourceName )
     }
 
     // Add the resource and load it
-    CResource* pResource = new CResource ( this, false, strAbsPath, szResourceName );
-    if ( pResource )
+    CResource* pResource = new CResource ( this, false, strDstAbsPath, strNewResourceName );
+    AddResourceToLists ( pResource );
+    return pResource;
+}
+
+
+/////////////////////////////////
+//
+// CopyResource
+//
+/////////////////////////////////
+CResource* CResourceManager::CopyResource ( CResource* pSourceResource, const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus )
+{
+    // Get source resource information
+    SString strSrcResourceName     = pSourceResource->GetName ();
+    SString strSrcOrganizationalPath = GetResourceOrganizationalPath ( pSourceResource );
+
+    // Calculate destination location
+    SString strDstTemp             = PathJoin ( g_pServerInterface->GetServerModPath (), "resource-cache", "temp", strNewResourceName );
+    SString strDstOrganizationalPath = strNewOrganizationalPath.empty () ? strSrcOrganizationalPath : strNewOrganizationalPath;
+    SString strDstAbsPath          = PathJoin ( g_pServerInterface->GetServerModPath (), "resources", strDstOrganizationalPath );
+    SString strDstResourceLocation = PathJoin ( strDstAbsPath, strNewResourceName );
+
+    // Is the source resource loaded
+    if ( !pSourceResource->IsLoaded () )
     {
-        AddResourceToLists ( pResource );
+        strOutStatus = SString ( "Could not copy '%s' as the resource is not loaded\n", *strSrcResourceName );
+        return NULL;
+    }
+
+    // Does the resource name already exist?
+    if ( GetResource ( strNewResourceName ) != NULL )
+    {
+        strOutStatus = SString ( "Could not copy '%s' as the resource '%s' already exists\n", *strSrcResourceName, *strNewResourceName );
+        return NULL;
+    }
+
+    // Does the destination directory already exist?
+    if ( FileExists ( strDstResourceLocation ) || DirectoryExists ( strDstResourceLocation ) )
+    {
+        strOutStatus = SString ( "Could not copy '%s' as the file/directory '%s' already exists\n", *strSrcResourceName, *strNewResourceName );
+        return NULL;
+    }
+
+    // Clear temp directory
+    // in temp:
+    //    Create target directory
+    //    Copy meta
+    //    Copy resouce files
+    //    If copy success, move directory
+
+    // Make sure temp directory is clear
+    MoveDirToTrash ( strDstTemp );
+
+    // Copy meta.xml
+    {
+        SString strFileName = "meta.xml";
+        SString strSrcFileName;
+        pSourceResource->GetFilePath ( strFileName, strSrcFileName );
+
+        SString strDstFileName = PathJoin ( strDstTemp, strFileName );
+
+        if ( !FileCopy ( strSrcFileName, strDstFileName ) )
+        {
+            strOutStatus = SString ( "Could not copy '%s' to '%s'\n", *strSrcFileName, *strDstFileName );
+            return NULL;
+        }
+    }
+
+    // Go through all our resource files
+    std::list <CResourceFile*> ::iterator iter = pSourceResource->IterBegin ();
+    for ( ; iter != pSourceResource->IterEnd (); iter++ )
+    {
+        CResourceFile* pResourceFile = *iter;
+
+        SString strFileName = pResourceFile->GetName ();
+        SString strSrcFileName;
+        pSourceResource->GetFilePath ( strFileName, strSrcFileName );
+        SString strDstFileName = PathJoin ( strDstTemp, strFileName );
+
+        if ( !FileCopy ( strSrcFileName, strDstFileName ) )
+        {
+            strOutStatus = SString ( "Could not copy '%s' to '%s'\n", *strSrcFileName, *strDstFileName );
+            return NULL;
+        }
+    }
+
+    // Now move the directory into place
+    MakeSureDirExists( strDstResourceLocation );
+    if ( !FileRename ( strDstTemp, strDstResourceLocation ) )
+    {
+        strOutStatus = SString ( "Could not rename '%s' to '%s'\n", *strDstTemp, *strDstResourceLocation );
+        return NULL;
+    }
+
+    // Add the resource and load it
+    CResource* pResource = Load ( false, strDstAbsPath, strNewResourceName );
+    return pResource;
+}
+
+
+/////////////////////////////////
+//
+// RenameResource
+//
+/////////////////////////////////
+CResource* CResourceManager::RenameResource ( CResource* pSourceResource, const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus )
+{
+    // Get source resource information
+    SString strSrcResourceName     = pSourceResource->GetName ();
+    bool bIsZip                    = pSourceResource->IsResourceZip ();
+    SString strSrcAbsPath          = ExtractPath ( ExtractPath ( PathConform ( pSourceResource->GetResourceDirectoryPath () ) ) );
+    SString strSrcOrganizationalPath = GetResourceOrganizationalPath ( pSourceResource );
+    SString strSrcResourceLocation = pSourceResource->GetResourceDirectoryPath ();
+    if ( bIsZip )
+        strSrcResourceLocation = strSrcResourceLocation.TrimEnd ( "\\" ).TrimEnd ( "/" ) + ".zip";
+
+    // Calculate destination location
+    SString strDstOrganizationalPath = strNewOrganizationalPath.empty () ? strSrcOrganizationalPath : strNewOrganizationalPath;
+    SString strDstAbsPath          = PathJoin ( g_pServerInterface->GetServerModPath (), "resources", strDstOrganizationalPath );
+    SString strDstResourceLocation = PathJoin ( strDstAbsPath, strNewResourceName );
+    if ( bIsZip )
+        strDstResourceLocation = strDstResourceLocation.TrimEnd ( "\\" ).TrimEnd ( "/" ) + ".zip";
+
+    // Is the source resource active
+    if ( pSourceResource->IsActive () )
+    {
+        strOutStatus = SString ( "Could not rename '%s' as the resource is running\n", *strSrcResourceName );
+        return NULL;
+    }
+
+    // Is the source resource loaded
+    if ( !pSourceResource->IsLoaded () )
+    {
+        strOutStatus = SString ( "Could not rename '%s' as the resource is not loaded\n", *strSrcResourceName );
+        return NULL;
+    }
+
+    // Does the destination already exist?
+    if ( FileExists ( strDstResourceLocation ) || DirectoryExists ( strDstResourceLocation ) )
+    {
+        strOutStatus = SString ( "Could not rename to '%s' as the file/directory name already exists\n", *strNewResourceName );
+        return NULL;
+    }
+
+    // Unload - this will also free the resource object
+    Unload ( pSourceResource );
+    pSourceResource = NULL;
+
+    // Rename
+    MakeSureDirExists( strDstResourceLocation );
+    if ( !FileRename ( strSrcResourceLocation, strDstResourceLocation ) )
+    {
+        strOutStatus = SString ( "Could not rename '%s' to '%s'\n", *strSrcResourceLocation, *strDstResourceLocation );
+
+        // Panic reload
+        CResource* pResource = Load ( bIsZip, strSrcAbsPath, strSrcResourceName );
         return pResource;
     }
 
-    // We failed
-    return NULL;
+    // reload as new name
+    CResource* pResource = Load ( bIsZip, strDstAbsPath, strNewResourceName );
+    return pResource;
 }
 
 
-CResource* CResourceManager::CopyResource ( CResource* pSourceResource, const char* szNewResourceName )
+/////////////////////////////////
+//
+// DeleteResource
+//
+// TODO: Handle invalid resources by matching the directory name
+//
+/////////////////////////////////
+bool CResourceManager::DeleteResource ( const SString& strResourceName, SString& strOutStatus )
 {
-    return NULL;
+    // See if it's a known resource first
+    CResource* pSourceResource = g_pGame->GetResourceManager()->GetResource ( strResourceName );
+
+    // Is the source resource present
+    if ( !pSourceResource )
+    {
+        strOutStatus = SString ( "Could not delete '%s' as the resource could not be found\n", *strResourceName );
+        return false;
+    }
+
+    // Get source resource information
+    SString strSrcResourceName     = pSourceResource->GetName ();
+    bool bIsZip                    = pSourceResource->IsResourceZip ();
+    SString strSrcResourceLocation = pSourceResource->GetResourceDirectoryPath ();
+    if ( bIsZip )
+        strSrcResourceLocation = strSrcResourceLocation.TrimEnd ( "\\" ).TrimEnd ( "/" ) + ".zip";
+
+    // Is the source resource active
+    if ( pSourceResource->IsActive () )
+    {
+        strOutStatus = SString ( "Could not delete '%s' as the resource is running\n", *strSrcResourceName );
+        return false;
+    }
+
+    // Unload - this will also free the resource object
+    Unload ( pSourceResource );
+    pSourceResource = NULL;
+
+    // Move resource dir/zip to the trash
+    return MoveDirToTrash ( strSrcResourceLocation );
 }
+
+
+/////////////////////////////////
+//
+// CResourceManager::GetResourceTrashDir
+//
+/////////////////////////////////
+SString CResourceManager::GetResourceTrashDir ( void )
+{
+    return PathJoin ( g_pServerInterface->GetServerModPath (), "resource-cache", "trash" );
+}
+
+
+/////////////////////////////////
+//
+// CResourceManager::MoveDirToTrash
+//
+/////////////////////////////////
+bool CResourceManager::MoveDirToTrash ( const SString& strPathDirName )
+{
+    // Get path to unique trash sub-directory
+    SString strDestPathDirName = MakeUniquePath ( PathJoin ( GetResourceTrashDir (), ExtractFilename ( strPathDirName.TrimEnd ( "\\" ).TrimEnd ( "/" ) ) ) );
+    // Try move
+    return FileRename ( strPathDirName, strDestPathDirName );
+}
+
+
+/////////////////////////////////
+//
+// CResourceManager::GetResourceOrganizationalPath
+//
+/////////////////////////////////
+SString CResourceManager::GetResourceOrganizationalPath ( CResource* pResource )
+{
+    SString strBaseAbsPath        = PathJoin ( g_pServerInterface->GetServerModPath (), "resources" );
+    SString strResourceAbsPath    = ExtractPath ( ExtractPath ( PathConform ( pResource->GetResourceDirectoryPath () ) ) );
+    SString strOrganizationalPath = strResourceAbsPath.SubStr ( strBaseAbsPath.length () );
+    return strOrganizationalPath;
+}
+
 
 // pResource may be changed on return, and it could be NULL if the function returns false.
 bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*& pResource, std::string* pstrPath, std::string* pstrMetaPath )
@@ -900,4 +1147,65 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
         return true;
     }
     return false;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CResourceManager::ApplyMinClientRequirement
+//
+// If resource has a client version requirement, add it to the list
+//
+/////////////////////////////////////////////////////////////////////////////
+void CResourceManager::ApplyMinClientRequirement ( CResource* pResource, const SString& strMinClientRequirement )
+{
+    if ( !strMinClientRequirement.empty () )
+    {
+        MapSet ( m_MinClientRequirementMap, pResource, strMinClientRequirement );
+        ReevaluateMinClientRequirement ();
+    }
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CResourceManager::RemoveMinClientRequirement
+//
+// Remove any previous client version requirement associated with the resource
+//
+/////////////////////////////////////////////////////////////////////////////
+void CResourceManager::RemoveMinClientRequirement ( CResource* pResource )
+{
+    if ( MapContains ( m_MinClientRequirementMap, pResource ) )
+    {
+        MapRemove ( m_MinClientRequirementMap, pResource );
+        ReevaluateMinClientRequirement ();
+    }
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CResourceManager::ReevaluateMinClientRequirement
+//
+// Recalculate highest client version requirement from all running resources
+//  and get the config to apply it
+//
+/////////////////////////////////////////////////////////////////////////////
+void CResourceManager::ReevaluateMinClientRequirement ( void )
+{
+    // Calc highest requirement
+    SString strMinClientRequirement;
+    for ( std::map < CResource*, SString >::iterator iter = m_MinClientRequirementMap.begin () ; iter != m_MinClientRequirementMap.end () ; ++iter )
+        if ( iter->second > strMinClientRequirement )
+            strMinClientRequirement = iter->second;
+
+    // Apply
+    SString strBefore = g_pGame->GetConfig ()->GetMinimumClientVersion ();
+    g_pGame->GetConfig ()->SetMinimumClientVersionOverride ( strMinClientRequirement );
+    SString strAfter = g_pGame->GetConfig ()->GetMinimumClientVersion ();
+
+    // Log change
+    if ( strBefore != strAfter && !strAfter.empty () )
+        CLogger::LogPrintf ( SString ( "Server minclientversion is now %s\n", *strAfter ) );
 }

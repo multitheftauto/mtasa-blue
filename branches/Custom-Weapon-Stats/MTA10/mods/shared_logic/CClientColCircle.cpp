@@ -38,3 +38,65 @@ CSphere CClientColCircle::GetWorldBoundingSphere ( void )
     sphere.fRadius        = m_fRadius;
     return sphere;
 }
+
+
+//
+// Draw wireframe circle
+//
+void CClientColCircle::DebugRender ( const CVector& vecPosition, float fDrawRadius )
+{
+    SColorARGB color ( 128, 0, 255, 255 );
+    float fLineWidth = 4.f + pow ( m_fRadius, 0.5f );
+    CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
+
+    CVector vecBase ( m_vecPosition.fX - m_fRadius, m_vecPosition.fY - m_fRadius, vecPosition.fZ - fDrawRadius );
+    CVector vecOrigin  ( m_vecPosition.fX, m_vecPosition.fY, vecPosition.fZ );
+    float fHeight = fDrawRadius * 2.f;
+
+    // Don't draw a few end slices to show it goes on for ever
+    int iSkipEndSlices = 4;
+
+    // Calc required detail level
+    uint uiNumPoints = Max ( 6, Round ( sqrt ( m_fRadius ) * 2.0f ) );
+    uint uiNumSlices = Max ( 2 + iSkipEndSlices * 2, Round ( sqrt ( fHeight ) * 2.0f ) );
+
+    // Get the slice outline
+    std::vector < CVector > vertexList;
+    for ( uint p = 0; p < uiNumPoints; p++ )
+    {
+        float u = p / (float)uiNumPoints;
+        CVector2D vecPoint = CVector2D ( cos ( u * PI * 2 ), sin ( u * PI * 2 ) );
+        vertexList.push_back ( CVector ( vecPoint.fX, vecPoint.fY, 1 ) );
+    }
+
+    // Draw Slices
+    {
+        CVector vecMult ( m_fRadius, m_fRadius, fHeight );
+        CVector vecAdd ( vecOrigin.fX, vecOrigin.fY, vecBase.fZ + 4 ); // Extra bit so a slice is on the same Z coord as the camera
+
+        for ( uint s = iSkipEndSlices ; s < uiNumSlices - iSkipEndSlices ; s++ )
+        {
+            vecMult.fZ = fHeight * ( s / (float)( uiNumSlices - 1 ) );
+            for ( uint i = 0 ; i < vertexList.size () ; i++ )
+            {
+                CVector vecBegin = vertexList[ i ] * vecMult + vecAdd;
+                CVector vecEnd = vertexList[ ( i + 1 ) % uiNumPoints ] * vecMult + vecAdd;
+                pGraphics->DrawLine3DQueued ( vecBegin, vecEnd, fLineWidth, color, false );
+            }
+        }
+    }
+
+    // Draw lines from bottom to top
+    {
+        CVector vecMultB ( m_fRadius, m_fRadius, 0 );
+        CVector vecMultT ( m_fRadius, m_fRadius, fHeight );
+        CVector vecAdd ( vecOrigin.fX, vecOrigin.fY, vecBase.fZ );
+
+        for ( uint i = 0 ; i < vertexList.size () ; i++ )
+        {
+            CVector vecBegin = vertexList[ i ] * vecMultB + vecAdd;
+            CVector vecEnd = vertexList[ i ] * vecMultT + vecAdd;
+            pGraphics->DrawLine3DQueued ( vecBegin, vecEnd, fLineWidth, color, false );
+        }
+    }
+}

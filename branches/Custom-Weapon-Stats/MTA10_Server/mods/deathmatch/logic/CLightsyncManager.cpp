@@ -83,8 +83,10 @@ void CLightsyncManager::DoPulse ()
     long iPacketsSent = 0;
     long iBitsSent = 0;
 
-    CPlayerManager* pManager = g_pGame->GetPlayerManager();
-    while ( m_Queue.size() > 0 && m_Queue.front().ullTime <= GetTickCount64_ () )
+    // For limiting light sync processing
+    long iLimitCounter = g_pBandwidthSettings->iLightSyncPlrsPerFrame;
+
+    while ( m_Queue.size() > 0 && m_Queue.front().ullTime <= GetTickCount64_ () && iLimitCounter > 0 )
     {
         SEntry entry = m_Queue.front ();
         CPlayer* pPlayer = entry.pPlayer;
@@ -168,6 +170,7 @@ void CLightsyncManager::DoPulse ()
                 }
 
                 RegisterPlayer ( pPlayer );
+                iLimitCounter--;
                 break;
             }
 
@@ -192,4 +195,8 @@ void CLightsyncManager::DoPulse ()
     // Update stats
     g_pStats->lightsync.llLightSyncPacketsSent += iPacketsSent;
     g_pStats->lightsync.llLightSyncBytesSent += iBitsSent / 8;
+
+    // Subtract lightsync usage from skipped accumulators
+    g_pStats->lightsync.llSyncPacketsSkipped -= iPacketsSent;
+    g_pStats->lightsync.llSyncBytesSkipped -= iBitsSent / 8;
 }

@@ -742,24 +742,47 @@ bool CServerBrowser::IsVisible ( void )
     return m_pTopWindow->IsVisible ();
 }
 
+//
+// Check if the client can see another server version in the browser
+//
+bool CServerBrowser::CanBrowseVersion ( const SString& strVersion )
+{
+    // If in deny list, then no
+    if ( MapContains ( m_blockedVersionMap, strVersion ) )
+        return false;
+
+    // If not in allow list then no (unless allow list is empty)
+    if ( !m_allowedVersionMap.empty () && !MapContains ( m_allowedVersionMap, strVersion ) )
+        return false;
+
+    // otherwise yes
+    return true;
+}
+
 
 void CServerBrowser::UpdateServerList ( ServerBrowserType Type, bool bClearServerList )
 {
-    GetVersionUpdater ()->GetBlockedVersionMap ( m_blockedVersionMap );
+    GetVersionUpdater ()->GetBrowseVersionMaps ( m_blockedVersionMap, m_allowedVersionMap );
 
 #if MTA_DEBUG
     // Selecting 'Nightly update' in debug build will show other versions
     SString strUpdateBuildType;
     CVARS_GET ( "update_build_type", strUpdateBuildType );
     if ( strUpdateBuildType == "2" )
+    {
         m_blockedVersionMap.clear ();
+        m_allowedVersionMap.clear ();
+    }
 #endif
 
     // Setting this in coreconfig will show other versions
     bool bForceBrowseOtherVersions = false;
     CVARS_GET ( "force_browse_other_versions", bForceBrowseOtherVersions );
     if ( bForceBrowseOtherVersions )
+    {
         m_blockedVersionMap.clear ();
+        m_allowedVersionMap.clear ();
+    }
 
     // Save sort info
     uint uiSortColumn;
@@ -953,7 +976,7 @@ void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const Se
     bool bIsEmpty           = ( pServer->nPlayers == 0 ) && ( pServer->nMaxPlayers != 0 );
     bool bIsFull            = ( pServer->nPlayers >= pServer->nMaxPlayers ) && ( pServer->nMaxPlayers != 0 );
     bool bIsLocked          = pServer->bPassworded;
-    bool bIsBlockedVersion  = bIsOtherVersion && MapContains ( m_blockedVersionMap, pServer->strVersion );
+    bool bIsBlockedVersion  = bIsOtherVersion && !CanBrowseVersion ( pServer->strVersion );
     bool bIsBlockedServer   = ( pServer->uiMasterServerSaysRestrictions & ASE_FLAG_RESTRICTIONS ) != false;
 
     // Maybe switch on 'Other version' checkbox

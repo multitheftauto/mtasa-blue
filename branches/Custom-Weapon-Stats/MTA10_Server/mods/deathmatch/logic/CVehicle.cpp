@@ -493,8 +493,11 @@ bool CVehicle::SetOccupant ( CPed* pPed, unsigned int uiSeat )
         // Set the Player
         if ( m_pOccupants [uiSeat] != pPed )
         {
-            if ( uiSeat == 0 && m_pOccupants[0] && IS_PLAYER(m_pOccupants[0]) )
-                g_pGame->GetPlayerManager()->BroadcastOnlyJoined ( CVehicleResyncPacket(this) );
+            if ( g_pBandwidthSettings->bLightSyncEnabled )
+            {
+                if ( uiSeat == 0 && m_pOccupants[0] && IS_PLAYER(m_pOccupants[0]) )
+                    g_pGame->GetPlayerManager()->BroadcastOnlyJoined ( CVehicleResyncPacket(this) );
+            }
             m_pOccupants [uiSeat] = pPed;
         }
 

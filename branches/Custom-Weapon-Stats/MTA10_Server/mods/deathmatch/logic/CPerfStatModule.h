@@ -25,11 +25,15 @@ struct SStatData
     } puresync;
 
     struct {
-        long long llPureSyncPacketsSkipped;
-        long long llPureSyncBytesSkipped;
+        long long llSyncPacketsSkipped;
+        long long llSyncBytesSkipped;
         long long llLightSyncPacketsSent;
         long long llLightSyncBytesSent;
     } lightsync;
+
+    bool bFunctionTimingActive;
+    int iDbJobDataCount;
+    int iDbConnectionCount;
 };
 
 extern SStatData* g_pStats;
@@ -244,4 +248,54 @@ public:
     // CPerfStatBandwidthReduction
 
     static CPerfStatBandwidthReduction*  GetSingleton      ( void );
+};
+
+
+//
+// CPerfStatServerInfo
+//
+class CPerfStatServerInfo : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    // CPerfStatServerInfo
+
+    static CPerfStatServerInfo*  GetSingleton      ( void );
+};
+
+
+//
+// CPerfStatServerTiming
+//
+class CPerfStatServerTiming : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    static CPerfStatServerTiming*  GetSingleton        ( void );
+};
+
+
+//
+// CPerfStatFunctionTiming
+//
+class CPerfStatFunctionTiming : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    // CPerfStatFunctionTiming
+    virtual void                UpdateTiming        ( const char* szFunctionName, TIMEUS timeUs ) = 0;
+
+    static CPerfStatFunctionTiming*  GetSingleton        ( void );
 };

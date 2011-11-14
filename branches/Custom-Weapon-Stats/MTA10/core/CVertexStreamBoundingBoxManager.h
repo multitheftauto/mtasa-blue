@@ -84,7 +84,7 @@ public:
 
     SCurrentStateInfo2 ( void )
     {
-        memset( this, 0, sizeof(*this) );
+        ZERO_POD_STRUCT( this );
     }
 
     ~SCurrentStateInfo2 ( void )

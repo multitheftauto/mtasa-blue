@@ -344,6 +344,19 @@ namespace SharedUtil
         return it->second;
     }
 
+    // Find or add a value in collection
+    template < class T, class V, class TR, class T2 >
+    V& MapGet ( std::map < T, V, TR >& collection, const T2& key )
+    {
+        typename std::map < T, V, TR > ::iterator it = collection.find ( key );
+        if ( it == collection.end () )
+        {
+            collection[key] = V ();
+            it = collection.find ( key );
+        }
+        return it->second;
+    }
+
 
     //
     // std::multimap helpers
@@ -390,6 +403,18 @@ namespace SharedUtil
             }
     }
 
+    // Returns true if the pair is in the collection
+    template < class T, class V, class TR, class T2, class V2 >
+    bool MapContainsPair ( std::multimap < T, V, TR >& collection, const T2& key, const V2& value )
+    {
+        typedef typename std::multimap < T, V, TR > ::iterator iter_t;
+        std::pair < iter_t, iter_t > itp = collection.equal_range ( key );
+        for ( iter_t it = itp.first ; it != itp.second ; ++it )
+            if ( it->second == value )
+                return true;
+        return false;
+    }
+
 
     //
     // std::set helpers
@@ -420,6 +445,24 @@ namespace SharedUtil
         return true;
     }
 
+    // Remove value from collection. Returns number of pairs removed
+    template < class T, class V, class TR, class V2 >
+    uint MapRemoveByValue ( std::map < T, V, TR >& collection, const V2& value )
+    {
+        uint uiCount = 0;
+        typename std::map < T, V, TR > ::iterator it = collection.begin ();
+        for ( ; it != collection.end () ; )
+        {
+            if ( it->second == value )
+            {
+                uiCount++;
+                collection.erase ( it++ );
+            }
+            else
+                ++it;
+        }
+        return uiCount;
+    }
 
 
     //
@@ -1273,6 +1316,85 @@ namespace SharedUtil
       }
       return !*wild;
     }
+
+
+    ///////////////////////////////////////////////////////////////
+    //
+    // CFilterMap
+    //
+    // Change the string "+all,-{1000~2006},+2003,-{2050},-2611,-{3120},-{4002~4100},+{4010~4020}"
+    // into a map which can be queried using IsFiltered( int )
+    //
+    ///////////////////////////////////////////////////////////////
+    class CFilterMap
+    {
+    public:
+        CFilterMap ( const SString& strFilterDesc = "" )
+        {
+            SetAll ( '+' );
+            AddString ( strFilterDesc );
+        }
+
+        bool IsFiltered ( int iValue )
+        {
+            if ( MapContains ( idMap, iValue ) )
+                return cDefaultType == '+';
+            return cDefaultType == '-';
+        }
+
+    protected:
+        void AddString ( const SString& strFilterDesc )
+        {
+            std::vector < SString > partList;
+            strFilterDesc.Split ( ",", partList );
+            for ( uint i = 0; i < partList.size () ; i++ )
+            {
+                const SString& part = partList [ i ];
+                char cType = part.Left ( 1 )[0];
+
+                SString strRest = part.Right ( part.length () - 1 );
+                strRest = strRest.Replace ( "{", "" ).Replace ( "}", "" );
+
+                SString strFrom, strTo;
+                strRest.Split ( "~", &strFrom, &strTo );
+
+                if ( strFrom == "all" )
+                    SetAll ( cType );
+                else
+                if ( strTo.empty () )
+                    AddSingle ( cType, atoi ( strFrom ) );
+                else
+                {
+                    const int iTo = atoi ( strTo );
+                    for ( int i = atoi ( strFrom ) ; i <= iTo ; i++ )
+                        AddSingle ( cType, i );
+                } 
+            }
+        }
+
+        void AddSingle ( char cType, int iValue )
+        {
+            if ( cType != cDefaultType )
+            {
+                // Add
+                MapSet ( idMap, iValue, true );
+            }
+            else
+            {
+                // Remove
+                MapRemove ( idMap, iValue );
+            }
+        }
+
+        void SetAll ( char cType )
+        {
+            idMap.clear ();
+            cDefaultType = cType;
+        }
+
+        std::map < uint, bool >     idMap;
+        char                        cDefaultType;
+    };
 
 };
 

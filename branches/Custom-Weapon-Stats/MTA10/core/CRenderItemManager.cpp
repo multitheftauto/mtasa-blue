@@ -10,6 +10,7 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include "CRenderItem.EffectCloner.h"
 
 
 ////////////////////////////////////////////////////////////////
@@ -21,6 +22,7 @@
 ////////////////////////////////////////////////////////////////
 CRenderItemManager::CRenderItemManager ( void )
 {
+    m_pEffectCloner = NewEffectCloner ( this );
 }
 
 
@@ -33,6 +35,7 @@ CRenderItemManager::CRenderItemManager ( void )
 ////////////////////////////////////////////////////////////////
 CRenderItemManager::~CRenderItemManager ( void )
 {
+    SAFE_DELETE( m_pEffectCloner );
 }
 
 
@@ -53,7 +56,7 @@ void CRenderItemManager::OnDeviceCreate ( IDirect3DDevice9* pDevice, float fView
     m_pRenderWare->InitWorldTextureWatch ( StaticWatchCallback );
 
     // Get some stats
-    m_strVideoCardName = g_pDeviceState->AdapterState.Name;
+    m_strVideoCardName = (const char*)g_pDeviceState->AdapterState.Name;
     m_iVideoCardMemoryKBTotal = g_pDeviceState->AdapterState.InstalledMemoryKB;
 
     m_iVideoCardMemoryKBForMTATotal = ( m_iVideoCardMemoryKBTotal - ( 64 * 1024 ) ) * 4 / 5;
@@ -107,10 +110,10 @@ void CRenderItemManager::OnResetDevice ( void )
 // TODO: Make underlying data for textures shared
 //
 ////////////////////////////////////////////////////////////////
-CTextureItem* CRenderItemManager::CreateTexture ( const SString& strFullFilePath )
+CTextureItem* CRenderItemManager::CreateTexture ( const SString& strFullFilePath, bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format )
 {
     CFileTextureItem* pTextureItem = new CFileTextureItem ();
-    pTextureItem->PostConstruct ( this, strFullFilePath );
+    pTextureItem->PostConstruct ( this, strFullFilePath, bMipMaps, uiSizeX, uiSizeY, format );
 
     if ( !pTextureItem->IsValid () )
     {
@@ -131,9 +134,9 @@ CTextureItem* CRenderItemManager::CreateTexture ( const SString& strFullFilePath
 //
 //
 ////////////////////////////////////////////////////////////////
-CRenderTargetItem* CRenderItemManager::CreateRenderTarget ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel )
+CRenderTargetItem* CRenderItemManager::CreateRenderTarget ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce )
 {
-    if ( !CanCreateRenderItem ( CRenderTargetItem::GetClassId () ) )
+    if ( !bForce && !CanCreateRenderItem ( CRenderTargetItem::GetClassId () ) )
         return NULL;
 
     CRenderTargetItem* pRenderTargetItem = new CRenderTargetItem ();
@@ -261,19 +264,6 @@ CGuiFontItem* CRenderItemManager::CreateGuiFont ( const SString& strFullFilePath
 
 ////////////////////////////////////////////////////////////////
 //
-// CRenderItemManager::ReleaseRenderItem
-//
-// Decrement reference count on a render item, and delete if necessary
-//
-////////////////////////////////////////////////////////////////
-void CRenderItemManager::ReleaseRenderItem ( CRenderItem* pItem )
-{
-    SAFE_RELEASE ( pItem );
-}
-
-
-////////////////////////////////////////////////////////////////
-//
 // CRenderItemManager::NotifyContructRenderItem
 //
 // Add to managers list
@@ -311,53 +301,6 @@ void CRenderItemManager::NotifyDestructRenderItem ( CRenderItem* pItem )
 }
 
 
-
-//
-//
-// Shaders
-//
-//
-
-////////////////////////////////////////////////////////////////
-//
-// CRenderItemManager::SetShaderValue
-//
-// Set one texture
-//
-////////////////////////////////////////////////////////////////
-bool CRenderItemManager::SetShaderValue ( CShaderItem* pShaderItem, const SString& strName, CTextureItem* pTextureItem )
-{
-    return pShaderItem->SetValue ( strName, pTextureItem );
-}
-
-
-////////////////////////////////////////////////////////////////
-//
-// CRenderItemManager::SetShaderValue
-//
-// Set one bool
-//
-////////////////////////////////////////////////////////////////
-bool CRenderItemManager::SetShaderValue ( CShaderItem* pShaderItem, const SString& strName, bool bValue )
-{
-    return pShaderItem->SetValue ( strName, bValue );
-}
-
-
-////////////////////////////////////////////////////////////////
-//
-// CRenderItemManager::SetShaderValue
-//
-// Set up to 16 floats
-//
-////////////////////////////////////////////////////////////////
-bool CRenderItemManager::SetShaderValue ( CShaderItem* pShaderItem, const SString& strName, const float* pfValues, uint uiCount )
-{
-    return pShaderItem->SetValue ( strName, pfValues, uiCount );
-}
-
-
-
 //
 //
 // Render targets and back buffers
@@ -379,6 +322,9 @@ void CRenderItemManager::UpdateBackBufferCopy ( void )
     // and this
     m_PrevFrameTextureUsage = m_FrameTextureUsage;
     m_FrameTextureUsage.clear ();
+
+    // and this
+    m_pEffectCloner->DoPulse ();
 
 
     //
@@ -460,11 +406,7 @@ void CRenderItemManager::UpdateBackBufferCopySize ( void )
     if ( !m_pBackBufferCopy || m_pBackBufferCopy->m_uiSizeX != uiSizeX || m_pBackBufferCopy->m_uiSizeY != uiSizeY )
     {
         // Delete old one if it exists
-        if ( m_pBackBufferCopy )
-        {
-            ReleaseRenderItem ( m_pBackBufferCopy );
-            m_pBackBufferCopy = NULL;
-        }
+        SAFE_RELEASE( m_pBackBufferCopy );
 
         // Try to create new one if needed
         if ( uiSizeX > 0 )

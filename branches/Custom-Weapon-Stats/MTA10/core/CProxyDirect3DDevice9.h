@@ -389,6 +389,12 @@ public:
 
     struct SD3DVertexDeclState
     {
+        SD3DVertexDeclState ( void )
+        {
+            ZERO_POD_STRUCT( this );
+        }
+
+        bool bUsesStreamAtIndex[2];
         DWORD Position;
         DWORD PositionT;
         DWORD Normal;
@@ -400,7 +406,7 @@ public:
 
     struct SAdapterState
     {
-        char Name[128];
+        CStaticString < 128 > Name;
         int InstalledMemoryKB;
         int MaxAnisotropicSetting;
     };
@@ -416,15 +422,22 @@ public:
         eD3DCallType callType;
         uint uiNumArgs;
         int args [ 10 ];
-        SString strShaderName;
+        CStaticString < 32 > strShaderName;
         bool bShaderRequiresNormals;
+    };
+
+    struct SStreamSourceState
+    {
+        IDirect3DVertexBuffer9*     StreamData;
+        UINT                        StreamOffset;
+        UINT                        StreamStride;
     };
 
     struct SD3DDeviceState
     {
         SD3DDeviceState ()
         {
-            memset ( this, 0, sizeof(*this) );
+            ZERO_POD_STRUCT( this );
         }
 
         SD3DRenderState                 RenderState;
@@ -444,16 +457,11 @@ public:
         SD3DVertexDeclState             VertexDeclState;
         SAdapterState                   AdapterState;
         SCallState                      CallState;
-
-        struct
-        {
-            IDirect3DVertexBuffer9*     StreamData;
-            UINT                        StreamOffset;
-            UINT                        StreamStride;
-        }                               VertexStreams[16];
+        SStreamSourceState              VertexStreams[16];
     };
 
     SD3DDeviceState     DeviceState;
+    std::map < IDirect3DVertexDeclaration9*, SD3DVertexDeclState > m_VertexDeclMap;
 
     // Debugging
     void                SetCallType     ( SCallState::eD3DCallType callType, uint uiNumArgs = 0, ... );

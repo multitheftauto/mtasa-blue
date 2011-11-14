@@ -3085,8 +3085,8 @@ void CClientVehicle::SetTargetRotation ( CVector& vecRotation, unsigned long ulD
         m_interp.rot.vecError.fY = GetOffsetDegrees ( vecLocalRotation.fY, vecRotation.fY );
         m_interp.rot.vecError.fZ = GetOffsetDegrees ( vecLocalRotation.fZ, vecRotation.fZ );
     
-        // Apply the error over 400ms (i.e. 1/4 per 100ms )
-        m_interp.rot.vecError *= Lerp < const float > ( 0.25f, UnlerpClamped( 100, ulDelay, 400 ), 1.0f );
+        // Apply the error over 250ms (i.e. 2/5 per 100ms )
+        m_interp.rot.vecError *= Lerp < const float > ( 0.40f, UnlerpClamped( 100, ulDelay, 400 ), 1.0f );
     
         // Get the interpolation interval
         m_interp.rot.ulStartTime = ulTime;

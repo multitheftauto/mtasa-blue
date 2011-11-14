@@ -21,6 +21,8 @@
 void CShaderInstance::PostConstruct ( CRenderItemManager* pManager, CShaderItem* pShaderItem )
 {
     Super::PostConstruct ( pManager );
+    m_uiTessellationX = 1;
+    m_uiTessellationY = 1;
     // Initial creation of d3d data
     CreateUnderlyingData ( pShaderItem );
 }
@@ -99,6 +101,8 @@ void CShaderInstance::CreateUnderlyingData ( CShaderItem* pShaderItem )
     {
         // Clone values from previous instance
         m_currentSetValues = pShaderItem->m_pShaderInstance->m_currentSetValues;
+        m_uiTessellationX = pShaderItem->m_pShaderInstance->m_uiTessellationX;
+        m_uiTessellationY = pShaderItem->m_pShaderInstance->m_uiTessellationY;
 
         // Increment refs on cloned texture values
         for ( std::map < D3DXHANDLE, SShaderValue >::iterator iter = m_currentSetValues.begin () ; iter != m_currentSetValues.end () ; ++iter )

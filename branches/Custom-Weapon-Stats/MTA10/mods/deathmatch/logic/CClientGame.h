@@ -154,7 +154,7 @@ public:
         QUIT_BAN,
         QUIT_CONNECTION_DESYNC,
         QUIT_TIMEOUT,
-    };   
+    };
     enum 
     {
         GLITCH_QUICKRELOAD,
@@ -173,6 +173,7 @@ public:
     };
 
 public:
+    ZERO_ON_NEW
                                         CClientGame                     ( bool bLocalPlay = false );
                                         ~CClientGame                    ( void );
 
@@ -348,6 +349,11 @@ public:
     bool                                IsDownloadingBigPacket          ( ) const                       { return m_bReceivingBigPacket; }
     bool                                IsBeingDeleted                  ( void )                        { return m_bBeingDeleted; }
 
+    void                                SetDevelopmentMode              ( bool bEnable )                { m_bDevelopmentMode = bEnable; } 
+    bool                                GetDevelopmentMode              ( void )                        { return m_bDevelopmentMode; } 
+    void                                SetShowCollision                ( bool bEnable )                { m_bShowCollision = bEnable; } 
+    bool                                GetShowCollision                ( void )                        { return m_bShowCollision; } 
+
 private:
 
     // CGUI Callbacks
@@ -439,6 +445,7 @@ private:
     static bool                         StaticProcessPacket             ( unsigned char ucPacketID, NetBitStreamInterface& bitStream );
 
     bool                                VerifySADataFiles               ( int iEnableClientChecks = 0 );
+    void                                DebugElementRender              ( void );
 
 public:
     void                                SendExplosionSync               ( const CVector& vecPosition, eExplosionType Type, CClientEntity * pOrigin = NULL );
@@ -617,6 +624,8 @@ private:
     bool                                m_bDoPaintballs;
     bool                                m_bShowInterpolation;
     #endif
+    bool                                m_bDevelopmentMode;
+    bool                                m_bShowCollision;
 
     // Debug class. Empty in release.
 public:

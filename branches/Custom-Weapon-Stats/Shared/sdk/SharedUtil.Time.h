@@ -85,9 +85,9 @@ namespace SharedUtil
         long long   ToLongLong      ( void ) const      { return m_llTicks; }
 
         // Static functions
-        static CTickCount Now ( void )
+        static CTickCount Now ( bool bUseModuleTickCount = false )
         {
-            return CTickCount ( GetTickCount64_ () );
+            return CTickCount ( bUseModuleTickCount ? GetModuleTickCount64 () : GetTickCount64_ () );
         }
     };
 
@@ -99,13 +99,13 @@ namespace SharedUtil
     class CElapsedTime
     {
         long long   m_llUpdateTime;
-        long        m_lElapsedTime;
-        long        m_lMaxIncrement;
+        long long   m_llElapsedTime;
+        long long   m_llMaxIncrement;
         bool        m_bUseModuleTickCount;
     public:
 
         CElapsedTime ( long lMaxIncrement = 500, bool bUseModuleTickCount = false )
-            : m_lMaxIncrement ( lMaxIncrement )
+            : m_llMaxIncrement ( lMaxIncrement )
             , m_bUseModuleTickCount ( bUseModuleTickCount )
         {
             Reset ();
@@ -114,15 +114,15 @@ namespace SharedUtil
         void Reset ( void )
         {
             m_llUpdateTime = DoGetTickCount ();
-            m_lElapsedTime = 0;
+            m_llElapsedTime = 0;
         }
 
-        long Get ( void )
+        long long Get ( void )
         {
             long long llTime = DoGetTickCount ();
-            m_lElapsedTime += Min ( m_lMaxIncrement, static_cast < long > ( llTime - m_llUpdateTime ) );
+            m_llElapsedTime += Min ( m_llMaxIncrement, llTime - m_llUpdateTime );
             m_llUpdateTime = llTime;
-            return m_lElapsedTime;
+            return m_llElapsedTime;
         }
 
     protected:

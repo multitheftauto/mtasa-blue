@@ -2216,6 +2216,27 @@ int CLuaFunctionDefinitions::GetDeadPlayers ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetPlayerIdleTime ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
+        if ( pPlayer )
+        {
+            lua_pushnumber ( luaVM, static_cast <double> ( GetTickCount64_ () - pPlayer->GetPositionLastChanged () ) );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPlayerIdleTime", "player", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getPlayerIdleTime" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::IsPlayerScoreboardForced ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
@@ -10755,6 +10776,299 @@ int CLuaFunctionDefinitions::ExecuteSQLInsert ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     lua_pushstring ( luaVM, strError.c_str () );
     return 2;
+}
+
+
+int CLuaFunctionDefinitions::DbConnect ( lua_State* luaVM )
+{
+//  element dbConnect ( string type, string host, string username, string password, string options )
+    SString strType; SString strHost; SString strUsername; SString strPassword; SString strOptions;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strType );
+    argStream.ReadString ( strHost );
+    argStream.ReadString ( strUsername, "" );
+    argStream.ReadString ( strPassword, "" );
+    argStream.ReadString ( strOptions, "" );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            CResource* pThisResource = pLuaMain->GetResource ();
+
+            // If type is sqlite, and has a host, try to resolve path
+            if ( strType == "sqlite" && !strHost.empty () )
+            {
+                // If path starts with :/ then use global database directory
+                if ( strHost.BeginsWith ( ":/" ) )
+                {
+                    strHost = strHost.SubStr ( 1 );
+                    if ( !IsValidFilePath ( strHost ) )
+                    {
+                        m_pScriptDebugging->LogError ( luaVM, "dbConnect failed; host path not valid" );
+                        lua_pushboolean ( luaVM, false );
+                        return 1;
+                    }
+                    strHost = PathJoin ( g_pGame->GetConfig ()->GetGlobalDatabasesPath (), strHost );
+                }
+                else
+                {
+                    std::string strAbsPath;
+
+                    // Parse path
+                    CResource* pPathResource = pThisResource;
+                    if ( CResourceManager::ParseResourcePathInput ( strHost, pPathResource, &strAbsPath, NULL ) )
+                    {
+                        if ( pPathResource == pThisResource ||
+                             m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
+                                                                CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                                                                "ModifyOtherObjects",
+                                                                CAccessControlListRight::RIGHT_TYPE_GENERAL,
+                                                                false ) )
+                        {
+                            strHost = strAbsPath;
+                        }
+                        else
+                        {
+                            m_pScriptDebugging->LogError ( luaVM, "dbConnect failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pPathResource->GetName ().c_str () );
+                            lua_pushboolean ( luaVM, false );
+                            return 1;
+                        }
+                    }
+                    else
+                    {
+                        m_pScriptDebugging->LogError ( luaVM, "dbConnect failed; host path %s not found", *strHost );
+                        lua_pushboolean ( luaVM, false );
+                        return 1;
+                    }
+                }
+            }
+            SConnectionHandle connection = g_pGame->GetDatabaseManager ()->Connect ( strType, strHost, strUsername, strPassword, strOptions );
+            if ( connection == INVALID_DB_HANDLE )
+            {
+                m_pScriptDebugging->LogError ( luaVM, "dbConnect failed; %s", *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
+
+            // Use an element to wrap the connection for auto disconnected when the resource stops
+            CDatabaseConnectionElement* pElement = new CDatabaseConnectionElement ( NULL, connection );
+            CElementGroup * pGroup = pThisResource->GetElementGroup();
+            if ( pGroup )
+            {
+                pGroup->Add ( pElement );
+            }
+
+            lua_pushelement ( luaVM, pElement );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dbConnect", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+//
+// Handle directing the callback for DbQuery
+//
+static void DbQueryCallback ( CDbJobData* pJobData, void* pContext )
+{
+    CLuaCallback* pLuaCallback = (CLuaCallback*)pContext;
+    if ( pJobData->stage == EJobStage::RESULT )
+    {
+        if ( pLuaCallback )
+            pLuaCallback->Call ();
+    }
+    SAFE_DELETE( pLuaCallback );
+}
+
+
+int CLuaFunctionDefinitions::DbQuery ( lua_State* luaVM )
+{
+//  handle dbQuery ( [ function callbackFunction, [ table callbackArguments, ] ] element connection, string query, ... )
+    CLuaFunctionRef iLuaFunction; CLuaArguments callbackArgs; CDatabaseConnectionElement* pElement; SString strQuery; CLuaArguments Args;
+
+    CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsFunction () )
+    {
+        argStream.ReadFunction ( iLuaFunction );
+        if ( argStream.NextIsTable () )
+        {
+            lua_pushnil ( luaVM );      // Loop through our table, beginning at the first key
+            while ( lua_next ( luaVM, argStream.m_iIndex ) != 0 )
+            {
+                callbackArgs.ReadArgument ( luaVM, -1 );    // Ignore the index at -2, and just read the value
+                lua_pop ( luaVM, 1 );                       // Remove the item and keep the key for the next iteration
+            }
+            argStream.m_iIndex++;
+        }
+    }
+    argStream.ReadUserData ( pElement );
+    argStream.ReadString ( strQuery );
+    argStream.ReadLuaArguments ( Args );
+    argStream.ReadFunctionComplete ();
+
+    if ( !argStream.HasErrors () )
+    {
+        // Start async query
+        CDbJobData* pJobData = g_pGame->GetDatabaseManager ()->QueryStart ( pElement->GetConnectionHandle (), strQuery, &Args );
+        if ( !pJobData )
+        {
+            m_pScriptDebugging->LogWarning ( luaVM, "dbQuery failed; %s", *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
+        // Make callback function if required
+        if ( VERIFY_FUNCTION( iLuaFunction ) )
+        {
+            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+            if ( pLuaMain )
+            {
+                CLuaArguments Arguments;
+                Arguments.PushUserData ( reinterpret_cast < void* > ( pJobData->GetId () ) );
+                Arguments.PushArguments ( callbackArgs );
+                pJobData->SetCallback ( DbQueryCallback, new CLuaCallback ( pLuaMain, iLuaFunction, Arguments ) );
+            }
+        }
+        lua_pushquery ( luaVM, pJobData );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dbQuery", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::DbExec ( lua_State* luaVM )
+{
+//  bool dbExec ( element connection, string query, ... )
+    CDatabaseConnectionElement* pElement; SString strQuery; CLuaArguments Args;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadString ( strQuery );
+    argStream.ReadLuaArguments ( Args );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Start async query
+        if ( !g_pGame->GetDatabaseManager ()->Exec ( pElement->GetConnectionHandle (), strQuery, &Args ) )
+        {
+            m_pScriptDebugging->LogWarning ( luaVM, "dbExec failed; %s", *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dbExec", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::DbFree ( lua_State* luaVM )
+{
+//  bool dbFree ( handle query )
+    CDbJobData* pJobData;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pJobData );
+
+    if ( !argStream.HasErrors () )
+    {
+        bool bResult = g_pGame->GetDatabaseManager ()->QueryFree ( pJobData );
+        lua_pushboolean ( luaVM, bResult );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dbFree", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
+{
+//  table dbPoll ( handle query, int timeout )
+    CDbJobData* pJobData; uint uiTimeout;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pJobData );
+    argStream.ReadNumber ( uiTimeout );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( !g_pGame->GetDatabaseManager ()->QueryPoll ( pJobData, uiTimeout ) )
+        {
+            // Not ready yet
+            lua_pushnil ( luaVM );
+            return 1;
+        }
+
+        if ( pJobData->result.status == EJobResult::FAIL )
+        {
+            m_pScriptDebugging->LogWarning ( luaVM, "dbPoll failed; %s", *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
+            lua_pushboolean ( luaVM, false );
+            lua_pushnumber ( luaVM, pJobData->result.strErrorCode );
+            lua_pushstring ( luaVM, pJobData->result.strReason );
+            return 3;
+        }
+
+        const CRegistryResult& Result = pJobData->result.registryResult;
+
+        // Make table!
+        lua_newtable ( luaVM );
+        for ( int i = 0; i < Result.nRows; i++ ) {
+            lua_newtable ( luaVM );                             // new table
+            lua_pushnumber ( luaVM, i+1 );                      // row index number (starting at 1, not 0)
+            lua_pushvalue ( luaVM, -2 );                        // value
+            lua_settable ( luaVM, -4 );                         // refer to the top level table
+            for ( int j = 0; j < Result.nColumns; j++ )
+            {
+                const CRegistryResultCell& cell = Result.Data[i][j];
+
+                // Push the column name
+                lua_pushlstring ( luaVM, Result.ColNames[j].c_str (), Result.ColNames[j].size () );
+                switch ( cell.nType )                           // push the value with the right type
+                {
+                    case SQLITE_INTEGER:
+                        lua_pushnumber ( luaVM, cell.nVal );
+                        break;
+                    case SQLITE_FLOAT:
+                        lua_pushnumber ( luaVM, cell.fVal );
+                        break;
+                    case SQLITE_BLOB:
+                        lua_pushlstring ( luaVM, (char *)cell.pVal, cell.nLength );
+                        break;
+                    case SQLITE_TEXT:
+                        lua_pushlstring ( luaVM, (char *)cell.pVal, cell.nLength - 1 );
+                        break;
+                    default:
+                        lua_pushboolean ( luaVM, false );
+                }
+                lua_settable ( luaVM, -3 );
+            }
+            lua_pop ( luaVM, 1 );                               // pop the inner table
+        }
+        lua_pushnumber ( luaVM, pJobData->result.uiNumAffectedRows );
+        return 2;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dbPoll", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 

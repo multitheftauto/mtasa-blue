@@ -130,6 +130,7 @@
 #include "lua/CLuaArgument.h"
 #include "lua/CLuaCFunctions.h"
 #include "lua/CLuaArguments.h"
+#include "lua/CLuaCallback.h"
 
 // Shared includes
 #include "TInterpolation.h"
@@ -276,6 +277,7 @@
 #include "utils/CTCPServerSocketImpl.h"
 #include "utils/CTCPSocket.h"
 #include "utils/CTCPSocketImpl.h"
+#include "utils/CZipMaker.h"
 #include <base64.h>
 
 // Module includes

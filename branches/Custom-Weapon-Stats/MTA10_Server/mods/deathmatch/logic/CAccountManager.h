@@ -18,6 +18,66 @@ class CAccountManager;
 
 #include "CAccount.h"
 #include "CXMLConfig.h"
+typedef uint SDbConnectionId;
+
+
+//
+// CFastList with additional name->account mapping
+//
+class CMappedAccountList : protected CFastList < CAccount >
+{
+public:
+    typedef CFastList < CAccount > Super;
+    typedef CFastList < CAccount >::iterator        iterator;
+    typedef CFastList < CAccount >::const_iterator  const_iterator;
+
+    // CMappedList functions
+    bool        contains ( CAccount* item ) const   { return Super::contains ( item ); }
+    iterator    begin ( void )                      { return Super::begin (); }
+    iterator    end ( void )                        { return Super::end (); }
+
+    void push_back ( CAccount* item )
+    {
+        assert ( !MapContainsPair( m_NameAccountMap, item->GetName (), item ) );
+        MapInsert( m_NameAccountMap, item->GetName (), item );
+        Super::push_back ( item );
+        assert ( m_NameAccountMap.size () == size () );
+    }
+
+    void remove ( CAccount* item )
+    {
+        MapRemovePair( m_NameAccountMap, item->GetName (), item );
+        Super::remove ( item );
+        assert ( m_NameAccountMap.size () == size () );
+    }
+
+    void clear ( void )
+    {
+        assert ( m_NameAccountMap.size () == size () );
+        m_NameAccountMap.clear ();
+        Super::clear ();
+    }
+
+    // Account functions
+    void FindAccountMatches ( std::vector < CAccount* >* pOutResults, const SString& strName )
+    {
+        MultiFind ( m_NameAccountMap, strName, pOutResults );
+    }
+
+    void ChangingName ( CAccount* pAccount, const SString& strOldName, const SString& strNewName )
+    {
+        if ( MapContainsPair ( m_NameAccountMap, strOldName, pAccount ) )
+        {
+            MapRemovePair ( m_NameAccountMap, strOldName, pAccount );
+            assert ( !MapContainsPair ( m_NameAccountMap, strNewName, pAccount ) );
+            MapInsert( m_NameAccountMap, strNewName, pAccount );
+        }
+    }
+
+protected:
+    std::multimap < SString, CAccount* > m_NameAccountMap;
+};
+
 
 
 //
@@ -32,12 +92,13 @@ public:
 
     void                        DoPulse                     ( void );
 
-    bool                        Load                        ( const char* szFileName = NULL );
+    bool                        Load                        ( void );
     bool                        Load                        ( CXMLNode* pParent );
     bool                        LoadSetting                 ( CXMLNode* pNode );
-    bool                        Save                        ( const char* szFileName = NULL );
+    bool                        Save                        ( void );
     bool                        Save                        ( CXMLNode* pParent );
-    bool                        Save                        ( CAccount* pParent, SString* pStrError = NULL );
+    void                        Save                        ( CAccount* pParent );
+
     bool                        SaveSettings                ( void );
     bool                        IntegrityCheck              ( void );
 
@@ -61,19 +122,22 @@ public:
     void                        Register                    ( CAccount* pAccount );
     void                        RemoveAccount               ( CAccount* pAccount );
 protected:
-    inline void                 AddToList                   ( CAccount* pAccount )      { m_List.push_back ( pAccount ); }
+    void                        AddToList                   ( CAccount* pAccount )      { m_List.push_back ( pAccount ); }
     void                        RemoveFromList              ( CAccount* pAccount );
 
     void                        MarkAsChanged               ( CAccount* pAccount );
+    void                        ChangingName                ( CAccount* pAccount, const SString& strOldName, const SString& strNewName );
     void                        ClearSQLDatabase            ( void );
 public:
     void                        RemoveAll                   ( void );
+    static void                 StaticDbCallback            ( CDbJobData* pJobData, void* pContext );
+    void                        DbCallback                  ( CDbJobData* pJobData );
 
-    inline list < CAccount* > ::const_iterator  IterBegin   ( void )                    { return m_List.begin (); };
-    inline list < CAccount* > ::const_iterator  IterEnd     ( void )                    { return m_List.end (); };
+    CMappedAccountList::const_iterator  IterBegin           ( void )                    { return m_List.begin (); };
+    CMappedAccountList::const_iterator  IterEnd             ( void )                    { return m_List.end (); };
 
 protected:
-    CMappedList < CAccount* >   m_List;
+    CMappedAccountList          m_List;
     bool                        m_bRemoveFromList;
 
     bool                        m_bAutoLogin;
@@ -81,7 +145,8 @@ protected:
     bool                        m_bChangedSinceSaved;
     long long                   m_llLastTimeSaved;
     CConnectHistory             m_AccountProtect;
-    CRegistry*                  m_pSaveFile;
+    SDbConnectionId             m_hDbConnection;
+    CDatabaseManager*           m_pDatabaseManager;
     bool                        m_bLoadXML;
     int                         m_iAccounts;
 };

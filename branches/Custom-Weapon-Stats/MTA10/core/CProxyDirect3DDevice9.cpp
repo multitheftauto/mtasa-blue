@@ -61,7 +61,7 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
     //
     // Get video card name
     //
-    STRNCPY( g_pDeviceState->AdapterState.Name, adaptIdent.Description, sizeof ( g_pDeviceState->AdapterState.Name ) );
+    g_pDeviceState->AdapterState.Name = adaptIdent.Description;
 
     //
     // Get max anisotropic setting
@@ -686,13 +686,13 @@ HRESULT CProxyDirect3DDevice9::ProcessVertices                ( UINT SrcStartInd
 
 HRESULT CProxyDirect3DDevice9::CreateVertexDeclaration        ( CONST D3DVERTEXELEMENT9* pVertexElements,IDirect3DVertexDeclaration9** ppDecl )
 {
-    return m_pDevice->CreateVertexDeclaration ( pVertexElements, ppDecl );
+    return CDirect3DEvents9::CreateVertexDeclaration ( m_pDevice, pVertexElements, ppDecl );
 }
 
 HRESULT CProxyDirect3DDevice9::SetVertexDeclaration           ( IDirect3DVertexDeclaration9* pDecl )
 {
     DeviceState.VertexDeclaration = pDecl;
-    return m_pDevice->SetVertexDeclaration ( pDecl );
+    return CDirect3DEvents9::SetVertexDeclaration ( m_pDevice, pDecl );
 }
 
 HRESULT CProxyDirect3DDevice9::GetVertexDeclaration           ( IDirect3DVertexDeclaration9** ppDecl )

@@ -79,10 +79,14 @@ void CServer::HandleInput ( char* szCommand )
 
 void CServer::DoPulse()
 {
+    UNCLOCK( "Top", "Other" );
     if ( m_pGame )
     {
+        CLOCK( "Top", "Game->DoPulse" );
         m_pGame->DoPulse ();
+        UNCLOCK( "Top", "Game->DoPulse" );
     }
+    CLOCK( "Top", "Other" );
 }
 
 
@@ -96,7 +100,15 @@ bool CServer::IsFinished ()
     return false;
 }
 
-bool CServer::PendingWorkToDo ()
+bool CServer::PendingWorkToDo ( int& iSleepMs )
 {
-    return g_pNetServer->GetPendingPacketCount () > 0;
+    if ( m_pGame && g_pNetServer )
+    {
+        if ( g_pNetServer->GetPendingPacketCount () > 0 )
+        {
+            iSleepMs = m_pGame->GetConfig ()->GetPendingWorkToDoSleepTime ();
+            return true;
+        }
+    }
+    return false;
 }

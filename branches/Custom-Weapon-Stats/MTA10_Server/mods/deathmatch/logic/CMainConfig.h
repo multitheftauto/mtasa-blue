@@ -35,9 +35,9 @@ class CMainConfig: public CXMLConfig
 public:
                                     CMainConfig                     ( CConsole* pConsole, class CLuaManager* pLuaMain );
 
-    bool                            Load                            ( const char* szFileName = NULL );
+    bool                            Load                            ( void );
     bool                            LoadExtended                    ( void );
-    bool                            Save                            ( const char* szFileName = NULL );
+    bool                            Save                            ( void );
 
     inline const std::string&       GetServerName                   ( void )        { return m_strServerName; };
     std::string                     GetServerIP                     ( void );
@@ -76,19 +76,27 @@ public:
     inline bool                     GetAutoUpdateIncludedResourcesEnabled   ( void )        { return m_bAutoUpdateIncludedResources; };
     inline bool                     GetDontBroadcastLan             ( void )        { return m_bDontBroadcastLan; };
     inline bool                     GetSerialVerificationEnabled    ( void )        { return m_bVerifySerials; };
-    bool                            IsDisableAC                     ( const char* szTagAC )     { return MapContains ( m_DisableACMap, szTagAC ); };
+    bool                            IsDisableAC                     ( const char* szTagAC )     { return MapContains ( m_DisableComboACMap, szTagAC ); };
     bool                            IsEnableDiagnostic              ( const char* szTag )       { return MapContains ( m_EnableDiagnosticMap, szTag ); };
-    bool                            IsBelowMinimumClient            ( const char* szVersion )   { return m_strMinClientVersion.length () && m_strMinClientVersion > szVersion; }
+    bool                            IsBelowMinimumClient            ( const char* szVersion )   { return GetMinimumClientVersion () > szVersion; }
     bool                            IsBelowRecommendedClient        ( const char* szVersion )   { return m_strRecommendedClientVersion.length () && m_strRecommendedClientVersion > szVersion; }
-    const SString&                  GetMinimumClientVersion         ( void )                    { return m_strMinClientVersion; }
+    void                            SetMinimumClientVersionOverride ( const SString& strOverride ) { m_strMinClientVersionOverride = strOverride; }
+    const SString&                  GetMinimumClientVersion         ( void )                    { return m_strMinClientVersionOverride > m_strMinClientVersion ? m_strMinClientVersionOverride : m_strMinClientVersion; }
     const SString&                  GetRecommendedClientVersion     ( void )                    { return m_strRecommendedClientVersion; }
     inline bool                     IsAutoLoginEnabled              ( )                         { return m_bAutoLogin; }
     const SString&                  GetIdFile                       ( void )                    { return m_strIdFile; }
     bool                            GetNetworkEncryptionEnabled     ( void )                    { return m_bNetworkEncryptionEnabled; }
+    const SString&                  GetGlobalDatabasesPath          ( void )                    { return m_strGlobalDatabasesPath; }
+    const SString&                  GetSystemDatabasesPath          ( void )                    { return m_strSystemDatabasesPath; }
+    const SString&                  GetBackupPath                   ( void )                    { return m_strBackupPath; }
+    int                             GetBackupInterval               ( void )                    { return m_iBackupInterval; }
+    int                             GetBackupAmount                 ( void )                    { return m_iBackupAmount; }
 
     inline unsigned short           GetFPSLimit                     ( void )        { return m_usFPSLimit; };
     bool                            SetFPSLimit                     ( unsigned short usFPS, bool bSave );
+    int                             GetPendingWorkToDoSleepTime     ( void )        { return m_iPendingWorkToDoSleepTime; };
 
+    SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
     bool                            SetSetting                      ( const SString& configSetting, const SString& strValue, bool bSave );
 
@@ -135,14 +143,21 @@ private:
     bool                            m_bVerifySerials;
     unsigned short                  m_usFPSLimit;
     bool                            m_bDontBroadcastLan;
-    std::map < SString, int >       m_DisableACMap;
-    std::map < SString, int >       m_EnableDiagnosticMap;
+    std::set < SString >            m_DisableComboACMap;
+    std::set < SString >            m_EnableDiagnosticMap;
     SString                         m_strMinClientVersion;
     SString                         m_strRecommendedClientVersion;
+    SString                         m_strMinClientVersionOverride;
     bool                            m_bAutoLogin;
     SString                         m_strIdFile;
+    SString                         m_strGlobalDatabasesPath;
+    SString                         m_strSystemDatabasesPath;
+    SString                         m_strBackupPath;
+    int                             m_iBackupInterval;
+    int                             m_iBackupAmount;
     bool                            m_bNetworkEncryptionEnabled;
     SString                         m_strBandwidthReductionMode;
+    int                             m_iPendingWorkToDoSleepTime;
     std::map < SString, SString >   m_TransientSettings;
 };
 

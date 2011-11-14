@@ -91,6 +91,7 @@ class CPlayer;
 class CPlayerManager;
 class CRadarAreaManager;
 class CRegisteredCommands;
+class CDatabaseManager;
 class CRegistryManager;
 class CRegistry;
 class CRemoteCalls;
@@ -197,6 +198,7 @@ public:
     inline CObjectSync*             GetObjectSync               ( void )        { return m_pObjectSync; }
 #endif
     inline CConsole*                GetConsole                  ( void )        { return m_pConsole; }
+    inline CDatabaseManager*        GetDatabaseManager          ( void )        { return m_pDatabaseManager; }
     inline CRegistryManager*        GetRegistryManager          ( void )        { return m_pRegistryManager; }
     inline CRegistry*               GetRegistry                 ( void )        { return m_pRegistry; }
     inline CAccountManager*         GetAccountManager           ( void )        { return m_pAccountManager; }
@@ -327,6 +329,9 @@ public:
 
     bool                        IsServerFullyUp             ( void )        { return m_bServerFullyUp; }
 
+    ushort                      GetServerFPS                ( void )        { return m_usFPS; }
+    void                        HandleBackup                ( void );
+
 private:
     void                        AddBuiltInEvents            ( void );
     void                        RelayPlayerPuresync         ( class CPacket& Packet );
@@ -395,6 +400,7 @@ private:
     CWhoWas                         m_WhoWas;
     CCommandLineParser              m_CommandLineParser;
     CRegisteredCommands*            m_pRegisteredCommands;
+    CDatabaseManager*               m_pDatabaseManager;
     CRegistryManager*               m_pRegistryManager;
     CRegistry*                      m_pRegistry;
     CAccountManager*                m_pAccountManager;
