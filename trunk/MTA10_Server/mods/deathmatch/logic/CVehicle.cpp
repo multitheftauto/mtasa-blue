@@ -400,6 +400,11 @@ bool CVehicle::HasValidModel ( void )
     return CVehicleManager::IsValidModel ( m_usModel );
 }
 
+void CVehicle::SetVariants ( unsigned char ucVariant, unsigned char ucVariant2 )
+{
+    m_ucVariant = ucVariant;
+    m_ucVariant2 = ucVariant2;
+}
 
 CVehicleColor& CVehicle::RandomizeColor ( void )
 {

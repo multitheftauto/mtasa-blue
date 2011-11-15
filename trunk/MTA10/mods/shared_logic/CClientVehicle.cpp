@@ -969,6 +969,13 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, bool bLoadImmedi
     }
 }
 
+void CClientVehicle::SetVariant ( unsigned char ucVariant, unsigned char ucVariant2 )
+{
+    m_ucVariation = ucVariant;
+    m_ucVariation2 = ucVariant2;
+
+    ReCreate ( );
+}
 
 bool CClientVehicle::IsEngineBroken ( void )
 {

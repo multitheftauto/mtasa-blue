@@ -136,6 +136,8 @@ public:
     inline unsigned char            GetVariant              ( void )                        { return m_ucVariant; };
     inline unsigned char            GetVariant2             ( void )                        { return m_ucVariant2; };
 
+    void                            SetVariants             ( unsigned char ucVariant, unsigned char ucVariant2 );
+
     eVehicleType                    GetVehicleType          ( void )                        { return m_eVehicleType; };
 
     inline CVehicleColor&           GetColor                ( void )                        { return m_Color; };

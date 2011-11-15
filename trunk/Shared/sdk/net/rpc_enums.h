@@ -210,5 +210,7 @@ enum eRPCFunctions
 
     SET_WEAPON_PROPERTY,
 
+    SET_VEHICLE_VARIANT,
+
     NUM_RPC_FUNCS
 };
