@@ -1729,7 +1729,7 @@ ushort CModelNames::ResolveModelID ( const SString& strModelName )
     // Check if it's a number
     bool bIsNumber = true;
     for ( int i = strModelName.length () - 1 ; i >= 0 && bIsNumber ; i-- )
-        if ( !isdigit ( strModelName [ i ] ) )
+        if ( !isdigit ( (uchar)strModelName [ i ] ) )
             bIsNumber = false;
 
     if ( bIsNumber )

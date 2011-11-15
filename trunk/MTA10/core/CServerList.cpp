@@ -446,7 +446,7 @@ bool ReadString ( std::string &strRead, const char * szBuffer, unsigned int &i, 
     if ( i <= nLength )
     {
         unsigned char len = szBuffer[i];
-        if ( i + len <= nLength )
+        if ( i + len <= nLength && len > 0 )
         {
             const char *ptr = &szBuffer[i + 1];
             i += len;
@@ -556,15 +556,22 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
     while ( i < nLength )
     {
         std::string strPlayer;
-
-        if ( ReadString ( strPlayer, szBuffer, i, nLength ) )
+        try
         {
-            // Remove color code, unless that results in an empty string
-            std::string strResult = RemoveColorCode ( strPlayer.c_str () );
-            if ( strResult.length () == 0 )
-                strResult = strPlayer;
-            if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PLAYER_LIST ) == false )
-                vecPlayers.push_back ( strResult );
+            if ( ReadString ( strPlayer, szBuffer, i, nLength ) )
+            {
+                // Remove color code, unless that results in an empty string
+                std::string strResult = RemoveColorCode ( strPlayer.c_str () );
+                if ( strResult.length () == 0 )
+                    strResult = strPlayer;
+                if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PLAYER_LIST ) == false )
+                    vecPlayers.push_back ( strResult );
+            }
+        }
+        catch ( ... )
+        {
+            // yeah that's what I thought.
+            return false;
         }
     }
 
