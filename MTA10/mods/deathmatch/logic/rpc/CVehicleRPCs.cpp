@@ -46,6 +46,7 @@ void CVehicleRPCs::LoadFunctions ( void )
     AddHandler ( SET_VEHICLE_HEADLIGHT_COLOR, SetVehicleHeadLightColor, "SetVehicleHeadLightColor" );
     AddHandler ( SET_VEHICLE_TURRET_POSITION, SetVehicleTurretPosition, "SetVehicleTurretPosition" );
     AddHandler ( SET_VEHICLE_DOOR_OPEN_RATIO, SetVehicleDoorOpenRatio, "SetVehicleDoorOpenRatio" );
+    AddHandler ( SET_VEHICLE_VARIANT, SetVehicleVariant, "SetVehicleVariant" );
 }
 
 
@@ -569,6 +570,21 @@ void CVehicleRPCs::SetVehicleDoorOpenRatio ( CClientEntity* pSource, NetBitStrea
         if ( pVehicle )
         {
             pVehicle->SetDoorOpenRatio ( ucDoor, angle.data.fRatio, uiTime, true );
+        }
+    }
+}
+
+void CVehicleRPCs::SetVehicleVariant ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+{
+    unsigned char ucVariant = 0;
+    unsigned char ucVariant2 = 0;
+    if ( bitStream.Read ( ucVariant ) &&
+         bitStream.Read ( ucVariant2 ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        if ( pVehicle )
+        {
+            pVehicle->SetVariant ( ucVariant, ucVariant2 );
         }
     }
 }

@@ -3673,8 +3673,8 @@ int CLuaFunctionDefinitions::CreateVehicle ( lua_State* luaVM )
         // Grab the rotation parameters
         CVector vecRotation;
         const char* szRegPlate = NULL;
-        unsigned char ucVariant = 255;
-        unsigned char ucVariant2 = 255;
+        unsigned char ucVariant = 254;
+        unsigned char ucVariant2 = 254;
         int iArgument5 = lua_type ( luaVM, 5 );
         if ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING )
         {
@@ -3765,6 +3765,36 @@ int CLuaFunctionDefinitions::GetVehicleType ( lua_State* luaVM )
     else
         lua_pushboolean ( luaVM, false );
 
+    return 1;
+}
+
+int CLuaFunctionDefinitions::SetVehicleVariant ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            unsigned char ucVariant = 254;
+            unsigned char ucVariant2 = 254;
+            if ( lua_type ( luaVM, 2 ) == LUA_TNUMBER && lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+            {
+                ucVariant = ( unsigned char ) lua_tonumber ( luaVM, 2 );
+                ucVariant2 = ( unsigned char ) lua_tonumber ( luaVM, 3 );
+            }
+            if ( CStaticFunctionDefinitions::SetVehicleVariant ( pVehicle, ucVariant, ucVariant2 ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleVariant", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleVariant" );
+
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 

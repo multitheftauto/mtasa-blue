@@ -173,6 +173,8 @@ public:
     inline unsigned char        GetVariant              ( void )                        { return m_ucVariation; };
     inline unsigned char        GetVariant2             ( void )                        { return m_ucVariation2; };
 
+    void                        SetVariant              ( unsigned char ucVariant, unsigned char ucVariant2 );
+
     bool                        IsEngineBroken          ( void );
     void                        SetEngineBroken         ( bool bEngineBroken );
 

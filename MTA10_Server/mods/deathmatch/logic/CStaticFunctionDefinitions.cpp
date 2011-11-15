@@ -4411,14 +4411,13 @@ bool CStaticFunctionDefinitions::SetWeaponAmmo ( CElement* pElement, unsigned ch
 
 CVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, char* szRegPlate, bool bDirection, unsigned char ucVariant, unsigned char ucVariant2 )
 {
-    if ( CVehicleManager::IsValidModel ( usModel ) && ( ucVariant <= 5 || ucVariant == 255 ) && ( ucVariant2 <= 5 || ucVariant2 == 255 ) )
+    unsigned char ucVariation = ucVariant;
+    unsigned char ucVariation2 = ucVariant2;
+    if ( ucVariant == 254 && ucVariant == 254 )
+        CVehicleManager::GetRandomVariation ( usModel, ucVariation, ucVariation2 );
+
+    if ( CVehicleManager::IsValidModel ( usModel ) && ( ucVariation <= 5 || ucVariation == 255 ) && ( ucVariation2 <= 5 || ucVariation2 == 255 ) )
     {
-
-        unsigned char ucVariation = ucVariant;
-        unsigned char ucVariation2 = ucVariant2;
-        if ( ucVariant2 == 255 && ucVariant == 255 )
-            CVehicleManager::GetRandomVariation ( usModel, ucVariation, ucVariation2 );
-
         //CVehicle* pVehicle = m_pVehicleManager->Create ( usModel, m_pMapManager->GetRootElement () );
         CVehicle* pVehicle = m_pVehicleManager->Create ( usModel, ucVariation, ucVariation2, pResource->GetDynamicElementRoot() );
         if ( pVehicle )
@@ -4446,6 +4445,28 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource* pResource, unsi
     }
 
     return NULL;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleVariant ( CVehicle* pVehicle, unsigned char ucVariant, unsigned char ucVariant2 )
+{
+    assert ( pVehicle );
+    unsigned char ucVariation = ucVariant;
+    unsigned char ucVariation2 = ucVariant2;
+    if ( ucVariant == 254 && ucVariant == 254 )
+        CVehicleManager::GetRandomVariation ( pVehicle->GetModel(), ucVariation, ucVariation2 );
+
+    if ( ( ucVariation <= 5 || ucVariation == 255 ) && ( ucVariation2 <= 5 || ucVariation2 == 255 ) )
+    {
+        pVehicle->SetVariants ( ucVariation, ucVariation2 );
+
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( ucVariation );
+        BitStream.pBitStream->Write ( ucVariation2 );
+
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_VARIANT, *BitStream.pBitStream ) );
+        return true;
+    }
+    return false;
 }
 
 bool CStaticFunctionDefinitions::GetVehicleVariant ( CVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2 )
