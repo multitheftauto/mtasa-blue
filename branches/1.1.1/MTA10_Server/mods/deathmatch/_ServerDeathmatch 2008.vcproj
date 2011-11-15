@@ -54,7 +54,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;&quot;../../../vendor/json-c/shipped_for_mta&quot;;../../../vendor/mysql/include"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;&quot;../../../vendor/json-c/shipped_for_mta&quot;"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -83,11 +83,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="lua5.1.lib wsock32.lib sqlite3.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre_2008.lib json2008.lib libmysql.lib"
+				AdditionalDependencies="lua5.1.lib wsock32.lib sqlite3.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre_2008.lib json2008.lib"
 				OutputFile="C:\Program Files\MTA San Andreas 1.1\server/mods/deathmatch/deathmatch.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib;&quot;../../../vendor/json-c/lib&quot;;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/sqlite/lib;../../../vendor/zlib/lib;../../../vendor/mysql/lib/opt"
+				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib;&quot;../../../vendor/json-c/lib&quot;;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/sqlite/lib;../../../vendor/zlib/lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
 				GenerateMapFile="true"
@@ -157,7 +157,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;&quot;../../../vendor/json-c/shipped_for_mta&quot;;../../../vendor/mysql/include"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;&quot;../../../vendor/json-c/shipped_for_mta&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
@@ -188,11 +188,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="lua5.1d.lib wsock32.lib sqlite3d.lib zlibd_2008.lib ehsd_2008.lib pthreadVC2.lib pmed_2008.lib pcred_2008.lib jsonD2008.lib libmysql.lib"
+				AdditionalDependencies="lua5.1d.lib wsock32.lib sqlite3d.lib zlibd_2008.lib ehsd_2008.lib pthreadVC2.lib pmed_2008.lib pcred_2008.lib jsonD2008.lib"
 				OutputFile="C:\Program Files\MTA San Andreas 1.1\server/mods/deathmatch/deathmatch_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib;&quot;../../../vendor/json-c/lib&quot;;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/sqlite/lib;../../../vendor/zlib/lib;../../../vendor/mysql/lib/opt"
+				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib;&quot;../../../vendor/json-c/lib&quot;;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/sqlite/lib;../../../vendor/zlib/lib"
 				IgnoreDefaultLibraryNames="MSVCRT"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/client_d.pdb"
@@ -262,7 +262,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;&quot;../../../vendor/json-c/shipped_for_mta&quot;;../../../vendor/mysql/include"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;&quot;../../../vendor/json-c/shipped_for_mta&quot;"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -291,11 +291,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="lua5.1.lib wsock32.lib sqlite3.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre_2008.lib json2008.lib libmysql.lib"
+				AdditionalDependencies="lua5.1.lib wsock32.lib sqlite3.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre_2008.lib json2008.lib"
 				OutputFile="../../../output/MTA San Andreas/server/mods/deathmatch/deathmatch.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib;&quot;../../../vendor/json-c/lib&quot;;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/sqlite/lib;../../../vendor/zlib/lib;../../../vendor/mysql/lib/opt"
+				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib;&quot;../../../vendor/json-c/lib&quot;;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/sqlite/lib;../../../vendor/zlib/lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
 				GenerateMapFile="true"
@@ -506,10 +506,6 @@
 				</File>
 				<File
 					RelativePath=".\logic\CCustomData.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CDatabaseConnectionMySql.cpp"
 					>
 				</File>
 				<File

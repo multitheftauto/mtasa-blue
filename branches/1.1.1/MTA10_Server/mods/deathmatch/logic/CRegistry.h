@@ -96,7 +96,7 @@ struct CRegistryResultCell
                                         delete [] pVal;
                                 }
 
-                                CRegistryResultCell& CRegistryResultCell::operator = ( const CRegistryResultCell& cell )
+                                CRegistryResultCell& operator = ( const CRegistryResultCell& cell )
                                 {
                                     if ( pVal )
                                         delete [] pVal;
