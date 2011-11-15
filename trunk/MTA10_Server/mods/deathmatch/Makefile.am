@@ -11,7 +11,6 @@ INCLUDES += -I$(srcdir)/../../../vendor/pme/
 INCLUDES += -I$(srcdir)/../../../vendor/json-c/
 INCLUDES += -I$(srcdir)/../../../vendor/bob_withers/
 INCLUDES += -I$(srcdir)/../../../vendor/bochs/
-INCLUDES += -I/usr/include/mysql
 INCLUDES += -I$(srcdir)/../../../Shared/animation/
 INCLUDES += -I$(ZIPDIR)/
 INCLUDES += -I$(LUADIR)/src
@@ -69,7 +68,6 @@ LOGIC = \
 ./logic/CConsoleCommands.cpp \
 ./logic/CCustomData.cpp \
 ./logic/CDummy.cpp \
-./logic/CDatabaseConnectionMySql.cpp \
 ./logic/CDatabaseConnectionSqlite.cpp \
 ./logic/CDatabaseJobQueue.cpp \
 ./logic/CDatabaseManager.cpp \
@@ -291,8 +289,7 @@ deathmatch_la_LIBADD = \
 	$(LUABDIR)/src/liblua.la \
 	$(top_builddir)/vendor/json-c/libjson.la \
 	$(SPARSEHASH_LIBS) \
-	$(SQLITE3_LIBS) \
-    -lmysqlclient
+	$(SQLITE3_LIBS)
 
 deathmatch_la_LDFLAGS = \
 	-module -avoid-version

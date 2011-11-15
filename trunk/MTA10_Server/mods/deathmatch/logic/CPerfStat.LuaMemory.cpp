@@ -303,7 +303,7 @@ void CPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CPerfStatResult* pResult, const
         // Some extra 'all VM' things
         c += 6;
         row[c++] = !g_pStats->iDbJobDataCount ? "-" : SString ( "%d", g_pStats->iDbJobDataCount );
-        row[c++] = !g_pStats->iDbConnectionCount ? "-" : SString ( "%d", g_pStats->iDbConnectionCount );
+        row[c++] = !g_pStats->iDbConnectionCount - 2 ? "-" : SString ( "%d", g_pStats->iDbConnectionCount - 2 );
     }
 
     // For each VM
