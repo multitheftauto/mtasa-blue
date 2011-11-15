@@ -37,6 +37,7 @@ typedef signed char         int8;       //  8
 typedef unsigned char       BYTE;       //  8
 typedef unsigned short      WORD;       //  16
 typedef unsigned long       DWORD;      //  32      32      64
+typedef float               FLOAT;      //  32
 
 // Type: considerations:
 // a) long (and therefore DWORD) is 64 bits when compiled using 64 bit GCC 

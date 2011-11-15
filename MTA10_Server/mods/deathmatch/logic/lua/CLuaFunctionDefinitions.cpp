@@ -697,9 +697,9 @@ int CLuaFunctionDefinitions::DetonateSatchels ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetWeaponProperty ( lua_State* luaVM )
 {
-    eWeaponSkill eWepSkill = eWeaponSkill::WEAPONSKILL_STD;
-    eWeaponType eWep = eWeaponType::WEAPONTYPE_BRASSKNUCKLE;
-    eWeaponProperty eProp = eWeaponProperty::WEAPON_ACCURACY;
+    eWeaponSkill eWepSkill = WEAPONSKILL_STD;
+    eWeaponType eWep = WEAPONTYPE_BRASSKNUCKLE;
+    eWeaponProperty eProp = WEAPON_ACCURACY;
 
     CScriptArgReader argStream ( luaVM );
     if ( argStream.NextIsEnumString ( eWep ) )
@@ -803,9 +803,9 @@ int CLuaFunctionDefinitions::SetWeaponProperty ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetWeaponProperty ( lua_State* luaVM )
 {
-    eWeaponSkill eWepSkill = eWeaponSkill::WEAPONSKILL_STD;
-    eWeaponType eWep = eWeaponType::WEAPONTYPE_UNARMED;
-    eWeaponProperty eProp = eWeaponProperty::WEAPON_INVALID_PROPERTY;
+    eWeaponSkill eWepSkill = WEAPONSKILL_STD;
+    eWeaponType eWep = WEAPONTYPE_UNARMED;
+    eWeaponProperty eProp = WEAPON_INVALID_PROPERTY;
 
     CScriptArgReader argStream ( luaVM );
     if ( argStream.NextIsEnumString ( eWep ) )
@@ -931,9 +931,9 @@ int CLuaFunctionDefinitions::GetWeaponProperty ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetOriginalWeaponProperty ( lua_State* luaVM )
 {
-    eWeaponSkill eWepSkill = eWeaponSkill::WEAPONSKILL_STD;
-    eWeaponType eWep = eWeaponType::WEAPONTYPE_UNARMED;
-    eWeaponProperty eProp = eWeaponProperty::WEAPON_INVALID_PROPERTY;
+    eWeaponSkill eWepSkill = WEAPONSKILL_STD;
+    eWeaponType eWep = WEAPONTYPE_UNARMED;
+    eWeaponProperty eProp = WEAPON_INVALID_PROPERTY;
 
     CScriptArgReader argStream ( luaVM );
     if ( argStream.NextIsEnumString ( eWep ) )

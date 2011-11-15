@@ -165,6 +165,8 @@ LOGIC = \
 ./logic/CWater.cpp \
 ./logic/CWaterManager.cpp \
 ./logic/CWeaponNames.cpp \
+./logic/CWeaponStat.cpp \
+./logic/CWeaponStatManager.cpp \
 ./logic/CWhoWas.cpp \
 ./logic/CXMLConfig.cpp \
 ./logic/CZoneNames.cpp \
