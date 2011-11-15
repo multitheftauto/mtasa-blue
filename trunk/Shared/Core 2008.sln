@@ -78,6 +78,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqlite", "..\vendor\sqlite\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client - Launch", "..\MTA10\launch\_Launch 2008.vcproj", "{C9188AB9-F099-4370-85DC-876B3904B939}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server - Dbconmy", "..\MTA10_Server\dbconmy\_ServerDbconmy 2008.vcproj", "{74BA3D0E-374F-419D-A313-977DFA863D2A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -223,6 +225,12 @@ Global
 		{C9188AB9-F099-4370-85DC-876B3904B939}.Nightly|Win32.Build.0 = Nightly|Win32
 		{C9188AB9-F099-4370-85DC-876B3904B939}.Release|Win32.ActiveCfg = Release|Win32
 		{C9188AB9-F099-4370-85DC-876B3904B939}.Release|Win32.Build.0 = Release|Win32
+		{74BA3D0E-374F-419D-A313-977DFA863D2A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{74BA3D0E-374F-419D-A313-977DFA863D2A}.Debug|Win32.Build.0 = Debug|Win32
+		{74BA3D0E-374F-419D-A313-977DFA863D2A}.Nightly|Win32.ActiveCfg = Nightly|Win32
+		{74BA3D0E-374F-419D-A313-977DFA863D2A}.Nightly|Win32.Build.0 = Nightly|Win32
+		{74BA3D0E-374F-419D-A313-977DFA863D2A}.Release|Win32.ActiveCfg = Release|Win32
+		{74BA3D0E-374F-419D-A313-977DFA863D2A}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
