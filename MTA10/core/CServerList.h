@@ -255,7 +255,7 @@ public:
         if ( strVersionSortKey.empty () )
             strVersionSortKey = "0.0";
 
-        if ( isdigit ( strVersionSortKey.Right ( 1 )[0] ) )
+        if ( isdigit ( (uchar)strVersionSortKey.Right ( 1 )[0] ) )
             strVersionSortKey += 'z';
 
         SString strTemp;

@@ -760,7 +760,7 @@ bool CLuaArguments::ReadFromJSONString ( const char* szJSON )
         char c = *ptr++;
         if ( c == '[' )
             break;
-        if ( isspace( c ) )
+        if ( isspace( (uchar)c ) )
             continue;
         return false;
     }

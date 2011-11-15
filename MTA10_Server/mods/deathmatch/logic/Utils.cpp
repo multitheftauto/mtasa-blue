@@ -28,8 +28,8 @@
         char *ret = a;
         while (*a != '\0')
         {
-            if (islower (*a))
-                *a = toupper (*a);
+            if (islower ((uchar)*a))
+                *a = toupper ((uchar)*a);
             ++a;
         }
         return ret;

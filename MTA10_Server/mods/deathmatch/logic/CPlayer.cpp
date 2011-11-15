@@ -608,7 +608,10 @@ const std::string& CPlayer::GetAnnounceValue ( const string& strKey ) const
 
 void CPlayer::SetAnnounceValue ( const string& strKey, const string& strValue )
 {
-    m_AnnounceValues [ strKey ] = strValue;
+    if ( strValue.length () > MAX_ANNOUNCE_VALUE_LENGTH )
+        m_AnnounceValues [ strKey ] = strValue.substr ( 0, MAX_ANNOUNCE_VALUE_LENGTH );
+    else
+        m_AnnounceValues [ strKey ] = strValue;
 }
 
 

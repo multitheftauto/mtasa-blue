@@ -40,7 +40,7 @@ struct SKeyBindSection
         // convert to upper case
         for ( unsigned int i = 0; i < strlen(szTitle); i++ )
         {
-            if ( isalpha(szTitle[i]) )
+            if ( isalpha((uchar)szTitle[i]) )
                 this->szTitle[i] = toupper(szTitle[i]);
             else
                 this->szTitle[i] = szTitle[i];

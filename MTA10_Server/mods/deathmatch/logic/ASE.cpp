@@ -417,18 +417,26 @@ CLanBroadcast* ASE::InitLan ( void )
 
 void ASE::SetGameType ( const char * szGameType )
 {
-    m_strGameType = szGameType;
+    m_strGameType = SStringX ( szGameType ).Left ( MAX_ASE_GAME_TYPE_LENGTH );
 }
 
 
 void ASE::SetMapName ( const char * szMapName )
 {
-    m_strMapName = szMapName;
+    m_strMapName = SStringX ( szMapName ).Left ( MAX_ASE_MAP_NAME_LENGTH );
 }
 
 
 const char* ASE::GetRuleValue ( const char* szKey )
 {
+    // Limit szKey length
+    SString strKeyTemp;
+    if ( szKey && strlen ( szKey ) > MAX_RULE_KEY_LENGTH )
+    {
+        strKeyTemp = SStringX ( szKey ).Left ( MAX_RULE_KEY_LENGTH );
+        szKey = *strKeyTemp;
+    }
+
     list < CASERule* > ::iterator iter = m_Rules.begin ();
     for ( ; iter != m_Rules.end () ; iter++ )
     {
@@ -443,8 +451,24 @@ const char* ASE::GetRuleValue ( const char* szKey )
 
 void ASE::SetRuleValue ( const char* szKey, const char* szValue )
 {
+    // Limit szKey length
+    SString strKeyTemp;
+    if ( szKey && strlen ( szKey ) > MAX_RULE_KEY_LENGTH )
+    {
+        strKeyTemp = SStringX ( szKey ).Left ( MAX_RULE_KEY_LENGTH );
+        szKey = *strKeyTemp;
+    }
+
     if ( szKey && szKey [ 0 ] )
     {
+        // Limit szValue to 200 characters
+        SString strValueTemp;
+        if ( szValue && strlen ( szValue ) > MAX_RULE_VALUE_LENGTH )
+        {
+            strValueTemp = SStringX ( szValue ).Left ( MAX_RULE_VALUE_LENGTH );
+            szValue = *strValueTemp;
+        }
+
         list < CASERule* > ::iterator iter = m_Rules.begin ();
         for ( ; iter != m_Rules.end () ; iter++ )
         {
@@ -472,6 +496,14 @@ void ASE::SetRuleValue ( const char* szKey, const char* szValue )
 
 bool ASE::RemoveRuleValue ( const char* szKey )
 {
+    // Limit szKey length
+    SString strKeyTemp;
+    if ( szKey && strlen ( szKey ) > MAX_RULE_KEY_LENGTH )
+    {
+        strKeyTemp = SStringX ( szKey ).Left ( MAX_RULE_KEY_LENGTH );
+        szKey = *strKeyTemp;
+    }
+
     list < CASERule* > ::iterator iter = m_Rules.begin ();
     for ( ; iter != m_Rules.end () ; iter++ )
     {
