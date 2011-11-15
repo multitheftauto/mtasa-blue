@@ -113,7 +113,7 @@ CGameSA::CGameSA()
     {
         eWeaponType weaponType = (eWeaponType)(WEAPONTYPE_PISTOL + i);
         WeaponInfos[i] = new CWeaponInfoSA( (CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + i*CLASSSIZE_WeaponInfo), weaponType );
-        m_pWeaponStatsManager->CreateWeaponStat ( WeaponInfos[i], weaponType, WEAPONSKILL_STD );
+        m_pWeaponStatsManager->CreateWeaponStat ( WeaponInfos[i], (eWeaponType)(weaponType - WEAPONTYPE_PISTOL), WEAPONSKILL_STD );
     }
 
     // Extra weapon types for skills (WEAPONSKILL_POOR,WEAPONSKILL_PRO,WEAPONSKILL_SPECIAL)

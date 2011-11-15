@@ -2168,7 +2168,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     
     g_pGame->GetWorld ()->SetAircraftMaxHeight ( fAircraftMaxHeight );
 
-    for (int i = 0;i <= WEAPONTYPE_EXTINGUISHER - WEAPONTYPE_PISTOL;i++)
+    for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_EXTINGUISHER;i++)
     {
         bool bReadWeaponInfo = true;
         sWeaponPropertySync weaponProperty;
@@ -2176,7 +2176,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
         if ( bReadWeaponInfo )
         {
             bitStream.Read( &weaponProperty );
-            CWeaponStat * pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( (eWeaponType)weaponProperty.data.weaponType );
+            CWeaponStat * pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( (eWeaponType)i );
             pWeaponInfo->SetAccuracy        ( weaponProperty.data.fAccuracy );
             pWeaponInfo->SetMoveSpeed       ( weaponProperty.data.fMoveSpeed );
             pWeaponInfo->SetTargetRange     ( weaponProperty.data.fTargetRange );

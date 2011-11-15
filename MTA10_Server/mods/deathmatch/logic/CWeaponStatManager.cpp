@@ -173,7 +173,7 @@ void CWeaponStatManager::Init ( void )
     OriginalNormalWeaponData[22].firing_speed = 0.0f;
     OriginalNormalWeaponData[22].spread = 0.0f;
     OriginalNormalWeaponData[22].maximum_clip_ammo = 17;
-    OriginalNormalWeaponData[22].move_speed = 0.0f;
+    OriginalNormalWeaponData[22].move_speed = 1.0f;
     OriginalNormalWeaponData[22].flags = 12339;
     OriginalNormalWeaponData[22].anim_group = 13;
     OriginalNormalWeaponData[22].fire_type = (eFireType) 1;
@@ -227,7 +227,7 @@ void CWeaponStatManager::Init ( void )
     // 24 - Deagle
     OriginalNormalWeaponData[24].weapon_range = 35.0f;
     OriginalNormalWeaponData[24].target_range = 30.0f;
-    OriginalNormalWeaponData[24].accuracy = 0.0f;
+    OriginalNormalWeaponData[24].accuracy = 1.0f;
     OriginalNormalWeaponData[24].damage = 140;
     OriginalNormalWeaponData[24].life_span = 0.0f;
     OriginalNormalWeaponData[24].firing_speed = 0.0f;
@@ -323,7 +323,7 @@ void CWeaponStatManager::Init ( void )
     OriginalNormalWeaponData[27].firing_speed = 0.0f;
     OriginalNormalWeaponData[27].spread = 0.0f;
     OriginalNormalWeaponData[27].maximum_clip_ammo = 7;
-    OriginalNormalWeaponData[27].move_speed = 0.0f;
+    OriginalNormalWeaponData[27].move_speed = 1.0f;
     OriginalNormalWeaponData[27].flags = 28689;
     OriginalNormalWeaponData[27].anim_group = 21;
     OriginalNormalWeaponData[27].fire_type = (eFireType) 1;
@@ -377,7 +377,7 @@ void CWeaponStatManager::Init ( void )
     // 29 - MP5
     OriginalNormalWeaponData[29].weapon_range = 45.0f;
     OriginalNormalWeaponData[29].target_range = 40.0f;
-    OriginalNormalWeaponData[29].accuracy = 0.0f;
+    OriginalNormalWeaponData[29].accuracy = 1.0f;
     OriginalNormalWeaponData[29].damage = 25;
     OriginalNormalWeaponData[29].life_span = 0.0f;
     OriginalNormalWeaponData[29].firing_speed = 0.0f;
@@ -443,7 +443,7 @@ void CWeaponStatManager::Init ( void )
     OriginalNormalWeaponData[31].firing_speed = 0.0f;
     OriginalNormalWeaponData[31].spread = 0.0f;
     OriginalNormalWeaponData[31].maximum_clip_ammo = 50;
-    OriginalNormalWeaponData[31].move_speed = 0.0f;
+    OriginalNormalWeaponData[31].move_speed = 1.0f;
     OriginalNormalWeaponData[31].flags = 28689;
     OriginalNormalWeaponData[31].anim_group = 25;
     OriginalNormalWeaponData[31].fire_type = (eFireType) 1;
@@ -473,7 +473,7 @@ void CWeaponStatManager::Init ( void )
     OriginalNormalWeaponData[32].firing_speed = 0.0f;
     OriginalNormalWeaponData[32].spread = 0.0f;
     OriginalNormalWeaponData[32].maximum_clip_ammo = 50;
-    OriginalNormalWeaponData[32].move_speed = 0.0f;
+    OriginalNormalWeaponData[32].move_speed = 1.0f;
     OriginalNormalWeaponData[32].flags = 12339;
     OriginalNormalWeaponData[32].anim_group = 13;
     OriginalNormalWeaponData[32].fire_type = (eFireType) 1;
@@ -497,7 +497,7 @@ void CWeaponStatManager::Init ( void )
     // 33 - Rifle
     OriginalNormalWeaponData[33].weapon_range = 100.0f;
     OriginalNormalWeaponData[33].target_range = 55.0f;
-    OriginalNormalWeaponData[33].accuracy = 0.0f;
+    OriginalNormalWeaponData[33].accuracy = 1.0f;
     OriginalNormalWeaponData[33].damage = 75;
     OriginalNormalWeaponData[33].life_span = 0.0f;
     OriginalNormalWeaponData[33].firing_speed = 0.0f;
@@ -525,15 +525,15 @@ void CWeaponStatManager::Init ( void )
     OriginalNormalWeaponData[33].default_combo = 4;
     OriginalNormalWeaponData[33].combos_available = 1;
     // 34 - Sniper
-    OriginalNormalWeaponData[34].weapon_range = 300.0f;
-    OriginalNormalWeaponData[34].target_range = 250.0f;
-    OriginalNormalWeaponData[34].accuracy = 0.0f;
+    OriginalNormalWeaponData[34].weapon_range = 100.0f;
+    OriginalNormalWeaponData[34].target_range = 50.0f;
+    OriginalNormalWeaponData[34].accuracy = 1.0f;
     OriginalNormalWeaponData[34].damage = 125;
     OriginalNormalWeaponData[34].life_span = 0.0f;
     OriginalNormalWeaponData[34].firing_speed = 0.0f;
     OriginalNormalWeaponData[34].spread = 0.0f;
     OriginalNormalWeaponData[34].maximum_clip_ammo = 1;
-    OriginalNormalWeaponData[34].move_speed = 0.0f;
+    OriginalNormalWeaponData[34].move_speed = 1.0f;
     OriginalNormalWeaponData[34].flags = -24556;
     OriginalNormalWeaponData[34].anim_group = 27;
     OriginalNormalWeaponData[34].fire_type = (eFireType) 1;
@@ -557,13 +557,13 @@ void CWeaponStatManager::Init ( void )
     // 35 - Rocket Launcher
     OriginalNormalWeaponData[35].weapon_range = 55.0f;
     OriginalNormalWeaponData[35].target_range = 50.0f;
-    OriginalNormalWeaponData[35].accuracy = 0.0f;
+    OriginalNormalWeaponData[35].accuracy = 1.0f;
     OriginalNormalWeaponData[35].damage = 75;
     OriginalNormalWeaponData[35].life_span = 0.0f;
     OriginalNormalWeaponData[35].firing_speed = 0.0f;
     OriginalNormalWeaponData[35].spread = 0.0f;
     OriginalNormalWeaponData[35].maximum_clip_ammo = 1;
-    OriginalNormalWeaponData[35].move_speed = 0.0f;
+    OriginalNormalWeaponData[35].move_speed = 1.0f;
     OriginalNormalWeaponData[35].flags = -32236;
     OriginalNormalWeaponData[35].anim_group = 30;
     OriginalNormalWeaponData[35].fire_type = (eFireType) 2;
@@ -587,13 +587,13 @@ void CWeaponStatManager::Init ( void )
     // 36 - Rocket Launcher HS
     OriginalNormalWeaponData[36].weapon_range = 55.0f;
     OriginalNormalWeaponData[36].target_range = 50.0f;
-    OriginalNormalWeaponData[36].accuracy = 0.0f;
+    OriginalNormalWeaponData[36].accuracy = 1.0f;
     OriginalNormalWeaponData[36].damage = 75;
     OriginalNormalWeaponData[36].life_span = 0.0f;
     OriginalNormalWeaponData[36].firing_speed = 0.0f;
     OriginalNormalWeaponData[36].spread = 0.0f;
     OriginalNormalWeaponData[36].maximum_clip_ammo = 1;
-    OriginalNormalWeaponData[36].move_speed = 0.0f;
+    OriginalNormalWeaponData[36].move_speed = 1.0f;
     OriginalNormalWeaponData[36].flags = -32236;
     OriginalNormalWeaponData[36].anim_group = 30;
     OriginalNormalWeaponData[36].fire_type = (eFireType) 2;
@@ -617,13 +617,13 @@ void CWeaponStatManager::Init ( void )
     // 37 - Flamethrower
     OriginalNormalWeaponData[37].weapon_range = 5.0999999046326f;
     OriginalNormalWeaponData[37].target_range = 4.0f;
-    OriginalNormalWeaponData[37].accuracy = 0.0f;
+    OriginalNormalWeaponData[37].accuracy = 1.0f;
     OriginalNormalWeaponData[37].damage = 25;
     OriginalNormalWeaponData[37].life_span = 1000.0f;
     OriginalNormalWeaponData[37].firing_speed = 0.5f;
     OriginalNormalWeaponData[37].spread = 0.0f;
     OriginalNormalWeaponData[37].maximum_clip_ammo = 500;
-    OriginalNormalWeaponData[37].move_speed = 0.0f;
+    OriginalNormalWeaponData[37].move_speed = 1.0f;
     OriginalNormalWeaponData[37].flags = 568;
     OriginalNormalWeaponData[37].anim_group = 29;
     OriginalNormalWeaponData[37].fire_type = (eFireType) 3;
@@ -647,13 +647,13 @@ void CWeaponStatManager::Init ( void )
     // 38 - Minigun
     OriginalNormalWeaponData[38].weapon_range = 75.0f;
     OriginalNormalWeaponData[38].target_range = 65.0f;
-    OriginalNormalWeaponData[38].accuracy = 0.0f;
+    OriginalNormalWeaponData[38].accuracy = 1.0f;
     OriginalNormalWeaponData[38].damage = 140;
     OriginalNormalWeaponData[38].life_span = 0.0f;
     OriginalNormalWeaponData[38].firing_speed = 0.0f;
     OriginalNormalWeaponData[38].spread = 0.0f;
     OriginalNormalWeaponData[38].maximum_clip_ammo = 500;
-    OriginalNormalWeaponData[38].move_speed = 0.0f;
+    OriginalNormalWeaponData[38].move_speed = 1.0f;
     OriginalNormalWeaponData[38].flags = 568;
     OriginalNormalWeaponData[38].anim_group = 29;
     OriginalNormalWeaponData[38].fire_type = (eFireType) 1;
@@ -677,13 +677,13 @@ void CWeaponStatManager::Init ( void )
     // 39 - Satchel
     OriginalNormalWeaponData[39].weapon_range = 40.0f;
     OriginalNormalWeaponData[39].target_range = 30.0f;
-    OriginalNormalWeaponData[39].accuracy = 0.0f;
+    OriginalNormalWeaponData[39].accuracy = 1.0f;
     OriginalNormalWeaponData[39].damage = 75;
     OriginalNormalWeaponData[39].life_span = 800.0f;
     OriginalNormalWeaponData[39].firing_speed = 0.25f;
     OriginalNormalWeaponData[39].spread = 0.0f;
     OriginalNormalWeaponData[39].maximum_clip_ammo = 1;
-    OriginalNormalWeaponData[39].move_speed = 0.0f;
+    OriginalNormalWeaponData[39].move_speed = 1.0f;
     OriginalNormalWeaponData[39].flags = 256;
     OriginalNormalWeaponData[39].anim_group = 28;
     OriginalNormalWeaponData[39].fire_type = (eFireType) 2;
@@ -707,13 +707,13 @@ void CWeaponStatManager::Init ( void )
     // 40 - Bomb
     OriginalNormalWeaponData[40].weapon_range = 25.0f;
     OriginalNormalWeaponData[40].target_range = 25.0f;
-    OriginalNormalWeaponData[40].accuracy = 0.0f;
+    OriginalNormalWeaponData[40].accuracy = 1.0f;
     OriginalNormalWeaponData[40].damage = 0;
     OriginalNormalWeaponData[40].life_span = 0.0f;
     OriginalNormalWeaponData[40].firing_speed = 0.0f;
     OriginalNormalWeaponData[40].spread = 0.0f;
     OriginalNormalWeaponData[40].maximum_clip_ammo = 1;
-    OriginalNormalWeaponData[40].move_speed = 0.0f;
+    OriginalNormalWeaponData[40].move_speed = 1.0f;
     OriginalNormalWeaponData[40].flags = 0;
     OriginalNormalWeaponData[40].anim_group = 0;
     OriginalNormalWeaponData[40].fire_type = (eFireType) 5;
@@ -737,13 +737,13 @@ void CWeaponStatManager::Init ( void )
     // 41 - Spraycan
     OriginalNormalWeaponData[41].weapon_range = 6.0999999046326f;
     OriginalNormalWeaponData[41].target_range = 4.0f;
-    OriginalNormalWeaponData[41].accuracy = 0.0f;
+    OriginalNormalWeaponData[41].accuracy = 1.0f;
     OriginalNormalWeaponData[41].damage = 1;
     OriginalNormalWeaponData[41].life_span = 1000.0f;
     OriginalNormalWeaponData[41].firing_speed = 0.050000000745058f;
     OriginalNormalWeaponData[41].spread = 0.0099999997764826f;
     OriginalNormalWeaponData[41].maximum_clip_ammo = 500;
-    OriginalNormalWeaponData[41].move_speed = 0.0f;
+    OriginalNormalWeaponData[41].move_speed = 1.0f;
     OriginalNormalWeaponData[41].flags = 1073;
     OriginalNormalWeaponData[41].anim_group = 31;
     OriginalNormalWeaponData[41].fire_type = (eFireType) 3;
@@ -767,13 +767,13 @@ void CWeaponStatManager::Init ( void )
     // 42 - Fire Extinguisher
     OriginalNormalWeaponData[42].weapon_range = 10.10000038147f;
     OriginalNormalWeaponData[42].target_range = 10.0f;
-    OriginalNormalWeaponData[42].accuracy = 0.0f;
+    OriginalNormalWeaponData[42].accuracy = 1.0f;
     OriginalNormalWeaponData[42].damage = 1;
     OriginalNormalWeaponData[42].life_span = 1000.0f;
     OriginalNormalWeaponData[42].firing_speed = 0.10000000149012f;
     OriginalNormalWeaponData[42].spread = 0.0099999997764826f;
     OriginalNormalWeaponData[42].maximum_clip_ammo = 500;
-    OriginalNormalWeaponData[42].move_speed = 0.0f;
+    OriginalNormalWeaponData[42].move_speed = 1.0f;
     OriginalNormalWeaponData[42].flags = 56;
     OriginalNormalWeaponData[42].anim_group = 29;
     OriginalNormalWeaponData[42].fire_type = (eFireType) 3;
