@@ -1,2 +1,2 @@
-SUBDIRS = sdk core mods launcher
+SUBDIRS = sdk core dbconmy mods launcher
 

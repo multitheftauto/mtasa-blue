@@ -63,4 +63,4 @@ CDatabaseConnection*    NewDatabaseConnectionSqlite ( CDatabaseType* pManager, c
 // Create interfaces for mysql
 //
 CDatabaseType*          NewDatabaseTypeMySql        ( void );
-CDatabaseConnection*    NewDatabaseConnectionMySql  ( CDatabaseType* pManager, const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions );
+typedef CDatabaseConnection* ( NewDatabaseConnectionMySql_t )( CDatabaseType* pManager, const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions );

@@ -512,6 +512,7 @@ DontInstallRedist:
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\pthreadVC2.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\sqlite3.dll"
+		File "${SERVER_FILES_ROOT}\mods\deathmatch\dbconmy.dll"
 		!ifndef LIGHTBUILD
             File "${SERVER_FILES_ROOT}\mods\deathmatch\libmysql.dll"
 		!endif
@@ -773,6 +774,7 @@ Section Uninstall
 			Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
 			Delete "$INSTDIR\server\mods\deathmatch\pthreadVC2.dll"
 			Delete "$INSTDIR\server\mods\deathmatch\sqlite3.dll"
+			Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
 			Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
 		!endif
 

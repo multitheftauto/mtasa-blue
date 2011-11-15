@@ -220,6 +220,7 @@ AC_CONFIG_FILES([
 	irc/Makefile
 	MTA10_Server/Makefile
 	MTA10_Server/core/Makefile
+	MTA10_Server/dbconmy/Makefile
 	MTA10_Server/launcher/Makefile
 	MTA10_Server/mods/Makefile
 	MTA10_Server/mods/deathmatch/Makefile
