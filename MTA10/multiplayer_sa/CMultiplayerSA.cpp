@@ -297,6 +297,7 @@ DWORD RETURN_CHandlingData_isNotFWD =               0x6A04C3;
 #define CALL_CBike_ProcessEntityCollision1                  0x6BDF82
 #define CALL_CBike_ProcessEntityCollision2                  0x6BE0D1
 #define CALL_CMonsterTruck_ProcessEntityCollision           0x6C8B9E
+DWORD RETURN_ProcessEntityCollision =                             0x4185C0;
 
 #define HOOKPOS_PreHUDRender                                      0x053EAD8
 DWORD RETURN_PreHUDRender =                                       0x053EADD;
@@ -490,6 +491,7 @@ CMultiplayerSA::CMultiplayerSA()
 
     MemSetFast ( &localStatsData, 0, sizeof ( CStatsData ) );
     localStatsData.StatTypesFloat [ 24 ] = 569.0f; // Max Health
+    m_bSuspensionEnabled = true;
 }
 
 void CMultiplayerSA::InitHooks()
@@ -637,10 +639,6 @@ void CMultiplayerSA::InitHooks()
 
     HookInstallCall ( CALL_CTrafficLights_GetPrimaryLightState, (DWORD)HOOK_CTrafficLights_GetPrimaryLightState);
     HookInstallCall ( CALL_CTrafficLights_GetSecondaryLightState, (DWORD)HOOK_CTrafficLights_GetSecondaryLightState);
-    HookInstallCall ( CALL_CAutomobile_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
-    HookInstallCall ( CALL_CBike_ProcessEntityCollision1, (DWORD)HOOK_ProcessVehicleCollision );
-    HookInstallCall ( CALL_CBike_ProcessEntityCollision2, (DWORD)HOOK_ProcessVehicleCollision );
-    //HookInstallCall ( CALL_CMonsterTruck_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -1330,6 +1328,8 @@ void CMultiplayerSA::InitHooks()
 
     // Double the size of CPlaceable matrix array to fix a crash after CMatrixLinkList::AddToList1
     MemPut < int > ( 0x54F3A1, 1800 );
+
+    SetSuspensionEnabled ( false );
 }
 
 
@@ -5888,44 +5888,82 @@ void SetModelSuspensionLines ( CVehicleSAInterface* pVehicleIntf, void* pSuspens
     CModelInfo* pModelInfo = pGameInterface->GetModelInfo ( pVehicleIntf->m_pVehicle->GetModelIndex () );
     pModelInfo->SetVehicleSuspensionData ( pSuspensionLines );
 }
+// Some variables.
+DWORD dwSuspensionChangedJump = 0x4185C0;
+bool bSuspensionChanged = false;
+CVehicleSAInterface* pSuspensionInterface = NULL;
+bool CheckHasSuspensionChanged ( void )
+{
+    // Make sure we have a valid suspension interface
+    if ( pSuspensionInterface )
+    {
+        // Check our suspension interface has a valid vehicle and return the suspension changed marker
+        CVehicle* pVehicle = pSuspensionInterface->m_pVehicle;
+        if ( pVehicle )
+            return pVehicle->GetHandlingData()->HasSuspensionChanged ( );
+        else
+            return false;
+    }
+    else
+        return false;
 
+}
 void _declspec(naked) HOOK_ProcessVehicleCollision ()
 {
-    // When the vehicle's collision is about to be processed, set its per-vehicle
-    // suspension lines as the per-model suspension lines, and restore the per-model lines
-    // afterwards
     _asm
     {
-        push esi
-        call SetModelSuspensionLinesToVehiclePrivate
-        add esp, 4
-
-        push eax
-
-            push dword ptr [esp+4+0x20]
-            push dword ptr [esp+8+0x1C]
-            push dword ptr [esp+0xC+0x18]
-            push dword ptr [esp+0x10+0x14]
-            push dword ptr [esp+0x14+0x10]
-            push dword ptr [esp+0x18+0xC]
-            push dword ptr [esp+0x1C+8]
-            push dword ptr [esp+0x20+4]
-            mov eax, 0x4185C0       // CCollision::ProcessColModels
-            call eax
-            add esp, 0x20
-
-        pop edx
-
-        push eax
-        
-            push edx
-            push esi
-            call SetModelSuspensionLines
-            add esp, 8
-
-        pop eax
-        ret
+        mov     pSuspensionInterface, esi
+        pushad
     }
+
+    if ( CheckHasSuspensionChanged ( ) )
+    {
+        // When the vehicle's collision is about to be processed, set its per-vehicle
+        // suspension lines as the per-model suspension lines, and restore the per-model lines
+        // afterwards
+        _asm
+        {
+            popad
+            push esi
+            call SetModelSuspensionLinesToVehiclePrivate
+            add esp, 4
+
+            push eax
+
+                push dword ptr [esp+4+0x20]
+                push dword ptr [esp+8+0x1C]
+                push dword ptr [esp+0xC+0x18]
+                push dword ptr [esp+0x10+0x14]
+                push dword ptr [esp+0x14+0x10]
+                push dword ptr [esp+0x18+0xC]
+                push dword ptr [esp+0x1C+8]
+                push dword ptr [esp+0x20+4]
+                mov eax, 0x4185C0       // CCollision::ProcessColModels
+                call eax
+                add esp, 0x20
+
+            pop edx
+
+            push eax
+            
+                push edx
+                push esi
+                call SetModelSuspensionLines
+                add esp, 8
+
+            pop eax
+            ret
+        }
+    }
+    else
+    {
+        // Skip our code in this case because they haven't changed anything so it'l just cause problems.
+        _asm
+        {
+            popad
+            jmp dwSuspensionChangedJump
+        }
+    }    
 }
 
 
@@ -5948,5 +5986,28 @@ void _declspec(naked) HOOK_PreHUDRender ()
         mov     eax, ds:0B6F0B8h
 
         jmp     RETURN_PreHUDRender  // 0053EADD
+    }
+}
+
+
+void CMultiplayerSA::SetSuspensionEnabled ( bool bEnabled )
+{
+    if ( bEnabled )
+    {
+        // Hook Install
+        m_bSuspensionEnabled = true;
+        HookInstallCall ( CALL_CAutomobile_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
+        HookInstallCall ( CALL_CBike_ProcessEntityCollision1, (DWORD)HOOK_ProcessVehicleCollision );
+        HookInstallCall ( CALL_CBike_ProcessEntityCollision2, (DWORD)HOOK_ProcessVehicleCollision );
+        HookInstallCall ( CALL_CMonsterTruck_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
+    }
+    else
+    {
+        // Hook Uninstall
+        m_bSuspensionEnabled = false;
+        HookInstallCall ( CALL_CAutomobile_ProcessEntityCollision, RETURN_ProcessEntityCollision );
+        HookInstallCall ( CALL_CBike_ProcessEntityCollision1, RETURN_ProcessEntityCollision );
+        HookInstallCall ( CALL_CBike_ProcessEntityCollision2, RETURN_ProcessEntityCollision );
+        HookInstallCall ( CALL_CMonsterTruck_ProcessEntityCollision, RETURN_ProcessEntityCollision );
     }
 }

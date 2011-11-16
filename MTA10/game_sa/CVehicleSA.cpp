@@ -1977,6 +1977,11 @@ void CVehicleSA::CopyGlobalSuspensionLinesToPrivate ( void )
 
 void CVehicleSA::RecalculateSuspensionLines ( void )
 {
+    CHandlingEntry * pHandlingEntry = GetHandlingData ( );
+    // if suspension is master disabled or suspension hasn't changed return.
+    if ( g_pCore->GetMultiplayer ()->IsSuspensionEnabled () == false || pHandlingEntry->HasSuspensionChanged ( ) == false )
+        return;
+
     CVehicleSAInterface* pInt = GetVehicleInterface ();
     DWORD dwModel = GetModelIndex ();
     CModelInfo* pModelInfo = pGame->GetModelInfo ( dwModel );

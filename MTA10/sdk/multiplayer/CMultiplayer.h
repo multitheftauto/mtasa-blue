@@ -221,6 +221,9 @@ public:
     virtual void                        DeleteAndDisableGangTags    () = 0;
 
     virtual CLimits*                    GetLimits                   () = 0;
+
+    virtual bool                        IsSuspensionEnabled         ( ) = 0;
+    virtual void                        SetSuspensionEnabled        ( bool bEnabled ) = 0;
 };
 
 #endif

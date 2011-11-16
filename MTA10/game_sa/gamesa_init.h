@@ -11,11 +11,14 @@
 *****************************************************************************/
 
 #include "CGameSA.h"
+#include <multiplayer/CMultiplayer.h>
+#include <core/CCoreInterface.h>
 
 #ifndef __CGAMESA_INIT
 #define __CGAMESA_INIT
 
 extern CGameSA * pGame;
+extern CCoreInterface * g_pCore;
 
 //
 // Use MemSet/Cpy/Put/Add for the following memory regions:
