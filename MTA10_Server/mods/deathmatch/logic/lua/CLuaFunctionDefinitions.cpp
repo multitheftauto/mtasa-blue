@@ -10809,6 +10809,42 @@ int CLuaFunctionDefinitions::ExecuteSQLInsert ( lua_State* luaVM )
 }
 
 
+//
+// Db function callbacks
+//
+
+// Handle directing callback for DbQuery
+static void DbQueryCallback ( CDbJobData* pJobData, void* pContext )
+{
+    CLuaCallback* pLuaCallback = (CLuaCallback*)pContext;
+    if ( pJobData->stage == EJobStage::RESULT )
+    {
+        if ( pLuaCallback )
+            pLuaCallback->Call ();
+    }
+    SAFE_DELETE( pLuaCallback );
+}
+
+// Handle callback for DbExec
+static void DbExecCallback ( CDbJobData* pJobData, void* pContext )
+{
+    assert ( pContext == NULL );
+    if ( pJobData->stage >= EJobStage::RESULT && pJobData->result.status == EJobResult::FAIL )
+    {
+        m_pScriptDebugging->LogWarning ( NULL, "dbExec failed; %s", *pJobData->result.strReason );
+    }
+}
+
+// Handle callback for DbFree
+static void DbFreeCallback ( CDbJobData* pJobData, void* pContext )
+{
+    assert ( pContext == NULL );
+    if ( pJobData->stage >= EJobStage::RESULT && pJobData->result.status == EJobResult::FAIL )
+    {
+        m_pScriptDebugging->LogWarning ( NULL, "dbFree failed; %s", *pJobData->result.strReason );
+    }
+}
+
 int CLuaFunctionDefinitions::DbConnect ( lua_State* luaVM )
 {
 //  element dbConnect ( string type, string host, string username, string password, string options )
@@ -10903,21 +10939,6 @@ int CLuaFunctionDefinitions::DbConnect ( lua_State* luaVM )
 }
 
 
-//
-// Handle directing the callback for DbQuery
-//
-static void DbQueryCallback ( CDbJobData* pJobData, void* pContext )
-{
-    CLuaCallback* pLuaCallback = (CLuaCallback*)pContext;
-    if ( pJobData->stage == EJobStage::RESULT )
-    {
-        if ( pLuaCallback )
-            pLuaCallback->Call ();
-    }
-    SAFE_DELETE( pLuaCallback );
-}
-
-
 int CLuaFunctionDefinitions::DbQuery ( lua_State* luaVM )
 {
 //  handle dbQuery ( [ function callbackFunction, [ table callbackArguments, ] ] element connection, string query, ... )
@@ -10989,12 +11010,16 @@ int CLuaFunctionDefinitions::DbExec ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         // Start async query
-        if ( !g_pGame->GetDatabaseManager ()->Exec ( pElement->GetConnectionHandle (), strQuery, &Args ) )
+        CDbJobData* pJobData = g_pGame->GetDatabaseManager ()->Exec ( pElement->GetConnectionHandle (), strQuery, &Args );
+        if ( !pJobData )
         {
             m_pScriptDebugging->LogWarning ( luaVM, "dbExec failed; %s", *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
             lua_pushboolean ( luaVM, false );
             return 1;
         }
+        // Add callback for tracking errors
+        pJobData->SetCallback ( DbExecCallback, NULL );
+
         lua_pushboolean ( luaVM, true );
         return 1;
     }
@@ -11016,6 +11041,9 @@ int CLuaFunctionDefinitions::DbFree ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        // Add callback for tracking errors
+        pJobData->SetCallback ( DbFreeCallback, NULL );
+
         bool bResult = g_pGame->GetDatabaseManager ()->QueryFree ( pJobData );
         lua_pushboolean ( luaVM, bResult );
         return 1;
