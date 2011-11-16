@@ -629,11 +629,11 @@ json_object * CLuaArguments::WriteTableToJSONObject ( bool bSerialize, std::map 
 
 bool CLuaArguments::ReadFromJSONString ( const char* szJSON )
 {
-    // Fast isJSON check: Check first non-white space character is '['
+    // Fast isJSON check: Check first non-white space character is '[' or '{'
     for ( const char* ptr = szJSON ; true ; )
     {
         char c = *ptr++;
-        if ( c == '[' )
+        if ( c == '[' || c == '{' )
             break;
         if ( isspace( (uchar)c ) )
             continue;
