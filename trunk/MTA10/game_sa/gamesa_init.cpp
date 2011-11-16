@@ -16,6 +16,7 @@
 
 CGameSA* pGame = NULL;
 CNet* g_pNet = NULL;
+CCoreInterface* g_pCore = NULL;
 
 //-----------------------------------------------------------
 // This function uses the initialized data sections of the executables
@@ -31,6 +32,7 @@ CGame * GetGameInterface( CCoreInterface* pCore )
     assert ( g_pNet );
 
     pGame = new CGameSA;
+    g_pCore = pCore;
 
     return (CGame *)pGame;
 }

@@ -148,6 +148,7 @@ CHandlingManagerSA::CHandlingManagerSA ( void )
     m_HandlingNames["tailLight"] =                      HANDLING_TAILLIGHT;                     // doesn't seem to work*
     m_HandlingNames["animGroup"] =                      HANDLING_ANIMGROUP;                     // works model based
 
+    iChangedVehicles = 0;
 }
 
 
@@ -7980,3 +7981,66 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
 }
 
 
+
+void CHandlingManagerSA::CheckSuspensionChanges ( CHandlingEntry* pEntry )
+{
+    // Grab us a multiplayer_sa pointer
+    CMultiplayer * pMultiplayer = g_pCore->GetMultiplayer();
+    // Find our original data
+    const CHandlingEntry * pOriginal = m_pOriginalEntries [ pEntry->GetModel ( ) ];    
+    // Default bChanged to false
+    bool bChanged = false;
+    
+    // loads of if statements because I'm pro like that... na j/k
+    // Set bChanged to true if we find ANY change.
+    if ( pEntry->GetSuspensionAntiDiveMultiplier () != pOriginal->GetSuspensionAntiDiveMultiplier () )
+        bChanged = true;
+
+    if ( pEntry->GetSuspensionDamping () != pOriginal->GetSuspensionDamping () )
+        bChanged = true;
+
+    if ( pEntry->GetSuspensionForceLevel () != pOriginal->GetSuspensionForceLevel () )
+        bChanged = true;
+
+    if ( pEntry->GetSuspensionFrontRearBias () != pOriginal->GetSuspensionFrontRearBias () )
+        bChanged = true;
+
+    if ( pEntry->GetSuspensionHighSpeedDamping () != pOriginal->GetSuspensionHighSpeedDamping () )
+        bChanged = true;
+
+    if ( pEntry->GetSuspensionLowerLimit () != pOriginal->GetSuspensionLowerLimit () )
+        bChanged = true;
+
+    if ( pEntry->GetSuspensionUpperLimit () != pOriginal->GetSuspensionUpperLimit () )
+        bChanged = true;
+
+    // Is bChanged true and the suspension flag changed marker false
+    if ( bChanged == true && pEntry->HasSuspensionChanged ( ) == false )
+    {
+        // Is our hook uninstalled?
+        if ( pMultiplayer->IsSuspensionEnabled ( ) == false )
+            // Install the hook
+            pMultiplayer->SetSuspensionEnabled ( true );
+
+        // Increment iChangedVehicles
+        iChangedVehicles++;
+        // Set our Suspension Changed flag
+        pEntry->SetSuspensionChanged ( true );
+    }
+    // is bChanged false and is this model supposed to contain non-default info? (i.e. they just reverted)
+    else if ( bChanged == false && pEntry->HasSuspensionChanged ( ) == true )
+    {
+        // Decrement iChangedVehicles
+        iChangedVehicles--;
+        // Set the suspension Changed flag to false
+        pEntry->SetSuspensionChanged ( false );
+    }
+    // if we hit 0 vehicles installed and it's installed uninstall the hook
+    if ( iChangedVehicles == 0 && pMultiplayer->IsSuspensionEnabled ( ) == true )
+        pMultiplayer->SetSuspensionEnabled ( false );
+}
+void CHandlingManagerSA::RemoveChangedVehicle ( )
+{
+    // Decrement the count
+    iChangedVehicles--;
+}

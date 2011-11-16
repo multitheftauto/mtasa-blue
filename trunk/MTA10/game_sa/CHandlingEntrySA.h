@@ -145,6 +145,8 @@ public:
     eLightType      GetTailLight                    ( void ) const    { return static_cast < eLightType > ( m_Handling.ucTailLight ); };
     unsigned char   GetAnimGroup                    ( void ) const    { return m_Handling.ucAnimGroup; };
 
+    eVehicleTypes   GetModel                        ( void ) const    { return static_cast < eVehicleTypes > ( m_Handling.iVehicleID ); };
+    bool            HasSuspensionChanged            ( void ) const    { return m_bChanged; };
 
     // Set functions
     void            SetMass                         ( float fMass )                 { m_Handling.fMass = fMass; };
@@ -171,13 +173,13 @@ public:
     void            SetTractionLoss                 ( float fTractionLoss )         { m_Handling.fTractionLoss = fTractionLoss; };
     void            SetTractionBias                 ( float fTractionBias )         { m_Handling.fTractionBias = fTractionBias; };
 
-    void            SetSuspensionForceLevel         ( float fForce )                { m_Handling.fSuspensionForceLevel = fForce; };
-    void            SetSuspensionDamping            ( float fDamping )              { m_Handling.fSuspensionDamping = fDamping; };
-    void            SetSuspensionHighSpeedDamping   ( float fDamping )              { m_Handling.fSuspensionHighSpdDamping = fDamping; };
-    void            SetSuspensionUpperLimit         ( float fUpperLimit )           { m_Handling.fSuspensionUpperLimit = fUpperLimit; };
-    void            SetSuspensionLowerLimit         ( float fLowerLimit )           { m_Handling.fSuspensionLowerLimit = fLowerLimit; };
-    void            SetSuspensionFrontRearBias      ( float fBias )                 { m_Handling.fSuspensionFrontRearBias = fBias; };
-    void            SetSuspensionAntiDiveMultiplier ( float fAntidive )             { m_Handling.fSuspensionAntiDiveMultiplier = fAntidive; };
+    void            SetSuspensionForceLevel         ( float fForce );
+    void            SetSuspensionDamping            ( float fDamping );
+    void            SetSuspensionHighSpeedDamping   ( float fDamping );
+    void            SetSuspensionUpperLimit         ( float fUpperLimit );
+    void            SetSuspensionLowerLimit         ( float fLowerLimit );
+    void            SetSuspensionFrontRearBias      ( float fBias );
+    void            SetSuspensionAntiDiveMultiplier ( float fAntidive );
 
     void            SetCollisionDamageMultiplier    ( float fMultiplier )           { m_Handling.fCollisionDamageMultiplier = fMultiplier; };
 
@@ -194,6 +196,8 @@ public:
 
     tHandlingDataSA*    GetInterface                ( void )                        { return m_pHandlingSA; };
 
+    void            SetSuspensionChanged            ( bool bChanged )               { m_bChanged = bChanged; };
+
 private:
     tHandlingDataSA*        m_pHandlingSA;
     bool                    m_bDeleteInterface;
@@ -201,6 +205,7 @@ private:
     tHandlingDataSA         m_Handling;
 
     tHandlingDataSA*        m_pOriginalData;
+    bool                    m_bChanged;
 };
 
 #endif

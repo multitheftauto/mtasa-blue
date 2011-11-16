@@ -140,6 +140,8 @@ public:
     virtual eLightType      GetTailLight                    ( void ) const = 0;
     virtual unsigned char   GetAnimGroup                    ( void ) const = 0;
 
+    virtual eVehicleTypes   GetModel                        ( void ) const = 0;
+    virtual bool            HasSuspensionChanged            ( void ) const = 0;
 
     // Set functions
     virtual void            SetMass                         ( float fMass ) = 0;
@@ -185,6 +187,7 @@ public:
     virtual void            SetTailLight                    ( eLightType Style ) = 0;
     virtual void            SetAnimGroup                    ( unsigned char ucGroup ) = 0;
 
+    virtual void            SetSuspensionChanged            ( bool bChanged ) = 0;
 
     // Call this every time you're done changing something. This will recalculate
     // all transmission/handling values according to the new values.

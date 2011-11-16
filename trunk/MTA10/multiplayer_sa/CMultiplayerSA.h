@@ -164,6 +164,10 @@ public:
     bool                        m_bAkimboTargetUp;
 
     CLimits*                    GetLimits () { return &m_limits; }
+
+    bool                        m_bSuspensionEnabled;
+    void                        SetSuspensionEnabled        ( bool bEnabled );
+    bool                        IsSuspensionEnabled         ( void )                    { return m_bSuspensionEnabled; };
 private:
     CLimitsSA                   m_limits;
 
