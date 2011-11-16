@@ -347,9 +347,9 @@ void CDatabaseJobQueueImpl::DoPulse ( void )
         FreeCommand ( pJobData );
     }
 
-again:
     shared.m_Mutex.Lock ();
 
+again:
     // Delete finished
     for ( std::set < CDbJobData* >::iterator iter = m_FinishedList.begin () ; iter != m_FinishedList.end () ; )
     {
@@ -363,7 +363,7 @@ again:
 
         assert ( MapContains ( m_ActiveJobHandles, pJobData->GetId () ) );
         MapRemove ( m_ActiveJobHandles, pJobData->GetId () );
-        assert ( !pJobData->pfnDbResultCallback );
+        assert ( !pJobData->HasCallback () );
         SAFE_DELETE( pJobData );
         g_pStats->iDbJobDataCount--;
     }
@@ -375,13 +375,12 @@ again:
     for ( std::list < CDbJobData* >::iterator iter = shared.m_ResultQueue.begin () ; iter != shared.m_ResultQueue.end () ; ++iter )
     {
         CDbJobData* pJobData = *iter;
-        if ( pJobData->pfnDbResultCallback )
+
+        if ( pJobData->HasCallback () )
         {
-            PFN_DBRESULT pfnDbResultCallback = pJobData->pfnDbResultCallback;
-            pJobData->pfnDbResultCallback = NULL;
             shared.m_Mutex.Unlock ();
-            
-            pfnDbResultCallback ( pJobData, pJobData->pCallbackContext );
+            pJobData->ProcessCallback ();              
+            shared.m_Mutex.Lock ();
 
             // Redo from the top ensure everything is consistent
             goto again;
@@ -431,17 +430,11 @@ again:
             MapInsert ( m_FinishedList, pJobData );
 
             // Do callback incase any cleanup is needed
-            if ( pJobData->pfnDbResultCallback )
+            if ( pJobData->HasCallback () )
             {
-                PFN_DBRESULT pfnDbResultCallback = pJobData->pfnDbResultCallback;
-                pJobData->pfnDbResultCallback = NULL;
-                shared.m_Mutex.Unlock ();
-                
-                pfnDbResultCallback ( pJobData, pJobData->pCallbackContext );
-
+                shared.m_Mutex.Unlock ();                 
+                pJobData->ProcessCallback ();              
                 shared.m_Mutex.Lock ();
-                // Redo from the top ensure everything is consistent
-                goto again;
             }
         }
         else
@@ -479,12 +472,10 @@ bool CDatabaseJobQueueImpl::PollCommand ( CDbJobData* pJobData, uint uiTimeout )
                 MapInsert ( m_FinishedList, pJobData );
 
                 // Do callback incase any cleanup is needed
-                if ( pJobData->pfnDbResultCallback )
+                if ( pJobData->HasCallback () )
                 {
-                    PFN_DBRESULT pfnDbResultCallback = pJobData->pfnDbResultCallback;
-                    pJobData->pfnDbResultCallback = NULL;
                     shared.m_Mutex.Unlock ();                 
-                    pfnDbResultCallback ( pJobData, pJobData->pCallbackContext );
+                    pJobData->ProcessCallback ();              
                     shared.m_Mutex.Lock ();
                 }
 
@@ -600,6 +591,8 @@ void CDatabaseJobQueueImpl::IgnoreConnectionResults ( SConnectionHandle connecti
 ///////////////////////////////////////////////////////////////
 void CDatabaseJobQueueImpl::IgnoreJobResults ( CDbJobData* pJobData )
 {
+    dassert ( pJobData->stage <= EJobStage::RESULT );
+    dassert ( !MapContains ( m_FinishedList, pJobData ) );
     MapInsert ( m_IgnoreResultList, pJobData );
 }
 
