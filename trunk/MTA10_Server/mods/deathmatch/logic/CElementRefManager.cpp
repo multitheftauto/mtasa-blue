@@ -134,7 +134,6 @@ void CElementRefManager::RemoveElementListRef ( const char* szDebugInfo, std::li
 ///////////////////////////////////////////////////////////////
 void CElementRefManager::OnElementDelete ( CElement* pElement )
 {
-    OutputDebugLine ( SString ( "ms_ElementRefList.size: %d  ms_ElementRefListList.size: %d", ms_ElementRefList.size (), ms_ElementRefListList.size () ) );
     {
         std::set < CElement** > ::iterator iter = ms_ElementRefList.begin ();
         for ( ; iter != ms_ElementRefList.end () ; ++iter )
