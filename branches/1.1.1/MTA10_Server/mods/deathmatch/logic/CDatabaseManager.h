@@ -52,7 +52,7 @@ using EJobCommand::EJobCommandType;
 using EJobResult::EJobResultType;
 using EJobStage::EJobStageType;
 
-typedef void (*PFN_DBRESULT)  ( CDbJobData* pJobData, void* pContext );
+typedef void (*PFN_DBRESULT) ( CDbJobData* pJobData, void* pContext );
 
 //
 // All data realating to a database job
@@ -64,12 +64,12 @@ public:
 
                 CDbJobData      ( SDbJobId id ) : id ( id ) {}
     SDbJobId    GetId           ( void ) { return id; }
-    void        SetCallback     ( PFN_DBRESULT pfnInDbResult, void* pInCallbackContext ) { pfnDbResultCallback = pfnInDbResult; pCallbackContext = pInCallbackContext; }
+    bool        SetCallback     ( PFN_DBRESULT pfnDbResult, void* pContext );
+    bool        HasCallback     ( void );
+    void        ProcessCallback ( void );
 
     EJobStageType       stage;
     SDbJobId            id;
-    PFN_DBRESULT        pfnDbResultCallback;
-    void*               pCallbackContext;
 
     struct
     {
@@ -87,6 +87,14 @@ public:
         uint                uiNumAffectedRows;
         CRegistryResult     registryResult;
     } result;
+
+    struct
+    {
+        PFN_DBRESULT        pfnDbResult;
+        void*               pContext;
+        bool                bSet;
+        bool                bDone;
+    } callback;
 };
 
 
@@ -109,8 +117,8 @@ public:
     virtual void                    DoPulse                 ( void ) = 0;
     virtual SConnectionHandle       Connect                 ( const SString& strType, const SString& strHost, const SString& strUsername = "", const SString& strPassword = "", const SString& strOptions = "" ) = 0;
     virtual bool                    Disconnect              ( SConnectionHandle hConnection ) = 0;
-    virtual bool                    Exec                    ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs ) = 0;
-    virtual bool                    Execf                   ( SConnectionHandle hConnection, const char* szQuery, ... ) = 0;
+    virtual CDbJobData*             Exec                    ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs ) = 0;
+    virtual CDbJobData*             Execf                   ( SConnectionHandle hConnection, const char* szQuery, ... ) = 0;
     virtual CDbJobData*             QueryStart              ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs ) = 0;
     virtual CDbJobData*             QueryStartf             ( SConnectionHandle hConnection, const char* szQuery, ... ) = 0;
     virtual bool                    QueryPoll               ( CDbJobData* pJobData, uint ulTimeout ) = 0;

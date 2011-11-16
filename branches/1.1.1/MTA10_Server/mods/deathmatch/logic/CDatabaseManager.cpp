@@ -34,8 +34,8 @@ public:
     virtual void                    DoPulse                     ( void );
     virtual SConnectionHandle       Connect                     ( const SString& strType, const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions );
     virtual bool                    Disconnect                  ( SConnectionHandle hConnection );
-    virtual bool                    Exec                        ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
-    virtual bool                    Execf                       ( SConnectionHandle hConnection, const char* szQuery, ... );
+    virtual CDbJobData*             Exec                        ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
+    virtual CDbJobData*             Execf                       ( SConnectionHandle hConnection, const char* szQuery, ... );
     virtual CDbJobData*             QueryStart                  ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
     virtual CDbJobData*             QueryStartf                 ( SConnectionHandle hConnection, const char* szQuery, ... );
     virtual bool                    QueryPoll                   ( CDbJobData* pJobData, uint ulTimeout );
@@ -187,7 +187,7 @@ bool CDatabaseManagerImpl::Disconnect ( uint hConnection )
 // Start a query and ignore the result
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseManagerImpl::Exec ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs )
+CDbJobData* CDatabaseManagerImpl::Exec ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs )
 {
     ClearLastErrorMessage ();
 
@@ -195,7 +195,7 @@ bool CDatabaseManagerImpl::Exec ( SConnectionHandle hConnection, const SString& 
     if ( !MapContains ( m_ConnectionTypeMap, hConnection ) )
     {
         SetLastErrorMessage ( "Invalid connection" );
-        return false;
+        return NULL;
     }
 
     // Insert arguments with correct escapement
@@ -206,7 +206,7 @@ bool CDatabaseManagerImpl::Exec ( SConnectionHandle hConnection, const SString& 
 
     // Ignore result
     m_JobQueue->FreeCommand ( pJobData );
-    return true;
+    return pJobData;
 }
 
 
@@ -217,7 +217,7 @@ bool CDatabaseManagerImpl::Exec ( SConnectionHandle hConnection, const SString& 
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseManagerImpl::Execf ( SConnectionHandle hConnection, const char* szQuery, ... )
+CDbJobData* CDatabaseManagerImpl::Execf ( SConnectionHandle hConnection, const char* szQuery, ... )
 {
     va_list vl;
     va_start ( vl, szQuery );
@@ -228,7 +228,7 @@ bool CDatabaseManagerImpl::Execf ( SConnectionHandle hConnection, const char* sz
     if ( !MapContains ( m_ConnectionTypeMap, hConnection ) )
     {
         SetLastErrorMessage ( "Invalid connection" );
-        return false;
+        return NULL;
     }
 
     // Insert arguments with correct escapement
@@ -239,7 +239,7 @@ bool CDatabaseManagerImpl::Execf ( SConnectionHandle hConnection, const char* sz
 
     // Ignore result
     m_JobQueue->FreeCommand ( pJobData );
-    return true;
+    return pJobData;
 }
 
 
@@ -480,4 +480,55 @@ SString CDatabaseManagerImpl::InsertQueryArguments ( SConnectionHandle hConnecti
     // 'Helpful' error message
     CLogger::ErrorPrintf ( "DatabaseManager internal error #2" );
     return "";
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDbJobData::SetCallback
+//
+// Set callback for a job data
+// Returns false if callback could not be set
+//
+///////////////////////////////////////////////////////////////
+bool CDbJobData::SetCallback ( PFN_DBRESULT pfnDbResult, void* pContext )
+{
+    if ( callback.bSet )
+        return false;   // One has already been set
+
+    if ( this->stage > EJobStage::RESULT )
+        return false;   // Too late to set a callback now
+
+    // Set new
+    callback.pfnDbResult = pfnDbResult;
+    callback.pContext = pContext;
+    callback.bSet = true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDbJobData::HasCallback
+//
+// Returns true if callback has been set and has not been called yet
+//
+///////////////////////////////////////////////////////////////
+bool CDbJobData::HasCallback ( void )
+{
+    return callback.bSet && !callback.bDone;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDbJobData::ProcessCallback
+//
+// Do callback
+//
+///////////////////////////////////////////////////////////////
+void CDbJobData::ProcessCallback ( void )
+{
+    assert ( HasCallback () );
+    callback.bDone = true;
+    callback.pfnDbResult( this, callback.pContext );
 }

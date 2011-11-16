@@ -116,7 +116,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     pNet->SetEncryptionEnabled ( iVar != 0 );
 
     // Try to start a network to connect
-    if ( !pNet->StartNetwork ( m_strHost.c_str (), m_usPort ) )
+    if ( m_usPort && !pNet->StartNetwork ( m_strHost.c_str (), m_usPort ) )
     {
         SString strBuffer ( "Connecting to %s at port %u failed!", m_strHost.c_str (), m_usPort );
         CCore::GetSingleton ().ShowMessageBox ( "Error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
@@ -141,8 +141,19 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 
 bool CConnectManager::Reconnect ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave )
 {
+    // Use previous connection datum when function arguments are not set
+    unsigned int uiPort = 0;
+    CVARS_GET ( "host",         m_strHost );
+    CVARS_GET ( "port",         uiPort );
+    m_usPort = uiPort;
+
+    // If keeping the same host & port, retrieve the password as well
+    if ( !szHost || !szHost[0] || m_strHost == szHost )
+        if ( usPort == 0 || m_usPort == usPort )
+            CVARS_GET ( "password",     m_strPassword );
+
     // Allocate a new host and nick buffer and store the strings in them
-    if ( szHost )
+    if ( szHost && szHost[0] )
     {
         m_strHost = szHost;
     }
