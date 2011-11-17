@@ -1195,6 +1195,10 @@
 						RelativePath=".\logic\lua\LuaCommon.cpp"
 						>
 					</File>
+					<File
+						RelativePath=".\logic\lua\LuaUtils.cpp"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="luadefs"
@@ -2342,6 +2346,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\lua\CLuaTimerManager.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\LuaUtils.h"
 						>
 					</File>
 					<File

@@ -10375,7 +10375,7 @@ static void DbExecCallback ( CDbJobData* pJobData, void* pContext )
     assert ( pContext == NULL );
     if ( pJobData->stage >= EJobStage::RESULT && pJobData->result.status == EJobResult::FAIL )
     {
-        m_pScriptDebugging->LogWarning ( NULL, "dbExec failed; %s", *pJobData->result.strReason );
+        m_pScriptDebugging->LogWarning ( NULL, "%s: dbExec failed; %s", *pJobData->m_strDebugInfo, *pJobData->result.strReason );
     }
 }
 
@@ -10385,7 +10385,7 @@ static void DbFreeCallback ( CDbJobData* pJobData, void* pContext )
     assert ( pContext == NULL );
     if ( pJobData->stage >= EJobStage::RESULT && pJobData->result.status == EJobResult::FAIL )
     {
-        m_pScriptDebugging->LogWarning ( NULL, "dbFree failed; %s", *pJobData->result.strReason );
+        m_pScriptDebugging->LogWarning ( NULL, "%s: dbFree failed; %s", *pJobData->m_strDebugInfo, *pJobData->result.strReason );
     }
 }
 
@@ -10557,12 +10557,13 @@ int CLuaFunctionDefinitions::DbExec ( lua_State* luaVM )
         CDbJobData* pJobData = g_pGame->GetDatabaseManager ()->Exec ( pElement->GetConnectionHandle (), strQuery, &Args );
         if ( !pJobData )
         {
-            m_pScriptDebugging->LogWarning ( luaVM, "dbExec failed; %s", *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
+            m_pScriptDebugging->LogWarning ( luaVM, "dbExec failed: %s", *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
             lua_pushboolean ( luaVM, false );
             return 1;
         }
         // Add callback for tracking errors
         pJobData->SetCallback ( DbExecCallback, NULL );
+        pJobData->SetDebugInfo ( GetDebugMessage ( luaVM ) );
 
         lua_pushboolean ( luaVM, true );
         return 1;
@@ -10587,6 +10588,7 @@ int CLuaFunctionDefinitions::DbFree ( lua_State* luaVM )
     {
         // Add callback for tracking errors
         pJobData->SetCallback ( DbFreeCallback, NULL );
+        pJobData->SetDebugInfo ( GetDebugMessage ( luaVM ) );
 
         bool bResult = g_pGame->GetDatabaseManager ()->QueryFree ( pJobData );
         lua_pushboolean ( luaVM, bResult );
