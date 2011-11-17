@@ -67,6 +67,7 @@ public:
     bool        SetCallback     ( PFN_DBRESULT pfnDbResult, void* pContext );
     bool        HasCallback     ( void );
     void        ProcessCallback ( void );
+    void        SetDebugInfo    ( const SString& strMsg )   { m_strDebugInfo = strMsg; }
 
     EJobStageType       stage;
     SDbJobId            id;
@@ -95,6 +96,7 @@ public:
         bool                bSet;
         bool                bDone;
     } callback;
+    SString                 m_strDebugInfo;
 };
 
 

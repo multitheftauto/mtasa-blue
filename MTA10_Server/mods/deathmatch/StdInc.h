@@ -131,6 +131,7 @@
 #include "lua/CLuaCFunctions.h"
 #include "lua/CLuaArguments.h"
 #include "lua/CLuaCallback.h"
+#include "lua/LuaUtils.h"
 
 // Shared includes
 #include "TInterpolation.h"
