@@ -435,6 +435,7 @@ again:
                 shared.m_Mutex.Unlock ();                 
                 pJobData->ProcessCallback ();              
                 shared.m_Mutex.Lock ();
+                goto again;
             }
         }
         else
