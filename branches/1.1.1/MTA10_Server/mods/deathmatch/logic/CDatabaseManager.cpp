@@ -503,6 +503,7 @@ bool CDbJobData::SetCallback ( PFN_DBRESULT pfnDbResult, void* pContext )
     callback.pfnDbResult = pfnDbResult;
     callback.pContext = pContext;
     callback.bSet = true;
+    return true;
 }
 
 
