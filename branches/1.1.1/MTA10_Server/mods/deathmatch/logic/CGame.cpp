@@ -1058,11 +1058,16 @@ bool CGame::ProcessPacket ( CPacket& Packet )
 
 void CGame::JoinPlayer ( CPlayer& Player )
 {
+    CTimeUsMarker < 20 > marker;
+    marker.Set ( "Start" );
+
     // Set the root element as his parent
     // NOTE: Make sure he doesn't get any entities sent to him because we're sending him soon
     Player.SetDoNotSendEntities ( true );
     Player.SetParentObject ( m_pMapManager->GetRootElement () );
     Player.SetDoNotSendEntities ( false );
+
+    marker.Set ( "SetParentObject" );
 
     // Let him join
     Player.Send ( CPlayerJoinCompletePacket ( Player.GetID (),
@@ -1077,10 +1082,20 @@ void CGame::JoinPlayer ( CPlayer& Player )
                                               m_pMainConfig->GetVoiceSampleRate(),
                                               m_pMainConfig->GetVoiceQuality(),
                                               m_pMainConfig->GetVoiceBitrate() ) );
+
+    marker.Set ( "CPlayerJoinCompletePacket" );
+
+    // Add debug info if wanted
+    if ( CPerfStatDebugInfo::GetSingleton ()->IsActive ( "PlayerInGameNotice" ) )
+        CPerfStatDebugInfo::GetSingleton ()->AddLine ( "PlayerInGameNotice", marker.GetString () );
 }
+
 
 void CGame::InitialDataStream ( CPlayer& Player )
 {
+    CTimeUsMarker < 20 > marker;
+    marker.Set ( "Start" );
+
     // He's joined now
     Player.SetStatus ( STATUS_JOINED );
 
@@ -1095,8 +1110,12 @@ void CGame::InitialDataStream ( CPlayer& Player )
     PlayerNotice.SetShowInChat ( true );
     m_pPlayerManager->BroadcastOnlyJoined ( PlayerNotice, &Player );
 
+    marker.Set ( "PlayerNotice" );
+
     // Tell the map manager
     m_pMapManager->OnPlayerJoin ( Player ); // This sends the elements that are needed before the resources start
+
+    marker.Set ( "SendMapElements" );
 
     // Write all players connected right now to a playerlist packet except the one we got the ingame notice from
     CPlayerListPacket PlayerList;
@@ -1113,6 +1132,8 @@ void CGame::InitialDataStream ( CPlayer& Player )
     // Send it to the player we got this ingame notice from
     Player.Send ( PlayerList );
 
+    marker.Set ( "PlayerList" );
+
     // Send him element data of all the other players
     CEntityAddPacket EntityPacket;
     iter = m_pPlayerManager->IterBegin ();
@@ -1127,8 +1148,12 @@ void CGame::InitialDataStream ( CPlayer& Player )
     }
     Player.Send ( EntityPacket );
 
+    marker.Set ( "SendPlayerElements" );
+
     // Tell him about the blips (needs to be done after all the entities it can be attached to)
     m_pMapManager->SendBlips ( Player );
+
+    marker.Set ( "SendBlips" );
 
     // Send him the current info of the current players ( stats, clothes, etc )
     iter = m_pPlayerManager->IterBegin ();
@@ -1160,12 +1185,18 @@ void CGame::InitialDataStream ( CPlayer& Player )
         }
     }
 
+    marker.Set ( "PlayerStats" );
+
     // Tell the resource manager
     m_pResourceManager->OnPlayerJoin ( Player );
+
+    marker.Set ( "ResourceStartPacket" );
 
     // Tell our scripts the player has joined
     CLuaArguments Arguments;
     Player.CallEvent ( "onPlayerJoin", Arguments );
+
+    marker.Set ( "onPlayerJoin" );
 
     // If auto-login is enabled, try and log him in
     if ( m_pAccountManager->IsAutoLoginEnabled () )
@@ -1188,9 +1219,15 @@ void CGame::InitialDataStream ( CPlayer& Player )
         }
     }
 
+    marker.Set ( "AutoLogin" );
+
     // Register them on the lightweight sync manager.
     if ( Player.GetBitStreamVersion () >= 0x1a )
         m_lightsyncManager.RegisterPlayer ( &Player );
+
+    // Add debug info if wanted
+    if ( CPerfStatDebugInfo::GetSingleton ()->IsActive ( "InitialDataStream" ) )
+        CPerfStatDebugInfo::GetSingleton ()->AddLine ( "InitialDataStream", marker.GetString () );
 }
 
 void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSayInConsole, const char* szKickReason, const char* szResponsiblePlayer )

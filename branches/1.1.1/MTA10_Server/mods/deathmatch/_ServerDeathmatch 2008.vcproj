@@ -661,6 +661,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CPerfStat.DebugInfo.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CPerfStat.FunctionTiming.cpp"
 					>
 				</File>

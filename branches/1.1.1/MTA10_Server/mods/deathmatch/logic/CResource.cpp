@@ -568,6 +568,7 @@ CChecksum CResource::GenerateChecksum ( void )
         {
             CChecksum checksum = CChecksum::GenerateChecksumFromFile ( strPath );
             ( *iterf )->SetLastChecksum ( checksum );
+            ( *iterf )->SetLastFileSize ( FileSize ( strPath ) );
         }
     }
 
