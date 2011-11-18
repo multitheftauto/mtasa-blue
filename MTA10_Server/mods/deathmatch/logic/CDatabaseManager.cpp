@@ -44,6 +44,7 @@ public:
     virtual const SString&          GetLastErrorMessage         ( void )                    { return m_strLastErrorMessage; }
     virtual bool                    QueryWithResultf            ( SConnectionHandle hConnection, CRegistryResult* pResult, const char* szQuery, ... );
     virtual bool                    QueryWithCallbackf          ( SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const char* szQuery, ... );
+    virtual void                    SetLogLevel                 ( EJobLogLevelType logLevel, const SString& strLogFilename );
 
     // CDatabaseManagerImpl
     SString                         InsertQueryArguments        ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
@@ -428,6 +429,22 @@ CDbJobData* CDatabaseManagerImpl::GetQueryFromId ( SDbJobId id )
     return m_JobQueue->FindCommandFromId ( id );
 }
 
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseManagerImpl::SetLogLevel
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseManagerImpl::SetLogLevel ( EJobLogLevelType logLevel, const SString& strLogFilename )
+{
+    CDbOptionsMap argMap;
+    argMap.Set ( "name", strLogFilename );
+    argMap.Set ( "level", logLevel );
+    CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::SETLOGLEVEL, NULL, argMap.ToString () );
+    m_JobQueue->FreeCommand ( pJobData );
+}
 
 ///////////////////////////////////////////////////////////////
 //

@@ -358,6 +358,12 @@ bool CMainConfig::Load ( void )
     if ( GetString ( m_pRootNode, "authfile", strBuffer, 1 ) == IS_SUCCESS )
         m_strAuthFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
 
+    if ( GetString ( m_pRootNode, "dbfile", strBuffer, 1 ) == IS_SUCCESS )
+        m_strDbLogFilename = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
+    else
+        m_strDbLogFilename = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "logs/db.log" );
+
+
     // Grab the server access control list
     if ( GetString ( m_pRootNode, "acl", strBuffer, 1, 255 ) == IS_SUCCESS )
     {
@@ -679,6 +685,7 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "test", CConsoleCommands::Test, false );
 
     RegisterCommand ( "checkls", CConsoleCommands::CheckLightSync, false );
+    RegisterCommand ( "dblog", CConsoleCommands::SetDbLogLevel, false );
 
     return true;
 }
