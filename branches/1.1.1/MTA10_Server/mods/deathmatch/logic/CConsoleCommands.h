@@ -71,6 +71,7 @@ public:
     static bool         OpenPortsTest   ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         Test            ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         CheckLightSync  ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         SetDbLogLevel   ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 };
 
 #endif

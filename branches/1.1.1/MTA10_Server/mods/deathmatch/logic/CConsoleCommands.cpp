@@ -1975,3 +1975,25 @@ bool CConsoleCommands::CheckLightSync ( CConsole* pConsole, const char* szArgume
     }
     return false;
 }
+
+
+bool CConsoleCommands::SetDbLogLevel ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    if ( pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    {
+        if ( SStringX ( szArguments ).empty () )
+        {
+            pEchoClient->SendConsole ( "Usage: dblog [0-2]" );
+        }
+        else
+        {
+            EJobLogLevelType logLevel = static_cast < EJobLogLevelType > ( atoi ( szArguments ) );
+            logLevel = Clamp ( EJobLogLevel::NONE, logLevel, EJobLogLevel::ALL );
+            g_pGame->GetDatabaseManager ()->SetLogLevel ( logLevel, g_pGame->GetConfig ()->GetDbLogFilename () );
+            const char* logLevelNames[] = { "Off", "Errors only", "All queries" };
+            pEchoClient->SendConsole ( SString ( "Database logging level is now %d (%s)", logLevel, logLevelNames[logLevel] ) );
+        }
+        return true;
+    }
+    return false;
+}

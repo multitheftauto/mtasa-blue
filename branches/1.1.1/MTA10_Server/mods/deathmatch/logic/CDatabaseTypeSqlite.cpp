@@ -121,11 +121,7 @@ CDatabaseConnection* CDatabaseTypeSqlite::Connect ( const SString& strHost, cons
 
     // Parse options
     int bShareConnection = true;
-    {
-        CArgMap argMap ( "=", ";" );
-        argMap.SetFromString ( strOptions );
-        argMap.Get ( "share", bShareConnection, 1 );
-    }
+    GetOption < CDbOptionsMap > ( strOptions, "share", bShareConnection, 1 );
 
     CDatabaseConnection* pConnection = NULL;
 

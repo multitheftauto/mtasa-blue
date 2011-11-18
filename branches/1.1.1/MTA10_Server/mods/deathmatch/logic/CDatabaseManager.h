@@ -33,6 +33,7 @@ namespace EJobCommand
         DISCONNECT,
         QUERY,
         FLUSH,
+        SETLOGLEVEL,
     };
 };
 
@@ -48,11 +49,33 @@ namespace EJobStage
     };
 };
 
+namespace EJobLogLevel
+{
+    enum EJobLogLevelType
+    {
+        NONE,
+        ERRORS,
+        ALL,
+    };
+};
+
 using EJobCommand::EJobCommandType;
 using EJobResult::EJobResultType;
 using EJobStage::EJobStageType;
+using EJobLogLevel::EJobLogLevelType;
 
 typedef void (*PFN_DBRESULT) ( CDbJobData* pJobData, void* pContext );
+
+
+//
+// Specialized map for the options string
+//
+class CDbOptionsMap : public CArgMap
+{
+public:
+    CDbOptionsMap ( void ) : CArgMap ( "=", ";" ) {}
+};
+
 
 //
 // All data realating to a database job
@@ -82,7 +105,7 @@ public:
     struct
     {
         EJobResultType      status;
-        uint                strErrorCode;
+        uint                uiErrorCode;
         SString             strReason;
         SConnectionHandle   connectionHandle;
         uint                uiNumAffectedRows;
@@ -129,6 +152,7 @@ public:
     virtual const SString&          GetLastErrorMessage     ( void ) = 0;
     virtual bool                    QueryWithResultf        ( SConnectionHandle hConnection, CRegistryResult* pResult, const char* szQuery, ... ) = 0;
     virtual bool                    QueryWithCallbackf      ( SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const char* szQuery, ... ) = 0;
+    virtual void                    SetLogLevel             ( EJobLogLevelType logLevel, const SString& strLogFilename ) = 0;
 };
 
 CDatabaseManager* NewDatabaseManager ( void );

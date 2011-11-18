@@ -728,6 +728,32 @@ namespace SharedUtil
         void        GetKeys             ( std::vector < SString >& outList  ) const;                                        // All keys
     };
 
+    // Some templated accessors for CArgMap derived classes
+    template < class T, class U >
+    void SetOption ( SString& strText, const SString& strKey, const U& value )
+    {
+        T temp;
+        temp.SetFromString ( strText );
+        temp.Set ( strKey, value );
+        strText = temp.ToString ();
+    }
+
+    template < class T >
+    void GetOption ( const SString& strText, const SString& strKey, SString& strOutValue, const char* szDefault = "" )
+    {
+        T temp;
+        temp.SetFromString ( strText );
+        temp.Get ( strKey, strOutValue, szDefault );
+    }
+
+    template < class T >
+    void GetOption ( const SString& strText, const SString& strKey, int& iOutValue, int iDefault = 0 )
+    {
+        T temp;
+        temp.SetFromString ( strText );
+        temp.Get ( strKey, iOutValue, iDefault );
+    }
+
 
     ///////////////////////////////////////////////////////////////
     //

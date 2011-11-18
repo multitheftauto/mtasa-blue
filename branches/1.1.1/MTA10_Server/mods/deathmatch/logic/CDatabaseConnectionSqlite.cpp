@@ -78,9 +78,7 @@ CDatabaseConnectionSqlite::CDatabaseConnectionSqlite ( CDatabaseType* pManager, 
     g_pStats->iDbConnectionCount++;
 
     // Parse options string
-    CArgMap optionsMap ( "=", ";" );
-    optionsMap.SetFromString ( strOptions );
-    optionsMap.Get ( "batch", m_bAutomaticTransactionsEnabled, 1 );
+    GetOption < CDbOptionsMap > ( strOptions, "batch", m_bAutomaticTransactionsEnabled, 1 );
 
     MakeSureDirExists ( strPath );
     if ( sqlite3_open ( strPath, &m_handle ) )
