@@ -299,3 +299,22 @@ public:
 
     static CPerfStatFunctionTiming*  GetSingleton        ( void );
 };
+
+
+//
+// CPerfStatDebugInfo
+//
+class CPerfStatDebugInfo : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    // CPerfStatDebugInfo
+    virtual bool                IsActive            ( const char* szSectionName = NULL ) = 0;
+    virtual void                AddLine             ( const SString& strSection, const SString& strData ) = 0;
+
+    static CPerfStatDebugInfo*  GetSingleton      ( void );
+};

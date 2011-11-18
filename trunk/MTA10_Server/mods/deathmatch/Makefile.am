@@ -105,6 +105,7 @@ LOGIC = \
 ./logic/CPedSync.cpp \
 ./logic/CPerfStat.BandwidthReduction.cpp \
 ./logic/CPerfStat.BandwidthUsage.cpp \
+./logic/CPerfStat.DebugInfo.cpp \
 ./logic/CPerfStat.FunctionTiming.cpp \
 ./logic/CPerfStat.LibMemory.cpp \
 ./logic/CPerfStat.LuaMemory.cpp \

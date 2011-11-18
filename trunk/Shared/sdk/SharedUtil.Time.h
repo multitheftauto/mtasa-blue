@@ -132,4 +132,47 @@ namespace SharedUtil
         }
     };
 
+
+    //
+    // Timing sections of code
+    //
+    template < int RESERVE_NUM_ITEMS = 20 >
+    class CTimeUsMarker
+    {
+    public:
+        struct SItem
+        {
+            const char* szDesc;
+            TIMEUS timeUs;
+        };
+
+        CTimeUsMarker ( void )
+        {
+            itemList.reserve ( RESERVE_NUM_ITEMS );
+        }
+
+        void Set ( const char* szDesc )
+        {
+            itemList.push_back ( SItem () );
+            SItem& item = itemList.back ();
+            item.timeUs = GetTimeUs ();
+            item.szDesc = szDesc;
+        }
+
+        SString GetString ( void ) const
+        {
+            SString strStatus;
+            for ( uint i = 1 ; i < itemList.size () ; i++ )
+            {
+                const SItem& itemPrev = itemList[i-1];
+                const SItem& item = itemList[i];
+                strStatus += SString ( "[%0.2fms %s] ", ( item.timeUs - itemPrev.timeUs ) / 1000.f, item.szDesc ); 
+            }
+            return strStatus;
+        }
+
+     protected:
+        std::vector < SItem > itemList;
+    };
+
 }
