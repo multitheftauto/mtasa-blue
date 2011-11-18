@@ -685,7 +685,7 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "test", CConsoleCommands::Test, false );
 
     RegisterCommand ( "checkls", CConsoleCommands::CheckLightSync, false );
-    RegisterCommand ( "dblog", CConsoleCommands::SetDbLogLevel, false );
+    RegisterCommand ( "debugdb", CConsoleCommands::SetDbLogLevel, false );
 
     return true;
 }
