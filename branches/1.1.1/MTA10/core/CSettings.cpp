@@ -913,6 +913,7 @@ void CSettings::CreateGUI ( void )
     m_pDebugSettingCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
     m_pDebugSettingCombo->AddItem ( "Default" )->SetData ( (void*)0 );
     m_pDebugSettingCombo->AddItem ( "#6323 Network" )->SetData ( (void*)1 );
+    m_pDebugSettingCombo->AddItem ( "#0001 Graphics" )->SetData ( (void*)2 );
     m_pDebugSettingCombo->SetReadOnly ( true );
 
     m_pDebugSettingLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Select default always.\n(This setting is not saved)" ) );
@@ -2489,6 +2490,8 @@ void CSettings::SaveData ( void )
         SString strDebugSetting = "none";
         if ( iSelected == 1 )
             strDebugSetting = "net";    // #6323 Network
+        if ( iSelected == 2 )
+            strDebugSetting = "noshad";     // #0001 Graphics
         SetApplicationSetting ( "diagnostics", "debug-setting", strDebugSetting );
     }
 

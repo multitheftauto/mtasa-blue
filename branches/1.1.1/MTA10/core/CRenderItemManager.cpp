@@ -727,6 +727,9 @@ bool CRenderItemManager::CanCreateRenderItem ( ClassId classId )
     {
         if ( m_TestMode == DX_TEST_MODE_NO_SHADER )
             return false;
+
+        if ( GetApplicationSetting ( "diagnostics", "debug-setting" ) == "noshad" )
+            return false;
     }
     return true;
 }
