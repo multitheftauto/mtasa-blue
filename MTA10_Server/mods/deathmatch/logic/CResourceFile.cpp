@@ -58,22 +58,6 @@ CResourceFile::~CResourceFile ( void )
 }
 
 
-double CResourceFile::GetApproxSize ( void )
-{
-    double dSize = 0.0;
-
-    FILE * file = fopen ( m_strResourceFileName.c_str (), "rb" );
-    if ( file )
-    {
-        fseek ( file, 0, SEEK_END );
-        dSize = ftell ( file );
-        fclose ( file );
-    }
-
-    return dSize;
-}
-
-
 ResponseCode CResourceFile::Request ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse )
 {
     // HACK - Use http-client-files if possible as the resources directory may have been changed since the resource was loaded.
