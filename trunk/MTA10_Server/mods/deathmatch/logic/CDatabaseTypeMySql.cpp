@@ -133,11 +133,7 @@ CDatabaseConnection* CDatabaseTypeMySql::Connect ( const SString& strHost, const
 {
     // Parse options
     int bShareConnection = false;
-    {
-        CArgMap argMap ( "=", ";" );
-        argMap.SetFromString ( strOptions );
-        argMap.Get ( "share", bShareConnection, 0 );
-    }
+    GetOption < CDbOptionsMap > ( strOptions, "share", bShareConnection, 0 );
 
     CDatabaseConnection* pConnection = NULL;
 

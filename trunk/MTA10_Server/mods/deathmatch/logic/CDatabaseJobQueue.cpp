@@ -157,10 +157,13 @@ protected:
     void                        ProcessDisconnect           ( CDbJobData* pJobData );
     void                        ProcessQuery                ( CDbJobData* pJobData );
     void                        ProcessFlush                ( CDbJobData* pJobData );
+    void                        ProcessSetLogLevel          ( CDbJobData* pJobData );
     uint                        MakeHandleForConnection     ( CDatabaseConnection* pConnection );
     CDatabaseConnection*        GetConnectionFromHandle     ( SConnectionHandle connectionHandle );
     void                        RemoveHandleForConnection   ( SConnectionHandle connectionHandle, CDatabaseConnection* pConnection );
     SConnectionHandle           GetNextConnectionHandle     ( void );
+    void                        LogResult                   ( CDbJobData* pJobData );
+    void                        LogString                   ( const SString& strText );
 
     // Main thread variables
     SDbJobId                            m_JobHandleCounter;
@@ -178,6 +181,8 @@ protected:
     std::map < SConnectionHandle, CDatabaseConnection* >    m_HandleConnectionMap;
     std::map < SString, CDatabaseType* >                    m_DatabaseTypeMap;
     uint                                                    m_uiConnectionCountWarnThresh;
+    EJobLogLevelType                                        m_LogLevel;
+    SString                                                 m_strLogFilename;
 
     // Shared variables
     struct
@@ -690,6 +695,9 @@ void CDatabaseJobQueueImpl::ProcessCommand ( CDbJobData* pJobData )
     else
     if ( pJobData->command.type == EJobCommand::FLUSH )
         ProcessFlush ( pJobData );
+    else
+    if ( pJobData->command.type == EJobCommand::SETLOGLEVEL )
+        ProcessSetLogLevel ( pJobData );
 }
 
 
@@ -736,6 +744,10 @@ void CDatabaseJobQueueImpl::ProcessConnect ( CDbJobData* pJobData )
         pConnection->Release ();
         return;
     }
+
+    // Extract some options
+    GetOption < CDbOptionsMap > ( parts[4], "log", pConnection->m_bLoggingEnabled, 0 );
+    GetOption < CDbOptionsMap > ( parts[4], "tag", pConnection->m_strLogTag );
 
     // Get handle from CDatabaseConnection*
     SConnectionHandle connectionHandle = MakeHandleForConnection ( pConnection );
@@ -797,13 +809,16 @@ void CDatabaseJobQueueImpl::ProcessQuery ( CDbJobData* pJobData )
     {
         pJobData->result.status = EJobResult::FAIL;
         pJobData->result.strReason = pConnection->GetLastErrorMessage ();
-        pJobData->result.strErrorCode = pConnection->GetLastErrorCode ();
-        return;
+        pJobData->result.uiErrorCode = pConnection->GetLastErrorCode ();
+    }
+    else
+    {
+        pJobData->result.status = EJobResult::SUCCESS;
+        pJobData->result.uiNumAffectedRows = pConnection->GetNumAffectedRows ();
     }
 
-    // Set result
-    pJobData->result.status = EJobResult::SUCCESS;
-    pJobData->result.uiNumAffectedRows = pConnection->GetNumAffectedRows ();
+    // And log if required
+    LogResult ( pJobData );
 }
 
 
@@ -826,6 +841,21 @@ void CDatabaseJobQueueImpl::ProcessFlush ( CDbJobData* pJobData )
 
     // Do flush
     pConnection->Flush ();
+    pJobData->result.status = EJobResult::SUCCESS;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseJobQueueImpl::ProcessSetLogLevel ()
+//
+// Change logging level and filename
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseJobQueueImpl::ProcessSetLogLevel ( CDbJobData* pJobData )
+{
+    GetOption < CDbOptionsMap > ( pJobData->command.strData, "name", m_strLogFilename );
+    GetOption < CDbOptionsMap > ( pJobData->command.strData, "level", (int&)m_LogLevel );
     pJobData->result.status = EJobResult::SUCCESS;
 }
 
@@ -900,4 +930,65 @@ void CDatabaseJobQueueImpl::RemoveHandleForConnection ( SConnectionHandle connec
         CLogger::ErrorPrintf ( "RemoveHandleForConnection: Serious problem here\n" );
 
     MapRemove ( m_HandleConnectionMap, connectionHandle );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseJobQueueImpl::LogResult
+//
+// Log last job if connection has logging enabled
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseJobQueueImpl::LogResult ( CDbJobData* pJobData )
+{
+    // Early out if logging switched off globally
+    if ( m_LogLevel == EJobLogLevel::NONE )
+        return;
+
+    // Check logging status of connection
+    CDatabaseConnection* pConnection = GetConnectionFromHandle ( pJobData->command.connectionHandle );
+    if ( !pConnection || !pConnection->m_bLoggingEnabled )
+        return;
+
+    if ( pJobData->result.status == EJobResult::SUCCESS )
+    {
+        if ( m_LogLevel >= EJobLogLevel::ALL )
+        {
+            SString strLine ( "%s: [%s] SUCCESS: Affected rows:%d [Query:%s]\n"
+                                    , *GetLocalTimeString ( true, true )
+                                    , *pConnection->m_strLogTag
+                                    , pJobData->result.uiNumAffectedRows
+                                    , *pJobData->command.strData
+                                );
+            LogString ( strLine );
+        }
+    }
+    else
+    {
+        if ( m_LogLevel >= EJobLogLevel::ERRORS )
+        {
+            SString strLine ( "%s: [%s] FAIL: (%d) %s [Query:%s]\n"
+                                    , *GetLocalTimeString ( true, true )
+                                    , *pConnection->m_strLogTag
+                                    , pJobData->result.uiErrorCode
+                                    , *pJobData->result.strReason
+                                    , *pJobData->command.strData
+                                );
+            LogString ( strLine );
+        }
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseJobQueueImpl::LogString
+//
+// Add string to log output
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseJobQueueImpl::LogString ( const SString& strText )
+{
+    FileAppend ( m_strLogFilename, strText );
 }

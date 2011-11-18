@@ -10911,6 +10911,10 @@ int CLuaFunctionDefinitions::DbConnect ( lua_State* luaVM )
                     }
                 }
             }
+            // Add logging options
+            SetOption < CDbOptionsMap > ( strOptions, "log", 1 );
+            SetOption < CDbOptionsMap > ( strOptions, "tag", pThisResource->GetName () );
+            // Do connect
             SConnectionHandle connection = g_pGame->GetDatabaseManager ()->Connect ( strType, strHost, strUsername, strPassword, strOptions );
             if ( connection == INVALID_DB_HANDLE )
             {
@@ -11080,7 +11084,7 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
         {
             m_pScriptDebugging->LogWarning ( luaVM, "dbPoll failed; %s", *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
             lua_pushboolean ( luaVM, false );
-            lua_pushnumber ( luaVM, pJobData->result.strErrorCode );
+            lua_pushnumber ( luaVM, pJobData->result.uiErrorCode );
             lua_pushstring ( luaVM, pJobData->result.strReason );
             return 3;
         }
