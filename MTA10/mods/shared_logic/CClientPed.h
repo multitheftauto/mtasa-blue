@@ -319,6 +319,7 @@ public:
     inline CTaskManager*        GetTaskManager              ( void ) { return m_pTaskManager; }
 
     bool                        GetShotData                 ( CVector * pvecOrigin, CVector * pvecTarget = NULL, CVector * pvecGunMuzzle = NULL, CVector * pvecFireOffset = NULL, float* fAimX = NULL, float* fAimY = NULL );
+    CVector                     AdjustShotOriginForWalls    ( const CVector& vecOrigin, const CVector& vecTarget, float fMaxPullBack );
 
     eFightingStyle              GetFightingStyle            ( void );
     void                        SetFightingStyle            ( eFightingStyle style );
