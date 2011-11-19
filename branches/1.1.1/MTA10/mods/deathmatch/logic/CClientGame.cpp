@@ -1285,8 +1285,10 @@ bool CClientGame::IsNickValid ( const char* szNick )
     return true;
 }
 
-void CClientGame::ShowNetstat ( bool bShow )
+void CClientGame::ShowNetstat ( int iCmd )
 {
+    bool bShow = ( iCmd == 1 ) ? true : ( iCmd == 0 ) ? false : !m_bShowNetstat;
+
     if ( bShow && !m_bShowNetstat )
     {
         m_pNetworkStats->Reset ();
@@ -2769,7 +2771,8 @@ void CClientGame::DrawPlayerDetails ( CClientPlayer* pPlayer )
     const CVector& vecAimTarget = pPlayer->GetAimTarget ();
     unsigned char ucDrivebyAim = pPlayer->GetVehicleAimAnim ();
 
-    g_pCore->GetGraphics ()->DrawLine3D ( vecAimSource, vecAimTarget, 0x90DE1212, 1.0f );
+    g_pCore->GetGraphics ()->DrawLine3DQueued ( vecAimSource, vecAimTarget, 1.0f, 0x10DE1212, true );
+    g_pCore->GetGraphics ()->DrawLine3DQueued ( vecAimSource, vecAimTarget, 1.0f, 0x90DE1212, false );
 
     CTask *pPrimaryTask = pPlayer->GetCurrentPrimaryTask ();
     int iPrimaryTask = pPrimaryTask ? pPrimaryTask->GetTaskType () : -1;
@@ -2849,7 +2852,8 @@ void CClientGame::DrawWeaponsyncData ( CClientPlayer* pPlayer )
 
         // red line: Draw their synced aim line
         pPlayer->GetShotData ( &vecSource, &vecTarget );
-        g_pCore->GetGraphics ()->DrawLine3D ( vecSource, vecTarget, 0x90DE1212, 2.0f );
+        g_pCore->GetGraphics ()->DrawLine3DQueued ( vecSource, vecTarget, 2.0f, 0x10DE1212, true );
+        g_pCore->GetGraphics ()->DrawLine3DQueued ( vecSource, vecTarget, 2.0f, 0x90DE1212, false );
 
         // green line: Set muzzle as origin and perform a collision test for the target
         CColPoint* pCollision;
@@ -2862,7 +2866,8 @@ void CClientGame::DrawWeaponsyncData ( CClientPlayer* pPlayer )
                 CVector vecBullet = *pCollision->GetPosition() - vecSource;
                 vecBullet.Normalize();
                 CVector vecTarget = vecSource + (vecBullet * 200);
-                g_pCore->GetGraphics ()->DrawLine3D ( vecSource, vecTarget, 0x9012DE12, 0.5f );
+                g_pCore->GetGraphics ()->DrawLine3DQueued ( vecSource, vecTarget, 0.5f, 0x1012DE12, true );
+                g_pCore->GetGraphics ()->DrawLine3DQueued ( vecSource, vecTarget, 0.5f, 0x9012DE12, false );
             }
             pCollision->Destroy();
         }

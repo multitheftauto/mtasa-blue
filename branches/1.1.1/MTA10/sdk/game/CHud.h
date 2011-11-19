@@ -21,6 +21,7 @@ public:
     virtual VOID                SetHelpMessage( char * szMessage )=0;
     virtual VOID                SetBigMessage ( char * szBigMessage )=0;
     virtual VOID                Disable ( bool bDisabled )=0;
+    virtual bool                IsDisabled ( void )=0;
     //virtual VOID                DrawBarChart ( float fX, float fY, DWORD dwWidth, DWORD dwHeight, float fPercentage, DWORD dwForeColor, DWORD dwBorderColor )=0;
     virtual bool                CalcScreenCoors ( CVector * vecPosition1, CVector * vecPosition2, float * fX, float * fY, bool bSetting1, bool bSetting2 )=0;
     // Do not use - Seems to changes render/internal states
