@@ -4164,6 +4164,7 @@ bool CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
             vecOrigin += ( vecFront * 2.0f );
             vecTarget = vecOrigin + ( vecFront * fRange );
 
+            // Apply shoot through walls fix
             vecOrigin = AdjustShotOriginForWalls ( vecOrigin, vecTarget, 2.5f );
         }
         else
@@ -4180,6 +4181,7 @@ bool CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
             else if ( Controller.RightShoulder1 == 255 )    // First-person weapons, crosshair active: sync the crosshair
             {
                 g_pGame->GetCamera ()->Find3rdPersonCamTargetVector ( fRange, &vecGunMuzzle, &vecOrigin, &vecTarget );
+                // Apply shoot through walls fix
                 vecOrigin = AdjustShotOriginForWalls ( vecOrigin, vecTarget, 0.5f );
             }
             else if ( pVehicle )                            // Drive-by/vehicle weapons: camera origin as origin, performing collision tests
