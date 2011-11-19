@@ -10718,6 +10718,28 @@ int CLuaFunctionDefinitions::SetPlayerAnnounceValue ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::ResendPlayerModInfo ( lua_State* luaVM )
+{
+    // bool getPlayerModInfo ( player thePlayer )
+    CPlayer* pPlayer;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPlayer );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pNetServer->ResendModPackets ( pPlayer->GetSocket () );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "resendPlayerModInfo", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::ExecuteSQLCreateTable ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) == LUA_TSTRING )
