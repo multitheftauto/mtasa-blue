@@ -245,7 +245,7 @@ public:
     inline CElementDeleter*             GetElementDeleter               ( void )        { return &m_ElementDeleter; }
 
     // Status toggles
-    void                                ShowNetstat                     ( bool bShow );
+    void                                ShowNetstat                     ( int iCmd );
     void                                ShowEaeg                        ( bool bShow );
     inline void                         ShowFPS                         ( bool bShow )  { m_bShowFPS = bShow; };
 

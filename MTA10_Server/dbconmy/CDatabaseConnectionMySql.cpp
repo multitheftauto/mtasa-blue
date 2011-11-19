@@ -343,6 +343,8 @@ bool CDatabaseConnectionMySql::QueryInternal ( const SString& strQuery, CRegistr
         pResult->nRows++;
     }
 
+    mysql_free_result ( res );
+
     return true;
 }
 

@@ -160,7 +160,7 @@ void COMMAND_Disconnect ( const char *szCmdLine )
 void COMMAND_ShowNametags ( const char* szCmdLine )
 {
     int iCmd = ( szCmdLine && szCmdLine [ 0 ] ) ? atoi ( szCmdLine ) : -1;
-    bool bShow = ( iCmd == 1 ) ? true : ( iCmd == 0 ) ? false : !g_pCore->IsChatVisible ();
+    bool bShow = ( iCmd == 1 ) ? true : ( iCmd == 0 ) ? false : !g_pClientGame->GetNametags ()->IsVisible ();
     g_pClientGame->GetNametags ()->SetVisible ( bShow );
 }
 
@@ -173,10 +173,8 @@ void COMMAND_ShowChat ( const char* szCmdLine )
 
 void COMMAND_ShowNetstat ( const char* szCmdLine )
 {
-    if ( szCmdLine && szCmdLine [ 0 ] )
-    {
-        g_pClientGame->ShowNetstat ( atoi ( szCmdLine ) == 1 );
-    }
+    int iCmd = ( szCmdLine && szCmdLine [ 0 ] ) ? atoi ( szCmdLine ) : -1;
+    g_pClientGame->ShowNetstat ( iCmd );
 }
 
 void COMMAND_Eaeg ( const char* szCmdLine )
@@ -1029,6 +1027,10 @@ void COMMAND_Debug4 ( const char* szCmdLine )
 
 void COMMAND_ShowCollision ( const char* szCmdLine )
 {
-    g_pClientGame->SetShowCollision ( !g_pClientGame->GetShowCollision () );
-    return;
+    int iCmd = ( szCmdLine && szCmdLine [ 0 ] ) ? atoi ( szCmdLine ) : -1;
+    bool bShow = ( iCmd == 1 ) ? true : ( iCmd == 0 ) ? false : !g_pClientGame->GetShowCollision ();
+    g_pClientGame->SetShowCollision ( bShow );
+    g_pCore->GetConsole ()->Printf ( "showcol is now set to %d", bShow ? 1 : 0 );
+    if ( bShow && !g_pClientGame->GetDevelopmentMode () )
+        g_pCore->GetConsole ()->Print ( "showcol will have no effect because development mode is off" );
 }
