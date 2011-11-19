@@ -4216,11 +4216,12 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                 unlink ( pDownloadableResource->GetName () );
 
                                 // Queue the file to be downloaded
-                                pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame () );
+                                bool bAddedFile = pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame () );
 
                                 // If the file was successfully queued, increment the resources to be downloaded
                                 usResourcesToBeDownloaded++;
-                                g_pClientGame->m_pTransferBox->AddToTotalSize ( dChunkDataSize );
+                                if ( bAddedFile )
+                                    g_pClientGame->m_pTransferBox->AddToTotalSize ( dChunkDataSize );
                             }                       
                         }
                     }

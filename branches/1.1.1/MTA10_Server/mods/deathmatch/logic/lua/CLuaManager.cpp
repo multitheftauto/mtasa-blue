@@ -266,6 +266,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPlayerIP", CLuaFunctionDefinitions::GetPlayerIP );
     CLuaCFunctions::AddFunction ( "getPlayerAccount", CLuaFunctionDefinitions::GetPlayerAccount );
     CLuaCFunctions::AddFunction ( "getPlayerVersion", CLuaFunctionDefinitions::GetPlayerVersion );
+    CLuaCFunctions::AddFunction ( "resendPlayerModInfo", CLuaFunctionDefinitions::ResendPlayerModInfo );
 
     // Player set funcs
     CLuaCFunctions::AddFunction ( "setPlayerMoney", CLuaFunctionDefinitions::SetPlayerMoney );

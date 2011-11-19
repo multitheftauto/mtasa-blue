@@ -4163,6 +4163,9 @@ bool CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
             // Jax: advance along the line 2 units (seems to decrease the chance of corrupt bullet vectors)
             vecOrigin += ( vecFront * 2.0f );
             vecTarget = vecOrigin + ( vecFront * fRange );
+
+            // Apply shoot through walls fix
+            vecOrigin = AdjustShotOriginForWalls ( vecOrigin, vecTarget, 2.5f );
         }
         else
         { 
@@ -4178,6 +4181,8 @@ bool CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
             else if ( Controller.RightShoulder1 == 255 )    // First-person weapons, crosshair active: sync the crosshair
             {
                 g_pGame->GetCamera ()->Find3rdPersonCamTargetVector ( fRange, &vecGunMuzzle, &vecOrigin, &vecTarget );
+                // Apply shoot through walls fix
+                vecOrigin = AdjustShotOriginForWalls ( vecOrigin, vecTarget, 0.5f );
             }
             else if ( pVehicle )                            // Drive-by/vehicle weapons: camera origin as origin, performing collision tests
             {
@@ -4231,6 +4236,44 @@ bool CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
     if ( fAimX ) *fAimX = m_shotSyncData->m_fArmDirectionX;
     if ( fAimY ) *fAimY = m_shotSyncData->m_fArmDirectionY;
     return true;
+}
+
+
+//
+// Fix firing through walls by pulling back shot origin when next to a wall
+//
+CVector CClientPed::AdjustShotOriginForWalls ( const CVector& vecOrigin, const CVector& vecTarget, float fMaxPullBack )
+{
+    CVector vecResultOrigin = vecOrigin;
+
+    // Do a short line of sight check from the max pullback position
+    CVector vecFront = ( vecTarget - vecOrigin );
+    vecFront.Normalize ();
+    CVector vecTempOrigin = vecOrigin - vecFront * fMaxPullBack;
+    CVector vecTempTarget = vecOrigin + vecFront * 1;
+
+    g_pGame->GetWorld ()->IgnoreEntity ( m_pPlayerPed );
+    CColPoint* pCollision;   
+    bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecTempOrigin, &vecTempTarget, &pCollision, NULL );
+    g_pGame->GetWorld ()->IgnoreEntity ( NULL );
+
+    if ( pCollision )
+    {
+        if ( bCollision )
+        {
+            float fDist = ( *pCollision->GetPosition() - vecTempOrigin ).Length ();
+
+            if ( fDist < fMaxPullBack )
+            {
+                // If wall is hit, move origin back to the wall
+                float fFrontMul = fDist - fMaxPullBack;
+                vecResultOrigin = vecOrigin + ( vecFront * fFrontMul );
+            }
+        }
+        pCollision->Destroy();
+    }
+
+    return vecResultOrigin;
 }
 
 

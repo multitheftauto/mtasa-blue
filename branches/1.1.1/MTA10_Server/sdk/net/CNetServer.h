@@ -80,6 +80,7 @@ public:
 
     virtual bool                            InitServerId                    ( const char* szPath ) = 0;
     virtual void                            SetEncryptionEnabled            ( bool bEncryptionEnabled ) = 0;
+    virtual void                            ResendModPackets                ( NetServerPlayerID& playerID ) = 0;
 };
 
 #endif
