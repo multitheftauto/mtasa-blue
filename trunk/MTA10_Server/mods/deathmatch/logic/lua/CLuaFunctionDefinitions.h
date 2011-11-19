@@ -470,6 +470,7 @@ public:
     static int      RemoveRuleValue                     ( lua_State* luaVM );
     static int      GetPlayerAnnounceValue              ( lua_State* luaVM );
     static int      SetPlayerAnnounceValue              ( lua_State* luaVM );
+    static int      ResendPlayerModInfo                 ( lua_State* luaVM );
 
     // Database funcs
     static int      DbConnect                           ( lua_State* luaVM );
