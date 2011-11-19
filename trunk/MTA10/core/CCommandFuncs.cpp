@@ -396,8 +396,8 @@ void CCommandFuncs::CopyGTAControls ( const char* szParameters )
 void CCommandFuncs::HUD ( const char* szParameters )
 {
     int iCmd = ( szParameters && szParameters [ 0 ] ) ? atoi ( szParameters ) : -1;
-    bool bDisabled = ( iCmd == 1 ) ? false : true;
-    CCore::GetSingleton ().GetGame ()->GetHud ()->Disable ( bDisabled );
+    bool bShow = ( iCmd == 1 ) ? true : ( iCmd == 0 ) ? false : g_pCore->GetGame ()->GetHud ()->IsDisabled ();
+    g_pCore->GetGame ()->GetHud ()->Disable ( !bShow );
 }
 
 void CCommandFuncs::SaveConfig ( const char* szParameters )

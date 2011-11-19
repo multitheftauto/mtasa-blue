@@ -108,6 +108,11 @@ VOID CHudSA::Disable ( bool bDisabled )
 
 }
 
+bool CHudSA::IsDisabled ( void )
+{
+    return *(BYTE*)FUNC_Draw == 0xC3;
+}
+
 VOID CHudSA::DrawBarChart ( float fX, float fY, DWORD dwWidth, DWORD dwHeight, float fPercentage, DWORD dwForeColor, DWORD dwBorderColor )
 {
     DWORD dwFunc= FUNC_DrawBarChart;

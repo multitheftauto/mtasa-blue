@@ -59,6 +59,7 @@ public:
     VOID                SetVehicleName( char * szName );
     VOID                SetZoneName( char * szName );
     VOID                Disable ( bool bDisabled );
+    bool                IsDisabled ( void );
     VOID                DrawBarChart ( float fX, float fY, DWORD dwWidth, DWORD dwHeight, float fPercentage, DWORD dwForeColor, DWORD dwBorderColor );
     bool                CalcScreenCoors ( CVector * vecPosition1, CVector * vecPosition2, float * fX, float * fY, bool bSetting1, bool bSetting2 );
     void                Draw2DPolygon ( float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, float fX4, float fY4, DWORD dwColor );
