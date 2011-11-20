@@ -806,8 +806,6 @@ void CServerBrowser::UpdateServerList ( ServerBrowserType Type, bool bClearServe
         m_pServerPlayerList [ Type ]->Clear ();
     }
 
-    bool bIncludeOffline = m_pIncludeOffline [ Type ] && m_pIncludeOffline [ Type ]->GetSelected ();
-
     // Loop the server list
     for ( CServerListIterator it = pList->IteratorBegin () ; it != pList->IteratorEnd (); it++ )
     {

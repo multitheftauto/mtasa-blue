@@ -189,7 +189,7 @@ public:
 
     bool                ParseQuery      ( const char * szBuffer, unsigned int nLength );
     void                Query           ( void );
-    std::string         Pulse           ( bool bCanSendQuery );
+    std::string         Pulse           ( bool bCanSendQuery, bool bRemoveNonResponding = false );
     void                ResetForRefresh            ( void );
 
     in_addr             Address;        // IP-address
@@ -450,6 +450,7 @@ public:
     // Base implementation scans all listed servers
     virtual void                            Pulse                   ( void );
     virtual void                            Refresh                 ( void );
+    virtual bool                            RemoveNonResponding     ( void )                        { return true; }
 
     CServerListIterator                     IteratorBegin           ( void )                        { return m_Servers.begin (); };
     CServerListIterator                     IteratorEnd             ( void )                        { return m_Servers.end (); };
@@ -487,6 +488,7 @@ public:
                                             ~CServerListInternet    ( void );
     void                                    Pulse                   ( void );
     void                                    Refresh                 ( void );
+    bool                                    RemoveNonResponding     ( void )    { return m_nScanned > 10; }     // Don't remove until net access is confirmed
 
 private:
 
