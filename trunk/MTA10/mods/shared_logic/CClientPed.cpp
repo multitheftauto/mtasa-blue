@@ -2407,8 +2407,8 @@ void CClientPed::StreamedInPulse ( void )
             // This fixes a weapon desync bug involving aiming and sprinting packets arriving simultaneously
             eWeaponType iCurrentWeapon = GetCurrentWeaponType ();
             if ( Current.RightShoulder1 != 0 && 
-                ( iCurrentWeapon == 29 || iCurrentWeapon == 24 || iCurrentWeapon == 23 || iCurrentWeapon == 41 || iCurrentWeapon == 42 ) )
-            {
+             ( iCurrentWeapon == 29 || iCurrentWeapon == 24 || iCurrentWeapon == 23 || iCurrentWeapon == 41 || iCurrentWeapon == 42 ) )
+            { 
                 Current.ButtonCircle = 0;
                 Current.LeftShoulder1 = 0;
             }
@@ -2551,25 +2551,12 @@ void CClientPed::StreamedInPulse ( void )
             pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_DUCK );
             if ( !pTask || pTask->GetTaskType () != TASK_SIMPLE_DUCK )
             {
+                eWeaponType eWeapon = GetCurrentWeaponType ( );
+                float fSkill = GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( eWeapon ) );
+                CWeaponStat * pWeaponStat = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel ( eWeapon, fSkill ) ;
                 // Apply fix for aimable weapons only
-                switch ( GetCurrentWeaponType () )
+                if ( pWeaponStat && pWeaponStat->IsFlagSet ( WEAPONTYPE_MOVEFIRE ) == true  )
                 {
-                    case 23:    // Silenced Pistol
-                    case 24:    // Desert Eagle
-                    case 25:    // Shotgun
-                    case 27:    // SPAZ-12 Combat Shotgun
-                    case 29:    // MP5
-                    case 30:    // AK-47
-                    case 31:    // M4
-                    case 33:    // Country Rifle
-                    case 34:    // Sniper Rifle
-                    case 35:    // Rocket Launcher
-                    case 36:    // Heat-Seeking RPG
-                    case 37:    // Flamethrower
-                    case 38:    // Minigun
-                    case 41:    // Spraycan
-                    case 42:    // Fire Extinguisher
-                    case 43:    // Camera
                         // See which way input wants to go
                         const bool bInputRight = Current.LeftStickX >  6;
                         const bool bInputLeft  = Current.LeftStickX < -6;
@@ -4150,7 +4137,7 @@ bool CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
     CVector vecOrigin, vecTarget;
     if ( m_bIsLocalPlayer )
     {
-        if ( ucWeaponType == WEAPONTYPE_SNIPERRIFLE )
+        if ( pCurrentWeaponInfo->IsFlagSet ( WEAPONTYPE_FIRSTPERSON ) )
         {
             // Grab the active cam
             CCamera* pCamera = g_pGame->GetCamera ();

@@ -389,7 +389,7 @@ void CWorldRPCs::SetWeaponProperty ( NetBitStreamInterface& bitStream )
     unsigned char ucProperty = 0;
     unsigned char ucWeaponSkill = 0;
     float fData = 0.0f;
-    short sData = 0.0f;
+    short sData = 0;
     if ( bitStream.Read ( ucWeapon ) && bitStream.Read ( ucProperty ) && bitStream.Read ( ucWeaponSkill ) )
     {
         CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( static_cast < eWeaponType > ( ucWeapon ), static_cast < eWeaponSkill > ( ucWeaponSkill ) );

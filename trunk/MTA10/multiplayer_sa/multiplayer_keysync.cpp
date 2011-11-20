@@ -282,12 +282,13 @@ void SwitchContext ( CPed* thePed )
                 if ( data )
                 {
                     // We want the player to be seen as in targeting mode if they are right clicking and with weapons 
-                    eWeaponType currentWeapon = thePed->GetWeapon(thePed->GetCurrentWeaponSlot())->GetType();
+                    CWeapon* pWeapon = thePed->GetWeapon(thePed->GetCurrentWeaponSlot());
+                    eWeaponType currentWeapon = pWeapon->GetType();
                     CControllerState * cs = data->CurrentControllerState();
+                    CWeaponInfo * pWeaponInfo = pWeapon->GetInfo ( );
                     
                     if ( cs->RightShoulder1 != 0 
-                        && ( currentWeapon == WEAPONTYPE_SNIPERRIFLE || currentWeapon == WEAPONTYPE_ROCKETLAUNCHER
-                        || currentWeapon == WEAPONTYPE_ROCKETLAUNCHER_HS || currentWeapon == WEAPONTYPE_CAMERA ) )
+                        && ( pWeaponInfo && pWeaponInfo->IsFlagSet ( WEAPONTYPE_FIRSTPERSON ) ) )
                     {
                         b1stPersonWeaponModeHackInPlace = true;
                         
@@ -316,16 +317,13 @@ void SwitchContext ( CPed* thePed )
                     // Only disable mouselook if they're not holding a 1st-person weapon
                     // And if they're not under-water
                     bool bDisableMouseLook = true;
-                    CWeapon* pWeapon = thePed->GetWeapon ( thePed->GetCurrentWeaponSlot () );
                     if ( pWeapon )
                     {
                         eWeaponType weaponType = pWeapon->GetType ();
-                        switch ( weaponType )
+                        CWeaponInfo * pWeaponInfo = pWeapon->GetInfo ( );
+                        if ( pWeaponInfo->IsFlagSet ( WEAPONTYPE_FIRSTPERSON ) )
                         {
-                            case WEAPONTYPE_SNIPERRIFLE:
-                            case WEAPONTYPE_ROCKETLAUNCHER:
-                            case WEAPONTYPE_ROCKETLAUNCHER_HS:
-                                bDisableMouseLook = false;
+                            bDisableMouseLook = false;
                         }
                     }
                     bMouseLookEnabled = *(bool *)0xB6EC2E;

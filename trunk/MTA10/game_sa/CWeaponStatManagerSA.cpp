@@ -104,6 +104,18 @@ CWeaponStat* CWeaponStatManagerSA::GetWeaponStats ( eWeaponType type, eWeaponSki
     }
     return NULL;
 }
+
+CWeaponStat* CWeaponStatManagerSA::GetWeaponStatsFromSkillLevel ( eWeaponType type, float fSkillLevel )
+{
+    CWeaponStat * pPoor = GetWeaponStats ( type, WEAPONSKILL_POOR );
+    CWeaponStat * pStd = GetWeaponStats ( type, WEAPONSKILL_STD );
+    CWeaponStat * pPro = GetWeaponStats ( type, WEAPONSKILL_PRO );
+
+    if ( fSkillLevel >= pPro->GetRequiredStatLevel () ) return pPro;
+    else if ( fSkillLevel >= pStd->GetRequiredStatLevel () ) return pStd;
+    else return pPoor;
+}
+
 CWeaponStat* CWeaponStatManagerSA::GetOriginalWeaponStats ( eWeaponType type, eWeaponSkill skill )
 {
     for ( std::list < CWeaponStat* >::iterator iter = m_OriginalWeaponData.begin (); iter != m_OriginalWeaponData.end ();iter++ )
