@@ -101,9 +101,12 @@ void CNametags::DrawFromAim ( void )
 
                 // Range
                 float fRange;
-                if ( eSlot == WEAPONSLOT_TYPE_RIFLE && State.RightShoulder1 )
+                eWeaponType eWeapon = pLocalPlayer->GetCurrentWeaponType ( );
+                float fSkill = pLocalPlayer->GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( eWeapon ) );
+                CWeaponStat * pWeaponStat = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel ( eWeapon, fSkill ) ;
+                if ( pWeaponStat )
                 {
-                    fRange = SNIPER_AIM_VISIBLE_RANGE;
+                    fRange = pWeaponStat->GetTargetRange ( );
                 }
                 else
                 {

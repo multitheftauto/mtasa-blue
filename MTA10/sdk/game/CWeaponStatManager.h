@@ -18,6 +18,7 @@ class CWeaponStatManager
 {
 public:
     virtual CWeaponStat*                GetWeaponStats                  ( eWeaponType type, eWeaponSkill skill = WEAPONSKILL_STD ) = 0;
+    virtual CWeaponStat*                GetWeaponStatsFromSkillLevel     ( eWeaponType type, float fSkillLevel ) = 0;
     virtual CWeaponStat*                GetOriginalWeaponStats          ( eWeaponType type, eWeaponSkill skill = WEAPONSKILL_STD ) = 0;
     virtual void                        Init                            ( void ) = 0;
     virtual void                        ResetLists                      ( void ) = 0;
