@@ -83,6 +83,7 @@ void CServerList::Pulse ( void )
     unsigned int uiRepliesParsed = 0;
     unsigned int uiNoReplies = 0;
     unsigned int uiActiveServers = 0;
+    bool bRemoveNonResponding = RemoveNonResponding ();
 
     // If a query is going to be done this pass, try to find high priority items first
     if ( iNumQueries > 0 )
@@ -95,7 +96,7 @@ void CServerList::Pulse ( void )
             CServerListItem* pServer = m_Servers.Find ( (in_addr&)iter->m_ulIp, iter->m_usPort+123 );
             if ( pServer && pServer->WaitingToSendQuery () )
             {
-                std::string strResult = pServer->Pulse ( (int)( uiQueriesSent /*+ uiQueriesResent*/ ) < iNumQueries );
+                std::string strResult = pServer->Pulse ( (int)( uiQueriesSent /*+ uiQueriesResent*/ ) < iNumQueries, bRemoveNonResponding );
                 assert ( strResult == "SentQuery" );
                 uiQueriesSent++;
                 if ( (int)uiQueriesSent >= iNumQueries )
@@ -109,7 +110,7 @@ void CServerList::Pulse ( void )
     {
         CServerListItem * pServer = *i;
         uint uiPrevRevision = pServer->uiRevision;
-        std::string strResult = pServer->Pulse ( (int)( uiQueriesSent /*+ uiQueriesResent*/ ) < iNumQueries );
+        std::string strResult = pServer->Pulse ( (int)( uiQueriesSent /*+ uiQueriesResent*/ ) < iNumQueries, bRemoveNonResponding );
         if ( uiPrevRevision != pServer->uiRevision )
             m_bUpdated |= true;         // Flag GUI update
         if ( strResult == "SentQuery" )
@@ -347,7 +348,7 @@ void CServerListLAN::Discover ( void )
 }
 
 
-std::string CServerListItem::Pulse ( bool bCanSendQuery )
+std::string CServerListItem::Pulse ( bool bCanSendQuery, bool bRemoveNonResponding )
 {   // Queries the server on it's query port (ASE protocol)
     // and returns whether it is done scanning
     if ( bScanned || bSkipped ) return "Done";
@@ -381,8 +382,11 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery )
 
         if ( m_ElapsedTime.Get () > SERVER_LIST_ITEM_TIMEOUT )
         {
-            bMaybeOffline = true;       // Flag to help 'Include offline' browser option
-            nPlayers = 0;               // We don't have player names, so zero this now
+            if ( bRemoveNonResponding )
+            {
+                bMaybeOffline = true;       // Flag to help 'Include offline' browser option
+                nPlayers = 0;               // We don't have player names, so zero this now
+            }
             uiRevision++;               // To flag browser gui update
             uint uiMaxRetries = GetDataQuality () <= SERVER_INFO_ASE_0 || MaybeWontRespond () ? 0 : 1;
 
@@ -391,9 +395,6 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery )
                 // Try again
                 uiQueryRetryCount++;
                 uiRevision++;           // To flag browser gui update
-#if MTA_DEBUG
-                //strGameMode = SString ( "%d/%d Q:%d", uiQueryRetryCount, uiMaxRetries, GetDataQuality () );
-#endif
                 if ( GetDataQuality () > SERVER_INFO_ASE_0 )
                     GetServerCache ()->SetServerCachedInfo ( this );
                 Query ();
@@ -402,15 +403,22 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery )
             else
             {
                 // Give up
-                uiCacheNoReplyCount++;  // Keep a persistent count of failures. (When uiCacheNoReplyCount gets to 3, the server is removed from the Server Cache)
-                bSkipped = true;
-                uiRevision++;           // To flag browser gui update#if MTA_DEBUG
-#if MTA_DEBUG
-                //strGameMode = SString ( "noreply %d/%d Q:%d", uiQueryRetryCount, uiMaxRetries, GetDataQuality () );
-#endif
                 CloseSocket ();
-                if ( GetDataQuality () > SERVER_INFO_ASE_0 )
-                    GetServerCache ()->SetServerCachedInfo ( this );
+                uiRevision++;           // To flag browser gui update
+
+                if ( bRemoveNonResponding )
+                {
+                    uiCacheNoReplyCount++;  // Keep a persistent count of failures. (When uiCacheNoReplyCount gets to 3, the server is removed from the Server Cache)
+                    bSkipped = true;
+                    if ( GetDataQuality () > SERVER_INFO_ASE_0 )
+                        GetServerCache ()->SetServerCachedInfo ( this );
+                }
+                else
+                {
+                    // Pretend everything is fine until network access is confirmed
+                    bScanned = true;
+                    bMaybeOffline = false;
+                }
                 return "NoReply";
             }
         }
