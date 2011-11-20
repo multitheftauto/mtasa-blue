@@ -110,10 +110,18 @@ CWeaponStat* CWeaponStatManagerSA::GetWeaponStatsFromSkillLevel ( eWeaponType ty
     CWeaponStat * pPoor = GetWeaponStats ( type, WEAPONSKILL_POOR );
     CWeaponStat * pStd = GetWeaponStats ( type, WEAPONSKILL_STD );
     CWeaponStat * pPro = GetWeaponStats ( type, WEAPONSKILL_PRO );
-
-    if ( fSkillLevel >= pPro->GetRequiredStatLevel () ) return pPro;
-    else if ( fSkillLevel >= pStd->GetRequiredStatLevel () ) return pStd;
-    else return pPoor;
+    if ( pStd )
+    {
+        if ( pPoor && pPro )
+        {
+            if ( fSkillLevel >= pPro->GetRequiredStatLevel () ) return pPro;
+            else if ( fSkillLevel >= pStd->GetRequiredStatLevel () ) return pStd;
+            else return pPoor;
+        }
+        else
+            return pStd;
+    }
+    return NULL;
 }
 
 CWeaponStat* CWeaponStatManagerSA::GetOriginalWeaponStats ( eWeaponType type, eWeaponSkill skill )
