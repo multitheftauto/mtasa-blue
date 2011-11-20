@@ -45,6 +45,7 @@ namespace
                                          { "dbPoll",                    "1.1.1-9.03328" },
                                          { "dbFree",                    "1.1.1-9.03328" },
                                          { "dbExec",                    "1.1.1-9.03341" },
+                                         { "resendPlayerModInfo",       "1.1.1-9.03451" },
                                         };
 }
 
