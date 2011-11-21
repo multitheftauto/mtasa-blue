@@ -96,7 +96,7 @@ void CClientEntityRefManager::OnEntityDelete ( CClientEntity* pEntity )
 #ifdef MTA_DEBUG
             SString* pstrDebugInfo = MapFind ( ms_EntityRefListDebugInfo, &pOther );
             assert ( pstrDebugInfo );
-            OutputDebugLine ( SString ( "Did null %s (%08x @ %08x)", **pstrDebugInfo, pEntity, &pOther ) );     
+            OutputDebugLine ( SString ( "[EntityRef] Did null %s (%08x @ %08x)", **pstrDebugInfo, pEntity, &pOther ) );     
 #endif
         }
     }

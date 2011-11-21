@@ -858,7 +858,7 @@ bool CPlayer::IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo
         vecDirToOther.Normalize ();
         float fDot = m_vecCamFwd.DotProduct ( &vecDirToOther );
 
-        OutputDebugLine ( SString ( "Dist:%1.0f  Dot:%0.3f  %s SyncTo %s zone changing: %d -> %d [Interval:%d] CamPos:%1.0f,%1.0f,%1.0f  CamFwd:%1.2f,%1.2f,%1.2f "
+        OutputDebugLine ( SString ( "[Sync] Dist:%1.0f  Dot:%0.3f  %s SyncTo %s zone changing: %d -> %d [Interval:%d] CamPos:%1.0f,%1.0f,%1.0f  CamFwd:%1.2f,%1.2f,%1.2f "
                 ,sqrtf ( fDistSq )
                 ,fDot
                 ,pOther->GetNick ()

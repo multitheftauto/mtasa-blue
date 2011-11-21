@@ -52,9 +52,9 @@ CBassAudio::~CBassAudio ( void )
 
 #ifdef MTA_DEBUG // OutputDebugLine only works in debug mode!
     if ( m_bStream )
-        OutputDebugLine ( "       stream destroyed" );
+        OutputDebugLine ( "[Bass]        stream destroyed" );
     else
-        OutputDebugLine ( "sound destroyed" );
+        OutputDebugLine ( "[Bass] sound destroyed" );
 #endif
 }
 
@@ -87,7 +87,7 @@ bool CBassAudio::BeginLoadingMedia ( void )
         m_pVars->lFlags = lFlags;
         CreateThread ( NULL, 0, reinterpret_cast <LPTHREAD_START_ROUTINE> ( &CBassAudio::PlayStreamIntern ), m_pVars, 0, NULL );
         m_bPendingPlay = true;
-        OutputDebugLine ( "       stream connect started" );
+        OutputDebugLine ( "[Bass]        stream connect started" );
     }
     else
     {
@@ -114,7 +114,7 @@ bool CBassAudio::BeginLoadingMedia ( void )
         BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_FREQ, &m_fDefaultFrequency );
         m_bPendingPlay = true;
         SetFinishedCallbacks ();
-        OutputDebugLine ( "sound loaded" );
+        OutputDebugLine ( "[Bass] sound loaded" );
     }
 
     return true;
@@ -248,7 +248,7 @@ void CBassAudio::CompleteStreamConnect ( HSTREAM pSound )
     else
         g_pCore->GetConsole()->Printf ( "BASS ERROR %d in PlayStream  b3D = %s  path = %s", BASS_ErrorGetCode(), m_b3D ? "true" : "false", m_strPath.c_str() );
 
-    OutputDebugLine ( "       stream connect complete" );
+    OutputDebugLine ( "[Bass]        stream connect complete" );
 
     AddQueuedEvent ( SOUND_EVENT_STREAM_RESULT, m_strStreamName, GetLength (), pSound ? true : false );
 }

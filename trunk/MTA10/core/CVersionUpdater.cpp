@@ -424,7 +424,7 @@ void CVersionUpdater::DoPulse ( void )
             m_MasterConfig.master.interval.SetFromString ( "7d" );
 
         time_t secondsSinceCheck = CDateTime::Now ().ToSeconds () - m_VarConfig.master_lastCheckTime.ToSeconds ();
-        OutputDebugLine ( SString ( "master timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.master.interval.ToSeconds () - secondsSinceCheck) ) );
+        OutputDebugLine ( SString ( "[Updater] master timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.master.interval.ToSeconds () - secondsSinceCheck) ) );
 
         // Only check once a week
         if ( secondsSinceCheck > m_MasterConfig.master.interval.ToSeconds () || secondsSinceCheck < 0 )
@@ -445,7 +445,7 @@ void CVersionUpdater::DoPulse ( void )
             m_VarConfig.version_lastCheckTime.SetFromSeconds ( 0 );
 
         time_t secondsSinceCheck = CDateTime::Now ().ToSeconds () - m_VarConfig.version_lastCheckTime.ToSeconds ();
-        OutputDebugLine ( SString ( "version timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.version.interval.ToSeconds () - secondsSinceCheck) ) );
+        OutputDebugLine ( SString ( "[Updater] version timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.version.interval.ToSeconds () - secondsSinceCheck) ) );
 
         // Only check once a day
         if ( secondsSinceCheck > m_MasterConfig.version.interval.ToSeconds () || secondsSinceCheck < 0 )
@@ -462,7 +462,7 @@ void CVersionUpdater::DoPulse ( void )
         m_bCheckedTimeForNewsUpdate = true;
 
         time_t secondsSinceCheck = CDateTime::Now ().ToSeconds () - m_VarConfig.news_lastCheckTime.ToSeconds ();
-        OutputDebugLine ( SString ( "news timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.news.interval.ToSeconds () - secondsSinceCheck) ) );
+        OutputDebugLine ( SString ( "[Updater] news timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.news.interval.ToSeconds () - secondsSinceCheck) ) );
 
         // Only check once an interval
         if ( secondsSinceCheck > m_MasterConfig.news.interval.ToSeconds () || secondsSinceCheck < 0 )
@@ -1264,7 +1264,7 @@ void CVersionUpdater::CheckPrograms ()
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::RunProgram ( const SString& strProgramName )
 {
-    OutputDebugLine ( SString ( "RunProgram %s", strProgramName.c_str () ) );
+    OutputDebugLine ( SString ( "[Updater] RunProgram %s", strProgramName.c_str () ) );
     ResetEverything ();
     CProgram* pProgram = MapFind ( m_ProgramMap, strProgramName );
     if ( pProgram )
@@ -1468,7 +1468,7 @@ void CVersionUpdater::_ExitGame ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_ResetVersionCheckTimer ( void )
 {
-    OutputDebugLine ( SStringX ( "_ResetVersionCheckTimer" ) );
+    OutputDebugLine ( SStringX ( "[Updater] _ResetVersionCheckTimer" ) );
     m_VarConfig.version_lastCheckTime = CDateTime::Now ();
 }
 
@@ -1482,7 +1482,7 @@ void CVersionUpdater::_ResetVersionCheckTimer ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_ResetNewsCheckTimer ( void )
 {
-    OutputDebugLine ( SStringX ( "_ResetNewsCheckTimer" ) );
+    OutputDebugLine ( SStringX ( "[Updater] _ResetNewsCheckTimer" ) );
     m_VarConfig.news_lastCheckTime = CDateTime::Now ();
 }
 
@@ -2002,7 +2002,7 @@ void CVersionUpdater::_ProcessPatchFileQuery ( void )
 
     if ( m_JobInfo.downloadBuffer.size () == 0 )
     {
-        OutputDebugLine ( "Empty download buffer" );
+        OutputDebugLine ( "[Error] Empty download buffer" );
         return;
     }
 
@@ -2767,7 +2767,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     // Perform the HTTP request
     m_HTTP.Get ( strQueryURL );
     m_strLastQueryURL = strQueryURL;
-    OutputDebugLine( SString ( "DoSendDownloadRequestToNextServer %d/%d %s", m_JobInfo.iCurrent, m_JobInfo.serverList.size (), strQueryURL.c_str () ) );
+    OutputDebugLine( SString ( "[Updater] DoSendDownloadRequestToNextServer %d/%d %s", m_JobInfo.iCurrent, m_JobInfo.serverList.size (), strQueryURL.c_str () ) );
     return RES_OK;
 }
 

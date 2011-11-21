@@ -5447,7 +5447,7 @@ void CClientPed::HandleWaitingForGroundToLoad ( void )
         // If not near any MTA objects, then don't bother waiting
         SetFrozenWaitingForGroundToLoad ( false );
         #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-            OutputDebugLine ( "  FreezeUntilCollisionLoaded - Early stop" );
+            OutputDebugLine ( "[AsyncLoading]   FreezeUntilCollisionLoaded - Early stop" );
         #endif 
         return;
     }
@@ -5512,7 +5512,7 @@ void CClientPed::HandleWaitingForGroundToLoad ( void )
     }
 
     #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-        OutputDebugLine ( status );
+        OutputDebugLine ( SStringX ( "[AsyncLoading] " ) ++ status );
         g_pCore->GetGraphics ()->DrawText ( 10, 220, -1, 1, status );
 
         std::vector < SString > lineList;

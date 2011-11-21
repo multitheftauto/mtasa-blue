@@ -112,16 +112,6 @@ namespace SharedUtil
     SString         ExpandEnvString                 ( const SString& strInput );
 
     //
-    // Output timestamped line into the debugger
-    //
-    #ifdef MTA_DEBUG
-        void OutputDebugLine ( const char* szMessage );
-    #else
-        inline void OutputDebugLineDummy ( void ) {}
-        #define OutputDebugLine(x) OutputDebugLineDummy ()
-    #endif
-
-    //
     // Return true if supplied string adheres to the new version format
     //
     bool IsValidVersionString ( const SString& strVersion );

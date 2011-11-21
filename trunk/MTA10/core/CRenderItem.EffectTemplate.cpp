@@ -96,7 +96,7 @@ namespace
             {
                 SString strMsg ( "[CIncludeManager: Illegal path %s]", *strPathFilename );
                 m_strReport += strMsg;
-                OutputDebugLine ( strMsg );
+                OutputDebugLine ( SStringX ( "[Shader] " ) + strMsg );
                 return E_FAIL;
             }
 
@@ -106,7 +106,7 @@ namespace
             {
                 SString strMsg ( "[CIncludeManager: Can't find %s]", *strPathFilename );
                 m_strReport += strMsg;
-                OutputDebugLine ( strMsg );
+                OutputDebugLine ( SStringX ( "[Shader] " ) + strMsg );
                 return E_FAIL;
             }
 
@@ -435,7 +435,7 @@ bool CEffectTemplateImpl::HaveFilesChanged ( void )
             SString strNewMD5 = CMD5Hasher::CalculateHexString ( strPathFilename );
             if ( strNewMD5 != strMD5 )
             {
-                OutputDebugLine ( SString ( "%s file has changed from %s to %s", *strPathFilename, *strMD5, *strNewMD5 ) );
+                OutputDebugLine ( SString ( "[Shader] %s file has changed from %s to %s", *strPathFilename, *strMD5, *strNewMD5 ) );
                 m_bHaveFilesChanged = true;
             }
         }

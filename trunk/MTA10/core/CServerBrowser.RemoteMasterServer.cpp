@@ -211,7 +211,7 @@ bool CRemoteMasterServer::ParseListVer0 ( CServerListItemList& itemList )
     }
 
 #if MTA_DEBUG
-    OutputDebugLine ( SString ( "%d servers (%d added, %d updated) from %s", uiNumServers, itemList.size () - uiNumServersBefore, uiNumServersUpdated, *m_strURL ) );
+    OutputDebugLine ( SString ( "[Browser] %d servers (%d added, %d updated) from %s", uiNumServers, itemList.size () - uiNumServersBefore, uiNumServersUpdated, *m_strURL ) );
 #endif
 
     return true;
@@ -347,9 +347,9 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
     }
 
 #if MTA_DEBUG
-    OutputDebugLine ( SString ( "%d servers (%d added, %d updated) from %s", uiNumServers, itemList.size () - uiNumServersBefore, uiNumServersUpdated, *m_strURL ) );
+    OutputDebugLine ( SString ( "[Browser] %d servers (%d added, %d updated) from %s", uiNumServers, itemList.size () - uiNumServersBefore, uiNumServersUpdated, *m_strURL ) );
     for ( std::map < SString, SItem >::iterator iter = totalMap.begin () ; iter != totalMap.end () ; ++iter )
-        OutputDebugLine ( SString ( "version '%s' - %d total  %d noresponse", *iter->first, iter->second.iTotal, iter->second.iNoResponse ) );
+        OutputDebugLine ( SString ( "[Browser] version '%s' - %d total  %d noresponse", *iter->first, iter->second.iTotal, iter->second.iNoResponse ) );
 #endif
 
     return true;

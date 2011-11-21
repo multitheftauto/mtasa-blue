@@ -42,7 +42,7 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
     // Error here can be non fatal
     //if (FAILED(hres))
     //{
-    //    OutputDebugLine ( SString ( "Failed to initialize COM library. Error code = %x", hres ) );
+    //    OutputDebugLine ( SString ( "[Error] Failed to initialize COM library. Error code = %x", hres ) );
     //    return "";
     //}
 
@@ -68,7 +68,7 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
     // Error here can be non fatal
 //    if (FAILED(hres))
 //    {
-//        OutputDebugLine ( SString ( "QueryWMI - Failed to initialize security. Error code = %x", hres ) );
+//        OutputDebugLine ( SString ( "[Error] QueryWMI - Failed to initialize security. Error code = %x", hres ) );
 //        return "";
 //    }
     
@@ -86,7 +86,7 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
     if (FAILED(hres))
     {
 #if MTA_DEBUG
-        OutputDebugString ( SString ( "QueryWMI - Failed to create IWbemLocator object. Error code = %x", hres ) );
+        OutputDebugLine ( SString ( "[Error] QueryWMI - Failed to create IWbemLocator object. Error code = %x", hres ) );
 #endif
         return false;
     }
@@ -114,7 +114,7 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
     if (FAILED(hres))
     {
         pLoc->Release();     
-        OutputDebugLine ( SString ( "QueryWMI - Could not connect. Error code = %x", hres ) );
+        OutputDebugLine ( SString ( "[Error] QueryWMI - Could not connect. Error code = %x", hres ) );
         return false;
     }
 
@@ -136,7 +136,7 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
     {
         pSvc->Release();
         pLoc->Release();     
-        OutputDebugLine ( SString ( "QueryWMI - Could not set proxy blanket. Error code = %x", hres ) );
+        OutputDebugLine ( SString ( "[Error] QueryWMI - Could not set proxy blanket. Error code = %x", hres ) );
         return false;
     }
 
@@ -154,7 +154,7 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
     {
         pSvc->Release();
         pLoc->Release();
-        OutputDebugLine ( SString ( "QueryWMI - Query failed. Error code = %x", hres ) );
+        OutputDebugLine ( SString ( "[Error] QueryWMI - Query failed. Error code = %x", hres ) );
         return false;
     }
 
