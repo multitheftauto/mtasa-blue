@@ -47,7 +47,7 @@ public:
 
     virtual NetBitStreamInterface*      AllocateNetBitStream        ( void ) = 0;
     virtual void                        DeallocateNetBitStream      ( NetBitStreamInterface* bitStream ) = 0;
-    virtual bool                        SendPacket                  ( unsigned char ucPacketID, NetBitStreamInterface* bitStream, NetPacketPriority packetPriority = PACKET_PRIORITY_HIGH, NetPacketReliability packetReliability = PACKET_RELIABILITY_RELIABLE, NetPacketOrdering packetOrdering = PACKET_ORDERING_GAME ) = 0;
+    virtual bool                        SendPacket                  ( unsigned char ucPacketID, NetBitStreamInterface* bitStream, NetPacketPriority packetPriority = PACKET_PRIORITY_HIGH, NetPacketReliability packetReliability = PACKET_RELIABILITY_RELIABLE_ORDERED, NetPacketOrdering packetOrdering = PACKET_ORDERING_GAME ) = 0;
 
     virtual void                        SetClientPort               ( unsigned short usClientPort ) = 0;
     virtual const char *                GetConnectedServer          ( void )=0;
