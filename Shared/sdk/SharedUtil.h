@@ -70,6 +70,7 @@ typedef float               FLOAT;      //  32
 #include "SharedUtil.Hash.h"
 #include "SharedUtil.SysInfo.h"
 #include "SharedUtil.Profiling.h"
+#include "SharedUtil.Logging.h"
 #include "CFastList.h"
 
 #ifdef _MSC_VER

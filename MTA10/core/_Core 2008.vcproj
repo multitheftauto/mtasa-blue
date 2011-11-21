@@ -1737,6 +1737,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Logging.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Logging.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.Math.h"
 					>
 				</File>

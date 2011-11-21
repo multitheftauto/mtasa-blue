@@ -877,7 +877,7 @@ namespace
     #if MTA_DEBUG
             CStringPair* pPair = MapFind ( *this, strType.ToLower () );
             if ( !pPair || pPair->strValue1 != pair.strValue1 || pPair->strValue2 != pair.strValue2 )
-                OutputDebugLine ( SString ( "SetCondition %s %s %s", strType.c_str (), strValue1.c_str (), strValue2.c_str () ) );
+                OutputDebugLine ( SString ( "[Updater] SetCondition %s %s %s", strType.c_str (), strValue1.c_str (), strValue2.c_str () ) );
     #endif
             MapSet ( *this, strType.ToLower (), pair );
         }

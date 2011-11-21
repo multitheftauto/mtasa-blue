@@ -108,7 +108,7 @@ ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, co
             return NULL;
         }
 
-        OutputDebugLine ( SString ( "CEffectClonerImpl::CreateD3DEffect - New EffectTemplate for %s", *strFilename ) );
+        OutputDebugLine ( SString ( "[Shader] CEffectClonerImpl::CreateD3DEffect - New EffectTemplate for %s", *strFilename ) );
         // Add to active map
         MapSet ( m_ValidMap, ConformPathForSorting ( strFilename ), pEffectTemplate );
     }
@@ -190,7 +190,7 @@ void CEffectClonerImpl::MaybeTidyUp ( void )
         CEffectTemplate* pEffectTemplate = m_OldList[i];
         if ( pEffectTemplate->GetTicksSinceLastUsed () > 0 )
         {
-            OutputDebugLine ( "CEffectClonerImpl::MaybeTidyUp: Releasing old EffectTemplate" );
+            OutputDebugLine ( "[Shader] CEffectClonerImpl::MaybeTidyUp: Releasing old EffectTemplate" );
             SAFE_RELEASE( pEffectTemplate );
             ListRemoveIndex ( m_OldList, i-- );
         }
@@ -211,7 +211,7 @@ void CEffectClonerImpl::MaybeTidyUp ( void )
         CEffectTemplate* pEffectTemplate = iter->second;
         if ( pEffectTemplate->GetTicksSinceLastUsed () > iTicks )
         {
-            OutputDebugLine ( "CEffectClonerImpl::MaybeTidyUp: Releasing valid EffectTemplate" );
+            OutputDebugLine ( "[Shader] CEffectClonerImpl::MaybeTidyUp: Releasing valid EffectTemplate" );
             SAFE_RELEASE( pEffectTemplate );
             m_ValidMap.erase ( iter++ );
         }
