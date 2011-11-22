@@ -58,40 +58,57 @@ enum
 /// \note All these enumerations should be casted to (unsigned char) before writing them to RakNet::BitStream
 enum
 {
-	//
+    //
 	// RESERVED TYPES - DO NOT CHANGE THESE
 	// All types from RakPeer
 	//
 	/// These types are never returned to the user.
 	/// Ping from a connected system.  Update timestamps (internal use only)
-	/// 0 is reserved for UDT's connect message
-	RID_INTERNAL_PING,  
+	RID_CONNECTED_PING,  
 	/// Ping from an unconnected system.  Reply but do not update timestamps. (internal use only)
-	RID_PING,
+	RID_UNCONNECTED_PING,
 	/// Ping from an unconnected system.  Only reply if we have open connections. Do not update timestamps. (internal use only)
-	RID_PING_OPEN_CONNECTIONS,
+	RID_UNCONNECTED_PING_OPEN_CONNECTIONS,
 	/// Pong from a connected system.  Update timestamps (internal use only)
 	RID_CONNECTED_PONG,
-	/// Asking for a new connection (internal use only)
-	RID_CONNECTION_REQUEST,
-	/// Connecting to a secured server/peer (internal use only)
-	RID_SECURED_CONNECTION_RESPONSE,
-	/// Connecting to a secured server/peer (internal use only)
-	RID_SECURED_CONNECTION_CONFIRMATION,
-	/// Packet that tells us the packet contains an integer ID to name mapping for the remote system (internal use only)
-	RID_RPC_MAPPING,
 	/// A reliable packet to detect lost connections (internal use only)
 	RID_DETECT_LOST_CONNECTIONS,
-	/// Offline message so we know when to reset and start a new connection (internal use only)
-	RID_OPEN_CONNECTION_REQUEST,
-	/// Offline message response so we know when to reset and start a new connection (internal use only)
-	RID_OPEN_CONNECTION_REPLY,
-	/// Remote procedure call (internal use only)
-	RID_RPC,
-	/// Remote procedure call reply, for RPCs that return data (internal use only)
-	RID_RPC_REPLY,
-	/// RakPeer - Same as ID_ADVERTISE_SYSTEM, but intended for internal use rather than being passed to the user. Second byte indicates type. Used currently for NAT punchthrough for receiver port advertisement. See ID_NAT_ADVERTISE_RECIPIENT_PORT
+	/// C2S: Initial query: Header(1), OfflineMesageID(16), Protocol number(1), Pad(toMTU), sent with no fragment set.
+	/// If protocol fails on server, returns ID_INCOMPATIBLE_PROTOCOL_VERSION to client
+	RID_OPEN_CONNECTION_REQUEST_1,
+	/// S2C: Header(1), OfflineMesageID(16), server GUID(8), HasSecurity(1), Cookie(4, if HasSecurity)
+	/// , public key (if do security is true), MTU(2). If public key fails on client, returns ID_PUBLIC_KEY_MISMATCH
+	RID_OPEN_CONNECTION_REPLY_1,
+	/// C2S: Header(1), OfflineMesageID(16), Cookie(4, if HasSecurity is true on the server), clientSupportsSecurity(1 bit),
+	/// handshakeChallenge (if has security on both server and client), remoteBindingAddress(6), MTU(2), client GUID(8)
+	/// Connection slot allocated if cookie is valid, server is not full, GUID and IP not already in use.
+	RID_OPEN_CONNECTION_REQUEST_2,
+	/// S2C: Header(1), OfflineMesageID(16), server GUID(8), mtu(2), doSecurity(1 bit), handshakeAnswer (if do security is true)
+	RID_OPEN_CONNECTION_REPLY_2,
+	/// C2S: Header(1), GUID(8), Timestamp, HasSecurity(1), Proof(32)
+	RID_CONNECTION_REQUEST,
+	/// RakPeer - Remote system requires secure connections, pass a public key to RakPeerInterface::Connect()
+	RID_REMOTE_SYSTEM_REQUIRES_PUBLIC_KEY,
+	/// RakPeer - We passed a public key to RakPeerInterface::Connect(), but the other system did not have security turned on
+	RID_OUR_SYSTEM_REQUIRES_SECURITY,
+	/// RakPeer - Wrong public key passed to RakPeerInterface::Connect()
+	RID_PUBLIC_KEY_MISMATCH,
+	/// RakPeer - Same as ID_ADVERTISE_SYSTEM, but intended for internal use rather than being passed to the user.
+	/// Second byte indicates type. Used currently for NAT punchthrough for receiver port advertisement. See ID_NAT_ADVERTISE_RECIPIENT_PORT
 	RID_OUT_OF_BAND_INTERNAL,
+	/// If RakPeerInterface::Send() is called where PacketReliability contains _WITH_ACK_RECEIPT, then on a later call to
+	/// RakPeerInterface::Receive() you will get ID_SND_RECEIPT_ACKED or ID_SND_RECEIPT_LOSS. The message will be 5 bytes long,
+	/// and bytes 1-4 inclusive will contain a number in native order containing a number that identifies this message.
+	/// This number will be returned by RakPeerInterface::Send() or RakPeerInterface::SendList(). ID_SND_RECEIPT_ACKED means that
+	/// the message arrived
+	RID_SND_RECEIPT_ACKED,
+	/// If RakPeerInterface::Send() is called where PacketReliability contains UNRELIABLE_WITH_ACK_RECEIPT, then on a later call to
+	/// RakPeerInterface::Receive() you will get ID_SND_RECEIPT_ACKED or ID_SND_RECEIPT_LOSS. The message will be 5 bytes long,
+	/// and bytes 1-4 inclusive will contain a number in native order containing a number that identifies this message. This number
+	/// will be returned by RakPeerInterface::Send() or RakPeerInterface::SendList(). ID_SND_RECEIPT_LOSS means that an ack for the
+	/// message did not arrive (it may or may not have been delivered, probably not). On disconnect or shutdown, you will not get
+	/// ID_SND_RECEIPT_LOSS for unsent messages, you should consider those messages as all lost.
+	RID_SND_RECEIPT_LOSS,
 	
 
 	//
@@ -108,12 +125,12 @@ enum
 	RID_NEW_INCOMING_CONNECTION,
 	/// RakPeer - The system we attempted to connect to is not accepting new connections.
 	RID_NO_FREE_INCOMING_CONNECTIONS,
-	/// RakPeer - The system specified in Packet::systemAddress has disconnected from us.  For the client, this would mean the server has shutdown. 
+	/// RakPeer - The system specified in Packet::systemAddress has disconnected from us.  For the client, this would mean the
+	/// server has shutdown. 
 	RID_DISCONNECTION_NOTIFICATION,
-	/// RakPeer - Reliable packets cannot be delivered to the system specified in Packet::systemAddress.  The connection to that system has been closed. 
+	/// RakPeer - Reliable packets cannot be delivered to the system specified in Packet::systemAddress.  The connection to that
+	/// system has been closed. 
 	RID_CONNECTION_LOST,
-	/// RakPeer - We preset an RSA public key which does not match what the system we connected to is using.
-	RID_RSA_PUBLIC_KEY_MISMATCH,
 	/// RakPeer - We are banned from the system we attempted to connect to.
 	RID_CONNECTION_BANNED,
 	/// RakPeer - The remote system is using a password and has refused our connection because we did not set the correct password.
@@ -122,26 +139,34 @@ enum
 	// This means the two systems cannot communicate.
 	// The 2nd byte of the message contains the value of RAKNET_PROTOCOL_VERSION for the remote system
 	RID_INCOMPATIBLE_PROTOCOL_VERSION,
-	// Means that this IP address connected recently, and can't connect again as a security measure. See RakPeer::SetLimitIPConnectionFrequency()
+	// Means that this IP address connected recently, and can't connect again as a security measure. See
+	/// RakPeer::SetLimitIPConnectionFrequency()
 	RID_IP_RECENTLY_CONNECTED,
-	/// RakPeer - A packet has been tampered with in transit.  The sender is contained in Packet::systemAddress.
-	RID_MODIFIED_PACKET,
-	/// RakPeer - The four bytes following this byte represent an unsigned int which is automatically modified by the difference in system times between the sender and the recipient. Requires that you call SetOccasionalPing.
+	/// RakPeer - The sizeof(RakNetTime) bytes following this byte represent a value which is automatically modified by the difference
+	/// in system times between the sender and the recipient. Requires that you call SetOccasionalPing.
 	RID_TIMESTAMP,
-    /// RakPeer - Pong from an unconnected system.  First byte is ID_PONG, second sizeof(RakNetTime) bytes is the ping, following bytes is system specific enumeration data.
-	RID_PONG,
-	/// RakPeer - Inform a remote system of our IP/Port. On the recipient, all data past ID_ADVERTISE_SYSTEM is whatever was passed to the data parameter
+    /// RakPeer - Pong from an unconnected system.  First byte is ID_UNCONNECTED_PONG, second sizeof(RakNet::TimeMS) bytes is the ping,
+	/// following bytes is system specific enumeration data.
+	/// Read using bitstreams
+	RID_UNCONNECTED_PONG,
+	/// RakPeer - Inform a remote system of our IP/Port. On the recipient, all data past ID_ADVERTISE_SYSTEM is whatever was passed to
+	/// the data parameter
 	RID_ADVERTISE_SYSTEM,
-	/// ConnectionGraph plugin - In a client/server environment, a client other than ourselves has disconnected gracefully.  Packet::systemAddress is modified to reflect the systemAddress of this client.
-	RID_REMOTE_DISCONNECTION_NOTIFICATION,
-	/// ConnectionGraph plugin - In a client/server environment, a client other than ourselves has been forcefully dropped. Packet::systemAddress is modified to reflect the systemAddress of this client.
-	RID_REMOTE_CONNECTION_LOST,
-	/// ConnectionGraph plugin - In a client/server environment, a client other than ourselves has connected.  Packet::systemAddress is modified to reflect the systemAddress of the client that is not connected directly to us. The packet encoding is SystemAddress 1, ConnectionGraphGroupID 1, SystemAddress 2, ConnectionGraphGroupID 2
-	/// ConnectionGraph2 plugin: Bytes 1-4 = count. for (count items) contains {SystemAddress, RakNetGUID}
-	RID_REMOTE_NEW_INCOMING_CONNECTION,
-	// RakPeer - Downloading a large message. Format is ID_DOWNLOAD_PROGRESS (MessageID), partCount (unsigned int), partTotal (unsigned int), partLength (unsigned int), first part data (length <= MAX_MTU_SIZE). See the three parameters partCount, partTotal and partLength in OnFileProgress in FileListTransferCBInterface.h
+	// RakPeer - Downloading a large message. Format is ID_DOWNLOAD_PROGRESS (MessageID), partCount (unsigned int),
+	///  partTotal (unsigned int),
+	/// partLength (unsigned int), first part data (length <= MAX_MTU_SIZE). See the three parameters partCount, partTotal
+	///  and partLength in OnFileProgress in FileListTransferCBInterface.h
 	RID_DOWNLOAD_PROGRESS,
 	
+	/// ConnectionGraph2 plugin - In a client/server environment, a client other than ourselves has disconnected gracefully.
+	///   Packet::systemAddress is modified to reflect the systemAddress of this client.
+	RID_REMOTE_DISCONNECTION_NOTIFICATION,
+	/// ConnectionGraph2 plugin - In a client/server environment, a client other than ourselves has been forcefully dropped.
+	///  Packet::systemAddress is modified to reflect the systemAddress of this client.
+	RID_REMOTE_CONNECTION_LOST,
+	/// ConnectionGraph2 plugin: Bytes 1-4 = count. for (count items) contains {SystemAddress, RakNetGUID, 2 byte ping}
+	RID_REMOTE_NEW_INCOMING_CONNECTION,
+
 	/// FileListTransfer plugin - Setup data
 	RID_FILE_LIST_TRANSFER_HEADER,
 	/// FileListTransfer plugin - A file
@@ -155,34 +180,16 @@ enum
 	/// RakNetTransport plugin - Transport provider message, used for remote console
 	RID_TRANSPORT_STRING,
 
-	/// ReplicaManager plugin - Create an object
+ 	/// ReplicaManager plugin - Create an object
 	RID_REPLICA_MANAGER_CONSTRUCTION,
-	/// ReplicaManager plugin - Destroy an object
-	RID_REPLICA_MANAGER_DESTRUCTION,
-	/// ReplicaManager plugin - Changed scope of an object
-	RID_REPLICA_MANAGER_SCOPE_CHANGE,
-	/// ReplicaManager plugin - Serialized data of an object
+ 	/// ReplicaManager plugin - Changed scope of an object
+ 	RID_REPLICA_MANAGER_SCOPE_CHANGE,
+ 	/// ReplicaManager plugin - Serialized data of an object
 	RID_REPLICA_MANAGER_SERIALIZE,
-	/// ReplicaManager plugin - New connection, about to send all world objects
+ 	/// ReplicaManager plugin - New connection, about to send all world objects
 	RID_REPLICA_MANAGER_DOWNLOAD_STARTED,
-	/// ReplicaManager plugin - Finished downloading all serialized objects
+ 	/// ReplicaManager plugin - Finished downloading all serialized objects
 	RID_REPLICA_MANAGER_DOWNLOAD_COMPLETE,
-
-	/// ConnectionGraph plugin - Request the connection graph from another system
-	RID_CONNECTION_GRAPH_REQUEST,
-	/// ConnectionGraph plugin - Reply to a connection graph download request
-	RID_CONNECTION_GRAPH_REPLY,
-	/// ConnectionGraph plugin - Update edges / nodes for a system with a connection graph
-	RID_CONNECTION_GRAPH_UPDATE,
-	/// ConnectionGraph plugin - Add a new connection to a connection graph
-	RID_CONNECTION_GRAPH_NEW_CONNECTION,
-	/// ConnectionGraph plugin - Remove a connection from a connection graph - connection was abruptly lost. Two systems addresses encoded in the data packet.
-	RID_CONNECTION_GRAPH_CONNECTION_LOST,
-	/// ConnectionGraph plugin - Remove a connection from a connection graph - connection was gracefully lost. Two systems addresses encoded in the data packet.
-	RID_CONNECTION_GRAPH_DISCONNECTION_NOTIFICATION,
-
-	/// Router plugin - route a message through another system
-	RID_ROUTE_AND_MULTICAST,
 
 	/// RakVoice plugin - Open a communication channel
 	RID_RAKVOICE_OPEN_CHANNEL_REQUEST,
@@ -214,37 +221,51 @@ enum
 	/// NATPunchthrough plugin: internal
 	RID_NAT_PUNCHTHROUGH_REQUEST,
 	/// NATPunchthrough plugin: internal
+	RID_NAT_GROUP_PUNCHTHROUGH_REQUEST,
+	/// NATPunchthrough plugin: internal
+	RID_NAT_GROUP_PUNCHTHROUGH_REPLY,
+	/// NATPunchthrough plugin: internal
 	RID_NAT_CONNECT_AT_TIME,
 	/// NATPunchthrough plugin: internal
 	RID_NAT_GET_MOST_RECENT_PORT,
 	/// NATPunchthrough plugin: internal
 	RID_NAT_CLIENT_READY,
+	/// NATPunchthrough plugin: internal
+	RID_NAT_GROUP_PUNCHTHROUGH_FAILURE_NOTIFICATION,
 
-	/// NATPunchthrough plugin: Destination system is not connected to the server. Bytes starting at offset 1 contains the RakNetGUID destination field of NatPunchthroughClient::OpenNAT().
+	/// NATPunchthrough plugin: Destination system is not connected to the server. Bytes starting at offset 1 contains the
+	///  RakNetGUID destination field of NatPunchthroughClient::OpenNAT().
 	RID_NAT_TARGET_NOT_CONNECTED,
-	/// NATPunchthrough plugin: Destination system is not responding to the plugin messages. Possibly the plugin is not installed. Bytes starting at offset 1 contains the RakNetGUID  destination field of NatPunchthroughClient::OpenNAT().
+	/// NATPunchthrough plugin: Destination system is not responding to ID_NAT_GET_MOST_RECENT_PORT. Possibly the plugin is not installed.
+	///  Bytes starting at offset 1 contains the RakNetGUID  destination field of NatPunchthroughClient::OpenNAT().
 	RID_NAT_TARGET_UNRESPONSIVE,
-	/// NATPunchthrough plugin: The server lost the connection to the destination system while setting up punchthrough. Possibly the plugin is not installed. Bytes starting at offset 1 contains the RakNetGUID  destination field of NatPunchthroughClient::OpenNAT().
+	/// NATPunchthrough plugin: The server lost the connection to the destination system while setting up punchthrough.
+	///  Possibly the plugin is not installed. Bytes starting at offset 1 contains the RakNetGUID  destination
+	///  field of NatPunchthroughClient::OpenNAT().
 	RID_NAT_CONNECTION_TO_TARGET_LOST,
-	/// NATPunchthrough plugin: This punchthrough is already in progress. Possibly the plugin is not installed. Bytes starting at offset 1 contains the RakNetGUID destination field of NatPunchthroughClient::OpenNAT().
+	/// NATPunchthrough plugin: This punchthrough is already in progress. Possibly the plugin is not installed.
+	///  Bytes starting at offset 1 contains the RakNetGUID destination field of NatPunchthroughClient::OpenNAT().
 	RID_NAT_ALREADY_IN_PROGRESS,
-	/// NATPunchthrough plugin: This message is generated on the local system, and does not come from the network. packet::guid contains the destination field of NatPunchthroughClient::OpenNAT(). Byte 1 contains 1 if you are the sender, 0 if not
+	/// NATPunchthrough plugin: This message is generated on the local system, and does not come from the network.
+	///  packet::guid contains the destination field of NatPunchthroughClient::OpenNAT(). Byte 1 contains 1 if you are the sender, 0 if not
 	RID_NAT_PUNCHTHROUGH_FAILED,
-	/// NATPunchthrough plugin: Punchthrough suceeded. See packet::systemAddress and packet::guid. Byte 1 contains 1 if you are the sender, 0 if not. You can now use RakPeer::Connect() or other calls to communicate with this system.
+	/// NATPunchthrough plugin: Punchthrough succeeded. See packet::systemAddress and packet::guid. Byte 1 contains 1 if you are the sender,
+	///  0 if not. You can now use RakPeer::Connect() or other calls to communicate with this system.
 	RID_NAT_PUNCHTHROUGH_SUCCEEDED,
-
-	/// LightweightDatabase plugin - Query
-	RID_DATABASE_QUERY_REQUEST,
-	/// LightweightDatabase plugin - Update
-	RID_DATABASE_UPDATE_ROW,
-	/// LightweightDatabase plugin - Remove
-	RID_DATABASE_REMOVE_ROW,
-	/// LightweightDatabase plugin - A serialized table.  Bytes 1+ contain the table.  Pass to TableSerializer::DeserializeTable
-	RID_DATABASE_QUERY_REPLY,
-	/// LightweightDatabase plugin - Specified table not found
-	RID_DATABASE_UNKNOWN_TABLE,
-	/// LightweightDatabase plugin - Incorrect password
-	RID_DATABASE_INCORRECT_PASSWORD,
+	/// NATPunchthrough plugin: OpenNATGroup failed.
+	/// packet::guid contains the facilitator field of NatPunchthroughClient::OpenNAT()
+	/// Data format starts at byte 1:<BR>
+	/// (char) passedSystemsCount,<BR>
+	/// (RakNetGuid, SystemAddress) (for passedSystemsCount),<BR>
+	/// (char) ignoredSystemsCount (caused by ID_NAT_TARGET_NOT_CONNECTED, ID_NAT_CONNECTION_TO_TARGET_LOST, ID_NAT_TARGET_UNRESPONSIVE),<BR>
+	/// RakNetGuid (for ignoredSystemsCount),<BR>
+	/// (char) failedSystemsCount,<BR>
+	/// RakNetGuid (for failedSystemsCount)<BR>
+	RID_NAT_GROUP_PUNCH_FAILED,
+	/// NATPunchthrough plugin: OpenNATGroup succeeded.
+	/// packet::guid contains the facilitator field of NatPunchthroughClient::OpenNAT()
+	/// See ID_NAT_GROUP_PUNCH_FAILED for data format
+	RID_NAT_GROUP_PUNCH_SUCCEEDED,
 
 	/// ReadyEvent plugin - Set the ready state for a particular system
 	/// First 4 bytes after the message contains the id
@@ -262,22 +283,13 @@ enum
 	/// Lobby packets. Second byte indicates type.
 	RID_LOBBY_GENERAL,
 
-	/// Auto RPC procedure call
-	RID_AUTO_RPC_CALL,
-
-	/// Auto RPC functionName to index mapping
-	RID_AUTO_RPC_REMOTE_INDEX,
-
-	/// Auto RPC functionName to index mapping, lookup failed. Will try to auto recover
-	RID_AUTO_RPC_UNKNOWN_REMOTE_INDEX,
-
-	/// Auto RPC error code
-	/// See AutoRPC.h for codes, stored in packet->data[1]
+	// RPC3, RPC4Plugin error
 	RID_RPC_REMOTE_ERROR,
+	/// Plugin based replacement for RPC system
+	RID_RPC_PLUGIN,
 
 	/// FileListTransfer transferring large files in chunks that are read only when needed, to save memory
 	RID_FILE_LIST_REFERENCE_PUSH,
-
 	/// Force the ready event to all set
 	RID_READY_EVENT_FORCE_ALL_SET,
 
@@ -290,8 +302,9 @@ enum
 	RID_LOBBY2_SEND_MESSAGE,
 	RID_LOBBY2_SERVER_ERROR,
 
-
-	/// Informs user of a new host GUID. Packet::Guid contains this RakNetGuid
+	/// Informs user of a new host GUID. Packet::Guid contains this new host RakNetGuid. The old host can be read out using BitStream->Read(RakNetGuid) starting on byte 1
+	/// This is not returned until connected to a remote system
+	/// If the oldHost is UNASSIGNED_RAKNET_GUID, then this is the first time the host has been determined
 	RID_FCM2_NEW_HOST,
 	/// \internal For FullyConnectedMesh2 plugin
 	RID_FCM2_REQUEST_FCMGUID,
@@ -299,6 +312,8 @@ enum
 	RID_FCM2_RESPOND_CONNECTION_COUNT,
 	/// \internal For FullyConnectedMesh2 plugin
 	RID_FCM2_INFORM_FCMGUID,
+	/// \internal For FullyConnectedMesh2 plugin
+	RID_FCM2_UPDATE_MIN_TOTAL_CONNECTION_COUNT,
 
 	/// UDP proxy messages. Second byte indicates type.
 	RID_UDP_PROXY_GENERAL,
@@ -307,20 +322,13 @@ enum
 	RID_SQLite3_EXEC,
 	/// SQLite3Plugin - Remote database is unknown
 	RID_SQLite3_UNKNOWN_DB,
-
-	/// Serialize construction for an object that already exists on the remote system
-	RID_REPLICA_MANAGER_3_SERIALIZE_CONSTRUCTION_EXISTING,
-	RID_REPLICA_MANAGER_3_LOCAL_CONSTRUCTION_REJECTED,
-	RID_REPLICA_MANAGER_3_LOCAL_CONSTRUCTION_ACCEPTED,
+	/// Events happening with SQLiteClientLoggerPlugin
+	RID_SQLLITE_LOGGER,
 
 	/// Sent to NatTypeDetectionServer
 	RID_NAT_TYPE_DETECTION_REQUEST,
-
 	/// Sent to NatTypeDetectionClient. Byte 1 contains the type of NAT detected.
 	RID_NAT_TYPE_DETECTION_RESULT,
-
-	/// Events happening with SQLiteClientLoggerPlugin
-	RID_SQLLITE_LOGGER,
 
 	/// Used by the router2 plugin
 	RID_ROUTER_2_INTERNAL,
@@ -347,25 +355,54 @@ enum
 
 	/// \internal Used by the team balancer plugin
 	RID_TEAM_BALANCER_INTERNAL,
-	/// Cannot switch to the desired team because it is full. However, if someone on that team leaves, you will get ID_TEAM_BALANCER_SET_TEAM later. Byte 1 contains the team you requested to join.
+	/// Cannot switch to the desired team because it is full. However, if someone on that team leaves, you will
+	///  get ID_TEAM_BALANCER_SET_TEAM later. Byte 1 contains the team you requested to join. Following bytes contain NetworkID of which member.
 	RID_TEAM_BALANCER_REQUESTED_TEAM_CHANGE_PENDING,
-	/// Cannot switch to the desired team because all teams are locked. However, if someone on that team leaves, you will get ID_TEAM_BALANCER_SET_TEAM later. Byte 1 contains the team you requested to join.
+	/// Cannot switch to the desired team because all teams are locked. However, if someone on that team leaves,
+	///  you will get ID_TEAM_BALANCER_SET_TEAM later. Byte 1 contains the team you requested to join.
 	RID_TEAM_BALANCER_TEAMS_LOCKED,
-	/// Team balancer plugin informing you of your team. Byte 1 contains the team you requested to join.
+	/// Team balancer plugin informing you of your team. Byte 1 contains the team you requested to join. Following bytes contain NetworkID of which member.
 	RID_TEAM_BALANCER_TEAM_ASSIGNED,
-	/// Gamebryo Lightspeed
+
+	/// Gamebryo Lightspeed integration
 	RID_LIGHTSPEED_INTEGRATION,
 
-	/// Plugin based replacement for old RPC system, no boost required, but only works with C functions
-	RID_RPC_4_PLUGIN,
+	/// XBOX integration
+	RID_XBOX_LOBBY,
 
-	/// If RakPeerInterface::Send() is called where PacketReliability contains _WITH_ACK_RECEIPT, then on a later call to RakPeerInterface::Receive() you will get ID_SND_RECEIPT_ACKED or ID_SND_RECEIPT_LOSS. The message will be 5 bytes long, and bytes 1-4 inclusive will contain a number in native order containing a number that identifies this message. This number will be returned by RakPeerInterface::Send() or RakPeerInterface::SendList(). ID_SND_RECEIPT_ACKED means that the message arrived
-	RID_SND_RECEIPT_ACKED,
+	/// The password we used to challenge the other system passed, meaning the other system has called TwoWayAuthentication::AddPassword() with the same password we passed to TwoWayAuthentication::Challenge()
+	/// You can read the identifier used to challenge as follows:
+	/// RakNet::BitStream bs(packet->data, packet->length, false); bs.IgnoreBytes(sizeof(RakNet::MessageID)); RakNet::RakString password; bs.Read(password);
+	RID_TWO_WAY_AUTHENTICATION_INCOMING_CHALLENGE_SUCCESS,
+	RID_TWO_WAY_AUTHENTICATION_OUTGOING_CHALLENGE_SUCCESS,
+	/// A remote system sent us a challenge using TwoWayAuthentication::Challenge(), and the challenge failed.
+	/// If the other system must pass the challenge to stay connected, you should call RakPeer::CloseConnection() to terminate the connection to the other system. 
+	RID_TWO_WAY_AUTHENTICATION_INCOMING_CHALLENGE_FAILURE,
+	/// The other system did not add the password we used to TwoWayAuthentication::AddPassword()
+	/// You can read the identifier used to challenge as follows:
+	/// RakNet::BitStream bs(packet->data, packet->length, false); bs.IgnoreBytes(sizeof(MessageID)); RakNet::RakString password; bs.Read(password);
+	RID_TWO_WAY_AUTHENTICATION_OUTGOING_CHALLENGE_FAILURE,
+	/// The other system did not respond within a timeout threshhold. Either the other system is not running the plugin or the other system was blocking on some operation for a long time.
+	/// You can read the identifier used to challenge as follows:
+	/// RakNet::BitStream bs(packet->data, packet->length, false); bs.IgnoreBytes(sizeof(MessageID)); RakNet::RakString password; bs.Read(password);
+	RID_TWO_WAY_AUTHENTICATION_OUTGOING_CHALLENGE_TIMEOUT,
+	/// \internal
+	RID_TWO_WAY_AUTHENTICATION_NEGOTIATION,
 
-	/// If RakPeerInterface::Send() is called where PacketReliability contains _WITH_ACK_RECEIPT, then on a later call to RakPeerInterface::Receive() you will get ID_SND_RECEIPT_ACKED or ID_SND_RECEIPT_LOSS. The message will be 5 bytes long, and bytes 1-4 inclusive will contain a number in native order containing a number that identifies this message. This number will be returned by RakPeerInterface::Send() or RakPeerInterface::SendList(). ID_SND_RECEIPT_LOSS means that an ack for the message did not arrive (it may or may not have been delivered, probably not). On disconnect or shutdown, you will not get ID_SND_RECEIPT_LOSS for unsent messages, you should consider those messages as all lost.
-	RID_SND_RECEIPT_LOSS,
+	/// CloudClient / CloudServer
+	RID_CLOUD_POST_REQUEST,
+	RID_CLOUD_RELEASE_REQUEST,
+	RID_CLOUD_GET_REQUEST,
+	RID_CLOUD_GET_RESPONSE,
+	RID_CLOUD_UNSUBSCRIBE_REQUEST,
+	RID_CLOUD_SERVER_TO_SERVER_COMMAND,
+	RID_CLOUD_SUBSCRIPTION_NOTIFICATION,
 
 	// So I can add more without changing user enumerations
+	RID_RESERVED_1,
+	RID_RESERVED_2,
+	RID_RESERVED_3,
+	RID_RESERVED_4,
 	RID_RESERVED_5,
 	RID_RESERVED_6,
 	RID_RESERVED_7,

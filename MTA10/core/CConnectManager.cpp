@@ -252,7 +252,7 @@ void CConnectManager::DoPulse ( void )
                 SString strError;
                 switch ( ucError )
                 {
-                    case RID_RSA_PUBLIC_KEY_MISMATCH:
+                    case RID_PUBLIC_KEY_MISMATCH:
                         strError = "Disconnected: unknown protocol error";  // encryption key mismatch
                         break;
                     case RID_REMOTE_DISCONNECTION_NOTIFICATION:
