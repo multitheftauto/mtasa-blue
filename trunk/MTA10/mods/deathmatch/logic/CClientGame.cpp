@@ -488,12 +488,6 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
     strncpy ( m_szLocalNick, szNick, MAX_PLAYER_NICK_LENGTH );
     m_szLocalNick [MAX_PLAYER_NICK_LENGTH] = 0;
 
-    // Make sure that the SA data files weren't tampered with before we connect
-    // (will be verified again after having joined to prevent modifying the files
-    // during loading)
-    if ( !VerifySADataFiles () )
-        return false;
-
     // Are we connected?
     if ( g_pNet->IsConnected () || m_bIsPlayingBack )
     {

@@ -425,8 +425,9 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     g_pClientGame->m_pLocalPlayer->CallEvent ( "onClientPlayerJoin", Arguments, true );
 
     g_pCore->UpdateRecentlyPlayed();
-    // Make sure that the SA data files weren't tampered with
-    g_pClientGame->VerifySADataFiles ( iEnableClientChecks );
+
+    if ( bitStream.Version () < 0x22 )
+        g_pNet->ResetStub ( 'ecc', iEnableClientChecks );
 }
 
 

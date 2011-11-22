@@ -25,6 +25,40 @@ CBandwidthSettings* g_pBandwidthSettings = new CBandwidthSettings ();
 
 using namespace std;
 
+// Used to identify <client_file> names
+struct
+{
+    int iBitNumber;
+    const char* szRealFilename;
+} const gtaDataFiles[] =  {
+          {   1, "data/animgrp.dat" },
+          {   3, "data/ar_stats.dat" },
+          {   0, "data/carmods.dat" },
+          {   5, "data/clothes.dat" },
+          {   7, "data/default.dat" },
+          {   9, "data/default.ide" },
+          {  11, "data/gta.dat" },
+          {  25, "data/maps" },
+          {   6, "data/object.dat" },
+          {  13, "data/peds.ide" },
+          {  15, "data/pedstats.dat" },
+          {  17, "data/txdcut.ide" },
+          {  14, "data/vehicles.ide" },
+          {  20, "data/weapon.dat" },
+          {   4, "data/melee.dat" },
+          {  16, "data/water.dat" },
+          {  18, "data/water1.dat" },
+          {   2, "data/handling.cfg" },
+          {  19, "models/coll/weapons.col" },
+          {  21, "data/plants.dat" },
+          {  23, "data/furnitur.dat" },
+          {  24, "data/procobj.dat" },
+          {   8, "data/surface.dat" },
+          {  12, "data/surfinfo.dat" },
+          {  22, "anim/ped.ifp" },
+         };
+
+
 CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConfig ( NULL )
 {
     m_pConsole = pConsole;
@@ -197,6 +231,47 @@ bool CMainConfig::Load ( void )
 
     // verifyclientsettings
     GetInteger ( m_pRootNode, "verifyclientsettings", m_iEnableClientChecks );
+
+    // Handle the <client_file> nodes
+    CXMLNode* pNode = NULL;
+    unsigned int uiCurrentIndex = 0;
+    do
+    {
+        // Grab the current script node
+        pNode = m_pRootNode->FindSubNode ( "client_file", uiCurrentIndex++ );
+        if ( pNode )
+        {
+            // Grab its "name" attribute
+            CXMLAttribute* pAttribute = pNode->GetAttributes ().Find ( "name" );
+            SString strName = pAttribute ? pAttribute->GetValue () : "";
+            strName = strName.Replace ( "\\", "/" ).ToLower ();
+
+            // Grab its "verify" attribute
+            pAttribute = pNode->GetAttributes ().Find ( "verify" );
+            SString strVerify = pAttribute ? pAttribute->GetValue () : "";
+            bool bVerify = strVerify == "true" || strVerify == "yes" || strVerify == "1";
+
+            // Find bitnumber
+            bool bFound = false;
+            for ( uint i = 0 ; i < NUMELMS( gtaDataFiles ) ; i++ )
+            {
+                if ( strName == gtaDataFiles[i].szRealFilename )
+                {
+                    if ( bVerify )
+                        m_iEnableClientChecks |= 1 << gtaDataFiles[i].iBitNumber;
+                    else
+                        m_iEnableClientChecks &= ~( 1 << gtaDataFiles[i].iBitNumber );
+                    bFound = true;
+                    break;
+                }
+            }
+
+            if ( !bFound )
+                CLogger::ErrorPrintf ( "Unknown client_file '%s'\n", *strName );
+        }
+    }
+    while ( pNode );
+
 
     // hideac
     int iHideAC = 0;

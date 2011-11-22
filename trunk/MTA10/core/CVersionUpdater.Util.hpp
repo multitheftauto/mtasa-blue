@@ -748,6 +748,10 @@ namespace
 
         struct {
             CDataInfoSet    serverInfoMap;
+        } gtadatafiles2;
+
+        struct {
+            CDataInfoSet    serverInfoMap;
         } trouble;
 
         struct {
