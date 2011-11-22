@@ -44,6 +44,11 @@ namespace SharedUtil
             return empty ();
         }
 
+        void Reserve ( uint uiSize )
+        {
+            return reserve ( uiSize );
+        }
+
         // Comparison
         bool operator== ( const CBuffer& other ) const
         {

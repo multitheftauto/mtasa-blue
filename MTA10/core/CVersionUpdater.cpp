@@ -65,7 +65,7 @@ public:
     void                _UseMasterFetchURLs                 ( void );
     void                _UseVersionQueryURLs                ( void );
     void                _UseProvidedURLs                    ( void );
-    void                _UseDataFilesURLs                   ( void );
+    void                _UseDataFiles2URLs                   ( void );
     void                _UseReportLogURLs                   ( void );
     void                _UseCrashDumpURLs                   ( void );
     void                _UseSidegradeURLs                   ( void );
@@ -282,6 +282,7 @@ bool CVersionUpdater::EnsureLoadedConfigFromXML ( void )
         XMLAccess.GetSubNodeValue ( "crashdump.duplicates",         m_MasterConfig.crashdump.iDuplicates );
         XMLAccess.GetSubNodeValue ( "crashdump.maxhistorylength",   m_MasterConfig.crashdump.iMaxHistoryLength );
         XMLAccess.GetSubNodeValue ( "gtadatafiles.serverlist",      m_MasterConfig.gtadatafiles.serverInfoMap );
+        XMLAccess.GetSubNodeValue ( "gtadatafiles2.serverlist",     m_MasterConfig.gtadatafiles2.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "trouble.serverlist",           m_MasterConfig.trouble.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "ase.serverlist",               m_MasterConfig.ase.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "sidegrade.serverlist",         m_MasterConfig.sidegrade.serverInfoMap );
@@ -349,6 +350,7 @@ bool CVersionUpdater::SaveConfigToXML ( void )
         XMLAccess.SetSubNodeValue ( "crashdump.duplicates",         m_MasterConfig.crashdump.iDuplicates );
         XMLAccess.SetSubNodeValue ( "crashdump.maxhistorylength",   m_MasterConfig.crashdump.iMaxHistoryLength );
         XMLAccess.SetSubNodeValue ( "gtadatafiles.serverlist",      m_MasterConfig.gtadatafiles.serverInfoMap );
+        XMLAccess.SetSubNodeValue ( "gtadatafiles2.serverlist",     m_MasterConfig.gtadatafiles2.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "trouble.serverlist",           m_MasterConfig.trouble.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "ase.serverlist",               m_MasterConfig.ase.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "sidegrade.serverlist",         m_MasterConfig.sidegrade.serverInfoMap );
@@ -1080,18 +1082,18 @@ void CVersionUpdater::InitPrograms ()
         MapSet ( m_ProgramMap, strProgramName, CProgram () );
         CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
 
-        ADDINST (   _UseDataFilesURLs );                        // Use DATA_FILES_URL*
+        ADDINST (   _UseDataFiles2URLs );                        // Use DATA_FILES_URL*
         ADDINST (   _DialogDataFilesQuestion );                 // Show "Data files wrong" dialog
         ADDCOND ( "if QuestionResponse.!Yes goto end" );        // If user says 'No', then goto end:
         ADDINST (   _DialogChecking );                          // Show "Checking..." message
         ADDINST (   _StartDownload );                          // Fetch file info from server
         ADDINST (   _ProcessPatchFileQuery );
-        ADDCOND ( "if ProcessResponse.!datafiles goto error1" );  // If server says 'No files' then goto error1:
+        ADDCOND ( "if ProcessResponse.!files goto error1" );  // If server says 'No files' then goto error1:
         ADDINST (   _DialogDownloading );                       // Show "Downloading..." message
         ADDINST (   _UseProvidedURLs );
         ADDINST (   _StartDownload );                       // Fetch file binary from mirror
         ADDINST (   _ProcessPatchFileDownload );
-        ADDINST (   _DialogDataFilesResult );                   // Show "Update ok/failed" message
+        ADDINST (   _DialogUpdateResult );                   // Show "Update ok/failed" message
         ADDINST (   _End );
 
         ADDLABL ( "error1:" );
@@ -1874,10 +1876,28 @@ void CVersionUpdater::_QUpdateNewsResult ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_DialogDataFilesQuestion ( void )
 {
+    // If using customized SA files, advise user to stop using customized SA files
+    if ( GetApplicationSettingInt ( "customized-sa-files-using" ) )
+    {
+        GetQuestionBox ().Reset ();
+        GetQuestionBox ().SetTitle ( "CUSTOMIZED GTA:SA FILES" );
+        SString strMessage;
+        strMessage += "This server is blocking your customized GTA:SA files.";
+        strMessage += "\n\nTo join this server please uncheck:";
+        strMessage += "\nSettings->Multiplayer->Use customized GTA:SA files";
+        strMessage += "\n\n";
+        GetQuestionBox ().SetMessage ( strMessage );
+        GetQuestionBox ().SetButton ( 0, "Ok" );
+        GetQuestionBox ().Show ();
+        Push ( _PollAnyButton );
+        m_ConditionMap.SetCondition ( "QuestionResponse", "No" );
+        return;
+    }
+
     // Display message
     GetQuestionBox ().Reset ();
     GetQuestionBox ().SetTitle ( "ERROR" );
-    GetQuestionBox ().SetMessage ( "San Andreas data files have been modified\n\n\nDo you want to automatically fix this problem?" );
+    GetQuestionBox ().SetMessage ( "Some MTA:SA data files are missing.\n\n\nDo you want to automatically fix this problem?" );
     GetQuestionBox ().SetButton ( 0, "No" );
     GetQuestionBox ().SetButton ( 1, "Yes" );
     GetQuestionBox ().Show ();
@@ -2121,6 +2141,7 @@ void CVersionUpdater::_ProcessMasterFetch ( void )
     XMLAccess.GetSubNodeValue ( "crashdump.duplicates",         newMasterConfig.crashdump.iDuplicates );
     XMLAccess.GetSubNodeValue ( "crashdump.maxhistorylength",   newMasterConfig.crashdump.iMaxHistoryLength );
     XMLAccess.GetSubNodeValue ( "gtadatafiles.serverlist",      newMasterConfig.gtadatafiles.serverInfoMap );
+    XMLAccess.GetSubNodeValue ( "gtadatafiles2.serverlist",     newMasterConfig.gtadatafiles2.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "trouble.serverlist",           newMasterConfig.trouble.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "ase.serverlist",               newMasterConfig.ase.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "sidegrade.serverlist",         newMasterConfig.sidegrade.serverInfoMap );
@@ -2231,15 +2252,17 @@ void CVersionUpdater::_UseProvidedURLs ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CVersionUpdater::_UseDataFilesURLs
+// CVersionUpdater::_UseDataFiles2URLs
 //
 // Called before starting the file download
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_UseDataFilesURLs ( void )
+void CVersionUpdater::_UseDataFiles2URLs ( void )
 {
     m_JobInfo = SJobInfo ();
-    m_JobInfo.serverList = MakeServerList ( m_MasterConfig.gtadatafiles.serverInfoMap );
+    m_JobInfo.serverList = MakeServerList ( m_MasterConfig.gtadatafiles2.serverInfoMap );
+    if ( m_JobInfo.serverList.empty () )
+        m_JobInfo.serverList.push_back ( "http://updatesa.mtasa.com/sa/gtadatafiles2/?v=%VERSION%&amp;id=%ID%" );
 }
 
 

@@ -32,6 +32,7 @@ namespace SharedUtil
         SetDebugTagHidden ( "Lua" );
         SetDebugTagHidden ( "Sync" );
         SetDebugTagHidden ( "DEBUG EVENT" );
+        SetDebugTagHidden ( "ReportLog" );
 
         #ifdef Has_InitDebugTagsLocal
             InitDebugTagsLocal ();
