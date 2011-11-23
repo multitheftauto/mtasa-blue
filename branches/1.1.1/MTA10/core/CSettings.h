@@ -152,6 +152,7 @@ protected:
     CGUIComboBox*       m_pComboAspectRatio;
     CGUILabel*          m_pAspectRatioLabel;
 	CGUICheckBox*       m_pCheckBoxVolumetricShadows;
+	CGUICheckBox*       m_pCheckBoxCustomizedSAFiles;
 	CGUICheckBox*       m_pCheckBoxGrass;
     CGUILabel*          m_pDrawDistanceLabel;
     CGUIScrollBar*      m_pDrawDistance;
@@ -313,6 +314,7 @@ protected:
 
     bool                OnFxQualityChanged      ( CGUIElement* pElement );
     bool                OnVolumetricShadowsClick ( CGUIElement* pElement );
+    bool                OnCustomizedSAFilesClick ( CGUIElement* pElement );
 
 private:
     void                ProcessKeyBinds         ( void );

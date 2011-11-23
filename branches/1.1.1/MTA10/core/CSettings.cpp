@@ -356,6 +356,11 @@ void CSettings::CreateGUI ( void )
     m_pAutoRefreshBrowser->GetPosition ( vecTemp, false );
     m_pAutoRefreshBrowser->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
+    m_pCheckBoxCustomizedSAFiles = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, "Use customized GTA:SA files", true ) );
+    m_pCheckBoxCustomizedSAFiles->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
+    m_pCheckBoxCustomizedSAFiles->GetPosition ( vecTemp, false );
+    m_pCheckBoxCustomizedSAFiles->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
     /**
      *  Audio tab
      **/
@@ -979,6 +984,7 @@ void CSettings::CreateGUI ( void )
     m_pComboFxQuality->SetSelectionHandler ( GUI_CALLBACK( &CSettings::OnFxQualityChanged, this ) );
     m_pCheckBoxVolumetricShadows->SetClickHandler ( GUI_CALLBACK( &CSettings::OnVolumetricShadowsClick, this ) );
     m_pStreamingMemory->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnStreamingMemoryChanged, this ) );
+    m_pCheckBoxCustomizedSAFiles->SetClickHandler ( GUI_CALLBACK( &CSettings::OnCustomizedSAFilesClick, this ) );
     /*
     // Give a warning if no community account settings were stored in config
     CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, "Multi Theft Auto: Community settings", MB_ICON_WARNING );
@@ -1145,6 +1151,9 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     CVARS_GET("volumetric_shadows", bVolumetricShadowsEnabled);
     m_pCheckBoxVolumetricShadows->SetSelected ( bVolumetricShadowsEnabled );
     m_pCheckBoxVolumetricShadows->SetEnabled ( FxQuality != 0 );
+
+    // Customized sa files
+    m_pCheckBoxCustomizedSAFiles->SetSelected ( GetApplicationSettingInt ( "customized-sa-files-request" ) != 0 );
 
     // Grass
     bool bGrassEnabled;
@@ -2170,6 +2179,10 @@ void CSettings::LoadData ( void )
 	m_pCheckBoxVolumetricShadows->SetSelected ( bVolumetricShadowsEnabled );
 	m_pCheckBoxVolumetricShadows->SetEnabled ( FxQuality != 0 );
 
+    // Customized sa files
+	m_pCheckBoxCustomizedSAFiles->SetSelected ( GetApplicationSettingInt ( "customized-sa-files-request" ) != 0 );
+	m_pCheckBoxCustomizedSAFiles->SetEnabled ( GetApplicationSettingInt ( "customized-sa-files-show" ) != 0 );
+
     // Grass
     bool bGrassEnabled;
     CVARS_GET ( "grass", bGrassEnabled );
@@ -2366,12 +2379,15 @@ void CSettings::SaveData ( void )
     if ( CGUIListItem* pSelected = m_pComboAntiAliasing->GetSelectedItem () )
         iAntiAliasing = ( int ) pSelected->GetData();
     int iAeroEnabled = m_pCheckBoxDisableAero->GetSelected() ? 0 : 1;
+    bool bCustomizedSAFilesEnabled = m_pCheckBoxCustomizedSAFiles->GetSelected();
+    bool bCustomizedSAFilesWasEnabled = GetApplicationSettingInt ( "customized-sa-files-request" ) != 0;
 
     // change
     bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize );
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != iAntiAliasing;
     bool bIsAeroChanged = GetApplicationSettingInt ( "aero-enabled"  ) != iAeroEnabled;
-    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged )
+    bool bIsCustomizedSAFilesChanged = bCustomizedSAFilesWasEnabled != bCustomizedSAFilesEnabled;
+    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsCustomizedSAFilesChanged )
     {
         SString strChangedOptions;
         if ( bIsVideoModeChanged )
@@ -2395,6 +2411,13 @@ void CSettings::SaveData ( void )
             strChangedOptions += "Aero setting";
         }
 
+        if ( bIsCustomizedSAFilesChanged )
+        {
+            if ( !strChangedOptions.empty () )
+                strChangedOptions += " and ";
+            strChangedOptions += "Customized GTA:SA files setting";
+        }
+
         SString strMessage ( "%s will be changed when you next start MTA", strChangedOptions.c_str () );
         strMessage += "\n\nDo you want to restart now?";
         CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
@@ -2412,6 +2435,7 @@ void CSettings::SaveData ( void )
     gameSettings->SetBrightness ( m_pBrightness->GetScrollPosition () * 384 );
     gameSettings->SetMouseSensitivity ( ( m_pMouseSensitivity->GetScrollPosition () * 0.004688f ) + 0.000312f );
 	gameSettings->SetMipMappingEnabled ( m_pCheckBoxMipMapping->GetSelected () );
+    SetApplicationSettingInt ( "customized-sa-files-request", bCustomizedSAFilesEnabled ? 1 : 0 );
 
     // Update Aero override setting. This need to be a registry setting as it's done in the launcher
     SetApplicationSettingInt ( "aero-enabled", m_pCheckBoxDisableAero->GetSelected() ? 0 : 1 );
@@ -3127,6 +3151,38 @@ bool CSettings::OnVolumetricShadowsClick ( CGUIElement* pElement )
     }
     return true;
 }
+
+//
+// CustomizedSAFiles
+//
+void CustomizedSAFilesCallBack ( void* ptr, unsigned int uiButton )
+{
+    CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->Reset ();
+    if ( uiButton == 0 )
+        ((CGUICheckBox*)ptr)->SetSelected ( false );
+}
+
+bool CSettings::OnCustomizedSAFilesClick ( CGUIElement* pElement )
+{
+    if ( m_pCheckBoxCustomizedSAFiles->GetSelected () )
+    {
+        SString strMessage;
+        strMessage += "Some files in your GTA:SA data directory are customized";
+        strMessage += "\nMTA will only use these modified files if this check box is ticked";
+        strMessage += "\n\nHowever, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS";
+        strMessage += "\n\nAre you sure you want to use them?";
+        CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
+        pQuestionBox->Reset ();
+        pQuestionBox->SetTitle ( "CUSTOMIZED GTA:SA FILES" );
+        pQuestionBox->SetMessage ( strMessage );
+        pQuestionBox->SetButton ( 0, "No" );
+        pQuestionBox->SetButton ( 1, "Yes" );
+        pQuestionBox->SetCallback ( CustomizedSAFilesCallBack, m_pCheckBoxCustomizedSAFiles );
+        pQuestionBox->Show ();
+    }
+    return true;
+}
+
 
 void NewNicknameCallback ( void* ptr, unsigned int uiButton, std::string strNick )
 {

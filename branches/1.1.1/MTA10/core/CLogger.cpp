@@ -37,7 +37,7 @@ void CLogger::WriteDebugEventInt ( const string& EventDescription )
 
     // Output message to debug console
 #ifdef MTA_DEBUG
-    OutputDebugString ( string ( EventDescription + '\n' ).c_str ( ) );
+    OutputDebugLine ( SStringX ( "[DEBUG EVENT] " ) + EventDescription );
 #endif
 
     // Ask windows for the system time.
@@ -90,7 +90,7 @@ void CLogger::OutputDebugMessage ( const string& DebugMessage )
 {
     #ifdef MTA_DEBUG
         WriteEvent ( DebugMessage );
-        OutputDebugString ( DebugMessage.c_str ( ) );
+        OutputDebugLine ( SStringX ( "[DEBUG MESSAGE] " ) + DebugMessage.c_str ( ) );
     #endif
 }
 

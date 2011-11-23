@@ -65,7 +65,7 @@ public:
     void                _UseMasterFetchURLs                 ( void );
     void                _UseVersionQueryURLs                ( void );
     void                _UseProvidedURLs                    ( void );
-    void                _UseDataFilesURLs                   ( void );
+    void                _UseDataFiles2URLs                   ( void );
     void                _UseReportLogURLs                   ( void );
     void                _UseCrashDumpURLs                   ( void );
     void                _UseSidegradeURLs                   ( void );
@@ -282,6 +282,7 @@ bool CVersionUpdater::EnsureLoadedConfigFromXML ( void )
         XMLAccess.GetSubNodeValue ( "crashdump.duplicates",         m_MasterConfig.crashdump.iDuplicates );
         XMLAccess.GetSubNodeValue ( "crashdump.maxhistorylength",   m_MasterConfig.crashdump.iMaxHistoryLength );
         XMLAccess.GetSubNodeValue ( "gtadatafiles.serverlist",      m_MasterConfig.gtadatafiles.serverInfoMap );
+        XMLAccess.GetSubNodeValue ( "gtadatafiles2.serverlist",     m_MasterConfig.gtadatafiles2.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "trouble.serverlist",           m_MasterConfig.trouble.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "ase.serverlist",               m_MasterConfig.ase.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "sidegrade.serverlist",         m_MasterConfig.sidegrade.serverInfoMap );
@@ -349,6 +350,7 @@ bool CVersionUpdater::SaveConfigToXML ( void )
         XMLAccess.SetSubNodeValue ( "crashdump.duplicates",         m_MasterConfig.crashdump.iDuplicates );
         XMLAccess.SetSubNodeValue ( "crashdump.maxhistorylength",   m_MasterConfig.crashdump.iMaxHistoryLength );
         XMLAccess.SetSubNodeValue ( "gtadatafiles.serverlist",      m_MasterConfig.gtadatafiles.serverInfoMap );
+        XMLAccess.SetSubNodeValue ( "gtadatafiles2.serverlist",     m_MasterConfig.gtadatafiles2.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "trouble.serverlist",           m_MasterConfig.trouble.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "ase.serverlist",               m_MasterConfig.ase.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "sidegrade.serverlist",         m_MasterConfig.sidegrade.serverInfoMap );
@@ -424,7 +426,7 @@ void CVersionUpdater::DoPulse ( void )
             m_MasterConfig.master.interval.SetFromString ( "7d" );
 
         time_t secondsSinceCheck = CDateTime::Now ().ToSeconds () - m_VarConfig.master_lastCheckTime.ToSeconds ();
-        OutputDebugLine ( SString ( "master timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.master.interval.ToSeconds () - secondsSinceCheck) ) );
+        OutputDebugLine ( SString ( "[Updater] master timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.master.interval.ToSeconds () - secondsSinceCheck) ) );
 
         // Only check once a week
         if ( secondsSinceCheck > m_MasterConfig.master.interval.ToSeconds () || secondsSinceCheck < 0 )
@@ -445,7 +447,7 @@ void CVersionUpdater::DoPulse ( void )
             m_VarConfig.version_lastCheckTime.SetFromSeconds ( 0 );
 
         time_t secondsSinceCheck = CDateTime::Now ().ToSeconds () - m_VarConfig.version_lastCheckTime.ToSeconds ();
-        OutputDebugLine ( SString ( "version timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.version.interval.ToSeconds () - secondsSinceCheck) ) );
+        OutputDebugLine ( SString ( "[Updater] version timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.version.interval.ToSeconds () - secondsSinceCheck) ) );
 
         // Only check once a day
         if ( secondsSinceCheck > m_MasterConfig.version.interval.ToSeconds () || secondsSinceCheck < 0 )
@@ -462,7 +464,7 @@ void CVersionUpdater::DoPulse ( void )
         m_bCheckedTimeForNewsUpdate = true;
 
         time_t secondsSinceCheck = CDateTime::Now ().ToSeconds () - m_VarConfig.news_lastCheckTime.ToSeconds ();
-        OutputDebugLine ( SString ( "news timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.news.interval.ToSeconds () - secondsSinceCheck) ) );
+        OutputDebugLine ( SString ( "[Updater] news timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.news.interval.ToSeconds () - secondsSinceCheck) ) );
 
         // Only check once an interval
         if ( secondsSinceCheck > m_MasterConfig.news.interval.ToSeconds () || secondsSinceCheck < 0 )
@@ -1080,18 +1082,18 @@ void CVersionUpdater::InitPrograms ()
         MapSet ( m_ProgramMap, strProgramName, CProgram () );
         CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
 
-        ADDINST (   _UseDataFilesURLs );                        // Use DATA_FILES_URL*
+        ADDINST (   _UseDataFiles2URLs );                        // Use DATA_FILES_URL*
         ADDINST (   _DialogDataFilesQuestion );                 // Show "Data files wrong" dialog
         ADDCOND ( "if QuestionResponse.!Yes goto end" );        // If user says 'No', then goto end:
         ADDINST (   _DialogChecking );                          // Show "Checking..." message
         ADDINST (   _StartDownload );                          // Fetch file info from server
         ADDINST (   _ProcessPatchFileQuery );
-        ADDCOND ( "if ProcessResponse.!datafiles goto error1" );  // If server says 'No files' then goto error1:
+        ADDCOND ( "if ProcessResponse.!files goto error1" );  // If server says 'No files' then goto error1:
         ADDINST (   _DialogDownloading );                       // Show "Downloading..." message
         ADDINST (   _UseProvidedURLs );
         ADDINST (   _StartDownload );                       // Fetch file binary from mirror
         ADDINST (   _ProcessPatchFileDownload );
-        ADDINST (   _DialogDataFilesResult );                   // Show "Update ok/failed" message
+        ADDINST (   _DialogUpdateResult );                   // Show "Update ok/failed" message
         ADDINST (   _End );
 
         ADDLABL ( "error1:" );
@@ -1264,7 +1266,7 @@ void CVersionUpdater::CheckPrograms ()
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::RunProgram ( const SString& strProgramName )
 {
-    OutputDebugLine ( SString ( "RunProgram %s", strProgramName.c_str () ) );
+    OutputDebugLine ( SString ( "[Updater] RunProgram %s", strProgramName.c_str () ) );
     ResetEverything ();
     CProgram* pProgram = MapFind ( m_ProgramMap, strProgramName );
     if ( pProgram )
@@ -1468,7 +1470,7 @@ void CVersionUpdater::_ExitGame ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_ResetVersionCheckTimer ( void )
 {
-    OutputDebugLine ( SStringX ( "_ResetVersionCheckTimer" ) );
+    OutputDebugLine ( SStringX ( "[Updater] _ResetVersionCheckTimer" ) );
     m_VarConfig.version_lastCheckTime = CDateTime::Now ();
 }
 
@@ -1482,7 +1484,7 @@ void CVersionUpdater::_ResetVersionCheckTimer ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_ResetNewsCheckTimer ( void )
 {
-    OutputDebugLine ( SStringX ( "_ResetNewsCheckTimer" ) );
+    OutputDebugLine ( SStringX ( "[Updater] _ResetNewsCheckTimer" ) );
     m_VarConfig.news_lastCheckTime = CDateTime::Now ();
 }
 
@@ -1874,10 +1876,28 @@ void CVersionUpdater::_QUpdateNewsResult ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_DialogDataFilesQuestion ( void )
 {
+    // If using customized SA files, advise user to stop using customized SA files
+    if ( GetApplicationSettingInt ( "customized-sa-files-using" ) )
+    {
+        GetQuestionBox ().Reset ();
+        GetQuestionBox ().SetTitle ( "CUSTOMIZED GTA:SA FILES" );
+        SString strMessage;
+        strMessage += "This server is blocking your customized GTA:SA files.";
+        strMessage += "\n\nTo join this server please uncheck:";
+        strMessage += "\nSettings->Multiplayer->Use customized GTA:SA files";
+        strMessage += "\n\n";
+        GetQuestionBox ().SetMessage ( strMessage );
+        GetQuestionBox ().SetButton ( 0, "Ok" );
+        GetQuestionBox ().Show ();
+        Push ( _PollAnyButton );
+        m_ConditionMap.SetCondition ( "QuestionResponse", "No" );
+        return;
+    }
+
     // Display message
     GetQuestionBox ().Reset ();
     GetQuestionBox ().SetTitle ( "ERROR" );
-    GetQuestionBox ().SetMessage ( "San Andreas data files have been modified\n\n\nDo you want to automatically fix this problem?" );
+    GetQuestionBox ().SetMessage ( "Some MTA:SA data files are missing.\n\n\nDo you want to automatically fix this problem?" );
     GetQuestionBox ().SetButton ( 0, "No" );
     GetQuestionBox ().SetButton ( 1, "Yes" );
     GetQuestionBox ().Show ();
@@ -2002,7 +2022,7 @@ void CVersionUpdater::_ProcessPatchFileQuery ( void )
 
     if ( m_JobInfo.downloadBuffer.size () == 0 )
     {
-        OutputDebugLine ( "Empty download buffer" );
+        OutputDebugLine ( "[Error] Empty download buffer" );
         return;
     }
 
@@ -2121,6 +2141,7 @@ void CVersionUpdater::_ProcessMasterFetch ( void )
     XMLAccess.GetSubNodeValue ( "crashdump.duplicates",         newMasterConfig.crashdump.iDuplicates );
     XMLAccess.GetSubNodeValue ( "crashdump.maxhistorylength",   newMasterConfig.crashdump.iMaxHistoryLength );
     XMLAccess.GetSubNodeValue ( "gtadatafiles.serverlist",      newMasterConfig.gtadatafiles.serverInfoMap );
+    XMLAccess.GetSubNodeValue ( "gtadatafiles2.serverlist",     newMasterConfig.gtadatafiles2.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "trouble.serverlist",           newMasterConfig.trouble.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "ase.serverlist",               newMasterConfig.ase.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "sidegrade.serverlist",         newMasterConfig.sidegrade.serverInfoMap );
@@ -2231,15 +2252,17 @@ void CVersionUpdater::_UseProvidedURLs ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CVersionUpdater::_UseDataFilesURLs
+// CVersionUpdater::_UseDataFiles2URLs
 //
 // Called before starting the file download
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_UseDataFilesURLs ( void )
+void CVersionUpdater::_UseDataFiles2URLs ( void )
 {
     m_JobInfo = SJobInfo ();
-    m_JobInfo.serverList = MakeServerList ( m_MasterConfig.gtadatafiles.serverInfoMap );
+    m_JobInfo.serverList = MakeServerList ( m_MasterConfig.gtadatafiles2.serverInfoMap );
+    if ( m_JobInfo.serverList.empty () )
+        m_JobInfo.serverList.push_back ( "http://updatesa.mtasa.com/sa/gtadatafiles2/?v=%VERSION%&amp;id=%ID%" );
 }
 
 
@@ -2767,7 +2790,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     // Perform the HTTP request
     m_HTTP.Get ( strQueryURL );
     m_strLastQueryURL = strQueryURL;
-    OutputDebugLine( SString ( "DoSendDownloadRequestToNextServer %d/%d %s", m_JobInfo.iCurrent, m_JobInfo.serverList.size (), strQueryURL.c_str () ) );
+    OutputDebugLine( SString ( "[Updater] DoSendDownloadRequestToNextServer %d/%d %s", m_JobInfo.iCurrent, m_JobInfo.serverList.size (), strQueryURL.c_str () ) );
     return RES_OK;
 }
 

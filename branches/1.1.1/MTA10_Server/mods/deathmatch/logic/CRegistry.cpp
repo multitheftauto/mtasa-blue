@@ -37,7 +37,7 @@ bool CRegistry::SetLastErrorMessage ( const std::string& strLastErrorMessage, co
 {
     m_strLastErrorMessage = strLastErrorMessage;
     m_strLastErrorQuery = strQuery;
-    OutputDebugLine ( SString ( "%s [Query was:%s]", *m_strLastErrorMessage, *m_strLastErrorQuery ) );
+    OutputDebugLine ( SString ( "[Database] %s [Query was:%s]", *m_strLastErrorMessage, *m_strLastErrorQuery ) );
     return false;
 }
 

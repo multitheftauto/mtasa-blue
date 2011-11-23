@@ -494,7 +494,7 @@ void SharedUtil::AddReportLog ( uint uiId, const SString& strText )
     SString strMessage ( "%u: %s %s - %s\n", uiId, GetTimeString ( true, false ).c_str (), GetReportLogHeaderText ().c_str (), strText.c_str () );
     FileAppend ( strPathFilename, &strMessage.at ( 0 ), strMessage.length () );
 #if MTA_DEBUG
-    OutputDebugString ( SStringX ( "ReportLog: " ) + strMessage );
+    OutputDebugLine ( SStringX ( "[ReportLog] " ) + strMessage );
 #endif
 }
 
@@ -885,23 +885,6 @@ std::wstring SharedUtil::ANSIToUTF16 ( const std::string& input )
     delete wcsOutput;
     return strOutput;
 }
-
-#ifdef MTA_DEBUG
-//
-// Output timestamped line into the debugger
-//
-void SharedUtil::OutputDebugLine ( const char* szMessage )
-{
-    SString strMessage = GetLocalTimeString ( false, true ) + " - " + szMessage;
-    if ( strMessage.length () > 0 && strMessage[ strMessage.length () - 1 ] != '\n' )
-        strMessage += "\n";
-#ifdef _WIN32
-    OutputDebugString ( strMessage );
-#else
-    // Other platforms here
-#endif
-}
-#endif
 
 
 //

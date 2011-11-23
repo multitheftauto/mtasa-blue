@@ -146,7 +146,7 @@ void CElementRefManager::OnElementDelete ( CElement* pElement )
     #ifdef MTA_DEBUG
                 SString* pstrDebugInfo = MapFind ( ms_ElementRefListDebugInfo, &pOther );
                 assert ( pstrDebugInfo );
-                OutputDebugLine ( SString ( "Did null %s (%08x @ %08x)", **pstrDebugInfo, pElement, &pOther ) );
+                OutputDebugLine ( SString ( "[ElementRef] Did null %s (%08x @ %08x)", **pstrDebugInfo, pElement, &pOther ) );
     #endif
             }
         }
@@ -171,7 +171,7 @@ void CElementRefManager::OnElementDelete ( CElement* pElement )
         #ifdef MTA_DEBUG
                     SString* pstrDebugInfo = MapFind ( ms_ElementRefListListDebugInfo, &rList );
                     assert ( pstrDebugInfo );
-                    OutputDebugLine ( SString ( "Did list item %s (%08x @ %08x)", **pstrDebugInfo, pElement, &rList ) );     
+                    OutputDebugLine ( SString ( "[ElementRef] Did list item %s (%08x @ %08x)", **pstrDebugInfo, pElement, &rList ) );     
         #endif
                 }
                 else

@@ -136,7 +136,7 @@ void CServerList::Pulse ( void )
     m_nScanned += uiRepliesParsed;
     m_nSkipped += uiNoReplies;
 #if MTA_DEBUG
-    //OutputDebugLine ( SString ( "%08x  Size: %d  m_nScanned:%d  m_nSkipped:%d [%d]  iNumQueries: %d", this, m_Servers.size(), m_nScanned, m_nSkipped, m_nScanned+m_nSkipped, iNumQueries ) );
+    //OutputDebugLine ( SString ( "[Browser] %08x  Size: %d  m_nScanned:%d  m_nSkipped:%d [%d]  iNumQueries: %d", this, m_Servers.size(), m_nScanned, m_nSkipped, m_nScanned+m_nSkipped, iNumQueries ) );
 #endif
 
     if ( m_nScanned + m_nSkipped == m_Servers.size () ) {
