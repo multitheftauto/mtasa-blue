@@ -146,6 +146,7 @@ public:
 protected:
     void                        StopThread                  ( void );
     CDbJobData*                 GetNewJobData               ( void );
+    void                        UpdateDebugData             ( void );
     void                        RemoveUnwantedResults       ( void );
     void                        IgnoreJobResults            ( CDbJobData* pJobData );
 
@@ -394,18 +395,53 @@ again:
 
     shared.m_Mutex.Unlock ();
 
-    // Determine min query count over 10 seconds
-    if ( m_JobCountElpasedTime.Get () > 10000 )
+    UpdateDebugData ();
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseJobQueueImpl::UpdateDebugData
+//
+// Update info relevant to debugging database jobs
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseJobQueueImpl::UpdateDebugData ( void )
+{
+    // Update once every 10 seconds
+    if ( m_JobCountElpasedTime.Get () < 10000 )
+        return;
+
+    shared.m_Mutex.Lock ();
+
+    // Log to console if job count is creeping up
+    if ( m_uiJobCount10sMin > m_uiJobCountWarnThresh )
     {
-        if ( m_uiJobCount10sMin > m_uiJobCountWarnThresh )
-        {
-            m_uiJobCountWarnThresh = m_uiJobCount10sMin * 2;
-            CLogger::LogPrintf ( "Notice: There are now %d job handles\n", m_uiJobCount10sMin );
-        }
-        m_JobCountElpasedTime.Reset ();
-        m_uiJobCount10sMin = m_ActiveJobHandles.size ();
+        m_uiJobCountWarnThresh = m_uiJobCount10sMin * 2;
+        CLogger::LogPrintf ( "Notice: There are now %d job handles\n", m_uiJobCount10sMin );
     }
-    m_uiJobCount10sMin = Min ( m_uiJobCount10sMin, m_ActiveJobHandles.size () );
+    m_JobCountElpasedTime.Reset ();
+    m_uiJobCount10sMin = m_ActiveJobHandles.size ();
+
+    CTickCount timeNow = CTickCount::Now ( true );
+
+    // Log old uncollected queries
+    for ( std::list < CDbJobData* >::iterator iter = shared.m_ResultQueue.begin () ; iter != shared.m_ResultQueue.end () ; iter++ )
+    {
+        CDbJobData* pJobData = *iter;
+        if ( !pJobData->result.bLoggedWarning )
+        {
+            CTickCount age = timeNow - pJobData->result.timeReady;
+            if ( age.ToLongLong () > 1000 * 60 * 5 )
+            {
+                CLogger::LogPrintf ( "WARNING: %s: Database result uncollected after 5 minutes. [Query: %s]\n", *pJobData->m_strDebugInfo, *pJobData->command.strData );
+                pJobData->result.bLoggedWarning = true;
+                break;
+            }
+        }
+    }
+
+    shared.m_Mutex.Unlock ();
 }
 
 
@@ -662,6 +698,7 @@ void* CDatabaseJobQueueImpl::ThreadProc ( void )
                 shared.m_CommandQueue.pop_front ();
                 // Add result
                 pJobData->stage = EJobStage::RESULT;
+                pJobData->result.timeReady = CTickCount::Now ( true );
                 shared.m_ResultQueue.push_back ( pJobData );
             }
             shared.m_Mutex.Signal ();
@@ -855,7 +892,7 @@ void CDatabaseJobQueueImpl::ProcessFlush ( CDbJobData* pJobData )
 void CDatabaseJobQueueImpl::ProcessSetLogLevel ( CDbJobData* pJobData )
 {
     GetOption < CDbOptionsMap > ( pJobData->command.strData, "name", m_strLogFilename );
-    GetOption < CDbOptionsMap > ( pJobData->command.strData, "level", (int&)m_LogLevel );
+    GetOption < CDbOptionsMap > ( pJobData->command.strData, "level", m_LogLevel );
     pJobData->result.status = EJobResult::SUCCESS;
 }
 

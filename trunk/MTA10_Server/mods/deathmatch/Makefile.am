@@ -106,6 +106,7 @@ LOGIC = \
 ./logic/CPerfStat.BandwidthReduction.cpp \
 ./logic/CPerfStat.BandwidthUsage.cpp \
 ./logic/CPerfStat.DebugInfo.cpp \
+./logic/CPerfStat.DebugTable.cpp \
 ./logic/CPerfStat.FunctionTiming.cpp \
 ./logic/CPerfStat.LibMemory.cpp \
 ./logic/CPerfStat.LuaMemory.cpp \
@@ -183,6 +184,7 @@ LOGIC = \
 ./logic/lua/CLuaTimer.cpp \
 ./logic/lua/CLuaTimerManager.cpp \
 ./logic/lua/LuaCommon.cpp \
+./logic/lua/LuaUtils.cpp \
 ./logic/luadefs/CLuaACLDefs.cpp \
 ./logic/luadefs/CLuaCameraDefs.cpp \
 ./logic/luadefs/CLuaDefs.cpp \

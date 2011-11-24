@@ -318,3 +318,22 @@ public:
 
     static CPerfStatDebugInfo*  GetSingleton      ( void );
 };
+
+
+//
+// CPerfStatDebugTable
+//
+class CPerfStatDebugTable : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    // CPerfStatDebugInfo
+    virtual void                RemoveLines         ( const SString& strKeyMatch ) = 0;
+    virtual void                UpdateLine          ( const SString& strKey, int iLifeTimeMs, ... ) = 0;
+
+    static CPerfStatDebugTable*  GetSingleton      ( void );
+};

@@ -10,6 +10,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define DEFAULT_THRESH_MS 1
 
 namespace
 {
@@ -221,7 +222,7 @@ void CPerfStatFunctionTimingImpl::DoPulse ( void )
     // Update PeakUs threshold
     //
     m_PeakUsRequiredHistory.RemoveOlderThan ( 10000 );
-    m_PeakUsThresh = m_PeakUsRequiredHistory.GetLowestValue ( 50000 );
+    m_PeakUsThresh = m_PeakUsRequiredHistory.GetLowestValue ( DEFAULT_THRESH_MS * 1000 );
 }
 
 
@@ -286,7 +287,7 @@ void CPerfStatFunctionTimingImpl::GetStats ( CPerfStatResult* pResult, const std
     bool bHelp = MapContains ( optionMap, "h" );
     int iPeakMsThresh = optionMap.empty () ? 0 : atoi ( optionMap.begin ()->first );
     if ( iPeakMsThresh < 1 )
-        iPeakMsThresh = 50000;
+        iPeakMsThresh = DEFAULT_THRESH_MS;
     m_PeakUsRequiredHistory.AddValue ( iPeakMsThresh * 1000 );
 
     //
@@ -296,7 +297,7 @@ void CPerfStatFunctionTimingImpl::GetStats ( CPerfStatResult* pResult, const std
     {
         pResult->AddColumn ( "Function timings help" );
         pResult->AddRow ()[0] = "Option h - This help";
-        pResult->AddRow ()[0] = "1-50 - Peak Ms threshold (defaults to 50)";
+        pResult->AddRow ()[0] = "1-50 - Peak Ms threshold (defaults to 1)";
         return;
     }
 

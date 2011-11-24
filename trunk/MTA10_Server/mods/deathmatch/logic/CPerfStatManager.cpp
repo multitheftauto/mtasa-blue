@@ -78,6 +78,7 @@ CPerfStatManagerImpl::CPerfStatManagerImpl ( void )
     AddModule ( CPerfStatServerTiming::GetSingleton () );
     AddModule ( CPerfStatFunctionTiming::GetSingleton () );
     AddModule ( CPerfStatDebugInfo::GetSingleton () );
+    AddModule ( CPerfStatDebugTable::GetSingleton () );
 }
 
 

@@ -26,6 +26,7 @@ public:
     virtual SString                 GetDataSourceTag            ( void ) = 0;
     virtual CDatabaseConnection*    Connect                     ( const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strDriverOptions ) = 0;
     virtual void                    NotifyConnectionDeleted     ( CDatabaseConnection* pConnection ) = 0;
+    virtual void                    NotifyConnectionChanged     ( CDatabaseConnection* pConnection ) = 0;
 };
 
 
@@ -50,9 +51,11 @@ public:
     virtual void            Release                 ( void ) = 0;
     virtual bool            Query                   ( const SString& strQuery, CRegistryResult& registryResult ) = 0;
     virtual void            Flush                   ( void ) = 0;
+    virtual int             GetShareCount           ( void ) = 0;
 
-    int                     m_bLoggingEnabled;
+    bool                    m_bLoggingEnabled;
     SString                 m_strLogTag;
+    SString                 m_strOtherTag;
 };
 
 

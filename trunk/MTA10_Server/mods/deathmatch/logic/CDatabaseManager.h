@@ -110,6 +110,8 @@ public:
         SConnectionHandle   connectionHandle;
         uint                uiNumAffectedRows;
         CRegistryResult     registryResult;
+        CTickCount          timeReady;
+        bool                bLoggedWarning;
     } result;
 
     struct

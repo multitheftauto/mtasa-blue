@@ -572,6 +572,33 @@ namespace SharedUtil
 
 
     //
+    // Class to automatically local/unlock a critical section for the current scope
+    //
+    class CAutoCSLock
+    {
+        CAutoCSLock ( const CAutoCSLock& );
+        CAutoCSLock& operator= ( const CAutoCSLock& );
+    public:
+        CAutoCSLock ( CCriticalSection& criticalSection ) : m_CS ( criticalSection )
+        {
+            m_CS.Lock();
+        }
+
+        ~CAutoCSLock ()
+        {
+            m_CS.Unlock();
+        }
+
+    protected:
+        CCriticalSection& m_CS;
+    };
+
+    // Macro for instantiating automatic critical section locking procedure
+    #define LOCK_SCOPE( cs ) \
+                volatile CAutoCSLock _lock ( cs )
+
+
+    //
     // Expiry stuff
     //
     int GetBuildAge ( void );
@@ -742,6 +769,28 @@ namespace SharedUtil
         T temp;
         temp.SetFromString ( strText );
         temp.Get ( strKey, iOutValue, iDefault );
+    }
+
+    // Coerce to a bool from an int
+    template < class T >
+    void GetOption ( const SString& strText, const SString& strKey, bool& bOutValue, int iDefault = 0 )
+    {
+        T temp;
+        temp.SetFromString ( strText );
+        int iOutValue;
+        temp.Get ( strKey, iOutValue, iDefault );
+        bOutValue = ( iOutValue != 0 );
+    }
+
+    // Coerce to other types from an int
+    template < class T, class U >
+    void GetOption ( const SString& strText, const SString& strKey, U& outValue, int iDefault = 0 )
+    {
+        T temp;
+        temp.SetFromString ( strText );
+        int iOutValue;
+        temp.Get ( strKey, iOutValue, iDefault );
+        outValue = static_cast < U > ( iOutValue );
     }
 
 
