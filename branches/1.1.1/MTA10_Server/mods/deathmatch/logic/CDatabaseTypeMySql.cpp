@@ -41,9 +41,11 @@ public:
     virtual SString                 GetDataSourceTag            ( void );
     virtual CDatabaseConnection*    Connect                     ( const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strDriverOptions );
     virtual void                    NotifyConnectionDeleted     ( CDatabaseConnection* pConnection );
+    virtual void                    NotifyConnectionChanged     ( CDatabaseConnection* pConnection );
 
     // CDatabaseTypeMySql
     CDatabaseConnection*            CallNewDatabaseConnectionMySql ( CDatabaseType* pManager, const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions );
+    void                            UpdateStats                 ( void );
 
     CDynamicLibrary                                 m_DbconmyLib;
     NewDatabaseConnectionMySql_t*                   m_pfnNewDatabaseConnection;
@@ -113,6 +115,21 @@ void CDatabaseTypeMySql::NotifyConnectionDeleted ( CDatabaseConnection* pConnect
     assert ( MapContains ( m_AllConnectionMap, pConnection ) );
     MapRemove ( m_AllConnectionMap, pConnection );
     MapRemoveByValue ( m_SharedConnectionMap, pConnection );
+
+    UpdateStats ();
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseTypeMySql::NotifyConnectionChanged
+//
+// Update things that need to know
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseTypeMySql::NotifyConnectionChanged ( CDatabaseConnection* pConnection )
+{
+    UpdateStats ();
 }
 
 
@@ -132,8 +149,8 @@ void CDatabaseTypeMySql::NotifyConnectionDeleted ( CDatabaseConnection* pConnect
 CDatabaseConnection* CDatabaseTypeMySql::Connect ( const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions )
 {
     // Parse options
-    int bShareConnection = false;
-    GetOption < CDbOptionsMap > ( strOptions, "share", bShareConnection, 0 );
+    bool bShareConnection = false;
+    GetOption < CDbOptionsMap > ( strOptions, "share", bShareConnection, false );
 
     CDatabaseConnection* pConnection = NULL;
 
@@ -142,11 +159,12 @@ CDatabaseConnection* CDatabaseTypeMySql::Connect ( const SString& strHost, const
     {
         // No sharing so create a new connection
         pConnection = CallNewDatabaseConnectionMySql ( this, strHost, strUsername, strPassword, strOptions );
+        pConnection->m_strOtherTag = strHost + "%" + strUsername + "%" + strOptions;
     }
     else
     {
         // Yes sharing, so make a key
-        SString strShareKey = strHost + "*" + strOptions;
+        SString strShareKey = strHost + "%" + strUsername + "%" + strOptions;
 
         // Look for a match
         pConnection = MapFindRef ( m_SharedConnectionMap, strShareKey );
@@ -166,6 +184,8 @@ CDatabaseConnection* CDatabaseTypeMySql::Connect ( const SString& strHost, const
 
     if ( pConnection )
         MapInsert ( m_AllConnectionMap, pConnection );
+
+    UpdateStats ();
 
     return pConnection;
 }
@@ -197,6 +217,52 @@ CDatabaseConnection* CDatabaseTypeMySql::CallNewDatabaseConnectionMySql ( CDatab
     return pConnection;
 }
 
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseTypeMySql::UpdateStats
+//
+// Tracking connections
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseTypeMySql::UpdateStats ( void )
+{
+    // Remove all lines with this key
+    CPerfStatDebugTable::GetSingleton ()->RemoveLines ( "dbcon mysql*" );
+
+    int iIndex = 0;
+    std::set < CDatabaseConnection* > unsharedConnectionMap = m_AllConnectionMap;
+
+    // Add shared info
+    for ( std::map < SString, CDatabaseConnection* >::iterator iter = m_SharedConnectionMap.begin () ; iter != m_SharedConnectionMap.end () ; ++iter )
+    {
+        const SString& strShareKey = iter->first;
+        CDatabaseConnection* pConnection = iter->second;
+
+        // Add new line with this key
+        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( *SString ( "dbcon mysql %d", iIndex++ ), 0
+                                                          ,"Database connection: mysql (shared)"
+                                                          ,*strShareKey
+                                                          ,*SString ( "Share count: %d", pConnection->GetShareCount () )
+                                                          , NULL );
+
+        // Update unshared map for the second part
+        MapRemove ( unsharedConnectionMap, pConnection );
+    }
+
+    // Add unshared info
+    for ( std::set < CDatabaseConnection* >::iterator iter = unsharedConnectionMap.begin () ; iter != unsharedConnectionMap.end () ; ++iter )
+    {
+        CDatabaseConnection* pConnection = *iter;
+
+        // Add new line with this key
+        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( *SString ( "dbcon mysql %d", iIndex++ ), 0
+                                                          ,"Database connection: mysql (unshared)"
+                                                          ,*pConnection->m_strOtherTag
+                                                          ,*SString ( "Refs: %d", pConnection->GetShareCount () )
+                                                          , NULL );
+    }
+}
 
 
 ///////////////////////////////////////////////////////////////

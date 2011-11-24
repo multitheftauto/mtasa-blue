@@ -28,7 +28,12 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
 
     //Load internal.db
     m_pDatabaseManager = g_pGame->GetDatabaseManager ();
-    m_hDbConnection = m_pDatabaseManager->Connect ( "sqlite", strBuffer );
+    m_hDbConnection = m_pDatabaseManager->Connect ( "sqlite", PathConform ( strBuffer ) );
+
+    // Check if new installation
+    CRegistryResult result;
+	m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT name FROM sqlite_master WHERE type='table' AND name='accounts'" );
+    bool bNewInstallation = ( result.nRows == 0 );
 
     //Create all our tables (Don't echo the results)
     m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS accounts (id INTEGER PRIMARY KEY, name TEXT, password TEXT, ip TEXT, serial TEXT)" );
@@ -36,12 +41,12 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
     m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY, key TEXT, value INTEGER)" );
 
     // Check if unique index on accounts exists
-    CRegistryResult result;
 	m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT name FROM sqlite_master WHERE type='index' AND name='IDX_ACCOUNTS_NAME_U'" );
     if ( result.nRows == 0 )
     {
         // Need to add unique index on accounts
-        CLogger::LogPrintNoStamp ( "Updating accounts table...\n" );
+        if ( !bNewInstallation )
+            CLogger::LogPrintNoStamp ( "Updating accounts table...\n" );
 
         // Make sure we have a non-unique index to speed up the duplication removal
 	    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE INDEX IF NOT EXISTS IDX_ACCOUNTS_NAME on accounts(name)" );
@@ -61,7 +66,8 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
     if ( result.nRows == 0 )
     {
         // Need to add unique index on userdata
-        CLogger::LogPrintNoStamp ( "Updating userdata table...\n" );
+        if ( !bNewInstallation )
+            CLogger::LogPrintNoStamp ( "Updating userdata table...\n" );
 
         // Make sure we have a non-unique index to speed up the duplication removal
 	    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE INDEX IF NOT EXISTS IDX_USERDATA_USERID_KEY on userdata(userid,key)" );

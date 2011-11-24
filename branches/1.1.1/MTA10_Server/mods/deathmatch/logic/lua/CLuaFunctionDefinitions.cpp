@@ -10556,6 +10556,8 @@ int CLuaFunctionDefinitions::DbQuery ( lua_State* luaVM )
                 pJobData->SetCallback ( DbQueryCallback, new CLuaCallback ( pLuaMain, iLuaFunction, Arguments ) );
             }
         }
+        // Add debug info incase query result does not get collected
+        pJobData->SetDebugInfo ( GetDebugMessage ( luaVM ) );
         lua_pushquery ( luaVM, pJobData );
         return 1;
     }

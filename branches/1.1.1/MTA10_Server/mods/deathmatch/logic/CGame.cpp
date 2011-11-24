@@ -288,6 +288,9 @@ void CGame::DoPulse ( void )
 {
     // Lock the critical section so http server won't interrupt in the middle of our pulse
     Lock ();
+
+    UpdateModuleTickCount64 ();
+
     // Calculate FPS
     unsigned long ulCurrentTime = GetTickCount32 ();
     unsigned long ulDiff = ulCurrentTime - m_ulLastFPSTime;

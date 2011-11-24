@@ -35,6 +35,7 @@ public:
     virtual void            Release                 ( void );
     virtual bool            Query                   ( const SString& strQuery, CRegistryResult& registryResult );
     virtual void            Flush                   ( void );
+    virtual int             GetShareCount           ( void )        { return m_iRefCount; }
 
     // CDatabaseConnectionSqlite
     void                    SetLastError            ( uint uiCode, const SString& strMessage );
@@ -49,7 +50,7 @@ public:
     SString                 m_strLastErrorMessage;
     uint                    m_uiLastErrorCode;
     uint                    m_uiNumAffectedRows;
-    int                     m_bAutomaticTransactionsEnabled;
+    bool                    m_bAutomaticTransactionsEnabled;
     bool                    m_bInAutomaticTransaction;
     CTickCount              m_AutomaticTransactionStartTime;
 };
@@ -134,7 +135,10 @@ void CDatabaseConnectionSqlite::AddRef ( void )
 void CDatabaseConnectionSqlite::Release ( void )
 {
     if ( --m_iRefCount > 0 )
+    {
+        m_pManager->NotifyConnectionChanged ( this );
         return;
+    }
 
     // Do disconnect
     delete this;
