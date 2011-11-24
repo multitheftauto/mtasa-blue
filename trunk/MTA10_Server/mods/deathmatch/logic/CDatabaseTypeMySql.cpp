@@ -240,7 +240,7 @@ void CDatabaseTypeMySql::UpdateStats ( void )
         CDatabaseConnection* pConnection = iter->second;
 
         // Add new line with this key
-        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( *SString ( "dbcon mysql %d", iIndex++ ), INFINITE
+        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( *SString ( "dbcon mysql %d", iIndex++ ), 0
                                                           ,"Database connection: mysql (shared)"
                                                           ,*strShareKey
                                                           ,*SString ( "Share count: %d", pConnection->GetShareCount () )
@@ -256,7 +256,7 @@ void CDatabaseTypeMySql::UpdateStats ( void )
         CDatabaseConnection* pConnection = *iter;
 
         // Add new line with this key
-        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( *SString ( "dbcon mysql %d", iIndex++ ), INFINITE
+        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( *SString ( "dbcon mysql %d", iIndex++ ), 0
                                                           ,"Database connection: mysql (unshared)"
                                                           ,*pConnection->m_strOtherTag
                                                           ,*SString ( "Refs: %d", pConnection->GetShareCount () )

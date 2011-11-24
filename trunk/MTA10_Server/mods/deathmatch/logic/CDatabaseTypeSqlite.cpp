@@ -199,7 +199,7 @@ void CDatabaseTypeSqlite::UpdateStats ( void )
         CDatabaseConnection* pConnection = iter->second;
 
         // Add new line with this key
-        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( *SString ( "dbcon sqlite %d", iIndex++ ), INFINITE
+        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( *SString ( "dbcon sqlite %d", iIndex++ ), 0
                                                           ,"Database connection: sqlite (shared)"
                                                           ,*strShareKey
                                                           ,*SString ( "Share count: %d", pConnection->GetShareCount () )
@@ -216,7 +216,7 @@ void CDatabaseTypeSqlite::UpdateStats ( void )
         CDatabaseConnection* pConnection = *iter;
 
         // Add new line with this key
-        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( *SString ( "dbcon sqlite %d", iIndex++ ), INFINITE
+        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( *SString ( "dbcon sqlite %d", iIndex++ ), 0
                                                           ,"Database connection: sqlite (unshared)"
                                                           ,*pConnection->m_strOtherTag
                                                           ,*SString ( "Refs: %d", pConnection->GetShareCount () )
