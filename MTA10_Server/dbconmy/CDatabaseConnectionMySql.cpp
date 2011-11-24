@@ -37,6 +37,7 @@ public:
     virtual void            Release                 ( void );
     virtual bool            Query                   ( const SString& strQuery, CRegistryResult& registryResult );
     virtual void            Flush                   ( void );
+    virtual int             GetShareCount           ( void )        { return m_iRefCount; }
 
     // CDatabaseConnectionMySql
     void                    SetLastError            ( uint uiCode, const SString& strMessage );
@@ -160,7 +161,10 @@ void CDatabaseConnectionMySql::AddRef ( void )
 void CDatabaseConnectionMySql::Release ( void )
 {
     if ( --m_iRefCount > 0 )
+    {
+        m_pManager->NotifyConnectionChanged ( this );
         return;
+    }
 
     // Do disconnect
     delete this;

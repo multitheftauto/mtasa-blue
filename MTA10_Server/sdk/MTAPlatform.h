@@ -53,7 +53,7 @@ extern "C" bool g_bNoTopBar;
     #define Print printf
 
     // Define types
-    #define socklen_t int
+    typedef int socklen_t;
 
     // Define keys
     #define KEY_BACKSPACE   0x08

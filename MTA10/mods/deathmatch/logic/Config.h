@@ -28,7 +28,7 @@
     #include <cstdio>
 
     // Type, function and normal defines
-    #define socklen_t int
+    typedef int socklen_t;
 
     #define MTA_OS_STRING "Windows"
 #else
