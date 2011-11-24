@@ -6665,6 +6665,11 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, 
                 fData = pWeaponInfo->GetSpread ( );
                 break;
             }
+            case WEAPON_REQ_SKILL_LEVEL:
+            {
+                fData = pWeaponInfo->GetRequiredStatLevel ( );
+                break;
+            }
             case WEAPON_ANIM_LOOP_START:
             {
                 fData = pWeaponInfo->GetWeaponAnimLoopStart ( );
@@ -6738,7 +6743,7 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, 
             }
             case WEAPON_ANIM_GROUP:
             {
-                sData = pWeaponInfo->GetAnimGroup ( );
+                sData = (short)pWeaponInfo->GetAnimGroup ( );
                 break;
             }
             case WEAPON_FLAGS:
@@ -6774,11 +6779,6 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, 
             case WEAPON_SKILL_LEVEL:
             {
                 sData = pWeaponInfo->GetSkill ( );
-                break;
-            }
-            case WEAPON_REQ_SKILL_LEVEL:
-            {
-                sData = pWeaponInfo->GetRequiredStatLevel ( );
                 break;
             }
             case WEAPON_DEFAULT_COMBO:
@@ -6879,6 +6879,12 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty ePr
                 fData = pWeaponInfo->GetSpread ( );
                 break;
             }
+            
+        case WEAPON_REQ_SKILL_LEVEL:
+            {
+                fData = pWeaponInfo->GetRequiredStatLevel ( );
+                break;
+            }
         case WEAPON_ANIM_LOOP_START:
             {
                 fData = pWeaponInfo->GetWeaponAnimLoopStart ( );
@@ -6952,7 +6958,7 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty ePr
             }
         case WEAPON_ANIM_GROUP:
             {
-                sData = pWeaponInfo->GetAnimGroup ( );
+                sData = (short)pWeaponInfo->GetAnimGroup ( );
                 break;
             }
         case WEAPON_FLAGS:
@@ -6988,11 +6994,6 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty ePr
         case WEAPON_SKILL_LEVEL:
             {
                 sData = pWeaponInfo->GetSkill ( );
-                break;
-            }
-        case WEAPON_REQ_SKILL_LEVEL:
-            {
-                sData = pWeaponInfo->GetRequiredStatLevel ( );
                 break;
             }
         case WEAPON_DEFAULT_COMBO:

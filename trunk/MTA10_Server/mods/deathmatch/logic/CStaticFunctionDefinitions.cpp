@@ -2075,7 +2075,7 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
         {
         case WEAPON_DAMAGE:
             {
-                if ( sData >= 0 && sData <= 10000 )
+                if ( sData >= -10000 && sData <= 10000 )
                     pWeaponInfo->SetDamagePerHit ( sData );
                 else
                     return false;

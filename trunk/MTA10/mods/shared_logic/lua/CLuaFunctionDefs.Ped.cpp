@@ -1743,7 +1743,7 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
         else
         {
             // Failed
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponInfo", "invalid weapon type at argument 1" ) );
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponProperty", "invalid weapon type at argument 1" ) );
             lua_pushboolean ( luaVM, false );
             return 1;
         }
@@ -1762,7 +1762,7 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
         }
         else
         {
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponInfo", "invalid skill type at argument 2" ) );
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponProperty", "invalid skill type at argument 2" ) );
             lua_pushboolean ( luaVM, false );
             return 1;
         }
@@ -1780,6 +1780,7 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
             case WEAPON_SPREAD:
             case WEAPON_MOVE_SPEED:
             // Get only
+            case WEAPON_REQ_SKILL_LEVEL:
             case WEAPON_ANIM_LOOP_START:
             case WEAPON_ANIM_LOOP_STOP:
             case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
@@ -1808,7 +1809,6 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
             case WEAPON_SLOT:
             case WEAPON_AIM_OFFSET:
             case WEAPON_SKILL_LEVEL:
-            case WEAPON_REQ_SKILL_LEVEL:
             case WEAPON_DEFAULT_COMBO:
             case WEAPON_COMBOS_AVAILABLE:
             {
@@ -1841,7 +1841,7 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponInfo", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponProperty", *argStream.GetErrorMessage () ) );
 
 
     // Failed
@@ -1871,7 +1871,7 @@ int CLuaFunctionDefs::GetOriginalWeaponProperty ( lua_State* luaVM )
         else
         {
             // Failed
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponInfo", "invalid weapon type at argument 1" ) );
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getOriginalWeaponProperty", "invalid weapon type at argument 1" ) );
             lua_pushboolean ( luaVM, false );
             return 1;
         }
@@ -1890,7 +1890,7 @@ int CLuaFunctionDefs::GetOriginalWeaponProperty ( lua_State* luaVM )
         }
         else
         {
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponInfo", "invalid skill type at argument 2" ) );
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getOriginalWeaponProperty", "invalid skill type at argument 2" ) );
             lua_pushboolean ( luaVM, false );
             return 1;
         }
@@ -1908,6 +1908,7 @@ int CLuaFunctionDefs::GetOriginalWeaponProperty ( lua_State* luaVM )
         case WEAPON_SPREAD:
         case WEAPON_MOVE_SPEED:
             // Get only
+        case WEAPON_REQ_SKILL_LEVEL:
         case WEAPON_ANIM_LOOP_START:
         case WEAPON_ANIM_LOOP_STOP:
         case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
@@ -1936,7 +1937,6 @@ int CLuaFunctionDefs::GetOriginalWeaponProperty ( lua_State* luaVM )
         case WEAPON_SLOT:
         case WEAPON_AIM_OFFSET:
         case WEAPON_SKILL_LEVEL:
-        case WEAPON_REQ_SKILL_LEVEL:
         case WEAPON_DEFAULT_COMBO:
         case WEAPON_COMBOS_AVAILABLE:
             {
@@ -1969,7 +1969,7 @@ int CLuaFunctionDefs::GetOriginalWeaponProperty ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponInfo", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getOriginalWeaponProperty", *argStream.GetErrorMessage () ) );
 
 
     // Failed
