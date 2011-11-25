@@ -1329,6 +1329,9 @@ void CMultiplayerSA::InitHooks()
     // Double the size of CPlaceable matrix array to fix a crash after CMatrixLinkList::AddToList1
     MemPut < int > ( 0x54F3A1, 1800 );
 
+    // Change float comparison to 0 so SA doesn't use close range damage.
+    MemPut < BYTE > ( 0x73B9FF, 0x50 );
+    MemPut < BYTE > ( 0x73BA00, 0x8B );
     SetSuspensionEnabled ( false );
 }
 
