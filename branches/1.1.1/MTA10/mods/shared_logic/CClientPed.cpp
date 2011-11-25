@@ -2517,7 +2517,7 @@ void CClientPed::StreamedInPulse ( void )
                 if ( slot != WEAPONSLOT_TYPE_UNARMED && slot != WEAPONSLOT_TYPE_MELEE )
                 {
                     // No Ammo left?
-                    if ( pWeapon->GetAmmoInClip() == 0 || pWeapon->GetAmmoTotal () == 0 )
+                    if ( ( pWeapon->GetAmmoInClip ( ) == 0 && pWeapon->GetInfo ( )->GetMaximumClipAmmo ( ) > 0 ) || pWeapon->GetAmmoTotal () == 0 )
                     {
                         // Make sure our fire key isn't pressed
                         Current.ButtonCircle = 0;
