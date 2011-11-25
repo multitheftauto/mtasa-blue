@@ -121,6 +121,7 @@ public:
     float                       GetRequiredStatLevel () { return static_cast < float > ( GetInterface()->m_nReqStatLevel ); }
     void                        SetRequiredStatLevel ( float fStatLevel ) { GetInterface()->m_nReqStatLevel = static_cast < int > ( fStatLevel ); }
     eFireType                   GetFireType () { return GetInterface()->m_eFireType; }
+    short                       GetMaximumClipAmmo () { return GetInterface()->m_nAmmo; }
 };
 
 #endif

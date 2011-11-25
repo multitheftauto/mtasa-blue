@@ -251,6 +251,7 @@ public:
     virtual void                        ClearFlag       (DWORD flag) = 0;
     virtual bool                        IsFlagSet       (DWORD flag) = 0;
     virtual eFireType                   GetFireType() = 0;
+    virtual short                       GetMaximumClipAmmo () = 0;
 };
 
 #endif
