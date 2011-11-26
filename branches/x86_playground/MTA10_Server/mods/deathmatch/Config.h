@@ -31,7 +31,7 @@ public:
     SVaPassNext<50> svapassnext;
     CVaPassNext(va_list & args){
         try{//to avoid access violation
-            memcpy(&svapassnext, args, sizeof(svapassnext));
+            //memcpy(&svapassnext, args, sizeof(svapassnext));
         } catch (...) {}
     }
 };

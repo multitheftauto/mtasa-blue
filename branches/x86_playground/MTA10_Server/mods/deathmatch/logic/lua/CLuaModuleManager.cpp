@@ -49,7 +49,7 @@ void CLuaModuleManager::ErrorPrintf ( const char* szFormat, ... )
 {
     va_list args;
     va_start ( args, szFormat );
-    CLogger::ErrorPrintf ( szFormat, va_pass ( args ) );
+    //CLogger::ErrorPrintf ( szFormat, va_pass ( args ) );
     va_end ( args );
 }
 
@@ -59,7 +59,7 @@ void CLuaModuleManager::DebugPrintf ( lua_State * luaVM, const char* szFormat, .
     va_list args;
     va_start ( args, szFormat );
     //m_pScriptDebugging->LogError ( luaVM, szFormat, va_pass ( args ) );
-    m_pScriptDebugging->LogInformation ( luaVM, szFormat, va_pass ( args ) );
+    //m_pScriptDebugging->LogInformation ( luaVM, szFormat, va_pass ( args ) );
     va_end ( args );
 }
 
@@ -68,7 +68,7 @@ void CLuaModuleManager::Printf ( const char* szFormat, ... )
 {
     va_list args;
     va_start ( args, szFormat );
-    CLogger::LogPrintf ( szFormat, va_pass ( args ) );
+    //CLogger::LogPrintf ( szFormat, va_pass ( args ) );
     va_end ( args );
 }
 
