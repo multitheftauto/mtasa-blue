@@ -1409,7 +1409,11 @@ bool CConsoleCommands::DelAccount ( CConsole* pConsole, const char* szArguments,
 
             if ( pAccountClient )
             {
-                g_pGame->GetAccountManager ()->LogOut ( pAccountClient, NULL );
+                if ( !g_pGame->GetAccountManager ()->LogOut ( pAccountClient, NULL ) )
+                {
+                    pEchoClient->SendEcho ( "delaccount: Unable to delete account as unable to log out client. (Maybe onPlayerLogout is cancelled)" );
+                    return false;
+                }
 
                 char szClientMessage [128];
                 szClientMessage[0] = '\0';
