@@ -1527,7 +1527,7 @@ void CMultiplayerSA::DisableCloseRangeDamage ( bool bDisabled )
     }
     else
     {
-        // Change float comparison to 1.0f so SA doesn't use close range damage.
+        // Change float comparison to 1.0f so SA uses close range damage.
         MemPut < BYTE > ( 0x73B9FF, 0x24 );
         MemPut < BYTE > ( 0x73BA00, 0x86 );
 
