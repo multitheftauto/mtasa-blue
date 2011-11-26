@@ -115,6 +115,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_Glitches [ GLITCH_FASTFIRE ] = false;
     m_Glitches [ GLITCH_FASTMOVE ] = false;
     m_Glitches [ GLITCH_CROUCHBUG ] = false;
+    m_Glitches [ GLITCH_CLOSEDAMAGE ] = false;
+    g_pMultiplayer->DisableCloseRangeDamage ( true );
 
     // Remove Night & Thermal vision view (if enabled).
     g_pMultiplayer->SetNightVisionEnabled ( false );
@@ -4994,6 +4996,8 @@ bool CClientGame::SetGlitchEnabled ( unsigned char ucGlitch, bool bEnabled )
         m_Glitches[ucGlitch] = bEnabled;
         if ( ucGlitch == GLITCH_QUICKRELOAD )
             g_pMultiplayer->DisableQuickReload ( !bEnabled );
+        if ( ucGlitch == GLITCH_CLOSEDAMAGE )
+            g_pMultiplayer->DisableCloseRangeDamage ( !bEnabled );
         return true;
     }
     return false;

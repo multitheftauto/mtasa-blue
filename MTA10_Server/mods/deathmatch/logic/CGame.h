@@ -166,6 +166,8 @@ public:
         GLITCH_FASTFIRE,
         GLITCH_FASTMOVE,
         GLITCH_CROUCHBUG,
+        GLITCH_CLOSEDAMAGE,
+        NUM_GLITCHES
     };
 public:
                                 CGame                       ( void );
@@ -470,7 +472,7 @@ private:
     unsigned short              m_usFrames;
     unsigned short              m_usFPS;
     std::map<std::string,eGlitchType> m_GlitchNames;
-    bool                        m_Glitches[4];
+    bool                        m_Glitches[NUM_GLITCHES];
 
     // This is ticked to true when the app should end
     bool                        m_bIsFinished;

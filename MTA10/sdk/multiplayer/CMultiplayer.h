@@ -111,6 +111,7 @@ public:
     virtual void                        DisableZoneNames            ( bool bDisabled ) = 0; // move to CHud
     virtual void                        DisableBirds                ( bool bDisabled ) = 0;
     virtual void                        DisableQuickReload          ( bool bDisable ) = 0;
+    virtual void                        DisableCloseRangeDamage     ( bool bDisable ) = 0;
 
     virtual bool                        GetExplosionsDisabled       () = 0;
     virtual void                        DisableExplosions           ( bool bDisabled ) = 0;

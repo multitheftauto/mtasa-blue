@@ -1703,6 +1703,7 @@ struct SFunBugsStateSync : public ISyncStructure
 
     struct
     {
+        bool bCloseRangeDamage : 1;
         bool bQuickReload : 1;
         bool bFastFire : 1;
         bool bFastMove : 1;

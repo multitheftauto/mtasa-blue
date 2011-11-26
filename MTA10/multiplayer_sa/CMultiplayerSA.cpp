@@ -1329,9 +1329,6 @@ void CMultiplayerSA::InitHooks()
     // Double the size of CPlaceable matrix array to fix a crash after CMatrixLinkList::AddToList1
     MemPut < int > ( 0x54F3A1, 1800 );
 
-    // Change float comparison to 0 so SA doesn't use close range damage.
-    MemPut < BYTE > ( 0x73B9FF, 0x50 );
-    MemPut < BYTE > ( 0x73BA00, 0x8B );
     SetSuspensionEnabled ( false );
 }
 
@@ -1520,7 +1517,22 @@ void CMultiplayerSA::DisableQuickReload ( bool bDisabled )
     else
         MemPut < WORD > ( 0x60B4F6, 0x027C );
 }
+void CMultiplayerSA::DisableCloseRangeDamage ( bool bDisabled )
+{
+    if ( bDisabled )
+    {
+        // Change float comparison to 0.0f so SA doesn't use close range damage.
+        MemPut < BYTE > ( 0x73B9FF, 0x50 );
+        MemPut < BYTE > ( 0x73BA00, 0x8B );
+    }
+    else
+    {
+        // Change float comparison to 1.0f so SA doesn't use close range damage.
+        MemPut < BYTE > ( 0x73B9FF, 0x24 );
+        MemPut < BYTE > ( 0x73BA00, 0x86 );
 
+    }
+}
 bool CMultiplayerSA::GetInteriorSoundsEnabled ( )
 {
     return bInteriorSoundsEnabled;
