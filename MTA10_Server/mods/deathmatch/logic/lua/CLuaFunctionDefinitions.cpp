@@ -11510,6 +11510,10 @@ int CLuaFunctionDefinitions::RemoveAccount ( lua_State* luaVM )
             lua_pushboolean ( luaVM, true );
             return 1;
         }
+
+        CClient* pClient = pAccount->GetClient ();
+        if ( pClient )
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Problem @ '%s' [%s]", "removeAccount", "Unable to remove account as unable to log out client. (Maybe onPlayerLogout is cancelled)" ) );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "removeAccount", *argStream.GetErrorMessage () ) );

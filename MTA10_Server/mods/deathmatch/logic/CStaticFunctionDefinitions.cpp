@@ -9939,7 +9939,8 @@ bool CStaticFunctionDefinitions::RemoveAccount ( CAccount* pAccount )
         CClient* pClient = pAccount->GetClient ();
         if ( pClient )
         {
-            g_pGame->GetAccountManager ()->LogOut ( pClient, NULL );
+            if ( !g_pGame->GetAccountManager ()->LogOut ( pClient, NULL ) )
+                return false;
 
             char szMessage [128];
             szMessage[0] = '\0';
