@@ -751,6 +751,13 @@ int CLuaFunctionDefinitions::SetWeaponProperty ( lua_State* luaVM )
         case WEAPON_TARGET_RANGE:
         case WEAPON_ACCURACY:
         case WEAPON_MOVE_SPEED:
+        case WEAPON_ANIM_LOOP_START:
+        case WEAPON_ANIM_LOOP_STOP:
+        case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+        case WEAPON_ANIM2_LOOP_START:
+        case WEAPON_ANIM2_LOOP_STOP:
+        case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+        case WEAPON_ANIM_BREAKOUT_TIME:
             {
                 float fWeaponInfo = 0.0f;
                 argStream.ReadNumber ( fWeaponInfo );
@@ -787,7 +794,7 @@ int CLuaFunctionDefinitions::SetWeaponProperty ( lua_State* luaVM )
             }
         default:
             {
-                m_pScriptDebugging->LogBadType ( luaVM, "setPedWeaponInfo" );
+                m_pScriptDebugging->LogBadType ( luaVM, "setWeaponProperty" );
                 break;
             }
 

@@ -431,10 +431,48 @@ void CWorldRPCs::SetWeaponProperty ( NetBitStreamInterface& bitStream )
                     pWeaponInfo->SetMoveSpeed ( fData );
                     break;
                 }
+            case WEAPON_ANIM_LOOP_START:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetWeaponAnimLoopStart ( fData );
+                    break;
+                }
+            case WEAPON_ANIM_LOOP_STOP:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetWeaponAnimLoopStop ( fData );
+                    break;
+                }
             case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
                 {
                     bitStream.Read ( fData );
                     pWeaponInfo->SetWeaponAnimLoopFireTime ( fData );
+                    break;
+                }
+
+            case WEAPON_ANIM2_LOOP_START:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetWeaponAnim2LoopStart ( fData );
+                    break;
+                }
+            case WEAPON_ANIM2_LOOP_STOP:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetWeaponAnim2LoopStop ( fData );
+                    break;
+                }
+            case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetWeaponAnim2LoopFireTime ( fData );
+                    break;
+                }
+
+            case WEAPON_ANIM_BREAKOUT_TIME:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetWeaponAnimBreakoutTime ( fData );
                     break;
                 }
             case WEAPON_DAMAGE:
