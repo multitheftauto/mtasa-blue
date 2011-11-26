@@ -193,6 +193,16 @@ IMPLEMENT_ENUM_BEGIN( eWeaponProperty )
     ADD_ENUM ( WEAPON_FLAGS,                            "flags" )
     ADD_ENUM ( WEAPON_ANIM_GROUP,                       "anim_group" ) // Disabled for release
 
+    ADD_ENUM ( WEAPON_ANIM_LOOP_START,                  "anim_loop_start" ) 
+    ADD_ENUM ( WEAPON_ANIM_LOOP_STOP,                   "anim_loop_stop" ) 
+    ADD_ENUM ( WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME,    "anim_loop_bullet_fire" ) 
+
+    ADD_ENUM ( WEAPON_ANIM2_LOOP_START,                 "anim2_loop_start" ) 
+    ADD_ENUM ( WEAPON_ANIM2_LOOP_STOP,                  "anim2_loop_stop" ) 
+    ADD_ENUM ( WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME,   "anim2_loop_bullet_fire" ) 
+
+    ADD_ENUM ( WEAPON_ANIM_BREAKOUT_TIME,               "anim_breakout_time" ) 
+
     // Set is Disabled >= FIRETYPE - Move above WEAPON_TYPE_SET_DISABLED to re-enable and move it above here to make it less confusing.
     ADD_ENUM ( WEAPON_FIRETYPE,                         "fire_type" )
 
@@ -205,16 +215,6 @@ IMPLEMENT_ENUM_BEGIN( eWeaponProperty )
     
     ADD_ENUM ( WEAPON_SKILL_LEVEL,                      "skill_level" ) 
     ADD_ENUM ( WEAPON_REQ_SKILL_LEVEL,                  "required_skill_level" ) 
-
-    ADD_ENUM ( WEAPON_ANIM_LOOP_START,                  "anim_loop_start" ) 
-    ADD_ENUM ( WEAPON_ANIM_LOOP_STOP,                   "anim_loop_stop" ) 
-    ADD_ENUM ( WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME,    "anim_loop_bullet_fire" ) 
-
-    ADD_ENUM ( WEAPON_ANIM2_LOOP_START,                 "anim2_loop_start" ) 
-    ADD_ENUM ( WEAPON_ANIM2_LOOP_STOP,                  "anim2_loop_stop" ) 
-    ADD_ENUM ( WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME,   "anim2_loop_bullet_fire" ) 
-
-    ADD_ENUM ( WEAPON_ANIM_BREAKOUT_TIME,               "anim_breakout_time" ) 
     
     ADD_ENUM ( WEAPON_RADIUS,                           "radius" ) 
     

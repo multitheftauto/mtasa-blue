@@ -2044,6 +2044,62 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
                     return false;
                 break;
             }
+        case WEAPON_ANIM_LOOP_START:
+            {
+                if ( fData >= 0.0f && fData <= 5.0f )
+                    pWeaponInfo->SetWeaponAnimLoopStart ( fData );
+                else
+                    return false;
+                break;
+            }
+        case WEAPON_ANIM_LOOP_STOP:
+            {
+                if ( fData >= 0.0f && fData <= 5.0f )
+                    pWeaponInfo->SetWeaponAnimLoopStop ( fData );
+                else
+                    return false;
+                break;
+            }
+        case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+            {
+                if ( fData >= 0 && fData <= 2.0f )
+                    pWeaponInfo->SetWeaponAnimLoopFireTime ( fData );
+                else
+                    return false;
+                break;
+            }
+        case WEAPON_ANIM2_LOOP_START:
+            {
+                if ( fData >= 0.0f && fData <= 5.0f )
+                    pWeaponInfo->SetWeaponAnim2LoopStart ( fData );
+                else
+                    return false;
+                break;
+            }
+        case WEAPON_ANIM2_LOOP_STOP:
+            {
+                if ( fData >= 0.0f && fData <= 5.0f )
+                    pWeaponInfo->SetWeaponAnim2LoopStop ( fData );
+                else
+                    return false;
+                break;
+            }
+        case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+            {
+                if ( fData >= 0 && fData <= 2.0f )
+                    pWeaponInfo->SetWeaponAnim2LoopFireTime ( fData );
+                else
+                    return false;
+                break;
+            }
+        case WEAPON_ANIM_BREAKOUT_TIME:
+            {
+                if ( fData >= 0 && fData <= 5.0f )
+                    pWeaponInfo->SetWeaponAnimBreakoutTime ( fData );
+                else
+                    return false;
+                break;
+            }
         default:
             return false;
         }
