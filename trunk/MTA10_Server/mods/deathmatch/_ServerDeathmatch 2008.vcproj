@@ -1272,6 +1272,30 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="net"
+					>
+					<File
+						RelativePath=".\logic\net\CNetBuffer.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\net\CSimControl.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\net\CSimPlayerManager.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\net\CSimPlayerPuresyncPacket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\net\CSimVehiclePuresyncPacket.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="utils"
@@ -2446,6 +2470,42 @@
 					</File>
 					<File
 						RelativePath=".\logic\lua\LuaCommon.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="net"
+					>
+					<File
+						RelativePath=".\logic\net\CNetBuffer.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\net\CNetBufferUtil.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\net\CSimControl.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\net\CSimPlayer.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\net\CSimPlayerManager.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\net\CSimPlayerPuresyncPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\net\CSimVehiclePuresyncPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\net\SimHeaders.h"
 						>
 					</File>
 				</Filter>

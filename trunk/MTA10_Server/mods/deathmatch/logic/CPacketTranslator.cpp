@@ -27,7 +27,7 @@ CPacketTranslator::~CPacketTranslator ( void )
 }
 
 
-CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID PacketID, NetBitStreamInterface& BitStream )
+CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID PacketID, NetBitStreamInterface& BitStream, SNetExtraInfo* pNetExtraInfo )
 {
     // Create the packet class
     CPacket* pTemp = NULL;
@@ -153,6 +153,12 @@ CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID Pac
         // Make sure players that have just disconnected don't get their packet processed
         CPlayer* pSourcePlayer = m_pPlayerManager->Get ( Socket );
         if ( pSourcePlayer && pSourcePlayer->IsBeingDeleted () ) pSourcePlayer = NULL;
+
+        if ( pSourcePlayer && pNetExtraInfo )
+        {
+            if ( pNetExtraInfo->m_bHasPing )
+                pSourcePlayer->SetPing ( pNetExtraInfo->m_uiPing );
+        }
 
         // Set the source player
         pTemp->SetSourceElement ( pSourcePlayer );

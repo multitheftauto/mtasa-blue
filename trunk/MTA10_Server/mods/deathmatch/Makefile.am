@@ -255,7 +255,12 @@ LOGIC = \
 ./logic/packets/CVehicleSpawnPacket.cpp \
 ./logic/packets/CVehicleTrailerPacket.cpp \
 ./logic/packets/CVoiceDataPacket.cpp \
-./logic/packets/CVoiceEndPacket.cpp
+./logic/packets/CVoiceEndPacket.cpp \
+./logic/net/CNetBuffer.cpp \
+./logic/net/CSimControl.cpp \
+./logic/net/CSimPlayerManager.cpp \
+./logic/net/CSimPlayerPuresyncPacket.cpp \
+./logic/net/CSimVehiclePuresyncPacket.cpp
 
 if PRECOMPILE_HEADERS
 BUILT_SOURCES = StdInc.h.gch

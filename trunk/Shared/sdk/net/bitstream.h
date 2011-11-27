@@ -22,8 +22,11 @@ struct ISyncStructure;
 
 class NetBitStreamInterface
 {
-public:
+protected:
     virtual             ~NetBitStreamInterface      ( void ) {};
+public:
+    virtual void        AddRef                      ( void ) = 0;
+    virtual void        Release                     ( void ) = 0;
 
     virtual int         GetReadOffsetAsBits         ( void ) = 0;
 

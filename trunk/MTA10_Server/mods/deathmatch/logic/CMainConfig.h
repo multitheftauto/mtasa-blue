@@ -86,6 +86,7 @@ public:
     inline bool                     IsAutoLoginEnabled              ( )                         { return m_bAutoLogin; }
     const SString&                  GetIdFile                       ( void )                    { return m_strIdFile; }
     bool                            GetNetworkEncryptionEnabled     ( void )                    { return m_bNetworkEncryptionEnabled; }
+    bool                            GetThreadNetEnabled             ( void )                    { return m_bThreadNetEnabled; }
     const SString&                  GetGlobalDatabasesPath          ( void )                    { return m_strGlobalDatabasesPath; }
     const SString&                  GetSystemDatabasesPath          ( void )                    { return m_strSystemDatabasesPath; }
     const SString&                  GetBackupPath                   ( void )                    { return m_strBackupPath; }
@@ -102,6 +103,7 @@ public:
 
     void                            SetCommandLineParser            ( CCommandLineParser* pCommandLineParser );
     void                            ApplyBandwidthReductionMode     ( void );
+    void                            ApplyThreadNetEnabled           ( void );
 
 private:
     void                            RegisterCommand                 ( const char* szName, FCommandHandler* pFunction, bool bRestricted );
@@ -159,6 +161,7 @@ private:
     bool                            m_bNetworkEncryptionEnabled;
     SString                         m_strBandwidthReductionMode;
     int                             m_iPendingWorkToDoSleepTime;
+    bool                            m_bThreadNetEnabled;
     std::map < SString, SString >   m_TransientSettings;
 };
 

@@ -47,6 +47,8 @@ enum eVoiceState
 struct SNearInfo
 {
     int iCount;
+    int iPrevZone;
+    int iZone;
     long long llLastUpdateTime;
 };
 
@@ -111,9 +113,12 @@ public:
 
     inline NetServerPlayerID&                   GetSocket                   ( void )                        { return m_PlayerSocket; };
     char*                                       GetSourceIP                 ( char* pBuffer );
+    const char*                                 GetSourceIPString           ( void );
     inline unsigned long                        GetSourceIP                 ( void )                        { return m_PlayerSocket.GetBinaryAddress (); };
     inline unsigned short                       GetSourcePort               ( void )                        { return m_PlayerSocket.GetPort (); };
-    inline unsigned int                         GetPing                     ( void )                        { return g_pNetServer->GetPing ( m_PlayerSocket ); };
+
+    void                                        SetPing                     ( uint uiPing )                 { m_uiPing = uiPing; }
+    unsigned int                                GetPing                     ( void )                        { return m_uiPing; }
 
     inline unsigned char                        GetLoginAttempts            ( void )                        { return m_ucLoginAttempts; };
     inline void                                 SetLoginAttempts            ( unsigned char ucLoginAttempts )   { m_ucLoginAttempts = ucLoginAttempts; };
@@ -302,6 +307,7 @@ public:
     const CVector&                              GetCamFwd                   ( void )            { return m_vecCamFwd; };
 
 
+    class CSimPlayer*                           m_pSimPlayer;
 private:
     SLightweightSyncData                        m_lightweightSyncData;
 
@@ -336,6 +342,7 @@ private:
     unsigned long                               m_ulTimeConnected;
 
     NetServerPlayerID                           m_PlayerSocket;
+    uint                                        m_uiPing;
 
     time_t                                      m_tNickChange;
 
@@ -406,6 +413,7 @@ private:
     int                                         m_iLastZoneDebug;
 
     long long                                   m_llLastPositionHasChanged;
+    SString                                     m_strIP;
 };
 
 #endif

@@ -52,7 +52,8 @@ namespace SharedUtil
         // Comparison
         bool operator== ( const CBuffer& other ) const
         {
-            return std::equal( begin(), end(), other.begin() );
+            return size () == other.size ()
+                && std::equal( begin(), end(), other.begin() );
         }
 
         bool operator!= ( const CBuffer& other ) const

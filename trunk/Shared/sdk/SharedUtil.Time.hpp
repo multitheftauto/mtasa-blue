@@ -124,9 +124,16 @@ namespace SharedUtil
 
 long long SharedUtil::GetModuleTickCount64 ( void )
 {
+    static CCriticalSection criticalSection;
+    criticalSection.Lock ();
+
     if ( !gCurrentTickCount64 )
         UpdateModuleTickCount64 ();
-    return gCurrentTickCount64;
+
+    long long result = gCurrentTickCount64;
+
+    criticalSection.Unlock ();
+    return result;
 }
 
 void SharedUtil::UpdateModuleTickCount64 ( void )

@@ -12455,9 +12455,9 @@ int CLuaFunctionDefinitions::GetNetworkStats ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        NetServerPlayerID* pPlayerID = pPlayer ? &pPlayer->GetSocket () : NULL;
+        NetServerPlayerID PlayerID = pPlayer ? pPlayer->GetSocket () : NetServerPlayerID ();
         NetStatistics stats;
-        if ( g_pNetServer->GetNetworkStatistics ( &stats, pPlayerID ) )
+        if ( g_pNetServer->GetNetworkStatistics ( &stats, PlayerID ) )
         {
             uint uiNumMessagesInSendBuffer = 0;
             for ( int i = 0; i < PACKET_PRIORITY_COUNT; ++i )

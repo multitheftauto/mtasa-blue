@@ -181,7 +181,7 @@ public:
     bool                        Start                       ( int iArgumentCount, char* szArguments [] );
     void                        Stop                        ( void );
 
-    static bool                 StaticProcessPacket         ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface& BitStream );
+    static bool                 StaticProcessPacket         ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo );
     bool                        ProcessPacket               ( CPacket& Packet );
 
     inline void                 SetIsFinished               ( bool bFinished )  { m_bIsFinished = bFinished; };
