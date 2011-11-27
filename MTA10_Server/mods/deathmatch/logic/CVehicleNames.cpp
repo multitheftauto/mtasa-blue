@@ -28,7 +28,7 @@ SVehicleName VehicleNames [] = { {"Landstalker"}, {"Bravura"}, {"Buffalo"}, {"Li
 {"Patriot"}, {"Quadbike"}, {"Coastguard"}, {"Dinghy"}, {"Hermes"}, {"Sabre"}, {"Rustler"}, {"ZR-350"}, {"Walton"}, {"Regina"}, 
 {"Comet"}, {"BMX"}, {"Burrito"}, {"Camper"}, {"Marquis"}, {"Baggage"}, {"Dozer"}, {"Maverick"}, {"News Chopper"}, {"Rancher"}, 
 {"FBI Rancher"}, {"Virgo"}, {"Greenwood"}, {"Jetmax"}, {"Hotring Racer"}, {"Sandking"}, {"Blista Compact"}, {"Police Maverick"}, {"Boxville"}, {"Benson"}, 
-{"Mesa"}, {"RC Goblin"}, {"Hotring Racer"}, {"Hotring Racer 2"}, {"Bloodring Banger"}, {"Rancher Lure"}, {"Super GT"}, {"Elegant"}, {"Journey"}, {"Bike"}, 
+{"Mesa"}, {"RC Goblin"}, {"Hotring Racer 3"}, {"Hotring Racer 2"}, {"Bloodring Banger"}, {"Rancher Lure"}, {"Super GT"}, {"Elegant"}, {"Journey"}, {"Bike"}, 
 {"Mountain Bike"}, {"Beagle"}, {"Cropduster"}, {"Stuntplane"}, {"Tanker"}, {"Roadtrain"}, {"Nebula"}, {"Majestic"}, {"Buccaneer"}, {"Shamal"}, 
 {"Hydra"}, {"FCR-900"}, {"NRG-500"}, {"HPV1000"}, {"Cement Truck"}, {"Towtruck"}, {"Fortune"}, {"Cadrona"}, {"FBI Truck"}, {"Willard"}, 
 {"Forklift"}, {"Tractor"}, {"Combine Harvester"}, {"Feltzer"}, {"Remington"}, {"Slamvan"}, {"Blade"}, {"Freight"}, {"Streak"}, {"Vortex"}, 
