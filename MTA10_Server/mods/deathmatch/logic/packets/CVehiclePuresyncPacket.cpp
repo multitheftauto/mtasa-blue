@@ -279,6 +279,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             pSourcePlayer->SetWearingGoggles ( flags.data.bIsWearingGoggles );
             pSourcePlayer->SetDoingGangDriveby ( flags.data.bIsDoingGangDriveby );            
 
+
             // Weapon sync
             if ( flags.data.bHasAWeapon )
             {
@@ -290,6 +291,11 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
                 if ( flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo ( slot.data.uiSlot ) )
                 {
+                    
+                    eWeaponType eWeapon = static_cast < eWeaponType > ( pSourcePlayer->GetWeaponType ( slot.data.uiSlot ) );
+                    float fSkill = pSourcePlayer->GetPlayerStat ( CWeaponStatManager::GetSkillStatIndex ( eWeapon ) );
+                    float fWeaponRange = g_pGame->GetWeaponStatManager ( )->GetWeaponRangeFromSkillLevel ( eWeapon, fSkill );
+
                     // Read the ammo states
                     SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), false, true );
                     if ( !BitStream.Read ( &ammo ) )
@@ -297,7 +303,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                     pSourcePlayer->SetWeaponAmmoInClip ( ammo.data.usAmmoInClip );
 
                     // Read aim data
-                    SWeaponAimSync aim ( pSourcePlayer->GetWeaponRange (), true );
+                    SWeaponAimSync aim ( fWeaponRange, true );
                     if ( !BitStream.Read ( &aim ) )
                         return false;
                     pSourcePlayer->SetAimDirection ( aim.data.fArm );

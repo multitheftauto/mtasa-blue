@@ -81,10 +81,14 @@ public:
                                 CWeaponStatManager              ( void );
                                 ~CWeaponStatManager             ( void );
     CWeaponStat*                GetWeaponStats                  ( eWeaponType type, eWeaponSkill skill = WEAPONSKILL_STD );
+    CWeaponStat*                GetWeaponStatsFromSkillLevel    ( eWeaponType type, float fSkillLevel );
     CWeaponStat*                GetOriginalWeaponStats          ( eWeaponType type, eWeaponSkill skill = WEAPONSKILL_STD );
     void                        Init                            ( void );
     bool                        LoadDefault                     ( CWeaponStat* pDest, eWeaponType weaponType, eWeaponSkill skill = WEAPONSKILL_STD );
+    float                       GetWeaponRangeFromSkillLevel    ( eWeaponType eWeapon, float fSkillLevel );
 
+    // Static Methods
+    static unsigned short       GetSkillStatIndex               ( eWeaponType eWeapon );
 
 private:
 
