@@ -14,11 +14,13 @@
 CSimPlayerPuresyncPacket::CSimPlayerPuresyncPacket ( ElementID PlayerID,
                                                      ushort PlayerLatency,
                                                      uchar PlayerSyncTimeContext,
-                                                     uchar PlayerGotWeaponType )
+                                                     uchar PlayerGotWeaponType,
+                                                     float WeaponRange )
     : m_PlayerID ( PlayerID )
     , m_PlayerLatency ( PlayerLatency )
     , m_PlayerSyncTimeContext ( PlayerSyncTimeContext )
     , m_PlayerGotWeaponType ( PlayerGotWeaponType )
+    , m_WeaponRange ( WeaponRange )
 {
 }
 
@@ -137,7 +139,7 @@ bool CSimPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 return false;
 
             // Read out the aim data
-            SWeaponAimSync sync ( CWeaponNames::GetWeaponRange ( ucUseWeaponType ), ( m_Cache.ControllerState.RightShoulder1 || m_Cache.ControllerState.ButtonCircle ) );
+            SWeaponAimSync sync ( m_WeaponRange, ( m_Cache.ControllerState.RightShoulder1 || m_Cache.ControllerState.ButtonCircle ) );
             if ( !BitStream.Read ( &sync ) )
                 return false;
 
