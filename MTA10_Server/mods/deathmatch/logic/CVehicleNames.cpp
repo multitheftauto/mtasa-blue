@@ -38,7 +38,7 @@ SVehicleName VehicleNames [] = { {"Landstalker"}, {"Bravura"}, {"Buffalo"}, {"Li
 {"Streak Train Trailer"}, {"Kart"}, {"Mower"}, {"Dune"}, {"Sweeper"}, {"Broadway"}, {"Tornado"}, {"AT-400"}, {"DFT-30"}, {"Huntley"}, 
 {"Stafford"}, {"BF-400"}, {"Newsvan"}, {"Tug"}, {"Trailer (Tanker Commando)"}, {"Emperor"}, {"Wayfarer"}, {"Euros"}, {"Hotdog"}, {"Club"}, 
 {"Box Freight"}, {"Trailer 3"}, {"Andromada"}, {"Dodo"}, {"RC Cam"}, {"Launch"}, {"Police LS", "Police"}, {"Police SF"}, {"Police LV"}, {"Police Ranger", "Ranger"}, 
-{"Picador"}, {"S.W.A.T."}, {"Alpha"}, {"Phoenix"}, {"Glendale Damaged"}, {"Sadler"}, {"Baggage Trailer (covered)"}, {"Baggage Trailer (Uncovered)"}, {"Trailer (Stairs)"}, {"Boxville Mission"}, 
+{"Picador"}, {"S.W.A.T."}, {"Alpha"}, {"Phoenix"}, {"Glendale Damaged"}, {"Sadler Damaged", "Sadler"}, {"Baggage Trailer (covered)"}, {"Baggage Trailer (Uncovered)"}, {"Trailer (Stairs)"}, {"Boxville Mission"}, 
 {"Farm Trailer"} };
 
 bool CVehicleNames::IsValidModel ( unsigned long ulModel )
