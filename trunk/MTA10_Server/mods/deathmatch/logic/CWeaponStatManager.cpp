@@ -83,6 +83,26 @@ CWeaponStat* CWeaponStatManager::GetWeaponStats ( eWeaponType type, eWeaponSkill
     }
     return NULL;
 }
+
+CWeaponStat* CWeaponStatManager::GetWeaponStatsFromSkillLevel ( eWeaponType type, float fSkillLevel )
+{
+    CWeaponStat * pPoor = GetWeaponStats ( type, WEAPONSKILL_POOR );
+    CWeaponStat * pStd = GetWeaponStats ( type, WEAPONSKILL_STD );
+    CWeaponStat * pPro = GetWeaponStats ( type, WEAPONSKILL_PRO );
+    if ( pStd )
+    {
+        if ( pPoor && pPro )
+        {
+            if ( fSkillLevel >= pPro->GetRequiredStatLevel () ) return pPro;
+            else if ( fSkillLevel >= pStd->GetRequiredStatLevel () ) return pStd;
+            else return pPoor;
+        }
+        else
+            return pStd;
+    }
+    return NULL;
+}
+
 CWeaponStat* CWeaponStatManager::GetOriginalWeaponStats ( eWeaponType type, eWeaponSkill skill )
 {
     for ( std::list < CWeaponStat* >::iterator iter = m_OriginalWeaponData.begin (); iter != m_OriginalWeaponData.end ();iter++ )
@@ -1635,4 +1655,83 @@ bool CWeaponStatManager::LoadDefault ( CWeaponStat* pDest, eWeaponType weaponTyp
         }
     }
     return true;
+}
+
+unsigned short CWeaponStatManager::GetSkillStatIndex ( eWeaponType eWeapon )
+{
+    switch ( eWeapon )
+    {
+        case WEAPONTYPE_PISTOL:
+        {
+            return 46;
+            break;
+        }
+        case WEAPONTYPE_PISTOL_SILENCED:
+        {
+            return 47;
+            break;
+        }
+        case WEAPONTYPE_DESERT_EAGLE:
+        {
+            return 48;
+            break;
+        }
+        case WEAPONTYPE_SHOTGUN:
+        {
+            return 49;
+            break;
+        }
+        case WEAPONTYPE_SAWNOFF_SHOTGUN:
+        {
+            return 50;
+            break;
+        }
+        case WEAPONTYPE_SPAS12_SHOTGUN:
+        {
+            return 51;
+            break;
+        }
+        case WEAPONTYPE_MICRO_UZI:
+        case WEAPONTYPE_TEC9:
+        {
+            return 52;
+            break;
+        }
+        case WEAPONTYPE_MP5:
+        {
+            return 53;
+            break;
+        }
+        case WEAPONTYPE_M4:
+        {
+            return 54;
+            break;
+        }
+        case WEAPONTYPE_AK47:
+        {
+            return 55;
+            break;
+        }
+        case WEAPONTYPE_SNIPERRIFLE:
+        case WEAPONTYPE_COUNTRYRIFLE:
+        {
+            return 56;
+            break;
+        }
+        default:
+        {
+            return 0;
+        }
+    }
+}
+
+float CWeaponStatManager::GetWeaponRangeFromSkillLevel ( eWeaponType eWeapon, float fSkillLevel )
+{
+    float fWeaponRange = 0.0f;
+    CWeaponStat* pWeaponStat = GetWeaponStatsFromSkillLevel ( eWeapon, fSkillLevel );
+    if ( pWeaponStat )
+    {
+        fWeaponRange = pWeaponStat->GetWeaponRange ( );
+    }
+    return fWeaponRange;
 }

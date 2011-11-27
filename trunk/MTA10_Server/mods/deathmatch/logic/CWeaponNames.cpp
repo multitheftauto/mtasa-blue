@@ -91,25 +91,6 @@ const char* CWeaponNames::GetWeaponName ( unsigned char ucID )
     return szWeaponNameEmpty;
 }
 
-
-float CWeaponNames::GetWeaponRange ( unsigned char ucWeaponType )
-{
-    static const float s_fWeaponRanges [ 60 ] = {
-        1.6f,  1.6f,  1.6f,  1.6f,   1.6f,   1.6f,   1.6f,  1.6f,  1.6f,  1.6f,
-        1.6f,  1.6f,  1.6f,  0.0f,   1.6f,   1.6f,   40.0f, 40.0f, 40.0f, 0.0f,
-        0.0f,  0.0f,  35.0f, 35.0f,  35.0f,  40.0f,  35.0f, 40.0f, 35.0f, 45.0f,
-        70.0f, 90.0f, 35.0f, 100.0f, 300.0f, 55.0f,  55.0f, 5.1f,  75.0f, 40.0f,
-        25.0f, 6.1f,  10.1f, 100.0f, 100.0f, 100.0f, 1.6f,  0.0f,  0.0f,  0.0f,
-        0.0f,  0.0f,  0.0f,  0.0f,   0.0f,   0.0f,   0.0f,  0.0f,  0.0f,  0.0f
-    };
-
-    if ( ucWeaponType < 60 )
-        return s_fWeaponRanges [ ucWeaponType ];
-
-    return 0.0f;
-}
-
-
 char CWeaponNames::GetSlotFromWeapon ( unsigned char ucID )
 {
     if ( ucID < NUMELMS ( WeaponIDs ) )

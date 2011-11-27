@@ -302,29 +302,6 @@ void CPed::SetWeaponTotalAmmo ( unsigned short usTotalAmmo, unsigned char ucSlot
     }
 }
 
-float CPed::GetWeaponRange ( unsigned char ucSlot )
-{
-    static const float s_fWeaponRanges [ 60 ] = {
-        1.6f,  1.6f,  1.6f,  1.6f,   1.6f,   1.6f,   1.6f,  1.6f,  1.6f,  1.6f,
-        1.6f,  1.6f,  1.6f,  0.0f,   1.6f,   1.6f,   40.0f, 40.0f, 40.0f, 0.0f,
-        0.0f,  0.0f,  35.0f, 35.0f,  35.0f,  40.0f,  35.0f, 40.0f, 35.0f, 45.0f,
-        70.0f, 90.0f, 35.0f, 100.0f, 300.0f, 55.0f,  55.0f, 5.1f,  75.0f, 40.0f,
-        25.0f, 6.1f,  10.1f, 100.0f, 100.0f, 100.0f, 1.6f,  0.0f,  0.0f,  0.0f,
-        0.0f,  0.0f,  0.0f,  0.0f,   0.0f,   0.0f,   0.0f,  0.0f,  0.0f,  0.0f
-    };
-
-    if ( ucSlot == 0xFF )
-        ucSlot = m_ucWeaponSlot;
-    if ( ucSlot < WEAPON_SLOTS )
-    {
-        unsigned char ucWeaponType = m_Weapons [ ucSlot ].ucType;
-        if ( ucWeaponType < 60 )
-            return s_fWeaponRanges [ ucWeaponType ];
-    }
-    return 0.0f;
-}
-
-
 float CPed::GetMaxHealth ( void )
 {
     // TODO: Verify this formula
