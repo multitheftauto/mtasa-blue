@@ -133,6 +133,9 @@
 #include "lua/CLuaCallback.h"
 #include "lua/LuaUtils.h"
 
+// Sim includes
+#include "net/CSimControl.h"
+
 // Shared includes
 #include "TInterpolation.h"
 #include "CPositionRotationAnimation.h"

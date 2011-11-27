@@ -230,6 +230,7 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     m_OptionsList.push_back ( StringPair ( "Busy sleep time",           SString ( "%d ms", pConfig->GetPendingWorkToDoSleepTime () ) ) );
     m_OptionsList.push_back ( StringPair ( "BandwidthReductionMode",    pConfig->GetSetting ( "bandwidth_reduction" ) ) );
     m_OptionsList.push_back ( StringPair ( "LightSyncEnabled",          SString ( "%d", g_pBandwidthSettings->bLightSyncEnabled ) ) );
+    m_OptionsList.push_back ( StringPair ( "ThreadNetEnabled",          SString ( "%d", pConfig->GetThreadNetEnabled () ) ) );
     m_OptionsList.push_back ( StringPair ( "Max LS plrs/frame",         SString ( "%d", g_pBandwidthSettings->iLightSyncPlrsPerFrame ) ) );
 
     //

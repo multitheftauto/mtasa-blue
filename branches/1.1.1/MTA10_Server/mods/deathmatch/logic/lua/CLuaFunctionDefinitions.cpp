@@ -11054,6 +11054,10 @@ int CLuaFunctionDefinitions::RemoveAccount ( lua_State* luaVM )
             lua_pushboolean ( luaVM, true );
             return 1;
         }
+
+        CClient* pClient = pAccount->GetClient ();
+        if ( pClient )
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Problem @ '%s' [%s]", "removeAccount", "Unable to remove account as unable to log out client. (Maybe onPlayerLogout is cancelled)" ) );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "removeAccount", *argStream.GetErrorMessage () ) );
@@ -11988,9 +11992,9 @@ int CLuaFunctionDefinitions::GetNetworkStats ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        NetServerPlayerID* pPlayerID = pPlayer ? &pPlayer->GetSocket () : NULL;
+        NetServerPlayerID PlayerID = pPlayer ? pPlayer->GetSocket () : NetServerPlayerID ();
         NetStatistics stats;
-        if ( g_pNetServer->GetNetworkStatistics ( &stats, pPlayerID ) )
+        if ( g_pNetServer->GetNetworkStatistics ( &stats, PlayerID ) )
         {
             uint uiNumMessagesInSendBuffer = 0;
             for ( int i = 0; i < PACKET_PRIORITY_COUNT; ++i )

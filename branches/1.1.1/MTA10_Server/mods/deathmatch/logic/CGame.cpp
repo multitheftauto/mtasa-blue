@@ -253,6 +253,7 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pRPCFunctions );
     SAFE_DELETE ( m_pWaterManager );
     SAFE_DELETE ( m_pOpenPortsTester );
+    CSimControl::Shutdown ();
 
     // Clear our global pointer
     g_pGame = NULL;
@@ -386,6 +387,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Startup the getElementsByType from root optimizations
     CElement::StartupEntitiesFromRoot ();
 
+    CSimControl::Startup ();
     m_pGroups = new CGroups;
     m_pClock = new CClock;
     m_pBlipManager = new CBlipManager;
@@ -682,7 +684,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pAccountManager->SmartLoad ();
 
     // Register our packethandler
-    g_pNetServer->RegisterPacketHandler ( CGame::StaticProcessPacket, TRUE );
+    g_pNetServer->RegisterPacketHandler ( CGame::StaticProcessPacket );
 
     // Set encryption level
     g_pNetServer->SetEncryptionEnabled ( m_pMainConfig->GetNetworkEncryptionEnabled () );
@@ -784,7 +786,7 @@ void CGame::Stop ( void )
     g_pNetServer->StopNetwork ();
 
     // Unregister our packethandler
-    g_pNetServer->RegisterPacketHandler ( NULL, TRUE );
+    g_pNetServer->RegisterPacketHandler ( NULL );
 
 }
 
@@ -869,7 +871,7 @@ void CGame::PulseMasterServerAnnounce ( void )
 }
 
 
-bool CGame::StaticProcessPacket ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface& BitStream )
+bool CGame::StaticProcessPacket ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* pBitStream, SNetExtraInfo* pNetExtraInfo )
 {
     // Is it a join packet? Pass it to the handler immediately
     if ( ucPacketID == PACKET_ID_PLAYER_JOIN )
@@ -881,12 +883,12 @@ bool CGame::StaticProcessPacket ( unsigned char ucPacketID, NetServerPlayerID& S
     // Is it an rpc call?
     if ( ucPacketID == PACKET_ID_RPC )
     {
-        g_pGame->m_pRPCFunctions->ProcessPacket ( Socket, BitStream );
+        g_pGame->m_pRPCFunctions->ProcessPacket ( Socket, *pBitStream );
         return true;
     }
 
     // Translate the packet
-    CPacket* pPacket = g_pGame->m_pPacketTranslator->Translate ( Socket, static_cast < ePacketID > ( ucPacketID ), BitStream );
+    CPacket* pPacket = g_pGame->m_pPacketTranslator->Translate ( Socket, static_cast < ePacketID > ( ucPacketID ), *pBitStream, pNetExtraInfo );
     if ( pPacket )
     {
         // Handle it
@@ -1488,8 +1490,15 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 
             // Get the serial number from the packet source
             NetServerPlayerID p = Packet.GetSourceSocket ();
-            SString strSerial        = p.GetSerial ();
-            SString strPlayerVersion = p.GetPlayerVersion ();
+            SString strSerial;
+            SString strPlayerVersion;
+            {
+                CStaticString < 32 > strSerialTemp;
+                CStaticString < 32 > strPlayerVersionTemp;
+                g_pNetServer->GetClientSerialAndVersion ( p, strSerialTemp, strPlayerVersionTemp );
+                strSerial = SStringX ( strSerialTemp );
+                strPlayerVersion = SStringX ( strPlayerVersionTemp );
+            }
 
             char szIP [22];
             SString strIPAndSerial( "IP: %s  Serial: %s  Version: %s", pPlayer->GetSourceIP ( szIP ), strSerial.c_str (), strPlayerVersion.c_str () );
@@ -1814,6 +1823,8 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
 
     // Make a list of players to send this packet to
     std::vector < CPlayer* > sendList;
+    std::vector < CPlayer* > simSendList;
+    bool bUseSimSendList = CSimControl::IsSimSystemEnabled ();
 
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
 
@@ -1863,8 +1874,33 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
             }
             else
             {
-                if ( pSendPlayer->IsTimeToReceiveNearSyncFrom ( pPlayer, nearInfo ) )
-                    sendList.push_back ( pSendPlayer );
+                bool bTimeForSync = pSendPlayer->IsTimeToReceiveNearSyncFrom ( pPlayer, nearInfo );
+                if ( !bUseSimSendList )
+                {
+                    // Standard sending
+                    if ( bTimeForSync )
+                        sendList.push_back ( pSendPlayer );
+                }
+                else
+                {
+                    //
+                    // Sim sync relays pure sync packets to the other player when he is in zone 0 (as seen from this player)
+                    // Enabling/disabling sim sync will only take effect for the next pure sync packet, so:
+                    //                           prev  now
+                    //      Moving into zone 0:   1+    0    Do sync here, sim sync on
+                    //      In zone 0:            0     0    No sync here, sim sync on
+                    //      Moving from zone 0:   0     1+   No sync here, sim sync off
+                    //      Not in zone0:         1+    1+   Do sync here  sim sync off
+                    //
+                    bool bSyncHere = ( nearInfo.iPrevZone > 0 );
+                    bool bSimSync = ( nearInfo.iZone == 0 );
+        
+                    if ( bSyncHere && bTimeForSync )
+                        sendList.push_back ( pSendPlayer );
+    
+                    if ( bSimSync )
+                        simSendList.push_back ( pSendPlayer );
+                }
             }
         }
 
@@ -1876,9 +1912,12 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
     }
 
     // Relay packet
-    CPlayerManager::Broadcast ( Packet, sendList );
-}
+    if ( !sendList.empty () )
+        CPlayerManager::Broadcast ( Packet, sendList );
 
+    // Update sim data
+    CSimControl::UpdateSimPlayer ( pPlayer, simSendList );
+}
 
 void CGame::Packet_PlayerPuresync ( CPlayerPuresyncPacket& Packet )
 {

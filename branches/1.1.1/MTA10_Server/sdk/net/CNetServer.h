@@ -40,13 +40,11 @@ public:
 
     virtual void                            DoPulse                         ( void ) = 0;
 
-    virtual void                            RegisterPacketHandler           ( PPACKETHANDLER pfnPacketHandler, bool bIsPrimaryPacketHandler = true ) = 0;
+    virtual void                            RegisterPacketHandler           ( PPACKETHANDLER pfnPacketHandler ) = 0;
 
-    virtual bool                            GetNetworkStatistics            ( NetStatistics* pDest, NetServerPlayerID* pPlayerID = NULL ) = 0;
+    virtual bool                            GetNetworkStatistics            ( NetStatistics* pDest, NetServerPlayerID& PlayerID ) = 0;
     virtual const SPacketStat*              GetPacketStats                  ( void ) = 0;
     virtual bool                            GetBandwidthStatistics          ( SBandwidthStatistics* pDest ) = 0;
-
-    virtual int                             GetPing                         ( NetServerPlayerID& playerID ) = 0;
 
     virtual NetBitStreamInterface*          AllocateNetServerBitStream      ( unsigned short usBitStreamVersion ) = 0;
     virtual void                            DeallocateNetServerBitStream    ( NetBitStreamInterface* bitStream ) = 0;
@@ -68,19 +66,16 @@ public:
 
     virtual void                            SetClientBitStreamVersion       ( const NetServerPlayerID &PlayerID, unsigned short usBitStreamVersion ) = 0;
     virtual void                            ClearClientBitStreamVersion     ( const NetServerPlayerID &PlayerID ) = 0;
-    virtual unsigned short                  GetClientBitStreamVersion       ( const NetServerPlayerID &PlayerID ) = 0;
 
-    virtual void                            EnablePortForwarding            ( unsigned short usPort, const char* szProtocol, bool bEnable ) = 0;
-    virtual int                             GetPortForwardingStatus         ( unsigned short usPort, const char* szProtocol ) = 0;  // 0:closed  1:busy  2:open  -1:fail
-
-    virtual void                            ResetStub                       ( uint dwType, ... ) = 0;
-    virtual void                            ResetStub                       ( uint dwType, va_list ) = 0;
+    virtual void                            SetChecks                       ( const std::set < SString >& disableComboACMap, const std::set < SString >& disableACMap, const std::set < SString >& enableSDMap, int iEnableClientChecks, bool bHideAC ) = 0;
 
     virtual unsigned int                    GetPendingPacketCount           ( void ) = 0;
 
     virtual bool                            InitServerId                    ( const char* szPath ) = 0;
     virtual void                            SetEncryptionEnabled            ( bool bEncryptionEnabled ) = 0;
     virtual void                            ResendModPackets                ( NetServerPlayerID& playerID ) = 0;
+
+    virtual void                            GetClientSerialAndVersion       ( NetServerPlayerID& playerID, CStaticString < 32 >& strSerial, CStaticString < 32 >& strVersion ) = 0;
 };
 
 #endif

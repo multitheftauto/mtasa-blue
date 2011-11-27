@@ -1391,7 +1391,11 @@ bool CConsoleCommands::DelAccount ( CConsole* pConsole, const char* szArguments,
 
             if ( pAccountClient )
             {
-                g_pGame->GetAccountManager ()->LogOut ( pAccountClient, NULL );
+                if ( !g_pGame->GetAccountManager ()->LogOut ( pAccountClient, NULL ) )
+                {
+                    pEchoClient->SendEcho ( "delaccount: Unable to delete account as unable to log out client. (Maybe onPlayerLogout is cancelled)" );
+                    return false;
+                }
 
                 char szClientMessage [128];
                 szClientMessage[0] = '\0';
@@ -1950,7 +1954,7 @@ bool CConsoleCommands::Test ( CConsole* pConsole, const char* szArguments, CClie
     if ( pClient->GetClientType () == CClient::CLIENT_CONSOLE )
     {
         char szBuffer[2048] = "";
-        g_pNetServer->ResetStub ( 'test', szArguments, szBuffer );
+        //g_pNetServer->ResetStub ( 'test', szArguments, szBuffer );
         if ( strlen ( szBuffer ) > 0 )
             pEchoClient->SendConsole ( SString ( "TEST: %s", szBuffer ) );
         return true;
