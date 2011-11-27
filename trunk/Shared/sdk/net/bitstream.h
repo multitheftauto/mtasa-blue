@@ -20,14 +20,14 @@
 
 struct ISyncStructure;
 
-class NetBitStreamInterface
+class NetBitStreamInterface : public CRefCountable
 {
+    NetBitStreamInterface      ( const NetBitStreamInterface& );
+    const NetBitStreamInterface& operator= ( const NetBitStreamInterface& );
 protected:
-    virtual             ~NetBitStreamInterface      ( void ) {};
+                        NetBitStreamInterface       ( void ) {}
+    virtual             ~NetBitStreamInterface      ( void ) {}
 public:
-    virtual void        AddRef                      ( void ) = 0;
-    virtual void        Release                     ( void ) = 0;
-
     virtual int         GetReadOffsetAsBits         ( void ) = 0;
 
     virtual void        Reset                       ( void ) = 0;
