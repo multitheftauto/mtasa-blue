@@ -43,7 +43,7 @@ SVehicleName VehicleNames [611] = { {"Landstalker"}, {"Bravura"}, {"Buffalo"}, {
 {"Streak Train Trailer"}, {"Kart"}, {"Mower"}, {"Dune"}, {"Sweeper"}, {"Broadway"}, {"Tornado"}, {"AT-400"}, {"DFT-30"}, {"Huntley"}, 
 {"Stafford"}, {"BF-400"}, {"Newsvan"}, {"Tug"}, {"Trailer (Tanker Commando)"}, {"Emperor"}, {"Wayfarer"}, {"Euros"}, {"Hotdog"}, {"Club"}, 
 {"Box Freight"}, {"Trailer 3"}, {"Andromada"}, {"Dodo"}, {"RC Cam"}, {"Launch"}, {"Police LS", "Police"}, {"Police SF"}, {"Police LV"}, {"Police Ranger", "Ranger"}, 
-{"Picador"}, {"S.W.A.T."}, {"Alpha"}, {"Phoenix"}, {"Glendale Damaged"}, {"Sadler"}, {"Baggage Trailer (covered)"}, {"Baggage Trailer (Uncovered)"}, {"Trailer (Stairs)"}, {"Boxville Mission"}, 
+{"Picador"}, {"S.W.A.T."}, {"Alpha"}, {"Phoenix"}, {"Glendale Damaged"}, {"Sadler", "Sadler Damaged"}, {"Baggage Trailer (covered)"}, {"Baggage Trailer (Uncovered)"}, {"Trailer (Stairs)"}, {"Boxville Mission"}, 
 {"Farm Trailer"} };
 
 SVehicleName VehicleTypes [] = { {"Automobile"}, {"Plane"}, {"Bike"}, {"Helicopter"}, {"Boat"}, {"Train"}, {"Trailer"}, {"BMX"}, {"Monster Truck"}, {"Quad"} };
