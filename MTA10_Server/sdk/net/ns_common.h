@@ -33,7 +33,7 @@ typedef struct __static_server_data_t
 {
 } static_server_data_t, *pstatic_server_data_t;
 
-typedef bool (*PPACKETHANDLER) ( unsigned char, NetServerPlayerID&, NetBitStreamInterface& );
+typedef bool (*PPACKETHANDLER) ( unsigned char, NetServerPlayerID&, NetBitStreamInterface*, SNetExtraInfo* );
 
 enum NetServerPacketPriority
 {

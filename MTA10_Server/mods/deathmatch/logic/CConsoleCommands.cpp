@@ -1972,7 +1972,7 @@ bool CConsoleCommands::Test ( CConsole* pConsole, const char* szArguments, CClie
     if ( pClient->GetClientType () == CClient::CLIENT_CONSOLE )
     {
         char szBuffer[2048] = "";
-        g_pNetServer->ResetStub ( 'test', szArguments, szBuffer );
+        //g_pNetServer->ResetStub ( 'test', szArguments, szBuffer );
         if ( strlen ( szBuffer ) > 0 )
             pEchoClient->SendConsole ( SString ( "TEST: %s", szBuffer ) );
         return true;

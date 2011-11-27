@@ -88,8 +88,10 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_ucVoiceQuality = 4;
     m_bVoiceEnabled = false;
     m_uiVoiceBitrate = 0;
+    m_bNetworkEncryptionEnabled = true;
     m_strBandwidthReductionMode = "medium";
     m_iPendingWorkToDoSleepTime = 10;
+    m_bThreadNetEnabled = false;
     m_iBackupInterval = 3;
     m_iBackupAmount = 5;
 }
@@ -310,7 +312,7 @@ bool CMainConfig::Load ( void )
                 }
         }
 
-        g_pNetServer->ResetStub ( 'delu', &m_DisableComboACMap, &disableACMap, &enableSDMap, m_iEnableClientChecks, iHideAC );
+        g_pNetServer->SetChecks ( m_DisableComboACMap, disableACMap, enableSDMap, m_iEnableClientChecks, iHideAC != 0 );
     }
 
     {
@@ -490,7 +492,6 @@ bool CMainConfig::Load ( void )
     GetBoolean ( m_pRootNode, "autologin", m_bAutoLogin );
 
     // networkencryption - Encryption for Server <-> client communications
-    m_bNetworkEncryptionEnabled = true;
     GetBoolean ( m_pRootNode, "networkencryption", m_bNetworkEncryptionEnabled );
 
     // bandwidth_reduction
@@ -500,6 +501,10 @@ bool CMainConfig::Load ( void )
     // busy_sleep_time
     GetInteger ( m_pRootNode, "busy_sleep_time", m_iPendingWorkToDoSleepTime );
     m_iPendingWorkToDoSleepTime = Clamp ( 0, m_iPendingWorkToDoSleepTime, 10 );
+
+    // threadnet
+    GetBoolean ( m_pRootNode, "threadnet", m_bThreadNetEnabled );
+    ApplyThreadNetEnabled ();
 
     return true;
 }
@@ -524,6 +529,12 @@ void CMainConfig::ApplyBandwidthReductionMode ( void )
         m_strBandwidthReductionMode = "none";
         g_pBandwidthSettings->SetNone ();
     }
+}
+
+
+void CMainConfig::ApplyThreadNetEnabled ( void )
+{
+    CSimControl::EnableSimSystem ( m_bThreadNetEnabled );
 }
 
 
@@ -1064,6 +1075,21 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
             if ( bSave )
             {
                 SetString ( m_pRootNode, "busy_sleep_time", SString ( "%d", m_iPendingWorkToDoSleepTime ) );
+                Save ();
+            }
+            return true;
+        }
+    }
+    else
+    if ( strName == "threadnet" )
+    {
+        if ( strValue == "0" || strValue == "1" )
+        {
+            m_bThreadNetEnabled = atoi ( strValue ) ? true : false;
+            ApplyThreadNetEnabled ();
+            if ( bSave )
+            {
+                SetString ( m_pRootNode, "threadnet", SString ( "%d", m_bThreadNetEnabled ) );
                 Save ();
             }
             return true;

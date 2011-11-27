@@ -16,6 +16,7 @@
 
 CServerInterface* g_pServerInterface = NULL;
 CNetServer* g_pNetServer = NULL;
+CNetServer* g_pRealNetServer = NULL;
 
 CServer::CServer ( void )
 {
@@ -36,6 +37,7 @@ void CServer::ServerInitialize ( CServerInterface* pServerInterface )
     m_pServerInterface = pServerInterface;
     g_pServerInterface = pServerInterface;
     g_pNetServer = pServerInterface->GetNetwork ();
+    g_pRealNetServer = g_pNetServer;
 }
 
 

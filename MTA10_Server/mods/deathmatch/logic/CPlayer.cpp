@@ -105,6 +105,8 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_iLastZoneDebug = 0;
 
     m_llLastPositionHasChanged = 0;
+
+    CSimControl::AddSimPlayer ( this );
 }
 
 
@@ -145,6 +147,7 @@ CPlayer::~CPlayer ( void )
 
     // Unlink from manager
     Unlink ();
+    CSimControl::RemoveSimPlayer ( this );
 
     // Unparent us (CElement's unparenting will crash because of the incomplete vtable at that point)
     m_bDoNotSendEntities = true;
@@ -189,17 +192,24 @@ void CPlayer::SetNick ( const char* szNick )
     STRNCPY ( m_szNick, szNick, MAX_NICK_LENGTH + 1 );
 }
 
-
 char* CPlayer::GetSourceIP ( char* pBuffer )
 {
-    // Grab the player IP
-    char szIP [22];
-    unsigned short usPort;
-    g_pNetServer->GetPlayerIP ( m_PlayerSocket, szIP, &usPort );
+    const char* szIP = GetSourceIPString ();
 
-    // Copy the buffer and return a pointer to it
     strcpy ( pBuffer, szIP );
     return pBuffer;
+}
+
+const char* CPlayer::GetSourceIPString ( void )
+{
+    if ( m_strIP.empty () )
+    {
+        char szIP [22];
+        unsigned short usPort;
+        g_pNetServer->GetPlayerIP ( m_PlayerSocket, szIP, &usPort );
+        m_strIP = szIP;
+    }
+    return m_strIP;
 }
 
 // TODO [28-Feb-2009] packetOrdering is currently always PACKET_ORDERING_GAME
@@ -841,6 +851,8 @@ bool CPlayer::IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo
         GetCamera ()->GetPosition ( m_vecCamPosition );
 
     int iZone = GetSyncZone ( pOther );
+    nearInfo.iPrevZone = nearInfo.iZone;
+    nearInfo.iZone = iZone;
 
     int iUpdateInterval = g_pBandwidthSettings->ZoneUpdateIntervals [ iZone ];
 

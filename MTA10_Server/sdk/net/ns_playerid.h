@@ -17,14 +17,27 @@
 #include <MTAPlatform.h>
 #include <SharedUtil.h>
 
+class SNetExtraInfo
+{
+    ~SNetExtraInfo ( void ) {}
+public:
+    ZERO_ON_NEW
+
+    SNetExtraInfo   ( void ) : m_iRefCount ( 1 )    {}
+    void AddRef     ( void )                        { ++m_iRefCount; }
+    void Release    ( void )                        { if ( --m_iRefCount <= 0 ) delete this; }
+
+    bool    m_bHasPing;
+    uint    m_uiPing;
+    int     m_iRefCount;
+};
+
 
 class NetServerPlayerID
 {
 public:
     unsigned long           m_uiBinaryAddress;
     unsigned short          m_usPort;
-    CStaticString < 32 >    m_strSerial;
-    CStaticString < 32 >    m_strPlayerVersion;
 
 public:
     NetServerPlayerID ( void )
@@ -56,12 +69,6 @@ public:
 
     inline unsigned long    GetBinaryAddress    ( void ) const                      { return m_uiBinaryAddress; };
     inline unsigned short   GetPort             ( void ) const                      { return m_usPort; };
-    
-    const char*             GetSerial           ( void ) const                      { return m_strSerial; };
-    inline void             SetSerial           ( const char* szSerial )            { m_strSerial = szSerial; };
-
-    const char*             GetPlayerVersion    ( void ) const                      { return m_strPlayerVersion; }
-    void                    SetPlayerVersion    ( const char* szPlayerVersion )     { m_strPlayerVersion = szPlayerVersion; }
 };
 
 #endif
