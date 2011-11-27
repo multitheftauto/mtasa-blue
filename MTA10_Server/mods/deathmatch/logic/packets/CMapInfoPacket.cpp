@@ -267,6 +267,7 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
         WeaponProperty.data.fWeaponRange = pWeaponStat->GetWeaponRange();
         WeaponProperty.data.nAmmo = pWeaponStat->GetMaximumClipAmmo();
         WeaponProperty.data.nDamage = pWeaponStat->GetDamagePerHit();
+        WeaponProperty.data.nFlags = pWeaponStat->GetFlags();
 
         WeaponProperty.data.anim_loop_start = pWeaponStat->GetWeaponAnimLoopStart();
         WeaponProperty.data.anim_loop_stop = pWeaponStat->GetWeaponAnimLoopStop();
