@@ -2179,13 +2179,23 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
         {
             bitStream.Read( &weaponProperty );
             CWeaponStat * pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( (eWeaponType)i );
-            pWeaponInfo->SetAccuracy        ( weaponProperty.data.fAccuracy );
-            pWeaponInfo->SetMoveSpeed       ( weaponProperty.data.fMoveSpeed );
-            pWeaponInfo->SetTargetRange     ( weaponProperty.data.fTargetRange );
-            pWeaponInfo->SetWeaponRange     ( weaponProperty.data.fWeaponRange );
-            pWeaponInfo->SetMaximumClipAmmo ( weaponProperty.data.nAmmo );
-            pWeaponInfo->SetDamagePerHit    ( weaponProperty.data.nDamage );
-            pWeaponInfo->SetFlags           ( weaponProperty.data.nFlags );
+            pWeaponInfo->SetAccuracy                    ( weaponProperty.data.fAccuracy );
+            pWeaponInfo->SetMoveSpeed                   ( weaponProperty.data.fMoveSpeed );
+            pWeaponInfo->SetTargetRange                 ( weaponProperty.data.fTargetRange );
+            pWeaponInfo->SetWeaponRange                 ( weaponProperty.data.fWeaponRange );
+            pWeaponInfo->SetMaximumClipAmmo             ( weaponProperty.data.nAmmo );
+            pWeaponInfo->SetDamagePerHit                ( weaponProperty.data.nDamage );
+            pWeaponInfo->SetFlags                       ( weaponProperty.data.nFlags );
+
+            pWeaponInfo->SetWeaponAnimLoopStart         ( weaponProperty.data.anim_loop_start );
+            pWeaponInfo->SetWeaponAnimLoopStop          ( weaponProperty.data.anim_loop_stop );
+            pWeaponInfo->SetWeaponAnimLoopFireTime      ( weaponProperty.data.anim_loop_bullet_fire );
+
+            pWeaponInfo->SetWeaponAnim2LoopStart        ( weaponProperty.data.anim2_loop_start );
+            pWeaponInfo->SetWeaponAnim2LoopStop         ( weaponProperty.data.anim2_loop_stop );
+            pWeaponInfo->SetWeaponAnim2LoopFireTime     ( weaponProperty.data.anim2_loop_bullet_fire );
+
+            pWeaponInfo->SetAnimBreakoutTime            ( weaponProperty.data.anim_breakout_time );
         }
     }
     for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_M4;i++)
@@ -2199,13 +2209,23 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
             {
                 bitStream.Read( &weaponProperty );
                 CWeaponStat * pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( (eWeaponType)weaponProperty.data.weaponType, (eWeaponSkill)j );
-                pWeaponInfo->SetAccuracy        ( weaponProperty.data.fAccuracy );
-                pWeaponInfo->SetMoveSpeed       ( weaponProperty.data.fMoveSpeed );
-                pWeaponInfo->SetTargetRange     ( weaponProperty.data.fTargetRange );
-                pWeaponInfo->SetWeaponRange     ( weaponProperty.data.fWeaponRange );
-                pWeaponInfo->SetMaximumClipAmmo ( weaponProperty.data.nAmmo );
-                pWeaponInfo->SetDamagePerHit    ( weaponProperty.data.nDamage );
-                pWeaponInfo->SetFlags           ( weaponProperty.data.nFlags );
+                pWeaponInfo->SetAccuracy                    ( weaponProperty.data.fAccuracy );
+                pWeaponInfo->SetMoveSpeed                   ( weaponProperty.data.fMoveSpeed );
+                pWeaponInfo->SetTargetRange                 ( weaponProperty.data.fTargetRange );
+                pWeaponInfo->SetWeaponRange                 ( weaponProperty.data.fWeaponRange );
+                pWeaponInfo->SetMaximumClipAmmo             ( weaponProperty.data.nAmmo );
+                pWeaponInfo->SetDamagePerHit                ( weaponProperty.data.nDamage );
+                pWeaponInfo->SetFlags                       ( weaponProperty.data.nFlags );
+
+                pWeaponInfo->SetWeaponAnimLoopStart         ( weaponProperty.data.anim_loop_start );
+                pWeaponInfo->SetWeaponAnimLoopStop          ( weaponProperty.data.anim_loop_stop );
+                pWeaponInfo->SetWeaponAnimLoopFireTime      ( weaponProperty.data.anim_loop_bullet_fire );
+
+                pWeaponInfo->SetWeaponAnim2LoopStart        ( weaponProperty.data.anim2_loop_start );
+                pWeaponInfo->SetWeaponAnim2LoopStop         ( weaponProperty.data.anim2_loop_stop );
+                pWeaponInfo->SetWeaponAnim2LoopFireTime     ( weaponProperty.data.anim2_loop_bullet_fire );
+
+                pWeaponInfo->SetAnimBreakoutTime            ( weaponProperty.data.anim_breakout_time );
             }
         }
     }

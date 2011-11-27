@@ -267,7 +267,16 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
         WeaponProperty.data.fWeaponRange = pWeaponStat->GetWeaponRange();
         WeaponProperty.data.nAmmo = pWeaponStat->GetMaximumClipAmmo();
         WeaponProperty.data.nDamage = pWeaponStat->GetDamagePerHit();
-        WeaponProperty.data.nFlags = pWeaponStat->GetFlags();
+
+        WeaponProperty.data.anim_loop_start = pWeaponStat->GetWeaponAnimLoopStart();
+        WeaponProperty.data.anim_loop_stop = pWeaponStat->GetWeaponAnimLoopStop();
+        WeaponProperty.data.anim_loop_bullet_fire = pWeaponStat->GetWeaponAnimLoopFireTime();
+
+        WeaponProperty.data.anim2_loop_start = pWeaponStat->GetWeaponAnim2LoopStart();
+        WeaponProperty.data.anim2_loop_stop = pWeaponStat->GetWeaponAnim2LoopStop();
+        WeaponProperty.data.anim2_loop_bullet_fire = pWeaponStat->GetWeaponAnim2LoopFireTime();
+
+        WeaponProperty.data.anim_breakout_time = pWeaponStat->GetWeaponAnimBreakoutTime();
         BitStream.Write( &WeaponProperty );
     }
 
@@ -287,6 +296,16 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
             WeaponProperty.data.nAmmo = pWeaponStat->GetMaximumClipAmmo();
             WeaponProperty.data.nDamage = pWeaponStat->GetDamagePerHit();
             WeaponProperty.data.nFlags = pWeaponStat->GetFlags();
+
+            WeaponProperty.data.anim_loop_start = pWeaponStat->GetWeaponAnimLoopStart();
+            WeaponProperty.data.anim_loop_stop = pWeaponStat->GetWeaponAnimLoopStop();
+            WeaponProperty.data.anim_loop_bullet_fire = pWeaponStat->GetWeaponAnimLoopFireTime();
+
+            WeaponProperty.data.anim2_loop_start = pWeaponStat->GetWeaponAnim2LoopStart();
+            WeaponProperty.data.anim2_loop_stop = pWeaponStat->GetWeaponAnim2LoopStop();
+            WeaponProperty.data.anim2_loop_bullet_fire = pWeaponStat->GetWeaponAnim2LoopFireTime();
+
+            WeaponProperty.data.anim_breakout_time = pWeaponStat->GetWeaponAnimBreakoutTime();
             BitStream.Write( &WeaponProperty );
         }
     }

@@ -1994,7 +1994,14 @@ struct sWeaponPropertySync : public ISyncStructure
             bitStream.Read     ( data.nAmmo ) &&
             bitStream.Read     ( data.nDamage ) &&
             bitStream.Read     ( data.fAccuracy ) &&
-            bitStream.Read     ( data.fMoveSpeed )
+            bitStream.Read     ( data.fMoveSpeed ) &&
+            bitStream.Read     ( data.anim_loop_start ) &&
+            bitStream.Read     ( data.anim_loop_stop ) &&
+            bitStream.Read     ( data.anim_loop_bullet_fire ) &&
+            bitStream.Read     ( data.anim2_loop_start ) &&
+            bitStream.Read     ( data.anim2_loop_stop ) &&
+            bitStream.Read     ( data.anim2_loop_bullet_fire ) &&
+            bitStream.Read     ( data.anim_breakout_time )
             )
             return true;
 
@@ -2011,6 +2018,14 @@ struct sWeaponPropertySync : public ISyncStructure
         bitStream.Write    ( data.nDamage );
         bitStream.Write    ( data.fAccuracy );
         bitStream.Write    ( data.fMoveSpeed );
+        
+        bitStream.Write    ( data.anim_loop_start );
+        bitStream.Write    ( data.anim_loop_stop );
+        bitStream.Write    ( data.anim_loop_bullet_fire );
+        bitStream.Write    ( data.anim2_loop_start );
+        bitStream.Write    ( data.anim2_loop_stop );
+        bitStream.Write    ( data.anim2_loop_bullet_fire );
+        bitStream.Write    ( data.anim_breakout_time );
     }
 
     struct
@@ -2026,6 +2041,16 @@ struct sWeaponPropertySync : public ISyncStructure
 
         FLOAT       fAccuracy;            // modify accuracy of weapon
         FLOAT       fMoveSpeed;           // how fast can move with weapon
+        
+        FLOAT       anim_loop_start;        // start of animation loop
+        FLOAT       anim_loop_stop;          // end of animation loop
+        FLOAT       anim_loop_bullet_fire;         // time in animation when weapon should be fired
+
+        FLOAT       anim2_loop_start;       // start of animation2 loop
+        FLOAT       anim2_loop_stop;         // end of animation2 loop
+        FLOAT       anim2_loop_bullet_fire;        // time in animation2 when weapon should be fired
+
+        FLOAT       anim_breakout_time;     // time after which player can break out of attack and run off
     } data;
 };
 

@@ -30,7 +30,8 @@ public:
                       CSimPlayerPuresyncPacket              ( ElementID PlayerID,
                                                               ushort PlayerLatency,
                                                               uchar PlayerSyncTimeContext,
-                                                              uchar PlayerGotWeaponType );
+                                                              uchar PlayerGotWeaponType,
+                                                              float WeaponRange );
 
     ePacketID               GetPacketID                     ( void ) const                  { return PACKET_ID_PLAYER_PURESYNC; };
     unsigned long           GetFlags                        ( void ) const                  { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
@@ -54,6 +55,7 @@ public:
     const ushort    m_PlayerLatency;
     const uchar     m_PlayerSyncTimeContext;
     const uchar     m_PlayerGotWeaponType;
+    const float     m_WeaponRange;
 
     // Set in Read ()
     struct

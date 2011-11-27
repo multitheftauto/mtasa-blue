@@ -129,6 +129,11 @@ void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::vector < 
     //
     CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
 
+    // Work out our weapon range.
+    eWeaponType eWeapon = static_cast < eWeaponType > ( pPlayer->GetWeaponType ( ) );
+    float fSkill = pPlayer->GetPlayerStat ( CWeaponStatManager::GetSkillStatIndex ( eWeapon ) );
+    float fWeaponRange = g_pGame->GetWeaponStatManager ( )->GetWeaponRangeFromSkillLevel ( eWeapon, fSkill );
+
     pSim->m_iStatus                 = pPlayer->GetStatus ();
     pSim->m_usBitStreamVersion      = pPlayer->GetBitStreamVersion ();
     pSim->m_bHasOccupiedVehicle     = pVehicle != NULL;
@@ -138,7 +143,7 @@ void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::vector < 
     pSim->m_usVehicleModel          = pVehicle ? pVehicle->GetModel () : 0;
     pSim->m_ucSyncTimeContext       = pPlayer->GetSyncTimeContext ();
     pSim->m_ucOccupiedVehicleSeat   = pPlayer->GetOccupiedVehicleSeat ();
-    pSim->m_fWeaponRange            = pPlayer->GetWeaponRange ();
+    pSim->m_fWeaponRange            = fWeaponRange;
 
     // Copy send list
     pSim->m_SendList.clear ();
@@ -226,7 +231,8 @@ bool CSimPlayerManager::HandlePlayerPureSync ( NetServerPlayerID& Socket, NetBit
         CSimPlayerPuresyncPacket* pPacket = new CSimPlayerPuresyncPacket ( pSourceSimPlayer->m_PlayerID,
                                                                            pSourceSimPlayer->m_usLatency,
                                                                            pSourceSimPlayer->m_ucSyncTimeContext,
-                                                                           pSourceSimPlayer->m_ucWeaponType );
+                                                                           pSourceSimPlayer->m_ucWeaponType,
+                                                                           pSourceSimPlayer->m_fWeaponRange );
         pPacket->Read ( *BitStream );
 
         // Relay it to nearbyers
