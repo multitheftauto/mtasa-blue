@@ -20,6 +20,8 @@
     #include <shellapi.h>
 #endif
 
+CCriticalSection CRefCountable::ms_CS;
+
 #ifdef MTA_CLIENT
 #ifdef WIN32
 

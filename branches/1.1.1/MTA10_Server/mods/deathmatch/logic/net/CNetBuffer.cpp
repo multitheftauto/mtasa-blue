@@ -343,7 +343,7 @@ bool CNetServerBuffer::SendPacket ( unsigned char ucPacketID, NetServerPlayerID&
 // CNetServerBuffer::GetPlayerIP
 //
 // BLOCKING. Called once per player
-// (To make non blocking, strIP will have to be stored in SGetPlayerIPArgs)
+// (To make non blocking, don't)
 //
 ///////////////////////////////////////////////////////////////////////////
 void CNetServerBuffer::GetPlayerIP ( NetServerPlayerID& playerID, char strIP[22], unsigned short* usPort )
@@ -411,7 +411,7 @@ void CNetServerBuffer::Kick ( NetServerPlayerID &PlayerID )
 // CNetServerBuffer::SetPassword
 //
 // BLOCKING
-// (To make non blocking, szPassword will have to be stored in SGetPlayerIPArgs)
+// (To make non blocking, szPassword will have to be stored in SSetPasswordArgs)
 //
 ///////////////////////////////////////////////////////////////////////////
 void CNetServerBuffer::SetPassword ( const char* szPassword )
@@ -481,7 +481,7 @@ void CNetServerBuffer::ClearClientBitStreamVersion ( const NetServerPlayerID &Pl
 // CNetServerBuffer::SetChecks
 //
 // BLOCKING. Called once at startup
-// (To make non blocking, maps will have to be stored in SGetPlayerIPArgs)
+// (To make non blocking, maps will have to be stored in SSetChecksArgs)
 //
 ///////////////////////////////////////////////////////////////////////////
 void CNetServerBuffer::SetChecks ( const std::set < SString >& disableComboACMap, const std::set < SString >& disableACMap, const std::set < SString >& enableSDMap, int iEnableClientChecks, bool bHideAC )
@@ -512,7 +512,7 @@ unsigned int CNetServerBuffer::GetPendingPacketCount ( void )
 // CNetServerBuffer::InitServerId
 //
 // BLOCKING. Called once at startup
-// (To make non blocking, szPath will have to be stored in SGetPlayerIPArgs)
+// (To make non blocking, szPath will have to be stored in SInitServerIdArgs)
 //
 ///////////////////////////////////////////////////////////////////////////
 bool CNetServerBuffer::InitServerId ( const char* szPath )

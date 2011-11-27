@@ -227,10 +227,11 @@ bool CSimPlayerManager::HandlePlayerPureSync ( NetServerPlayerID& Socket, NetBit
                                                                            pSourceSimPlayer->m_usLatency,
                                                                            pSourceSimPlayer->m_ucSyncTimeContext,
                                                                            pSourceSimPlayer->m_ucWeaponType );
-        pPacket->Read ( *BitStream );
-
-        // Relay it to nearbyers
-        Broadcast ( *pPacket, pSourceSimPlayer->GetSendList () );
+        if ( pPacket->Read ( *BitStream ) )
+        {
+            // Relay it to nearbyers
+            Broadcast ( *pPacket, pSourceSimPlayer->GetSendList () );
+        }
     }
 
     UnlockSimSystem ();
@@ -265,10 +266,11 @@ bool CSimPlayerManager::HandleVehiclePureSync ( NetServerPlayerID& Socket, NetBi
                                                                              pSourceSimPlayer->m_ucOccupiedVehicleSeat,
                                                                              pSourceSimPlayer->m_ucWeaponType,
                                                                              pSourceSimPlayer->m_fWeaponRange );
-        pPacket->Read ( *BitStream );
-
-        // Relay it to nearbyers
-        Broadcast ( *pPacket, pSourceSimPlayer->GetSendList () );
+        if ( pPacket->Read ( *BitStream ) )
+        {
+            // Relay it to nearbyers
+            Broadcast ( *pPacket, pSourceSimPlayer->GetSendList () );
+        }
     }
 
     UnlockSimSystem ();

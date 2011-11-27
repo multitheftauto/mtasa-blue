@@ -17,19 +17,18 @@
 #include <MTAPlatform.h>
 #include <SharedUtil.h>
 
-class SNetExtraInfo
+class SNetExtraInfo : public CRefCountable
 {
+protected:
+    SNetExtraInfo( const SNetExtraInfo& );
+    const SNetExtraInfo& operator=( const SNetExtraInfo& );
     ~SNetExtraInfo ( void ) {}
 public:
     ZERO_ON_NEW
-
-    SNetExtraInfo   ( void ) : m_iRefCount ( 1 )    {}
-    void AddRef     ( void )                        { ++m_iRefCount; }
-    void Release    ( void )                        { if ( --m_iRefCount <= 0 ) delete this; }
+    SNetExtraInfo( void ) {}
 
     bool    m_bHasPing;
     uint    m_uiPing;
-    int     m_iRefCount;
 };
 
 
