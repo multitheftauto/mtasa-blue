@@ -160,7 +160,7 @@ public:
     virtual float           GetArmor () = 0;
     virtual void            SetArmor ( float fArmor ) = 0;
     virtual bool            AddProjectile ( eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity )=0;
-    virtual CWeapon *       GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )=0;
+    virtual CWeapon *       GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo, eWeaponSkill weaponSkill )=0;
     virtual CWeapon *       GetWeapon ( eWeaponSlot weaponSlot )=0;
     virtual CWeapon *       GetWeapon ( eWeaponType weaponType )=0;
     virtual void            ClearWeapons        ( void ) = 0;

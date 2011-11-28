@@ -33,7 +33,7 @@ public:
     virtual CPed            * GetPed()=0;
     virtual eWeaponSlot     GetSlot()=0;
     virtual VOID            SetAsCurrentWeapon()=0;
-    virtual CWeaponInfo     * GetInfo()=0;
+    virtual CWeaponInfo     * GetInfo( eWeaponSkill skill )=0;
     virtual void            Remove ()=0;
 };
 

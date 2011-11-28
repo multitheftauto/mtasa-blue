@@ -207,7 +207,7 @@ void CClientPedManager::RestreamWeapon ( unsigned short usModel )
         // Streamed in and same vehicle ID?
         if ( pPed->IsStreamedIn () && 
             pPed->GetWeapon ( eSlot ) && 
-            pPed->GetWeapon ( eSlot )->GetInfo ()->GetModel () == usModel )
+            pPed->GetWeapon ( eSlot )->GetInfo ( WEAPONSKILL_STD )->GetModel () == usModel )
         {
             // Awesome hack skills + 1, change him to another model while we unload for the lulz
             // Translation: My hack level has increased to ninety nine and we need to wait a frame before reloading the model ID in question so that the custom model unloads properly.

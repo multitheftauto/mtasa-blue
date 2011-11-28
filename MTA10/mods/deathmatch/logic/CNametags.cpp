@@ -125,8 +125,11 @@ void CNametags::DrawFromAim ( void )
                 if ( pPlayerWeapon && State.RightShoulder1 )
                 {
                     // Grab the gun muzzle position
-                    CWeaponInfo* pCurrentWeaponInfo = pPlayerWeapon->GetInfo ();
-                    CVector vecGunMuzzle = *pCurrentWeaponInfo->GetFireOffset ();
+                    eWeaponType eWeapon = pLocalPlayer->GetCurrentWeaponType ( );
+                    float fSkill = pLocalPlayer->GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( eWeapon ) );
+                    CWeaponStat * pWeaponStat = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel ( eWeapon, fSkill ) ;
+
+                    CVector vecGunMuzzle = *pWeaponStat->GetFireOffset ();
                     pLocalPlayer->GetTransformedBonePosition ( BONE_RIGHTWRIST, vecGunMuzzle );
 
                     // Grab the target point

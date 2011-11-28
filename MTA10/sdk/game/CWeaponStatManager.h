@@ -24,7 +24,7 @@ public:
     virtual void                        ResetLists                      ( void ) = 0;
     virtual bool                        LoadDefault                     ( CWeaponStat* pDest, eWeaponType weaponType, eWeaponSkill skill = WEAPONSKILL_STD  ) = 0;
     virtual void                        CreateWeaponStat                ( CWeaponInfo* pInterface, eWeaponType weaponType, eWeaponSkill weaponSkill ) = 0;
-
+    virtual eWeaponSkill                GetWeaponSkillFromSkillLevel    ( eWeaponType type, float fSkillLevel ) = 0;
 };
 
 #endif
