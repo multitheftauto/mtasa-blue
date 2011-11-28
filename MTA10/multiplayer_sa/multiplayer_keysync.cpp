@@ -286,7 +286,7 @@ void SwitchContext ( CPed* thePed )
                     eWeaponType currentWeapon = pWeapon->GetType();
                     CControllerState * cs = data->CurrentControllerState();
                     CWeaponStat * pWeaponStat = NULL;
-                    if ( currentWeapon >= WEAPONTYPE_PISTOL && currentWeapon <= WEAPONTYPE_M4 )
+                    if ( currentWeapon >= WEAPONTYPE_PISTOL && currentWeapon <= WEAPONTYPE_TEC9 )
                     {
                         float fValue = data->m_stats.StatTypesFloat [ pGameInterface->GetStats ()->GetSkillStatIndex ( currentWeapon ) ];
                         pWeaponStat = pGameInterface->GetWeaponStatManager ( )->GetWeaponStatsFromSkillLevel ( currentWeapon, fValue );
