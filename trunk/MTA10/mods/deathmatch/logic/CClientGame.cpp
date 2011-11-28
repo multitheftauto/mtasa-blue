@@ -2758,7 +2758,9 @@ void CClientGame::DrawPlayerDetails ( CClientPlayer* pPlayer )
         ucWeapon = static_cast < unsigned char > ( pWeapon->GetType () );
         ucWeaponState = static_cast < unsigned char > ( pWeapon->GetState () );
         usWeaponAmmo = static_cast < unsigned short > ( pWeapon->GetAmmoInClip () );
-        fWeaponRange = pWeapon->GetInfo ()->GetWeaponRange ();
+        float fSkill = pPlayer->GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( pWeapon->GetType () ) );
+        CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager ( )->GetWeaponStatsFromSkillLevel ( pWeapon->GetType (), fSkill );
+        fWeaponRange = pWeaponInfo->GetWeaponRange ();
     }
 
     float fAimX, fAimY;

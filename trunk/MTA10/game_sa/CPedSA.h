@@ -347,7 +347,7 @@ public:
     float               GetArmor        ( void );
     void                SetArmor        ( float fArmor );
 
-    CWeapon *           GiveWeapon      ( eWeaponType weaponType, unsigned int uiAmmo );
+    CWeapon *           GiveWeapon      ( eWeaponType weaponType, unsigned int uiAmmo, eWeaponSkill skill );
     CWeapon *           GetWeapon       ( eWeaponSlot weaponSlot );
     CWeapon *           GetWeapon       ( eWeaponType weaponType );
     void                ClearWeapons    ( void );

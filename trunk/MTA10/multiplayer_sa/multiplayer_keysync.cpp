@@ -285,10 +285,17 @@ void SwitchContext ( CPed* thePed )
                     CWeapon* pWeapon = thePed->GetWeapon(thePed->GetCurrentWeaponSlot());
                     eWeaponType currentWeapon = pWeapon->GetType();
                     CControllerState * cs = data->CurrentControllerState();
-                    CWeaponInfo * pWeaponInfo = pWeapon->GetInfo ( );
-                    
+                    CWeaponStat * pWeaponStat = NULL;
+                    if ( currentWeapon >= WEAPONTYPE_PISTOL && currentWeapon <= WEAPONTYPE_M4 )
+                    {
+                        float fValue = data->m_stats.StatTypesFloat [ pGameInterface->GetStats ()->GetSkillStatIndex ( currentWeapon ) ];
+                        pWeaponStat = pGameInterface->GetWeaponStatManager ( )->GetWeaponStatsFromSkillLevel ( currentWeapon, fValue );
+                    }
+                    else
+                        pWeaponStat = pGameInterface->GetWeaponStatManager ( )->GetWeaponStats ( currentWeapon );
+
                     if ( cs->RightShoulder1 != 0 
-                        && ( pWeaponInfo && pWeaponInfo->IsFlagSet ( WEAPONTYPE_FIRSTPERSON ) ) )
+                        && ( pWeaponStat && pWeaponStat->IsFlagSet ( WEAPONTYPE_FIRSTPERSON ) ) )
                     {
                         b1stPersonWeaponModeHackInPlace = true;
                         
@@ -320,8 +327,7 @@ void SwitchContext ( CPed* thePed )
                     if ( pWeapon )
                     {
                         eWeaponType weaponType = pWeapon->GetType ();
-                        CWeaponInfo * pWeaponInfo = pWeapon->GetInfo ( );
-                        if ( pWeaponInfo->IsFlagSet ( WEAPONTYPE_FIRSTPERSON ) )
+                        if ( pWeaponStat->IsFlagSet ( WEAPONTYPE_FIRSTPERSON ) )
                         {
                             bDisableMouseLook = false;
                         }

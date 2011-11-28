@@ -365,11 +365,11 @@ void CPedSA::ClearWeapon ( eWeaponType weaponType )
     }
 }
 
-CWeapon * CPedSA::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
+CWeapon * CPedSA::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo, eWeaponSkill skill )
 {
     if ( weaponType != WEAPONTYPE_UNARMED )
     {
-        CWeaponInfo* pInfo = pGame->GetWeaponInfo ( weaponType );
+        CWeaponInfo* pInfo = pGame->GetWeaponInfo ( weaponType, skill );
         if ( pInfo )
         {
             int iModel = pInfo->GetModel();
@@ -396,7 +396,7 @@ CWeapon * CPedSA::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
                     }
                 }*/
                 // Load the weapon and give it properly so getPedWeapon shows the weapon is there.
-                GiveWeapon( WEAPONTYPE_DETONATOR, 1 );
+                GiveWeapon( WEAPONTYPE_DETONATOR, 1, WEAPONSKILL_STD );
             }
         }
     }
@@ -414,13 +414,7 @@ CWeapon * CPedSA::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
         mov     dwReturn, eax
     }
 
-    // ryden: Hack to increase the sniper range
     CWeapon* pWeapon = GetWeapon ( (eWeaponSlot)dwReturn );
-    if ( weaponType == WEAPONTYPE_SNIPERRIFLE )
-    {
-        pWeapon->GetInfo ()->SetWeaponRange ( 300.0f );
-        pWeapon->GetInfo ()->SetTargetRange ( 250.0f );
-    }
 
     return pWeapon;
 }
@@ -497,7 +491,7 @@ void CPedSA::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
         if ( weaponSlot != GetCurrentWeaponSlot () )
         {
             CWeapon * pWeapon = GetWeapon ( currentSlot );
-            if ( pWeapon ) RemoveWeaponModel ( pWeapon->GetInfo ()->GetModel () );
+            if ( pWeapon ) RemoveWeaponModel ( pWeapon->GetInfo ( WEAPONSKILL_STD )->GetModel () );
 
             CPedSAInterface * thisPed = (CPedSAInterface *)this->GetInterface();
          

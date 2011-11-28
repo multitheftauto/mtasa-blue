@@ -1814,16 +1814,24 @@ CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
     CWeapon* pWeapon = NULL;
     if ( m_pPlayerPed )
     {   
+        CWeaponInfo* pWeaponInfo = NULL;
         // Grab our current ammo in clip
         pWeapon = GetWeapon ( weaponType );
         unsigned int uiPreviousAmmoTotal = 0, uiPreviousAmmoInClip = 0;
+        eWeaponSkill weaponSkill = WEAPONSKILL_STD;
         if ( pWeapon )
         {
             uiPreviousAmmoTotal = pWeapon->GetAmmoTotal ();
-            uiPreviousAmmoInClip = pWeapon->GetAmmoInClip ();            
+            uiPreviousAmmoInClip = pWeapon->GetAmmoInClip ();
         }
 
-        pWeapon = m_pPlayerPed->GiveWeapon ( weaponType, uiAmmo );
+        if ( weaponType >= WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_M4 )
+        {
+            float fSkill = GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( weaponType ) );
+            weaponSkill = g_pGame->GetWeaponStatManager ( )->GetWeaponSkillFromSkillLevel ( weaponType, fSkill );            
+        }
+
+        pWeapon = m_pPlayerPed->GiveWeapon ( weaponType, uiAmmo, weaponSkill );
         
         // Restore clip ammo?
         if ( uiPreviousAmmoInClip )
@@ -1833,7 +1841,17 @@ CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
         }            
     }
 
-    CWeaponInfo* pInfo = g_pGame->GetWeaponInfo ( weaponType );
+    CWeaponInfo* pInfo = NULL;
+    if ( weaponType >= eWeaponType::WEAPONTYPE_PISTOL && weaponType <= eWeaponType::WEAPONTYPE_M4  )
+    {
+        float fStat = GetStat ( g_pGame->GetStats ( )->GetSkillStatIndex ( weaponType ) );
+        eWeaponSkill weaponSkill = g_pGame->GetWeaponStatManager ( )->GetWeaponSkillFromSkillLevel ( weaponType, fStat );
+        pInfo = g_pGame->GetWeaponInfo ( weaponType, weaponSkill );
+    }
+    else
+    {
+        pInfo = g_pGame->GetWeaponInfo ( weaponType );
+    }
     if ( pInfo )
     {
         m_CurrentWeaponSlot = pInfo->GetSlot ();
@@ -2516,8 +2534,11 @@ void CClientPed::StreamedInPulse ( void )
                 eWeaponSlot slot = pWeapon->GetSlot ();
                 if ( slot != WEAPONSLOT_TYPE_UNARMED && slot != WEAPONSLOT_TYPE_MELEE )
                 {
+                    eWeaponType eWeapon = pWeapon->GetType ( );
                     // No Ammo left?
-                    if ( ( pWeapon->GetAmmoInClip ( ) == 0 && pWeapon->GetInfo ( )->GetMaximumClipAmmo ( ) > 0 ) || pWeapon->GetAmmoTotal () == 0 )
+                    float fSkill = GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( eWeapon ) );
+                    CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager ( )->GetWeaponStatsFromSkillLevel ( eWeapon, fSkill );
+                    if ( ( pWeapon->GetAmmoInClip ( ) == 0 && pWeaponStat->GetMaximumClipAmmo ( ) > 0 ) || pWeapon->GetAmmoTotal () == 0 )
                     {
                         // Make sure our fire key isn't pressed
                         Current.ButtonCircle = 0;
@@ -4126,7 +4147,8 @@ bool CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
     float fRotation = GetCurrentRotation ();
 
     // Grab the target range of the current weapon
-    CWeaponInfo* pCurrentWeaponInfo = pWeapon->GetInfo ();
+    float fSkill = GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( pWeapon->GetType () ) );
+    CWeaponStat* pCurrentWeaponInfo = g_pGame->GetWeaponStatManager ( )->GetWeaponStatsFromSkillLevel ( pWeapon->GetType (), fSkill );
     float fRange = pCurrentWeaponInfo->GetWeaponRange ();
 
     // Grab the gun muzzle position

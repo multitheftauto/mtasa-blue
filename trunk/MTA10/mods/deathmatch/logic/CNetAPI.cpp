@@ -547,7 +547,9 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
             if ( pWeapon )
             {
                 ucCurrentWeaponType = pWeapon->GetType ();
-                fWeaponRange = pWeapon->GetInfo ()->GetWeaponRange ();
+                float fSkill = pPlayer->GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( pWeapon->GetType () ) );
+                CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager ( )->GetWeaponStatsFromSkillLevel ( pWeapon->GetType (), fSkill );
+                fWeaponRange = pWeaponInfo->GetWeaponRange ();
             }
 
             // Read out the weapon ammo
@@ -704,13 +706,18 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
 
             if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
             {
+                eWeaponType eWeapon = pPlayerWeapon->GetType ( );
                  // Write the clip ammo
-                SWeaponAmmoSync ammo ( pPlayerWeapon->GetType (), false, true );
+                SWeaponAmmoSync ammo ( eWeapon, false, true );
                 ammo.data.usAmmoInClip = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoInClip () );
                 BitStream.Write ( &ammo );
 
                 // Write the aim data
-                SWeaponAimSync aim ( pPlayerWeapon->GetInfo ()->GetWeaponRange () );
+                float fSkill = pPlayerModel->GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( eWeapon ) );
+                CWeaponStat* pCurrentWeaponInfo = g_pGame->GetWeaponStatManager ( )->GetWeaponStatsFromSkillLevel ( eWeapon, fSkill );
+                float fRange = pCurrentWeaponInfo->GetWeaponRange ();
+
+                SWeaponAimSync aim ( fRange );
                 if ( pVehicle )
                     pPlayerModel->GetShotData ( &aim.data.vecOrigin, &aim.data.vecTarget, NULL, NULL, &aim.data.fArm );
                 else
@@ -853,7 +860,9 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
             if ( pWeapon )
             {
                 ucCurrentWeapon = pWeapon->GetType ();
-                fWeaponRange = pWeapon->GetInfo ()->GetWeaponRange ();
+                float fSkill = pPlayer->GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( pWeapon->GetType () ) );
+                CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager ( )->GetWeaponStatsFromSkillLevel ( pWeapon->GetType (), fSkill );
+                fWeaponRange = pWeaponInfo->GetWeaponRange ();
             }
 
             // Read out the weapon ammo
@@ -1327,7 +1336,9 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
             if ( pWeapon )
             {
                 ucCurrentWeapon = pWeapon->GetType ();
-                fWeaponRange = pWeapon->GetInfo ()->GetWeaponRange ();
+                float fSkill = pPlayer->GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( pWeapon->GetType () ) );
+                CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager ( )->GetWeaponStatsFromSkillLevel ( pWeapon->GetType (), fSkill );
+                fWeaponRange = pWeaponInfo->GetWeaponRange ();
             }
 
             // Read out the weapon ammo

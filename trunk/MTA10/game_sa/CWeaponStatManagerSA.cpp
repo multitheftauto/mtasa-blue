@@ -1789,3 +1789,22 @@ bool CWeaponStatManagerSA::LoadDefaultInternal ( CWeaponStatSA* pDest, eWeaponTy
     }
     return true;
 }
+
+eWeaponSkill CWeaponStatManagerSA::GetWeaponSkillFromSkillLevel ( eWeaponType type, float fSkillLevel )
+{
+    CWeaponStat * pPoor = GetWeaponStats ( type, WEAPONSKILL_POOR );
+    CWeaponStat * pStd = GetWeaponStats ( type, WEAPONSKILL_STD );
+    CWeaponStat * pPro = GetWeaponStats ( type, WEAPONSKILL_PRO );
+    if ( pStd )
+    {
+        if ( pPoor && pPro )
+        {
+            if ( fSkillLevel >= pPro->GetRequiredStatLevel () ) return WEAPONSKILL_PRO;
+            else if ( fSkillLevel >= pStd->GetRequiredStatLevel () ) return WEAPONSKILL_STD;
+            else return WEAPONSKILL_POOR;
+        }
+        else
+            return WEAPONSKILL_STD;
+    }
+    return WEAPONSKILL_STD;
+}
