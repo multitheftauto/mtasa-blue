@@ -566,8 +566,8 @@ void CWeaponStatManagerSA::Init ( void )
     OriginalNormalWeaponData[33].default_combo = 4;
     OriginalNormalWeaponData[33].combos_available = 1;
     // 34 - Sniper
-    OriginalNormalWeaponData[34].weapon_range = 100.0f;
-    OriginalNormalWeaponData[34].target_range = 50.0f;
+    OriginalNormalWeaponData[34].weapon_range = 300.0f;
+    OriginalNormalWeaponData[34].target_range = 250.0f;
     OriginalNormalWeaponData[34].accuracy = 1.0f;
     OriginalNormalWeaponData[34].damage = 125;
     OriginalNormalWeaponData[34].life_span = 0.0f;
