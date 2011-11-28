@@ -1825,7 +1825,7 @@ CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
             uiPreviousAmmoInClip = pWeapon->GetAmmoInClip ();
         }
 
-        if ( weaponType >= WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_M4 )
+        if ( weaponType >= WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_TEC9 )
         {
             float fSkill = GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( weaponType ) );
             weaponSkill = g_pGame->GetWeaponStatManager ( )->GetWeaponSkillFromSkillLevel ( weaponType, fSkill );            
@@ -1842,7 +1842,7 @@ CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
     }
 
     CWeaponInfo* pInfo = NULL;
-    if ( weaponType >= eWeaponType::WEAPONTYPE_PISTOL && weaponType <= eWeaponType::WEAPONTYPE_M4  )
+    if ( weaponType >= eWeaponType::WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_TEC9  )
     {
         float fStat = GetStat ( g_pGame->GetStats ( )->GetSkillStatIndex ( weaponType ) );
         eWeaponSkill weaponSkill = g_pGame->GetWeaponStatManager ( )->GetWeaponSkillFromSkillLevel ( weaponType, fStat );

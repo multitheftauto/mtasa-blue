@@ -2198,7 +2198,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
             pWeaponInfo->SetAnimBreakoutTime            ( weaponProperty.data.anim_breakout_time );
         }
     }
-    for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_M4;i++)
+    for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_TEC9;i++)
     {
         bool bReadWeaponInfo = true;
         sWeaponPropertySync weaponProperty;
