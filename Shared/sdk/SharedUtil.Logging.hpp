@@ -33,6 +33,7 @@ namespace SharedUtil
         SetDebugTagHidden ( "Sync" );
         SetDebugTagHidden ( "DEBUG EVENT" );
         SetDebugTagHidden ( "ReportLog" );
+        SetDebugTagHidden ( "InstanceCount" );
 
         #ifdef Has_InitDebugTagsLocal
             InitDebugTagsLocal ();
@@ -89,6 +90,37 @@ void SharedUtil::OutputDebugLine ( const char* szMessage )
 #else
     // Other platforms here
 #endif
+}
+
+
+namespace SharedUtil
+{
+    struct SDebugCountInfo
+    {
+        SDebugCountInfo ( void ) : iCount ( 0 ), iHigh ( 0 ) {}
+        int iCount;
+        int iHigh;
+    };
+    static std::map < SString, SDebugCountInfo > ms_DebugCountMap;
+
+    void DebugCreateCount ( const SString& strName )
+    {
+        SDebugCountInfo& info = MapGet ( ms_DebugCountMap, strName );
+        info.iCount++;
+        if ( info.iCount > info.iHigh )
+        {
+            info.iHigh = info.iCount;
+            OutputDebugLine ( SString ( "[InstanceCount] New high of %d for %s", info.iCount, *strName ) );
+        }
+    }
+
+    void DebugDestroyCount ( const SString& strName )
+    {
+        SDebugCountInfo& info = MapGet ( ms_DebugCountMap, strName );
+        info.iCount--;
+        if ( info.iCount < 0 )
+            OutputDebugLine ( SString ( "[InstanceCount] Count is negative (%d) for %s", info.iCount, *strName ) );
+    }
 }
 
 #endif  // MTA_DEBUG
