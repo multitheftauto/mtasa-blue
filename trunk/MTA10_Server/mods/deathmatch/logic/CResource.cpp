@@ -465,6 +465,15 @@ void CResource::TidyUp ( void )
         (*iterc)->InvalidateIncludedResourceReference ( this );
     }
 
+    // Overkill, but easiest way to stop crashes:
+    // Go through all other resources and make sure we are not in m_includedResources, m_dependents and m_temporaryIncludes
+    std::list < CResource* > ::const_iterator iter = m_resourceManager->IterBegin ();
+    for ( ; iter != m_resourceManager->IterEnd (); iter++ )
+    {
+        if ( *iter != this )
+            (*iter)->InvalidateIncludedResourceReference ( this );
+    }
+    
     this->UnregisterEHS("call");
     g_pGame->GetHTTPD()->UnregisterEHS ( m_strResourceName.c_str () );
 
