@@ -122,6 +122,7 @@
       <right name="function.aclGroupRemoveObject" access="false"/>
       <right name="function.refreshResources" access="false"/>
       <right name="function.setServerConfigSetting" access="false" />
+      <right name="function.updateResourceACLRequest" access="false" />
    </acl>
    <acl name="Moderator">
       <right name="general.ModifyOtherObjects" access="false"/>
@@ -205,6 +206,7 @@
       <right name="function.aclGroupRemoveObject" access="true"/>
       <right name="function.refreshResources" access="true"/>
       <right name="function.setServerConfigSetting" access="true" />
+      <right name="function.updateResourceACLRequest" access="true" />
    </acl>
    <acl name="RPC">
       <right name="function.callRemote" access="true"/>

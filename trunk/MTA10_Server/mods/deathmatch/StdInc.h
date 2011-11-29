@@ -23,6 +23,10 @@
 #include <google/dense_hash_map>
 #include <google/sparse_hash_map>
 
+// Forward declarations
+class CAclRightName;
+struct SAclRequest;
+
 // SDK includes
 #include "MTAPlatform.h"
 #include <xml/CXML.h>
@@ -149,6 +153,7 @@
 #include "CAccessControlListRight.h"
 #include "CAccount.h"
 #include "CAccountManager.h"
+#include "CAclRightName.h"
 #include "CBan.h"
 #include "CBanManager.h"
 #include "CBandwidthSettings.h"

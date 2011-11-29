@@ -773,6 +773,8 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "checkls", CConsoleCommands::CheckLightSync, false );
     RegisterCommand ( "debugdb", CConsoleCommands::SetDbLogLevel, false );
 
+    RegisterCommand ( "aclrequest", CConsoleCommands::AclRequest, false );
+
     return true;
 }
 

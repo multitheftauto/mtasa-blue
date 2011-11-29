@@ -107,47 +107,7 @@ void CAccessControlList::WriteToXMLNode ( CXMLNode* pNode )
     for ( ; iter != m_Rights.end (); iter++ )
     {
         CAccessControlListRight* pRight = *iter;
-
-        // Find out the right type string
-        char szRightType [255];
-        switch ( pRight->GetRightType () )
-        {
-            case CAccessControlListRight::RIGHT_TYPE_COMMAND:
-                strcpy ( szRightType, "command" );
-                break;
-
-            case CAccessControlListRight::RIGHT_TYPE_FUNCTION:
-                strcpy ( szRightType, "function" );
-                break;
-
-            case CAccessControlListRight::RIGHT_TYPE_GENERAL:
-                strcpy ( szRightType, "general" );
-                break;
-
-            case CAccessControlListRight::RIGHT_TYPE_RESOURCE:
-                strcpy ( szRightType, "resource" );
-                break;
-
-            default:
-                strcpy ( szRightType, "error" );
-                break;
-        }
-
-        // Append a dot append the name of the node
-        strcat ( szRightType, "." );
-        strncat ( szRightType, pRight->GetRightName (), 255 );
-
-        // Create the subnode for this object and write the name attribute we generated
-        CXMLNode* pRightNode = pSubNode->CreateSubNode ( "right" );
-        pAttribute = pRightNode->GetAttributes ().Create ( "name" );
-        pAttribute->SetValue ( szRightType );
-
-        // Create the access attribute
-        pAttribute = pRightNode->GetAttributes ().Create ( "access" );
-        if ( pRight->GetRightAccess () )
-            pAttribute->SetValue ( "true" );
-        else
-            pAttribute->SetValue ( "false" );
+        pRight->WriteToXMLNode ( pSubNode );
     }
 }
 
@@ -155,4 +115,11 @@ void CAccessControlList::WriteToXMLNode ( CXMLNode* pNode )
 void CAccessControlList::OnChange ( void )
 {
     g_pGame->GetACLManager ()->OnChange ();
+}
+
+
+bool CAccessControlList::CanBeModifiedByScript ( void )
+{
+    // If this isn't horrible, I don't know what is
+    return !SStringX ( GetName () ).BeginsWith ( "autoACL_" );
 }

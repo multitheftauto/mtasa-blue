@@ -502,3 +502,9 @@ bool CXMLNodeImpl::StringToLong ( const char* szString, long& lValue )
     }
 }
 
+
+SString CXMLNodeImpl::GetAttributeValue ( const SString& strAttributeName )
+{
+    CXMLAttribute* pAttribute = GetAttributes ().Find ( strAttributeName );
+    return pAttribute ? pAttribute->GetValue () : "";
+}
