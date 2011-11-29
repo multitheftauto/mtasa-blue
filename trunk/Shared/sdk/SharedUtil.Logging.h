@@ -27,6 +27,18 @@ namespace SharedUtil
         #define IsDebugTagHidden(x) IsDebugTagHiddenDummy ()
     #endif
 
+
+    // Instance counter
+    #ifdef MTA_DEBUG
+        void DebugCreateCount ( const SString& strName );
+        void DebugDestroyCount ( const SString& strName );
+        #define DEBUG_CREATE_COUNT(cls) DebugCreateCount(cls)
+        #define DEBUG_DESTROY_COUNT(cls) DebugDestroyCount(cls)
+    #else
+        #define DEBUG_CREATE_COUNT(cls)
+        #define DEBUG_DESTROY_COUNT(cls)
+    #endif
+
 };
 
 using namespace SharedUtil;

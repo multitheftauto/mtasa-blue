@@ -11,7 +11,8 @@
 // Base class for net function arguments
 struct SArgs
 {
-    virtual         ~SArgs     ( void ) {}
+                    SArgs       ( void )    { DEBUG_CREATE_COUNT( "SArgs" ); }
+    virtual         ~SArgs      ( void )    { DEBUG_DESTROY_COUNT( "SArgs" ); }
     int type;
 };
 
@@ -29,9 +30,11 @@ public:
     bool        HasCallback     ( void );
     void        ProcessCallback ( void );
 
+    CNetJobData                 ( void )    { DEBUG_CREATE_COUNT( "CNetJobData" ); }
     ~CNetJobData ( void )
     {
         SAFE_DELETE( pArgs );
+        DEBUG_DESTROY_COUNT( "CNetJobData" );
     }
 
     EJobStageType   stage;

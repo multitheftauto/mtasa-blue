@@ -11,6 +11,9 @@
 class CSimPacket
 {
 public:
+                                        CSimPacket          ( void )                        { DEBUG_CREATE_COUNT( "CSimPacket" ); }
+                                        ~CSimPacket         ( void )                        { DEBUG_DESTROY_COUNT( "CSimPacket" ); }
+
     virtual ePacketID                   GetPacketID         ( void ) const = 0;
     virtual unsigned long               GetFlags            ( void ) const = 0;
 
