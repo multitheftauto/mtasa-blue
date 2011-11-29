@@ -301,6 +301,10 @@ DWORD RETURN_CHandlingData_isNotFWD =               0x6A04C3;
 #define HOOKPOS_PreHUDRender                                      0x053EAD8
 DWORD RETURN_PreHUDRender =                                       0x053EADD;
 
+#define HOOKPOS_LoadingPlayerImgDir                         0x5A69E3
+DWORD RETURN_LoadingPlayerImgDira =                         0x5A69E8;
+DWORD RETURN_LoadingPlayerImgDirb =                         0x5A6A06;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -456,6 +460,7 @@ void HOOK_CTrafficLights_GetSecondaryLightState ();
 void HOOK_CAutomobile__ProcessSwingingDoor ();
 
 void HOOK_ProcessVehicleCollision ();
+void HOOK_LoadingPlayerImgDir ();
 
 void vehicle_lights_init ();
 
@@ -624,6 +629,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9 );
     HookInstall(HOOKPOS_PreHUDRender, (DWORD)HOOK_PreHUDRender, 5 );
     HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7 );
+    HookInstall(HOOKPOS_LoadingPlayerImgDir, (DWORD)HOOK_LoadingPlayerImgDir, 5 );
 
     HookInstall(HOOKPOS_CHandlingData_isNotRWD, (DWORD)HOOK_isVehDriveTypeNotRWD, 7 );
     HookInstall(HOOKPOS_CHandlingData_isNotFWD, (DWORD)HOOK_isVehDriveTypeNotFWD, 7 );
@@ -5948,5 +5954,44 @@ void _declspec(naked) HOOK_PreHUDRender ()
         mov     eax, ds:0B6F0B8h
 
         jmp     RETURN_PreHUDRender  // 0053EADD
+    }
+}
+
+
+//
+// Skip loading the directory data from player.img if it has already been loaded.
+// Speeds up clothes a bit, but is only part of a solution - The actual files from inside player.img are still loaded each time
+//
+bool _cdecl IsPlayerImgDirLoaded ( void )
+{
+    // When player.img dir is loaded, it looks this this:
+    // 0x00BC12C0  00bbcdc8 00000226
+    DWORD* ptr1 = (DWORD*)0x00BC12C0;
+    if ( ptr1[0] == 0x00BBCDC8 && ptr1[1] == 0x0000226 )
+    {
+        return true;
+    }
+    return false;
+}
+
+void _declspec(naked) HOOK_LoadingPlayerImgDir()
+{
+// hook from 005A69E3 5 bytes
+    _asm
+    {
+        pushad
+        call    IsPlayerImgDirLoaded
+        cmp     al, 0
+        jnz     skip
+        popad
+
+        // Standard code to load img directory
+        push    0BBCDC8h 
+        jmp     RETURN_LoadingPlayerImgDira     // 5A69E8
+
+        // Skip loading img directory
+skip:
+        popad
+        jmp     RETURN_LoadingPlayerImgDirb     // 5A6A06
     }
 }
