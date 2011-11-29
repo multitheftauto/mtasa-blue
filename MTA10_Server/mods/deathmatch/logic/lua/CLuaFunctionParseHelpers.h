@@ -20,6 +20,7 @@ DECLARE_ENUM( CEasingCurve::eType );
 DECLARE_ENUM( eWeaponType )
 DECLARE_ENUM( eWeaponProperty )
 DECLARE_ENUM( eWeaponSkill )
+DECLARE_ENUM( CAccessControlListRight::ERightType );
 
 enum eHudComponent
 {
@@ -82,6 +83,8 @@ inline SString GetClassTypeName ( CXMLNode* )       { return "xml-node"; }
 inline SString GetClassTypeName ( CLuaTimer* )      { return "lua-timer"; }
 inline SString GetClassTypeName ( CAccount* )       { return "account"; }
 inline SString GetClassTypeName ( CDbJobData* )     { return "db-query"; }
+inline SString GetClassTypeName ( CAccessControlList* )         { return "acl"; }
+inline SString GetClassTypeName ( CAccessControlListGroup* )    { return "acl-group"; }
 
 
 
@@ -149,6 +152,32 @@ CDbJobData* UserDataCast ( CDbJobData*, void* ptr, lua_State* )
 
 
 //
+// CAccessControlList from userdata
+//
+template < class T >
+CAccessControlList* UserDataCast ( CAccessControlList*, void* ptr, lua_State* )
+{
+    CAccessControlList* pACL = reinterpret_cast < CAccessControlList* > ( ptr );
+    if ( g_pGame->GetACLManager ()->VerifyACL ( pACL ) )
+        return pACL;
+    return NULL;
+}
+
+
+//
+// CAccessControlListGroup from userdata
+//
+template < class T >
+CAccessControlListGroup* UserDataCast ( CAccessControlListGroup*, void* ptr, lua_State* )
+{
+    CAccessControlListGroup* pACLGroup = reinterpret_cast < CAccessControlListGroup* > ( ptr );
+    if ( g_pGame->GetACLManager ()->VerifyGroup ( pACLGroup ) )
+        return pACLGroup;
+    return NULL;
+}
+
+
+//
 // CElement from userdata
 //
 template < class T >
@@ -178,3 +207,4 @@ class CScriptArgReader;
 SString GetUserDataClassName ( void* ptr, lua_State* luaVM );
 void MixedReadResourceString ( CScriptArgReader& argStream, SString& strOutResourceName );
 void MixedReadResourceString ( CScriptArgReader& argStream, CResource*& pOutResource );
+bool StringToBool ( const SString& strText );

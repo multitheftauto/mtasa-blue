@@ -65,6 +65,9 @@ public:
     // Misc
     static int      call                                ( lua_State* luaVM );
     static int      refreshResources                    ( lua_State* luaVM );
+
+    static int      getResourceACLRequests              ( lua_State* luaVM );
+    static int      updateResourceACLRequest            ( lua_State* luaVM );
 };
 
 #endif

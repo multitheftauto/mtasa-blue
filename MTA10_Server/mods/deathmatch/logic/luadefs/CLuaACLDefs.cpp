@@ -273,7 +273,7 @@ int CLuaACLDefs::aclSetRight ( lua_State* luaVM )
         bool bAccess = lua_toboolean ( luaVM, 3 ) ?true:false;
 
         // Verify the ACL pointer
-        if ( pACL )
+        if ( pACL && pACL->CanBeModifiedByScript () )
         {
             // Grab the type from the name passed
             char* szRightAftedDot = szRight;

@@ -38,6 +38,7 @@ public:
     inline list < CAccessControlListRight* >  ::const_iterator  IterBegin   ( void ) { return m_Rights.begin (); };
     inline list < CAccessControlListRight* >  ::const_iterator  IterEnd     ( void ) { return m_Rights.end (); };
 
+    bool                                        CanBeModifiedByScript       ( void );
 private:
     void                                        OnChange                    ( void );
 
