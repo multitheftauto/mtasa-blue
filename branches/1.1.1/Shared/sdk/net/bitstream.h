@@ -25,8 +25,8 @@ class NetBitStreamInterface : public CRefCountable
     NetBitStreamInterface      ( const NetBitStreamInterface& );
     const NetBitStreamInterface& operator= ( const NetBitStreamInterface& );
 protected:
-                        NetBitStreamInterface       ( void ) {}
-    virtual             ~NetBitStreamInterface      ( void ) {}
+                        NetBitStreamInterface       ( void ) { DEBUG_CREATE_COUNT( "NetBitStreamInterface" ); }
+    virtual             ~NetBitStreamInterface      ( void ) { DEBUG_DESTROY_COUNT( "NetBitStreamInterface" ); }
 public:
     virtual int         GetReadOffsetAsBits         ( void ) = 0;
 

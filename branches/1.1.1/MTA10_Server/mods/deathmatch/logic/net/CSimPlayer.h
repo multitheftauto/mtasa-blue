@@ -14,6 +14,8 @@ class CSimPlayer
 {
 public:
     ZERO_ON_NEW
+                                            CSimPlayer                  ( void )                        { DEBUG_CREATE_COUNT( "CSimPlayer" ); }
+                                            ~CSimPlayer                 ( void )                        { DEBUG_DESTROY_COUNT( "CSimPlayer" ); }
 
     bool                                    IsJoined                    ( void )                        { return m_iStatus == STATUS_JOINED; };
     bool                                    HasOccupiedVehicle          ( void )                        { return m_bHasOccupiedVehicle; };

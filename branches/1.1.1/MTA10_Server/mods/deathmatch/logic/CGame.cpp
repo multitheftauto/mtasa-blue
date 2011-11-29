@@ -583,6 +583,10 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         }
     }
 
+    // Load the ACL's
+    if ( !m_pACLManager->Load () )
+        return false;
+
     m_pRemoteCalls = new CRemoteCalls();
     m_pRegistry = m_pRegistryManager->OpenRegistry ( "" );
 
@@ -667,10 +671,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
             CLogger::ErrorPrintf ( "%s", "Generating a new 'vehiclecolors.conf' failed\n " );
         }
     }
-
-    // Load the ACL's
-    if ( !m_pACLManager->Load () )
-        return false;
 
     // Load the registry
     strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "registry.db" );

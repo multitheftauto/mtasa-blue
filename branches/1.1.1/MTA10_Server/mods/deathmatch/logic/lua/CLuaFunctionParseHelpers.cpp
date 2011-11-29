@@ -79,6 +79,14 @@ IMPLEMENT_ENUM_BEGIN( eHudComponent )
 IMPLEMENT_ENUM_END( "hud-component" )
 
 
+IMPLEMENT_ENUM_BEGIN( CAccessControlListRight::ERightType )
+    ADD_ENUM ( CAccessControlListRight::RIGHT_TYPE_COMMAND,      "command" )
+    ADD_ENUM ( CAccessControlListRight::RIGHT_TYPE_FUNCTION,     "function" )
+    ADD_ENUM ( CAccessControlListRight::RIGHT_TYPE_RESOURCE,     "resource" )
+    ADD_ENUM ( CAccessControlListRight::RIGHT_TYPE_GENERAL,      "general" )
+IMPLEMENT_ENUM_END( "right-type" )
+
+
 //
 // Get best guess at name of userdata type
 //
@@ -146,4 +154,17 @@ void MixedReadResourceString ( CScriptArgReader& argStream, CResource*& pOutReso
         if ( !pOutResource )
             argStream.SetTypeError ( "resource", argStream.m_iIndex - 1 );
     }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// StringToBool
+//
+// Convert a string into a best guess bool equivalent
+//
+///////////////////////////////////////////////////////////////
+bool StringToBool ( const SString& strText )
+{
+    return ( strText == "true" || strText == "1" || strText == "yes" );
 }

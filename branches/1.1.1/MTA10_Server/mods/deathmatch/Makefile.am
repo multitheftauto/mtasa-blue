@@ -134,6 +134,7 @@ LOGIC = \
 ./logic/CRegistryManager.cpp \
 ./logic/CRemoteCalls.cpp \
 ./logic/CResource.cpp \
+./logic/CResource.AclRequest.cpp \
 ./logic/CResourceChecker.cpp \
 ./logic/CResourceClientConfigItem.cpp \
 ./logic/CResourceClientFileItem.cpp \

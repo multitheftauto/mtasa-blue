@@ -387,7 +387,23 @@ public:
     inline list < CExportedFunction* >::iterator    IterEndExportedFunctions     ( void )        { return m_exportedFunctions.end(); }
 
     static list < CResource* > m_StartedResources;
-};
 
+    void                GetAclRequests                  ( std::vector < SAclRequest >& outResultList );
+    bool                HandleAclRequestListCommand     ( bool bDetail );
+    bool                HandleAclRequestChangeCommand   ( const SString& strRightName, bool bAccess, const SString& strWho );
+    bool                HandleAclRequestChange          ( const CAclRightName& strRightName, bool bAccess, const SString& strWho );
+
+protected:
+    SString             GetAutoGroupName                ( void );
+    SString             GetAutoAclName                  ( void );
+    CAccessControlList* GetAutoAcl                      ( void );
+    CAccessControlList* FindAutoAcl                     ( void );
+
+    void                RemoveAutoPermissions           ( void );
+    bool                RefreshAutoPermissions          ( CXMLNode* pNodeAclRequest );
+
+    void                CommitAclRequest                ( const SAclRequest& request );
+    bool                FindAclRequest                  ( SAclRequest& request );
+};
 
 #endif

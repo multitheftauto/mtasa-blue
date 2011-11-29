@@ -139,6 +139,13 @@ bool CAccessControlListManager::Load ( void )
                                 pRight = pACL->AddRight ( &szRightName[8], CAccessControlListRight::RIGHT_TYPE_GENERAL, bAccess );
                             }
                             else continue;
+
+                            // Set all the extra attributes
+                            for ( uint i = 0 ; i < pSubSubNode->GetAttributes ().Count () ; i++ )
+                            {
+                                CXMLAttribute* pAttribute = pSubSubNode->GetAttributes ().Get ( i );
+                                pRight->SetAttributeValue ( pAttribute->GetName (), pAttribute->GetValue () );
+                            }
                         }
                     }
                 }

@@ -222,6 +222,13 @@ bool CResource::Load ( void )
                         m_strMinServerReqFromConfig = m_strMinClientReqFromConfig = pAttr->GetValue ();
                 }
 
+                // Find the acl requets
+                CXMLNode * pNodeAclRequest = root->FindSubNode ( "aclrequest", 0 );
+                if ( pNodeAclRequest )
+                    RefreshAutoPermissions ( pNodeAclRequest );
+                else
+                    RemoveAutoPermissions ();
+
                 // disabled for now
                 /*
                 CXMLNode * update = root->FindSubNode ( "update", 0 );

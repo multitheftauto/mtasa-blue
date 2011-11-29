@@ -32,12 +32,17 @@ public:
                                                 CAccessControlListRight     ( const char* szRightName, ERightType eRightType, bool bAccess, class CAccessControlListManager* pACLManager );
     virtual                                     ~CAccessControlListRight    ( void )            { OnChange (); }
 
+    void                                        WriteToXMLNode              ( CXMLNode* pNode );
+
     inline const char*                          GetRightName                ( void )            { return m_szRightName; };
     inline unsigned int                         GetRightNameHash            ( void )            { return m_uiNameHash; };
     inline ERightType                           GetRightType                ( void )            { return m_eRightType; };
 
     inline bool                                 GetRightAccess              ( void )            { return m_bAccess; };
     inline void                                 SetRightAccess              ( bool bAccess)     { m_bAccess = bAccess; OnChange (); };
+
+    void                                        SetAttributeValue           ( const SString& strAttributeName, const SString& strAttributeValue );
+    SString                                     GetAttributeValue           ( const SString& strAttributeName );
 
 private:
     void                                        OnChange                    ( void );
@@ -47,7 +52,7 @@ private:
     ERightType                                  m_eRightType;
     bool                                        m_bAccess;
     class CAccessControlListManager*            m_pACLManager;
-
+    std::map < SString, SString >               m_ExtraAttributeMap;
 };
 
 #endif

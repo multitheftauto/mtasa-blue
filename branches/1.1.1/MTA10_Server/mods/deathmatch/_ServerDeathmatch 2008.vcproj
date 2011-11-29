@@ -765,6 +765,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CResource.AclRequest.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CResource.cpp"
 					>
 				</File>
@@ -1595,6 +1599,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CAccountManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CAclRightName.h"
 					>
 				</File>
 				<File

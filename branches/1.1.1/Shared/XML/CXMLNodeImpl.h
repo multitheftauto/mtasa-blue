@@ -76,6 +76,8 @@ public:
 
     bool                    IsValid             ( void ) { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
 
+    virtual SString         GetAttributeValue   ( const SString& strAttributeName );
+
 private:
     bool                    StringToLong        ( const char* szString, long& lValue );
 

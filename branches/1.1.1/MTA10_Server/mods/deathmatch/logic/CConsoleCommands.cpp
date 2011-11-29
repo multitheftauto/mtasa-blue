@@ -1983,21 +1983,89 @@ bool CConsoleCommands::CheckLightSync ( CConsole* pConsole, const char* szArgume
 
 bool CConsoleCommands::SetDbLogLevel ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    if ( pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
     {
-        if ( SStringX ( szArguments ).empty () )
+        if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetNick(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "debugdb", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
         {
-            pEchoClient->SendConsole ( "Usage: dblog [0-2]" );
+            pEchoClient->SendConsole ( "debugdb: You do not have sufficient rights to use this command." );
+            return false;
+        }
+    }
+
+    if ( SStringX ( szArguments ).empty () )
+    {
+        pEchoClient->SendConsole ( "Usage: debugdb [0-2]" );
+    }
+    else
+    {
+        EJobLogLevelType logLevel = static_cast < EJobLogLevelType > ( atoi ( szArguments ) );
+        logLevel = Clamp ( EJobLogLevel::NONE, logLevel, EJobLogLevel::ALL );
+        g_pGame->GetDatabaseManager ()->SetLogLevel ( logLevel, g_pGame->GetConfig ()->GetDbLogFilename () );
+        const char* logLevelNames[] = { "Off", "Errors only", "All queries" };
+        pEchoClient->SendConsole ( SString ( "Database logging level is now %d (%s)", logLevel, logLevelNames[logLevel] ) );
+    }
+    return true;
+}
+
+
+bool CConsoleCommands::AclRequest ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    {
+        if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetNick(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "aclrequest", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
+        {
+            pEchoClient->SendConsole ( "aclrequest: You do not have sufficient rights to use this command." );
+            return false;
+        }
+    }
+
+    std::vector < SString > parts;
+    SStringX ( szArguments ).Split ( " ", parts );
+    const SString& strAction       = parts.size () > 0 ? parts[0] : "";
+    const SString& strResourceName = parts.size () > 1 ? parts[1] : "";
+    const SString& strRightName    = parts.size () > 2 ? parts[2] : "";
+
+    bool bList  = strAction == "list";
+    bool bAllow = strAction == "allow";
+    bool bDeny  = strAction == "deny";
+
+    if ( bList && strResourceName.empty () )
+    {
+        bool bAnyOutput = false;
+        std::list < CResource* > ::const_iterator iter = g_pGame->GetResourceManager()->IterBegin ();
+        for ( ; iter != g_pGame->GetResourceManager()->IterEnd (); iter++ )
+        {
+            bAnyOutput |= (*iter)->HandleAclRequestListCommand ( false );
+        }
+
+        if ( !bAnyOutput )
+            pEchoClient->SendConsole ( "aclrequest: No loaded resources have any requests" );  
+        return true;
+    }
+    else
+    if ( bList | bAllow | bDeny )
+    {
+        CResource* pResource = g_pGame->GetResourceManager()->GetResource ( strResourceName );
+        if ( !pResource )
+        {
+            pEchoClient->SendConsole ( SString ( "Unknown resource '%s'", *strResourceName ) );
+            return false;
+        }
+
+        if ( bList )
+        {
+            if ( !pResource->HandleAclRequestListCommand ( true ) )
+                pEchoClient->SendConsole ( "aclrequest: No requests" );
+            return true;
         }
         else
         {
-            EJobLogLevelType logLevel = static_cast < EJobLogLevelType > ( atoi ( szArguments ) );
-            logLevel = Clamp ( EJobLogLevel::NONE, logLevel, EJobLogLevel::ALL );
-            g_pGame->GetDatabaseManager ()->SetLogLevel ( logLevel, g_pGame->GetConfig ()->GetDbLogFilename () );
-            const char* logLevelNames[] = { "Off", "Errors only", "All queries" };
-            pEchoClient->SendConsole ( SString ( "Database logging level is now %d (%s)", logLevel, logLevelNames[logLevel] ) );
+            if ( !pResource->HandleAclRequestChangeCommand ( strRightName, bAllow, GetAdminNameForLog ( pClient ) ) )
+                pEchoClient->SendConsole ( "aclrequest: No change required" );
+            return true;
         }
-        return true;
     }
+
+    pEchoClient->SendConsole ( "Usage: aclrequest [list|allow|deny] <resource> [<right>|all]" );
     return false;
 }

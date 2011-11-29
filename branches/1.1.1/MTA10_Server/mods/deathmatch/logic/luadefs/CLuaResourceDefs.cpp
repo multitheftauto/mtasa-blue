@@ -59,6 +59,9 @@ void CLuaResourceDefs::LoadFunctions ( void )
     // Misc
     CLuaCFunctions::AddFunction ( "call", CLuaResourceDefs::call );
     CLuaCFunctions::AddFunction ( "refreshResources", CLuaResourceDefs::refreshResources );
+
+    CLuaCFunctions::AddFunction ( "getResourceACLRequests", CLuaResourceDefs::getResourceACLRequests );
+    CLuaCFunctions::AddFunction ( "updateResourceACLRequest", CLuaResourceDefs::updateResourceACLRequest, true );
 }
 
 
@@ -1172,5 +1175,91 @@ int CLuaResourceDefs::refreshResources ( lua_State* luaVM )
     m_pResourceManager->Refresh ( bRefreshAll );
 
     lua_pushboolean ( luaVM, true );
+    return 1;
+}
+
+
+int CLuaResourceDefs::getResourceACLRequests  ( lua_State* luaVM )
+{
+//  table getResourceACLRequests ( resource theResource )
+    CResource* pResource;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pResource );
+
+    if ( !argStream.HasErrors () )
+    {
+        std::vector < SAclRequest > Result;
+        pResource->GetAclRequests ( Result );
+
+        // Make table!
+        lua_newtable ( luaVM );
+        for ( uint i = 0; i < Result.size (); i++ )
+        {
+            lua_newtable ( luaVM );                             // new table
+            lua_pushnumber ( luaVM, i+1 );                      // row index number (starting at 1, not 0)
+            lua_pushvalue ( luaVM, -2 );                        // value
+            lua_settable ( luaVM, -4 );                         // refer to the top level table
+
+            const SAclRequest& request = Result[i];
+            lua_pushstring ( luaVM, "name" );
+            lua_pushstring ( luaVM, request.rightName.GetFullName () );
+            lua_settable ( luaVM, -3 );
+
+            lua_pushstring ( luaVM, "access" );
+            lua_pushboolean ( luaVM, request.bAccess );
+            lua_settable ( luaVM, -3 );
+
+            lua_pushstring ( luaVM, "pending" );
+            lua_pushboolean ( luaVM, request.bPending );
+            lua_settable ( luaVM, -3 );
+
+            lua_pushstring ( luaVM, "who" );
+            lua_pushstring ( luaVM, request.strWho );
+            lua_settable ( luaVM, -3 );
+
+            lua_pushstring ( luaVM, "date" );
+            lua_pushstring ( luaVM, request.strDate );
+            lua_settable ( luaVM, -3 );
+
+            lua_pop ( luaVM, 1 );                               // pop the inner table
+        }
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getResourceACLRequests", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaResourceDefs::updateResourceACLRequest ( lua_State* luaVM )
+{
+//  bool updateResourceACLRequest ( resource theResource, string rightName, bool access, string byWho )
+    CResource* pResource; SString strRightName; bool bAccess; SString strUserName;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pResource );
+    argStream.ReadString ( strRightName );
+    argStream.ReadBool ( bAccess );
+    argStream.ReadString ( strUserName, "" );
+
+    if ( !argStream.HasErrors () )
+    {
+        CResource* pThisResource = m_pResourceManager->GetResourceFromLuaState ( luaVM );
+        if ( strUserName.empty () && pThisResource )
+            strUserName = pThisResource->GetName ();
+
+        if ( pResource->HandleAclRequestChange ( CAclRightName ( strRightName ), bAccess, strUserName ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "updateResourceACLRequest", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
     return 1;
 }

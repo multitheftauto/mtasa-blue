@@ -232,6 +232,8 @@ bool CSimPlayerManager::HandlePlayerPureSync ( NetServerPlayerID& Socket, NetBit
             // Relay it to nearbyers
             Broadcast ( *pPacket, pSourceSimPlayer->GetSendList () );
         }
+
+        delete pPacket;
     }
 
     UnlockSimSystem ();
@@ -271,6 +273,8 @@ bool CSimPlayerManager::HandleVehiclePureSync ( NetServerPlayerID& Socket, NetBi
             // Relay it to nearbyers
             Broadcast ( *pPacket, pSourceSimPlayer->GetSendList () );
         }
+
+        delete pPacket;
     }
 
     UnlockSimSystem ();
