@@ -626,14 +626,14 @@ int CLuaFunctionDefs::dxSetShaderValue ( lua_State* luaVM )
             // float(s)
             float fBuffer[16];
             uint i;
-            for ( i = 0 ; i < NUMELMS(fBuffer); i++ )
+            for ( i = 0 ; i < NUMELMS(fBuffer); )
             {
-                fBuffer[i] = static_cast < float > ( lua_tonumber ( argStream.m_luaVM, argStream.m_iIndex++ ) );
+                fBuffer[i++] = static_cast < float > ( lua_tonumber ( argStream.m_luaVM, argStream.m_iIndex++ ) );
                 iArgument = lua_type ( argStream.m_luaVM, argStream.m_iIndex );
                 if ( iArgument != LUA_TNUMBER && iArgument != LUA_TSTRING )
                     break;
             }
-            bool bResult = pShader->GetShaderItem ()->SetValue ( strName, fBuffer, i + 1 );
+            bool bResult = pShader->GetShaderItem ()->SetValue ( strName, fBuffer, i );
             lua_pushboolean ( luaVM, bResult );
             return 1;
         }
@@ -642,10 +642,17 @@ int CLuaFunctionDefs::dxSetShaderValue ( lua_State* luaVM )
         {
             // table (of floats)
             float fBuffer[16];
-            for ( uint i = 0 ; i < NUMELMS(fBuffer); i++ )
+            uint i = 0;
+
+            lua_pushnil ( luaVM );      // Loop through our table, beginning at the first key
+            while ( lua_next ( luaVM, argStream.m_iIndex ) != 0 && i < NUMELMS(fBuffer) )
             {
-                // TODO
+                fBuffer[i++] = static_cast < float > ( lua_tonumber ( luaVM, -1 ) );    // Ignore the index at -2, and just read the value
+                lua_pop ( luaVM, 1 );                     // Remove the item and keep the key for the next iteration
             }
+            bool bResult = pShader->GetShaderItem ()->SetValue ( strName, fBuffer, i );
+            lua_pushboolean ( luaVM, bResult );
+            return 1;
         }
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetShaderValue", "Expected number, bool, table or texture at argument 3" ) );
     }
