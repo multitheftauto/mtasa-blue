@@ -2125,6 +2125,8 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
         return false;
 
     CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( eWeapon, eSkillLevel );
+    CWeaponStat* pOriginalWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats( eWeapon, eSkillLevel );
+        
     if ( pWeaponInfo )
     {
         switch ( eProperty )
@@ -2148,9 +2150,31 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( eWeaponProperty eProperty, 
         case WEAPON_FLAGS:
             {
                 if ( pWeaponInfo->IsFlagSet ( sData ) )
+                {
+                    if ( sData == 0x800 )
+                    {
+                        // if it can support this anim group
+                        if ( ( eWeapon >= WEAPONTYPE_PISTOL && eWeapon <= WEAPONTYPE_SNIPERRIFLE ) || eWeapon == WEAPONTYPE_MINIGUN )
+                        {
+                            // Revert anim group to default
+                            pWeaponInfo->SetAnimGroup ( pOriginalWeaponInfo->GetAnimGroup ( ) );
+                        }
+                    }
                     pWeaponInfo->ClearFlag ( sData );
+                }
                 else
+                {
+                    if ( sData == 0x800 )
+                    {
+                        // if it can support this anim group
+                        if ( ( eWeapon >= WEAPONTYPE_PISTOL && eWeapon <= WEAPONTYPE_SNIPERRIFLE ) || eWeapon == WEAPONTYPE_MINIGUN )
+                        {
+                            // sawn off shotgun anim group
+                            pWeaponInfo->SetAnimGroup ( 17 );
+                        }
+                    }
                     pWeaponInfo->SetFlag ( sData );
+                }
                 break;
             }
         default:
