@@ -103,222 +103,277 @@ CVehicleManager::CVehicleManager ( void )
             case 416:
             {
                 g_ucVariants[i] = 1;
+                break;
             }
             case 435:
             {
                 g_ucVariants[i] = 5;
+                break;
             }
             case 450:
             {
                 g_ucVariants[i] = 0;
+                break;
             }
             case 607:
             {
                 g_ucVariants[i] = 2;
+                break;
             }
             case 485:
             {
                 g_ucVariants[i] = 2;
+                break;
             }
             case 433:
             {
                 g_ucVariants[i] = 1;
+                break;
             }
             case 499:
             {
                 g_ucVariants[i] = 3;
+                break;
             }
             case 581:
             {
                 g_ucVariants[i] = 4;
+                break;
             }
             case 424:
             {
                 g_ucVariants[i] = 1;
+                break;
             }
             case 504:
             {
                 g_ucVariants[i] = 5;
+                break;
             }
             case 422:
             {
                 g_ucVariants[i] = 1;
+                break;
             }
             case 482:
             {
                 g_ucVariants[i] = 0;
+                break;
             }
             case 457:
             {
                 g_ucVariants[i] = 5;
+                break;
             }
             case 483:
             {
                 g_ucVariants[i] = 1;
+                break;
             }
             case 415:
             {
                 g_ucVariants[i] = 1;
+                break;
             }
             case 437:
             {
                 g_ucVariants[i] = 1;
+                break;
             }
             case 472:
             {
                 g_ucVariants[i] = 2;
+                break;
             }
             case 521:
             {
                 g_ucVariants[i] = 4;
+                break;
             }
             case 407:
             {
                 g_ucVariants[i] = 2;
+                break;
             }
             case 455:
             {
                 g_ucVariants[i] = 2;
+                break;
             }
             case 434:
             {
                 g_ucVariants[i] = 0;
+                break;
             }
             case 502:
             {
                 g_ucVariants[i] = 5;
+                break;
             }
             case 503:
             {
                 g_ucVariants[i] = 5;
+                break;
             }
             case 571:
             {
                 g_ucVariants[i] = 1;
+                break;
             }
             case 595:
             {
                 g_ucVariants[i] = 1;
+                break;
             }
             case 484:
             {
                 g_ucVariants[i] = 0;
+                break;
             }
             case 500:
             {
                 g_ucVariants[i] = 1;
+                break;
             }
             case 556:
             {
                 g_ucVariants[i] = 2;
+                break;
             }
             case 557:
             {
                 g_ucVariants[i] = 1;
+                break;
             }
             case 423:
             {
                 g_ucVariants[i] = 1;
+                break;
             }
             case 414:
             {
                 g_ucVariants[i] = 3;
+                break;
             }
             case 522:
             {
                 g_ucVariants[i] = 4;
+                break;
             }
             case 470:
             {
                 g_ucVariants[i] = 2;
+                break;
             }
             case 404:
             {
                 g_ucVariants[i] = 0;
+                break;
             }
             case 600:
             {
                 g_ucVariants[i] = 1;
+                break;
             }
             case 413:
             {
                 g_ucVariants[i] = 0;
+                break;
             }
             case 453:
             {
                 g_ucVariants[i] = 1;
+                break;
             }
             case 442:
             {
                 g_ucVariants[i] = 2;
+                break;
             }
             case 440:
             {
                 g_ucVariants[i] = 5;
+                break;
             }
             case 543:
             {
                 g_ucVariants[i] = 3;
+                break;
             }
             case 605:
             {
                 g_ucVariants[i] = 3;
+                break;
             }
             case 428:
             {
                 g_ucVariants[i] = 1;
+                break;
             }
             case 535:
             {
                 g_ucVariants[i] = 1;
+                break;
             }
             case 439:
             {
                 g_ucVariants[i] = 2;
+                break;
             }
             case 506:
             {
                 g_ucVariants[i] = 0;
+                break;
             }
             case 601:
             {
                 g_ucVariants[i] = 3;
+                break;
             }
             case 459:
             {
                 g_ucVariants[i] = 0;
+                break;
             }
             case 449:
             {
                 g_ucVariants[i] = 3;
+                break;
             }
             case 408:
             {
                 g_ucVariants[i] = 0;
+                break;
             }
             case 583:
             {
                 g_ucVariants[i] = 1;
+                break;
             }
             case 552:
             {
                 g_ucVariants[i] = 1;
+                break;
             }
             case 478:
             {
                 g_ucVariants[i] = 2;
+                break;
             }
             case 555:
             {
                 g_ucVariants[i] = 0;
+                break;
             }
             case 456:
             {
                 g_ucVariants[i] = 3;
+                break;
             }
             case 477:
             {
                 g_ucVariants[i] = 0;
+                break;
             }
         }
     }
@@ -352,6 +407,7 @@ CVehicle* CVehicleManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CL
 {
     // Create the vehicle
     srand ( GetTickCount32() );
+
     CVehicle* pVehicle = new CVehicle ( this, pParent, &Node, 400, rand() % 5, rand() % 5 );
 
     // Verify the vehicle id and load the data from xml
@@ -439,17 +495,17 @@ unsigned int CVehicleManager::GetMaxPassengers ( unsigned int uiVehicleModel )
     return 0xFF;
 }
 
-void CVehicleManager::GetRandomVariation ( unsigned long ulModel, unsigned char &ucVariant, unsigned char &ucVariant2 )
+void CVehicleManager::GetRandomVariation ( unsigned short usModel, unsigned char &ucVariant, unsigned char &ucVariant2 )
 {
     srand ( GetTickCount32() );
     ucVariant = 255;
     ucVariant2 = 255;
     // Valid model?
-    if ( IsValidModel( ulModel ) && g_ucVariants[ ulModel - 400 ] != 255 )
+    if ( IsValidModel( usModel ) && g_ucVariants[ usModel - 400 ] != 255 )
     {
-        if ( ulModel == 581 || ulModel == 457 || ulModel == 512 || ulModel == 522 )
+        if ( usModel == 581 || usModel == 457 || usModel == 512 || usModel == 522 )
         {
-            unsigned char ucVariants = g_ucVariants [ulModel - 400];
+            unsigned char ucVariants = g_ucVariants [usModel - 400];
             unsigned char ucVariantsHalf = ucVariants / 2;
             // e.g. 581 ( BF400 )
             // first 3 properties are Exhaust
@@ -462,16 +518,16 @@ void CVehicleManager::GetRandomVariation ( unsigned long ulModel, unsigned char 
             ucVariant2 += 3;
             return;
         }
-        else if ( ulModel == 535 )
+        else if ( usModel == 535 )
         {
             // Slamvan has steering wheel "extras" we want one of those so default cannot be an option.
-            ucVariant = rand ( ) % g_ucVariants [ulModel - 400];
+            ucVariant = rand ( ) % g_ucVariants [usModel - 400];
             return;
         }
         // e.g. ( rand () % ( 5 + 1 ) ) - 1
         // Can generate 6 then minus 1 = 5
         // Can generate 0 then minus 1 = -1 (255) (default model with nothing)
-        ucVariant = ( rand ( ) % (g_ucVariants [ulModel - 400] + 1) ) - 1;
+        ucVariant = ( rand ( ) % (g_ucVariants [usModel - 400] + 1) );
     }
 }
 
