@@ -205,18 +205,16 @@ bool CVehicle::ReadSpecialData ( void )
     }
 
     // Grab the variant data
-    unsigned char ucVariant = 254;
-    unsigned char ucVariant2 = 254;
     if ( GetCustomDataInt ( "variant1", iTemp, true ) )
     {
-        ucVariant = static_cast < unsigned char > ( iTemp );
+        m_ucVariant = static_cast < unsigned char > ( iTemp );
     }
     if ( GetCustomDataInt ( "variant2", iTemp, true ) )
     {
-        ucVariant2 = static_cast < unsigned char > ( iTemp );
+        m_ucVariant = static_cast < unsigned char > ( iTemp );
     }
-    if ( ucVariant == 254 && ucVariant == 254 )
-        CVehicleManager::GetRandomVariation ( m_usModel, ucVariant, ucVariant2 );
+    if ( m_ucVariant == 254 && m_ucVariant == 254 )
+        CVehicleManager::GetRandomVariation ( m_usModel, m_ucVariant, m_ucVariant );
 
     // Grab the "turretX" data
     if ( GetCustomDataFloat ( "turretX", m_fTurretPositionX, true ) )
