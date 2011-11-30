@@ -408,7 +408,7 @@ CVehicle* CVehicleManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CL
     // Create the vehicle
     srand ( GetTickCount32() );
 
-    CVehicle* pVehicle = new CVehicle ( this, pParent, &Node, 400, rand() % 5, rand() % 5 );
+    CVehicle* pVehicle = new CVehicle ( this, pParent, &Node, 400, 254, 254 );
 
     // Verify the vehicle id and load the data from xml
     if ( pVehicle->GetID () == INVALID_ELEMENT_ID ||
