@@ -393,6 +393,7 @@ void CWorldRPCs::SetWeaponProperty ( NetBitStreamInterface& bitStream )
     if ( bitStream.Read ( ucWeapon ) && bitStream.Read ( ucProperty ) && bitStream.Read ( ucWeaponSkill ) )
     {
         CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( static_cast < eWeaponType > ( ucWeapon ), static_cast < eWeaponSkill > ( ucWeaponSkill ) );
+        CWeaponStat* pOriginalWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats( static_cast < eWeaponType > ( ucWeapon ), static_cast < eWeaponSkill > ( ucWeaponSkill ) );
         switch ( ucProperty )
         {
             case WEAPON_WEAPON_RANGE:
@@ -491,9 +492,32 @@ void CWorldRPCs::SetWeaponProperty ( NetBitStreamInterface& bitStream )
                 {
                     bitStream.Read ( sData );
                     if ( pWeaponInfo->IsFlagSet ( sData ) )
+                    {
+                        if ( sData == 0x800 )
+                        {
+                            // if it can support this anim group
+                            if ( ( ucWeapon >= WEAPONTYPE_PISTOL && ucWeapon <= WEAPONTYPE_SNIPERRIFLE ) || ucWeapon == WEAPONTYPE_MINIGUN )
+                            {
+                                // Revert anim group to default
+                                pWeaponInfo->SetAnimGroup ( pOriginalWeaponInfo->GetAnimGroup ( ) );
+                            }
+                        }
                         pWeaponInfo->ClearFlag ( sData );
+                    }
                     else
+                    {
+                        if ( sData == 0x800 )
+                        {
+                            // if it can support this anim group
+                            if ( ( ucWeapon >= WEAPONTYPE_PISTOL && ucWeapon <= WEAPONTYPE_SNIPERRIFLE ) || ucWeapon == WEAPONTYPE_MINIGUN )
+                            {
+                                // sawn off shotgun anim group
+                                pWeaponInfo->SetAnimGroup ( 17 );
+                            }
+                        }
                         pWeaponInfo->SetFlag ( sData );
+                    }
+
                     break;
                 }
             case WEAPON_ANIM_GROUP:
