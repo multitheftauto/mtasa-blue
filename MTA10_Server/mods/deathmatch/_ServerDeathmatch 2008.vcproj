@@ -2489,10 +2489,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\net\CNetBufferUtil.h"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\net\CSimControl.h"
 						>
 					</File>

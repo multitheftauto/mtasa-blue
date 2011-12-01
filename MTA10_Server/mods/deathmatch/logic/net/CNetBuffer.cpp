@@ -890,12 +890,16 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
 {
 
 // Macros of doom
+#define CALLPRE0(func) \
+    case TYPE_##func: \
+    {
+
 #define CALLPRE(func) \
     case TYPE_##func: \
     { \
-        S##func##Args& a = *(S##func##Args*)pJobData->pArgs; \
+        S##func##Args& a = *(S##func##Args*)pJobData->pArgs;
 
-#define CALLREALNET0(func)                                                CALLPRE(func) m_pRealNetServer->func (); CALLPOST
+#define CALLREALNET0(func)                                                CALLPRE0(func) m_pRealNetServer->func (); CALLPOST
 #define CALLREALNET1(func,t1,n1)                                          CALLPRE(func) m_pRealNetServer->func ( a.n1 ); CALLPOST
 #define CALLREALNET2(func,t1,n1,t2,n2)                                    CALLPRE(func) m_pRealNetServer->func ( a.n1, a.n2 ); CALLPOST
 #define CALLREALNET3(func,t1,n1,t2,n2,t3,n3)                              CALLPRE(func) m_pRealNetServer->func ( a.n1, a.n2, a.n3 ); CALLPOST
