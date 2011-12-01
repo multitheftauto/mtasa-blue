@@ -35,6 +35,8 @@ private:
     CRemoteDataSA               * RemoteData;
     CPopulationSA               * Population;
 public:
+    ZERO_ON_NEW
+
     CMultiplayerSA();
     void                        InitHooks();
     CRemoteDataStorage *        CreateRemoteDataStorage     ();
@@ -161,16 +163,22 @@ public:
     void                        AllowCreatedObjectsInVerticalLineTest ( bool bOn );
     void                        DeleteAndDisableGangTags    ();
     
-    CVector                     m_vecAkimboTarget;
-    bool                        m_bAkimboTargetUp;
-
     CLimits*                    GetLimits () { return &m_limits; }
 
-    bool                        m_bSuspensionEnabled;
     void                        SetSuspensionEnabled        ( bool bEnabled );
     bool                        IsSuspensionEnabled         ( void )                    { return m_bSuspensionEnabled; };
+
+    virtual void                SetFastClothesLoading       ( EFastClothesLoading fastClothesLoading );
+
+    CVector                     m_vecAkimboTarget;
+    bool                        m_bAkimboTargetUp;
+    static char*                ms_PlayerImgCachePtr;
 private:
+    bool                        m_bSuspensionEnabled;
+    std::vector < char >        m_PlayerImgCache;
+    EFastClothesLoading         m_FastClothesLoading;
     CLimitsSA                   m_limits;
+
 
 /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
     VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);

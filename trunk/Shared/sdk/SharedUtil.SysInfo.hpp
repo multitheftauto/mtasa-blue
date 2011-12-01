@@ -242,6 +242,35 @@ SString SharedUtil::GetWMIOSVersion ( void )
 
 /////////////////////////////////////////////////////////////////////
 //
+// GetWMITotalPhysicalMemory
+//
+//
+//
+/////////////////////////////////////////////////////////////////////
+long long SharedUtil::GetWMITotalPhysicalMemory ( void )
+{
+    // This won't change after the first call
+    static long long llResult = 0;
+
+    if ( llResult == 0 )
+    {
+        SQueryWMIResult result;
+
+        QueryWMI ( result, "Win32_ComputerSystem", "TotalPhysicalMemory" );
+
+        if ( result.empty () )
+            return 0;
+
+        const SString& strTotalPhysicalMemory  = result[0][0];
+        llResult = _atoi64 ( strTotalPhysicalMemory );
+    }
+
+    return llResult;
+}
+
+
+/////////////////////////////////////////////////////////////////////
+//
 // GetWMIVideoAdapterMemorySize
 //
 //

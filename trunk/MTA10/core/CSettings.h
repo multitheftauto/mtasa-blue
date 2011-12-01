@@ -176,6 +176,9 @@ protected:
     CGUILabel*          m_pAsyncLabelInfo;
     CGUILabel*          m_pAsyncLabel;
     CGUIComboBox*       m_pAsyncCombo;
+    CGUILabel*          m_pFastClothesLabelInfo;
+    CGUILabel*          m_pFastClothesLabel;
+    CGUIComboBox*       m_pFastClothesCombo;
     CGUILabel*          m_pAudioGeneralLabel;
     CGUILabel*          m_pUserTrackGeneralLabel;
     CGUILabel*          m_pBrowserSpeedLabelInfo;

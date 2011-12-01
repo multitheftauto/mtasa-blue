@@ -303,6 +303,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "anisotropic",                0 );                            // Anisotropic filtering
     DEFAULT ( "grass",                      1 );                            // Enable grass
     DEFAULT ( "network_encryption",         1 );                            // Force off encryption if 0
+    DEFAULT ( "fast_clothes_loading",       1 );                            // 0-off 1-auto 2-on
 
     // We will default this one at CClientGame.cpp, because we need a valid direct3d device to give a proper default value.
 #if 0

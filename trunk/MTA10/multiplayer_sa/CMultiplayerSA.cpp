@@ -27,6 +27,8 @@
 
 using namespace std;
 
+char* CMultiplayerSA::ms_PlayerImgCachePtr = NULL;
+
 extern CGame * pGameInterface;
 
 unsigned long CMultiplayerSA::HOOKPOS_FindPlayerCoors;
@@ -306,6 +308,26 @@ DWORD RETURN_PreHUDRender =                                       0x053EADD;
 DWORD RETURN_LoadingPlayerImgDira =                         0x5A69E8;
 DWORD RETURN_LoadingPlayerImgDirb =                         0x5A6A06;
 
+#define HOOKPOS_CStreamingRequestFile_US                    0x15663B0
+#define HOOKPOS_CStreamingRequestFile_EU                    0x15663A0
+#define HOOKPOS_CStreamingLoadRequestedModels_US            0x15670A0
+#define HOOKPOS_CStreamingLoadRequestedModels_EU            0x1567090
+
+DWORD RETURN_CStreamingRequestFilea_US =            0x15663B5;
+DWORD RETURN_CStreamingRequestFilea_EU =            0x15663A5;
+DWORD RETURN_CStreamingRequestFilea_BOTH =          0;
+DWORD RETURN_CStreamingRequestFileb_US =            0x156641E;
+DWORD RETURN_CStreamingRequestFileb_EU =            0x156640E;
+DWORD RETURN_CStreamingRequestFileb_BOTH =          0;
+DWORD RETURN_CStreamingLoadRequestedModelsa_US =    0x15670A5;
+DWORD RETURN_CStreamingLoadRequestedModelsa_EU =    0x1567095;
+DWORD RETURN_CStreamingLoadRequestedModelsa_BOTH =  0;
+DWORD RETURN_CStreamingLoadRequestedModelsb_US =    0x156711B;
+DWORD RETURN_CStreamingLoadRequestedModelsb_EU =    0x156710B;
+DWORD RETURN_CStreamingLoadRequestedModelsb_BOTH =  0;
+DWORD CStreaming__ConvertBufferToObject =           0x040C6B0;
+
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -462,6 +484,9 @@ void HOOK_CAutomobile__ProcessSwingingDoor ();
 
 void HOOK_ProcessVehicleCollision ();
 void HOOK_LoadingPlayerImgDir ();
+void HOOK_CStreamingRequestFile ();
+void HOOK_CStreamingLoadRequestedModels ();
+
 
 void vehicle_lights_init ();
 
@@ -597,6 +622,8 @@ void CMultiplayerSA::InitHooks()
         HookInstall(HOOKPOS_CrashFix_Misc19_US, (DWORD)HOOK_CrashFix_Misc19, 6 );
         HookInstall(HOOKPOS_CrashFix_Misc24_US, (DWORD)HOOK_CrashFix_Misc24, 6 );
         HookInstall(HOOKPOS_CheckAnimMatrix_US, (DWORD)HOOK_CheckAnimMatrix, 5 );
+        HookInstall(HOOKPOS_CStreamingRequestFile_US, (DWORD)HOOK_CStreamingRequestFile, 5 );
+        HookInstall(HOOKPOS_CStreamingLoadRequestedModels_US, (DWORD)HOOK_CStreamingLoadRequestedModels, 5 );
         RETURN_FreezeFix_Misc15_BOTH = RETURN_FreezeFix_Misc15_US;
         RETURN_CrashFix_Misc17a_BOTH = RETURN_CrashFix_Misc17a_US;
         RETURN_CrashFix_Misc17b_BOTH = RETURN_CrashFix_Misc17b_US;
@@ -604,6 +631,10 @@ void CMultiplayerSA::InitHooks()
         RETURN_CrashFix_Misc19b_BOTH = RETURN_CrashFix_Misc19b_US;
         RETURN_CrashFix_Misc24_BOTH = RETURN_CrashFix_Misc24_US;
         RETURN_CheckAnimMatrix_BOTH = RETURN_CheckAnimMatrix_US;
+        RETURN_CStreamingRequestFilea_BOTH = RETURN_CStreamingRequestFilea_US;
+        RETURN_CStreamingRequestFileb_BOTH = RETURN_CStreamingRequestFileb_US;
+        RETURN_CStreamingLoadRequestedModelsa_BOTH = RETURN_CStreamingLoadRequestedModelsa_US;
+        RETURN_CStreamingLoadRequestedModelsb_BOTH = RETURN_CStreamingLoadRequestedModelsb_US;
     }
     if ( version == VERSION_EU_10 )
     {
@@ -612,6 +643,8 @@ void CMultiplayerSA::InitHooks()
         HookInstall(HOOKPOS_CrashFix_Misc19_EU, (DWORD)HOOK_CrashFix_Misc19, 6 );
         HookInstall(HOOKPOS_CrashFix_Misc24_EU, (DWORD)HOOK_CrashFix_Misc24, 6 );
         HookInstall(HOOKPOS_CheckAnimMatrix_EU, (DWORD)HOOK_CheckAnimMatrix, 5 );
+        HookInstall(HOOKPOS_CStreamingRequestFile_EU, (DWORD)HOOK_CStreamingRequestFile, 5 );
+        HookInstall(HOOKPOS_CStreamingLoadRequestedModels_EU, (DWORD)HOOK_CStreamingLoadRequestedModels, 5 );
         RETURN_FreezeFix_Misc15_BOTH = RETURN_FreezeFix_Misc15_EU;
         RETURN_CrashFix_Misc17a_BOTH = RETURN_CrashFix_Misc17a_EU;
         RETURN_CrashFix_Misc17b_BOTH = RETURN_CrashFix_Misc17b_EU;
@@ -619,6 +652,10 @@ void CMultiplayerSA::InitHooks()
         RETURN_CrashFix_Misc19b_BOTH = RETURN_CrashFix_Misc19b_EU;
         RETURN_CrashFix_Misc24_BOTH = RETURN_CrashFix_Misc24_EU;
         RETURN_CheckAnimMatrix_BOTH = RETURN_CheckAnimMatrix_EU;
+        RETURN_CStreamingRequestFilea_BOTH = RETURN_CStreamingRequestFilea_EU;
+        RETURN_CStreamingRequestFileb_BOTH = RETURN_CStreamingRequestFileb_EU;
+        RETURN_CStreamingLoadRequestedModelsa_BOTH = RETURN_CStreamingLoadRequestedModelsa_EU;
+        RETURN_CStreamingLoadRequestedModelsb_BOTH = RETURN_CStreamingLoadRequestedModelsb_EU;
     }
     HookInstall(HOOKPOS_CrashFix_Misc16, (DWORD)HOOK_CrashFix_Misc16, 6 );
     HookInstall(HOOKPOS_CrashFix_Misc18, (DWORD)HOOK_CrashFix_Misc18, 7 );
@@ -6034,6 +6071,44 @@ void CMultiplayerSA::SetSuspensionEnabled ( bool bEnabled )
 }
 
 
+// Enable caching and faster loading of clothes files
+void CMultiplayerSA::SetFastClothesLoading ( EFastClothesLoading fastClothesLoading )
+{
+    if ( m_FastClothesLoading == fastClothesLoading )
+        return;
+
+    m_FastClothesLoading = fastClothesLoading;
+
+    // Handle auto setting
+    if ( fastClothesLoading == FAST_CLOTHES_AUTO )
+    {
+        // Disable if less than 512MB installed ram
+        long long llSystemRamKB = GetWMITotalPhysicalMemory () / 1024LL;
+        if ( llSystemRamKB > 0 && llSystemRamKB < 512 * 1024 )
+           fastClothesLoading = FAST_CLOTHES_OFF;
+    }
+
+    if ( fastClothesLoading != FAST_CLOTHES_OFF )
+    {
+        // Load and cache player.img
+        SString strGTASAPath = GetCommonRegistryValue ( "", "GTA:SA Path" );
+        SString strFilename = PathJoin ( strGTASAPath, "models", "player.img" );
+        FileLoad ( strFilename, m_PlayerImgCache );
+    }
+    else
+    {
+        // Remove cached data
+        m_PlayerImgCache.clear ();
+    }
+
+    // Update the cache pointer
+    if ( !m_PlayerImgCache.empty () )
+        ms_PlayerImgCachePtr = &m_PlayerImgCache[0];
+    else
+        ms_PlayerImgCachePtr = NULL;
+}
+
+
 //
 // Skip loading the directory data from player.img if it has already been loaded.
 // Speeds up clothes a bit, but is only part of a solution - The actual files from inside player.img are still loaded each time
@@ -6069,6 +6144,147 @@ void _declspec(naked) HOOK_LoadingPlayerImgDir()
 skip:
         popad
         jmp     RETURN_LoadingPlayerImgDirb     // 5A6A06
+    }
+}
+
+
+////////////////////////////////////////////////
+//
+// Hook CStreaming::RequestFile
+//
+//
+//
+////////////////////////////////////////////////
+namespace
+{
+    struct SImgGTAItemInfo
+    {
+        uint    uiHash;
+        ushort  uiUnknown1;
+        uchar   uiUnknown2;         // 0x12 when loading, 0x02 when finished loading
+        uchar   ucImgId;
+        int     iBlockOffset;
+        int     iBlockCount;
+        uint    uiLoadflag;         // 0-not loaded  2-requested  3-loaded  1-processed
+    };
+
+    int     iReturnFileId;
+    char*   pReturnBuffer;
+}
+
+//
+// If request is for a file inside player.img (imgId 5) and uiLoadflag is 0 or 1
+// then force use of our cached player.img data
+//
+bool _cdecl OnStreamingRequestFile ( int iFileId, int iBlockOffset, int iBlockCount, int iImgId, int iSomething )
+{
+    if ( !CMultiplayerSA::ms_PlayerImgCachePtr )
+        return false;
+
+    if ( iImgId == 5 )
+    {
+        SImgGTAItemInfo* pImgGTAInfo = ((SImgGTAItemInfo*)(0x8E4CC0)) + iFileId;
+
+        if ( pImgGTAInfo->uiLoadflag > 1 )
+            return false;
+
+        pImgGTAInfo->uiUnknown1 = 0xffff;
+        pImgGTAInfo->uiUnknown2 = iSomething & 0x0f;
+        pImgGTAInfo->ucImgId = iImgId;
+        pImgGTAInfo->iBlockOffset = iBlockOffset;
+        pImgGTAInfo->iBlockCount = iBlockCount;
+        pImgGTAInfo->uiLoadflag = 3;
+
+        iReturnFileId = iFileId;
+        pReturnBuffer = CMultiplayerSA::ms_PlayerImgCachePtr + iBlockOffset * 2048;
+        return true;
+    }
+
+    return false;
+}
+
+
+void _declspec(naked) HOOK_CStreamingRequestFile()
+{
+// hook from 015663B0/015663A0 5 bytes
+    _asm
+    {
+        pushad
+        push    [esp+32+4*5]
+        push    [esp+32+4*5]
+        push    [esp+32+4*5]
+        push    [esp+32+4*5]
+        push    [esp+32+4*5]
+        call    OnStreamingRequestFile
+        add     esp, 4*5
+        cmp     al, 0
+        jnz     skip
+
+        // Continue with standard code
+        popad
+        push    ebx
+        mov     ebx, [esp+14h]
+        jmp     RETURN_CStreamingRequestFilea_BOTH     // 015663B5/015663A5
+
+        // Handle loaded here
+skip:
+        popad
+        pushad
+
+        mov     eax, 0
+        push    eax
+        mov     eax, iReturnFileId
+        push    eax
+        mov     eax, pReturnBuffer
+        push    eax
+        call    CStreaming__ConvertBufferToObject      // 40C6B0
+        add     esp, 4*3
+
+        popad
+        jmp     RETURN_CStreamingRequestFileb_BOTH     // 0156641E/0156640E
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+// Return true to skip
+bool _cdecl ShouldSkipLoadRequestedModels ( DWORD calledFrom )
+{
+    if ( !CMultiplayerSA::ms_PlayerImgCachePtr )
+        return false;
+
+    // Skip LoadRequestedModels if called from:
+    //      CClothesBuilder::ConstructGeometryArray      5A55A0 - 5A56B6
+    //      CClothesBuilder::LoadAndPutOnClothes         5A5F70 - 5A6039
+    //      CClothesBuilder::ConstructTextures           5A6040 - 5A6520
+    if ( calledFrom > 0x5A55A0 && calledFrom < 0x5A6520 )
+        return true;
+
+    return false;
+}
+
+
+void _declspec(naked) HOOK_CStreamingLoadRequestedModels()
+{
+// hook from 015670A0/01567090 5 bytes
+    _asm
+    {
+        pushad
+        push    [esp+32+4*0]
+        call    ShouldSkipLoadRequestedModels
+        add     esp, 4*1
+        cmp     al, 0
+        jnz     skip
+
+        // Continue with standard code
+        popad
+        mov     al,byte ptr ds:[008E4A58h]
+        jmp     RETURN_CStreamingLoadRequestedModelsa_BOTH     // 015663B5/015663A5
+
+        // Skip LoadRequestedModels
+skip:
+        popad
+        jmp     RETURN_CStreamingLoadRequestedModelsb_BOTH     // 0156711B/0156710B
     }
 }
 
