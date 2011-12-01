@@ -233,13 +233,12 @@ void CPerfStatDebugTableImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     }
 
     // Add columns
-    const uint uiNumColumns = 4;
-    for ( uint i = 0 ; i < uiNumColumns ; i++ )
+    const int iNumColumns = 4;
+    for ( int i = 0 ; i < iNumColumns ; i++ )
         pResult->AddColumn ( "" );
 
     for ( std::map < SString, SLineInfo >::iterator iter = m_LineMap.begin () ; iter != m_LineMap.end () ; ++iter )
     {
-        const SString& strKey = iter->first;
         const SLineInfo& info = iter->second;
 
         // Apply filter
@@ -250,7 +249,7 @@ void CPerfStatDebugTableImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         int c = 0;
 
         // Add cells
-        for ( uint i = 0 ; i < info.strCellList.size () && c < uiNumColumns ; i++ )
+        for ( uint i = 0 ; i < info.strCellList.size () && c < iNumColumns ; i++ )
             row[c++] = info.strCellList[i];
     }
 }

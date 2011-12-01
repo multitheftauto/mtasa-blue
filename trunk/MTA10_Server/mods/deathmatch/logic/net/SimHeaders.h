@@ -10,8 +10,7 @@
 class CSimPacket;
 class CSimPlayerManager;
 
-#include <sys/timeb.h>
-#include "CNetBufferUtil.h"
+#include "SharedUtil.Thread.h"
 #include "CNetBuffer.h"
 #include "CSimPlayer.h"
 #include "CSimPlayerManager.h"

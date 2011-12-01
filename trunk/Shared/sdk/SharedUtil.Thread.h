@@ -2,13 +2,27 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
+*  FILE:        SharedUtil.Thread.h
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
 
-namespace
+#include <sys/timeb.h>
+#include <pthread.h>
+
+#ifdef WIN32
+#ifndef _WINSOCKAPI_
+    struct timeval {
+            long    tv_sec;         /* seconds */
+            long    tv_usec;        /* and microseconds */
+    };
+#endif
+#endif
+
+namespace SharedUtil
 {
+
     typedef void *(*PFN_ThreadStart) (void *);
 
     // Wrap pthread
@@ -82,14 +96,14 @@ namespace
             {
                 // Get time now
                 struct timeval tv;
-#ifdef WIN32
+    #ifdef WIN32
                 _timeb timeb;
                 _ftime(&timeb);
                 tv.tv_sec = static_cast < ulong > ( timeb.time );
                 tv.tv_usec = timeb.millitm * 1000;
-#else
+    #else
                 gettimeofday ( &tv , NULL );
-#endif
+    #endif
                 // Add the timeout length
                 tv.tv_sec += uiTimeout / 1000;
                 tv.tv_usec += ( uiTimeout % 1000 ) * 1000;
@@ -110,4 +124,5 @@ namespace
             pthread_cond_signal ( &cond );
         }
     };
+
 }

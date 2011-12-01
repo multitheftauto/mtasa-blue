@@ -46,6 +46,8 @@ namespace
                                          { "dbFree",                    "1.1.1-9.03328" },
                                          { "dbExec",                    "1.1.1-9.03341" },
                                          { "resendPlayerModInfo",       "1.1.1-9.03451" },
+                                         { "getResourceACLRequests",    "1.1.1-9.03503" },
+                                         { "updateResourceACLRequest",  "1.1.1-9.03503" },
                                         };
 }
 

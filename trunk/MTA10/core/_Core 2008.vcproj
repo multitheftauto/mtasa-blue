@@ -1781,6 +1781,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Thread.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.Time.h"
 					>
 				</File>
