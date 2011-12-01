@@ -19,4 +19,5 @@ namespace SharedUtil
     bool        QueryWMI                        ( SQueryWMIResult& outResult, const SString& strQuery, const SString& strKeys );
     SString     GetWMIOSVersion                 ( void );
     long long   GetWMIVideoAdapterMemorySize    ( const SString& strDisplay );
+    long long   GetWMITotalPhysicalMemory       ( void );
 }

@@ -95,6 +95,13 @@ public:
 class CMultiplayer
 {
 public:
+    enum EFastClothesLoading
+    {
+        FAST_CLOTHES_OFF = 0,
+        FAST_CLOTHES_AUTO = 1,
+        FAST_CLOTHES_ON = 2,
+    };
+
     virtual CRemoteDataStorage *        CreateRemoteDataStorage     () = 0;
     virtual void                        DestroyRemoteDataStorage    ( CRemoteDataStorage* pData ) = 0;
     virtual void                        AddRemoteDataStorage        ( CPlayerPed* pPed, CRemoteDataStorage* pData ) = 0;
@@ -225,6 +232,8 @@ public:
 
     virtual bool                        IsSuspensionEnabled         ( ) = 0;
     virtual void                        SetSuspensionEnabled        ( bool bEnabled ) = 0;
+
+    virtual void                        SetFastClothesLoading       ( EFastClothesLoading fastClothesLoading ) = 0;
 };
 
 #endif

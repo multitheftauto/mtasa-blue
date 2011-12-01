@@ -853,6 +853,25 @@ void CSettings::CreateGUI ( void )
     m_pAsyncLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
 
+    // Fast clothes loading
+    m_pFastClothesLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Fast CJ clothes loading:" ) );
+    m_pFastClothesLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pFastClothesLabel->AutoSize ( m_pFastClothesLabel->GetText ().c_str () );
+
+    m_pFastClothesCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pFastClothesCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pFastClothesCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pFastClothesCombo->AddItem ( "Off" )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_OFF );
+    m_pFastClothesCombo->AddItem ( "On" )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_ON );
+    m_pFastClothesCombo->AddItem ( "Auto" )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_AUTO );
+    m_pFastClothesCombo->SetReadOnly ( true );
+
+    m_pFastClothesLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Stops stalls with CJ variations\n(Uses 65MB more RAM)" ) );
+    m_pFastClothesLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
+    m_pFastClothesLabelInfo->SetFont ( "default-bold-small" );
+    m_pFastClothesLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 40-4;
+
     // Browser scan speed
     m_pBrowserSpeedLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Browser speed:" ) );
     m_pBrowserSpeedLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
@@ -2244,6 +2263,12 @@ void CSettings::LoadData ( void )
     else if ( iVar == 1 ) m_pAsyncCombo->SetText ( "Auto" );
     else if ( iVar == 2 ) m_pAsyncCombo->SetText ( "On" );
 
+    // Fast clothes loading
+    CVARS_GET ( "fast_clothes_loading", iVar );
+    if ( iVar == CMultiplayer::FAST_CLOTHES_OFF ) m_pFastClothesCombo->SetText ( "Off" );
+    else if ( iVar == CMultiplayer::FAST_CLOTHES_AUTO ) m_pFastClothesCombo->SetText ( "Auto" );
+    else if ( iVar == CMultiplayer::FAST_CLOTHES_ON ) m_pFastClothesCombo->SetText ( "On" );
+
     // Browser speed
     CVARS_GET ( "browser_speed", iVar );
     if ( iVar == 0 ) m_pBrowserSpeedCombo->SetText ( "Very slow" );
@@ -2473,6 +2498,14 @@ void CSettings::SaveData ( void )
         int iSelected = ( int ) pSelected->GetData();
         CVARS_SET ( "async_loading", iSelected );
         g_pCore->GetGame ()->SetAsyncLoadingFromSettings ( iSelected == 1, iSelected == 2 );
+    }
+
+    // Fast clothes loading
+    if ( CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "fast_clothes_loading", iSelected );
+        g_pCore->GetMultiplayer ()->SetFastClothesLoading ( (CMultiplayer::EFastClothesLoading)iSelected );
     }
 
     // Audio
