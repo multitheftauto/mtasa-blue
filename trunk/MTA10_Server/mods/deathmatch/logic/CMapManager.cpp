@@ -849,7 +849,8 @@ bool CMapManager::HandleNode ( CResource& Loader, CXMLNode& Node, CElement* pPar
     }
     else if ( strBuffer.compare ( "object" ) == 0 )
     {
-        pNode = m_pObjectManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
+        bool bIsLowLod = false;
+        pNode = m_pObjectManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents, bIsLowLod );
     }
     else if ( strBuffer.compare ( "blip" ) == 0 )
     {

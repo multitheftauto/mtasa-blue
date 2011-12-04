@@ -2512,6 +2512,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 CElementIDs::SetElement ( EntityID, NULL );
             }
 
+            ElementID LowLodObjectID = INVALID_ELEMENT_ID;
+
             // Handle the rest depending on what entity type it is
             switch ( ucEntityTypeID )
             {
@@ -2538,12 +2540,16 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             usObjectID = 1700;
                         }
 
+                        // Low LOD stuff
+                        bool bIsLowLod;
+                        bitStream.ReadBit ( bIsLowLod );
+                        bitStream.Read ( LowLodObjectID );
+
                         // Create the object and put it at its position
 #ifdef WITH_OBJECT_SYNC
                         CDeathmatchObject* pObject = new CDeathmatchObject ( g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, g_pClientGame->m_pObjectSync, EntityID, usObjectID );
 #else
-                        bool bLowLod = false;
-                        CDeathmatchObject* pObject = new CDeathmatchObject ( g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, EntityID, usObjectID, bLowLod );
+                        CDeathmatchObject* pObject = new CDeathmatchObject ( g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, EntityID, usObjectID, bIsLowLod );
 #endif
                         pEntity = pObject;
                         if ( pObject )
@@ -3425,6 +3431,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 SEntityDependantStuff* pStuff = new SEntityDependantStuff;
                 pStuff->pEntity = pEntity;
                 pStuff->Parent = ParentID;
+                pStuff->LowLodObjectID = LowLodObjectID;
                 if ( bIsAttached )
                     pStuff->AttachedToID = EntityAttachedToID;
                 else
@@ -3448,6 +3455,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
         CClientEntity* pTempEntity = pEntityStuff->pEntity;
         ElementID TempParent = pEntityStuff->Parent;
         ElementID TempAttachedToID = pEntityStuff->AttachedToID;
+        ElementID TempLowLodObjectID = pEntityStuff->LowLodObjectID;
 
         if ( TempParent != INVALID_ELEMENT_ID )
         {
@@ -3462,6 +3470,14 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
             {
                 pTempEntity->AttachTo ( pAttachedToEntity );
             }
+        }
+
+        if ( TempLowLodObjectID != INVALID_ELEMENT_ID )
+        {
+            CClientObject* pTempObject = DynamicCast < CClientObject > ( pTempEntity );
+            CClientObject* pLowLodObject = DynamicCast < CClientObject > ( CElementIDs::GetElement ( TempLowLodObjectID ) );
+            if ( pTempObject )
+                pTempObject->SetLowLodObject ( pLowLodObject );
         }
 
         delete pEntityStuff;

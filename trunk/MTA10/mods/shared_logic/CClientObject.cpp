@@ -549,8 +549,10 @@ void CClientObject::StreamedInPulse ( void )
         // Manually update attaching incase other objects are streamed out
         DoAttaching ();
 
-        // Check if we should be visible
+        // Be visible if any HighLodObject is not fully visible
         bool bMakeVisible = false;
+        if ( m_HighLodObjectList.empty () )
+            bMakeVisible = true;
         for ( std::vector < CClientObject* >::iterator iter = m_HighLodObjectList.begin () ; iter != m_HighLodObjectList.end () ; ++iter )
         {
             CObject* pObject = (*iter)->m_pObject;

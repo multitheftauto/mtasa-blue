@@ -29,6 +29,7 @@ class CPacketHandler
         CClientEntity*      pEntity;
         ElementID           Parent;
         ElementID           AttachedToID;
+        ElementID           LowLodObjectID;
     };
 
 public:

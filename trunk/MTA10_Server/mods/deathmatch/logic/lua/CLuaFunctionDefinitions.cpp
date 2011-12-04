@@ -7262,76 +7262,49 @@ int CLuaFunctionDefinitions::SetBlipVisibleDistance ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::CreateObject ( lua_State* luaVM )
 {
-    int iArgument1 = lua_type ( luaVM, 1 );
-    if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
-    {
-        unsigned short usModelID = static_cast < unsigned short > ( lua_tonumber ( luaVM, 1 ) );
+//  object createObject ( int modelid, float x, float y, float z, [float rx, float ry, float rz, bool lowLOD] )
+    ushort usModelID; CVector vecPosition; CVector vecRotation; bool bIsLowLod;
 
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( usModelID );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadNumber ( vecRotation.fX, 0 );
+    argStream.ReadNumber ( vecRotation.fY, 0 );
+    argStream.ReadNumber ( vecRotation.fZ, 0 );
+    argStream.ReadBool ( bIsLowLod, false );
+
+    if ( !argStream.HasErrors () )
+    {
         if ( CObjectManager::IsValidModel  ( usModelID ) )
         {
-            int iArgument2 = lua_type ( luaVM, 2 );
-            int iArgument3 = lua_type ( luaVM, 3 );
-            int iArgument4 = lua_type ( luaVM, 4 );
-
-            if ( ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-                 ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
-                 ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
+            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+            if ( pLuaMain )
             {
-                CVector vecPosition;
-                vecPosition.fX = static_cast < float > ( atof ( lua_tostring ( luaVM, 2 ) ) );
-                vecPosition.fY = static_cast < float > ( atof ( lua_tostring ( luaVM, 3 ) ) );
-                vecPosition.fZ = static_cast < float > ( atof ( lua_tostring ( luaVM, 4 ) ) );
-
-                CVector vecRotation;
-                int iArgument5 = lua_type ( luaVM, 5 );
-
-                if ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING )
+                CResource* pResource = pLuaMain->GetResource ();
+                if ( pResource )
                 {
-                    vecRotation.fX = static_cast < float > ( atof ( lua_tostring ( luaVM, 5 ) ) );
-                    int iArgument6 = lua_type ( luaVM, 6 );
-
-                    if ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING )
+                    CObject* pObject = CStaticFunctionDefinitions::CreateObject ( pResource, usModelID, vecPosition, vecRotation, bIsLowLod );
+                    if ( pObject )
                     {
-                        vecRotation.fY = static_cast < float > ( atof ( lua_tostring ( luaVM, 6 ) ) );
-                        int iArgument7 = lua_type ( luaVM, 7 );
-
-                        if ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING )
+                        CElementGroup * pGroup = pResource->GetElementGroup();
+                        if ( pGroup )
                         {
-                            vecRotation.fZ = static_cast < float > ( atof ( lua_tostring ( luaVM, 7 ) ) );
+                            pGroup->Add ( pObject );
                         }
-                    }
-                }
 
-                CLuaMain * pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
-                if ( pLuaMain )
-                {
-                    CResource * pResource = pLuaMain->GetResource();
-                    if ( pResource )
-                    {
-                        CObject* pObject = CStaticFunctionDefinitions::CreateObject ( pResource, usModelID, vecPosition, vecRotation );
-                        if ( pObject )
-                        {
-
-                            CElementGroup * pGroup = pResource->GetElementGroup();
-                            if ( pGroup )
-                            {
-                                pGroup->Add ( pObject );
-                            }
-
-                            lua_pushelement ( luaVM, pObject );
-                            return 1;
-                        }
+                        lua_pushelement ( luaVM, pObject );
+                        return 1;
                     }
                 }
             }
-            else
-                m_pScriptDebugging->LogBadType ( luaVM, "createObject" );
         }
         else
-            m_pScriptDebugging->LogWarning ( luaVM, "Bad model id passed to createObject" );
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createObject", "Invalid model id" ) );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "createObject" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createObject", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;

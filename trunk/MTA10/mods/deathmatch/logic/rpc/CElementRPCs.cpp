@@ -35,6 +35,7 @@ void CElementRPCs::LoadFunctions ( void )
     AddHandler ( SET_ELEMENT_DOUBLESIDED,        SetElementDoubleSided,       "SetElementDoubleSided" );
     AddHandler ( SET_ELEMENT_COLLISIONS_ENABLED, SetElementCollisionsEnabled, "SetElementCollisionsEnabled" );
     AddHandler ( SET_ELEMENT_FROZEN,             SetElementFrozen,            "SetElementFrozen" );
+    AddHandler ( SET_LOW_LOD_ELEMENT,            SetLowLodElement,            "SetLowLodElement" );
 }
 
 
@@ -498,6 +499,25 @@ void CElementRPCs::SetElementFrozen ( CClientEntity* pSource, NetBitStreamInterf
             {
                 CClientObject* pObject = static_cast < CClientObject * > ( pSource );
                 pObject->SetStatic ( bFrozen );
+                break;
+            }
+        }
+    }
+}
+
+
+void CElementRPCs::SetLowLodElement ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+{
+    ElementID LowLodObjectID;
+    if ( bitStream.Read ( LowLodObjectID ) )
+    {
+        switch ( pSource->GetType () )
+        {
+            case CCLIENTOBJECT:
+            {
+                CClientObject* pLowLodObject = DynamicCast < CClientObject > ( CElementIDs::GetElement ( LowLodObjectID ) );
+                CClientObject* pObject = static_cast < CClientObject * > ( pSource );
+                pObject->SetLowLodObject ( pLowLodObject );
                 break;
             }
         }

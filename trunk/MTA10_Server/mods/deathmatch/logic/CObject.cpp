@@ -17,7 +17,9 @@
 
 extern CGame * g_pGame;
 
-CObject::CObject ( CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectManager ) : CElement ( pParent, pNode )
+CObject::CObject ( CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectManager, bool bIsLowLod ) : CElement ( pParent, pNode )
+    , m_bIsLowLod ( bIsLowLod )
+    , m_pLowLodObject ( NULL )
 {
     // Init
     m_iType = CElement::OBJECT;
@@ -44,6 +46,8 @@ CObject::CObject ( CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectMa
 
 
 CObject::CObject ( const CObject& Copy ) : CElement ( Copy.m_pParent, Copy.m_pXMLNode )
+    , m_bIsLowLod ( Copy.m_bIsLowLod )
+    , m_pLowLodObject ( Copy.m_pLowLodObject )
 {
     // Init
     m_szName [0] = 0;
@@ -89,6 +93,11 @@ void CObject::Unlink ( void )
     // Remove us from the manager's list
     m_pObjectManager->RemoveFromList ( this );
     m_pObjectManager->m_Attached.remove ( this );
+
+    // Remove LowLod refs in others
+    SetLowLodObject ( NULL );
+    while ( !m_HighLodObjectList.empty () )
+        m_HighLodObjectList[0]->SetLowLodObject ( NULL );
 }
 
 
@@ -367,4 +376,56 @@ void CObject::SetSyncer ( CPlayer* pPlayer )
         // Set it
         m_pSyncer = pPlayer;
     }
+}
+
+
+bool CObject::IsLowLod ( void )
+{
+    return m_bIsLowLod;
+}
+
+
+bool CObject::SetLowLodObject ( CObject* pNewLowLodObject )
+{
+    // This object has to be high lod
+    if ( m_bIsLowLod )
+        return false;
+
+    // Set or clear?
+    if ( !pNewLowLodObject )
+    {
+        // Check if already clear
+        if ( !m_pLowLodObject )
+            return false;
+
+        // Verify link
+        assert ( ListContains ( m_pLowLodObject->m_HighLodObjectList, this ) );
+
+        // Clear there and here
+        ListRemove ( m_pLowLodObject->m_HighLodObjectList, this );
+        m_pLowLodObject = NULL;
+        return true;
+    }
+    else
+    {
+        // new object has to be low lod
+        if ( !pNewLowLodObject->m_bIsLowLod )
+            return false;
+
+        // Remove any previous link
+        SetLowLodObject ( NULL );
+
+        // Make new link
+        m_pLowLodObject = pNewLowLodObject;
+        pNewLowLodObject->m_HighLodObjectList.push_back ( this );
+        return true;
+    }
+}
+
+
+CObject* CObject::GetLowLodObject ( void )
+{
+    if ( m_bIsLowLod )
+        return NULL;
+    return m_pLowLodObject;
 }
