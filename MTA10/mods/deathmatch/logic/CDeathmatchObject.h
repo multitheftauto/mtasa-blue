@@ -23,7 +23,7 @@ public:
 #ifdef WITH_OBJECT_SYNC
                                         CDeathmatchObject               ( CClientManager* pManager, class CMovingObjectsManager* pMovingObjectsManager, class CObjectSync* pObjectSync, ElementID ID, unsigned short usModel );
 #else
-                                        CDeathmatchObject               ( CClientManager* pManager, class CMovingObjectsManager* pMovingObjectsManager, ElementID ID, unsigned short usModel );
+                                        CDeathmatchObject               ( CClientManager* pManager, class CMovingObjectsManager* pMovingObjectsManager, ElementID ID, unsigned short usModel, bool bLowLod );
 #endif
                                         ~CDeathmatchObject              ( void );
 

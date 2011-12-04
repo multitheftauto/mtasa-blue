@@ -2118,6 +2118,7 @@ void CClientGame::SetAllDimensions ( unsigned short usDimension )
 {
     m_pManager->GetMarkerStreamer ()->SetDimension ( usDimension );
     m_pManager->GetObjectStreamer ()->SetDimension ( usDimension );
+    m_pManager->GetObjectLodStreamer ()->SetDimension ( usDimension );
     m_pManager->GetPickupStreamer ()->SetDimension ( usDimension );
     m_pManager->GetPlayerStreamer ()->SetDimension ( usDimension );
     m_pManager->GetRadarAreaManager ()->SetDimension ( usDimension );

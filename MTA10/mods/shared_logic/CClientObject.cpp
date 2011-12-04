@@ -21,7 +21,10 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned short usModel ) : ClassInit ( this ), CClientStreamElement ( pManager->GetObjectStreamer (), ID )
+CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned short usModel, bool bLowLod )
+    : ClassInit ( this )
+    , CClientStreamElement ( bLowLod ? pManager->GetObjectLodStreamer () : pManager->GetObjectStreamer (), ID )
+    , m_bIsLowLod ( bLowLod )
 {
     // Init
     m_pManager = pManager;
@@ -70,6 +73,11 @@ void CClientObject::Unlink ( void )
     m_pObjectManager->RemoveFromList ( this );
     m_pObjectManager->m_Attached.remove ( this );
     ListRemove ( m_pObjectManager->m_StreamedIn, this );
+
+    // Remove LowLod refs in others
+    SetLowLodObject ( NULL );
+    while ( !m_HighLodObjectList.empty () )
+        m_HighLodObjectList[0]->SetLowLodObject ( NULL );
 }
 
 
@@ -258,6 +266,58 @@ void CClientObject::SetModel ( unsigned short usModel )
 }
 
 
+bool CClientObject::IsLowLod ( void )
+{
+    return m_bIsLowLod;
+}
+
+
+bool CClientObject::SetLowLodObject ( CClientObject* pNewLowLodObject )
+{
+    // This object has to be high lod
+    if ( m_bIsLowLod )
+        return false;
+
+    // Set or clear?
+    if ( !pNewLowLodObject )
+    {
+        // Check if already clear
+        if ( !m_pLowLodObject )
+            return false;
+
+        // Verify link
+        assert ( ListContains ( m_pLowLodObject->m_HighLodObjectList, this ) );
+
+        // Clear there and here
+        ListRemove ( m_pLowLodObject->m_HighLodObjectList, this );
+        m_pLowLodObject = NULL;
+        return true;
+    }
+    else
+    {
+        // new object has to be low lod
+        if ( !pNewLowLodObject->m_bIsLowLod )
+            return false;
+
+        // Remove any previous link
+        SetLowLodObject ( NULL );
+
+        // Make new link
+        m_pLowLodObject = pNewLowLodObject;
+        pNewLowLodObject->m_HighLodObjectList.push_back ( this );
+        return true;
+    }
+}
+
+
+CClientObject* CClientObject::GetLowLodObject ( void )
+{
+    if ( m_bIsLowLod )
+        return NULL;
+    return m_pLowLodObject;
+}
+
+
 void CClientObject::Render ( void )
 {
     if ( m_pObject )
@@ -396,7 +456,7 @@ void CClientObject::Create ( void )
             g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest ( !CClientObjectManager::IsBreakableModel ( m_usModel ) );
 
             // Create the object
-            m_pObject = g_pGame->GetPools ()->AddObject ( m_usModel );
+            m_pObject = g_pGame->GetPools ()->AddObject ( m_usModel, m_bIsLowLod );
 
             // Restore default behaviour
             g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest ( false );
@@ -483,6 +543,32 @@ void CClientObject::NotifyDestroy ( void )
 
 void CClientObject::StreamedInPulse ( void )
 {
+    // Some things to do if low LOD object
+    if ( m_bIsLowLod )
+    {
+        // Manually update attaching incase other objects are streamed out
+        DoAttaching ();
+
+        // Check if we should be visible
+        bool bMakeVisible = false;
+        for ( std::vector < CClientObject* >::iterator iter = m_HighLodObjectList.begin () ; iter != m_HighLodObjectList.end () ; ++iter )
+        {
+            CObject* pObject = (*iter)->m_pObject;
+            if ( pObject )
+            {
+                if ( pObject->IsDistanceFaded () )
+                {
+                    bMakeVisible = true;
+                }
+            }
+            else
+                bMakeVisible = true;
+        }
+
+        SetVisible ( bMakeVisible );
+    }
+
+
     // Are we not a static object (allowed to move by physics)
     if ( !m_bIsStatic )
     {

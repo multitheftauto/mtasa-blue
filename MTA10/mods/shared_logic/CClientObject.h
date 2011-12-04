@@ -33,7 +33,7 @@ class CClientObject : public CClientStreamElement
     friend class CClientPed;
 
 public:
-                                    CClientObject           ( class CClientManager* pManager, ElementID ID, unsigned short usModel );
+                                    CClientObject           ( class CClientManager* pManager, ElementID ID, unsigned short usModel, bool bLowLod );
                                     ~CClientObject          ( void );
 
     void                            Unlink                  ( void );
@@ -70,6 +70,10 @@ public:
 
     inline unsigned short           GetModel                ( void ) const                      { return m_usModel; };
     void                            SetModel                ( unsigned short usModel );
+
+    bool                            IsLowLod                ( void );
+    bool                            SetLowLodObject         ( CClientObject* pLowLodObject );
+    CClientObject*                  GetLowLodObject         ( void );
 
     void                            Render                  ( void );
 
@@ -119,6 +123,10 @@ protected:
     bool                                m_bBreakable;
 
     CVector                             m_vecMoveSpeed;
+
+    const bool                          m_bIsLowLod;            // true if this object is low LOD
+    CClientObject*                      m_pLowLodObject;        // Pointer to low LOD version of this object
+    std::vector < CClientObject* >      m_HighLodObjectList;    // List of objects that use this object as a low LOD version
 
 public:
     CObject*                            m_pObject;

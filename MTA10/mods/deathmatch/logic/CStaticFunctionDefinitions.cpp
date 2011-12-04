@@ -3088,14 +3088,75 @@ bool CStaticFunctionDefinitions::SetElementFrozen ( CClientEntity& Entity, bool 
 }
 
 
-CClientObject* CStaticFunctionDefinitions::CreateObject ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation )
+bool CStaticFunctionDefinitions::SetLowLodElement ( CClientEntity& Entity, CClientEntity* pLowLodEntity )
+{
+    RUN_CHILDREN SetLowLodElement ( **iter, pLowLodEntity );
+
+    switch ( Entity.GetType () )
+    {
+        case CCLIENTOBJECT:
+        {
+            CClientObject& Object = static_cast < CClientObject& > ( Entity );
+            CClientObject* pLowLodObject = static_cast < CClientObject* > ( pLowLodEntity );
+            if ( !pLowLodObject )
+                return false;
+            if ( !Object.SetLowLodObject ( pLowLodObject ) )
+                return false;
+            break;
+        }
+        default: return false;
+    }
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetLowLodElement ( CClientEntity& Entity, CClientEntity*& pOutLowLodEntity )
+{
+    pOutLowLodEntity = NULL;
+
+    switch ( Entity.GetType () )
+    {
+        case CCLIENTOBJECT:
+        {
+            CClientObject& Object = static_cast < CClientObject& > ( Entity );
+            pOutLowLodEntity = Object.GetLowLodObject ();
+            break;
+        }
+        default: return false;
+    }
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::IsElementLowLod ( CClientEntity& Entity, bool& bOutIsLowLod )
+{
+    bOutIsLowLod = false;
+
+    switch ( Entity.GetType () )
+    {
+        case CCLIENTOBJECT:
+        {
+            CClientObject& Object = static_cast < CClientObject& > ( Entity );
+            bOutIsLowLod = Object.IsLowLod ();
+            break;
+        }
+        default: return false;
+    }
+
+    return true;
+}
+
+
+CClientObject* CStaticFunctionDefinitions::CreateObject ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod )
 {
     if ( CClientObjectManager::IsValidModel ( usModelID ) )
     {
 #ifdef WITH_OBJECT_SYNC
         CClientObject* pObject = new CDeathmatchObject ( m_pManager, m_pMovingObjectsManager, m_pClientGame->GetObjectSync (), INVALID_ELEMENT_ID, usModelID );
 #else
-        CClientObject* pObject = new CDeathmatchObject ( m_pManager, m_pMovingObjectsManager, INVALID_ELEMENT_ID, usModelID );
+        CClientObject* pObject = new CDeathmatchObject ( m_pManager, m_pMovingObjectsManager, INVALID_ELEMENT_ID, usModelID, bLowLod );
 #endif
         if ( pObject )
         {

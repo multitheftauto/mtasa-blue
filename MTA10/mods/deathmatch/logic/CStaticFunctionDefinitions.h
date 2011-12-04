@@ -76,6 +76,8 @@ public:
     static bool                         IsElementCollidableWith             ( CClientEntity& Entity, CClientEntity& ThisEntity, bool & bCanCollide );
     static bool                         GetElementCollisionsEnabled         ( CClientEntity& Entity );
     static bool                         IsElementFrozen                     ( CClientEntity& Entity, bool& bFrozen );
+    static bool                         GetLowLodElement                    ( CClientEntity& Entity, CClientEntity*& pOutLowLodEntity );
+    static bool                         IsElementLowLod                     ( CClientEntity& Entity, bool& bOutIsLowLod );
 
     // Element set funcs
     static CClientDummy*                CreateElement                       ( CResource& Resource, const char* szTypeName, const char* szID );
@@ -98,6 +100,7 @@ public:
     static bool                         SetElementCollisionsEnabled         ( CClientEntity& Entity, bool bEnabled );
     static bool                         SetElementCollidableWith            ( CClientEntity& Entity, CClientEntity& ThisEntity, bool bCanCollide );
     static bool                         SetElementFrozen                    ( CClientEntity& Entity, bool bFrozen );
+    static bool                         SetLowLodElement                    ( CClientEntity& Entity, CClientEntity* pLowLodEntity );
 
     // Radio funcs
     static bool                         SetRadioChannel                     ( unsigned char& ucChannel );
@@ -229,7 +232,7 @@ public:
     static bool                         SetVehicleDoorOpenRatio             ( CClientEntity& Vehicle, unsigned char ucDoor, float fRatio, unsigned long ulTime = 0 );
 
     // Object get funcs
-    static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation );
+    static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod );
     static bool                         IsObjectStatic                      ( CClientObject& Object, bool & bStatic );
     static bool                         GetObjectScale                      ( CClientObject& Object, float& fScale );
 

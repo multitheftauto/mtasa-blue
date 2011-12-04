@@ -29,11 +29,12 @@ CClientManager::CClientManager ( void )
     m_pConnectionTroubleTexture = g_pCore->GetGUI ()->CreateTexture ();
     m_pConnectionTroubleTexture->LoadFromFile ( CalcMTASAPath( CGUI_ICON_NETWORK_TROUBLE ) );
 
-    m_pMarkerStreamer = new CClientStreamer ( CClientMarker::IsLimitReached, 600.0f );
-    m_pObjectStreamer = new CClientStreamer ( CClientObjectManager::IsObjectLimitReached, 500.0f );
-    m_pPickupStreamer = new CClientStreamer ( CClientPickupManager::IsPickupLimitReached, 100.0f );
-    m_pPlayerStreamer = new CClientStreamer ( CClientPlayerManager::IsPlayerLimitReached, 250.0f );
-    m_pVehicleStreamer = new CClientStreamer ( CClientVehicleManager::IsVehicleLimitReached, 250.0f );
+    m_pMarkerStreamer = new CClientStreamer ( CClientMarker::IsLimitReached, 600.0f, 300, 300 );
+    m_pObjectStreamer = new CClientStreamer ( CClientObjectManager::IsObjectLimitReached, 500.0f, 300, 300 );
+    m_pObjectLodStreamer = new CClientStreamer ( CClientObjectManager::IsObjectLimitReached, 1200.0f, 1000, 1000 );
+    m_pPickupStreamer = new CClientStreamer ( CClientPickupManager::IsPickupLimitReached, 100.0f, 300, 300 );
+    m_pPlayerStreamer = new CClientStreamer ( CClientPlayerManager::IsPlayerLimitReached, 250.0f, 300, 300 );
+    m_pVehicleStreamer = new CClientStreamer ( CClientVehicleManager::IsVehicleLimitReached, 250.0f, 300, 300 );
     m_pModelRequestManager = new CClientModelRequestManager;
 
     m_pGUIManager = new CClientGUIManager;
@@ -160,6 +161,9 @@ CClientManager::~CClientManager ( void )
     delete m_pObjectStreamer;
     m_pObjectStreamer = NULL;
 
+    delete m_pObjectLodStreamer;
+    m_pObjectLodStreamer = NULL;
+
     delete m_pMarkerStreamer;
     m_pMarkerStreamer = NULL;
 
@@ -222,6 +226,7 @@ void CClientManager::UpdateStreamers ( void )
         // Update the streamers
         m_pMarkerStreamer->DoPulse ( vecTemp );
         m_pObjectStreamer->DoPulse ( vecTemp );
+        m_pObjectLodStreamer->DoPulse ( vecTemp );
         m_pPickupStreamer->DoPulse ( vecTemp );
         m_pPlayerStreamer->DoPulse ( vecTemp );
         m_pVehicleStreamer->DoPulse ( vecTemp );

@@ -70,6 +70,7 @@ public:
     inline CClientModelRequestManager*  GetModelRequestManager      ( void )        { return m_pModelRequestManager; }
     inline CClientObjectManager*        GetObjectManager            ( void )        { return m_pObjectManager; }
     inline CClientStreamer*             GetObjectStreamer           ( void )        { return m_pObjectStreamer; }
+    inline CClientStreamer*             GetObjectLodStreamer        ( void )        { return m_pObjectLodStreamer; }
     inline CClientPathManager*          GetPathManager              ( void )        { return m_pPathManager; }
     inline CClientPickupManager*        GetPickupManager            ( void )        { return m_pPickupManager; }
     inline CClientStreamer*             GetPickupStreamer           ( void )        { return m_pPickupStreamer; }
@@ -127,6 +128,7 @@ private:
     CClientSoundManager*                m_pSoundManager;
     CClientRenderElementManager*        m_pRenderElementManager;
     CClientStreamer*                    m_pObjectStreamer;
+    CClientStreamer*                    m_pObjectLodStreamer;
     CClientTeamManager*                 m_pTeamManager;
     CClientDisplayManager*              m_pDisplayManager;
     CClientVehicleManager*              m_pVehicleManager;

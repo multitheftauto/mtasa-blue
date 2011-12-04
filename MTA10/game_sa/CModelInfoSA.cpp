@@ -535,6 +535,8 @@ void CModelInfoSA::SetLODDistance ( float fDistance )
     // Ensure fDistance is in range
     fDistance = Min ( fDistance, fMaximumValue );
 #endif
+    // Limit to 325.f as is goes horrible after that
+    fDistance = Min ( fDistance, 325.f );
     m_pInterface = ppModelInfo [ m_dwModelID ];
     if ( m_pInterface )
         m_pInterface->fLodDistanceUnscaled = fDistance;

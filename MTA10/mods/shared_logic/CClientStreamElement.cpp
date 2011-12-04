@@ -82,6 +82,10 @@ void CClientStreamElement::InternalStreamOut ( void )
             CClientStreamElement* attachedElement = dynamic_cast< CClientStreamElement* > (*i);
             if ( attachedElement )
             {
+                // Don't stream out low LOD version
+                CClientObject* attachedObject = DynamicCast < CClientObject > (*i);
+                if ( attachedObject->IsLowLod () )
+                    continue;
                 attachedElement->InternalStreamOut();
             }
         }

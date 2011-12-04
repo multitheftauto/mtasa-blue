@@ -13,7 +13,9 @@
 
 using std::list;
 
-CClientStreamSectorRow::CClientStreamSectorRow ( float fBottom, float fTop )
+CClientStreamSectorRow::CClientStreamSectorRow ( float fBottom, float fTop, float fSectorSize, float fRowSize )
+    : m_fSectorSize ( fSectorSize )
+    , m_fRowSize ( fRowSize )
 {
     m_fBottom = fBottom;
     m_fTop = fTop;
@@ -84,10 +86,10 @@ CClientStreamSector * CClientStreamSectorRow::FindOrCreateSector ( CVector & vec
     }
     
     // We need a new row, align it with the others
-    float fLeft = float ( ( int ) ( vecPosition.fX / SECTOR_SIZE ) ) * SECTOR_SIZE;
-    if ( vecPosition.fX < 0.0f ) fLeft -= SECTOR_SIZE;
+    float fLeft = float ( ( int ) ( vecPosition.fX / m_fSectorSize ) ) * m_fSectorSize;
+    if ( vecPosition.fX < 0.0f ) fLeft -= m_fSectorSize;
     CVector2D vecBottomLeft ( fLeft, m_fBottom );
-    CVector2D vecTopRight ( vecBottomLeft.fX + SECTOR_SIZE, vecBottomLeft.fY + ROW_SIZE );
+    CVector2D vecTopRight ( vecBottomLeft.fX + m_fSectorSize, vecBottomLeft.fY + m_fRowSize );
     pSector = new CClientStreamSector ( this, vecBottomLeft, vecTopRight );
     ConnectSector ( pSector );
     pSector->SetExtra ( true );
@@ -122,8 +124,8 @@ void CClientStreamSectorRow::ConnectSector ( CClientStreamSector * pSector )
     pSector->GetCorners ( vecBottomLeft, vecTopRight );
 
     // Grab our left and right sectors from the same row
-    pSector->m_pLeft = FindSector ( vecBottomLeft.fX - ( SECTOR_SIZE / 2.0f ) );
-    pSector->m_pRight = FindSector ( vecTopRight.fX + ( SECTOR_SIZE / 2.0f ) );
+    pSector->m_pLeft = FindSector ( vecBottomLeft.fX - ( m_fSectorSize / 2.0f ) );
+    pSector->m_pRight = FindSector ( vecTopRight.fX + ( m_fSectorSize / 2.0f ) );
 
     // Grab our top and bottom sectors from the row below and above our own
     if ( m_pTop ) pSector->m_pTop = m_pTop->FindSector ( vecBottomLeft.fX );

@@ -38,7 +38,7 @@ CDeathmatchObject::~CDeathmatchObject ( void )
 
 #else
 
-CDeathmatchObject::CDeathmatchObject ( CClientManager* pManager, CMovingObjectsManager* pMovingObjectsManager, ElementID ID, unsigned short usModel ) : ClassInit ( this ), CClientObject ( pManager, ID, usModel )
+CDeathmatchObject::CDeathmatchObject ( CClientManager* pManager, CMovingObjectsManager* pMovingObjectsManager, ElementID ID, unsigned short usModel, bool bLowLod ) : ClassInit ( this ), CClientObject ( pManager, ID, usModel, bLowLod )
 {
     m_pMovingObjectsManager = pMovingObjectsManager;
     m_pMoveAnimation = NULL;

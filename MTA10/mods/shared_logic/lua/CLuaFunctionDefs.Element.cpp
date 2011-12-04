@@ -2243,3 +2243,75 @@ int CLuaFunctionDefs::SetElementStreamable ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GetLowLodElement ( lua_State* luaVM )
+{
+//  element getLowLODElement ( element theElement )
+    CClientEntity* pEntity;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !argStream.HasErrors () )
+    {
+        CClientEntity* pLowLodEntity;
+        if ( CStaticFunctionDefinitions::GetLowLodElement ( *pEntity, pLowLodEntity ) )
+        {
+            lua_pushelement ( luaVM, pLowLodEntity );
+            return 1;
+        }        
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getLowLODElement", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetLowLodElement ( lua_State* luaVM )
+{
+//  bool setLowLODElement ( element theElement )
+    CClientEntity* pEntity; CClientEntity* pLowLodEntity;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadUserData ( pLowLodEntity );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetLowLodElement ( *pEntity, pLowLodEntity ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }        
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setLowLODElement", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::IsElementLowLod ( lua_State* luaVM )
+{
+//  bool isElementLowLOD ( element theElement )
+    CClientEntity* pEntity;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !argStream.HasErrors () )
+    {
+        bool bLowLod;
+        if ( CStaticFunctionDefinitions::IsElementLowLod ( *pEntity, bLowLod ) )
+        {
+            lua_pushboolean ( luaVM, bLowLod );
+            return 1;
+        }        
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "isElementLowLOD", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
