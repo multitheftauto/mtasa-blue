@@ -414,6 +414,12 @@ bool CEntitySA::IsOnScreen ()
     return bReturn;
 }
 
+bool CEntitySA::IsDistanceFaded ( void )
+{
+    if ( !m_pInterface->m_pLastRenderedLink )
+        return true;
+    return m_pInterface->bDistanceFade;
+}
 
 bool CEntitySA::IsVisible ( void )
 {

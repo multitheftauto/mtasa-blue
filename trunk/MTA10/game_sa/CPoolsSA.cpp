@@ -361,7 +361,7 @@ inline bool CPoolsSA::AddObjectToPool ( CObjectSA* pObject )
     return true;
 }
 
-CObject* CPoolsSA::AddObject ( DWORD dwModelID )
+CObject* CPoolsSA::AddObject ( DWORD dwModelID, bool bLowLod )
 {
     DEBUG_TRACE("CObject * CPoolsSA::AddObject ( DWORD dwModelID )");
 
@@ -370,6 +370,14 @@ CObject* CPoolsSA::AddObject ( DWORD dwModelID )
     if ( m_objectPool.ulCount < MAX_OBJECTS )
     {
         pObject = new CObjectSA ( dwModelID );
+
+        if ( bLowLod )
+        {
+            pObject->m_pInterface->bUsesCollision = 0;
+            pObject->m_pInterface->bDontCastShadowsOn = 1; 
+            // Set super hacky flag to indicate this is a special low lod object
+            pObject->m_pInterface->numLodChildrenRendered = 100;
+        }
 
         if ( ! AddObjectToPool ( pObject ) )
         {

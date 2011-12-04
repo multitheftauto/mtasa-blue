@@ -18,7 +18,9 @@ using std::list;
 
 void* CClientStreamer::pAddingElement = NULL;
 
-CClientStreamer::CClientStreamer ( StreamerLimitReachedFunction* pLimitReachedFunc, float fMaxDistance )
+CClientStreamer::CClientStreamer ( StreamerLimitReachedFunction* pLimitReachedFunc, float fMaxDistance, float fSectorSize, float fRowSize )
+    : m_fSectorSize ( fSectorSize )
+    , m_fRowSize ( fRowSize )
 {    
     // Setup our distance variables
     m_fMaxDistanceExp = fMaxDistance * fMaxDistance;
@@ -30,7 +32,7 @@ CClientStreamer::CClientStreamer ( StreamerLimitReachedFunction* pLimitReachedFu
 
     // Create our main world sectors covering the mainland
     CreateSectors ( &m_WorldRows,
-                    CVector2D ( SECTOR_SIZE, ROW_SIZE ),
+                    CVector2D ( m_fSectorSize, m_fRowSize ),
                     CVector2D ( -WORLD_SIZE, -WORLD_SIZE ),
                     CVector2D ( WORLD_SIZE, WORLD_SIZE ) );
 
@@ -69,7 +71,7 @@ void CClientStreamer::CreateSectors ( list < CClientStreamSectorRow * > * pList,
     float fX = vecBottomLeft.fX, fY = vecBottomLeft.fY;
     while ( fY < vecTopRight.fY )
     {
-        pCurrentRow = new CClientStreamSectorRow ( fY, fY + vecSize.fY );
+        pCurrentRow = new CClientStreamSectorRow ( fY, fY + vecSize.fY, m_fSectorSize, m_fRowSize );
         pList->push_back ( pCurrentRow );
         pCurrentRow->m_pBottom = pPreviousRow;
         if ( pPreviousRow ) pPreviousRow->m_pTop = pCurrentRow;
@@ -104,8 +106,8 @@ void CClientStreamer::ConnectRow ( CClientStreamSectorRow * pRow )
     pRow->GetPosition ( fTop, fBottom );
 
     // Connect up our row
-    pRow->m_pTop = FindRow ( fTop + ( ROW_SIZE / 2.0f ) );
-    pRow->m_pBottom = FindRow ( fBottom - ( ROW_SIZE / 2.0f ) );
+    pRow->m_pTop = FindRow ( fTop + ( m_fRowSize / 2.0f ) );
+    pRow->m_pBottom = FindRow ( fBottom - ( m_fRowSize / 2.0f ) );
 
     // Connect the other rows to us
     if ( pRow->m_pTop ) pRow->m_pTop->m_pBottom = pRow;
@@ -242,9 +244,9 @@ CClientStreamSectorRow * CClientStreamer::FindOrCreateRow ( CVector & vecPositio
         }
     }
     // We need a new row, align it with the others
-    float fBottom = float ( ( int ) ( vecPosition.fY / ROW_SIZE ) ) * ROW_SIZE;
-    if ( vecPosition.fY < 0.0f ) fBottom -= ROW_SIZE;
-    pRow = new CClientStreamSectorRow ( fBottom, fBottom + ROW_SIZE );
+    float fBottom = float ( ( int ) ( vecPosition.fY / m_fRowSize ) ) * m_fRowSize;
+    if ( vecPosition.fY < 0.0f ) fBottom -= m_fRowSize;
+    pRow = new CClientStreamSectorRow ( fBottom, fBottom + m_fRowSize, m_fSectorSize, m_fRowSize );
     ConnectRow ( pRow );
     pRow->SetExtra ( true );
     m_ExtraRows.push_back ( pRow );
@@ -442,7 +444,12 @@ void CClientStreamer::Restream ( void )
                 // If attached and attached-to is streamed out, don't consider for streaming in
                 CClientStreamElement* pAttachedTo = dynamic_cast< CClientStreamElement * >( pElement->GetAttachedTo() );
                 if ( pAttachedTo && !pAttachedTo->IsStreamedIn() )
-                    continue;
+                {
+                    // ...unless attached to low LOD version
+                    CClientObject* pObject = DynamicCast < CClientObject > ( pElement );
+                    if ( !pObject || !pObject->IsLowLod () )
+                        continue;
+                }
 
                 // Not room to stream in more elements?
                 if ( bReachedLimit )

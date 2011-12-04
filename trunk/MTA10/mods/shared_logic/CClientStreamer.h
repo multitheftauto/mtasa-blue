@@ -28,7 +28,7 @@ class CClientStreamer
 {
     friend class CClientStreamElement;
 public:
-                                            CClientStreamer             ( StreamerLimitReachedFunction* pLimitReachedFunc, float fMaxDistance );
+                                            CClientStreamer             ( StreamerLimitReachedFunction* pLimitReachedFunc, float fMaxDistance, float fSectorSize, float fRowSize );
                                             ~CClientStreamer            ( void );
 
     
@@ -66,6 +66,8 @@ private:
     void                                    OnElementForceStreamOut     ( CClientStreamElement * pElement );
     void                                    OnElementDimension          ( CClientStreamElement * pElement );
 
+    const float                             m_fSectorSize;
+    const float                             m_fRowSize;
     float                                   m_fMaxDistanceExp;
     float                                   m_fMaxDistanceThreshold;
     StreamerLimitReachedFunction*           m_pLimitReachedFunc;

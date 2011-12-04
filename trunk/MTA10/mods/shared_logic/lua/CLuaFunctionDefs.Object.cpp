@@ -21,40 +21,46 @@
 
 int CLuaFunctionDefs::CreateObject ( lua_State* luaVM )
 {
-//  object createObject ( int modelid, float x, float y, float z, [float rx, float ry, float rz] )
-    int iModelID; CVector vecPosition; CVector vecRotation;
+//  object createObject ( int modelid, float x, float y, float z, [float rx, float ry, float rz, bool lowLOD] )
+    ushort usModelID; CVector vecPosition; CVector vecRotation; bool bLowLod;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( iModelID );
+    argStream.ReadNumber ( usModelID );
     argStream.ReadNumber ( vecPosition.fX );
     argStream.ReadNumber ( vecPosition.fY );
     argStream.ReadNumber ( vecPosition.fZ );
     argStream.ReadNumber ( vecRotation.fX, 0 );
     argStream.ReadNumber ( vecRotation.fY, 0 );
     argStream.ReadNumber ( vecRotation.fZ, 0 );
+    argStream.ReadBool ( bLowLod, false );
 
     if ( !argStream.HasErrors () )
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
+        if ( CClientObjectManager::IsValidModel  ( usModelID ) )
         {
-            CResource* pResource = pLuaMain->GetResource ();
-            if ( pResource )
+            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+            if ( pLuaMain )
             {
-                CClientObject* pObject = CStaticFunctionDefinitions::CreateObject ( *pResource, iModelID, vecPosition, vecRotation );
-                if ( pObject )
+                CResource* pResource = pLuaMain->GetResource ();
+                if ( pResource )
                 {
-                    CElementGroup * pGroup = pResource->GetElementGroup();
-                    if ( pGroup )
+                    CClientObject* pObject = CStaticFunctionDefinitions::CreateObject ( *pResource, usModelID, vecPosition, vecRotation, bLowLod );
+                    if ( pObject )
                     {
-                        pGroup->Add ( ( CClientEntity* ) pObject );
-                    }
+                        CElementGroup * pGroup = pResource->GetElementGroup();
+                        if ( pGroup )
+                        {
+                            pGroup->Add ( ( CClientEntity* ) pObject );
+                        }
 
-                    lua_pushelement ( luaVM, pObject );
-                    return 1;
+                        lua_pushelement ( luaVM, pObject );
+                        return 1;
+                    }
                 }
             }
         }
+        else
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createObject", "Invalid model id" ) );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createObject", *argStream.GetErrorMessage () ) );

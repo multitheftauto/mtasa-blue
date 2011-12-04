@@ -204,6 +204,7 @@ public:
     WORD                        GetModelIndex ();
     eEntityType                 GetEntityType ();
     bool                        IsOnScreen ();
+    bool                        IsDistanceFaded ();
 
     bool                        IsVisible ( void );
     void                        SetVisible ( bool bVisible );

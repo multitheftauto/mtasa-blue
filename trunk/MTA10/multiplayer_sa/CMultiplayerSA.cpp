@@ -327,6 +327,12 @@ DWORD RETURN_CStreamingLoadRequestedModelsb_EU =    0x156710B;
 DWORD RETURN_CStreamingLoadRequestedModelsb_BOTH =  0;
 DWORD CStreaming__ConvertBufferToObject =           0x040C6B0;
 
+#define HOOKPOS_CRenderer_SetupEntityVisibility     0x554230    // 8 bytes
+DWORD RETURN_CRenderer_SetupEntityVisibility =      0x554238;
+
+#define HOOKPOS_CWorldScan_ScanWorld                0x55555E    // 5 bytes
+DWORD RETURN_CWorldScan_ScanWorlda =                0x555563;
+DWORD RETURN_CWorldScan_ScanWorldb =                0x72CAE0;
 
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
@@ -487,6 +493,8 @@ void HOOK_LoadingPlayerImgDir ();
 void HOOK_CStreamingRequestFile ();
 void HOOK_CStreamingLoadRequestedModels ();
 
+void HOOK_CRenderer_SetupEntityVisibility ();
+void HOOK_CWorldScan_ScanWorld ();
 
 void vehicle_lights_init ();
 
@@ -669,6 +677,8 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_PreHUDRender, (DWORD)HOOK_PreHUDRender, 5 );
     HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7 );
     HookInstall(HOOKPOS_LoadingPlayerImgDir, (DWORD)HOOK_LoadingPlayerImgDir, 5 );
+    HookInstall(HOOKPOS_CRenderer_SetupEntityVisibility, (DWORD)HOOK_CRenderer_SetupEntityVisibility, 8 );
+    HookInstall(HOOKPOS_CWorldScan_ScanWorld, (DWORD)HOOK_CWorldScan_ScanWorld, 5 );
 
     HookInstall(HOOKPOS_CHandlingData_isNotRWD, (DWORD)HOOK_isVehDriveTypeNotRWD, 7 );
     HookInstall(HOOKPOS_CHandlingData_isNotFWD, (DWORD)HOOK_isVehDriveTypeNotFWD, 7 );
@@ -6288,3 +6298,141 @@ skip:
     }
 }
 
+
+////////////////////////////////////////////////
+//
+// CRenderer_SetupEntityVisibility helpers
+//
+////////////////////////////////////////////////
+namespace
+{
+    #define     ARRAY_ModelInfo                 0xA9B0C8
+    #define     LOW_LOD_DRAW_DISTANCE_SCALE     3
+
+    // Is this a special low lod entity?
+    bool IsEntityLowLod ( CEntitySAInterface* pEntity )
+    {
+        // Read super hacky flag
+        return pEntity->numLodChildrenRendered == 100;
+    }
+
+    void SetGlobalDrawDistanceScale ( float fValue )
+    {
+        *(float*)0x858FD8 = 300.f * fValue;
+    }
+
+    struct
+    {
+        bool bValid;
+        float fLodDistanceUnscaled;
+        CBaseModelInfoSAInterface* pModelInfo;
+    } saved = { false, 0.f, NULL };
+}
+
+
+////////////////////////////////////////////////
+//
+// CRenderer_SetupEntityVisibility
+//
+////////////////////////////////////////////////
+void OnMY_CRenderer_SetupEntityVisibility_Pre( CEntitySAInterface* pEntity, float& fValue )
+{
+    if ( IsEntityLowLod ( pEntity ) )
+    {
+        SetGlobalDrawDistanceScale ( LOW_LOD_DRAW_DISTANCE_SCALE );
+        saved.pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[pEntity->m_nModelIndex];
+        saved.fLodDistanceUnscaled = saved.pModelInfo->fLodDistanceUnscaled;
+        saved.bValid = true;
+        saved.pModelInfo->fLodDistanceUnscaled *= LOW_LOD_DRAW_DISTANCE_SCALE;
+    }
+    else
+        saved.bValid = false;
+}
+
+void OnMY_CRenderer_SetupEntityVisibility_Post( int result, CEntitySAInterface* pEntity, float& fValue )
+{
+    if ( saved.bValid )
+    {
+        SetGlobalDrawDistanceScale ( 1 );
+        saved.pModelInfo->fLodDistanceUnscaled = saved.fLodDistanceUnscaled;
+        saved.bValid = false;
+    }
+}
+
+void _declspec(naked) HOOK_CRenderer_SetupEntityVisibility()
+{
+// hook from 554230 8 bytes
+    _asm
+    {
+////////////////////
+        pushad
+        push    [esp+32+4*2]
+        push    [esp+32+4*2]
+        call    OnMY_CRenderer_SetupEntityVisibility_Pre
+        add     esp, 4*2
+        popad
+
+////////////////////
+        push    [esp+4*2]
+        push    [esp+4*2]
+        call    second
+        add     esp, 4*2
+
+////////////////////
+        pushad
+        push    [esp+32+4*2]
+        push    [esp+32+4*2]
+        push    eax
+        call    OnMY_CRenderer_SetupEntityVisibility_Post
+        add     esp, 4*2+4
+        popad
+
+        retn
+
+second:
+        sub     esp,14h 
+        push    esi  
+        mov     esi,dword ptr [esp+1Ch] 
+        jmp     RETURN_CRenderer_SetupEntityVisibility   // 0x554238
+    }
+}
+
+
+////////////////////////////////////////////////
+//
+// CWorldScan_ScanWorld
+//
+////////////////////////////////////////////////
+void OnMY_CWorldScan_ScanWorld_Pre( CVector2D* pVec, int iValue, void (__cdecl *func)(int, int) )
+{
+    // Scale scan area
+    const CVector2D& vecOrigin = pVec[0];
+
+    for ( uint i = 1 ; i < 5 ; i++ )
+    {
+        CVector2D vecDiff = pVec[i] - vecOrigin;
+        vecDiff *= LOW_LOD_DRAW_DISTANCE_SCALE;
+        pVec[i] = vecDiff + vecOrigin;
+    }
+}
+
+void _declspec(naked) HOOK_CWorldScan_ScanWorld()
+{
+// hook from 55555E 5 bytes
+    _asm
+    {
+        call    second
+        jmp     RETURN_CWorldScan_ScanWorlda   // 555563
+
+second:
+        pushad
+        push    [esp+32+4*3]
+        push    [esp+32+4*3]
+        push    [esp+32+4*3]
+        call    OnMY_CWorldScan_ScanWorld_Pre
+        add     esp, 4*3
+        popad
+
+        jmp     RETURN_CWorldScan_ScanWorldb   // 72CAE0
+    }
+}

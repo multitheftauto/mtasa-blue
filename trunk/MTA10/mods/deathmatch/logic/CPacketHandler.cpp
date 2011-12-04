@@ -2542,7 +2542,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 #ifdef WITH_OBJECT_SYNC
                         CDeathmatchObject* pObject = new CDeathmatchObject ( g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, g_pClientGame->m_pObjectSync, EntityID, usObjectID );
 #else
-                        CDeathmatchObject* pObject = new CDeathmatchObject ( g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, EntityID, usObjectID );
+                        bool bLowLod = false;
+                        CDeathmatchObject* pObject = new CDeathmatchObject ( g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, EntityID, usObjectID, bLowLod );
 #endif
                         pEntity = pObject;
                         if ( pObject )
