@@ -34,6 +34,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "isElementWithinMarker", CLuaElementDefs::isElementWithinMarker );
     CLuaCFunctions::AddFunction ( "isElementInWater", CLuaElementDefs::isElementInWater );
     CLuaCFunctions::AddFunction ( "isElementFrozen", CLuaElementDefs::isElementFrozen );
+    CLuaCFunctions::AddFunction ( "isElementLowLOD", CLuaElementDefs::isElementLowLOD );
 
     CLuaCFunctions::AddFunction ( "getElementByID", CLuaElementDefs::getElementByID );
     CLuaCFunctions::AddFunction ( "getElementByIndex", CLuaElementDefs::getElementByIndex );
@@ -59,6 +60,8 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getElementModel", CLuaElementDefs::getElementModel );
     CLuaCFunctions::AddFunction ( "getElementSyncer", CLuaElementDefs::getElementSyncer );
     CLuaCFunctions::AddFunction ( "getElementCollisionsEnabled", CLuaElementDefs::getElementCollisionsEnabled );
+    CLuaCFunctions::AddFunction ( "getElementCollisionsEnabled", CLuaElementDefs::getElementCollisionsEnabled );
+    CLuaCFunctions::AddFunction ( "getLowLODElement", CLuaElementDefs::getLowLODElement );
 
     // Attachement
     CLuaCFunctions::AddFunction ( "attachElements", CLuaElementDefs::attachElements );
@@ -92,6 +95,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementSyncer", CLuaElementDefs::setElementSyncer );
     CLuaCFunctions::AddFunction ( "setElementCollisionsEnabled", CLuaElementDefs::setElementCollisionsEnabled );
     CLuaCFunctions::AddFunction ( "setElementFrozen", CLuaElementDefs::setElementFrozen );
+    CLuaCFunctions::AddFunction ( "setLowLODElement", CLuaElementDefs::setLowLODElement );
 }
 
 
@@ -1984,6 +1988,80 @@ int CLuaElementDefs::setElementFrozen ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setElementFrozen" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaElementDefs::getLowLODElement ( lua_State* luaVM )
+{
+//  element getLowLODElement ( element theElement )
+    CElement* pEntity;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !argStream.HasErrors () )
+    {
+        CElement* pLowLodEntity;
+        if ( CStaticFunctionDefinitions::GetLowLodElement ( pEntity, pLowLodEntity ) )
+        {
+            lua_pushelement ( luaVM, pLowLodEntity );
+            return 1;
+        }        
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getLowLODElement", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaElementDefs::setLowLODElement ( lua_State* luaVM )
+{
+//  bool setLowLODElement ( element theElement )
+    CElement* pEntity; CElement* pLowLodEntity;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadUserData ( pLowLodEntity, NULL );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetLowLodElement ( pEntity, pLowLodEntity ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }        
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setLowLODElement", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaElementDefs::isElementLowLOD ( lua_State* luaVM )
+{
+//  bool isElementLowLOD ( element theElement )
+    CElement* pEntity;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !argStream.HasErrors () )
+    {
+        bool bIsLowLod;
+        if ( CStaticFunctionDefinitions::IsElementLowLod ( pEntity, bIsLowLod ) )
+        {
+            lua_pushboolean ( luaVM, bIsLowLod );
+            return 1;
+        }        
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "isElementLowLOD", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;

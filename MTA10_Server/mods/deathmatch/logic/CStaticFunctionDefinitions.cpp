@@ -358,7 +358,7 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
         {
             CObject* pObject = static_cast < CObject* > ( pElement );
 
-            CObject* pTemp = m_pObjectManager->Create ( pElement->GetParentEntity () );
+            CObject* pTemp = m_pObjectManager->Create ( pElement->GetParentEntity (), NULL, pObject->IsLowLod () );
             if ( pTemp )
             {
                 CVector vecRotation;
@@ -366,6 +366,7 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
                 pTemp->SetRotation ( vecRotation );
                 pTemp->SetModel ( pObject->GetModel () );
                 pTemp->SetParentObject ( pObject->GetParentEntity () );
+                pTemp->SetLowLodObject ( pObject->GetLowLodObject () );
 
                 pNewElement = pTemp;
             }
@@ -870,6 +871,73 @@ bool CStaticFunctionDefinitions::IsElementFrozen ( CElement* pElement, bool &bFr
         {
             CObject* pObject = static_cast < CObject* > ( pElement );
             bFrozen = pObject->IsStatic ();
+            break;
+        }
+        default: return false;
+    }
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetLowLodElement ( CElement* pElement, CElement* pLowLodElement )
+{
+    RUN_CHILDREN SetLowLodElement ( *iter, pLowLodElement );
+
+    switch ( pElement->GetType () )
+    {
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast < CObject* > ( pElement );
+            CObject* pLowLodObject = NULL;
+            if ( pLowLodElement && pLowLodElement->GetType () == CElement::OBJECT )
+                pLowLodObject = static_cast < CObject* > ( pLowLodElement );
+            if ( !pObject->SetLowLodObject ( pLowLodObject ) )
+                return false;
+            break;
+        }
+        default: return false;
+    }
+
+    ElementID elementID = pLowLodElement ? pLowLodElement->GetID () : INVALID_ELEMENT_ID;
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( elementID );
+    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_LOW_LOD_ELEMENT, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetLowLodElement ( CElement* pElement, CElement*& pOutLowLodElement )
+{
+    pOutLowLodElement = NULL;
+
+    switch ( pElement->GetType () )
+    {
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast < CObject* > ( pElement );
+            pOutLowLodElement = pObject->GetLowLodObject ();
+            break;
+        }
+        default: return false;
+    }
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::IsElementLowLod ( CElement* pElement, bool& bOutIsLowLod )
+{
+    bOutIsLowLod = false;
+
+    switch ( pElement->GetType () )
+    {
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast < CObject* > ( pElement );
+            bOutIsLowLod = pObject->IsLowLod ();
             break;
         }
         default: return false;
@@ -7488,10 +7556,10 @@ bool CStaticFunctionDefinitions::SetBlipVisibleDistance ( CElement* pElement, un
 }
 
 
-CObject* CStaticFunctionDefinitions::CreateObject ( CResource* pResource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation )
+CObject* CStaticFunctionDefinitions::CreateObject ( CResource* pResource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bIsLowLod )
 {
     //CObject* pObject = m_pObjectManager->Create ( m_pMapManager->GetRootElement () );
-    CObject* pObject = m_pObjectManager->Create ( pResource->GetDynamicElementRoot() );
+    CObject* pObject = m_pObjectManager->Create ( pResource->GetDynamicElementRoot(), NULL, bIsLowLod );
     if ( pObject )
     {
         // Convert the rotation from degrees to radians managed internally

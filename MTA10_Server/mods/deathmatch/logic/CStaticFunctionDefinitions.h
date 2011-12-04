@@ -78,6 +78,8 @@ public:
     static CElement*            GetElementSyncer                    ( CElement* pElement );
     static bool                 GetElementCollisionsEnabled         ( CElement* pElement );
     static bool                 IsElementFrozen                     ( CElement* pElement, bool& bFrozen );
+    static bool                 GetLowLodElement                    ( CElement* pElement, CElement*& pOutLowLodElement );
+    static bool                 IsElementLowLod                     ( CElement* pElement, bool& bOutLowLod );
 
     // Element set funcs
     static bool                 ClearElementVisibleTo               ( CElement* pElement );
@@ -101,6 +103,7 @@ public:
     static bool                 SetElementSyncer                    ( CElement* pElement, CPlayer* pPlayer, bool bEnable = true );
     static bool                 SetElementCollisionsEnabled         ( CElement* pElement, bool bEnable );
     static bool                 SetElementFrozen                    ( CElement* pElement, bool bFrozen );
+    static bool                 SetLowLodElement                    ( CElement* pElement, CElement* pLowLodElement );
 
     // Scoreboard
     static bool                 AddScoreboardColumn                 ( const char* szID, const char* szName, float fWidth );
@@ -382,7 +385,7 @@ public:
     static bool                 SetBlipVisibleDistance              ( CElement* pElement, unsigned short usVisibleDistance );
 
     // Object create/destroy functions
-    static CObject*             CreateObject                        ( CResource* pResource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation );
+    static CObject*             CreateObject                        ( CResource* pResource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bIsLowLod );
 
     // Object get functions
     static bool                 GetObjectRotation                   ( CObject* pObject, CVector& vecRotation );

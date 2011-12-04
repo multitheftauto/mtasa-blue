@@ -3098,8 +3098,6 @@ bool CStaticFunctionDefinitions::SetLowLodElement ( CClientEntity& Entity, CClie
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             CClientObject* pLowLodObject = static_cast < CClientObject* > ( pLowLodEntity );
-            if ( !pLowLodObject )
-                return false;
             if ( !Object.SetLowLodObject ( pLowLodObject ) )
                 return false;
             break;

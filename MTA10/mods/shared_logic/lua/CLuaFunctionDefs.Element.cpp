@@ -2274,7 +2274,7 @@ int CLuaFunctionDefs::SetLowLodElement ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadUserData ( pLowLodEntity );
+    argStream.ReadUserData ( pLowLodEntity, NULL );
 
     if ( !argStream.HasErrors () )
     {

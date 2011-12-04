@@ -189,6 +189,14 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     alpha.data.ucAlpha = pObject->GetAlpha ();
                     BitStream.Write ( &alpha );
 
+                    // Low LOD stuff
+                    bool bIsLowLod = pObject->IsLowLod ();
+                    BitStream.WriteBit ( bIsLowLod );
+
+                    CObject* pLowLodObject = pObject->GetLowLodObject ();
+                    ElementID LowLodObjectID = pLowLodObject ? pLowLodObject->GetID () : INVALID_ELEMENT_ID;
+                    BitStream.Write ( LowLodObjectID );
+
                     // Double sided
                     bool bIsDoubleSided = pObject->IsDoubleSided ();
                     BitStream.WriteBit ( bIsDoubleSided );

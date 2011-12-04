@@ -190,7 +190,8 @@ bool CResourceMapItem::HandleNode ( CXMLNode& Node, CElement* pParent, vector < 
     }
     else if ( strBuffer.compare ( "object" ) == 0 )
     {
-        pNode = m_pObjectManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
+        bool bIsLowLod = false;
+        pNode = m_pObjectManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents, bIsLowLod );
     }
     else if ( strBuffer.compare ( "blip" ) == 0 )
     {

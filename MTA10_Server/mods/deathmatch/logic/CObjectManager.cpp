@@ -101,10 +101,10 @@ CObjectManager::~CObjectManager ( void )
 }
 
 
-CObject* CObjectManager::Create ( CElement* pParent, CXMLNode* pNode )
+CObject* CObjectManager::Create ( CElement* pParent, CXMLNode* pNode, bool bIsLowLod )
 {
     // Create the object
-    CObject* pObject = new CObject ( pParent, pNode, this );
+    CObject* pObject = new CObject ( pParent, pNode, this, bIsLowLod );
 
     // Valid object id?
     if ( pObject->GetID () == INVALID_ELEMENT_ID )
@@ -118,10 +118,10 @@ CObject* CObjectManager::Create ( CElement* pParent, CXMLNode* pNode )
 }
 
 
-CObject* CObjectManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents )
+CObject* CObjectManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents, bool bIsLowLod )
 {
     // Create the object
-    CObject* pObject = new CObject ( pParent, &Node, this );
+    CObject* pObject = new CObject ( pParent, &Node, this, bIsLowLod );
 
     // Valid object id and load it from xml
     if ( pObject->GetID () == INVALID_ELEMENT_ID ||
