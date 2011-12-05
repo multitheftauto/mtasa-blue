@@ -1276,6 +1276,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\net\CNetBufferWatchDog.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\net\CSimControl.cpp"
 						>
 					</File>
@@ -2473,7 +2477,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\net\CNetBufferUtil.h"
+						RelativePath=".\logic\net\CNetBufferWatchDog.h"
 						>
 					</File>
 					<File

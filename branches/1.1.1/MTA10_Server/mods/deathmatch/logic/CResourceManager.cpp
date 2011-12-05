@@ -54,10 +54,11 @@ CResourceManager::~CResourceManager ( void )
     StopAllResources ();
 
     // Then start deleting them
-    list < CResource* > ::const_iterator iter = m_resources.begin ();
-    for ( ; iter != m_resources.end (); iter++ )
-    {
-        delete (*iter);
+    while ( m_resources.size () )
+    {    
+        CResource* pResource = m_resources.front ();
+        delete pResource;
+        m_resources.remove ( pResource );
     }
 }
 

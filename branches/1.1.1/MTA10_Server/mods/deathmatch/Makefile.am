@@ -256,6 +256,7 @@ LOGIC = \
 ./logic/packets/CVoiceDataPacket.cpp \
 ./logic/packets/CVoiceEndPacket.cpp \
 ./logic/net/CNetBuffer.cpp \
+./logic/net/CNetBufferWatchDog.cpp \
 ./logic/net/CSimControl.cpp \
 ./logic/net/CSimPlayerManager.cpp \
 ./logic/net/CSimPlayerPuresyncPacket.cpp \

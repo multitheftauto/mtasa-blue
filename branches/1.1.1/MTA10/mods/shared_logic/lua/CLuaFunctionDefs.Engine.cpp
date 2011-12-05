@@ -580,7 +580,7 @@ int CLuaFunctionDefs::EngineGetModelIDFromName ( lua_State* luaVM )
     return 1;
 }
 
-
+// Only works if the model is loaded. EngineGetVisibleTextureNames should be used instead
 int CLuaFunctionDefs::EngineGetModelTextureNames ( lua_State* luaVM )
 {
 //  table engineGetModelTextureNames ( string modelName )

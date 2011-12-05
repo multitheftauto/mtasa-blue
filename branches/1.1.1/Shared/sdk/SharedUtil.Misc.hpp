@@ -550,15 +550,6 @@ SString SharedUtil::GetSystemErrorMessage ( uint uiError, bool bRemoveNewlines, 
 }
 
 
-//
-// Return true if currently executing the main thread.
-// Main thread being defined as the thread the function is first called from.
-bool SharedUtil::IsMainThread ( void )
-{
-    static DWORD dwMainThread = GetCurrentThreadId ();
-    return GetCurrentThreadId () == dwMainThread;
-}
-
 #endif
 
 
@@ -760,6 +751,20 @@ SString SharedUtil::UnescapeString ( const SString& strText, char cSpecialChar )
 
 #endif
 
+//
+// Return true if currently executing the main thread.
+// Main thread being defined as the thread the function is first called from.
+//
+bool SharedUtil::IsMainThread ( void )
+{
+#ifdef WIN32
+    static DWORD dwMainThread = GetCurrentThreadId ();
+    return GetCurrentThreadId () == dwMainThread;
+#else
+    static pthread_t dwMainThread = pthread_self ();
+    return pthread_equal ( pthread_self (), dwMainThread ) != 0;
+#endif
+}
 
 
 //

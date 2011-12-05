@@ -383,6 +383,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 {
     // Init
     m_pASE = NULL;
+    IsMainThread ();
 
     // Startup the getElementsByType from root optimizations
     CElement::StartupEntitiesFromRoot ();

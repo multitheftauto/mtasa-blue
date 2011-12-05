@@ -873,6 +873,7 @@ ushort CRenderWareSA::GetTXDIDForModelID ( ushort usModelID )
 // CRenderWareSA::GetModelTextureNames
 //
 // Get list of texture names associated with the model
+// Only works if the model is loaded
 //
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::GetModelTextureNames ( std::vector < SString >& outNameList, ushort usModelID )
