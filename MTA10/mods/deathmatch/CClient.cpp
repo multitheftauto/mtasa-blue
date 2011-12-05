@@ -75,7 +75,10 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     g_pCore->GetCommands ()->Add ( "radar_move_south",          "moves the radar south",                                COMMAND_RadarMoveSouth, true );
     g_pCore->GetCommands ()->Add ( "radar_move_east",           "moves the radar east",                                 COMMAND_RadarMoveEast, true );
     g_pCore->GetCommands ()->Add ( "radar_move_west",           "moves the radar west",                                 COMMAND_RadarMoveWest, true );
-    g_pCore->GetCommands ()->Add ( "radar_attach",              "attaches the radar ",                                  COMMAND_RadarAttach, true );
+    g_pCore->GetCommands ()->Add ( "radar_attach",              "attaches the radar",                                   COMMAND_RadarAttach, true );
+    g_pCore->GetCommands ()->Add ( "radar_opacity_down",        "reduces radar opacity",                                COMMAND_RadarOpacityDown, true );
+    g_pCore->GetCommands ()->Add ( "radar_opacity_up",          "increases radar opacity",                              COMMAND_RadarOpacityUp, true );
+    g_pCore->GetCommands ()->Add ( "radar_help",                "toggles radar help test",                              COMMAND_RadarHelp, true );
     g_pCore->GetCommands ()->Add ( "msg_target",                "sends a message to the targetted player",              COMMAND_MessageTarget, true );
     g_pCore->GetCommands ()->Add ( "vehicle_next_weapon",       "changes to the next weapon whilst in a vehicle",       COMMAND_VehicleNextWeapon, true );
     g_pCore->GetCommands ()->Add ( "vehicle_previous_weapon",   "changes to the previous weapon whilst in a vehicle",   COMMAND_VehiclePreviousWeapon, true );

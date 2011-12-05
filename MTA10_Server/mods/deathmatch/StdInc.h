@@ -40,6 +40,7 @@ struct SAclRequest;
 #include "CMatrix.h"
 #include "CQuat.h"
 #include "SharedUtil.h"
+#include "SharedUtil.Maps.h"
 #include <bochs_internal/crc32.h>
 #include "CChecksum.h"
 

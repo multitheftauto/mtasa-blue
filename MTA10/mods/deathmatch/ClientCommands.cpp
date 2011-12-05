@@ -357,8 +357,33 @@ void COMMAND_RadarAttach ( const char* szCmdLine )
     }
 }
 
-void COMMAND_RadarTransparency ( const char* szCmdLine )
+void COMMAND_RadarOpacityDown ( const char* szCmdLine )
 {
+    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap ();
+    if ( pRadarMap->IsRadarShowing () )
+    {
+        int iAlpha;
+        g_pCore->GetCVars ()->Get ( "mapalpha", iAlpha );
+        iAlpha = Max ( 0, iAlpha - 20 );
+        g_pCore->GetCVars ()->Set ( "mapalpha", iAlpha );
+    }
+}
+
+void COMMAND_RadarOpacityUp ( const char* szCmdLine )
+{
+    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap ();
+    if ( pRadarMap->IsRadarShowing () )
+    {
+        int iAlpha;
+        g_pCore->GetCVars ()->Get ( "mapalpha", iAlpha );
+        iAlpha = Min ( 255, iAlpha + 20 );
+        g_pCore->GetCVars ()->Set ( "mapalpha", iAlpha );
+    }
+}
+
+void COMMAND_RadarHelp ( const char* szCmdLine )
+{
+    g_pClientGame->GetRadarMap ()->ToggleHelpText ();
 }
 
 void COMMAND_MessageTarget ( const char* szCmdLine )

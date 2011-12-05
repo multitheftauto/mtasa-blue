@@ -38,6 +38,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     m_bIsRadarEnabled = false;
     m_bForcedState = false;
     m_bIsAttachedToLocal = false;
+    m_bHideHelpText = false;
 
     // Set the movement bools
     m_bIsMovingNorth = false;
@@ -45,11 +46,6 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     m_bIsMovingEast = false;
     m_bIsMovingWest = false;
     m_bTextVisible = false;
-
-    // Set the initial alpha to the alpha from the users options
-    int iVar;
-    g_pCore->GetCVars()->Get ( "mapalpha", iVar );
-    m_iRadarAlpha = iVar;
 
     // Set the update time to the current time
     m_ulUpdateTime = GetTickCount32 ();
@@ -69,82 +65,34 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     // Create the marker textures
     CreateMarkerTextures ();
 
-    // Create the text display for the mode text
-    m_pModeText = new CClientTextDisplay ( m_pManager->GetDisplayManager () );
-    m_pModeText->SetCaption ( "Current Mode: Free Move" );
-    m_pModeText->SetColor ( SColorRGBA ( 255, 255, 255, 200 ) );
-    m_pModeText->SetPosition ( CVector ( 0.50f, 0.92f, 0 ) );
-    m_pModeText->SetFormat ( DT_CENTER | DT_VCENTER );
-    m_pModeText->SetScale ( 1.5f );
-    m_pModeText->SetVisible ( false );
-
-    m_pHelpTextZooming = NULL;
-    m_pHelpTextMovement = NULL;
-    m_pHelpTextAttachment = NULL;
-
-    // retrieve the key binds
-    //   zooming
-    CCommandBind * cbZoomOut = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_zoom_out", 0, 0, 0, false, 0 );
-    if ( !cbZoomOut )
-        return;
-    const SBindableKey *bkZoomOut = cbZoomOut->boundKey;
-
-    CCommandBind * cbZoomIn = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_zoom_in", 0, 0, 0, false, 0 );
-    if ( !cbZoomIn )
-        return;
-    const SBindableKey *bkZoomIn = cbZoomIn->boundKey;
-
-    //   movement
-    CCommandBind * cbMoveNorth = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_move_north", 0, 0, 0, false, 0 );
-    if ( !cbMoveNorth )
-        return;
-    const SBindableKey *bkMoveNorth = cbMoveNorth->boundKey;
-
-    CCommandBind * cbMoveEast = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_move_east", 0, 0, 0, false, 0 );
-    if ( !cbMoveEast )
-        return;
-    const SBindableKey *bkMoveEast = cbMoveEast->boundKey;
-
-    CCommandBind * cbMoveSouth = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_move_south", 0, 0, 0, false, 0 );
-    if ( !cbMoveSouth )
-        return;
-    const SBindableKey *bkMoveSouth = cbMoveSouth->boundKey;
-
-    CCommandBind * cbMoveWest = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_move_west", 0, 0, 0, false, 0 );
-    if ( !cbMoveWest )
-        return;
-    const SBindableKey *bkMoveWest = cbMoveWest->boundKey;
-
-    //   toggle map mode
-    CCommandBind * cbAttachRadar = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_attach", 0, 0, 0, false, 0 );
-    if ( !cbAttachRadar )
-        return;
-    const SBindableKey *bkAttachRadar = cbAttachRadar->boundKey;
-
     // Create the text displays for the help text
-    m_pHelpTextZooming = new CClientTextDisplay ( m_pManager->GetDisplayManager () );
-    m_pHelpTextZooming->SetCaption ( SString("Press %s/%s to zoom in/out.", bkZoomIn->szKey, bkZoomOut->szKey).c_str () );
-    m_pHelpTextZooming->SetColor( SColorRGBA ( 255, 255, 255, 255 ) );
-    m_pHelpTextZooming->SetPosition ( CVector ( 0.50f, 0.05f, 0 ) );
-    m_pHelpTextZooming->SetFormat ( DT_CENTER | DT_VCENTER );
-    m_pHelpTextZooming->SetScale ( 1.0f );
-    m_pHelpTextZooming->SetVisible ( false );
+    struct {
+        SColor color;
+        float fPosY;
+        float fScale;
+        SString strMessage;
+    } messageList [] = {
+        { SColorRGBA ( 255, 255, 255, 200 ), 0.92f, 1.5f, "Current Mode: Free Move" },
+        { SColorRGBA ( 255, 255, 255, 255 ), 0.05f, 1.0f, SString ( "Press %s/%s to zoom in/out.", *GetBoundKeyName ( "radar_zoom_in" ), *GetBoundKeyName ( "radar_zoom_out" ) ) },
+        { SColorRGBA ( 255, 255, 255, 255 ), 0.08f, 1.0f, SString ( "Press %s, %s, %s, %s to navigate the map.", *GetBoundKeyName ( "radar_move_north" ), *GetBoundKeyName ( "radar_move_east" ), *GetBoundKeyName ( "radar_move_south" ), *GetBoundKeyName ( "radar_move_west" ) ) },
+        { SColorRGBA ( 255, 255, 255, 255 ), 0.11f, 1.0f, SString ( "Press %s to change mode.", *GetBoundKeyName ( "radar_attach" ) ) },
+        { SColorRGBA ( 255, 255, 255, 255 ), 0.14f, 1.0f, SString ( "Press %s/%s to change opacity.", *GetBoundKeyName ( "radar_opacity_down" ), *GetBoundKeyName ( "radar_opacity_up" ) ) },
+        { SColorRGBA ( 255, 255, 255, 255 ), 0.17f, 1.0f, SString ( "Press %s to hide the map.", *GetBoundKeyName ( "radar" ) ) },
+        { SColorRGBA ( 255, 255, 255, 255 ), 0.20f, 1.0f, SString ( "Press %s to hide this help text.", *GetBoundKeyName ( "radar_help" ) ) },
+    };
 
-    m_pHelpTextMovement = new CClientTextDisplay ( m_pManager->GetDisplayManager () );
-    m_pHelpTextMovement->SetCaption ( SString("Press %s, %s, %s, %s to navigate the map.", bkMoveNorth->szKey, bkMoveEast->szKey, bkMoveSouth->szKey, bkMoveWest->szKey).c_str() );
-    m_pHelpTextMovement->SetColor( SColorRGBA ( 255, 255, 255, 255 ) );
-    m_pHelpTextMovement->SetPosition ( CVector ( 0.50f, 0.08f, 0 ) );
-    m_pHelpTextMovement->SetFormat ( DT_CENTER | DT_VCENTER );
-    m_pHelpTextMovement->SetScale ( 1.0f );
-    m_pHelpTextMovement->SetVisible ( false );
+    for ( uint i = 0 ; i < NUMELMS( messageList ) ; i++ )
+    {
+        CClientTextDisplay* pTextDisplay = new CClientTextDisplay ( m_pManager->GetDisplayManager () );
+        pTextDisplay->SetCaption ( messageList[i].strMessage );
+        pTextDisplay->SetColor( messageList[i].color );
+        pTextDisplay->SetPosition ( CVector ( 0.50f, messageList[i].fPosY, 0 ) );
+        pTextDisplay->SetFormat ( DT_CENTER | DT_VCENTER );
+        pTextDisplay->SetScale ( messageList[i].fScale );
+        pTextDisplay->SetVisible ( false );
 
-    m_pHelpTextAttachment = new CClientTextDisplay ( m_pManager->GetDisplayManager () );
-    m_pHelpTextAttachment->SetCaption ( SString("Press %s to change mode.", bkAttachRadar->szKey).c_str() );
-    m_pHelpTextAttachment->SetColor( SColorRGBA ( 255, 255, 255, 255 ) );
-    m_pHelpTextAttachment->SetPosition ( CVector ( 0.50f, 0.11f, 0 ) );
-    m_pHelpTextAttachment->SetFormat ( DT_CENTER | DT_VCENTER );
-    m_pHelpTextAttachment->SetScale ( 1.0f );
-    m_pHelpTextAttachment->SetVisible ( false );
+        m_HelpTextList.push_back ( pTextDisplay );
+    }
 }
 
 
@@ -168,11 +116,6 @@ void CRadarMap::DoPulse ( void )
     // If our radar image exists
     if ( IsRadarShowing () )
     {
-        // Get the alpha from the options, incase it has changed
-        int iVar;
-        g_pCore->GetCVars()->Get ( "mapalpha", iVar );
-        m_iRadarAlpha = iVar;
-
         // If we are following the local player blip
         if ( m_bIsAttachedToLocal )
         {
@@ -286,16 +229,21 @@ CTextureItem* CRadarMap::GetMarkerTexture ( CClientRadarMarker* pMarker, float f
 
 void CRadarMap::DoRender ( void )
 {
-    // If our radar image exists
-    if ( IsRadarShowing () )
+    bool bIsRadarShowing = IsRadarShowing ();
+
+    // Render if showing
+    if ( bIsRadarShowing )
     {
+        // Get the alpha value from the settings
+        int iRadarAlpha;
+        g_pCore->GetCVars()->Get ( "mapalpha", iRadarAlpha );
 
         g_pCore->GetGraphics()->DrawTexture ( m_pRadarImage, static_cast < float > ( m_iMapMinX ),
                                                              static_cast < float > ( m_iMapMinY ),
                                                              m_fMapSize / m_pRadarImage->m_uiSizeX,
                                                              m_fMapSize / m_pRadarImage->m_uiSizeY,
                                                              0.0f, 0.0f, 0.0f,
-                                                             SColorARGB ( m_iRadarAlpha, 255, 255, 255 ) );
+                                                             SColorARGB ( iRadarAlpha, 255, 255, 255 ) );
 
         // Grab the info for the local player blip
         CVector2D vecLocalPos;
@@ -366,43 +314,15 @@ void CRadarMap::DoRender ( void )
         }
 
         g_pCore->GetGraphics()->DrawTexture ( m_pLocalPlayerBlip, vecLocalPos.fX, vecLocalPos.fY, 1.0, 1.0, vecLocalRot.fZ, 0.5f, 0.5f );
-
-        if ( !m_bTextVisible )
-        {
-            m_bTextVisible = true;
-            m_pModeText->SetVisible ( true );
-            if ( m_pHelpTextZooming )
-                m_pHelpTextZooming->SetVisible ( true );
-            if ( m_pHelpTextMovement )
-                m_pHelpTextMovement->SetVisible ( true );
-            if ( m_pHelpTextAttachment )
-                m_pHelpTextAttachment->SetVisible ( true );
-        }
-
-        if ( m_bTextVisible )
-        {
-            m_pModeText->Render ();
-            if ( m_pHelpTextZooming )
-                m_pHelpTextZooming->Render ();
-            if ( m_pHelpTextMovement )
-                m_pHelpTextMovement->Render ();
-            if ( m_pHelpTextAttachment )
-                m_pHelpTextAttachment->Render ();
-        }
     }
-    else
+
+    // Update visibility of help text
+    bool bRequiredTextVisible = bIsRadarShowing && !m_bHideHelpText;
+    if ( bRequiredTextVisible != m_bTextVisible )
     {
-        if ( m_bTextVisible )
-        {
-            m_bTextVisible = false;
-            m_pModeText->SetVisible ( false );
-            if ( m_pHelpTextZooming )
-                m_pHelpTextZooming->SetVisible ( false );
-            if ( m_pHelpTextMovement )
-                m_pHelpTextMovement->SetVisible ( false );
-            if ( m_pHelpTextAttachment )
-                m_pHelpTextAttachment->SetVisible ( false );
-        }
+        m_bTextVisible = bRequiredTextVisible;
+        for ( uint i = 0 ; i < m_HelpTextList.size () ; i++ )
+            m_HelpTextList[i]->SetVisible ( m_bTextVisible );
     }
 }
 
@@ -745,11 +665,11 @@ void CRadarMap::SetAttachedToLocalPlayer ( bool bIsAttachedToLocal )
 
     if ( m_bIsAttachedToLocal )
     {
-        m_pModeText->SetCaption ( "Current Mode: Attached to local player" );
+        m_HelpTextList[0]->SetCaption ( "Current Mode: Attached to local player" );
     }
     else
     {
-        m_pModeText->SetCaption ( "Current Mode: Free Move" );
+        m_HelpTextList[0]->SetCaption ( "Current Mode: Free Move" );
     }
 }
 
@@ -781,7 +701,15 @@ bool CRadarMap::GetBoundingBox ( CVector &vecMin, CVector &vecMax )
     }
 }
 
-void CRadarMap::SetRadarAlpha ( int iRadarAlpha )
+void CRadarMap::ToggleHelpText ( void )
 {
-    m_iRadarAlpha = iRadarAlpha;
+    m_bHideHelpText = !m_bHideHelpText;
+}
+
+SString CRadarMap::GetBoundKeyName ( const SString& strCommand )
+{
+    CCommandBind* pCommandBind = g_pCore->GetKeyBinds () -> GetBindFromCommand ( strCommand, 0, 0, 0, false, 0 );
+    if ( !pCommandBind )
+        return strCommand;
+    return pCommandBind->boundKey->szKey;
 }

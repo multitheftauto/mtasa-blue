@@ -40,8 +40,7 @@ public:
 
     bool                                GetBoundingBox                      ( CVector &vecMin, CVector &vecMax );
 
-    int                                 GetRadarAlpha                       ( void ) const                  { return m_iRadarAlpha; }
-    void                                SetRadarAlpha                       ( int iRadarAlpha );
+    void                                ToggleHelpText                      ( void );
 
 protected:
     void                                InternalSetRadarEnabled             ( bool bEnabled );
@@ -68,6 +67,8 @@ public:
 
     void                                ZoomIn                              ( void );
     void                                ZoomOut                             ( void );
+
+    SString                             GetBoundKeyName                     ( const SString& strCommand );
 
 private:
     bool                                CalculateEntityOnScreenPosition     ( class CClientEntity* pEntity, CVector2D& vecLocalPos );
@@ -100,8 +101,6 @@ private:
     int                                 m_iHorizontalMovement;
     int                                 m_iVerticalMovement;
 
-    int                                 m_iRadarAlpha;
-
     unsigned char                       m_ucZoom;
 
     bool                                m_bIsRadarEnabled;
@@ -115,10 +114,8 @@ private:
 
     unsigned long                       m_ulUpdateTime;
 
-    CClientTextDisplay*                 m_pModeText;
-    CClientTextDisplay*                 m_pHelpTextZooming;
-    CClientTextDisplay*                 m_pHelpTextMovement;
-    CClientTextDisplay*                 m_pHelpTextAttachment;
+    std::vector < CClientTextDisplay* > m_HelpTextList;
+    bool                                m_bHideHelpText;
 
     bool                                m_bHudVisible;
     bool                                m_bChatVisible;
