@@ -11,6 +11,7 @@ class CSimPacket;
 class CSimPlayerManager;
 
 #include "SharedUtil.Thread.h"
+#include "CNetBufferWatchDog.h"
 #include "CNetBuffer.h"
 #include "CSimPlayer.h"
 #include "CSimPlayerManager.h"

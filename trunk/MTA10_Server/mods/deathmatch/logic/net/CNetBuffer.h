@@ -168,6 +168,9 @@ public:
     static bool                 StaticProcessPacket         ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo );
     bool                        ProcessPacket               ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo );
 
+    // Either thread functions
+    void                        UpdateQueueStats            ( void );
+
     // Main thread variables
     PPACKETHANDLER                      m_pfnDMPacketHandler;
     CThreadHandle*                      m_pServiceThreadHandle;
@@ -187,6 +190,7 @@ public:
         std::list < CNetJobData* >                  m_OutCommandQueue;
         std::list < CNetJobData* >                  m_OutResultQueue;
         std::list < SProcessPacketArgs* >           m_InResultQueue;
-        CComboMutex                                 m_Mutex;
+        CDebugComboMutex                            m_Mutex;
+        CNetBufferWatchDog*                         m_pWatchDog;
     } shared;
 };
