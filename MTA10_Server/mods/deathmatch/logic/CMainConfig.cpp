@@ -94,6 +94,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_bThreadNetEnabled = false;
     m_iBackupInterval = 3;
     m_iBackupAmount = 5;
+    m_iDebugFlag = 0;
 }
 
 
@@ -493,6 +494,10 @@ bool CMainConfig::Load ( void )
 
     // networkencryption - Encryption for Server <-> client communications
     GetBoolean ( m_pRootNode, "networkencryption", m_bNetworkEncryptionEnabled );
+
+    // debug_flag
+    m_iDebugFlag = 0;
+    GetInteger ( m_pRootNode, "debug_flag", m_iDebugFlag );
 
     // bandwidth_reduction
     GetString ( m_pRootNode, "bandwidth_reduction", m_strBandwidthReductionMode );
@@ -973,6 +978,12 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
         return true;
     }
     else
+    if ( strName == "debug_flag" )
+    {
+        strValue = SString ( "%d", m_iDebugFlag );
+        return true;
+    }
+    else
     {
         //
         // Everything else is read only, so can be fetched directly from the XML data
@@ -1124,6 +1135,20 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
             // Transient settings go in their own map, so they don't get saved
             MapSet ( m_TransientSettings, "lslimit", strValue );
             g_pBandwidthSettings->iLightSyncPlrsPerFrame = iLimit;
+            return true;
+        }
+    }
+    else
+    if ( strName == "debug_flag" )
+    {
+        if ( !strValue.empty() && isdigit( (uchar)strValue[0] ) )
+        {
+            m_iDebugFlag = atoi ( strValue );
+            if ( bSave )
+            {
+                SetString ( m_pRootNode, "debug_flag", SString ( "%d", m_iDebugFlag ) );
+                Save ();
+            }
             return true;
         }
     }

@@ -68,7 +68,7 @@ void CSimControl::EnableSimSystem ( bool bEnable )
         g_pNetServer = ms_pNetServerBuffer;
 
         // Replace packet handler
-        g_pNetServer->RegisterPacketHandler ( CGame::StaticProcessPacket );
+        ms_pNetServerBuffer->RegisterPacketHandler ( CGame::StaticProcessPacket );
 
         // Let the pulsing begin
         ms_pNetServerBuffer->SetAutoPulseEnabled ( true );
@@ -82,7 +82,8 @@ void CSimControl::EnableSimSystem ( bool bEnable )
         g_pNetServer = g_pRealNetServer;
 
         // Restore packet handler - This is blocking so will drain the outgoing queue
-        g_pNetServer->RegisterPacketHandler ( CGame::StaticProcessPacket );
+        ms_pNetServerBuffer->RegisterPacketHandler ( NULL );
+        g_pRealNetServer->RegisterPacketHandler ( CGame::StaticProcessPacket );
 
         // Drain the incoming queue
         ms_pNetServerBuffer->ProcessIncoming ();
