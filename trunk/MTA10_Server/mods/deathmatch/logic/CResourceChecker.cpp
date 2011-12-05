@@ -11,46 +11,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "CResourceChecker.Data.h"
 #include <clocale>
-
-namespace
-{
-    //
-    // Minimum version requirments for functions/events
-    //
-
-    struct SVersionItem
-    {
-        SString functionName;
-        SString minMtaVersion;      
-    };
-
-    SVersionItem clientFunctionInitList[] = {
-                                         { "createSWATRope",            "1.1.1-9.03250" },
-                                         { "toJSON",                    "1.1.1-9.03316" },
-                                         { "fromJSON",                  "1.1.1-9.03316" },
-                                         { "dxSetShaderTessellation",   "1.1.1-9.03316" },
-                                         { "setDevelopmentMode",        "1.1.1-9.03355" },
-                                         { "getDevelopmentMode",        "1.1.1-9.03355" },
-                                        };
-
-    SVersionItem serverFunctionInitList[] = {
-                                         { "onChatMessage",             "1.1.1-9.03316" },
-                                         { "getPlayerIdleTime",         "1.1.1-9.03316" },
-                                         { "copyResource",              "1.1.1-9.03316" },
-                                         { "renameResource",            "1.1.1-9.03316" },
-                                         { "deleteResource",            "1.1.1-9.03316" },
-                                         { "dbConnect",                 "1.1.1-9.03328" },
-                                         { "dbQuery",                   "1.1.1-9.03328" },
-                                         { "dbPoll",                    "1.1.1-9.03328" },
-                                         { "dbFree",                    "1.1.1-9.03328" },
-                                         { "dbExec",                    "1.1.1-9.03341" },
-                                         { "resendPlayerModInfo",       "1.1.1-9.03451" },
-                                         { "getResourceACLRequests",    "1.1.1-9.03503" },
-                                         { "updateResourceACLRequest",  "1.1.1-9.03503" },
-                                        };
-}
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -344,7 +306,7 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
 ///////////////////////////////////////////////////////////////
 void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const string& strFileName, const string& strResourceName, bool bClientScript, bool bCompiledScript, const string& strMode, string* pstrOutResult )
 {
-    map < string, long > doneWarningMap;
+    CStringHashMap < long > doneWarningMap;
     long lLineNumber = 1;
     bool bUTF8 = false;
 
@@ -596,192 +558,26 @@ void CResourceChecker::IssueLuaFunctionNameWarnings ( const string& strFunctionN
 ///////////////////////////////////////////////////////////////
 bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunctionName, bool bClientScript, string& strOutWhat, string& strOutHow )
 {
-    static map < string, string > hashClient;
-    static map < string, string > hashServer;
+    static CStringHashMap < SDeprecatedItem* > clientUpgradeInfoMap;
+    static CStringHashMap < SDeprecatedItem* > serverUpgradeInfoMap;
 
-    if ( hashClient.size () == 0 )
+    if ( clientUpgradeInfoMap.size () == 0 )
     {
-        // Client functions
-        hashClient["getPlayerRotation"]         = "Replaced|getPedRotation";
-        hashClient["canPlayerBeKnockedOffBike"] = "Replaced|canPedBeKnockedOffBike";
-        hashClient["getPlayerContactElement"]   = "Replaced|getPedContactElement";
-        hashClient["isPlayerInVehicle"]         = "Replaced|isPedInVehicle";
-        hashClient["doesPlayerHaveJetPack"]     = "Replaced|doesPedHaveJetPack";
-        hashClient["isPlayerInWater"]           = "Replaced|isElementInWater";
-        hashClient["isPedInWater"]              = "Replaced|isElementInWater";
-        hashClient["isPlayerOnGround"]          = "Replaced|isPedOnGround";
-        hashClient["getPlayerTask"]             = "Replaced|getPedTask";
-        hashClient["getPlayerSimplestTask"]     = "Replaced|getPedSimplestTask";
-        hashClient["isPlayerDoingTask"]         = "Replaced|isPedDoingTask";
-        hashClient["getPlayerTarget"]           = "Replaced|getPedTarget";
-        hashClient["getPlayerTargetStart"]      = "Replaced|getPedTargetStart";
-        hashClient["getPlayerTargetEnd"]        = "Replaced|getPedTargetEnd";
-        hashClient["getPlayerTargetRange"]      = "Replaced|getPedTargetRange";
-        hashClient["getPlayerTargetCollision"]  = "Replaced|getPedTargetCollision";
-        hashClient["getPlayerWeaponSlot"]       = "Replaced|getPedWeaponSlot";
-        hashClient["getPlayerWeapon"]           = "Replaced|getPedWeapon";
-        hashClient["getPlayerAmmoInClip"]       = "Replaced|getPedAmmoInClip";
-        hashClient["getPlayerTotalAmmo"]        = "Replaced|getPedTotalAmmo";
-        hashClient["getPlayerOccupiedVehicle"]  = "Replaced|getPedOccupiedVehicle";
-        hashClient["getPlayerArmor"]            = "Replaced|getPedArmor";
-        hashClient["getPlayerSkin"]             = "Replaced|getElementModel";
-        hashClient["isPlayerChoking"]           = "Replaced|isPedChoking";
-        hashClient["isPlayerDucked"]            = "Replaced|isPedDucked";
-        hashClient["getPlayerStat"]             = "Replaced|getPedStat";
-        hashClient["setPlayerWeaponSlot"]       = "Replaced|setPedWeaponSlot";
-        hashClient["setPlayerSkin"]             = "Replaced|setElementModel";
-        hashClient["setPlayerRotation"]         = "Replaced|setPedRotation";
-        hashClient["setPlayerCanBeKnockedOffBike"] = "Replaced|setPedCanBeKnockedOffBike";
-        hashClient["setVehicleModel"]           = "Replaced|setElementModel";
-        hashClient["getVehicleModel"]           = "Replaced|getElementModel";
-        hashClient["getPedSkin"]                = "Replaced|getElementModel";
-        hashClient["setPedSkin"]                = "Replaced|setElementModel";
-        hashClient["getObjectRotation"]         = "Replaced|getElementRotation";
-        hashClient["setObjectRotation"]         = "Replaced|setElementRotation";
-        hashClient["getModel"]                  = "Replaced|getElementModel";
-        hashClient["getVehicleIDFromName"]      = "Replaced|getVehicleModelFromName";
-        hashClient["getVehicleID"]              = "Replaced|getElementModel";
-        hashClient["getVehicleRotation"]        = "Replaced|getElementRotation";
-        hashClient["getVehicleNameFromID"]      = "Replaced|getVehicleNameFromModel";
-        hashClient["setVehicleRotation"]        = "Replaced|setElementRotation";
-        hashClient["attachElementToElement"]    = "Replaced|attachElements";
-        hashClient["detachElementFromElement"]  = "Replaced|detachElements";
-        hashClient["xmlFindSubNode"]            = "Replaced|xmlFindChild";
-        hashClient["xmlNodeGetSubNodes"]        = "Replaced|xmlNodeGetChildren";
-        hashClient["xmlNodeFindSubNode"]        = "Replaced|xmlFindChild";
-        hashClient["xmlCreateSubNode"]          = "Replaced|xmlCreateChild";
-        hashClient["isPedFrozen"]               = "Replaced|isElementFrozen";
-        hashClient["isVehicleFrozen"]           = "Replaced|isElementFrozen";
-        hashClient["isObjectStatic"]            = "Replaced|isElementFrozen";
-        hashClient["setPedFrozen"]              = "Replaced|setElementFrozen";
-        hashClient["setVehicleFrozen"]          = "Replaced|setElementFrozen";
-        hashClient["setObjectStatic"]           = "Replaced|setElementFrozen";
+        // Make maps to speed things up
+        for ( uint i = 0 ; i < NUMELMS( clientDeprecatedList ) ; i++ )
+            clientUpgradeInfoMap[ clientDeprecatedList[i].strOldName ] = &clientDeprecatedList[i];
 
-        // Camera
-        //hashClient["getCameraPosition"]         = "Replaced|getCameraMatrix";
-        //hashClient["getCameraRotation"]         = "Removed|Please manually update this.  Refer to the wiki for details";
-        //hashClient["setCameraLookAt"]           = "Removed|Please manually update this.  Refer to the wiki for details";
-        //hashClient["setCameraPosition"]         = "Removed|Please manually update this.  Refer to the wiki for details";
-        //hashClient["getCameraFixedModeTarget"]  = "Removed|Please manually update this.  Refer to the wiki for details";
-        //hashClient["toggleCameraFixedMode"]     = "Removed|Please manually update this.  Refer to the wiki for details";
-        //hashClient["rotateCameraRight"]         = "Removed|Please manually update this.  Refer to the wiki for details";
-        //hashClient["rotateCameraUp"]            = "Removed|Please manually update this.  Refer to the wiki for details";
-        // Edit
-        hashClient["guiEditSetCaratIndex"]      = "Replaced|guiEditSetCaretIndex";
-
-        // XML
-        hashClient["xmlNodeFindChild"]          = "Replaced|xmlFindChild";
-
-        // Server events
-        hashServer["onClientLogin"]             = "Replaced|onPlayerLogin";
-        hashServer["onClientLogout"]            = "Replaced|onPlayerLogout";
-        hashServer["onClientChangeNick"]        = "Replaced|onPlayerChangeNick";
-
-        // Server functions
-        hashServer["getPlayerSkin"]             = "Replaced|getElementModel";
-        hashServer["setPlayerSkin"]             = "Replaced|setElementModel";
-        hashServer["getVehicleModel"]           = "Replaced|getElementModel";
-        hashServer["setVehicleModel"]           = "Replaced|setElementModel";
-        hashServer["getObjectModel"]            = "Replaced|getElementModel";
-        hashServer["setObjectModel"]            = "Replaced|setElementModel";
-        hashServer["getVehicleID"]              = "Replaced|getElementModel";
-        hashServer["getVehicleIDFromName"]      = "Replaced|getVehicleModelFromName";
-        hashServer["getVehicleNameFromID"]      = "Replaced|getVehicleNameFromModel";
-        hashServer["getPlayerWeaponSlot"]       = "Replaced|getPedWeaponSlot";
-        hashServer["getPlayerWeapon"]           = "Replaced|getPedWeapon";
-        hashServer["getPlayerTotalAmmo"]        = "Replaced|getPedTotalAmmo";
-        hashServer["getPlayerAmmoInClip"]       = "Replaced|getPedAmmoInClip";
-        hashServer["getPlayerArmor"]            = "Replaced|getPedArmor";
-        hashServer["getPlayerRotation"]         = "Replaced|getPedRotation";
-        hashServer["isPlayerChoking"]           = "Replaced|isPedChoking";
-        hashServer["isPlayerDead"]              = "Replaced|isPedDead";
-        hashServer["isPlayerDucked"]            = "Replaced|isPedDucked";
-        hashServer["getPlayerStat"]             = "Replaced|getPedStat";
-        hashServer["getPlayerTarget"]           = "Replaced|getPedTarget";
-        hashServer["getPlayerClothes"]          = "Replaced|getPedClothes";
-        hashServer["doesPlayerHaveJetPack"]     = "Replaced|doesPedHaveJetPack";
-        hashServer["isPlayerInWater"]           = "Replaced|isElementInWater";
-        hashServer["isPedInWater"]              = "Replaced|isElementInWater";
-        hashServer["isPlayerOnGround"]          = "Replaced|isPedOnGround";
-        hashServer["getPlayerFightingStyle"]    = "Replaced|getPedFightingStyle";
-        hashServer["getPlayerGravity"]          = "Replaced|getPedGravity";
-        hashServer["getPlayerContactElement"]   = "Replaced|getPedContactElement";
-        hashServer["setPlayerArmor"]            = "Replaced|setPedArmor";
-        hashServer["setPlayerWeaponSlot"]       = "Replaced|setPedWeaponSlot";
-        hashServer["killPlayer"]                = "Replaced|killPed";
-        hashServer["setPlayerRotation"]         = "Replaced|setPedRotation";
-        hashServer["setPlayerStat"]             = "Replaced|setPedStat";
-        hashServer["addPlayerClothes"]          = "Replaced|addPedClothes";
-        hashServer["removePlayerClothes"]       = "Replaced|removePedClothes";
-        hashServer["givePlayerJetPack"]         = "Replaced|givePedJetPack";
-        hashServer["removePlayerJetPack"]       = "Replaced|removePedJetPack";
-        hashServer["setPlayerFightingStyle"]    = "Replaced|setPedFightingStyle";
-        hashServer["setPlayerGravity"]          = "Replaced|setPedGravity";
-        hashServer["setPlayerChoking"]          = "Replaced|setPedChoking";
-        hashServer["warpPlayerIntoVehicle"]     = "Replaced|warpPedIntoVehicle";
-        hashServer["removePlayerFromVehicle"]   = "Replaced|removePedFromVehicle";
-
-        hashServer["attachElementToElement"]    = "Replaced|attachElements";
-        hashServer["detachElementFromElement"]  = "Replaced|detachElements";
-
-        hashServer["xmlNodeGetSubNodes"]        = "Replaced|xmlNodeGetChildren";
-        hashServer["xmlCreateSubNode"]          = "Replaced|xmlCreateChild";
-        hashServer["xmlFindSubNode"]            = "Replaced|xmlFindChild";
-
-        hashClient["isPedFrozen"]               = "Replaced|isElementFrozen";
-        hashClient["isVehicleFrozen"]           = "Replaced|isElementFrozen";
-        hashClient["setPedFrozen"]              = "Replaced|setElementFrozen";
-        hashClient["setVehicleFrozen"]          = "Replaced|setElementFrozen";
-
-        // Camera
-        //hashServer["getCameraPosition"]         = "Replaced|getCameraMatrix";
-        //hashServer["setCameraPosition"]         = "Removed|Please manually update this.  Refer to the wiki for details";
-        //hashServer["setCameraLookAt"]           = "Removed|Please manually update this.  Refer to the wiki for details";
-        //hashServer["setCameraMode"]             = "Removed|Please manually update this.  Refer to the wiki for details";
-        //hashServer["getCameraMode"]             = "Removed|Please manually update this.  Refer to the wiki for details";
-        // Player
-        hashServer["getPlayerOccupiedVehicle"]  = "Replaced|getPedOccupiedVehicle";
-        hashServer["getPlayerOccupiedVehicleSeat"] = "Replaced|getPedOccupiedVehicleSeat";
-        hashServer["isPlayerInVehicle"]         = "Replaced|isPedInVehicle";
-        hashServer["getPlayerFromNick"]         = "Replaced|getPlayerFromName";
-
-        // Client
-        hashServer["getClientName"]             = "Replaced|getPlayerName";
-        hashServer["getClientIP"]               = "Replaced|getPlayerIP";
-        hashServer["getClientAccount"]          = "Replaced|getPlayerAccount";
-        hashServer["getAccountClient"]          = "Replaced|getAccountPlayer";
-        hashServer["setClientName"]             = "Replaced|setPlayerName";
-
-        // Utility
-        hashServer["randFloat"]                 = "Replaced|math.random";
-        hashServer["randInt"]                   = "Replaced|math.random";
-
-        // Admin
-        hashServer["banIP"]                     = "Removed|Please manually update this.  Refer to the wiki for details";
-        hashServer["banSerial"]                 = "Removed|Please manually update this.  Refer to the wiki for details";
-        hashServer["unbanIP"]                   = "Removed|Please manually update this.  Refer to the wiki for details";
-        hashServer["unbanSerial"]               = "Removed|Please manually update this.  Refer to the wiki for details";
-        hashServer["getBansXML"]                = "Removed|Please manually update this.  Refer to the wiki for details";
-
-        // Weapon
-        hashServer["giveWeaponAmmo"]            = "Replaced|giveWeapon";
-        hashServer["takeWeaponAmmo"]            = "Replaced|takeWeapon";
+        for ( uint i = 0 ; i < NUMELMS( serverDeprecatedList ) ; i++ )
+            serverUpgradeInfoMap[ serverDeprecatedList[i].strOldName ] = &serverDeprecatedList[i];
     }
 
-    // Which hash?
-    const map< string, string >& hash = bClientScript ? hashClient : hashServer;
-
-    // Query the hash
-    map < string, string >::const_iterator iter = hash.find ( strFunctionName );
-
-    if ( iter == hash.end () )
+    // Query the correct map
+    SDeprecatedItem* pItem = MapFindRef ( bClientScript ? clientUpgradeInfoMap : serverUpgradeInfoMap, strFunctionName );
+    if ( !pItem )
         return false;     // Nothing found
 
-    string value    = iter->second.c_str ();
-
-    long lPos       = max<long>( value.find ('|') , 0 );
-    strOutWhat      = value.substr ( 0, lPos );
-    strOutHow       = value.substr ( lPos + 1 );
+    strOutHow = pItem->strNewName;
+    strOutWhat = pItem->bRemoved ? "Removed" : "Replaced";
     return true;
 }
 
@@ -796,8 +592,8 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
 ///////////////////////////////////////////////////////////////
 void CResourceChecker::CheckVersionRequirements ( const string& strIdentifierName, bool bClientScript )
 {
-    static map < SString, SString > clientFunctionMap;
-    static map < SString, SString > serverFunctionMap;
+    static CStringHashMap < SString > clientFunctionMap;
+    static CStringHashMap < SString > serverFunctionMap;
 
     // Check if lookup maps need initializing
     if ( clientFunctionMap.empty () )
@@ -810,7 +606,7 @@ void CResourceChecker::CheckVersionRequirements ( const string& strIdentifierNam
     }
 
     // Select client or server check
-    const std::map < SString, SString >& functionMap = bClientScript ? clientFunctionMap : serverFunctionMap;
+    const CStringHashMap < SString >& functionMap = bClientScript ? clientFunctionMap : serverFunctionMap;
     SString& strReqMtaVersion                        = bClientScript ? m_strReqClientVersion : m_strReqServerVersion;
     SString& strReqMtaReason                         = bClientScript ? m_strReqClientReason : m_strReqServerReason;
 
