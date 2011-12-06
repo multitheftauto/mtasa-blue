@@ -7,6 +7,7 @@
 *
 *****************************************************************************/
 
+class CNetServerBuffer;
 
 namespace EActionWho
 {
@@ -36,6 +37,7 @@ namespace EActionWhere
         ThreadProc2,
         ThreadProc3,
         ProcessPacket,
+        GetQueueSizes,
     };
 }
 using EActionWhere::EActionWhereType;
@@ -63,52 +65,13 @@ using EActionWhat::EActionWhatType;
 class CActionHistory
 {
 public:
-    const static int HistoryLength = 60;
-    struct SItem
-    {
-        EActionWhoType uiWho;
-        EActionWhereType uiWhere;
-        EActionWhatType uiWhat;
-        uint uiWhen;
-        int iExtra;
-    };
-    std::vector < SItem > itemList;
-    uint position;
-    CCriticalSection cs;
+    volatile bool bChanged;
+    uint uiLastChangedTime;
 
-    CActionHistory ( void ) : position ( 0 ) {}
+    CActionHistory ( void ) : bChanged ( 0 ), uiLastChangedTime ( 0 ) {}
     void AddAction ( EActionWhoType uiWho, EActionWhereType uiWhere, EActionWhatType uiWhat, int iExtra = 0 )
     {
-        cs.Lock ();
-        if ( itemList.size () < HistoryLength )
-        {
-            position = itemList.size ();
-            itemList.push_back ( SItem() );
-        }
-        else
-        {
-            position = ( position + 1 ) % HistoryLength;
-        }
-        SItem& item = itemList[position];
-        item.uiWho = uiWho;
-        item.uiWhere = uiWhere;
-        item.uiWhat = uiWhat;
-        item.uiWhen = GetTickCount32 ();
-        item.iExtra = iExtra;
-        cs.Unlock ();
-    }
-
-    bool GetLastItem ( SItem& outItem )
-    {
-        cs.Lock ();
-        bool bResult = false;
-        if ( position > 0 )
-        {
-            outItem = itemList[position];
-            bResult = true;
-        }
-        cs.Unlock ();
-        return bResult;
+        bChanged = true;
     }
 };
 
@@ -122,9 +85,11 @@ public:
     CActionHistory main;
     CActionHistory sync;
 
-    void AddAction ( EActionWhereType uiWhere, EActionWhatType uiWhat, int iExtra = 0 )
+    void AddAction ( EActionWhoType uiWho, EActionWhereType uiWhere, EActionWhatType uiWhat, int iExtra = 0 )
     {
-        if ( IsMainThread () )
+        dassert ( IsMainThread () == ( uiWho == EActionWho::MAIN ) );
+
+        if ( uiWho == EActionWho::MAIN )
             main.AddAction ( EActionWho::MAIN, uiWhere, uiWhat, iExtra );
         else
             sync.AddAction ( EActionWho::SYNC, uiWhere, uiWhat, iExtra );
@@ -138,33 +103,33 @@ extern CActionHistorySet      g_HistorySet;
 class CDebugComboMutex : public CComboMutex
 {
 public:
-    void Lock ( EActionWhereType uiWhere )
+    void Lock ( EActionWhoType uiWho, EActionWhereType uiWhere )
     {
-        g_HistorySet.AddAction ( uiWhere, EActionWhat::PRE_LOCK );
+        g_HistorySet.AddAction ( uiWho, uiWhere, EActionWhat::PRE_LOCK );
         CComboMutex::Lock ();
-        g_HistorySet.AddAction ( uiWhere, EActionWhat::POST_LOCK );
+        g_HistorySet.AddAction ( uiWho, uiWhere, EActionWhat::POST_LOCK );
     }
 
-    void Unlock ( EActionWhereType uiWhere )
+    void Unlock ( EActionWhoType uiWho, EActionWhereType uiWhere )
     {
-        g_HistorySet.AddAction ( uiWhere, EActionWhat::PRE_UNLOCK );
+        g_HistorySet.AddAction ( uiWho, uiWhere, EActionWhat::PRE_UNLOCK );
         CComboMutex::Unlock ();
-        g_HistorySet.AddAction ( uiWhere, EActionWhat::POST_UNLOCK );
+        g_HistorySet.AddAction ( uiWho, uiWhere, EActionWhat::POST_UNLOCK );
     }
 
     // unlock - wait for signal - lock
     // Returns ETIMEDOUT if timeout period expired
-    int Wait ( uint uiTimeout, EActionWhereType uiWhere )
+    int Wait ( uint uiTimeout, EActionWhoType uiWho, EActionWhereType uiWhere )
     {
-        g_HistorySet.AddAction ( uiWhere, EActionWhat::PRE_WAIT, uiTimeout );
+        g_HistorySet.AddAction ( uiWho, uiWhere, EActionWhat::PRE_WAIT, uiTimeout );
         int iResult = CComboMutex::Wait ( uiTimeout );
-        g_HistorySet.AddAction ( uiWhere, EActionWhat::POST_WAIT );
+        g_HistorySet.AddAction ( uiWho, uiWhere, EActionWhat::POST_WAIT );
         return iResult;
     }
 
-    void Signal ( EActionWhereType uiWhere )
+    void Signal ( EActionWhoType uiWho, EActionWhereType uiWhere )
     {
-        g_HistorySet.AddAction ( uiWhere, EActionWhat::SIGNAL );
+        g_HistorySet.AddAction ( uiWho, uiWhere, EActionWhat::SIGNAL );
         CComboMutex::Signal ();
     }
 };
@@ -177,12 +142,8 @@ class CNetBufferWatchDog
 {
 public:
     ZERO_ON_NEW
-                                            CNetBufferWatchDog              ( void );
+                                            CNetBufferWatchDog              ( CNetServerBuffer* pNetBuffer );
                                             ~CNetBufferWatchDog             ( void );
-
-    // CNetBufferWatchDog interface
-    //virtual bool                            StartNetwork                    ( const char* szIP, unsigned short usServerPort, unsigned int uiAllowedPlayers );
-    void                        RecordQueueSizes            ( uint uiFinishedList , uint uiOutCommandQueue, uint uiOutResultQueue, uint uiInResultQueue );
 
     // Main thread functions
     void                        StopThread                  ( void );
@@ -198,6 +159,7 @@ public:
     CThreadHandle*              m_pServiceThreadHandle;
 
     // Check thread variables
+    CNetServerBuffer*           m_pNetBuffer;
     uint                        m_uiMainAgeHigh;
     uint                        m_uiSyncAgeHigh;
     uint                        m_uiFinishedListHigh;
@@ -210,10 +172,6 @@ public:
     {
         bool                                        m_bTerminateThread;
         bool                                        m_bThreadTerminated;
-        uint                                        m_uiFinishedList;
-        uint                                        m_uiOutCommandQueue;
-        uint                                        m_uiOutResultQueue;
-        uint                                        m_uiInResultQueue;
         CComboMutex                                 m_Mutex;
     } shared;
 };
