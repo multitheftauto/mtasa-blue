@@ -10,12 +10,6 @@
 #include "StdInc.h"
 #include "SimHeaders.h"
 
-namespace
-{
-    // Used in StaticProcessPacket and elsewhere
-    CNetBufferWatchDog*       ms_pNetServerBuffer = NULL;
-}
-
 CActionHistorySet g_HistorySet;
 
 ///////////////////////////////////////////////////////////////////////////
@@ -25,7 +19,8 @@ CActionHistorySet g_HistorySet;
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-CNetBufferWatchDog::CNetBufferWatchDog ( void )
+CNetBufferWatchDog::CNetBufferWatchDog ( CNetServerBuffer* pNetBuffer )
+    : m_pNetBuffer ( pNetBuffer )
 {
     CLogger::LogPrintf ( "INFO: CNetBufferWatchDog started\n" );
     // Start the job queue processing thread
@@ -116,7 +111,7 @@ void* CNetBufferWatchDog::ThreadProc ( void )
     while ( !shared.m_bTerminateThread )
     {
         DoChecks ();
-        shared.m_Mutex.Wait ( 100 );
+        shared.m_Mutex.Wait ( 1000 );
     }
 
     shared.m_bThreadTerminated = true;
@@ -140,10 +135,16 @@ void CNetBufferWatchDog::DoChecks ( void )
     CheckActionHistory ( g_HistorySet.main, "Main", m_uiMainAgeHigh );
     CheckActionHistory ( g_HistorySet.sync, "Sync", m_uiSyncAgeHigh );
 
-    CheckQueueSize ( 100, shared.m_uiFinishedList, "FinishedList", m_uiFinishedListHigh );
-    CheckQueueSize ( 100, shared.m_uiOutCommandQueue, "OutCommandQueue", m_uiOutCommandQueueHigh );
-    CheckQueueSize ( 100, shared.m_uiOutResultQueue, "OutResultQueue", m_uiOutResultQueueHigh );
-    CheckQueueSize ( 100, shared.m_uiInResultQueue, "InResultQueue", m_uiInResultQueueHigh );
+    uint uiFinishedList;
+    uint uiOutCommandQueue;
+    uint uiOutResultQueue;
+    uint uiInResultQueue;
+    m_pNetBuffer->GetQueueSizes ( uiFinishedList, uiOutCommandQueue, uiOutResultQueue, uiInResultQueue );
+
+    CheckQueueSize ( 1000, uiFinishedList, "FinishedList", m_uiFinishedListHigh );
+    CheckQueueSize ( 1000, uiOutCommandQueue, "OutCommandQueue", m_uiOutCommandQueueHigh );
+    CheckQueueSize ( 1000, uiOutResultQueue, "OutResultQueue", m_uiOutResultQueueHigh );
+    CheckQueueSize ( 1000, uiInResultQueue, "InResultQueue", m_uiInResultQueueHigh );
 }
 
 
@@ -157,11 +158,16 @@ void CNetBufferWatchDog::DoChecks ( void )
 ///////////////////////////////////////////////////////////////
 void CNetBufferWatchDog::CheckActionHistory ( CActionHistory& history, const char* szTag, uint& uiHigh )
 {
-    CActionHistory::SItem lastItem;
-    if ( !history.GetLastItem ( lastItem ) )
+    if ( history.bChanged )
+    {
+        history.bChanged = false;
+        history.uiLastChangedTime = GetTickCount32 ();
+    }
+
+    if ( !history.uiLastChangedTime )
         return;
 
-    uint uiAge = GetTickCount32 () - lastItem.uiWhen;
+    uint uiAge = GetTickCount32 () - history.uiLastChangedTime;
     if ( uiAge < 1000 * 5 )
         uiHigh = 10;
 
@@ -174,13 +180,9 @@ void CNetBufferWatchDog::CheckActionHistory ( CActionHistory& history, const cha
 
     if ( bShowMessage )
     {
-        CLogger::LogPrintf ( "INFO: %s thread last action age: %d ticks. (who:%d where:%d what:%d extra:%d)\n"
+        CLogger::LogPrintf ( "INFO: %s thread last action age: %d ticks.\n"
                                     , szTag
                                     , uiAge
-                                    , lastItem.uiWho
-                                    , lastItem.uiWhere
-                                    , lastItem.uiWhat
-                                    , lastItem.iExtra
                                 );
     }
 }
@@ -196,7 +198,13 @@ void CNetBufferWatchDog::CheckActionHistory ( CActionHistory& history, const cha
 ///////////////////////////////////////////////////////////////
 void CNetBufferWatchDog::CheckQueueSize ( uint uiSizeLimit, uint uiSize, const char* szTag, uint& uiHigh )
 {
-    uiHigh = Max < uint > ( 100, uiHigh );
+#ifdef MTA_DEBUG
+    uint uiMinLevel = 5;
+#else
+    uint uiMinLevel = uiSizeLimit;
+#endif
+
+    uiHigh = Max < uint > ( uiMinLevel, uiHigh );
 
     bool bShowMessage = false;
     if ( uiSize > uiHigh )
@@ -204,32 +212,23 @@ void CNetBufferWatchDog::CheckQueueSize ( uint uiSizeLimit, uint uiSize, const c
         uiHigh = uiSize + Max < uint > ( 10, uiSize / 2 );
         bShowMessage = true;
     }
+    else
+    if ( uiSize < uiHigh / 4 )
+    {
+        if ( uiHigh > uiMinLevel )
+        {
+            uiHigh = uiSize / 2;
+            bShowMessage = true;
+        }
+    }
+
+    uiHigh = Max < uint > ( uiMinLevel, uiHigh );
 
     if ( bShowMessage )
     {
-        CLogger::LogPrintf ( "INFO: %s queue size: %d. (Next warning will be at %d)\n"
-                                    , szTag
-                                    , uiSize
-                                    , uiHigh
-                                );
+        SString strMessage ( "INFO: %s queue size: %d.", szTag, uiSize );
+        if ( uiSize > uiMinLevel )
+            strMessage += SString ( " (Next warning will be outside %d to %d)", uiHigh / 4, uiHigh );
+        CLogger::LogPrint ( strMessage + "\n" );
     }
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// CNetBufferWatchDog::RecordQueueSizes
-//
-// Thread:                  any
-// Mutex should be locked:  no
-//
-///////////////////////////////////////////////////////////////
-void CNetBufferWatchDog::RecordQueueSizes ( uint uiFinishedList , uint uiOutCommandQueue, uint uiOutResultQueue, uint uiInResultQueue )
-{
-    shared.m_Mutex.Lock ();
-    shared.m_uiFinishedList = uiFinishedList;
-    shared.m_uiOutCommandQueue = uiOutCommandQueue;
-    shared.m_uiOutResultQueue = uiOutResultQueue;
-    shared.m_uiInResultQueue = uiInResultQueue;
-    shared.m_Mutex.Unlock ();
 }
