@@ -168,8 +168,8 @@ public:
     static bool                 StaticProcessPacket         ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo );
     bool                        ProcessPacket               ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo );
 
-    // Either thread functions
-    void                        UpdateQueueStats            ( void );
+    // Watchdog thread functions
+    void                        GetQueueSizes               ( uint& uiFinishedList, uint& uiOutCommandQueue, uint& uiOutResultQueue, uint& uiInResultQueue );
 
     // Main thread variables
     PPACKETHANDLER                      m_pfnDMPacketHandler;
