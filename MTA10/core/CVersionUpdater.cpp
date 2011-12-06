@@ -1897,11 +1897,11 @@ void CVersionUpdater::_DialogDataFilesQuestion ( void )
     // Display message
     GetQuestionBox ().Reset ();
     GetQuestionBox ().SetTitle ( "ERROR" );
-    GetQuestionBox ().SetMessage ( "Some MTA:SA data files are missing.\n\n\nDo you want to automatically fix this problem?" );
-    GetQuestionBox ().SetButton ( 0, "No" );
-    GetQuestionBox ().SetButton ( 1, "Yes" );
+    GetQuestionBox ().SetMessage ( "Some MTA:SA data files are missing.\n\n\nPlease reinstall MTA:SA" );
+    GetQuestionBox ().SetButton ( 0, "Ok" );
     GetQuestionBox ().Show ();
-    Push ( _PollQuestionNoYes );
+    Push ( _PollAnyButton );
+    m_ConditionMap.SetCondition ( "QuestionResponse", "No" );
 }
 
 
