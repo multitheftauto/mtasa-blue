@@ -26,7 +26,7 @@ Var Install_Dir
 ; Don't forget to update the BUILD_NUMBER
 ; ###########################################################################################################
 !define FILES_ROOT "."
-!define BUILD_NUMBER "3333"
+!define BUILD_NUMBER "3519"
 !define PRODUCT_VERSION "Data-r${BUILD_NUMBER}"
 !define INSTALL_OUTPUT "mtasa-${0.0}-data-r${BUILD_NUMBER}.exe"
 ; ###########################################################################################################
@@ -130,6 +130,7 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
+	File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
 
 	SetOutPath "$INSTDIR\skins\Classic"
     File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"
