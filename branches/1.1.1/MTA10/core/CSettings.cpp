@@ -3167,8 +3167,8 @@ bool CSettings::OnCustomizedSAFilesClick ( CGUIElement* pElement )
     if ( m_pCheckBoxCustomizedSAFiles->GetSelected () )
     {
         SString strMessage;
-        strMessage += "Some files in your GTA:SA data directory are customized";
-        strMessage += "\nMTA will only use these modified files if this check box is ticked";
+        strMessage += "Some files in your GTA:SA data directory are customized.";
+        strMessage += "\nMTA will only use these modified files if this check box is ticked.";
         strMessage += "\n\nHowever, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS";
         strMessage += "\n\nAre you sure you want to use them?";
         CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();

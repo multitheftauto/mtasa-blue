@@ -54,6 +54,11 @@ Var RedistInstalled
 ; ###########################################################################################################
 
 ;ReserveFile "${NSISDIR}\Plugins\InstallOptions.dll"
+!ifdef REVISION
+	!define REVISION_TAG "(r${REVISION})"
+!else
+	!define REVISION_TAG ""
+!endif
 
 !ifdef CLIENT_SETUP
 	!define PRODUCT_NAME "MTA:SA ${0.0}"
@@ -88,7 +93,7 @@ Var RedistInstalled
 
 ; Welcome page
 !define MUI_WELCOMEPAGE_TITLE_3LINES
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation or update of $(^Name)\n\n\
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
 It is recommended that you close all other applications before starting Setup.\n\n\
 [Admin access will be requested for Vista and up]\n\n\
 Click Next to continue."
@@ -413,6 +418,7 @@ DontInstallRedist:
 				File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
+				File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
 
                 SetOutPath "$INSTDIR\skins\Classic"
                 File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"
@@ -788,6 +794,7 @@ Section Uninstall
 		Delete "$INSTDIR\MTA\*.dll"
 		Delete "$INSTDIR\MTA\*.ax"
 		Delete "$INSTDIR\MTA\*.txt"
+		Delete "$INSTDIR\MTA\*.dat"
 
 		RmDir /r "$APPDATA\MTA San Andreas All\${0.0}"
 		; TODO if $APPDATA\MTA San Andreas All\Common is the only one left, delete it
