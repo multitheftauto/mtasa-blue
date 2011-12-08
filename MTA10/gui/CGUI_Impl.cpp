@@ -20,6 +20,11 @@ using std::list;
 #define CGUI_MTA_DEFAULT_FONT       "tahoma.ttf"        // %WINDIR%/font/<...>
 #define CGUI_MTA_DEFAULT_FONT_BOLD  "tahomabd.ttf"      // %WINDIR%/font/<...>
 #define CGUI_MTA_CLEAR_FONT         "verdana.ttf"       // %WINDIR%/font/<...>
+
+#define CGUI_MTA_DEFAULT_REG        "Tahoma (TrueType)"
+#define CGUI_MTA_DEFAULT_REG_BOLD   "Tahoma Bold (TrueType)"
+#define CGUI_MTA_CLEAR_REG          "Verdana (TrueType)"
+
 #define CGUI_MTA_SUBSTITUTE_FONT    "cgui/unifont-5.1.20080907.ttf"  // GTA/MTA/<...>
 #define CGUI_MTA_SANS_FONT          "cgui/sans.ttf"     // GTA/MTA/<...>
 #define CGUI_SA_HEADER_FONT         "cgui/saheader.ttf" // GTA/MTA/<...>
@@ -70,15 +75,14 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
 
     m_pFontManager->setSubstituteFont ( CGUI_MTA_SUBSTITUTE_FONT, 9 );
 
+    // Window fonts first
+    m_pDefaultFont = (CGUIFont_Impl*) CreateFntFromWinFont ( "default-normal", CGUI_MTA_DEFAULT_REG, CGUI_MTA_DEFAULT_FONT, 9, 0 );
+    m_pSmallFont = (CGUIFont_Impl*) CreateFntFromWinFont ( "default-small", CGUI_MTA_DEFAULT_REG, CGUI_MTA_DEFAULT_FONT, 7, 0 );
+    m_pBoldFont = (CGUIFont_Impl*) CreateFntFromWinFont ( "default-bold-small", CGUI_MTA_DEFAULT_REG_BOLD, CGUI_MTA_DEFAULT_FONT_BOLD, 8, 0 );
+    m_pClearFont = (CGUIFont_Impl*) CreateFntFromWinFont ( "clear-normal", CGUI_MTA_CLEAR_REG, CGUI_MTA_CLEAR_FONT, 9 );
+
 	try
 	{
-
-        m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", PathJoin ( strFontsPath, CGUI_MTA_DEFAULT_FONT ), 9, 0 );
-        m_pSmallFont = (CGUIFont_Impl*) CreateFnt ( "default-small", PathJoin ( strFontsPath, CGUI_MTA_DEFAULT_FONT ), 7, 0 );
-
-        m_pBoldFont = (CGUIFont_Impl*) CreateFnt ( "default-bold-small", PathJoin ( strFontsPath, CGUI_MTA_DEFAULT_FONT_BOLD ), 8, 0 );
-
-        m_pClearFont = (CGUIFont_Impl*) CreateFnt ( "clear-normal", PathJoin ( strFontsPath, CGUI_MTA_CLEAR_FONT ), 9 );
         m_pSAHeaderFont = (CGUIFont_Impl*) CreateFnt ( "sa-header", CGUI_SA_HEADER_FONT, CGUI_SA_HEADER_SIZE, 0, true );
         m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, true );
         m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, false );
@@ -368,6 +372,41 @@ CGUIEdit* CGUI_Impl::_CreateEdit ( CGUIElement_Impl* pParent, const char* szText
 CGUIFont* CGUI_Impl::CreateFnt ( const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, bool bAutoScale )
 {
     return new CGUIFont_Impl ( this, szFontName, szFontFile, uSize, uFlags, bAutoScale );
+}
+
+CGUIFont* CGUI_Impl::CreateFntFromWinFont ( const char* szFontName, const char* szFontWinReg, const char* szFontWinFile, unsigned int uSize, unsigned int uFlags, bool bAutoScale )
+{
+    SString strFontWinRegName = GetSystemRegistryValue ( (uint)HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", szFontWinReg );
+    SString strWinFontsPath = PathJoin ( SharedUtil::GetWindowsDirectory (), "fonts" );
+
+    // Compile a list of places to look
+    std::vector < SString > lookList;
+    lookList.push_back ( PathJoin ( strWinFontsPath, strFontWinRegName ) );
+    lookList.push_back ( PathJoin ( "cgui", szFontWinFile ) );
+    lookList.push_back ( PathJoin ( strWinFontsPath, szFontWinFile ) );
+
+    // Try each place
+    CGUIFont* pResult = NULL;
+    for ( uint i = 0 ; i < lookList.size () ; i++ )
+    {
+        if ( FileExists ( lookList[i] ) )
+        {
+	        try
+	        {
+                pResult = (CGUIFont_Impl*) CreateFnt ( szFontName, lookList[i], uSize, uFlags, bAutoScale );
+	        }
+	        catch ( CEGUI::InvalidRequestException e ) {}
+        }
+
+        if ( pResult )
+            break;
+    }
+    if ( !pResult )
+    {
+        BrowseToSolution ( "create-fonts", true, true, true, SString ( "Error loading font!\n\n(%s)", szFontWinFile ) );
+    }
+
+    return pResult;
 }
 
 
