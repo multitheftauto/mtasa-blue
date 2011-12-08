@@ -31,6 +31,8 @@ public:
         m_bIgnoreMismatchMatch = false;
         m_pPendingFunctionOutValue = NULL;
         m_pPendingFunctionIndex = -1;
+        m_bResolvedErrorGotArgumentTypeAndValue = false;
+        m_iErrorGotArgumentType = 0;
     }
 
     CScriptArgReader ( void )
@@ -338,6 +340,9 @@ public:
         if ( !m_pPendingFunctionOutValue )
             return true;
 
+        // As we are going to change the stack, save any error info already gotten
+        ResolveErrorGotArgumentTypeAndValue ();
+
         assert ( m_pPendingFunctionIndex != -1 );
         *m_pPendingFunctionOutValue = luaM_toref ( m_luaVM, m_pPendingFunctionIndex );
         if ( VERIFY_FUNCTION( *m_pPendingFunctionOutValue ) )
@@ -398,6 +403,7 @@ public:
             m_bError = true;
             m_iErrorIndex = iIndex;
             m_strErrorExpectedType = strExpectedType;
+            m_bResolvedErrorGotArgumentTypeAndValue = false;
         }
     }
 
@@ -415,19 +421,19 @@ public:
     //
     // GetErrorMessage
     //
-    SString GetErrorMessage ( void ) const
+    SString GetErrorMessage ( void )
     {
         if ( !m_bError )
             return "No error";
 
-        int             iGotArgumentType    = lua_type ( m_luaVM, m_iErrorIndex );
-        SString         strGotArgumentType  = EnumToString ( (eLuaType)iGotArgumentType );
-        SString         strGotArgumentValue = lua_tostring ( m_luaVM, m_iErrorIndex );
+        ResolveErrorGotArgumentTypeAndValue ();
+        SString strGotArgumentType  = EnumToString ( (eLuaType)m_iErrorGotArgumentType );
+        SString strGotArgumentValue = m_strErrorGotArgumentValue;
 
         // Compose error message
         SString strMessage ( "Expected %s at argument %d", *m_strErrorExpectedType, m_iErrorIndex );
 
-        if ( iGotArgumentType == LUA_TLIGHTUSERDATA )
+        if ( m_iErrorGotArgumentType == LUA_TLIGHTUSERDATA )
         {
 	        // Get name of userdata type
             strGotArgumentType = GetUserDataClassName ( lua_touserdata ( m_luaVM, m_iErrorIndex ), m_luaVM );
@@ -447,6 +453,19 @@ public:
     }
 
     //
+    // Put off getting error type and value until just before we need it
+    //
+    void ResolveErrorGotArgumentTypeAndValue ( void )
+    {
+        if ( !m_bError || m_bResolvedErrorGotArgumentTypeAndValue )
+            return;
+
+        m_bResolvedErrorGotArgumentTypeAndValue = true;
+        m_iErrorGotArgumentType = lua_type ( m_luaVM, m_iErrorIndex );
+        m_strErrorGotArgumentValue = lua_tostring ( m_luaVM, m_iErrorIndex );
+    }
+
+    //
     // Strict off means mismatches are ignored if they have a default value
     //
     void SetStrict ( bool bStrictMode )
@@ -463,4 +482,7 @@ public:
     lua_State*              m_luaVM;
     CLuaFunctionRef*        m_pPendingFunctionOutValue;
     int                     m_pPendingFunctionIndex;
+    bool                    m_bResolvedErrorGotArgumentTypeAndValue;
+    int                     m_iErrorGotArgumentType;
+    SString                 m_strErrorGotArgumentValue;
 };

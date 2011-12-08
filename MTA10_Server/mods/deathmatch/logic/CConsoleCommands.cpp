@@ -2003,7 +2003,7 @@ bool CConsoleCommands::SetDbLogLevel ( CConsole* pConsole, const char* szArgumen
 {
     if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
     {
-        if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetNick(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "debugdb", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
+        if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "debugdb", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
         {
             pEchoClient->SendConsole ( "debugdb: You do not have sufficient rights to use this command." );
             return false;
@@ -2026,11 +2026,11 @@ bool CConsoleCommands::SetDbLogLevel ( CConsole* pConsole, const char* szArgumen
 }
 
 
-bool CConsoleCommands::AclRequest ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+bool DoAclRequest ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
     if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
     {
-        if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetNick(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "aclrequest", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
+        if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "aclrequest", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
         {
             pEchoClient->SendConsole ( "aclrequest: You do not have sufficient rights to use this command." );
             return false;
@@ -2086,4 +2086,13 @@ bool CConsoleCommands::AclRequest ( CConsole* pConsole, const char* szArguments,
 
     pEchoClient->SendConsole ( "Usage: aclrequest [list|allow|deny] <resource> [<right>|all]" );
     return false;
+}
+
+
+bool CConsoleCommands::AclRequest ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    BeginConsoleOutputCapture ( pEchoClient );
+    DoAclRequest ( pConsole, szArguments, pClient, pEchoClient );
+    EndConsoleOutputCapture ( pEchoClient, "" );
+    return true;
 }

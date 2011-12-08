@@ -424,7 +424,7 @@ void CServerImpl::MainLoop ( void )
         // Limit the pulses to avoid heavy CPU usage
         int iSleepMs;
         if ( m_pModManager->PendingWorkToDo ( iSleepMs ) )
-            Sleep ( Clamp ( 0, iSleepMs, 10 ) );
+            Sleep ( Clamp ( 0, iSleepMs, 50 ) );
         else
             Sleep ( 10 );
     }
