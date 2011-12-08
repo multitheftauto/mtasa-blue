@@ -111,6 +111,11 @@ bool CServer::PendingWorkToDo ( int& iSleepMs )
             iSleepMs = m_pGame->GetConfig ()->GetPendingWorkToDoSleepTime ();
             return true;
         }
+        else
+        {
+            iSleepMs = m_pGame->GetConfig ()->GetNoWorkToDoSleepTime ();
+            return true;
+        }
     }
     return false;
 }

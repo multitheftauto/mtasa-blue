@@ -91,6 +91,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_bNetworkEncryptionEnabled = true;
     m_strBandwidthReductionMode = "medium";
     m_iPendingWorkToDoSleepTime = 10;
+    m_iNoWorkToDoSleepTime = 10;
     m_bThreadNetEnabled = false;
     m_iBackupInterval = 3;
     m_iBackupAmount = 5;
@@ -505,7 +506,11 @@ bool CMainConfig::Load ( void )
 
     // busy_sleep_time
     GetInteger ( m_pRootNode, "busy_sleep_time", m_iPendingWorkToDoSleepTime );
-    m_iPendingWorkToDoSleepTime = Clamp ( 0, m_iPendingWorkToDoSleepTime, 10 );
+    m_iPendingWorkToDoSleepTime = Clamp ( 0, m_iPendingWorkToDoSleepTime, 50 );
+
+    // idle_sleep_time
+    GetInteger ( m_pRootNode, "idle_sleep_time", m_iNoWorkToDoSleepTime );
+    m_iNoWorkToDoSleepTime = Clamp ( 0, m_iPendingWorkToDoSleepTime, 50 );
 
     // threadnet
     GetBoolean ( m_pRootNode, "threadnet", m_bThreadNetEnabled );
@@ -978,6 +983,12 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
         return true;
     }
     else
+    if ( strName == "idle_sleep_time" )
+    {
+        strValue = SString ( "%d", m_iNoWorkToDoSleepTime );
+        return true;
+    }
+    else
     if ( strName == "debug_flag" )
     {
         strValue = SString ( "%d", m_iDebugFlag );
@@ -1082,12 +1093,27 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
     if ( strName == "busy_sleep_time" )
     {
         int iSleepMs = atoi ( strValue );
-        if ( iSleepMs >= 0 && iSleepMs <= 10 )
+        if ( iSleepMs >= 0 && iSleepMs <= 50 )
         {
             m_iPendingWorkToDoSleepTime = iSleepMs;
             if ( bSave )
             {
                 SetString ( m_pRootNode, "busy_sleep_time", SString ( "%d", m_iPendingWorkToDoSleepTime ) );
+                Save ();
+            }
+            return true;
+        }
+    }
+    else
+    if ( strName == "idle_sleep_time" )
+    {
+        int iSleepMs = atoi ( strValue );
+        if ( iSleepMs >= 0 && iSleepMs <= 50 )
+        {
+            m_iNoWorkToDoSleepTime = iSleepMs;
+            if ( bSave )
+            {
+                SetString ( m_pRootNode, "idle_sleep_time", SString ( "%d", m_iNoWorkToDoSleepTime ) );
                 Save ();
             }
             return true;

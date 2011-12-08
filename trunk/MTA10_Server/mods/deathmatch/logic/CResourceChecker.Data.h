@@ -220,5 +220,6 @@ namespace
                 { true, "unbanIP",                         "Please manually update this.  Refer to the wiki for details" },
                 { true, "unbanSerial",                     "Please manually update this.  Refer to the wiki for details" },
                 { true, "getBansXML",                      "Please manually update this.  Refer to the wiki for details" },
+                { true, "canPlayerUseFunction",            "Please manually update this.  Refer to the wiki for details" },
             };
 }

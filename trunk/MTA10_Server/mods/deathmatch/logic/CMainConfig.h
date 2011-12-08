@@ -95,6 +95,7 @@ public:
     inline unsigned short           GetFPSLimit                     ( void )                    { return m_usFPSLimit; };
     bool                            SetFPSLimit                     ( unsigned short usFPS, bool bSave );
     int                             GetPendingWorkToDoSleepTime     ( void )                    { return m_iPendingWorkToDoSleepTime; };
+    int                             GetNoWorkToDoSleepTime          ( void )                    { return m_iNoWorkToDoSleepTime; };
     const SString&                  GetDbLogFilename                ( void )                    { return m_strDbLogFilename; }
     int                             GetDebugFlag                    ( void )                    { return m_iDebugFlag; }
 
@@ -162,6 +163,7 @@ private:
     bool                            m_bNetworkEncryptionEnabled;
     SString                         m_strBandwidthReductionMode;
     int                             m_iPendingWorkToDoSleepTime;
+    int                             m_iNoWorkToDoSleepTime;
     bool                            m_bThreadNetEnabled;
     int                             m_iDebugFlag;
     std::map < SString, SString >   m_TransientSettings;
