@@ -21,6 +21,9 @@ namespace SharedUtil
 
     SString GetMajorVersionString ( void );
 
+    // Get a system registry value
+    SString GetSystemRegistryValue ( uint hKey, const SString& strPath, const SString& strName );
+
     // Get/set registry values for the current version
     void SetRegistryValue ( const SString& strPath, const SString& strName, const SString& strValue );
     SString GetRegistryValue ( const SString& strPath, const SString& strName );
