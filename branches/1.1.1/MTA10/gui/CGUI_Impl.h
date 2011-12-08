@@ -227,6 +227,7 @@ private:
     CGUIComboBox*                   _CreateComboBox             ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "" );
 	
     void                            SubscribeToMouseEvents();
+    CGUIFont*                       CreateFntFromWinFont        ( const char* szFontName, const char* szFontWinReg, const char* szFontWinFile, unsigned int uSize = 8, unsigned int uFlags = 0, bool bAutoScale = false );
 
     IDirect3DDevice9*               m_pDevice;
 

@@ -125,6 +125,15 @@ SString SharedUtil::GetMajorVersionString ( void )
     return SStringX ( MTA_DM_ASE_VERSION ).Left ( 3 );
 }
 
+//
+// GetSystemRegistryValue
+//
+SString SharedUtil::GetSystemRegistryValue ( uint hKey, const SString& strPath, const SString& strName )
+{
+    return ReadRegistryStringValue ( (HKEY)hKey, strPath, strName, NULL );
+}
+
+
 
 // Old layout:
 //              HKCU Software\\Multi Theft Auto: San Andreas\\             - For 1.0
