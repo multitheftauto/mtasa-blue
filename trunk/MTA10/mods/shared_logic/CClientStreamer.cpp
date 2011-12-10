@@ -446,8 +446,9 @@ void CClientStreamer::Restream ( void )
                 if ( pAttachedTo && !pAttachedTo->IsStreamedIn() )
                 {
                     // ...unless attached to low LOD version
+                    CClientObject* pAttachedToObject = DynamicCast < CClientObject > ( pAttachedTo );
                     CClientObject* pObject = DynamicCast < CClientObject > ( pElement );
-                    if ( !pObject || !pObject->IsLowLod () )
+                    if ( !pObject || !pAttachedToObject || pObject->IsLowLod () == pAttachedToObject->IsLowLod () )
                         continue;
                 }
 

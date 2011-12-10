@@ -49,6 +49,9 @@ CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned 
 
     // Add this object to the list
     m_pObjectManager->AddToList ( this );
+
+    if ( m_bIsLowLod )
+        m_pManager->OnLowLODElementCreated ();
 }
 
 
@@ -65,6 +68,9 @@ CClientObject::~CClientObject ( void )
 
     // Remove us from the list
     Unlink ();
+
+    if ( m_bIsLowLod )
+        m_pManager->OnLowLODElementDestroyed ();
 }
 
 
@@ -235,12 +241,18 @@ float CClientObject::GetDistanceFromCentreOfMassToBaseOfModel ( void )
 
 void CClientObject::SetVisible ( bool bVisible )
 {
+    m_bIsVisible = bVisible;
+    UpdateVisibility ();
+}
+
+
+// Call this when m_bIsVisible, m_IsHiddenLowLod or m_pObject is changed
+void CClientObject::UpdateVisibility ( void )
+{
     if ( m_pObject )
     {
-        m_pObject->SetVisible ( bVisible );
+        m_pObject->SetVisible ( m_bIsVisible && !m_IsHiddenLowLod );
     }
-
-    m_bIsVisible = bVisible;
 }
 
 
@@ -477,7 +489,7 @@ void CClientObject::Create ( void )
                 #endif
                 m_pObject->SetupLighting ();
 
-                if ( !m_bIsVisible ) SetVisible ( false );
+                UpdateVisibility ();
                 if ( !m_bUsesCollision ) SetCollisionEnabled ( false );
                 if ( m_fScale != 1.0f ) SetScale ( m_fScale );
                 m_pObject->SetAreaCode ( m_ucInterior );
@@ -546,28 +558,24 @@ void CClientObject::StreamedInPulse ( void )
     // Some things to do if low LOD object
     if ( m_bIsLowLod )
     {
-        // Manually update attaching incase other objects are streamed out
+        // Manually update attaching in case other object is streamed out
         DoAttaching ();
 
-        // Be visible if any HighLodObject is not fully visible
-        bool bMakeVisible = false;
+        // Be hidden if all HighLodObjects are fully visible
+        m_IsHiddenLowLod = true;
         if ( m_HighLodObjectList.empty () )
-            bMakeVisible = true;
+            m_IsHiddenLowLod = false;
         for ( std::vector < CClientObject* >::iterator iter = m_HighLodObjectList.begin () ; iter != m_HighLodObjectList.end () ; ++iter )
         {
             CObject* pObject = (*iter)->m_pObject;
-            if ( pObject )
+            if ( !pObject || !pObject->IsFullyVisible () )
             {
-                if ( pObject->IsDistanceFaded () )
-                {
-                    bMakeVisible = true;
-                }
+                m_IsHiddenLowLod = false;
+                break;
             }
-            else
-                bMakeVisible = true;
         }
 
-        SetVisible ( bMakeVisible );
+        UpdateVisibility ();
     }
 
 

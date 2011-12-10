@@ -72,7 +72,7 @@ public:
     virtual VOID                        SetEntityStatus( eEntityStatus bStatus )=0;
     virtual eEntityStatus               GetEntityStatus( )=0;
     virtual bool                        IsOnScreen ()=0;
-    virtual bool                        IsDistanceFaded ()=0;
+    virtual bool                        IsFullyVisible ()=0;
     virtual void                        SetUnderwater ( bool bUnderwater )=0;
     virtual bool                        GetUnderwater ( void )=0;
     virtual RwFrame *                   GetFrameFromId ( int id )=0;

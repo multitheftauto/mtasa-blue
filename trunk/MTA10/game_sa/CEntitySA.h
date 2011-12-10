@@ -170,6 +170,45 @@ public:
     BYTE pad2 [ 1 ];
 
     /* IMPORTANT: KEEP "pad" in CVehicle UP-TO-DATE if you add something here (or eventually pad someplace else) */
+
+    //
+    // Functions to hide member variable misuse
+    //
+
+    // Sets
+    void SetIsLowLodEntity ( void )
+    {
+        numLodChildrenRendered = 0x40;
+    }
+
+    void SetIsHighLodEntity ( void )
+    {
+        numLodChildrenRendered = 0x60;
+    }
+
+    void SetEntityVisibilityResult ( int result )
+    {
+        if ( numLodChildrenRendered & 0x60 )
+            numLodChildrenRendered = ( numLodChildrenRendered & 0x60 ) | ( result & 0x1f );
+    }
+
+    // Gets
+    bool IsLowLodEntity ( void ) const
+    {
+        return ( numLodChildrenRendered & 0x60 ) == 0x40;
+    }
+
+    bool IsHighLodEntity ( void ) const
+    {
+        return ( numLodChildrenRendered & 0x60 ) == 0x60;
+    }
+
+    int GetEntityVisibilityResult ( void ) const
+    {
+        if ( numLodChildrenRendered & 0x60 )
+            return numLodChildrenRendered & 0x1f;
+        return -1;
+    }
 };
 
 class CEntitySA : public virtual CEntity
@@ -204,7 +243,7 @@ public:
     WORD                        GetModelIndex ();
     eEntityType                 GetEntityType ();
     bool                        IsOnScreen ();
-    bool                        IsDistanceFaded ();
+    bool                        IsFullyVisible ();
 
     bool                        IsVisible ( void );
     void                        SetVisible ( bool bVisible );

@@ -169,6 +169,7 @@ public:
     bool                        IsSuspensionEnabled         ( void )                    { return m_bSuspensionEnabled; };
 
     virtual void                SetFastClothesLoading       ( EFastClothesLoading fastClothesLoading );
+    virtual void                SetLODSystemEnabled         ( bool bEnable );
 
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;
@@ -178,6 +179,7 @@ private:
     std::vector < char >        m_PlayerImgCache;
     EFastClothesLoading         m_FastClothesLoading;
     CLimitsSA                   m_limits;
+    bool                        m_bEnabledLODSystem;
 
 
 /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);

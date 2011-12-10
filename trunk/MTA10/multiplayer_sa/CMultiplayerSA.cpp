@@ -334,6 +334,9 @@ DWORD RETURN_CRenderer_SetupEntityVisibility =      0x554238;
 DWORD RETURN_CWorldScan_ScanWorlda =                0x555563;
 DWORD RETURN_CWorldScan_ScanWorldb =                0x72CAE0;
 
+#define HOOKPOS_CVisibilityPlugins_CalculateFadingAtomicAlpha   0x732500    // 5 bytes
+DWORD RETURN_CVisibilityPlugins_CalculateFadingAtomicAlpha =    0x732505;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -495,6 +498,7 @@ void HOOK_CStreamingLoadRequestedModels ();
 
 void HOOK_CRenderer_SetupEntityVisibility ();
 void HOOK_CWorldScan_ScanWorld ();
+void HOOK_CVisibilityPlugins_CalculateFadingAtomicAlpha ();
 
 void vehicle_lights_init ();
 
@@ -677,8 +681,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_PreHUDRender, (DWORD)HOOK_PreHUDRender, 5 );
     HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7 );
     HookInstall(HOOKPOS_LoadingPlayerImgDir, (DWORD)HOOK_LoadingPlayerImgDir, 5 );
-    HookInstall(HOOKPOS_CRenderer_SetupEntityVisibility, (DWORD)HOOK_CRenderer_SetupEntityVisibility, 8 );
-    HookInstall(HOOKPOS_CWorldScan_ScanWorld, (DWORD)HOOK_CWorldScan_ScanWorld, 5 );
 
     HookInstall(HOOKPOS_CHandlingData_isNotRWD, (DWORD)HOOK_isVehDriveTypeNotRWD, 7 );
     HookInstall(HOOKPOS_CHandlingData_isNotFWD, (DWORD)HOOK_isVehDriveTypeNotFWD, 7 );
@@ -6301,24 +6303,82 @@ skip:
 
 ////////////////////////////////////////////////
 //
+// CMultiplayerSA::EnableLODSystem
+//
+//
+////////////////////////////////////////////////
+void CMultiplayerSA::SetLODSystemEnabled ( bool bEnable )
+{
+    // Switch
+    if ( m_bEnabledLODSystem == bEnable )
+        return;
+    m_bEnabledLODSystem = bEnable;
+
+    // Memory saved here
+    static CBuffer savedMem;
+    struct {
+        DWORD dwAddress;
+        uint uiSize;
+    } memoryList[] = {  { HOOKPOS_CRenderer_SetupEntityVisibility, 8 },
+                        { HOOKPOS_CWorldScan_ScanWorld, 6 },
+                        { HOOKPOS_CVisibilityPlugins_CalculateFadingAtomicAlpha, 5 } };
+
+    // Enable or not?
+    if ( bEnable )
+    {
+        // Save memory before we blat it
+        CBufferWriteStream stream ( savedMem );
+        for ( uint i = 0 ; i < NUMELMS( memoryList ) ; i++ )
+            stream.WriteBytes ( (void*)memoryList[i].dwAddress, memoryList[i].uiSize );
+
+        // Add hooks and things
+        HookInstall(HOOKPOS_CRenderer_SetupEntityVisibility, (DWORD)HOOK_CRenderer_SetupEntityVisibility, 8 );
+        HookInstall(HOOKPOS_CWorldScan_ScanWorld, (DWORD)HOOK_CWorldScan_ScanWorld, 5 );
+        HookInstall(HOOKPOS_CVisibilityPlugins_CalculateFadingAtomicAlpha, (DWORD)HOOK_CVisibilityPlugins_CalculateFadingAtomicAlpha, 5 );
+    }
+    else
+    {
+        // Restore memory
+        CBufferReadStream stream ( savedMem );
+        for ( uint i = 0 ; i < NUMELMS( memoryList ) ; i++ )
+        {
+            BYTE temp[10];
+            assert ( sizeof(temp) >= memoryList[i].uiSize );
+            stream.ReadBytes ( temp, memoryList[i].uiSize );
+            MemCpy ( (void*)memoryList[i].dwAddress, temp, memoryList[i].uiSize );
+        }
+    }
+}
+
+
+////////////////////////////////////////////////
+//
 // CRenderer_SetupEntityVisibility helpers
 //
 ////////////////////////////////////////////////
 namespace
 {
     #define     ARRAY_ModelInfo                 0xA9B0C8
-    #define     LOW_LOD_DRAW_DISTANCE_SCALE     3
+    #define     LOW_LOD_DRAW_DISTANCE_SCALE     5
 
-    // Is this a special low lod entity?
-    bool IsEntityLowLod ( CEntitySAInterface* pEntity )
-    {
-        // Read super hacky flag
-        return pEntity->numLodChildrenRendered == 100;
-    }
 
     void SetGlobalDrawDistanceScale ( float fValue )
     {
         *(float*)0x858FD8 = 300.f * fValue;
+    }
+
+    float GetDrawDistanceSetting ( void )
+    {
+        return *(float*)0xB6F118;
+    }
+
+    float CalculateLowLodFadeAlpha ( CBaseModelInfoSAInterface* pModelInfo, float fDist )
+    {
+        float fModelDrawDistance = pModelInfo->fLodDistanceUnscaled * LOW_LOD_DRAW_DISTANCE_SCALE + 20.f;
+        float fFadeWidth = 20.f + fModelDrawDistance / 50.f;
+        float fFadeFar = fModelDrawDistance;
+        float fFadeNear = fFadeFar - fFadeWidth;
+        return UnlerpClamped ( fFadeFar, fDist, fFadeNear );
     }
 
     struct
@@ -6337,25 +6397,38 @@ namespace
 ////////////////////////////////////////////////
 void OnMY_CRenderer_SetupEntityVisibility_Pre( CEntitySAInterface* pEntity, float& fValue )
 {
-    if ( IsEntityLowLod ( pEntity ) )
+    if ( pEntity->IsLowLodEntity () )
     {
-        SetGlobalDrawDistanceScale ( LOW_LOD_DRAW_DISTANCE_SCALE );
+        SetGlobalDrawDistanceScale ( LOW_LOD_DRAW_DISTANCE_SCALE * 2 );
         saved.pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[pEntity->m_nModelIndex];
         saved.fLodDistanceUnscaled = saved.pModelInfo->fLodDistanceUnscaled;
+        saved.pModelInfo->fLodDistanceUnscaled *= LOW_LOD_DRAW_DISTANCE_SCALE / GetDrawDistanceSetting ();
         saved.bValid = true;
-        saved.pModelInfo->fLodDistanceUnscaled *= LOW_LOD_DRAW_DISTANCE_SCALE;
     }
     else
         saved.bValid = false;
 }
 
-void OnMY_CRenderer_SetupEntityVisibility_Post( int result, CEntitySAInterface* pEntity, float& fValue )
+void OnMY_CRenderer_SetupEntityVisibility_Post( int result, CEntitySAInterface* pEntity, float& fDist )
 {
     if ( saved.bValid )
     {
         SetGlobalDrawDistanceScale ( 1 );
         saved.pModelInfo->fLodDistanceUnscaled = saved.fLodDistanceUnscaled;
         saved.bValid = false;
+
+        // Doing any distance fading?
+        if ( result == 0 && CalculateLowLodFadeAlpha ( saved.pModelInfo, fDist ) < 1.0f )
+            pEntity->bDistanceFade = 1;
+        else
+            pEntity->bDistanceFade = 0;
+
+        pEntity->SetEntityVisibilityResult ( result );
+    }
+    else
+    if ( pEntity->IsHighLodEntity () )
+    {
+        pEntity->SetEntityVisibilityResult ( result );
     }
 }
 
@@ -6411,7 +6484,7 @@ void OnMY_CWorldScan_ScanWorld_Pre( CVector2D* pVec, int iValue, void (__cdecl *
     for ( uint i = 1 ; i < 5 ; i++ )
     {
         CVector2D vecDiff = pVec[i] - vecOrigin;
-        vecDiff *= LOW_LOD_DRAW_DISTANCE_SCALE;
+        vecDiff *= LOW_LOD_DRAW_DISTANCE_SCALE * 2;
         pVec[i] = vecDiff + vecOrigin;
     }
 }
@@ -6434,5 +6507,60 @@ second:
         popad
 
         jmp     RETURN_CWorldScan_ScanWorldb   // 72CAE0
+    }
+}
+
+
+////////////////////////////////////////////////
+//
+//
+//
+////////////////////////////////////////////////
+int OnMY_CVisibilityPlugins_CalculateFadingAtomicAlpha_Pre( CBaseModelInfoSAInterface* pModelInfo, CEntitySAInterface* pEntity, float fDist )
+{
+    if ( pEntity->IsLowLodEntity () )
+    {
+        // Apply custom distance fade
+        float fAlpha = CalculateLowLodFadeAlpha ( pModelInfo, fDist );
+        fAlpha *= pModelInfo->ucAlpha;
+        return Clamp < int > ( 0, (int)fAlpha, 255 );
+    }
+    return -1;
+}
+
+
+void _declspec(naked) HOOK_CVisibilityPlugins_CalculateFadingAtomicAlpha()
+{
+// hook from 732500 5 bytes
+    _asm
+    {
+        pushad
+        push    [esp+32+4*3]
+        push    [esp+32+4*3]
+        push    [esp+32+4*3]
+        call    OnMY_CVisibilityPlugins_CalculateFadingAtomicAlpha_Pre
+        mov     [esp+0],eax
+        add     esp, 4*3
+        popad
+        mov     eax,[esp-32-4*3]
+
+        cmp     eax, 0xffffffff
+        jne     usecustom
+
+        // Use standard code
+        push    [esp+4*3]
+        push    [esp+4*3]
+        push    [esp+4*3]
+        call    second
+        add     esp, 4*3
+
+usecustom:
+        retn
+
+second:
+        push    ecx
+        mov     ecx, [esp+8]
+        jmp     RETURN_CVisibilityPlugins_CalculateFadingAtomicAlpha                // 732505
+
     }
 }

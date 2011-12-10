@@ -95,6 +95,8 @@ public:
     inline void                     SetBreakable            ( bool bBreakable )                 { m_bBreakable = bBreakable; };
 
     void                            ReCreate                ( void );
+    void                            UpdateVisibility        ( void );
+
 protected:
     void                            StreamIn                ( bool bInstantly );
     void                            StreamOut               ( void );
@@ -127,6 +129,7 @@ protected:
     const bool                          m_bIsLowLod;            // true if this object is low LOD
     CClientObject*                      m_pLowLodObject;        // Pointer to low LOD version of this object
     std::vector < CClientObject* >      m_HighLodObjectList;    // List of objects that use this object as a low LOD version
+    bool                                m_IsHiddenLowLod;       // true if this object is low LOD and should not be drawn
 
 public:
     CObject*                            m_pObject;
