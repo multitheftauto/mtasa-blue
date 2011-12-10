@@ -31,7 +31,7 @@ CClientManager::CClientManager ( void )
 
     m_pMarkerStreamer = new CClientStreamer ( CClientMarker::IsLimitReached, 600.0f, 300, 300 );
     m_pObjectStreamer = new CClientStreamer ( CClientObjectManager::IsObjectLimitReached, 500.0f, 300, 300 );
-    m_pObjectLodStreamer = new CClientStreamer ( CClientObjectManager::IsObjectLimitReached, 1200.0f, 1000, 1000 );
+    m_pObjectLodStreamer = new CClientStreamer ( CClientObjectManager::IsObjectLimitReached, 1700.0f, 1500, 1500 );
     m_pPickupStreamer = new CClientStreamer ( CClientPickupManager::IsPickupLimitReached, 100.0f, 300, 300 );
     m_pPlayerStreamer = new CClientStreamer ( CClientPlayerManager::IsPlayerLimitReached, 250.0f, 300, 300 );
     m_pVehicleStreamer = new CClientStreamer ( CClientVehicleManager::IsVehicleLimitReached, 250.0f, 300, 300 );
@@ -66,6 +66,8 @@ CClientManager::CClientManager ( void )
 
     m_bBeingDeleted = false;
     m_bGameUnloadedFlag = false;
+
+    g_pCore->GetMultiplayer ()->SetLODSystemEnabled ( false );
 }
 
 
@@ -329,4 +331,21 @@ void CClientManager::OnUpdateStreamPosition ( CClientStreamElement * pElement )
     {
         m_pColManager->DoHitDetection ( pElement->GetStreamPosition (), 0.0f, pElement );
     }
+}
+
+// Only enable LOD hooks when needed
+void CClientManager::OnLowLODElementCreated ( void )
+{
+    // Switch on with first low LOD element
+    if ( m_iNumLowLODElements == 0 )
+        g_pCore->GetMultiplayer ()->SetLODSystemEnabled ( true );
+    m_iNumLowLODElements++;
+}
+
+void CClientManager::OnLowLODElementDestroyed ( void )
+{
+    // Switch off with last low LOD element
+    m_iNumLowLODElements--;
+    if ( m_iNumLowLODElements == 0 )
+        g_pCore->GetMultiplayer ()->SetLODSystemEnabled ( false );
 }

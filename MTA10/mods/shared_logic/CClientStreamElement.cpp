@@ -76,6 +76,7 @@ void CClientStreamElement::InternalStreamOut ( void )
         m_bStreamedIn = false;
 
         // Stream out attached elements
+        CClientObject* thisObject = DynamicCast < CClientObject > ( this );
         list < CClientEntity* >::iterator i = m_AttachedEntities.begin();
         for (; i != m_AttachedEntities.end(); i++)
         {
@@ -84,7 +85,7 @@ void CClientStreamElement::InternalStreamOut ( void )
             {
                 // Don't stream out low LOD version
                 CClientObject* attachedObject = DynamicCast < CClientObject > (*i);
-                if ( attachedObject && attachedObject->IsLowLod () )
+                if ( attachedObject && thisObject && attachedObject->IsLowLod () != thisObject->IsLowLod () )
                     continue;
                 attachedElement->InternalStreamOut();
             }

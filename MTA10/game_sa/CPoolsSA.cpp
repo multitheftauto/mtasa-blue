@@ -376,8 +376,11 @@ CObject* CPoolsSA::AddObject ( DWORD dwModelID, bool bLowLod )
             pObject->m_pInterface->bUsesCollision = 0;
             pObject->m_pInterface->bDontCastShadowsOn = 1; 
             // Set super hacky flag to indicate this is a special low lod object
-            pObject->m_pInterface->numLodChildrenRendered = 100;
+            pObject->m_pInterface->SetIsLowLodEntity ();
         }
+        else
+            pObject->m_pInterface->SetIsHighLodEntity ();
+
 
         if ( ! AddObjectToPool ( pObject ) )
         {

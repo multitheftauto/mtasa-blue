@@ -52,6 +52,7 @@ class CClientExplosionManager;
 class CClientManager
 {
 public:
+    ZERO_ON_NEW
                                         CClientManager              ( void );
                                         ~CClientManager             ( void );
 
@@ -106,6 +107,8 @@ public:
     CClientEntity *                     FindEntitySafe              ( CEntity * pGameEntity );
 
     void                                OnUpdateStreamPosition      ( CClientStreamElement* pElement );
+    void                                OnLowLODElementCreated      ( void );
+    void                                OnLowLODElementDestroyed    ( void );
 
 private:
     CAntiCheat                          m_AntiCheat;
@@ -144,6 +147,7 @@ private:
     CClientPacketRecorder*              m_pPacketRecorder;
     bool                                m_bBeingDeleted;
     bool                                m_bGameUnloadedFlag;
+    int                                 m_iNumLowLODElements;
 };
 
 #endif
