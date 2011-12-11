@@ -90,9 +90,9 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_uiVoiceBitrate = 0;
     m_bNetworkEncryptionEnabled = true;
     m_strBandwidthReductionMode = "medium";
-    m_iPendingWorkToDoSleepTime = 10;
-    m_iNoWorkToDoSleepTime = 10;
-    m_bThreadNetEnabled = false;
+    m_iPendingWorkToDoSleepTime = -1;
+    m_iNoWorkToDoSleepTime = -1;
+    m_bThreadNetEnabled = true;
     m_iBackupInterval = 3;
     m_iBackupAmount = 5;
     m_iDebugFlag = 0;
@@ -506,11 +506,11 @@ bool CMainConfig::Load ( void )
 
     // busy_sleep_time
     GetInteger ( m_pRootNode, "busy_sleep_time", m_iPendingWorkToDoSleepTime );
-    m_iPendingWorkToDoSleepTime = Clamp ( 0, m_iPendingWorkToDoSleepTime, 50 );
+    m_iPendingWorkToDoSleepTime = Clamp ( -1, m_iPendingWorkToDoSleepTime, 50 );
 
     // idle_sleep_time
     GetInteger ( m_pRootNode, "idle_sleep_time", m_iNoWorkToDoSleepTime );
-    m_iNoWorkToDoSleepTime = Clamp ( 0, m_iPendingWorkToDoSleepTime, 50 );
+    m_iNoWorkToDoSleepTime = Clamp ( -1, m_iPendingWorkToDoSleepTime, 50 );
 
     // threadnet
     GetBoolean ( m_pRootNode, "threadnet", m_bThreadNetEnabled );
@@ -918,6 +918,33 @@ bool CMainConfig::IsVoiceEnabled ( void )
 }
 
 
+int CMainConfig::GetPendingWorkToDoSleepTime ( void )
+{
+    if ( m_iPendingWorkToDoSleepTime != -1 )
+        return m_iPendingWorkToDoSleepTime;
+
+    // -1 means auto
+    if ( m_bThreadNetEnabled )
+        return 20;
+    else
+        return 10;
+}
+
+
+int CMainConfig::GetNoWorkToDoSleepTime ( void )
+{
+    if ( m_iNoWorkToDoSleepTime != -1 )
+        return m_iNoWorkToDoSleepTime;
+
+    // -1 means auto
+    if ( m_bThreadNetEnabled )
+        return 40;
+    else
+        return 10;
+}
+
+
+
 //////////////////////////////////////////////////////////////////////
 //
 // Fetch any single setting from the server config
@@ -1093,7 +1120,7 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
     if ( strName == "busy_sleep_time" )
     {
         int iSleepMs = atoi ( strValue );
-        if ( iSleepMs >= 0 && iSleepMs <= 50 )
+        if ( iSleepMs >= -1 && iSleepMs <= 50 )
         {
             m_iPendingWorkToDoSleepTime = iSleepMs;
             if ( bSave )
@@ -1108,7 +1135,7 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
     if ( strName == "idle_sleep_time" )
     {
         int iSleepMs = atoi ( strValue );
-        if ( iSleepMs >= 0 && iSleepMs <= 50 )
+        if ( iSleepMs >= -1 && iSleepMs <= 50 )
         {
             m_iNoWorkToDoSleepTime = iSleepMs;
             if ( bSave )

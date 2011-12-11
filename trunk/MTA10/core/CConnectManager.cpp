@@ -108,7 +108,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     }
 
     // Set our packet handler
-    pNet->RegisterPacketHandler ( CConnectManager::StaticProcessPacket, true );
+    pNet->RegisterPacketHandler ( CConnectManager::StaticProcessPacket );
 
     // Set encryption option
     int iVar;

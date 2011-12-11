@@ -332,6 +332,9 @@ public:
     bool                        IsServerFullyUp             ( void )        { return m_bServerFullyUp; }
 
     ushort                      GetServerFPS                ( void )        { return m_usFPS; }
+    int                         GetSyncFPS                  ( void )        { return m_iSyncFPS; }
+    void                        SetSyncFPS                  ( int iSyncFPS ) { m_iSyncFPS = iSyncFPS; }
+
     void                        HandleBackup                ( void );
 
 private:
@@ -471,6 +474,7 @@ private:
     unsigned long               m_ulLastFPSTime;
     unsigned short              m_usFrames;
     unsigned short              m_usFPS;
+    int                         m_iSyncFPS;
     std::map<std::string,eGlitchType> m_GlitchNames;
     bool                        m_Glitches[NUM_GLITCHES];
 
