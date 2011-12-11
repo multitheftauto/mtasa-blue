@@ -12,6 +12,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "net/SimHeaders.h"
 
 CPlayerManager::CPlayerManager ( void )
 {
@@ -169,6 +170,9 @@ void CPlayerManager::Broadcast ( const CPacket& Packet, const std::list < CPlaye
 // Send one packet to a list of players
 void CPlayerManager::Broadcast ( const CPacket& Packet, const std::vector < CPlayer* >& sendList )
 {
+    if ( !CNetBufferWatchDog::CanSendPacket ( Packet.GetPacketID () ) )
+        return; 
+
     // Use the flags to determine how to send it
     NetServerPacketReliability Reliability;
     unsigned long ulFlags = Packet.GetFlags ();

@@ -15,6 +15,7 @@ namespace EActionWho
     {
         MAIN,
         SYNC,
+        WATCHDOG,
     };
 }
 using EActionWho::EActionWhoType;
@@ -38,6 +39,7 @@ namespace EActionWhere
         ThreadProc3,
         ProcessPacket,
         GetQueueSizes,
+        DoPulse,
     };
 }
 using EActionWhere::EActionWhereType;
@@ -58,6 +60,8 @@ namespace EActionWhat
 }
 using EActionWhat::EActionWhatType;
 
+void SetCurrentThreadType ( EActionWhoType type );
+bool IsCurrentThreadType ( EActionWhoType type );
 
 //
 // History for a thread
@@ -87,7 +91,7 @@ public:
 
     void AddAction ( EActionWhoType uiWho, EActionWhereType uiWhere, EActionWhatType uiWhat, int iExtra = 0 )
     {
-        dassert ( IsMainThread () == ( uiWho == EActionWho::MAIN ) );
+        dassert ( IsCurrentThreadType ( uiWho ) );
 
         if ( uiWho == EActionWho::MAIN )
             main.AddAction ( EActionWho::MAIN, uiWhere, uiWhat, iExtra );
@@ -136,13 +140,61 @@ public:
 
 
 //
+// Info about a queue
+//
+namespace EQueueStatus
+{
+    enum EQueueStatusType
+    {
+        OK,
+        SUSPEND_SYNC,
+        STOP_THREAD_NET,
+        SHUTDOWN,
+        TERMINATE,
+    };
+}
+using EQueueStatus::EQueueStatusType;
+
+// 30 slot history of sizes
+class CSizeHistory
+{
+    std::vector < int > dataList;
+public:
+    void AddPoint ( int iPoint )
+    {
+        dataList.push_back ( iPoint );
+        if ( dataList.size () > 30 )
+            dataList.erase ( dataList.begin () );
+    }
+
+    int GetLowestPointSince ( int iAge )
+    {
+        if ( iAge >= (int)dataList.size () )
+            return 0;
+        int iLowest = INT_MAX;
+        for ( int i = dataList.size () - 1 ; i >= 0 && iAge > 0 ; i--, iAge-- )
+            iLowest = Min ( iLowest, dataList[i] );
+        return iLowest;
+    }
+};
+
+// Queue status and size history
+class CQueueInfo
+{
+public:
+    EQueueStatusType status;
+    CSizeHistory m_SizeHistory;
+};
+
+
+//
 // Monitor queues and locks for trouble
 //
 class CNetBufferWatchDog
 {
 public:
     ZERO_ON_NEW
-                                            CNetBufferWatchDog              ( CNetServerBuffer* pNetBuffer );
+                                            CNetBufferWatchDog              ( CNetServerBuffer* pNetBuffer, bool bVerboseDebug );
                                             ~CNetBufferWatchDog             ( void );
 
     // Main thread functions
@@ -153,7 +205,11 @@ public:
     void*                       ThreadProc                  ( void );
     void                        DoChecks                    ( void );
     void                        CheckActionHistory          ( CActionHistory& history, const char* szTag, uint& uiDoneMessage );
-    void                        CheckQueueSize              ( uint uiSizeLimit, uint uiSize, const char* szTag, uint& uiHigh );
+    void                        UpdateQueueInfo             ( CQueueInfo& queueInfo, int iQueueSize, const char* szTag );
+    void                        BlockOutgoingSyncPackets    ( void );
+    void                        AllowOutgoingSyncPackets    ( void );
+    void                        BlockIncomingSyncPackets    ( void );
+    void                        AllowIncomingSyncPackets    ( void );
 
     // Main thread variables
     CThreadHandle*              m_pServiceThreadHandle;
@@ -166,6 +222,10 @@ public:
     uint                        m_uiOutCommandQueueHigh;
     uint                        m_uiOutResultQueueHigh;
     uint                        m_uiInResultQueueHigh;
+    CQueueInfo                  m_FinishedListQueueInfo;
+    CQueueInfo                  m_OutCommandQueueInfo;
+    CQueueInfo                  m_OutResultQueueInfo;
+    CQueueInfo                  m_InResultQueueInfo;
 
     // Shared variables
     struct
@@ -174,6 +234,19 @@ public:
         bool                                        m_bThreadTerminated;
         CComboMutex                                 m_Mutex;
     } shared;
+
+
+    // Static globals
+    static volatile bool ms_bBlockOutgoingSyncPackets;
+    static volatile bool ms_bBlockIncomingSyncPackets;
+    static volatile bool ms_bCriticalStopThreadNet;
+    static volatile bool ms_bVerboseDebug;
+
+    // Static functions
+    static void     DoPulse                 ( void );
+    static bool     IsUnreliableSyncPacket  ( uchar ucPacketID );
+    static bool     CanSendPacket           ( uchar ucPacketID );
+    static bool     CanReceivePacket        ( uchar ucPacketID );
 };
 
 

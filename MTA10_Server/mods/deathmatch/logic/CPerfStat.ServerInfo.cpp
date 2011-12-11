@@ -216,7 +216,10 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     m_InfoList.push_back ( StringPair ( "Date",                         GetLocalTimeString ( true ) ) );
     m_InfoList.push_back ( StringPair ( "Uptime",                       SString ( "%d Days %d Hours %02d Mins", (int)tDays, (int)tHours, (int)tMinutes ) ) );
 
-    m_StatusList.push_back ( StringPair ( "Server FPS",                 SString ( "%d", g_pGame->GetServerFPS () ) ) );
+    if ( !pConfig->GetThreadNetEnabled () )
+        m_StatusList.push_back ( StringPair ( "Server FPS",                 SString ( "%d", g_pGame->GetServerFPS () ) ) );
+    else
+        m_StatusList.push_back ( StringPair ( "Server FPS sync (logic)",    SString ( "%3d (%d)", g_pGame->GetSyncFPS (), g_pGame->GetServerFPS () ) ) );
     m_StatusList.push_back ( StringPair ( "Players",                    SString ( "%d / %d", g_pGame->GetPlayerManager ()->Count (), pConfig->GetMaxPlayers () ) ) );
     m_StatusList.push_back ( StringPair ( "Bytes/sec incoming",         CPerfStatManager::GetScaledByteString ( llIncomingBytesPS ) ) );
     m_StatusList.push_back ( StringPair ( "Bytes/sec outgoing",         CPerfStatManager::GetScaledByteString ( llOutgoingBytesPS ) ) );
@@ -228,6 +231,7 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     m_OptionsList.push_back ( StringPair ( "NetworkEncryptionEnabled",  SString ( "%d", pConfig->GetNetworkEncryptionEnabled () ) ) );
     m_OptionsList.push_back ( StringPair ( "VoiceEnabled",              SString ( "%d", pConfig->IsVoiceEnabled () ) ) );
     m_OptionsList.push_back ( StringPair ( "Busy sleep time",           SString ( "%d ms", pConfig->GetPendingWorkToDoSleepTime () ) ) );
+    m_OptionsList.push_back ( StringPair ( "Idle sleep time",           SString ( "%d ms", pConfig->GetNoWorkToDoSleepTime () ) ) );
     m_OptionsList.push_back ( StringPair ( "BandwidthReductionMode",    pConfig->GetSetting ( "bandwidth_reduction" ) ) );
     m_OptionsList.push_back ( StringPair ( "LightSyncEnabled",          SString ( "%d", g_pBandwidthSettings->bLightSyncEnabled ) ) );
     m_OptionsList.push_back ( StringPair ( "ThreadNetEnabled",          SString ( "%d", pConfig->GetThreadNetEnabled () ) ) );

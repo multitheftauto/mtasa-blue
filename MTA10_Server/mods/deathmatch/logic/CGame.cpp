@@ -21,6 +21,7 @@
 
 #include "StdInc.h"
 #include "../utils/COpenPortsTester.h"
+#include "net/SimHeaders.h"
 
 #define MAX_KEYSYNC_DISTANCE 400.0f
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
@@ -199,6 +200,7 @@ CGame::~CGame ( void )
     #endif
 
     // Eventually stop our game
+    CSimControl::EnableSimSystem ( false );
     Stop ();
 
     // Stop the web server
@@ -267,13 +269,23 @@ CGame::~CGame ( void )
 void CGame::GetTag ( char *szInfoTag, int iInfoTag )
 {
     // Construct the info tag
-    snprintf ( szInfoTag, iInfoTag, "%c[%c%c%c] MTA: San Andreas %c:%c: %d/%d players %c:%c: %u resources %c:%c: %u fps",
+    SString strInfoTag ( "%c[%c%c%c] MTA: San Andreas %c:%c: %d/%d players %c:%c: %u resources",
                132, 135, szProgress[ucProgress], 132,
                130, 130, m_pPlayerManager->Count (), m_pMainConfig->GetMaxPlayers (),
-               130, 130, m_pResourceManager->GetResourceLoadedCount (),
-               130, 130, m_usFPS );
-    if (iInfoTag > 0)
-        szInfoTag[iInfoTag-1] = '\0';
+               130, 130, m_pResourceManager->GetResourceLoadedCount () );
+
+    if ( !GetConfig ()->GetThreadNetEnabled () )
+    {
+        strInfoTag += SString ( " %c:%c: %u fps",
+               130, 130, g_pGame->GetServerFPS () );
+    }
+    else
+    {
+        strInfoTag += SString ( " %c:%c: %u fps (%u)",
+               130, 130, g_pGame->GetSyncFPS (), g_pGame->GetServerFPS () );
+    }
+
+    STRNCPY ( szInfoTag, *strInfoTag, iInfoTag );
 }
 
 
@@ -300,15 +312,6 @@ void CGame::DoPulse ( void )
     unsigned long ulCurrentTime = GetTickCount32 ();
     unsigned long ulDiff = ulCurrentTime - m_ulLastFPSTime;
 
-    // Update the progress rotator
-    if ( ucProgressSkip == 5 ) {
-        ucProgressSkip = 0;
-
-        // Clamp ucProgress between 0 and 3
-        ucProgress = ( ucProgress + 1 ) & 3;
-    }
-    ucProgressSkip++;
-
     // Calculate the server-side fps
     if ( ulDiff >= 1000 )
     {
@@ -317,6 +320,19 @@ void CGame::DoPulse ( void )
         m_ulLastFPSTime = ulCurrentTime;
     }
     m_usFrames++;
+
+    // Update the progress rotator
+    uchar ucDelta = (uchar)ulCurrentTime - ucProgressSkip;
+    ushort usReqDelta = 80 - ( 100 - Min < ushort > ( 100, m_usFPS ) ) / 5;
+    
+    if ( ucDelta > usReqDelta ) {
+        // Clamp ucProgress between 0 and 3
+        ucProgress = ( ucProgress + 1 ) & 3;
+        ucProgressSkip = (uchar)ulCurrentTime;
+    }
+
+    // Handle critical things
+    CNetBufferWatchDog::DoPulse ();
 
     CLOCK_SET_SECTION( "CGame::DoPulse" );
     CLOCK_CALL1( g_pNetServer->GetHTTPDownloadManager()->ProcessQueuedFiles(); );

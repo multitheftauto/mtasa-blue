@@ -38,9 +38,8 @@ CNetServerBuffer::CNetServerBuffer ( CSimPlayerManager* pSimPlayerManager )
     ms_pNetServerBuffer = this;
     m_pRealNetServer = g_pRealNetServer;
 
-    // Begin the debug watchdog if required
-    if ( g_pGame->GetConfig ()->GetDebugFlag () & 1 )
-        shared.m_pWatchDog = new CNetBufferWatchDog ( this );
+    // Begin the watchdog
+    shared.m_pWatchDog = new CNetBufferWatchDog ( this, g_pGame->GetConfig ()->GetDebugFlag () & 1 );
 
 
     // Start the job queue processing thread
@@ -171,6 +170,18 @@ void CNetServerBuffer::DoPulse ( void )
 
     // Read incoming packets
     ProcessIncoming ();
+
+    // See if it's time to check the thread 'fps'
+    if ( m_TimeThreadFPSLastCalced.Get () > 1000 )
+    {
+        m_TimeThreadFPSLastCalced.Reset ();
+        int iSyncFPS;
+        shared.m_Mutex.Lock ( EActionWho::MAIN, EActionWhere::DoPulse );
+        iSyncFPS = shared.m_iThreadFrameCount;
+        shared.m_iThreadFrameCount = 0;
+        shared.m_Mutex.Unlock ( EActionWho::MAIN, EActionWhere::DoPulse );
+        g_pGame->SetSyncFPS ( iSyncFPS );
+    }
 }
 
 
@@ -696,7 +707,7 @@ bool CNetServerBuffer::PollCommand ( CNetJobData* pJobData, uint uiTimeout )
                 // Found result. Remove from the result queue and flag return value
                 shared.m_OutResultQueue.erase ( iter );
                 pJobData->stage = EJobStage::FINISHED;
-                MapInsert ( m_FinishedList, pJobData );
+                MapInsert ( shared.m_FinishedList, pJobData );
 
                 // Do callback incase any cleanup is needed
                 if ( pJobData->HasCallback () )
@@ -762,14 +773,14 @@ void CNetServerBuffer::ProcessIncoming ( void )
     shared.m_Mutex.Lock ( EActionWho::MAIN, EActionWhere::ProcessIncoming2 );
 
     // Delete finished
-    for ( std::set < CNetJobData* >::iterator iter = m_FinishedList.begin () ; iter != m_FinishedList.end () ; )
+    for ( std::set < CNetJobData* >::iterator iter = shared.m_FinishedList.begin () ; iter != shared.m_FinishedList.end () ; )
     {
         CNetJobData* pJobData = *iter;
-        m_FinishedList.erase ( iter++ );
+        shared.m_FinishedList.erase ( iter++ );
         // Check not refed
         assert ( !ListContains ( shared.m_OutCommandQueue, pJobData ) );
         assert ( !ListContains ( shared.m_OutResultQueue, pJobData ) );
-        assert ( !MapContains ( m_FinishedList, pJobData ) );
+        assert ( !MapContains ( shared.m_FinishedList, pJobData ) );
         SAFE_DELETE( pJobData );
     }
 
@@ -812,6 +823,7 @@ again:
 ///////////////////////////////////////////////////////////////
 void* CNetServerBuffer::StaticThreadProc ( void* pContext )
 {
+    SetCurrentThreadType ( EActionWho::SYNC );
     CThreadHandle::AllowASyncCancel ();
     return ((CNetServerBuffer*)pContext)->ThreadProc ();
 }
@@ -829,16 +841,13 @@ void* CNetServerBuffer::ThreadProc ( void )
     shared.m_Mutex.Lock ( EActionWho::SYNC, EActionWhere::ThreadProc );
     while ( !shared.m_bTerminateThread )
     {
-        // Check if time to do a net pulse
-        if ( ( CTickCount::Now () - m_LastPulseTime ).ToLongLong () > 20 )
+        shared.m_iThreadFrameCount++;
+
+        if ( shared.m_bAutoPulse )
         {
-            if ( shared.m_bAutoPulse )
-            {
-                shared.m_Mutex.Unlock ( EActionWho::SYNC, EActionWhere::ThreadProc2 );
-                m_pRealNetServer->DoPulse ();
-                shared.m_Mutex.Lock ( EActionWho::SYNC, EActionWhere::ThreadProc2 );
-            }
-            m_LastPulseTime = CTickCount::Now ();
+            shared.m_Mutex.Unlock ( EActionWho::SYNC, EActionWhere::ThreadProc2 );
+            m_pRealNetServer->DoPulse ();
+            shared.m_Mutex.Lock ( EActionWho::SYNC, EActionWhere::ThreadProc2 );
         }
 
         // Is there a waiting command?
@@ -959,12 +968,6 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
         SSendPacketArgs& a = *(SSendPacketArgs*)pJobData->pArgs;
         SAFE_RELEASE(a.bitStream);
     }
-
-    // DoPulse extra
-    if ( pJobData->pArgs->type == TYPE_DoPulse )
-    {
-        m_LastPulseTime = CTickCount::Now ();
-    }
 }
 
 
@@ -985,7 +988,8 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
 ///////////////////////////////////////////////////////////////
 bool CNetServerBuffer::StaticProcessPacket ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo )
 {
-    return ms_pNetServerBuffer->ProcessPacket ( ucPacketID, Socket, BitStream, pNetExtraInfo );
+    ms_pNetServerBuffer->ProcessPacket ( ucPacketID, Socket, BitStream, pNetExtraInfo );
+    return true;
 }
 
 
@@ -996,12 +1000,8 @@ bool CNetServerBuffer::StaticProcessPacket ( unsigned char ucPacketID, NetServer
 // Handle data pushed from netmodule during its pulse
 //
 ///////////////////////////////////////////////////////////////
-bool CNetServerBuffer::ProcessPacket ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo )
+void CNetServerBuffer::ProcessPacket ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo )
 {
-    BitStream->AddRef ();
-    if ( pNetExtraInfo )
-        pNetExtraInfo->AddRef ();
-    SProcessPacketArgs* pArgs = new SProcessPacketArgs ( ucPacketID, Socket, BitStream, pNetExtraInfo );
 
     if ( ucPacketID == PACKET_ID_PLAYER_PURESYNC )
     {
@@ -1021,12 +1021,18 @@ bool CNetServerBuffer::ProcessPacket ( unsigned char ucPacketID, NetServerPlayer
         BitStream->ResetReadPointer ();
     }
 
+    if ( !CNetBufferWatchDog::CanReceivePacket ( ucPacketID ) )
+       return;
+
+    BitStream->AddRef ();
+    if ( pNetExtraInfo )
+        pNetExtraInfo->AddRef ();
+    SProcessPacketArgs* pArgs = new SProcessPacketArgs ( ucPacketID, Socket, BitStream, pNetExtraInfo );
+
     // Store result
     shared.m_Mutex.Lock ( EActionWho::SYNC, EActionWhere::ProcessPacket );
     shared.m_InResultQueue.push_back ( pArgs );
     shared.m_Mutex.Unlock ( EActionWho::SYNC, EActionWhere::ProcessPacket );
-
-    return true;
 }
 
 
@@ -1039,14 +1045,14 @@ bool CNetServerBuffer::ProcessPacket ( unsigned char ucPacketID, NetServerPlayer
 ///////////////////////////////////////////////////////////////
 void CNetServerBuffer::GetQueueSizes ( uint& uiFinishedList, uint& uiOutCommandQueue, uint& uiOutResultQueue, uint& uiInResultQueue )
 {
-    shared.m_Mutex.Lock ( EActionWho::SYNC, EActionWhere::GetQueueSizes );
+    shared.m_Mutex.Lock ( EActionWho::WATCHDOG, EActionWhere::GetQueueSizes );
 
-    uiFinishedList = m_FinishedList.size ();
+    uiFinishedList = shared.m_FinishedList.size ();
     uiOutCommandQueue = shared.m_OutCommandQueue.size ();
     uiOutResultQueue = shared.m_OutResultQueue.size ();
     uiInResultQueue = shared.m_InResultQueue.size ();
 
-    shared.m_Mutex.Unlock ( EActionWho::SYNC, EActionWhere::GetQueueSizes );
+    shared.m_Mutex.Unlock ( EActionWho::WATCHDOG, EActionWhere::GetQueueSizes );
 }
 
 

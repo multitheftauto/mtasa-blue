@@ -12,6 +12,11 @@
 
 CActionHistorySet g_HistorySet;
 
+volatile bool CNetBufferWatchDog::ms_bBlockOutgoingSyncPackets = false;
+volatile bool CNetBufferWatchDog::ms_bBlockIncomingSyncPackets = false;
+volatile bool CNetBufferWatchDog::ms_bCriticalStopThreadNet = false;
+volatile bool CNetBufferWatchDog::ms_bVerboseDebug = false;
+
 ///////////////////////////////////////////////////////////////////////////
 //
 // CNetBufferWatchDog::CNetBufferWatchDog
@@ -19,11 +24,19 @@ CActionHistorySet g_HistorySet;
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-CNetBufferWatchDog::CNetBufferWatchDog ( CNetServerBuffer* pNetBuffer )
+CNetBufferWatchDog::CNetBufferWatchDog ( CNetServerBuffer* pNetBuffer, bool bVerboseDebug )
     : m_pNetBuffer ( pNetBuffer )
 {
-    CLogger::LogPrintf ( "INFO: CNetBufferWatchDog started\n" );
-    // Start the job queue processing thread
+    // Reset some statics
+    ms_bBlockOutgoingSyncPackets = false;
+    ms_bBlockIncomingSyncPackets = false;
+    ms_bCriticalStopThreadNet = false;
+    ms_bVerboseDebug = bVerboseDebug;
+
+    if ( ms_bVerboseDebug )
+        CLogger::LogPrintf ( "INFO: CNetBufferWatchDog started\n" );
+
+    // Start the watch dog thread
     m_pServiceThreadHandle = new CThreadHandle ( CNetBufferWatchDog::StaticThreadProc, this );
 }
 
@@ -37,9 +50,10 @@ CNetBufferWatchDog::CNetBufferWatchDog ( CNetServerBuffer* pNetBuffer )
 ///////////////////////////////////////////////////////////////////////////
 CNetBufferWatchDog::~CNetBufferWatchDog ( void )
 {
-    CLogger::LogPrintf ( "INFO: CNetBufferWatchDog stopped\n" );
+    if ( ms_bVerboseDebug )
+        CLogger::LogPrintf ( "INFO: CNetBufferWatchDog stopped\n" );
 
-    // Stop the job queue processing thread
+    // Stop the watch dog thread
     StopThread ();
 
     // Delete thread
@@ -51,12 +65,12 @@ CNetBufferWatchDog::~CNetBufferWatchDog ( void )
 //
 // CNetBufferWatchDog::StopThread
 //
-// Stop the job queue processing thread
+// Stop the watch dog thread
 //
 ///////////////////////////////////////////////////////////////
 void CNetBufferWatchDog::StopThread ( void )
 {
-    // Stop the job queue processing thread
+    // Stop the watch dog thread
     shared.m_Mutex.Lock ();
     shared.m_bTerminateThread = true;
     shared.m_Mutex.Signal ();
@@ -93,6 +107,7 @@ void CNetBufferWatchDog::StopThread ( void )
 ///////////////////////////////////////////////////////////////
 void* CNetBufferWatchDog::StaticThreadProc ( void* pContext )
 {
+    SetCurrentThreadType ( EActionWho::WATCHDOG );
     CThreadHandle::AllowASyncCancel ();
     return ((CNetBufferWatchDog*)pContext)->ThreadProc ();
 }
@@ -135,16 +150,31 @@ void CNetBufferWatchDog::DoChecks ( void )
     CheckActionHistory ( g_HistorySet.main, "Main", m_uiMainAgeHigh );
     CheckActionHistory ( g_HistorySet.sync, "Sync", m_uiSyncAgeHigh );
 
+    // Get queue sizes now
     uint uiFinishedList;
     uint uiOutCommandQueue;
     uint uiOutResultQueue;
     uint uiInResultQueue;
     m_pNetBuffer->GetQueueSizes ( uiFinishedList, uiOutCommandQueue, uiOutResultQueue, uiInResultQueue );
 
-    CheckQueueSize ( 1000, uiFinishedList, "FinishedList", m_uiFinishedListHigh );
-    CheckQueueSize ( 1000, uiOutCommandQueue, "OutCommandQueue", m_uiOutCommandQueueHigh );
-    CheckQueueSize ( 1000, uiOutResultQueue, "OutResultQueue", m_uiOutResultQueueHigh );
-    CheckQueueSize ( 1000, uiInResultQueue, "InResultQueue", m_uiInResultQueueHigh );
+    // Update queue status
+    UpdateQueueInfo ( m_FinishedListQueueInfo, uiFinishedList, "FinishedList" );
+    UpdateQueueInfo ( m_OutCommandQueueInfo, uiOutCommandQueue, "OutCommandQueue" );
+    UpdateQueueInfo ( m_OutResultQueueInfo, uiOutResultQueue, "OutResultQueue" );
+    UpdateQueueInfo ( m_InResultQueueInfo, uiInResultQueue, "InResultQueue" );
+
+    // Apply queue status
+    if ( m_OutCommandQueueInfo.status == EQueueStatus::OK )
+        AllowOutgoingSyncPackets ();
+    else
+    if ( m_OutCommandQueueInfo.status == EQueueStatus::SUSPEND_SYNC )
+        BlockOutgoingSyncPackets ();
+
+    if ( m_InResultQueueInfo.status == EQueueStatus::OK )
+        AllowIncomingSyncPackets ();
+    else
+    if ( m_OutCommandQueueInfo.status == EQueueStatus::SUSPEND_SYNC )
+        BlockIncomingSyncPackets ();
 }
 
 
@@ -180,55 +210,285 @@ void CNetBufferWatchDog::CheckActionHistory ( CActionHistory& history, const cha
 
     if ( bShowMessage )
     {
-        CLogger::LogPrintf ( "INFO: %s thread last action age: %d ticks.\n"
-                                    , szTag
-                                    , uiAge
-                                );
+        if ( ms_bVerboseDebug )
+            CLogger::LogPrintf ( "INFO: %s thread last action age: %d ticks.\n"
+                                        , szTag
+                                        , uiAge
+                                    );
     }
 }
 
 
 ///////////////////////////////////////////////////////////////
 //
-// CNetBufferWatchDog::CheckQueueSize
+// CNetBufferWatchDog::UpdateQueueInfo
+//
+// Generic queue info updater
 //
 // Thread:                  check
 // Mutex should be locked:  yes
 //
 ///////////////////////////////////////////////////////////////
-void CNetBufferWatchDog::CheckQueueSize ( uint uiSizeLimit, uint uiSize, const char* szTag, uint& uiHigh )
+void CNetBufferWatchDog::UpdateQueueInfo ( CQueueInfo& queueInfo, int iQueueSize, const char* szTag )
 {
-#ifdef MTA_DEBUG
-    uint uiMinLevel = 5;
-#else
-    uint uiMinLevel = uiSizeLimit;
-#endif
+    const int iThreshLevel1 = 100000;
+    const int iThreshLevel2 = 200000;
+    const int iThreshLevel3 = 300000;
+    const int iThreshLevel4 = 400000;
+    const int iThreshLevel5 = 500000;
 
-    uiHigh = Max < uint > ( uiMinLevel, uiHigh );
-
-    bool bShowMessage = false;
-    if ( uiSize > uiHigh )
+    queueInfo.m_SizeHistory.AddPoint ( iQueueSize );
+    if ( queueInfo.status == EQueueStatus::OK )
     {
-        uiHigh = uiSize + Max < uint > ( 10, uiSize / 2 );
-        bShowMessage = true;
-    }
-    else
-    if ( uiSize < uiHigh / 4 )
-    {
-        if ( uiHigh > uiMinLevel )
+        //  if Queue > 200,000 for 5 seconds
+        //      stop related queue until it is below 100,000
+        if ( queueInfo.m_SizeHistory.GetLowestPointSince( 5 ) > iThreshLevel2 )
         {
-            uiHigh = uiSize / 2;
-            bShowMessage = true;
+            CLogger::LogPrintf ( "%s > 200,000pkts. This is due to server overload or another problem\n", szTag );
+            queueInfo.status = EQueueStatus::SUSPEND_SYNC;
         }
     }
-
-    uiHigh = Max < uint > ( uiMinLevel, uiHigh );
-
-    if ( bShowMessage )
+    else
+    if ( queueInfo.status == EQueueStatus::SUSPEND_SYNC )
     {
-        SString strMessage ( "INFO: %s queue size: %d.", szTag, uiSize );
-        if ( uiSize > uiMinLevel )
-            strMessage += SString ( " (Next warning will be outside %d to %d)", uiHigh / 4, uiHigh );
-        CLogger::LogPrint ( strMessage + "\n" );
+        //  if Queue < 100,000 within the last 5 seconds
+        //      resume related queue
+        if ( queueInfo.m_SizeHistory.GetLowestPointSince( 5 ) < iThreshLevel1 )
+        {
+            queueInfo.status = EQueueStatus::OK;
+        }
+
+        //  if Queue > 300,000 for 10 seconds
+        //      terminate threadnet
+        if ( queueInfo.m_SizeHistory.GetLowestPointSince( 10 ) > iThreshLevel3 )
+        {
+            CLogger::ErrorPrintf ( "%s > 300,000pkts for 10 seconds\n", szTag );
+            CLogger::ErrorPrintf ( "Something is wrong - Switching from threaded sync mode\n" );
+            queueInfo.status = EQueueStatus::STOP_THREAD_NET;
+            ms_bCriticalStopThreadNet = true;
+        }
     }
+    else
+    if ( queueInfo.status == EQueueStatus::STOP_THREAD_NET )
+    {
+        //  if Queue > 400,000 for 15 seconds
+        //      shutdown
+        if ( queueInfo.m_SizeHistory.GetLowestPointSince( 15 ) > iThreshLevel4 )
+        {
+            CLogger::ErrorPrintf ( "%s > 400,000pkts for 15 seconds\n", szTag );
+            CLogger::ErrorPrintf ( "Something is very wrong - Shutting down server\n" );
+            queueInfo.status = EQueueStatus::SHUTDOWN;
+            g_pGame->SetIsFinished ( true );
+        }
+    }
+    else
+    if ( queueInfo.status == EQueueStatus::SHUTDOWN )
+    {
+        //  if Queue > 500,000 for 20 seconds
+        //      terminate server
+        if ( queueInfo.m_SizeHistory.GetLowestPointSince( 20 ) > iThreshLevel5 )
+        {
+            CLogger::ErrorPrintf ( "%s > 500,000pkts for 20 seconds\n", szTag );
+            CLogger::ErrorPrintf ( "Something is badly wrong right here - Terminating server\n" );
+            queueInfo.status = EQueueStatus::TERMINATE;
+#ifdef WIN32
+            TerminateProcess ( GetCurrentProcess (), 1 );
+#else
+            exit(1);
+#endif
+        }
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CNetBufferWatchDog::BlockOutgoingSyncPackets
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CNetBufferWatchDog::BlockOutgoingSyncPackets ( void )
+{
+    if ( !ms_bBlockOutgoingSyncPackets )
+    {
+        ms_bBlockOutgoingSyncPackets = true;
+        CLogger::LogPrintf ( "Temporarily suspending outgoing sync packets\n" );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CNetBufferWatchDog::BlockOutgoingSyncPackets
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CNetBufferWatchDog::AllowOutgoingSyncPackets ( void )
+{
+    if ( ms_bBlockOutgoingSyncPackets )
+    {
+        ms_bBlockOutgoingSyncPackets = false;
+        CLogger::LogPrintf ( "Resuming outgoing sync packets\n" );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CNetBufferWatchDog::BlockOutgoingSyncPackets
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CNetBufferWatchDog::BlockIncomingSyncPackets ( void )
+{
+    if ( !ms_bBlockIncomingSyncPackets )
+    {
+        ms_bBlockIncomingSyncPackets = true;
+        CLogger::LogPrintf ( "Temporarily suspending incoming sync packets\n" );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CNetBufferWatchDog::BlockOutgoingSyncPackets
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CNetBufferWatchDog::AllowIncomingSyncPackets ( void )
+{
+    if ( ms_bBlockIncomingSyncPackets )
+    {
+        ms_bBlockIncomingSyncPackets = false;
+        CLogger::LogPrintf ( "Resuming incoming sync packets\n" );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CNetBufferWatchDog::DoPulse
+//
+// Static function
+// Check for critical sitayshun
+//
+///////////////////////////////////////////////////////////////
+void CNetBufferWatchDog::DoPulse ( void )
+{
+    if ( CSimControl::IsSimSystemEnabled () )
+    {
+        if ( CNetBufferWatchDog::ms_bCriticalStopThreadNet )
+        {
+            CNetBufferWatchDog::ms_bCriticalStopThreadNet = false;
+            g_pGame->GetConfig ()->SetSetting ( "threadnet", "0", false );
+        }
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CNetBufferWatchDog::IsUnreliableSyncPacket
+//
+// Static function
+//
+///////////////////////////////////////////////////////////////
+bool CNetBufferWatchDog::IsUnreliableSyncPacket ( uchar ucPacketID )
+{
+    switch ( ucPacketID )
+    {
+        case PACKET_ID_PLAYER_KEYSYNC:
+        case PACKET_ID_PLAYER_PURESYNC:
+        case PACKET_ID_PLAYER_VEHICLE_PURESYNC:
+        case PACKET_ID_LIGHTSYNC:
+        case PACKET_ID_VEHICLE_RESYNC:
+        case PACKET_ID_RETURN_SYNC:
+        case PACKET_ID_OBJECT_SYNC:
+        case PACKET_ID_UNOCCUPIED_VEHICLE_SYNC:
+        case PACKET_ID_PED_SYNC:
+        case PACKET_ID_CAMERA_SYNC:
+            return true;
+        default:
+            return false;
+    };
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CNetBufferWatchDog::CanSendPacket
+//
+// Static function
+//
+///////////////////////////////////////////////////////////////
+bool CNetBufferWatchDog::CanSendPacket ( uchar ucPacketID )
+{
+    if ( CSimControl::IsSimSystemEnabled () )
+        if ( CNetBufferWatchDog::ms_bBlockOutgoingSyncPackets )
+            return !IsUnreliableSyncPacket ( ucPacketID );
+    return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CNetBufferWatchDog::CanReceivePacket
+//
+// Static function
+//
+///////////////////////////////////////////////////////////////
+bool CNetBufferWatchDog::CanReceivePacket ( uchar ucPacketID )
+{
+    if ( CSimControl::IsSimSystemEnabled () )
+        if ( CNetBufferWatchDog::ms_bBlockIncomingSyncPackets )
+            return !IsUnreliableSyncPacket ( ucPacketID );
+    return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// SetCurrentThreadType
+//
+// Thread id for debugging
+//
+///////////////////////////////////////////////////////////////
+static DWORD dwThreadIds[3] = { -1, -1, -1 };
+void SetCurrentThreadType ( EActionWhoType type )
+{
+#ifdef MTA_DEBUG
+#ifdef WIN32
+    dassert ( type < NUMELMS( dwThreadIds ) );
+    dwThreadIds[ type ] = GetCurrentThreadId ();
+#endif
+#endif
+}
+
+///////////////////////////////////////////////////////////////
+//
+// IsCurrentThreadType
+//
+// Thread id for debugging
+//
+///////////////////////////////////////////////////////////////
+bool IsCurrentThreadType ( EActionWhoType type )
+{
+#ifdef MTA_DEBUG
+#ifdef WIN32
+    dassert ( type < NUMELMS( dwThreadIds ) );
+    if ( dwThreadIds[ type ] == -1 )
+    {
+        if ( type == EActionWho::MAIN )
+            return true;
+        SetCurrentThreadType ( type );
+    }
+    return dwThreadIds[ type ] == GetCurrentThreadId ();
+#endif
+#else
+    return true;
+#endif
 }

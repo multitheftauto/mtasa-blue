@@ -43,7 +43,7 @@ public:
 
     virtual void                        DoPulse                     ( void ) = 0;
 
-    virtual void                        RegisterPacketHandler       ( PPACKETHANDLER pfnPacketHandler, bool bIsPrimaryPacketHandler = true ) = 0;
+    virtual void                        RegisterPacketHandler       ( PPACKETHANDLER pfnPacketHandler ) = 0;
 
     virtual NetBitStreamInterface*      AllocateNetBitStream        ( void ) = 0;
     virtual void                        DeallocateNetBitStream      ( NetBitStreamInterface* bitStream ) = 0;
