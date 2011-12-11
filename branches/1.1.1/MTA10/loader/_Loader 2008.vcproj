@@ -345,6 +345,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SplashWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SplashWindow.h"
+				>
+			</File>
+			<File
 				RelativePath=".\StdInc.cpp"
 				>
 				<FileConfiguration

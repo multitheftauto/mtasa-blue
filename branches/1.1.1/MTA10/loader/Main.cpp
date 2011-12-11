@@ -13,10 +13,12 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "SplashWindow.h"
 #include "direct.h"
 #include "SharedUtil.Tests.hpp"
 int DoLaunchGame ( LPSTR lpCmdLine );
 int LaunchGame ( LPSTR lpCmdLine );
+void MaybeShowNag ( void );
 
 HINSTANCE g_hInstance = NULL;
 
@@ -366,6 +368,8 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     bool bDoneAdmin = strCmdLine.Contains ( "/done-admin" );
     strCmdLine = strCmdLine.Replace ( " /done-admin", "" );
 
+    MaybeShowNag ();
+
     //////////////////////////////////////////////////////////
     //
     // Hook 'n' go
@@ -521,6 +525,117 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 }
 
 
+#define MODDB_REG_KEY  "moddb2011-nag"
+#define MODDB_VOTE_URL  "http://mtasa.com/moddb/"
+
+//////////////////////////////////////////////////////////
+//
+// NotifyNonStandardStart
+//
+// Don't show nag!
+//
+//////////////////////////////////////////////////////////
+void NotifyNonStandardStart ( void )
+{
+    // Make sure next time show is at least 10 mins aways
+    int iTimeNow = static_cast < int > ( time ( NULL ) );
+    int iTimeNextShow = GetApplicationSettingInt ( MODDB_REG_KEY, "next-time-show" );
+    iTimeNextShow = Max ( iTimeNextShow, iTimeNow + 60 * 10 );
+    SetApplicationSettingInt ( MODDB_REG_KEY, "next-time-show", iTimeNextShow );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// MaybeShowNag
+//
+//
+//
+//////////////////////////////////////////////////////////
+void MaybeShowNag ( void )
+{
+    // Show max of once per 18 hrs
+    // Don't show after 21 dec 0600 UDT
+    // Don't show after crash
+    // Show nag1 until top button has been pressed
+    // Then show nag2 until bottom button has been pressed
+
+    // Dont show after 21 dec 0600 UDT
+    {
+        time_t t = time ( NULL );
+        tm* tmp = gmtime ( &t );
+        char outstr[200] = { 0 };
+        strftime ( outstr, sizeof ( outstr ), "%Y-%m-%d %H:%M:%S", tmp );
+        if ( SStringX ( "2011-12-21 06:00:00" ) < outstr )
+        {
+            return;
+        }
+    }
+
+    // Show once per 18 hrs
+    bool bTimeForNag = false;
+    {
+#if MTA_DEBUG
+        int iInterval = 60;
+#else
+        int iInterval = 60 * 60 * 18;
+#endif
+        int iTimeNow = static_cast < int > ( time ( NULL ) );
+        int iTimeNextShow = GetApplicationSettingInt ( MODDB_REG_KEY, "next-time-show" );
+        iTimeNextShow = Min ( iTimeNextShow, iTimeNow + iInterval );
+        if ( iTimeNextShow < iTimeNow )
+        {
+            iTimeNextShow = iTimeNow + iInterval;
+            bTimeForNag = true;
+        }
+        SetApplicationSettingInt ( MODDB_REG_KEY, "next-time-show", iTimeNextShow );
+    }
+
+
+    if ( bTimeForNag )
+    {
+        int iWhichNag = GetApplicationSettingInt ( MODDB_REG_KEY, "which-one" );
+        if ( iWhichNag == 0 || iWhichNag == 1 )
+        {
+            HideSplash ();  // Hide standard MTA splash
+            SplashWindow &splash = SplashWindow::GetInstance();
+            splash.Initialize( g_hInstance, iWhichNag );
+            splash.Show();
+
+            int iResult = 0;
+            while ( !iResult )
+            {
+                iResult = splash.PulseMessagePump();
+            }
+            
+            splash.Shutdown();
+
+            // Show nag1 until top button has been pressed
+            if ( iWhichNag == 0 && iResult == IDYES )
+                iWhichNag++;
+            else
+            // Then show nag2 until bottom button has been pressed
+            if ( iWhichNag == 1 && iResult == IDNO )
+                iWhichNag++;
+
+            SetApplicationSettingInt ( MODDB_REG_KEY, "which-one", iWhichNag );
+
+            // Launch thing
+            if ( iResult == IDYES )
+            {
+                MessageBox( 0, "Your web browser will now open and show you the voting infomation.", "MTA: San Andreas", MB_ICONINFORMATION|MB_OK );
+                int iResult = (int)ShellExecuteNonBlocking ( "open", MODDB_VOTE_URL );
+                if ( iResult < 32 )
+                {                   
+                    MessageBox( 0, "If browsing fails, please go to:\n\n" MODDB_VOTE_URL, "MTA: San Andreas", MB_ICONINFORMATION|MB_OK );
+                    AddReportLog ( 5400, SString ( "Browse failed %d", iResult ) );
+                }
+
+                TerminateProcess ( GetCurrentProcess (), 0 );
+            }
+        }
+    }
+}
 extern "C" _declspec(dllexport)
 int DoWinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
