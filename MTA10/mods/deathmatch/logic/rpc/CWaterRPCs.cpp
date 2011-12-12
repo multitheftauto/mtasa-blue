@@ -15,41 +15,33 @@
 
 void CWaterRPCs::LoadFunctions ( void )
 {
-    AddHandler ( SET_WATER_LEVEL, SetGTAWaterLevel, "SetWaterLevel" );
-    AddHandler ( SET_WATER_LEVEL, SetWaterElementLevel, "SetWaterLevel" );
+    AddHandler ( SET_WORLD_WATER_LEVEL, SetWorldWaterLevel, "SetWorldWaterLevel" );
+    AddHandler ( RESET_WORLD_WATER_LEVEL, ResetWorldWaterLevel, "ResetWorldWaterLevel" );
+    AddHandler ( SET_ELEMENT_WATER_LEVEL, SetElementWaterLevel, "SetElementWaterLevel" );
+    AddHandler ( SET_ALL_ELEMENT_WATER_LEVEL, SetAllElementWaterLevel, "SetAllElementWaterLevel" );
     AddHandler ( SET_WATER_VERTEX_POSITION, SetWaterVertexPosition, "SetWaterVertexPosition" );
     AddHandler ( SET_WATER_COLOR, SetWaterColor, "SetWaterColor" );
     AddHandler ( RESET_WATER_COLOR, ResetWaterColor, "ResetWaterColor" );
 }
 
-void CWaterRPCs::SetGTAWaterLevel ( NetBitStreamInterface& bitStream )
+void CWaterRPCs::SetWorldWaterLevel ( NetBitStreamInterface& bitStream )
 {
     float fLevel;
-    bool bUsePosition;
+    bool bIncludeWorldNonSeaLevel;
 
-    if ( bitStream.Read ( fLevel ) && bitStream.ReadBit ( bUsePosition ) )
+    if ( bitStream.Read ( fLevel )
+            && bitStream.ReadBit ( bIncludeWorldNonSeaLevel ) )
     {
-        if ( bUsePosition == true )
-        {
-            // (x, y, z, level)
-            short sX, sY;
-            CVector vecPos;
-            if ( bitStream.Read ( sX ) && bitStream.Read ( sY ) && bitStream.Read ( vecPos.fZ ) )
-            {
-                vecPos.fX = sX;
-                vecPos.fY = sY;
-                m_pWaterManager->SetWaterLevel ( &vecPos, fLevel );
-            }
-        }
-        else
-        {
-            // (level)
-            m_pWaterManager->SetWaterLevel ( (CVector *)NULL, fLevel );
-        }
+        m_pWaterManager->SetWorldWaterLevel ( fLevel, NULL, bIncludeWorldNonSeaLevel );
     }
 }
 
-void CWaterRPCs::SetWaterElementLevel ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CWaterRPCs::ResetWorldWaterLevel ( NetBitStreamInterface& bitStream )
+{
+    m_pWaterManager->ResetWorldWaterLevel ();
+}
+
+void CWaterRPCs::SetElementWaterLevel ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     float fLevel;
 
@@ -59,16 +51,21 @@ void CWaterRPCs::SetWaterElementLevel ( CClientEntity* pSource, NetBitStreamInte
         CClientWater* pWater = m_pWaterManager->Get ( pSource->GetID () );
         if ( pWater )
         {
-            CVector vecVertexPos;
-            for ( int i = 0; i < pWater->GetNumVertices (); i++ )
-            {
-                pWater->GetVertexPosition ( i, vecVertexPos );
-                vecVertexPos.fZ = fLevel;
-                pWater->SetVertexPosition ( i, vecVertexPos );
-            }
+            m_pWaterManager->SetElementWaterLevel ( pWater, fLevel, NULL );
         }
     }
 }
+
+void CWaterRPCs::SetAllElementWaterLevel ( NetBitStreamInterface& bitStream )
+{
+    float fLevel;
+
+    if ( bitStream.Read ( fLevel ) )
+    {
+        m_pWaterManager->SetAllElementWaterLevel ( fLevel, NULL );
+    }
+}
+
 
 void CWaterRPCs::SetWaterVertexPosition ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {

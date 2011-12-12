@@ -13,9 +13,22 @@
 #include "StdInc.h"
 
 extern CWaterManagerSA* g_pWaterManager;
+int ms_iNumNonDefaultAndNonZeroVertices = 0;
 
 // -----------------------------------------------------
 // Vertices
+
+CWaterVertexSA::CWaterVertexSA ( void )
+{
+    m_pInterface = NULL;
+    m_bIsWorldWaterVertex = false;
+}
+
+CWaterVertexSA::CWaterVertexSA ( CWaterVertexSAInterface* pInterface )
+{
+    m_pInterface = pInterface;
+    m_bIsWorldWaterVertex = false;
+}
 
 WORD CWaterVertexSA::GetID ()
 {
@@ -31,16 +44,68 @@ void CWaterVertexSA::GetPosition ( CVector& vec )
     vec.fZ = m_pInterface->m_fZ;
 }
 
-bool CWaterVertexSA::SetPosition ( CVector& vec, void* pChangeSource )
+bool CWaterVertexSA::SetPosition ( const CVector& vec, void* pChangeSource )
 {
     if ( pChangeSource )
         g_pWaterManager->AddChange ( pChangeSource, this, new CWaterChangeVertexMove ( this ) );
-    
+
+    OnChangeLevel ( m_pInterface->m_fZ, vec.fZ );
+
     m_pInterface->m_sX = ((short)vec.fX) & ~1;
     m_pInterface->m_sY = ((short)vec.fY) & ~1;
     m_pInterface->m_fZ = vec.fZ;
     return true;
 }
+
+// See if level will require alt render order
+void CWaterVertexSA::OnChangeLevel ( float fOldZ, float fNewZ )
+{
+    if ( m_bIsWorldWaterVertex )
+    {
+        // If changing from default or zero, increment global counter
+        // If changing to default or zero, decrement global counter
+        bool bWasDefaultOrZero = ( fOldZ == m_fDefaultZ ) || ( fOldZ == 0 );
+        bool bIsDefaultOrZero  = ( fNewZ == m_fDefaultZ ) || ( fNewZ == 0 );
+        if ( bWasDefaultOrZero != bIsDefaultOrZero )
+        {
+            if ( bWasDefaultOrZero )
+                ms_iNumNonDefaultAndNonZeroVertices++;
+            else
+                ms_iNumNonDefaultAndNonZeroVertices--;
+
+            if ( ms_iNumNonDefaultAndNonZeroVertices == 0 || ms_iNumNonDefaultAndNonZeroVertices == 1 )
+                g_pWaterManager->UpdateRenderOrderRequirement ();
+        }
+    }
+}
+
+// Save initial state
+void CWaterVertexSA::Init ( bool bIsWorldWaterVertex )
+{
+    m_bIsWorldWaterVertex = bIsWorldWaterVertex;
+    if ( m_bIsWorldWaterVertex )
+        m_fDefaultZ = m_pInterface->m_fZ;
+}
+
+// Restore initial state
+void CWaterVertexSA::Reset ( void )
+{
+    if ( m_bIsWorldWaterVertex )
+    {
+        CVector vec;
+        GetPosition ( vec );
+        vec.fZ = m_fDefaultZ;
+        SetPosition ( vec );
+    }
+}
+
+// Check if swimming pool etc.
+bool CWaterVertexSA::IsWorldNonSeaLevel ( void )
+{
+    return m_bIsWorldWaterVertex && m_fDefaultZ != 0.f;
+}
+
+
 
 // -----------------------------------------------------
 // Polygons

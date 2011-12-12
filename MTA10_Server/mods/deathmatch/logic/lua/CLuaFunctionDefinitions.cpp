@@ -8750,71 +8750,70 @@ int CLuaFunctionDefinitions::CreateWater ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaFunctionDefinitions::SetWaterLevel ( lua_State* luaVM )
 {
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+    CResource* pResource = pLuaMain ? pLuaMain->GetResource () : NULL;
+    if ( !pResource )
     {
-        CResource* pResource = pLuaMain->GetResource ();
-        if ( pResource )
-        {
-            int iArgument1 = lua_type ( luaVM, 1 );
-            int iArgument2 = lua_type ( luaVM, 2 );
-            int iArgument3 = lua_type ( luaVM, 3 );
-            int iArgument4 = lua_type ( luaVM, 4 );
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
 
-            if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
+    CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsUserData () )
+    {
+        // Call type 1
+        //  bool setWaterLevel ( [water theWater,] float level )
+        CWater* pWater; float fLevel;
+
+        argStream.ReadUserData ( pWater );
+        argStream.ReadNumber ( fLevel );
+
+        if ( !argStream.HasErrors () )
+        {
+            if ( CStaticFunctionDefinitions::SetElementWaterLevel ( pWater, fLevel ) )
             {
-                if ( ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-                     ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
-                     ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
-                {
-                    // (x, y, z, level)
-                    /*CVector vecPosition ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ),
-                                          static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
-                                          static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
-                    float fLevel = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
-                    if ( CStaticFunctionDefinitions::SetWaterLevel ( &vecPosition, fLevel, pResource ) )
-                    {
-                        lua_pushboolean ( luaVM, true );
-                        return 1;
-                    }*/
-                    lua_pushboolean ( luaVM, false );
-                    return 1;
-                }
-                else
-                {
-                    // (level)
-                    float fLevel = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
-                    if ( CStaticFunctionDefinitions::SetWaterLevel ( (CVector *)NULL, fLevel ) )
-                    {
-                        lua_pushboolean ( luaVM, true );
-                        return 1;
-                    }
-                }
+                lua_pushboolean ( luaVM, true );
+                return 1;
             }
-            else if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
-                      ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
-            {
-                // (water, level)
-                CWater* pWater = lua_towater ( luaVM, 1 );
-                float fLevel = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
-                if ( pWater )
-                {
-                    if ( CStaticFunctionDefinitions::SetWaterLevel ( pWater, fLevel ) )
-                    {
-                        lua_pushboolean ( luaVM, true );
-                        return 1;
-                    }
-                }
-                else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "setWaterLevel", "water", 1 );
-            }
-            else
-                m_pScriptDebugging->LogBadType ( luaVM, "setWaterLevel" );
         }
     }
+    else
+    {
+        // Call type 2
+        //  bool setWaterLevel ( float level, bool bIncludeWorldNonSeaLevel, bool bIncludeAllWaterElements )
+        float fLevel; bool bIncludeWorldNonSeaLevel; bool bIncludeAllWaterElements;
+
+        argStream.ReadNumber ( fLevel );
+        argStream.ReadBool ( bIncludeWorldNonSeaLevel, true );
+        argStream.ReadBool ( bIncludeAllWaterElements, true );
+
+        if ( !argStream.HasErrors () )
+        {
+            if ( bIncludeAllWaterElements )
+                CStaticFunctionDefinitions::SetAllElementWaterLevel ( fLevel );
+            if ( CStaticFunctionDefinitions::SetWorldWaterLevel ( fLevel, bIncludeWorldNonSeaLevel ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWaterLevel", *argStream.GetErrorMessage () ) );
+
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::ResetWaterLevel ( lua_State* luaVM )
+{
+    CStaticFunctionDefinitions::ResetWorldWaterLevel ();
+    lua_pushboolean ( luaVM, true );
     return 1;
 }
 

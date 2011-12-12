@@ -424,8 +424,11 @@ public:
     static bool                         GetWaterLevel                       ( CVector& vecPosition, float& fLevel, bool bCheckWaves, CVector& vecUnknown );
     static bool                         GetWaterLevel                       ( CClientWater* pWater, float& fLevel );
     static bool                         GetWaterVertexPosition              ( CClientWater* pWater, int iVertexIndex, CVector& vecPosition );
-    static bool                         SetWaterLevel                       ( CVector* pvecPosition, float fLevel, void* pChangeSource = NULL );
-    static bool                         SetWaterLevel                       ( CClientWater* pWater, float fLevel, void* pChangeSource = NULL );
+    static bool                         SetWorldWaterLevel                  ( float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel );
+    static bool                         SetPositionWaterLevel               ( const CVector& vecPosition, float fLevel, void* pChangeSource );
+    static bool                         SetElementWaterLevel                ( CClientWater* pWater, float fLevel, void* pChangeSource );
+    static bool                         SetAllElementWaterLevel             ( float fLevel, void* pChangeSource );
+    static bool                         ResetWorldWaterLevel                ( void );
     static bool                         SetWaterVertexPosition              ( CClientWater* pWater, int iVertexIndex, CVector& vecPosition );
     static bool                         GetWorldFromScreenPosition          ( CVector& vecScreen, CVector& vecWorld );
     static bool                         GetScreenFromWorldPosition          ( CVector& vecWorld, CVector& vecScreen, float fEdgeTolerance, bool bRelative );

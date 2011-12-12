@@ -142,27 +142,32 @@ public:
     void                             InstallHooks      ();
     CWaterZoneSA*                    GetZoneContaining ( float fX, float fY );
     void                             GetZonesContaining ( CWaterPoly* pPoly, std::vector < CWaterZoneSA* >& out );
-    void                             GetZonesContaining ( CVector& v1, CVector& v2, CVector& v3, std::vector < CWaterZoneSA* >& out );
+    void                             GetZonesContaining ( const CVector& v1, const CVector& v2, const CVector& v3, std::vector < CWaterZoneSA* >& out );
 
-    CWaterVertex*                    CreateVertex      ( CVector& vecPosition );
+    CWaterVertex*                    CreateVertex      ( const CVector& vecPosition );
 
-    CWaterPoly*                      GetPolyAtPoint    ( CVector& vecPosition );
-    CWaterPoly*                      CreateQuad        ( CVector& vecBL, CVector& vecBR, CVector& vecTL, CVector& vecTR, bool bShallow = false );
-    CWaterPoly*                      CreateTriangle    ( CVector& vec1, CVector& vec2, CVector& vec3, bool bShallow = false );
+    CWaterPoly*                      GetPolyAtPoint    ( const CVector& vecPosition );
+    CWaterPoly*                      CreateQuad        ( const CVector& vecBL, const CVector& vecBR, const CVector& vecTL, const CVector& vecTR, bool bShallow = false );
+    CWaterPoly*                      CreateTriangle    ( const CVector& vec1, const CVector& vec2, const CVector& vec3, bool bShallow = false );
     bool                             DeletePoly        ( CWaterPoly* pPoly );
 
-    bool                             GetWaterLevel     ( CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown );
-    bool                             SetWaterLevel     ( CVector* pvecPosition, float fLevel, void* pChangeSource = NULL );
-    bool                             SetWaterLevel     ( CWaterPoly* pPoly, float fLevel, void* pChangeSource = NULL );
+    bool                             GetWaterLevel     ( const CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown );
+
+    bool                             SetWorldWaterLevel     ( float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel );
+    bool                             SetPositionWaterLevel  ( const CVector& vecPosition, float fLevel, void* pChangeSource );
+    bool                             SetPolyWaterLevel      ( CWaterPoly* pPoly, float fLevel, void* pChangeSource );
+    void                             ResetWorldWaterLevel   ( void );
+
     float                            GetWaveLevel      ();
     void                             SetWaveLevel      ( float fWaveLevel );
-    
-    bool                             TestLineAgainstWater ( CVector& vecStart, CVector& vecEnd, CVector* vecCollision );
+
+    bool                             TestLineAgainstWater ( const CVector& vecStart, const CVector& vecEnd, CVector* vecCollision );
 
     void                             AddChange         ( void* pChangeSource, void* pChangedObject, CWaterChange* pChange );
     void                             UndoChanges       ( void* pChangeSource = NULL );
     void                             RebuildIndex      ();
     void                             Reset             ();
+    void                             UpdateRenderOrderRequirement ( bool bForceOff = false );
 
 private:
     CWaterVertexSA                   m_Vertices [NUM_NewWaterVertices];
@@ -181,6 +186,9 @@ private:
     static DWORD                     m_ZonePolyXrefs[];
 
     std::map < void*, std::map < void*, CWaterChange* > > m_Changes;
+    bool                             m_bAltRenderOrder;
+    bool                             m_bInitializedVertices;
+    int                              m_iActivePolyCount;
 
     friend class                     CWaterVertexSA;
     friend class                     CWaterPolySA;

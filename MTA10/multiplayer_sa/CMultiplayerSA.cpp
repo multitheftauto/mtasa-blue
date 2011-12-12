@@ -605,8 +605,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect, 5);
     HookInstall(HOOKPOS_CGame_Process, (DWORD)HOOK_CGame_Process, 10 );
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10 );
-    HookInstall(HOOKPOS_RenderScene_end, (DWORD)HOOK_RenderScene_end, 5);
-    HookInstall(HOOKPOS_CPlantMgr_Render, (DWORD)HOOK_CPlantMgr_Render, 6);
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7 );
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10 ); 
     HookInstall(HOOKPOS_CAnimManager_BlendAnimation, (DWORD)HOOK_CAnimManager_BlendAnimation, 7 );
@@ -690,7 +688,6 @@ void CMultiplayerSA::InitHooks()
     HookInstallCall ( CALL_VehicleCamUp, (DWORD)HOOK_VehicleCamUp );
     HookInstallCall ( CALL_VehicleLookBehindUp, (DWORD)HOOK_VehicleCamUp );
     HookInstallCall ( CALL_VehicleLookAsideUp, (DWORD)HOOK_VehicleCamUp );
-    HookInstallCall ( CALL_RenderScene_Plants, (DWORD)HOOK_RenderScene_Plants );
 
     HookInstallCall ( CALL_CTrafficLights_GetPrimaryLightState, (DWORD)HOOK_CTrafficLights_GetPrimaryLightState);
     HookInstallCall ( CALL_CTrafficLights_GetSecondaryLightState, (DWORD)HOOK_CTrafficLights_GetSecondaryLightState);
@@ -1258,17 +1255,6 @@ void CMultiplayerSA::InitHooks()
     // Do not fixate camera behind spectated player if local player is dead
     MemPut < BYTE > ( 0x52A2BB, 0 );
     MemPut < BYTE > ( 0x52A4F8, 0 );
-
-    // Always render water after other entities (otherwise underwater LODs and trees are rendered
-    // in front of it)
-    MemPut < BYTE > ( 0x53DFF5, 0xEB );
-    MemPut < WORD > ( 0x53E133, 0x9090 );
-    // Disable some stack management instructions as we need ebx for a bit longer. We replicate
-    // these in HOOK_RenderScene_end
-    MemPut < BYTE > ( 0x53E132, 0x90 );
-    MemSet ( (void *)0x53E156, 0x90, 3 );
-    // Use 0.5 instead of 0.0 for underwater threshold
-    MemPut < DWORD > ( 0x53DF4B, 0x858B8C );
 
     // Disable setting players on fire when they're riding burning bmx's (see #4573)
     MemPut < BYTE > ( 0x53A982, 0xEB );
@@ -4756,6 +4742,66 @@ fail:
 }
 
 // ---------------------------------------------------
+
+// When the water is not customized, use the default render order so water through glass looks better
+void CMultiplayerSA::SetAltWaterOrderEnabled ( bool bEnable )
+{
+    // Switch
+    if ( m_bEnabledAltWaterOrder == bEnable )
+        return;
+    m_bEnabledAltWaterOrder = bEnable;
+
+    // Memory saved here
+    static CBuffer savedMem;
+    struct {
+        DWORD dwAddress;
+        uint uiSize;
+    } memoryList[] = {  { 0x53DFF5, 1 },
+                        { 0x53E133, 2 },
+                        { 0x53E132, 1 },
+                        { 0x53E156, 3 },
+                        { 0x53DF4B, 4 },
+                        { HOOKPOS_RenderScene_end, 5 },
+                        { HOOKPOS_CPlantMgr_Render, 6 },
+                        { CALL_RenderScene_Plants, 5 }, };
+
+    // Enable or not?
+    if ( bEnable )
+    {
+        // Save memory before we blat it
+        CBufferWriteStream stream ( savedMem );
+        for ( uint i = 0 ; i < NUMELMS( memoryList ) ; i++ )
+            stream.WriteBytes ( (void*)memoryList[i].dwAddress, memoryList[i].uiSize );
+
+        // Add hooks and things
+        // Always render water after other entities (otherwise underwater LODs and trees are rendered
+        // in front of it)
+        MemPut < BYTE > ( 0x53DFF5, 0xEB );
+        MemPut < WORD > ( 0x53E133, 0x9090 );
+        // Disable some stack management instructions as we need ebx for a bit longer. We replicate
+        // these in HOOK_RenderScene_end
+        MemPut < BYTE > ( 0x53E132, 0x90 );
+        MemSet ( (void *)0x53E156, 0x90, 3 );
+        // Use 0.5 instead of 0.0 for underwater threshold
+        MemPut < DWORD > ( 0x53DF4B, 0x858B8C );
+
+        HookInstall(HOOKPOS_RenderScene_end, (DWORD)HOOK_RenderScene_end, 5);
+        HookInstall(HOOKPOS_CPlantMgr_Render, (DWORD)HOOK_CPlantMgr_Render, 6);
+        HookInstallCall ( CALL_RenderScene_Plants, (DWORD)HOOK_RenderScene_Plants );
+    }
+    else
+    {
+        // Restore memory
+        CBufferReadStream stream ( savedMem );
+        for ( uint i = 0 ; i < NUMELMS( memoryList ) ; i++ )
+        {
+            BYTE temp[10];
+            assert ( sizeof(temp) >= memoryList[i].uiSize );
+            stream.ReadBytes ( temp, memoryList[i].uiSize );
+            MemCpy ( (void*)memoryList[i].dwAddress, temp, memoryList[i].uiSize );
+        }
+    }
+}
 
 // The purpose of these hooks is to divide plant (grass) rendering in two:
 // rather than render *all* grass before or after the water like SA does, we render

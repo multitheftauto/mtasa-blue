@@ -8691,47 +8691,50 @@ CWater* CStaticFunctionDefinitions::CreateWater ( CResource* pResource, CVector*
     return NULL;
 }
 
-bool CStaticFunctionDefinitions::SetWaterLevel ( CVector* pvecPosition, float fLevel )
+
+bool CStaticFunctionDefinitions::SetElementWaterLevel ( CWater* pWater, float fLevel )
 {
+    assert ( pWater );
+    g_pGame->GetWaterManager ()->SetElementWaterLevel ( pWater, fLevel );
+
     CBitStream BitStream;
     BitStream.pBitStream->Write ( fLevel );
-    if ( pvecPosition )
-    {
-        if ( pvecPosition->fX < -3000.0f || pvecPosition->fX > 3000.0f ||
-             pvecPosition->fY < -3000.0f || pvecPosition->fY > 3000.0f )
-             return false;
-
-        BitStream.pBitStream->WriteBit ( true );
-        BitStream.pBitStream->Write ( static_cast < short > ( pvecPosition->fX ) );
-        BitStream.pBitStream->Write ( static_cast < short > ( pvecPosition->fY ) );
-        BitStream.pBitStream->Write ( pvecPosition->fZ );
-    }
-    else
-    {
-        BitStream.pBitStream->WriteBit ( false );
-        g_pGame->GetWaterManager ()->SetGlobalWaterLevel ( fLevel );
-    }
-    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WATER_LEVEL, *BitStream.pBitStream ) );
+    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pWater, SET_ELEMENT_WATER_LEVEL, *BitStream.pBitStream ) );
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetWaterLevel ( CWater* pWater, float fLevel )
+
+bool CStaticFunctionDefinitions::SetAllElementWaterLevel ( float fLevel )
 {
+    g_pGame->GetWaterManager ()->SetAllElementWaterLevel ( fLevel );
+
     CBitStream BitStream;
     BitStream.pBitStream->Write ( fLevel );
-    if ( pWater )
-    {
-        pWater->SetLevel ( fLevel );
-        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pWater, SET_WATER_LEVEL, *BitStream.pBitStream ) );
-    }
-    else
-    {
-        BitStream.pBitStream->WriteBit ( false );
-        g_pGame->GetWaterManager ()->SetGlobalWaterLevel ( fLevel );
-        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WATER_LEVEL, *BitStream.pBitStream ) );
-    }
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ALL_ELEMENT_WATER_LEVEL, *BitStream.pBitStream ) );
     return true;
 }
+
+
+bool CStaticFunctionDefinitions::SetWorldWaterLevel ( float fLevel, bool bIncludeWorldNonSeaLevel )
+{
+    g_pGame->GetWaterManager ()->SetWorldWaterLevel ( fLevel, bIncludeWorldNonSeaLevel );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( fLevel );
+    BitStream.pBitStream->WriteBit ( bIncludeWorldNonSeaLevel );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WORLD_WATER_LEVEL, *BitStream.pBitStream ) );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::ResetWorldWaterLevel ( void )
+{
+    CBitStream BitStream;
+    g_pGame->GetWaterManager ()->ResetWorldWaterLevel ();
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_WORLD_WATER_LEVEL, *BitStream.pBitStream ) );
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::GetWaterVertexPosition ( CWater* pWater, int iVertexIndex, CVector& vecPosition )
 {

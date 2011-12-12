@@ -165,7 +165,7 @@ void CGame::ResetMapInfo ( void )
 
     if ( m_pWaterManager )
     {
-        m_pWaterManager->SetGlobalWaterLevel ( 0.0f );
+        m_pWaterManager->ResetWorldWaterLevel ();
         m_pWaterManager->SetGlobalWaveHeight ( 0.0f );
     }
 

@@ -565,6 +565,7 @@ void CLuaManager::LoadCFunctions ( void )
     // Water functions
     CLuaCFunctions::AddFunction ( "createWater", CLuaFunctionDefinitions::CreateWater );
     CLuaCFunctions::AddFunction ( "setWaterLevel", CLuaFunctionDefinitions::SetWaterLevel );
+    CLuaCFunctions::AddFunction ( "resetWaterLevel", CLuaFunctionDefinitions::ResetWaterLevel );
     CLuaCFunctions::AddFunction ( "getWaterVertexPosition", CLuaFunctionDefinitions::GetWaterVertexPosition );
     CLuaCFunctions::AddFunction ( "setWaterVertexPosition", CLuaFunctionDefinitions::SetWaterVertexPosition );
     CLuaCFunctions::AddFunction ( "getWaterColor", CLuaFunctionDefinitions::GetWaterColor );

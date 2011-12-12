@@ -2016,10 +2016,22 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     bitStream.Read ( fWaveHeight );
     g_pGame->GetWaterManager ()->SetWaveLevel ( fWaveHeight );
 
-    float fWaterLevel = 0.0f;
-    bitStream.Read ( fWaterLevel );
-    if ( fWaterLevel != 0.0f )
-        g_pGame->GetWaterManager ()->SetWaterLevel ( (CVector *)NULL, fWaterLevel ); 
+    // Read out the world water levels
+    float fSeaLevel = 0.0f;
+    bool bHasNonSeaLevel = false;
+    float fNonSeaLevel = 0.0f;
+    bitStream.Read ( fSeaLevel );
+    bitStream.ReadBit ( bHasNonSeaLevel );
+    if ( bHasNonSeaLevel )
+        bitStream.Read ( fNonSeaLevel );
+
+    // Reset world water level to GTA default
+    g_pClientGame->GetManager ()->GetWaterManager ()->ResetWorldWaterLevel (); 
+    // Apply world non-sea level (to all world water)
+    if ( bHasNonSeaLevel )
+        g_pClientGame->GetManager ()->GetWaterManager ()->SetWorldWaterLevel ( fNonSeaLevel, NULL, true ); 
+    // Apply world sea level (to world sea level water only)
+    g_pClientGame->GetManager ()->GetWaterManager ()->SetWorldWaterLevel ( fSeaLevel, NULL, false ); 
 
     unsigned short usFPSLimit = 36;
     bitStream.ReadCompressed ( usFPSLimit );

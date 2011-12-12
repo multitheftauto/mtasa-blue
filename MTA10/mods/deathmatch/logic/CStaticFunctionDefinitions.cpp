@@ -5216,26 +5216,30 @@ bool CStaticFunctionDefinitions::GetWaterVertexPosition ( CClientWater* pWater, 
 }
 
 
-bool CStaticFunctionDefinitions::SetWaterLevel ( CVector* pvecPosition, float fLevel, void* pChangeSource )
+bool CStaticFunctionDefinitions::SetWorldWaterLevel ( float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel )
 {
-    return g_pGame->GetWaterManager ()->SetWaterLevel ( pvecPosition, fLevel, pChangeSource );
+    return g_pClientGame->GetManager ()->GetWaterManager ()->SetWorldWaterLevel ( fLevel, pChangeSource, bIncludeWorldNonSeaLevel );
 }
 
-
-bool CStaticFunctionDefinitions::SetWaterLevel ( CClientWater* pWater, float fLevel, void* pChangeSource )
+bool CStaticFunctionDefinitions::SetPositionWaterLevel ( const CVector& vecPosition, float fLevel, void* pChangeSource )
 {
-    if ( pWater )
-    {
-        CVector vecPosition;
-        pWater->GetPosition ( vecPosition );
-        vecPosition.fZ = fLevel;
-        pWater->SetPosition ( vecPosition );
-        return true;
-    }
-    else
-    {
-        return g_pGame->GetWaterManager ()->SetWaterLevel ( (CVector *)NULL, fLevel, pChangeSource );
-    }
+    return g_pClientGame->GetManager ()->GetWaterManager ()->SetPositionWaterLevel ( vecPosition, fLevel, pChangeSource );
+}
+
+bool CStaticFunctionDefinitions::SetElementWaterLevel ( CClientWater* pWater, float fLevel, void* pChangeSource )
+{
+    return g_pClientGame->GetManager ()->GetWaterManager ()->SetElementWaterLevel ( pWater, fLevel, pChangeSource );
+}
+
+bool CStaticFunctionDefinitions::SetAllElementWaterLevel ( float fLevel, void* pChangeSource )
+{
+    return g_pClientGame->GetManager ()->GetWaterManager ()->SetAllElementWaterLevel ( fLevel, pChangeSource );
+}
+
+bool CStaticFunctionDefinitions::ResetWorldWaterLevel ( void )
+{
+    g_pClientGame->GetManager ()->GetWaterManager ()->ResetWorldWaterLevel ();
+    return true;
 }
 
 
