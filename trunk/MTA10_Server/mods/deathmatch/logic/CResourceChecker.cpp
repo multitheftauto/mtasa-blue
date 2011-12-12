@@ -306,7 +306,7 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
 ///////////////////////////////////////////////////////////////
 void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const string& strFileName, const string& strResourceName, bool bClientScript, bool bCompiledScript, const string& strMode, string* pstrOutResult )
 {
-    CStringHashMap < long > doneWarningMap;
+    CHashMap < SString, long > doneWarningMap;
     long lLineNumber = 1;
     bool bUTF8 = false;
 
@@ -558,8 +558,8 @@ void CResourceChecker::IssueLuaFunctionNameWarnings ( const string& strFunctionN
 ///////////////////////////////////////////////////////////////
 bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunctionName, bool bClientScript, string& strOutWhat, string& strOutHow )
 {
-    static CStringHashMap < SDeprecatedItem* > clientUpgradeInfoMap;
-    static CStringHashMap < SDeprecatedItem* > serverUpgradeInfoMap;
+    static CHashMap < SString, SDeprecatedItem* > clientUpgradeInfoMap;
+    static CHashMap < SString, SDeprecatedItem* > serverUpgradeInfoMap;
 
     if ( clientUpgradeInfoMap.size () == 0 )
     {
@@ -592,8 +592,8 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
 ///////////////////////////////////////////////////////////////
 void CResourceChecker::CheckVersionRequirements ( const string& strIdentifierName, bool bClientScript )
 {
-    static CStringHashMap < SString > clientFunctionMap;
-    static CStringHashMap < SString > serverFunctionMap;
+    static CHashMap < SString, SString > clientFunctionMap;
+    static CHashMap < SString, SString > serverFunctionMap;
 
     // Check if lookup maps need initializing
     if ( clientFunctionMap.empty () )
@@ -606,7 +606,7 @@ void CResourceChecker::CheckVersionRequirements ( const string& strIdentifierNam
     }
 
     // Select client or server check
-    const CStringHashMap < SString >& functionMap = bClientScript ? clientFunctionMap : serverFunctionMap;
+    const CHashMap < SString, SString >& functionMap = bClientScript ? clientFunctionMap : serverFunctionMap;
     SString& strReqMtaVersion                        = bClientScript ? m_strReqClientVersion : m_strReqServerVersion;
     SString& strReqMtaReason                         = bClientScript ? m_strReqClientReason : m_strReqServerReason;
 

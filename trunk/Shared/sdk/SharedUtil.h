@@ -60,6 +60,7 @@ typedef float               FLOAT;      //  32
 #include <stdarg.h>
 #include <assert.h>
 #include "SString.h"
+#include "SharedUtil.Map.h"
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.File.h"
 #include "SharedUtil.Time.h"
