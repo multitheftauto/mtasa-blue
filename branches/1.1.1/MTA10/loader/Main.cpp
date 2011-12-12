@@ -526,6 +526,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 
 
 #define MODDB_REG_KEY  "moddb2011-nag"
+#define MODDB_VOTE_URL_LONG  "http://mtasa.com/moddb/?ingame=true"
 #define MODDB_VOTE_URL  "http://mtasa.com/moddb/"
 
 //////////////////////////////////////////////////////////
@@ -624,7 +625,7 @@ void MaybeShowNag ( void )
             if ( iResult == IDYES )
             {
                 MessageBox( 0, "Your web browser will now open and show you the voting infomation.", "MTA: San Andreas", MB_ICONINFORMATION|MB_OK );
-                int iResult = (int)ShellExecuteNonBlocking ( "open", MODDB_VOTE_URL );
+                int iResult = (int)ShellExecuteNonBlocking ( "open", MODDB_VOTE_URL_LONG );
                 if ( iResult < 32 )
                 {                   
                     MessageBox( 0, "If browsing fails, please go to:\n\n" MODDB_VOTE_URL, "MTA: San Andreas", MB_ICONINFORMATION|MB_OK );
