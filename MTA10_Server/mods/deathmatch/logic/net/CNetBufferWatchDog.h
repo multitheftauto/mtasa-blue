@@ -146,7 +146,7 @@ namespace EQueueStatus
 {
     enum EQueueStatusType
     {
-        OK,
+        STATUS_OK,
         SUSPEND_SYNC,
         STOP_THREAD_NET,
         SHUTDOWN,

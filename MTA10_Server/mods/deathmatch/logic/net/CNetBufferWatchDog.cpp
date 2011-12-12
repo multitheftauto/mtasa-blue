@@ -164,13 +164,13 @@ void CNetBufferWatchDog::DoChecks ( void )
     UpdateQueueInfo ( m_InResultQueueInfo, uiInResultQueue, "InResultQueue" );
 
     // Apply queue status
-    if ( m_OutCommandQueueInfo.status == EQueueStatus::OK )
+    if ( m_OutCommandQueueInfo.status == EQueueStatus::STATUS_OK )
         AllowOutgoingSyncPackets ();
     else
     if ( m_OutCommandQueueInfo.status == EQueueStatus::SUSPEND_SYNC )
         BlockOutgoingSyncPackets ();
 
-    if ( m_InResultQueueInfo.status == EQueueStatus::OK )
+    if ( m_InResultQueueInfo.status == EQueueStatus::STATUS_OK )
         AllowIncomingSyncPackets ();
     else
     if ( m_OutCommandQueueInfo.status == EQueueStatus::SUSPEND_SYNC )
@@ -238,7 +238,7 @@ void CNetBufferWatchDog::UpdateQueueInfo ( CQueueInfo& queueInfo, int iQueueSize
     const int iThreshLevel5 = 500000;
 
     queueInfo.m_SizeHistory.AddPoint ( iQueueSize );
-    if ( queueInfo.status == EQueueStatus::OK )
+    if ( queueInfo.status == EQueueStatus::STATUS_OK )
     {
         //  if Queue > 200,000 for 5 seconds
         //      stop related queue until it is below 100,000
@@ -255,7 +255,7 @@ void CNetBufferWatchDog::UpdateQueueInfo ( CQueueInfo& queueInfo, int iQueueSize
         //      resume related queue
         if ( queueInfo.m_SizeHistory.GetLowestPointSince( 5 ) < iThreshLevel1 )
         {
-            queueInfo.status = EQueueStatus::OK;
+            queueInfo.status = EQueueStatus::STATUS_OK;
         }
 
         //  if Queue > 300,000 for 10 seconds
