@@ -30,8 +30,12 @@ public:
     bool                                            Exists                      ( CClientWater* pWater );
 
     bool                                            GetWaterLevel               ( CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown );
-    bool                                            SetWaterLevel               ( CVector* pvecPosition, float fLevel, void* pChangeSource = NULL );
-    bool                                            SetWaterLevel               ( CClientWater* pWater, float fLevel, void* pChangeSource = NULL );
+    bool                                            SetPositionWaterLevel       ( const CVector& vecPosition, float fLevel, void* pChangeSource );
+    bool                                            SetWorldWaterLevel          ( float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel );
+    bool                                            SetElementWaterLevel        ( CClientWater* pWater, float fLevel, void* pChangeSource );
+    bool                                            SetAllElementWaterLevel     ( float fLevel, void* pChangeSource );
+    void                                            ResetWorldWaterLevel        ( void );
+
     float                                           GetWaveLevel                ();
     void                                            SetWaveLevel                ( float fWaveLevel );
 

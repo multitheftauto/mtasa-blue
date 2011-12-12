@@ -27,7 +27,7 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
                                  float fGravity,
                                  float fGameSpeed,
                                  float fWaveHeight,
-                                 float fWaterLevel,
+                                 const SWorldWaterLevelInfo& worldWaterLevelInfo,
                                  bool bHasSkyGradient,
                                  bool* pbGarageStates,
                                  unsigned char ucSkyGradientTR,
@@ -79,7 +79,7 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
     m_fGravity = fGravity;
     m_fGameSpeed = fGameSpeed;
     m_fWaveHeight = fWaveHeight;
-    m_fWaterLevel = fWaterLevel;
+    m_WorldWaterLevelInfo = worldWaterLevelInfo;
     m_bHasSkyGradient = bHasSkyGradient;
     m_pbGarageStates = pbGarageStates;
     m_ucSkyGradientTR = ucSkyGradientTR;
@@ -171,7 +171,11 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.Write ( m_fGameSpeed );
     }
     BitStream.Write ( m_fWaveHeight );
-    BitStream.Write ( m_fWaterLevel );
+    // Write world water level
+    BitStream.Write ( m_WorldWaterLevelInfo.fSeaLevel );
+    BitStream.WriteBit ( m_WorldWaterLevelInfo.bNonSeaLevelSet );
+    if ( m_WorldWaterLevelInfo.bNonSeaLevelSet )
+        BitStream.Write ( m_WorldWaterLevelInfo.fNonSeaLevel );
 
     BitStream.WriteCompressed ( m_usFPSLimit );
 

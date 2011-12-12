@@ -453,7 +453,7 @@ int CLuaFunctionDefs::SetWaterLevel ( lua_State* luaVM )
 
         if ( !argStream.HasErrors () )
         {
-            if ( CStaticFunctionDefinitions::SetWaterLevel ( pWater, fLevel, pResource ) )
+            if ( CStaticFunctionDefinitions::SetElementWaterLevel ( pWater, fLevel, pResource ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -474,7 +474,7 @@ int CLuaFunctionDefs::SetWaterLevel ( lua_State* luaVM )
 
         if ( !argStream.HasErrors () )
         {
-            if ( CStaticFunctionDefinitions::SetWaterLevel ( &vecPosition, fLevel, pResource ) )
+            if ( CStaticFunctionDefinitions::SetPositionWaterLevel ( vecPosition, fLevel, pResource ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -484,14 +484,18 @@ int CLuaFunctionDefs::SetWaterLevel ( lua_State* luaVM )
     else
     {
         // Call type 3
-        //  bool setWaterLevel ( float level )
-        float fLevel;
+        //  bool setWaterLevel ( float level, bool bIncludeWorldNonSeaLevel, bool bIncludeAllWaterElements )
+        float fLevel; bool bIncludeWorldNonSeaLevel; bool bIncludeAllWaterElements;
 
         argStream.ReadNumber ( fLevel );
+        argStream.ReadBool ( bIncludeWorldNonSeaLevel, true );
+        argStream.ReadBool ( bIncludeAllWaterElements, true );
 
         if ( !argStream.HasErrors () )
         {
-            if ( CStaticFunctionDefinitions::SetWaterLevel ( (CVector *)NULL, fLevel, pResource ) )
+            if ( bIncludeAllWaterElements )
+                CStaticFunctionDefinitions::SetAllElementWaterLevel ( fLevel, pResource );
+            if ( CStaticFunctionDefinitions::SetWorldWaterLevel ( fLevel, pResource, bIncludeWorldNonSeaLevel ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -503,6 +507,13 @@ int CLuaFunctionDefs::SetWaterLevel ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWaterLevel", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::ResetWaterLevel ( lua_State* luaVM )
+{
+    CStaticFunctionDefinitions::ResetWorldWaterLevel ();
+    lua_pushboolean ( luaVM, true );
     return 1;
 }
 

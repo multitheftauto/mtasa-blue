@@ -410,7 +410,7 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     float fGravity = g_pGame->GetGravity ();
     float fGameSpeed = g_pGame->GetGameSpeed ();
     float fWaveHeight = g_pGame->GetWaterManager ()->GetGlobalWaveHeight ();
-    float fWaterLevel = g_pGame->GetWaterManager ()->GetGlobalWaterLevel ();
+    const SWorldWaterLevelInfo& worldWaterLevelInfo = g_pGame->GetWaterManager ()->GetWorldWaterLevelInfo ();
     float fJetpackMaxHeight = g_pGame->GetJetpackMaxHeight ();
     float fAircraftMaxHeight = g_pGame->GetAircraftMaxHeight ();
 
@@ -486,7 +486,7 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    fGravity,
                                    fGameSpeed,
                                    fWaveHeight,
-                                   fWaterLevel,
+                                   worldWaterLevelInfo,
                                    bHasSkyGradient,
                                    pbGarageStates,
                                    ucTopRed,

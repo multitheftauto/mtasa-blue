@@ -87,14 +87,36 @@ bool CClientWaterManager::GetWaterLevel ( CVector& vecPosition, float* pfLevel, 
     return g_pGame->GetWaterManager ()->GetWaterLevel ( vecPosition, pfLevel, bCheckWaves, pvecUnknown );
 }
 
-bool CClientWaterManager::SetWaterLevel ( CVector* pvecPosition, float fLevel, void* pChangeSource )
+bool CClientWaterManager::SetPositionWaterLevel ( const CVector& vecPosition, float fLevel, void* pChangeSource )
 {
-    return g_pGame->GetWaterManager ()->SetWaterLevel ( pvecPosition, fLevel, pChangeSource );
+    return g_pGame->GetWaterManager ()->SetPositionWaterLevel ( vecPosition, fLevel, pChangeSource );
 }
 
-bool CClientWaterManager::SetWaterLevel ( CClientWater* pWater, float fLevel, void* pChangeSource )
+bool CClientWaterManager::SetWorldWaterLevel ( float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel )
 {
-    return g_pGame->GetWaterManager ()->SetWaterLevel ( pWater->m_pPoly, fLevel, pChangeSource );
+    return g_pGame->GetWaterManager ()->SetWorldWaterLevel ( fLevel, pChangeSource, bIncludeWorldNonSeaLevel );
+}
+
+bool CClientWaterManager::SetElementWaterLevel ( CClientWater* pWater, float fLevel, void* pChangeSource )
+{
+    // Not calling CClientWater::SetPosition as x and y are not changing so the poly zone will not change
+    return g_pGame->GetWaterManager ()->SetPolyWaterLevel ( pWater->m_pPoly, fLevel, pChangeSource );
+}
+
+bool CClientWaterManager::SetAllElementWaterLevel ( float fLevel, void* pChangeSource )
+{
+    list < CClientWater* > ::const_iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
+    {
+        SetElementWaterLevel ( *iter, fLevel, pChangeSource );
+    }
+    return true;
+}
+
+
+void CClientWaterManager::ResetWorldWaterLevel ( void )
+{
+    g_pGame->GetWaterManager ()->ResetWorldWaterLevel ();
 }
 
 float CClientWaterManager::GetWaveLevel ()

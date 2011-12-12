@@ -4509,7 +4509,7 @@ void CClientGame::ResetMapInfo ( void )
     g_pMultiplayer->ResetWater ( );
 
 	// Water
-    g_pGame->GetWaterManager ()->Reset ();
+    GetManager ()->GetWaterManager ()->ResetWorldWaterLevel ();
 
     // Re-enable interior sounds
     g_pMultiplayer->SetInteriorSoundsEnabled ( true );

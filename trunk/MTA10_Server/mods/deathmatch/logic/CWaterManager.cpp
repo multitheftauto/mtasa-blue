@@ -16,7 +16,9 @@ CWaterManager::CWaterManager ()
 {
     m_bDontRemoveFromList = false;
 
-    m_fGlobalWaterLevel = 0.0f;
+    m_WorldWaterLevelInfo.bNonSeaLevelSet = false;
+    m_WorldWaterLevelInfo.fSeaLevel = 0;
+    m_WorldWaterLevelInfo.fNonSeaLevel = 0;
     m_fGlobalWaveHeight = 0.0f;
 }
 
@@ -47,15 +49,41 @@ CWater* CWaterManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMa
     return pWater;
 }
 
-void CWaterManager::SetGlobalWaterLevel ( float fLevel )
+
+void CWaterManager::SetElementWaterLevel ( CWater* pWater, float fLevel )
 {
-    m_fGlobalWaterLevel = fLevel;
+    pWater->SetLevel ( fLevel );
+}
+
+
+void CWaterManager::SetAllElementWaterLevel ( float fLevel )
+{
     std::list < CWater* > ::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end (); iter++ )
     {
-        (*iter)->SetLevel ( fLevel );
+        SetElementWaterLevel ( *iter, fLevel );
     }
 }
+
+
+void CWaterManager::SetWorldWaterLevel ( float fLevel, bool bIncludeWorldNonSeaLevel )
+{
+    m_WorldWaterLevelInfo.fSeaLevel = fLevel;
+    if ( bIncludeWorldNonSeaLevel )
+    {
+        m_WorldWaterLevelInfo.bNonSeaLevelSet = true;
+        m_WorldWaterLevelInfo.fNonSeaLevel = fLevel;
+    }
+}
+
+
+void CWaterManager::ResetWorldWaterLevel ( void )
+{
+    m_WorldWaterLevelInfo.bNonSeaLevelSet = false;
+    m_WorldWaterLevelInfo.fSeaLevel = 0;
+    m_WorldWaterLevelInfo.fNonSeaLevel = 0;
+}
+
 
 void CWaterManager::DeleteAll ()
 {

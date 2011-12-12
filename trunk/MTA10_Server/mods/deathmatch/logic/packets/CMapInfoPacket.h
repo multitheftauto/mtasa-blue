@@ -19,6 +19,13 @@
 
 #include "CPacket.h"
 
+struct SWorldWaterLevelInfo
+{
+    bool bNonSeaLevelSet;
+    float fSeaLevel;
+    float fNonSeaLevel;
+};
+
 class CMapInfoPacket : public CPacket
 {
 public:
@@ -33,7 +40,7 @@ public:
                                                       float fGravity,
                                                       float fGameSpeed,
                                                       float fWaveHeight,
-                                                      float fWaterLevel,
+                                                      const SWorldWaterLevelInfo& worldWaterLevelInfo,
                                                       bool bHasSkyGradient,
                                                       bool* pbGarageStates,
                                                       unsigned char ucSkyGradientTR,
@@ -91,7 +98,7 @@ private:
     float                   m_fGravity;
     float                   m_fGameSpeed;
     float                   m_fWaveHeight;
-    float                   m_fWaterLevel;
+    SWorldWaterLevelInfo    m_WorldWaterLevelInfo;
     bool                    m_bHasSkyGradient;
     unsigned char           m_ucSkyGradientTR, m_ucSkyGradientTG, m_ucSkyGradientTB;
     unsigned char           m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;

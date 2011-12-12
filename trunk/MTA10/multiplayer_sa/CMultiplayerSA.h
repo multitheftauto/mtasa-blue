@@ -170,6 +170,7 @@ public:
 
     virtual void                SetFastClothesLoading       ( EFastClothesLoading fastClothesLoading );
     virtual void                SetLODSystemEnabled         ( bool bEnable );
+    virtual void                SetAltWaterOrderEnabled     ( bool bEnable );
 
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;
@@ -180,6 +181,7 @@ private:
     EFastClothesLoading         m_FastClothesLoading;
     CLimitsSA                   m_limits;
     bool                        m_bEnabledLODSystem;
+    bool                        m_bEnabledAltWaterOrder;
 
 
 /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);

@@ -17,18 +17,21 @@
 class CWaterManager
 {
 public:
-    virtual CWaterPoly*         GetPolyAtPoint    ( CVector& vecPosition ) = 0;
-    virtual CWaterPoly*         CreateQuad        ( CVector& vecBL, CVector& vecBR, CVector& vecTL, CVector& vecTR, bool bShallow = false ) = 0;
-    virtual CWaterPoly*         CreateTriangle    ( CVector& vec1, CVector& vec2, CVector& vec3, bool bShallow = false ) = 0;
+    virtual CWaterPoly*         GetPolyAtPoint    ( const CVector& vecPosition ) = 0;
+    virtual CWaterPoly*         CreateQuad        ( const CVector& vecBL, const CVector& vecBR, const CVector& vecTL, const CVector& vecTR, bool bShallow = false ) = 0;
+    virtual CWaterPoly*         CreateTriangle    ( const CVector& vec1, const CVector& vec2, const CVector& vec3, bool bShallow = false ) = 0;
     virtual bool                DeletePoly        ( CWaterPoly* pPoly ) = 0;
 
-    virtual bool                GetWaterLevel     ( CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown ) = 0;
-    virtual bool                SetWaterLevel     ( CVector* pvecPosition, float fLevel, void* pChangeSource = NULL ) = 0;
-    virtual bool                SetWaterLevel     ( CWaterPoly* pPoly, float fLevel, void* pChangeSource = NULL ) = 0;
-    virtual float               GetWaveLevel      () = 0;
-    virtual void                SetWaveLevel      ( float fWaveLevel ) = 0;
+    virtual bool                GetWaterLevel           ( const CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown ) = 0;
+    virtual bool                SetWorldWaterLevel      ( float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel ) = 0;
+    virtual bool                SetPositionWaterLevel   ( const CVector& vecPosition, float fLevel, void* pChangeSource ) = 0;
+    virtual bool                SetPolyWaterLevel       ( CWaterPoly* pPoly, float fLevel, void* pChangeSource ) = 0;
+    virtual void                ResetWorldWaterLevel    ( void ) = 0;
 
-    virtual bool                TestLineAgainstWater ( CVector& vecStart, CVector& vecEnd, CVector* vecCollision ) = 0;
+    virtual float               GetWaveLevel            () = 0;
+    virtual void                SetWaveLevel            ( float fWaveLevel ) = 0;
+
+    virtual bool                TestLineAgainstWater ( const CVector& vecStart, const CVector& vecEnd, CVector* vecCollision ) = 0;
 
     virtual void                UndoChanges       ( void* pChangeSource = NULL ) = 0;
     virtual void                RebuildIndex      () = 0;       // Call this after moving a polygon's vertices

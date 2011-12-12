@@ -235,6 +235,7 @@ public:
 
     virtual void                        SetFastClothesLoading       ( EFastClothesLoading fastClothesLoading ) = 0;
     virtual void                        SetLODSystemEnabled         ( bool bEnable ) = 0;
+    virtual void                        SetAltWaterOrderEnabled     ( bool bEnable ) = 0;
 };
 
 #endif

@@ -690,6 +690,7 @@ public:
     LUA_DECLARE ( SetGameSpeed );
     LUA_DECLARE ( SetMinuteDuration );
     LUA_DECLARE ( SetWaterLevel );
+    LUA_DECLARE ( ResetWaterLevel );
     LUA_DECLARE ( SetWaterVertexPosition );
     LUA_DECLARE ( SetWaveHeight );
     LUA_DECLARE ( SetGarageOpen );
