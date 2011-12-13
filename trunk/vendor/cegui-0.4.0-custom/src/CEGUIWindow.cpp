@@ -896,25 +896,15 @@ void Window::setClippedByParent(bool setting)
 /*************************************************************************
 	Set the current text string for the Window.
 *************************************************************************/
-void Window::setText(const String& text, bool bidify)
+void Window::setText(const String& text)
 {
     if ( d_font )
         d_font->processStringForGlyphs ( text ); // Refresh our glyph set if there are new characters
 
+    if ( text == d_text_raw )
+        return;
     d_text_raw = text;
-    if ( !bidify )
-    {
-        if ( text == d_text )
-            return;
-	    d_text = text;
-    }
-    else
-    {
-        String& bidiText = text.bidify();
-        if ( bidiText == d_text )
-            return;
-        d_text = bidiText;
-    }
+    d_text = d_text_raw.bidify ();
 
     WindowEventArgs args(this);
 	onTextChanged(args);

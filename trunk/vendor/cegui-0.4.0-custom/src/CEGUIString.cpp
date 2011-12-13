@@ -144,9 +144,27 @@ String String::bidify(void) const
 #ifdef DETECT_ARRAY_ISSUES
     doBidiTest ();
 #endif
-
     String tmp = *this;
-    doBidi(tmp.ptr(), length(), true, true);
+
+    // Apply in sections seperated by \n
+    size_type pos = 0;
+    while ( true )
+    {
+        size_type newpos = tmp.find ( '\n', pos );
+        if ( newpos == String::npos )
+        {
+            doBidi(tmp.ptr() + pos, tmp.length() - pos, true, true);
+            break;
+        }
+        else
+        if ( newpos - pos > 0 )
+        {
+            doBidi(tmp.ptr() + pos, newpos - pos, true, true);
+            tmp[newpos] = '\n';     // Restore \n (doBidi replaces it with a zero)
+        }
+        pos = newpos + 1;
+    }
+
     return tmp;
 }
 

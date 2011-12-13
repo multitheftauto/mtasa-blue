@@ -106,7 +106,7 @@ namespace CEGUI
         initColoursRect(srcWindow, modColours, finalColours);
 
         // decide which string to render.
-        const String& renderString = d_text.empty() ? srcWindow.getText() : d_text;
+        const String& renderString = d_text.empty() ? srcWindow.getText(true) : d_text;
 
         // calculate height of formatted text
         float textHeight = font->getFormattedLineCount(renderString, destRect, (TextFormatting)horzFormatting) * font->getLineSpacing();
