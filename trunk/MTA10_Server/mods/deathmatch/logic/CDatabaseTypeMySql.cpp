@@ -159,7 +159,8 @@ CDatabaseConnection* CDatabaseTypeMySql::Connect ( const SString& strHost, const
     {
         // No sharing so create a new connection
         pConnection = CallNewDatabaseConnectionMySql ( this, strHost, strUsername, strPassword, strOptions );
-        pConnection->m_strOtherTag = strHost + "%" + strUsername + "%" + strOptions;
+        if ( pConnection )
+            pConnection->m_strOtherTag = strHost + "%" + strUsername + "%" + strOptions;
     }
     else
     {
