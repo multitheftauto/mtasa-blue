@@ -510,7 +510,7 @@ bool CMainConfig::Load ( void )
 
     // idle_sleep_time
     GetInteger ( m_pRootNode, "idle_sleep_time", m_iNoWorkToDoSleepTime );
-    m_iNoWorkToDoSleepTime = Clamp ( -1, m_iPendingWorkToDoSleepTime, 50 );
+    m_iNoWorkToDoSleepTime = Clamp ( -1, m_iNoWorkToDoSleepTime, 50 );
 
     // threadnet
     GetBoolean ( m_pRootNode, "threadnet", m_bThreadNetEnabled );
