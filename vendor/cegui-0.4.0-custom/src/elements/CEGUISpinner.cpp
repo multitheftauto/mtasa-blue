@@ -305,11 +305,11 @@ namespace CEGUI
     void Spinner::onTextChanged(WindowEventArgs& e)
     {
         // update only if needed
-        if (d_editbox->getText() != d_text)
+        if (d_editbox->getText() != getText())
         {
             // done before doing base class processing so event subscribers see
             // 'updated' version.
-            d_editbox->setText(d_text);
+            d_editbox->setText(getText());
             e.handled = true;
 
             Window::onTextChanged(e);

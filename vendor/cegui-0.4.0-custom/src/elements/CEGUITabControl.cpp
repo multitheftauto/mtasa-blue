@@ -442,7 +442,7 @@ void TabControl::calculateTabButtonSizePosition(TabButton* btn, uint targetIndex
     // Width is based on font size (expressed as absolute)
     const Font* fnt = btn->getFont();
     btn->setWidth(Absolute, 
-        fnt->getTextExtent(btn->getText()) + getAbsoluteTabTextPadding()*2);
+        fnt->getTextExtent(btn->getText(true)) + getAbsoluteTabTextPadding()*2);
     btn->requestRedraw();
 }
 /*************************************************************************

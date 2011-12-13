@@ -319,18 +319,13 @@ eInputMode CGUI_Impl::GetGUIInputMode( void )
 CEGUI::String CGUI_Impl::GetUTFString ( const char* szInput )
 {
     CEGUI::String strUTF = (CEGUI::utf8*)szInput; //Convert into a CEGUI String
-    return GetUTFString ( strUTF );
+    return strUTF;
 }
 
-CEGUI::String CGUI_Impl::GetUTFString ( const std::string strInput )
+CEGUI::String CGUI_Impl::GetUTFString ( const std::string& strInput )
 {
     CEGUI::String strUTF = (CEGUI::utf8*)strInput.c_str(); //Convert into a CEGUI String
-    return GetUTFString ( strUTF );
-}
-
-CEGUI::String CGUI_Impl::GetUTFString ( const CEGUI::String strInput )
-{
-    return strInput.bidify();  // Bidify the string
+    return strUTF;
 }
 
 void CGUI_Impl::ProcessCharacter ( unsigned long ulCharacter )
@@ -727,7 +722,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                 if ( strTemp.length () > 0 )
                 {
                     // Convert it to Unicode
-                    std::wstring strUTF = MbUTF8ToUTF16(strTemp.bidify().c_str());
+                    std::wstring strUTF = MbUTF8ToUTF16(strTemp.c_str());
 
                     // Open and empty the clipboard
                     OpenClipboard ( NULL );
@@ -782,7 +777,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                                 CloseClipboard();
                                 return true;
                             }
-                            strEditText = WndEdit->getText ().bidify();
+                            strEditText = WndEdit->getText ();
                             iSelectionStart = WndEdit->getSelectionStartIndex ();
                             iSelectionLength = WndEdit->getSelectionLength();
                             iMaxLength = WndEdit->getMaxTextLength();
@@ -797,7 +792,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                                 CloseClipboard();
                                 return true;
                             }
-                            strEditText = WndEdit->getText ().bidify();
+                            strEditText = WndEdit->getText ();
                             iSelectionStart = WndEdit->getSelectionStartIndex ();
                             iSelectionLength = WndEdit->getSelectionLength();
                             iMaxLength = WndEdit->getMaxTextLength();
@@ -882,13 +877,13 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                             if ( Wnd->getType ( ) == "CGUI/Editbox" )
                             {
                                 CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );  
-                                WndEdit->setText ( strEditText, true );
+                                WndEdit->setText ( strEditText );
                                 WndEdit->setCaratIndex ( iCaratIndex );
                             }
                             else
                             {
                                 CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast < CEGUI::MultiLineEditbox* > ( Wnd );  
-                                WndEdit->setText ( strEditText, true );
+                                WndEdit->setText ( strEditText );
                                 WndEdit->setCaratIndex ( iCaratIndex );
                             }
                         }

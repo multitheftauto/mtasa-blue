@@ -1400,6 +1400,7 @@ String Font::cleanGlyphCache ( String strCache ) const
     {
         if ( (uiCurrentTime - it->second) > 30 ) //If outdated, add to our erase list
         {
+            OutputDebugLine ( SString ( "[CEGUI] Purging glyph 0x%08x", it->first ) );
             l_Outdated.push_back(it->first);
             bPurged = true;
         }

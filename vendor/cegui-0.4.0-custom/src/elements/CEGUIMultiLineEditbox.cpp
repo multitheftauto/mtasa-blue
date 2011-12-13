@@ -314,9 +314,10 @@ void MultiLineEditbox::setMaxTextLength(size_t max_len)
 		onMaximumTextLengthChanged(args);
 
 		// trim string
-		if (d_text.length() > d_maxTextLen)
+		if (d_text_raw.length() > d_maxTextLen)
 		{
-			d_text.resize(d_maxTextLen);
+			d_text_raw.resize(d_maxTextLen);
+			d_text = d_text_raw.bidify ();
 			onTextChanged(args);
 		}
 
@@ -1216,7 +1217,7 @@ void MultiLineEditbox::handleNewLine(uint sysKeys)
 		eraseSelectedText();
 
 		// if there is room
-		if (d_text.length() - 1 < d_maxTextLen)
+		if (d_text_raw.length() - 1 < d_maxTextLen)
 		{
 			d_text_raw.insert(getCaratIndex(), 1, 0x0a);
             d_text = d_text_raw.bidify ();

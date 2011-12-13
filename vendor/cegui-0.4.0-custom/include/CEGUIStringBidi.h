@@ -151,7 +151,7 @@ enum
 /* function declarations */
 int findIndexOfRun(UCharArray level , int start, int count, int tlevel);
 unsigned char getType(CHARTYPE ch);
-unsigned char getCAPRtl(CHARTYPE ch);
+//unsigned char getCAPRtl(CHARTYPE ch);
 void doMirror(CHARTYPE* ch);
 
 typedef struct{
@@ -276,6 +276,7 @@ unsigned char GetParagraphLevel(const UTF32Array &  line, int count)
 	return 0;		/* Compiler Nag-Stopper */
 }
 
+#if 0
 /*
  * Returns character type of ch, by calling RLE table lookup
  * function
@@ -302,6 +303,7 @@ int TypesFromChar[]  =
  else 
    return R;
 }
+#endif
 
 unsigned char getType(CHARTYPE ch)
 {
@@ -1331,7 +1333,7 @@ int doBidi(BLOCKTYPE const line, int count, const bool applyShape, const bool re
     * to a European number. A single common separator between two numbers
     * of the same type changes to that type.
     */
-    for( i=1; i<(count-1); i++) // Changed i=0 to 1=i to fix crash
+    for( i=1; i<(count-1); i++) // Changed i=0 to i=1 to fix crash
     {
         if(types[i] == ES)
         {

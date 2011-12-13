@@ -603,7 +603,7 @@ void Editbox::onCharacter(KeyEventArgs& e)
                 d_caratPos++;
 
                 // set text to the newly modified string
-				setText(tmp,true);
+				setText(tmp);
 			}
 			else
 			{
@@ -722,7 +722,7 @@ void Editbox::handleBackspace(void)
 				eraseSelectedText(false);
 
 				// set text to the newly modified string
-				setText(tmp,true);
+				setText(tmp);
 			}
 			else
 			{
@@ -741,7 +741,7 @@ void Editbox::handleBackspace(void)
 				setCaratIndex(d_caratPos - 1);
 
 				// set text to the newly modified string
-				setText(tmp,true);
+				setText(tmp);
 			}
 			else
 			{
@@ -776,7 +776,7 @@ void Editbox::handleDelete(void)
 				eraseSelectedText(false);
 
 				// set text to the newly modified string
-				setText(tmp,true);
+				setText(tmp);
 			}
 			else
 			{
@@ -793,7 +793,7 @@ void Editbox::handleDelete(void)
 			if (isStringValid(tmp))
 			{
 				// set text to the newly modified string
-				setText(tmp,true);
+				setText(tmp);
 			}
 			else
 			{

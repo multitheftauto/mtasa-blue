@@ -107,7 +107,7 @@ void TextItem::populateRenderCache()
 
     if ( font )
     {
-        d_renderCache.cacheText(getText(), font, d_textFormatting, absrect, zBase, colours);
+        d_renderCache.cacheText(getText(true), font, d_textFormatting, absrect, zBase, colours);
     }
 }
 

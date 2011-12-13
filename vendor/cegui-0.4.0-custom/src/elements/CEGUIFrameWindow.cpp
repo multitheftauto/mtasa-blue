@@ -793,7 +793,7 @@ void FrameWindow::onCaptureLost(WindowEventArgs& e)
 void FrameWindow::onTextChanged(WindowEventArgs& e)
 {
     // pass this onto titlebar component.
-    WindowManager::getSingleton().getWindow(getName() + "__auto_titlebar__")->setText(d_text);
+    WindowManager::getSingleton().getWindow(getName() + "__auto_titlebar__")->setText(getText());
     // redo child layout
     performChildWindowLayout();
 }
