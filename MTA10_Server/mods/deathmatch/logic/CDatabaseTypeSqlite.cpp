@@ -146,7 +146,8 @@ CDatabaseConnection* CDatabaseTypeSqlite::Connect ( const SString& strHost, cons
     {
         // No sharing so create a new connection
         pConnection = NewDatabaseConnectionSqlite ( this, strPath, strOptions );
-        pConnection->m_strOtherTag = strHost + "%" + strOptions;
+        if ( pConnection )
+            pConnection->m_strOtherTag = strHost + "%" + strOptions;
     }
     else
     {
@@ -159,7 +160,8 @@ CDatabaseConnection* CDatabaseTypeSqlite::Connect ( const SString& strHost, cons
         {
             // No match, so create a new connection
             pConnection = NewDatabaseConnectionSqlite ( this, strPath, strOptions );
-            MapSet ( m_SharedConnectionMap, strShareKey, pConnection );
+            if ( pConnection )
+                MapSet ( m_SharedConnectionMap, strShareKey, pConnection );
         }
         else
         {
@@ -168,7 +170,9 @@ CDatabaseConnection* CDatabaseTypeSqlite::Connect ( const SString& strHost, cons
         }
     }
 
-    MapInsert ( m_AllConnectionMap, pConnection );
+    if ( pConnection )
+        MapInsert ( m_AllConnectionMap, pConnection );
+
     UpdateStats ();
 
     return pConnection;
