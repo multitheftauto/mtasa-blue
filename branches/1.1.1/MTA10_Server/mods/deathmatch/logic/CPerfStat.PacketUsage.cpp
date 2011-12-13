@@ -134,6 +134,7 @@ public:
     // CPerfStatPacketUsageImpl
     void                        RecordStats             ( void );
 
+    CElapsedTime                m_TimeSinceGetStats;
     long long                   m_llNextRecordTime;
     SString                     m_strCategoryName;
     SPacketStat                 m_PrevPacketStats [ 2 ] [ 256 ];
@@ -225,9 +226,18 @@ void CPerfStatPacketUsageImpl::DoPulse ( void )
 ///////////////////////////////////////////////////////////////
 void CPerfStatPacketUsageImpl::RecordStats ( void )
 {
-    // Save previous sample so we can calc the delta values
-    memcpy ( m_PrevPacketStats, m_PacketStats, sizeof ( m_PacketStats ) );
-    memcpy ( m_PacketStats, g_pNetServer->GetPacketStats (), sizeof ( m_PacketStats ) );
+    if ( m_TimeSinceGetStats.Get () < 10000 )
+    {
+        // Save previous sample so we can calc the delta values
+        memcpy ( m_PrevPacketStats, m_PacketStats, sizeof ( m_PacketStats ) );
+        memcpy ( m_PacketStats, g_pNetServer->GetPacketStats (), sizeof ( m_PacketStats ) );
+    }
+    else
+    {
+        // No one watching
+        memset ( m_PrevPacketStats, 0, sizeof ( m_PacketStats ) );
+        memset ( m_PacketStats, 0, sizeof ( m_PacketStats ) );
+    }
 }
 
 
@@ -240,6 +250,8 @@ void CPerfStatPacketUsageImpl::RecordStats ( void )
 ///////////////////////////////////////////////////////////////
 void CPerfStatPacketUsageImpl::GetStats ( CPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter )
 {
+    m_TimeSinceGetStats.Reset ();
+
     //
     // Set option flags
     //

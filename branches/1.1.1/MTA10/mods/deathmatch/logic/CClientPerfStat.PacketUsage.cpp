@@ -104,6 +104,7 @@ public:
     // CClientPerfStatModuleImpl
     void                        RecordStats             ( void );
 
+    CElapsedTime                m_TimeSinceGetStats;
     long long                   m_llNextRecordTime;
     SString                     m_strCategoryName;
     SPacketStat                 m_PrevPacketStats [ 2 ] [ 256 ];
@@ -136,6 +137,7 @@ CClientPerfStatPacketUsage* CClientPerfStatPacketUsage::GetSingleton ()
 //
 ///////////////////////////////////////////////////////////////
 CClientPerfStatPacketUsageImpl::CClientPerfStatPacketUsageImpl ( void )
+    : m_TimeSinceGetStats ( INT_MAX, true ) 
 {
     m_strCategoryName = "Packet usage";
 }
@@ -194,11 +196,19 @@ void CClientPerfStatPacketUsageImpl::DoPulse ( void )
 ///////////////////////////////////////////////////////////////
 void CClientPerfStatPacketUsageImpl::RecordStats ( void )
 {
-    // Save previous sample so we can calc the delta values
-    memcpy ( m_PrevPacketStats, m_PacketStats, sizeof ( m_PacketStats ) );
-    memcpy ( m_PacketStats, g_pNet->GetPacketStats (), sizeof ( m_PacketStats ) );
+    if ( m_TimeSinceGetStats.Get () < 10000 )
+    {
+        // Save previous sample so we can calc the delta values
+        memcpy ( m_PrevPacketStats, m_PacketStats, sizeof ( m_PacketStats ) );
+        memcpy ( m_PacketStats, g_pNet->GetPacketStats (), sizeof ( m_PacketStats ) );
+    }
+    else
+    {
+        // No one watching
+        memset ( m_PrevPacketStats, 0, sizeof ( m_PacketStats ) );
+        memset ( m_PacketStats, 0, sizeof ( m_PacketStats ) );
+    }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -209,6 +219,8 @@ void CClientPerfStatPacketUsageImpl::RecordStats ( void )
 ///////////////////////////////////////////////////////////////
 void CClientPerfStatPacketUsageImpl::GetStats ( CClientPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter )
 {
+    m_TimeSinceGetStats.Reset ();
+
     //
     // Set option flags
     //

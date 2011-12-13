@@ -94,8 +94,8 @@ public:
     int                             GetBackupAmount                 ( void )                    { return m_iBackupAmount; }
     inline unsigned short           GetFPSLimit                     ( void )                    { return m_usFPSLimit; };
     bool                            SetFPSLimit                     ( unsigned short usFPS, bool bSave );
-    int                             GetPendingWorkToDoSleepTime     ( void )                    { return m_iPendingWorkToDoSleepTime; };
-    int                             GetNoWorkToDoSleepTime          ( void )                    { return m_iNoWorkToDoSleepTime; };
+    int                             GetPendingWorkToDoSleepTime     ( void );
+    int                             GetNoWorkToDoSleepTime          ( void );
     const SString&                  GetDbLogFilename                ( void )                    { return m_strDbLogFilename; }
     int                             GetDebugFlag                    ( void )                    { return m_iDebugFlag; }
 

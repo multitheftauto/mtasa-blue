@@ -59,6 +59,7 @@ typedef unsigned long       DWORD;      //  32      32      64
 #include <stdarg.h>
 #include <assert.h>
 #include "SString.h"
+#include "SharedUtil.Map.h"
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.File.h"
 #include "SharedUtil.Time.h"

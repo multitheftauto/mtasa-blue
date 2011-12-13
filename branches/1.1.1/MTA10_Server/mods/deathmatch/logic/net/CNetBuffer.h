@@ -166,7 +166,7 @@ public:
     void*                       ThreadProc                  ( void );
     void                        ProcessCommand              ( CNetJobData* pJobData );
     static bool                 StaticProcessPacket         ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo );
-    bool                        ProcessPacket               ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo );
+    void                        ProcessPacket               ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo );
 
     // Watchdog thread functions
     void                        GetQueueSizes               ( uint& uiFinishedList, uint& uiOutCommandQueue, uint& uiOutResultQueue, uint& uiInResultQueue );
@@ -174,12 +174,11 @@ public:
     // Main thread variables
     PPACKETHANDLER                      m_pfnDMPacketHandler;
     CThreadHandle*                      m_pServiceThreadHandle;
-    std::set < CNetJobData* >           m_FinishedList;         // Result has been used, will be deleted next pulse
+    CElapsedTime                        m_TimeThreadFPSLastCalced;
 
     // Sync thread variables
     CNetServer*                         m_pRealNetServer;
     CSimPlayerManager*                  m_pSimPlayerManager;
-    CTickCount                          m_LastPulseTime;
 
     // Shared variables
     struct
@@ -190,7 +189,9 @@ public:
         std::list < CNetJobData* >                  m_OutCommandQueue;
         std::list < CNetJobData* >                  m_OutResultQueue;
         std::list < SProcessPacketArgs* >           m_InResultQueue;
+        std::set < CNetJobData* >                   m_FinishedList;         // Result has been used, will be deleted next pulse (shared access with watchdog thread)
         CDebugComboMutex                            m_Mutex;
         CNetBufferWatchDog*                         m_pWatchDog;
+        int                                         m_iThreadFrameCount;
     } shared;
 };

@@ -214,6 +214,9 @@ void CSimPlayerManager::UnlockSimSystem ( void )
 ///////////////////////////////////////////////////////////////
 bool CSimPlayerManager::HandlePlayerPureSync ( NetServerPlayerID& Socket, NetBitStreamInterface* BitStream )
 {
+    if ( !CNetBufferWatchDog::CanSendPacket ( PACKET_ID_PLAYER_PURESYNC ) )
+        return true;
+
     LockSimSystem ();     // Prevent player additions and deletions
 
     // Grab the source player
@@ -251,6 +254,9 @@ bool CSimPlayerManager::HandlePlayerPureSync ( NetServerPlayerID& Socket, NetBit
 ///////////////////////////////////////////////////////////////
 bool CSimPlayerManager::HandleVehiclePureSync ( NetServerPlayerID& Socket, NetBitStreamInterface* BitStream )
 {
+    if ( !CNetBufferWatchDog::CanSendPacket ( PACKET_ID_PLAYER_VEHICLE_PURESYNC ) )
+        return true;
+
     LockSimSystem ();     // Prevent player additions and deletions
 
     // Grab the source player
@@ -312,6 +318,10 @@ CSimPlayer* CSimPlayerManager::Get ( NetServerPlayerID& PlayerSocket )
 void CSimPlayerManager::Broadcast ( const CSimPacket& Packet, const std::vector < CSimPlayer* >& sendList )
 {
     dassert ( m_bIsLocked );
+
+    if ( !CNetBufferWatchDog::CanSendPacket ( Packet.GetPacketID () ) )
+        return;
+
 
     // Use the flags to determine how to send it
     NetServerPacketReliability Reliability;
