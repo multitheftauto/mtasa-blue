@@ -180,7 +180,13 @@ void CNetServerBuffer::DoPulse ( void )
         iSyncFPS = shared.m_iThreadFrameCount;
         shared.m_iThreadFrameCount = 0;
         shared.m_Mutex.Unlock ( EActionWho::MAIN, EActionWhere::DoPulse );
-        g_pGame->SetSyncFPS ( iSyncFPS );
+
+        // Clamp the max change
+        float fChange = iSyncFPS - m_fSmoothThreadFPS;
+        float fMaxChange = 50;
+        fChange = Clamp ( -fMaxChange, fChange, fMaxChange );
+        m_fSmoothThreadFPS = Lerp ( m_fSmoothThreadFPS, 0.4f, m_fSmoothThreadFPS + fChange );
+        g_pGame->SetSyncFPS ( static_cast < int > ( m_fSmoothThreadFPS ) );
     }
 }
 

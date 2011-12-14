@@ -61,6 +61,12 @@ typedef float               FLOAT;      //  32
 #include <assert.h>
 #include "SString.h"
 #include "SharedUtil.Map.h"
+#if defined(SHARED_UTIL_WITH_HASH_MAP) || defined(SHARED_UTIL_WITH_FAST_HASH_MAP)
+    #include "SharedUtil.HashMap.h"
+#endif
+#if defined(SHARED_UTIL_WITH_FAST_HASH_MAP)
+    #include "SharedUtil.FastHashMap.h"
+#endif
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.File.h"
 #include "SharedUtil.Time.h"

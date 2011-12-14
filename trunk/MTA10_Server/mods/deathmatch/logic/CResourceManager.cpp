@@ -33,6 +33,7 @@ struct SResInfo
     SString strName;
     bool bIsDir;
     bool bPathIssue;
+    SString strAbsPathDup;
 };
 
 
@@ -147,6 +148,7 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
                 {
                     // Don't load resource if there are duplicates on different paths
                     pDup->bPathIssue = true;
+                    pDup->strAbsPathDup = newInfo.strAbsPath;
                 }
             }
             else
@@ -182,7 +184,9 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
         const SResInfo& info = iter->second;
         if ( info.bPathIssue )
         {
-            CLogger::ErrorPrintf ( "Not processing resource '%s' as it has duplicates on different paths\n", *info.strName );
+            CLogger::ErrorPrintf ( "Not processing resource '%s' as it has duplicates on different paths:\n", *info.strName );
+            CLogger::LogPrintfNoStamp ( "                  Path #1: \"%s\"\n", *PathJoin ( PathMakeRelative ( strModPath, info.strAbsPath ), info.strName ) );
+            CLogger::LogPrintfNoStamp ( "                  Path #2: \"%s\"\n", *PathJoin ( PathMakeRelative ( strModPath, info.strAbsPathDup ), info.strName ) );
         }
         else
         {

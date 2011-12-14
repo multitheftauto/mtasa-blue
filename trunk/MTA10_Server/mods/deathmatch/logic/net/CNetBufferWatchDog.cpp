@@ -457,7 +457,9 @@ bool CNetBufferWatchDog::CanReceivePacket ( uchar ucPacketID )
 // Thread id for debugging
 //
 ///////////////////////////////////////////////////////////////
+#ifdef MTA_DEBUG
 static DWORD dwThreadIds[3] = { -1, -1, -1 };
+#endif
 void SetCurrentThreadType ( EActionWhoType type )
 {
 #ifdef MTA_DEBUG

@@ -265,6 +265,19 @@ SString SharedUtil::PathJoin ( const SString& str1, const SString& str2, const S
     return PathConform ( strResult );
 }
 
+// Remove base path from the start of abs path
+SString SharedUtil::PathMakeRelative ( const SString& strInBasePath, const SString& strInAbsPath )
+{
+    SString strBasePath = PathConform ( strInBasePath );
+    SString strAbsPath = PathConform ( strInAbsPath );
+    if ( strAbsPath.BeginsWithI ( strBasePath ) )
+    {
+        return strAbsPath.SubStr ( strBasePath.length () ).TrimStart ( PATH_SEPERATOR );
+    }
+    return strAbsPath;
+}
+
+
 #ifdef WIN32
 #ifdef MTA_CLIENT
 

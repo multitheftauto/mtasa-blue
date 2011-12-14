@@ -36,6 +36,7 @@ namespace
                                          { "setLowLODElement",          "1.2" },
                                          { "getLowLODElement",          "1.2" },
                                          { "isElementLowLOD",           "1.2" },
+                                         { "resetWaterLevel",           "1.2" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
@@ -60,6 +61,7 @@ namespace
                                          { "setLowLODElement",          "1.2" },
                                          { "getLowLODElement",          "1.2" },
                                          { "isElementLowLOD",           "1.2" },
+                                         { "resetWaterLevel",           "1.2" },
                                         };
 
 

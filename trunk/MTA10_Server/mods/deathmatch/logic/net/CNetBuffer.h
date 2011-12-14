@@ -175,6 +175,7 @@ public:
     PPACKETHANDLER                      m_pfnDMPacketHandler;
     CThreadHandle*                      m_pServiceThreadHandle;
     CElapsedTime                        m_TimeThreadFPSLastCalced;
+    float                               m_fSmoothThreadFPS;
 
     // Sync thread variables
     CNetServer*                         m_pRealNetServer;

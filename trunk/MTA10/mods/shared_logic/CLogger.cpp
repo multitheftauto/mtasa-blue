@@ -38,7 +38,6 @@ void CLogger::LogPrint ( const char* szText )
     HandleLogPrint ( true, "", szText, false, true );
 }
 
-#if 0   // Currently unused
 void CLogger::LogPrintfNoStamp ( const char* szFormat, ... )
 {
     // Compose the formatted message
@@ -52,7 +51,7 @@ void CLogger::LogPrintfNoStamp ( const char* szFormat, ... )
     HandleLogPrint ( false, "", szBuffer, true, true );
 }
 
-
+#if 0   // Currently unused
 void CLogger::LogPrintNoStamp ( const char* szText )
 {
     // Send to the console and logfile
