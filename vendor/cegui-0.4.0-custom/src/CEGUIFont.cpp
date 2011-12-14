@@ -1398,7 +1398,7 @@ String Font::cleanGlyphCache ( String strCache ) const
     // Let's check for outdated caches
     for ( std::map< unsigned long, unsigned long >::const_iterator it = m_pGlyphCache->begin(); it != m_pGlyphCache->end(); ++it )
     {
-        if ( (uiCurrentTime - it->second) > 30 ) //If outdated, add to our erase list
+        if ( (uiCurrentTime - it->second) > 30 * 10 ) //If outdated, add to our erase list
         {
             OutputDebugLine ( SString ( "[CEGUI] Purging glyph 0x%08x", it->first ) );
             l_Outdated.push_back(it->first);
