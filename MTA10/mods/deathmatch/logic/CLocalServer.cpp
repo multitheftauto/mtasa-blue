@@ -24,6 +24,7 @@ struct SResInfo
     SString strName;
     bool bIsDir;
     bool bPathIssue;
+    SString strAbsPathDup;
 };
 
 
@@ -309,6 +310,7 @@ void CLocalServer::GetResourceNameList ( std::vector < SString >& outResourceNam
                 {
                     // Don't load resource if there are duplicates on different paths
                     pDup->bPathIssue = true;
+                    pDup->strAbsPathDup = newInfo.strAbsPath;
                 }
             }
             else
@@ -325,7 +327,9 @@ void CLocalServer::GetResourceNameList ( std::vector < SString >& outResourceNam
         const SResInfo& info = iter->second;
         if ( info.bPathIssue )
         {
-            CLogger::ErrorPrintf ( "Not processing resource '%s' as it has duplicates on different paths\n", *info.strName );
+            CLogger::ErrorPrintf ( "Not processing resource '%s' as it has duplicates on different paths:\n", *info.strName );
+            CLogger::LogPrintfNoStamp ( "                  Path #1: \"%s\"\n", *PathJoin ( PathMakeRelative ( strModPath, info.strAbsPath ), info.strName ) );
+            CLogger::LogPrintfNoStamp ( "                  Path #2: \"%s\"\n", *PathJoin ( PathMakeRelative ( strModPath, info.strAbsPathDup ), info.strName ) );
         }
         else
         {

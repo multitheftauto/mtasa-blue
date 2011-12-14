@@ -1,3 +1,6 @@
+#define SHARED_UTIL_WITH_HASH_MAP
+#define SHARED_UTIL_WITH_FAST_HASH_MAP
+
 #ifdef WIN32
 #pragma message("Compiling precompiled header.\n")
 

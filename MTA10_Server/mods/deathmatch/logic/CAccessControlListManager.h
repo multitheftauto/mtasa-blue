@@ -81,7 +81,7 @@ private:
 
     bool                                        m_bReadCacheDirty;
     long long                                   m_llLastTimeReadCacheCleared;
-    std::map < SString, bool >                  m_ReadCacheMap;
+    CFastHashMap < SString, bool >              m_ReadCacheMap;
 
     bool                                        m_bNeedsSave;
     CElapsedTime                                m_AutoSaveTimer;

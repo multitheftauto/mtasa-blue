@@ -1556,6 +1556,14 @@
 						>
 					</File>
 					<File
+						RelativePath="..\sdk\game\CWeaponStat.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\game\CWeaponStatManager.h"
+						>
+					</File>
+					<File
 						RelativePath="..\..\MTA10\sdk\game\CWeather.h"
 						>
 					</File>
@@ -1705,6 +1713,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.FastHashMap.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.File.h"
 					>
 				</File>
@@ -1733,6 +1745,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.HashMap.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.hpp"
 					>
 				</File>
@@ -1745,7 +1761,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\Shared\sdk\SharedUtil.Maps.h"
+					RelativePath="..\..\Shared\sdk\SharedUtil.Map.h"
 					>
 				</File>
 				<File

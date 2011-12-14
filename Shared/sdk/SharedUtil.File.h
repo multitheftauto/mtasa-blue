@@ -49,6 +49,7 @@ namespace SharedUtil
     SString         PathConform                     ( const SString& strInPath );
     SString         PathJoin                        ( const SString& str1, const SString& str2 );
     SString         PathJoin                        ( const SString& str1, const SString& str2, const SString& str3, const SString& str4 = "", const SString& str5 = "" );
+    SString         PathMakeRelative                ( const SString& strInBasePath, const SString& strInAbsPath );
     void            ExtractFilename                 ( const SString& strPathFilename, SString* strPath, SString* strFilename );
     bool            ExtractExtention                ( const SString& strFilename, SString* strRest, SString* strExt );
     SString         ExtractPath                     ( const SString& strPathFilename );

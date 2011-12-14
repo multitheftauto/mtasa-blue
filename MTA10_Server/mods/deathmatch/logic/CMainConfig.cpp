@@ -921,7 +921,12 @@ bool CMainConfig::IsVoiceEnabled ( void )
 int CMainConfig::GetPendingWorkToDoSleepTime ( void )
 {
     if ( m_iPendingWorkToDoSleepTime != -1 )
-        return m_iPendingWorkToDoSleepTime;
+    {
+        if ( m_bThreadNetEnabled )
+            return Max ( 5, m_iPendingWorkToDoSleepTime );
+        else
+            return m_iPendingWorkToDoSleepTime;
+    }
 
     // -1 means auto
     if ( m_bThreadNetEnabled )
@@ -934,7 +939,9 @@ int CMainConfig::GetPendingWorkToDoSleepTime ( void )
 int CMainConfig::GetNoWorkToDoSleepTime ( void )
 {
     if ( m_iNoWorkToDoSleepTime != -1 )
-        return m_iNoWorkToDoSleepTime;
+    {
+        return Max ( 10, m_iNoWorkToDoSleepTime );
+    }
 
     // -1 means auto
     if ( m_bThreadNetEnabled )
