@@ -598,7 +598,7 @@ void CServerListItem::ResetForRefresh ( void )
     m_ElapsedTime.Reset ();
     uiQueryRetryCount = 0;
 
-    if ( m_iDataQuality > SERVER_INFO_ASE_2 )
-        m_iDataQuality = SERVER_INFO_ASE_2;
+    if ( m_iDataQuality >= SERVER_INFO_QUERY )
+        m_iDataQuality = SERVER_INFO_QUERY - 1;
     bMaybeOffline = false;
 }
