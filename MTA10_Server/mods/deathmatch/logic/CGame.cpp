@@ -63,7 +63,7 @@ CGame::CGame ( void )
     m_bServerFullyUp = false;
 
     // Initialize random number generator and time
-    srand ( (unsigned int) time ( NULL ) );
+    RandomizeRandomSeed ();
     InitializeTime ();
 
     m_bBeingDeleted = false;

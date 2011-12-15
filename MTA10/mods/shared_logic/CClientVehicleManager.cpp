@@ -525,7 +525,7 @@ unsigned char CClientVehicleManager::GetMaxPassengerCount ( unsigned long ulMode
 
 void CClientVehicleManager::GetRandomVariation ( unsigned short usModel, unsigned char &ucVariant, unsigned char &ucVariant2 )
 {
-    srand ( GetTickCount32() );
+    RandomizeRandomSeed ();
     ucVariant = 255;
     ucVariant2 = 255;
     // Valid model?

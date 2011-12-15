@@ -761,6 +761,15 @@ SString SharedUtil::UnescapeString ( const SString& strText, char cSpecialChar )
 #endif
 
 //
+// Ensure rand() seed gets set to a new unique value
+//
+void SharedUtil::RandomizeRandomSeed ( void )
+{
+    srand ( rand () + GetTickCount32 () );
+}
+
+
+//
 // Return true if currently executing the main thread.
 // Main thread being defined as the thread the function is first called from.
 //
