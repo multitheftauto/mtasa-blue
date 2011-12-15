@@ -4561,7 +4561,7 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource* pResource, unsi
 {
     unsigned char ucVariation = ucVariant;
     unsigned char ucVariation2 = ucVariant2;
-    if ( ucVariant == 254 && ucVariant == 254 )
+    if ( ucVariant == 254 && ucVariant2 == 254 )
         CVehicleManager::GetRandomVariation ( usModel, ucVariation, ucVariation2 );
 
     if ( CVehicleManager::IsValidModel ( usModel ) && ( ucVariation <= 5 || ucVariation == 255 ) && ( ucVariation2 <= 5 || ucVariation2 == 255 ) )
@@ -4600,7 +4600,7 @@ bool CStaticFunctionDefinitions::SetVehicleVariant ( CVehicle* pVehicle, unsigne
     assert ( pVehicle );
     unsigned char ucVariation = ucVariant;
     unsigned char ucVariation2 = ucVariant2;
-    if ( ucVariant == 254 && ucVariant == 254 )
+    if ( ucVariant == 254 && ucVariant2 == 254 )
         CVehicleManager::GetRandomVariation ( pVehicle->GetModel(), ucVariation, ucVariation2 );
 
     if ( ( ucVariation <= 5 || ucVariation == 255 ) && ( ucVariation2 <= 5 || ucVariation2 == 255 ) )

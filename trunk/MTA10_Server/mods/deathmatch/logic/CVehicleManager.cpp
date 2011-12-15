@@ -406,7 +406,7 @@ CVehicle* CVehicleManager::Create ( unsigned short usModel, unsigned char ucVari
 CVehicle* CVehicleManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents )
 {
     // Create the vehicle
-    srand ( GetTickCount32() );
+    RandomizeRandomSeed ();
 
     CVehicle* pVehicle = new CVehicle ( this, pParent, &Node, 400, 254, 254 );
 
@@ -497,7 +497,7 @@ unsigned int CVehicleManager::GetMaxPassengers ( unsigned int uiVehicleModel )
 
 void CVehicleManager::GetRandomVariation ( unsigned short usModel, unsigned char &ucVariant, unsigned char &ucVariant2 )
 {
-    srand ( GetTickCount32() );
+    RandomizeRandomSeed ();
     ucVariant = 255;
     ucVariant2 = 255;
     // Valid model?

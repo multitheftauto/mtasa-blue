@@ -104,6 +104,9 @@ namespace SharedUtil
 
 #endif
 
+    // Ensure rand() seed gets set to a new unique value
+    void            RandomizeRandomSeed             ( void );
+
     //
     // Return true if currently executing the main thread
     // See implementation for details
