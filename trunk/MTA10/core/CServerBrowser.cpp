@@ -678,6 +678,15 @@ void CServerBrowser::Update ( void )
         UpdateSelectedServerPlayerList ( Type );
     }
 
+    // Flash searchbox if needed
+    if ( m_FlashSearchBox [ Type ].uiCount )
+    {
+        if ( m_FlashSearchBox [ Type ].uiNextTime < GetTickCount32 () )
+        {
+            m_pEditSearch[ Type ]->SetVisible ( m_FlashSearchBox [ Type ].uiCount-- & ( 8 + 1 ) );
+            m_FlashSearchBox [ Type ].uiNextTime = GetTickCount32 () + 100;
+        }
+    }
 }
 
 void CServerBrowser::SetVisible ( bool bVisible )
@@ -727,6 +736,10 @@ void CServerBrowser::SetVisible ( bool bVisible )
         ServerBrowserType Type = GetCurrentServerBrowserType();
         m_pEditAddress [ Type ]->Activate();
         m_pEditAddress [ Type ]->SetCaratAtEnd();
+
+        // Flash search box if it is not empty
+        for ( uint i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
+            m_FlashSearchBox[ i ].uiCount = m_pEditSearch[ i ]->GetText().empty() ? 0 : 15;
     }
     else
     {
@@ -936,7 +949,7 @@ void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const Se
         if ( iCurrentSearchType == SearchTypes::SERVERS )
         {
             // Search for the search text in the servername
-            SString strServerName = pServer->strName;
+            SString strServerName = pServer->strSearchableName;
             bServerSearchFound = strServerName.ContainsI ( strServerSearchText );
         }
         else if ( iCurrentSearchType == SearchTypes::PLAYERS )

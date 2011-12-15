@@ -175,14 +175,18 @@ void CNetServerBuffer::DoPulse ( void )
     if ( m_TimeThreadFPSLastCalced.Get () > 1000 )
     {
         m_TimeThreadFPSLastCalced.Reset ();
-        int iSyncFPS;
+        float fSyncFPS;
         shared.m_Mutex.Lock ( EActionWho::MAIN, EActionWhere::DoPulse );
-        iSyncFPS = shared.m_iThreadFrameCount;
+        fSyncFPS = shared.m_iThreadFrameCount;
         shared.m_iThreadFrameCount = 0;
         shared.m_Mutex.Unlock ( EActionWho::MAIN, EActionWhere::DoPulse );
 
+        // Compress high counts
+        if ( fSyncFPS > 500 )
+            fSyncFPS = pow ( fSyncFPS - 500, 0.6f ) + 500;
+
         // Clamp the max change
-        float fChange = iSyncFPS - m_fSmoothThreadFPS;
+        float fChange = fSyncFPS - m_fSmoothThreadFPS;
         float fMaxChange = 50;
         fChange = Clamp ( -fMaxChange, fChange, fMaxChange );
         m_fSmoothThreadFPS = Lerp ( m_fSmoothThreadFPS, 0.4f, m_fSmoothThreadFPS + fChange );

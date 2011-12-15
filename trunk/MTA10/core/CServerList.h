@@ -68,6 +68,7 @@ enum
     SERVER_INFO_ASE_0,
     SERVER_INFO_CACHE,
     SERVER_INFO_ASE_2,
+    SERVER_INFO_ASE_2b,
     SERVER_INFO_QUERY,
 };
 
@@ -213,6 +214,7 @@ public:
     SString             strGameName;    // Game name. Always 'mta'
     SString             strVersion;     // Game version
     SString             strName;        // Server name
+    SString             strSearchableName;  // Server name to use for searches
     SString             strHost;        // Server host as IP
     SString             strHostName;    // Server host as name
     SString             strGameMode;    // Gamemode
@@ -279,6 +281,10 @@ public:
             if ( isalpha(c) )
                 strNameSortKey += toupper ( c );
         }
+
+        // Ensure searchable name is set
+        if ( strSearchableName.empty () )
+            strSearchableName = strName;
     }
 
     const SString& GetVersionSortKey ( void ) const

@@ -197,6 +197,12 @@ protected:
     // Player list columns
     CGUIHandle          m_hPlayerName [ SERVER_BROWSER_TYPE_COUNT ];
 
+    // Flash searchbox
+    struct {
+        uint uiCount;
+        uint uiNextTime;
+    } m_FlashSearchBox  [ SERVER_BROWSER_TYPE_COUNT ];
+
 private:
     enum
     {

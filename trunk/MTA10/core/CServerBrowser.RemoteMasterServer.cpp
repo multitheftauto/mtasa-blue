@@ -257,6 +257,12 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
     bool bHasPlayers        = ( uiFlags & 0x0800 ) != 0;
     bool bHasRespondingFlag = ( uiFlags & 0x1000 ) != 0;
     bool bHasRestrictionFlags = ( uiFlags & 0x2000 ) != 0;
+    bool bHasSearchIgnoreSections = ( uiFlags & 0x4000 ) != 0;
+
+    // Rate quality of data supplied here
+    uint uiDataQuality = SERVER_INFO_ASE_2;
+    if ( bHasSearchIgnoreSections )
+        uiDataQuality = SERVER_INFO_ASE_2b;
 
     // Read sequence number
     uint uiSequenceNumber = 0;
@@ -295,9 +301,9 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
         // Add or find item to update
         CServerListItem* pItem = GetServerListItem ( itemList, Address, usGamePort + 123 );
 
-        if ( pItem->ShouldAllowDataQuality ( SERVER_INFO_ASE_2 ) )
+        if ( pItem->ShouldAllowDataQuality ( uiDataQuality ) )
         {
-            pItem->SetDataQuality ( SERVER_INFO_ASE_2 );
+            pItem->SetDataQuality ( uiDataQuality );
 
             if ( bHasPlayerCount )          stream.Read ( pItem->nPlayers );
             if ( bHasMaxPlayerCount )       stream.Read ( pItem->nMaxPlayers );
@@ -311,6 +317,8 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
 
             if ( bHasPlayers )
             {
+                pItem->vecPlayers.clear ();
+
                 ushort usPlayerListSize = 0;
                 stream.Read ( usPlayerListSize );
 
@@ -330,6 +338,25 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
             if ( bHasRestrictionFlags )
             {
                 stream.Read ( pItem->uiMasterServerSaysRestrictions );
+            }
+
+            if ( bHasSearchIgnoreSections )
+            {
+                // Construct searchable name
+                pItem->strSearchableName = pItem->strName;
+                uchar ucNumItems = 0;
+                stream.Read ( ucNumItems );
+                while ( ucNumItems-- )
+                {
+                    // Read section of name to remove
+                    uchar ucOffset = 0;
+                    uchar ucLength = 0;
+                    stream.Read ( ucOffset );
+                    stream.Read ( ucLength );
+                    for ( uint i = ucOffset ; i  < ucOffset + ucLength ; i++ )
+                        if ( i < pItem->strSearchableName.length () )
+                            pItem->strSearchableName[i] = '\1';
+                }
             }
 
             pItem->PostChange ();
