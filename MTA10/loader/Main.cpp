@@ -367,6 +367,8 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     bool bDoneAdmin = strCmdLine.Contains ( "/done-admin" );
     strCmdLine = strCmdLine.Replace ( " /done-admin", "" );
 
+    MaybeShowCopySettingsDialog ();
+
     //////////////////////////////////////////////////////////
     //
     // Hook 'n' go

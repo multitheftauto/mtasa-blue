@@ -1488,3 +1488,45 @@ void CleanDownloadCache ( void )
         }
     }
 }
+
+
+//////////////////////////////////////////////////////////
+//
+// MaybeShowCopySettingsDialog
+//
+// For new installs, give the user an option to copy
+// settings from a previous version
+//
+//////////////////////////////////////////////////////////
+void MaybeShowCopySettingsDialog ( void )
+{
+    // Check if coreconfig.xml is present
+    const SString strMTASAPath = GetMTASAPath ();
+    SString strCurrentConfig = PathJoin ( GetMTASAPath (), "mta", "coreconfig.xml" );
+    if ( FileExists ( strCurrentConfig ) )
+        return;
+
+    // Check if coreconfig.xml from previous version is present
+    SString strCurrentVersion = SString ( "%d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR );
+    SString strPreviousVersion = SString ( "%d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR - 1 );
+    SString strPreviousPath = GetVersionRegistryValue ( strPreviousVersion, "", "Last Run Location" );
+    if ( strPreviousPath.empty () )
+        return;
+    SString strPreviousConfig = PathJoin ( strPreviousPath, "mta", "coreconfig.xml" );
+    if ( !FileExists ( strPreviousConfig ) )
+        return;
+
+    HideSplash ();  // Hide standard MTA splash
+
+    // Show dialog
+    SString strMessage;
+    strMessage += "New installation of " + strCurrentVersion + " detected.\n";
+    strMessage += "\n";
+    strMessage += "Do you want to copy your settings from " + strPreviousVersion + " ?";
+    int iResponse = MessageBox ( NULL, strMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION );
+    if ( iResponse != IDYES )
+        return;
+
+    // Copy settings from previous version
+    FileCopy ( strPreviousConfig, strCurrentConfig );
+}
