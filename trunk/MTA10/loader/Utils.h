@@ -72,6 +72,8 @@ HMODULE         GetLibraryHandle                    ( const SString& strFilename
 void            FreeLibraryHandle                   ( void );
 uint            WaitForObject                       ( HANDLE hProcess, HANDLE hThread, DWORD dwMilliseconds, HANDLE hMutex );
 
+void            MaybeShowCopySettingsDialog         ( void );
+
 #undef CREATE_SUSPENDED
 #define CREATE_SUSPENDED 5
 
