@@ -1,5 +1,67 @@
 Changelog for Multi Theft Auto
 
+Multi Theft Auto : San Andreas - 1.2
+====================================
+
+Goal: Fix more obscure issues and implement features that have large applications but not high-priority demand.
+
+- 0006702: [Client] Crash on connect (ccw) - resolved.
+- 0006720: [Resources] Few errors and warnings of resources (arranTuna) - resolved.
+- 0006422: [Client] Incorrect width of GUI Tab title with Unicode symbols (while first creating) (ccw) - resolved.
+- 0006699: [Client] All vehicles in a mapfile have the same color and variant (ccw) - resolved.
+- 0006426: [Server] resetMapInfo sets the level of the predefined water bodies and pools to the sea level (Mr.Hankey) - resolved.
+- 0004361: [Scripting] Water elements destroyed through resetMapInfo do not reappear (ccw) - resolved.
+- 0005189: [Client] Water/clouds invisible through the vehicles windows (ccw) - resolved.
+- 0006561: [Client] Loading system fonts can sometimes fail (ccw) - resolved.
+- 0006708: [Client] Loading of CJ clothes causes client pauses (ccw) - resolved.
+- 0005236: [Maps] LOD system for custom models (ccw) - resolved.
+- 0006698: [Resources] GPS causes errors when path or path2 used incorrectly (arranTuna) - resolved.
+- 0006694: [Client] Change dual-wielded weapon animations. (Cazomino05) - resolved.
+- 0004035: [General] Integrate MySQL into MTA server, and unify interface with SQlite (ccw) - resolved.
+- 0006597: [Server] Actually save data to registry.db and internal.db (ccw) - resolved.
+- 0005962: [Synchronization] Sawnoff shotgun glitch (Cazomino05) - resolved.
+- 0006163: [Synchronization] Fix lightweight sync (Cazomino05) - resolved.
+- 0006686: [Resources] It is impossible to get the Hotring racer with ID 502 by typing it's name, (Cazomino05) - resolved.
+- 0005982: [Synchronization] Add option to disable/enable very close range extreme damage (Cazomino05) - resolved.
+- 0006299: [Vehicles] [1.1] Always falling off bikes and motorbikes (Cazomino05) - resolved.
+- 0006439: [Client] Created vehicle suddenly warps to far location (Cazomino05) - resolved.
+- 0005625: [Client] [Request] clientside functions toJSON, fromJSON (ccw) - resolved.
+- 0006567: [Server] function to rename resource (ccw) - resolved.
+- 0006568: [Server] copyResource() function does not function (ccw) - resolved.
+- 0005169: [Synchronization] Optimize puresync and keysync broadcasting (ccw) - resolved.
+- 0005484: [Server] function to delete resources (ccw) - resolved.
+- 0003162: [Scripting] setVehicleIdleRespawnDelay doesn't work (mekorea) - resolved.
+- 0006367: [Client] Unicode symbols dont show in "disconnected" window. (Talidan) - resolved.
+- 0005423: [Server] [Request] More debug for infinite running script (mekorea) - resolved.
+- 0006277: [Client] CEGUI Chat unicode bug (Talidan) - resolved.
+- 0005868: [Scripting] [Request] onChatMessage server-side (mekorea) - resolved.
+
+
+Multi Theft Auto : San Andreas - 1.1.1 R2
+=========================================
+- 0006655: [Client] Text problems (ccw) - resolved.
+- 0006657: [Server] Large race maps rocket the CPU usage (ccw) - resolved.
+- 0004503: [Synchronization] Glitch for shooting bullets remotely while reloading (Cazomino05) - resolved.
+- 0006669: [Server] Request: File and line number for db* warnings - resolved.
+- 0006673: [Client] Sometimes possible to shoot though walls (ccw) - resolved.
+- 0006665: [Client] Unfinished download size double when a race map is restarted (ccw) - resolved.
+- 0006644: [Client] New detailed F11 map (ccw) - resolved.
+- 0006124: [Server] Some console messages doesn't make a new line. (ccw) - resolved.
+- 0006629: [Server] dbQuery crashes the server if it encounters an empty (NULL) MySQL data field (ccw) - resolved.
+- 0006410: [Server] Segmentation fault with latest MTA 1.1 (ccw) - resolved.
+- 0006618: [Map Editor] Press F5, CJ spawns and nothing else happens (ccw) - resolved.
+- 0005884: [Server] REQUEST: Ability to create/open/delete custom SQLite DBs insteed of using general "registry.db" (ccw) - resolved.
+- 0006603: [Server] 1.1.1 Server Crash (ccw) - resolved.
+- 0006594: [Client] When connect to notfind server, mta dont check password and say "entering the game..." (ccw) - resolved.
+- 0006578: [Client] Colorful shapes flashing all over my screen. (enough to probably cause a siezure) (ccw) - resolved.
+- 0006411: [Client] MTA does not recognise UTF-8 without BOM (and luac can't compile UTF-8 files) (ccw) - resolved.
+- 0005875: [Scripting] Incorrect usage of guiCreateTab causes crash - resolved.
+- 0006549: [Client] Maximizing with roadshine 3 shader causes runtime error (ccw) - resolved.
+- 0006539: [Server] setResourceInfo won't update the file, if the attribute is already set (ccw) - resolved.
+- 0006532: [Client] Client sounds replaying when restreamed (ccw) - resolved.
+- 0006214: [Client] Menu labels issue (ccw) - resolved.
+
+
 Multi Theft Auto : San Andreas - 1.1.1
 ======================================
 Goal: Interim bugfix release
