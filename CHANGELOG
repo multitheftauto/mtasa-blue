@@ -6,7 +6,6 @@ Multi Theft Auto : San Andreas - 1.2
 Goal: Fix more obscure issues and implement features that have large applications but not high-priority demand.
 
 - 0006702: [Client] Crash on connect (ccw) - resolved.
-- 0006720: [Resources] Few errors and warnings of resources (arranTuna) - resolved.
 - 0006422: [Client] Incorrect width of GUI Tab title with Unicode symbols (while first creating) (ccw) - resolved.
 - 0006699: [Client] All vehicles in a mapfile have the same color and variant (ccw) - resolved.
 - 0006426: [Server] resetMapInfo sets the level of the predefined water bodies and pools to the sea level (Mr.Hankey) - resolved.
@@ -15,7 +14,6 @@ Goal: Fix more obscure issues and implement features that have large application
 - 0006561: [Client] Loading system fonts can sometimes fail (ccw) - resolved.
 - 0006708: [Client] Loading of CJ clothes causes client pauses (ccw) - resolved.
 - 0005236: [Maps] LOD system for custom models (ccw) - resolved.
-- 0006698: [Resources] GPS causes errors when path or path2 used incorrectly (arranTuna) - resolved.
 - 0006694: [Client] Change dual-wielded weapon animations. (Cazomino05) - resolved.
 - 0004035: [General] Integrate MySQL into MTA server, and unify interface with SQlite (ccw) - resolved.
 - 0006597: [Server] Actually save data to registry.db and internal.db (ccw) - resolved.
@@ -35,6 +33,12 @@ Goal: Fix more obscure issues and implement features that have large application
 - 0005423: [Server] [Request] More debug for infinite running script (mekorea) - resolved.
 - 0006277: [Client] CEGUI Chat unicode bug (Talidan) - resolved.
 - 0005868: [Scripting] [Request] onChatMessage server-side (mekorea) - resolved.
+
+Resources:
+
+
+- 0006720: [Resources] Few errors and warnings of resources (arranTuna) - resolved.
+- 0006698: [Resources] GPS causes errors when path or path2 used incorrectly (arranTuna) - resolved.
 
 
 Multi Theft Auto : San Andreas - 1.1.1 R2
