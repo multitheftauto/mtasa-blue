@@ -1,0 +1,68 @@
+The following files may be redistributed (as described in the End User
+License Agreement ("EULA")).
+
+Library files (redistributable only when linked to an application):
+
+  lib\detours.lib
+  lib\detours.pdb
+
+Header files (redistributable in either source or binary form):
+
+  include\detours.h
+
+Samples (redistributable in either source or binary form):
+
+  samples\Detours.mak
+  samples\Makefile
+  samples\ReadMe.Txt
+  samples\cping\cping.cpp
+  samples\cping\iping.idl
+  samples\cping\Makefile
+  samples\cping\README.TXT
+  samples\disas\disas.cpp
+  samples\disas\Makefile
+  samples\dtest\dtest.cpp
+  samples\dtest\Makefile
+  samples\dumpe\dumpe.cpp
+  samples\dumpe\Makefile
+  samples\dumpi\dumpi.cpp
+  samples\dumpi\Makefile
+  samples\einst\edll1.cpp
+  samples\einst\edll2.cpp
+  samples\einst\edll3.cpp
+  samples\einst\einst.cpp
+  samples\einst\Makefile
+  samples\excep\excep.cpp
+  samples\excep\Makefile
+  samples\injdll\injdll.cpp
+  samples\injdll\Makefile
+  samples\setdll\Makefile
+  samples\setdll\setdll.cpp
+  samples\slept\Makefile
+  samples\slept\NORMAL.TXT
+  samples\slept\sleepinj.cpp
+  samples\slept\sleepnew.cpp
+  samples\slept\sleepold.cpp
+  samples\slept\slept.cpp
+  samples\slept\slept.h
+  samples\slept\TEST.BAT
+  samples\syelog\Makefile
+  samples\syelog\sltest.cpp
+  samples\syelog\slteste.cpp
+  samples\syelog\sltestp.cpp
+  samples\syelog\sltests.cpp
+  samples\syelog\syelog.cpp
+  samples\syelog\syelog.h
+  samples\syelog\syelogd.cpp
+  samples\traceapi\Makefile
+  samples\traceapi\traceapi.cpp
+  samples\tracemem\Makefile
+  samples\tracemem\tracemem.cpp
+  samples\tracereg\Makefile
+  samples\tracereg\tracereg.cpp
+  samples\traceser\Makefile
+  samples\traceser\traceser.cpp
+  samples\tracetcp\Makefile
+  samples\tracetcp\tracetcp.cpp
+  samples\withdll\Makefile
+  samples\withdll\withdll.cpp
