@@ -30,9 +30,9 @@ Var Install_Dir
 !ifndef FILES_ROOT
     !define FILES_ROOT "."
     !define BUILD_NUMBER "0000"
+    !define INSTALL_OUTPUT "mtasa-${0.0}-data-r${BUILD_NUMBER}.exe"
 !endif
 !define PRODUCT_VERSION "Data-r${BUILD_NUMBER}"
-!define INSTALL_OUTPUT "mtasa-${0.0}-data-r${BUILD_NUMBER}.exe"
 ; ###########################################################################################################
 
 
