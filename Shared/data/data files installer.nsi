@@ -15,18 +15,22 @@ SetCompressor /SOLID /FINAL lzma
 
 Var Install_Dir
 
-!define MAJOR_VER "1"
-!define MINOR_VER "2"
-!define MAINT_VER "0"
+!ifndef MAJOR_VER
+    !define MAJOR_VER "1"
+    !define MINOR_VER "3"
+    !define MAINT_VER "0"
+!endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
 !define 0.0.0 "${MAJOR_VER}.${MINOR_VER}.${MAINT_VER}"
 
 
 ; ###########################################################################################################
-; Don't forget to update the BUILD_NUMBER
+; Don't forget to set the BUILD_NUMBER if this is built manually
 ; ###########################################################################################################
-!define FILES_ROOT "."
-!define BUILD_NUMBER "3519"
+!ifndef FILES_ROOT
+    !define FILES_ROOT "."
+    !define BUILD_NUMBER "0000"
+!endif
 !define PRODUCT_VERSION "Data-r${BUILD_NUMBER}"
 !define INSTALL_OUTPUT "mtasa-${0.0}-data-r${BUILD_NUMBER}.exe"
 ; ###########################################################################################################

@@ -22,14 +22,16 @@ Var CreateDesktopIcon
 Var RedistInstalled
 
 ; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\GDFImp.gdf.xml
-!define GUID "{D37BCD9D-382E-4270-83AB-94CD39F16E1D}"
+!define GUID "{DEEC1E88-94A4-412C-B64A-1D772535AD58}"
 
-!define MAJOR_VER "1"
-!define MINOR_VER "2"
-!define MAINT_VER "0"
+
+!ifndef MAJOR_VER
+    !define MAJOR_VER "1"
+    !define MINOR_VER "3"
+    !define MAINT_VER "0"
+!endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
 !define 0.0.0 "${MAJOR_VER}.${MINOR_VER}.${MAINT_VER}"
-
 
 ; ###########################################################################################################
 !ifndef FILES_ROOT
@@ -442,8 +444,6 @@ DontInstallRedist:
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sabankgothic.ttf"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sagothic.ttf"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\saheader.ttf"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.dat"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.tga"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.ttf"
                 File "${FILES_ROOT}\MTA San Andreas\mta\cgui\unifont-5.1.20080907.ttf"
 
