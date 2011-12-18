@@ -24,12 +24,14 @@ Var RedistInstalled
 ; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\GDFImp.gdf.xml
 !define GUID "{D37BCD9D-382E-4270-83AB-94CD39F16E1D}"
 
-!define MAJOR_VER "1"
-!define MINOR_VER "2"
-!define MAINT_VER "0"
+
+!ifndef MAJOR_VER
+    !define MAJOR_VER "1"
+    !define MINOR_VER "2"
+    !define MAINT_VER "0"
+!endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
 !define 0.0.0 "${MAJOR_VER}.${MINOR_VER}.${MAINT_VER}"
-
 
 ; ###########################################################################################################
 !ifndef FILES_ROOT
@@ -150,14 +152,14 @@ LangString DESC_Section2 ${LANG_ENGLISH}			"The MTA:SA modification, allowing yo
 LangString DESC_SectionGroupServer ${LANG_ENGLISH}  "The Multi Theft Auto Server. This allows you to host games from your computer. This requires a fast internet connection."
 LangString DESC_Section4 ${LANG_ENGLISH}			"The Multi Theft Auto server. This is a required component."
 LangString DESC_Section5 ${LANG_ENGLISH}			"The MTA:SA modification for the server."
-;LangString DESC_Section6 ${LANG_ENGLISH}			"This is a set of required resources for your server."
-;LangString DESC_Section7 ${LANG_ENGLISH}			"This is an optional set of gamemodes and maps for your server."
-;LangString DESC_Section8 ${LANG_ENGLISH}			"The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
-;LangString DESC_Section9 ${LANG_ENGLISH}			"This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
+LangString DESC_Section6 ${LANG_ENGLISH}			"This is a set of required resources for your server."
+LangString DESC_Section7 ${LANG_ENGLISH}			"This is an optional set of gamemodes and maps for your server."
+LangString DESC_Section8 ${LANG_ENGLISH}			"The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
+LangString DESC_Section9 ${LANG_ENGLISH}			"This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
 LangString DESC_Section10 ${LANG_ENGLISH}			"Create a Start Menu group for installed applications"
 LangString DESC_Section11 ${LANG_ENGLISH}			"Create a Desktop Shortcut for the MTA:SA Client."
 ;LangString DESC_Blank ${LANG_ENGLISH}			""
-;LangString DESC_SectionGroupDev ${LANG_ENGLISH}		"Development code and tools that aid in the creation of mods for Multi Theft Auto"
+LangString DESC_SectionGroupDev ${LANG_ENGLISH}		"Development code and tools that aid in the creation of mods for Multi Theft Auto"
 LangString DESC_SectionGroupClient ${LANG_ENGLISH}  "The client is the program you run to play on a Multi Theft Auto server"
 
 
@@ -442,8 +444,6 @@ DontInstallRedist:
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sabankgothic.ttf"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sagothic.ttf"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\saheader.ttf"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.dat"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.tga"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.ttf"
                 File "${FILES_ROOT}\MTA San Andreas\mta\cgui\unifont-5.1.20080907.ttf"
 
@@ -686,15 +686,15 @@ SectionEnd
 	;!insertmacro MUI_DESCRIPTION_TEXT ${SECGMODS} $(DESC_SectionGroupMods)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC04} $(DESC_Section4)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC05} $(DESC_Section5)
-	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC06} $(DESC_Section6)
-	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC07} $(DESC_Section7)
-	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC08} $(DESC_Section8)
-	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC09} $(DESC_Section9)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC06} $(DESC_Section6)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC07} $(DESC_Section7)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC08} $(DESC_Section8)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09} $(DESC_Section9)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC10} $(DESC_Section10)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC11} $(DESC_Section11)
 	;!insertmacro MUI_DESCRIPTION_TEXT ${SECBLANK} $(DESC_Blank)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SECGSERVER} $(DESC_SectionGroupServer)
-	;!insertmacro MUI_DESCRIPTION_TEXT ${SECGDEV} $(DESC_SectionGroupDev)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SECGDEV} $(DESC_SectionGroupDev)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SECGCLIENT} $(DESC_SectionGroupClient)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
