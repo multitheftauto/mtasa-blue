@@ -105,6 +105,8 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     pPlayerManager->AddToList ( this );
     m_iLastZoneDebug = 0;
 
+    // DO NOT DEFAULT THIS TO THE CURRENT TIME OR YOU WILL BREAK EVERYTHING.
+    // THIS IS USED BY LIGHT SYNC AND SHOULD NOT BE CHANGED>>> EVER.
     m_llLastPositionHasChanged = 0;
 
     CSimControl::AddSimPlayer ( this );

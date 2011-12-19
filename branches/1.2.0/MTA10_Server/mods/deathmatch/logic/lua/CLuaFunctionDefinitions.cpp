@@ -2230,8 +2230,19 @@ int CLuaFunctionDefinitions::GetPlayerIdleTime ( lua_State* luaVM )
         CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
         if ( pPlayer )
         {
-            lua_pushnumber ( luaVM, static_cast <double> ( GetTickCount64_ () - pPlayer->GetPositionLastChanged () ) );
-            return 1;
+            long long llLastPositionChanged = pPlayer->GetPositionLastChanged ();
+            if ( llLastPositionChanged == 0 )
+            {
+                // DO NOT REMOVE THIS AND DEFAULT THE POSITION LAST CHANGED TO THE CURRENT TIME OR YOU WILL BREAK EVERYTHING.
+                // He hasn't idled since he just joined so give them 0 idle time
+                lua_pushnumber ( luaVM, 0.0 );
+                return 1;
+            }
+            else
+            {
+                lua_pushnumber ( luaVM, static_cast <double> ( GetTickCount64_ () - pPlayer->GetPositionLastChanged () ) );
+                return 1;
+            }
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "getPlayerIdleTime", "player", 1 );
