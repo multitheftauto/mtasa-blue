@@ -321,9 +321,13 @@ void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const stri
     if ( !bCompiledScript && !bUTF8 && GetUTF8Confidence ( (unsigned char*)&strLuaSource.at ( 0 ), strLuaSource.length() ) < 80 )
     {
         std::wstring strUTF16Script = ANSIToUTF16 ( strLuaSource );
+#ifdef WIN32
         std::setlocale(LC_CTYPE,""); // Temporarilly use locales to read the script
         std::string strUTFScript = UTF16ToMbUTF8 ( strUTF16Script );
         std::setlocale(LC_CTYPE,"C");
+#else
+        std::string strUTFScript = UTF16ToMbUTF8 ( strUTF16Script );
+#endif
         if ( strLuaSource.length () != strUTFScript.size() )
         {
             // In-place upgrade...
