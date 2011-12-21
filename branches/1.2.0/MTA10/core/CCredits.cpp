@@ -90,6 +90,7 @@ const char* g_szCredits = "== Multi Theft Auto: San Andreas v" MTA_DM_BUILDTAG_S
                           "MCvarial\n"
                           "tvc\n"
                           "Audifire\n"
+                          "Kayl\n"
                           "\n"
                           "\n"
 
