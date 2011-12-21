@@ -528,16 +528,16 @@ lRestart:
                 CEntitySAInterface * pEntity = NULL;
                 std::list < CEntitySAInterface* > ::const_iterator entityIter = pFind->pLODList->begin ( );
                 // Loop through the LOD list
-                for ( ; entityIter != pFind->pLODList->end (); ++entityIter )
-                {
-                    // Grab the pEntity
-                    pEntity = (*entityIter);
-                    // if it's valid re-add it to the world.
-                    if ( pEntity )
-                        Add ( pEntity );
-                }
+                //for ( ; entityIter != pFind->pLODList->end (); ++entityIter )
+                //{
+                //    // Grab the pEntity
+                //    pEntity = (*entityIter);
+                //    // if it's valid re-add it to the world.
+                //    if ( pEntity && (DWORD)pEntity->vtbl == VTBL_CBUILDING )
+                //        Add ( pEntity );
+                //}
                 entityIter = pFind->pDataRemoveList->begin ( );
-                // Loop through the LOD list
+                // Loop through the Data list
                 for ( ; entityIter != pFind->pDataRemoveList->end (); ++entityIter )
                 {
                     // Grab the pEntity
@@ -622,11 +622,11 @@ void CWorldSA::ClearRemovedBuildingLists ( )
                 // Grab the pEntity
                 pEntity = (*entityIter);
                 // if it's valid re-add it to the world.
-                if ( pEntity )
+                if ( pEntity && (DWORD)pEntity->vtbl == VTBL_CBUILDING )
                     Add ( pEntity );
             }
             entityIter = pFind->pDataRemoveList->begin ( );
-            // Loop through the LOD list
+            // Loop through the Data list
             for ( ; entityIter != pFind->pDataRemoveList->end (); ++entityIter )
             {
                 // Grab the pEntity

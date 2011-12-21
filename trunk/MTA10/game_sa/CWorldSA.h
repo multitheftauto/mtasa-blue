@@ -42,7 +42,7 @@
 #define NUM_StreamRepeatSectorCols                          16
 #define VAR_fJetpackMaxHeight                               0x8703D8
 #define VAR_fAircraftMaxHeight                              0x8594DC
-
+#define VTBL_CBUILDING                                      0x8585C8
 
 #include <game/CWorld.h>
 #include "CEntitySA.h"
