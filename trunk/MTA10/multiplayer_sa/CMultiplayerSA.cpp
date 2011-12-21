@@ -22,6 +22,7 @@
 // These includes have to be fixed!
 #include "..\game_sa\CCameraSA.h"
 #include "..\game_sa\CEntitySA.h"
+#include "..\game_sa\CBuildingSA.h"
 #include "..\game_sa\CPedSA.h"
 #include "..\game_sa\common.h"
 
@@ -337,6 +338,13 @@ DWORD RETURN_CWorldScan_ScanWorldb =                0x72CAE0;
 #define HOOKPOS_CVisibilityPlugins_CalculateFadingAtomicAlpha   0x732500    // 5 bytes
 DWORD RETURN_CVisibilityPlugins_CalculateFadingAtomicAlpha =    0x732505;
 
+#define HOOKPOS_LoadIPLInstance                                    0x4061E8
+DWORD CALL_LoadIPLInstance   =                                     0x538090;
+DWORD RETURN_LoadIPLInstance =                                     0x04061ED;
+
+#define HOOKPOS_CWorld_LOD_SETUP                                  0x406224
+DWORD CALL_CWorld_LODSETUP   =                                    0x404C90;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -501,6 +509,10 @@ void HOOK_CWorldScan_ScanWorld ();
 void HOOK_CVisibilityPlugins_CalculateFadingAtomicAlpha ();
 
 void vehicle_lights_init ();
+
+void HOOK_LoadIPLInstance ();
+
+void HOOK_CWorld_LOD_SETUP ();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -691,6 +703,11 @@ void CMultiplayerSA::InitHooks()
 
     HookInstallCall ( CALL_CTrafficLights_GetPrimaryLightState, (DWORD)HOOK_CTrafficLights_GetPrimaryLightState);
     HookInstallCall ( CALL_CTrafficLights_GetSecondaryLightState, (DWORD)HOOK_CTrafficLights_GetSecondaryLightState);
+
+    HookInstallCall ( HOOKPOS_LoadIPLInstance, (DWORD)HOOK_LoadIPLInstance );
+
+    HookInstallCall ( HOOKPOS_CWorld_LOD_SETUP, (DWORD)HOOK_CWorld_LOD_SETUP );
+
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -6608,5 +6625,93 @@ second:
         mov     ecx, [esp+8]
         jmp     RETURN_CVisibilityPlugins_CalculateFadingAtomicAlpha                // 732505
 
+    }
+}
+// Variables
+SIPLInst* pEntityWorldAdd = NULL;
+CEntitySAInterface * pLODInterface = NULL; 
+bool bNextHookSetModel = false;
+
+bool CheckRemovedModel ( )
+{
+    // Init our variables
+    bNextHookSetModel = false;
+    pLODInterface = NULL;
+    CWorld* pWorld = pGameInterface->GetWorld();
+    // You never know.
+    if ( pWorld )
+    {
+        // Is the model in question even removed?
+        if ( pWorld->IsModelRemoved ( pEntityWorldAdd->m_nModelIndex ) )
+        {
+            // is the replaced model in the spherical radius of any building removal
+            if ( pGameInterface->GetWorld ( )->IsRemovedModelInRadius ( pEntityWorldAdd ) )
+            {
+                // if it is next hook remove it from the world
+                bNextHookSetModel = true;
+                return true;
+            }
+        }
+        return false;
+    }
+    return false;
+}
+// Hook 1
+void _declspec(naked) HOOK_LoadIPLInstance ()
+{
+    _asm
+    {
+        pushad
+        mov pEntityWorldAdd, ecx
+    }
+    if ( pEntityWorldAdd )
+    {
+        CheckRemovedModel ( );
+    }
+    _asm
+    {
+        popad
+        jmp CALL_LoadIPLInstance
+        jmp RETURN_LoadIPLInstance
+    }
+}
+
+
+void HideEntitySomehow ( )
+{
+    // Did we get instructed to set the model
+    if ( bNextHookSetModel && pLODInterface )
+    {
+        // Init pInterface with the Initial model
+        CEntitySAInterface * pInterface = pLODInterface;
+        // Grab the removal for the interface
+        SBuildingRemoval* pBuildingRemoval = pGameInterface->GetWorld ( )->GetBuildingRemoval ( pInterface );
+        // Remove down the LOD tree
+        while ( pInterface && pInterface != NULL )
+        {
+            // Add the LOD to the list
+            pBuildingRemoval->AddLOD ( pInterface );
+            // Remove the model from the world
+            pGameInterface->GetWorld ( )->Remove ( pInterface );
+            // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
+            pInterface = pInterface->m_pLod;
+        }
+    }
+    // Reset our next hook variable
+    bNextHookSetModel = false;
+}
+// Hook 2
+void _declspec(naked) HOOK_CWorld_LOD_SETUP ()
+{
+    _asm
+    {
+        pushad
+        mov pLODInterface, esi
+    }
+    HideEntitySomehow ( );
+    _asm
+    {
+        popad
+        jmp CALL_CWorld_LODSETUP
     }
 }

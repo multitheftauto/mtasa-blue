@@ -46,10 +46,12 @@
 
 #include <game/CWorld.h>
 #include "CEntitySA.h"
-
+#include "CBuildingSA.h"
+#include <google/dense_hash_map>
 class CWorldSA : public CWorld
 {
 public:
+    CWorldSA ( );
     void        Add                       ( CEntity * entity );
     void        Add                       ( CEntitySAInterface * entityInterface );
     void        Remove                    ( CEntity * entity );
@@ -92,6 +94,15 @@ public:
      * StopAllLawEnforcersInTheirTracks
 
      */
+    void                RemoveBuilding              ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ );
+    bool                IsRemovedModelInRadius      ( SIPLInst* pInst );
+    bool                IsModelRemoved              ( unsigned short modelID );
+    void                ClearRemovedBuildingLists   ( void );
+    bool                RestoreBuilding             ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ );
+    SBuildingRemoval*   GetBuildingRemoval          ( CEntitySAInterface * pInterface );
+private:
+    std::list< SBuildingRemoval* >                              *m_pBuildings;
+    std::list< unsigned short >                                *m_pRemovedObjects;
 };
 
 #endif
