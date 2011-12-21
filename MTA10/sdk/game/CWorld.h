@@ -53,6 +53,7 @@ struct SBuildingRemoval
     SBuildingRemoval ( )
     {
         pLODList = new std::list < CEntitySAInterface * >;
+        pDataRemoveList = new std::list < CEntitySAInterface * >;
         usPreviousModel = 0;
         vecPos = CVector( 0, 0, 0);
         fRadius = 0.0f;
@@ -60,16 +61,22 @@ struct SBuildingRemoval
     ~SBuildingRemoval ( )
     {
         delete pLODList;
+        delete pDataRemoveList;
     }
     void AddLOD ( CEntitySAInterface * pInterface )
     {
         // Add to list of LOD's for this removal
         pLODList->push_back ( pInterface );
     }
+    void AddDataBuilding ( CEntitySAInterface * pInterface )
+    {
+        pDataRemoveList->push_back ( pInterface );
+    }
     unsigned short usPreviousModel;
     CVector vecPos;
     float fRadius;
     std::list < CEntitySAInterface * > * pLODList;
+    std::list < CEntitySAInterface * > * pDataRemoveList;
 };
 struct SIPLInst
 {
@@ -111,6 +118,7 @@ public:
     virtual void        ClearRemovedBuildingLists   ( void ) = 0;
     virtual bool        RestoreBuilding             ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ ) = 0;
     virtual SBuildingRemoval*   GetBuildingRemoval  ( CEntitySAInterface * pInterface ) = 0;
+    virtual void        AddDataBuilding             ( CEntitySAInterface * pInterface ) = 0;
 };
 
 #endif
