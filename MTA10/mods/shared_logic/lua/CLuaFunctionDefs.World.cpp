@@ -1259,6 +1259,92 @@ int CLuaFunctionDefs::SetJetpackMaxHeight ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::RemoveWorldBuilding ( lua_State* luaVM )
+{
+    int iModelToRemove; 
+    CVector vecPosition;
+    float fRadius = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( iModelToRemove );
+    argStream.ReadNumber ( fRadius );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( pResource )
+            {
+                CStaticFunctionDefinitions::RemoveWorldBuilding ( iModelToRemove, fRadius, vecPosition.fX, vecPosition.fY, vecPosition.fZ );
+
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "removeWorldBuilding", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::RestoreWorldBuildings ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        CResource* pResource = pLuaMain->GetResource ();
+        if ( pResource )
+        {
+            CStaticFunctionDefinitions::RestoreWorldBuildings ( );
+
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::RestoreWorldBuilding ( lua_State* luaVM )
+{
+    int iModelToRestore; 
+    CVector vecPosition;
+    float fRadius = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( iModelToRestore );
+    argStream.ReadNumber ( fRadius );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( pResource )
+            {
+                CStaticFunctionDefinitions::RestoreWorldBuilding ( iModelToRestore, fRadius, vecPosition.fX, vecPosition.fY, vecPosition.fZ );
+
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "restoreWorldBuilding", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::SetAircraftMaxHeight ( lua_State* luaVM )
 {
 //  bool setAircraftMaxHeight ( float Height )

@@ -721,6 +721,9 @@ public:
     LUA_DECLARE ( GetSunSize );
     LUA_DECLARE ( SetSunSize );
     LUA_DECLARE ( ResetSunSize );
+    LUA_DECLARE ( RemoveWorldBuilding );
+    LUA_DECLARE ( RestoreWorldBuildings );
+    LUA_DECLARE ( RestoreWorldBuilding );
     LUA_DECLARE ( SetAircraftMaxHeight );
     LUA_DECLARE ( CreateSWATRope );
 
