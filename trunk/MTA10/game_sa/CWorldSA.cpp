@@ -19,6 +19,7 @@ CWorldSA::CWorldSA ( )
 {
     m_pBuildings = new std::list < SBuildingRemoval* >;
     m_pRemovedObjects = new std::list < unsigned short >;
+    m_pDataBuildings = new std::list < CEntitySAInterface * >;
 }
 
 void CWorldSA::Add ( CEntity * pEntity )
@@ -452,9 +453,8 @@ float CWorldSA::GetAircraftMaxHeight ( void )
 void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, float fX, float fY, float fZ)
 {    
     // New building Removal
-    SBuildingRemoval* pRemoval = new SBuildingRemoval();
 
-    // Fill in the data
+    SBuildingRemoval* pRemoval = new SBuildingRemoval();
     pRemoval->usPreviousModel = usModelToRemove;
     pRemoval->vecPos.fX = fX;
     pRemoval->vecPos.fY = fY;
@@ -463,13 +463,36 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
     // Push it to the back of the removal list
     m_pBuildings->push_back ( pRemoval );
 
+    CEntitySAInterface * pFind = NULL;
+    std::list < CEntitySAInterface* > ::const_iterator iter = m_pDataBuildings->begin ( );
+    for ( ; iter != m_pDataBuildings->end (); ++iter )
+    {
+        pFind = (*iter);
+        if ( pFind )
+        {
+            if ( pFind->bRemoveFromWorld != 1 && pFind->m_nModelIndex == usModelToRemove )
+            {
+                CEntitySAInterface * pInterface = pFind;
+                while ( pInterface && pInterface != NULL )
+                {
+                    // Add the Data Building to the list
+                    pRemoval->AddDataBuilding ( pInterface );
+                    // Remove the model from the world
+                    Remove ( pInterface );
+                    // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
+                    pInterface = pInterface->m_pLod;
+                }
+            }
+        }
+    }
+
     // if this model isn't marked as deleted mark it
     if ( IsModelRemoved ( usModelToRemove ) == false )
         m_pRemovedObjects->push_back ( usModelToRemove );
 
     // Grab the current camera position
     CMatrix Matrix;
-    g_pCore->GetGame ( )->GetCamera ( )->GetMatrix ( &Matrix );
+    pGame->GetCamera ( )->GetMatrix ( &Matrix );
     // Grab distances across each axis
     float fDistanceX = Matrix.vPos.fX - pRemoval->vecPos.fX;
     float fDistanceY = Matrix.vPos.fY - pRemoval->vecPos.fY;
@@ -506,6 +529,16 @@ lRestart:
                 std::list < CEntitySAInterface* > ::const_iterator entityIter = pFind->pLODList->begin ( );
                 // Loop through the LOD list
                 for ( ; entityIter != pFind->pLODList->end (); ++entityIter )
+                {
+                    // Grab the pEntity
+                    pEntity = (*entityIter);
+                    // if it's valid re-add it to the world.
+                    if ( pEntity )
+                        Add ( pEntity );
+                }
+                entityIter = pFind->pDataRemoveList->begin ( );
+                // Loop through the LOD list
+                for ( ; entityIter != pFind->pDataRemoveList->end (); ++entityIter )
                 {
                     // Grab the pEntity
                     pEntity = (*entityIter);
@@ -592,6 +625,17 @@ void CWorldSA::ClearRemovedBuildingLists ( )
                 if ( pEntity )
                     Add ( pEntity );
             }
+            entityIter = pFind->pDataRemoveList->begin ( );
+            // Loop through the LOD list
+            for ( ; entityIter != pFind->pDataRemoveList->end (); ++entityIter )
+            {
+                // Grab the pEntity
+                pEntity = (*entityIter);
+                // if it's valid re-add it to the world.
+                if ( pEntity )
+                    Add ( pEntity );
+            }
+
             delete pFind;
         }
     }
@@ -631,4 +675,9 @@ SBuildingRemoval* CWorldSA::GetBuildingRemoval ( CEntitySAInterface * pInterface
         }
     }
     return NULL;
+}
+
+void CWorldSA::AddDataBuilding ( CEntitySAInterface * pInterface )
+{
+    m_pDataBuildings->push_back ( pInterface );
 }

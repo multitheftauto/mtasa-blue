@@ -100,9 +100,11 @@ public:
     void                ClearRemovedBuildingLists   ( void );
     bool                RestoreBuilding             ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ );
     SBuildingRemoval*   GetBuildingRemoval          ( CEntitySAInterface * pInterface );
+    void                AddDataBuilding             ( CEntitySAInterface * pInterface );
 private:
     std::list< SBuildingRemoval* >                              *m_pBuildings;
-    std::list< unsigned short >                                *m_pRemovedObjects;
+    std::list< CEntitySAInterface* >                            *m_pDataBuildings;
+    std::list< unsigned short >                                 *m_pRemovedObjects;
 };
 
 #endif

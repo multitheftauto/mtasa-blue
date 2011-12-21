@@ -345,6 +345,10 @@ DWORD RETURN_LoadIPLInstance =                                     0x04061ED;
 #define HOOKPOS_CWorld_LOD_SETUP                                  0x406224
 DWORD CALL_CWorld_LODSETUP   =                                    0x404C90;
 
+#define HOOKPOS_AddBuildingInstancesToWorld_CWorldAdd             0x5B5348
+DWORD CALL_CWorldAdd   =                                          0x563220;
+DWORD RETURN_AddBuildingInstancesToWorld_CWorldAdd =              0x5B534D;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -513,6 +517,8 @@ void vehicle_lights_init ();
 void HOOK_LoadIPLInstance ();
 
 void HOOK_CWorld_LOD_SETUP ();
+
+void Hook_AddBuildingInstancesToWorld ( );
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -706,9 +712,9 @@ void CMultiplayerSA::InitHooks()
 
     HookInstallCall ( HOOKPOS_LoadIPLInstance, (DWORD)HOOK_LoadIPLInstance );
 
-    HookInstallCall ( HOOKPOS_CWorld_LOD_SETUP, (DWORD)HOOK_CWorld_LOD_SETUP );
+    HookInstallCall ( HOOKPOS_CWorld_LOD_SETUP, (DWORD)HOOK_CWorld_LOD_SETUP );;
 
-
+    HookInstallCall ( HOOKPOS_AddBuildingInstancesToWorld_CWorldAdd, (DWORD)Hook_AddBuildingInstancesToWorld );
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
 
@@ -6713,5 +6719,29 @@ void _declspec(naked) HOOK_CWorld_LOD_SETUP ()
     {
         popad
         jmp CALL_CWorld_LODSETUP
+    }
+}
+
+CEntitySAInterface * pBuildingAdd = NULL;
+void StorePointerToBuilding ( )
+{
+    if ( pBuildingAdd )
+    {
+        pGameInterface->GetWorld ( )->AddDataBuilding ( pBuildingAdd );
+    }
+}
+// Called when a data entity is added to the world (this happens once when the game loads so we just dump those in a list and we can sift through when someone tries to remove.)
+void _declspec(naked) Hook_AddBuildingInstancesToWorld ( )
+{
+    _asm
+    {
+        pushad
+        mov pBuildingAdd, edx
+    }
+    StorePointerToBuilding ( );
+    _asm
+    {
+        popad
+        jmp CALL_CWorldAdd
     }
 }

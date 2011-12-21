@@ -927,7 +927,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setSunSize", CLuaFunctionDefs::SetSunSize );
     CLuaCFunctions::AddFunction ( "resetSunSize", CLuaFunctionDefs::ResetSunSize );
     CLuaCFunctions::AddFunction ( "removeWorldBuilding", CLuaFunctionDefs::RemoveWorldBuilding );
-    CLuaCFunctions::AddFunction ( "restoreWorldBuilding", CLuaFunctionDefs::RestoreWorldBuildings );
+    CLuaCFunctions::AddFunction ( "restoreWorldBuildings", CLuaFunctionDefs::RestoreWorldBuildings );
     CLuaCFunctions::AddFunction ( "restoreWorldBuilding", CLuaFunctionDefs::RestoreWorldBuilding );
     CLuaCFunctions::AddFunction ( "setAircraftMaxHeight", CLuaFunctionDefs::SetAircraftMaxHeight );
     CLuaCFunctions::AddFunction ( "createSWATRope", CLuaFunctionDefs::CreateSWATRope );
