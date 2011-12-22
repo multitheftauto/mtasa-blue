@@ -80,7 +80,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib psapi.lib"
-				OutputFile="C:/Program Files/MTA San Andreas 1.2/mta/loader_d.dll"
+				OutputFile="C:/Program Files/MTA San Andreas 1.3/mta/loader_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
