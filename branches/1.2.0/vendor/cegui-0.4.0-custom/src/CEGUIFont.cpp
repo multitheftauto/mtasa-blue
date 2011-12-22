@@ -63,6 +63,7 @@ const char	Font::FontSchemaName[]				= "Font.xsd";
 *************************************************************************/
 Font::Font(const String& filename, const String& resourceGroup, FontImplData* dat) :
     d_glyph_images(0),
+    d_glyph_images_deleteme(0),
     d_freetype(false),
     d_lineHeight(0),
     d_lineSpacing(0),
@@ -75,7 +76,11 @@ Font::Font(const String& filename, const String& resourceGroup, FontImplData* da
     d_vertScaling(1.0f),
     d_nativeHorzRes(DefaultNativeHorzRes),
     d_nativeVertRes(DefaultNativeVertRes),
-    d_antiAliased(false)
+    d_antiAliased(false),
+    d_bAddedGlyphPage(false),
+    d_uiLastPulseTime(0),
+    d_total_width(0),
+    d_avg_width(0)
 {
 	load(filename, resourceGroup);
 
@@ -91,6 +96,7 @@ Font::Font(const String& filename, const String& resourceGroup, FontImplData* da
 *************************************************************************/
 Font::Font(const String& name, const String& fontname, const String& resourceGroup, uint size, uint flags, const String& glyph_set, FontImplData* dat) :
     d_glyph_images(0),
+    d_glyph_images_deleteme(0),
     d_freetype(false),
     d_lineHeight(0),
     d_lineSpacing(0),
@@ -103,7 +109,11 @@ Font::Font(const String& name, const String& fontname, const String& resourceGro
     d_vertScaling(1.0f),
     d_nativeHorzRes(DefaultNativeHorzRes),
     d_nativeVertRes(DefaultNativeVertRes),
-    d_antiAliased(false)
+    d_antiAliased(false),
+    d_bAddedGlyphPage(false),
+    d_uiLastPulseTime(0),
+    d_total_width(0),
+    d_avg_width(0)
 {
 	constructor_impl(name, fontname, resourceGroup, size, flags, glyph_set);
 }
@@ -116,6 +126,7 @@ Font::Font(const String& name, const String& fontname, const String& resourceGro
 *************************************************************************/
 Font::Font(const String& name, const String& fontname, const String& resourceGroup, uint size, uint flags, utf32 first_code_point, utf32 last_code_point, FontImplData* dat) :
     d_glyph_images(0),
+    d_glyph_images_deleteme(0),
     d_freetype(false),
     d_lineHeight(0),
     d_lineSpacing(0),
@@ -128,7 +139,11 @@ Font::Font(const String& name, const String& fontname, const String& resourceGro
     d_vertScaling(1.0f),
     d_nativeHorzRes(DefaultNativeHorzRes),
     d_nativeVertRes(DefaultNativeVertRes),
-    d_antiAliased(false)
+    d_antiAliased(false),
+    d_bAddedGlyphPage(false),
+    d_uiLastPulseTime(0),
+    d_total_width(0),
+    d_avg_width(0)
 {
 	String tmp;
 
@@ -147,6 +162,7 @@ Font::Font(const String& name, const String& fontname, const String& resourceGro
 *************************************************************************/
 Font::Font(const String& name, const String& fontname, const String& resourceGroup, uint size, uint flags, FontImplData* dat, bool bAutoScale, float fNativeResX, float fNativeResY) :
     d_glyph_images(0),
+    d_glyph_images_deleteme(0),
     d_freetype(false),
     d_lineHeight(0),
     d_lineSpacing(0),
@@ -159,7 +175,11 @@ Font::Font(const String& name, const String& fontname, const String& resourceGro
     d_vertScaling(1.0f),
     d_nativeHorzRes(fNativeResX),
     d_nativeVertRes(fNativeResY),
-    d_antiAliased(false)
+    d_antiAliased(false),
+    d_bAddedGlyphPage(false),
+    d_uiLastPulseTime(0),
+    d_total_width(0),
+    d_avg_width(0)
 {
 	String tmp;
 
@@ -370,80 +390,33 @@ void Font::defineFontGlyphs(const String& glyph_set)
 }
 
 /*************************************************************************
-	Add characters to the current set of glyphs available for this font
-*************************************************************************/
-void Font::extendFontGlyphs (const String glyph_set ) const
-{
-    const_cast<Font*>( this )->defineFontGlyphs(d_glyphset + glyph_set);
-}
-
-
-/*************************************************************************
 	Return the required texture size required to store imagery for the
 	glyphs specified in 'glyph_set'
 *************************************************************************/
 uint Font::getRequiredTextureSize(const String& glyph_set)
 {
-	d_maxGlyphHeight = 0;
+    TIMEUS startTime = GetTimeUs ();
 
-	uint	texSize = 32;			// start with a texture this size
-	uint	width;
+    // Guess required size
+    int numPixels = d_avg_width * d_maxGlyphHeight * glyph_set.size ();
+    int size = sqrt ( (float)numPixels ) / 80 * 100;
 
-	uint	cur_x = 0;
-	uint	cur_y = d_maxGlyphHeight;
+    // Make power of 2
+    int targetlevel = 1;
+    while (size >>= 1) ++targetlevel;
+    size = Max ( 32, 1 << targetlevel );
 
-	uint	glyph_set_length = static_cast<uint>(glyph_set.length());
+    // Try
+    while ( !utilFontGlyphSet( glyph_set, size, NULL ) )
+    {
+        size *= 2;
+    }
 
-    FT_GlyphSlot thisGlyph = d_impldat->fontFace->glyph;
+    TIMEUS deltaTime = GetTimeUs () - startTime;
+    OutputDebugLine ( SString ( "[CEGUI] getRequiredTextureSize in %0.2fms", deltaTime / 1000.f ) );
 
-	for (uint i = 0; i < glyph_set_length; ++i)
-	{
-        FT_GlyphSlot glyph = thisGlyph;
-
-		// load-up required glyph
-        if (!FT_Get_Char_Index( d_impldat->fontFace, glyph_set[i] ) )
-        {
-			//We couldnt find a glyph for this font.  Load it from the substitute font.
-            glyph = (FT_GlyphSlot)FontManager::getSingleton().getSubstituteGlyph ( glyph_set[i] );
-        }
-		else if (FT_Load_Char(d_impldat->fontFace, glyph_set[i], FT_LOAD_RENDER | (d_antiAliased ? FT_LOAD_TARGET_NORMAL : FT_LOAD_MONOCHROME | FT_LOAD_TARGET_MONO)))
-		{
-			// skip errors
-			continue;
-		}
-
-		// if this glyph is taller than all others so far, update height and re-calculate cur_y
-		if ((uint)glyph->bitmap.rows + InterGlyphPadSpace > d_maxGlyphHeight)
-		{
-			d_maxGlyphHeight = glyph->bitmap.rows + InterGlyphPadSpace;
-			cur_y = (i + 1) * d_maxGlyphHeight;
-		}
-
-		width = glyph->bitmap.width + InterGlyphPadSpace;
-		cur_x += width;
-
-		// check for fit
-		if (cur_x >= texSize)
-		{
-			cur_x = width;
-			cur_y += d_maxGlyphHeight;
-
-			if (cur_y >= texSize)
-			{
-				// texture is too small, set-up to start again...
-				texSize *= 2;
-				cur_x = 0;
-				cur_y = d_maxGlyphHeight;
-				i = (uint)-1;
-			}
-
-		}
-
-	}
-
-	return texSize;
+    return size;
 }
-
 
 /*************************************************************************
 	Render a set of glyph images into the given memory buffer.
@@ -451,6 +424,26 @@ uint Font::getRequiredTextureSize(const String& glyph_set)
 *************************************************************************/
 void Font::createFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer)
 {
+    TIMEUS startTime = GetTimeUs ();
+
+    if ( !utilFontGlyphSet( glyph_set, size, buffer ) )
+    {
+        OutputDebugLine ( SString ( "[CEGUI] Error - Could not fit font into texture of size %d", size ) );
+    }
+
+    TIMEUS deltaTime = GetTimeUs () - startTime;
+    OutputDebugLine ( SString ( "[CEGUI] createFontGlyphSet in %0.2fms", deltaTime / 1000.f ) );
+}
+
+
+/*************************************************************************
+// Use same code to calculate the texture size and draw to prevent incorrect sizes.
+// Returns false if could not fit in the texture.
+*************************************************************************/
+bool Font::utilFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer)
+{
+    bool bCalcSizeOnly = ( buffer == NULL );
+
 	String	imageName;
 	Rect	rect;
 	Point	offset;
@@ -462,94 +455,124 @@ void Font::createFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer
 	size_t	glyph_set_length = glyph_set.length();
 	uint	cur_x = 0;
 	uint	cur_y = 0;
-	uint	width;
+    uint    rows = 0;
 
 	for (uint i = 0; i < glyph_set_length; ++i)
 	{
         FT_GlyphSlot glyph = thisGlyph;
 
-        //Check for repetitions
-	    CodepointMap::const_iterator	pos, end = d_cp_map.end();
-        pos = d_cp_map.find(glyph_set[i]);
-        if (pos != end)
-            continue;
+        SCharSize* pCharSize = MapFind ( d_sizes_map, glyph_set[i] );
 
-        // Check if the glyph exists in this font
-        if (!FT_Get_Char_Index( d_impldat->fontFace, glyph_set[i] ) )
+        if ( !bCalcSizeOnly )
         {
-			//We couldnt find a glyph for this font.  Load it from the substitute font.
-            glyph = (FT_GlyphSlot)FontManager::getSingleton().getSubstituteGlyph ( glyph_set[i] );
+            //Check for repetitions
+	        CodepointMap::const_iterator	pos, end = d_cp_map.end();
+            pos = d_cp_map.find(glyph_set[i]);
+            if (pos != end)
+                continue;
         }
-        else if (FT_Load_Char(d_impldat->fontFace, glyph_set[i], FT_LOAD_RENDER | (d_antiAliased ? FT_LOAD_TARGET_NORMAL : FT_LOAD_MONOCHROME | FT_LOAD_TARGET_MONO)))
-		{
-			// skip errors (but now we log them!)
-			std::stringstream err;
-			err << "Font::createFontGlyphSet - Failed to load glyph for codepoint: ";
-			err << static_cast<unsigned int>(glyph_set[i]);
-			Logger::getSingleton().logEvent(err.str(), Errors);
 
-			continue;
+        if ( !bCalcSizeOnly || !pCharSize )
+        {
+            // Check if the glyph exists in this font
+            if (!FT_Get_Char_Index( d_impldat->fontFace, glyph_set[i] ) )
+            {
+			    //We couldnt find a glyph for this font.  Load it from the substitute font.
+                glyph = (FT_GlyphSlot)FontManager::getSingleton().getSubstituteGlyph ( glyph_set[i] );
+            }
+            else if (FT_Load_Char(d_impldat->fontFace, glyph_set[i], FT_LOAD_RENDER | (d_antiAliased ? FT_LOAD_TARGET_NORMAL : FT_LOAD_MONOCHROME | FT_LOAD_TARGET_MONO)))
+		    {
+			    // skip errors (but now we log them!)
+			    std::stringstream err;
+			    err << "Font::createFontGlyphSet - Failed to load glyph for codepoint: ";
+			    err << static_cast<unsigned int>(glyph_set[i]);
+			    Logger::getSingleton().logEvent(err.str(), Errors);
+
+			    continue;
+		    }
+
+            if ( !pCharSize )
+            {
+                // Record size info for this character
+                SCharSize item;
+                item.width = glyph->bitmap.width;
+                item.height = glyph->bitmap.rows;
+                MapSet ( d_sizes_map, glyph_set[i], item );
+                pCharSize = MapFind ( d_sizes_map, glyph_set[i] );
+
+                d_total_width += pCharSize->width;
+                d_avg_width = d_total_width / d_sizes_map.size ();
+            }
+            else
+            {
+                dassert ( pCharSize->width == glyph->bitmap.width && pCharSize->height == glyph->bitmap.rows );
+            }
+        }
+
+
+		// if this glyph is taller than all others so far, update height and re-calculate cur_y
+		if (pCharSize->height + InterGlyphPadSpace > d_maxGlyphHeight)
+		{
+			d_maxGlyphHeight = pCharSize->height + InterGlyphPadSpace;
+			cur_y = rows * d_maxGlyphHeight;
+            if ( cur_y + d_maxGlyphHeight >= size )
+                return false;
 		}
 
-		width = glyph->bitmap.width + InterGlyphPadSpace;
+		uint width = pCharSize->width + InterGlyphPadSpace;
 
 		// see if we need to wrap to next row
 		if (cur_x + width >= size)
 		{
+            if ( width >= size )
+                return false;
+
 			cur_x = 0;
+            rows++;
 			cur_y += d_maxGlyphHeight;
+            dassert ( cur_y == rows * d_maxGlyphHeight );
+
+            if ( cur_y + d_maxGlyphHeight >= size )
+                return false;
 		}
 
-		// calculate offset into buffer for this glyph
-		argb_t* dest_buff = buffer + (cur_y * size) + cur_x;
+        if ( !bCalcSizeOnly )
+        {
+		    // calculate offset into buffer for this glyph
+		    argb_t* dest_buff = buffer + (cur_y * size) + cur_x;
 
-		// draw glyph into buffer
-		drawGlyphToBuffer((void*)glyph,dest_buff, size);
+		    // draw glyph into buffer
+		    drawGlyphToBuffer((void*)glyph,dest_buff, size);
 
-		// define Image on Imageset for this glyph to save re-rendering glyph later
-        imageName		= glyph_set[i];
-		rect.d_left		= (float)cur_x;
-		rect.d_top		= (float)cur_y;
-		rect.d_right	= (float)(cur_x + width - InterGlyphPadSpace);
-		rect.d_bottom	= (float)(cur_y + d_maxGlyphHeight - InterGlyphPadSpace);
+		    // define Image on Imageset for this glyph to save re-rendering glyph later
+            imageName		= glyph_set[i];
+		    rect.d_left		= (float)cur_x;
+		    rect.d_top		= (float)cur_y;
+		    rect.d_right	= (float)(cur_x + width - InterGlyphPadSpace);
+		    rect.d_bottom	= (float)(cur_y + d_maxGlyphHeight - InterGlyphPadSpace);
 
-		offset.d_x		= (float)(glyph->metrics.horiBearingX >> 6);
-		offset.d_y		= -(float)(glyph->metrics.horiBearingY >> 6);
-		d_glyph_images->defineImage(imageName, rect, offset, glyph_set[i], this);
+		    offset.d_x		= (float)(glyph->metrics.horiBearingX >> 6);
+		    offset.d_y		= -(float)(glyph->metrics.horiBearingY >> 6);
+		    d_glyph_images->defineImage(imageName, rect, offset, glyph_set[i], this);
+
+    //		// check and update maximum bearingY value
+    //		if (static_cast<float>(glyph->metrics.horiBearingY >> 6) > d_max_bearingY)
+    //		{
+    //			d_max_bearingY = static_cast<float>(glyph->metrics.horiBearingY >> 6);
+    //		}
+
+		    // create entry in code-point to Image map
+		    glyphDat	dat;
+		    dat.d_image = &d_glyph_images->getImage(imageName);
+            const Image* image = dat.d_image;
+		    dat.d_horz_advance = glyph->advance.x >> 6;
+		    d_cp_map[glyph_set[i]] = dat;
+        }
 
 		cur_x += width;
-
-//		// check and update maximum bearingY value
-//		if (static_cast<float>(glyph->metrics.horiBearingY >> 6) > d_max_bearingY)
-//		{
-//			d_max_bearingY = static_cast<float>(glyph->metrics.horiBearingY >> 6);
-//		}
-
-		// create entry in code-point to Image map
-		glyphDat	dat;
-		dat.d_image = &d_glyph_images->getImage(imageName);
-        const Image* image = dat.d_image;
-		dat.d_horz_advance = glyph->advance.x >> 6;
-		d_cp_map[glyph_set[i]] = dat;
 	}
 
-}
-
-
-/*************************************************************************
-	Render a range of glyph images into the given memory buffer.
-	pixels will be in A8R8G8B8 format
-*************************************************************************/
-void Font::createFontGlyphSet(utf32 first_code_point, utf32 last_code_point, uint size, argb_t* buffer)
-{
-	String tmp;
-
-	for (utf32 cp = first_code_point; cp <=last_code_point; ++cp)
-	{
-		tmp += cp;
-	}
-
-	createFontGlyphSet(tmp, size, buffer);
+    return true;
 }
 
 
@@ -700,11 +723,15 @@ void Font::drawTextLine(const String& text, const Vector3& position, const Rect&
 	size_t char_count = text.length();
 	CodepointMap::const_iterator	pos, end = d_cp_map.end();
 
-    processStringForGlyphs ( text ); // Refresh our glyph set if there are new characters
+    const_cast < Font* > ( this )->refreshStringForGlyphs ( text ); // Refresh our glyph set if there are new characters
 
 	for (size_t c = 0; c < char_count; ++c)
 	{
 		pos = d_cp_map.find(text[c]);
+
+        // Add holding character if required not found
+		if (pos == end)
+		    pos = d_cp_map.find('*');
 
 		if (pos != end)
 		{
@@ -744,7 +771,7 @@ void Font::drawTextLineJustified(const String& text, const Rect& draw_area, cons
 	float shared_lost_space = 0.0;
 	if (space_count > 0) shared_lost_space = lost_space / (float)space_count;
 
-    processStringForGlyphs ( text ); // Refresh our glyph set if there are new characters
+    const_cast < Font* > ( this )->refreshStringForGlyphs ( text ); // Refresh our glyph set if there are new characters
     
     for (c = 0; c < char_count; ++c)
 	{
@@ -777,7 +804,7 @@ void Font::constructor_impl(const String& name, const String& fontname, const St
 	d_antiAliased = (flags == NoAntiAlias) ? false : true;
 
 	// create an blank Imageset
-	d_glyph_images = ismgr.createImageset(name + "_auto_glyph_images", System::getSingleton().getRenderer()->createTexture());
+	d_glyph_images = ismgr.createImageset(name + "_auto_glyph_images1", System::getSingleton().getRenderer()->createTexture());
 
 	uint		horzdpi		= System::getSingleton().getRenderer()->getHorzScreenDPI();
 	uint		vertdpi		= System::getSingleton().getRenderer()->getVertScreenDPI();
@@ -882,6 +909,11 @@ void Font::unload(void)
 		ImagesetManager::getSingleton().destroyImageset(d_glyph_images);
 		d_glyph_images = NULL;
 	}
+	if (d_glyph_images_deleteme != NULL)
+	{
+		ImagesetManager::getSingleton().destroyImageset(d_glyph_images_deleteme);
+		d_glyph_images_deleteme = NULL;
+	}
 
 	// cleanup FreeType face if this is a FreeType based font.
 	if (d_freetype)
@@ -931,7 +963,7 @@ void Font::defineFontGlyphs_impl(void)
 
 	// clear old data about glyphs and images
 	d_cp_map.clear();
-	d_glyph_images->undefineAllImages();
+    queueUndefineGlyphImages ();
 
 	// render new glyphs and define Imageset images.
 	createFontGlyphSet(d_glyphset, texture_size, mem_buffer);
@@ -946,6 +978,39 @@ void Font::defineFontGlyphs_impl(void)
 	// calculate spacing and base-line
     d_max_bearingY = ((float)d_impldat->fontFace->ascender / (float)d_impldat->fontFace->units_per_EM) * (float)d_impldat->fontFace->size->metrics.y_ppem;
 	d_lineSpacing = ((float)d_impldat->fontFace->height / (float)d_impldat->fontFace->units_per_EM) * (float)d_impldat->fontFace->size->metrics.y_ppem;
+}
+
+
+/*************************************************************************
+    If render cache contains images from this font, swap image sets
+    and delete the old one after the next redraw
+*************************************************************************/
+void Font::queueUndefineGlyphImages(void)
+{
+    flushPendingUndefineGlyphImages ();
+    SString strName = d_glyph_images->getName ().c_str ();
+    if ( strName.EndsWith ( "1" ) )
+        strName = strName.Left ( strName.length () - 1 ) + "2";
+    else
+        strName = strName.Left ( strName.length () - 1 ) + "1";
+    d_glyph_images_deleteme = d_glyph_images;
+	ImagesetManager& ismgr	= ImagesetManager::getSingleton();
+    d_glyph_images = ismgr.createImageset(strName, System::getSingleton().getRenderer()->createTexture());
+}
+
+/*************************************************************************
+   Delete old image set if required
+*************************************************************************/
+void Font::flushPendingUndefineGlyphImages(void)
+{
+    if ( d_glyph_images_deleteme )
+    {
+        TIMEUS startTime = GetTimeUs ();
+		ImagesetManager::getSingleton().destroyImageset(d_glyph_images_deleteme);
+        d_glyph_images_deleteme = NULL;
+        TIMEUS deltaTime = GetTimeUs () - startTime;
+        OutputDebugLine ( SString ( "[CEGUI] destroyImageset in %0.2fms", deltaTime / 1000.f ) );
+    }
 }
 
 
@@ -1319,134 +1384,182 @@ bool Font::isGlyphBeingUsed (unsigned long ulGlyph) const
     return false;
 }
 
+
 /*************************************************************************
-!Talidan!: Callback for when a glyph has just been used from this font
+	Glyph <-> PageId helpers
 *************************************************************************/
-String Font::OnGlyphDrawn ( unsigned long ulGlyph ) const
+static uint GlyphToGlyphPageId ( ulong ulGlyph )
 {
-    //std::map< unsigned long, unsigned long >* m_pGlyphCache = &m_GlyphCache;
-    // Are we an ASCII character (always loaded), or out of range character?
+    return ( ulGlyph & ~0x7F );
+}
+
+static ulong GlyphPageIdFirstGlyph ( uint uiPageId )
+{
+    return uiPageId;
+}
+
+static ulong GlyphPageIdLastGlyph ( uint uiPageId )
+{
+    return uiPageId + 0x7F;
+}
+
+
+/*************************************************************************
+	Find an existing cache page for the glyph
+*************************************************************************/
+GlyphPageInfo* Font::findGlyphPageInfo ( ulong ulGlyph )
+{
+    uint uiPageId = GlyphToGlyphPageId ( ulGlyph );
+    return MapFind ( d_GlyphPageInfoMap, uiPageId );
+}
+
+
+/*************************************************************************
+	Add a cache page for the glyph
+*************************************************************************/
+GlyphPageInfo* Font::addGlyphPageInfo ( ulong ulGlyph )
+{
+    d_bAddedGlyphPage = true;
+    uint uiPageId = GlyphToGlyphPageId ( ulGlyph );
+    OutputDebugLine ( SString ( "[CEGUI] Adding glyph page 0x%08x  (glyph: 0x%08x)", uiPageId, ulGlyph ) );
+    return &MapGet ( d_GlyphPageInfoMap, uiPageId );
+}
+
+
+/*************************************************************************
+	Keep the glyph in the cache
+*************************************************************************/
+void Font::refreshCachedGlyph ( unsigned long ulGlyph )
+{
+    GlyphPageInfo* pInfo = findGlyphPageInfo ( ulGlyph );
+    if ( pInfo )
+        pInfo->uiLastUsedTime = d_uiLastPulseTime;
+}
+
+
+/*************************************************************************
+	Add/keep the glyph in the cache
+*************************************************************************/
+void Font::insertGlyphToCache ( unsigned long ulGlyph )
+{
     if ( ulGlyph < 128 )
-        return "";
+        return;
 
-    unsigned int iRange = 128;
-    // To prevent overlapping, we set limits 
-    unsigned int iLowerBound = 127;
-    unsigned int iUpperBound = 65534;
-
-    std::map< unsigned long, unsigned long >::iterator itToErase;
-    bool bErase = false;
-
-    std::map< unsigned long, unsigned long >* m_pGlyphCache = const_cast< std::map< unsigned long, unsigned long >* >( &m_GlyphCache );
-
-    // Let's check our cache to see if this glyph is already loaded
-    for ( std::map< unsigned long, unsigned long >::iterator it = m_pGlyphCache->begin(); it != m_pGlyphCache->end(); ++it )
-    {
-        // If we're in range of another cache, we only update that cache
-        if ( (unsigned int)abs((int)(it->first - ulGlyph)) <= iRange )
-        {
-            itToErase = it;
-            bErase = true;
-            break;
-        }
-
-        // Assuming this is a new glyph, we need to find boundaries to avoid overwriting glyphs
-        unsigned int iterLowerBound = it->first - iRange;
-        unsigned int iterUpperBound = it->first + iRange;
-        // Is this upper bound closer than the previous lower bound?
-        if ( ( iterUpperBound < ulGlyph ) && ((ulGlyph - iLowerBound) < (ulGlyph - iterUpperBound)) )
-            iLowerBound = iterUpperBound;
-
-        // Is this lower bound closer than the previous upper bound?
-        if ( ( iterLowerBound > ulGlyph ) && ((iUpperBound - ulGlyph) > (iterLowerBound - ulGlyph)) )
-            iUpperBound = iterLowerBound;
-    }
-
-    if ( bErase )
-    {
-        unsigned long ulGlyphToUpdate = itToErase->first;
-        m_pGlyphCache->erase(itToErase);
-        m_pGlyphCache->insert ( std::pair<unsigned long,unsigned long>(ulGlyphToUpdate,clock()/CLOCKS_PER_SEC) );
-        return "";
-    }
-
-    // Not in any other cache, let's create a new cache
-    m_pGlyphCache->insert ( std::pair<unsigned long,unsigned long>(ulGlyph,clock()/CLOCKS_PER_SEC) );
-
-
-    CEGUI::String strNewCache = "";
-    unsigned long i;
-    for(i=(ulGlyph-iRange); i <= (ulGlyph+iRange); i++)
-    {
-        if ( ( i > iLowerBound ) && ( i < iUpperBound ) )
-            strNewCache += (CEGUI::utf32)i;
-    }
-    return strNewCache;
+    GlyphPageInfo* pInfo = findGlyphPageInfo ( ulGlyph );
+    if ( !pInfo )
+        pInfo = addGlyphPageInfo ( ulGlyph );
+    pInfo->uiLastUsedTime = d_uiLastPulseTime;
 }
 
-String Font::cleanGlyphCache ( String strCache ) const
-{
-    unsigned int iRange = 128;
-    unsigned int iLowerBound = 127;
-    unsigned int iUpperBound = 65534;
-    bool bPurged = false; //Have we purged any outdated caches?
 
-    std::map< unsigned long, unsigned long >* m_pGlyphCache = const_cast< std::map< unsigned long, unsigned long >* >( &m_GlyphCache );
-    std::vector<unsigned long> l_Outdated;
-    unsigned int uiCurrentTime = (clock()/CLOCKS_PER_SEC);
-
-    // Let's check for outdated caches
-    for ( std::map< unsigned long, unsigned long >::const_iterator it = m_pGlyphCache->begin(); it != m_pGlyphCache->end(); ++it )
-    {
-        if ( (uiCurrentTime - it->second) > 30 * 10 ) //If outdated, add to our erase list
-        {
-            OutputDebugLine ( SString ( "[CEGUI] Purging glyph 0x%08x", it->first ) );
-            l_Outdated.push_back(it->first);
-            bPurged = true;
-        }
-    }
-    if ( !bPurged )
-        return strCache;
-
-    String strNewCache = strCache;
-    std::vector<unsigned long>::iterator iter;
-    for (iter=l_Outdated.begin(); iter!=l_Outdated.end(); iter++)
-    {
-        String::iterator c;
-        for (c = strNewCache.begin(); c != strNewCache.end(); c++)
-	    {
-            unsigned long ulGlyph = (unsigned long)*c;
-            if ( ( ulGlyph > iLowerBound) && ( ulGlyph < iUpperBound ) )
-            {
-                if ( ( (*iter-iRange) <= ulGlyph ) && ( (ulGlyph <= (*iter+iRange) ) ) )
-                {
-                    strNewCache.erase(c);
-                    c--;
-                }
-            }
-        }
-        m_pGlyphCache->erase(*iter);
-    }
-
-    return strNewCache;
-}
-
-void Font::processStringForGlyphs ( String text ) const
+/*************************************************************************
+	Add/keep the glyphs in the cache
+*************************************************************************/
+void Font::refreshStringForGlyphs ( const String& text )
 {
     if ( d_glyphset.empty() )
         return;
 
 	size_t char_count = text.length();
-
-    String strNewGlyphs = cleanGlyphCache(d_glyphset);  //Purge unused glyphs
 	for (size_t c = 0; c < char_count; ++c)
-	{
-        strNewGlyphs += OnGlyphDrawn(text[c]);
-    }
-    if ( strNewGlyphs != d_glyphset )
     {
-        const_cast<Font*>( this )->defineFontGlyphs(strNewGlyphs);
+        insertGlyphToCache(text[c]);
     }
+}
+
+
+/*************************************************************************
+	Add/keep the glyphs in the cache. Rebuild the font if cache was added to.
+*************************************************************************/
+void Font::insertStringForGlyphs ( const String& text )
+{
+    if ( d_glyphset.empty() )
+        return;
+
+	size_t char_count = text.length();
+	for (size_t c = 0; c < char_count; ++c)
+    {
+        insertGlyphToCache(text[c]);
+    }
+
+    if ( needsRebuild () )
+        rebuild ();
+}
+
+
+/*************************************************************************
+	Update cache timer
+*************************************************************************/
+void Font::pulse ( void )
+{
+    d_uiLastPulseTime = clock() / CLOCKS_PER_SEC;
+}
+
+/*************************************************************************
+	Returns true if font needs rebuilding
+*************************************************************************/
+bool Font::needsRebuild ( void )
+{
+    return d_bAddedGlyphPage;
+}
+
+/*************************************************************************
+    Called when the renderer has no cached images from this font,
+    so will speed up rebuiling.
+*************************************************************************/
+void Font::onClearRenderList ( void )
+{
+    flushPendingUndefineGlyphImages ();
+    if ( needsRebuild () )
+        rebuild ();
+}
+
+/*************************************************************************
+*************************************************************************/
+bool Font::needsClearRenderList ( void )
+{
+    return d_glyph_images_deleteme != NULL;
+}
+
+
+/*************************************************************************
+	Rebuild font if required
+*************************************************************************/
+void Font::rebuild ( void )
+{
+    if ( d_glyphset.empty() || !needsRebuild () )
+        return;
+
+    // Save initial characters
+    if ( d_glyphset_default.empty() )
+        d_glyphset_default = d_glyphset;
+
+    // Make glyphset
+    String glyphset = d_glyphset_default;
+    for ( std::map < uint, GlyphPageInfo >::iterator iter = d_GlyphPageInfoMap.begin () ; iter != d_GlyphPageInfoMap.end () ; )
+    {
+        if ( ( d_uiLastPulseTime - iter->second.uiLastUsedTime ) > /*30 **/ 10 ) //If outdated, add to our erase list
+	    {
+            OutputDebugLine ( SString ( "[CEGUI] Purging glyph page 0x%08x", iter->first ) );
+            d_GlyphPageInfoMap.erase ( iter++ );
+        }
+        else
+        {
+            ulong ulFirst = GlyphPageIdFirstGlyph ( iter->first );
+            ulong ulLast = GlyphPageIdLastGlyph ( iter->first );
+            for ( ulong i = ulFirst ; i <= ulLast ; i++ )
+            {
+                glyphset += (CEGUI::utf32)i;
+            }
+            ++iter;
+        }
+    }
+    d_bAddedGlyphPage = false;
+
+    TIMEUS startTime = GetTimeUs ();
+    defineFontGlyphs(glyphset);
+    TIMEUS deltaTime = GetTimeUs () - startTime;
+    OutputDebugLine ( SString ( "[CEGUI] Made font with %d characters in %0.2fms", glyphset.size (), deltaTime / 1000.f ) );
 }
 
 

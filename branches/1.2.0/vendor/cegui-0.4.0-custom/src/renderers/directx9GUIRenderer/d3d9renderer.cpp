@@ -166,6 +166,9 @@ void DirectX9Renderer::addQuad(const Rect& dest_rect, float z, const Texture* te
 //
 void DirectX9Renderer::NotifyImageInvalid ( Image* const image )
 {
+    // Quickest thing to do here is to clear the quad list
+    d_quadlist.clear ();
+#if 0
 	for (QuadList::iterator i = d_quadlist.begin(); i != d_quadlist.end(); )
 	{
 		const QuadInfo& quad = (*i);
@@ -176,6 +179,7 @@ void DirectX9Renderer::NotifyImageInvalid ( Image* const image )
         else
             ++i;
     }
+#endif
 }
 
 
@@ -233,7 +237,7 @@ void DirectX9Renderer::doRender(void)
             {
                 CEGUI::Font* pFont = quad.image->getFont();
                 if ( pFont )
-                    pFont->OnGlyphDrawn(ulCodepoint);
+                    pFont->refreshCachedGlyph(ulCodepoint);
             }
         }
 
