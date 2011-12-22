@@ -6243,7 +6243,15 @@ bool _cdecl OnStreamingRequestFile ( int iFileId, int iBlockOffset, int iBlockCo
     {
         SImgGTAItemInfo* pImgGTAInfo = ((SImgGTAItemInfo*)(0x8E4CC0)) + iFileId;
 
-        if ( pImgGTAInfo->uiLoadflag > 1 )
+        // Cached enabled setting here as it doesn't usually change
+        static bool bLogClothesLoad = GetDebugIdEnabled ( 501 );
+        if ( bLogClothesLoad )
+        {
+            SString strMessage ( "%d - id:%d Loadflag:%d", GetTickCount32 (), iFileId, pImgGTAInfo->uiLoadflag );
+            LogEvent ( 501, "Clothes Load", "", strMessage );
+        }
+
+        if ( pImgGTAInfo->uiLoadflag > 0 )
             return false;
 
         pImgGTAInfo->uiUnknown1 = 0xffff;
