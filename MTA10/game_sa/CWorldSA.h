@@ -104,7 +104,7 @@ public:
 private:
     std::list< SBuildingRemoval* >                              *m_pBuildings;
     std::list< CEntitySAInterface* >                            *m_pDataBuildings;
-    std::list< unsigned short >                                 *m_pRemovedObjects;
+    std::map < unsigned short, unsigned short >                 *m_pRemovedObjects;
 };
 
 #endif

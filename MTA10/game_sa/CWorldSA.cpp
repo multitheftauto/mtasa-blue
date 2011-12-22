@@ -18,7 +18,7 @@
 CWorldSA::CWorldSA ( )
 {
     m_pBuildings = new std::list < SBuildingRemoval* >;
-    m_pRemovedObjects = new std::list < unsigned short >;
+    m_pRemovedObjects = new std::map < unsigned short, unsigned short >;
     m_pDataBuildings = new std::list < CEntitySAInterface * >;
 }
 
@@ -488,7 +488,9 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
 
     // if this model isn't marked as deleted mark it
     if ( IsModelRemoved ( usModelToRemove ) == false )
-        m_pRemovedObjects->push_back ( usModelToRemove );
+        (*m_pRemovedObjects) [ usModelToRemove ] = 1;
+    else
+        m_pRemovedObjects->find ( usModelToRemove )->second++;
 
     // Grab the current camera position
     CMatrix Matrix;
@@ -546,6 +548,12 @@ lRestart:
                     if ( pEntity && (DWORD)pEntity->vtbl->Add == 0x533020 )
                         Add ( pEntity );
                 }
+                // Decrement our model ID info
+                std::map<unsigned short,unsigned short>::iterator iter = m_pRemovedObjects->find ( usModelToRestore );
+                if ( iter != m_pRemovedObjects->end ( ) )
+                {
+                    iter->second--;
+                }
                 // Remove the building from the list
                 m_pBuildings->remove ( pFind );
                 // Success! don't return incase there are any others to delete
@@ -589,17 +597,13 @@ bool CWorldSA::IsRemovedModelInRadius ( SIPLInst* pInst )
 // Check if a given model is replaced
 bool CWorldSA::IsModelRemoved ( unsigned short usModelID )
 {
-    // Init some variables
-    std::list < unsigned short > ::const_iterator iter = m_pRemovedObjects->begin ();
-    // Loop through our replaced object ID list
-    for ( ; iter != m_pRemovedObjects->end (); ++iter )
+    std::map<unsigned short,unsigned short>::iterator iter = m_pRemovedObjects->find ( usModelID );
+    if ( iter != m_pRemovedObjects->end ( ) )
     {
-        // They match! brilliant
-        if ( (*iter) == usModelID )
-            return true;
+        return iter->second > 0;
     }
-    // They didn't match :(
-    return false;
+    else
+        return false;
 }
 
 // Resets deleted list
@@ -644,7 +648,7 @@ void CWorldSA::ClearRemovedBuildingLists ( )
     delete m_pRemovedObjects;
     // Create new
     m_pBuildings = new std::list < SBuildingRemoval* >;
-    m_pRemovedObjects = new std::list < unsigned short >;
+    m_pRemovedObjects = new std::map < unsigned short, unsigned short >;
 }
 
 
