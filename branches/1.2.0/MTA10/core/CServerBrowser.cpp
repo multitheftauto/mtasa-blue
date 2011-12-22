@@ -683,7 +683,7 @@ void CServerBrowser::Update ( void )
     {
         if ( m_FlashSearchBox [ Type ].uiNextTime < GetTickCount32 () )
         {
-            m_pEditSearch[ Type ]->SetVisible ( m_FlashSearchBox [ Type ].uiCount-- & ( 8 + 1 ) );
+            m_pEditSearch[ Type ]->SetVisible ( ( m_FlashSearchBox [ Type ].uiCount-- & ( 8 + 1 ) ) ? true : false );
             m_FlashSearchBox [ Type ].uiNextTime = GetTickCount32 () + 100;
         }
     }

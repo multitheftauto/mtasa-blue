@@ -65,3 +65,13 @@ void OnCrashAverted ( uint uiId )
 {
     g_pCore->OnCrashAverted ( uiId );  
 }
+
+bool GetDebugIdEnabled ( uint uiDebugId )
+{
+    return g_pCore->GetDebugIdEnabled ( uiDebugId );  
+}
+
+void LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody )
+{
+    g_pCore->LogEvent ( uiDebugId, szType, szContext, szBody );  
+}
