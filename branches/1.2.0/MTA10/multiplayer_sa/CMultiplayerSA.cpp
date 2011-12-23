@@ -6175,11 +6175,13 @@ bool _cdecl IsPlayerImgDirLoaded ( void )
 {
     // When player.img dir is loaded, it looks this this:
     // 0x00BC12C0  00bbcdc8 00000226
+#if WITH_RANDOM_CRASHES
     DWORD* ptr1 = (DWORD*)0x00BC12C0;
     if ( ptr1[0] == 0x00BBCDC8 && ptr1[1] == 0x0000226 )
     {
         return true;
     }
+#endif
     return false;
 }
 
@@ -6247,7 +6249,16 @@ bool _cdecl OnStreamingRequestFile ( int iFileId, int iBlockOffset, int iBlockCo
         static bool bLogClothesLoad = GetDebugIdEnabled ( 501 );
         if ( bLogClothesLoad )
         {
-            SString strMessage ( "id:%d Loadflag:%d", iFileId, pImgGTAInfo->uiLoadflag );
+            SString strMessage ( "id:%d h:%08x un1:%08x un2:%08x Loadflag:%d os:%d c:%d s:%d"
+                                    , iFileId
+                                    , pImgGTAInfo->uiHash
+                                    , pImgGTAInfo->uiUnknown1
+                                    , pImgGTAInfo->uiUnknown2
+                                    , pImgGTAInfo->uiLoadflag
+                                    , iBlockOffset
+                                    , iBlockCount
+                                    , iSomething
+                                );
             LogEvent ( 501, "Clothes Load", "", strMessage );
         }
 
