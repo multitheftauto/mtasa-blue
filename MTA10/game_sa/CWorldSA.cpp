@@ -17,9 +17,9 @@
 #include "StdInc.h"
 CWorldSA::CWorldSA ( )
 {
-    m_pBuildings = new std::list < SBuildingRemoval* >;
+    m_pBuildings = new std::multimap< unsigned short, SBuildingRemoval* >;
     m_pRemovedObjects = new std::map < unsigned short, unsigned short >;
-    m_pDataBuildings = new std::list < CEntitySAInterface * >;
+    m_pDataBuildings = new std::multimap < unsigned short, sDataBuildingRemoval* >;
 }
 
 void CWorldSA::Add ( CEntity * pEntity )
@@ -461,26 +461,38 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
     pRemoval->vecPos.fZ = fZ;
     pRemoval->fRadius = fRange;
     // Push it to the back of the removal list
-    m_pBuildings->push_back ( pRemoval );
+    m_pBuildings->insert ( std::pair<unsigned short, SBuildingRemoval*> ( usModelToRemove, pRemoval ) );
 
-    CEntitySAInterface * pFind = NULL;
-    std::list < CEntitySAInterface* > ::const_iterator iter = m_pDataBuildings->begin ( );
-    for ( ; iter != m_pDataBuildings->end (); ++iter )
+    sDataBuildingRemoval * pFind = NULL;
+    std::pair < std::multimap < unsigned short, sDataBuildingRemoval*>::iterator, std::multimap < unsigned short, sDataBuildingRemoval* >::iterator> iterators = m_pDataBuildings->equal_range ( usModelToRemove );
+    std::multimap < unsigned short, sDataBuildingRemoval* > ::const_iterator iter = iterators.first;
+    for ( ; iter != iterators.second; ++iter )
     {
-        pFind = (*iter);
+        pFind = (*iter).second;
         if ( pFind )
         {
-            if ( pFind->bRemoveFromWorld != 1 && pFind->m_nModelIndex == usModelToRemove )
+            if ( pFind->iCount <= 0 && pFind->m_pInterface )
             {
-                CEntitySAInterface * pInterface = pFind;
-                while ( pInterface && pInterface != NULL )
+                // Grab distances across each axis
+                float fDistanceX = fX - pFind->m_pInterface->Placeable.m_transform.m_translate.fX;
+                float fDistanceY = fY - pFind->m_pInterface->Placeable.m_transform.m_translate.fY;
+                float fDistanceZ = fZ - pFind->m_pInterface->Placeable.m_transform.m_translate.fZ;
+
+                // Square root 'em
+                float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
+                if ( fDistance <= fRange && pFind->m_pInterface->bRemoveFromWorld != 1 )
                 {
-                    // Add the Data Building to the list
-                    pRemoval->AddDataBuilding ( pInterface );
-                    // Remove the model from the world
-                    Remove ( pInterface );
-                    // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
-                    pInterface = pInterface->m_pLod;
+                    CEntitySAInterface * pInterface = pFind->m_pInterface;
+                    //while ( pInterface && pInterface != NULL )
+                    {
+                        // Add the Data Building to the list
+                        pRemoval->AddDataBuilding ( pInterface );
+                        // Remove the model from the world
+                        Remove ( pInterface );
+                        // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
+                        pInterface = pInterface->m_pLod;
+                    }
+                    pFind->iCount = 1;
                 }
             }
         }
@@ -514,53 +526,97 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
     bool bSuccess = false;
     // Init some variables
     SBuildingRemoval * pFind = NULL;
-    std::list < SBuildingRemoval* > ::const_iterator iter;
-lRestart:
-    iter = m_pBuildings->begin ();
+    std::pair < std::multimap < unsigned short, SBuildingRemoval* >::iterator, std::multimap < unsigned short, SBuildingRemoval* >::iterator> iterators = m_pBuildings->equal_range ( usModelToRestore );
+    std::multimap < unsigned short, SBuildingRemoval* > ::const_iterator iter = iterators.first;
     // Loop through the buildings list
-    for ( ; iter != m_pBuildings->end (); ++iter )
+    for ( ; iter != iterators.second;  )
     {
-        pFind = (*iter);
+        pFind = (*iter).second;
         // if pFind is valid and the model is the same
-        if ( pFind && pFind->usPreviousModel == usModelToRestore )
+        if ( pFind )
         {
-            if ( pFind->vecPos.fX == fX && pFind->vecPos.fY == fY && pFind->vecPos.fZ == fZ )
+            // Grab distances across each axis
+            float fDistanceX = fX - pFind->vecPos.fX;
+            float fDistanceY = fY - pFind->vecPos.fY;
+            float fDistanceZ = fZ - pFind->vecPos.fZ;
+
+            // Square root 'em
+            float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
+            if ( fDistance <= pFind->fRadius )
             {
                 // Init some variables
                 CEntitySAInterface * pEntity = NULL;
                 std::list < CEntitySAInterface* > ::const_iterator entityIter = pFind->pLODList->begin ( );
-                // Loop through the LOD list
-                for ( ; entityIter != pFind->pLODList->end (); ++entityIter )
+                if ( pFind->pLODList->empty ( ) == false ) 
                 {
-                    // Grab the pEntity
-                    pEntity = (*entityIter);
-                    // if it's valid re-add it to the world.
-                    if ( pEntity && (DWORD)pEntity->vtbl->Add == 0x533020 )
-                        Add ( pEntity );
+                    // Loop through the LOD list
+                    for ( ; entityIter != pFind->pLODList->end (); )
+                    {
+                        // Grab the pEntity
+                        pEntity = (*entityIter);
+                        // if it's valid re-add it to the world.
+                        if ( pEntity && pEntity != NULL && (DWORD)pEntity->vtbl == VTBL_CBUILDING )
+                        {
+                            Add ( pEntity );
+                            pFind->pLODList->erase ( entityIter++ );
+                        }
+                        else
+                            ++entityIter;
+                    }
                 }
                 entityIter = pFind->pDataRemoveList->begin ( );
-                // Loop through the Data list
-                for ( ; entityIter != pFind->pDataRemoveList->end (); ++entityIter )
+                if ( pFind->pDataRemoveList->empty ( ) == false )
                 {
-                    // Grab the pEntity
-                    pEntity = (*entityIter);
-                    // if it's valid re-add it to the world.
-                    if ( pEntity && (DWORD)pEntity->vtbl->Add == 0x533020 )
-                        Add ( pEntity );
-                }
-                // Decrement our model ID info
-                std::map<unsigned short,unsigned short>::iterator iter = m_pRemovedObjects->find ( usModelToRestore );
-                if ( iter != m_pRemovedObjects->end ( ) )
-                {
-                    iter->second--;
+                    // Loop through the Data list
+                    for ( ; entityIter != pFind->pDataRemoveList->end (); )
+                    {
+                        // Grab the pEntity
+                        pEntity = (*entityIter);
+                        // if it's valid re-add it to the world.
+                        if ( pEntity && pEntity != NULL && (DWORD)pEntity->vtbl == VTBL_CBUILDING )
+                        {
+                            Add ( pEntity );
+                            pFind->pDataRemoveList->erase ( entityIter++ );
+                        }
+                        else
+                            ++entityIter;
+                    }
                 }
                 // Remove the building from the list
-                m_pBuildings->remove ( pFind );
+                m_pBuildings->erase ( iter++ );
                 // Success! don't return incase there are any others to delete
                 bSuccess = true;
-                goto lRestart;
+            }
+            else
+                iter++;
+        }
+        else
+            iter++;
+    }
+    sDataBuildingRemoval * pFound = NULL;
+    std::pair < std::multimap < unsigned short, sDataBuildingRemoval*>::iterator, std::multimap < unsigned short, sDataBuildingRemoval* >::iterator> dataBuildingIterators = m_pDataBuildings->equal_range ( usModelToRestore );
+    std::multimap < unsigned short, sDataBuildingRemoval* > ::const_iterator iterator = dataBuildingIterators.first;
+    for ( ; iterator != dataBuildingIterators.second; ++iterator )
+    {
+        pFound = (*iterator).second;
+        if ( pFound )
+        {
+            // Grab distances across each axis
+            float fDistanceX = fX - pFound->m_pInterface->Placeable.m_transform.m_translate.fX;
+            float fDistanceY = fY - pFound->m_pInterface->Placeable.m_transform.m_translate.fY;
+            float fDistanceZ = fZ - pFound->m_pInterface->Placeable.m_transform.m_translate.fZ;
+
+            // Square root 'em
+            float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
+            if ( fDistance <= fRange )
+            {
+                // Fix the removed count.
+                pFound->iCount--;
+                if ( pFound->iCount < 0 )
+                    pFound->iCount = 0;
             }
         }
+
     }
     return bSuccess;
 }
@@ -570,13 +626,14 @@ bool CWorldSA::IsRemovedModelInRadius ( SIPLInst* pInst )
 {
     // Init some variables
     SBuildingRemoval * pFind = NULL;
-    std::list < SBuildingRemoval* > ::const_iterator iter = m_pBuildings->begin ();
+    std::pair < std::multimap < unsigned short, SBuildingRemoval* >::iterator, std::multimap < unsigned short, SBuildingRemoval* >::iterator> iterators = m_pBuildings->equal_range ( pInst->m_nModelIndex );
+    std::multimap < unsigned short, SBuildingRemoval* > ::const_iterator iter = iterators.first;
     // Loop through the buildings list
-    for ( ; iter != m_pBuildings->end (); ++iter )
+    for ( ; iter != iterators.second; ++iter )
     {
-        pFind = (*iter);
+        pFind = (*iter).second;
         // if pFind is valid and the model is the same
-        if ( pFind && pFind->usPreviousModel == pInst->m_nModelIndex )
+        if ( pFind )
         {
             // Grab the distance
             float fDistanceX = pFind->vecPos.fX - pInst->m_pPosition.fX;
@@ -611,43 +668,65 @@ void CWorldSA::ClearRemovedBuildingLists ( )
 {
     // Ensure no memory leaks by deleting items.
     SBuildingRemoval * pFind = NULL;
-    std::list < SBuildingRemoval* > ::const_iterator iter = m_pBuildings->begin ( );
-    for ( ; iter != m_pBuildings->end (); ++iter )
+    std::multimap < unsigned short, SBuildingRemoval* > ::const_iterator iter = m_pBuildings->begin ( );
+    for ( ; iter != m_pBuildings->end ( ); )
     {
-        pFind = (*iter);
+        pFind = (*iter).second;
         if ( pFind )
         {
             // Init some variables
             CEntitySAInterface * pEntity = NULL;
             std::list < CEntitySAInterface* > ::const_iterator entityIter = pFind->pLODList->begin ( );
-            // Loop through the LOD list
-            for ( ; entityIter != pFind->pLODList->end (); ++entityIter )
+            if ( pFind->pLODList->empty ( ) == false )
             {
-                // Grab the pEntity
-                pEntity = (*entityIter);
-                // if it's valid re-add it to the world.
-                if ( pEntity && (DWORD)pEntity->vtbl == VTBL_CBUILDING )
-                    Add ( pEntity );
+                // Loop through the LOD list
+                for ( ; entityIter != pFind->pLODList->end (); ++entityIter )
+                {
+                    // Grab the pEntity
+                    pEntity = (*entityIter);
+                    // if it's valid re-add it to the world.
+                    if ( pEntity && (DWORD)pEntity->vtbl == VTBL_CBUILDING )
+                    {
+                        Add ( pEntity );
+                    }
+                }
             }
             entityIter = pFind->pDataRemoveList->begin ( );
-            // Loop through the Data list
-            for ( ; entityIter != pFind->pDataRemoveList->end (); ++entityIter )
+            if ( pFind->pDataRemoveList->empty ( ) == false )
             {
-                // Grab the pEntity
-                pEntity = (*entityIter);
-                // if it's valid re-add it to the world.
-                if ( pEntity )
-                    Add ( pEntity );
+                // Loop through the Data list
+                for ( ; entityIter != pFind->pDataRemoveList->end (); ++entityIter )
+                {
+                    // Grab the pEntity
+                    pEntity = (*entityIter);
+                    // if it's valid re-add it to the world.
+                    if ( pEntity && (DWORD)pEntity->vtbl == VTBL_CBUILDING )
+                    {
+                        Add ( pEntity );
+                    }
+                }
             }
-
-            delete pFind;
+            m_pBuildings->erase ( iter++ );
         }
+        else
+            iter++;
+    }
+    sDataBuildingRemoval * pFound = NULL;   
+    std::multimap < unsigned short, sDataBuildingRemoval* > ::const_iterator iterator = m_pDataBuildings->begin ( );
+    for ( ; iterator != m_pDataBuildings->end ( ); ++iterator )
+    {
+        pFound = (*iterator).second;
+        if ( pFound )
+        {
+            pFound->iCount = 0;
+        }
+
     }
     // Delete old building lists
     delete m_pBuildings;
     delete m_pRemovedObjects;
     // Create new
-    m_pBuildings = new std::list < SBuildingRemoval* >;
+    m_pBuildings = new std::multimap< unsigned short, SBuildingRemoval* >;
     m_pRemovedObjects = new std::map < unsigned short, unsigned short >;
 }
 
@@ -657,13 +736,14 @@ SBuildingRemoval* CWorldSA::GetBuildingRemoval ( CEntitySAInterface * pInterface
 {
     // Init some variables
     SBuildingRemoval * pFind = NULL;
-    std::list < SBuildingRemoval* > ::const_iterator iter = m_pBuildings->begin ();
+    std::pair < std::multimap < unsigned short, SBuildingRemoval* >::iterator, std::multimap < unsigned short, SBuildingRemoval* >::iterator> iterators = m_pBuildings->equal_range ( pInterface->m_nModelIndex );
+    std::multimap < unsigned short, SBuildingRemoval* > ::const_iterator iter = iterators.first;
     // Loop through the buildings list
-    for ( ; iter != m_pBuildings->end (); ++iter )
+    for ( ; iter != iterators.second; ++iter )
     {
-        pFind = (*iter);
+        pFind = (*iter).second;
         // if pFind is valid and the model is the same
-        if ( pFind && pFind->usPreviousModel == pInterface->m_nModelIndex )
+        if ( pFind )
         {
             // Grab the distance
             float fDistanceX = pFind->vecPos.fX - pInterface->Placeable.m_transform.m_translate.fX;
@@ -683,5 +763,59 @@ SBuildingRemoval* CWorldSA::GetBuildingRemoval ( CEntitySAInterface * pInterface
 
 void CWorldSA::AddDataBuilding ( CEntitySAInterface * pInterface )
 {
-    m_pDataBuildings->push_back ( pInterface );
+    sDataBuildingRemoval * pBuildingRemoval = new sDataBuildingRemoval ( pInterface, true );
+    m_pDataBuildings->insert ( std::pair<unsigned short, sDataBuildingRemoval*> ( (unsigned short)pInterface->m_nModelIndex, pBuildingRemoval ) );
+}
+
+void CWorldSA::RemoveWorldBuilding ( CEntitySAInterface * pInterface )
+{
+    SBuildingRemoval * pFind = NULL;
+    std::pair < std::multimap < unsigned short, SBuildingRemoval* >::iterator, std::multimap < unsigned short, SBuildingRemoval* >::iterator> iterators = m_pBuildings->equal_range ( pInterface->m_nModelIndex );
+    std::multimap < unsigned short, SBuildingRemoval* > ::const_iterator iter = iterators.first;
+
+    // Loop through the buildings list
+    for ( ; iter != iterators.second; ++iter )
+    {
+        pFind = (*iter).second;
+        // if pFind is valid and the model is the same
+        if ( pFind )
+        {
+            {
+                CEntitySAInterface * pEntity = NULL;
+                if ( pFind->pLODList->empty ( ) == false )
+                {
+                    std::list < CEntitySAInterface* > ::const_iterator entityIter = pFind->pLODList->begin ( );
+                    for ( ; entityIter != pFind->pLODList->end (); )
+                    {
+                        if ( pEntity == pInterface )
+                        {
+                            pFind->pLODList->erase ( entityIter++ );
+                        }
+                        else
+                            entityIter++;
+                    }
+                }
+                if ( pFind->pDataRemoveList->empty ( ) == false )
+                {
+                    std::list < CEntitySAInterface* > ::const_iterator entityIter = pFind->pDataRemoveList->begin ( );
+                    // Loop through the Data list
+                    for ( ; entityIter != pFind->pDataRemoveList->end (); )
+                    {
+                        // Grab the pEntity
+                        pEntity = (*entityIter);
+                        // if it's valid re-add it to the world.
+                        if ( pEntity && (DWORD)pEntity->vtbl == VTBL_CBUILDING )
+                        {
+                            if ( pEntity == pInterface )
+                            {
+                                pFind->pDataRemoveList->erase ( entityIter++ );
+                            }
+                            else
+                                entityIter++;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
