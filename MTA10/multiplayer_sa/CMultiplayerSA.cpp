@@ -345,8 +345,8 @@ DWORD RETURN_LoadIPLInstance =                                     0x04061ED;
 #define HOOKPOS_CWorld_LOD_SETUP                                  0x406224
 DWORD CALL_CWorld_LODSETUP   =                                    0x404C90;
 
-#define HOOKPOS_CBuilding_DTR                                     0x404180
-DWORD JMP_CBuilding_DTR   =                                       0x535E90;
+#define HOOKPOS_CBuilding_DTR                                     0x535E92
+DWORD JMP_CBuilding_DTR   =                                       0x406F55;
 
 #define HOOKPOS_AddBuildingInstancesToWorld_CWorldAdd             0x5B5348
 DWORD CALL_CWorldAdd   =                                          0x563220;
@@ -6701,7 +6701,7 @@ void HideEntitySomehow ( )
         // Grab the removal for the interface
         SBuildingRemoval* pBuildingRemoval = pGameInterface->GetWorld ( )->GetBuildingRemoval ( pInterface );
         // Remove down the LOD tree
-        //while ( pInterface && pInterface != NULL )
+        if ( pInterface && pInterface != NULL && pInterface->bIsProcObject == 0 && ( pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY ) )
         {
             // Add the LOD to the list
             pBuildingRemoval->AddLOD ( pInterface );
@@ -6766,7 +6766,10 @@ void _declspec(naked) Hook_CBuilding_DTR ( )
         pushad
         mov pBuildingRemove, ecx
     }
-   RemovePointerToBuilding ( );
+    if ( pBuildingRemove->nType == ENTITY_TYPE_BUILDING || pBuildingRemove->nType == ENTITY_TYPE_DUMMY )
+    {
+        RemovePointerToBuilding ( );
+    }
     _asm
     {
         popad
