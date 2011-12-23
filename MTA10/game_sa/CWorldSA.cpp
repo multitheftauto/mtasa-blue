@@ -490,7 +490,7 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
                         // Remove the model from the world
                         Remove ( pInterface );
                         // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
-                        pInterface = pInterface->m_pLod;
+                        //pInterface = pInterface->m_pLod;
                     }
                     pFind->iCount = 1;
                 }
@@ -685,7 +685,7 @@ void CWorldSA::ClearRemovedBuildingLists ( )
                     // Grab the pEntity
                     pEntity = (*entityIter);
                     // if it's valid re-add it to the world.
-                    if ( pEntity && (DWORD)pEntity->vtbl == VTBL_CBUILDING )
+                    if ( pEntity && pEntity != NULL && (DWORD)pEntity->vtbl == VTBL_CBUILDING )
                     {
                         Add ( pEntity );
                     }
@@ -700,7 +700,7 @@ void CWorldSA::ClearRemovedBuildingLists ( )
                     // Grab the pEntity
                     pEntity = (*entityIter);
                     // if it's valid re-add it to the world.
-                    if ( pEntity && (DWORD)pEntity->vtbl == VTBL_CBUILDING )
+                    if ( pEntity && pEntity != NULL && (DWORD)pEntity->vtbl == VTBL_CBUILDING )
                     {
                         Add ( pEntity );
                     }
@@ -813,6 +813,8 @@ void CWorldSA::RemoveWorldBuilding ( CEntitySAInterface * pInterface )
                             else
                                 entityIter++;
                         }
+                        else
+                            entityIter++;
                     }
                 }
             }

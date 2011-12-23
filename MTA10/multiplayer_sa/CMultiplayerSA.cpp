@@ -6708,7 +6708,7 @@ void HideEntitySomehow ( )
             // Remove the model from the world
             pGameInterface->GetWorld ( )->Remove ( pInterface );
             // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
-            pInterface = pInterface->m_pLod;
+            //pInterface = pInterface->m_pLod;
         }
     }
     // Reset our next hook variable
@@ -6733,7 +6733,7 @@ void _declspec(naked) HOOK_CWorld_LOD_SETUP ()
 CEntitySAInterface * pBuildingAdd = NULL;
 void StorePointerToBuilding ( )
 {
-    if ( pBuildingAdd )
+    if ( pBuildingAdd != NULL )
     {
         pGameInterface->GetWorld ( )->AddDataBuilding ( pBuildingAdd );
     }
