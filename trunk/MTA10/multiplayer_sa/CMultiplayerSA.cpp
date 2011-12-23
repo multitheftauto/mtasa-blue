@@ -345,6 +345,9 @@ DWORD RETURN_LoadIPLInstance =                                     0x04061ED;
 #define HOOKPOS_CWorld_LOD_SETUP                                  0x406224
 DWORD CALL_CWorld_LODSETUP   =                                    0x404C90;
 
+#define HOOKPOS_CBuilding_DTR                                     0x404180
+DWORD JMP_CBuilding_DTR   =                                       0x535E90;
+
 #define HOOKPOS_AddBuildingInstancesToWorld_CWorldAdd             0x5B5348
 DWORD CALL_CWorldAdd   =                                          0x563220;
 DWORD RETURN_AddBuildingInstancesToWorld_CWorldAdd =              0x5B534D;
@@ -519,6 +522,9 @@ void HOOK_LoadIPLInstance ();
 void HOOK_CWorld_LOD_SETUP ();
 
 void Hook_AddBuildingInstancesToWorld ( );
+
+void Hook_CBuilding_DTR ( );
+
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -713,6 +719,8 @@ void CMultiplayerSA::InitHooks()
     HookInstallCall ( HOOKPOS_LoadIPLInstance, (DWORD)HOOK_LoadIPLInstance );
 
     HookInstallCall ( HOOKPOS_CWorld_LOD_SETUP, (DWORD)HOOK_CWorld_LOD_SETUP );;
+
+    HookInstall ( HOOKPOS_CBuilding_DTR, (DWORD)Hook_CBuilding_DTR, 5 );
 
     HookInstallCall ( HOOKPOS_AddBuildingInstancesToWorld_CWorldAdd, (DWORD)Hook_AddBuildingInstancesToWorld );
     // Disable GTA setting g_bGotFocus to false when we minimize
@@ -6693,7 +6701,7 @@ void HideEntitySomehow ( )
         // Grab the removal for the interface
         SBuildingRemoval* pBuildingRemoval = pGameInterface->GetWorld ( )->GetBuildingRemoval ( pInterface );
         // Remove down the LOD tree
-        while ( pInterface && pInterface != NULL )
+        //while ( pInterface && pInterface != NULL )
         {
             // Add the LOD to the list
             pBuildingRemoval->AddLOD ( pInterface );
@@ -6743,5 +6751,25 @@ void _declspec(naked) Hook_AddBuildingInstancesToWorld ( )
     {
         popad
         jmp CALL_CWorldAdd
+    }
+}
+
+CEntitySAInterface * pBuildingRemove = NULL;
+void RemovePointerToBuilding ( )
+{
+    pGameInterface->GetWorld ( )->RemoveWorldBuilding ( pBuildingRemove );
+}
+void _declspec(naked) Hook_CBuilding_DTR ( )
+{
+    _asm
+    {
+        pushad
+        mov pBuildingRemove, ecx
+    }
+   RemovePointerToBuilding ( );
+    _asm
+    {
+        popad
+        jmp JMP_CBuilding_DTR
     }
 }

@@ -87,8 +87,25 @@ struct SIPLInst
     BYTE        m_nInterior;
     BYTE        m_bLOD;
 };
- 
- 
+
+struct sDataBuildingRemoval
+{
+    sDataBuildingRemoval ( CEntitySAInterface * pInterface, bool bData )
+    {
+        m_pInterface = pInterface;
+        iCount = 0;
+    }
+    void AddCount ( )
+    {
+        iCount++;
+    }
+    void RemoveCount ( )
+    {
+        iCount--;
+    }
+    CEntitySAInterface * m_pInterface;
+    int iCount;
+};
 
 class CWorld
 {
@@ -119,6 +136,7 @@ public:
     virtual bool        RestoreBuilding             ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ ) = 0;
     virtual SBuildingRemoval*   GetBuildingRemoval  ( CEntitySAInterface * pInterface ) = 0;
     virtual void        AddDataBuilding             ( CEntitySAInterface * pInterface ) = 0;
+    virtual void        RemoveWorldBuilding         ( CEntitySAInterface * pInterface ) = 0;
 };
 
 #endif

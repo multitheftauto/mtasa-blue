@@ -101,9 +101,11 @@ public:
     bool                RestoreBuilding             ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ );
     SBuildingRemoval*   GetBuildingRemoval          ( CEntitySAInterface * pInterface );
     void                AddDataBuilding             ( CEntitySAInterface * pInterface );
+    void                RemoveWorldBuilding         ( CEntitySAInterface * pInterface );
+    void                AddBinaryBuilding           ( CEntitySAInterface * pInterface );
 private:
-    std::list< SBuildingRemoval* >                              *m_pBuildings;
-    std::list< CEntitySAInterface* >                            *m_pDataBuildings;
+    std::multimap< unsigned short, SBuildingRemoval* >          *m_pBuildings;
+    std::multimap < unsigned short, sDataBuildingRemoval* >     *m_pDataBuildings;
     std::map < unsigned short, unsigned short >                 *m_pRemovedObjects;
 };
 
