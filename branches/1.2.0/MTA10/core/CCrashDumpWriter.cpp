@@ -25,6 +25,7 @@ struct SLogEventInfo
 
 static std::list < SLogEventInfo >  ms_LogEventList;
 static std::map < int, int >        ms_CrashAvertedMap;
+static uint                         ms_uiTickCountBase = 0;
 
 
 typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hFile, MINIDUMP_TYPE DumpType,
@@ -62,10 +63,8 @@ void CCrashDumpWriter::OnCrashAverted ( uint uiId )
 ///////////////////////////////////////////////////////////////
 void CCrashDumpWriter::LogEvent ( const char* szType, const char* szContext, const char* szBody )
 {
-    uint uiTickCount = static_cast < uint > ( GetModuleTickCount64 () );
-
     SLogEventInfo info;
-    info.uiTickCount = uiTickCount;
+    info.uiTickCount = GetTickCount32 ();
     info.strType = szType;
     info.strContext = szContext;
     info.strBody = szBody;
@@ -99,6 +98,9 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal ( _EXCEPTION_POINTERS* pExce
                     delete pExceptionInformation;
                     return EXCEPTION_CONTINUE_SEARCH;
                 }
+
+                // Save tick count now
+                ms_uiTickCountBase = GetTickCount32 ();
 
                 // The client wants us to terminate the process
                 DumpCoreLog ( pExceptionInformation );
@@ -683,12 +685,10 @@ void CCrashDumpWriter::GetLogInfo ( CBuffer& buffer )
     // Write number of stats
     stream.Write ( ms_LogEventList.size () );
 
-    uint uiTickCountBase = static_cast < uint > ( GetModuleTickCount64 () );
-
     // Write stats
     for ( std::list < SLogEventInfo >::iterator iter = ms_LogEventList.begin () ; iter != ms_LogEventList.end () ; ++iter )
     {
-        stream.Write ( uiTickCountBase - iter->uiTickCount );
+        stream.Write ( ms_uiTickCountBase - iter->uiTickCount );
         stream.WriteString ( iter->strType );
         stream.WriteString ( iter->strContext );
         stream.WriteString ( iter->strBody );

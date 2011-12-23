@@ -6247,11 +6247,11 @@ bool _cdecl OnStreamingRequestFile ( int iFileId, int iBlockOffset, int iBlockCo
         static bool bLogClothesLoad = GetDebugIdEnabled ( 501 );
         if ( bLogClothesLoad )
         {
-            SString strMessage ( "%d - id:%d Loadflag:%d", GetTickCount32 (), iFileId, pImgGTAInfo->uiLoadflag );
+            SString strMessage ( "id:%d Loadflag:%d", iFileId, pImgGTAInfo->uiLoadflag );
             LogEvent ( 501, "Clothes Load", "", strMessage );
         }
 
-        if ( pImgGTAInfo->uiLoadflag > 0 )
+        if ( pImgGTAInfo->uiLoadflag > 1 )
             return false;
 
         pImgGTAInfo->uiUnknown1 = 0xffff;
@@ -6323,8 +6323,10 @@ bool _cdecl ShouldSkipLoadRequestedModels ( DWORD calledFrom )
     //      CClothesBuilder::ConstructGeometryArray      5A55A0 - 5A56B6
     //      CClothesBuilder::LoadAndPutOnClothes         5A5F70 - 5A6039
     //      CClothesBuilder::ConstructTextures           5A6040 - 5A6520
+#if WITH_RANDOM_CRASHES
     if ( calledFrom > 0x5A55A0 && calledFrom < 0x5A6520 )
         return true;
+#endif
 
     return false;
 }
