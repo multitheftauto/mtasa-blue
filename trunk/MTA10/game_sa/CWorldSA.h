@@ -94,17 +94,17 @@ public:
      * StopAllLawEnforcersInTheirTracks
 
      */
-    void                RemoveBuilding              ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ );
-    bool                IsRemovedModelInRadius      ( SIPLInst* pInst );
-    bool                IsModelRemoved              ( unsigned short modelID );
-    void                ClearRemovedBuildingLists   ( void );
-    bool                RestoreBuilding             ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ );
-    SBuildingRemoval*   GetBuildingRemoval          ( CEntitySAInterface * pInterface );
-    void                AddDataBuilding             ( CEntitySAInterface * pInterface );
-    void                RemoveWorldBuilding         ( CEntitySAInterface * pInterface );
-    void                AddBinaryBuilding           ( CEntitySAInterface * pInterface );
+    void                RemoveBuilding                  ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ );
+    bool                IsRemovedModelInRadius          ( SIPLInst* pInst );
+    bool                IsModelRemoved                  ( unsigned short modelID );
+    void                ClearRemovedBuildingLists       ( void );
+    bool                RestoreBuilding                 ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ );
+    SBuildingRemoval*   GetBuildingRemoval              ( CEntitySAInterface * pInterface );
+    void                AddDataBuilding                 ( CEntitySAInterface * pInterface );
+    void                RemoveWorldBuildingFromLists    ( CEntitySAInterface * pInterface );
+    void                AddBinaryBuilding               ( CEntitySAInterface * pInterface );
 private:
-    std::multimap< unsigned short, SBuildingRemoval* >          *m_pBuildings;
+    std::multimap< unsigned short, SBuildingRemoval* >          *m_pBinaryBuildings;
     std::multimap < unsigned short, sDataBuildingRemoval* >     *m_pDataBuildings;
     std::map < unsigned short, unsigned short >                 *m_pRemovedObjects;
 };
