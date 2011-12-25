@@ -52,31 +52,35 @@ struct SBuildingRemoval
 {
     SBuildingRemoval ( )
     {
-        pLODList = new std::list < CEntitySAInterface * >;
-        pDataRemoveList = new std::list < CEntitySAInterface * >;
-        usPreviousModel = 0;
-        vecPos = CVector( 0, 0, 0);
-        fRadius = 0.0f;
+        m_pBinaryRemoveList = new std::list < CEntitySAInterface * >;
+        m_pDataRemoveList = new std::list < CEntitySAInterface * >;
+        m_usModel = 0;
+        m_vecPos = CVector( 0, 0, 0);
+        m_fRadius = 0.0f;
     }
+
     ~SBuildingRemoval ( )
     {
-        delete pLODList;
-        delete pDataRemoveList;
+        delete m_pBinaryRemoveList;
+        delete m_pDataRemoveList;
     }
-    void AddLOD ( CEntitySAInterface * pInterface )
+
+    void AddBinaryBuilding ( CEntitySAInterface * pInterface )
     {
-        // Add to list of LOD's for this removal
-        pLODList->push_back ( pInterface );
+        // Add to list of binary buildings for this removal
+        m_pBinaryRemoveList->push_back ( pInterface );
     }
     void AddDataBuilding ( CEntitySAInterface * pInterface )
     {
-        pDataRemoveList->push_back ( pInterface );
+        // Add to list of data buildings for this removal
+        m_pDataRemoveList->push_back ( pInterface );
     }
-    unsigned short usPreviousModel;
-    CVector vecPos;
-    float fRadius;
-    std::list < CEntitySAInterface * > * pLODList;
-    std::list < CEntitySAInterface * > * pDataRemoveList;
+
+    unsigned short m_usModel;
+    CVector m_vecPos;
+    float m_fRadius;
+    std::list < CEntitySAInterface * > * m_pBinaryRemoveList;
+    std::list < CEntitySAInterface * > * m_pDataRemoveList;
 };
 struct SIPLInst
 {
@@ -93,18 +97,18 @@ struct sDataBuildingRemoval
     sDataBuildingRemoval ( CEntitySAInterface * pInterface, bool bData )
     {
         m_pInterface = pInterface;
-        iCount = 0;
+        m_iCount = 0;
     }
     void AddCount ( )
     {
-        iCount++;
+        m_iCount++;
     }
     void RemoveCount ( )
     {
-        iCount--;
+        m_iCount--;
     }
     CEntitySAInterface * m_pInterface;
-    int iCount;
+    int m_iCount;
 };
 
 class CWorld
@@ -136,7 +140,7 @@ public:
     virtual bool        RestoreBuilding             ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ ) = 0;
     virtual SBuildingRemoval*   GetBuildingRemoval  ( CEntitySAInterface * pInterface ) = 0;
     virtual void        AddDataBuilding             ( CEntitySAInterface * pInterface ) = 0;
-    virtual void        RemoveWorldBuilding         ( CEntitySAInterface * pInterface ) = 0;
+    virtual void        RemoveWorldBuildingFromLists         ( CEntitySAInterface * pInterface ) = 0;
 };
 
 #endif

@@ -6711,7 +6711,7 @@ void HideEntitySomehow ( )
         if ( pInterface && pInterface != NULL && pInterface->bIsProcObject == 0 && ( pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY ) )
         {
             // Add the LOD to the list
-            pBuildingRemoval->AddLOD ( pInterface );
+            pBuildingRemoval->AddBinaryBuilding ( pInterface );
             // Remove the model from the world
             pGameInterface->GetWorld ( )->Remove ( pInterface );
             // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
@@ -6766,7 +6766,7 @@ void RemovePointerToBuilding ( )
 {
     if ( pBuildingRemove->nType == ENTITY_TYPE_BUILDING || pBuildingRemove->nType == ENTITY_TYPE_DUMMY )
     {
-        pGameInterface->GetWorld ( )->RemoveWorldBuilding ( pBuildingRemove );
+        pGameInterface->GetWorld ( )->RemoveWorldBuildingFromLists ( pBuildingRemove );
     }
 }
 void _declspec(naked) Hook_CBuilding_DTR ( )
