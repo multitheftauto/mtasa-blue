@@ -345,8 +345,11 @@ DWORD RETURN_LoadIPLInstance =                                     0x04061ED;
 #define HOOKPOS_CWorld_LOD_SETUP                                  0x406224
 DWORD CALL_CWorld_LODSETUP   =                                    0x404C90;
 
-#define HOOKPOS_CBuilding_DTR                                     0x535E92
-DWORD JMP_CBuilding_DTR   =                                       0x406F55;
+#define HOOKPOS_CBuilding_DTR                                     0x404180
+DWORD JMP_CBuilding_DTR   =                                       0x535E90;
+
+#define HOOKPOS_CDummy_DTR                                        0x532566
+DWORD JMP_CDummy_DTR   =                                          0x535E90;
 
 #define HOOKPOS_AddBuildingInstancesToWorld_CWorldAdd             0x5B5348
 DWORD CALL_CWorldAdd   =                                          0x563220;
@@ -524,6 +527,8 @@ void HOOK_CWorld_LOD_SETUP ();
 void Hook_AddBuildingInstancesToWorld ( );
 
 void Hook_CBuilding_DTR ( );
+
+void Hook_CDummy_DTR ( );
 
 
 CMultiplayerSA::CMultiplayerSA()
@@ -721,6 +726,8 @@ void CMultiplayerSA::InitHooks()
     HookInstallCall ( HOOKPOS_CWorld_LOD_SETUP, (DWORD)HOOK_CWorld_LOD_SETUP );;
 
     HookInstall ( HOOKPOS_CBuilding_DTR, (DWORD)Hook_CBuilding_DTR, 5 );
+
+    HookInstall ( HOOKPOS_CDummy_DTR, (DWORD)Hook_CDummy_DTR, 5 );
 
     HookInstallCall ( HOOKPOS_AddBuildingInstancesToWorld_CWorldAdd, (DWORD)Hook_AddBuildingInstancesToWorld );
     // Disable GTA setting g_bGotFocus to false when we minimize
@@ -6757,7 +6764,10 @@ void _declspec(naked) Hook_AddBuildingInstancesToWorld ( )
 CEntitySAInterface * pBuildingRemove = NULL;
 void RemovePointerToBuilding ( )
 {
-    pGameInterface->GetWorld ( )->RemoveWorldBuilding ( pBuildingRemove );
+    if ( pBuildingRemove->nType == ENTITY_TYPE_BUILDING || pBuildingRemove->nType == ENTITY_TYPE_DUMMY )
+    {
+        pGameInterface->GetWorld ( )->RemoveWorldBuilding ( pBuildingRemove );
+    }
 }
 void _declspec(naked) Hook_CBuilding_DTR ( )
 {
@@ -6766,13 +6776,25 @@ void _declspec(naked) Hook_CBuilding_DTR ( )
         pushad
         mov pBuildingRemove, ecx
     }
-    if ( pBuildingRemove->nType == ENTITY_TYPE_BUILDING || pBuildingRemove->nType == ENTITY_TYPE_DUMMY )
-    {
-        RemovePointerToBuilding ( );
-    }
+    RemovePointerToBuilding ( );
     _asm
     {
         popad
         jmp JMP_CBuilding_DTR
+    }
+}
+
+void _declspec(naked) Hook_CDummy_DTR ( )
+{
+    _asm
+    {
+        pushad
+        mov pBuildingRemove, ecx
+    }
+    RemovePointerToBuilding ( );
+    _asm
+    {
+        popad
+        jmp JMP_CDummy_DTR
     }
 }

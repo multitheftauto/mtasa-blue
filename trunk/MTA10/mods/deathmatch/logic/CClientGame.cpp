@@ -3285,8 +3285,6 @@ void CClientGame::Event_OnIngame ( void )
 
     g_pGame->GetWorld ( )->ClearRemovedBuildingLists ( );
 
-    g_pGame->GetWorld ( )->ClearRemovedBuildingLists ( );
-
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat ( CITIES_PASSED, 2.0 );
 

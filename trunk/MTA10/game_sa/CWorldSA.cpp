@@ -500,22 +500,6 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
             }
         }
     }
-
-    // Grab the current camera position
-    CMatrix Matrix;
-    pGame->GetCamera ( )->GetMatrix ( &Matrix );
-    // Grab distances across each axis
-    float fDistanceX = Matrix.vPos.fX - pRemoval->vecPos.fX;
-    float fDistanceY = Matrix.vPos.fY - pRemoval->vecPos.fY;
-    float fDistanceZ = Matrix.vPos.fZ - pRemoval->vecPos.fZ;
-
-    // Square root 'em
-    float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
-    //  if distance is <= 300 do something
-    if ( fDistance <= 300 )
-    {
-        // Put Flush Code here or something
-    }
 }
 
 bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, float fX, float fY, float fZ )
@@ -783,7 +767,6 @@ void CWorldSA::AddDataBuilding ( CEntitySAInterface * pInterface )
 
 void CWorldSA::RemoveWorldBuilding ( CEntitySAInterface * pInterface )
 {
-    assert ( pInterface->m_nModelIndex != 0 );
     SBuildingRemoval * pFind = NULL;
     std::pair < std::multimap < unsigned short, SBuildingRemoval* >::iterator, std::multimap < unsigned short, SBuildingRemoval* >::iterator> iterators = m_pBuildings->equal_range ( pInterface->m_nModelIndex );
     std::multimap < unsigned short, SBuildingRemoval* > ::const_iterator iter = iterators.first;
@@ -802,7 +785,7 @@ void CWorldSA::RemoveWorldBuilding ( CEntitySAInterface * pInterface )
                 for ( ; entityIter != pFind->pLODList->end (); )
                 {
                     pEntity = (*entityIter);
-                    if ( pEntity == pInterface )
+                    if ( (DWORD)pEntity == (DWORD)pInterface )
                     {
                         pFind->pLODList->erase ( entityIter++ );
                     }
@@ -820,7 +803,7 @@ void CWorldSA::RemoveWorldBuilding ( CEntitySAInterface * pInterface )
                     pEntity = (*entityIter);
                     if ( pEntity )
                     {
-                        if ( pEntity == pInterface )
+                        if ( (DWORD)pEntity == (DWORD)pInterface )
                         {
                             pFind->pDataRemoveList->erase ( entityIter++ );
                         }
@@ -841,7 +824,7 @@ void CWorldSA::RemoveWorldBuilding ( CEntitySAInterface * pInterface )
         pFound = (*iterator).second;
         if ( pFound )
         {
-            if ( pFound->m_pInterface == pInterface )
+            if ( (DWORD)pFound->m_pInterface == (DWORD)pInterface )
             {
                 m_pDataBuildings->erase ( iterator++ );
             }
