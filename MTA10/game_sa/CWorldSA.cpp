@@ -207,6 +207,11 @@ bool CWorldSA::ProcessLineOfSight(const CVector * vecStart, const CVector * vecE
             {
                 pBuildingResult->bValid = true;
                 pBuildingResult->usModelID = targetEntity->m_nModelIndex;
+                if ( targetEntity->m_pLod )
+                    pBuildingResult->usLODModelID = targetEntity->m_pLod->m_nModelIndex;
+                else
+                    pBuildingResult->usLODModelID = 0;
+
                 pBuildingResult->vecPosition = targetEntity->Placeable.m_transform.m_translate;
                 if ( targetEntity->Placeable.matrix )
                 {
