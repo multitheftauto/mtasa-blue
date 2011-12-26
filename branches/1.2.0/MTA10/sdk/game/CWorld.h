@@ -44,6 +44,7 @@ struct SLineOfSightBuildingResult
     {}
     bool bValid;
     ushort usModelID;
+    ushort usLODModelID;
     CVector vecPosition;
     CVector vecRotation;
 };
