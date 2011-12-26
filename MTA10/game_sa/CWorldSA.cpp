@@ -549,7 +549,7 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
                             if ( ( pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY ) && pEntity->bRemoveFromWorld != 1 )
                             {
                                 // Don't call this on entities being removed.
-                                if ( (DWORD)(pEntity->vtbl->Add) != VTBL_CPlaceable )
+                                if ( (DWORD)(pEntity->vtbl) != VTBL_CPlaceable )
                                 {
                                     Add ( pEntity );
                                 }
@@ -690,7 +690,7 @@ void CWorldSA::ClearRemovedBuildingLists ( )
                         if ( ( pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY ) && pEntity->bRemoveFromWorld != 1 )
                         {
                             // Don't call this on entities being removed.
-                            if ( (DWORD)(pEntity->vtbl->Add) != VTBL_CPlaceable )
+                            if ( (DWORD)(pEntity->vtbl) != VTBL_CPlaceable )
                             {
                                 Add ( pEntity );
                             }
