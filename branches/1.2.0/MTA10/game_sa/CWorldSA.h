@@ -42,14 +42,16 @@
 #define NUM_StreamRepeatSectorCols                          16
 #define VAR_fJetpackMaxHeight                               0x8703D8
 #define VAR_fAircraftMaxHeight                              0x8594DC
-
+#define VTBL_CBUILDING                                      0x8585C8
 
 #include <game/CWorld.h>
 #include "CEntitySA.h"
-
+#include "CBuildingSA.h"
+#include <google/dense_hash_map>
 class CWorldSA : public CWorld
 {
 public:
+    CWorldSA ( );
     void        Add                       ( CEntity * entity );
     void        Add                       ( CEntitySAInterface * entityInterface );
     void        Remove                    ( CEntity * entity );
@@ -92,6 +94,19 @@ public:
      * StopAllLawEnforcersInTheirTracks
 
      */
+    void                RemoveBuilding                  ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ );
+    bool                IsRemovedModelInRadius          ( SIPLInst* pInst );
+    bool                IsModelRemoved                  ( unsigned short modelID );
+    void                ClearRemovedBuildingLists       ( void );
+    bool                RestoreBuilding                 ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ );
+    SBuildingRemoval*   GetBuildingRemoval              ( CEntitySAInterface * pInterface );
+    void                AddDataBuilding                 ( CEntitySAInterface * pInterface );
+    void                RemoveWorldBuildingFromLists    ( CEntitySAInterface * pInterface );
+    void                AddBinaryBuilding               ( CEntitySAInterface * pInterface );
+private:
+    std::multimap< unsigned short, SBuildingRemoval* >          *m_pBinaryBuildings;
+    std::multimap < unsigned short, sDataBuildingRemoval* >     *m_pDataBuildings;
+    std::map < unsigned short, unsigned short >                 *m_pRemovedObjects;
 };
 
 #endif

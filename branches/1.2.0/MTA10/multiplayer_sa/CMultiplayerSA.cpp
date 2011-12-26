@@ -22,6 +22,7 @@
 // These includes have to be fixed!
 #include "..\game_sa\CCameraSA.h"
 #include "..\game_sa\CEntitySA.h"
+#include "..\game_sa\CBuildingSA.h"
 #include "..\game_sa\CPedSA.h"
 #include "..\game_sa\common.h"
 
@@ -333,6 +334,23 @@ DWORD RETURN_CWorldScan_ScanWorldb =                0x72CAE0;
 #define HOOKPOS_CVisibilityPlugins_CalculateFadingAtomicAlpha   0x732500    // 5 bytes
 DWORD RETURN_CVisibilityPlugins_CalculateFadingAtomicAlpha =    0x732505;
 
+#define HOOKPOS_LoadIPLInstance                                    0x4061E8
+DWORD CALL_LoadIPLInstance   =                                     0x538090;
+DWORD RETURN_LoadIPLInstance =                                     0x04061ED;
+
+#define HOOKPOS_CWorld_LOD_SETUP                                  0x406224
+DWORD CALL_CWorld_LODSETUP   =                                    0x404C90;
+
+#define HOOKPOS_CBuilding_DTR                                     0x404180
+DWORD JMP_CBuilding_DTR   =                                       0x535E90;
+
+#define HOOKPOS_CDummy_DTR                                        0x532566
+DWORD JMP_CDummy_DTR   =                                          0x535E90;
+
+#define HOOKPOS_AddBuildingInstancesToWorld_CWorldAdd             0x5B5348
+DWORD CALL_CWorldAdd   =                                          0x563220;
+DWORD RETURN_AddBuildingInstancesToWorld_CWorldAdd =              0x5B534D;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -497,6 +515,17 @@ void HOOK_CWorldScan_ScanWorld ();
 void HOOK_CVisibilityPlugins_CalculateFadingAtomicAlpha ();
 
 void vehicle_lights_init ();
+
+void HOOK_LoadIPLInstance ();
+
+void HOOK_CWorld_LOD_SETUP ();
+
+void Hook_AddBuildingInstancesToWorld ( );
+
+void Hook_CBuilding_DTR ( );
+
+void Hook_CDummy_DTR ( );
+
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -683,6 +712,15 @@ void CMultiplayerSA::InitHooks()
     HookInstallCall ( CALL_CTrafficLights_GetPrimaryLightState, (DWORD)HOOK_CTrafficLights_GetPrimaryLightState);
     HookInstallCall ( CALL_CTrafficLights_GetSecondaryLightState, (DWORD)HOOK_CTrafficLights_GetSecondaryLightState);
 
+    HookInstallCall ( HOOKPOS_LoadIPLInstance, (DWORD)HOOK_LoadIPLInstance );
+
+    HookInstallCall ( HOOKPOS_CWorld_LOD_SETUP, (DWORD)HOOK_CWorld_LOD_SETUP );;
+
+    HookInstall ( HOOKPOS_CBuilding_DTR, (DWORD)Hook_CBuilding_DTR, 5 );
+
+    HookInstall ( HOOKPOS_CDummy_DTR, (DWORD)Hook_CDummy_DTR, 5 );
+
+    HookInstallCall ( HOOKPOS_AddBuildingInstancesToWorld_CWorldAdd, (DWORD)Hook_AddBuildingInstancesToWorld );
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
 
@@ -6600,5 +6638,155 @@ second:
         mov     ecx, [esp+8]
         jmp     RETURN_CVisibilityPlugins_CalculateFadingAtomicAlpha                // 732505
 
+    }
+}
+// Variables
+SIPLInst* pEntityWorldAdd = NULL;
+CEntitySAInterface * pLODInterface = NULL; 
+bool bNextHookSetModel = false;
+
+bool CheckRemovedModel ( )
+{
+    // Init our variables
+    bNextHookSetModel = false;
+    pLODInterface = NULL;
+    CWorld* pWorld = pGameInterface->GetWorld();
+    // You never know.
+    if ( pWorld )
+    {
+        // Is the model in question even removed?
+        if ( pWorld->IsModelRemoved ( pEntityWorldAdd->m_nModelIndex ) )
+        {
+            // is the replaced model in the spherical radius of any building removal
+            if ( pGameInterface->GetWorld ( )->IsRemovedModelInRadius ( pEntityWorldAdd ) )
+            {
+                // if it is next hook remove it from the world
+                bNextHookSetModel = true;
+                return true;
+            }
+        }
+        return false;
+    }
+    return false;
+}
+// Hook 1
+void _declspec(naked) HOOK_LoadIPLInstance ()
+{
+    _asm
+    {
+        pushad
+        mov pEntityWorldAdd, ecx
+    }
+    if ( pEntityWorldAdd )
+    {
+        CheckRemovedModel ( );
+    }
+    _asm
+    {
+        popad
+        jmp CALL_LoadIPLInstance
+        jmp RETURN_LoadIPLInstance
+    }
+}
+
+
+void HideEntitySomehow ( )
+{
+    // Did we get instructed to set the model
+    if ( bNextHookSetModel && pLODInterface )
+    {
+        // Init pInterface with the Initial model
+        CEntitySAInterface * pInterface = pLODInterface;
+        // Grab the removal for the interface
+        SBuildingRemoval* pBuildingRemoval = pGameInterface->GetWorld ( )->GetBuildingRemoval ( pInterface );
+        // Remove down the LOD tree
+        if ( pInterface && pInterface != NULL && pInterface->bIsProcObject == 0 && ( pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY ) )
+        {
+            // Add the LOD to the list
+            pBuildingRemoval->AddBinaryBuilding ( pInterface );
+            // Remove the model from the world
+            pGameInterface->GetWorld ( )->Remove ( pInterface );
+            // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
+            //pInterface = pInterface->m_pLod;
+        }
+    }
+    // Reset our next hook variable
+    bNextHookSetModel = false;
+}
+// Hook 2
+void _declspec(naked) HOOK_CWorld_LOD_SETUP ()
+{
+    _asm
+    {
+        pushad
+        mov pLODInterface, esi
+    }
+    HideEntitySomehow ( );
+    _asm
+    {
+        popad
+        jmp CALL_CWorld_LODSETUP
+    }
+}
+
+CEntitySAInterface * pBuildingAdd = NULL;
+void StorePointerToBuilding ( )
+{
+    if ( pBuildingAdd != NULL )
+    {
+        pGameInterface->GetWorld ( )->AddDataBuilding ( pBuildingAdd );
+    }
+}
+// Called when a data entity is added to the world (this happens once when the game loads so we just dump those in a list and we can sift through when someone tries to remove.)
+void _declspec(naked) Hook_AddBuildingInstancesToWorld ( )
+{
+    _asm
+    {
+        pushad
+        mov pBuildingAdd, edx
+    }
+    StorePointerToBuilding ( );
+    _asm
+    {
+        popad
+        jmp CALL_CWorldAdd
+    }
+}
+
+CEntitySAInterface * pBuildingRemove = NULL;
+void RemovePointerToBuilding ( )
+{
+    if ( pBuildingRemove->nType == ENTITY_TYPE_BUILDING || pBuildingRemove->nType == ENTITY_TYPE_DUMMY )
+    {
+        pGameInterface->GetWorld ( )->RemoveWorldBuildingFromLists ( pBuildingRemove );
+    }
+}
+void _declspec(naked) Hook_CBuilding_DTR ( )
+{
+    _asm
+    {
+        pushad
+        mov pBuildingRemove, ecx
+    }
+    RemovePointerToBuilding ( );
+    _asm
+    {
+        popad
+        jmp JMP_CBuilding_DTR
+    }
+}
+
+void _declspec(naked) Hook_CDummy_DTR ( )
+{
+    _asm
+    {
+        pushad
+        mov pBuildingRemove, ecx
+    }
+    RemovePointerToBuilding ( );
+    _asm
+    {
+        popad
+        jmp JMP_CDummy_DTR
     }
 }

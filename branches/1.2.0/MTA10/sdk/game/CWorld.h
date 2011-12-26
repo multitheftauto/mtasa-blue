@@ -48,12 +48,75 @@ struct SLineOfSightBuildingResult
     CVector vecRotation;
 };
 
+struct SBuildingRemoval
+{
+    SBuildingRemoval ( )
+    {
+        m_pBinaryRemoveList = new std::list < CEntitySAInterface * >;
+        m_pDataRemoveList = new std::list < CEntitySAInterface * >;
+        m_usModel = 0;
+        m_vecPos = CVector( 0, 0, 0);
+        m_fRadius = 0.0f;
+    }
+
+    ~SBuildingRemoval ( )
+    {
+        delete m_pBinaryRemoveList;
+        delete m_pDataRemoveList;
+    }
+
+    void AddBinaryBuilding ( CEntitySAInterface * pInterface )
+    {
+        // Add to list of binary buildings for this removal
+        m_pBinaryRemoveList->push_back ( pInterface );
+    }
+    void AddDataBuilding ( CEntitySAInterface * pInterface )
+    {
+        // Add to list of data buildings for this removal
+        m_pDataRemoveList->push_back ( pInterface );
+    }
+
+    unsigned short m_usModel;
+    CVector m_vecPos;
+    float m_fRadius;
+    std::list < CEntitySAInterface * > * m_pBinaryRemoveList;
+    std::list < CEntitySAInterface * > * m_pDataRemoveList;
+};
+struct SIPLInst
+{
+    CVector     m_pPosition;
+    CVector     m_pRotation;
+    float       m_fRotationCont;
+    WORD        m_nModelIndex;
+    BYTE        m_nInterior;
+    BYTE        m_bLOD;
+};
+
+struct sDataBuildingRemoval
+{
+    sDataBuildingRemoval ( CEntitySAInterface * pInterface, bool bData )
+    {
+        m_pInterface = pInterface;
+        m_iCount = 0;
+    }
+    void AddCount ( )
+    {
+        m_iCount++;
+    }
+    void RemoveCount ( )
+    {
+        m_iCount--;
+    }
+    CEntitySAInterface * m_pInterface;
+    int m_iCount;
+};
 
 class CWorld
 {
 public:
     virtual void        Add                         ( CEntity * entity ) = 0;
     virtual void        Remove                      ( CEntity * entity ) = 0;
+    virtual void        Remove                      ( CEntitySAInterface * entityInterface ) = 0;
     virtual bool        ProcessLineOfSight          ( const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, CEntity ** CollisionEntity, const SLineOfSightFlags flags = SLineOfSightFlags(), SLineOfSightBuildingResult* pBuildingResult = NULL ) = 0;
     // THIS FUNCTION IS INCOMPLETE AND SHOULD NOT BE USED ----------v
     virtual bool        TestLineSphere              ( CVector * vecStart, CVector * vecEnd, CVector * vecSphereCenter, float fSphereRadius, CColPoint ** colCollision ) = 0;
@@ -70,6 +133,14 @@ public:
     virtual float       GetJetpackMaxHeight         ( void ) = 0;
     virtual void        SetAircraftMaxHeight        ( float fHeight ) = 0;
     virtual float       GetAircraftMaxHeight        ( void ) = 0;
+    virtual void        RemoveBuilding              ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ) = 0;
+    virtual bool        IsRemovedModelInRadius      ( SIPLInst* pInst ) = 0;
+    virtual bool        IsModelRemoved              ( unsigned short usModelID ) = 0;
+    virtual void        ClearRemovedBuildingLists   ( void ) = 0;
+    virtual bool        RestoreBuilding             ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ ) = 0;
+    virtual SBuildingRemoval*   GetBuildingRemoval  ( CEntitySAInterface * pInterface ) = 0;
+    virtual void        AddDataBuilding             ( CEntitySAInterface * pInterface ) = 0;
+    virtual void        RemoveWorldBuildingFromLists         ( CEntitySAInterface * pInterface ) = 0;
 };
 
 #endif

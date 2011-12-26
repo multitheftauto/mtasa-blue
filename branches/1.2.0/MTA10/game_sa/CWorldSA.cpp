@@ -15,6 +15,11 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+CWorldSA::CWorldSA ( )
+{
+    m_pBinaryBuildings = new std::multimap< unsigned short, SBuildingRemoval* >;
+    m_pDataBuildings = new std::multimap < unsigned short, sDataBuildingRemoval* >;
+}
 
 void CWorldSA::Add ( CEntity * pEntity )
 {
@@ -442,4 +447,419 @@ void CWorldSA::SetAircraftMaxHeight ( float fHeight )
 float CWorldSA::GetAircraftMaxHeight ( void )
 {
     return *(float *)( VAR_fAircraftMaxHeight );
+}
+
+void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, float fX, float fY, float fZ)
+{    
+    // New building Removal
+    SBuildingRemoval* pRemoval = new SBuildingRemoval();
+    pRemoval->m_usModel = usModelToRemove;
+    pRemoval->m_vecPos.fX = fX;
+    pRemoval->m_vecPos.fY = fY;
+    pRemoval->m_vecPos.fZ = fZ;
+    pRemoval->m_fRadius = fRange;
+
+    // Push it to the back of the removal list
+    m_pBinaryBuildings->insert ( std::pair<unsigned short, SBuildingRemoval*> ( usModelToRemove, pRemoval ) );
+
+    // Init loop variables
+    sDataBuildingRemoval * pFind = NULL;
+    std::pair < std::multimap < unsigned short, sDataBuildingRemoval*>::iterator, std::multimap < unsigned short, sDataBuildingRemoval* >::iterator> iterators = m_pDataBuildings->equal_range ( usModelToRemove );
+    std::multimap < unsigned short, sDataBuildingRemoval* > ::const_iterator iter = iterators.first;
+    for ( ; iter != iterators.second; ++iter )
+    {
+        pFind = (*iter).second;
+        if ( pFind )
+        {
+            // if the count is <= 0 and the interface is valid check the distance in case we found a removal (count is used to store if we have already removed this once)
+            if ( pFind->m_iCount <= 0 && pFind->m_pInterface )
+            {
+                // Grab distances across each axis
+                float fDistanceX = fX - pFind->m_pInterface->Placeable.m_transform.m_translate.fX;
+                float fDistanceY = fY - pFind->m_pInterface->Placeable.m_transform.m_translate.fY;
+                float fDistanceZ = fZ - pFind->m_pInterface->Placeable.m_transform.m_translate.fZ;
+
+                // Square root 'em
+                float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
+
+                // Is it in range
+                if ( fDistance <= fRange && pFind->m_pInterface->bIsProcObject == 0 )
+                {
+                    CEntitySAInterface * pInterface = pFind->m_pInterface;
+                    //while ( pInterface && pInterface != NULL )
+                    // if the interface is valid
+                    if ( pInterface && pInterface != NULL )
+                    {
+                        // if the building type is dummy or building and it's not already being removed
+                        if ( ( pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY ) && pInterface->bRemoveFromWorld != 1 )
+                        {
+                            // Add the Data Building to the list
+                            pRemoval->AddDataBuilding ( pInterface );
+                            // Remove the model from the world
+                            Remove ( pInterface );
+                        }
+                        // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
+                        //pInterface = pInterface->m_pLod;
+                    }
+                    // Set the count.
+                    pFind->m_iCount = 1;
+                }
+            }
+        }
+    }
+}
+
+bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, float fX, float fY, float fZ )
+{        
+    bool bSuccess = false;
+    // Init some variables
+    SBuildingRemoval * pFind = NULL;
+    std::pair < std::multimap < unsigned short, SBuildingRemoval* >::iterator, std::multimap < unsigned short, SBuildingRemoval* >::iterator> iterators = m_pBinaryBuildings->equal_range ( usModelToRestore );
+    std::multimap < unsigned short, SBuildingRemoval* > ::const_iterator iter = iterators.first;
+    // Loop through the buildings list
+    for ( ; iter != iterators.second;  )
+    {
+        pFind = (*iter).second;
+        // if pFind is valid and the model is the same
+        if ( pFind )
+        {
+            // Grab distances across each axis
+            float fDistanceX = fX - pFind->m_vecPos.fX;
+            float fDistanceY = fY - pFind->m_vecPos.fY;
+            float fDistanceZ = fZ - pFind->m_vecPos.fZ;
+
+            // Square root 'em
+            float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
+            if ( fDistance <= pFind->m_fRadius )
+            {
+                // Init some variables
+                CEntitySAInterface * pEntity = NULL;
+                std::list < CEntitySAInterface* > ::const_iterator entityIter = pFind->m_pBinaryRemoveList->begin ( );
+                if ( pFind->m_pBinaryRemoveList->empty ( ) == false ) 
+                {
+                    // Loop through the Binary object list
+                    for ( ; entityIter != pFind->m_pBinaryRemoveList->end (); )
+                    {
+                        // Grab the pEntity
+                        pEntity = (*entityIter);
+                        // if it's valid re-add it to the world.
+                        if ( pEntity != NULL )
+                        {
+                            // if the building type is dummy or building and it's not already being removed
+                            if ( ( pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY ) && pEntity->bRemoveFromWorld != 1 )
+                            {
+                                // Don't call this on entities being removed.
+                                if ( (DWORD)(pEntity->vtbl) != VTBL_CPlaceable )
+                                {
+                                    Add ( pEntity );
+                                }
+                            }
+                            // Remove it from the binary list
+                            pFind->m_pBinaryRemoveList->erase ( entityIter++ );
+                        }
+                        else
+                            ++entityIter;
+                    }
+                }
+                // Start the iterator with the data remove list first item
+                entityIter = pFind->m_pDataRemoveList->begin ( );
+                if ( pFind->m_pDataRemoveList->empty ( ) == false )
+                {
+                    // Loop through the Data list
+                    for ( ; entityIter != pFind->m_pDataRemoveList->end (); )
+                    {
+                        // Grab the pEntity
+                        pEntity = (*entityIter);
+                        // if it's valid re-add it to the world.
+                        if ( pEntity != NULL )
+                        {
+                            // if the building type is dummy or building and it's not already being removed
+                            if ( ( pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY ) && pEntity->bRemoveFromWorld != 1 )
+                            {
+                                Add ( pEntity );
+                            }
+                            pFind->m_pDataRemoveList->erase ( entityIter++ );
+                        }
+                        else
+                        {
+                            ++entityIter;
+                        }
+                    }
+                }
+                // Remove the building from the list
+                m_pBinaryBuildings->erase ( iter++ );
+                delete pFind;
+                // Success! don't return incase there are any others to delete
+                bSuccess = true;
+            }
+            else
+                iter++;
+        }
+        else
+            iter++;
+    }
+    sDataBuildingRemoval * pFound = NULL;
+    std::pair < std::multimap < unsigned short, sDataBuildingRemoval*>::iterator, std::multimap < unsigned short, sDataBuildingRemoval* >::iterator> dataBuildingIterators = m_pDataBuildings->equal_range ( usModelToRestore );
+    std::multimap < unsigned short, sDataBuildingRemoval* > ::const_iterator iterator = dataBuildingIterators.first;
+    for ( ; iterator != dataBuildingIterators.second; ++iterator )
+    {
+        pFound = (*iterator).second;
+        if ( pFound )
+        {
+            // Grab distances across each axis
+            float fDistanceX = fX - pFound->m_pInterface->Placeable.m_transform.m_translate.fX;
+            float fDistanceY = fY - pFound->m_pInterface->Placeable.m_transform.m_translate.fY;
+            float fDistanceZ = fZ - pFound->m_pInterface->Placeable.m_transform.m_translate.fZ;
+
+            // Square root 'em
+            float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
+            if ( fDistance <= fRange )
+            {
+                // Fix the removed count.
+                pFound->m_iCount--;
+                if ( pFound->m_iCount < 0 )
+                    pFound->m_iCount = 0;
+            }
+        }
+
+    }
+    return bSuccess;
+}
+
+// Check Distance to see if the model being requested is in the radius
+bool CWorldSA::IsRemovedModelInRadius ( SIPLInst* pInst )
+{
+    // Init some variables
+    SBuildingRemoval * pFind = NULL;
+    std::pair < std::multimap < unsigned short, SBuildingRemoval* >::iterator, std::multimap < unsigned short, SBuildingRemoval* >::iterator> iterators = m_pBinaryBuildings->equal_range ( pInst->m_nModelIndex );
+    std::multimap < unsigned short, SBuildingRemoval* > ::const_iterator iter = iterators.first;
+    // Loop through the buildings list
+    for ( ; iter != iterators.second; ++iter )
+    {
+        pFind = (*iter).second;
+        // if pFind is valid and the model is the same
+        if ( pFind )
+        {
+            // Grab the distance
+            float fDistanceX = pFind->m_vecPos.fX - pInst->m_pPosition.fX;
+            float fDistanceY = pFind->m_vecPos.fY - pInst->m_pPosition.fY;
+            float fDistanceZ = pFind->m_vecPos.fZ - pInst->m_pPosition.fZ;
+
+            float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
+            // is it in the removal spheres radius if so return else keep looking
+            if ( fDistance <=  pFind->m_fRadius )
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+// Check if a given model is replaced
+bool CWorldSA::IsModelRemoved ( unsigned short usModelID )
+{
+    return m_pBinaryBuildings->count ( usModelID ) > 0;
+}
+
+// Resets deleted list
+void CWorldSA::ClearRemovedBuildingLists ( )
+{
+    // Ensure no memory leaks by deleting items.
+    SBuildingRemoval * pFind = NULL;
+    std::multimap < unsigned short, SBuildingRemoval* > ::const_iterator iter = m_pBinaryBuildings->begin ( );
+    for ( ; iter != m_pBinaryBuildings->end ( ); )
+    {
+        pFind = (*iter).second;
+        if ( pFind )
+        {
+            // Init some variables
+            CEntitySAInterface * pEntity = NULL;
+            std::list < CEntitySAInterface* > ::const_iterator entityIter = pFind->m_pBinaryRemoveList->begin ( );
+            if ( pFind->m_pBinaryRemoveList->empty ( ) == false )
+            {
+                // Loop through the Binary remove list
+                for ( ; entityIter != pFind->m_pBinaryRemoveList->end (); ++entityIter )
+                {
+                    // Grab the pEntity
+                    pEntity = (*entityIter);
+                    // if it's valid re-add it to the world.
+                    if ( pEntity && pEntity != NULL )
+                    {
+                        // if the building type is dummy or building and it's not already being removed
+                        if ( ( pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY ) && pEntity->bRemoveFromWorld != 1 )
+                        {
+                            // Don't call this on entities being removed.
+                            if ( (DWORD)(pEntity->vtbl) != VTBL_CPlaceable )
+                            {
+                                Add ( pEntity );
+                            }
+                        }
+                    }
+                }
+            }
+            entityIter = pFind->m_pDataRemoveList->begin ( );
+            if ( pFind->m_pDataRemoveList->empty ( ) == false )
+            {
+                // Loop through the Data list
+                for ( ; entityIter != pFind->m_pDataRemoveList->end (); ++entityIter )
+                {
+                    // Grab the pEntity
+                    pEntity = (*entityIter);
+                    // if it's valid re-add it to the world.
+                    if ( pEntity && pEntity != NULL )
+                    {
+                        // if the building type is dummy or building and it's not already being removed
+                        if ( ( pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY ) && pEntity->bRemoveFromWorld != 1 )
+                        {
+                            Add ( pEntity );
+                        }
+                    }
+                }
+            }
+            m_pBinaryBuildings->erase ( iter++ );
+        }
+        else
+            iter++;
+    }
+    // Init some variables
+    sDataBuildingRemoval * pFound = NULL;   
+    std::multimap < unsigned short, sDataBuildingRemoval* > ::const_iterator iterator = m_pDataBuildings->begin ( );
+    // Loop through the data building list
+    for ( ; iterator != m_pDataBuildings->end ( ); ++iterator )
+    {
+        pFound = (*iterator).second;
+        if ( pFound )
+        {
+            // Set the count to 0 so we can remove it again
+            pFound->m_iCount = 0;
+        }
+
+    }
+    // Delete old building lists
+    delete m_pBinaryBuildings;
+    // Create new
+    m_pBinaryBuildings = new std::multimap< unsigned short, SBuildingRemoval* >;
+}
+
+
+// Resets deleted list
+SBuildingRemoval* CWorldSA::GetBuildingRemoval ( CEntitySAInterface * pInterface )
+{
+    // Init some variables
+    SBuildingRemoval * pFind = NULL;
+    std::pair < std::multimap < unsigned short, SBuildingRemoval* >::iterator, std::multimap < unsigned short, SBuildingRemoval* >::iterator> iterators = m_pBinaryBuildings->equal_range ( pInterface->m_nModelIndex );
+    std::multimap < unsigned short, SBuildingRemoval* > ::const_iterator iter = iterators.first;
+    // Loop through the buildings list
+    for ( ; iter != iterators.second; ++iter )
+    {
+        pFind = (*iter).second;
+        // if pFind is valid and the model is the same
+        if ( pFind )
+        {
+            // Grab the distance
+            float fDistanceX = pFind->m_vecPos.fX - pInterface->Placeable.m_transform.m_translate.fX;
+            float fDistanceY = pFind->m_vecPos.fY - pInterface->Placeable.m_transform.m_translate.fY;
+            float fDistanceZ = pFind->m_vecPos.fZ - pInterface->Placeable.m_transform.m_translate.fZ;
+
+            float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
+            // is it in the removal spheres radius if so return else keep looking
+            if ( fDistance <=  pFind->m_fRadius )
+            {
+                return pFind;
+            }
+        }
+    }
+    return NULL;
+}
+
+void CWorldSA::AddDataBuilding ( CEntitySAInterface * pInterface )
+{
+    // Create a new building removal
+    sDataBuildingRemoval * pBuildingRemoval = new sDataBuildingRemoval ( pInterface, true );
+    // Insert it with the model index so we can fast lookup
+    m_pDataBuildings->insert ( std::pair<unsigned short, sDataBuildingRemoval*> ( (unsigned short)pInterface->m_nModelIndex, pBuildingRemoval ) );
+}
+
+void CWorldSA::RemoveWorldBuildingFromLists ( CEntitySAInterface * pInterface )
+{
+    SBuildingRemoval * pFind = NULL;
+    std::pair < std::multimap < unsigned short, SBuildingRemoval* >::iterator, std::multimap < unsigned short, SBuildingRemoval* >::iterator> iterators = m_pBinaryBuildings->equal_range ( pInterface->m_nModelIndex );
+    std::multimap < unsigned short, SBuildingRemoval* > ::const_iterator iter = iterators.first;
+
+    // Loop through the buildings list
+    for ( ; iter != iterators.second; ++iter )
+    {
+        pFind = (*iter).second;
+        // if pFind is valid and the model is the same
+        if ( pFind )
+        {
+            CEntitySAInterface * pEntity = NULL;
+            // if the binary remove list is empty don't continue
+            if ( pFind->m_pBinaryRemoveList->empty ( ) == false )
+            {
+                // grab the beginning
+                std::list < CEntitySAInterface* > ::const_iterator entityIter = pFind->m_pBinaryRemoveList->begin ( );
+                // Loop through the binary remove list
+                for ( ; entityIter != pFind->m_pBinaryRemoveList->end (); )
+                {
+                    pEntity = (*entityIter);
+                    // is the pointer the same as the one being deleted
+                    if ( (DWORD)pEntity == (DWORD)pInterface )
+                    {
+                        // remove it from the binary removed list for this removal
+                        pFind->m_pBinaryRemoveList->erase ( entityIter++ );
+                    }
+                    else
+                        entityIter++;
+                }
+            }
+            if ( pFind->m_pDataRemoveList->empty ( ) == false )
+            {
+                std::list < CEntitySAInterface* > ::const_iterator entityIter = pFind->m_pDataRemoveList->begin ( );
+                // Loop through the Data list
+                for ( ; entityIter != pFind->m_pDataRemoveList->end (); )
+                {
+                    // Grab the pEntity
+                    pEntity = (*entityIter);
+                    if ( pEntity )
+                    {
+                        // is the pointer the same as the one being deleted
+                        if ( (DWORD)pEntity == (DWORD)pInterface )
+                        {
+                            // remove it from the data removed list for this removal
+                            pFind->m_pDataRemoveList->erase ( entityIter++ );
+                        }
+                        else
+                            entityIter++;
+                    }
+                    else
+                        entityIter++;
+                }
+            }
+        }
+    }
+
+    // Init some variables
+    sDataBuildingRemoval * pFound = NULL;
+    std::pair < std::multimap < unsigned short, sDataBuildingRemoval* >::iterator, std::multimap < unsigned short, sDataBuildingRemoval* >::iterator> dataIterators = m_pDataBuildings->equal_range ( pInterface->m_nModelIndex );
+    std::multimap < unsigned short, sDataBuildingRemoval* > ::const_iterator iterator = dataIterators.first;
+    for ( ; iterator != dataIterators.second; )
+    {
+        pFound = (*iterator).second;
+        if ( pFound )
+        {
+            // is the pointer the same as the one being deleted
+            if ( (DWORD)pFound->m_pInterface == (DWORD)pInterface )
+            {
+                // remove it from the data buildings list so we don't try and remove or add it again.
+                m_pDataBuildings->erase ( iterator++ );
+            }
+            else
+                iterator++;
+        }
+        else
+            iterator++;
+    }
+
 }
