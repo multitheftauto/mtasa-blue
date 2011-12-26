@@ -206,7 +206,9 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
                     lua_pushnumber ( luaVM, ConvertRadiansToDegrees ( buildingResult.vecRotation.fX ) );
                     lua_pushnumber ( luaVM, ConvertRadiansToDegrees ( buildingResult.vecRotation.fY ) );
                     lua_pushnumber ( luaVM, ConvertRadiansToDegrees ( buildingResult.vecRotation.fZ ) );
-                    return 18;
+
+                    lua_pushnumber ( luaVM, buildingResult.usLODModelID );
+                    return 19;
                 }
                 return 11;
             }
