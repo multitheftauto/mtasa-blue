@@ -37,6 +37,9 @@ namespace
                                          { "getLowLODElement",          "1.2" },
                                          { "isElementLowLOD",           "1.2" },
                                          { "resetWaterLevel",           "1.2" },
+                                         { "removeWorldModel",          "1.2" },
+                                         { "restoreWorldModel",         "1.2" },
+                                         { "restoreAllWorldModels",     "1.2" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
