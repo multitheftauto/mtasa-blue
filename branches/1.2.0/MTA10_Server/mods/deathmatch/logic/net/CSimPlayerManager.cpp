@@ -361,7 +361,7 @@ void CSimPlayerManager::Broadcast ( const CSimPacket& Packet, const std::vector 
     }
     else if ( ulFlags & PACKET_LOW_PRIORITY )
     {
-        packetPriority = PACKET_PRIORITY_LOW;
+        //packetPriority = PACKET_PRIORITY_LOW;
     }
 
     // Group players by bitstream version
