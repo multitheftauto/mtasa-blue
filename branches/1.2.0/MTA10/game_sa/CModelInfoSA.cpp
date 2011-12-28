@@ -365,6 +365,9 @@ VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad, bool bHighPriority
         {
             uint uiAnimId = uiAnimFileIndex + 25575;
             CModelInfoSA* pAnim = static_cast < CModelInfoSA* > ( pGame->GetModelInfo ( uiAnimId ) );
+            if ( !pAnim )
+                LogEvent ( 505, "Model no anim", "", SString ( "%d (%d)", m_dwModelID, uiAnimId ) );
+            else
             if ( !pAnim->IsLoaded() )
             {
                 OutputDebugLine ( SString ( "[Models] Requesting anim file %d for model %d", uiAnimId, m_dwModelID ) );
