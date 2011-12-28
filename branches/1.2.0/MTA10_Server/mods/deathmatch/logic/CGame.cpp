@@ -332,6 +332,7 @@ void CGame::DoPulse ( void )
     }
 
     // Handle critical things
+    CSimControl::DoPulse ();
     CNetBufferWatchDog::DoPulse ();
 
     CLOCK_SET_SECTION( "CGame::DoPulse" );

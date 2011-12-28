@@ -544,7 +544,7 @@ void CMainConfig::ApplyBandwidthReductionMode ( void )
 
 void CMainConfig::ApplyThreadNetEnabled ( void )
 {
-    CSimControl::EnableSimSystem ( m_bThreadNetEnabled );
+    CSimControl::EnableSimSystem ( m_bThreadNetEnabled, false );
 }
 
 

@@ -13,6 +13,7 @@
 namespace
 {
     bool                ms_bEnabled = false;
+    bool                ms_bEnableRequest = false;
     CNetServerBuffer*   ms_pNetServerBuffer = NULL;
     CSimPlayerManager*  ms_pSimPlayerManager = NULL;
 }
@@ -50,15 +51,31 @@ void CSimControl::Shutdown ( void )
 // CSimControl::EnableSimSystem
 //
 // Turn on and off here
+// Not applied until the next pulse unless bApplyNow is set
 //
 ///////////////////////////////////////////////////////////////
-void CSimControl::EnableSimSystem ( bool bEnable )
+void CSimControl::EnableSimSystem ( bool bEnable, bool bApplyNow )
 {
-    if ( bEnable == ms_bEnabled )
-        return;
-    ms_bEnabled = bEnable;
+    ms_bEnableRequest = bEnable;
+    if ( bApplyNow )
+        DoPulse ();
+}
 
-    if ( bEnable )
+
+///////////////////////////////////////////////////////////////
+//
+// CSimControl::DoPulse
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CSimControl::DoPulse ( void )
+{
+    if ( ms_bEnableRequest == ms_bEnabled )
+        return;
+    ms_bEnabled = ms_bEnableRequest;
+
+    if ( ms_bEnabled )
     {
         // Startup NetServerBuffer
         assert ( !ms_pNetServerBuffer );
