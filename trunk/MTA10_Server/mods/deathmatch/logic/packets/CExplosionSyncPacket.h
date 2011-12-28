@@ -40,8 +40,9 @@ public:
                             CExplosionSyncPacket        ( void );
                             CExplosionSyncPacket        ( const CVector& vecPosition, unsigned char ucType );
 
-    inline ePacketID        GetPacketID                 ( void ) const                  { return PACKET_ID_EXPLOSION; };
-    inline unsigned long    GetFlags                    ( void ) const                  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline ePacketID                GetPacketID                 ( void ) const                  { return PACKET_ID_EXPLOSION; };
+    inline NetServerPacketOrdering  GetPacketOrdering           ( void ) const                  { return PACKET_ORDERING_OTHERSYNC; }
+    inline unsigned long            GetFlags                    ( void ) const                  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Read                        ( NetBitStreamInterface& BitStream );
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;

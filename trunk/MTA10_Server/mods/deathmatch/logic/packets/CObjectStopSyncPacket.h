@@ -20,8 +20,9 @@ class CObjectStopSyncPacket : public CPacket
 public:
     inline                  CObjectStopSyncPacket                   ( CObject* pObject )                                { m_pObject = pObject; };
 
-    inline ePacketID        GetPacketID                             ( void ) const                                      { return PACKET_ID_OBJECT_STOPSYNC; };
-    inline unsigned long    GetFlags                                ( void ) const                                      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline ePacketID                GetPacketID                     ( void ) const                                      { return PACKET_ID_OBJECT_STOPSYNC; };
+    inline NetServerPacketOrdering  GetPacketOrdering               ( void ) const                                      { return PACKET_ORDERING_OTHERSYNC; }
+    inline unsigned long            GetFlags                        ( void ) const                                      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     inline bool             Write                                   ( NetBitStreamInterface& BitStream ) const          { BitStream.Write ( m_pObject->GetID () ); return true; };
 
