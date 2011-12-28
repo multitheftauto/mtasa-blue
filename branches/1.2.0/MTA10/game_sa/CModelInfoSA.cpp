@@ -310,6 +310,39 @@ char * CModelInfoSA::GetNameIfVehicle ( )
 //  return NULL;
 }
 
+uint CModelInfoSA::GetAnimFileIndex ( void )
+{
+    DWORD dwFunc = m_pInterface->VFTBL->GetAnimFileIndex;
+    DWORD dwThis = (DWORD) m_pInterface;
+    uint uiReturn = 0;
+    if ( dwFunc )
+    {
+        _asm
+        {
+            mov     ecx, dwThis
+            call    dwFunc
+            mov     uiReturn, eax
+        }
+    }
+    return uiReturn;
+}
+
+// Try ones very best to load the file
+void CModelInfoSA::Sure2Load( DWORD dwFlags )
+{
+    const int iMaxWaitTime = 500;
+    const int iWaitStep = 10;
+    for ( int iTimeWaited = 0 ; !IsLoaded () && iTimeWaited < iMaxWaitTime ; iTimeWaited += iWaitStep )
+    {
+        pGame->GetStreaming()->RequestModel ( m_dwModelID, dwFlags );
+        pGame->GetStreaming()->LoadAllRequestedModels ();
+        Sleep ( iWaitStep );
+    }
+
+    if ( !IsLoaded() )
+        LogEvent ( 504, "Model load fail", "", SString ( "%d (flags:0x%x)", m_dwModelID, dwFlags ) );
+}
+
 VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad, bool bHighPriority )
 {
     DEBUG_TRACE("VOID CModelInfoSA::Request( BOOL bAndLoad, BOOL bWaitForLoad )");
@@ -323,6 +356,23 @@ VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad, bool bHighPriority
         pGame->GetModelInfo ( 7 )->Request ( bAndLoad, false );
     }
 
+    // Bikes can sometimes get stuck when loading unless the anim file is handled like what is does here
+    // Don't change the code below unless you can test it (by recreating the problem it solves)
+    if ( IsVehicle () )
+    {
+        uint uiAnimFileIndex = GetAnimFileIndex ();
+        if ( uiAnimFileIndex != 0xffffffff )
+        {
+            uint uiAnimId = uiAnimFileIndex + 25575;
+            CModelInfoSA* pAnim = static_cast < CModelInfoSA* > ( pGame->GetModelInfo ( uiAnimId ) );
+            if ( !pAnim->IsLoaded() )
+            {
+                OutputDebugLine ( SString ( "[Models] Requesting anim file %d for model %d", uiAnimId, m_dwModelID ) );
+                pAnim->Sure2Load ( 0x16 );
+            }
+        }
+    }
+
     DWORD dwFlags;
     if ( bHighPriority )
         dwFlags = 0x16;
@@ -330,19 +380,13 @@ VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad, bool bHighPriority
         dwFlags = 6;
     pGame->GetStreaming()->RequestModel(m_dwModelID, dwFlags);
 
-    int iTimeToWait = 50;
-
     if(bAndLoad)
     {
         pGame->GetStreaming()->LoadAllRequestedModels();
         
         if(bWaitForLoad)
         {
-            while(!this->IsLoaded() && iTimeToWait != 0)
-            {
-                iTimeToWait--;
-                Sleep(10);
-            }
+            Sure2Load ( dwFlags );
         }
     }
 }

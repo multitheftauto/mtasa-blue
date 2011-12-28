@@ -72,6 +72,7 @@ class CPedModelInfoSAInterface;
  */
 class CBaseModelInfo_SA_VTBL
 {
+public:
     DWORD           Destructor;
     DWORD           AsAtomicModelInfoPtr;           // (void)
     DWORD           AsDamageAtomicModelInfoPtr;     // (void)
@@ -243,6 +244,7 @@ public:
     CPedModelInfoSAInterface *      GetPedModelInfoInterface ( void )              { return reinterpret_cast < CPedModelInfoSAInterface * > ( GetInterface () ); }
 
     DWORD                           GetModel                ( void )               { return m_dwModelID; }
+    uint                            GetAnimFileIndex        ( void );
 
     bool                            IsPlayerModel           ( void );
 
@@ -312,7 +314,10 @@ public:
 
     inline RwObject*                GetRwObject             ( void ) { return m_pInterface ? m_pInterface->pRwObject : NULL; }
 
+    // CModelInfoSA methods
     void                            MakePedModel            ( char * szTexture );
+    void                            Sure2Load               ( DWORD dwFlags );
+
 };
 
 #endif
