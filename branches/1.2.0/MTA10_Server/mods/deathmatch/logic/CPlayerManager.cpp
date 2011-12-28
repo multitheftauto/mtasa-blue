@@ -235,7 +235,7 @@ void CPlayerManager::Broadcast ( const CPacket& Packet, const std::vector < CPla
             {
                 CPlayer* pPlayer = s_it->second;
                 dassert ( usBitStreamVersion == pPlayer->GetBitStreamVersion () );
-                g_pNetServer->SendPacket ( Packet.GetPacketID (), pPlayer->GetSocket (), pBitStream, FALSE, packetPriority, Reliability, PACKET_ORDERING_GAME );
+                g_pNetServer->SendPacket ( Packet.GetPacketID (), pPlayer->GetSocket (), pBitStream, FALSE, packetPriority, Reliability, Packet.GetPacketOrdering() );
             }
         }
         else

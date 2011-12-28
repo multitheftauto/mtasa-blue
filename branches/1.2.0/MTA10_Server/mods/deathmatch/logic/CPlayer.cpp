@@ -215,7 +215,6 @@ const char* CPlayer::GetSourceIPString ( void )
     return m_strIP;
 }
 
-// TODO [28-Feb-2009] packetOrdering is currently always PACKET_ORDERING_GAME
 uint CPlayer::Send ( const CPacket& Packet )
 {
     if ( !CNetBufferWatchDog::CanSendPacket ( Packet.GetPacketID () ) )
@@ -265,7 +264,7 @@ uint CPlayer::Send ( const CPacket& Packet )
         if ( Packet.Write ( *pBitStream ) )
         {
             uiBitsSent = pBitStream->GetNumberOfBitsUsed ();
-            g_pNetServer->SendPacket ( Packet.GetPacketID (), m_PlayerSocket, pBitStream, FALSE, packetPriority, Reliability, PACKET_ORDERING_GAME );
+            g_pNetServer->SendPacket ( Packet.GetPacketID (), m_PlayerSocket, pBitStream, FALSE, packetPriority, Reliability, Packet.GetPacketOrdering() );
         }
 
         // Destroy the bitstream

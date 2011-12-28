@@ -29,6 +29,7 @@ public:
                                                               float fPlayerGotWeaponRange );
 
     inline ePacketID            GetPacketID                 ( void ) const                  { return PACKET_ID_PLAYER_VEHICLE_PURESYNC; };
+    NetServerPacketOrdering     GetPacketOrdering           ( void ) const                  { return PACKET_ORDERING_PURESYNC; }
     inline unsigned long        GetFlags                    ( void ) const                  { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
 
     bool                        Read                        ( NetBitStreamInterface& BitStream );

@@ -21,8 +21,9 @@ class CReturnSyncPacket : public CPacket
 public:
                             CReturnSyncPacket           ( class CPlayer* pPlayer );
 
-    inline ePacketID        GetPacketID                 ( void ) const                  { return PACKET_ID_RETURN_SYNC; };
-    inline unsigned long    GetFlags                    ( void ) const                  { return 0; };
+    inline ePacketID                GetPacketID         ( void ) const                  { return PACKET_ID_RETURN_SYNC; };
+    inline NetServerPacketOrdering  GetPacketOrdering   ( void ) const                  { return PACKET_ORDERING_PURESYNC; }
+    inline unsigned long            GetFlags            ( void ) const                  { return 0; };
 
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 };

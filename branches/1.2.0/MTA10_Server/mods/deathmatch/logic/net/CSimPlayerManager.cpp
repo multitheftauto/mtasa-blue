@@ -391,7 +391,7 @@ void CSimPlayerManager::Broadcast ( const CSimPacket& Packet, const std::vector 
             {
                 CSimPlayer* pPlayer = s_it->second;
                 dassert ( usBitStreamVersion == pPlayer->GetBitStreamVersion () );
-                g_pRealNetServer->SendPacket ( Packet.GetPacketID (), pPlayer->GetSocket (), pBitStream, FALSE, packetPriority, Reliability, PACKET_ORDERING_GAME );
+                g_pRealNetServer->SendPacket ( Packet.GetPacketID (), pPlayer->GetSocket (), pBitStream, FALSE, packetPriority, Reliability, Packet.GetPacketOrdering() );
             }
         }
         else
