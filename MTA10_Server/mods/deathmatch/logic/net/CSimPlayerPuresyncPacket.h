@@ -15,6 +15,7 @@ public:
                                         ~CSimPacket         ( void )                        { DEBUG_DESTROY_COUNT( "CSimPacket" ); }
 
     virtual ePacketID                   GetPacketID         ( void ) const = 0;
+    virtual NetServerPacketOrdering     GetPacketOrdering   ( void ) const { return PACKET_ORDERING_DEFAULT; }
     virtual unsigned long               GetFlags            ( void ) const = 0;
 
     virtual bool                        Read                ( NetBitStreamInterface& BitStream )                { return false; };
@@ -37,6 +38,7 @@ public:
                                                               float WeaponRange );
 
     ePacketID               GetPacketID                     ( void ) const                  { return PACKET_ID_PLAYER_PURESYNC; };
+    NetServerPacketOrdering GetPacketOrdering               ( void ) const                  { return PACKET_ORDERING_PURESYNC; }
     unsigned long           GetFlags                        ( void ) const                  { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
 
     bool                    Read                            ( NetBitStreamInterface& BitStream );

@@ -21,8 +21,9 @@ class CPedStartSyncPacket : public CPacket
 public:
     inline                  CPedStartSyncPacket                     ( CPed * pPed )                             { m_pPed = pPed; };
 
-    inline ePacketID        GetPacketID                             ( void ) const                              { return PACKET_ID_PED_STARTSYNC; };
-    inline unsigned long    GetFlags                                ( void ) const                              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline ePacketID                GetPacketID                     ( void ) const                              { return PACKET_ID_PED_STARTSYNC; };
+    inline NetServerPacketOrdering  GetPacketOrdering               ( void ) const                              { return PACKET_ORDERING_OTHERSYNC; }
+    inline unsigned long            GetFlags                        ( void ) const                              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Write                                   ( NetBitStreamInterface& BitStream ) const;
 

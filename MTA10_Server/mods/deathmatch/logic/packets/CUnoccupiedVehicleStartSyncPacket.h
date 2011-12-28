@@ -22,8 +22,9 @@ class CUnoccupiedVehicleStartSyncPacket : public CPacket
 public:
     inline                  CUnoccupiedVehicleStartSyncPacket       ( CVehicle * pVehicle )                             { m_pVehicle = pVehicle; };
 
-    inline ePacketID        GetPacketID                             ( void ) const                                      { return PACKET_ID_UNOCCUPIED_VEHICLE_STARTSYNC; };
-    inline unsigned long    GetFlags                                ( void ) const                                      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline ePacketID                GetPacketID                     ( void ) const                                      { return PACKET_ID_UNOCCUPIED_VEHICLE_STARTSYNC; };
+    inline NetServerPacketOrdering  GetPacketOrdering               ( void ) const                                      { return PACKET_ORDERING_OTHERSYNC; }
+    inline unsigned long            GetFlags                        ( void ) const                                      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Write                                   ( NetBitStreamInterface& BitStream ) const;
 

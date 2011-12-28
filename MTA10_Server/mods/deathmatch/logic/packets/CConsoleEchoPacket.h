@@ -21,8 +21,9 @@ class CConsoleEchoPacket : public CPacket
 public:
     inline                  CConsoleEchoPacket          ( const char* szMessage )   { strncpy ( m_szMessage, szMessage, MAX_CONSOLEECHO_LENGTH ); m_szMessage [MAX_CONSOLEECHO_LENGTH] = 0; };
 
-    inline ePacketID        GetPacketID                 ( void ) const              { return PACKET_ID_CONSOLE_ECHO; };
-    inline unsigned long    GetFlags                    ( void ) const              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline ePacketID                GetPacketID                 ( void ) const              { return PACKET_ID_CONSOLE_ECHO; };
+    inline NetServerPacketOrdering  GetPacketOrdering           ( void ) const              { return PACKET_ORDERING_CHAT; }
+    inline unsigned long            GetFlags                    ( void ) const              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 

@@ -23,8 +23,9 @@ class CLightsyncPacket : public CPacket
 public:
                                 CLightsyncPacket            () {}
 
-    inline ePacketID            GetPacketID                 ( void ) const                  { return PACKET_ID_LIGHTSYNC; };
-    inline unsigned long        GetFlags                    ( void ) const                  { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
+    inline ePacketID                GetPacketID                 ( void ) const                  { return PACKET_ID_LIGHTSYNC; };
+    inline NetServerPacketOrdering  GetPacketOrdering           ( void ) const                  { return PACKET_ORDERING_LIGHTSYNC; }
+    inline unsigned long            GetFlags                    ( void ) const                  { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
 
     void                        AddPlayer                   ( CPlayer* pPlayer ) { m_players.push_back(pPlayer); }
     unsigned int                Count                       () const { return m_players.size(); }

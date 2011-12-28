@@ -22,8 +22,9 @@ public:
                             CFireSyncPacket        ( void );
                             CFireSyncPacket        ( const CVector& vecPosition, float fSize );
 
-    inline ePacketID        GetPacketID                 ( void ) const                  { return PACKET_ID_FIRE; };
-    inline unsigned long    GetFlags                    ( void ) const                  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline ePacketID                GetPacketID                 ( void ) const                  { return PACKET_ID_FIRE; };
+    inline NetServerPacketOrdering  GetPacketOrdering           ( void ) const                  { return PACKET_ORDERING_OTHERSYNC; }
+    inline unsigned long            GetFlags                    ( void ) const                  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Read                        ( NetBitStreamInterface& BitStream );
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
