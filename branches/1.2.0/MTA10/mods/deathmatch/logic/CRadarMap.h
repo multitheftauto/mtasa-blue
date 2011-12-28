@@ -101,7 +101,7 @@ private:
     int                                 m_iHorizontalMovement;
     int                                 m_iVerticalMovement;
 
-    unsigned char                       m_ucZoom;
+    float                               m_fZoom;
 
     bool                                m_bIsRadarEnabled;
     bool                                m_bForcedState;
