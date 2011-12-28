@@ -729,8 +729,8 @@ void Font::drawTextLine(const String& text, const Vector3& position, const Rect&
 	{
 		pos = d_cp_map.find(text[c]);
 
-        // Add holding character if required not found
-		if (pos == end)
+        // Add holding character if not found
+		if (pos == end && text[c] >= 32 )
 		    pos = d_cp_map.find('*');
 
 		if (pos != end)
