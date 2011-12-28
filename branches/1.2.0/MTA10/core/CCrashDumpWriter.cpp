@@ -23,9 +23,15 @@ struct SLogEventInfo
     SString strBody;
 };
 
-static std::list < SLogEventInfo >  ms_LogEventList;
-static std::map < int, int >        ms_CrashAvertedMap;
-static uint                         ms_uiTickCountBase = 0;
+struct SCrashAvertedInfo
+{
+    uint uiTickCount;
+    int uiUsageCount;
+};
+
+static std::list < SLogEventInfo >              ms_LogEventList;
+static std::map < int, SCrashAvertedInfo >      ms_CrashAvertedMap;
+static uint                                     ms_uiTickCountBase = 0;
 
 
 typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hFile, MINIDUMP_TYPE DumpType,
@@ -44,13 +50,15 @@ typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hF
 ///////////////////////////////////////////////////////////////
 void CCrashDumpWriter::OnCrashAverted ( uint uiId )
 {
-    int* pCount = MapFind ( ms_CrashAvertedMap, uiId );
-    if ( !pCount )
+    SCrashAvertedInfo* pInfo = MapFind ( ms_CrashAvertedMap, uiId );
+    if ( !pInfo )
     {
-        MapSet ( ms_CrashAvertedMap, uiId, 0 );
-        pCount = MapFind ( ms_CrashAvertedMap, uiId );
+        MapSet ( ms_CrashAvertedMap, uiId, SCrashAvertedInfo () );
+        pInfo = MapFind ( ms_CrashAvertedMap, uiId );
+        pInfo->uiUsageCount = 0;
     }
-    (*pCount)++;
+    pInfo->uiTickCount = GetTickCount32 ();
+    pInfo->uiUsageCount++;
 }
 
 
@@ -653,16 +661,17 @@ void CCrashDumpWriter::GetCrashAvertedStats ( CBuffer& buffer )
     CBufferWriteStream stream ( buffer );
 
     // Write info version
-    stream.Write ( 1 );
+    stream.Write ( 2 );
 
     // Write number of stats
     stream.Write ( ms_CrashAvertedMap.size () );
 
     // Write stats
-    for ( std::map < int, int >::iterator iter = ms_CrashAvertedMap.begin () ; iter != ms_CrashAvertedMap.end () ; ++iter )
+    for ( std::map < int, SCrashAvertedInfo >::iterator iter = ms_CrashAvertedMap.begin () ; iter != ms_CrashAvertedMap.end () ; ++iter )
     {
+        stream.Write ( ms_uiTickCountBase - iter->second.uiTickCount );
         stream.Write ( iter->first );
-        stream.Write ( iter->second );
+        stream.Write ( iter->second.uiUsageCount );
     }
 }
 
