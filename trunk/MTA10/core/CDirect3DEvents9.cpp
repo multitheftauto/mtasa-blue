@@ -133,6 +133,9 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     // Make sure stencil is off to avoid problems with flame effects
     pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
 
+    // Tell everyone that the zbuffer will need clearing before use
+    CGraphics::GetSingleton ().OnZBufferModified ();
+
     // Notify core
     CCore::GetSingleton ().DoPostFramePulse ();
 

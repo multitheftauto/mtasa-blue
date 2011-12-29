@@ -780,6 +780,12 @@ void CGraphics::OnDeviceRestore ( IDirect3DDevice9 * pDevice )
 }
 
 
+void CGraphics::OnZBufferModified ( void )
+{
+    m_pTileBatcher->OnZBufferModified ();
+}
+
+
 void CGraphics::DrawPreGUIQueue ( void )
 {
     m_pLine3DBatcherPreGUI->Flush ();

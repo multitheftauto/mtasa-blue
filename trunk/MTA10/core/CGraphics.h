@@ -144,6 +144,7 @@ private:
     void                OnDeviceCreate          ( IDirect3DDevice9 * pDevice );
     void                OnDeviceInvalidate      ( IDirect3DDevice9 * pDevice );
     void                OnDeviceRestore         ( IDirect3DDevice9 * pDevice );
+    void                OnZBufferModified       ( void );
     ID3DXFont*          MaybeGetBigFont         ( ID3DXFont* pDXFont, float& fScaleX, float& fScaleY );
 
     CLocalGUI*          m_pGUI;
