@@ -21,7 +21,6 @@ public:
     inline                  CPedStopSyncPacket                      ( ElementID ID )                                    { m_ID = ID; };
 
     inline ePacketID                GetPacketID                     ( void ) const                                      { return PACKET_ID_PED_STOPSYNC; };
-    inline NetServerPacketOrdering  GetPacketOrdering               ( void ) const                                      { return PACKET_ORDERING_OTHERSYNC; }
     inline unsigned long            GetFlags                        ( void ) const                                      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     inline bool             Write                                   ( NetBitStreamInterface& BitStream ) const          { BitStream.Write ( m_ID ); return true; };

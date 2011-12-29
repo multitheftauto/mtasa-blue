@@ -22,7 +22,6 @@ public:
     inline explicit             CVehicleResyncPacket        ( CVehicle* pVehicle )          { m_pVehicle = pVehicle; };
 
     inline ePacketID                GetPacketID             ( void ) const                  { return PACKET_ID_VEHICLE_RESYNC; };
-    inline NetServerPacketOrdering  GetPacketOrdering       ( void ) const                  { return PACKET_ORDERING_LIGHTSYNC; }
     inline unsigned long            GetFlags                ( void ) const                  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                        Read                        ( NetBitStreamInterface& BitStream );

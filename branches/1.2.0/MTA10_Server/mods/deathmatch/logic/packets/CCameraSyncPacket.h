@@ -22,7 +22,6 @@ class CCameraSyncPacket : public CPacket
 public:
 
     inline ePacketID                        GetPacketID                 ( void ) const                  { return PACKET_ID_CAMERA_SYNC; };
-    inline NetServerPacketOrdering          GetPacketOrdering           ( void ) const                  { return PACKET_ORDERING_OTHERSYNC; }
     unsigned long                           GetFlags                    ( void ) const                  { return PACKET_SEQUENCED; };
 
     bool                                    Read                        ( NetBitStreamInterface& BitStream );

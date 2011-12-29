@@ -52,17 +52,6 @@ enum NetServerPacketReliability
     PACKET_RELIABILITY_RELIABLE_SEQUENCED   //     Can drop packets
 };
 
-enum NetServerPacketOrdering
-{
-    PACKET_ORDERING_DEFAULT = 0,
-    PACKET_ORDERING_CHAT,
-    PACKET_ORDERING_FILETRANSFER,
-    PACKET_ORDERING_LUA,
-    PACKET_ORDERING_PURESYNC,
-    PACKET_ORDERING_LIGHTSYNC,
-    PACKET_ORDERING_OTHERSYNC
-};
-
 enum NSPerSecondMetrics
 {
 	NS_USER_MESSAGE_BYTES_PUSHED,
@@ -108,6 +97,17 @@ struct SBandwidthStatistics
     long long llIncomingUDPByteCount;
     long long llOutgoingUDPPacketCount;
     long long llIncomingUDPPacketCount;
+};
+
+enum ePacketOrdering
+{
+    PACKET_ORDERING_DEFAULT = 0,
+    PACKET_ORDERING_CHAT,
+    PACKET_ORDERING_FILETRANSFER,
+    PACKET_ORDERING_LUA,
+    PACKET_ORDERING_PURESYNC,
+    PACKET_ORDERING_LIGHTSYNC,
+    PACKET_ORDERING_OTHERSYNC
 };
 
 #endif

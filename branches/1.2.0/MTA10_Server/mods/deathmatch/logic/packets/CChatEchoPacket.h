@@ -34,7 +34,6 @@ public:
                                                           bool bColorCoded = false )    { m_strMessage = strMessage; m_ucRed = ucRed; m_ucGreen = ucGreen; m_ucBlue = ucBlue; m_bColorCoded = bColorCoded; };
 
     inline ePacketID                GetPacketID                 ( void ) const              { return PACKET_ID_CHAT_ECHO; };
-    inline NetServerPacketOrdering  GetPacketOrdering           ( void ) const              { return PACKET_ORDERING_CHAT; }
     inline unsigned long            GetFlags                    ( void ) const              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
