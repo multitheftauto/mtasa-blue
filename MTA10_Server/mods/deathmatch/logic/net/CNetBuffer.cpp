@@ -358,7 +358,7 @@ void CNetServerBuffer::DeallocateNetServerBitStream ( NetBitStreamInterface* bit
 // Non blocking
 //
 ///////////////////////////////////////////////////////////////////////////
-bool CNetServerBuffer::SendPacket ( unsigned char ucPacketID, NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, NetServerPacketOrdering packetOrdering  )
+bool CNetServerBuffer::SendPacket ( unsigned char ucPacketID, NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering  )
 {
     bitStream->AddRef ();
     SSendPacketArgs* pArgs = new SSendPacketArgs ( ucPacketID, playerID, bitStream, bBroadcast, packetPriority, packetReliability, packetOrdering );
@@ -953,7 +953,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
         CALLREALNET2R( bool,                GetNetworkStatistics            , NetStatistics*, pDest, NetServerPlayerID&, PlayerID )
         CALLREALNET0R( const SPacketStat*,  GetPacketStats                  )
         CALLREALNET1R( bool,                GetBandwidthStatistics          , SBandwidthStatistics*, pDest )
-        CALLREALNET7R( bool,                SendPacket                      , unsigned char, ucPacketID, NetServerPlayerID&, playerID, NetBitStreamInterface*, bitStream, bool, bBroadcast, NetServerPacketPriority, packetPriority, NetServerPacketReliability, packetReliability, NetServerPacketOrdering, packetOrdering )
+        CALLREALNET7R( bool,                SendPacket                      , unsigned char, ucPacketID, NetServerPlayerID&, playerID, NetBitStreamInterface*, bitStream, bool, bBroadcast, NetServerPacketPriority, packetPriority, NetServerPacketReliability, packetReliability, ePacketOrdering, packetOrdering )
         CALLREALNET3 (                      GetPlayerIP                     , NetServerPlayerID&, playerID, char*, strIP, unsigned short*, usPort )
         CALLREALNET1 (                      Kick                            , NetServerPlayerID &,PlayerID )
         CALLREALNET1 (                      SetPassword                     , const char*, szPassword )

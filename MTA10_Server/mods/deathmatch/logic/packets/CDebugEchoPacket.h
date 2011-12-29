@@ -31,7 +31,6 @@ public:
                                                            )    { strncpy ( m_szMessage, szMessage, MAX_DEBUGECHO_LENGTH ); m_szMessage [MAX_DEBUGECHO_LENGTH] = 0; m_ucRed = ucRed; m_ucGreen = ucGreen; m_ucBlue = ucBlue; m_uiLevel = uiLevel; };
 
     inline ePacketID                GetPacketID                 ( void ) const              { return PACKET_ID_DEBUG_ECHO; };
-    inline NetServerPacketOrdering  GetPacketOrdering           ( void ) const              { return PACKET_ORDERING_CHAT; }
     inline unsigned long            GetFlags                    ( void ) const              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;

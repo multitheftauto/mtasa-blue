@@ -76,7 +76,7 @@ public:
 
     virtual NetBitStreamInterface*          AllocateNetServerBitStream      ( unsigned short usBitStreamVersion );
     virtual void                            DeallocateNetServerBitStream    ( NetBitStreamInterface* bitStream );
-    virtual bool                            SendPacket                      ( unsigned char ucPacketID, NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast = false, NetServerPacketPriority packetPriority = PACKET_PRIORITY_LOW, NetServerPacketReliability packetReliability = PACKET_RELIABILITY_RELIABLE_ORDERED, NetServerPacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
+    virtual bool                            SendPacket                      ( unsigned char ucPacketID, NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast = false, NetServerPacketPriority packetPriority = PACKET_PRIORITY_LOW, NetServerPacketReliability packetReliability = PACKET_RELIABILITY_RELIABLE_ORDERED, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
 
     virtual void                            GetPlayerIP                     ( NetServerPlayerID& playerID, char strIP[22], unsigned short* usPort );
 
@@ -134,7 +134,7 @@ public:
     DECLARE_FUNC_ARGS2R( bool,                  GetNetworkStatistics            , NetStatistics*, pDest, NetServerPlayerIDRef, PlayerID );
     DECLARE_FUNC_ARGS0R( const SPacketStat*,    GetPacketStats                  );
     DECLARE_FUNC_ARGS1R( bool,                  GetBandwidthStatistics          , SBandwidthStatistics*, pDest );
-    DECLARE_FUNC_ARGS7R( bool,                  SendPacket                      , unsigned char, ucPacketID, NetServerPlayerIDRef, playerID, NetBitStreamInterface*, bitStream, bool, bBroadcast, NetServerPacketPriority, packetPriority, NetServerPacketReliability, packetReliability, NetServerPacketOrdering, packetOrdering );
+    DECLARE_FUNC_ARGS7R( bool,                  SendPacket                      , unsigned char, ucPacketID, NetServerPlayerIDRef, playerID, NetBitStreamInterface*, bitStream, bool, bBroadcast, NetServerPacketPriority, packetPriority, NetServerPacketReliability, packetReliability, ePacketOrdering, packetOrdering );
     DECLARE_FUNC_ARGS3 (                        GetPlayerIP                     , NetServerPlayerIDRef, playerID, char*, strIP, unsigned short*, usPort );
     DECLARE_FUNC_ARGS1 (                        Kick                            , NetServerPlayerIDRef, PlayerID );
     DECLARE_FUNC_ARGS1 (                        SetPassword                     , const char*, szPassword );

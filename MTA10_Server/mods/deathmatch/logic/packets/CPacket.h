@@ -40,7 +40,7 @@ public:
 
     virtual bool                        RequiresSourcePlayer ( void ) const                                     { return true; }
     virtual ePacketID                   GetPacketID         ( void ) const = 0;
-    virtual NetServerPacketOrdering     GetPacketOrdering   ( void ) const { return PACKET_ORDERING_DEFAULT; }
+    virtual ePacketOrdering             GetPacketOrdering   ( void ) const { return PACKET_ORDERING_DEFAULT; }
     virtual unsigned long               GetFlags            ( void ) const = 0;
 
     virtual bool                        Read                ( NetBitStreamInterface& BitStream )                { return false; };
