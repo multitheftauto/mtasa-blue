@@ -390,6 +390,10 @@ std::string ASE::QueryLight ( void )
     // players
     CPlayer* pPlayer = NULL;
 
+    // Keep the packet under 1350 bytes to try to avoid fragmentation 
+    int iBytesLeft = 1340 - reply.tellp ();
+    int iPlayersLeft = m_pPlayerManager->CountJoined ();
+
     list < CPlayer* > ::const_iterator pIter = m_pPlayerManager->IterBegin ();
     for ( ; pIter != m_pPlayerManager->IterEnd (); pIter++ )
     {
@@ -400,6 +404,12 @@ std::string ASE::QueryLight ( void )
             std::string strPlayerName = RemoveColorCode ( pPlayer->GetNick () );
             if ( strPlayerName.length () == 0 )
                 strPlayerName = pPlayer->GetNick ();
+
+            // Check if we can fit more names
+            iBytesLeft -= strPlayerName.length () + 1;
+            if ( iBytesLeft < iPlayersLeft-- )
+                strPlayerName = "";
+
             reply << ( unsigned char ) ( strPlayerName.length () + 1 );
             reply << strPlayerName.c_str ();
         }
