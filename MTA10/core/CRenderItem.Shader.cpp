@@ -266,6 +266,26 @@ void CShaderItem::SetTessellation ( uint uiTessellationX, uint uiTessellationY )
 
 ////////////////////////////////////////////////////////////////
 //
+// CShaderItem::SetTransform
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CShaderItem::SetTransform ( const SShaderTransform& transform )
+{
+    // Check if value is changing
+    if ( memcmp ( &m_pShaderInstance->m_Transform, &transform, sizeof ( transform ) ) != 0 )
+    {
+        // Check if we need a new shader instance
+        MaybeRenewShaderInstance ();
+        m_pShaderInstance->m_Transform = transform;
+        m_pShaderInstance->m_bHasModifiedTransform = true;
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // CShaderItem::MaybeRenewShaderInstance
 //
 // If current instance is in use by something else (i.e. in draw queue), we must create a new instance before changing parameter values
