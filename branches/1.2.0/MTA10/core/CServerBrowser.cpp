@@ -739,7 +739,10 @@ void CServerBrowser::SetVisible ( bool bVisible )
 
         // Flash search box if it is not empty
         for ( uint i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
+        {
             m_FlashSearchBox[ i ].uiCount = m_pEditSearch[ i ]->GetText().empty() ? 0 : 15;
+            m_FlashSearchBox [ Type ].uiNextTime = 0;
+        }
     }
     else
     {
