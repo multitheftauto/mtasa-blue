@@ -53,7 +53,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     // Get the window sizes and set the map variables to default zoom/movement
     m_uiHeight = g_pCore->GetGraphics ()->GetViewportHeight ();
     m_uiWidth = g_pCore->GetGraphics ()->GetViewportWidth ();
-    m_ucZoom = 1;
+    m_fZoom = 1;
     m_iHorizontalMovement = 0;
     m_iVerticalMovement = 0;
     SetupMapVariables ();
@@ -72,13 +72,13 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
         float fScale;
         SString strMessage;
     } messageList [] = {
-        { SColorRGBA ( 255, 255, 255, 200 ), 0.92f, 1.5f, "Current Mode: Free Move" },
+        { SColorRGBA ( 255, 255, 255, 200 ), 0.92f, 1.5f, "Current Mode: Kill all humans" },
+        { SColorRGBA ( 255, 255, 255, 255 ), 0.95f, 1.0f, SString ( "Press %s to change mode.", *GetBoundKeyName ( "radar_attach" ) ) },
         { SColorRGBA ( 255, 255, 255, 255 ), 0.05f, 1.0f, SString ( "Press %s/%s to zoom in/out.", *GetBoundKeyName ( "radar_zoom_in" ), *GetBoundKeyName ( "radar_zoom_out" ) ) },
         { SColorRGBA ( 255, 255, 255, 255 ), 0.08f, 1.0f, SString ( "Press %s, %s, %s, %s to navigate the map.", *GetBoundKeyName ( "radar_move_north" ), *GetBoundKeyName ( "radar_move_east" ), *GetBoundKeyName ( "radar_move_south" ), *GetBoundKeyName ( "radar_move_west" ) ) },
-        { SColorRGBA ( 255, 255, 255, 255 ), 0.11f, 1.0f, SString ( "Press %s to change mode.", *GetBoundKeyName ( "radar_attach" ) ) },
-        { SColorRGBA ( 255, 255, 255, 255 ), 0.14f, 1.0f, SString ( "Press %s/%s to change opacity.", *GetBoundKeyName ( "radar_opacity_down" ), *GetBoundKeyName ( "radar_opacity_up" ) ) },
-        { SColorRGBA ( 255, 255, 255, 255 ), 0.17f, 1.0f, SString ( "Press %s to hide the map.", *GetBoundKeyName ( "radar" ) ) },
-        { SColorRGBA ( 255, 255, 255, 255 ), 0.20f, 1.0f, SString ( "Press %s to hide this help text.", *GetBoundKeyName ( "radar_help" ) ) },
+        { SColorRGBA ( 255, 255, 255, 255 ), 0.11f, 1.0f, SString ( "Press %s/%s to change opacity.", *GetBoundKeyName ( "radar_opacity_down" ), *GetBoundKeyName ( "radar_opacity_up" ) ) },
+        { SColorRGBA ( 255, 255, 255, 255 ), 0.14f, 1.0f, SString ( "Press %s to hide the map.", *GetBoundKeyName ( "radar" ) ) },
+        { SColorRGBA ( 255, 255, 255, 255 ), 0.17f, 1.0f, SString ( "Press %s to hide this help text.", *GetBoundKeyName ( "radar_help" ) ) },
     };
 
     for ( uint i = 0 ; i < NUMELMS( messageList ) ; i++ )
@@ -93,6 +93,9 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
 
         m_HelpTextList.push_back ( pTextDisplay );
     }
+
+    // Default to attached to player
+    SetAttachedToLocalPlayer ( true );
 }
 
 
@@ -323,6 +326,8 @@ void CRadarMap::DoRender ( void )
         m_bTextVisible = bRequiredTextVisible;
         for ( uint i = 0 ; i < m_HelpTextList.size () ; i++ )
             m_HelpTextList[i]->SetVisible ( m_bTextVisible );
+
+        SetupMapVariables ();
     }
 }
 
@@ -436,73 +441,60 @@ bool CRadarMap::CalculateEntityOnScreenPosition ( CVector vecPosition, CVector2D
 void CRadarMap::SetupMapVariables ( void )
 {
     // Calculate the map size and the middle of the screen coords
-    m_fMapSize = static_cast < float > ( m_uiHeight * m_ucZoom );
+    m_fMapSize = static_cast < float > ( m_uiHeight * m_fZoom );
     int iMiddleX = static_cast < int > ( m_uiWidth / 2 );
     int iMiddleY = static_cast < int > ( m_uiHeight / 2 );
 
-    // If we are attached to the local player
-    if ( m_bIsAttachedToLocal )
+    // If we are attached to the local player and zoomed in at all
+    if ( m_bIsAttachedToLocal && m_fZoom > 1 )
     {
-        // If we are zoomed in at all
-        if ( m_ucZoom > 1 )
-        {
-            // Get the local player position
-            CVector vec;
-            CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager ()->GetLocalPlayer ();
-            if ( pLocalPlayer )
-                pLocalPlayer->GetPosition ( vec );
+        // Get the local player position
+        CVector vec;
+        CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager ()->GetLocalPlayer ();
+        if ( pLocalPlayer )
+            pLocalPlayer->GetPosition ( vec );
 
-            // Calculate the maps min and max vector positions putting the local player in the middle of the map
-            m_iMapMinX = static_cast < int > ( iMiddleX - ( iMiddleY * m_ucZoom ) - ( ( vec.fX * m_fMapSize ) / 6000.0f ) );
+        // Calculate the maps min and max vector positions putting the local player in the middle of the map
+        m_iMapMinX = static_cast < int > ( iMiddleX - ( iMiddleY * m_fZoom ) - ( ( vec.fX * m_fMapSize ) / 6000.0f ) );
+        m_iMapMaxX = static_cast < int > ( m_iMapMinX + m_fMapSize );
+        m_iMapMinY = static_cast < int > ( iMiddleY - ( iMiddleY * m_fZoom ) + ( ( vec.fY * m_fMapSize ) / 6000.0f ) );
+        m_iMapMaxY = static_cast < int > ( m_iMapMinY + m_fMapSize );
+
+        // If we are moving the map too far then stop centering the local player blip
+        if ( m_iMapMinX > 0 )
+        {
+            m_iMapMinX = 0;
             m_iMapMaxX = static_cast < int > ( m_iMapMinX + m_fMapSize );
-            m_iMapMinY = static_cast < int > ( iMiddleY - ( iMiddleY * m_ucZoom ) + ( ( vec.fY * m_fMapSize ) / 6000.0f ) );
-            m_iMapMaxY = static_cast < int > ( m_iMapMinY + m_fMapSize );
-
-            // If we are moving the map too far then stop centering the local player blip
-            if ( m_iMapMinX > 0 )
-            {
-                m_iMapMinX = 0;
-                m_iMapMaxX = static_cast < int > ( m_iMapMinX + m_fMapSize );
-            }
-            else if ( m_iMapMaxX <= static_cast < int > ( m_uiWidth ) )
-            {
-                m_iMapMaxX = m_uiWidth;
-                m_iMapMinX = static_cast < int > ( m_iMapMaxX - m_fMapSize );
-            }
-
-            if ( m_iMapMinY > 0 )
-            {
-                m_iMapMinY = 0;
-                m_iMapMaxY = static_cast < int > ( m_iMapMinY + m_fMapSize );
-            }
-            else if ( m_iMapMaxY <= static_cast < int > ( m_uiHeight ) )
-            {
-                m_iMapMaxY = m_uiHeight;
-                m_iMapMinY = static_cast < int > ( m_iMapMaxY - m_fMapSize );
-            }
         }
-        // If we are not zoomed in
-        else
+        else if ( m_iMapMaxX <= static_cast < int > ( m_uiWidth ) )
         {
-            // Set the map to the middle of the screen
-            m_iMapMinX = static_cast < int > ( iMiddleX - iMiddleY );
-            m_iMapMaxX = static_cast < int > ( iMiddleX + iMiddleY );
-            m_iMapMinY = static_cast < int > ( iMiddleY - iMiddleY );
-            m_iMapMaxY = static_cast < int > ( iMiddleY + iMiddleY );
+            m_iMapMaxX = m_uiWidth;
+            m_iMapMinX = static_cast < int > ( m_iMapMaxX - m_fMapSize );
+        }
+
+        if ( m_iMapMinY > 0 )
+        {
+            m_iMapMinY = 0;
+            m_iMapMaxY = static_cast < int > ( m_iMapMinY + m_fMapSize );
+        }
+        else if ( m_iMapMaxY <= static_cast < int > ( m_uiHeight ) )
+        {
+            m_iMapMaxY = m_uiHeight;
+            m_iMapMinY = static_cast < int > ( m_iMapMaxY - m_fMapSize );
         }
 
     }
-    // If we are in free roam mode
+    // If we are in free roam mode or not zoomed in
     else
     {
         // Set the maps min and max vector positions relative to the movement selected
-        m_iMapMinX = static_cast < int > ( iMiddleX - ( iMiddleY * m_ucZoom ) - ( ( m_iHorizontalMovement * m_fMapSize ) / 6000.0f ) );
+        m_iMapMinX = static_cast < int > ( iMiddleX - ( iMiddleY * m_fZoom ) - ( ( m_iHorizontalMovement * m_fMapSize ) / 6000.0f ) );
         m_iMapMaxX = static_cast < int > ( m_iMapMinX + m_fMapSize );
-        m_iMapMinY = static_cast < int > ( iMiddleY - ( iMiddleY * m_ucZoom ) + ( ( m_iVerticalMovement * m_fMapSize ) / 6000.0f )  );
+        m_iMapMinY = static_cast < int > ( iMiddleY - ( iMiddleY * m_fZoom ) + ( ( m_iVerticalMovement * m_fMapSize ) / 6000.0f )  );
         m_iMapMaxY = static_cast < int > ( m_iMapMinY + m_fMapSize );
 
         // If we are zoomed in
-        if ( m_ucZoom > 1 )
+        if ( m_fZoom > 1 )
         {
             if ( m_iMapMinX >= 0 )
             {
@@ -534,14 +526,21 @@ void CRadarMap::SetupMapVariables ( void )
             m_iVerticalMovement = 0;
         }
     }
+
+    // Show mode only when zoomed in
+    if ( !m_HelpTextList.empty () )
+    {
+        m_HelpTextList[0]->SetVisible ( m_fZoom > 1 && m_bTextVisible );
+        m_HelpTextList[1]->SetVisible ( m_fZoom > 1 && m_bTextVisible );
+    }
 }
 
 
 void CRadarMap::ZoomIn ( void )
 {
-    if ( m_ucZoom <= 4 )
+    if ( m_fZoom <= 4 )
     {
-        m_ucZoom = m_ucZoom * 2;
+        m_fZoom = m_fZoom * 2;
         SetupMapVariables ();
     }
 }
@@ -549,11 +548,11 @@ void CRadarMap::ZoomIn ( void )
 
 void CRadarMap::ZoomOut ( void )
 {
-    if ( m_ucZoom >= 2 )
+    if ( m_fZoom >= 1 )
     {
-        m_ucZoom = m_ucZoom / 2;
+        m_fZoom = m_fZoom / 2;
 
-        if ( m_ucZoom > 1 )
+        if ( m_fZoom > 1 )
         {
             m_iVerticalMovement = static_cast < int > ( m_iVerticalMovement / 1.7f );
             m_iHorizontalMovement = static_cast < int > ( m_iHorizontalMovement / 1.7f );
@@ -578,7 +577,7 @@ void CRadarMap::MoveNorth ( void )
 {
     if ( !m_bIsAttachedToLocal )
     {
-        if ( m_ucZoom > 1 )
+        if ( m_fZoom > 1 )
         {
             if ( m_iMapMinY >= 0 )
             {
@@ -599,7 +598,7 @@ void CRadarMap::MoveSouth ( void )
 {
     if ( !m_bIsAttachedToLocal )
     {
-        if ( m_ucZoom > 1 )
+        if ( m_fZoom > 1 )
         {
             if ( m_iMapMaxY <= static_cast < int > ( m_uiHeight ) )
             {
@@ -620,7 +619,7 @@ void CRadarMap::MoveEast ( void )
 {
     if ( !m_bIsAttachedToLocal )
     {
-        if ( m_ucZoom > 1 )
+        if ( m_fZoom > 1 )
         {
             if ( m_iMapMaxX <= static_cast < int > ( m_uiWidth ) )
             {
@@ -641,7 +640,7 @@ void CRadarMap::MoveWest ( void )
 {
     if ( !m_bIsAttachedToLocal )
     {
-        if ( m_ucZoom > 1 )
+        if ( m_fZoom > 1 )
         {
             if ( m_iMapMinX >= 0 )
             {

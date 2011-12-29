@@ -1906,7 +1906,10 @@ void CCore::OnCrashAverted ( uint uiId )
 void CCore::LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody )
 {
     if ( GetDebugIdEnabled ( uiDebugId ) )
+    {
         CCrashDumpWriter::LogEvent ( szType, szContext, szBody );
+        OutputDebugLine ( SString ( "[LogEvent] %d %s %s %s", uiDebugId, szType, szContext, szBody ) );
+    }
 }
 
 

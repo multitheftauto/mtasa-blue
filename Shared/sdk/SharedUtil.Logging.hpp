@@ -34,6 +34,10 @@ namespace SharedUtil
         SetDebugTagHidden ( "DEBUG EVENT" );
         SetDebugTagHidden ( "ReportLog" );
         SetDebugTagHidden ( "InstanceCount" );
+        SetDebugTagHidden ( "ModelLoading" );
+        SetDebugTagHidden ( "Models" );
+        SetDebugTagHidden ( "CEGUI" );
+        SetDebugTagHidden ( "LogEvent" );
 
         #ifdef Has_InitDebugTagsLocal
             InitDebugTagsLocal ();

@@ -25,6 +25,8 @@ public:
     CBandwidthSettings ( void )
     {
         SetNone ();
+        bTestPretendEveryoneIsNear = false;
+        iTestSendMultiplier = 1;
     }
 
     void SetNone ( void )
@@ -95,6 +97,10 @@ public:
     int iMaxZoneIfOtherCanSee;
     bool bLightSyncEnabled;
     int iLightSyncPlrsPerFrame;
+
+    // Testing
+    bool bTestPretendEveryoneIsNear;
+    int iTestSendMultiplier;
 };
 
 extern CBandwidthSettings* g_pBandwidthSettings;

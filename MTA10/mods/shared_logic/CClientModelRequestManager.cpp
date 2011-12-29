@@ -113,8 +113,12 @@ bool CClientModelRequestManager::RequestBlocking ( unsigned short usModelID )
     if ( pInfo )
     {
         pInfo->Request ( TRUE, TRUE );
-        pInfo->MakeCustomModel ();
-        return true;
+        if ( pInfo->IsLoaded () )
+        {
+            pInfo->MakeCustomModel ();
+            return true;
+        }
+        OutputDebugLine ( SString ( "[Models] RequestBlocking failed for id %d", usModelID ) );
     }
 
     // Bad model ID probably.

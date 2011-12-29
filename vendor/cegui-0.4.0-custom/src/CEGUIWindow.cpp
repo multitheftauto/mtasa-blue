@@ -903,8 +903,8 @@ void Window::setText(const String& text)
     d_text_raw = text;
     d_text = d_text_raw.bidify ();
 
-    if ( d_font )
-        d_font->processStringForGlyphs ( d_text ); // Refresh our glyph set if there are new characters
+    if ( getFont () )
+        const_cast < Font* > ( getFont () )->insertStringForGlyphs ( d_text ); // Refresh our glyph set if there are new characters
 
     WindowEventArgs args(this);
 	onTextChanged(args);
@@ -990,7 +990,7 @@ void Window::setAreaRect(const Rect& area)
 void Window::setFont(const Font* font)
 {
     if ( !d_font && font && !d_text.empty() )
-        font->processStringForGlyphs ( d_text ); // Refresh our glyph set if there are new characters
+        const_cast < Font* > ( font )->insertStringForGlyphs ( d_text ); // Refresh our glyph set if there are new characters
 
 	d_font = font;
     WindowEventArgs args(this);

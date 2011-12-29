@@ -239,7 +239,8 @@ bool CSimPlayerManager::HandlePlayerPureSync ( NetServerPlayerID& Socket, NetBit
         if ( pPacket->Read ( *BitStream ) )
         {
             // Relay it to nearbyers
-            Broadcast ( *pPacket, pSourceSimPlayer->GetSendList () );
+            for ( uint i = 0 ; i < g_pBandwidthSettings->iTestSendMultiplier ; i++ )
+                Broadcast ( *pPacket, pSourceSimPlayer->GetSendList () );
         }
 
         delete pPacket;
@@ -361,7 +362,7 @@ void CSimPlayerManager::Broadcast ( const CSimPacket& Packet, const std::vector 
     }
     else if ( ulFlags & PACKET_LOW_PRIORITY )
     {
-        packetPriority = PACKET_PRIORITY_LOW;
+        //packetPriority = PACKET_PRIORITY_LOW;
     }
 
     // Group players by bitstream version

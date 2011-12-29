@@ -353,7 +353,7 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
                     uchar ucLength = 0;
                     stream.Read ( ucOffset );
                     stream.Read ( ucLength );
-                    for ( uint i = ucOffset ; i  < ucOffset + ucLength ; i++ )
+                    for ( uint i = ucOffset ; i < (uint)( ucOffset + ucLength ) ; i++ )
                         if ( i < pItem->strSearchableName.length () )
                             pItem->strSearchableName[i] = '\1';
                 }
