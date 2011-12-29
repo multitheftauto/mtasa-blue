@@ -71,6 +71,18 @@ enum TextFormatting
 	WordWrapJustified 		//!< Text is broken into multiple lines no wider than the formatting Rect.  The left-most and right-most characters of each line are aligned with the edges of the formatting Rect.
 };
 
+struct GlyphPageInfo
+{
+    GlyphPageInfo ( void ) : uiLastUsedTime ( 0 ) {}
+    uint uiLastUsedTime;
+};
+
+struct SCharSize
+{
+    ushort width;
+    ushort height;
+};
+
 /*!
 \brief
 	Class that encapsulates text rendering functionality for a typeface
@@ -672,15 +684,21 @@ public:
 
 	/*!
 	\brief
-		hacked callback for when a Glyph has been rendered
+        glyph cache functions
 	*/
-    String	OnGlyphDrawn ( unsigned long ulGlyph ) const;
-
-    String	cleanGlyphCache ( String strCache ) const;
-
-    void	processStringForGlyphs ( String strText ) const;
-    
-    void    extendFontGlyphs (const String glyph_set) const;
+    GlyphPageInfo*      findGlyphPageInfo               ( ulong ulGlyph );
+    GlyphPageInfo*      addGlyphPageInfo                ( ulong ulGlyph );
+    void                refreshCachedGlyph              ( unsigned long ulGlyph );
+    void                insertGlyphToCache              ( unsigned long ulGlyph );
+    void	            refreshStringForGlyphs          ( const String& strText );
+    void	            insertStringForGlyphs           ( const String& strText );
+    void                pulse                           ( void );
+    bool                needsRebuild                    ( void );
+    void                rebuild                         ( void );
+    void                queueUndefineGlyphImages        ( void );
+    void                flushPendingUndefineGlyphImages ( void );   
+    void                onClearRenderList               ( void );
+    bool                needsClearRenderList            ( void );
 
 	/*!
 	\brief
@@ -920,29 +938,7 @@ private:
 	*/
 	void	createFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer);
 
-
-	/*!
-	\brief
-		Paint the set of glyphs required for all code points in the range [\a first_code_point, \a last_code_point]
-		into the buffer \a buffer, which has a size of \a size pixels (not bytes) square.  This also defines an
-		Image for each glyph in the Imageset for this font, and creates an entry in the code point to Image map.
-
-	\param first_code_point
-		utf32 code point that is the first code point in a range whos glyph are to be loaded into the buffer.
-
-	\param last_code_point
-		utf32 code point that is the last code point in a range whos glyph are to be loaded into the buffer.
-
-	\param size
-		Width of \a buffer in pixels (not bytes).
-
-	\param buffer
-		Pointer to a memory buffer large enough to receive the glyph image data.
-
-	\return
-		Nothing.
-	*/
-	void	createFontGlyphSet(utf32 first_code_point, utf32 last_code_point, uint size, argb_t* buffer);
+    bool    utilFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer);
 
 
 	/*!
@@ -1075,6 +1071,7 @@ private:
 
 	String		d_name;			//!< Name of this font.
 	Imageset*	d_glyph_images;	//!< Imageset that holds the glyphs for this font.
+	Imageset*	d_glyph_images_deleteme;
 	String     d_sourceFilename;   //!< Holds the name of the file used to create this font (either font file or imagset)
 
 	bool	d_freetype;			//!< true when the font is a FreeType based font
@@ -1096,7 +1093,16 @@ private:
 
 	bool	d_antiAliased;			//!< True if the font should be rendered as anti-alaised by freeType.
 
-    std::map < unsigned long, unsigned long >   m_GlyphCache;
+    // Glyph cache
+    bool    d_bAddedGlyphPage;
+    uint    d_uiLastPulseTime;
+    String  d_glyphset_default;
+    std::map < uint, GlyphPageInfo >    d_GlyphPageInfoMap;
+
+    // Character sizes
+    std::map < utf32, SCharSize > d_sizes_map;      // Character sizes we know about - Used to speed up checking texture size
+    int d_total_width;                              // Total width of characters we know about
+    int d_avg_width;                                // d_total_width / d_sizes_map.size ()
 };
 
 } // End of  CEGUI namespace section

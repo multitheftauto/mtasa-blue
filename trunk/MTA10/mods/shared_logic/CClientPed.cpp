@@ -2576,7 +2576,7 @@ void CClientPed::StreamedInPulse ( void )
                 float fSkill = GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( eWeapon ) );
                 CWeaponStat * pWeaponStat = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel ( eWeapon, fSkill ) ;
                 // Apply fix for aimable weapons only
-                if ( pWeaponStat && pWeaponStat->IsFlagSet ( WEAPONTYPE_MOVEFIRE ) == true  )
+                if ( pWeaponStat && pWeaponStat->IsFlagSet ( WEAPONTYPE_CANAIMWITHARM ) == false  )
                 {
                         // See which way input wants to go
                         const bool bInputRight = Current.LeftStickX >  6;

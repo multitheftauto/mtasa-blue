@@ -1582,14 +1582,23 @@ struct SMapInfoFlagsSync : public ISyncStructure
 //////////////////////////////////////////
 struct SFunBugsStateSync : public ISyncStructure
 {
-    enum { BITCOUNT = 4 };
+    enum { BITCOUNT = 5 };
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
+        if ( bitStream.Version ( ) == 0x22 )
+        {
+            return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), 4 );
+        }
         return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
     }
     void Write ( NetBitStreamInterface& bitStream ) const
     {
+        if ( bitStream.Version ( ) == 0x22 )
+        {
+            bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), 4 );
+            return;
+        }
         bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
     }
 

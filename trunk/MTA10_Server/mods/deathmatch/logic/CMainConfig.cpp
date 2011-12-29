@@ -544,7 +544,7 @@ void CMainConfig::ApplyBandwidthReductionMode ( void )
 
 void CMainConfig::ApplyThreadNetEnabled ( void )
 {
-    CSimControl::EnableSimSystem ( m_bThreadNetEnabled );
+    CSimControl::EnableSimSystem ( m_bThreadNetEnabled, false );
 }
 
 
@@ -1029,6 +1029,18 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
         return true;
     }
     else
+    if ( strName == "test_send_multiplier" )
+    {
+        strValue = SString ( "%d", g_pBandwidthSettings->iTestSendMultiplier );
+        return true;
+    }
+    else
+    if ( strName == "test_everyone_near" )
+    {
+        strValue = SString ( "%d", g_pBandwidthSettings->bTestPretendEveryoneIsNear );
+        return true;
+    }
+    else
     {
         //
         // Everything else is read only, so can be fetched directly from the XML data
@@ -1209,6 +1221,24 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
                 SetString ( m_pRootNode, "debug_flag", SString ( "%d", m_iDebugFlag ) );
                 Save ();
             }
+            return true;
+        }
+    }
+    else
+    if ( strName == "test_send_multiplier" )
+    {
+        if ( !strValue.empty() && isdigit( (uchar)strValue[0] ) )
+        {
+            g_pBandwidthSettings->iTestSendMultiplier = Clamp ( 1, atoi ( strValue ), 1000 );
+            return true;
+        }
+    }
+    else
+    if ( strName == "test_everyone_near" )
+    {
+        if ( strValue == "0" || strValue == "1" )
+        {
+            g_pBandwidthSettings->bTestPretendEveryoneIsNear = atoi ( strValue ) == 0 ? false : true;
             return true;
         }
     }

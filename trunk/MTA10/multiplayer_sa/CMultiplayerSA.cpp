@@ -309,17 +309,13 @@ DWORD RETURN_PreHUDRender =                                       0x053EADD;
 DWORD RETURN_LoadingPlayerImgDira =                         0x5A69E8;
 DWORD RETURN_LoadingPlayerImgDirb =                         0x5A6A06;
 
-#define HOOKPOS_CStreamingRequestFile_US                    0x15663B0
-#define HOOKPOS_CStreamingRequestFile_EU                    0x15663A0
+#define HOOKPOS_CallCStreamingInfoAddToList                 0x408962
+DWORD FUNC_CStreamingInfoAddToList              = 0x407480;
+DWORD RETURN_CallCStreamingInfoAddToLista       = 0x408967;
+DWORD RETURN_CallCStreamingInfoAddToListb       = 0x408990;
+
 #define HOOKPOS_CStreamingLoadRequestedModels_US            0x15670A0
 #define HOOKPOS_CStreamingLoadRequestedModels_EU            0x1567090
-
-DWORD RETURN_CStreamingRequestFilea_US =            0x15663B5;
-DWORD RETURN_CStreamingRequestFilea_EU =            0x15663A5;
-DWORD RETURN_CStreamingRequestFilea_BOTH =          0;
-DWORD RETURN_CStreamingRequestFileb_US =            0x156641E;
-DWORD RETURN_CStreamingRequestFileb_EU =            0x156640E;
-DWORD RETURN_CStreamingRequestFileb_BOTH =          0;
 DWORD RETURN_CStreamingLoadRequestedModelsa_US =    0x15670A5;
 DWORD RETURN_CStreamingLoadRequestedModelsa_EU =    0x1567095;
 DWORD RETURN_CStreamingLoadRequestedModelsa_BOTH =  0;
@@ -511,7 +507,7 @@ void HOOK_CAutomobile__ProcessSwingingDoor ();
 
 void HOOK_ProcessVehicleCollision ();
 void HOOK_LoadingPlayerImgDir ();
-void HOOK_CStreamingRequestFile ();
+void HOOK_CallCStreamingInfoAddToList ();
 void HOOK_CStreamingLoadRequestedModels ();
 
 void HOOK_CRenderer_SetupEntityVisibility ();
@@ -661,7 +657,6 @@ void CMultiplayerSA::InitHooks()
         HookInstall(HOOKPOS_CrashFix_Misc19_US, (DWORD)HOOK_CrashFix_Misc19, 6 );
         HookInstall(HOOKPOS_CrashFix_Misc24_US, (DWORD)HOOK_CrashFix_Misc24, 6 );
         HookInstall(HOOKPOS_CheckAnimMatrix_US, (DWORD)HOOK_CheckAnimMatrix, 5 );
-        HookInstall(HOOKPOS_CStreamingRequestFile_US, (DWORD)HOOK_CStreamingRequestFile, 5 );
         HookInstall(HOOKPOS_CStreamingLoadRequestedModels_US, (DWORD)HOOK_CStreamingLoadRequestedModels, 5 );
         RETURN_FreezeFix_Misc15_BOTH = RETURN_FreezeFix_Misc15_US;
         RETURN_CrashFix_Misc17a_BOTH = RETURN_CrashFix_Misc17a_US;
@@ -670,8 +665,6 @@ void CMultiplayerSA::InitHooks()
         RETURN_CrashFix_Misc19b_BOTH = RETURN_CrashFix_Misc19b_US;
         RETURN_CrashFix_Misc24_BOTH = RETURN_CrashFix_Misc24_US;
         RETURN_CheckAnimMatrix_BOTH = RETURN_CheckAnimMatrix_US;
-        RETURN_CStreamingRequestFilea_BOTH = RETURN_CStreamingRequestFilea_US;
-        RETURN_CStreamingRequestFileb_BOTH = RETURN_CStreamingRequestFileb_US;
         RETURN_CStreamingLoadRequestedModelsa_BOTH = RETURN_CStreamingLoadRequestedModelsa_US;
         RETURN_CStreamingLoadRequestedModelsb_BOTH = RETURN_CStreamingLoadRequestedModelsb_US;
     }
@@ -682,7 +675,6 @@ void CMultiplayerSA::InitHooks()
         HookInstall(HOOKPOS_CrashFix_Misc19_EU, (DWORD)HOOK_CrashFix_Misc19, 6 );
         HookInstall(HOOKPOS_CrashFix_Misc24_EU, (DWORD)HOOK_CrashFix_Misc24, 6 );
         HookInstall(HOOKPOS_CheckAnimMatrix_EU, (DWORD)HOOK_CheckAnimMatrix, 5 );
-        HookInstall(HOOKPOS_CStreamingRequestFile_EU, (DWORD)HOOK_CStreamingRequestFile, 5 );
         HookInstall(HOOKPOS_CStreamingLoadRequestedModels_EU, (DWORD)HOOK_CStreamingLoadRequestedModels, 5 );
         RETURN_FreezeFix_Misc15_BOTH = RETURN_FreezeFix_Misc15_EU;
         RETURN_CrashFix_Misc17a_BOTH = RETURN_CrashFix_Misc17a_EU;
@@ -691,8 +683,6 @@ void CMultiplayerSA::InitHooks()
         RETURN_CrashFix_Misc19b_BOTH = RETURN_CrashFix_Misc19b_EU;
         RETURN_CrashFix_Misc24_BOTH = RETURN_CrashFix_Misc24_EU;
         RETURN_CheckAnimMatrix_BOTH = RETURN_CheckAnimMatrix_EU;
-        RETURN_CStreamingRequestFilea_BOTH = RETURN_CStreamingRequestFilea_EU;
-        RETURN_CStreamingRequestFileb_BOTH = RETURN_CStreamingRequestFileb_EU;
         RETURN_CStreamingLoadRequestedModelsa_BOTH = RETURN_CStreamingLoadRequestedModelsa_EU;
         RETURN_CStreamingLoadRequestedModelsb_BOTH = RETURN_CStreamingLoadRequestedModelsb_EU;
     }
@@ -708,6 +698,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_PreHUDRender, (DWORD)HOOK_PreHUDRender, 5 );
     HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7 );
     HookInstall(HOOKPOS_LoadingPlayerImgDir, (DWORD)HOOK_LoadingPlayerImgDir, 5 );
+    HookInstall(HOOKPOS_CallCStreamingInfoAddToList, (DWORD)HOOK_CallCStreamingInfoAddToList, 5 );
 
     HookInstall(HOOKPOS_CHandlingData_isNotRWD, (DWORD)HOOK_isVehDriveTypeNotRWD, 7 );
     HookInstall(HOOKPOS_CHandlingData_isNotFWD, (DWORD)HOOK_isVehDriveTypeNotFWD, 7 );
@@ -6255,10 +6246,13 @@ namespace
 {
     struct SImgGTAItemInfo
     {
-        uint    uiHash;
-        ushort  uiUnknown1;
+        ushort    usNext;
+        ushort    usPrev;
+
+        ushort  uiUnknown1;         // Parent ?
         uchar   uiUnknown2;         // 0x12 when loading, 0x02 when finished loading
         uchar   ucImgId;
+
         int     iBlockOffset;
         int     iBlockCount;
         uint    uiLoadflag;         // 0-not loaded  2-requested  3-loaded  1-processed
@@ -6268,31 +6262,51 @@ namespace
     char*   pReturnBuffer;
 }
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // If request is for a file inside player.img (imgId 5) and uiLoadflag is 0 or 1
 // then force use of our cached player.img data
 //
-bool _cdecl OnStreamingRequestFile ( int iFileId, int iBlockOffset, int iBlockCount, int iImgId, int iSomething )
+bool _cdecl OnCallCStreamingInfoAddToList ( int flags, SImgGTAItemInfo* pImgGTAInfo )
 {
     if ( !CMultiplayerSA::ms_PlayerImgCachePtr )
         return false;
 
-    if ( iImgId == 5 )
+    if ( pImgGTAInfo->ucImgId == 5 )
     {
-        SImgGTAItemInfo* pImgGTAInfo = ((SImgGTAItemInfo*)(0x8E4CC0)) + iFileId;
+        int iFileId = ((int)pImgGTAInfo - 0x08E4CC0) / 20;
 
-        if ( pImgGTAInfo->uiLoadflag > 1 )
-            return false;
+        // Cached enabled setting here as it doesn't usually change
+        static bool bLogClothesLoad = GetDebugIdEnabled ( 501 );
+        if ( bLogClothesLoad )
+        {
+            SString strMessage ( "id:%d np:%04x %04x un1:%08x un2:%08x img:%d os:%d #:%d flg:%d"
+                                    , iFileId
+                                    , pImgGTAInfo->usNext
+                                    , pImgGTAInfo->usPrev
+                                    , pImgGTAInfo->uiUnknown1
+                                    , pImgGTAInfo->uiUnknown2
+                                    , pImgGTAInfo->ucImgId
+                                    , pImgGTAInfo->iBlockOffset
+                                    , pImgGTAInfo->iBlockCount
+                                    , pImgGTAInfo->uiLoadflag
+                                );
 
-        pImgGTAInfo->uiUnknown1 = 0xffff;
-        pImgGTAInfo->uiUnknown2 = iSomething & 0x0f;
-        pImgGTAInfo->ucImgId = iImgId;
-        pImgGTAInfo->iBlockOffset = iBlockOffset;
-        pImgGTAInfo->iBlockCount = iBlockCount;
-        pImgGTAInfo->uiLoadflag = 3;
+            LogEvent ( 501, "Clothes Load", "", strMessage );
+        }
 
         iReturnFileId = iFileId;
-        pReturnBuffer = CMultiplayerSA::ms_PlayerImgCachePtr + iBlockOffset * 2048;
+        pReturnBuffer = CMultiplayerSA::ms_PlayerImgCachePtr + pImgGTAInfo->iBlockOffset * 2048;
+
+        // Update flags
+        pImgGTAInfo->uiLoadflag = 3;
+
+        // TODO - Check ms_numModelsRequested and ms_numPriorityRequests
+
+        // Remove priorty flag, as not counted in ms_numPriorityRequests
+        pImgGTAInfo->uiUnknown2 &= ~ 0x10;
+
         return true;
     }
 
@@ -6300,29 +6314,26 @@ bool _cdecl OnStreamingRequestFile ( int iFileId, int iBlockOffset, int iBlockCo
 }
 
 
-void _declspec(naked) HOOK_CStreamingRequestFile()
+void _declspec(naked) HOOK_CallCStreamingInfoAddToList()
 {
-// hook from 015663B0/015663A0 5 bytes
+// hook from 408962 5 bytes
     _asm
     {
         pushad
-        push    [esp+32+4*5]
-        push    [esp+32+4*5]
-        push    [esp+32+4*5]
-        push    [esp+32+4*5]
-        push    [esp+32+4*5]
-        call    OnStreamingRequestFile
-        add     esp, 4*5
+        push    ecx
+        push    ebx
+        call    OnCallCStreamingInfoAddToList
+        add     esp, 4*2
         cmp     al, 0
         jnz     skip
 
         // Continue with standard code
         popad
-        push    ebx
-        mov     ebx, [esp+14h]
-        jmp     RETURN_CStreamingRequestFilea_BOTH     // 015663B5/015663A5
+        call    FUNC_CStreamingInfoAddToList
+        jmp     RETURN_CallCStreamingInfoAddToLista     // 408967
 
-        // Handle loaded here
+
+        // Handle load here
 skip:
         popad
         pushad
@@ -6337,7 +6348,8 @@ skip:
         add     esp, 4*3
 
         popad
-        jmp     RETURN_CStreamingRequestFileb_BOTH     // 0156641E/0156640E
+        add     esp, 4*1
+        jmp     RETURN_CallCStreamingInfoAddToListb     // 408990
     }
 }
 

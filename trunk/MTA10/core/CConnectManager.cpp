@@ -210,6 +210,15 @@ bool CConnectManager::Abort ( void )
 }
 
 
+static SString AppendNetErrorCode ( const SString& strText )
+{
+    uint uiErrorCode = CCore::GetSingleton ().GetNetwork ()->GetExtendedErrorCode ();
+    if ( uiErrorCode != 0 )
+        return strText + SString ( " \nCode: %08X", uiErrorCode );
+    return strText;
+}
+
+
 void CConnectManager::DoPulse ( void )
 {
     // Are we connecting?
@@ -240,7 +249,7 @@ void CConnectManager::DoPulse ( void )
         if ( time ( NULL ) >= m_tConnectStarted + 8 )
         {
             // Show a message that the connection timed out and abort
-            CCore::GetSingleton ().ShowMessageBox ( "Error", "Connection timed out", MB_BUTTON_OK | MB_ICON_ERROR );
+            CCore::GetSingleton ().ShowMessageBox ( "Error", AppendNetErrorCode ( "Connection timed out" ), MB_BUTTON_OK | MB_ICON_ERROR );
             Abort ();
         }
         else
@@ -285,7 +294,9 @@ void CConnectManager::DoPulse ( void )
 
                 // Only display the error if we set one
                 if ( strError.length() > 0 )
-                    CCore::GetSingleton ().ShowMessageBox ( "Error", strError, MB_BUTTON_OK | MB_ICON_ERROR );
+                {
+                    CCore::GetSingleton ().ShowMessageBox ( "Error", AppendNetErrorCode ( strError ), MB_BUTTON_OK | MB_ICON_ERROR );
+                }
                 else // Otherwise, remove the message box and hide quick connect
                 {
                     CCore::GetSingleton ().RemoveMessageBox( false );
@@ -386,7 +397,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
             else
             {
                 // Show failed message and abort the attempt
-                CCore::GetSingleton ().ShowMessageBox ( "Error", "Bad server response (2)", MB_BUTTON_OK | MB_ICON_ERROR );
+                CCore::GetSingleton ().ShowMessageBox ( "Error", AppendNetErrorCode ( "Bad server response (2)" ), MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pConnectManager->Abort ();
             }
         }
@@ -396,7 +407,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
             if ( ucPacketID != PACKET_ID_SERVER_JOIN && ucPacketID != PACKET_ID_SERVER_JOIN_DATA )
             {
                 // Show failed message and abort the attempt
-                CCore::GetSingleton ().ShowMessageBox ( "Error", "Bad server response (1)", MB_BUTTON_OK | MB_ICON_ERROR );
+                CCore::GetSingleton ().ShowMessageBox ( "Error", AppendNetErrorCode ( "Bad server response (1)" ), MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pConnectManager->Abort ();
             }
         }

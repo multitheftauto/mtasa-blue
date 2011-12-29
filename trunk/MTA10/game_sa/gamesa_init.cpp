@@ -49,3 +49,13 @@ void MemCpy ( void* dwDest, const void* dwSrc, uint uiAmount )
 {
     memcpy ( dwDest, dwSrc, uiAmount );
 }
+
+bool GetDebugIdEnabled ( uint uiDebugId )
+{
+    return g_pCore->GetDebugIdEnabled ( uiDebugId );  
+}
+
+void LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody )
+{
+    g_pCore->LogEvent ( uiDebugId, szType, szContext, szBody );  
+}

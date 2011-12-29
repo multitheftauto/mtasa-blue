@@ -105,6 +105,8 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     pPlayerManager->AddToList ( this );
     m_iLastZoneDebug = 0;
 
+    // DO NOT DEFAULT THIS TO THE CURRENT TIME OR YOU WILL BREAK EVERYTHING.
+    // THIS IS USED BY LIGHT SYNC AND SHOULD NOT BE CHANGED>>> EVER.
     m_llLastPositionHasChanged = 0;
 
     CSimControl::AddSimPlayer ( this );
@@ -250,7 +252,7 @@ uint CPlayer::Send ( const CPacket& Packet )
     }
     else if ( ulFlags & PACKET_LOW_PRIORITY )
     {
-        packetPriority = PACKET_PRIORITY_LOW;
+        //packetPriority = PACKET_PRIORITY_LOW;
     }
 
     uint uiBitsSent = 0;
@@ -647,6 +649,21 @@ bool CPlayer::GetWeaponCorrect ( void )
 void CPlayer::UpdateOthersNearList ( void )
 {
     m_llNearListUpdateTime = GetTickCount64_ ();
+
+    // If testing, put into every other players near list
+    if ( g_pBandwidthSettings->bTestPretendEveryoneIsNear )
+    {
+        std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
+        for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
+        {
+            CPlayer* pOtherPlayer = *iter;
+            if ( pOtherPlayer != this && m_usDimension == pOtherPlayer->GetDimension () )
+            {
+                pOtherPlayer->RefreshNearPlayer ( this );
+            }
+        }
+        return;
+    }
 
     // Get the two positions to check
     const CVector& vecPlayerPosition = GetPosition ();

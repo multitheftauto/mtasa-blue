@@ -70,6 +70,7 @@ const char* g_szCredits = "== Multi Theft Auto: San Andreas v" MTA_DM_BUILDTAG_S
                           "Patch contributors\n"
                           "\n"
                           
+                          "Lukasz \"W\" Biegaj\n"
                           "Florian \"Flobu\" Busse\n"
                           "Philip \"Fenix\" Farquharson\n"
                           "Robin \"robhol\" Holm\n"
@@ -89,7 +90,7 @@ const char* g_szCredits = "== Multi Theft Auto: San Andreas v" MTA_DM_BUILDTAG_S
                           "MCvarial\n"
                           "tvc\n"
                           "Audifire\n"
-                          "W\n"
+                          "Kayl\n"
                           "\n"
                           "\n"
 
