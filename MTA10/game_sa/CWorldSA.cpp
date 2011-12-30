@@ -454,7 +454,7 @@ float CWorldSA::GetAircraftMaxHeight ( void )
     return *(float *)( VAR_fAircraftMaxHeight );
 }
 
-void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, float fX, float fY, float fZ)
+void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, float fX, float fY, float fZ )
 {    
     // New building Removal
     SBuildingRemoval* pRemoval = new SBuildingRemoval();
@@ -467,6 +467,7 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
     // Push it to the back of the removal list
     m_pBinaryBuildings->insert ( std::pair<unsigned short, SBuildingRemoval*> ( usModelToRemove, pRemoval ) );
 
+    bool bFound = false;
     // Init loop variables
     sDataBuildingRemoval * pFind = NULL;
     std::pair < std::multimap < unsigned short, sDataBuildingRemoval*>::iterator, std::multimap < unsigned short, sDataBuildingRemoval* >::iterator> iterators = m_pDataBuildings->equal_range ( usModelToRemove );
@@ -504,6 +505,8 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
                                 pRemoval->AddDataBuilding ( pInterface );
                                 // Remove the model from the world
                                 Remove ( pInterface );
+                                bFound = true;
+
                             }
                         }
                         // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
@@ -515,7 +518,9 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
             }
         }
     }
-    pGame->GetModelInfo ( pInterface->m_nModelIndex )->RestreamIPL ();
+
+    if ( bFound )
+        pGame->GetModelInfo ( usModelToRemove )->RestreamIPL ();
 }
 
 bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, float fX, float fY, float fZ )
