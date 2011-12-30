@@ -103,6 +103,8 @@ public:
     void                AddDataBuilding                 ( CEntitySAInterface * pInterface );
     void                RemoveWorldBuildingFromLists    ( CEntitySAInterface * pInterface );
     void                AddBinaryBuilding               ( CEntitySAInterface * pInterface );
+    bool                IsObjectRemoved                 ( CEntitySAInterface * pInterface );
+    bool                IsDataModelRemoved              ( unsigned short usModelID );
 private:
     std::multimap< unsigned short, SBuildingRemoval* >          *m_pBinaryBuildings;
     std::multimap < unsigned short, sDataBuildingRemoval* >     *m_pDataBuildings;

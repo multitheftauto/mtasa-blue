@@ -141,7 +141,9 @@ public:
     virtual bool        RestoreBuilding             ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ ) = 0;
     virtual SBuildingRemoval*   GetBuildingRemoval  ( CEntitySAInterface * pInterface ) = 0;
     virtual void        AddDataBuilding             ( CEntitySAInterface * pInterface ) = 0;
-    virtual void        RemoveWorldBuildingFromLists         ( CEntitySAInterface * pInterface ) = 0;
+    virtual void        RemoveWorldBuildingFromLists( CEntitySAInterface * pInterface ) = 0;
+    virtual bool        IsObjectRemoved             ( CEntitySAInterface * pInterface ) = 0;
+    virtual bool        IsDataModelRemoved          ( unsigned short usModelID ) = 0;
 };
 
 #endif
