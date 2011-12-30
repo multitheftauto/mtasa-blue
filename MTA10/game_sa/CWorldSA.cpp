@@ -496,12 +496,15 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
                     if ( pInterface && pInterface != NULL )
                     {
                         // if the building type is dummy or building and it's not already being removed
-                        if ( ( pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY ) && pInterface->bRemoveFromWorld != 1 )
+                        if ( ( pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY || pInterface->nType == ENTITY_TYPE_OBJECT ) && pInterface->bRemoveFromWorld != 1 )
                         {
-                            // Add the Data Building to the list
-                            pRemoval->AddDataBuilding ( pInterface );
-                            // Remove the model from the world
-                            Remove ( pInterface );
+                            if ( (DWORD)(pInterface->vtbl) != VTBL_CPlaceable )
+                            {
+                                // Add the Data Building to the list
+                                pRemoval->AddDataBuilding ( pInterface );
+                                // Remove the model from the world
+                                Remove ( pInterface );
+                            }
                         }
                         // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
                         //pInterface = pInterface->m_pLod;
@@ -512,6 +515,7 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
             }
         }
     }
+    pGame->GetModelInfo ( pInterface->m_nModelIndex )->RestreamIPL ();
 }
 
 bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, float fX, float fY, float fZ )
@@ -551,7 +555,7 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
                         if ( pEntity != NULL )
                         {
                             // if the building type is dummy or building and it's not already being removed
-                            if ( ( pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY ) && pEntity->bRemoveFromWorld != 1 )
+                            if ( ( pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT ) && pEntity->bRemoveFromWorld != 1 )
                             {
                                 // Don't call this on entities being removed.
                                 if ( (DWORD)(pEntity->vtbl) != VTBL_CPlaceable )
@@ -579,9 +583,12 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
                         if ( pEntity != NULL )
                         {
                             // if the building type is dummy or building and it's not already being removed
-                            if ( ( pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY ) && pEntity->bRemoveFromWorld != 1 )
+                            if ( ( pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT ) && pEntity->bRemoveFromWorld != 1 )
                             {
-                                Add ( pEntity );
+                                if ( (DWORD)(pEntity->vtbl) != VTBL_CPlaceable )
+                                {
+                                    Add ( pEntity );
+                                }
                             }
                             pFind->m_pDataRemoveList->erase ( entityIter++ );
                         }
@@ -661,11 +668,48 @@ bool CWorldSA::IsRemovedModelInRadius ( SIPLInst* pInst )
     return false;
 }
 
+// Check Distance to see if the model being requested is in the radius
+bool CWorldSA::IsObjectRemoved ( CEntitySAInterface* pInterface )
+{
+    // Init some variables
+    SBuildingRemoval * pFind = NULL;
+    std::pair < std::multimap < unsigned short, SBuildingRemoval* >::iterator, std::multimap < unsigned short, SBuildingRemoval* >::iterator> iterators = m_pBinaryBuildings->equal_range ( pInterface->m_nModelIndex );
+    std::multimap < unsigned short, SBuildingRemoval* > ::const_iterator iter = iterators.first;
+    // Loop through the buildings list
+    for ( ; iter != iterators.second; ++iter )
+    {
+        pFind = (*iter).second;
+        // if pFind is valid and the model is the same
+        if ( pFind )
+        {
+            // Grab the distance
+            float fDistanceX = pFind->m_vecPos.fX - pInterface->Placeable.m_transform.m_translate.fX;
+            float fDistanceY = pFind->m_vecPos.fY - pInterface->Placeable.m_transform.m_translate.fY;
+            float fDistanceZ = pFind->m_vecPos.fZ - pInterface->Placeable.m_transform.m_translate.fZ;
+
+            float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
+            // is it in the removal spheres radius if so return else keep looking
+            if ( fDistance <=  pFind->m_fRadius )
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 // Check if a given model is replaced
 bool CWorldSA::IsModelRemoved ( unsigned short usModelID )
 {
     return m_pBinaryBuildings->count ( usModelID ) > 0;
 }
+
+// Check if a given model is replaced
+bool CWorldSA::IsDataModelRemoved ( unsigned short usModelID )
+{
+    return m_pBinaryBuildings->count ( usModelID ) > 0;
+}
+
 
 // Resets deleted list
 void CWorldSA::ClearRemovedBuildingLists ( )
@@ -692,7 +736,7 @@ void CWorldSA::ClearRemovedBuildingLists ( )
                     if ( pEntity && pEntity != NULL )
                     {
                         // if the building type is dummy or building and it's not already being removed
-                        if ( ( pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY ) && pEntity->bRemoveFromWorld != 1 )
+                        if ( ( pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT ) && pEntity->bRemoveFromWorld != 1 )
                         {
                             // Don't call this on entities being removed.
                             if ( (DWORD)(pEntity->vtbl) != VTBL_CPlaceable )
@@ -715,9 +759,13 @@ void CWorldSA::ClearRemovedBuildingLists ( )
                     if ( pEntity && pEntity != NULL )
                     {
                         // if the building type is dummy or building and it's not already being removed
-                        if ( ( pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY ) && pEntity->bRemoveFromWorld != 1 )
+                        if ( ( pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT ) && pEntity->bRemoveFromWorld != 1 )
                         {
-                            Add ( pEntity );
+                            // Don't call this on entities being removed.
+                            if ( (DWORD)(pEntity->vtbl) != VTBL_CPlaceable )
+                            {
+                                Add ( pEntity );
+                            }
                         }
                     }
                 }
