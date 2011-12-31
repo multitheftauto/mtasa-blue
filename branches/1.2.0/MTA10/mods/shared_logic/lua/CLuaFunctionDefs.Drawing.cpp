@@ -690,6 +690,40 @@ int CLuaFunctionDefs::dxSetShaderTessellation ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::dxSetShaderTransform ( lua_State* luaVM )
+{
+//  bool dxSetShaderTransform( element shader, lots )
+    CClientShader* pShader; SShaderTransform transform;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pShader );
+
+    argStream.ReadNumber ( transform.vecRot.fX, 0 );
+    argStream.ReadNumber ( transform.vecRot.fY, 0 );
+    argStream.ReadNumber ( transform.vecRot.fZ, 0 );
+    argStream.ReadNumber ( transform.vecRotCenOffset.fX, 0 );
+    argStream.ReadNumber ( transform.vecRotCenOffset.fY, 0 );
+    argStream.ReadNumber ( transform.vecRotCenOffset.fZ, 0 );
+    argStream.ReadBool ( transform.bRotCenOffsetOriginIsScreen, false );
+    argStream.ReadNumber ( transform.vecPersCenOffset.fX, 0 );
+    argStream.ReadNumber ( transform.vecPersCenOffset.fY, 0 );
+    argStream.ReadBool ( transform.bPersCenOffsetOriginIsScreen, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        pShader->GetShaderItem ()->SetTransform ( transform );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetShaderTransform", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::dxSetRenderTarget ( lua_State* luaVM )
 {
 //  bool setRenderTaget( element renderTarget [, bool clear = false ] )

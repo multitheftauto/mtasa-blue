@@ -10,6 +10,8 @@
 *
 *****************************************************************************/
 
+#include <CVector.h>
+
 struct ID3DXFont;
 struct IDirect3DBaseTexture9;
 struct IDirect3DSurface9;
@@ -131,6 +133,23 @@ struct SShaderValue
         float floatList[16];
     };
 };
+
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// SShaderTransform
+//
+struct SShaderTransform
+{
+    CVector vecRot;
+    CVector vecRotCenOffset;
+    bool bRotCenOffsetOriginIsScreen;
+
+    CVector vecPersCenOffset;
+    bool bPersCenOffsetOriginIsScreen;
+};
+
 
 
 ////////////////////////////////////////////////////////////////
@@ -296,6 +315,7 @@ class CShaderItem : public CMaterialItem
     void            MaybeRenewShaderInstance ( void );
     void            RenewShaderInstance     ( void );
     virtual void    SetTessellation         ( uint uiTessellationX, uint uiTessellationY );
+    virtual void    SetTransform            ( const SShaderTransform& transform );
 
     CEffectWrap*        m_pEffectWrap;
     float               m_fPriority;
@@ -336,6 +356,8 @@ class CShaderInstance : public CMaterialItem
     CEffectWrap*        m_pEffectWrap;
     uint                m_uiTessellationX;
     uint                m_uiTessellationY;
+    SShaderTransform    m_Transform;
+    bool                m_bHasModifiedTransform;
     std::map < D3DXHANDLE, SShaderValue > m_currentSetValues;
 };
 

@@ -12,6 +12,7 @@
 
 #include <StdInc.h>
 #include "CTileBatcher.h"
+#define DEG2RAD(deg) ( (deg) * (6.2832f/360.f) )
 
 ////////////////////////////////////////////////////////////////
 //
@@ -79,16 +80,19 @@ void CTileBatcher::OnChangingRenderTarget ( uint uiNewViewportSizeX, uint uiNewV
 ////////////////////////////////////////////////////////////////
 void CTileBatcher::UpdateMatrices ( float fViewportSizeX, float fViewportSizeY)
 {
+    m_fViewportSizeX = fViewportSizeX;
+    m_fViewportSizeY = fViewportSizeY;
+
     D3DXMatrixIdentity ( &m_MatView );
     D3DXMatrixIdentity ( &m_MatProjection );
 
     // Make projection 3D friendly, so shaders can alter the z coord for fancy effects
-    float fFarPlane = 1000;
-    float fNearPlane = 10;
+    float fFarPlane = 10000;
+    float fNearPlane = 100;
     float Q = fFarPlane / ( fFarPlane - fNearPlane );
-    float fAdjustZFactor = 20.f;
-    float rcpSizeX = 2.0f / fViewportSizeX;
-    float rcpSizeY = -2.0f / fViewportSizeY;
+    float fAdjustZFactor = 1000.f;
+    float rcpSizeX = 2.0f / m_fViewportSizeX;
+    float rcpSizeY = -2.0f / m_fViewportSizeY;
     rcpSizeX *= fAdjustZFactor;
     rcpSizeY *= fAdjustZFactor;
 
@@ -96,12 +100,25 @@ void CTileBatcher::UpdateMatrices ( float fViewportSizeX, float fViewportSizeY)
     m_MatProjection.m[1][1] = rcpSizeY;
     m_MatProjection.m[2][2] = Q;
     m_MatProjection.m[2][3] = 1;
-    m_MatProjection.m[3][0] = ( -fViewportSizeX / 2.0f - 0.5f ) * rcpSizeX;
-    m_MatProjection.m[3][1] = ( -fViewportSizeY / 2.0f - 0.5f ) * rcpSizeY;
+    m_MatProjection.m[3][0] = ( -m_fViewportSizeX / 2.0f - 0.5f ) * rcpSizeX;
+    m_MatProjection.m[3][1] = ( -m_fViewportSizeY / 2.0f - 0.5f ) * rcpSizeY;
     m_MatProjection.m[3][2] = -Q * fNearPlane;
     m_MatProjection.m[3][3] = 0;
 
     m_MatView.m[3][2] = fAdjustZFactor;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CTileBatcher::OnZBufferModified
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CTileBatcher::OnZBufferModified ( void )
+{
+    m_bZBufferDirty = true;
 }
 
 
@@ -120,6 +137,13 @@ void CTileBatcher::Flush ( void )
         // TODO - Optimize all this
         //
 
+        if ( m_bUseCustomMatrices && m_bZBufferDirty )
+        {
+            // Shaders with transforms will probably need a clear zbuffer
+            m_pDevice->Clear ( 0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0,0,0,0), 1, 0 );
+            m_bZBufferDirty = false;
+        }
+
         // Save state
         LPDIRECT3DSTATEBLOCK9   m_pDeviceState = NULL;
 #if 0   // Creating a state block here may not be necessary
@@ -127,7 +151,7 @@ void CTileBatcher::Flush ( void )
 #endif
 
         // Set states
-        m_pDevice->SetRenderState ( D3DRS_ZENABLE, D3DZB_FALSE );
+        m_pDevice->SetRenderState ( D3DRS_ZENABLE, m_bUseCustomMatrices ? D3DZB_TRUE : D3DZB_FALSE );
         m_pDevice->SetRenderState ( D3DRS_CULLMODE, D3DCULL_NONE );
         m_pDevice->SetRenderState ( D3DRS_SHADEMODE, D3DSHADE_GOURAUD );
         m_pDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
@@ -147,28 +171,38 @@ void CTileBatcher::Flush ( void )
         m_pDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
 
 
-        // Set transforms
-        D3DXMATRIX matWorld;
-        if ( m_fCurrentRotation == 0.0f )
+        if ( m_bUseCustomMatrices )
         {
-            // No rotation
-            D3DXMatrixIdentity ( &matWorld );
+            m_pDevice->SetTransform ( D3DTS_WORLD, &m_MatCustomWorld );
+            m_pDevice->SetTransform ( D3DTS_VIEW, &m_MatView );
+            m_pDevice->SetTransform ( D3DTS_PROJECTION, &m_MatCustomProjection );
         }
         else
         {
-            // Yes rotation
-            D3DXMATRIX MatToCOR, MatRot, MatFromCOR;
-            D3DXMatrixTranslation ( &MatToCOR, -m_fCurrentRotCenX, -m_fCurrentRotCenY, 0 );
-            D3DXMatrixRotationZ ( &MatRot, m_fCurrentRotation * (6.2832f/360.f) );
-            D3DXMatrixTranslation ( &MatFromCOR, m_fCurrentRotCenX, m_fCurrentRotCenY, 0 );
+            // Set transforms
+            D3DXMATRIX matWorld;
+            if ( m_fCurrentRotation == 0.0f )
+            {
+                // No rotation
+                D3DXMatrixIdentity ( &matWorld );
+            }
+            else
+            {
+                // Yes rotation
+                D3DXMATRIX MatToCOR, MatRot, MatFromCOR;
+                D3DXMatrixTranslation ( &MatToCOR, -m_fCurrentRotCenX, -m_fCurrentRotCenY, 0 );
+                D3DXMatrixRotationZ ( &MatRot, m_fCurrentRotation * (6.2832f/360.f) );
+                D3DXMatrixTranslation ( &MatFromCOR, m_fCurrentRotCenX, m_fCurrentRotCenY, 0 );
 
-            // Mout = Mrc-1 * Mr * Mrc
-            matWorld = MatToCOR * MatRot * MatFromCOR;
+                // Mout = Mrc-1 * Mr * Mrc
+                matWorld = MatToCOR * MatRot * MatFromCOR;
+            }
+
+            m_pDevice->SetTransform ( D3DTS_WORLD, &matWorld );
+            m_pDevice->SetTransform ( D3DTS_VIEW, &m_MatView );
+            m_pDevice->SetTransform ( D3DTS_PROJECTION, &m_MatProjection );
         }
 
-        m_pDevice->SetTransform ( D3DTS_WORLD, &matWorld );
-        m_pDevice->SetTransform ( D3DTS_VIEW, &m_MatView );
-        m_pDevice->SetTransform ( D3DTS_PROJECTION, &m_MatProjection );
 
         // Set vertex stream
         uint PrimitiveCount                 = m_Indices.size () / 3;
@@ -275,21 +309,32 @@ void CTileBatcher::AddTile ( float fX1, float fY1,
                               float fRotCenOffY,
                               unsigned long ulColor )
 {
-    // Get tessellation setting from shader
+    // Flush previous if it was using a shader transform
+    if ( m_bUseCustomMatrices )
+        Flush ();
+
+    m_bUseCustomMatrices = false;
     uint uiTessellationX = 1;
     uint uiTessellationY = 1;
+
+    // Get settings from shader
     if ( CShaderInstance* pShaderInstance = DynamicCast < CShaderInstance > ( pMaterial ) )
     {
+        // Get transform setting 
+        if ( pShaderInstance && pShaderInstance->m_bHasModifiedTransform )
+        {
+            MakeCustomMatrices ( pShaderInstance->m_Transform, fX1, fY1, fX2, fY2, m_MatCustomWorld, m_MatCustomProjection );
+            m_bUseCustomMatrices = true;
+        }
+
+        // Get tessellation setting
         // Validate tessellation range (ensure x*y < 65536)
         uiTessellationX = Clamp < uint > ( 1, pShaderInstance->m_uiTessellationX, 4000 );
         uiTessellationY = Clamp < uint > ( 1, pShaderInstance->m_uiTessellationY, 4000 );
-
         uint uiNumVertices = ( uiTessellationX + 1 ) * ( uiTessellationY + 1 );
-
         if ( uiNumVertices > 65535 )
         {
             uint div = uiNumVertices / 6553 + 1;
-
             if ( uiTessellationX > uiTessellationY )
                 uiTessellationX = uiTessellationX / div * 10;
             else
@@ -301,8 +346,13 @@ void CTileBatcher::AddTile ( float fX1, float fY1,
     uint uiNumVertices = ( uiTessellationX + 1 ) * ( uiTessellationY + 1 );
 
     // Calc position of rotation center
-    float fRotCenX = fRotCenOffX + ( fX1 + fX2 ) * 0.5f;
-    float fRotCenY = fRotCenOffY + ( fY1 + fY2 ) * 0.5f;
+    float fRotCenX = 0;
+    float fRotCenY = 0;
+    if ( m_fCurrentRotation != 0.0f )
+    {
+        fRotCenX = fRotCenOffX + ( fX1 + fX2 ) * 0.5f;
+        fRotCenY = fRotCenOffY + ( fY1 + fY2 ) * 0.5f;
+    }
 
     // Check if we need to flush what has been done so far
     if ( pMaterial != m_pCurrentMaterial
@@ -310,6 +360,7 @@ void CTileBatcher::AddTile ( float fX1, float fY1,
             || fRotCenX != m_fCurrentRotCenX
             || fRotCenY != m_fCurrentRotCenY
             || uiNumVertices + m_Vertices.size () > 65535
+            || m_bUseCustomMatrices
             )
     {
         Flush ();
@@ -387,4 +438,65 @@ void CTileBatcher::AddTile ( float fX1, float fY1,
             }
         }
     }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CTileBatcher::MakeCustomMatrices
+//
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CTileBatcher::MakeCustomMatrices ( const SShaderTransform& t
+                                        ,float fX1, float fY1
+                                        ,float fX2, float fY2
+                                        ,D3DXMATRIX& matOutWorld
+                                        ,D3DXMATRIX& matOutProjection )
+{
+    CVector vecCenterOfTile = ( CVector( fX1, fY1, 0 ) + CVector( fX2, fY2, 0 ) ) * 0.5f; 
+    CVector vecCenterOfScreen = CVector( m_fViewportSizeX, m_fViewportSizeY, 0 ) * 0.5f;
+    CVector vecHalfScreenSize = CVector( m_fViewportSizeX, m_fViewportSizeY, 1000 ) * 0.5f;
+
+    // Rotation
+    CVector useCenOfRot = t.vecRotCenOffset * vecHalfScreenSize;
+    if ( t.bRotCenOffsetOriginIsScreen )
+    {
+        useCenOfRot += vecCenterOfScreen;
+    }
+    else
+    {
+        useCenOfRot += vecCenterOfTile;
+    }
+
+    D3DXMATRIX matToCOR, matRot, matFromCOR;
+    D3DXMatrixTranslation ( &matToCOR, -useCenOfRot.fX, -useCenOfRot.fY, -useCenOfRot.fZ );
+    D3DXMatrixRotationYawPitchRoll ( &matRot, DEG2RAD(t.vecRot.fX), DEG2RAD(t.vecRot.fY), DEG2RAD(t.vecRot.fZ) );
+    D3DXMatrixTranslation ( &matFromCOR, useCenOfRot.fX, useCenOfRot.fY, useCenOfRot.fZ );
+
+    matOutWorld = matToCOR * matRot * matFromCOR;
+
+
+    // Perspective
+    CVector useCenOfPers = t.vecPersCenOffset * vecHalfScreenSize;
+    if ( !t.bPersCenOffsetOriginIsScreen )
+    {
+        useCenOfPers += vecCenterOfTile - vecCenterOfScreen;
+    }
+
+    D3DXMATRIX matFromCOP;
+    D3DXMATRIX matToCOP;
+    D3DXMatrixIdentity ( &matFromCOP );
+
+    matFromCOP.m[3][0] = useCenOfPers.fX * ( 2.0f / m_fViewportSizeX );
+    matFromCOP.m[3][1] = -useCenOfPers.fY * ( 2.0f / m_fViewportSizeY );
+    D3DXMatrixInverse ( &matToCOP, NULL, &matFromCOP );
+
+    matOutProjection = matToCOP * m_MatProjection * matFromCOP;
+
+    // Use world transform to centralize perspective offset
+    D3DXMATRIX matCentralize;
+    D3DXMatrixTranslation ( &matCentralize, -useCenOfPers.fX, -useCenOfPers.fY, 0 );
+    matOutWorld = matOutWorld * matCentralize;
 }

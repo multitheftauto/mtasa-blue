@@ -611,6 +611,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxGetMaterialSize", CLuaFunctionDefs::dxGetMaterialSize );
     CLuaCFunctions::AddFunction ( "dxSetShaderValue", CLuaFunctionDefs::dxSetShaderValue );
     CLuaCFunctions::AddFunction ( "dxSetShaderTessellation", CLuaFunctionDefs::dxSetShaderTessellation );
+    CLuaCFunctions::AddFunction ( "dxSetShaderTransform", CLuaFunctionDefs::dxSetShaderTransform );
     CLuaCFunctions::AddFunction ( "dxSetRenderTarget", CLuaFunctionDefs::dxSetRenderTarget );
     CLuaCFunctions::AddFunction ( "dxUpdateScreenSource", CLuaFunctionDefs::dxUpdateScreenSource );
     CLuaCFunctions::AddFunction ( "dxGetStatus", CLuaFunctionDefs::dxGetStatus );

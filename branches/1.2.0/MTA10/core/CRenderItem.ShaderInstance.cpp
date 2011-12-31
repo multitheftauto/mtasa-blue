@@ -103,6 +103,8 @@ void CShaderInstance::CreateUnderlyingData ( CShaderItem* pShaderItem )
         m_currentSetValues = pShaderItem->m_pShaderInstance->m_currentSetValues;
         m_uiTessellationX = pShaderItem->m_pShaderInstance->m_uiTessellationX;
         m_uiTessellationY = pShaderItem->m_pShaderInstance->m_uiTessellationY;
+        m_Transform = pShaderItem->m_pShaderInstance->m_Transform;
+        m_bHasModifiedTransform = pShaderItem->m_pShaderInstance->m_bHasModifiedTransform;
 
         // Increment refs on cloned texture values
         for ( std::map < D3DXHANDLE, SShaderValue >::iterator iter = m_currentSetValues.begin () ; iter != m_currentSetValues.end () ; ++iter )
