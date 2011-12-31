@@ -105,6 +105,7 @@ CGame::CGame ( void )
     m_pPedSync = NULL;
     m_pWaterManager = NULL;
     m_pWeaponStatsManager = NULL;
+    m_pBuildingRemovalManager = NULL;
 #ifdef WITH_OBJECT_SYNC
     m_pObjectSync = NULL;
 #endif
@@ -258,6 +259,7 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pRPCFunctions );
     SAFE_DELETE ( m_pWaterManager );
     SAFE_DELETE ( m_pWeaponStatsManager );
+    SAFE_DELETE ( m_pBuildingRemovalManager );
     SAFE_DELETE ( m_pOpenPortsTester );
     CSimControl::Shutdown ();
 
@@ -437,6 +439,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pWaterManager = new CWaterManager;
 
     m_pWeaponStatsManager = new CWeaponStatManager();
+
+    m_pBuildingRemovalManager = new CBuildingRemovalManager;
 
 
     // Parse the commandline

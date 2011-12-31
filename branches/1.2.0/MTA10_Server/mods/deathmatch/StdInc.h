@@ -270,6 +270,8 @@ struct SAclRequest;
 #include "Utils.h"
 #include "logic/CWeaponStat.h"
 #include "logic/CWeaponStatManager.h"
+#include "logic/CBuildingRemoval.h"
+#include "logic/CBuildingRemovalManager.h"
 
 #include "CStaticFunctionDefinitions.h"
 

@@ -109,6 +109,8 @@ class CLanBroadcast;
 class CWaterManager;
 
 class CWeaponStatManager;
+class CBuildingRemovalManager;
+
 
 // Packet forward declarations
 class CCommandPacket;
@@ -227,6 +229,7 @@ public:
     inline CWaterManager*           GetWaterManager             ( void )        { return m_pWaterManager; }
     inline CLightsyncManager*       GetLightSyncManager         ( void )        { return &m_lightsyncManager; }
     inline CWeaponStatManager*      GetWeaponStatManager        ( void )        { return m_pWeaponStatsManager; }
+    inline CBuildingRemovalManager* GetBuildingRemovalManager   ( void )        { return m_pBuildingRemovalManager; }
 
     void                        JoinPlayer                  ( CPlayer& Player );
     void                        InitialDataStream           ( CPlayer& Player );
@@ -421,6 +424,8 @@ private:
     CWaterManager*                  m_pWaterManager;
 
     CWeaponStatManager*             m_pWeaponStatsManager;
+    CBuildingRemovalManager*        m_pBuildingRemovalManager;
+
     CSerialManager                  m_SerialManager;
 
 

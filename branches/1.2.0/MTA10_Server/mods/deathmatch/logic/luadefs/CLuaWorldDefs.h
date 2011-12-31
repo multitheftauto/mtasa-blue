@@ -84,6 +84,9 @@ public:
     static int      resetWindVelocity                   ( lua_State* luaVM );
     static int      resetFarClipDistance                ( lua_State* luaVM );
     static int      resetFogDistance                    ( lua_State* luaVM );
+    static int      RemoveWorldModel                    ( lua_State* luaVM );
+    static int      RestoreWorldModel                   ( lua_State* luaVM );
+    static int      RestoreAllWorldModels               ( lua_State* luaVM );
 };
 
 #endif
