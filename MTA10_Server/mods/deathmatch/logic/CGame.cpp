@@ -1939,7 +1939,7 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
 
     // Relay packet
     if ( !sendList.empty () )
-        for ( uint i = 0 ; i < g_pBandwidthSettings->iTestSendMultiplier ; i++ )
+        for ( int i = 0 ; i < g_pBandwidthSettings->iTestSendMultiplier ; i++ )
             CPlayerManager::Broadcast ( Packet, sendList );
 
     // Update sim data

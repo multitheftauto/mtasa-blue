@@ -239,7 +239,7 @@ bool CSimPlayerManager::HandlePlayerPureSync ( NetServerPlayerID& Socket, NetBit
         if ( pPacket->Read ( *BitStream ) )
         {
             // Relay it to nearbyers
-            for ( uint i = 0 ; i < g_pBandwidthSettings->iTestSendMultiplier ; i++ )
+            for ( int i = 0 ; i < g_pBandwidthSettings->iTestSendMultiplier ; i++ )
                 Broadcast ( *pPacket, pSourceSimPlayer->GetSendList () );
         }
 

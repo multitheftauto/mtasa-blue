@@ -399,7 +399,7 @@ uint Font::getRequiredTextureSize(const String& glyph_set)
 
     // Guess required size
     int numPixels = d_avg_width * d_maxGlyphHeight * glyph_set.size ();
-    int size = sqrt ( (float)numPixels ) / 80 * 100;
+    int size = static_cast < int > ( sqrt ( (float)numPixels ) / 80 * 100 );
 
     // Make power of 2
     int targetlevel = 1;
