@@ -288,7 +288,6 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_TEC9;i++)
     {
         sWeaponPropertySync WeaponProperty;
-        CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager ()->GetWeaponStats( (eWeaponType)i );
         BitStream.WriteBit ( true );
         for (int j = 0; j <= 2;j++)
         {

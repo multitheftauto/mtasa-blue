@@ -37,9 +37,10 @@ namespace
                                          { "getLowLODElement",          "1.2" },
                                          { "isElementLowLOD",           "1.2" },
                                          { "resetWaterLevel",           "1.2" },
-                                         { "removeWorldModel",          "1.2" },
-                                         { "restoreWorldModel",         "1.2" },
-                                         { "restoreAllWorldModels",     "1.2" },
+                                         { "removeWorldModel",          "1.2.0-9.03618" },
+                                         { "restoreWorldModel",         "1.2.0-9.03618" },
+                                         { "restoreAllWorldModels",     "1.2.0-9.03618" },
+                                         { "dxSetShaderTransform",      "1.2.0-9.03618" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
