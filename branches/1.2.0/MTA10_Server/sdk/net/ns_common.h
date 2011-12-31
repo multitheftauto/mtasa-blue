@@ -89,6 +89,7 @@ struct NetStatistics
     float compressionRatio, decompressionRatio;
 
     int encryptionStatus;
+    int usingSlidingWindow;
 };
 
 struct SBandwidthStatistics

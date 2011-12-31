@@ -84,7 +84,8 @@ void CNetworkStats::Draw ( void )
                 "Decompression ratio: %.3f%%\n"
                 "BPS limit by CC: %llu\n"
                 "BPS limit by OB: %llu\n"
-                "Encryption: %s\n",
+                "Encryption: %s\n"
+                "CC is sliding window: %d\n",
 
                 g_pNet->GetPing (),
 
@@ -111,7 +112,8 @@ void CNetworkStats::Draw ( void )
                 stats.isLimitedByCongestionControl ? stats.BPSLimitByCongestionControl : 0ULL,
                 stats.isLimitedByOutgoingBandwidthLimit ? stats.BPSLimitByOutgoingBandwidthLimit : 0ULL,
 
-                stats.encryptionStatus ? stats.encryptionStatus == 1 ? "On" : "Unknown" : "Off"
+                stats.encryptionStatus ? stats.encryptionStatus == 1 ? "On" : "Unknown" : "Off",
+                stats.usingSlidingWindow
                 );
 
     // Print it

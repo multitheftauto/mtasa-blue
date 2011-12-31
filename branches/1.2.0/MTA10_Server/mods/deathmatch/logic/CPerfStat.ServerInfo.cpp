@@ -239,6 +239,12 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     m_OptionsList.push_back ( StringPair ( "Test - Everyone near",      SString ( "%d", g_pBandwidthSettings->bTestPretendEveryoneIsNear ) ) );
     m_OptionsList.push_back ( StringPair ( "Test - Send multiplier",    SString ( "%d", g_pBandwidthSettings->iTestSendMultiplier ) ) );
 
+    NetStatistics netStatistics;
+    if ( g_pNetServer->GetNetworkStatistics ( &netStatistics, NetServerPlayerID() ) )
+    {
+        m_OptionsList.push_back ( StringPair ( "Players using sliding window",  SString ( "%d", netStatistics.usingSlidingWindow ) ) );
+    }
+    
     //
     // Set option flags
     //
