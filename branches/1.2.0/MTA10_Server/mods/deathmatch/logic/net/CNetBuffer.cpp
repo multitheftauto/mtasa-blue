@@ -177,7 +177,7 @@ void CNetServerBuffer::DoPulse ( void )
         m_TimeThreadFPSLastCalced.Reset ();
         float fSyncFPS;
         shared.m_Mutex.Lock ( EActionWho::MAIN, EActionWhere::DoPulse );
-        fSyncFPS = shared.m_iThreadFrameCount;
+        fSyncFPS = static_cast < float > ( shared.m_iThreadFrameCount );
         shared.m_iThreadFrameCount = 0;
         shared.m_Mutex.Unlock ( EActionWho::MAIN, EActionWhere::DoPulse );
 

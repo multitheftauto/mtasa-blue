@@ -1651,6 +1651,8 @@ bool CWeaponStatManager::LoadDefault ( CWeaponStat* pDest, eWeaponType weaponTyp
                     pDest->SetCombosAvailable ( OriginalNormalWeaponData[iVal].combos_available );
                     break;
                 }
+            default:
+                    break;
             }
         }
     }
