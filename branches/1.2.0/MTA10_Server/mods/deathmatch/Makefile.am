@@ -48,7 +48,7 @@ LOGIC = \
 ./logic/CBlendedWeather.cpp \
 ./logic/CBlip.cpp \
 ./logic/CBlipManager.cpp \
-./logic/CBuildingRemovalManager \
+./logic/CBuildingRemovalManager.cpp \
 ./logic/CBuildingRemoval.cpp \
 ./logic/CClient.cpp \
 ./logic/CClock.cpp \
