@@ -38,6 +38,7 @@ void CBuildingRemovalManager::ClearBuildingRemovals ( void )
         if ( (*iter ).second )
             delete (*iter).second;
     }
+    m_BuildingRemovals.clear ( );
 }
 
 void CBuildingRemovalManager::RestoreWorldModel ( unsigned short usModel, float fRadius, CVector vecPos )
