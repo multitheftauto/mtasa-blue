@@ -45,7 +45,7 @@ void CBuildingRemovalManager::RestoreWorldModel ( unsigned short usModel, float 
 
     CBuildingRemoval * pFind = NULL;
     std::pair < std::multimap < unsigned short, CBuildingRemoval* >::iterator, std::multimap < unsigned short, CBuildingRemoval* >::iterator> iterators = m_BuildingRemovals.equal_range ( usModel );
-    std::multimap < unsigned short, CBuildingRemoval* > ::const_iterator iter = iterators.first;
+    std::multimap < unsigned short, CBuildingRemoval* > ::iterator iter = iterators.first;
     for ( ; iter != iterators.second; )
     {
         pFind = (*iter).second;
