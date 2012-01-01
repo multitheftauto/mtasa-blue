@@ -104,6 +104,7 @@ public:
     bool                            SetSetting                      ( const SString& configSetting, const SString& strValue, bool bSave );
 
     void                            SetCommandLineParser            ( CCommandLineParser* pCommandLineParser );
+    bool                            SetAllowedCongestionControl     ( const SString& strName );
     void                            ApplyBandwidthReductionMode     ( void );
     void                            ApplyThreadNetEnabled           ( void );
 
@@ -167,6 +168,7 @@ private:
     bool                            m_bThreadNetEnabled;
     int                             m_iDebugFlag;
     std::map < SString, SString >   m_TransientSettings;
+    bool                            m_bAllowSW;
 };
 
 #endif

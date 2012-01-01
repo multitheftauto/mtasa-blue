@@ -516,6 +516,12 @@ bool CMainConfig::Load ( void )
     GetBoolean ( m_pRootNode, "threadnet", m_bThreadNetEnabled );
     ApplyThreadNetEnabled ();
 
+    // congestion control
+    SString strCongestionControlName;
+    GetString ( m_pRootNode, "congestion_control", strCongestionControlName );
+    if ( !SetAllowedCongestionControl ( strCongestionControlName ) )
+        SetAllowedCongestionControl ( "both" );
+
     return true;
 }
 
@@ -539,6 +545,20 @@ void CMainConfig::ApplyBandwidthReductionMode ( void )
         m_strBandwidthReductionMode = "none";
         g_pBandwidthSettings->SetNone ();
     }
+}
+
+
+bool CMainConfig::SetAllowedCongestionControl ( const SString& strValue )
+{
+    if ( strValue == "old" || strValue == "both" )
+    {
+        SetString ( m_pRootNode, "congestion_control", strValue );
+        m_bAllowSW = false;
+        if ( strValue == "both" )   m_bAllowSW = true;
+        g_pNetServer->SetAllowedCongestionControl ( m_bAllowSW );
+        return true;
+    }
+    return false;
 }
 
 
@@ -1239,6 +1259,18 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
         if ( strValue == "0" || strValue == "1" )
         {
             g_pBandwidthSettings->bTestPretendEveryoneIsNear = atoi ( strValue ) == 0 ? false : true;
+            return true;
+        }
+    }
+    else
+    if ( strName == "congestion_control" )
+    {
+        if ( SetAllowedCongestionControl ( strValue ) )
+        {
+            if ( bSave )
+            {
+                Save ();
+            }
             return true;
         }
     }
