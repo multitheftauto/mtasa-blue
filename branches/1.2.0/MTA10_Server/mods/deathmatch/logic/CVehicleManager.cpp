@@ -505,7 +505,6 @@ void CVehicleManager::GetRandomVariation ( unsigned short usModel, unsigned char
     {
         if ( usModel == 581 || usModel == 457 || usModel == 512 || usModel == 522 )
         {
-            unsigned char ucVariants = g_ucVariants [usModel - 400];
             // e.g. 581 ( BF400 )
             // first 3 properties are Exhaust
             // last 2 are fairings.

@@ -3,7 +3,7 @@
 *  PROJECT:     Multi Theft Auto v1.0
 *               (Shared logic for modifications)
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CWeaponStatManager.h
+*  FILE:        mods/deathmatch/logic/CBuildingRemovalManager.h
 *  PURPOSE:     source file for the custom weapon stats manager.
 *  DEVELOPERS:  Cazomino05 < Cazomino05@gmail.com >
 *
