@@ -706,8 +706,11 @@ bool CClientVehicle::AreSwingingDoorsAllowed () const
 
 void CClientVehicle::AllowDoorRatioSetting ( unsigned char ucDoor, bool bAllow )
 {
-    m_bAllowDoorRatioSetting [ucDoor] = bAllow;
-    CancelDoorInterpolation ( ucDoor );
+    if ( ucDoor < NUMELMS(m_bAllowDoorRatioSetting) )
+    {
+        m_bAllowDoorRatioSetting [ucDoor] = bAllow;
+        CancelDoorInterpolation ( ucDoor );
+    }
 }
 
 bool CClientVehicle::AreDoorsLocked ( void )
