@@ -1511,7 +1511,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
                     case CClientGame::VEHICLE_NOTIFY_IN_ABORT_RETURN:
                     {
-                        unsigned char ucDoor;
+                        unsigned char ucDoor = 0;
                         SDoorOpenRatioSync door;
 
                         bitStream.ReadBits ( &ucDoor, 3 );

@@ -1571,9 +1571,10 @@ void CClientGame::UpdateVehicleInOut ( void )
                             CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( CElementIDs::GetElement ( m_VehicleInOutID ) );
                             if ( pVehicle )
                             {
-                                pBitStream->WriteBits ( &(m_pLocalPlayer->m_ucEnteringDoor ), 3 );
+                                unsigned char ucDoor = m_pLocalPlayer->m_ucEnteringDoor - 2;
+                                pBitStream->WriteBits ( &ucDoor, 3 );
                                 SDoorOpenRatioSync door;
-                                door.data.fRatio = pVehicle->GetDoorOpenRatio ( m_pLocalPlayer->m_ucEnteringDoor + 2 );
+                                door.data.fRatio = pVehicle->GetDoorOpenRatio ( m_pLocalPlayer->m_ucEnteringDoor );
                                 pBitStream->Write ( &door );
                             }
 
