@@ -591,6 +591,8 @@ CMultiplayerSA::CMultiplayerSA()
     MemSetFast ( &localStatsData, 0, sizeof ( CStatsData ) );
     localStatsData.StatTypesFloat [ 24 ] = 569.0f; // Max Health
     m_bSuspensionEnabled = true;
+
+    m_fAircraftMaxHeight = 800.0f;
 }
 
 void CMultiplayerSA::InitHooks()
@@ -1450,6 +1452,10 @@ void CMultiplayerSA::InitHooks()
     MemPut < int > ( 0x54F3A1, 1800 );
 
     SetSuspensionEnabled ( false );
+
+    // Aircraft Max Height checks are at 0x6D2614 and 0x6D2625 edit the check to use our own float.
+    MemPut ( 0x6D2614, &m_fAircraftMaxHeight );
+    MemPut ( 0x6D2625, &m_fAircraftMaxHeight );
 }
 
 

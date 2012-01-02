@@ -172,6 +172,9 @@ public:
     virtual void                SetLODSystemEnabled         ( bool bEnable );
     virtual void                SetAltWaterOrderEnabled     ( bool bEnable );
 
+    float                       GetAircraftMaxHeight        ( void )                    { return m_fAircraftMaxHeight; };
+    void                        SetAircraftMaxHeight        ( float fHeight )           { m_fAircraftMaxHeight = fHeight; };
+
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;
     static char*                ms_PlayerImgCachePtr;
@@ -182,7 +185,7 @@ private:
     CLimitsSA                   m_limits;
     bool                        m_bEnabledLODSystem;
     bool                        m_bEnabledAltWaterOrder;
-
+    float                       m_fAircraftMaxHeight;
 
 /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
     VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);
