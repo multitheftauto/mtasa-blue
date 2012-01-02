@@ -236,6 +236,9 @@ public:
     virtual void                        SetFastClothesLoading       ( EFastClothesLoading fastClothesLoading ) = 0;
     virtual void                        SetLODSystemEnabled         ( bool bEnable ) = 0;
     virtual void                        SetAltWaterOrderEnabled     ( bool bEnable ) = 0;
+
+    virtual float                       GetAircraftMaxHeight        ( void ) = 0;
+    virtual void                        SetAircraftMaxHeight        ( float fHeight ) = 0;
 };
 
 #endif

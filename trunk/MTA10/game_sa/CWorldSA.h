@@ -41,7 +41,7 @@
 #define NUM_StreamRepeatSectorRows                          16
 #define NUM_StreamRepeatSectorCols                          16
 #define VAR_fJetpackMaxHeight                               0x8703D8
-#define VAR_fAircraftMaxHeight                              0x8594DC
+#define VAR_fAircraftMaxHeight                              0x8594DC // Touch this directly and you are an idiot it's clearly in the data section and the xrefs map is massive :|
 #define VTBL_CBUILDING                                      0x8585C8
 
 #include <game/CWorld.h>
@@ -109,6 +109,7 @@ private:
     std::multimap< unsigned short, SBuildingRemoval* >          *m_pBinaryBuildings;
     std::multimap < unsigned short, sDataBuildingRemoval* >     *m_pDataBuildings;
     std::map < unsigned short, unsigned short >                 *m_pRemovedObjects;
+    float                                                       m_fAircraftMaxHeight;
 };
 
 #endif
