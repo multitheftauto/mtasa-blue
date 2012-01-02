@@ -446,12 +446,12 @@ float CWorldSA::GetJetpackMaxHeight ( void )
 
 void CWorldSA::SetAircraftMaxHeight ( float fHeight )
 {
-    MemPut < float > ( VAR_fAircraftMaxHeight, fHeight );
+    g_pCore->GetMultiplayer ( )->SetAircraftMaxHeight ( fHeight );
 }
 
 float CWorldSA::GetAircraftMaxHeight ( void )
 {
-    return *(float *)( VAR_fAircraftMaxHeight );
+    return g_pCore->GetMultiplayer ( )->GetAircraftMaxHeight ( );
 }
 
 void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, float fX, float fY, float fZ )
