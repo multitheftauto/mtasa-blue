@@ -1540,7 +1540,8 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                         }
 
                         // Set the door angle.
-                        pVehicle->AllowDoorRatioSetting ( ucDoor + 2, true );
+                        // Not sure why this was set if we force it anyway but it causes vehicles to be undamagable when all doors are open so... yeeeeeeeeeeeeeah
+                        //pVehicle->AllowDoorRatioSetting ( ucDoor + 2, true );
                         pVehicle->SetDoorOpenRatio ( ucDoor + 2, door.data.fRatio, 0, true );
 
 
