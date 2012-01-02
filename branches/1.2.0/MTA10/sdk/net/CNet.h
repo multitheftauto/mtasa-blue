@@ -90,7 +90,7 @@ public:
     virtual bool                        CheckFile                   ( const char* szType, const char* szFilename ) = 0;
 
     virtual void                        SetEncryptionEnabled        ( bool bEncryptionEnabled ) = 0;
-    virtual uint                        GetExtendedErrorCode        ( void ) = 0;
+    virtual uint                        GetExtendedErrorCode        ( CStaticString < 64 >* pstrExtraInfo = NULL ) = 0;
 };
 
 #endif

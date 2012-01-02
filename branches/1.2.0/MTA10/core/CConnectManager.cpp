@@ -212,7 +212,20 @@ bool CConnectManager::Abort ( void )
 
 static SString AppendNetErrorCode ( const SString& strText )
 {
-    uint uiErrorCode = CCore::GetSingleton ().GetNetwork ()->GetExtendedErrorCode ();
+    CStaticString < 64 > sstrTemp;
+    uint uiErrorCode = CCore::GetSingleton ().GetNetwork ()->GetExtendedErrorCode ( &sstrTemp );
+    SString strExtraInfo = sstrTemp;
+
+    // Handle timeout debugging info
+    if ( !strExtraInfo.empty () )
+    {
+        SString strConsoleText = "Timeout trace: ";
+        if ( uiErrorCode != 0 )
+            strConsoleText += SString ( "Code: %08X ", uiErrorCode );
+        strConsoleText += strExtraInfo;
+        g_pCore->GetConsole ()->Print ( strConsoleText + "\n" );
+    }
+
     if ( uiErrorCode != 0 )
         return strText + SString ( " \nCode: %08X", uiErrorCode );
     return strText;
