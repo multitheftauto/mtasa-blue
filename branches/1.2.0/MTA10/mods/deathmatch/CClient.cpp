@@ -104,7 +104,6 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     // Debug commands
     #if defined (MTA_DEBUG) || defined(MTA_BETA)
         g_pCore->GetCommands ()->Add ( "showsyncing",       "shows syncing information",                        COMMAND_ShowSyncing );
-        g_pCore->GetCommands ()->Add ( "fakelag",           "enables fake lag",                                 COMMAND_FakeLag );
     #endif
 
 #ifdef MTA_WEPSYNCDBG

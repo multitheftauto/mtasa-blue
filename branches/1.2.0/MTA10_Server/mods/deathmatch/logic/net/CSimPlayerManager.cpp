@@ -284,7 +284,8 @@ bool CSimPlayerManager::HandleVehiclePureSync ( NetServerPlayerID& Socket, NetBi
         if ( pPacket->Read ( *BitStream ) )
         {
             // Relay it to nearbyers
-            Broadcast ( *pPacket, pSourceSimPlayer->GetSendList () );
+            for ( int i = 0 ; i < g_pBandwidthSettings->iTestSendMultiplier ; i++ )
+                Broadcast ( *pPacket, pSourceSimPlayer->GetSendList () );
         }
 
         delete pPacket;

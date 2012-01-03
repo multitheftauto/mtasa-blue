@@ -2096,3 +2096,33 @@ bool CConsoleCommands::AclRequest ( CConsole* pConsole, const char* szArguments,
     EndConsoleOutputCapture ( pEchoClient, "" );
     return true;
 }
+
+
+bool CConsoleCommands::FakeLag ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    {
+        if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "sfakelag", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
+        {
+            pEchoClient->SendConsole ( "sfakelag: You do not have sufficient rights to use this command." );
+            return false;
+        }
+    }
+
+    std::vector < SString > parts;
+    SStringX ( szArguments ).Split ( " ", parts );
+
+    if ( parts.size () < 3 )
+    {
+        pEchoClient->SendConsole ( "sfakelag <packet loss> <extra ping> <ping variance>" );
+        return false;
+    }
+
+    int iPacketLoss = atoi ( parts[0] );
+    int iExtraPing = atoi ( parts[1] );
+    int iExtraPingVary = atoi ( parts[2] );
+
+    g_pGame->GetConfig ()->SetFakeLag ( iPacketLoss, iExtraPing, iExtraPingVary );
+    pEchoClient->SendConsole ( SString ( "Server send lag is now: %d%% packet loss and %d extra ping with %d extra ping variance", iPacketLoss, iExtraPing, iExtraPingVary ) );
+    return true;
+}

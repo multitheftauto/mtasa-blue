@@ -597,14 +597,14 @@ void CNetServerBuffer::GetClientSerialAndVersion ( NetServerPlayerID& playerID, 
 
 ///////////////////////////////////////////////////////////////////////////
 //
-// CNetServerBuffer::SetAllowedCongestionControl
+// CNetServerBuffer::SetNetOptions
 //
 // Non-blocking.
 //
 ///////////////////////////////////////////////////////////////////////////
-void CNetServerBuffer::SetAllowedCongestionControl ( bool bAllowSlidingWindow )
+void CNetServerBuffer::SetNetOptions ( const SNetOptions& options )
 {
-    SSetAllowedCongestionControlArgs* pArgs = new SSetAllowedCongestionControlArgs ( bAllowSlidingWindow );
+    SSetNetOptionsArgs* pArgs = new SSetNetOptionsArgs ( options );
     AddCommandAndFree ( pArgs );
 }
 
@@ -980,7 +980,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
         CALLREALNET1 (                      SetEncryptionEnabled            , bool, bEncryptionEnabled )
         CALLREALNET1 (                      ResendModPackets                , NetServerPlayerID&, playerID )
         CALLREALNET3 (                      GetClientSerialAndVersion       , NetServerPlayerIDRef, playerID, CStaticString < 32 >&, strSerial, CStaticString < 32 >&, strVersion )
-        CALLREALNET1 (                      SetAllowedCongestionControl     , bool, bAllowSlidingWindow );
+        CALLREALNET1 (                      SetNetOptions                   , const SNetOptions&, options )
 
         default:
             // no args type match

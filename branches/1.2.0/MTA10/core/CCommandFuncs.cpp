@@ -451,3 +451,25 @@ void CCommandFuncs::Serial ( const char* szParameters )
     // Print it
     CCore::GetSingleton ().GetConsole ()->Printf ( "* Your serial is: %s", szSerial );
 }
+
+
+void CCommandFuncs::FakeLag ( const char *szCmdLine )
+{
+    std::vector < SString > parts;
+    SStringX ( szCmdLine ).Split ( " ", parts );
+
+    if ( parts.size () < 3 )
+    {
+        g_pCore->GetConsole ()->Print ( "fakelag <packet loss> <extra ping> <ping variance>" );
+        return;
+    }
+
+    int iPacketLoss = atoi ( parts[0] );
+    int iExtraPing = atoi ( parts[1] );
+    int iExtraPingVary = atoi ( parts[2] );
+
+    g_pCore->GetNetwork ()->SetFakeLag ( iPacketLoss, iExtraPing, iExtraPingVary );
+    g_pCore->GetConsole ()->Print ( SString ( "Client send lag is now: %d%% packet loss and %d extra ping with %d extra ping variance", iPacketLoss, iExtraPing, iExtraPingVary ) );
+
+}
+

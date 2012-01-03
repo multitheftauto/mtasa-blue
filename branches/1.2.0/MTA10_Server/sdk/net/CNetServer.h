@@ -24,6 +24,17 @@ struct SPacketStat
     TIMEUS totalTime;
 };
 
+struct SNetOptions
+{
+    bool bAllowSlidingWindow;
+    bool bAllowUDT;
+    bool bEnableMemoryTracking;
+    bool bEnableThreadChecks;
+    int iFakePacketLoss;
+    int iFakeExtraPing;
+    int iFakeExtraPingVariance;
+};
+
 class CNetServer
 {
 public:
@@ -76,7 +87,7 @@ public:
     virtual void                            ResendModPackets                ( NetServerPlayerID& playerID ) = 0;
 
     virtual void                            GetClientSerialAndVersion       ( NetServerPlayerID& playerID, CStaticString < 32 >& strSerial, CStaticString < 32 >& strVersion ) = 0;
-    virtual void                            SetAllowedCongestionControl     ( bool bAllowSlidingWindow ) = 0;
+    virtual void                            SetNetOptions                   ( const SNetOptions& options ) = 0;
 };
 
 #endif

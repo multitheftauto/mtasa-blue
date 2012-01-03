@@ -184,6 +184,24 @@ void CPerfStatServerInfoImpl::RecordStats ( void )
 ///////////////////////////////////////////////////////////////
 void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter )
 {
+    //
+    // Set option flags
+    //
+    bool bHelp = MapContains ( strOptionMap, "h" );
+    bool bIncludeDebugInfo = MapContains ( strOptionMap, "d" );
+
+    //
+    // Process help
+    //
+    if ( bHelp )
+    {
+        pResult->AddColumn ( "Server info help" );
+        pResult->AddRow ()[0] ="Option h - This help";
+        pResult->AddRow ()[0] ="Option d - Include debug info";
+        return;
+    }
+
+
     // Calculate current rates
     long long llIncomingBytesPS = CPerfStatManager::GetPerSecond ( m_llDeltaGameBytesRecv, m_DeltaTickCount.ToLongLong () );
     long long llOutgoingBytesPS = CPerfStatManager::GetPerSecond ( m_llDeltaGameBytesSent, m_DeltaTickCount.ToLongLong () );
@@ -235,32 +253,23 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     m_OptionsList.push_back ( StringPair ( "BandwidthReductionMode",    pConfig->GetSetting ( "bandwidth_reduction" ) ) );
     m_OptionsList.push_back ( StringPair ( "LightSyncEnabled",          SString ( "%d", g_pBandwidthSettings->bLightSyncEnabled ) ) );
     m_OptionsList.push_back ( StringPair ( "ThreadNetEnabled",          SString ( "%d", pConfig->GetThreadNetEnabled () ) ) );
-    m_OptionsList.push_back ( StringPair ( "Max LS plrs/frame",         SString ( "%d", g_pBandwidthSettings->iLightSyncPlrsPerFrame ) ) );
-    m_OptionsList.push_back ( StringPair ( "Test - Everyone near",      SString ( "%d", g_pBandwidthSettings->bTestPretendEveryoneIsNear ) ) );
-    m_OptionsList.push_back ( StringPair ( "Test - Send multiplier",    SString ( "%d", g_pBandwidthSettings->iTestSendMultiplier ) ) );
-    m_OptionsList.push_back ( StringPair ( "Congestion control",        pConfig->GetSetting ( "congestion_control" ) ) );
 
-    NetStatistics netStatistics;
-    NetServerPlayerID playerId;
-    if ( g_pNetServer->GetNetworkStatistics ( &netStatistics, playerId ) )
+    if ( bIncludeDebugInfo )
     {
-        m_OptionsList.push_back ( StringPair ( "Players using sliding window",  SString ( "%d", netStatistics.usingSlidingWindow ) ) );
-    }
-    
-    //
-    // Set option flags
-    //
-    bool bHelp = MapContains ( strOptionMap, "h" );
+        m_OptionsList.push_back ( StringPair ( "Max LS plrs/frame",         SString ( "%d", g_pBandwidthSettings->iLightSyncPlrsPerFrame ) ) );
+        m_OptionsList.push_back ( StringPair ( "Test - Everyone near",      SString ( "%d", g_pBandwidthSettings->bTestPretendEveryoneIsNear ) ) );
+        m_OptionsList.push_back ( StringPair ( "Test - Send multiplier",    SString ( "%d", g_pBandwidthSettings->iTestSendMultiplier ) ) );
+        m_OptionsList.push_back ( StringPair ( "Congestion control",        pConfig->GetSetting ( "congestion_control" ) ) );
+        m_OptionsList.push_back ( StringPair ( "Memory tracking",           pConfig->GetSetting ( "memory_tracking" ) ) );
+        m_OptionsList.push_back ( StringPair ( "Thread checks",             pConfig->GetSetting ( "thread_checks" ) ) );
 
-    //
-    // Process help
-    //
-    if ( bHelp )
-    {
-        pResult->AddColumn ( "Server info help" );
-        pResult->AddRow ()[0] ="Option h - This help";
-        return;
-    }
+        NetStatistics netStatistics;
+        NetServerPlayerID playerId;
+        if ( g_pNetServer->GetNetworkStatistics ( &netStatistics, playerId ) )
+        {
+            m_OptionsList.push_back ( StringPair ( "Players using sliding window",  SString ( "%d", netStatistics.usingSlidingWindow ) ) );
+        }
+    }    
 
     // Add columns
     pResult->AddColumn ( "Info.Name" );

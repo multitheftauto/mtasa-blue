@@ -104,7 +104,7 @@ public:
     virtual void                            ResendModPackets                ( NetServerPlayerID& playerID );
 
     virtual void                            GetClientSerialAndVersion       ( NetServerPlayerID& playerID, CStaticString < 32 >& strSerial, CStaticString < 32 >& strVersion );
-    virtual void                            SetAllowedCongestionControl     ( bool bAllowSlidingWindow );
+    virtual void                            SetNetOptions                   ( const SNetOptions& options );
 
     //
     // Macros of doom to declare function argument structures
@@ -148,7 +148,7 @@ public:
     DECLARE_FUNC_ARGS1 (                        SetEncryptionEnabled            , bool, bEncryptionEnabled );
     DECLARE_FUNC_ARGS1 (                        ResendModPackets                , NetServerPlayerIDRef, playerID );
     DECLARE_FUNC_ARGS3 (                        GetClientSerialAndVersion       , NetServerPlayerIDRef, playerID, CStaticString < 32 >&, strSerial, CStaticString < 32 >&, strVersion );
-    DECLARE_FUNC_ARGS1 (                        SetAllowedCongestionControl     , bool, bAllowSlidingWindow );
+    DECLARE_FUNC_ARGS1 (                        SetNetOptions                   , const SNetOptions&, options );
     DECLARE_FUNC_ARGS4R( bool,                  ProcessPacket                   , unsigned char, ucPacketID, NetServerPlayerIDRef, Socket, NetBitStreamInterface*, BitStream, SNetExtraInfo*, pNetExtraInfo );
 
 

@@ -96,6 +96,13 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_iBackupInterval = 3;
     m_iBackupAmount = 5;
     m_iDebugFlag = 0;
+    m_NetOptions.bAllowSlidingWindow = true;
+    m_NetOptions.bAllowUDT = true;
+    m_NetOptions.bEnableMemoryTracking = false;
+    m_NetOptions.bEnableThreadChecks = false;
+    m_NetOptions.iFakePacketLoss = 0;
+    m_NetOptions.iFakeExtraPing = 0;
+    m_NetOptions.iFakeExtraPingVariance = 0;
 }
 
 
@@ -517,10 +524,19 @@ bool CMainConfig::Load ( void )
     ApplyThreadNetEnabled ();
 
     // congestion control
-    SString strCongestionControlName;
+    SString strCongestionControlName = "both";
     GetString ( m_pRootNode, "congestion_control", strCongestionControlName );
     if ( !SetAllowedCongestionControl ( strCongestionControlName ) )
-        SetAllowedCongestionControl ( "both" );
+    {
+        CLogger::ErrorPrintf ( "congestion_control is not valid. Defaulting to 'both'\n" );
+    }
+
+    // memory tracking
+    GetBoolean ( m_pRootNode, "memory_tracking", m_NetOptions.bEnableMemoryTracking );
+
+    // thread checks
+    GetBoolean ( m_pRootNode, "thread_checks", m_NetOptions.bEnableThreadChecks );
+    ApplyNetOptions ();
 
     return true;
 }
@@ -550,15 +566,31 @@ void CMainConfig::ApplyBandwidthReductionMode ( void )
 
 bool CMainConfig::SetAllowedCongestionControl ( const SString& strValue )
 {
-    if ( strValue == "old" || strValue == "both" )
+    if ( strValue == "old" || strValue == "both" || strValue == "new" )
     {
-        SetString ( m_pRootNode, "congestion_control", strValue );
-        m_bAllowSW = false;
-        if ( strValue == "both" )   m_bAllowSW = true;
-        g_pNetServer->SetAllowedCongestionControl ( m_bAllowSW );
+        m_NetOptions.bAllowSlidingWindow = true;
+        m_NetOptions.bAllowUDT = true;
+        if ( strValue == "old" )    { m_NetOptions.bAllowSlidingWindow = false; }
+        if ( strValue == "new" )    { m_NetOptions.bAllowUDT = false; }
+        ApplyNetOptions ();
         return true;
     }
     return false;
+}
+
+
+void CMainConfig::SetFakeLag ( int iPacketLoss, int iExtraPing, int iExtraPingVary )
+{
+    m_NetOptions.iFakePacketLoss = iPacketLoss;
+    m_NetOptions.iFakeExtraPing = iExtraPing;
+    m_NetOptions.iFakeExtraPingVariance = iExtraPingVary;
+    ApplyNetOptions ();
+}
+
+
+void CMainConfig::ApplyNetOptions ( void )
+{
+    g_pNetServer->SetNetOptions ( m_NetOptions );
 }
 
 
@@ -804,6 +836,7 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "debugdb", CConsoleCommands::SetDbLogLevel, false );
 
     RegisterCommand ( "aclrequest", CConsoleCommands::AclRequest, false );
+    RegisterCommand ( "sfakelag", CConsoleCommands::FakeLag, false );
 
     return true;
 }
@@ -971,6 +1004,18 @@ int CMainConfig::GetNoWorkToDoSleepTime ( void )
 }
 
 
+SString CMainConfig::GetMinimumClientVersion ( void )
+{
+    SString strMinReq = m_strMinClientVersionOverride > m_strMinClientVersion ? m_strMinClientVersionOverride : m_strMinClientVersion;
+    if ( m_NetOptions.bAllowSlidingWindow && !m_NetOptions.bAllowUDT )
+    {
+        SString strMinReqForSW = "1.2.0-9.03616";
+        if ( strMinReqForSW > strMinReq )
+            strMinReq = strMinReqForSW;
+    }
+    return strMinReq;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -1058,6 +1103,14 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
     if ( strName == "test_everyone_near" )
     {
         strValue = SString ( "%d", g_pBandwidthSettings->bTestPretendEveryoneIsNear );
+        return true;
+    }
+    else
+    if ( strName == "congestion_control" )
+    {
+        strValue = "both";
+        if ( !m_NetOptions.bAllowSlidingWindow && m_NetOptions.bAllowUDT )   strValue = "old";
+        if ( m_NetOptions.bAllowSlidingWindow && !m_NetOptions.bAllowUDT )   strValue = "new";
         return true;
     }
     else
@@ -1269,11 +1322,43 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
         {
             if ( bSave )
             {
+                SetString ( m_pRootNode, "congestion_control", strValue );
                 Save ();
             }
             return true;
         }
     }
+    else
+    if ( strName == "memory_tracking" )
+    {
+        if ( strValue == "0" || strValue == "1" )
+        {
+            m_NetOptions.bEnableMemoryTracking = atoi ( strValue ) ? true : false;
+            ApplyNetOptions ();
+            if ( bSave )
+            {
+                SetString ( m_pRootNode, "memory_tracking", SString ( "%d", m_NetOptions.bEnableMemoryTracking ) );
+                Save ();
+            }
+            return true;
+        }
+    }
+    else
+    if ( strName == "thread_checks" )
+    {
+        if ( strValue == "0" || strValue == "1" )
+        {
+            m_NetOptions.bEnableThreadChecks = atoi ( strValue ) ? true : false;
+            ApplyNetOptions ();
+            if ( bSave )
+            {
+                SetString ( m_pRootNode, "thread_checks", SString ( "%d", m_NetOptions.bEnableThreadChecks ) );
+                Save ();
+            }
+            return true;
+        }
+    }
+
 
     //
     // Everything else is read only, so can't be set
