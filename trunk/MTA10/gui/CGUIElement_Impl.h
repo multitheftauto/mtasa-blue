@@ -107,6 +107,9 @@ public:
     void                SetMouseButtonDownHandler   ( GUI_CALLBACK Callback );
     void                SetActivateHandler          ( GUI_CALLBACK Callback );
     void                SetDeactivateHandler        ( GUI_CALLBACK Callback );
+    void                SetKeyDownHandler           ( GUI_CALLBACK Callback );
+    void                SetKeyDownHandler           ( const GUI_CALLBACK_KEY & Callback );
+    void                SetEnterKeyHandler          ( GUI_CALLBACK Callback );
 
 protected:
     void                DestroyElement              ( void );
@@ -125,6 +128,7 @@ protected:
     bool                Event_OnMouseButtonDown     ( const CEGUI::EventArgs& e );
     bool                Event_OnActivated           ( const CEGUI::EventArgs& e );
     bool                Event_OnDeactivated         ( const CEGUI::EventArgs& e );
+    bool                Event_OnKeyDown             ( const CEGUI::EventArgs& e );
 
 
     CEGUI::Window*              m_pWindow;
@@ -144,6 +148,9 @@ protected:
     GUI_CALLBACK               m_OnMouseDown;
     GUI_CALLBACK               m_OnActivate;
     GUI_CALLBACK               m_OnDeactivate;
+    GUI_CALLBACK               m_OnKeyDown;
+    GUI_CALLBACK               m_OnEnter;
+    GUI_CALLBACK_KEY           m_OnKeyDownWithArgs;
 };
 
 #endif
