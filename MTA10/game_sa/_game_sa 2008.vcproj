@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Client - Game SA"
 	ProjectGUID="{E13D1441-438B-4A03-AB79-5E8EF08EE414}"
 	RootNamespace="Client - Game SA"
@@ -938,11 +938,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CColBoxSA.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CColModelSA.h"
 				>
 			</File>
 			<File
 				RelativePath=".\CColPointSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CColSphereSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CColTrianglePlaneSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CColTriangleSA.h"
 				>
 			</File>
 			<File

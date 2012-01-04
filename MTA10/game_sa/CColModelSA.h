@@ -5,6 +5,7 @@
 *  FILE:        game_sa/CColModelSA.h
 *  PURPOSE:     Header file for collision model entity class
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
+*               Alberto Alonso <rydencillo@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -15,6 +16,11 @@
 
 #include <windows.h>
 #include <game/CColModel.h>
+
+#include "CColSphereSA.h"
+#include "CColBoxSA.h"
+#include "CColTriangleSA.h"
+#include "CColTrianglePlaneSA.h"
 
 #define FUNC_CColModel_Constructor      0x40FB60
 #define FUNC_CColModel_Destructor       0x40F700
@@ -28,13 +34,17 @@ typedef struct
 
 typedef struct
 {
-    DWORD                           pad0;
-    WORD                            pad1;
+    WORD                            numColSpheres;
+    WORD                            numColBoxes;
+    WORD                            numColTriangles;
     BYTE                            ucNumWheels;
-    BYTE                            pad2;
-    DWORD                           pad3;
-    DWORD                           pad4;
+    BYTE                            pad3;
+    CColSphereSA*                   pColSpheres;
+    CColBoxSA*                      pColBoxes;
     void*                           pSuspensionLines;
+    void*                           pUnknown;
+    CColTriangleSA*                 pColTriangles;
+    CColTrianglePlaneSA*            pColTrianglePlanes;
 } CColDataSA;
 
 class CColModelSAInterface
