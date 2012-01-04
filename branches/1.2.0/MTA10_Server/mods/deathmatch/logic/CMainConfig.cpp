@@ -96,7 +96,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_iBackupInterval = 3;
     m_iBackupAmount = 5;
     m_iDebugFlag = 0;
-    m_NetOptions.bAllowSlidingWindow = true;
+    m_NetOptions.bAllowSlidingWindow = false;
     m_NetOptions.bAllowUDT = true;
     m_NetOptions.bEnableMemoryTracking = false;
     m_NetOptions.bEnableThreadChecks = false;
@@ -524,11 +524,11 @@ bool CMainConfig::Load ( void )
     ApplyThreadNetEnabled ();
 
     // congestion control
-    SString strCongestionControlName = "both";
+    SString strCongestionControlName = "old";
     GetString ( m_pRootNode, "congestion_control", strCongestionControlName );
     if ( !SetAllowedCongestionControl ( strCongestionControlName ) )
     {
-        CLogger::ErrorPrintf ( "congestion_control is not valid. Defaulting to 'both'\n" );
+        CLogger::ErrorPrintf ( "congestion_control is not valid. Defaulting to 'old'\n" );
     }
 
     // memory tracking
