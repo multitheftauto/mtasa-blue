@@ -228,7 +228,6 @@ CServerBrowser::CServerBrowser ( void )
         CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pGeneralHelpWindow, "" ) );
         pLabel->SetPosition ( CVector2D ( 0, 0 ) );
         pLabel->SetSize ( CVector2D ( generalHelpSize ) );
-        pLabel->SetProperty( "BackgroundEnabled", "True" );
         pLabel->SetZOrderingEnabled ( false );
     }
 
@@ -279,7 +278,6 @@ CServerBrowser::CServerBrowser ( void )
                              {  20, iBase + iGap * 3,      26, 26, "cgui\\images\\serverbrowser\\info.png", },
                              { 195, iBase + iGap * 0 + 5,  29, 16, "cgui\\images\\serverbrowser\\search-servers.png", },
                              { 195, iBase + iGap * 1 + 5,  29, 16, "cgui\\images\\serverbrowser\\search-players.png", },
-                             { 194, iBase + iGap * 2 + 4,  18, 18, "cgui\\images\\radarset\\01.png", },
                              { 195, iBase + iGap * 2 + 5,  16, 16, "cgui\\images\\serverbrowser\\search.png", },
                         };
 
@@ -289,6 +287,7 @@ CServerBrowser::CServerBrowser ( void )
             pIcon->SetPosition ( CVector2D ( iconInfoList[i].x, iconInfoList[i].y ) );
             pIcon->SetSize ( CVector2D ( iconInfoList[i].w, iconInfoList[i].h ) );
             pIcon->LoadFromFile ( iconInfoList[i].szName );
+            pIcon->SetZOrderingEnabled ( false );
         }
     }
 }
@@ -542,6 +541,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pServerListStatus [ type ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTab [ type ], "" ) );
     m_pServerListStatus [ type ]->SetPosition ( CVector2D ( fX, fY ) );
     m_pServerListStatus [ type ]->SetSize ( CVector2D ( 100, fLineHeight ), true );
+    m_pServerListStatus [ type ]->SetZOrderingEnabled ( false );
 
     // Back button
     fX = m_WidgetSize.fX - fPlayerListSizeX - SB_SMALL_SPACER;
@@ -568,6 +568,10 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pEditAddress [ type ]->BringToFront();
     m_pComboAddressHistory [ type ]->SetZOrderingEnabled ( false );
     m_pServerList [ type ]->SetZOrderingEnabled ( false );
+
+    // Attach some keyboard events to the serverlist.
+    m_pServerList [ type ]->SetEnterKeyHandler ( GUI_CALLBACK ( &CServerBrowser::OnDoubleClick, this ) );
+    m_pServerList [ type ]->SetKeyDownHandler ( GUI_CALLBACK_KEY ( &CServerBrowser::OnServerListChangeRow, this ) );
 }
 
 void CServerBrowser::DeleteTab ( ServerBrowserType type )
@@ -2194,3 +2198,36 @@ void CServerBrowser::OnQuickConnectButtonClick ( void )
     // Show history
     m_pComboAddressHistory [ ServerBrowserTypes::LAN ]->ShowDropList ();
 }
+
+
+bool CServerBrowser::OnServerListChangeRow ( CGUIKeyEventArgs Args )
+{
+    ServerBrowserType Type = GetCurrentServerBrowserType ();
+    int SelectedItem       = m_pServerList [ Type ]->GetSelectedItemRow ( );
+    int iMax               = m_pServerList [ Type ]->GetRowCount ( );
+
+    switch ( Args.scancode )
+    {
+        case DIK_UPARROW:
+        {
+            if ( SelectedItem > 0 )
+            {
+                m_pServerList [ Type ]->SetSelectedItem ( SelectedItem - 1 , 1, true );
+            }
+            break;
+        }
+        case DIK_DOWNARROW:
+        {
+            if ( SelectedItem < ( iMax - 1 ) )
+            {
+                m_pServerList [ Type ]->SetSelectedItem ( SelectedItem + 1 , 1, true );
+            }
+            break;
+        }
+        default:
+            break;
+    }
+
+    return true;
+}
+

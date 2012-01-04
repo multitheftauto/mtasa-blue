@@ -173,7 +173,7 @@ protected:
 
     CGUIComboBox*       m_pComboSearchType  [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIEdit*           m_pEditSearch  [ SERVER_BROWSER_TYPE_COUNT ];
-	CGUILabel*          m_pLabelSearchDescription  [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUILabel*          m_pLabelSearchDescription  [ SERVER_BROWSER_TYPE_COUNT ];
 
 
     
@@ -234,10 +234,12 @@ private:
 
     bool                    OnSearchTypeSelected            ( CGUIElement* pElement );
 
-    bool					OnSearchFocused					( CGUIElement* pElement );
-    bool					OnSearchDefocused			    ( CGUIElement* pElement );
-    bool					OnAddressFocused				( CGUIElement* pElement );
-    bool					OnAddressDefocused				( CGUIElement* pElement );
+    bool                    OnSearchFocused                 ( CGUIElement* pElement );
+    bool                    OnSearchDefocused               ( CGUIElement* pElement );
+    bool                    OnAddressFocused                ( CGUIElement* pElement );
+    bool                    OnAddressDefocused              ( CGUIElement* pElement );
+
+    bool                    OnServerListChangeRow           ( CGUIKeyEventArgs Args );
 
     ServerBrowserType       GetCurrentServerBrowserType     ( void );
     ServerBrowserType       GetCurrentServerBrowserTypeForSave ( void );
@@ -256,8 +258,8 @@ private:
     std::map < SString, int > m_blockedVersionMap;
     std::map < SString, int > m_allowedVersionMap;
 
-	CGUIWindow* 			m_pQuickConnectHelpWindow;
-	bool 					m_bFocusTextEdit;
+    CGUIWindow*             m_pQuickConnectHelpWindow;
+    bool                    m_bFocusTextEdit;
 
     uint                    m_uiShownQuickConnectHelpCount;
     uint                    m_uiIsUsingTempTab;

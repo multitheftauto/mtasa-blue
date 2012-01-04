@@ -14,6 +14,7 @@ class CGUIElement;
 #ifndef __CGUIELEMENT_H
 #define __CGUIELEMENT_H
 
+#include "CGUIEvent.h"
 #include "CGUICallback.h"
 #include <string>
 #include "CGUITypes.h"
@@ -119,6 +120,9 @@ public:
     virtual void                SetMouseButtonDownHandler   ( GUI_CALLBACK Callback ) = 0;
     virtual void                SetActivateHandler          ( GUI_CALLBACK Callback ) = 0;
     virtual void                SetDeactivateHandler        ( GUI_CALLBACK Callback ) = 0;
+    virtual void                SetKeyDownHandler           ( GUI_CALLBACK Callback ) = 0;
+    virtual void                SetKeyDownHandler           ( const GUI_CALLBACK_KEY & Callback ) = 0;
+    virtual void                SetEnterKeyHandler          ( GUI_CALLBACK Callback ) = 0;
 };
 
 #endif
