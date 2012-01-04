@@ -17,6 +17,7 @@
 #include <windows.h>
 #include <game/CColModel.h>
 
+#include "CBoundingBoxSA.h"
 #include "CColSphereSA.h"
 #include "CColBoxSA.h"
 #include "CColTriangleSA.h"
@@ -50,7 +51,10 @@ typedef struct
 class CColModelSAInterface
 {
 public:
-    BYTE                            pad [ 44 ];
+    CBoundingBoxSA                  boundingBox;
+    BYTE                            level;
+    BYTE                            unknownFlags;
+    BYTE                            pad [ 2 ];
     CColDataSA*                     pColData;
 };
 

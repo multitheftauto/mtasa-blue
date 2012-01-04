@@ -902,6 +902,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CBoundingBoxSA.h"
+				>
+			</File>
+			<File
 				RelativePath="CBuildingSA.h"
 				>
 			</File>
