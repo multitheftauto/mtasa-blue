@@ -46,6 +46,7 @@ typedef void ( IdleHandler ) ( void );
 typedef void ( AddAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
 typedef void ( BlendAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
 typedef bool ( ProcessCollisionHandler ) ( class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface );
+typedef bool ( VehicleCollisionHandler ) ( class CVehicleSAInterface* pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, float fDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity );
 
 /**
  * This class contains information used for shot syncing, one exists per player.
@@ -136,6 +137,7 @@ public:
     virtual void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler ) = 0;
     virtual void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler ) = 0;
     virtual void                        SetProcessCollisionHandler  ( ProcessCollisionHandler * pHandler ) = 0;
+    virtual void                        SetVehicleCollisionHandler  ( VehicleCollisionHandler * pHandler ) = 0;
 
     virtual void                        AllowMouseMovement          ( bool bAllow ) = 0;
     virtual void                        DoSoundHacksOnLostFocus     ( bool bLostFocus ) = 0;

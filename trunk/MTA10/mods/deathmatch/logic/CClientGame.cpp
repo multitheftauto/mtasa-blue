@@ -239,6 +239,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetAddAnimationHandler ( CClientGame::StaticAddAnimationHandler );
     g_pMultiplayer->SetBlendAnimationHandler ( CClientGame::StaticBlendAnimationHandler );
     g_pMultiplayer->SetProcessCollisionHandler ( CClientGame::StaticProcessCollisionHandler );
+    g_pMultiplayer->SetVehicleCollisionHandler( CClientGame::StaticVehicleCollisionHandler );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( CClientGame::StaticKeyStrokeHandler );
@@ -369,6 +370,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetAddAnimationHandler ( NULL );
     g_pMultiplayer->SetBlendAnimationHandler ( NULL );
     g_pMultiplayer->SetProcessCollisionHandler ( NULL );
+    g_pMultiplayer->SetVehicleCollisionHandler( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( NULL );
@@ -2571,6 +2573,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientTrailerAttach", "towedBy", NULL, false );
     m_Events.AddEvent ( "onClientTrailerDetach", "towedBy", NULL, false );
     m_Events.AddEvent ( "onClientVehicleExplode", "", NULL, false );
+    m_Events.AddEvent ( "onClientVehicleCollision", "collidedelement, damageImpulseMag, bodypart, x, y, z, velX, velY, velZ", NULL, false );
 
     // GUI events
     m_Events.AddEvent ( "onClientGUIClick", "button, state, absoluteX, absoluteY", NULL, false );
@@ -3431,6 +3434,10 @@ bool CClientGame::StaticProcessCollisionHandler ( CEntitySAInterface* pThisInter
     return g_pClientGame->ProcessCollisionHandler ( pThisInterface, pOtherInterface );
 }
 
+bool CClientGame::StaticVehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, float fDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity )
+{
+    return g_pClientGame->VehicleCollisionHandler( pCollidingVehicle, pCollidedVehicle, fDamageImpulseMag, byBodyPartHit, vecCollisionPos, vecCollisionVelocity );
+}
 void CClientGame::DrawRadarAreasHandler ( void )
 {
     m_pRadarAreaManager->DoPulse ();
@@ -3907,7 +3914,56 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
     return true;
 }
 
+bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedWith, float fDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity )
+{
+    if ( pCollidingVehicle && pCollidedWith )
+    {
+        CVehicle * pColliderVehicle = g_pGame->GetPools ( )->GetVehicle ( (DWORD *)pCollidingVehicle );
+        CClientEntity * pVehicleClientEntity = m_pManager->FindEntity ( pColliderVehicle, true );
 
+        CEntity * pCollidedWithEntity = g_pGame->GetPools ( )->GetEntity ( (DWORD *)pCollidedWith );
+        CClientEntity * pCollidedWithClientEntity = NULL;
+        if ( pCollidedWithEntity )
+        {
+            if ( pCollidedWithEntity->GetEntityType ( ) == ENTITY_TYPE_VEHICLE )
+            {
+                CVehicle * pCollidedWithVehicle = g_pGame->GetPools ( )->GetVehicle ( (DWORD *)pCollidedWith );
+                pCollidedWithClientEntity = m_pManager->FindEntity ( pCollidedWithVehicle, true );
+            }
+            else if ( pCollidedWithEntity->GetEntityType ( ) == ENTITY_TYPE_OBJECT )
+            {
+                CObject * pCollidedWithObject = g_pGame->GetPools ( )->GetObject ( (DWORD *)pCollidedWith );
+                pCollidedWithClientEntity = m_pManager->FindEntity ( pCollidedWithObject, true );
+            }
+            else if ( pCollidedWithEntity->GetEntityType ( ) == ENTITY_TYPE_PED )
+            {
+                CPed * pCollidedWithPed = g_pGame->GetPools ( )->GetPed ( (DWORD *)pCollidedWith );
+                pCollidedWithClientEntity = m_pManager->FindEntity ( pCollidedWithPed, true );
+            }
+        }
+        CLuaArguments Arguments;
+        if ( pCollidedWithClientEntity )
+        {
+            Arguments.PushElement ( pCollidedWithClientEntity );
+        }
+        else
+        {
+            Arguments.PushNil ( );
+        }
+        Arguments.PushNumber ( fDamageImpulseMag );
+        Arguments.PushNumber ( byBodyPartHit );
+        Arguments.PushNumber ( vecCollisionPos.fX );
+        Arguments.PushNumber ( vecCollisionPos.fY );
+        Arguments.PushNumber ( vecCollisionPos.fZ );
+        Arguments.PushNumber ( vecCollisionVelocity.fX );
+        Arguments.PushNumber ( vecCollisionVelocity.fY );
+        Arguments.PushNumber ( vecCollisionVelocity.fZ );
+
+        pVehicleClientEntity->CallEvent ( "onClientVehicleCollision", Arguments, true );
+        return true;
+    }
+    return false;
+}
 bool CClientGame::StaticProcessMessage ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
     if ( g_pClientGame )

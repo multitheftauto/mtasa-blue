@@ -63,7 +63,13 @@ public:
     float fDamageImpulseMagnitude; //216
     CEntitySAInterface * damageEntity; // 220
 
-    BYTE pad2[28];
+    CVector vecCollisionImpactVelocity; // 224
+    CVector vecCollisionPosition; // 236
+
+    BYTE byBodyPartHit : 2; // 248
+    
+    BYTE pad52526[2]; // 250
+
     CEntitySAInterface * pAttachedEntity;   // 252
     CVector vecAttachedPosition;    // 256
     CVector vecAttachedRotation;    // 268
