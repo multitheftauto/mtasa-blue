@@ -519,7 +519,6 @@ private:
     SColor                      m_RGBColors[4];
     CDoorSA                     m_doors[6];
     bool                        m_bSwingingDoorsAllowed;
-    float                       m_fHealth;
 
 public:
                                 CVehicleSA                      ();

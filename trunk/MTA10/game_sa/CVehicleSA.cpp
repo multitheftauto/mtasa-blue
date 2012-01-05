@@ -196,8 +196,6 @@ void CVehicleSA::Init ( void )
     m_bSwingingDoorsAllowed = false;
 
     CopyGlobalSuspensionLinesToPrivate ();
-
-    m_fHealth = GetHealth ( );
 }
 
 // DESTRUCTOR
@@ -1301,7 +1299,6 @@ void CVehicleSA::SetHealth( FLOAT fHealth )
     vehicle->m_nHealth = fHealth;
     if ( fHealth >= 250.0f )
         vehicle->m_fBurningTime = 0.0f;
-    m_fHealth = fHealth;
 }
 
 // SHould be plane funcs
