@@ -14,5 +14,6 @@
 
 typedef struct
 {
-    BYTE pad0 [ 20 ];
+    CVector     vecCenter;
+    float       fRadius;
 } CColSphereSA;

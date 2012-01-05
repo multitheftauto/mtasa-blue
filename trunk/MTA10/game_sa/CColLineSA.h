@@ -2,8 +2,8 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CColTriangleSA.h
-*  PURPOSE:     Header file for collision triangle class
+*  FILE:        game_sa/CColLineSA.h
+*  PURPOSE:     Header file for collision line class
 *  DEVELOPERS:  Alberto Alonso <rydencillo@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -14,9 +14,8 @@
 
 typedef struct
 {
-    unsigned short  v1;
-    unsigned short  v2;
-    unsigned short  v3;
-    BYTE            unknown1;
-    BYTE            unknown2;
-} CColTriangleSA;
+    CVector     vecStart;
+    DWORD       pad0;
+    CVector     vecEnd;
+    DWORD       pad1
+} CColLineSA;
