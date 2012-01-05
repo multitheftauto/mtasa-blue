@@ -375,6 +375,10 @@ DWORD JMP_RETN_Cancelled_CPopulation_ConvertToDummyObject = 0x614715;
 #define HOOKPOS_CEntity_IsOnScreen_FixObjectsScale      0x534575
 DWORD JMP_CEntity_IsOnScreen_FixObjectsScale = 0x53457C;
 
+#define HOOKPOS_CEventVehicleDamageCollision                    0x6A7657
+DWORD CALL_CEventDamageCollision = 0x6A765D;
+DWORD JMP_CEventVehicleDamageCollision_RETN = 0x6A765D;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -433,6 +437,7 @@ IdleHandler * m_pIdleHandler = NULL;
 AddAnimationHandler* m_pAddAnimationHandler = NULL;
 BlendAnimationHandler* m_pBlendAnimationHandler = NULL;
 ProcessCollisionHandler* m_pProcessCollisionHandler = NULL;
+VehicleCollisionHandler* m_pVehicleCollisionHandler = NULL;
 
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
@@ -562,6 +567,7 @@ void Hook_CObject_DTR ( );
 
 void HOOK_CEntity_IsOnScreen_FixObjectScale ();
 
+void HOOK_CEventVehicleDamageCollision ( );
 
 
 CMultiplayerSA::CMultiplayerSA()
@@ -777,6 +783,8 @@ void CMultiplayerSA::InitHooks()
     HookInstall ( HOOKPOS_CWorld_ADD_CPopulation_ConvertToDummyObject, (DWORD)HOOK_CWorld_Add_CPopulation_ConvertToDummyObject, 6 );
     
     HookInstall ( HOOKPOS_ConvertToObject_CPopulationManageDummy, (DWORD)HOOK_ConvertToObject_CPopulationManageDummy, 6 );
+
+    HookInstall ( HOOKPOS_CEventVehicleDamageCollision, (DWORD)HOOK_CEventVehicleDamageCollision, 6 );
 
     // End of building removal hooks
 
@@ -2082,7 +2090,10 @@ void CMultiplayerSA::SetProcessCollisionHandler ( ProcessCollisionHandler * pHan
 {
     m_pProcessCollisionHandler = pHandler;
 }
-
+void CMultiplayerSA::SetVehicleCollisionHandler ( VehicleCollisionHandler * pHandler )
+{
+    m_pVehicleCollisionHandler = pHandler;
+}
 void CMultiplayerSA::HideRadar ( bool bHide )
 {
     bHideRadar = bHide;
@@ -7071,5 +7082,44 @@ IsOnScreen_IsObject:
         fstp    dwMultResult
         mov     esi, dwMultResult
         jmp     JMP_CEntity_IsOnScreen_FixObjectsScale
+    }
+}
+CVehicleSAInterface * pCollisionVehicle = NULL;
+void TriggerVehicleDamageEvent ( )
+{
+    if ( pCollisionVehicle )
+    {
+        CEntitySAInterface * pEntity = pCollisionVehicle->damageEntity;
+        if ( pEntity )
+        {
+            // Not handled because it triggers too much
+            if ( pEntity->nType != ENTITY_TYPE_BUILDING )
+            {
+                if ( m_pVehicleCollisionHandler )
+                {
+                    m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pCollisionVehicle->fDamageImpulseMagnitude, pCollisionVehicle->byBodyPartHit, pCollisionVehicle->vecCollisionPosition, pCollisionVehicle->vecCollisionImpactVelocity );
+                }
+            }
+        }
+    }
+}
+
+void _declspec(naked) HOOK_CEventVehicleDamageCollision ( )
+{
+    // ecx = this ptr
+    // pVehicle->damageEntity = damage entity obvs
+    _asm
+    {
+        pushad
+        mov pCollisionVehicle, ecx
+    }
+    TriggerVehicleDamageEvent ( );
+
+    // move 0 to eax as the previous code did and jump back like nothing happened... like a boss
+    _asm
+    {
+        popad
+        mov eax, fs:0
+        jmp JMP_CEventVehicleDamageCollision_RETN
     }
 }
