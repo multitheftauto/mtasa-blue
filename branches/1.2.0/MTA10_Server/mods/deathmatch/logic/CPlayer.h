@@ -59,6 +59,7 @@ class CPlayer : public CPed, public CClient
     friend class CScriptDebugging;
 
 public:
+    ZERO_ON_NEW
                                                 CPlayer                     ( class CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket );
                                                 ~CPlayer                    ( void );
 

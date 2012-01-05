@@ -907,7 +907,7 @@ std::wstring SharedUtil::ANSIToUTF16 ( const std::string& input )
     mbstowcs ( wcsOutput, input.c_str(), input.length() );
     wcsOutput[len] = NULL; //Null terminate the string
     std::wstring strOutput(wcsOutput);
-    delete wcsOutput;
+    delete [] wcsOutput;
     return strOutput;
 }
 
