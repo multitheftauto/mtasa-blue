@@ -262,6 +262,7 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         m_OptionsList.push_back ( StringPair ( "Congestion control",        pConfig->GetSetting ( "congestion_control" ) ) );
         m_OptionsList.push_back ( StringPair ( "Memory tracking",           pConfig->GetSetting ( "memory_tracking" ) ) );
         m_OptionsList.push_back ( StringPair ( "Thread checks",             pConfig->GetSetting ( "thread_checks" ) ) );
+        m_OptionsList.push_back ( StringPair ( "Assert checks",             pConfig->GetSetting ( "assert_checks" ) ) );
 
         NetStatistics netStatistics;
         NetServerPlayerID playerId;

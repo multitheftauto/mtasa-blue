@@ -100,6 +100,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_NetOptions.bAllowUDT = true;
     m_NetOptions.bEnableMemoryTracking = false;
     m_NetOptions.bEnableThreadChecks = false;
+    m_NetOptions.bEnableAssertChecks = false;
     m_NetOptions.iFakePacketLoss = 0;
     m_NetOptions.iFakeExtraPing = 0;
     m_NetOptions.iFakeExtraPingVariance = 0;
@@ -536,6 +537,9 @@ bool CMainConfig::Load ( void )
 
     // thread checks
     GetBoolean ( m_pRootNode, "thread_checks", m_NetOptions.bEnableThreadChecks );
+
+    // assert checks
+    GetBoolean ( m_pRootNode, "assert_checks", m_NetOptions.bEnableAssertChecks );
     ApplyNetOptions ();
 
     return true;
@@ -1353,6 +1357,21 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
             if ( bSave )
             {
                 SetString ( m_pRootNode, "thread_checks", SString ( "%d", m_NetOptions.bEnableThreadChecks ) );
+                Save ();
+            }
+            return true;
+        }
+    }
+    else
+    if ( strName == "assert_checks" )
+    {
+        if ( strValue == "0" || strValue == "1" )
+        {
+            m_NetOptions.bEnableAssertChecks = atoi ( strValue ) ? true : false;
+            ApplyNetOptions ();
+            if ( bSave )
+            {
+                SetString ( m_pRootNode, "assert_checks", SString ( "%d", m_NetOptions.bEnableAssertChecks ) );
                 Save ();
             }
             return true;

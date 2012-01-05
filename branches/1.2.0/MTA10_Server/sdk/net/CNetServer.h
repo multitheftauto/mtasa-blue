@@ -30,6 +30,7 @@ struct SNetOptions
     bool bAllowUDT;
     bool bEnableMemoryTracking;
     bool bEnableThreadChecks;
+    bool bEnableAssertChecks;
     int iFakePacketLoss;
     int iFakeExtraPing;
     int iFakeExtraPingVariance;
