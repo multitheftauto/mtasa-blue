@@ -946,6 +946,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CColLineSA.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CColModelSA.h"
 				>
 			</File>
@@ -963,6 +967,10 @@
 			</File>
 			<File
 				RelativePath=".\CColTriangleSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CCompressedVectorSA.h"
 				>
 			</File>
 			<File

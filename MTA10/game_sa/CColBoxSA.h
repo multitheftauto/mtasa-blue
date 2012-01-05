@@ -14,5 +14,6 @@
 
 typedef struct
 {
-    BYTE pad0 [ 28 ];
+    CVector     min;
+    CVector     max;
 } CColBoxSA;
