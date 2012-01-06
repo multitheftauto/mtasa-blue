@@ -314,5 +314,20 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
         }
     }
 
+    if ( BitStream.Version ( ) >= 0x24 )
+    {
+        multimap< unsigned short, CBuildingRemoval* >::const_iterator iter = g_pGame->GetBuildingRemovalManager ( )->IterBegin();
+        for (; iter != g_pGame->GetBuildingRemovalManager ( )->IterEnd();++iter)
+        {
+            CBuildingRemoval * pBuildingRemoval = (*iter).second;
+            BitStream.WriteBit( true );
+            BitStream.Write( pBuildingRemoval->GetModel ( ) );
+            BitStream.Write( pBuildingRemoval->GetRadius ( ) );
+            BitStream.Write( pBuildingRemoval->GetPosition ( ).fX );
+            BitStream.Write( pBuildingRemoval->GetPosition ( ).fY );
+            BitStream.Write( pBuildingRemoval->GetPosition ( ).fZ );
+        }
+        BitStream.WriteBit( false );
+    }
     return true;
 }

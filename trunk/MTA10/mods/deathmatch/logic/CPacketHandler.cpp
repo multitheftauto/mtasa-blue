@@ -2241,6 +2241,21 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
             }
         }
     }
+
+    if ( bitStream.Version ( ) >= 0x24 )
+    {
+        unsigned short usModel = 0;
+        float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+        while ( bitStream.ReadBit ( ) == true )
+        {
+            bitStream.Read( usModel );
+            bitStream.Read( fRadius );
+            bitStream.Read( fX );
+            bitStream.Read( fY );
+            bitStream.Read( fZ );
+            g_pGame->GetWorld ( )->RemoveBuilding( usModel, fRadius, fX, fY, fZ );
+        }
+    }
 }
 
 

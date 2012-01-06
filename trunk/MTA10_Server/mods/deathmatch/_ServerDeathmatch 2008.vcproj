@@ -437,6 +437,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CBuildingRemoval.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CBuildingRemovalManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CClient.cpp"
 					>
 				</File>
@@ -1639,6 +1647,14 @@
 				</File>
 				<File
 					RelativePath=".\logic\CBlipManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CBuildingRemoval.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CBuildingRemovalManager.h"
 					>
 				</File>
 				<File

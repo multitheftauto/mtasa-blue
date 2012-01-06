@@ -59,6 +59,9 @@ public:
     DECLARE_RPC ( ResetFarClipDistance );
     DECLARE_RPC ( ResetFogDistance );
     DECLARE_RPC ( SetWeaponProperty );
+    DECLARE_RPC ( RemoveWorldModel );
+    DECLARE_RPC ( RestoreWorldModel );
+    DECLARE_RPC ( RestoreAllWorldModels );
 };
 
 #endif

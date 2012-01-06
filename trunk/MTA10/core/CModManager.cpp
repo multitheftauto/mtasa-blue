@@ -292,7 +292,7 @@ void CModManager::DoPulsePostFrame ( void )
     if ( m_pClientBase )
         CCore::GetSingleton ().EnsureFrameRateLimitApplied ();  // Catch missed frames
     else
-        CCore::GetSingleton ().ApplyFrameRateLimit ( 60 );      // Limit when not connected
+        CCore::GetSingleton ().ApplyFrameRateLimit ( 88 );      // Limit when not connected
 
     // Load/unload requested?
     if ( m_bUnloadRequested )

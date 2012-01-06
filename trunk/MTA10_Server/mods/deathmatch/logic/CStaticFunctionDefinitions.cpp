@@ -9526,6 +9526,44 @@ bool CStaticFunctionDefinitions::ResetFogDistance ( )
     return true;
 }
 
+bool CStaticFunctionDefinitions::RemoveWorldModel ( unsigned short usModel, float fRadius, float fX, float fY, float fZ )
+{
+    g_pGame->GetBuildingRemovalManager ( )->CreateBuildingRemoval( usModel, fRadius, CVector ( fX, fY, fZ ) );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( usModel );
+    BitStream.pBitStream->Write ( fRadius );
+    BitStream.pBitStream->Write ( fX );
+    BitStream.pBitStream->Write ( fY );
+    BitStream.pBitStream->Write ( fZ );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( REMOVE_WORLD_MODEL, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::RestoreWorldModel ( unsigned short usModel, float fRadius, float fX, float fY, float fZ )
+{
+    g_pGame->GetBuildingRemovalManager ( )->CreateBuildingRemoval( usModel, fRadius, CVector ( fX, fY, fZ ) );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( usModel );
+    BitStream.pBitStream->Write ( fRadius );
+    BitStream.pBitStream->Write ( fX );
+    BitStream.pBitStream->Write ( fY );
+    BitStream.pBitStream->Write ( fZ );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESTORE_WORLD_MODEL, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::RestoreAllWorldModels ( void )
+{
+    g_pGame->GetBuildingRemovalManager ( )->ClearBuildingRemovals ( );
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESTORE_ALL_WORLD_MODELS, *BitStream.pBitStream ) );
+
+    return true;
+}
 
 bool CStaticFunctionDefinitions::SetWeather ( unsigned char ucWeather )
 {
