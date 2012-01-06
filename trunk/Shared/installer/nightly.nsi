@@ -152,14 +152,14 @@ LangString DESC_Section2 ${LANG_ENGLISH}			"The MTA:SA modification, allowing yo
 LangString DESC_SectionGroupServer ${LANG_ENGLISH}  "The Multi Theft Auto Server. This allows you to host games from your computer. This requires a fast internet connection."
 LangString DESC_Section4 ${LANG_ENGLISH}			"The Multi Theft Auto server. This is a required component."
 LangString DESC_Section5 ${LANG_ENGLISH}			"The MTA:SA modification for the server."
-;LangString DESC_Section6 ${LANG_ENGLISH}			"This is a set of required resources for your server."
-;LangString DESC_Section7 ${LANG_ENGLISH}			"This is an optional set of gamemodes and maps for your server."
-;LangString DESC_Section8 ${LANG_ENGLISH}			"The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
-;LangString DESC_Section9 ${LANG_ENGLISH}			"This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
+LangString DESC_Section6 ${LANG_ENGLISH}			"This is a set of required resources for your server."
+LangString DESC_Section7 ${LANG_ENGLISH}			"This is an optional set of gamemodes and maps for your server."
+LangString DESC_Section8 ${LANG_ENGLISH}			"The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
+LangString DESC_Section9 ${LANG_ENGLISH}			"This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
 LangString DESC_Section10 ${LANG_ENGLISH}			"Create a Start Menu group for installed applications"
 LangString DESC_Section11 ${LANG_ENGLISH}			"Create a Desktop Shortcut for the MTA:SA Client."
 ;LangString DESC_Blank ${LANG_ENGLISH}			""
-;LangString DESC_SectionGroupDev ${LANG_ENGLISH}		"Development code and tools that aid in the creation of mods for Multi Theft Auto"
+LangString DESC_SectionGroupDev ${LANG_ENGLISH}		"Development code and tools that aid in the creation of mods for Multi Theft Auto"
 LangString DESC_SectionGroupClient ${LANG_ENGLISH}  "The client is the program you run to play on a Multi Theft Auto server"
 
 
@@ -491,7 +491,7 @@ DontInstallRedist:
 		SectionGroup /e "Dedicated server" SECGSERVER
 	!endif
 	Section "Core components" SEC04
-	SectionIn 1 2 RO ; section is required
+	SectionIn 1 2 ; RO section is no longer required
 	
 	StrCmp "$RedistInstalled" "1" DontInstallRedist
 	Call InstallVC90Redistributable
@@ -686,15 +686,15 @@ SectionEnd
 	;!insertmacro MUI_DESCRIPTION_TEXT ${SECGMODS} $(DESC_SectionGroupMods)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC04} $(DESC_Section4)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC05} $(DESC_Section5)
-	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC06} $(DESC_Section6)
-	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC07} $(DESC_Section7)
-	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC08} $(DESC_Section8)
-	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC09} $(DESC_Section9)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC06} $(DESC_Section6)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC07} $(DESC_Section7)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC08} $(DESC_Section8)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09} $(DESC_Section9)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC10} $(DESC_Section10)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC11} $(DESC_Section11)
 	;!insertmacro MUI_DESCRIPTION_TEXT ${SECBLANK} $(DESC_Blank)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SECGSERVER} $(DESC_SectionGroupServer)
-	;!insertmacro MUI_DESCRIPTION_TEXT ${SECGDEV} $(DESC_SectionGroupDev)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SECGDEV} $(DESC_SectionGroupDev)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SECGCLIENT} $(DESC_SectionGroupClient)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
