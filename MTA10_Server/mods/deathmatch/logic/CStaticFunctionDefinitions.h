@@ -561,6 +561,9 @@ public:
     static bool                 ResetWindVelocity                   ( void );
     static bool                 ResetFarClipDistance                ( void );
     static bool                 ResetFogDistance                    ( void );
+    static bool                 RemoveWorldModel                    ( unsigned short usModel, float fRadius, float fX, float fY, float fZ );
+    static bool                 RestoreWorldModel                   ( unsigned short usModel, float fRadius, float fX, float fY, float fZ );
+    static bool                 RestoreAllWorldModels               ( void );
 
     // Loaded Map Functions
     static CElement*            GetRootElement                      ( void );

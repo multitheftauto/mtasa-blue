@@ -5362,6 +5362,7 @@ void _declspec(naked) HOOK_CrashFix_Misc1 ()
         test    ecx,ecx
         jne     cont
         CRASH_AVERTED( 1 )
+        xor    ecx,ecx
     cont:
         jmp     RETURN_CrashFix_Misc1   // 0x5D9A74
     }

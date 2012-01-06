@@ -480,6 +480,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CGUIMessageBox_Impl.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CGUIProgressBar_Impl.h"
 				>
 			</File>

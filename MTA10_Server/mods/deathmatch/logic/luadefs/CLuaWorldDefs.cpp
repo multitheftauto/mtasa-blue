@@ -78,6 +78,9 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "resetWindVelocity", CLuaWorldDefs::resetWindVelocity );
     CLuaCFunctions::AddFunction ( "resetFarClipDistance", CLuaWorldDefs::resetFarClipDistance );
     CLuaCFunctions::AddFunction ( "resetFogDistance", CLuaWorldDefs::resetFogDistance );
+    CLuaCFunctions::AddFunction ( "removeWorldModel", CLuaWorldDefs::RemoveWorldModel );
+    CLuaCFunctions::AddFunction ( "restoreWorldModel", CLuaWorldDefs::RestoreWorldModel );
+    CLuaCFunctions::AddFunction ( "restoreAllWorldModels", CLuaWorldDefs::RestoreAllWorldModels );
 }
 
 
@@ -981,6 +984,63 @@ int CLuaWorldDefs::resetFarClipDistance ( lua_State* luaVM )
 int CLuaWorldDefs::resetFogDistance ( lua_State* luaVM )
 {
     if ( CStaticFunctionDefinitions::ResetFogDistance ( ) )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::RemoveWorldModel ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+
+    unsigned short usModel = 0;
+    float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+    argStream.ReadNumber ( usModel );
+    argStream.ReadNumber ( fRadius );
+    argStream.ReadNumber ( fX );
+    argStream.ReadNumber ( fY );
+    argStream.ReadNumber ( fZ );
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( CStaticFunctionDefinitions::RemoveWorldModel ( usModel, fRadius, fX, fY, fZ ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::RestoreWorldModel ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+
+    unsigned short usModel = 0;
+    float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+    argStream.ReadNumber ( usModel );
+    argStream.ReadNumber ( fRadius );
+    argStream.ReadNumber ( fX );
+    argStream.ReadNumber ( fY );
+    argStream.ReadNumber ( fZ );
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( CStaticFunctionDefinitions::RestoreWorldModel ( usModel, fRadius, fX, fY, fZ ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::RestoreAllWorldModels ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::RestoreAllWorldModels ( ) )
     {
         lua_pushboolean ( luaVM, true );
         return 1;
