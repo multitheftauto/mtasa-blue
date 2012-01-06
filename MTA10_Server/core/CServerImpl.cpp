@@ -202,7 +202,8 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         SetConsoleOutputCP(CP_UTF8);
 #else
         // support user locales
-        std::setlocale(LC_ALL, "C");
+        std::setlocale(LC_ALL, "");
+        std::setlocale(LC_NUMERIC, "C");
 
         // Initialize the window and any necessary curses options
         initscr ( );
