@@ -491,7 +491,7 @@ DontInstallRedist:
 		SectionGroup /e "Dedicated server" SECGSERVER
 	!endif
 	Section "Core components" SEC04
-	SectionIn 1 2 ; RO section is no longer required
+	SectionIn 1 2 RO ; section is required
 	
 	StrCmp "$RedistInstalled" "1" DontInstallRedist
 	Call InstallVC90Redistributable
@@ -549,7 +549,7 @@ DontInstallRedist:
 
 	!ifndef LIGHTBUILD
 		Section "Core resources" SEC06
-		SectionIn 1 2 RO ; section is required
+		SectionIn 1 2 ; RO section is now optional
 			SetOutPath "$INSTDIR\server\mods\deathmatch\resources\"
             File "${SERVER_FILES_ROOT}\mods\deathmatch\resources\Directory layout readme.txt"
 
