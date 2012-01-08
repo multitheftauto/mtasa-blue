@@ -33,6 +33,7 @@ public:
     CClientPed*                     Get                             ( CPlayerPed* pPlayer, bool bValidatePointer, bool bCheckPlayers );
     CClientPed*                     Get                             ( RpClump* pClump, bool bCheckPlayers );
     CClientPed*                     GetSafe                         ( CEntity * pEntity, bool bCheckPlayers );
+    CClientPed*                     GetSafeClientPedFromGameEntity  ( CEntity* pPlayerPedSA );
 
     bool                            Exists                          ( CClientPed* pPed );
 
@@ -62,6 +63,9 @@ protected:
     std::vector < CClientPed* >     m_List;    
     std::vector < CClientPed* >     m_StreamedIn;
     bool                            m_bRemoveFromList;
+
+    std::map < CEntity*, CClientPed* > m_GamePlayerPedToClientPedMap;
+    bool                            m_bBuiltLookupMapThisFrame;
 };
 
 #endif

@@ -65,6 +65,8 @@ CClientVehicleManager::CClientVehicleManager ( CClientManager* pManager )
     // Initialize members
     m_pManager = pManager;
     m_bCanRemoveFromList = true;
+    m_bBuiltLookupMapThisFrame = false;
+
     int iVehicleID = 0;
 for ( int i = 0; i <= 212; i++ )
     {
@@ -378,6 +380,7 @@ void CClientVehicleManager::DeleteAll ( void )
 
 void CClientVehicleManager::DoPulse ( void )
 {
+    m_bBuiltLookupMapThisFrame = false;
     CClientVehicle * pVehicle = NULL;
     // Loop through our streamed-in vehicles
     vector < CClientVehicle * > cloneList = m_StreamedIn;
@@ -389,6 +392,42 @@ void CClientVehicleManager::DoPulse ( void )
         assert ( pVehicle->GetGameVehicle () );
         pVehicle->StreamedInPulse ();
     }
+}
+
+
+//
+// Return CClientVehicle which is using the supplied CVehicleSA.
+// CVehicleSA can be any value.
+// Utilizes the fact that upcasting between virtual classes is automatic and quick.
+//
+CClientVehicle* CClientVehicleManager::GetSafeClientVehicleFromGameEntity ( CEntity* pVehicleSA )
+{
+    // Use a per-frame cache
+    if ( !m_bBuiltLookupMapThisFrame )
+    {
+        m_bBuiltLookupMapThisFrame = true;
+        m_GameVehicleToClientVehicleMap.clear ();
+
+        vector < CClientVehicle* > ::const_iterator iter = m_StreamedIn.begin ();
+        for ( ; iter != m_StreamedIn.end (); iter++ )
+        {
+            CClientVehicle* pClientVehicle = *iter;
+            CEntity* pEntitySA = pClientVehicle->GetGameEntity ();
+            if ( pEntitySA )
+                m_GameVehicleToClientVehicleMap[ pEntitySA ] = pClientVehicle;
+        }
+    }
+
+    // Find match in the cache
+    CClientVehicle* pClientVehicle = MapFindRef ( m_GameVehicleToClientVehicleMap, pVehicleSA );
+
+    // Check the client entity has not been deleted since the cache was last built
+    if ( pClientVehicle && ( !CClientEntity::IsValidEntity ( pClientVehicle ) || pClientVehicle->GetGameEntity () != pVehicleSA ) )
+    {
+        m_bBuiltLookupMapThisFrame = false;
+        return GetSafeClientVehicleFromGameEntity ( pVehicleSA );
+    }
+    return pClientVehicle;
 }
 
 

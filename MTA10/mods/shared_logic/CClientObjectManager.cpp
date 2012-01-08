@@ -100,6 +100,7 @@ CClientObjectManager::CClientObjectManager ( CClientManager* pManager )
     // Initialize members
     m_pManager = pManager;
     m_bCanRemoveFromList = true;
+    m_bBuiltLookupMapThisFrame = false;
 }
 
 
@@ -112,6 +113,7 @@ CClientObjectManager::~CClientObjectManager ( void )
 
 void CClientObjectManager::DoPulse ( void )
 {
+    m_bBuiltLookupMapThisFrame = false;
     UpdateLimitInfo ();
 
     CClientObject * pObject = NULL;
@@ -140,6 +142,42 @@ void CClientObjectManager::DeleteAll ( void )
     // Clear the list
     m_Objects.clear ();
     m_bCanRemoveFromList = true;
+}
+
+
+//
+// Return CClientObject which is using the supplied CObjectSA.
+// CObjectSA can be any value.
+// Utilizes the fact that upcasting between virtual classes is automatic and quick.
+//
+CClientObject* CClientObjectManager::GetSafeClientObjectFromGameEntity ( CEntity* pObjectSA )
+{
+    // Use a per-frame cache
+    if ( !m_bBuiltLookupMapThisFrame )
+    {
+        m_bBuiltLookupMapThisFrame = true;
+        m_GameObjectToClientObjectMap.clear ();
+
+        vector < CClientObject* > ::const_iterator iter = m_StreamedIn.begin ();
+        for ( ; iter != m_StreamedIn.end (); iter++ )
+        {
+            CClientObject* pClientObject = *iter;
+            CEntity* pEntitySA = pClientObject->GetGameEntity ();
+            if ( pEntitySA )
+                m_GameObjectToClientObjectMap[ pEntitySA ] = pClientObject;
+        }
+    }
+
+    // Find match in the cache
+    CClientObject* pClientObject = MapFindRef ( m_GameObjectToClientObjectMap, pObjectSA );
+
+    // Check the client entity has not been deleted since the cache was last built
+    if ( pClientObject && ( !CClientEntity::IsValidEntity ( pClientObject ) || pClientObject->GetGameEntity () != pObjectSA ) )
+    {
+        m_bBuiltLookupMapThisFrame = false;
+        return GetSafeClientObjectFromGameEntity ( pObjectSA );
+    }
+    return pClientObject;
 }
 
 
