@@ -657,9 +657,41 @@ bool CLocalGUI::ProcessMessage ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
                 return false;
             }
 
+            case WM_IME_COMPOSITION:
+            {
+        	    HIMC himc = ImmGetContext ( hwnd );
+                if ( himc )
+                {
+                    if ( lParam & GCS_RESULTSTR )
+                    {
+                        // Handle composition result
+                        ushort buffer[256];
+                        LONG numBytes = ImmGetCompositionStringW ( himc, GCS_RESULTSTR, buffer, sizeof ( buffer ) - 2 );
+                        for ( uint i = 0 ; i < numBytes / sizeof ( ushort ) ; i++ )
+                            pGUI->ProcessCharacter ( buffer[i] );
+
+                        // Remove processed string
+                        ImmNotifyIME ( himc, NI_COMPOSITIONSTR, CPS_CANCEL, 0 );
+                    }
+                    ImmReleaseContext ( hwnd, himc );
+                }
+            }
+            break;
+
+            case WM_IME_CHAR:
+            case WM_IME_KEYDOWN:
+            {
+                // Stop these here
+                return true;
+            }
+            break;
+
             case WM_CHAR:
+            {
                 pGUI->ProcessCharacter ( wParam );
                 return true;
+            }
+            break;
         }
     }
 
