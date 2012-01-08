@@ -226,6 +226,8 @@ public:
     void                    OnCrashAverted                  ( uint uiId );
     void                    LogEvent                        ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody );
     bool                    GetDebugIdEnabled               ( uint uiDebugId );
+    EDiagnosticDebugType    GetDiagnosticDebug              ( void );
+    void                    SetDiagnosticDebug              ( EDiagnosticDebugType value );
 
 private:
     // Core devices.
@@ -300,6 +302,7 @@ private:
     double                      m_dPrevOverrun;
     bool                        m_bWaitToSetNick;
     uint                        m_uiNewNickWaitFrames;
+    EDiagnosticDebugType        m_DiagnosticDebug;
 
     // Command line
     static void                 ParseCommandLine                ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions = NULL );

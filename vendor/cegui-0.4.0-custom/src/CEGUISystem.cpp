@@ -65,6 +65,7 @@
 // Start of CEGUI namespace section
 namespace CEGUI
 {
+bool System::ms_bBidiEnabled = true;
 const String System::EventNamespace("System");
 
 /*!

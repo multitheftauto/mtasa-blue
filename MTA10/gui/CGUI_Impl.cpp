@@ -154,6 +154,13 @@ void CGUI_Impl::SetSkin ( const char* szName )
     m_bTransferBoxVisible = false;
 }
 
+
+void CGUI_Impl::SetBidiEnabled ( bool bEnabled )
+{
+    m_pSystem->SetBidiEnabled ( bEnabled );
+}
+
+
 void CGUI_Impl::SubscribeToMouseEvents()
 {
     // Mouse events
