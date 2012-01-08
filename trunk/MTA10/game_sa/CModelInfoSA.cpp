@@ -458,6 +458,13 @@ BOOL CModelInfoSA::IsLoaded ( )
     //return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + 20*dwModelID);
     BOOL bLoaded = pGame->GetStreaming()->HasModelLoaded(m_dwModelID);
     m_pInterface = ppModelInfo [ m_dwModelID ];
+
+    if ( bLoaded && m_dwModelID < 20000 )
+    {
+        // Check rw object is there
+        if ( !m_pInterface || !m_pInterface->pRwObject )
+            return false;
+    }
     return bLoaded;
 }
 
