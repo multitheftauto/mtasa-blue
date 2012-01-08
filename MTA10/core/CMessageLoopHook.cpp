@@ -121,6 +121,26 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 
     if ( hwnd != pThis->GetHookedWindowHandle () ) return NULL;
 
+    // Handle IME if input is not for the GUI
+    if ( !g_pCore->GetLocalGUI ()->InputGoesToGUI () )
+    {
+        if ( uMsg == WM_KEYDOWN )
+        {
+            // Recover virtual key
+            if ( wParam == VK_PROCESSKEY )
+                wParam = MapVirtualKey ( lParam >> 16, MAPVK_VSC_TO_VK_EX );
+        }
+
+        if ( uMsg == WM_IME_STARTCOMPOSITION || uMsg == WM_IME_ENDCOMPOSITION || uMsg == WM_IME_COMPOSITION )
+        {
+            // Cancel, stop, block and ignore
+            HIMC himc = ImmGetContext ( hwnd );
+            ImmNotifyIME ( himc, NI_COMPOSITIONSTR, CPS_CANCEL, 0 );
+            ImmReleaseContext ( hwnd, himc );
+            return true;
+        }
+    }
+   
     // Make sure our pointers are valid.
     if ( pThis != NULL && CLocalGUI::GetSingletonPtr ( ) != NULL && CCore::GetSingleton ().GetGame () )
     {
@@ -321,6 +341,9 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                 // Call GTA's window procedure.
                 return CallWindowProcW ( pThis->m_HookedWindowProc, hwnd, uMsg, wParam, lParam );
             }
+
+            // Don't allow DefWindowProc if processed here. (Important for IME)
+            return true; 
         }
     }
 
