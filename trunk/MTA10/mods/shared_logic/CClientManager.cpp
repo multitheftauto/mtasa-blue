@@ -271,13 +271,13 @@ CClientEntity * CClientManager::FindEntity ( CEntity * pGameEntity, bool bValida
         if ( bValidatePointer )
         {
             // Dont check CEntity::GetEntityType, it may be an invalid pointer
-            if ( pEntity = m_pPedManager->Get ( dynamic_cast < CPlayerPed* > ( pGameEntity ), true, true ) )
+            if ( pEntity = m_pPedManager->GetSafeClientPedFromGameEntity ( pGameEntity ) )
                 return pEntity;
 
-            if ( pEntity = m_pVehicleManager->Get ( dynamic_cast < CVehicle* > ( pGameEntity ), true ) )
+            if ( pEntity = m_pVehicleManager->GetSafeClientVehicleFromGameEntity ( pGameEntity ) )
                 return pEntity;
 
-            if ( pEntity = m_pObjectManager->Get ( dynamic_cast < CObject* > ( pGameEntity ), true ) )
+            if ( pEntity = m_pObjectManager->GetSafeClientObjectFromGameEntity ( pGameEntity ) )
                 return pEntity;
         }
         else

@@ -302,6 +302,9 @@ public:
 
     float                                       GetDistanceBetweenBoundingSpheres   ( CClientEntity* pOther );
 
+    template < class T >
+    static bool                                 IsValidEntity               ( T* pEntity );
+
 protected:
     CClientManager*                             m_pManager;
     CClientEntity*                              m_pParent;
@@ -343,7 +346,9 @@ protected:
     bool                                        m_bDoubleSidedInit;
 
 private:
+    // Tracking
     static int                                  iCount;
+    static std::set < CClientEntity* >          ms_ValidEntityMap;
 
     // Optimization for getElementsByType starting at root
 public:
@@ -361,5 +366,14 @@ private:
 #endif
 
 };
+
+
+// Check entity is known and the correct class
+template < class T >
+bool CClientEntity::IsValidEntity ( T* pEntity )
+{
+    return MapContains ( ms_ValidEntityMap, pEntity )
+            && pEntity->IsA ( T::GetClassId () );
+}
 
 #endif
