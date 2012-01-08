@@ -28,7 +28,7 @@ static int                 ms_bSaveStarted      = 0;
 static long long           ms_LastSaveTime      = 0;
 // Other variables
 static uint                ms_RequiredAnisotropicLevel = 1;
-
+static EDiagnosticDebugType ms_DiagnosticDebug = EDiagnosticDebug::NONE;
 
 void CDirect3DEvents9::OnDirect3DDeviceCreate  ( IDirect3DDevice9 *pDevice )
 {
@@ -165,6 +165,8 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     int iAnisotropic;
     CVARS_GET ( "anisotropic", iAnisotropic );
     ms_RequiredAnisotropicLevel = 1 << iAnisotropic;
+    ms_DiagnosticDebug = CCore::GetSingleton ().GetDiagnosticDebug ();
+    CCore::GetSingleton().GetGUI ()->SetBidiEnabled ( ms_DiagnosticDebug != EDiagnosticDebug::BIDI_6778 );
     
     // Tidyup after last screenshot
     if ( ms_bSaveStarted )
@@ -248,6 +250,9 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 /////////////////////////////////////////////////////////////
 HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,UINT StartVertex,UINT PrimitiveCount )
 {
+    if ( ms_DiagnosticDebug == EDiagnosticDebug::GRAPHICS_6734 )
+        return pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
+
     // Any shader for this texture ?
     CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
 
@@ -313,6 +318,9 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
 /////////////////////////////////////////////////////////////
 HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount )
 {
+    if ( ms_DiagnosticDebug == EDiagnosticDebug::GRAPHICS_6734 )
+        return pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+
     // Apply anisotropic filtering if required
     if ( ms_RequiredAnisotropicLevel > 1 )
     {
@@ -450,6 +458,9 @@ bool AreVertexStreamsAreBigEnough ( IDirect3DDevice9* pDevice, WORD viMinBased, 
 /////////////////////////////////////////////////////////////
 HRESULT CDirect3DEvents9::DrawPrimitiveGuarded ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,UINT StartVertex,UINT PrimitiveCount )
 {
+    if ( ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732 )
+        return pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
+
     HRESULT hr = D3D_OK;
 
     // Check vertices used will be within the supplied vertex buffer bounds
@@ -487,6 +498,9 @@ HRESULT CDirect3DEvents9::DrawPrimitiveGuarded ( IDirect3DDevice9 *pDevice, D3DP
 /////////////////////////////////////////////////////////////
 HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount )
 {
+    if ( ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732 )
+        return pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+
     HRESULT hr = D3D_OK;
 
     // Check vertices used will be within the supplied vertex buffer bounds

@@ -134,6 +134,7 @@ CCore::CCore ( void )
     m_bCursorToggleControls = false;
     m_bLastFocused = true;
     m_bWaitToSetNick = false;
+    m_DiagnosticDebug = EDiagnosticDebug::NONE;
 
     // Initialize time
     CClientTime::InitializeTime ();
@@ -1920,4 +1921,14 @@ bool CCore::GetDebugIdEnabled ( uint uiDebugId )
 {
     static CFilterMap debugIdFilterMap ( GetVersionUpdater ()->GetDebugFilterString () );
     return !debugIdFilterMap.IsFiltered ( uiDebugId );
+}
+
+EDiagnosticDebugType CCore::GetDiagnosticDebug ( void )
+{
+    return m_DiagnosticDebug;
+}
+
+void CCore::SetDiagnosticDebug ( EDiagnosticDebugType value )
+{
+    m_DiagnosticDebug = value;
 }

@@ -936,7 +936,9 @@ void CSettings::CreateGUI ( void )
     m_pDebugSettingCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
     m_pDebugSettingCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
     m_pDebugSettingCombo->AddItem ( "Default" )->SetData ( (void*)0 );
-    m_pDebugSettingCombo->AddItem ( "#6323 Network" )->SetData ( (void*)1 );
+    m_pDebugSettingCombo->AddItem ( "#6734 Graphics" )->SetData ( (void*)EDiagnosticDebug::GRAPHICS_6734 );
+    m_pDebugSettingCombo->AddItem ( "#6778 BIDI" )->SetData ( (void*)EDiagnosticDebug::BIDI_6778 );
+    m_pDebugSettingCombo->AddItem ( "#6732 D3D" )->SetData ( (void*)EDiagnosticDebug::D3D_6732 );
     m_pDebugSettingCombo->SetReadOnly ( true );
 
     m_pDebugSettingLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Select default always.\n(This setting is not saved)" ) );
@@ -2542,11 +2544,8 @@ void CSettings::SaveData ( void )
     // Debug setting
     if ( CGUIListItem* pSelected = m_pDebugSettingCombo->GetSelectedItem () )
     {
-        int iSelected = ( int ) pSelected->GetData();
-        SString strDebugSetting = "none";
-        if ( iSelected == 1 )
-            strDebugSetting = "net";    // #6323 Network
-        SetApplicationSetting ( "diagnostics", "debug-setting", strDebugSetting );
+        EDiagnosticDebugType iSelected = ( EDiagnosticDebugType )(int) pSelected->GetData();
+        g_pCore->SetDiagnosticDebug ( iSelected );
     }
 
     // Update build type

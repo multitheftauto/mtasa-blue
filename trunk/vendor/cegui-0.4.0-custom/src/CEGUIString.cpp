@@ -144,6 +144,9 @@ String String::bidify(void) const
 #ifdef DETECT_ARRAY_ISSUES
     doBidiTest ();
 #endif
+    if ( !System::ms_bBidiEnabled )
+        return *this;
+
     String tmp = *this;
 
     // Apply in sections seperated by \n

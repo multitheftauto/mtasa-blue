@@ -67,6 +67,7 @@ public:
                                     ~CGUI_Impl                  ( void );
 
     void                            SetSkin                     ( const char* szName );
+    void                            SetBidiEnabled              ( bool bEnabled );
 
     void                            Draw                        ( void );
     void                            Invalidate                  ( void );

@@ -131,6 +131,8 @@ public:
     virtual void                    OnCrashAverted                  ( uint uiId ) = 0;
     virtual void                    LogEvent                        ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody ) = 0;
     virtual bool                    GetDebugIdEnabled               ( uint uiDebugId ) = 0;
+    virtual EDiagnosticDebugType    GetDiagnosticDebug              ( void ) = 0;
+    virtual void                    SetDiagnosticDebug              ( EDiagnosticDebugType value ) = 0;
 };
 
 #endif
