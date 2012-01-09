@@ -18,7 +18,7 @@
 class CVoiceEndPacket : public CPacket
 {
 public:
-    CVoiceEndPacket            ( void );
+    CVoiceEndPacket            ( class CPlayer* pPlayer = NULL );
     ~CVoiceEndPacket            ( );
 
     ePacketID               GetPacketID                 ( void ) const;
