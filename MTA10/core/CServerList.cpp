@@ -546,7 +546,7 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
         nMaxPlayers = (unsigned char)szBuffer[i++];
 
     // Recover large player count if present
-    SString strPlayerCount = strMapTemp.Right ( strMapTemp.length () - strlen ( strMapTemp ) - 1 );
+    const SString strPlayerCount = strMapTemp.Right ( strMapTemp.length () - strlen ( strMapTemp ) - 1 );
     if ( !strPlayerCount.empty () )
     {
         SString strJoinedPlayers, strMaxPlayers;
@@ -558,6 +558,21 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
                 nMaxPlayers = atoi ( strMaxPlayers );
         }
     }
+
+    // Recover server build type if present
+    const SString strBuildType = strPlayerCount.Right ( strPlayerCount.length () - strlen ( strPlayerCount ) - 1 );
+    if ( !strBuildType.empty () )
+        m_iBuildType = atoi ( strBuildType );
+    else
+        m_iBuildType = 1;
+
+    // Recover server build number if present
+    const SString strBuildNumber = strBuildType.Right ( strBuildType.length () - strlen ( strBuildType ) - 1 );
+    if ( !strBuildNumber.empty () )
+        m_iBuildNumber = atoi ( strBuildNumber );
+    else
+        m_iBuildNumber = 0;
+
 
     // Get player nicks
     vecPlayers.clear ();
