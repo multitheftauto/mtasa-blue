@@ -355,6 +355,8 @@ std::string ASE::QueryLight ( void )
     int iJoinedPlayers = m_pPlayerManager->CountJoined ();
     int iMaxPlayers = m_pMainConfig->GetMaxPlayers ();
     SString strPlayerCount = SString ( "%d/%d", iJoinedPlayers, iMaxPlayers );
+    SString strBuildType = SString ( "%d", MTASA_VERSION_TYPE );
+    SString strBuildNumber = SString ( "%d", MTASA_VERSION_BUILD );
 
     reply << "EYE2";
     // game
@@ -369,11 +371,15 @@ std::string ASE::QueryLight ( void )
     // game type
     reply << ( unsigned char ) ( m_strGameType.length() + 1 );
     reply << m_strGameType;
-    // map name with backwardly compatible large player count
-    reply << ( unsigned char ) ( m_strMapName.length() + 1 + strPlayerCount.length () + 1 );
+    // map name with backwardly compatible large player count, build type and build number
+    reply << ( unsigned char ) ( m_strMapName.length() + 1 + strPlayerCount.length () + 1 + strBuildType.length () + 1 + strBuildNumber.length () + 1 );
     reply << m_strMapName;
     reply << ( unsigned char ) 0;
     reply << strPlayerCount;
+    reply << ( unsigned char ) 0;
+    reply << strBuildType;
+    reply << ( unsigned char ) 0;
+    reply << strBuildNumber;
     // version
     std::string temp = MTA_DM_ASE_VERSION;
     reply << ( unsigned char ) ( temp.length() + 1 );

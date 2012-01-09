@@ -177,6 +177,8 @@ public:
         uiTieBreakPosition = 1000;
         m_iDataQuality = SERVER_INFO_NONE;
         m_iTimeoutLength = SERVER_LIST_ITEM_TIMEOUT;
+        m_iBuildType = 0;
+        m_iBuildNumber = 0;
     }
 
     void                CloseSocket     ( void )
@@ -220,6 +222,9 @@ public:
     SString             strGameMode;    // Gamemode
     SString             strMap;         // Map name
     SString             strEndpoint;    // IP:port as a string
+
+    int                 m_iBuildType;     // 9=release
+    int                 m_iBuildNumber;   // 00000 and up
 
     SString             strNameSortKey;         // Server name as a sortable string
     SString             strVersionSortKey;      // Game version as a sortable string
@@ -271,7 +276,7 @@ public:
                 c = 'z' - c + 'a';
             strTemp += c;
         }
-        strVersionSortKey = strTemp;
+        strVersionSortKey = SString ( "%s_%05d_", *strTemp, m_iBuildNumber );
 
         // Update name sort key
         strNameSortKey = "";
