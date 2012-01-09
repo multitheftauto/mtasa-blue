@@ -2547,8 +2547,27 @@ void CClientPed::StreamedInPulse ( void )
                 }
             }
 
+
+            // * Fix for warp glitches when sprinting and blocking simultaneously
+            // This is applied locally, and prevents you using the backwards key while sprint-blocking
+            CTask * pTask = m_pTaskManager->GetSimplestActiveTask ();
+            if ( ( pTask && pTask->GetTaskType () == TASK_SIMPLE_PLAYER_ON_FOOT ) &&
+                 ( GetWeapon()->GetSlot() == WEAPONSLOT_TYPE_UNARMED ) &&
+                 ( Current.RightShoulder1 != 0 ) &&
+                 ( Current.ButtonSquare != 0 ) &&
+                 ( Current.ButtonCross != 0 ) )
+            {  // We are block jogging
+                if ( Current.LeftStickY > 0 )  
+                    // We're pressing target+jump+sprint+backwards.  Using the backwards key in this situation is prone to bugs, swap it with forwards
+                    Current.LeftStickY = -Current.LeftStickY;
+                else if ( Current.LeftStickY == 0 )
+                    // We're pressing target+jump+sprint 
+                    // This causes some sliding, so let's disable this glitchy animation
+                    Current.ButtonCross = 0;
+            }
+
             // * Check for entering a vehicle whilst using a gun
-            CTask * pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
+            pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
             if ( pTask )
             {
                 int iTaskType = pTask->GetTaskType ();
