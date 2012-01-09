@@ -265,6 +265,8 @@ public:
         if ( isdigit ( (uchar)strVersionSortKey.Right ( 1 )[0] ) )
             strVersionSortKey += 'z';
 
+        strVersionSortKey = SString ( "%s_%05d_", *strVersionSortKey, m_iBuildNumber );
+
         SString strTemp;
         for ( uint i = 0 ; i < strVersionSortKey.length () ; i++ )
         {
@@ -276,7 +278,7 @@ public:
                 c = 'z' - c + 'a';
             strTemp += c;
         }
-        strVersionSortKey = SString ( "%s_%05d_", *strTemp, m_iBuildNumber );
+        strVersionSortKey = strTemp;
 
         // Update name sort key
         strNameSortKey = "";
