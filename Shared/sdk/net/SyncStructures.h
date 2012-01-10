@@ -1586,19 +1586,10 @@ struct SFunBugsStateSync : public ISyncStructure
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        if ( bitStream.Version ( ) == 0x22 )
-        {
-            return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), 4 );
-        }
         return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
     }
     void Write ( NetBitStreamInterface& bitStream ) const
     {
-        if ( bitStream.Version ( ) == 0x22 )
-        {
-            bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), 4 );
-            return;
-        }
         bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
     }
 
