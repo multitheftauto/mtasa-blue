@@ -3398,6 +3398,9 @@ void CClientPed::_ChangeModel ( void )
 
             m_pPlayerPed->GetFightingStyle ();
 
+            // Takes care of clothes/task issues
+            Respawn ( NULL, true, false );
+
             // Remember the model we had loaded and store the new model we're going to load
             CModelInfo* pLoadedModel = m_pLoadedModelInfo;
             m_pLoadedModelInfo = m_pModelInfo;
@@ -3408,9 +3411,8 @@ void CClientPed::_ChangeModel ( void )
             // Set the new player model and restore the interior
             m_pPlayerPed->SetModelIndex ( m_ulModel );
 
-            // Respawn takes care of clothes/task issues - Also rebuilds the model
-            // Done after new model has been set to avoid spider CJ
-            Respawn ( NULL, true, false );
+            // Rebuild the player after a skin change
+            RebuildModel ();
 
             // Remove reference to the old model we used (Flag extra GTA reference to be removed as well)
             pLoadedModel->RemoveRef ( true );
