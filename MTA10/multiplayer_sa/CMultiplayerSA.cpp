@@ -379,6 +379,10 @@ DWORD JMP_CEntity_IsOnScreen_FixObjectsScale = 0x53457C;
 DWORD CALL_CEventDamageCollision = 0x6A765D;
 DWORD JMP_CEventVehicleDamageCollision_RETN = 0x6A765D;
 
+#define HOOKPOS_CClothes_RebuildPlayer                      0x5A82C0
+DWORD RETURN_CClothes_RebuildPlayera                        = 0x5A82C8;
+DWORD RETURN_CClothes_RebuildPlayerb                        = 0x5A837F;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -569,6 +573,7 @@ void HOOK_CEntity_IsOnScreen_FixObjectScale ();
 
 void HOOK_CEventVehicleDamageCollision ( );
 
+void HOOK_CClothes_RebuildPlayer ();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -787,6 +792,9 @@ void CMultiplayerSA::InitHooks()
     HookInstall ( HOOKPOS_CEventVehicleDamageCollision, (DWORD)HOOK_CEventVehicleDamageCollision, 6 );
 
     // End of building removal hooks
+
+    // Spider CJ fix
+    HookInstall ( HOOKPOS_CClothes_RebuildPlayer, (DWORD)HOOK_CClothes_RebuildPlayer, 8 );
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -7122,5 +7130,27 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision ( )
         popad
         mov eax, fs:0
         jmp JMP_CEventVehicleDamageCollision_RETN
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Only allow rebuild player on CJ - Stops other models getting corrupted (spider CJ)
+// hooked at 5A82C0 8 bytes
+void _declspec(naked) HOOK_CClothes_RebuildPlayer ()
+{
+    _asm
+    {
+        push    esi
+        mov     esi, [esp+8]
+        movsx   eax, word ptr [esi+34]
+        cmp     eax, 0
+        jne     cont        // Not CJ, so skip
+
+        // continue standard path
+        mov     eax, [esi+18h]
+        jmp     RETURN_CClothes_RebuildPlayera  // 005A82C8
+
+    cont:
+        jmp     RETURN_CClothes_RebuildPlayerb  // 005A837F
     }
 }
