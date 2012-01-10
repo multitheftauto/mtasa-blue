@@ -425,9 +425,6 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     g_pClientGame->m_pLocalPlayer->CallEvent ( "onClientPlayerJoin", Arguments, true );
 
     g_pCore->UpdateRecentlyPlayed();
-
-    if ( bitStream.Version () < 0x22 )
-        g_pNet->ResetStub ( 'ecc', iEnableClientChecks );
 }
 
 
@@ -499,8 +496,7 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
     SString strACInfo;
     SString strSDInfo;
     bitStream.ReadString ( strACInfo );
-    if ( bitStream.Version () >= 0x20 )
-        bitStream.ReadString ( strSDInfo );
+    bitStream.ReadString ( strSDInfo );
 
     // Grab the flags
     bool bJustJoined;
@@ -2242,19 +2238,16 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
         }
     }
 
-    if ( bitStream.Version ( ) >= 0x24 )
+    unsigned short usModel = 0;
+    float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+    while ( bitStream.ReadBit ( ) == true )
     {
-        unsigned short usModel = 0;
-        float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
-        while ( bitStream.ReadBit ( ) == true )
-        {
-            bitStream.Read( usModel );
-            bitStream.Read( fRadius );
-            bitStream.Read( fX );
-            bitStream.Read( fY );
-            bitStream.Read( fZ );
-            g_pGame->GetWorld ( )->RemoveBuilding( usModel, fRadius, fX, fY, fZ );
-        }
+        bitStream.Read( usModel );
+        bitStream.Read( fRadius );
+        bitStream.Read( fX );
+        bitStream.Read( fY );
+        bitStream.Read( fZ );
+        g_pGame->GetWorld ( )->RemoveBuilding( usModel, fRadius, fX, fY, fZ );
     }
 }
 
