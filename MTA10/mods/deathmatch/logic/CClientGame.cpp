@@ -3434,9 +3434,9 @@ bool CClientGame::StaticProcessCollisionHandler ( CEntitySAInterface* pThisInter
     return g_pClientGame->ProcessCollisionHandler ( pThisInterface, pOtherInterface );
 }
 
-bool CClientGame::StaticVehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, float fDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity )
+bool CClientGame::StaticVehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity )
 {
-    return g_pClientGame->VehicleCollisionHandler( pCollidingVehicle, pCollidedVehicle, fDamageImpulseMag, byBodyPartHit, vecCollisionPos, vecCollisionVelocity );
+    return g_pClientGame->VehicleCollisionHandler( pCollidingVehicle, pCollidedVehicle, iModelIndex, fDamageImpulseMag, fCollidingDamageImpulseMag, byBodyPartHit, vecCollisionPos, vecCollisionVelocity );
 }
 void CClientGame::DrawRadarAreasHandler ( void )
 {
@@ -3914,7 +3914,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
     return true;
 }
 
-bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedWith, float fDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity )
+bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedWith, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity )
 {
     if ( pCollidingVehicle && pCollidedWith )
     {
@@ -3958,6 +3958,8 @@ bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehic
         Arguments.PushNumber ( vecCollisionVelocity.fX );
         Arguments.PushNumber ( vecCollisionVelocity.fY );
         Arguments.PushNumber ( vecCollisionVelocity.fZ );
+        Arguments.PushNumber ( fCollidingDamageImpulseMag );
+        Arguments.PushNumber ( iModelIndex );
 
         pVehicleClientEntity->CallEvent ( "onClientVehicleCollision", Arguments, true );
         return true;
