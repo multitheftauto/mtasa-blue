@@ -7106,7 +7106,15 @@ void TriggerVehicleDamageEvent ( )
             {
                 if ( m_pVehicleCollisionHandler )
                 {
-                    m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pCollisionVehicle->fDamageImpulseMagnitude, pCollisionVehicle->byBodyPartHit, pCollisionVehicle->vecCollisionPosition, pCollisionVehicle->vecCollisionImpactVelocity );
+                    if ( pEntity->nType == ENTITY_TYPE_VEHICLE )
+                    {
+                        CVehicleSAInterface * pInterface = static_cast < CVehicleSAInterface* > ( pEntity );
+                        m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->fDamageImpulseMagnitude, pInterface->fDamageImpulseMagnitude, pCollisionVehicle->byBodyPartHit, pCollisionVehicle->vecCollisionPosition, pCollisionVehicle->vecCollisionImpactVelocity );
+                    }
+                    else
+                    {
+                        m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->fDamageImpulseMagnitude, 0.0f, pCollisionVehicle->byBodyPartHit, pCollisionVehicle->vecCollisionPosition, pCollisionVehicle->vecCollisionImpactVelocity );
+                    }
                 }
             }
         }
@@ -7115,16 +7123,19 @@ void TriggerVehicleDamageEvent ( )
 
 void _declspec(naked) HOOK_CEventVehicleDamageCollision ( )
 {
+    // .006A7657 64 A1 00 00 00 00                       mov     eax, large fs:0 < Hook >
+    // .006A765D 50                                      push    eax < Jmp Back >
+
     // ecx = this ptr
-    // pVehicle->damageEntity = damage entity obvs
+    // pVehicle->damageEntity = damage entity
     _asm
     {
         pushad
         mov pCollisionVehicle, ecx
     }
     TriggerVehicleDamageEvent ( );
-
-    // move 0 to eax as the previous code did and jump back like nothing happened... like a boss
+    
+    // do the replaced code and return back as if nothing happened.
     _asm
     {
         popad
