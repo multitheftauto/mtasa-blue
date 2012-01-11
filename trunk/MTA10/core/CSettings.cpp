@@ -618,23 +618,6 @@ void CSettings::CreateGUI ( void )
     m_pComboAspectRatio->AddItem ( "16:9" )->SetData ( (void*)ASPECT_RATIO_16_9 );
     m_pComboAspectRatio->SetReadOnly ( true );
 
-    m_pStreamingMemoryLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Usable video memory:" ) );
-    m_pStreamingMemoryLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
-    m_pStreamingMemoryLabel->GetPosition ( vecTemp, false );
-    m_pStreamingMemoryLabel->AutoSize ( "Usable video memory:" );
-
-    unsigned int uiMinMemory = g_pCore->GetMinStreamingMemory ();
-    unsigned int uiMaxMemory = g_pCore->GetMaxStreamingMemory ();
-
-    m_pStreamingMemory = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
-    m_pStreamingMemory->SetPosition ( CVector2D ( vecTemp.fX + 130.0f, vecTemp.fY ) );
-    m_pStreamingMemory->SetSize ( CVector2D ( 160.0f, 20.0f ) );
-    m_pStreamingMemory->SetProperty ( "StepSize", SString("%.07lf", 1.0 / (uiMaxMemory - uiMinMemory)) );
-
-    m_pStreamingMemoryValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "0 MB") );
-    m_pStreamingMemoryValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY ) );
-    m_pStreamingMemoryValueLabel->AutoSize ( "9999 MB " );
-
     m_pMapRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Map rendering options" ) );
     m_pMapRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 38.0f ) );
     m_pMapRenderingLabel->GetPosition ( vecTemp, false );
@@ -949,6 +932,29 @@ void CSettings::CreateGUI ( void )
 
     m_pDebugSettingCombo->SetText ( "Default" );
     SetApplicationSetting ( "diagnostics", "debug-setting", "none" );
+
+    // Streaming memory
+    m_pStreamingMemoryLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Streaming memory:" ) );
+    m_pStreamingMemoryLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY + 0.0f ) );
+    m_pStreamingMemoryLabel->AutoSize ( "Streaming memory:" );
+
+    unsigned int uiMinMemory = g_pCore->GetMinStreamingMemory ();
+    unsigned int uiMaxMemory = g_pCore->GetMaxStreamingMemory ();
+
+    m_pStreamingMemory = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAdvanced ) );
+    m_pStreamingMemory->SetPosition ( CVector2D ( vecTemp.fX + 140.0f, vecTemp.fY - 0.f ) );
+    m_pStreamingMemory->SetSize ( CVector2D ( 130.0f, 20.0f ) );
+    m_pStreamingMemory->SetProperty ( "StepSize", SString("%.07lf", 1.0 / (uiMaxMemory - uiMinMemory)) );
+
+    m_pStreamingMemoryValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "0 MB") );
+    m_pStreamingMemoryValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 280.0f, vecTemp.fY ) );
+    m_pStreamingMemoryValueLabel->AutoSize ( "999 MB" );
+
+    m_pStreamingMemoryLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Maximum is usually best" ) );
+    m_pStreamingMemoryLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 0.f ) );
+    m_pStreamingMemoryLabelInfo->SetFont ( "default-bold-small" );
+    m_pStreamingMemoryLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 40-4;
 
     // Auto updater section label
     m_pAdvancedUpdaterLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Auto updater" ) );

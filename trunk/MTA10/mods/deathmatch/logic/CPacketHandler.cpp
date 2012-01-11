@@ -508,19 +508,38 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
 
     if ( !bJustJoined )
     {
-        SString strVerifyFiles = "Undisclosed";
+        SString strAllowedFiles = "Undisclosed";
         SString strDisabledAC = "Undisclosed";
         SString strEnabledSD = "Undisclosed";
         if ( !strACInfo.empty () )
         {
-            strVerifyFiles = strACInfo.SplitLeft ( "," );
+            SString strVerifyFiles = strACInfo.SplitLeft ( "," );
             strDisabledAC = strACInfo.SplitRight ( "," );
             strEnabledSD = strSDInfo;
-            strVerifyFiles = strVerifyFiles == "-1" ? "All" : strVerifyFiles;
             strDisabledAC = strDisabledAC == "" ? "None" : strDisabledAC;
             strEnabledSD = strEnabledSD == "" ? "None" : strEnabledSD;
+
+            int iVerifyFiles = atoi ( strVerifyFiles );
+            if ( iVerifyFiles == -1 )
+                strAllowedFiles = "None";
+            else
+            if ( iVerifyFiles == 0 )
+                strAllowedFiles = "All";
+            else
+            {
+                strAllowedFiles = "";
+                for ( uint i = 0 ; i < 31 ; i++ )
+                {
+                    if ( ( iVerifyFiles & ( 1 << i ) ) == 0 )
+                    {
+                        if ( !strAllowedFiles.empty () )
+                            strAllowedFiles += ",";
+                        strAllowedFiles += SString ( "%d", i + 1 );
+                    }
+                }
+            }
         }
-        g_pCore->GetConsole ()->Print ( SString ( "Server AC info: Verify client files: %s  Disabled AC: %s  Enabled SD: %s", *strVerifyFiles, *strDisabledAC, *strEnabledSD ) );
+        g_pCore->GetConsole ()->Print ( SString ( "Server AC info: [Allowed client files: %s] [Disabled AC: %s] [Enabled SD: %s]", *strAllowedFiles, *strDisabledAC, *strEnabledSD ) );
     }
 
     // While there are bytes left, parse player list items
