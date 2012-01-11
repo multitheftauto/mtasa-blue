@@ -171,6 +171,7 @@ protected:
     CGUILabel*          m_pStreamingMemoryLabel;
     CGUIScrollBar*      m_pStreamingMemory;
     CGUILabel*          m_pStreamingMemoryValueLabel;
+    CGUILabel*          m_pStreamingMemoryLabelInfo;
     CGUIButton*         m_pVideoDefButton;
 
     CGUILabel*          m_pAsyncLabelInfo;

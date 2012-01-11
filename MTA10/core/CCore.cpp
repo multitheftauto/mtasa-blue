@@ -176,6 +176,8 @@ CCore::CCore ( void )
     m_uiNewNickWaitFrames = 0;
     m_iUnminimizeFrameCounter = 0;
     m_bDidRecreateRenderTargets = false;
+    m_fMinStreamingMemory = 0;
+    m_fMaxStreamingMemory = 0;
 }
 
 CCore::~CCore ( void )
@@ -1868,17 +1870,64 @@ void CCore::OnPreHUDRender ( void )
 
 
 //
+// CCore::CalculateStreamingMemoryRange
+//
+// Streaming memory range based on system installed memory:
+//
+//     System RAM MB     min     max
+//           512     =   64      96
+//           768     =   96      128
+//          1024     =   128     256
+//          1536     =   128     376
+//          2048     =   128     512
+//
+// Also:
+//   Max should be no more than 2 * installed video memory
+//   Max should be no less than 96MB
+//   Gap between min and max should be no less than 32MB
+//
+void CCore::CalculateStreamingMemoryRange ( void )
+{
+    // Only need to do this once
+    if ( m_fMinStreamingMemory != 0 )
+        return;
+
+    // Get system info
+    int iSystemRamMB = static_cast < int > ( GetWMITotalPhysicalMemory () / 1024LL / 1024LL );
+    int iVideoMemoryMB = g_pDeviceState->AdapterState.InstalledMemoryKB / 1024;
+
+    // Calc min and max from lookup table
+    SSamplePoint < float > minPoints[] = { {512, 64},  {768,  96},  {1024, 128},  {1536, 128},  {2048, 128} };
+    SSamplePoint < float > maxPoints[] = { {512, 96},  {768, 128},  {1024, 256},  {1536, 376},  {2048, 512} };
+
+    float fMinAmount = EvalSamplePosition < float > ( minPoints, NUMELMS ( minPoints ), iSystemRamMB );
+    float fMaxAmount = EvalSamplePosition < float > ( maxPoints, NUMELMS ( maxPoints ), iSystemRamMB );
+
+    // Apply cap dependant on video memory
+    fMaxAmount = Min ( fMaxAmount, iVideoMemoryMB * 2.f );
+
+    // Apply 96MB lower limit
+    fMaxAmount = Max ( fMaxAmount, 96.f );
+
+    // Apply gap limit
+    fMinAmount = fMaxAmount - Max ( fMaxAmount - fMinAmount, 32.f );
+
+    m_fMinStreamingMemory = fMinAmount;
+    m_fMaxStreamingMemory = fMaxAmount;
+}
+
+
+//
 // GetMinStreamingMemory
 //
 uint CCore::GetMinStreamingMemory ( void )
 {
-    uint uiAmount = 50;
+    CalculateStreamingMemoryRange ();
 
 #ifdef MTA_DEBUG
-    uiAmount = 1;
+    return 1;
 #endif
-
-    return Min ( uiAmount, GetMaxStreamingMemory () );
+    return m_fMinStreamingMemory;
 }
 
 
@@ -1887,8 +1936,8 @@ uint CCore::GetMinStreamingMemory ( void )
 //
 uint CCore::GetMaxStreamingMemory ( void )
 {
-    uint iMemoryMB = g_pDeviceState->AdapterState.InstalledMemoryKB / 1024;
-    return Max < uint > ( 64, iMemoryMB );
+    CalculateStreamingMemoryRange ();
+    return m_fMaxStreamingMemory;
 }
 
 

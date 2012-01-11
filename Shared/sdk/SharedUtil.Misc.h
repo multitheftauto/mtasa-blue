@@ -193,6 +193,38 @@ namespace SharedUtil
     }
 
 
+    //
+    // Evaluate a function that is described by a set of points
+    //
+    template < class T >
+    struct SSamplePoint
+    {
+        T in, out;
+    };
+
+    template < class T >
+    T EvalSamplePosition ( const SSamplePoint < T >* pPoints, uint uiNumPoints, const T& samplePosition )
+    {
+        // Before first point
+        if ( samplePosition < pPoints[ 0 ].in )
+            return pPoints[ 0 ].out;
+
+        // Between points
+        for ( uint i = 1 ; i < uiNumPoints ; i++ )
+        {
+            if ( samplePosition < pPoints[ i ].in )
+            {
+                // Find position between input points
+                T pos = UnlerpClamped ( pPoints[ i - 1 ].in, samplePosition, pPoints[ i ].in );
+                // Map to output points
+                return Lerp ( pPoints[ i - 1 ].out, pos, pPoints[ i ].out );
+            }
+        }
+
+        // After last point
+        return pPoints[ uiNumPoints - 1 ].out;
+    }
+
 
     //
     // Container helpers for std::list/vector/map

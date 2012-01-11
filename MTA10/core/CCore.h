@@ -204,6 +204,7 @@ public:
     void                    EnsureFrameRateLimitApplied     ( void );
     void                    DoReliablePulse                 ( void );
 
+    void                    CalculateStreamingMemoryRange   ( void );
     uint                    GetMinStreamingMemory           ( void );
     uint                    GetMaxStreamingMemory           ( void );
 
@@ -303,6 +304,8 @@ private:
     bool                        m_bWaitToSetNick;
     uint                        m_uiNewNickWaitFrames;
     EDiagnosticDebugType        m_DiagnosticDebug;
+    float                       m_fMinStreamingMemory;
+    float                       m_fMaxStreamingMemory;
 
     // Command line
     static void                 ParseCommandLine                ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions = NULL );
