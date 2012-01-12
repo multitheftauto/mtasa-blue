@@ -355,8 +355,6 @@ void CRenderWareSA::ModelInfoTXDAddTextures ( std::list < RwTexture* >& textures
     unsigned short usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
 
     // Get the TXD corresponding to this ID
-    SetTextureDict ( usTxdId );
-
     RwTexDictionary* pTXD = CTxdStore_GetTxd ( usTxdId );
     if ( bAddRef )
     {
@@ -486,9 +484,17 @@ RwTexDictionary * CRenderWareSA::ReadTXD ( const char *szTXD )
 }
 
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
-// usModelID == 0 means no collisions will be loaded (be careful! seems crashy!)
-RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short usModelID )
+// bLoadEmbeddedCollisions should be true for vehicles
+// Any custom TXD should be imported before this call
+RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short usModelID, bool bLoadEmbeddedCollisions )
 {
+    // Set correct TXD as materials are processed at the same time
+    if ( usModelID != 0 )
+    {
+        unsigned short usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
+        SetTextureDict ( usTxdId );
+    }
+
     // open the stream
     RwStream * streamModel = RwStreamOpen ( STREAM_TYPE_FILENAME, STREAM_MODE_READ, szDFF );
 
@@ -499,45 +505,24 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short usModelID )
     if ( streamModel == NULL )
         return NULL;
 
-    // force a load of the model, if this is a vehicle
-    //if ( usModelID != 0 )
-    //  pGame->GetModelInfo ( usModelID )->Request ( true, true );
-
     // DFF header id: 0x10
     // find our dff chunk
     if ( RwStreamFindChunk ( streamModel, 0x10, NULL, NULL ) == false )
         return NULL;
 
     // rockstar's collision hack: set the global particle emitter to the modelinfo pointer of this model
-    //#pragma message(__LOC__ "(IJs) RpPrtStdGlobalDataSetStreamEmbedded R* hack is unstable. Seems to work when forced to packer vehicle id (443).")
-    if ( usModelID != 0 )
+    if ( bLoadEmbeddedCollisions )
         RpPrtStdGlobalDataSetStreamEmbedded ( ( void* ) pPool[usModelID] );
 
     // read the clump with all its extensions
     RpClump * pClump = RpClumpStreamRead ( streamModel );
 
     // reset collision hack
-    if ( usModelID != 0 )
+    if ( bLoadEmbeddedCollisions )
         RpPrtStdGlobalDataSetStreamEmbedded ( NULL );
 
     // close the stream
     RwStreamClose ( streamModel, NULL );
-
-    //
-    /*
-    if ( usModelID != 0 ) {
-        //
-        DWORD dwCreateModelInfo = 0x4C95C0; //0x4C5110
-        DWORD dwThis = (DWORD)(pPool[usModelID]);
-
-        __asm {
-            mov     ecx, dwThis
-            push    pClump
-            call    dwCreateModelInfo
-        }
-        //pGame->GetModelInfo ( usModelID )->Request ( TRUE, TRUE );
-    }
-    */
 
     return pClump;
 }
