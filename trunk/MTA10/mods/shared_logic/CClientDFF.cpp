@@ -38,7 +38,7 @@ CClientDFF::~CClientDFF ( void )
 }
 
 
-bool CClientDFF::LoadDFF ( const char* szFile, unsigned short usCollisionModel )
+bool CClientDFF::LoadDFF ( const char* szFile, unsigned short usModelId, bool bLoadEmbeddedCollisions )
 {
     // We can't have two clumps loaded.
     if ( !m_pLoadedClump )
@@ -47,7 +47,7 @@ bool CClientDFF::LoadDFF ( const char* szFile, unsigned short usCollisionModel )
             return false;
 
         // Attempt loading it
-        m_pLoadedClump = g_pGame->GetRenderWare ()->ReadDFF ( szFile, usCollisionModel );
+        m_pLoadedClump = g_pGame->GetRenderWare ()->ReadDFF ( szFile, usModelId, bLoadEmbeddedCollisions );
 
         // Return whether we succeeded or not
         return ( m_pLoadedClump != NULL );

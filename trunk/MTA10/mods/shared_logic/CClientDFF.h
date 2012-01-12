@@ -29,7 +29,7 @@ public:
 
     eClientEntityType               GetType                 ( void ) const              { return CCLIENTDFF; }
 
-    bool                            LoadDFF                 ( const char* szFile, unsigned short usCollisionModel = 0 );
+    bool                            LoadDFF                 ( const char* szFile, unsigned short usModelId, bool bLoadEmbeddedCollisions );
     void                            UnloadDFF               ( void );
     inline bool                     IsLoaded                ( void )                    { return m_pLoadedClump != NULL; };
 

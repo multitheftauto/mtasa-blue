@@ -19,6 +19,9 @@
 
 #include "StdInc.h"
 
+// Backwards compatibility hack
+static ushort g_usLastImportTXDModel = 0;
+
 int CLuaFunctionDefs::EngineLoadCOL ( lua_State* luaVM )
 {
     // Grab the lua main and the resource belonging to this script
@@ -90,6 +93,18 @@ int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
                 unsigned short usModelID = static_cast < unsigned short > ( lua_tonumber ( luaVM, 2 ) );
                 if ( usModelID == 0 || CClientDFFManager::IsReplacableModel ( usModelID ) )
                 {
+                    if ( usModelID == 0 )
+                    {
+                        // Issue warning if model ID is 0
+                        m_pScriptDebugging->LogCustom ( luaVM, "engineLoadDFF model id should not be 0 these days" );
+
+                        // Do hack which should cover most cases
+                        usModelID = g_usLastImportTXDModel;
+                    }
+
+                    // Special extra for vehicles
+                    bool bLoadEmbeddedCollisions = CClientVehicleManager::IsValidModel ( usModelID );
+
                     // Grab the resource root entity
                     CClientEntity* pRoot = pResource->GetResourceDFFRoot ();
 
@@ -97,7 +112,7 @@ int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
                     CClientDFF* pDFF = new CClientDFF ( m_pManager, INVALID_ELEMENT_ID );
 
                     // Try to load the DFF file
-                    if ( pDFF->LoadDFF ( strPath, usModelID ) )
+                    if ( pDFF->LoadDFF ( strPath, usModelID, bLoadEmbeddedCollisions ) )
                     {
                         // Success loading the file. Set parent to DFF root
                         pDFF->SetParent ( pRoot );
@@ -251,6 +266,7 @@ int CLuaFunctionDefs::EngineImportTXD ( lua_State* luaVM )
             // Try to import
             if ( pTXD->Import ( usModelID ) )
             {
+                g_usLastImportTXDModel = usModelID;
                 // Success
                 lua_pushboolean ( luaVM, true );
                 return 1;

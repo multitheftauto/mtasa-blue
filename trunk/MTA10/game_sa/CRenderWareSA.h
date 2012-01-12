@@ -41,8 +41,7 @@ class CRenderWareSA : public CRenderWare
     RwTexDictionary *   ReadTXD                     ( const char *szTXD );
 
     // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
-    // uiModelID == 0 means no collisions will be loaded (be careful! seems crashy!)
-    RpClump *           ReadDFF                     ( const char * szDFF, unsigned short usModelID );
+    RpClump *           ReadDFF                     ( const char * szDFF, unsigned short usModelID, bool bLoadEmbeddedCollisions );
 
     // Destroys a DFF instance
     void                DestroyDFF                  ( RpClump * pClump );
