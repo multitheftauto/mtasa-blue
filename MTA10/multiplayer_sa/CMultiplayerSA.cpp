@@ -7102,7 +7102,7 @@ void TriggerVehicleDamageEvent ( )
         if ( pEntity )
         {
             // Not handled because it triggers too much
-            if ( pEntity->nType != ENTITY_TYPE_BUILDING )
+            //if ( pEntity->nType != ENTITY_TYPE_BUILDING )
             {
                 if ( m_pVehicleCollisionHandler )
                 {
