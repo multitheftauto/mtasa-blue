@@ -1979,14 +1979,16 @@ void CVehicleSA::RecalculateSuspensionLines ( void )
 {
     CHandlingEntry * pHandlingEntry = GetHandlingData ( );
     // if suspension is master disabled or suspension hasn't changed return.
-    if ( g_pCore->GetMultiplayer ()->IsSuspensionEnabled () == false || pHandlingEntry->HasSuspensionChanged ( ) == false )
-        return;
+    //if ( g_pCore->GetMultiplayer ()->IsSuspensionEnabled () == false || pHandlingEntry->HasSuspensionChanged ( ) == false )
+    //{
+    //    return;
+    //}
 
     CVehicleSAInterface* pInt = GetVehicleInterface ();
     DWORD dwModel = GetModelIndex ();
     CModelInfo* pModelInfo = pGame->GetModelInfo ( dwModel );
-    // Trains (Their trailers do as well!) and boats crash obviously.
-    if ( pModelInfo->IsBoat () || pModelInfo->IsTrain () || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590 || dwModel == 557 || dwModel == 444 || dwModel == 556 || dwModel == 573 )
+    // Trains (Their trailers do as well!)
+    if ( pModelInfo->IsTrain () || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590 || dwModel == 557 || dwModel == 444 || dwModel == 556 || dwModel == 573 )
         return;
 
     CVehicleSAInterfaceVTBL* pVtbl = reinterpret_cast < CVehicleSAInterfaceVTBL* > ( pInt->vtbl );
