@@ -383,6 +383,10 @@ DWORD JMP_CEventVehicleDamageCollision_RETN = 0x6A765D;
 DWORD RETURN_CClothes_RebuildPlayera                        = 0x5A82C8;
 DWORD RETURN_CClothes_RebuildPlayerb                        = 0x5A837F;
 
+#define HOOKPOS_CProjectileInfo_FindPlayerPed               0x739321
+#define HOOKPOS_CProjectileInfo_FindPlayerVehicle           0x739570
+
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -574,6 +578,8 @@ void HOOK_CEntity_IsOnScreen_FixObjectScale ();
 void HOOK_CEventVehicleDamageCollision ( );
 
 void HOOK_CClothes_RebuildPlayer ();
+
+void HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlayerVehicle ();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -795,6 +801,10 @@ void CMultiplayerSA::InitHooks()
 
     // Spider CJ fix
     HookInstall ( HOOKPOS_CClothes_RebuildPlayer, (DWORD)HOOK_CClothes_RebuildPlayer, 8 );
+
+    // Fix for projectiles firing too fast locally.
+    HookInstallCall ( (DWORD)HOOKPOS_CProjectileInfo_FindPlayerPed, (DWORD)HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlayerVehicle );
+    HookInstallCall ( (DWORD)HOOKPOS_CProjectileInfo_FindPlayerVehicle, (DWORD)HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlayerVehicle );
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -7163,5 +7173,19 @@ void _declspec(naked) HOOK_CClothes_RebuildPlayer ()
 
     cont:
         jmp     RETURN_CClothes_RebuildPlayerb  // 005A837F
+    }
+}
+
+
+void _declspec(naked) HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlayerVehicle ()
+{
+    // 00739559 E8 B2 4C E3 FF                          call    FindPlayerPed < HOOK >
+    // 00739570 E8 5B 4B E3 FF                          call    FindPlayerVehicle < HOOK >
+    // Checks if the creator is the local player ped or the creator is the local player peds vehicle else decreases the velocity substantially.
+    // We are forcing it to think the creator is not the local player ped or his vehicle for this specific check
+    _asm
+    {
+        xor eax, eax
+        retn
     }
 }
