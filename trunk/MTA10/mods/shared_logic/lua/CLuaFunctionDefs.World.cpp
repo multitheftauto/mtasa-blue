@@ -1854,3 +1854,37 @@ int CLuaFunctionDefs::CreateSWATRope ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::SetBirdsEnabled ( lua_State* luaVM )
+{
+    bool bEnabled = false;
+    CScriptArgReader argStream ( luaVM );
+
+    argStream.ReadBool( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetBirdsEnabled ( bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setBirdsEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetBirdsEnabled ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::GetBirdsEnabled ( ) )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

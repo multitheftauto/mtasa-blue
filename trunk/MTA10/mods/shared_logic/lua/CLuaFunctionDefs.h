@@ -727,6 +727,8 @@ public:
     LUA_DECLARE ( RestoreWorldBuilding );
     LUA_DECLARE ( SetAircraftMaxHeight );
     LUA_DECLARE ( CreateSWATRope );
+    LUA_DECLARE ( SetBirdsEnabled );
+    LUA_DECLARE ( GetBirdsEnabled );
 
     // Input functions
     LUA_DECLARE ( BindKey );

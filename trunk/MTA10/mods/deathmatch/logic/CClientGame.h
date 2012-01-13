@@ -343,6 +343,9 @@ public:
     bool                                SetCloudsEnabled                ( bool bEnabled );
     bool                                GetCloudsEnabled                ( void );
 
+    bool                                SetBirdsEnabled                 ( bool bEnabled );
+    bool                                GetBirdsEnabled                 ( void );
+
     inline CTransferBox*                GetTransferBox                  ( void )                        { return m_pTransferBox; };
 
     void                                ChangeVehicleWeapon             ( bool bNext );
@@ -579,6 +582,8 @@ private:
 
     //Clouds Enabled
     bool                                m_bCloudsEnabled;
+    // Birds Enabled
+    bool                                m_bBirdsEnabled;
 
     unsigned long                       m_ulMinuteDuration;
 

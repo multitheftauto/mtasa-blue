@@ -1664,9 +1664,17 @@ void CMultiplayerSA::DisableZoneNames ( bool bDisabled )
 void CMultiplayerSA::DisableBirds ( bool bDisabled )
 {
     if ( bDisabled )
+    {
+        // return out of render and update to make sure birds already created aren't rendered at least.. also no point in calling render if there is nothing to render I guess
+        MemPut < BYTE > ( 0x712810, 0xC3 );
         MemPut < BYTE > ( 0x712330, 0xC3 );
+    }
     else
+    {
+        // restore previous first bytes render and update to normal
+        MemPut < BYTE > ( 0x712810, 0x64 );
         MemPut < BYTE > ( 0x712330, 0xA1 );
+    }
 }
 
 void CMultiplayerSA::DisableQuickReload ( bool bDisabled )

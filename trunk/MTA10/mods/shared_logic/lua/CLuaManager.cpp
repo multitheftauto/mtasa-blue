@@ -932,6 +932,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "restoreWorldModel", CLuaFunctionDefs::RestoreWorldBuilding );
     CLuaCFunctions::AddFunction ( "setAircraftMaxHeight", CLuaFunctionDefs::SetAircraftMaxHeight );
     CLuaCFunctions::AddFunction ( "createSWATRope", CLuaFunctionDefs::CreateSWATRope );
+    CLuaCFunctions::AddFunction ( "setBirdsEnabled", CLuaFunctionDefs::SetBirdsEnabled );
+    CLuaCFunctions::AddFunction ( "getBirdsEnabled", CLuaFunctionDefs::GetBirdsEnabled );
 
     // Input functions
     CLuaCFunctions::AddFunction ( "bindKey", CLuaFunctionDefs::BindKey );

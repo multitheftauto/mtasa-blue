@@ -478,6 +478,8 @@ public:
     static bool                         GetWindVelocity                     ( float& fX, float& fY, float& fZ );
     static bool                         SetAircraftMaxHeight                ( float fHeight );
     static bool                         CreateSWATRope                      ( CVector vecPosition, DWORD dwDuration );
+    static bool                         SetBirdsEnabled                     ( bool bEnabled );
+    static bool                         GetBirdsEnabled                     ( void );
 
     // Input functions
     static bool                         BindKey                             ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );

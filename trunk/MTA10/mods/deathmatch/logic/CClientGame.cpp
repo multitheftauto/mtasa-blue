@@ -124,6 +124,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     m_bCloudsEnabled = true;
 
+    m_bBirdsEnabled = true;
+
     m_bWasMinimized = false;
 
     // Grab the mod path
@@ -4588,6 +4590,11 @@ void CClientGame::ResetMapInfo ( void )
     g_pMultiplayer->SetCloudsEnabled ( true );
     g_pClientGame->SetCloudsEnabled ( true );
 
+
+    // Birds
+    g_pMultiplayer->DisableBirds ( false );
+    g_pClientGame->SetBirdsEnabled ( true );
+
     // Ambient sounds
     g_pGame->GetAudio ()->ResetAmbientSounds ();
 
@@ -5089,6 +5096,16 @@ bool CClientGame::SetCloudsEnabled ( bool bEnabled )
 bool CClientGame::GetCloudsEnabled ( void )
 {
     return m_bCloudsEnabled;
+}
+
+bool CClientGame::SetBirdsEnabled ( bool bEnabled )
+{
+    m_bBirdsEnabled = bEnabled;
+    return true;
+}
+bool CClientGame::GetBirdsEnabled ( void )
+{
+    return m_bBirdsEnabled;
 }
 
 #pragma code_seg(".text")
