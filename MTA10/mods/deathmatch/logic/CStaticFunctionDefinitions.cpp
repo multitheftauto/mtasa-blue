@@ -5676,6 +5676,18 @@ bool CStaticFunctionDefinitions::CreateSWATRope ( CVector vecPosition, DWORD dwD
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetBirdsEnabled ( bool bEnabled )
+{
+    g_pMultiplayer->DisableBirds( !bEnabled );
+    g_pClientGame->SetBirdsEnabled ( bEnabled );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetBirdsEnabled ( void )
+{
+    return g_pClientGame->GetBirdsEnabled();
+}
+
 bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments )
 {
     assert ( szKey );
