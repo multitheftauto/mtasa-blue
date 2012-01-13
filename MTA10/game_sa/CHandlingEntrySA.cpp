@@ -72,8 +72,21 @@ void CHandlingEntrySA::Recalculate ( void )
         // Copy our stored field to GTA's
         memcpy ( m_pHandlingSA, &m_Handling, sizeof ( m_Handling ) );
 
-        // Call GTA's function that calculates the final values from the read values
-        ( (void (_stdcall *)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits )( m_pHandlingSA );
+        CModelInfo* pModelInfo = pGame->GetModelInfo ( GetInterface()->iVehicleID );
+        bool bIsBike = ( pModelInfo->IsBike() || pModelInfo->IsBmx() );
+        // Bikes and BMX's both use Bike data.
+        if ( bIsBike )
+        {
+            // Call GTA's function that calculates the final values from the read values
+            ( (void (_stdcall *)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits )( m_pHandlingSA );
+            // Call GTA's function that calculates the final values from the read values
+            ( (void (_stdcall *)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertBikeDataToGameUnits )( m_pHandlingSA );
+        }
+        else
+        {
+            // Call GTA's function that calculates the final values from the read values
+            ( (void (_stdcall *)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits )( m_pHandlingSA );
+        }
     }
 }
 
