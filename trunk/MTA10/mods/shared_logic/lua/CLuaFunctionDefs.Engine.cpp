@@ -87,10 +87,10 @@ int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
             
             SString strPath;
             // Is this a legal filepath?
-            if ( lua_istype ( luaVM, 2, LUA_TNUMBER ) && CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+            if ( ( lua_istype ( luaVM, 2, LUA_TNUMBER ) || lua_istype ( luaVM, 2, LUA_TSTRING ) ) && CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
             {
                 // Check the model ID
-                unsigned short usModelID = static_cast < unsigned short > ( lua_tonumber ( luaVM, 2 ) );
+                unsigned short usModelID = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 2 ) );
                 if ( usModelID == 0 || CClientDFFManager::IsReplacableModel ( usModelID ) )
                 {
                     if ( usModelID == 0 )
@@ -200,7 +200,7 @@ int CLuaFunctionDefs::EngineReplaceCOL ( lua_State* luaVM )
 {
     // Grab the DFF and model ID
     CClientColModel* pCol = ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) ? lua_tocolmodel ( luaVM, 1 ) : NULL );
-    unsigned short usModel = ( lua_istype ( luaVM, 2, LUA_TNUMBER ) ? ( static_cast < unsigned short > ( lua_tonumber ( luaVM, 2 ) ) ) : 0 );
+    unsigned short usModel = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 2 ) );
 
     // Valid collision model?
     if ( pCol )
@@ -233,7 +233,7 @@ int CLuaFunctionDefs::EngineRestoreCOL ( lua_State* luaVM )
     int iArgument1 = lua_type ( luaVM, 1 );
     if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
     {
-        unsigned short usModelID = static_cast < unsigned short > ( lua_tonumber ( luaVM, 1 ) );
+        unsigned short usModelID = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 1 ) );
 
         if ( m_pColModelManager->RestoreModel ( usModelID ) )
         {
@@ -255,7 +255,7 @@ int CLuaFunctionDefs::EngineImportTXD ( lua_State* luaVM )
 {
     // Grab the TXD and the model ID
     CClientTXD* pTXD = ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) ? lua_totxd ( luaVM, 1 ) : NULL );
-    unsigned short usModelID = ( lua_istype ( luaVM, 2, LUA_TNUMBER ) ? ( static_cast < unsigned short > ( lua_tonumber ( luaVM, 2 ) ) ) : 0 );
+    unsigned short usModelID = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 2 ) );
 
     // Valid txd?
     if ( pTXD )
@@ -288,7 +288,7 @@ int CLuaFunctionDefs::EngineReplaceModel ( lua_State* luaVM )
 {
     // Grab the DFF and model ID
     CClientDFF* pDFF = ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) ? lua_todff ( luaVM, 1 ) : NULL );
-    unsigned short usModelID = ( lua_istype ( luaVM, 2, LUA_TNUMBER ) ? ( static_cast < unsigned short > ( lua_tonumber ( luaVM, 2 ) ) ) : 0 );
+    unsigned short usModelID = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 2 ) );
 
     // Valid client DFF?
     if ( pDFF )
@@ -318,7 +318,7 @@ int CLuaFunctionDefs::EngineReplaceModel ( lua_State* luaVM )
 int CLuaFunctionDefs::EngineRestoreModel ( lua_State* luaVM )
 {
     // Grab the model ID
-    unsigned short usModelID = ( lua_istype ( luaVM, 1, LUA_TNUMBER ) ? ( static_cast < unsigned short > ( lua_tonumber ( luaVM, 1 ) ) ) : 0 );
+    unsigned short usModelID = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 1 ) );
 
     // Valid client DFF and model?
     if ( CClientDFFManager::IsReplacableModel ( usModelID )  )
@@ -349,7 +349,7 @@ int CLuaFunctionDefs::EngineSetModelLODDistance ( lua_State* luaVM )
     if ( ( iArgument1 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
     {
-        unsigned short usModelID = static_cast < unsigned short > ( lua_tonumber ( luaVM, 1 ) );
+        unsigned short usModelID = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 1 )  );
         float fDistance = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
         CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModelID );
         if ( pModelInfo && fDistance > 0.0f )

@@ -957,10 +957,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CDOMConfig.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CElementArray.cpp"
 					>
 				</File>
@@ -2476,10 +2472,6 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CCustomData.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CDOMConfig.h"
 					>
 				</File>
 				<File

@@ -1763,4 +1763,13 @@ void CModelNames::InitializeMaps ( void )
         MapSet ( ms_ModelIDNameMap, usID, szName );
         MapSet ( ms_NameModelIDMap, SStringX ( szName ).ToLower (), usID );
     }
+
+    // Include vehicle names as well
+    for ( uint i = 400 ; i <= 610 ; i++ )
+    {
+        ushort usID = i;
+        const char* szName = CVehicleNames::GetVehicleName ( i );
+        MapSet ( ms_ModelIDNameMap, usID, szName );
+        MapSet ( ms_NameModelIDMap, SStringX ( szName ).ToLower (), usID );
+    }
 }

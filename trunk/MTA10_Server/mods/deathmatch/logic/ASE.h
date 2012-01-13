@@ -121,6 +121,9 @@ private:
     std::string             m_strXfireLightCached;
 
     unsigned long           m_ulMasterServerQueryCount;
+
+    CConnectHistory         m_QueryDosProtect;
+
 protected:
     void                    GetStatusVals();
 
