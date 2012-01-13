@@ -24,6 +24,7 @@ extern "C"
 ASE* ASE::_instance = NULL;
 
 ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP, bool bLan )
+    : m_QueryDosProtect( 5, 6000, 7000 )        // Max of 5 queries per 6 seconds, then 7 second ignore
 {
     _instance = this;
 
@@ -115,6 +116,9 @@ void ASE::DoPulse ( void )
     iBuffer = recvfrom ( m_Socket, szBuffer, 1, 0, (sockaddr*)&SockAddr, &nLen );
     if ( iBuffer > 0 )
     {
+        if ( m_QueryDosProtect.AddConnect ( inet_ntoa ( SockAddr.sin_addr ) ) )
+            return;
+
         std::string strReply;
 
         switch ( szBuffer[0] )
