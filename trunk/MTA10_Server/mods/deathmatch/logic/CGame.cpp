@@ -2224,6 +2224,7 @@ void CGame::Packet_ExplosionSync ( CExplosionSyncPacket& Packet )
                             case 5: // EXP_TYPE_CAR_QUICK
                             case 6: // EXP_TYPE_BOAT
                             case 7: // EXP_TYPE_HELI
+                            case 12: // EXP_TYPE_TINY - RC Vehicles
                             {
                                 CVehicle * pVehicle = static_cast < CVehicle * > ( pOrigin );
                                 // Is this vehicle not already blown?
