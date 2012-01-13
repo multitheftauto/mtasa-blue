@@ -376,8 +376,10 @@ DWORD JMP_RETN_Cancelled_CPopulation_ConvertToDummyObject = 0x614715;
 DWORD JMP_CEntity_IsOnScreen_FixObjectsScale = 0x53457C;
 
 #define HOOKPOS_CEventVehicleDamageCollision                    0x6A7657
-DWORD CALL_CEventDamageCollision = 0x6A765D;
 DWORD JMP_CEventVehicleDamageCollision_RETN = 0x6A765D;
+
+#define HOOKPOS_CEventVehicleDamageCollision_Plane              0x6CC4B3
+DWORD JMP_CEventVehicleDamageCollision_Plane_RETN = 0x6CC4B8;
 
 #define HOOKPOS_CClothes_RebuildPlayer                      0x5A82C0
 DWORD RETURN_CClothes_RebuildPlayera                        = 0x5A82C8;
@@ -576,6 +578,8 @@ void Hook_CObject_DTR ( );
 void HOOK_CEntity_IsOnScreen_FixObjectScale ();
 
 void HOOK_CEventVehicleDamageCollision ( );
+
+void HOOK_CEventVehicleDamageCollision_Plane ( );
 
 void HOOK_CClothes_RebuildPlayer ();
 
@@ -794,10 +798,13 @@ void CMultiplayerSA::InitHooks()
     HookInstall ( HOOKPOS_CWorld_ADD_CPopulation_ConvertToDummyObject, (DWORD)HOOK_CWorld_Add_CPopulation_ConvertToDummyObject, 6 );
     
     HookInstall ( HOOKPOS_ConvertToObject_CPopulationManageDummy, (DWORD)HOOK_ConvertToObject_CPopulationManageDummy, 6 );
+    // End of building removal hooks
 
+    // Vehicle Collision Event Hooks
     HookInstall ( HOOKPOS_CEventVehicleDamageCollision, (DWORD)HOOK_CEventVehicleDamageCollision, 6 );
 
-    // End of building removal hooks
+    HookInstall ( HOOKPOS_CEventVehicleDamageCollision_Plane, (DWORD)HOOK_CEventVehicleDamageCollision_Plane, 5 );
+    // End of Vehicle Collision Event Hooks
 
     // Spider CJ fix
     HookInstall ( HOOKPOS_CClothes_RebuildPlayer, (DWORD)HOOK_CClothes_RebuildPlayer, 8 );
@@ -7159,6 +7166,30 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision ( )
         popad
         mov eax, fs:0
         jmp JMP_CEventVehicleDamageCollision_RETN
+    }
+}
+
+DWORD dwPlaneDamageThreadshold = 0x8D33E4;
+void _declspec(naked) HOOK_CEventVehicleDamageCollision_Plane ( )
+{
+    // .006CC4B3 A1 E4 33 8D 00                            mov     eax, ds:?PLANE_DAMAGE_THRESHHOLD@@3MA
+    //  006CC4B8 53                                        push    ebx < Jmp Back >
+
+    // ecx = this ptr
+    // pVehicle->damageEntity = damage entity
+    _asm
+    {
+        pushad
+        mov pCollisionVehicle, ecx
+    }
+    TriggerVehicleDamageEvent ( );
+
+    // do the replaced code and return back as if nothing happened.
+    _asm
+    {
+        popad
+        mov eax, dwPlaneDamageThreadshold
+        jmp JMP_CEventVehicleDamageCollision_Plane_RETN
     }
 }
 
