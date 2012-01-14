@@ -64,21 +64,21 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     
     // Key commands (registered as 'mod commands', can be disabled)
     g_pCore->GetCommands ()->Add ( "chatbox",                   "defines the chatbox color (r g b)",                    COMMAND_ChatBox, true );
-    g_pCore->GetCommands ()->Add ( "voiceptt",                  "transmits voice to other players",                     COMMAND_VoicePushToTalk, true );
-    g_pCore->GetCommands ()->Add ( "enter_passenger",           "enters a car as passenger",                            COMMAND_EnterPassenger, true );
-    g_pCore->GetCommands ()->Add ( "radio_next",                "next radio channel",                                   COMMAND_RadioNext, true );
-    g_pCore->GetCommands ()->Add ( "radio_previous",            "previous radio channel",                               COMMAND_RadioPrevious, true );
-    g_pCore->GetCommands ()->Add ( "radar",                     "enables the radar view",                               COMMAND_RadarMap, true );
-    g_pCore->GetCommands ()->Add ( "radar_zoom_in",             "zooms the radar in",                                   COMMAND_RadarZoomIn, true );
-    g_pCore->GetCommands ()->Add ( "radar_zoom_out",            "zooms the radar out",                                  COMMAND_RadarZoomOut, true );
-    g_pCore->GetCommands ()->Add ( "radar_move_north",          "moves the radar north",                                COMMAND_RadarMoveNorth, true );
-    g_pCore->GetCommands ()->Add ( "radar_move_south",          "moves the radar south",                                COMMAND_RadarMoveSouth, true );
-    g_pCore->GetCommands ()->Add ( "radar_move_east",           "moves the radar east",                                 COMMAND_RadarMoveEast, true );
-    g_pCore->GetCommands ()->Add ( "radar_move_west",           "moves the radar west",                                 COMMAND_RadarMoveWest, true );
-    g_pCore->GetCommands ()->Add ( "radar_attach",              "attaches the radar",                                   COMMAND_RadarAttach, true );
-    g_pCore->GetCommands ()->Add ( "radar_opacity_down",        "reduces radar opacity",                                COMMAND_RadarOpacityDown, true );
-    g_pCore->GetCommands ()->Add ( "radar_opacity_up",          "increases radar opacity",                              COMMAND_RadarOpacityUp, true );
-    g_pCore->GetCommands ()->Add ( "radar_help",                "toggles radar help test",                              COMMAND_RadarHelp, true );
+    g_pCore->GetCommands ()->Add ( "voiceptt",                  "transmits voice to other players",                     COMMAND_VoicePushToTalk, true, true );
+    g_pCore->GetCommands ()->Add ( "enter_passenger",           "enters a car as passenger",                            COMMAND_EnterPassenger, true, true );
+    g_pCore->GetCommands ()->Add ( "radio_next",                "next radio channel",                                   COMMAND_RadioNext, true, true );
+    g_pCore->GetCommands ()->Add ( "radio_previous",            "previous radio channel",                               COMMAND_RadioPrevious, true, true );
+    g_pCore->GetCommands ()->Add ( "radar",                     "enables the radar view",                               COMMAND_RadarMap, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_zoom_in",             "zooms the radar in",                                   COMMAND_RadarZoomIn, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_zoom_out",            "zooms the radar out",                                  COMMAND_RadarZoomOut, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_move_north",          "moves the radar north",                                COMMAND_RadarMoveNorth, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_move_south",          "moves the radar south",                                COMMAND_RadarMoveSouth, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_move_east",           "moves the radar east",                                 COMMAND_RadarMoveEast, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_move_west",           "moves the radar west",                                 COMMAND_RadarMoveWest, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_attach",              "attaches the radar",                                   COMMAND_RadarAttach, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_opacity_down",        "reduces radar opacity",                                COMMAND_RadarOpacityDown, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_opacity_up",          "increases radar opacity",                              COMMAND_RadarOpacityUp, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_help",                "toggles radar help text",                              COMMAND_RadarHelp, true, true );
     g_pCore->GetCommands ()->Add ( "msg_target",                "sends a message to the targetted player",              COMMAND_MessageTarget, true );
     g_pCore->GetCommands ()->Add ( "vehicle_next_weapon",       "changes to the next weapon whilst in a vehicle",       COMMAND_VehicleNextWeapon, true );
     g_pCore->GetCommands ()->Add ( "vehicle_previous_weapon",   "changes to the previous weapon whilst in a vehicle",   COMMAND_VehiclePreviousWeapon, true );
