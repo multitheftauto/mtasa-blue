@@ -381,6 +381,9 @@ DWORD JMP_CEventVehicleDamageCollision_RETN = 0x6A765D;
 #define HOOKPOS_CEventVehicleDamageCollision_Plane              0x6CC4B3
 DWORD JMP_CEventVehicleDamageCollision_Plane_RETN = 0x6CC4B8;
 
+#define HOOKPOS_CEventVehicleDamageCollision_Bike               0x6B8EC6
+DWORD JMP_CEventVehicleDamageCollision_Bike_RETN = 0x6B8ECC;
+
 #define HOOKPOS_CClothes_RebuildPlayer                      0x5A82C0
 DWORD RETURN_CClothes_RebuildPlayera                        = 0x5A82C8;
 DWORD RETURN_CClothes_RebuildPlayerb                        = 0x5A837F;
@@ -580,6 +583,8 @@ void HOOK_CEntity_IsOnScreen_FixObjectScale ();
 void HOOK_CEventVehicleDamageCollision ( );
 
 void HOOK_CEventVehicleDamageCollision_Plane ( );
+
+void HOOK_CEventVehicleDamageCollision_Bike ( );
 
 void HOOK_CClothes_RebuildPlayer ();
 
@@ -804,6 +809,8 @@ void CMultiplayerSA::InitHooks()
     HookInstall ( HOOKPOS_CEventVehicleDamageCollision, (DWORD)HOOK_CEventVehicleDamageCollision, 6 );
 
     HookInstall ( HOOKPOS_CEventVehicleDamageCollision_Plane, (DWORD)HOOK_CEventVehicleDamageCollision_Plane, 5 );
+
+    HookInstall ( HOOKPOS_CEventVehicleDamageCollision_Bike, (DWORD)HOOK_CEventVehicleDamageCollision_Bike, 6 );
     // End of Vehicle Collision Event Hooks
 
     // Spider CJ fix
@@ -7193,6 +7200,29 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision_Plane ( )
     }
 }
 
+DWORD dwBikeCollisionComparison = 0x0859EF8;
+void _declspec(naked) HOOK_CEventVehicleDamageCollision_Bike ( )
+{
+    // .006B8EC6 DC 1D F8 9E 85 00                       fcomp   ds:__real@0000000000000000 < Hook >
+    //  006B8ECC 8B F1                                   mov     esi, ecx < Jmp Back >
+
+    // ecx = this ptr
+    // pVehicle->damageEntity = damage entity
+    _asm
+    {
+        pushad
+        mov pCollisionVehicle, ecx
+    }
+    TriggerVehicleDamageEvent ( );
+
+    // do the replaced code and return back as if nothing happened.
+    _asm
+    {
+        popad
+        fcomp dwBikeCollisionComparison
+        jmp JMP_CEventVehicleDamageCollision_Bike_RETN
+    }
+}
 //////////////////////////////////////////////////////////////////////////////////////////
 // Only allow rebuild player on CJ - Stops other models getting corrupted (spider CJ)
 // hooked at 5A82C0 8 bytes
