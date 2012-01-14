@@ -46,6 +46,9 @@ bool CClientDFF::LoadDFF ( const char* szFile, unsigned short usModelId, bool bL
         if ( !g_pCore->GetNetwork ()->CheckFile ( "dff", szFile ) )
             return false;
 
+        // Make sure previous model+collision is loaded
+        m_pManager->GetModelRequestManager ()->RequestBlocking ( usModelId );
+
         // Attempt loading it
         m_pLoadedClump = g_pGame->GetRenderWare ()->ReadDFF ( szFile, usModelId, bLoadEmbeddedCollisions );
 
@@ -252,10 +255,8 @@ bool CClientDFF::ReplacePedModel ( unsigned short usModel )
 
 bool CClientDFF::ReplaceVehicleModel ( unsigned short usModel )
 {
-    // Stream out all the vehicle models with matching ID.
-    // Streamer will stream them back in async after a frame
-    // or so.
-    m_pManager->GetVehicleManager ()->RestreamVehicles ( usModel );
+    // Make sure previous model+collision is loaded
+    m_pManager->GetModelRequestManager ()->RequestBlocking ( usModel );
 
     // Grab the model info for that model and replace the model
     CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModel );
@@ -263,6 +264,11 @@ bool CClientDFF::ReplaceVehicleModel ( unsigned short usModel )
 
     // Remember that we've replaced that vehicle model
     m_Replaced.push_back ( usModel );
+
+    // Stream out all the vehicle models with matching ID.
+    // Streamer will stream them back in async after a frame
+    // or so.
+    m_pManager->GetVehicleManager ()->RestreamVehicles ( usModel );
 
     // Success
     return true;
