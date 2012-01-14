@@ -437,9 +437,12 @@ void CCommandFuncs::DebugClear ( const char* szParameters )
 
 void CCommandFuncs::Test ( const char* szParameters )
 {
-    char szBuffer[2048] = "";
-    CCore::GetSingleton ().GetNetwork ()->ResetStub ( 'test', szParameters, szBuffer );
-    CCore::GetSingleton ().GetConsole ()->Print ( szBuffer );
+    if ( SStringX ( szParameters ) == "ca" )
+    {
+        SString strStats = CCrashDumpWriter::GetCrashAvertedStatsSoFar ();
+        SString strMsg = SString ( "Crash averted stats:\n%s", strStats.empty () ? "None" : *strStats );
+        CCore::GetSingleton ().GetConsole ()->Print ( strMsg );
+    }
 }
 
 void CCommandFuncs::Serial ( const char* szParameters )

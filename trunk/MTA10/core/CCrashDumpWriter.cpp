@@ -764,3 +764,30 @@ void CCrashDumpWriter::GetMiscInfo ( CBuffer& buffer )
     stream.Write ( ucA );
     stream.Write ( ucB );
 }
+
+
+///////////////////////////////////////////////////////////////
+//
+// CCrashDumpWriter::GetCrashAvertedStatsSoFar
+//
+// Static function
+// Grab the crash averted stats
+//
+///////////////////////////////////////////////////////////////
+SString CCrashDumpWriter::GetCrashAvertedStatsSoFar ()
+{
+    SString strResult;
+    ms_uiTickCountBase = GetTickCount32 ();
+
+    int iIndex = 1;
+    for ( std::map < int, SCrashAvertedInfo >::iterator iter = ms_CrashAvertedMap.begin () ; iter != ms_CrashAvertedMap.end () ; ++iter )
+    {
+        strResult += SString ( "%d) Age:%5d Type:%2d Count:%d\n"
+                                            , iIndex++
+                                            , ms_uiTickCountBase - iter->second.uiTickCount
+                                            , iter->first
+                                            , iter->second.uiUsageCount
+                                            );
+    }
+    return strResult;
+}
