@@ -3922,49 +3922,51 @@ bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehic
     {
         CVehicle * pColliderVehicle = g_pGame->GetPools ( )->GetVehicle ( (DWORD *)pCollidingVehicle );
         CClientEntity * pVehicleClientEntity = m_pManager->FindEntity ( pColliderVehicle, true );
+        if ( pVehicleClientEntity )
+        {
+            CEntity * pCollidedWithEntity = g_pGame->GetPools ( )->GetEntity ( (DWORD *)pCollidedWith );
+            CClientEntity * pCollidedWithClientEntity = NULL;
+            if ( pCollidedWithEntity )
+            {
+                if ( pCollidedWithEntity->GetEntityType ( ) == ENTITY_TYPE_VEHICLE )
+                {
+                    CVehicle * pCollidedWithVehicle = g_pGame->GetPools ( )->GetVehicle ( (DWORD *)pCollidedWith );
+                    pCollidedWithClientEntity = m_pManager->FindEntity ( pCollidedWithVehicle, true );
+                }
+                else if ( pCollidedWithEntity->GetEntityType ( ) == ENTITY_TYPE_OBJECT )
+                {
+                    CObject * pCollidedWithObject = g_pGame->GetPools ( )->GetObject ( (DWORD *)pCollidedWith );
+                    pCollidedWithClientEntity = m_pManager->FindEntity ( pCollidedWithObject, true );
+                }
+                else if ( pCollidedWithEntity->GetEntityType ( ) == ENTITY_TYPE_PED )
+                {
+                    CPed * pCollidedWithPed = g_pGame->GetPools ( )->GetPed ( (DWORD *)pCollidedWith );
+                    pCollidedWithClientEntity = m_pManager->FindEntity ( pCollidedWithPed, true );
+                }
+            }
+            CLuaArguments Arguments;
+            if ( pCollidedWithClientEntity )
+            {
+                Arguments.PushElement ( pCollidedWithClientEntity );
+            }
+            else
+            {
+                Arguments.PushNil ( );
+            }
+            Arguments.PushNumber ( fDamageImpulseMag );
+            Arguments.PushNumber ( byBodyPartHit );
+            Arguments.PushNumber ( vecCollisionPos.fX );
+            Arguments.PushNumber ( vecCollisionPos.fY );
+            Arguments.PushNumber ( vecCollisionPos.fZ );
+            Arguments.PushNumber ( vecCollisionVelocity.fX );
+            Arguments.PushNumber ( vecCollisionVelocity.fY );
+            Arguments.PushNumber ( vecCollisionVelocity.fZ );
+            Arguments.PushNumber ( fCollidingDamageImpulseMag );
+            Arguments.PushNumber ( iModelIndex );
 
-        CEntity * pCollidedWithEntity = g_pGame->GetPools ( )->GetEntity ( (DWORD *)pCollidedWith );
-        CClientEntity * pCollidedWithClientEntity = NULL;
-        if ( pCollidedWithEntity )
-        {
-            if ( pCollidedWithEntity->GetEntityType ( ) == ENTITY_TYPE_VEHICLE )
-            {
-                CVehicle * pCollidedWithVehicle = g_pGame->GetPools ( )->GetVehicle ( (DWORD *)pCollidedWith );
-                pCollidedWithClientEntity = m_pManager->FindEntity ( pCollidedWithVehicle, true );
-            }
-            else if ( pCollidedWithEntity->GetEntityType ( ) == ENTITY_TYPE_OBJECT )
-            {
-                CObject * pCollidedWithObject = g_pGame->GetPools ( )->GetObject ( (DWORD *)pCollidedWith );
-                pCollidedWithClientEntity = m_pManager->FindEntity ( pCollidedWithObject, true );
-            }
-            else if ( pCollidedWithEntity->GetEntityType ( ) == ENTITY_TYPE_PED )
-            {
-                CPed * pCollidedWithPed = g_pGame->GetPools ( )->GetPed ( (DWORD *)pCollidedWith );
-                pCollidedWithClientEntity = m_pManager->FindEntity ( pCollidedWithPed, true );
-            }
+            pVehicleClientEntity->CallEvent ( "onClientVehicleCollision", Arguments, true );
+            return true;
         }
-        CLuaArguments Arguments;
-        if ( pCollidedWithClientEntity )
-        {
-            Arguments.PushElement ( pCollidedWithClientEntity );
-        }
-        else
-        {
-            Arguments.PushNil ( );
-        }
-        Arguments.PushNumber ( fDamageImpulseMag );
-        Arguments.PushNumber ( byBodyPartHit );
-        Arguments.PushNumber ( vecCollisionPos.fX );
-        Arguments.PushNumber ( vecCollisionPos.fY );
-        Arguments.PushNumber ( vecCollisionPos.fZ );
-        Arguments.PushNumber ( vecCollisionVelocity.fX );
-        Arguments.PushNumber ( vecCollisionVelocity.fY );
-        Arguments.PushNumber ( vecCollisionVelocity.fZ );
-        Arguments.PushNumber ( fCollidingDamageImpulseMag );
-        Arguments.PushNumber ( iModelIndex );
-
-        pVehicleClientEntity->CallEvent ( "onClientVehicleCollision", Arguments, true );
-        return true;
     }
     return false;
 }
