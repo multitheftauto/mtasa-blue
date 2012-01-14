@@ -22,7 +22,7 @@ CHandlingEntrySA::CHandlingEntrySA ( void )
 
     // We have no original data
     m_pOriginalData = NULL;
-    m_bChanged = false;
+    m_bChanged = true;
 }
 
 
@@ -33,7 +33,7 @@ CHandlingEntrySA::CHandlingEntrySA ( tHandlingDataSA* pOriginal )
     m_pOriginalData = NULL;
     m_bDeleteInterface = false;
     memcpy ( &m_Handling, pOriginal, sizeof ( tHandlingDataSA ) );
-    m_bChanged = false;
+    m_bChanged = true;
 }
 
 
@@ -64,7 +64,7 @@ void CHandlingEntrySA::Assign ( const CHandlingEntry* pData )
 }
 
 
-void CHandlingEntrySA::Recalculate ( void )
+void CHandlingEntrySA::Recalculate ( unsigned short usModel )
 {
     // Real GTA class?
     if ( m_pHandlingSA )
@@ -72,8 +72,12 @@ void CHandlingEntrySA::Recalculate ( void )
         // Copy our stored field to GTA's
         memcpy ( m_pHandlingSA, &m_Handling, sizeof ( m_Handling ) );
 
-        CModelInfo* pModelInfo = pGame->GetModelInfo ( GetInterface()->iVehicleID );
-        bool bIsBike = ( pModelInfo->IsBike() || pModelInfo->IsBmx() );
+        CModelInfo* pModelInfo = pGame->GetModelInfo ( usModel );
+        bool bIsBike = false;
+        if ( pModelInfo )
+        {
+            bIsBike = ( pModelInfo->IsBike() || pModelInfo->IsBmx() );
+        }
         // Bikes and BMX's both use Bike data.
         if ( bIsBike )
         {
