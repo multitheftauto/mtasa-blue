@@ -524,7 +524,7 @@ bool CKeyBinds::Call ( CKeyBind* pKeyBind )
             {
                 CCommandBind* pBind = static_cast < CCommandBind* > ( pKeyBind );
                 if ( pBind->bActive )
-                    m_pCore->GetCommands ()->Execute ( pBind->szCommand, pBind->szArguments );
+                    m_pCore->GetCommands ()->Execute ( pBind->szCommand, pBind->szArguments, false, pBind->szResource != NULL );
                 break;
             }
             case KEY_BIND_FUNCTION:

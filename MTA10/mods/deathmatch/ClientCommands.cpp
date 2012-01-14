@@ -29,7 +29,7 @@ using std::vector;
 
 extern CClientGame* g_pClientGame;
 
-bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled )
+bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled, bool bIsScriptedBind )
 {
     // Has the core already handled this command?
     if ( !bHandled )

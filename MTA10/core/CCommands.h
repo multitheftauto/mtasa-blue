@@ -25,13 +25,13 @@ public:
                         CCommands                   ( void );
                         ~CCommands                  ( void );
 
-    void                Add                         ( const char* szCommand, const char* szDescription, PFNCOMMANDHANDLER pfnHandler, bool bModCommand = false );
+    void                Add                         ( const char* szCommand, const char* szDescription, PFNCOMMANDHANDLER pfnHandler, bool bModCommand = false, bool bAllowScriptedBind = false );
 
     unsigned int        Count                       ( void );
     bool                Exists                      ( const char* szCommand );
 
     bool                Execute                     ( const char* szCommandLine );
-    bool                Execute                     ( const char* szCommand, const char* szParameters, bool bHandleRemotely = false );
+    bool                Execute                     ( const char* szCommand, const char* szParameters, bool bHandleRemotely = false, bool bIsScriptedBind = false );
 
     void                Delete                      ( const char* szCommand );
     void                DeleteAll                   ( void );

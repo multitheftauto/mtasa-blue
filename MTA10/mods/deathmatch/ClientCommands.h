@@ -15,7 +15,7 @@
 #ifndef __CLIENTCOMMANDS_H
 #define __CLIENTCOMMANDS_H
 
-bool COMMAND_Executed              ( const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled );
+bool COMMAND_Executed               ( const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled, bool bIsScriptedBind );
 
 void COMMAND_Help                   ( const char* szCmdLine );
 void COMMAND_Disconnect             ( const char* szCmdLine );

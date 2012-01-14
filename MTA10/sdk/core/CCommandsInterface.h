@@ -15,7 +15,7 @@
 #include <list>
 
 typedef void (*PFNCOMMANDHANDLER)               ( const char* );
-typedef bool (*pfnExecuteCommandHandler)        ( const char*, const char*, bool, bool );
+typedef bool (*pfnExecuteCommandHandler)        ( const char*, const char*, bool, bool, bool );
 
 typedef void (*PFNCOMMAND) ( const char * );
 
@@ -28,19 +28,20 @@ typedef struct tagCOMMANDENTRY
     char            szDescription[MAX_COMMAND_DESCRIPTION_LENGTH];
     PFNCOMMAND      pfnCmdFunc;
     bool            bModCommand;
+    bool            bAllowScriptedBind;
     bool            bEnabled;
 } COMMANDENTRY;
 
 class CCommandsInterface
 {
 public:
-    virtual void            Add                                 ( const char* szCommand, const char* szDescription, PFNCOMMANDHANDLER pfnHandler, bool bModCommand = false ) = 0;
+    virtual void            Add                                 ( const char* szCommand, const char* szDescription, PFNCOMMANDHANDLER pfnHandler, bool bModCommand = false, bool bAllowScriptedBind = false ) = 0;
 
     virtual unsigned int    Count                               ( void ) = 0;
     virtual bool            Exists                              ( const char* szCommand ) = 0;
 
     virtual bool            Execute                             ( const char* szCommandLine ) = 0;
-    virtual bool            Execute                             ( const char* szCommand, const char* szParameters, bool bHandleRemotely = false ) = 0;
+    virtual bool            Execute                             ( const char* szCommand, const char* szParameters, bool bHandleRemotely = false, bool bIsScriptedBind = false ) = 0;
 
     virtual void            Delete                              ( const char* szCommand ) = 0;
     virtual void            DeleteAll                           ( void ) = 0;
