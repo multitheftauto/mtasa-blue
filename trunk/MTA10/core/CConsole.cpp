@@ -264,6 +264,12 @@ void CConsole::GetCommandInfo ( const string &strIn, string & strCmdOut, string 
 
 void CConsole::SetNextHistoryText ( void )
 {
+    // Don't set history back if we aren't focused.
+    if ( !m_pInput->IsActive ( ) )
+    {
+        return;
+    }
+
     // Next index
     if ( m_iHistoryIndex == CONSOLE_HISTORY_LENGTH )
     {        
@@ -305,6 +311,12 @@ void CConsole::SetNextHistoryText ( void )
 
 void CConsole::SetPreviousHistoryText ( void )
 {
+    // Don't set history back if we aren't focused.
+    if ( !m_pInput->IsActive ( ) )
+    {
+        return;
+    }
+
     // Previous index
     if ( m_iHistoryIndex <= 0 )
     {
