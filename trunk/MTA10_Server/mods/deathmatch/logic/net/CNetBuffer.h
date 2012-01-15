@@ -95,7 +95,7 @@ public:
     virtual void                            SetClientBitStreamVersion       ( const NetServerPlayerID &PlayerID, unsigned short usBitStreamVersion );
     virtual void                            ClearClientBitStreamVersion     ( const NetServerPlayerID &PlayerID );
 
-    virtual void                            SetChecks                       ( const std::set < SString >& disableComboACMap, const std::set < SString >& disableACMap, const std::set < SString >& enableSDMap, int iEnableClientChecks, bool bHideAC );
+    virtual void                            SetChecks                       ( const char* szDisableComboACMap, const char* szDisableACMap, const char* szEnableSDMap, int iEnableClientChecks, bool bHideAC );
 
     virtual unsigned int                    GetPendingPacketCount           ( void );
 
@@ -141,7 +141,7 @@ public:
     DECLARE_FUNC_ARGS1 (                        SetMaximumIncomingConnections   , unsigned short, numberAllowed );
     DECLARE_FUNC_ARGS2 (                        SetClientBitStreamVersion       , const NetServerPlayerIDRef, PlayerID, unsigned short, usBitStreamVersion );
     DECLARE_FUNC_ARGS1 (                        ClearClientBitStreamVersion     , const NetServerPlayerIDRef, PlayerID );
-    DECLARE_FUNC_ARGS5 (                        SetChecks                       , const std::set < SString >&, disableComboACMap, const std::set < SString >&, disableACMap, const std::set < SString >&, enableSDMap, int, iEnableClientChecks, bool, bHideAC );
+    DECLARE_FUNC_ARGS5 (                        SetChecks                       , const char*, szDisableComboACMap, const char*, szDisableACMap, const char*, szEnableSDMap, int, iEnableClientChecks, bool, bHideAC );
     DECLARE_FUNC_ARGS0R( unsigned int,          GetPendingPacketCount           );
     DECLARE_FUNC_ARGS1R( bool,                  InitServerId                    , const char*, szPath );
     DECLARE_FUNC_ARGS1 (                        SetEncryptionEnabled            , bool, bEncryptionEnabled );

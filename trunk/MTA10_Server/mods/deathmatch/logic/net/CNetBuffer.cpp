@@ -510,12 +510,12 @@ void CNetServerBuffer::ClearClientBitStreamVersion ( const NetServerPlayerID &Pl
 // CNetServerBuffer::SetChecks
 //
 // BLOCKING. Called once at startup
-// (To make non blocking, maps will have to be stored in SSetChecksArgs)
+// (To make non blocking, strings will have to be stored in SSetChecksArgs)
 //
 ///////////////////////////////////////////////////////////////////////////
-void CNetServerBuffer::SetChecks ( const std::set < SString >& disableComboACMap, const std::set < SString >& disableACMap, const std::set < SString >& enableSDMap, int iEnableClientChecks, bool bHideAC )
+void CNetServerBuffer::SetChecks ( const char* szDisableComboACMap, const char* szDisableACMap, const char* szEnableSDMap, int iEnableClientChecks, bool bHideAC )
 {
-    SSetChecksArgs* pArgs = new SSetChecksArgs ( disableComboACMap, disableACMap, enableSDMap, iEnableClientChecks, bHideAC );
+    SSetChecksArgs* pArgs = new SSetChecksArgs ( szDisableComboACMap, szDisableACMap, szEnableSDMap, iEnableClientChecks, bHideAC );
     AddCommandAndWait ( pArgs );
 }
 
@@ -960,7 +960,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
         CALLREALNET1 (                      SetMaximumIncomingConnections   , unsigned short, numberAllowed )
         CALLREALNET2 (                      SetClientBitStreamVersion       , const NetServerPlayerID &,PlayerID, unsigned short, usBitStreamVersion )
         CALLREALNET1 (                      ClearClientBitStreamVersion     , const NetServerPlayerID &,PlayerID )
-        CALLREALNET5 (                      SetChecks                       , const std::set < SString >&, disableComboACMap, const std::set < SString >&, disableACMap, const std::set < SString >&, enableSDMap, int, iEnableClientChecks, bool, bHideAC )
+        CALLREALNET5 (                      SetChecks                       , const char*, szDisableComboACMap, const char*, szDisableACMap, const char*, szEnableSDMap, int, iEnableClientChecks, bool, bHideAC );
         CALLREALNET0R( unsigned int,        GetPendingPacketCount           )
         CALLREALNET1R( bool,                InitServerId                    , const char*, szPath )
         CALLREALNET1 (                      SetEncryptionEnabled            , bool, bEncryptionEnabled )

@@ -314,7 +314,22 @@ bool CMainConfig::Load ( void )
                 }
         }
 
-        g_pNetServer->SetChecks ( m_DisableComboACMap, disableACMap, enableSDMap, m_iEnableClientChecks, iHideAC != 0 );
+        CArgMap argMap;
+        for ( std::set < SString >::iterator it = m_DisableComboACMap.begin () ; it != m_DisableComboACMap.end () ; ++it )
+            argMap.Set ( *it, "" );
+        SString strDisableComboACMap = argMap.ToString ();
+
+        argMap = CArgMap ();
+        for ( std::set < SString >::iterator it = disableACMap.begin () ; it != disableACMap.end () ; ++it )
+            argMap.Set ( *it, "" );
+        SString strDisableACMap = argMap.ToString ();
+
+        argMap = CArgMap ();
+        for ( std::set < SString >::iterator it = enableSDMap.begin () ; it != enableSDMap.end () ; ++it )
+            argMap.Set ( *it, "" );
+        SString strEnableSDMap = argMap.ToString ();
+
+        g_pNetServer->SetChecks ( strDisableComboACMap, strDisableACMap, strEnableSDMap, m_iEnableClientChecks, iHideAC != 0 );
     }
 
     {
