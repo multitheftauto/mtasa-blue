@@ -189,6 +189,7 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
             RpClumpAddAtomic                    = (RpClumpAddAtomic_t)                      0x0074A4E0;
             RpAtomicSetFrame                    = (RpAtomicSetFrame_t)                      0x0074BF70;
             RwTexDictionaryStreamRead           = (RwTexDictionaryStreamRead_t)             0x00804C70; 
+            RwTexDictionaryGtaStreamRead        = (RwTexDictionaryGtaStreamRead_t)          0x00730FC0;
             RwTexDictionaryGetCurrent           = (RwTexDictionaryGetCurrent_t)             0x007F3AD0;
             RwTexDictionarySetCurrent           = (RwTexDictionarySetCurrent_t)             0x007F3AB0;
             RwTexDictionaryForAllTextures       = (RwTexDictionaryForAllTextures_t)         0x007F3770;
@@ -272,6 +273,7 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
             RpClumpAddAtomic                    = (RpClumpAddAtomic_t)                      0x0074A490;
             RpAtomicSetFrame                    = (RpAtomicSetFrame_t)                      0x0074BF20;
             RwTexDictionaryStreamRead           = (RwTexDictionaryStreamRead_t)             0x00804C30;
+            RwTexDictionaryGtaStreamRead        = (RwTexDictionaryGtaStreamRead_t)          0x00730FC0;
             RwTexDictionaryGetCurrent           = (RwTexDictionaryGetCurrent_t)             0x007F3A90;
             RwTexDictionarySetCurrent           = (RwTexDictionarySetCurrent_t)             0x007F3A70;
             RwTexDictionaryForAllTextures       = (RwTexDictionaryForAllTextures_t)         0x007F3730;
@@ -474,12 +476,13 @@ RwTexDictionary * CRenderWareSA::ReadTXD ( const char *szTXD )
         return NULL;
 
     // read the texture dictionary from our model (txd)
-    RwTexDictionary *pTex = RwTexDictionaryStreamRead ( streamTexture );
+    RwTexDictionary *pTex = RwTexDictionaryGtaStreamRead ( streamTexture );
 
     // close the stream
     RwStreamClose ( streamTexture, NULL );
 
-    //return pTex;
+    ScriptAddedTxd ( pTex );
+
     return pTex;
 }
 
@@ -796,7 +799,10 @@ void CRenderWareSA::DestroyTXD ( RwTexDictionary * pTXD )
 void CRenderWareSA::DestroyTexture ( RwTexture* pTex )
 {
     if ( pTex )
+    {
+        ScriptRemovedTexture ( pTex );
         RwTextureDestroy ( pTex );
+    }
 }
 
 void CRenderWareSA::RwTexDictionaryRemoveTexture ( RwTexDictionary* pTXD, RwTexture* pTex )
@@ -858,25 +864,40 @@ ushort CRenderWareSA::GetTXDIDForModelID ( ushort usModelID )
 // CRenderWareSA::GetModelTextureNames
 //
 // Get list of texture names associated with the model
-// Only works if the model is loaded
+// Will try to load the model if needed
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::GetModelTextureNames ( std::vector < SString >& outNameList, ushort usModelID )
+void CRenderWareSA::GetModelTextureNames ( std::vector < SString >& outNameList, ushort usModelId )
 {
-    outNameList.empty ();
+    outNameList.clear ();
 
-    ushort usTxdId = GetTXDIDForModelID ( usModelID );
+    ushort usTxdId = GetTXDIDForModelID ( usModelId );
 
     if ( usTxdId == 0 )
         return;
 
+    // Get the TXD corresponding to this ID
+    RwTexDictionary* pTXD = CTxdStore_GetTxd ( usTxdId );
+
+    bool bLoadedModel = false;
+    if ( !pTXD )
+    {
+        // Try model load
+        bLoadedModel = true;
+        pGame->GetModelInfo ( usModelId )->Request ( true, true );
+        pTXD = CTxdStore_GetTxd ( usTxdId );
+    }
+
     std::vector < RwTexture* > textureList;
-    GetTxdTextures ( textureList, usTxdId );
+    GetTxdTextures ( textureList, pTXD );
 
     for ( std::vector < RwTexture* > ::iterator iter = textureList.begin () ; iter != textureList.end () ; iter++ )
     {
         outNameList.push_back ( (*iter)->name );
     }
+
+    if ( bLoadedModel )
+        ( (void (__cdecl *)(unsigned short))FUNC_RemoveModel )( usModelId );
 }
 
 
@@ -884,7 +905,7 @@ void CRenderWareSA::GetModelTextureNames ( std::vector < SString >& outNameList,
 //
 // CRenderWareSA::GetTxdTextures
 //
-//
+// If TXD must already be loaded
 //
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::GetTxdTextures ( std::vector < RwTexture* >& outTextureList, ushort usTxdId )
@@ -893,10 +914,24 @@ void CRenderWareSA::GetTxdTextures ( std::vector < RwTexture* >& outTextureList,
         return;
 
     // Get the TXD corresponding to this ID
-    SetTextureDict ( usTxdId );
-
     RwTexDictionary* pTXD = CTxdStore_GetTxd ( usTxdId );
 
+    if ( !pTXD )
+        return;
+
+    GetTxdTextures ( outTextureList, pTXD );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::GetTxdTextures
+//
+// Get textures from a TXD
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::GetTxdTextures ( std::vector < RwTexture* >& outTextureList, RwTexDictionary* pTXD )
+{
     if ( pTXD )
     {
         RwTexDictionaryForAllTextures ( pTXD, StaticGetTextureCB, &outTextureList );
@@ -922,7 +957,7 @@ bool CRenderWareSA::StaticGetTextureCB ( RwTexture* texture, std::vector < RwTex
 //
 // CRenderWareSA::GetTextureName
 //
-//
+// Only called by CRenderItemManager::GetVisibleTextureNames ?
 //
 ////////////////////////////////////////////////////////////////
 const SString& CRenderWareSA::GetTextureName ( CD3DDUMMY* pD3DData )
