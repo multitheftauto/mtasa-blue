@@ -202,7 +202,64 @@ void CRenderWareSA::StreamingRemovedTxd ( ushort usTxdId )
     for ( std::list < STexInfo > ::iterator iter = m_TexInfoList.begin () ; iter != m_TexInfoList.end () ; )
     {
         STexInfo* pTexInfo = &*iter;
-        if ( pTexInfo->usTxdId == usTxdId )
+        if ( pTexInfo->texTag.Matches ( usTxdId ) )
+        {
+            // If texinfo has a shadinfo, unassociate
+            if ( SShadInfo* pShadInfo = pTexInfo->pAssociatedShadInfo )
+            {
+                BreakAssociation ( pShadInfo, pTexInfo );
+            }
+
+            OnDestroyTexInfo ( pTexInfo );
+            iter = m_TexInfoList.erase ( iter );
+        }
+        else
+            ++iter;
+    }
+}
+
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::ScriptAddedTxd
+//
+// Called when a TXD is loaded outside of streaming
+// Create texinfos for the textures and find a best match shaders for them
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::ScriptAddedTxd ( RwTexDictionary *pTxd )
+{
+    std::vector < RwTexture* > textureList;
+    GetTxdTextures ( textureList, pTxd );
+    for ( std::vector < RwTexture* > ::iterator iter = textureList.begin () ; iter != textureList.end () ; iter++ )
+    {
+        RwTexture* texture = *iter;
+        const char* szTextureName = texture->name;
+        CD3DDUMMY* pD3DData = texture->raster ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
+
+        // Added texture
+        STexInfo* pTexInfo = CreateTexInfo ( texture, szTextureName, pD3DData );
+        UpdateAssociationForTexInfo ( pTexInfo );
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::ScriptRemovedTexture
+//
+// Called when a texture is destroyed outside of streaming
+// Delete texinfo for that texture
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::ScriptRemovedTexture ( RwTexture* pTex )
+{
+    // Find all TexInfo's for this txd
+    for ( std::list < STexInfo > ::iterator iter = m_TexInfoList.begin () ; iter != m_TexInfoList.end () ; )
+    {
+        STexInfo* pTexInfo = &*iter;
+        if ( pTexInfo->texTag.Matches ( pTex ) )
         {
             // If texinfo has a shadinfo, unassociate
             if ( SShadInfo* pShadInfo = pTexInfo->pAssociatedShadInfo )
@@ -498,20 +555,21 @@ void CRenderWareSA::FlushPendingAssociations ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-STexInfo* CRenderWareSA::CreateTexInfo ( ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData )
+STexInfo* CRenderWareSA::CreateTexInfo ( const STexTag& texTag, const SString& strTextureName, CD3DDUMMY* pD3DData )
 {
     // Create texinfo
-    m_TexInfoList.push_back ( STexInfo ( usTxdId, strTextureName, pD3DData ) );
+    m_TexInfoList.push_back ( STexInfo ( texTag, strTextureName, pD3DData ) );
     STexInfo* pTexInfo = &m_TexInfoList.back ();
 
     // Add to lookup maps
-    SString strUniqueKey ( "%d_%s", pTexInfo->usTxdId, *pTexInfo->strTextureName );
+#if WITH_UNIQUE_CHECK
+    SString strUniqueKey ( "%d_%08x_%s", pTexInfo->texTag.m_usTxdId, pTexInfo->texTag.m_pTex, *pTexInfo->strTextureName );
     if ( MapContains ( m_UniqueTexInfoMap, strUniqueKey ) )
         AddReportLog ( 5132, SString ( "CreateTexInfo duplicate %s", *strUniqueKey ) );
     MapSet ( m_UniqueTexInfoMap, strUniqueKey, pTexInfo );
+#endif
 
-	// This assert fails when using engine txd replace functions - TODO find out why
-    //assert ( !MapContains ( m_D3DDataTexInfoMap, pTexInfo->pD3DData ) );
+    // Add to D3DData/name lookup map. (Currently only used by GetTextureName (CRenderItemManager::GetVisibleTextureNames))
     MapSet ( m_D3DDataTexInfoMap, pTexInfo->pD3DData, pTexInfo );
     return pTexInfo;
 }
@@ -527,14 +585,18 @@ STexInfo* CRenderWareSA::CreateTexInfo ( ushort usTxdId, const SString& strTextu
 void CRenderWareSA::OnDestroyTexInfo ( STexInfo* pTexInfo )
 {
     // Remove from lookup maps
-    SString strUniqueKey ( "%d_%s", pTexInfo->usTxdId, *pTexInfo->strTextureName );
+#if WITH_UNIQUE_CHECK
+    SString strUniqueKey ( "%d_%08x_%s", pTexInfo->texTag.m_usTxdId, pTexInfo->texTag.m_pTex, *pTexInfo->strTextureName );
     if ( !MapContains ( m_UniqueTexInfoMap, strUniqueKey ) )
         AddReportLog ( 5133, SString ( "OnDestroyTexInfo missing %s", *strUniqueKey ) );
     MapRemove ( m_UniqueTexInfoMap, strUniqueKey );
+#endif
 
-	// This assert fails when using engine txd replace functions - TODO find out why
-    //assert ( MapContains ( m_D3DDataTexInfoMap, pTexInfo->pD3DData ) );
-    MapRemove ( m_D3DDataTexInfoMap, pTexInfo->pD3DData );
+    // Remove from D3DData/name lookup map
+    if ( MapFindRef ( m_D3DDataTexInfoMap, pTexInfo->pD3DData ) == pTexInfo )
+        MapRemove ( m_D3DDataTexInfoMap, pTexInfo->pD3DData );
+    else
+        pTexInfo = pTexInfo;
 }
 
 

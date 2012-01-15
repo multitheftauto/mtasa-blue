@@ -10,19 +10,55 @@
 *
 *****************************************************************************/
 
+
+//
+// Info on how a texture is identified.
+//
+struct STexTag
+{
+    STexTag ( ushort usTxdId )
+        : m_bUsingTxdId ( true )
+        , m_usTxdId ( usTxdId )
+        , m_pTex ( NULL )
+    {
+    }
+
+    STexTag ( RwTexture* pTex )
+        : m_bUsingTxdId ( false )
+        , m_usTxdId ( 0 )
+        , m_pTex ( pTex )
+    {
+    }
+
+    bool Matches ( ushort usTxdId ) const
+    {
+        return m_bUsingTxdId && usTxdId == m_usTxdId;
+    }
+
+    bool Matches ( RwTexture* pTex ) const
+    {
+        return !m_bUsingTxdId && pTex == m_pTex;
+    }
+
+    const bool          m_bUsingTxdId;
+    const ushort        m_usTxdId;      // Streamed textures are identified using the TXD id
+    const RwTexture*    m_pTex;         // Custom textures are identified using the RwTexture pointer
+};
+
+
 //
 // Info about a streamed in texture
 //
 struct STexInfo
 {
-    STexInfo ( ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData )
-        : usTxdId ( usTxdId )
+    STexInfo ( const STexTag& texTag, const SString& strTextureName, CD3DDUMMY* pD3DData )
+        : texTag ( texTag )
         , strTextureName ( strTextureName.ToLower () )
         , pD3DData ( pD3DData )
         , pAssociatedShadInfo ( NULL )
     {
     }
-    const ushort            usTxdId;
+    STexTag                 texTag;
     const SString           strTextureName;         // Always lower case
     CD3DDUMMY* const        pD3DData;
     struct SShadInfo*       pAssociatedShadInfo;    // The shader which is currently replacing this texture
