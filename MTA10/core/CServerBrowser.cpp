@@ -2213,6 +2213,7 @@ bool CServerBrowser::OnServerListChangeRow ( CGUIKeyEventArgs Args )
             if ( SelectedItem > 0 )
             {
                 m_pServerList [ Type ]->SetSelectedItem ( SelectedItem - 1 , 1, true );
+                OnClick ( m_pServerPlayerList [ Type ] ); // hacky
             }
             break;
         }
@@ -2221,6 +2222,7 @@ bool CServerBrowser::OnServerListChangeRow ( CGUIKeyEventArgs Args )
             if ( SelectedItem < ( iMax - 1 ) )
             {
                 m_pServerList [ Type ]->SetSelectedItem ( SelectedItem + 1 , 1, true );
+                OnClick ( m_pServerPlayerList [ Type ] ); // hacky
             }
             break;
         }
