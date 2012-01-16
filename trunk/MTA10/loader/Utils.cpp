@@ -1492,6 +1492,100 @@ void CleanDownloadCache ( void )
 
 //////////////////////////////////////////////////////////
 //
+// DirectoryCopy
+//
+// Recursive directory copy
+//
+//
+//////////////////////////////////////////////////////////
+void DirectoryCopy ( SString strSrcBase, SString strDestBase, bool bShowProgressDialog = false, int iMinFreeSpaceMB = 1 )
+{
+    // Setup diskspace checking
+    ULARGE_INTEGER FreeBytesAvailable;
+    GetDiskFreeSpaceEx ( strDestBase, &FreeBytesAvailable, NULL, NULL );
+    long long llFreeBytesAvailable = FreeBytesAvailable.QuadPart;
+    bool bCheckFreeSpace = ( llFreeBytesAvailable < ( iMinFreeSpaceMB + 10000 ) * 0x100000LL );    // Only check if initial freespace is less than 10GB
+
+    if ( bShowProgressDialog )
+        ShowProgressDialog( g_hInstance, "Copying files...", true );
+
+    strSrcBase = PathConform ( strSrcBase ).TrimEnd ( PATH_SEPERATOR );
+    strDestBase = PathConform ( strDestBase ).TrimEnd ( PATH_SEPERATOR );
+
+    float fProgress = 0;
+    float fUseProgress = 0;
+    std::list < SString > toDoList;
+    toDoList.push_back ( "" );
+    while ( toDoList.size () )
+    {
+        fProgress += 0.5f;
+        fUseProgress = fProgress;
+        if ( fUseProgress > 50 )
+            fUseProgress = Min ( 100.f, pow ( fUseProgress - 50, 0.6f ) + 50 );
+
+        SString strPathHereBaseRel = toDoList.front ();
+        toDoList.pop_front ();
+
+        SString strPathHereSrc = PathJoin ( strSrcBase, strPathHereBaseRel );
+        SString strPathHereDest = PathJoin ( strDestBase, strPathHereBaseRel );
+
+        std::vector < SString > fileListHere = FindFiles ( PathJoin ( strPathHereSrc, "*" ), true, false );
+        std::vector < SString > dirListHere = FindFiles ( PathJoin ( strPathHereSrc, "*" ), false, true );
+
+        // Copy the files at this level
+        for ( unsigned int i = 0 ; i < fileListHere.size (); i++ )
+        {
+            SString filePathNameSrc = PathJoin ( strPathHereSrc, fileListHere[i] );
+            SString filePathNameDest = PathJoin ( strPathHereDest, fileListHere[i] );
+            if ( bShowProgressDialog )
+                if ( UpdateProgress ( (int)fUseProgress, 100, SString ( "...%s", *PathJoin ( strPathHereBaseRel, fileListHere[i] ) ) ) )
+                    goto stop_copy;
+
+            // Check enough disk space
+            if ( bCheckFreeSpace )
+            {
+                llFreeBytesAvailable -= FileSize ( filePathNameSrc );
+                if ( llFreeBytesAvailable / 0x100000LL < iMinFreeSpaceMB )
+                    goto stop_copy;
+            }
+
+            FileCopy ( filePathNameSrc, filePathNameDest, true );
+        }
+
+        // Add the directories at this level
+        for ( unsigned int i = 0 ; i < dirListHere.size (); i++ )
+        {
+            SString dirPathNameBaseRel = PathJoin ( strPathHereBaseRel, dirListHere[i] );
+            toDoList.push_back ( dirPathNameBaseRel );
+        }
+    }
+
+stop_copy:
+    if ( bShowProgressDialog )
+    {
+        // Reassuring messages
+        if ( toDoList.size () )
+        {
+            Sleep ( 1000 );
+            UpdateProgress ( (int)fUseProgress, 100, "Copy finished early. Everything OK." );
+            Sleep ( 2000 );
+        }
+        else
+        {
+            fUseProgress = Max ( 90.f, fUseProgress );
+            UpdateProgress ( (int)fUseProgress, 100, "Finishing..." );
+            Sleep ( 1000 );
+            UpdateProgress ( 100, 100, "Done!" );
+            Sleep ( 2000 );
+        }
+
+        HideProgressDialog ();
+    }
+}
+
+
+//////////////////////////////////////////////////////////
+//
 // MaybeShowCopySettingsDialog
 //
 // For new installs, give the user an option to copy
@@ -1529,4 +1623,23 @@ void MaybeShowCopySettingsDialog ( void )
 
     // Copy settings from previous version
     FileCopy ( strPreviousConfig, strCurrentConfig );
+
+    // Copy some directories if empty
+    SString strCurrentNewsDir = PathJoin ( GetMTADataPath (), "news" );
+    SString strCurrentPrivDir = PathJoin ( GetMTASAPath (), "mods", "deathmatch", "priv" );
+    SString strCurrentResourcesDir = PathJoin ( GetMTASAPath (), "mods", "deathmatch", "resources" );
+
+    SString strPreviousDataPath = PathJoin ( GetSystemCommonAppDataPath(), "MTA San Andreas All", strPreviousVersion );
+    SString strPreviousNewsDir = PathJoin ( strPreviousDataPath, "news" );
+    SString strPreviousPrivDir = PathJoin ( strPreviousPath, "mods", "deathmatch", "priv" );
+    SString strPreviousResourcesDir = PathJoin ( strPreviousPath, "mods", "deathmatch", "resources" );
+
+    if ( !DirectoryExists( strCurrentNewsDir ) && DirectoryExists( strPreviousNewsDir ) )
+        DirectoryCopy ( strPreviousNewsDir, strCurrentNewsDir );
+
+    if ( !DirectoryExists( strCurrentPrivDir ) && DirectoryExists( strPreviousPrivDir ) )
+        DirectoryCopy ( strPreviousPrivDir, strCurrentPrivDir );
+
+    if ( !DirectoryExists( strCurrentResourcesDir ) && DirectoryExists( strPreviousResourcesDir ) )
+        DirectoryCopy ( strPreviousResourcesDir, strCurrentResourcesDir, true, 100 );
 }
