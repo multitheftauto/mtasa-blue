@@ -1492,6 +1492,40 @@ void CleanDownloadCache ( void )
 
 //////////////////////////////////////////////////////////
 //
+// IsDirectoryEmpty
+//
+// Returns true if directory does not exist, or it is empty
+//
+//////////////////////////////////////////////////////////
+bool IsDirectoryEmpty ( const SString& strSrcBase )
+{
+    return FindFiles ( PathJoin ( strSrcBase, "*" ), true, true ).empty ();
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// GetDiskFreeSpace
+//
+// Get free disk space in bytes
+//
+//////////////////////////////////////////////////////////
+long long GetDiskFreeSpace ( SString strSrcBase )
+{
+    for ( uint i = 0 ; i < 100 ; i++ )
+    {
+        ULARGE_INTEGER FreeBytesAvailable;
+        if ( GetDiskFreeSpaceEx ( strSrcBase, &FreeBytesAvailable, NULL, NULL ) )
+            return FreeBytesAvailable.QuadPart;
+
+        strSrcBase = ExtractPath( strSrcBase );
+    }
+    return 0;
+}
+
+
+//////////////////////////////////////////////////////////
+//
 // DirectoryCopy
 //
 // Recursive directory copy
@@ -1501,10 +1535,10 @@ void CleanDownloadCache ( void )
 void DirectoryCopy ( SString strSrcBase, SString strDestBase, bool bShowProgressDialog = false, int iMinFreeSpaceMB = 1 )
 {
     // Setup diskspace checking
-    ULARGE_INTEGER FreeBytesAvailable;
-    GetDiskFreeSpaceEx ( strDestBase, &FreeBytesAvailable, NULL, NULL );
-    long long llFreeBytesAvailable = FreeBytesAvailable.QuadPart;
-    bool bCheckFreeSpace = ( llFreeBytesAvailable < ( iMinFreeSpaceMB + 10000 ) * 0x100000LL );    // Only check if initial freespace is less than 10GB
+    bool bCheckFreeSpace = false;
+    long long llFreeBytesAvailable = GetDiskFreeSpace ( strDestBase );
+    if ( llFreeBytesAvailable != 0 )
+        bCheckFreeSpace = ( llFreeBytesAvailable < ( iMinFreeSpaceMB + 10000 ) * 0x100000LL );    // Only check if initial freespace is less than 10GB
 
     if ( bShowProgressDialog )
         ShowProgressDialog( g_hInstance, "Copying files...", true );
@@ -1634,12 +1668,12 @@ void MaybeShowCopySettingsDialog ( void )
     SString strPreviousPrivDir = PathJoin ( strPreviousPath, "mods", "deathmatch", "priv" );
     SString strPreviousResourcesDir = PathJoin ( strPreviousPath, "mods", "deathmatch", "resources" );
 
-    if ( !DirectoryExists( strCurrentNewsDir ) && DirectoryExists( strPreviousNewsDir ) )
+    if ( IsDirectoryEmpty( strCurrentNewsDir ) && DirectoryExists( strPreviousNewsDir ) )
         DirectoryCopy ( strPreviousNewsDir, strCurrentNewsDir );
 
-    if ( !DirectoryExists( strCurrentPrivDir ) && DirectoryExists( strPreviousPrivDir ) )
+    if ( IsDirectoryEmpty( strCurrentPrivDir ) && DirectoryExists( strPreviousPrivDir ) )
         DirectoryCopy ( strPreviousPrivDir, strCurrentPrivDir );
 
-    if ( !DirectoryExists( strCurrentResourcesDir ) && DirectoryExists( strPreviousResourcesDir ) )
+    if ( IsDirectoryEmpty( strCurrentResourcesDir ) && DirectoryExists( strPreviousResourcesDir ) )
         DirectoryCopy ( strPreviousResourcesDir, strCurrentResourcesDir, true, 100 );
 }
