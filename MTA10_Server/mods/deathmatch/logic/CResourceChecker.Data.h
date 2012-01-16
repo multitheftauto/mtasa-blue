@@ -41,6 +41,9 @@ namespace
                                          { "restoreWorldModel",         "1.2.0-9.03618" },
                                          { "restoreAllWorldModels",     "1.2.0-9.03618" },
                                          { "dxSetShaderTransform",      "1.2.0-9.03618" },
+                                         { "onClientVehicleCollision",  "1.3" },
+                                         { "setBirdsEnabled",           "1.3" },
+                                         { "getBirdsEnabled",           "1.3" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
