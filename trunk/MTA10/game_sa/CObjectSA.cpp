@@ -137,7 +137,7 @@ CObjectSA::CObjectSA( DWORD dwModel )
     {
         this->SetInterface((CEntitySAInterface *)dwObjectPtr);
 
-        world->Add( m_pInterface );
+        world->Add( m_pInterface, CObject_Constructor );
 
         // Setup some flags
         this->BeingDeleted = FALSE;
@@ -172,7 +172,7 @@ CObjectSA::~CObjectSA( )
             if ( (DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable )
             {
                 CWorldSA * world = (CWorldSA *)pGame->GetWorld();
-                world->Remove(this->GetInterface());
+                world->Remove(this->GetInterface(), CObject_Destructor);
             
                 DWORD dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
                 _asm    
