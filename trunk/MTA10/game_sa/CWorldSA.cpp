@@ -72,12 +72,12 @@ void CWorldSA::Remove ( CEntity * pEntity, eDebugCaller CallerId )
 
     if ( pEntitySA )
     {
+        CEntitySAInterface * pInterface = pEntitySA->GetInterface();
         if ( (DWORD)pInterface->vtbl == VTBL_CPlaceable )
         {
             SString strMessage ( "Caller: %i ", CallerId );
             LogEvent ( 507, "CWorld::Remove ( CEntity * ) Crash", "", strMessage );
         }
-        CEntitySAInterface * pInterface = pEntitySA->GetInterface();
         DWORD dwEntity = (DWORD)pInterface;
         DWORD dwFunction = FUNC_Remove;
         _asm
