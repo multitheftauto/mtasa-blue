@@ -52,10 +52,10 @@ class CWorldSA : public CWorld
 {
 public:
     CWorldSA ( );
-    void        Add                       ( CEntity * entity );
-    void        Add                       ( CEntitySAInterface * entityInterface );
-    void        Remove                    ( CEntity * entity );
-    void        Remove                    ( CEntitySAInterface * entityInterface );
+    void        Add                       ( CEntity * entity, eDebugCaller CallerId );
+    void        Add                       ( CEntitySAInterface * entityInterface, eDebugCaller CallerId );
+    void        Remove                    ( CEntity * entity, eDebugCaller CallerId );
+    void        Remove                    ( CEntitySAInterface * entityInterface, eDebugCaller CallerId );
     void        RemoveReferencesToDeletedObject ( CEntitySAInterface * entity );
     bool        ProcessLineOfSight        ( const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, CEntity ** CollisionEntity, const SLineOfSightFlags flags, SLineOfSightBuildingResult* pBuildingResult );
     bool        TestLineSphere            ( CVector * vecStart, CVector * vecEnd, CVector * vecSphereCenter, float fSphereRadius, CColPoint ** colCollision );

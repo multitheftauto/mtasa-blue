@@ -155,7 +155,7 @@ VOID CEntitySA::Render ( )
 VOID CEntitySA::SetOrientation ( float fX, float fY, float fZ )
 {
     DEBUG_TRACE("VOID CEntitySA::SetOrientation ( float fX, float fY, float fZ )");
-    pGame->GetWorld()->Remove ( this );
+    pGame->GetWorld()->Remove ( this, CEntity_SetOrientation );
     DWORD dwThis = (DWORD) m_pInterface;
     DWORD dwFunc = FUNC_SetOrientation;
     _asm
@@ -184,13 +184,13 @@ VOID CEntitySA::SetOrientation ( float fX, float fY, float fZ )
         call    dwFunc
     }
 
-    pGame->GetWorld()->Add ( this );
+    pGame->GetWorld()->Add ( this, CEntity_SetOrientation );
 }
 
 VOID CEntitySA::FixBoatOrientation ( void )
 {
     DEBUG_TRACE("VOID CEntitySA::FixBoatOrientation ( void )");
-    pGame->GetWorld()->Remove ( this );
+    pGame->GetWorld()->Remove ( this, CEntity_FixBoatOrientation );
     DWORD dwThis = (DWORD) m_pInterface;
     DWORD dwFunc = 0x446F90;
     _asm
@@ -206,7 +206,7 @@ VOID CEntitySA::FixBoatOrientation ( void )
         call    dwFunc
     }
 
-    pGame->GetWorld()->Add ( this );
+    pGame->GetWorld()->Add ( this, CEntity_FixBoatOrientation );
 }
 
 VOID CEntitySA::SetPosition( CVector * vecPosition )
@@ -286,7 +286,7 @@ VOID CEntitySA::SetMatrix ( CMatrix * matrix )
         }
         */
 
-        pGame->GetWorld()->Remove ( this );
+        pGame->GetWorld()->Remove ( this, CEntity_SetMatrix );
         DWORD dwThis = (DWORD) m_pInterface;
         DWORD dwFunc = 0x446F90;    // CEntity::UpdateRwMatrix
         _asm
@@ -301,7 +301,7 @@ VOID CEntitySA::SetMatrix ( CMatrix * matrix )
             mov     ecx, dwThis
             call    dwFunc
         }
-        pGame->GetWorld()->Add ( this );
+        pGame->GetWorld()->Add ( this, CEntity_SetMatrix );
     }
 }
 

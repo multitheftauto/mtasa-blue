@@ -229,7 +229,7 @@ CVehicleSA::~CVehicleSA()
             }
 
             CWorldSA* pWorld = (CWorldSA *)pGame->GetWorld();
-            pWorld->Remove ( m_pInterface );
+            pWorld->Remove ( m_pInterface, CVehicle_Destructor );
             pWorld->RemoveReferencesToDeletedObject ( m_pInterface );
 
             

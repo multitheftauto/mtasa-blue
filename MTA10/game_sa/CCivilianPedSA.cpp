@@ -42,7 +42,7 @@ CCivilianPedSA::CCivilianPedSA( ePedModel pedType )
     CPoolsSA * pools = (CPoolsSA *)pGame->GetPools();
     this->internalID =  pools->GetPedRef ( (DWORD *)this->GetInterface () );
     CWorldSA * world = (CWorldSA *)pGame->GetWorld();
-    world->Add(this->GetInterface());
+    world->Add(this->GetInterface(), CCivPed_Constructor);
     this->SetModelIndex(pedType);
     this->BeingDeleted = FALSE;
     this->DoNotRemoveFromGame = FALSE;
@@ -62,7 +62,7 @@ CCivilianPedSA::~CCivilianPedSA( )
         if ( (DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable )
         {
             CWorldSA * world = (CWorldSA *)pGame->GetWorld();
-            world->Remove(this->GetInterface());
+            world->Remove(this->GetInterface(), CCivPed_Destructor);
         
             DWORD dwThis = (DWORD)this->GetInterface();
             DWORD dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
