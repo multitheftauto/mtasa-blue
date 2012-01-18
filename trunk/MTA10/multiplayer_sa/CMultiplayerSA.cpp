@@ -7200,7 +7200,6 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision_Plane ( )
     }
 }
 
-DWORD dwBikeCollisionComparison = 0x0859EF8;
 void _declspec(naked) HOOK_CEventVehicleDamageCollision_Bike ( )
 {
     // .006B8EC6 DC 1D F8 9E 85 00                       fcomp   ds:__real@0000000000000000 < Hook >
@@ -7219,7 +7218,7 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision_Bike ( )
     _asm
     {
         popad
-        fcomp dwBikeCollisionComparison
+        fcomp ds:0x859EF8
         jmp JMP_CEventVehicleDamageCollision_Bike_RETN
     }
 }
