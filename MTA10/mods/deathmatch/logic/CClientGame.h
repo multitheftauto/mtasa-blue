@@ -172,6 +172,23 @@ public:
         unsigned short  usAmmo;
         unsigned short  usAmmoInClip;
     };
+    struct SScreenShotArgs
+    {
+        uint uiMaxBandwidth;
+        uint uiMaxPacketSize;
+        uint uiServerSentTime;
+        SString strResourceName;
+        SString strTag;
+    };
+    struct SDelayedPacketInfo
+    {
+        CTickCount useTickCount;
+        unsigned char ucPacketID;
+        NetBitStreamInterface* pBitStream;
+        NetPacketPriority packetPriority;
+        NetPacketReliability packetReliability;
+        ePacketOrdering packetOrdering;
+    };
 
 public:
     ZERO_ON_NEW
@@ -357,6 +374,11 @@ public:
     bool                                GetDevelopmentMode              ( void )                        { return m_bDevelopmentMode; } 
     void                                SetShowCollision                ( bool bEnable )                { m_bShowCollision = bEnable; } 
     bool                                GetShowCollision                ( void )                        { return m_bShowCollision; } 
+
+    void                                TakePlayerScreenShot            ( uint uiSizeX, uint uiSizeY, const SString& strTag, uint uiQuality, uint uiMaxBandwidth, uint uiMaxPacketSize, const SString& strResourceName, uint uiServerSentTime );
+    static void                         StaticGottenPlayerScreenShot    ( const CBuffer& buffer, uint uiTimeSpentInQueue );
+    void                                GottenPlayerScreenShot          ( const CBuffer& buffer, uint uiTimeSpentInQueue );
+    void                                ProcessDelayedSendList          ( void );
 
 private:
 
@@ -642,6 +664,9 @@ public:
 private:
 
     CEvents                             m_Events;
+    std::list < SScreenShotArgs >       m_ScreenShotArgList;
+    ushort                              m_usNextScreenShotId;
+    std::list < SDelayedPacketInfo >    m_DelayedSendList;
 };
 
 extern CClientGame* g_pClientGame;

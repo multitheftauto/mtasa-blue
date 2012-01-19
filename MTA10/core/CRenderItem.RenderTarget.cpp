@@ -175,4 +175,69 @@ void CRenderTargetItem::ReleaseUnderlyingData ( void )
     SAFE_RELEASE( m_pD3DRenderTargetSurface )
     SAFE_RELEASE( m_pD3DTexture )
     SAFE_RELEASE( m_pD3DZStencilSurface )
+    SAFE_RELEASE( m_pD3DReadSurface )
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderTargetItem::ReadPixels
+//
+// Read render target pixels into the buffer.
+// Not very quick thing to do.
+//
+////////////////////////////////////////////////////////////////
+void CRenderTargetItem::ReadPixels ( CBuffer& outBuffer )
+{
+    D3DSURFACE_DESC Desc;  
+    m_pD3DRenderTargetSurface->GetDesc ( &Desc );  
+
+    // Make sure we have an offscreen surface which is exactly the same as the render target
+    if ( m_pD3DReadSurface )
+    {
+        D3DSURFACE_DESC ReadDesc;  
+        m_pD3DReadSurface->GetDesc ( &ReadDesc );  
+        if ( ReadDesc.Width != Desc.Width || ReadDesc.Height != Desc.Height || ReadDesc.Format != Desc.Format )
+        {
+            SAFE_RELEASE( m_pD3DReadSurface )
+        }
+    }
+
+    if ( !m_pD3DReadSurface )
+        if ( FAILED ( m_pDevice->CreateOffscreenPlainSurface ( Desc.Width, Desc.Height, Desc.Format, D3DPOOL_SYSTEMMEM, &m_pD3DReadSurface, NULL ) ) )
+            return;
+
+    // Copy render target to m_pD3DReadSurface
+    if ( FAILED ( m_pDevice->GetRenderTargetData ( m_pD3DRenderTargetSurface, m_pD3DReadSurface ) ) )
+        return;
+
+    // Get pixels from m_pD3DReadSurface
+    D3DLOCKED_RECT LockedRect;
+    if ( FAILED ( m_pD3DReadSurface->LockRect ( &LockedRect, NULL, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK ) ) )
+        return;
+
+    // Allocate 32 bit buffer
+    uint ulScreenWidth = Desc.Width;
+    uint ulScreenHeight = Desc.Height;
+    uint ulLineBytes = ulScreenWidth * 4;
+    outBuffer.SetSize ( ulLineBytes * ulScreenHeight );
+    char* pDest = outBuffer.GetData ();
+
+    void* ms_pBits = LockedRect.pBits;
+    uint ms_ulPitch = LockedRect.Pitch;
+    if ( CRenderItemManager::GetBitsPerPixel ( Desc.Format ) == 32 )
+    {
+        // Copy lines into a buffer
+        for ( unsigned int i = 0; i < ulScreenHeight; i++ )
+            memcpy ( pDest + ulLineBytes * i, (BYTE*) ms_pBits + i * ms_ulPitch, ulLineBytes );
+    }
+    else
+    if ( CRenderItemManager::GetBitsPerPixel ( Desc.Format ) == 16 )
+    {
+        // TODO
+        for ( unsigned int i = 0; i < ulScreenHeight; i++ )
+            memset ( pDest + ulLineBytes * i, i < ulScreenHeight / 2 ? 0 : -1, ulLineBytes );
+    }
+
+    m_pD3DReadSurface->UnlockRect ();
 }

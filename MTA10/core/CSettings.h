@@ -152,6 +152,7 @@ protected:
     CGUIComboBox*       m_pComboAspectRatio;
     CGUILabel*          m_pAspectRatioLabel;
 	CGUICheckBox*       m_pCheckBoxVolumetricShadows;
+	CGUICheckBox*       m_pCheckBoxAllowScreenUpload;
 	CGUICheckBox*       m_pCheckBoxCustomizedSAFiles;
 	CGUICheckBox*       m_pCheckBoxGrass;
     CGUILabel*          m_pDrawDistanceLabel;
@@ -318,6 +319,7 @@ protected:
 
     bool                OnFxQualityChanged      ( CGUIElement* pElement );
     bool                OnVolumetricShadowsClick ( CGUIElement* pElement );
+    bool                OnAllowScreenUploadClick ( CGUIElement* pElement );
     bool                OnCustomizedSAFilesClick ( CGUIElement* pElement );
 
 private:
@@ -353,6 +355,7 @@ private:
 
     DWORD               m_dwFrameCount;
     bool                m_bShownVolumetricShadowsWarning;
+    bool                m_bShownAllowScreenUploadMessage;
     int                 m_iMaxAnisotropic;
 
     std::list < SKeyBindSection *> m_pKeyBindSections;

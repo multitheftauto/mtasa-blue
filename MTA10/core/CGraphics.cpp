@@ -46,6 +46,7 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
     m_pLine3DBatcherPreGUI = new CLine3DBatcher ( true );
     m_pLine3DBatcherPostGUI = new CLine3DBatcher ( false );
     m_bSetRenderTargetEnabled = false;
+    m_pScreenGrabber = NewScreenGrabber ();
 }
 
 
@@ -60,6 +61,7 @@ CGraphics::~CGraphics ( void )
     SAFE_DELETE ( m_pTileBatcher );
     SAFE_DELETE ( m_pLine3DBatcherPreGUI );
     SAFE_DELETE ( m_pLine3DBatcherPostGUI );
+    SAFE_DELETE ( m_pScreenGrabber );
 }
 
 
@@ -741,6 +743,7 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
     m_pLine3DBatcherPreGUI->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
     m_pLine3DBatcherPostGUI->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
     m_pRenderItemManager->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pScreenGrabber->OnDeviceCreate ( pDevice );
 }
 
 

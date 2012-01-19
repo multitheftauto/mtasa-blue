@@ -1213,6 +1213,9 @@ void CClientGame::DoPulses ( void )
 
     // Update streaming
     m_pManager->UpdateStreamers ();
+
+    // Send screen shot data
+    ProcessDelayedSendList ();
 }
 
 
@@ -5184,5 +5187,151 @@ void CClientGame::DebugElementRender ( void )
         CClientEntity* pEntity = *it;
         if ( pEntity->GetParent () )
             pEntity->DebugRender ( vecCameraPos, fDrawRadius );
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////
+// Click
+//
+void CClientGame::TakePlayerScreenShot ( uint uiSizeX, uint uiSizeY, const SString& strTag, uint uiQuality, uint uiMaxBandwidth, uint uiMaxPacketSize, const SString& strResourceName, uint uiServerSentTime )
+{
+    bool bAllowScreenUploadEnabled = 1;
+    g_pCore->GetCVars ()->Get ( "allow_screen_upload", bAllowScreenUploadEnabled );
+    bool bWindowMinimized = g_pCore->IsWindowMinimized ();
+
+    if ( bWindowMinimized || !bAllowScreenUploadEnabled  )
+    {
+        // If alt-tabbed or opt-out
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+        if ( !bAllowScreenUploadEnabled )
+            pBitStream->Write ( (uchar)3 );
+        else
+            pBitStream->Write ( (uchar)2 );
+        pBitStream->Write ( uiServerSentTime );
+        pBitStream->WriteString ( strResourceName );
+        pBitStream->WriteString ( strTag );
+        g_pNet->SendPacket ( PACKET_ID_PLAYER_SCREENSHOT, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_CHAT );
+        g_pNet->DeallocateNetBitStream ( pBitStream );
+    }
+    else
+    {
+        // Do grab and send
+        SScreenShotArgs screenShotArgs;
+        screenShotArgs.uiMaxBandwidth = uiMaxBandwidth;
+        screenShotArgs.uiMaxPacketSize = uiMaxPacketSize;
+        screenShotArgs.strResourceName = strResourceName;
+        screenShotArgs.strTag = strTag;
+        screenShotArgs.uiServerSentTime = uiServerSentTime;
+        m_ScreenShotArgList.push_back ( screenShotArgs );
+        g_pCore->GetGraphics ()->GetScreenGrabber ()->QueueScreenShot ( uiSizeX, uiSizeY, uiQuality, &CClientGame::StaticGottenPlayerScreenShot );
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////
+// Callback from TakePlayerScreendsShot
+//
+void CClientGame::StaticGottenPlayerScreenShot ( const CBuffer& buffer, uint uiTimeSpentInQueue )
+{
+    g_pClientGame->GottenPlayerScreenShot ( buffer, uiTimeSpentInQueue );
+}
+
+
+//////////////////////////////////////////////////////////////////
+// Break data into packets and put into delayed send list
+//
+void CClientGame::GottenPlayerScreenShot ( const CBuffer& buffer, uint uiTimeSpentInQueue )
+{
+    // Pop saved args
+    if ( m_ScreenShotArgList.empty () )
+        return;
+
+    SScreenShotArgs screenShotArgs = m_ScreenShotArgList.front ();
+    m_ScreenShotArgList.pop_front ();
+    const uint uiMaxBandwidth = Clamp < uint > ( 100, screenShotArgs.uiMaxBandwidth, 1000000 );
+    const uint uiMaxPacketSize = Clamp < uint > ( 100, screenShotArgs.uiMaxPacketSize, 100000 );
+    const SString strResourceName = screenShotArgs.strResourceName;
+    const SString strTag = screenShotArgs.strTag;
+    const uint uiServerGrabTime = screenShotArgs.uiServerSentTime + uiTimeSpentInQueue;
+
+    // Validate buffer
+    if ( buffer.GetSize () == 0 )
+        return;
+
+    // Calc constants stuff
+    const uint uiSendRate = Clamp < uint > ( 5, uiMaxBandwidth / uiMaxPacketSize, 20 );
+    const long long llPacketInterval = 1000 / uiSendRate;
+    const uint uiTotalByteSize = buffer.GetSize ();
+    const char* pData = buffer.GetData ();
+    const uint uiBytesPerPart = Min ( Min ( Max ( 100U, uiMaxBandwidth / uiSendRate ), uiTotalByteSize ), 30000U );
+    const uint uiNumParts = Max ( 1U, ( uiTotalByteSize + uiBytesPerPart - 1 ) / uiBytesPerPart );
+
+    // Calc variables stuff
+    CTickCount tickCount = CTickCount::Now () + CTickCount ( llPacketInterval );
+    uint uiBytesRemaining = uiTotalByteSize;
+    m_usNextScreenShotId++;
+
+    // Make each packet
+    for ( uint i = 0 ; i < uiNumParts ; i++ )
+    {
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+
+        ushort usPartNumber = i;
+        ushort usBytesThisPart = Min ( uiBytesRemaining, uiBytesPerPart );
+        assert ( usBytesThisPart != 0 );
+
+        pBitStream->Write ( (uchar)1 );
+        pBitStream->Write ( m_usNextScreenShotId );
+        pBitStream->Write ( usPartNumber );
+        pBitStream->Write ( usBytesThisPart );
+        pBitStream->Write ( pData, usBytesThisPart );
+
+        // Write more info if first part
+        if ( usPartNumber == 0 )
+        {
+            pBitStream->Write ( uiServerGrabTime );
+            pBitStream->Write ( uiTotalByteSize );
+            pBitStream->Write ( (ushort)uiNumParts );
+            pBitStream->WriteString ( strResourceName );
+            pBitStream->WriteString ( strTag );
+        }
+
+        // Add to delay send list
+        SDelayedPacketInfo delayedPacketInfo;
+        delayedPacketInfo.useTickCount = tickCount;
+        delayedPacketInfo.ucPacketID = PACKET_ID_PLAYER_SCREENSHOT;
+        delayedPacketInfo.pBitStream = pBitStream;
+        delayedPacketInfo.packetPriority = PACKET_PRIORITY_MEDIUM;
+        delayedPacketInfo.packetReliability = PACKET_RELIABILITY_RELIABLE_ORDERED;
+        delayedPacketInfo.packetOrdering = PACKET_ORDERING_CHAT;
+        m_DelayedSendList.push_back ( delayedPacketInfo );
+
+        // Increment stuff
+        pData += usBytesThisPart;
+        uiBytesRemaining -= usBytesThisPart;
+        tickCount += CTickCount ( llPacketInterval );
+    }
+
+    assert ( uiBytesRemaining == 0 );
+}
+
+
+//////////////////////////////////////////////////////////////////
+// Process delay send list
+//
+void CClientGame::ProcessDelayedSendList ( void )
+{
+    CTickCount tickCount = CTickCount::Now ();
+
+    while ( !m_DelayedSendList.empty () )
+    {
+        SDelayedPacketInfo& info = m_DelayedSendList.front ();
+        if ( info.useTickCount > tickCount )
+            break;
+
+        g_pNet->SendPacket ( info.ucPacketID, info.pBitStream, info.packetPriority, info.packetReliability, info.packetOrdering );
+        g_pNet->DeallocateNetBitStream ( info.pBitStream );
+        m_DelayedSendList.pop_front ();
     }
 }

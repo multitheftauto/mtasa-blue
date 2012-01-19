@@ -135,6 +135,7 @@ public:
 
     // Subsystems
     CRenderItemManagerInterface* GetRenderItemManager   ( void )        { return m_pRenderItemManager; }
+    CScreenGrabberInterface*     GetScreenGrabber       ( void )        { return m_pScreenGrabber; }
 
     // To draw queued up drawings
     void                DrawPreGUIQueue         ( void );
@@ -160,6 +161,7 @@ private:
     IDirect3DDevice9 *  m_pDevice;
 
     CRenderItemManager* m_pRenderItemManager;
+    CScreenGrabberInterface* m_pScreenGrabber;
     CTileBatcher*       m_pTileBatcher;
     CLine3DBatcher*     m_pLine3DBatcherPreGUI;
     CLine3DBatcher*     m_pLine3DBatcherPostGUI;

@@ -1067,6 +1067,12 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
+        case PACKET_ID_PLAYER_SCREENSHOT:
+        {
+            Packet_PlayerScreenShot ( static_cast < CPlayerScreenShotPacket& > ( Packet ) );
+            return true;
+        }
+
         default:
             break;
     }
@@ -1387,6 +1393,7 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPlayerUnmute", "", NULL, false );
     m_Events.AddEvent ( "onPlayerCommand", "command", NULL, false );
     m_Events.AddEvent ( "onPlayerModInfo", "type, ids, names", NULL, false );
+    m_Events.AddEvent ( "onPlayerScreenShot", "resource, status, file_data, timestamp, tag", NULL, false );
 
     // Ped events
     m_Events.AddEvent ( "onPedWasted", "ammo, killer, weapon, bodypart", NULL, false );
@@ -3317,6 +3324,85 @@ void CGame::Packet_PlayerDiagnostic ( CPlayerDiagnosticPacket & Packet )
     }
 }
 
+
+void CGame::Packet_PlayerScreenShot ( CPlayerScreenShotPacket & Packet )
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer && pPlayer->IsJoined () )
+    {
+        if ( Packet.m_ucStatus != 1 )
+        {
+            // disabled or minimized
+            CResource* pResource = g_pGame->GetResourceManager ()->GetResource ( Packet.m_strResourceName );
+            if ( pResource )
+            {
+                CLuaArguments Arguments;
+                Arguments.PushResource ( pResource );
+                Arguments.PushString ( Packet.m_ucStatus == 2 ? "minimized" : "disabled" );
+                Arguments.PushBoolean ( false );
+                Arguments.PushNumber ( static_cast < double > ( Packet.m_llServerGrabTime ) );
+                Arguments.PushString ( Packet.m_strTag );
+                pPlayer->CallEvent ( "onPlayerScreenShot", Arguments );
+            }
+        }
+        else
+        if ( Packet.m_ucStatus == 1 )
+        {
+            // Get in-progress info
+            SScreenShotInfo& info = pPlayer->GetScreenShotInfo ();
+
+            // Validate
+            if ( !info.bInProgress
+                    || info.usNextPartNumber != Packet.m_usPartNumber
+                    || info.usScreenShotId != Packet.m_usScreenShotId
+                    )
+            {
+                info.bInProgress = false;
+                info.buffer.Clear ();
+
+                // Check if new start
+                if ( Packet.m_usPartNumber == 0 )
+                {
+                    info.bInProgress = true;
+                    info.usNextPartNumber = 0;
+                    info.usScreenShotId = Packet.m_usScreenShotId;
+
+                    info.llTimeStamp = Packet.m_llServerGrabTime;
+                    info.uiTotalBytes = Packet.m_uiTotalBytes;
+                    info.usTotalParts = Packet.m_usTotalParts;
+                    info.strResourceName = Packet.m_strResourceName;
+                    info.strTag = Packet.m_strTag;
+                }
+            }
+
+            // Add data if valid
+            if ( info.bInProgress )
+            {
+                info.buffer += Packet.m_buffer;
+                info.usNextPartNumber++;
+
+                // Finished?
+                if ( info.usNextPartNumber == info.usTotalParts )
+                {
+                    CResource* pResource = g_pGame->GetResourceManager ()->GetResource ( info.strResourceName );
+                    if ( pResource && info.uiTotalBytes == info.buffer.GetSize () )
+                    {
+                        CLuaArguments Arguments;
+                        Arguments.PushResource ( pResource );
+                        Arguments.PushString ( "ok" );
+                        Arguments.PushString ( std::string ( info.buffer.GetData (), info.buffer.GetSize () ) );
+                        Arguments.PushNumber ( static_cast < double > ( info.llTimeStamp ) );
+                        Arguments.PushString ( info.strTag );
+                        pPlayer->CallEvent ( "onPlayerScreenShot", Arguments );
+                    }
+
+                    info.bInProgress = false;
+                    info.buffer.Clear ();
+                }
+            }
+        }
+    }
+}
 
 void CGame::Packet_PlayerModInfo ( CPlayerModInfoPacket & Packet )
 {
