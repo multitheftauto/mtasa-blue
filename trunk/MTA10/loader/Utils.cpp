@@ -1658,7 +1658,7 @@ void MaybeShowCopySettingsDialog ( void )
     // Copy settings from previous version
     FileCopy ( strPreviousConfig, strCurrentConfig );
 
-    // Copy registery setting for aero-enabled
+    // Copy registry setting for aero-enabled
     SString strAeroEnabled = GetVersionRegistryValue ( strPreviousVersion, PathJoin ( "Settings", "general" ) , "aero-enabled" );
     SetApplicationSetting ( "aero-enabled", strAeroEnabled );
 
