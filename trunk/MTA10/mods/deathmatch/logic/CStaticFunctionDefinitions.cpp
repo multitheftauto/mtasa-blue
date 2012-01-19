@@ -6456,7 +6456,7 @@ bool CStaticFunctionDefinitions::GetVehicleHandling ( CClientVehicle* pVehicle, 
 {
     assert ( pVehicle );
 
-    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ( );
     if ( eProperty == HANDLING_CENTEROFMASS )
     {
         vecValue = pEntry->GetCenterOfMass ();
@@ -6469,9 +6469,11 @@ bool CStaticFunctionDefinitions::GetVehicleHandling ( CClientVehicle* pVehicle, 
 {
     assert ( pVehicle );
 
-    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ( );
     if ( GetEntryHandling ( pEntry, eProperty, fValue ) )
+    {
         return true;
+    }
 
     return false;
 }
@@ -6481,9 +6483,11 @@ bool CStaticFunctionDefinitions::GetVehicleHandling ( CClientVehicle* pVehicle, 
 {
     assert ( pVehicle );
 
-    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ( );
     if ( GetEntryHandling ( pEntry, eProperty, strValue ) )
+    {
         return true;
+    }
 
     return false;
 }
@@ -6492,10 +6496,11 @@ bool CStaticFunctionDefinitions::GetVehicleHandling ( CClientVehicle* pVehicle, 
 {
     assert ( pVehicle );
 
-    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ( );
     if ( GetEntryHandling ( pEntry, eProperty, uiValue ) )
+    {
         return true;
-
+    }
     return false;
 }
 
@@ -6503,10 +6508,11 @@ bool CStaticFunctionDefinitions::GetVehicleHandling ( CClientVehicle* pVehicle, 
 {
     assert ( pVehicle );
 
-    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ( );
     if ( GetEntryHandling ( pEntry, eProperty, ucValue ) )
+    {
         return true;
-
+    }
     return false;
 }
 

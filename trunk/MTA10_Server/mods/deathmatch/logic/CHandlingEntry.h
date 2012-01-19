@@ -104,7 +104,7 @@ public:
     };
 
                     // Constructor for creatable dummy entries
-                    CHandlingEntry                ( void ){};
+                    CHandlingEntry                ( void )                          {};
 
                     // Constructor for original entries
                     CHandlingEntry                ( tHandlingData* pOriginal );
@@ -112,52 +112,53 @@ public:
                     ~CHandlingEntry               ( void ){};
 
     // Use this to copy data from an another handling class to this
-    void            ApplyHandlingData               ( CHandlingEntry* pData );
+    void            ApplyHandlingData               ( const CHandlingEntry* pData );
+
 
     // Get functions
-    tHandlingData   GetHandlingData                 ( void )          { return m_Handling; };
-    float           GetMass                         ( void ) const    { return m_Handling.fMass; };
-    float           GetTurnMass                     ( void ) const    { return m_Handling.fTurnMass; };
-    float           GetDragCoeff                    ( void ) const    { return m_Handling.fDragCoeff; };
-    const CVector&  GetCenterOfMass                 ( void ) const    { return m_Handling.vecCenterOfMass; };
+    tHandlingData   GetHandlingData                 ( void )                        { return m_Handling; };
+    float           GetMass                         ( void ) const                  { return m_Handling.fMass; };
+    float           GetTurnMass                     ( void ) const                  { return m_Handling.fTurnMass; };
+    float           GetDragCoeff                    ( void ) const                  { return m_Handling.fDragCoeff; };
+    const CVector&  GetCenterOfMass                 ( void ) const                  { return m_Handling.vecCenterOfMass; };
 
-    unsigned int    GetPercentSubmerged             ( void ) const    { return m_Handling.uiPercentSubmerged; };
-    float           GetTractionMultiplier           ( void ) const    { return m_Handling.fTractionMultiplier; };
+    unsigned int    GetPercentSubmerged             ( void ) const                  { return m_Handling.uiPercentSubmerged; };
+    float           GetTractionMultiplier           ( void ) const                  { return m_Handling.fTractionMultiplier; };
 
-    eDriveType      GetCarDriveType                 ( void ) const    { return static_cast < eDriveType > ( m_Handling.Transmission.ucDriveType ); };
-    eEngineType     GetCarEngineType                ( void ) const    { return static_cast < eEngineType > ( m_Handling.Transmission.ucEngineType ); };
-    unsigned char   GetNumberOfGears                ( void ) const    { return m_Handling.Transmission.ucNumberOfGears; };
+    eDriveType      GetCarDriveType                 ( void ) const                  { return static_cast < eDriveType > ( m_Handling.Transmission.ucDriveType ); };
+    eEngineType     GetCarEngineType                ( void ) const                  { return static_cast < eEngineType > ( m_Handling.Transmission.ucEngineType ); };
+    unsigned char   GetNumberOfGears                ( void ) const                  { return m_Handling.Transmission.ucNumberOfGears; };
 
-    float           GetEngineAcceleration          ( void ) const    { return m_Handling.Transmission.fEngineAcceleration; };
-    float           GetEngineInertia                ( void ) const    { return m_Handling.Transmission.fEngineInertia; };
-    float           GetMaxVelocity                  ( void ) const    { return m_Handling.Transmission.fMaxVelocity; };
+    float           GetEngineAcceleration          ( void ) const                   { return m_Handling.Transmission.fEngineAcceleration; };
+    float           GetEngineInertia                ( void ) const                  { return m_Handling.Transmission.fEngineInertia; };
+    float           GetMaxVelocity                  ( void ) const                  { return m_Handling.Transmission.fMaxVelocity; };
 
-    float           GetBrakeDeceleration           ( void ) const    { return m_Handling.fBrakeDeceleration; };
-    float           GetBrakeBias                    ( void ) const    { return m_Handling.fBrakeBias; };
-    bool            GetABS                          ( void ) const    { return m_Handling.bABS; };
+    float           GetBrakeDeceleration           ( void ) const                   { return m_Handling.fBrakeDeceleration; };
+    float           GetBrakeBias                    ( void ) const                  { return m_Handling.fBrakeBias; };
+    bool            GetABS                          ( void ) const                  { return m_Handling.bABS; };
 
-    float           GetSteeringLock                 ( void ) const    { return m_Handling.fSteeringLock; };
-    float           GetTractionLoss                 ( void ) const    { return m_Handling.fTractionLoss; };
-    float           GetTractionBias                 ( void ) const    { return m_Handling.fTractionBias; };
+    float           GetSteeringLock                 ( void ) const                  { return m_Handling.fSteeringLock; };
+    float           GetTractionLoss                 ( void ) const                  { return m_Handling.fTractionLoss; };
+    float           GetTractionBias                 ( void ) const                  { return m_Handling.fTractionBias; };
 
-    float           GetSuspensionForceLevel         ( void ) const    { return m_Handling.fSuspensionForceLevel; };
-    float           GetSuspensionDamping            ( void ) const    { return m_Handling.fSuspensionDamping; };
-    float           GetSuspensionHighSpeedDamping   ( void ) const    { return m_Handling.fSuspensionHighSpdDamping; };
-    float           GetSuspensionUpperLimit         ( void ) const    { return m_Handling.fSuspensionUpperLimit; };
-    float           GetSuspensionLowerLimit         ( void ) const    { return m_Handling.fSuspensionLowerLimit; };
-    float           GetSuspensionFrontRearBias      ( void ) const    { return m_Handling.fSuspensionFrontRearBias; };
-    float           GetSuspensionAntiDiveMultiplier ( void ) const    { return m_Handling.fSuspensionAntiDiveMultiplier; };
+    float           GetSuspensionForceLevel         ( void ) const                  { return m_Handling.fSuspensionForceLevel; };
+    float           GetSuspensionDamping            ( void ) const                  { return m_Handling.fSuspensionDamping; };
+    float           GetSuspensionHighSpeedDamping   ( void ) const                  { return m_Handling.fSuspensionHighSpdDamping; };
+    float           GetSuspensionUpperLimit         ( void ) const                  { return m_Handling.fSuspensionUpperLimit; };
+    float           GetSuspensionLowerLimit         ( void ) const                  { return m_Handling.fSuspensionLowerLimit; };
+    float           GetSuspensionFrontRearBias      ( void ) const                  { return m_Handling.fSuspensionFrontRearBias; };
+    float           GetSuspensionAntiDiveMultiplier ( void ) const                  { return m_Handling.fSuspensionAntiDiveMultiplier; };
 
-    float           GetCollisionDamageMultiplier    ( void ) const    { return m_Handling.fCollisionDamageMultiplier; };
+    float           GetCollisionDamageMultiplier    ( void ) const                  { return m_Handling.fCollisionDamageMultiplier; };
 
-    unsigned int    GetHandlingFlags                ( void ) const    { return m_Handling.uiHandlingFlags; };
-    unsigned int    GetModelFlags                   ( void ) const    { return m_Handling.uiModelFlags; };
-    float           GetSeatOffsetDistance           ( void ) const    { return m_Handling.fSeatOffsetDistance; };
-    unsigned int    GetMonetary                     ( void ) const    { return m_Handling.uiMonetary; };
+    unsigned int    GetHandlingFlags                ( void ) const                  { return m_Handling.uiHandlingFlags; };
+    unsigned int    GetModelFlags                   ( void ) const                  { return m_Handling.uiModelFlags; };
+    float           GetSeatOffsetDistance           ( void ) const                  { return m_Handling.fSeatOffsetDistance; };
+    unsigned int    GetMonetary                     ( void ) const                  { return m_Handling.uiMonetary; };
 
-    eLightType      GetHeadLight                    ( void ) const    { return static_cast < eLightType > ( m_Handling.ucHeadLight ); };
-    eLightType      GetTailLight                    ( void ) const    { return static_cast < eLightType > ( m_Handling.ucTailLight ); };
-    unsigned char   GetAnimGroup                    ( void ) const    { return m_Handling.ucAnimGroup; };
+    eLightType      GetHeadLight                    ( void ) const                  { return static_cast < eLightType > ( m_Handling.ucHeadLight ); };
+    eLightType      GetTailLight                    ( void ) const                  { return static_cast < eLightType > ( m_Handling.ucTailLight ); };
+    unsigned char   GetAnimGroup                    ( void ) const                  { return m_Handling.ucAnimGroup; };
 
 
     // Set functions
@@ -173,11 +174,11 @@ public:
     void            SetCarEngineType                ( eEngineType Type )            { m_Handling.Transmission.ucEngineType = Type; };
     void            SetNumberOfGears                ( unsigned char ucNumber )      { m_Handling.Transmission.ucNumberOfGears = ucNumber; };
 
-    void            SetEngineAcceleration          ( float fAcceleration )        { m_Handling.Transmission.fEngineAcceleration = fAcceleration; };
+    void            SetEngineAcceleration          ( float fAcceleration )          { m_Handling.Transmission.fEngineAcceleration = fAcceleration; };
     void            SetEngineInertia                ( float fInertia )              { m_Handling.Transmission.fEngineInertia = fInertia; };
     void            SetMaxVelocity                  ( float fVelocity )             { m_Handling.Transmission.fMaxVelocity = fVelocity; };
     
-    void            SetBrakeDeceleration           ( float fDeceleration )        { m_Handling.fBrakeDeceleration = fDeceleration; };
+    void            SetBrakeDeceleration           ( float fDeceleration )          { m_Handling.fBrakeDeceleration = fDeceleration; };
     void            SetBrakeBias                    ( float fBias )                 { m_Handling.fBrakeBias = fBias; };
     void            SetABS                          ( bool bABS )                   { m_Handling.bABS = bABS; };
 

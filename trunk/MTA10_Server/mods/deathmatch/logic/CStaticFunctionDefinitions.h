@@ -278,10 +278,10 @@ public:
     static bool                 GetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, std::string& strValue, bool origin = false );
     static bool                 GetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, unsigned int& uiValue, bool origin = false );
     static bool                 GetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, unsigned char& ucValue, bool origin = false );
-    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, float& fValue );
-    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string& strValue );
-    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int& uiValue );
-    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char& ucValue );
+    static bool                 GetEntryHandling                    ( const CHandlingEntry* pEntry, eHandlingProperty eProperty, float& fValue );
+    static bool                 GetEntryHandling                    ( const CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string& strValue );
+    static bool                 GetEntryHandling                    ( const CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int& uiValue );
+    static bool                 GetEntryHandling                    ( const CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char& ucValue );
 
     // Vehicle set functions
     static bool                 FixVehicle                          ( CElement* pElement );
@@ -343,7 +343,7 @@ public:
     static bool                 SetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, unsigned char ucValue);
     static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, float fValue );
     static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, CVector vecValue );
-    static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string strValue, unsigned char& ucChar );
+    static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string strValue );
     static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int uiValue );
     static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char ucValue );
     static bool                 SetVehicleVariant                   ( CVehicle* pVehicle, unsigned char ucVariant, unsigned char ucVariant2 );

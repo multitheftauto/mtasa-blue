@@ -312,140 +312,142 @@ void CHandlingRPCs::RestoreVehicleHandlingProperty ( CClientEntity* pSource, Net
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( *pSource );
             CHandlingEntry* pHandlingEntry = Vehicle.GetHandlingData ();
             const CHandlingEntry* pOriginalEntry = Vehicle.GetOriginalHandlingData ();
-
-            // Depending on what property
-            switch ( ucProperty )
+            if ( pOriginalEntry )
             {
-                case HANDLING_MASS:
-                    pHandlingEntry->SetMass ( pOriginalEntry->GetMass () );
-                    break;
-                    
-                case HANDLING_TURNMASS:
-                    pHandlingEntry->SetTurnMass ( pOriginalEntry->GetTurnMass () );
-                    break;
+                // Depending on what property
+                switch ( ucProperty )
+                {
+                    case HANDLING_MASS:
+                        pHandlingEntry->SetMass ( pOriginalEntry->GetMass () );
+                        break;
 
-                case HANDLING_DRAGCOEFF:
-                    pHandlingEntry->SetDragCoeff ( pOriginalEntry->GetDragCoeff () );
-                    break;
+                    case HANDLING_TURNMASS:
+                        pHandlingEntry->SetTurnMass ( pOriginalEntry->GetTurnMass () );
+                        break;
 
-                case HANDLING_CENTEROFMASS:
-                    pHandlingEntry->SetCenterOfMass ( pOriginalEntry->GetCenterOfMass () );
-                    break;
+                    case HANDLING_DRAGCOEFF:
+                        pHandlingEntry->SetDragCoeff ( pOriginalEntry->GetDragCoeff () );
+                        break;
 
-                case HANDLING_PERCENTSUBMERGED:
-                    pHandlingEntry->SetPercentSubmerged ( pOriginalEntry->GetPercentSubmerged () );
-                    break;
+                    case HANDLING_CENTEROFMASS:
+                        pHandlingEntry->SetCenterOfMass ( pOriginalEntry->GetCenterOfMass () );
+                        break;
 
-                case HANDLING_TRACTIONMULTIPLIER:
-                    pHandlingEntry->SetTractionMultiplier ( pOriginalEntry->GetTractionMultiplier () );
-                    break;
+                    case HANDLING_PERCENTSUBMERGED:
+                        pHandlingEntry->SetPercentSubmerged ( pOriginalEntry->GetPercentSubmerged () );
+                        break;
 
-                case HANDLING_DRIVETYPE:
-                    pHandlingEntry->SetCarDriveType ( pOriginalEntry->GetCarDriveType () );
-                    break;
+                    case HANDLING_TRACTIONMULTIPLIER:
+                        pHandlingEntry->SetTractionMultiplier ( pOriginalEntry->GetTractionMultiplier () );
+                        break;
 
-                case HANDLING_ENGINETYPE:
-                    pHandlingEntry->SetCarEngineType ( pOriginalEntry->GetCarEngineType () );
-                    break;
+                    case HANDLING_DRIVETYPE:
+                        pHandlingEntry->SetCarDriveType ( pOriginalEntry->GetCarDriveType () );
+                        break;
 
-                case HANDLING_NUMOFGEARS:
-                    pHandlingEntry->SetNumberOfGears ( pOriginalEntry->GetNumberOfGears () );
-                    break;
+                    case HANDLING_ENGINETYPE:
+                        pHandlingEntry->SetCarEngineType ( pOriginalEntry->GetCarEngineType () );
+                        break;
 
-                case HANDLING_ENGINEACCELERATION:
-                    pHandlingEntry->SetEngineAcceleration ( pOriginalEntry->GetEngineAcceleration () );
-                    break;
+                    case HANDLING_NUMOFGEARS:
+                        pHandlingEntry->SetNumberOfGears ( pOriginalEntry->GetNumberOfGears () );
+                        break;
 
-                case HANDLING_ENGINEINERTIA:
-                    pHandlingEntry->SetEngineInertia ( pOriginalEntry->GetEngineInertia () );
-                    break;
+                    case HANDLING_ENGINEACCELERATION:
+                        pHandlingEntry->SetEngineAcceleration ( pOriginalEntry->GetEngineAcceleration () );
+                        break;
 
-                case HANDLING_MAXVELOCITY:
-                    pHandlingEntry->SetMaxVelocity ( pOriginalEntry->GetMaxVelocity () );
-                    break;
+                    case HANDLING_ENGINEINERTIA:
+                        pHandlingEntry->SetEngineInertia ( pOriginalEntry->GetEngineInertia () );
+                        break;
 
-                case HANDLING_BRAKEDECELERATION:
-                    pHandlingEntry->SetBrakeDeceleration ( pOriginalEntry->GetBrakeDeceleration () );
-                    break;
+                    case HANDLING_MAXVELOCITY:
+                        pHandlingEntry->SetMaxVelocity ( pOriginalEntry->GetMaxVelocity () );
+                        break;
 
-                case HANDLING_BRAKEBIAS:
-                    pHandlingEntry->SetBrakeBias ( pOriginalEntry->GetBrakeBias () );
-                    break;
+                    case HANDLING_BRAKEDECELERATION:
+                        pHandlingEntry->SetBrakeDeceleration ( pOriginalEntry->GetBrakeDeceleration () );
+                        break;
 
-                case HANDLING_ABS:
-                    pHandlingEntry->SetABS ( pOriginalEntry->GetABS () );
-                    break;
+                    case HANDLING_BRAKEBIAS:
+                        pHandlingEntry->SetBrakeBias ( pOriginalEntry->GetBrakeBias () );
+                        break;
 
-                case HANDLING_STEERINGLOCK:
-                    pHandlingEntry->SetSteeringLock ( pOriginalEntry->GetSteeringLock () );
-                    break;
+                    case HANDLING_ABS:
+                        pHandlingEntry->SetABS ( pOriginalEntry->GetABS () );
+                        break;
 
-                case HANDLING_TRACTIONLOSS:
-                    pHandlingEntry->SetTractionLoss ( pOriginalEntry->GetTractionLoss () );
-                    break;
+                    case HANDLING_STEERINGLOCK:
+                        pHandlingEntry->SetSteeringLock ( pOriginalEntry->GetSteeringLock () );
+                        break;
 
-                case HANDLING_TRACTIONBIAS:
-                    pHandlingEntry->SetTractionBias ( pOriginalEntry->GetTractionBias () );
-                    break;
+                    case HANDLING_TRACTIONLOSS:
+                        pHandlingEntry->SetTractionLoss ( pOriginalEntry->GetTractionLoss () );
+                        break;
 
-                case HANDLING_SUSPENSION_FORCELEVEL:
-                    pHandlingEntry->SetSuspensionForceLevel ( pOriginalEntry->GetSuspensionForceLevel () );
-                    break;
+                    case HANDLING_TRACTIONBIAS:
+                        pHandlingEntry->SetTractionBias ( pOriginalEntry->GetTractionBias () );
+                        break;
 
-                case HANDLING_SUSPENSION_DAMPING:
-                    pHandlingEntry->SetSuspensionDamping ( pOriginalEntry->GetSuspensionDamping () );
-                    break;
+                    case HANDLING_SUSPENSION_FORCELEVEL:
+                        pHandlingEntry->SetSuspensionForceLevel ( pOriginalEntry->GetSuspensionForceLevel () );
+                        break;
 
-                case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
-                    pHandlingEntry->SetSuspensionHighSpeedDamping ( pOriginalEntry->GetSuspensionHighSpeedDamping () );
-                    break;
+                    case HANDLING_SUSPENSION_DAMPING:
+                        pHandlingEntry->SetSuspensionDamping ( pOriginalEntry->GetSuspensionDamping () );
+                        break;
 
-                case HANDLING_SUSPENSION_UPPER_LIMIT:
-                    pHandlingEntry->SetSuspensionUpperLimit ( pOriginalEntry->GetSuspensionUpperLimit () );
-                    break;
+                    case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
+                        pHandlingEntry->SetSuspensionHighSpeedDamping ( pOriginalEntry->GetSuspensionHighSpeedDamping () );
+                        break;
 
-                case HANDLING_SUSPENSION_LOWER_LIMIT:
-                    pHandlingEntry->SetSuspensionLowerLimit ( pOriginalEntry->GetSuspensionLowerLimit () );
-                    break;
+                    case HANDLING_SUSPENSION_UPPER_LIMIT:
+                        pHandlingEntry->SetSuspensionUpperLimit ( pOriginalEntry->GetSuspensionUpperLimit () );
+                        break;
 
-                case HANDLING_SUSPENSION_FRONTREARBIAS:
-                    pHandlingEntry->SetSuspensionFrontRearBias ( pOriginalEntry->GetSuspensionFrontRearBias () );
-                    break;
+                    case HANDLING_SUSPENSION_LOWER_LIMIT:
+                        pHandlingEntry->SetSuspensionLowerLimit ( pOriginalEntry->GetSuspensionLowerLimit () );
+                        break;
 
-                case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
-                    pHandlingEntry->SetSuspensionAntiDiveMultiplier ( pOriginalEntry->GetSuspensionAntiDiveMultiplier () );
-                    break;
+                    case HANDLING_SUSPENSION_FRONTREARBIAS:
+                        pHandlingEntry->SetSuspensionFrontRearBias ( pOriginalEntry->GetSuspensionFrontRearBias () );
+                        break;
 
-                case HANDLING_COLLISIONDAMAGEMULTIPLIER:
-                    pHandlingEntry->SetCollisionDamageMultiplier ( pOriginalEntry->GetCollisionDamageMultiplier () );
-                    break;
+                    case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
+                        pHandlingEntry->SetSuspensionAntiDiveMultiplier ( pOriginalEntry->GetSuspensionAntiDiveMultiplier () );
+                        break;
 
-                case HANDLING_SEATOFFSETDISTANCE:
-                    pHandlingEntry->SetSeatOffsetDistance ( pOriginalEntry->GetSeatOffsetDistance () );
-                    break;
+                    case HANDLING_COLLISIONDAMAGEMULTIPLIER:
+                        pHandlingEntry->SetCollisionDamageMultiplier ( pOriginalEntry->GetCollisionDamageMultiplier () );
+                        break;
 
-                case HANDLING_HANDLINGFLAGS:
-                    pHandlingEntry->SetHandlingFlags ( pOriginalEntry->GetHandlingFlags () );
-                    break;
+                    case HANDLING_SEATOFFSETDISTANCE:
+                        pHandlingEntry->SetSeatOffsetDistance ( pOriginalEntry->GetSeatOffsetDistance () );
+                        break;
 
-                case HANDLING_MODELFLAGS:
-                    pHandlingEntry->SetModelFlags ( pOriginalEntry->GetModelFlags () );
-                    break;
+                    case HANDLING_HANDLINGFLAGS:
+                        pHandlingEntry->SetHandlingFlags ( pOriginalEntry->GetHandlingFlags () );
+                        break;
 
-                case HANDLING_HEADLIGHT:
-                    pHandlingEntry->SetHeadLight ( pOriginalEntry->GetHeadLight () );
-                    break;
+                    case HANDLING_MODELFLAGS:
+                        pHandlingEntry->SetModelFlags ( pOriginalEntry->GetModelFlags () );
+                        break;
 
-                case HANDLING_TAILLIGHT:
-                    pHandlingEntry->SetTailLight ( pOriginalEntry->GetTailLight () );
-                    break;
+                    case HANDLING_HEADLIGHT:
+                        pHandlingEntry->SetHeadLight ( pOriginalEntry->GetHeadLight () );
+                        break;
 
-                case HANDLING_ANIMGROUP:
-                    pHandlingEntry->SetAnimGroup ( pOriginalEntry->GetAnimGroup () );
-                    break;
+                    case HANDLING_TAILLIGHT:
+                        pHandlingEntry->SetTailLight ( pOriginalEntry->GetTailLight () );
+                        break;
+
+                    case HANDLING_ANIMGROUP:
+                        pHandlingEntry->SetAnimGroup ( pOriginalEntry->GetAnimGroup () );
+                        break;
+                }
+
+                Vehicle.ApplyHandling();
             }
-
-            Vehicle.ApplyHandling();
         }
     }
 }
@@ -458,8 +460,12 @@ void CHandlingRPCs::RestoreVehicleHandling ( CClientEntity* pSource, NetBitStrea
     {
         // Grab the vehicle handling entry and restore all data
         CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( *pSource );
-        Vehicle.GetHandlingData()->Assign ( Vehicle.GetOriginalHandlingData () );
+        const CHandlingEntry * pHandlingEntry = Vehicle.GetOriginalHandlingData ( );
+        if ( pHandlingEntry )
+        {
+            Vehicle.GetHandlingData()->Assign ( pHandlingEntry );
 
-        Vehicle.ApplyHandling();
+            Vehicle.ApplyHandling();
+        }
     }
 }
