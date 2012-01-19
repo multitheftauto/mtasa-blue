@@ -1088,6 +1088,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPlayerScreenShotPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPlayerSpawnPacket.cpp"
 						>
 					</File>
@@ -2274,6 +2278,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CPlayerQuitPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CPlayerScreenShotPacket.h"
 						>
 					</File>
 					<File

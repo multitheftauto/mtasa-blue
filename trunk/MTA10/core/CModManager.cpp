@@ -197,6 +197,9 @@ void CModManager::Unload ( void )
         // Unregister the commands it had registered
         CCore::GetSingleton ().GetCommands ()->DeleteAll ();
 
+        // Stop all screen grabs
+        CGraphics::GetSingleton ().GetScreenGrabber ()->ClearScreenShotQueue ();
+
         // Free the Client DLL
         FreeLibrary ( m_hClientDLL );
         m_hClientDLL = NULL;

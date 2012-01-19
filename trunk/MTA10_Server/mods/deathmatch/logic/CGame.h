@@ -58,6 +58,7 @@ class CGame;
 #include "packets/CPlayerTransgressionPacket.h"
 #include "packets/CPlayerDiagnosticPacket.h"
 #include "packets/CPlayerModInfoPacket.h"
+#include "packets/CPlayerScreenShotPacket.h"
 
 #include "CRPCFunctions.h"
 
@@ -370,6 +371,7 @@ private:
     void                        Packet_PlayerTransgression  ( class CPlayerTransgressionPacket& Packet );
     void                        Packet_PlayerDiagnostic     ( class CPlayerDiagnosticPacket& Packet );
     void                        Packet_PlayerModInfo        ( class CPlayerModInfoPacket & Packet );
+    void                        Packet_PlayerScreenShot     ( class CPlayerScreenShotPacket & Packet );
 
     static void                 PlayerCompleteConnect       ( CPlayer* pPlayer, bool bSuccess, const char* szError );
 

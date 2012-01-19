@@ -3037,6 +3037,41 @@ int CLuaFunctionDefinitions::ShowPlayerHudComponent ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::TakePlayerScreenShot ( lua_State* luaVM )
+{
+//  bool takePlayerScreenShot ( player thePlayer, int sizeX, int sizeY, string tag, int quality, int maxBandwidth, int maxPacketSize )
+    CElement* pElement; uint sizeX; uint sizeY; SString tag; uint quality; uint maxBandwidth; uint maxPacketSize;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData( pElement );
+    argStream.ReadNumber ( sizeX );
+    argStream.ReadNumber ( sizeY );
+    argStream.ReadString ( tag, "" );
+    argStream.ReadNumber ( quality, 30 );
+    argStream.ReadNumber ( maxBandwidth, 5000 );
+    argStream.ReadNumber ( maxPacketSize, 500 );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain * pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        CResource * pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
+        if ( pResource )
+        {
+            if ( CStaticFunctionDefinitions::TakePlayerScreenShot ( pElement, sizeX, sizeY, tag, quality, maxBandwidth, maxPacketSize, pResource->GetName () ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "takePlayerScreenShot", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::SetPlayerWantedLevel ( lua_State* luaVM )
 {
     int iArgument1 = lua_type ( luaVM, 1 );

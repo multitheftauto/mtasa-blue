@@ -67,6 +67,7 @@ void CSettings::CreateGUI ( void )
     m_bCaptureKey = false;
     m_dwFrameCount = 0;
     m_bShownVolumetricShadowsWarning = false;
+    m_bShownAllowScreenUploadMessage = false;
     CVector2D vecTemp;
 
     // Create the window
@@ -355,6 +356,11 @@ void CSettings::CreateGUI ( void )
     m_pAutoRefreshBrowser->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
     m_pAutoRefreshBrowser->GetPosition ( vecTemp, false );
     m_pAutoRefreshBrowser->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
+    m_pCheckBoxAllowScreenUpload = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, "Allow screen upload", true ) );
+    m_pCheckBoxAllowScreenUpload->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
+    m_pCheckBoxAllowScreenUpload->GetPosition ( vecTemp, false );
+    m_pCheckBoxAllowScreenUpload->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, "Use customized GTA:SA files", true ) );
     m_pCheckBoxCustomizedSAFiles->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
@@ -1010,6 +1016,7 @@ void CSettings::CreateGUI ( void )
     m_pComboFxQuality->SetSelectionHandler ( GUI_CALLBACK( &CSettings::OnFxQualityChanged, this ) );
     m_pCheckBoxVolumetricShadows->SetClickHandler ( GUI_CALLBACK( &CSettings::OnVolumetricShadowsClick, this ) );
     m_pStreamingMemory->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnStreamingMemoryChanged, this ) );
+    m_pCheckBoxAllowScreenUpload->SetClickHandler ( GUI_CALLBACK( &CSettings::OnAllowScreenUploadClick, this ) );
     m_pCheckBoxCustomizedSAFiles->SetClickHandler ( GUI_CALLBACK( &CSettings::OnCustomizedSAFilesClick, this ) );
     /*
     // Give a warning if no community account settings were stored in config
@@ -1177,6 +1184,11 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     CVARS_GET("volumetric_shadows", bVolumetricShadowsEnabled);
     m_pCheckBoxVolumetricShadows->SetSelected ( bVolumetricShadowsEnabled );
     m_pCheckBoxVolumetricShadows->SetEnabled ( FxQuality != 0 );
+
+    // Allow screen upload
+    bool bAllowScreenUploadEnabled;
+    CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
+    m_pCheckBoxAllowScreenUpload->SetSelected ( bAllowScreenUploadEnabled );
 
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected ( GetApplicationSettingInt ( "customized-sa-files-request" ) != 0 );
@@ -2205,6 +2217,11 @@ void CSettings::LoadData ( void )
 	m_pCheckBoxVolumetricShadows->SetSelected ( bVolumetricShadowsEnabled );
 	m_pCheckBoxVolumetricShadows->SetEnabled ( FxQuality != 0 );
 
+    // Allow screen upload
+    bool bAllowScreenUploadEnabled;
+    CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
+    m_pCheckBoxAllowScreenUpload->SetSelected ( bAllowScreenUploadEnabled );
+
     // Customized sa files
 	m_pCheckBoxCustomizedSAFiles->SetSelected ( GetApplicationSettingInt ( "customized-sa-files-request" ) != 0 );
 	m_pCheckBoxCustomizedSAFiles->SetVisible ( GetApplicationSettingInt ( "customized-sa-files-show" ) != 0 );
@@ -2494,6 +2511,10 @@ void CSettings::SaveData ( void )
     bool bVolumetricShadowsEnabled = m_pCheckBoxVolumetricShadows->GetSelected ();
     CVARS_SET ( "volumetric_shadows", bVolumetricShadowsEnabled );
 	gameSettings->SetVolumetricShadowsEnabled ( bVolumetricShadowsEnabled );
+
+    // Allow screen upload
+    bool bAllowScreenUploadEnabled = m_pCheckBoxAllowScreenUpload->GetSelected ();
+    CVARS_SET ( "allow_screen_upload", bAllowScreenUploadEnabled );
 
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected ();
@@ -3181,6 +3202,23 @@ bool CSettings::OnVolumetricShadowsClick ( CGUIElement* pElement )
     }
     return true;
 }
+
+//
+// AllowScreenUpload
+//
+bool CSettings::OnAllowScreenUploadClick ( CGUIElement* pElement )
+{
+    if ( !m_pCheckBoxAllowScreenUpload->GetSelected () && !m_bShownAllowScreenUploadMessage )
+    {
+        m_bShownAllowScreenUploadMessage = true;
+        SString strMessage;
+        strMessage += "Screen upload is required by some servers for anti-cheat purposes.";
+        strMessage += "\n\n(The chat box and GUI is excluded from the upload)\n";
+        CCore::GetSingleton ().ShowMessageBox ( "SCREEN UPLOAD INFORMATION", strMessage, MB_BUTTON_OK | MB_ICON_INFO );
+    }
+    return true;
+}
+
 
 //
 // CustomizedSAFiles

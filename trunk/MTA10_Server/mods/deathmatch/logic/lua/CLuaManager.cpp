@@ -289,6 +289,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPlayerName", CLuaFunctionDefinitions::SetPlayerName );
     CLuaCFunctions::AddFunction ( "detonateSatchels", CLuaFunctionDefinitions::DetonateSatchels );
     CLuaCFunctions::AddFunction ( "setWeaponProperty", CLuaFunctionDefinitions::SetWeaponProperty );
+    CLuaCFunctions::AddFunction ( "takePlayerScreenShot", CLuaFunctionDefinitions::TakePlayerScreenShot );
 
     // Ped get functions
     CLuaCFunctions::AddFunction ( "getPedWeaponSlot", CLuaFunctionDefinitions::GetPedWeaponSlot );

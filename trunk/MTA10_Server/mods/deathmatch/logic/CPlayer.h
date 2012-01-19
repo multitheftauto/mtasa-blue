@@ -52,6 +52,19 @@ struct SNearInfo
     long long llLastUpdateTime;
 };
 
+struct SScreenShotInfo
+{
+    bool        bInProgress;
+    ushort      usNextPartNumber;
+    ushort      usScreenShotId;
+    long long   llTimeStamp;
+    uint        uiTotalBytes;
+    ushort      usTotalParts;
+    SString     strResourceName;
+    SString     strTag;
+    CBuffer     buffer;
+};
+
 
 class CPlayer : public CPed, public CClient
 {
@@ -241,6 +254,8 @@ public:
     void                                        MovePlayerToNearList        ( CPlayer* pOther );
     void                                        MovePlayerToFarList         ( CPlayer* pOther );
 
+    SScreenShotInfo&                            GetScreenShotInfo           ( void )                        { return m_ScreenShotInfo; }
+
 public:
 
     //
@@ -415,6 +430,8 @@ private:
 
     long long                                   m_llLastPositionHasChanged;
     SString                                     m_strIP;
+
+    SScreenShotInfo                             m_ScreenShotInfo;
 };
 
 #endif

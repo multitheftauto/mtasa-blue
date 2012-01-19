@@ -153,6 +153,7 @@ public:
     static bool                 RedirectPlayer                      ( CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword );
     static bool                 SetPlayerName                       ( CElement* pElement, const char* szName );
     static bool                 DetonateSatchels                    ( CElement* pElement );
+    static bool                 TakePlayerScreenShot                ( CElement* pElement, uint uiSizeX, uint uiSizeY, const SString& strTag, uint uiQuality, uint uiMaxBandwidth, uint uiMaxPacketSize, const SString& strResourceName );
 
     // Ped get funcs
     static CPed*                CreatePed                           ( CResource* pResource, unsigned short usModel, const CVector& vecPosition, float fRotation = 0.0f, bool bSynced = true );

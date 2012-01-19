@@ -142,6 +142,9 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     // Draw pre-GUI primitives
     CGraphics::GetSingleton ().DrawPreGUIQueue ();
 
+    // Maybe grab screen for upload
+    CGraphics::GetSingleton ().GetScreenGrabber ()->DoPulse ();
+
     // Draw the GUI
     CLocalGUI::GetSingleton().Draw ();
 
