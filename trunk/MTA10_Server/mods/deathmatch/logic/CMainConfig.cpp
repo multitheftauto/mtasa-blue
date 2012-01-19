@@ -1056,6 +1056,12 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
         return true;
     }
     else
+    if ( strName == "verifyclientsettings" )
+    {
+        strValue = SString ( "%d", m_iEnableClientChecks );
+        return true;
+    }
+    else
     {
         //
         // Everything else is read only, so can be fetched directly from the XML data
