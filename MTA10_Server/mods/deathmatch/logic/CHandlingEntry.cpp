@@ -16,15 +16,16 @@
 
 CHandlingEntry::CHandlingEntry ( tHandlingData* pOriginal )
 {
-    // Store gta's pointer
-    memcpy ( &m_Handling, pOriginal, sizeof ( tHandlingData ) );
+    if ( pOriginal )
+    {
+        // Copy the data from our original
+        m_Handling = *pOriginal;
+    }
 }
 
-
-// Apply the handlingdata from another data
-void CHandlingEntry::ApplyHandlingData ( CHandlingEntry* pData )
+// Apply the handling data from another data
+void CHandlingEntry::ApplyHandlingData ( const CHandlingEntry* pData )
 {
-    // Copy the data
-    CHandlingEntry* pEntry = static_cast < CHandlingEntry* > ( pData );
-    m_Handling = pEntry->m_Handling;
+    // Copy the data from our handling entry
+    m_Handling = pData->m_Handling;
 }

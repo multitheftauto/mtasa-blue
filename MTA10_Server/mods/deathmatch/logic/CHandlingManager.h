@@ -28,7 +28,7 @@ public:
 
     bool                        ApplyHandlingData               ( eVehicleTypes eModel, CHandlingEntry* pEntry );
 
-    CHandlingEntry*             GetModelHandlingData            ( eVehicleTypes eModel );
+    const CHandlingEntry*       GetModelHandlingData            ( eVehicleTypes eModel );
     const CHandlingEntry*       GetOriginalHandlingData         ( eVehicleTypes eModel );
 
     eHandlingTypes              GetHandlingID                   ( eVehicleTypes eModel );
@@ -49,9 +49,9 @@ private:
     static CHandlingEntry*      m_pOriginalEntries [HT_MAX];
 
     // Array with the model handling entries
-    static CHandlingEntry*      m_pModelEntries [VT_MAX];
+    static CHandlingEntry*      m_pModelEntries [HT_MAX];
 
-    bool                        m_bModelHandlingChanged[VT_MAX];
+    bool                        m_bModelHandlingChanged[HT_MAX];
 };
 
 #endif

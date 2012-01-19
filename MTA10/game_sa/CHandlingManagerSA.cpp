@@ -175,7 +175,8 @@ eHandlingProperty CHandlingManagerSA::GetPropertyEnumFromName ( std::string strN
 
 CHandlingEntry* CHandlingManagerSA::CreateHandlingData ( void )
 {
-    return new CHandlingEntrySA ();
+    CHandlingEntrySA * pHandlingEntry = new CHandlingEntrySA ();
+    return pHandlingEntry;
 }
 
 
@@ -184,8 +185,10 @@ const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData ( eVehicleType
     // Within range?
     if ( eModel >= 400 && eModel < VT_MAX )
     {
+        // Get our Handling ID
+        eHandlingTypes eHandling = GetHandlingID ( eModel );
         // Return it
-        return m_pOriginalEntries [GetHandlingID(eModel)];
+        return m_pOriginalEntries [eHandling];
     }
 
     return NULL;
@@ -7986,32 +7989,33 @@ void CHandlingManagerSA::CheckSuspensionChanges ( CHandlingEntry* pEntry )
 {
     // Grab us a multiplayer_sa pointer
     CMultiplayer * pMultiplayer = g_pCore->GetMultiplayer();
+    eVehicleTypes eModel = pEntry->GetModel ( );
     // Find our original data
-    const CHandlingEntry * pOriginal = m_pOriginalEntries [ pEntry->GetModel ( ) ];    
+    const CHandlingEntry * pOriginal = m_pOriginalEntries [ eModel ];
     // Default bChanged to false
     bool bChanged = false;
     
     // loads of if statements because I'm pro like that... na j/k
     // Set bChanged to true if we find ANY change.
-    if ( pEntry->GetSuspensionAntiDiveMultiplier () != pOriginal->GetSuspensionAntiDiveMultiplier () )
+    if ( pEntry->GetSuspensionAntiDiveMultiplier ( ) != pOriginal->GetSuspensionAntiDiveMultiplier ( ) )
         bChanged = true;
 
-    if ( pEntry->GetSuspensionDamping () != pOriginal->GetSuspensionDamping () )
+    if ( pEntry->GetSuspensionDamping ( ) != pOriginal->GetSuspensionDamping ( ) )
         bChanged = true;
 
-    if ( pEntry->GetSuspensionForceLevel () != pOriginal->GetSuspensionForceLevel () )
+    if ( pEntry->GetSuspensionForceLevel ( ) != pOriginal->GetSuspensionForceLevel ( ) )
         bChanged = true;
 
-    if ( pEntry->GetSuspensionFrontRearBias () != pOriginal->GetSuspensionFrontRearBias () )
+    if ( pEntry->GetSuspensionFrontRearBias ( ) != pOriginal->GetSuspensionFrontRearBias () )
         bChanged = true;
 
-    if ( pEntry->GetSuspensionHighSpeedDamping () != pOriginal->GetSuspensionHighSpeedDamping () )
+    if ( pEntry->GetSuspensionHighSpeedDamping ( ) != pOriginal->GetSuspensionHighSpeedDamping () )
         bChanged = true;
 
-    if ( pEntry->GetSuspensionLowerLimit () != pOriginal->GetSuspensionLowerLimit () )
+    if ( pEntry->GetSuspensionLowerLimit ( ) != pOriginal->GetSuspensionLowerLimit ( ) )
         bChanged = true;
 
-    if ( pEntry->GetSuspensionUpperLimit () != pOriginal->GetSuspensionUpperLimit () )
+    if ( pEntry->GetSuspensionUpperLimit ( ) != pOriginal->GetSuspensionUpperLimit ( ) )
         bChanged = true;
 
     // Is bChanged true and the suspension flag changed marker false
