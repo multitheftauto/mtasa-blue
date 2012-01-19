@@ -72,6 +72,8 @@ namespace
                                          { "removeWorldModel",          "1.2.0-9.03618" },
                                          { "restoreWorldModel",         "1.2.0-9.03618" },
                                          { "restoreAllWorldModels",     "1.2.0-9.03618" },
+                                         { "takePlayerScreenShot",      "1.3" },
+                                         { "onPlayerScreenShot",        "1.3" },
                                         };
 
 
