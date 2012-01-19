@@ -1110,6 +1110,12 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
         return true;
     }
     else
+    if ( strName == "verifyclientsettings" )
+    {
+        strValue = SString ( "%d", m_iEnableClientChecks );
+        return true;
+    }
+    else
     if ( strName == "congestion_control" )
     {
         strValue = "both";
