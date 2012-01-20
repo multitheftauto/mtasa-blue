@@ -48,6 +48,8 @@ public:
     static int      getFarClipDistance                  ( lua_State* luaVM );
     static int      getFogDistance                      ( lua_State* luaVM );
     static int      getAircraftMaxHeight                ( lua_State* luaVM );
+    static int      setOcclusionsEnabled                ( lua_State* luaVM );
+    static int      getOcclusionsEnabled                ( lua_State* luaVM );
 
     // Set
     static int      setTime                             ( lua_State* luaVM );

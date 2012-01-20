@@ -52,6 +52,7 @@ public:
     DECLARE_RPC ( SetFarClipDistance );
     DECLARE_RPC ( SetFogDistance );
     DECLARE_RPC ( SetAircraftMaxHeight );
+    DECLARE_RPC ( SetOcclusionsEnabled );
     DECLARE_RPC ( ResetRainLevel );
     DECLARE_RPC ( ResetSunSize );
     DECLARE_RPC ( ResetSunColor );

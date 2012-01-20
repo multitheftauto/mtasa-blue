@@ -327,5 +327,11 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     }
     BitStream.WriteBit( false );
 
+    if ( BitStream.Version () >= 0x25 )
+    {
+        bool bOcclusionsEnabled = g_pGame->GetOcclusionsEnabled ();
+        BitStream.WriteBit( bOcclusionsEnabled );
+    }
+
     return true;
 }

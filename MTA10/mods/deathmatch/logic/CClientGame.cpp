@@ -3302,6 +3302,7 @@ void CClientGame::Event_OnIngame ( void )
     g_pGame->GetPathFind ()->SetVehicleDensity ( 0.0f );
 
     g_pGame->GetWorld ( )->ClearRemovedBuildingLists ( );
+    g_pGame->GetWorld ( )->SetOcclusionsEnabled ( true );
 
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat ( CITIES_PASSED, 2.0 );

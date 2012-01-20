@@ -674,6 +674,7 @@ public:
     LUA_DECLARE ( AreTrafficLightsLocked );
     LUA_DECLARE ( GetJetpackMaxHeight );
     LUA_DECLARE ( GetAircraftMaxHeight );
+    LUA_DECLARE ( GetOcclusionsEnabled );
 
     LUA_DECLARE ( SetTime );
     LUA_DECLARE ( GetSkyGradient );
@@ -726,6 +727,7 @@ public:
     LUA_DECLARE ( RestoreWorldBuildings );
     LUA_DECLARE ( RestoreWorldBuilding );
     LUA_DECLARE ( SetAircraftMaxHeight );
+    LUA_DECLARE ( SetOcclusionsEnabled );
     LUA_DECLARE ( CreateSWATRope );
     LUA_DECLARE ( SetBirdsEnabled );
     LUA_DECLARE ( GetBirdsEnabled );

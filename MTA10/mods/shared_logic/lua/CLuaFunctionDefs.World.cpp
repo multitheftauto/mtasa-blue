@@ -1370,6 +1370,30 @@ int CLuaFunctionDefs::SetAircraftMaxHeight ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::SetOcclusionsEnabled ( lua_State* luaVM )
+{
+//  bool setOcclusionsEnabled ( bool enabled )
+    bool bEnabled;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadBool ( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetOcclusionsEnabled ( bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setOcclusionsEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::IsWorldSpecialPropertyEnabled ( lua_State* luaVM )
 {
 //  bool isWorldSpecialPropertyEnabled ( string propname )
@@ -1447,6 +1471,12 @@ int CLuaFunctionDefs::GetJetpackMaxHeight ( lua_State* luaVM )
 int CLuaFunctionDefs::GetAircraftMaxHeight ( lua_State* luaVM )
 {
     lua_pushnumber ( luaVM, g_pGame->GetWorld ()->GetAircraftMaxHeight ( ) );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetOcclusionsEnabled ( lua_State* luaVM )
+{
+    lua_pushboolean ( luaVM, g_pGame->GetWorld ()->GetOcclusionsEnabled ( ) );
     return 1;
 }
 

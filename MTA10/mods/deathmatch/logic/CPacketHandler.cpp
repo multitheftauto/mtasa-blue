@@ -2268,6 +2268,12 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
         bitStream.Read( fZ );
         g_pGame->GetWorld ( )->RemoveBuilding( usModel, fRadius, fX, fY, fZ );
     }
+
+    bool bOcclusionsEnabled = true;
+    if ( bitStream.Version () >= 0x25 )
+        bitStream.ReadBit ( bOcclusionsEnabled );
+
+    g_pGame->GetWorld ( )->SetOcclusionsEnabled ( bOcclusionsEnabled );
 }
 
 

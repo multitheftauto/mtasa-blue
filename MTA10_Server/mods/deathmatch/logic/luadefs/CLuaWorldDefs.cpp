@@ -42,6 +42,7 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getFarClipDistance", CLuaWorldDefs::getFarClipDistance );
     CLuaCFunctions::AddFunction ( "getFogDistance", CLuaWorldDefs::getFogDistance );
     CLuaCFunctions::AddFunction ( "getAircraftMaxHeight", CLuaWorldDefs::getAircraftMaxHeight );
+    CLuaCFunctions::AddFunction ( "getOcclusionsEnabled", CLuaWorldDefs::getOcclusionsEnabled );
 
     // Set
     CLuaCFunctions::AddFunction ( "setTime", CLuaWorldDefs::setTime );
@@ -68,6 +69,7 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setFarClipDistance", CLuaWorldDefs::setFarClipDistance );
     CLuaCFunctions::AddFunction ( "setFogDistance", CLuaWorldDefs::setFogDistance );
     CLuaCFunctions::AddFunction ( "setAircraftMaxHeight", CLuaWorldDefs::setAircraftMaxHeight );
+    CLuaCFunctions::AddFunction ( "setOcclusionsEnabled", CLuaWorldDefs::setOcclusionsEnabled );
 
     // Reset
     CLuaCFunctions::AddFunction ( "resetSkyGradient", CLuaWorldDefs::resetSkyGradient );
@@ -1225,3 +1227,37 @@ int CLuaWorldDefs::getAircraftMaxHeight ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaWorldDefs::setOcclusionsEnabled ( lua_State* luaVM )
+{
+//  bool setOcclusionsEnabled ( bool enabled )
+    bool bEnabled;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadBool( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetOcclusionsEnabled ( bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setOcclusionsEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::getOcclusionsEnabled ( lua_State* luaVM )
+{
+    bool bEnabled;
+    if ( CStaticFunctionDefinitions::GetOcclusionsEnabled ( bEnabled ) )
+    {
+        lua_pushboolean ( luaVM, bEnabled );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
