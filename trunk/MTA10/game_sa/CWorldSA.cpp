@@ -476,6 +476,26 @@ float CWorldSA::GetAircraftMaxHeight ( void )
     return g_pCore->GetMultiplayer ( )->GetAircraftMaxHeight ( );
 }
 
+void CWorldSA::SetOcclusionsEnabled ( bool bEnabled )
+{
+    if ( !bEnabled )
+    {
+        MemPut < BYTE > ( FUNC_COcclusion_ProcessBeforeRendering, 0xC3 );   // retn
+        MemPutFast < int > ( VAR_COcclusion_NumActiveOccluders, 0 );
+    }
+    else
+    {
+        MemPut < BYTE > ( FUNC_COcclusion_ProcessBeforeRendering, 0x51 );   // Standard value
+    }
+}
+
+bool CWorldSA::GetOcclusionsEnabled ( void )
+{
+    if ( *(BYTE*)FUNC_COcclusion_ProcessBeforeRendering == 0x51 )           // Is standard value ?
+        return true;
+    return false;
+}
+
 void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, float fX, float fY, float fZ )
 {    
     // New building Removal

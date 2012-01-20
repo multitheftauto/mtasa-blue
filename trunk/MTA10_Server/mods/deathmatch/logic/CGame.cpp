@@ -150,6 +150,8 @@ CGame::CGame ( void )
     m_ucTrafficLightState = 0;
     m_ulLastTrafficUpdate = 0;
 
+    m_bOcclusionsEnabled = true;
+
     memset( m_bGarageStates, 0, sizeof(bool) * MAX_GARAGES );
 
     // init our mutex

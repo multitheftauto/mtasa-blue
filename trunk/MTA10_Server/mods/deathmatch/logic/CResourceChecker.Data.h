@@ -43,7 +43,8 @@ namespace
                                          { "dxSetShaderTransform",      "1.2.0-9.03618" },
                                          { "onClientVehicleCollision",  "1.3" },
                                          { "setBirdsEnabled",           "1.3" },
-                                         { "getBirdsEnabled",           "1.3" },
+                                         { "setOcclusionsEnabled",      "1.3" },
+                                         { "getOcclusionsEnabled",      "1.3" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
@@ -74,6 +75,8 @@ namespace
                                          { "restoreAllWorldModels",     "1.2.0-9.03618" },
                                          { "takePlayerScreenShot",      "1.3" },
                                          { "onPlayerScreenShot",        "1.3" },
+                                         { "setOcclusionsEnabled",      "1.3" },
+                                         { "getOcclusionsEnabled",      "1.3" },
                                         };
 
 

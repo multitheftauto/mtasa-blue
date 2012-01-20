@@ -5420,6 +5420,12 @@ bool CStaticFunctionDefinitions::SetAircraftMaxHeight ( float fHeight )
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetOcclusionsEnabled ( bool bEnabled )
+{
+    g_pGame->GetWorld ()->SetOcclusionsEnabled ( bEnabled );
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetTrafficLightState ( unsigned char ucState )
 {
     if ( ucState >= 0 && ucState < 10 )

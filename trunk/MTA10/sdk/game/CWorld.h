@@ -161,6 +161,8 @@ public:
     virtual float       GetJetpackMaxHeight         ( void ) = 0;
     virtual void        SetAircraftMaxHeight        ( float fHeight ) = 0;
     virtual float       GetAircraftMaxHeight        ( void ) = 0;
+    virtual void        SetOcclusionsEnabled        ( bool bEnabled ) = 0;
+    virtual bool        GetOcclusionsEnabled        ( void ) = 0;
     virtual void        RemoveBuilding              ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ) = 0;
     virtual bool        IsRemovedModelInRadius      ( SIPLInst* pInst ) = 0;
     virtual bool        IsModelRemoved              ( unsigned short usModelID ) = 0;
