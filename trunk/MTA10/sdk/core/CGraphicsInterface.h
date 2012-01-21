@@ -105,6 +105,7 @@ public:
     // Subsystems
     virtual CRenderItemManagerInterface*   GetRenderItemManager  ( void ) = 0;
     virtual CScreenGrabberInterface*       GetScreenGrabber     ( void ) = 0;
+    virtual CPixelsManagerInterface*       GetPixelsManager     ( void ) = 0;
 };
 
 #endif

@@ -390,11 +390,38 @@ int CLuaFunctionDefs::dxGetFontHeight ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
 {
-//  element dxCreateTexture( string filepath )
-    SString strFilePath;
+//  element dxCreateTexture( string filepath, string textureFormat, bool mipmaps )
+//  element dxCreateTexture( string pixels, string textureFormat, bool mipmaps )
+//  element dxCreateTexture( int width, int height, string textureFormat )
+    SString strFilePath; CPixels pixels; int width; int height; ERenderFormat renderFormat; bool bMipMaps;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strFilePath );
+    if ( !argStream.NextIsNumber () )
+    {
+        argStream.ReadCharStringRef ( pixels.externalData );
+        if ( !g_pCore->GetGraphics ()->GetPixelsManager ()->IsPixels ( pixels ) )
+        {
+            // element dxCreateTexture( string filepath, string textureFormat, bool mipmaps )
+            pixels = CPixels ();
+            argStream = CScriptArgReader ( luaVM );
+            argStream.ReadString ( strFilePath );
+            argStream.ReadEnumString ( renderFormat, RFORMAT_UNKNOWN );
+            argStream.ReadBool ( bMipMaps, true );
+        }
+        else
+        {
+            // element dxCreateTexture( string pixels, string textureFormat, bool mipmaps )
+            argStream.ReadEnumString ( renderFormat, RFORMAT_UNKNOWN );
+            argStream.ReadBool ( bMipMaps, true );
+        }
+    }
+    else
+    {
+        // element dxCreateTexture( int width, int height, string textureFormat )
+        argStream.ReadNumber ( width );
+        argStream.ReadNumber ( height );
+        argStream.ReadEnumString ( renderFormat, RFORMAT_UNKNOWN );
+    }
 
     if ( !argStream.HasErrors () )
     {
@@ -402,26 +429,54 @@ int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
         if ( pLuaMain )
         {
             CResource* pParentResource = pLuaMain->GetResource ();
-            CResource* pFileResource = pParentResource;
-            SString strPath, strMetaPath;
-            if ( CResourceManager::ParseResourcePathInput( strFilePath, pFileResource, strPath, strMetaPath ) )
+
+            if ( !strFilePath.empty () )
             {
-                if ( FileExists ( strPath ) )
+                // From file
+                CResource* pFileResource = pParentResource;
+                SString strPath, strMetaPath;
+                if ( CResourceManager::ParseResourcePathInput( strFilePath, pFileResource, strPath, strMetaPath ) )
                 {
-                    CClientTexture* pTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateTexture ( strPath );
-                    if ( pTexture )
+                    if ( FileExists ( strPath ) )
                     {
-                        // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
-                        pTexture->SetParent ( pParentResource->GetResourceDynamicEntity () );
+                        CClientTexture* pTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateTexture ( strPath, NULL, bMipMaps, RDEFAULT, RDEFAULT, renderFormat );
+                        if ( pTexture )
+                        {
+                            // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+                            pTexture->SetParent ( pParentResource->GetResourceDynamicEntity () );
+                        }
+                        lua_pushelement ( luaVM, pTexture );
+                        return 1;
                     }
-                    lua_pushelement ( luaVM, pTexture );
-                    return 1;
+                    else
+                        m_pScriptDebugging->LogBadPointer ( luaVM, "dxCreateTexture", "file-path", 1 );
                 }
                 else
                     m_pScriptDebugging->LogBadPointer ( luaVM, "dxCreateTexture", "file-path", 1 );
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "dxCreateTexture", "file-path", 1 );
+            if ( pixels.GetSize () )
+            {
+                // From pixels
+                CClientTexture* pTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateTexture ( "", &pixels, bMipMaps, RDEFAULT, RDEFAULT, renderFormat );
+                if ( pTexture )
+                {
+                    pTexture->SetParent ( pParentResource->GetResourceDynamicEntity () );
+                }
+                lua_pushelement ( luaVM, pTexture );
+                return 1;
+            }
+            else
+            {
+                // Blank sized
+                CClientTexture* pTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateTexture ( "", NULL, false, width, height, renderFormat );
+                if ( pTexture )
+                {
+                    pTexture->SetParent ( pParentResource->GetResourceDynamicEntity () );
+                }
+                lua_pushelement ( luaVM, pTexture );
+                return 1;
+            }
         }
     }
     else
@@ -916,10 +971,220 @@ int CLuaFunctionDefs::dxGetStatus ( lua_State* luaVM )
         lua_pushnumber ( luaVM, dxStatus.settings.iStreamingMemory );
         lua_settable   ( luaVM, -3 );
 
+        lua_pushstring ( luaVM, "AllowScreenUpload" );
+        lua_pushboolean ( luaVM, dxStatus.settings.bAllowScreenUpload );
+        lua_settable   ( luaVM, -3 );
+
         return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxGetStatus", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxGetTexturePixels ( lua_State* luaVM )
+{
+//  string dxGetTexturePixels( element texture [, int x, int y, int width, int height ] )
+    CClientTexture* pTexture; int x; int y; int width; int height;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pTexture );
+    argStream.ReadNumber ( x, 0 );
+    argStream.ReadNumber ( y, 0 );
+    argStream.ReadNumber ( width, 0 );
+    argStream.ReadNumber ( height, 0 );
+
+    if ( !argStream.HasErrors () )
+    {
+        RECT rc = { x, y, x + width, y + height };
+        CPixels pixels;
+        if ( g_pCore->GetGraphics ()->GetPixelsManager ()->GetTexturePixels ( pTexture->GetTextureItem ()->m_pD3DTexture, pixels, height ? &rc : NULL ) )
+        {
+            lua_pushlstring ( luaVM, pixels.GetData (), pixels.GetSize () );
+            return 1;           
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxGetTexturePixels", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxSetTexturePixels ( lua_State* luaVM )
+{
+//  string dxGetTexturePixels( element texture, string pixels [, int x, int y, int width, int height ] )
+    CClientTexture* pTexture; CPixels pixels; int x; int y; int width; int height;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pTexture );
+    argStream.ReadCharStringRef ( pixels.externalData );
+    argStream.ReadNumber ( x, 0 );
+    argStream.ReadNumber ( y, 0 );
+    argStream.ReadNumber ( width, 0 );
+    argStream.ReadNumber ( height, 0 );
+
+    if ( !argStream.HasErrors () )
+    {
+        RECT rc = { x, y, x + width, y + height };
+        if ( g_pCore->GetGraphics ()->GetPixelsManager ()->SetTexturePixels ( pTexture->GetTextureItem ()->m_pD3DTexture, pixels, height ? &rc : NULL ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;           
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxGetTexturePixels", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxGetPixelsSize ( lua_State* luaVM )
+{
+//  int x,y dxGetPixelsSize( string pixels )
+    CPixels pixels;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadCharStringRef ( pixels.externalData );
+
+    if ( !argStream.HasErrors () )
+    {
+        uint uiSizeX;
+        uint uiSizeY;
+        if ( g_pCore->GetGraphics ()->GetPixelsManager ()->GetPixelsSize ( pixels, uiSizeX, uiSizeY ) )
+        {
+            lua_pushinteger ( luaVM, uiSizeX );
+            lua_pushinteger ( luaVM, uiSizeY );
+            return 2;           
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxGetPixelsSize", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxGetPixelsFormat ( lua_State* luaVM )
+{
+//  string dxGetPixelsFormat( string pixels )
+    CPixels pixels;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadCharStringRef ( pixels.externalData );
+
+    if ( !argStream.HasErrors () )
+    {
+        EPixelsFormatType format = g_pCore->GetGraphics ()->GetPixelsManager ()->GetPixelsFormat ( pixels );
+        if ( format != EPixelsFormat::UNKNOWN )
+        {
+            lua_pushstring ( luaVM, EnumToString ( format ) );
+            return 1;           
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxGetPixelsFormat", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxConvertPixels ( lua_State* luaVM )
+{
+//  string dxConvertPixels( string pixels, string pixelFormat [, int quality] )
+    CPixels pixels; EPixelsFormatType format; int quality;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadCharStringRef ( pixels.externalData );
+    argStream.ReadEnumString ( format );
+    argStream.ReadNumber ( quality, 80 );
+
+    if ( !argStream.HasErrors () )
+    {
+        CPixels newPixels;
+        if ( g_pCore->GetGraphics ()->GetPixelsManager ()->ChangePixelsFormat ( pixels, newPixels, format, quality ) )
+        {
+            lua_pushlstring ( luaVM, newPixels.GetData (), newPixels.GetSize () );
+            return 1;           
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxConvertPixels", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxGetPixelColor ( lua_State* luaVM )
+{
+//  int r,g,b,a dxSetPixelColor( string pixels, int x, int y )
+    CPixels pixels; int x; int y;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadCharStringRef ( pixels.externalData );
+    argStream.ReadNumber ( x );
+    argStream.ReadNumber ( y );
+
+    if ( !argStream.HasErrors () )
+    {
+        SColor color;
+        if ( g_pCore->GetGraphics ()->GetPixelsManager ()->GetPixelColor ( pixels, x, y, color ) )
+        {
+            lua_pushnumber ( luaVM, color.R );
+            lua_pushnumber ( luaVM, color.G );
+            lua_pushnumber ( luaVM, color.B );
+            lua_pushnumber ( luaVM, color.A );
+            return 4;           
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxGetPixelColor", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxSetPixelColor ( lua_State* luaVM )
+{
+//  bool dxSetPixelColor( string pixels, int x, int y, int r, int g, int b [, int a] )
+    CPixels pixels; int x; int y; SColor color;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadCharStringRef ( pixels.externalData );
+    argStream.ReadNumber ( x );
+    argStream.ReadNumber ( y );
+    argStream.ReadNumber ( color.R );
+    argStream.ReadNumber ( color.G );
+    argStream.ReadNumber ( color.B );
+    argStream.ReadNumber ( color.A, 255 );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( g_pCore->GetGraphics ()->GetPixelsManager ()->SetPixelColor ( pixels, x, y, color ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;           
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetPixelColor", *argStream.GetErrorMessage () ) );
 
     // error: bad arguments
     lua_pushboolean ( luaVM, false );

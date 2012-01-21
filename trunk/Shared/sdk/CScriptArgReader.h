@@ -158,6 +158,26 @@ public:
 
 
     //
+    // Read next string as a string reference
+    //
+    bool ReadCharStringRef ( SCharStringRef& outValue )
+    {
+        int iArgument = lua_type ( m_luaVM, m_iIndex );
+        if ( iArgument == LUA_TSTRING )
+        {
+            outValue.pData = (char*)lua_tolstring ( m_luaVM, m_iIndex++, &outValue.uiSize );
+            return true;
+        }
+
+        outValue.pData = NULL;
+        outValue.uiSize = 0;
+        SetTypeError ( "string" );
+        m_iIndex++;
+        return false;
+    }
+
+
+    //
     // Read next string as an enum
     //
     template < class T >

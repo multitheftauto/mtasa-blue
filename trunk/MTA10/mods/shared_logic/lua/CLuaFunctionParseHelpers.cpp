@@ -230,6 +230,24 @@ ADD_ENUM ( WEAPONSKILL_STD,                             "std" )
 ADD_ENUM ( WEAPONSKILL_PRO,                             "pro" )
 IMPLEMENT_ENUM_END( "weapon-skill" )
 
+IMPLEMENT_ENUM_BEGIN( ERenderFormat )
+    ADD_ENUM ( RFORMAT_UNKNOWN,      "unknown" )
+    ADD_ENUM ( RFORMAT_ARGB,         "argb" )
+    ADD_ENUM ( RFORMAT_DXT1,         "dxt1" )
+    ADD_ENUM ( RFORMAT_DXT2,         "dxt2" )
+    ADD_ENUM ( RFORMAT_DXT3,         "dxt3" )
+    ADD_ENUM ( RFORMAT_DXT4,         "dxt4" )
+    ADD_ENUM ( RFORMAT_DXT5,         "dxt5" )
+IMPLEMENT_ENUM_END( "texture-format" )
+
+IMPLEMENT_ENUM_BEGIN( EPixelsFormatType )
+    ADD_ENUM ( EPixelsFormat::UNKNOWN,      "unknown" )
+    ADD_ENUM ( EPixelsFormat::PLAIN,        "plain" )
+    ADD_ENUM ( EPixelsFormat::JPEG,         "jpeg" )
+    ADD_ENUM ( EPixelsFormat::PNG,          "png" )
+IMPLEMENT_ENUM_END( "pixel-format" )
+
+
 //
 // Get best guess at name of userdata type
 //

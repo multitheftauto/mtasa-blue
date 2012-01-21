@@ -9,7 +9,6 @@
 *
 *****************************************************************************/
 
-void JpegEncode ( uint uiSizeX, uint uiSizeY, uint uiQuality, const CBuffer& inBuffer, CBuffer& outBuffer );
 
 namespace EJobResult
 {

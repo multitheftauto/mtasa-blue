@@ -110,10 +110,10 @@ CClientGuiFont* CClientRenderElementManager::CreateGuiFont ( const SString& strF
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientTexture* CClientRenderElementManager::CreateTexture ( const SString& strFullFilePath )
+CClientTexture* CClientRenderElementManager::CreateTexture ( const SString& strFullFilePath, const CPixels* pPixels, bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format )
 {
     // Create the item
-    CTextureItem* pTextureItem = m_pRenderItemManager->CreateTexture ( strFullFilePath );
+    CTextureItem* pTextureItem = m_pRenderItemManager->CreateTexture ( strFullFilePath, pPixels, bMipMaps, uiSizeX, uiSizeY, format );
 
     // Check create worked
     if ( !pTextureItem )

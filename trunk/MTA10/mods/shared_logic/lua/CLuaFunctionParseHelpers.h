@@ -26,6 +26,8 @@ DECLARE_ENUM( eDxTestMode )
 DECLARE_ENUM( eWeaponType )
 DECLARE_ENUM( eWeaponProperty )
 DECLARE_ENUM( eWeaponSkill )
+DECLARE_ENUM( ERenderFormat );
+DECLARE_ENUM( EPixelsFormatType );
 
 enum eDXHorizontalAlign
 {
