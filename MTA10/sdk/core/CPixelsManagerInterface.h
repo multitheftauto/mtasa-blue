@@ -31,7 +31,7 @@ class CPixels
 public:
     ~CPixels ( void )
     {
-        assert ( externalData.pData == NULL || buffer.GetSize () == 0 );
+        dassert ( externalData.pData == NULL || buffer.GetSize () == 0 );
     }
 
     char*       GetData     ( void )        { return externalData.pData ? externalData.pData : buffer.GetData (); }
@@ -40,7 +40,7 @@ public:
 
     void SetSize ( uint uiSize )
     {
-        assert ( externalData.pData == NULL || buffer.GetSize () == 0 );
+        dassert ( externalData.pData == NULL || buffer.GetSize () == 0 );
         if ( externalData.pData )
         {
             buffer = CBuffer ( externalData.pData, externalData.uiSize );
