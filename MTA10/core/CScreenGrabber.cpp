@@ -9,11 +9,6 @@
 
 #include "StdInc.h"
 #include "CCompressorJobQueue.h"
-#include "jinclude.h"
-#include "jpeglib.h"
-#include "jerror.h"         /* get library error codes too */
-#include "cderror.h"        /* get application-specific error codes */
-
 
 struct SScreenShotQueueItem
 {
@@ -235,70 +230,4 @@ void CScreenGrabber::ClearScreenShotQueue ( void )
     if ( m_pCompressJobData )
         m_pCompressorJobQueue->PollCommand ( m_pCompressJobData, -1 );
     m_pCompressJobData = NULL;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// JpegEncode
-//
-// RGBX to jpeg
-//
-///////////////////////////////////////////////////////////////
-void JpegEncode ( uint uiSizeX, uint uiSizeY, uint uiQuality, const CBuffer& inBuffer, CBuffer& outBuffer )
-{
-    // Validate
-    if ( inBuffer.IsEmpty () || inBuffer.GetSize () != uiSizeX * uiSizeY * 4 )
-        return;
-
-    const char* pData = inBuffer.GetData ();
-
-    struct jpeg_compress_struct cinfo;
-    struct jpeg_error_mgr jerr;
-    cinfo.err = jpeg_std_error(&jerr);
-    jpeg_create_compress(&cinfo);
-
-    unsigned long memlen = 0;
-    unsigned char *membuffer = NULL;
-    jpeg_mem_dest (&cinfo,&membuffer,&memlen );
-
-    cinfo.image_width = uiSizeX;    /* image width and height, in pixels */
-    cinfo.image_height = uiSizeY;
-    cinfo.input_components = 3;     /* # of color components per pixel */
-    cinfo.in_color_space = JCS_RGB; /* colorspace of input image */
-    jpeg_set_defaults(&cinfo);
-    jpeg_set_quality (&cinfo, uiQuality, true);
-    cinfo.dct_method = JDCT_IFAST;
-
-    /* Start compressor */
-    jpeg_start_compress(&cinfo, TRUE);
-
-    /* Process data */
-    CBuffer rowBuffer;
-    rowBuffer.SetSize ( uiSizeX * 3 );
-    char* pRowTemp = rowBuffer.GetData ();
-
-    JSAMPROW row_pointer[1];
-    while (cinfo.next_scanline < cinfo.image_height)
-    {
-        JDIMENSION num_scanlines = 1;
-        const char* pRowSrc = pData + cinfo.next_scanline * uiSizeX * 4;
-
-        for ( uint i = 0 ; i < uiSizeX ; i++ )
-        {
-            pRowTemp[i*3+0] = pRowSrc[i*4+2];
-            pRowTemp[i*3+1] = pRowSrc[i*4+1];
-            pRowTemp[i*3+2] = pRowSrc[i*4+0];
-        }
-        row_pointer[0] = (JSAMPROW)pRowTemp;
-        (void) jpeg_write_scanlines(&cinfo, row_pointer, 1);
-    }
-
-    /* Finish compression and release memory */
-    jpeg_finish_compress(&cinfo);
-    jpeg_destroy_compress(&cinfo);
-
-    // Copy out data and free memory
-    outBuffer = CBuffer ( membuffer, memlen );
-    free ( membuffer );
 }

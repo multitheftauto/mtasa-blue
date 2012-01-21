@@ -616,6 +616,13 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxUpdateScreenSource", CLuaFunctionDefs::dxUpdateScreenSource );
     CLuaCFunctions::AddFunction ( "dxGetStatus", CLuaFunctionDefs::dxGetStatus );
     CLuaCFunctions::AddFunction ( "dxSetTestMode", CLuaFunctionDefs::dxSetTestMode );
+    CLuaCFunctions::AddFunction ( "dxGetTexturePixels", CLuaFunctionDefs::dxGetTexturePixels );
+    CLuaCFunctions::AddFunction ( "dxSetTexturePixels", CLuaFunctionDefs::dxSetTexturePixels );
+    CLuaCFunctions::AddFunction ( "dxGetPixelsSize", CLuaFunctionDefs::dxGetPixelsSize );
+    CLuaCFunctions::AddFunction ( "dxGetPixelsFormat", CLuaFunctionDefs::dxGetPixelsFormat );
+    CLuaCFunctions::AddFunction ( "dxConvertPixels", CLuaFunctionDefs::dxConvertPixels );
+    CLuaCFunctions::AddFunction ( "dxGetPixelColor", CLuaFunctionDefs::dxGetPixelColor );
+    CLuaCFunctions::AddFunction ( "dxSetPixelColor", CLuaFunctionDefs::dxSetPixelColor );
 
     // Audio funcs
     CLuaCFunctions::AddFunction ( "playSoundFrontEnd", CLuaFunctionDefs::PlaySoundFrontEnd );

@@ -136,6 +136,7 @@ public:
     // Subsystems
     CRenderItemManagerInterface* GetRenderItemManager   ( void )        { return m_pRenderItemManager; }
     CScreenGrabberInterface*     GetScreenGrabber       ( void )        { return m_pScreenGrabber; }
+    CPixelsManagerInterface*     GetPixelsManager       ( void )        { return m_pPixelsManager; }
 
     // To draw queued up drawings
     void                DrawPreGUIQueue         ( void );
@@ -162,6 +163,7 @@ private:
 
     CRenderItemManager* m_pRenderItemManager;
     CScreenGrabberInterface* m_pScreenGrabber;
+    CPixelsManagerInterface* m_pPixelsManager;
     CTileBatcher*       m_pTileBatcher;
     CLine3DBatcher*     m_pLine3DBatcherPreGUI;
     CLine3DBatcher*     m_pLine3DBatcherPostGUI;

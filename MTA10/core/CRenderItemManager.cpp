@@ -110,10 +110,10 @@ void CRenderItemManager::OnResetDevice ( void )
 // TODO: Make underlying data for textures shared
 //
 ////////////////////////////////////////////////////////////////
-CTextureItem* CRenderItemManager::CreateTexture ( const SString& strFullFilePath, bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format )
+CTextureItem* CRenderItemManager::CreateTexture ( const SString& strFullFilePath, const CPixels* pPixels, bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format )
 {
     CFileTextureItem* pTextureItem = new CFileTextureItem ();
-    pTextureItem->PostConstruct ( this, strFullFilePath, bMipMaps, uiSizeX, uiSizeY, format );
+    pTextureItem->PostConstruct ( this, strFullFilePath, pPixels, bMipMaps, uiSizeX, uiSizeY, format );
 
     if ( !pTextureItem->IsValid () )
     {
@@ -808,11 +808,13 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     outStatus.settings.iFXQuality = gameSettings->GetFXQuality(); ;
     outStatus.settings.iDrawDistance = ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f * 100;
     outStatus.settings.bVolumetricShadows = false;
+    outStatus.settings.bAllowScreenUpload = true;
     outStatus.settings.iStreamingMemory = 0;
 
     CVARS_GET ( "streaming_memory",     outStatus.settings.iStreamingMemory );
     CVARS_GET ( "display_windowed",     outStatus.settings.bWindowed );
     CVARS_GET ( "volumetric_shadows",   outStatus.settings.bVolumetricShadows );
+    CVARS_GET ( "allow_screen_upload",  outStatus.settings.bAllowScreenUpload );
 
     // Modify if using test mode
     if ( m_TestMode == DX_TEST_MODE_NO_MEM )

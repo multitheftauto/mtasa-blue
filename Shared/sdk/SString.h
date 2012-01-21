@@ -123,3 +123,16 @@ public:
         : SString ( std::string ( szText ? szText : "" ) )
     { }
 };
+
+
+//
+// SCharStringRef
+//
+// String reference - Used for direct access to Lua strings
+//
+struct SCharStringRef
+{
+    SCharStringRef ( void ) : pData ( NULL ),  uiSize ( 0 ) {}
+    char* pData;
+    uint uiSize;
+};

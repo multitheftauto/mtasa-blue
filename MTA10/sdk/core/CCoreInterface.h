@@ -17,6 +17,7 @@
 #include "CCommunityInterface.h"
 #include "CRenderItemManagerInterface.h"
 #include "CScreenGrabberInterface.h"
+#include "CPixelsManagerInterface.h"
 #include "CGraphicsInterface.h"
 #include "CModManagerInterface.h"
 #include "CKeyBindsInterface.h"

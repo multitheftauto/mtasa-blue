@@ -512,6 +512,13 @@ public:
     LUA_DECLARE ( dxUpdateScreenSource );
     LUA_DECLARE ( dxGetStatus );
     LUA_DECLARE ( dxSetTestMode );
+    LUA_DECLARE ( dxGetTexturePixels );
+    LUA_DECLARE ( dxSetTexturePixels );
+    LUA_DECLARE ( dxGetPixelsSize );
+    LUA_DECLARE ( dxGetPixelsFormat );
+    LUA_DECLARE ( dxConvertPixels );
+    LUA_DECLARE ( dxGetPixelColor );
+    LUA_DECLARE ( dxSetPixelColor );
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them

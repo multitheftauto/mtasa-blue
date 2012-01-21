@@ -46,7 +46,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;"
-				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;INITGUID"
+				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -154,7 +154,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;"
-				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID"
+				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
@@ -259,7 +259,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;"
-				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID"
+				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
@@ -445,6 +445,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CFileFormatJpeg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CFileFormatPng.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CFilePathTranslator.cpp"
 				>
 			</File>
@@ -518,6 +526,10 @@
 			</File>
 			<File
 				RelativePath="CPEHookUtils.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CPixelsManager.cpp"
 				>
 			</File>
 			<File
@@ -862,6 +874,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CFileFormat.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CFilePathTranslator.h"
 				>
 			</File>
@@ -1145,6 +1161,10 @@
 					</File>
 					<File
 						RelativePath="..\sdk\core\CModManagerInterface.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\CPixelsManagerInterface.h"
 						>
 					</File>
 					<File

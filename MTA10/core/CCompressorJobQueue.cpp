@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CCompressorJobQueue.h"
+#include "CFileFormat.h"
 #include "SharedUtil.Thread.h"
 
 
@@ -452,7 +453,7 @@ void CCompressorJobQueueImpl::ProcessCommand ( CCompressJobData* pJobData )
     CBuffer& outBuffer = pJobData->result.buffer;
 
     // JPEG compress here
-    JpegEncode ( uiSizeX, uiSizeY, uiQuality, inBuffer, outBuffer );
+    JpegEncode ( uiSizeX, uiSizeY, uiQuality, inBuffer.GetData (), inBuffer.GetSize (), outBuffer );
 
     pJobData->result.status = EJobResult::SUCCESS;
 }

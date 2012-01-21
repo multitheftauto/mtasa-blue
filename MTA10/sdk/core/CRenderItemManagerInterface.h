@@ -32,12 +32,14 @@ class CRenderItemManager;
 class CD3DDUMMY;
 class CSHADERDUMMY;
 class CEffectCloner;
+class CPixels;
 
 #define RDEFAULT            ((uint) -1)
 
 enum ERenderFormat
 {
     RFORMAT_UNKNOWN,
+    RFORMAT_ARGB                 = 21,          // D3DFMT_A8R8G8B8
     RFORMAT_DXT1                 = '1TXD',
     RFORMAT_DXT2                 = '2TXD',
     RFORMAT_DXT3                 = '3TXD',
@@ -78,6 +80,7 @@ struct SDxStatus
         int             iFXQuality;
         int             iDrawDistance;
         bool            bVolumetricShadows;
+        bool            bAllowScreenUpload;
         int             iStreamingMemory;
     } settings;
 };
@@ -98,7 +101,7 @@ public:
     // CRenderItemManagerInterface
     virtual CDxFontItem*        CreateDxFont                        ( const SString& strFullFilePath, uint uiSize, bool bBold ) = 0;
     virtual CGuiFontItem*       CreateGuiFont                       ( const SString& strFullFilePath, const SString& strFontName, uint uiSize ) = 0;
-    virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN ) = 0;
+    virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath, const CPixels* pPixels = NULL, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN ) = 0;
     virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug ) = 0;
     virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false ) = 0;
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY ) = 0;
@@ -387,12 +390,14 @@ class CFileTextureItem : public CTextureItem
 {
     DECLARE_CLASS( CFileTextureItem, CTextureItem )
                     CFileTextureItem        ( void ) : ClassInit ( this ) {}
-    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN );
+    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, const CPixels* pPixels, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN );
     virtual void    PreDestruct             ( void );
     virtual bool    IsValid                 ( void );
     virtual void    OnLostDevice            ( void );
     virtual void    OnResetDevice           ( void );
-    void            CreateUnderlyingData    ( const SString& strFilename, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN );
+    void            CreateUnderlyingData    ( const SString& strFilename, bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format );
+    void            CreateUnderlyingData    ( const CPixels* pPixels, bool bMipMaps, ERenderFormat format );
+    void            CreateUnderlyingData    ( bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format );
     void            ReleaseUnderlyingData   ( void );
 };
 
