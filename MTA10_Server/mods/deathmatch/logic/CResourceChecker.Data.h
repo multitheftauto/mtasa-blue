@@ -44,7 +44,13 @@ namespace
                                          { "onClientVehicleCollision",  "1.3" },
                                          { "setBirdsEnabled",           "1.3" },
                                          { "setOcclusionsEnabled",      "1.3" },
-                                         { "getOcclusionsEnabled",      "1.3" },
+                                         { "dxGetTexturePixels",        "1.3" },
+                                         { "dxSetTexturePixels",        "1.3" },
+                                         { "dxGetPixelsSize",           "1.3" },
+                                         { "dxGetPixelsFormat",         "1.3" },
+                                         { "dxConvertPixels",           "1.3" },
+                                         { "dxGetPixelColor",           "1.3" },
+                                         { "dxSetPixelColor",           "1.3" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
