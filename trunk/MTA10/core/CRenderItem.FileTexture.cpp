@@ -101,7 +101,6 @@ void CFileTextureItem::CreateUnderlyingData ( const SString& strFilename, bool b
         return;
 
     D3DFORMAT D3DFormat = (D3DFORMAT)format;
-    D3DFormat = D3DFMT_R5G6B5;
     int iMipMaps = bMipMaps ? D3DX_DEFAULT : 1;
     if ( uiSizeX != D3DX_DEFAULT )
         imageInfo.Width = uiSizeX;
