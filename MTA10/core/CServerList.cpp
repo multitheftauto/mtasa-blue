@@ -83,6 +83,8 @@ void CServerList::Pulse ( void )
     unsigned int uiRepliesParsed = 0;
     unsigned int uiNoReplies = 0;
     unsigned int uiActiveServers = 0;
+    unsigned int uiTotalSlots = 0;
+    unsigned int uiOccupiedSlots = 0;
     bool bRemoveNonResponding = RemoveNonResponding ();
 
     // If a query is going to be done this pass, try to find high priority items first
@@ -126,7 +128,11 @@ void CServerList::Pulse ( void )
             uiNoReplies++;
 
         if ( pServer->nMaxPlayers && !pServer->bMaybeOffline && !pServer->MaybeWontRespond () )
+        {
             uiActiveServers++;
+            uiTotalSlots += pServer->nMaxPlayers;
+            uiOccupiedSlots += pServer->nPlayers;
+        }
     }
 
     // Check whether we are done scanning
@@ -144,7 +150,15 @@ void CServerList::Pulse ( void )
         m_iPass = 0;
     }
 
-    ss << "   " << uiActiveServers << " server";
+    ss << "   ";
+    if ( uiTotalSlots > 0 )
+    {
+        ss << uiOccupiedSlots << " player";
+        if ( uiOccupiedSlots != 1 )
+            ss << "s";
+        ss << " on ";
+    }
+    ss << uiActiveServers << " server";
     if ( uiActiveServers != 1 )
         ss << "s";
     if ( m_iPass )
