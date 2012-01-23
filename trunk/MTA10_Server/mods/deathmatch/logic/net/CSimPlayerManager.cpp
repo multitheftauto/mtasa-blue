@@ -217,7 +217,7 @@ void CSimPlayerManager::UnlockSimSystem ( void )
 // CS should be locked: no
 //
 ///////////////////////////////////////////////////////////////
-bool CSimPlayerManager::HandlePlayerPureSync ( NetServerPlayerID& Socket, NetBitStreamInterface* BitStream )
+bool CSimPlayerManager::HandlePlayerPureSync ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream )
 {
     if ( !CNetBufferWatchDog::CanSendPacket ( PACKET_ID_PLAYER_PURESYNC ) )
         return true;
@@ -259,7 +259,7 @@ bool CSimPlayerManager::HandlePlayerPureSync ( NetServerPlayerID& Socket, NetBit
 // CS should be locked: no
 //
 ///////////////////////////////////////////////////////////////
-bool CSimPlayerManager::HandleVehiclePureSync ( NetServerPlayerID& Socket, NetBitStreamInterface* BitStream )
+bool CSimPlayerManager::HandleVehiclePureSync ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream )
 {
     if ( !CNetBufferWatchDog::CanSendPacket ( PACKET_ID_PLAYER_VEHICLE_PURESYNC ) )
         return true;
@@ -305,7 +305,7 @@ bool CSimPlayerManager::HandleVehiclePureSync ( NetServerPlayerID& Socket, NetBi
 // Get a sim player from a player socket
 //
 ///////////////////////////////////////////////////////////////////////////
-CSimPlayer* CSimPlayerManager::Get ( NetServerPlayerID& PlayerSocket )
+CSimPlayer* CSimPlayerManager::Get ( const NetServerPlayerID& PlayerSocket )
 {
     dassert ( m_bIsLocked );
     return MapFindRef ( m_SocketSimMap, PlayerSocket );

@@ -23,9 +23,9 @@ public:
     void            UnlockSimSystem         ( void );
 
     // Sync thread methods
-    bool            HandlePlayerPureSync    ( NetServerPlayerID& Socket, NetBitStreamInterface* BitStream );
-    bool            HandleVehiclePureSync   ( NetServerPlayerID& Socket, NetBitStreamInterface* BitStream );
-    CSimPlayer*     Get                     ( NetServerPlayerID& PlayerSocket );
+    bool            HandlePlayerPureSync    ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream );
+    bool            HandleVehiclePureSync   ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream );
+    CSimPlayer*     Get                     ( const NetServerPlayerID& PlayerSocket );
     void            Broadcast               ( const CSimPacket& Packet, const std::vector < CSimPlayer* >& sendList );
 
 protected:

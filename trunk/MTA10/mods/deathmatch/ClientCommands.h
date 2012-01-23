@@ -54,7 +54,6 @@ void COMMAND_ShowSyncData           ( const char* szCmdLine );
 
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
     void COMMAND_ShowSyncing        ( const char* szCmdLine );
-    void COMMAND_FakeLag            ( const char* szCmdLine );
 #endif
 
 #ifdef MTA_DEBUG

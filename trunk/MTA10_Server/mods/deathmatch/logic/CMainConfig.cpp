@@ -96,6 +96,9 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_iBackupInterval = 3;
     m_iBackupAmount = 5;
     m_iDebugFlag = 0;
+    m_NetOptions.iFakePacketLoss = 0;
+    m_NetOptions.iFakeExtraPing = 0;
+    m_NetOptions.iFakeExtraPingVariance = 0;
 }
 
 
@@ -531,6 +534,8 @@ bool CMainConfig::Load ( void )
     GetBoolean ( m_pRootNode, "threadnet", m_bThreadNetEnabled );
     ApplyThreadNetEnabled ();
 
+    ApplyNetOptions ();
+
     return true;
 }
 
@@ -554,6 +559,20 @@ void CMainConfig::ApplyBandwidthReductionMode ( void )
         m_strBandwidthReductionMode = "none";
         g_pBandwidthSettings->SetNone ();
     }
+}
+
+void CMainConfig::SetFakeLag ( int iPacketLoss, int iExtraPing, int iExtraPingVary )
+{
+    m_NetOptions.iFakePacketLoss = iPacketLoss;
+    m_NetOptions.iFakeExtraPing = iExtraPing;
+    m_NetOptions.iFakeExtraPingVariance = iExtraPingVary;
+    ApplyNetOptions ();
+}
+
+
+void CMainConfig::ApplyNetOptions ( void )
+{
+    g_pNetServer->SetNetOptions ( m_NetOptions );
 }
 
 
@@ -799,7 +818,9 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "debugdb", CConsoleCommands::SetDbLogLevel, false );
 
     RegisterCommand ( "aclrequest", CConsoleCommands::AclRequest, false );
-
+#if defined(MTA_DEBUG) || defined(MTA_BETA)
+    RegisterCommand ( "sfakelag", CConsoleCommands::FakeLag, false );
+#endif
     return true;
 }
 
@@ -965,6 +986,17 @@ int CMainConfig::GetNoWorkToDoSleepTime ( void )
         return 10;
 }
 
+
+SString CMainConfig::GetMinimumClientVersion ( void )
+{
+    SString strMinReq = m_strMinClientVersionOverride > m_strMinClientVersion ? m_strMinClientVersionOverride : m_strMinClientVersion;
+#ifndef MTA_DEBUG
+    SString strMinReqForRelease = "1.3.0-9.03724";
+    if ( strMinReqForRelease > strMinReq )
+        strMinReq = strMinReqForRelease;
+#endif
+    return strMinReq;
+}
 
 
 //////////////////////////////////////////////////////////////////////

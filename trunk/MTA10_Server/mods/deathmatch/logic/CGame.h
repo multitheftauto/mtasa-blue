@@ -184,7 +184,7 @@ public:
     bool                        Start                       ( int iArgumentCount, char* szArguments [] );
     void                        Stop                        ( void );
 
-    static bool                 StaticProcessPacket         ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo );
+    static bool                 StaticProcessPacket         ( unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo );
     bool                        ProcessPacket               ( CPacket& Packet );
 
     inline void                 SetIsFinished               ( bool bFinished )  { m_bIsFinished = bFinished; };
@@ -350,7 +350,7 @@ private:
 
     void                        ProcessTrafficLights        ( unsigned long ulCurrentTime );
 
-    void                        Packet_PlayerJoin           ( NetServerPlayerID& Source );
+    void                        Packet_PlayerJoin           ( const NetServerPlayerID& Source );
     void                        Packet_PlayerJoinData       ( class CPlayerJoinDataPacket& Packet );
     void                        Packet_PedWasted            ( class CPedWastedPacket& Packet );
     void                        Packet_PlayerWasted         ( class CPlayerWastedPacket& Packet );

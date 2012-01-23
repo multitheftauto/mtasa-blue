@@ -771,31 +771,6 @@ void COMMAND_ShowSyncing ( const char *szCmdLine )
     g_pClientGame->ShowSyncingInfo ( atoi ( szCmdLine ) == 1 );
 }
 
-void COMMAND_FakeLag ( const char *szCmdLine )
-{
-    char szBuffer [256];
-    char* szExtraPing = NULL;
-    char* szExtraPingVary = NULL;
-
-    if ( !(szCmdLine && szCmdLine[0]) )
-        return;
-
-    strncpy ( szBuffer, szCmdLine, 256 );
-    szBuffer[255] = 0;
-    szExtraPing = strtok ( szBuffer, " " );
-    szExtraPingVary = strtok ( NULL, " " );
-    
-    if ( !(szExtraPing && szExtraPingVary) )
-    {
-        g_pCore->GetConsole ()->Echo ( "Bad syntax" );
-        return;
-    }
-
-    g_pNet->SetFakeLag ( 0, atoi ( szExtraPing ), atoi ( szExtraPingVary ) );
-    g_pCore->GetConsole ()->Printf ( "Fake lag set to %s extra ping with %s extra ping variance", szExtraPing, szExtraPingVary );
-}
-
-
 #endif
 
 #ifdef MTA_DEBUG

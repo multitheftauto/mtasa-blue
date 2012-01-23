@@ -1236,8 +1236,8 @@ void CCore::RegisterCommands ( )
 
     m_pCommands->Add ( "test",              "",                                 CCommandFuncs::Test );
 
-#ifdef MTA_DEBUG
-    //m_pCommands->Add ( "pools",               "read out the pool values",         CCommandFuncs::PoolRelocations );
+#if defined(MTA_DEBUG) || defined(MTA_BETA)
+    m_pCommands->Add ( "fakelag",           "",                                 CCommandFuncs::FakeLag );
 #endif
 }
 

@@ -64,7 +64,7 @@ void CRPCFunctions::AddHandler ( unsigned char ucID, pfnRPCHandler Callback )
 }
 
 
-void CRPCFunctions::ProcessPacket ( NetServerPlayerID& Socket, NetBitStreamInterface& bitStream )
+void CRPCFunctions::ProcessPacket ( const NetServerPlayerID& Socket, NetBitStreamInterface& bitStream )
 {
     m_pSourcePlayer = m_pPlayerManager->Get ( Socket );
     if ( m_pSourcePlayer && !m_pSourcePlayer->IsBeingDeleted () )
