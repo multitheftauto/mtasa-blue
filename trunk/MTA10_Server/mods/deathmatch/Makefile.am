@@ -198,7 +198,7 @@ LOGIC = \
 ./logic/luadefs/CLuaPickupDefs.cpp \
 ./logic/luadefs/CLuaResourceDefs.cpp \
 ./logic/luadefs/CLuaTextDefs.cpp \
-	./logic/luadefs/CLuaVoiceDefs.cpp \
+./logic/luadefs/CLuaVoiceDefs.cpp \
 ./logic/luadefs/CLuaWorldDefs.cpp \
 ./logic/luadefs/CLuaXMLDefs.cpp \
 ./logic/packets/CCameraSyncPacket.cpp \
@@ -245,6 +245,7 @@ LOGIC = \
 ./logic/packets/CPlayerTimeoutPacket.cpp \
 ./logic/packets/CPlayerWastedPacket.cpp \
 ./logic/packets/CProjectileSyncPacket.cpp \
+./logic/packets/CResourceClientScriptsPacket.cpp \	
 ./logic/packets/CResourceStartPacket.cpp \
 ./logic/packets/CResourceStopPacket.cpp \
 ./logic/packets/CReturnSyncPacket.cpp \
