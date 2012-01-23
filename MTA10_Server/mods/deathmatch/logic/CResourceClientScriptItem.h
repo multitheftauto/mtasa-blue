@@ -20,14 +20,20 @@ class CResourceClientScriptItem : public CResourceFile
     
 public:
 
-                                        CResourceClientScriptItem       ( class CResource * resource, const char * szShortName, const char * szResourceFileName, CXMLAttributes * xmlAttributes );
-                                        ~CResourceClientScriptItem      ( void );
+                                CResourceClientScriptItem       ( class CResource * resource, const char * szShortName, const char * szResourceFileName, CXMLAttributes * xmlAttributes );
+                                ~CResourceClientScriptItem      ( void );
 
-    bool                                Start                           ( void );
-    bool                                Stop                            ( void );
+    bool                        Start                           ( void );
+    bool                        Stop                            ( void );
+
+    bool                        IsProtected                     () const { return m_bIsProtected; }
+    const SString&              GetChunkCode                    () const { return m_chunkCode; }
+
+    ResponseCode                Request                         ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse );
     
 private:
-
+    bool                        m_bIsProtected;
+    SString                     m_chunkCode;
 };
 
 #endif

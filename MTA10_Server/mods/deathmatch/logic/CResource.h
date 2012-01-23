@@ -369,6 +369,7 @@ public:
     void                    SetID ( unsigned short usID ) { m_usID = usID; }
     unsigned short          GetID ( void ) { return m_usID; }
     void                    OnPlayerJoin ( CPlayer& Player );
+    void                    SendProtectedScripts ( CPlayer* player = 0 );
     CDummy*                 GetResourceRootElement ( void ) { return m_pResourceElement; };
     CDummy*                 GetDynamicElementRoot ( void ) { return m_pResourceDynamicElementRoot; };
 

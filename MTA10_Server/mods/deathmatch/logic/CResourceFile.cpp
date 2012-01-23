@@ -20,7 +20,7 @@
 #include "StdInc.h"
 
 CResourceFile::CResourceFile ( CResource * resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes * xmlAttributes ) 
-{ 
+{
     m_strResourceFileName = szResourceFileName; 
 
     // Stupid hack to automatically change all forward slashes to back slashes to get around internal http sub dir issue

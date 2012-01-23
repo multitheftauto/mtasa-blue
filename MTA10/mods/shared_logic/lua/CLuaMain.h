@@ -60,6 +60,7 @@ public:
     bool                            LoadScriptFromBuffer    ( const char* cpBuffer, unsigned int uiSize, const char* szFileName, bool bUTF8 );
     bool                            LoadScript              ( const char* szLUAScript );
     void                            UnloadScript            ( void );
+    bool                            CompileScriptFromFile   ( const char* szFile, SString* pDest );
 
     void                            Start                   ( void );
 

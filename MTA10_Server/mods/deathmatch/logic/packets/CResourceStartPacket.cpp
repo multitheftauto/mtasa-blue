@@ -43,11 +43,26 @@ bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
         // Write the resource dynamic element id
         BitStream.Write ( m_pResource->GetDynamicElementRoot ()->GetID () );
         
+        // Count the amount of protected scripts
+        unsigned short usProtectedScriptCount = 0;
         list < CResourceFile* > ::iterator iter = m_pResource->IterBegin();
         for ( ; iter != m_pResource->IterEnd (); iter++ )
         {
+            if ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT &&
+                 m_pResource->IsClientScriptsOn () &&
+                 static_cast<CResourceClientScriptItem*>(*iter)->IsProtected() == false )
+            {
+                ++usProtectedScriptCount;
+            }
+        }
+        BitStream.Write ( usProtectedScriptCount );
+
+        // Send the resource files info
+        iter = m_pResource->IterBegin();
+        for ( ; iter != m_pResource->IterEnd (); iter++ )
+        {
             if ( ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_CONFIG && m_pResource->IsClientConfigsOn () ) ||
-                 ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT && m_pResource->IsClientScriptsOn () ) ||
+                 ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT && m_pResource->IsClientScriptsOn () && static_cast<CResourceClientScriptItem*>(*iter)->IsProtected() == false ) ||
                  ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_FILE && m_pResource->IsClientFilesOn () ) )
             {
                 // Write the Type of chunk to read (F - File, E - Exported Function)
