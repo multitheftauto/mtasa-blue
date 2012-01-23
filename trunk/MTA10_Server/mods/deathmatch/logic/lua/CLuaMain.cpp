@@ -397,6 +397,48 @@ void CLuaMain::UnloadScript ( void )
     }
 }
 
+static int lua_dump_writer ( lua_State* luaVM, const void* data, size_t size, void* myUserData )
+{
+    (void)luaVM;
+    SString* pDest = (SString *)myUserData;
+    pDest->append ( (const char *)data, size );
+    return 0;
+}
+
+bool CLuaMain::CompileScriptFromFile ( const char* szFile, SString* pDest )
+{
+    if ( m_luaVM )
+    {
+        // Load the script
+        if ( luaL_loadfile ( m_luaVM, szFile ) )
+        {
+            // Print the error
+            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+            if ( strRes.length () )
+            {
+                CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );
+                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", strRes.c_str () );
+            }
+            else
+            {
+                CLogger::LogPrint ( "SCRIPT ERROR: Unknown\n" );
+                g_pGame->GetScriptDebugging()->LogInformation ( m_luaVM, "Loading script failed for unknown reason" );
+            }
+        }
+        else
+        {
+            pDest->assign ( "" );
+            if ( lua_dump(m_luaVM, lua_dump_writer, pDest) != 0 )
+                return false;
+            lua_pop ( m_luaVM, 1 );
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
 
 void CLuaMain::DoPulse ( void )
 {

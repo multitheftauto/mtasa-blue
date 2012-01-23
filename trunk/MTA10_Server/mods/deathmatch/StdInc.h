@@ -91,6 +91,7 @@ struct SAclRequest;
 #include "packets/CProjectileSyncPacket.h"
 #include "packets/CResourceStartPacket.h"
 #include "packets/CResourceStopPacket.h"
+#include "packets/CResourceClientScriptsPacket.h"
 #include "packets/CReturnSyncPacket.h"
 #include "packets/CServerTextItemPacket.h"
 #include "packets/CUpdateInfoPacket.h"

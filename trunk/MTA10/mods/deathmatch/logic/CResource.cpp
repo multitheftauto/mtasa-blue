@@ -29,6 +29,8 @@ CResource::CResource ( unsigned short usID, char* szResourceName, CClientEntity*
     m_bActive = false;
     m_bInDownloadQueue = false;
     m_bShowingCursor = false;
+    m_usRemainingProtectedScripts = 0;
+    m_bLoadAfterReceivingProtectedScripts = false;
 
     if ( szResourceName )
     {
@@ -265,6 +267,13 @@ static bool CheckFileForCorruption( string strPath )
 void CResource::Load ( CClientEntity *pRootEntity )
 {
     m_pRootEntity = pRootEntity;
+
+    if ( m_usRemainingProtectedScripts > 0 )
+    {
+        m_bLoadAfterReceivingProtectedScripts = true;
+        return;
+    }
+
     if ( m_pRootEntity )
     {
         // Set the GUI parent to the resource root entity
@@ -380,4 +389,19 @@ SString CResource::GetResourceDirectoryPath ( eAccessType accessType )
     if ( accessType == ACCESS_PRIVATE )
         return m_strResourcePrivateDirectoryPath;
     return m_strResourceDirectoryPath;
+}
+
+void CResource::LoadProtectedScript ( const char* chunk, unsigned int len )
+{
+    if ( m_usRemainingProtectedScripts > 0 )
+    {
+        --m_usRemainingProtectedScripts;
+        GetVM()->LoadScriptFromBuffer ( chunk, len, "(unknown)", false );
+
+        if ( m_usRemainingProtectedScripts == 0 && m_bLoadAfterReceivingProtectedScripts )
+        {
+            m_bLoadAfterReceivingProtectedScripts = false;
+            Load ( m_pRootEntity );
+        }
+    }
 }

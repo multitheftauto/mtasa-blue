@@ -89,6 +89,9 @@ public:
     inline std::list < CExportedFunction* >::iterator    IterBeginExportedFunctions   ( void )        { return m_exportedFunctions.begin(); }
     inline std::list < CExportedFunction* >::iterator    IterEndExportedFunctions     ( void )        { return m_exportedFunctions.end(); }
 
+    void                    SetRemainingProtectedScripts    ( unsigned short usRemaining ) { m_usRemainingProtectedScripts = usRemaining; }
+    void                    LoadProtectedScript             ( const char* chunk, unsigned int length );
+
 private:
     unsigned short          m_usID;
     char                    m_szResourceName [ MAX_RESOURCE_NAME_LENGTH ];
@@ -103,6 +106,8 @@ private:
     class CClientEntity*    m_pResourceGUIEntity;
     class CClientEntity*    m_pResourceTXDRoot;
     bool                    m_bInDownloadQueue;
+    unsigned short          m_usRemainingProtectedScripts;
+    bool                    m_bLoadAfterReceivingProtectedScripts;
 
     // To control cursor show/hide
     static int              m_iShowingCursor;

@@ -170,6 +170,10 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_ResourceStop ( bitStream );
             return true;
 
+        case PACKET_ID_RESOURCE_CLIENT_SCRIPTS:
+            Packet_ResourceClientScripts ( bitStream );
+            return true;
+
         case PACKET_ID_DETONATE_SATCHELS:
             Packet_DetonateSatchels ( bitStream );
             return true;
@@ -4228,6 +4232,9 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
     // Number of Resources to be Downloaded
     unsigned short usResourcesToBeDownloaded = 0;
 
+    // Number of protected scripts
+    unsigned short usProtectedScriptCount = 0;
+
     // Resource Name Size
     unsigned char ucResourceNameSize;
     bitStream.Read ( ucResourceNameSize );
@@ -4253,6 +4260,9 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
     bitStream.Read ( ResourceEntityID );
     bitStream.Read ( ResourceDynamicEntityID );
 
+    // Read the amount of protected scripts
+    bitStream.Read ( usProtectedScriptCount );
+
     // Get the resource entity
     CClientEntity* pResourceEntity = CElementIDs::GetElement ( ResourceEntityID );
 
@@ -4262,6 +4272,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
     CResource* pResource = g_pClientGame->m_pResourceManager->Add ( usResourceID, szResourceName, pResourceEntity, pResourceDynamicEntity );
     if ( pResource )
     {
+        pResource->SetRemainingProtectedScripts ( usProtectedScriptCount );
 
         // Resource Chunk Type (F = Resource File, E = Exported Function)
         unsigned char ucChunkType;
@@ -4427,6 +4438,50 @@ void CPacketHandler::Packet_ResourceStop ( NetBitStreamInterface& bitStream )
     }
 }
 
+void CPacketHandler::Packet_ResourceClientScripts ( NetBitStreamInterface& bitStream )
+{
+    unsigned short usID;
+    unsigned short usScriptCount = 0;
+    if ( bitStream.Read ( usID ) && bitStream.Read ( usScriptCount ) )
+    {
+        CResource* pResource = g_pClientGame->m_pResourceManager->GetResource ( usID );
+        if ( pResource )
+        {
+            for ( unsigned int i = 0; i < usScriptCount; ++i )
+            {
+                // Read the script compressed chunk
+                unsigned int len;
+                if ( !bitStream.Read ( len ) || len < 4 )
+                    return;
+                char* data = new char [ len ];
+                if ( !bitStream.Read ( data, len ) )
+                {
+                    memset ( data, 0, len );
+                    delete [] data;
+                    return;
+                }
+
+                // First grab the original length from the data chunk
+                const unsigned char* uData = (const unsigned char *)data;
+                unsigned long originalLength = uData[0] << 24 | uData[1] << 16 | uData[2] << 8 | uData[3];
+                char* uncompressedBuffer = new char [ originalLength ];
+
+                // Uncompress it
+                if ( uncompress ( (Bytef *)uncompressedBuffer, &originalLength, (const Bytef *)&data[4], len-4 ) == Z_OK )
+                {
+                    // Load the script!
+                    pResource->LoadProtectedScript ( uncompressedBuffer, originalLength );
+                }
+
+                memset ( uncompressedBuffer, 0, originalLength );
+                memset ( data, 0, len );
+
+                delete [] uncompressedBuffer;
+                delete [] data;
+            }
+        }
+    }
+}
 
 void CPacketHandler::Packet_DetonateSatchels ( NetBitStreamInterface& bitStream )
 {

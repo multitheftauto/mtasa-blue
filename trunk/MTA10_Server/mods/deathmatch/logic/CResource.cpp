@@ -779,6 +779,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
             if ( ( (*iterf)->GetType() == CResourceFile::RESOURCE_FILE_TYPE_MAP && bMaps ) ||
                  ( (*iterf)->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CONFIG && bConfigs ) ||
                  ( (*iterf)->GetType() == CResourceFile::RESOURCE_FILE_TYPE_SCRIPT && bScripts ) ||
+                 ( (*iterf)->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT && bScripts ) ||
                  ( (*iterf)->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML && bHTML ) )
             {
                 // Start. Failed?
@@ -907,6 +908,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         // Broadcast new resourceelement that is loaded and tell the players that a new resource was started
         g_pGame->GetMapManager()->BroadcastElements ( m_pResourceElement, true );
         g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( CResourceStartPacket ( m_strResourceName.c_str (), this ) );
+        SendProtectedScripts ();
 
         // HACK?: stops resources getting loaded twice when you change them then manually restart
         GenerateChecksum ();
@@ -3017,8 +3019,63 @@ void CResource::OnPlayerJoin ( CPlayer& Player )
 {
     // do the player join crap
     Player.Send ( CResourceStartPacket ( m_strResourceName.c_str (), this ) );
+    SendProtectedScripts ( &Player );
 }
 
+void CResource::SendProtectedScripts ( CPlayer* player )
+{
+    if ( !IsClientScriptsOn() )
+        return;
+
+    std::vector < CPlayer* > vecPlayers;
+
+    // Send it to either a single player or all the players in the server.
+    if ( player != 0 )
+        vecPlayers.push_back ( player );
+    else
+    {
+        std::list<CPlayer*>::const_iterator iter = g_pGame->GetPlayerManager()->IterBegin ();
+        for ( ; iter != g_pGame->GetPlayerManager()->IterEnd();
+              ++iter )
+        {
+            vecPlayers.push_back ( *iter );
+        }
+    }
+
+    if ( vecPlayers.size() > 0 )
+    {
+        // Decide what scripts to send
+        CResourceClientScriptsPacket packet ( this );
+        bool anyScript = false;
+
+        for ( std::list<CResourceFile*>::iterator iter = this->IterBegin();
+              iter != this->IterEnd ();
+              ++iter )
+        {
+            CResourceFile* file = *iter;
+            if ( file->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT )
+            {
+                CResourceClientScriptItem* clientScript = static_cast < CResourceClientScriptItem* > ( file );
+                if ( clientScript->IsProtected() == true )
+                {
+                    packet.AddItem ( clientScript );
+                    anyScript = true;
+                }
+            }
+        }
+
+        // Send them!
+        if ( anyScript )
+        {
+            for ( std::vector<CPlayer*>::iterator iter = vecPlayers.begin();
+                  iter != vecPlayers.end();
+                  ++iter )
+            {
+                (*iter)->Send ( packet );
+            }
+        }
+    }
+}
 
 unsigned long get_current_file_crc ( unzFile uf )
 {

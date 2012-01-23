@@ -19,6 +19,8 @@
 #include <cstdio>
 #include <cstring>
 
+#include <zlib.h>
+
 // SDK includes
 #define MTA_CLIENT
 #include "SharedUtil.h"
