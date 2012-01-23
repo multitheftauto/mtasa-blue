@@ -62,7 +62,7 @@ bool CResourceClientScriptItem::Start ( void )
         char* compressedBuffer = new char [ bufferLength ];
         if ( compress2 ( (Bytef*)compressedBuffer, (uLongf *)&bufferLength, (const Bytef *)m_chunkCode.c_str(), m_chunkCode.length(), Z_BEST_COMPRESSION ) != Z_OK )
         {
-            g_pGame->GetScriptDebugging ()->LogWarning ( 0, "Failed to compress the client-side script '%s' of resource '%s'\n", GetName(), m_resource->GetName () );
+            g_pGame->GetScriptDebugging ()->LogWarning ( 0, "Failed to compress the client-side script '%s' of resource '%s'\n", GetName(), m_resource->GetName ().c_str() );
             return false;
         }
         char lengthData [ 4 ];
