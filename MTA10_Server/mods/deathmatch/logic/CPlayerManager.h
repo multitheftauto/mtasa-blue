@@ -41,7 +41,7 @@ public:
     unsigned int                                CountWithStatus                 ( int iStatus );
     bool                                        Exists                          ( CPlayer* pPlayer );
 
-    CPlayer*                                    Get                             ( NetServerPlayerID& PlayerSocket );
+    CPlayer*                                    Get                             ( const NetServerPlayerID& PlayerSocket );
     CPlayer*                                    Get                             ( const char* szNick, bool bCaseSensitive = false );
 
     inline std::list < CPlayer* > ::const_iterator  IterBegin                   ( void )                                            { return m_Players.begin (); };

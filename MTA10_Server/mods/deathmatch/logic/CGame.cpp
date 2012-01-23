@@ -902,7 +902,7 @@ void CGame::PulseMasterServerAnnounce ( void )
 }
 
 
-bool CGame::StaticProcessPacket ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* pBitStream, SNetExtraInfo* pNetExtraInfo )
+bool CGame::StaticProcessPacket ( unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* pBitStream, SNetExtraInfo* pNetExtraInfo )
 {
     // Is it a join packet? Pass it to the handler immediately
     if ( ucPacketID == PACKET_ID_PLAYER_JOIN )
@@ -1475,7 +1475,7 @@ void CGame::ProcessTrafficLights ( unsigned long ulCurrentTime )
 }
 
 
-void CGame::Packet_PlayerJoin ( NetServerPlayerID& Source )
+void CGame::Packet_PlayerJoin ( const NetServerPlayerID& Source )
 {
     // Reply with the mod this server is running
     NetBitStreamInterface* pBitStream = g_pNetServer->AllocateNetServerBitStream ( 0 );

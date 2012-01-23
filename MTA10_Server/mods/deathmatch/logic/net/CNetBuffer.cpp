@@ -234,7 +234,7 @@ void GetNetworkStatisticsCallback ( CNetJobData* pJobData, void* pContext )
     delete pStore;
 }
 
-bool CNetServerBuffer::GetNetworkStatistics ( NetStatistics* pDest, NetServerPlayerID& PlayerID )
+bool CNetServerBuffer::GetNetworkStatistics ( NetStatistics* pDest, const NetServerPlayerID& PlayerID )
 {
     // Blocking read required?
     if ( !ms_bNetStatisticsLastSavedValid || ms_NetStatisticsLastFor != PlayerID )
@@ -358,7 +358,7 @@ void CNetServerBuffer::DeallocateNetServerBitStream ( NetBitStreamInterface* bit
 // Non blocking
 //
 ///////////////////////////////////////////////////////////////////////////
-bool CNetServerBuffer::SendPacket ( unsigned char ucPacketID, NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering  )
+bool CNetServerBuffer::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering  )
 {
     bitStream->AddRef ();
     SSendPacketArgs* pArgs = new SSendPacketArgs ( ucPacketID, playerID, bitStream, bBroadcast, packetPriority, packetReliability, packetOrdering );
@@ -375,7 +375,7 @@ bool CNetServerBuffer::SendPacket ( unsigned char ucPacketID, NetServerPlayerID&
 // (To make non blocking, don't)
 //
 ///////////////////////////////////////////////////////////////////////////
-void CNetServerBuffer::GetPlayerIP ( NetServerPlayerID& playerID, char strIP[22], unsigned short* usPort )
+void CNetServerBuffer::GetPlayerIP ( const NetServerPlayerID& playerID, char strIP[22], unsigned short* usPort )
 {
     SGetPlayerIPArgs* pArgs = new SGetPlayerIPArgs ( playerID, strIP, usPort );
     AddCommandAndWait ( pArgs );
@@ -428,7 +428,7 @@ bool CNetServerBuffer::IsBanned ( const char* szIP )
 // Non blocking
 //
 ///////////////////////////////////////////////////////////////////////////
-void CNetServerBuffer::Kick ( NetServerPlayerID &PlayerID )
+void CNetServerBuffer::Kick ( const NetServerPlayerID &PlayerID )
 {
     SKickArgs* pArgs = new SKickArgs (PlayerID);
     AddCommandAndFree ( pArgs );
@@ -573,7 +573,7 @@ void CNetServerBuffer::SetEncryptionEnabled ( bool bEncryptionEnabled )
 // Non-blocking.
 //
 ///////////////////////////////////////////////////////////////////////////
-void CNetServerBuffer::ResendModPackets ( NetServerPlayerID& playerID )
+void CNetServerBuffer::ResendModPackets ( const NetServerPlayerID& playerID )
 {
     SResendModPacketsArgs* pArgs = new SResendModPacketsArgs ( playerID );
     AddCommandAndFree ( pArgs );
@@ -588,12 +588,26 @@ void CNetServerBuffer::ResendModPackets ( NetServerPlayerID& playerID )
 // (To make non blocking, don't)
 //
 ///////////////////////////////////////////////////////////////////////////
-void CNetServerBuffer::GetClientSerialAndVersion ( NetServerPlayerID& playerID, CStaticString < 32 >& strSerial, CStaticString < 32 >& strVersion )
+void CNetServerBuffer::GetClientSerialAndVersion ( const NetServerPlayerID& playerID, CStaticString < 32 >& strSerial, CStaticString < 32 >& strVersion )
 {
     SGetClientSerialAndVersionArgs* pArgs = new SGetClientSerialAndVersionArgs ( playerID, strSerial, strVersion );
     AddCommandAndWait ( pArgs );
 }
 
+
+///////////////////////////////////////////////////////////////////////////
+//
+// CNetServerBuffer::SetNetOptions
+//
+// BLOCKING. Called rarely
+// (To make non blocking, don't)
+//
+///////////////////////////////////////////////////////////////////////////
+void CNetServerBuffer::SetNetOptions ( const SNetOptions& options )
+{
+    SSetNetOptionsArgs* pArgs = new SSetNetOptionsArgs ( options );
+    AddCommandAndWait ( pArgs );
+}
 
 
 //
@@ -953,9 +967,9 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
         CALLREALNET2R( bool,                GetNetworkStatistics            , NetStatistics*, pDest, NetServerPlayerID&, PlayerID )
         CALLREALNET0R( const SPacketStat*,  GetPacketStats                  )
         CALLREALNET1R( bool,                GetBandwidthStatistics          , SBandwidthStatistics*, pDest )
-        CALLREALNET7R( bool,                SendPacket                      , unsigned char, ucPacketID, NetServerPlayerID&, playerID, NetBitStreamInterface*, bitStream, bool, bBroadcast, NetServerPacketPriority, packetPriority, NetServerPacketReliability, packetReliability, ePacketOrdering, packetOrdering )
-        CALLREALNET3 (                      GetPlayerIP                     , NetServerPlayerID&, playerID, char*, strIP, unsigned short*, usPort )
-        CALLREALNET1 (                      Kick                            , NetServerPlayerID &,PlayerID )
+        CALLREALNET7R( bool,                SendPacket                      , unsigned char, ucPacketID, const NetServerPlayerID&, playerID, NetBitStreamInterface*, bitStream, bool, bBroadcast, NetServerPacketPriority, packetPriority, NetServerPacketReliability, packetReliability, ePacketOrdering, packetOrdering )
+        CALLREALNET3 (                      GetPlayerIP                     , const NetServerPlayerID&, playerID, char*, strIP, unsigned short*, usPort )
+        CALLREALNET1 (                      Kick                            , const NetServerPlayerID &,PlayerID )
         CALLREALNET1 (                      SetPassword                     , const char*, szPassword )
         CALLREALNET1 (                      SetMaximumIncomingConnections   , unsigned short, numberAllowed )
         CALLREALNET2 (                      SetClientBitStreamVersion       , const NetServerPlayerID &,PlayerID, unsigned short, usBitStreamVersion )
@@ -964,8 +978,9 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
         CALLREALNET0R( unsigned int,        GetPendingPacketCount           )
         CALLREALNET1R( bool,                InitServerId                    , const char*, szPath )
         CALLREALNET1 (                      SetEncryptionEnabled            , bool, bEncryptionEnabled )
-        CALLREALNET1 (                      ResendModPackets                , NetServerPlayerID&, playerID )
-        CALLREALNET3 (                      GetClientSerialAndVersion       , NetServerPlayerIDRef, playerID, CStaticString < 32 >&, strSerial, CStaticString < 32 >&, strVersion )
+        CALLREALNET1 (                      ResendModPackets                , const NetServerPlayerID&, playerID )
+        CALLREALNET3 (                      GetClientSerialAndVersion       , const NetServerPlayerID&, playerID, CStaticString < 32 >&, strSerial, CStaticString < 32 >&, strVersion )
+        CALLREALNET1 (                      SetNetOptions                   , const SNetOptions&, options )
 
         default:
             // no args type match
@@ -996,7 +1011,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
 // Handle data pushed from netmodule during its pulse
 //
 ///////////////////////////////////////////////////////////////
-bool CNetServerBuffer::StaticProcessPacket ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo )
+bool CNetServerBuffer::StaticProcessPacket ( unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo )
 {
     ms_pNetServerBuffer->ProcessPacket ( ucPacketID, Socket, BitStream, pNetExtraInfo );
     return true;
@@ -1010,7 +1025,7 @@ bool CNetServerBuffer::StaticProcessPacket ( unsigned char ucPacketID, NetServer
 // Handle data pushed from netmodule during its pulse
 //
 ///////////////////////////////////////////////////////////////
-void CNetServerBuffer::ProcessPacket ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo )
+void CNetServerBuffer::ProcessPacket ( unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo )
 {
 
     if ( ucPacketID == PACKET_ID_PLAYER_PURESYNC )

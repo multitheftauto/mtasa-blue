@@ -94,7 +94,7 @@ bool CPlayerManager::Exists ( CPlayer* pPlayer )
 }
 
 
-CPlayer* CPlayerManager::Get ( NetServerPlayerID& PlayerSocket )
+CPlayer* CPlayerManager::Get ( const NetServerPlayerID& PlayerSocket )
 {
     return MapFindRef ( m_SocketPlayerMap, PlayerSocket );
 }

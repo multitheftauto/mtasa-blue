@@ -70,21 +70,21 @@ public:
 
     virtual void                            RegisterPacketHandler           ( PPACKETHANDLER pfnPacketHandler );
 
-    virtual bool                            GetNetworkStatistics            ( NetStatistics* pDest, NetServerPlayerID& PlayerID );
+    virtual bool                            GetNetworkStatistics            ( NetStatistics* pDest, const NetServerPlayerID& PlayerID );
     virtual const SPacketStat*              GetPacketStats                  ( void );
     virtual bool                            GetBandwidthStatistics          ( SBandwidthStatistics* pDest );
 
     virtual NetBitStreamInterface*          AllocateNetServerBitStream      ( unsigned short usBitStreamVersion );
     virtual void                            DeallocateNetServerBitStream    ( NetBitStreamInterface* bitStream );
-    virtual bool                            SendPacket                      ( unsigned char ucPacketID, NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast = false, NetServerPacketPriority packetPriority = PACKET_PRIORITY_LOW, NetServerPacketReliability packetReliability = PACKET_RELIABILITY_RELIABLE_ORDERED, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
+    virtual bool                            SendPacket                      ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast = false, NetServerPacketPriority packetPriority = PACKET_PRIORITY_LOW, NetServerPacketReliability packetReliability = PACKET_RELIABILITY_RELIABLE_ORDERED, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
 
-    virtual void                            GetPlayerIP                     ( NetServerPlayerID& playerID, char strIP[22], unsigned short* usPort );
+    virtual void                            GetPlayerIP                     ( const NetServerPlayerID& playerID, char strIP[22], unsigned short* usPort );
 
     virtual void                            AddBan                          ( const char* szIP );
     virtual void                            RemoveBan                       ( const char* szIP );
     virtual bool                            IsBanned                        ( const char* szIP );
 
-    virtual void                            Kick                            ( NetServerPlayerID &PlayerID );
+    virtual void                            Kick                            ( const NetServerPlayerID &PlayerID );
 
     virtual void                            SetPassword                     ( const char* szPassword );
 
@@ -101,9 +101,10 @@ public:
 
     virtual bool                            InitServerId                    ( const char* szPath );
     virtual void                            SetEncryptionEnabled            ( bool bEncryptionEnabled );
-    virtual void                            ResendModPackets                ( NetServerPlayerID& playerID );
+    virtual void                            ResendModPackets                ( const NetServerPlayerID& playerID );
 
-    virtual void                            GetClientSerialAndVersion       ( NetServerPlayerID& playerID, CStaticString < 32 >& strSerial, CStaticString < 32 >& strVersion );
+    virtual void                            GetClientSerialAndVersion       ( const NetServerPlayerID& playerID, CStaticString < 32 >& strSerial, CStaticString < 32 >& strVersion );
+    virtual void                            SetNetOptions                   ( const SNetOptions& options );
 
     //
     // Macros of doom to declare function argument structures
@@ -131,12 +132,12 @@ public:
     DECLARE_FUNC_ARGS0 (                        ResetNetwork                    );
     DECLARE_FUNC_ARGS0 (                        DoPulse                         );
     DECLARE_FUNC_ARGS1 (                        RegisterPacketHandler           , PPACKETHANDLER, pfnPacketHandler );
-    DECLARE_FUNC_ARGS2R( bool,                  GetNetworkStatistics            , NetStatistics*, pDest, NetServerPlayerIDRef, PlayerID );
+    DECLARE_FUNC_ARGS2R( bool,                  GetNetworkStatistics            , NetStatistics*, pDest, const NetServerPlayerIDRef, PlayerID );
     DECLARE_FUNC_ARGS0R( const SPacketStat*,    GetPacketStats                  );
     DECLARE_FUNC_ARGS1R( bool,                  GetBandwidthStatistics          , SBandwidthStatistics*, pDest );
-    DECLARE_FUNC_ARGS7R( bool,                  SendPacket                      , unsigned char, ucPacketID, NetServerPlayerIDRef, playerID, NetBitStreamInterface*, bitStream, bool, bBroadcast, NetServerPacketPriority, packetPriority, NetServerPacketReliability, packetReliability, ePacketOrdering, packetOrdering );
-    DECLARE_FUNC_ARGS3 (                        GetPlayerIP                     , NetServerPlayerIDRef, playerID, char*, strIP, unsigned short*, usPort );
-    DECLARE_FUNC_ARGS1 (                        Kick                            , NetServerPlayerIDRef, PlayerID );
+    DECLARE_FUNC_ARGS7R( bool,                  SendPacket                      , unsigned char, ucPacketID, const NetServerPlayerIDRef, playerID, NetBitStreamInterface*, bitStream, bool, bBroadcast, NetServerPacketPriority, packetPriority, NetServerPacketReliability, packetReliability, ePacketOrdering, packetOrdering );
+    DECLARE_FUNC_ARGS3 (                        GetPlayerIP                     , const NetServerPlayerIDRef, playerID, char*, strIP, unsigned short*, usPort );
+    DECLARE_FUNC_ARGS1 (                        Kick                            , const NetServerPlayerIDRef, PlayerID );
     DECLARE_FUNC_ARGS1 (                        SetPassword                     , const char*, szPassword );
     DECLARE_FUNC_ARGS1 (                        SetMaximumIncomingConnections   , unsigned short, numberAllowed );
     DECLARE_FUNC_ARGS2 (                        SetClientBitStreamVersion       , const NetServerPlayerIDRef, PlayerID, unsigned short, usBitStreamVersion );
@@ -145,10 +146,10 @@ public:
     DECLARE_FUNC_ARGS0R( unsigned int,          GetPendingPacketCount           );
     DECLARE_FUNC_ARGS1R( bool,                  InitServerId                    , const char*, szPath );
     DECLARE_FUNC_ARGS1 (                        SetEncryptionEnabled            , bool, bEncryptionEnabled );
-    DECLARE_FUNC_ARGS1 (                        ResendModPackets                , NetServerPlayerIDRef, playerID );
-    DECLARE_FUNC_ARGS3 (                        GetClientSerialAndVersion       , NetServerPlayerIDRef, playerID, CStaticString < 32 >&, strSerial, CStaticString < 32 >&, strVersion );
-    DECLARE_FUNC_ARGS4R( bool,                  ProcessPacket                   , unsigned char, ucPacketID, NetServerPlayerIDRef, Socket, NetBitStreamInterface*, BitStream, SNetExtraInfo*, pNetExtraInfo );
-
+    DECLARE_FUNC_ARGS1 (                        ResendModPackets                , const NetServerPlayerIDRef, playerID );
+    DECLARE_FUNC_ARGS3 (                        GetClientSerialAndVersion       , const NetServerPlayerIDRef, playerID, CStaticString < 32 >&, strSerial, CStaticString < 32 >&, strVersion );
+    DECLARE_FUNC_ARGS1 (                        SetNetOptions                   , const SNetOptions, options );
+    DECLARE_FUNC_ARGS4R( bool,                  ProcessPacket                   , unsigned char, ucPacketID, const NetServerPlayerIDRef, Socket, NetBitStreamInterface*, BitStream, SNetExtraInfo*, pNetExtraInfo );
 
     // Main thread functions
     void                        StopThread                  ( void );
@@ -165,8 +166,8 @@ public:
     static void*                StaticThreadProc            ( void* pContext );
     void*                       ThreadProc                  ( void );
     void                        ProcessCommand              ( CNetJobData* pJobData );
-    static bool                 StaticProcessPacket         ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo );
-    void                        ProcessPacket               ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo );
+    static bool                 StaticProcessPacket         ( unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo );
+    void                        ProcessPacket               ( unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo );
 
     // Watchdog thread functions
     void                        GetQueueSizes               ( uint& uiFinishedList, uint& uiOutCommandQueue, uint& uiOutResultQueue, uint& uiInResultQueue );

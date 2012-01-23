@@ -24,6 +24,13 @@ struct SPacketStat
     TIMEUS totalTime;
 };
 
+struct SNetOptions
+{
+    int iFakePacketLoss;
+    int iFakeExtraPing;
+    int iFakeExtraPingVariance;
+};
+
 class CNetServer
 {
 public:
@@ -42,21 +49,21 @@ public:
 
     virtual void                            RegisterPacketHandler           ( PPACKETHANDLER pfnPacketHandler ) = 0;
 
-    virtual bool                            GetNetworkStatistics            ( NetStatistics* pDest, NetServerPlayerID& PlayerID ) = 0;
+    virtual bool                            GetNetworkStatistics            ( NetStatistics* pDest, const NetServerPlayerID& PlayerID ) = 0;
     virtual const SPacketStat*              GetPacketStats                  ( void ) = 0;
     virtual bool                            GetBandwidthStatistics          ( SBandwidthStatistics* pDest ) = 0;
 
     virtual NetBitStreamInterface*          AllocateNetServerBitStream      ( unsigned short usBitStreamVersion ) = 0;
     virtual void                            DeallocateNetServerBitStream    ( NetBitStreamInterface* bitStream ) = 0;
-    virtual bool                            SendPacket                      ( unsigned char ucPacketID, NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast = false, NetServerPacketPriority packetPriority = PACKET_PRIORITY_LOW, NetServerPacketReliability packetReliability = PACKET_RELIABILITY_RELIABLE_ORDERED, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT ) = 0;
+    virtual bool                            SendPacket                      ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast = false, NetServerPacketPriority packetPriority = PACKET_PRIORITY_LOW, NetServerPacketReliability packetReliability = PACKET_RELIABILITY_RELIABLE_ORDERED, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT ) = 0;
 
-    virtual void                            GetPlayerIP                     ( NetServerPlayerID& playerID, char strIP[22], unsigned short* usPort ) = 0;
+    virtual void                            GetPlayerIP                     ( const NetServerPlayerID& playerID, char strIP[22], unsigned short* usPort ) = 0;
 
     virtual void                            AddBan                          ( const char* szIP ) = 0;
     virtual void                            RemoveBan                       ( const char* szIP ) = 0;
     virtual bool                            IsBanned                        ( const char* szIP ) = 0;
 
-    virtual void                            Kick                            ( NetServerPlayerID &PlayerID ) = 0;
+    virtual void                            Kick                            ( const NetServerPlayerID &PlayerID ) = 0;
 
     virtual void                            SetPassword                     ( const char* szPassword ) = 0;
 
@@ -73,9 +80,10 @@ public:
 
     virtual bool                            InitServerId                    ( const char* szPath ) = 0;
     virtual void                            SetEncryptionEnabled            ( bool bEncryptionEnabled ) = 0;
-    virtual void                            ResendModPackets                ( NetServerPlayerID& playerID ) = 0;
+    virtual void                            ResendModPackets                ( const NetServerPlayerID& playerID ) = 0;
 
-    virtual void                            GetClientSerialAndVersion       ( NetServerPlayerID& playerID, CStaticString < 32 >& strSerial, CStaticString < 32 >& strVersion ) = 0;
+    virtual void                            GetClientSerialAndVersion       ( const NetServerPlayerID& playerID, CStaticString < 32 >& strSerial, CStaticString < 32 >& strVersion ) = 0;
+    virtual void                            SetNetOptions                   ( const SNetOptions& options ) = 0;
 };
 
 #endif

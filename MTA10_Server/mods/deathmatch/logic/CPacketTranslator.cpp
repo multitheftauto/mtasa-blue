@@ -27,7 +27,7 @@ CPacketTranslator::~CPacketTranslator ( void )
 }
 
 
-CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID PacketID, NetBitStreamInterface& BitStream, SNetExtraInfo* pNetExtraInfo )
+CPacket* CPacketTranslator::Translate ( const NetServerPlayerID& Socket, ePacketID PacketID, NetBitStreamInterface& BitStream, SNetExtraInfo* pNetExtraInfo )
 {
     // Create the packet class
     CPacket* pTemp = NULL;

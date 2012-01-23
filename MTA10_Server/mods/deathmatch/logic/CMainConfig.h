@@ -81,7 +81,7 @@ public:
     bool                            IsBelowMinimumClient            ( const char* szVersion )   { return GetMinimumClientVersion () > szVersion; }
     bool                            IsBelowRecommendedClient        ( const char* szVersion )   { return m_strRecommendedClientVersion.length () && m_strRecommendedClientVersion > szVersion; }
     void                            SetMinimumClientVersionOverride ( const SString& strOverride ) { m_strMinClientVersionOverride = strOverride; }
-    const SString&                  GetMinimumClientVersion         ( void )                    { return m_strMinClientVersionOverride > m_strMinClientVersion ? m_strMinClientVersionOverride : m_strMinClientVersion; }
+    SString                         GetMinimumClientVersion         ( void );
     const SString&                  GetRecommendedClientVersion     ( void )                    { return m_strRecommendedClientVersion; }
     inline bool                     IsAutoLoginEnabled              ( )                         { return m_bAutoLogin; }
     const SString&                  GetIdFile                       ( void )                    { return m_strIdFile; }
@@ -104,8 +104,11 @@ public:
     bool                            SetSetting                      ( const SString& configSetting, const SString& strValue, bool bSave );
 
     void                            SetCommandLineParser            ( CCommandLineParser* pCommandLineParser );
+    void                            ApplyNetOptions                 ( void );
     void                            ApplyBandwidthReductionMode     ( void );
     void                            ApplyThreadNetEnabled           ( void );
+    void                            SetFakeLag                      ( int iPacketLoss, int iExtraPing, int iExtraPingVary );
+    const SNetOptions&              GetNetOptions                   ( void )                    { return m_NetOptions; }
 
 private:
     void                            RegisterCommand                 ( const char* szName, FCommandHandler* pFunction, bool bRestricted );
@@ -167,6 +170,7 @@ private:
     bool                            m_bThreadNetEnabled;
     int                             m_iDebugFlag;
     std::map < SString, SString >   m_TransientSettings;
+    SNetOptions                     m_NetOptions;
 };
 
 #endif

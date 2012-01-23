@@ -12477,18 +12477,14 @@ int CLuaFunctionDefinitions::GetNetworkStats ( lua_State* luaVM )
         NetStatistics stats;
         if ( g_pNetServer->GetNetworkStatistics ( &stats, PlayerID ) )
         {
-            uint uiNumMessagesInSendBuffer = 0;
-            for ( int i = 0; i < PACKET_PRIORITY_COUNT; ++i )
-                uiNumMessagesInSendBuffer += stats.messageInSendBuffer[i];
-
             lua_createtable ( luaVM, 0, 11 );
 
             lua_pushstring ( luaVM, "bytesReceived" );
-            lua_pushnumber ( luaVM, static_cast < double > ( stats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] ) );
+            lua_pushnumber ( luaVM, static_cast < double > ( stats.bytesReceived ) );
             lua_settable   ( luaVM, -3 );
 
             lua_pushstring ( luaVM, "bytesSent" );
-            lua_pushnumber ( luaVM, static_cast < double > ( stats.runningTotal [ NS_ACTUAL_BYTES_SENT ] ) );
+            lua_pushnumber ( luaVM, static_cast < double > ( stats.bytesSent ) );
             lua_settable   ( luaVM, -3 );
 
             lua_pushstring ( luaVM, "packetsReceived" );
@@ -12508,7 +12504,7 @@ int CLuaFunctionDefinitions::GetNetworkStats ( lua_State* luaVM )
             lua_settable   ( luaVM, -3 );
 
             lua_pushstring ( luaVM, "messagesInSendBuffer" );
-            lua_pushnumber ( luaVM, uiNumMessagesInSendBuffer );
+            lua_pushnumber ( luaVM, stats.messagesInSendBuffer );
             lua_settable   ( luaVM, -3 );
 
             lua_pushstring ( luaVM, "messagesInResendBuffer" );

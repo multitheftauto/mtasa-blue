@@ -29,7 +29,7 @@ public:
                             CPacketTranslator       ( CPlayerManager* pPlayerManager );
                             ~CPacketTranslator      ( void );
 
-    CPacket*                Translate               ( NetServerPlayerID& Socket, ePacketID PacketID, NetBitStreamInterface& BitStream, SNetExtraInfo* pNetExtraInfo );
+    CPacket*                Translate               ( const NetServerPlayerID& Socket, ePacketID PacketID, NetBitStreamInterface& BitStream, SNetExtraInfo* pNetExtraInfo );
 
 private:
     CPlayerManager*         m_pPlayerManager;
