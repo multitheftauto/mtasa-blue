@@ -117,7 +117,7 @@ private:
     STexInfo*           CreateTexInfo               ( const STexTag& texTag, const SString& strTextureName, CD3DDUMMY* pD3DData );
     void                OnDestroyTexInfo            ( STexInfo* pTexInfo );
     SShadInfo*          GetShadInfo                 ( CSHADERDUMMY* pShaderData, bool bAddIfRequired, float fPriority );
-    void                OnDestroyShadInfo           ( SShadInfo* pShadInfo );
+    void                DestroyShadInfo             ( SShadInfo* pShadInfo );
     void                MakeAssociation             ( SShadInfo* pShadInfo, STexInfo* pTexInfo );
     void                BreakAssociation            ( SShadInfo* pShadInfo, STexInfo* pTexInfo );
     void                UpdateAssociationForTexInfo ( STexInfo* pTexInfo );
