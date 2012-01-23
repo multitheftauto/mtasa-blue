@@ -45,20 +45,22 @@ bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
         
         // Count the amount of protected scripts
         unsigned short usProtectedScriptCount = 0;
-        list < CResourceFile* > ::iterator iter = m_pResource->IterBegin();
-        for ( ; iter != m_pResource->IterEnd (); iter++ )
+        if ( m_pResource->IsClientScriptsOn () == true )
         {
-            if ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT &&
-                 m_pResource->IsClientScriptsOn () &&
-                 static_cast<CResourceClientScriptItem*>(*iter)->IsProtected() == false )
+            list < CResourceFile* > ::iterator iter = m_pResource->IterBegin();
+            for ( ; iter != m_pResource->IterEnd (); iter++ )
             {
-                ++usProtectedScriptCount;
+                if ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT &&
+                     static_cast<CResourceClientScriptItem*>(*iter)->IsProtected() == true )
+                {
+                    ++usProtectedScriptCount;
+                }
             }
         }
         BitStream.Write ( usProtectedScriptCount );
 
         // Send the resource files info
-        iter = m_pResource->IterBegin();
+        list < CResourceFile* > ::iterator iter = m_pResource->IterBegin();
         for ( ; iter != m_pResource->IterEnd (); iter++ )
         {
             if ( ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_CONFIG && m_pResource->IsClientConfigsOn () ) ||
