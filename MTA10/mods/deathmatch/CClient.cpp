@@ -63,7 +63,7 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     g_pCore->GetCommands ()->Add ( "\x64\x61\x72\x6B\x73\x31\x64\x33","",                                               COMMAND_Eaeg );
     
     // Key commands (registered as 'mod commands', can be disabled)
-    g_pCore->GetCommands ()->Add ( "chatbox",                   "defines the chatbox color (r g b)",                    COMMAND_ChatBox, true );
+    g_pCore->GetCommands ()->Add ( "chatbox",                   "open the chat input",                                  COMMAND_ChatBox, true, true );
     g_pCore->GetCommands ()->Add ( "voiceptt",                  "transmits voice to other players",                     COMMAND_VoicePushToTalk, true, true );
     g_pCore->GetCommands ()->Add ( "enter_passenger",           "enters a car as passenger",                            COMMAND_EnterPassenger, true, true );
     g_pCore->GetCommands ()->Add ( "radio_next",                "next radio channel",                                   COMMAND_RadioNext, true, true );
