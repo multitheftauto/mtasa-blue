@@ -59,6 +59,7 @@ public:
 
     virtual bool                Start ( void ) = 0;
     virtual bool                Stop ( void ) = 0;
+    virtual bool                IsProtected ( void ) const              { return false; }
 
     inline eResourceType        GetType() { return m_type; }
     inline const char *         GetName() { return m_strShortName.c_str (); }
@@ -70,6 +71,7 @@ public:
 
     double                      GetApproxSize ( void ) { return m_uiFileSize; }    // Only used by download counters
     string                      GetMetaFileAttribute ( const string& key ) { return m_attributeMap[key]; }
+    SString                     GetCachedPathFilename ( bool bForceUnprotectedPath = false );
 };
 
 #endif

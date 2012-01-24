@@ -344,10 +344,9 @@ bool CResource::Load ( void )
                     case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
                     case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
                     {
-                        string clientFileShortPath = pResourceFile->GetName();
-                        string strDstFilePath = string ( g_pServerInterface->GetServerModPath () ) + "/resource-cache/http-client-files/" + this->GetName() + "/" + clientFileShortPath;
+                        string strDstFilePath = pResourceFile->GetCachedPathFilename ();
                         string strSrcFilePath;
-                        if ( GetFilePath ( clientFileShortPath.c_str (), strSrcFilePath ) )
+                        if ( GetFilePath ( pResourceFile->GetName(), strSrcFilePath ) )
                         {
                             unsigned long ulSrcFileCRC = CRCGenerator::GetCRCFromFile ( strSrcFilePath.c_str () );
                             unsigned long ulDstFileCRC = CRCGenerator::GetCRCFromFile ( strDstFilePath.c_str () );
@@ -359,6 +358,10 @@ bool CResource::Load ( void )
                                 {
                                     CLogger::LogPrintf ( "Could not copy '%s' to '%s'\n", strSrcFilePath.c_str (), strDstFilePath.c_str () );
                                 }
+
+                                // If script is protected, make sure there is no trace of it in the unprotected cache
+                                if ( pResourceFile->IsProtected () )
+                                    FileDelete ( pResourceFile->GetCachedPathFilename ( true ) );
                             }
                         }
                     }
