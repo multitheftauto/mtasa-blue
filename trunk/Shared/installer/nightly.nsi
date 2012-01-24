@@ -434,7 +434,13 @@ DontInstallRedist:
                 File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.is.xml"
                 File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.lnf.xml"
                 File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.png"
-                File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.xml"                
+                File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.xml"
+                
+                SetOutPath "$INSTDIR\skins\Lighter black"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.is.xml"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.lnf.xml"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.png"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.xml"
 
 				SetOutPath "$INSTDIR\MTA\cgui"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Falagard.xsd"
