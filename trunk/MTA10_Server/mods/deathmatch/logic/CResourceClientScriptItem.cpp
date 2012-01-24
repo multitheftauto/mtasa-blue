@@ -52,7 +52,7 @@ bool CResourceClientScriptItem::Start ( void )
     if ( IsProtected() == true )
     {
         // HACK - Use http-client-files if possible as the resources directory may have been changed since the resource was loaded.
-        SString strDstFilePath = string ( g_pServerInterface->GetServerModPath () ) + "/resource-cache/http-client-files/" + m_resource->GetName() + "/" + this->GetName();
+        SString strDstFilePath = GetCachedPathFilename ();
         if ( !m_resource->GetVirtualMachine()->CompileScriptFromFile ( strDstFilePath, &m_chunkCode ) )
             return false;
 

@@ -576,10 +576,12 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         SString strResourceCachePath ( "%s/resource-cache", g_pServerInterface->GetServerModPath () );
         SString strResourceCacheUnzippedPath ( "%s/unzipped", strResourceCachePath.c_str () );
         SString strResourceCacheHttpClientFilesPath ( "%s/http-client-files", strResourceCachePath.c_str () );
+        SString strResourceCacheHttpClientFilesProtectedPath ( "%s/http-client-files-protected", strResourceCachePath.c_str () );
 
         // Make sure the resource-cache directories exists
         MakeSureDirExists ( ( strResourceCacheUnzippedPath + "/" ).c_str () );
         MakeSureDirExists ( ( strResourceCacheHttpClientFilesPath + "/" ).c_str () );
+        MakeSureDirExists ( ( strResourceCacheHttpClientFilesProtectedPath + "/" ).c_str () );
 
         // Rename old resourcecache dir to show that it is no longer used
         SString strOldResourceCachePath ( "%s/resourcecache", g_pServerInterface->GetServerModPath () );
