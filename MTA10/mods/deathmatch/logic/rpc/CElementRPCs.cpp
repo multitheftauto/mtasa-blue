@@ -38,8 +38,6 @@ void CElementRPCs::LoadFunctions ( void )
     AddHandler ( SET_LOW_LOD_ELEMENT,            SetLowLodElement,            "SetLowLodElement" );
 }
 
-#define RUN_CHILDREN_SERVER CChildListType::const_iterator iter=pSource->IterBegin();for(;iter!=pSource->IterEnd();iter++) if (!(*iter)->IsLocalEntity())
-
 
 void CElementRPCs::SetElementParent ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
@@ -107,7 +105,6 @@ void CElementRPCs::RemoveElementData ( CClientEntity* pSource, NetBitStreamInter
 
 void CElementRPCs::SetElementPosition ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    RUN_CHILDREN_SERVER SetElementPosition ( *iter, bitStream );
     // Read out the entity id and the position
     CVector vecPosition;
     unsigned char ucTimeContext;
@@ -160,7 +157,6 @@ void CElementRPCs::SetElementPosition ( CClientEntity* pSource, NetBitStreamInte
 
 void CElementRPCs::SetElementVelocity ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    RUN_CHILDREN_SERVER SetElementVelocity ( *iter, bitStream );
     // Read out the entity id and the speed
     CVector vecVelocity;
     if ( bitStream.Read ( vecVelocity.fX ) &&
@@ -172,7 +168,7 @@ void CElementRPCs::SetElementVelocity ( CClientEntity* pSource, NetBitStreamInte
             case CCLIENTPED:
             case CCLIENTPLAYER:
             {
-                 CClientPed* pPed = static_cast < CClientPed* > ( pSource );
+                CClientPed* pPed = static_cast < CClientPed* > ( pSource );
 
                 pPed->SetMoveSpeed ( vecVelocity );
                 pPed->ResetInterpolation ();
@@ -186,7 +182,7 @@ void CElementRPCs::SetElementVelocity ( CClientEntity* pSource, NetBitStreamInte
             }
             case CCLIENTVEHICLE:
             {
-                 CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( pSource );                    
+                CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( pSource );                    
                 pVehicle->SetMoveSpeed ( vecVelocity );
 
                 break;
@@ -205,7 +201,6 @@ void CElementRPCs::SetElementVelocity ( CClientEntity* pSource, NetBitStreamInte
 
 void CElementRPCs::SetElementInterior ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    RUN_CHILDREN_SERVER SetElementInterior ( *iter, bitStream );
     unsigned char ucInterior, ucSetPosition;
     if ( bitStream.Read ( ucInterior ) && bitStream.Read ( ucSetPosition ) )
     {
@@ -307,7 +302,6 @@ void CElementRPCs::DetachElements ( CClientEntity* pSource, NetBitStreamInterfac
 
 void CElementRPCs::SetElementAlpha ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    RUN_CHILDREN_SERVER SetElementAlpha ( *iter, bitStream );
     unsigned char ucAlpha;
     if ( bitStream.Read ( ucAlpha ) )
     {
@@ -340,7 +334,6 @@ void CElementRPCs::SetElementAlpha ( CClientEntity* pSource, NetBitStreamInterfa
 
 void CElementRPCs::SetElementDoubleSided ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    RUN_CHILDREN_SERVER SetElementDoubleSided ( *iter, bitStream );
     bool bDoubleSided;
     if ( bitStream.ReadBit ( bDoubleSided ) )
     {
@@ -368,7 +361,6 @@ void CElementRPCs::SetElementName ( CClientEntity* pSource, NetBitStreamInterfac
 
 void CElementRPCs::SetElementHealth ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    RUN_CHILDREN_SERVER SetElementHealth ( *iter, bitStream );
     float fHealth;
     unsigned char ucTimeContext;
     if ( bitStream.Read ( fHealth ) &&
@@ -406,7 +398,6 @@ void CElementRPCs::SetElementHealth ( CClientEntity* pSource, NetBitStreamInterf
 
 void CElementRPCs::SetElementModel ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    RUN_CHILDREN_SERVER SetElementModel ( *iter, bitStream );
     unsigned short usModel;
     if ( bitStream.Read ( usModel ) )
     {
@@ -440,7 +431,6 @@ void CElementRPCs::SetElementModel ( CClientEntity* pSource, NetBitStreamInterfa
 
 void CElementRPCs::SetElementAttachedOffsets ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    RUN_CHILDREN_SERVER SetElementAttachedOffsets ( *iter, bitStream );
     SPositionSync position ( true );
     SRotationRadiansSync rotation ( true );
     if ( position.Read ( bitStream ) && rotation.Read ( bitStream ) )
@@ -484,7 +474,6 @@ void CElementRPCs::SetElementCollisionsEnabled ( CClientEntity* pSource, NetBitS
 
 void CElementRPCs::SetElementFrozen ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    RUN_CHILDREN_SERVER SetElementFrozen ( *iter, bitStream );
     bool bFrozen;
 
     if ( bitStream.ReadBit ( bFrozen ) )

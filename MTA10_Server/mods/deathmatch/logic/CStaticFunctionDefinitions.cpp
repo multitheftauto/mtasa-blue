@@ -1170,10 +1170,10 @@ bool CStaticFunctionDefinitions::GetElementVelocity ( CElement* pElement, CVecto
 }
 
 
-bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const CVector& vecPosition, bool bWarp, bool bBroadcast )
+bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const CVector& vecPosition, bool bWarp )
 {
     assert ( pElement );
-    RUN_CHILDREN SetElementPosition ( *iter, vecPosition, true, false );
+    RUN_CHILDREN SetElementPosition ( *iter, vecPosition );
 
     // Update our position for that entity.
     pElement->SetPosition ( vecPosition );
@@ -1183,28 +1183,25 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const 
         // Run colpoint checks
         m_pColManager->DoHitDetection ( pElement->GetLastPosition (), pElement->GetPosition (), 0.0f, pElement );
     }
-    
-    if ( bBroadcast )
-    {
-        // Construct the set position packet
-        CBitStream BitStream;
-        BitStream.pBitStream->Write ( vecPosition.fX );
-        BitStream.pBitStream->Write ( vecPosition.fY );
-        BitStream.pBitStream->Write ( vecPosition.fZ );
-        BitStream.pBitStream->Write ( pElement->GenerateSyncTimeContext () );
-        if ( IS_PLAYER ( pElement ) && !bWarp )
-            BitStream.pBitStream->Write ( static_cast < unsigned char > ( 0 ) );
 
-        // Tell only the relevant clients about this elements new position
-        if ( IS_PERPLAYER_ENTITY ( pElement ) )
-        {
-            m_pPlayerManager->Broadcast ( CElementRPCPacket ( pElement, SET_ELEMENT_POSITION, *BitStream.pBitStream ), static_cast < CPerPlayerEntity * > ( pElement )->GetPlayersList () );
-        }
-        // Tell all clients about its new position
-        else
-        {
-            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_POSITION, *BitStream.pBitStream ) );
-        }
+    // Construct the set position packet
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( vecPosition.fX );
+    BitStream.pBitStream->Write ( vecPosition.fY );
+    BitStream.pBitStream->Write ( vecPosition.fZ );
+    BitStream.pBitStream->Write ( pElement->GenerateSyncTimeContext () );
+    if ( IS_PLAYER ( pElement ) && !bWarp )
+        BitStream.pBitStream->Write ( static_cast < unsigned char > ( 0 ) );
+
+    // Tell only the relevant clients about this elements new position
+    if ( IS_PERPLAYER_ENTITY ( pElement ) )
+    {
+        m_pPlayerManager->Broadcast ( CElementRPCPacket ( pElement, SET_ELEMENT_POSITION, *BitStream.pBitStream ), static_cast < CPerPlayerEntity * > ( pElement )->GetPlayersList () );
+    }
+    // Tell all clients about its new position
+    else
+    {
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_POSITION, *BitStream.pBitStream ) );
     }
 
     return true;
@@ -1267,19 +1264,10 @@ bool CStaticFunctionDefinitions::SetElementRotation ( CElement* pElement, const 
 }
 
 
-bool CStaticFunctionDefinitions::SetElementVelocity ( CElement* pElement, const CVector& vecVelocity, bool bBroadcast )
+bool CStaticFunctionDefinitions::SetElementVelocity ( CElement* pElement, const CVector& vecVelocity )
 {
     assert ( pElement );
-    RUN_CHILDREN SetElementVelocity ( *iter, vecVelocity, false );
-
-    if ( bBroadcast )
-    {
-        CBitStream BitStream;
-        BitStream.pBitStream->Write ( vecVelocity.fX );
-        BitStream.pBitStream->Write ( vecVelocity.fY );
-        BitStream.pBitStream->Write ( vecVelocity.fZ );
-        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_VELOCITY, *BitStream.pBitStream ) );
-    }
+    RUN_CHILDREN SetElementVelocity ( *iter, vecVelocity );
 
     int iType = pElement->GetType ();
     switch ( iType )
@@ -1302,6 +1290,12 @@ bool CStaticFunctionDefinitions::SetElementVelocity ( CElement* pElement, const 
         default: return false;
     }
 
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( vecVelocity.fX );
+    BitStream.pBitStream->Write ( vecVelocity.fY );
+    BitStream.pBitStream->Write ( vecVelocity.fZ );
+    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_VELOCITY, *BitStream.pBitStream ) );
+
     return true;
 }
 
@@ -1323,30 +1317,26 @@ bool CStaticFunctionDefinitions::SetElementVisibleTo ( CElement* pElement, CElem
 }
 
 
-bool CStaticFunctionDefinitions::SetElementInterior ( CElement* pElement, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition, bool bBroadcast )
+bool CStaticFunctionDefinitions::SetElementInterior ( CElement* pElement, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition )
 {
     assert ( pElement );
-    RUN_CHILDREN SetElementInterior ( *iter, ucInterior, bSetPosition, vecPosition, false );
+    RUN_CHILDREN SetElementInterior ( *iter, ucInterior, bSetPosition, vecPosition );
 
     if ( ucInterior != pElement->GetInterior () )
     {
         pElement->SetInterior ( ucInterior );
 
-
-        if ( bBroadcast )
+        // Tell everyone
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( ucInterior );
+        BitStream.pBitStream->Write ( static_cast < unsigned char > ( ( bSetPosition ) ? 1 : 0 ) );
+        if ( bSetPosition )
         {
-            // Tell everyone
-            CBitStream BitStream;
-            BitStream.pBitStream->Write ( ucInterior );
-            BitStream.pBitStream->Write ( static_cast < unsigned char > ( ( bSetPosition ) ? 1 : 0 ) );
-            if ( bSetPosition )
-            {
-                BitStream.pBitStream->Write ( vecPosition.fX );
-                BitStream.pBitStream->Write ( vecPosition.fY );
-                BitStream.pBitStream->Write ( vecPosition.fZ );
-            }
-            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_INTERIOR, *BitStream.pBitStream ) );
+            BitStream.pBitStream->Write ( vecPosition.fX );
+            BitStream.pBitStream->Write ( vecPosition.fY );
+            BitStream.pBitStream->Write ( vecPosition.fZ );
         }
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_INTERIOR, *BitStream.pBitStream ) );
 
         return true;
     }
@@ -1426,6 +1416,7 @@ bool CStaticFunctionDefinitions::AttachElements ( CElement* pElement, CElement* 
 {
     assert ( pElement );
     assert ( pAttachedToElement );
+    RUN_CHILDREN AttachElements ( *iter, pAttachedToElement, vecPosition, vecRotation );
 
     // Check the elements we are attaching are not already connected
     std::set < CElement* > history;
@@ -1464,6 +1455,7 @@ bool CStaticFunctionDefinitions::AttachElements ( CElement* pElement, CElement* 
 bool CStaticFunctionDefinitions::DetachElements ( CElement* pElement, CElement* pAttachedToElement )
 {
     assert ( pElement );
+    RUN_CHILDREN DetachElements ( *iter, pAttachedToElement );
 
     CElement* pActualAttachedToElement = pElement->GetAttachedToElement ();
     if ( pActualAttachedToElement )
@@ -1491,18 +1483,10 @@ bool CStaticFunctionDefinitions::DetachElements ( CElement* pElement, CElement* 
 }
 
 
-bool CStaticFunctionDefinitions::SetElementAlpha ( CElement* pElement, unsigned char ucAlpha, bool bBroadcast )
+bool CStaticFunctionDefinitions::SetElementAlpha ( CElement* pElement, unsigned char ucAlpha )
 {
     assert ( pElement );
-    RUN_CHILDREN SetElementAlpha ( *iter, ucAlpha, false );
-
-
-    if ( bBroadcast )
-    {
-        CBitStream BitStream;
-        BitStream.pBitStream->Write ( ucAlpha );
-        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_ALPHA, *BitStream.pBitStream ) );
-    }
+    RUN_CHILDREN SetElementAlpha ( *iter, ucAlpha );
 
     switch ( pElement->GetType () )
     {
@@ -1536,40 +1520,33 @@ bool CStaticFunctionDefinitions::SetElementAlpha ( CElement* pElement, unsigned 
         default: return false;
     }
 
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( ucAlpha );
+    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_ALPHA, *BitStream.pBitStream ) );
+
     return true;
 }
 
 
-bool CStaticFunctionDefinitions::SetElementDoubleSided ( CElement* pElement, bool bDoubleSided, bool bBroadcast )
+bool CStaticFunctionDefinitions::SetElementDoubleSided ( CElement* pElement, bool bDoubleSided )
 {
     assert ( pElement );
-    RUN_CHILDREN SetElementDoubleSided ( *iter, bDoubleSided, false );
+    RUN_CHILDREN SetElementDoubleSided ( *iter, bDoubleSided );
 
     pElement->SetDoubleSided ( bDoubleSided );
 
-    if ( bBroadcast )
-    {
-        CBitStream BitStream;
-        BitStream.pBitStream->WriteBit ( bDoubleSided );
-        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DOUBLESIDED, *BitStream.pBitStream ) );
-    }
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteBit ( bDoubleSided );
+    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DOUBLESIDED, *BitStream.pBitStream ) );
 
     return true;
 }
 
 
-bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fHealth, bool bBroadcast )
+bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fHealth )
 {
     assert ( pElement );
-    RUN_CHILDREN SetElementHealth ( *iter, fHealth, false );
-
-    if ( bBroadcast )
-    {
-        CBitStream BitStream;
-        BitStream.pBitStream->Write ( fHealth );
-        BitStream.pBitStream->Write ( pElement->GenerateSyncTimeContext () );
-        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_HEALTH, *BitStream.pBitStream ) );
-    }
+    RUN_CHILDREN SetElementHealth ( *iter, fHealth );
 
     switch ( pElement->GetType () )
     {
@@ -1610,21 +1587,19 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fH
         default: return false;
     }
 
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( fHealth );
+    BitStream.pBitStream->Write ( pElement->GenerateSyncTimeContext () );
+    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_HEALTH, *BitStream.pBitStream ) );
+
     return true;
 }
 
 
-bool CStaticFunctionDefinitions::SetElementModel ( CElement* pElement, unsigned short usModel, bool bBroadcast )
+bool CStaticFunctionDefinitions::SetElementModel ( CElement* pElement, unsigned short usModel )
 {
     assert ( pElement );
-    RUN_CHILDREN SetElementModel ( *iter, usModel, false );
-
-    if ( bBroadcast )
-    {
-        CBitStream BitStream;
-        BitStream.pBitStream->Write ( usModel );
-        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_MODEL, *BitStream.pBitStream ) );
-    }
+    RUN_CHILDREN SetElementModel ( *iter, usModel );
 
     switch ( pElement->GetType () )
     {
@@ -1685,13 +1660,17 @@ bool CStaticFunctionDefinitions::SetElementModel ( CElement* pElement, unsigned 
         default: return false;
     }
 
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( usModel );
+    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_MODEL, *BitStream.pBitStream ) );
+
     return true;
 }
 
 
-bool CStaticFunctionDefinitions::SetElementAttachedOffsets ( CElement* pElement, CVector & vecPosition, CVector & vecRotation, bool bBroadcast )
+bool CStaticFunctionDefinitions::SetElementAttachedOffsets ( CElement* pElement, CVector & vecPosition, CVector & vecRotation )
 {
-    RUN_CHILDREN SetElementAttachedOffsets ( *iter, vecPosition, vecRotation, false );
+    RUN_CHILDREN SetElementAttachedOffsets ( *iter, vecPosition, vecRotation );
 
     CVector vecCurrentPos, vecCurrentRot;
     pElement->GetAttachedOffsets ( vecCurrentPos, vecCurrentRot );
@@ -1706,13 +1685,10 @@ bool CStaticFunctionDefinitions::SetElementAttachedOffsets ( CElement* pElement,
         SRotationRadiansSync rotation ( true );
         rotation.data.vecRotation = vecRotation;
 
-        if ( bBroadcast )
-        {
-            CBitStream BitStream;
-            position.Write ( *BitStream.pBitStream );
-            rotation.Write ( *BitStream.pBitStream );
-            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_ATTACHED_OFFSETS, *BitStream.pBitStream ) );
-        }
+        CBitStream BitStream;
+        position.Write ( *BitStream.pBitStream );
+        rotation.Write ( *BitStream.pBitStream );
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_ATTACHED_OFFSETS, *BitStream.pBitStream ) );
     }
     return true;
 }
@@ -1803,17 +1779,10 @@ bool CStaticFunctionDefinitions::SetElementCollisionsEnabled ( CElement* pElemen
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementFrozen ( CElement* pElement, bool bFrozen, bool bBroadcast )
+bool CStaticFunctionDefinitions::SetElementFrozen ( CElement* pElement, bool bFrozen )
 {
     assert ( pElement );
-    RUN_CHILDREN SetElementFrozen ( *iter, bFrozen, false );
-
-    if ( bBroadcast )
-    {
-        CBitStream BitStream;
-        BitStream.pBitStream->WriteBit ( bFrozen );
-        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_FROZEN, *BitStream.pBitStream ) );
-    }
+    RUN_CHILDREN SetElementFrozen ( *iter, bFrozen );
 
     switch ( pElement->GetType () )
     {
@@ -1838,6 +1807,10 @@ bool CStaticFunctionDefinitions::SetElementFrozen ( CElement* pElement, bool bFr
         }
         default: return false;
     }
+
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteBit ( bFrozen );
+    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_FROZEN, *BitStream.pBitStream ) );
 
     return true;
 }
