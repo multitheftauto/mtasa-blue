@@ -1341,9 +1341,11 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
                     CTaskSimpleCarSetPedInAsPassenger* pInTask = g_pGame->GetTasks ()->CreateTaskSimpleCarSetPedInAsPassenger ( pGameVehicle, ucSeat );
                     if ( pInTask )
                     {
+                        g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter ( false );
                         pInTask->SetIsWarpingPedIntoCar ();
                         pInTask->ProcessPed ( m_pPlayerPed );
                         pInTask->Destroy ();
+                        g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter ( true );
                     }
                 }
             }

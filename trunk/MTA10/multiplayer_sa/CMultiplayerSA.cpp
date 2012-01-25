@@ -7219,6 +7219,7 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision_Bike ( )
     {
         popad
         fcomp ds:0x859EF8
+        fcomp ds:0x0859EF8
         jmp JMP_CEventVehicleDamageCollision_Bike_RETN
     }
 }
@@ -7256,4 +7257,17 @@ void _declspec(naked) HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlaye
         xor eax, eax
         retn
     }
+}
+
+
+void CMultiplayerSA::SetAutomaticVehicleStartupOnPedEnter ( bool bSet )
+{
+    static BYTE originalCode [ 3 ] = { 0 };
+    if ( originalCode[0] == '\0' )
+        MemCpyFast ( &originalCode[0], (const void *)0x64BC05, 3 );
+
+    if ( bSet )
+        MemCpyFast ( (char *)0x64BC05, originalCode, 3 );
+    else
+        MemSetFast ( (char *)0x64BC05, 0x90, 3 );
 }
