@@ -7195,7 +7195,7 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision_Plane ( )
     _asm
     {
         popad
-        mov eax, dwPlaneDamageThreadshold
+        mov eax, DWORD PTR DS:[8D33E4h]
         jmp JMP_CEventVehicleDamageCollision_Plane_RETN
     }
 }
@@ -7218,8 +7218,7 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision_Bike ( )
     _asm
     {
         popad
-        fcomp ds:0x859EF8
-        fcomp ds:0x0859EF8
+        fcomp DWORD PTR DS:[859EF8h]
         jmp JMP_CEventVehicleDamageCollision_Bike_RETN
     }
 }
