@@ -83,7 +83,7 @@ namespace
                                          { "onPlayerScreenShot",        "1.3" },
                                          { "setOcclusionsEnabled",      "1.3" },
                                          { "getOcclusionsEnabled",      "1.3" },
-                                         { "fetchRemote",               "1.3.0-9.03736" },
+                                         { "fetchRemote",               "1.3.0-9.03739" },
                                         };
 
 
