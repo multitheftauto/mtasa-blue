@@ -729,6 +729,7 @@ void CLuaManager::LoadCFunctions ( void )
     */
 
     CLuaCFunctions::AddFunction ( "callRemote", CLuaFunctionDefinitions::CallRemote );
+    CLuaCFunctions::AddFunction ( "fetchRemote", CLuaFunctionDefinitions::FetchRemote );
 
     // Cursor get funcs
     CLuaCFunctions::AddFunction ( "isCursorShowing", CLuaFunctionDefinitions::IsCursorShowing );

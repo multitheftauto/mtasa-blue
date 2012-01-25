@@ -4261,7 +4261,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
     bitStream.Read ( ResourceDynamicEntityID );
 
     // Read the amount of protected scripts
-    if ( g_pCore->GetNetwork ()->GetServerBitStreamVersion() >= MTA_DM_BITSTREAM_VERSION )
+    if ( bitStream.Version () >= 0x26 )
         bitStream.Read ( usProtectedScriptCount );
 
     // Get the resource entity

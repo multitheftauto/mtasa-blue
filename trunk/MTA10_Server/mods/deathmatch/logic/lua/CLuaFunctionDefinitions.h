@@ -55,6 +55,7 @@ public:
 
     //
     static int      CallRemote                          ( lua_State* luaVM );
+    static int      FetchRemote                         ( lua_State* luaVM );
 
     // Event functions
     static int      AddEvent                            ( lua_State* luaVM );

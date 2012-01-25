@@ -36,7 +36,7 @@ CResourceDownloadFile::CResourceDownloadFile ( const char * szURL, const char * 
 void CResourceDownloadFile::Download()
 {
     CNetHTTPDownloadManagerInterface * manager = g_pNetServer->GetHTTPDownloadManager();
-    manager->QueueFile ( m_strURL.c_str (), m_strFileName.c_str (), 0, NULL, this, ProgressCallback );
+    manager->QueueFile ( m_strURL.c_str (), m_strFileName.c_str (), 0, 0, false, NULL, this, ProgressCallback );
     if ( !manager->IsDownloading() )
         manager->StartDownloadingQueuedFiles();
 }
@@ -85,7 +85,7 @@ void CResourceDownload::DownloadMeta (  )
     szMetaURL[511] = '\0';
 
 
-    m_downloadManager->QueueFile ( szMetaURL, szMetaDownloadPath, 0, NULL, this, ProgressCallback );
+    m_downloadManager->QueueFile ( szMetaURL, szMetaDownloadPath, 0, 0, false, NULL, this, ProgressCallback );
     if ( !m_downloadManager->IsDownloading() )
         m_downloadManager->StartDownloadingQueuedFiles();
 }
@@ -601,7 +601,7 @@ void CUpdateSite::DownloadUpdateManifest()
     szDownload[511] = '\0';
     m_strManifestDownloadFileName = szDownload;
 
-    m_downloadManager->QueueFile ( szManifestURL, szDownload, 0, 0, this, ProgressCallback );
+    m_downloadManager->QueueFile ( szManifestURL, szDownload, 0, 0, false, 0, this, ProgressCallback );
     if ( !m_downloadManager->IsDownloading() )
         m_downloadManager->StartDownloadingQueuedFiles();
 }
