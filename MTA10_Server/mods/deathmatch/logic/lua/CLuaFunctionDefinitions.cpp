@@ -208,6 +208,37 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
 }
 
 
+// Call a function on a remote server
+int CLuaFunctionDefinitions::FetchRemote ( lua_State* luaVM )
+{
+//  bool fetchRemote ( string URL, callback callbackFunction, [ string postData, bool bPostBinary ] )
+    CScriptArgReader argStream ( luaVM );
+    SString strURL; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary;
+
+    argStream.ReadString ( strURL );
+    argStream.ReadFunction ( iLuaFunction );
+    argStream.ReadString ( strPostData, "" );
+    argStream.ReadBool ( bPostBinary, false );
+    argStream.ReadFunctionComplete ();
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
+        {
+            g_pGame->GetRemoteCalls()->Call ( strURL, strPostData, bPostBinary, luaMain, iLuaFunction );
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fetchRemote", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::GetServerName ( lua_State* luaVM )
 {
     lua_pushstring ( luaVM, g_pGame->GetConfig()->GetServerName().c_str () );
