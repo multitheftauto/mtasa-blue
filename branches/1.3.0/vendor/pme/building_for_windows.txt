@@ -1,0 +1,16 @@
+Building PME for Visual Studio 6.0
+
+PCRE
+
+Regular expressions library
+
+http://gnuwin32.sourceforge.net/packages/pcre.htm -- you want "developer files"
+
+
+
+PME
+
+Windows - grab the latest version. There will be a vs6 directory. Open this in visual studio. Go into project->settings, hit the C/C++ tab, Category: preprocessor, and add/change the directory in "Additional include paths" to the PCRE include file - likely c:\program files\gnuwin32\include. Build it.
+
+http://xaxxon.slackworks.com/pme/
+
