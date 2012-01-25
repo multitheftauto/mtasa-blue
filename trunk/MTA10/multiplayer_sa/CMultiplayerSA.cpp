@@ -7257,16 +7257,3 @@ void _declspec(naked) HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlaye
         retn
     }
 }
-
-
-void CMultiplayerSA::SetAutomaticVehicleStartupOnPedEnter ( bool bSet )
-{
-    static BYTE originalCode [ 6 ] = { 0 };
-    if ( originalCode[0] == '\0' )
-        MemCpyFast ( &originalCode[0], (const void *)0x64BC0D, 6 );
-
-    if ( bSet )
-        MemCpyFast ( (char *)0x64BC0D, originalCode, 6 );
-    else
-        MemSetFast ( (char *)0x64BC0D, 0x90, 6 );
-}

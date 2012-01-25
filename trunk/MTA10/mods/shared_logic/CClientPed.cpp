@@ -1341,11 +1341,9 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
                     CTaskSimpleCarSetPedInAsPassenger* pInTask = g_pGame->GetTasks ()->CreateTaskSimpleCarSetPedInAsPassenger ( pGameVehicle, ucSeat );
                     if ( pInTask )
                     {
-                        g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter ( false );
                         pInTask->SetIsWarpingPedIntoCar ();
                         pInTask->ProcessPed ( m_pPlayerPed );
                         pInTask->Destroy ();
-                        g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter ( true );
                     }
                 }
             }
@@ -3611,11 +3609,9 @@ void CClientPed::InternalWarpIntoVehicle ( CVehicle* pGameVehicle )
         CTaskSimpleCarSetPedInAsDriver* pInTask = g_pGame->GetTasks ()->CreateTaskSimpleCarSetPedInAsDriver ( pGameVehicle );
         if ( pInTask )
         {
-            g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter ( false );
             pInTask->SetIsWarpingPedIntoCar ();
             pInTask->ProcessPed ( m_pPlayerPed );
             pInTask->Destroy ();
-            g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter ( true );
         }        
 
         // If we're a remote player, make sure we can't fall off

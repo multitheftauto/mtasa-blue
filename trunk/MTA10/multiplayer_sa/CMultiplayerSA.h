@@ -176,8 +176,6 @@ public:
     float                       GetAircraftMaxHeight        ( void )                    { return m_fAircraftMaxHeight; };
     void                        SetAircraftMaxHeight        ( float fHeight )           { m_fAircraftMaxHeight = fHeight; };
 
-    void                        SetAutomaticVehicleStartupOnPedEnter    ( bool bSet );
-
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;
     static char*                ms_PlayerImgCachePtr;
