@@ -87,22 +87,22 @@ public:
     static bool                 SetElementData                      ( CElement* pElement, const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronize );
     static bool                 RemoveElementData                   ( CElement* pElement, const char* szName );
     static bool                 SetElementParent                    ( CElement* pElement, CElement* pParent );
-    static bool                 SetElementPosition                  ( CElement* pElement, const CVector& vecPosition, bool bWarp = true );
+    static bool                 SetElementPosition                  ( CElement* pElement, const CVector& vecPosition, bool bWarp = true, bool bBroadcast = true );
     static bool                 SetElementRotation                  ( CElement* pElement, const CVector& vecRotation, const char* szRotationOrder );
-    static bool                 SetElementVelocity                  ( CElement* pElement, const CVector& vecVelocity );
+    static bool                 SetElementVelocity                  ( CElement* pElement, const CVector& vecVelocity, bool bBroadcast = true );
     static bool                 SetElementVisibleTo                 ( CElement* pElement, CElement* pReference, bool bVisible );
-    static bool                 SetElementInterior                  ( CElement* pElement, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition );
+    static bool                 SetElementInterior                  ( CElement* pElement, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition, bool bBroadcast = true );
     static bool                 SetElementDimension                 ( CElement* pElement, unsigned short usDimension );
     static bool                 AttachElements                      ( CElement* pElement, CElement* pAttachedToElement, CVector& vecPosition, CVector& vecRotation );
-    static bool                 DetachElements                      ( CElement* pElement, CElement* pAttachedToElement = NULL );
-    static bool                 SetElementAlpha                     ( CElement* pElement, unsigned char ucAlpha );
-    static bool                 SetElementDoubleSided               ( CElement* pElement, bool bDoubleSided );
-    static bool                 SetElementHealth                    ( CElement* pElement, float fHealth );
-    static bool                 SetElementModel                     ( CElement* pElement, unsigned short usModel );
-    static bool                 SetElementAttachedOffsets           ( CElement* pElement, CVector & vecPosition, CVector & vecRotation );
+    static bool                 DetachElements                      ( CElement* pElement, CElement* pAttachedToElement = NULL  );
+    static bool                 SetElementAlpha                     ( CElement* pElement, unsigned char ucAlpha, bool bBroadcast = true );
+    static bool                 SetElementDoubleSided               ( CElement* pElement, bool bDoubleSided, bool bBroadcast = true );
+    static bool                 SetElementHealth                    ( CElement* pElement, float fHealth, bool bBroadcast = true );
+    static bool                 SetElementModel                     ( CElement* pElement, unsigned short usModel, bool bBroadcast = true );
+    static bool                 SetElementAttachedOffsets           ( CElement* pElement, CVector & vecPosition, CVector & vecRotation, bool bBroadcast = true );
     static bool                 SetElementSyncer                    ( CElement* pElement, CPlayer* pPlayer, bool bEnable = true );
     static bool                 SetElementCollisionsEnabled         ( CElement* pElement, bool bEnable );
-    static bool                 SetElementFrozen                    ( CElement* pElement, bool bFrozen );
+    static bool                 SetElementFrozen                    ( CElement* pElement, bool bFrozen, bool bBroadcast = true );
     static bool                 SetLowLodElement                    ( CElement* pElement, CElement* pLowLodElement );
 
     // Scoreboard
