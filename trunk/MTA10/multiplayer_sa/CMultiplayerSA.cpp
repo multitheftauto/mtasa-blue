@@ -391,6 +391,9 @@ DWORD RETURN_CClothes_RebuildPlayerb                        = 0x5A837F;
 #define HOOKPOS_CProjectileInfo_FindPlayerPed               0x739321
 #define HOOKPOS_CProjectileInfo_FindPlayerVehicle           0x739570
 
+#define HOOKPOS_CHeli_ProcessHeliKill                       0x6DB201
+DWORD RETURN_CHeli_ProcessHeliKill_RETN_Cancel = 0x6DB9E0;
+DWORD RETURN_CHeli_ProcessHeliKill_RETN_Cont_Zero = 0x6DB207;
 
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
@@ -451,7 +454,7 @@ AddAnimationHandler* m_pAddAnimationHandler = NULL;
 BlendAnimationHandler* m_pBlendAnimationHandler = NULL;
 ProcessCollisionHandler* m_pProcessCollisionHandler = NULL;
 VehicleCollisionHandler* m_pVehicleCollisionHandler = NULL;
-
+HeliKillHandler* m_pHeliKillHandler = NULL;
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
 
@@ -589,6 +592,8 @@ void HOOK_CEventVehicleDamageCollision_Bike ( );
 void HOOK_CClothes_RebuildPlayer ();
 
 void HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlayerVehicle ();
+
+void HOOK_CHeli_ProcessHeliKill ();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -819,6 +824,8 @@ void CMultiplayerSA::InitHooks()
     // Fix for projectiles firing too fast locally.
     HookInstallCall ( (DWORD)HOOKPOS_CProjectileInfo_FindPlayerPed, (DWORD)HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlayerVehicle );
     HookInstallCall ( (DWORD)HOOKPOS_CProjectileInfo_FindPlayerVehicle, (DWORD)HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlayerVehicle );
+
+    HookInstall( (DWORD)HOOKPOS_CHeli_ProcessHeliKill, (DWORD)HOOK_CHeli_ProcessHeliKill, 6);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -2130,9 +2137,15 @@ void CMultiplayerSA::SetProcessCollisionHandler ( ProcessCollisionHandler * pHan
 {
     m_pProcessCollisionHandler = pHandler;
 }
+
 void CMultiplayerSA::SetVehicleCollisionHandler ( VehicleCollisionHandler * pHandler )
 {
     m_pVehicleCollisionHandler = pHandler;
+}
+
+void CMultiplayerSA::SetHeliKillHandler ( HeliKillHandler * pHandler )
+{
+    m_pHeliKillHandler = pHandler;
 }
 void CMultiplayerSA::HideRadar ( bool bHide )
 {
@@ -7269,4 +7282,57 @@ void CMultiplayerSA::SetAutomaticVehicleStartupOnPedEnter ( bool bSet )
         MemCpyFast ( (char *)0x64BC0D, originalCode, 6 );
     else
         MemSetFast ( (char *)0x64BC0D, 0x90, 6 );
+}
+
+// Storage
+CVehicleSAInterface * pHeliKiller = NULL;
+CPedSAInterface * pPedKilledByHeli = NULL;
+bool CallHeliKillEvent ( )
+{
+    // Is our handler alive
+    if ( m_pHeliKillHandler )
+    {
+        // Return our handlers return
+        return m_pHeliKillHandler ( pHeliKiller, pPedKilledByHeli );
+    }
+    // Return true else
+    return true;
+}
+
+void _declspec(naked) HOOK_CHeli_ProcessHeliKill ( )
+{
+    // 006DB201 0F 85 30 02 00 00                         jnz     loc_6DB437 < HOOK >
+    // 006DB207 8B 47 14                                  mov     eax, [edi+14h] < RETURN CONTINUE >
+    // 006DB9E0 8B 44 24 6C                               mov     eax, [esp+1C8h+var_15C] < RETURN CANCEL >
+    // Hook is in Process Heli blades I think it's processing a Heli's blades against peds inside a collision shape.
+    // We hook just after the check if he's touched the blade as before that it's just got the results of if he's near enough the heli to hit the blades
+    // esi = Heli
+    // edi = ped
+    _asm
+    {
+        pushad
+        mov pHeliKiller, esi
+        mov pPedKilledByHeli, edi
+    }
+    // Call our event
+    if ( CallHeliKillEvent ( ) == false )
+    {
+        _asm
+        {
+            popad
+            // Go to the end of the while loop and let it start again
+            jmp RETURN_CHeli_ProcessHeliKill_RETN_Cancel
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            // do our JNZ
+            jnz 6DB437h
+            // if it failed do our continue
+            jmp RETURN_CHeli_ProcessHeliKill_RETN_Cont_Zero
+        }
+    }
 }
