@@ -1173,7 +1173,7 @@ bool CStaticFunctionDefinitions::GetElementVelocity ( CElement* pElement, CVecto
 bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const CVector& vecPosition, bool bWarp, bool bBroadcast )
 {
     assert ( pElement );
-    RUN_CHILDREN SetElementPosition ( *iter, vecPosition, true, false );
+    RUN_CHILDREN SetElementPosition ( *iter, vecPosition, bWarp, false );
 
     // Update our position for that entity.
     pElement->SetPosition ( vecPosition );
