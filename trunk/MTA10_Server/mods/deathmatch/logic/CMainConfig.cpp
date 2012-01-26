@@ -991,7 +991,8 @@ SString CMainConfig::GetMinimumClientVersion ( void )
 {
     SString strMinReq = m_strMinClientVersionOverride > m_strMinClientVersion ? m_strMinClientVersionOverride : m_strMinClientVersion;
 #ifndef MTA_DEBUG
-    SString strMinReqForRelease = "1.3.0-9.03724";
+    // For forcing a minclient requirement
+    SString strMinReqForRelease = "1.4.0-0.00000";
     if ( strMinReqForRelease > strMinReq )
         strMinReq = strMinReqForRelease;
 #endif
