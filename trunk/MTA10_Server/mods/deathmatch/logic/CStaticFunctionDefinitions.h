@@ -92,7 +92,7 @@ public:
     static bool                 SetElementVelocity                  ( CElement* pElement, const CVector& vecVelocity, bool bBroadcast = true );
     static bool                 SetElementVisibleTo                 ( CElement* pElement, CElement* pReference, bool bVisible );
     static bool                 SetElementInterior                  ( CElement* pElement, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition, bool bBroadcast = true );
-    static bool                 SetElementDimension                 ( CElement* pElement, unsigned short usDimension );
+    static bool                 SetElementDimension                 ( CElement* pElement, unsigned short usDimension, bool bBroadcast = true );
     static bool                 AttachElements                      ( CElement* pElement, CElement* pAttachedToElement, CVector& vecPosition, CVector& vecRotation );
     static bool                 DetachElements                      ( CElement* pElement, CElement* pAttachedToElement = NULL  );
     static bool                 SetElementAlpha                     ( CElement* pElement, unsigned char ucAlpha, bool bBroadcast = true );

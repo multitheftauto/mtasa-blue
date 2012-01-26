@@ -1355,9 +1355,17 @@ bool CStaticFunctionDefinitions::SetElementInterior ( CElement* pElement, unsign
 }
 
 
-bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsigned short usDimension )
+bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsigned short usDimension, bool bBroadcast )
 {
     assert ( pElement );
+    RUN_CHILDREN ( *iter, usDimension, false );
+
+    if ( bBroadcast )
+    {
+        CBitStream bitStream;
+        bitStream.pBitStream->Write ( usDimension );
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DIMENSION, *bitStream.pBitStream ) );
+    }
 
     if ( pElement->GetType () == CElement::TEAM )
     {
@@ -1409,11 +1417,6 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsig
         case CElement::WORLD_MESH:
         {
             pElement->SetDimension ( usDimension );
-
-            CBitStream bitStream;
-            bitStream.pBitStream->Write ( usDimension );
-            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DIMENSION, *bitStream.pBitStream ) );
-
             return true;
         }
     }

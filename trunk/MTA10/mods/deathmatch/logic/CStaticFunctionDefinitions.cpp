@@ -1128,6 +1128,8 @@ bool CStaticFunctionDefinitions::SetElementInterior ( CClientEntity& Entity, uns
 
 bool CStaticFunctionDefinitions::SetElementDimension ( CClientEntity& Entity, unsigned short usDimension )
 {
+    RUN_CHILDREN SetElementDimension ( **iter, usDimension );
+
     switch ( Entity.GetType () )
     {
         // Client side elements
