@@ -227,6 +227,7 @@ void CElementRPCs::SetElementInterior ( CClientEntity* pSource, NetBitStreamInte
 
 void CElementRPCs::SetElementDimension ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
+    RUN_CHILDREN_SERVER SetElementDimension ( *iter, bitStream );
     unsigned short usDimension;
     if ( bitStream.Read ( usDimension ) )
     {
