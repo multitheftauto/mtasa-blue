@@ -37,6 +37,7 @@ CNetAPI::CNetAPI ( CClientManager* pManager )
     m_pLastSentCameraTarget = NULL;
     m_ulLastCameraSyncTime = 0;
     m_bStoredReturnSync = false;
+    m_bIncreaseTimeoutTime = false;
 }
 
 
@@ -271,6 +272,21 @@ void CNetAPI::DoPulse ( void )
     // If we're ingame
     if ( m_pManager->IsGameLoaded () )
     {
+        // Increase timeout time if downloading something
+        if ( g_pClientGame->IsDownloadingBigPacket () || g_pNet->GetHTTPDownloadManager ()->IsDownloading () )
+        {
+            m_bIncreaseTimeoutTime = true;
+            m_IncreaseTimeoutTimeTimer.Reset ();
+        }
+        else
+        if ( m_bIncreaseTimeoutTime )
+        {
+            // Extra 5 seconds after download has finished before restoring default timeout time
+            if ( m_IncreaseTimeoutTimeTimer.Get () > 5000 )
+                m_bIncreaseTimeoutTime = false;
+        }
+        g_pNet->SetTimeoutTime ( m_bIncreaseTimeoutTime ? 30000 : 10000 );
+
         // Grab the local player
         CClientPlayer* pPlayer = m_pPlayerManager->GetLocalPlayer ();
         if ( pPlayer && !pPlayer->IsDeadOnNetwork () )
@@ -352,7 +368,8 @@ void CNetAPI::DoPulse ( void )
                     ( m_ulLastSyncReturnTime != 0 ) &&
                     ( ulCurrentTime <= m_ulLastPuresyncTime + 5000 ) &&
                     ( ulCurrentTime >= m_ulLastSyncReturnTime + 10000 ) &&
-                    ( !g_pClientGame->IsGettingIntoVehicle () ) )
+                    ( !g_pClientGame->IsGettingIntoVehicle () ) &&
+                    ( !m_bIncreaseTimeoutTime ) )
             {
                 // No vehicle or vehicle in seat 0?
                 if ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 )

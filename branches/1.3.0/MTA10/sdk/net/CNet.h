@@ -91,6 +91,7 @@ public:
 
     virtual void                        SetEncryptionEnabled        ( bool bEncryptionEnabled ) = 0;
     virtual uint                        GetExtendedErrorCode        ( void ) = 0;
+    virtual void                        SetTimeoutTime              ( uint uiTimeoutTime ) = 0;
 };
 
 #endif
