@@ -58,7 +58,7 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
                     ReadLightweightSync ( pPlayer, BitStream );
                 }
                 else
-                    g_pCore->GetConsole ()->Print ( "Player not found." );
+                    OutputDebugLine ( "[Sync] Player not found" );
             }
             return true;
         }
