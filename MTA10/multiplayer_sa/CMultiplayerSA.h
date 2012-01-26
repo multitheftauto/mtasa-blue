@@ -75,6 +75,7 @@ public:
     void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler );
     void                        SetProcessCollisionHandler  ( ProcessCollisionHandler * pHandler );
     void                        SetVehicleCollisionHandler  ( VehicleCollisionHandler * pHandler );
+    void                        SetHeliKillHandler          ( HeliKillHandler * pHandler );
 
     void                        AllowMouseMovement          ( bool bAllow );
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );

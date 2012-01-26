@@ -55,6 +55,7 @@
 #include "CVariableBuffer.h"
 #include "CLocalServer.h"
 #include "CVoiceRecorder.h"
+#define HeliKill_List_Clear_Rate 500
 
 class CClientGame
 {
@@ -448,7 +449,8 @@ private:
     static void                         StaticBlendAnimationHandler     ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     static bool                         StaticProcessCollisionHandler   ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     static bool                         StaticVehicleCollisionHandler   ( CVehicleSAInterface* pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity  );
- 
+    static bool                         StaticHeliKillHandler           ( CVehicleSAInterface* pHeli, CPedSAInterface* pPed );
+
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
     void                                FireHandler                     ( CFire* pFire );
     bool                                BreakTowLinkHandler             ( CVehicle* pTowedVehicle );
@@ -463,7 +465,8 @@ private:
     void                                BlendAnimationHandler           ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     bool                                ProcessCollisionHandler         ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     bool                                VehicleCollisionHandler         ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity  );
-   
+    bool                                HeliKillHandler                 ( CVehicleSAInterface* pHeli, CPedSAInterface* pPed );
+
     static bool                         StaticProcessMessage            ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     bool                                ProcessMessage                  ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
@@ -667,6 +670,8 @@ private:
     std::list < SScreenShotArgs >       m_ScreenShotArgList;
     ushort                              m_usNextScreenShotId;
     std::list < SDelayedPacketInfo >    m_DelayedSendList;
+    std::multimap < CClientVehicle *, CClientPed * > m_HeliCollisionsMap;
+    CElapsedTime                        m_LastClearTime;
 };
 
 extern CClientGame* g_pClientGame;
