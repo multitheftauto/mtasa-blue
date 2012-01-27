@@ -113,6 +113,9 @@ private:
     CVector                 m_vecLastSentCameraLookAt;
 
     CInterpolator<CVector>  m_Interpolator;
+
+    bool                    m_bIncreaseTimeoutTime;
+    CElapsedTime            m_IncreaseTimeoutTimeTimer;
 };
 
 #endif

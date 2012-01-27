@@ -636,7 +636,7 @@ int CLuaFunctionDefs::GetZoneName ( lua_State* luaVM )
     argStream.ReadNumber ( vecPosition.fX );
     argStream.ReadNumber ( vecPosition.fY );
     argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadBool ( bCitiesOnly, true );
+    argStream.ReadBool ( bCitiesOnly, false );
 
     if ( !argStream.HasErrors () )
     {
