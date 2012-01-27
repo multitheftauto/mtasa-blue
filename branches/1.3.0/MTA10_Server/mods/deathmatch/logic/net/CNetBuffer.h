@@ -170,7 +170,7 @@ public:
     void                        ProcessPacket               ( unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo );
 
     // Watchdog thread functions
-    void                        GetQueueSizes               ( uint& uiFinishedList, uint& uiOutCommandQueue, uint& uiOutResultQueue, uint& uiInResultQueue );
+    void                        GetQueueSizes               ( uint& uiFinishedList, uint& uiOutCommandQueue, uint& uiOutResultQueue, uint& uiInResultQueue, uint& uiGamePlayerCount );
 
     // Main thread variables
     PPACKETHANDLER                      m_pfnDMPacketHandler;
@@ -195,5 +195,6 @@ public:
         CDebugComboMutex                            m_Mutex;
         CNetBufferWatchDog*                         m_pWatchDog;
         int                                         m_iThreadFrameCount;
+        uint                                        m_iuGamePlayerCount;
     } shared;
 };
