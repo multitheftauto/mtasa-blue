@@ -10901,7 +10901,7 @@ static void DbQueryCallback ( CDbJobData* pJobData, void* pContext )
         if ( pLuaCallback )
             pLuaCallback->Call ();
     }
-    SAFE_DELETE( pLuaCallback );
+    g_pGame->GetLuaCallbackManager ()->DestroyCallback ( pLuaCallback );
 }
 
 // Handle callback for DbExec
@@ -11066,7 +11066,7 @@ int CLuaFunctionDefinitions::DbQuery ( lua_State* luaVM )
                 CLuaArguments Arguments;
                 Arguments.PushUserData ( reinterpret_cast < void* > ( pJobData->GetId () ) );
                 Arguments.PushArguments ( callbackArgs );
-                pJobData->SetCallback ( DbQueryCallback, new CLuaCallback ( pLuaMain, iLuaFunction, Arguments ) );
+                pJobData->SetCallback ( DbQueryCallback, g_pGame->GetLuaCallbackManager ()->CreateCallback ( pLuaMain, iLuaFunction, Arguments ) );
             }
         }
         // Add debug info incase query result does not get collected

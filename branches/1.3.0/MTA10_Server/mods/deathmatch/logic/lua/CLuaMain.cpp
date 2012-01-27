@@ -101,6 +101,7 @@ CLuaMain::~CLuaMain ( void )
 {
     // remove all current remote calls originating from this VM
     g_pGame->GetRemoteCalls()->Remove ( this );
+    g_pGame->GetLuaCallbackManager ()->OnLuaMainDestroy ( this );
 
     // Unload the current script
     UnloadScript ();

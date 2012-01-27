@@ -93,6 +93,7 @@ class CPlayerManager;
 class CRadarAreaManager;
 class CRegisteredCommands;
 class CDatabaseManager;
+class CLuaCallbackManager;
 class CRegistryManager;
 class CRegistry;
 class CRemoteCalls;
@@ -204,6 +205,7 @@ public:
 #endif
     inline CConsole*                GetConsole                  ( void )        { return m_pConsole; }
     inline CDatabaseManager*        GetDatabaseManager          ( void )        { return m_pDatabaseManager; }
+    inline CLuaCallbackManager*     GetLuaCallbackManager       ( void )        { return m_pLuaCallbackManager; }
     inline CRegistryManager*        GetRegistryManager          ( void )        { return m_pRegistryManager; }
     inline CRegistry*               GetRegistry                 ( void )        { return m_pRegistry; }
     inline CAccountManager*         GetAccountManager           ( void )        { return m_pAccountManager; }
@@ -414,6 +416,7 @@ private:
     CCommandLineParser              m_CommandLineParser;
     CRegisteredCommands*            m_pRegisteredCommands;
     CDatabaseManager*               m_pDatabaseManager;
+    CLuaCallbackManager*            m_pLuaCallbackManager;
     CRegistryManager*               m_pRegistryManager;
     CRegistry*                      m_pRegistry;
     CAccountManager*                m_pAccountManager;
