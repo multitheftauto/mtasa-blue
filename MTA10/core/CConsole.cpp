@@ -90,6 +90,7 @@ void CConsole::Echo ( const char* szText )
     {
         m_pHistory->SetVerticalScrollPosition ( fScroll );
     }
+    CConsoleLogger::GetSingleton().LinePrintf ( "[Output] : %s", szText );
 }
 
 
@@ -232,6 +233,9 @@ bool CConsole::Edit_OnTextAccepted ( CGUIElement* pElement )
 
     // Add the text to the history buffer.
     //Echo ( strInput.c_str () );
+
+    // Write to console log
+    CConsoleLogger::GetSingleton().LinePrintf ( "[Input]  : %s", strInput.c_str() );
 
     // Parse out the command name and command line.
     GetCommandInfo ( strInput.c_str (), strCmd, strCmdLine );

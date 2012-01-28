@@ -111,6 +111,7 @@ CCore::CCore ( void )
 
     // Create a logger instance.
     m_pLogger                   = new CLogger ( );
+    m_pConsoleLogger            = new CConsoleLogger ( );
 
     // Create interaction objects.
     m_pCommands                 = new CCommands;
@@ -229,6 +230,7 @@ CCore::~CCore ( void )
 
     // Delete the logger
     delete m_pLogger;
+    delete m_pConsoleLogger;
 
     //Delete the Current Server
     delete m_pCurrentServer;
