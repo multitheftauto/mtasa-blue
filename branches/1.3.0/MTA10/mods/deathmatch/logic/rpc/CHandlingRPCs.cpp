@@ -32,6 +32,7 @@ void CHandlingRPCs::SetVehicleHandling ( CClientEntity* pSource, NetBitStreamInt
         // Grab the vehicle handling entry
         CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( *pSource );
         CHandlingEntry* pEntry = Vehicle.GetHandlingData();
+        bool bReadSuspension = Vehicle.GetModelInfo()->IsCar() || Vehicle.GetModelInfo()->IsMonsterTruck();
 
         SVehicleHandlingSync handling;
         bitStream.Read ( &handling );
@@ -53,13 +54,16 @@ void CHandlingRPCs::SetVehicleHandling ( CClientEntity* pSource, NetBitStreamInt
         pEntry->SetSteeringLock ( handling.data.fSteeringLock );
         pEntry->SetTractionLoss ( handling.data.fTractionLoss );
         pEntry->SetTractionBias ( handling.data.fTractionBias );
-        pEntry->SetSuspensionForceLevel ( handling.data.fSuspensionForceLevel );
-        pEntry->SetSuspensionDamping ( handling.data.fSuspensionDamping );
-        pEntry->SetSuspensionHighSpeedDamping ( handling.data.fSuspensionHighSpdDamping );
-        pEntry->SetSuspensionUpperLimit ( handling.data.fSuspensionUpperLimit );
-        pEntry->SetSuspensionLowerLimit ( handling.data.fSuspensionLowerLimit );
-        pEntry->SetSuspensionFrontRearBias ( handling.data.fSuspensionFrontRearBias );
-        pEntry->SetSuspensionAntiDiveMultiplier ( handling.data.fSuspensionAntiDiveMultiplier );
+        if ( bReadSuspension )
+        {
+            pEntry->SetSuspensionForceLevel ( handling.data.fSuspensionForceLevel );
+            pEntry->SetSuspensionDamping ( handling.data.fSuspensionDamping );
+            pEntry->SetSuspensionHighSpeedDamping ( handling.data.fSuspensionHighSpdDamping );
+            pEntry->SetSuspensionUpperLimit ( handling.data.fSuspensionUpperLimit );
+            pEntry->SetSuspensionLowerLimit ( handling.data.fSuspensionLowerLimit );
+            pEntry->SetSuspensionFrontRearBias ( handling.data.fSuspensionFrontRearBias );
+            pEntry->SetSuspensionAntiDiveMultiplier ( handling.data.fSuspensionAntiDiveMultiplier );
+        }
         pEntry->SetCollisionDamageMultiplier ( handling.data.fCollisionDamageMultiplier );
         pEntry->SetModelFlags ( handling.data.uiModelFlags );
         pEntry->SetHandlingFlags ( handling.data.uiHandlingFlags );
@@ -212,39 +216,75 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
                     break;
 
                 case HANDLING_SUSPENSION_FORCELEVEL:
+                {
+
                     bitStream.Read ( fFloat );
-                    pHandlingEntry->SetSuspensionForceLevel ( fFloat );
+                    if ( vehicle.GetModelInfo()->IsCar ( ) || vehicle.GetModelInfo()->IsMonsterTruck() )
+                    {
+                        pHandlingEntry->SetSuspensionForceLevel ( fFloat );
+                    }
                     break;
+                }
 
                 case HANDLING_SUSPENSION_DAMPING:
+                {
                     bitStream.Read ( fFloat );
-                    pHandlingEntry->SetSuspensionDamping ( fFloat );
+                    if ( vehicle.GetModelInfo()->IsCar ( ) || vehicle.GetModelInfo()->IsMonsterTruck() )
+                    {
+                        pHandlingEntry->SetSuspensionDamping ( fFloat );
+                    }
                     break;
+                }
 
                 case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
+                {
                     bitStream.Read ( fFloat );
-                    pHandlingEntry->SetSuspensionHighSpeedDamping ( fFloat );
+                    if ( vehicle.GetModelInfo()->IsCar ( ) || vehicle.GetModelInfo()->IsMonsterTruck() )
+                    {
+                        pHandlingEntry->SetSuspensionHighSpeedDamping ( fFloat );
+                    }
                     break;
+                }
 
                 case HANDLING_SUSPENSION_UPPER_LIMIT:
+                {
                     bitStream.Read ( fFloat );
-                    pHandlingEntry->SetSuspensionUpperLimit ( fFloat );
+                    if ( vehicle.GetModelInfo()->IsCar ( ) || vehicle.GetModelInfo()->IsMonsterTruck() )
+                    {
+                        pHandlingEntry->SetSuspensionUpperLimit ( fFloat );
+                    }
                     break;
+                }
 
                 case HANDLING_SUSPENSION_LOWER_LIMIT:
+                {
                     bitStream.Read ( fFloat );
-                    pHandlingEntry->SetSuspensionLowerLimit ( fFloat );
+                    if ( vehicle.GetModelInfo()->IsCar ( ) || vehicle.GetModelInfo()->IsMonsterTruck() )
+                    {
+                        pHandlingEntry->SetSuspensionLowerLimit ( fFloat );
+                    }
                     break;
+                }
 
                 case HANDLING_SUSPENSION_FRONTREARBIAS:
+                {
                     bitStream.Read ( fFloat );
-                    pHandlingEntry->SetSuspensionFrontRearBias ( fFloat );
+                    if ( vehicle.GetModelInfo()->IsCar ( ) || vehicle.GetModelInfo()->IsMonsterTruck() )
+                    {
+                        pHandlingEntry->SetSuspensionFrontRearBias ( fFloat );
+                    }
                     break;
+                }
 
                 case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
+                {
                     bitStream.Read ( fFloat );
-                    pHandlingEntry->SetSuspensionAntiDiveMultiplier ( fFloat );
+                    if ( vehicle.GetModelInfo()->IsCar ( ) || vehicle.GetModelInfo()->IsMonsterTruck() )
+                    {
+                        pHandlingEntry->SetSuspensionAntiDiveMultiplier ( fFloat );
+                    }
                     break;
+                }
 
                 case HANDLING_COLLISIONDAMAGEMULTIPLIER:
                     bitStream.Read ( fFloat );
@@ -312,6 +352,11 @@ void CHandlingRPCs::RestoreVehicleHandlingProperty ( CClientEntity* pSource, Net
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( *pSource );
             CHandlingEntry* pHandlingEntry = Vehicle.GetHandlingData ();
             const CHandlingEntry* pOriginalEntry = Vehicle.GetOriginalHandlingData ();
+            if ( ucProperty >= HANDLING_SUSPENSION_FORCELEVEL && ucProperty <= HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER &&
+                ( Vehicle.GetModelInfo()->IsCar ( ) || Vehicle.GetModelInfo()->IsMonsterTruck ( ) ) )
+            {
+                return;
+            }
             if ( pOriginalEntry )
             {
                 // Depending on what property

@@ -2014,21 +2014,24 @@ void CVehicleSA::RecalculateSuspensionLines ( void )
     //    return;
     //}
 
-    CVehicleSAInterface* pInt = GetVehicleInterface ();
     DWORD dwModel = GetModelIndex ();
     CModelInfo* pModelInfo = pGame->GetModelInfo ( dwModel );
-    // Trains (Their trailers do as well!)
-    if ( pModelInfo->IsTrain () || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590 )
-        return;
-
-    CVehicleSAInterfaceVTBL* pVtbl = reinterpret_cast < CVehicleSAInterfaceVTBL* > ( pInt->vtbl );
-    DWORD dwSetupSuspensionLines = pVtbl->SetupSuspensionLines;
-    DWORD dwThis = (DWORD)pInt;
-    _asm
+    if ( pModelInfo->IsMonsterTruck() || pModelInfo->IsCar() )
     {
-        mov ecx, dwThis
-        call dwSetupSuspensionLines
-    }
+        CVehicleSAInterface* pInt = GetVehicleInterface ();
+        // Trains (Their trailers do as well!)
+        if ( pModelInfo->IsTrain () || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590 )
+            return;
 
-    CopyGlobalSuspensionLinesToPrivate ();
+        CVehicleSAInterfaceVTBL* pVtbl = reinterpret_cast < CVehicleSAInterfaceVTBL* > ( pInt->vtbl );
+        DWORD dwSetupSuspensionLines = pVtbl->SetupSuspensionLines;
+        DWORD dwThis = (DWORD)pInt;
+        _asm
+        {
+            mov ecx, dwThis
+            call dwSetupSuspensionLines
+        }
+
+        CopyGlobalSuspensionLinesToPrivate ();
+    }
 }

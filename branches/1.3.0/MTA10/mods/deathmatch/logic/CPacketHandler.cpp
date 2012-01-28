@@ -2959,13 +2959,16 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         pEntry->SetSteeringLock ( handling.data.fSteeringLock );
                         pEntry->SetTractionLoss ( handling.data.fTractionLoss );
                         pEntry->SetTractionBias ( handling.data.fTractionBias );
-                        pEntry->SetSuspensionForceLevel ( handling.data.fSuspensionForceLevel );
-                        pEntry->SetSuspensionDamping ( handling.data.fSuspensionDamping );
-                        pEntry->SetSuspensionHighSpeedDamping ( handling.data.fSuspensionHighSpdDamping );
-                        pEntry->SetSuspensionUpperLimit ( handling.data.fSuspensionUpperLimit );
-                        pEntry->SetSuspensionLowerLimit ( handling.data.fSuspensionLowerLimit );
-                        pEntry->SetSuspensionFrontRearBias ( handling.data.fSuspensionFrontRearBias );
-                        pEntry->SetSuspensionAntiDiveMultiplier ( handling.data.fSuspensionAntiDiveMultiplier );
+                        if ( pVehicle->GetModelInfo()->IsCar ( ) || pVehicle->GetModelInfo()->IsMonsterTruck() )
+                        {
+                            pEntry->SetSuspensionForceLevel ( handling.data.fSuspensionForceLevel );
+                            pEntry->SetSuspensionDamping ( handling.data.fSuspensionDamping );
+                            pEntry->SetSuspensionHighSpeedDamping ( handling.data.fSuspensionHighSpdDamping );
+                            pEntry->SetSuspensionUpperLimit ( handling.data.fSuspensionUpperLimit );
+                            pEntry->SetSuspensionLowerLimit ( handling.data.fSuspensionLowerLimit );
+                            pEntry->SetSuspensionFrontRearBias ( handling.data.fSuspensionFrontRearBias );
+                            pEntry->SetSuspensionAntiDiveMultiplier ( handling.data.fSuspensionAntiDiveMultiplier );
+                        }
                         pEntry->SetCollisionDamageMultiplier ( handling.data.fCollisionDamageMultiplier );
                         pEntry->SetModelFlags ( handling.data.uiModelFlags );
                         pEntry->SetHandlingFlags ( handling.data.uiHandlingFlags );
