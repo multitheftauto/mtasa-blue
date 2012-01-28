@@ -242,6 +242,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetBlendAnimationHandler ( CClientGame::StaticBlendAnimationHandler );
     g_pMultiplayer->SetProcessCollisionHandler ( CClientGame::StaticProcessCollisionHandler );
     g_pMultiplayer->SetVehicleCollisionHandler( CClientGame::StaticVehicleCollisionHandler );
+    g_pMultiplayer->SetHeliKillHandler ( CClientGame::StaticHeliKillHandler );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( CClientGame::StaticKeyStrokeHandler );
@@ -373,6 +374,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetBlendAnimationHandler ( NULL );
     g_pMultiplayer->SetProcessCollisionHandler ( NULL );
     g_pMultiplayer->SetVehicleCollisionHandler( NULL );
+    g_pMultiplayer->SetHeliKillHandler( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( NULL );
@@ -829,7 +831,13 @@ void CClientGame::DoPulsePostFrame ( void )
             }
         }
         #endif
-
+        // Heli Clear time
+        if ( m_LastClearTime.Get ( ) > HeliKill_List_Clear_Rate )
+        {
+            // Clear our list now
+            m_HeliCollisionsMap.clear ( );
+            m_LastClearTime.Reset ( );
+        }
         CClientPerfStatManager::GetSingleton ()->DoPulse ();
     }
 
@@ -2579,6 +2587,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientTrailerDetach", "towedBy", NULL, false );
     m_Events.AddEvent ( "onClientVehicleExplode", "", NULL, false );
     m_Events.AddEvent ( "onClientVehicleCollision", "collidedelement, damageImpulseMag, bodypart, x, y, z, velX, velY, velZ", NULL, false );
+    m_Events.AddEvent ( "onClientPedHeliKilled", "heli", NULL, false );
 
     // GUI events
     m_Events.AddEvent ( "onClientGUIClick", "button, state, absoluteX, absoluteY", NULL, false );
@@ -3444,6 +3453,12 @@ bool CClientGame::StaticVehicleCollisionHandler ( CVehicleSAInterface* pCollidin
 {
     return g_pClientGame->VehicleCollisionHandler( pCollidingVehicle, pCollidedVehicle, iModelIndex, fDamageImpulseMag, fCollidingDamageImpulseMag, byBodyPartHit, vecCollisionPos, vecCollisionVelocity );
 }
+
+bool CClientGame::StaticHeliKillHandler ( CVehicleSAInterface* pHeliInterface, CPedSAInterface* pPed )
+{
+    return g_pClientGame->HeliKillHandler( pHeliInterface, pPed );
+}
+
 void CClientGame::DrawRadarAreasHandler ( void )
 {
     m_pRadarAreaManager->DoPulse ();
@@ -3970,6 +3985,57 @@ bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehic
 
             pVehicleClientEntity->CallEvent ( "onClientVehicleCollision", Arguments, true );
             return true;
+        }
+    }
+    return false;
+}
+
+bool CClientGame::HeliKillHandler ( CVehicleSAInterface* pHeliInterface, CPedSAInterface* pPedInterface )
+{
+    if ( pHeliInterface && pPedInterface )
+    {
+        // Get our ped and client ped
+        CPed * pPed = g_pGame->GetPools ( )->GetPed ( (DWORD *)pPedInterface );
+        CClientPed * pClientPed = m_pManager->GetPedManager ( )->GetSafe( pPed, true );
+        // Was our client ped valid
+        if ( pClientPed )
+        {
+            // Get our heli and client heli
+            CVehicle * pHeli = g_pGame->GetPools ( )->GetVehicle( (DWORD *)pHeliInterface );
+            CClientVehicle * pClientHeli = m_pManager->GetVehicleManager ( )->GetSafe( pHeli );
+
+            // Iterate our "stored" cancel state and find the heli in question
+            std::pair < std::multimap < CClientVehicle *, CClientPed * >::iterator, std::multimap < CClientVehicle *, CClientPed * >::iterator> iterators = m_HeliCollisionsMap.equal_range ( pClientHeli );
+            std::multimap < CClientVehicle *, CClientPed * > ::const_iterator iter = iterators.first;
+            for ( ; iter != iterators.second; ++iter )
+            {
+                // If the Heli and ped collided within the clear rate return false
+                if ( (*iter).first == pClientHeli && (*iter).second == pClientPed )
+                    return false;
+            }
+
+            CLuaArguments Arguments;
+            if ( pClientHeli )
+            {
+                // Push our heli
+                Arguments.PushElement ( pClientHeli );
+            }
+            else
+            {
+                Arguments.PushNil ( );
+            }
+            
+            // Trigger our event
+            bool bContinue = pClientPed->CallEvent ( "onClientPedHeliKilled", Arguments, true );
+            // Was our event cancelled
+            if ( !bContinue )
+            {
+                // Add our heli and ped pair to the list
+                std::pair < CClientVehicle *, CClientPed * > pair = std::pair < CClientVehicle *, CClientPed * > ( pClientHeli, pClientPed ); 
+                m_HeliCollisionsMap.insert( pair );
+            }
+            // Return if it was cancelled
+            return bContinue;
         }
     }
     return false;
