@@ -2938,6 +2938,12 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     // Read out and set handling
                     if ( bitStream.ReadBit () == true )
                     {
+                        CModelInfo * pModelInfo = pVehicle->GetModelInfo ( );
+
+                        bool bReadSuspension = false;
+                        if ( pModelInfo )
+                            bReadSuspension = pModelInfo->IsCar ( ) || pModelInfo->IsMonsterTruck ( );
+
                         SVehicleHandlingSync handling;
                         bitStream.Read ( &handling );
                         CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
@@ -2959,7 +2965,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         pEntry->SetSteeringLock ( handling.data.fSteeringLock );
                         pEntry->SetTractionLoss ( handling.data.fTractionLoss );
                         pEntry->SetTractionBias ( handling.data.fTractionBias );
-                        if ( pVehicle->GetModelInfo()->IsCar ( ) || pVehicle->GetModelInfo()->IsMonsterTruck() )
+                        if ( bReadSuspension )
                         {
                             pEntry->SetSuspensionForceLevel ( handling.data.fSuspensionForceLevel );
                             pEntry->SetSuspensionDamping ( handling.data.fSuspensionDamping );

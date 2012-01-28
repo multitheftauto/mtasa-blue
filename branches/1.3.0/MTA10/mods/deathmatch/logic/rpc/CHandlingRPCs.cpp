@@ -32,7 +32,11 @@ void CHandlingRPCs::SetVehicleHandling ( CClientEntity* pSource, NetBitStreamInt
         // Grab the vehicle handling entry
         CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( *pSource );
         CHandlingEntry* pEntry = Vehicle.GetHandlingData();
-        bool bReadSuspension = Vehicle.GetModelInfo()->IsCar() || Vehicle.GetModelInfo()->IsMonsterTruck();
+        CModelInfo * pModelInfo = Vehicle.GetModelInfo ( );
+        
+        bool bReadSuspension = false;
+        if ( pModelInfo )
+            bReadSuspension = pModelInfo->IsCar ( ) || pModelInfo->IsMonsterTruck();
 
         SVehicleHandlingSync handling;
         bitStream.Read ( &handling );
@@ -89,7 +93,12 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
         {
             // Grab the vehicle handling entry
             CClientVehicle& vehicle = static_cast < CClientVehicle& > ( *pSource );
-            CHandlingEntry* pHandlingEntry = vehicle.GetHandlingData();
+            CHandlingEntry* pHandlingEntry = vehicle.GetHandlingData ( );
+            CModelInfo * pModelInfo = vehicle.GetModelInfo ( );
+
+            bool bReadSuspension = false;
+            if ( pModelInfo )
+                bReadSuspension = pModelInfo->IsCar ( ) || pModelInfo->IsMonsterTruck ( );
 
             // Temporary storage for reading out data
             union
@@ -219,7 +228,7 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
                 {
 
                     bitStream.Read ( fFloat );
-                    if ( vehicle.GetModelInfo()->IsCar ( ) || vehicle.GetModelInfo()->IsMonsterTruck() )
+                    if ( bReadSuspension )
                     {
                         pHandlingEntry->SetSuspensionForceLevel ( fFloat );
                     }
@@ -229,7 +238,7 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
                 case HANDLING_SUSPENSION_DAMPING:
                 {
                     bitStream.Read ( fFloat );
-                    if ( vehicle.GetModelInfo()->IsCar ( ) || vehicle.GetModelInfo()->IsMonsterTruck() )
+                    if ( bReadSuspension )
                     {
                         pHandlingEntry->SetSuspensionDamping ( fFloat );
                     }
@@ -239,7 +248,7 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
                 case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
                 {
                     bitStream.Read ( fFloat );
-                    if ( vehicle.GetModelInfo()->IsCar ( ) || vehicle.GetModelInfo()->IsMonsterTruck() )
+                    if ( bReadSuspension )
                     {
                         pHandlingEntry->SetSuspensionHighSpeedDamping ( fFloat );
                     }
@@ -249,7 +258,7 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
                 case HANDLING_SUSPENSION_UPPER_LIMIT:
                 {
                     bitStream.Read ( fFloat );
-                    if ( vehicle.GetModelInfo()->IsCar ( ) || vehicle.GetModelInfo()->IsMonsterTruck() )
+                    if ( bReadSuspension )
                     {
                         pHandlingEntry->SetSuspensionUpperLimit ( fFloat );
                     }
@@ -259,7 +268,7 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
                 case HANDLING_SUSPENSION_LOWER_LIMIT:
                 {
                     bitStream.Read ( fFloat );
-                    if ( vehicle.GetModelInfo()->IsCar ( ) || vehicle.GetModelInfo()->IsMonsterTruck() )
+                    if ( bReadSuspension )
                     {
                         pHandlingEntry->SetSuspensionLowerLimit ( fFloat );
                     }
@@ -269,7 +278,7 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
                 case HANDLING_SUSPENSION_FRONTREARBIAS:
                 {
                     bitStream.Read ( fFloat );
-                    if ( vehicle.GetModelInfo()->IsCar ( ) || vehicle.GetModelInfo()->IsMonsterTruck() )
+                    if ( bReadSuspension )
                     {
                         pHandlingEntry->SetSuspensionFrontRearBias ( fFloat );
                     }
@@ -279,7 +288,7 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
                 case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
                 {
                     bitStream.Read ( fFloat );
-                    if ( vehicle.GetModelInfo()->IsCar ( ) || vehicle.GetModelInfo()->IsMonsterTruck() )
+                    if ( bReadSuspension )
                     {
                         pHandlingEntry->SetSuspensionAntiDiveMultiplier ( fFloat );
                     }

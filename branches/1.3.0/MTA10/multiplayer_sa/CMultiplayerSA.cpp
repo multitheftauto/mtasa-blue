@@ -6173,7 +6173,7 @@ bool CheckHasSuspensionChanged ( void )
         // Check our suspension interface has a valid vehicle and return the suspension changed marker
         CVehicle* pVehicle = pSuspensionInterface->m_pVehicle;
         CModelInfo* pModelInfo = pGameInterface->GetModelInfo ( pVehicle->GetModelIndex () );
-        if ( pVehicle && ( pModelInfo->IsCar() || pModelInfo->IsMonsterTruck() ) )
+        if ( pVehicle && pModelInfo && ( pModelInfo->IsCar() || pModelInfo->IsMonsterTruck() ) )
             return pVehicle->GetHandlingData()->HasSuspensionChanged ( );
         else
             return false;

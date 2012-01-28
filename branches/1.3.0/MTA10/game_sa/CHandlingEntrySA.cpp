@@ -87,7 +87,7 @@ void CHandlingEntrySA::Recalculate ( unsigned short usModel )
 //             ( (void (_stdcall *)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertBikeDataToGameUnits )( m_pHandlingSA );
 //         }
 //         else
-        if ( pModelInfo->IsMonsterTruck() || pModelInfo->IsCar() )
+        if ( pModelInfo && pModelInfo->IsMonsterTruck() || pModelInfo->IsCar() )
         {
             // Call GTA's function that calculates the final values from the read values
             ( (void (_stdcall *)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits )( m_pHandlingSA );

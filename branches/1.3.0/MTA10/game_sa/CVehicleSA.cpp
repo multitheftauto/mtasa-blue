@@ -2016,7 +2016,7 @@ void CVehicleSA::RecalculateSuspensionLines ( void )
 
     DWORD dwModel = GetModelIndex ();
     CModelInfo* pModelInfo = pGame->GetModelInfo ( dwModel );
-    if ( pModelInfo->IsMonsterTruck() || pModelInfo->IsCar() )
+    if ( pModelInfo && pModelInfo->IsMonsterTruck() || pModelInfo->IsCar() )
     {
         CVehicleSAInterface* pInt = GetVehicleInterface ();
         // Trains (Their trailers do as well!)
