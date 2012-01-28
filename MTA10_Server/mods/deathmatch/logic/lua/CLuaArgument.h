@@ -28,6 +28,7 @@ class CElement;
 class CLuaArguments;
 
 #define LUA_TTABLEREF 9
+#define LUA_TSTRING_LONG 10
 
 class CLuaArgument
 {

@@ -124,6 +124,9 @@ public:
     // GetNumberOfUnreadBits appears to round up to the next byte boundary, when reading
     virtual int         GetNumberOfUnreadBits       ( void ) const = 0;
 
+    virtual void        AlignWriteToByteBoundary    ( void ) const = 0;
+    virtual void        AlignReadToByteBoundary     ( void ) const = 0;
+
     // Helper template methods that are not actually part
     // of the interface but get inline compiled.
 
