@@ -2938,11 +2938,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     // Read out and set handling
                     if ( bitStream.ReadBit () == true )
                     {
-                        CModelInfo * pModelInfo = pVehicle->GetModelInfo ( );
-
                         bool bReadSuspension = false;
-                        if ( pModelInfo )
-                            bReadSuspension = pModelInfo->IsCar ( ) || pModelInfo->IsMonsterTruck ( );
 
                         SVehicleHandlingSync handling;
                         bitStream.Read ( &handling );
@@ -2983,8 +2979,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         //pEntry->SetHeadLight ( (CHandlingEntry::eLightType)handling.data.ucHeadLight );
                         //pEntry->SetTailLight ( (CHandlingEntry::eLightType)handling.data.ucTailLight );
                         //pEntry->SetAnimGroup ( handling.data.ucAnimGroup );
-                        pVehicle->ApplyHandling();
                     }
+                    pVehicle->ApplyHandling();
                  
                     // Set the matrix
                     pVehicle->SetPosition ( position.data.vecPosition );

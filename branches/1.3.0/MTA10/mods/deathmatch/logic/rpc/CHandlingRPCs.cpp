@@ -32,11 +32,8 @@ void CHandlingRPCs::SetVehicleHandling ( CClientEntity* pSource, NetBitStreamInt
         // Grab the vehicle handling entry
         CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( *pSource );
         CHandlingEntry* pEntry = Vehicle.GetHandlingData();
-        CModelInfo * pModelInfo = Vehicle.GetModelInfo ( );
         
         bool bReadSuspension = false;
-        if ( pModelInfo )
-            bReadSuspension = pModelInfo->IsCar ( ) || pModelInfo->IsMonsterTruck();
 
         SVehicleHandlingSync handling;
         bitStream.Read ( &handling );
@@ -94,11 +91,8 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
             // Grab the vehicle handling entry
             CClientVehicle& vehicle = static_cast < CClientVehicle& > ( *pSource );
             CHandlingEntry* pHandlingEntry = vehicle.GetHandlingData ( );
-            CModelInfo * pModelInfo = vehicle.GetModelInfo ( );
 
             bool bReadSuspension = false;
-            if ( pModelInfo )
-                bReadSuspension = pModelInfo->IsCar ( ) || pModelInfo->IsMonsterTruck ( );
 
             // Temporary storage for reading out data
             union
