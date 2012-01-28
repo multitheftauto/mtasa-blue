@@ -389,6 +389,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CConsoleLogger.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CCore.cpp"
 				>
 			</File>
@@ -811,6 +815,10 @@
 			</File>
 			<File
 				RelativePath=".\CConsoleHistory.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CConsoleLogger.h"
 				>
 			</File>
 			<File
