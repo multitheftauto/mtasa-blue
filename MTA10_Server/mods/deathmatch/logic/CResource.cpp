@@ -96,7 +96,7 @@ bool CResource::Load ( void )
     {
         // Initialize
         m_strCircularInclude = "";
-        m_checksum = CChecksum ();
+        m_metaChecksum = CChecksum ();
         m_bActive = false;
         m_bIsPersistent = false;
         m_bLoaded = false;
@@ -330,48 +330,8 @@ bool CResource::Load ( void )
         }
 
         // Generate a CRC for this resource
-        m_checksum = GenerateChecksum();
-
-        // copy client files to http holding directory
-        {
-            list < CResourceFile* > ::const_iterator iter = this->IterBegin ();
-            for ( ; iter != this->IterEnd () ; iter++ )
-            {
-                CResourceFile* pResourceFile = *iter;
-                switch ( pResourceFile->GetType () )
-                {
-                    case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
-                    case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
-                    case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
-                    {
-                        string strDstFilePath = pResourceFile->GetCachedPathFilename ();
-                        string strSrcFilePath;
-                        if ( GetFilePath ( pResourceFile->GetName(), strSrcFilePath ) )
-                        {
-                            unsigned long ulSrcFileCRC = CRCGenerator::GetCRCFromFile ( strSrcFilePath.c_str () );
-                            unsigned long ulDstFileCRC = CRCGenerator::GetCRCFromFile ( strDstFilePath.c_str () );
-                            if ( ulSrcFileCRC != ulDstFileCRC )
-                            {
-                                MakeSureDirExists( strDstFilePath.c_str () );
-
-                                if ( !FileCopy ( strSrcFilePath.c_str (), strDstFilePath.c_str () ) )
-                                {
-                                    CLogger::LogPrintf ( "Could not copy '%s' to '%s'\n", strSrcFilePath.c_str (), strDstFilePath.c_str () );
-                                }
-
-                                // If script is protected, make sure there is no trace of it in the unprotected cache
-                                if ( pResourceFile->IsProtected () )
-                                    FileDelete ( pResourceFile->GetCachedPathFilename ( true ) );
-                            }
-                        }
-                    }
-                    break;
-
-                    default:
-                        break;
-               }
-            }
-        }
+        if ( !GenerateChecksums () )
+            return false;
 
         m_bLoaded = true;
         m_bDoneUpgradeWarnings = false;
@@ -574,29 +534,64 @@ void CResource::SetInfoValue ( const char * szKey, const char * szValue )
 }
 
 
-CChecksum CResource::GenerateChecksum ( void )
+bool CResource::GenerateChecksums ( void )
 {
-    // initialize all of the CRC variables
-    m_checksum = CChecksum ();
-    string strPath;
+    bool bOk = true;
 
     list < CResourceFile* > ::iterator iterf = m_resourceFiles.begin ();
     for ( ; iterf != m_resourceFiles.end (); iterf++ )
     {
-        if ( GetFilePath ( (*iterf)->GetName(), strPath ) )
+        CResourceFile* pResourceFile = *iterf;
+        SString strPath;
+        if ( GetFilePath ( pResourceFile->GetName(), strPath ) )
         {
-            CChecksum checksum = CChecksum::GenerateChecksumFromFile ( strPath );
-            ( *iterf )->SetLastChecksum ( checksum );
-            ( *iterf )->SetLastFileSize ( FileSize ( strPath ) );
+            std::vector < char > buffer;
+            FileLoad ( strPath, buffer );
+            uint uiFileSize = buffer.size ();
+            const char* pFileContents = uiFileSize ? &buffer[0] : "";
+
+            CChecksum checksum = CChecksum::GenerateChecksumFromBuffer ( pFileContents, uiFileSize );
+            pResourceFile->SetLastChecksum ( checksum );
+            pResourceFile->SetLastFileSize ( uiFileSize );
+
+            // Copy file to http holding directory
+            switch ( pResourceFile->GetType () )
+            {
+                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
+                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
+                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
+                {
+                    SString strCachedFilePath = pResourceFile->GetCachedPathFilename ();
+                    unsigned long ulCachedFileCRC = CRCGenerator::GetCRCFromFile ( strCachedFilePath );
+                    if ( checksum.ulCRC != ulCachedFileCRC )
+                    {
+                        if ( !FileSave ( strCachedFilePath, pFileContents, uiFileSize ) )
+                        {
+                            CLogger::LogPrintf ( "Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath );
+                            bOk = false;
+                        }
+
+                        // If script is protected, make sure there is no trace of it in the unprotected cache
+                        if ( pResourceFile->IsProtected () )
+                            FileDelete ( pResourceFile->GetCachedPathFilename ( true ) );
+                    }
+                }
+                break;
+
+                default:
+                    break;
+           }
         }
     }
 
+    m_metaChecksum = CChecksum ();
+    SString strPath;
     if ( GetFilePath ( "meta.xml", strPath ) )
     {
-        m_checksum = CChecksum::GenerateChecksumFromFile ( strPath );
+        m_metaChecksum = CChecksum::GenerateChecksumFromFile ( strPath );
     }
 
-    return m_checksum;
+    return bOk;
 }
 
 
@@ -612,13 +607,32 @@ bool CResource::HasResourceChanged ()
             CChecksum checksum = CChecksum::GenerateChecksumFromFile ( strPath );
             if ( ( *iterf )->GetLastChecksum() != checksum )
                 return true;
+
+            // Also check if file in http cache has been externally altered
+            CResourceFile* pResourceFile = *iterf;
+            switch ( pResourceFile->GetType () )
+            {
+                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
+                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
+                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
+                {
+                    string strCachedFilePath = pResourceFile->GetCachedPathFilename ();
+                    CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFile ( strCachedFilePath );
+                    if ( cachedChecksum != checksum )
+                        return true;
+                }
+                break;
+
+                default:
+                    break;
+            }
         }
     }
 
     if ( GetFilePath ( "meta.xml", strPath ) )
     {
         CChecksum checksum = CChecksum::GenerateChecksumFromFile ( strPath );
-        if ( checksum != m_checksum )
+        if ( checksum != m_metaChecksum )
             return true;
     }
     return false;
@@ -914,7 +928,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         SendProtectedScripts ();
 
         // HACK?: stops resources getting loaded twice when you change them then manually restart
-        GenerateChecksum ();
+        GenerateChecksums ();
 
         // Add us to the running resources list
         m_StartedResources.push_back ( this );

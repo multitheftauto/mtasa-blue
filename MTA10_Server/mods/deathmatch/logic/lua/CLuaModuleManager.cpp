@@ -119,7 +119,7 @@ CChecksum CLuaModuleManager::GetResourceMetaChecksum ( lua_State* luaVM )
             CResource* pResource = pLuaMain->GetResource ();
             if ( pResource )
             {
-                return pResource->GetLastChecksum ();
+                return pResource->GetLastMetaChecksum ();
             }
         }
     }
