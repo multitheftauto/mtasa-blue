@@ -2587,7 +2587,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientTrailerDetach", "towedBy", NULL, false );
     m_Events.AddEvent ( "onClientVehicleExplode", "", NULL, false );
     m_Events.AddEvent ( "onClientVehicleCollision", "collidedelement, damageImpulseMag, bodypart, x, y, z, velX, velY, velZ", NULL, false );
-    m_Events.AddEvent ( "onClientPedHeliKill", "heli", NULL, false );
+    m_Events.AddEvent ( "onClientPedHeliKilled", "heli", NULL, false );
 
     // GUI events
     m_Events.AddEvent ( "onClientGUIClick", "button, state, absoluteX, absoluteY", NULL, false );
@@ -4026,7 +4026,7 @@ bool CClientGame::HeliKillHandler ( CVehicleSAInterface* pHeliInterface, CPedSAI
             }
             
             // Trigger our event
-            bool bContinue = pClientPed->CallEvent ( "onClientPedHeliKill", Arguments, true );
+            bool bContinue = pClientPed->CallEvent ( "onClientPedHeliKilled", Arguments, true );
             // Was our event cancelled
             if ( !bContinue )
             {
