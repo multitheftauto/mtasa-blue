@@ -147,6 +147,7 @@ struct SAclRequest;
 // Shared includes
 #include "TInterpolation.h"
 #include "CPositionRotationAnimation.h"
+#include "CLatentTransferManager.h"
 
 // Logic includes
 #include "ASE.h"
@@ -275,10 +276,6 @@ struct SAclRequest;
 #include "logic/CBuildingRemovalManager.h"
 
 #include "CStaticFunctionDefinitions.h"
-
-// Shared includes
-//#include "CEasingCurve.h"
-//#include "CPositionRotationAnimation.h"
 
 // Utility includes
 #include "utils/CHTTPClient.h"

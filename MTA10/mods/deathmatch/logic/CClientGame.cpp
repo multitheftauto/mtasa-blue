@@ -176,6 +176,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_pProjectileManager = m_pManager->GetProjectileManager ();
     m_pLocalServer = NULL;
 
+    m_pLatentTransferManager = new CLatentTransferManager ();
     m_pZoneNames = new CZoneNames;
     m_pScriptKeyBinds = new CScriptKeyBinds;
 
@@ -392,6 +393,7 @@ CClientGame::~CClientGame ( void )
     SetCursorEventsEnabled ( false );   
 
     // Destroy our stuff
+    delete m_pLatentTransferManager;
     delete m_pNametags;
     delete m_pSyncDebug;
     delete m_pNetworkStats;
@@ -954,6 +956,7 @@ void CClientGame::DoPulses ( void )
 #ifdef WITH_OBJECT_SYNC
     m_pObjectSync->DoPulse ();
 #endif
+    m_pLatentTransferManager->DoPulse ();
     m_pLuaManager->DoPulse ();
 
     #ifdef MTA_DEBUG

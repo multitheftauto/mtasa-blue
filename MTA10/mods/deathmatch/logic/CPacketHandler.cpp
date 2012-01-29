@@ -186,6 +186,10 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_UpdateInfo ( bitStream );
             return true;
 
+        case PACKET_ID_LATENT_TRANSFER:
+            Packet_LatentTransfer ( bitStream );
+            return true;
+
         default:             break;
     }
 
@@ -4538,4 +4542,10 @@ void CPacketHandler::Packet_UpdateInfo ( NetBitStreamInterface& bitStream )
     {
         g_pCore->InitiateUpdate ( strType, strData, g_pNet->GetConnectedServer () );
     }
+}
+
+
+void CPacketHandler::Packet_LatentTransfer ( NetBitStreamInterface& bitStream )
+{
+    g_pClientGame->GetLatentTransferManager ()->OnReceive ( 0, &bitStream );
 }

@@ -72,6 +72,7 @@ public:
     void                Packet_DetonateSatchels         ( NetBitStreamInterface& bitStream );
     void                Packet_VoiceData                ( NetBitStreamInterface& bitStream );
     void                Packet_UpdateInfo               ( NetBitStreamInterface& bitStream );
+    void                Packet_LatentTransfer           ( NetBitStreamInterface& bitStream );
 };
 
 #endif

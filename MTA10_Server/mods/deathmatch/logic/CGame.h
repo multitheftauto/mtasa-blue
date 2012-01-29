@@ -86,6 +86,7 @@ class CMarkerManager;
 class CObjectManager;
 class CPacket;
 class CPacketTranslator;
+class CLatentTransferManager;
 class CPedManager;
 class CPickupManager;
 class CPlayer;
@@ -212,6 +213,7 @@ public:
     inline CScriptDebugging*        GetScriptDebugging          ( void )        { return m_pScriptDebugging; }
     inline CEvents*                 GetEvents                   ( void )        { return &m_Events; }
     inline CColManager*             GetColManager               ( void )        { return m_pColManager; }
+    inline CLatentTransferManager*  GetLatentTransferManager    ( void )        { return m_pLatentTransferManager; }
     inline CPedManager*             GetPedManager               ( void )        { return m_pPedManager; }
     inline CResourceManager*        GetResourceManager          ( void )        { return m_pResourceManager; }
     inline CMarkerManager*          GetMarkerManager            ( void )        { return m_pMarkerManager; }
@@ -345,6 +347,8 @@ public:
     void                        SetSyncFPS                  ( int iSyncFPS ) { m_iSyncFPS = iSyncFPS; }
 
     void                        HandleBackup                ( void );
+    void                        EnableLatentSends           ( bool bEnabled, int iBandwidth = 0, CLuaMain* pLuaMain = NULL );
+    bool                        SendPacket                  ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast = false, NetServerPacketPriority packetPriority = PACKET_PRIORITY_LOW, NetServerPacketReliability packetReliability = PACKET_RELIABILITY_RELIABLE_ORDERED, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
 
 private:
     void                        AddBuiltInEvents            ( void );
@@ -420,6 +424,7 @@ private:
     CRegistryManager*               m_pRegistryManager;
     CRegistry*                      m_pRegistry;
     CAccountManager*                m_pAccountManager;
+    CLatentTransferManager*         m_pLatentTransferManager;
     CPedManager*                    m_pPedManager;
     CResourceManager*               m_pResourceManager;
     CAccessControlListManager*      m_pACLManager;
@@ -505,6 +510,10 @@ private:
     CLightsyncManager           m_lightsyncManager;
 
     bool                        m_bServerFullyUp;       // No http operations should be allowed unless this is true
+
+    bool                        m_bLatentSendsEnabled;
+    int                         m_iLatentSendsBandwidth;
+    CLuaMain*                   m_pLatentSendsLuaMain;
 };
 
 #endif

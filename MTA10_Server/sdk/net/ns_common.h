@@ -132,5 +132,9 @@ enum ePacketOrdering
     PACKET_ORDERING_OTHERSYNC
 };
 
-#endif
+// Typedefs to make shared code easier
+typedef NetServerPlayerID NetPlayerID;
+typedef NetServerPacketPriority NetPacketPriority;
+typedef NetServerPacketReliability NetPacketReliability;
 
+#endif

@@ -93,6 +93,7 @@ CGame::CGame ( void )
     m_pAccountManager = NULL;
     m_pPedManager = NULL;
     m_pResourceManager = NULL;
+    m_pLatentTransferManager = NULL;
     m_pHTTPD = NULL;
     m_pACLManager = NULL;
     m_pRegisteredCommands = NULL;
@@ -252,6 +253,7 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pLuaCallbackManager );
     SAFE_DELETE ( m_pRegisteredCommands );
     SAFE_DELETE ( m_pPedManager );
+    SAFE_DELETE ( m_pLatentTransferManager );
     SAFE_DELETE ( m_pHTTPD );
     SAFE_DELETE ( m_pACLManager );
     SAFE_DELETE ( m_pGroups );
@@ -401,6 +403,8 @@ void CGame::DoPulse ( void )
 
     CLOCK_CALL1( m_lightsyncManager.DoPulse (); );
 
+    CLOCK_CALL1( m_pLatentTransferManager->DoPulse (); );
+
     // Unlock the critical section again
     Unlock();
 }
@@ -493,6 +497,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     // Create and start the HTTP server
     m_pHTTPD = new CHTTPD;
+    m_pLatentTransferManager = new CLatentTransferManager ();
 
     // Enable it if required
     if ( m_pMainConfig->IsHTTPEnabled () )
@@ -923,6 +928,13 @@ bool CGame::StaticProcessPacket ( unsigned char ucPacketID, const NetServerPlaye
         return true;
     }
 
+    // Is it this?
+    if ( ucPacketID == PACKET_ID_LATENT_TRANSFER )
+    {
+        g_pGame->GetLatentTransferManager ()->OnReceive ( Socket, pBitStream );
+        return true;
+    }
+
     // Translate the packet
     CPacket* pPacket = g_pGame->m_pPacketTranslator->Translate ( Socket, static_cast < ePacketID > ( ucPacketID ), *pBitStream, pNetExtraInfo );
     if ( pPacket )
@@ -1338,6 +1350,9 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
 
     // Tell net module connection version info will no longer be required
     g_pNetServer->ClearClientBitStreamVersion ( Player.GetSocket () );
+
+    // Remove from any latent transfers
+    GetLatentTransferManager ()->RemoveRemote ( Player.GetSocket () );
 
     // Delete it, don't unlink yet, we could be inside the player-manager's iteration
     m_ElementDeleter.Delete ( &Player, false );
@@ -3658,3 +3673,28 @@ void CGame::HandleBackup ( void )
         fileList.pop_back ();
     }
 }
+
+
+//
+// Toggle latent send mode
+//
+void CGame::EnableLatentSends ( bool bEnabled, int iBandwidth, CLuaMain* pLuaMain )
+{
+    m_bLatentSendsEnabled = bEnabled && iBandwidth;
+    m_iLatentSendsBandwidth = iBandwidth;
+    m_pLatentSendsLuaMain = pLuaMain;
+}
+
+
+//
+// Maybe route though LatentTransferManager
+//
+bool CGame::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering )
+{
+    if ( !m_bLatentSendsEnabled )
+        return g_pNetServer->SendPacket ( ucPacketID, playerID, pBitStream, bBroadcast, packetPriority, packetReliability, packetOrdering );
+    else
+        GetLatentTransferManager ()->AddSend ( playerID, ucPacketID, pBitStream, m_iLatentSendsBandwidth, m_pLatentSendsLuaMain );
+    return true;
+}
+

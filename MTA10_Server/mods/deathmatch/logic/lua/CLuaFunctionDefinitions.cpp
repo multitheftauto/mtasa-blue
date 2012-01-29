@@ -583,6 +583,140 @@ int CLuaFunctionDefinitions::TriggerClientEvent ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::TriggerLatentClientEvent ( lua_State* luaVM )
+{
+//  int triggerLatentClientEvent ( [element triggerFor,] string event, [int bandwidth=50000,] [bool persist=false,] element theElement, [arguments...] )
+    CElement* pElement; SString strName; int iBandwidth; bool bPersist; CElement* pCallWithElement; CLuaArguments Arguments;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadIfNextIsUserData ( pElement, CStaticFunctionDefinitions::GetRootElement () );
+    argStream.ReadString ( strName );
+    argStream.ReadIfNextCouldBeNumber ( iBandwidth, 50000 );
+    argStream.ReadIfNextIsBool ( bPersist, false );
+    argStream.ReadUserData ( pCallWithElement );
+    argStream.ReadLuaArguments ( Arguments );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain * pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
+
+        // Trigger it
+        if ( CStaticFunctionDefinitions::TriggerLatentClientEvent ( pElement, strName, pCallWithElement, Arguments, iBandwidth, bPersist ? NULL : pLuaMain ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "triggerLatentClientEvent", *argStream.GetErrorMessage () ) );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::GetLatentEventHandles ( lua_State* luaVM )
+{
+//  table getLatentEventHandles ( element player )
+    CPlayer* pPlayer;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPlayer );
+
+    if ( !argStream.HasErrors () )
+    {
+        std::vector < uint > resultList;
+        if ( g_pGame->GetLatentTransferManager ()->GetSendHandles ( pPlayer->GetSocket (), resultList ) )
+        {
+            lua_createtable ( luaVM, 0, resultList.size () );
+            for ( uint i = 0 ; i < resultList.size () ; i++ )
+            {
+                lua_pushnumber ( luaVM, i + 1 );
+                lua_pushnumber ( luaVM, resultList[i] );
+                lua_settable   ( luaVM, -3 );
+            }
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getLatentEventHandles", *argStream.GetErrorMessage () ) );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::GetLatentEventStatus ( lua_State* luaVM )
+{
+//  int start,end = getLatentEventStatus ( element player, int handle )
+    CPlayer* pPlayer; int iHandle;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPlayer );
+    argStream.ReadNumber ( iHandle );
+
+    if ( !argStream.HasErrors () )
+    {
+        SSendStatus sendStatus;
+        if ( g_pGame->GetLatentTransferManager ()->GetSendStatus ( pPlayer->GetSocket (), iHandle, &sendStatus ) )
+        {
+            lua_createtable ( luaVM, 0, 4 );
+
+            lua_pushstring  ( luaVM, "tickStart" );
+            lua_pushinteger ( luaVM, sendStatus.iStartTimeMsOffset );
+            lua_settable    ( luaVM, -3 );
+
+            lua_pushstring  ( luaVM, "tickEnd" );
+            lua_pushinteger ( luaVM, sendStatus.iEndTimeMsOffset );
+            lua_settable    ( luaVM, -3 );
+
+            lua_pushstring  ( luaVM, "totalSize" );
+            lua_pushinteger ( luaVM, sendStatus.iTotalSize );
+            lua_settable    ( luaVM, -3 );
+
+            lua_pushstring  ( luaVM, "percentComplete" );
+            lua_pushinteger ( luaVM, sendStatus.iPercentComplete );
+            lua_settable    ( luaVM, -3 );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getLatentEventStatus", *argStream.GetErrorMessage () ) );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::CancelLatentEvent ( lua_State* luaVM )
+{
+//  bool cancelLatentEvent ( element player, int handle )
+    CPlayer* pPlayer; int iHandle;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPlayer );
+    argStream.ReadNumber ( iHandle );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( g_pGame->GetLatentTransferManager ()->CancelSend ( pPlayer->GetSocket (), iHandle ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "cancelLatentEvent", *argStream.GetErrorMessage () ) );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::GetPlayerName ( lua_State* luaVM )
 {
 //  string getPlayerName ( player thePlayer )
