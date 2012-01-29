@@ -51,6 +51,11 @@ namespace
                                          { "dxConvertPixels",           "1.3" },
                                          { "dxGetPixelColor",           "1.3" },
                                          { "dxSetPixelColor",           "1.3" },
+                                         { "onClientPedHeliKilled",     "1.3.0-9.03772" },
+                                         { "triggerLatentServerEvent",  "1.3.0-9.03772" },
+                                         { "getLatentEventHandles",     "1.3.0-9.03772" },
+                                         { "getLatentEventStatus",      "1.3.0-9.03772" },
+                                         { "cancelLatentEvent",         "1.3.0-9.03772" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
@@ -84,6 +89,10 @@ namespace
                                          { "setOcclusionsEnabled",      "1.3" },
                                          { "getOcclusionsEnabled",      "1.3" },
                                          { "fetchRemote",               "1.3.0-9.03739" },
+                                         { "triggerLatentClientEvent",  "1.3.0-9.03772" },
+                                         { "getLatentEventHandles",     "1.3.0-9.03772" },
+                                         { "getLatentEventStatus",      "1.3.0-9.03772" },
+                                         { "cancelLatentEvent",         "1.3.0-9.03772" },
                                         };
 
 
