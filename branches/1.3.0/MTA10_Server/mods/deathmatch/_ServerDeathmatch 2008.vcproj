@@ -925,10 +925,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CZoneNames.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\TaskNames.cpp"
 					>
 				</File>
@@ -1560,6 +1556,10 @@
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CZoneNames.cpp"
+					>
+				</File>
 				<Filter
 					Name="animation"
 					>
@@ -2118,10 +2118,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CZoneNames.h"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\Element.h"
 					>
 				</File>
@@ -2623,6 +2619,10 @@
 				>
 				<File
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLatentTransferManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CZoneNames.h"
 					>
 				</File>
 				<Filter

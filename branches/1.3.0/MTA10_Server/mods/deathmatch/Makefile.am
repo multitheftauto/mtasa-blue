@@ -12,6 +12,7 @@ INCLUDES += -I$(srcdir)/../../../vendor/json-c/
 INCLUDES += -I$(srcdir)/../../../vendor/bob_withers/
 INCLUDES += -I$(srcdir)/../../../vendor/bochs/
 INCLUDES += -I$(srcdir)/../../../Shared/animation/
+INCLUDES += -I$(srcdir)/../../../Shared/mods/deathmatch/logic/
 INCLUDES += -I$(ZIPDIR)/
 INCLUDES += -I$(LUADIR)/src
 INCLUDES += -I$(LUABDIR)/src
@@ -23,6 +24,10 @@ INCLUDES += $(PCRE_CFLAGS)
 UTILS = \
 	../../../Shared/animation/CEasingCurve.cpp \
 	../../../Shared/animation/CPositionRotationAnimation.cpp \
+	../../../Shared/mods/deathmatch/logic/CLatentReceiver.cpp \
+	../../../Shared/mods/deathmatch/logic/CLatentSendQueue.cpp \
+	../../../Shared/mods/deathmatch/logic/CLatentTransferManager.cpp \
+	../../../Shared/mods/deathmatch/logic/CZoneNames.cpp \
 	./utils/CHTTPClient.cpp ./utils/CHTTPRequest.cpp \
 	./utils/CHTTPResponse.cpp \
 	./utils/CTCPClientSocketImpl.cpp \
@@ -172,7 +177,6 @@ LOGIC = \
 ./logic/CWeaponStatManager.cpp \
 ./logic/CWhoWas.cpp \
 ./logic/CXMLConfig.cpp \
-./logic/CZoneNames.cpp \
 ./logic/TaskNames.cpp \
 ./logic/Utils.cpp \
 ./logic/lua/CLuaArgument.cpp \
@@ -245,7 +249,7 @@ LOGIC = \
 ./logic/packets/CPlayerTimeoutPacket.cpp \
 ./logic/packets/CPlayerWastedPacket.cpp \
 ./logic/packets/CProjectileSyncPacket.cpp \
-./logic/packets/CResourceClientScriptsPacket.cpp \	
+./logic/packets/CResourceClientScriptsPacket.cpp \
 ./logic/packets/CResourceStartPacket.cpp \
 ./logic/packets/CResourceStopPacket.cpp \
 ./logic/packets/CReturnSyncPacket.cpp \
