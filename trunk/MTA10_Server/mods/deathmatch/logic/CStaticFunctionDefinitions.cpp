@@ -170,6 +170,30 @@ bool CStaticFunctionDefinitions::TriggerClientEvent ( CElement* pElement, const 
 }
 
 
+bool CStaticFunctionDefinitions::TriggerLatentClientEvent ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain )
+{
+    assert ( pElement );
+    assert ( szName );
+    assert ( pCallWithElement );
+
+    // Make packet
+    CLuaEventPacket Packet ( szName, pCallWithElement->GetID (), Arguments );
+
+    // Make send list
+    std::vector < CPlayer* > sendList;
+
+    // Get descendants (incl. pElement if a player)
+    pElement->GetDescendantsByType ( sendList, true, CElement::PLAYER );
+
+    // Send packet to players
+    g_pGame->EnableLatentSends ( true, iBandwidth, pLuaMain );
+    CPlayerManager::Broadcast ( Packet, sendList );
+    g_pGame->EnableLatentSends ( false );
+
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::CancelEvent ( bool bCancel, const char* szReason )
 {
     m_pEvents->CancelEvent ( bCancel, szReason );

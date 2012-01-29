@@ -411,6 +411,62 @@ public:
         return false;
     }
 
+
+    //
+    // Conditional reads. Default required in case condition is not met.
+    //
+    bool ReadIfNextIsBool ( bool& bOutValue, const bool bDefaultValue )
+    {
+        if ( NextIsBool () )
+            return ReadBool ( bOutValue, bDefaultValue );
+        bOutValue = bDefaultValue;
+        return false;
+    }
+
+    template < class T >
+    bool ReadIfNextIsUserData ( T*& outValue, T* defaultValue  )
+    {
+        if ( NextIsUserData () )
+            return ReadUserData ( outValue, defaultValue );
+        outValue = defaultValue;
+        return false;
+    }
+
+    template < class T, class U >
+    bool ReadIfNextIsNumber ( T& outValue, const U& defaultValue )
+    {
+        if ( NextIsNumber () )
+            return ReadNumber ( outValue, defaultValue );
+        outValue = defaultValue;
+        return false;
+    }
+
+    bool ReadIfNextIsString ( SString& outValue, const char* defaultValue )
+    {
+        if ( NextIsString () )
+            return ReadString ( outValue, defaultValue );
+        outValue = defaultValue;
+        return false;
+    }
+
+    template < class T, class U >
+    bool ReadIfNextCouldBeNumber ( T& outValue, const U& defaultValue )
+    {
+        if ( NextCouldBeNumber () )
+            return ReadNumber ( outValue, defaultValue );
+        outValue = defaultValue;
+        return false;
+    }
+
+    bool ReadIfNextCouldBeString ( SString& outValue, const char* defaultValue )
+    {
+        if ( NextCouldBeString () )
+            return ReadString ( outValue, defaultValue );
+        outValue = defaultValue;
+        return false;
+    }
+
+
     //
     // SetTypeError
     //

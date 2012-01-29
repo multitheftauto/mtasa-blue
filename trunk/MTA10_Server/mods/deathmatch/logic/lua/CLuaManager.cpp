@@ -237,6 +237,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "cancelEvent", CLuaFunctionDefinitions::CancelEvent );
     CLuaCFunctions::AddFunction ( "wasEventCancelled", CLuaFunctionDefinitions::WasEventCancelled );
     CLuaCFunctions::AddFunction ( "getCancelReason", CLuaFunctionDefinitions::GetCancelReason );
+    CLuaCFunctions::AddFunction ( "triggerLatentClientEvent", CLuaFunctionDefinitions::TriggerLatentClientEvent );
+    CLuaCFunctions::AddFunction ( "getLatentEventHandles", CLuaFunctionDefinitions::GetLatentEventHandles );
+    CLuaCFunctions::AddFunction ( "getLatentEventStatus", CLuaFunctionDefinitions::GetLatentEventStatus );
+    CLuaCFunctions::AddFunction ( "cancelLatentEvent", CLuaFunctionDefinitions::CancelLatentEvent );
 
     // Ped funcs
     CLuaCFunctions::AddFunction ( "createPed", CLuaFunctionDefinitions::CreatePed );

@@ -41,6 +41,7 @@ public:
     static bool                         RemoveEventHandler                  ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction );
     static bool                         TriggerEvent                        ( const char* szName, CClientEntity& Entity, const CLuaArguments& Arguments, bool& bWasCancelled );
     static bool                         TriggerServerEvent                  ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments );
+    static bool                         TriggerLatentServerEvent            ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, int bandwidth, CLuaMain* pLuaMain );
     static bool                         CancelEvent                         ( bool bCancel );
     static bool                         WasEventCancelled                   ( void );
 

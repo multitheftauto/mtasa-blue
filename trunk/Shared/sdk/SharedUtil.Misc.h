@@ -168,7 +168,7 @@ namespace SharedUtil
     template< class T >
     T Lerp ( const T& from, float fAlpha, const T& to )
     {
-        return ( to - from ) * fAlpha + from;
+        return (T)( ( to - from ) * fAlpha + from );
     }
 
     // Find the relative position of Pos between From and To

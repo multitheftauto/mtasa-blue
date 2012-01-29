@@ -268,6 +268,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "triggerServerEvent", CLuaFunctionDefs::TriggerServerEvent );
     CLuaCFunctions::AddFunction ( "cancelEvent", CLuaFunctionDefs::CancelEvent );
     CLuaCFunctions::AddFunction ( "wasEventCancelled", CLuaFunctionDefs::WasEventCancelled );
+    CLuaCFunctions::AddFunction ( "triggerLatentServerEvent", CLuaFunctionDefs::TriggerLatentServerEvent );
+    CLuaCFunctions::AddFunction ( "getLatentEventHandles", CLuaFunctionDefs::GetLatentEventHandles );
+    CLuaCFunctions::AddFunction ( "getLatentEventStatus", CLuaFunctionDefs::GetLatentEventStatus );
+    CLuaCFunctions::AddFunction ( "cancelLatentEvent", CLuaFunctionDefs::CancelLatentEvent );
 
     // Output funcs
     CLuaCFunctions::AddFunction ( "outputConsole", CLuaFunctionDefs::OutputConsole );

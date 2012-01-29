@@ -87,6 +87,8 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner )
 
 CLuaMain::~CLuaMain ( void )
 {
+    g_pClientGame->GetLatentTransferManager ()->OnLuaMainDestroy ( this );
+
     // Unload the current script
     UnloadScript ();
     m_bBeingDeleted = true;

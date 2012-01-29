@@ -260,6 +260,7 @@ public:
 #ifdef WITH_OBJECT_SYNC
     inline CObjectSync*                 GetObjectSync                   ( void )        { return m_pObjectSync; }
 #endif
+    inline CLatentTransferManager*      GetLatentTransferManager        ( void )        { return m_pLatentTransferManager; }
 
     inline CElementDeleter*             GetElementDeleter               ( void )        { return &m_ElementDeleter; }
 
@@ -473,12 +474,12 @@ private:
     static void                         PreWeaponFire                   ( CPlayerPed* pPlayerPed );
     static void                         PostWeaponFire                  ( void );
     static void                         BulletImpact                    ( CPed* pInitiator, CEntity* pVictim, const CVector* pStartPosition, const CVector* pEndPosition );
+public:
     static bool                         StaticProcessPacket             ( unsigned char ucPacketID, NetBitStreamInterface& bitStream );
 
     bool                                VerifySADataFiles               ( int iEnableClientChecks = 0 );
     void                                DebugElementRender              ( void );
 
-public:
     void                                SendExplosionSync               ( const CVector& vecPosition, eExplosionType Type, CClientEntity * pOrigin = NULL );
     void                                SendFireSync                    ( CFire* pFire );
     void                                SendProjectileSync              ( CClientProjectile * pProjectile );
@@ -531,6 +532,7 @@ private:
     CZoneNames*                         m_pZoneNames;
     CPacketHandler*                     m_pPacketHandler;
     CLocalServer*                       m_pLocalServer;
+    CLatentTransferManager*             m_pLatentTransferManager;
     bool                                m_bInitiallyFadedOut;
     bool                                m_bHudAreaNameDisabled;
 
