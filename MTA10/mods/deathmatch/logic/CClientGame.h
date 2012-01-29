@@ -44,7 +44,7 @@
 #include "CClientPedManager.h"
 #include "../../shared_logic/lua/CLuaManager.h"
 #include "../../shared_logic/CScriptDebugging.h"
-#include "../../shared_logic/CZoneNames.h"
+#include "CZoneNames.h"
 #include "CEvents.h"
 #include "CResourceManager.h"
 #include "CScriptKeyBinds.h"
