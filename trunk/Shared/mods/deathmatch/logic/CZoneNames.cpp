@@ -468,10 +468,10 @@ const SZone* CZoneNames::GetSmallestZoneInSphere ( const CVector& vecPosition, f
     for ( uint i = 0 ; i < results.size () ; i++ )
     {
         const SZone* pZone = results[i];
-        float sizeX = pZone->x2 - pZone->x1;
-        float sizeY = pZone->y2 - pZone->y1;
-        float sizeZ = pZone->z2 - pZone->z1;
-        float fZoneSize = ( sizeX * sizeY * sizeZ );
+        float sizeX = static_cast < float > ( pZone->x2 - pZone->x1 );
+        float sizeY = static_cast < float > ( pZone->y2 - pZone->y1 );
+        float sizeZ = static_cast < float > ( pZone->z2 - pZone->z1 );
+        float fZoneSize = sizeX * sizeY * sizeZ;
 
         if ( !pSmallestZone || fZoneSize < fSmallestSize )
         {
