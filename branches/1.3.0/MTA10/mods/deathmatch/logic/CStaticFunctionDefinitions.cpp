@@ -186,6 +186,35 @@ bool CStaticFunctionDefinitions::TriggerServerEvent ( const char* szName, CClien
 }
 
 
+bool CStaticFunctionDefinitions::TriggerLatentServerEvent ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain )
+{
+    assert ( szName );
+
+    if ( CallWithEntity.IsLocalEntity ()  )
+        return false;
+
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+    if ( pBitStream )
+    {
+        unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
+        pBitStream->WriteCompressed ( usNameLength );
+        pBitStream->Write ( const_cast < char* > ( szName ), usNameLength );
+        pBitStream->Write ( CallWithEntity.GetID () );
+        if ( !Arguments.WriteToBitStream ( *pBitStream ) )
+        {
+            g_pNet->DeallocateNetBitStream ( pBitStream );
+            return false;
+        }
+        g_pClientGame->GetLatentTransferManager ()->AddSend ( 0, PACKET_ID_LUA_EVENT, pBitStream, iBandwidth, pLuaMain );
+        g_pNet->DeallocateNetBitStream ( pBitStream );
+
+        return true;
+    }
+
+    return false;
+}
+
+
 bool CStaticFunctionDefinitions::CancelEvent ( bool bCancel )
 {
     m_pEvents->CancelEvent ( bCancel );

@@ -117,4 +117,7 @@ enum ePacketOrdering
     PACKET_ORDERING_OTHERSYNC
 };
 
+// Typedefs to make shared code easier
+typedef int NetPlayerID;
+
 #endif

@@ -28,6 +28,8 @@ class CElement;
 class CLuaArguments;
 
 #define LUA_TTABLEREF 9
+#define LUA_TSTRING_LONG 10
+#define LONG_STRING_MIN_VERSION     "1.3.0-9.03772"
 
 class CLuaArgument
 {
