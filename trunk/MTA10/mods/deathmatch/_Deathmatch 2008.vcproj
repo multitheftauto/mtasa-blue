@@ -1033,10 +1033,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CZoneNames.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\Utils.cpp"
 					>
 				</File>
@@ -1746,6 +1742,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CZoneNames.cpp"
 					>
 				</File>
 				<Filter
@@ -2547,10 +2547,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CZoneNames.h"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\Element.h"
 					>
 				</File>
@@ -2644,6 +2640,10 @@
 				>
 				<File
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLatentTransferManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CZoneNames.h"
 					>
 				</File>
 				<Filter
