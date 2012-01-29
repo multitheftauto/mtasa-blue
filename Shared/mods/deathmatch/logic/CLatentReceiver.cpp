@@ -76,7 +76,6 @@ void CLatentReceiver::OnReceive ( NetBitStreamInterface* pBitStream )
     bool bIsHead = false;
     bool bIsTail = false;
     bool bIsCancel = false;
-    bool bIsError = false;
     ushort usCategory = 0;
     uint uiFinalSize = 0;
     uint uiRate = 0;
@@ -185,7 +184,7 @@ void CLatentReceiver::OnReceive ( NetBitStreamInterface* pBitStream )
         }
         else
         {
-            OutputDebugString ( "CLatentReceiver::OnReceive - Unknown category" );
+            OutputDebugLine ( "[Misc] CLatentReceiver::OnReceive - Unknown category" );
         }
 
         // Reset for next receive
