@@ -686,6 +686,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getAccountPlayer", CLuaFunctionDefinitions::GetAccountPlayer );
     CLuaCFunctions::AddFunction ( "isGuestAccount", CLuaFunctionDefinitions::IsGuestAccount );
     CLuaCFunctions::AddFunction ( "getAccountData", CLuaFunctionDefinitions::GetAccountData );
+    CLuaCFunctions::AddFunction ( "getAccountAllData", CLuaFunctionDefinitions::GetAccountAllData );
     CLuaCFunctions::AddFunction ( "getAccount", CLuaFunctionDefinitions::GetAccount );
     CLuaCFunctions::AddFunction ( "getAccounts", CLuaFunctionDefinitions::GetAccounts );
 

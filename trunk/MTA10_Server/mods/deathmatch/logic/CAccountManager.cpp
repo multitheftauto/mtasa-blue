@@ -877,6 +877,65 @@ bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAcco
 }
 
 
+bool CAccountManager::GetAllAccountData( CAccount* pAccount, lua_State* pLua )
+{
+    //Get the user ID
+    int iUserID = pAccount->GetID();
+    //create a new registry result for the query return
+    CRegistryResult result;
+    SString strKey;
+    SString strValue;
+    unsigned int uiIndex = 0;
+
+    //Select the value and type from the database where the user is our user and the key is the required key
+    m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT key,value,type from userdata where userid=?", SQLITE_INTEGER, iUserID );
+
+    //Store the returned amount of rows
+    int iResults = result.nRows;
+
+    //Do we have any results?
+    if ( iResults > 0 ) 
+    {
+        //Loop through until i is the same as the number of rows
+        for ( int i = 0;i < iResults;i++ ) 
+        {
+            //Get our key
+            strKey = (char *)result.Data[i][0].pVal;
+            //Get our type
+            int iType = result.Data[i][2].nVal;
+            //Account data is stored as text so we don't need to check what type it is just return it
+            if ( iType == LUA_TNIL )
+            {
+                lua_pushstring ( pLua, strKey );
+                lua_pushnil ( pLua );
+                lua_settable ( pLua, -3 );
+            }
+            if ( iType == LUA_TBOOLEAN )
+            {
+                SString strResult = (char *)result.Data[i][1].pVal;
+                lua_pushstring ( pLua, strKey );
+                lua_pushboolean ( pLua, strResult == "true" ? true : false );
+                lua_settable ( pLua, -3 );
+            }
+            if ( iType == LUA_TNUMBER )
+            {
+                lua_pushstring ( pLua, strKey );
+                lua_pushnumber ( pLua, strtod ( (char*)result.Data[i][1].pVal, NULL ) );
+                lua_settable ( pLua, -3 );
+            }
+            else
+            {
+                lua_pushstring ( pLua, strKey );
+                lua_pushstring ( pLua, ( (char*)result.Data[i][1].pVal ) );
+                lua_settable ( pLua, -3 );
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+
 void CAccountManager::SmartLoad ()
 {
     //##Function to work out if we need to reload the accounts.xml file into internal.db##

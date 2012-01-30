@@ -599,6 +599,7 @@ public:
     static CClient*             GetAccountPlayer                    ( CAccount* pAccount );
     static bool                 IsGuestAccount                      ( CAccount* pAccount, bool& bGuest );
     static CLuaArgument*        GetAccountData                      ( CAccount* pAccount, const char* szKey );
+    static bool                 GetAccountAllData                   ( lua_State* pLua, CAccount* pAccount );
 
     // Account set funcs
     static CAccount*            AddAccount                          ( const char* szName, const char* szPassword );
