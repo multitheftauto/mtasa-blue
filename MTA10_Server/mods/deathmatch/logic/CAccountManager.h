@@ -115,6 +115,7 @@ public:
     CLuaArgument*               GetAccountData              ( CAccount* pAccount, const char* szKey );
     bool                        SetAccountData              ( CAccount* pAccount, const char* szKey, const SString& strValue, int iType );
     bool                        CopyAccountData             ( CAccount* pFromAccount, CAccount* pToAccount );
+    bool                        GetAllAccountData           ( CAccount* pAccount, lua_State* pLua );
 
     bool                        ConvertXMLToSQL             ( const char* szFileName );
     bool                        LoadXML                     ( CXMLNode* pParent );
