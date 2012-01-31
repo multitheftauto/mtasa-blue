@@ -1516,7 +1516,10 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
                         // If local player, we are now allowed to exit it again
                         if ( pPlayer->IsLocalPlayer () )
+                        {
                             g_pClientGame->m_bNoNewVehicleTask = false;
+                            g_pClientGame->m_NoNewVehicleTaskReasonID = INVALID_ELEMENT_ID;
+                        }
 
                         // Call the onClientPlayerEnterVehicle event
                         CLuaArguments Arguments;
@@ -3559,6 +3562,13 @@ void CPacketHandler::Packet_EntityRemove ( NetBitStreamInterface& bitStream )
             if ( g_pClientGame->m_VehicleInOutID == ID )
             {
                 g_pClientGame->ResetVehicleInOut ();
+            }
+
+            // Are we blocking a new vehicle task because of this vehicle?
+            if ( g_pClientGame->m_bNoNewVehicleTask && g_pClientGame->m_NoNewVehicleTaskReasonID == ID )
+            {
+                g_pClientGame->m_bNoNewVehicleTask = false;
+                g_pClientGame->m_NoNewVehicleTaskReasonID = INVALID_ELEMENT_ID;
             }
 
             // Delete its clientside children
