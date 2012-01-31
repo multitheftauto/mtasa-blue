@@ -627,6 +627,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxConvertPixels", CLuaFunctionDefs::dxConvertPixels );
     CLuaCFunctions::AddFunction ( "dxGetPixelColor", CLuaFunctionDefs::dxGetPixelColor );
     CLuaCFunctions::AddFunction ( "dxSetPixelColor", CLuaFunctionDefs::dxSetPixelColor );
+    CLuaCFunctions::AddFunction ( "dxSetBlendMode", CLuaFunctionDefs::dxSetBlendMode );
+    CLuaCFunctions::AddFunction ( "dxGetBlendMode", CLuaFunctionDefs::dxGetBlendMode );
 
     // Audio funcs
     CLuaCFunctions::AddFunction ( "playSoundFrontEnd", CLuaFunctionDefs::PlaySoundFrontEnd );

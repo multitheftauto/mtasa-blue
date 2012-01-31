@@ -33,6 +33,18 @@ enum eFontType
     NUM_FONTS
 };
 
+namespace EBlendMode
+{
+    enum EBlendModeType
+    {
+        NONE,
+        BLEND,              // Alpha blend
+        ADD,                // Color add                          (used for making composite textures with a premultiplied source)
+        MODULATE_ADD,       // Modulate color with alpha then add (used for making composite textures with a non-premultiplied source)
+    };
+}
+using EBlendMode::EBlendModeType;
+
 class CGraphicsInterface
 {
 public:
@@ -46,6 +58,9 @@ public:
 
     virtual void                    DrawLine3D          ( const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f ) = 0;
     virtual void                    DrawRectangle       ( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor ) = 0;
+
+    virtual void                    SetBlendMode        ( EBlendModeType blendMode ) = 0;
+    virtual EBlendModeType          GetBlendMode        ( void ) = 0;
 
     virtual unsigned int            GetViewportWidth    ( void ) = 0;
     virtual unsigned int            GetViewportHeight   ( void ) = 0;
