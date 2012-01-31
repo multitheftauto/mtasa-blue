@@ -231,7 +231,7 @@ void CFileTextureItem::CreateUnderlyingData ( bool bMipMaps, uint uiSizeX, uint 
         return;
 
     m_uiSizeX = uiSizeX;
-    m_uiSizeY = uiSizeX;
+    m_uiSizeY = uiSizeY;
 
     // Update surface size if it's a normal texture
     D3DSURFACE_DESC desc;
