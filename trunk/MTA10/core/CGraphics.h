@@ -29,22 +29,24 @@ class CLine3DBatcher;
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
 
-namespace EBlendMode
+namespace EDrawMode
 {
-    enum EBlendModeType
+    enum EDrawModeType
     {
-        BLEND = 100,            // Alpha blend
-        ADD = 1000,             // Color add                          (used for making composite textures with a premultiplied source)
-        MODULATE_ADD = 10000,   // Modulate color with alpha then add (used for making composite textures with a non-premultiplied source)
+        NONE,
+        DX_LINE,
+        DX_SPRITE,
+        TILE_BATCHER,
     };
 }
+using EDrawMode::EDrawModeType;
 
-using EBlendMode::EBlendModeType;
 
 class CGraphics : public CGraphicsInterface, public CSingleton < CGraphics >
 {
     friend class CDirect3DEvents9;
 public:
+    ZERO_ON_NEW
                         CGraphics               ( CLocalGUI* pGUI );
                         ~CGraphics              ( void );
 
@@ -61,10 +63,12 @@ public:
     void                DrawLine3D              ( const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f );
     void                DrawRectangle           ( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor );
 
-    void                SetBlendMode            ( EBlendModeType blendMode = EBlendMode::BLEND );
-    SColor              ModifyColorForBlendMode ( SColor color );
-    void                BeginDrawBatch          ( void );
+    void                SetBlendMode            ( EBlendModeType blendMode );
+    EBlendModeType      GetBlendMode            ( void );
+    SColor              ModifyColorForBlendMode ( SColor color, EBlendModeType blendMode );
+    void                BeginDrawBatch          ( EBlendModeType blendMode = EBlendMode::NONE );
     void                EndDrawBatch            ( void );
+    void                SetBlendModeRenderStates ( EBlendModeType blendMode );
 
     unsigned int        GetViewportWidth        ( void );
     unsigned int        GetViewportHeight       ( void );
@@ -148,13 +152,15 @@ private:
     void                OnDeviceRestore         ( IDirect3DDevice9 * pDevice );
     void                OnZBufferModified       ( void );
     ID3DXFont*          MaybeGetBigFont         ( ID3DXFont* pDXFont, float& fScaleX, float& fScaleY );
+    void                CheckModes              ( EDrawModeType newDrawMode, EBlendModeType newBlendMode = EBlendMode::NONE );
 
     CLocalGUI*          m_pGUI;
 
     int                 m_iDebugQueueRefs;
     int                 m_iDrawBatchRefCount;
-    EBlendModeType      m_BlendMode;
-    EBlendModeType      m_BatchBlendMode;
+    EBlendModeType      m_ActiveBlendMode;
+    EDrawModeType       m_CurDrawMode;
+    EBlendModeType      m_CurBlendMode;
 
     LPD3DXSPRITE        m_pDXSprite;
     IDirect3DTexture9 * m_pDXPixelTexture;
@@ -184,7 +190,6 @@ private:
         QUEUE_LINE,
         QUEUE_TEXT,
         QUEUE_RECT,
-        QUEUE_CIRCLE,
         QUEUE_TEXTURE,
         QUEUE_SHADER,
     };
@@ -221,14 +226,6 @@ private:
         unsigned long   ulColor;
     };
 
-    struct sDrawQueueCircle
-    {
-        float           fX;
-        float           fY;
-        float           fRadius;
-        unsigned long   ulColor;
-    };
-
     struct sDrawQueueTexture
     {
         CMaterialItem*  pMaterial;
@@ -250,6 +247,7 @@ private:
     struct sDrawQueueItem
     {
         eDrawQueueType      eType;
+        EBlendModeType      blendMode;
         std::wstring        strText;
 
         // Queue item data based on the eType.
@@ -258,7 +256,6 @@ private:
             sDrawQueueLine          Line;
             sDrawQueueText          Text;
             sDrawQueueRect          Rect;
-            sDrawQueueCircle        Circle;
             sDrawQueueTexture       Texture;
         };
     };
@@ -275,7 +272,6 @@ private:
     std::vector < sDrawQueueItem >      m_PreGUIQueue;
     std::vector < sDrawQueueItem >      m_PostGUIQueue;
 
-    void                                HandleDrawQueueModeChange ( uint curMode, uint newMode );
     void                                AddQueueItem            ( const sDrawQueueItem& Item, bool bPostGUI );
     void                                DrawQueueItem           ( const sDrawQueueItem& Item );
     void                                DrawQueue               ( std::vector < sDrawQueueItem >& Queue );

@@ -21,117 +21,60 @@
 
 int CLuaFunctionDefs::dxDrawLine ( lua_State* luaVM )
 {
-    // dxDrawLine ( int x,int y,int x2,int y2,int color, [float width=1,bool postGUI=false] )
-    // Grab all argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
-    int iArgument6 = lua_type ( luaVM, 6 );
-    int iArgument7 = lua_type ( luaVM, 7 );
+//  bool dxDrawLine ( int startX, int startY, int endX, int endY, int color, [float width=1, bool postGUI=false] )
+    float fStartX; float fStartY; float fEndX; float fEndY; uint ulColor; float fWidth; bool bPostGUI;
 
-    // Check required arguments. Should all be numbers.
-    if ( ( iArgument1 != LUA_TNUMBER && iArgument1 != LUA_TSTRING ) ||
-        ( iArgument2 != LUA_TNUMBER && iArgument2 != LUA_TSTRING ) || 
-        ( iArgument3 != LUA_TNUMBER && iArgument3 != LUA_TSTRING ) ||
-        ( iArgument4 != LUA_TNUMBER && iArgument4 != LUA_TSTRING ) ||
-        ( iArgument5 != LUA_TNUMBER && iArgument5 != LUA_TSTRING ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( fStartX );
+    argStream.ReadNumber ( fStartY );
+    argStream.ReadNumber ( fEndX );
+    argStream.ReadNumber ( fEndY );
+    argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
+    argStream.ReadNumber ( fWidth, 1 );
+    argStream.ReadBool ( bPostGUI, false );
+
+    if ( !argStream.HasErrors () )
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "dxDrawLine" );
-        lua_pushboolean ( luaVM, false );
+        g_pCore->GetGraphics ()->DrawLineQueued ( fStartX, fStartY, fEndX, fEndY, fWidth, ulColor, bPostGUI );
+        lua_pushboolean ( luaVM, true );
         return 1;
-    }    
-
-    // Got a line width too?
-    float fWidth = 1.0f;
-    if ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING )
-    {
-        fWidth = static_cast < float > ( lua_tonumber ( luaVM, 6 ) );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawLine", *argStream.GetErrorMessage () ) );
 
-    // Got a post gui specifier?
-    bool bPostGUI = false;
-    if ( iArgument7 == LUA_TBOOLEAN )
-    {
-        bPostGUI = ( lua_toboolean ( luaVM, 7 ) ) ? true:false;
-    }
-
-    // Grab the arguments
-    float fX1 = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
-    float fY1 = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
-    float fX2 = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
-    float fY2 = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
-    unsigned long ulColor = static_cast < unsigned long > ( lua_tonumber ( luaVM, 5 ) );
-
-    // Draw it
-    g_pCore->GetGraphics ()->DrawLineQueued ( fX1, fY1, fX2, fY2,fWidth, ulColor, bPostGUI );
-
-    // Success
-    lua_pushboolean ( luaVM, true );
+    // Failed
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 
 
 int CLuaFunctionDefs::dxDrawLine3D ( lua_State* luaVM )
 {
-    // dxDrawLine3D ( float x,float y,float z,float x2,float y2,float z2,int color, [float width,bool postGUI,float zBuffer] )
+// bool dxDrawLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, int color[, int width, bool postGUI ] )
+    CVector vecBegin; CVector vecEnd; uint ulColor; float fWidth; bool bPostGUI;
 
-    // Grab all argument types
-    int iArgument1 = lua_type ( luaVM, 1 ); // X1
-    int iArgument2 = lua_type ( luaVM, 2 ); // Y1
-    int iArgument3 = lua_type ( luaVM, 3 ); // Z1
-    int iArgument4 = lua_type ( luaVM, 4 ); // X2
-    int iArgument5 = lua_type ( luaVM, 5 ); // Y2
-    int iArgument6 = lua_type ( luaVM, 6 ); // Z2
-    int iArgument7 = lua_type ( luaVM, 7 ); // Color
-    int iArgument8 = lua_type ( luaVM, 8 ); // Width
-    int iArgument9 = lua_type ( luaVM, 9 ); // Reserved: Post GUI
-    int iArgument10 = lua_type ( luaVM, 10 ); // Reserved: Z-buffer
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( vecBegin.fX );
+    argStream.ReadNumber ( vecBegin.fY );
+    argStream.ReadNumber ( vecBegin.fZ );
+    argStream.ReadNumber ( vecEnd.fX );
+    argStream.ReadNumber ( vecEnd.fY );
+    argStream.ReadNumber ( vecEnd.fZ );
+    argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
+    argStream.ReadNumber ( fWidth, 1 );
+    argStream.ReadBool ( bPostGUI, false );
 
-    // Check required arguments. Should all be numbers.
-    if ( ( iArgument1 != LUA_TNUMBER && iArgument1 != LUA_TSTRING ) ||
-        ( iArgument2 != LUA_TNUMBER && iArgument2 != LUA_TSTRING ) || 
-        ( iArgument3 != LUA_TNUMBER && iArgument3 != LUA_TSTRING ) ||
-        ( iArgument4 != LUA_TNUMBER && iArgument4 != LUA_TSTRING ) ||
-        ( iArgument5 != LUA_TNUMBER && iArgument5 != LUA_TSTRING ) ||
-        ( iArgument6 != LUA_TNUMBER && iArgument6 != LUA_TSTRING ) ||
-        ( iArgument7 != LUA_TNUMBER && iArgument7 != LUA_TSTRING ))
+    if ( !argStream.HasErrors () )
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "dxDrawLine3D" );
-        lua_pushboolean ( luaVM, false );
+        g_pCore->GetGraphics ()->DrawLine3DQueued ( vecBegin, vecEnd, fWidth, ulColor, bPostGUI );
+        lua_pushboolean ( luaVM, true );
         return 1;
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawLine3D", *argStream.GetErrorMessage () ) );
 
-    // Got a line width too?
-    float fWidth = 1.0f;
-    if ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING )
-    {
-        fWidth = static_cast < float > ( lua_tonumber ( luaVM, 8 ) );
-    }
-
-    // Got a post gui specifier?
-    bool bPostGUI = false;
-    if ( iArgument9 == LUA_TBOOLEAN )
-    {
-        bPostGUI = ( lua_toboolean ( luaVM, 9 ) ) ? true : false;
-    }
-
-    // Grab the arguments
-    CVector vecBegin, vecEnd;
-    vecBegin.fX = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
-    vecBegin.fY = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
-    vecBegin.fZ = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
-    vecEnd.fX = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
-    vecEnd.fY = static_cast < float > ( lua_tonumber ( luaVM, 5 ) );
-    vecEnd.fZ = static_cast < float > ( lua_tonumber ( luaVM, 6 ) );
-    unsigned long ulColor = static_cast < unsigned long > ( lua_tonumber ( luaVM, 7 ) );
-
-    // Draw it
-    g_pCore->GetGraphics ()->DrawLine3DQueued ( vecBegin, vecEnd, fWidth, ulColor, bPostGUI );
-
-    // Success
-    lua_pushboolean ( luaVM, true );
+    // Failed
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 
@@ -189,50 +132,26 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxDrawRectangle ( lua_State* luaVM )
 {
-    // dxDrawRectangle ( int x,int y,float width,float height,[int color=0xffffffff] )
+// bool dxDrawRectangle ( int startX, int startY, float width, float height [, int color = white, bool postGUI = false] )
+    float fStartX; float fStartY; float fWidth; float fHeight; uint ulColor; bool bPostGUI;
 
-    // Grab all argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) && 
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) && 
-        ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) && 
-        ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( fStartX );
+    argStream.ReadNumber ( fStartY );
+    argStream.ReadNumber ( fWidth );
+    argStream.ReadNumber ( fHeight );
+    argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
+    argStream.ReadBool ( bPostGUI, false );
+
+
+    if ( !argStream.HasErrors () )
     {
-        int iX = static_cast < int > ( lua_tonumber ( luaVM, 1 ) );
-        int iY = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
-        int iWidth = static_cast < int > ( lua_tonumber ( luaVM, 3 ) );
-        int iHeight = static_cast < int > ( lua_tonumber ( luaVM, 4 ) );
-        unsigned long ulColor = 0xFFFFFFFF;
-
-        int iArgument5 = lua_type ( luaVM, 5 );
-        if ( ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) )
-        {
-            ulColor = static_cast < unsigned long > ( lua_tonumber ( luaVM, 5 ) );
-        }
-
-        // Got a post gui specifier?
-        bool bPostGUI = false;
-        int iArgument6 = lua_type ( luaVM, 6 );
-        if ( iArgument6 == LUA_TBOOLEAN )
-        {
-            bPostGUI = ( lua_toboolean ( luaVM, 6 ) ) ? true:false;
-        }
-
-        g_pCore->GetGraphics ()->DrawRectQueued ( static_cast < float > ( iX ),
-                                                  static_cast < float > ( iY ),
-                                                  static_cast < float > ( iWidth ),
-                                                  static_cast < float > ( iHeight ),
-                                                  ulColor, bPostGUI );
-
-        // Success
+        g_pCore->GetGraphics ()->DrawRectQueued ( fStartX, fStartY, fWidth, fHeight, ulColor, bPostGUI );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "dxDrawRectangle" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawRectangle", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1040,7 +959,7 @@ int CLuaFunctionDefs::dxSetTexturePixels ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxGetTexturePixels", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetTexturePixels", *argStream.GetErrorMessage () ) );
 
     // error: bad arguments
     lua_pushboolean ( luaVM, false );
@@ -1132,7 +1051,7 @@ int CLuaFunctionDefs::dxConvertPixels ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxGetPixelColor ( lua_State* luaVM )
 {
-//  int r,g,b,a dxSetPixelColor( string pixels, int x, int y )
+//  int r,g,b,a dxGetPixelColor( string pixels, int x, int y )
     CPixels pixels; int x; int y;
 
     CScriptArgReader argStream ( luaVM );
@@ -1188,5 +1107,37 @@ int CLuaFunctionDefs::dxSetPixelColor ( lua_State* luaVM )
 
     // error: bad arguments
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxSetBlendMode ( lua_State* luaVM )
+{
+//  bool dxSetBlendMode ( string blendMode )
+    EBlendModeType blendMode;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( blendMode, EBlendMode::BLEND );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pCore->GetGraphics ()->SetBlendMode ( blendMode );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetBlendMode", *argStream.GetErrorMessage () ) );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxGetBlendMode ( lua_State* luaVM )
+{
+//  string dxGetBlendMode ()
+    EBlendModeType blendMode = g_pCore->GetGraphics ()->GetBlendMode ();
+    lua_pushstring ( luaVM, EnumToString ( blendMode ) );
     return 1;
 }
