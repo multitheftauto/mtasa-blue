@@ -572,6 +572,7 @@ private:
     ElementID                           m_VehicleInOutID;
     unsigned char                       m_ucVehicleInOutSeat;
     bool                                m_bNoNewVehicleTask;
+    ElementID                           m_NoNewVehicleTaskReasonID;
     CClientPlayer*                      m_pGettingJackedBy;
 
     CEntity*                            m_pTargetedGameEntity;
