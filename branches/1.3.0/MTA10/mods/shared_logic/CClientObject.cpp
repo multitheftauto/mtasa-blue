@@ -468,7 +468,7 @@ void CClientObject::Create ( void )
             g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest ( !CClientObjectManager::IsBreakableModel ( m_usModel ) );
 
             // Create the object
-            m_pObject = g_pGame->GetPools ()->AddObject ( m_usModel, m_bIsLowLod );
+            m_pObject = g_pGame->GetPools ()->AddObject ( m_usModel, m_bIsLowLod, m_bBreakable );
 
             // Restore default behaviour
             g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest ( false );
@@ -645,4 +645,17 @@ CSphere CClientObject::GetWorldBoundingSphere ( void )
     }
     sphere.vecPosition += GetStreamPosition ();
     return sphere;
+}
+
+bool CClientObject::SetBreakable ( bool bBreakable )
+{
+    // Are we breakable and have we changed
+    if ( CClientObjectManager::IsBreakableModel ( m_usModel ) && m_bBreakable != bBreakable )
+    {
+        m_bBreakable = bBreakable;
+        // Re-create us
+        ReCreate ( );
+        return true;
+    }
+    return false;
 }

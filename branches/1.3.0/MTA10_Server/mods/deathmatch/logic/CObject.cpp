@@ -33,7 +33,6 @@ CObject::CObject ( CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectMa
     m_ucAlpha = 255;
     m_fScale  = 1;
     m_fHealth = 1000.0f;
-    m_bBreakable = true;
     m_bSyncable = true;
     m_pSyncer = NULL;
     m_bIsStatic = false;
