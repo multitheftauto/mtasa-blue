@@ -247,6 +247,12 @@ IMPLEMENT_ENUM_BEGIN( EPixelsFormatType )
     ADD_ENUM ( EPixelsFormat::PNG,          "png" )
 IMPLEMENT_ENUM_END( "pixel-format" )
 
+IMPLEMENT_ENUM_BEGIN( EBlendModeType )
+    ADD_ENUM ( EBlendMode::BLEND,           "blend" )
+    ADD_ENUM ( EBlendMode::ADD,             "add" )
+    ADD_ENUM ( EBlendMode::MODULATE_ADD,    "modulate_add" )
+IMPLEMENT_ENUM_END( "blend-mode" )
+
 
 //
 // Get best guess at name of userdata type

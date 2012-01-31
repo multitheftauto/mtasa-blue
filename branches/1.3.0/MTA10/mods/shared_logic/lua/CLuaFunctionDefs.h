@@ -523,6 +523,8 @@ public:
     LUA_DECLARE ( dxConvertPixels );
     LUA_DECLARE ( dxGetPixelColor );
     LUA_DECLARE ( dxSetPixelColor );
+    LUA_DECLARE ( dxSetBlendMode );
+    LUA_DECLARE ( dxGetBlendMode );
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them

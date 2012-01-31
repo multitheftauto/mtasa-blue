@@ -38,8 +38,9 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
 
     m_iDebugQueueRefs = 0;
     m_iDrawBatchRefCount = 0;
-    m_BlendMode = EBlendMode::BLEND;
-    m_BatchBlendMode = EBlendMode::BLEND;
+    m_ActiveBlendMode = EBlendMode::BLEND;
+    m_CurDrawMode = EDrawMode::NONE;
+    m_CurBlendMode = EBlendMode::BLEND;
 
     m_pRenderItemManager = new CRenderItemManager ();
     m_pTileBatcher = new CTileBatcher ();
@@ -98,12 +99,13 @@ void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, uns
 
         BeginDrawBatch ();
             D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, NULL );
+            CheckModes ( EDrawMode::DX_SPRITE, m_ActiveBlendMode );
             m_pDXSprite->SetTransform ( &matrix );  
             
             // Convert to UTF16
             std::wstring strText = MbUTF8ToUTF16(szText);
 
-            pDXFont->DrawTextW ( m_pDXSprite, strText.c_str(), -1, &rect, ulFormat, ModifyColorForBlendMode ( ulColor ) );
+            pDXFont->DrawTextW ( m_pDXSprite, strText.c_str(), -1, &rect, ulFormat, ulColor );
         EndDrawBatch ();
     }        
 }
@@ -135,27 +137,32 @@ void CGraphics::DrawRectangle ( float fX, float fY, float fWidth, float fHeight,
     D3DXVECTOR2 scaling ( fWidth, fHeight );
     D3DXVECTOR2 position ( fX, fY );
     D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, &position );
+    CheckModes ( EDrawMode::DX_SPRITE, m_ActiveBlendMode );
     m_pDXSprite->SetTransform ( &matrix );
-    m_pDXSprite->Draw ( m_pDXPixelTexture, NULL, NULL, NULL, ModifyColorForBlendMode ( ulColor ) );
+    m_pDXSprite->Draw ( m_pDXPixelTexture, NULL, NULL, NULL, ulColor );
     EndDrawBatch ();
 }
 
 
 //
-// Set current blend mode
+// Set/get current blend mode
 // 
 void CGraphics::SetBlendMode ( EBlendModeType blendMode )
 {
-    m_BlendMode = blendMode;
+    m_ActiveBlendMode = blendMode;
 }
 
+EBlendModeType CGraphics::GetBlendMode ( void )
+{
+    return m_ActiveBlendMode;
+}
 
 //
 // Modify diffuse color if blend mode requires it
 // 
-SColor CGraphics::ModifyColorForBlendMode ( SColor color )
+SColor CGraphics::ModifyColorForBlendMode ( SColor color, EBlendModeType blendMode )
 {
-    if ( m_BlendMode == EBlendMode::MODULATE_ADD )
+    if ( blendMode == EBlendMode::MODULATE_ADD )
     {
         // Apply modulation to diffuse color also
         color.R = color.R * color.A / 256;
@@ -167,27 +174,13 @@ SColor CGraphics::ModifyColorForBlendMode ( SColor color )
 
 
 //
-// BeginDrawBatch
-//
-// Slightly speed up successive uses of DXSprite.
-// Matching EndDrawBatch() must be called otherwise end of world.
-//
-void CGraphics::BeginDrawBatch ( void )
+// SetBlendModeRenderStates
+// 
+void CGraphics::SetBlendModeRenderStates ( EBlendModeType blendMode )
 {
-    if ( m_BlendMode != m_BatchBlendMode )
+    switch ( blendMode )
     {
-        if ( m_iDrawBatchRefCount > 0 )
-        {
-            // Flush if changing blend mode
-            m_iDrawBatchRefCount = 1;
-            EndDrawBatch ();
-        }
-        m_BatchBlendMode = m_BlendMode;
-    }
-
-    if ( m_iDrawBatchRefCount++ == 0 )
-    {
-        if ( m_BlendMode == EBlendMode::BLEND )
+        case EBlendMode::BLEND:
         {
             // Draw NonPM texture
             m_pDevice->SetRenderState ( D3DRS_ZENABLE,          D3DZB_FALSE );
@@ -211,8 +204,9 @@ void CGraphics::BeginDrawBatch ( void )
             m_pDevice->SetTextureStageState ( 1, D3DTSS_COLOROP,        D3DTOP_DISABLE );
             m_pDevice->SetTextureStageState ( 1, D3DTSS_ALPHAOP,        D3DTOP_DISABLE );
         }
-        else
-        if ( m_BlendMode == EBlendMode::MODULATE_ADD )
+        break;
+
+        case EBlendMode::MODULATE_ADD:
         {
             // Draw NonPM texture as PM texture
             m_pDevice->SetRenderState ( D3DRS_ZENABLE,          D3DZB_FALSE );
@@ -245,8 +239,9 @@ void CGraphics::BeginDrawBatch ( void )
             m_pDevice->SetTextureStageState ( 2, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
 
         }
-        else
-        if ( m_BlendMode == EBlendMode::ADD )
+        break;
+
+        case EBlendMode::ADD:
         {
             // Draw PM texture
             m_pDevice->SetRenderState ( D3DRS_ZENABLE,          D3DZB_FALSE );
@@ -271,14 +266,23 @@ void CGraphics::BeginDrawBatch ( void )
             m_pDevice->SetTextureStageState ( 1, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
 
         }
-        else
-            assert ( 0 );
+        break;
 
-        m_pDXSprite->Begin ( D3DXSPRITE_SORT_TEXTURE | D3DXSPRITE_DO_NOT_ADDREF_TEXTURE
-                | D3DXSPRITE_DONOTSAVESTATE
-                | D3DXSPRITE_DONOTMODIFY_RENDERSTATE
-            );
+        default:
+            break;
     }
+}
+
+
+//
+// BeginDrawBatch
+//
+// Batching is automatic, and it is vital to to flush the last set of operations.
+// Surrounding drawing calls with BeginDrawBatch() and EndDrawBatch() will ensure everything goes to plan.
+//
+void CGraphics::BeginDrawBatch ( EBlendModeType xxblendMode )
+{
+    m_iDrawBatchRefCount++;
 }
 
 //
@@ -287,8 +291,58 @@ void CGraphics::BeginDrawBatch ( void )
 void CGraphics::EndDrawBatch ( void )
 {
     if ( --m_iDrawBatchRefCount == 0 )
-        m_pDXSprite->End ();
+        CheckModes ( EDrawMode::NONE, EBlendMode::BLEND );
     m_iDrawBatchRefCount = Max ( 0, m_iDrawBatchRefCount );
+}
+
+
+//
+// Flush buffers if a change in drawing mode if occurring.
+//
+void CGraphics::CheckModes ( EDrawModeType newDrawMode, EBlendModeType newBlendMode )
+{
+    bool bDrawModeChanging = ( m_CurDrawMode != newDrawMode );
+    bool bBlendModeChanging = ( m_CurBlendMode != newBlendMode );
+    // Draw mode changing?
+    if ( bDrawModeChanging || bBlendModeChanging )
+    {
+        // Flush old
+        if ( m_CurDrawMode == EDrawMode::DX_SPRITE )
+        {
+            m_pDXSprite->End ();
+        }
+        else
+        if ( m_CurDrawMode == EDrawMode::DX_LINE )
+        {
+            m_pLineInterface->End ();
+        }
+        else
+        if ( m_CurDrawMode == EDrawMode::TILE_BATCHER )
+        {
+            m_pTileBatcher->Flush ();
+        }
+
+
+        // Start new
+        if ( newDrawMode == EDrawMode::DX_SPRITE )
+        {
+            m_pDXSprite->Begin ( D3DXSPRITE_DO_NOT_ADDREF_TEXTURE | D3DXSPRITE_DONOTSAVESTATE | D3DXSPRITE_DONOTMODIFY_RENDERSTATE );
+        }
+        else
+        if ( newDrawMode == EDrawMode::DX_LINE )
+        {
+            m_pLineInterface->Begin ();
+        }
+    }
+
+    // Blend mode changing?
+    if ( bDrawModeChanging || bBlendModeChanging )
+    {
+        SetBlendModeRenderStates ( newBlendMode );
+    }
+
+    m_CurDrawMode = newDrawMode;
+    m_CurBlendMode = newBlendMode;
 }
 
 
@@ -450,6 +504,7 @@ void CGraphics::DrawLineQueued ( float fX1, float fY1,
     // Set up a queue item
     sDrawQueueItem Item;
     Item.eType = QUEUE_LINE;
+    Item.blendMode = m_ActiveBlendMode;
     Item.Line.fX1 = fX1;
     Item.Line.fY1 = fY1;
     Item.Line.fX2 = fX2;
@@ -487,6 +542,7 @@ void CGraphics::DrawRectQueued ( float fX, float fY,
     // Set up a queue item
     sDrawQueueItem Item;
     Item.eType = QUEUE_RECT;
+    Item.blendMode = m_ActiveBlendMode;
     Item.Rect.fX = fX;
     Item.Rect.fY = fY;
     Item.Rect.fWidth = fWidth;
@@ -513,6 +569,7 @@ void CGraphics::DrawTextureQueued ( float fX, float fY,
 
     // Set up a queue item
     sDrawQueueItem Item;
+    Item.blendMode = m_ActiveBlendMode;
     Item.Texture.fX = fX;
     Item.Texture.fY = fY;
     Item.Texture.fWidth = fWidth;
@@ -578,6 +635,7 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
 
         sDrawQueueItem Item;
         Item.eType = QUEUE_TEXT;
+        Item.blendMode = m_ActiveBlendMode;
 
         Item.Text.iLeft = iLeft;
         Item.Text.iTop = iTop;
@@ -726,8 +784,9 @@ void CGraphics::DrawTexture ( CTextureItem* pTexture, float fX, float fY, float 
     D3DXVECTOR2 rotationCenter  ( fFileWidth * fScaleX * fCenterX, fFileHeight * fScaleX * fCenterY );
     D3DXVECTOR2 position ( fX - fFileWidth * fScaleX * fCenterX, fY - fFileHeight * fScaleY * fCenterY );
     D3DXMatrixTransformation2D ( &matrix, NULL, NULL, &scaling, &rotationCenter, fRotation * 6.2832f / 360.f, &position );
+    CheckModes ( EDrawMode::DX_SPRITE, m_ActiveBlendMode );
     m_pDXSprite->SetTransform ( &matrix );
-    m_pDXSprite->Draw ( (IDirect3DTexture9*)pTexture->m_pD3DTexture, NULL, NULL, NULL, ModifyColorForBlendMode ( dwColor ) );
+    m_pDXSprite->Draw ( (IDirect3DTexture9*)pTexture->m_pD3DTexture, NULL, NULL, NULL, /*ModifyColorForBlendMode (*/ dwColor/*, blendMode )*/ );
     EndDrawBatch ();
 }
 
@@ -809,67 +868,25 @@ void CGraphics::DrawPostGUIQueue ( void )
 }
 
 
-void CGraphics::HandleDrawQueueModeChange ( uint curMode, uint newMode )
-{
-    // Changing from...
-    if ( curMode == 'spri' )
-    {
-        // ...sprite mode
-        m_pDXSprite->End ();
-    }
-    else
-    if ( curMode == 'tile' )
-    {
-        // ...tile mode
-        m_pTileBatcher->Flush ();
-    }
-
-    // Changing to...
-    if ( newMode == 'spri' )
-    {
-        // ...sprite mode
-        m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND );
-        m_pDevice->SetSamplerState ( 0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP );
-        m_pDevice->SetSamplerState ( 0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP );
-    }
-}
-
 
 void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )
 {
+    BeginDrawBatch ();
     // Items to draw?
     if ( Queue.size () > 0 )
     {
         // Loop through it
-        int curMode = 0;
         std::vector < sDrawQueueItem >::iterator iter = Queue.begin ();
         for ( ; iter != Queue.end (); iter++ )
         {
-            const sDrawQueueItem& item = *iter;
-
-            // Determine new mode
-            uint newMode;
-            if ( item.eType == QUEUE_SHADER )                                   newMode = 'tile';
-            else if ( item.eType == QUEUE_LINE )                                newMode = 'misc';
-            else                                                                newMode = 'spri';
-
-            // Switching mode ?
-            if ( curMode != newMode )
-            {
-                HandleDrawQueueModeChange ( curMode, newMode );
-                curMode = newMode;
-            }
-
             // Draw the item
-            DrawQueueItem ( item );
+            DrawQueueItem ( *iter );
         }
-
-        // Mode clean up
-        HandleDrawQueueModeChange ( curMode, 0 );
 
         // Clear the list
         Queue.clear ();
     }
+    EndDrawBatch ();
 }
 
 
@@ -910,8 +927,10 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
                 List [1].y = Item.Line.fY2;
 
                 // Draw it
-                m_pLineInterface->SetWidth ( Item.Line.fWidth );
-                m_pLineInterface->Draw ( List, 2, Item.Line.ulColor );
+                if ( m_pLineInterface->GetWidth () != Item.Line.fWidth )
+                    m_pLineInterface->SetWidth ( Item.Line.fWidth );
+                CheckModes ( EDrawMode::DX_LINE, Item.blendMode );
+                m_pLineInterface->Draw ( List, 2, ModifyColorForBlendMode ( Item.Line.ulColor, Item.blendMode ) );
             }
 
             break;
@@ -924,8 +943,9 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
             D3DXVECTOR2 scaling ( Item.Rect.fWidth, Item.Rect.fHeight );
             D3DXVECTOR2 position ( Item.Rect.fX, Item.Rect.fY );
             D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, &position );
+            CheckModes ( EDrawMode::DX_SPRITE, Item.blendMode );
             m_pDXSprite->SetTransform ( &matrix );
-            m_pDXSprite->Draw ( m_pDXPixelTexture, NULL, NULL, NULL, Item.Rect.ulColor );
+            m_pDXSprite->Draw ( m_pDXPixelTexture, NULL, NULL, NULL, /*ModifyColorForBlendMode (*/ Item.Rect.ulColor/*, Item.blendMode )*/ );
             break;
         }
         case QUEUE_TEXT:
@@ -936,8 +956,9 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
             D3DXVECTOR2 scalingCentre ( 0.5f, 0.5f );
             D3DXVECTOR2 scaling ( Item.Text.fScaleX, Item.Text.fScaleY );
             D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, NULL );
+            CheckModes ( EDrawMode::DX_SPRITE, Item.blendMode );
             m_pDXSprite->SetTransform ( &matrix );        
-            Item.Text.pDXFont->DrawTextW ( m_pDXSprite, Item.strText.c_str (), -1, &rect, Item.Text.ulFormat, Item.Text.ulColor );
+            Item.Text.pDXFont->DrawTextW ( m_pDXSprite, Item.strText.c_str (), -1, &rect, Item.Text.ulFormat, /*ModifyColorForBlendMode (*/ Item.Text.ulColor/*, Item.blendMode )*/ );
             RemoveQueueRef ( Item.Text.pDXFont );
             break;
         }
@@ -963,8 +984,9 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
                 const float fRotationRad  = Item.Texture.fRotation * (6.2832f/360.f);
                 D3DXMATRIX matrix;
                 D3DXMatrixTransformation2D  ( &matrix, NULL, 0.0f, &scaling, &rotationCenter, fRotationRad, &position );
+                CheckModes ( EDrawMode::DX_SPRITE, Item.blendMode );
                 m_pDXSprite->SetTransform ( &matrix );
-                m_pDXSprite->Draw ( (IDirect3DTexture9*)pTexture->m_pD3DTexture, &cutImagePos, NULL, NULL, Item.Texture.ulColor );
+                m_pDXSprite->Draw ( (IDirect3DTexture9*)pTexture->m_pD3DTexture, &cutImagePos, NULL, NULL, /*ModifyColorForBlendMode (*/ Item.Texture.ulColor/*, Item.blendMode )*/ );
             }
             RemoveQueueRef ( Item.Texture.pMaterial );
             break;
@@ -986,13 +1008,9 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
                 fU2 *= fUScale;
                 fV2 *= fVScale;
             }
+            CheckModes ( EDrawMode::TILE_BATCHER );
             m_pTileBatcher->AddTile ( t.fX, t.fY, t.fX+t.fWidth, t.fY+t.fHeight, fU1, fV1, fU2, fV2, t.pMaterial, t.fRotation, t.fRotCenOffX, t.fRotCenOffY, t.ulColor );
             RemoveQueueRef ( Item.Texture.pMaterial );
-            break;
-        }
-        // Circle type?
-        case QUEUE_CIRCLE:
-        {
             break;
         }
     }

@@ -97,6 +97,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     ResetAmmoInClip();
 
     m_bNoNewVehicleTask = false;
+    m_NoNewVehicleTaskReasonID = INVALID_ELEMENT_ID;
     m_bTransferResource = false;            // flag controls whether a resource is being transferred or not
     m_bTransferInitiated = false;           // flag controls whether a transfer has been initiated (to prevent PacketResource, AUTOPATCHER_REQUEST_FILES priority issues)
 
@@ -1469,8 +1470,10 @@ void CClientGame::UpdateVehicleInOut ( void )
 
                     // Reset the vehicle in out stuff so we're ready for another car entry/leave.
                     // Don't allow a new entry/leave until we've gotten the notify return packet
+                    ElementID ReasonVehicleID = m_VehicleInOutID;
                     g_pClientGame->ResetVehicleInOut ();
                     m_bNoNewVehicleTask = true;
+                    m_NoNewVehicleTaskReasonID = ReasonVehicleID;
 
 #ifdef MTA_DEBUG
                             g_pCore->GetConsole ()->Printf ( "* Sent_InOut: vehicle_notify_out" );
@@ -1635,8 +1638,10 @@ void CClientGame::UpdateVehicleInOut ( void )
 
                 // Reset
                 // Don't allow a new entry/leave until we've gotten the notify return packet
+                ElementID ReasonID = m_VehicleInOutID;
                 ResetVehicleInOut ();
                 m_bNoNewVehicleTask = true;
+                m_NoNewVehicleTaskReasonID = ReasonID;
             }
         }
     }
@@ -1677,6 +1682,7 @@ void CClientGame::UpdateVehicleInOut ( void )
 
                     // We're not allowed to enter any vehicle before we get a confirm
                     m_bNoNewVehicleTask = true;
+                    m_NoNewVehicleTaskReasonID = pOccupiedVehicle->GetID ();
 
                     // Remove him from the vehicle
                     m_pLocalPlayer->RemoveFromVehicle ();
@@ -2138,6 +2144,7 @@ void CClientGame::ResetVehicleInOut ( void )
     m_VehicleInOutID = INVALID_ELEMENT_ID;
     m_ucVehicleInOutSeat = 0xFF;
     m_bNoNewVehicleTask = false;
+    m_NoNewVehicleTaskReasonID = INVALID_ELEMENT_ID;
     m_pGettingJackedBy = NULL;
 }
 
