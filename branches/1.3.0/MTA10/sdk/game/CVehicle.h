@@ -221,6 +221,8 @@ public:
     virtual void                 RecalculateHandling                    ( void ) = 0;
 
     virtual void*                GetPrivateSuspensionLines              ( void ) = 0;
+
+    virtual bool                 CheckVTBL                              ( void ) = 0;
 };
 
 #endif

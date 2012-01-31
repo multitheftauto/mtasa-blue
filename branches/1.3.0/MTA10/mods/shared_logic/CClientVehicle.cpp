@@ -1941,9 +1941,9 @@ void CClientVehicle::StreamedInPulse ( void )
     // Make sure the vehicle doesn't go too far down
     if ( m_pVehicle )
     {
-        if ( m_pVehicle->GetInterface() && (DWORD)m_pVehicle->GetInterface()->vtbl == VTBL_CPlaceable )
+        if ( m_pVehicle->CheckVTBL ( ) )
         {
-            LogEvent ( 508, "CWorld::Add Crash fix", "", "" );
+            g_pCore->LogEvent ( 508, "CWorld::Add Crash fix", "", "" );
             ReCreate();
             return;
         }

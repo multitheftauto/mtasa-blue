@@ -719,6 +719,7 @@ public:
 
     CVehicleSAInterface*        GetVehicleInterface             ()  { return (CVehicleSAInterface*) m_pInterface; }
 
+    bool                        CheckVTBL                       ( void ) { return (m_pInterface->vtbl && (DWORD)m_pInterface->vtbl == VTBL_CPlaceable); }
 private:
     void                        RecalculateSuspensionLines          ( void );
     void                        CopyGlobalSuspensionLinesToPrivate  ( void );
