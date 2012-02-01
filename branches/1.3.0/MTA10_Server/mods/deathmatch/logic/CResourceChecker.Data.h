@@ -58,6 +58,8 @@ namespace
                                          { "cancelLatentEvent",         "1.3.0-9.03772" },
                                          { "dxSetBlendMode",            "1.3.0-9.03782" },
                                          { "dxGetBlendMode",            "1.3.0-9.03782" },
+                                         { "isObjectBreakable",         "1.3.0-9.03783" },
+                                         { "setObjectBreakable",        "1.3.0-9.03783" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
