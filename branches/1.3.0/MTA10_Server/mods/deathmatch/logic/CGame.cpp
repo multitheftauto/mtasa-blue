@@ -1178,13 +1178,20 @@ void CGame::InitialDataStream ( CPlayer& Player )
 
     // Write all players connected right now to a playerlist packet except the one we got the ingame notice from
     CPlayerListPacket PlayerList;
+    // Entity add packet might as well be generated
+    CEntityAddPacket EntityPacket;
     PlayerList.SetShowInChat ( false );
     list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
     for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
     {
+        CPlayer * pPlayer = *iter;
         if ( &Player != *iter && (*iter)->IsJoined () && !(*iter)->IsBeingDeleted () )
         {
             PlayerList.AddPlayer ( *iter );
+        }
+        if ( pPlayer != &Player )
+        {
+            EntityPacket.Add ( pPlayer );
         }
     }
 
@@ -1193,18 +1200,6 @@ void CGame::InitialDataStream ( CPlayer& Player )
 
     marker.Set ( "PlayerList" );
 
-    // Send him element data of all the other players
-    CEntityAddPacket EntityPacket;
-    iter = m_pPlayerManager->IterBegin ();
-    for ( ; iter != m_pPlayerManager->IterEnd () ; iter++ )
-    {
-        CPlayer * pPlayer = *iter;
-        // He doesn't need to know about himself
-        if ( pPlayer != &Player )
-        {
-            EntityPacket.Add ( pPlayer );
-        }
-    }
     Player.Send ( EntityPacket );
 
     marker.Set ( "SendPlayerElements" );
@@ -1222,17 +1217,9 @@ void CGame::InitialDataStream ( CPlayer& Player )
         {
             float* usStats = (*iter)->GetPlayerStats ();
             unsigned short count = 0;
-            CPlayerStatsPacket PlayerStats;
+            CPlayerStatsPacket PlayerStats = *(*iter)->GetPlayerStatsPacket ( );
             PlayerStats.SetSourceElement ( *iter );
-            for ( unsigned short us = 0 ; us < NUM_PLAYER_STATS ; us++ )
-            {
-                if ( usStats [ us ] != 0 )
-                {
-                    PlayerStats.Add ( us, usStats [ us ] );
-                    count++;
-                }
-            }
-            if ( count > 0 )
+            if ( PlayerStats.GetSize() > 0 )
                 Player.Send ( PlayerStats );
 
             count = 0;

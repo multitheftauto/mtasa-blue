@@ -14,12 +14,7 @@
 
 CPlayerStatsPacket::~CPlayerStatsPacket ( void )
 {
-    vector < sPlayerStat* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end () ; iter++ )
-    {
-        delete (*iter);
-    }
-    m_List.clear ();
+    Clear ( );
 }
 
 
@@ -35,11 +30,13 @@ bool CPlayerStatsPacket::Write ( NetBitStreamInterface& BitStream ) const
         unsigned short usNumStats = static_cast < unsigned short  >( m_List.size () );
         BitStream.WriteCompressed ( usNumStats );
 
-        vector < sPlayerStat* > ::const_iterator iter = m_List.begin ();
+        map < unsigned short, sPlayerStat* > ::const_iterator iter = m_List.begin ();
+        sPlayerStat* pPlayerStat = NULL;
         for ( ; iter != m_List.end () ; iter++ )
         {
-            BitStream.Write ( (*iter)->id );
-            BitStream.Write ( (*iter)->value );
+            pPlayerStat = (*iter).second;
+            BitStream.Write ( pPlayerStat->id );
+            BitStream.Write ( pPlayerStat->value );
         }
 
         return true;
@@ -51,8 +48,48 @@ bool CPlayerStatsPacket::Write ( NetBitStreamInterface& BitStream ) const
 
 void CPlayerStatsPacket::Add ( unsigned short usID, float fValue )
 {
-    sPlayerStat* Stat = new sPlayerStat;
-    Stat->id = usID;
-    Stat->value = fValue;
-    m_List.push_back ( Stat );
+    map < unsigned short, sPlayerStat* > ::iterator iter = m_List.find ( usID );
+    if ( iter != m_List.end ( ) )
+    {
+        if ( fValue == 0.0f )
+        {
+            sPlayerStat* pStat = (*iter).second;
+            delete pStat;
+            m_List.erase ( iter );
+        }
+        else
+        {
+            sPlayerStat* pStat = (*iter).second;
+            pStat->value = fValue;
+        }
+    }
+    else
+    {
+        sPlayerStat* pStat = new sPlayerStat;
+        pStat->id = usID;
+        pStat->value = fValue;
+        m_List[ usID ] = pStat;
+    }
+}
+
+
+void CPlayerStatsPacket::Remove ( unsigned short usID, float fValue )
+{
+    map < unsigned short, sPlayerStat* > ::const_iterator iter = m_List.find ( usID );
+    sPlayerStat* pStat = NULL;
+    if ( iter != m_List.end ( ) )
+    {
+        sPlayerStat* pStat = iter->second;
+        delete pStat;
+        m_List.erase ( iter );
+    }
+}
+void CPlayerStatsPacket::Clear ( void )
+{
+    map < unsigned short, sPlayerStat* > ::iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end () ; iter++ )
+    {
+        delete (*iter).second;
+    }
+    m_List.clear ();
 }
