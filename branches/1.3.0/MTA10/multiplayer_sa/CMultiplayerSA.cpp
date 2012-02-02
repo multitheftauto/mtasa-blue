@@ -6161,7 +6161,6 @@ void SetModelSuspensionLines ( CVehicleSAInterface* pVehicleIntf, void* pSuspens
     CModelInfo* pModelInfo = pGameInterface->GetModelInfo ( pVehicleIntf->m_pVehicle->GetModelIndex () );
     pModelInfo->SetVehicleSuspensionData ( pSuspensionLines );
 }
-
 // Some variables.
 DWORD dwSuspensionChangedJump = 0x4185C0;
 bool bSuspensionChanged = false;
@@ -6271,10 +6270,10 @@ void CMultiplayerSA::SetSuspensionEnabled ( bool bEnabled )
     {
         // Hook Install
         m_bSuspensionEnabled = true;
-        //HookInstallCall ( CALL_CAutomobile_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
+        HookInstallCall ( CALL_CAutomobile_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
         //HookInstallCall ( CALL_CBike_ProcessEntityCollision1, (DWORD)HOOK_ProcessVehicleCollision );
         //HookInstallCall ( CALL_CBike_ProcessEntityCollision2, (DWORD)HOOK_ProcessVehicleCollision );
-        //HookInstallCall ( CALL_CMonsterTruck_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
+        HookInstallCall ( CALL_CMonsterTruck_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
     }
 //     else
 //     {

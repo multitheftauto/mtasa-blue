@@ -216,7 +216,7 @@ CVehicleSA::~CVehicleSA()
 
             if ( m_pSuspensionLines )
             {
-                delete m_pSuspensionLines;
+                delete [] m_pSuspensionLines;
                 m_pSuspensionLines = NULL;
             }
             
@@ -2007,31 +2007,31 @@ void CVehicleSA::CopyGlobalSuspensionLinesToPrivate ( void )
 
 void CVehicleSA::RecalculateSuspensionLines ( void )
 {
-    //CHandlingEntry * pHandlingEntry = GetHandlingData ( );
+    CHandlingEntry * pHandlingEntry = GetHandlingData ( );
     // if suspension is master disabled or suspension hasn't changed return.
     //if ( g_pCore->GetMultiplayer ()->IsSuspensionEnabled () == false || pHandlingEntry->HasSuspensionChanged ( ) == false )
     //{
     //    return;
     //}
 
-    //DWORD dwModel = GetModelIndex ();
-    //CModelInfo* pModelInfo = pGame->GetModelInfo ( dwModel );
-    //if ( pModelInfo && ( pModelInfo->IsMonsterTruck() || pModelInfo->IsCar() ) )
-    //{
-    //    CVehicleSAInterface* pInt = GetVehicleInterface ();
-    //    // Trains (Their trailers do as well!)
-    //    if ( pModelInfo->IsTrain () || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590 )
-    //        return;
+    DWORD dwModel = GetModelIndex ();
+    CModelInfo* pModelInfo = pGame->GetModelInfo ( dwModel );
+    if ( pModelInfo && pModelInfo->IsMonsterTruck() || pModelInfo->IsCar() )
+    {
+        CVehicleSAInterface* pInt = GetVehicleInterface ();
+        // Trains (Their trailers do as well!)
+        if ( pModelInfo->IsTrain () || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590 )
+            return;
 
-    //    CVehicleSAInterfaceVTBL* pVtbl = reinterpret_cast < CVehicleSAInterfaceVTBL* > ( pInt->vtbl );
-    //    DWORD dwSetupSuspensionLines = pVtbl->SetupSuspensionLines;
-    //    DWORD dwThis = (DWORD)pInt;
-    //    _asm
-    //    {
-    //        mov ecx, dwThis
-    //        call dwSetupSuspensionLines
-    //    }
+        CVehicleSAInterfaceVTBL* pVtbl = reinterpret_cast < CVehicleSAInterfaceVTBL* > ( pInt->vtbl );
+        DWORD dwSetupSuspensionLines = pVtbl->SetupSuspensionLines;
+        DWORD dwThis = (DWORD)pInt;
+        _asm
+        {
+            mov ecx, dwThis
+            call dwSetupSuspensionLines
+        }
 
-    //    CopyGlobalSuspensionLinesToPrivate ();
-    //}
+        CopyGlobalSuspensionLinesToPrivate ();
+    }
 }
