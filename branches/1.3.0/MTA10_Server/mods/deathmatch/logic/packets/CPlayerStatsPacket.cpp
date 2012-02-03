@@ -75,8 +75,7 @@ void CPlayerStatsPacket::Add ( unsigned short usID, float fValue )
 
 void CPlayerStatsPacket::Remove ( unsigned short usID, float fValue )
 {
-    map < unsigned short, sPlayerStat* > ::const_iterator iter = m_List.find ( usID );
-    sPlayerStat* pStat = NULL;
+    map < unsigned short, sPlayerStat* > ::iterator iter = m_List.find ( usID );
     if ( iter != m_List.end ( ) )
     {
         sPlayerStat* pStat = iter->second;

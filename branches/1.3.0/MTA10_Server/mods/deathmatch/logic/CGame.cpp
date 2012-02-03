@@ -1215,14 +1215,11 @@ void CGame::InitialDataStream ( CPlayer& Player )
     {
         if ( &Player != *iter && (*iter)->IsJoined () && (*iter)->IsSpawned () )
         {
-            float* usStats = (*iter)->GetPlayerStats ();
-            unsigned short count = 0;
             CPlayerStatsPacket PlayerStats = *(*iter)->GetPlayerStatsPacket ( );
             PlayerStats.SetSourceElement ( *iter );
             if ( PlayerStats.GetSize() > 0 )
                 Player.Send ( PlayerStats );
 
-            count = 0;
             CPlayerClothesPacket PlayerClothes;
             PlayerClothes.SetSourceElement ( *iter );
             PlayerClothes.Add ( (*iter)->GetClothes () );
