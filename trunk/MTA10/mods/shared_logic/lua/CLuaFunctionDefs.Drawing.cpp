@@ -734,15 +734,16 @@ int CLuaFunctionDefs::dxSetRenderTarget ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxUpdateScreenSource ( lua_State* luaVM )
 {
-//  bool dxUpdateScreenSource( element screenSource )
-    CClientScreenSource* pScreenSource;
+//  bool dxUpdateScreenSource( element screenSource [, bool resampleNow] )
+    CClientScreenSource* pScreenSource; bool bResampleNow;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pScreenSource );
+    argStream.ReadBool ( bResampleNow, false );
 
     if ( !argStream.HasErrors () )
     {
-        g_pCore->GetGraphics ()->GetRenderItemManager ()->UpdateScreenSource ( pScreenSource->GetScreenSourceItem () );
+        g_pCore->GetGraphics ()->GetRenderItemManager ()->UpdateScreenSource ( pScreenSource->GetScreenSourceItem (), bResampleNow );
         lua_pushboolean ( luaVM, true );
         return 1;
     }

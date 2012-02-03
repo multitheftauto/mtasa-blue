@@ -1846,8 +1846,8 @@ void CCore::OnPreHUDRender ( void )
     // Make sure stencil is off to avoid problems with flame effects
     pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
 
-    // Maybe capture screen
-    CGraphics::GetSingleton ().GetRenderItemManager ()->UpdateBackBufferCopy ();
+    // Maybe capture screen and other stuff
+    CGraphics::GetSingleton ().GetRenderItemManager ()->DoPulse ();
 
     // Handle script stuffs
     if ( m_iUnminimizeFrameCounter-- && !m_iUnminimizeFrameCounter )
