@@ -1017,10 +1017,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CVariableBuffer.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CVehicleNames.cpp"
 					>
 				</File>
@@ -2528,10 +2524,6 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CSimulatedPlayPosition.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CVariableBuffer.h"
 					>
 				</File>
 				<File
