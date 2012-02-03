@@ -30,9 +30,10 @@ public:
     inline bool             IsPropagated        ( void )                                { return m_bPropagated; }
 
     void                    Call                ( const class CLuaArguments& Arguments );
+    bool                    IsHigherPriorityThan ( const CMapEvent* pOther );
 
 private:
-                            CMapEvent           ( class CLuaMain* pMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated );
+                            CMapEvent           ( class CLuaMain* pMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod );
                             ~CMapEvent          ( void );
 
     inline void             SetBeingDestroyed   ( bool bBeingDestroyed )                { m_bBeingDestroyed = bBeingDestroyed; }
@@ -43,6 +44,9 @@ private:
     bool                    m_bDestroyFunction;
     bool                    m_bPropagated;
     bool                    m_bBeingDestroyed;
+    EEventPriorityType      m_eventPriority;
+    float                   m_fPriorityMod;
+
 };
 
 #endif

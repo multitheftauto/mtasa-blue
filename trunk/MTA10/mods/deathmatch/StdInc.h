@@ -41,6 +41,7 @@
 #include <CBox.h>
 #include <ijsify.h>
 #include <Common.h>
+#include "Enums.h"
 #include "net/SyncStructures.h"
 
 // Shared logic includes

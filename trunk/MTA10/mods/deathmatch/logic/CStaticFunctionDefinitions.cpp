@@ -108,7 +108,7 @@ bool CStaticFunctionDefinitions::AddEvent ( CLuaMain& LuaMain, const char* szNam
 }
 
 
-bool CStaticFunctionDefinitions::AddEventHandler ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated )
+bool CStaticFunctionDefinitions::AddEventHandler ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod )
 {
     assert ( szName );
 
@@ -116,7 +116,7 @@ bool CStaticFunctionDefinitions::AddEventHandler ( CLuaMain& LuaMain, const char
     if ( m_pEvents->Exists ( szName ) )
     {
         // Add the event handler
-        if ( Entity.AddEvent ( &LuaMain, szName, iLuaFunction, bPropagated ) )
+        if ( Entity.AddEvent ( &LuaMain, szName, iLuaFunction, bPropagated, eventPriority, fPriorityMod ) )
             return true;
     }
 
