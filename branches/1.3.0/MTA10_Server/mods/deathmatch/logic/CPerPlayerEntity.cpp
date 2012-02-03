@@ -182,15 +182,14 @@ bool CPerPlayerEntity::IsVisibleToReferenced ( CElement* pElement )
 bool CPerPlayerEntity::IsVisibleToPlayer ( CPlayer& Player )
 {
     // Return true if we're visible to the given player
-    list < CPlayer* > ::const_iterator iter = m_Players.begin ();
-    for ( ; iter != m_Players.end (); iter++ )
+    map < ElementID, CPlayer* > ::const_iterator iter = m_PlayersMap.find ( Player.GetID ( ) );
+    if ( iter != m_PlayersMap.end ( ) )
     {
-        if ( *iter == &Player )
+        if ( &Player == (*iter).second )
         {
             return true;
         }
     }
-
     return false;
 }
 
@@ -364,4 +363,5 @@ void CPerPlayerEntity::RemovePlayerReference ( CPlayer* pPlayer )
             iter++;
         }
     }
+    m_PlayersMap.erase ( pPlayer->GetID ( ) );
 }
