@@ -1744,6 +1744,10 @@
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CZoneNames.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\Enums.cpp"
+					>
+				</File>
 				<Filter
 					Name="animation"
 					>
@@ -2636,6 +2640,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CZoneNames.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\Enums.h"
 					>
 				</File>
 				<Filter

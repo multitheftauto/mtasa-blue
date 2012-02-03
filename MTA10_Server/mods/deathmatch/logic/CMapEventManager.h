@@ -25,7 +25,7 @@ public:
                             CMapEventManager                ( void );
                             ~CMapEventManager               ( void );
 
-    bool                    Add                             ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated );
+    bool                    Add                             ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod );
     bool                    Delete                          ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
     void                    Delete                          ( CMapEvent* pEvent );
     void                    Delete                          ( CLuaMain* pLuaMain );
