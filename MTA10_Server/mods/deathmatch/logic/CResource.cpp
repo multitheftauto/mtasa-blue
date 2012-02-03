@@ -212,7 +212,7 @@ bool CResource::Load ( void )
                 m_strMinClientReqFromConfig = "";
                 m_strMinServerReqFromConfig = "";
                 CXMLNode * pNodeMinMtaVersion = root->FindSubNode ( "min_mta_version", 0 );
-                if ( pNodeMinMtaVersion )
+                if ( pNodeMinMtaVersion && MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE )
                 {
                     if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "server" ) )
                         m_strMinServerReqFromConfig = pAttr->GetValue ();

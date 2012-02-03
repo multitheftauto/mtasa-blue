@@ -96,9 +96,9 @@ private:
     eWindowType         m_pCurrentWindowType;
     bool                m_bWaitingToActivatePassword;
 
-    const char*         m_szHost;
+    SString             m_strHost;
     unsigned short      m_usPort;
-    const char*         m_szPassword;
+    SString             m_strPassword;
 
     void                Refresh                     ( void );
     void                Connect                     ( void );
