@@ -119,7 +119,7 @@ public:
     CElement*                                   SetParentObject             ( CElement* pParent, bool bUpdatePerPlayerEntities = true );
     void                                        SetXMLNode                  ( CXMLNode* pNode );
 
-    bool                                        AddEvent                    ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated );
+    bool                                        AddEvent                    ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod );
     bool                                        CallEvent                   ( const char* szName, const CLuaArguments& Arguments, CPlayer* pCaller = NULL );
     bool                                        DeleteEvent                 ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
     void                                        DeleteEvents                ( CLuaMain* pLuaMain, bool bRecursive );

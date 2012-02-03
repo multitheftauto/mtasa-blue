@@ -573,12 +573,9 @@ bool CKeyBinds::AddCommand ( const char* szKey, const char* szCommand, const cha
             strcpy ( bind->szResource, szResource );
 
             if ( bAltKey )
-                bind->szDefaultKey = "";
+                bind->strDefaultKey = "";
             else
-            {
-                bind->szDefaultKey = new char [ strlen ( szKey ) + 1 ];
-                strcpy ( bind->szDefaultKey, szKey );
-            }
+                bind->strDefaultKey = szKey;
         }
         bind->bHitState = bState;
         bind->bState = false;
@@ -2404,7 +2401,7 @@ bool CKeyBinds::SaveToXML ( CXMLNode* pMainNode )
                         pA->SetValue ( szResource );
 
                         //If its still the default key dont bother saving it
-                        if ( !strcmp ( pBind->szDefaultKey, szKey ) )
+                        if ( !strcmp ( pBind->strDefaultKey, szKey ) )
                             pNode->GetParent()->DeleteSubNode(pNode);
                     }
                 }

@@ -17,14 +17,47 @@
 #include <windows.h>
 #include <game/CColModel.h>
 
-#include "CBoundingBoxSA.h"
-#include "CColSphereSA.h"
-#include "CColBoxSA.h"
-#include "CColTriangleSA.h"
-#include "CColTrianglePlaneSA.h"
-
 #define FUNC_CColModel_Constructor      0x40FB60
 #define FUNC_CColModel_Destructor       0x40F700
+
+typedef struct
+{
+    CVector     vecMin;
+    CVector     vecMax;
+    CVector     vecOffset;
+    FLOAT       fRadius;
+} CBoundingBoxSA;
+
+
+typedef struct
+{
+    CVector     vecCenter;
+    float       fRadius;
+} CColSphereSA;
+
+
+typedef struct
+{
+    CVector     min;
+    CVector     max;
+} CColBoxSA;
+
+
+typedef struct
+{
+    unsigned short  v1;
+    unsigned short  v2;
+    unsigned short  v3;
+    BYTE            unknown1;
+    BYTE            unknown2;
+} CColTriangleSA;
+
+
+typedef struct
+{
+    BYTE pad0 [ 12 ];
+} CColTrianglePlaneSA;
+
 
 typedef struct
 {

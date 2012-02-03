@@ -96,7 +96,7 @@ bool CStaticFunctionDefinitions::AddEvent ( CLuaMain* pLuaMain, const char* szNa
 }
 
 
-bool CStaticFunctionDefinitions::AddEventHandler ( CLuaMain* pLuaMain, const char* szName, CElement* pElement, const CLuaFunctionRef& iLuaFunction, bool bPropagated )
+bool CStaticFunctionDefinitions::AddEventHandler ( CLuaMain* pLuaMain, const char* szName, CElement* pElement, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod )
 {
     assert ( pLuaMain );
     assert ( szName );
@@ -106,7 +106,7 @@ bool CStaticFunctionDefinitions::AddEventHandler ( CLuaMain* pLuaMain, const cha
     if ( m_pEvents->Exists ( szName ) )
     {
         // Add the event handler
-        if ( pElement->AddEvent ( pLuaMain, szName, iLuaFunction, bPropagated ) )
+        if ( pElement->AddEvent ( pLuaMain, szName, iLuaFunction, bPropagated, eventPriority, fPriorityMod ) )
             return true;
     }
 

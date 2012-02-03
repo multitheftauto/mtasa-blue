@@ -23,6 +23,7 @@ public:
                                 ~CRenderItemManager                 ( void );
 
     // CRenderItemManagerInterface
+    virtual void                DoPulse                             ( void );
     virtual CDxFontItem*        CreateDxFont                        ( const SString& strFullFilePath, uint uiSize, bool bBold );
     virtual CGuiFontItem*       CreateGuiFont                       ( const SString& strFullFilePath, const SString& strFontName, uint uiSize );
     virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath, const CPixels* pPixels, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN );
@@ -33,7 +34,7 @@ public:
     virtual bool                SaveDefaultRenderTarget             ( void );
     virtual bool                RestoreDefaultRenderTarget          ( void );
     virtual void                UpdateBackBufferCopy                ( void );
-    virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem );
+    virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem, bool bResampleNow );
     virtual CShaderItem*        GetAppliedShaderForD3DData          ( CD3DDUMMY* pD3DData );
     virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch );
     virtual bool                RemoveShaderItemFromWorldTexture    ( CShaderItem* pShaderItem, const SString& strTextureNameMatch );

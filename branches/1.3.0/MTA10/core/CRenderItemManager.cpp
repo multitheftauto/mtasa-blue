@@ -309,6 +309,26 @@ void CRenderItemManager::NotifyDestructRenderItem ( CRenderItem* pItem )
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderItemManager::DoPulse
+//
+// Update stuff
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::DoPulse ( void )
+{
+    m_pRenderWare->PulseWorldTextureWatch ();
+
+    m_PrevFrameTextureUsage = m_FrameTextureUsage;
+    m_FrameTextureUsage.clear ();
+
+    m_pEffectCloner->DoPulse ();
+
+    UpdateBackBufferCopy ();
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderItemManager::UpdateBackBufferCopy
 //
 // Save back buffer pixels in our special place
@@ -316,21 +336,6 @@ void CRenderItemManager::NotifyDestructRenderItem ( CRenderItem* pItem )
 ////////////////////////////////////////////////////////////////
 void CRenderItemManager::UpdateBackBufferCopy ( void )
 {
-    // Do this here for now
-    m_pRenderWare->PulseWorldTextureWatch ();
-
-    // and this
-    m_PrevFrameTextureUsage = m_FrameTextureUsage;
-    m_FrameTextureUsage.clear ();
-
-    // and this
-    m_pEffectCloner->DoPulse ();
-
-
-    //
-    // UpdateBackBufferCopy
-    //
-
     if ( m_bBackBufferCopyMaybeNeedsResize )
         UpdateBackBufferCopySize ();
 
@@ -363,8 +368,29 @@ void CRenderItemManager::UpdateBackBufferCopy ( void )
 // TODO - Optimize the case where the screen source is the same size as the back buffer copy (i.e. Use back buffer copy resources instead)
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::UpdateScreenSource ( CScreenSourceItem* pScreenSourceItem )
+void CRenderItemManager::UpdateScreenSource ( CScreenSourceItem* pScreenSourceItem, bool bResampleNow )
 {
+    if ( bResampleNow )
+    {
+        // Tell graphics things are about to change
+        CGraphics::GetSingleton().OnChangingRenderTarget ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY );
+
+        // Try to get the back buffer
+	    IDirect3DSurface9* pD3DBackBufferSurface = NULL;
+        m_pDevice->GetBackBuffer ( 0, 0, D3DBACKBUFFER_TYPE_MONO, &pD3DBackBufferSurface );
+        if ( !pD3DBackBufferSurface )
+            return;
+
+        // Copy back buffer into our private render target
+        D3DTEXTUREFILTERTYPE FilterType = D3DTEXF_LINEAR;
+        HRESULT hr = m_pDevice->StretchRect( pD3DBackBufferSurface, NULL, pScreenSourceItem->m_pD3DRenderTargetSurface, NULL, FilterType );
+
+        // Clean up
+	    SAFE_RELEASE( pD3DBackBufferSurface );
+        return;
+    }
+
+
     // Only do update if back buffer copy has changed
     if ( pScreenSourceItem->m_uiRevision == m_uiBackBufferCopyRevision )
         return;

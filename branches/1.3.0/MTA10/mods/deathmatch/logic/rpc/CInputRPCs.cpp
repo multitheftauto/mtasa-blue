@@ -256,7 +256,7 @@ void CInputRPCs::ForceReconnect ( NetBitStreamInterface& bitStream )
 
         bitStream.Read ( szHost, ucHost );
 
-        if ( szHost && bitStream.Read ( usPort ) )
+        if ( szHost[0] && bitStream.Read ( usPort ) )
         {
             if ( bitStream.Read ( ucPassword ) )
             {
@@ -265,12 +265,14 @@ void CInputRPCs::ForceReconnect ( NetBitStreamInterface& bitStream )
 
                 bitStream.Read ( szPassword, ucPassword );
 
-                if ( szPassword )
+                if ( szPassword[0] )
                 {
                     g_pCore->Reconnect ( szHost, usPort, szPassword, false );
+                    delete [] szPassword;
                     delete [] szHost;
                     return;
                 }
+                delete [] szPassword;
             }
 
             g_pCore->Reconnect ( szHost, usPort, NULL );

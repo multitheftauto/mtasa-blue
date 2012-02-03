@@ -52,7 +52,6 @@
 #include "CFoo.h"
 #include "../../shared_logic/CRegisteredCommands.h"
 #include "../../shared_logic/CClientGUIElement.h"
-#include "CVariableBuffer.h"
 #include "CLocalServer.h"
 #include "CVoiceRecorder.h"
 #define HeliKill_List_Clear_Rate 500

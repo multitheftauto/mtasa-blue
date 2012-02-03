@@ -28,6 +28,7 @@ UTILS = \
 	../../../Shared/mods/deathmatch/logic/CLatentSendQueue.cpp \
 	../../../Shared/mods/deathmatch/logic/CLatentTransferManager.cpp \
 	../../../Shared/mods/deathmatch/logic/CZoneNames.cpp \
+	../../../Shared/mods/deathmatch/logic/Enums.cpp \
 	./utils/CHTTPClient.cpp ./utils/CHTTPRequest.cpp \
 	./utils/CHTTPResponse.cpp \
 	./utils/CTCPClientSocketImpl.cpp \

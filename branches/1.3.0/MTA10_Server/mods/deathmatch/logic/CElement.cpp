@@ -386,9 +386,9 @@ void CElement::SetXMLNode ( CXMLNode* pNode )
 };
 
 
-bool CElement::AddEvent ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated )
+bool CElement::AddEvent ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod )
 {
-    return m_pEventManager->Add ( pLuaMain, szName, iLuaFunction, bPropagated );
+    return m_pEventManager->Add ( pLuaMain, szName, iLuaFunction, bPropagated, eventPriority, fPriorityMod );
 }
 
 

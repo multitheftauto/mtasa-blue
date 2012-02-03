@@ -53,15 +53,31 @@ int CLuaFunctionDefs::AddEvent ( lua_State* luaVM )
 
 int CLuaFunctionDefs::AddEventHandler ( lua_State* luaVM )
 {
-//  bool addEventHandler ( string eventName, element attachedTo, function handlerFunction, [bool getPropagated = true] )
-    SString strName; CClientEntity* pEntity; CLuaFunctionRef iLuaFunction; bool bPropagated;
+//  bool addEventHandler ( string eventName, element attachedTo, function handlerFunction [, bool getPropagated = true, string priority = "normal" ] )
+    SString strName; CClientEntity* pEntity; CLuaFunctionRef iLuaFunction; bool bPropagated; SString strPriority;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strName );
     argStream.ReadUserData ( pEntity );
     argStream.ReadFunction ( iLuaFunction );
     argStream.ReadBool ( bPropagated, true );
+    argStream.ReadString ( strPriority, "normal" );
     argStream.ReadFunctionComplete ();
+
+    // Check if strPriority has a number as well. e.g. name+1 or name-1.32
+    float fPriorityMod = 0;
+    EEventPriorityType eventPriority;
+    {
+        int iPos = strPriority.find_first_of ( "-+" );
+        if ( iPos != SString::npos )
+        {
+            fPriorityMod = atof ( strPriority.SubStr ( iPos ) );
+            strPriority = strPriority.Left ( iPos );
+        }
+
+        if ( !StringToEnum ( strPriority, eventPriority ) )
+            argStream.SetTypeError ( GetEnumTypeName ( eventPriority ), 5 );    // priority is argument #5
+    }
 
     if ( !argStream.HasErrors () )
     {
@@ -78,7 +94,7 @@ int CLuaFunctionDefs::AddEventHandler ( lua_State* luaVM )
             }
 
             // Do it
-            if ( CStaticFunctionDefinitions::AddEventHandler ( *pLuaMain, strName, *pEntity, iLuaFunction, bPropagated ) )
+            if ( CStaticFunctionDefinitions::AddEventHandler ( *pLuaMain, strName, *pEntity, iLuaFunction, bPropagated, eventPriority, fPriorityMod ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

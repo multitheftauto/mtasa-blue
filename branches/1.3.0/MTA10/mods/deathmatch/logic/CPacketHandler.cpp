@@ -1179,8 +1179,8 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
 
                 // Echo it
                 g_pCore->ChatEchoColor ( szMessage, ucRed, ucGreen, ucBlue, ucColorCoded );
-                delete[] szMessage;
             }
+            delete[] szMessage;
         }
     }
 }

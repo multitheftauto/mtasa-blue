@@ -437,15 +437,9 @@ void CGUIElement_Impl::FillProperties ( void )
         CEGUI::String strKey = itPropertySet.getCurrentKey ();
         CEGUI::String strValue = m_pWindow->getProperty ( strKey );
 
-        const char *szKey = strKey.c_str ();
-        const char *szValue = strValue.c_str ();
-
         CGUIProperty* pProperty = new CGUIProperty;
-        pProperty->szKey = new char[strlen ( szKey ) + 1];
-        pProperty->szValue = new char[strlen ( szValue ) + 1];
-
-        strcpy ( pProperty->szKey, szKey );
-        strcpy ( pProperty->szValue, szValue );
+        pProperty->strKey = strKey.c_str ();
+        pProperty->strValue = strValue.c_str ();
 
         m_Properties.push_back ( pProperty );
         itPropertySet++;
@@ -459,8 +453,6 @@ void CGUIElement_Impl::EmptyProperties ( void )
         CGUIPropertyIter iterEnd = m_Properties.end ();
         for ( ; iter != iterEnd; iter++ ) {
             if (*iter) {
-                delete (*iter)->szKey;
-                delete (*iter)->szValue;
                 delete (*iter);
             }
         }

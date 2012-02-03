@@ -1017,10 +1017,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CVariableBuffer.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CVehicleNames.cpp"
 					>
 				</File>
@@ -1746,6 +1742,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CZoneNames.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\Enums.cpp"
 					>
 				</File>
 				<Filter
@@ -2531,10 +2531,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CVariableBuffer.h"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CVehicleNames.h"
 					>
 				</File>
@@ -2644,6 +2640,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CZoneNames.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\Enums.h"
 					>
 				</File>
 				<Filter
