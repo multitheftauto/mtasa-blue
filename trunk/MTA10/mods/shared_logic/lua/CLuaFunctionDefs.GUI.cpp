@@ -1413,8 +1413,8 @@ int CLuaFunctionDefs::GUIGetProperties ( lua_State* luaVM )
         CGUIPropertyIter iterEnd = guiElement->GetCGUIElement ()->GetPropertiesEnd ();
         for ( ; iter != iterEnd; iter++ )
         {
-            char * szKey = (*iter)->szKey;
-            char * szValue = (*iter)->szValue;
+            const char * szKey = (*iter)->strKey;
+            const char * szValue = (*iter)->strValue;
 
             // Add it to the table
             lua_pushstring ( luaVM, szKey );

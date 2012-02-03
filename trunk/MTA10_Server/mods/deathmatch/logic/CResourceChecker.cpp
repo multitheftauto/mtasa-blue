@@ -592,6 +592,9 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
 ///////////////////////////////////////////////////////////////
 void CResourceChecker::CheckVersionRequirements ( const string& strIdentifierName, bool bClientScript )
 {
+    if ( MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE )
+        return;
+
     static CHashMap < SString, SString > clientFunctionMap;
     static CHashMap < SString, SString > serverFunctionMap;
 

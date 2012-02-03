@@ -25,9 +25,6 @@ CServerInfo::CServerInfo ( void )
     // Initialize
     m_ulLastUpdateTime = CClientTime::GetTime ();
 
-    m_szPassword = NULL;
-    m_szHost = NULL;
-
     // Obtain our screen resolution
     CVector2D vecResolution = CCore::GetSingleton().GetGUI()->GetResolution();
 
@@ -241,9 +238,6 @@ CServerInfo::~CServerInfo ( void )
 
     delete m_pEnterPasswordEdit;
     m_pEnterPasswordEdit = 0;
-
-    if ( m_szPassword )
-        delete m_szPassword;
 }
 
 bool CServerInfo::OnCloseClicked ( CGUIElement* pElement )
@@ -337,19 +331,8 @@ void CServerInfo::SetServerInformation( const char* szHost, unsigned short usPor
     // Store the parameters in our class instance for later use
     m_usPort = usPort;
 
-    // cleanup previous password
-    if ( m_szPassword )
-        delete m_szPassword;
-
-    m_szPassword = new char[strlen(szPassword) + 1];
-    strcpy((char*)m_szPassword, szPassword);
-
-    // cleanup previous host
-    if ( m_szHost )
-        delete m_szHost;
-
-    m_szHost = new char[strlen(szHost) + 1];
-    strcpy((char*)m_szHost, szHost);
+    m_strPassword = szPassword;
+    m_strHost = szHost;
 
     // Create a winsock address endpoint and parse the IP into it
     in_addr Address;
@@ -462,7 +445,7 @@ void CServerInfo::Connect( void )
     // Hide the window
     m_pWindow->SetVisible( false );
 
-    std::string strPassword = m_szPassword;
+    std::string strPassword = m_strPassword;
     if ( m_pCurrentWindowType == eWindowTypes::SERVER_INFO_PASSWORD )
         strPassword = m_pEnterPasswordEdit->GetText();
     else if ( m_Server.bPassworded )  // If we're not in a passworded window, but the server is passworded
@@ -478,7 +461,7 @@ void CServerInfo::Connect( void )
     }
 
     // Let's attempt to join
-    CCore::GetSingleton ().GetConnectManager ()->Connect ( m_szHost, m_usPort, strNick.c_str (), strPassword.c_str() );
+    CCore::GetSingleton ().GetConnectManager ()->Connect ( m_strHost, m_usPort, strNick.c_str (), strPassword.c_str() );
 }
 
 void CServerInfo::ResetServerGUI ( CServerListItem* pServer )
