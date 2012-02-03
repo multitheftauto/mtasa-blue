@@ -293,6 +293,9 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
 
 void CMapManager::SendBlips ( CPlayer& Player )
 {
+    CTimeUsMarker < 20 > marker;
+    marker.Set ( "Start" );
+
     // Add all blips to an entity add packet
     CEntityAddPacket Packet;
 
@@ -306,8 +309,16 @@ void CMapManager::SendBlips ( CPlayer& Player )
         }
     }
 
+    marker.Set ( "Compile" );
+
     // Tell the player
     Player.Send ( Packet );
+
+    marker.Set ( "Send" );
+
+    // Add debug info if wanted
+    if ( CPerfStatDebugInfo::GetSingleton ()->IsActive ( "SendBlips" ) )
+        CPerfStatDebugInfo::GetSingleton ()->AddLine ( "SendBlips", marker.GetString () );
 }
 
 
