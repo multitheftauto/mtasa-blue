@@ -40,7 +40,7 @@ public:
     int                         GetSize                     ( void )                        { return m_List.size ( ); }
 
 private:
-    map < unsigned short, sPlayerStat* >     m_List;
+    map < unsigned short, sPlayerStat >     m_List;
 };
 
 #endif
