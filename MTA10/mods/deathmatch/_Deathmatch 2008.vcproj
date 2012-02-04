@@ -949,10 +949,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CConfig.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CCustomData.cpp"
 					>
 				</File>
@@ -2480,10 +2476,6 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientWaterManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CConfig.h"
 					>
 				</File>
 				<File
