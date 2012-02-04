@@ -11634,6 +11634,28 @@ int CLuaFunctionDefinitions::GetAccountData ( lua_State* luaVM )
     return 1;
 }
 
+
+int CLuaFunctionDefinitions::GetAccountAllData ( lua_State* luaVM )
+{
+    //  string getAccountAllData ( account theAccount )
+    CAccount* pAccount;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pAccount );
+    if ( !argStream.HasErrors () )
+    {
+        lua_newtable ( luaVM );
+//__asm int 3;
+        CStaticFunctionDefinitions::GetAccountAllData ( luaVM, pAccount );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getAccountAllData", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::GetAccount ( lua_State* luaVM )
 {
 //  account getAccount ( string username, [ string password ] )

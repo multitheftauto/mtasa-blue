@@ -97,6 +97,7 @@ namespace
                                          { "getLatentEventHandles",     "1.3.0-9.03772" },
                                          { "getLatentEventStatus",      "1.3.0-9.03772" },
                                          { "cancelLatentEvent",         "1.3.0-9.03772" },
+                                         { "getAccountAllData",         "1.3.0-9.03804" },
                                         };
 
 

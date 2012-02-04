@@ -10233,6 +10233,15 @@ CLuaArgument* CStaticFunctionDefinitions::GetAccountData ( CAccount* pAccount, c
 }
 
 
+bool CStaticFunctionDefinitions::GetAccountAllData ( lua_State* pLua, CAccount* pAccount )
+{
+    assert ( pLua );
+    assert ( pAccount );
+    m_pAccountManager->GetAllAccountData ( pAccount, pLua );
+    return true;
+}
+
+
 CAccount* CStaticFunctionDefinitions::AddAccount ( const char* szName, const char* szPassword )
 {
     assert ( szName );
