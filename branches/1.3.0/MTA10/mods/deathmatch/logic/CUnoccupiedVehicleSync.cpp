@@ -321,14 +321,21 @@ bool CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
     }
     else
     {
-        if ( pVehicle->m_LastSyncedData->vecPosition != vehicle.data.vecPosition )
+        const CVector& vecLastPosition = pVehicle->m_LastSyncedData->vecPosition;
+        if ( fabs ( vecLastPosition.fX - vehicle.data.vecPosition.fX ) > FLOAT_EPSILON ||
+            fabs ( vecLastPosition.fY - vehicle.data.vecPosition.fY ) > FLOAT_EPSILON ||
+            fabs ( vecLastPosition.fZ - vehicle.data.vecPosition.fZ ) > FLOAT_EPSILON  )
         {
             bSyncVehicle = true;
             vehicle.data.bSyncPosition = true;
             pVehicle->m_LastSyncedData->vecPosition = vehicle.data.vecPosition;
         }
 
-        if ( pVehicle->m_LastSyncedData->vecMoveSpeed != vehicle.data.vecVelocity )
+        const CVector& vecLastVelocity = pVehicle->m_LastSyncedData->vecMoveSpeed;
+        if (
+            fabs ( vehicle.data.vecVelocity.fX ) > FLOAT_EPSILON ||
+            fabs ( vehicle.data.vecVelocity.fY ) > FLOAT_EPSILON ||
+            fabs ( vehicle.data.vecVelocity.fZ ) > FLOAT_EPSILON )
         {
             bSyncVehicle = true;
             vehicle.data.bSyncVelocity = true;
@@ -336,7 +343,10 @@ bool CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
         }
     }
 
-    if ( pVehicle->m_LastSyncedData->vecRotation != vehicle.data.vecRotation )
+    const CVector& vecLastRotation = pVehicle->m_LastSyncedData->vecRotation;
+    if ( fabs ( vecLastRotation.fX - vehicle.data.vecRotation.fX ) > FLOAT_EPSILON ||
+        fabs ( vecLastRotation.fY - vehicle.data.vecRotation.fY ) > FLOAT_EPSILON ||
+        fabs ( vecLastRotation.fZ - vehicle.data.vecRotation.fZ ) > FLOAT_EPSILON )
     {
         bSyncVehicle = true;
         vehicle.data.bSyncRotation = true;
