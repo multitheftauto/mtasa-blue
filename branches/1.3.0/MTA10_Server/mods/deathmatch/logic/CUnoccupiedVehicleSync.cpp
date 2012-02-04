@@ -256,10 +256,43 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                     if ( !pOccupant || !IS_PLAYER ( pOccupant ) )
                     {
                         // Apply the data to the vehicle
-                        if ( vehicle.data.bSyncPosition ) pVehicle->SetPosition ( vehicle.data.vecPosition );
-                        if ( vehicle.data.bSyncRotation ) pVehicle->SetRotationDegrees ( vehicle.data.vecRotation );
-                        if ( vehicle.data.bSyncVelocity ) pVehicle->SetVelocity ( vehicle.data.vecVelocity );
-                        if ( vehicle.data.bSyncTurnVelocity ) pVehicle->SetTurnSpeed ( vehicle.data.vecTurnVelocity );
+                        if ( vehicle.data.bSyncPosition ) 
+                        {
+                            const CVector& vecLastPosition = pVehicle->GetPosition ( );
+                            if ( fabs ( vecLastPosition.fX - vehicle.data.vecPosition.fX ) <= FLOAT_EPSILON &&
+                                fabs ( vecLastPosition.fY - vehicle.data.vecPosition.fY ) <= FLOAT_EPSILON &&
+                                fabs ( vecLastPosition.fZ - vehicle.data.vecPosition.fZ ) <= FLOAT_EPSILON )
+                            {
+                                vehicle.data.bSyncPosition = false;
+                            }
+                            pVehicle->SetPosition ( vehicle.data.vecPosition );
+                        }
+                        if ( vehicle.data.bSyncRotation )
+                        {
+                            CVector vecLastRotation;
+                            pVehicle->GetRotation ( vecLastRotation );
+                            if ( fabs ( vecLastRotation.fX - vehicle.data.vecRotation.fX ) <= MIN_ROTATION_DIFF &&
+                                fabs ( vecLastRotation.fY - vehicle.data.vecRotation.fY ) <= MIN_ROTATION_DIFF &&
+                                fabs ( vecLastRotation.fZ - vehicle.data.vecRotation.fZ ) <= MIN_ROTATION_DIFF )
+                            {
+                                vehicle.data.bSyncRotation = false;
+                            }
+                            pVehicle->SetRotationDegrees ( vehicle.data.vecRotation );
+                        }
+                        if ( vehicle.data.bSyncVelocity )
+                        {
+                            if ( fabs ( vehicle.data.vecVelocity.fX ) <= FLOAT_EPSILON &&
+                                fabs ( vehicle.data.vecVelocity.fY ) <= FLOAT_EPSILON &&
+                                fabs ( vehicle.data.vecVelocity.fZ ) <= FLOAT_EPSILON )
+                            {
+                                vehicle.data.bSyncVelocity = false;
+                            }
+                            pVehicle->SetVelocity ( vehicle.data.vecVelocity );
+                        }
+                        if ( vehicle.data.bSyncTurnVelocity ) 
+                        {
+                            pVehicle->SetTurnSpeed ( vehicle.data.vecTurnVelocity );
+                        }
 
                         // Less health than last time?
                         if ( vehicle.data.bSyncHealth )
