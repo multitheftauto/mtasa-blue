@@ -149,15 +149,6 @@ int CLuaFunctionDefinitions::DisabledFunction ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefinitions::UnloadedFunction ( lua_State* luaVM )
-{   // For use when a module is unloaded
-    m_pScriptDebugging->LogError ( luaVM, "Unloaded function was called." );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
 // Call a function on a remote server
 int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
 {

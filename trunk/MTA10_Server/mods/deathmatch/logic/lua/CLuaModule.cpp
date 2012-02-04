@@ -133,8 +133,9 @@ void CLuaModule::_UnregisterFunctions ( void )
         vector < SString > ::iterator iter = m_Functions.begin ();
         for ( ; iter != m_Functions.end (); iter++ )
         {
-            // Point function to dummy C function
-            lua_register ( luaVM, (iter)->c_str(), CLuaFunctionDefinitions::UnloadedFunction );
+            // points function to nill
+            lua_pushnil ( luaVM );
+            lua_setglobal ( luaVM, (iter)->c_str());
         }
     }
 }
@@ -158,8 +159,9 @@ void CLuaModule::_ResourceStopped ( lua_State * luaVM )
     vector < SString > ::iterator iter = m_Functions.begin ();
     for ( ; iter != m_Functions.end (); iter++ )
     {
-        // Point function to dummy C function
-        lua_register ( luaVM, (iter)->c_str(), CLuaFunctionDefinitions::UnloadedFunction );
+        // points function to nil
+        lua_pushnil ( luaVM );
+        lua_setglobal ( luaVM, (iter)->c_str());
     }
 }
 
