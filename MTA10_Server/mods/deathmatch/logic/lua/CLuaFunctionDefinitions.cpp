@@ -149,6 +149,15 @@ int CLuaFunctionDefinitions::DisabledFunction ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::UnloadedFunction ( lua_State* luaVM )
+{   // For use when a module is unloaded
+    m_pScriptDebugging->LogError ( luaVM, "Unloaded function was called." );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 // Call a function on a remote server
 int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
 {
@@ -12780,25 +12789,25 @@ int CLuaFunctionDefinitions::GetVersion ( lua_State* luaVM )
 int CLuaFunctionDefinitions::GetModuleInfo ( lua_State* luaVM )
 {
     if (lua_type( luaVM, 1 ) == LUA_TSTRING) {
-        vector < FunctionInfo > func_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
-        vector < FunctionInfo > ::iterator iter = func_LoadedModules.begin ();
+        list < CLuaModule* > lua_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
+        list < CLuaModule* > ::iterator iter = lua_LoadedModules.begin ();
         SString strAttribute = lua_tostring( luaVM, 2 );
         SString strModuleName = lua_tostring( luaVM, 1 );
-        for ( ; iter != func_LoadedModules.end (); iter++ )
+        for ( ; iter != lua_LoadedModules.end (); iter++ )
         {
-            if ( stricmp ( strModuleName, (*iter).szFileName ) == 0 ) {
+            if ( stricmp ( strModuleName, (*iter)->_GetName().c_str() ) == 0 ) {
                 lua_newtable ( luaVM );
 
                 lua_pushstring ( luaVM, "name" );
-                lua_pushstring ( luaVM, (*iter).szModuleName );
+                lua_pushstring ( luaVM, (*iter)->_GetFunctions().szModuleName );
                 lua_settable ( luaVM, -3 );
 
                 lua_pushstring ( luaVM, "author" );
-                lua_pushstring ( luaVM, (*iter).szAuthor );
+                lua_pushstring ( luaVM, (*iter)->_GetFunctions().szAuthor );
                 lua_settable ( luaVM, -3 );
 
                 lua_pushstring ( luaVM, "version" );
-                SString strVersion ( "%.2f", (*iter).fVersion );
+                SString strVersion ( "%.2f", (*iter)->_GetFunctions().fVersion );
                 lua_pushstring ( luaVM, strVersion );
                 lua_settable ( luaVM, -3 );
 
@@ -12814,13 +12823,13 @@ int CLuaFunctionDefinitions::GetModuleInfo ( lua_State* luaVM )
 int CLuaFunctionDefinitions::GetModules ( lua_State* luaVM )
 {
     lua_newtable ( luaVM );
-    vector < FunctionInfo > func_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
-    vector < FunctionInfo > ::iterator iter = func_LoadedModules.begin ();
+    list < CLuaModule* > lua_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
+    list < CLuaModule* > ::iterator iter = lua_LoadedModules.begin ();
     unsigned int uiIndex = 1;
-    for ( ; iter != func_LoadedModules.end (); iter++ )
+    for ( ; iter != lua_LoadedModules.end (); iter++ )
     {
         lua_pushnumber ( luaVM, uiIndex++ );
-        lua_pushstring ( luaVM, (*iter).szFileName );
+        lua_pushstring ( luaVM, (*iter)->_GetFunctions().szFileName );
         lua_settable ( luaVM, -3 );
     }
     return 1;

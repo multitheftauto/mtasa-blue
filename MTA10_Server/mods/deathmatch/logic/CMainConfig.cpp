@@ -661,7 +661,7 @@ bool CMainConfig::LoadExtended ( void )
 
                 if ( IsValidFilePath ( strBuffer.c_str () ) )
                 {
-                    m_pLuaManager->GetLuaModuleManager ()->_LoadModule ( strBuffer.c_str (), strFilename, false );
+                    m_pLuaManager->GetLuaModuleManager ()->LoadModule ( strBuffer.c_str (), strFilename, false );
                 }
             }
         }
@@ -805,8 +805,8 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "help", CConsoleCommands::Help, false );
 
     RegisterCommand ( "loadmodule", CConsoleCommands::LoadModule, false );
-    //RegisterCommand ( "unloadmodule", CConsoleCommands::UnloadModule, false );
-    //RegisterCommand ( "reloadmodule", CConsoleCommands::ReloadModule, false );
+    RegisterCommand ( "unloadmodule", CConsoleCommands::UnloadModule, false );
+    RegisterCommand ( "reloadmodule", CConsoleCommands::ReloadModule, false );
 
     RegisterCommand ( "ver", CConsoleCommands::Ver, false );
     RegisterCommand ( "sver", CConsoleCommands::Ver, false );
