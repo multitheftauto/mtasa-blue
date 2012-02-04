@@ -198,6 +198,9 @@ void CMapManager::BroadcastMapInformation ( void )
 
 void CMapManager::SendMapInformation ( CPlayer& Player )
 {
+    CTimeUsMarker < 20 > marker;
+    marker.Set ( "Start" );
+
     // Start an entity list packet
     CEntityAddPacket EntityPacket;    
 
@@ -212,12 +215,16 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
         }
     }
 
+    marker.Set ( "Dummys" );
+
     // Add the objects to the packet
     CObjectListType::const_iterator iterObjects = m_pObjectManager->IterBegin ();
     for ( ; iterObjects != m_pObjectManager->IterEnd (); iterObjects++ )
     {
         EntityPacket.Add ( *iterObjects );
     }
+
+    marker.Set ( "Objects" );
 
     // Add the pickups to the packet
     list < CPickup* > ::const_iterator iterPickups = m_pPickupManager->IterBegin ();
@@ -226,12 +233,16 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
         EntityPacket.Add ( *iterPickups );
     }
 
+    marker.Set ( "Pickups" );
+
     // Add the vehicles to the packet
     list < CVehicle* > ::const_iterator iterVehicles = m_pVehicleManager->IterBegin ();
     for ( ; iterVehicles != m_pVehicleManager->IterEnd (); iterVehicles++ )
     {
         EntityPacket.Add ( *iterVehicles );
     }
+
+    marker.Set ( "Vehicles" );
 
     // Add the teams to the packet
     list < CTeam* > ::const_iterator iterTeams = m_pTeamManager->IterBegin ();
@@ -240,12 +251,16 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
         EntityPacket.Add ( *iterTeams );
     }
 
+    marker.Set ( "Teams" );
+
     // Add the peds to the packet
     list < CPed* > ::const_iterator iterPeds = m_pPedManager->IterBegin ();
     for ( ; iterPeds != m_pPedManager->IterEnd (); iterPeds++ )
     {
         EntityPacket.Add ( *iterPeds );
     }
+
+    marker.Set ( "Peds" );
 
     // Add the colshapes to the packet
     vector < CColShape* > ::const_iterator iterColShapes = m_pColManager->IterBegin ();
@@ -258,6 +273,8 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
         }
     }
 
+    marker.Set ( "ColShapes" );
+
     // Add the water polys to the packet
     CWaterManager* pWaterManager = g_pGame->GetWaterManager ();
     list < CWater* > ::const_iterator iterWater = pWaterManager->IterBegin ();
@@ -267,11 +284,17 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
         EntityPacket.Add ( pWater );
     }
 
+    marker.Set ( "Water" );
+
     // Send it
     Player.Send ( EntityPacket );
 
+    marker.Set ( "SendEntityPacket" );
+
     // Send per-player entities
     SendPerPlayerEntities ( Player );
+
+    marker.Set ( "SendPerPlayerEntities" );
 
     // Send the trailer attachments
     CVehicle* pVehicle;
@@ -288,6 +311,12 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
             Player.Send ( AttachPacket );
         }
     }
+
+    marker.Set ( "SendAttachPackets" );
+
+    // Add debug info if wanted
+    if ( CPerfStatDebugInfo::GetSingleton ()->IsActive ( "SendMapInformation" ) )
+        CPerfStatDebugInfo::GetSingleton ()->AddLine ( "SendMapInformation", marker.GetString () );
 }
 
 
@@ -406,6 +435,9 @@ void CMapManager::BroadcastElementChildren ( CElement* pElement, CEntityAddPacke
 
 void CMapManager::OnPlayerJoin ( CPlayer& Player )
 {
+    CTimeUsMarker < 20 > marker;
+    marker.Set ( "Start" );
+
     // Grab the time now
     unsigned char ucClockHour, ucClockMin;
     m_pServerClock->Get ( ucClockHour, ucClockMin );
@@ -485,6 +517,8 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     bool bOverrideFogDistance = g_pGame->HasFogDistance ( );
     float fFogDistance = g_pGame->GetFogDistance ( );
 
+    marker.Set ( "FirstBit" );
+
     // Send the packet to the given player
     Player.Send ( CMapInfoPacket ( ucCurrentWeather,
                                    ucWeatherBlendingTo,
@@ -532,8 +566,16 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    fFogDistance,
                                    fAircraftMaxHeight ) );
 
+    marker.Set ( "SendMapInfoPacket" );
+
     // Send him all the elements
     SendMapInformation ( Player );
+
+    marker.Set ( "SendMapInformation" );
+
+    // Add debug info if wanted
+    if ( CPerfStatDebugInfo::GetSingleton ()->IsActive ( "SendMapElements" ) )
+        CPerfStatDebugInfo::GetSingleton ()->AddLine ( "SendMapElements", marker.GetString () );
 }
 
 
