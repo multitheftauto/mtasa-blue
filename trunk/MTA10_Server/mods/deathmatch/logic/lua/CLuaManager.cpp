@@ -41,7 +41,7 @@ CLuaManager::CLuaManager ( CObjectManager* pObjectManager,
 
     // Create our lua dynamic module manager
     m_pLuaModuleManager = new CLuaModuleManager ( this );
-    m_pLuaModuleManager->_SetScriptDebugging ( g_pGame->GetScriptDebugging() );
+    m_pLuaModuleManager->SetScriptDebugging ( g_pGame->GetScriptDebugging() );
 
     // Load our C Functions into LUA and hook callback
     CLuaCFunctions::InitializeHashMaps ();
@@ -92,7 +92,7 @@ CLuaMain * CLuaManager::CreateVirtualMachine ( CResource* pResourceOwner )
     m_virtualMachines.push_back ( vm );
     vm->InitVM ();
 
-    m_pLuaModuleManager->_RegisterFunctions ( vm->GetVirtualMachine() );
+    m_pLuaModuleManager->RegisterFunctions ( vm->GetVirtualMachine() );
 
     return vm;
 }
@@ -128,7 +128,7 @@ void CLuaManager::DoPulse ( void )
     {
         (*iter)->DoPulse();
     }
-    m_pLuaModuleManager->_DoPulse ();
+    m_pLuaModuleManager->DoPulse ();
 }
 
 CLuaMain* CLuaManager::GetVirtualMachine ( lua_State* luaVM )

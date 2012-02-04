@@ -1212,6 +1212,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\lua\CLuaModule.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\lua\CLuaModuleManager.cpp"
 						>
 					</File>
@@ -2442,6 +2446,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\lua\CLuaManager.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaModule.h"
 						>
 					</File>
 					<File

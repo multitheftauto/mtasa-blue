@@ -52,6 +52,7 @@ public:
 
     // Reserved functions
     static int      DisabledFunction                    ( lua_State* luaVM );
+    static int      UnloadedFunction                    ( lua_State* luaVM );
 
     //
     static int      CallRemote                          ( lua_State* luaVM );

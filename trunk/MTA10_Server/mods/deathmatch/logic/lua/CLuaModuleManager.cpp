@@ -29,292 +29,117 @@ CLuaModuleManager::CLuaModuleManager ( CLuaManager* pLuaManager )
 CLuaModuleManager::~CLuaModuleManager ( void )
 {
     // Shutdown all our modules
-    DefaultModuleFunc pfnShutdownModule = NULL;
-    vector < FunctionInfo > ::iterator iter = m_Functions.begin ();
-    for ( ; iter != m_Functions.end (); iter++ )
+    list < CLuaModule* > ::iterator iter = m_Modules.begin ();
+    for ( ; iter != m_Modules.end (); iter++ )
     {
-        pfnShutdownModule = iter->ShutdownModule;
-        pfnShutdownModule ();
+        delete *iter;
+        //m_Modules.remove ( *iter );
     }
 }
 
 
-void CLuaModuleManager::_SetScriptDebugging ( CScriptDebugging* pScriptDebugging )
+void CLuaModuleManager::SetScriptDebugging ( CScriptDebugging* pScriptDebugging )
 {
     m_pScriptDebugging = pScriptDebugging;
 }
 
 
-void CLuaModuleManager::ErrorPrintf ( const char* szFormat, ... )
+void CLuaModuleManager::RegisterFunctions ( lua_State * luaVM )
 {
-    va_list args;
-    va_start ( args, szFormat );
-    CLogger::ErrorPrintf ( szFormat, va_pass ( args ) );
-    va_end ( args );
-}
-
-
-void CLuaModuleManager::DebugPrintf ( lua_State * luaVM, const char* szFormat, ... )
-{
-    va_list args;
-    va_start ( args, szFormat );
-    //m_pScriptDebugging->LogError ( luaVM, szFormat, va_pass ( args ) );
-    m_pScriptDebugging->LogInformation ( luaVM, szFormat, va_pass ( args ) );
-    va_end ( args );
-}
-
-
-void CLuaModuleManager::Printf ( const char* szFormat, ... )
-{
-    va_list args;
-    va_start ( args, szFormat );
-    CLogger::LogPrintf ( szFormat, va_pass ( args ) );
-    va_end ( args );
-}
-
-
-bool CLuaModuleManager::RegisterFunction ( lua_State * luaVM, const char *szFunctionName, lua_CFunction Func )
-{
-    if ( luaVM )
+    list < CLuaModule* > ::iterator iter = m_Modules.begin ();
+    for ( ; iter != m_Modules.end (); iter++ )
     {
-        //CLogger::LogPrintf ( "MODULE: Registering function \"%s\"\n", szFunctionName );
-        if ( szFunctionName ) 
-        {
-            CLuaCFunctions::AddFunction ( szFunctionName, Func );
-            lua_register ( luaVM, szFunctionName, Func );
-        }
-    } else {
-        CLogger::LogPrintf ( "MODULE: Lua is not initialised.\n" );
+        (*iter)->_RegisterFunctions ( luaVM );
     }
+}
+
+
+void CLuaModuleManager::DoPulse ( void )
+{
+    list < CLuaModule* > ::iterator iter = m_Modules.begin ();
+    for ( ; iter != m_Modules.end (); iter++ )
+    {
+        (*iter)->_DoPulse ();
+    }
+}
+
+
+bool CLuaModuleManager::LoadModule ( const char *szShortFileName, const char *szFileName, bool bLateLoad )
+{
+    // bLateLoad specified whether this is a module that was loaded "late" (after startup)
+    // and we need to register all it's functions to all available VM's
+
+    // Initialize
+    CLuaModule* pModule = new CLuaModule ( this, m_pScriptDebugging, szFileName, szShortFileName );
+    // Load the module
+    if ( !pModule->_LoadModule () )
+    {
+        delete pModule;
+        return false;
+    }
+    
+    m_Modules.push_back ( pModule );
+
+    // Perform registering for late loaded modules
+    if ( bLateLoad ) 
+    {
+        list < CLuaMain* > ::const_iterator iter = m_pLuaManager->IterBegin ();
+        for ( ; iter != m_pLuaManager->IterEnd (); iter++ )
+        {
+            lua_State* luaVM = (*iter)->GetVM ();
+            pModule->_RegisterFunctions ( luaVM );
+        }
+    }
+
     return true;
 }
 
 
-bool CLuaModuleManager::GetResourceName ( lua_State * luaVM, std::string& strName )
+bool CLuaModuleManager::ReloadModule ( const char *szShortFileName, const char *szFileName, bool bLateLoad )
 {
-    if ( luaVM )
+    // Unload module
+    bool bUnloaded = UnloadModule ( szShortFileName );
+    
+    // If it fails to unload, don't attempt to load again
+    if (!bUnloaded) return false;
+
+    // Load module
+    return LoadModule ( szShortFileName, szFileName, bLateLoad );    
+}
+
+
+bool CLuaModuleManager::UnloadModule ( const char* szShortFileName )
+{
+    list < CLuaModule* > ::iterator iter = m_Modules.begin ();
+    for ( ; iter != m_Modules.end (); iter++ )
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
+        if ( strcmp ( (*iter)->_GetName().c_str(), szShortFileName ) == 0 )
         {
-            CResource* pResource = pLuaMain->GetResource ();
-            if ( pResource )
-            {
-                strName = pResource->GetName ();
-                return true;
-            }
+            delete *iter;
+            m_Modules.remove ( *iter );
+            return true;
         }
     }
     return false;
 }
 
 
-CChecksum CLuaModuleManager::GetResourceMetaChecksum ( lua_State* luaVM )
+
+void CLuaModuleManager::ResourceStopping ( lua_State * luaVM )
 {
-    if ( luaVM )
+    list < CLuaModule* > ::iterator iter = m_Modules.begin ();
+    for ( ; iter != m_Modules.end (); iter++ )
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
-        {
-            CResource* pResource = pLuaMain->GetResource ();
-            if ( pResource )
-            {
-                return pResource->GetLastMetaChecksum ();
-            }
-        }
-    }
-    return CChecksum ();
-}
-
-
-CChecksum CLuaModuleManager::GetResourceFileChecksum ( lua_State* luaVM, const char* szFile )
-{
-    if ( luaVM )
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
-        {
-            CResource* pResource = pLuaMain->GetResource ();
-            if ( pResource )
-            {
-                list < CResourceFile* >::iterator iter = pResource->IterBegin();
-                for ( ; iter != pResource->IterEnd(); iter++ )
-                {
-                    if ( strcmp ( (*iter)->GetName (), szFile ) == 0 )
-                        return (*iter)->GetLastChecksum ();
-                }
-            }
-        }
-    }
-    return CChecksum ();
-}
-
-
-unsigned long CLuaModuleManager::GetVersion ( )
-{
-    return CStaticFunctionDefinitions::GetVersion ( );
-}
-
-const char* CLuaModuleManager::GetVersionString ( )
-{
-    return CStaticFunctionDefinitions::GetVersionString ( );
-}
-
-const char* CLuaModuleManager::GetVersionName ( )
-{
-    return CStaticFunctionDefinitions::GetVersionName ( );
-}
-
-unsigned long CLuaModuleManager::GetNetcodeVersion ( )
-{
-    return CStaticFunctionDefinitions::GetNetcodeVersion ( );
-}
-
-const char* CLuaModuleManager::GetOperatingSystemName ( )
-{
-    return CStaticFunctionDefinitions::GetOperatingSystemName ( );
-}
-
-
-lua_State* CLuaModuleManager::GetResourceFromName ( const char* szResourceName )
-{
-    CResource* pResource = g_pGame->GetResourceManager()->GetResource ( szResourceName );
-
-    if ( pResource )
-    {
-        CLuaMain* pLuaMain = pResource->GetVirtualMachine ();
-        if ( pLuaMain )
-        {
-            return pLuaMain->GetVM ();
-        }
-    }
-
-    return NULL;
-}
-
-
-void CLuaModuleManager::_RegisterFunctions ( lua_State * luaVM )
-{
-    RegisterModuleFunc pfnDoPulse = NULL;
-    vector < FunctionInfo > ::iterator iter = m_Functions.begin ();
-    for ( ; iter != m_Functions.end (); iter++ )
-    {
-        pfnDoPulse = iter->RegisterFunctions;
-        pfnDoPulse ( luaVM );
+        (*iter)->_ResourceStopping ( luaVM );
     }
 }
 
 
-void CLuaModuleManager::_DoPulse ( void )
+void CLuaModuleManager::ResourceStopped ( lua_State * luaVM )
 {
-    DefaultModuleFunc pfnDoPulse = NULL;
-    vector < FunctionInfo > ::iterator iter = m_Functions.begin ();
-    for ( ; iter != m_Functions.end (); iter++ )
+    list < CLuaModule* > ::iterator iter = m_Modules.begin ();
+    for ( ; iter != m_Modules.end (); iter++ )
     {
-        pfnDoPulse = iter->DoPulse;
-        pfnDoPulse ();
-    }
-}
-
-
-bool CLuaModuleManager::_LoadModule ( const char *szShortFileName, const char *szFileName, bool bLateLoad )
-{
-    // bLateLoad specified whether this is a module that was loaded "late" (after startup)
-    // and we need to register all it's functions to all available VM's
-
-    InitModuleFunc pfnInitFunc;
-
-    // Load the module
-#ifdef WIN32
-    HMODULE hModule = LoadLibrary ( szFileName );
-    if ( hModule == NULL )
-    {
-        CLogger::LogPrintf ( "MODULE: Unable to find modules/%s!\n", szShortFileName );
-        return false;
-    }
-#else
-    void* hModule = dlopen ( szFileName, RTLD_NOW );
-
-    if ( hModule == NULL )
-    {
-        CLogger::LogPrintf ( "MODULE: Unable to find modules/%s (%s)!\n", szShortFileName, dlerror() );
-        return false;
-    }
-#endif
-
-    // Find the initialisation function
-    FunctionInfo fi;
-#ifdef WIN32
-    pfnInitFunc = ( InitModuleFunc ) ( GetProcAddress ( hModule, "InitModule" ) );
-    if ( pfnInitFunc == NULL )
-    {
-        CLogger::LogPrintf ( "MODULE: Unable to load modules/%s!\n", szShortFileName );
-        return false;
-    }
-    fi.szFileName = SString ("%s",szShortFileName);
-    fi.DoPulse = ( DefaultModuleFunc ) ( GetProcAddress ( hModule, "DoPulse" ) );
-    fi.ShutdownModule = ( DefaultModuleFunc ) ( GetProcAddress ( hModule, "ShutdownModule" ) );
-    fi.RegisterFunctions = ( RegisterModuleFunc ) ( GetProcAddress ( hModule, "RegisterFunctions" ) );
-
-    fi.ResourceStopping = ( RegisterModuleFunc ) ( GetProcAddress ( hModule, "ResourceStopping" ) );
-    fi.ResourceStopped = ( RegisterModuleFunc ) ( GetProcAddress ( hModule, "ResourceStopped" ) );
-#else
-    pfnInitFunc = ( InitModuleFunc ) ( dlsym ( hModule, "InitModule" ) );
-    if ( dlerror () != NULL )
-    {
-        CLogger::LogPrintf ( "MODULE: Unable to load modules/%s (%s)!\n", szShortFileName, dlerror () );
-        return false;
-    }
-    fi.DoPulse = ( DefaultModuleFunc ) ( dlsym ( hModule, "DoPulse" ) );
-    fi.ShutdownModule = ( DefaultModuleFunc ) ( dlsym ( hModule, "ShutdownModule" ) );
-    fi.RegisterFunctions = ( RegisterModuleFunc ) ( dlsym ( hModule, "RegisterFunctions" ) );
-
-    fi.ResourceStopping = ( RegisterModuleFunc ) ( dlsym ( hModule, "ResourceStopping" ) );
-    fi.ResourceStopped = ( RegisterModuleFunc ) ( dlsym ( hModule, "ResourceStopped" ) );
-#endif
-    // Initialize
-    pfnInitFunc( this, &fi.szModuleName[0], &fi.szAuthor[0], &fi.fVersion );
-    CLogger::LogPrintf ("MODULE: Loaded \"%s\" (%.2f) by \"%s\"\n", fi.szModuleName, fi.fVersion, fi.szAuthor);
-
-    m_Functions.push_back(fi);
-
-    // Perform registering for late loaded modules
-    if ( bLateLoad ) {
-        RegisterModuleFunc pfnRegFuncs = NULL;
-        pfnRegFuncs = fi.RegisterFunctions;
-        list < CLuaMain* > ::const_iterator iter = m_pLuaManager->IterBegin ();
-        for ( ; iter != m_pLuaManager->IterEnd (); iter++ )
-        {
-            lua_State* luaVM = (*iter)->GetVM ();
-            pfnRegFuncs ( luaVM );
-        }
-    }
-
-    return true;
-}
-
-
-void CLuaModuleManager::_ResourceStopping ( lua_State * luaVM )
-{
-    RegisterModuleFunc pfnResourceStopping = NULL;
-    vector < FunctionInfo > ::iterator iter = m_Functions.begin ();
-    for ( ; iter != m_Functions.end (); iter++ )
-    {
-        pfnResourceStopping = iter->ResourceStopping;
-        if ( pfnResourceStopping )
-            pfnResourceStopping ( luaVM );
-    }
-}
-
-
-void CLuaModuleManager::_ResourceStopped ( lua_State * luaVM )
-{
-    RegisterModuleFunc pfnResourceStopped = NULL;
-    vector < FunctionInfo > ::iterator iter = m_Functions.begin ();
-    for ( ; iter != m_Functions.end (); iter++ )
-    {
-        pfnResourceStopped = iter->ResourceStopped;
-        if ( pfnResourceStopped )
-            pfnResourceStopped ( luaVM );
+        (*iter)->_ResourceStopped ( luaVM );
     }
 }

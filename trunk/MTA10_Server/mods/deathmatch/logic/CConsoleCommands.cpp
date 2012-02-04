@@ -1879,9 +1879,9 @@ bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments,
         SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
 
         // These modules are late loaded
-        if ( !g_pGame->GetLuaManager ()->GetLuaModuleManager ()->_LoadModule ( szArguments, strFilename, true ) )
+        if ( !g_pGame->GetLuaManager ()->GetLuaModuleManager ()->LoadModule ( szArguments, strFilename, true ) )
         {
-                pEchoClient->SendConsole ( "stop: Resource could not be found" );
+                pEchoClient->SendConsole ( "loadmodule: module failed to load" );
                 return true;
         }
     }
@@ -1899,16 +1899,14 @@ bool CConsoleCommands::UnloadModule ( CConsole* pConsole, const char* szArgument
         if ( pClient->GetNick () )
             CLogger::LogPrintf ( "unloadmodule: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
 
-        SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
-
-        /*if ( !g_pGame->GetLuaManager()->GetLuaModuleManager()->_UnloadModule ( szArguments, strFilename ) )
+        if ( !g_pGame->GetLuaManager()->GetLuaModuleManager()->UnloadModule ( szArguments ) )
         {
-                pEchoClient->SendConsole ( "stop: Resource could not be found" );
+                pEchoClient->SendConsole ( "unloadmodule: module failed to unload" );
                 return true;
-        }*/
+        }
     }
     else
-        pEchoClient->SendConsole ( "* Syntax: loadmodule <module-name-with-extension>" );
+        pEchoClient->SendConsole ( "* Syntax: unloadmodule <module-name-with-extension>" );
 
     return false;
 }
@@ -1919,18 +1917,18 @@ bool CConsoleCommands::ReloadModule ( CConsole* pConsole, const char* szArgument
     if ( szArguments && szArguments[0] )
     {
         if ( pClient->GetNick () )
-            CLogger::LogPrintf ( "loadmodule: Requested by %s\n", pClient->GetNick () );
+            CLogger::LogPrintf ( "reloadmodule: Requested by %s\n", pClient->GetNick () );
 
         SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
 
-        /*if ( !g_pGame->GetLuaManager()->GetLuaModuleManager()->_ReloadModule ( szArguments, strFilename ) )
+        if ( !g_pGame->GetLuaManager()->GetLuaModuleManager()->ReloadModule ( szArguments, strFilename, true ) )
         {
-                pEchoClient->SendConsole ( "stop: Resource could not be found" );
+            pEchoClient->SendConsole ( "reloadmodule: module failed to reload" );
                 return true;
-        }*/
+        }
     }
     else
-        pEchoClient->SendConsole ( "* Syntax: loadmodule <module-name-with-extension>" );
+        pEchoClient->SendConsole ( "* Syntax: reloadmodule <module-name-with-extension>" );
 
     return false;
 }
