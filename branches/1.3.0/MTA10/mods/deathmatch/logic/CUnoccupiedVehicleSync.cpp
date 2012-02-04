@@ -344,9 +344,9 @@ bool CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
     }
 
     const CVector& vecLastRotation = pVehicle->m_LastSyncedData->vecRotation;
-    if ( fabs ( vecLastRotation.fX - vehicle.data.vecRotation.fX ) > FLOAT_EPSILON ||
-        fabs ( vecLastRotation.fY - vehicle.data.vecRotation.fY ) > FLOAT_EPSILON ||
-        fabs ( vecLastRotation.fZ - vehicle.data.vecRotation.fZ ) > FLOAT_EPSILON )
+    if ( fabs ( vecLastRotation.fX - vehicle.data.vecRotation.fX ) > MIN_ROTATION_DIFF ||
+        fabs ( vecLastRotation.fY - vehicle.data.vecRotation.fY ) > MIN_ROTATION_DIFF ||
+        fabs ( vecLastRotation.fZ - vehicle.data.vecRotation.fZ ) > MIN_ROTATION_DIFF )
     {
         bSyncVehicle = true;
         vehicle.data.bSyncRotation = true;
