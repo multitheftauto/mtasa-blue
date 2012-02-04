@@ -261,7 +261,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                             const CVector& vecLastPosition = pVehicle->GetPosition ( );
                             if ( fabs ( vecLastPosition.fX - vehicle.data.vecPosition.fX ) <= FLOAT_EPSILON &&
                                 fabs ( vecLastPosition.fY - vehicle.data.vecPosition.fY ) <= FLOAT_EPSILON &&
-                                fabs ( vecLastPosition.fZ - vehicle.data.vecPosition.fZ ) <= FLOAT_EPSILON )
+                                fabs ( vecLastPosition.fZ - vehicle.data.vecPosition.fZ ) <= 0.1f )
                             {
                                 vehicle.data.bSyncPosition = false;
                             }
@@ -283,7 +283,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                         {
                             if ( fabs ( vehicle.data.vecVelocity.fX ) <= FLOAT_EPSILON &&
                                 fabs ( vehicle.data.vecVelocity.fY ) <= FLOAT_EPSILON &&
-                                fabs ( vehicle.data.vecVelocity.fZ ) <= FLOAT_EPSILON )
+                                fabs ( vehicle.data.vecVelocity.fZ ) <= 0.1f )
                             {
                                 vehicle.data.bSyncVelocity = false;
                             }
@@ -410,6 +410,10 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                 }
                             }
                         }
+                        bool bEngineOn = pVehicle->IsEngineOn ( );
+                        bool bDerailed = pVehicle->IsDerailed ( );
+                        bool bInWater = pVehicle->IsInWater ( );
+
                         // Turn the engine on if it's on
                         pVehicle->SetEngineOn ( vehicle.data.bEngineOn );
 
@@ -422,8 +426,8 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                         // Run colpoint checks on vehicle
                         g_pGame->GetColManager()->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );
 
-                        // Send this sync
-                        data.bSend = true;
+                        // Send this sync if something important changed or one of the flags has changed since last sync.
+                        data.bSend = vehicle.HasChanged ( ) || ( bEngineOn != vehicle.data.bEngineOn || bDerailed != vehicle.data.bDerailed || bInWater != vehicle.data.bIsInWater );
                     }
                 }
             }
