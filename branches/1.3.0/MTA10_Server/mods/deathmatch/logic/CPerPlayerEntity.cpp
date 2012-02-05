@@ -364,4 +364,7 @@ void CPerPlayerEntity::RemovePlayerReference ( CPlayer* pPlayer )
         }
     }
     m_PlayersMap.erase ( pPlayer->GetID ( ) );
+
+    ListRemove ( m_PlayersAdded, pPlayer );
+    ListRemove ( m_PlayersRemoved, pPlayer );
 }
