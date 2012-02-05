@@ -12,8 +12,12 @@
 
 #include "StdInc.h"
 
+std::set < CPerPlayerEntity* > CPerPlayerEntity::ms_AllPerPlayerEntityMap;
+
+
 CPerPlayerEntity::CPerPlayerEntity ( CElement* pParent, CXMLNode* pNode ) : CElement ( pParent, pNode )
 {
+    MapInsert ( ms_AllPerPlayerEntityMap, this );
     m_bIsSynced = false;
     AddVisibleToReference ( g_pGame->GetMapManager ()->GetRootElement () );
 };
@@ -29,6 +33,7 @@ CPerPlayerEntity::~CPerPlayerEntity ( void )
     {
         if ( !(*iter)->m_ElementReferenced.empty() ) (*iter)->m_ElementReferenced.remove ( this );
     }
+    MapRemove ( ms_AllPerPlayerEntityMap, this );
 }
 
 
@@ -364,7 +369,25 @@ void CPerPlayerEntity::RemovePlayerReference ( CPlayer* pPlayer )
         }
     }
     m_PlayersMap.erase ( pPlayer->GetID ( ) );
+}
 
+
+//
+// Hacks to stop crash
+//
+void CPerPlayerEntity::StaticOnPlayerDelete ( CPlayer* pPlayer )
+{
+    for ( std::set < CPerPlayerEntity* >::iterator iter = ms_AllPerPlayerEntityMap.begin (); iter != ms_AllPerPlayerEntityMap.begin () ; ++iter )
+    {
+        (*iter)->OnPlayerDelete ( pPlayer );
+    }
+}
+
+
+void CPerPlayerEntity::OnPlayerDelete ( CPlayer* pPlayer )
+{
+    MapRemove ( m_PlayersMap, pPlayer->GetID ( ) );
+    ListRemove ( m_Players, pPlayer );
     ListRemove ( m_PlayersAdded, pPlayer );
     ListRemove ( m_PlayersRemoved, pPlayer );
 }

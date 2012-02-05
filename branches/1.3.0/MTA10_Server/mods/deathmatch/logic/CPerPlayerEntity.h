@@ -44,6 +44,9 @@ public:
 
     list < CPlayer * >          &GetPlayersList                  ( void )                    { return m_Players; }
 
+    static void                 StaticOnPlayerDelete            ( CPlayer* pPlayer );
+    void                        OnPlayerDelete                  ( CPlayer* pPlayer );
+
 protected:
     virtual void                CreateEntity                    ( CPlayer* pPlayer );
     virtual void                DestroyEntity                   ( CPlayer* pPlayer );
@@ -66,6 +69,8 @@ private:
     list < class CPlayer* >     m_PlayersRemoved;
     list < class CPlayer* >     m_Players;
     map < ElementID, class CPlayer* >     m_PlayersMap;
+
+    static std::set < CPerPlayerEntity* > ms_AllPerPlayerEntityMap;
 };
 
 #endif

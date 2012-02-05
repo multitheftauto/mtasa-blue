@@ -428,6 +428,10 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
                 pTemp->m_ucSize = pBlip->m_ucSize;
                 pTemp->SetColor ( pBlip->GetColor () );
 
+                if ( pResource->HasStarted() )
+                    pTemp->Sync ( true );
+                bAddEntity = false;
+
                 pNewElement = pTemp;
             }
             break;
