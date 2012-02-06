@@ -1273,16 +1273,16 @@ char * CResource::DisplayInfoHTML ( char * info, size_t length )
     LAZYNESS "Exported functions: %d<br>", m_exportedFunctions.size() );
     if ( m_exportedFunctions.size() != 0 )
     {
-        list < CExportedFunction* > ::iterator iterf = m_exportedFunctions.begin ();
+        list < CExportedFunction> ::iterator iterf = m_exportedFunctions.begin ();
         for ( ; iterf != m_exportedFunctions.end (); iterf++ )
         {
-            if ( (*iterf)->IsHTTPAccessible() )
+            if ( iterf->IsHTTPAccessible() )
             {
-                LAZYNESS "<li> <a href='/call/%s/%s?' style='color: black;'>%s</a>", m_strResourceName.c_str (), (*iterf)->GetFunctionName ().c_str (), (*iterf)->GetFunctionName ().c_str () );
+                LAZYNESS "<li> <a href='/call/%s/%s?' style='color: black;'>%s</a>", m_strResourceName.c_str (), iterf->GetFunctionName ().c_str (), iterf->GetFunctionName ().c_str () );
             }
             else
             {
-                LAZYNESS "<li> %s", (*iterf)->GetFunctionName ().c_str () );
+                LAZYNESS "<li> %s", iterf->GetFunctionName ().c_str () );
             }
 
         }
@@ -1640,6 +1640,7 @@ bool CResource::ReadIncludedFiles ( CXMLNode * root )
 bool CResource::ReadIncludedExports ( CXMLNode * root )
 {
     int i = 0;
+    m_exportedFunctions.clear ();
 
     // Read our exportlist
     for ( CXMLNode * inc = root->FindSubNode("export", i);
@@ -1649,14 +1650,6 @@ bool CResource::ReadIncludedExports ( CXMLNode * root )
         CXMLAttributes * attributes = &(inc->GetAttributes ());
         if ( attributes )
         {
-            // Find the access attribute and grab its value
-            std::string strAccess;
-            CXMLAttribute * access = attributes->Find("access");
-            if ( access )
-            {
-                strAccess = access->GetValue ();
-            }
-
             // See if the http attribute is true or false
             bool bHTTP = false;
             CXMLAttribute * http = attributes->Find("http");
@@ -1712,14 +1705,7 @@ bool CResource::ReadIncludedExports ( CXMLNode * root )
                 // Add it to the list if it wasn't zero long. Otherwize show a warning
                 if ( !strFunction.empty () )
                 {
-                    m_exportedFunctions.push_back ( new CExportedFunction ( strFunction.c_str (), strAccess.c_str (), bHTTP, ucType, bRestricted ) );
-                   /* if ( bHTTP && ucType == CExportedFunction::EXPORTED_FUNCTION_TYPE_SERVER )
-                    {
-                        char szExportCall[512];
-                        snprintf ( szExportCall, 511, "call/%s", szFunction );
-                        szExportCall[511] = '\0';
-                        this->RegisterEHS ( this, szExportCall );
-                    }*/
+                    m_exportedFunctions.push_back ( CExportedFunction ( strFunction.c_str (), bHTTP, ucType, bRestricted || GetName () == "webadmin" || GetName () == "runcode" ) );
                 }
                 else
                 {
@@ -2641,12 +2627,12 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
     }
     Unescape ( strFuncName );
 
-    list < CExportedFunction* > ::iterator iter =  m_exportedFunctions.begin ();
+    list < CExportedFunction > ::iterator iter =  m_exportedFunctions.begin ();
     for ( ; iter != m_exportedFunctions.end (); iter++ )
     {
-        if ( strFuncName == (*iter)->GetFunctionName () )
+        if ( strFuncName == iter->GetFunctionName () )
         {
-            if ( (*iter)->IsHTTPAccessible() )
+            if ( iter->IsHTTPAccessible() )
             {
                 CAccessControlListManager * aclManager = g_pGame->GetACLManager();
                 SString strResourceFuncName ( "%s.function.%s", m_strResourceName.c_str (), strFuncName.c_str () );
@@ -2984,14 +2970,14 @@ bool CResource::CallExportedFunction ( char * szFunctionName, CLuaArguments& arg
     if ( !m_bActive )
         return false;
 
-    list < CExportedFunction* > ::iterator iter =  m_exportedFunctions.begin ();
+    list < CExportedFunction > ::iterator iter = m_exportedFunctions.begin ();
     for ( ; iter != m_exportedFunctions.end (); iter++ )
     {
         // Verify that the exported function is marked as "Server" (since both Client and Server exported functions exist here)
-        if ( ( *iter )->GetType () == CExportedFunction::EXPORTED_FUNCTION_TYPE_SERVER )
+        if ( iter->GetType () == CExportedFunction::EXPORTED_FUNCTION_TYPE_SERVER )
         {
-            bool bRestricted = (*iter)->IsRestricted ();
-            if ( strcmp ( (*iter)->GetFunctionName ().c_str (), szFunctionName ) == 0 )
+            bool bRestricted = iter->IsRestricted ();
+            if ( strcmp ( iter->GetFunctionName ().c_str (), szFunctionName ) == 0 )
             {
                 char szFunctionRightName[512];
                 snprintf ( szFunctionRightName, 512, "%s.function.%s", m_strResourceName.c_str (), szFunctionName );

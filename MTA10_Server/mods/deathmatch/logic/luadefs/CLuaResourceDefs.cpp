@@ -1059,11 +1059,11 @@ int CLuaResourceDefs::getResourceExportedFunctions ( lua_State* luaVM )
     {
         lua_newtable ( luaVM );
         unsigned int uiIndex = 0;
-        list<CExportedFunction *>::iterator iterd = resource->IterBeginExportedFunctions();
+        list < CExportedFunction >::iterator iterd = resource->IterBeginExportedFunctions();
         for ( ; iterd != resource->IterEndExportedFunctions(); iterd++ )
         {
             lua_pushnumber ( luaVM, ++uiIndex );
-            lua_pushstring ( luaVM, (*iterd)->GetFunctionName ().c_str () );
+            lua_pushstring ( luaVM, iterd->GetFunctionName ().c_str () );
             lua_settable ( luaVM, -3 );
         }
         return 1;
