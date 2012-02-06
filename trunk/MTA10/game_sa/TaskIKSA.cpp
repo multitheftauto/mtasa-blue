@@ -42,6 +42,7 @@ CTaskSimpleIKChainSA::CTaskSimpleIKChainSA ( char* idString, int effectorBoneTag
         push    fEffectorX
         push    effectorBoneTag
         push    idString
+        call    dwFunc
     }
 }
 

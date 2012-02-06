@@ -884,8 +884,6 @@ bool CAccountManager::GetAllAccountData( CAccount* pAccount, lua_State* pLua )
     //create a new registry result for the query return
     CRegistryResult result;
     SString strKey;
-    SString strValue;
-    unsigned int uiIndex = 0;
 
     //Select the value and type from the database where the user is our user and the key is the required key
     m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT key,value,type from userdata where userid=?", SQLITE_INTEGER, iUserID );
