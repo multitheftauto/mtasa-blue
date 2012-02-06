@@ -394,7 +394,6 @@ CClientGame::~CClientGame ( void )
     SetCursorEventsEnabled ( false );   
 
     // Destroy our stuff
-    delete m_pLatentTransferManager;
     delete m_pNametags;
     delete m_pSyncDebug;
     delete m_pNetworkStats;
@@ -411,6 +410,7 @@ CClientGame::~CClientGame ( void )
     delete m_pMovingObjectsManager;
     delete m_pRadarMap;
     delete m_pLuaManager;
+    delete m_pLatentTransferManager;
 
     delete m_pRootEntity;
 

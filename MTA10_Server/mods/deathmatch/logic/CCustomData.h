@@ -36,6 +36,7 @@ public:
     void                    Copy                    ( CCustomData* pCustomData );
 
     SCustomData*            Get                     ( const char* szName );
+    SCustomData*            GetSynced               ( const char* szName );
     void                    Set                     ( const char* szName, const CLuaArgument& Variable, class CLuaMain* pLuaMain, bool bSynchronized = true );
 
     bool                    Delete                  ( const char* szName );
@@ -50,8 +51,16 @@ public:
     std::map < std::string, SCustomData > :: const_iterator IterBegin   ( void )   { return m_Data.begin (); }
     std::map < std::string, SCustomData > :: const_iterator IterEnd     ( void )   { return m_Data.end (); }
 
+    std::map < std::string, SCustomData > :: const_iterator SyncedIterBegin   ( void )   { return m_SyncedData.begin (); }
+    std::map < std::string, SCustomData > :: const_iterator SyncedIterEnd     ( void )   { return m_SyncedData.end (); }
+
 private:
+    bool                    DeleteSynced            ( const char* szName );
+    void                    UpdateSynced            ( const char* szName, const CLuaArgument& Variable, class CLuaMain* pLuaMain, bool bSynchronized );
+
+
     std::map < std::string, SCustomData >       m_Data;
+    std::map < std::string, SCustomData >       m_SyncedData;
 };
 
 #endif

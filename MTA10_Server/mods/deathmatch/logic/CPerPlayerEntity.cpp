@@ -12,8 +12,12 @@
 
 #include "StdInc.h"
 
+std::set < CPerPlayerEntity* > CPerPlayerEntity::ms_AllPerPlayerEntityMap;
+
+
 CPerPlayerEntity::CPerPlayerEntity ( CElement* pParent, CXMLNode* pNode ) : CElement ( pParent, pNode )
 {
+    MapInsert ( ms_AllPerPlayerEntityMap, this );
     m_bIsSynced = false;
     AddVisibleToReference ( g_pGame->GetMapManager ()->GetRootElement () );
 };
@@ -29,6 +33,7 @@ CPerPlayerEntity::~CPerPlayerEntity ( void )
     {
         if ( !(*iter)->m_ElementReferenced.empty() ) (*iter)->m_ElementReferenced.remove ( this );
     }
+    MapRemove ( ms_AllPerPlayerEntityMap, this );
 }
 
 
@@ -182,15 +187,14 @@ bool CPerPlayerEntity::IsVisibleToReferenced ( CElement* pElement )
 bool CPerPlayerEntity::IsVisibleToPlayer ( CPlayer& Player )
 {
     // Return true if we're visible to the given player
-    list < CPlayer* > ::const_iterator iter = m_Players.begin ();
-    for ( ; iter != m_Players.end (); iter++ )
+    map < ElementID, CPlayer* > ::const_iterator iter = m_PlayersMap.find ( Player.GetID ( ) );
+    if ( iter != m_PlayersMap.end ( ) )
     {
-        if ( *iter == &Player )
+        if ( &Player == (*iter).second )
         {
             return true;
         }
     }
-
     return false;
 }
 
@@ -364,4 +368,26 @@ void CPerPlayerEntity::RemovePlayerReference ( CPlayer* pPlayer )
             iter++;
         }
     }
+    m_PlayersMap.erase ( pPlayer->GetID ( ) );
+}
+
+
+//
+// Hacks to stop crash
+//
+void CPerPlayerEntity::StaticOnPlayerDelete ( CPlayer* pPlayer )
+{
+    for ( std::set < CPerPlayerEntity* >::iterator iter = ms_AllPerPlayerEntityMap.begin (); iter != ms_AllPerPlayerEntityMap.begin () ; ++iter )
+    {
+        (*iter)->OnPlayerDelete ( pPlayer );
+    }
+}
+
+
+void CPerPlayerEntity::OnPlayerDelete ( CPlayer* pPlayer )
+{
+    MapRemove ( m_PlayersMap, pPlayer->GetID ( ) );
+    ListRemove ( m_Players, pPlayer );
+    ListRemove ( m_PlayersAdded, pPlayer );
+    ListRemove ( m_PlayersRemoved, pPlayer );
 }

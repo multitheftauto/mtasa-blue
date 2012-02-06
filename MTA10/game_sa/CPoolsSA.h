@@ -66,7 +66,7 @@ public:
     void                    DeleteAllVehicles   ( );
 
     // Objects pool
-    CObject*                AddObject           ( DWORD dwModelID, bool bLowLod );
+    CObject*                AddObject           ( DWORD dwModelID, bool bLowLod, bool bBreakable );
 private:
     bool                    AddObjectToPool     ( CObjectSA* pObject );
 public:

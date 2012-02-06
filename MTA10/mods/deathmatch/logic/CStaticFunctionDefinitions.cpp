@@ -3214,6 +3214,11 @@ bool CStaticFunctionDefinitions::GetObjectScale ( CClientObject & Object, float&
     return true;
 }
 
+bool CStaticFunctionDefinitions::IsObjectBreakable ( CClientObject& Object, bool& bBreakable )
+{
+    bBreakable = Object.IsBreakable ( );
+    return true;
+}
 
 bool CStaticFunctionDefinitions::SetObjectRotation ( CClientEntity& Entity, const CVector& vecRotation )
 {
@@ -3314,6 +3319,18 @@ bool CStaticFunctionDefinitions::SetObjectStatic ( CClientEntity& Entity, bool b
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetObjectBreakable ( CClientEntity& Entity, bool bBreakable )
+{
+    RUN_CHILDREN SetObjectBreakable ( **iter, bBreakable );
+
+    if ( IS_OBJECT ( &Entity ) )
+    {
+        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
+        Object.SetBreakable ( bBreakable );
+        return true;
+    }
+    return false;
+}
 
 CClientRadarArea* CStaticFunctionDefinitions::CreateRadarArea ( CResource& Resource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color )
 {

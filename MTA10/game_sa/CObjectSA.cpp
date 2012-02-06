@@ -40,7 +40,7 @@ CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)
     CheckForGangTag ();
 }
 
-CObjectSA::CObjectSA( DWORD dwModel )
+CObjectSA::CObjectSA( DWORD dwModel, bool bBreakable )
 {
     DEBUG_TRACE("CObjectSA::CObjectSA( DWORD dwModel )");
 
@@ -143,6 +143,12 @@ CObjectSA::CObjectSA( DWORD dwModel )
         this->BeingDeleted = FALSE;
         this->DoNotRemoveFromGame = FALSE;
         MemPutFast < BYTE > ( dwObjectPtr + 316, 6 );
+        if ( !bBreakable )
+        {
+            // Set our immunities
+            // Sum of all flags checked @ CPhysical__CanPhysicalBeDamaged 
+            MemPutFast < int > ( dwObjectPtr + 64, 0x00BC0000 );
+        }
         m_pInterface->bStreamingDontDelete = true;
     }
     else
@@ -157,7 +163,10 @@ CObjectSA::CObjectSA( DWORD dwModel )
     m_ucAlpha = 255;
 
     if ( m_pInterface )
+    {
         CheckForGangTag ();
+    }
+
 }
 
 CObjectSA::~CObjectSA( )

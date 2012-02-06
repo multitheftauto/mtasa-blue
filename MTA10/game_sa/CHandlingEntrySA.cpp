@@ -73,20 +73,21 @@ void CHandlingEntrySA::Recalculate ( unsigned short usModel )
         memcpy ( m_pHandlingSA, &m_Handling, sizeof ( m_Handling ) );
 
         CModelInfo* pModelInfo = pGame->GetModelInfo ( usModel );
-        bool bIsBike = false;
-        if ( pModelInfo )
-        {
-            bIsBike = ( pModelInfo->IsBike() || pModelInfo->IsBmx() );
-        }
-        // Bikes and BMX's both use Bike data.
-        if ( bIsBike )
-        {
-            // Call GTA's function that calculates the final values from the read values
-            ( (void (_stdcall *)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits )( m_pHandlingSA );
-            // Call GTA's function that calculates the final values from the read values
-            ( (void (_stdcall *)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertBikeDataToGameUnits )( m_pHandlingSA );
-        }
-        else
+//         bool bIsBike = false;
+//         if ( pModelInfo )
+//         {
+//             bIsBike = ( pModelInfo->IsBike() || pModelInfo->IsBmx() );
+//         }
+//         // Bikes and BMX's both use Bike data.
+//         if ( bIsBike )
+//         {
+//             // Call GTA's function that calculates the final values from the read values
+//             ( (void (_stdcall *)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits )( m_pHandlingSA );
+//             // Call GTA's function that calculates the final values from the read values
+//             ( (void (_stdcall *)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertBikeDataToGameUnits )( m_pHandlingSA );
+//         }
+//         else
+        //if ( pModelInfo && pModelInfo->IsMonsterTruck() || pModelInfo->IsCar() )
         {
             // Call GTA's function that calculates the final values from the read values
             ( (void (_stdcall *)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits )( m_pHandlingSA );

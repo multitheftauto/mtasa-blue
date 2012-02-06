@@ -14,12 +14,7 @@
 
 CPlayerStatsPacket::~CPlayerStatsPacket ( void )
 {
-    vector < sPlayerStat* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end () ; iter++ )
-    {
-        delete (*iter);
-    }
-    m_List.clear ();
+    Clear ( );
 }
 
 
@@ -35,11 +30,12 @@ bool CPlayerStatsPacket::Write ( NetBitStreamInterface& BitStream ) const
         unsigned short usNumStats = static_cast < unsigned short  >( m_List.size () );
         BitStream.WriteCompressed ( usNumStats );
 
-        vector < sPlayerStat* > ::const_iterator iter = m_List.begin ();
+        map < unsigned short, sPlayerStat > ::const_iterator iter = m_List.begin ();
         for ( ; iter != m_List.end () ; iter++ )
         {
-            BitStream.Write ( (*iter)->id );
-            BitStream.Write ( (*iter)->value );
+            const sPlayerStat& playerStat = (*iter).second;
+            BitStream.Write ( playerStat.id );
+            BitStream.Write ( playerStat.value );
         }
 
         return true;
@@ -51,8 +47,38 @@ bool CPlayerStatsPacket::Write ( NetBitStreamInterface& BitStream ) const
 
 void CPlayerStatsPacket::Add ( unsigned short usID, float fValue )
 {
-    sPlayerStat* Stat = new sPlayerStat;
-    Stat->id = usID;
-    Stat->value = fValue;
-    m_List.push_back ( Stat );
+    map < unsigned short, sPlayerStat > ::iterator iter = m_List.find ( usID );
+    if ( iter != m_List.end ( ) )
+    {
+        if ( fValue == 0.0f )
+        {
+            m_List.erase ( iter );
+        }
+        else
+        {
+            sPlayerStat stat = (*iter).second;
+            stat.value = fValue;
+        }
+    }
+    else
+    {
+        sPlayerStat stat;
+        stat.id = usID;
+        stat.value = fValue;
+        m_List[ usID ] = stat;
+    }
+}
+
+
+void CPlayerStatsPacket::Remove ( unsigned short usID, float fValue )
+{
+    map < unsigned short, sPlayerStat > ::iterator iter = m_List.find ( usID );
+    if ( iter != m_List.end ( ) )
+    {
+        m_List.erase ( iter );
+    }
+}
+void CPlayerStatsPacket::Clear ( void )
+{
+    m_List.clear ();
 }

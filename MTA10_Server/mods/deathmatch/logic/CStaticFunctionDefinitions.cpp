@@ -428,6 +428,10 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
                 pTemp->m_ucSize = pBlip->m_ucSize;
                 pTemp->SetColor ( pBlip->GetColor () );
 
+                if ( pResource->HasStarted() )
+                    pTemp->Sync ( true );
+                bAddEntity = false;
+
                 pNewElement = pTemp;
             }
             break;
@@ -3696,6 +3700,26 @@ bool CStaticFunctionDefinitions::SetPedStat ( CElement* pElement, unsigned short
     {
         RUN_CHILDREN SetPedStat ( *iter, usStat, fValue );
 
+        if ( IS_PLAYER ( pElement ) )
+        {
+            CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
+
+            // Dont let them set visual stats if they dont have the CJ model
+            if ( ( usStat != 21 /* FAT */ && usStat != 23 /* BODY_MUSCLE */ ) || pPlayer->GetModel () == 0 )
+            {
+                // Save the stat
+                pPlayer->SetPlayerStat ( usStat, fValue );
+
+                // Notify everyone
+                CPlayerStatsPacket Packet;
+                Packet.SetSourceElement ( pPlayer );
+                Packet.Add ( usStat, fValue );
+                m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+
+                return true;
+            }
+            return false;
+        }
         if ( IS_PED ( pElement ) )
         {
             CPed* pPed = static_cast < CPed* > ( pElement );

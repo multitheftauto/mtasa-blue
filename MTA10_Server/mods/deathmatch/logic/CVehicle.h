@@ -148,7 +148,7 @@ public:
 
     const CVector&                  GetPosition             ( void );
     void                            SetPosition             ( const CVector& vecPosition );
-    inline void                     GetRotation             ( CVector& vecRotation );
+    void                            GetRotation             ( CVector& vecRotation );
     void                            GetRotationDegrees      ( CVector& vecRotation );
     void                            SetRotationDegrees      ( const CVector& vecRotation );
 

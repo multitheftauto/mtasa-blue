@@ -226,6 +226,7 @@ public:
     CQueueInfo                  m_OutCommandQueueInfo;
     CQueueInfo                  m_OutResultQueueInfo;
     CQueueInfo                  m_InResultQueueInfo;
+    uint                        m_uiGamePlayerCount;
 
     // Shared variables
     struct

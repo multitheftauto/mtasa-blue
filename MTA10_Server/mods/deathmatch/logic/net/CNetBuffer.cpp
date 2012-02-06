@@ -179,6 +179,7 @@ void CNetServerBuffer::DoPulse ( void )
         shared.m_Mutex.Lock ( EActionWho::MAIN, EActionWhere::DoPulse );
         fSyncFPS = static_cast < float > ( shared.m_iThreadFrameCount );
         shared.m_iThreadFrameCount = 0;
+        shared.m_iuGamePlayerCount = g_pGame->GetPlayerManager ()->Count (); // Also update player count here (for scaling buffer size checks)
         shared.m_Mutex.Unlock ( EActionWho::MAIN, EActionWhere::DoPulse );
 
         // Compress high counts
@@ -1068,7 +1069,7 @@ void CNetServerBuffer::ProcessPacket ( unsigned char ucPacketID, const NetServer
 // Called from watchdog thread
 //
 ///////////////////////////////////////////////////////////////
-void CNetServerBuffer::GetQueueSizes ( uint& uiFinishedList, uint& uiOutCommandQueue, uint& uiOutResultQueue, uint& uiInResultQueue )
+void CNetServerBuffer::GetQueueSizes ( uint& uiFinishedList, uint& uiOutCommandQueue, uint& uiOutResultQueue, uint& uiInResultQueue, uint& uiGamePlayerCount )
 {
     shared.m_Mutex.Lock ( EActionWho::WATCHDOG, EActionWhere::GetQueueSizes );
 
@@ -1076,6 +1077,7 @@ void CNetServerBuffer::GetQueueSizes ( uint& uiFinishedList, uint& uiOutCommandQ
     uiOutCommandQueue = shared.m_OutCommandQueue.size ();
     uiOutResultQueue = shared.m_OutResultQueue.size ();
     uiInResultQueue = shared.m_InResultQueue.size ();
+    uiGamePlayerCount = shared.m_iuGamePlayerCount;
 
     shared.m_Mutex.Unlock ( EActionWho::WATCHDOG, EActionWhere::GetQueueSizes );
 }

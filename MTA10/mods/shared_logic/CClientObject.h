@@ -92,7 +92,7 @@ public:
     void                            SetHealth               ( float fHealth );
 
     inline bool                     IsBreakable             ( void )                            { return m_pObjectManager->IsBreakableModel ( m_usModel ) && m_bBreakable; };
-    inline void                     SetBreakable            ( bool bBreakable )                 { m_bBreakable = bBreakable; };
+    bool                            SetBreakable            ( bool bBreakable );
 
     void                            ReCreate                ( void );
     void                            UpdateVisibility        ( void );

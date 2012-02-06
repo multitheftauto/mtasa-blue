@@ -18,6 +18,7 @@
 #include "CPlayerManager.h"
 #include "CVehicleManager.h"
 #include "packets/CUnoccupiedVehicleSyncPacket.h"
+#define MIN_ROTATION_DIFF   0.1
 
 class CUnoccupiedVehicleSync
 {

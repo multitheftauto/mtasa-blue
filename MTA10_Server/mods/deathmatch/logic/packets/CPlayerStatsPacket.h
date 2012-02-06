@@ -34,9 +34,13 @@ public:
     bool                        Write                       ( NetBitStreamInterface& BitStream ) const;
 
     void                        Add                         ( unsigned short usID, float fValue );
+    void                        Remove                      ( unsigned short usID, float fValue );
+    void                        Clear                       ( void );
+
+    int                         GetSize                     ( void )                        { return m_List.size ( ); }
 
 private:
-    vector < sPlayerStat* >     m_List;
+    map < unsigned short, sPlayerStat >     m_List;
 };
 
 #endif

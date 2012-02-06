@@ -110,6 +110,8 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_llLastPositionHasChanged = 0;
 
     CSimControl::AddSimPlayer ( this );
+
+    m_pPlayerStatsPacket = new CPlayerStatsPacket ( );
 }
 
 
@@ -159,6 +161,8 @@ CPlayer::~CPlayer ( void )
     CElementRefManager::RemoveElementRefs ( ELEMENT_REF_DEBUG ( this, "CPlayer" ), &m_pTeam, NULL );
     CElementRefManager::RemoveElementListRef ( ELEMENT_REF_DEBUG ( this, "CPlayer m_lstBroadcastList" ), &m_lstBroadcastList );
     CElementRefManager::RemoveElementListRef ( ELEMENT_REF_DEBUG ( this, "CPlayer m_lstIgnoredList" ), &m_lstIgnoredList );
+    
+    delete m_pPlayerStatsPacket;
 }
 
 
@@ -486,7 +490,9 @@ void CPlayer::Reset ( void )
 {
     //Called when resetMapInfo is called to reset per player information that is reset in the clientside implimentation of resetMapInfo. This stops our functions clientside and serverside possibly returning different results.
     memset ( m_fStats, 0, sizeof ( m_fStats ) );
-    m_fStats [ 24 ] = 569.0f;           // default max_health
+    m_pPlayerStatsPacket->Clear ( );
+    SetPlayerStat ( 24, 569.0f );           // default max_health
+
     m_pClothes->DefaultClothes ();    
     m_bHasJetPack = false;
 
@@ -1008,4 +1014,10 @@ void CPlayer::SetPosition ( const CVector &vecPosition )
         MarkPositionAsChanged ( );
     }
     CElement::SetPosition ( vecPosition );
+}
+
+void CPlayer::SetPlayerStat ( unsigned short usStat, float fValue )
+{
+    m_pPlayerStatsPacket->Add( usStat, fValue );
+    CPed::SetPlayerStat( usStat, fValue );
 }

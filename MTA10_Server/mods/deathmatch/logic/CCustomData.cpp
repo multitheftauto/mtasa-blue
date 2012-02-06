@@ -35,6 +35,57 @@ SCustomData* CCustomData::Get ( const char* szName )
     return NULL;
 }
 
+SCustomData* CCustomData::GetSynced ( const char* szName )
+{
+    assert ( szName );
+
+    std::map < std::string, SCustomData > :: const_iterator it = m_SyncedData.find ( szName );
+    if ( it != m_SyncedData.end () )
+        return (SCustomData *)&it->second;
+
+    return NULL;
+}
+
+
+bool CCustomData::DeleteSynced ( const char* szName )
+{
+    // Find the item and delete it
+    std::map < std::string, SCustomData > :: iterator iter = m_SyncedData.find ( szName );
+    if ( iter != m_SyncedData.end () )
+    {
+        m_SyncedData.erase ( iter );
+        return true;
+    }
+
+    // Didn't exist
+    return false;
+}
+
+void CCustomData::UpdateSynced ( const char* szName, const CLuaArgument& Variable, class CLuaMain* pLuaMain, bool bSynchronized )
+{
+    if ( bSynchronized )
+    {
+        SCustomData* pDataSynced = GetSynced ( szName );
+        if ( pDataSynced )
+        {
+            pDataSynced->Variable = Variable;
+            pDataSynced->pLuaMain = pLuaMain;
+            pDataSynced->bSynchronized = bSynchronized;
+        }
+        else
+        {
+            SCustomData newData;
+            newData.Variable = Variable;
+            newData.pLuaMain = pLuaMain;
+            newData.bSynchronized = bSynchronized;
+            m_SyncedData [ szName ] = newData;
+        }
+    }
+    else
+    {
+        DeleteSynced ( szName );
+    }
+}
 // User-defined warnings
 #define __STR2__(x) #x
 #define __STR1__(x) __STR2__(x)
@@ -52,6 +103,7 @@ void CCustomData::Set ( const char* szName, const CLuaArgument& Variable, class 
         pData->Variable = Variable;
         pData->pLuaMain = pLuaMain;
         pData->bSynchronized = bSynchronized;
+        UpdateSynced ( szName, Variable, pLuaMain, bSynchronized );
     }
     else
     {
@@ -61,6 +113,7 @@ void CCustomData::Set ( const char* szName, const CLuaArgument& Variable, class 
         newData.pLuaMain = pLuaMain;
         newData.bSynchronized = bSynchronized;
         m_Data [ szName ] = newData;
+        UpdateSynced ( szName, Variable, pLuaMain, bSynchronized );
     }
 }
 
@@ -71,6 +124,7 @@ bool CCustomData::Delete ( const char* szName )
     std::map < std::string, SCustomData > :: iterator it = m_Data.find ( szName );
     if ( it != m_Data.end () )
     {
+        DeleteSynced ( szName );
         m_Data.erase ( it );
         return true;
     }
@@ -78,7 +132,6 @@ bool CCustomData::Delete ( const char* szName )
     // Didn't exist
     return false;
 }
-
 
 void CCustomData::DeleteAll ( class CLuaMain* pLuaMain )
 {
@@ -88,7 +141,16 @@ void CCustomData::DeleteAll ( class CLuaMain* pLuaMain )
     {
         // Delete it if they match
         if ( iter->second.pLuaMain == pLuaMain )
-            m_Data.erase ( iter );
+            m_Data.erase ( iter++ );
+        else
+            iter++;
+    }
+    iter = m_SyncedData.begin ();
+    while ( iter != m_SyncedData.end () )
+    {
+        // Delete it if they match
+        if ( iter->second.pLuaMain == pLuaMain )
+            m_SyncedData.erase ( iter++ );
         else
             iter++;
     }
@@ -98,7 +160,8 @@ void CCustomData::DeleteAll ( class CLuaMain* pLuaMain )
 void CCustomData::DeleteAll ( void )
 {
     // Delete all the items
-    m_Data.clear ();
+    m_Data.clear ( );
+    m_SyncedData.clear ( );
 }
 
 CXMLNode * CCustomData::OutputToXML ( CXMLNode * pNode )
@@ -135,13 +198,5 @@ CXMLNode * CCustomData::OutputToXML ( CXMLNode * pNode )
 
 unsigned short CCustomData::CountOnlySynchronized ( void )
 {
-    unsigned short usSynchronized = 0;
-    std::map < std::string, SCustomData > :: iterator iter = m_Data.begin ();
-    while ( iter != m_Data.end () ) {
-        if ( iter->second.bSynchronized ) { 
-            usSynchronized++;
-        } 
-        iter++; 
-    } 
-    return usSynchronized; 
+    return m_SyncedData.size ( ); 
 }
