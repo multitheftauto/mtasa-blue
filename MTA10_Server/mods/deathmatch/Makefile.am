@@ -187,6 +187,7 @@ LOGIC = \
 ./logic/lua/CLuaFunctionRef.cpp \
 ./logic/lua/CLuaMain.cpp \
 ./logic/lua/CLuaManager.cpp \
+./logic/lua/CLuaModule.cpp \
 ./logic/lua/CLuaModuleManager.cpp \
 ./logic/lua/CLuaTimer.cpp \
 ./logic/lua/CLuaTimerManager.cpp \

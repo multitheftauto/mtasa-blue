@@ -57,7 +57,7 @@ bool CLuaModule::_LoadModule ( void )
 
     if ( m_hModule == NULL )
     {
-        CLogger::LogPrintf ( "MODULE: Unable to find modules/%s (%s)!\n", szShortFileName.c_str(), dlerror() );
+        CLogger::LogPrintf ( "MODULE: Unable to find modules/%s (%s)!\n", m_szShortFileName.c_str(), dlerror() );
         return false;
     }
 #endif
@@ -74,15 +74,15 @@ bool CLuaModule::_LoadModule ( void )
     pfnInitFunc = ( InitModuleFunc ) ( dlsym ( m_hModule, "InitModule" ) );
     if ( dlerror () != NULL )
     {
-        CLogger::LogPrintf ( "MODULE: Unable to load modules/%s (%s)!\n", szShortFileName.c_str(), dlerror () );
+        CLogger::LogPrintf ( "MODULE: Unable to load modules/%s (%s)!\n", m_szShortFileName.c_str(), dlerror () );
         return false;
     }
 #endif
 
     // Initialise
+    m_FunctionInfo.szFileName = m_szShortFileName;
 #ifdef WIN32
     pfnInitFunc = ( InitModuleFunc ) ( GetProcAddress ( m_hModule, "InitModule" ) );
-    m_FunctionInfo.szFileName = ("%s",m_szShortFileName);
     m_FunctionInfo.DoPulse = ( DefaultModuleFunc ) ( GetProcAddress ( m_hModule, "DoPulse" ) );
     m_FunctionInfo.ShutdownModule = ( DefaultModuleFunc ) ( GetProcAddress ( m_hModule, "ShutdownModule" ) );
     m_FunctionInfo.RegisterFunctions = ( RegisterModuleFunc ) ( GetProcAddress ( m_hModule, "RegisterFunctions" ) );
@@ -218,7 +218,7 @@ bool CLuaModule::RegisterFunction ( lua_State * luaVM, const char *szFunctionNam
             lua_register ( luaVM, szFunctionName, Func );
             if ( !_DoesFunctionExist ( szFunctionName ) )
             {   // Check or it adds for each resource
-                m_Functions.push_back ( ("%s", szFunctionName ) );
+                m_Functions.push_back ( szFunctionName );
             }
         }
     } 
