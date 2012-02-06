@@ -1386,7 +1386,7 @@ bool CStaticFunctionDefinitions::SetElementInterior ( CElement* pElement, unsign
 bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsigned short usDimension, bool bBroadcast )
 {
     assert ( pElement );
-    RUN_CHILDREN ( *iter, usDimension, false );
+    RUN_CHILDREN SetElementDimension ( *iter, usDimension, false );
 
     if ( bBroadcast )
     {

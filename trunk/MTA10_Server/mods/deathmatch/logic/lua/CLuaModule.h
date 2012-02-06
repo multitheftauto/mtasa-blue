@@ -12,6 +12,10 @@
 
 // IMPLEMENTATION of Lua dynamic modules
 
+#ifndef WIN32
+    typedef void* HMODULE;
+#endif
+
 class CLuaModule;
 
 #ifndef __CLUAMODULE_H
