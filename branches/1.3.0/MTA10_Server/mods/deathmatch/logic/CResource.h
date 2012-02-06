@@ -61,51 +61,24 @@ public:
 
 private:
     std::string                     m_strFunctionName;
-    vector<std::string>             m_accessList;
     bool                            m_bHTTPAccess;
     bool                            m_bRestricted;
 
     eExportedFunctionType           m_ucType;
 
 public:
-                                    CExportedFunction ( const std::string& strFunctionName, const std::string& access, bool bHTTPAccess, eExportedFunctionType ucType, bool bRestricted )
+                                    CExportedFunction ( const std::string& strFunctionName, bool bHTTPAccess, eExportedFunctionType ucType, bool bRestricted )
                                     {
                                         m_ucType = ucType;
                                         m_strFunctionName = strFunctionName;
                                         m_bHTTPAccess = bHTTPAccess;
                                         m_bRestricted = bRestricted;
-                                        size_t leng = access.length ();
-                                        char szResourceName[MAX_RESOURCE_NAME_LENGTH] = {'\0'};
-                                        size_t s = 0;
-                                        for ( size_t i = 0; i < leng; i++ )
-                                        {
-                                            if ( access[i] != ',' )
-                                                szResourceName[s] = access[i];
-                                            else if ( strlen(szResourceName) != 0 )
-                                            {
-                                                m_accessList.push_back ( szResourceName );
-                                                szResourceName[0] = '\0';
-                                                s = 0;
-                                            }
-                                        }   
                                     }
 
     inline eExportedFunctionType    GetType ( void ) { return m_ucType; }
     inline const std::string&       GetFunctionName ( void ) { return m_strFunctionName; }
     inline bool                     IsHTTPAccessible ( void ) { return m_bHTTPAccess; }
     inline bool                     IsRestricted ( void ) { return m_bRestricted; };
-    inline bool                     IsOnAccessList ( char * strResourceName )
-    {
-        if ( m_accessList.size() == 0 )
-            return false;
-        vector < std::string > ::iterator iter = m_accessList.begin ();
-        for ( ; iter != m_accessList.end (); iter++ )
-        {
-            if ( (*iter).compare ( "*" ) == 0 || (*iter).compare ( strResourceName ) == 0 )
-                return true;
-        }
-        return false;
-    }
 };
 
 class CIncludedResources 
@@ -195,7 +168,7 @@ private:
     list<CResourceFile *>   m_resourceFiles;
     list<CResource *>       m_dependents; // resources that have "included" or loaded this one
     list<CElementGroup *>   m_elementGroups; // stores elements created by scripts in this resource
-    list<CExportedFunction *>   m_exportedFunctions;
+    list<CExportedFunction> m_exportedFunctions;
     list<CResource *>       m_temporaryIncludes; // started by startResource script command
     
     CElementGroup *         m_pDefaultElementGroup;
@@ -384,8 +357,8 @@ public:
     inline list < CResourceFile* >::iterator    IterEnd     ( void )        { return m_resourceFiles.end(); }
     inline unsigned short                       IterCount   ( void )        { return m_resourceFiles.size(); }
 
-    inline list < CExportedFunction* >::iterator    IterBeginExportedFunctions   ( void )        { return m_exportedFunctions.begin(); }
-    inline list < CExportedFunction* >::iterator    IterEndExportedFunctions     ( void )        { return m_exportedFunctions.end(); }
+    inline list < CExportedFunction >::iterator    IterBeginExportedFunctions   ( void )        { return m_exportedFunctions.begin(); }
+    inline list < CExportedFunction >::iterator    IterEndExportedFunctions     ( void )        { return m_exportedFunctions.end(); }
 
     static list < CResource* > m_StartedResources;
 

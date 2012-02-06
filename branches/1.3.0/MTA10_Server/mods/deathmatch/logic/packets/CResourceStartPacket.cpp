@@ -101,17 +101,17 @@ bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
         }
 
         // Loop through the exported functions
-        list < CExportedFunction* >::iterator iterExportedFunction = m_pResource->IterBeginExportedFunctions();
+        list < CExportedFunction >::iterator iterExportedFunction = m_pResource->IterBeginExportedFunctions();
         for ( ; iterExportedFunction != m_pResource->IterEndExportedFunctions (); iterExportedFunction++)
         {
             // Check to see if the exported function is 'client'
-            if ( ( *iterExportedFunction )->GetType () == CExportedFunction::EXPORTED_FUNCTION_TYPE_CLIENT )
+            if ( iterExportedFunction->GetType () == CExportedFunction::EXPORTED_FUNCTION_TYPE_CLIENT )
             {
                 // Write the Type of chunk to read (F - File, E - Exported Function)
                 BitStream.Write ( static_cast < unsigned char > ( 'E' ) ) ;
 
                 // Write the exported function
-                std::string strFunctionName = ( *iterExportedFunction )->GetFunctionName ();
+                std::string strFunctionName = iterExportedFunction->GetFunctionName ();
                 size_t sizeFunctionName = strFunctionName.length ();
 
                 BitStream.Write ( static_cast < unsigned char > ( sizeFunctionName ) );
