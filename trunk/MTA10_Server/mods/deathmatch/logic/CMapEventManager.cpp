@@ -44,7 +44,7 @@ bool CMapEventManager::Add ( CLuaMain* pLuaMain, const char* szName, const CLuaF
         // Make a new event
         CMapEvent* pEvent = new CMapEvent ( pLuaMain, szName, iLuaFunction, bPropagated, eventPriority, fPriorityMod );
         // Find place to insert
-        for ( std::list < CMapEvent* > ::const_iterator iter = m_Events.begin () ; iter != m_Events.end (); iter++ )
+        for ( std::list < CMapEvent* > ::iterator iter = m_Events.begin () ; iter != m_Events.end (); iter++ )
         {
             if ( pEvent->IsHigherPriorityThan ( *iter ) )
             {

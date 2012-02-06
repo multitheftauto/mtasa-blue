@@ -27,7 +27,7 @@ class CPlayer;
 #include "CPad.h"
 #include "CObject.h"
 #include "packets/CPacket.h"
-
+#include "packets/CPlayerStatsPacket.h"
 class CKeyBinds;
 class CPlayerCamera;
 
@@ -256,6 +256,8 @@ public:
 
     SScreenShotInfo&                            GetScreenShotInfo           ( void )                        { return m_ScreenShotInfo; }
 
+    CPlayerStatsPacket*                         GetPlayerStatsPacket        ( void )                        { return m_pPlayerStatsPacket; }
+    void                                        SetPlayerStat               ( unsigned short usID, float fValue );
 public:
 
     //
@@ -432,6 +434,8 @@ private:
     SString                                     m_strIP;
 
     SScreenShotInfo                             m_ScreenShotInfo;
+
+    CPlayerStatsPacket*                         m_pPlayerStatsPacket;
 };
 
 #endif

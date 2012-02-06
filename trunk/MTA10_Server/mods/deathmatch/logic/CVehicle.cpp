@@ -380,8 +380,13 @@ void CVehicle::GetRotation ( CVector & vecRotation )
 
 void CVehicle::GetRotationDegrees ( CVector & vecRotation )
 {
-    if ( m_pAttachedTo ) GetAttachedRotation ( vecRotation );
-    else vecRotation = m_vecRotationDegrees;
+    if ( m_pAttachedTo )
+    {
+        GetAttachedRotation ( vecRotation );
+        ConvertRadiansToDegrees ( vecRotation );
+    }
+    else
+        vecRotation = m_vecRotationDegrees;
 }
 
 

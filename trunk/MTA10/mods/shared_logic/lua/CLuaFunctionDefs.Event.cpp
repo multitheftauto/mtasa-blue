@@ -68,7 +68,7 @@ int CLuaFunctionDefs::AddEventHandler ( lua_State* luaVM )
     float fPriorityMod = 0;
     EEventPriorityType eventPriority;
     {
-        int iPos = strPriority.find_first_of ( "-+" );
+        uint iPos = strPriority.find_first_of ( "-+" );
         if ( iPos != SString::npos )
         {
             fPriorityMod = atof ( strPriority.SubStr ( iPos ) );

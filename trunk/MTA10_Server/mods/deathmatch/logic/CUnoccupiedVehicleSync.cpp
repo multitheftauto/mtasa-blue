@@ -256,10 +256,43 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                     if ( !pOccupant || !IS_PLAYER ( pOccupant ) )
                     {
                         // Apply the data to the vehicle
-                        if ( vehicle.data.bSyncPosition ) pVehicle->SetPosition ( vehicle.data.vecPosition );
-                        if ( vehicle.data.bSyncRotation ) pVehicle->SetRotationDegrees ( vehicle.data.vecRotation );
-                        if ( vehicle.data.bSyncVelocity ) pVehicle->SetVelocity ( vehicle.data.vecVelocity );
-                        if ( vehicle.data.bSyncTurnVelocity ) pVehicle->SetTurnSpeed ( vehicle.data.vecTurnVelocity );
+                        if ( vehicle.data.bSyncPosition ) 
+                        {
+                            const CVector& vecLastPosition = pVehicle->GetPosition ( );
+                            if ( fabs ( vecLastPosition.fX - vehicle.data.vecPosition.fX ) <= FLOAT_EPSILON &&
+                                fabs ( vecLastPosition.fY - vehicle.data.vecPosition.fY ) <= FLOAT_EPSILON &&
+                                fabs ( vecLastPosition.fZ - vehicle.data.vecPosition.fZ ) <= 0.1f )
+                            {
+                                vehicle.data.bSyncPosition = false;
+                            }
+                            pVehicle->SetPosition ( vehicle.data.vecPosition );
+                        }
+                        if ( vehicle.data.bSyncRotation )
+                        {
+                            CVector vecLastRotation;
+                            pVehicle->GetRotation ( vecLastRotation );
+                            if ( fabs ( vecLastRotation.fX - vehicle.data.vecRotation.fX ) <= MIN_ROTATION_DIFF &&
+                                fabs ( vecLastRotation.fY - vehicle.data.vecRotation.fY ) <= MIN_ROTATION_DIFF &&
+                                fabs ( vecLastRotation.fZ - vehicle.data.vecRotation.fZ ) <= MIN_ROTATION_DIFF )
+                            {
+                                vehicle.data.bSyncRotation = false;
+                            }
+                            pVehicle->SetRotationDegrees ( vehicle.data.vecRotation );
+                        }
+                        if ( vehicle.data.bSyncVelocity )
+                        {
+                            if ( fabs ( vehicle.data.vecVelocity.fX ) <= FLOAT_EPSILON &&
+                                fabs ( vehicle.data.vecVelocity.fY ) <= FLOAT_EPSILON &&
+                                fabs ( vehicle.data.vecVelocity.fZ ) <= 0.1f )
+                            {
+                                vehicle.data.bSyncVelocity = false;
+                            }
+                            pVehicle->SetVelocity ( vehicle.data.vecVelocity );
+                        }
+                        if ( vehicle.data.bSyncTurnVelocity ) 
+                        {
+                            pVehicle->SetTurnSpeed ( vehicle.data.vecTurnVelocity );
+                        }
 
                         // Less health than last time?
                         if ( vehicle.data.bSyncHealth )
@@ -377,6 +410,10 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                 }
                             }
                         }
+                        bool bEngineOn = pVehicle->IsEngineOn ( );
+                        bool bDerailed = pVehicle->IsDerailed ( );
+                        bool bInWater = pVehicle->IsInWater ( );
+
                         // Turn the engine on if it's on
                         pVehicle->SetEngineOn ( vehicle.data.bEngineOn );
 
@@ -389,8 +426,8 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                         // Run colpoint checks on vehicle
                         g_pGame->GetColManager()->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );
 
-                        // Send this sync
-                        data.bSend = true;
+                        // Send this sync if something important changed or one of the flags has changed since last sync.
+                        data.bSend = vehicle.HasChanged ( ) || ( bEngineOn != vehicle.data.bEngineOn || bDerailed != vehicle.data.bDerailed || bInWater != vehicle.data.bIsInWater );
                     }
                 }
             }

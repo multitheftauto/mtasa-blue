@@ -44,6 +44,9 @@ public:
 
     list < CPlayer * >          &GetPlayersList                  ( void )                    { return m_Players; }
 
+    static void                 StaticOnPlayerDelete            ( CPlayer* pPlayer );
+    void                        OnPlayerDelete                  ( CPlayer* pPlayer );
+
 protected:
     virtual void                CreateEntity                    ( CPlayer* pPlayer );
     virtual void                DestroyEntity                   ( CPlayer* pPlayer );
@@ -59,12 +62,15 @@ private:
     void                        AddPlayersBelow                 ( CElement* pElement, list < class CPlayer* >& Added );
     void                        RemovePlayersBelow              ( CElement* pElement, list < class CPlayer* >& Removed );
 
-    inline void                 AddPlayerReference              ( class CPlayer* pPlayer )      { m_Players.push_back ( pPlayer ); };
+    inline void                 AddPlayerReference              ( class CPlayer* pPlayer )      { m_Players.push_back ( pPlayer ); m_PlayersMap[ pPlayer->GetID ( ) ] = pPlayer; };
     void                        RemovePlayerReference           ( class CPlayer* pPlayer );
 
     list < class CPlayer* >     m_PlayersAdded;
     list < class CPlayer* >     m_PlayersRemoved;
     list < class CPlayer* >     m_Players;
+    map < ElementID, class CPlayer* >     m_PlayersMap;
+
+    static std::set < CPerPlayerEntity* > ms_AllPerPlayerEntityMap;
 };
 
 #endif

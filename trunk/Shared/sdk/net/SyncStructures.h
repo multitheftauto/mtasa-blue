@@ -773,9 +773,19 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
             bitStream.Write ( data.trailer );
         }
     }
-
+    bool HasChanged ( )
+    {
+        return ( data.bSyncPosition ||
+            data.bSyncRotation ||
+            data.bSyncVelocity ||
+            data.bSyncTurnVelocity ||
+            data.bSyncHealth ||
+            data.bSyncTrailer );
+    }
     struct
     {
+        // Update HasChanged when adding any bool flags that should always be synced if they change.
+        // Engine on/IsInWater/Derailed can be delta synced
         bool bSyncPosition : 1;
         bool bSyncRotation : 1;
         bool bSyncVelocity : 1;

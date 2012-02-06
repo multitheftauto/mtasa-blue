@@ -68,9 +68,6 @@ public:
     inline float                GetHealth               ( void )                        { return m_fHealth; }
     inline void                 SetHealth               ( float fHealth )               { m_fHealth = fHealth; }
 
-    inline bool                 IsBreakable             ( void )                        { return m_pObjectManager->IsBreakableModel ( m_usModel ) && m_bBreakable; }
-    inline void                 SetBreakable            ( bool bBreakable )             { m_bBreakable = bBreakable; }
-
     inline bool                 IsSyncable              ( void )                        { return m_bSyncable; }
     inline void                 SetSyncable             ( bool bSyncable )              { m_bSyncable = bSyncable; }
 
