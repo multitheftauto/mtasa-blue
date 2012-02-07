@@ -398,6 +398,9 @@ public:
     CHandlingEntry*             GetHandlingData         ( void );
     const CHandlingEntry*       GetOriginalHandlingData ( void )    { return m_pOriginalHandlingEntry; }
 
+    CElapsedTime                    GetLastPushTime         ( void )                      { return m_LastPushedTime; }
+    void                            ResetLastPushTime       ( void )                      { m_LastPushedTime.Reset ( ); }
+
 protected:
     void                        StreamIn                ( bool bInstantly );
     void                        StreamOut               ( void );
@@ -550,6 +553,8 @@ protected:
 
     unsigned char               m_ucVariation;
     unsigned char               m_ucVariation2;
+
+    CElapsedTime                m_LastPushedTime;
 
 public:
     CClientPlayer *             m_pLastSyncer;

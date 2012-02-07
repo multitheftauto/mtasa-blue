@@ -298,6 +298,9 @@ public:
     void                            GenerateHandlingData    ( void );
     CHandlingEntry*                 GetHandlingData         ( void )                      { return m_pHandlingEntry; }
 
+    CElapsedTime                    GetLastPushTime         ( void )                      { return m_LastPushedTime; }
+    void                            ResetLastPushTime       ( void )                      { m_LastPushedTime.Reset ( ); }
+
 private:
     class CVehicleManager*          m_pVehicleManager;
 
@@ -373,6 +376,8 @@ private:
 
     unsigned char                   m_ucVariant;
     unsigned char                   m_ucVariant2;
+
+    CElapsedTime                    m_LastPushedTime;
 
 public: // 'Safe' variables (that have no need for accessors)
     bool                            m_bDamageProof;

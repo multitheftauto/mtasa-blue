@@ -1132,6 +1132,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CUnoccupiedVehiclePushPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CUnoccupiedVehicleStartSyncPacket.cpp"
 						>
 					</File>
@@ -2346,6 +2350,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CServerTextItemPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CUnoccupiedVehiclePushPacket.h"
 						>
 					</File>
 					<File

@@ -3953,6 +3953,8 @@ bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehic
         CClientEntity * pVehicleClientEntity = m_pManager->FindEntity ( pColliderVehicle, true );
         if ( pVehicleClientEntity )
         {
+            CClientVehicle * pClientVehicle = static_cast < CClientVehicle * > ( pVehicleClientEntity );
+
             CEntity * pCollidedWithEntity = g_pGame->GetPools ( )->GetEntity ( (DWORD *)pCollidedWith );
             CClientEntity * pCollidedWithClientEntity = NULL;
             if ( pCollidedWithEntity )
@@ -3994,6 +3996,44 @@ bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehic
             Arguments.PushNumber ( iModelIndex );
 
             pVehicleClientEntity->CallEvent ( "onClientVehicleCollision", Arguments, true );
+            // Alocate a BitStream
+            NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+            if ( pBitStream->Version ( ) >= 0x028 )
+            {
+                // Sync Stuff
+                // if it's not a local vehicle + it collided with the local player
+                if ( pVehicleClientEntity->IsLocalEntity ( ) == false && 
+                    pCollidedWithClientEntity == g_pClientGame->GetLocalPlayer ( ) )
+                {
+                    CElapsedTime LastSyncerChange = pClientVehicle->GetLastPushTime ( );
+                    // is it below the anti spam threshold?
+                    if ( LastSyncerChange.Get ( ) >= MIN_PUSH_ANTISPAM_RATE )
+                    {
+                        // if there is no occupant.
+                        if ( pClientVehicle->GetOccupant ( 0 ) == NULL )
+                        {
+                            CDeathmatchVehicle* Vehicle = static_cast < CDeathmatchVehicle* > ( pVehicleClientEntity );
+                            // if We aren't already syncing the vehicle
+                            if ( GetUnoccupiedVehicleSync()->Exists ( Vehicle ) == false )
+                            {
+                                // Alocate a BitStream
+                                NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+                                // Make sure it created
+                                if ( pBitStream )
+                                {
+                                    // Write the vehicle ID
+                                    pBitStream->Write ( pVehicleClientEntity->GetID ( ) );
+                                    // Send!
+                                    g_pNet->SendPacket ( PACKET_ID_VEHICLE_PUSH_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
+                                    g_pNet->DeallocateNetBitStream ( pBitStream );
+                                    // Reset our push time
+                                    pClientVehicle->ResetLastPushTime ( );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             return true;
         }
     }

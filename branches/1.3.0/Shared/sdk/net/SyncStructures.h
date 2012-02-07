@@ -2064,4 +2064,33 @@ struct sWeaponPropertySync : public ISyncStructure
     } data;
 };
 
+//////////////////////////////////////////
+//                                      //
+//     Unoccupied vehicle push sync     //
+//                                      //
+//////////////////////////////////////////
+struct SUnoccupiedPushSync : public ISyncStructure
+{
+    SUnoccupiedPushSync () { *((char *)&data) = 0; }
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        if ( bitStream.Read ( data.vehicleID ) )
+        {
+            return true;
+        }
+        return false;
+    }
+
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.Write ( data.vehicleID );
+    }
+
+    struct
+    {
+        ElementID vehicleID;
+    } data;
+};
+
 #pragma pack(pop)

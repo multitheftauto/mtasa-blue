@@ -99,6 +99,7 @@ struct SAclRequest;
 #include "packets/CUnoccupiedVehicleStartSyncPacket.h"
 #include "packets/CUnoccupiedVehicleStopSyncPacket.h"
 #include "packets/CUnoccupiedVehicleSyncPacket.h"
+#include "packets/CUnoccupiedVehiclePushPacket.h"
 #include "packets/CVehicleDamageSyncPacket.h"
 #include "packets/CVehicleInOutPacket.h"
 #include "packets/CVehiclePuresyncPacket.h"
