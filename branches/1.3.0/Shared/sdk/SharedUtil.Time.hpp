@@ -117,28 +117,61 @@ SString SharedUtil::GetLocalTimeString ( bool bDate, bool bMilliseconds )
     return GetTimeString ( bDate, bMilliseconds, true );
 }
 
+
 namespace SharedUtil
 {
-    long long gCurrentTickCount64 = 0;
+    //
+    // ModuleTickCount is a per-module cached tickcount value
+    //
+    class CPerModuleTickCount
+    {
+    public:
+        CPerModuleTickCount ( void )
+        {
+            m_llCurrentTickCount = GetTickCount64_ ();
+        }
+    
+        long long Get ( void )
+        {
+            m_ModuleTickCountCS.Lock ();
+    #ifdef _DEBUG
+            if ( m_TimeSinceUpdated.Get () > 10000 )
+                OutputDebugLine ( "WARNING: UpdateModuleTickCount64 not being called for the current module" );
+    #endif
+            long long result = m_llCurrentTickCount;
+            m_ModuleTickCountCS.Unlock ();
+            return result;
+        }
+    
+        void Update ( void )
+        {
+            m_ModuleTickCountCS.Lock ();
+    #ifdef _DEBUG
+            m_TimeSinceUpdated.Reset ();
+    #endif
+            m_llCurrentTickCount = GetTickCount64_ ();
+            m_ModuleTickCountCS.Unlock ();
+        }
+    
+    protected:
+        CCriticalSection m_ModuleTickCountCS;
+        long long        m_llCurrentTickCount;
+    #ifdef _DEBUG
+        CElapsedTime     m_TimeSinceUpdated;
+    #endif
+    };
+
+    CPerModuleTickCount ms_PerModuleTickCount;
 }
 
 long long SharedUtil::GetModuleTickCount64 ( void )
 {
-    static CCriticalSection criticalSection;
-    criticalSection.Lock ();
-
-    if ( !gCurrentTickCount64 )
-        UpdateModuleTickCount64 ();
-
-    long long result = gCurrentTickCount64;
-
-    criticalSection.Unlock ();
-    return result;
+    return ms_PerModuleTickCount.Get ();
 }
 
 void SharedUtil::UpdateModuleTickCount64 ( void )
 {
-    gCurrentTickCount64 = GetTickCount64_ ();
+    return ms_PerModuleTickCount.Update ();
 }
 
 

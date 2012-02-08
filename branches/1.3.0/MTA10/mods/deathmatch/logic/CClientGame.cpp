@@ -734,6 +734,8 @@ void CClientGame::DoPulsePostFrame ( void )
         g_pCore->GetGraphics ()->DrawTextTTF ( 300, 320, 1280, 800, 0xFFFFFFFF, strBuffer, 1.0f, 0 );
     #endif
 
+    UpdateModuleTickCount64 ();
+
     if ( m_pManager->IsGameLoaded () )
     {
         // Pulse the nametags before anything that changes player positions, we'll be 1 frame behind, but so is the camera
