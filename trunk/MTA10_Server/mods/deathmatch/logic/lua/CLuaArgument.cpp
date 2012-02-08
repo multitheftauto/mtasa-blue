@@ -575,7 +575,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
                 uint uiLength;
                 if ( bitStream.ReadCompressed ( uiLength ) && uiLength )
                 {
-                    bitStream.AlignWriteToByteBoundary ();
+                    bitStream.AlignReadToByteBoundary ();
 
                     // Allocate a buffer and read the string into it
                     char* szValue = new char [ uiLength + 1 ];
