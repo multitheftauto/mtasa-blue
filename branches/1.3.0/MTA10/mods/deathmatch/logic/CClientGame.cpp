@@ -4010,9 +4010,8 @@ bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehic
                     if ( pVehicleClientEntity->IsLocalEntity ( ) == false && 
                         pCollidedWithClientEntity == g_pClientGame->GetLocalPlayer ( ) )
                     {
-                        CElapsedTime& LastSyncerChange = pClientVehicle->GetLastPushTime ( );
                         // is it below the anti spam threshold?
-                        if ( LastSyncerChange.Get ( ) >= MIN_PUSH_ANTISPAM_RATE )
+                        if ( pClientVehicle->GetTimeSinceLastPush ( ) >= MIN_PUSH_ANTISPAM_RATE )
                         {
                             // if there is no occupant.
                             if ( pClientVehicle->GetOccupant ( 0 ) == NULL )

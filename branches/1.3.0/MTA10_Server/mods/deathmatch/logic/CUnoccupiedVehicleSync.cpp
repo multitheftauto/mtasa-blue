@@ -454,10 +454,9 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehiclePushSync ( CUnoccupiedVehic
         {
             // Convert to a CVehicle
             CVehicle* pVehicle = static_cast < CVehicle* > ( pVehicleElement );
-            CElapsedTime& LastSyncerChange = pVehicle->GetLastPushTime ( );
             // Is the player syncing this vehicle and there is no driver? Also only process
             // this packet if the time context matches.
-            if ( pVehicle->GetSyncer () != pPlayer && LastSyncerChange.Get ( ) >= MIN_PUSH_ANTISPAM_RATE )
+            if ( pVehicle->GetSyncer () != pPlayer && pVehicle->GetTimeSinceLastPush ( ) >= MIN_PUSH_ANTISPAM_RATE )
             {
                 // Is there no player driver?
                 CPed * pOccupant = pVehicle->GetOccupant ( 0 );
