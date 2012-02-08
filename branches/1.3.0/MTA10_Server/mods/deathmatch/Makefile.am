@@ -256,6 +256,7 @@ LOGIC = \
 ./logic/packets/CReturnSyncPacket.cpp \
 ./logic/packets/CServerTextItemPacket.cpp \
 ./logic/packets/CUpdateInfoPacket.cpp \
+./logic/packets/CUnoccupiedVehiclePushPacket.cpp \
 ./logic/packets/CUnoccupiedVehicleStartSyncPacket.cpp \
 ./logic/packets/CUnoccupiedVehicleSyncPacket.cpp \
 ./logic/packets/CVehicleDamageSyncPacket.cpp \
