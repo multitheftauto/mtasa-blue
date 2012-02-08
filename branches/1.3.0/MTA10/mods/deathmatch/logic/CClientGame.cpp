@@ -557,7 +557,7 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
             pBitStream->Write ( strUser.c_str (), MAX_SERIAL_LENGTH );
 
             // Send the packet as joindata
-            g_pNet->SendPacket ( PACKET_ID_PLAYER_JOINDATA, pBitStream );
+            g_pNet->SendPacket ( PACKET_ID_PLAYER_JOINDATA, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
             g_pNet->DeallocateNetBitStream ( pBitStream );
 
             return true;
@@ -920,7 +920,7 @@ void CClientGame::DoPulses ( void )
                 NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
                 pBitStream->Write ( uiLevel );
                 pBitStream->WriteString ( strMessageCombo );
-                g_pNet->SendPacket ( PACKET_ID_PLAYER_TRANSGRESSION, pBitStream );
+                g_pNet->SendPacket ( PACKET_ID_PLAYER_TRANSGRESSION, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
                 g_pNet->DeallocateNetBitStream ( pBitStream );
             }
             else
@@ -945,7 +945,7 @@ void CClientGame::DoPulses ( void )
             m_strLastDiagnosticStatus = strMessage;
             NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
             pBitStream->WriteString ( strMessage );
-            g_pNet->SendPacket ( PACKET_ID_PLAYER_DIAGNOSTIC, pBitStream );
+            g_pNet->SendPacket ( PACKET_ID_PLAYER_DIAGNOSTIC, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
             g_pNet->DeallocateNetBitStream ( pBitStream );
         }
     }
@@ -4023,7 +4023,7 @@ bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehic
                                     // Write the vehicle ID
                                     pBitStream->Write ( pVehicleClientEntity->GetID ( ) );
                                     // Send!
-                                    g_pNet->SendPacket ( PACKET_ID_VEHICLE_PUSH_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
+                                    g_pNet->SendPacket ( PACKET_ID_VEHICLE_PUSH_SYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
                                     // Reset our push time
                                     pClientVehicle->ResetLastPushTime ( );
                                 }
@@ -5327,7 +5327,7 @@ void CClientGame::TakePlayerScreenShot ( uint uiSizeX, uint uiSizeY, const SStri
         pBitStream->Write ( uiServerSentTime );
         pBitStream->WriteString ( strResourceName );
         pBitStream->WriteString ( strTag );
-        g_pNet->SendPacket ( PACKET_ID_PLAYER_SCREENSHOT, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_CHAT );
+        g_pNet->SendPacket ( PACKET_ID_PLAYER_SCREENSHOT, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DATA_TRANSFER );
         g_pNet->DeallocateNetBitStream ( pBitStream );
     }
     else

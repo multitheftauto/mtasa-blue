@@ -176,7 +176,7 @@ bool CStaticFunctionDefinitions::TriggerServerEvent ( const char* szName, CClien
             g_pNet->DeallocateNetBitStream ( pBitStream );
             return false;
         }
-        g_pNet->SendPacket ( PACKET_ID_LUA_EVENT, pBitStream );
+        g_pNet->SendPacket ( PACKET_ID_LUA_EVENT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
         g_pNet->DeallocateNetBitStream ( pBitStream );
 
         return true;
@@ -938,7 +938,7 @@ bool CStaticFunctionDefinitions::SetElementData ( CClientEntity& Entity, const c
                 Variable.WriteToBitStream ( *pBitStream );
 
                 // Send the packet and deallocate
-                g_pNet->SendPacket ( PACKET_ID_CUSTOM_DATA, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE, PACKET_ORDERING_CHAT );
+                g_pNet->SendPacket ( PACKET_ID_CUSTOM_DATA, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
                 g_pNet->DeallocateNetBitStream ( pBitStream );
 
                 // Set its custom data

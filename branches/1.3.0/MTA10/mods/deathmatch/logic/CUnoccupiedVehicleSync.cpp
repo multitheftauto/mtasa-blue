@@ -257,7 +257,7 @@ void CUnoccupiedVehicleSync::UpdateStates ( void )
 
             // Send and destroy the packet
             if ( bAnyVehicleAdded )
-                g_pNet->SendPacket ( PACKET_ID_UNOCCUPIED_VEHICLE_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
+                g_pNet->SendPacket ( PACKET_ID_UNOCCUPIED_VEHICLE_SYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
             g_pNet->DeallocateNetBitStream ( pBitStream );
         }
     }

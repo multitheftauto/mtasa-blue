@@ -22,7 +22,7 @@ public:
     inline                      CUnoccupiedVehiclePushPacket       ( void )                                         {};
 
     inline ePacketID            GetPacketID                     ( void ) const                                      { return PACKET_ID_VEHICLE_PUSH_SYNC; };
-    inline unsigned long        GetFlags                        ( void ) const                                      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline unsigned long        GetFlags                        ( void ) const                                      { return 0; };  // Not used
 
     bool                        Read                                    ( NetBitStreamInterface& BitStream );
 

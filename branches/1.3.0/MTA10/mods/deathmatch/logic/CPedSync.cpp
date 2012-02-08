@@ -240,7 +240,7 @@ void CPedSync::Update ( void )
             }
 
             // Send and destroy the packet
-            g_pNet->SendPacket ( PACKET_ID_PED_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
+            g_pNet->SendPacket ( PACKET_ID_PED_SYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
             g_pNet->DeallocateNetBitStream ( pBitStream );
         }
     }

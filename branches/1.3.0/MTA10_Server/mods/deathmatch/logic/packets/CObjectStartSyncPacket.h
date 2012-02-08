@@ -21,7 +21,7 @@ public:
     inline                  CObjectStartSyncPacket                  ( CObject* pObject )                        { m_pObject = pObject; };
 
     inline ePacketID                GetPacketID                     ( void ) const                  { return PACKET_ID_OBJECT_STARTSYNC; };
-    inline unsigned long            GetFlags                        ( void ) const                  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline unsigned long            GetFlags                        ( void ) const                  { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Write                                   ( NetBitStreamInterface& BitStream ) const;
 

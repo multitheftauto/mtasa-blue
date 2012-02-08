@@ -38,7 +38,7 @@ public:
                             ~CPedSyncPacket                         ( void );
             
     inline ePacketID                GetPacketID                     ( void ) const                  { return PACKET_ID_PED_SYNC; };
-    inline unsigned long            GetFlags                        ( void ) const                  { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
+    inline unsigned long            GetFlags                        ( void ) const                  { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 
     bool                    Read                                    ( NetBitStreamInterface& BitStream );
     bool                    Write                                   ( NetBitStreamInterface& BitStream ) const;
