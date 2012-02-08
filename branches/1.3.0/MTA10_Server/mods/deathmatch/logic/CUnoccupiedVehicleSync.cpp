@@ -276,9 +276,9 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                         {
                             CVector vecLastRotation;
                             pVehicle->GetRotation ( vecLastRotation );
-                            if ( fabs ( vecLastRotation.fX - vehicle.data.vecRotation.fX ) <= MIN_ROTATION_DIFF &&
-                                fabs ( vecLastRotation.fY - vehicle.data.vecRotation.fY ) <= MIN_ROTATION_DIFF &&
-                                fabs ( vecLastRotation.fZ - vehicle.data.vecRotation.fZ ) <= MIN_ROTATION_DIFF )
+                            if ( GetSmallestWrapUnsigned ( vecLastRotation.fX - vehicle.data.vecRotation.fX, 360 ) <= MIN_ROTATION_DIFF &&
+                                GetSmallestWrapUnsigned ( vecLastRotation.fY - vehicle.data.vecRotation.fY, 360 ) <= MIN_ROTATION_DIFF &&
+                                GetSmallestWrapUnsigned ( vecLastRotation.fZ - vehicle.data.vecRotation.fZ, 360 ) <= MIN_ROTATION_DIFF )
                             {
                                 vehicle.data.bSyncRotation = false;
                             }
@@ -454,7 +454,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehiclePushSync ( CUnoccupiedVehic
         {
             // Convert to a CVehicle
             CVehicle* pVehicle = static_cast < CVehicle* > ( pVehicleElement );
-            CElapsedTime LastSyncerChange = pVehicle->GetLastPushTime ( );
+            CElapsedTime& LastSyncerChange = pVehicle->GetLastPushTime ( );
             // Is the player syncing this vehicle and there is no driver? Also only process
             // this packet if the time context matches.
             if ( pVehicle->GetSyncer () != pPlayer && LastSyncerChange.Get ( ) >= MIN_PUSH_ANTISPAM_RATE )

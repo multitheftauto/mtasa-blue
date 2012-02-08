@@ -298,7 +298,7 @@ public:
     void                            GenerateHandlingData    ( void );
     CHandlingEntry*                 GetHandlingData         ( void )                      { return m_pHandlingEntry; }
 
-    CElapsedTime                    GetLastPushTime         ( void )                      { return m_LastPushedTime; }
+    CElapsedTime&                   GetLastPushTime         ( void )                      { return m_LastPushedTime; }
     void                            ResetLastPushTime       ( void )                      { m_LastPushedTime.Reset ( ); }
 
 private:

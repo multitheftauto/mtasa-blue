@@ -126,6 +126,8 @@ namespace SharedUtil
         }
 
     protected:
+        CElapsedTime ( const CElapsedTime& );       // Not implemented
+
         long long DoGetTickCount ( void )
         {
             return m_bUseModuleTickCount ? GetModuleTickCount64 () : GetTickCount64_ ();

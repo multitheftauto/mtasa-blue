@@ -76,12 +76,21 @@ struct SDelayedSyncVehicleData
 
 struct SLastSyncedVehData
 {
+    SLastSyncedVehData ( void )
+    {
+        // Initialize to a known state
+        memset ( this, 0, sizeof ( *this ) );
+    }
+
     CVector             vecPosition;
     CVector             vecRotation;
     CVector             vecMoveSpeed;
     CVector             vecTurnSpeed;
     float               fHealth;
     ElementID           Trailer;
+    bool                bEngineOn;
+    bool                bDerailed;
+    bool                bIsInWater;
 };
 
 class CClientProjectile;
@@ -398,7 +407,7 @@ public:
     CHandlingEntry*             GetHandlingData         ( void );
     const CHandlingEntry*       GetOriginalHandlingData ( void )    { return m_pOriginalHandlingEntry; }
 
-    CElapsedTime                    GetLastPushTime         ( void )                      { return m_LastPushedTime; }
+    CElapsedTime&                   GetLastPushTime         ( void )                      { return m_LastPushedTime; }
     void                            ResetLastPushTime       ( void )                      { m_LastPushedTime.Reset ( ); }
 
 protected:
