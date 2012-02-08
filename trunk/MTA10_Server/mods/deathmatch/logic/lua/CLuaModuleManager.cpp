@@ -33,7 +33,6 @@ CLuaModuleManager::~CLuaModuleManager ( void )
     for ( ; iter != m_Modules.end (); iter++ )
     {
         delete *iter;
-        //m_Modules.remove ( *iter );
     }
 }
 
@@ -64,18 +63,29 @@ void CLuaModuleManager::DoPulse ( void )
 }
 
 
-bool CLuaModuleManager::LoadModule ( const char *szShortFileName, const char *szFileName, bool bLateLoad )
-{
+int CLuaModuleManager::LoadModule ( const char *szShortFileName, const char *szFileName, bool bLateLoad )
+{   // 0 = Success, 1 = Can't find file, 2 = Can't initialise, 3 = Already loaded
     // bLateLoad specified whether this is a module that was loaded "late" (after startup)
     // and we need to register all it's functions to all available VM's
+
+    // Check if the module is already loaded
+    list < CLuaModule* > ::iterator iter = m_Modules.begin ();
+    for ( ; iter != m_Modules.end (); iter++ )
+    {
+        if ( strcmp ( (*iter)->_GetName().c_str(), szShortFileName ) == 0 )
+        {
+            return 3;
+        }
+    }
 
     // Initialize
     CLuaModule* pModule = new CLuaModule ( this, m_pScriptDebugging, szFileName, szShortFileName );
     // Load the module
-    if ( !pModule->_LoadModule () )
+    int iSuccess = pModule->_LoadModule ();
+    if ( iSuccess != 0 )
     {
         delete pModule;
-        return false;
+        return iSuccess;
     }
     
     m_Modules.push_back ( pModule );
@@ -91,25 +101,25 @@ bool CLuaModuleManager::LoadModule ( const char *szShortFileName, const char *sz
         }
     }
 
-    return true;
+    return iSuccess;
 }
 
 
-bool CLuaModuleManager::ReloadModule ( const char *szShortFileName, const char *szFileName, bool bLateLoad )
-{
+int CLuaModuleManager::ReloadModule ( const char *szShortFileName, const char *szFileName, bool bLateLoad )
+{   // 0 = Success, 1 = Can't find file (load), 2 = Can't initialise, 4 = Can't find module by name (unload)
     // Unload module
-    bool bUnloaded = UnloadModule ( szShortFileName );
+    int iUnloaded = UnloadModule ( szShortFileName );
     
     // If it fails to unload, don't attempt to load again
-    if (!bUnloaded) return false;
+    if ( iUnloaded != 0 ) return iUnloaded;
 
     // Load module
     return LoadModule ( szShortFileName, szFileName, bLateLoad );    
 }
 
 
-bool CLuaModuleManager::UnloadModule ( const char* szShortFileName )
-{
+int CLuaModuleManager::UnloadModule ( const char* szShortFileName )
+{   // 0 = Success, 4 = Can't find module by name
     list < CLuaModule* > ::iterator iter = m_Modules.begin ();
     for ( ; iter != m_Modules.end (); iter++ )
     {
@@ -117,10 +127,10 @@ bool CLuaModuleManager::UnloadModule ( const char* szShortFileName )
         {
             delete *iter;
             m_Modules.remove ( *iter );
-            return true;
+            return 0;
         }
     }
-    return false;
+    return 4;
 }
 
 
