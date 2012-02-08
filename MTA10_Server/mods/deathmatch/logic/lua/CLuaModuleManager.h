@@ -36,11 +36,11 @@ public:
 
     // functions for deathmatch
     void                    DoPulse                 ( void );
-    bool                    LoadModule              ( const char *szShortFileName, const char *szFileName, bool bLateLoad );
+    int                     LoadModule              ( const char *szShortFileName, const char *szFileName, bool bLateLoad );
     void                    SetScriptDebugging      ( CScriptDebugging* pScriptDebugging );
     void                    RegisterFunctions       ( lua_State * luaVM );
-    bool                    UnloadModule            ( const char *szShortFileName );
-    bool                    ReloadModule            ( const char *szShortFileName, const char *szFileName, bool bLateLoad );
+    int                     UnloadModule            ( const char *szShortFileName );
+    int                     ReloadModule            ( const char *szShortFileName, const char *szFileName, bool bLateLoad );
     void                    ResourceStopping        ( lua_State * luaVM );
     void                    ResourceStopped         ( lua_State * luaVM );
 

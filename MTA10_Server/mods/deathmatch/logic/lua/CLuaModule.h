@@ -67,7 +67,7 @@ public:
     lua_State*              GetResourceFromName     ( const char* szResourceName );
 
     // functions for deathmatch
-    bool                    _LoadModule             ( void );
+    int                     _LoadModule             ( void );
     void                    _UnloadModule           ( void );
     void                    _RegisterFunctions      ( lua_State * luaVM );
     void                    _UnregisterFunctions    ( void );
@@ -87,6 +87,7 @@ private:
     FunctionInfo        m_FunctionInfo;
     HMODULE             m_hModule;
     vector < SString >  m_Functions;
+    bool                m_bInitialised;
 
     CScriptDebugging*   m_pScriptDebugging;
     CLuaModuleManager*  m_pLuaModuleManager;

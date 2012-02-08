@@ -1870,7 +1870,7 @@ bool CConsoleCommands::Help ( CConsole* pConsole, const char* szArguments, CClie
 
 
 bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
-{
+{   // 0 = Success, 1 = Can't find file, 2 = Can't initialise, 3 = Already loaded
     if ( szArguments && szArguments[0] )
     {
         if ( pClient->GetNick () )
@@ -1879,10 +1879,25 @@ bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments,
         SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
 
         // These modules are late loaded
-        if ( !g_pGame->GetLuaManager ()->GetLuaModuleManager ()->LoadModule ( szArguments, strFilename, true ) )
+        int iSuccess = g_pGame->GetLuaManager ()->GetLuaModuleManager ()->LoadModule ( szArguments, strFilename, true );
+        switch ( iSuccess )
         {
-                pEchoClient->SendConsole ( "loadmodule: module failed to load" );
+            case 1:
+            {
+                pEchoClient->SendConsole ( "loadmodule: Couldn't find module" );
                 return true;
+            }
+            case 2:
+            {
+                pEchoClient->SendConsole ( "loadmodule: Couldn't initialise module" );
+                return true;
+            }
+            case 3:
+            {
+                pEchoClient->SendConsole ( "loadmodule: Module already loaded" );
+                return true;
+            }
+            default: break;
         }
     }
     else
@@ -1893,15 +1908,15 @@ bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments,
 
 
 bool CConsoleCommands::UnloadModule ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
-{
+{   // 0 = Success, 4 = Can't find module by name
     if ( szArguments && szArguments[0] )
     {
         if ( pClient->GetNick () )
             CLogger::LogPrintf ( "unloadmodule: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
 
-        if ( !g_pGame->GetLuaManager()->GetLuaModuleManager()->UnloadModule ( szArguments ) )
+        if ( g_pGame->GetLuaManager()->GetLuaModuleManager()->UnloadModule ( szArguments ) != 0 )
         {
-                pEchoClient->SendConsole ( "unloadmodule: module failed to unload" );
+                pEchoClient->SendConsole ( "unloadmodule: Couldn't find a module by that name" );
                 return true;
         }
     }
@@ -1913,7 +1928,7 @@ bool CConsoleCommands::UnloadModule ( CConsole* pConsole, const char* szArgument
 
 
 bool CConsoleCommands::ReloadModule ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
-{
+{   // 0 = Success, 1 = Can't find file (load), 2 = Can't initialise, 4 = Can't find module by name (unload)
     if ( szArguments && szArguments[0] )
     {
         if ( pClient->GetNick () )
@@ -1921,10 +1936,25 @@ bool CConsoleCommands::ReloadModule ( CConsole* pConsole, const char* szArgument
 
         SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
 
-        if ( !g_pGame->GetLuaManager()->GetLuaModuleManager()->ReloadModule ( szArguments, strFilename, true ) )
+        int iSuccess = g_pGame->GetLuaManager()->GetLuaModuleManager()->ReloadModule ( szArguments, strFilename, true );
+        switch ( iSuccess )
         {
-            pEchoClient->SendConsole ( "reloadmodule: module failed to reload" );
+            case 1:
+            {
+                pEchoClient->SendConsole ( "reloadmodule: Couldn't find module during load" );
                 return true;
+            }
+            case 2:
+            {
+                pEchoClient->SendConsole ( "reloadmodule: Couldn't initialise module" );
+                return true;
+            }
+            case 4:
+            {
+                pEchoClient->SendConsole ( "reloadmodule: Couldn't find a module by that name" );
+                return true;
+            }
+            default:;
         }
     }
     else

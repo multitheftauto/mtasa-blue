@@ -23,25 +23,33 @@ CLuaModule::CLuaModule ( CLuaModuleManager* pLuaModuleManager, CScriptDebugging*
     // set module path
     m_szFileName = SString ("%s",szFileName);
     m_szShortFileName = SString ("%s",szShortFileName);
+    // set as uninitialised
+    m_bInitialised = false;
 }
 
 
 CLuaModule::~CLuaModule ( void )
 {
-    // Shutdown module
-    m_FunctionInfo.ShutdownModule ();
+    if ( m_hModule )
+    {
+        if ( m_bInitialised )
+        {
+            // Shutdown module
+            m_FunctionInfo.ShutdownModule ();
 
-    // Unregister Functions
-    _UnregisterFunctions ();
+            // Unregister Functions
+            _UnregisterFunctions ();
 
-    // Unload Module
-    _UnloadModule ();
+            CLogger::LogPrintf ("MODULE: Unloaded \"%s\" (%.2f) by \"%s\"\n", m_FunctionInfo.szModuleName, m_FunctionInfo.fVersion, m_FunctionInfo.szAuthor);
+        }
 
-    CLogger::LogPrintf ("MODULE: Unloaded \"%s\" (%.2f) by \"%s\"\n", m_FunctionInfo.szModuleName, m_FunctionInfo.fVersion, m_FunctionInfo.szAuthor);
+        // Unload Module
+        _UnloadModule ();
+    }
 }
 
 
-bool CLuaModule::_LoadModule ( void )
+int CLuaModule::_LoadModule ( void )
 {
     InitModuleFunc pfnInitFunc;
     // Load Module
@@ -50,7 +58,7 @@ bool CLuaModule::_LoadModule ( void )
     if ( m_hModule == NULL )
     {
         CLogger::LogPrintf ( "MODULE: Unable to find modules/%s!\n", m_szShortFileName.c_str() );
-        return false;
+        return 1;
     }
 #else
     m_hModule = dlopen ( m_szFileName, RTLD_NOW );
@@ -58,7 +66,7 @@ bool CLuaModule::_LoadModule ( void )
     if ( m_hModule == NULL )
     {
         CLogger::LogPrintf ( "MODULE: Unable to find modules/%s (%s)!\n", m_szShortFileName.c_str(), dlerror() );
-        return false;
+        return 1;
     }
 #endif
 
@@ -68,14 +76,14 @@ bool CLuaModule::_LoadModule ( void )
     if ( pfnInitFunc == NULL )
     {
         CLogger::LogPrintf ( "MODULE: Unable to load modules/%s!\n", m_szShortFileName.c_str() );
-        return false;
+        return 2;
     }
 #else
     pfnInitFunc = ( InitModuleFunc ) ( dlsym ( m_hModule, "InitModule" ) );
     if ( dlerror () != NULL )
     {
         CLogger::LogPrintf ( "MODULE: Unable to load modules/%s (%s)!\n", m_szShortFileName.c_str(), dlerror () );
-        return false;
+        return 2;
     }
 #endif
 
@@ -100,10 +108,11 @@ bool CLuaModule::_LoadModule ( void )
 #endif
     // Run initialisation function
     pfnInitFunc( this, &m_FunctionInfo.szModuleName[0], &m_FunctionInfo.szAuthor[0], &m_FunctionInfo.fVersion );
+    m_bInitialised = true;
 
     CLogger::LogPrintf ("MODULE: Loaded \"%s\" (%.2f) by \"%s\"\n", m_FunctionInfo.szModuleName, m_FunctionInfo.fVersion, m_FunctionInfo.szAuthor);
 
-    return true;
+    return 0;
 }
 
 
