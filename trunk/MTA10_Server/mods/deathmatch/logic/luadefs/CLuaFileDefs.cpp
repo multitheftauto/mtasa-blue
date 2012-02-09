@@ -69,32 +69,18 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
                     MakeSureDirExists ( strAbsPath.c_str () );
 
                     // Create the file to create
-                    CScriptFile* pFile = new CScriptFile ( pResource, strSubPath.c_str (), DEFAULT_MAX_FILESIZE );
+                    CScriptFile* pFile = new CScriptFile ( NULL, strSubPath.c_str (), DEFAULT_MAX_FILESIZE );
                     assert ( pFile );
 
                     // Try to load it
                     if ( pFile->Load ( CScriptFile::MODE_CREATE ) )
                     {
-                        // Make it a child of the resource's file root
-                        pFile->SetParentObject ( pResource->GetDynamicElementRoot () );
-
-                        // Grab its owner resource
-                        CResource* pParentResource = pLuaMain->GetResource ();
-                        if ( pParentResource )
+                        // Add it to the scrpt resource element group
+                        CElementGroup* pGroup = pThisResource->GetElementGroup ();
+                        if ( pGroup )
                         {
-                            // Add it to the scrpt resource element group
-                            CElementGroup* pGroup = pParentResource->GetElementGroup ();
-                            if ( pGroup )
-                            {
-                                pGroup->Add ( pFile );
-                            }
+                            pGroup->Add ( pFile );
                         }
-
-                        // Tell the clients about it. This is because other elements might get
-                        // parented below this one.
-                        CEntityAddPacket Packet;
-                        Packet.Add ( pFile );
-                        m_pPlayerManager->BroadcastOnlyJoined ( Packet );
 
                         // Success. Return the file.
                         lua_pushelement ( luaVM, pFile );
@@ -206,33 +192,19 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
                 {
 
                     // Create the file to create
-                    CScriptFile* pFile = new CScriptFile ( pResource, strSubPath.c_str (), DEFAULT_MAX_FILESIZE );
+                    CScriptFile* pFile = new CScriptFile ( NULL, strSubPath.c_str (), DEFAULT_MAX_FILESIZE );
                     assert ( pFile );
 
                     // Try to load it
                     if ( ( bReadOnly && pFile->Load ( CScriptFile::MODE_READ ) ) ||
                         ( !bReadOnly && pFile->Load ( CScriptFile::MODE_READWRITE ) ) )
                     {
-                        // Make it a child of the resource's file root
-                        pFile->SetParentObject ( pResource->GetDynamicElementRoot () );
-
-                        // Grab its owner resource
-                        CResource* pParentResource = pLuaMain->GetResource ();
-                        if ( pParentResource )
+                        // Add it to the scrpt resource element group
+                        CElementGroup* pGroup = pThisResource->GetElementGroup ();
+                        if ( pGroup )
                         {
-                            // Add it to the scrpt resource element group
-                            CElementGroup* pGroup = pParentResource->GetElementGroup ();
-                            if ( pGroup )
-                            {
-                                pGroup->Add ( pFile );
-                            }
+                            pGroup->Add ( pFile );
                         }
-
-                        // Tell the clients about it. This is because other elements might get
-                        // parented below this one.
-                        CEntityAddPacket Packet;
-                        Packet.Add ( pFile );
-                        m_pPlayerManager->BroadcastOnlyJoined ( Packet );
 
                         // Success. Return the file.
                         lua_pushelement ( luaVM, pFile );
