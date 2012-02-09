@@ -9825,11 +9825,10 @@ int CLuaFunctionDefinitions::OutputChatBox ( lua_State* luaVM )
     }
 
     // Verify argument
-    int iArgument1 = lua_type ( luaVM, 1 );
-    if ( iArgument1 == LUA_TSTRING || iArgument1 == LUA_TNUMBER )
+    if ( lua_type ( luaVM, 1 ) != LUA_TNONE )
     {
         // Grab it
-        const char* szChat = lua_tostring ( luaVM, 1 );
+        const char* szChat = lua_makestring ( luaVM, 1 );
 
         // Do it
         if ( CStaticFunctionDefinitions::OutputChatBox ( szChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain ) )
@@ -9863,11 +9862,10 @@ int CLuaFunctionDefinitions::OutputConsole ( lua_State* luaVM )
     }
 
     // Verify argument
-    int iArgument1 = lua_type ( luaVM, 1 );
-    if ( iArgument1 == LUA_TSTRING || iArgument1 == LUA_TNUMBER )
+    if ( lua_type ( luaVM, 1 ) != LUA_TNONE )
     {
         // Grab it
-        const char* szChat = lua_tostring ( luaVM, 1 );
+        const char* szChat = lua_makestring ( luaVM, 1 );
 
         // Do it
         if ( CStaticFunctionDefinitions::OutputConsole ( szChat, pElement ) )
@@ -9943,10 +9941,11 @@ int CLuaFunctionDefinitions::OutputDebugString ( lua_State* luaVM )
         }
 
         // Valid string?
-        if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+        if ( lua_type ( luaVM, 1 ) != LUA_TNONE )
         {
             // Output it
-            const char* szString = lua_tostring ( luaVM, 1 );
+            const char* szString = lua_makestring ( luaVM, 1 );
+
             if ( uiLevel == 1 )
             {
                 m_pScriptDebugging->LogError ( luaVM, "%s", szString );

@@ -63,6 +63,9 @@ void                    lua_pushxmlnode         ( lua_State* luaVM, class CXMLNo
 void                    lua_pushban             ( lua_State* luaVM, class CBan* pBan );
 void                    lua_pushquery           ( lua_State* luaVM, class CDbJobData* pJobData );
 
+// Converts any type to string
+const char*             lua_makestring          ( lua_State* luaVM, int iArgument );
+
 // Include the RPC functions enum
 #include "net/rpc_enums.h"
 

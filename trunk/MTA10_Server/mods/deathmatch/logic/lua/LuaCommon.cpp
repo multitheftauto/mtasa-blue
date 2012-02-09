@@ -329,3 +329,21 @@ void lua_pushquery ( lua_State* luaVM, CDbJobData* pJobData )
 {
     lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pJobData->GetId () ) );
 }
+
+
+// Just do a type check vs LUA_TNONE before calling this, or bant
+const char* lua_makestring ( lua_State* luaVM, int iArgument )
+{
+    if ( lua_type ( luaVM, iArgument ) == LUA_TSTRING )
+    {
+        return lua_tostring ( luaVM, 1 );
+    }
+    lua_getglobal ( luaVM, "tostring" );
+    lua_pushvalue ( luaVM, 1 );
+    lua_call ( luaVM, 1, 1 );
+
+    const char* szString = lua_tostring ( luaVM, -1 );
+    lua_pop ( luaVM, 1 );
+
+    return szString;
+}
