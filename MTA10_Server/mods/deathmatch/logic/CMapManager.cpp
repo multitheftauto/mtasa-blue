@@ -909,10 +909,10 @@ bool CMapManager::HandleNode ( CResource& Loader, CXMLNode& Node, CElement* pPar
     {
         CBlip* pBlip = m_pBlipManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
         pNode = pBlip;
-        if ( pBlip )
+        /*if ( pBlip )
         {
             pBlip->SetIsSynced ( bIsDuringStart );
-        }
+        }*/
     }
     else if ( strBuffer.compare ( "pickup" ) == 0 )
     {
@@ -943,6 +943,10 @@ bool CMapManager::HandleNode ( CResource& Loader, CXMLNode& Node, CElement* pPar
     else if ( strBuffer.compare ( "ped" ) == 0 )
     {
         pNode = m_pPedManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
+    }
+    else if ( strBuffer.compare ( "water" ) == 0 )
+    {
+        pNode = m_pWaterManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
     }
     else if ( strBuffer.empty () )
     {
