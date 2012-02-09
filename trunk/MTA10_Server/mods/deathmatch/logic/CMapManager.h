@@ -47,6 +47,7 @@ public:
                                                               CTeamManager* pTeamManager,
                                                               CPedManager* pPedManager,
                                                               CColManager* pColManager,
+                                                              CWaterManager* pWaterManager,
                                                               CClock* pClock,
                                                               class CLuaManager* pLuaManager,
                                                               CGroups* pGroups,
@@ -106,6 +107,7 @@ private:
     CTeamManager*               m_pTeamManager;
     CPedManager*                m_pPedManager;
     CColManager*                m_pColManager;
+    CWaterManager*              m_pWaterManager;
     CClock*                     m_pServerClock;
     class CLuaManager*          m_pLuaManager;
     CGroups*                    m_pGroups;
