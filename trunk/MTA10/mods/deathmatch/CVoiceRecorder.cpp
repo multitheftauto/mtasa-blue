@@ -321,8 +321,8 @@ void CVoiceRecorder::DoPulse( void )
                         pBitStream->Write ( (unsigned short) uiBytesWritten ); // size of buffer / voice data
                         pBitStream->Write ( (char*) bufTempOutput, uiBytesWritten); // voice data
 
-                        g_pNet->SendPacket(PACKET_ID_VOICE_DATA, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE, PACKET_ORDERING_DEFAULT);
-                        g_pNet->DeallocateNetBitStream( pBitStream );
+                        g_pNet->SendPacket ( PACKET_ID_VOICE_DATA, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, PACKET_ORDERING_VOICE );
+                        g_pNet->DeallocateNetBitStream ( pBitStream );
                     }
                 }
             }
@@ -343,8 +343,8 @@ void CVoiceRecorder::DoPulse( void )
 
             if ( pLocalPlayer )
             {
-                g_pNet->SendPacket(PACKET_ID_VOICE_END, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE, PACKET_ORDERING_DEFAULT);
-                g_pNet->DeallocateNetBitStream( pBitStream );
+                g_pNet->SendPacket ( PACKET_ID_VOICE_END, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, PACKET_ORDERING_VOICE );
+                g_pNet->DeallocateNetBitStream ( pBitStream );
             }
         }
     }

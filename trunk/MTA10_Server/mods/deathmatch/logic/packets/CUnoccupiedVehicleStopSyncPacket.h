@@ -22,7 +22,7 @@ public:
     inline                  CUnoccupiedVehicleStopSyncPacket        ( ElementID ID )                             { m_ID = ID; };
 
     inline ePacketID                GetPacketID                     ( void ) const                                      { return PACKET_ID_UNOCCUPIED_VEHICLE_STOPSYNC; };
-    inline unsigned long            GetFlags                        ( void ) const                                      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline unsigned long            GetFlags                        ( void ) const                                      { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     inline bool             Write                                   ( NetBitStreamInterface& BitStream ) const    { BitStream.Write ( m_ID ); return true; };
 

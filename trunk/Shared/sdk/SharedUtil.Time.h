@@ -104,6 +104,7 @@ namespace SharedUtil
         bool        m_bUseModuleTickCount;
     public:
 
+        // MaxIncrement should be set higher than the expected tick interval between Get() calls
         CElapsedTime ( long lMaxIncrement = 500, bool bUseModuleTickCount = false )
             : m_llMaxIncrement ( lMaxIncrement )
             , m_bUseModuleTickCount ( bUseModuleTickCount )
@@ -126,6 +127,8 @@ namespace SharedUtil
         }
 
     protected:
+        CElapsedTime ( const CElapsedTime& );       // Not implemented
+
         long long DoGetTickCount ( void )
         {
             return m_bUseModuleTickCount ? GetModuleTickCount64 () : GetTickCount64_ ();

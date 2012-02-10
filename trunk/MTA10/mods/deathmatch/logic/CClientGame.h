@@ -55,7 +55,7 @@
 #include "CLocalServer.h"
 #include "CVoiceRecorder.h"
 #define HeliKill_List_Clear_Rate 500
-
+#define MIN_PUSH_ANTISPAM_RATE 1500
 class CClientGame
 {
     friend class CPacketHandler;

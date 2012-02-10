@@ -298,6 +298,9 @@ public:
     void                            GenerateHandlingData    ( void );
     CHandlingEntry*                 GetHandlingData         ( void )                      { return m_pHandlingEntry; }
 
+    uint                            GetTimeSinceLastPush    ( void )                      { return (uint)( CTickCount::Now () - m_LastPushedTime ).ToLongLong (); }
+    void                            ResetLastPushTime       ( void )                      { m_LastPushedTime = CTickCount::Now (); }
+
 private:
     class CVehicleManager*          m_pVehicleManager;
 
@@ -373,6 +376,8 @@ private:
 
     unsigned char                   m_ucVariant;
     unsigned char                   m_ucVariant2;
+
+    CTickCount                      m_LastPushedTime;
 
 public: // 'Safe' variables (that have no need for accessors)
     bool                            m_bDamageProof;

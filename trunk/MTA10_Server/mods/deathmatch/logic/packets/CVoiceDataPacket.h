@@ -22,8 +22,9 @@ public:
                             CVoiceDataPacket            ( void );
                            ~CVoiceDataPacket            ( );
 
-    ePacketID               GetPacketID                 ( void ) const;
-    unsigned long           GetFlags                    ( void ) const;
+    ePacketID               GetPacketID                 ( void ) const              { return PACKET_ID_VOICE_DATA; }
+    unsigned long           GetFlags                    ( void ) const              { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
+    virtual ePacketOrdering GetPacketOrdering           ( void ) const              { return PACKET_ORDERING_VOICE; }
 
     bool                    Read                        ( NetBitStreamInterface& BitStream );
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;

@@ -105,7 +105,7 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
         pBitStream->Write ( strClumpedCommand.c_str(), static_cast < int > ( strlen ( strClumpedCommand.c_str() ) ) );
 
         // Send the packet to the server and free it
-        g_pNet->SendPacket ( PACKET_ID_COMMAND, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE, PACKET_ORDERING_CHAT );
+        g_pNet->SendPacket ( PACKET_ID_COMMAND, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_CHAT );
         g_pNet->DeallocateNetBitStream ( pBitStream );
 
         return true;

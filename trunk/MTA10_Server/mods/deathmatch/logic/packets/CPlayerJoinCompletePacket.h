@@ -36,7 +36,7 @@ public:
                                                               unsigned int uiBitrate );
 
     inline ePacketID        GetPacketID             ( void ) const      { return PACKET_ID_SERVER_JOINEDGAME; };
-    inline unsigned long    GetFlags                ( void ) const      { return PACKET_RELIABLE | PACKET_SEQUENCED | PACKET_HIGH_PRIORITY; };
+    inline unsigned long    GetFlags                ( void ) const      { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Write                           ( NetBitStreamInterface& BitStream ) const;
 

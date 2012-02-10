@@ -1490,7 +1490,7 @@ void CGame::Packet_PlayerJoin ( const NetServerPlayerID& Source )
         pBitStream->WriteString ( "deathmatch" );
 
         // Send and destroy the bitstream
-        g_pNetServer->SendPacket ( PACKET_ID_MOD_NAME, Source, pBitStream );
+        g_pNetServer->SendPacket ( PACKET_ID_MOD_NAME, Source, pBitStream, false, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
         g_pNetServer->DeallocateNetServerBitStream ( pBitStream );
     }
 }

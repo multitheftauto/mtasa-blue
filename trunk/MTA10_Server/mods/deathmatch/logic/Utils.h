@@ -155,6 +155,16 @@ inline void ConvertDegreesToRadiansNoWrap ( CVector& vecRotation )
     vecRotation.fZ = ConvertDegreesToRadiansNoWrap ( vecRotation.fZ );
 }
 
+// Assuming fValue is the result of a difference calculation, calculate
+// the shortest positive distance after wrapping
+inline float GetSmallestWrapUnsigned ( float fValue, float fHigh )
+{
+    float fWrapped =  fValue - ( fHigh * floor ( static_cast < float > ( fValue / fHigh ) ) );
+    if ( fWrapped > fHigh / 2 )
+        fWrapped = fHigh - fWrapped;
+    return fWrapped;
+}
+
 // Escapes the HTML characters <, >, &, " and '. Don't forget to remove your buffer to avoid memory leaks.
 const char* HTMLEscapeString ( const char *szSource );
 

@@ -55,7 +55,7 @@ public:
 
     virtual NetBitStreamInterface*          AllocateNetServerBitStream      ( unsigned short usBitStreamVersion ) = 0;
     virtual void                            DeallocateNetServerBitStream    ( NetBitStreamInterface* bitStream ) = 0;
-    virtual bool                            SendPacket                      ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast = false, NetServerPacketPriority packetPriority = PACKET_PRIORITY_LOW, NetServerPacketReliability packetReliability = PACKET_RELIABILITY_RELIABLE_ORDERED, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT ) = 0;
+    virtual bool                            SendPacket                      ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT ) = 0;
 
     virtual void                            GetPlayerIP                     ( const NetServerPlayerID& playerID, char strIP[22], unsigned short* usPort ) = 0;
 

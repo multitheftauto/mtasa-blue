@@ -45,6 +45,11 @@ bool CUnoccupiedVehicleSync::ProcessPacket ( CPacket& Packet )
         Packet_UnoccupiedVehicleSync ( static_cast < CUnoccupiedVehicleSyncPacket& > ( Packet ) );
         return true;
     }
+    if ( Packet.GetPacketID () == PACKET_ID_VEHICLE_PUSH_SYNC )
+    {
+        Packet_UnoccupiedVehiclePushSync ( static_cast < CUnoccupiedVehiclePushPacket& > ( Packet ) );
+        return true;
+    }
 
     return false;
 }
@@ -271,9 +276,9 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                         {
                             CVector vecLastRotation;
                             pVehicle->GetRotation ( vecLastRotation );
-                            if ( fabs ( vecLastRotation.fX - vehicle.data.vecRotation.fX ) <= MIN_ROTATION_DIFF &&
-                                fabs ( vecLastRotation.fY - vehicle.data.vecRotation.fY ) <= MIN_ROTATION_DIFF &&
-                                fabs ( vecLastRotation.fZ - vehicle.data.vecRotation.fZ ) <= MIN_ROTATION_DIFF )
+                            if ( GetSmallestWrapUnsigned ( vecLastRotation.fX - vehicle.data.vecRotation.fX, 360 ) <= MIN_ROTATION_DIFF &&
+                                GetSmallestWrapUnsigned ( vecLastRotation.fY - vehicle.data.vecRotation.fY, 360 ) <= MIN_ROTATION_DIFF &&
+                                GetSmallestWrapUnsigned ( vecLastRotation.fZ - vehicle.data.vecRotation.fZ, 360 ) <= MIN_ROTATION_DIFF )
                             {
                                 vehicle.data.bSyncRotation = false;
                             }
@@ -435,5 +440,34 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
 
         // Tell everyone
         m_pPlayerManager->BroadcastOnlyJoined ( Packet, pPlayer );
+    }
+}
+void CUnoccupiedVehicleSync::Packet_UnoccupiedVehiclePushSync ( CUnoccupiedVehiclePushPacket& Packet )
+{
+    // Grab the player
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer && pPlayer->IsJoined () )
+    {
+        // Grab the vehicle this packet is for
+        CElement* pVehicleElement = CElementIDs::GetElement ( Packet.vehicle.data.vehicleID );
+        if ( pVehicleElement && IS_VEHICLE ( pVehicleElement ) )
+        {
+            // Convert to a CVehicle
+            CVehicle* pVehicle = static_cast < CVehicle* > ( pVehicleElement );
+            // Is the player syncing this vehicle and there is no driver? Also only process
+            // this packet if the time context matches.
+            if ( pVehicle->GetSyncer () != pPlayer && pVehicle->GetTimeSinceLastPush ( ) >= MIN_PUSH_ANTISPAM_RATE )
+            {
+                // Is there no player driver?
+                CPed * pOccupant = pVehicle->GetOccupant ( 0 );
+                if ( !pOccupant || !IS_PLAYER ( pOccupant ) )
+                {
+                    // Change our syncer
+                    OverrideSyncer ( pVehicle, pPlayer );
+                    // Reset our push time
+                    pVehicle->ResetLastPushTime ( );
+                }
+            }
+        }
     }
 }

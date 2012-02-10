@@ -23,7 +23,7 @@ public:
     inline                  CUnoccupiedVehicleStartSyncPacket       ( CVehicle * pVehicle )                             { m_pVehicle = pVehicle; };
 
     inline ePacketID                GetPacketID                     ( void ) const                                      { return PACKET_ID_UNOCCUPIED_VEHICLE_STARTSYNC; };
-    inline unsigned long            GetFlags                        ( void ) const                                      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline unsigned long            GetFlags                        ( void ) const                                      { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Write                                   ( NetBitStreamInterface& BitStream ) const;
 

@@ -127,7 +127,7 @@ void CLatentSendQueue::DoPulse ( int iTimeMsBetweenCalls )
         pBitStream->Write ( activeTx.buffer.GetData () + uiDataOffset, uiSizeToSend );
 
         // Send
-        DoSendPacket ( PACKET_ID_LATENT_TRANSFER, m_RemoteId, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_CHAT );
+        DoSendPacket ( PACKET_ID_LATENT_TRANSFER, m_RemoteId, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DATA_TRANSFER );
         DoDeallocateNetBitStream ( pBitStream );
     }
 }
@@ -315,7 +315,7 @@ void CLatentSendQueue::SendCancelNotification ( SSendItem& activeTx )
     pBitStream->WriteBits ( &activeTx.uiId, 15 );
     pBitStream->WriteBit ( 1 );
     pBitStream->Write ( (uchar)FLAG_CANCEL );
-    DoSendPacket ( PACKET_ID_LATENT_TRANSFER, m_RemoteId, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_CHAT );
+    DoSendPacket ( PACKET_ID_LATENT_TRANSFER, m_RemoteId, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DATA_TRANSFER );
     DoDeallocateNetBitStream ( pBitStream );
 }
 
