@@ -22,7 +22,7 @@ public:
     inline                  CPlayerDisconnectedPacket   ( const char* szReason )    { strncpy ( m_szReason, szReason, sizeof ( m_szReason ) ); m_szReason [sizeof ( m_szReason ) - 1] = 0; };
 
     inline ePacketID        GetPacketID                 ( void ) const              { return PACKET_ID_SERVER_DISCONNECTED; };
-    inline unsigned long    GetFlags                    ( void ) const              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline unsigned long    GetFlags                    ( void ) const              { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     inline bool             Write                       ( NetBitStreamInterface& BitStream ) const    { BitStream.Write ( const_cast < char* > ( m_szReason ), strlen ( m_szReason ) ); return true; };
 

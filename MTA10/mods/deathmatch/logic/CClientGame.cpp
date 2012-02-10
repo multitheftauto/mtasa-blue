@@ -557,7 +557,7 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
             pBitStream->Write ( strUser.c_str (), MAX_SERIAL_LENGTH );
 
             // Send the packet as joindata
-            g_pNet->SendPacket ( PACKET_ID_PLAYER_JOINDATA, pBitStream );
+            g_pNet->SendPacket ( PACKET_ID_PLAYER_JOINDATA, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
             g_pNet->DeallocateNetBitStream ( pBitStream );
 
             return true;
@@ -733,6 +733,8 @@ void CClientGame::DoPulsePostFrame ( void )
 
         g_pCore->GetGraphics ()->DrawTextTTF ( 300, 320, 1280, 800, 0xFFFFFFFF, strBuffer, 1.0f, 0 );
     #endif
+
+    UpdateModuleTickCount64 ();
 
     if ( m_pManager->IsGameLoaded () )
     {
@@ -918,7 +920,7 @@ void CClientGame::DoPulses ( void )
                 NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
                 pBitStream->Write ( uiLevel );
                 pBitStream->WriteString ( strMessageCombo );
-                g_pNet->SendPacket ( PACKET_ID_PLAYER_TRANSGRESSION, pBitStream );
+                g_pNet->SendPacket ( PACKET_ID_PLAYER_TRANSGRESSION, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
                 g_pNet->DeallocateNetBitStream ( pBitStream );
             }
             else
@@ -943,7 +945,7 @@ void CClientGame::DoPulses ( void )
             m_strLastDiagnosticStatus = strMessage;
             NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
             pBitStream->WriteString ( strMessage );
-            g_pNet->SendPacket ( PACKET_ID_PLAYER_DIAGNOSTIC, pBitStream );
+            g_pNet->SendPacket ( PACKET_ID_PLAYER_DIAGNOSTIC, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
             g_pNet->DeallocateNetBitStream ( pBitStream );
         }
     }
@@ -3953,6 +3955,8 @@ bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehic
         CClientEntity * pVehicleClientEntity = m_pManager->FindEntity ( pColliderVehicle, true );
         if ( pVehicleClientEntity )
         {
+            CClientVehicle * pClientVehicle = static_cast < CClientVehicle * > ( pVehicleClientEntity );
+
             CEntity * pCollidedWithEntity = g_pGame->GetPools ( )->GetEntity ( (DWORD *)pCollidedWith );
             CClientEntity * pCollidedWithClientEntity = NULL;
             if ( pCollidedWithEntity )
@@ -3994,6 +3998,41 @@ bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehic
             Arguments.PushNumber ( iModelIndex );
 
             pVehicleClientEntity->CallEvent ( "onClientVehicleCollision", Arguments, true );
+            // Alocate a BitStream
+            NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+            // Make sure it created
+            if ( pBitStream )
+            {
+                if ( pBitStream->Version ( ) >= 0x028 )
+                {
+                    // Sync Stuff
+                    // if it's not a local vehicle + it collided with the local player
+                    if ( pVehicleClientEntity->IsLocalEntity ( ) == false && 
+                        pCollidedWithClientEntity == g_pClientGame->GetLocalPlayer ( ) )
+                    {
+                        // is it below the anti spam threshold?
+                        if ( pClientVehicle->GetTimeSinceLastPush ( ) >= MIN_PUSH_ANTISPAM_RATE )
+                        {
+                            // if there is no occupant.
+                            if ( pClientVehicle->GetOccupant ( 0 ) == NULL )
+                            {
+                                CDeathmatchVehicle* Vehicle = static_cast < CDeathmatchVehicle* > ( pVehicleClientEntity );
+                                // if We aren't already syncing the vehicle
+                                if ( GetUnoccupiedVehicleSync()->Exists ( Vehicle ) == false )
+                                {
+                                    // Write the vehicle ID
+                                    pBitStream->Write ( pVehicleClientEntity->GetID ( ) );
+                                    // Send!
+                                    g_pNet->SendPacket ( PACKET_ID_VEHICLE_PUSH_SYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
+                                    // Reset our push time
+                                    pClientVehicle->ResetLastPushTime ( );
+                                }
+                            }
+                        }
+                    }
+                }
+                g_pNet->DeallocateNetBitStream ( pBitStream );
+            }
             return true;
         }
     }
@@ -5288,7 +5327,7 @@ void CClientGame::TakePlayerScreenShot ( uint uiSizeX, uint uiSizeY, const SStri
         pBitStream->Write ( uiServerSentTime );
         pBitStream->WriteString ( strResourceName );
         pBitStream->WriteString ( strTag );
-        g_pNet->SendPacket ( PACKET_ID_PLAYER_SCREENSHOT, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_CHAT );
+        g_pNet->SendPacket ( PACKET_ID_PLAYER_SCREENSHOT, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DATA_TRANSFER );
         g_pNet->DeallocateNetBitStream ( pBitStream );
     }
     else

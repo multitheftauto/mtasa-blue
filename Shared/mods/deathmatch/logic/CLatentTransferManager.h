@@ -211,6 +211,6 @@ protected:
 //
 NetBitStreamInterface*  DoAllocateNetBitStream      ( NetPlayerID remoteId, ushort usBitStreamVersion );
 void                    DoDeallocateNetBitStream    ( NetBitStreamInterface* pBitStream );
-bool                    DoSendPacket                ( unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* bitStream, NetPacketPriority packetPriority = PACKET_PRIORITY_HIGH, NetPacketReliability packetReliability = PACKET_RELIABILITY_RELIABLE_ORDERED, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
+bool                    DoSendPacket                ( unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* bitStream, NetPacketPriority packetPriority, NetPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
 bool                    DoStaticProcessPacket       ( unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* pBitStream );
 void                    DoDisconnectRemote          ( NetPlayerID remoteId, const SString& strReason );

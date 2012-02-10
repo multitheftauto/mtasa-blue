@@ -256,7 +256,7 @@ uint CPlayer::Send ( const CPacket& Packet )
     }
     else if ( ulFlags & PACKET_LOW_PRIORITY )
     {
-        //packetPriority = PACKET_PRIORITY_LOW;
+        packetPriority = PACKET_PRIORITY_LOW;
     }
 
     uint uiBitsSent = 0;

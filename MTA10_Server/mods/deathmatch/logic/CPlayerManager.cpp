@@ -205,7 +205,7 @@ void CPlayerManager::Broadcast ( const CPacket& Packet, const std::vector < CPla
     }
     else if ( ulFlags & PACKET_LOW_PRIORITY )
     {
-        //packetPriority = PACKET_PRIORITY_LOW;
+        packetPriority = PACKET_PRIORITY_LOW;
     }
 
     // Group players by bitstream version

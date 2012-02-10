@@ -25,18 +25,6 @@ CVoiceEndPacket::~CVoiceEndPacket ( )
 }
 
 
-ePacketID CVoiceEndPacket::GetPacketID ( void ) const
-{
-    return static_cast < ePacketID > ( PACKET_ID_VOICE_END );
-}
-
-
-unsigned long CVoiceEndPacket::GetFlags ( void ) const
-{
-    return 0;
-}
-
-
 bool CVoiceEndPacket::Read ( NetBitStreamInterface& BitStream )
 {
     return true;

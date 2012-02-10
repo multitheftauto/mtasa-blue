@@ -22,7 +22,7 @@ public:
                             CPlayerQuitPacket           ( void );
 
     inline ePacketID        GetPacketID                 ( void ) const                                      { return static_cast < ePacketID > ( PACKET_ID_PLAYER_QUIT ); };
-    inline unsigned long    GetFlags                    ( void ) const                                      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline unsigned long    GetFlags                    ( void ) const                                      { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     inline bool             Read                        ( NetBitStreamInterface& BitStream )                { return true; };
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;

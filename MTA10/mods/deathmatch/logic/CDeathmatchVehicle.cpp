@@ -115,7 +115,7 @@ bool CDeathmatchVehicle::SyncDamageModel ( void )
             pBitStream->Write ( &damage );
 
             // Send and delete it
-            g_pNet->SendPacket ( PACKET_ID_VEHICLE_DAMAGE_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED );
+            g_pNet->SendPacket ( PACKET_ID_VEHICLE_DAMAGE_SYNC, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
             g_pNet->DeallocateNetBitStream ( pBitStream );
         }
 

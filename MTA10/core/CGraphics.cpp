@@ -326,7 +326,7 @@ void CGraphics::CheckModes ( EDrawModeType newDrawMode, EBlendModeType newBlendM
         // Start new
         if ( newDrawMode == EDrawMode::DX_SPRITE )
         {
-            m_pDXSprite->Begin ( D3DXSPRITE_DO_NOT_ADDREF_TEXTURE | D3DXSPRITE_DONOTSAVESTATE | D3DXSPRITE_DONOTMODIFY_RENDERSTATE );
+            m_pDXSprite->Begin ( D3DXSPRITE_DONOTSAVESTATE | D3DXSPRITE_DONOTMODIFY_RENDERSTATE );
         }
         else
         if ( newDrawMode == EDrawMode::DX_LINE )

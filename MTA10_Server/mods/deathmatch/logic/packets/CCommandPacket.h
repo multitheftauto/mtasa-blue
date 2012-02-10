@@ -21,7 +21,8 @@ public:
     inline                  CCommandPacket          ( void )                { m_strCommand = ""; };
 
     inline ePacketID        GetPacketID             ( void ) const          { return static_cast < ePacketID > ( PACKET_ID_COMMAND ); };
-    inline unsigned long    GetFlags                ( void ) const          { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline unsigned long    GetFlags                ( void ) const          { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    virtual ePacketOrdering GetPacketOrdering       ( void ) const          { return PACKET_ORDERING_CHAT; }
 
     bool                    Read                    ( NetBitStreamInterface& BitStream );
 

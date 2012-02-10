@@ -145,6 +145,10 @@ CPacket* CPacketTranslator::Translate ( const NetServerPlayerID& Socket, ePacket
             pTemp = new CPlayerScreenShotPacket;
             break;
 
+        case PACKET_ID_VEHICLE_PUSH_SYNC:
+            pTemp = new CUnoccupiedVehiclePushPacket;
+            break;
+
         default: break;
     }
 

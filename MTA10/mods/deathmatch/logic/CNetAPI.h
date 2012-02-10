@@ -92,7 +92,7 @@ public:
     bool                    IsCameraSyncNeeded              ( void );
     void                    WriteCameraSync                 ( NetBitStreamInterface& BitStream );
 
-    void                    RPC                             ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream = NULL, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
+    void                    RPC                             ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream = NULL );
 
 private:
     CClientManager*         m_pManager;

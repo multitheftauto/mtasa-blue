@@ -23,7 +23,7 @@ public:
     explicit                CPlayerChangeNickPacket     ( const char* szNewNick );
 
     inline ePacketID        GetPacketID                 ( void ) const          { return PACKET_ID_PLAYER_CHANGE_NICK; };
-    inline unsigned long    GetFlags                    ( void ) const          { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline unsigned long    GetFlags                    ( void ) const          { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
