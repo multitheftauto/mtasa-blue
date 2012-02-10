@@ -64,7 +64,10 @@ void CLuaModuleManager::DoPulse ( void )
 
 
 int CLuaModuleManager::LoadModule ( const char *szShortFileName, const char *szFileName, bool bLateLoad )
-{   // 0 = Success, 1 = Can't find file, 2 = Can't initialise, 3 = Already loaded
+{   // 0 = Success, 1 = Can't find file, 2 = Can't find initialise function, 3 = can't find dopulse function, 
+    // 4 = can't find shutdownmodule function, 5 = can't find register function, 6 = can't find resourcestopping function
+    // 7 = can't find resourcestopped function, 8 = resource already loaded
+
     // bLateLoad specified whether this is a module that was loaded "late" (after startup)
     // and we need to register all it's functions to all available VM's
 
@@ -74,7 +77,7 @@ int CLuaModuleManager::LoadModule ( const char *szShortFileName, const char *szF
     {
         if ( strcmp ( (*iter)->_GetName().c_str(), szShortFileName ) == 0 )
         {
-            return 3;
+            return 8;
         }
     }
 
@@ -106,7 +109,7 @@ int CLuaModuleManager::LoadModule ( const char *szShortFileName, const char *szF
 
 
 int CLuaModuleManager::ReloadModule ( const char *szShortFileName, const char *szFileName, bool bLateLoad )
-{   // 0 = Success, 1 = Can't find file (load), 2 = Can't initialise, 4 = Can't find module by name (unload)
+{
     // Unload module
     int iUnloaded = UnloadModule ( szShortFileName );
     
@@ -119,7 +122,7 @@ int CLuaModuleManager::ReloadModule ( const char *szShortFileName, const char *s
 
 
 int CLuaModuleManager::UnloadModule ( const char* szShortFileName )
-{   // 0 = Success, 4 = Can't find module by name
+{   // 0 = Success, 9 = Can't find module by name
     list < CLuaModule* > ::iterator iter = m_Modules.begin ();
     for ( ; iter != m_Modules.end (); iter++ )
     {
@@ -130,7 +133,7 @@ int CLuaModuleManager::UnloadModule ( const char* szShortFileName )
             return 0;
         }
     }
-    return 4;
+    return 9;
 }
 
 
