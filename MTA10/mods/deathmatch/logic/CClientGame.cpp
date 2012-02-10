@@ -1908,7 +1908,7 @@ void CClientGame::UpdateFireKey ( void )
                         // Change the state back to false so this press doesn't do anything else
                         pControl->bState = false;
 
-                        // Tell the server we wanna destroy our satchels
+                        // Tell the server we want to detonate our satchels
                         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
                         if ( pBitStream )
                         {
@@ -4768,6 +4768,13 @@ void CClientGame::ResetMapInfo ( void )
         m_pLocalPlayer->SetVoice ( sVoiceType, sVoiceID );
 
         m_pLocalPlayer->DestroySatchelCharges( false, true );
+        // Tell the server we want to destroy our satchels
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+        if ( pBitStream )
+        {
+            g_pNet->SendPacket ( PACKET_ID_DESTROY_SATCHELS, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
+            g_pNet->DeallocateNetBitStream ( pBitStream );
+        }
     }
 }
 

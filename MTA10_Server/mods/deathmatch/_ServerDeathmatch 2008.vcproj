@@ -960,6 +960,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CDestroySatchelsPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CDetonateSatchelsPacket.cpp"
 						>
 					</File>
@@ -2170,6 +2174,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CDebugEchoPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CDestroySatchelsPacket.h"
 						>
 					</File>
 					<File

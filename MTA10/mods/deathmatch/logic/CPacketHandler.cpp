@@ -178,6 +178,10 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_DetonateSatchels ( bitStream );
             return true;
 
+        case PACKET_ID_DESTROY_SATCHELS:
+            Packet_DestroySatchels ( bitStream );
+            return true;
+
         case PACKET_ID_VOICE_DATA:
             Packet_VoiceData ( bitStream );
             return true;
@@ -4525,6 +4529,24 @@ void CPacketHandler::Packet_DetonateSatchels ( NetBitStreamInterface& bitStream 
             if ( pPlayer->IsLocalPlayer () )
             {
                 pPlayer->RemoveWeapon ( WEAPONTYPE_DETONATOR );
+            }
+        }
+    }
+}
+
+void CPacketHandler::Packet_DestroySatchels ( NetBitStreamInterface& bitStream )
+{
+    ElementID Player;
+
+    if ( bitStream.Read ( Player ) )
+    {
+        // Grab the player
+        CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->Get ( Player );
+        if ( pPlayer )
+        {
+            if ( !pPlayer->IsLocalPlayer () )
+            {
+                pPlayer->DestroySatchelCharges ( false, true );
             }
         }
     }
