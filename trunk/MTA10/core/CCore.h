@@ -217,6 +217,7 @@ public:
     const char *            GetCommandLineArgs              ( void ) { return m_szCommandLineArgs; }
     void                    RequestNewNickOnStart           ( void ) { m_bWaitToSetNick = true; };
     bool                    WillRequestNewNickOnStart       ( void ) { return m_bWaitToSetNick; };
+    bool                    WasLaunchedWithConnectURI       ( void );
 
     //XFire
     SString                 UpdateXfire                     ( void );

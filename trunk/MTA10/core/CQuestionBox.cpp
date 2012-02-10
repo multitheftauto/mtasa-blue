@@ -24,6 +24,7 @@ CQuestionBox::CQuestionBox ( void )
     m_CallbackParameter = 0;
     m_uiActiveButtons = 0;
     m_uiActiveEditboxes = 0;
+    m_bAutoCloseOnConnect = false;
 
     CGUI *pManager = g_pCore->GetGUI ();
 
@@ -111,6 +112,7 @@ void CQuestionBox::Reset ( void )
 {
     Hide ();
     m_uiLastButton = -1;
+    m_bAutoCloseOnConnect = false;
     m_strMsg = "";
     SetTitle ( "" );
     SetMessage ( "" );
@@ -217,3 +219,14 @@ bool CQuestionBox::OnButtonClick ( CGUIElement* pElement )
 }
 
 
+void CQuestionBox::SetAutoCloseOnConnect ( bool bEnable )
+{
+    m_bAutoCloseOnConnect = bEnable;
+}
+
+
+void CQuestionBox::OnConnect ( void )
+{
+    if ( m_bAutoCloseOnConnect )
+        Hide ();
+}
