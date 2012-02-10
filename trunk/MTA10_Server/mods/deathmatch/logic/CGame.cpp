@@ -1012,6 +1012,13 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
+
+        case PACKET_ID_DESTROY_SATCHELS:
+        {
+            Packet_DestroySatchels ( static_cast < CDestroySatchelsPacket& > ( Packet ) );
+            return true;
+        }
+
         case PACKET_ID_EXPLOSION:
             Packet_ExplosionSync ( static_cast < CExplosionSyncPacket& > ( Packet ) );
             return true;
@@ -2183,6 +2190,20 @@ void CGame::Packet_DetonateSatchels ( CDetonateSatchelsPacket& Packet )
     if ( pPlayer && pPlayer->IsJoined () )
     {
         // Tell everyone to blow up this guy's satchels
+        m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+        //Take away their detonator
+        CStaticFunctionDefinitions::TakeWeapon( pPlayer, 40 );
+    }
+}
+
+
+void CGame::Packet_DestroySatchels ( CDestroySatchelsPacket& Packet )
+{
+    // Grab the source player
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer && pPlayer->IsJoined () )
+    {
+        // Tell everyone to destroy up this player's satchels
         m_pPlayerManager->BroadcastOnlyJoined ( Packet );
         //Take away their detonator
         CStaticFunctionDefinitions::TakeWeapon( pPlayer, 40 );
