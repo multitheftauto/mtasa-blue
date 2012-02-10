@@ -90,21 +90,29 @@ int CLuaModule::_LoadModule ( void )
     // Initialise
     m_FunctionInfo.szFileName = m_szShortFileName;
 #ifdef WIN32
-    pfnInitFunc = ( InitModuleFunc ) ( GetProcAddress ( m_hModule, "InitModule" ) );
     m_FunctionInfo.DoPulse = ( DefaultModuleFunc ) ( GetProcAddress ( m_hModule, "DoPulse" ) );
+    if ( m_FunctionInfo.DoPulse == NULL ) return 3;
     m_FunctionInfo.ShutdownModule = ( DefaultModuleFunc ) ( GetProcAddress ( m_hModule, "ShutdownModule" ) );
+    if ( m_FunctionInfo.ShutdownModule == NULL ) return 4;
     m_FunctionInfo.RegisterFunctions = ( RegisterModuleFunc ) ( GetProcAddress ( m_hModule, "RegisterFunctions" ) );
+    if ( m_FunctionInfo.RegisterFunctions == NULL ) return 5;
 
     m_FunctionInfo.ResourceStopping = ( RegisterModuleFunc ) ( GetProcAddress ( m_hModule, "ResourceStopping" ) );
+    if ( m_FunctionInfo.ResourceStopping == NULL ) return 6;
     m_FunctionInfo.ResourceStopped = ( RegisterModuleFunc ) ( GetProcAddress ( m_hModule, "ResourceStopped" ) );
+    if ( m_FunctionInfo.ResourceStopped == NULL ) return 7;
 #else
-    pfnInitFunc = ( InitModuleFunc ) ( dlsym ( m_hModule, "InitModule" ) );
     m_FunctionInfo.DoPulse = ( DefaultModuleFunc ) ( dlsym ( m_hModule, "DoPulse" ) );
+    if ( m_FunctionInfo.DoPulse == NULL ) return 3;
     m_FunctionInfo.ShutdownModule = ( DefaultModuleFunc ) ( dlsym ( m_hModule, "ShutdownModule" ) );
+    if ( m_FunctionInfo.ShutdownModule == NULL ) return 4;
     m_FunctionInfo.RegisterFunctions = ( RegisterModuleFunc ) ( dlsym ( m_hModule, "RegisterFunctions" ) );
+    if ( m_FunctionInfo.RegisterFunctions == NULL ) return 5;
 
     m_FunctionInfo.ResourceStopping = ( RegisterModuleFunc ) ( dlsym ( m_hModule, "ResourceStopping" ) );
+    if ( m_FunctionInfo.ResourceStopping == NULL ) return 6;
     m_FunctionInfo.ResourceStopped = ( RegisterModuleFunc ) ( dlsym ( m_hModule, "ResourceStopped" ) );
+    if ( m_FunctionInfo.ResourceStopped == NULL ) return 7;
 #endif
     // Run initialisation function
     pfnInitFunc( this, &m_FunctionInfo.szModuleName[0], &m_FunctionInfo.szAuthor[0], &m_FunctionInfo.fVersion );

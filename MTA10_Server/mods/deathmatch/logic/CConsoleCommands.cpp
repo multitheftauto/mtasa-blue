@@ -1870,7 +1870,7 @@ bool CConsoleCommands::Help ( CConsole* pConsole, const char* szArguments, CClie
 
 
 bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
-{   // 0 = Success, 1 = Can't find file, 2 = Can't initialise, 3 = Already loaded
+{   
     if ( szArguments && szArguments[0] )
     {
         if ( pClient->GetNick () )
@@ -1884,15 +1884,47 @@ bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments,
         {
             case 1:
             {
-                pEchoClient->SendConsole ( "loadmodule: Couldn't find module" );
+                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
+                pEchoClient->SendConsole ( "loadmodule: Couldn't find module file" );
                 return true;
             }
             case 2:
             {
-                pEchoClient->SendConsole ( "loadmodule: Couldn't initialise module" );
+                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
+                pEchoClient->SendConsole ( "loadmodule: Couldn't find InitModule function in module" );
                 return true;
             }
             case 3:
+            {
+                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
+                pEchoClient->SendConsole ( "loadmodule: Couldn't find DoPulse function in module" );
+                return true;
+            }
+            case 4:
+            {
+                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
+                pEchoClient->SendConsole ( "loadmodule: Couldn't find ShutdownModule function in module" );
+                return true;
+            }
+            case 5:
+            {
+                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
+                pEchoClient->SendConsole ( "loadmodule: Couldn't find RegisterFunctions function in module" );
+                return true;
+            }
+            case 6:
+            {
+                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
+                pEchoClient->SendConsole ( "loadmodule: Couldn't find ResourceStopping function in module" );
+                return true;
+            }
+            case 7:
+            {
+                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
+                pEchoClient->SendConsole ( "loadmodule: Couldn't find ResourceStopped function in module" );
+                return true;
+            }
+            case 8:
             {
                 pEchoClient->SendConsole ( "loadmodule: Module already loaded" );
                 return true;
@@ -1908,7 +1940,7 @@ bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments,
 
 
 bool CConsoleCommands::UnloadModule ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
-{   // 0 = Success, 4 = Can't find module by name
+{   
     if ( szArguments && szArguments[0] )
     {
         if ( pClient->GetNick () )
@@ -1916,8 +1948,9 @@ bool CConsoleCommands::UnloadModule ( CConsole* pConsole, const char* szArgument
 
         if ( g_pGame->GetLuaManager()->GetLuaModuleManager()->UnloadModule ( szArguments ) != 0 )
         {
-                pEchoClient->SendConsole ( "unloadmodule: Couldn't find a module by that name" );
-                return true;
+            pEchoClient->SendConsole ( "unloadmodule: Module failed to unload" );
+            pEchoClient->SendConsole ( "unloadmodule: Couldn't find a module by that name" );
+            return true;
         }
     }
     else
@@ -1928,7 +1961,7 @@ bool CConsoleCommands::UnloadModule ( CConsole* pConsole, const char* szArgument
 
 
 bool CConsoleCommands::ReloadModule ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
-{   // 0 = Success, 1 = Can't find file (load), 2 = Can't initialise, 4 = Can't find module by name (unload)
+{   
     if ( szArguments && szArguments[0] )
     {
         if ( pClient->GetNick () )
@@ -1941,16 +1974,49 @@ bool CConsoleCommands::ReloadModule ( CConsole* pConsole, const char* szArgument
         {
             case 1:
             {
-                pEchoClient->SendConsole ( "reloadmodule: Couldn't find module during load" );
+                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
+                pEchoClient->SendConsole ( "reloadmodule: Couldn't find module file" );
                 return true;
             }
             case 2:
             {
-                pEchoClient->SendConsole ( "reloadmodule: Couldn't initialise module" );
+                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
+                pEchoClient->SendConsole ( "reloadmodule: Couldn't find InitModule function in module" );
+                return true;
+            }
+            case 3:
+            {
+                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
+                pEchoClient->SendConsole ( "reloadmodule: Couldn't find DoPulse function in module" );
                 return true;
             }
             case 4:
             {
+                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
+                pEchoClient->SendConsole ( "reloadmodule: Couldn't find ShutdownModule function in module" );
+                return true;
+            }
+            case 5:
+            {
+                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
+                pEchoClient->SendConsole ( "reloadmodule: Couldn't find RegisterFunctions function in module" );
+                return true;
+            }
+            case 6:
+            {
+                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
+                pEchoClient->SendConsole ( "reloadmodule: Couldn't find ResourceStopping function in module" );
+                return true;
+            }
+            case 7:
+            {
+                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
+                pEchoClient->SendConsole ( "reloadmodule: Couldn't find ResourceStopped function in module" );
+                return true;
+            }
+            case 9:
+            {
+                pEchoClient->SendConsole ( "reloadmodule: Module failed to unload" );
                 pEchoClient->SendConsole ( "reloadmodule: Couldn't find a module by that name" );
                 return true;
             }
