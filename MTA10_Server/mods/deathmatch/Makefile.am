@@ -212,6 +212,7 @@ LOGIC = \
 ./logic/packets/CConsoleEchoPacket.cpp \
 ./logic/packets/CCustomDataPacket.cpp \
 ./logic/packets/CDebugEchoPacket.cpp \
+./logic/packets/CDestroySatchelsPacket.cpp \
 ./logic/packets/CDetonateSatchelsPacket.cpp \
 ./logic/packets/CEntityAddPacket.cpp \
 ./logic/packets/CEntityRemovePacket.cpp \
