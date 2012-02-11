@@ -73,9 +73,6 @@ CBan* CBanManager::AddBan ( CPlayer* pPlayer, const SString& strBanner, const SS
             CBan* pBan = AddBan ( strBanner, strReason, tTimeOfUnban );
             pBan->SetNick ( pPlayer->GetNick() );
             pBan->SetIP ( szIP );
-
-            g_pNetServer->AddBan ( szIP );
-
             return pBan;
         }
     }
@@ -90,9 +87,6 @@ CBan* CBanManager::AddBan ( const SString& strIP, const SString& strBanner, cons
     {
         CBan* pBan = AddBan ( strBanner, strReason, tTimeOfUnban );
         pBan->SetIP ( strIP );
-
-        g_pNetServer->AddBan ( strIP.c_str() );
-
         return pBan;
     }
 
@@ -194,12 +188,6 @@ bool CBanManager::Exists ( CBan* pBan )
 }
 
 
-bool CBanManager::IsBanned ( const char* szIP )
-{
-    return g_pNetServer->IsBanned ( szIP );
-}
-
-
 bool CBanManager::IsSpecificallyBanned ( const char* szIP )
 {
     list < CBan* >::const_iterator iter = m_BanManager.begin ();
@@ -249,9 +237,7 @@ void CBanManager::RemoveBan ( CBan* pBan )
 {
     if ( pBan )
     {
-        if ( !pBan->GetIP ().empty() )
-            g_pNetServer->RemoveBan ( pBan->GetIP ().c_str () );
-        if ( !m_BanManager.empty() ) m_BanManager.remove ( pBan );
+        m_BanManager.remove ( pBan );
         delete pBan;
     }
     SaveBanList ();
@@ -308,6 +294,50 @@ CBan* CBanManager::GetBan ( const char* szNick, unsigned int uiOccurrance )
     }
 
     return NULL;
+}
+
+
+// Include wildcard checks
+CBan* CBanManager::GetBanFromIP ( const char* szIP )
+{
+    CBan* pBanWildcardMatch = NULL;
+
+    list < CBan* >::const_iterator iter = m_BanManager.begin ();
+    for ( ; iter != m_BanManager.end (); iter++ )
+    {
+        const SString& strIP = (*iter)->GetIP ().c_str ();
+
+        if ( strIP.Contains ( "*" ) )
+        {
+            for ( uint i = 0 ; i < 17 ; i++ )
+            {
+                char a = szIP[i];
+                char b = strIP[i];
+                if ( a == b )
+                {
+                    if ( a == 0 )
+                        return *iter;   // Full match
+                }
+                else
+                {
+                    if ( !a || !b )
+                        break;          // No match
+
+                    if ( b == '*' )
+                    {
+                        pBanWildcardMatch = *iter;
+                        break;          // Wildcard match
+                    }
+                }
+            }
+        }
+        else
+        if ( strIP == szIP )
+        {
+            return *iter;   // Full match
+        }
+    }
+    return pBanWildcardMatch;
 }
 
 
@@ -411,7 +441,6 @@ bool CBanManager::LoadBanList ( void )
                     if ( IsValidIP ( strIP.c_str() ) )
                     {
                         pBan->SetIP ( strIP );
-                        g_pNetServer->AddBan ( strIP.c_str() );
                     }
                     pBan->SetAccount ( strAccount );
                     pBan->SetSerial ( strSerial );
