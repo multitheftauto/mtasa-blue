@@ -989,10 +989,6 @@ void CAccountManager::DbCallback ( CDbJobData* pJobData )
     {
         if ( pJobData->result.status == EJobResult::FAIL ) 
             CLogger::LogPrintf ( "ERROR: While updating account with '%s': %s.\n", *pJobData->command.strData, *pJobData->result.strReason );
-#ifdef MTA_DEBUG
-        else
-            CLogger::LogPrintf ( "DEBUGINFO: Query completed: '%s'\n", *pJobData->command.strData );
-#endif
     }
     else
     {

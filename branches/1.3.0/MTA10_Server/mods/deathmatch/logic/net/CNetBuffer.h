@@ -80,10 +80,6 @@ public:
 
     virtual void                            GetPlayerIP                     ( const NetServerPlayerID& playerID, char strIP[22], unsigned short* usPort );
 
-    virtual void                            AddBan                          ( const char* szIP );
-    virtual void                            RemoveBan                       ( const char* szIP );
-    virtual bool                            IsBanned                        ( const char* szIP );
-
     virtual void                            Kick                            ( const NetServerPlayerID &PlayerID );
 
     virtual void                            SetPassword                     ( const char* szPassword );

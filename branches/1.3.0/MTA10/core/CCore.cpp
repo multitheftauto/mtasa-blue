@@ -1340,6 +1340,15 @@ bool CCore::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
     return bHandled;
 }
 
+
+bool CCore::WasLaunchedWithConnectURI ( void )
+{
+    if ( m_szCommandLineArgs && strnicmp ( m_szCommandLineArgs, "mtasa://", 8 ) == 0 )
+        return true;
+    return false;
+}
+
+
 void CCore::ParseCommandLine ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions )
 {
     std::set < std::string > noValOptions;

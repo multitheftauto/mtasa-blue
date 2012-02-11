@@ -59,6 +59,9 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 
     m_bNotifyServerBrowser = bNotifyServerBrowser;
 
+    // Hide certain questions
+    CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->OnConnect ();
+
     // Hide the server queue
     CServerInfo::GetSingletonPtr()->Hide( );
 

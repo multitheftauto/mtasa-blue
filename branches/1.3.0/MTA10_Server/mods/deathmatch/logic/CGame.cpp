@@ -1641,6 +1641,26 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                     return;
                                 }
 
+                                // Check the ip for banness
+                                if ( CBan* pBan = m_pBanManager->GetBanFromIP ( szIP ) )
+                                {
+                                    // Make a message including the ban duration
+                                    SString strBanMessage;// = "Serial is banned";
+                                    SString strDurationDesc = pBan->GetDurationDesc ();
+                                    if ( strDurationDesc.length () )
+                                        strBanMessage += " (" + strDurationDesc + ")";
+
+                                    // Tell the console
+                                    CLogger::LogPrintf ( "CONNECT: %s failed to connect (IP is banned%s) (%s)\n", szNick, strBanMessage.c_str (), strIPAndSerial.c_str () );
+
+                                    // Make a message for the player
+                                    strBanMessage = std::string ( "Disconnected: You are banned " ) + strBanMessage;
+
+                                    // Tell the player he's banned
+                                    DisconnectPlayer ( this, *pPlayer, strBanMessage );
+                                    return;
+                                }
+
                                 if ( !pPlayer->GetSerialUser ().empty() &&
                                      m_pBanManager->IsAccountBanned ( pPlayer->GetSerialUser ().c_str () ) )
                                 {

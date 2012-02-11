@@ -438,7 +438,7 @@ void CVersionUpdater::DoPulse ( void )
     //
     // Time for periodic check?
     //
-    if ( !m_bCheckedTimeForVersionCheck && !IsBusy () )
+    if ( !m_bCheckedTimeForVersionCheck && !IsBusy () && !CCore::GetSingleton().WasLaunchedWithConnectURI () )
     {
         m_bCheckedTimeForVersionCheck = true;
 
@@ -1693,6 +1693,7 @@ void CVersionUpdater::_DialogUpdateQuestion ( void )
     GetQuestionBox ().SetButton ( 0, m_JobInfo.strNo );
     GetQuestionBox ().SetButton ( 1, m_JobInfo.strYes );
     GetQuestionBox ().Show ();
+    GetQuestionBox ().SetAutoCloseOnConnect ( true );
     Push ( _PollQuestionNoYes );
 }
 

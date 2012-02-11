@@ -985,8 +985,16 @@ bool CStaticFunctionDefinitions::IsElementInWater ( CElement* pElement, bool & b
         case CElement::PLAYER:
         {
             CPed* pPed = static_cast < CPed* > ( pElement );
-            bInWater = pPed->IsInWater ();
-            break;
+            if ( pPed->GetOccupiedVehicle() )
+            {
+                bInWater = pPed->GetOccupiedVehicle()->IsInWater();
+                break;
+            }
+            else
+            {
+                bInWater = pPed->IsInWater ();
+                break;
+            }
         }
         case CElement::VEHICLE:
         {

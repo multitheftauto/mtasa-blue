@@ -66,7 +66,7 @@ void CUnoccupiedVehicleSync::OverrideSyncer ( CVehicle* pVehicle, CPlayer* pPlay
         StopSync ( pVehicle );
     }
 
-    if ( pPlayer )
+    if ( pPlayer && !pVehicle->IsBeingDeleted () )
         StartSync ( pPlayer, pVehicle );
 }
 
@@ -77,9 +77,9 @@ void CUnoccupiedVehicleSync::Update ( unsigned long ulCurrentTime )
 
     // Update all the vehicle's sync states
     list < CVehicle* > ::const_iterator iter = m_pVehicleManager->IterBegin ();
-    for ( ; iter != m_pVehicleManager->IterEnd (); iter++ )
+    for ( ; iter != m_pVehicleManager->IterEnd (); )
     {
-        UpdateVehicle ( *iter );
+        UpdateVehicle ( *( iter++ ) );
     }
 }
 
@@ -124,8 +124,11 @@ void CUnoccupiedVehicleSync::UpdateVehicle ( CVehicle* pVehicle )
                 // Stop him from syncing it
                 StopSync ( pVehicle );
 
-                // Find a new syncer for it
-                FindSyncer ( pVehicle );
+                if ( !pVehicle->IsBeingDeleted () )
+                {
+                    // Find a new syncer for it
+                    FindSyncer ( pVehicle );
+                }
             }
         }
         else
