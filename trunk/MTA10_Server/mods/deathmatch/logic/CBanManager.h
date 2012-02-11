@@ -39,7 +39,6 @@ public:
 
     bool                Exists                  ( CBan* pBan );
 
-    bool                IsBanned                ( const char* szIP );
     bool                IsSpecificallyBanned    ( const char* szIP );
     bool                IsSerialBanned          ( const char* szSerial );
     bool                IsAccountBanned         ( const char* szAccount );
@@ -49,6 +48,7 @@ public:
     CBan*               GetBan                  ( const char* szIP );
     CBan*               GetBan                  ( const char* szNick, unsigned int uiOccurrance );
     CBan*               GetBanFromSerial        ( const char* szSerial );
+    CBan*               GetBanFromIP            ( const char* szIP );
 
     unsigned int        GetBansWithNick         ( const char* szNick );
     unsigned int        GetBansWithBanner       ( const char* szBanner );
