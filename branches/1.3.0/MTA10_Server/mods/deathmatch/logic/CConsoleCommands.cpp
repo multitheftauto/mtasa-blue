@@ -1969,16 +1969,32 @@ bool CConsoleCommands::OpenPortsTest ( CConsole* pConsole, const char* szArgumen
 
 bool CConsoleCommands::Test ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    if ( pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
     {
-        char szBuffer[2048] = "";
-        //g_pNetServer->ResetStub ( 'test', szArguments, szBuffer );
-        if ( strlen ( szBuffer ) > 0 )
-            pEchoClient->SendConsole ( SString ( "TEST: %s", szBuffer ) );
+        if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "kick", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
+        {
+            pEchoClient->SendConsole ( "stest: You do not have sufficient rights to use this command." );
+            return false;
+        }
+    }
+
+    if ( szArguments && isdigit ( (int)szArguments[0] ) )
+    {
+        int iInput = atoi ( szArguments );
+
+        float fTweak1Amount = UnlerpClamped ( 0, iInput, 5 );
+        float fTweak2Amount = UnlerpClamped ( 5, iInput, 10 );
+        g_pGame->GetConfig ()->SetTweakValue ( 0, fTweak1Amount );
+        g_pGame->GetConfig ()->SetTweakValue ( 1, fTweak2Amount );
+
+        pEchoClient->SendConsole ( SString ( "stest: Set %d", iInput ) );
         return true;
     }
+
+    pEchoClient->SendConsole ( "Usage: stest <0-10>" );
     return false;
 }
+
 
 bool CConsoleCommands::CheckLightSync ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {

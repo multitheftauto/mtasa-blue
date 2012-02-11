@@ -26,9 +26,21 @@ struct SPacketStat
 
 struct SNetOptions
 {
-    int iFakePacketLoss;
-    int iFakeExtraPing;
-    int iFakeExtraPingVariance;
+    SNetOptions ( void ) { memset ( this, 0, sizeof( *this ) ); }
+
+    struct {
+        bool bValid;
+        int iPacketLoss;
+        int iExtraPing;
+        int iExtraPingVariance;
+        int iKBPSLimit;
+    } netSim;
+
+    struct {
+        bool bValid;
+        float fTweak1Amount;
+        float fTweak2Amount;
+    } netTweak;
 };
 
 class CNetServer

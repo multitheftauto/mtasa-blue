@@ -96,9 +96,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_iBackupInterval = 3;
     m_iBackupAmount = 5;
     m_iDebugFlag = 0;
-    m_NetOptions.iFakePacketLoss = 0;
-    m_NetOptions.iFakeExtraPing = 0;
-    m_NetOptions.iFakeExtraPingVariance = 0;
+    m_NetOptions.netTweak.fTweak1Amount = 1.0f;
 }
 
 
@@ -563,9 +561,23 @@ void CMainConfig::ApplyBandwidthReductionMode ( void )
 
 void CMainConfig::SetFakeLag ( int iPacketLoss, int iExtraPing, int iExtraPingVary )
 {
-    m_NetOptions.iFakePacketLoss = iPacketLoss;
-    m_NetOptions.iFakeExtraPing = iExtraPing;
-    m_NetOptions.iFakeExtraPingVariance = iExtraPingVary;
+    m_NetOptions.netSim.bValid = true;
+    m_NetOptions.netSim.iPacketLoss = iPacketLoss;
+    m_NetOptions.netSim.iExtraPing = iExtraPing;
+    m_NetOptions.netSim.iExtraPingVariance = iExtraPingVary;
+    m_NetOptions.netSim.iKBPSLimit = 0;
+    ApplyNetOptions ();
+}
+
+
+void CMainConfig::SetTweakValue ( int iWhich, float fAmount )
+{
+    m_NetOptions.netTweak.bValid = true;
+    if ( iWhich == 0 )
+        m_NetOptions.netTweak.fTweak1Amount = Clamp ( 0.f, fAmount, 1.f );
+    if ( iWhich == 1 )
+        m_NetOptions.netTweak.fTweak2Amount = Clamp ( 0.f, fAmount, 1.f );
+
     ApplyNetOptions ();
 }
 
@@ -812,7 +824,7 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "sver", CConsoleCommands::Ver, false );
     RegisterCommand ( "ase", CConsoleCommands::Ase, false );
     RegisterCommand ( "openports", CConsoleCommands::OpenPortsTest, false );
-    RegisterCommand ( "test", CConsoleCommands::Test, false );
+    RegisterCommand ( "stest", CConsoleCommands::Test, false );
 
     RegisterCommand ( "checkls", CConsoleCommands::CheckLightSync, false );
     RegisterCommand ( "debugdb", CConsoleCommands::SetDbLogLevel, false );

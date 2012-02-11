@@ -108,6 +108,7 @@ public:
     void                            ApplyBandwidthReductionMode     ( void );
     void                            ApplyThreadNetEnabled           ( void );
     void                            SetFakeLag                      ( int iPacketLoss, int iExtraPing, int iExtraPingVary );
+    void                            SetTweakValue                   ( int iWhich, float fAmount );
     const SNetOptions&              GetNetOptions                   ( void )                    { return m_NetOptions; }
 
 private:
