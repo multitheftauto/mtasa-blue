@@ -67,6 +67,7 @@ public:
     void                _UseProvidedURLs                    ( void );
     void                _UseDataFiles2URLs                   ( void );
     void                _UseReportLogURLs                   ( void );
+    void                _UseCrashDumpQueryURLs              ( void );
     void                _UseCrashDumpURLs                   ( void );
     void                _UseSidegradeURLs                   ( void );
     void                _UseNewsUpdateURLs                  ( void );
@@ -106,6 +107,7 @@ public:
     void                _DialogSidegradeLaunchQuestion      ( void );
     void                _DialogSidegradeQueryError          ( void );
 
+    void                _ProcessCrashDumpQuery              ( void );
     void                _ProcessMasterFetch                 ( void );
     void                _ProcessPatchFileQuery              ( void );
     void                _ProcessPatchFileDownload           ( void );
@@ -1135,6 +1137,10 @@ void CVersionUpdater::InitPrograms ()
         MapSet ( m_ProgramMap, strProgramName, CProgram () );
         CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
 
+        ADDINST (   _UseCrashDumpQueryURLs );
+        ADDINST (   _StartDownload );
+        ADDINST (   _ProcessCrashDumpQuery );                   // Do we need to send the dump?
+        ADDCOND ( "if ProcessResponse.!ok goto end" );
         ADDINST (   _UseCrashDumpURLs );                        // Use CRASH_DUMP_URL*
         ADDINST (   _UseCrashDumpPostContent );                 // Use crash dump source
         ADDINST (   _StartSendPost );                           // Send data
@@ -2562,6 +2568,45 @@ void CVersionUpdater::_UseReportLogPostContent ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// CVersionUpdater::_UseCrashDumpQueryURLs
+//
+// Check if upload is needed
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_UseCrashDumpQueryURLs ( void )
+{
+    m_JobInfo = SJobInfo ();
+    m_JobInfo.serverList = MakeServerList ( m_MasterConfig.crashdump.serverInfoMap );
+
+    SString strPathFilename = GetApplicationSetting ( "diagnostics", "last-dump-save" );
+    strPathFilename.Split ( PATH_SEPERATOR, NULL, &m_JobInfo.strPostFilename, -1 );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_ProcessCrashDumpQuery
+//
+// Called after completing a CrashDumpQuery
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_ProcessCrashDumpQuery ( void )
+{
+    m_ConditionMap.SetCondition ( "ProcessResponse", "" );
+
+    if ( m_JobInfo.downloadBuffer.size () == 0 )
+        return;
+
+    SString strResponse ( &m_JobInfo.downloadBuffer[0], m_JobInfo.downloadBuffer.size () );
+
+    // Is the dump file wanted?
+    if ( strResponse.BeginsWithI ( "yes" ) )
+        m_ConditionMap.SetCondition ( "ProcessResponse", "ok" );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CVersionUpdater::_UseCrashDumpURLs
 //
 //
@@ -2787,6 +2832,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     strQueryURL = strQueryURL.Replace ( "%REFER%", m_strServerSaysHost );
     strQueryURL = strQueryURL.Replace ( "%WANTVER%", m_strSidegradeVersion );
     strQueryURL = strQueryURL.Replace ( "%LASTNEWS%", m_VarConfig.news_lastNewsDate );
+    strQueryURL = strQueryURL.Replace ( "%FILE%", m_JobInfo.strPostFilename );
 
     // Perform the HTTP request
     m_HTTP.Get ( strQueryURL );

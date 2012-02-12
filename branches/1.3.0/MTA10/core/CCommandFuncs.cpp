@@ -443,6 +443,17 @@ void CCommandFuncs::Test ( const char* szParameters )
         SString strMsg = SString ( "Crash averted stats:\n%s", strStats.empty () ? "None" : *strStats );
         CCore::GetSingleton ().GetConsole ()->Print ( strMsg );
     }
+    else
+    if ( SStringX ( szParameters ) == "crashme" )
+    {
+        std::string strNick;
+        CVARS_GET ( "nick", strNick );
+        if ( strNick == szParameters )
+        {
+            int* pData = NULL;
+            *pData = 0;
+        }
+    }
 }
 
 void CCommandFuncs::Serial ( const char* szParameters )
