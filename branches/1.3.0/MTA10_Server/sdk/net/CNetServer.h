@@ -41,6 +41,11 @@ struct SNetOptions
         float fTweak1Amount;
         float fTweak2Amount;
     } netTweak;
+
+    struct {
+        bool bValid;
+        int reliabilityMode;
+    } netType;
 };
 
 class CNetServer

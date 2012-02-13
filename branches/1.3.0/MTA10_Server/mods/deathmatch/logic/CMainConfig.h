@@ -172,6 +172,7 @@ private:
     int                             m_iDebugFlag;
     std::map < SString, SString >   m_TransientSettings;
     SNetOptions                     m_NetOptions;
+    int                             m_iNetReliabilityMode;
 };
 
 #endif

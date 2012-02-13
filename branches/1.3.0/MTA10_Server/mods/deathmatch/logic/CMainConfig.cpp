@@ -97,6 +97,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_iBackupAmount = 5;
     m_iDebugFlag = 0;
     m_NetOptions.netTweak.fTweak1Amount = 1.0f;
+    m_iNetReliabilityMode = 0;
 }
 
 
@@ -532,6 +533,10 @@ bool CMainConfig::Load ( void )
     GetBoolean ( m_pRootNode, "threadnet", m_bThreadNetEnabled );
     ApplyThreadNetEnabled ();
 
+    // net_type
+    GetInteger ( m_pRootNode, "net_type", m_iNetReliabilityMode );
+    m_iNetReliabilityMode = Clamp ( 0, m_iNetReliabilityMode, 3 );
+
     ApplyNetOptions ();
 
     return true;
@@ -584,6 +589,8 @@ void CMainConfig::SetTweakValue ( int iWhich, float fAmount )
 
 void CMainConfig::ApplyNetOptions ( void )
 {
+    m_NetOptions.netType.bValid = true;
+    m_NetOptions.netType.reliabilityMode = m_iNetReliabilityMode;
     g_pNetServer->SetNetOptions ( m_NetOptions );
 }
 
@@ -1297,6 +1304,21 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
         if ( strValue == "0" || strValue == "1" )
         {
             g_pBandwidthSettings->bTestPretendEveryoneIsNear = atoi ( strValue ) == 0 ? false : true;
+            return true;
+        }
+    }
+    else
+    if ( strName == "net_type" )
+    {
+        int iValue = atoi ( strValue );
+        if ( iValue >= 0 && iValue <= 3 )
+        {
+            m_iNetReliabilityMode = iValue;
+            if ( bSave )
+            {
+                SetString ( m_pRootNode, "net_type", SString ( "%d", m_iNetReliabilityMode ) );
+                Save ();
+            }
             return true;
         }
     }
