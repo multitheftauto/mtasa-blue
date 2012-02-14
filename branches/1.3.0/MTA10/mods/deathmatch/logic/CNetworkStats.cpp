@@ -79,7 +79,9 @@ void CNetworkStats::Draw ( void )
                 "Packet rate in/out: %u / %u\n"
                 "BPS limit by CC: %llu\n"
                 "BPS limit by OB: %llu\n"
-                "Encryption: %s\n",
+                "Encryption: %s\n"
+                "Client: %s\n"
+                "Server: %s\n",
                 g_pNet->GetPing (),
                 stats.messagesInSendBuffer,
                 stats.messagesInResendBuffer,
@@ -95,7 +97,9 @@ void CNetworkStats::Draw ( void )
                 (unsigned int)floor(m_fPacketSendRate + 0.5f),                   
                 stats.isLimitedByCongestionControl ? 1ULL : 0ULL,
                 stats.isLimitedByOutgoingBandwidthLimit ? 1ULL : 0ULL,
-                stats.encryptionStatus ? stats.encryptionStatus == 1 ? "On" : "Unknown" : "Off"
+                stats.encryptionStatus ? stats.encryptionStatus == 1 ? "On" : "Unknown" : "Off",
+                *CStaticFunctionDefinitions::GetVersionSortable(),
+                *g_pClientGame->GetServerVersionSortable ()
                 );
     }
     else
@@ -150,12 +154,20 @@ void CNetworkStats::Draw ( void )
     float fX = fResWidth - fBackWidth;
     float fY = 0.40f * fResHeight - iNumLines * 4;
 
-    g_pCore->GetGraphics ()->DrawRectangle ( 
+    g_pCore->GetGraphics ()->DrawRectQueued ( 
                                         fX - 10, fY - 10,
                                         fBackWidth + 10, fBackHeight + 20,
-                                        0x78000000 );
+                                        0x78000000, true );
 
-    m_pDisplayManager->DrawText2D ( strBuffer, CVector ( fX / fResWidth, fY / fResHeight, 0 ), 1.0f, 0xFFFFFFFF );
+    g_pCore->GetGraphics ()->DrawTextQueued ( fX, fY,
+                                              fX, fY,
+                                              0xFFFFFFFF,
+                                              strBuffer,
+                                              1,
+                                              1,
+                                              DT_NOCLIP,
+                                              NULL,
+                                              true );
 }
 
 

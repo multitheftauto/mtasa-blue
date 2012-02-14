@@ -259,6 +259,12 @@ void CPacketHandler::Packet_ServerConnected ( NetBitStreamInterface& bitStream )
         g_pCore->ChatEchoColor ( "* Connected!", CHATCOLOR_INFO );
     }
 
+    // Get the long server version
+    SString strServerVersionSortable = SStringX ( szVersionString ).SplitRight ( " ", NULL, 2 ).SplitLeft ( " " );
+    if ( bitStream.Version () >= 0x29 )
+        bitStream.ReadString ( strServerVersionSortable );
+    g_pClientGame->SetServerVersionSortable ( strServerVersionSortable );
+
     //m_Status = CClientGame::STATUS_TRANSFER;
 
     // Tell the core we're finished
