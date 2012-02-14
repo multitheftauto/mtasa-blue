@@ -320,14 +320,11 @@ CBan* CBanManager::GetBanFromIP ( const char* szIP )
                 }
                 else
                 {
-                    if ( !a || !b )
-                        break;          // No match
-
                     if ( b == '*' )
-                    {
                         pBanWildcardMatch = *iter;
-                        break;          // Wildcard match
-                    }
+
+                    // Characters do not match
+                    break;
                 }
             }
         }
