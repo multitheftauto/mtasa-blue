@@ -535,7 +535,7 @@ bool CMainConfig::Load ( void )
 
     // net_type
     GetInteger ( m_pRootNode, "net_type", m_iNetReliabilityMode );
-    m_iNetReliabilityMode = Clamp ( 0, m_iNetReliabilityMode, 3 );
+    m_iNetReliabilityMode = Clamp ( 0, m_iNetReliabilityMode, 4 );
 
     ApplyNetOptions ();
 
@@ -564,13 +564,13 @@ void CMainConfig::ApplyBandwidthReductionMode ( void )
     }
 }
 
-void CMainConfig::SetFakeLag ( int iPacketLoss, int iExtraPing, int iExtraPingVary )
+void CMainConfig::SetFakeLag ( int iPacketLoss, int iExtraPing, int iExtraPingVary, int iKBPSLimit )
 {
     m_NetOptions.netSim.bValid = true;
     m_NetOptions.netSim.iPacketLoss = iPacketLoss;
     m_NetOptions.netSim.iExtraPing = iExtraPing;
     m_NetOptions.netSim.iExtraPingVariance = iExtraPingVary;
-    m_NetOptions.netSim.iKBPSLimit = 0;
+    m_NetOptions.netSim.iKBPSLimit = iKBPSLimit;
     ApplyNetOptions ();
 }
 
@@ -1311,7 +1311,7 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
     if ( strName == "net_type" )
     {
         int iValue = atoi ( strValue );
-        if ( iValue >= 0 && iValue <= 3 )
+        if ( iValue >= 0 && iValue <= 4 )
         {
             m_iNetReliabilityMode = iValue;
             if ( bSave )

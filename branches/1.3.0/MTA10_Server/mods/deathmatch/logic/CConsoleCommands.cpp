@@ -2132,16 +2132,19 @@ bool CConsoleCommands::FakeLag ( CConsole* pConsole, const char* szArguments, CC
 
     if ( parts.size () < 3 )
     {
-        pEchoClient->SendConsole ( "sfakelag <packet loss> <extra ping> <ping variance>" );
+        pEchoClient->SendConsole ( "sfakelag <packet loss> <extra ping> <ping variance> [ <KBPS limit> ]" );
         return false;
     }
 
     int iPacketLoss = atoi ( parts[0] );
     int iExtraPing = atoi ( parts[1] );
     int iExtraPingVary = atoi ( parts[2] );
+    int iKBPSLimit = 0;
+    if ( parts.size () > 3 )
+        iKBPSLimit = atoi ( parts[3] );
 
-    g_pGame->GetConfig ()->SetFakeLag ( iPacketLoss, iExtraPing, iExtraPingVary );
-    pEchoClient->SendConsole ( SString ( "Server send lag is now: %d%% packet loss and %d extra ping with %d extra ping variance", iPacketLoss, iExtraPing, iExtraPingVary ) );
+    g_pGame->GetConfig ()->SetFakeLag ( iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit );
+    pEchoClient->SendConsole ( SString ( "Server send lag is now: %d%% packet loss and %d extra ping with %d extra ping variance and %d KBPS limit", iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit ) );
 
 #endif
     return true;
