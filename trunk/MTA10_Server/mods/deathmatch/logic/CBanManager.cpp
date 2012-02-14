@@ -300,11 +300,11 @@ CBan* CBanManager::GetBan ( const char* szNick, unsigned int uiOccurrance )
 // Include wildcard checks
 CBan* CBanManager::GetBanFromIP ( const char* szIP )
 {
-    CBan* pBanWildcardMatch = NULL;
-
     list < CBan* >::const_iterator iter = m_BanManager.begin ();
     for ( ; iter != m_BanManager.end (); iter++ )
     {
+        bool bMatch = false, bFindNextOctet = false;
+        int iBan = 0, iOctetCount = 1;
         const SString& strIP = (*iter)->GetIP ().c_str ();
 
         if ( strIP.Contains ( "*" ) )
@@ -312,32 +312,81 @@ CBan* CBanManager::GetBanFromIP ( const char* szIP )
             for ( uint i = 0 ; i < 17 ; i++ )
             {
                 char a = szIP[i];
-                char b = strIP[i];
-                if ( a == b )
+                char b = strIP[iBan];
+                if ( b == '.' )
                 {
-                    if ( a == 0 )
-                        return *iter;   // Full match
+                    // End of octet so increment
+                    iOctetCount++;
+                }
+                if ( bFindNextOctet )
+                {
+                    if ( a == '.' )
+                    {
+                        bFindNextOctet = false;
+                        // Increment iBan to get to next octet as well
+                        iBan++;
+                    }
+                }
+                else if ( a == b )
+                {
+                    // matched char
+                    // iBan can only be incremented at specific times or it won't work properly
+                    iBan++;
                 }
                 else
                 {
-                    if ( !a || !b )
-                        break;          // No match
-
-                    if ( b == '*' )
+                    // iBan can only be incremented at specific times or it won't work properly
+                    iBan++;
+                    if ( !a )
                     {
-                        pBanWildcardMatch = *iter;
-                        break;          // Wildcard match
+                        // end of source IP range
+                        if ( !b )
+                        {
+                            // end of banned IP range also, end check
+                            break;
+                        }
+                        // banned range not ended so make false and end this check
+                        bMatch = false;
+                        break;
+                    }
+                    else if ( b == '*' )
+                    {
+                        // wildcard char
+                        if ( iOctetCount == 4 )
+                        {
+                            // wildcard found at last octet, nothing further to check
+                            break;
+                        }
+                        if ( a != '.' )
+                        {
+                            // need to find the next octet as we are still looking at an IP
+                            bFindNextOctet = true;
+                        }
+                    }
+                    else
+                    {
+                        // doesn't match so make false and end this check
+                        bMatch = false;
+                        break;
                     }
                 }
             }
+            if ( bMatch )
+            {
+                // ban found, return it
+                return *iter;
+            }
         }
         else
-        if ( strIP == szIP )
         {
-            return *iter;   // Full match
+            if ( strIP == szIP )
+            {
+                return *iter;   // Full match
+            }
         }
     }
-    return pBanWildcardMatch;
+    // return NULL as no match found
+    return NULL;
 }
 
 
