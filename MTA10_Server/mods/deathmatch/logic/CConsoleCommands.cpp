@@ -2063,16 +2063,32 @@ bool CConsoleCommands::OpenPortsTest ( CConsole* pConsole, const char* szArgumen
 
 bool CConsoleCommands::Test ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    if ( pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
     {
-        char szBuffer[2048] = "";
-        //g_pNetServer->ResetStub ( 'test', szArguments, szBuffer );
-        if ( strlen ( szBuffer ) > 0 )
-            pEchoClient->SendConsole ( SString ( "TEST: %s", szBuffer ) );
+        if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "kick", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
+        {
+            pEchoClient->SendConsole ( "stest: You do not have sufficient rights to use this command." );
+            return false;
+        }
+    }
+
+    if ( szArguments && isdigit ( (int)szArguments[0] ) )
+    {
+        int iInput = atoi ( szArguments );
+
+        float fTweak1Amount = UnlerpClamped ( 0, iInput, 5 );
+        float fTweak2Amount = UnlerpClamped ( 5, iInput, 10 );
+        g_pGame->GetConfig ()->SetTweakValue ( 0, fTweak1Amount );
+        g_pGame->GetConfig ()->SetTweakValue ( 1, fTweak2Amount );
+
+        pEchoClient->SendConsole ( SString ( "stest: Set %d", iInput ) );
         return true;
     }
+
+    pEchoClient->SendConsole ( "Usage: stest <0-10>" );
     return false;
 }
+
 
 bool CConsoleCommands::CheckLightSync ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
@@ -2210,16 +2226,19 @@ bool CConsoleCommands::FakeLag ( CConsole* pConsole, const char* szArguments, CC
 
     if ( parts.size () < 3 )
     {
-        pEchoClient->SendConsole ( "sfakelag <packet loss> <extra ping> <ping variance>" );
+        pEchoClient->SendConsole ( "sfakelag <packet loss> <extra ping> <ping variance> [ <KBPS limit> ]" );
         return false;
     }
 
     int iPacketLoss = atoi ( parts[0] );
     int iExtraPing = atoi ( parts[1] );
     int iExtraPingVary = atoi ( parts[2] );
+    int iKBPSLimit = 0;
+    if ( parts.size () > 3 )
+        iKBPSLimit = atoi ( parts[3] );
 
-    g_pGame->GetConfig ()->SetFakeLag ( iPacketLoss, iExtraPing, iExtraPingVary );
-    pEchoClient->SendConsole ( SString ( "Server send lag is now: %d%% packet loss and %d extra ping with %d extra ping variance", iPacketLoss, iExtraPing, iExtraPingVary ) );
+    g_pGame->GetConfig ()->SetFakeLag ( iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit );
+    pEchoClient->SendConsole ( SString ( "Server send lag is now: %d%% packet loss and %d extra ping with %d extra ping variance and %d KBPS limit", iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit ) );
 
 #endif
     return true;

@@ -745,12 +745,6 @@ void CClientGame::DoPulsePostFrame ( void )
             m_pNametags->DoPulse ();
         }
 
-        // If we're supposed to show netstat, draw it
-        if ( m_bShowNetstat )
-        {
-            m_pNetworkStats->Draw ();
-        }
-
         // Sync debug
         m_pSyncDebug->OnPulse ();
 
@@ -852,6 +846,12 @@ void CClientGame::DoPulsePostFrame ( void )
         m_pRadarMap->DoRender ();
         m_pManager->DoRender ();
         DoPulses ();
+    }
+
+    // If we're supposed to show netstat, draw them infront of everything else
+    if ( m_bShowNetstat )
+    {
+        m_pNetworkStats->Draw ();
     }
 }
 
