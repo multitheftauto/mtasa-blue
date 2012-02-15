@@ -4496,7 +4496,7 @@ bool CStaticFunctionDefinitions::GiveWeapon ( CElement* pElement, unsigned char 
             if ( pPed->IsSpawned () )
             {
                 unsigned char ucCurrentWeapon = pPed->GetWeaponType ();
-                if ( ucCurrentWeapon != ucWeaponID )
+                if ( ucCurrentWeapon != ucWeaponID && bSetAsCurrent )
                 {
                     // Call our weapon switch command
                     CLuaArguments Arguments;
