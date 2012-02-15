@@ -1653,32 +1653,38 @@ int CLuaElementDefs::setElementInterior ( lua_State* luaVM )
          ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
     {
         CElement* pElement = lua_toelement ( luaVM, 1 );
-        unsigned char ucInterior = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-        bool bSetPosition = false;
-        CVector vecPosition;
+        unsigned int uiInterior = static_cast < unsigned int > ( lua_tonumber ( luaVM, 2 ) );
+        if ( uiInterior <= 0xFF )
+        {
+            unsigned char ucInterior = static_cast < unsigned char > ( uiInterior );
+            bool bSetPosition = false;
+            CVector vecPosition;
 
-        int iArgument3 = lua_type ( luaVM, 3 );
-        int iArgument4 = lua_type ( luaVM, 4 );
-        int iArgument5 = lua_type ( luaVM, 5 );
-        if ( ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
-             ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) &&
-             ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) )
-        {
-            vecPosition = CVector ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
-                                    static_cast < float > ( lua_tonumber ( luaVM, 4 ) ),
-                                    static_cast < float > ( lua_tonumber ( luaVM, 5 ) ) );
-            bSetPosition = true;
-        }
-        if ( pElement )
-        {
-            if ( CStaticFunctionDefinitions::SetElementInterior ( pElement, ucInterior, bSetPosition, vecPosition ) )
+            int iArgument3 = lua_type ( luaVM, 3 );
+            int iArgument4 = lua_type ( luaVM, 4 );
+            int iArgument5 = lua_type ( luaVM, 5 );
+            if ( ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
+                 ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) &&
+                 ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) )
             {
-                lua_pushboolean ( luaVM, true );
-                return 1;
+                vecPosition = CVector ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
+                                        static_cast < float > ( lua_tonumber ( luaVM, 4 ) ),
+                                        static_cast < float > ( lua_tonumber ( luaVM, 5 ) ) );
+                bSetPosition = true;
             }
+            if ( pElement )
+            {
+                if ( CStaticFunctionDefinitions::SetElementInterior ( pElement, ucInterior, bSetPosition, vecPosition ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "setElementInterior", "element", 1 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementInterior", "element", 1 );
+            m_pScriptDebugging->LogBadType ( luaVM, "setElementInterior" );
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setElementInterior" );
