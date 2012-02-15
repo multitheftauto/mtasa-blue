@@ -503,16 +503,13 @@ void CVehicleManager::GetRandomVariation ( unsigned short usModel, unsigned char
     // Valid model?
     if ( IsValidModel( usModel ) && g_ucVariants[ usModel - 400 ] != 255 )
     {
-        // BF400 || caddy || ???
-        if ( usModel == 581 || usModel == 457 || usModel == 512 )
+        // caddy || cropduster
+        if ( usModel == 457 || usModel == 512 )
         {
-            // e.g. 581 ( BF400 )
-            // first 3 properties are Exhaust
-            // last 2 are fairings.
-
-
+            // 255, 0, 1, 2
             ucVariant = ( rand ( ) % 4 ) - 1;
 
+            // 3, 4, 5
             ucVariant2 = ( rand ( ) % 3 );
             ucVariant2 += 3;
             return;
@@ -521,21 +518,28 @@ void CVehicleManager::GetRandomVariation ( unsigned short usModel, unsigned char
         else if ( usModel == 535 )
         {
             // Slamvan has steering wheel "extras" we want one of those so default cannot be an option.
-            ucVariant = rand ( ) % g_ucVariants [usModel - 400];
+            ucVariant = ( rand ( ) % ( g_ucVariants [usModel - 400] + 1 ) );
             return;
         }
-        // NRG 500
-        else if ( usModel == 522 )
+        // NRG 500 || BF400
+        else if ( usModel == 522 || usModel == 581 )
         {
+            // e.g. 581 ( BF400 )
+            // first 3 properties are Exhaust
+            // last 2 are fairings.
+
+            // 255, 0, 1, 2
             ucVariant = ( rand ( ) % 4 ) - 1;
 
+            // 3, 4
             ucVariant2 = ( rand ( ) % 2 );
             ucVariant2 += 3;
+            return;
         }
-        // e.g. ( rand () % ( 5 + 1 ) ) - 1
+        // e.g. ( rand () % ( 5 + 2 ) ) - 1
         // Can generate 6 then minus 1 = 5
         // Can generate 0 then minus 1 = -1 (255) (default model with nothing)
-        ucVariant = ( rand ( ) % (g_ucVariants [usModel - 400] + 1) );
+        ucVariant = ( rand ( ) % (g_ucVariants [usModel - 400] + 2) ) - 1;
     }
 }
 

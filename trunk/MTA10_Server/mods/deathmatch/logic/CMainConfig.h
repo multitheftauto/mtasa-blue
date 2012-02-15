@@ -107,7 +107,8 @@ public:
     void                            ApplyNetOptions                 ( void );
     void                            ApplyBandwidthReductionMode     ( void );
     void                            ApplyThreadNetEnabled           ( void );
-    void                            SetFakeLag                      ( int iPacketLoss, int iExtraPing, int iExtraPingVary );
+    void                            SetFakeLag                      ( int iPacketLoss, int iExtraPing, int iExtraPingVary, int iKBPSLimit );
+    void                            SetTweakValue                   ( int iWhich, float fAmount );
     const SNetOptions&              GetNetOptions                   ( void )                    { return m_NetOptions; }
 
 private:
@@ -171,6 +172,7 @@ private:
     int                             m_iDebugFlag;
     std::map < SString, SString >   m_TransientSettings;
     SNetOptions                     m_NetOptions;
+    int                             m_iNetReliabilityMode;
 };
 
 #endif

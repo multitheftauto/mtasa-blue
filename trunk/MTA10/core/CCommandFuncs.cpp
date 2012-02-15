@@ -443,6 +443,17 @@ void CCommandFuncs::Test ( const char* szParameters )
         SString strMsg = SString ( "Crash averted stats:\n%s", strStats.empty () ? "None" : *strStats );
         CCore::GetSingleton ().GetConsole ()->Print ( strMsg );
     }
+    else
+    if ( SStringX ( szParameters ) == "crashme" )
+    {
+        std::string strNick;
+        CVARS_GET ( "nick", strNick );
+        if ( strNick == szParameters )
+        {
+            int* pData = NULL;
+            *pData = 0;
+        }
+    }
 }
 
 void CCommandFuncs::Serial ( const char* szParameters )
@@ -465,16 +476,19 @@ void CCommandFuncs::FakeLag ( const char *szCmdLine )
 
     if ( parts.size () < 3 )
     {
-        g_pCore->GetConsole ()->Print ( "fakelag <packet loss> <extra ping> <ping variance>" );
+        g_pCore->GetConsole ()->Print ( "fakelag <packet loss> <extra ping> <ping variance> [ <KBPS limit> ]" );
         return;
     }
 
     int iPacketLoss = atoi ( parts[0] );
     int iExtraPing = atoi ( parts[1] );
     int iExtraPingVary = atoi ( parts[2] );
+    int iKBPSLimit = 0;
+    if ( parts.size () > 3 )
+        iKBPSLimit = atoi ( parts[3] );
 
-    g_pCore->GetNetwork ()->SetFakeLag ( iPacketLoss, iExtraPing, iExtraPingVary );
-    g_pCore->GetConsole ()->Print ( SString ( "Client send lag is now: %d%% packet loss and %d extra ping with %d extra ping variance", iPacketLoss, iExtraPing, iExtraPingVary ) );
+    g_pCore->GetNetwork ()->SetFakeLag ( iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit );
+    g_pCore->GetConsole ()->Print ( SString ( "Client send lag is now: %d%% packet loss and %d extra ping with %d extra ping variance and %d KBPS limit", iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit ) );
 
 #endif
 }

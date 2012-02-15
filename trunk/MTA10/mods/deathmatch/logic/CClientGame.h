@@ -483,6 +483,9 @@ public:
     void                                SendFireSync                    ( CFire* pFire );
     void                                SendProjectileSync              ( CClientProjectile * pProjectile );
 
+    void                                SetServerVersionSortable        ( const SString& strVersion )   { m_strServerVersionSortable = strVersion; }
+    const SString&                      GetServerVersionSortable        ( void )                        { return m_strServerVersionSortable; }
+
 private:
     eStatus                             m_Status;
     unsigned long                       m_ulTimeStart;
@@ -674,6 +677,7 @@ private:
     std::list < SDelayedPacketInfo >    m_DelayedSendList;
     std::multimap < CClientVehicle *, CClientPed * > m_HeliCollisionsMap;
     CElapsedTime                        m_LastClearTime;
+    SString                             m_strServerVersionSortable;
 };
 
 extern CClientGame* g_pClientGame;

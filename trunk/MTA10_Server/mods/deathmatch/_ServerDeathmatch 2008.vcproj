@@ -2417,10 +2417,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\packets\PacketIODeclarators.h"
-						>
-					</File>
-					<File
 						RelativePath="..\..\..\Shared\sdk\net\Packets.h"
 						>
 					</File>
