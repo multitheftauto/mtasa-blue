@@ -4677,6 +4677,9 @@ void CClientGame::ResetMapInfo ( void )
     // Weather
     m_pBlendedWeather->SetWeather ( 0 );
 
+    // Rain
+    g_pGame->GetWeather()->ResetAmountOfRain();
+
     // Wind
     g_pMultiplayer->RestoreWindVelocity ( );
 
