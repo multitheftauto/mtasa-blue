@@ -30,7 +30,7 @@ public:
     inline const char*                          GetName                     ( void )        { return m_szACLName; };
 
     CAccessControlListRight*                    AddRight                    ( const char* szRightName, CAccessControlListRight::ERightType eRightType, bool bAccess );
-    CAccessControlListRight*                    GetRight                    ( const char* szRightName, CAccessControlListRight::ERightType eRightType );
+    CAccessControlListRight*                    GetRight                    ( const char* szRightName, CAccessControlListRight::ERightType eRightType, bool bAllowWildcardMatch = false );
     bool                                        RemoveRight                 ( const char* szRightName, CAccessControlListRight::ERightType eRightType );
 
     void                                        WriteToXMLNode              ( CXMLNode* pNode );
