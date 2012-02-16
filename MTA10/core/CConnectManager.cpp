@@ -135,7 +135,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 
     // Start server version detection
     SAFE_DELETE ( m_pServerItem );
-    m_pServerItem = new CServerListItem ( m_Address, m_usPort + SERVER_LIST_QUERY_PORT_OFFSET );
+    m_pServerItem = new CServerListItem ( m_Address, m_usPort );
     m_pServerItem->m_iTimeoutLength = 2000;
     m_bIsDetectingVersion = true;
 
@@ -372,7 +372,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                 }
 
                 //Set the current server info and Add the ASE Offset to the Query port)
-                CCore::GetSingleton().SetCurrentServer ( g_pConnectManager->m_Address, g_pConnectManager->m_usPort + 123 );
+                CCore::GetSingleton().SetCurrentServer ( g_pConnectManager->m_Address, g_pConnectManager->m_usPort );
 
                 SetApplicationSettingInt ( "last-server-ip", g_pConnectManager->m_Address.s_addr );
                 SetApplicationSettingInt ( "last-server-port", g_pConnectManager->m_usPort );

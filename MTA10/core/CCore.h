@@ -221,7 +221,7 @@ public:
 
     //XFire
     SString                 UpdateXfire                     ( void );
-    void                    SetCurrentServer                ( in_addr Addr, unsigned short usQueryPort );
+    void                    SetCurrentServer                ( in_addr Addr, unsigned short usGamePort );
     void                    SetXfireData                    ( std::string strServerName, std::string strVersion, bool bPassworded, std::string strGamemode, std::string strMap, std::string strPlayerName, std::string strPlayerCount );
 
     void                    OnPreHUDRender                  ( void );

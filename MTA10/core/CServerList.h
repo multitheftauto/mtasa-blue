@@ -72,6 +72,7 @@ enum
     SERVER_INFO_QUERY,
 };
 
+
 class CServerListItem
 {
     friend class CServerList;
@@ -80,24 +81,21 @@ public:
     CServerListItem ( void )
     {
         Address.S_un.S_addr = 0;
-        usQueryPort = 0;
         usGamePort = 0;
         Init ();
     }
 
-    CServerListItem ( in_addr _Address, unsigned short _usQueryPort )
+    CServerListItem ( in_addr _Address, unsigned short _usGamePort )
     {
         Address = _Address;
-        usQueryPort = _usQueryPort;
-        usGamePort = _usQueryPort - SERVER_LIST_QUERY_PORT_OFFSET;
+        usGamePort = _usGamePort;
         Init ();
     }
 
-    CServerListItem ( in_addr _Address, unsigned short _usQueryPort, std::string _strHostName )
+    CServerListItem ( in_addr _Address, unsigned short _usGamePort, std::string _strHostName )
     {
         Address = _Address;
-        usQueryPort = _usQueryPort;
-        usGamePort = _usQueryPort - SERVER_LIST_QUERY_PORT_OFFSET;
+        usGamePort = _usGamePort;
         strHostName = _strHostName;
         Init ();
     }
@@ -105,7 +103,6 @@ public:
     CServerListItem ( const CServerListItem & copy )
     {
         Address.S_un.S_addr = copy.Address.S_un.S_addr;
-        usQueryPort = copy.usQueryPort;
         usGamePort = copy.usGamePort;
         strHostName = copy.strHostName;
         Init ();
@@ -138,7 +135,7 @@ public:
 
     bool                operator==      ( const CServerListItem &other ) const
     {
-        return ( Address.S_un.S_addr == other.Address.S_un.S_addr && usQueryPort == other.usQueryPort );
+        return ( Address.S_un.S_addr == other.Address.S_un.S_addr && usGamePort == other.usGamePort );
     }
 
     void                Init            ( void )
@@ -193,10 +190,10 @@ public:
     bool                ParseQuery      ( const char * szBuffer, unsigned int nLength );
     void                Query           ( void );
     std::string         Pulse           ( bool bCanSendQuery, bool bRemoveNonResponding = false );
-    void                ResetForRefresh            ( void );
+    void                ResetForRefresh ( void );
+    unsigned short      GetQueryPort    ( void );
 
     in_addr             Address;        // IP-address
-    unsigned short      usQueryPort;    // Query port
     unsigned short      usGamePort;     // Game port
     unsigned short      nPlayers;      // Current players
     unsigned short      nMaxPlayers;   // Maximum players
@@ -402,19 +399,19 @@ public:
         m_Map.clear ();
     }
 
-    CServerListItem* Find ( in_addr Address, ushort usQueryPort )
+    CServerListItem* Find ( in_addr Address, ushort usGamePort )
     {
-        SAddressPort key ( Address, usQueryPort );
+        SAddressPort key ( Address, usGamePort );
         if ( CServerListItem** ppItem = MapFind ( m_Map, key ) )
             return *ppItem;
         return NULL;
     }
 
-    CServerListItem* Add ( in_addr Address, ushort usQueryPort, bool bAtFront = false )
+    CServerListItem* Add ( in_addr Address, ushort usGamePort, bool bAtFront = false )
     {
-        SAddressPort key ( Address, usQueryPort );
+        SAddressPort key ( Address, usGamePort );
         assert ( !MapContains ( m_Map, key ) );
-        CServerListItem* pItem = new CServerListItem ( Address, usQueryPort );
+        CServerListItem* pItem = new CServerListItem ( Address, usGamePort );
         MapSet ( m_Map, key, pItem );
         pItem->uiTieBreakPosition = 5000;
         if ( !m_List.empty () )
@@ -431,15 +428,15 @@ public:
         return pItem;
     }
 
-    bool Remove ( in_addr Address, ushort usQueryPort )
+    bool Remove ( in_addr Address, ushort usGamePort )
     {
-        SAddressPort key ( Address, usQueryPort );
+        SAddressPort key ( Address, usGamePort );
         if ( MapRemove ( m_Map, key ) )
         {
             for ( std::list<CServerListItem *>::iterator iter = m_List.begin (); iter != m_List.end (); iter++ )
             {
                 CServerListItem* pItem = *iter;
-                if ( pItem->Address.s_addr == Address.s_addr && pItem->usQueryPort == usQueryPort )
+                if ( pItem->Address.s_addr == Address.s_addr && pItem->usGamePort == usGamePort )
                 {
                     m_List.erase ( iter );
                     delete pItem;
@@ -471,9 +468,9 @@ public:
     CServerListReverseIterator              ReverseIteratorEnd      ( void )                        { return m_Servers.rend (); };
     unsigned int                            GetServerCount          ( void )                        { return m_Servers.size (); };
 
-    bool                                    AddUnique               ( in_addr Address, ushort usQueryPort, bool addAtFront = false );
+    bool                                    AddUnique               ( in_addr Address, ushort usGamePort, bool addAtFront = false );
     void                                    Clear                   ( void );
-    bool                                    Remove                  ( in_addr Address, ushort usQueryPort );
+    bool                                    Remove                  ( in_addr Address, ushort usGamePort );
 
     std::string&                            GetStatus               ( void )                        { return m_strStatus; };
     bool                                    IsUpdated               ( void )                        { return m_bUpdated; };

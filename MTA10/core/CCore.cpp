@@ -1604,8 +1604,8 @@ void CCore::UpdateRecentlyPlayed()
     {
         CServerBrowser* pServerBrowser = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ();
         CServerList* pRecentList = pServerBrowser->GetRecentList ();
-        pRecentList->Remove ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
-        pRecentList->AddUnique ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET, true );
+        pRecentList->Remove ( Address, uiPort );
+        pRecentList->AddUnique ( Address, uiPort, true );
        
         pServerBrowser->SaveRecentlyPlayedList();
         if ( !m_pConnectManager->m_strLastPassword.empty() )
@@ -1615,13 +1615,14 @@ void CCore::UpdateRecentlyPlayed()
     //Save our configuration file
     CCore::GetSingleton ().SaveConfig ();
 }
-void CCore::SetCurrentServer( in_addr Addr, unsigned short usQueryPort )
+
+void CCore::SetCurrentServer( in_addr Addr, unsigned short usGamePort )
 {
     //Set the current server info so we can query it with ASE for xfire
     m_pCurrentServer->Address = Addr;
-    m_pCurrentServer->usQueryPort = usQueryPort;
-
+    m_pCurrentServer->usGamePort = usGamePort;
 }
+
 SString CCore::UpdateXfire( void )
 {
     //Check if a current server exists
