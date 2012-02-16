@@ -129,6 +129,10 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     m_bIsConnecting = true;
     m_tConnectStarted = time ( NULL );
 
+    // Load server password
+    if ( m_strPassword.empty () )
+        m_strPassword = CServerBrowser::GetSingletonPtr()->GetServerPassword ( m_strHost + ":" + SString ( "%u", m_usPort ) );
+
     // Start server version detection
     SAFE_DELETE ( m_pServerItem );
     m_pServerItem = new CServerListItem ( m_Address, m_usPort + SERVER_LIST_QUERY_PORT_OFFSET );
@@ -160,7 +164,7 @@ bool CConnectManager::Reconnect ( const char* szHost, unsigned short usPort, con
     {
         m_strHost = szHost;
     }
-    if ( szPassword )
+    if ( szPassword && szPassword[0] )
     {
         m_strPassword = szPassword;
     }
