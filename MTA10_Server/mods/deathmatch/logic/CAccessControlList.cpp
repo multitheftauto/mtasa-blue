@@ -52,20 +52,34 @@ CAccessControlListRight* CAccessControlList::AddRight ( const char* szRightName,
 }
 
 
-CAccessControlListRight* CAccessControlList::GetRight ( const char* szRightName, CAccessControlListRight::ERightType eRightType )
+CAccessControlListRight* CAccessControlList::GetRight ( const char* szRightName, CAccessControlListRight::ERightType eRightType, bool bAllowWildcardMatch )
 {
+    static unsigned int uiStarHash = HashString ( "*" );
     unsigned int uiHash = HashString ( szRightName );
+    CAccessControlListRight* pWildcardMatch = NULL;
 
     list < CAccessControlListRight* > ::iterator iter = m_Rights.begin ();
     for ( ; iter != m_Rights.end (); iter++ )
     {
-        if ( (*iter)->GetRightNameHash () == uiHash && eRightType == (*iter)->GetRightType () )
+        CAccessControlListRight* pACLRight = *iter;
+        if ( eRightType == pACLRight->GetRightType () )
         {
-            return *iter;
+            if ( pACLRight->GetRightNameHash () == uiHash && SStringX ( szRightName ) == pACLRight->GetRightName () )
+            {
+                // Exact match
+                return pACLRight;
+            }
+            else
+            if ( bAllowWildcardMatch && pACLRight->GetRightNameHash () == uiStarHash )
+            {
+                // Save first wildcard match to be used if no exact matches
+                if ( !pWildcardMatch )
+                    pWildcardMatch = pACLRight;
+            }
         }
     }
 
-    return NULL;
+    return pWildcardMatch;
 }
 
 
@@ -77,7 +91,8 @@ bool CAccessControlList::RemoveRight ( const char* szRightName, CAccessControlLi
     for ( ; iter != m_Rights.end (); iter++ )
     {
         CAccessControlListRight* pACLRight = *iter;
-        if ( pACLRight->GetRightNameHash () == uiHash && eRightType == pACLRight->GetRightType () )
+        if ( pACLRight->GetRightNameHash () == uiHash && eRightType == pACLRight->GetRightType ()
+             && SStringX ( szRightName ) == pACLRight->GetRightName () )
         {
             m_Rights.remove ( pACLRight );
             delete pACLRight;
