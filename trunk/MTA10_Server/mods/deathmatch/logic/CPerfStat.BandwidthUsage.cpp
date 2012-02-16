@@ -617,9 +617,14 @@ void CPerfStatBandwidthUsageImpl::GetStats ( CPerfStatResult* pResult, const std
             }
             else
             {
-                c += 4;
-                if ( bShowBlocked[t] )
-                    c += 1;
+                if ( !bTotalsOnly )
+                {
+                    c += 4;
+                    if ( bShowBlocked[t] )
+                        c += 1;
+                }
+                else
+                    c += 2;
             }
         }
     }    
