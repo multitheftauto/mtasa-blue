@@ -340,7 +340,6 @@ void CServerInfo::SetServerInformation( const char* szHost, unsigned short usPor
 
     // Set our server query's address, query port and game port
     m_Server.Address = Address;
-    m_Server.usQueryPort = usPort + SERVER_LIST_QUERY_PORT_OFFSET;
     m_Server.usGamePort = usPort;
 
     if ( pInitialServerListItem )  // If we have a pointer to an already scanned server, we initially set text to this
