@@ -54,6 +54,7 @@ public:
     unsigned int        GetBansWithBanner       ( const char* szBanner );
 
     bool                LoadBanList             ( void );
+    bool                ReloadBanList           ( void );
     void                SaveBanList             ( void );
     void                SafeSetValue            ( CXMLNode* pNode, const char* szKey, const std::string& strValue );
     void                SafeSetValue            ( CXMLNode* pNode, const char* szKey, unsigned int );

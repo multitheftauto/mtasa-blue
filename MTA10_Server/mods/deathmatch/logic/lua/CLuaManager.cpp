@@ -709,6 +709,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "removeBan", CLuaFunctionDefinitions::RemoveBan );
 
     CLuaCFunctions::AddFunction ( "getBans", CLuaFunctionDefinitions::GetBans );
+    CLuaCFunctions::AddFunction ( "reloadBans", CLuaFunctionDefinitions::ReloadBanList );
 
     CLuaCFunctions::AddFunction ( "getBanIP", CLuaFunctionDefinitions::GetBanIP );
     CLuaCFunctions::AddFunction ( "getBanSerial", CLuaFunctionDefinitions::GetBanSerial );
