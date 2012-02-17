@@ -512,6 +512,13 @@ bool CBanManager::LoadBanList ( void )
 }
 
 
+bool CBanManager::ReloadBanList ( void )
+{
+    RemoveAllBans();
+    return LoadBanList();
+}
+
+
 void CBanManager::SaveBanList ( void )
 {
     // Only allow save after a load was attempted

@@ -836,6 +836,8 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "checkls", CConsoleCommands::CheckLightSync, false );
     RegisterCommand ( "debugdb", CConsoleCommands::SetDbLogLevel, false );
 
+    RegisterCommand ( "reloadbans", CConsoleCommands::ReloadBans, false );
+
     RegisterCommand ( "aclrequest", CConsoleCommands::AclRequest, false );
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
     RegisterCommand ( "sfakelag", CConsoleCommands::FakeLag, false );

@@ -524,6 +524,7 @@ public:
     static int      RemoveBan                           ( lua_State* luaVM );
 
     static int      GetBans                             ( lua_State* luaVM );
+    static int      ReloadBanList                       ( lua_State* luaVM );
 
     static int      GetBanIP                            ( lua_State* luaVM );
     static int      GetBanSerial                        ( lua_State* luaVM );

@@ -10735,6 +10735,12 @@ bool CStaticFunctionDefinitions::GetBans ( lua_State* pLua )
 }
 
 
+bool CStaticFunctionDefinitions::ReloadBanList ( void )
+{
+    return m_pBanManager->ReloadBanList ();
+}
+
+
 bool CStaticFunctionDefinitions::GetBanIP ( CBan* pBan, char* szIP, size_t size )
 {
     if ( !pBan->GetIP ().empty () )

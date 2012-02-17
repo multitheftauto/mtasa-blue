@@ -74,6 +74,7 @@
       <right name="command.ban" access="false"/>
       <right name="command.banip" access="false"/>
       <right name="command.unbanip" access="false"/>
+      <right name="command.reloadbans" access="false"/>
       <right name="command.shutdown" access="false"/>
       <right name="command.install" access="false"/>
       <right name="command.aexec" access="false"/>
@@ -93,6 +94,7 @@
       <right name="function.getBansXML" access="false"/>
       <right name="function.unbanIP" access="false"/>
       <right name="function.unbanSerial" access="false"/>
+      <right name="function.reloadBans" access="false"/>
       <right name="function.getClientIP" access="false"/>
       <right name="function.setServerPassword" access="false"/>
       <right name="function.getServerPassword" access="false"/>
@@ -160,6 +162,7 @@
       <right name="command.ban" access="true"/>
       <right name="command.banip" access="true"/>
       <right name="command.unbanip" access="true"/>
+      <right name="command.reloadbans" access="true"/>
       <right name="command.refresh" access="true"/>
       <right name="command.refreshall" access="true"/>
       <right name="command.loadmodule" access="true"/>
@@ -183,6 +186,7 @@
       <right name="command.run" access="true"/>
       <right name="function.addBan" access="true"/>
       <right name="function.removeBan" access="true"/>
+      <right name="function.reloadBans" access="true"/>
       <right name="function.executeCommandHandler" access="true"/>
       <right name="function.setServerPassword" access="true"/>
       <right name="function.getServerPassword" access="true"/>

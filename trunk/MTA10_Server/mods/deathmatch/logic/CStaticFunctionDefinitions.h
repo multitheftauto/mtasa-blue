@@ -620,6 +620,7 @@ public:
     static bool                 RemoveBan                           ( CBan* pBan, CPlayer* pResponsible = NULL );
 
     static bool                 GetBans                             ( lua_State* luaVM );
+    static bool                 ReloadBanList                       ( void );
 
     static bool                 GetBanIP                            ( CBan* pBan, char* szIP, size_t size );
     static bool                 GetBanSerial                        ( CBan* pBan, char* szSerial, size_t size );

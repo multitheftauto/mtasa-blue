@@ -12162,6 +12162,16 @@ int CLuaFunctionDefinitions::GetBans ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::ReloadBanList ( lua_State* luaVM )
+{
+    bool bSuccess = CStaticFunctionDefinitions::ReloadBanList ();
+    if ( !bSuccess )
+        m_pScriptDebugging->LogError ( luaVM, "reloadBans: Ban List failed to reload, fix any errors and run again" );
+    lua_pushboolean ( luaVM, bSuccess );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::GetBanIP ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
