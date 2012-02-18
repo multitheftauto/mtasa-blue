@@ -340,6 +340,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMultiplayerSA_1.3.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\COffsets.cpp"
 				>
 			</File>

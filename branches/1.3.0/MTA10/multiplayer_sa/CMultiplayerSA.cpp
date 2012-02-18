@@ -1510,6 +1510,9 @@ void CMultiplayerSA::InitHooks()
     // Aircraft Max Height checks are at 0x6D2614 and 0x6D2625 edit the check to use our own float.
     MemPut ( 0x6D2614, &m_fAircraftMaxHeight );
     MemPut ( 0x6D2625, &m_fAircraftMaxHeight );
+
+    // Init our 1.3 hooks.
+    Init_13 ( );
 }
 
 
