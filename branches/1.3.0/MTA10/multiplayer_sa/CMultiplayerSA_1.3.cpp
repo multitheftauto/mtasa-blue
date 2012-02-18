@@ -11,11 +11,13 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+
 void CMultiplayerSA::Init_13 ( void )
 {
     InitHooks_13 ( );
     InitMemoryCopies_13 ( );
 }
+
 void CMultiplayerSA::InitHooks_13 ( void )
 {
     // HookInstalls go here
