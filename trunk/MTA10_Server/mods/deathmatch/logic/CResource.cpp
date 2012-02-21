@@ -1615,9 +1615,18 @@ bool CResource::ReadIncludedFiles ( CXMLNode * root )
                 string strFullFilename;
                 ReplaceSlashes ( strFilename );
 
+                bool bDownload = true;
+                CXMLAttribute * download = attributes->Find("download");
+                if ( download )
+                {
+                    const char *szDownload = download->GetValue ().c_str ();
+                    if ( stricmp ( szDownload, "no" ) == 0 || stricmp ( szDownload, "false" ) == 0 )
+                        bDownload = false;
+                }
+
                 // Create a new resourcefile item
                 if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
-                    m_resourceFiles.push_back ( new CResourceClientFileItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes ) );
+                    m_resourceFiles.push_back ( new CResourceClientFileItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes, bDownload ) );
                 else
                 {
                     char szBuffer[512];

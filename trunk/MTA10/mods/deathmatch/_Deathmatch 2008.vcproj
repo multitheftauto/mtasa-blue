@@ -537,6 +537,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CSingularFileDownload.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CSingularFileDownloadManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CStaticFunctionDefinitions.cpp"
 					>
 				</File>
@@ -1916,6 +1924,14 @@
 				</File>
 				<File
 					RelativePath=".\logic\CServerIdManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CSingularFileDownload.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CSingularFileDownloadManager.h"
 					>
 				</File>
 				<File

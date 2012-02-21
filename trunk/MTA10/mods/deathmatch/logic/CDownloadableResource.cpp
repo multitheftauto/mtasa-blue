@@ -13,7 +13,7 @@
 
 #include <StdInc.h>
 
-CDownloadableResource::CDownloadableResource ( eResourceType resourceType, const char* szName, const char* szNameShort, CChecksum serverChecksum, bool bGenerateClientChecksum )
+CDownloadableResource::CDownloadableResource ( eResourceType resourceType, const char* szName, const char* szNameShort, CChecksum serverChecksum, bool bGenerateClientChecksum, bool bAutoDownload )
 {
     // Store the resource type
     m_resourceType = resourceType;
@@ -43,6 +43,8 @@ CDownloadableResource::CDownloadableResource ( eResourceType resourceType, const
         // Default the last client checksum
         m_LastClientChecksum = CChecksum ();
     }
+
+    m_bAutoDownload = bAutoDownload;
 }
 
 CDownloadableResource::~CDownloadableResource ( void )

@@ -101,6 +101,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_bTransferResource = false;            // flag controls whether a resource is being transferred or not
     m_bTransferInitiated = false;           // flag controls whether a transfer has been initiated (to prevent PacketResource, AUTOPATCHER_REQUEST_FILES priority issues)
 
+    m_bSingularTransfer = false;            // flag controls whether a singular file is being transferred or not
+
     m_dwTransferStarted = 0;                // timestamp for transfer start
     m_bTransferReset = false;               // flag controls whether we have to reset the transfer counter
 
@@ -223,6 +225,9 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     // MTA Voice
     m_pVoiceRecorder = new CVoiceRecorder();
+
+    // Singular file download manager
+    m_pSingularFileDownloadManager = new CSingularFileDownloadManager();
 
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
@@ -353,6 +358,10 @@ CClientGame::~CClientGame ( void )
 
     delete m_pVoiceRecorder;
     m_pVoiceRecorder = NULL;
+
+    // Singular file download manager
+    delete m_pSingularFileDownloadManager;
+    m_pSingularFileDownloadManager = NULL;
 
     // NULL the message/net stuff
     g_pMultiplayer->SetPreContextSwitchHandler ( NULL );
@@ -1083,7 +1092,15 @@ void CClientGame::DoPulses ( void )
     else if ( m_Status == CClientGame::STATUS_JOINED )
     {
         // Pulse DownloadFiles if we're transferring stuff
-        if ( m_bTransferResource ) DownloadFiles ();
+        if ( m_bTransferResource ) 
+        {
+            DownloadFiles ();
+        }
+        else if ( m_bSingularTransfer )
+        {
+            DownloadFiles ( true );
+        }
+
     }
     else if ( m_Status == CClientGame::STATUS_TRANSFER )
     {
@@ -2671,6 +2688,9 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientSoundStream", "success, length, streamName", NULL, false );
     m_Events.AddEvent ( "onClientSoundFinishedDownload", "length", NULL, false );
     m_Events.AddEvent ( "onClientSoundChangedMeta", "streamTitle", NULL, false );
+
+    // Misc events
+    m_Events.AddEvent ( "onFileDownloadComplete", "fileName, success", NULL, false );
 }
 
 
@@ -3664,9 +3684,10 @@ bool CClientGame::ProcessCollisionHandler ( CEntitySAInterface* pThisInterface, 
     return true;
 }
 
-void CClientGame::DownloadFiles ( void )
+void CClientGame::DownloadFiles ( bool bBackgroundDownload )
 {
-    m_pTransferBox->DoPulse ();
+    if ( !bBackgroundDownload )
+        m_pTransferBox->DoPulse (); // should increase FPS while downloading singular files
 
     CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager ();
     if ( pHTTP )
@@ -3679,8 +3700,16 @@ void CClientGame::DownloadFiles ( void )
 
                 m_bTransferReset = false;
             }
+            if ( !bBackgroundDownload && !m_bTransferResource )
+                m_pTransferBox->SetInfo ( pHTTP->GetDownloadSizeNow () ); // no need to set this if it's a singular file
 
-            m_pTransferBox->SetInfo ( pHTTP->GetDownloadSizeNow () );
+            if ( bBackgroundDownload & m_pTransferBox->IsVisible() )
+            {
+                if ( pHTTP->GetDownloadSizeNow () > m_pTransferBox->GetTotalSize () )
+                {
+                    m_pTransferBox->Hide(); // singular files don't add to total size so if current size > total size then just hide, should increase FPS a little as well
+                }
+            }
         }
         else
         {
@@ -3697,10 +3726,20 @@ void CClientGame::DownloadFiles ( void )
             }
             else
             {
-                // Throw the error and disconnect
-                g_pCore->GetModManager ()->RequestUnload ();
-                g_pCore->ShowMessageBox ( "Error", szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR );
-                g_pCore->GetConsole ()->Printf ( "Download error: %s", szHTTPError );
+                // Resource transfers can't deal with errors but singular transfers can
+                if ( m_bTransferResource )
+                {
+                    // Throw the error and disconnect
+                    g_pCore->GetModManager ()->RequestUnload ();
+                    g_pCore->ShowMessageBox ( "Error", szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR );
+                    g_pCore->GetConsole ()->Printf ( "Download error: %s", szHTTPError );
+                }
+                else
+                {
+                    m_bTransferReset = true;
+                    Event_OnTransferComplete ();
+                    m_dwTransferStarted = 0;
+                }
             }
         }
     }
@@ -4473,6 +4512,19 @@ void CClientGame::Event_OnTransferComplete ( void )
         {
             m_bTransferResource = false;
             m_pTransferBox->Hide ();
+        }
+    }
+    else if ( m_bSingularTransfer )  /*** singular file transfer (lua downloadFile) ***/
+    {
+        // Disable m_bSingularTransfer, if there are no more files in the autopatch query (to prevent "simulatenous" transfer fuck-ups)
+        if ( !g_pNet->GetHTTPDownloadManager ()->IsDownloading () )
+        {
+            // Can't clear list until all files have been processed
+            if ( m_pSingularFileDownloadManager->AllComplete () )
+            {
+                m_bSingularTransfer = false;
+                m_pSingularFileDownloadManager->ClearList ();
+            }
         }
     }
     else                        /*** on-join transfer ***/
