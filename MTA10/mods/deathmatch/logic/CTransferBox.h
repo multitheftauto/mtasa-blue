@@ -43,6 +43,8 @@ public:
 
     inline void                         AddToTotalSize                          ( double dSize )    { m_dTotalSize += dSize; };
 
+    inline double                       GetTotalSize                            ( void )            { return m_dTotalSize; }
+
 private:
     CGUIWindow*                         m_pWindow;
     CGUIStaticImage*                    m_pIcon[TRANSFERBOX_FRAMES];

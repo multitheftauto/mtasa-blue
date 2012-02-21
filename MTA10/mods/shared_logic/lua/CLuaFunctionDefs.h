@@ -65,6 +65,9 @@ public:
     LUA_DECLARE ( GetLatentEventStatus );
     LUA_DECLARE ( CancelLatentEvent );
 
+    // Misc functions
+    LUA_DECLARE ( DownloadFile );
+
     // Sound effects and synth functions
     LUA_DECLARE ( PlaySound );
     LUA_DECLARE ( PlaySound3D );

@@ -4361,9 +4361,12 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                         switch ( ucChunkSubType )
                         {
                             case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE:
-                                pDownloadableResource = pResource->QueueFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE, szChunkData, chunkChecksum );
+                                {
+                                    bool bDownload = bitStream.ReadBit ();
+                                    pDownloadableResource = pResource->QueueFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE, szChunkData, chunkChecksum, bDownload );
 
-                                break;
+                                    break;
+                                }
                             case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
                                 pDownloadableResource = pResource->QueueFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT, szChunkData, chunkChecksum );
 
@@ -4380,31 +4383,34 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                         // Is it a valid downloadable resource?
                         if ( pDownloadableResource )
                         {
-                            // Does the Client and Server checksum Match?
-                            if ( !pDownloadableResource->DoesClientAndServerChecksumMatch () )
+                            if ( pDownloadableResource->IsAutoDownload() )
                             {
-                                // Make sure the directory exists
-                                const char* szTempName = pDownloadableResource->GetName ();
-                                if ( szTempName )
+                                // Does the Client and Server checksum Match?
+                                if ( !pDownloadableResource->DoesClientAndServerChecksumMatch () )
                                 {
-                                    // Make sure its directory exists
-                                    MakeSureDirExists ( szTempName );
-                                }
+                                    // Make sure the directory exists
+                                    const char* szTempName = pDownloadableResource->GetName ();
+                                    if ( szTempName )
+                                    {
+                                        // Make sure its directory exists
+                                        MakeSureDirExists ( szTempName );
+                                    }
 
-                                // Combine the HTTP Download URL, the Resource Name and the Resource File
-                                SString strHTTPDownloadURLFull ( "%s/%s/%s", g_pClientGame->m_strHTTPDownloadURL.c_str (), pResource->GetName (), pDownloadableResource->GetShortName () );
+                                    // Combine the HTTP Download URL, the Resource Name and the Resource File
+                                    SString strHTTPDownloadURLFull ( "%s/%s/%s", g_pClientGame->m_strHTTPDownloadURL.c_str (), pResource->GetName (), pDownloadableResource->GetShortName () );
 
-                                // Delete the file that already exists
-                                unlink ( pDownloadableResource->GetName () );
+                                    // Delete the file that already exists
+                                    unlink ( pDownloadableResource->GetName () );
 
-                                // Queue the file to be downloaded
-                                bool bAddedFile = pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame () );
+                                    // Queue the file to be downloaded
+                                    bool bAddedFile = pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame () );
 
-                                // If the file was successfully queued, increment the resources to be downloaded
-                                usResourcesToBeDownloaded++;
-                                if ( bAddedFile )
-                                    g_pClientGame->m_pTransferBox->AddToTotalSize ( dChunkDataSize );
-                            }                       
+                                    // If the file was successfully queued, increment the resources to be downloaded
+                                    usResourcesToBeDownloaded++;
+                                    if ( bAddedFile )
+                                        g_pClientGame->m_pTransferBox->AddToTotalSize ( dChunkDataSize );
+                                }                       
+                            }
                         }
                     }
                 }

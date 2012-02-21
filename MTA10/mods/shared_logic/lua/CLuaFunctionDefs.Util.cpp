@@ -941,3 +941,41 @@ int CLuaFunctionDefs::GetDevelopmentMode ( lua_State* luaVM )
     lua_pushboolean ( luaVM, bResult );
     return 1;
 }
+
+
+int CLuaFunctionDefs::DownloadFile ( lua_State* luaVM )
+{
+    // Grab our VM
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        // Grab its resource
+        CResource * pResource = pLuaMain->GetResource();
+        if ( pResource )
+        {
+            const char* szFile = {0};
+            int iArgument = lua_type ( luaVM, 1 );
+            if ( iArgument == LUA_TSTRING )
+            {
+                szFile = lua_tostring ( luaVM, 1 );
+                std::list < CResourceFile* > ::const_iterator iter = pResource->IterBeginResourceFiles();
+                for ( ; iter != pResource->IterEndResourceFiles() ; iter++ ) 
+                {
+                    if ( strcmp ( szFile, (*iter)->GetShortName() ) == 0 )
+                    {
+                        if ( CStaticFunctionDefinitions::DownloadFile ( pResource, szFile, (*iter)->GetServerChecksum() ) )
+                        {
+                            lua_pushboolean ( luaVM, true );
+                            return 1;
+                        }
+                    }
+                }
+                m_pScriptDebugging->LogCustom ( luaVM, 255, 255, 255, "downloadFile: File doesn't exist" );
+            }
+            else
+                m_pScriptDebugging->LogBadType ( luaVM, "downloadFile" );
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

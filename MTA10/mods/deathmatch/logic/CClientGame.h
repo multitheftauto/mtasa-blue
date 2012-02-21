@@ -54,6 +54,7 @@
 #include "../../shared_logic/CClientGUIElement.h"
 #include "CLocalServer.h"
 #include "CVoiceRecorder.h"
+#include "CSingularFileDownloadManager.h"
 #define HeliKill_List_Clear_Rate 500
 #define MIN_PUSH_ANTISPAM_RATE 1500
 class CClientGame
@@ -244,6 +245,7 @@ public:
     inline CNametags*                   GetNametags                     ( void )        { return m_pNametags; }
     inline CSyncDebug*                  GetSyncDebug                    ( void )        { return m_pSyncDebug; };
     inline CRPCFunctions*               GetRPCFunctions                 ( void )        { return m_pRPCFunctions; }
+    inline CSingularFileDownloadManager* GetSingularFileDownloadManager ( void )        { return m_pSingularFileDownloadManager; };
 
     inline CClientEntity*               GetRootEntity                   ( void )        { return m_pRootEntity; }
     inline CEvents*                     GetEvents                       ( void )        { return &m_Events; }
@@ -381,6 +383,8 @@ public:
     void                                GottenPlayerScreenShot          ( const CBuffer& buffer, uint uiTimeSpentInQueue );
     void                                ProcessDelayedSendList          ( void );
 
+    SString                             GetHTTPURL                      ( void ) { return m_strHTTPDownloadURL; };
+
 private:
 
     // CGUI Callbacks
@@ -426,7 +430,7 @@ private:
     #endif
 
 
-    void                                DownloadFiles                   ( void );
+    void                                DownloadFiles                   ( bool bBackgroundDownload = false );
 
     void                                QuitPlayer                      ( CClientPlayer* pPlayer, eQuitReason Reason );
 
@@ -486,6 +490,9 @@ public:
     void                                SetServerVersionSortable        ( const SString& strVersion )   { m_strServerVersionSortable = strVersion; }
     const SString&                      GetServerVersionSortable        ( void )                        { return m_strServerVersionSortable; }
 
+    void                                SetSingularTransfers            ( bool bTransfer )  { m_bSingularTransfer = bTransfer; };
+    void                                ShowTransferBox                 ( void )            { m_pTransferBox->Show (); };
+
 private:
     eStatus                             m_Status;
     unsigned long                       m_ulTimeStart;
@@ -537,6 +544,7 @@ private:
     CLatentTransferManager*             m_pLatentTransferManager;
     bool                                m_bInitiallyFadedOut;
     bool                                m_bHudAreaNameDisabled;
+    CSingularFileDownloadManager*       m_pSingularFileDownloadManager;
 
     // Revised facilities
     CServer                             m_Server;
@@ -637,6 +645,8 @@ private:
     bool                                m_bBeingDeleted;        // To enable speedy disconnect
 
     bool                                m_bWasMinimized;
+
+    bool                                m_bSingularTransfer;
 
     // Cache for speeding up collision processing
 public:
