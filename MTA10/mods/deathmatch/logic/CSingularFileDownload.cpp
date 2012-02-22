@@ -72,11 +72,11 @@ void CSingularFileDownload::ProgressCallBack ( double sizeJustDownloaded, double
         CResource* pResource = pFile->GetResource();
         if ( pResource )
         {
-            // Call the onFileDownloadComplete event
+            // Call the onClientFileDownloadComplete event
             CLuaArguments Arguments;
             Arguments.PushString ( pFile->GetShortName() );        // file name
             Arguments.PushBoolean ( true );     // Completed successfully?
-            pResource->GetResourceEntity()->CallEvent ( "onFileDownloadComplete", Arguments, false );
+            pResource->GetResourceEntity()->CallEvent ( "onClientFileDownloadComplete", Arguments, false );
         }
         pFile->SetComplete();
     }
@@ -86,11 +86,11 @@ void CSingularFileDownload::ProgressCallBack ( double sizeJustDownloaded, double
         CResource* pResource = pFile->GetResource();
         if ( pResource )
         {
-            // Call the onFileDownloadComplete event
+            // Call the onClientFileDownloadComplete event
             CLuaArguments Arguments;
             Arguments.PushString ( pFile->GetShortName() );        // file name
             Arguments.PushBoolean ( false );    // Completed successfully?
-            pResource->GetResourceEntity()->CallEvent ( "onFileDownloadComplete", Arguments, false );
+            pResource->GetResourceEntity()->CallEvent ( "onClientFileDownloadComplete", Arguments, false );
         }
         pFile->SetComplete();
     }
@@ -101,11 +101,11 @@ void CSingularFileDownload::CallFinished ( void )
 {
     if ( m_pResource )
     {
-        // Call the onFileDownloadComplete event
+        // Call the onClientbFileDownloadComplete event
         CLuaArguments Arguments;
         Arguments.PushString ( GetShortName() );        // file name
         Arguments.PushBoolean ( true );     // Completed successfully?
-        m_pResource->GetResourceEntity()->CallEvent ( "onFileDownloadComplete", Arguments, false );
+        m_pResource->GetResourceEntity()->CallEvent ( "onClientFileDownloadComplete", Arguments, false );
     }
     SetComplete();
 }
