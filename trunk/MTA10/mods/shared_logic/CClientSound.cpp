@@ -379,6 +379,24 @@ void CClientSound::GetVelocity ( CVector& vecVelocity )
 
 void CClientSound::SetPaused ( bool bPaused )
 {
+    if ( m_bPaused != bPaused )
+    {
+        if ( bPaused )
+        {
+            // call onClientSoundStopped
+            CLuaArguments Arguments;
+            Arguments.PushString ( "paused" );     // Reason
+            this->CallEvent ( "onClientSoundStopped", Arguments, false );
+        }
+        else
+        {
+            // call onClientSoundStarted
+            CLuaArguments Arguments;
+            Arguments.PushString ( "resumed" );     // Reason
+            this->CallEvent ( "onClientSoundStarted", Arguments, false );
+        }
+    }
+
     m_bPaused = bPaused;
 
     m_SimulatedPlayPosition.SetPaused ( bPaused );
