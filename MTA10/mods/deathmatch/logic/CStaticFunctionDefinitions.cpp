@@ -6348,6 +6348,10 @@ CClientSound* CStaticFunctionDefinitions::PlaySound3D ( CResource* pResource, co
 
 bool CStaticFunctionDefinitions::StopSound ( CClientSound& Sound )
 {
+    // call onClientSoundStopped
+    CLuaArguments Arguments;
+    Arguments.PushString ( "destroyed" );     // Reason
+    Sound.CallEvent ( "onClientSoundStopped", Arguments, false );
     g_pClientGame->GetElementDeleter()->Delete ( &Sound );
     return true;
 }

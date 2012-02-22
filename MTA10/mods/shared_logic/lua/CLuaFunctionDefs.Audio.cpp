@@ -50,6 +50,11 @@ int CLuaFunctionDefs::PlaySound ( lua_State* luaVM )
                     CClientSound* pSound = CStaticFunctionDefinitions::PlaySound ( pResource, strSound, bIsURL, bLoop );
                     if ( pSound )
                     {
+                        // call onClientSoundStarted
+                        CLuaArguments Arguments;
+                        Arguments.PushString ( "play" );     // Reason
+                        pSound->CallEvent ( "onClientSoundStarted", Arguments, false );
+
                         lua_pushelement ( luaVM, pSound );
                         return 1;
                     }
@@ -104,6 +109,11 @@ int CLuaFunctionDefs::PlaySound3D ( lua_State* luaVM )
                     CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D ( pResource, strSound, bIsURL, vecPosition, bLoop );
                     if ( pSound )
                     {
+                        // call onClientSoundStarted
+                        CLuaArguments Arguments;
+                        Arguments.PushString ( "play" );     // Reason
+                        pSound->CallEvent ( "onClientSoundStarted", Arguments, false );
+
                         lua_pushelement ( luaVM, pSound );
                         return 1;
                     }
