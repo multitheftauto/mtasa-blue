@@ -56,7 +56,18 @@ namespace CEGUI
                 "DefaultResourceProvider::load - Filename supplied for data loading must be valid");
         }
 
-        std::ifstream dataFile(filename.c_str(), std::ios::binary|std::ios::ate);
+        SString strFilename = filename.c_str();
+        if ( !FileExists( strFilename ) )
+        {
+            // If filename does not exist, try preserving original 128-255 characters
+            strFilename = "";
+            for ( uint i = 0 ; i < filename.length () ; i++ )
+            {
+                strFilename += filename[i];
+            }
+        }
+
+        std::ifstream dataFile(strFilename, std::ios::binary|std::ios::ate);
         if( dataFile.fail())
         {
             throw InvalidRequestException((utf8*)
