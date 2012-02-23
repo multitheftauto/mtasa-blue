@@ -540,12 +540,83 @@ HRESULT CDirect3DEvents9::CreateVertexBuffer ( IDirect3DDevice9 *pDevice, UINT L
     if ( ( Usage & D3DUSAGE_DYNAMIC ) == 0 )
         Usage &= -1 - D3DUSAGE_WRITEONLY;
 
-    hr = pDevice->CreateVertexBuffer ( Length, Usage, FVF, Pool, ppVertexBuffer, pSharedHandle );
-    if ( FAILED(hr) )
-        return hr;
+    for ( uint i = 0 ; i < 2 ; i++ )
+    {
+        hr = pDevice->CreateVertexBuffer ( Length, Usage, FVF, Pool, ppVertexBuffer, pSharedHandle );
+        if( SUCCEEDED( hr ) )
+            break;
+
+        if ( hr != D3DERR_OUTOFVIDEOMEMORY || i > 0 )
+        {
+            CCore::GetSingleton ().LogEvent ( 610, "CreateVertexBuffer", "", SString ( "hr:%x Length:%x Usage:%x FVF:%x Pool:%x", hr, Length, Usage, FVF, Pool ) );
+            return hr;
+        }
+
+        pDevice->EvictManagedResources ();
+    }
 
     // Create proxy
-	*ppVertexBuffer = new CProxyDirect3DVertexBuffer ( pDevice, *ppVertexBuffer, Length, Usage, FVF, Pool );
+    *ppVertexBuffer = new CProxyDirect3DVertexBuffer ( pDevice, *ppVertexBuffer, Length, Usage, FVF, Pool );
+    return hr;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::CreateIndexBuffer
+//
+//
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::CreateIndexBuffer ( IDirect3DDevice9 *pDevice, UINT Length, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, IDirect3DIndexBuffer9** ppIndexBuffer, HANDLE* pSharedHandle )
+{
+    HRESULT hr;
+
+    for ( uint i = 0 ; i < 2 ; i++ )
+    {
+        hr = pDevice->CreateIndexBuffer ( Length, Usage, Format, Pool, ppIndexBuffer, pSharedHandle );
+        if( SUCCEEDED( hr ) )
+            break;
+
+        if ( hr != D3DERR_OUTOFVIDEOMEMORY || i > 0 )
+        {
+            CCore::GetSingleton ().LogEvent ( 611, "CreateIndexBuffer", "", SString ( "hr:%x Length:%x Usage:%x Format:%x Pool:%x", hr, Length, Usage, Format, Pool ) );
+            return hr;
+        }
+
+        pDevice->EvictManagedResources ();
+    }
+
+    return hr;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::CreateTexture
+//
+//
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::CreateTexture ( IDirect3DDevice9 *pDevice, UINT Width, UINT Height, UINT Levels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, IDirect3DTexture9** ppTexture, HANDLE* pSharedHandle )
+{
+    HRESULT hr;
+
+    for ( uint i = 0 ; i < 2 ; i++ )
+    {
+        hr = pDevice->CreateTexture ( Width, Height, Levels, Usage, Format, Pool, ppTexture, pSharedHandle );
+        if( SUCCEEDED( hr ) )
+            break;
+
+        if ( hr != D3DERR_OUTOFVIDEOMEMORY || i > 0 )
+        {
+            CCore::GetSingleton ().LogEvent ( 612, "CreateTexture", "", SString ( "hr:%x W:%x H:%x L:%x Usage:%x Format:%x Pool:%x", hr, Width, Height, Levels, Usage, Format, Pool ) );
+            return hr;
+        }
+
+        pDevice->EvictManagedResources ();
+    }
+
     return hr;
 }
 
