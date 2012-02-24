@@ -311,7 +311,7 @@ VOID    CProxyDirect3DDevice9::GetGammaRamp                   ( UINT iSwapChain,
 
 HRESULT CProxyDirect3DDevice9::CreateTexture                  ( UINT Width,UINT Height,UINT Levels,DWORD Usage,D3DFORMAT Format,D3DPOOL Pool,IDirect3DTexture9** ppTexture,HANDLE* pSharedHandle )
 {
-    return m_pDevice->CreateTexture ( Width, Height, Levels, Usage, Format, Pool, ppTexture, pSharedHandle );
+    return CDirect3DEvents9::CreateTexture ( m_pDevice, Width, Height, Levels, Usage, Format, Pool, ppTexture, pSharedHandle );
 }
 
 HRESULT CProxyDirect3DDevice9::CreateVolumeTexture            ( UINT Width,UINT Height,UINT Depth,UINT Levels,DWORD Usage,D3DFORMAT Format,D3DPOOL Pool,IDirect3DVolumeTexture9** ppVolumeTexture,HANDLE* pSharedHandle )
@@ -331,7 +331,7 @@ HRESULT CProxyDirect3DDevice9::CreateVertexBuffer             ( UINT Length,DWOR
 
 HRESULT CProxyDirect3DDevice9::CreateIndexBuffer              ( UINT Length,DWORD Usage,D3DFORMAT Format,D3DPOOL Pool,IDirect3DIndexBuffer9** ppIndexBuffer,HANDLE* pSharedHandle )
 {
-    return m_pDevice->CreateIndexBuffer ( Length, Usage, Format, Pool, ppIndexBuffer, pSharedHandle );
+    return CDirect3DEvents9::CreateIndexBuffer ( m_pDevice, Length, Usage, Format, Pool, ppIndexBuffer, pSharedHandle );
 }
 
 HRESULT CProxyDirect3DDevice9::CreateRenderTarget             ( UINT Width,UINT Height,D3DFORMAT Format,D3DMULTISAMPLE_TYPE MultiSample,DWORD MultisampleQuality,BOOL Lockable,IDirect3DSurface9** ppSurface,HANDLE* pSharedHandle )

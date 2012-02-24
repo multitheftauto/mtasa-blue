@@ -344,6 +344,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMultiplayerSA_ClothesMemFix.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\COffsets.cpp"
 				>
 			</File>

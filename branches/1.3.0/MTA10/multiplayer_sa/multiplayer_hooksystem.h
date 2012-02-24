@@ -21,4 +21,6 @@ VOID HookInstallCall( DWORD dwInstallAddress, DWORD dwHookFunction );
 BOOL HookInstall( DWORD dwInstallAddress, DWORD dwHookHandler, int iJmpCodeSize );
 BYTE * CreateJump ( DWORD dwFrom, DWORD dwTo, BYTE * ByteArray );
 
+#define EZHookInstall(type) HookInstall( HOOKPOS_##type, (DWORD)HOOK_##type, HOOKSIZE_##type )
+
 #endif

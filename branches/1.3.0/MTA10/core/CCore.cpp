@@ -1893,6 +1893,7 @@ void CCore::OnPreHUDRender ( void )
 //
 // Also:
 //   Max should be no more than 2 * installed video memory
+//   Min should be no more than 1 * installed video memory
 //   Max should be no less than 96MB
 //   Gap between min and max should be no less than 32MB
 //
@@ -1915,6 +1916,7 @@ void CCore::CalculateStreamingMemoryRange ( void )
 
     // Apply cap dependant on video memory
     fMaxAmount = Min ( fMaxAmount, iVideoMemoryMB * 2.f );
+    fMinAmount = Min ( fMinAmount, iVideoMemoryMB * 1.f );
 
     // Apply 96MB lower limit
     fMaxAmount = Max ( fMaxAmount, 96.f );
