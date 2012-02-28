@@ -1560,14 +1560,27 @@ int CLuaFunctionDefinitions::SetPedAnimationProgress ( lua_State* luaVM )
         {
             const char * szAnimName = NULL;
             float fProgress = 0.0f;
-            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) szAnimName = lua_tostring ( luaVM, 2 );
-            if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER ) fProgress = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
-
-            if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( pElement, szAnimName, fProgress ) )
+            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) 
             {
-                lua_pushboolean ( luaVM, true );
-                return 1;
+                szAnimName = lua_tostring ( luaVM, 2 );
+                if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER ) fProgress = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
+
+                if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( pElement, szAnimName, fProgress ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
             }
+            else if ( lua_type ( luaVM, 2 ) == LUA_TNONE || lua_type ( luaVM, 2 ) == LUA_TNIL )
+            {
+                if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( pElement, szAnimName, fProgress ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+                m_pScriptDebugging->LogBadType ( luaVM, "setPedAnimationProgress" );
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAnimationProgress", "element", 1 );
