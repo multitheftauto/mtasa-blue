@@ -31,6 +31,7 @@ typedef void ( PostContextSwitchHandler ) ( void );
 typedef void ( PreWeaponFireHandler ) ( class CPlayerPed* pPlayer );
 typedef void ( PostWeaponFireHandler ) ( void );
 typedef void ( BulletImpactHandler ) ( class CPed* pInitiator, class CEntity* pVictim, const CVector* pvecStartPosition, const CVector* pvecEndPosition );
+typedef void ( BulletFireHandler ) ( class CPed* pInitiator, const CVector* pvecStartPosition, const CVector* pvecEndPosition );
 typedef bool ( DamageHandler ) ( class CPed* pDamagePed, class CEventDamage * pEvent );
 typedef void ( FireHandler ) ( class CFire* pFire );
 typedef bool ( ProjectileStopHandler ) ( class CEntity * owner, enum eWeaponType weaponType, class CVector * origin, float fForce, class CVector * target, class CEntity * targetEntity );
@@ -63,6 +64,10 @@ public:
     char m_cInVehicleAimDirection; // 0 = forwards, 1 = left, 2 = back, 3 = right
     // use origin
     bool m_bUseOrigin;
+
+    bool m_bRemoteBulletSyncVectorsValid;
+    CVector m_vecRemoteBulletSyncStart;
+    CVector m_vecRemoteBulletSyncEnd;
 };
 
 class CStatsData
@@ -190,6 +195,7 @@ public:
     virtual void                        SetPreWeaponFireHandler     ( PreWeaponFireHandler* pHandler ) = 0;
     virtual void                        SetPostWeaponFireHandler    ( PostWeaponFireHandler* pHandler ) = 0;
     virtual void                        SetBulletImpactHandler      ( BulletImpactHandler* pHandler ) = 0;
+    virtual void                        SetBulletFireHandler        ( BulletFireHandler* pHandler ) = 0;
     virtual void                        SetDrawRadarAreasHandler    ( DrawRadarAreasHandler * pRadarAreasHandler ) = 0;
     virtual void                        SetRender3DStuffHandler     ( Render3DStuffHandler * pHandler ) = 0;
 

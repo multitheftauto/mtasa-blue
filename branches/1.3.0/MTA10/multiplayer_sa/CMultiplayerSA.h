@@ -128,6 +128,7 @@ public:
     void                        SetPreWeaponFireHandler     ( PreWeaponFireHandler* pHandler );
     void                        SetPostWeaponFireHandler    ( PostWeaponFireHandler* pHandler );
     void                        SetBulletImpactHandler      ( BulletImpactHandler* pHandler );
+    void                        SetBulletFireHandler        ( BulletFireHandler* pHandler );
     void                        SetDrawRadarAreasHandler    ( DrawRadarAreasHandler * pRadarAreasHandler );
     void                        SetRender3DStuffHandler     ( Render3DStuffHandler * pHandler );
 

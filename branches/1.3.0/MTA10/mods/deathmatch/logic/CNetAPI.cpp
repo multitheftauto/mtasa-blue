@@ -139,6 +139,24 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
 
             return true;
         }
+
+        case PACKET_ID_PLAYER_BULLETSYNC:
+        {
+            // Read out the player ID
+            ElementID PlayerID;
+            if ( BitStream.Read ( PlayerID ) )
+            {
+                // Grab the player
+                CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
+                if ( pPlayer )
+                {
+                    // Read out the bulletsync data
+                    ReadBulletsync ( pPlayer, BitStream );
+                }
+            }
+
+            return true;
+        }
         
         case PACKET_ID_RETURN_SYNC:
         {
@@ -298,6 +316,9 @@ void CNetAPI::DoPulse ( void )
 
             // Record local data in the packet recorder
             m_pManager->GetPacketRecorder ()->RecordLocalData ( pPlayer );
+
+            // Bulletsync fire button release
+            MaybeSendBulletSyncFireRelease ();
 
             // We should do a puresync?
             if ( IsPureSyncNeeded () && !g_pClientGame->IsDownloadingBigPacket () )
@@ -673,6 +694,7 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
         pPlayer->SetChoking ( flags.data.bIsChoking );       
     }
 
+    ModifyControllerStateForBulletSync ( pPlayer, ControllerState );
     pPlayer->SetControllerState ( ControllerState );
 
     // Increment keysync counter
@@ -682,6 +704,9 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
 
 void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& BitStream )
 {
+    // Update bulletsync enabled or not for the players current weapon
+    MaybeSendBulletSyncEnabled ();
+
     // Grab the local controllerstates
     CControllerState ControllerState;
     CControllerState LastControllerState;
@@ -949,6 +974,7 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     }
 
     // Set move speed, controller state and camera rotation + duck state
+    ModifyControllerStateForBulletSync ( pPlayer, ControllerState );
     pPlayer->SetControllerState ( ControllerState );
     pPlayer->SetCameraRotation ( fCameraRotation );
     pPlayer->Duck ( flags.data.bIsDucked );
@@ -977,7 +1003,7 @@ void WriteCameraOrientation ( const CVector& vecPositionBase, NetBitStreamInterf
     //
     // Write rotations
     //
-    const static float fPI = 3.14159265f;
+    const float fPI = 3.14159265f;
     SFloatAsBitsSync < 8 > rotation ( -fPI, fPI, false );
 
     rotation.data.fValue = fCamRotZ;
@@ -1993,4 +2019,155 @@ void CNetAPI::ReadVehicleResync ( CClientVehicle* pVehicle, NetBitStreamInterfac
     // Apply the correct move and turnspeed
     pVehicle->SetMoveSpeed ( velocity.data.vecVelocity );
     pVehicle->SetTurnSpeed ( turnSpeed.data.vecVelocity );
+}
+
+
+//
+// Allow bulletsync to modify fire button pressed state for remote players
+//
+void CNetAPI::ModifyControllerStateForBulletSync ( CClientPlayer* pPlayer, CControllerState& ControllerState )
+{
+    if ( pPlayer->m_bRemoteBulletSyncEnabled )
+    {
+        if ( pPlayer->m_bRemoteBulletSyncFireButtonPressed || pPlayer->m_shotSyncData->m_bRemoteBulletSyncVectorsValid )
+            ControllerState.ButtonCircle = 255;
+        else
+            ControllerState.ButtonCircle = 0;
+    }
+}
+
+
+//
+// Read bulletsync packet for a remote player
+//
+void CNetAPI::ReadBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream )
+{
+    // Read the bulletsync data
+    char cFlag = 0;
+    BitStream.Read ( cFlag );
+
+    if ( cFlag == 2 )
+    {
+        // Off
+        pPlayer->m_bRemoteBulletSyncEnabled = false;
+        return;
+    }
+    if ( cFlag == 3 )
+    {
+        // On
+        pPlayer->m_bRemoteBulletSyncEnabled = true;
+        return;
+    }
+
+    if ( cFlag == 0 )
+    {
+        // Fire button release
+        pPlayer->m_bRemoteBulletSyncFireButtonPressed = false;
+    }
+    else
+    if ( cFlag == 1 )
+    {
+        // Fire button press
+        CVector vecStart, vecEnd;
+        BitStream.Read ( (char*)&vecStart, sizeof ( CVector ) );
+        BitStream.Read ( (char*)&vecEnd, sizeof ( CVector ) );
+        pPlayer->m_shotSyncData->m_vecRemoteBulletSyncStart = vecStart;
+        pPlayer->m_shotSyncData->m_vecRemoteBulletSyncEnd = vecEnd;
+        pPlayer->m_shotSyncData->m_bRemoteBulletSyncVectorsValid = true;
+        pPlayer->m_bRemoteBulletSyncFireButtonPressed = true;
+    }
+    else
+    {
+        assert ( 0 );
+    }
+
+    // Update fire button press
+    CControllerState ControllerState;
+    pPlayer->GetControllerState ( ControllerState );
+    ModifyControllerStateForBulletSync ( pPlayer, ControllerState );
+    pPlayer->SetControllerState ( ControllerState );
+}
+
+
+//
+// Send bulletsync fire button press packet to remote players
+//
+void CNetAPI::SendBulletSyncFire ( const CVector& vecStart, const CVector& vecEnd )
+{
+    if ( g_pNet->GetServerBitStreamVersion () < 0x2A )
+        return;
+
+    m_bBulletSyncLastSentFireButtonDown = true;
+
+    // Send a bulletsync packet
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+
+    // Write the bulletsync data
+    pBitStream->Write ( (char)1 );      // Fire button pressed
+
+    pBitStream->Write ( (char*)&vecStart, sizeof ( CVector ) );
+    pBitStream->Write ( (char*)&vecEnd, sizeof ( CVector ) );
+
+    // Send the packet
+    g_pNet->SendPacket ( PACKET_ID_PLAYER_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE );
+    g_pNet->DeallocateNetBitStream ( pBitStream );
+}
+
+
+//
+// Send bulletsync fire button release packet to remote players (if required)
+//
+void CNetAPI::MaybeSendBulletSyncFireRelease ( void )
+{
+    if ( g_pNet->GetServerBitStreamVersion () < 0x2A )
+        return;
+
+    // Check if fire button has been released since last bulletsync
+    if ( !m_bBulletSyncLastSentFireButtonDown )
+        return;
+
+    CControllerState ControllerState;
+    g_pClientGame->GetLocalPlayer ()->GetControllerState ( ControllerState );
+
+    if ( ControllerState.ButtonCircle )
+        return;
+    m_bBulletSyncLastSentFireButtonDown = false;
+
+    // Send a bulletsync packet
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+
+    // Write the bulletsync data
+    pBitStream->Write ( (char)0 );      // Fire button up
+
+    // Send the packet
+    g_pNet->SendPacket ( PACKET_ID_PLAYER_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE );
+    g_pNet->DeallocateNetBitStream ( pBitStream );
+}
+
+
+//
+// Send bulletsync enabled/disabled (if required)
+//
+void CNetAPI::MaybeSendBulletSyncEnabled ( void )
+{
+    if ( g_pNet->GetServerBitStreamVersion () < 0x2A )
+        return;
+
+    bool bUseBulletSync = g_pClientGame->GetWeaponTypeUsesBulletSync ( g_pClientGame->GetLocalPlayer ()->GetCurrentWeaponType () );
+    if ( bUseBulletSync == m_bUsingBulletSync )
+        return;
+    m_bUsingBulletSync = bUseBulletSync;
+
+    // Send a bulletsync packet
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+
+    // Write the bulletsync data
+    if  ( !m_bUsingBulletSync )
+        pBitStream->Write ( (char)2 );      // Bullet sync off
+    else
+        pBitStream->Write ( (char)3 );      // Bullet sync on
+
+    // Send the packet
+    g_pNet->SendPacket ( PACKET_ID_PLAYER_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE );
+    g_pNet->DeallocateNetBitStream ( pBitStream );
 }

@@ -228,6 +228,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pMultiplayer->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
     g_pMultiplayer->SetBulletImpactHandler ( CClientGame::BulletImpact );
+    g_pMultiplayer->SetBulletFireHandler ( CClientGame::BulletFire );
     g_pMultiplayer->SetExplosionHandler ( CClientExplosionManager::Hook_StaticExplosionCreation );
     g_pMultiplayer->SetBreakTowLinkHandler ( CClientGame::StaticBreakTowLinkHandler );
     g_pMultiplayer->SetDrawRadarAreasHandler ( CClientGame::StaticDrawRadarAreasHandler );
@@ -360,6 +361,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetPreWeaponFireHandler ( NULL );
     g_pMultiplayer->SetPostWeaponFireHandler ( NULL );
     g_pMultiplayer->SetBulletImpactHandler ( NULL );
+    g_pMultiplayer->SetBulletFireHandler ( NULL );
     g_pMultiplayer->SetExplosionHandler ( NULL );
     g_pMultiplayer->SetBreakTowLinkHandler ( NULL );
     g_pMultiplayer->SetDrawRadarAreasHandler ( NULL );
@@ -4449,6 +4451,19 @@ void CClientGame::BulletImpact ( CPed* pInitiator, CEntity* pVictim, const CVect
 }
 
 
+void CClientGame::BulletFire ( CPed* pInitiator, const CVector* pStartPosition, const CVector* pEndPosition )
+{
+    // Got a local player model?
+    CClientPlayer* pLocalPlayer = g_pClientGame->m_pLocalPlayer;
+    if ( pLocalPlayer && pLocalPlayer->GetGamePlayer () == pInitiator )
+    {
+        // Maybe send bulletsync packet for the firing of this bullet
+        if ( g_pClientGame->GetWeaponTypeUsesBulletSync ( pLocalPlayer->GetCurrentWeaponType () ) )
+            g_pClientGame->m_pNetAPI->SendBulletSyncFire ( *pStartPosition, *pEndPosition );
+    }
+}
+
+
 bool CClientGame::StaticProcessPacket ( unsigned char ucPacketID, NetBitStreamInterface& bitStream )
 {
     if ( g_pClientGame )
@@ -5450,4 +5465,64 @@ void CClientGame::ProcessDelayedSendList ( void )
         g_pNet->DeallocateNetBitStream ( info.pBitStream );
         m_DelayedSendList.pop_front ();
     }
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::SetDevSetting
+//
+// For testing features
+//
+//////////////////////////////////////////////////////////////////
+void CClientGame::SetDevSetting ( const SString& strCommand )
+{
+    std::vector < SString > parts;
+    (strCommand + ",,,").Split ( ",", parts );
+
+    SString strMessage = "Unknown setting";
+
+    if ( parts[0] == "bullet-sync" )
+    {
+        eWeaponType weaponType;
+        if ( StringToEnum ( parts[1], weaponType ) )
+        {
+            SetWeaponTypeUsesBulletSync ( weaponType, atoi ( parts[2] ) );
+            strMessage = SString ( "Local player bullet sync sending for %s is now %d"
+                                                ,*parts[1]
+                                                ,GetWeaponTypeUsesBulletSync ( weaponType )
+                                    );
+        }
+    }
+
+    g_pCore->GetConsole ()->Echo ( strMessage );
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::SetWeaponTypeUsesBulletSync
+//
+// Set whether the local player will send bulletsync messages for the supplied weapon type
+//
+//////////////////////////////////////////////////////////////////
+void CClientGame::SetWeaponTypeUsesBulletSync ( eWeaponType weaponType, bool bEnable )
+{
+    if ( bEnable )
+        MapInsert ( m_weaponTypesUsingBulletSync, weaponType );
+    else
+        MapRemove ( m_weaponTypesUsingBulletSync, weaponType );
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::GetWeaponTypeUsesBulletSync
+//
+// Get whether the local player should send bulletsync messages for the supplied weapon type
+//
+//////////////////////////////////////////////////////////////////
+bool CClientGame::GetWeaponTypeUsesBulletSync ( eWeaponType weaponType )
+{
+    return MapContains ( m_weaponTypesUsingBulletSync, weaponType );
 }

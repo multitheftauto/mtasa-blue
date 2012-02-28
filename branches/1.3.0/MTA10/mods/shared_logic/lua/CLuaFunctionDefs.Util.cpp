@@ -915,9 +915,17 @@ int CLuaFunctionDefs::GetPerformanceStats ( lua_State* luaVM )
 int CLuaFunctionDefs::SetDevelopmentMode ( lua_State* luaVM )
 {
 //  bool setDevelopmentMode ( bool enable )
-    bool bEnable;
+//  bool setDevelopmentMode ( string command )
+    bool bEnable; SString strCommand;
 
     CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsString () )
+    {
+        argStream.ReadString ( strCommand );
+        g_pClientGame->SetDevSetting ( strCommand );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
     argStream.ReadBool ( bEnable );
 
     if ( !argStream.HasErrors () )
