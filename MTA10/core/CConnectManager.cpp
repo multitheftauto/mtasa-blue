@@ -113,11 +113,6 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     // Set our packet handler
     pNet->RegisterPacketHandler ( CConnectManager::StaticProcessPacket );
 
-    // Set encryption option
-    int iVar;
-    CVARS_GET ( "network_encryption", iVar );
-    pNet->SetEncryptionEnabled ( iVar != 0 );
-
     // Try to start a network to connect
     if ( m_usPort && !pNet->StartNetwork ( m_strHost.c_str (), m_usPort ) )
     {
