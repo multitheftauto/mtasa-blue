@@ -691,7 +691,7 @@ void ReadCameraOrientation ( const CVector& vecBasePosition, NetBitStreamInterfa
     //
     // Read rotations
     //
-    const static float fPI = 3.14159265f;
+    const float fPI = 3.14159265f;
     SFloatAsBitsSync < 8 > rotation ( -fPI, fPI, false );
 
     BitStream.Read ( &rotation );

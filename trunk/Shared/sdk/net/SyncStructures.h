@@ -581,7 +581,7 @@ struct SPedRotationSync : public ISyncStructure
 {
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        const static float fPI = 3.14159265f;
+        const float fPI = 3.14159265f;
         SFloatAsBitsSync < 16 > rotation ( -fPI, fPI, false );
         if ( bitStream.Read ( &rotation ) )
         {
@@ -592,7 +592,7 @@ struct SPedRotationSync : public ISyncStructure
     }
     void Write ( NetBitStreamInterface& bitStream ) const
     {
-        const static float fPI = 3.14159265f;
+        const float fPI = 3.14159265f;
         float fRotation = data.fRotation;
         if ( fRotation < -fPI )
             fRotation += fPI * 2.0f;

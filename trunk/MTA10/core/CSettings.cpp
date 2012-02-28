@@ -898,24 +898,6 @@ void CSettings::CreateGUI ( void )
     m_pSingleDownloadLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
 
-    // Network encryption setting
-    m_pNetworkEncryptionLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Network encryption:" ) );
-    m_pNetworkEncryptionLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
-    m_pNetworkEncryptionLabel->AutoSize ( m_pNetworkEncryptionLabel->GetText ().c_str () );
-
-    m_pNetworkEncryptionCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
-    m_pNetworkEncryptionCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
-    m_pNetworkEncryptionCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
-    m_pNetworkEncryptionCombo->AddItem ( "Off" )->SetData ( (void*)0 );
-    m_pNetworkEncryptionCombo->AddItem ( "Default" )->SetData ( (void*)1 );
-    m_pNetworkEncryptionCombo->SetReadOnly ( true );
-
-    m_pNetworkEncryptionLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Some ISPs may have\ntrouble with encryption" ) );
-    m_pNetworkEncryptionLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
-    m_pNetworkEncryptionLabelInfo->SetFont ( "default-bold-small" );
-    m_pNetworkEncryptionLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 40-4;
-
     // Debug setting
     m_pDebugSettingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Debug setting:" ) );
     m_pDebugSettingLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
@@ -2305,11 +2287,6 @@ void CSettings::LoadData ( void )
     if ( iVar == 0 ) m_pSingleDownloadCombo->SetText ( "Default" );
     else if ( iVar == 1 ) m_pSingleDownloadCombo->SetText ( "On" );
 
-    // Network encryption
-    CVARS_GET ( "network_encryption", iVar );
-    if ( iVar == 0 ) m_pNetworkEncryptionCombo->SetText ( "Off" );
-    else if ( iVar == 1 ) m_pNetworkEncryptionCombo->SetText ( "Default" );
-
     // Update build type
     CVARS_GET ( "update_build_type", iVar );
     if ( iVar == 0 ) m_pUpdateBuildTypeCombo->SetText ( "Default" );
@@ -2559,13 +2536,6 @@ void CSettings::SaveData ( void )
     {
         int iSelected = ( int ) pSelected->GetData();
         CVARS_SET ( "single_download", iSelected );
-    }
-
-    // Network encryption
-    if ( CGUIListItem* pSelected = m_pNetworkEncryptionCombo->GetSelectedItem () )
-    {
-        int iSelected = ( int ) pSelected->GetData();
-        CVARS_SET ( "network_encryption", iSelected );
     }
 
     // Debug setting

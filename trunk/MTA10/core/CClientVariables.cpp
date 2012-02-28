@@ -302,7 +302,6 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "aspect_ratio",               0 );                            // Display aspect ratio
     DEFAULT ( "anisotropic",                0 );                            // Anisotropic filtering
     DEFAULT ( "grass",                      1 );                            // Enable grass
-    DEFAULT ( "network_encryption",         1 );                            // Force off encryption if 0
     DEFAULT ( "fast_clothes_loading",       1 );                            // 0-off 1-auto 2-on
     DEFAULT ( "allow_screen_upload",        1 );                            // 0-off 1-on
 
