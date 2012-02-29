@@ -189,9 +189,6 @@ protected:
     CGUILabel*          m_pSingleDownloadLabelInfo;
     CGUILabel*          m_pSingleDownloadLabel;
     CGUIComboBox*       m_pSingleDownloadCombo;
-    CGUILabel*          m_pNetworkEncryptionLabelInfo;
-    CGUILabel*          m_pNetworkEncryptionLabel;
-    CGUIComboBox*       m_pNetworkEncryptionCombo;
     CGUILabel*          m_pDebugSettingLabelInfo;
     CGUILabel*          m_pDebugSettingLabel;
     CGUIComboBox*       m_pDebugSettingCombo;
