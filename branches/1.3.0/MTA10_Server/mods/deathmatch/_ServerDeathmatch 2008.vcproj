@@ -936,7 +936,7 @@
 					Name="packets"
 					>
 					<File
-						RelativePath=".\logic\packets\CBulletsyncPacket .cpp"
+						RelativePath=".\logic\packets\CBulletsyncPacket.cpp"
 						>
 					</File>
 					<File
