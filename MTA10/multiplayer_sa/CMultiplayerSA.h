@@ -40,6 +40,10 @@ public:
     CMultiplayerSA();
     void                        InitHooks();
     void                        InitHooks_ClothesMemFix ( void );
+    void                        Init_13 ( void );
+    void                        InitHooks_13 ( void );
+    void                        InitMemoryCopies_13 ( void );
+
     CRemoteDataStorage *        CreateRemoteDataStorage     ();
     void                        DestroyRemoteDataStorage    ( CRemoteDataStorage* pData );
     void                        AddRemoteDataStorage        ( CPlayerPed* pPed, CRemoteDataStorage* pData );
