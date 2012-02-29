@@ -43,6 +43,8 @@ struct SAclRequest;
 #include "CMatrix.h"
 #include "CQuat.h"
 #include "SharedUtil.h"
+#include "SharedUtil.Profiling.h"
+extern CStatEvents g_StatEvents;
 #include "Enums.h"
 #include <bochs_internal/crc32.h>
 #include "CChecksum.h"

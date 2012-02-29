@@ -236,6 +236,8 @@ CMapEvent* CMapEventManager::Get ( const char* szName )
 
 bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments, class CClientEntity* pSource, class CClientEntity* pThis )
 {
+    CLOCK( "CMapEventManager", "Call" );
+
     // Check for multi-threading slipups
     assert ( IsMainThread () );
 
@@ -344,6 +346,8 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
         // We're no longer iterating the list
         m_bIteratingList = false;
     }
+
+    UNCLOCK( "CMapEventManager", "Call" );
 
     // Return whether we called atleast one func or not
     return bCalled;

@@ -4541,6 +4541,16 @@ void _declspec(naked) HOOK_ApplyCarBlowHop ()
 
 // ---------------------------------------------------
 
+void clock_cgame_process ()
+{
+    CLOCK( "sa", "cgame_process" );
+}
+
+void unclock_cgame_process ()
+{
+    UNCLOCK( "sa", "cgame_process" );
+}
+
 
 DWORD CALL_CWorld_Process = 0x5684a0;
 void _declspec(naked) HOOK_CGame_Process ()
@@ -4548,6 +4558,7 @@ void _declspec(naked) HOOK_CGame_Process ()
     _asm
     {
         pushad
+        call clock_cgame_process
     }
 
     if ( m_pPreWorldProcessHandler ) m_pPreWorldProcessHandler ();
@@ -4564,15 +4575,32 @@ void _declspec(naked) HOOK_CGame_Process ()
 
     _asm
     {
+        call unclock_cgame_process
         popad
         jmp     RETURN_CGame_Process;
     }
 }
 
+void clock_idle ()
+{
+    CLOCK( "sa", "idle" );
+}
+
+void unclock_idle ()
+{
+    UNCLOCK( "sa", "idle" );
+}
 
 DWORD CALL_CGame_Process = 0x53BEE0;
 void _declspec(naked) HOOK_Idle ()
 {
+    _asm
+    {
+        pushad
+        call clock_idle
+        popad
+    }
+
     _asm
     {
         call    CALL_CGame_Process
@@ -4580,6 +4608,13 @@ void _declspec(naked) HOOK_Idle ()
     }
 
     if ( m_pIdleHandler ) m_pIdleHandler ();
+
+    _asm
+    {
+        pushad
+        call unclock_idle
+        popad
+    }
 
     _asm
     {

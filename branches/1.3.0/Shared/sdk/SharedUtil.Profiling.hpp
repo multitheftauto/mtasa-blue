@@ -11,9 +11,6 @@
 
 namespace SharedUtil
 {
-    // Global CStatEvents instance 
-    CStatEvents g_StatEvents;
-
 
     //
     // The input buffer from CStatsEvents is converted into SFrameEvents

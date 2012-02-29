@@ -54,6 +54,8 @@ public:
     DECLARE_COMMAND_HANDLER ( DebugScrollDown );
 
     DECLARE_COMMAND_HANDLER ( Test );
+    DECLARE_COMMAND_HANDLER ( ShowCpuStat )
+    
     DECLARE_COMMAND_HANDLER ( FakeLag );
 };
 

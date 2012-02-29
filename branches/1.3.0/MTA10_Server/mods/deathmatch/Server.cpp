@@ -11,6 +11,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "SharedUtil.Profiling.hpp"
+CStatEvents g_StatEvents;
 
 CServer* g_pServer = NULL;
 

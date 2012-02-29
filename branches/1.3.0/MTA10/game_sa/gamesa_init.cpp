@@ -42,12 +42,16 @@ CGame * GetGameInterface( CCoreInterface* pCore )
 
 void MemSet ( void* dwDest, int cValue, uint uiAmount )
 {
+    CLOCK( "game_sa", "MemSet" );
     memset ( dwDest, cValue, uiAmount );
+    UNCLOCK( "game_sa", "MemSet" );
 }
 
 void MemCpy ( void* dwDest, const void* dwSrc, uint uiAmount )
 {
+    CLOCK( "game_sa", "MemCpy" );
     memcpy ( dwDest, dwSrc, uiAmount );
+    UNCLOCK( "game_sa", "MemCpy" );
 }
 
 bool GetDebugIdEnabled ( uint uiDebugId )

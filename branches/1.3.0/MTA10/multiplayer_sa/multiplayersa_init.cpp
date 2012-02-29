@@ -48,12 +48,16 @@ CMultiplayer* InitMultiplayerInterface(CCoreInterface* pCore)
 
 void MemSet ( void* dwDest, int cValue, uint uiAmount )
 {
+    CLOCK( "multiplayer_sa", "MemSet" );
     memset ( dwDest, cValue, uiAmount );
+    UNCLOCK( "multiplayer_sa", "MemSet" );
 }
 
 void MemCpy ( void* dwDest, const void* dwSrc, uint uiAmount )
 {
+    CLOCK( "multiplayer_sa", "MemCpy" );
     memcpy ( dwDest, dwSrc, uiAmount );
+    UNCLOCK( "multiplayer_sa", "MemCpy" );
 }
 
 void OnPreHUDRender ( void )

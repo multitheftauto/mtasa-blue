@@ -200,6 +200,9 @@ void CModManager::Unload ( void )
         // Stop all screen grabs
         CGraphics::GetSingleton ().GetScreenGrabber ()->ClearScreenShotQueue ();
 
+        // Remove all stat pointers
+        GetRealtimeStats ()->RemovedStatSource ();
+
         // Free the Client DLL
         FreeLibrary ( m_hClientDLL );
         m_hClientDLL = NULL;

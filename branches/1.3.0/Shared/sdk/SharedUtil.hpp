@@ -22,5 +22,4 @@
 #include "SharedUtil.Math.hpp"
 #include "SharedUtil.Hash.hpp"
 #include "SharedUtil.SysInfo.hpp"
-#include "SharedUtil.Profiling.hpp"
 #include "SharedUtil.Logging.hpp"

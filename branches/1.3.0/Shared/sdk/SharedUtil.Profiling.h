@@ -66,9 +66,6 @@ namespace SharedUtil
         std::vector < SItem >   m_ItemBufferArray;
     };
 
-    // Global CStatEvents instance 
-    extern class CStatEvents g_StatEvents;
-
     // Macros for clocking areas
     #define CLOCK(section,name)     g_StatEvents.Add( section, name, STATS_CLOCK )
     #define UNCLOCK(section,name)   g_StatEvents.Add( section, name, STATS_UNCLOCK )

@@ -454,6 +454,20 @@ void CCommandFuncs::Test ( const char* szParameters )
             *pData = 0;
         }
     }
+    else
+    if ( SStringX ( szParameters ) == "tidy1" )
+    {
+        DWORD dwFunc = 0x040CFD0;   //FUNC_CStreaming_RemoveLeastUsedModel    0x040CFD0
+        _asm
+        {
+        again:
+            push    20h
+            call    dwFunc
+            add     esp, 4
+            test    al, al
+            jnz     again
+        }
+    }
 }
 
 void CCommandFuncs::Serial ( const char* szParameters )
@@ -491,4 +505,11 @@ void CCommandFuncs::FakeLag ( const char *szCmdLine )
     g_pCore->GetConsole ()->Print ( SString ( "Client send lag is now: %d%% packet loss and %d extra ping with %d extra ping variance and %d KBPS limit", iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit ) );
 
 #endif
+}
+
+void CCommandFuncs::ShowCpuStat ( const char* szParameters )
+{
+    if ( strlen ( szParameters ) > 0 )
+        return GetRealtimeStats ()->OnCommand ( szParameters );
+    CCore::GetSingleton ().GetConsole ()->Print ( "Usage: stats [all|none|section name]" );
 }

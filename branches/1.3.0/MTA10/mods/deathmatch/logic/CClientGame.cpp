@@ -740,6 +740,8 @@ void CClientGame::DoPulsePostFrame ( void )
 
     if ( m_pManager->IsGameLoaded () )
     {
+        CLOCK( "CClientGame", "DoPulsePostFrame" );
+
         // Pulse the nametags before anything that changes player positions, we'll be 1 frame behind, but so is the camera
         // If nametags are enabled, pulse the nametag manager
         if ( m_bShowNametags )
@@ -841,13 +843,18 @@ void CClientGame::DoPulsePostFrame ( void )
         }
         CClientPerfStatManager::GetSingleton ()->DoPulse ();
     }
+    UNCLOCK( "CClientGame", "DoPulsePostFrame" );
 
     // If we are not minimized we do the pulsing here
     if ( !g_pCore->IsWindowMinimized () )
     {
+        CLOCK( "CClientGame", "DoPulsesPre" );
         m_pRadarMap->DoRender ();
         m_pManager->DoRender ();
+        UNCLOCK( "CClientGame", "DoPulsesPre" );
+        CLOCK( "CClientGame", "DoPulses" );
         DoPulses ();
+        UNCLOCK( "CClientGame", "DoPulses" );
     }
 
     // If we're supposed to show netstat, draw them infront of everything else
@@ -869,8 +876,11 @@ static SString AppendNetErrorCode ( const SString& strText )
 
 void CClientGame::DoPulses ( void )
 {
+    CLOCK( "CClientGame::DoPulses", "FPSLimit" );
     g_pCore->ApplyFrameRateLimit ();
+    UNCLOCK( "CClientGame::DoPulses", "FPSLimit" );
 
+    CLOCK( "CClientGame::DoPulses", "Misc1" );
     m_BuiltCollisionMapThisFrame = false;
 
     if ( m_bIsPlayingBack && m_bFirstPlaybackFrame && m_pManager->IsGameLoaded () )
@@ -951,19 +961,37 @@ void CClientGame::DoPulses ( void )
             g_pNet->DeallocateNetBitStream ( pBitStream );
         }
     }
+    UNCLOCK( "CClientGame::DoPulses", "Misc1" );
 
     // Pulse the network interface
+    CLOCK( "CClientGame::DoPulses", "Net" );
     g_pNet->DoPulse ();
+    UNCLOCK( "CClientGame::DoPulses", "Net" );
+
+    CLOCK( "CClientGame::DoPulses", "Manager" );
     m_pManager->DoPulse ();
+    UNCLOCK( "CClientGame::DoPulses", "Manager" );
+
+    CLOCK( "CClientGame::DoPulses", "NetAPI" );
     m_pNetAPI->DoPulse ();
+    UNCLOCK( "CClientGame::DoPulses", "NetAPI" );
+
+    CLOCK( "CClientGame::DoPulses", "UnoccupiedVehicleSync" );
     m_pUnoccupiedVehicleSync->DoPulse ();
+    UNCLOCK( "CClientGame::DoPulses", "UnoccupiedVehicleSync" );
+
+    CLOCK( "CClientGame::DoPulses", "PedSync" );
     m_pPedSync->DoPulse ();
+    UNCLOCK( "CClientGame::DoPulses", "PedSync" );
 #ifdef WITH_OBJECT_SYNC
     m_pObjectSync->DoPulse ();
 #endif
     m_pLatentTransferManager->DoPulse ();
+    CLOCK( "CClientGame::DoPulses", "LuaManager" );
     m_pLuaManager->DoPulse ();
+    UNCLOCK( "CClientGame::DoPulses", "LuaManager" );
 
+    CLOCK( "CClientGame::DoPulses", "Misc2" );
     #ifdef MTA_DEBUG
     UpdateMimics ();
     #endif
@@ -1021,9 +1049,12 @@ void CClientGame::DoPulses ( void )
         }
     }
 
+    UNCLOCK( "CClientGame::DoPulses", "Misc2" );
+
     // If the game is loaded ...
     if ( m_pManager->IsGameLoaded () )
     {
+        CLOCK( "CClientGame::DoPulses", "onClientRenderPre" );
         // Pulse the blended weather manager
         m_pBlendedWeather->DoPulse ();
 
@@ -1053,18 +1084,24 @@ void CClientGame::DoPulses ( void )
 
         // Allow scripted dxSetRenderTarget
         g_pCore->GetGraphics ()->EnableSetRenderTarget ( true );
+        UNCLOCK( "CClientGame::DoPulses", "onClientRenderPre" );
 
+        CLOCK( "CClientGame::DoPulses", "onClientRender" );
         // Call onClientRender LUA event
         CLuaArguments Arguments;
         m_pRootEntity->CallEvent ( "onClientRender", Arguments, false );
+        UNCLOCK( "CClientGame::DoPulses", "onClientRender" );
 
+        CLOCK( "CClientGame::DoPulses", "onClientRenderPost" );
         // Disallow scripted dxSetRenderTarget
         g_pCore->GetGraphics ()->EnableSetRenderTarget ( false );
 
         // Ensure replaced/restored textures for models in the GTA map are correct
         g_pGame->FlushPendingRestreamIPL ();
+        UNCLOCK( "CClientGame::DoPulses", "onClientRenderPost" );
     }
 
+    CLOCK( "CClientGame::DoPulses", "Misc3" );
     // Are we connecting?
     if ( m_Status == CClientGame::STATUS_CONNECTING )
     {
@@ -1189,10 +1226,14 @@ void CClientGame::DoPulses ( void )
             Event_OnIngameAndReady ();
         }
     }
+    UNCLOCK( "CClientGame::DoPulses", "Misc3" );
 
     // Check for radar input
+    CLOCK( "CClientGame::DoPulses", "RadarMap" );
     m_pRadarMap->DoPulse ();
+    UNCLOCK( "CClientGame::DoPulses", "RadarMap" );
 
+    CLOCK( "CClientGame::DoPulses", "LocalPlayer" );
     // Got a local player?
     if ( m_pLocalPlayer )
     {
@@ -1227,8 +1268,12 @@ void CClientGame::DoPulses ( void )
     g_pGame->GetPlayerInfo()->SetLastTimeEaten ( 0 );
     // reset weapon logs (for preventing quickreload)
 
+    UNCLOCK( "CClientGame::DoPulses", "LocalPlayer" );
+
     // Update streaming
+    CLOCK( "CClientGame::DoPulses", "UpdateStreamers" );
     m_pManager->UpdateStreamers ();
+    UNCLOCK( "CClientGame::DoPulses", "UpdateStreamers" );
 
     // Send screen shot data
     ProcessDelayedSendList ();
@@ -3399,73 +3444,106 @@ void CClientGame::Event_OnIngameAndConnected ( void )
 
 bool CClientGame::StaticBreakTowLinkHandler ( CVehicle * pTowingVehicle )
 {
-    return g_pClientGame->BreakTowLinkHandler ( pTowingVehicle );
+    CLOCK( "Handlers", "BreakTowLink" );
+    bool bResult = g_pClientGame->BreakTowLinkHandler ( pTowingVehicle );
+    UNCLOCK( "Handlers", "BreakTowLink" );
+    return bResult;
 }
 
 void CClientGame::StaticDrawRadarAreasHandler ( void )
 {
+    CLOCK( "Handlers", "DrawRadarAreas" );
     g_pClientGame->DrawRadarAreasHandler ( );
+    UNCLOCK( "Handlers", "DrawRadarAreas" );
 }
 
 bool CClientGame::StaticDamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
 {
-    return g_pClientGame->DamageHandler ( pDamagePed, pEvent );
+    CLOCK( "Handlers", "Damage" );
+    bool bResult = g_pClientGame->DamageHandler ( pDamagePed, pEvent );
+    UNCLOCK( "Handlers", "Damage" );
+    return bResult;
 }
 
 void CClientGame::StaticFireHandler ( CFire* pFire )
 {
+    CLOCK( "Handlers", "Fire" );
     g_pClientGame->FireHandler ( pFire );
+    UNCLOCK( "Handlers", "Fire" );
 }
 
 void CClientGame::StaticProjectileInitiateHandler ( CClientProjectile * pProjectile )
 {
+    CLOCK( "Handlers", "ProjectileInitiate" );
     g_pClientGame->ProjectileInitiateHandler ( pProjectile );
+    UNCLOCK( "Handlers", "ProjectileInitiate" );
 }
 
 void CClientGame::StaticRender3DStuffHandler ( void )
 {
+    CLOCK( "Handlers", "Render3DStuff" );
     g_pClientGame->Render3DStuffHandler ();
+    UNCLOCK( "Handlers", "Render3DStuff" );
 }
 
 bool CClientGame::StaticChokingHandler ( unsigned char ucWeaponType )
 {
-    return g_pClientGame->ChokingHandler ( ucWeaponType );
+    CLOCK( "Handlers", "Choking" );
+    bool bResult = g_pClientGame->ChokingHandler ( ucWeaponType );
+    UNCLOCK( "Handlers", "Choking" );
+    return bResult;
 }
 
 void CClientGame::StaticAddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
 {
+    CLOCK( "Handlers", "AddAnimation" );
     g_pClientGame->AddAnimationHandler ( pClump, animGroup, animID );
+    UNCLOCK( "Handlers", "AddAnimation" );
 }
 
 void CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
 {
+    CLOCK( "Handlers", "BlendAnimation" );
     g_pClientGame->BlendAnimationHandler ( pClump, animGroup, animID, fBlendDelta );
+    UNCLOCK( "Handlers", "BlendAnimation" );
 }
 
 void CClientGame::StaticPreWorldProcessHandler ( void )
 {
+    CLOCK( "Handlers", "PreWorldProcess" );
     g_pClientGame->PreWorldProcessHandler ();
+    UNCLOCK( "Handlers", "PreWorldProcess" );
 }
 
 void CClientGame::StaticPostWorldProcessHandler ( void )
 {
+    CLOCK( "Handlers", "PostWorldProcess" );
     g_pClientGame->PostWorldProcessHandler ();
+    UNCLOCK( "Handlers", "PostWorldProcess" );
 }
 
 
 void CClientGame::StaticIdleHandler ( void )
 {
+    CLOCK( "Handlers", "Idle" );
     g_pClientGame->IdleHandler ();
+    UNCLOCK( "Handlers", "Idle" );
 }
 
 bool CClientGame::StaticProcessCollisionHandler ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface )
 {
-    return g_pClientGame->ProcessCollisionHandler ( pThisInterface, pOtherInterface );
+    CLOCK( "Handlers", "ProcessCollision" );
+    bool bResult = g_pClientGame->ProcessCollisionHandler ( pThisInterface, pOtherInterface );
+    UNCLOCK( "Handlers", "ProcessCollision" );
+    return bResult;
 }
 
 bool CClientGame::StaticVehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity )
 {
-    return g_pClientGame->VehicleCollisionHandler( pCollidingVehicle, pCollidedVehicle, iModelIndex, fDamageImpulseMag, fCollidingDamageImpulseMag, byBodyPartHit, vecCollisionPos, vecCollisionVelocity );
+    CLOCK( "Handlers", "VehicleCollision" );
+    bool bResult = g_pClientGame->VehicleCollisionHandler( pCollidingVehicle, pCollidedVehicle, iModelIndex, fDamageImpulseMag, fCollidingDamageImpulseMag, byBodyPartHit, vecCollisionPos, vecCollisionVelocity );
+    UNCLOCK( "Handlers", "VehicleCollision" );
+    return bResult;
 }
 
 bool CClientGame::StaticHeliKillHandler ( CVehicleSAInterface* pHeliInterface, CPedSAInterface* pPed )
@@ -3553,6 +3631,7 @@ void CClientGame::PreWorldProcessHandler ( void )
 
 void CClientGame::PostWorldProcessHandler ( void )
 {
+    CLOCK( "CClientGame", "PostWorld" );
     m_pManager->GetMarkerManager ()->DoPulse ();
 
     // Update frame time slice
@@ -3567,6 +3646,7 @@ void CClientGame::PostWorldProcessHandler ( void )
         m_pRootEntity->CallEvent ( "onClientPreRender", Arguments, false );
     }
     m_dwLastFrameTick = dwCurrentTick;
+    UNCLOCK( "CClientGame", "PostWorld" );
 }
 
 
@@ -3584,7 +3664,9 @@ void CClientGame::IdleHandler ( void )
         }
         m_pRadarMap->DoRender ();
         m_pManager->DoRender ();
+        CLOCK( "CClientGame", "DoPulses" );
         DoPulses ();
+        UNCLOCK( "CClientGame", "DoPulses" );
     }
 }
 

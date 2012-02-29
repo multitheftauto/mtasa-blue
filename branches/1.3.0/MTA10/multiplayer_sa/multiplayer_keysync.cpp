@@ -438,11 +438,13 @@ void SwitchContext ( CPed* thePed )
 
 void SwitchContext ( CPedSAInterface* ped )
 {
+    CLOCK( "multiplayer_sa", "pSwitchContext" );
     CPed* thePed = pGameInterface->GetPools ()->GetPed ( (DWORD*) ped );
     if ( thePed )
     {
         SwitchContext ( thePed );
     }
+    UNCLOCK( "multiplayer_sa", "pSwitchContext" );
 }
 
 
@@ -510,6 +512,7 @@ void SwitchContext ( CVehicle* pVehicle )
 
 void SwitchContext ( CVehicleSAInterface* pVehicleInterface )
 {   
+    CLOCK( "multiplayer_sa", "vSwitchContext" );
     // Grab the CVehicle for the given vehicle interface
     CPoolsSA* pool = (CPoolsSA*) pGameInterface->GetPools ();
     CVehicle* pVehicle = pool->GetVehicle ( (DWORD *)pVehicleInterface );
@@ -517,6 +520,17 @@ void SwitchContext ( CVehicleSAInterface* pVehicleInterface )
     {
         SwitchContext ( pVehicle );
     }
+    UNCLOCK( "multiplayer_sa", "vSwitchContext" );
+}
+
+void xclock ( void )
+{   
+    CLOCK( "multiplayer_sa", "ProcessContro" );
+}
+
+void xunclock ( void )
+{   
+    UNCLOCK( "multiplayer_sa", "ProcessContro" );
 }
 
 /************************** ACTUAL HOOK FUNCTIONS BELOW THIS LINE *******************************/
@@ -552,10 +566,12 @@ VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
 
     _asm
     {
+        call xclock
         popad
         mov     edx, FUNC_CPlayerPed__ProcessControl
         call    edx
         pushad
+        call xunclock
     }
 
     ReturnContextToLocalPlayer();
