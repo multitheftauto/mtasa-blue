@@ -503,7 +503,7 @@ public:
     static int      GetAccountPlayer                    ( lua_State* luaVM );
     static int      IsGuestAccount                      ( lua_State* luaVM );
     static int      GetAccountData                      ( lua_State* luaVM );
-    static int      GetAccountAllData                   ( lua_State* luaVM );
+    static int      GetAllAccountData                   ( lua_State* luaVM );
 
     // Account set funcs
     static int      AddAccount                          ( lua_State* luaVM );

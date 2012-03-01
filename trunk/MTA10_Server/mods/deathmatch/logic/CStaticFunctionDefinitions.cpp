@@ -10275,7 +10275,7 @@ CLuaArgument* CStaticFunctionDefinitions::GetAccountData ( CAccount* pAccount, c
 }
 
 
-bool CStaticFunctionDefinitions::GetAccountAllData ( lua_State* pLua, CAccount* pAccount )
+bool CStaticFunctionDefinitions::GetAllAccountData ( lua_State* pLua, CAccount* pAccount )
 {
     assert ( pLua );
     assert ( pAccount );
