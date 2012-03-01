@@ -725,16 +725,24 @@ void CCore::ShowServerInfo ( unsigned int WindowType )
 
 void CCore::ApplyHooks ( )
 { 
+    WriteDebugEvent ( "CCore::ApplyHooks" );
     ApplyLoadingCrashPatch ();
 
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook ( );
-    m_pDirect3DHookManager->ApplyHook ( );
+    //m_pDirect3DHookManager->ApplyHook ( );
     //m_pFileSystemHook->ApplyHook ( );
     m_pSetCursorPosHook->ApplyHook ( );
 
     // Redirect basic files.
     //m_pFileSystemHook->RedirectFile ( "main.scm", "../../mta/gtafiles/main.scm" );
+}
+
+void CCore::ApplyHooks2 ( )
+{ 
+    WriteDebugEvent ( "CCore::ApplyHooks2" );
+    // Try this one a little later
+    m_pDirect3DHookManager->ApplyHook ( );
 }
 
 

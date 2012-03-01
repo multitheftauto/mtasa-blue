@@ -59,6 +59,7 @@ void DumpDirect3DHookInfo ( void )
 
 bool CDirect3DHook9::ApplyHook ( )
 {
+    WriteDebugEvent ( "CDirect3DHook9::ApplyHook" );
     // Hook Direct3DCreate9.
     pFunction = DetourFindFunction ( "D3D9.DLL", "Direct3DCreate9" );
     m_pfnDirect3DCreate9 = reinterpret_cast < pDirect3DCreate > ( DetourFunction ( pFunction, reinterpret_cast < PBYTE > ( API_Direct3DCreate9 ) ) );
@@ -89,6 +90,7 @@ bool CDirect3DHook9::RemoveHook ( )
 IUnknown * CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
 {
     WriteDebugEvent ( "CDirect3DHook9::API_Direct3DCreate9" );
+    DumpDirect3DHookInfo ();
 
     CDirect3DHook9 *    pThis;
     CProxyDirect3D9 *   pNewProxy;

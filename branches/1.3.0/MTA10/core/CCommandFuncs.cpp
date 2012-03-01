@@ -509,7 +509,7 @@ void CCommandFuncs::FakeLag ( const char *szCmdLine )
 
 void CCommandFuncs::ShowCpuStat ( const char* szParameters )
 {
-    if ( strlen ( szParameters ) > 0 )
+    if ( szParameters && strlen ( szParameters ) > 0 )
         return GetRealtimeStats ()->OnCommand ( szParameters );
     CCore::GetSingleton ().GetConsole ()->Print ( "Usage: stats [all|none|section name]" );
 }
