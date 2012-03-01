@@ -33,7 +33,14 @@ CDirect3DHookManager::~CDirect3DHookManager ( )
     
 void CDirect3DHookManager::ApplyHook ( )
 {
+    if ( m_pDirect3DHook9 )
+    {
+        WriteDebugEvent ( "CDirect3DHookManager::ApplyHook - Ignoring second call" );
+        return;
+    }
+
     WriteDebugEvent ( "CDirect3DHookManager::ApplyHook" );
+
     PBYTE           pbDirect3D9;
 
     // First load the module(s).
