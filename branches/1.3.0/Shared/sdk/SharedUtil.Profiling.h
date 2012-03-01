@@ -64,6 +64,8 @@ namespace SharedUtil
         int                     m_BufferPosMax;
         int                     m_BufferPosMaxUsing;
         std::vector < SItem >   m_ItemBufferArray;
+        CElapsedTime            m_ResetTimer;
+        bool                    m_bResetFrame;
     };
 
     // Macros for clocking areas
