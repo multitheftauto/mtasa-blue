@@ -51,7 +51,6 @@ namespace
                                          { "dxConvertPixels",           "1.3" },
                                          { "dxGetPixelColor",           "1.3" },
                                          { "dxSetPixelColor",           "1.3" },
-                                         { "onClientPedHeliKilled",     "1.3.0-9.03772" },
                                          { "triggerLatentServerEvent",  "1.3.0-9.03772" },
                                          { "getLatentEventHandles",     "1.3.0-9.03772" },
                                          { "getLatentEventStatus",      "1.3.0-9.03772" },
@@ -60,6 +59,8 @@ namespace
                                          { "dxGetBlendMode",            "1.3.0-9.03782" },
                                          { "isObjectBreakable",         "1.3.0-9.03783" },
                                          { "setObjectBreakable",        "1.3.0-9.03783" },
+                                         { "onClientPedHeliKilled",     "1.3.0-9.03893" },
+                                         { "onClientPlayerHeliKilled",  "1.3.0-9.03893" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {

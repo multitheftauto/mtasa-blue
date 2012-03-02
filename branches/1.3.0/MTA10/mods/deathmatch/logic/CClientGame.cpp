@@ -4159,7 +4159,12 @@ bool CClientGame::HeliKillHandler ( CVehicleSAInterface* pHeliInterface, CPedSAI
             }
             
             // Trigger our event
-            bool bContinue = pClientPed->CallEvent ( "onClientPedHeliKilled", Arguments, true );
+            bool bContinue;
+            if ( IS_PLAYER ( pClientPed ) )
+                bContinue = pClientPed->CallEvent ( "onClientPlayerHeliKilled", Arguments, true );
+            else
+                bContinue = pClientPed->CallEvent ( "onClientPedHeliKilled", Arguments, true );
+
             // Was our event cancelled
             if ( !bContinue )
             {
