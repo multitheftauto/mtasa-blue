@@ -38,7 +38,9 @@ protected:
     void                DrawStats                   ( void );
     void                UpdateStatsTexture          ( void );
     void                DrawStatLine                ( int& x, int& y, const SString& strText );
+    void                SetVisible                  ( bool bVisible );
 
+    bool                                m_bVisible;
     CStatResults                        m_StatResults;
 
     CGraphics*                          m_pGraphics;
@@ -110,7 +112,10 @@ void CRealtimeStats::RemovedStatSource ( void )
 ///////////////////////////////////////////////////////////////
 void CRealtimeStats::FrameEnd ( void )
 {
-    m_StatResults.FrameEnd ();
+    if ( m_bVisible )
+        m_StatResults.FrameEnd ();
+    else
+        g_StatEvents.ClearBuffer ( false );
 }
 
 
@@ -170,9 +175,23 @@ void CRealtimeStats::OnCommand ( const std::string& strParametersIn )
     }
 
     if ( !m_EnabledSectionNames.empty () || m_bInvertEnabled )
-        g_StatEvents.SetEnabled ( true );
+        SetVisible ( true );
     else
-        g_StatEvents.SetEnabled ( false );
+        SetVisible ( false );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CRealtimeStats::SetVisible
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CRealtimeStats::SetVisible ( bool bVisible )
+{
+    m_bVisible = bVisible;
+    g_StatEvents.SetEnabled ( m_bVisible );
 }
 
 
@@ -185,6 +204,12 @@ void CRealtimeStats::OnCommand ( const std::string& strParametersIn )
 ///////////////////////////////////////////////////////////////
 void CRealtimeStats::DrawStats ( void )
 {
+    if ( !m_bVisible )
+    {
+        SAFE_RELEASE ( m_pRenderTargetItem );
+        return;
+    }
+
 	m_pGraphics = CGraphics::GetSingletonPtr ();
     int width = m_pGraphics->GetViewportWidth ();
     int height = m_pGraphics->GetViewportHeight ();
@@ -214,11 +239,6 @@ void CRealtimeStats::UpdateStatsTexture ( void )
     CRenderItemManagerInterface* pRenderItemManager = m_pGraphics->GetRenderItemManager ();
     int width = m_pGraphics->GetViewportWidth ();
     int height = m_pGraphics->GetViewportHeight ();
-
-    if ( !m_pRenderTargetItem )
-    {
-        m_pRenderTargetItem = pRenderItemManager->CreateRenderTarget ( width, height, true );
-    }
 
     bool bDraw = false;
     if ( m_ElapsedTime.Get () > 1000 )
@@ -252,6 +272,11 @@ void CRealtimeStats::UpdateStatsTexture ( void )
 
         if ( MapContains ( m_EnabledSectionNames, sectionName.ToLower () ) == m_bInvertEnabled )
             continue;
+
+        if ( !m_pRenderTargetItem )
+        {
+            m_pRenderTargetItem = pRenderItemManager->CreateRenderTarget ( width, height, true );
+        }
 
         if ( !bDoneKey )
         {
