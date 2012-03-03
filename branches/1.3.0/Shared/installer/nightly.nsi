@@ -98,7 +98,7 @@ Var RedistInstalled
 !define MUI_WELCOMEPAGE_TITLE_3LINES
 !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
 It is recommended that you close all other applications before starting Setup.\n\n\
-[Admin access will be requested for Vista and up]\n\n\
+[Admin access may be requested for Vista and up]\n\n\
 Click Next to continue."
 !define MUI_PAGE_CUSTOMFUNCTION_PRE "WelcomePreProc"
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW "WelcomeShowProc"
