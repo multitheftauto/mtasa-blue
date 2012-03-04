@@ -856,6 +856,10 @@ void CCore::CreateGame ( )
         BrowseToSolution ( "downgrade" );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
+
+    // Apply hiding device selection dialog
+    bool bDeviceSelectionDialogEnabled = GetApplicationSettingInt ( "device-selection-disabled" ) ? false : true;
+    m_pGame->GetSettings ()->SetSelectDeviceDialogEnabled ( bDeviceSelectionDialogEnabled );
 }
 
 
