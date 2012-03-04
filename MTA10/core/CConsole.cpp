@@ -18,7 +18,7 @@
 using SharedUtil::CalcMTASAPath;
 using std::string;
 
-#define CONSOLE_HISTORY_LENGTH 64
+#define CONSOLE_HISTORY_LENGTH 128
 #define CONSOLE_SIZE 4096
 
 #define NATIVE_RES_X    1152.0f
@@ -53,7 +53,7 @@ CConsole::CConsole ( CGUI* pManager, CGUIElement* pParent )
     m_pHistory->SetTextChangedHandler ( GUI_CALLBACK ( &CConsole::History_OnTextChanged, this ) );
 
     // Load the console history from a file
-    m_pConsoleHistory->LoadFromFile ( CalcMTASAPath ( "\\MTA\\console.log" ), true );
+    m_pConsoleHistory->LoadFromFile ( CalcMTASAPath ( "\\MTA\\console.log" ) );
 }
 
 CConsole::~CConsole ( void )
