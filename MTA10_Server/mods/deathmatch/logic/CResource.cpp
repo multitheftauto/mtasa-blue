@@ -1830,6 +1830,14 @@ bool CResource::ReadIncludedMaps ( CXMLNode * root )
                 // Grab the source text from the node
                 string strFilename = src->GetValue ();
                 CLogger::LogPrintf ( "Meta.xml - Map: 4\n" );
+                if ( strFilename.c_str() )
+                {
+                    CLogger::LogPrintf ( "strFilename valid - %i\n", strlen ( strFilename.c_str() ) );
+                }
+                else    // #6871 check
+                {
+                    CLogger::LogPrintf ( "strFilename invalid - %i\n", strlen ( strFilename.c_str() ) );
+                }
                 string strFullFilename;
                 ReplaceSlashes ( strFilename );
                 CLogger::LogPrintf ( "Meta.xml - Map: 5\n" );
