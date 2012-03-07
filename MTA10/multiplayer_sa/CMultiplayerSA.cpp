@@ -708,7 +708,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CPhysical_ProcessCollisionSectorList, (DWORD)HOOK_CPhysical_ProcessCollisionSectorList, 7 );
     HookInstall(HOOKPOS_CrashFix_Misc1, (DWORD)HOOK_CrashFix_Misc1, 6 );
     HookInstall(HOOKPOS_CrashFix_Misc2, (DWORD)HOOK_CrashFix_Misc2, 9 );
-    HookInstall(HOOKPOS_CrashFix_Misc3, (DWORD)HOOK_CrashFix_Misc3, 6 );
+    //HookInstall(HOOKPOS_CrashFix_Misc3, (DWORD)HOOK_CrashFix_Misc3, 6 );
     HookInstall(HOOKPOS_CrashFix_Misc4, (DWORD)HOOK_CrashFix_Misc4, 5 );
     HookInstall(HOOKPOS_CrashFix_Misc5, (DWORD)HOOK_CrashFix_Misc5, 7 );
     HookInstall(HOOKPOS_CrashFix_Misc6, (DWORD)HOOK_CrashFix_Misc6, 5 );
@@ -717,7 +717,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CrashFix_Misc9, (DWORD)HOOK_CrashFix_Misc9, 6 );
     HookInstall(HOOKPOS_CrashFix_Misc10, (DWORD)HOOK_CrashFix_Misc10, 6 );
     HookInstall(HOOKPOS_CrashFix_Misc11, (DWORD)HOOK_CrashFix_Misc11, 5 );
-    HookInstall(HOOKPOS_CrashFix_Misc12, (DWORD)HOOK_CrashFix_Misc12, 5 );
+    //HookInstall(HOOKPOS_CrashFix_Misc12, (DWORD)HOOK_CrashFix_Misc12, 5 );
     HookInstall(HOOKPOS_CrashFix_Misc13, (DWORD)HOOK_CrashFix_Misc13, 6 );
     HookInstall(HOOKPOS_CrashFix_Misc14, (DWORD)HOOK_CrashFix_Misc14, 6 );
     if ( version == VERSION_US_10 )
