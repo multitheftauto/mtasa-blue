@@ -152,6 +152,7 @@ protected:
     CGUIComboBox*       m_pComboAspectRatio;
     CGUILabel*          m_pAspectRatioLabel;
 	CGUICheckBox*       m_pCheckBoxVolumetricShadows;
+	CGUICheckBox*       m_pCheckBoxDeviceSelectionDialog;
 	CGUICheckBox*       m_pCheckBoxAllowScreenUpload;
 	CGUICheckBox*       m_pCheckBoxCustomizedSAFiles;
 	CGUICheckBox*       m_pCheckBoxGrass;

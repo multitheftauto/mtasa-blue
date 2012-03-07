@@ -490,12 +490,12 @@ void CSettings::CreateGUI ( void )
     m_pComboResolution->SetReadOnly ( true );
 
     m_pCheckBoxWindowed = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Windowed", true ) );
-    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY - 3.0f ) );
+    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY - 3.0f ) );
     m_pCheckBoxWindowed->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     float fPosY =  vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Full Screen Minimize", true ) );
-    m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, fPosY + 13.0f ) );
+    m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, fPosY + 13.0f ) );
     m_pCheckBoxMinimize->SetSize ( CVector2D ( 224.0f, 16.0f ) );
     if ( !GetVideoModeManager ()->IsMultiMonitor () )
     {
@@ -504,7 +504,7 @@ void CSettings::CreateGUI ( void )
     }
 
     m_pCheckBoxDisableAero = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Disable Aero Desktop", true ) );
-    m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 29.0f ) );
+    m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 29.0f ) );
     m_pCheckBoxDisableAero->SetSize ( CVector2D ( 224.0f, 16.0f ) );
     if ( GetApplicationSetting ( "os-version" ) < "6.1" || GetApplicationSettingInt ( "aero-changeable" ) == 0 )
     {
@@ -512,8 +512,17 @@ void CSettings::CreateGUI ( void )
         fPosY -= 16.0f;
     }
 
+    m_pCheckBoxDeviceSelectionDialog = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Enable Device Selection Dialog", true ) );
+    m_pCheckBoxDeviceSelectionDialog->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, fPosY + 45.0f ) );
+    m_pCheckBoxDeviceSelectionDialog->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    if ( !GetVideoModeManager ()->IsMultiMonitor () )
+    {
+        m_pCheckBoxDeviceSelectionDialog->SetVisible ( false );
+        fPosY -= 16.0f;
+    }
+
     m_pCheckBoxMipMapping = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Mip Mapping", true ) );
-    m_pCheckBoxMipMapping->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 45.0f ) );
+    m_pCheckBoxMipMapping->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 45.0f ) );
     m_pCheckBoxMipMapping->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 #ifndef MIP_MAPPING_SETTING_APPEARS_TO_DO_SOMETHING
     m_pCheckBoxMipMapping->SetVisible ( false );
@@ -565,11 +574,11 @@ void CSettings::CreateGUI ( void )
     m_pComboFxQuality->SetReadOnly ( true );
 
     m_pCheckBoxVolumetricShadows = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Volumetric Shadows", true ) );
-    m_pCheckBoxVolumetricShadows->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 2.0f ) );
+    m_pCheckBoxVolumetricShadows->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 2.0f ) );
     m_pCheckBoxVolumetricShadows->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pCheckBoxGrass = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Grass effect", true ) );
-    m_pCheckBoxGrass->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 22.0f ) );
+    m_pCheckBoxGrass->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 22.0f ) );
     m_pCheckBoxGrass->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pAnisotropicLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Anisotropic filtering:" ) );
@@ -1166,6 +1175,10 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     CVARS_GET("volumetric_shadows", bVolumetricShadowsEnabled);
     m_pCheckBoxVolumetricShadows->SetSelected ( bVolumetricShadowsEnabled );
     m_pCheckBoxVolumetricShadows->SetEnabled ( FxQuality != 0 );
+
+    // Device selection dialog
+    bool bDeviceSelectionDialogEnabled = GetApplicationSettingInt ( "device-selection-disabled" ) ? false : true;
+    m_pCheckBoxDeviceSelectionDialog->SetSelected ( bDeviceSelectionDialogEnabled );
 
     // Allow screen upload
     bool bAllowScreenUploadEnabled;
@@ -2199,6 +2212,10 @@ void CSettings::LoadData ( void )
 	m_pCheckBoxVolumetricShadows->SetSelected ( bVolumetricShadowsEnabled );
 	m_pCheckBoxVolumetricShadows->SetEnabled ( FxQuality != 0 );
 
+    // Device selection dialog
+    bool bDeviceSelectionDialogEnabled = GetApplicationSettingInt ( "device-selection-disabled" ) ? false : true;
+    m_pCheckBoxDeviceSelectionDialog->SetSelected ( bDeviceSelectionDialogEnabled );
+
     // Allow screen upload
     bool bAllowScreenUploadEnabled;
     CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
@@ -2488,6 +2505,10 @@ void CSettings::SaveData ( void )
     bool bVolumetricShadowsEnabled = m_pCheckBoxVolumetricShadows->GetSelected ();
     CVARS_SET ( "volumetric_shadows", bVolumetricShadowsEnabled );
 	gameSettings->SetVolumetricShadowsEnabled ( bVolumetricShadowsEnabled );
+
+    // Device selection dialog
+    bool bDeviceSelectionDialogEnabled = m_pCheckBoxDeviceSelectionDialog->GetSelected ();
+    SetApplicationSettingInt ( "device-selection-disabled", bDeviceSelectionDialogEnabled ? 0 : 1 );
 
     // Allow screen upload
     bool bAllowScreenUploadEnabled = m_pCheckBoxAllowScreenUpload->GetSelected ();

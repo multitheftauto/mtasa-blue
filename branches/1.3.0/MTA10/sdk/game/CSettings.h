@@ -130,6 +130,8 @@ public:
     virtual bool            IsGrassEnabled          ( void ) = 0;
     virtual void            SetGrassEnabled         ( bool bEnable ) = 0;
 
+    virtual void            SetSelectDeviceDialogEnabled    ( bool bEnable ) = 0;
+
     virtual void            Save                    ( void ) = 0;
 };
 
