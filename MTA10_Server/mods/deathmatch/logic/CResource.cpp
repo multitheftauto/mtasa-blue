@@ -1821,43 +1821,20 @@ bool CResource::ReadIncludedMaps ( CXMLNode * root )
             }
 
             // Grab the source node
-            CLogger::LogPrintf ( "Meta.xml - Map: 1\n" );
             CXMLAttribute * src = attributes->Find("src");
-            CLogger::LogPrintf ( "Meta.xml - Map: 2\n" );
             if ( src )
             {
-                CLogger::LogPrintf ( "Meta.xml - Map: 3\n" );
                 // Grab the source text from the node
                 string strFilename = src->GetValue ();
-                CLogger::LogPrintf ( "Meta.xml - Map: 4\n" );
-                if ( strFilename.c_str() )
-                {
-                    CLogger::LogPrintf ( "strFilename valid - %i\n", strlen ( strFilename.c_str() ) );
-                    if ( strlen ( strFilename.c_str() ) > 0 )
-                    {
-                        CLogger::LogPrintf ( "strFilename is valid - check 2\n" );
-                    }
-                    else
-                    {
-                        CLogger::LogPrintf ( "strFilename is invalid - check 2\n" );
-                    }
-                }
-                else    // #6871 check
-                {
-                    CLogger::LogPrintf ( "strFilename invalid - %i\n", strlen ( strFilename.c_str() ) );
-                }
                 string strFullFilename;
                 ReplaceSlashes ( strFilename );
-                CLogger::LogPrintf ( "Meta.xml - Map: 5\n" );
                 // Grab the file (evt extract it). Make a map item resource and put it into the resourcefiles list
                 if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
                 {
-                    CLogger::LogPrintf ( "Meta.xml - Map: 6\n" );
                     m_resourceFiles.push_back ( new CResourceMapItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes, iDimension ) );
                 }
                 else
                 {
-                    CLogger::LogPrintf ( "Meta.xml - Map: 7\n" );
                     char szBuffer[512];
                     snprintf ( szBuffer, 511, "Couldn't find map %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     m_strFailureReason = szBuffer;
@@ -1867,7 +1844,6 @@ bool CResource::ReadIncludedMaps ( CXMLNode * root )
             }
             else
             {
-                CLogger::LogPrintf ( "Meta.xml - Map: 8\n" );
                 CLogger::LogPrintf ( "WARNING: Missing 'src' attribute from 'map' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str () );
             }
         }
