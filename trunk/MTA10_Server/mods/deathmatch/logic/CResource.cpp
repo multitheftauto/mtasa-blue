@@ -1833,6 +1833,14 @@ bool CResource::ReadIncludedMaps ( CXMLNode * root )
                 if ( strFilename.c_str() )
                 {
                     CLogger::LogPrintf ( "strFilename valid - %i\n", strlen ( strFilename.c_str() ) );
+                    if ( strlen ( strFilename.c_str() ) > 0 )
+                    {
+                        CLogger::LogPrintf ( "strFilename is valid - check 2\n" );
+                    }
+                    else
+                    {
+                        CLogger::LogPrintf ( "strFilename is invalid - check 2\n" );
+                    }
                 }
                 else    // #6871 check
                 {
