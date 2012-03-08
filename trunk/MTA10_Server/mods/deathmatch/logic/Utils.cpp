@@ -442,9 +442,11 @@ bool IsValidFilePath ( const char *szDir )
 {
     if ( szDir == NULL ) return false;
 
-    bool bValid = false; // check for invalid ending characters
-
     unsigned int uiLen = strlen ( szDir );
+
+    if ( szDir [ uiLen - 1 ] == '/' ) // will return false if ending with an invalid character, mainly used for linux (#6871)
+        return false;
+
     unsigned char c, c_d;
     
     // iterate through the char array
@@ -453,12 +455,8 @@ bool IsValidFilePath ( const char *szDir )
         c_d = ( i < ( uiLen - 1 ) ) ? szDir[i+1] : 0;       // one character ahead, if any
         if ( !IsVisibleCharacter ( c ) || c == ':' || ( c == '.' && c_d == '.' ) || ( c == '\\' && c_d == '\\' ) )
             return false;
-        if ( c == '/' )     // check for invalid ending characters
-            bValid = false;
-        else
-            bValid = true;
     }
-    return bValid; // will return false if ending with an invalid character, mainly used for linux (#6871)
+    return true;
 }
 
 unsigned int HexToInt ( const char * szHex )
