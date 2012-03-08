@@ -480,7 +480,7 @@ void CBassAudio::Process3D ( const CVector& vecPlayerPosition, const CVector& ve
     assert ( m_b3D && m_pSound );
 
     // Limit panning when getting close to the min distance
-    float fDistance = DistanceBetweenPoints3D ( vecPlayerPosition, m_vecPosition );
+    float fDistance = DistanceBetweenPoints3D ( vecCameraPosition, m_vecPosition );
     float fPanSharpness = UnlerpClamped ( m_fMinDistance, fDistance, m_fMinDistance * 2 );
     float fPanLimit = Lerp ( 0.35f, fPanSharpness, 1.0f );
 
