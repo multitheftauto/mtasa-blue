@@ -37,7 +37,7 @@ public:
 
     CBan*               AddBan                  ( const SString& strBanner = "Console", const SString& strReason = "", time_t tTimeOfUnban = 0 );
 
-    bool                Exists                  ( CBan* pBan );
+    CBan*               GetBanFromScriptID      ( uint uiScriptID );
 
     bool                IsSpecificallyBanned    ( const char* szIP );
     bool                IsSerialBanned          ( const char* szSerial );

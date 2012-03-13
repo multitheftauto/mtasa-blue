@@ -1733,6 +1733,10 @@
 				Name="shared"
 				>
 				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CIdArray.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLatentReceiver.cpp"
 					>
 				</File>
@@ -2642,6 +2646,10 @@
 			<Filter
 				Name="shared"
 				>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CIdArray.h"
+					>
+				</File>
 				<File
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLatentTransferManager.h"
 					>

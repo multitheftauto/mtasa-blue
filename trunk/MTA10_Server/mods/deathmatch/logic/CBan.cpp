@@ -14,10 +14,15 @@
 
 CBan::CBan ( void )
 {
+    m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::BAN );
     m_tTimeOfBan = 0;
     m_tTimeOfUnban = 0;
 }
 
+CBan::~CBan ( void )
+{
+    CIdArray::PushUniqueId ( this, EIdClass::BAN, m_uiScriptID );
+}
 
 SString CBan::GetDurationDesc( void )
 {

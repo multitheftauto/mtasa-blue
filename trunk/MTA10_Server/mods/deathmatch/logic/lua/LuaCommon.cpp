@@ -31,33 +31,15 @@ CElement* lua_toelement ( lua_State* luaVM, int iArgument )
 }
 
 
-CAccount* lua_toaccount ( lua_State* luaVM, int iArgument )
-{
-    CAccount* pAccount = reinterpret_cast < CAccount* > ( lua_touserdata ( luaVM, iArgument ) );
-    if ( g_pGame->GetAccountManager ()->Exists ( pAccount ) )
-        return pAccount;
-
-    return NULL;
-}
-
-
 CAccessControlList* lua_toacl ( lua_State* luaVM, int iArgument )
 {
-    CAccessControlList* pACL = reinterpret_cast < CAccessControlList* > ( lua_touserdata ( luaVM, iArgument ) );
-    if ( g_pGame->GetACLManager ()->VerifyACL ( pACL ) )
-        return pACL;
-
-    return NULL;
+    return g_pGame->GetACLManager ()->GetACLFromScriptID ( reinterpret_cast < unsigned long > ( lua_touserdata ( luaVM, iArgument ) ) );
 }
 
 
 CAccessControlListGroup* lua_toaclgroup ( lua_State* luaVM, int iArgument )
 {
-    CAccessControlListGroup* pACLGroup = reinterpret_cast < CAccessControlListGroup* > ( lua_touserdata ( luaVM, iArgument ) );
-    if ( g_pGame->GetACLManager ()->VerifyGroup ( pACLGroup ) )
-        return pACLGroup;
-
-    return NULL;
+    return g_pGame->GetACLManager ()->GetGroupFromScriptID ( reinterpret_cast < unsigned long > ( lua_touserdata ( luaVM, iArgument ) ) );
 }
 
 
@@ -143,11 +125,7 @@ CPlayer* lua_toplayer ( lua_State* luaVM, int iArgument )
 
 CResource* lua_toresource ( lua_State* luaVM, int iArgument )
 {
-    CResource* pResource = reinterpret_cast < CResource* > ( lua_touserdata ( luaVM, iArgument ) );
-    if ( g_pGame->GetResourceManager ()->Exists ( pResource ) )
-        return pResource;
-
-    return NULL;
+    return g_pGame->GetResourceManager ()->GetResourceFromScriptID ( reinterpret_cast < unsigned long > ( lua_touserdata ( luaVM, iArgument ) ) );
 }
 
 
@@ -173,14 +151,10 @@ CTeam* lua_toteam ( lua_State* luaVM, int iArgument )
 
 CTextDisplay* lua_totextdisplay ( lua_State* luaVM, int iArgument )
 {
-    CLuaMain* pLuaVM = g_pGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
-    if ( pLuaVM )
+    CLuaMain* pLuaMain = g_pGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
     {
-        CTextDisplay* pDisplay = reinterpret_cast < CTextDisplay* > ( lua_touserdata ( luaVM, iArgument ) );
-        if ( pLuaVM->TextDisplayExists ( pDisplay ) )
-        {
-            return pDisplay;
-        }
+        return pLuaMain->GetTextDisplayFromScriptID ( reinterpret_cast < unsigned long > ( lua_touserdata ( luaVM, iArgument ) ) );
     }
 
     return NULL;
@@ -189,30 +163,10 @@ CTextDisplay* lua_totextdisplay ( lua_State* luaVM, int iArgument )
 
 CTextItem* lua_totextitem ( lua_State* luaVM, int iArgument )
 {
-    CLuaMain* pLuaVM = g_pGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
-    if ( pLuaVM )
+    CLuaMain* pLuaMain = g_pGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
     {
-        CTextItem* pItem = reinterpret_cast < CTextItem* > ( lua_touserdata ( luaVM, iArgument ) );
-        if ( pLuaVM->TextItemExists ( pItem ) )
-        {
-            return pItem;
-        }
-    }
-
-    return NULL;
-}
-
-
-CLuaTimer* lua_totimer ( lua_State* luaVM, int iArgument )
-{
-    CLuaMain* pLuaVM = g_pGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
-    if ( pLuaVM )
-    {
-        CLuaTimer* pTimer = reinterpret_cast < CLuaTimer* > ( lua_touserdata ( luaVM, iArgument ) );
-        if ( pLuaVM->GetTimerManager ()->Exists ( pTimer ) )
-        {
-            return pTimer;
-        }
+        return pLuaMain->GetTextItemFromScriptID ( reinterpret_cast < unsigned long > ( lua_touserdata ( luaVM, iArgument ) ) );
     }
 
     return NULL;
@@ -237,11 +191,7 @@ CXMLNode* lua_toxmlnode ( lua_State* luaVM, int iArgument )
 
 CBan* lua_toban ( lua_State* luaVM, int iArgument )
 {
-    CBan* pBan = reinterpret_cast < CBan* > ( lua_touserdata ( luaVM, iArgument ) );
-    if ( g_pGame->GetBanManager ()->Exists ( pBan ) )
-        return pBan;
-
-    return NULL;
+    return g_pGame->GetBanManager ()->GetBanFromScriptID ( reinterpret_cast < unsigned long > ( lua_touserdata ( luaVM, iArgument ) ) );
 }
 
 
@@ -273,43 +223,43 @@ void lua_pushelement ( lua_State* luaVM, CElement* pElement )
 
 void lua_pushacl ( lua_State* luaVM, CAccessControlList* pACL )
 {
-    lua_pushlightuserdata ( luaVM, pACL );
+    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pACL->GetScriptID () ) );
 }
 
 
-void lua_pushaclgroup ( lua_State* luaVM, CAccessControlListGroup* pACL )
+void lua_pushaclgroup ( lua_State* luaVM, CAccessControlListGroup* pGroup )
 {
-    lua_pushlightuserdata ( luaVM, pACL );
+    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pGroup->GetScriptID () ) );
 }
 
 
 void lua_pushaccount ( lua_State* luaVM, CAccount* pAccount )
 {
-    lua_pushlightuserdata ( luaVM, pAccount );
+    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pAccount->GetScriptID () ) );
 }
 
 
-void lua_pushresource ( lua_State* luaVM, CResource* pElement )
+void lua_pushresource ( lua_State* luaVM, CResource* pResource )
 {
-    lua_pushlightuserdata ( luaVM, pElement );
+    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pResource->GetScriptID () ) );
 }
 
 
 void lua_pushtextdisplay ( lua_State* luaVM, CTextDisplay* pDisplay )
 {
-    lua_pushlightuserdata ( luaVM, pDisplay );
+    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pDisplay->GetScriptID () ) );
 }
 
 
 void lua_pushtextitem ( lua_State* luaVM, CTextItem* pItem )
 {
-    lua_pushlightuserdata ( luaVM, pItem );
+    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pItem->GetScriptID () ) );
 }
 
 
-void lua_pushtimer ( lua_State* luaVM, CLuaTimer* pElement )
+void lua_pushtimer ( lua_State* luaVM, CLuaTimer* pTimer )
 {
-    lua_pushlightuserdata ( luaVM, pElement );
+    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pTimer->GetScriptID () ) );
 }
 
 
@@ -321,7 +271,7 @@ void lua_pushxmlnode ( lua_State* luaVM, CXMLNode* pElement )
 
 void lua_pushban ( lua_State* luaVM, CBan* pBan )
 {
-    lua_pushlightuserdata ( luaVM, pBan );
+    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pBan->GetScriptID () ) );
 }
 
 

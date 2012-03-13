@@ -16,6 +16,7 @@
 
 CAccessControlList::CAccessControlList ( const char* szACLName, CAccessControlListManager* pACLManager )
 {
+    m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::ACL );
     m_szACLName[0] = '\0';
     snprintf ( m_szACLName, MAX_ACL_NAME_LENGTH, "%s", szACLName );
     m_szACLName[MAX_ACL_NAME_LENGTH-1] = '\0';
@@ -26,6 +27,7 @@ CAccessControlList::CAccessControlList ( const char* szACLName, CAccessControlLi
 
 CAccessControlList::~CAccessControlList ( void )
 {
+    CIdArray::PushUniqueId ( this, EIdClass::ACL, m_uiScriptID );
     list < CAccessControlListRight* > ::iterator iter = m_Rights.begin ();
     for ( ; iter != m_Rights.end (); iter++ )
     {

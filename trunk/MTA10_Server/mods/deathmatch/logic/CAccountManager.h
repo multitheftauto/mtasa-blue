@@ -78,6 +78,12 @@ protected:
     std::multimap < SString, CAccount* > m_NameAccountMap;
 };
 
+// Returns true if the item is in the itemList
+template < class T >
+bool ListContains ( const CMappedAccountList& itemList, const T& item )
+{
+    return itemList.contains ( item );
+}
 
 
 //
@@ -104,7 +110,8 @@ public:
 
     CAccount*                   Get                         ( const char* szName, bool bRegistered = true );
     CAccount*                   Get                         ( const char* szName, const char* szIP );
-    bool                        Exists                      ( CAccount* pAccount );
+    CAccount*                   GetAccountFromScriptID      ( uint uiScriptID );
+
     bool                        LogIn                       ( CClient* pClient, CClient* pEchoClient, const char* szNick, const char* szPassword );
     bool                        LogIn                       ( CClient* pClient, CClient* pEchoClient, CAccount* pAccount, bool bAutoLogin = false );
     bool                        LogOut                      ( CClient* pClient, CClient* pEchoClient );

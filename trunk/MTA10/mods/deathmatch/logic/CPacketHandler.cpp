@@ -4455,10 +4455,10 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
 void CPacketHandler::Packet_ResourceStop ( NetBitStreamInterface& bitStream )
 {
     // unsigned short (2)    - resource id
-    unsigned short usID;
-    if ( bitStream.Read ( usID ) )
+    unsigned short usNetID;
+    if ( bitStream.Read ( usNetID ) )
     {
-        CResource* pResource = g_pClientGame->m_pResourceManager->GetResource ( usID );
+        CResource* pResource = g_pClientGame->m_pResourceManager->GetResourceFromNetID ( usNetID );
         if ( pResource )
         {
             // Grab the resource entity
@@ -4467,23 +4467,23 @@ void CPacketHandler::Packet_ResourceStop ( NetBitStreamInterface& bitStream )
             {
                 // Call our lua event
                 CLuaArguments Arguments;
-                Arguments.PushUserData ( pResource );
+                Arguments.PushResource ( pResource );
                 pResourceEntity->CallEvent ( "onClientResourceStop", Arguments, true );
             }
 
             // Delete the resource
-            g_pClientGame->m_pResourceManager->RemoveResource ( usID );
+            g_pClientGame->m_pResourceManager->RemoveResource ( usNetID );
         }
     }
 }
 
 void CPacketHandler::Packet_ResourceClientScripts ( NetBitStreamInterface& bitStream )
 {
-    unsigned short usID;
+    unsigned short usNetID;
     unsigned short usScriptCount = 0;
-    if ( bitStream.Read ( usID ) && bitStream.Read ( usScriptCount ) )
+    if ( bitStream.Read ( usNetID ) && bitStream.Read ( usScriptCount ) )
     {
-        CResource* pResource = g_pClientGame->m_pResourceManager->GetResource ( usID );
+        CResource* pResource = g_pClientGame->m_pResourceManager->GetResourceFromNetID ( usNetID );
         if ( pResource )
         {
             for ( unsigned int i = 0; i < usScriptCount; ++i )

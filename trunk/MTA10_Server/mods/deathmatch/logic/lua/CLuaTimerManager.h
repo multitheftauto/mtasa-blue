@@ -31,7 +31,7 @@ public:
     void                        DoPulse                         ( CLuaMain* pLuaMain );
 
     bool                        Exists                          ( CLuaTimer* pLuaTimer );
-    CLuaTimer*                  GetTimer                        ( unsigned int uiID );
+    CLuaTimer*                  GetTimerFromScriptID            ( unsigned int uiScriptID );
 
     CLuaTimer*                  AddTimer                        ( const CLuaFunctionRef& iLuaFunction, CTickCount llTimeDelay, unsigned int uiRepeats, const CLuaArguments& Arguments );
     void                        RemoveTimer                     ( CLuaTimer* pLuaTimer );

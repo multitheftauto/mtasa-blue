@@ -46,6 +46,8 @@ public:
 
     inline bool             IsBeingDeleted              ( void )                        { return m_bBeingDeleted; }
     inline void             SetBeingDeleted             ( bool bBeingDeleted )          { m_bBeingDeleted = bBeingDeleted; }
+    uint                    GetScriptID                 ( void ) const                  { return m_uiScriptID; }
+
 private:
     CLuaFunctionRef         m_iLuaFunction;
     CLuaArguments           m_Arguments;
@@ -53,6 +55,7 @@ private:
     CTickCount              m_llDelay;
     unsigned int            m_uiRepeats;
     bool                    m_bBeingDeleted;
+    uint                    m_uiScriptID;
 };
 
 #endif

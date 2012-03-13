@@ -44,10 +44,11 @@ class CResource
 {  
 
 public:
-                            CResource       ( unsigned short usID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity );
+                            CResource       ( unsigned short usNetID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity );
                             ~CResource      ( void );
 
-    inline unsigned short   GetID           ( void )                { return m_usID; };
+    inline unsigned short   GetNetID        ( void )                { return m_usNetID; };
+    uint                    GetScriptID     ( void ) const          { return m_uiScriptID; };
     inline char*            GetName         ( void )                { return m_szResourceName; };
     inline CLuaMain*        GetVM           ( void )                { return m_pLuaVM; };
     inline bool             GetActive       ( void )                { return m_bActive; };
@@ -96,7 +97,8 @@ public:
     void                    LoadProtectedScript             ( const char* chunk, unsigned int length );
 
 private:
-    unsigned short          m_usID;
+    unsigned short          m_usNetID;
+    uint                    m_uiScriptID;
     char                    m_szResourceName [ MAX_RESOURCE_NAME_LENGTH ];
     CLuaMain*               m_pLuaVM;
     CLuaManager*            m_pLuaManager;

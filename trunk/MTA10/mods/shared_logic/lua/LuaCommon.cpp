@@ -170,26 +170,9 @@ CClientProjectile* lua_toprojectile ( lua_State* luaVM, int iArgument )
     return NULL;
 }
 
-CLuaTimer* lua_totimer ( lua_State* luaVM, int iArgument )
-{
-    CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
-    {
-        CLuaTimer* pElement = reinterpret_cast < CLuaTimer* > ( lua_touserdata ( luaVM, iArgument ) );
-        if ( pLuaMain->GetTimerManager ()->Exists ( pElement ) )
-            return pElement;
-    }
-
-    return NULL;
-}
-
 CResource* lua_toresource ( lua_State* luaVM, int iArgument )
 {
-    CResource* pResource = reinterpret_cast < CResource* > ( lua_touserdata ( luaVM, iArgument ) );
-    if ( CLuaDefs::m_pResourceManager->Exists ( pResource ) )
-        return pResource;
-
-    return NULL;
+    return g_pClientGame->GetResourceManager ()->GetResourceFromScriptID ( reinterpret_cast < unsigned long > ( lua_touserdata ( luaVM, iArgument ) ) );
 }
 
 CClientSound* lua_tosound ( lua_State* luaVM, int iArgument )
@@ -267,14 +250,14 @@ void lua_pushelement ( lua_State* luaVM, CClientEntity* pElement )
     lua_pushnil ( luaVM );
 }
 
-void lua_pushresource ( lua_State* luaVM, CResource* pElement )
+void lua_pushresource ( lua_State* luaVM, CResource* pResource )
 {
-    lua_pushlightuserdata ( luaVM, pElement );
+    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pResource->GetScriptID () ) );
 }
 
-void lua_pushtimer ( lua_State* luaVM, CLuaTimer* pElement )
+void lua_pushtimer ( lua_State* luaVM, CLuaTimer* pTimer )
 {
-    lua_pushlightuserdata ( luaVM, pElement );
+    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pTimer->GetScriptID () ) );
 }
 
 void lua_pushxmlnode ( lua_State* luaVM, CXMLNode* pElement )

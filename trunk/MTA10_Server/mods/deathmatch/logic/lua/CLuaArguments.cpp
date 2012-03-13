@@ -403,7 +403,8 @@ CLuaArgument* CLuaArguments::PushNil ( void )
 
 CLuaArgument* CLuaArguments::PushBoolean ( bool bBool )
 {
-    CLuaArgument* pArgument = new CLuaArgument ( bBool );
+    CLuaArgument* pArgument = new CLuaArgument ();
+    pArgument->ReadBool ( bBool );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -412,14 +413,15 @@ CLuaArgument* CLuaArguments::PushBoolean ( bool bBool )
 CLuaArgument* CLuaArguments::PushTable ( CLuaArguments * table )
 {
     CLuaArgument* pArgument = new CLuaArgument (  );
-    pArgument->Read(table);
+    pArgument->ReadTable ( table );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
 
 CLuaArgument* CLuaArguments::PushNumber ( double dNumber )
 {
-    CLuaArgument* pArgument = new CLuaArgument ( dNumber );
+    CLuaArgument* pArgument = new CLuaArgument ();
+    pArgument->ReadNumber ( dNumber );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -433,16 +435,8 @@ CLuaArgument* CLuaArguments::PushArgument ( const CLuaArgument & argument )
 
 CLuaArgument* CLuaArguments::PushString ( const std::string& strString )
 {
-    CLuaArgument* pArgument = new CLuaArgument ( strString );
-    m_Arguments.push_back ( pArgument );
-    return pArgument;
-}
-
-
-CLuaArgument* CLuaArguments::PushUserData ( void* pUserData )
-{
-    CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadUserData ( pUserData );
+    CLuaArgument* pArgument = new CLuaArgument ();
+    pArgument->ReadString ( strString );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -450,7 +444,17 @@ CLuaArgument* CLuaArguments::PushUserData ( void* pUserData )
 
 CLuaArgument* CLuaArguments::PushElement ( CElement* pElement )
 {
-    CLuaArgument* pArgument = new CLuaArgument ( pElement );
+    CLuaArgument* pArgument = new CLuaArgument ();
+    pArgument->ReadElement ( pElement );
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+
+CLuaArgument* CLuaArguments::PushBan ( CBan* pBan )
+{
+    CLuaArgument* pArgument = new CLuaArgument;
+    pArgument->ReadScriptID ( pBan->GetScriptID () );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -459,7 +463,7 @@ CLuaArgument* CLuaArguments::PushElement ( CElement* pElement )
 CLuaArgument* CLuaArguments::PushACL ( CAccessControlList* pACL )
 {
     CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadUserData ( pACL );
+    pArgument->ReadScriptID ( pACL->GetScriptID () );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -468,7 +472,7 @@ CLuaArgument* CLuaArguments::PushACL ( CAccessControlList* pACL )
 CLuaArgument* CLuaArguments::PushACLGroup ( CAccessControlListGroup* pACLGroup )
 {
     CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadUserData ( pACLGroup );
+    pArgument->ReadScriptID ( pACLGroup->GetScriptID () );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -477,7 +481,7 @@ CLuaArgument* CLuaArguments::PushACLGroup ( CAccessControlListGroup* pACLGroup )
 CLuaArgument* CLuaArguments::PushAccount ( CAccount* pAccount )
 {
     CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadUserData ( pAccount );
+    pArgument->ReadScriptID ( pAccount->GetScriptID () );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -486,7 +490,7 @@ CLuaArgument* CLuaArguments::PushAccount ( CAccount* pAccount )
 CLuaArgument* CLuaArguments::PushResource ( CResource* pResource )
 {
     CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadUserData ( pResource );
+    pArgument->ReadScriptID ( pResource->GetScriptID () );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -495,7 +499,7 @@ CLuaArgument* CLuaArguments::PushResource ( CResource* pResource )
 CLuaArgument* CLuaArguments::PushTextDisplay ( CTextDisplay* pTextDisplay )
 {
     CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadUserData ( pTextDisplay );
+    pArgument->ReadScriptID ( pTextDisplay->GetScriptID () );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -504,7 +508,7 @@ CLuaArgument* CLuaArguments::PushTextDisplay ( CTextDisplay* pTextDisplay )
 CLuaArgument* CLuaArguments::PushTextItem ( CTextItem* pTextItem )
 {
     CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadUserData ( pTextItem );
+    pArgument->ReadScriptID ( pTextItem->GetScriptID () );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -513,7 +517,16 @@ CLuaArgument* CLuaArguments::PushTextItem ( CTextItem* pTextItem )
 CLuaArgument* CLuaArguments::PushTimer ( CLuaTimer* pLuaTimer )
 {
     CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadUserData ( pLuaTimer );
+    pArgument->ReadScriptID ( pLuaTimer->GetScriptID () );
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+
+CLuaArgument* CLuaArguments::PushDbQuery ( CDbJobData* pJobData )
+{
+    CLuaArgument* pArgument = new CLuaArgument;
+    pArgument->ReadScriptID ( pJobData->GetId () );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -813,7 +826,8 @@ bool CLuaArguments::ReadFromJSONObject ( json_object * object, std::vector < CLu
             bool bSuccess = true;
             json_object_object_foreach(object, key, val) 
             {
-                CLuaArgument* pArgument = new CLuaArgument ( std::string ( key ) );
+                CLuaArgument* pArgument = new CLuaArgument ();
+                pArgument->ReadString ( key );
                 m_Arguments.push_back ( pArgument ); // push the key first
                 pArgument = new CLuaArgument ( );
                 bSuccess = pArgument->ReadFromJSONObject ( val, pKnownTables ); // then the value
@@ -851,7 +865,8 @@ bool CLuaArguments::ReadFromJSONArray ( json_object * object, std::vector < CLua
             for(int i=0; i < json_object_array_length(object); i++) 
             {
                 json_object *arrayObject = json_object_array_get_idx(object, i);
-                CLuaArgument* pArgument = new CLuaArgument ((double)i+1); // push the key
+                CLuaArgument* pArgument = new CLuaArgument ();
+                pArgument->ReadNumber ( i + 1 );    // push the key
                 m_Arguments.push_back ( pArgument );
 
                 pArgument = new CLuaArgument();
