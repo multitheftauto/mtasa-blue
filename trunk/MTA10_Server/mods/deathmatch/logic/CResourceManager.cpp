@@ -1091,6 +1091,8 @@ bool CResourceManager::MoveDirToTrash ( const SString& strPathDirName )
 {
     // Get path to unique trash sub-directory
     SString strDestPathDirName = MakeUniquePath ( PathJoin ( GetResourceTrashDir (), ExtractFilename ( strPathDirName.TrimEnd ( "\\" ).TrimEnd ( "/" ) ) ) );
+    // Make sure the trash directory exists and create if it does not
+    MakeSureDirExists ( GetResourceTrashDir () + "/" );
     // Try move
     return FileRename ( strPathDirName, strDestPathDirName );
 }
