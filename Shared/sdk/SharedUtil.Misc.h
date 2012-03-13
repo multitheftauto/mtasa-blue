@@ -756,7 +756,25 @@ namespace SharedUtil
     template < class T >
     class CMappedArray : public CMappedContainer < T, std::vector < T > >
     {
+    public:
+        const T& operator[] ( int idx ) const   { return m_List[idx]; }
+        T& operator[] ( int idx )               { return m_List[idx]; }
     };
+
+
+    // Returns true if the item is in the itemList
+    template < class U, class T >
+    bool ListContains ( const CMappedList < U >& itemList, const T& item )
+    {
+        return itemList.Contains ( item );
+    }
+
+    // Returns true if the item is in the itemList
+    template < class U, class T >
+    bool ListContains ( const CMappedArray < U >& itemList, const T& item )
+    {
+        return itemList.Contains ( item );
+    }
 
 
     ///////////////////////////////////////////////////////////////

@@ -108,6 +108,13 @@ bool CLuaTimerManager::Exists ( CLuaTimer* pLuaTimer )
 }
 
 
+CLuaTimer* CLuaTimerManager::GetTimerFromScriptID ( uint uiScriptID )
+{
+    CLuaTimer* pLuaTimer = (CLuaTimer*) CIdArray::FindEntry ( uiScriptID, EIdClass::TIMER );
+    dassert ( !pLuaTimer || m_TimerList.Contains ( pLuaTimer ) );
+    return pLuaTimer;
+}
+
 
 CLuaTimer* CLuaTimerManager::AddTimer ( const CLuaFunctionRef& iLuaFunction, CTickCount llTimeDelay, unsigned int uiRepeats, const CLuaArguments& Arguments )
 {

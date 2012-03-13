@@ -85,7 +85,8 @@ class CDbJobData
 public:
     ZERO_ON_NEW
 
-                CDbJobData      ( SDbJobId id ) : id ( id ) {}
+                CDbJobData      ( void );
+                ~CDbJobData     ( void );
     SDbJobId    GetId           ( void ) { return id; }
     bool        SetCallback     ( PFN_DBRESULT pfnDbResult, void* pContext );
     bool        HasCallback     ( void );

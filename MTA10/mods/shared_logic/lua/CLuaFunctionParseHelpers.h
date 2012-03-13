@@ -141,10 +141,7 @@ inline SString GetClassTypeName ( CEntity* )                { return "entity"; }
 template < class T >
 CResource* UserDataCast ( CResource*, void* ptr, lua_State* )
 {
-    CResource* pResource = reinterpret_cast < CResource* > ( ptr );
-    if ( CLuaDefs::m_pResourceManager->Exists ( pResource ) )
-        return pResource;
-    return NULL;
+    return g_pClientGame->GetResourceManager ()->GetResourceFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
 }
 
 
@@ -168,9 +165,7 @@ CLuaTimer* UserDataCast ( CLuaTimer*, void* ptr, lua_State* luaVM )
     CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine ( luaVM );
     if ( pLuaMain )
     {
-        CLuaTimer* pLuaTimer = reinterpret_cast < CLuaTimer* > ( ptr );
-        if ( pLuaMain->GetTimerManager ()->Exists ( pLuaTimer ) )
-            return pLuaTimer;
+        return pLuaMain->GetTimerManager ()->GetTimerFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
     }
     return NULL;
 }

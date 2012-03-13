@@ -11226,7 +11226,7 @@ int CLuaFunctionDefinitions::DbQuery ( lua_State* luaVM )
             if ( pLuaMain )
             {
                 CLuaArguments Arguments;
-                Arguments.PushUserData ( reinterpret_cast < void* > ( pJobData->GetId () ) );
+                Arguments.PushDbQuery ( pJobData );
                 Arguments.PushArguments ( callbackArgs );
                 pJobData->SetCallback ( DbQueryCallback, g_pGame->GetLuaCallbackManager ()->CreateCallback ( pLuaMain, iLuaFunction, Arguments ) );
             }

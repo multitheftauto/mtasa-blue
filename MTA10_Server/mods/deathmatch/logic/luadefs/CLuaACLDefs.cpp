@@ -964,7 +964,7 @@ int CLuaACLDefs::isObjectInACLGroup ( lua_State* luaVM )
         CAccessControlListGroup* pGroup = lua_toaclgroup ( luaVM, 2 );
         CAccessControlListGroupObject::EObjectType GroupObjectType;
 
-        if ( pGroup && m_pACLManager->VerifyGroup ( pGroup ) )
+        if ( pGroup )
         {
             if ( StringBeginsWith ( szObject, "resource." ) ) {
                 szObject += 9;

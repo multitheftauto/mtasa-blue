@@ -204,7 +204,8 @@ private:
 
     CChecksum               m_metaChecksum;     // Checksum of meta.xml last time this was loaded, generated in GenerateChecksums()
 
-    unsigned short          m_usID; // resource ID    
+    unsigned short          m_usNetID; // resource ID    
+    uint                    m_uiScriptID;
 
     bool                    m_bProtected;
     bool                    m_bStartedManually;
@@ -339,8 +340,9 @@ public:
     CElementGroup *         GetElementGroup ( void ) { return m_pDefaultElementGroup; }
     inline time_t           GetTimeStarted ( void ) { return m_timeStarted; }
     inline time_t           GetTimeLoaded ( void ) { return m_timeLoaded; }
-    void                    SetID ( unsigned short usID ) { m_usID = usID; }
-    unsigned short          GetID ( void ) { return m_usID; }
+    void                    SetNetID ( unsigned short usNetID ) { m_usNetID = usNetID; }
+    unsigned short          GetNetID ( void ) { return m_usNetID; }
+    uint                    GetScriptID ( void ) const { return m_uiScriptID; }
     void                    OnPlayerJoin ( CPlayer& Player );
     void                    SendProtectedScripts ( CPlayer* player = 0 );
     CDummy*                 GetResourceRootElement ( void ) { return m_pResourceElement; };

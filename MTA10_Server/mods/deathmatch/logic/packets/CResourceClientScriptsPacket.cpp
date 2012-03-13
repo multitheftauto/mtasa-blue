@@ -26,7 +26,7 @@ bool CResourceClientScriptsPacket::Write ( NetBitStreamInterface& BitStream ) co
     if ( m_vecItems.size() == 0 )
         return false;
 
-    BitStream.Write ( m_pResource->GetID() );
+    BitStream.Write ( m_pResource->GetNetID() );
 
     unsigned short usItemCount = m_vecItems.size();
     BitStream.Write ( usItemCount );

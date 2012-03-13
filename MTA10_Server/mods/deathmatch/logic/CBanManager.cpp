@@ -46,7 +46,7 @@ void CBanManager::DoPulse ( void )
                 {
                     // Trigger the event
                     CLuaArguments Arguments;
-                    Arguments.PushUserData ( *iter );
+                    Arguments.PushBan ( *iter );
                     g_pGame->GetMapManager()->GetRootElement()->CallEvent ( "onUnban", Arguments );
 
                     RemoveBan ( *iter );
@@ -182,9 +182,11 @@ CBan* CBanManager::AddBan ( const SString& strBanner, const SString& strReason, 
 }
 
 
-bool CBanManager::Exists ( CBan* pBan )
+CBan* CBanManager::GetBanFromScriptID ( uint uiScriptID )
 {
-    return m_BanManager.Contains ( pBan );
+    CBan* pBan = (CBan*) CIdArray::FindEntry ( uiScriptID, EIdClass::BAN );
+    dassert ( !pBan || ListContains ( m_BanManager, pBan ) );
+    return pBan;
 }
 
 

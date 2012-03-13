@@ -87,6 +87,7 @@ public:
     list < class CAccessControlListGroupObject* > ::iterator IterEndObjects     ( void )        { return m_Objects.end (); };
 
     void                                            WriteToXMLNode              ( CXMLNode* pNode );
+    uint                                            GetScriptID                 ( void ) const  { return m_uiScriptID; }
 
 private:
     void                                            OnChange                    ( void );
@@ -106,6 +107,7 @@ private:
 
     ObjectList                                      m_Objects;
     ObjectMap                                       m_ObjectsById;
+    uint                                            m_uiScriptID;
 };
 
 #endif

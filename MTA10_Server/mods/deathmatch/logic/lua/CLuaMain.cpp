@@ -599,33 +599,18 @@ void CLuaMain::DestroyTextItem ( CTextItem * pTextItem )
 }
 
 
-bool CLuaMain::TextDisplayExists ( CTextDisplay* pDisplay )
+CTextDisplay* CLuaMain::GetTextDisplayFromScriptID ( uint uiScriptID )
 {
-    list < CTextDisplay* > ::const_iterator iter = m_Displays.begin ();
-    for ( ; iter != m_Displays.end (); iter++ )
-    {
-        if ( *iter == pDisplay )
-        {
-            return true;
-        }
-    }
-
-    return false;
+    CTextDisplay* pTextDisplay = (CTextDisplay*) CIdArray::FindEntry ( uiScriptID, EIdClass::TEXT_DISPLAY );
+    dassert ( !pTextDisplay || ListContains ( m_Displays, pTextDisplay ) );
+    return pTextDisplay;
 }
 
-
-bool CLuaMain::TextItemExists ( CTextItem* pTextItem )
+CTextItem* CLuaMain::GetTextItemFromScriptID ( uint uiScriptID )
 {
-    list < CTextItem* > ::const_iterator iter = m_TextItems.begin ();
-    for ( ; iter != m_TextItems.end (); iter++ )
-    {
-        if ( *iter == pTextItem )
-        {
-            return true;
-        }
-    }
-
-    return false;
+    CTextItem* pTextItem = (CTextItem*) CIdArray::FindEntry ( uiScriptID, EIdClass::TEXT_ITEM );
+    dassert ( !pTextItem || ListContains ( m_TextItems, pTextItem ) );
+    return pTextItem;
 }
 
 

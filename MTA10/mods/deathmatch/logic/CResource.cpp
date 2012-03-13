@@ -23,9 +23,10 @@ extern CClientGame* g_pClientGame;
 
 int CResource::m_iShowingCursor = 0;
 
-CResource::CResource ( unsigned short usID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity )
+CResource::CResource ( unsigned short usNetID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity )
 {
-    m_usID = usID;
+    m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::RESOURCE );
+    m_usNetID = usNetID;
     m_bActive = false;
     m_bInDownloadQueue = false;
     m_bShowingCursor = false;
@@ -80,6 +81,7 @@ CResource::CResource ( unsigned short usID, char* szResourceName, CClientEntity*
 
 CResource::~CResource ( void )
 {
+    CIdArray::PushUniqueId ( this, EIdClass::RESOURCE, m_uiScriptID );
     // Make sure we don't force the cursor on
     ShowCursor ( false );
 
@@ -340,7 +342,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
     {
         // Call the Lua "onClientResourceStart" event
         CLuaArguments Arguments;
-        Arguments.PushUserData ( this );
+        Arguments.PushResource ( this );
         m_pResourceEntity->CallEvent ( "onClientResourceStart", Arguments, true );
     }
     else

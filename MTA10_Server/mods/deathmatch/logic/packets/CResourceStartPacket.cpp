@@ -35,7 +35,7 @@ bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
         }
 
         // Write the resource id
-        BitStream.Write ( m_pResource->GetID () );
+        BitStream.Write ( m_pResource->GetNetID () );
         
         // Write the resource element id
         BitStream.Write ( m_pResource->GetResourceRootElement ()->GetID () );

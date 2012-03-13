@@ -46,6 +46,7 @@ extern int errno;
 
 CResource::CResource ( CResourceManager * resourceManager, bool bIsZipped, const char * szAbsPath, const char * szResourceName )
 {
+    m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::RESOURCE );
     m_bHandlingHTTPRequest = false;
     m_pDefaultElementGroup = NULL;
     m_pNodeSettings = NULL;
@@ -387,6 +388,7 @@ void CResource::Reload ( void )
 
 CResource::~CResource ( )
 {
+    CIdArray::PushUniqueId ( this, EIdClass::RESOURCE, m_uiScriptID );
     Unload ();
 
     m_strResourceName = "";
@@ -969,7 +971,7 @@ bool CResource::Stop ( bool bStopManually )
         m_StartedResources.remove ( this );
 
         // Tell all the players that have joined that this resource is stopped
-        g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( CResourceStopPacket ( m_usID ) );
+        g_pGame->GetPlayerManager ()->BroadcastOnlyJoined ( CResourceStopPacket ( m_usNetID ) );
 
         // Call the onResourceStop event on this resource element
         CLuaArguments Arguments;

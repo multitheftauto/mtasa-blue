@@ -542,9 +542,11 @@ CAccount* CAccountManager::Get ( const char* szName, const char* szIP )
 }
 
 
-bool CAccountManager::Exists ( CAccount* pAccount )
+CAccount* CAccountManager::GetAccountFromScriptID ( uint uiScriptID )
 {
-    return m_List.contains ( pAccount );
+    CAccount* pAccount = (CAccount*) CIdArray::FindEntry ( uiScriptID, EIdClass::ACCOUNT );
+    dassert ( !pAccount || ListContains ( m_List, pAccount ) );
+    return pAccount;
 }
 
 
@@ -796,25 +798,32 @@ CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, const char* s
     //Store the returned amount of rows
     int iResults = result.nRows;
 
+    // Default result is nil
+    CLuaArgument* pResult = new CLuaArgument ();
+
     //Do we have any results?
-    if ( iResults > 0 ) {
+    if ( iResults > 0 )
+    {
         int iType = result.Data[0][1].nVal;
         //Account data is stored as text so we don't need to check what type it is just return it
-        if ( iType == LUA_TNIL )
-            return new CLuaArgument;
         if ( iType == LUA_TBOOLEAN )
         {
             SString strResult = (char *)result.Data[0][0].pVal;
-            return new CLuaArgument ( strResult == "true" ? true : false );
+            pResult->ReadBool ( strResult == "true" );
         }
-        if ( iType == LUA_TNUMBER )
-            return new CLuaArgument ( strtod ( (char *)result.Data[0][0].pVal, NULL ) );
         else
-            return new CLuaArgument ( std::string ( (char *)result.Data[0][0].pVal ) );
+        if ( iType == LUA_TNUMBER )
+            pResult->ReadNumber ( strtod ( (char *)result.Data[0][0].pVal, NULL ) );
+        else
+            pResult->ReadString ( (char *)result.Data[0][0].pVal );
+    }
+    else
+    {
+        //No results
+        pResult->ReadBool ( false );
     }
 
-    //No results
-    return new CLuaArgument ( false );
+    return pResult;
 }
 
 bool CAccountManager::SetAccountData( CAccount* pAccount, const char* szKey, const SString& strValue, int iType )
