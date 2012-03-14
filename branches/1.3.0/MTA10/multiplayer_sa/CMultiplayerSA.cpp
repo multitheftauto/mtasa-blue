@@ -6481,6 +6481,10 @@ bool _cdecl OnCallCStreamingInfoAddToList ( int flags, SImgGTAItemInfo* pImgGTAI
         // Remove priorty flag, as not counted in ms_numPriorityRequests
         pImgGTAInfo->uiUnknown2 &= ~ 0x10;
 
+        // Magical thing to maybe fix crashing
+        #define VAR_CStreaming_bLoadingBigModel     0x08E4A58
+        MemPutFast < BYTE > ( VAR_CStreaming_bLoadingBigModel, 0 );
+
         return true;
     }
 
