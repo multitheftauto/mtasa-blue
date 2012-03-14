@@ -1901,10 +1901,8 @@ void CCore::OnPreHUDRender ( void )
 //
 //     System RAM MB     min     max
 //           512     =   64      96
-//           768     =   96      128
-//          1024     =   128     256
-//          1536     =   128     376
-//          2048     =   128     512
+//          1024     =   96     128
+//          2048     =  128     256
 //
 // Also:
 //   Max should be no more than 2 * installed video memory
@@ -1923,8 +1921,8 @@ void CCore::CalculateStreamingMemoryRange ( void )
     int iVideoMemoryMB = g_pDeviceState->AdapterState.InstalledMemoryKB / 1024;
 
     // Calc min and max from lookup table
-    SSamplePoint < float > minPoints[] = { {512, 64},  {768,  96},  {1024, 128},  {1536, 128},  {2048, 128} };
-    SSamplePoint < float > maxPoints[] = { {512, 96},  {768, 128},  {1024, 256},  {1536, 376},  {2048, 512} };
+    SSamplePoint < float > minPoints[] = { {512, 64},  {1024, 96},   {2048, 128} };
+    SSamplePoint < float > maxPoints[] = { {512, 96},  {1024, 128},  {2048, 256} };
 
     float fMinAmount = EvalSamplePosition < float > ( minPoints, NUMELMS ( minPoints ), iSystemRamMB );
     float fMaxAmount = EvalSamplePosition < float > ( maxPoints, NUMELMS ( maxPoints ), iSystemRamMB );
