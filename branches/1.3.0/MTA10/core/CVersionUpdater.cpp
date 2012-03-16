@@ -73,6 +73,8 @@ public:
     void                _UseNewsUpdateURLs                  ( void );
     void                _UseReportLogPostContent            ( void );
     void                _UseCrashDumpPostContent            ( void );
+    void                _ShouldSendCrashDump                ( void );
+    void                _ResetLastCrashDump                 ( void );
     void                _ActionReconnect                    ( void );
     void                _DialogHide                         ( void );
     void                _End                                ( void );
@@ -1137,14 +1139,17 @@ void CVersionUpdater::InitPrograms ()
         MapSet ( m_ProgramMap, strProgramName, CProgram () );
         CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
 
+        ADDINST (   _ShouldSendCrashDump );                     // Have we already sent a matching dump?
+        ADDCOND ( "if ProcessResponse.!ok goto end" );
         ADDINST (   _UseCrashDumpQueryURLs );
         ADDINST (   _StartDownload );
-        ADDINST (   _ProcessCrashDumpQuery );                   // Do we need to send the dump?
+        ADDINST (   _ProcessCrashDumpQuery );                   // Does the server want this dump?
         ADDCOND ( "if ProcessResponse.!ok goto end" );
         ADDINST (   _UseCrashDumpURLs );                        // Use CRASH_DUMP_URL*
         ADDINST (   _UseCrashDumpPostContent );                 // Use crash dump source
         ADDINST (   _StartSendPost );                           // Send data
         ADDLABL ( "end:" );
+        ADDINST (   _ResetLastCrashDump );
         ADDINST (     _End );
     }
 
@@ -2568,9 +2573,88 @@ void CVersionUpdater::_UseReportLogPostContent ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// CVersionUpdater::_ShouldSendCrashDump
+//
+// Check if upload is required by client
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_ShouldSendCrashDump ( void )
+{
+    m_ConditionMap.SetCondition ( "ProcessResponse", "" );
+
+    // Add to history
+    SString strPathFilename = GetApplicationSetting ( "diagnostics", "last-dump-save" );
+
+    // Extract module and address from filename
+    std::vector < SString > parts;
+    strPathFilename.Split ( "_", parts );
+    if ( parts.size () > DUMP_PART_TIME )
+    {
+        SString strVersionAndModuleAndOffset = parts[DUMP_PART_VERSION] + "_" + parts[DUMP_PART_MODULE] + "_" + parts[DUMP_PART_OFFSET];
+        SString strDateAndTime = parts[DUMP_PART_DATE] + "_" + parts[DUMP_PART_TIME];
+        strDateAndTime.Split ( ".", &strDateAndTime, NULL );
+
+        // Check history for duplicates
+        CDataInfoSet& history = m_VarConfig.crashdump_history;
+        int iDuplicates = 0;
+        for ( uint i = 0 ; i < history.size () ; i++ )
+            if ( strVersionAndModuleAndOffset == history[i].GetAttribute ( "tag" ) )
+                iDuplicates++;
+
+        // Add to history
+        if ( iDuplicates <= m_MasterConfig.crashdump.iDuplicates )
+        {
+            SDataInfoItem item;
+            item.strName = "dump";
+            item.SetAttribute( "tag", strVersionAndModuleAndOffset );
+            item.SetAttribute( "date", strDateAndTime );
+            history.push_back ( item );
+        }
+        else
+            return;
+
+        // Sort by date
+        for ( int i = 0 ; i < (int)history.size () - 1 ; i++ )
+        {
+            SDataInfoItem& a = history[i];
+            SDataInfoItem& b = history[i+1];
+            if ( a.GetAttribute ( "date" ) > b.GetAttribute ( "date" ) )
+            {
+                std::swap ( a, b );
+                i = Max ( i - 2, -1 );
+            }
+        }
+
+        // Remove oldest if required
+        int iNumToRemove = history.size () - m_MasterConfig.crashdump.iMaxHistoryLength;
+        if ( iNumToRemove > 0 )
+            history.erase ( history.begin (), history.begin () + iNumToRemove );
+
+        CCore::GetSingleton ().SaveConfig ();
+
+        m_ConditionMap.SetCondition ( "ProcessResponse", "ok" );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_ResetLastCrashDump
+//
+// Make sure last-dump-save is ignored next time
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_ResetLastCrashDump ( void )
+{
+    SetApplicationSetting ( "diagnostics", "last-dump-save", "" );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CVersionUpdater::_UseCrashDumpQueryURLs
 //
-// Check if upload is needed
+// Check if upload is needed by server
 //
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_UseCrashDumpQueryURLs ( void )
@@ -2637,57 +2721,6 @@ void CVersionUpdater::_UseCrashDumpPostContent ( void )
     // Get user pref
     if ( GetApplicationSetting ( "diagnostics", "send-dumps" ) == "no" )
         return;
-
-    // Add to history
-
-    // Extract module and address from filename
-    std::vector < SString > parts;
-    strPathFilename.Split ( "_", parts );
-    if ( parts.size () > DUMP_PART_TIME )
-    {
-        SString strVersionAndModuleAndOffset = parts[DUMP_PART_VERSION] + "_" + parts[DUMP_PART_MODULE] + "_" + parts[DUMP_PART_OFFSET];
-        SString strDateAndTime = parts[DUMP_PART_DATE] + "_" + parts[DUMP_PART_TIME];
-        strDateAndTime.Split ( ".", &strDateAndTime, NULL );
-
-        // Check history for duplicates
-        CDataInfoSet& history = m_VarConfig.crashdump_history;
-        int iDuplicates = 0;
-        for ( uint i = 0 ; i < history.size () ; i++ )
-            if ( strVersionAndModuleAndOffset == history[i].GetAttribute ( "tag" ) )
-                iDuplicates++;
-
-        // Add to history
-        if ( iDuplicates <= m_MasterConfig.crashdump.iDuplicates )
-        {
-            SDataInfoItem item;
-            item.strName = "dump";
-            item.SetAttribute( "tag", strVersionAndModuleAndOffset );
-            item.SetAttribute( "date", strDateAndTime );
-            history.push_back ( item );
-        }
-        else
-            return;
-
-        // Sort by date
-        for ( int i = 0 ; i < (int)history.size () - 1 ; i++ )
-        {
-            SDataInfoItem& a = history[i];
-            SDataInfoItem& b = history[i+1];
-            if ( a.GetAttribute ( "date" ) > b.GetAttribute ( "date" ) )
-            {
-                std::swap ( a, b );
-                i = Max ( i - 2, -1 );
-            }
-        }
-
-        // Remove oldest if required
-        int iNumToRemove = history.size () - m_MasterConfig.crashdump.iMaxHistoryLength;
-        if ( iNumToRemove > 0 )
-            history.erase ( history.begin (), history.begin () + iNumToRemove );
-
-        CCore::GetSingleton ().SaveConfig ();
-    }
-
 
     // Load into post buffer
     if ( FileLoad ( strPathFilename, m_JobInfo.postContent ) )
