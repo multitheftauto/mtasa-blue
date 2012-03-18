@@ -27,12 +27,12 @@ SBindableKey g_bkKeys[] =
     { "mouse_wheel_down", 0x00, GTA_KEY_MSCROLLDOWN,    DATA_NONE,              0 },
     { "backspace",   0x08,      GTA_KEY_BACK,           DATA_NONE,              0 },
     { "tab",     0x09,          GTA_KEY_TAB,            DATA_NONE,              0 }, 
-    { "lshift",  0xA0,          GTA_KEY_LSHIFT,         DATA_NOT_EXTENDED,      0 },
-    { "rshift",  0xA1,          GTA_KEY_RSHIFT,         DATA_EXTENDED,          0 }, // 10
-    { "lctrl",   0xA2,          GTA_KEY_LCONTROL,       DATA_NOT_EXTENDED,      0 }, 
-    { "rctrl",   0xA3,          GTA_KEY_RCONTROL,       DATA_EXTENDED,          0 },
-    { "lalt",    0xA4,          GTA_KEY_LMENU,          DATA_NOT_EXTENDED,      0,      true },
-    { "ralt",    0xA5,          GTA_KEY_RMENU,          DATA_EXTENDED,          0,      true },
+    { "lshift",  0x10,          GTA_KEY_LSHIFT,         DATA_NOT_EXTENDED,      0 },
+    { "rshift",  0x10,          GTA_KEY_RSHIFT,         DATA_EXTENDED,          0 }, // 10
+    { "lctrl",   0x11,          GTA_KEY_LCONTROL,       DATA_NOT_EXTENDED,      0 }, 
+    { "rctrl",   0x11,          GTA_KEY_RCONTROL,       DATA_EXTENDED,          0 },
+    { "lalt",    0x12,          GTA_KEY_LMENU,          DATA_NOT_EXTENDED,      0,      true },
+    { "ralt",    0x12,          GTA_KEY_RMENU,          DATA_EXTENDED,          0,      true },
     { "pause",   0x13,          GTA_KEY_PAUSE,          DATA_NONE,              0,      true },
     { "capslock",0x14,          GTA_KEY_CAPSLOCK,       DATA_NONE,              0 },
     { "enter",   0x0D,          GTA_KEY_RETURN,         DATA_NOT_EXTENDED,      0 },
