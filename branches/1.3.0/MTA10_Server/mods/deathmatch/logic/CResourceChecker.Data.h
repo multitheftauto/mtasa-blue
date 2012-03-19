@@ -61,6 +61,8 @@ namespace
                                          { "setObjectBreakable",        "1.3.0-9.03783" },
                                          { "onClientPedHeliKilled",     "1.3.0-9.03893" },
                                          { "onClientPlayerHeliKilled",  "1.3.0-9.03893" },
+                                         { "onClientPlayerPickupHit",   "1.3.0-9.03919" },
+                                         { "onClientPlayerPickupLeave", "1.3.0-9.03919" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
