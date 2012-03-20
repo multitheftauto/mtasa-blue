@@ -30,14 +30,42 @@ CDirect3DHook9::~CDirect3DHook9 ( )
     m_pfnDirect3DCreate9 = NULL;
 }
 
+
+SString DumpBytes ( uchar* ptr, int iSize )
+{
+    SString strResult;
+    for ( uint i = 0 ; i < iSize ; i++ )
+    {
+        if ( i )
+            strResult += " ";
+        strResult += SString ( "%02x", ptr[i] );
+    }
+    return strResult;
+}
+
+PBYTE pFunction = NULL;
+void DumpDirect3DHookInfo ( void )
+{
+    pDirect3DCreate m_pfnDirect3DCreate9 = CDirect3DHook9::GetSingleton ().m_pfnDirect3DCreate9;
+    PBYTE pRedir = reinterpret_cast < PBYTE > ( CDirect3DHook9::API_Direct3DCreate9 );
+    WriteDebugEvent ( SString ( "GTA 007F630B: %s", *DumpBytes ( (uchar*)0x07F630B, 5 ) ) );
+    WriteDebugEvent ( SString ( "GTA 00807C2B: %s", *DumpBytes ( (uchar*)0x0807C2B, 6 ) ) );
+    WriteDebugEvent ( SString ( "GTA 008E3ED4: %s", *DumpBytes ( (uchar*)0x008E3ED4, 4 ) ) );
+    WriteDebugEvent ( SString ( "m_pfnDirect3DCreate9: 0%08x %s", m_pfnDirect3DCreate9, *DumpBytes ( (uchar*)m_pfnDirect3DCreate9, 12 ) ) );
+    WriteDebugEvent ( SString ( "pFunction: 0%08x %s", pFunction, *DumpBytes ( (uchar*)pFunction, 6 ) ) );
+    WriteDebugEvent ( SString ( "API_Direct3DCreate9: 0%08x %s", pRedir, *DumpBytes ( (uchar*)pRedir, 6 ) ) );
+}
+
+
 bool CDirect3DHook9::ApplyHook ( )
 {
+    WriteDebugEvent ( "CDirect3DHook9::ApplyHook" );
     // Hook Direct3DCreate9.
-    m_pfnDirect3DCreate9 = reinterpret_cast < pDirect3DCreate > ( DetourFunction ( DetourFindFunction ( "D3D9.DLL", "Direct3DCreate9" ), 
-                                                                  reinterpret_cast < PBYTE > ( API_Direct3DCreate9 ) ) );
+    pFunction = DetourFindFunction ( "D3D9.DLL", "Direct3DCreate9" );
+    m_pfnDirect3DCreate9 = reinterpret_cast < pDirect3DCreate > ( DetourFunction ( pFunction, reinterpret_cast < PBYTE > ( API_Direct3DCreate9 ) ) );
 
-    WriteDebugEvent ( "Direct3D9 hook applied" );
-
+    WriteDebugEvent ( SString ( "Direct3D9 hook applied  pFunction:0%08x  m_pfnDirect3DCreate9:0%08x", pFunction, m_pfnDirect3DCreate9 ) );
+    DumpDirect3DHookInfo ();
     return true;
 }
 
@@ -61,6 +89,9 @@ bool CDirect3DHook9::RemoveHook ( )
 
 IUnknown * CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
 {
+    WriteDebugEvent ( "CDirect3DHook9::API_Direct3DCreate9" );
+    DumpDirect3DHookInfo ();
+
     CDirect3DHook9 *    pThis;
     CProxyDirect3D9 *   pNewProxy;
     static bool         bLoadedModules;

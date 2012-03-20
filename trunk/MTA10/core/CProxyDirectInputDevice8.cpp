@@ -11,11 +11,14 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+void DumpDirect3DHookInfo ( void );
 
 CProxyDirectInputDevice8::CProxyDirectInputDevice8 ( IDirectInputDevice8A* pDevice )
 {
     WriteDebugEvent ( "CProxyDirectInputDevice8::CProxyDirectInputDevice8" );
-    
+    CCore::GetSingleton().ApplyHooks2 ( );
+    DumpDirect3DHookInfo ();
+
     // Notify the event handler
     CDirectInputEvents8::OnDirectInputDeviceCreate ( pDevice );
 
@@ -31,6 +34,7 @@ CProxyDirectInputDevice8::~CProxyDirectInputDevice8 ( )
 {
     GetJoystickManager ( )->RemoveDevice ( m_pDevice );
     WriteDebugEvent ( "CProxyDirectInputDevice8::~CProxyDirectInputDevice8" );
+    DumpDirect3DHookInfo ();
 }
 
 /*** IUnknown methods ***/

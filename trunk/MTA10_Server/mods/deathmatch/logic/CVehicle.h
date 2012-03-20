@@ -163,6 +163,8 @@ public:
     inline void                     SetHealth               ( float fHealth )               { m_fHealth = fHealth; };
     inline unsigned long            GetHealthChangeTime     ( void )                        { return m_ulHealthChangeTime; }
     inline void                     SetHealthChangeTime     ( unsigned long ulTime )        { m_ulHealthChangeTime = ulTime; }
+    inline float                    GetLastSyncedHealth     ( void )                        { return m_fLastSyncedHealthHealth; };
+    inline void                     SetLastSyncedHealth     ( float fHealth )               { m_fLastSyncedHealthHealth = fHealth; };
     
     inline unsigned long            GetBlowTime             ( void )                        { return m_ulBlowTime; };
     inline void                     SetBlowTime             ( unsigned long ulBlowTime )    { m_ulBlowTime = ulBlowTime; };
@@ -315,6 +317,7 @@ private:
     CVector                         m_vecVelocityMeters;
     CVector                         m_vecTurnSpeed;
     float                           m_fHealth;
+    float                           m_fLastSyncedHealthHealth;
     unsigned long                   m_ulHealthChangeTime;
     unsigned long                   m_ulBlowTime;
     unsigned long                   m_ulIdleTime;

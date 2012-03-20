@@ -305,8 +305,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                         // Less health than last time?
                         if ( vehicle.data.bSyncHealth )
                         {
-                            float fPreviousHealth = pVehicle->GetHealth ();
-                            pVehicle->SetHealth ( vehicle.data.fHealth );
+                            float fPreviousHealth = pVehicle->GetLastSyncedHealth ();
 
                             if ( vehicle.data.fHealth < fPreviousHealth )
                             {
@@ -321,6 +320,10 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                     pVehicle->CallEvent ( "onVehicleDamage", Arguments );
                                 }
                             }
+                            pVehicle->SetHealth ( vehicle.data.fHealth );
+                            // Stops sync + fixVehicle/setElementHealth conflicts triggering onVehicleDamage by having a seperate stored float keeping track of ONLY what comes in via sync
+                            // - Caz
+                            pVehicle->SetLastSyncedHealth( vehicle.data.fHealth );
                         }
 
                         if ( vehicle.data.bSyncTrailer )
