@@ -98,7 +98,7 @@ Var RedistInstalled
 !define MUI_WELCOMEPAGE_TITLE_3LINES
 !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
 It is recommended that you close all other applications before starting Setup.\n\n\
-[Admin access will be requested for Vista and up]\n\n\
+[Admin access may be requested for Vista and up]\n\n\
 Click Next to continue."
 !define MUI_PAGE_CUSTOMFUNCTION_PRE "WelcomePreProc"
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW "WelcomeShowProc"
@@ -116,6 +116,7 @@ Click Next to continue."
 ; Game directory page
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW "DirectoryShowProc"
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE "DirectoryLeaveProc"
+!define MUI_CUSTOMFUNCTION_ABORT "DirectoryAbort"
 !define MUI_DIRECTORYPAGE_VARIABLE				$INSTDIR
 !insertmacro MUI_PAGE_DIRECTORY
 
@@ -173,8 +174,8 @@ Function LaunchLink
 	!endif
 FunctionEnd
 
-Function .OnInstFailed
-	;UAC::Unload ;Must call unload!
+Function .onInstFailed
+    Call CleanupUsingInstallDirectory
 FunctionEnd
 
 Function .onInit
@@ -387,11 +388,31 @@ DontInstallRedist:
 			#############################################################
 			# Make the directory "$INSTDIR" read write accessible by all users
 			# Make the directory "$APPDATA\MTA San Andreas All" read write accessible by all users
+            # Make the directory "$GTA_DIR" read write accessible by all users
 
             ${If} ${AtLeastWinVista}
                 DetailPrint "Updating permissions. This could take a few minutes..."
+
+                # Fix permissions for MTA install directory
                 FastPerms::FullAccessPlox "$INSTDIR"
                 FastPerms::FullAccessPlox "$APPDATA\MTA San Andreas All"
+
+                # Remove MTA virtual store
+                StrCpy $0 $INSTDIR
+                !insertmacro UAC_AsUser_Call Function RemoveVirtualStore ${UAC_SYNCREGISTERS}
+                StrCpy $0 $INSTDIR
+                Call RemoveVirtualStore
+
+                IfFileExists $GTA_DIR\gta_sa.exe 0 PathBad
+                    # Fix permissions for GTA install directory
+                    FastPerms::FullAccessPlox "$GTA_DIR"
+
+                    # Remove GTA virtual store
+                    StrCpy $0 $GTA_DIR
+                    !insertmacro UAC_AsUser_Call Function RemoveVirtualStore ${UAC_SYNCREGISTERS}
+                    StrCpy $0 $GTA_DIR
+                    Call RemoveVirtualStore
+                PathBad:
             ${EndIf}
 			#############################################################
 
@@ -1309,6 +1330,22 @@ Function "DirectoryShowProc"
 FunctionEnd
 
 
+;****************************************************************
+;
+; Remove virtual store version of path
+;
+;****************************************************************
+; In $0 = install path
+Function RemoveVirtualStore
+    StrCpy $2 $0 "" 3     # Skip first 3 chars
+    StrCpy $3 "$LOCALAPPDATA\VirtualStore\$2"
+    StrCpy $4 "$0\FromVirtualStore"
+    IfFileExists $3 0 NoVirtualStore
+        CopyFiles $3\*.* $4
+        RmDir /r "$3"
+    NoVirtualStore:
+FunctionEnd
+
 
 ;****************************************************************
 ;
@@ -1365,6 +1402,8 @@ FunctionEnd
 
 
 Function "DirectoryLeaveProc"
+    Call CleanupUsingInstallDirectory
+
 	Push $INSTDIR 
 	Call GetInstallType
 	Pop $0
@@ -1403,4 +1442,51 @@ Function "GTADirectoryLeaveProc"
         cont1:
     cont:
 
+FunctionEnd
+
+
+;****************************************************************
+;
+; Ensure INSTDIR exists so the browse button works correctly
+;
+;****************************************************************
+
+Function .onVerifyInstDir
+    Push $INSTDIR 
+    Call SetUsingInstallDirectory
+FunctionEnd
+
+; In <stack> = install path
+Function SetUsingInstallDirectory
+    Var /GLOBAL SAVED_INSTDIR
+    Pop $0
+
+    IfFileExists $0 alreadyexists
+        # Create new dir if not exists
+        CreateDirectory $0
+
+        # Remove old dir if created by us
+        StrCmp $SAVED_INSTDIR "" nosaveddir
+            RMDir $SAVED_INSTDIR
+            StrCpy $SAVED_INSTDIR ""
+        nosaveddir:
+
+        # And new create dir again
+        StrCpy $SAVED_INSTDIR $0
+        CreateDirectory $SAVED_INSTDIR
+
+    alreadyexists:
+FunctionEnd
+
+
+Function "DirectoryAbort"
+    Call CleanupUsingInstallDirectory
+FunctionEnd
+
+Function CleanupUsingInstallDirectory
+    # Remove old dir if created by us
+    StrCmp $SAVED_INSTDIR "" nosaveddir
+        RMDir $SAVED_INSTDIR
+        StrCpy $SAVED_INSTDIR ""
+    nosaveddir:
 FunctionEnd

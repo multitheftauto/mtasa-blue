@@ -6407,6 +6407,15 @@ bool _cdecl OnCallCStreamingInfoAddToList ( int flags, SImgGTAItemInfo* pImgGTAI
 
     if ( pImgGTAInfo->ucImgId == 5 )
     {
+        // If bLoadingBigModel is set, try to get it unset
+        #define VAR_CStreaming_bLoadingBigModel     0x08E4A58
+        BYTE& bLoadingBigModel = *(BYTE*)VAR_CStreaming_bLoadingBigModel;
+        if ( bLoadingBigModel )
+        {
+            pGameInterface->GetStreaming()->LoadAllRequestedModels ();
+            assert ( !bLoadingBigModel );
+        }
+
         int iFileId = ((int)pImgGTAInfo - 0x08E4CC0) / 20;
 
         // Cached enabled setting here as it doesn't usually change

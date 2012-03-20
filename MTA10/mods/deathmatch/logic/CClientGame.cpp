@@ -2601,6 +2601,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPlayerVoiceStart", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerVoiceStop", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerStealthKill", "target", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerHeliKilled", "heli", NULL, false );
     m_Events.AddEvent ( "onClientPlayerHitByWaterCannon", "vehicle", NULL, false );
 	m_Events.AddEvent ( "onClientPlayerPickupHit", "pickup, matchingDimension", NULL, false );
 	m_Events.AddEvent ( "onClientPlayerPickupLeave", "pickup, matchingDimension", NULL, false );
@@ -4127,7 +4128,12 @@ bool CClientGame::HeliKillHandler ( CVehicleSAInterface* pHeliInterface, CPedSAI
             }
             
             // Trigger our event
-            bool bContinue = pClientPed->CallEvent ( "onClientPedHeliKilled", Arguments, true );
+            bool bContinue;
+            if ( IS_PLAYER ( pClientPed ) )
+                bContinue = pClientPed->CallEvent ( "onClientPlayerHeliKilled", Arguments, true );
+            else
+                bContinue = pClientPed->CallEvent ( "onClientPedHeliKilled", Arguments, true );
+
             // Was our event cancelled
             if ( !bContinue )
             {
