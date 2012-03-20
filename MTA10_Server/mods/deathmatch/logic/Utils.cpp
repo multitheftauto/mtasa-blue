@@ -444,7 +444,7 @@ bool IsValidFilePath ( const char *szDir )
 
     unsigned int uiLen = strlen ( szDir );
 
-    if ( szDir [ uiLen - 1 ] == '/' ) // will return false if ending with an invalid character, mainly used for linux (#6871)
+    if ( uiLen > 0 && szDir [ uiLen - 1 ] == '/' ) // will return false if ending with an invalid character, mainly used for linux (#6871)
         return false;
 
     unsigned char c, c_d;
