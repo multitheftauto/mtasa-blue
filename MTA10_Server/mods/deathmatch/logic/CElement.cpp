@@ -702,7 +702,7 @@ bool CElement::GetCustomDataBool ( const char* szName, bool& bOut, bool bInherit
 }
 
 
-void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized, CPlayer* pClient, bool bTriggerEvent, bool bServer )
+void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized, CPlayer* pClient, bool bTriggerEvent )
 {
     assert ( szName );
     if ( strlen ( szName ) > MAX_CUSTOMDATA_NAME_LENGTH )
@@ -730,7 +730,6 @@ void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable,
         Arguments.PushString ( szName );
         Arguments.PushArgument ( oldVariable );
         Arguments.PushArgument ( Variable );
-        Arguments.PushBoolean ( bServer );
         CallEvent ( "onElementDataChange", Arguments, pClient );
     }
 }

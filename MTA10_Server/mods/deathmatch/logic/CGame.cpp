@@ -1416,7 +1416,7 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onElementColShapeHit", "colshape, matchingDimension", NULL, false );
     m_Events.AddEvent ( "onElementColShapeLeave", "colshape, matchingDimension", NULL, false );
     m_Events.AddEvent ( "onElementClicked", "button, state, clicker, posX, posY, posZ", NULL, false );
-    m_Events.AddEvent ( "onElementDataChange", "key, oldValue, bServer", NULL, false );
+    m_Events.AddEvent ( "onElementDataChange", "key, oldValue", NULL, false );
     m_Events.AddEvent ( "onElementDestroy", "", NULL, false );
     m_Events.AddEvent ( "onElementStartSync", "newSyncer", NULL, false );
     m_Events.AddEvent ( "onElementStopSync", "oldSyncer", NULL, false );
@@ -2189,7 +2189,7 @@ void CGame::Packet_CustomData ( CCustomDataPacket& Packet )
                 CLogger::ErrorPrintf( "Received oversized custom data name from %s (%s)", Packet.GetSourcePlayer ()->GetNick (), *SStringX ( szName ).Left ( MAX_CUSTOMDATA_NAME_LENGTH + 1 ) );
                 return;
             }
-            pElement->SetCustomData ( szName, Value, NULL, true, pSourcePlayer, true, false );
+            pElement->SetCustomData ( szName, Value, NULL, true, pSourcePlayer );
 
             // Tell our clients to update their data. Send to everyone but the one we got this packet from.
             unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
