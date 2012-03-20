@@ -80,6 +80,7 @@ public:
     void                        SetProcessCollisionHandler  ( ProcessCollisionHandler * pHandler );
     void                        SetVehicleCollisionHandler  ( VehicleCollisionHandler * pHandler );
     void                        SetHeliKillHandler          ( HeliKillHandler * pHandler );
+    void                        SetWaterCannonHitHandler    ( WaterCannonHitHandler * pHandler );
 
     void                        AllowMouseMovement          ( bool bAllow );
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );

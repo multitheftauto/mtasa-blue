@@ -246,6 +246,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetProcessCollisionHandler ( CClientGame::StaticProcessCollisionHandler );
     g_pMultiplayer->SetVehicleCollisionHandler( CClientGame::StaticVehicleCollisionHandler );
     g_pMultiplayer->SetHeliKillHandler ( CClientGame::StaticHeliKillHandler );
+    g_pMultiplayer->SetWaterCannonHitHandler ( CClientGame::StaticWaterCannonHandler );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( CClientGame::StaticKeyStrokeHandler );
@@ -379,6 +380,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetProcessCollisionHandler ( NULL );
     g_pMultiplayer->SetVehicleCollisionHandler( NULL );
     g_pMultiplayer->SetHeliKillHandler( NULL );
+    g_pMultiplayer->SetWaterCannonHitHandler( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( NULL );
@@ -2584,6 +2586,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPlayerVoiceStart", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerVoiceStop", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerStealthKill", "target", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerHitByWaterCannon", "vehicle", NULL, false );
     m_Events.AddEvent ( "onClientPlayerHeliKilled", "heli", NULL, false );
 	m_Events.AddEvent ( "onClientPlayerPickupHit", "pickup, matchingDimension", NULL, false );
 	m_Events.AddEvent ( "onClientPlayerPickupLeave", "pickup, matchingDimension", NULL, false );
@@ -2594,6 +2597,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPedWasted", "", NULL, false );
     m_Events.AddEvent ( "onClientPedChoke", "", NULL, false );
     m_Events.AddEvent ( "onClientPedHeliKilled", "heli", NULL, false );
+    m_Events.AddEvent ( "onClientPedHitByWaterCannon", "vehicle", NULL, false );
 
     // Vehicle events
     m_Events.AddEvent ( "onClientVehicleRespawn", "", NULL, false );
@@ -3473,7 +3477,12 @@ bool CClientGame::StaticVehicleCollisionHandler ( CVehicleSAInterface* pCollidin
 
 bool CClientGame::StaticHeliKillHandler ( CVehicleSAInterface* pHeliInterface, CPedSAInterface* pPed )
 {
-    return g_pClientGame->HeliKillHandler( pHeliInterface, pPed );
+    return g_pClientGame->HeliKillHandler ( pHeliInterface, pPed );
+}
+
+bool CClientGame::StaticWaterCannonHandler ( CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed )
+{
+    return g_pClientGame->WaterCannonHitHandler ( pCannonVehicle, pHitPed );
 }
 
 void CClientGame::DrawRadarAreasHandler ( void )
@@ -4099,6 +4108,45 @@ bool CClientGame::HeliKillHandler ( CVehicleSAInterface* pHeliInterface, CPedSAI
     }
     return false;
 }
+
+bool CClientGame::WaterCannonHitHandler ( CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed )
+{
+    if ( pCannonVehicle && pHitPed )
+    {
+        // Get our vehicle and client vehicle
+        CVehicle * pVehicle = g_pGame->GetPools ( )->GetVehicle( (DWORD *)pCannonVehicle );
+        CClientVehicle * pCannonClientVehicle = m_pManager->GetVehicleManager ( )->GetSafe( pVehicle );
+        // Was our client vehicle valid
+        if ( pCannonClientVehicle )
+        {
+            // Get our ped and client ped
+            CPed * pPed = g_pGame->GetPools ( )->GetPed ( (DWORD *)pHitPed );
+            CClientPed * pClientPed = m_pManager->GetPedManager ( )->GetSafe( pPed, true );
+
+            CLuaArguments Arguments;
+            if ( pClientPed )
+            {
+                // Push our ped
+                Arguments.PushElement ( pClientPed );
+            }
+            else
+            {
+                Arguments.PushNil ( );
+            }
+
+            // Trigger our event
+            bool bContinue = true;
+            if ( !IS_PLAYER ( pClientPed ) )
+                bContinue = pCannonClientVehicle->CallEvent ( "onClientPedHitByWaterCannon", Arguments, true );
+            else
+                bContinue = pCannonClientVehicle->CallEvent ( "onClientPlayerHitByWaterCannon", Arguments, true );
+
+            // Return if it was cancelled
+            return bContinue;
+        }
+    }
+    return false;
+}
 bool CClientGame::StaticProcessMessage ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
     if ( g_pClientGame )
@@ -4699,6 +4747,9 @@ void CClientGame::ResetMapInfo ( void )
 
     // Weather
     m_pBlendedWeather->SetWeather ( 0 );
+
+    // Rain
+    g_pGame->GetWeather()->ResetAmountOfRain();
 
     // Wind
     g_pMultiplayer->RestoreWindVelocity ( );

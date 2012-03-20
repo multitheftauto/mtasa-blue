@@ -4466,7 +4466,7 @@ bool CStaticFunctionDefinitions::GiveWeapon ( CElement* pElement, unsigned char 
             if ( pPed->IsSpawned () )
             {
                 unsigned char ucCurrentWeapon = pPed->GetWeaponType ();
-                if ( ucCurrentWeapon != ucWeaponID )
+                if ( ucCurrentWeapon != ucWeaponID && bSetAsCurrent )
                 {
                     // Call our weapon switch command
                     CLuaArguments Arguments;
@@ -10245,7 +10245,7 @@ CLuaArgument* CStaticFunctionDefinitions::GetAccountData ( CAccount* pAccount, c
 }
 
 
-bool CStaticFunctionDefinitions::GetAccountAllData ( lua_State* pLua, CAccount* pAccount )
+bool CStaticFunctionDefinitions::GetAllAccountData ( lua_State* pLua, CAccount* pAccount )
 {
     assert ( pLua );
     assert ( pAccount );
@@ -10491,14 +10491,14 @@ CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool b
         {
             // Call the event with the responsible player as the source
             CLuaArguments Arguments;
-            Arguments.PushUserData ( pBan );
+            Arguments.PushBan ( pBan );
             pResponsible->CallEvent ( "onBan", Arguments );
         }
         else
         {
             // Call the event with the root element as the source
             CLuaArguments Arguments;
-            Arguments.PushUserData ( pBan );
+            Arguments.PushBan ( pBan );
             m_pMapManager->GetRootElement()->CallEvent ( "onBan", Arguments );
         }
 
@@ -10507,9 +10507,9 @@ CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool b
 
         // Call the event
         CLuaArguments Arguments;
-        Arguments.PushUserData ( pBan );
+        Arguments.PushBan ( pBan );
         if ( pResponsible )
-            Arguments.PushUserData ( pResponsible );
+            Arguments.PushElement ( pResponsible );
         pPlayer->CallEvent ( "onPlayerBan", Arguments );
 
         // Tell the player that was banned why. QuitPlayer will delete the player.
@@ -10590,14 +10590,14 @@ CBan* CStaticFunctionDefinitions::AddBan ( SString strIP, SString strUsername, S
         {
             // Call the event with the responsible player as the source
             CLuaArguments Arguments;
-            Arguments.PushUserData ( pBan );
+            Arguments.PushBan ( pBan );
             pResponsible->CallEvent ( "onBan", Arguments );
         }
         else
         {
             // Call the event with the root element as the source
             CLuaArguments Arguments;
-            Arguments.PushUserData ( pBan );
+            Arguments.PushBan ( pBan );
             m_pMapManager->GetRootElement()->CallEvent ( "onBan", Arguments );
         }
 
@@ -10653,9 +10653,9 @@ CBan* CStaticFunctionDefinitions::AddBan ( SString strIP, SString strUsername, S
 
                 // Call the event
                 CLuaArguments Arguments;
-                Arguments.PushUserData ( pBan );
+                Arguments.PushBan ( pBan );
                 if ( pResponsible )
-                    Arguments.PushUserData ( pResponsible );
+                    Arguments.PushElement ( pResponsible );
                 (*iter)->CallEvent ( "onPlayerBan", Arguments );
 
                 // Tell the player that was banned why. QuitPlayer will delete the player.
@@ -10677,9 +10677,9 @@ CBan* CStaticFunctionDefinitions::AddBan ( SString strIP, SString strUsername, S
 bool CStaticFunctionDefinitions::RemoveBan ( CBan* pBan, CPlayer* pResponsible )
 {
     CLuaArguments Arguments;
-    Arguments.PushUserData ( pBan );
+    Arguments.PushBan ( pBan );
     if ( pResponsible )
-        Arguments.PushUserData ( pResponsible );
+        Arguments.PushElement ( pResponsible );
     m_pMapManager->GetRootElement()->CallEvent ( "onUnban", Arguments );
 
 
@@ -10702,6 +10702,12 @@ bool CStaticFunctionDefinitions::GetBans ( lua_State* pLua )
         lua_settable ( pLua, -3 );
     }
     return true;
+}
+
+
+bool CStaticFunctionDefinitions::ReloadBanList ( void )
+{
+    return m_pBanManager->ReloadBanList ();
 }
 
 
@@ -10813,7 +10819,7 @@ bool CStaticFunctionDefinitions::ShowCursor ( CElement* pElement, CLuaMain* pLua
             // Get him to show/hide the cursor
             CBitStream BitStream;
             BitStream.pBitStream->Write ( static_cast < unsigned char > ( ( bShow ) ? 1 : 0 ) );
-            BitStream.pBitStream->Write ( static_cast < unsigned short > ( pResource->GetID () ) );
+            BitStream.pBitStream->Write ( static_cast < unsigned short > ( pResource->GetNetID () ) );
             BitStream.pBitStream->Write ( static_cast < unsigned char > ( ( bToggleControls ) ? 1 : 0 ) );
             pPlayer->Send ( CLuaPacket ( SHOW_CURSOR, *BitStream.pBitStream ) );
 

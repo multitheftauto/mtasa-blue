@@ -29,6 +29,7 @@ CMapManager::CMapManager ( CBlipManager* pBlipManager,
                            CTeamManager* pTeamManager,
                            CPedManager* pPedManager,
                            CColManager* pColManager,
+                           CWaterManager* pWaterManager,
                            CClock* pClock,
                            CLuaManager* pLuaManager,
                            CGroups* pGroups,
@@ -47,6 +48,7 @@ CMapManager::CMapManager ( CBlipManager* pBlipManager,
     m_pTeamManager = pTeamManager;
     m_pPedManager = pPedManager;
     m_pColManager = pColManager;
+    m_pWaterManager = pWaterManager;
     m_pServerClock = pClock;
     m_pLuaManager = pLuaManager;
     m_pGroups = pGroups;
@@ -909,10 +911,10 @@ bool CMapManager::HandleNode ( CResource& Loader, CXMLNode& Node, CElement* pPar
     {
         CBlip* pBlip = m_pBlipManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
         pNode = pBlip;
-        if ( pBlip )
+        /*if ( pBlip )
         {
             pBlip->SetIsSynced ( bIsDuringStart );
-        }
+        }*/
     }
     else if ( strBuffer.compare ( "pickup" ) == 0 )
     {
@@ -943,6 +945,10 @@ bool CMapManager::HandleNode ( CResource& Loader, CXMLNode& Node, CElement* pPar
     else if ( strBuffer.compare ( "ped" ) == 0 )
     {
         pNode = m_pPedManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
+    }
+    else if ( strBuffer.compare ( "water" ) == 0 )
+    {
+        pNode = m_pWaterManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
     }
     else if ( strBuffer.empty () )
     {

@@ -599,7 +599,7 @@ public:
     static CClient*             GetAccountPlayer                    ( CAccount* pAccount );
     static bool                 IsGuestAccount                      ( CAccount* pAccount, bool& bGuest );
     static CLuaArgument*        GetAccountData                      ( CAccount* pAccount, const char* szKey );
-    static bool                 GetAccountAllData                   ( lua_State* pLua, CAccount* pAccount );
+    static bool                 GetAllAccountData                   ( lua_State* pLua, CAccount* pAccount );
 
     // Account set funcs
     static CAccount*            AddAccount                          ( const char* szName, const char* szPassword );
@@ -620,6 +620,7 @@ public:
     static bool                 RemoveBan                           ( CBan* pBan, CPlayer* pResponsible = NULL );
 
     static bool                 GetBans                             ( lua_State* luaVM );
+    static bool                 ReloadBanList                       ( void );
 
     static bool                 GetBanIP                            ( CBan* pBan, char* szIP, size_t size );
     static bool                 GetBanSerial                        ( CBan* pBan, char* szSerial, size_t size );

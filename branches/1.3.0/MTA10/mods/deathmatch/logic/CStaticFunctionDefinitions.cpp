@@ -1939,11 +1939,20 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress ( CClientEntity& Entity
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-        CAnimBlendAssociation* pA = g_pGame->GetAnimManager ()->RpAnimBlendClumpGetAssociation ( Ped.GetClump (), szAnimName );
-
-        if ( pA )
+        if ( szAnimName )
         {
-            pA->SetCurrentProgress ( fProgress );
+            CAnimBlendAssociation* pA = g_pGame->GetAnimManager ()->RpAnimBlendClumpGetAssociation ( Ped.GetClump (), szAnimName );
+
+            if ( pA )
+            {
+                pA->SetCurrentProgress ( fProgress );
+                return true;
+            }
+        }
+        else
+        {
+            Ped.KillAnimation();
+            return true;
         }
     }
 

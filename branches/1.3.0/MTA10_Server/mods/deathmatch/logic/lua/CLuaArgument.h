@@ -35,10 +35,6 @@ class CLuaArgument
 {
 public:
                             CLuaArgument        ( void );
-                            CLuaArgument        ( bool bBool );
-                            CLuaArgument        ( double dNumber );
-                            CLuaArgument        ( const std::string& strString );
-                            CLuaArgument        ( CElement* pElement );
                             CLuaArgument        ( const CLuaArgument& Argument, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables = NULL );
                             CLuaArgument        ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
                             CLuaArgument        ( lua_State* luaVM, int iArgument, std::map < const void*, CLuaArguments* > * pKnownTables = NULL );
@@ -51,13 +47,12 @@ public:
     void                    Read                ( lua_State* luaVM, int iArgument, std::map < const void*, CLuaArguments* > * pKnownTables = NULL );
     void                    Push                ( lua_State* luaVM, std::map < CLuaArguments*, int > * pKnownTables = NULL ) const;
     
-    void                    Read                ( bool bBool );
-    void                    Read                ( double dNumber );
-    void                    Read                ( const std::string& strString );
-    void                    Read                ( CElement* pElement );
-
-    void                    ReadUserData        ( void* pUserData );
-    void                    Read                ( class CLuaArguments * table );
+    void                    ReadBool            ( bool bBool );
+    void                    ReadNumber          ( double dNumber );
+    void                    ReadString          ( const std::string& strString );
+    void                    ReadElement         ( CElement* pElement );
+    void                    ReadScriptID        ( uint uiScriptID );
+    void                    ReadTable           ( class CLuaArguments * table );
 
     inline int              GetType             ( void ) const      { return m_iType; };
 

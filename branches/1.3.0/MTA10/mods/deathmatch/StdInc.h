@@ -43,6 +43,7 @@
 #include <Common.h>
 #include "Enums.h"
 #include "net/SyncStructures.h"
+#include "CIdArray.h"
 
 // Shared logic includes
 #include <Utils.h>

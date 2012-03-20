@@ -39,6 +39,8 @@ public:
     inline list < CAccessControlListRight* >  ::const_iterator  IterEnd     ( void ) { return m_Rights.end (); };
 
     bool                                        CanBeModifiedByScript       ( void );
+    uint                                        GetScriptID                 ( void ) const  { return m_uiScriptID; }
+
 private:
     void                                        OnChange                    ( void );
 
@@ -46,7 +48,7 @@ private:
     list < CAccessControlListRight* >           m_Rights;
 
     class CAccessControlListManager*            m_pACLManager;
-
+    uint                                        m_uiScriptID;
 };
 
 #endif

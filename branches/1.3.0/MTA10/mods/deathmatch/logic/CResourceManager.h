@@ -38,9 +38,10 @@ public:
                                 CResourceManager            ( void );
                                 ~CResourceManager           ( void );
 
-    CResource*                  Add                         ( unsigned short usID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity );
+    CResource*                  Add                         ( unsigned short usNetID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity );
     CResource*                  GetResource                 ( const char* szResourceName );
-    CResource*                  GetResource                 ( unsigned short usID );
+    CResource*                  GetResourceFromNetID        ( unsigned short usNetID );
+    CResource*                  GetResourceFromScriptID     ( uint uiScriptID );
     bool                        RemoveResource              ( unsigned short usID );
     void                        Remove                      ( CResource* pResource );
     bool                        Exists                      ( CResource* pResource );

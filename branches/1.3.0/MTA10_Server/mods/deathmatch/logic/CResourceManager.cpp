@@ -387,7 +387,7 @@ CResource * CResourceManager::Load ( bool bIsZipped, const char * szAbsPath, con
         if ( s_bNotFirstTime )
             CLogger::LogPrintf("New resource '%s' loaded\n", loadedResource->GetName().c_str () );
         unsigned short usID = GenerateID ();
-        loadedResource->SetID ( usID );
+        loadedResource->SetNetID ( usID );
         AddResourceToLists ( loadedResource );
         m_bResourceListChanged = true;
     }
@@ -404,9 +404,11 @@ CResource * CResourceManager::GetResource ( const char * szResourceName )
 }
 
 
-bool CResourceManager::Exists ( CResource* pResource )
+CResource* CResourceManager::GetResourceFromScriptID ( uint uiScriptID )
 {
-    return m_resources.Contains ( pResource );
+    CResource* pResource = (CResource*) CIdArray::FindEntry ( uiScriptID, EIdClass::RESOURCE );
+    dassert ( !pResource || ListContains ( m_resources, pResource ) );
+    return pResource;
 }
 
 
@@ -417,7 +419,7 @@ unsigned short CResourceManager::GenerateID ( void )
     list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
-        idMap[ ( *iter )->GetID () ] = true;
+        idMap[ ( *iter )->GetNetID () ] = true;
     }
 
     // Find an unused ID
@@ -596,7 +598,7 @@ bool CResourceManager::Reload ( CResource* pResource )
         m_bResourceListChanged = true;
 
         // Generate a new ID for it
-        pResource->SetID ( GenerateID () );
+        pResource->SetNetID ( GenerateID () );
     }
     else
     {

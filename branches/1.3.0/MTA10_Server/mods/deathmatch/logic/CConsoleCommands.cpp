@@ -1869,6 +1869,18 @@ bool CConsoleCommands::Help ( CConsole* pConsole, const char* szArguments, CClie
 }
 
 
+bool CConsoleCommands::ReloadBans ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    if ( g_pGame->GetBanManager()->ReloadBanList() )
+    {
+        pClient->SendEcho ( "reloadbans: Ban List successfully reloaded" );
+        return true;
+    }
+    pClient->SendEcho ( "reloadbans: Ban List failed to reload, fix any errors and run again" );
+    return false;
+}
+
+
 bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
     if ( szArguments && szArguments[0] )

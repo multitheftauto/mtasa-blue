@@ -19,7 +19,8 @@
 class CBan
 {
 public:
-                                CBan                    ( void ) ;
+                                CBan                    ( void );
+                                ~CBan                   ( void );
 
     inline const std::string&   GetIP                   ( void )                        { return m_strIP; };
     inline void                 SetIP                   ( const std::string& strIP )    { m_strIP = strIP; };
@@ -47,6 +48,7 @@ public:
 
     SString                     GetDurationDesc         ( void );
     SString                     GetReasonText           ( void ) const;
+    uint                        GetScriptID             ( void ) const                  { return m_uiScriptID; }
 
 private:
     std::string                 m_strIP;
@@ -57,6 +59,7 @@ private:
     std::string                 m_strAccount;
     time_t                      m_tTimeOfBan;
     time_t                      m_tTimeOfUnban;
+    uint                        m_uiScriptID;
 };
 
 #endif

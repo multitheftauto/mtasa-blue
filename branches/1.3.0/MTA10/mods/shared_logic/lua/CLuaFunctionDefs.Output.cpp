@@ -22,10 +22,10 @@
 int CLuaFunctionDefs::OutputConsole ( lua_State* luaVM )
 {
     // Valid string argument?
-    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) || lua_istype ( luaVM, 1, LUA_TNUMBER ) )
+    if ( lua_type ( luaVM, 1 ) != LUA_TNONE )
     {
         // Grab it and output
-        const char* szText = lua_tostring ( luaVM, 1 );
+        const char* szText = lua_makestring ( luaVM, 1 );
         if ( CStaticFunctionDefinitions::OutputConsole ( szText ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -44,10 +44,10 @@ int CLuaFunctionDefs::OutputConsole ( lua_State* luaVM )
 int CLuaFunctionDefs::OutputChatBox ( lua_State* luaVM )
 {
     // Valid string argument?
-    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) || lua_istype ( luaVM, 1, LUA_TNUMBER ) )
+    if ( lua_type ( luaVM, 1 ) != LUA_TNONE )
     {
         // Grab the output string
-        const char* szText = lua_tostring ( luaVM, 1 );
+        const char* szText = lua_makestring ( luaVM, 1 );
 
         // Default color setup
         unsigned char ucRed = 235;
@@ -210,10 +210,10 @@ int CLuaFunctionDefs::OutputClientDebugString ( lua_State* luaVM )
         }
 
         // Valid string?
-        if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+        if ( lua_type ( luaVM, 1 ) != LUA_TNONE )
         {
             // Output it
-            const char* szString = lua_tostring ( luaVM, 1 );
+            const char* szString = lua_makestring ( luaVM, 1 );
             if ( uiLevel == 1 )
             {
                 m_pScriptDebugging->LogError ( luaVM, "%s", szString );

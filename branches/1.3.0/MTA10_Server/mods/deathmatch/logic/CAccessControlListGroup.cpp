@@ -17,6 +17,7 @@
 CAccessControlListGroup::CAccessControlListGroup ( const char* szGroupName )
 : m_ObjectsById ( 512 )
 {
+    m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::ACL_GROUP );
     snprintf ( m_szGroupName, 256, "%s", szGroupName );
     m_szGroupName[255] = '\0';
 
@@ -27,6 +28,7 @@ CAccessControlListGroup::CAccessControlListGroup ( const char* szGroupName )
 
 CAccessControlListGroup::~CAccessControlListGroup ( void )
 {
+    CIdArray::PushUniqueId ( this, EIdClass::ACL_GROUP, m_uiScriptID );
     ObjectList::iterator iter = m_Objects.begin ();
     for ( ; iter != m_Objects.end (); iter++ )
     {

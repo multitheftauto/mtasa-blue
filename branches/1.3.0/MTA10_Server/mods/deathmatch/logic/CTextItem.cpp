@@ -16,6 +16,7 @@ static unsigned long ulUniqueId = 0;
 
 CTextItem::CTextItem ( const char* szText, const CVector2D& vecPosition, eTextPriority Priority, const SColor color, float fScale, unsigned char ucFormat, unsigned char ucShadowAlpha )
 {
+    m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::TEXT_ITEM );
     // Assign us an unique ID
     m_ulUniqueId = ulUniqueId++;
 
@@ -35,6 +36,7 @@ CTextItem::CTextItem ( const char* szText, const CVector2D& vecPosition, eTextPr
 
 CTextItem::CTextItem ( const CTextItem& TextItem )
 {
+    m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::TEXT_ITEM );
     // Copy the tex
     m_strText = TextItem.m_strText;
 
@@ -72,6 +74,7 @@ bool CTextItem::operator= ( const CTextItem& TextItem )
 
 CTextItem::~CTextItem ( )
 {
+    CIdArray::PushUniqueId ( this, EIdClass::TEXT_ITEM, m_uiScriptID );
     // Tell all our observers about it
     m_bDeletable = true;
     NotifyObservers ();

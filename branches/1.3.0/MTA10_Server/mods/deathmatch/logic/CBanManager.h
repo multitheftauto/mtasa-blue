@@ -37,7 +37,7 @@ public:
 
     CBan*               AddBan                  ( const SString& strBanner = "Console", const SString& strReason = "", time_t tTimeOfUnban = 0 );
 
-    bool                Exists                  ( CBan* pBan );
+    CBan*               GetBanFromScriptID      ( uint uiScriptID );
 
     bool                IsSpecificallyBanned    ( const char* szIP );
     bool                IsSerialBanned          ( const char* szSerial );
@@ -54,6 +54,7 @@ public:
     unsigned int        GetBansWithBanner       ( const char* szBanner );
 
     bool                LoadBanList             ( void );
+    bool                ReloadBanList           ( void );
     void                SaveBanList             ( void );
     void                SafeSetValue            ( CXMLNode* pNode, const char* szKey, const std::string& strValue );
     void                SafeSetValue            ( CXMLNode* pNode, const char* szKey, unsigned int );

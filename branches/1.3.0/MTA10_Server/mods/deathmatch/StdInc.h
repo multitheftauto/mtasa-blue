@@ -46,6 +46,7 @@ struct SAclRequest;
 #include "Enums.h"
 #include <bochs_internal/crc32.h>
 #include "CChecksum.h"
+#include "CIdArray.h"
 
 // Packet includes
 #include "net/Packets.h"

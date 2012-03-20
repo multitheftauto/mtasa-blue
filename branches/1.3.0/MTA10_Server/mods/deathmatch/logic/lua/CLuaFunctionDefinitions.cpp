@@ -1560,14 +1560,27 @@ int CLuaFunctionDefinitions::SetPedAnimationProgress ( lua_State* luaVM )
         {
             const char * szAnimName = NULL;
             float fProgress = 0.0f;
-            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) szAnimName = lua_tostring ( luaVM, 2 );
-            if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER ) fProgress = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
-
-            if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( pElement, szAnimName, fProgress ) )
+            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) 
             {
-                lua_pushboolean ( luaVM, true );
-                return 1;
+                szAnimName = lua_tostring ( luaVM, 2 );
+                if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER ) fProgress = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
+
+                if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( pElement, szAnimName, fProgress ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
             }
+            else if ( lua_type ( luaVM, 2 ) == LUA_TNONE || lua_type ( luaVM, 2 ) == LUA_TNIL )
+            {
+                if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( pElement, szAnimName, fProgress ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+                m_pScriptDebugging->LogBadType ( luaVM, "setPedAnimationProgress" );
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAnimationProgress", "element", 1 );
@@ -9825,11 +9838,10 @@ int CLuaFunctionDefinitions::OutputChatBox ( lua_State* luaVM )
     }
 
     // Verify argument
-    int iArgument1 = lua_type ( luaVM, 1 );
-    if ( iArgument1 == LUA_TSTRING || iArgument1 == LUA_TNUMBER )
+    if ( lua_type ( luaVM, 1 ) != LUA_TNONE )
     {
         // Grab it
-        const char* szChat = lua_tostring ( luaVM, 1 );
+        const char* szChat = lua_makestring ( luaVM, 1 );
 
         // Do it
         if ( CStaticFunctionDefinitions::OutputChatBox ( szChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain ) )
@@ -9863,11 +9875,10 @@ int CLuaFunctionDefinitions::OutputConsole ( lua_State* luaVM )
     }
 
     // Verify argument
-    int iArgument1 = lua_type ( luaVM, 1 );
-    if ( iArgument1 == LUA_TSTRING || iArgument1 == LUA_TNUMBER )
+    if ( lua_type ( luaVM, 1 ) != LUA_TNONE )
     {
         // Grab it
-        const char* szChat = lua_tostring ( luaVM, 1 );
+        const char* szChat = lua_makestring ( luaVM, 1 );
 
         // Do it
         if ( CStaticFunctionDefinitions::OutputConsole ( szChat, pElement ) )
@@ -9943,10 +9954,11 @@ int CLuaFunctionDefinitions::OutputDebugString ( lua_State* luaVM )
         }
 
         // Valid string?
-        if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+        if ( lua_type ( luaVM, 1 ) != LUA_TNONE )
         {
             // Output it
-            const char* szString = lua_tostring ( luaVM, 1 );
+            const char* szString = lua_makestring ( luaVM, 1 );
+
             if ( uiLevel == 1 )
             {
                 m_pScriptDebugging->LogError ( luaVM, "%s", szString );
@@ -11214,7 +11226,7 @@ int CLuaFunctionDefinitions::DbQuery ( lua_State* luaVM )
             if ( pLuaMain )
             {
                 CLuaArguments Arguments;
-                Arguments.PushUserData ( reinterpret_cast < void* > ( pJobData->GetId () ) );
+                Arguments.PushDbQuery ( pJobData );
                 Arguments.PushArguments ( callbackArgs );
                 pJobData->SetCallback ( DbQueryCallback, g_pGame->GetLuaCallbackManager ()->CreateCallback ( pLuaMain, iLuaFunction, Arguments ) );
             }
@@ -11635,21 +11647,20 @@ int CLuaFunctionDefinitions::GetAccountData ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefinitions::GetAccountAllData ( lua_State* luaVM )
+int CLuaFunctionDefinitions::GetAllAccountData ( lua_State* luaVM )
 {
-    //  string getAccountAllData ( account theAccount )
+    //  string getAllAccountData ( account theAccount )
     CAccount* pAccount;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pAccount );
     if ( !argStream.HasErrors () )
     {
         lua_newtable ( luaVM );
-//__asm int 3;
-        CStaticFunctionDefinitions::GetAccountAllData ( luaVM, pAccount );
+        CStaticFunctionDefinitions::GetAllAccountData ( luaVM, pAccount );
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getAccountAllData", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getAllAccountData", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -12159,6 +12170,16 @@ int CLuaFunctionDefinitions::GetBans ( lua_State* luaVM )
     }
 
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::ReloadBanList ( lua_State* luaVM )
+{
+    bool bSuccess = CStaticFunctionDefinitions::ReloadBanList ();
+    if ( !bSuccess )
+        m_pScriptDebugging->LogError ( luaVM, "reloadBans: Ban List failed to reload, fix any errors and run again" );
+    lua_pushboolean ( luaVM, bSuccess );
     return 1;
 }
 

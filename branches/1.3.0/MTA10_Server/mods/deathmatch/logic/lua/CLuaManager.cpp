@@ -686,7 +686,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getAccountPlayer", CLuaFunctionDefinitions::GetAccountPlayer );
     CLuaCFunctions::AddFunction ( "isGuestAccount", CLuaFunctionDefinitions::IsGuestAccount );
     CLuaCFunctions::AddFunction ( "getAccountData", CLuaFunctionDefinitions::GetAccountData );
-    CLuaCFunctions::AddFunction ( "getAccountAllData", CLuaFunctionDefinitions::GetAccountAllData );
+    CLuaCFunctions::AddFunction ( "getAllAccountData", CLuaFunctionDefinitions::GetAllAccountData );
     CLuaCFunctions::AddFunction ( "getAccount", CLuaFunctionDefinitions::GetAccount );
     CLuaCFunctions::AddFunction ( "getAccounts", CLuaFunctionDefinitions::GetAccounts );
 
@@ -709,6 +709,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "removeBan", CLuaFunctionDefinitions::RemoveBan );
 
     CLuaCFunctions::AddFunction ( "getBans", CLuaFunctionDefinitions::GetBans );
+    CLuaCFunctions::AddFunction ( "reloadBans", CLuaFunctionDefinitions::ReloadBanList );
 
     CLuaCFunctions::AddFunction ( "getBanIP", CLuaFunctionDefinitions::GetBanIP );
     CLuaCFunctions::AddFunction ( "getBanSerial", CLuaFunctionDefinitions::GetBanSerial );

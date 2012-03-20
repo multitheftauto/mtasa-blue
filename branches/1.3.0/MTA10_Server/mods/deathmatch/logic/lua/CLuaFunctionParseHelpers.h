@@ -94,10 +94,7 @@ inline SString GetClassTypeName ( CAccessControlListGroup* )    { return "acl-gr
 template < class T >
 CResource* UserDataCast ( CResource*, void* ptr, lua_State* )
 {
-    CResource* pResource = reinterpret_cast < CResource* > ( ptr );
-    if ( g_pGame->GetResourceManager ()->Exists ( pResource ) )
-        return pResource;
-    return NULL;
+    return g_pGame->GetResourceManager ()->GetResourceFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
 }
 
 
@@ -120,9 +117,7 @@ CLuaTimer* UserDataCast ( CLuaTimer*, void* ptr, lua_State* luaVM )
     CLuaMain* pLuaMain = g_pGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
     if ( pLuaMain )
     {
-        CLuaTimer* pLuaTimer = reinterpret_cast < CLuaTimer* > ( ptr );
-        if ( pLuaMain->GetTimerManager ()->Exists ( pLuaTimer ) )
-            return pLuaTimer;
+        return pLuaMain->GetTimerManager ()->GetTimerFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
     }
     return NULL;
 }
@@ -134,10 +129,7 @@ CLuaTimer* UserDataCast ( CLuaTimer*, void* ptr, lua_State* luaVM )
 template < class T >
 CAccount* UserDataCast ( CAccount*, void* ptr, lua_State* luaVM )
 {
-    CAccount* pAccount = reinterpret_cast < CAccount* > ( ptr );
-    if ( g_pGame->GetAccountManager ()->Exists ( pAccount ) )
-        return pAccount;
-    return NULL;
+    return g_pGame->GetAccountManager ()->GetAccountFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
 }
 
 
@@ -157,10 +149,7 @@ CDbJobData* UserDataCast ( CDbJobData*, void* ptr, lua_State* )
 template < class T >
 CAccessControlList* UserDataCast ( CAccessControlList*, void* ptr, lua_State* )
 {
-    CAccessControlList* pACL = reinterpret_cast < CAccessControlList* > ( ptr );
-    if ( g_pGame->GetACLManager ()->VerifyACL ( pACL ) )
-        return pACL;
-    return NULL;
+    return g_pGame->GetACLManager ()->GetACLFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
 }
 
 
@@ -170,10 +159,7 @@ CAccessControlList* UserDataCast ( CAccessControlList*, void* ptr, lua_State* )
 template < class T >
 CAccessControlListGroup* UserDataCast ( CAccessControlListGroup*, void* ptr, lua_State* )
 {
-    CAccessControlListGroup* pACLGroup = reinterpret_cast < CAccessControlListGroup* > ( ptr );
-    if ( g_pGame->GetACLManager ()->VerifyGroup ( pACLGroup ) )
-        return pACLGroup;
-    return NULL;
+    return g_pGame->GetACLManager ()->GetGroupFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
 }
 
 

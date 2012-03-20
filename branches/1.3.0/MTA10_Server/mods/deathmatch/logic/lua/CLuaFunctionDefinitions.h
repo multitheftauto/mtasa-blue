@@ -503,7 +503,7 @@ public:
     static int      GetAccountPlayer                    ( lua_State* luaVM );
     static int      IsGuestAccount                      ( lua_State* luaVM );
     static int      GetAccountData                      ( lua_State* luaVM );
-    static int      GetAccountAllData                   ( lua_State* luaVM );
+    static int      GetAllAccountData                   ( lua_State* luaVM );
 
     // Account set funcs
     static int      AddAccount                          ( lua_State* luaVM );
@@ -524,6 +524,7 @@ public:
     static int      RemoveBan                           ( lua_State* luaVM );
 
     static int      GetBans                             ( lua_State* luaVM );
+    static int      ReloadBanList                       ( lua_State* luaVM );
 
     static int      GetBanIP                            ( lua_State* luaVM );
     static int      GetBanSerial                        ( lua_State* luaVM );

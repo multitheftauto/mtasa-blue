@@ -52,6 +52,8 @@ public:
 
     inline void                 SetChanged              ( bool bChanged )           { m_bChanged = bChanged; }
     inline bool                 HasChanged              ( void )                    { return m_bChanged; }
+    uint                        GetScriptID             ( void ) const              { return m_uiScriptID; }
+
 protected:
     CAccountManager*            m_pManager;
 
@@ -66,8 +68,8 @@ protected:
 
     unsigned int                m_uiNameHash;
 
-
     class CClient*              m_pClient;
+    uint                        m_uiScriptID;
 };
 
 #endif
