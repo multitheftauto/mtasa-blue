@@ -229,7 +229,7 @@ public:
     static bool                 SetWeaponAmmo                       ( CElement* pElement, unsigned char ucWeaponID, unsigned short usAmmo, unsigned short usAmmoInClip );
 
     // Vehicle create/destroy functions
-    static CVehicle*            CreateVehicle                       ( CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, char* szRegPlate = NULL, bool bDirection = false, unsigned char ucVariant = 5, unsigned char ucVariant2 = 5 );
+    static CVehicle*            CreateVehicle                       ( CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2 );
 
     // Vehicle get functions
     static bool                 GetVehicleVariant                   ( CVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2 );
