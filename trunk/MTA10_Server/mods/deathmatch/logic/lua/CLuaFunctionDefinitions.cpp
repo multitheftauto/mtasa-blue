@@ -3899,71 +3899,28 @@ int CLuaFunctionDefinitions::GetSlotFromWeapon ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::CreateVehicle ( lua_State* luaVM )
 {
-    // Verify the parameters
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
-         ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
+//  vehicle createVehicle ( int model, float x, float y, float z, [float rx, float ry, float rz, string numberplate, bool bDirection, int variant1, int variant2] )
+    ushort usModel; CVector vecPosition; CVector vecRotation; SString strNumberPlate; uchar ucVariant; uchar ucVariant2;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( usModel );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadNumber ( vecRotation.fX, 0 );
+    argStream.ReadNumber ( vecRotation.fY, 0 );
+    argStream.ReadNumber ( vecRotation.fZ, 0 );
+    argStream.ReadString ( strNumberPlate, "" );
+    if ( argStream.NextIsBool () )
     {
-        // Grab the vehicle id parameter
-        unsigned short usModel = static_cast < unsigned short > ( atoi ( lua_tostring ( luaVM, 1 ) ) );
+        bool bDirection;
+        argStream.ReadBool ( bDirection );
+    }
+    argStream.ReadNumber ( ucVariant, 254 );
+    argStream.ReadNumber ( ucVariant2, 254 );
 
-        // Grab the position parameters
-        CVector vecPosition;
-        vecPosition.fX = static_cast < float > ( atof ( lua_tostring ( luaVM, 2 ) ) );
-        vecPosition.fY = static_cast < float > ( atof ( lua_tostring ( luaVM, 3 ) ) );
-        vecPosition.fZ = static_cast < float > ( atof ( lua_tostring ( luaVM, 4 ) ) );
-
-        // Grab the rotation parameters
-        CVector vecRotation;
-        const char* szRegPlate = NULL;
-        unsigned char ucVariant = 254;
-        unsigned char ucVariant2 = 254;
-        int iArgument5 = lua_type ( luaVM, 5 );
-        if ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING )
-        {
-            vecRotation.fX = static_cast < float > ( atof ( lua_tostring ( luaVM, 5 ) ) );
-
-            int iArgument6 = lua_type ( luaVM, 6 );
-            if ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING )
-            {
-                vecRotation.fY = static_cast < float > ( atof ( lua_tostring ( luaVM, 6 ) ) );
-
-                int iArgument7 = lua_type ( luaVM, 7 );
-                if ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING )
-                {
-                    vecRotation.fZ = static_cast < float > ( atof ( lua_tostring ( luaVM, 7 ) ) );
-
-                    int iArgument8 = lua_type ( luaVM, 8 );
-                    if ( iArgument8 == LUA_TSTRING || iArgument8 == LUA_TBOOLEAN )
-                    {
-                        if ( iArgument8 == LUA_TSTRING )
-                        {
-                            szRegPlate = lua_tostring ( luaVM, 8 );
-                        }
-                        int iArgument10 = lua_type ( luaVM, 10 );
-                        if ( iArgument10 == LUA_TNUMBER || iArgument10 == LUA_TSTRING )
-                        {
-                            ucVariant = static_cast < unsigned char > ( atoi ( lua_tostring ( luaVM, 10 ) ) );
-                            int iArgument11 = lua_type ( luaVM, 11 );
-                            if ( iArgument11 == LUA_TNUMBER || iArgument11 == LUA_TSTRING )
-                            {
-                                ucVariant2 = static_cast < unsigned char > ( atoi ( lua_tostring ( luaVM, 11 ) ) );
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        bool bDirection = false;
-        if ( lua_type ( luaVM, 9 ) == LUA_TBOOLEAN )
-            bDirection = ( lua_toboolean ( luaVM, 9 ) ) ? true : false;
-
+    if ( !argStream.HasErrors () )
+    {
         CLuaMain * pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
@@ -3971,7 +3928,7 @@ int CLuaFunctionDefinitions::CreateVehicle ( lua_State* luaVM )
             if ( pResource )
             {
                 // Create the vehicle and return its handle
-                CVehicle* pVehicle = CStaticFunctionDefinitions::CreateVehicle ( pResource, usModel, vecPosition, vecRotation, const_cast < char* > ( szRegPlate ), bDirection, ucVariant, ucVariant2 );
+                CVehicle* pVehicle = CStaticFunctionDefinitions::CreateVehicle ( pResource, usModel, vecPosition, vecRotation, strNumberPlate, ucVariant, ucVariant2 );
                 if ( pVehicle )
                 {
                     CElementGroup * pGroup = pResource->GetElementGroup();
@@ -3986,7 +3943,7 @@ int CLuaFunctionDefinitions::CreateVehicle ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "createVehicle" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createVehicle", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
