@@ -117,4 +117,3 @@
 #include "logic/CResource.h"
 #include "logic/CStaticFunctionDefinitions.h"
 #include "../../version.h"
-#include <../../core/CorePublic.h>

@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        SharedUtil.Profiling.hpp
+*  FILE:        SharedUtil.Game.hpp
 *  PURPOSE:     Shared stuff which measures things
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -11,6 +11,9 @@
 
 namespace SharedUtil
 {
+    // Global CStatEvents instance 
+    CStatEvents g_StatEvents;
+
 
     //
     // The input buffer from CStatsEvents is converted into SFrameEvents
@@ -145,11 +148,8 @@ namespace SharedUtil
     // Returns number of missing unclocks inserted
     //
     ///////////////////////////////////////////////////////////////
-    int CloseOpenEvents ( std::vector < SFrameEvent >& eventList, const char* szSection, const char* szName, bool bResetFrame )
+    int CloseOpenEvents ( std::vector < SFrameEvent >& eventList, const char* szSection, const char* szName )
     {
-        if ( !eventList.empty () && eventList[0].type == STATS_UNCLOCK  )
-            ListRemoveIndex ( eventList, 0 );
-
         int iNumClocks = 0;
         int iNumUnclocks = 0;
         for( uint i = 0 ; i < eventList.size () ; i++ )
@@ -169,8 +169,7 @@ namespace SharedUtil
         for( int i = 0 ; i < iExtraClocks ; i++ )
         {
             eventList.push_back ( SFrameEvent ( STATS_UNCLOCK, GetTimeUs () ) );
-            if ( !bResetFrame )
-                g_StatEvents.Add ( szSection, szName, STATS_CLOCK );
+            g_StatEvents.Add ( szSection, szName, STATS_CLOCK );
         }
 
         return iExtraClocks;
@@ -190,7 +189,6 @@ namespace SharedUtil
         , m_BufferPos ( 0 )
         , m_BufferPosMax ( 0 )
         , m_BufferPosMaxUsing ( 0 )
-        , m_bResetFrame ( false )
     {
         ClearBuffer ( true );
     }
@@ -226,14 +224,10 @@ namespace SharedUtil
 
         if ( bCanResize )
         {
-            if ( m_BufferPos == (int)m_ItemBufferArray.size () )
-                m_bResetFrame = true;
-
             // Grow quickly, shrink slowly
             m_BufferPosMax = Max ( m_BufferPos * 2, m_BufferPosMax * 1000 / 1001 );
             m_BufferPosMax = Clamp ( 10000, m_BufferPosMax, 1000000 );
-            if ( m_BufferPosMax > (int)m_ItemBufferArray.size ()
-                || m_BufferPosMax < (int)m_ItemBufferArray.size () / 4 )
+            if ( m_BufferPosMax != (int)m_ItemBufferArray.size () )
                 m_ItemBufferArray.resize ( m_BufferPosMax );
         }
 
@@ -286,7 +280,7 @@ namespace SharedUtil
         }
 
         // Clear input buffer
-        ClearBuffer( true );
+        ClearBuffer( false );
 
         //
         // Put events into a SStatCollection
@@ -307,7 +301,7 @@ namespace SharedUtil
                 const SString& strItemName = itSection->first;
                 SFrameEventList& frameEvents  = itSection->second;
 
-                int iFakeHits = CloseOpenEvents ( frameEvents, frameSection.szSectionName, frameEvents.szEventListName, m_bResetFrame );
+                int iFakeHits = CloseOpenEvents ( frameEvents, frameSection.szSectionName, frameEvents.szEventListName );
                 ValidateEventList ( frameEvents );
 
                 int iHitCount = frameEvents.size() / 2 - iFakeHits;
@@ -341,13 +335,6 @@ namespace SharedUtil
                 item.iCounter   += iHitCount;
                 item.fMs        += fTotalMs;
             }    
-        }
-
-        if ( m_bResetFrame || m_ResetTimer.Get () > 20000 )
-        {
-            ClearBuffer ( false );
-            m_ResetTimer.Reset ();
-            m_bResetFrame = false;
         }
     }
 

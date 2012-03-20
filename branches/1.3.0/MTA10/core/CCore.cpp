@@ -1247,7 +1247,6 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "debugscrolldown",   "scrolls the debug view downwards", CCommandFuncs::DebugScrollDown );
 
     m_pCommands->Add ( "test",              "",                                 CCommandFuncs::Test );
-    m_pCommands->Add ( "showcpustat",       "shows the timing statistics",      CCommandFuncs::ShowCpuStat );
 
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
     m_pCommands->Add ( "fakelag",           "",                                 CCommandFuncs::FakeLag );
@@ -1851,7 +1850,6 @@ void CCore::OnDeviceRestore ( void )
 //
 void CCore::OnPreHUDRender ( void )
 {
-    CLOCK( "CCore", "OnPreHUDRender" );
     IDirect3DDevice9* pDevice = CGraphics::GetSingleton ().GetDevice ();
 
     // Create a state block.
@@ -1890,7 +1888,6 @@ void CCore::OnPreHUDRender ( void )
         pDeviceState->Apply ( );
         pDeviceState->Release ( );
     }
-    UNCLOCK( "CCore", "OnPreHUDRender" );
 }
 
 

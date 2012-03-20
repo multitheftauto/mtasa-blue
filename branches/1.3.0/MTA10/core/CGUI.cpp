@@ -238,19 +238,14 @@ void CLocalGUI::DoPulse ( void )
 
 void CLocalGUI::Draw ( void )
 {
-    CLOCK( "CLocalGUI", "GetSystemState" );
     // Get the game interface
     CGame* pGame = CCore::GetSingleton ().GetGame ();
     eSystemState SystemState = pGame->GetSystemState ();
     CGUI* pGUI = CCore::GetSingleton ().GetGUI ();
-    UNCLOCK( "CLocalGUI", "GetSystemState" );
 
     // Update mainmenu stuff
-    CLOCK( "CLocalGUI", "m_pMainMenu->Update" );
     m_pMainMenu->Update ();
-    UNCLOCK( "CLocalGUI", "m_pMainMenu->Update" );
 
-    CLOCK( "CLocalGUI", "WaitForMenu" );
     // Make sure our version labels are always visible
     static short WaitForMenu = 0;
 
@@ -273,23 +268,15 @@ void CLocalGUI::Draw ( void )
     bool bDebugVisible = ( SystemState == 9 /* GS_INGAME */ && m_pMainMenu->GetIsIngame () && m_pDebugViewVisible && !CCore::GetSingleton ().IsOfflineMod() );
     if ( m_pDebugView->IsVisible () != bDebugVisible )
         m_pDebugView->SetVisible ( bDebugVisible );
-    UNCLOCK( "CLocalGUI", "WaitForMenu" );
 
     // Make sure the cursor is displayed only when needed
-    CLOCK( "CLocalGUI", "UpdateCursor" );
     UpdateCursor ();
-    UNCLOCK( "CLocalGUI", "UpdateCursor" );
 
     // Draw the chat
-    CLOCK( "CLocalGUI", "m_pChat->Draw" );
     m_pChat->Draw ( true );
-    UNCLOCK( "CLocalGUI", "m_pChat->Draw" );
     // Draw the debugger
-    CLOCK( "CLocalGUI", "m_pDebugView->Draw" );
     m_pDebugView->Draw ( false );
-    UNCLOCK( "CLocalGUI", "m_pDebugView->Draw" );
 
-    CLOCK( "CLocalGUI", "bDelayedFrame" );
     // If we're not at the loadingscreen
     static bool bDelayedFrame = false;
     if ( SystemState != 8 || !bDelayedFrame /* GS_INIT_PLAYING_GAME */ )
@@ -310,7 +297,6 @@ void CLocalGUI::Draw ( void )
             bDelayedFrame = true;
         }
     }
-    UNCLOCK( "CLocalGUI", "bDelayedFrame" );
 }
 
 

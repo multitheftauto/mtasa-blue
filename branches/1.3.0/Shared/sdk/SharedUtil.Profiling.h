@@ -64,9 +64,10 @@ namespace SharedUtil
         int                     m_BufferPosMax;
         int                     m_BufferPosMaxUsing;
         std::vector < SItem >   m_ItemBufferArray;
-        CElapsedTime            m_ResetTimer;
-        bool                    m_bResetFrame;
     };
+
+    // Global CStatEvents instance 
+    extern class CStatEvents g_StatEvents;
 
     // Macros for clocking areas
     #define CLOCK(section,name)     g_StatEvents.Add( section, name, STATS_CLOCK )

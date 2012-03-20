@@ -183,28 +183,26 @@ CClientManager::~CClientManager ( void )
 
 void CClientManager::DoPulse ( void )
 {
-    CLOCK_SET_SECTION( "Manager" );
-
-    CLOCK_CALL1( m_pPacketRecorder->DoPulse (); )
+    m_pPacketRecorder->DoPulse ();
 
     if ( IsGameLoaded () )
     {
-        CLOCK_CALL1( m_pModelRequestManager->DoPulse (); )
-        CLOCK_CALL1( m_pCamera->DoPulse (); )
+        m_pModelRequestManager->DoPulse ();
+        m_pCamera->DoPulse ();
         /* now called from CClientGame::PostWorldProcessHandler so marker positions
            are no longer a frame behind when attached to other entities.
         m_pMarkerManager->DoPulse (); */ 
-        CLOCK_CALL1( m_pRadarAreaManager->DoPulse ( false ); ) // DoPulse, but do not render (we render them from a hook to avoid render issues - the mask not blocking the edges)
-        CLOCK_CALL1( m_pVehicleManager->DoPulse (); )
-        CLOCK_CALL1( m_pPathManager->DoPulse (); )
-        CLOCK_CALL1( m_pRadarMarkerManager->DoPulse (); )
-        CLOCK_CALL1( m_pPedManager->DoPulse (); )
-        CLOCK_CALL1( m_pObjectManager->DoPulse (); )
-        CLOCK_CALL1( m_pProjectileManager->DoPulse (); )
-        CLOCK_CALL1( m_pSoundManager->DoPulse (); )
-        CLOCK_CALL1( m_pPlayerManager->DoPulse (); )
-        CLOCK_CALL1( m_pColManager->DoPulse (); )
-        CLOCK_CALL1( m_pGUIManager->DoPulse (); )
+        m_pRadarAreaManager->DoPulse ( false ); // DoPulse, but do not render (we render them from a hook to avoid render issues - the mask not blocking the edges)
+        m_pVehicleManager->DoPulse ();
+        m_pPathManager->DoPulse ();
+        m_pRadarMarkerManager->DoPulse ();
+        m_pPedManager->DoPulse ();
+        m_pObjectManager->DoPulse ();
+        m_pProjectileManager->DoPulse ();
+        m_pSoundManager->DoPulse ();
+        m_pPlayerManager->DoPulse ();
+        m_pColManager->DoPulse ();
+        m_pGUIManager->DoPulse ();
     }
 }
 

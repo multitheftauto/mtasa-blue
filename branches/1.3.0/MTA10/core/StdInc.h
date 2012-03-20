@@ -62,4 +62,3 @@
 #include "CVideoModeManager.h"
 #include "CServerCache.h"
 #include "CCrashDumpWriter.h"
-#include "CorePublic.h"

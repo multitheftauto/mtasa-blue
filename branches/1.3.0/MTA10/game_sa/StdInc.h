@@ -25,8 +25,6 @@
 #include <../version.h>
 #include <ijsify.h>
 
-#include <../core/CorePublic.h>
-
 // Game includes
 #include "CEntitySA.h"
 #include "gamesa_init.h"

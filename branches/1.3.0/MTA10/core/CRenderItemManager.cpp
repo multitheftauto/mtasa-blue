@@ -638,13 +638,10 @@ void CRenderItemManager::GetVisibleTextureNames ( std::vector < SString >& outNa
 ////////////////////////////////////////////////////////////////
 bool CRenderItemManager::ApplyShaderItemToWorldTexture ( CShaderItem* pShaderItem, const SString& strTextureNameMatch )
 {
-    CLOCK( "Shaders", "ApplyToTexture" );
     assert ( pShaderItem );
 
     // Add new match at the end
-    bool bResult = m_pRenderWare->AddWorldTextureWatch ( (CSHADERDUMMY*)pShaderItem, strTextureNameMatch, pShaderItem->m_fPriority );
-    UNCLOCK( "Shaders", "ApplyToTexture" );
-    return bResult;
+    return m_pRenderWare->AddWorldTextureWatch ( (CSHADERDUMMY*)pShaderItem, strTextureNameMatch, pShaderItem->m_fPriority );
 }
 
 
@@ -657,11 +654,9 @@ bool CRenderItemManager::ApplyShaderItemToWorldTexture ( CShaderItem* pShaderIte
 ////////////////////////////////////////////////////////////////
 bool CRenderItemManager::RemoveShaderItemFromWorldTexture ( CShaderItem* pShaderItem, const SString& strTextureNameMatch )
 {
-    CLOCK( "Shaders", "RemoveFromTexture" );
     assert ( pShaderItem );
 
     m_pRenderWare->RemoveWorldTextureWatch ( (CSHADERDUMMY*)pShaderItem, strTextureNameMatch );
-    UNCLOCK( "Shaders", "RemoveFromTexture" );
     return true;
 }
 
@@ -826,7 +821,6 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     outStatus.videoCard.strName = m_strVideoCardName;
     outStatus.videoCard.iInstalledMemoryKB = m_iVideoCardMemoryKBTotal;
     outStatus.videoCard.strPSVersion = m_strVideoCardPSVersion;
-    outStatus.videoCard.uiAvailableTextureMem = m_pDevice->GetAvailableTextureMem ();
 
     // Memory usage
     outStatus.videoMemoryKB.iFreeForMTA = m_iMemoryKBFreeForMTA;

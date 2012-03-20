@@ -64,7 +64,6 @@ struct SDxStatus
         SString         strName;
         int             iInstalledMemoryKB;
         SString         strPSVersion;
-        uint            uiAvailableTextureMem;
     } videoCard;
 
     struct

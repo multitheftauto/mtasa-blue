@@ -103,7 +103,6 @@ void CDirect3DEvents9::OnRestore ( IDirect3DDevice9 *pDevice )
 
 void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 {
-    CLOCK( "CCore", "OnPresent0 Begin Scene" );
     // Start a new scene. This isn't ideal and is not really recommended by MSDN.
     // I tried disabling EndScene from GTA and just end it after this code ourselves
     // before present, but that caused graphical issues randomly with the sky.
@@ -121,16 +120,10 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
             pDevice->SetSamplerState ( i, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
         }
     }
-    UNCLOCK( "CCore", "OnPresent0 Begin Scene" );
 
-    CLOCK( "CCore", "OnPresent1 CreateStateBlock" );
     // Create a state block.
     IDirect3DStateBlock9 * pDeviceState = NULL;
     pDevice->CreateStateBlock ( D3DSBT_ALL, &pDeviceState );
-    UNCLOCK( "CCore", "OnPresent1 CreateStateBlock" );
-
-    GetRealtimeStats ()->FrameEnd ();
-    CLOCK( "CCore", "OnPresent2" );
 
     // Make sure linear sampling is enabled
     pDevice->SetSamplerState ( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
@@ -143,53 +136,33 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     // Tell everyone that the zbuffer will need clearing before use
     CGraphics::GetSingleton ().OnZBufferModified ();
 
-    UNCLOCK( "CCore", "OnPresent2" );
-
     // Notify core
     CCore::GetSingleton ().DoPostFramePulse ();
 
     // Draw pre-GUI primitives
-    CLOCK( "CCore", "OnPresent3a DrawPreGUIQueue" );
     CGraphics::GetSingleton ().DrawPreGUIQueue ();
-    UNCLOCK( "CCore", "OnPresent3a DrawPreGUIQueue" );
 
     // Maybe grab screen for upload
     CGraphics::GetSingleton ().GetScreenGrabber ()->DoPulse ();
 
     // Draw the GUI
-    CLOCK( "CCore", "OnPresent3b CLocalGUI Draw" );
     CLocalGUI::GetSingleton().Draw ();
-    UNCLOCK( "CCore", "OnPresent3b CLocalGUI Draw" );
 
     // Draw post-GUI primitives
-    CLOCK( "CCore", "OnPresent3c DrawPostGUIQueue" );
     CGraphics::GetSingleton ().DrawPostGUIQueue ();
-    UNCLOCK( "CCore", "OnPresent3c DrawPostGUIQueue" );
-
-    GetRealtimeStats ()->DoPulse ();
-    CLOCK( "CCore", "OnPresent4 MouseCursor" );
 
     // Redraw the mouse cursor so it will always be over other elements
     CLocalGUI::GetSingleton().DrawMouseCursor();
-    UNCLOCK( "CCore", "OnPresent4 MouseCursor" );
 
-    CLOCK( "CCore", "OnPresent5 RestoreDeviceState" );
     // Restore the render states
     if ( pDeviceState )
     {
         pDeviceState->Apply ( );
         pDeviceState->Release ( );
     }
-    UNCLOCK( "CCore", "OnPresent5 RestoreDeviceState" );
-   
-    CLOCK( "CCore", "OnPresent6 EndScene" );
+    
     // End the scene that we started.
     pDevice->EndScene ();
-    UNCLOCK( "CCore", "OnPresent6 EndScene" );
-
-    CLOCK( "CCore", "OnPresent7" );
-
-
 
     // Update incase settings changed
     int iAnisotropic;
@@ -268,7 +241,6 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
             pSurface = NULL;
         }
     }
-    UNCLOCK( "CCore", "OnPresent7" );
 }
 
 
