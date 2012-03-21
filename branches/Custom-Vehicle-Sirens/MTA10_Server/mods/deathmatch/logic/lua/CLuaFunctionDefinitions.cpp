@@ -4189,29 +4189,34 @@ int CLuaFunctionDefinitions::GiveVehicleSirens ( lua_State* luaVM )
     argStream.ReadUserData ( pVehicle );
     argStream.ReadNumber ( ucSirenCount );
     argStream.ReadNumber ( ucSirenType );
-    for ( int i = 0; i <= ucSirenCount;i++ )
+    if ( ucSirenCount < 8 )
     {
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fX );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fY );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fZ );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.R );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.G );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.B );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.A );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_fMinSirenAlpha );
-    }
-    if ( argStream.HasErrors ( ) == false )
-    {
-        if ( pVehicle )
+        for ( int i = 0; i < ucSirenCount;i++ )
         {
-            if ( CStaticFunctionDefinitions::GiveVehicleSirens ( pVehicle, ucSirenType, ucSirenCount, tSirenInfo ) )
+            argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fX );
+            argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fY );
+            argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fZ );
+            argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.R );
+            argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.G );
+            argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.B );
+            argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.A );
+            argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_fMinSirenAlpha );
+        }
+        if ( argStream.HasErrors ( ) == false )
+        {
+            if ( pVehicle )
             {
-                lua_pushboolean ( luaVM, true );
-                return 1;
+                if ( CStaticFunctionDefinitions::GiveVehicleSirens ( pVehicle, ucSirenType, ucSirenCount, tSirenInfo ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
             }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "giveVehicleSirens", "vehicle", 1 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "giveVehicleSirens", "vehicle", 1 );
+            m_pScriptDebugging->LogBadType ( luaVM, "giveVehicleSirens" );
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "giveVehicleSirens" );

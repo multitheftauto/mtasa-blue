@@ -1548,7 +1548,7 @@ struct SVehicleSirenSync : public ISyncStructure
                 bitStream.Read ( data.m_ucSirenCount )
                 )
             {
-                for ( int i = 0; i <= Min ( data.m_ucSirenCount, (unsigned char) 8 );i++ )
+                for ( int i = 0; i < Min ( data.m_ucSirenCount, (unsigned char) 8 );i++ )
                 {
                     bitStream.Read ( data.m_vecSirenPositions[i].fX );
                     bitStream.Read ( data.m_vecSirenPositions[i].fY );
@@ -1573,7 +1573,7 @@ struct SVehicleSirenSync : public ISyncStructure
         {
             bitStream.Write ( data.m_ucSirenType );
             bitStream.Write ( data.m_ucSirenCount );
-            for ( int i = 0; i <= Min ( data.m_ucSirenCount, (unsigned char) 8 );i++ )
+            for ( int i = 0; i < Min ( data.m_ucSirenCount, (unsigned char) 8 );i++ )
             {
                 bitStream.Write ( data.m_vecSirenPositions[i].fX );
                 bitStream.Write ( data.m_vecSirenPositions[i].fY );

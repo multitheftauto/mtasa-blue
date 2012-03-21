@@ -2416,7 +2416,7 @@ void CClientVehicle::Create ( void )
         {   
             m_tSirenBeaconInfo.m_bOverrideSirens = false;
         }
-        for ( unsigned char i = 0; i <= 7; i++ )
+        for ( unsigned char i = 0; i < 8; i++ )
             m_pVehicle->SetVehicleSirenPosition( i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_vecSirenPositions );
 
         // Tell the streamer we've created this object

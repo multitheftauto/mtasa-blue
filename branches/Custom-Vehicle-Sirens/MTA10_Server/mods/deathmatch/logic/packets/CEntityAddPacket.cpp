@@ -486,7 +486,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                         syncData.data.m_bOverrideSirens =  pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens;
                         syncData.data.m_ucSirenCount =  pVehicle->m_tSirenBeaconInfo.m_ucSirenCount;
                         syncData.data.m_ucSirenType =  pVehicle->m_tSirenBeaconInfo.m_ucSirenType;
-                        for ( int i = 0; i <= Min ( syncData.data.m_ucSirenCount, (unsigned char) 8 );i++ )
+                        for ( int i = 0; i < Min ( syncData.data.m_ucSirenCount, (unsigned char) 8 );i++ )
                         {
                             syncData.data.m_vecSirenPositions[i] = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[i].m_vecSirenPositions;
                             syncData.data.m_colSirenColour[i] = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[i].m_RGBBeaconColour;
