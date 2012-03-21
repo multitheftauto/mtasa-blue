@@ -602,6 +602,8 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Drawing funcs
     CLuaCFunctions::AddFunction ( "dxDrawLine", CLuaFunctionDefs::dxDrawLine );
+    CLuaCFunctions::AddFunction ( "dxDrawLine3DImage", CLuaFunctionDefs::dxDrawLine3DImage );
+    CLuaCFunctions::AddFunction ( "dxDrawLine3DImageSection", CLuaFunctionDefs::dxDrawLine3DImageSection );
     CLuaCFunctions::AddFunction ( "dxDrawLine3D", CLuaFunctionDefs::dxDrawLine3D );
     CLuaCFunctions::AddFunction ( "dxDrawText", CLuaFunctionDefs::dxDrawText );
     CLuaCFunctions::AddFunction ( "dxDrawRectangle", CLuaFunctionDefs::dxDrawRectangle );

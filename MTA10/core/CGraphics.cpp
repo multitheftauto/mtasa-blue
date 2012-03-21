@@ -16,6 +16,7 @@
 #include "StdInc.h"
 #include "CTileBatcher.h"
 #include "CLine3DBatcher.h"
+#include "CMaterialLine3DBatcher.h"
 extern CCore* g_pCore;
 
 using namespace std;
@@ -46,6 +47,8 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
     m_pTileBatcher = new CTileBatcher ();
     m_pLine3DBatcherPreGUI = new CLine3DBatcher ( true );
     m_pLine3DBatcherPostGUI = new CLine3DBatcher ( false );
+    m_pMaterialLine3DBatcher = new CMaterialLine3DBatcher ();
+
     m_bSetRenderTargetEnabled = false;
     m_pScreenGrabber = NewScreenGrabber ();
     m_pPixelsManager = NewPixelsManager ();
@@ -63,6 +66,7 @@ CGraphics::~CGraphics ( void )
     SAFE_DELETE ( m_pTileBatcher );
     SAFE_DELETE ( m_pLine3DBatcherPreGUI );
     SAFE_DELETE ( m_pLine3DBatcherPostGUI );
+    SAFE_DELETE ( m_pMaterialLine3DBatcher );
     SAFE_DELETE ( m_pScreenGrabber );
     SAFE_DELETE ( m_pPixelsManager );
 }
@@ -533,6 +537,25 @@ void CGraphics::DrawLine3DQueued ( const CVector& vecBegin,
         m_pLine3DBatcherPreGUI->AddLine3D ( vecBegin, vecEnd, fWidth, ulColor ); 
 }
 
+void CGraphics::DrawMaterialLine3DQueued ( const CVector& vecBegin,
+                                           const CVector& vecEnd,
+                                           float fWidth,
+                                           unsigned long ulColor,
+                                           CMaterialItem* pMaterial,
+                                           float fU, float fV,
+                                           float fSizeU, float fSizeV, 
+                                           bool bRelativeUV,
+                                           bool bUseFaceToward,
+                                           const CVector& vecFaceToward )
+{
+    if ( g_pCore->IsWindowMinimized () )
+        return;
+
+    // Add it to the queue
+    m_pMaterialLine3DBatcher->AddLine3D ( vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bUseFaceToward, vecFaceToward ); 
+}
+
+
 
 void CGraphics::DrawRectQueued ( float fX, float fY,
                                  float fWidth, float fHeight,
@@ -803,6 +826,7 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
     m_pTileBatcher->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
     m_pLine3DBatcherPreGUI->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
     m_pLine3DBatcherPostGUI->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pMaterialLine3DBatcher->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
     m_pRenderItemManager->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
     m_pScreenGrabber->OnDeviceCreate ( pDevice );
     m_pPixelsManager->OnDeviceCreate ( pDevice );
@@ -867,6 +891,15 @@ void CGraphics::DrawPostGUIQueue ( void )
     assert ( m_PreGUIQueue.empty () && m_iDebugQueueRefs == 0 );
 }
 
+void CGraphics::DrawMaterialLine3DQueue ( void )
+{
+    m_pMaterialLine3DBatcher->Flush ();
+}
+
+bool CGraphics::HasMaterialLine3DQueueItems ( void )
+{
+    return m_pMaterialLine3DBatcher->HasItems ();
+}
 
 
 void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )

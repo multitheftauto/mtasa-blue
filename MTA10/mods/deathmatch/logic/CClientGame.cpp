@@ -245,6 +245,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetPreWorldProcessHandler ( CClientGame::StaticPreWorldProcessHandler );
     g_pMultiplayer->SetPostWorldProcessHandler ( CClientGame::StaticPostWorldProcessHandler );
     g_pMultiplayer->SetIdleHandler ( CClientGame::StaticIdleHandler );
+    g_pMultiplayer->SetPreFxRenderHandler ( CClientGame::StaticPreFxRenderHandler );
+    g_pMultiplayer->SetPreHudRenderHandler ( CClientGame::StaticPreHudRenderHandler );
     g_pMultiplayer->SetAddAnimationHandler ( CClientGame::StaticAddAnimationHandler );
     g_pMultiplayer->SetBlendAnimationHandler ( CClientGame::StaticBlendAnimationHandler );
     g_pMultiplayer->SetProcessCollisionHandler ( CClientGame::StaticProcessCollisionHandler );
@@ -382,6 +384,8 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetPreWorldProcessHandler (  NULL );
     g_pMultiplayer->SetPostWorldProcessHandler (  NULL );
     g_pMultiplayer->SetIdleHandler ( NULL );
+    g_pMultiplayer->SetPreFxRenderHandler ( NULL );
+    g_pMultiplayer->SetPreHudRenderHandler ( NULL );
     g_pMultiplayer->SetAddAnimationHandler ( NULL );
     g_pMultiplayer->SetBlendAnimationHandler ( NULL );
     g_pMultiplayer->SetProcessCollisionHandler ( NULL );
@@ -3483,6 +3487,16 @@ void CClientGame::StaticPostWorldProcessHandler ( void )
 void CClientGame::StaticIdleHandler ( void )
 {
     g_pClientGame->IdleHandler ();
+}
+
+void CClientGame::StaticPreFxRenderHandler ( void )
+{
+    g_pCore->OnPreFxRender ();
+}
+
+void CClientGame::StaticPreHudRenderHandler ( void )
+{
+    g_pCore->OnPreHUDRender ();
 }
 
 bool CClientGame::StaticProcessCollisionHandler ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface )

@@ -302,6 +302,9 @@ DWORD RETURN_CHandlingData_isNotFWD =               0x6A04C3;
 #define CALL_CMonsterTruck_ProcessEntityCollision           0x6C8B9E
 DWORD RETURN_ProcessEntityCollision =                             0x4185C0;
 
+#define HOOKPOS_PreFxRender                                       0x049E650
+DWORD RETURN_PreFxRender =                                        0x0404D1E;
+
 #define HOOKPOS_PreHUDRender                                      0x053EAD8
 DWORD RETURN_PreHUDRender =                                       0x053EADD;
 
@@ -450,6 +453,8 @@ Render3DStuffHandler * m_pRender3DStuffHandler = NULL;
 PreWorldProcessHandler * m_pPreWorldProcessHandler = NULL;
 PostWorldProcessHandler * m_pPostWorldProcessHandler = NULL;
 IdleHandler * m_pIdleHandler = NULL;
+PreFxRenderHandler * m_pPreFxRenderHandler = NULL;
+PreHudRenderHandler * m_pPreHudRenderHandler = NULL;
 AddAnimationHandler* m_pAddAnimationHandler = NULL;
 BlendAnimationHandler* m_pBlendAnimationHandler = NULL;
 ProcessCollisionHandler* m_pProcessCollisionHandler = NULL;
@@ -543,7 +548,8 @@ void HOOK_VehColCB ();
 void HOOK_VehCol ();
 void HOOK_isVehDriveTypeNotRWD ();
 void HOOK_isVehDriveTypeNotFWD ();
-void HOOK_PreHUDRender();
+void HOOK_PreFxRender ();
+void HOOK_PreHUDRender ();
 
 void HOOK_CTrafficLights_GetPrimaryLightState ();
 void HOOK_CTrafficLights_GetSecondaryLightState ();
@@ -765,6 +771,7 @@ void CMultiplayerSA::InitHooks()
 
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29 );
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9 );
+    HookInstall(HOOKPOS_PreFxRender, (DWORD)HOOK_PreFxRender, 5 );
     HookInstall(HOOKPOS_PreHUDRender, (DWORD)HOOK_PreHUDRender, 5 );
     HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7 );
     HookInstall(HOOKPOS_LoadingPlayerImgDir, (DWORD)HOOK_LoadingPlayerImgDir, 5 );
@@ -2124,6 +2131,16 @@ void CMultiplayerSA::SetPostWorldProcessHandler ( PostWorldProcessHandler * pHan
 void CMultiplayerSA::SetIdleHandler ( IdleHandler * pHandler )
 {
     m_pIdleHandler = pHandler;
+}
+
+void CMultiplayerSA::SetPreFxRenderHandler ( PreFxRenderHandler * pHandler )
+{
+    m_pPreFxRenderHandler = pHandler;
+}
+
+void CMultiplayerSA::SetPreHudRenderHandler ( PreHudRenderHandler * pHandler )
+{
+    m_pPreHudRenderHandler = pHandler;
 }
 
 void CMultiplayerSA::SetAddAnimationHandler ( AddAnimationHandler * pHandler )
@@ -4582,6 +4599,52 @@ void _declspec(naked) HOOK_Idle ()
     }
 }
 
+
+// Hooked from 0049E650 5 bytes
+void _declspec(naked) HOOK_PreFxRender ()
+{
+    DWORD dwMode1;
+    DWORD dwMode2;
+    _asm
+    {
+        pushad
+        mov     eax,[esp+32+4*2]
+        cmp     eax,0
+        jne skip
+    }
+
+    if ( m_pPreFxRenderHandler )
+        m_pPreFxRenderHandler ();
+
+    _asm
+    {
+skip:
+        popad
+        jmp     RETURN_PreFxRender  // 00404D1E
+    }
+}
+
+
+// Hooked from 0053EAD8  5 bytes
+void _declspec(naked) HOOK_PreHUDRender ()
+{
+    _asm
+    {
+        pushad
+    }
+
+    if ( m_pPreHudRenderHandler )
+        m_pPreHudRenderHandler ();
+
+    _asm
+    {
+        popad
+        mov     eax, ds:0B6F0B8h
+        jmp     RETURN_PreHUDRender  // 0053EADD
+    }
+}
+
+
 // ---------------------------------------------------
 
 #define ENABLE_VEHICLE_HEADLIGHT_COLOR 1
@@ -6241,29 +6304,6 @@ void _declspec(naked) HOOK_ProcessVehicleCollision ()
             jmp dwSuspensionChangedJump
         }
     }    
-}
-
-
-void OnPreHUDRender ( void );
-
-void _declspec(naked) HOOK_PreHUDRender ()
-{
-    _asm
-    {
-        pushad
-    }
-        //call PreHUDRender
-    OnPreHUDRender ();
-
-    _asm
-    {
-        popad
-
-        // Hooked from 0053EAD8  5 bytes
-        mov     eax, ds:0B6F0B8h
-
-        jmp     RETURN_PreHUDRender  // 0053EADD
-    }
 }
 
 

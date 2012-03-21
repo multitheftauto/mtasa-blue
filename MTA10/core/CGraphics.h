@@ -26,6 +26,7 @@ class CGraphics;
 
 class CTileBatcher;
 class CLine3DBatcher;
+class CMaterialLine3DBatcher;
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
 
@@ -100,11 +101,23 @@ public:
                                                   unsigned long ulColor,
                                                   bool bPostGUI );
 
-    void                DrawLine3DQueued        ( const CVector& vecBegin,
-                                                  const CVector& vecEnd,
-                                                  float fWidth,
-                                                  unsigned long ulColor,
-                                                  bool bPostGUI );
+    void                DrawLine3DQueued       ( const CVector& vecBegin,
+                                                 const CVector& vecEnd,
+                                                 float fWidth,
+                                                 unsigned long ulColor,
+                                                 bool bPostGUI );
+
+    void                DrawMaterialLine3DQueued
+                                               ( const CVector& vecBegin,
+                                                 const CVector& vecEnd,
+                                                 float fWidth,
+                                                 unsigned long ulColor,
+                                                 CMaterialItem* pMaterial,
+                                                 float fU = 0, float fV = 0,
+                                                 float fSizeU = 1, float fSizeV = 1, 
+                                                 bool bRelativeUV = true,
+                                                 bool bUseFaceToward = false,
+                                                 const CVector& vecFaceToward = CVector () );
 
     void                DrawRectQueued          ( float fX, float fY,
                                                   float fWidth, float fHeight,
@@ -145,7 +158,9 @@ public:
     // To draw queued up drawings
     void                DrawPreGUIQueue         ( void );
     void                DrawPostGUIQueue        ( void );
-    
+    void                DrawMaterialLine3DQueue ( void );
+    bool                HasMaterialLine3DQueueItems ( void );
+
 private:
     void                OnDeviceCreate          ( IDirect3DDevice9 * pDevice );
     void                OnDeviceInvalidate      ( IDirect3DDevice9 * pDevice );
@@ -167,12 +182,13 @@ private:
 
     IDirect3DDevice9 *  m_pDevice;
 
-    CRenderItemManager* m_pRenderItemManager;
-    CScreenGrabberInterface* m_pScreenGrabber;
-    CPixelsManagerInterface* m_pPixelsManager;
-    CTileBatcher*       m_pTileBatcher;
-    CLine3DBatcher*     m_pLine3DBatcherPreGUI;
-    CLine3DBatcher*     m_pLine3DBatcherPostGUI;
+    CRenderItemManager*         m_pRenderItemManager;
+    CScreenGrabberInterface*    m_pScreenGrabber;
+    CPixelsManagerInterface*    m_pPixelsManager;
+    CTileBatcher*               m_pTileBatcher;
+    CLine3DBatcher*             m_pLine3DBatcherPreGUI;
+    CLine3DBatcher*             m_pLine3DBatcherPostGUI;
+    CMaterialLine3DBatcher*     m_pMaterialLine3DBatcher;
     bool                m_bSetRenderTargetEnabled;
 
     // Fonts

@@ -301,6 +301,15 @@ namespace SharedUtil
         itemList.insert( itemList.end(), other.begin(), other.end() );
     }
 
+    // Clear and reserve memory for the same size
+    template < class T >
+    void ListClearAndReserve ( std::vector < T >& itemList )
+    {
+        size_t prevSize = itemList.size ();
+        itemList.clear ();
+        itemList.reserve ( prevSize );
+    }
+
 
 
     //

@@ -81,3 +81,12 @@
 // Note: Struct should have simple member variables and no virtual functions.
 #define ZERO_POD_STRUCT(ptr) \
         memset ( ptr, 0, sizeof(*(ptr)) )
+
+// Inline callback definition for std::sort
+#define sort_inline(a,b,c) \
+        { \
+            struct local { \
+                static bool SortPredicate c \
+            }; \
+            std::sort ( a, b, local::SortPredicate ); \
+        }

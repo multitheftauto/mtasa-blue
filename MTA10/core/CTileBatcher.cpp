@@ -254,8 +254,9 @@ void CTileBatcher::Flush ( void )
         }
 
         // Clean up
-        m_Indices.clear ();
-        m_Vertices.clear ();
+        ListClearAndReserve ( m_Indices );
+        ListClearAndReserve ( m_Vertices );
+
         SetCurrentMaterial ( NULL );
         m_fCurrentRotation = 0;
         m_fCurrentRotCenX = 0;

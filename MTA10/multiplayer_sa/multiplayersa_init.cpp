@@ -56,11 +56,6 @@ void MemCpy ( void* dwDest, const void* dwSrc, uint uiAmount )
     memcpy ( dwDest, dwSrc, uiAmount );
 }
 
-void OnPreHUDRender ( void )
-{
-    g_pCore->OnPreHUDRender ();  
-}
-
 void OnCrashAverted ( uint uiId )
 {
     g_pCore->OnCrashAverted ( uiId );  
