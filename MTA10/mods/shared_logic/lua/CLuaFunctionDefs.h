@@ -502,8 +502,8 @@ public:
     // Drawing funcs (low-level)
     LUA_DECLARE ( dxDrawLine );
     LUA_DECLARE ( dxDrawLine3D );
-    LUA_DECLARE ( dxDrawLine3DImage );
-    LUA_DECLARE ( dxDrawLine3DImageSection );
+    LUA_DECLARE ( dxDrawMaterialLine3D );
+    LUA_DECLARE ( dxDrawMaterialSectionLine3D );
     LUA_DECLARE ( dxDrawText );
     LUA_DECLARE ( dxDrawRectangle );
     LUA_DECLARE ( dxDrawImage );

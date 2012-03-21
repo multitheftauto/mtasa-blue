@@ -79,9 +79,9 @@ int CLuaFunctionDefs::dxDrawLine3D ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::dxDrawLine3DImage ( lua_State* luaVM )
+int CLuaFunctionDefs::dxDrawMaterialLine3D ( lua_State* luaVM )
 {
-// bool dxDrawLine3DImage ( float startX, float startY, float startZ, float endX, float endY, float endZ, element material, int width [, int color = white,
+// bool dxDrawMaterialLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, element material, int width [, int color = white,
 //                          float faceX, float faceY, float faceZ ] )
     CVector vecBegin; CVector vecEnd; CClientMaterial* pMaterial; float fWidth; uint ulColor;
     CVector vecFaceToward; bool bUseFaceToward = false;
@@ -111,7 +111,7 @@ int CLuaFunctionDefs::dxDrawLine3DImage ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawLine3DImage", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawMaterialLine3D", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -119,9 +119,9 @@ int CLuaFunctionDefs::dxDrawLine3DImage ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::dxDrawLine3DImageSection ( lua_State* luaVM )
+int CLuaFunctionDefs::dxDrawMaterialSectionLine3D ( lua_State* luaVM )
 {
-// bool dxDrawLine3DImageSection ( float startX, float startY, float startZ, float endX, float endY, float endZ, float u, float v, float usize, float vsize,
+// bool dxDrawMaterialSectionLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, float u, float v, float usize, float vsize,
 //                                  element material, int width, [ int color = white, float faceX, float faceY, float faceZ ] )
     CVector vecBegin; CVector vecEnd; float fU; float fV; float fSizeU; float fSizeV;
     CClientMaterial* pMaterial; float fWidth; uint ulColor; CVector vecFaceToward; bool bUseFaceToward = false;
@@ -155,7 +155,7 @@ int CLuaFunctionDefs::dxDrawLine3DImageSection ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawLine3DImageSection", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawMaterialSectionLine3D", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
