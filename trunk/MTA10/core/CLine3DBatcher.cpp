@@ -53,20 +53,6 @@ void CLine3DBatcher::OnDeviceCreate ( IDirect3DDevice9* pDevice, float fViewport
 
 ////////////////////////////////////////////////////////////////
 //
-// CLine3DBatcher::OnRenderTargetChange
-//
-//
-//
-////////////////////////////////////////////////////////////////
-void CLine3DBatcher::OnChangingRenderTarget ( uint uiNewViewportSizeX, uint uiNewViewportSizeY )
-{
-    // Flush dx draws
-    Flush ();
-}
-
-
-////////////////////////////////////////////////////////////////
-//
 // CLine3DBatcher::Flush
 //
 // Send all buffered vertices to D3D

@@ -79,6 +79,90 @@ int CLuaFunctionDefs::dxDrawLine3D ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::dxDrawLine3DImage ( lua_State* luaVM )
+{
+// bool dxDrawLine3DImage ( float startX, float startY, float startZ, float endX, float endY, float endZ, element material, int width [, int color = white,
+//                          float faceX, float faceY, float faceZ ] )
+    CVector vecBegin; CVector vecEnd; CClientMaterial* pMaterial; float fWidth; uint ulColor;
+    CVector vecFaceToward; bool bUseFaceToward = false;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( vecBegin.fX );
+    argStream.ReadNumber ( vecBegin.fY );
+    argStream.ReadNumber ( vecBegin.fZ );
+    argStream.ReadNumber ( vecEnd.fX );
+    argStream.ReadNumber ( vecEnd.fY );
+    argStream.ReadNumber ( vecEnd.fZ );
+    argStream.ReadUserData ( pMaterial );
+    argStream.ReadNumber ( fWidth );
+    argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
+    if ( argStream.NextCouldBeNumber () )
+    {
+        argStream.ReadNumber ( vecFaceToward.fX );
+        argStream.ReadNumber ( vecFaceToward.fY );
+        argStream.ReadNumber ( vecFaceToward.fZ );
+        bUseFaceToward = true;
+    }
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pCore->GetGraphics ()->DrawMaterialLine3DQueued ( vecBegin, vecEnd, fWidth, ulColor, pMaterial->GetMaterialItem (), 0, 0, 1, 1, true, bUseFaceToward, vecFaceToward );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawLine3DImage", *argStream.GetErrorMessage () ) );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxDrawLine3DImageSection ( lua_State* luaVM )
+{
+// bool dxDrawLine3DImageSection ( float startX, float startY, float startZ, float endX, float endY, float endZ, float u, float v, float usize, float vsize,
+//                                  element material, int width, [ int color = white, float faceX, float faceY, float faceZ ] )
+    CVector vecBegin; CVector vecEnd; float fU; float fV; float fSizeU; float fSizeV;
+    CClientMaterial* pMaterial; float fWidth; uint ulColor; CVector vecFaceToward; bool bUseFaceToward = false;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( vecBegin.fX );
+    argStream.ReadNumber ( vecBegin.fY );
+    argStream.ReadNumber ( vecBegin.fZ );
+    argStream.ReadNumber ( vecEnd.fX );
+    argStream.ReadNumber ( vecEnd.fY );
+    argStream.ReadNumber ( vecEnd.fZ );
+    argStream.ReadNumber ( fU );
+    argStream.ReadNumber ( fV );
+    argStream.ReadNumber ( fSizeU );
+    argStream.ReadNumber ( fSizeV );
+    argStream.ReadUserData ( pMaterial );
+    argStream.ReadNumber ( fWidth );
+    argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
+    if ( argStream.NextCouldBeNumber () )
+    {
+        argStream.ReadNumber ( vecFaceToward.fX );
+        argStream.ReadNumber ( vecFaceToward.fY );
+        argStream.ReadNumber ( vecFaceToward.fZ );
+        bUseFaceToward = true;
+    }
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pCore->GetGraphics ()->DrawMaterialLine3DQueued ( vecBegin, vecEnd, fWidth, ulColor, pMaterial->GetMaterialItem (), fU, fV, fSizeU, fSizeV, false, bUseFaceToward, vecFaceToward );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawLine3DImageSection", *argStream.GetErrorMessage () ) );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
 {
 //  bool dxDrawText ( string text, int left, int top [, int right=left, int bottom=top, int color=white, float scale=1, mixed font="default", 

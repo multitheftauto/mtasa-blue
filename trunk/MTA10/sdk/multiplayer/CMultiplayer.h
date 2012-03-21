@@ -43,6 +43,8 @@ typedef bool ( ChokingHandler ) ( unsigned char ucWeaponType );
 typedef void ( PreWorldProcessHandler ) ( void );
 typedef void ( PostWorldProcessHandler ) ( void );
 typedef void ( IdleHandler ) ( void );
+typedef void ( PreFxRenderHandler ) ( void );
+typedef void ( PreHudRenderHandler ) ( void );
 typedef void ( AddAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
 typedef void ( BlendAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
 typedef bool ( ProcessCollisionHandler ) ( class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface );
@@ -135,6 +137,8 @@ public:
     virtual void                        SetPreWorldProcessHandler   ( PreWorldProcessHandler * pHandler ) = 0;
     virtual void                        SetPostWorldProcessHandler  ( PostWorldProcessHandler * pHandler ) = 0;
     virtual void                        SetIdleHandler              ( IdleHandler * pHandler ) = 0;
+    virtual void                        SetPreFxRenderHandler       ( PreFxRenderHandler * pHandler ) = 0;
+    virtual void                        SetPreHudRenderHandler      ( PreHudRenderHandler * pHandler ) = 0;
     virtual void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler ) = 0;
     virtual void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler ) = 0;
     virtual void                        SetProcessCollisionHandler  ( ProcessCollisionHandler * pHandler ) = 0;
