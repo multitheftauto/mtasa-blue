@@ -3000,7 +3000,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         //pEntry->SetTailLight ( (CHandlingEntry::eLightType)handling.data.ucTailLight );
                         //pEntry->SetAnimGroup ( handling.data.ucAnimGroup );
                     }
-                    if ( bitStream.Version ( ) >= 0x02B )
+                    if ( bitStream.Version ( ) >= 0x02A )
                     {
                         SVehicleSirenSync sirenData;
                         bitStream.Read ( &sirenData );

@@ -480,7 +480,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     else
                         BitStream.WriteBit ( false );
 
-                    if ( BitStream.Version ( ) >= 0x02B )
+                    if ( BitStream.Version ( ) >= 0x02A )
                     {
                         SVehicleSirenSync syncData;
                         syncData.data.m_bOverrideSirens =  pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens;
