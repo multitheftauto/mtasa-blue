@@ -1986,6 +1986,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CResourceChecker.Data.h"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CResourceChecker.h"
 					>
 				</File>

@@ -449,6 +449,8 @@ private:
     static void                         StaticPreWorldProcessHandler    ( void );
     static void                         StaticPostWorldProcessHandler   ( void );
     static void                         StaticIdleHandler               ( void );
+    static void                         StaticPreFxRenderHandler        ( void );
+    static void                         StaticPreHudRenderHandler       ( void );
     static void                         StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     static void                         StaticBlendAnimationHandler     ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     static bool                         StaticProcessCollisionHandler   ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );

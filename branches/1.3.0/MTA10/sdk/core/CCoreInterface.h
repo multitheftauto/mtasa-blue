@@ -127,6 +127,7 @@ public:
     virtual void                    ApplyFrameRateLimit             ( uint uiOverrideRate = -1 ) = 0;
     virtual void                    EnsureFrameRateLimitApplied     ( void ) = 0;
 
+    virtual void                    OnPreFxRender                   ( void ) = 0;
     virtual void                    OnPreHUDRender                  ( void ) = 0;
     virtual uint                    GetMinStreamingMemory           ( void ) = 0;
     virtual uint                    GetMaxStreamingMemory           ( void ) = 0;

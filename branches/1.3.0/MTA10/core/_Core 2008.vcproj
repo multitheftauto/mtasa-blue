@@ -509,6 +509,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMaterialLine3DBatcher.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CMessageLoopHook.cpp"
 				>
 			</File>
@@ -939,6 +943,10 @@
 			</File>
 			<File
 				RelativePath=".\CMainMenuScene.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CMaterialLine3DBatcher.h"
 				>
 			</File>
 			<File
