@@ -61,6 +61,10 @@ namespace
                                          { "setObjectBreakable",        "1.3.0-9.03783" },
                                          { "onClientPedHeliKilled",     "1.3.0-9.03893" },
                                          { "onClientPlayerHeliKilled",  "1.3.0-9.03893" },
+                                         { "onClientPlayerHitByWaterCannon","1.3.0-9.03931" },
+                                         { "onClientPedHitByWaterCannon",   "1.3.0-9.03931" },
+                                         { "dxDrawMaterialLine3D",          "1.3.0-9.03931" },
+                                         { "dxDrawMaterialSectionLine3D",   "1.3.0-9.03931" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
@@ -98,6 +102,8 @@ namespace
                                          { "getLatentEventHandles",     "1.3.0-9.03772" },
                                          { "getLatentEventStatus",      "1.3.0-9.03772" },
                                          { "cancelLatentEvent",         "1.3.0-9.03772" },
+                                         { "reloadBans",                "1.3.0-9.03931" },
+                                         { "getAllAccountData",         "1.3.0-9.03931" },
                                         };
 
 
