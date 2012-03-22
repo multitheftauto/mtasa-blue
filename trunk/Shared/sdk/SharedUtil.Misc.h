@@ -766,8 +766,8 @@ namespace SharedUtil
     class CMappedArray : public CMappedContainer < T, std::vector < T > >
     {
     public:
-        const T& operator[] ( int idx ) const   { return m_List[idx]; }
-        T& operator[] ( int idx )               { return m_List[idx]; }
+        const T& operator[] ( int idx ) const   { return CMappedContainer < T, std::vector < T > >::m_List[idx]; }
+        T& operator[] ( int idx )               { return CMappedContainer < T, std::vector < T > >::m_List[idx]; }
     };
 
 
