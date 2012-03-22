@@ -735,6 +735,8 @@ public:
     void                        SetVehicleSirenColour           ( unsigned char ucSirenID, SColor tVehicleSirenColour )  { m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour; }
     void                        SetVehicleCurrentSirenID        ( unsigned char ucCurrentSirenID )  { m_tSirenInfo.m_ucCurrentSirenID = ucCurrentSirenID; }
     unsigned char               GetVehicleCurrentSirenID        ( void )  { return m_tSirenInfo.m_ucCurrentSirenID; }
+    unsigned char               GetSirenRandomiser              ( void )  { return m_tSirenInfo.m_ucCurrentSirenRandomiser; }
+    void                        SetSirenRandomiser              ( unsigned char ucSirenRandomiser )  { m_tSirenInfo.m_ucCurrentSirenRandomiser = ucSirenRandomiser; }
 
 private:
     void                        RecalculateSuspensionLines          ( void );

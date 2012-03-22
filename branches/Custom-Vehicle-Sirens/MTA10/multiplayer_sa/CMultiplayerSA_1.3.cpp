@@ -96,6 +96,7 @@ DWORD dwSirenTypePostHook = 0;
 
 bool DoesVehicleHaveSiren ( )
 {
+    // Static function to check if the vehicle has sirens natively if so we ignore those for now
     return ( pVehicleWithTheSiren->m_nModelIndex == 596 || pVehicleWithTheSiren->m_nModelIndex == 597 ||
         pVehicleWithTheSiren->m_nModelIndex == 598 || pVehicleWithTheSiren->m_nModelIndex == 599 ||
 
@@ -109,24 +110,35 @@ void GetVehicleSirenType ( )
 {
     if ( DoesVehicleHaveSiren ( ) )
     {
+        // QUICK RUN
         return;
     }
+    // Valid?
     if ( pVehicleWithTheSiren )
     {
+        // Grab the CVehicle
         CVehicle * pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)pVehicleWithTheSiren );
+        // Valid ? I see a pattern here!
         if ( pVehicle )
         {
+            // Get the vehicles siren type (dual or single and the default colours such as red/yellow for fire truck or red/blue for the police car)
+            // in SA the siren type also defines position so we totally ignore that.
             DWORD dwVehicleSirenType = pVehicle->GetVehicleSirenType ( );
-            if ( dwVehicleSirenType >= 1 && dwVehicleSirenType <= 2 )
+            // siren type's 1 and 2 are single
+            if ( dwVehicleSirenType == 1 || dwVehicleSirenType == 2 )
             {
                 // Single Sirens
                 dwSirenType = ++dwVehicleSirenType;
+                // dual are off
                 dwSirenType2 = 5;
             }
             else
             {
+                // set the siren type minus 2 to account for the two dual sirens
                 dwVehicleSirenType -= 2;
+                // diable singles
                 dwSirenType = 0;
+                // dual are now on
                 dwSirenType2 = dwVehicleSirenType;
             }
         }
@@ -137,55 +149,87 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( )
     _asm
     {
         pushad
-            movzx edx, byte ptr [edi+6ACCD0h]
+        // Grab our original siren type
+        movzx edx, byte ptr [edi+6ACCD0h]
+        // Put it into dwSirenType
         mov dwSirenType, edx
-            mov pVehicleWithTheSiren, esi
+        // Grab our siren vehicle
+        mov pVehicleWithTheSiren, esi
     }
+    // Call our Get siren type function which edits dwSirenType to our desired type
     GetVehicleSirenType ( );
     _asm
     {
         popad
-            mov edx, dwSirenType
-            JMP RETN_CVehicle_ProcessStuff_TestSirenTypeSingle
+        // put our new siren type into edx or old one for default/no sirens
+        mov edx, dwSirenType
+        // Jump back to the original code
+        JMP RETN_CVehicle_ProcessStuff_TestSirenTypeSingle
     }
 }
 
-void ProcessVehicleSirenPosition ( )
+bool ProcessVehicleSirenPosition ( )
 {
+    // Disable our original siren based vehicles from this hook
     if ( DoesVehicleHaveSiren ( ) )
     {
-        bContinue = false;
-        return;
+        // return false so our hook knows we decided not to edit anything
+        return false;
     }
-    bContinue = true;
+    // Valid interface
     if ( pVehicleWithTheSiren )
     {
+        // Grab our vehicle from the interface
         CVehicle * pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)pVehicleWithTheSiren );
+        // Valid - Wait this seems familiar
         if ( pVehicle )
         {
+            // Does the vehicle have sirens and is the siren count greater than 0 
             if ( pVehicle->DoesVehicleHaveSirens ( ) && pVehicle->GetVehicleSirenCount ( ) >= 0 )
             {
+                // Get our siren count
                 unsigned char ucVehicleSirenCount = pVehicle->GetVehicleSirenCount ( );
+                // Get our current Siren ID
                 ucSirenCount = pVehicle->GetVehicleCurrentSirenID ( );
+                // Make sure we aren't beyond our limit
                 if ( ucSirenCount > ucVehicleSirenCount )
                 {
-                    ucSirenCount = ucRandomiser;
+                    // Get our randomiser
+                    ucSirenCount = pVehicle->GetSirenRandomiser ( );
+                    // if we have more than 1 sirens
                     if ( ucVehicleSirenCount > 0 )
+                        // Set our Randomiser
                         ucRandomiser = rand () % pVehicle->GetVehicleSirenCount ( );
                     else
+                        // Set our Randomiser
                         ucRandomiser = 0;
+                    // Update our stored Randomiser
+                    pVehicle->SetSirenRandomiser ( ucRandomiser );
                 }
+                else
+                {
+                    // Set our Randomiser
+                    ucRandomiser = rand () % pVehicle->GetVehicleSirenCount ( );
+                    // Update our stored Randomiser
+                    pVehicle->SetSirenRandomiser ( ucRandomiser );
+                }
+                // Gete our siren position for this siren count
                 pVehicle->GetVehicleSirenPosition ( ucSirenCount, *vecRelativeSirenPosition );
+                // Storage 'n stuff
                 CMatrix matCamera;
                 CMatrix matVehicle;
+                // Grab our vehicle matrix
                 pVehicle->GetMatrix( &matVehicle );
 
+                // Get our Camera
                 CCamera* pCamera = pGameInterface->GetCamera ();
+                // Get the Camera Matrix
                 pCamera->GetMatrix( &matCamera );
 
-
+                // Get our sirens ACTUAL position from the relative value
                 CVector vecSirenPosition = matVehicle.TransformVector ( *vecRelativeSirenPosition );
 
+                // Setup our LOS flags
                 SLineOfSightFlags flags;
                 flags.bCheckBuildings = false;
                 flags.bCheckDummies = false;
@@ -195,62 +239,83 @@ void ProcessVehicleSirenPosition ( )
                 flags.bIgnoreSomeObjectsForCamera = false;
                 flags.bSeeThroughStuff = false;
                 flags.bShootThroughStuff = false;
+                // Ignore nothing
                 pGameInterface->GetWorld()->IgnoreEntity ( NULL );
+                // Variables 'n tings
                 CColPoint* pColPoint = NULL;
                 CEntity* pGameEntity = NULL;
+                // Check if we can see it
                 if ( pGameInterface->GetWorld()->ProcessLineOfSight( &matCamera.vPos, &vecSirenPosition, &pColPoint, &pGameEntity, flags ) == true )
                 {
+                    // Nope? Invisible
                     dwRed = 0;
                     dwGreen = 0;
                     dwBlue = 0;
                 }
                 else
                 {
+                    // Yep?
+                    // Set our time based alpha to 10% of the current time float
                     fTime = *((float*)0xB7C4E4) * 0.1f;
+                    // Get our minimum alpha
                     float fMinimumAlpha = pVehicle->GetVehicleSirenMinimumAlpha ( ucSirenCount );
+                    // if our time is less than or equal to the minimum alpha
                     if ( fTime <= fMinimumAlpha )
                     {
+                        // Set it to the minimum
                         fTime = fMinimumAlpha;
                     }
+                    // Get our Siren RGB Colour
                     SColor tSirenColour = pVehicle->GetVehicleSirenColour ( ucSirenCount );
-
+                    // times the R,G and B components by the fTime variable ( to get our time based brightness )
                     dwRed = (DWORD)( tSirenColour.R * fTime );
                     dwGreen = (DWORD)( tSirenColour.G * fTime );
                     dwBlue = (DWORD)( tSirenColour.B * fTime );
                 }
+                // Set our current Siren ID after we increment it
                 pVehicle->SetVehicleCurrentSirenID ( ++ucSirenCount );
             }
         }
     }
+    // Return true
+    return true;
 }
 
 void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( )
 {
     _asm
     {
+        // Get our siren position into edx
         lea edx, [esp+64h]
         pushad
-            mov pVehicleWithTheSiren, esi
-            mov vecRelativeSirenPosition, edx
+        // Grab our siren vehicle
+        mov pVehicleWithTheSiren, esi
+        // Put edx into our position variable
+        mov vecRelativeSirenPosition, edx
     }
+    // Call our main siren Process function
     ProcessVehicleSirenPosition ( );
     _asm
     {
         popad
-            push edx
-            JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionSingle
+        // push our siren position
+        push edx
+        // return back to SA
+        JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionSingle
     }
 }
 
 void TestSirenTypeDualDefaultFix ( )
 {
+    // if we have a siren normally
     if ( DoesVehicleHaveSiren ( ) )
     {
+        // Set our siren type to the post hook value
         dwSirenType2 = dwSirenTypePostHook;
-        return;
     }
     else
     {
+        // Set our siren type to the stored value
         GetVehicleSirenType ( );
     }
 }
@@ -258,17 +323,23 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeDual ( )
 {
     _asm
     {
+        // Grab our default siren type into edi 
         movzx edi, byte ptr ds:[edi+06ACDACh]
         pushad
-            mov pVehicleWithTheSiren, esi
-            mov dwSirenTypePostHook, edi
+        // Store our Vehicle interface
+        mov pVehicleWithTheSiren, esi
+        // Store our post hook default siren type
+        mov dwSirenTypePostHook, edi
     }
+    // Do our test and edit dwSirenType2 appropriately
     TestSirenTypeDualDefaultFix ( );
     _asm
     {
         popad
-            mov edi, dwSirenType2
-            JMP RETN_CVehicle_ProcessStuff_TestSirenTypeDual
+        // Move dwSirenType into edi
+        mov edi, dwSirenType2
+        // Return back to SA
+        JMP RETN_CVehicle_ProcessStuff_TestSirenTypeDual
     }
 }
 
@@ -276,27 +347,34 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed ( 
 {
     _asm
     {
+        // Grab our siren position vector
         lea eax,[esp+130h]
         pushad
-            mov pVehicleWithTheSiren, esi
-            mov vecRelativeSirenPosition, eax
+        // Grab our vehicle interface
+        mov pVehicleWithTheSiren, esi
+        // move our position vector pointer into our position variable
+        mov vecRelativeSirenPosition, eax
     }
-    ProcessVehicleSirenPosition ( );
-    if ( bContinue )
-    {
 
+    // Call our main process siren function
+    if ( ProcessVehicleSirenPosition ( ) )
+    {
         _asm
         {
             popad
-                push eax
-                mov eax, dwRed // Red
-                mov ecx, dwBlue // Blue
-                mov edx, dwGreen // Green
-                push 0FFh
-                push ecx
-                push edx
-                push eax
-                JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual1
+            // Push our position
+            push eax
+            // move our R,G,B components into registers
+            mov eax, dwRed // Red
+            mov edx, dwGreen // Green
+            mov ecx, dwBlue // Blue
+            push 0FFh
+            // Push our R,G,B components (inverse order)
+            push ecx
+            push edx
+            push eax
+            // Return control
+            JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual1
         }
     }
     else
@@ -304,13 +382,17 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed ( 
         _asm
         {
             popad
-                push eax
-                mov eax, DWORD PTR SS:[esp+8Ch]
+            // Push our position
+            push eax
+            // move our red component into eax (you'l notice eax is used above so we are just giving it a value first)
+            mov eax, DWORD PTR SS:[esp+8Ch]
             push 0FFh
-                push ecx
-                push edx
-                push eax
-                JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual1
+            // Push our R,G,B components (inverse order)
+            push ecx
+            push edx
+            push eax
+            // Return control
+            JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual1
         }
     }
 }
@@ -319,27 +401,34 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue (
 {
     _asm
     {
+        // Grab our siren position vector
         lea eax, [esp+130h]
         pushad
-            mov pVehicleWithTheSiren, esi
-            mov vecRelativeSirenPosition, eax
+        // Grab our vehicle interface
+        mov pVehicleWithTheSiren, esi
+        // move our position vector pointer into our position variable
+        mov vecRelativeSirenPosition, eax
     }
-    ProcessVehicleSirenPosition ( );
-    if ( bContinue )
+
+    // Call our main process siren function
+    if ( ProcessVehicleSirenPosition ( ) )
     {
         _asm
         {
             popad
-                push eax
-                mov ecx, dwBlue // Blue
-                mov edx, dwGreen // Green
-                mov ebp, dwRed // Red
-                push 0FFh
-                push ecx
-                push edx
-                push ebp
-
-                JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual2
+            // Push our position
+            push eax
+            // move our R,G,B components into registers
+            mov ecx, dwBlue // Blue
+            mov edx, dwGreen // Green
+            mov ebp, dwRed // Red
+            push 0FFh
+            // Push our R,G,B components (inverse order)
+            push ecx
+            push edx
+            push ebp
+            // Return control
+            JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual2
         }
     }
     else
@@ -347,45 +436,51 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue (
         _asm
         {
             popad
-                push eax
-                push 0FFh
-                push ecx
-                push edx
-                push ebp
-
-                JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual2
+            // Push our position
+            push eax
+            push 0FFh
+            // Push our R,G,B components (inverse order)
+            push ecx
+            push edx
+            push ebp
+            // Return control
+            JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual2
         }
     }
 }
 
-void TestVehicleForSiren ( )
+bool TestVehicleForSiren ( )
 {
+    // Grab our vehicle
     CVehicle * pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)pVehicleWithTheSiren );
+    // Is it valid and it doesn't have a siren by default
     if ( pVehicle && DoesVehicleHaveSiren ( ) == false )
     {
-        bSiren = pVehicle->DoesVehicleHaveSirens ( );
-        return;
+        // Return our stored siren state
+        return pVehicle->DoesVehicleHaveSirens ( );
     }
-    bSiren = true;
-    return;
+    // Return true here for default vehicles
+    return true;
 }
 
 void _declspec(naked) HOOK_CVehicle_DoesVehicleUseSiren ( )
 {
     _asm
     {
-        pushad  
-            mov pVehicleWithTheSiren, ecx
+        pushad
+        // Grab our vehicle interface
+        mov pVehicleWithTheSiren, ecx
     }
-
-    TestVehicleForSiren ( );
-    if ( bSiren )
+    // Test our vehicle for sirens
+    if ( TestVehicleForSiren ( ) )
     {
         _asm
         {
-            popad   
-                mov al, 1
-                jmp RETN_CVehicleDoesVehicleUseSirenRetn
+            popad 
+            // Move 1 into AL (true)
+            mov al, 1
+            // Return
+            jmp RETN_CVehicleDoesVehicleUseSirenRetn
         }
     }
     else
@@ -393,8 +488,10 @@ void _declspec(naked) HOOK_CVehicle_DoesVehicleUseSiren ( )
         _asm
         {
             popad
-                xor al, al
-                jmp RETN_CVehicleDoesVehicleUseSirenRetn
+            // xor AL (false)
+            xor al, al
+            // Return
+            jmp RETN_CVehicleDoesVehicleUseSirenRetn
         }
     }
 }
@@ -423,20 +520,20 @@ void _declspec(naked) HOOK_CEventHitByWaterCannon ( )
     _asm
     {
         pushad
-            // EDX = CWaterCannon
-            // EDX+0h = CVehicle Owner
-            // ESI = CPed Hit
-            mov eax, [edx]
+        // EDX = CWaterCannon
+        // EDX+0h = CVehicle Owner
+        // ESI = CPed Hit
+        mov eax, [edx]
         mov pPedHitByWaterCannonInterface, esi
-            mov pVehicleWithTheCannonMounted, eax
+        mov pVehicleWithTheCannonMounted, eax
     }
     if ( TriggerTheEvent() )
     {
         _asm
         {
             popad
-                // Cancel.
-                jmp RETURN_CWaterCannon_PushPeds_RETN_Cancel
+            // Cancel.
+            jmp RETURN_CWaterCannon_PushPeds_RETN_Cancel
         }
     }
     else
@@ -444,14 +541,14 @@ void _declspec(naked) HOOK_CEventHitByWaterCannon ( )
         _asm
         {
             popad
-                // Replaced code
-                push ebp
-                push ecx
-                lea ecx, [esp+0B0h]
+            // Replaced code
+            push ebp
+            push ecx
+            lea ecx, [esp+0B0h]
             // Call our function
             call CALL_CEventHitByWaterCannon
-                // Go back to execution
-                jmp RETURN_CWaterCannon_PushPeds_RETN
+            // Go back to execution
+            jmp RETURN_CWaterCannon_PushPeds_RETN
         }
     }
 }
