@@ -302,8 +302,10 @@ DWORD RETURN_CHandlingData_isNotFWD =               0x6A04C3;
 #define CALL_CMonsterTruck_ProcessEntityCollision           0x6C8B9E
 DWORD RETURN_ProcessEntityCollision =                             0x4185C0;
 
-#define HOOKPOS_PreFxRender                                       0x049E650
-DWORD RETURN_PreFxRender =                                        0x0404D1E;
+#define HOOKPOS_PreFxRender                                     0x049E650
+DWORD RETURN_PreFxRender_US =                                   0x0404D1E;
+DWORD RETURN_PreFxRender_EU =                                   0x0405855;
+DWORD RETURN_PreFxRender_BOTH =                                 0;
 
 #define HOOKPOS_PreHUDRender                                      0x053EAD8
 DWORD RETURN_PreHUDRender =                                       0x053EADD;
@@ -744,6 +746,7 @@ void CMultiplayerSA::InitHooks()
         RETURN_CheckAnimMatrix_BOTH = RETURN_CheckAnimMatrix_US;
         RETURN_CStreamingLoadRequestedModelsa_BOTH = RETURN_CStreamingLoadRequestedModelsa_US;
         RETURN_CStreamingLoadRequestedModelsb_BOTH = RETURN_CStreamingLoadRequestedModelsb_US;
+        RETURN_PreFxRender_BOTH = RETURN_PreFxRender_US;
     }
     if ( version == VERSION_EU_10 )
     {
@@ -762,6 +765,7 @@ void CMultiplayerSA::InitHooks()
         RETURN_CheckAnimMatrix_BOTH = RETURN_CheckAnimMatrix_EU;
         RETURN_CStreamingLoadRequestedModelsa_BOTH = RETURN_CStreamingLoadRequestedModelsa_EU;
         RETURN_CStreamingLoadRequestedModelsb_BOTH = RETURN_CStreamingLoadRequestedModelsb_EU;
+        RETURN_PreFxRender_BOTH = RETURN_PreFxRender_EU;
     }
     HookInstall(HOOKPOS_CrashFix_Misc16, (DWORD)HOOK_CrashFix_Misc16, 6 );
     HookInstall(HOOKPOS_CrashFix_Misc18, (DWORD)HOOK_CrashFix_Misc18, 7 );
@@ -4627,7 +4631,7 @@ void _declspec(naked) HOOK_PreFxRender ()
     {
 skip:
         popad
-        jmp     RETURN_PreFxRender  // 00404D1E
+        jmp     RETURN_PreFxRender_BOTH  // 00404D1E / 00405855
     }
 }
 
