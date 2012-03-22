@@ -4607,8 +4607,6 @@ void _declspec(naked) HOOK_Idle ()
 // Hooked from 0049E650 5 bytes
 void _declspec(naked) HOOK_PreFxRender ()
 {
-    DWORD dwMode1;
-    DWORD dwMode2;
     _asm
     {
         pushad
