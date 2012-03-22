@@ -551,6 +551,12 @@ void CGraphics::DrawMaterialLine3DQueued ( const CVector& vecBegin,
     if ( g_pCore->IsWindowMinimized () )
         return;
 
+    if ( CShaderItem* pShaderItem = DynamicCast < CShaderItem >( pMaterial ) )
+    {
+        // If material is a shader, use its current instance
+        pMaterial = pShaderItem->m_pShaderInstance;
+    }
+
     // Add it to the queue
     m_pMaterialLine3DBatcher->AddLine3D ( vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bUseFaceToward, vecFaceToward ); 
 }
