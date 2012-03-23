@@ -598,9 +598,9 @@ void CVehicleRPCs::GiveVehicleSirens ( CClientEntity* pSourceEntity, NetBitStrea
         if ( sirenData.data.m_ucSirenCount >= 0 )
         {
             pVehicle->GiveVehicleSirens( sirenData.data.m_ucSirenType, sirenData.data.m_ucSirenCount );
-            pVehicle->SetVehicleSirenPosition ( sirenData.data.m_ucSirenID, sirenData.data.m_vecSirenPositions[ sirenData.data.m_ucSirenID ] );
-            pVehicle->SetVehicleSirenMinimumAlpha ( sirenData.data.m_ucSirenID, sirenData.data.m_fSirenMinAlpha[ sirenData.data.m_ucSirenID ] );
-            pVehicle->SetVehicleSirenColour ( sirenData.data.m_ucSirenID, sirenData.data.m_colSirenColour[ sirenData.data.m_ucSirenID ] );
+            pVehicle->SetVehicleSirenPosition ( sirenData.data.m_ucSirenID, sirenData.data.m_vecSirenPositions );
+            pVehicle->SetVehicleSirenMinimumAlpha ( sirenData.data.m_ucSirenID, sirenData.data.m_fSirenMinAlpha );
+            pVehicle->SetVehicleSirenColour ( sirenData.data.m_ucSirenID, sirenData.data.m_colSirenColour );
         }
     }
 }

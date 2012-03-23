@@ -4745,9 +4745,9 @@ bool CStaticFunctionDefinitions::GiveVehicleSirens( CVehicle* pVehicle, unsigned
     tSirenSync.data.m_bOverrideSirens =  pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens;
     tSirenSync.data.m_ucSirenCount =  pVehicle->m_tSirenBeaconInfo.m_ucSirenCount;
     tSirenSync.data.m_ucSirenType =  pVehicle->m_tSirenBeaconInfo.m_ucSirenType;
-    tSirenSync.data.m_vecSirenPositions[ ucSirenID ] = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions;
-    tSirenSync.data.m_colSirenColour[ ucSirenID ] = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour;
-    tSirenSync.data.m_fSirenMinAlpha[ ucSirenID ] = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ].m_fMinSirenAlpha;
+    tSirenSync.data.m_vecSirenPositions = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions;
+    tSirenSync.data.m_colSirenColour = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour;
+    tSirenSync.data.m_fSirenMinAlpha = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ].m_fMinSirenAlpha;
     tSirenSync.data.m_ucSirenID = ucSirenID;
 
     CBitStream BitStream;

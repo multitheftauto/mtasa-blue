@@ -1544,14 +1544,14 @@ struct SVehicleSirenSync : public ISyncStructure
         {
             if ( bitStream.Read ( data.m_ucSirenType ) && bitStream.Read ( data.m_ucSirenCount ) && bitStream.Read ( data.m_ucSirenID ) )
             {
-                bitStream.Read ( data.m_vecSirenPositions[ data.m_ucSirenID ].fX );
-                bitStream.Read ( data.m_vecSirenPositions[ data.m_ucSirenID ].fY );
-                bitStream.Read ( data.m_vecSirenPositions[ data.m_ucSirenID ].fZ );
-                bitStream.Read ( data.m_colSirenColour[ data.m_ucSirenID ].A );
-                bitStream.Read ( data.m_colSirenColour[ data.m_ucSirenID ].R );
-                bitStream.Read ( data.m_colSirenColour[ data.m_ucSirenID ].G );
-                bitStream.Read ( data.m_colSirenColour[ data.m_ucSirenID ].B );
-                bitStream.Read ( data.m_fSirenMinAlpha[ data.m_ucSirenID ] );
+                bitStream.Read ( data.m_vecSirenPositions.fX );
+                bitStream.Read ( data.m_vecSirenPositions.fY );
+                bitStream.Read ( data.m_vecSirenPositions.fZ );
+                bitStream.Read ( data.m_colSirenColour.A );
+                bitStream.Read ( data.m_colSirenColour.R );
+                bitStream.Read ( data.m_colSirenColour.G );
+                bitStream.Read ( data.m_colSirenColour.B );
+                bitStream.Read ( data.m_fSirenMinAlpha );
                 return true;
             }
         }
@@ -1567,14 +1567,14 @@ struct SVehicleSirenSync : public ISyncStructure
             bitStream.Write ( data.m_ucSirenType );
             bitStream.Write ( data.m_ucSirenCount );
             bitStream.Write ( data.m_ucSirenID );
-            bitStream.Write ( data.m_vecSirenPositions[ data.m_ucSirenID ].fX );
-            bitStream.Write ( data.m_vecSirenPositions[ data.m_ucSirenID ].fY );
-            bitStream.Write ( data.m_vecSirenPositions[ data.m_ucSirenID ].fZ );
-            bitStream.Write ( data.m_colSirenColour[ data.m_ucSirenID ].A );
-            bitStream.Write ( data.m_colSirenColour[ data.m_ucSirenID ].R );
-            bitStream.Write ( data.m_colSirenColour[ data.m_ucSirenID ].G );
-            bitStream.Write ( data.m_colSirenColour[ data.m_ucSirenID ].B );
-            bitStream.Write ( data.m_fSirenMinAlpha[ data.m_ucSirenID ] );
+            bitStream.Write ( data.m_vecSirenPositions.fX );
+            bitStream.Write ( data.m_vecSirenPositions.fY );
+            bitStream.Write ( data.m_vecSirenPositions.fZ );
+            bitStream.Write ( data.m_colSirenColour.A );
+            bitStream.Write ( data.m_colSirenColour.R );
+            bitStream.Write ( data.m_colSirenColour.G );
+            bitStream.Write ( data.m_colSirenColour.B );
+            bitStream.Write ( data.m_fSirenMinAlpha );
         }
     }
 
@@ -1583,9 +1583,9 @@ struct SVehicleSirenSync : public ISyncStructure
         bool                        m_bOverrideSirens;
         unsigned char               m_ucSirenType;
         unsigned char               m_ucSirenCount;
-        CVector                     m_vecSirenPositions[8];
-        SColor                      m_colSirenColour[8];
-        float                       m_fSirenMinAlpha[8];
+        CVector                     m_vecSirenPositions;
+        SColor                      m_colSirenColour;
+        float                       m_fSirenMinAlpha;
         unsigned char               m_ucSirenID;
     } data;
 };

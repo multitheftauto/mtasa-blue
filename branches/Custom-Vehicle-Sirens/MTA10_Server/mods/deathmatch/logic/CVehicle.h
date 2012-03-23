@@ -317,7 +317,7 @@ public:
     uint                            GetTimeSinceLastPush    ( void )                      { return (uint)( CTickCount::Now () - m_LastPushedTime ).ToLongLong (); }
     void                            ResetLastPushTime       ( void )                      { m_LastPushedTime = CTickCount::Now (); }
 
-    bool                            DoesVehicleHaveSirens   ( void )                      { return m_tSirenBeaconInfo.m_bOverrideSirens; }
+    inline bool                     DoesVehicleHaveSirens   ( void )                      { return m_tSirenBeaconInfo.m_bOverrideSirens; }
 private:
     class CVehicleManager*          m_pVehicleManager;
 

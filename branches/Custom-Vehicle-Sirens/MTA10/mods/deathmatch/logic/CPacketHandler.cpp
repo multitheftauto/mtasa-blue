@@ -3011,9 +3011,9 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             {
                                 SVehicleSirenSync sirenData;
                                 bitStream.Read ( &sirenData );
-                                pVehicle->SetVehicleSirenPosition ( i, sirenData.data.m_vecSirenPositions[i] );
-                                pVehicle->SetVehicleSirenColour ( i, sirenData.data.m_colSirenColour[i] );
-                                pVehicle->SetVehicleSirenMinimumAlpha ( i, sirenData.data.m_fSirenMinAlpha[i] );
+                                pVehicle->SetVehicleSirenPosition ( i, sirenData.data.m_vecSirenPositions );
+                                pVehicle->SetVehicleSirenColour ( i, sirenData.data.m_colSirenColour );
+                                pVehicle->SetVehicleSirenMinimumAlpha ( i, sirenData.data.m_fSirenMinAlpha );
                             }
                         }
                         // If the vehicle has sirens, set the siren state
