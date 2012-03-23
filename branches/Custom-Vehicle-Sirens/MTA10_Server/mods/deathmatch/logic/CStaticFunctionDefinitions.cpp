@@ -6195,7 +6195,7 @@ bool CStaticFunctionDefinitions::SetVehicleSirensOn ( CElement* pElement, bool b
         CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
 
         // Has Sirens and different state than before?
-        if ( CVehicleManager::HasSirens ( pVehicle->GetModel () ) &&
+        if ( ( CVehicleManager::HasSirens ( pVehicle->GetModel () ) || pVehicle->DoesVehicleHaveSirens ( ) ) &&
              bSirensOn != pVehicle->IsSirenActive () )
         {
             // Set the new state
