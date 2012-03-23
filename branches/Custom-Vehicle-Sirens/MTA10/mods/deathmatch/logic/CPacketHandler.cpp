@@ -3010,6 +3010,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             for ( int i = 0; i < Min ( sirenData.data.m_ucSirenCount, (unsigned char)8 ); i++ )
                             {
                                 pVehicle->SetVehicleSirenPosition ( i, sirenData.data.m_vecSirenPositions[i] );
+                                pVehicle->SetVehicleSirenColour ( i, sirenData.data.m_colSirenColour[i] );
                                 pVehicle->SetVehicleSirenMinimumAlpha ( i, sirenData.data.m_fSirenMinAlpha[i] );
                             }
                         }
