@@ -2399,23 +2399,6 @@ void CClientVehicle::Create ( void )
         if ( m_pUpgrades )
             m_pUpgrades->ReAddAll ();
 
-        if ( m_usModel == 560 )
-        {
-            GiveVehicleSirens ( 3, 1 );
-            SetVehicleSirenPosition( 0, CVector ( -0.7f, 2.7f, -0.23f ) );
-            SetVehicleSirenPosition( 1, CVector ( 0.7f, 2.7f, -0.23f ) );
-            SetVehicleSirenMinimumAlpha ( 0, 0.20f );
-            SetVehicleSirenMinimumAlpha ( 1, 0.20f );
-        }
-        else if ( m_usModel == 415 )
-        {
-            GiveVehicleSirens ( 2, 0 );
-            SetVehicleSirenPosition( 0, CVector ( -0.4f, -0.3f, 0.6f ) );
-        }
-        else
-        {   
-            m_tSirenBeaconInfo.m_bOverrideSirens = false;
-        }
         for ( unsigned char i = 0; i < 8; i++ )
             m_pVehicle->SetVehicleSirenPosition( i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_vecSirenPositions );
 
