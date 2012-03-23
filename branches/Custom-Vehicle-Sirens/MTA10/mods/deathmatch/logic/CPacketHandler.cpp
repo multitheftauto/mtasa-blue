@@ -2912,11 +2912,6 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         pVehicle->SetLandingGearDown ( bLandingGearDown );
                     }
 
-                    // If the vehicle has sirens, set the siren state
-                    if ( CClientVehicleManager::HasSirens ( usModel ) )
-                    {
-                        pVehicle->SetSirenOrAlarmActive ( bSirenesActive );
-                    }
                     //Set the taxi light state
                     if ( CClientVehicleManager::HasTaxiLight ( usModel ) )
                     {
@@ -3002,17 +2997,29 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     }
                     if ( bitStream.Version ( ) >= 0x02A )
                     {
-                        SVehicleSirenSync sirenData;
-                        bitStream.Read ( &sirenData );
-                        if ( sirenData.data.m_ucSirenCount > 0 )
+                        unsigned char ucSirenCount = 0;
+                        unsigned char ucSirenType = 0;
+                        bool bSync = false;
+                        bitStream.ReadBit ( bSync );
+                        if ( bSync )
                         {
-                            pVehicle->GiveVehicleSirens( sirenData.data.m_ucSirenType, sirenData.data.m_ucSirenCount );
-                            for ( int i = 0; i < Min ( sirenData.data.m_ucSirenCount, (unsigned char)8 ); i++ )
+                            bitStream.Read ( ucSirenCount );
+                            bitStream.Read ( ucSirenType );
+
+                            pVehicle->GiveVehicleSirens( ucSirenType, ucSirenCount );
+                            for ( int i = 0; i < ucSirenCount; i++ )
                             {
+                                SVehicleSirenSync sirenData;
+                                bitStream.Read ( &sirenData );
                                 pVehicle->SetVehicleSirenPosition ( i, sirenData.data.m_vecSirenPositions[i] );
                                 pVehicle->SetVehicleSirenColour ( i, sirenData.data.m_colSirenColour[i] );
                                 pVehicle->SetVehicleSirenMinimumAlpha ( i, sirenData.data.m_fSirenMinAlpha[i] );
                             }
+                        }
+                        // If the vehicle has sirens, set the siren state
+                        if ( CClientVehicleManager::HasSirens ( usModel ) || pVehicle->DoesVehicleHaveSirens ( ) )
+                        {
+                            pVehicle->SetSirenOrAlarmActive ( bSirenesActive );
                         }
                     }
                     pVehicle->ApplyHandling();

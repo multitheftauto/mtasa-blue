@@ -366,7 +366,7 @@ int CLuaFunctionDefs::GetVehicleSirensOn ( lua_State* luaVM )
         if ( pVehicle )
         {
             // Does the vehicle have Sirens?
-            if ( CClientVehicleManager::HasSirens ( pVehicle->GetModel () ) )
+            if ( CClientVehicleManager::HasSirens ( pVehicle->GetModel () ) || pVehicle->DoesVehicleHaveSirens ( ) )
             {
                 // Return whether it has its Sirens on or not
                 bool bSirensOn = pVehicle->IsSirenOrAlarmActive ();

@@ -4730,12 +4730,12 @@ bool CStaticFunctionDefinitions::SetVehicleVariant ( CVehicle* pVehicle, unsigne
     }
     return false;
 }
-bool CStaticFunctionDefinitions::GiveVehicleSirens( CVehicle* pVehicle, unsigned char ucSirenType, unsigned char ucSirenCount, SSirenInfo tSirenInfo )
+bool CStaticFunctionDefinitions::GiveVehicleSirens( CVehicle* pVehicle, unsigned char ucSirenType, unsigned char ucSirenCount, unsigned char ucSirenID, SSirenInfo tSirenInfo )
 {
     assert ( pVehicle );
     pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens = true;
-    for ( int i = 0; i < ucSirenCount; i++)
-        pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[i] = tSirenInfo.m_tSirenInfo[i];
+    
+    pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ] = tSirenInfo.m_tSirenInfo[ ucSirenID ];
 
     pVehicle->m_tSirenBeaconInfo.m_ucSirenCount = ucSirenCount;
     pVehicle->m_tSirenBeaconInfo.m_ucSirenType = ucSirenType;
@@ -4745,12 +4745,10 @@ bool CStaticFunctionDefinitions::GiveVehicleSirens( CVehicle* pVehicle, unsigned
     tSirenSync.data.m_bOverrideSirens =  pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens;
     tSirenSync.data.m_ucSirenCount =  pVehicle->m_tSirenBeaconInfo.m_ucSirenCount;
     tSirenSync.data.m_ucSirenType =  pVehicle->m_tSirenBeaconInfo.m_ucSirenType;
-    for ( int i = 0; i < Min ( tSirenSync.data.m_ucSirenCount, (unsigned char) 8 );i++ )
-    {
-        tSirenSync.data.m_vecSirenPositions[i] = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[i].m_vecSirenPositions;
-        tSirenSync.data.m_colSirenColour[i] = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[i].m_RGBBeaconColour;
-        tSirenSync.data.m_fSirenMinAlpha[i] = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[i].m_fMinSirenAlpha;
-    }
+    tSirenSync.data.m_vecSirenPositions[ ucSirenID ] = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions;
+    tSirenSync.data.m_colSirenColour[ ucSirenID ] = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour;
+    tSirenSync.data.m_fSirenMinAlpha[ ucSirenID ] = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ].m_fMinSirenAlpha;
+    tSirenSync.data.m_ucSirenID = ucSirenID;
 
     CBitStream BitStream;
     BitStream.pBitStream->Write ( &tSirenSync );

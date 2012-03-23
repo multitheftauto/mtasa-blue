@@ -1540,25 +1540,18 @@ struct SVehicleSirenSync : public ISyncStructure
 {
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        if ( bitStream.ReadBit ( data.m_bOverrideSirens ) && 
-            data.m_bOverrideSirens )
+        if ( bitStream.ReadBit ( data.m_bOverrideSirens ) && data.m_bOverrideSirens )
         {
-            if (
-                bitStream.Read ( data.m_ucSirenType ) &&
-                bitStream.Read ( data.m_ucSirenCount )
-                )
+            if ( bitStream.Read ( data.m_ucSirenType ) && bitStream.Read ( data.m_ucSirenCount ) && bitStream.Read ( data.m_ucSirenID ) )
             {
-                for ( int i = 0; i < Min ( data.m_ucSirenCount, (unsigned char) 8 );i++ )
-                {
-                    bitStream.Read ( data.m_vecSirenPositions[i].fX );
-                    bitStream.Read ( data.m_vecSirenPositions[i].fY );
-                    bitStream.Read ( data.m_vecSirenPositions[i].fZ );
-                    bitStream.Read ( data.m_colSirenColour[i].A );
-                    bitStream.Read ( data.m_colSirenColour[i].R );
-                    bitStream.Read ( data.m_colSirenColour[i].G );
-                    bitStream.Read ( data.m_colSirenColour[i].B );
-                    bitStream.Read ( data.m_fSirenMinAlpha[i] );
-                }
+                bitStream.Read ( data.m_vecSirenPositions[ data.m_ucSirenID ].fX );
+                bitStream.Read ( data.m_vecSirenPositions[ data.m_ucSirenID ].fY );
+                bitStream.Read ( data.m_vecSirenPositions[ data.m_ucSirenID ].fZ );
+                bitStream.Read ( data.m_colSirenColour[ data.m_ucSirenID ].A );
+                bitStream.Read ( data.m_colSirenColour[ data.m_ucSirenID ].R );
+                bitStream.Read ( data.m_colSirenColour[ data.m_ucSirenID ].G );
+                bitStream.Read ( data.m_colSirenColour[ data.m_ucSirenID ].B );
+                bitStream.Read ( data.m_fSirenMinAlpha[ data.m_ucSirenID ] );
                 return true;
             }
         }
@@ -1568,22 +1561,20 @@ struct SVehicleSirenSync : public ISyncStructure
 
     void Write ( NetBitStreamInterface& bitStream ) const
     {
-        bitStream.WriteBit    ( data.m_bOverrideSirens );
+        bitStream.WriteBit ( data.m_bOverrideSirens );
         if ( data.m_bOverrideSirens )
         {
             bitStream.Write ( data.m_ucSirenType );
             bitStream.Write ( data.m_ucSirenCount );
-            for ( int i = 0; i < Min ( data.m_ucSirenCount, (unsigned char) 8 );i++ )
-            {
-                bitStream.Write ( data.m_vecSirenPositions[i].fX );
-                bitStream.Write ( data.m_vecSirenPositions[i].fY );
-                bitStream.Write ( data.m_vecSirenPositions[i].fZ );
-                bitStream.Write ( data.m_colSirenColour[i].A );
-                bitStream.Write ( data.m_colSirenColour[i].R );
-                bitStream.Write ( data.m_colSirenColour[i].G );
-                bitStream.Write ( data.m_colSirenColour[i].B );
-                bitStream.Write ( data.m_fSirenMinAlpha[i] );
-            }
+            bitStream.Write ( data.m_ucSirenID );
+            bitStream.Write ( data.m_vecSirenPositions[ data.m_ucSirenID ].fX );
+            bitStream.Write ( data.m_vecSirenPositions[ data.m_ucSirenID ].fY );
+            bitStream.Write ( data.m_vecSirenPositions[ data.m_ucSirenID ].fZ );
+            bitStream.Write ( data.m_colSirenColour[ data.m_ucSirenID ].A );
+            bitStream.Write ( data.m_colSirenColour[ data.m_ucSirenID ].R );
+            bitStream.Write ( data.m_colSirenColour[ data.m_ucSirenID ].G );
+            bitStream.Write ( data.m_colSirenColour[ data.m_ucSirenID ].B );
+            bitStream.Write ( data.m_fSirenMinAlpha[ data.m_ucSirenID ] );
         }
     }
 
@@ -1595,6 +1586,7 @@ struct SVehicleSirenSync : public ISyncStructure
         CVector                     m_vecSirenPositions[8];
         SColor                      m_colSirenColour[8];
         float                       m_fSirenMinAlpha[8];
+        unsigned char               m_ucSirenID;
     } data;
 };
 

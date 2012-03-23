@@ -4184,29 +4184,28 @@ int CLuaFunctionDefinitions::GiveVehicleSirens ( lua_State* luaVM )
     CVehicle* pVehicle = NULL;
     unsigned char ucSirenType = 0;
     unsigned char ucSirenCount = 0;
+    unsigned char ucSirenID = 0;
     SSirenInfo tSirenInfo;
 
     argStream.ReadUserData ( pVehicle );
     argStream.ReadNumber ( ucSirenCount );
+    argStream.ReadNumber ( ucSirenID );
     argStream.ReadNumber ( ucSirenType );
     if ( ucSirenCount < 8 )
     {
-        for ( int i = 0; i < ucSirenCount;i++ )
-        {
-            argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fX );
-            argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fY );
-            argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fZ );
-            argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.R );
-            argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.G );
-            argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.B );
-            argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.A );
-            argStream.ReadNumber( tSirenInfo.m_tSirenInfo[i].m_fMinSirenAlpha );
-        }
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fX );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fY );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fZ );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.R );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.G );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.B );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.A );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_fMinSirenAlpha );
         if ( argStream.HasErrors ( ) == false )
         {
             if ( pVehicle )
             {
-                if ( CStaticFunctionDefinitions::GiveVehicleSirens ( pVehicle, ucSirenType, ucSirenCount, tSirenInfo ) )
+                if ( CStaticFunctionDefinitions::GiveVehicleSirens ( pVehicle, ucSirenType, ucSirenCount, ucSirenID, tSirenInfo ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;

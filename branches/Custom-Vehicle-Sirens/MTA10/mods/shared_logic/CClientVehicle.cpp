@@ -2233,11 +2233,17 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetTurnSpeed ( &m_vecTurnSpeed );
         m_pVehicle->SetVisible ( m_bVisible );
         m_pVehicle->SetUsesCollision ( m_bIsCollisionEnabled );
-        m_pVehicle->SetEngineBroken ( m_bEngineBroken );        
-        if ( m_bSireneOrAlarmActive == true )
+        m_pVehicle->SetEngineBroken ( m_bEngineBroken );
+
+        if ( m_tSirenBeaconInfo.m_bOverrideSirens )
         {
-            SetSirenOrAlarmActive ( false );
-            m_tSirenBeaconInfo.m_bOverrideSirens = false;
+            GiveVehicleSirens( m_tSirenBeaconInfo.m_ucSirenType, m_tSirenBeaconInfo.m_ucSirenCount );
+            for ( unsigned char i = 0; i < m_tSirenBeaconInfo.m_ucSirenCount; i++ )
+            {
+                m_pVehicle->SetVehicleSirenPosition( i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_vecSirenPositions );
+                m_pVehicle->SetVehicleSirenMinimumAlpha( i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_fMinSirenAlpha );
+                m_pVehicle->SetVehicleSirenColour( i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_RGBBeaconColour );
+            }
         }
         m_pVehicle->SetSirenOrAlarmActive ( m_bSireneOrAlarmActive );
         SetLandingGearDown ( m_bLandingGearDown );
@@ -2398,9 +2404,6 @@ void CClientVehicle::Create ( void )
         // Re-add all the upgrades - Has to be applied after handling *shrugs*
         if ( m_pUpgrades )
             m_pUpgrades->ReAddAll ();
-
-        for ( unsigned char i = 0; i < 8; i++ )
-            m_pVehicle->SetVehicleSirenPosition( i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_vecSirenPositions );
 
         // Tell the streamer we've created this object
         NotifyCreate ();
@@ -3799,7 +3802,9 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
 
 bool CClientVehicle::GiveVehicleSirens ( unsigned char ucSirenType, unsigned char ucSirenCount )
 {
+    m_tSirenBeaconInfo.m_bOverrideSirens = true;
     m_tSirenBeaconInfo.m_ucSirenType = ucSirenType;
+    m_tSirenBeaconInfo.m_ucSirenCount = ucSirenCount;
     if ( m_pVehicle )
     {
         m_pVehicle->GiveVehicleSirens ( ucSirenType, ucSirenCount );
