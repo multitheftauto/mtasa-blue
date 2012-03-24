@@ -39,9 +39,9 @@ DWORD RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual2 = 0x6ABA07;
 #define HOOKPOS_CVehicle_DoesVehicleUseSiren                    0x6D8470
 DWORD RETN_CVehicleDoesVehicleUseSirenRetn = 0x6D8497;
 
-#define HOOKPOS_CVehicle_ProcessStuff_TestCameraPosition        0x6ABC19
-DWORD RETN_CVehicle_ProcessStuff_TestCameraPosition = 0x6ABC1E;
-DWORD JP_Address_CVehicle_ProcessStuff_TestCameraPosition = 0x6ABC71;
+#define HOOKPOS_CVehicle_ProcessStuff_TestCameraPosition        0x6ABC17
+DWORD RETN_CVehicle_ProcessStuff_TestCameraPosition = 0x6ABC1C;
+DWORD RETN_CVehicle_ProcessStuff_TestCameraPosition2 = 0x6ABC1E;
 
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( );
@@ -69,7 +69,7 @@ void CMultiplayerSA::InitHooks_13 ( void )
     HookInstall ( HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition1, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed, 15 ); // mov before push for the siren position (overhook so we can get RGBA)
     HookInstall ( HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition2, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue, 15 ); // mov before push for the siren position (overhook so we can get RGBA)
     HookInstall ( HOOKPOS_CVehicle_DoesVehicleUseSiren, (DWORD)HOOK_CVehicle_DoesVehicleUseSiren, 5 ); // Does vehicle have a siren
-    //HookInstall ( HOOKPOS_CVehicle_ProcessStuff_TestCameraPosition, (DWORD)HOOK_CVehicle_ProcessStuff_TestCameraPosition, 5 ); // Fix for single sirens being 360 degrees
+    HookInstall ( HOOKPOS_CVehicle_ProcessStuff_TestCameraPosition, (DWORD)HOOK_CVehicle_ProcessStuff_TestCameraPosition, 5 ); // Fix for single sirens being 360 degrees
 }
 
 void CMultiplayerSA::InitMemoryCopies_13 ( void )
@@ -577,10 +577,10 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestCameraPosition ( )
             popad
             // 180 effect
             // Replaced code
+            fnstsw ax
             test ah, 5
-            jpe 06ABC71h
             // Carry on
-            jmp RETN_CVehicle_ProcessStuff_TestCameraPosition
+            jmp RETN_CVehicle_ProcessStuff_TestCameraPosition2
         }
     }
 }
