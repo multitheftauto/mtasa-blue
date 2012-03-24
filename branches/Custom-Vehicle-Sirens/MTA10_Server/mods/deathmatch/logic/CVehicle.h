@@ -122,6 +122,9 @@ struct SSirenBeaconInfo
 };
 struct SSirenInfo
 {
+    bool                        m_b360Flag;
+    bool                        m_bDoLOSCheck;
+    bool                        m_bUseRandomiser;
     bool                        m_bOverrideSirens;
     unsigned char               m_ucSirenType;
     unsigned char               m_ucSirenCount;

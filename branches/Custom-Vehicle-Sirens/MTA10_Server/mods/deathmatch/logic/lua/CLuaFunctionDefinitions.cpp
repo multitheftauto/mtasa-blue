@@ -4191,16 +4191,22 @@ int CLuaFunctionDefinitions::GiveVehicleSirens ( lua_State* luaVM )
     argStream.ReadNumber ( ucSirenCount );
     argStream.ReadNumber ( ucSirenID );
     argStream.ReadNumber ( ucSirenType );
-    if ( ucSirenCount < 8 )
+    if ( ucSirenCount > 0 && ucSirenID > 0 )
     {
+        // Array indicies start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
+        ucSirenID--;
+        ucSirenCount--;
         argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fX );
         argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fY );
         argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fZ );
         argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.R );
         argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.G );
         argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.B );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.A );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_fMinSirenAlpha );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.A, 255 );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_fMinSirenAlpha, 0.0f );
+        argStream.ReadBool ( tSirenInfo.m_b360Flag, false );
+        argStream.ReadBool ( tSirenInfo.m_bDoLOSCheck, true );
+        argStream.ReadBool ( tSirenInfo.m_bUseRandomiser, true );
         if ( argStream.HasErrors ( ) == false )
         {
             if ( pVehicle )

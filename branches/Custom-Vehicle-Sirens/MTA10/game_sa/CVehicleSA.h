@@ -737,6 +737,10 @@ public:
     unsigned char               GetVehicleCurrentSirenID        ( void )  { return m_tSirenInfo.m_ucCurrentSirenID; }
     unsigned char               GetSirenRandomiser              ( void )  { return m_tSirenInfo.m_ucCurrentSirenRandomiser; }
     void                        SetSirenRandomiser              ( unsigned char ucSirenRandomiser )  { m_tSirenInfo.m_ucCurrentSirenRandomiser = ucSirenRandomiser; }
+    bool                        IsSiren360EffectEnabled         ( void )  { return m_tSirenInfo.m_b360Flag; }
+    bool                        IsSirenLOSCheckEnabled          ( void )  { return m_tSirenInfo.m_bDoLOSCheck; }
+    bool                        IsSirenRandomiserEnabled        ( void )  { return m_tSirenInfo.m_bUseRandomiser; }
+    void                        SetVehicleFlags                 ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck );
 
 private:
     void                        RecalculateSuspensionLines          ( void );

@@ -1552,6 +1552,9 @@ struct SVehicleSirenSync : public ISyncStructure
                 bitStream.Read ( data.m_colSirenColour.G );
                 bitStream.Read ( data.m_colSirenColour.B );
                 bitStream.Read ( data.m_fSirenMinAlpha );
+                bitStream.ReadBit ( data.m_b360Flag );
+                bitStream.ReadBit ( data.m_bDoLOSCheck );
+                bitStream.ReadBit ( data.m_bUseRandomiser );
                 return true;
             }
         }
@@ -1575,11 +1578,17 @@ struct SVehicleSirenSync : public ISyncStructure
             bitStream.Write ( data.m_colSirenColour.G );
             bitStream.Write ( data.m_colSirenColour.B );
             bitStream.Write ( data.m_fSirenMinAlpha );
+            bitStream.WriteBit ( data.m_b360Flag );
+            bitStream.WriteBit ( data.m_bDoLOSCheck );
+            bitStream.WriteBit ( data.m_bUseRandomiser );
         }
     }
 
     struct
     {
+        bool                        m_b360Flag;
+        bool                        m_bDoLOSCheck;
+        bool                        m_bUseRandomiser;
         bool                        m_bOverrideSirens;
         unsigned char               m_ucSirenType;
         unsigned char               m_ucSirenCount;

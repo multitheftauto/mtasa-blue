@@ -44,6 +44,9 @@ struct SSirenBeaconInfo
 };
 struct SSirenInfo
 {
+    bool                        m_b360Flag;
+    bool                        m_bDoLOSCheck;
+    bool                        m_bUseRandomiser;
     bool                        m_bOverrideSirens;
     unsigned char               m_ucSirenType;
     unsigned char               m_ucSirenCount;
@@ -255,6 +258,10 @@ public:
     virtual unsigned char        GetVehicleCurrentSirenID               ( void ) = 0;
     virtual unsigned char        GetSirenRandomiser                     ( void ) = 0;
     virtual void                 SetSirenRandomiser                     ( unsigned char ucSirenRandomiser ) = 0;
+    virtual bool                 IsSiren360EffectEnabled                ( void ) = 0;
+    virtual bool                 IsSirenLOSCheckEnabled                 ( void ) = 0;
+    virtual bool                 IsSirenRandomiserEnabled               ( void ) = 0;
+    virtual void                 SetVehicleFlags                        ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck ) = 0;
 };
 
 #endif

@@ -3837,3 +3837,14 @@ void CClientVehicle::SetVehicleSirenColour ( unsigned char ucSirenID, SColor tVe
         m_pVehicle->SetVehicleSirenColour ( ucSirenID, tVehicleSirenColour );
     }
 }
+
+void CClientVehicle::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck )
+{
+     m_tSirenBeaconInfo.m_b360Flag = bEnable360; 
+     m_tSirenBeaconInfo.m_bDoLOSCheck = bEnableLOSCheck; 
+     m_tSirenBeaconInfo.m_bUseRandomiser = bEnableRandomiser;
+      if ( m_pVehicle )
+      {
+          m_pVehicle->SetVehicleFlags ( bEnable360, bEnableLOSCheck, bEnableRandomiser );
+      }
+};

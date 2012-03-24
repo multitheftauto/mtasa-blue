@@ -39,12 +39,17 @@ DWORD RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual2 = 0x6ABA07;
 #define HOOKPOS_CVehicle_DoesVehicleUseSiren                    0x6D8470
 DWORD RETN_CVehicleDoesVehicleUseSirenRetn = 0x6D8497;
 
+#define HOOKPOS_CVehicle_ProcessStuff_TestCameraPosition        0x6ABC19
+DWORD RETN_CVehicle_ProcessStuff_TestCameraPosition = 0x6ABC1E;
+DWORD JP_Address_CVehicle_ProcessStuff_TestCameraPosition = 0x6ABC71;
+
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( );
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeDual ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue ( );
 void HOOK_CVehicle_DoesVehicleUseSiren ( );
+void HOOK_CVehicle_ProcessStuff_TestCameraPosition ( );
 
 void CMultiplayerSA::Init_13 ( void )
 {
@@ -64,6 +69,7 @@ void CMultiplayerSA::InitHooks_13 ( void )
     HookInstall ( HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition1, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed, 15 ); // mov before push for the siren position (overhook so we can get RGBA)
     HookInstall ( HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition2, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue, 15 ); // mov before push for the siren position (overhook so we can get RGBA)
     HookInstall ( HOOKPOS_CVehicle_DoesVehicleUseSiren, (DWORD)HOOK_CVehicle_DoesVehicleUseSiren, 5 ); // Does vehicle have a siren
+    //HookInstall ( HOOKPOS_CVehicle_ProcessStuff_TestCameraPosition, (DWORD)HOOK_CVehicle_ProcessStuff_TestCameraPosition, 5 ); // Fix for single sirens being 360 degrees
 }
 
 void CMultiplayerSA::InitMemoryCopies_13 ( void )
@@ -168,6 +174,26 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( )
     }
 }
 
+void SetupSirenColour ( CVehicle * pVehicle )
+{
+    // Set our time based alpha to 10% of the current time float
+    fTime = *((float*)0xB7C4E4) * 0.1f;
+    // Get our minimum alpha
+    float fMinimumAlpha = pVehicle->GetVehicleSirenMinimumAlpha ( ucSirenCount );
+    // if our time is less than or equal to the minimum alpha
+    if ( fTime <= fMinimumAlpha )
+    {
+        // Set it to the minimum
+        fTime = fMinimumAlpha;
+    }
+    // Get our Siren RGB Colour
+    SColor tSirenColour = pVehicle->GetVehicleSirenColour ( ucSirenCount );
+    // times the R,G and B components by the fTime variable ( to get our time based brightness )
+    dwRed = (DWORD)( tSirenColour.R * fTime );
+    dwGreen = (DWORD)( tSirenColour.G * fTime );
+    dwBlue = (DWORD)( tSirenColour.B * fTime );
+}
+
 bool ProcessVehicleSirenPosition ( )
 {
     // Disable our original siren based vehicles from this hook
@@ -191,88 +217,101 @@ bool ProcessVehicleSirenPosition ( )
                 unsigned char ucVehicleSirenCount = pVehicle->GetVehicleSirenCount ( );
                 // Get our current Siren ID
                 ucSirenCount = pVehicle->GetVehicleCurrentSirenID ( );
-                // Make sure we aren't beyond our limit
-                if ( ucSirenCount > ucVehicleSirenCount )
+
+                // Get our randomiser
+                ucRandomiser = pVehicle->GetSirenRandomiser ( );
+
+                if ( pVehicle->IsSirenRandomiserEnabled ( ) )
                 {
-                    // Get our randomiser
-                    ucSirenCount = pVehicle->GetSirenRandomiser ( );
-                    // if we have more than 1 sirens
-                    if ( ucVehicleSirenCount > 0 )
-                        // Set our Randomiser
-                        ucRandomiser = rand () % pVehicle->GetVehicleSirenCount ( );
+                    // Make sure we aren't beyond our limit
+                    if ( ucSirenCount > ucVehicleSirenCount )
+                    {
+                        // if we have more than 1 sirens
+                        if ( ucVehicleSirenCount > 0 )
+                            // Set our Randomiser
+                            ucRandomiser = rand () % ucVehicleSirenCount;
+                        else
+                            // Set our Randomiser
+                            ucRandomiser = 0;
+
+                        // Update our stored Randomiser
+                        pVehicle->SetSirenRandomiser ( ucRandomiser );
+                    }
                     else
+                    {
                         // Set our Randomiser
-                        ucRandomiser = 0;
-                    // Update our stored Randomiser
-                    pVehicle->SetSirenRandomiser ( ucRandomiser );
+                        ucRandomiser = rand () % ucVehicleSirenCount;
+                        // Update our stored Randomiser
+                        pVehicle->SetSirenRandomiser ( ucRandomiser );
+                    }
                 }
-                else
-                {
-                    // Set our Randomiser
-                    ucRandomiser = rand () % pVehicle->GetVehicleSirenCount ( );
-                    // Update our stored Randomiser
-                    pVehicle->SetSirenRandomiser ( ucRandomiser );
-                }
+                 else
+                 {
+                     ucRandomiser++;
+                     if ( ucRandomiser >= ucVehicleSirenCount )
+                     {
+                         ucRandomiser = 0;
+                     }
+                     // Update our stored Randomiser
+                     pVehicle->SetSirenRandomiser ( ucRandomiser );
+                 }
+                ucSirenCount = ucRandomiser;
+
                 // Gete our siren position for this siren count
                 pVehicle->GetVehicleSirenPosition ( ucSirenCount, *vecRelativeSirenPosition );
-                // Storage 'n stuff
-                CMatrix matCamera;
-                CMatrix matVehicle;
-                // Grab our vehicle matrix
-                pVehicle->GetMatrix( &matVehicle );
 
-                // Get our Camera
-                CCamera* pCamera = pGameInterface->GetCamera ();
-                // Get the Camera Matrix
-                pCamera->GetMatrix( &matCamera );
-
-                // Get our sirens ACTUAL position from the relative value
-                CVector vecSirenPosition = matVehicle.TransformVector ( *vecRelativeSirenPosition );
-
-                // Setup our LOS flags
-                SLineOfSightFlags flags;
-                flags.bCheckBuildings = false;
-                flags.bCheckDummies = false;
-                flags.bCheckObjects = false;
-                flags.bCheckPeds = false;
-                flags.bCheckVehicles = true;
-                flags.bIgnoreSomeObjectsForCamera = false;
-                flags.bSeeThroughStuff = false;
-                flags.bShootThroughStuff = false;
-                // Ignore nothing
-                pGameInterface->GetWorld()->IgnoreEntity ( NULL );
-                // Variables 'n tings
-                CColPoint* pColPoint = NULL;
-                CEntity* pGameEntity = NULL;
-                // Check if we can see it
-                if ( pGameInterface->GetWorld()->ProcessLineOfSight( &matCamera.vPos, &vecSirenPosition, &pColPoint, &pGameEntity, flags ) == true )
+                // Are we skipping LOS Checks?
+                if ( pVehicle->IsSirenLOSCheckEnabled ( ) )
                 {
-                    // Nope? Invisible
-                    dwRed = 0;
-                    dwGreen = 0;
-                    dwBlue = 0;
-                }
-                else
-                {
-                    // Yep?
-                    // Set our time based alpha to 10% of the current time float
-                    fTime = *((float*)0xB7C4E4) * 0.1f;
-                    // Get our minimum alpha
-                    float fMinimumAlpha = pVehicle->GetVehicleSirenMinimumAlpha ( ucSirenCount );
-                    // if our time is less than or equal to the minimum alpha
-                    if ( fTime <= fMinimumAlpha )
+                    // Storage 'n stuff
+                    CMatrix matCamera;
+                    CMatrix matVehicle;
+                    // Grab our vehicle matrix
+                    pVehicle->GetMatrix( &matVehicle );
+
+                    // Get our Camera
+                    CCamera* pCamera = pGameInterface->GetCamera ();
+                    // Get the Camera Matrix
+                    pCamera->GetMatrix( &matCamera );
+
+                    // Get our sirens ACTUAL position from the relative value
+                    CVector vecSirenPosition = matVehicle.TransformVector ( *vecRelativeSirenPosition );
+
+                    // Setup our LOS flags
+                    SLineOfSightFlags flags;
+                    flags.bCheckBuildings = false;
+                    flags.bCheckDummies = false;
+                    flags.bCheckObjects = false;
+                    flags.bCheckPeds = false;
+                    flags.bCheckVehicles = true;
+                    flags.bIgnoreSomeObjectsForCamera = false;
+                    flags.bSeeThroughStuff = false;
+                    flags.bShootThroughStuff = false;
+                    // Ignore nothing
+                    pGameInterface->GetWorld()->IgnoreEntity ( NULL );
+                    // Variables 'n tings
+                    CColPoint* pColPoint = NULL;
+                    CEntity* pGameEntity = NULL;
+                    // Check if we can see it
+                    if ( pGameInterface->GetWorld()->IsLineOfSightClear ( &matCamera.vPos, &vecSirenPosition, flags ) == false )
                     {
-                        // Set it to the minimum
-                        fTime = fMinimumAlpha;
+                        // Nope? Invisible
+                        dwRed = 0;
+                        dwGreen = 0;
+                        dwBlue = 0;
                     }
-                    // Get our Siren RGB Colour
-                    SColor tSirenColour = pVehicle->GetVehicleSirenColour ( ucSirenCount );
-                    // times the R,G and B components by the fTime variable ( to get our time based brightness )
-                    dwRed = (DWORD)( tSirenColour.R * fTime );
-                    dwGreen = (DWORD)( tSirenColour.G * fTime );
-                    dwBlue = (DWORD)( tSirenColour.B * fTime );
+                    else
+                    {
+                        // Yep?
+                        SetupSirenColour ( pVehicle );
+                    }
                 }
-                // Set our current Siren ID after we increment it
+                 else
+                 {
+                     // Skip LOS Checks.
+                     SetupSirenColour ( pVehicle ); 
+                 }
+//                 // Set our current Siren ID after we increment it
                 pVehicle->SetVehicleCurrentSirenID ( ++ucSirenCount );
             }
         }
@@ -495,6 +534,58 @@ void _declspec(naked) HOOK_CVehicle_DoesVehicleUseSiren ( )
         }
     }
 }
+bool SirenCheckCameraPosition ( )
+{
+    // Default SA sirens we don't bother processing
+    if ( DoesVehicleHaveSiren ( ) == false )
+    {
+        CVehicle * pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)pVehicleWithTheSiren );
+        // Do we have sirens given by us and is the 360 flag set?
+        if ( pVehicle->DoesVehicleHaveSirens ( ) && pVehicle->IsSiren360EffectEnabled ( ) )
+        {
+            // Do 360 code
+            return true;
+        }
+    }
+    // Only visible from the front
+    return false;
+}
+void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestCameraPosition ( )
+{
+    _asm
+    {
+        pushad
+        // Grab our vehicle
+        mov pVehicleWithTheSiren, esi
+    }
+    // Check if we disable or enable the 360 effect
+    if ( SirenCheckCameraPosition ( ) )
+    {
+        _asm
+        {
+            popad
+            // 360 effect
+            // Carry on
+            jmp RETN_CVehicle_ProcessStuff_TestCameraPosition
+        }
+    }
+    else
+    {
+
+        _asm
+        {
+            popad
+            // 180 effect
+            // Replaced code
+            test ah, 5
+            jpe 06ABC71h
+            // Carry on
+            jmp RETN_CVehicle_ProcessStuff_TestCameraPosition
+        }
+    }
+}
+
+// Water Cannon Stuff
 
 void CMultiplayerSA::SetWaterCannonHitHandler ( WaterCannonHitHandler * pHandler )
 {
