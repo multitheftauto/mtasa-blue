@@ -4769,6 +4769,19 @@ bool CStaticFunctionDefinitions::GiveVehicleSirens( CVehicle* pVehicle, unsigned
     }
     return false;
 }
+
+bool CStaticFunctionDefinitions::RemoveVehicleSirens ( CVehicle* pVehicle )
+{
+    assert ( pVehicle );
+
+    pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens = false;
+    pVehicle->RemoveVehicleSirens ( );
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, REMOVE_VEHICLE_SIRENS, *BitStream.pBitStream ) );
+    return true;
+}
+
 bool CStaticFunctionDefinitions::GetVehicleVariant ( CVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2 )
 {
     assert ( pVehicle );

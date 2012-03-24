@@ -417,6 +417,7 @@ public:
     void                        SetVehicleSirenMinimumAlpha ( unsigned char ucSirenID, float fPercentage );
     void                        SetVehicleSirenColour       ( unsigned char ucSirenID, SColor tVehicleSirenColour );
     void                        SetVehicleFlags             ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck );
+    void                        RemoveVehicleSirens         ( void );
 
 protected:
     void                        StreamIn                ( bool bInstantly );

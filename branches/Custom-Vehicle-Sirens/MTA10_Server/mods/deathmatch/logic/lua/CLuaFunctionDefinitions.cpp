@@ -4178,6 +4178,32 @@ int CLuaFunctionDefinitions::SetVehicleDoorsUndamageable ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::RemoveVehicleSirens ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    CVehicle* pVehicle = NULL;
+
+    argStream.ReadUserData ( pVehicle );
+    
+    if ( argStream.HasErrors ( ) == false )
+    {
+        if ( pVehicle )
+        {
+            if ( CStaticFunctionDefinitions::RemoveVehicleSirens ( pVehicle ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "removeVehicleSirens", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "removeVehicleSirens" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 int CLuaFunctionDefinitions::GiveVehicleSirens ( lua_State* luaVM )
 {
     CScriptArgReader argStream ( luaVM );

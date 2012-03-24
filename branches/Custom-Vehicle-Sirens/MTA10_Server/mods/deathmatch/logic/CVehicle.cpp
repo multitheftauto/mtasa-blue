@@ -756,7 +756,7 @@ void CVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
 }
 
 
-void CVehicle::GenerateHandlingData ()
+void CVehicle::GenerateHandlingData ( void )
 {
     // Make a new CHandlingEntry
     m_pHandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData ( );
@@ -764,4 +764,36 @@ void CVehicle::GenerateHandlingData ()
     m_pHandlingEntry->ApplyHandlingData( g_pGame->GetHandlingManager ()->GetModelHandlingData ( static_cast < eVehicleTypes > ( m_usModel ) ) );
 
     m_bHandlingChanged = false;
+}
+
+void CVehicle::SetVehicleSirenPosition ( unsigned char ucSirenID, CVector vecPos )
+{
+    m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions = vecPos;
+}
+
+void CVehicle::SetVehicleSirenMinimumAlpha( unsigned char ucSirenID, float fPercentage )
+{
+    m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_fMinSirenAlpha = fPercentage;
+}
+
+void CVehicle::SetVehicleSirenColour ( unsigned char ucSirenID, SColor tVehicleSirenColour )
+{
+    m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour;
+}
+
+void CVehicle::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck )
+{
+    m_tSirenBeaconInfo.m_b360Flag = bEnable360; 
+    m_tSirenBeaconInfo.m_bDoLOSCheck = bEnableLOSCheck; 
+    m_tSirenBeaconInfo.m_bUseRandomiser = bEnableRandomiser;
+}
+void CVehicle::RemoveVehicleSirens ( void )
+{
+    for ( int i = 0; i <= 7; i++ )
+    {
+        m_tSirenBeaconInfo.m_tSirenInfo [ i ] = SSirenBeaconInfo ( );
+        SetVehicleSirenPosition( i, CVector ( 0, 0, 0 ) );
+        SetVehicleSirenMinimumAlpha( i, 0.0f );
+        SetVehicleSirenColour( i, SColor ( ) );
+    }
 }

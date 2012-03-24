@@ -273,6 +273,7 @@ public:
     static int      SetVehicleDoorOpenRatio             ( lua_State* luaVM );
     static int      SetVehicleVariant                   ( lua_State* luaVM );
     static int      GiveVehicleSirens                   ( lua_State* luaVM );
+    static int      RemoveVehicleSirens                 ( lua_State* luaVM );
 
     // Marker create/destroy functions
     static int      CreateMarker                        ( lua_State* luaVM );

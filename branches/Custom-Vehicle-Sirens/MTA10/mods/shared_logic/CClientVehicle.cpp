@@ -3847,4 +3847,20 @@ void CClientVehicle::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, 
       {
           m_pVehicle->SetVehicleFlags ( bEnable360, bEnableLOSCheck, bEnableRandomiser );
       }
-};
+}
+
+void CClientVehicle::RemoveVehicleSirens ( void )
+{
+    if ( m_pVehicle )
+    {
+        m_pVehicle->RemoveVehicleSirens ( );
+    }
+    m_tSirenBeaconInfo.m_bOverrideSirens = false;
+    SetSirenOrAlarmActive ( false );
+    for ( unsigned char i = 0; i < 7; i++ )
+    {
+        SetVehicleSirenPosition( i, CVector ( 0, 0, 0 ) );
+        SetVehicleSirenMinimumAlpha( i, 0.0f );
+        SetVehicleSirenColour( i, SColor ( ) );
+    }
+}
