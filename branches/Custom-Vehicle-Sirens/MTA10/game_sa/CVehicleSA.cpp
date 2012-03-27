@@ -197,6 +197,7 @@ void CVehicleSA::Init ( void )
 
     CopyGlobalSuspensionLinesToPrivate ();
     m_tSirenInfo.m_bOverrideSirens = false;
+    m_tSirenInfo.m_bSirenSilent = false;
 }
 
 // DESTRUCTOR
