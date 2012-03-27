@@ -155,6 +155,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
 
     // Add this vehicle to the vehicle list
     m_pVehicleManager->AddToList ( this );
+    m_tSirenBeaconInfo.m_bSirenSilent = false;
 }
 
 
@@ -3838,15 +3839,16 @@ void CClientVehicle::SetVehicleSirenColour ( unsigned char ucSirenID, SColor tVe
     }
 }
 
-void CClientVehicle::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck )
+void CClientVehicle::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent )
 {
      m_tSirenBeaconInfo.m_b360Flag = bEnable360; 
      m_tSirenBeaconInfo.m_bDoLOSCheck = bEnableLOSCheck; 
      m_tSirenBeaconInfo.m_bUseRandomiser = bEnableRandomiser;
-      if ( m_pVehicle )
-      {
-          m_pVehicle->SetVehicleFlags ( bEnable360, bEnableLOSCheck, bEnableRandomiser );
-      }
+     m_tSirenBeaconInfo.m_bSirenSilent = bEnableSilent;
+     if ( m_pVehicle )
+     {
+        m_pVehicle->SetVehicleFlags ( bEnable360, bEnableLOSCheck, bEnableRandomiser, bEnableSilent );
+     }
 }
 
 void CClientVehicle::RemoveVehicleSirens ( void )

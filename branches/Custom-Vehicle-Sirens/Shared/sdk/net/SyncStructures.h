@@ -1555,6 +1555,7 @@ struct SVehicleSirenSync : public ISyncStructure
                 bitStream.ReadBit ( data.m_b360Flag );
                 bitStream.ReadBit ( data.m_bDoLOSCheck );
                 bitStream.ReadBit ( data.m_bUseRandomiser );
+                bitStream.ReadBit ( data.m_bEnableSilent );
                 return true;
             }
         }
@@ -1581,6 +1582,7 @@ struct SVehicleSirenSync : public ISyncStructure
             bitStream.WriteBit ( data.m_b360Flag );
             bitStream.WriteBit ( data.m_bDoLOSCheck );
             bitStream.WriteBit ( data.m_bUseRandomiser );
+            bitStream.WriteBit ( data.m_bEnableSilent );
         }
     }
 
@@ -1589,6 +1591,7 @@ struct SVehicleSirenSync : public ISyncStructure
         bool                        m_b360Flag;
         bool                        m_bDoLOSCheck;
         bool                        m_bUseRandomiser;
+        bool                        m_bEnableSilent;
         bool                        m_bOverrideSirens;
         unsigned char               m_ucSirenType;
         unsigned char               m_ucSirenCount;

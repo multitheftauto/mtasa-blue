@@ -3014,7 +3014,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                                 pVehicle->SetVehicleSirenPosition ( i, sirenData.data.m_vecSirenPositions );
                                 pVehicle->SetVehicleSirenColour ( i, sirenData.data.m_colSirenColour );
                                 pVehicle->SetVehicleSirenMinimumAlpha ( i, sirenData.data.m_fSirenMinAlpha );
-                                pVehicle->SetVehicleFlags ( sirenData.data.m_b360Flag, sirenData.data.m_bUseRandomiser, sirenData.data.m_bDoLOSCheck );
+                                pVehicle->SetVehicleFlags ( sirenData.data.m_b360Flag, sirenData.data.m_bUseRandomiser, sirenData.data.m_bDoLOSCheck, sirenData.data.m_bEnableSilent );
                             }
                         }
                         // If the vehicle has sirens, set the siren state

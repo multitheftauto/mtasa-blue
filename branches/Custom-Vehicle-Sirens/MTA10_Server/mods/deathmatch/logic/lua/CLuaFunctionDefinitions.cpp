@@ -4233,6 +4233,7 @@ int CLuaFunctionDefinitions::GiveVehicleSirens ( lua_State* luaVM )
         argStream.ReadBool ( tSirenInfo.m_b360Flag, false );
         argStream.ReadBool ( tSirenInfo.m_bDoLOSCheck, true );
         argStream.ReadBool ( tSirenInfo.m_bUseRandomiser, true );
+        argStream.ReadBool ( tSirenInfo.m_bSirenSilent, false );
         if ( argStream.HasErrors ( ) == false )
         {
             if ( pVehicle )

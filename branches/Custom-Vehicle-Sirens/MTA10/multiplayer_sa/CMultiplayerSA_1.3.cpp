@@ -43,6 +43,8 @@ DWORD RETN_CVehicleDoesVehicleUseSirenRetn = 0x6D8497;
 DWORD RETN_CVehicle_ProcessStuff_TestCameraPosition = 0x6ABC1C;
 DWORD RETN_CVehicle_ProcessStuff_TestCameraPosition2 = 0x6ABC1E;
 
+#define HOOKPOS_CVehicleAudio_ProcessSirenSound             0x4F62BB
+DWORD RETN_CVehicleAudio_GetVehicleSirenType             =  0x4F62C1;
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( );
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeDual ( );
@@ -50,6 +52,8 @@ void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue ( );
 void HOOK_CVehicle_DoesVehicleUseSiren ( );
 void HOOK_CVehicle_ProcessStuff_TestCameraPosition ( );
+void HOOK_CVehicleAudio_ProcessSirenSound ( );
+void HOOK_CVehicleAudio_ProcessSirenSound2 ( );
 
 void CMultiplayerSA::Init_13 ( void )
 {
@@ -70,6 +74,8 @@ void CMultiplayerSA::InitHooks_13 ( void )
     HookInstall ( HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition2, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue, 15 ); // mov before push for the siren position (overhook so we can get RGBA)
     HookInstall ( HOOKPOS_CVehicle_DoesVehicleUseSiren, (DWORD)HOOK_CVehicle_DoesVehicleUseSiren, 5 ); // Does vehicle have a siren
     HookInstall ( HOOKPOS_CVehicle_ProcessStuff_TestCameraPosition, (DWORD)HOOK_CVehicle_ProcessStuff_TestCameraPosition, 5 ); // Fix for single sirens being 360 degrees
+    HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound, (DWORD)HOOK_CVehicleAudio_ProcessSirenSound, 6 );
+    HookInstall ( 0x5002C4, (DWORD)HOOK_CVehicleAudio_ProcessSirenSound2, 5 );
 }
 
 void CMultiplayerSA::InitMemoryCopies_13 ( void )
@@ -585,7 +591,60 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestCameraPosition ( )
         }
     }
 }
+bool DisableVehicleSiren ( )
+{
+    if ( pVehicleWithTheSiren && pVehicleWithTheSiren->vtbl != NULL )
+    {
+        CVehicle * pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)pVehicleWithTheSiren );
+        if ( pVehicle && pVehicle->IsSirenSilentEffectEnabled ( ) )
+        {
+            return true;
+        }
+    }
+    return false;
+}
+void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound ( )
+{
+    _asm
+    {
+        pushad
+    }
+    if ( DisableVehicleSiren ( ) )
+    {
+        _asm
+        {
+            popad
+            mov dl, 0
+            jmp RETN_CVehicleAudio_GetVehicleSirenType
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            mov dl, [ecx+42Dh]
+            jmp RETN_CVehicleAudio_GetVehicleSirenType
+        }
+    }
+}
+DWORD dwReturn = 0x5002C9;
+void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound2 ( )
+{
+    _asm
+    {
+        pushad
+        mov pVehicleWithTheSiren, edi
+    }
 
+    _asm
+    {
+        popad
+        push edi
+        mov edi, [esp+18h]
+        jmp dwReturn
+    }
+}
 // Water Cannon Stuff
 
 void CMultiplayerSA::SetWaterCannonHitHandler ( WaterCannonHitHandler * pHandler )

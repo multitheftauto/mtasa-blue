@@ -416,7 +416,7 @@ public:
     void                        SetVehicleSirenPosition     ( unsigned char ucSirenID, CVector vecPos );
     void                        SetVehicleSirenMinimumAlpha ( unsigned char ucSirenID, float fPercentage );
     void                        SetVehicleSirenColour       ( unsigned char ucSirenID, SColor tVehicleSirenColour );
-    void                        SetVehicleFlags             ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck );
+    void                        SetVehicleFlags             ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent );
     void                        RemoveVehicleSirens         ( void );
 
 protected:

@@ -2054,9 +2054,10 @@ void CVehicleSA::GetVehicleSirenPosition ( unsigned char ucSirenID, CVector & ve
     vecPos = m_tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions;
 }
 
-void CVehicleSA::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck )
+void CVehicleSA::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent )
 {
      m_tSirenInfo.m_b360Flag = bEnable360; 
      m_tSirenInfo.m_bDoLOSCheck = bEnableLOSCheck; 
      m_tSirenInfo.m_bUseRandomiser = bEnableRandomiser;
+     m_tSirenInfo.m_bSirenSilent = bEnableSilent;
 }

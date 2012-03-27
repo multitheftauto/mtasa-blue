@@ -740,7 +740,8 @@ public:
     bool                        IsSiren360EffectEnabled         ( void )  { return m_tSirenInfo.m_b360Flag; }
     bool                        IsSirenLOSCheckEnabled          ( void )  { return m_tSirenInfo.m_bDoLOSCheck; }
     bool                        IsSirenRandomiserEnabled        ( void )  { return m_tSirenInfo.m_bUseRandomiser; }
-    void                        SetVehicleFlags                 ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck );
+    bool                        IsSirenSilentEffectEnabled      ( void )  { return m_tSirenInfo.m_bSirenSilent; }
+    void                        SetVehicleFlags                 ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent );
 
 private:
     void                        RecalculateSuspensionLines          ( void );

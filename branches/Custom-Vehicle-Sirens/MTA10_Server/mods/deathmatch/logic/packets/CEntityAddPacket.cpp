@@ -497,6 +497,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                                 syncData.data.m_b360Flag = pVehicle->m_tSirenBeaconInfo.m_b360Flag;
                                 syncData.data.m_bDoLOSCheck = pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck;
                                 syncData.data.m_bUseRandomiser = pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser;
+                                syncData.data.m_bEnableSilent = pVehicle->m_tSirenBeaconInfo.m_bSirenSilent;
                                 syncData.data.m_ucSirenID = i;
                                 syncData.data.m_vecSirenPositions = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[i].m_vecSirenPositions;
                                 syncData.data.m_colSirenColour = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[i].m_RGBBeaconColour;
