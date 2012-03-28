@@ -49,6 +49,7 @@ void CVehicleRPCs::LoadFunctions ( void )
     AddHandler ( SET_VEHICLE_VARIANT, SetVehicleVariant, "SetVehicleVariant" );
     AddHandler ( GIVE_VEHICLE_SIRENS, GiveVehicleSirens, "giveVehicleSirens");
     AddHandler ( REMOVE_VEHICLE_SIRENS, RemoveVehicleSirens, "removeVehicleSirens");
+    AddHandler ( SET_VEHICLE_SIRENS, SetVehicleSirens, "setVehicleSirens");
 }
 
 
@@ -590,9 +591,10 @@ void CVehicleRPCs::SetVehicleVariant ( CClientEntity* pSource, NetBitStreamInter
         }
     }
 }
+
 void CVehicleRPCs::GiveVehicleSirens ( CClientEntity* pSourceEntity, NetBitStreamInterface& bitStream )
 {
-    SVehicleSirenSync sirenData;
+    SVehicleSirenAddSync sirenData;
     if ( bitStream.Read ( &sirenData ) )
     {
         CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSourceEntity->GetID () );
@@ -601,11 +603,23 @@ void CVehicleRPCs::GiveVehicleSirens ( CClientEntity* pSourceEntity, NetBitStrea
             if ( sirenData.data.m_ucSirenCount >= 0 )
             {
                 pVehicle->GiveVehicleSirens( sirenData.data.m_ucSirenType, sirenData.data.m_ucSirenCount );
-                pVehicle->SetVehicleSirenPosition ( sirenData.data.m_ucSirenID, sirenData.data.m_vecSirenPositions );
-                pVehicle->SetVehicleSirenMinimumAlpha ( sirenData.data.m_ucSirenID, sirenData.data.m_fSirenMinAlpha );
-                pVehicle->SetVehicleSirenColour ( sirenData.data.m_ucSirenID, sirenData.data.m_colSirenColour );
                 pVehicle->SetVehicleFlags ( sirenData.data.m_b360Flag, sirenData.data.m_bUseRandomiser, sirenData.data.m_bDoLOSCheck, sirenData.data.m_bEnableSilent );
             }
+        }
+    }
+}
+
+void CVehicleRPCs::SetVehicleSirens ( CClientEntity* pSourceEntity, NetBitStreamInterface& bitStream )
+{
+    SVehicleSirenSync sirenData;
+    if ( bitStream.Read ( &sirenData ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSourceEntity->GetID () );
+        if ( pVehicle )
+        {
+            pVehicle->SetVehicleSirenPosition ( sirenData.data.m_ucSirenID, sirenData.data.m_vecSirenPositions );
+            pVehicle->SetVehicleSirenMinimumAlpha ( sirenData.data.m_ucSirenID, sirenData.data.m_fSirenMinAlpha );
+            pVehicle->SetVehicleSirenColour ( sirenData.data.m_ucSirenID, sirenData.data.m_colSirenColour );
         }
     }
 }

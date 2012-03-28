@@ -4204,24 +4204,22 @@ int CLuaFunctionDefinitions::RemoveVehicleSirens ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-int CLuaFunctionDefinitions::GiveVehicleSirens ( lua_State* luaVM )
+
+int CLuaFunctionDefinitions::SetVehicleSirens( lua_State* luaVM )
 {
     CScriptArgReader argStream ( luaVM );
     CVehicle* pVehicle = NULL;
     unsigned char ucSirenType = 0;
-    unsigned char ucSirenCount = 0;
     unsigned char ucSirenID = 0;
     SSirenInfo tSirenInfo;
 
     argStream.ReadUserData ( pVehicle );
-    argStream.ReadNumber ( ucSirenCount );
     argStream.ReadNumber ( ucSirenID );
     argStream.ReadNumber ( ucSirenType );
-    if ( ucSirenCount > 0 && ucSirenID > 0 )
+    if ( ucSirenID > 0 )
     {
         // Array indicies start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
         ucSirenID--;
-        ucSirenCount--;
         argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fX );
         argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fY );
         argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fZ );
@@ -4230,6 +4228,44 @@ int CLuaFunctionDefinitions::GiveVehicleSirens ( lua_State* luaVM )
         argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.B );
         argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.A, 255 );
         argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_fMinSirenAlpha, 0.0f );
+        if ( argStream.HasErrors ( ) == false )
+        {
+            if ( pVehicle )
+            {
+                if ( CStaticFunctionDefinitions::SetVehicleSirens ( pVehicle, ucSirenID, tSirenInfo ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "giveVehicleSirens", "vehicle", 1 );
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM, "giveVehicleSirens" );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "giveVehicleSirens" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::GiveVehicleSirens ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    CVehicle* pVehicle = NULL;
+    unsigned char ucSirenType = 0;
+    unsigned char ucSirenCount = 0;
+    SSirenInfo tSirenInfo;
+
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadNumber ( ucSirenCount );
+    argStream.ReadNumber ( ucSirenType );
+    if ( ucSirenCount > 0)
+    {
+        // Array indicies start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
+        ucSirenCount--;
         argStream.ReadBool ( tSirenInfo.m_b360Flag, false );
         argStream.ReadBool ( tSirenInfo.m_bDoLOSCheck, true );
         argStream.ReadBool ( tSirenInfo.m_bUseRandomiser, true );
@@ -4238,7 +4274,7 @@ int CLuaFunctionDefinitions::GiveVehicleSirens ( lua_State* luaVM )
         {
             if ( pVehicle )
             {
-                if ( CStaticFunctionDefinitions::GiveVehicleSirens ( pVehicle, ucSirenType, ucSirenCount, ucSirenID, tSirenInfo ) )
+                if ( CStaticFunctionDefinitions::GiveVehicleSirens ( pVehicle, ucSirenType, ucSirenCount, tSirenInfo ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;

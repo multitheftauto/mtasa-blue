@@ -274,6 +274,7 @@ public:
     static int      SetVehicleVariant                   ( lua_State* luaVM );
     static int      GiveVehicleSirens                   ( lua_State* luaVM );
     static int      RemoveVehicleSirens                 ( lua_State* luaVM );
+    static int      SetVehicleSirens                    ( lua_State* luaVM );
 
     // Marker create/destroy functions
     static int      CreateMarker                        ( lua_State* luaVM );
