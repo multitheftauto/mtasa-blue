@@ -296,7 +296,7 @@ void CScriptDebugging::LogString ( const char* szPrePend, lua_State * luaVM, con
     }
     else
     {
-        strText = SString ( "%s%s", szPrePend, szMessage );
+        strText = SString ( "%s%s%s", szPrePend, m_strLineAndFile.c_str(), szMessage );
     }
 
     // Create a different message if type is "INFO"
