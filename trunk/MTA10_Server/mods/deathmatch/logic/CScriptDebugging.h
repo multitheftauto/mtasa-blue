@@ -45,6 +45,8 @@ public:
     bool                            SetLogfile                      ( const char* szFilename, unsigned int uiLevel );
     inline void                     SetHTMLLogLevel                 ( unsigned int uiLevel ) { m_uiHtmlLogLevel = uiLevel; }
 
+    inline void                     SetErrorLineAndFile             ( SString strOutput ) { m_strLineAndFile = strOutput; }
+
 private:
     void                            LogString                       ( const char* szPrePend, lua_State * luaVM, const char* szMessage, unsigned int uiMinimumDebugLevelunsigned, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255 );
 
@@ -57,6 +59,7 @@ private:
     FILE*                           m_pLogFile;
     list < class CPlayer* >         m_Players;
     bool                            m_bTriggeringOnDebugMessage;
+    SString                         m_strLineAndFile;
 };
 
 #endif
