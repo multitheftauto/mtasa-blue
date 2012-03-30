@@ -4734,32 +4734,37 @@ bool CStaticFunctionDefinitions::SetVehicleVariant ( CVehicle* pVehicle, unsigne
 bool CStaticFunctionDefinitions::GiveVehicleSirens( CVehicle* pVehicle, unsigned char ucSirenType, unsigned char ucSirenCount, SSirenInfo tSirenInfo )
 {
     assert ( pVehicle );
-    if ( ucSirenCount >= 0 && ucSirenCount <= 7 )
+    eVehicleType vehicleType = CVehicleManager::GetVehicleType ( pVehicle->GetModel ( ) );
+    // Won't work with below.
+    if ( vehicleType != VEHICLE_PLANE && vehicleType != VEHICLE_BOAT && vehicleType != VEHICLE_TRAILER && vehicleType != VEHICLE_HELI && vehicleType != VEHICLE_BIKE && vehicleType != VEHICLE_BMX )
     {
-        pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens = true;
+        if ( ucSirenCount >= 0 && ucSirenCount <= 7 )
+        {
+            pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens = true;
 
-        pVehicle->m_tSirenBeaconInfo.m_ucSirenCount = ++ucSirenCount;
-        pVehicle->m_tSirenBeaconInfo.m_ucSirenType = ucSirenType;
+            pVehicle->m_tSirenBeaconInfo.m_ucSirenCount = ++ucSirenCount;
+            pVehicle->m_tSirenBeaconInfo.m_ucSirenType = ucSirenType;
 
-        pVehicle->m_tSirenBeaconInfo.m_b360Flag = tSirenInfo.m_b360Flag;
-        pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck = tSirenInfo.m_bDoLOSCheck;
-        pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser = tSirenInfo.m_bUseRandomiser;
-        pVehicle->m_tSirenBeaconInfo.m_bSirenSilent = tSirenInfo.m_bSirenSilent;
+            pVehicle->m_tSirenBeaconInfo.m_b360Flag = tSirenInfo.m_b360Flag;
+            pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck = tSirenInfo.m_bDoLOSCheck;
+            pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser = tSirenInfo.m_bUseRandomiser;
+            pVehicle->m_tSirenBeaconInfo.m_bSirenSilent = tSirenInfo.m_bSirenSilent;
 
 
-        SVehicleSirenAddSync tSirenSync;
-        tSirenSync.data.m_bOverrideSirens =  pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens;
-        tSirenSync.data.m_b360Flag = pVehicle->m_tSirenBeaconInfo.m_b360Flag;
-        tSirenSync.data.m_bDoLOSCheck = pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck;
-        tSirenSync.data.m_bEnableSilent = pVehicle->m_tSirenBeaconInfo.m_bSirenSilent;
-        tSirenSync.data.m_bUseRandomiser = pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser;
-        tSirenSync.data.m_ucSirenCount =  pVehicle->m_tSirenBeaconInfo.m_ucSirenCount;
-        tSirenSync.data.m_ucSirenType =  pVehicle->m_tSirenBeaconInfo.m_ucSirenType;
+            SVehicleSirenAddSync tSirenSync;
+            tSirenSync.data.m_bOverrideSirens =  pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens;
+            tSirenSync.data.m_b360Flag = pVehicle->m_tSirenBeaconInfo.m_b360Flag;
+            tSirenSync.data.m_bDoLOSCheck = pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck;
+            tSirenSync.data.m_bEnableSilent = pVehicle->m_tSirenBeaconInfo.m_bSirenSilent;
+            tSirenSync.data.m_bUseRandomiser = pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser;
+            tSirenSync.data.m_ucSirenCount =  pVehicle->m_tSirenBeaconInfo.m_ucSirenCount;
+            tSirenSync.data.m_ucSirenType =  pVehicle->m_tSirenBeaconInfo.m_ucSirenType;
 
-        CBitStream BitStream;
-        BitStream.pBitStream->Write ( &tSirenSync );
-        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, GIVE_VEHICLE_SIRENS, *BitStream.pBitStream ) );
-        return true;
+            CBitStream BitStream;
+            BitStream.pBitStream->Write ( &tSirenSync );
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, GIVE_VEHICLE_SIRENS, *BitStream.pBitStream ) );
+            return true;
+        }
     }
     return false;
 }
@@ -4767,25 +4772,30 @@ bool CStaticFunctionDefinitions::GiveVehicleSirens( CVehicle* pVehicle, unsigned
 bool CStaticFunctionDefinitions::SetVehicleSirens ( CVehicle* pVehicle, unsigned char ucSirenID, SSirenInfo tSirenInfo )
 {
     assert ( pVehicle );
-    if ( ucSirenID >= 0 && ucSirenID <= 7 )
+    eVehicleType vehicleType = CVehicleManager::GetVehicleType ( pVehicle->GetModel ( ) );
+    // Won't work with below.
+    if ( vehicleType != VEHICLE_PLANE && vehicleType != VEHICLE_BOAT && vehicleType != VEHICLE_TRAILER && vehicleType != VEHICLE_HELI && vehicleType != VEHICLE_BIKE && vehicleType != VEHICLE_BMX )
     {
-        pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ] = tSirenInfo.m_tSirenInfo[ ucSirenID ];
+        if ( ucSirenID >= 0 && ucSirenID <= 7 )
+        {
+            pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ] = tSirenInfo.m_tSirenInfo[ ucSirenID ];
 
-        SVehicleSirenSync tSirenSync;
-        tSirenSync.data.m_bOverrideSirens =  pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens;
-        tSirenSync.data.m_b360Flag = pVehicle->m_tSirenBeaconInfo.m_b360Flag;
-        tSirenSync.data.m_bDoLOSCheck = pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck;
-        tSirenSync.data.m_bEnableSilent = pVehicle->m_tSirenBeaconInfo.m_bSirenSilent;
-        tSirenSync.data.m_bUseRandomiser = pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser;
-        tSirenSync.data.m_vecSirenPositions = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions;
-        tSirenSync.data.m_colSirenColour = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour;
-        tSirenSync.data.m_fSirenMinAlpha = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ].m_fMinSirenAlpha;
-        tSirenSync.data.m_ucSirenID = ucSirenID;
+            SVehicleSirenSync tSirenSync;
+            tSirenSync.data.m_bOverrideSirens =  pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens;
+            tSirenSync.data.m_b360Flag = pVehicle->m_tSirenBeaconInfo.m_b360Flag;
+            tSirenSync.data.m_bDoLOSCheck = pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck;
+            tSirenSync.data.m_bEnableSilent = pVehicle->m_tSirenBeaconInfo.m_bSirenSilent;
+            tSirenSync.data.m_bUseRandomiser = pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser;
+            tSirenSync.data.m_vecSirenPositions = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions;
+            tSirenSync.data.m_colSirenColour = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour;
+            tSirenSync.data.m_fSirenMinAlpha = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ].m_fMinSirenAlpha;
+            tSirenSync.data.m_ucSirenID = ucSirenID;
 
-        CBitStream BitStream;
-        BitStream.pBitStream->Write ( &tSirenSync );
-        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_SIRENS, *BitStream.pBitStream ) );
-        return true;
+            CBitStream BitStream;
+            BitStream.pBitStream->Write ( &tSirenSync );
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_SIRENS, *BitStream.pBitStream ) );
+            return true;
+        }
     }
     return false;
 }

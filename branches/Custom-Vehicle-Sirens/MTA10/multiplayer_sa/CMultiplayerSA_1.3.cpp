@@ -22,29 +22,41 @@ DWORD RETURN_CWaterCannon_PushPeds_RETN_Cancel = 0x729AEB;
 void HOOK_CEventHitByWaterCannon ( );
 
 #define HOOKPOS_CVehicle_ProcessStuff_TestSirenTypeSingle       0x6AB366
-DWORD RETN_CVehicle_ProcessStuff_TestSirenTypeSingle = 0x6AB36D;
+DWORD RETN_CVehicle_ProcessStuff_TestSirenTypeSingle          = 0x6AB36D;
 
 #define HOOKPOS_CVehicle_ProcessStuff_SetSirenPositionSingle    0x6ABC51
-DWORD RETN_CVehicle_ProcessStuff_PostPushSirenPositionSingle = 0x6ABC56;
+DWORD RETN_CVehicle_ProcessStuff_PostPushSirenPositionSingle  = 0x6ABC64;
 
 #define HOOKPOS_CVehicle_ProcessStuff_TestSirenTypeDual         0x6AB382
-DWORD RETN_CVehicle_ProcessStuff_TestSirenTypeDual = 0x6AB389;
+DWORD RETN_CVehicle_ProcessStuff_TestSirenTypeDual            = 0x6AB389;
 
 #define HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition1    0x6ABA47
-DWORD RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual1 = 0x6ABA5E;
+DWORD RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual1   = 0x6ABA5E;
 
 #define HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition2    0x6AB9F7
-DWORD RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual2 = 0x6ABA07;
+DWORD RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual2   = 0x6ABA07;
+
+#define HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionBlue    0x6BD4C3
+DWORD RETN_CMotorBike_ProcessStuff_PushSirenPositionDualBlue   = 0x6BD4DB;
+
+#define HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionRed     0x6BD516
+DWORD RETN_CMotorBike_ProcessStuff_PushSirenPositionDualRed    = 0x6BD52C;
+
+#define HOOKPOS_CMotorbike_ProcessStuff_TestVehicleModel        0x6BD40F
+DWORD RETN_CMotorbike_ProcessStuff_TestVehicleModel           = 0x6BD415;
 
 #define HOOKPOS_CVehicle_DoesVehicleUseSiren                    0x6D8470
-DWORD RETN_CVehicleDoesVehicleUseSirenRetn = 0x6D8497;
+DWORD RETN_CVehicleDoesVehicleUseSirenRetn                    = 0x6D8497;
 
 #define HOOKPOS_CVehicle_ProcessStuff_TestCameraPosition        0x6ABC17
-DWORD RETN_CVehicle_ProcessStuff_TestCameraPosition = 0x6ABC1C;
-DWORD RETN_CVehicle_ProcessStuff_TestCameraPosition2 = 0x6ABC1E;
+DWORD RETN_CVehicle_ProcessStuff_TestCameraPosition           = 0x6ABC1C;
+DWORD RETN_CVehicle_ProcessStuff_TestCameraPosition2          = 0x6ABC1E;
 
-#define HOOKPOS_CVehicleAudio_ProcessSirenSound             0x4F62BB
-DWORD RETN_CVehicleAudio_GetVehicleSirenType             =  0x4F62C1;
+#define HOOKPOS_CVehicleAudio_ProcessSirenSound                 0x4F62BB
+DWORD RETN_CVehicleAudio_GetVehicleSirenType                 =  0x4F62C1;
+
+#define HOOKPOS_CVehicleAudio_ProcessSirenSound2                0x5002C4
+
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( );
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeDual ( );
@@ -54,6 +66,10 @@ void HOOK_CVehicle_DoesVehicleUseSiren ( );
 void HOOK_CVehicle_ProcessStuff_TestCameraPosition ( );
 void HOOK_CVehicleAudio_ProcessSirenSound ( );
 void HOOK_CVehicleAudio_ProcessSirenSound2 ( );
+void HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue ( );
+void HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed ( );
+void HOOK_CMotorBike_ProcessStuff_PushSirenPosition2 ( );
+void HOOK_CMotorbike_ProcessStuff_TestVehicleModel ( );
 
 void CMultiplayerSA::Init_13 ( void )
 {
@@ -68,14 +84,19 @@ void CMultiplayerSA::InitHooks_13 ( void )
 
     // Siren hooks
     HookInstall ( HOOKPOS_CVehicle_ProcessStuff_TestSirenTypeSingle, (DWORD)HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle, 7 ); // Test siren type is single for a jump
-    HookInstall ( HOOKPOS_CVehicle_ProcessStuff_SetSirenPositionSingle, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle, 5 ); // mov before Push for the siren position
+    HookInstall ( HOOKPOS_CVehicle_ProcessStuff_SetSirenPositionSingle, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle, 19 ); // mov before Push for the siren position (overhook so we can get RGBA)
     HookInstall ( HOOKPOS_CVehicle_ProcessStuff_TestSirenTypeDual, (DWORD)HOOK_CVehicle_ProcessStuff_TestSirenTypeDual, 7 ); // test siren type is dual for a jump
     HookInstall ( HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition1, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed, 15 ); // mov before push for the siren position (overhook so we can get RGBA)
     HookInstall ( HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition2, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue, 15 ); // mov before push for the siren position (overhook so we can get RGBA)
     HookInstall ( HOOKPOS_CVehicle_DoesVehicleUseSiren, (DWORD)HOOK_CVehicle_DoesVehicleUseSiren, 5 ); // Does vehicle have a siren
     HookInstall ( HOOKPOS_CVehicle_ProcessStuff_TestCameraPosition, (DWORD)HOOK_CVehicle_ProcessStuff_TestCameraPosition, 5 ); // Fix for single sirens being 360 degrees
     HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound, (DWORD)HOOK_CVehicleAudio_ProcessSirenSound, 6 );
-    HookInstall ( 0x5002C4, (DWORD)HOOK_CVehicleAudio_ProcessSirenSound2, 5 );
+    HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound2, (DWORD)HOOK_CVehicleAudio_ProcessSirenSound2, 5 );
+    // Breaks Rear wheel rendering leave for now
+    //HookInstall ( HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionBlue, (DWORD)HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue, 15 ); // mov before the push for the sien position (overhook so we can get RGBA)
+    //HookInstall ( HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionRed, (DWORD)HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed, 22 ); // mov before the push for the sien position (overhook so we can get RGBA)
+
+    //HookInstall ( HOOKPOS_CMotorbike_ProcessStuff_TestVehicleModel, (DWORD)HOOK_CMotorbike_ProcessStuff_TestVehicleModel, 6 );
 }
 
 void CMultiplayerSA::InitMemoryCopies_13 ( void )
@@ -187,14 +208,20 @@ void SetupSirenColour ( CVehicle * pVehicle )
     fTime = *((float*)0xB7C4E4) * 0.1f;
     // Get our minimum alpha
     float fMinimumAlpha = pVehicle->GetVehicleSirenMinimumAlpha ( ucSirenCount );
+    // Get our Siren RGB Colour
+    SColor tSirenColour = pVehicle->GetVehicleSirenColour ( ucSirenCount );
+    // Times the alpha (255) by a multiplier to get it 0.0f-1.0f this multiplier was gained by doing 1.0 / 255.
+    float fMaximumAlpha =  tSirenColour.A * 0.003921568627451f;
     // if our time is less than or equal to the minimum alpha
     if ( fTime <= fMinimumAlpha )
     {
         // Set it to the minimum
         fTime = fMinimumAlpha;
     }
-    // Get our Siren RGB Colour
-    SColor tSirenColour = pVehicle->GetVehicleSirenColour ( ucSirenCount );
+    if ( fTime >= fMaximumAlpha )
+    {
+        fTime = fMaximumAlpha;
+    }
     // times the R,G and B components by the fTime variable ( to get our time based brightness )
     dwRed = (DWORD)( tSirenColour.R * fTime );
     dwGreen = (DWORD)( tSirenColour.G * fTime );
@@ -340,14 +367,39 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( )
         mov vecRelativeSirenPosition, edx
     }
     // Call our main siren Process function
-    ProcessVehicleSirenPosition ( );
-    _asm
+    if ( ProcessVehicleSirenPosition ( ) )
     {
-        popad
-        // push our siren position
-        push edx
-        // return back to SA
-        JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionSingle
+        _asm
+        {
+            popad
+            // push our siren position
+            push edx
+            push 0FFh
+            mov eax, dwBlue
+            push eax
+            mov eax, dwGreen
+            push eax
+            mov eax, dwRed
+            push eax
+            
+            // return back to SA
+            JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionSingle
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            // push our siren position
+            push edx
+            push 0FFh
+            push 0FFh
+            push 0
+            push 0
+            // return back to SA
+            JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionSingle
+        }
     }
 }
 
@@ -645,6 +697,142 @@ void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound2 ( )
         jmp dwReturn
     }
 }
+DWORD RETN_CMotorbike_ProcessStuff_PostPushSirenPositionDual1 = 0x6BD4DB;
+
+void _declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue ( )
+{ 
+    _asm
+    {
+        // Grab our siren position vector
+        lea eax,[esp+0ECh]
+        pushad
+        // Grab our vehicle interface
+        mov pVehicleWithTheSiren, esi
+        // move our position vector pointer into our position variable
+        mov vecRelativeSirenPosition, eax
+    }
+
+    // Call our main process siren function
+    if ( ProcessVehicleSirenPosition ( ) )
+    {
+        _asm
+        {
+            popad
+            // Push our position
+            push eax
+            // move our R,G,B components into registers then push them
+            push 0FFh
+            mov ebp, dwBlue
+            push ebp
+            mov ebp, dwGreen
+            push ebp
+            mov eax, dwRed
+            lea ecx, [esi+15h]
+            push eax
+            // Return control
+            JMP RETN_CMotorbike_ProcessStuff_PostPushSirenPositionDual1
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            // Push our position
+            push eax
+            push 0FFh
+            // Push our R,G,B components (inverse order)
+            push ebp
+            push ebp
+            lea ecx, [esi+15h]
+            push eax
+            // Return control
+            JMP RETN_CMotorbike_ProcessStuff_PostPushSirenPositionDual1
+        }
+    }
+}
+
+void _declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed ( )
+{ 
+    _asm
+    {
+        pushad
+        // Grab our vehicle interface
+        mov pVehicleWithTheSiren, esi
+        // move our position vector pointer into our position variable
+        mov vecRelativeSirenPosition, edx
+    }
+
+    // Call our main process siren function
+    if ( ProcessVehicleSirenPosition ( ) )
+    {
+        _asm
+        {
+            popad
+            // Push our position
+            push edx
+            // Grab our siren position vector
+            mov [esp+4Fh], al
+            sub bl, al
+            push 0FFh
+            // move our R,G,B components into registers then push them ( Use eax because it's reset after )
+            mov eax, dwBlue
+            push eax
+            mov eax, dwGreen
+            push eax
+            mov eax, dwRed
+            push eax
+            // Return control
+            JMP RETN_CMotorBike_ProcessStuff_PushSirenPositionDualRed
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            // Push our position
+            push edx
+            mov [esp+4Fh], al
+            sub bl, al
+            push 0FFh
+            // Push our R,G,B components (inverse order)
+            push eax
+            push 0
+            push 0
+            // Return control
+            JMP RETN_CMotorBike_ProcessStuff_PushSirenPositionDualRed
+        }
+    }
+}
+DWORD RETN_CMotorbike_ProcessStuff_TestVehicleModel2 = 0x6BD41B;
+void _declspec(naked) HOOK_CMotorbike_ProcessStuff_TestVehicleModel ( )
+{
+    _asm
+    {
+        pushad
+        mov pVehicleWithTheSiren, esi
+    }
+    if ( TestVehicleForSiren ( ) )
+    {
+        _asm
+        {
+            popad
+            cmp word ptr [esi+22h], 20Bh
+            jmp RETN_CMotorbike_ProcessStuff_TestVehicleModel2
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            cmp word ptr [esi+22h], 20Bh
+            jmp RETN_CMotorbike_ProcessStuff_TestVehicleModel
+        }
+    }
+}
+
 // Water Cannon Stuff
 
 void CMultiplayerSA::SetWaterCannonHitHandler ( WaterCannonHitHandler * pHandler )
