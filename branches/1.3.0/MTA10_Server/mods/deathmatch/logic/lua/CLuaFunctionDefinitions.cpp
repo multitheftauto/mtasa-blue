@@ -10280,8 +10280,30 @@ int CLuaFunctionDefinitions::SetTimer ( lua_State* luaVM )
                 lua_pushboolean ( luaVM, false );
                 return 1;
             }
-
+            lua_Debug debugInfo;
+            SString strDebugOutput = "";
+            // Check our luaVM and get a debug info from the stack
+            if ( luaVM && lua_getstack ( luaVM, 1, &debugInfo ) )
+            {
+                // Get name line and... no idea. for debug
+                lua_getinfo ( luaVM, "nlS", &debugInfo );
+                if ( debugInfo.source[0] == '@' )
+                {
+                    SString strFile = ConformResourcePath ( debugInfo.source );
+                    // Get and store the location of the setTimer call in case the contents error
+                    strDebugOutput = SString ( "%s:%i ", strFile.c_str ( ), debugInfo.currentline );
+                }
+                else
+                {
+                    // Get and store the location of the setTimer call in case the contents error
+                    strDebugOutput = SString ( "%s ", debugInfo.short_src );
+                }
+            }
             CLuaTimer* pLuaTimer = luaMain->GetTimerManager ()->AddTimer ( iLuaFunction, CTickCount ( dTimeInterval ), uiTimesToExecute, Arguments );
+
+            // Set our timer debug info (in case we don't have any debug info which is usually when you do setTimer(destroyElement, 50, 1) or such)
+            pLuaTimer->SetDebugInfo ( strDebugOutput );
+
             if ( pLuaTimer )
             {
                 lua_pushtimer ( luaVM, pLuaTimer );
