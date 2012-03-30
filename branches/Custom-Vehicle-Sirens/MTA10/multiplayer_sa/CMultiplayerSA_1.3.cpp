@@ -57,6 +57,9 @@ DWORD RETN_CVehicleAudio_GetVehicleSirenType                 =  0x4F62C1;
 
 #define HOOKPOS_CVehicleAudio_ProcessSirenSound2                0x5002C4
 
+#define HOOOKPOS_CVehicle_ProcessStuff_PushRGBPointLights       0x6AB7A5
+DWORD RETN_CVehicle_ProcessStuff_PushRGBPointLights          =  0x6AB7D5;
+
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( );
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeDual ( );
@@ -70,6 +73,7 @@ void HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue ( );
 void HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed ( );
 void HOOK_CMotorBike_ProcessStuff_PushSirenPosition2 ( );
 void HOOK_CMotorbike_ProcessStuff_TestVehicleModel ( );
+void HOOOK_CVehicle_ProcessStuff_PushRGBPointLights ( );
 
 void CMultiplayerSA::Init_13 ( void )
 {
@@ -97,6 +101,7 @@ void CMultiplayerSA::InitHooks_13 ( void )
     //HookInstall ( HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionRed, (DWORD)HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed, 22 ); // mov before the push for the sien position (overhook so we can get RGBA)
 
     //HookInstall ( HOOKPOS_CMotorbike_ProcessStuff_TestVehicleModel, (DWORD)HOOK_CMotorbike_ProcessStuff_TestVehicleModel, 6 );
+    HookInstall ( HOOOKPOS_CVehicle_ProcessStuff_PushRGBPointLights, (DWORD)HOOOK_CVehicle_ProcessStuff_PushRGBPointLights, 48 );
 }
 
 void CMultiplayerSA::InitMemoryCopies_13 ( void )
@@ -127,7 +132,7 @@ DWORD dwGreen = 0;
 DWORD dwBlue = 0;
 DWORD dwMinAlphaValue = 0x46;
 DWORD dwSirenTypePostHook = 0;
-
+bool bPointLights = false;
 bool DoesVehicleHaveSiren ( )
 {
     // Static function to check if the vehicle has sirens natively if so we ignore those for now
@@ -222,10 +227,20 @@ void SetupSirenColour ( CVehicle * pVehicle )
     {
         fTime = fMaximumAlpha;
     }
-    // times the R,G and B components by the fTime variable ( to get our time based brightness )
-    dwRed = (DWORD)( tSirenColour.R * fTime );
-    dwGreen = (DWORD)( tSirenColour.G * fTime );
-    dwBlue = (DWORD)( tSirenColour.B * fTime );
+    if ( bPointLights == false )
+    {
+        // times the R,G and B components by the fTime variable ( to get our time based brightness )
+        dwRed = (DWORD)( tSirenColour.R * fTime );
+        dwGreen = (DWORD)( tSirenColour.G * fTime );
+        dwBlue = (DWORD)( tSirenColour.B * fTime );
+    }
+    else
+    {
+        // times the R,G and B components by the fTime variable ( to get our time based brightness )
+        dwRed = (DWORD)( tSirenColour.R );
+        dwGreen = (DWORD)( tSirenColour.G );
+        dwBlue = (DWORD)( tSirenColour.B );
+    }
 }
 
 bool ProcessVehicleSirenPosition ( )
@@ -233,6 +248,7 @@ bool ProcessVehicleSirenPosition ( )
     // Disable our original siren based vehicles from this hook
     if ( DoesVehicleHaveSiren ( ) )
     {
+        bPointLights = false;
         // return false so our hook knows we decided not to edit anything
         return false;
     }
@@ -268,88 +284,104 @@ bool ProcessVehicleSirenPosition ( )
                             // Set our Randomiser
                             ucRandomiser = 0;
 
-                        // Update our stored Randomiser
-                        pVehicle->SetSirenRandomiser ( ucRandomiser );
+                        if ( bPointLights == false )
+                        {
+                            // Update our stored Randomiser
+                            pVehicle->SetSirenRandomiser ( ucRandomiser );
+                        }
                     }
                     else
                     {
                         // Set our Randomiser
                         ucRandomiser = rand () % ucVehicleSirenCount;
+                        if ( bPointLights == false )
+                        {
+                            // Update our stored Randomiser
+                            pVehicle->SetSirenRandomiser ( ucRandomiser );
+                        }
+                    }
+                }
+                else
+                {
+                    ucRandomiser++;
+                    if ( ucRandomiser >= ucVehicleSirenCount )
+                    {
+                        ucRandomiser = 0;
+                    }
+                    if ( bPointLights == false )
+                    {
                         // Update our stored Randomiser
                         pVehicle->SetSirenRandomiser ( ucRandomiser );
                     }
                 }
-                 else
-                 {
-                     ucRandomiser++;
-                     if ( ucRandomiser >= ucVehicleSirenCount )
-                     {
-                         ucRandomiser = 0;
-                     }
-                     // Update our stored Randomiser
-                     pVehicle->SetSirenRandomiser ( ucRandomiser );
-                 }
                 ucSirenCount = ucRandomiser;
 
-                // Gete our siren position for this siren count
-                pVehicle->GetVehicleSirenPosition ( ucSirenCount, *vecRelativeSirenPosition );
-
-                // Are we skipping LOS Checks?
-                if ( pVehicle->IsSirenLOSCheckEnabled ( ) )
+                if ( bPointLights == false )
                 {
-                    // Storage 'n stuff
-                    CMatrix matCamera;
-                    CMatrix matVehicle;
-                    // Grab our vehicle matrix
-                    pVehicle->GetMatrix( &matVehicle );
+                    // Gete our siren position for this siren count
+                    pVehicle->GetVehicleSirenPosition ( ucSirenCount, *vecRelativeSirenPosition );
+                }
 
-                    // Get our Camera
-                    CCamera* pCamera = pGameInterface->GetCamera ();
-                    // Get the Camera Matrix
-                    pCamera->GetMatrix( &matCamera );
-
-                    // Get our sirens ACTUAL position from the relative value
-                    CVector vecSirenPosition = matVehicle.TransformVector ( *vecRelativeSirenPosition );
-
-                    // Setup our LOS flags
-                    SLineOfSightFlags flags;
-                    flags.bCheckBuildings = false;
-                    flags.bCheckDummies = false;
-                    flags.bCheckObjects = false;
-                    flags.bCheckPeds = false;
-                    flags.bCheckVehicles = true;
-                    flags.bIgnoreSomeObjectsForCamera = false;
-                    flags.bSeeThroughStuff = false;
-                    flags.bShootThroughStuff = false;
-                    // Ignore nothing
-                    pGameInterface->GetWorld()->IgnoreEntity ( NULL );
-                    // Variables 'n tings
-                    CColPoint* pColPoint = NULL;
-                    CEntity* pGameEntity = NULL;
-                    // Check if we can see it
-                    if ( pGameInterface->GetWorld()->IsLineOfSightClear ( &matCamera.vPos, &vecSirenPosition, flags ) == false )
+                if ( bPointLights == false )
+                {
+                    // Are we skipping LOS Checks?
+                    if ( pVehicle->IsSirenLOSCheckEnabled ( ) )
                     {
-                        // Nope? Invisible
-                        dwRed = 0;
-                        dwGreen = 0;
-                        dwBlue = 0;
+                        // Storage 'n stuff
+                        CMatrix matCamera;
+                        CMatrix matVehicle;
+                        // Grab our vehicle matrix
+                        pVehicle->GetMatrix( &matVehicle );
+
+                        // Get our Camera
+                        CCamera* pCamera = pGameInterface->GetCamera ();
+                        // Get the Camera Matrix
+                        pCamera->GetMatrix( &matCamera );
+
+                        // Get our sirens ACTUAL position from the relative value
+                        CVector vecSirenPosition = matVehicle.TransformVector ( *vecRelativeSirenPosition );
+
+                        // Setup our LOS flags
+                        SLineOfSightFlags flags;
+                        flags.bCheckBuildings = false;
+                        flags.bCheckDummies = false;
+                        flags.bCheckObjects = false;
+                        flags.bCheckPeds = false;
+                        flags.bCheckVehicles = true;
+                        flags.bIgnoreSomeObjectsForCamera = false;
+                        flags.bSeeThroughStuff = false;
+                        flags.bShootThroughStuff = false;
+                        // Ignore nothing
+                        pGameInterface->GetWorld()->IgnoreEntity ( NULL );
+                        // Variables 'n tings
+                        CColPoint* pColPoint = NULL;
+                        CEntity* pGameEntity = NULL;
+                        // Check if we can see it
+                        if ( pGameInterface->GetWorld()->IsLineOfSightClear ( &matCamera.vPos, &vecSirenPosition, flags ) == false )
+                        {
+                            // Nope? Invisible
+                            dwRed = 0;
+                            dwGreen = 0;
+                            dwBlue = 0;
+                        }
+                        else
+                        {
+                            // Yep?
+                            SetupSirenColour ( pVehicle );
+                        }
                     }
                     else
                     {
-                        // Yep?
-                        SetupSirenColour ( pVehicle );
+                        // Skip LOS Checks.
+                        SetupSirenColour ( pVehicle ); 
                     }
+                    // Set our current Siren ID after we increment it
+                    pVehicle->SetVehicleCurrentSirenID ( ++ucSirenCount );
                 }
-                 else
-                 {
-                     // Skip LOS Checks.
-                     SetupSirenColour ( pVehicle ); 
-                 }
-//                 // Set our current Siren ID after we increment it
-                pVehicle->SetVehicleCurrentSirenID ( ++ucSirenCount );
             }
         }
     }
+    bPointLights = false;
     // Return true
     return true;
 }
@@ -832,7 +864,58 @@ void _declspec(naked) HOOK_CMotorbike_ProcessStuff_TestVehicleModel ( )
         }
     }
 }
-
+DWORD dwValue = 0x858B4C;
+void _declspec(naked) HOOOK_CVehicle_ProcessStuff_PushRGBPointLights ( )
+{
+    _asm
+    {
+        pushad
+        mov esi, pVehicleWithTheSiren
+    }
+    bPointLights = true;
+    if ( ProcessVehicleSirenPosition ( ) )
+    {
+        _asm
+        {
+            popad
+            mov     edx, dwBlue
+            mov     eax, dwGreen
+            mov     ecx, dwRed
+            mov     [esp+30h], edx
+            fild    dword ptr [esp+30h]
+            mov     [esp+30h], eax
+            mov     eax, [esp+44h]
+            fmul    dword ptr ds:[0858B4Ch]
+            fstp    dword ptr [esp+8]
+            fild    dword ptr [esp+30h]
+            mov     [esp+30h], ecx
+            mov     ecx, [esp+48h]
+            fmul    dword ptr ds:[0858B4Ch]
+            fstp    dword ptr [esp+4]
+            fild    dword ptr [esp+30h]
+            JMP RETN_CVehicle_ProcessStuff_PushRGBPointLights
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            fild    dword ptr [esp+30h]
+            mov     [esp+30h], eax
+            mov     eax, [esp+44h]
+            fmul    dword ptr ds:[0858B4Ch]
+            fstp    dword ptr [esp+8]
+            fild    dword ptr [esp+30h]
+            mov     [esp+30h], ecx
+            mov     ecx, [esp+48h]
+            fmul    dword ptr ds:[0858B4Ch]
+            fstp    dword ptr [esp+4]
+            fild    dword ptr [esp+30h]
+            JMP RETN_CVehicle_ProcessStuff_PushRGBPointLights
+        }
+    }
+}
 // Water Cannon Stuff
 
 void CMultiplayerSA::SetWaterCannonHitHandler ( WaterCannonHitHandler * pHandler )
