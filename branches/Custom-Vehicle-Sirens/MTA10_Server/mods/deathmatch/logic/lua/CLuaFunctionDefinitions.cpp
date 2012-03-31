@@ -4209,13 +4209,11 @@ int CLuaFunctionDefinitions::SetVehicleSirens( lua_State* luaVM )
 {
     CScriptArgReader argStream ( luaVM );
     CVehicle* pVehicle = NULL;
-    unsigned char ucSirenType = 0;
     unsigned char ucSirenID = 0;
     SSirenInfo tSirenInfo;
 
     argStream.ReadUserData ( pVehicle );
     argStream.ReadNumber ( ucSirenID );
-    argStream.ReadNumber ( ucSirenType );
     if ( ucSirenID > 0 )
     {
         // Array indicies start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
