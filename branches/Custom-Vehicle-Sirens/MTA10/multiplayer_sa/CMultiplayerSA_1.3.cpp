@@ -738,7 +738,6 @@ void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound2 ( )
 {
     _asm
     {
-        mov edx, [esp+1Ch]
         mov pVehicleWithTheSiren, edi
         pushad
     }
@@ -749,6 +748,7 @@ void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound2 ( )
         call CALL_CVehicleAudio_ProcessCarHorn
     }
 }
+
 DWORD RETN_CMotorbike_ProcessStuff_PostPushSirenPositionDual1 = 0x6BD4DB;
 
 void _declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue ( )
