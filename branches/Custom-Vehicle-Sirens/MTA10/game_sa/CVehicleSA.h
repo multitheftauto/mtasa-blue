@@ -737,6 +737,8 @@ public:
     unsigned char               GetVehicleCurrentSirenID        ( void )  { return m_tSirenInfo.m_ucCurrentSirenID; }
     unsigned char               GetSirenRandomiser              ( void )  { return m_tSirenInfo.m_ucCurrentSirenRandomiser; }
     void                        SetSirenRandomiser              ( unsigned char ucSirenRandomiser )  { m_tSirenInfo.m_ucCurrentSirenRandomiser = ucSirenRandomiser; }
+    void                        SetPointLightColour             ( SColor tPointLightColour )  { m_tSirenInfo.m_tPointLightColour = tPointLightColour; }
+    SColor                      GetPointLightColour             ( void )  { return m_tSirenInfo.m_tPointLightColour; }
     bool                        IsSiren360EffectEnabled         ( void )  { return m_tSirenInfo.m_b360Flag; }
     bool                        IsSirenLOSCheckEnabled          ( void )  { return m_tSirenInfo.m_bDoLOSCheck; }
     bool                        IsSirenRandomiserEnabled        ( void )  { return m_tSirenInfo.m_bUseRandomiser; }

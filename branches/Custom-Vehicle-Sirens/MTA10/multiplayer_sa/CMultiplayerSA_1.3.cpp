@@ -36,11 +36,11 @@ DWORD RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual1   = 0x6ABA5E;
 #define HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition2    0x6AB9F7
 DWORD RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual2   = 0x6ABA07;
 
-#define HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionBlue    0x6BD4C3
-DWORD RETN_CMotorBike_ProcessStuff_PushSirenPositionDualBlue   = 0x6BD4DB;
+#define HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionBlue   0x6BD4C3
+DWORD RETN_CMotorBike_ProcessStuff_PushSirenPositionDualBlue  = 0x6BD4DB;
 
-#define HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionRed     0x6BD516
-DWORD RETN_CMotorBike_ProcessStuff_PushSirenPositionDualRed    = 0x6BD52C;
+#define HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionRed    0x6BD516
+DWORD RETN_CMotorBike_ProcessStuff_PushSirenPositionDualRed   = 0x6BD52C;
 
 #define HOOKPOS_CMotorbike_ProcessStuff_TestVehicleModel        0x6BD40F
 DWORD RETN_CMotorbike_ProcessStuff_TestVehicleModel           = 0x6BD415;
@@ -57,8 +57,12 @@ DWORD RETN_CVehicleAudio_GetVehicleSirenType                 =  0x4F62C1;
 
 #define HOOKPOS_CVehicleAudio_ProcessSirenSound2                0x5002C4
 
-#define HOOOKPOS_CVehicle_ProcessStuff_PushRGBPointLights       0x6AB7A5
+#define HOOKPOS_CVehicle_ProcessStuff_PushRGBPointLights        0x6AB7A5
 DWORD RETN_CVehicle_ProcessStuff_PushRGBPointLights          =  0x6AB7D5;
+
+#define HOOKPOS_CVehicle_ProcessStuff_StartPointLightCode       0x6AB722
+DWORD RETN_CVehicle_ProcessStuff_StartPointLightCode         =  0x6AB729;
+DWORD RETN_CVehicle_ProcessStuff_IgnorePointLightCode        =  0x6AB823;
 
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( );
@@ -73,7 +77,8 @@ void HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue ( );
 void HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed ( );
 void HOOK_CMotorBike_ProcessStuff_PushSirenPosition2 ( );
 void HOOK_CMotorbike_ProcessStuff_TestVehicleModel ( );
-void HOOOK_CVehicle_ProcessStuff_PushRGBPointLights ( );
+void HOOK_CVehicle_ProcessStuff_PushRGBPointLights ( );
+void HOOK_CVehicle_ProcessStuff_StartPointLightCode ( );
 
 void CMultiplayerSA::Init_13 ( void )
 {
@@ -101,7 +106,8 @@ void CMultiplayerSA::InitHooks_13 ( void )
     //HookInstall ( HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionRed, (DWORD)HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed, 22 ); // mov before the push for the sien position (overhook so we can get RGBA)
 
     //HookInstall ( HOOKPOS_CMotorbike_ProcessStuff_TestVehicleModel, (DWORD)HOOK_CMotorbike_ProcessStuff_TestVehicleModel, 6 );
-    HookInstall ( HOOOKPOS_CVehicle_ProcessStuff_PushRGBPointLights, (DWORD)HOOOK_CVehicle_ProcessStuff_PushRGBPointLights, 48 );
+    //HookInstall ( HOOKPOS_CVehicle_ProcessStuff_PushRGBPointLights, (DWORD)HOOK_CVehicle_ProcessStuff_PushRGBPointLights, 48 );
+    HookInstall ( HOOKPOS_CVehicle_ProcessStuff_StartPointLightCode, (DWORD)HOOK_CVehicle_ProcessStuff_StartPointLightCode, 5 );
 }
 
 void CMultiplayerSA::InitMemoryCopies_13 ( void )
@@ -130,6 +136,9 @@ DWORD dwSirenType2 = 3;
 DWORD dwRed = 0;
 DWORD dwGreen = 0;
 DWORD dwBlue = 0;
+float fRed = 0.0f;
+float fGreen = 0.0f;
+float fBlue = 0.0f;
 DWORD dwMinAlphaValue = 0x46;
 DWORD dwSirenTypePostHook = 0;
 bool bPointLights = false;
@@ -233,13 +242,15 @@ void SetupSirenColour ( CVehicle * pVehicle )
         dwRed = (DWORD)( tSirenColour.R * fTime );
         dwGreen = (DWORD)( tSirenColour.G * fTime );
         dwBlue = (DWORD)( tSirenColour.B * fTime );
+        //pVehicle->SetPointLightColour ( tSirenColour );
     }
     else
     {
+        SColor tSirenColour = pVehicle->GetPointLightColour ( );
         // times the R,G and B components by the fTime variable ( to get our time based brightness )
-        dwRed = (DWORD)( tSirenColour.R );
-        dwGreen = (DWORD)( tSirenColour.G );
-        dwBlue = (DWORD)( tSirenColour.B );
+        dwRed = 0x3DCCCCCD;
+        dwGreen = 0x3DCCCCCD;
+        dwBlue = 0x3D4CCCCD;
     }
 }
 
@@ -398,6 +409,7 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( )
         // Put edx into our position variable
         mov vecRelativeSirenPosition, edx
     }
+    bPointLights = false;
     // Call our main siren Process function
     if ( ProcessVehicleSirenPosition ( ) )
     {
@@ -485,6 +497,7 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed ( 
         // move our position vector pointer into our position variable
         mov vecRelativeSirenPosition, eax
     }
+    bPointLights = false;
 
     // Call our main process siren function
     if ( ProcessVehicleSirenPosition ( ) )
@@ -539,6 +552,7 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue (
         // move our position vector pointer into our position variable
         mov vecRelativeSirenPosition, eax
     }
+    bPointLights = false;
 
     // Call our main process siren function
     if ( ProcessVehicleSirenPosition ( ) )
@@ -744,6 +758,7 @@ void _declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue ( )
         mov vecRelativeSirenPosition, eax
     }
 
+    bPointLights = false;
     // Call our main process siren function
     if ( ProcessVehicleSirenPosition ( ) )
     {
@@ -795,6 +810,7 @@ void _declspec(naked) HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed ( )
         mov vecRelativeSirenPosition, edx
     }
 
+    bPointLights = false;
     // Call our main process siren function
     if ( ProcessVehicleSirenPosition ( ) )
     {
@@ -865,7 +881,7 @@ void _declspec(naked) HOOK_CMotorbike_ProcessStuff_TestVehicleModel ( )
     }
 }
 DWORD dwValue = 0x858B4C;
-void _declspec(naked) HOOOK_CVehicle_ProcessStuff_PushRGBPointLights ( )
+void _declspec(naked) HOOK_CVehicle_ProcessStuff_PushRGBPointLights ( )
 {
     _asm
     {
@@ -913,6 +929,36 @@ void _declspec(naked) HOOOK_CVehicle_ProcessStuff_PushRGBPointLights ( )
             fstp    dword ptr [esp+4]
             fild    dword ptr [esp+30h]
             JMP RETN_CVehicle_ProcessStuff_PushRGBPointLights
+        }
+    }
+}
+
+void _declspec(naked) HOOK_CVehicle_ProcessStuff_StartPointLightCode ( )
+{
+    _asm
+    {
+        pushad
+        mov pVehicleWithTheSiren, esi
+    }
+    if ( DoesVehicleHaveSiren ( ) )
+    {
+        _asm
+        {
+            popad
+            fld dword ptr [eax+28h]
+            mov edx, [ecx]
+            fadd st, st
+            jmp RETN_CVehicle_ProcessStuff_StartPointLightCode
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            movzx   eax, byte ptr [esp+88h]
+            mov     [esp+50h], eax
+            jmp RETN_CVehicle_ProcessStuff_IgnorePointLightCode
         }
     }
 }

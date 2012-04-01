@@ -56,6 +56,7 @@ struct SSirenInfo
     unsigned char               m_ucCurrentSirenID;
     unsigned char               m_ucCurrentSirenRandomiser;
     SSirenBeaconInfo            m_tSirenInfo [8];
+    SColor                      m_tPointLightColour;
 };
 class CVehicle : public virtual CPhysical
 {
@@ -261,6 +262,8 @@ public:
     virtual unsigned char        GetVehicleCurrentSirenID               ( void ) = 0;
     virtual unsigned char        GetSirenRandomiser                     ( void ) = 0;
     virtual void                 SetSirenRandomiser                     ( unsigned char ucSirenRandomiser ) = 0;
+    virtual void                 SetPointLightColour                    ( SColor tPointLightColour ) = 0;
+    virtual SColor               GetPointLightColour                    ( void ) = 0;
     virtual bool                 IsSiren360EffectEnabled                ( void ) = 0;
     virtual bool                 IsSirenLOSCheckEnabled                 ( void ) = 0;
     virtual bool                 IsSirenRandomiserEnabled               ( void ) = 0;
