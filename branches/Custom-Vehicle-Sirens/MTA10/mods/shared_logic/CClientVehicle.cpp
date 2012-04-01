@@ -2245,6 +2245,7 @@ void CClientVehicle::Create ( void )
                 m_pVehicle->SetVehicleSirenMinimumAlpha( i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_fMinSirenAlpha );
                 m_pVehicle->SetVehicleSirenColour( i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_RGBBeaconColour );
             }
+            SetVehicleFlags ( m_tSirenBeaconInfo.m_b360Flag, m_tSirenBeaconInfo.m_bUseRandomiser, m_tSirenBeaconInfo.m_bDoLOSCheck, m_tSirenBeaconInfo.m_bSirenSilent );
         }
         m_pVehicle->SetSirenOrAlarmActive ( m_bSireneOrAlarmActive );
         SetLandingGearDown ( m_bLandingGearDown );

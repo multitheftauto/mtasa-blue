@@ -52,10 +52,14 @@ DWORD RETN_CVehicleDoesVehicleUseSirenRetn                    = 0x6D8497;
 DWORD RETN_CVehicle_ProcessStuff_TestCameraPosition           = 0x6ABC1C;
 DWORD RETN_CVehicle_ProcessStuff_TestCameraPosition2          = 0x6ABC1E;
 
-#define HOOKPOS_CVehicleAudio_ProcessSirenSound                 0x4F62BB
-DWORD RETN_CVehicleAudio_GetVehicleSirenType                 =  0x4F62C1;
+#define HOOKPOS_CVehicleAudio_ProcessSirenSound1                 0x501FC2
 
-#define HOOKPOS_CVehicleAudio_ProcessSirenSound2                0x5002C4
+#define HOOKPOS_CVehicleAudio_ProcessSirenSound2                0x502067
+
+#define HOOKPOS_CVehicleAudio_ProcessSirenSound3                0x5021AE
+
+#define HOOKPOS_CVehicleAudio_ProcessSirenSound             0x4F62BB
+DWORD RETN_CVehicleAudio_GetVehicleSirenType             =  0x4F62C1;
 
 #define HOOKPOS_CVehicle_ProcessStuff_PushRGBPointLights        0x6AB7A5
 DWORD RETN_CVehicle_ProcessStuff_PushRGBPointLights          =  0x6AB7D5;
@@ -99,8 +103,6 @@ void CMultiplayerSA::InitHooks_13 ( void )
     HookInstall ( HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition2, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue, 15 ); // mov before push for the siren position (overhook so we can get RGBA)
     HookInstall ( HOOKPOS_CVehicle_DoesVehicleUseSiren, (DWORD)HOOK_CVehicle_DoesVehicleUseSiren, 5 ); // Does vehicle have a siren
     HookInstall ( HOOKPOS_CVehicle_ProcessStuff_TestCameraPosition, (DWORD)HOOK_CVehicle_ProcessStuff_TestCameraPosition, 5 ); // Fix for single sirens being 360 degrees
-    HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound, (DWORD)HOOK_CVehicleAudio_ProcessSirenSound, 6 );
-    HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound2, (DWORD)HOOK_CVehicleAudio_ProcessSirenSound2, 5 );
     // Breaks Rear wheel rendering leave for now
     //HookInstall ( HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionBlue, (DWORD)HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue, 15 ); // mov before the push for the sien position (overhook so we can get RGBA)
     //HookInstall ( HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionRed, (DWORD)HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed, 22 ); // mov before the push for the sien position (overhook so we can get RGBA)
@@ -108,6 +110,11 @@ void CMultiplayerSA::InitHooks_13 ( void )
     //HookInstall ( HOOKPOS_CMotorbike_ProcessStuff_TestVehicleModel, (DWORD)HOOK_CMotorbike_ProcessStuff_TestVehicleModel, 6 );
     //HookInstall ( HOOKPOS_CVehicle_ProcessStuff_PushRGBPointLights, (DWORD)HOOK_CVehicle_ProcessStuff_PushRGBPointLights, 48 );
     HookInstall ( HOOKPOS_CVehicle_ProcessStuff_StartPointLightCode, (DWORD)HOOK_CVehicle_ProcessStuff_StartPointLightCode, 5 );
+
+    HookInstallCall ( HOOKPOS_CVehicleAudio_ProcessSirenSound1, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound2 );
+    HookInstallCall ( HOOKPOS_CVehicleAudio_ProcessSirenSound2, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound2 );
+    HookInstallCall ( HOOKPOS_CVehicleAudio_ProcessSirenSound3, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound2 );
+    HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound, 6 );
 }
 
 void CMultiplayerSA::InitMemoryCopies_13 ( void )
@@ -726,21 +733,20 @@ void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound ( )
         }
     }
 }
-DWORD dwReturn = 0x5002C9;
+DWORD CALL_CVehicleAudio_ProcessCarHorn = 0x5002C0;
 void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound2 ( )
 {
     _asm
     {
-        pushad
+        mov edx, [esp+1Ch]
         mov pVehicleWithTheSiren, edi
+        pushad
     }
 
     _asm
     {
         popad
-        push edi
-        mov edi, [esp+18h]
-        jmp dwReturn
+        call CALL_CVehicleAudio_ProcessCarHorn
     }
 }
 DWORD RETN_CMotorbike_ProcessStuff_PostPushSirenPositionDual1 = 0x6BD4DB;
