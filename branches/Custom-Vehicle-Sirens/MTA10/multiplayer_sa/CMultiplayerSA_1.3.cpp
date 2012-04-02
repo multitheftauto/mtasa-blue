@@ -203,6 +203,14 @@ void GetVehicleSirenType ( )
             }
         }
     }
+    if ( dwSirenType > 2 )
+    {
+        dwSirenType = 0;
+    }
+    if ( dwSirenType2 < 0 || dwSirenType2 > 5 )
+    {
+        dwSirenType2 = 5;
+    }
 }
 void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( )
 {
