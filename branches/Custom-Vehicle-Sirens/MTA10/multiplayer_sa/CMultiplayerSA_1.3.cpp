@@ -241,13 +241,15 @@ void SetupSirenColour ( CVehicle * pVehicle )
     // Set our time based alpha to 10% of the current time float
     fTime = *((float*)0xB7C4E4) * 0.1f;
     // Get our minimum alpha
-    float fMinimumAlpha = pVehicle->GetVehicleSirenMinimumAlpha ( ucSirenCount );
+    DWORD dwMinimumAlpha = pVehicle->GetVehicleSirenMinimumAlpha ( ucSirenCount );
     // Get our Siren RGB Colour
     SColor tSirenColour = pVehicle->GetVehicleSirenColour ( ucSirenCount );
     // Times the alpha (255) by a multiplier to get it 0.0f-1.0f this multiplier was gained by doing 1.0 / 255.
     float fMaximumAlpha =  tSirenColour.A * 0.003921568627451f;
+    // Times the min alpha (255) by a multiplier to get it 0.0f-1.0f this multiplier was gained by doing 1.0 / 255.
+    float fMinimumAlpha =  dwMinimumAlpha * 0.003921568627451f;
     // if our time is less than or equal to the minimum alpha
-    if ( fTime <= fMinimumAlpha )
+    if ( fTime <= dwMinimumAlpha )
     {
         // Set it to the minimum
         fTime = fMinimumAlpha;

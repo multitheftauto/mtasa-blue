@@ -118,7 +118,7 @@ struct SSirenBeaconInfo
 {
     CVector                     m_vecSirenPositions;
     SColor                      m_RGBBeaconColour;
-    float                       m_fMinSirenAlpha;
+    DWORD                       m_dwMinSirenAlpha;
 };
 struct SSirenInfo
 {
@@ -326,7 +326,7 @@ public:
     inline bool                     DoesVehicleHaveSirens   ( void )                      { return m_tSirenBeaconInfo.m_bOverrideSirens; }
     void                            RemoveVehicleSirens     ( void );
     void                            SetVehicleSirenPosition     ( unsigned char ucSirenID, CVector vecPos );
-    void                            SetVehicleSirenMinimumAlpha ( unsigned char ucSirenID, float fPercentage );
+    void                            SetVehicleSirenMinimumAlpha ( unsigned char ucSirenID, DWORD dwPercentage );
     void                            SetVehicleSirenColour       ( unsigned char ucSirenID, SColor tVehicleSirenColour );
     void                            SetVehicleFlags             ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck );
 private:

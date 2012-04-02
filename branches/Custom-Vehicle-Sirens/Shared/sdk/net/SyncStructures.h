@@ -1601,7 +1601,7 @@ struct SVehicleSirenSync : public ISyncStructure
                 bitStream.Read ( data.m_colSirenColour.R );
                 bitStream.Read ( data.m_colSirenColour.G );
                 bitStream.Read ( data.m_colSirenColour.B );
-                bitStream.Read ( data.m_fSirenMinAlpha );
+                bitStream.Read ( data.m_dwSirenMinAlpha );
                 bitStream.ReadBit ( data.m_b360Flag );
                 bitStream.ReadBit ( data.m_bDoLOSCheck );
                 bitStream.ReadBit ( data.m_bUseRandomiser );
@@ -1626,7 +1626,7 @@ struct SVehicleSirenSync : public ISyncStructure
             bitStream.Write ( data.m_colSirenColour.R );
             bitStream.Write ( data.m_colSirenColour.G );
             bitStream.Write ( data.m_colSirenColour.B );
-            bitStream.Write ( data.m_fSirenMinAlpha );
+            bitStream.Write ( data.m_dwSirenMinAlpha );
             bitStream.WriteBit ( data.m_b360Flag );
             bitStream.WriteBit ( data.m_bDoLOSCheck );
             bitStream.WriteBit ( data.m_bUseRandomiser );
@@ -1643,7 +1643,7 @@ struct SVehicleSirenSync : public ISyncStructure
         bool                        m_bOverrideSirens;
         CVector                     m_vecSirenPositions;
         SColor                      m_colSirenColour;
-        float                       m_fSirenMinAlpha;
+        DWORD                       m_dwSirenMinAlpha;
         unsigned char               m_ucSirenID;
     } data;
 };

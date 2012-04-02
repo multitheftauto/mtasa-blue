@@ -2797,7 +2797,7 @@ int CLuaFunctionDefs::GetVehicleSirens( lua_State* luaVM )
                 lua_newtable ( luaVM );
 
                 lua_pushstring( luaVM, "Min_Alpha" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_fMinSirenAlpha );
+                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_dwMinSirenAlpha );
                 lua_settable ( luaVM, -3 ); // End of Min_Alpha property
 
                 lua_pushstring( luaVM, "Red" );
@@ -2863,7 +2863,7 @@ int CLuaFunctionDefs::SetVehicleSirens ( lua_State* luaVM )
         argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.G );
         argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.B );
         argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.A, 255 );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_fMinSirenAlpha, 0.0f );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_dwMinSirenAlpha, 0 );
         if ( argStream.HasErrors ( ) == false )
         {
             if ( pVehicle )

@@ -3013,7 +3013,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                                 bitStream.Read ( &sirenData );
                                 pVehicle->SetVehicleSirenPosition ( i, sirenData.data.m_vecSirenPositions );
                                 pVehicle->SetVehicleSirenColour ( i, sirenData.data.m_colSirenColour );
-                                pVehicle->SetVehicleSirenMinimumAlpha ( i, sirenData.data.m_fSirenMinAlpha );
+                                pVehicle->SetVehicleSirenMinimumAlpha ( i, sirenData.data.m_dwSirenMinAlpha );
                                 pVehicle->SetVehicleFlags ( sirenData.data.m_b360Flag, sirenData.data.m_bUseRandomiser, sirenData.data.m_bDoLOSCheck, sirenData.data.m_bEnableSilent );
                             }
                         }

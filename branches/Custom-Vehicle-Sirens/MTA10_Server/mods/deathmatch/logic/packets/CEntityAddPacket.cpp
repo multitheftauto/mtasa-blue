@@ -501,7 +501,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                                 syncData.data.m_ucSirenID = i;
                                 syncData.data.m_vecSirenPositions = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[i].m_vecSirenPositions;
                                 syncData.data.m_colSirenColour = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[i].m_RGBBeaconColour;
-                                syncData.data.m_fSirenMinAlpha = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[i].m_fMinSirenAlpha;
+                                syncData.data.m_dwSirenMinAlpha = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[i].m_dwMinSirenAlpha;
                                 BitStream.Write ( &syncData );
                             }
                         }

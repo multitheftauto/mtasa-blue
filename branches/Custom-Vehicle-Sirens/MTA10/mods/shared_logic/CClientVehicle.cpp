@@ -2242,7 +2242,7 @@ void CClientVehicle::Create ( void )
             for ( unsigned char i = 0; i < m_tSirenBeaconInfo.m_ucSirenCount; i++ )
             {
                 m_pVehicle->SetVehicleSirenPosition( i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_vecSirenPositions );
-                m_pVehicle->SetVehicleSirenMinimumAlpha( i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_fMinSirenAlpha );
+                m_pVehicle->SetVehicleSirenMinimumAlpha( i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_dwMinSirenAlpha );
                 m_pVehicle->SetVehicleSirenColour( i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_RGBBeaconColour );
             }
             SetVehicleFlags ( m_tSirenBeaconInfo.m_b360Flag, m_tSirenBeaconInfo.m_bUseRandomiser, m_tSirenBeaconInfo.m_bDoLOSCheck, m_tSirenBeaconInfo.m_bSirenSilent );
@@ -3822,12 +3822,12 @@ void CClientVehicle::SetVehicleSirenPosition ( unsigned char ucSirenID, CVector 
     }
 }
 
-void CClientVehicle::SetVehicleSirenMinimumAlpha( unsigned char ucSirenID, float fPercentage )
+void CClientVehicle::SetVehicleSirenMinimumAlpha( unsigned char ucSirenID, DWORD dwPercentage )
 {
-    m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_fMinSirenAlpha = fPercentage;
+    m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha = dwPercentage;
     if ( m_pVehicle )
     {
-        m_pVehicle->SetVehicleSirenMinimumAlpha ( ucSirenID, fPercentage );
+        m_pVehicle->SetVehicleSirenMinimumAlpha ( ucSirenID, dwPercentage );
     }
 }
 

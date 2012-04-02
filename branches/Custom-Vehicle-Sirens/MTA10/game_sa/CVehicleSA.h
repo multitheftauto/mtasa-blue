@@ -725,12 +725,12 @@ public:
 
     void                        GiveVehicleSirens               ( unsigned char ucSirenType, unsigned char ucSirenCount );
     void                        RemoveVehicleSirens             ( void )  { m_tSirenInfo.m_bOverrideSirens = false; }
-    void                        SetVehicleSirenMinimumAlpha     ( unsigned char ucSirenCount, float fPercentage )  { m_tSirenInfo.m_tSirenInfo[ucSirenCount].m_fMinSirenAlpha = fPercentage; }
+    void                        SetVehicleSirenMinimumAlpha     ( unsigned char ucSirenCount, DWORD dwPercentage )  { m_tSirenInfo.m_tSirenInfo[ucSirenCount].m_dwMinSirenAlpha = dwPercentage; }
     void                        SetVehicleSirenPosition         ( unsigned char ucSirenID, CVector vecPos );
     void                        GetVehicleSirenPosition         ( unsigned char ucSirenID, CVector & vecPos );
     unsigned char               GetVehicleSirenCount            ( void )  { return m_tSirenInfo.m_ucSirenCount; }
     unsigned char               GetVehicleSirenType             ( void )  { return m_tSirenInfo.m_ucSirenType; }
-    float                       GetVehicleSirenMinimumAlpha     ( unsigned char ucSirenID )  { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_fMinSirenAlpha; }
+    DWORD                       GetVehicleSirenMinimumAlpha     ( unsigned char ucSirenID )  { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha; }
     SColor                      GetVehicleSirenColour           ( unsigned char ucSirenID )  { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour; }
     void                        SetVehicleSirenColour           ( unsigned char ucSirenID, SColor tVehicleSirenColour )  { m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour; }
     void                        SetVehicleCurrentSirenID        ( unsigned char ucCurrentSirenID )  { m_tSirenInfo.m_ucCurrentSirenID = ucCurrentSirenID; }

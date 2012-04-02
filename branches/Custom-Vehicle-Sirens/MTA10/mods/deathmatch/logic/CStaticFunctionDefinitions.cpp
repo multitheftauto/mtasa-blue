@@ -3068,7 +3068,7 @@ bool CStaticFunctionDefinitions::SetVehicleSirens ( CClientVehicle& Vehicle, uns
         {
             Vehicle.SetVehicleSirenPosition ( ucSirenID, tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions );
             Vehicle.SetVehicleSirenColour ( ucSirenID, tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour );
-            Vehicle.SetVehicleSirenMinimumAlpha ( ucSirenID, tSirenInfo.m_tSirenInfo[ ucSirenID ].m_fMinSirenAlpha );
+            Vehicle.SetVehicleSirenMinimumAlpha ( ucSirenID, tSirenInfo.m_tSirenInfo[ ucSirenID ].m_dwMinSirenAlpha );
             return true;
         }
 
