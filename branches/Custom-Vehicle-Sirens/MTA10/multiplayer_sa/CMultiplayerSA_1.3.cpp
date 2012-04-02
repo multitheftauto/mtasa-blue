@@ -276,13 +276,6 @@ void SetupSirenColour ( CVehicle * pVehicle )
 
 bool ProcessVehicleSirenPosition ( )
 {
-    // Disable our original siren based vehicles from this hook
-    if ( DoesVehicleHaveSiren ( ) )
-    {
-        bPointLights = false;
-        // return false so our hook knows we decided not to edit anything
-        return false;
-    }
     // Valid interface
     if ( pVehicleWithTheSiren )
     {
@@ -290,7 +283,14 @@ bool ProcessVehicleSirenPosition ( )
         CVehicle * pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)pVehicleWithTheSiren );
         // Valid - Wait this seems familiar
         if ( pVehicle )
-        {
+        {    
+            // Disable our original siren based vehicles from this hook
+            if ( DoesVehicleHaveSiren ( ) && pVehicle->DoesVehicleHaveSirens ( ) == false )
+            {
+                bPointLights = false;
+                // return false so our hook knows we decided not to edit anything
+                return false;
+            }
             // Does the vehicle have sirens and is the siren count greater than 0 
             if ( pVehicle->DoesVehicleHaveSirens ( ) && pVehicle->GetVehicleSirenCount ( ) >= 0 )
             {
@@ -409,12 +409,15 @@ bool ProcessVehicleSirenPosition ( )
                     // Set our current Siren ID after we increment it
                     pVehicle->SetVehicleCurrentSirenID ( ++ucSirenCount );
                 }
+                bPointLights = false;
+                // Return true
+                return true;
             }
         }
     }
     bPointLights = false;
-    // Return true
-    return true;
+    // Return false
+    return false;
 }
 
 void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( )
@@ -618,10 +621,10 @@ bool TestVehicleForSiren ( )
     // Grab our vehicle
     CVehicle * pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)pVehicleWithTheSiren );
     // Is it valid and it doesn't have a siren by default
-    if ( pVehicle && DoesVehicleHaveSiren ( ) == false )
+    if ( pVehicle )
     {
         // Return our stored siren state
-        return pVehicle->DoesVehicleHaveSirens ( );
+        return pVehicle->DoesVehicleHaveSirens ( ) || DoesVehicleHaveSiren ( );
     }
     // Return true here for default vehicles
     return true;
@@ -662,7 +665,7 @@ void _declspec(naked) HOOK_CVehicle_DoesVehicleUseSiren ( )
 bool SirenCheckCameraPosition ( )
 {
     // Default SA sirens we don't bother processing
-    if ( DoesVehicleHaveSiren ( ) == false )
+    //if ( DoesVehicleHaveSiren ( ) == false )
     {
         CVehicle * pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)pVehicleWithTheSiren );
         // Do we have sirens given by us and is the 360 flag set?
