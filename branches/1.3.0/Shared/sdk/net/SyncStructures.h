@@ -1531,7 +1531,122 @@ struct SVehicleHandlingSync : public ISyncStructure
     } data;
 };
 
+//////////////////////////////////////////
+//                                      //
+//           Vehicle sirens sync        //
+//                                      //
+//////////////////////////////////////////
+struct SVehicleSirenAddSync : public ISyncStructure
+{
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        if ( bitStream.ReadBit ( data.m_bOverrideSirens ) && data.m_bOverrideSirens )
+        {
+            if ( bitStream.Read ( data.m_ucSirenType ) && bitStream.Read ( data.m_ucSirenCount ) )
+            {
+                bitStream.ReadBit ( data.m_b360Flag );
+                bitStream.ReadBit ( data.m_bDoLOSCheck );
+                bitStream.ReadBit ( data.m_bUseRandomiser );
+                bitStream.ReadBit ( data.m_bEnableSilent );
+                return true;
+            }
+        }
 
+        return false;
+    }
+
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBit ( data.m_bOverrideSirens );
+        if ( data.m_bOverrideSirens )
+        {
+            bitStream.Write ( data.m_ucSirenType );
+            bitStream.Write ( data.m_ucSirenCount );
+            bitStream.WriteBit ( data.m_b360Flag );
+            bitStream.WriteBit ( data.m_bDoLOSCheck );
+            bitStream.WriteBit ( data.m_bUseRandomiser );
+            bitStream.WriteBit ( data.m_bEnableSilent );
+        }
+    }
+
+    struct
+    {
+        bool                        m_b360Flag;
+        bool                        m_bDoLOSCheck;
+        bool                        m_bUseRandomiser;
+        bool                        m_bEnableSilent;
+        bool                        m_bOverrideSirens;
+        unsigned char               m_ucSirenType;
+        unsigned char               m_ucSirenCount;
+    } data;
+};
+
+//////////////////////////////////////////
+//                                      //
+//           Vehicle sirens sync        //
+//                                      //
+//////////////////////////////////////////
+struct SVehicleSirenSync : public ISyncStructure
+{
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        if ( bitStream.ReadBit ( data.m_bOverrideSirens ) && data.m_bOverrideSirens )
+        {
+            if ( bitStream.Read ( data.m_ucSirenID ) )
+            {
+                bitStream.Read ( data.m_vecSirenPositions.fX );
+                bitStream.Read ( data.m_vecSirenPositions.fY );
+                bitStream.Read ( data.m_vecSirenPositions.fZ );
+                bitStream.Read ( data.m_colSirenColour.A );
+                bitStream.Read ( data.m_colSirenColour.R );
+                bitStream.Read ( data.m_colSirenColour.G );
+                bitStream.Read ( data.m_colSirenColour.B );
+                bitStream.Read ( data.m_dwSirenMinAlpha );
+                bitStream.ReadBit ( data.m_b360Flag );
+                bitStream.ReadBit ( data.m_bDoLOSCheck );
+                bitStream.ReadBit ( data.m_bUseRandomiser );
+                bitStream.ReadBit ( data.m_bEnableSilent );
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBit ( data.m_bOverrideSirens );
+        if ( data.m_bOverrideSirens )
+        {
+            bitStream.Write ( data.m_ucSirenID );
+            bitStream.Write ( data.m_vecSirenPositions.fX );
+            bitStream.Write ( data.m_vecSirenPositions.fY );
+            bitStream.Write ( data.m_vecSirenPositions.fZ );
+            bitStream.Write ( data.m_colSirenColour.A );
+            bitStream.Write ( data.m_colSirenColour.R );
+            bitStream.Write ( data.m_colSirenColour.G );
+            bitStream.Write ( data.m_colSirenColour.B );
+            bitStream.Write ( data.m_dwSirenMinAlpha );
+            bitStream.WriteBit ( data.m_b360Flag );
+            bitStream.WriteBit ( data.m_bDoLOSCheck );
+            bitStream.WriteBit ( data.m_bUseRandomiser );
+            bitStream.WriteBit ( data.m_bEnableSilent );
+        }
+    }
+
+    struct
+    {
+        bool                        m_b360Flag;
+        bool                        m_bDoLOSCheck;
+        bool                        m_bUseRandomiser;
+        bool                        m_bEnableSilent;
+        bool                        m_bOverrideSirens;
+        CVector                     m_vecSirenPositions;
+        SColor                      m_colSirenColour;
+        DWORD                       m_dwSirenMinAlpha;
+        unsigned char               m_ucSirenID;
+    } data;
+};
 
 //////////////////////////////////////////
 //                                      //

@@ -1329,7 +1329,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
     int iModelID = pVehicle->GetModel ();
     if ( uiSeat == 0 )
     {
-        if ( CClientVehicleManager::HasSirens ( iModelID ) )
+        if ( CClientVehicleManager::HasSirens ( iModelID ) || pVehicle->DoesVehicleHaveSirens ( ) )
         {
             pVehicle->SetSirenOrAlarmActive ( flags.data.bIsSirenOrAlarmActive );
         }

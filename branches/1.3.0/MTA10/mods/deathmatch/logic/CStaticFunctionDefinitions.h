@@ -231,6 +231,7 @@ public:
     static bool                         SetTrainSpeed                       ( CClientVehicle& Vehicle, float fSpeed );
     static bool                         SetVehicleHeadLightColor            ( CClientEntity& Vehicle, const SColor color );
     static bool                         SetVehicleDoorOpenRatio             ( CClientEntity& Vehicle, unsigned char ucDoor, float fRatio, unsigned long ulTime = 0 );
+    static bool                         SetVehicleSirens                    ( CClientVehicle& pVehicle, unsigned char ucSirenID, SSirenInfo tSirenInfo );
 
     // Object get funcs
     static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod );
