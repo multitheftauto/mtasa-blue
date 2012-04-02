@@ -367,6 +367,8 @@ public:
     LUA_DECLARE ( SetVehicleTurretPosition );
     LUA_DECLARE ( SetVehicleDoorOpenRatio );
     LUA_DECLARE ( SetVehicleSirens );
+    LUA_DECLARE ( GetVehicleSirens );
+    LUA_DECLARE ( GetVehicleSirenParams );
 
     // Object create funcs
     LUA_DECLARE ( CreateObject );

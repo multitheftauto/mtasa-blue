@@ -53,10 +53,13 @@ DWORD RETN_CVehicle_ProcessStuff_TestCameraPosition           = 0x6ABC1C;
 DWORD RETN_CVehicle_ProcessStuff_TestCameraPosition2          = 0x6ABC1E;
 
 #define HOOKPOS_CVehicleAudio_ProcessSirenSound1                 0x501FC2
+DWORD RETN_CVehicleAudio_ProcessSirenSound1                   = 0x501FC7;
 
 #define HOOKPOS_CVehicleAudio_ProcessSirenSound2                0x502067
+DWORD RETN_CVehicleAudio_ProcessSirenSound2                   = 0x50206C;
 
 #define HOOKPOS_CVehicleAudio_ProcessSirenSound3                0x5021AE
+DWORD RETN_CVehicleAudio_ProcessSirenSound3                   = 0x5021B3;
 
 #define HOOKPOS_CVehicleAudio_ProcessSirenSound             0x4F62BB
 DWORD RETN_CVehicleAudio_GetVehicleSirenType             =  0x4F62C1;
@@ -76,7 +79,9 @@ void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue ( );
 void HOOK_CVehicle_DoesVehicleUseSiren ( );
 void HOOK_CVehicle_ProcessStuff_TestCameraPosition ( );
 void HOOK_CVehicleAudio_ProcessSirenSound ( );
+void HOOK_CVehicleAudio_ProcessSirenSound1 ( );
 void HOOK_CVehicleAudio_ProcessSirenSound2 ( );
+void HOOK_CVehicleAudio_ProcessSirenSound3 ( );
 void HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue ( );
 void HOOK_CMotorBike_ProcessStuff_PushSirenPositionRed ( );
 void HOOK_CMotorBike_ProcessStuff_PushSirenPosition2 ( );
@@ -111,9 +116,9 @@ void CMultiplayerSA::InitHooks_13 ( void )
     //HookInstall ( HOOKPOS_CVehicle_ProcessStuff_PushRGBPointLights, (DWORD)HOOK_CVehicle_ProcessStuff_PushRGBPointLights, 48 );
     HookInstall ( HOOKPOS_CVehicle_ProcessStuff_StartPointLightCode, (DWORD)HOOK_CVehicle_ProcessStuff_StartPointLightCode, 5 );
 
-    HookInstallCall ( HOOKPOS_CVehicleAudio_ProcessSirenSound1, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound2 );
-    HookInstallCall ( HOOKPOS_CVehicleAudio_ProcessSirenSound2, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound2 );
-    HookInstallCall ( HOOKPOS_CVehicleAudio_ProcessSirenSound3, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound2 );
+    HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound1, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound1, 5 );
+    HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound2, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound2, 5 );
+    HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound3, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound3, 5 );
     HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound, 6 );
 }
 
@@ -734,7 +739,7 @@ void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound ( )
     }
 }
 DWORD CALL_CVehicleAudio_ProcessCarHorn = 0x5002C0;
-void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound2 ( )
+void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound1 ( )
 {
     _asm
     {
@@ -746,6 +751,36 @@ void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound2 ( )
     {
         popad
         call CALL_CVehicleAudio_ProcessCarHorn
+        jmp RETN_CVehicleAudio_ProcessSirenSound1
+    }
+}void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound2 ( )
+{
+    _asm
+    {
+        mov pVehicleWithTheSiren, edi
+        pushad
+    }
+
+    _asm
+    {
+        popad
+        call CALL_CVehicleAudio_ProcessCarHorn
+        jmp RETN_CVehicleAudio_ProcessSirenSound2
+    }
+}
+void _declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound3 ( )
+{
+    _asm
+    {
+        mov pVehicleWithTheSiren, edi
+        pushad
+    }
+
+    _asm
+    {
+        popad
+        call CALL_CVehicleAudio_ProcessCarHorn
+        jmp RETN_CVehicleAudio_ProcessSirenSound3
     }
 }
 
