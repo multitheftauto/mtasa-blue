@@ -125,7 +125,7 @@ void CMultiplayerSA::InitHooks_13 ( void )
 void CMultiplayerSA::InitMemoryCopies_13 ( void )
 {
     // Memory based fixes go here
-    MemSet ( (void*)0x6AB35A, 0x90, 12 ); // Ignore some retarded R* if statement that checks if the model is the buffalo and jumps the siren code even though it doesn't have a siren anyway
+    //MemSet ( (void*)0x6AB35A, 0x90, 12 ); // Ignore some retarded R* if statement that checks if the model is the buffalo and jumps the siren code even though it doesn't have a siren anyway
 
 }
 
@@ -626,7 +626,7 @@ bool TestVehicleForSiren ( )
         // Return our stored siren state
         return pVehicle->DoesVehicleHaveSirens ( ) || DoesVehicleHaveSiren ( );
     }
-    // Return true here for default vehicles
+    // Return true here for default vehicles    
     return true;
 }
 
