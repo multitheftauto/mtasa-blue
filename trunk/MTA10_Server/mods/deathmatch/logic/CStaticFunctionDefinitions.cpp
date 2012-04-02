@@ -4731,6 +4731,90 @@ bool CStaticFunctionDefinitions::SetVehicleVariant ( CVehicle* pVehicle, unsigne
     return false;
 }
 
+bool CStaticFunctionDefinitions::GiveVehicleSirens( CVehicle* pVehicle, unsigned char ucSirenType, unsigned char ucSirenCount, SSirenInfo tSirenInfo )
+{
+    assert ( pVehicle );
+    eVehicleType vehicleType = CVehicleManager::GetVehicleType ( pVehicle->GetModel ( ) );
+    // Won't work with below.
+    if ( vehicleType != VEHICLE_PLANE && vehicleType != VEHICLE_BOAT && vehicleType != VEHICLE_TRAILER && vehicleType != VEHICLE_HELI && vehicleType != VEHICLE_BIKE && vehicleType != VEHICLE_BMX )
+    {
+        if ( ucSirenType >= 1 && ucSirenType <= 6 )
+        {
+            if ( ucSirenCount >= 0 && ucSirenCount <= 7 )
+            {
+                pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens = true;
+
+                pVehicle->m_tSirenBeaconInfo.m_ucSirenCount = ++ucSirenCount;
+                pVehicle->m_tSirenBeaconInfo.m_ucSirenType = ucSirenType;
+
+                pVehicle->m_tSirenBeaconInfo.m_b360Flag = tSirenInfo.m_b360Flag;
+                pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck = tSirenInfo.m_bDoLOSCheck;
+                pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser = tSirenInfo.m_bUseRandomiser;
+                pVehicle->m_tSirenBeaconInfo.m_bSirenSilent = tSirenInfo.m_bSirenSilent;
+
+
+                SVehicleSirenAddSync tSirenSync;
+                tSirenSync.data.m_bOverrideSirens =  pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens;
+                tSirenSync.data.m_b360Flag = pVehicle->m_tSirenBeaconInfo.m_b360Flag;
+                tSirenSync.data.m_bDoLOSCheck = pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck;
+                tSirenSync.data.m_bEnableSilent = pVehicle->m_tSirenBeaconInfo.m_bSirenSilent;
+                tSirenSync.data.m_bUseRandomiser = pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser;
+                tSirenSync.data.m_ucSirenCount =  pVehicle->m_tSirenBeaconInfo.m_ucSirenCount;
+                tSirenSync.data.m_ucSirenType =  pVehicle->m_tSirenBeaconInfo.m_ucSirenType;
+
+                CBitStream BitStream;
+                BitStream.pBitStream->Write ( &tSirenSync );
+                m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, GIVE_VEHICLE_SIRENS, *BitStream.pBitStream ) );
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleSirens ( CVehicle* pVehicle, unsigned char ucSirenID, SSirenInfo tSirenInfo )
+{
+    assert ( pVehicle );
+    eVehicleType vehicleType = CVehicleManager::GetVehicleType ( pVehicle->GetModel ( ) );
+    // Won't work with below.
+    if ( vehicleType != VEHICLE_PLANE && vehicleType != VEHICLE_BOAT && vehicleType != VEHICLE_TRAILER && vehicleType != VEHICLE_HELI && vehicleType != VEHICLE_BIKE && vehicleType != VEHICLE_BMX )
+    {
+        if ( ucSirenID >= 0 && ucSirenID <= 7 )
+        {
+            pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ] = tSirenInfo.m_tSirenInfo[ ucSirenID ];
+
+            SVehicleSirenSync tSirenSync;
+            tSirenSync.data.m_bOverrideSirens =  pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens;
+            tSirenSync.data.m_b360Flag = pVehicle->m_tSirenBeaconInfo.m_b360Flag;
+            tSirenSync.data.m_bDoLOSCheck = pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck;
+            tSirenSync.data.m_bEnableSilent = pVehicle->m_tSirenBeaconInfo.m_bSirenSilent;
+            tSirenSync.data.m_bUseRandomiser = pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser;
+            tSirenSync.data.m_vecSirenPositions = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions;
+            tSirenSync.data.m_colSirenColour = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour;
+            tSirenSync.data.m_dwSirenMinAlpha = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ].m_dwMinSirenAlpha;
+            tSirenSync.data.m_ucSirenID = ucSirenID;
+
+            CBitStream BitStream;
+            BitStream.pBitStream->Write ( &tSirenSync );
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_SIRENS, *BitStream.pBitStream ) );
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::RemoveVehicleSirens ( CVehicle* pVehicle )
+{
+    assert ( pVehicle );
+
+    pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens = false;
+    pVehicle->RemoveVehicleSirens ( );
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, REMOVE_VEHICLE_SIRENS, *BitStream.pBitStream ) );
+    return true;
+}
+
 bool CStaticFunctionDefinitions::GetVehicleVariant ( CVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2 )
 {
     assert ( pVehicle );
@@ -6171,7 +6255,7 @@ bool CStaticFunctionDefinitions::SetVehicleSirensOn ( CElement* pElement, bool b
         CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
 
         // Has Sirens and different state than before?
-        if ( CVehicleManager::HasSirens ( pVehicle->GetModel () ) &&
+        if ( ( CVehicleManager::HasSirens ( pVehicle->GetModel () ) || pVehicle->DoesVehicleHaveSirens ( ) ) &&
              bSirensOn != pVehicle->IsSirenActive () )
         {
             // Set the new state

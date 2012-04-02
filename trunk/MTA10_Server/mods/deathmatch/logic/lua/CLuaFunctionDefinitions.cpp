@@ -4178,6 +4178,240 @@ int CLuaFunctionDefinitions::SetVehicleDoorsUndamageable ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::RemoveVehicleSirens ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    CVehicle* pVehicle = NULL;
+
+    argStream.ReadUserData ( pVehicle );
+    
+    if ( argStream.HasErrors ( ) == false )
+    {
+        if ( pVehicle )
+        {
+            if ( CStaticFunctionDefinitions::RemoveVehicleSirens ( pVehicle ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "removeVehicleSirens", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "removeVehicleSirens" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::SetVehicleSirens( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    CVehicle* pVehicle = NULL;
+    unsigned char ucSirenID = 0;
+    SSirenInfo tSirenInfo;
+
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadNumber ( ucSirenID );
+    if ( ucSirenID > 0 )
+    {
+        // Array indicies start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
+        ucSirenID--;
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fX );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fY );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fZ );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.R );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.G );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.B );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.A, 255 );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_dwMinSirenAlpha, 0 );
+        if ( argStream.HasErrors ( ) == false )
+        {
+            if ( pVehicle )
+            {
+                if ( CStaticFunctionDefinitions::SetVehicleSirens ( pVehicle, ucSirenID, tSirenInfo ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleSirens", "vehicle", 1 );
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM, "setVehicleSirens" );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleSirens" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+int CLuaFunctionDefinitions::GetVehicleSirenParams( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    CVehicle* pVehicle = NULL;
+    unsigned char ucSirenID = 0;
+    SSirenInfo tSirenInfo;
+
+    argStream.ReadUserData ( pVehicle );
+    if ( argStream.HasErrors ( ) == false )
+    {
+        if ( pVehicle )
+        {
+            tSirenInfo = pVehicle->m_tSirenBeaconInfo;// Create a new table
+            lua_newtable ( luaVM );
+
+            lua_pushstring( luaVM, "SirenCount" );
+            lua_pushnumber ( luaVM, tSirenInfo.m_ucSirenCount );
+            lua_settable ( luaVM, -3 ); // End of SirenCount Property
+
+            lua_pushstring( luaVM, "SirenType" );
+            lua_pushnumber ( luaVM, tSirenInfo.m_ucSirenType );
+            lua_settable ( luaVM, -3 ); // End of SirenType Property
+
+            lua_pushstring( luaVM, "Flags" );
+            lua_newtable ( luaVM );
+
+            lua_pushstring ( luaVM, "360" );
+            lua_pushboolean ( luaVM, tSirenInfo.m_b360Flag );
+            lua_settable ( luaVM, -3 ); // End of 360 Property
+
+            lua_pushstring ( luaVM, "DoLOSCheck" );
+            lua_pushboolean ( luaVM, tSirenInfo.m_bDoLOSCheck );
+            lua_settable ( luaVM, -3 ); // End of DoLOSCheck Property
+
+            lua_pushstring ( luaVM, "UseRandomiser" );
+            lua_pushboolean ( luaVM, tSirenInfo.m_bUseRandomiser );
+            lua_settable ( luaVM, -3 ); // End of UseRandomiser Property
+
+            lua_pushstring ( luaVM, "Silent" );
+            lua_pushboolean ( luaVM, tSirenInfo.m_bSirenSilent );
+            lua_settable ( luaVM, -3 ); // End of Silent Property
+
+            lua_settable ( luaVM, -3 ); // End of Flags table
+
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleSirenParams", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleSirenParams" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::GetVehicleSirens( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    CVehicle* pVehicle = NULL;
+    unsigned char ucSirenID = 0;
+    SSirenInfo tSirenInfo;
+
+    argStream.ReadUserData ( pVehicle );
+    if ( argStream.HasErrors ( ) == false )
+    {
+        if ( pVehicle )
+        {
+            tSirenInfo = pVehicle->m_tSirenBeaconInfo;// Create a new table
+            lua_newtable ( luaVM );
+
+            for ( int i = 0; i <= tSirenInfo.m_ucSirenCount;i++ )
+            {
+                lua_pushnumber ( luaVM, i+1 );
+                lua_newtable ( luaVM );
+
+                lua_pushstring( luaVM, "Min_Alpha" );
+                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_dwMinSirenAlpha );
+                lua_settable ( luaVM, -3 ); // End of Min_Alpha property
+
+                lua_pushstring( luaVM, "Red" );
+                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.R );
+                lua_settable ( luaVM, -3 ); // End of Red property
+
+                lua_pushstring( luaVM, "Green" );
+                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.G );
+                lua_settable ( luaVM, -3 ); // End of Green property
+
+                lua_pushstring( luaVM, "Blue" );
+                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.B );
+                lua_settable ( luaVM, -3 ); // End of Blue property
+
+                lua_pushstring( luaVM, "Alpha" );
+                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.A );
+                lua_settable ( luaVM, -3 ); // End of Alpha property
+
+                lua_pushstring( luaVM, "x" );
+                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fX );
+                lua_settable ( luaVM, -3 ); // End of X property
+
+                lua_pushstring( luaVM, "y" );
+                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fY );
+                lua_settable ( luaVM, -3 ); // End of Y property
+
+                lua_pushstring( luaVM, "z" );
+                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fZ );
+                lua_settable ( luaVM, -3 ); // End of Z property
+
+                lua_settable ( luaVM, -3 ); // End of Table
+            }
+
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleSirens", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleSirens" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::GiveVehicleSirens ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    CVehicle* pVehicle = NULL;
+    unsigned char ucSirenType = 0;
+    unsigned char ucSirenCount = 0;
+    SSirenInfo tSirenInfo;
+
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadNumber ( ucSirenCount );
+    argStream.ReadNumber ( ucSirenType );
+    if ( ucSirenCount > 0)
+    {
+        // Array indicies start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
+        ucSirenCount--;
+        argStream.ReadBool ( tSirenInfo.m_b360Flag, false );
+        argStream.ReadBool ( tSirenInfo.m_bDoLOSCheck, true );
+        argStream.ReadBool ( tSirenInfo.m_bUseRandomiser, true );
+        argStream.ReadBool ( tSirenInfo.m_bSirenSilent, false );
+        if ( argStream.HasErrors ( ) == false )
+        {
+            if ( pVehicle )
+            {
+                if ( CStaticFunctionDefinitions::GiveVehicleSirens ( pVehicle, ucSirenType, ucSirenCount, tSirenInfo ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "addVehicleSirens", "vehicle", 1 );
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM, "addVehicleSirens" );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "addVehicleSirens" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefinitions::GetVehicleMaxPassengers ( lua_State* luaVM )
 {

@@ -410,6 +410,15 @@ public:
     uint                            GetTimeSinceLastPush    ( void )                      { return (uint)( CTickCount::Now () - m_LastPushedTime ).ToLongLong (); }
     void                            ResetLastPushTime       ( void )                      { m_LastPushedTime = CTickCount::Now (); }
 
+    bool                        DoesVehicleHaveSirens       ( void ) { return m_tSirenBeaconInfo.m_bOverrideSirens; }
+
+    bool                        GiveVehicleSirens           ( unsigned char ucSirenType, unsigned char ucSirenCount );
+    void                        SetVehicleSirenPosition     ( unsigned char ucSirenID, CVector vecPos );
+    void                        SetVehicleSirenMinimumAlpha ( unsigned char ucSirenID, DWORD dwPercentage );
+    void                        SetVehicleSirenColour       ( unsigned char ucSirenID, SColor tVehicleSirenColour );
+    void                        SetVehicleFlags             ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent );
+    void                        RemoveVehicleSirens         ( void );
+
 protected:
     void                        StreamIn                ( bool bInstantly );
     void                        StreamOut               ( void );
@@ -570,6 +579,7 @@ public:
     unsigned long               m_ulLastSyncTime;
     char *                      m_szLastSyncType;
     SLastSyncedVehData*         m_LastSyncedData;
+    SSirenInfo                  m_tSirenBeaconInfo;
 };
 
 #endif

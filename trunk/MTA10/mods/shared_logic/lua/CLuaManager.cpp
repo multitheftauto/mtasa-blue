@@ -516,6 +516,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getVehicleHandling", CLuaFunctionDefs::GetVehicleHandling );
     CLuaCFunctions::AddFunction ( "getOriginalHandling", CLuaFunctionDefs::GetOriginalHandling );
     CLuaCFunctions::AddFunction ( "getVehicleDoorOpenRatio", CLuaFunctionDefs::GetVehicleDoorOpenRatio );
+    CLuaCFunctions::AddFunction ( "getVehicleSirens", CLuaFunctionDefs::GetVehicleSirens );
+    CLuaCFunctions::AddFunction ( "getVehicleSirenParams", CLuaFunctionDefs::GetVehicleSirenParams );
 
     // Vehicle set funcs
     CLuaCFunctions::AddFunction ( "createVehicle", CLuaFunctionDefs::CreateVehicle );
@@ -553,6 +555,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleHeadLightColor", CLuaFunctionDefs::SetVehicleHeadLightColor );
     CLuaCFunctions::AddFunction ( "setVehicleTurretPosition", CLuaFunctionDefs::SetVehicleTurretPosition );
     CLuaCFunctions::AddFunction ( "setVehicleDoorOpenRatio", CLuaFunctionDefs::SetVehicleDoorOpenRatio );
+    CLuaCFunctions::AddFunction ( "setVehicleSirens", CLuaFunctionDefs::SetVehicleSirens );
 
     // Object create/destroy funcs
     CLuaCFunctions::AddFunction ( "createObject", CLuaFunctionDefs::CreateObject );

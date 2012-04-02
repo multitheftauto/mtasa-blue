@@ -196,6 +196,8 @@ void CVehicleSA::Init ( void )
     m_bSwingingDoorsAllowed = false;
 
     CopyGlobalSuspensionLinesToPrivate ();
+    m_tSirenInfo.m_bOverrideSirens = false;
+    m_tSirenInfo.m_bSirenSilent = false;
 }
 
 // DESTRUCTOR
@@ -2034,4 +2036,29 @@ void CVehicleSA::RecalculateSuspensionLines ( void )
 
         CopyGlobalSuspensionLinesToPrivate ();
     }
+}
+
+void CVehicleSA::GiveVehicleSirens ( unsigned char ucSirenType, unsigned char ucSirenCount )
+{
+    m_tSirenInfo.m_bOverrideSirens = true;
+    m_tSirenInfo.m_ucSirenType = ucSirenType;
+    m_tSirenInfo.m_ucSirenCount = ucSirenCount;
+}
+
+void CVehicleSA::SetVehicleSirenPosition ( unsigned char ucSirenID, CVector vecPos )
+{
+    m_tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions = vecPos;
+}
+
+void CVehicleSA::GetVehicleSirenPosition ( unsigned char ucSirenID, CVector & vecPos )
+{
+    vecPos = m_tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions;
+}
+
+void CVehicleSA::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent )
+{
+     m_tSirenInfo.m_b360Flag = bEnable360; 
+     m_tSirenInfo.m_bDoLOSCheck = bEnableLOSCheck; 
+     m_tSirenInfo.m_bUseRandomiser = bEnableRandomiser;
+     m_tSirenInfo.m_bSirenSilent = bEnableSilent;
 }
