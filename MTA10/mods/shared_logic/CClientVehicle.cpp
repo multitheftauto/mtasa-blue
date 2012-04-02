@@ -155,6 +155,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
 
     // Add this vehicle to the vehicle list
     m_pVehicleManager->AddToList ( this );
+    m_tSirenBeaconInfo.m_bSirenSilent = false;
 }
 
 
@@ -2234,6 +2235,18 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetVisible ( m_bVisible );
         m_pVehicle->SetUsesCollision ( m_bIsCollisionEnabled );
         m_pVehicle->SetEngineBroken ( m_bEngineBroken );
+
+        if ( m_tSirenBeaconInfo.m_bOverrideSirens )
+        {
+            GiveVehicleSirens( m_tSirenBeaconInfo.m_ucSirenType, m_tSirenBeaconInfo.m_ucSirenCount );
+            for ( unsigned char i = 0; i < m_tSirenBeaconInfo.m_ucSirenCount; i++ )
+            {
+                m_pVehicle->SetVehicleSirenPosition( i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_vecSirenPositions );
+                m_pVehicle->SetVehicleSirenMinimumAlpha( i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_dwMinSirenAlpha );
+                m_pVehicle->SetVehicleSirenColour( i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_RGBBeaconColour );
+            }
+            SetVehicleFlags ( m_tSirenBeaconInfo.m_b360Flag, m_tSirenBeaconInfo.m_bUseRandomiser, m_tSirenBeaconInfo.m_bDoLOSCheck, m_tSirenBeaconInfo.m_bSirenSilent );
+        }
         m_pVehicle->SetSirenOrAlarmActive ( m_bSireneOrAlarmActive );
         SetLandingGearDown ( m_bLandingGearDown );
         _SetAdjustablePropertyValue ( m_usAdjustablePropertyValue );
@@ -3787,4 +3800,70 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
         for ( unsigned int i = 0 ; i < lineList.size () ; i++ )
             g_pCore->GetGraphics ()->DrawText ( 10, 230 + i * 10, -1, 1, lineList[i] );
     #endif
+}
+
+bool CClientVehicle::GiveVehicleSirens ( unsigned char ucSirenType, unsigned char ucSirenCount )
+{
+    m_tSirenBeaconInfo.m_bOverrideSirens = true;
+    m_tSirenBeaconInfo.m_ucSirenType = ucSirenType;
+    m_tSirenBeaconInfo.m_ucSirenCount = ucSirenCount;
+    if ( m_pVehicle )
+    {
+        m_pVehicle->GiveVehicleSirens ( ucSirenType, ucSirenCount );
+    }
+    return true;
+}
+void CClientVehicle::SetVehicleSirenPosition ( unsigned char ucSirenID, CVector vecPos )
+{
+    m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions = vecPos;
+    if ( m_pVehicle )
+    {
+        m_pVehicle->SetVehicleSirenPosition ( ucSirenID, vecPos );
+    }
+}
+
+void CClientVehicle::SetVehicleSirenMinimumAlpha( unsigned char ucSirenID, DWORD dwPercentage )
+{
+    m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha = dwPercentage;
+    if ( m_pVehicle )
+    {
+        m_pVehicle->SetVehicleSirenMinimumAlpha ( ucSirenID, dwPercentage );
+    }
+}
+
+void CClientVehicle::SetVehicleSirenColour ( unsigned char ucSirenID, SColor tVehicleSirenColour )
+{
+    m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour;
+    if ( m_pVehicle )
+    {
+        m_pVehicle->SetVehicleSirenColour ( ucSirenID, tVehicleSirenColour );
+    }
+}
+
+void CClientVehicle::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent )
+{
+     m_tSirenBeaconInfo.m_b360Flag = bEnable360; 
+     m_tSirenBeaconInfo.m_bDoLOSCheck = bEnableLOSCheck; 
+     m_tSirenBeaconInfo.m_bUseRandomiser = bEnableRandomiser;
+     m_tSirenBeaconInfo.m_bSirenSilent = bEnableSilent;
+     if ( m_pVehicle )
+     {
+        m_pVehicle->SetVehicleFlags ( bEnable360, bEnableLOSCheck, bEnableRandomiser, bEnableSilent );
+     }
+}
+
+void CClientVehicle::RemoveVehicleSirens ( void )
+{
+    if ( m_pVehicle )
+    {
+        m_pVehicle->RemoveVehicleSirens ( );
+    }
+    m_tSirenBeaconInfo.m_bOverrideSirens = false;
+    SetSirenOrAlarmActive ( false );
+    for ( unsigned char i = 0; i < 7; i++ )
+    {
+        SetVehicleSirenPosition( i, CVector ( 0, 0, 0 ) );
+        SetVehicleSirenMinimumAlpha( i, 0.0f );
+        SetVehicleSirenColour( i, SColor ( ) );
+    }
 }

@@ -480,8 +480,34 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     else
                         BitStream.WriteBit ( false );
 
+                    if ( BitStream.Version ( ) >= 0x02A )
+                    {
+                        unsigned char ucSirenCount = pVehicle->m_tSirenBeaconInfo.m_ucSirenCount;
+                        unsigned char ucSirenType = pVehicle->m_tSirenBeaconInfo.m_ucSirenType;
+                        bool bSync = pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens;
+                        BitStream.WriteBit ( bSync );
+                        if ( bSync )
+                        {
+                            BitStream.Write ( ucSirenCount );
+                            BitStream.Write ( ucSirenType );
+
+                            for ( int i = 0; i < ucSirenCount; i++ )
+                            {
+                                SVehicleSirenSync syncData;
+                                syncData.data.m_b360Flag = pVehicle->m_tSirenBeaconInfo.m_b360Flag;
+                                syncData.data.m_bDoLOSCheck = pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck;
+                                syncData.data.m_bUseRandomiser = pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser;
+                                syncData.data.m_bEnableSilent = pVehicle->m_tSirenBeaconInfo.m_bSirenSilent;
+                                syncData.data.m_ucSirenID = i;
+                                syncData.data.m_vecSirenPositions = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[i].m_vecSirenPositions;
+                                syncData.data.m_colSirenColour = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[i].m_RGBBeaconColour;
+                                syncData.data.m_dwSirenMinAlpha = pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[i].m_dwMinSirenAlpha;
+                                BitStream.Write ( &syncData );
+                            }
+                        }
+                    }
                     break;
-                }                
+                }
 
                 case CElement::MARKER:
                 {

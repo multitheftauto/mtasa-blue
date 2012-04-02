@@ -348,6 +348,9 @@ public:
     static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int uiValue );
     static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char ucValue );
     static bool                 SetVehicleVariant                   ( CVehicle* pVehicle, unsigned char ucVariant, unsigned char ucVariant2 );
+    static bool                 SetVehicleSirens                    ( CVehicle* pVehicle, unsigned char ucSirenID, SSirenInfo tSirenInfo );
+    static bool                 GiveVehicleSirens                   ( CVehicle* pVehicle, unsigned char ucSirenType, unsigned char ucSirenCount, SSirenInfo tSirenInfo );
+    static bool                 RemoveVehicleSirens                 ( CVehicle* pVehicle );
 
     // Marker create/destroy functions
     static CMarker*             CreateMarker                        ( CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, CElement* pVisibleTo );

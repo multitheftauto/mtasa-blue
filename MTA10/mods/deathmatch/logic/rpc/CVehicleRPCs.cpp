@@ -47,6 +47,9 @@ void CVehicleRPCs::LoadFunctions ( void )
     AddHandler ( SET_VEHICLE_TURRET_POSITION, SetVehicleTurretPosition, "SetVehicleTurretPosition" );
     AddHandler ( SET_VEHICLE_DOOR_OPEN_RATIO, SetVehicleDoorOpenRatio, "SetVehicleDoorOpenRatio" );
     AddHandler ( SET_VEHICLE_VARIANT, SetVehicleVariant, "SetVehicleVariant" );
+    AddHandler ( GIVE_VEHICLE_SIRENS, GiveVehicleSirens, "giveVehicleSirens");
+    AddHandler ( REMOVE_VEHICLE_SIRENS, RemoveVehicleSirens, "removeVehicleSirens");
+    AddHandler ( SET_VEHICLE_SIRENS, SetVehicleSirens, "setVehicleSirens");
 }
 
 
@@ -586,5 +589,46 @@ void CVehicleRPCs::SetVehicleVariant ( CClientEntity* pSource, NetBitStreamInter
         {
             pVehicle->SetVariant ( ucVariant, ucVariant2 );
         }
+    }
+}
+
+void CVehicleRPCs::GiveVehicleSirens ( CClientEntity* pSourceEntity, NetBitStreamInterface& bitStream )
+{
+    SVehicleSirenAddSync sirenData;
+    if ( bitStream.Read ( &sirenData ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSourceEntity->GetID () );
+        if ( pVehicle )
+        {
+            if ( sirenData.data.m_ucSirenCount >= 0 )
+            {
+                pVehicle->GiveVehicleSirens( sirenData.data.m_ucSirenType, sirenData.data.m_ucSirenCount );
+                pVehicle->SetVehicleFlags ( sirenData.data.m_b360Flag, sirenData.data.m_bUseRandomiser, sirenData.data.m_bDoLOSCheck, sirenData.data.m_bEnableSilent );
+            }
+        }
+    }
+}
+
+void CVehicleRPCs::SetVehicleSirens ( CClientEntity* pSourceEntity, NetBitStreamInterface& bitStream )
+{
+    SVehicleSirenSync sirenData;
+    if ( bitStream.Read ( &sirenData ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSourceEntity->GetID () );
+        if ( pVehicle )
+        {
+            pVehicle->SetVehicleSirenPosition ( sirenData.data.m_ucSirenID, sirenData.data.m_vecSirenPositions );
+            pVehicle->SetVehicleSirenMinimumAlpha ( sirenData.data.m_ucSirenID, sirenData.data.m_dwSirenMinAlpha );
+            pVehicle->SetVehicleSirenColour ( sirenData.data.m_ucSirenID, sirenData.data.m_colSirenColour );
+        }
+    }
+}
+
+void CVehicleRPCs::RemoveVehicleSirens ( CClientEntity* pSourceEntity, NetBitStreamInterface& bitStream )
+{
+    CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSourceEntity->GetID () );
+    if ( pVehicle )
+    {
+        pVehicle->RemoveVehicleSirens ( );
     }
 }

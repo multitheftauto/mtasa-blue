@@ -114,6 +114,26 @@ enum eVehicleType
     VEHICLE_TRAILER
 };
 
+struct SSirenBeaconInfo
+{
+    CVector                     m_vecSirenPositions;
+    SColor                      m_RGBBeaconColour;
+    DWORD                       m_dwMinSirenAlpha;
+};
+struct SSirenInfo
+{
+    // Flags
+    bool                        m_b360Flag;
+    bool                        m_bDoLOSCheck;
+    bool                        m_bUseRandomiser;
+    bool                        m_bSirenSilent;
+    // End of flags
+    bool                        m_bOverrideSirens;
+    unsigned char               m_ucSirenType;
+    unsigned char               m_ucSirenCount;
+    SSirenBeaconInfo            m_tSirenInfo [8];
+};
+
 class CVehicle : public CElement
 {
     friend class CPlayer;
@@ -303,6 +323,12 @@ public:
     uint                            GetTimeSinceLastPush    ( void )                      { return (uint)( CTickCount::Now () - m_LastPushedTime ).ToLongLong (); }
     void                            ResetLastPushTime       ( void )                      { m_LastPushedTime = CTickCount::Now (); }
 
+    inline bool                     DoesVehicleHaveSirens   ( void )                      { return m_tSirenBeaconInfo.m_bOverrideSirens; }
+    void                            RemoveVehicleSirens     ( void );
+    void                            SetVehicleSirenPosition     ( unsigned char ucSirenID, CVector vecPos );
+    void                            SetVehicleSirenMinimumAlpha ( unsigned char ucSirenID, DWORD dwPercentage );
+    void                            SetVehicleSirenColour       ( unsigned char ucSirenID, SColor tVehicleSirenColour );
+    void                            SetVehicleFlags             ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck );
 private:
     class CVehicleManager*          m_pVehicleManager;
 
@@ -388,6 +414,7 @@ public: // 'Safe' variables (that have no need for accessors)
     unsigned char                   m_ucWheelStates [MAX_WHEELS];
     unsigned char                   m_ucPanelStates [MAX_PANELS];
     unsigned char                   m_ucLightStates [MAX_LIGHTS];
+    SSirenInfo                      m_tSirenBeaconInfo;
 };
 
 #endif

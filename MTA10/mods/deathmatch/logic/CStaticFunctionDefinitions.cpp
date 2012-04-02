@@ -2573,12 +2573,14 @@ bool CStaticFunctionDefinitions::SetVehicleSirensOn ( CClientEntity& Entity, boo
         CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
 
         // Has Sirens and different state than before?
-        if ( CClientVehicleManager::HasSirens ( Vehicle.GetModel () ) &&
-             bSirensOn != Vehicle.IsSirenOrAlarmActive () )
+        if ( CClientVehicleManager::HasSirens ( Vehicle.GetModel () ) || Vehicle.DoesVehicleHaveSirens ( ) )
         {
-            // Set the new state
-            Vehicle.SetSirenOrAlarmActive ( bSirensOn );
-            return true;
+            if ( bSirensOn != Vehicle.IsSirenOrAlarmActive () )
+            {
+                // Set the new state
+                Vehicle.SetSirenOrAlarmActive ( bSirensOn );
+                return true;
+            }
         }
     }
 
@@ -3053,6 +3055,24 @@ bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio ( CClientEntity& Entity
         }
     }
 
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleSirens ( CClientVehicle& Vehicle, unsigned char ucSirenID, SSirenInfo tSirenInfo )
+{
+    eClientVehicleType vehicleType = CClientVehicleManager::GetVehicleType( Vehicle.GetModel ( ) );
+    // Won't work with below.
+    if ( vehicleType != CLIENTVEHICLE_PLANE && vehicleType != CLIENTVEHICLE_BOAT && vehicleType != CLIENTVEHICLE_TRAILER && vehicleType != CLIENTVEHICLE_HELI && vehicleType != CLIENTVEHICLE_BIKE && vehicleType != CLIENTVEHICLE_BMX )
+    {
+        if ( ucSirenID >= 0 && ucSirenID <= 7 )
+        {
+            Vehicle.SetVehicleSirenPosition ( ucSirenID, tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions );
+            Vehicle.SetVehicleSirenColour ( ucSirenID, tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour );
+            Vehicle.SetVehicleSirenMinimumAlpha ( ucSirenID, tSirenInfo.m_tSirenInfo[ ucSirenID ].m_dwMinSirenAlpha );
+            return true;
+        }
+
+    }
     return false;
 }
 

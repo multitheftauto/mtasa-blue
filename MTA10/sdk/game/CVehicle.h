@@ -36,6 +36,28 @@ class CPed;
 class CObject;
 class CColModel;
 
+struct SSirenBeaconInfo
+{
+    CVector                     m_vecSirenPositions;
+    SColor                      m_RGBBeaconColour;
+    DWORD                       m_dwMinSirenAlpha;
+};
+struct SSirenInfo
+{
+    // Flags
+    bool                        m_b360Flag;
+    bool                        m_bDoLOSCheck;
+    bool                        m_bUseRandomiser;
+    bool                        m_bSirenSilent;
+    // End of flags
+    bool                        m_bOverrideSirens;
+    unsigned char               m_ucSirenType;
+    unsigned char               m_ucSirenCount;
+    unsigned char               m_ucCurrentSirenID;
+    unsigned char               m_ucCurrentSirenRandomiser;
+    SSirenBeaconInfo            m_tSirenInfo [8];
+    SColor                      m_tPointLightColour;
+};
 class CVehicle : public virtual CPhysical
 {
 public:
@@ -223,6 +245,30 @@ public:
     virtual void*                GetPrivateSuspensionLines              ( void ) = 0;
 
     virtual bool                 CheckVTBL                              ( void ) = 0;
+
+    virtual bool                 DoesVehicleHaveSirens                  ( void ) = 0;
+
+    virtual void                 RemoveVehicleSirens                    ( void ) = 0;
+    virtual void                 GiveVehicleSirens                      ( unsigned char ucSirenType, unsigned char ucSirenCount ) = 0;
+    virtual void                 SetVehicleSirenMinimumAlpha            ( unsigned char ucSirenID, DWORD dwPercentage ) = 0;
+    virtual void                 SetVehicleSirenPosition                ( unsigned char ucSirenID, CVector vecPos ) = 0;
+    virtual void                 GetVehicleSirenPosition                ( unsigned char ucSirenID, CVector & vecPos ) = 0;
+    virtual unsigned char        GetVehicleSirenCount                   ( void ) = 0;
+    virtual unsigned char        GetVehicleSirenType                    ( void ) = 0;
+    virtual DWORD                GetVehicleSirenMinimumAlpha            ( unsigned char ucSirenID ) = 0;
+    virtual SColor               GetVehicleSirenColour                  ( unsigned char ucSirenCount ) = 0;
+    virtual void                 SetVehicleSirenColour                  ( unsigned char ucSirenID, SColor tVehicleSirenColour ) = 0;
+    virtual void                 SetVehicleCurrentSirenID               ( unsigned char ucCurrentSirenID ) = 0;
+    virtual unsigned char        GetVehicleCurrentSirenID               ( void ) = 0;
+    virtual unsigned char        GetSirenRandomiser                     ( void ) = 0;
+    virtual void                 SetSirenRandomiser                     ( unsigned char ucSirenRandomiser ) = 0;
+    virtual void                 SetPointLightColour                    ( SColor tPointLightColour ) = 0;
+    virtual SColor               GetPointLightColour                    ( void ) = 0;
+    virtual bool                 IsSiren360EffectEnabled                ( void ) = 0;
+    virtual bool                 IsSirenLOSCheckEnabled                 ( void ) = 0;
+    virtual bool                 IsSirenRandomiserEnabled               ( void ) = 0;
+    virtual bool                 IsSirenSilentEffectEnabled             ( void ) = 0;
+    virtual void                 SetVehicleFlags                        ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent ) = 0;
 };
 
 #endif
