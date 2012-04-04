@@ -781,11 +781,12 @@ void CVehicle::SetVehicleSirenColour ( unsigned char ucSirenID, SColor tVehicleS
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour;
 }
 
-void CVehicle::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck )
+void CVehicle::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent )
 {
     m_tSirenBeaconInfo.m_b360Flag = bEnable360; 
     m_tSirenBeaconInfo.m_bDoLOSCheck = bEnableLOSCheck; 
     m_tSirenBeaconInfo.m_bUseRandomiser = bEnableRandomiser;
+    m_tSirenBeaconInfo.m_bSirenSilent = bEnableSilent;
 }
 void CVehicle::RemoveVehicleSirens ( void )
 {
