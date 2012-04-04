@@ -3848,7 +3848,7 @@ void CClientVehicle::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, 
      m_tSirenBeaconInfo.m_bSirenSilent = bEnableSilent;
      if ( m_pVehicle )
      {
-        m_pVehicle->SetVehicleFlags ( bEnable360, bEnableLOSCheck, bEnableRandomiser, bEnableSilent );
+        m_pVehicle->SetVehicleFlags ( bEnable360, bEnableRandomiser, bEnableLOSCheck bEnableSilent );
      }
 }
 

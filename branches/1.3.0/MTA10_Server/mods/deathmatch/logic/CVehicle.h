@@ -328,7 +328,7 @@ public:
     void                            SetVehicleSirenPosition     ( unsigned char ucSirenID, CVector vecPos );
     void                            SetVehicleSirenMinimumAlpha ( unsigned char ucSirenID, DWORD dwPercentage );
     void                            SetVehicleSirenColour       ( unsigned char ucSirenID, SColor tVehicleSirenColour );
-    void                            SetVehicleFlags             ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck );
+    void                            SetVehicleFlags             ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent );
 private:
     class CVehicleManager*          m_pVehicleManager;
 
