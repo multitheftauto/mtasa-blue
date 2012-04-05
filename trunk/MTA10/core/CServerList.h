@@ -282,7 +282,7 @@ public:
         for ( uint i = 0 ; i < strName.length () ; i++ )
         {
             uchar c = strName[i];
-            if ( isalpha(c) )
+            if ( isalnum(c) )
                 strNameSortKey += toupper ( c );
         }
 
