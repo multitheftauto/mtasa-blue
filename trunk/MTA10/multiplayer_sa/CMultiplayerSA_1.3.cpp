@@ -127,6 +127,10 @@ void CMultiplayerSA::InitMemoryCopies_13 ( void )
     // Memory based fixes go here
     //MemSet ( (void*)0x6AB35A, 0x90, 12 ); // Ignore some retarded R* if statement that checks if the model is the buffalo and jumps the siren code even though it doesn't have a siren anyway
 
+
+    // Pass on loading priority to dependent models
+    MemPut < BYTE > ( 0x040892A, 0x53 );
+    MemPut < BYTE > ( 0x040892B, 0x90 );
 }
 
 // Siren Stuff
