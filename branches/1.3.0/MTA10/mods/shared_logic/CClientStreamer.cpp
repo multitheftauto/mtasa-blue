@@ -444,7 +444,7 @@ void CClientStreamer::Restream ( void )
                 if ( IS_VEHICLE ( pElement ) )
                 {
                     CClientVehicle* pVehicle = DynamicCast < CClientVehicle > ( pElement );
-                    if ( pVehicle && IS_PLAYER ( pVehicle->GetOccupant ( ) ))
+                    if ( pVehicle && pVehicle->GetOccupant ( ) && IS_PLAYER ( pVehicle->GetOccupant ( ) ))
                     {
                         CClientPlayer* pPlayer = DynamicCast < CClientPlayer > ( pVehicle->GetOccupant ( ) );
                         if ( pPlayer->GetLastPuresyncType ( ) == PURESYNC_TYPE_LIGHTSYNC )
