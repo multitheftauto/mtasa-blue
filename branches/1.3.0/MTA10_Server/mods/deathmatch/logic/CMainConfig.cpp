@@ -537,6 +537,18 @@ bool CMainConfig::Load ( void )
     GetInteger ( m_pRootNode, "net_type", m_iNetReliabilityMode );
     m_iNetReliabilityMode = Clamp ( 0, m_iNetReliabilityMode, 4 );
 
+    // lightsync_rate
+    iResult = GetInteger ( m_pRootNode, "lightsync_rate", m_iLightSyncRate );
+    if ( iResult == IS_SUCCESS )
+    {
+        m_iLightSyncRate = Clamp ( 200, m_iLightSyncRate, 4000 );
+    }
+    else
+    {
+        CLogger::ErrorPrintf ( "lightsync_rate is not valid. Defaulting to 1.5s\n" );
+        m_iLightSyncRate = 1500;
+    }
+
     ApplyNetOptions ();
 
     return true;
@@ -1324,6 +1336,21 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
             return true;
         }
     }
+    else
+        if ( strName == "lightsync_rate" )
+        {
+            int iValue = atoi ( strValue );
+            if ( iValue >= 100 && iValue <= 4000 )
+            {
+                m_iLightSyncRate = iValue;
+                if ( bSave )
+                {
+                    SetString ( m_pRootNode, "lightsync_rate", SString ( "%d", m_iLightSyncRate ) );
+                    Save ();
+                }
+                return true;
+            }
+        }
 
     //
     // Everything else is read only, so can't be set

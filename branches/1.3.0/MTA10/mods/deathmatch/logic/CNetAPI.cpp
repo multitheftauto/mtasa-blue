@@ -986,6 +986,7 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     pPlayer->SetLastPuresyncTime ( CClientTime::GetTime () );
     pPlayer->SetLastPuresyncPosition ( position.data.vecPosition );
     pPlayer->IncrementPlayerSync ();
+    pPlayer->SetLastPuresyncType ( PURESYNC_TYPE_PURESYNC );
 }
 
 
@@ -1454,6 +1455,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
     pPlayer->SetLastPuresyncPosition ( vecPosition );
     pPlayer->SetLastPuresyncTime ( CClientTime::GetTime () );
     pPlayer->IncrementVehicleSync ();
+    pPlayer->SetLastPuresyncType ( PURESYNC_TYPE_PURESYNC );
 }
 
 
@@ -1983,6 +1985,7 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
 
     pPlayer->SetLastPuresyncTime ( CClientTime::GetTime () );
     pPlayer->IncrementPlayerSync ();
+    pPlayer->SetLastPuresyncType ( PURESYNC_TYPE_LIGHTSYNC );
 }
 
 void CNetAPI::ReadVehicleResync ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream )

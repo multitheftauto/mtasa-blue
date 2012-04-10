@@ -441,6 +441,19 @@ void CClientStreamer::Restream ( void )
                 if ( fElementDistanceExp > m_fMaxDistanceExp )
                     continue;
 
+                if ( IS_VEHICLE ( pElement ) )
+                {
+                    CClientVehicle* pVehicle = DynamicCast < CClientVehicle > ( pElement );
+                    if ( pVehicle && IS_PLAYER ( pVehicle->GetOccupant ( ) ))
+                    {
+                        CClientPlayer* pPlayer = DynamicCast < CClientPlayer > ( pVehicle->GetOccupant ( ) );
+                        if ( pPlayer->GetLastPuresyncType ( ) == PURESYNC_TYPE_LIGHTSYNC )
+                        {
+                            // LOL IF IT'S LIGHTSYNC WE DON'T WANT IT. IT'S CLEARLY OUT OF STREAM RANGE.
+                            continue;
+                        }
+                    }
+                }
                 // If attached and attached-to is streamed out, don't consider for streaming in
                 CClientStreamElement* pAttachedTo = dynamic_cast< CClientStreamElement * >( pElement->GetAttachedTo() );
                 if ( pAttachedTo && !pAttachedTo->IsStreamedIn() )
@@ -454,9 +467,9 @@ void CClientStreamer::Restream ( void )
 
                 // Not room to stream in more elements?
                 if ( bReachedLimit )
-                {                 
+                {
                     // Do we not have a closest streamed out element yet? set it to this
-                    if ( !pClosestStreamedOut ) pClosestStreamedOut = pElement;                    
+                    if ( !pClosestStreamedOut ) pClosestStreamedOut = pElement;
                 }
                 else
                 {
@@ -464,7 +477,7 @@ void CClientStreamer::Restream ( void )
                     pElement->InternalStreamIn ( false );
                     bReachedLimit = ReachedLimit ();
                 }
-            }            
+            }
         }
     }
 
