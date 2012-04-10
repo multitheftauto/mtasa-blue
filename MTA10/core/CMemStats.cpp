@@ -193,12 +193,12 @@ namespace
             uint uiArray[];
             struct
             {
-                uint uiPlayerModels_0_299;
-                uint uiUnknown_300_317;
-                uint uiWeaponModels_318_399;
+                uint uiPlayerModels_0_312;
+                uint uiUnknown_313_317;
+                uint uiWeaponModels_318_372;
                 uint uiUnknown_373_399;
                 uint uiVehicles_400_611;
-                uint uiUnknown_612_399;
+                uint uiUnknown_612_999;
                 uint uiUpgrades_1000_1193;
                 uint uiUnknown_1194_19999;
                 uint uiTextures_20000_24999;
@@ -372,12 +372,12 @@ void CMemStats::SampleValues ( void )
         if ( uiLoadedFlag )
         {
             m_MemStatsNow.modelInfo.uiTotal++;
-            if ( i < 300 )          m_MemStatsNow.modelInfo.uiPlayerModels_0_299++;
-            else if ( i < 318 )     m_MemStatsNow.modelInfo.uiUnknown_300_317++;
-            else if ( i < 373 )     m_MemStatsNow.modelInfo.uiWeaponModels_318_399++;
+            if ( i < 313 )          m_MemStatsNow.modelInfo.uiPlayerModels_0_312++;
+            else if ( i < 318 )     m_MemStatsNow.modelInfo.uiUnknown_313_317++;
+            else if ( i < 373 )     m_MemStatsNow.modelInfo.uiWeaponModels_318_372++;
             else if ( i < 400 )     m_MemStatsNow.modelInfo.uiUnknown_373_399++;
             else if ( i < 612 )     m_MemStatsNow.modelInfo.uiVehicles_400_611++;
-            else if ( i < 1000 )    m_MemStatsNow.modelInfo.uiUnknown_612_399++;
+            else if ( i < 1000 )    m_MemStatsNow.modelInfo.uiUnknown_612_999++;
             else if ( i < 1194 )    m_MemStatsNow.modelInfo.uiUpgrades_1000_1193++;
             else if ( i < 20000 )   m_MemStatsNow.modelInfo.uiUnknown_1194_19999++;
             else if ( i < 25000 )   m_MemStatsNow.modelInfo.uiTextures_20000_24999++;
@@ -547,12 +547,12 @@ void CMemStats::CreateTables ( void )
         CDxTable& table = m_TableList.back ();
         table.SetColumnWidths( "90,50,50:R,60:R" );
         table.AddRow ( "Models in use| |Change|Count" );
-        table.AddRow ( SString ( "0-288|(Players)|%d|%d", m_MemStatsDelta.modelInfo.uiPlayerModels_0_299, m_MemStatsNow.modelInfo.uiPlayerModels_0_299 ) );
-        table.AddRow ( SString ( "300-317| |%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_300_317, m_MemStatsNow.modelInfo.uiUnknown_300_317 ) );
-        table.AddRow ( SString ( "318-399|(Weapons)|%d|%d", m_MemStatsDelta.modelInfo.uiWeaponModels_318_399, m_MemStatsNow.modelInfo.uiWeaponModels_318_399 ) );
+        table.AddRow ( SString ( "0-312|(Players)|%d|%d", m_MemStatsDelta.modelInfo.uiPlayerModels_0_312, m_MemStatsNow.modelInfo.uiPlayerModels_0_312 ) );
+        table.AddRow ( SString ( "313-317| |%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_313_317, m_MemStatsNow.modelInfo.uiUnknown_313_317 ) );
+        table.AddRow ( SString ( "318-372|(Weapons)|%d|%d", m_MemStatsDelta.modelInfo.uiWeaponModels_318_372, m_MemStatsNow.modelInfo.uiWeaponModels_318_372 ) );
         table.AddRow ( SString ( "373-399| |%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_373_399, m_MemStatsNow.modelInfo.uiUnknown_373_399 ) );
         table.AddRow ( SString ( "400-611|(Vehicles)|%d|%d", m_MemStatsDelta.modelInfo.uiVehicles_400_611, m_MemStatsNow.modelInfo.uiVehicles_400_611 ) );
-        table.AddRow ( SString ( "612-999| |%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_612_399, m_MemStatsNow.modelInfo.uiUnknown_612_399 ) );
+        table.AddRow ( SString ( "612-999| |%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_612_999, m_MemStatsNow.modelInfo.uiUnknown_612_999 ) );
         table.AddRow ( SString ( "1000-1193|(Upgrades)|%d|%d", m_MemStatsDelta.modelInfo.uiUpgrades_1000_1193, m_MemStatsNow.modelInfo.uiUpgrades_1000_1193 ) );
         table.AddRow ( SString ( "1194-19999|(World)|%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_1194_19999, m_MemStatsNow.modelInfo.uiUnknown_1194_19999 ) );
         table.AddRow ( SString ( "20000-24999|(Textures)|%d|%d", m_MemStatsDelta.modelInfo.uiTextures_20000_24999, m_MemStatsNow.modelInfo.uiTextures_20000_24999 ) );
