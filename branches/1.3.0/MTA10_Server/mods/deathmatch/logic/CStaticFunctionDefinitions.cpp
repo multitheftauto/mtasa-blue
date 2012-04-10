@@ -1579,10 +1579,10 @@ bool CStaticFunctionDefinitions::SetElementDoubleSided ( CElement* pElement, boo
 }
 
 
-bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fHealth )
+bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fHealth, bool bSyncGlobal )
 {
     assert ( pElement );
-    RUN_CHILDREN SetElementHealth ( *iter, fHealth );
+    RUN_CHILDREN SetElementHealth ( *iter, fHealth, bSyncGlobal );
 
     switch ( pElement->GetType () )
     {
@@ -1603,7 +1603,7 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fH
                 pPed->SetHealth ( fHealth );
                 pPed->SetHealthChangeTime ( GetTickCount32 () );
                 CPlayer * pPlayer = pPed->GetSyncer ( );
-                if ( pPlayer )
+                if ( pPlayer && bSyncGlobal == false )
                 {
                     CBitStream BitStream;
                     BitStream.pBitStream->Write ( fHealth );
@@ -1622,7 +1622,7 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fH
             pVehicle->SetHealth ( fHealth );
             pVehicle->SetHealthChangeTime ( GetTickCount32 () );
             CPlayer * pPlayer = pVehicle->GetSyncer ( );
-            if ( pPlayer )
+            if ( pPlayer && bSyncGlobal == false )
             {
                 CBitStream BitStream;
                 BitStream.pBitStream->Write ( fHealth );

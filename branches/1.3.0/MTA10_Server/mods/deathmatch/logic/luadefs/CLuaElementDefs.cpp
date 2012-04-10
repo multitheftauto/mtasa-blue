@@ -1864,15 +1864,19 @@ int CLuaElementDefs::setElementDoubleSided ( lua_State* luaVM )
 
 int CLuaElementDefs::setElementHealth ( lua_State* luaVM )
 {
-    int iArgument2 = lua_type ( luaVM, 2 );
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-         ( iArgument2 == LUA_TSTRING || iArgument2 == LUA_TNUMBER ) )
+    CElement* pElement = NULL;
+    float fHealth = 0.0f;
+    bool bSyncGlobal = true;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadNumber ( fHealth );
+    argStream.ReadBool ( bSyncGlobal, true );
+
+    if ( !argStream.HasErrors() )
     {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
         if ( pElement )
         {
-            float fHealth = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
-            if ( CStaticFunctionDefinitions::SetElementHealth ( pElement, fHealth ) )
+            if ( CStaticFunctionDefinitions::SetElementHealth ( pElement, fHealth, bSyncGlobal ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

@@ -32,9 +32,9 @@ class CClientPlayerManager;
 class CClientTeam;
 enum ePuresyncType
 {
+    PURESYNC_TYPE_NONE,
     PURESYNC_TYPE_LIGHTSYNC,
     PURESYNC_TYPE_PURESYNC,
-    PURESYNC_TYPE_NONE,
 };
 class CClientPlayer : public CClientPed
 {

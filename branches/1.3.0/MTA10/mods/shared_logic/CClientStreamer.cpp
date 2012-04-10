@@ -471,7 +471,7 @@ void CClientStreamer::Restream ( void )
                         CClientPlayer* pPlayer = DynamicCast < CClientPlayer > ( pVehicle->GetOccupant ( ) );
                         if ( pPlayer->GetLastPuresyncType ( ) == PURESYNC_TYPE_LIGHTSYNC )
                         {
-                            // LOL IF IT'S LIGHTSYNC WE DON'T WANT IT. IT'S CLEARLY OUT OF STREAM RANGE.
+                            // if the last packet was ls he isn't streaming in soon.
                             continue;
                         }
                     }
@@ -481,7 +481,7 @@ void CClientStreamer::Restream ( void )
                     CClientPlayer* pPlayer = DynamicCast < CClientPlayer > ( pElement );
                     if ( pPlayer->GetLastPuresyncType ( ) == PURESYNC_TYPE_LIGHTSYNC )
                     {
-                        //  if the last packet was ls he isn't streaming in soon.
+                        // if the last packet was ls he isn't streaming in soon.
                         continue;
                     }
                 }
