@@ -11,10 +11,10 @@
 *****************************************************************************/
 
 
-DEFINE_GUID(CProxyDirect3DVertexBuffer_GUID,   0x128A025E,0x0100,0x04F1,0x40,0x60,0x53,0x19,0x44,0x56,0x59,0x42);
+DEFINE_GUID(CProxyDirect3DIndexBuffer_GUID,   0x128A025E,0x0121,0x04F1,0x40,0x60,0x53,0x19,0x44,0x56,0x59,0x42);
 
 
-class CProxyDirect3DVertexBuffer : public IDirect3DVertexBuffer9
+class CProxyDirect3DIndexBuffer : public IDirect3DIndexBuffer9
 {
 public:
     /*** IUnknown methods ***/
@@ -32,19 +32,19 @@ public:
     void    __stdcall   PreLoad         ( void )                        { return m_pOriginal->PreLoad (); }
     D3DRESOURCETYPE __stdcall GetType   ( void )                        { return m_pOriginal->GetType (); }
 
-    /*** IDirect3DVertexBuffer9 methods ***/
+    /*** IDirect3DIndexBuffer9 methods ***/
     HRESULT __stdcall   Lock            ( UINT OffsetToLock, UINT SizeToLock, void** ppbData, DWORD Flags );
     HRESULT __stdcall   Unlock          ( void )                        { return m_pOriginal->Unlock (); }
-    HRESULT __stdcall   GetDesc         ( D3DVERTEXBUFFER_DESC * pDesc ){ return m_pOriginal->GetDesc ( pDesc ); }
+    HRESULT __stdcall   GetDesc         ( D3DINDEXBUFFER_DESC * pDesc ) { return m_pOriginal->GetDesc ( pDesc ); }
 
-    // CProxyDirect3DVertexBuffer
-            CProxyDirect3DVertexBuffer  ( IDirect3DDevice9* InD3DDevice9, IDirect3DVertexBuffer9* InOriginal, UINT Length, DWORD Usage, DWORD FVF, D3DPOOL Pool );
-    virtual ~CProxyDirect3DVertexBuffer ( void );
+    // CProxyDirect3DIndexBuffer
+            CProxyDirect3DIndexBuffer  ( IDirect3DDevice9* InD3DDevice9, IDirect3DIndexBuffer9* InOriginal, UINT Length, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool );
+    virtual ~CProxyDirect3DIndexBuffer ( void );
 
-    IDirect3DVertexBuffer9* GetOriginal ( void )                        { return m_pOriginal; }
+    IDirect3DIndexBuffer9* GetOriginal ( void )                        { return m_pOriginal; }
 
 protected:
-    IDirect3DVertexBuffer9* m_pOriginal;
+    IDirect3DIndexBuffer9*  m_pOriginal;
     int                     m_iMemUsed;
     DWORD                   m_dwUsage;
     CProxyDirect3DDevice9::SResourceMemory&     m_stats;

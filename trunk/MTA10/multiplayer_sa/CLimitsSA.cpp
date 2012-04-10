@@ -29,8 +29,8 @@ int CLimitsSA::GetIPLFiles () const
 }
 bool CLimitsSA::SetIPLFiles ( int value )
 {
-    MemPutFast<unsigned char>(0x405F25, 0x68);
-    MemPutFast<int>(0x405F26, value);
+    MemPut<unsigned char>(0x405F25, 0x68);
+    MemPut<int>(0x405F26, value);
     return true;
 }
 
@@ -40,8 +40,8 @@ int CLimitsSA::GetCollisionFiles () const
 }
 bool CLimitsSA::SetCollisionFiles ( int value )
 {
-    MemPutFast<unsigned char>(0x411457, 0x68);
-    MemPutFast<int>(0x411458, value);
+    MemPut<unsigned char>(0x411457, 0x68);
+    MemPut<int>(0x411458, value);
     return true;
 }
 
@@ -51,8 +51,8 @@ int CLimitsSA::GetQuadtreeNodes () const
 }
 bool CLimitsSA::SetQuadtreeNodes ( int value )
 {
-    MemPutFast<unsigned char>(0x552C3E, 0x68);
-    MemPutFast<int>(0x552C3F, value);
+    MemPut<unsigned char>(0x552C3E, 0x68);
+    MemPut<int>(0x552C3F, value);
     return true;
 }
 
@@ -62,8 +62,8 @@ int CLimitsSA::GetVehicleStructs () const
 }
 bool CLimitsSA::SetVehicleStructs ( int value )
 {
-    MemPutFast<unsigned char>(0x5B8FE3, 0x6A);
-    MemPutFast<unsigned char>(0x5B8FE4, static_cast<unsigned char>(value));
+    MemPut<unsigned char>(0x5B8FE3, 0x6A);
+    MemPut<unsigned char>(0x5B8FE4, static_cast<unsigned char>(value));
     return true;
 }
 
@@ -73,8 +73,8 @@ int CLimitsSA::GetPolygons () const
 }
 bool CLimitsSA::SetPolygons ( int value )
 {
-    MemPutFast<unsigned char>(0x731F5F, 0x68);
-    MemPutFast<int>(0x731F60, value);
+    MemPut<unsigned char>(0x731F5F, 0x68);
+    MemPut<int>(0x731F60, value);
     return true;
 }
 
@@ -98,9 +98,9 @@ int CLimitsSA::GetStreamingVehicles () const
 bool CLimitsSA::SetStreamingVehicles ( int value )
 {
     MemPutFast<int>(0x8A5A84, value);
-    MemPutFast<unsigned char>(0x611C3D, 0x83);
-    MemPutFast<unsigned char>(0x611C3E, 0xFA);
-    MemPutFast<unsigned char>(0x611C3F, static_cast<unsigned char>(value));
+    MemPut<unsigned char>(0x611C3D, 0x83);
+    MemPut<unsigned char>(0x611C3E, 0xFA);
+    MemPut<unsigned char>(0x611C3F, static_cast<unsigned char>(value));
     MemSet((void*)0x5BCD9C, 0x90, 5);
 	MemSet((void*)0x5B8E6E, 0x90, 10);
     return true;

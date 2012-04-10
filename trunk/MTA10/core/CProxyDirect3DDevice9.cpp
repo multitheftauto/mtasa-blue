@@ -568,7 +568,7 @@ HRESULT CProxyDirect3DDevice9::SetTexture                     ( DWORD Stage,IDir
 {
     if ( Stage < NUMELMS( DeviceState.TextureState ) )
         DeviceState.TextureState[Stage].Texture = pTexture;
-    return m_pDevice->SetTexture ( Stage, pTexture );
+    return m_pDevice->SetTexture ( Stage, CDirect3DEvents9::GetRealTexture ( pTexture ) );
 }
 
 HRESULT CProxyDirect3DDevice9::GetTextureStageState           ( DWORD Stage,D3DTEXTURESTAGESTATETYPE Type,DWORD* pValue )
@@ -764,7 +764,7 @@ HRESULT CProxyDirect3DDevice9::SetStreamSource                ( UINT StreamNumbe
         DeviceState.VertexStreams[StreamNumber].StreamOffset = OffsetInBytes;
         DeviceState.VertexStreams[StreamNumber].StreamStride = Stride;
     }
-    return CDirect3DEvents9::SetStreamSource ( m_pDevice, StreamNumber, pStreamData, OffsetInBytes, Stride );
+    return m_pDevice->SetStreamSource ( StreamNumber, CDirect3DEvents9::GetRealVertexBuffer ( pStreamData ), OffsetInBytes, Stride );
 }
 
 HRESULT CProxyDirect3DDevice9::GetStreamSource                ( UINT StreamNumber,IDirect3DVertexBuffer9** ppStreamData,UINT* pOffsetInBytes,UINT* pStride )
@@ -785,7 +785,7 @@ HRESULT CProxyDirect3DDevice9::GetStreamSourceFreq            ( UINT StreamNumbe
 HRESULT CProxyDirect3DDevice9::SetIndices                     ( IDirect3DIndexBuffer9* pIndexData )
 {
     DeviceState.IndexBufferData = pIndexData;
-    return m_pDevice->SetIndices ( pIndexData );
+    return m_pDevice->SetIndices ( CDirect3DEvents9::GetRealIndexBuffer ( pIndexData ) );
 }
 
 HRESULT CProxyDirect3DDevice9::GetIndices                     ( IDirect3DIndexBuffer9** ppIndexData )

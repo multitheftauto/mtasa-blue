@@ -492,3 +492,10 @@ void CCommandFuncs::FakeLag ( const char *szCmdLine )
 
 #endif
 }
+
+void CCommandFuncs::ShowMemStat ( const char* szParameters )
+{
+    int iCmd = ( szParameters && szParameters [ 0 ] ) ? atoi ( szParameters ) : -1;
+    bool bShow = ( iCmd == 1 ) ? true : ( iCmd == 0 ) ? false : !GetMemStats ()->IsEnabled ();
+    GetMemStats ()->SetEnabled ( bShow );
+}

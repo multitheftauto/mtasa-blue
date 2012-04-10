@@ -426,6 +426,27 @@ public:
         bool bShaderRequiresNormals;
     };
 
+    struct SResourceMemory
+    {
+        int iCurrentCount;
+        int iCurrentBytes;
+        int iCreatedCount;
+        int iCreatedBytes;
+        int iDestroyedCount;
+        int iDestroyedBytes;
+        int iLockedCount;
+    };
+
+    struct SMemoryState
+    {
+        SResourceMemory StaticVertexBuffer;
+        SResourceMemory DynamicVertexBuffer;
+        SResourceMemory StaticIndexBuffer;
+        SResourceMemory DynamicIndexBuffer;
+        SResourceMemory StaticTexture;
+        SResourceMemory DynamicTexture;
+    };
+
     struct SStreamSourceState
     {
         IDirect3DVertexBuffer9*     StreamData;
@@ -456,6 +477,7 @@ public:
         D3DCAPS9                        DeviceCaps;
         SD3DVertexDeclState             VertexDeclState;
         SAdapterState                   AdapterState;
+        SMemoryState                    MemoryState;
         SCallState                      CallState;
         SStreamSourceState              VertexStreams[16];
     };

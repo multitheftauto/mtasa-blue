@@ -129,6 +129,6 @@ void CMultiplayerSA::InitHooks_ClothesMemFix ( void )
     EZHookInstall ( PostCPedDress );
 
     // Force rebuild every time
-    MemPutFast < BYTE > ( 0x5A6B84, 0xb3 );   // mov     bl, 1
-    MemPutFast < BYTE > ( 0x5A6B85, 0x01 );
+    MemPut < BYTE > ( 0x5A6B84, 0xb3 );   // mov     bl, 1
+    MemPut < BYTE > ( 0x5A6B85, 0x01 );
 }

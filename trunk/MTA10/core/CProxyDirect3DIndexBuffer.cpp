@@ -11,20 +11,18 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "CProxyDirect3DVertexBuffer.h"
-#include "CAdditionalVertexStreamManager.h"
-#include "CVertexStreamBoundingBoxManager.h"
+#include "CProxyDirect3DIndexBuffer.h"
 
 
 /////////////////////////////////////////////////////////////
 //
-// CProxyDirect3DVertexBuffer::CProxyDirect3DVertexBuffer
+// CProxyDirect3DIndexBuffer::CProxyDirect3DIndexBuffer
 //
 //
 //
 /////////////////////////////////////////////////////////////
-CProxyDirect3DVertexBuffer::CProxyDirect3DVertexBuffer ( IDirect3DDevice9* InD3DDevice9,IDirect3DVertexBuffer9* pOriginal, UINT Length, DWORD Usage, DWORD FVF, D3DPOOL Pool )
-    : m_stats ( Usage & D3DUSAGE_DYNAMIC ? g_pDeviceState->MemoryState.DynamicVertexBuffer : g_pDeviceState->MemoryState.StaticVertexBuffer )
+CProxyDirect3DIndexBuffer::CProxyDirect3DIndexBuffer ( IDirect3DDevice9* InD3DDevice9,IDirect3DIndexBuffer9* pOriginal, UINT Length, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool )
+    : m_stats ( Usage & D3DUSAGE_DYNAMIC ? g_pDeviceState->MemoryState.DynamicIndexBuffer : g_pDeviceState->MemoryState.StaticIndexBuffer )
 {
 	m_pOriginal = pOriginal;
     m_iMemUsed = Length;
@@ -39,16 +37,13 @@ CProxyDirect3DVertexBuffer::CProxyDirect3DVertexBuffer ( IDirect3DDevice9* InD3D
 
 /////////////////////////////////////////////////////////////
 //
-// CProxyDirect3DVertexBuffer::~CProxyDirect3DVertexBuffer
+// CProxyDirect3DIndexBuffer::~CProxyDirect3DIndexBuffer
 //
 //
 //
 /////////////////////////////////////////////////////////////
-CProxyDirect3DVertexBuffer::~CProxyDirect3DVertexBuffer ( void )
+CProxyDirect3DIndexBuffer::~CProxyDirect3DIndexBuffer ( void )
 {
-    CAdditionalVertexStreamManager::GetSingleton ()->OnVertexBufferDestroy ( m_pOriginal );
-    CVertexStreamBoundingBoxManager::GetSingleton ()->OnVertexBufferDestroy ( m_pOriginal );
-
     m_stats.iCurrentCount--;
     m_stats.iCurrentBytes -= m_iMemUsed;
     m_stats.iDestroyedCount++;
@@ -58,17 +53,17 @@ CProxyDirect3DVertexBuffer::~CProxyDirect3DVertexBuffer ( void )
 
 /////////////////////////////////////////////////////////////
 //
-// CProxyDirect3DVertexBuffer::QueryInterface
+// CProxyDirect3DIndexBuffer::QueryInterface
 //
 // Used to find the pointer to the real interface
 //
 /////////////////////////////////////////////////////////////
-HRESULT CProxyDirect3DVertexBuffer::QueryInterface ( REFIID riid, void** ppvObj )
+HRESULT CProxyDirect3DIndexBuffer::QueryInterface ( REFIID riid, void** ppvObj )
 {
 	*ppvObj = NULL;
 
     // Looking for me?
-	if( riid == CProxyDirect3DVertexBuffer_GUID )
+	if( riid == CProxyDirect3DIndexBuffer_GUID )
 	{
 		*ppvObj = this;
 		return S_OK;
@@ -80,12 +75,12 @@ HRESULT CProxyDirect3DVertexBuffer::QueryInterface ( REFIID riid, void** ppvObj 
 
 /////////////////////////////////////////////////////////////
 //
-// CProxyDirect3DVertexBuffer::Release
+// CProxyDirect3DIndexBuffer::Release
 //
 // Delete this object on final release of the original
 //
 /////////////////////////////////////////////////////////////
-ULONG CProxyDirect3DVertexBuffer::Release ( void )
+ULONG CProxyDirect3DIndexBuffer::Release ( void )
 {
 	// Call original function
 	ULONG count = m_pOriginal->Release ();
@@ -102,19 +97,13 @@ ULONG CProxyDirect3DVertexBuffer::Release ( void )
 
 /////////////////////////////////////////////////////////////
 //
-// CProxyDirect3DVertexBuffer::Lock
+// CProxyDirect3DIndexBuffer::Lock
 //
-// If lock is writable, tell manager that range content will change
+// For stats
 //
 /////////////////////////////////////////////////////////////
-HRESULT CProxyDirect3DVertexBuffer::Lock ( UINT OffsetToLock, UINT SizeToLock, void** ppbData, DWORD Flags )
+HRESULT CProxyDirect3DIndexBuffer::Lock ( UINT OffsetToLock, UINT SizeToLock, void** ppbData, DWORD Flags )
 {
     m_stats.iLockedCount++;
-
-    if ( ( Flags & D3DLOCK_READONLY ) == 0 )
-    {
-        CAdditionalVertexStreamManager::GetSingleton ()->OnVertexBufferRangeInvalidated ( m_pOriginal, OffsetToLock, SizeToLock );
-        CVertexStreamBoundingBoxManager::GetSingleton ()->OnVertexBufferRangeInvalidated ( m_pOriginal, OffsetToLock, SizeToLock );
-    }
-    return m_pOriginal->Lock ( OffsetToLock, SizeToLock, ppbData, Flags );
+    return m_pOriginal->Lock ( OffsetToLock, SizeToLock, ppbData, Flags);
 }

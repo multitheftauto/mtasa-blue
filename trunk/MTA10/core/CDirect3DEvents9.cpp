@@ -16,6 +16,8 @@
 #define DECLARE_PROFILER_SECTION_CDirect3DEvents9
 #include "profiler/SharedUtil.Profiler.h"
 #include "CProxyDirect3DVertexBuffer.h"
+#include "CProxyDirect3DIndexBuffer.h"
+#include "CProxyDirect3DTexture.h"
 #include "CAdditionalVertexStreamManager.h"
 #include "CVertexStreamBoundingBoxManager.h"
 #include "CProxyDirect3DVertexDeclaration.h"
@@ -587,6 +589,8 @@ HRESULT CDirect3DEvents9::CreateIndexBuffer ( IDirect3DDevice9 *pDevice, UINT Le
         pDevice->EvictManagedResources ();
     }
 
+    // Create proxy so we can track when it's finished with
+    *ppIndexBuffer = new CProxyDirect3DIndexBuffer ( pDevice, *ppIndexBuffer, Length, Usage, Format, Pool );
     return hr;
 }
 
@@ -617,6 +621,8 @@ HRESULT CDirect3DEvents9::CreateTexture ( IDirect3DDevice9 *pDevice, UINT Width,
         pDevice->EvictManagedResources ();
     }
 
+    // Create proxy so we can track when it's finished with
+    *ppTexture = new CProxyDirect3DTexture ( pDevice, *ppTexture, Width, Height, Levels, Usage, Format, Pool );
     return hr;
 }
 
@@ -628,7 +634,7 @@ HRESULT CDirect3DEvents9::CreateTexture ( IDirect3DDevice9 *pDevice, UINT Width,
 // Ensures the correct object gets sent to D3D
 //
 /////////////////////////////////////////////////////////////
-HRESULT CDirect3DEvents9::SetStreamSource(IDirect3DDevice9 *pDevice, UINT StreamNumber,IDirect3DVertexBuffer9* pStreamData,UINT OffsetInBytes,UINT Stride)
+IDirect3DVertexBuffer9* CDirect3DEvents9::GetRealVertexBuffer ( IDirect3DVertexBuffer9* pStreamData )
 {
 	if( pStreamData )
 	{
@@ -641,7 +647,53 @@ HRESULT CDirect3DEvents9::SetStreamSource(IDirect3DDevice9 *pDevice, UINT Stream
             pStreamData = pProxy->GetOriginal ();
     }
 
-	return pDevice->SetStreamSource( StreamNumber, pStreamData, OffsetInBytes, Stride );
+	return pStreamData;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::SetIndices
+//
+// Ensures the correct object gets sent to D3D
+//
+/////////////////////////////////////////////////////////////
+IDirect3DIndexBuffer9* CDirect3DEvents9::GetRealIndexBuffer  ( IDirect3DIndexBuffer9* pIndexData )
+{
+	if( pIndexData )
+	{
+        // See if it's a proxy
+	    CProxyDirect3DIndexBuffer* pProxy = NULL;
+        pIndexData->QueryInterface ( CProxyDirect3DIndexBuffer_GUID, (void**)&pProxy );
+
+        // If so, use the original index buffer
+        if ( pProxy )
+            pIndexData = pProxy->GetOriginal ();
+    }
+    return pIndexData;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::SetTexture
+//
+// Ensures the correct object gets sent to D3D
+//
+/////////////////////////////////////////////////////////////
+IDirect3DBaseTexture9* CDirect3DEvents9::GetRealTexture ( IDirect3DBaseTexture9* pTexture )
+{
+	if( pTexture )
+	{
+        // See if it's a proxy
+	    CProxyDirect3DTexture* pProxy = NULL;
+        pTexture->QueryInterface ( CProxyDirect3DTexture_GUID, (void**)&pProxy );
+
+        // If so, use the original texture
+        if ( pProxy )
+            pTexture = pProxy->GetOriginal ();
+    }
+    return pTexture;
 }
 
 
