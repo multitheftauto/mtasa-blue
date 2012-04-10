@@ -80,7 +80,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlibd_2008.lib libpng2008d.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9d.lib winmm.lib Imagehlp.lib ws2_32.lib gdi32.lib Userenv.lib Imm32.lib pthreadVC2.lib jpegd.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlibd_2008.lib libpng2008d.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9d.lib winmm.lib Imagehlp.lib ws2_32.lib gdi32.lib Userenv.lib Imm32.lib pthreadVC2.lib jpegd.lib Psapi.lib"
 				ShowProgress="0"
 				OutputFile="C:\Program Files\MTA San Andreas 1.3\mta\core_d.dll"
 				LinkIncremental="2"
@@ -183,7 +183,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlib_2008.lib libpng2008.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib Imm32.lib pthreadVC2.lib jpeg.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlib_2008.lib libpng2008.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib Imm32.lib pthreadVC2.lib jpeg.lib Psapi.lib"
 				OutputFile="C:\Program Files\MTA San Andreas 1.3\MTA\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -288,7 +288,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlib_2008.lib libpng2008.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib Imm32.lib pthreadVC2.lib jpeg.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlib_2008.lib libpng2008.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib Imm32.lib pthreadVC2.lib jpeg.lib Psapi.lib"
 				OutputFile="..\..\output\MTA San Andreas\mta\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -513,6 +513,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMemStats.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CMessageLoopHook.cpp"
 				>
 			</File>
@@ -574,6 +578,14 @@
 			</File>
 			<File
 				RelativePath="CProxyDirect3DDevice9.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CProxyDirect3DIndexBuffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CProxyDirect3DTexture.cpp"
 				>
 			</File>
 			<File
@@ -950,6 +962,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMemStats.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CMessageBox.h"
 				>
 			</File>
@@ -987,6 +1003,14 @@
 			</File>
 			<File
 				RelativePath=".\CProxyDirect3DDevice9.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CProxyDirect3DIndexBuffer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CProxyDirect3DTexture.h"
 				>
 			</File>
 			<File

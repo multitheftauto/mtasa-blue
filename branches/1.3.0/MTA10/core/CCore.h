@@ -75,6 +75,9 @@ class CCore;
 #define CONFIG_RECENT_LIST_TAG      "recently_played_server"
 #define CONFIG_HISTORY_LIST_TAG     "connected_server"
 
+extern class CCore* g_pCore;
+extern class CGraphics* g_pGraphics;
+
 class CCore : public CCoreInterface, public CSingleton < CCore >
 {
 public:

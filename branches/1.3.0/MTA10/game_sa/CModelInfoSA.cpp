@@ -345,6 +345,13 @@ void CModelInfoSA::Sure2Load( DWORD dwFlags )
 
 VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad, bool bHighPriority )
 {
+    // Auto high priority for:
+    // 0 - 312      player models
+    // 400 - 611    vehicles
+    // 1000 - 1193  vehicle upgrades
+    if ( m_dwModelID < 1194 || bAndLoad )
+        bHighPriority = true;
+
     DEBUG_TRACE("VOID CModelInfoSA::Request( BOOL bAndLoad, BOOL bWaitForLoad )");
     // don't bother loading it if it already is
     if ( IsLoaded () )
@@ -371,7 +378,7 @@ VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad, bool bHighPriority
             if ( !pAnim->IsLoaded() )
             {
                 OutputDebugLine ( SString ( "[Models] Requesting anim file %d for model %d", uiAnimId, m_dwModelID ) );
-                pAnim->Sure2Load ( 0x16 );
+                pAnim->Request ( bAndLoad, bWaitForLoad, bHighPriority );
             }
         }
     }
@@ -385,7 +392,7 @@ VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad, bool bHighPriority
 
     if(bAndLoad)
     {
-        pGame->GetStreaming()->LoadAllRequestedModels();
+        pGame->GetStreaming()->LoadAllRequestedModels( bHighPriority );
         
         if(bWaitForLoad)
         {
@@ -916,7 +923,7 @@ void CModelInfoSA::RequestVehicleUpgrade ( void )
     DWORD ModelID = m_dwModelID;
     _asm
     {
-        push    10
+        push    0x16        // High priority
         push    ModelID
         call    dwFunc
         add     esp, 8

@@ -393,7 +393,7 @@ bool CSettingsSA::IsGrassEnabled ( void )
 
 void CSettingsSA::SetGrassEnabled ( bool bEnable )
 {
-    MemPutFast < BYTE > ( 0x05DBAED, bEnable ? 0x85 : 0x33 );
+    MemPut < BYTE > ( 0x05DBAED, bEnable ? 0x85 : 0x33 );
 }
 
 ////////////////////////////////////////////////
@@ -403,5 +403,5 @@ void CSettingsSA::SetGrassEnabled ( bool bEnable )
 ////////////////////////////////////////////////
 void CSettingsSA::SetSelectDeviceDialogEnabled ( bool bEnable )
 {
-    MemPutFast < BYTE > ( 0x74621F, bEnable ? 0x01 : 0x42 );
+    MemPut < BYTE > ( 0x74621F, bEnable ? 0x01 : 0x42 );
 }
