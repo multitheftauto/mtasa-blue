@@ -120,6 +120,7 @@ CCore::CCore ( void )
     // Create the GUI manager and the graphics lib wrapper
     m_pLocalGUI                 = new CLocalGUI;
     m_pGraphics                 = new CGraphics ( m_pLocalGUI );
+    g_pGraphics                 = m_pGraphics;
     m_pGUI                      = NULL;
 
     // Create the mod manager
@@ -1163,6 +1164,7 @@ void CCore::DoPostFramePulse ( )
 
     // Notify the mod manager and the connect manager
     m_pModManager->DoPulsePostFrame ();
+    GetMemStats ()->Draw ();
     m_pConnectManager->DoPulse ();
 
     m_Community.DoPulse ();
@@ -1249,6 +1251,7 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "debugscrolldown",   "scrolls the debug view downwards", CCommandFuncs::DebugScrollDown );
 
     m_pCommands->Add ( "test",              "",                                 CCommandFuncs::Test );
+    m_pCommands->Add ( "showmemstat",       "shows the memory statistics",      CCommandFuncs::ShowMemStat );
 
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
     m_pCommands->Add ( "fakelag",           "",                                 CCommandFuncs::FakeLag );
