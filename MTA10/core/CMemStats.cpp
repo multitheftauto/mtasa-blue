@@ -38,54 +38,6 @@ namespace
 
 
     //
-    // Faster type of SString::Split
-    // Uses pointers to a big buffer rather than an array of SStrings
-    //
-    class CSplitString : public std::vector < const char* >
-    {
-    public:
-        CSplitString ( void ) {}
-        CSplitString ( const SString& strInput, const SString& strDelim, unsigned int uiMaxAmount = 0, unsigned int uiMinAmount = 0 )
-        {
-            Split ( strInput, strDelim, uiMaxAmount, uiMinAmount );
-        }
-
-        void Split ( const SString& strInput, const SString& strDelim, unsigned int uiMaxAmount = 0, unsigned int uiMinAmount = 0 )
-        {
-            // Copy string to buffer
-            uint iInputLength = strInput.length ();
-            buffer.resize ( iInputLength + 1 );
-            memcpy ( &buffer[0], &strInput[0], iInputLength + 1 );
-
-            // Prime result list
-            clear ();
-            reserve ( Min ( 16U, uiMaxAmount ) );
-
-            // Split into pointers
-            unsigned long ulCurrentPoint = 0;
-            while ( true )
-            {
-                unsigned long ulPos = strInput.find ( strDelim, ulCurrentPoint );
-                if ( ulPos == SString::npos || ( uiMaxAmount > 0 && uiMaxAmount <= size () + 1 ) )
-                {
-                    if ( ulCurrentPoint <= strInput.length () )
-                        push_back ( &buffer[ ulCurrentPoint ] );
-                    break;
-                }
-                push_back ( &buffer[ ulCurrentPoint ] );
-                buffer[ ulPos ] = 0;
-                ulCurrentPoint = ulPos + strDelim.length ();
-            }
-            while ( size () < uiMinAmount )
-                push_back ( &buffer[ iInputLength ] );        
-        }
-
-    protected:
-        std::vector < char > buffer;
-    };
-
-
-    //
     // For drawing tables with nice neat columns in D3D
     //
     class CDxTable
@@ -130,17 +82,106 @@ namespace
             }
         }
 
+        // For cell colors depending on cell value
+        void SetNumberColors ( const SString& strTag, const SString& strColorInfo )
+        {
+            std::map < int, SString >& valueColorCodeMap = MapGet ( m_ValueColorCodeMapMap, strTag );
+
+            valueColorCodeMap.clear ();
+
+            CSplitString splitString ( strColorInfo, "," );
+
+            for ( uint i = 0 ; i < splitString.size () ; i++ )
+            {
+                const char* szItem = splitString[i];
+                if ( strlen ( szItem ) < 8 )
+                    continue;
+
+                int iValue =  atoi ( szItem + 7 );
+                MapSet ( valueColorCodeMap, iValue, SStringX ( szItem ).SubStr ( 0, 7 ) );
+            }
+        }
+
         // Add a new row of data
         void AddRow ( const SString& strRow )
         {
             CSplitString splitString ( strRow, m_strColumnDivider, 0, m_ColumnList.size () );
 
+            SString strTemp;
             for ( uint i = 0 ; i < splitString.size () ; i++ )
             {
                 SColumn& column = m_ColumnList[i];
-                column.strText += SStringX ( splitString[i] ) + "\n";
-            }
 
+                const char* szText = splitString[i];
+
+                // Replace ~X0 with X
+                if ( const char* szPos = strchr ( szText, '~' ) )
+                {
+                    uint iPos = (uint)szPos - (uint)szText;
+                    SStringX strText ( szText );
+                    if ( szPos[2] == '0' )
+                    {
+                        strTemp = strText.SubStr ( 0, iPos ) + strText.SubStr ( iPos + 1, 1 ) + strText.SubStr ( iPos + 3 );
+                    }
+                    else
+                    {
+                        strTemp = strText.SubStr ( 0, iPos ) + strText.SubStr ( iPos + 2 );
+                    }
+                    szText = strTemp;
+                }
+
+                // If it starts with ^, eval following number and prepend color code
+                if ( szText[0] == '^' && szText[1] )
+                {
+                    const std::map < int, SString >& valueColorCodeMap = MapGet ( m_ValueColorCodeMapMap, std::string ( szText, 2 ) );
+
+                    const char* szValue = szText + 2;
+                    int iValue = atoi ( szValue );
+                    SString strColorCode = "#00FFFF";
+
+                    std::map < int, SString >::const_iterator iterNext = valueColorCodeMap.begin ();
+                    if ( iterNext != valueColorCodeMap.end () )
+                    {
+                        std::map < int, SString >::const_iterator iterCur = iterNext++;
+                        for ( ; iterNext != valueColorCodeMap.end () ; ++iterCur, ++iterNext )
+                        {
+                            if ( iValue < 0 )
+                            {
+                                if ( iValue < iterNext->first )
+                                {
+                                    strColorCode = iterCur->second;
+                                    break;
+                                }
+                            }
+                            else
+                            if ( iValue == 0 )
+                            {
+                                if ( iValue == iterCur->first )
+                                {
+                                    strColorCode = iterCur->second;
+                                    break;
+                                }
+                            }
+                            else
+                            if ( iValue > 0 )
+                            {
+                                if ( iValue <= iterNext->first )
+                                {
+                                    strColorCode = iterNext->second;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    column.strText += strColorCode;
+                    column.strText += szValue;
+                }
+                else
+                {
+                    column.strText += szText;
+                }
+                column.strText += "\n";
+            }
             m_uiNumRows++;
         }
 
@@ -165,16 +206,17 @@ namespace
             for ( uint i = 0 ; i < m_ColumnList.size () ; i++ )
             {
                 const SColumn& column = m_ColumnList[i];
-                g_pGraphics->DrawTextQueued ( fX, fY, fX + column.uiWidth, fY, 0xFFFFFFFF, *column.strText, 1, 1, DT_NOCLIP | column.uiAlignment, NULL, true );
+                g_pGraphics->DrawTextQueued ( fX, fY, fX + column.uiWidth, fY, 0xFFFFFFFF, column.strText, 1, 1, DT_NOCLIP | column.uiAlignment, NULL, true, true );
                 fX += column.uiWidth;
             }
         }
 
     protected:
-        SString                     m_strColumnDivider;
-        uint                        m_uiTotalWidth;
-        uint                        m_uiNumRows;
-        std::vector < SColumn >     m_ColumnList;
+        std::map < SString, std::map < int, SString > >  m_ValueColorCodeMapMap;
+        SString                         m_strColumnDivider;
+        uint                            m_uiTotalWidth;
+        uint                            m_uiNumRows;
+        std::vector < SColumn >         m_ColumnList;
     };
 
 
@@ -210,7 +252,6 @@ namespace
             };
         } modelInfo;
     };
-
 }
 
 
@@ -232,6 +273,7 @@ public:
     virtual bool        IsEnabled               ( void );
 
 protected:
+    void                UpdateFrameStats        ( void );
     void                SampleValues            ( void );
     void                CreateTables            ( void );
 
@@ -240,6 +282,7 @@ protected:
     SMemStatsInfo           m_MemStatsNow;
     SMemStatsInfo           m_MemStatsPrev;
     SMemStatsInfo           m_MemStatsDelta;
+    SMemStatsInfo           m_MemStatsMax;
     std::list < CDxTable >  m_TableList;
 };
 
@@ -282,7 +325,17 @@ CMemStats::~CMemStats ( void )
 ///////////////////////////////////////////////////////////////
 void CMemStats::SetEnabled ( bool bEnabled )
 {
-    m_bEnabled = bEnabled;
+    if ( m_bEnabled != bEnabled )
+    {
+        m_bEnabled = bEnabled;
+        // Clear accumulated changes for first display
+        if ( m_bEnabled )
+        {
+            SampleValues ();
+            SampleValues ();
+            CreateTables ();
+        }
+    }
 }
 
 
@@ -311,14 +364,17 @@ void CMemStats::Draw ( void )
     if ( !m_bEnabled )
         return;
 
+    UpdateFrameStats ();
+
     // Time to update?
-    if ( m_UpdateTimer.Get () > 1000 )
+    if ( m_UpdateTimer.Get () > 2000 )
     {
         m_UpdateTimer.Reset ();
-        SampleValues();
-        CreateTables();
+        SampleValues ();
+        CreateTables ();
     }
 
+    // Draw tables
     if ( !m_TableList.empty () )
     {
         float fResWidth = static_cast < float > ( g_pGraphics->GetViewportWidth () );
@@ -334,6 +390,38 @@ void CMemStats::Draw ( void )
             fY += 20;
             fY += table.GetPixelHeight ();
         }
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CMemStats::UpdateFrameStats
+//
+// Update values that are measured each frame
+//
+///////////////////////////////////////////////////////////////
+void CMemStats::UpdateFrameStats ( void )
+{
+
+    m_MemStatsNow.d3dMemory = g_pDeviceState->MemoryState;
+
+    static CProxyDirect3DDevice9::SResourceMemory* const nowList[] = {    &m_MemStatsNow.d3dMemory.StaticVertexBuffer, &m_MemStatsNow.d3dMemory.DynamicVertexBuffer,
+                                                                                &m_MemStatsNow.d3dMemory.StaticIndexBuffer, &m_MemStatsNow.d3dMemory.DynamicIndexBuffer,
+                                                                                &m_MemStatsNow.d3dMemory.StaticTexture, &m_MemStatsNow.d3dMemory.DynamicTexture };
+
+    static CProxyDirect3DDevice9::SResourceMemory* const maxList[] = {    &m_MemStatsMax.d3dMemory.StaticVertexBuffer, &m_MemStatsMax.d3dMemory.DynamicVertexBuffer,
+                                                                                &m_MemStatsMax.d3dMemory.StaticIndexBuffer, &m_MemStatsMax.d3dMemory.DynamicIndexBuffer,
+                                                                                &m_MemStatsMax.d3dMemory.StaticTexture, &m_MemStatsMax.d3dMemory.DynamicTexture };
+
+    CProxyDirect3DDevice9::SResourceMemory* const prevList[] = {   &m_MemStatsPrev.d3dMemory.StaticVertexBuffer, &m_MemStatsPrev.d3dMemory.DynamicVertexBuffer,
+                                                                                &m_MemStatsPrev.d3dMemory.StaticIndexBuffer, &m_MemStatsPrev.d3dMemory.DynamicIndexBuffer,
+                                                                                &m_MemStatsPrev.d3dMemory.StaticTexture, &m_MemStatsPrev.d3dMemory.DynamicTexture };
+
+    for ( uint i = 0 ; i < NUMELMS( nowList ) ; i++ )
+    {
+        maxList[i]->iLockedCount = Max ( maxList[i]->iLockedCount, nowList[i]->iLockedCount - prevList[i]->iLockedCount );
+        prevList[i]->iLockedCount = nowList[i]->iLockedCount;
     }
 }
 
@@ -418,19 +506,26 @@ void CMemStats::SampleValues ( void )
                                                                                 &m_MemStatsDelta.d3dMemory.StaticIndexBuffer, &m_MemStatsDelta.d3dMemory.DynamicIndexBuffer,
                                                                                 &m_MemStatsDelta.d3dMemory.StaticTexture, &m_MemStatsDelta.d3dMemory.DynamicTexture };
 
+    static const CProxyDirect3DDevice9::SResourceMemory* const maxList[] = {    &m_MemStatsMax.d3dMemory.StaticVertexBuffer, &m_MemStatsMax.d3dMemory.DynamicVertexBuffer,
+                                                                                &m_MemStatsMax.d3dMemory.StaticIndexBuffer, &m_MemStatsMax.d3dMemory.DynamicIndexBuffer,
+                                                                                &m_MemStatsMax.d3dMemory.StaticTexture, &m_MemStatsMax.d3dMemory.DynamicTexture };
+
     for ( uint i = 0 ; i < NUMELMS( nowList ) ; i++ )
     {
         deltaList[i]->iCreatedCount     = nowList[i]->iCreatedCount - prevList[i]->iCreatedCount;
         deltaList[i]->iCreatedBytes     = nowList[i]->iCreatedBytes - prevList[i]->iCreatedBytes;
         deltaList[i]->iDestroyedCount   = nowList[i]->iDestroyedCount - prevList[i]->iDestroyedCount;
         deltaList[i]->iDestroyedBytes   = nowList[i]->iDestroyedBytes - prevList[i]->iDestroyedBytes;
-        deltaList[i]->iLockedCount      = nowList[i]->iLockedCount - prevList[i]->iLockedCount;
+        deltaList[i]->iLockedCount      = maxList[i]->iLockedCount;     // Use per-frame max for lock stats
     }
 
     //
     // Set 'prev' for next time
     //
     m_MemStatsPrev = m_MemStatsNow;
+
+    // Clear max records
+    memset ( &m_MemStatsMax, 0, sizeof ( m_MemStatsMax ) );
 }
 
 
@@ -445,6 +540,69 @@ void CMemStats::CreateTables ( void )
 {
     m_TableList.clear ();
 
+    //
+    // Color setups
+    //
+    #define YELLOW "#FFFF00"
+    #define RED "#FF0000"
+    #define BLUE "#0000FF"
+    #define WHITE "#FFFFFF"
+
+    #define LT_RED "#FF5050"
+    #define DK_RED "#CF0000"
+    #define GREY "#808080"
+    #define LT_GREY "#C0C0C0"
+    #define INVIS "#000000"
+    #define DK_GREEN "#00CF00"
+    #define LT_GREEN "#30FF30"
+    #define PURPLE "#FF00FF"
+    #define CYAN "#00FFFF"
+    #define LT_CYAN "#00C0F0"
+
+    // Table header
+    #define HEADER1(text) LT_CYAN text WHITE
+
+    // Cell colour depending upon the value
+    SString strNumberColorsCreat =
+                        GREY "0,"
+                        CYAN "999999,"
+                        ;
+
+    SString strNumberColorsDstry =
+                        GREY "0,"
+                        PURPLE "999999,"
+                        ;
+
+    SString strNumberColorsLockStatic =
+                        GREY "0,"
+                        YELLOW "999999,"
+                        ;
+
+    SString strNumberColorsLockDynamic =
+                        WHITE "0,"
+                        WHITE "999999,"
+                        ;
+
+    SString strNumberColorsMtaVidMem =
+                        LT_GREEN "-999999,"
+                        GREY "0,"
+                        LT_RED "999999,"
+                        ;
+
+    SString strNumberColorsModels =
+                        LT_GREEN "-99999,"
+                        GREY "0,"
+                        LT_RED "999999,"
+                        ;
+
+    //
+    // Key for weird codes in table.AddRow string:
+    //
+    //      |  is usually the cell delimiter character
+    //      ~X means replace any following zero with character X
+    //      ^2 means use number color ^2 for the following value
+    //
+
     {
 /*
     GTA vidmemory         Lock Create Destroy Total TotalKB
@@ -455,8 +613,7 @@ void CMemStats::CreateTables ( void )
     StaticTexture           1     1      1      10     1000
     DynamicTexture          1     1      1      10     1000
 */
-// static
-        const char* const nameList[] = {  "Vertices", "Vertices dynamic", "Indices", "Indices dynamic", "Textures", "Textures dynamic" };
+        static const char* const nameList[] = {  "Vertices", "Vertices dynamic", "Indices", "Indices dynamic", "Textures", "Textures dynamic" };
 
         static const CProxyDirect3DDevice9::SResourceMemory* const nowList[] = {    &m_MemStatsNow.d3dMemory.StaticVertexBuffer, &m_MemStatsNow.d3dMemory.DynamicVertexBuffer,
                                                                                     &m_MemStatsNow.d3dMemory.StaticIndexBuffer, &m_MemStatsNow.d3dMemory.DynamicIndexBuffer,
@@ -469,17 +626,31 @@ void CMemStats::CreateTables ( void )
         m_TableList.push_back ( CDxTable ( "|" ) );
         CDxTable& table = m_TableList.back ();
         table.SetColumnWidths( "100,45:R,40:R,40:R,50:R,60:R" );
-        table.AddRow( "GTA vid memory|Lock|Creat|Dstry|Count|Using KB" );
+        table.SetNumberColors ( "^1", strNumberColorsLockStatic );
+        table.SetNumberColors ( "^2", strNumberColorsLockDynamic );
+        table.SetNumberColors ( "^3", strNumberColorsCreat );
+        table.SetNumberColors ( "^4", strNumberColorsDstry );
+        table.AddRow ( HEADER1( "GTA vid memory" ) "|" HEADER1( "Lock" ) "|" HEADER1( "Creat" ) BLUE "|" HEADER1( "Dstry" ) "|" HEADER1( "Count" ) "|" HEADER1( "Using KB" ) );
         for ( uint i = 0 ; i < NUMELMS( nameList ) ; i++ )
         {
-            table.AddRow( SString ( "%s|%d|%d|%d|%d|%s"
-                                        ,nameList[i]
-                                        ,deltaList[i]->iLockedCount
-                                        ,deltaList[i]->iCreatedCount
-                                        ,deltaList[i]->iDestroyedCount
-                                        ,nowList[i]->iCurrentCount
-                                        ,*FormatNumberWithCommas ( nowList[i]->iCurrentBytes / 1024  )
-                                  ) );
+            if ( i & 1 )
+                table.AddRow( SString ( "%s|^2~ %d|^3~.%d|^4~.%d|%d|%s"
+                                            ,nameList[i]
+                                            ,deltaList[i]->iLockedCount
+                                            ,deltaList[i]->iCreatedCount
+                                            ,deltaList[i]->iDestroyedCount
+                                            ,nowList[i]->iCurrentCount
+                                            ,*FormatNumberWithCommas ( nowList[i]->iCurrentBytes / 1024  )
+                                      ) );
+            else
+                table.AddRow( SString ( "%s|^1~ %d|^3~.%d|^4~.%d|%d|%s"
+                                            ,nameList[i]
+                                            ,deltaList[i]->iLockedCount
+                                            ,deltaList[i]->iCreatedCount
+                                            ,deltaList[i]->iDestroyedCount
+                                            ,nowList[i]->iCurrentCount
+                                            ,*FormatNumberWithCommas ( nowList[i]->iCurrentBytes / 1024  )
+                                      ) );
         }
     }
 
@@ -494,11 +665,12 @@ void CMemStats::CreateTables ( void )
         m_TableList.push_back ( CDxTable ( "|" ) );
         CDxTable& table = m_TableList.back ();
         table.SetColumnWidths( "110,80:R,80:R" );
-        table.AddRow ( "MTA vid memory|Change KB|Using KB" );
-        table.AddRow ( SString ( "FreeForMTA|%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.dxStatus.videoMemoryKB.iFreeForMTA ), *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoMemoryKB.iFreeForMTA ) ) );
-        table.AddRow ( SString ( "Fonts|%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByFonts ), *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByFonts ) ) );
-        table.AddRow ( SString ( "Textures|%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByTextures ), *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByTextures ) ) );
-        table.AddRow ( SString ( "RenderTargets|%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByTextures ), *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByTextures ) ) );
+        table.SetNumberColors ( "^1", strNumberColorsMtaVidMem );
+        table.AddRow ( HEADER1( "MTA vid memory" ) "|" HEADER1( "Change KB" ) "|" HEADER1( "Using KB" ) );
+        table.AddRow ( SString ( "FreeForMTA|^1~.%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.dxStatus.videoMemoryKB.iFreeForMTA ), *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoMemoryKB.iFreeForMTA ) ) );
+        table.AddRow ( SString ( "Fonts|^1~.%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByFonts ), *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByFonts ) ) );
+        table.AddRow ( SString ( "Textures|^1~.%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByTextures ), *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByTextures ) ) );
+        table.AddRow ( SString ( "RenderTargets|^1~.%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByTextures ), *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByTextures ) ) );
     }
 
     {
@@ -510,10 +682,11 @@ void CMemStats::CreateTables ( void )
         m_TableList.push_back ( CDxTable ( "|" ) );
         CDxTable& table = m_TableList.back ();
         table.SetColumnWidths( "110,30:R,50:R,80:R" );
-        table.AddRow ( "GTA memory| |Change KB|Using KB" );
+        table.SetNumberColors ( "^1", strNumberColorsMtaVidMem );
+        table.AddRow ( HEADER1( "GTA memory" ) "| |" HEADER1( "Change KB" ) "|" HEADER1( "Using KB" ) );
         table.AddRow ( SString ( "Process memory| | |%s", *FormatNumberWithCommas ( m_MemStatsNow.iProcessMemSizeKB - m_MemStatsNow.iStreamingMemoryUsed / 1024 ) ) );
-        table.AddRow ( SString ( "Streaming memory| |%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.iStreamingMemoryUsed / 1024 ), *FormatNumberWithCommas ( m_MemStatsNow.iStreamingMemoryUsed / 1024 ) ) );
-        table.AddRow ( SString ( "|Total:|%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.iProcessMemSizeKB ), *FormatNumberWithCommas ( m_MemStatsNow.iProcessMemSizeKB ) ) );
+        table.AddRow ( SString ( "Streaming memory| |^1~.%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.iStreamingMemoryUsed / 1024 ), *FormatNumberWithCommas ( m_MemStatsNow.iStreamingMemoryUsed / 1024 ) ) );
+        table.AddRow ( SString ( "|Total:|^1~.%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.iProcessMemSizeKB ), *FormatNumberWithCommas ( m_MemStatsNow.iProcessMemSizeKB ) ) );
     }
 
     {
@@ -525,7 +698,7 @@ void CMemStats::CreateTables ( void )
         m_TableList.push_back ( CDxTable ( "|" ) );
         CDxTable& table = m_TableList.back ();
         table.SetColumnWidths( "140,130:R" );
-        table.AddRow ( "GTA settings|Setting KB" );
+        table.AddRow ( HEADER1( "GTA settings" ) "|" HEADER1( "Setting KB" ) );
         table.AddRow ( SString ( "Video card installed memory|%s", *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoCard.iInstalledMemoryKB ) ) );
         table.AddRow ( SString ( "Streaming memory limit|%s", *FormatNumberWithCommas ( m_MemStatsNow.iStreamingMemoryAvailable / 1024 ) ) );
     }
@@ -546,20 +719,21 @@ void CMemStats::CreateTables ( void )
         m_TableList.push_back ( CDxTable ( "|" ) );
         CDxTable& table = m_TableList.back ();
         table.SetColumnWidths( "90,50,50:R,60:R" );
-        table.AddRow ( "Models in use| |Change|Count" );
-        table.AddRow ( SString ( "0-312|(Players)|%d|%d", m_MemStatsDelta.modelInfo.uiPlayerModels_0_312, m_MemStatsNow.modelInfo.uiPlayerModels_0_312 ) );
-        table.AddRow ( SString ( "313-317| |%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_313_317, m_MemStatsNow.modelInfo.uiUnknown_313_317 ) );
-        table.AddRow ( SString ( "318-372|(Weapons)|%d|%d", m_MemStatsDelta.modelInfo.uiWeaponModels_318_372, m_MemStatsNow.modelInfo.uiWeaponModels_318_372 ) );
-        table.AddRow ( SString ( "373-399| |%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_373_399, m_MemStatsNow.modelInfo.uiUnknown_373_399 ) );
-        table.AddRow ( SString ( "400-611|(Vehicles)|%d|%d", m_MemStatsDelta.modelInfo.uiVehicles_400_611, m_MemStatsNow.modelInfo.uiVehicles_400_611 ) );
-        table.AddRow ( SString ( "612-999| |%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_612_999, m_MemStatsNow.modelInfo.uiUnknown_612_999 ) );
-        table.AddRow ( SString ( "1000-1193|(Upgrades)|%d|%d", m_MemStatsDelta.modelInfo.uiUpgrades_1000_1193, m_MemStatsNow.modelInfo.uiUpgrades_1000_1193 ) );
-        table.AddRow ( SString ( "1194-19999|(World)|%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_1194_19999, m_MemStatsNow.modelInfo.uiUnknown_1194_19999 ) );
-        table.AddRow ( SString ( "20000-24999|(Textures)|%d|%d", m_MemStatsDelta.modelInfo.uiTextures_20000_24999, m_MemStatsNow.modelInfo.uiTextures_20000_24999 ) );
-        table.AddRow ( SString ( "25000-25254|(Collisions)|%d|%d", m_MemStatsDelta.modelInfo.uiCollisions_25000_25254, m_MemStatsNow.modelInfo.uiCollisions_25000_25254 ) );
-        table.AddRow ( SString ( "25255-25510|(Ipls)|%d|%d", m_MemStatsDelta.modelInfo.uiIpls_25255_25510, m_MemStatsNow.modelInfo.uiIpls_25255_25510 ) );
-        table.AddRow ( SString ( "25511-25574|(Paths)|%d|%d", m_MemStatsDelta.modelInfo.uiPaths_25511_25574, m_MemStatsNow.modelInfo.uiPaths_25511_25574 ) );
-        table.AddRow ( SString ( "25575-25754|(Anims)|%d|%d", m_MemStatsDelta.modelInfo.uiAnims_25575_25754, m_MemStatsNow.modelInfo.uiAnims_25575_25754 ) );
-        table.AddRow ( SString ( "|Total:|%d|%d", m_MemStatsDelta.modelInfo.uiTotal, m_MemStatsNow.modelInfo.uiTotal ) );
+        table.SetNumberColors ( "^1", strNumberColorsModels );
+        table.AddRow ( HEADER1( "Models in use" ) "| |" HEADER1( "Change" ) "|" HEADER1( "Count" ) );
+        table.AddRow ( SString ( "0-312|(Players)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiPlayerModels_0_312, m_MemStatsNow.modelInfo.uiPlayerModels_0_312 ) );
+        table.AddRow ( SString ( "313-317| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_313_317, m_MemStatsNow.modelInfo.uiUnknown_313_317 ) );
+        table.AddRow ( SString ( "318-372|(Weapons)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiWeaponModels_318_372, m_MemStatsNow.modelInfo.uiWeaponModels_318_372 ) );
+        table.AddRow ( SString ( "373-399| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_373_399, m_MemStatsNow.modelInfo.uiUnknown_373_399 ) );
+        table.AddRow ( SString ( "400-611|(Vehicles)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiVehicles_400_611, m_MemStatsNow.modelInfo.uiVehicles_400_611 ) );
+        table.AddRow ( SString ( "612-999| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_612_999, m_MemStatsNow.modelInfo.uiUnknown_612_999 ) );
+        table.AddRow ( SString ( "1000-1193|(Upgrades)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUpgrades_1000_1193, m_MemStatsNow.modelInfo.uiUpgrades_1000_1193 ) );
+        table.AddRow ( SString ( "1194-19999|(World)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_1194_19999, m_MemStatsNow.modelInfo.uiUnknown_1194_19999 ) );
+        table.AddRow ( SString ( "20000-24999|(Textures)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiTextures_20000_24999, m_MemStatsNow.modelInfo.uiTextures_20000_24999 ) );
+        table.AddRow ( SString ( "25000-25254|(Collisions)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiCollisions_25000_25254, m_MemStatsNow.modelInfo.uiCollisions_25000_25254 ) );
+        table.AddRow ( SString ( "25255-25510|(Ipls)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiIpls_25255_25510, m_MemStatsNow.modelInfo.uiIpls_25255_25510 ) );
+        table.AddRow ( SString ( "25511-25574|(Paths)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiPaths_25511_25574, m_MemStatsNow.modelInfo.uiPaths_25511_25574 ) );
+        table.AddRow ( SString ( "25575-25754|(Anims)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiAnims_25575_25754, m_MemStatsNow.modelInfo.uiAnims_25575_25754 ) );
+        table.AddRow ( SString ( "|Total:|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiTotal, m_MemStatsNow.modelInfo.uiTotal ) );
     }
 }
