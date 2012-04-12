@@ -119,15 +119,17 @@ public:
                                                           unsigned long ulColor,
                                                           bool bPostGUI ) = 0;
 
-    virtual void                    DrawTextQueued      ( int iLeft, int iTop,
-                                                          int iRight, int iBottom,
+    virtual void                    DrawTextQueued      ( float fLeft, float fTop,
+                                                          float fRight, float fBottom,
                                                           unsigned long dwColor,
                                                           const char* wszText,
                                                           float fScaleX,
                                                           float fScaleY,
                                                           unsigned long ulFormat,
                                                           ID3DXFont * pDXFont,
-                                                          bool bPostGUI ) = 0;
+                                                          bool bPostGUI,
+                                                          bool bColorCoded = false,
+                                                          bool bSubPixelPositioning = false ) = 0;
 
     virtual void                    EnableSetRenderTarget       ( bool bEnable ) = 0;
     // Subsystems
