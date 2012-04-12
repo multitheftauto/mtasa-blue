@@ -468,6 +468,27 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
     return 0.0f;
 }
 
+
+float CGraphics::GetDXTextExtentW ( const wchar_t* wszText, float fScale, LPD3DXFONT pDXFont )
+{
+    if ( !pDXFont )
+        pDXFont = GetFont ();
+
+    pDXFont = MaybeGetBigFont ( pDXFont, fScale, fScale );
+
+    if ( pDXFont )
+    {
+        HDC dc = pDXFont->GetDC ();
+        SIZE size;
+
+        GetTextExtentPoint32W ( dc, wszText, wcslen ( wszText ), &size );
+
+        return ( ( float ) size.cx * fScale );
+    }
+    return 0.0f;
+}
+
+
 ID3DXFont * CGraphics::GetFont ( eFontType fontType )
 {
     if ( fontType < 0 || fontType >= NUM_FONTS )
@@ -634,15 +655,17 @@ void CGraphics::DrawTextureQueued ( float fX, float fY,
 }
 
 
-void CGraphics::DrawTextQueued ( int iLeft, int iTop,
-                                 int iRight, int iBottom,
+void CGraphics::DrawTextQueued ( float fLeft, float fTop,
+                                 float fRight, float fBottom,
                                  unsigned long dwColor,
                                  const char* szText,
                                  float fScaleX,
                                  float fScaleY,
                                  unsigned long ulFormat,
                                  ID3DXFont * pDXFont,
-                                 bool bPostGUI )
+                                 bool bPostGUI,
+                                 bool bColorCoded,
+                                 bool bSubPixelPositioning )
 {
     if ( !szText || !m_pDXSprite )
         return;
@@ -652,24 +675,41 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
     // We're using a big font to keep it looking nice, so get the actual scale
     pDXFont = MaybeGetBigFont ( pDXFont, fScaleX, fScaleY );
 
-    if ( pDXFont )
+    if ( !pDXFont )
+        return;
+
+    if ( !bColorCoded )
     {
+        //
+        // Simple case without color coding
+        //
+
         if ( fScaleX != 1.0f || fScaleY != 1.0f )
         {
-	        iLeft = unsigned int ( ( float ) iLeft * ( 1.0f / fScaleX ) );
-	        iTop = unsigned int ( ( float ) iTop * ( 1.0f / fScaleY ) );
-	        iRight = unsigned int ( ( float ) iRight * ( 1.0f / fScaleX ) );
-	        iBottom = unsigned int ( ( float ) iBottom * ( 1.0f / fScaleY ) );
+            const float fRcpScaleX = 1 / fScaleX;
+            const float fRcpScaleY = 1 / fScaleY;
+            fLeft *= fRcpScaleX;
+            fTop *= fRcpScaleY;
+            fRight *= fRcpScaleX;
+            fBottom *= fRcpScaleY;
+        }
+
+        if ( !bSubPixelPositioning )
+        {
+            fLeft = floor ( fLeft );
+            fTop = floor ( fTop );
+            fRight = floor ( fRight );
+            fBottom = floor ( fBottom );
         }
 
         sDrawQueueItem Item;
         Item.eType = QUEUE_TEXT;
         Item.blendMode = m_ActiveBlendMode;
 
-        Item.Text.iLeft = iLeft;
-        Item.Text.iTop = iTop;
-        Item.Text.iRight = iRight;
-        Item.Text.iBottom = iBottom;
+        Item.Text.fLeft = fLeft;
+        Item.Text.fTop = fTop;
+        Item.Text.fRight = fRight;
+        Item.Text.fBottom = fBottom;
         Item.Text.ulColor = dwColor;
         Item.Text.fScaleX = fScaleX;
         Item.Text.fScaleY = fScaleY;
@@ -677,15 +717,155 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
         Item.Text.pDXFont = pDXFont;
 
         // Convert to wstring        
-        Item.strText = MbUTF8ToUTF16(szText);
+        Item.wstrText = MbUTF8ToUTF16 ( szText );
 
         // Keep font valid while in the queue incase it's a custom font
         AddQueueRef ( Item.Text.pDXFont );
 
         // Add it to the queue
         AddQueueItem ( Item, bPostGUI );
+        return;
+    }
+    else
+    {
+        //
+        // Complex case with color coding
+        //
+
+        // Do everything as a wide string from this point
+        std::wstring wstrText = MbUTF8ToUTF16 ( szText );   
+
+        // Break into lines
+        CSplitStringW splitLines ( wstrText, L"\n" );
+        int iNumLines = splitLines.size ();
+
+        float fLineHeight = GetDXFontHeight ( fScaleY, pDXFont );
+        float fTotalHeight = iNumLines * fLineHeight;
+
+        // Y position of text
+        float fY;
+        if ( ulFormat & DT_BOTTOM )
+            fY = fBottom - fTotalHeight;
+        else
+        if ( ulFormat & DT_VCENTER )
+            fY = ( fBottom + fTop - fTotalHeight ) * 0.5f;
+        else
+            fY = fTop;  // DT_TOP
+
+        // Process each line
+        SColor currentColor = dwColor;
+        for ( uint i = 0 ; i < splitLines.size () ; i++ )
+        {
+            DrawColorCodedTextLine ( fLeft, fRight, fY, currentColor, splitLines[i], fScaleX, fScaleY, ulFormat, pDXFont, bPostGUI, bSubPixelPositioning );
+            fY += fLineHeight;
+        }
     }
 }
+
+
+void CGraphics::DrawColorCodedTextLine ( float fLeft, float fRight, float fY, SColor& currentColor, const wchar_t* wszText,
+                                         float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning )
+{
+    struct STextSection
+    {
+        std::wstring wstrText;
+        float fWidth;
+        SColor color;
+    };
+
+    std::list < STextSection > sectionList;
+
+    // Break line into color sections
+    float fTotalWidth = 0;
+    const wchar_t* wszSectionPos = wszText;
+    do
+    {
+        unsigned int uiSeekPos = 0;
+        const wchar_t* wszSectionStart = wszSectionPos;
+        SColor nextColor = currentColor;
+        while ( *wszSectionPos != '\0' )      // find end of this section
+        {
+            if ( CChatLine::IsColorCodeW ( wszSectionPos ) )
+            {
+                unsigned long ulColor = 0;
+                swscanf ( wszSectionPos + 1, L"%06x", &ulColor );
+                nextColor = ulColor;
+                wszSectionPos += 7;
+                break;
+            }
+            wszSectionPos++;
+            uiSeekPos++;
+        }
+
+        // Add a new section
+        sectionList.push_back ( STextSection () );
+        STextSection& section = sectionList.back ();
+        section.wstrText = std::wstring ( wszSectionStart, uiSeekPos );
+        section.fWidth = GetDXTextExtentW ( section.wstrText.c_str (), fScaleX, pDXFont );
+        section.color = currentColor;
+
+        fTotalWidth += section.fWidth;
+        nextColor.A = currentColor.A;
+        currentColor = nextColor;
+    }
+    while ( *wszSectionPos != '\0' );
+
+    // X position of text
+    float fX;
+    if ( ulFormat & DT_RIGHT )
+        fX = fRight - fTotalWidth;
+    else
+    if ( ulFormat & DT_CENTER )
+        fX = ( fRight + fLeft - fTotalWidth ) * 0.5f;
+    else
+        fX = fLeft;  // DT_LEFT
+
+    // Draw all the color sections
+    for ( std::list < STextSection >::const_iterator iter = sectionList.begin () ; iter != sectionList.end () ; ++iter )
+    {
+        const STextSection& section = *iter;
+
+        float fLeft = fX;
+        float fTop = fY;
+
+        if ( fScaleX != 1.0f || fScaleY != 1.0f )
+        {
+            fLeft /= fScaleX;
+            fTop /= fScaleY;
+        }
+
+        if ( !bSubPixelPositioning )
+        {
+            fLeft = floor ( fLeft );
+            fTop = floor ( fTop );
+        }
+
+        sDrawQueueItem Item;
+        Item.eType = QUEUE_TEXT;
+        Item.blendMode = m_ActiveBlendMode;
+
+        Item.Text.fLeft = fLeft;
+        Item.Text.fTop = fTop;
+        Item.Text.fRight = fLeft;
+        Item.Text.fBottom = fTop;
+        Item.Text.ulColor = section.color;
+        Item.Text.fScaleX = fScaleX;
+        Item.Text.fScaleY = fScaleY;
+        Item.Text.ulFormat = DT_NOCLIP;
+        Item.Text.pDXFont = pDXFont;
+
+        Item.wstrText = section.wstrText;
+
+        // Keep font valid while in the queue incase it's a custom font
+        AddQueueRef ( Item.Text.pDXFont );
+
+        // Add it to the queue
+        AddQueueItem ( Item, bPostGUI );
+
+        fX += section.fWidth;
+    }
+}
+
 
 bool CGraphics::LoadStandardDXFonts ( void )
 {
@@ -990,14 +1170,17 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
         case QUEUE_TEXT:
         {
             RECT rect;        
-            SetRect ( &rect, Item.Text.iLeft, Item.Text.iTop, Item.Text.iRight, Item.Text.iBottom );  
+            SetRect ( &rect, Item.Text.fLeft, Item.Text.fTop, Item.Text.fRight, Item.Text.fBottom );  
+            const float fPosFracX = Item.Text.fLeft - rect.left;
+            const float fPosFracY = Item.Text.fTop - rect.top;
             D3DXMATRIX matrix;
             D3DXVECTOR2 scalingCentre ( 0.5f, 0.5f );
             D3DXVECTOR2 scaling ( Item.Text.fScaleX, Item.Text.fScaleY );
-            D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, NULL );
+            D3DXVECTOR2 translation ( fPosFracX * Item.Text.fScaleX, fPosFracY * Item.Text.fScaleY );   // Sub-pixel positioning
+            D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, &translation );
             CheckModes ( EDrawMode::DX_SPRITE, Item.blendMode );
             m_pDXSprite->SetTransform ( &matrix );        
-            Item.Text.pDXFont->DrawTextW ( m_pDXSprite, Item.strText.c_str (), -1, &rect, Item.Text.ulFormat, /*ModifyColorForBlendMode (*/ Item.Text.ulColor/*, Item.blendMode )*/ );
+            Item.Text.pDXFont->DrawTextW ( m_pDXSprite, Item.wstrText.c_str (), -1, &rect, Item.Text.ulFormat, /*ModifyColorForBlendMode (*/ Item.Text.ulColor/*, Item.blendMode )*/ );
             RemoveQueueRef ( Item.Text.pDXFont );
             break;
         }

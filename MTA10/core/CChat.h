@@ -102,6 +102,7 @@ public:
                                 CChatLine               ( void );
 
     static bool                 IsColorCode             ( const char* szColorCode );
+    static bool                 IsColorCodeW            ( const wchar_t* wszColorCode );
 
     virtual const char*         Format                  ( const char* szText, float fWidth, CColor& color, bool bColorCoded );
     virtual void                Draw                    ( const CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds );    

@@ -165,17 +165,17 @@ int CLuaFunctionDefs::dxDrawMaterialSectionLine3D ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
 {
-//  bool dxDrawText ( string text, int left, int top [, int right=left, int bottom=top, int color=white, float scale=1, mixed font="default", 
-//      string alignX="left", string alignY="top", bool clip=false, bool wordBreak=false, bool postGUI] )
-    SString strText; int iLeft; int iTop; int iRight; int iBottom; ulong ulColor; float fScaleX; float fScaleY; SString strFontName; CClientDxFont* pDxFontElement;
-    eDXHorizontalAlign alignX; eDXVerticalAlign alignY; bool bClip; bool bWordBreak; bool bPostGUI;
+//  bool dxDrawText ( string text, float left, float top [, float right=left, float bottom=top, int color=white, float scale=1, mixed font="default", 
+//      string alignX="left", string alignY="top", bool clip=false, bool wordBreak=false, bool postGUI=false, bool colorCoded=false, bool subPixelPositioning=false] )
+    SString strText; float fLeft; float fTop; float fRight; float fBottom; ulong ulColor; float fScaleX; float fScaleY; SString strFontName; CClientDxFont* pDxFontElement;
+    eDXHorizontalAlign alignX; eDXVerticalAlign alignY; bool bClip; bool bWordBreak; bool bPostGUI; bool bColorCoded; bool bSubPixelPositioning;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strText );
-    argStream.ReadNumber ( iLeft );
-    argStream.ReadNumber ( iTop );
-    argStream.ReadNumber ( iRight, iLeft );
-    argStream.ReadNumber ( iBottom, iTop );
+    argStream.ReadNumber ( fLeft );
+    argStream.ReadNumber ( fTop );
+    argStream.ReadNumber ( fRight, fLeft );
+    argStream.ReadNumber ( fBottom, fTop );
     argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
     argStream.ReadNumber ( fScaleX, 1 );
     if ( argStream.NextIsNumber () )
@@ -188,6 +188,8 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
     argStream.ReadBool ( bClip, false );
     argStream.ReadBool ( bWordBreak, false );
     argStream.ReadBool ( bPostGUI, false );
+    argStream.ReadBool ( bColorCoded, false );
+    argStream.ReadBool ( bSubPixelPositioning, false );
 
     if ( !argStream.HasErrors () )
     {
@@ -200,7 +202,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
         if ( bWordBreak )           ulFormat |= DT_WORDBREAK;
         if ( !bClip )               ulFormat |= DT_NOCLIP;
 
-        CStaticFunctionDefinitions::DrawText ( iLeft, iTop, iRight, iBottom, ulColor, strText, fScaleX, fScaleY, ulFormat, pD3DXFont, bPostGUI );
+        CStaticFunctionDefinitions::DrawText ( fLeft, fTop, fRight, fBottom, ulColor, strText, fScaleX, fScaleY, ulFormat, pD3DXFont, bPostGUI, bColorCoded, bSubPixelPositioning );
 
         lua_pushboolean ( luaVM, true );
         return 1;

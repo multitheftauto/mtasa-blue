@@ -136,3 +136,57 @@ struct SCharStringRef
     char* pData;
     uint uiSize;
 };
+
+
+//
+// Faster type of SString::Split
+// Uses pointers to a big buffer rather than an array of strings
+//
+template < class STRING_TYPE, class CHAR_TYPE >
+class TSplitString : public std::vector < const CHAR_TYPE* >
+{
+public:
+    TSplitString ( void ) {}
+    TSplitString ( const STRING_TYPE& strInput, const STRING_TYPE& strDelim, unsigned int uiMaxAmount = 0, unsigned int uiMinAmount = 0 )
+    {
+        Split ( strInput, strDelim, uiMaxAmount, uiMinAmount );
+    }
+
+    void Split ( const STRING_TYPE& strInput, const STRING_TYPE& strDelim, unsigned int uiMaxAmount = 0, unsigned int uiMinAmount = 0 )
+    {
+        // Copy string to buffer
+        uint iInputLength = strInput.length ();
+        buffer.resize ( iInputLength + 1 );
+        memcpy ( &buffer[0], &strInput[0], ( iInputLength + 1 ) * sizeof ( CHAR_TYPE ) );
+
+        // Prime result list
+        clear ();
+        reserve ( Min ( 16U, uiMaxAmount ) );
+
+        // Split into pointers
+        unsigned long ulCurrentPoint = 0;
+        while ( true )
+        {
+            unsigned long ulPos = strInput.find ( strDelim, ulCurrentPoint );
+            if ( ulPos == STRING_TYPE::npos || ( uiMaxAmount > 0 && uiMaxAmount <= size () + 1 ) )
+            {
+                if ( ulCurrentPoint <= strInput.length () )
+                    push_back ( &buffer[ ulCurrentPoint ] );
+                break;
+            }
+            push_back ( &buffer[ ulCurrentPoint ] );
+            buffer[ ulPos ] = 0;
+            ulCurrentPoint = ulPos + strDelim.length ();
+        }
+        while ( size () < uiMinAmount )
+            push_back ( &buffer[ iInputLength ] );        
+    }
+
+protected:
+    std::vector < CHAR_TYPE > buffer;
+};
+
+
+typedef TSplitString < std::string, char >      CSplitString;
+typedef TSplitString < std::wstring, wchar_t >  CSplitStringW;
+

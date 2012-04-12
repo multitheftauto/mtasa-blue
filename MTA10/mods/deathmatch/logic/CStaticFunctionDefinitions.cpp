@@ -4111,17 +4111,19 @@ bool CStaticFunctionDefinitions::GetCursorPosition ( CVector2D& vecCursor, CVect
 }
 
 
-void CStaticFunctionDefinitions::DrawText ( int iLeft, int iTop,
-                                 int iRight, int iBottom,
+void CStaticFunctionDefinitions::DrawText ( float fLeft, float fTop,
+                                 float fRight, float fBottom,
                                  unsigned long dwColor,
                                  const char* szText,
                                  float fScaleX,
                                  float fScaleY,
                                  unsigned long ulFormat,
                                  ID3DXFont* pDXFont,
-                                 bool bPostGUI )
+                                 bool bPostGUI,
+                                 bool bColorCoded,
+                                 bool bSubPixelPositioning )
 {
-    g_pCore->GetGraphics ()->DrawTextQueued ( iLeft, iTop, iRight, iBottom, dwColor, szText, fScaleX, fScaleY, ulFormat, pDXFont, bPostGUI );
+    g_pCore->GetGraphics ()->DrawTextQueued ( fLeft, fTop, fRight, fBottom, dwColor, szText, fScaleX, fScaleY, ulFormat, pDXFont, bPostGUI, bColorCoded, bSubPixelPositioning );
 }
 
 
