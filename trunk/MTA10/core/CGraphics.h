@@ -87,6 +87,7 @@ public:
     float               GetDXFontHeight         ( float fScale = 1.0f, ID3DXFont * pDXFont = NULL );
     float               GetDXCharacterWidth     ( char c, float fScale = 1.0f, ID3DXFont * pDXFont = NULL );
     float               GetDXTextExtent         ( const char * szText, float fScale = 1.0f, ID3DXFont * pDXFont = NULL );
+    float               GetDXTextExtentW        ( const wchar_t* wszText, float fScale = 1.0f, LPD3DXFONT pDXFont = NULL );
 
     // Textures
     void                DrawTexture             ( CTextureItem* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, float fRotation = 0.0f, float fCenterX = 0.0f, float fCenterY = 0.0f, DWORD dwColor = 0xFFFFFFFF );
@@ -136,15 +137,18 @@ public:
                                                   unsigned long ulColor,
                                                   bool bPostGUI );
 
-    void                DrawTextQueued          ( int iLeft, int iTop,
-                                                  int iRight, int iBottom,
+    void                DrawTextQueued          ( float iLeft, float iTop,
+                                                  float iRight, float iBottom,
                                                   unsigned long dwColor,
                                                   const char* wszText,
                                                   float fScaleX,
                                                   float fScaleY,
                                                   unsigned long ulFormat,
                                                   ID3DXFont * pDXFont = NULL,
-                                                  bool bPostGUI = false );
+                                                  bool bPostGUI = false,
+                                                  bool bColorCoded = false,
+                                                  bool bSubPixelPositioning = false );
+
 
     bool                CanSetRenderTarget      ( void )                { return m_bSetRenderTargetEnabled; }
     void                EnableSetRenderTarget   ( bool bEnable );
@@ -168,6 +172,8 @@ private:
     void                OnZBufferModified       ( void );
     ID3DXFont*          MaybeGetBigFont         ( ID3DXFont* pDXFont, float& fScaleX, float& fScaleY );
     void                CheckModes              ( EDrawModeType newDrawMode, EBlendModeType newBlendMode = EBlendMode::NONE );
+    void                DrawColorCodedTextLine  ( float fLeft, float fRight, float fY, SColor& currentColor, const wchar_t* wszText,
+                                                  float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning );
 
     CLocalGUI*          m_pGUI;
 
@@ -222,10 +228,10 @@ private:
 
     struct sDrawQueueText
     {
-        int             iLeft;
-        int             iTop;
-        int             iRight;
-        int             iBottom;
+        float           fLeft;
+        float           fTop;
+        float           fRight;
+        float           fBottom;
         unsigned long   ulColor;
         float           fScaleX;
         float           fScaleY;
@@ -264,7 +270,7 @@ private:
     {
         eDrawQueueType      eType;
         EBlendModeType      blendMode;
-        std::wstring        strText;
+        std::wstring        wstrText;
 
         // Queue item data based on the eType.
         union
