@@ -293,6 +293,7 @@ bool ProcessVehicleSirenPosition ( )
             // Disable our original siren based vehicles from this hook
             if ( DoesVehicleHaveSiren ( ) && pVehicle->DoesVehicleHaveSirens ( ) == false )
             {
+                ucSirenCount = 0;
                 // Set our time based alpha to 10% of the current time float
                 fTime = *((float*)0xB7C4E4) * 0.1f;
                 // Get our minimum alpha
