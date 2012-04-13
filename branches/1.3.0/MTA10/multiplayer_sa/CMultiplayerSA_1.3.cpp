@@ -293,6 +293,23 @@ bool ProcessVehicleSirenPosition ( )
             // Disable our original siren based vehicles from this hook
             if ( DoesVehicleHaveSiren ( ) && pVehicle->DoesVehicleHaveSirens ( ) == false )
             {
+                // Set our time based alpha to 10% of the current time float
+                fTime = *((float*)0xB7C4E4) * 0.1f;
+                // Get our minimum alpha
+                DWORD dwMinimumAlpha = pVehicle->GetVehicleSirenMinimumAlpha ( ucSirenCount );
+                // Times the min alpha (255) by a multiplier to get it 0.0f-1.0f this multiplier was gained by doing 1.0 / 255.
+                float fMinimumAlpha =  dwMinimumAlpha * 0.003921568627451f;
+                // if our time is less than or equal to the minimum alpha
+                if ( fTime <= dwMinimumAlpha )
+                {
+                    // Set it to the minimum
+                    fTime = fMinimumAlpha;
+                }
+                // Set our red based on 255 and our blue based on 255 and green based on 0.. default SA values of course.
+                if ( dwRed > 0 )
+                    dwRed = (DWORD)( 255 * fTime );
+                if ( dwBlue > 0 )
+                    dwBlue = (DWORD)( 255 * fTime );
                 bPointLights = false;
                 // return false so our hook knows we decided not to edit anything
                 return false;
@@ -525,6 +542,9 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed ( 
         mov pVehicleWithTheSiren, esi
         // move our position vector pointer into our position variable
         mov vecRelativeSirenPosition, eax
+        mov eax, [esp+8Ch]
+        mov dwBlue, eax
+        mov dwRed, 0h
     }
     bPointLights = false;
 
@@ -556,8 +576,9 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed ( 
             popad
             // Push our position
             push eax
-            // move our red component into eax (you'l notice eax is used above so we are just giving it a value first)
-            mov eax, DWORD PTR SS:[esp+8Ch]
+            // Edit our components to get Alpha fixing working.
+            mov ecx, dwBlue // Blue
+            mov eax, dwRed // Red
             push 0FFh
             // Push our R,G,B components (inverse order)
             push ecx
@@ -580,6 +601,8 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue (
         mov pVehicleWithTheSiren, esi
         // move our position vector pointer into our position variable
         mov vecRelativeSirenPosition, eax
+        mov dwRed, ebp
+        mov dwBlue, 0h
     }
     bPointLights = false;
 
@@ -612,6 +635,9 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue (
             // Push our position
             push eax
             push 0FFh
+            // Edit our components to get Alpha fixing working.
+            mov ecx, dwBlue // Blue
+            mov ebp, dwRed // Red
             // Push our R,G,B components (inverse order)
             push ecx
             push edx
