@@ -797,14 +797,35 @@ void CGraphics::DrawColorCodedTextLine ( float fLeft, float fRight, float fY, SC
             uiSeekPos++;
         }
 
-        // Add a new section
-        sectionList.push_back ( STextSection () );
-        STextSection& section = sectionList.back ();
-        section.wstrText = std::wstring ( wszSectionStart, uiSeekPos );
-        section.fWidth = GetDXTextExtentW ( section.wstrText.c_str (), fScaleX, pDXFont );
-        section.color = currentColor;
+        if ( uiSeekPos > 0 )
+        {
+            // Add section
+            if ( !sectionList.empty () && sectionList.back ().color == currentColor )
+            {
+                // Append to last section if color has not changed
+                std::wstring strExtraText = std::wstring ( wszSectionStart, uiSeekPos );
+                float fExtraWidth = GetDXTextExtentW ( strExtraText.c_str (), fScaleX, pDXFont );
 
-        fTotalWidth += section.fWidth;
+                STextSection& section = sectionList.back ();
+                section.wstrText += strExtraText;
+                section.fWidth += fExtraWidth;
+                dassert ( section.color == currentColor );
+
+                fTotalWidth += fExtraWidth;
+            }
+            else
+            {
+                // Add a new section
+                sectionList.push_back ( STextSection () );
+                STextSection& section = sectionList.back ();
+                section.wstrText = std::wstring ( wszSectionStart, uiSeekPos );
+                section.fWidth = GetDXTextExtentW ( section.wstrText.c_str (), fScaleX, pDXFont );
+                section.color = currentColor;
+
+                fTotalWidth += section.fWidth;
+            }
+        }
+
         nextColor.A = currentColor.A;
         currentColor = nextColor;
     }

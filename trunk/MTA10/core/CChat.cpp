@@ -925,7 +925,7 @@ bool CChatLine::IsColorCodeW ( const wchar_t* wszColorCode )
     for ( uint i = 0 ; i < 6 ; i++ )
     {
         wchar_t c = wszColorCode [ i + 1 ];
-        if ( !iswdigit ( (unsigned wchar_t)c ) && (c < 'A' || c > 'F') && (c < 'a' || c > 'f') )
+        if ( !iswdigit ( c ) && (c < 'A' || c > 'F') && (c < 'a' || c > 'f') )
         {
             return false;
         }

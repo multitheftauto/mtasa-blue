@@ -2916,9 +2916,9 @@ int CVersionUpdater::DoPollDownload ( void )
     }
 
     // Got something
-    char* pData = buffer.GetData ();
-    if ( pData )
+    if ( buffer.GetSize () > 0 )
     {
+        char* pData = buffer.GetData ();
         unsigned int uiSize = buffer.GetSize ();
         m_JobInfo.downloadBuffer.resize ( buffer.GetSize () );
         memcpy ( &m_JobInfo.downloadBuffer[0], pData, uiSize );
