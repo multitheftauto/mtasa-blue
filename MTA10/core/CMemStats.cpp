@@ -670,7 +670,7 @@ void CMemStats::CreateTables ( void )
         table.AddRow ( SString ( "FreeForMTA|^1~.%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.dxStatus.videoMemoryKB.iFreeForMTA ), *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoMemoryKB.iFreeForMTA ) ) );
         table.AddRow ( SString ( "Fonts|^1~.%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByFonts ), *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByFonts ) ) );
         table.AddRow ( SString ( "Textures|^1~.%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByTextures ), *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByTextures ) ) );
-        table.AddRow ( SString ( "RenderTargets|^1~.%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByTextures ), *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByTextures ) ) );
+        table.AddRow ( SString ( "RenderTargets|^1~.%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByRenderTargets ), *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByRenderTargets ) ) );
     }
 
     {
