@@ -121,6 +121,12 @@ void CResourceChecker::CheckResourceForIssues( CResource* pResource, const strin
             remove( strTempZip.c_str () );
         }
     }
+
+    // Check LC_COLLATE is correct
+    if ( strcoll( "a", "B" ) < 0 )
+    {
+        CLogger::LogPrintf ( "ERROR: LC_COLLATE is not set correctly\n" );
+    }
 }
 
 

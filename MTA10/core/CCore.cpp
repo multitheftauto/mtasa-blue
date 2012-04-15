@@ -100,6 +100,8 @@ CCore::CCore ( void )
     // Set our locale to the C locale, except for character handling which is the system's default
     std::setlocale(LC_ALL,"C");
     std::setlocale(LC_CTYPE,"");
+    // check LC_COLLATE is the old-time raw ASCII sort order
+    assert ( strcoll( "a", "B" ) > 0 );
 
     // Parse the command line
     const char* pszNoValOptions[] =
