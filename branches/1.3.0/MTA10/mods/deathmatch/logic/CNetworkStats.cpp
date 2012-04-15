@@ -150,7 +150,7 @@ void CNetworkStats::Draw ( void )
             iNumLines++;
 
     float fBackWidth = 310;
-    float fBackHeight = iNumLines * 15;
+    float fBackHeight = (float)( iNumLines * 15 );
     float fX = fResWidth - fBackWidth;
     float fY = 0.40f * fResHeight - iNumLines * 4;
 

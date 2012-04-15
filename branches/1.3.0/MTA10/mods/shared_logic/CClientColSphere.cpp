@@ -30,7 +30,7 @@ namespace
     //
     void CreateSphereFaces ( std::vector < SFace >& faceList, int iIterations )
     {
-        int numFaces = pow ( 4.0, iIterations ) * 8;
+        int numFaces = (int)( pow ( 4.0, iIterations ) * 8 );
         faceList.empty ();
         faceList.reserve ( numFaces );
 

@@ -34,7 +34,7 @@ CDirect3DHook9::~CDirect3DHook9 ( )
 SString DumpBytes ( uchar* ptr, int iSize )
 {
     SString strResult;
-    for ( uint i = 0 ; i < iSize ; i++ )
+    for ( int i = 0 ; i < iSize ; i++ )
     {
         if ( i )
             strResult += " ";
