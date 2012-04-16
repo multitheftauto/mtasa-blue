@@ -98,6 +98,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_iDebugFlag = 0;
     m_NetOptions.netTweak.fTweak1Amount = 1.0f;
     m_iNetReliabilityMode = 0;
+    m_iLightSyncRate = 1500;
 }
 
 
@@ -397,28 +398,14 @@ bool CMainConfig::Load ( void )
     }
 
     // Grab the Sample Rate for Voice
+    iTemp = m_uiVoiceSampleRate;
     iResult = GetInteger ( m_pRootNode, "voice_samplerate", iTemp, 0, 2 );
-    if ( iResult == IS_SUCCESS )
-    {
-        m_uiVoiceSampleRate = iTemp;
-    }
-    else
-    {
-        if ( iResult != DOESNT_EXIST )
-            CLogger::ErrorPrintf ( "voice_samplerate rate must be between 0 and 2, defaulting to %u\n", m_uiVoiceSampleRate );
-    }
+    m_uiVoiceSampleRate = Clamp ( 0, iTemp, 2 );
 
     // Grab the Quality for Voice
+    iTemp = m_ucVoiceQuality;
     iResult = GetInteger ( m_pRootNode, "voice_quality", iTemp, 0, 10 );
-    if ( iResult == IS_SUCCESS )
-    {
-        m_ucVoiceQuality = iTemp;
-    }
-    else
-    {
-        if ( iResult != DOESNT_EXIST )
-            CLogger::ErrorPrintf ( "voice_quality must be between 0 and 10, defaulting to %u\n", m_ucVoiceQuality );
-    }
+    m_ucVoiceQuality = Clamp ( 0, iTemp, 10 );
 
     // Grab the bitrate for Voice [optional]
     iResult = GetInteger ( m_pRootNode, "voice_bitrate", iTemp );
@@ -539,15 +526,7 @@ bool CMainConfig::Load ( void )
 
     // lightsync_rate
     iResult = GetInteger ( m_pRootNode, "lightsync_rate", m_iLightSyncRate );
-    if ( iResult == IS_SUCCESS )
-    {
-        m_iLightSyncRate = Clamp ( 200, m_iLightSyncRate, 4000 );
-    }
-    else
-    {
-        CLogger::ErrorPrintf ( "lightsync_rate is not valid. Defaulting to 1.5s\n" );
-        m_iLightSyncRate = 1500;
-    }
+    m_iLightSyncRate = Clamp ( 200, m_iLightSyncRate, 4000 );
 
     ApplyNetOptions ();
 

@@ -549,12 +549,17 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         }
     if ( m_pMainConfig->GetVoiceBitrate() )
         strVoice += SString(";  Bitrate: [%ibps]",  m_pMainConfig->GetVoiceBitrate() );
-            
+
+    // Make bandwidth reduction string 
+    SString strBandwidthSaving = m_pMainConfig->GetSetting ( "bandwidth_reduction" );
+    strBandwidthSaving = strBandwidthSaving.Left ( 1 ).ToUpper () + strBandwidthSaving.SubStr ( 1 );
+    if ( g_pBandwidthSettings->bLightSyncEnabled )
+        strBandwidthSaving += SString ( " with lightweight sync rate of %dms", m_pMainConfig->GetLightSyncRate () );
 
     // Show the server header
-    CLogger::LogPrintfNoStamp ( "===========================================================\n" \
+    CLogger::LogPrintfNoStamp ( "==================================================================\n" \
                                 "= Multi Theft Auto: San Andreas v%s\n" \
-                                "===========================================================\n" \
+                                "==================================================================\n" \
                                 "= Server name      : %s\n" \
                                 "= Server IP address: %s\n" \
                                 "= Server port      : %u\n" \
@@ -563,7 +568,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
                                 "= Maximum players  : %u\n" \
                                 "= HTTP port        : %u\n" \
                                 "= Voice Chat       : %s\n" \
-                                "===========================================================\n",
+                                "= Bandwidth saving : %s\n" \
+                                "==================================================================\n",
 
                                 MTA_DM_BUILDTAG_SHORT,
                                 m_pMainConfig->GetServerName ().c_str (),
@@ -572,7 +578,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
                                 pszLogFileName,
                                 uiMaxPlayers,
                                 m_pMainConfig->IsHTTPEnabled () ? m_pMainConfig->GetHTTPPort () : 0,
-                                strVoice.c_str() );
+                                strVoice.c_str(),
+                                *strBandwidthSaving );
 
     if ( !bLogFile )
         CLogger::ErrorPrintf ( "Unable to save logfile to '%s'\n", m_pMainConfig->GetLogFile ().c_str () );
