@@ -67,6 +67,9 @@ namespace
                                          { "onClientPedHitByWaterCannon",   "1.3.0-9.03931" },
                                          { "dxDrawMaterialLine3D",          "1.3.0-9.03931" },
                                          { "dxDrawMaterialSectionLine3D",   "1.3.0-9.03931" },
+                                         { "getVehicleSirenParams",     "1.3.0-9.03968" },
+                                         { "getVehicleSirens",          "1.3.0-9.03968" },
+                                         { "setVehicleSirens",          "1.3.0-9.03968" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
@@ -106,6 +109,11 @@ namespace
                                          { "cancelLatentEvent",         "1.3.0-9.03772" },
                                          { "getAllAccountData",         "1.3.0-9.03804" },
                                          { "reloadBans",                "1.3.0-9.03931" },
+                                         { "getVehicleSirenParams",     "1.3.0-9.03968" },
+                                         { "removeVehicleSirens",       "1.3.0-9.03968" },
+                                         { "getVehicleSirens",          "1.3.0-9.03968" },
+                                         { "addVehicleSirens",          "1.3.0-9.03968" },
+                                         { "setVehicleSirens",          "1.3.0-9.03968" },
                                         };
 
 
