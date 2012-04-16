@@ -132,7 +132,6 @@ void CMultiplayerSA::InitMemoryCopies_13 ( void )
     MemPut < BYTE > ( 0x040892B, 0x90 );
 
     MemPut < BYTE > ( 0x04341C0, 0xC3 );    // Skip CCarCtrl::GenerateRandomCars
-    MemPut < BYTE > ( 0x0616650, 0xC3 );    // Skip CPopulation::Update
 }
 
 // Siren Stuff

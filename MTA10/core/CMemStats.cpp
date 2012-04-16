@@ -218,40 +218,6 @@ namespace
         uint                            m_uiNumRows;
         std::vector < SColumn >         m_ColumnList;
     };
-
-
-    //
-    // Memory state used in CMemStats
-    //
-    struct SMemStatsInfo
-    {
-        CProxyDirect3DDevice9::SMemoryState d3dMemory;
-        SDxStatus dxStatus;
-        int iProcessMemSizeKB;
-        int iStreamingMemoryUsed;
-        int iStreamingMemoryAvailable;
-
-        union {
-            uint uiArray[];
-            struct
-            {
-                uint uiPlayerModels_0_312;
-                uint uiUnknown_313_317;
-                uint uiWeaponModels_318_372;
-                uint uiUnknown_373_399;
-                uint uiVehicles_400_611;
-                uint uiUnknown_612_999;
-                uint uiUpgrades_1000_1193;
-                uint uiUnknown_1194_19999;
-                uint uiTextures_20000_24999;
-                uint uiCollisions_25000_25254;
-                uint uiIpls_25255_25510;
-                uint uiPaths_25511_25574;
-                uint uiAnims_25575_25754;
-                uint uiTotal;
-            };
-        } modelInfo;
-    };
 }
 
 
@@ -271,10 +237,11 @@ public:
     virtual void        Draw                    ( void );
     virtual void        SetEnabled              ( bool bEnabled );
     virtual bool        IsEnabled               ( void );
+    virtual void        SampleState             ( SMemStatsInfo& memStatsInfo );
 
 protected:
     void                UpdateFrameStats        ( void );
-    void                SampleValues            ( void );
+    void                UpdateIntervalStats     ( void );
     void                CreateTables            ( void );
 
     CElapsedTime            m_UpdateTimer;
@@ -331,8 +298,8 @@ void CMemStats::SetEnabled ( bool bEnabled )
         // Clear accumulated changes for first display
         if ( m_bEnabled )
         {
-            SampleValues ();
-            SampleValues ();
+            UpdateIntervalStats ();
+            UpdateIntervalStats ();
             CreateTables ();
         }
     }
@@ -370,7 +337,7 @@ void CMemStats::Draw ( void )
     if ( m_UpdateTimer.Get () > 2000 )
     {
         m_UpdateTimer.Reset ();
-        SampleValues ();
+        UpdateIntervalStats ();
         CreateTables ();
     }
 
@@ -428,29 +395,28 @@ void CMemStats::UpdateFrameStats ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CMemStats::SampleValues
+// CMemStats::SampleState
 //
-// Sample values
+// Sample current memory state
 //
 ///////////////////////////////////////////////////////////////
-void CMemStats::SampleValues ( void )
+void CMemStats::SampleState ( SMemStatsInfo& memStatsInfo )
 {
-    memset ( &m_MemStatsNow, 0, sizeof ( m_MemStatsNow ) );
-    memset ( &m_MemStatsDelta, 0, sizeof ( m_MemStatsDelta ) );
+    memset ( &memStatsInfo, 0, sizeof ( memStatsInfo ) );
 
     //
     // Update 'now' state
     //
-    m_MemStatsNow.d3dMemory = g_pDeviceState->MemoryState;
+    memStatsInfo.d3dMemory = g_pDeviceState->MemoryState;
 
-    g_pGraphics->GetRenderItemManager ()->GetDxStatus ( m_MemStatsNow.dxStatus );
+    g_pGraphics->GetRenderItemManager ()->GetDxStatus ( memStatsInfo.dxStatus );
 
     PROCESS_MEMORY_COUNTERS psmemCounters;  
     if ( GetProcessMemoryInfo ( GetCurrentProcess (), &psmemCounters, sizeof ( psmemCounters ) ) )
-        m_MemStatsNow.iProcessMemSizeKB = psmemCounters.WorkingSetSize / 1024LL;
+        memStatsInfo.iProcessMemSizeKB = psmemCounters.WorkingSetSize / 1024LL;
 
-    m_MemStatsNow.iStreamingMemoryUsed                  = *(int*)0x08E4CB4;
-    m_MemStatsNow.iStreamingMemoryAvailable             = *(int*)0x08A5A80;
+    memStatsInfo.iStreamingMemoryUsed                  = *(int*)0x08E4CB4;
+    memStatsInfo.iStreamingMemoryAvailable             = *(int*)0x08A5A80;
 
     uint* pModelInfoArray = (uint*)0x08E4CC0;
     for ( uint i = 0 ; i < 25755 ; i++ )
@@ -459,22 +425,41 @@ void CMemStats::SampleValues ( void )
         uint uiLoadedFlag = pModelInfo[4];
         if ( uiLoadedFlag )
         {
-            m_MemStatsNow.modelInfo.uiTotal++;
-            if ( i < 313 )          m_MemStatsNow.modelInfo.uiPlayerModels_0_312++;
-            else if ( i < 318 )     m_MemStatsNow.modelInfo.uiUnknown_313_317++;
-            else if ( i < 373 )     m_MemStatsNow.modelInfo.uiWeaponModels_318_372++;
-            else if ( i < 400 )     m_MemStatsNow.modelInfo.uiUnknown_373_399++;
-            else if ( i < 612 )     m_MemStatsNow.modelInfo.uiVehicles_400_611++;
-            else if ( i < 1000 )    m_MemStatsNow.modelInfo.uiUnknown_612_999++;
-            else if ( i < 1194 )    m_MemStatsNow.modelInfo.uiUpgrades_1000_1193++;
-            else if ( i < 20000 )   m_MemStatsNow.modelInfo.uiUnknown_1194_19999++;
-            else if ( i < 25000 )   m_MemStatsNow.modelInfo.uiTextures_20000_24999++;
-            else if ( i < 25255 )   m_MemStatsNow.modelInfo.uiCollisions_25000_25254++;
-            else if ( i < 25511 )   m_MemStatsNow.modelInfo.uiIpls_25255_25510++;
-            else if ( i < 25575 )   m_MemStatsNow.modelInfo.uiPaths_25511_25574++;
-            else if ( i < 25755 )   m_MemStatsNow.modelInfo.uiAnims_25575_25754++;
+            memStatsInfo.modelInfo.uiTotal++;
+            if ( i < 313 )          memStatsInfo.modelInfo.uiPlayerModels_0_312++;
+            else if ( i < 318 )     memStatsInfo.modelInfo.uiUnknown_313_317++;
+            else if ( i < 373 )     memStatsInfo.modelInfo.uiWeaponModels_318_372++;
+            else if ( i < 400 )     memStatsInfo.modelInfo.uiUnknown_373_399++;
+            else if ( i < 612 )     memStatsInfo.modelInfo.uiVehicles_400_611++;
+            else if ( i < 1000 )    memStatsInfo.modelInfo.uiUnknown_612_999++;
+            else if ( i < 1194 )    memStatsInfo.modelInfo.uiUpgrades_1000_1193++;
+            else if ( i < 20000 )   memStatsInfo.modelInfo.uiUnknown_1194_19999++;
+            else if ( i < 25000 )   memStatsInfo.modelInfo.uiTextures_20000_24999++;
+            else if ( i < 25255 )   memStatsInfo.modelInfo.uiCollisions_25000_25254++;
+            else if ( i < 25511 )   memStatsInfo.modelInfo.uiIpls_25255_25510++;
+            else if ( i < 25575 )   memStatsInfo.modelInfo.uiPaths_25511_25574++;
+            else if ( i < 25755 )   memStatsInfo.modelInfo.uiAnims_25575_25754++;
         }
     }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CMemStats::UpdateIntervalStats
+//
+// Update stats which are sampled at regular intervals
+//
+///////////////////////////////////////////////////////////////
+void CMemStats::UpdateIntervalStats ( void )
+{
+    memset ( &m_MemStatsNow, 0, sizeof ( m_MemStatsNow ) );
+    memset ( &m_MemStatsDelta, 0, sizeof ( m_MemStatsDelta ) );
+
+    //
+    // Update 'now' state
+    //
+    SampleState ( m_MemStatsNow );
 
     //
     // Calculate 'delta'
