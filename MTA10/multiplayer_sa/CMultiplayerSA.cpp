@@ -1366,6 +1366,13 @@ void CMultiplayerSA::InitHooks()
 
     // Avoid GTA setting vehicle first color to white after changing the paintjob
     MemSet ( (void *)0x6D65C5, 0x90, 11 );
+	
+	// Disable GTA vehicle detachment at rotation awkwardness
+    MemPut < BYTE > ( 0x547441, 0xE9 );
+    MemPut < BYTE > ( 0x547442, 0xFA );
+    MemPut < BYTE > ( 0x547443, 0x02 );
+    MemPut < BYTE > ( 0x547444, 0x00 );
+    MemPut < BYTE > ( 0x547445, 0x00 );
 
     // Disable idle cam
     MemPut < BYTE > ( 0x522C80, 0xC3 );
