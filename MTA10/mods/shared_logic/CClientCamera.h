@@ -42,8 +42,10 @@ public:
     bool                        GetMatrix                   ( CMatrix& Matrix ) const;
     void                        GetPosition                 ( CVector& vecPosition ) const;
     void                        GetRotation                 ( CVector& vecRotation ) const;
+    void                        GetRotation                 ( float &fX, float &fY );
     void                        SetPosition                 ( const CVector& vecPosition );
     void                        SetRotation                 ( const CVector& vecRotation );
+    void                        SetRotation                 ( float fX, float fY );
     void                        GetTarget                   ( CVector& vecTarget ) const;
     void                        SetTarget                   ( const CVector& vecPosition );
     float                       GetRoll                     ()                              { return m_fRoll; }
