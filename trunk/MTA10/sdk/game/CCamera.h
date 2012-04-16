@@ -113,6 +113,8 @@ public:
     virtual VOID                        RestoreWithJumpCut()=0;
     virtual CMatrix                     * GetMatrix ( CMatrix * matrix )=0;
     virtual VOID                        SetMatrix ( CMatrix * matrix )=0;
+    virtual VOID                        GetRotation ( float &fX, float &fY )=0;
+    virtual VOID                        SetRotation ( float fX, float fY )=0;
     virtual VOID                        SetCamPositionForFixedMode ( CVector * vecPosition, CVector * vecUpOffset )=0;
     virtual VOID                        Find3rdPersonCamTargetVector ( FLOAT fDistance, CVector * vecGunMuzzle, CVector * vecSource, CVector * vecTarget )=0;
     virtual float                       Find3rdPersonQuickAimPitch ( void ) = 0;
