@@ -6467,32 +6467,11 @@ bool _cdecl OnCallCStreamingInfoAddToList ( int flags, SImgGTAItemInfo* pImgGTAI
 
         int iFileId = ((int)pImgGTAInfo - 0x08E4CC0) / 20;
 
-        // Cached enabled setting here as it doesn't usually change
-        static bool bLogClothesLoad = GetDebugIdEnabled ( 501 );
-        if ( bLogClothesLoad )
-        {
-            SString strMessage ( "id:%d np:%04x %04x un1:%08x un2:%08x img:%d os:%d #:%d flg:%d"
-                                    , iFileId
-                                    , pImgGTAInfo->usNext
-                                    , pImgGTAInfo->usPrev
-                                    , pImgGTAInfo->uiUnknown1
-                                    , pImgGTAInfo->uiUnknown2
-                                    , pImgGTAInfo->ucImgId
-                                    , pImgGTAInfo->iBlockOffset
-                                    , pImgGTAInfo->iBlockCount
-                                    , pImgGTAInfo->uiLoadflag
-                                );
-
-            LogEvent ( 501, "Clothes Load", "", strMessage );
-        }
-
         iReturnFileId = iFileId;
         pReturnBuffer = CMultiplayerSA::ms_PlayerImgCachePtr + pImgGTAInfo->iBlockOffset * 2048;
 
         // Update flags
         pImgGTAInfo->uiLoadflag = 3;
-
-        // TODO - Check ms_numModelsRequested and ms_numPriorityRequests
 
         // Remove priorty flag, as not counted in ms_numPriorityRequests
         pImgGTAInfo->uiUnknown2 &= ~ 0x10;
