@@ -39,9 +39,11 @@ public:
 
     CMultiplayerSA();
     void                        InitHooks();
+    void                        InitHooks_CrashFixHacks();
     void                        Init_13 ( void );
     void                        InitHooks_13 ( void );
     void                        InitMemoryCopies_13 ( void );
+    void                        InitHooks_ClothesSpeedUp ( void );
     void                        InitHooks_ClothesMemFix ( void );
     void                        InitHooks_FixBadAnimId ( void );
     CRemoteDataStorage *        CreateRemoteDataStorage     ();
