@@ -1529,7 +1529,7 @@ void CMultiplayerSA::InitHooks()
     MemPut ( 0x6D2614, &m_fAircraftMaxHeight );
     MemPut ( 0x6D2625, &m_fAircraftMaxHeight );
 
-    InitHooks_ClothesMemFix ();
+    // Init our 1.3 hooks.
     Init_13 ();
 }
 

@@ -348,6 +348,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMultiplayerSA_FixBadAnimId.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\COffsets.cpp"
 				>
 			</File>
