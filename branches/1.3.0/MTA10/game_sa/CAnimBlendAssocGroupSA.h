@@ -14,6 +14,7 @@
 #define __CAnimBlendAssocGroupSA_H
 
 #include <game/CAnimBlendAssocGroup.h>
+#include "CAnimBlendStaticAssociationSA.h"
 #include "Common.h"
 
 #define FUNC_CAnimBlendAssocGroup_InitEmptyAssociations 0x4cdfb0
@@ -30,11 +31,11 @@ class CAnimManagerSA;
 class CAnimBlendAssocGroupSAInterface
 {
 public:
-    CAnimBlockSAInterface *             pAnimBlock;
-    CAnimBlendStaticAssociation * *     ppAssociations;
-    int                                 iNumAnimations;
-    int                                 iIDOffset;
-    AssocGroupId                        groupID;
+    CAnimBlockSAInterface*                  pAnimBlock;
+    CAnimBlendStaticAssociationSAInterface* pAssociationsArray;
+    int                                     iNumAnimations;
+    int                                     iIDOffset;
+    AssocGroupId                            groupID;
 };
 
 

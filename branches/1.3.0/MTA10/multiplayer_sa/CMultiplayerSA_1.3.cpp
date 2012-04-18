@@ -120,6 +120,9 @@ void CMultiplayerSA::InitHooks_13 ( void )
     HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound2, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound2, 5 );
     HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound3, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound3, 5 );
     HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound, 6 );
+
+    InitHooks_ClothesMemFix ();
+    InitHooks_FixBadAnimId ();
 }
 
 void CMultiplayerSA::InitMemoryCopies_13 ( void )

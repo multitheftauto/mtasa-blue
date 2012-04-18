@@ -1525,7 +1525,6 @@ void CMultiplayerSA::InitHooks()
 
     // Init our 1.3 hooks.
     Init_13 ( );
-    InitHooks_ClothesMemFix ();
 }
 
 

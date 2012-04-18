@@ -6,14 +6,11 @@
 !include UAC.nsh
 !include GameExplorer.nsh
 !include WinVer.nsh
+!include nsArray.nsh
 
 XPStyle on
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
-
-!define TEMP1 $R0
-!define TEMP2 $R1
-!define TEMP3 $R2
 
 Var GTA_DIR
 Var Install_Dir
@@ -114,11 +111,12 @@ Click Next to continue."
 !insertmacro MUI_PAGE_COMPONENTS
 
 ; Game directory page
-!define MUI_PAGE_CUSTOMFUNCTION_SHOW "DirectoryShowProc"
-!define MUI_PAGE_CUSTOMFUNCTION_LEAVE "DirectoryLeaveProc"
-!define MUI_CUSTOMFUNCTION_ABORT "DirectoryAbort"
-!define MUI_DIRECTORYPAGE_VARIABLE				$INSTDIR
-!insertmacro MUI_PAGE_DIRECTORY
+#!define MUI_PAGE_CUSTOMFUNCTION_SHOW "DirectoryShowProc"
+#!define MUI_PAGE_CUSTOMFUNCTION_LEAVE "DirectoryLeaveProc"
+#!define MUI_CUSTOMFUNCTION_ABORT "DirectoryAbort"
+#!define MUI_DIRECTORYPAGE_VARIABLE				$INSTDIR
+#!insertmacro MUI_PAGE_DIRECTORY
+Page custom CustomDirectoryPage DirectoryLeaveProc
 
 !ifdef CLIENT_SETUP
 	!define MUI_PAGE_CUSTOMFUNCTION_PRE				SkipDirectoryPage
@@ -175,7 +173,6 @@ Function LaunchLink
 FunctionEnd
 
 Function .onInstFailed
-    Call CleanupUsingInstallDirectory
 FunctionEnd
 
 Function .onInit
@@ -1402,8 +1399,6 @@ FunctionEnd
 
 
 Function "DirectoryLeaveProc"
-    Call CleanupUsingInstallDirectory
-
 	Push $INSTDIR 
 	Call GetInstallType
 	Pop $0
@@ -1447,46 +1442,238 @@ FunctionEnd
 
 ;****************************************************************
 ;
-; Ensure INSTDIR exists so the browse button works correctly
+; Custom MTA directory page
+;
+; To make sure the directory exists when 'Browse...' is clicked
 ;
 ;****************************************************************
+Var Dialog
+Var UpgradeLabel
+Var BrowseButton
+Var DirRequest
+!define LT_GREY "0xf0f0f0"
+!define MID_GREY "0x808080"
 
-Function .onVerifyInstDir
-    Push $INSTDIR 
-    Call SetUsingInstallDirectory
+Function CustomDirectoryPage
+
+	nsDialogs::Create 1018
+	Pop $Dialog
+	${If} $Dialog == error
+		Abort
+	${EndIf}
+
+    GetDlgItem $0 $HWNDPARENT 1037
+    ${NSD_SetText} $0 "Choose Install Location"
+    GetDlgItem $0 $HWNDPARENT 1038
+    ${NSD_SetText} $0 "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
+
+	${NSD_CreateLabel} 0 0 100% 50u "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n\
+To install in a different folder, click Browse and select another folder.$\n$\n Click Next to continue."
+	Pop $0
+
+	${NSD_CreateLabel} 20 190 100% 12u ""
+	Pop $UpgradeLabel
+    SetCtlColors $UpgradeLabel ${MID_GREY} ${LT_GREY}
+    Call CustomDirectoryPageSetUpgradeMessage
+
+	${NSD_CreateGroupBox} 0 115 100% 37u "Destination Folder"
+	Pop $0
+	${NSD_CreateDirRequest} 15 139 72% 12u $INSTDIR
+	Pop $DirRequest
+	${NSD_CreateBrowseButton} 77% 135 20% 15u "Browse..."
+	Pop $BrowseButton
+    ${NSD_OnClick} $BrowseButton CustomDirectoryPageBrowseButtonClick
+    ${NSD_OnChange} $DirRequest CustomDirectoryPageDirRequestChange
+
+    Call DirectoryShowProc
+    nsDialogs::Show
 FunctionEnd
 
-; In <stack> = install path
-Function SetUsingInstallDirectory
-    Var /GLOBAL SAVED_INSTDIR
+Function CustomDirectoryPageDirRequestChange
+    ${NSD_GetText} $DirRequest $0
+	${If} $0 != error
+		StrCpy $INSTDIR $0
+        Call CustomDirectoryPageSetUpgradeMessage
+	${EndIf}
+FunctionEnd
+
+Function CustomDirectoryPageBrowseButtonClick
+    ${NSD_GetText} $DirRequest $0
+
+    Call CreateDirectoryAndRememberWhichOnesWeDid
+
+    nsDialogs::SelectFolderDialog "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:" $0
+	Pop $0
+
+    Call RemoveDirectoriesWhichWeDid
+
+	${If} $0 != error
+		StrCpy $INSTDIR $0
+        ${NSD_SetText} $DirRequest $0
+        Call CustomDirectoryPageSetUpgradeMessage
+	${EndIf}
+FunctionEnd
+
+Function CustomDirectoryPageSetUpgradeMessage
+	Push $INSTDIR 
+	Call GetInstallType
+	Pop $0
+	Pop $1
+
+    ${NSD_SetText} $UpgradeLabel ""
+	${If} $0 == "overwrite"
+        ${NSD_SetText} $UpgradeLabel "Warning: A different major version of MTA ($1) already exists at that path."
+	${Endif}
+	${If} $0 == "upgrade"
+        ${NSD_SetText} $UpgradeLabel "Existing installation detected. Will perform in-place upgrade."
+	${Endif}
+FunctionEnd
+
+
+;****************************************************************
+;
+; Keep track of temp directories created
+;
+;****************************************************************
+Var SAVED_PATH_TO
+Var SAVED_CREATE_DEPTH
+
+; In $0 = path
+Function CreateDirectoryAndRememberWhichOnesWeDid
+    Push $0
+    Push $1
+    Push $2
+    Push $8
+    StrCpy $8 $0
+
+    StrCpy $0 $8
+    Call HowManyDepthsNotExist
+
+    StrCpy $SAVED_PATH_TO $8
+    StrCpy $SAVED_CREATE_DEPTH $2
+
+    #MessageBox mb_TopMost "CreateDirectoryAndRememberWhichOnesWeDid $\n\
+    #        path-to=$SAVED_PATH_TO $\n\
+    #        create-depth=$SAVED_CREATE_DEPTH $\n\
+    #        "
+
+    CreateDirectory $SAVED_PATH_TO
+
+    Pop $8
+    Pop $2
+    Pop $1
     Pop $0
+FunctionEnd
 
-    IfFileExists $0 alreadyexists
-        # Create new dir if not exists
-        CreateDirectory $0
+; In $0 = path
+; Out $2 = result
+Function HowManyDepthsNotExist
+    Push $0
+    Push $1
+    Push $8
+    Push $9
+    StrCpy $8 $0
+    StrCpy $9 0
+    ${Do}
+        StrCpy $0 $8
+        StrCpy $1 $9
+        Call RemoveEndsFromPath
 
-        # Remove old dir if created by us
-        StrCmp $SAVED_INSTDIR "" nosaveddir
-            RMDir $SAVED_INSTDIR
-            StrCpy $SAVED_INSTDIR ""
-        nosaveddir:
+        StrCpy $0 $2
+        Call DoesDirExist
 
-        # And new create dir again
-        StrCpy $SAVED_INSTDIR $0
-        CreateDirectory $SAVED_INSTDIR
+        #MessageBox mb_TopMost "HowManyDepthsNotExist $\n\
+        #        8-path=$8 $\n\
+        #        9-count=$9 $\n\
+        #        2-path-shrunk=$2 $\n\
+        #        1-dir-exist=$1 $\n\
+        #        "
 
+        IntOp $9 $9 + 1
+    ${LoopUntil} $1 = 1
+
+    IntOp $2 $9 - 1
+    Pop $9
+    Pop $8
+    Pop $1
+    Pop $0
+FunctionEnd
+
+Function RemoveDirectoriesWhichWeDid
+    Push $0
+    Push $1
+    Push $2
+    Push $3
+
+    ${If} $SAVED_PATH_TO != ""
+
+        #MessageBox mb_TopMost "RemoveDirectoriesWhichWeDid $\n\
+        #        path=$SAVED_PATH_TO $\n\
+        #        depth=$SAVED_CREATE_DEPTH $\n\
+        #        "
+
+        IntOp $3 $SAVED_CREATE_DEPTH - 1
+        ${ForEach} $2 0 $3 + 1
+            StrCpy $0 $SAVED_PATH_TO
+            StrCpy $1 $2
+            Call RemoveDirectoryAtNegDepth
+
+        ${Next}
+
+    ${EndIf}
+
+    StrCpy $SAVED_PATH_TO ""
+    StrCpy $SAVED_CREATE_DEPTH ""
+
+    Pop $3
+    Pop $2
+    Pop $1
+    Pop $0
+FunctionEnd
+
+; In $0 = path
+; In $1 = how many end bits to remove
+Function RemoveDirectoryAtNegDepth
+    Push $2
+        Call RemoveEndsFromPath
+
+        #MessageBox mb_TopMost "RemoveDirectoryAtNegDepth $\n\
+        #        2-result=$2 $\n\
+        #       "
+
+        RmDir $2
+    Pop $2
+FunctionEnd
+
+; In $0 = path
+; In $1 = how many end bits to remove
+; Out $2 = result
+Function RemoveEndsFromPath
+    nsArray::Clear my_array
+    nsArray::Split my_array $0 \ /noempty
+
+    ${ForEach} $2 1 $1 + 1
+        nsArray::Remove my_array /at=-1
+    ${Next}
+
+    nsArray::Join my_array \ /noempty
+    Pop $2
+FunctionEnd
+
+; In $0 = path
+; Out $0 = result
+Function ConformDirectoryPath
+    nsArray::Clear my_array
+    nsArray::Split my_array $0 \ /noempty
+    nsArray::Join my_array \ /noempty
+    Pop $0
+FunctionEnd
+
+; In $0 = path
+; Out $1 = result 0/1
+Function DoesDirExist
+    StrCpy $1 1
+    IfFileExists "$0\*.*" alreadyexists
+        StrCpy $1 0
     alreadyexists:
-FunctionEnd
-
-
-Function "DirectoryAbort"
-    Call CleanupUsingInstallDirectory
-FunctionEnd
-
-Function CleanupUsingInstallDirectory
-    # Remove old dir if created by us
-    StrCmp $SAVED_INSTDIR "" nosaveddir
-        RMDir $SAVED_INSTDIR
-        StrCpy $SAVED_INSTDIR ""
-    nosaveddir:
 FunctionEnd
