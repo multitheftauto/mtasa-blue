@@ -1866,17 +1866,15 @@ int CLuaElementDefs::setElementHealth ( lua_State* luaVM )
 {
     CElement* pElement = NULL;
     float fHealth = 0.0f;
-    bool bSyncGlobal = true;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
     argStream.ReadNumber ( fHealth );
-    argStream.ReadBool ( bSyncGlobal, true );
 
     if ( !argStream.HasErrors() )
     {
         if ( pElement )
         {
-            if ( CStaticFunctionDefinitions::SetElementHealth ( pElement, fHealth, bSyncGlobal ) )
+            if ( CStaticFunctionDefinitions::SetElementHealth ( pElement, fHealth ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
