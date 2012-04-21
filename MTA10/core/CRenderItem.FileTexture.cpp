@@ -18,9 +18,12 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-void CFileTextureItem::PostConstruct ( CRenderItemManager* pManager, const SString& strFilename, const CPixels* pPixels, bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format )
+void CFileTextureItem::PostConstruct ( CRenderItemManager* pManager, const SString& strFilename, const CPixels* pPixels, bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format, ETextureType textureType, uint uiVolumeDepth )
 {
     Super::PostConstruct ( pManager );
+
+    m_uiVolumeDepth = uiVolumeDepth;
+    m_TextureType = textureType;
 
     // Initial creation of d3d data
     if ( pPixels )
@@ -28,7 +31,7 @@ void CFileTextureItem::PostConstruct ( CRenderItemManager* pManager, const SStri
     else if ( !strFilename.empty () )
         CreateUnderlyingData ( strFilename, bMipMaps, uiSizeX, uiSizeY, format );
     else
-        CreateUnderlyingData ( bMipMaps, uiSizeX, uiSizeY, format );
+        CreateUnderlyingData ( bMipMaps, uiSizeX, uiSizeY, format, textureType, uiVolumeDepth );
 }
 
 
@@ -211,33 +214,67 @@ void CFileTextureItem::CreateUnderlyingData ( const CPixels* pInPixels, bool bMi
 // Blank sized
 //
 ////////////////////////////////////////////////////////////////
-void CFileTextureItem::CreateUnderlyingData ( bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format )
+void CFileTextureItem::CreateUnderlyingData ( bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format, ETextureType textureType, uint uiVolumeDepth )
 {
     assert ( !m_pD3DTexture );
 
     D3DFORMAT D3DFormat = (D3DFORMAT)format;
     int iMipMaps = bMipMaps ? D3DX_DEFAULT : 1;
 
-    if ( FAILED( D3DXCreateTexture(
-              m_pDevice,            //__in   LPDIRECT3DDEVICE9 pDevice,
-              uiSizeX,              //__in   UINT Width,
-              uiSizeY,              //__in   UINT Height,
-              iMipMaps,             //__in   UINT MipLevels,
-              0,                    //__in   DWORD Usage,
-              D3DFormat,            //__in   D3DFORMAT Format,
-              D3DPOOL_MANAGED,      //__in   D3DPOOL Pool,
-              (IDirect3DTexture9**)&m_pD3DTexture
-            ) ) )
-        return;
-
     m_uiSizeX = uiSizeX;
     m_uiSizeY = uiSizeY;
+    m_uiSurfaceSizeX = uiSizeX;
+    m_uiSurfaceSizeY = uiSizeY;
 
-    // Update surface size if it's a normal texture
-    D3DSURFACE_DESC desc;
-    ((IDirect3DTexture9*)m_pD3DTexture)->GetLevelDesc ( 0, &desc );
-    m_uiSurfaceSizeX = desc.Width;
-    m_uiSurfaceSizeY = desc.Height;
+    if ( textureType == D3DRTYPE_VOLUMETEXTURE )
+    {
+        if ( FAILED( D3DXCreateVolumeTexture(
+                  m_pDevice,            //__in   LPDIRECT3DDEVICE9 pDevice,
+                  uiSizeX,              //__in   UINT Width,
+                  uiSizeY,              //__in   UINT Height,
+                  uiVolumeDepth,        //__in   UINT Depth,
+                  iMipMaps,             //__in   UINT MipLevels,
+                  0,                    //__in   DWORD Usage,
+                  D3DFormat,            //__in   D3DFORMAT Format,
+                  D3DPOOL_MANAGED,      //__in   D3DPOOL Pool,
+                  (IDirect3DVolumeTexture9**)&m_pD3DTexture
+                ) ) )
+            return;
+    }
+    else
+    if ( textureType == D3DRTYPE_CUBETEXTURE )
+    {
+        if ( FAILED( D3DXCreateCubeTexture(
+                  m_pDevice,            //__in   LPDIRECT3DDEVICE9 pDevice,
+                  uiSizeX,              //__in   UINT Width,
+                  iMipMaps,             //__in   UINT MipLevels,
+                  0,                    //__in   DWORD Usage,
+                  D3DFormat,            //__in   D3DFORMAT Format,
+                  D3DPOOL_MANAGED,      //__in   D3DPOOL Pool,
+                  (IDirect3DCubeTexture9**)&m_pD3DTexture
+                ) ) )
+            return;
+    }
+    else
+    {
+        if ( FAILED( D3DXCreateTexture(
+                  m_pDevice,            //__in   LPDIRECT3DDEVICE9 pDevice,
+                  uiSizeX,              //__in   UINT Width,
+                  uiSizeY,              //__in   UINT Height,
+                  iMipMaps,             //__in   UINT MipLevels,
+                  0,                    //__in   DWORD Usage,
+                  D3DFormat,            //__in   D3DFORMAT Format,
+                  D3DPOOL_MANAGED,      //__in   D3DPOOL Pool,
+                  (IDirect3DTexture9**)&m_pD3DTexture
+                ) ) )
+            return;
+
+        // Update surface size if it's a normal texture
+        D3DSURFACE_DESC desc;
+        ((IDirect3DTexture9*)m_pD3DTexture)->GetLevelDesc ( 0, &desc );
+        m_uiSurfaceSizeX = desc.Width;
+        m_uiSurfaceSizeY = desc.Height;
+    }
 
     // Calc memory usage
     m_iMemoryKBUsed = CRenderItemManager::CalcD3DResourceMemoryKBUsage ( m_pD3DTexture );

@@ -395,10 +395,11 @@ int CLuaFunctionDefs::dxGetFontHeight ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
 {
-//  element dxCreateTexture( string filepath, string textureFormat, bool mipmaps )
-//  element dxCreateTexture( string pixels, string textureFormat, bool mipmaps )
-//  element dxCreateTexture( int width, int height, string textureFormat )
+//  element dxCreateTexture( string filepath [, string textureFormat = "argb", bool mipmaps = true ] )
+//  element dxCreateTexture( string pixels [, string textureFormat = "argb", bool mipmaps = true ] )
+//  element dxCreateTexture( int width, int height [, string textureFormat, string textureType, int depth ] )
     SString strFilePath; CPixels pixels; int width; int height; ERenderFormat renderFormat; bool bMipMaps;
+    ETextureType textureType; int depth;
 
     CScriptArgReader argStream ( luaVM );
     if ( !argStream.NextIsNumber () )
@@ -406,7 +407,7 @@ int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
         argStream.ReadCharStringRef ( pixels.externalData );
         if ( !g_pCore->GetGraphics ()->GetPixelsManager ()->IsPixels ( pixels ) )
         {
-            // element dxCreateTexture( string filepath, string textureFormat, bool mipmaps )
+            // element dxCreateTexture( string filepath [, string textureFormat = "argb", bool mipmaps = true ] )
             pixels = CPixels ();
             argStream = CScriptArgReader ( luaVM );
             argStream.ReadString ( strFilePath );
@@ -415,17 +416,20 @@ int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
         }
         else
         {
-            // element dxCreateTexture( string pixels, string textureFormat, bool mipmaps )
+            // element dxCreateTexture( string pixels [, string textureFormat = "argb", bool mipmaps = true ] )
             argStream.ReadEnumString ( renderFormat, RFORMAT_UNKNOWN );
             argStream.ReadBool ( bMipMaps, true );
         }
     }
     else
     {
-        // element dxCreateTexture( int width, int height, string textureFormat )
+        // element dxCreateTexture( int width, int height [, string textureFormat, string textureType, int depth ] )
         argStream.ReadNumber ( width );
         argStream.ReadNumber ( height );
         argStream.ReadEnumString ( renderFormat, RFORMAT_UNKNOWN );
+        argStream.ReadEnumString ( textureType, TTYPE_TEXTURE );
+        if ( textureType == TTYPE_VOLUMETEXTURE )
+            argStream.ReadNumber ( depth );
     }
 
     if ( !argStream.HasErrors () )
@@ -474,7 +478,7 @@ int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
             else
             {
                 // Blank sized
-                CClientTexture* pTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateTexture ( "", NULL, false, width, height, renderFormat );
+                CClientTexture* pTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateTexture ( "", NULL, false, width, height, renderFormat, textureType, depth );
                 if ( pTexture )
                 {
                     pTexture->SetParent ( pParentResource->GetResourceDynamicEntity () );
@@ -622,7 +626,7 @@ int CLuaFunctionDefs::dxCreateScreenSource ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxGetMaterialSize ( lua_State* luaVM )
 {
-//  int, int dxGetMaterialSize( element material )
+//  int, int [, int] dxGetMaterialSize( element material )
     CClientMaterial* pMaterial; SString strName;
 
     CScriptArgReader argStream ( luaVM );
@@ -632,6 +636,14 @@ int CLuaFunctionDefs::dxGetMaterialSize ( lua_State* luaVM )
     {
         lua_pushnumber ( luaVM, pMaterial->GetMaterialItem ()->m_uiSizeX );
         lua_pushnumber ( luaVM, pMaterial->GetMaterialItem ()->m_uiSizeY );
+        if ( CFileTextureItem* pTextureItem = DynamicCast < CFileTextureItem > ( pMaterial->GetMaterialItem () ) )
+        {
+            if ( pTextureItem->m_TextureType == TTYPE_VOLUMETEXTURE )
+            {
+                lua_pushnumber ( luaVM, pTextureItem->m_uiVolumeDepth );
+                return 3;
+            }
+        }
         return 2;
     }
     else
@@ -994,10 +1006,13 @@ int CLuaFunctionDefs::dxGetStatus ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxGetTexturePixels ( lua_State* luaVM )
 {
-//  string dxGetTexturePixels( element texture [, int x, int y, int width, int height ] )
+//  string dxGetTexturePixels( [ int surfaceIndex, ] element texture [, int x, int y, int width, int height ] )
     CClientTexture* pTexture; int x; int y; int width; int height;
+    int surfaceIndex = 0;
 
     CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsNumber () )
+        argStream.ReadNumber ( surfaceIndex );
     argStream.ReadUserData ( pTexture );
     argStream.ReadNumber ( x, 0 );
     argStream.ReadNumber ( y, 0 );
@@ -1008,7 +1023,7 @@ int CLuaFunctionDefs::dxGetTexturePixels ( lua_State* luaVM )
     {
         RECT rc = { x, y, x + width, y + height };
         CPixels pixels;
-        if ( g_pCore->GetGraphics ()->GetPixelsManager ()->GetTexturePixels ( pTexture->GetTextureItem ()->m_pD3DTexture, pixels, height ? &rc : NULL ) )
+        if ( g_pCore->GetGraphics ()->GetPixelsManager ()->GetTexturePixels ( pTexture->GetTextureItem ()->m_pD3DTexture, pixels, height ? &rc : NULL, surfaceIndex ) )
         {
             lua_pushlstring ( luaVM, pixels.GetData (), pixels.GetSize () );
             return 1;           
@@ -1025,10 +1040,13 @@ int CLuaFunctionDefs::dxGetTexturePixels ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxSetTexturePixels ( lua_State* luaVM )
 {
-//  string dxGetTexturePixels( element texture, string pixels [, int x, int y, int width, int height ] )
+//  string dxGetTexturePixels( [ int sufaceIndex, ] element texture, string pixels [, int x, int y, int width, int height ] )
     CClientTexture* pTexture; CPixels pixels; int x; int y; int width; int height;
+    int surfaceIndex = 0;
 
     CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsNumber () )
+        argStream.ReadNumber ( surfaceIndex );
     argStream.ReadUserData ( pTexture );
     argStream.ReadCharStringRef ( pixels.externalData );
     argStream.ReadNumber ( x, 0 );
@@ -1039,7 +1057,7 @@ int CLuaFunctionDefs::dxSetTexturePixels ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         RECT rc = { x, y, x + width, y + height };
-        if ( g_pCore->GetGraphics ()->GetPixelsManager ()->SetTexturePixels ( pTexture->GetTextureItem ()->m_pD3DTexture, pixels, height ? &rc : NULL ) )
+        if ( g_pCore->GetGraphics ()->GetPixelsManager ()->SetTexturePixels ( pTexture->GetTextureItem ()->m_pD3DTexture, pixels, height ? &rc : NULL, surfaceIndex ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;           
