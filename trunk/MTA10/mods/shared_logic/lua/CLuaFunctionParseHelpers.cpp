@@ -240,6 +240,12 @@ IMPLEMENT_ENUM_BEGIN( ERenderFormat )
     ADD_ENUM ( RFORMAT_DXT5,         "dxt5" )
 IMPLEMENT_ENUM_END( "texture-format" )
 
+IMPLEMENT_ENUM_BEGIN( ETextureType )
+    ADD_ENUM ( TTYPE_TEXTURE,           "2d" )
+    ADD_ENUM ( TTYPE_VOLUMETEXTURE,     "3d" )
+    ADD_ENUM ( TTYPE_CUBETEXTURE,       "cube" )
+IMPLEMENT_ENUM_END( "texture-type" )
+
 IMPLEMENT_ENUM_BEGIN( EPixelsFormatType )
     ADD_ENUM ( EPixelsFormat::UNKNOWN,      "unknown" )
     ADD_ENUM ( EPixelsFormat::PLAIN,        "plain" )

@@ -145,25 +145,32 @@ void CMaterialLine3DBatcher::Flush ( void )
         pIndices [ uiNumIndicies++ ] = i;
     }
 
-    // Sort index list by distance
-    ms_pLines = &m_LineList [ 0 ];
-    sort_inline ( indexList.begin (), indexList.end (), ( const uint a, const uint b ) { return ms_pLines [ a ].fDistSq > ms_pLines [ b ].fDistSq; } );
-
-    // Draw index list, batching by material
-    uint uiBatchFirstIndex = 0;
-    for ( uint i = 0 ; i < uiNumIndicies ; i++ )
+    if ( uiNumIndicies > 1 )
     {
-        const SMaterialLine3DItem& item = ms_pLines [ pIndices [ i ] ];
+        indexList.resize ( uiNumIndicies );
 
-        // Flush batch if this is the last index, or the next one uses a different material
-        if ( ( i == uiNumIndicies - 1 ) || item.pMaterial != ms_pLines [ pIndices [ i + 1 ] ].pMaterial )
+        // Sort index list by distance
+        ms_pLines = &m_LineList [ 0 ];
+        sort_inline ( indexList.begin (), indexList.end (), ( const uint a, const uint b ) { return ms_pLines [ a ].fDistSq > ms_pLines [ b ].fDistSq; } );
+
+        pIndices = &indexList [ 0 ];
+
+        // Draw index list, batching by material
+        uint uiBatchFirstIndex = 0;
+        for ( uint i = 0 ; i < uiNumIndicies ; i++ )
         {
-            uint* pBatchIndices = &pIndices [ uiBatchFirstIndex ];
-            uint uiNumBatchLines = i - uiBatchFirstIndex + 1;
+            const SMaterialLine3DItem& item = ms_pLines [ pIndices [ i ] ];
 
-            DrawBatch ( vecCameraPos, pBatchIndices, uiNumBatchLines, item.pMaterial );
+            // Flush batch if this is the last index, or the next one uses a different material
+            if ( ( i == uiNumIndicies - 1 ) || item.pMaterial != ms_pLines [ pIndices [ i + 1 ] ].pMaterial )
+            {
+                uint* pBatchIndices = &pIndices [ uiBatchFirstIndex ];
+                uint uiNumBatchLines = i - uiBatchFirstIndex + 1;
 
-            uiBatchFirstIndex = i + 1;
+                DrawBatch ( vecCameraPos, pBatchIndices, uiNumBatchLines, item.pMaterial );
+
+                uiBatchFirstIndex = i + 1;
+            }
         }
     }
 
