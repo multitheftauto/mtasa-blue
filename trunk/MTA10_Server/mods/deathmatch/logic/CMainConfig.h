@@ -111,6 +111,8 @@ public:
     void                            SetTweakValue                   ( int iWhich, float fAmount );
     const SNetOptions&              GetNetOptions                   ( void )                    { return m_NetOptions; }
 
+    int                             GetLightSyncRate                ( void )                    { return m_iLightSyncRate; }
+
 private:
     void                            RegisterCommand                 ( const char* szName, FCommandHandler* pFunction, bool bRestricted );
 
@@ -173,6 +175,7 @@ private:
     std::map < SString, SString >   m_TransientSettings;
     SNetOptions                     m_NetOptions;
     int                             m_iNetReliabilityMode;
+    int                             m_iLightSyncRate;
 };
 
 #endif

@@ -97,6 +97,7 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
 #ifdef MTA_DEBUG
     m_bShowingWepdata = false;
 #endif
+    m_LastPuresyncType = PURESYNC_TYPE_NONE;
 }
 
 
