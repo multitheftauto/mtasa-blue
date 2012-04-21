@@ -138,8 +138,8 @@ public:
     inline void                     SetSpawned                  ( bool bSpawned )                       { m_bSpawned = bSpawned; }
 
     inline CColShape*               GetColShape                 ( void )                                { return m_pCollision; }
-    inline void                     SetEnabled                  ( bool bEnabled )                       { return m_pCollision->SetEnabled( bEnabled ); }
-    inline bool                     IsEnabled                   ( void )                                { return m_pCollision->IsEnabled(); }
+    inline void                     SetEnabled                  ( bool bEnabled )                       { if ( m_pCollision ) m_pCollision->SetEnabled ( bEnabled ); }
+    inline bool                     IsEnabled                   ( void )                                { return m_pCollision && m_pCollision->IsEnabled (); }
 
     inline void                     SetDoneDelayHack            ( bool bDone )                          { m_bDoneDelayHack = bDone; }
     inline bool                     HasDoneDelayHack            ( void )                                { return m_bDoneDelayHack; }
