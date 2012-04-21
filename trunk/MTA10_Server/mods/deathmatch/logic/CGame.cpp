@@ -24,6 +24,7 @@
 #include "net/SimHeaders.h"
 
 #define MAX_KEYSYNC_DISTANCE 400.0f
+#define MAX_BULLETSYNC_DISTANCE 400.0f
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
 #define MAX_PROJECTILE_SYNC_DISTANCE 400.0f
 
@@ -1003,6 +1004,12 @@ bool CGame::ProcessPacket ( CPacket& Packet )
         case PACKET_ID_PLAYER_KEYSYNC:
         {
             Packet_Keysync ( static_cast < CKeysyncPacket& > ( Packet ) );
+            return true;
+        }
+
+        case PACKET_ID_PLAYER_BULLETSYNC:
+        {
+            Packet_Bulletsync ( static_cast < CBulletsyncPacket& > ( Packet ) );
             return true;
         }
 
@@ -2128,6 +2135,46 @@ void CGame::Packet_Keysync ( CKeysyncPacket& Packet )
 
                 // Is this players camera close enough to warrant keysync?
                 if ( IsPointNearPoint3D ( vecSourcePosition, vecCameraPosition, MAX_KEYSYNC_DISTANCE ) )
+                {
+                    // Send the packet to him
+                    sendList.push_back ( pSendPlayer );
+                }
+            }
+        }
+
+        CPlayerManager::Broadcast ( Packet, sendList );
+    }
+}
+
+
+void CGame::Packet_Bulletsync ( CBulletsyncPacket& Packet )
+{
+    // Grab the source player
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer && pPlayer->IsJoined () )
+    {
+        // Make a list of players to send this packet to
+        std::vector < CPlayer* > sendList;
+
+        // Grab the position of the source player
+        const CVector& vecSourcePosition = pPlayer->GetPosition ();
+
+        // Loop through all the players
+        CPlayer* pSendPlayer;
+        std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
+        for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
+        {
+            pSendPlayer = *iter;
+
+            // Not the player we got the packet from?
+            if ( pSendPlayer != pPlayer )
+            {
+                // Grab this player's camera position
+                CVector vecCameraPosition;
+                pSendPlayer->GetCamera ()->GetPosition ( vecCameraPosition );
+
+                // Is this players camera close enough to warrant bulletsync?
+                if ( IsPointNearPoint3D ( vecSourcePosition, vecCameraPosition, MAX_BULLETSYNC_DISTANCE ) )
                 {
                     // Send the packet to him
                     sendList.push_back ( pSendPlayer );
