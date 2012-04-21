@@ -220,8 +220,6 @@ int CLuaFunctionDefs::GUICreateStaticImage ( lua_State* luaVM )
             {
                 CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage ( *pLuaMain, x, y, width, height, strPath, relative, parent );
                 lua_pushelement ( luaVM, pGUIElement );
-                if ( !pGUIElement )
-                    m_pScriptDebugging->LogWarning( luaVM, "Image creation failed. Check if the file exists!" );
                 return 1;
             }
             else
