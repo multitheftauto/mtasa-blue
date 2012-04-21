@@ -434,7 +434,7 @@ void CPickup::Use ( CPlayer& Player )
                     if ( fNewHealth > 200.0f )
                         fNewHealth = 200.0f;
 
-                    CStaticFunctionDefinitions::SetElementHealth ( &Player, fNewHealth, true );
+                    CStaticFunctionDefinitions::SetElementHealth ( &Player, fNewHealth );
 
                     break;
                 }
