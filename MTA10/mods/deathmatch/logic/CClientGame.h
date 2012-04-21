@@ -383,6 +383,10 @@ public:
     void                                GottenPlayerScreenShot          ( const CBuffer& buffer, uint uiTimeSpentInQueue );
     void                                ProcessDelayedSendList          ( void );
 
+    void                                SetDevSetting                   ( const SString& strCommand );
+    void                                SetWeaponTypeUsesBulletSync     ( eWeaponType weaponType, bool bEnable );
+    bool                                GetWeaponTypeUsesBulletSync     ( eWeaponType weaponType );
+
     SString                             GetHTTPURL                      ( void ) { return m_strHTTPDownloadURL; };
 
 private:
@@ -481,6 +485,7 @@ private:
     static void                         PreWeaponFire                   ( CPlayerPed* pPlayerPed );
     static void                         PostWeaponFire                  ( void );
     static void                         BulletImpact                    ( CPed* pInitiator, CEntity* pVictim, const CVector* pStartPosition, const CVector* pEndPosition );
+    static void                         BulletFire                      ( CPed* pInitiator, const CVector* pStartPosition, const CVector* pEndPosition );
 public:
     static bool                         StaticProcessPacket             ( unsigned char ucPacketID, NetBitStreamInterface& bitStream );
 
@@ -692,6 +697,7 @@ private:
     std::multimap < CClientVehicle *, CClientPed * > m_HeliCollisionsMap;
     CElapsedTime                        m_LastClearTime;
     SString                             m_strServerVersionSortable;
+    std::set < eWeaponType >            m_weaponTypesUsingBulletSync;
 };
 
 extern CClientGame* g_pClientGame;

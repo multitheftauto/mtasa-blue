@@ -107,6 +107,9 @@ public:
 
     inline CClientManager*          GetManager              ( void )                                { return m_pManager; }
 
+    bool                            m_bRemoteBulletSyncFireButtonPressed;
+    bool                            m_bRemoteBulletSyncEnabled;
+
 private:
     bool                            m_bIsLocalPlayer;
     char                            m_szNick [ MAX_PLAYER_NICK_LENGTH + 1 ];

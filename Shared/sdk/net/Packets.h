@@ -144,4 +144,6 @@ enum ePacketID
 
     // Vehicle Push Sync
     PACKET_ID_VEHICLE_PUSH_SYNC,
+
+    PACKET_ID_PLAYER_BULLETSYNC,
 };

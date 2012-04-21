@@ -47,6 +47,7 @@ class CGame;
 #include "packets/CLightsyncPacket.h"
 #include "packets/CVehicleResyncPacket.h"
 #include "packets/CKeysyncPacket.h"
+#include "packets/CBulletsyncPacket.h"
 #include "packets/CVehicleInOutPacket.h"
 #include "packets/CVehicleDamageSyncPacket.h"
 #include "packets/CVehicleTrailerPacket.h"
@@ -372,6 +373,7 @@ private:
     void                        Packet_VehicleDamageSync    ( class CVehicleDamageSyncPacket& Packet );
     void                        Packet_VehiclePuresync      ( class CVehiclePuresyncPacket& Packet );
     void                        Packet_Keysync              ( class CKeysyncPacket& Packet );
+    void                        Packet_Bulletsync           ( class CBulletsyncPacket& Packet );
     void                        Packet_Vehicle_InOut        ( class CVehicleInOutPacket& Packet );
     void                        Packet_VehicleTrailer       ( class CVehicleTrailerPacket& Packet );
     void                        Packet_LuaEvent             ( class CLuaEventPacket& Packet );

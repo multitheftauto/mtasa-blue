@@ -35,6 +35,7 @@ public:
         m_fGravity = 0.008f;
         m_bAkimboTargetUp = false;
         m_bProcessPlayerWeapon = false;
+        m_shotSyncData.m_bRemoteBulletSyncVectorsValid = false;
     }
 
     inline CControllerState *   CurrentControllerState () { return &m_pad.NewState; }
