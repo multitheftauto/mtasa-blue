@@ -656,13 +656,16 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue (
 
 bool TestVehicleForSiren ( )
 {
-    // Grab our vehicle
-    CVehicle * pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)pVehicleWithTheSiren );
-    // Is it valid and it doesn't have a siren by default
-    if ( pVehicle )
+    if ( pVehicleWithTheSiren )
     {
-        // Return our stored siren state
-        return pVehicle->DoesVehicleHaveSirens ( ) || DoesVehicleHaveSiren ( );
+        // Grab our vehicle
+        CVehicle * pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)pVehicleWithTheSiren );
+        // Is it valid and it doesn't have a siren by default
+        if ( pVehicle )
+        {
+            // Return our stored siren state
+            return pVehicle->DoesVehicleHaveSirens ( ) || DoesVehicleHaveSiren ( );
+        }
     }
     // Return true here for default vehicles    
     return true;
