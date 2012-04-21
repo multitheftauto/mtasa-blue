@@ -956,7 +956,8 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, bool bLoadImmedi
         m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData ( (eVehicleTypes)usModel );
         m_pHandlingEntry->Assign ( m_pOriginalHandlingEntry );
         ApplyHandling ();
-
+        
+        SetSirenOrAlarmActive ( false );
         // Create the vehicle if we're streamed in
         if ( IsStreamedIn () )
         {

@@ -423,7 +423,29 @@ void CClientStreamer::Restream ( void )
         
         // Is this element streamed in?
         if ( pElement->IsStreamedIn () )
-        {
+        {                
+            if ( IS_VEHICLE ( pElement ) )
+            {
+                CClientVehicle* pVehicle = DynamicCast < CClientVehicle > ( pElement );
+                if ( pVehicle && pVehicle->GetOccupant ( ) && IS_PLAYER ( pVehicle->GetOccupant ( ) ))
+                {
+                    CClientPlayer* pPlayer = DynamicCast < CClientPlayer > ( pVehicle->GetOccupant ( ) );
+                    if ( pPlayer->GetLastPuresyncType ( ) == PURESYNC_TYPE_LIGHTSYNC )
+                    {
+                        // if the last packet was ls he shouldn't be streamed in
+                        m_ToStreamOut.push_back ( pElement );
+                    }
+                }
+            }
+            if ( IS_PLAYER ( pElement ) )
+            {
+                CClientPlayer* pPlayer = DynamicCast < CClientPlayer > ( pElement );
+                if ( pPlayer->GetLastPuresyncType ( ) == PURESYNC_TYPE_LIGHTSYNC )
+                {
+                    // if the last packet was ls he isn'tshouldn't be streamed in
+                    m_ToStreamOut.push_back ( pElement );
+                }
+            }
             // Too far away? Use the threshold so we won't flicker load it if it's on the border moving.
             if ( fElementDistanceExp > m_fMaxDistanceThreshold )
             {
@@ -441,6 +463,28 @@ void CClientStreamer::Restream ( void )
                 if ( fElementDistanceExp > m_fMaxDistanceExp )
                     continue;
 
+                if ( IS_VEHICLE ( pElement ) )
+                {
+                    CClientVehicle* pVehicle = DynamicCast < CClientVehicle > ( pElement );
+                    if ( pVehicle && pVehicle->GetOccupant ( ) && IS_PLAYER ( pVehicle->GetOccupant ( ) ))
+                    {
+                        CClientPlayer* pPlayer = DynamicCast < CClientPlayer > ( pVehicle->GetOccupant ( ) );
+                        if ( pPlayer->GetLastPuresyncType ( ) == PURESYNC_TYPE_LIGHTSYNC )
+                        {
+                            // if the last packet was ls he isn't streaming in soon.
+                            continue;
+                        }
+                    }
+                }
+                if ( IS_PLAYER ( pElement ) )
+                {
+                    CClientPlayer* pPlayer = DynamicCast < CClientPlayer > ( pElement );
+                    if ( pPlayer->GetLastPuresyncType ( ) == PURESYNC_TYPE_LIGHTSYNC )
+                    {
+                        // if the last packet was ls he isn't streaming in soon.
+                        continue;
+                    }
+                }
                 // If attached and attached-to is streamed out, don't consider for streaming in
                 CClientStreamElement* pAttachedTo = dynamic_cast< CClientStreamElement * >( pElement->GetAttachedTo() );
                 if ( pAttachedTo && !pAttachedTo->IsStreamedIn() )
@@ -454,9 +498,9 @@ void CClientStreamer::Restream ( void )
 
                 // Not room to stream in more elements?
                 if ( bReachedLimit )
-                {                 
+                {
                     // Do we not have a closest streamed out element yet? set it to this
-                    if ( !pClosestStreamedOut ) pClosestStreamedOut = pElement;                    
+                    if ( !pClosestStreamedOut ) pClosestStreamedOut = pElement;
                 }
                 else
                 {
@@ -464,7 +508,7 @@ void CClientStreamer::Restream ( void )
                     pElement->InternalStreamIn ( false );
                     bReachedLimit = ReachedLimit ();
                 }
-            }            
+            }
         }
     }
 

@@ -30,7 +30,12 @@ class CClientPlayer;
 
 class CClientPlayerManager;
 class CClientTeam;
-
+enum ePuresyncType
+{
+    PURESYNC_TYPE_NONE,
+    PURESYNC_TYPE_LIGHTSYNC,
+    PURESYNC_TYPE_PURESYNC,
+};
 class CClientPlayer : public CClientPed
 {
     DECLARE_CLASS( CClientPlayer, CClientPed )
@@ -76,7 +81,8 @@ public:
     inline void                     SetLastPuresyncPosition ( const CVector& vecPosition )          { m_vecLastPuresyncPosition = vecPosition; }
     inline bool                     HasConnectionTrouble    ( void )                                { return m_bHasConnectionTrouble; }
     inline void                     SetHasConnectionTrouble ( bool bHasTrouble )                    { m_bHasConnectionTrouble = bHasTrouble; }
-
+    inline ePuresyncType            GetLastPuresyncType     ( void )                                { return m_LastPuresyncType; }
+    inline void                     SetLastPuresyncType     ( ePuresyncType LastPuresyncType )      { m_LastPuresyncType = LastPuresyncType; }
     inline void                     IncrementPlayerSync     ( void )                                { ++m_uiPlayerSyncCount; }
     inline void                     IncrementKeySync        ( void )                                { ++m_uiKeySyncCount; }
     inline void                     IncrementVehicleSync    ( void )                                { ++m_uiVehicleSyncCount; }
@@ -148,7 +154,7 @@ private:
     bool                            m_bNetworkDead;
 
     CClientPlayerVoice*             m_voice;
-
+    ePuresyncType                   m_LastPuresyncType;
 #ifdef MTA_DEBUG
 private:
     bool                            m_bShowingWepdata;
