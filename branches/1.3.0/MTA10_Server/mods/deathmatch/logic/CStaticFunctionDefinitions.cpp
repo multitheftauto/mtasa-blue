@@ -1579,10 +1579,10 @@ bool CStaticFunctionDefinitions::SetElementDoubleSided ( CElement* pElement, boo
 }
 
 
-bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fHealth, bool bSyncGlobal )
+bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fHealth )
 {
     assert ( pElement );
-    RUN_CHILDREN SetElementHealth ( *iter, fHealth, bSyncGlobal );
+    RUN_CHILDREN SetElementHealth ( *iter, fHealth );
 
     switch ( pElement->GetType () )
     {
@@ -1602,15 +1602,6 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fH
                 fHealth = static_cast < float > ( ucHealth ) / 1.25f;
                 pPed->SetHealth ( fHealth );
                 pPed->SetHealthChangeTime ( GetTickCount32 () );
-                CPlayer * pPlayer = pPed->GetSyncer ( );
-                if ( pPlayer && bSyncGlobal == false )
-                {
-                    CBitStream BitStream;
-                    BitStream.pBitStream->Write ( fHealth );
-                    BitStream.pBitStream->Write ( pElement->GenerateSyncTimeContext () );
-                    pPlayer->Send ( CElementRPCPacket ( pElement, SET_ELEMENT_HEALTH, *BitStream.pBitStream ) );
-                    return true;
-                }
             }
             else
                 return false;
@@ -1621,15 +1612,6 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fH
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
             pVehicle->SetHealth ( fHealth );
             pVehicle->SetHealthChangeTime ( GetTickCount32 () );
-            CPlayer * pPlayer = pVehicle->GetSyncer ( );
-            if ( pPlayer && bSyncGlobal == false )
-            {
-                CBitStream BitStream;
-                BitStream.pBitStream->Write ( fHealth );
-                BitStream.pBitStream->Write ( pElement->GenerateSyncTimeContext () );
-                pPlayer->Send ( CElementRPCPacket ( pElement, SET_ELEMENT_HEALTH, *BitStream.pBitStream ) );
-                return true;
-            }
             break;
         }
         case CElement::OBJECT:
@@ -3553,22 +3535,11 @@ bool CStaticFunctionDefinitions::SetPedArmor ( CElement* pElement, float fArmor 
 
                 unsigned char ucArmor = static_cast < unsigned char > ( fArmor * 1.25 );
 
-                CPlayer * pPlayer = pPed->GetSyncer ( );
-                if ( pPlayer )
-                {
-                    CBitStream BitStream;
-                    BitStream.pBitStream->Write ( ucArmor );
-                    BitStream.pBitStream->Write ( pElement->GenerateSyncTimeContext () );
-                    pPlayer->Send ( CElementRPCPacket ( pElement, SET_PED_ARMOR, *BitStream.pBitStream ) );
-                }
-                else
-                {
-                    // Tell everyone
-                    CBitStream BitStream;
-                    BitStream.pBitStream->Write ( ucArmor );
-                    BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
-                    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pPed, SET_PED_ARMOR, *BitStream.pBitStream ) );
-                }
+                // Tell everyone
+                CBitStream BitStream;
+                BitStream.pBitStream->Write ( ucArmor );
+                BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
+                m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pPed, SET_PED_ARMOR, *BitStream.pBitStream ) );
             }
         }
 
