@@ -10,53 +10,7 @@
 
 #include "StdInc.h"
 #include "CFileFormat.h"
-
-#define XRGB_BYTES_PER_PIXEL (4)
-#define SIZEOF_PLAIN_TAIL (4)
-
-
-///////////////////////////////////////////////////////////////
-//
-// CPixelsManager
-//
-//
-///////////////////////////////////////////////////////////////
-class CPixelsManager : public CPixelsManagerInterface
-{
-public:
-    ZERO_ON_NEW
-                                    CPixelsManager                      ( void );
-                                    ~CPixelsManager                     ( void );
-
-    // CPixelsManagerInterface
-    virtual void                    OnDeviceCreate                      ( IDirect3DDevice9* pDevice );
-    virtual bool                    IsPixels                            ( const CPixels& pixels );
-    virtual bool                    GetTexturePixels                    ( IDirect3DBaseTexture9* pD3DBaseTexture, CPixels& outPixels, const RECT* pRect = NULL );
-    virtual bool                    SetTexturePixels                    ( IDirect3DBaseTexture9* pD3DBaseTexture, const CPixels& pixels, const RECT* pRect = NULL );
-    virtual bool                    GetPixelsSize                       ( const CPixels& pixels, uint& uiOutWidth, uint& uiOutHeight );
-    virtual EPixelsFormatType       GetPixelsFormat                     ( const CPixels& pixels );
-    virtual bool                    ChangePixelsFormat                  ( const CPixels& oldPixels, CPixels& newPixels, EPixelsFormatType newFormat, int uiQuality = 0 );
-    virtual bool                    GetPixelColor                       ( const CPixels& pixels, uint uiPosX, uint uiPosY, SColor& outColor );
-    virtual bool                    SetPixelColor                       ( CPixels& pixels, uint uiPosX, uint uiPosY, const SColor color );
-
-    // CPixelsManager
-    IDirect3DSurface9*              GetRTLockableSurface                ( IDirect3DSurface9* pRTSurface );
-    bool                            GetMatchingOffscreenSurface         ( IDirect3DSurface9* pD3DSurface, IDirect3DSurface9*& pOffscreenSurface, D3DFORMAT ReqFormat = D3DFMT_UNKNOWN );
-    bool                            GetSurfacePixels                    ( IDirect3DSurface9* pD3DSurface, CPixels& outPixels, const RECT* pRect );
-    bool                            SetSurfacePixels                    ( IDirect3DSurface9* pD3DSurface, const CPixels& pixels, const RECT* pRect );
-    bool                            SetPlainDimensions                  ( CPixels& pixels, uint uiWidth, uint uiHeight);
-    bool                            GetPlainDimensions                  ( const CPixels& pixels, uint& uiOutWidth, uint& uiOutHeight );
-
-    // Util
-    static int                      GetRectWidth                        ( const RECT& rc );
-    static int                      GetRectHeight                       ( const RECT& rc );
-    static bool                     ClipRects                           ( const POINT& SrcSize, RECT& SrcRect, const POINT& DestSize, RECT& DestRect );
-    static HRESULT                  LockSurfaceRect                     ( IDirect3DSurface9* pD3DSurface, D3DLOCKED_RECT* pLockedRect, CONST RECT* pRect, DWORD Flags );
-
-protected:
-    IDirect3DDevice9*               m_pDevice;
-    IDirect3DSurface9*              m_pTempOffscreenSurface;
-};
+#include "CPixelsManager.h"
 
 
 ///////////////////////////////////////////////////////////////
@@ -114,18 +68,35 @@ void CPixelsManager::OnDeviceCreate ( IDirect3DDevice9* pDevice )
 // Copy pixels from texture
 //
 ////////////////////////////////////////////////////////////////
-bool CPixelsManager::GetTexturePixels ( IDirect3DBaseTexture9* pD3DBaseTexture, CPixels& outPixels, const RECT* pRect )
+bool CPixelsManager::GetTexturePixels ( IDirect3DBaseTexture9* pD3DBaseTexture, CPixels& outPixels, const RECT* pRect, uint uiSurfaceIndex )
 {
     if ( !pD3DBaseTexture )
         return false;
 
-    if ( pD3DBaseTexture->GetType () != D3DRTYPE_TEXTURE )
-        return false;
-
     IDirect3DSurface9* pD3DSurface = NULL;
-    ((IDirect3DTexture9*)pD3DBaseTexture)->GetSurfaceLevel ( 0, &pD3DSurface );
-    if ( !pD3DSurface )
-        return false;
+
+    D3DRESOURCETYPE resourceType = pD3DBaseTexture->GetType ();
+    if ( resourceType == D3DRTYPE_VOLUMETEXTURE )
+    {
+        return GetVolumeTexturePixels ( (IDirect3DVolumeTexture9*)pD3DBaseTexture, outPixels, pRect, uiSurfaceIndex );
+    }
+    else
+    if ( resourceType == D3DRTYPE_CUBETEXTURE )
+    {
+        D3DCUBEMAP_FACES FaceType = (D3DCUBEMAP_FACES)uiSurfaceIndex;
+        ((IDirect3DCubeTexture9*)pD3DBaseTexture)->GetCubeMapSurface ( FaceType, 0, &pD3DSurface );
+        if ( !pD3DSurface )
+            return false;
+    }
+    else
+    if ( resourceType == D3DRTYPE_TEXTURE )
+    {
+        ((IDirect3DTexture9*)pD3DBaseTexture)->GetSurfaceLevel ( 0, &pD3DSurface );
+        if ( !pD3DSurface )
+            return false;
+    }
+
+
 
     bool bResult = false;
     D3DSURFACE_DESC Desc;
@@ -188,18 +159,34 @@ bool CPixelsManager::GetTexturePixels ( IDirect3DBaseTexture9* pD3DBaseTexture, 
 // Copy pixels into texture
 //
 ////////////////////////////////////////////////////////////////
-bool CPixelsManager::SetTexturePixels ( IDirect3DBaseTexture9* pD3DBaseTexture, const CPixels& pixels, const RECT* pRect )
+bool CPixelsManager::SetTexturePixels ( IDirect3DBaseTexture9* pD3DBaseTexture, const CPixels& pixels, const RECT* pRect, uint uiSurfaceIndex )
 {
     if ( !pD3DBaseTexture )
         return false;
 
-    if ( pD3DBaseTexture->GetType () != D3DRTYPE_TEXTURE )
-        return false;
-
     IDirect3DSurface9* pD3DSurface = NULL;
-    ((IDirect3DTexture9*)pD3DBaseTexture)->GetSurfaceLevel ( 0, &pD3DSurface );
-    if ( !pD3DSurface )
-        return false;
+
+    D3DRESOURCETYPE resourceType = pD3DBaseTexture->GetType ();
+    if ( resourceType == D3DRTYPE_VOLUMETEXTURE )
+    {
+        return SetVolumeTexturePixels ( (IDirect3DVolumeTexture9*)pD3DBaseTexture, pixels, pRect, uiSurfaceIndex );
+    }
+    else
+    if ( resourceType == D3DRTYPE_CUBETEXTURE )
+    {
+        D3DCUBEMAP_FACES FaceType = (D3DCUBEMAP_FACES)uiSurfaceIndex;
+        ((IDirect3DCubeTexture9*)pD3DBaseTexture)->GetCubeMapSurface ( FaceType, 0, &pD3DSurface );
+        if ( !pD3DSurface )
+            return false;
+    }
+    else
+    if ( resourceType == D3DRTYPE_TEXTURE )
+    {
+        ((IDirect3DTexture9*)pD3DBaseTexture)->GetSurfaceLevel ( 0, &pD3DSurface );
+        if ( !pD3DSurface )
+            return false;
+    }
+
 
     bool bResult = false;
     D3DSURFACE_DESC Desc;
@@ -759,6 +746,9 @@ bool CPixelsManager::GetPixelColor ( const CPixels& pixels, uint uiPosX, uint ui
     if ( !GetPlainDimensions ( pixels, uiWidth, uiHeight ) )
         return false;
 
+    if ( uiPosX >= uiWidth || uiPosY >= uiHeight )
+        return false;
+
     uint uiOffset = uiPosX + uiPosY * uiHeight;
 
     const SColor* pColorArray = (const SColor*)pixels.GetData ();
@@ -779,6 +769,9 @@ bool CPixelsManager::SetPixelColor ( CPixels& pixels, uint uiPosX, uint uiPosY, 
 {
     uint uiWidth, uiHeight;
     if ( !GetPlainDimensions ( pixels, uiWidth, uiHeight ) )
+        return false;
+
+    if ( uiPosX >= uiWidth || uiPosY >= uiHeight )
         return false;
 
     uint uiOffset = uiPosX + uiPosY * uiHeight;

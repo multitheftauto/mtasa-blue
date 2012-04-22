@@ -47,6 +47,17 @@ enum ERenderFormat
     RFORMAT_DXT5                 = '5TXD',
 };
 
+enum ETextureType
+{
+    //RTYPE_SURFACE                =  1,
+    //RTYPE_VOLUME                 =  2,
+    TTYPE_TEXTURE                =  3,
+    TTYPE_VOLUMETEXTURE          =  4,
+    TTYPE_CUBETEXTURE            =  5,
+    //RTYPE_VERTEXBUFFER           =  6,
+    //RTYPE_INDEXBUFFER            =  7,
+};
+
 enum eDxTestMode
 {
     DX_TEST_MODE_NONE,
@@ -102,7 +113,7 @@ public:
     virtual void                DoPulse                             ( void ) = 0;
     virtual CDxFontItem*        CreateDxFont                        ( const SString& strFullFilePath, uint uiSize, bool bBold ) = 0;
     virtual CGuiFontItem*       CreateGuiFont                       ( const SString& strFullFilePath, const SString& strFontName, uint uiSize ) = 0;
-    virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath, const CPixels* pPixels = NULL, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN ) = 0;
+    virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath, const CPixels* pPixels = NULL, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1 ) = 0;
     virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug ) = 0;
     virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false ) = 0;
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY ) = 0;
@@ -391,15 +402,18 @@ class CFileTextureItem : public CTextureItem
 {
     DECLARE_CLASS( CFileTextureItem, CTextureItem )
                     CFileTextureItem        ( void ) : ClassInit ( this ) {}
-    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, const CPixels* pPixels, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN );
+    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, const CPixels* pPixels, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1 );
     virtual void    PreDestruct             ( void );
     virtual bool    IsValid                 ( void );
     virtual void    OnLostDevice            ( void );
     virtual void    OnResetDevice           ( void );
     void            CreateUnderlyingData    ( const SString& strFilename, bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format );
     void            CreateUnderlyingData    ( const CPixels* pPixels, bool bMipMaps, ERenderFormat format );
-    void            CreateUnderlyingData    ( bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format );
+    void            CreateUnderlyingData    ( bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format, ETextureType textureType, uint uiVolumeDepth );
     void            ReleaseUnderlyingData   ( void );
+
+    uint                    m_uiVolumeDepth;
+    ETextureType            m_TextureType;
 };
 
 

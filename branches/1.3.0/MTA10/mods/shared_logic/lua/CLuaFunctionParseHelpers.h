@@ -27,6 +27,7 @@ DECLARE_ENUM( eWeaponType )
 DECLARE_ENUM( eWeaponProperty )
 DECLARE_ENUM( eWeaponSkill )
 DECLARE_ENUM( ERenderFormat );
+DECLARE_ENUM( ETextureType );
 DECLARE_ENUM( EPixelsFormatType );
 DECLARE_ENUM( EBlendModeType )
 

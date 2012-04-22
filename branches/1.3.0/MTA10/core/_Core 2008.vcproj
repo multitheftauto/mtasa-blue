@@ -545,6 +545,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CPixelsManager_VolumeTexture.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CProxyDirect3D8.cpp"
 				>
 				<FileConfiguration
@@ -991,6 +995,10 @@
 			</File>
 			<File
 				RelativePath=".\CPEHookUtils.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CPixelsManager.h"
 				>
 			</File>
 			<File
