@@ -67,6 +67,8 @@ public:
     long long                   m_llDeltaGamePacketsSent;
     long long                   m_llDeltaGamePacketsRecv;
     long long                   m_llDeltaGamePacketsRecvBlocked;
+    long long                   m_llDeltaGameBytesResent;
+    long long                   m_llDeltaGameMessagesResent;
     std::vector < StringPair >  m_InfoList;
     std::vector < StringPair >  m_StatusList;
     std::vector < StringPair >  m_OptionsList;
@@ -170,6 +172,8 @@ void CPerfStatServerInfoImpl::RecordStats ( void )
     m_llDeltaGamePacketsSent = Max < long long > ( 0LL, liveStats.llOutgoingUDPPacketCount - m_PrevLiveStats.llOutgoingUDPPacketCount );
     m_llDeltaGamePacketsRecv = Max < long long > ( 0LL, liveStats.llIncomingUDPPacketCount - m_PrevLiveStats.llIncomingUDPPacketCount );
     m_llDeltaGamePacketsRecvBlocked = Max < long long > ( 0LL, liveStats.llIncomingUDPPacketCountBlocked - m_PrevLiveStats.llIncomingUDPPacketCountBlocked );
+    m_llDeltaGameBytesResent = Max < long long > ( 0LL, liveStats.llOutgoingUDPByteResentCount - m_PrevLiveStats.llOutgoingUDPByteResentCount );
+    m_llDeltaGameMessagesResent = Max < long long > ( 0LL, liveStats.llOutgoingUDPMessageResentCount - m_PrevLiveStats.llOutgoingUDPMessageResentCount );
     m_PrevLiveStats = liveStats;
 
     // Save sample period length
@@ -209,9 +213,11 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     long long llIncomingBytesPS = CPerfStatManager::GetPerSecond ( m_llDeltaGameBytesRecv, m_DeltaTickCount.ToLongLong () );
     long long llIncomingBytesPSBlocked = CPerfStatManager::GetPerSecond ( m_llDeltaGameBytesRecvBlocked, m_DeltaTickCount.ToLongLong () );
     long long llOutgoingBytesPS = CPerfStatManager::GetPerSecond ( m_llDeltaGameBytesSent, m_DeltaTickCount.ToLongLong () );
+    long long llOutgoingBytesResentPS = CPerfStatManager::GetPerSecond ( m_llDeltaGameBytesResent, m_DeltaTickCount.ToLongLong () );
     SString strIncomingPacketsPS = CPerfStatManager::GetPerSecondString ( m_llDeltaGamePacketsRecv, m_DeltaTickCount.ToDouble () );
     SString strIncomingPacketsPSBlocked = CPerfStatManager::GetPerSecondString ( m_llDeltaGamePacketsRecvBlocked, m_DeltaTickCount.ToDouble () );
     SString strOutgoingPacketsPS = CPerfStatManager::GetPerSecondString ( m_llDeltaGamePacketsSent, m_DeltaTickCount.ToDouble () );
+    SString strOutgoingMessagesResentPS = CPerfStatManager::GetPerSecondString ( m_llDeltaGameMessagesResent, m_DeltaTickCount.ToDouble () );
 
     // Estimate total network usage
     long long llIncomingPacketsPS = CPerfStatManager::GetPerSecond ( m_llDeltaGamePacketsRecv, m_DeltaTickCount.ToLongLong () );
@@ -248,8 +254,10 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     m_StatusList.push_back ( StringPair ( "Players",                    SString ( "%d / %d", g_pGame->GetPlayerManager ()->Count (), pConfig->GetMaxPlayers () ) ) );
     m_StatusList.push_back ( StringPair ( "Bytes/sec incoming",         CPerfStatManager::GetScaledByteString ( llIncomingBytesPS ) ) );
     m_StatusList.push_back ( StringPair ( "Bytes/sec outgoing",         CPerfStatManager::GetScaledByteString ( llOutgoingBytesPS ) ) );
+    m_StatusList.push_back ( StringPair ( "Bytes/sec outgoing resent",  CPerfStatManager::GetScaledByteString ( llOutgoingBytesResentPS ) ) );
     m_StatusList.push_back ( StringPair ( "Packets/sec incoming",       strIncomingPacketsPS ) );
     m_StatusList.push_back ( StringPair ( "Packets/sec outgoing",       strOutgoingPacketsPS ) );
+    m_StatusList.push_back ( StringPair ( "Msgs/sec outgoing resent",   strOutgoingMessagesResentPS ) );
     m_StatusList.push_back ( StringPair ( "Approx network usage",       CPerfStatManager::GetScaledBitString ( llNetworkUsageBytesPS * 8LL ) + "/s" ) );
     m_OptionsList.push_back ( StringPair ( "MinClientVersion",          pConfig->GetMinimumClientVersion () ) );
     m_OptionsList.push_back ( StringPair ( "RecommendedClientVersion",  pConfig->GetRecommendedClientVersion () ) );
@@ -270,15 +278,6 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         m_OptionsList.push_back ( StringPair ( "Max LS plrs/frame",         SString ( "%d", g_pBandwidthSettings->iLightSyncPlrsPerFrame ) ) );
         m_OptionsList.push_back ( StringPair ( "Test - Everyone near",      SString ( "%d", g_pBandwidthSettings->bTestPretendEveryoneIsNear ) ) );
         m_OptionsList.push_back ( StringPair ( "Test - Send multiplier",    SString ( "%d", g_pBandwidthSettings->iTestSendMultiplier ) ) );
-
-        NetStatistics netStatistics;
-        NetServerPlayerID playerId;
-        if ( g_pNetServer->GetNetworkStatistics ( &netStatistics, playerId ) )
-        {
-            m_OptionsList.push_back ( StringPair ( "messageDataBitsResent", SString ( "%lld", netStatistics.raw.messageDataBitsResent ) ) );
-            m_OptionsList.push_back ( StringPair ( "packetlossTotal",       SString ( "%0.1f%%", netStatistics.packetlossTotal ) ) );
-            m_OptionsList.push_back ( StringPair ( "packetlossLastSecond",  SString ( "%0.1f%%", netStatistics.packetlossLastSecond ) ) );
-        }
     }    
 
     // Add columns

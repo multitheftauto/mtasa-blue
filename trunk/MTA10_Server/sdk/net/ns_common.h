@@ -121,6 +121,8 @@ struct SBandwidthStatistics
     long long llOutgoingUDPPacketCount;
     long long llIncomingUDPPacketCount;
     long long llIncomingUDPPacketCountBlocked;
+    long long llOutgoingUDPByteResentCount;
+    long long llOutgoingUDPMessageResentCount;
 };
 
 enum ePacketOrdering
