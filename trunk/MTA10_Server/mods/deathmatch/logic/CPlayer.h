@@ -87,7 +87,7 @@ public:
     inline int                                  GetClientType               ( void )                                { return CClient::CLIENT_PLAYER; };
     inline unsigned long                        GetTimeConnected            ( void ) const                          { return m_ulTimeConnected; };
 
-    inline const char*                          GetNick                     ( void )                                { return m_szNick; };
+    inline const char*                          GetNick                     ( void )                                { return m_strNick; };
     void                                        SetNick                     ( const char* szNick );
 
     inline int                                  GetGameVersion              ( void )                                { return m_iGameVersion; };
@@ -337,7 +337,7 @@ private:
 
     CPlayerTextManager*                         m_pPlayerTextManager;
 
-    char                                        m_szNick [MAX_NICK_LENGTH + 1];
+    SString                                     m_strNick;
     bool                                        m_bDoNotSendEntities;
     int                                         m_iGameVersion;
     unsigned short                              m_usMTAVersion;

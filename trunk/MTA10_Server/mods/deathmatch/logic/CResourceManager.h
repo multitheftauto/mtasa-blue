@@ -80,7 +80,7 @@ public:
     inline unsigned int         GetResourceFailedCount          ( void )            { return m_uiResourceFailedCount; }
     void                        OnPlayerJoin                    ( CPlayer& Player );
     
-    char *                      GetResourceDirectory            ( void );
+    const char*                 GetResourceDirectory            ( void );
 
     bool                        StartResource                   ( CResource* pResource, list < CResource* > * dependents = NULL, bool bStartedManually = false, bool bStartIncludedResources = true, bool bConfigs = true, bool bMaps = true, bool bScripts = true, bool bHTML = true, bool bClientConfigs = true, bool bClientScripts = true, bool bClientFiles = true );
     bool                        Reload                          ( CResource* pResource );
@@ -119,7 +119,7 @@ public:
     void                        ReevaluateMinClientRequirement  ( void );
 
 private:
-    char                        m_szResourceDirectory[260];
+    SString                     m_strResourceDirectory;
     CMappedList < CResource* >  m_resources;
     unsigned int                m_uiResourceLoadedCount;
     unsigned int                m_uiResourceFailedCount;

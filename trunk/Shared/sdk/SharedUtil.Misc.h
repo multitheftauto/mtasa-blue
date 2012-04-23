@@ -537,17 +537,17 @@ namespace SharedUtil
     // Fixed sized string buffer
     //
     template < int MAX_LENGTH >
-    class CStaticString
+    class SFixedString
     {
         char szData [ MAX_LENGTH + 1 ];
     public:
-        CStaticString ( void )
+        SFixedString ( void )
         {
             szData[0] = 0;
         }
 
         // In  
-        CStaticString& operator= ( const char* szOther )
+        SFixedString& operator= ( const char* szOther )
         {
             STRNCPY( szData, szOther, MAX_LENGTH + 1 );
             return *this;
@@ -1376,6 +1376,51 @@ namespace SharedUtil
             delete this;
         }
     };
+
+
+
+    //
+    // Fixed size array
+    //
+    // Replacement for e.g.  int var[100]
+    // Checks bounds during debug
+    //
+    template < class T, int SIZE >
+    struct SFixedArray
+    {
+        T& operator[] ( uint uiIndex )
+        {
+            dassert ( uiIndex < SIZE );
+            return data [ uiIndex ];
+        }
+
+        const T& operator[] ( uint uiIndex ) const
+        {
+            dassert ( uiIndex < SIZE );
+            return data [ uiIndex ];
+        }
+
+        T data [ SIZE ];
+    };
+
+
+    //
+    // Fixed size array with a constructer
+    // so it can be used with the IMPLEMENT_FIXED_ARRAY macro
+    //
+    template < class T, int SIZE >
+    struct SFixedArrayInit : SFixedArray < T, SIZE >
+    {
+        SFixedArrayInit ( const T* pInitData, uint uiInitCount )
+        {
+            dassert ( SIZE == uiInitCount );
+            memcpy ( data, pInitData, sizeof ( data ) );
+        }
+    };
+
+    // Use this macro if the size of the initializer list is unknown
+    #define IMPLEMENT_FIXED_ARRAY( vartype, varname ) \
+        SFixedArrayInit < vartype, NUMELMS( _##varname ) > varname ( _##varname, NUMELMS( _##varname ) )
 
 };
 

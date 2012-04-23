@@ -113,6 +113,7 @@ public:
     bool            BeginsWith          ( const SString& strOther ) const;
     bool            BeginsWithI         ( const SString& strOther ) const;
     static SString  Join                ( const SString& strDelim, const std::vector < SString >& parts, int iFirst = 0, int iCount = 0x3fffffff );
+    void            AssignLeft          ( const char* szOther, uint uiMaxLength );
 };
 
 

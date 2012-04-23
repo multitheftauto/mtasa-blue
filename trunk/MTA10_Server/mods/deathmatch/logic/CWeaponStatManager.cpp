@@ -10,9 +10,9 @@
 *****************************************************************************/
 #include "StdInc.h"
 
-sWeaponInfo CWeaponStatManager::OriginalPoorWeaponData [ WEAPONTYPE_MAX+1 ];
-sWeaponInfo CWeaponStatManager::OriginalNormalWeaponData [ WEAPONTYPE_MAX+1 ];
-sWeaponInfo CWeaponStatManager::OriginalHitmanWeaponData [ WEAPONTYPE_MAX+1 ];
+SFixedArray < sWeaponInfo, WEAPONTYPE_MAX+1 > CWeaponStatManager::OriginalPoorWeaponData;
+SFixedArray < sWeaponInfo, WEAPONTYPE_MAX+1 > CWeaponStatManager::OriginalNormalWeaponData;
+SFixedArray < sWeaponInfo, WEAPONTYPE_MAX+1 > CWeaponStatManager::OriginalHitmanWeaponData;
 CWeaponStatManager::CWeaponStatManager ( )
 {
     Init();

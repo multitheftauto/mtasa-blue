@@ -40,9 +40,9 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_bUnoccupiedSyncable = true;
     m_pSyncer = NULL;
     GetInitialDoorStates ( m_ucDoorStates );
-    memset ( m_ucWheelStates, 0, sizeof ( m_ucWheelStates ) );
-    memset ( m_ucPanelStates, 0, sizeof ( m_ucPanelStates ) );
-    memset ( m_ucLightStates, 0, sizeof ( m_ucLightStates ) );
+    memset ( &m_ucWheelStates[0], 0, sizeof ( m_ucWheelStates ) );
+    memset ( &m_ucPanelStates[0], 0, sizeof ( m_ucPanelStates ) );
+    memset ( &m_ucLightStates[0], 0, sizeof ( m_ucLightStates ) );
     m_ucOverrideLights = 0;
     m_pTowedVehicle = NULL;
     m_pTowedByVehicle = NULL;
@@ -660,9 +660,9 @@ void CVehicle::SpawnAt ( const CVector& vecPosition, const CVector& vecRotation 
     SetBlowTime ( 0 );
     SetIdleTime ( 0 );
     GetInitialDoorStates ( m_ucDoorStates );
-    memset ( m_ucWheelStates, 0, sizeof ( m_ucWheelStates ) );
-    memset ( m_ucPanelStates, 0, sizeof ( m_ucPanelStates ) );
-    memset ( m_ucLightStates, 0, sizeof ( m_ucLightStates ) );
+    memset ( &m_ucWheelStates[0], 0, sizeof ( m_ucWheelStates ) );
+    memset ( &m_ucPanelStates[0], 0, sizeof ( m_ucPanelStates ) );
+    memset ( &m_ucLightStates[0], 0, sizeof ( m_ucLightStates ) );
     SetLandingGearDown ( true );
     SetAdjustableProperty ( 0 );
     SetTowedByVehicle ( NULL );
@@ -725,7 +725,7 @@ void CVehicle::SetPaintjob ( unsigned char ucPaintjob )
 }
 
 
-void CVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
+void CVehicle::GetInitialDoorStates ( SFixedArray < unsigned char, MAX_DOORS >& ucOutDoorStates )
 {
     switch ( m_usModel )
     {
@@ -745,13 +745,13 @@ void CVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
         case VT_RCTIGER:
         case VT_TRACTOR:
         case VT_VORTEX:
-            memset ( pucDoorStates, DT_DOOR_MISSING, 6 );
+            memset ( &ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS );
 
             // Keep the bonet and boot intact
-            pucDoorStates [ 0 ] = pucDoorStates [ 1 ] = DT_DOOR_INTACT;
+            ucOutDoorStates [ 0 ] = ucOutDoorStates [ 1 ] = DT_DOOR_INTACT;
             break;
         default:
-            memset ( pucDoorStates, DT_DOOR_INTACT, 6 );
+            memset ( &ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS );
     }
 }
 

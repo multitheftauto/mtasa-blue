@@ -368,10 +368,10 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
                 pTemp->SetHealth ( pVehicle->GetHealth () );
                 pTemp->SetColor ( pVehicle->GetColor () );
                 pTemp->SetUpgrades ( pVehicle->GetUpgrades () );
-                memcpy ( pTemp->m_ucDoorStates, pVehicle->m_ucDoorStates, MAX_DOORS );
-                memcpy ( pTemp->m_ucWheelStates, pVehicle->m_ucWheelStates, MAX_WHEELS );
-                memcpy ( pTemp->m_ucPanelStates, pVehicle->m_ucPanelStates, MAX_PANELS );
-                memcpy ( pTemp->m_ucLightStates, pVehicle->m_ucLightStates, MAX_LIGHTS );
+                pTemp->m_ucDoorStates = pVehicle->m_ucDoorStates;
+                pTemp->m_ucWheelStates = pVehicle->m_ucWheelStates;
+                pTemp->m_ucPanelStates = pVehicle->m_ucPanelStates;
+                pTemp->m_ucLightStates = pVehicle->m_ucLightStates;
 
                 pNewElement = pTemp;
             }
@@ -5110,9 +5110,9 @@ bool CStaticFunctionDefinitions::FixVehicle ( CElement* pElement )
         // Repair it
         pVehicle->SetHealth ( DEFAULT_VEHICLE_HEALTH );
         pVehicle->GetInitialDoorStates ( pVehicle->m_ucDoorStates );
-        memset ( pVehicle->m_ucWheelStates, 0, sizeof ( pVehicle->m_ucWheelStates ) );
-        memset ( pVehicle->m_ucPanelStates, 0, sizeof ( pVehicle->m_ucPanelStates ) );
-        memset ( pVehicle->m_ucLightStates, 0, sizeof ( pVehicle->m_ucLightStates ) );
+        memset ( &pVehicle->m_ucWheelStates[0], 0, sizeof ( pVehicle->m_ucWheelStates ) );
+        memset ( &pVehicle->m_ucPanelStates[0], 0, sizeof ( pVehicle->m_ucPanelStates ) );
+        memset ( &pVehicle->m_ucLightStates[0], 0, sizeof ( pVehicle->m_ucLightStates ) );
 
         pVehicle->SetBlowTime ( 0 );
 
@@ -6452,7 +6452,7 @@ bool CStaticFunctionDefinitions::SetVehicleWheelStates ( CElement* pElement, int
                 if ( iRearRight != -1 )  pVehicle->m_ucWheelStates [ REAR_RIGHT_WHEEL ] = iRearRight;
 
                 CBitStream BitStream;
-                BitStream.pBitStream->Write ( ( char * ) pVehicle->m_ucWheelStates, MAX_WHEELS );
+                BitStream.pBitStream->Write ( ( char * ) &pVehicle->m_ucWheelStates[0], MAX_WHEELS );
                 m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_WHEEL_STATES, *BitStream.pBitStream ) );
 
                 return true;
@@ -9441,8 +9441,8 @@ bool CStaticFunctionDefinitions::IsGarageOpen ( unsigned char ucGarageID, bool& 
 {
     if ( ucGarageID >= 0 && ucGarageID < MAX_GARAGES )
     {
-        bool* pbGarageStates = g_pGame->GetGarageStates();
-        bIsOpen = pbGarageStates[ ucGarageID ];
+        const SGarageStates& garageStates = g_pGame->GetGarageStates ();
+        bIsOpen = garageStates[ ucGarageID ];
         return true;
     }
     return false;
@@ -9964,8 +9964,8 @@ bool CStaticFunctionDefinitions::SetGarageOpen ( unsigned char ucGarageID, bool 
 {
     if ( ucGarageID < MAX_GARAGES )
     {
-        bool* pbGarageStates = g_pGame->GetGarageStates();
-        pbGarageStates [ ucGarageID ] = bIsOpen;
+        SGarageStates& garageStates = g_pGame->GetGarageStates();
+        garageStates [ ucGarageID ] = bIsOpen;
 
         CBitStream BitStream;
         BitStream.pBitStream->Write ( ucGarageID );

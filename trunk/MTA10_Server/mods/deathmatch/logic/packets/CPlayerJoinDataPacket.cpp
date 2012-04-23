@@ -16,9 +16,6 @@
 
 bool CPlayerJoinDataPacket::Read ( NetBitStreamInterface& BitStream )
 {
-    m_szNick [ MAX_NICK_LENGTH ] = 0;
-    m_szSerialUser [MAX_SERIAL_LENGTH] = 0;
-
     // Read out the stuff
     if ( !BitStream.Read ( m_usNetVersion ) ||
          !BitStream.Read ( m_usMTAVersion ) )
@@ -31,8 +28,15 @@ bool CPlayerJoinDataPacket::Read ( NetBitStreamInterface& BitStream )
 
     m_bOptionalUpdateInfoRequired = BitStream.ReadBit ();
 
-    return ( BitStream.Read ( m_ucGameVersion ) &&
-             BitStream.Read ( m_szNick, MAX_NICK_LENGTH ) &&
+    if ( BitStream.Read ( m_ucGameVersion ) &&
+             BitStream.ReadStringCharacters ( m_strNick, MAX_NICK_LENGTH ) &&
              BitStream.Read ( reinterpret_cast < char* > ( &m_Password ), 16 ) &&
-             BitStream.Read ( m_szSerialUser, MAX_SERIAL_LENGTH ) );
+             BitStream.ReadStringCharacters ( m_strSerialUser, MAX_SERIAL_LENGTH ) )
+    {
+        // Shrink string sizes to fit
+        m_strNick = *m_strNick;
+        m_strSerialUser = *m_strSerialUser;
+        return true;
+    }
+    return false;
 }

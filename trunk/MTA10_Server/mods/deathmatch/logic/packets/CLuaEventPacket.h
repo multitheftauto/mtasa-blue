@@ -29,11 +29,11 @@ public:
     bool                    Read                        ( NetBitStreamInterface& BitStream );
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
-    inline char*            GetName                     ( void )                    { return m_szName; }
+    inline const char*      GetName                     ( void )                    { return m_strName; }
     inline ElementID        GetElementID                ( void )                    { return m_ElementID; }
     inline CLuaArguments&   GetArguments                ( void )                    { return m_Arguments; }
 private:
-    char                    m_szName [ MAX_EVENT_NAME_LENGTH ];
+    SString                 m_strName;
     ElementID               m_ElementID;
     CLuaArguments           m_Arguments;
 };

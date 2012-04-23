@@ -205,9 +205,8 @@ void CPerfStatBandwidthReductionImpl::GetStats ( CPerfStatResult* pResult, const
     pResult->AddColumn ( "Total - pure/light sync.Packets skipped" );
 
 
-    long long llTotals[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    //const char* szDesc[4] = { "Very near, or in FOV", "Near, just out of FOV", "Near, way out of FOV", "Far" };
-    const char* szDesc[4] = { "Very near/in FOV", "Near/close FOV", "Near/out FOV", "Far" };
+    SFixedArray < long long, 8 > llTotals = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    SFixedArray < const char*, 4 > szDesc = { "Very near/in FOV", "Near/close FOV", "Near/out FOV", "Far" };
 
     // Add puresync skipping zones
     for ( uint i = 0 ; i < ZONE_MAX ; i++ )

@@ -24,9 +24,7 @@ CMapEvent::CMapEvent ( CLuaMain* pMain, const char* szName, const CLuaFunctionRe
     m_bBeingDestroyed = false;
     m_eventPriority = eventPriority;
     m_fPriorityMod = fPriorityMod;
-
-    strncpy ( m_szName, szName, MAPEVENT_MAX_LENGTH_NAME );
-    m_szName [ MAPEVENT_MAX_LENGTH_NAME ] = '\0';
+    m_strName.AssignLeft ( szName, MAPEVENT_MAX_LENGTH_NAME );
 }
 
 

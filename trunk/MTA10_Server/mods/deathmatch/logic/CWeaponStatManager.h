@@ -94,9 +94,9 @@ private:
 
     std::list<CWeaponStat*>                                     m_OriginalWeaponData;
     std::list<CWeaponStat*>                                     m_WeaponData;
-    static sWeaponInfo                                          OriginalPoorWeaponData [ WEAPONTYPE_MAX+1 ];
-    static sWeaponInfo                                          OriginalNormalWeaponData [ WEAPONTYPE_MAX+1 ];
-    static sWeaponInfo                                          OriginalHitmanWeaponData [ WEAPONTYPE_MAX+1 ];
+    static SFixedArray < sWeaponInfo, WEAPONTYPE_MAX + 1 >      OriginalPoorWeaponData;
+    static SFixedArray < sWeaponInfo, WEAPONTYPE_MAX + 1 >      OriginalNormalWeaponData;
+    static SFixedArray < sWeaponInfo, WEAPONTYPE_MAX + 1 >      OriginalHitmanWeaponData;
 
 };
 

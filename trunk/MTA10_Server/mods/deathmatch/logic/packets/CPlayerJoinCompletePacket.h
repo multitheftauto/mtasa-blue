@@ -46,7 +46,7 @@ private:
     ElementID               m_RootElementID;
     eHTTPDownloadType       m_ucHTTPDownloadType;
     unsigned short          m_usHTTPDownloadPort;
-    char                    m_szHTTPDownloadURL [MAX_HTTP_DOWNLOAD_URL + 1];
+    SString                 m_strHTTPDownloadURL;
     int                     m_iHTTPMaxConnectionsPerClient;
     int                     m_iEnableClientChecks;
     bool                    m_bVoiceEnabled;

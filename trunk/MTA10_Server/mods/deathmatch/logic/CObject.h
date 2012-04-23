@@ -80,7 +80,6 @@ public:
 
 private:
     CObjectManager*             m_pObjectManager;
-    char                        m_szName [MAX_ELEMENT_NAME_LENGTH + 1];
     CVector                     m_vecRotation;
     unsigned char               m_ucAlpha;
     unsigned short              m_usModel;

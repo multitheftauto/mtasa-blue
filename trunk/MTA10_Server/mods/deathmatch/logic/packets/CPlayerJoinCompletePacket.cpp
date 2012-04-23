@@ -49,9 +49,7 @@ CPlayerJoinCompletePacket::CPlayerJoinCompletePacket ( ElementID PlayerID, unsig
         break;
     case HTTP_DOWNLOAD_ENABLED_URL:
         m_usHTTPDownloadPort = usHTTPDownloadPort;
-
-        strncpy ( m_szHTTPDownloadURL, szHTTPDownloadURL, MAX_HTTP_DOWNLOAD_URL );
-        m_szHTTPDownloadURL [MAX_HTTP_DOWNLOAD_URL] = 0;
+        m_strHTTPDownloadURL.AssignLeft ( szHTTPDownloadURL, MAX_HTTP_DOWNLOAD_URL );
         break;
     default:
         break;
@@ -97,13 +95,7 @@ bool CPlayerJoinCompletePacket::Write ( NetBitStreamInterface& BitStream ) const
         break;
     case HTTP_DOWNLOAD_ENABLED_URL:
         {
-            size_t sizeHTTPDownloadURL = strlen ( m_szHTTPDownloadURL );
-
-            BitStream.Write ( static_cast < unsigned short > ( sizeHTTPDownloadURL ) );
-            if ( sizeHTTPDownloadURL > 0 )
-            {
-                BitStream.Write ( const_cast < char* > ( m_szHTTPDownloadURL ), sizeHTTPDownloadURL );
-            }
+            BitStream.WriteString ( m_strHTTPDownloadURL );
         }
 
         break;

@@ -93,7 +93,7 @@ public:
     float fZone1Dot;
     float fZone2Dot;
     float fZone0RadiusSq;
-    int ZoneUpdateIntervals [ ZONE_MAX ];   // First is always 0, next is Zone1 interval then Zone2 and Zone3
+    SFixedArray < int, ZONE_MAX > ZoneUpdateIntervals;   // First is always 0, next is Zone1 interval then Zone2 and Zone3
     int iMaxZoneIfOtherCanSee;
     bool bLightSyncEnabled;
     int iLightSyncPlrsPerFrame;

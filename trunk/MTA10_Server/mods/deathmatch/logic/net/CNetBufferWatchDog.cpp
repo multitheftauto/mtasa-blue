@@ -460,7 +460,7 @@ bool CNetBufferWatchDog::CanReceivePacket ( uchar ucPacketID )
 //
 ///////////////////////////////////////////////////////////////
 #ifdef MTA_DEBUG
-static DWORD dwThreadIds[3] = { -1, -1, -1 };
+static SFixedArray < DWORD, 3 > dwThreadIds = { -1, -1, -1 };
 #endif
 void SetCurrentThreadType ( EActionWhoType type )
 {

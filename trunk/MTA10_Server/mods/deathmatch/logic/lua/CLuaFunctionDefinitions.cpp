@@ -4852,7 +4852,7 @@ int CLuaFunctionDefinitions::GetVehicleUpgrades ( lua_State* luaVM )
                 lua_newtable ( luaVM );
 
                 // Add all the upgrades to the table
-                unsigned short* usSlotStates = pUpgrades->GetSlotStates ();
+                const SSlotStates& usSlotStates = pUpgrades->GetSlotStates ();
 
                 unsigned int uiIndex = 0;
                 unsigned char ucSlot = 0;

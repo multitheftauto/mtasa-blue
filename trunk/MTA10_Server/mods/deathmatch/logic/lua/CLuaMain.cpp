@@ -82,8 +82,6 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
     // Set up the name of our script
     m_ulFunctionEnterTime = 0;
     m_iOwner = OWNER_SERVER;
-    m_szScriptName [0] = 0;
-    m_szScriptName [MAX_SCRIPTNAME_LENGTH] = 0;
 
     m_pObjectManager = pObjectManager;
     m_pPlayerManager = pPlayerManager;
@@ -212,10 +210,10 @@ void CLuaMain::InstructionCountHook ( lua_State* luaVM, lua_Debug* pDebug )
         if ( GetTime () >= pLuaMain->m_ulFunctionEnterTime + HOOK_MAXIMUM_TIME )
         {
             // Print it in the console
-            CLogger::ErrorPrintf ( "Infinite/too long execution (%s)\n", pLuaMain->GetScriptNamePointer () );
+            CLogger::ErrorPrintf ( "Infinite/too long execution (%s)\n", pLuaMain->GetScriptName () );
             
             SString strAbortInf = "Aborting; infinite running script in ";
-            strAbortInf += pLuaMain->GetScriptNamePointer ();
+            strAbortInf += pLuaMain->GetScriptName ();
             
             // Error out
             lua_pushstring ( luaVM, strAbortInf );

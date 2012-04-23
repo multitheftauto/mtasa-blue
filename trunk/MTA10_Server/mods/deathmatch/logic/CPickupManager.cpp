@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 
-static unsigned short g_usWeaponModels [47] =
+static SFixedArray < unsigned short, 47 > g_usWeaponModels =
 {   0, 331, 333, 334, 335, 336, 337, 338, 339, 341,     // 9
     321, 322, 323, 0, 325, 326, 342, 343, 344, 0,       // 19
     0, 0, 346, 347, 348, 349, 350, 351, 352, 353,       // 29

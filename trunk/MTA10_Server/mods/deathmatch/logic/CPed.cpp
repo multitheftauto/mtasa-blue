@@ -15,7 +15,7 @@
 #include "StdInc.h"
 
 char szBodyPartNameEmpty [] = "";
-struct SBodyPartName { char szName [32]; };
+struct SBodyPartName { const char szName [32]; };
 SBodyPartName BodyPartNames [10] =
 { {"Unknown"}, {"Unknown"}, {"Unknown"}, {"Torso"}, {"Ass"},
 {"Left Arm"}, {"Right Arm"}, {"Left Leg"}, {"Right Leg"}, {"Head"} };
@@ -38,7 +38,7 @@ CPed::CPed ( CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsig
     m_fArmor = 0.0f;
     m_ulArmorChangeTime = 0;
     
-    memset ( m_fStats, 0, sizeof ( m_fStats ) );
+    memset ( &m_fStats[0], 0, sizeof ( m_fStats ) );
     m_fStats [ 24 ] = 569.0f;           // default max_health
 
     m_pClothes = new CPlayerClothes;
@@ -53,7 +53,7 @@ CPed::CPed ( CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsig
     m_pTasks = new CPlayerTasks;
 
     m_ucWeaponSlot = 0;
-    memset ( m_Weapons, 0, sizeof ( m_Weapons ) );
+    memset ( &m_Weapons[0], 0, sizeof ( m_Weapons ) );
     m_ucAlpha = 255;
     m_pContactElement = NULL;
     m_bIsDead = true;
@@ -321,7 +321,7 @@ float CPed::GetMaxHealth ( void )
 
 const char* CPed::GetBodyPartName ( unsigned char ucID )
 {
-    if ( ucID <= 10 )
+    if ( ucID <= NUMELMS( BodyPartNames ) )
     {
         return BodyPartNames [ucID].szName;
     }

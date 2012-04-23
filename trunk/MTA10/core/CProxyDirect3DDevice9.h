@@ -406,7 +406,7 @@ public:
 
     struct SAdapterState
     {
-        CStaticString < 128 > Name;
+        SFixedString < 128 > Name;
         int InstalledMemoryKB;
         int MaxAnisotropicSetting;
     };
@@ -422,7 +422,7 @@ public:
         eD3DCallType callType;
         uint uiNumArgs;
         int args [ 10 ];
-        CStaticString < 32 > strShaderName;
+        SFixedString < 32 > strShaderName;
         bool bShaderRequiresNormals;
     };
 

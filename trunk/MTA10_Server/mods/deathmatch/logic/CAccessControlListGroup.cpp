@@ -18,9 +18,7 @@ CAccessControlListGroup::CAccessControlListGroup ( const char* szGroupName )
 : m_ObjectsById ( 512 )
 {
     m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::ACL_GROUP );
-    snprintf ( m_szGroupName, 256, "%s", szGroupName );
-    m_szGroupName[255] = '\0';
-
+    m_strGroupName = szGroupName;
     m_ObjectsById.set_empty_key ( (unsigned int)0xFB170551 );
     m_ObjectsById.set_deleted_key ( (unsigned int)0xF15AF001 );
 }
@@ -185,7 +183,7 @@ void CAccessControlListGroup::WriteToXMLNode ( CXMLNode* pNode )
 
     // Create attribute for the name and set it
     CXMLAttribute* pAttribute = pSubNode->GetAttributes ().Create ( "name" );
-    pAttribute->SetValue ( m_szGroupName );
+    pAttribute->SetValue ( m_strGroupName );
 
     // Write the ACL's this group use
     ACLsList::iterator iterACL = m_ACLs.begin ();
