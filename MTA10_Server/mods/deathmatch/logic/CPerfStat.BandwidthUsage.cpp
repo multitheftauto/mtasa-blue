@@ -51,12 +51,12 @@ namespace
 
     #define BW_STATS_TABLE_NAME     "`perfstats_bandwidth_usage`"
 
-    SFixedArray < SString, 4 > BWStatIndexNameList = {
+    SFixedArray < SString, 4 > BWStatIndexNameList = { {
                                         "Special",
                                         "Hour",
                                         "Day",
                                         "Month",
-                                    };
+                                    } };
 
     const SString& BWStatIndexToName ( uint uiIndex )
     {
@@ -526,11 +526,11 @@ void CPerfStatBandwidthUsageImpl::GetStats ( CPerfStatResult* pResult, const std
     //
     // Determine if blocked column contains any data
     //
-    SFixedArray < uint, 3 > showTypeList = {
+    SFixedArray < uint, 3 > showTypeList = { {
                             BWSTAT_INDEX_HOURS,
                             BWSTAT_INDEX_DAYS,
                             BWSTAT_INDEX_MONTHS,
-                          };
+                          } };
 
     SFixedArray < bool, NUMELMS( showTypeList ) > bShowBlocked;
 
