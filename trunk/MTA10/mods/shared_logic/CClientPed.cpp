@@ -49,10 +49,16 @@ enum eAnimIDs
 
 #define STEALTH_KILL_RANGE 2.5f
 
-struct SBodyPartName { char szName [32]; };
-SBodyPartName BodyPartNames [10] =
-{ {"Unknown"}, {"Unknown"}, {"Unknown"}, {"Torso"}, {"Ass"},
-{"Left Arm"}, {"Right Arm"}, {"Left Leg"}, {"Right Leg"}, {"Head"} };
+struct SBodyPartName
+{
+    const char* szName;
+};
+
+static const SFixedArray < SBodyPartName, 10 > BodyPartNames =
+{ {
+    {"Unknown"}, {"Unknown"}, {"Unknown"}, {"Torso"}, {"Ass"},
+    {"Left Arm"}, {"Right Arm"}, {"Left Leg"}, {"Right Leg"}, {"Head"}
+} };
 
 // HACK: saves unneccesary loading of clothes textures
 CClientPed* g_pLastRebuilt = NULL;
@@ -155,7 +161,6 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bDestroyingSatchels = false;
     m_bDoingGangDriveby = false;
     m_pAnimationBlock = NULL;
-    m_szAnimationName = NULL;
     m_bRequestedAnimation = false;
     m_iTimeAnimation = -1;
     m_bLoopAnimation = false;    
@@ -2771,11 +2776,9 @@ void CClientPed::StreamedInPulse ( void )
                 m_bRequestedAnimation = false;
 
                 // Copy our name incase it gets deleted
-                char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
-                strcpy ( szAnimName, m_szAnimationName );
+                SString strAnimName = m_strAnimationName;
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
-                delete [] szAnimName;                
+                RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
             }            
         }
 
@@ -3215,11 +3218,9 @@ void CClientPed::_CreateModel ( void )
         if ( m_bLoopAnimation && m_pAnimationBlock )
         {
             // Copy our anim name incase it gets deleted
-            char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
-            strcpy ( szAnimName, m_szAnimationName );
+            SString strAnimName = m_strAnimationName;
             // Run our animation
-            RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
-            delete [] szAnimName;
+            RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
         }
 
         // Set the voice that corresponds to our model
@@ -3450,11 +3451,9 @@ void CClientPed::_ChangeModel ( void )
             if ( m_bLoopAnimation && m_pAnimationBlock )
             {
                 // Copy our anim name incase it gets deleted
-                char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
-                strcpy ( szAnimName, m_szAnimationName );
+                SString strAnimName = m_strAnimationName;
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
-                delete [] szAnimName;
+                RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
             }
 
             // Set the voice that corresponds to the new model
@@ -4713,7 +4712,7 @@ void CClientPed::Respawn ( CVector * pvecPosition, bool bRestoreState, bool bCam
 }
 
 
-char* CClientPed::GetBodyPartName ( unsigned char ucID )
+const char* CClientPed::GetBodyPartName ( unsigned char ucID )
 {
     if ( ucID <= 10 )
     {
@@ -5136,8 +5135,7 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
         }
     }
     m_pAnimationBlock = pBlock;
-    m_szAnimationName = new char [ strlen ( szAnimName ) + 1 ];
-    strcpy ( m_szAnimationName, szAnimName ); 
+    m_strAnimationName = szAnimName; 
     m_iTimeAnimation = iTime;
     m_bLoopAnimation = bLoop;
     m_bUpdatePositionAnimation = bUpdatePosition;
@@ -5163,11 +5161,7 @@ void CClientPed::KillAnimation ( void )
         }
     }
     m_pAnimationBlock = NULL;
-    if ( m_szAnimationName )
-    {
-        delete [] m_szAnimationName;
-        m_szAnimationName = NULL;
-    }
+    m_strAnimationName = "";
     m_bRequestedAnimation = false;
 }
 

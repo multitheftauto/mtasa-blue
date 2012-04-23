@@ -183,7 +183,7 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     for ( unsigned char i = 0 ; i < MAX_GARAGES ; i++ )
     {
         const SGarageStates& garageStates = *m_pGarageStates;
-        BitStream.WriteBit( static_cast < unsigned char > ( garageStates[i] ) );
+        BitStream.WriteBit( garageStates[i] );
     }
 
     // Write the fun bugs state

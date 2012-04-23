@@ -29,7 +29,7 @@ public:
     static void             PushClientID            ( ElementID ID );
 
 private:
-    static CClientEntity*       m_Elements [MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS];
+    static SFixedArray < CClientEntity*, MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS > m_Elements;
     static CStack < ElementID, MAX_CLIENT_ELEMENTS - 2 > m_ClientStack;
 };
 

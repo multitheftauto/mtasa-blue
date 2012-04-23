@@ -26,6 +26,8 @@ enum eVehicleUpgrade
     VEHICLEUPGRADE_HYDRAULICS = 1087,
 };
 
+typedef SFixedArray < unsigned short, VEHICLE_UPGRADE_SLOTS > SSlotStates;
+
 class CVehicleUpgrades
 {
 public:
@@ -41,14 +43,14 @@ public:
     bool                    HasUpgrade                  ( unsigned short usUpgrade );
     bool                    RemoveUpgrade               ( unsigned short usUpgrade );
     unsigned short          GetSlotState                ( unsigned char ucSlot );
-    inline unsigned short*  GetSlotStates               ( void )        { return m_SlotStates; }
+    const SSlotStates&      GetSlotStates               ( void )        { return m_SlotStates; }
     static const char*      GetSlotName                 ( unsigned char ucSlot );
 
     void                    ReAddAll                    ( void );
     void                    RemoveAll                   ( bool bRipFromVehicle );
 
 protected:
-    unsigned short          m_SlotStates [ VEHICLE_UPGRADE_SLOTS ];
+    SSlotStates             m_SlotStates;
     CClientVehicle*         m_pVehicle;
 };
 

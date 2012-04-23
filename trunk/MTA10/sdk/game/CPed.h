@@ -194,7 +194,7 @@ public:
     virtual bool            IsWearingGoggles ( void )=0;
     virtual void            SetGogglesState ( bool bIsWearingThem )=0;
 
-    virtual void            SetClothesTextureAndModel ( char * szModel, char * szModelLocationName, int iTexture ) = 0;
+    virtual void            SetClothesTextureAndModel ( const char* szModel, const char* szModelLocationName, int iTexture ) = 0;
     virtual void            RebuildPlayer ( void ) = 0;
 
     virtual eFightingStyle  GetFightingStyle ( void ) = 0;

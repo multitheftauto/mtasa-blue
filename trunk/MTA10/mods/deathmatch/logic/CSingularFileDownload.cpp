@@ -15,16 +15,10 @@
 CSingularFileDownload::CSingularFileDownload ( CResource* pResource, const char *szName, const char *szNameShort, SString strHTTPURL, CChecksum checksum )
 {
     // Store the name
-    size_t sizeName = strlen ( szName );
-    m_szName = new char [ sizeName + 1 ];
-    strcpy ( m_szName, szName );
-    m_szName[sizeName] = '\0';
+    m_strName = szName;
 
     // Store the  name (short)
-    size_t sizeNameShort = strlen ( szNameShort );
-    m_szNameShort = new char [ sizeNameShort + 1 ];
-    strcpy ( m_szNameShort, szNameShort );
-    m_szNameShort[sizeNameShort] = '\0';
+    m_strNameShort = szName;
 
     // store the resource
     m_pResource = pResource;
@@ -50,17 +44,6 @@ CSingularFileDownload::CSingularFileDownload ( CResource* pResource, const char 
 
 CSingularFileDownload::~CSingularFileDownload ( void )
 {
-    if ( m_szName )
-    {
-        delete [] m_szName;
-        m_szName = 0;
-    }
-
-    if ( m_szNameShort )
-    {
-        delete [] m_szNameShort;
-        m_szNameShort = 0;
-    }
 }
 
 
@@ -118,7 +101,7 @@ bool CSingularFileDownload::DoesClientAndServerChecksumMatch ( void )
 
 CChecksum CSingularFileDownload::GenerateClientChecksum ( void )
 {
-    m_LastClientChecksum = CChecksum::GenerateChecksumFromFile ( m_szName );
+    m_LastClientChecksum = CChecksum::GenerateChecksumFromFile ( m_strName );
     return m_LastClientChecksum;
 }
 

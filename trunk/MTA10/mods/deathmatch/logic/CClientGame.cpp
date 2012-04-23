@@ -25,6 +25,14 @@
 #include "StdInc.h"
 #include <net/SyncStructures.h>
 
+SString StringZeroPadout ( const SString& strInput, uint uiPadoutSize )
+{
+    SString strResult = strInput;
+    while ( strResult.length () < uiPadoutSize )
+        strResult += '\0';
+    return strResult;
+}
+
 using SharedUtil::CalcMTASAPath;
 using std::list;
 using std::vector;
@@ -63,8 +71,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_ulLastClickTick = 0;
     m_pLocalPlayer = NULL;
     m_LocalID = INVALID_ELEMENT_ID;
-    m_szLocalNick [0] = 0;
-    m_szCurrentMapName [0] = 0;
     m_bShowNametags = true;
     m_bWaitingForLocalConnect = false;
     m_bShowRadar = false;
@@ -513,8 +519,7 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
     }
 
     // Store our nickname
-    strncpy ( m_szLocalNick, szNick, MAX_PLAYER_NICK_LENGTH );
-    m_szLocalNick [MAX_PLAYER_NICK_LENGTH] = 0;
+    m_strLocalNick.AssignLeft ( szNick, MAX_PLAYER_NICK_LENGTH );
 
     // Are we connected?
     if ( g_pNet->IsConnected () || m_bIsPlayingBack )
@@ -565,8 +570,9 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
             pBitStream->Write ( static_cast < unsigned char > ( g_pGame->GetGameVersion () ) );
             
             // Append user details
-            pBitStream->Write ( const_cast < char* > ( m_szLocalNick ), MAX_PLAYER_NICK_LENGTH );
-            pBitStream->Write ( reinterpret_cast < char* > ( Password.data ), sizeof ( MD5 ) );
+            SString strTemp = StringZeroPadout ( m_strLocalNick, MAX_PLAYER_NICK_LENGTH );
+            pBitStream->Write ( const_cast < const char* > ( *strTemp ), MAX_PLAYER_NICK_LENGTH );
+            pBitStream->Write ( reinterpret_cast < const char* > ( Password.data ), sizeof ( MD5 ) );
 
             // Append community information
             std::string strUser;
@@ -623,8 +629,7 @@ bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword 
     }
 
     // Store our nickname
-    strncpy ( m_szLocalNick, strNick.c_str(), MAX_PLAYER_NICK_LENGTH );
-    m_szLocalNick [MAX_PLAYER_NICK_LENGTH] = 0;
+    m_strLocalNick.AssignLeft ( strNick.c_str(), MAX_PLAYER_NICK_LENGTH );
 
     // Got a server?
     if ( m_bLocalPlay )
@@ -999,7 +1004,7 @@ void CClientGame::DoPulses ( void )
             g_pNet->SetServerBitStreamVersion ( MTA_DM_BITSTREAM_VERSION );
 
             // Run the game normally.
-            StartGame ( m_szLocalNick, m_Server.GetPassword().c_str() );
+            StartGame ( m_strLocalNick, m_Server.GetPassword().c_str() );
         }
         else
         {
@@ -2956,18 +2961,18 @@ void CClientGame::DrawWeaponsyncData ( CClientPlayer* pPlayer )
             vecPosition.fZ += 1.0f;
             g_pCore->GetGraphics ()->CalcScreenCoors ( &vecPosition, &vecScreenPosition );
 
-            char str [ 2048 ];
+            SString strTemp;
             int yoffset;
 
             yoffset = 0;
-            snprintf ( str, sizeof( str ), "Ammo in clip: %d", pWeapon->GetAmmoInClip () );
-            g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, COLOR_ARGB ( 255, 255, 255, 255 ), str, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
-            g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, COLOR_ARGB ( 255, 0, 0, 0 ), str, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+            strTemp.Format ( "Ammo in clip: %d", pWeapon->GetAmmoInClip () );
+            g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, COLOR_ARGB ( 255, 255, 255, 255 ), strTemp, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+            g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, COLOR_ARGB ( 255, 0, 0, 0 ), strTemp, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
 
             yoffset = 15;
-            snprintf ( str, sizeof( str ), "State: %d", pWeapon->GetState() );
-            g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, COLOR_ARGB ( 255, 255, 255, 255 ), str, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
-            g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, COLOR_ARGB ( 255, 0, 0, 0 ), str, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+            strTemp.Format ( "State: %d", pWeapon->GetState() );
+            g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, COLOR_ARGB ( 255, 255, 255, 255 ), strTemp, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+            g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, COLOR_ARGB ( 255, 0, 0, 0 ), strTemp, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
         }
     }
 }
@@ -3163,7 +3168,7 @@ void CClientGame::UpdateMimics ( void )
                         pMimicVehicle = new CDeathmatchVehicle ( m_pManager, m_pUnoccupiedVehicleSync, INVALID_ELEMENT_ID, uiModel, 0, 0 );
                         pMimicVehicle->SetPosition ( vecPosition );
 
-                        unsigned short * usUpgrades = pVehicle->GetUpgrades ()->GetSlotStates ();
+                        const SSlotStates& usUpgrades = pVehicle->GetUpgrades ()->GetSlotStates ();
                         for ( unsigned char uc = 0 ; uc < VEHICLE_UPGRADE_SLOTS ; uc++ )
                         {
                             if ( usUpgrades [ uc ] )
@@ -3345,7 +3350,7 @@ void CClientGame::Event_OnIngame ( void )
     g_pMultiplayer->DeleteAndDisableGangTags ();
 
     // Switch off peds and traffic
-    CVector vecs[] = {
+    SFixedArray < CVector, 5 > vecs = {
         CVector(-100000.0f, -100000.0f, -100000.0f),
         CVector( 100000.0f,  100000.0f,  100000.0f),
         CVector(-100000.0f, -100000.0f, -100000.0f),
@@ -3382,7 +3387,7 @@ void CClientGame::Event_OnIngame ( void )
         m_pLocalPlayer->SetParent ( m_pRootEntity );
 
         // Give the local player our nickname
-        m_pLocalPlayer->SetNick ( m_szLocalNick );
+        m_pLocalPlayer->SetNick ( m_strLocalNick );
 
         // Freeze the player at some location we won't see
         m_pLocalPlayer->SetHealth ( 100 );
@@ -4768,6 +4773,12 @@ void CClientGame::SendProjectileSync ( CClientProjectile * pProjectile )
         // Destroy it
         g_pNet->DeallocateNetBitStream ( pBitStream );
     }
+}
+
+
+void CClientGame::ResetAmmoInClip ( void )
+{
+    memset ( &m_wasWeaponAmmoInClip[0], 0, sizeof ( m_wasWeaponAmmoInClip ) );
 }
 
 

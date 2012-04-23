@@ -62,8 +62,8 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     // Set our default properties
     m_pDriver = NULL;
     m_pOccupyingDriver = NULL;
-    memset ( m_pPassengers, 0, sizeof ( m_pPassengers ) );
-    memset ( m_pOccupyingPassengers, 0, sizeof ( m_pOccupyingPassengers ) );
+    memset ( &m_pPassengers[0], 0, sizeof ( m_pPassengers ) );
+    memset ( &m_pOccupyingPassengers[0], 0, sizeof ( m_pOccupyingPassengers ) );
     m_pPreviousLink = NULL;
     m_pNextLink = NULL;
     m_Matrix.vFront.fY = 1.0f;

@@ -47,7 +47,7 @@ public:
 
 private:
     CGUIWindow*                         m_pWindow;
-    CGUIStaticImage*                    m_pIcon[TRANSFERBOX_FRAMES];
+    SFixedArray < CGUIStaticImage*, TRANSFERBOX_FRAMES >    m_pIcon;
     CGUILabel*                          m_pInfo;
     CGUIProgressBar*                    m_pProgress;
 

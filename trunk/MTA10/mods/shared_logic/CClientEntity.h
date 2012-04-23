@@ -166,10 +166,10 @@ public:
     inline void                                 SetSyncTimeContext      ( unsigned char ucContext ) { m_ucSyncTimeContext = ucContext; };
     bool                                        CanUpdateSync           ( unsigned char ucRemote );
 
-    inline char*                                GetName                 ( void )                    { return m_szName; };
-    inline void                                 SetName                 ( const char* szName )      { assert ( szName ); strncpy ( m_szName, szName, MAX_ELEMENT_NAME_LENGTH ); };
+    inline const char*                          GetName                 ( void )                    { return m_strName; }
+    inline void                                 SetName                 ( const char* szName )      { m_strName.AssignLeft ( szName, MAX_ELEMENT_NAME_LENGTH ); }
 
-    inline const char*                          GetTypeName             ( void )                    { return m_szTypeName; };
+    inline const char*                          GetTypeName             ( void )                    { return m_strTypeName; };
     inline unsigned int                         GetTypeHash             ( void )                    { return m_uiTypeHash; };
     void                                        SetTypeName             ( const char* szName );
 
@@ -322,8 +322,8 @@ protected:
 
 private:
     unsigned int                                m_uiTypeHash;
-    char                                        m_szTypeName [MAX_TYPENAME_LENGTH + 1];
-    char                                        m_szName [MAX_ELEMENT_NAME_LENGTH + 1];
+    SString                                     m_strTypeName;
+    SString                                     m_strName;
 
 protected:
     unsigned char                               m_ucSyncTimeContext;

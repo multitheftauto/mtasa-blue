@@ -29,7 +29,7 @@ std::list < std::string > CServer::m_OutputQueue;
 #define ERROR_NETWORK_LIBRARY_FAILED 2
 #define ERROR_LOADING_MOD 3
 
-char* szServerErrors[4] =
+static const SFixedArray < const char*, 4 > szServerErrors =
 {
     "Server stopped",
     "Could not load network library",

@@ -31,8 +31,6 @@ public:
 
     inline eDisplayType         GetType                 ( void )                                { return DISPLAY_TEXT; }
 
-    inline const char*          GetCaptionPointer       ( void )                                { return m_szCaption; };
-    char*                       GetCaption              ( char* szBuffer, size_t sizeBuffer );
     void                        SetCaption              ( const char* szCaption );
 
     void                        SetPosition             ( const CVector& vecPosition );
@@ -53,7 +51,7 @@ public:
 
     static void                 SetGlobalScale          ( float fScale )                        { m_fGlobalScale = fScale; }
 private:
-    char*                       m_szCaption;
+    SString                     m_strCaption;
     float                       m_fScale;
 
     unsigned long               m_ulFormat;

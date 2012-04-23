@@ -105,8 +105,8 @@ private:
     CVector                 m_vecPosition;
     CVector                 m_vecVelocity;
 
-    int                     m_EnabledEffects[9];
-    HFX                     m_FxEffects[9];
+    SFixedArray < int, 9 >  m_EnabledEffects;
+    SFixedArray < HFX, 9 >  m_FxEffects;
 
     // Info
     SString                 m_strStreamName;
