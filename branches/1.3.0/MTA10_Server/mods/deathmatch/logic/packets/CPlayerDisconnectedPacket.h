@@ -18,19 +18,19 @@
 class CPlayerDisconnectedPacket : public CPacket
 {
 public:
-    inline                  CPlayerDisconnectedPacket   ( void )                    { m_szReason [0] = 0; m_szReason [sizeof ( m_szReason ) - 1] = 0; };
-    inline                  CPlayerDisconnectedPacket   ( const char* szReason )    { strncpy ( m_szReason, szReason, sizeof ( m_szReason ) ); m_szReason [sizeof ( m_szReason ) - 1] = 0; };
+    inline                  CPlayerDisconnectedPacket   ( void )                    {}
+    inline                  CPlayerDisconnectedPacket   ( const char* szReason )    { m_strReason = szReason; }
 
     inline ePacketID        GetPacketID                 ( void ) const              { return PACKET_ID_SERVER_DISCONNECTED; };
     inline unsigned long    GetFlags                    ( void ) const              { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    inline bool             Write                       ( NetBitStreamInterface& BitStream ) const    { BitStream.Write ( const_cast < char* > ( m_szReason ), strlen ( m_szReason ) ); return true; };
+    inline bool             Write                       ( NetBitStreamInterface& BitStream ) const    { BitStream.Write ( *m_strReason, m_strReason.length () ); return true; }
 
-    inline const char*      GetReason                   ( void )                    { return m_szReason; };
-    inline void             SetReason                   ( const char* szReason )    { strncpy ( m_szReason, szReason, sizeof ( m_szReason ) ); };
+    inline const char*      GetReason                   ( void )                    { return m_strReason; }
+    inline void             SetReason                   ( const char* szReason )    { m_strReason = szReason; }
 
 private:
-    char                    m_szReason [512];
+    SString                 m_strReason;
 };
 
 #endif

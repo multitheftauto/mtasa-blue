@@ -368,10 +368,10 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
                 pTemp->SetHealth ( pVehicle->GetHealth () );
                 pTemp->SetColor ( pVehicle->GetColor () );
                 pTemp->SetUpgrades ( pVehicle->GetUpgrades () );
-                memcpy ( pTemp->m_ucDoorStates, pVehicle->m_ucDoorStates, MAX_DOORS );
-                memcpy ( pTemp->m_ucWheelStates, pVehicle->m_ucWheelStates, MAX_WHEELS );
-                memcpy ( pTemp->m_ucPanelStates, pVehicle->m_ucPanelStates, MAX_PANELS );
-                memcpy ( pTemp->m_ucLightStates, pVehicle->m_ucLightStates, MAX_LIGHTS );
+                pTemp->m_ucDoorStates = pVehicle->m_ucDoorStates;
+                pTemp->m_ucWheelStates = pVehicle->m_ucWheelStates;
+                pTemp->m_ucPanelStates = pVehicle->m_ucPanelStates;
+                pTemp->m_ucLightStates = pVehicle->m_ucLightStates;
 
                 pNewElement = pTemp;
             }
@@ -3402,7 +3402,7 @@ bool CStaticFunctionDefinitions::GetPedClothes ( CPed* pPed, unsigned char ucTyp
 {
     assert ( pPed );
 
-    SPlayerClothing* pClothing = pPed->GetClothes ()->GetClothing ( ucType );
+    const SPlayerClothing* pClothing = pPed->GetClothes ()->GetClothing ( ucType );
     if ( pClothing )
     {
         if ( szTextureReturn )
@@ -3767,7 +3767,7 @@ bool CStaticFunctionDefinitions::RemovePedClothes ( CElement* pElement, unsigned
         {
             CPed* pPed = static_cast < CPed* > ( pElement );
 
-            SPlayerClothing* pClothing = pPed->GetClothes ()->GetClothing ( ucType );
+            const SPlayerClothing* pClothing = pPed->GetClothes ()->GetClothing ( ucType );
             if ( pClothing )
             {
                 if ( ( !szTexture || !stricmp ( pClothing->szTexture, szTexture ) ) &&
@@ -5115,9 +5115,9 @@ bool CStaticFunctionDefinitions::FixVehicle ( CElement* pElement )
         // Repair it
         pVehicle->SetHealth ( DEFAULT_VEHICLE_HEALTH );
         pVehicle->GetInitialDoorStates ( pVehicle->m_ucDoorStates );
-        memset ( pVehicle->m_ucWheelStates, 0, sizeof ( pVehicle->m_ucWheelStates ) );
-        memset ( pVehicle->m_ucPanelStates, 0, sizeof ( pVehicle->m_ucPanelStates ) );
-        memset ( pVehicle->m_ucLightStates, 0, sizeof ( pVehicle->m_ucLightStates ) );
+        memset ( &pVehicle->m_ucWheelStates[0], 0, sizeof ( pVehicle->m_ucWheelStates ) );
+        memset ( &pVehicle->m_ucPanelStates[0], 0, sizeof ( pVehicle->m_ucPanelStates ) );
+        memset ( &pVehicle->m_ucLightStates[0], 0, sizeof ( pVehicle->m_ucLightStates ) );
 
         pVehicle->SetBlowTime ( 0 );
 
@@ -6457,7 +6457,7 @@ bool CStaticFunctionDefinitions::SetVehicleWheelStates ( CElement* pElement, int
                 if ( iRearRight != -1 )  pVehicle->m_ucWheelStates [ REAR_RIGHT_WHEEL ] = iRearRight;
 
                 CBitStream BitStream;
-                BitStream.pBitStream->Write ( ( char * ) pVehicle->m_ucWheelStates, MAX_WHEELS );
+                BitStream.pBitStream->Write ( ( char * ) &pVehicle->m_ucWheelStates[0], MAX_WHEELS );
                 m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_WHEEL_STATES, *BitStream.pBitStream ) );
 
                 return true;
@@ -8439,8 +8439,8 @@ bool CStaticFunctionDefinitions::BindKey ( CPlayer* pPlayer, const char* szKey, 
     bool bSuccess = false;
 
     CKeyBinds* pKeyBinds = pPlayer->GetKeyBinds ();
-    SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
-    SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szKey );
+    const SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
+    const SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szKey );
     bool bHitState = true;
 
     if ( stricmp ( szHitState, "down" ) == 0 || stricmp ( szHitState, "both" ) == 0 )
@@ -8489,7 +8489,7 @@ bool CStaticFunctionDefinitions::BindKey ( CPlayer* pPlayer, const char* szKey, 
     assert ( szResource );
 
     CKeyBinds* pKeyBinds = pPlayer->GetKeyBinds ();
-    SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
+    const SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
     szArguments = szArguments ? szArguments : "";
 
     if ( pKey )
@@ -8534,8 +8534,8 @@ bool CStaticFunctionDefinitions::UnbindKey ( CPlayer* pPlayer, const char* szKey
     assert ( pLuaMain );
 
     CKeyBinds* pKeyBinds = pPlayer->GetKeyBinds ();
-    SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
-    SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szKey );
+    const SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
+    const SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szKey );
     bool bCheckHitState = false, bHitState = true;
     if ( szHitState )
     {
@@ -8582,7 +8582,7 @@ bool CStaticFunctionDefinitions::UnbindKey ( CPlayer* pPlayer, const char* szKey
     assert ( szResource );
 
     CKeyBinds* pKeyBinds = pPlayer->GetKeyBinds ();
-    SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
+    const SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
 
     if ( pKey )
     {
@@ -8621,8 +8621,8 @@ bool CStaticFunctionDefinitions::IsKeyBound ( CPlayer* pPlayer, const char* szKe
     assert ( pLuaMain );
 
     CKeyBinds* pKeyBinds = pPlayer->GetKeyBinds ();
-    SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
-    SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szKey );
+    const SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
+    const SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szKey );
     bool bCheckHitState = false, bHitState = true;
     if ( szHitState )
     {
@@ -9229,7 +9229,7 @@ bool CStaticFunctionDefinitions::GetBodyPartName ( unsigned char ucID, char* szN
 
 bool CStaticFunctionDefinitions::GetClothesByTypeIndex ( unsigned char ucType, unsigned char ucIndex, char* szTextureReturn, char* szModelReturn )
 {
-    SPlayerClothing* pPlayerClothing = CPlayerClothes::GetClothingGroup ( ucType );
+    const SPlayerClothing* pPlayerClothing = CPlayerClothes::GetClothingGroup ( ucType );
     if ( pPlayerClothing )
     {
         if ( ucIndex < CPlayerClothes::GetClothingGroupMax ( ucType ) )
@@ -9254,7 +9254,7 @@ bool CStaticFunctionDefinitions::GetTypeIndexFromClothes ( char* szTexture, char
 
     for ( unsigned char ucType = 0 ; ucType < PLAYER_CLOTHING_SLOTS ; ucType++ )
     {
-        SPlayerClothing* pPlayerClothing = CPlayerClothes::GetClothingGroup ( ucType );
+        const SPlayerClothing* pPlayerClothing = CPlayerClothes::GetClothingGroup ( ucType );
         if ( pPlayerClothing )
         {
             for ( unsigned char ucIter = 0 ; pPlayerClothing [ ucIter ].szTexture != NULL ; ucIter++ )
@@ -9279,7 +9279,7 @@ bool CStaticFunctionDefinitions::GetClothesTypeName ( unsigned char ucType, char
 {
     assert ( szNameReturn );
 
-    char* szName = CPlayerClothes::GetClothingName ( ucType );
+    const char* szName = CPlayerClothes::GetClothingName ( ucType );
     if ( szName )
     {
         strcpy ( szNameReturn, szName );
@@ -9446,8 +9446,8 @@ bool CStaticFunctionDefinitions::IsGarageOpen ( unsigned char ucGarageID, bool& 
 {
     if ( ucGarageID >= 0 && ucGarageID < MAX_GARAGES )
     {
-        bool* pbGarageStates = g_pGame->GetGarageStates();
-        bIsOpen = pbGarageStates[ ucGarageID ];
+        const SGarageStates& garageStates = g_pGame->GetGarageStates ();
+        bIsOpen = garageStates[ ucGarageID ];
         return true;
     }
     return false;
@@ -9969,8 +9969,8 @@ bool CStaticFunctionDefinitions::SetGarageOpen ( unsigned char ucGarageID, bool 
 {
     if ( ucGarageID < MAX_GARAGES )
     {
-        bool* pbGarageStates = g_pGame->GetGarageStates();
-        pbGarageStates [ ucGarageID ] = bIsOpen;
+        SGarageStates& garageStates = g_pGame->GetGarageStates();
+        garageStates [ ucGarageID ] = bIsOpen;
 
         CBitStream BitStream;
         BitStream.pBitStream->Write ( ucGarageID );

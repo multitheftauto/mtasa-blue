@@ -49,7 +49,7 @@ public:
 
     eClientEntityType               GetType                 ( void ) const                          { return CCLIENTPLAYER; }
 
-    const char*                     GetNick                 ( void ) const                          { return m_szNick; }
+    const char*                     GetNick                 ( void ) const                          { return m_strNick; }
     void                            SetNick                 ( const char* szNick );
 
     inline unsigned int             GetPing                 ( void )                                { return ( m_bIsLocalPlayer ) ? g_pNet->GetPing () : m_uiPing; }
@@ -112,7 +112,7 @@ public:
 
 private:
     bool                            m_bIsLocalPlayer;
-    char                            m_szNick [ MAX_PLAYER_NICK_LENGTH + 1 ];
+    SString                         m_strNick;
 
     unsigned int                    m_uiPing;
 

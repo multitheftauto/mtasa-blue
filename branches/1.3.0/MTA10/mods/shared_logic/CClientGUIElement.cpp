@@ -25,64 +25,61 @@ CClientGUIElement::CClientGUIElement ( CClientManager * pManager, CLuaMain* pLua
     m_pLuaMain = pLuaMain;
     m_pFontElement = NULL;
 
-    memset ( &_szCallbackFunc1[0], NULL, sizeof ( _szCallbackFunc1 ) );
-    memset ( &_szCallbackFunc2[0], NULL, sizeof ( _szCallbackFunc2 ) );
-
     // Store the this-pointer in the userdata variable
     CGUI_SET_CCLIENTGUIELEMENT ( pCGUIElement, this );
 
     // Generate the CGUI type name variable
     switch ( m_pCGUIElement->GetType () ) {
         case CGUI_BUTTON:
-            m_szCGUITypeName = "button";
+            m_strCGUITypeName = "button";
             break;
         case CGUI_CHECKBOX:
-            m_szCGUITypeName = "checkbox";
+            m_strCGUITypeName = "checkbox";
             break;
         case CGUI_EDIT:
-            m_szCGUITypeName = "edit";
+            m_strCGUITypeName = "edit";
             break;
         case CGUI_GRIDLIST:
-            m_szCGUITypeName = "gridlist";
+            m_strCGUITypeName = "gridlist";
             break;
         case CGUI_LABEL:
-            m_szCGUITypeName = "label";
+            m_strCGUITypeName = "label";
             break;
         case CGUI_MEMO:
-            m_szCGUITypeName = "memo";
+            m_strCGUITypeName = "memo";
             break;
         case CGUI_PROGRESSBAR:
-            m_szCGUITypeName = "progressbar";
+            m_strCGUITypeName = "progressbar";
             break;
         case CGUI_RADIOBUTTON:
-            m_szCGUITypeName = "radiobutton";
+            m_strCGUITypeName = "radiobutton";
             break;
         case CGUI_STATICIMAGE:
-            m_szCGUITypeName = "staticimage";
+            m_strCGUITypeName = "staticimage";
             break;
         case CGUI_TAB:
-            m_szCGUITypeName = "tab";
+            m_strCGUITypeName = "tab";
             break;
         case CGUI_TABPANEL:
-            m_szCGUITypeName = "tabpanel";
+            m_strCGUITypeName = "tabpanel";
             break;
         case CGUI_WINDOW:
-            m_szCGUITypeName = "window";
+            m_strCGUITypeName = "window";
             break;
         case CGUI_SCROLLPANE:
-            m_szCGUITypeName = "scrollpane";
+            m_strCGUITypeName = "scrollpane";
             break;
         case CGUI_SCROLLBAR:
-            m_szCGUITypeName = "scrollbar";
+            m_strCGUITypeName = "scrollbar";
             break;
         case CGUI_COMBOBOX:
-            m_szCGUITypeName = "combobox";
+            m_strCGUITypeName = "combobox";
             break;
         default:
-            m_szCGUITypeName = "unknown";
+            m_strCGUITypeName = "unknown";
             break;
     }
-    SetTypeName ( SString ( "gui-%s", m_szCGUITypeName ) );
+    SetTypeName ( SString ( "gui-%s", *m_strCGUITypeName ) );
 
     // Add us to the list in the manager
     m_pGUIManager->Add ( this );
@@ -111,10 +108,10 @@ void CClientGUIElement::Unlink ( void )
 void CClientGUIElement::SetEvents ( const char* szFunc1, const char* szFunc2 )
 {
     if ( szFunc1 && strlen ( szFunc1 ) < MAX_EVENT_NAME )
-        strncpy ( &_szCallbackFunc1[0], szFunc1, strlen ( szFunc1 ) );
+        _strCallbackFunc1 = szFunc1;
 
     if ( szFunc2 && strlen ( szFunc2 ) < MAX_EVENT_NAME )
-        strncpy ( &_szCallbackFunc2[0], szFunc2, strlen ( szFunc2 ) );    
+        _strCallbackFunc2 = szFunc2;
 }
 
 
@@ -127,7 +124,7 @@ bool CClientGUIElement::_CallbackEvent1 ( CGUIElement* pCGUIElement )
         if ( pElement )
         {
             Arg.PushElement ( pElement );
-            pElement->CallEvent ( _szCallbackFunc1, Arg, true );
+            pElement->CallEvent ( _strCallbackFunc1, Arg, true );
             return true;
         }
     }
@@ -144,7 +141,7 @@ bool CClientGUIElement::_CallbackEvent2 ( CGUIElement* pCGUIElement )
         if ( pElement )
         {
             Arg.PushElement ( pElement );
-            pElement->CallEvent ( _szCallbackFunc2, Arg, true );
+            pElement->CallEvent ( _strCallbackFunc2, Arg, true );
             return true;
         }
     }

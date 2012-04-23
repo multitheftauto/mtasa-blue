@@ -131,7 +131,7 @@ struct SSirenInfo
     bool                        m_bOverrideSirens;
     unsigned char               m_ucSirenType;
     unsigned char               m_ucSirenCount;
-    SSirenBeaconInfo            m_tSirenInfo [8];
+    SFixedArray < SSirenBeaconInfo, 8 >    m_tSirenInfo;
 };
 
 class CVehicle : public CElement
@@ -269,7 +269,7 @@ public:
     inline unsigned char            GetAlpha                ( void )                        { return m_ucAlpha; }
     inline void                     SetAlpha                ( unsigned char ucAlpha )       { m_ucAlpha = ucAlpha; }
 
-    void                            GetInitialDoorStates    ( unsigned char * pucDoorStates );
+    void                            GetInitialDoorStates    ( SFixedArray < unsigned char, MAX_DOORS >& ucOutDoorStates );
 
     inline CPlayer *                GetJackingPlayer        ( void )                        { return m_pJackingPlayer; }
     inline void                     SetJackingPlayer        ( CPlayer * pPlayer )           { m_pJackingPlayer = pPlayer; }
@@ -333,7 +333,7 @@ private:
     class CVehicleManager*          m_pVehicleManager;
 
     CPlayer*                        m_pSyncer;
-    CPed*                           m_pOccupants [MAX_VEHICLE_SEATS];
+    SFixedArray < CPed*, MAX_VEHICLE_SEATS >   m_pOccupants;
 
     unsigned short                  m_usModel;
     eVehicleType                    m_eVehicleType;
@@ -365,7 +365,7 @@ private:
     char                            m_szRegPlate [9];
     unsigned char                   m_ucPaintjob;
 
-    float                           m_fDoorOpenRatio [ 6 ];
+    SFixedArray < float, 6 >        m_fDoorOpenRatio;
     bool                            m_bLocked;
     bool                            m_bDoorsUndamageable;
     bool                            m_bEngineOn;
@@ -410,10 +410,10 @@ private:
 
 public: // 'Safe' variables (that have no need for accessors)
     bool                            m_bDamageProof;
-    unsigned char                   m_ucDoorStates [MAX_DOORS];
-    unsigned char                   m_ucWheelStates [MAX_WHEELS];
-    unsigned char                   m_ucPanelStates [MAX_PANELS];
-    unsigned char                   m_ucLightStates [MAX_LIGHTS];
+    SFixedArray < unsigned char, MAX_DOORS >   m_ucDoorStates;
+    SFixedArray < unsigned char, MAX_WHEELS >  m_ucWheelStates;
+    SFixedArray < unsigned char, MAX_PANELS >  m_ucPanelStates;
+    SFixedArray < unsigned char, MAX_LIGHTS >  m_ucLightStates;
     SSirenInfo                      m_tSirenBeaconInfo;
 };
 

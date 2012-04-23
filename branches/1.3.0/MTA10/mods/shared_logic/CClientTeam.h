@@ -32,8 +32,8 @@ public:
 
     inline unsigned char        GetID               ( void )                    { return m_ucID; }
 
-    inline char*                GetTeamName         ( void )                    { return m_szTeamName; }
-    void                        SetTeamName         ( char* szName );
+    const char*                 GetTeamName         ( void )                    { return m_strTeamName; }
+    void                        SetTeamName         ( const char* szName );
 
     void                        GetColor            ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue );
     void                        SetColor            ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
@@ -59,7 +59,7 @@ protected:
     CClientTeamManager*         m_pTeamManager;
 
     unsigned char               m_ucID;
-    char*                       m_szTeamName;
+    SString                     m_strTeamName;
 
     unsigned char               m_ucRed;
     unsigned char               m_ucGreen;

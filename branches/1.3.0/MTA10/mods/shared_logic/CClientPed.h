@@ -373,7 +373,7 @@ public:
     bool                        UseGun                  ( CVector vecTarget, CClientEntity * pEntity );
 
     bool                        IsAttachToable            ( void );
-    static char*                GetBodyPartName         ( unsigned char ucID );
+    static const char*          GetBodyPartName         ( unsigned char ucID );
 
     bool                        IsDoingGangDriveby      ( void );
     void                        SetDoingGangDriveby     ( bool bDriveby );
@@ -383,7 +383,7 @@ public:
     void                        RunNamedAnimation       ( CAnimBlock * pBlock, const char * szAnimName, int iTime = -1, bool bLoop = true, bool bUpdatePosition = true, bool bInterruptable = false, bool bFreezeLastFrame = true, bool bRunInSequence = false, bool bOffsetPed = false, bool bHoldLastFrame = false );
     void                        KillAnimation           ( void );
     inline CAnimBlock *         GetAnimationBlock       ( void )                                        { return m_pAnimationBlock; }
-    inline char *               GetAnimationName        ( void )                                        { return m_szAnimationName; }
+    const char*                 GetAnimationName        ( void )                                        { return m_strAnimationName; }
 
     bool                        IsUsingGun              ( void );
 
@@ -539,7 +539,7 @@ public:
     CVector                     m_vecMoveSpeed;
     CVector                     m_vecTurnSpeed;
     eWeaponSlot                 m_CurrentWeaponSlot;
-    eWeaponType                 m_WeaponTypes [ WEAPONSLOT_MAX ];
+    SFixedArray < eWeaponType, WEAPONSLOT_MAX > m_WeaponTypes;
     bool                        m_bHasJetPack;
     CClientPlayerClothes*       m_pClothes;
     eFightingStyle              m_FightingStyle;
@@ -555,7 +555,7 @@ public:
     bool                        m_bDestroyingSatchels;
     bool                        m_bDoingGangDriveby;
     CAnimBlock *                m_pAnimationBlock;
-    char *                      m_szAnimationName;
+    SString                     m_strAnimationName;
     bool                        m_bRequestedAnimation;
     int                         m_iTimeAnimation;
     bool                        m_bLoopAnimation;

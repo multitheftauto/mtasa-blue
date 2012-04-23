@@ -156,25 +156,6 @@ CLuaMain* CLuaManager::GetVirtualMachine ( lua_State* luaVM )
 }
 
 
-CLuaMain* CLuaManager::GetVirtualMachine ( const char* szFilename )
-{
-    assert ( szFilename );
-
-    // Find a matching VM in our list
-    list < CLuaMain* >::const_iterator iter = m_virtualMachines.begin ();
-    for ( ; iter != m_virtualMachines.end (); iter++ )
-    {
-        if ( strcmp ( szFilename, (*iter)->GetScriptNamePointer () ) == 0 )
-        {
-            return *iter;
-        }
-    }
-
-    // Doesn't exist
-    return NULL;
-}
-
-
 void CLuaManager::LoadCFunctions ( void )
 {
     // ** BACKWARDS COMPATIBILITY FUNCS. SHOULD BE REMOVED BEFORE FINAL RELEASE! **

@@ -27,11 +27,11 @@ public:
 
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
-    inline const char*      GetNewNick                  ( void )                    { return m_szNewNick; };
-    inline void             SetNewNick                  ( const char* szNewNick )   { strncpy ( m_szNewNick, szNewNick, MAX_NICK_LENGTH ); };
+    inline const char*      GetNewNick                  ( void )                    { return m_strNewNick; }
+    inline void             SetNewNick                  ( const char* szNewNick )   { m_strNewNick.AssignLeft( szNewNick, MAX_NICK_LENGTH ); }
 
 private:
-    char                    m_szNewNick [MAX_NICK_LENGTH + 1];
+    SString                 m_strNewNick;
 };
 
 #endif

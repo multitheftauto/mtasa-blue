@@ -19,16 +19,10 @@ CDownloadableResource::CDownloadableResource ( eResourceType resourceType, const
     m_resourceType = resourceType;
 
     // Store the name
-    size_t sizeName = strlen ( szName );
-    m_szName = new char [ sizeName + 1 ];
-    strcpy ( m_szName, szName );
-    m_szName[sizeName] = '\0';
+    m_strName = szName;
 
     // Store the  name (short)
-    size_t sizeNameShort = strlen ( szNameShort );
-    m_szNameShort = new char [ sizeNameShort + 1 ];
-    strcpy ( m_szNameShort, szNameShort );
-    m_szNameShort[sizeNameShort] = '\0';
+    m_strNameShort = szNameShort;
 
     // Store the server checksum
     m_ServerChecksum = serverChecksum;
@@ -47,17 +41,6 @@ CDownloadableResource::CDownloadableResource ( eResourceType resourceType, const
 
 CDownloadableResource::~CDownloadableResource ( void )
 {
-    if ( m_szName )
-    {
-        delete [] m_szName;
-        m_szName = 0;
-    }
-
-    if ( m_szNameShort )
-    {
-        delete [] m_szNameShort;
-        m_szNameShort = 0;
-    }
 }
 
 bool CDownloadableResource::DoesClientAndServerChecksumMatch ( void )
@@ -67,7 +50,7 @@ bool CDownloadableResource::DoesClientAndServerChecksumMatch ( void )
 
 CChecksum CDownloadableResource::GenerateClientChecksum ( void )
 {
-    m_LastClientChecksum = CChecksum::GenerateChecksumFromFile ( m_szName );
+    m_LastClientChecksum = CChecksum::GenerateChecksumFromFile ( m_strName );
     return m_LastClientChecksum;
 }
 

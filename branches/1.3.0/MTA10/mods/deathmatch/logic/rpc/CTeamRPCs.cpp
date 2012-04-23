@@ -23,21 +23,14 @@ void CTeamRPCs::LoadFunctions ( void )
 
 void CTeamRPCs::SetTeamName ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    unsigned short usNameLength;
-    if ( bitStream.Read ( usNameLength ) )
+    SString strName;
+    if ( bitStream.ReadString ( strName ) )
     {
-        char* szName = new char [ usNameLength + 1 ];
-        szName [ usNameLength ] = NULL;
-
-        if ( bitStream.Read ( szName, usNameLength ) )
+        CClientTeam* pTeam = m_pTeamManager->GetTeam ( pSource->GetID () );
+        if ( pTeam )
         {
-            CClientTeam* pTeam = m_pTeamManager->GetTeam ( pSource->GetID () );
-            if ( pTeam )
-            {
-                pTeam->SetTeamName ( szName );
-            }
+            pTeam->SetTeamName ( strName );
         }
-        delete [] szName;
     }
 }
 

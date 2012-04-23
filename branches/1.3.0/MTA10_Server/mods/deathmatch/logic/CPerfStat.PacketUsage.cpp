@@ -139,7 +139,7 @@ public:
     SString                     m_strCategoryName;
     SPacketStat                 m_PrevPacketStats [ 2 ] [ 256 ];
     SPacketStat                 m_PacketStats [ 2 ] [ 256 ];
-    long long                   m_ShownPacketStats [ 256 ];
+    SFixedArray < long long, 256 > m_ShownPacketStats;
 };
 
 

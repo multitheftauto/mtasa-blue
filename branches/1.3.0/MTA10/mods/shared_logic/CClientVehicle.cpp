@@ -62,8 +62,8 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     // Set our default properties
     m_pDriver = NULL;
     m_pOccupyingDriver = NULL;
-    memset ( m_pPassengers, 0, sizeof ( m_pPassengers ) );
-    memset ( m_pOccupyingPassengers, 0, sizeof ( m_pOccupyingPassengers ) );
+    memset ( &m_pPassengers[0], 0, sizeof ( m_pPassengers ) );
+    memset ( &m_pOccupyingPassengers[0], 0, sizeof ( m_pOccupyingPassengers ) );
     m_pPreviousLink = NULL;
     m_pNextLink = NULL;
     m_Matrix.vFront.fY = 1.0f;
@@ -103,9 +103,9 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_fGroundCheckTolerance = 0.f;
     m_fObjectsAroundTolerance = 0.f;
     GetInitialDoorStates ( m_ucDoorStates );
-    memset ( m_ucWheelStates, 0, sizeof ( m_ucWheelStates ) );
-    memset ( m_ucPanelStates, 0, sizeof ( m_ucPanelStates ) );
-    memset ( m_ucLightStates, 0, sizeof ( m_ucLightStates ) );
+    memset ( &m_ucWheelStates[0], 0, sizeof ( m_ucWheelStates ) );
+    memset ( &m_ucPanelStates[0], 0, sizeof ( m_ucPanelStates ) );
+    memset ( &m_ucLightStates[0], 0, sizeof ( m_ucLightStates ) );
     m_bCanBeDamaged = true;
     m_bSyncUnoccupiedDamage = false;
     m_bScriptCanBeDamaged = true;
@@ -800,7 +800,7 @@ void CClientVehicle::Fix ( void )
 
     SetHealth ( DEFAULT_VEHICLE_HEALTH );
 
-    unsigned char ucDoorStates [ MAX_DOORS ];
+    SFixedArray < unsigned char, MAX_DOORS >   ucDoorStates;
     GetInitialDoorStates ( ucDoorStates );
     for ( int i = 0 ; i < MAX_DOORS ; i++ ) SetDoorStatus ( i, ucDoorStates [ i ] );
     for ( int i = 0 ; i < MAX_PANELS ; i++ ) SetPanelStatus ( i, 0 );
@@ -940,7 +940,7 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, bool bLoadImmedi
         if ( bResetWheelAndDoorStates )
         {
             GetInitialDoorStates ( m_ucDoorStates );
-            memset ( m_ucWheelStates, 0, sizeof ( m_ucWheelStates ) );
+            memset ( &m_ucWheelStates[0], 0, sizeof ( m_ucWheelStates ) );
         }
 
         // Check if we have landing gears and adjustable properties
@@ -3007,7 +3007,7 @@ void CClientVehicle::Interpolate ( void )
 }
 
 
-void CClientVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
+void CClientVehicle::GetInitialDoorStates ( SFixedArray < unsigned char, MAX_DOORS >& ucOutDoorStates )
 {
     switch ( m_usModel )
     {
@@ -3027,13 +3027,13 @@ void CClientVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
         case VT_RCTIGER:
         case VT_TRACTOR:
         case VT_VORTEX:
-            memset ( pucDoorStates, DT_DOOR_MISSING, 6 );
+            memset ( &ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS );
 
             // Keep the bonet and boot intact
-            pucDoorStates [ 0 ] = pucDoorStates [ 1 ] = DT_DOOR_INTACT;
+            ucOutDoorStates [ 0 ] = ucOutDoorStates [ 1 ] = DT_DOOR_INTACT;
             break;        
         default:
-            memset ( pucDoorStates, DT_DOOR_INTACT, 6 );
+            memset ( &ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS );
     }
 }
 

@@ -16,8 +16,7 @@ void CWhoWas::Add ( const char* szNick, unsigned long ulIP, std::string strSeria
 {
     // Create the struct and copy the data over
     SWhoWasEntry Entry;
-    Entry.szNick [MAX_NICK_LENGTH] = 0;
-    strncpy ( Entry.szNick, szNick, MAX_NICK_LENGTH );
+    Entry.strNick.AssignLeft ( szNick, MAX_NICK_LENGTH );
     Entry.ulIP = ulIP;
     Entry.strSerial  = strSerial;
     Entry.strPlayerVersion  = strPlayerVersion;

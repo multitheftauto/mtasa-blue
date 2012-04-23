@@ -29,7 +29,7 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
                                  float fWaveHeight,
                                  const SWorldWaterLevelInfo& worldWaterLevelInfo,
                                  bool bHasSkyGradient,
-                                 bool* pbGarageStates,
+                                 const SGarageStates& garageStates,
                                  unsigned char ucSkyGradientTR,
                                  unsigned char ucSkyGradientTG,
                                  unsigned char ucSkyGradientTB,
@@ -81,7 +81,7 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
     m_fWaveHeight = fWaveHeight;
     m_WorldWaterLevelInfo = worldWaterLevelInfo;
     m_bHasSkyGradient = bHasSkyGradient;
-    m_pbGarageStates = pbGarageStates;
+    m_pGarageStates = &garageStates;
     m_ucSkyGradientTR = ucSkyGradientTR;
     m_ucSkyGradientTG = ucSkyGradientTG;
     m_ucSkyGradientTB = ucSkyGradientTB;
@@ -182,7 +182,8 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     // Write the garage states
     for ( unsigned char i = 0 ; i < MAX_GARAGES ; i++ )
     {
-        BitStream.WriteBit( static_cast < unsigned char > ( m_pbGarageStates[i] ) );
+        const SGarageStates& garageStates = *m_pGarageStates;
+        BitStream.WriteBit( garageStates[i] );
     }
 
     // Write the fun bugs state

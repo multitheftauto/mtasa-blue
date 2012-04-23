@@ -42,7 +42,7 @@ public:
                                                       float fWaveHeight,
                                                       const SWorldWaterLevelInfo& worldWaterLevelInfo,
                                                       bool bHasSkyGradient,
-                                                      bool* pbGarageStates,
+                                                      const SGarageStates& garageStates,
                                                       unsigned char ucSkyGradientTR,
                                                       unsigned char ucSkyGradientTG,
                                                       unsigned char ucSkyGradientTB,
@@ -105,7 +105,7 @@ private:
     bool                    m_bHasHeatHaze;
     SHeatHazeSettings       m_HeatHazeSettings;
     unsigned short          m_usFPSLimit;
-    bool*                   m_pbGarageStates;
+    const SGarageStates*    m_pGarageStates;
     bool                    m_bCloudsEnabled;
     float                   m_fJetpackMaxHeight;
     bool                    m_bOverrideWaterColor;

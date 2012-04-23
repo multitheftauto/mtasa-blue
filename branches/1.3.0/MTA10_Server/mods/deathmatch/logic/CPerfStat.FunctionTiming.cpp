@@ -29,7 +29,7 @@ namespace
         STiming now5s;
         STiming prev60s;
         int iPrevIndex;
-        STiming history[12];
+        SFixedArray < STiming, 12 > history;
     };
 
 

@@ -37,7 +37,7 @@ public:
     static bool                     GetControlState         ( const char * szName, CControllerState & State, bool bOnFoot );
 
 protected:
-    bool                            m_bStates [ MAX_GTA_CONTROLS ];
+    SFixedArray < bool, MAX_GTA_CONTROLS >  m_bStates;
 };
 
 #endif

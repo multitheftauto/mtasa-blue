@@ -480,7 +480,7 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     unsigned short usFPSLimit = g_pGame->GetConfig()->GetFPSLimit();
 
     // Garage states
-    bool* pbGarageStates = g_pGame->GetGarageStates();
+    const SGarageStates& garageStates = g_pGame->GetGarageStates();
     bool bCloudsEnabled = g_pGame->GetCloudsEnabled();
 
     // Water color
@@ -535,7 +535,7 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    fWaveHeight,
                                    worldWaterLevelInfo,
                                    bHasSkyGradient,
-                                   pbGarageStates,
+                                   garageStates,
                                    ucTopRed,
                                    ucTopGreen,
                                    ucTopBlue,
@@ -998,7 +998,7 @@ void CMapManager::LinkupElements ( void )
     {
         CVehicle* pVehicle = *iterVehicles;
 
-        char* szAttachToID = pVehicle->GetAttachToID ();
+        const char* szAttachToID = pVehicle->GetAttachToID ();
         if ( szAttachToID [ 0 ] )
         {
             CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
@@ -1012,7 +1012,7 @@ void CMapManager::LinkupElements ( void )
     {
         CPlayer* pPlayer = *iterPlayers;
         // Link up all the attaching elements
-        char* szAttachToID = pPlayer->GetAttachToID ();
+        const char* szAttachToID = pPlayer->GetAttachToID ();
         if ( szAttachToID [ 0 ] )
         {
             CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
@@ -1026,7 +1026,7 @@ void CMapManager::LinkupElements ( void )
     {
         CObject* pObject = *iterObjects;
         // Link up all the attaching elements
-        char* szAttachToID = pObject->GetAttachToID ();
+        const char* szAttachToID = pObject->GetAttachToID ();
         if ( szAttachToID [ 0 ] )
         {
             CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
@@ -1040,7 +1040,7 @@ void CMapManager::LinkupElements ( void )
     {
         CBlip* pBlip = *iterBlips;
         // Link up all the attaching elements
-        char* szAttachToID = pBlip->GetAttachToID ();
+        const char* szAttachToID = pBlip->GetAttachToID ();
         if ( szAttachToID [ 0 ] )
         {
             CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );

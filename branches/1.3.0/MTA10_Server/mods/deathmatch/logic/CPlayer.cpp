@@ -33,7 +33,6 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     SetTypeName ( "player" );
     m_bIsPlayer = true;
     m_bDoNotSendEntities = false;
-    m_szNick [0] = 0;
     m_iGameVersion = 0;
     m_usMTAVersion = 0;
     m_usBitStreamVersion = 0;
@@ -187,16 +186,14 @@ void CPlayer::Unlink ( void )
 
 void CPlayer::SetNick ( const char* szNick )
 {
-    if ( strlen ( m_szNick ) > 0 && strcmp ( m_szNick, szNick ) != 0 )
+    if ( !m_strNick.empty () && m_strNick != szNick  )
     {
         // If changing, add the new name to the whowas list
         char szIP [22];
         g_pGame->GetConsole ()->GetWhoWas ()->Add ( szNick, inet_addr ( GetSourceIP( szIP ) ), GetSerial (), GetPlayerVersion () );
     }
 
-    assert ( sizeof ( m_szNick ) == MAX_NICK_LENGTH + 1 );
-    // Copy the nick to us
-    STRNCPY ( m_szNick, szNick, MAX_NICK_LENGTH + 1 );
+    m_strNick.AssignLeft ( szNick, MAX_NICK_LENGTH );
 }
 
 char* CPlayer::GetSourceIP ( char* pBuffer )
@@ -489,7 +486,7 @@ void CPlayer::SetTeam ( CTeam* pTeam, bool bChangeTeam )
 void CPlayer::Reset ( void )
 {
     //Called when resetMapInfo is called to reset per player information that is reset in the clientside implimentation of resetMapInfo. This stops our functions clientside and serverside possibly returning different results.
-    memset ( m_fStats, 0, sizeof ( m_fStats ) );
+    memset ( &m_fStats[0], 0, sizeof ( m_fStats ) );
     m_pPlayerStatsPacket->Clear ( );
     SetPlayerStat ( 24, 569.0f );           // default max_health
 

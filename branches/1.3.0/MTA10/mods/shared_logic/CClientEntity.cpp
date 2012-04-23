@@ -59,14 +59,10 @@ CClientEntity::CClientEntity ( ElementID ID )
 
     m_pAttachedToEntity = NULL;
 
-    strncpy ( m_szTypeName, "unknown", MAX_TYPENAME_LENGTH );
-    m_szTypeName [MAX_TYPENAME_LENGTH] = 0;
-    m_uiTypeHash = HashString ( m_szTypeName );
+    m_strTypeName = "unknown";
+    m_uiTypeHash = HashString ( m_strTypeName );
     if ( IsFromRoot ( m_pParent ) )
         CClientEntity::AddEntityFromRoot ( m_uiTypeHash, this );
-
-    m_szName [0] = 0;
-    m_szName [MAX_ELEMENT_NAME_LENGTH] = 0;
 
     m_bBeingDeleted = false;
 
@@ -197,7 +193,7 @@ CClientEntity::~CClientEntity ( void )
 void CClientEntity::SetTypeName ( const char* szName )
 {
     CClientEntity::RemoveEntityFromRoot ( m_uiTypeHash, this );
-    strncpy ( m_szTypeName, szName, MAX_TYPENAME_LENGTH );
+    m_strTypeName.AssignLeft ( szName, MAX_TYPENAME_LENGTH );
     m_uiTypeHash = HashString ( szName );
     if ( IsFromRoot ( m_pParent ) )
         CClientEntity::AddEntityFromRoot ( m_uiTypeHash, this );
@@ -824,7 +820,7 @@ CClientEntity* CClientEntity::FindChild ( const char* szName, unsigned int uiInd
 
     // Is it our name?
     unsigned int uiCurrentIndex = 0;
-    if ( strcmp ( szName, m_szName ) == 0 )
+    if ( strcmp ( szName, m_strName ) == 0 )
     {
         if ( uiIndex == 0 )
         {

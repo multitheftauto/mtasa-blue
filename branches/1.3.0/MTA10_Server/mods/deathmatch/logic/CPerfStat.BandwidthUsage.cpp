@@ -51,12 +51,12 @@ namespace
 
     #define BW_STATS_TABLE_NAME     "`perfstats_bandwidth_usage`"
 
-    SString BWStatIndexNameList[] = {
+    SFixedArray < SString, 4 > BWStatIndexNameList = { {
                                         "Special",
                                         "Hour",
                                         "Day",
                                         "Month",
-                                    };
+                                    } };
 
     const SString& BWStatIndexToName ( uint uiIndex )
     {
@@ -197,7 +197,7 @@ const SString& CPerfStatBandwidthUsageImpl::GetCategoryName ( void )
 ///////////////////////////////////////////////////////////////
 void CPerfStatBandwidthUsageImpl::LoadStats ( void )
 {
-    uint uiSizeList [ BWSTAT_INDEX_COUNT ];
+    SFixedArray < uint, BWSTAT_INDEX_COUNT > uiSizeList;
     uiSizeList [ BWSTAT_INDEX_SPECIAL ] = 1;
     uiSizeList [ BWSTAT_INDEX_HOURS ] = NUM_HOUR_STATS;
     uiSizeList [ BWSTAT_INDEX_DAYS ] = NUM_DAY_STATS;
@@ -447,7 +447,7 @@ void CPerfStatBandwidthUsageImpl::AddSampleAtTime ( time_t tTime, long long llGa
 {
     tm* tmp = localtime ( &tTime );
 
-    uint uiNowIndexList [ BWSTAT_INDEX_COUNT ];
+    SFixedArray < uint, BWSTAT_INDEX_COUNT > uiNowIndexList;
     uiNowIndexList [ BWSTAT_INDEX_HOURS ]  = Clamp ( 0, tmp->tm_hour,     NUM_HOUR_STATS  - 1 );
     uiNowIndexList [ BWSTAT_INDEX_DAYS ]   = Clamp ( 0, tmp->tm_mday - 1, NUM_DAY_STATS   - 1 );
     uiNowIndexList [ BWSTAT_INDEX_MONTHS ] = Clamp ( 0, tmp->tm_mon,      NUM_MONTH_STATS - 1 );
@@ -526,13 +526,13 @@ void CPerfStatBandwidthUsageImpl::GetStats ( CPerfStatResult* pResult, const std
     //
     // Determine if blocked column contains any data
     //
-    uint showTypeList[] = {
+    SFixedArray < uint, 3 > showTypeList = { {
                             BWSTAT_INDEX_HOURS,
                             BWSTAT_INDEX_DAYS,
                             BWSTAT_INDEX_MONTHS,
-                          };
+                          } };
 
-    bool bShowBlocked[ NUMELMS( showTypeList ) ];
+    SFixedArray < bool, NUMELMS( showTypeList ) > bShowBlocked;
 
     for ( uint t = 0 ; t < NUMELMS( showTypeList ) ; t++ )
     {

@@ -95,7 +95,7 @@ private:
         float           fTurretY;
         ushort          usAdjustableProperty;
 
-        float           fDoorOpenRatio[4];
+        SFixedArray < float, 4 >    fDoorOpenRatio;
     } m_Cache;
 };
 

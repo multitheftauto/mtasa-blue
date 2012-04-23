@@ -28,8 +28,6 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
     m_bNametagColorOverridden = false;
     m_uiPing = 0;
 
-    m_szNick [ 0 ] = '\0';
-
     m_usLatency = 0;
 
     m_uiPlayerSyncCount = 0;
@@ -77,7 +75,7 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
     m_ucNametagColorG = 255;
     m_ucNametagColorB = 255;
     m_ulLastNametagShow = 0;
-    SetNametagText ( m_szNick );
+    SetNametagText ( m_strNick );
     
     // Create the static icon (defaults to a warning icon for network trouble)
     m_pStatusIcon = g_pCore->GetGUI ()->CreateStaticImage ();
@@ -145,8 +143,7 @@ void CClientPlayer::SetNick ( const char* szNick )
     // Valid pointer?
     if ( szNick )
     {
-        strncpy ( m_szNick, szNick, MAX_PLAYER_NICK_LENGTH );
-        m_szNick [ MAX_PLAYER_NICK_LENGTH ] = '\0';
+        m_strNick.AssignLeft ( szNick, MAX_PLAYER_NICK_LENGTH );
 
         if ( m_strNametag.empty () )
             m_strNametag = szNick;
@@ -255,7 +252,7 @@ void CClientPlayer::Reset ( void )
     RebuildModel ( true );
 
     // Nametag
-    SetNametagText ( m_szNick );
+    SetNametagText ( m_strNick );
     m_bNametagShowing = true;
 
     // Otherwize default to white

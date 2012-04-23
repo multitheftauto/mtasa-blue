@@ -28,7 +28,7 @@ public:
 
 private:
     static CStack < ElementID, MAX_SERVER_ELEMENTS - 2 > m_UniqueIDs;
-    static CElement*            m_Elements [MAX_SERVER_ELEMENTS];
+    static SFixedArray < CElement*, MAX_SERVER_ELEMENTS >  m_Elements;
 };
 
 #endif

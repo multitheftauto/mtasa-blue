@@ -43,7 +43,7 @@ CResourceManager::CResourceManager ( void )
     m_uiResourceLoadedCount = 0;
     m_uiResourceFailedCount = 0;
 
-    sprintf ( m_szResourceDirectory, "%s/resources", g_pServerInterface->GetServerModPath () );
+    m_strResourceDirectory.Format ( "%s/resources", g_pServerInterface->GetServerModPath () );
 }
 
 CResourceManager::~CResourceManager ( void )
@@ -231,9 +231,9 @@ void CResourceManager::CheckAll ( void )
         (*iter)->LogUpgradeWarnings ();
 }
 
-char * CResourceManager::GetResourceDirectory ( void )
+const char* CResourceManager::GetResourceDirectory ( void )
 {
-    return m_szResourceDirectory;
+    return m_strResourceDirectory;
 }
 
 // first, go through each resource then link up to other resources, any that fail are noted

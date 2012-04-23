@@ -110,7 +110,7 @@ private:
     CVector     m_vecVelocity;
     float       m_fMinDistance;
     float       m_fMaxDistance;
-    int         m_EnabledEffects[9];
+    SFixedArray < int, 9 >  m_EnabledEffects;
 };
 
 #endif

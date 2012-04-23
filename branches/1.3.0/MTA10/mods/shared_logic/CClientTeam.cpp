@@ -18,8 +18,6 @@ CClientTeam::CClientTeam ( CClientManager* pManager, ElementID ID, char* szName,
     m_pManager = pManager;
     m_pTeamManager = pManager->GetTeamManager ();
 
-    m_szTeamName = NULL;
-
     SetTypeName ( "team" );
 
     SetTeamName ( szName );
@@ -34,7 +32,6 @@ CClientTeam::~CClientTeam ( void )
 {
     RemoveAll ();
     Unlink ();
-    delete [] m_szTeamName;
 }
 
 
@@ -85,16 +82,12 @@ bool CClientTeam::Exists ( CClientPlayer* pPlayer )
 }
 
 
-void CClientTeam::SetTeamName ( char* szName )
+void CClientTeam::SetTeamName ( const char* szName )
 {
-    delete [] m_szTeamName;
-    m_szTeamName = NULL;
-
     if ( szName )
-    {
-        m_szTeamName = new char [ strlen ( szName ) + 1 ];
-        strcpy ( m_szTeamName, szName );
-    }
+        m_strTeamName = szName;
+    else
+        m_strTeamName.clear ();
 }
 
 

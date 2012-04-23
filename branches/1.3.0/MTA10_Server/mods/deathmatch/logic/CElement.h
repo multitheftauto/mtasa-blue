@@ -186,7 +186,7 @@ public:
     inline void                                 RemoveAttachedElement       ( CElement* pElement )          { if ( !m_AttachedElements.empty() ) m_AttachedElements.remove ( pElement ); }
     std::list < CElement* > ::iterator          AttachedElementsBegin       ( void )                        { return m_AttachedElements.begin (); }
     std::list < CElement* > ::iterator          AttachedElementsEnd         ( void )                        { return m_AttachedElements.end (); }
-    inline char*                                GetAttachToID               ( void )                        { return m_szAttachToID; }
+    const char*                                 GetAttachToID               ( void )                        { return m_strAttachToID; }
     bool                                        IsElementAttached           ( CElement* pElement );
     virtual bool                                IsAttachable                ( void );
     virtual bool                                IsAttachToable              ( void );
@@ -259,7 +259,7 @@ protected:
     CVector                                     m_vecAttachedPosition;
     CVector                                     m_vecAttachedRotation;
     std::list < CElement* >                     m_AttachedElements;
-    char                                        m_szAttachToID [ MAX_ELEMENT_NAME_LENGTH + 1 ];
+    SString                                     m_strAttachToID;
 
     CElementGroup*                              m_pElementGroup;
 

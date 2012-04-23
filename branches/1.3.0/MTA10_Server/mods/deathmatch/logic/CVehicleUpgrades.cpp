@@ -16,30 +16,31 @@ char szUpgradeNameEmpty [] = "";
 
 struct SUpgradeName
 {
-    char szName [32];
+    const char* szName;
 };
 
-SUpgradeName UpgradeNames [17] =
-{ {"Hood"}, {"Vent"}, {"Spoiler"}, {"Sideskirt"}, {"Front Bullbars"},
-{"Rear Bullbars"}, {"Headlights"}, {"Roof"}, {"Nitro"}, {"Hydraulics"}, 
-{"Stereo"}, {"Unknown"}, {"Wheels"}, {"Exhaust"}, {"Front Bumper"},
-{"Rear Bumper"}, {"Misc"} };
+static const SFixedArray < SUpgradeName, VEHICLE_UPGRADE_SLOTS > UpgradeNames = 
+{ {
+    {"Hood"}, {"Vent"}, {"Spoiler"}, {"Sideskirt"}, {"Front Bullbars"},
+    {"Rear Bullbars"}, {"Headlights"}, {"Roof"}, {"Nitro"}, {"Hydraulics"}, 
+    {"Stereo"}, {"Unknown"}, {"Wheels"}, {"Exhaust"}, {"Front Bumper"},
+    {"Rear Bumper"}, {"Misc"}
+} };
 
 
 CVehicleUpgrades::CVehicleUpgrades ( CVehicle* pVehicle )
 {
     m_pVehicle = pVehicle;
-    memset ( m_SlotStates, 0, sizeof ( m_SlotStates ) );
+    memset ( &m_SlotStates[0], 0, sizeof ( m_SlotStates ) );
 }
 
 CVehicleUpgrades::CVehicleUpgrades ( CVehicle* pVehicle, CVehicleUpgrades* pUpgrades )
 {
     m_pVehicle = pVehicle;
-    memset ( m_SlotStates, 0, sizeof ( m_SlotStates ) );
+    memset ( &m_SlotStates[0], 0, sizeof ( m_SlotStates ) );
     if ( pUpgrades )
     {
-        unsigned short* usSlotStates = pUpgrades->GetSlotStates ();
-        memcpy ( m_SlotStates, usSlotStates, sizeof ( m_SlotStates ) );
+        m_SlotStates = pUpgrades->GetSlotStates ();
     }
 }
 

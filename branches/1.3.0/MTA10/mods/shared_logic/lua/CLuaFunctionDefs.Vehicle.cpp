@@ -504,7 +504,7 @@ int CLuaFunctionDefs::GetVehicleUpgrades ( lua_State* luaVM )
                 lua_newtable ( luaVM );
 
                 // Add all the upgrades to the table
-                unsigned short* usSlotStates = pUpgrades->GetSlotStates ();
+                const SSlotStates& usSlotStates = pUpgrades->GetSlotStates ();
 
                 unsigned int uiIndex = 0;
                 unsigned char ucSlot = 0;
@@ -2261,14 +2261,15 @@ int CLuaFunctionDefs::GetRadioChannel ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetRadioChannelName ( lua_State* luaVM )
 {
-    static const char* szRadioStations[] = { "Radio off", "Playback FM", "K-Rose", "K-DST",
+    static const SFixedArray < const char*, 13 > szRadioStations = { {
+        "Radio off", "Playback FM", "K-Rose", "K-DST",
         "Bounce FM", "SF-UR", "Radio Los Santos", "Radio X", "CSR 103.9", "K-Jah West",
-        "Master Sounds 98.3", "WCTR", "User Track Player" };
+        "Master Sounds 98.3", "WCTR", "User Track Player" } };
 
     if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
     {
         int iChannel = static_cast < int > ( lua_tonumber ( luaVM, 1 ) );
-        if ( iChannel >= 0 && iChannel < sizeof(szRadioStations)/sizeof(char *) ) {
+        if ( iChannel >= 0 && iChannel < NUMELMS( szRadioStations ) ) {
             lua_pushstring ( luaVM, szRadioStations [ iChannel ] );
             return 1;
         }

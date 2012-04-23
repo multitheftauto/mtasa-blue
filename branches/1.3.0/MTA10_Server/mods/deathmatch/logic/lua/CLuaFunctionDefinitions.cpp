@@ -4252,7 +4252,6 @@ int CLuaFunctionDefinitions::GetVehicleSirenParams( lua_State* luaVM )
 {
     CScriptArgReader argStream ( luaVM );
     CVehicle* pVehicle = NULL;
-    unsigned char ucSirenID = 0;
     SSirenInfo tSirenInfo;
 
     argStream.ReadUserData ( pVehicle );
@@ -4308,7 +4307,6 @@ int CLuaFunctionDefinitions::GetVehicleSirens( lua_State* luaVM )
 {
     CScriptArgReader argStream ( luaVM );
     CVehicle* pVehicle = NULL;
-    unsigned char ucSirenID = 0;
     SSirenInfo tSirenInfo;
 
     argStream.ReadUserData ( pVehicle );
@@ -4852,7 +4850,7 @@ int CLuaFunctionDefinitions::GetVehicleUpgrades ( lua_State* luaVM )
                 lua_newtable ( luaVM );
 
                 // Add all the upgrades to the table
-                unsigned short* usSlotStates = pUpgrades->GetSlotStates ();
+                const SSlotStates& usSlotStates = pUpgrades->GetSlotStates ();
 
                 unsigned int uiIndex = 0;
                 unsigned char ucSlot = 0;

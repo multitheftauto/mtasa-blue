@@ -155,7 +155,7 @@ CGame::CGame ( void )
 
     m_bOcclusionsEnabled = true;
 
-    memset( m_bGarageStates, 0, sizeof(bool) * MAX_GARAGES );
+    memset( &m_bGarageStates[0], 0, sizeof( m_bGarageStates ) );
 
     // init our mutex
     pthread_mutex_init(&mutexhttp, NULL);
@@ -1550,8 +1550,8 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
             SString strSerial;
             SString strPlayerVersion;
             {
-                CStaticString < 32 > strSerialTemp;
-                CStaticString < 32 > strPlayerVersionTemp;
+                SFixedString < 32 > strSerialTemp;
+                SFixedString < 32 > strPlayerVersionTemp;
                 g_pNetServer->GetClientSerialAndVersion ( p, strSerialTemp, strPlayerVersionTemp );
                 strSerial = SStringX ( strSerialTemp );
                 strPlayerVersion = SStringX ( strPlayerVersionTemp );
@@ -2191,7 +2191,7 @@ void CGame::Packet_LuaEvent ( CLuaEventPacket& Packet )
 {
     // Grab the source player, even name, element id and the arguments passed
     CPlayer* pCaller = Packet.GetSourcePlayer ();
-    char* szName = Packet.GetName ();
+    const char* szName = Packet.GetName ();
     ElementID ElementID = Packet.GetElementID ();
     CLuaArguments Arguments = Packet.GetArguments ();
 

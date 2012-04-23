@@ -344,18 +344,9 @@ void CElementRPCs::SetElementDoubleSided ( CClientEntity* pSource, NetBitStreamI
 
 void CElementRPCs::SetElementName ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    unsigned short usNameLength;
-    if ( bitStream.Read ( usNameLength ) )
-    {
-        char* szName = new char [ usNameLength + 1 ];
-        szName [ usNameLength ] = 0;
-
-        if ( bitStream.Read ( szName, usNameLength ) )
-        {
-            pSource->SetName ( szName );
-        }
-        delete [] szName;
-    }
+    SString strName;
+    if ( bitStream.ReadString ( strName ) )
+        pSource->SetName ( strName );
 }
 
 

@@ -13,8 +13,8 @@
 
 #include "StdInc.h"
 
-SBindableKey g_bkKeys [ NUMBER_OF_KEYS ] = 
-{ 
+static const SFixedArray < SBindableKey, 105 > g_bkKeys = 
+{ {
     { "mouse1" }, { "mouse2" }, { "mouse3" }, { "mouse_wheel_up" }, { "mouse_wheel_down" },
     { "mouse4" }, { "mouse5" }, { "backspace" }, { "tab" }, { "lshift" }, { "rshift" },
     { "lctrl" }, { "rctrl" }, { "lalt" }, { "ralt" }, { "pause" }, { "capslock" },
@@ -31,11 +31,10 @@ SBindableKey g_bkKeys [ NUMBER_OF_KEYS ] =
     { "F9" }, { "F10" }, { "F11" }, { "F12" }, { "scroll" }, { ";" }, { "=" }, { "," }, { "-" },
     { "." }, { "/" }, { "'" }, { "[" }, { "\\" }, { "]" },  { "#" },
     { "" }
-};
+} };
 
-
-SBindableGTAControl g_bcControls[] =
-{
+static const SFixedArray < SBindableGTAControl, 45 > g_bcControls = 
+{ {
     { "fire" }, { "next_weapon" }, { "previous_weapon" }, { "forwards" }, { "backwards" },
     { "left" }, { "right" }, { "zoom_in" }, { "zoom_out" }, { "enter_exit" },
     { "change_camera" }, { "jump" }, { "sprint" }, { "look_behind" }, { "crouch" },
@@ -48,7 +47,7 @@ SBindableGTAControl g_bcControls[] =
     { "special_control_down" }, { "special_control_up" }, { "aim_weapon" },
     { "conversation_yes" }, { "conversation_no" }, { "group_control_forwards" },
     { "group_control_back" }, { "" }
-};
+} };
 
 
 CKeyBinds::CKeyBinds ( CPlayer* pPlayer )
@@ -64,10 +63,10 @@ CKeyBinds::~CKeyBinds ( void )
 }
 
 
-SBindableKey* CKeyBinds::GetBindableFromKey ( const char* szKey )
+const SBindableKey* CKeyBinds::GetBindableFromKey ( const char* szKey )
 {
     // Map for faster lookup
-    static std::map < SString, SBindableKey* > bindableKeyMap;
+    static std::map < SString, const SBindableKey* > bindableKeyMap;
 
     // Init map if required
     if ( bindableKeyMap.empty () )
@@ -78,10 +77,10 @@ SBindableKey* CKeyBinds::GetBindableFromKey ( const char* szKey )
 }
 
 
-SBindableGTAControl* CKeyBinds::GetBindableFromControl ( const char* szControl )
+const SBindableGTAControl* CKeyBinds::GetBindableFromControl ( const char* szControl )
 {
     // Map for faster lookup
-    static std::map < SString, SBindableGTAControl* > bindableControlMap;
+    static std::map < SString, const SBindableGTAControl* > bindableControlMap;
 
     // Init map if required
     if ( bindableControlMap.empty () )
@@ -178,8 +177,8 @@ void CKeyBinds::Call ( CKeyBind* pKeyBind )
 
 bool CKeyBinds::ProcessKey ( const char* szKey, bool bHitState, eKeyBindType bindType )
 {
-    SBindableKey * pKey = NULL;
-    SBindableGTAControl * pControl = NULL;
+    const SBindableKey * pKey = NULL;
+    const SBindableGTAControl * pControl = NULL;
     if ( bindType == KEY_BIND_FUNCTION )
     {
         pKey = GetBindableFromKey ( szKey );
@@ -247,7 +246,7 @@ bool CKeyBinds::AddKeyFunction ( const char* szKey, bool bHitState, CLuaMain* pL
     if ( szKey == NULL || IS_REFNIL ( iLuaFunction ) )
         return false;
 
-    SBindableKey* pKey = GetBindableFromKey ( szKey );
+    const SBindableKey* pKey = GetBindableFromKey ( szKey );
     if ( pKey )
     {
         CKeyFunctionBind* pBind = new CKeyFunctionBind;
@@ -265,7 +264,7 @@ bool CKeyBinds::AddKeyFunction ( const char* szKey, bool bHitState, CLuaMain* pL
 }
 
 
-bool CKeyBinds::AddKeyFunction ( SBindableKey* pKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments )
+bool CKeyBinds::AddKeyFunction ( const SBindableKey* pKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments )
 {
     if ( pKey )
     {
@@ -385,7 +384,7 @@ bool CKeyBinds::AddControlFunction ( const char* szControl, bool bHitState, CLua
     if ( szControl == NULL )
         return false;
 
-    SBindableGTAControl* pControl = GetBindableFromControl ( szControl );
+    const SBindableGTAControl* pControl = GetBindableFromControl ( szControl );
     if ( pControl )
     {
         CControlFunctionBind* pBind = new CControlFunctionBind;
@@ -404,7 +403,7 @@ bool CKeyBinds::AddControlFunction ( const char* szControl, bool bHitState, CLua
 }
 
 
-bool CKeyBinds::AddControlFunction ( SBindableGTAControl* pControl, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments )
+bool CKeyBinds::AddControlFunction ( const SBindableGTAControl* pControl, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments )
 {
     if ( pControl )
     {
@@ -492,7 +491,7 @@ bool CKeyBinds::ControlFunctionExists ( const char* szControl, CLuaMain* pLuaMai
 }
 
 
-bool CKeyBinds::IsMouse ( SBindableKey* pKey )
+bool CKeyBinds::IsMouse ( const SBindableKey* pKey )
 {
     if ( pKey )
     {

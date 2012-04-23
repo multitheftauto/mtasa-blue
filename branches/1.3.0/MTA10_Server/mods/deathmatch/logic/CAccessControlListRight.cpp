@@ -14,10 +14,8 @@
 
 CAccessControlListRight::CAccessControlListRight ( const char* szRightName, ERightType eRightType, bool bAccess, CAccessControlListManager* pACLManager )
 {
-    m_szRightName[0] = '\0';
-    snprintf ( m_szRightName, MAX_ACL_RIGHT_NAME_LENGTH, "%s", szRightName );
-    m_szRightName[MAX_ACL_RIGHT_NAME_LENGTH-1] = '\0';
-    m_uiNameHash = HashString ( m_szRightName );
+    m_strRightName = szRightName;
+    m_uiNameHash = HashString ( m_strRightName );
 
     m_eRightType = eRightType;
     m_bAccess = bAccess;
@@ -36,7 +34,7 @@ void CAccessControlListRight::WriteToXMLNode ( CXMLNode* pNode )
 {
     assert ( pNode );
 
-    SString strRightFullName = CAclRightName ( m_eRightType, m_szRightName ).GetFullName ();
+    SString strRightFullName = CAclRightName ( m_eRightType, m_strRightName ).GetFullName ();
     SString strAccess = m_bAccess ? "true" : "false";
 
     CXMLNode* pRightNode = pNode->CreateSubNode ( "right" );
@@ -92,7 +90,7 @@ SString CAccessControlListRight::GetAttributeValue ( const SString& strAttribute
     else
     if ( strAttributeName == "name" )
     {
-        return m_szRightName;
+        return m_strRightName;
     }
     else
     {

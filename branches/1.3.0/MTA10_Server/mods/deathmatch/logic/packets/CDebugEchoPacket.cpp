@@ -25,11 +25,11 @@ bool CDebugEchoPacket::Write ( NetBitStreamInterface& BitStream ) const
     }
 
     // Too short?
-    size_t sizeMessage = strlen ( m_szMessage );
+    size_t sizeMessage = m_strMessage.length ();
     if ( sizeMessage >= MIN_DEBUGECHO_LENGTH )
     {
         // Write the string
-        BitStream.Write ( const_cast < char* > ( m_szMessage ), sizeMessage );
+        BitStream.WriteStringCharacters ( m_strMessage, sizeMessage );
         return true;
     }
 

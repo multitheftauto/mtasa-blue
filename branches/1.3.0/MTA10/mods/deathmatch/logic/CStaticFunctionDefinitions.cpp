@@ -1484,7 +1484,7 @@ bool CStaticFunctionDefinitions::GetPedTask ( CClientPed& Ped, bool bPrimary, un
 
 bool CStaticFunctionDefinitions::GetPedClothes ( CClientPed & Ped, unsigned char ucType, char* szTextureReturn, char* szModelReturn )
 {
-    SPlayerClothing* pClothing = Ped.GetClothes ()->GetClothing ( ucType );
+    const SPlayerClothing* pClothing = Ped.GetClothes ()->GetClothing ( ucType );
     if ( pClothing )
     {
         if ( szTextureReturn )
@@ -2159,7 +2159,7 @@ bool CStaticFunctionDefinitions::GetBodyPartName ( unsigned char ucID, char* szN
 
 bool CStaticFunctionDefinitions::GetClothesByTypeIndex ( unsigned char ucType, unsigned char ucIndex, char* szTextureReturn, char* szModelReturn )
 {
-    SPlayerClothing* pPlayerClothing = CClientPlayerClothes::GetClothingGroup ( ucType );
+    const SPlayerClothing* pPlayerClothing = CClientPlayerClothes::GetClothingGroup ( ucType );
     if ( pPlayerClothing )
     {
         if ( ucIndex < CClientPlayerClothes::GetClothingGroupMax ( ucType ) )
@@ -2184,7 +2184,7 @@ bool CStaticFunctionDefinitions::GetTypeIndexFromClothes ( char* szTexture, char
 
     for ( unsigned char ucType = 0 ; ucType < PLAYER_CLOTHING_SLOTS ; ucType++ )
     {
-        SPlayerClothing* pPlayerClothing = CClientPlayerClothes::GetClothingGroup ( ucType );
+        const SPlayerClothing* pPlayerClothing = CClientPlayerClothes::GetClothingGroup ( ucType );
         if ( pPlayerClothing )
         {
             for ( unsigned char ucIter = 0 ; pPlayerClothing [ ucIter ].szTexture != NULL ; ucIter++ )
@@ -2209,7 +2209,7 @@ bool CStaticFunctionDefinitions::GetClothesTypeName ( unsigned char ucType, char
 {
     assert ( szNameReturn );
 
-    char* szName = CClientPlayerClothes::GetClothingName ( ucType );
+    const char* szName = CClientPlayerClothes::GetClothingName ( ucType );
     if ( szName )
     {
         strcpy ( szNameReturn, szName );
@@ -2618,8 +2618,6 @@ bool CStaticFunctionDefinitions::AddAllVehicleUpgrades ( CClientEntity& Entity )
         CVehicleUpgrades* pUpgrades = Vehicle.GetUpgrades ();
         if ( pUpgrades )
         {
-            unsigned short* usUpgrades = pUpgrades->GetSlotStates ();
-
             pUpgrades->AddAllUpgrades ();
             return true;
         }
@@ -5781,11 +5779,11 @@ bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitS
 
     CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds ();
     const SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
-    SScriptBindableKey* pScriptKey = NULL;
+    const SScriptBindableKey* pScriptKey = NULL;
     if ( pKey )
         pScriptKey = m_pScriptKeyBinds->GetBindableFromKey ( szKey );
     SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szKey );
-    SScriptBindableGTAControl* pScriptControl = NULL;
+    const SScriptBindableGTAControl* pScriptControl = NULL;
     if ( pControl )
         pScriptControl = m_pScriptKeyBinds->GetBindableFromControl ( szKey );
 
@@ -5866,11 +5864,11 @@ bool CStaticFunctionDefinitions::UnbindKey ( const char* szKey, CLuaMain* pLuaMa
 
     CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds ();
     const SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
-    SScriptBindableKey* pScriptKey = NULL;
+    const SScriptBindableKey* pScriptKey = NULL;
     if ( pKey )
         pScriptKey = m_pScriptKeyBinds->GetBindableFromKey ( szKey );
     SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szKey );
-    SScriptBindableGTAControl* pScriptControl = NULL;
+    const SScriptBindableGTAControl* pScriptControl = NULL;
     if ( pControl )
         pScriptControl = m_pScriptKeyBinds->GetBindableFromControl ( szKey );
 

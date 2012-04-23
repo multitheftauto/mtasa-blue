@@ -384,7 +384,7 @@ public:
     bool                IsWearingGoggles ( void );
     void                SetGogglesState ( bool bIsWearingThem );
 
-    void                SetClothesTextureAndModel ( char * szTexture, char * szModel, int textureType );
+    void                SetClothesTextureAndModel ( const char* szTexture, const char* szModel, int textureType );
     void                RebuildPlayer ( void );
 
     eFightingStyle      GetFightingStyle ( void );

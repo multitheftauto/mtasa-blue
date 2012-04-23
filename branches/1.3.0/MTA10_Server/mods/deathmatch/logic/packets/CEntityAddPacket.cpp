@@ -327,10 +327,10 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
 
                     // Write the damage model
                     SVehicleDamageSync damage ( true, true, true, true, false );
-                    memcpy ( damage.data.ucDoorStates,  pVehicle->m_ucDoorStates,  MAX_DOORS );
-                    memcpy ( damage.data.ucWheelStates, pVehicle->m_ucWheelStates, MAX_WHEELS );
-                    memcpy ( damage.data.ucPanelStates, pVehicle->m_ucPanelStates, MAX_PANELS );
-                    memcpy ( damage.data.ucLightStates, pVehicle->m_ucLightStates, MAX_LIGHTS );
+                    damage.data.ucDoorStates = pVehicle->m_ucDoorStates;
+                    damage.data.ucWheelStates = pVehicle->m_ucWheelStates;
+                    damage.data.ucPanelStates = pVehicle->m_ucPanelStates;
+                    damage.data.ucLightStates = pVehicle->m_ucLightStates;
                     BitStream.Write ( &damage );
                     
                     unsigned char ucVariant = pVehicle->GetVariant();
@@ -369,7 +369,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     // Write all the upgrades
                     CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
                     unsigned char ucNumUpgrades = pUpgrades->Count ();
-                    unsigned short* usSlotStates = pUpgrades->GetSlotStates ();
+                    const SSlotStates& usSlotStates = pUpgrades->GetSlotStates ();
                     BitStream.Write ( ucNumUpgrades );
 
                     if ( ucNumUpgrades > 0 )
@@ -713,7 +713,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     CPlayerClothes* pClothes = pPed->GetClothes ( );
                     for ( unsigned char ucType = 0 ; ucType < PLAYER_CLOTHING_SLOTS ; ucType++ )
                     {
-                        SPlayerClothing* pClothing = pClothes->GetClothing ( ucType );
+                        const SPlayerClothing* pClothing = pClothes->GetClothing ( ucType );
                         if ( pClothing )
                         {
                             ucNumClothes++;
@@ -722,7 +722,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     BitStream.Write ( ucNumClothes );
                     for ( unsigned char ucType = 0 ; ucType < PLAYER_CLOTHING_SLOTS ; ucType++ )
                     {
-                        SPlayerClothing* pClothing = pClothes->GetClothing ( ucType );
+                        const SPlayerClothing* pClothing = pClothes->GetClothing ( ucType );
                         if ( pClothing )
                         {
                             unsigned char ucTextureLength = strlen ( pClothing->szTexture );

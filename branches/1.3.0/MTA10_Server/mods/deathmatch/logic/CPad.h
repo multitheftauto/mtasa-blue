@@ -135,7 +135,7 @@ enum eControlType
 
 struct SGTAControl
 {
-    char szControl [25];
+    const char szControl [25];
     eControllerAction action;
     eControlType controlType;
 };
@@ -177,7 +177,7 @@ protected:
     CControllerState            m_csCurrentState;
     CControllerState            m_csLastState;
 
-    SGTAControlState            m_ControlStates [ NUM_CONTROL_STATES ];
+    SFixedArray < SGTAControlState, NUM_CONTROL_STATES >   m_ControlStates;
     bool                        m_bUpdatedKeys;
 };
 

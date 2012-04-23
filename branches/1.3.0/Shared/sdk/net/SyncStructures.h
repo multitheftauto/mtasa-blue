@@ -1205,34 +1205,22 @@ struct SBodypartSync : public ISyncStructure
 //           Vehicle damage             //
 //                                      //
 //////////////////////////////////////////
-template < unsigned int maxElements, unsigned int numBits >
+template < unsigned int MAXELEMENTS, unsigned int NUMBITS >
 struct SVehiclePartStateSync : public ISyncStructure
 {
     SVehiclePartStateSync ( bool bDeltaSync = true ) : m_bDeltaSync ( bDeltaSync ) {}
 
-    void Set ( const bool bChanged [ maxElements ], const unsigned char ucStates [ maxElements ] )
-    {
-        memcpy ( data.bChanged, bChanged, sizeof ( bool ) * maxElements );
-        memcpy ( data.ucStates, ucStates, sizeof ( char ) * maxElements );
-    }
-
-    void Get ( bool* bChanged, unsigned char* ucStates )
-    {
-        memcpy ( bChanged, data.bChanged, sizeof ( bool ) * maxElements );
-        memcpy ( ucStates, data.ucStates, sizeof ( char ) * maxElements );
-    }
-
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        for ( unsigned int i = 0; i < maxElements; ++i )
+        for ( unsigned int i = 0; i < MAXELEMENTS; ++i )
         {
             if ( !m_bDeltaSync || ( data.bChanged [ i ] = bitStream.ReadBit () ) == true )
             {
                 struct
                 {
-                    unsigned int uiState : numBits;
+                    unsigned int uiState : NUMBITS;
                 } privateData;
-                if ( !bitStream.ReadBits ( reinterpret_cast < char* > ( &privateData ), numBits ) )
+                if ( !bitStream.ReadBits ( reinterpret_cast < char* > ( &privateData ), NUMBITS ) )
                     return false;
 
                 if ( !m_bDeltaSync )
@@ -1246,19 +1234,19 @@ struct SVehiclePartStateSync : public ISyncStructure
 
     void Write ( NetBitStreamInterface& bitStream ) const
     {
-        for ( unsigned int i = 0; i < maxElements; ++i )
+        for ( unsigned int i = 0; i < MAXELEMENTS; ++i )
         {
             if ( !m_bDeltaSync || data.bChanged [ i ] )
             {
                 struct
                 {
-                    unsigned int uiState : numBits;
+                    unsigned int uiState : NUMBITS;
                 } privateData;
                 privateData.uiState = data.ucStates [ i ];
 
                 if ( m_bDeltaSync )
                     bitStream.WriteBit ( true );
-                bitStream.WriteBits ( reinterpret_cast < const char* > ( &privateData ), numBits );
+                bitStream.WriteBits ( reinterpret_cast < const char* > ( &privateData ), NUMBITS );
             }
             else
                 bitStream.WriteBit ( false );
@@ -1267,8 +1255,8 @@ struct SVehiclePartStateSync : public ISyncStructure
 
     struct
     {
-        bool bChanged [ maxElements ];
-        unsigned char ucStates [ maxElements ];
+        SFixedArray < bool, MAXELEMENTS > bChanged;
+        SFixedArray < unsigned char, MAXELEMENTS > ucStates;
     } data;
 
 private:
@@ -1296,40 +1284,40 @@ struct SVehicleDamageSync : public ISyncStructure
         {
             // Read door states
             SVehiclePartStateSync < MAX_DOORS, 3 > doors ( m_bDeltaSync );
-            if ( bitStream.Read ( &doors ) )
-                doors.Get ( data.bDoorStatesChanged, data.ucDoorStates );
-            else
+            if ( !bitStream.Read ( &doors ) )
                 return false;
+            data.bDoorStatesChanged = doors.data.bChanged;
+            data.ucDoorStates = doors.data.ucStates;
         }
 
         if ( m_bSyncWheels )
         {
             // Read wheel states
             SVehiclePartStateSync < MAX_WHEELS, 2 > wheels ( m_bDeltaSync );
-            if ( bitStream.Read ( &wheels ) )
-                wheels.Get ( data.bWheelStatesChanged, data.ucWheelStates );
-            else
+            if ( !bitStream.Read ( &wheels ) )
                 return false;
+            data.bWheelStatesChanged = wheels.data.bChanged;
+            data.ucWheelStates = wheels.data.ucStates;
         }
 
         if ( m_bSyncPanels )
         {
             // Read panel states
             SVehiclePartStateSync < MAX_PANELS, 2 > panels ( m_bDeltaSync );
-            if ( bitStream.Read ( &panels ) )
-                panels.Get ( data.bPanelStatesChanged, data.ucPanelStates );
-            else
+            if ( !bitStream.Read ( &panels ) )
                 return false;
+            data.bPanelStatesChanged = panels.data.bChanged;
+            data.ucPanelStates = panels.data.ucStates;
         }
 
         if ( m_bSyncLights )
         {
             // Read light states
             SVehiclePartStateSync < MAX_LIGHTS, 2 > lights ( m_bDeltaSync );
-            if ( bitStream.Read ( &lights ) )
-                lights.Get ( data.bLightStatesChanged, data.ucLightStates );
-            else
+            if ( !bitStream.Read ( &lights ) )
                 return false;
+            data.bLightStatesChanged = lights.data.bChanged;
+            data.ucLightStates = lights.data.ucStates;
         }
 
         return true;
@@ -1341,7 +1329,8 @@ struct SVehicleDamageSync : public ISyncStructure
         {
             // Write door states
             SVehiclePartStateSync < MAX_DOORS, 3 > doors ( m_bDeltaSync );
-            doors.Set ( data.bDoorStatesChanged, data.ucDoorStates );
+            doors.data.bChanged = data.bDoorStatesChanged;
+            doors.data.ucStates = data.ucDoorStates;
             bitStream.Write ( &doors );
         }
 
@@ -1349,7 +1338,8 @@ struct SVehicleDamageSync : public ISyncStructure
         {
             // Write wheels states
             SVehiclePartStateSync < MAX_WHEELS, 2 > wheels ( m_bDeltaSync );
-            wheels.Set ( data.bWheelStatesChanged, data.ucWheelStates );
+            wheels.data.bChanged = data.bWheelStatesChanged;
+            wheels.data.ucStates = data.ucWheelStates;
             bitStream.Write ( &wheels );
         }
 
@@ -1357,7 +1347,8 @@ struct SVehicleDamageSync : public ISyncStructure
         {
             // Write panel states
             SVehiclePartStateSync < MAX_PANELS, 2 > panels ( m_bDeltaSync );
-            panels.Set ( data.bPanelStatesChanged, data.ucPanelStates );
+            panels.data.bChanged = data.bPanelStatesChanged;
+            panels.data.ucStates = data.ucPanelStates;
             bitStream.Write ( &panels );
         }
 
@@ -1365,22 +1356,23 @@ struct SVehicleDamageSync : public ISyncStructure
         {
             // Write light states
             SVehiclePartStateSync < MAX_LIGHTS, 2 > lights ( m_bDeltaSync );
-            lights.Set ( data.bLightStatesChanged, data.ucLightStates );
+            lights.data.bChanged = data.bLightStatesChanged;
+            lights.data.ucStates = data.ucLightStates;
             bitStream.Write ( &lights );
         }
     }
 
     struct
     {
-        bool bDoorStatesChanged  [ MAX_DOORS ];
-        bool bWheelStatesChanged [ MAX_WHEELS ];
-        bool bPanelStatesChanged [ MAX_PANELS ];
-        bool bLightStatesChanged [ MAX_LIGHTS ];
+        SFixedArray < bool, MAX_DOORS > bDoorStatesChanged;
+        SFixedArray < bool, MAX_WHEELS > bWheelStatesChanged;
+        SFixedArray < bool, MAX_PANELS > bPanelStatesChanged;
+        SFixedArray < bool, MAX_LIGHTS > bLightStatesChanged;
 
-        unsigned char ucDoorStates  [ MAX_DOORS ];
-        unsigned char ucWheelStates [ MAX_WHEELS ];
-        unsigned char ucPanelStates [ MAX_PANELS ];
-        unsigned char ucLightStates [ MAX_LIGHTS ];
+        SFixedArray < unsigned char, MAX_DOORS > ucDoorStates;
+        SFixedArray < unsigned char, MAX_WHEELS > ucWheelStates;
+        SFixedArray < unsigned char, MAX_PANELS > ucPanelStates;
+        SFixedArray < unsigned char, MAX_LIGHTS > ucLightStates;
     } data;
 
 private:

@@ -196,7 +196,7 @@ int CLuaFunctionDefs::GetResourceName ( lua_State* luaVM )
         if ( pResource )
         {
             // Grab its name and return it
-            char* szName = pResource->GetName ();
+            const char* szName = pResource->GetName ();
             if ( szName )
             {
                 lua_pushstring ( luaVM, szName );

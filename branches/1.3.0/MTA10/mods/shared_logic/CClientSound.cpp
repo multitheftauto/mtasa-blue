@@ -130,7 +130,7 @@ bool CClientSound::Create ( void )
     m_pAudio->SetVelocity ( m_vecVelocity );
     m_pAudio->SetMinDistance ( m_fMinDistance );
     m_pAudio->SetMaxDistance ( m_fMaxDistance );
-    m_pAudio->SetFxEffects ( m_EnabledEffects, NUMELMS( m_EnabledEffects ) );
+    m_pAudio->SetFxEffects ( &m_EnabledEffects[0], NUMELMS( m_EnabledEffects ) );
 
     // Transfer play position if it was being simulated
     EndSimulationOfPlayPositionAndApply ();
@@ -464,7 +464,7 @@ bool CClientSound::SetFxEffect ( uint uiFxEffect, bool bEnable )
     m_EnabledEffects[uiFxEffect] = bEnable;
 
     if ( m_pAudio )
-        m_pAudio->SetFxEffects ( m_EnabledEffects, NUMELMS( m_EnabledEffects ) );
+        m_pAudio->SetFxEffects ( &m_EnabledEffects[0], NUMELMS( m_EnabledEffects ) );
 
     return true;
 }
