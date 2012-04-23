@@ -18,9 +18,9 @@ CDeathmatchVehicle::CDeathmatchVehicle ( CClientManager* pManager, CUnoccupiedVe
 {
     m_pUnoccupiedVehicleSync = pUnoccupiedVehicleSync;
     GetInitialDoorStates ( m_ucLastDoorStates );
-    memset ( m_ucLastWheelStates, 0, sizeof ( m_ucLastWheelStates ) );
-    memset ( m_ucLastPanelStates, 0, sizeof ( m_ucLastPanelStates ) );
-    memset ( m_ucLastLightStates, 0, sizeof ( m_ucLastLightStates ) );
+    memset ( &m_ucLastWheelStates[0], 0, sizeof ( m_ucLastWheelStates ) );
+    memset ( &m_ucLastPanelStates[0], 0, sizeof ( m_ucLastPanelStates ) );
+    memset ( &m_ucLastLightStates[0], 0, sizeof ( m_ucLastLightStates ) );
     m_bIsSyncing = false;
 
     SetIsSyncing ( false );
@@ -101,10 +101,10 @@ bool CDeathmatchVehicle::SyncDamageModel ( void )
     if ( bChanges )
     {
         // Set the last state to current
-        memcpy ( m_ucLastDoorStates,  damage.data.ucDoorStates,  sizeof ( m_ucLastDoorStates ) );
-        memcpy ( m_ucLastWheelStates, damage.data.ucWheelStates, sizeof ( m_ucLastWheelStates ) );
-        memcpy ( m_ucLastPanelStates, damage.data.ucPanelStates, sizeof ( m_ucLastPanelStates ) );
-        memcpy ( m_ucLastLightStates, damage.data.ucLightStates, sizeof ( m_ucLastLightStates ) );
+        m_ucLastDoorStates = damage.data.ucDoorStates;
+        m_ucLastWheelStates = damage.data.ucWheelStates;
+        m_ucLastPanelStates = damage.data.ucPanelStates;
+        m_ucLastLightStates = damage.data.ucLightStates;
 
         // Sync it
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();

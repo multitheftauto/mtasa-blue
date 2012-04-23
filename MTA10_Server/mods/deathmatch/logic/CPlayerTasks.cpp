@@ -14,8 +14,8 @@
 
 CPlayerTasks::CPlayerTasks ( void )
 {
-    memset ( m_PriorityTasks, 0, sizeof ( m_PriorityTasks ) );
-    memset ( m_SecondaryTasks, 0, sizeof ( m_SecondaryTasks ) );
+    memset ( &m_PriorityTasks[0], 0, sizeof ( m_PriorityTasks ) );
+    memset ( &m_SecondaryTasks[0], 0, sizeof ( m_SecondaryTasks ) );
 }
 
 

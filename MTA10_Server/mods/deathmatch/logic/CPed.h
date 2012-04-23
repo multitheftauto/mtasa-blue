@@ -140,7 +140,6 @@ public:
     
     inline float                                GetPlayerStat               ( unsigned short usStat )       { return ( usStat < NUM_PLAYER_STATS ) ? m_fStats [ usStat ] : 0; }
     inline void                                 SetPlayerStat               ( unsigned short usStat, float fValue ) { if ( usStat < NUM_PLAYER_STATS ) m_fStats [ usStat ] = fValue; } 
-    inline float*                               GetPlayerStats              ( void )                        { return m_fStats; }
 
     inline CPlayerClothes*                      GetClothes                  ( void )                        { return m_pClothes; }
 
@@ -236,14 +235,14 @@ protected:
     unsigned long                               m_ulHealthChangeTime;
     float                                       m_fArmor;
     unsigned long                               m_ulArmorChangeTime;
-    float                                       m_fStats [ NUM_PLAYER_STATS ];
+    SFixedArray < float, NUM_PLAYER_STATS >    m_fStats;
     CPlayerClothes*                             m_pClothes;
     bool                                        m_bHasJetPack;
     bool                                        m_bInWater;
     bool                                        m_bOnGround;
     bool                                        m_bIsPlayer;
     CPlayerTasks*                               m_pTasks;
-    CWeapon                                     m_Weapons [ WEAPON_SLOTS ];
+    SFixedArray < CWeapon, WEAPON_SLOTS >      m_Weapons;
     unsigned char                               m_ucWeaponSlot;
     unsigned char                               m_ucCurrentWeaponState;
     unsigned char                               m_ucAlpha;

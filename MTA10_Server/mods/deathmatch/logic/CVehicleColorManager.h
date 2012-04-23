@@ -40,7 +40,7 @@ public:
     CVehicleColor           GetRandomColor                      ( unsigned short usModel );
 
 private:
-    CVehicleColors          m_Colors [212];
+    SFixedArray < CVehicleColors, 212 >    m_Colors;
 };
 
 #endif

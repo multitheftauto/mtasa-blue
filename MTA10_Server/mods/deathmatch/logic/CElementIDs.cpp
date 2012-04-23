@@ -15,11 +15,11 @@
 using namespace std;
 
 CStack <ElementID, MAX_SERVER_ELEMENTS - 2 > CElementIDs::m_UniqueIDs;
-CElement* CElementIDs::m_Elements [MAX_SERVER_ELEMENTS];
+SFixedArray < CElement*, MAX_SERVER_ELEMENTS > CElementIDs::m_Elements;
 
 void CElementIDs::Initialize ( void )
 {
-    memset ( m_Elements, 0, sizeof ( m_Elements ) );
+    memset ( &m_Elements[0], 0, sizeof ( m_Elements ) );
 }
 
 

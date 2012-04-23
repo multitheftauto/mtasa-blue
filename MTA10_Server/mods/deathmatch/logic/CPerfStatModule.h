@@ -18,10 +18,10 @@ struct SStatData
     ZERO_ON_NEW
 
     struct {
-        long long llSentPacketsByZone [ ZONE_MAX ];
-        long long llSentBytesByZone [ ZONE_MAX ];
-        long long llSkippedPacketsByZone [ ZONE_MAX ];
-        long long llSkippedBytesByZone [ ZONE_MAX ];
+        SFixedArray < long long, ZONE_MAX > llSentPacketsByZone;
+        SFixedArray < long long, ZONE_MAX > llSentBytesByZone;
+        SFixedArray < long long, ZONE_MAX > llSkippedPacketsByZone;
+        SFixedArray < long long, ZONE_MAX > llSkippedBytesByZone;
     } puresync;
 
     struct {

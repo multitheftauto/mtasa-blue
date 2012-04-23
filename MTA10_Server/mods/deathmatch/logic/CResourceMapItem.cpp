@@ -297,7 +297,7 @@ void CResourceMapItem::LinkupElements ( void )
     {
         CVehicle* pVehicle = *iterVehicles;
 
-        char* szAttachToID = pVehicle->GetAttachToID ();
+        const char* szAttachToID = pVehicle->GetAttachToID ();
         if ( szAttachToID [ 0 ] )
         {
             CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
@@ -310,7 +310,7 @@ void CResourceMapItem::LinkupElements ( void )
     for ( ; iterPlayers != m_pPlayerManager->IterEnd (); iterPlayers++ )
     {
         CPlayer* pPlayer = *iterPlayers;
-        char* szAttachToID = pPlayer->GetAttachToID ();
+        const char* szAttachToID = pPlayer->GetAttachToID ();
         if ( szAttachToID [ 0 ] )
         {
             CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
@@ -323,7 +323,7 @@ void CResourceMapItem::LinkupElements ( void )
     for ( ; iterObjects != m_pObjectManager->IterEnd (); iterObjects++ )
     {
         CObject* pObject = *iterObjects;
-        char* szAttachToID = pObject->GetAttachToID ();
+        const char* szAttachToID = pObject->GetAttachToID ();
         if ( szAttachToID [ 0 ] )
         {
             CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
@@ -336,7 +336,7 @@ void CResourceMapItem::LinkupElements ( void )
     for ( ; iterBlips != m_pBlipManager->IterEnd (); iterBlips++ )
     {
         CBlip* pBlip = *iterBlips;
-        char* szAttachToID = pBlip->GetAttachToID ();
+        const char* szAttachToID = pBlip->GetAttachToID ();
         if ( szAttachToID [ 0 ] )
         {
             CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );

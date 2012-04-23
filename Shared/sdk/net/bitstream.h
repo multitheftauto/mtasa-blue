@@ -158,6 +158,7 @@ public:
     // Write characters from a std::string
     void WriteStringCharacters ( const std::string& value, unsigned short usLength )
     {
+        dassert ( usLength <= value.length () );
         // Send the data
         if ( usLength )
             Write ( &value.at ( 0 ), usLength );

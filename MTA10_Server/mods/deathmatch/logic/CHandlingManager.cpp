@@ -13,10 +13,10 @@
 
 #include "StdInc.h"
 
-tHandlingData CHandlingManager::m_OriginalHandlingData [HT_MAX];
+SFixedArray < tHandlingData, HT_MAX > CHandlingManager::m_OriginalHandlingData;
 
-CHandlingEntry* CHandlingManager::m_pOriginalEntries [HT_MAX];
-CHandlingEntry* CHandlingManager::m_pModelEntries [HT_MAX];
+SFixedArray < CHandlingEntry*, HT_MAX > CHandlingManager::m_pOriginalEntries;
+SFixedArray < CHandlingEntry*, HT_MAX > CHandlingManager::m_pModelEntries;
 
 
 CHandlingManager::CHandlingManager ( void )
@@ -407,7 +407,7 @@ eHandlingTypes  CHandlingManager::GetHandlingID ( eVehicleTypes eModel )
 void CHandlingManager::InitializeDefaultHandlings ( void )
 {
     // Reset
-    memset ( m_OriginalHandlingData, 0, sizeof ( m_OriginalHandlingData ) );
+    memset ( &m_OriginalHandlingData[0], 0, sizeof ( m_OriginalHandlingData ) );
 
     // NB: Don't waste your time changing this manually. Use the dumping code
     //     commented out at the bottom :)

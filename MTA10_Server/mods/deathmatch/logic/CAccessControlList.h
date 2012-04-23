@@ -27,7 +27,7 @@ public:
                                                 CAccessControlList          ( const char* szACLName, class CAccessControlListManager* pACLManager );
                                                 ~CAccessControlList         ( void );
 
-    inline const char*                          GetName                     ( void )        { return m_szACLName; };
+    inline const char*                          GetName                     ( void )        { return m_strACLName; };
 
     CAccessControlListRight*                    AddRight                    ( const char* szRightName, CAccessControlListRight::ERightType eRightType, bool bAccess );
     CAccessControlListRight*                    GetRight                    ( const char* szRightName, CAccessControlListRight::ERightType eRightType, bool bAllowWildcardMatch = false );
@@ -44,7 +44,7 @@ public:
 private:
     void                                        OnChange                    ( void );
 
-    char                                        m_szACLName                 [ MAX_ACL_NAME_LENGTH ];
+    SString                                     m_strACLName;
     list < CAccessControlListRight* >           m_Rights;
 
     class CAccessControlListManager*            m_pACLManager;

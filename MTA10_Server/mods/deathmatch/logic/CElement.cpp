@@ -69,7 +69,6 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
     m_pCustomData = new CCustomData;
 
     m_pAttachedTo = NULL;
-    m_szAttachToID [ 0 ] = 0;
 }
 
 
@@ -826,7 +825,9 @@ bool CElement::LoadFromCustomData ( CLuaMain* pLuaMain, CEvents* pEvents )
     m_strName = szBuf;
 
     // Grab the attaching custom data
-    GetCustomDataString ( "attachTo", m_szAttachToID, MAX_ELEMENT_NAME_LENGTH, true );
+    szBuf[0] = 0;
+    GetCustomDataString ( "attachTo", szBuf, MAX_ELEMENT_NAME_LENGTH, true );
+    m_strAttachToID = szBuf;
     GetCustomDataFloat ( "attachX", m_vecAttachedPosition.fX, true );
     GetCustomDataFloat ( "attachY", m_vecAttachedPosition.fY, true );
     GetCustomDataFloat ( "attachZ", m_vecAttachedPosition.fZ, true );

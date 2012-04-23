@@ -59,12 +59,6 @@ public:
                                                               CResource* pResourceOwner );
                                     ~CLuaMain               ( void );
 
-    int                             GetClientType           ( void ) { return CClient::CLIENT_SCRIPT; };
-    const char*                     GetNick                 ( void ) { return m_szScriptName; };
-
-    void                            SendEcho                ( const char* szEcho ) {};
-    void                            SendConsole             ( const char* szEcho ) {};
-
     inline int                      GetOwner                ( void )                        { return m_iOwner; };
     inline void                     SetOwner                ( int iOwner )                  { m_iOwner = iOwner; };
 
@@ -79,9 +73,8 @@ public:
 
     void                            DoPulse                 ( void );
 
-    void                            GetScriptName           ( char* szLuaScript ) const     { strcpy ( szLuaScript, m_szScriptName ); };
-    inline const char*              GetScriptNamePointer    ( void ) const                  { return m_szScriptName; };
-    void                            SetScriptName           ( const char* szName )          { strncpy ( m_szScriptName, szName, MAX_SCRIPTNAME_LENGTH ); };
+    inline const char*              GetScriptName           ( void ) const                  { return m_strScriptName; }
+    void                            SetScriptName           ( const char* szName )          { m_strScriptName.AssignLeft ( szName, MAX_SCRIPTNAME_LENGTH ); }
 
     void                            RegisterFunction        ( const char* szFunction, lua_CFunction function );
 
@@ -132,7 +125,7 @@ private:
 
     static void                     InstructionCountHook    ( lua_State* luaVM, lua_Debug* pDebug );
 
-    char                            m_szScriptName [MAX_SCRIPTNAME_LENGTH + 1];
+    SString                         m_strScriptName;
     int                             m_iOwner;
 
     lua_State*                      m_luaVM;

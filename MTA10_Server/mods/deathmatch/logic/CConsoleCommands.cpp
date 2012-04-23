@@ -1678,12 +1678,8 @@ bool CConsoleCommands::WhoWas ( CConsole* pConsole, const char* szArguments, CCl
     // Got any arguments?
     if ( szArguments && strlen ( szArguments ) > 0 )
     {
-        // Make lower case
-        string strArguments ( szArguments );
-        std::transform ( strArguments.begin(), strArguments.end(), strArguments.begin(), ::tolower );
-
         // Is the nick requested anyone?
-        bool bAnyone = ( strArguments == "*" );
+        bool bAnyone = ( SStringX ( szArguments ) == "*" );
 
         // Start iterating the whowas list
         CWhoWas* pWhoWas = pConsole->GetWhoWas ();
@@ -1694,12 +1690,8 @@ bool CConsoleCommands::WhoWas ( CConsole* pConsole, const char* szArguments, CCl
             list < SWhoWasEntry > ::const_iterator iter = pWhoWas->IterBegin ();
             for ( ; iter != pWhoWas->IterEnd (); iter++ )
             {
-                // Make player name lower case
-                string strNick ( iter->szNick );
-                std::transform ( strNick.begin(), strNick.end(), strNick.begin(), ::tolower );
-
                 // Matches?
-                if ( bAnyone || strNick.find ( strArguments ) != string::npos )
+                if ( bAnyone || iter->strNick.ContainsI ( szArguments ) )
                 {
                     // Haven't got too many entries printed?
                     if ( ++uiCount <= 20 )
@@ -1710,7 +1702,7 @@ bool CConsoleCommands::WhoWas ( CConsole* pConsole, const char* szArguments, CCl
                         LongToDottedIP ( iter->ulIP, szIP );
 
                         // Populate a line about him
-                        pClient->SendEcho ( SString ( "%s  -  IP:%s  serial:%s  version:%s", iter->szNick, szIP, iter->strSerial.c_str (), iter->strPlayerVersion.c_str () ) );
+                        pClient->SendEcho ( SString ( "%s  -  IP:%s  serial:%s  version:%s", *iter->strNick, szIP, iter->strSerial.c_str (), iter->strPlayerVersion.c_str () ) );
                     }
                     else
                     {

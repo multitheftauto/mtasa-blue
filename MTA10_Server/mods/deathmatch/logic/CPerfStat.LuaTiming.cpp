@@ -347,8 +347,7 @@ void CPerfStatLuaTimingImpl::GetLuaTimingStats ( CPerfStatResult* pResult, const
     //
     // Set column names
     //
-    //const char* PartNames[] = { " 5s", " 60s", " 300s", " 3600s" };
-    SString PartNames[] = { "5s.", "60s.", "300s.", "3600s." };
+    SFixedArray < SString, 4 > PartNames = { "5s.", "60s.", "300s.", "3600s." };
 
     pResult->AddColumn ( "name" );
 
@@ -370,13 +369,13 @@ void CPerfStatLuaTimingImpl::GetLuaTimingStats ( CPerfStatResult* pResult, const
     for ( CLuaMainTimingMap::iterator iter = AllLuaTiming.LuaMainTimingMap.begin () ; iter != AllLuaTiming.LuaMainTimingMap.end () ; ++iter )
     {
         CLuaMainTiming& LuaMainTiming = iter->second;
-        const SString& resname = iter->first->GetScriptNamePointer ();
+        const SString& strResName = iter->first->GetScriptName ();
 
         // Apply filter
-        if ( strFilter != "" && resname.find ( strFilter ) == SString::npos )
+        if ( strFilter != "" && strResName.find ( strFilter ) == SString::npos )
             continue;
 
-        OutputTimingBlock ( pResult, LuaMainTiming.ResourceTiming, flags, resname, false );
+        OutputTimingBlock ( pResult, LuaMainTiming.ResourceTiming, flags, strResName, false );
 
         if ( bDetail )
         for ( CEventTimingMap::iterator iter = LuaMainTiming.EventTimingMap.begin () ; iter != LuaMainTiming.EventTimingMap.end () ; ++iter )
@@ -398,8 +397,8 @@ void CPerfStatLuaTimingImpl::GetLuaTimingStats ( CPerfStatResult* pResult, const
 ///////////////////////////////////////////////////////////////
 void CPerfStatLuaTimingImpl::OutputTimingBlock ( CPerfStatResult* pResult, const CTimingBlock& TimingBlock, int flags, const SString& BlockName, bool bSubBlock )
 {
-    const CTimingPair*  pairList[]      = { &TimingBlock.s5,  &TimingBlock.s60,   &TimingBlock.m5,    &TimingBlock.m60 };
-    const TIMEUS        threshList[]    = { 5,                60,                 300,                3600 };
+    SFixedArray < const CTimingPair*, 4 >  pairList      = { &TimingBlock.s5,  &TimingBlock.s60,   &TimingBlock.m5,    &TimingBlock.m60 };
+    SFixedArray < const TIMEUS, 4 >        threshList    = { 5,                60,                 300,                3600 };
 
     // See if any relavent data for this row
     bool bHasData = false;

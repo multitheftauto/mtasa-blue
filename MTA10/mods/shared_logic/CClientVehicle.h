@@ -342,7 +342,7 @@ public:
     void                        Interpolate             ( void );
     void                        UpdateKeysync           ( void );
 
-    void                        GetInitialDoorStates    ( unsigned char * pucDoorStates );
+    void                        GetInitialDoorStates    ( SFixedArray < unsigned char, MAX_DOORS >& ucOutDoorStates );
 
     void                        AddMatrix               ( CMatrix& Matrix, double dTime, unsigned short usTickRate );
     void                        AddVelocity             ( CVector& vecVelocity );
@@ -487,10 +487,10 @@ protected:
     bool                        m_bScriptCanBeDamaged;
     bool                        m_bSyncUnoccupiedDamage;
     bool                        m_bTyresCanBurst;
-    unsigned char               m_ucDoorStates [MAX_DOORS];
-    unsigned char               m_ucWheelStates [MAX_WHEELS];
-    unsigned char               m_ucPanelStates [MAX_PANELS];
-    unsigned char               m_ucLightStates [MAX_LIGHTS];
+    SFixedArray < unsigned char, MAX_DOORS >   m_ucDoorStates;
+    SFixedArray < unsigned char, MAX_WHEELS >  m_ucWheelStates;
+    SFixedArray < unsigned char, MAX_PANELS >  m_ucPanelStates;
+    SFixedArray < unsigned char, MAX_LIGHTS >  m_ucLightStates;
     bool                        m_bJustBlewUp;
     eEntityStatus               m_NormalStatus;
     bool                        m_bColorSaved;

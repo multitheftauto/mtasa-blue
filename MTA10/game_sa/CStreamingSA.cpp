@@ -32,7 +32,7 @@ namespace
             #define VAR_CStreaming_numModelsRequested       0x08E4CB8
             #define VAR_CStreaming_memoryUsed               0x08E4CB4
 
-            bLoadingBigModel    = *(BYTE*)VAR_CStreaming_bLoadingBigModel;
+            bLoadingBigModel    = *(BYTE*)VAR_CStreaming_bLoadingBigModel != 0;
             numPriorityRequests = *(DWORD*)VAR_CStreaming_numPriorityRequests;
             numModelsRequested  = *(DWORD*)VAR_CStreaming_numModelsRequested;
             memoryUsed          = *(DWORD*)VAR_CStreaming_memoryUsed;

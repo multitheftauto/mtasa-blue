@@ -17,10 +17,7 @@
 CAccessControlList::CAccessControlList ( const char* szACLName, CAccessControlListManager* pACLManager )
 {
     m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::ACL );
-    m_szACLName[0] = '\0';
-    snprintf ( m_szACLName, MAX_ACL_NAME_LENGTH, "%s", szACLName );
-    m_szACLName[MAX_ACL_NAME_LENGTH-1] = '\0';
-
+    m_strACLName = szACLName;
     m_pACLManager = pACLManager;
 }
 
@@ -117,7 +114,7 @@ void CAccessControlList::WriteToXMLNode ( CXMLNode* pNode )
 
     // Create attribute for the name and set it
     CXMLAttribute* pAttribute = pSubNode->GetAttributes ().Create ( "name" );
-    pAttribute->SetValue ( m_szACLName );
+    pAttribute->SetValue ( m_strACLName );
 
     // Loop through each right and write it to the ACL
     list < CAccessControlListRight* > ::iterator iter = m_Rights.begin ();

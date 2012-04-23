@@ -43,15 +43,15 @@ private:
     void                        InitializeDefaultHandlings      ( void );
 
     // Original handling data unaffected by handling.cfg changes
-    static tHandlingData        m_OriginalHandlingData [HT_MAX];
+    static SFixedArray < tHandlingData, HT_MAX >        m_OriginalHandlingData;
 
     // Array with the original handling entries
-    static CHandlingEntry*      m_pOriginalEntries [HT_MAX];
+    static SFixedArray < CHandlingEntry*, HT_MAX >      m_pOriginalEntries;
 
     // Array with the model handling entries
-    static CHandlingEntry*      m_pModelEntries [HT_MAX];
+    static SFixedArray < CHandlingEntry*, HT_MAX >      m_pModelEntries;
 
-    bool                        m_bModelHandlingChanged[HT_MAX];
+    SFixedArray < bool, HT_MAX >                        m_bModelHandlingChanged;
 };
 
 #endif

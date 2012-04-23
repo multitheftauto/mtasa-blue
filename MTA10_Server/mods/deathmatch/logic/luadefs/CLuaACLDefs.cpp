@@ -17,7 +17,7 @@
 static const char* GetResourceName ( lua_State* luaVM )
 {
     CLuaMain * luaMain = g_pGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
-    return luaMain ? luaMain->GetScriptNamePointer () : "";
+    return luaMain ? luaMain->GetScriptName () : "";
 }
 
 

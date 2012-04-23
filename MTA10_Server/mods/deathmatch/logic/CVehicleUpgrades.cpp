@@ -19,27 +19,28 @@ struct SUpgradeName
     char szName [32];
 };
 
-SUpgradeName UpgradeNames [17] =
+SUpgradeName _UpgradeNames [ VEHICLE_UPGRADE_SLOTS ] =
 { {"Hood"}, {"Vent"}, {"Spoiler"}, {"Sideskirt"}, {"Front Bullbars"},
 {"Rear Bullbars"}, {"Headlights"}, {"Roof"}, {"Nitro"}, {"Hydraulics"}, 
 {"Stereo"}, {"Unknown"}, {"Wheels"}, {"Exhaust"}, {"Front Bumper"},
 {"Rear Bumper"}, {"Misc"} };
 
+IMPLEMENT_FIXED_ARRAY( SUpgradeName, UpgradeNames );
+
 
 CVehicleUpgrades::CVehicleUpgrades ( CVehicle* pVehicle )
 {
     m_pVehicle = pVehicle;
-    memset ( m_SlotStates, 0, sizeof ( m_SlotStates ) );
+    memset ( &m_SlotStates[0], 0, sizeof ( m_SlotStates ) );
 }
 
 CVehicleUpgrades::CVehicleUpgrades ( CVehicle* pVehicle, CVehicleUpgrades* pUpgrades )
 {
     m_pVehicle = pVehicle;
-    memset ( m_SlotStates, 0, sizeof ( m_SlotStates ) );
+    memset ( &m_SlotStates[0], 0, sizeof ( m_SlotStates ) );
     if ( pUpgrades )
     {
-        unsigned short* usSlotStates = pUpgrades->GetSlotStates ();
-        memcpy ( m_SlotStates, usSlotStates, sizeof ( m_SlotStates ) );
+        m_SlotStates = pUpgrades->GetSlotStates ();
     }
 }
 

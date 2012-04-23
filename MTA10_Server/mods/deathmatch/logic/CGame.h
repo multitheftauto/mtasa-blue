@@ -137,6 +137,8 @@ class CVehicleTrailerPacket;
 class CVoiceDataPacket;
 class CWeaponDamageCheckPacket;
 
+typedef SFixedArray < bool, MAX_GARAGES > SGarageStates;
+
 class CGame
 {
 public:
@@ -322,7 +324,7 @@ public:
     inline bool                 GetOcclusionsEnabled        ( void ) { return m_bOcclusionsEnabled ; }
     inline void                 SetOcclusionsEnabled        ( bool bOcclusionsEnabled ) { m_bOcclusionsEnabled = bOcclusionsEnabled; }
 
-    inline bool*                GetGarageStates             ( void )        { return m_bGarageStates; }
+    SGarageStates&              GetGarageStates             ( void )        { return m_bGarageStates; }
 
     void                        Lock                        ( void );
     void                        Unlock                      ( void );
@@ -491,7 +493,7 @@ private:
     bool                        m_bOverrideFogDistance;
     float                       m_fFogDistance;
 
-    bool                        m_bGarageStates[MAX_GARAGES];
+    SGarageStates               m_bGarageStates;
 
     // FPS statistics
     unsigned long               m_ulLastFPSTime;
@@ -499,7 +501,7 @@ private:
     unsigned short              m_usFPS;
     int                         m_iSyncFPS;
     std::map<std::string,eGlitchType> m_GlitchNames;
-    bool                        m_Glitches[NUM_GLITCHES];
+    SFixedArray < bool, NUM_GLITCHES > m_Glitches;
 
     // This is ticked to true when the app should end
     bool                        m_bIsFinished;

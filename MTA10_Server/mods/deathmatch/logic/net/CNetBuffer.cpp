@@ -550,7 +550,7 @@ void CNetServerBuffer::ResendModPackets ( const NetServerPlayerID& playerID )
 // (To make non blocking, don't)
 //
 ///////////////////////////////////////////////////////////////////////////
-void CNetServerBuffer::GetClientSerialAndVersion ( const NetServerPlayerID& playerID, CStaticString < 32 >& strSerial, CStaticString < 32 >& strVersion )
+void CNetServerBuffer::GetClientSerialAndVersion ( const NetServerPlayerID& playerID, SFixedString < 32 >& strSerial, SFixedString < 32 >& strVersion )
 {
     SGetClientSerialAndVersionArgs* pArgs = new SGetClientSerialAndVersionArgs ( playerID, strSerial, strVersion );
     AddCommandAndWait ( pArgs );
@@ -941,7 +941,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
         CALLREALNET1R( bool,                InitServerId                    , const char*, szPath )
         CALLREALNET1 (                      SetEncryptionEnabled            , bool, bEncryptionEnabled )
         CALLREALNET1 (                      ResendModPackets                , const NetServerPlayerID&, playerID )
-        CALLREALNET3 (                      GetClientSerialAndVersion       , const NetServerPlayerID&, playerID, CStaticString < 32 >&, strSerial, CStaticString < 32 >&, strVersion )
+        CALLREALNET3 (                      GetClientSerialAndVersion       , const NetServerPlayerID&, playerID, SFixedString < 32 >&, strSerial, SFixedString < 32 >&, strVersion )
         CALLREALNET1 (                      SetNetOptions                   , const SNetOptions&, options )
 
         default:
