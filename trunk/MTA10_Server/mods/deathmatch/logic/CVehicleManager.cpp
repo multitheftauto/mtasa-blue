@@ -94,7 +94,7 @@ CVehicleManager::CVehicleManager ( void )
     m_bDontRemoveFromList = false;
 
     int iVehicleID = 0;
-    for ( int i = 0; i <= 212; i++ )
+    for ( int i = 0; i < 212; i++ )
     {
         g_ucVariants[i] = 255;
         iVehicleID = i + 400;
