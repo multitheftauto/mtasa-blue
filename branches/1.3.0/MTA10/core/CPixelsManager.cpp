@@ -749,7 +749,7 @@ bool CPixelsManager::GetPixelColor ( const CPixels& pixels, uint uiPosX, uint ui
     if ( uiPosX >= uiWidth || uiPosY >= uiHeight )
         return false;
 
-    uint uiOffset = uiPosX + uiPosY * uiHeight;
+    uint uiOffset = uiPosX + uiPosY * uiWidth;
 
     const SColor* pColorArray = (const SColor*)pixels.GetData ();
     outColor = pColorArray [ uiOffset ];
@@ -774,7 +774,7 @@ bool CPixelsManager::SetPixelColor ( CPixels& pixels, uint uiPosX, uint uiPosY, 
     if ( uiPosX >= uiWidth || uiPosY >= uiHeight )
         return false;
 
-    uint uiOffset = uiPosX + uiPosY * uiHeight;
+    uint uiOffset = uiPosX + uiPosY * uiWidth;
 
     SColor* pColorArray = (SColor*)pixels.GetData ();
     pColorArray [ uiOffset ] = color;
