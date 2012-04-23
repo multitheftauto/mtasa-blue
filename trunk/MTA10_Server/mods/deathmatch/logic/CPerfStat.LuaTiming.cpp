@@ -347,7 +347,7 @@ void CPerfStatLuaTimingImpl::GetLuaTimingStats ( CPerfStatResult* pResult, const
     //
     // Set column names
     //
-    SFixedArray < SString, 4 > PartNames = { "5s.", "60s.", "300s.", "3600s." };
+    SFixedArray < SString, 4 > PartNames = { { "5s.", "60s.", "300s.", "3600s." } };
 
     pResult->AddColumn ( "name" );
 
@@ -397,8 +397,8 @@ void CPerfStatLuaTimingImpl::GetLuaTimingStats ( CPerfStatResult* pResult, const
 ///////////////////////////////////////////////////////////////
 void CPerfStatLuaTimingImpl::OutputTimingBlock ( CPerfStatResult* pResult, const CTimingBlock& TimingBlock, int flags, const SString& BlockName, bool bSubBlock )
 {
-    SFixedArray < const CTimingPair*, 4 >  pairList      = { &TimingBlock.s5,  &TimingBlock.s60,   &TimingBlock.m5,    &TimingBlock.m60 };
-    SFixedArray < const TIMEUS, 4 >        threshList    = { 5,                60,                 300,                3600 };
+    SFixedArray < const CTimingPair*, 4 >  pairList      = { { &TimingBlock.s5,  &TimingBlock.s60,   &TimingBlock.m5,    &TimingBlock.m60 } };
+    SFixedArray < const TIMEUS, 4 >        threshList    = { { 5,                60,                 300,                3600 } };
 
     // See if any relavent data for this row
     bool bHasData = false;

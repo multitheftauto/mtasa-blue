@@ -22,8 +22,6 @@ bool CBulletsyncPacket::Read ( NetBitStreamInterface& BitStream )
     // Got a player?
     if ( m_pSourceElement )
     {
-        CPlayer * pSourcePlayer = static_cast < CPlayer * > ( m_pSourceElement );
-
         if ( !BitStream.Read ( m_cFlag ) )
             return false;
 

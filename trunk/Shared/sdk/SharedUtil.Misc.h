@@ -1414,7 +1414,7 @@ namespace SharedUtil
         SFixedArrayInit ( const T* pInitData, uint uiInitCount )
         {
             dassert ( SIZE == uiInitCount );
-            memcpy ( data, pInitData, sizeof ( data ) );
+            memcpy ( SFixedArray < T, SIZE >::data, pInitData, sizeof ( SFixedArray < T, SIZE >::data ) );
         }
     };
 
