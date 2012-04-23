@@ -45,8 +45,8 @@ public:
     bool DoesClientAndServerChecksumMatch ( void );
 
     eResourceType GetResourceType   ( void ) { return m_resourceType; };
-    const char* GetName             ( void ) { return m_szName; };
-    const char* GetShortName        ( void ) { return m_szNameShort; };
+    const char* GetName             ( void ) { return m_strName; };
+    const char* GetShortName        ( void ) { return m_strNameShort; };
 
     // CRC-based methods
     CChecksum GenerateClientChecksum ( void );
@@ -60,8 +60,8 @@ public:
 protected:
     eResourceType       m_resourceType;
 
-    char*               m_szName;
-    char*               m_szNameShort;
+    SString             m_strName;
+    SString             m_strNameShort;
 
     CChecksum           m_LastClientChecksum;
     CChecksum           m_ServerChecksum;

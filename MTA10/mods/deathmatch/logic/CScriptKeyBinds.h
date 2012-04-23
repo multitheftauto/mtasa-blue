@@ -19,8 +19,6 @@
 #include "../../shared_logic/lua/CLuaMain.h"
 #include <list>
 
-#define NUMBER_OF_KEYS 123
-
 enum eScriptKeyBindType
 {
     SCRIPT_KEY_BIND_FUNCTION = 0,
@@ -30,12 +28,12 @@ enum eScriptKeyBindType
 
 struct SScriptBindableKey
 {
-    char szKey [ 20 ];
+    const char* szKey;
 };
 
 struct SScriptBindableGTAControl
 {
-    char szControl [ 25 ];
+    const char* szControl;
 };
 
 class CScriptKeyBind
@@ -44,7 +42,7 @@ public:
                                 CScriptKeyBind      ( void ) : boundKey ( NULL ), luaMain ( NULL ), beingDeleted ( false ) {}
     virtual                     ~CScriptKeyBind     ( void ) {}
     bool                        IsBeingDeleted      ( void ) { return beingDeleted; }
-    SScriptBindableKey*         boundKey;
+    const SScriptBindableKey*   boundKey;
     CLuaMain*                   luaMain;
     bool                        beingDeleted;
     virtual eScriptKeyBindType  GetType             ( void ) = 0;
@@ -75,7 +73,7 @@ class CScriptControlFunctionBind: public CScriptKeyBindWithState, public CScript
 {
 public:
     inline eScriptKeyBindType     GetType              ( void )    { return SCRIPT_KEY_BIND_CONTROL_FUNCTION; }
-    SScriptBindableGTAControl*    boundControl;
+    const SScriptBindableGTAControl*    boundControl;
 };
 
 class CScriptKeyBinds
@@ -86,8 +84,8 @@ public:
     }
                                 ~CScriptKeyBinds        ( void );
 
-    static SScriptBindableKey*        GetBindableFromKey      ( const char* szKey );
-    static SScriptBindableGTAControl* GetBindableFromControl  ( const char* szControl );
+    static const SScriptBindableKey*        GetBindableFromKey      ( const char* szKey );
+    static const SScriptBindableGTAControl* GetBindableFromControl  ( const char* szControl );
 
     // Basic funcs
     void                        Add                     ( CScriptKeyBind* pKeyBind );
@@ -100,23 +98,23 @@ public:
 
     // Key-function bind funcs
     bool                        AddKeyFunction          ( const char* szKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
-    bool                        AddKeyFunction          ( SScriptBindableKey* pKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
+    bool                        AddKeyFunction          ( const SScriptBindableKey* pKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
     bool                        RemoveKeyFunction       ( const char* szKey, CLuaMain* pLuaMain, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
-    bool                        RemoveKeyFunction       ( SScriptBindableKey* pKey, CLuaMain* pLuaMain, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
+    bool                        RemoveKeyFunction       ( const SScriptBindableKey* pKey, CLuaMain* pLuaMain, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
     bool                        KeyFunctionExists       ( const char* szKey, CLuaMain* pLuaMain = NULL, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
-    bool                        KeyFunctionExists       ( SScriptBindableKey* pKey, CLuaMain* pLuaMain = NULL, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
+    bool                        KeyFunctionExists       ( const SScriptBindableKey* pKey, CLuaMain* pLuaMain = NULL, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
 
     // Control-function bind funcs
     bool                        AddControlFunction      ( const char* szControl, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
-    bool                        AddControlFunction      ( SScriptBindableGTAControl* pControl, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
+    bool                        AddControlFunction      ( const SScriptBindableGTAControl* pControl, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
     bool                        RemoveControlFunction   ( const char* szControl, CLuaMain* pLuaMain, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
-    bool                        RemoveControlFunction   ( SScriptBindableGTAControl* pControl, CLuaMain* pLuaMain, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
+    bool                        RemoveControlFunction   ( const SScriptBindableGTAControl* pControl, CLuaMain* pLuaMain, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
     bool                        ControlFunctionExists   ( const char* szControl, CLuaMain* pLuaMain = NULL, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
-    bool                        ControlFunctionExists   ( SScriptBindableGTAControl* pControl, CLuaMain* pLuaMain = NULL, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
+    bool                        ControlFunctionExists   ( const SScriptBindableGTAControl* pControl, CLuaMain* pLuaMain = NULL, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
 
     void                        RemoveAllKeys           ( CLuaMain* pLuaMain );
 
-    static bool                 IsMouse                 ( SScriptBindableKey* pKey );
+    static bool                 IsMouse                 ( const SScriptBindableKey* pKey );
     void                        RemoveDeletedBinds      ( void );
 
 protected:

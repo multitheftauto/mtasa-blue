@@ -23,7 +23,7 @@
 class CClientManager;
 class CClientVehicle;
 
-extern unsigned char g_ucMaxPassengers [];
+extern const SFixedArray < unsigned char, 212 > g_ucMaxPassengers;
 
 class CClientVehicleManager
 {

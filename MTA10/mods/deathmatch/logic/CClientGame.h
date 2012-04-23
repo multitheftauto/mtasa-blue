@@ -339,7 +339,7 @@ public:
     void                                SetMoney                        ( long lMoney );
     void                                SetWanted                       ( DWORD dwWanted );
 
-    void                                ResetAmmoInClip                 ( void ) { memset(m_wasWeaponAmmoInClip,0,sizeof(m_wasWeaponAmmoInClip)); }
+    void                                ResetAmmoInClip                 ( void );
 
     void                                ResetMapInfo                    ( void );
 
@@ -562,7 +562,7 @@ private:
 
     CClientPlayer*                      m_pLocalPlayer;
     ElementID                           m_LocalID;
-    char                                m_szLocalNick [MAX_PLAYER_NICK_LENGTH + 1];
+    SString                             m_strLocalNick;
 
     CClientEntity*                      m_pRootEntity;
     CLuaManager*                        m_pLuaManager;
@@ -570,7 +570,7 @@ private:
     CRegisteredCommands                 m_RegisteredCommands;
 
     // Map statuses
-    char                                m_szCurrentMapName [MAX_MAPNAME_LENGTH + 1];
+    SString                             m_strCurrentMapName;
     SString                             m_strModRoot;
 
     CBlendedWeather*                    m_pBlendedWeather;
@@ -610,7 +610,7 @@ private:
     bool                                m_bTransferReset;
 
     eWeaponSlot                         m_lastWeaponSlot;
-    DWORD                               m_wasWeaponAmmoInClip[WEAPONSLOT_MAX + 1];
+    SFixedArray < DWORD, WEAPONSLOT_MAX + 1 >   m_wasWeaponAmmoInClip;
 
     bool                                m_bCursorEventsEnabled;
     bool                                m_bLocalPlay;
@@ -625,7 +625,7 @@ private:
     long                                m_lMoney;
     DWORD                               m_dwWanted;
 
-    bool                                m_Glitches[NUM_GLITCHES];
+    SFixedArray < bool, NUM_GLITCHES >  m_Glitches;
 
     //Clouds Enabled
     bool                                m_bCloudsEnabled;

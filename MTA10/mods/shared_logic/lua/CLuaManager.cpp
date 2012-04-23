@@ -157,7 +157,7 @@ CLuaMain* CLuaManager::GetVirtualMachine ( const char* szFilename )
     list < CLuaMain* >::const_iterator iter = m_virtualMachines.begin ();
     for ( ; iter != m_virtualMachines.end (); iter++ )
     {
-        if ( strcmp ( szFilename, (*iter)->GetScriptNamePointer () ) == 0 )
+        if ( strcmp ( szFilename, (*iter)->GetScriptName () ) == 0 )
         {
             return *iter;
         }

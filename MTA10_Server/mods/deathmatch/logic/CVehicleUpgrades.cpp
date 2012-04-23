@@ -16,16 +16,16 @@ char szUpgradeNameEmpty [] = "";
 
 struct SUpgradeName
 {
-    char szName [32];
+    const char* szName;
 };
 
-SUpgradeName _UpgradeNames [ VEHICLE_UPGRADE_SLOTS ] =
-{ {"Hood"}, {"Vent"}, {"Spoiler"}, {"Sideskirt"}, {"Front Bullbars"},
-{"Rear Bullbars"}, {"Headlights"}, {"Roof"}, {"Nitro"}, {"Hydraulics"}, 
-{"Stereo"}, {"Unknown"}, {"Wheels"}, {"Exhaust"}, {"Front Bumper"},
-{"Rear Bumper"}, {"Misc"} };
-
-IMPLEMENT_FIXED_ARRAY( SUpgradeName, UpgradeNames );
+static const SFixedArray < SUpgradeName, VEHICLE_UPGRADE_SLOTS > UpgradeNames = 
+{ {
+    {"Hood"}, {"Vent"}, {"Spoiler"}, {"Sideskirt"}, {"Front Bullbars"},
+    {"Rear Bullbars"}, {"Headlights"}, {"Roof"}, {"Nitro"}, {"Hydraulics"}, 
+    {"Stereo"}, {"Unknown"}, {"Wheels"}, {"Exhaust"}, {"Front Bumper"},
+    {"Rear Bumper"}, {"Misc"}
+} };
 
 
 CVehicleUpgrades::CVehicleUpgrades ( CVehicle* pVehicle )

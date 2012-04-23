@@ -35,8 +35,8 @@ public:
 
         bool            DoesClientAndServerChecksumMatch ( void );
 
-        inline const char*      GetName                         ( void ) { return m_szName; };
-        inline const char*      GetShortName                    ( void ) { return m_szNameShort; };
+        inline const char*      GetName                         ( void ) { return m_strName; };
+        inline const char*      GetShortName                    ( void ) { return m_strNameShort; };
 
         inline CResource*       GetResource                     ( void ) { return m_pResource; };
 
@@ -55,8 +55,8 @@ public:
 
 protected:
 
-    char*               m_szName;
-    char*               m_szNameShort;
+    SString             m_strName;
+    SString             m_strNameShort;
 
     CResource*          m_pResource;
 

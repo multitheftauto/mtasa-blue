@@ -9,9 +9,9 @@
 
 #include "StdInc.h"
 
-static const char szUnknownZone [ 8 ] = "Unknown";
+static const char* szUnknownZone = "Unknown";
 
-static const char* cityNameList[] = {
+static const SFixedArray < const char*, 8 > cityNameList = {
                     "Tierra Robada",
                     "Bone County",
                     "Las Venturas",
@@ -22,7 +22,7 @@ static const char* cityNameList[] = {
                     "Los Santos",
                 };
 
-static const SZone zoneInfoList [] = {
+static const SZone _zoneInfoList [] = {
         { -2353,  2275,     0, -2153,  2475,   200, "Bayside Marina" },
         { -2741,  2175,     0, -2353,  2722,   200, "Bayside" },
         { -2741,  1268,     0, -2533,  1490,   200, "Battery Point" },
@@ -401,6 +401,7 @@ static const SZone zoneInfoList [] = {
         {  2541, -2059,   -89,  2703, -1941,   110, "Willowfield" },
         {  1098,  1726,   -89,  1197,  2243,   110, "Whitewood Estates" },
     };
+static const IMPLEMENT_FIXED_ARRAY( SZone, zoneInfoList );
 
 
 CZoneNames::CZoneNames ( void )

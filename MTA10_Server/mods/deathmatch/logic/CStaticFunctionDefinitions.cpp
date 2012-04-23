@@ -3397,7 +3397,7 @@ bool CStaticFunctionDefinitions::GetPedClothes ( CPed* pPed, unsigned char ucTyp
 {
     assert ( pPed );
 
-    SPlayerClothing* pClothing = pPed->GetClothes ()->GetClothing ( ucType );
+    const SPlayerClothing* pClothing = pPed->GetClothes ()->GetClothing ( ucType );
     if ( pClothing )
     {
         if ( szTextureReturn )
@@ -3762,7 +3762,7 @@ bool CStaticFunctionDefinitions::RemovePedClothes ( CElement* pElement, unsigned
         {
             CPed* pPed = static_cast < CPed* > ( pElement );
 
-            SPlayerClothing* pClothing = pPed->GetClothes ()->GetClothing ( ucType );
+            const SPlayerClothing* pClothing = pPed->GetClothes ()->GetClothing ( ucType );
             if ( pClothing )
             {
                 if ( ( !szTexture || !stricmp ( pClothing->szTexture, szTexture ) ) &&
@@ -8434,8 +8434,8 @@ bool CStaticFunctionDefinitions::BindKey ( CPlayer* pPlayer, const char* szKey, 
     bool bSuccess = false;
 
     CKeyBinds* pKeyBinds = pPlayer->GetKeyBinds ();
-    SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
-    SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szKey );
+    const SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
+    const SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szKey );
     bool bHitState = true;
 
     if ( stricmp ( szHitState, "down" ) == 0 || stricmp ( szHitState, "both" ) == 0 )
@@ -8484,7 +8484,7 @@ bool CStaticFunctionDefinitions::BindKey ( CPlayer* pPlayer, const char* szKey, 
     assert ( szResource );
 
     CKeyBinds* pKeyBinds = pPlayer->GetKeyBinds ();
-    SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
+    const SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
     szArguments = szArguments ? szArguments : "";
 
     if ( pKey )
@@ -8529,8 +8529,8 @@ bool CStaticFunctionDefinitions::UnbindKey ( CPlayer* pPlayer, const char* szKey
     assert ( pLuaMain );
 
     CKeyBinds* pKeyBinds = pPlayer->GetKeyBinds ();
-    SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
-    SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szKey );
+    const SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
+    const SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szKey );
     bool bCheckHitState = false, bHitState = true;
     if ( szHitState )
     {
@@ -8577,7 +8577,7 @@ bool CStaticFunctionDefinitions::UnbindKey ( CPlayer* pPlayer, const char* szKey
     assert ( szResource );
 
     CKeyBinds* pKeyBinds = pPlayer->GetKeyBinds ();
-    SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
+    const SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
 
     if ( pKey )
     {
@@ -8616,8 +8616,8 @@ bool CStaticFunctionDefinitions::IsKeyBound ( CPlayer* pPlayer, const char* szKe
     assert ( pLuaMain );
 
     CKeyBinds* pKeyBinds = pPlayer->GetKeyBinds ();
-    SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
-    SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szKey );
+    const SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
+    const SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szKey );
     bool bCheckHitState = false, bHitState = true;
     if ( szHitState )
     {
@@ -9224,7 +9224,7 @@ bool CStaticFunctionDefinitions::GetBodyPartName ( unsigned char ucID, char* szN
 
 bool CStaticFunctionDefinitions::GetClothesByTypeIndex ( unsigned char ucType, unsigned char ucIndex, char* szTextureReturn, char* szModelReturn )
 {
-    SPlayerClothing* pPlayerClothing = CPlayerClothes::GetClothingGroup ( ucType );
+    const SPlayerClothing* pPlayerClothing = CPlayerClothes::GetClothingGroup ( ucType );
     if ( pPlayerClothing )
     {
         if ( ucIndex < CPlayerClothes::GetClothingGroupMax ( ucType ) )
@@ -9249,7 +9249,7 @@ bool CStaticFunctionDefinitions::GetTypeIndexFromClothes ( char* szTexture, char
 
     for ( unsigned char ucType = 0 ; ucType < PLAYER_CLOTHING_SLOTS ; ucType++ )
     {
-        SPlayerClothing* pPlayerClothing = CPlayerClothes::GetClothingGroup ( ucType );
+        const SPlayerClothing* pPlayerClothing = CPlayerClothes::GetClothingGroup ( ucType );
         if ( pPlayerClothing )
         {
             for ( unsigned char ucIter = 0 ; pPlayerClothing [ ucIter ].szTexture != NULL ; ucIter++ )
@@ -9274,7 +9274,7 @@ bool CStaticFunctionDefinitions::GetClothesTypeName ( unsigned char ucType, char
 {
     assert ( szNameReturn );
 
-    char* szName = CPlayerClothes::GetClothingName ( ucType );
+    const char* szName = CPlayerClothes::GetClothingName ( ucType );
     if ( szName )
     {
         strcpy ( szNameReturn, szName );

@@ -635,7 +635,7 @@ void CPedSA::SetGogglesState ( bool bIsWearingThem )
     }
 }
 
-void CPedSA::SetClothesTextureAndModel ( char * szTexture, char * szModel, int textureType )
+void CPedSA::SetClothesTextureAndModel ( const char* szTexture, const char* szModel, int textureType )
 {
     DWORD dwFunc = FUNC_CPedClothesDesc__SetTextureAndModel;
     //DWORD dwThis = (DWORD)this->GetInterface()->PlayerPedData.m_pClothes;

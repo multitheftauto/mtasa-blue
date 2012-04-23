@@ -27,15 +27,15 @@ private:
     typedef void (*pfnElementRPCHandler) ( CClientEntity* pSourceEntity, class NetBitStreamInterface& bitStream );
     struct SRPCHandler
     {
-        SRPCHandler () { Callback = NULL; szName[0] = '\0'; }
+        SRPCHandler () { Callback = NULL; }
         pfnRPCHandler Callback;
-        char szName [ 32 ];
+        SString strName;
     };
     struct SElementRPCHandler
     {
-        SElementRPCHandler () { Callback = NULL; szName[0] = '\0'; }
+        SElementRPCHandler () { Callback = NULL; }
         pfnElementRPCHandler Callback;
-        char szName [ 32 ];
+        SString strName;
     };
 
 public:
@@ -72,8 +72,8 @@ protected:
     // Include the RPC functions enum
     #include "net/rpc_enums.h"
 
-    static SRPCHandler          m_RPCHandlers [ NUM_RPC_FUNCS ];
-    static SElementRPCHandler   m_ElementRPCHandlers [ NUM_RPC_FUNCS ];
+    static SFixedArray < SRPCHandler, NUM_RPC_FUNCS >           m_RPCHandlers;
+    static SFixedArray < SElementRPCHandler, NUM_RPC_FUNCS >    m_ElementRPCHandlers;
 };
 
 #endif

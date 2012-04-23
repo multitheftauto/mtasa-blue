@@ -15,8 +15,8 @@
 
 #include <StdInc.h>
 
-const char * g_GTAControls [ MAX_GTA_CONTROLS ] =
-{
+static const SFixedArray < const char*, MAX_GTA_CONTROLS > g_GTAControls =
+{ {
     "fire", "next_weapon", "previous_weapon", "forwards", "backwards",
     "left", "right", "zoom_in", "zoom_out", "enter_exit",
     "change_camera", "jump", "sprint", "look_behind", "crouch",
@@ -29,10 +29,10 @@ const char * g_GTAControls [ MAX_GTA_CONTROLS ] =
     "special_control_down", "special_control_up", "aim_weapon",
     "conversation_yes", "conversation_no", "group_control_forwards",
     "group_control_back",
-};
+} };
 
-const char * g_AnalogGTAControls [ MAX_GTA_ANALOG_CONTROLS ] =
-{
+static const SFixedArray < const char*, MAX_GTA_ANALOG_CONTROLS > g_AnalogGTAControls =
+{ {
     "left",
     "right",
     "forwards",
@@ -47,7 +47,7 @@ const char * g_AnalogGTAControls [ MAX_GTA_ANALOG_CONTROLS ] =
     "special_control_right",
     "special_control_up",
     "special_control_down",
-};
+} };
 
 
 bool CClientPad::GetControlIndex ( const char * szName, unsigned int & uiIndex )
@@ -76,7 +76,7 @@ const char * CClientPad::GetControlName ( unsigned int uiIndex )
 
 CClientPad::CClientPad ( void )
 {
-    memset ( m_bStates, 0, sizeof ( m_bStates ) );
+    memset ( &m_bStates[0], 0, sizeof ( m_bStates ) );
 }
 
 

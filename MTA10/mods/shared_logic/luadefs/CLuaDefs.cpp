@@ -71,7 +71,7 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
         // Get the resource name
         SString strScriptName;
         if ( CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine ( luaVM ) )
-            strScriptName = pLuaMain->GetScriptNamePointer ();
+            strScriptName = pLuaMain->GetScriptName ();
 
         // Record for the crash dump file
         g_pCore->LogEvent ( 404, "LuaCFunction", strScriptName, pFunction->GetFunctionName () );

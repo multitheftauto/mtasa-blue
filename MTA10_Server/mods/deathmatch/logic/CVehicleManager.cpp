@@ -14,7 +14,8 @@
 
 #include "StdInc.h"
 
-static unsigned char _g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1, 1, 3, 1, 1,       // 400->415
+static const SFixedArray < unsigned char, 212 > g_ucMaxPassengers = {
+                                       3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1, 1, 3, 1, 1,              // 400->415
                                        3, 1, 3, 1, 3, 3, 1, 1, 1, 0, 3, 3, 3, 1, 0, 8,              // 416->431
                                        0, 1, 1, 255, 1, 8, 3, 1, 3, 0, 1, 1, 1, 3, 0, 1,            // 432->447
                                        0, 1, 255, 1, 0, 0, 0, 1, 1, 1, 3, 3, 1, 1, 1,               // 448->462
@@ -29,8 +30,6 @@ static unsigned char _g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 
                                        1, 255, 255, 1, 1, 1, 0, 3, 3, 3, 1, 1, 1, 1, 1,             // 589->604
                                        3, 1, 255, 255, 255, 3, 255, 255 };                          // 605->611
 
-static IMPLEMENT_FIXED_ARRAY( unsigned char, g_ucMaxPassengers );
-
 
 // List over all vehicles with their special attributes
 #define VEHICLE_HAS_TURRENT             0x001UL //1
@@ -41,7 +40,7 @@ static IMPLEMENT_FIXED_ARRAY( unsigned char, g_ucMaxPassengers );
 #define VEHICLE_HAS_TAXI_LIGHTS         0x020UL //32
 #define VEHICLE_HAS_SEARCH_LIGHT        0x040UL //64
 
-static unsigned long _g_ulVehicleAttributes [] = {
+static const SFixedArray < unsigned long, 212 > g_ulVehicleAttributes = {
   0, 0, 0, 0, 0, 0, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 32, 0, 0, 2, 0,    // 400-424
   0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0,    // 425-449
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 450-474
@@ -52,10 +51,9 @@ static unsigned long _g_ulVehicleAttributes [] = {
   0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 2, 2, 2, 2,   // 575-599
   0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
-static IMPLEMENT_FIXED_ARRAY( unsigned long, g_ulVehicleAttributes );
 
 
-static eVehicleType _gs_vehicleTypes [] = {
+static const SFixedArray < eVehicleType, 212 > gs_vehicleTypes = {
     VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_MONSTERTRUCK,
     VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR,
     VEHICLE_CAR, VEHICLE_CAR, VEHICLE_HELI, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR,
@@ -85,9 +83,8 @@ static eVehicleType _gs_vehicleTypes [] = {
     VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR,
     VEHICLE_TRAILER, VEHICLE_TRAILER, VEHICLE_TRAILER, VEHICLE_CAR, VEHICLE_TRAILER, VEHICLE_TRAILER
 };
-static IMPLEMENT_FIXED_ARRAY( eVehicleType, gs_vehicleTypes );
 
-SFixedArray < unsigned char, 212 > g_ucVariants;
+static SFixedArray < unsigned char, 212 > g_ucVariants;
 
 CVehicleManager::CVehicleManager ( void )
 {

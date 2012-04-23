@@ -713,7 +713,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     CPlayerClothes* pClothes = pPed->GetClothes ( );
                     for ( unsigned char ucType = 0 ; ucType < PLAYER_CLOTHING_SLOTS ; ucType++ )
                     {
-                        SPlayerClothing* pClothing = pClothes->GetClothing ( ucType );
+                        const SPlayerClothing* pClothing = pClothes->GetClothing ( ucType );
                         if ( pClothing )
                         {
                             ucNumClothes++;
@@ -722,7 +722,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     BitStream.Write ( ucNumClothes );
                     for ( unsigned char ucType = 0 ; ucType < PLAYER_CLOTHING_SLOTS ; ucType++ )
                     {
-                        SPlayerClothing* pClothing = pClothes->GetClothing ( ucType );
+                        const SPlayerClothing* pClothing = pClothes->GetClothing ( ucType );
                         if ( pClothing )
                         {
                             unsigned char ucTextureLength = strlen ( pClothing->szTexture );

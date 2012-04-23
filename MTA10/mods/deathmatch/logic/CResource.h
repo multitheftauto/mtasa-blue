@@ -30,14 +30,14 @@
 class CExportedFunction
 {
 private:
-    char            m_szFunctionName[MAX_FUNCTION_NAME_LENGTH];
+    SString            m_strFunctionName;
 public:
-    CExportedFunction ( char * szFunctionName )
+    CExportedFunction ( const char* szFunctionName )
     {
-        strncpy ( m_szFunctionName, szFunctionName, MAX_FUNCTION_NAME_LENGTH - 1 );
+        m_strFunctionName.AssignLeft ( szFunctionName, MAX_FUNCTION_NAME_LENGTH );
     };
 
-    inline char *   GetFunctionName ( void ) { return m_szFunctionName; }
+    const char* GetFunctionName ( void ) { return m_strFunctionName; }
 };
 
 class CResource
@@ -49,7 +49,7 @@ public:
 
     inline unsigned short   GetNetID        ( void )                { return m_usNetID; };
     uint                    GetScriptID     ( void ) const          { return m_uiScriptID; };
-    inline char*            GetName         ( void )                { return m_szResourceName; };
+    const char*             GetName         ( void )                { return m_strResourceName; };
     inline CLuaMain*        GetVM           ( void )                { return m_pLuaVM; };
     inline bool             GetActive       ( void )                { return m_bActive; };
 
@@ -99,7 +99,7 @@ public:
 private:
     unsigned short          m_usNetID;
     uint                    m_uiScriptID;
-    char                    m_szResourceName [ MAX_RESOURCE_NAME_LENGTH ];
+    SString                 m_strResourceName;
     CLuaMain*               m_pLuaVM;
     CLuaManager*            m_pLuaManager;
     class CClientEntity*    m_pRootEntity;

@@ -267,7 +267,7 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                     TIMEUS startTime = GetTimeUs();
 
                     // Record event for the crash dump writer
-                    g_pCore->LogEvent ( 405, "Lua Event", pMapEvent->GetVM ()->GetScriptNamePointer (), szName );
+                    g_pCore->LogEvent ( 405, "Lua Event", pMapEvent->GetVM ()->GetScriptName (), szName );
 
                     // Store the current values of the globals
                     lua_getglobal ( pState, "source" );

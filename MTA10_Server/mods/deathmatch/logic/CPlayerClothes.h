@@ -41,7 +41,7 @@ class CPed;
 
 struct SPlayerClothingType
 {
-    char szName [ 32 ];
+    const char* szName;
 };
 
 struct SPlayerClothing
@@ -55,7 +55,7 @@ class CPlayerClothes
 public:
                                 CPlayerClothes              ( void );
 
-    SPlayerClothing*            GetClothing                 ( unsigned char ucType );
+    const SPlayerClothing*      GetClothing                 ( unsigned char ucType );
     void                        AddClothes                  ( const char* szTexture, const char* szModel, unsigned char ucType );
     bool                        RemoveClothes               ( unsigned char ucType );
 
@@ -64,15 +64,15 @@ public:
     void                        DefaultClothes              ( void );
 
     static bool                 HasEmptyClothing            ( unsigned char ucType );
-    static bool                 IsEmptyClothing             ( SPlayerClothing * pClothing, unsigned char ucType );
-    static char*                GetClothingName             ( unsigned char ucType );
+    static bool                 IsEmptyClothing             ( const SPlayerClothing * pClothing, unsigned char ucType );
+    static const  char*         GetClothingName             ( unsigned char ucType );
 
-    static SPlayerClothing*     GetClothingGroup            ( unsigned char ucType );
-    static SPlayerClothing*     GetClothing                 ( const char * szTexture, const char * szModel, unsigned char ucType );
+    static const SPlayerClothing*     GetClothingGroup      ( unsigned char ucType );
+    static const SPlayerClothing*     GetClothing           ( const char * szTexture, const char * szModel, unsigned char ucType );
     static const int            GetClothingGroupMax         ( unsigned char ucType );
     static bool                 IsValidClothing             ( const char * szTexture, const char * szModel, unsigned char ucType );
 
-    SPlayerClothing *           m_Clothes [ PLAYER_CLOTHING_SLOTS ];
+    SFixedArray < const SPlayerClothing*, PLAYER_CLOTHING_SLOTS >   m_Clothes;
 };
 
 #endif

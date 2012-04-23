@@ -442,9 +442,9 @@ protected:
     bool                        m_bIsVirtualized;
     CVehicle*                   m_pVehicle;
     CClientPed*                 m_pDriver;
-    CClientPed*                 m_pPassengers [8];
+    SFixedArray < CClientPed*, 8 >  m_pPassengers;
     CClientPed*                 m_pOccupyingDriver;
-    CClientPed*                 m_pOccupyingPassengers [8];
+    SFixedArray < CClientPed*, 8 >  m_pOccupyingPassengers;
     RpClump*                    m_pClump;
     short                       m_usRemoveTimer;
 
@@ -469,14 +469,14 @@ protected:
     bool                        m_bLandingGearDown;
     bool                        m_bHasAdjustableProperty;
     unsigned short              m_usAdjustablePropertyValue;
-    bool                        m_bAllowDoorRatioSetting [ 6 ];
-    float                       m_fDoorOpenRatio [ 6 ];
+    SFixedArray < bool, 6 >     m_bAllowDoorRatioSetting;
+    SFixedArray < float, 6 >    m_fDoorOpenRatio;
     struct
     {
-        float                   fStart  [ 6 ];
-        float                   fTarget [ 6 ];
-        unsigned long           ulStartTime [ 6 ];
-        unsigned long           ulTargetTime [ 6 ];
+        SFixedArray < float, 6 >            fStart;
+        SFixedArray < float, 6 >            fTarget;
+        SFixedArray < unsigned long, 6 >    ulStartTime;
+        SFixedArray < unsigned long, 6 >    ulTargetTime;
     } m_doorInterp;
     bool                        m_bSwingingDoorsAllowed;
     bool                        m_bDoorsLocked;
