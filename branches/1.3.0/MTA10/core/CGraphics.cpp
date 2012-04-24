@@ -313,6 +313,8 @@ void CGraphics::CheckModes ( EDrawModeType newDrawMode, EBlendModeType newBlendM
         // Flush old
         if ( m_CurDrawMode == EDrawMode::DX_SPRITE )
         {
+            m_pDevice->SetSamplerState( 0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP );
+            m_pDevice->SetSamplerState( 0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP );
             m_pDXSprite->End ();
         }
         else
@@ -644,7 +646,12 @@ void CGraphics::DrawTextureQueued ( float fX, float fY,
     {
         // Otherwise material must be a texture
         Item.Texture.pMaterial = pMaterial;
-        Item.eType = QUEUE_TEXTURE;
+
+        // Use tilebatcher if non-default texture addessing is needed
+        if ( pMaterial->m_TextureAddress == TADDRESS_WRAP )
+            Item.eType = QUEUE_TEXTURE;
+        else
+            Item.eType = QUEUE_SHADER;
     }
 
     // Keep material valid while in the queue

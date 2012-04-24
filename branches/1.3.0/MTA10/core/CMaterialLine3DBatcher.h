@@ -57,4 +57,5 @@ protected:
     IDirect3DDevice9*                       m_pDevice;
     std::vector < SMaterialLine3DItem >     m_LineList;
     static SMaterialLine3DItem*             ms_pLines;      // Used in sort callback
+    ETextureAddress                         m_CurrentTextureAddress;
 };
