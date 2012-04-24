@@ -18,12 +18,13 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-void CFileTextureItem::PostConstruct ( CRenderItemManager* pManager, const SString& strFilename, const CPixels* pPixels, bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format, ETextureType textureType, uint uiVolumeDepth )
+void CFileTextureItem::PostConstruct ( CRenderItemManager* pManager, const SString& strFilename, const CPixels* pPixels, bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format, ETextureAddress textureAddress, ETextureType textureType, uint uiVolumeDepth )
 {
     Super::PostConstruct ( pManager );
 
     m_uiVolumeDepth = uiVolumeDepth;
     m_TextureType = textureType;
+    m_TextureAddress = textureAddress;
 
     // Initial creation of d3d data
     if ( pPixels )

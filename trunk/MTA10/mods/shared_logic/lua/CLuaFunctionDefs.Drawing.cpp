@@ -395,11 +395,11 @@ int CLuaFunctionDefs::dxGetFontHeight ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
 {
-//  element dxCreateTexture( string filepath [, string textureFormat = "argb", bool mipmaps = true ] )
-//  element dxCreateTexture( string pixels [, string textureFormat = "argb", bool mipmaps = true ] )
-//  element dxCreateTexture( int width, int height [, string textureFormat, string textureType, int depth ] )
+//  element dxCreateTexture( string filepath [, string textureFormat = "argb", bool mipmaps = true, string textureEdge = "wrap" ] )
+//  element dxCreateTexture( string pixels [, string textureFormat = "argb", bool mipmaps = true, string textureEdge = "wrap" ] )
+//  element dxCreateTexture( int width, int height [, string textureFormat = "argb", string textureEdge = "wrap", string textureType = "2d", int depth ] )
     SString strFilePath; CPixels pixels; int width; int height; ERenderFormat renderFormat; bool bMipMaps;
-    ETextureType textureType; int depth;
+    ETextureAddress textureAddress; ETextureType textureType; int depth;
 
     CScriptArgReader argStream ( luaVM );
     if ( !argStream.NextIsNumber () )
@@ -407,26 +407,36 @@ int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
         argStream.ReadCharStringRef ( pixels.externalData );
         if ( !g_pCore->GetGraphics ()->GetPixelsManager ()->IsPixels ( pixels ) )
         {
-            // element dxCreateTexture( string filepath [, string textureFormat = "argb", bool mipmaps = true ] )
+            // element dxCreateTexture( string filepath [, string textureFormat = "argb", bool mipmaps = true, string textureEdge = "wrap" ] )
             pixels = CPixels ();
             argStream = CScriptArgReader ( luaVM );
             argStream.ReadString ( strFilePath );
             argStream.ReadEnumString ( renderFormat, RFORMAT_UNKNOWN );
             argStream.ReadBool ( bMipMaps, true );
+            argStream.ReadEnumString ( textureAddress, TADDRESS_WRAP );
         }
         else
         {
-            // element dxCreateTexture( string pixels [, string textureFormat = "argb", bool mipmaps = true ] )
+            // element dxCreateTexture( string pixels [, string textureFormat = "argb", bool mipmaps = true, string textureEdge = "wrap" ] )
             argStream.ReadEnumString ( renderFormat, RFORMAT_UNKNOWN );
             argStream.ReadBool ( bMipMaps, true );
+            argStream.ReadEnumString ( textureAddress, TADDRESS_WRAP );
         }
     }
     else
     {
-        // element dxCreateTexture( int width, int height [, string textureFormat, string textureType, int depth ] )
+        // element dxCreateTexture( int width, int height [, string textureFormat = "argb", string textureEdge = "wrap", string textureType = "2d", int depth ] )
         argStream.ReadNumber ( width );
         argStream.ReadNumber ( height );
         argStream.ReadEnumString ( renderFormat, RFORMAT_UNKNOWN );
+        if ( argStream.NextIsEnumString ( textureType ) )
+        {
+           // r4019 to r4037 had incorrect argument order
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxCreateTexture", "invalid texture-edge type at argument 4" ) );
+            textureAddress = TADDRESS_WRAP;
+        }
+        else
+            argStream.ReadEnumString ( textureAddress, TADDRESS_WRAP );
         argStream.ReadEnumString ( textureType, TTYPE_TEXTURE );
         if ( textureType == TTYPE_VOLUMETEXTURE )
             argStream.ReadNumber ( depth );
@@ -448,7 +458,7 @@ int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
                 {
                     if ( FileExists ( strPath ) )
                     {
-                        CClientTexture* pTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateTexture ( strPath, NULL, bMipMaps, RDEFAULT, RDEFAULT, renderFormat );
+                        CClientTexture* pTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateTexture ( strPath, NULL, bMipMaps, RDEFAULT, RDEFAULT, renderFormat, textureAddress );
                         if ( pTexture )
                         {
                             // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
@@ -467,7 +477,7 @@ int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
             if ( pixels.GetSize () )
             {
                 // From pixels
-                CClientTexture* pTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateTexture ( "", &pixels, bMipMaps, RDEFAULT, RDEFAULT, renderFormat );
+                CClientTexture* pTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateTexture ( "", &pixels, bMipMaps, RDEFAULT, RDEFAULT, renderFormat, textureAddress );
                 if ( pTexture )
                 {
                     pTexture->SetParent ( pParentResource->GetResourceDynamicEntity () );
@@ -478,7 +488,7 @@ int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
             else
             {
                 // Blank sized
-                CClientTexture* pTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateTexture ( "", NULL, false, width, height, renderFormat, textureType, depth );
+                CClientTexture* pTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateTexture ( "", NULL, false, width, height, renderFormat, textureAddress, textureType, depth );
                 if ( pTexture )
                 {
                     pTexture->SetParent ( pParentResource->GetResourceDynamicEntity () );

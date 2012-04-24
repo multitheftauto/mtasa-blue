@@ -49,13 +49,18 @@ enum ERenderFormat
 
 enum ETextureType
 {
-    //RTYPE_SURFACE                =  1,
-    //RTYPE_VOLUME                 =  2,
     TTYPE_TEXTURE                =  3,
     TTYPE_VOLUMETEXTURE          =  4,
     TTYPE_CUBETEXTURE            =  5,
-    //RTYPE_VERTEXBUFFER           =  6,
-    //RTYPE_INDEXBUFFER            =  7,
+};
+
+enum ETextureAddress
+{
+    TADDRESS_WRAP               = 1,
+    TADDRESS_MIRROR             = 2,
+    TADDRESS_CLAMP              = 3,
+    TADDRESS_BORDER             = 4,
+    TADDRESS_MIRRORONCE         = 5,
 };
 
 enum eDxTestMode
@@ -113,7 +118,7 @@ public:
     virtual void                DoPulse                             ( void ) = 0;
     virtual CDxFontItem*        CreateDxFont                        ( const SString& strFullFilePath, uint uiSize, bool bBold ) = 0;
     virtual CGuiFontItem*       CreateGuiFont                       ( const SString& strFullFilePath, const SString& strFontName, uint uiSize ) = 0;
-    virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath, const CPixels* pPixels = NULL, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1 ) = 0;
+    virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath, const CPixels* pPixels = NULL, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP, ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1 ) = 0;
     virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug ) = 0;
     virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false ) = 0;
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY ) = 0;
@@ -301,10 +306,11 @@ CEffectWrap* NewEffectWrap ( CRenderItemManager* pManager, const SString& strFil
 class CMaterialItem : public CRenderItem
 {
     DECLARE_CLASS( CMaterialItem, CRenderItem )
-                    CMaterialItem           ( void ) : ClassInit ( this ) {}
+                    CMaterialItem           ( void ) : ClassInit ( this ), m_TextureAddress ( TADDRESS_WRAP ) {}
 
     uint                m_uiSizeX;
     uint                m_uiSizeY;
+    ETextureAddress     m_TextureAddress;
 };
 
 
@@ -402,7 +408,7 @@ class CFileTextureItem : public CTextureItem
 {
     DECLARE_CLASS( CFileTextureItem, CTextureItem )
                     CFileTextureItem        ( void ) : ClassInit ( this ) {}
-    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, const CPixels* pPixels, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1 );
+    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, const CPixels* pPixels, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP, ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1 );
     virtual void    PreDestruct             ( void );
     virtual bool    IsValid                 ( void );
     virtual void    OnLostDevice            ( void );

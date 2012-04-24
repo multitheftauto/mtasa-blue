@@ -105,6 +105,9 @@ void CMaterialLine3DBatcher::Flush ( void )
     m_pDevice->SetTextureStageState( 1, D3DTSS_COLOROP, D3DTOP_DISABLE );
     m_pDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
 
+    m_CurrentTextureAddress = (ETextureAddress)0;
+
+
     //
     // Sort by distance
     //
@@ -244,6 +247,14 @@ void CMaterialLine3DBatcher::DrawBatch ( const CVector& vecCameraPos, uint* pBat
     const void* pVertexStreamZeroData   = &vertices[0];
     uint VertexStreamZeroStride         = sizeof(SPDTVertex);
     m_pDevice->SetFVF ( SPDTVertex::FVF );
+
+    // Change texture addressing mode if required
+    if ( m_CurrentTextureAddress != pMaterial->m_TextureAddress )
+    {
+        m_CurrentTextureAddress = pMaterial->m_TextureAddress;
+        m_pDevice->SetSamplerState( 0, D3DSAMP_ADDRESSU, m_CurrentTextureAddress );
+        m_pDevice->SetSamplerState( 0, D3DSAMP_ADDRESSV, m_CurrentTextureAddress );
+    }
 
     // Draw
     if ( CTextureItem* pTextureItem = DynamicCast < CTextureItem > ( pMaterial ) )
