@@ -532,6 +532,7 @@ void CPerfStatBandwidthUsageImpl::GetStats ( CPerfStatResult* pResult, const std
                             BWSTAT_INDEX_MONTHS,
                           } };
 
+    SFixedArray < bool, NUMELMS( showTypeList ) > bShowSentLoss;
     SFixedArray < bool, NUMELMS( showTypeList ) > bShowBlocked;
 
     for ( uint t = 0 ; t < NUMELMS( showTypeList ) ; t++ )
@@ -539,14 +540,15 @@ void CPerfStatBandwidthUsageImpl::GetStats ( CPerfStatResult* pResult, const std
         uint uiType = showTypeList [ t ];
         SNetStatHistoryType& type = m_History [ uiType ];
 
+        bShowSentLoss[t] = false;
         bShowBlocked[t] = false;
         for ( int i = type.itemList.size () - 1 ; i >= 0 ; i-- )
         {
+            if ( type.itemList [ i ].llGameResent )
+                bShowSentLoss[t] = true;
+
             if ( type.itemList [ i ].llGameRecvBlocked )
-            {
                 bShowBlocked[t] = true;
-                break;
-            }
         }
     }
 
@@ -557,7 +559,8 @@ void CPerfStatBandwidthUsageImpl::GetStats ( CPerfStatResult* pResult, const std
         pResult->AddColumn ( "Last 24 hours.Hour" );
         pResult->AddColumn ( "Last 24 hours.Recv game" );
         pResult->AddColumn ( "Last 24 hours.Sent game" );
-        pResult->AddColumn ( "Last 24 hours.Resent game" );
+        if ( bShowSentLoss[0] )
+            pResult->AddColumn ( "Last 24 hours.Sent loss" );
         pResult->AddColumn ( "Last 24 hours.Sent http" );
         if ( bShowBlocked[0] )
             pResult->AddColumn ( "Last 24 hours.Blocked" );
@@ -565,7 +568,8 @@ void CPerfStatBandwidthUsageImpl::GetStats ( CPerfStatResult* pResult, const std
         pResult->AddColumn ( "Last 31 days.Day" );
         pResult->AddColumn ( "Last 31 days.Recv game" );
         pResult->AddColumn ( "Last 31 days.Sent game" );
-        pResult->AddColumn ( "Last 31 days.Resent game" );
+        if ( bShowSentLoss[1] )
+            pResult->AddColumn ( "Last 31 days.Sent loss" );
         pResult->AddColumn ( "Last 31 days.Sent http" );
         if ( bShowBlocked[1] )
             pResult->AddColumn ( "Last 31 days.Blocked" );
@@ -573,7 +577,8 @@ void CPerfStatBandwidthUsageImpl::GetStats ( CPerfStatResult* pResult, const std
         pResult->AddColumn ( "Last 12 months.Month" );
         pResult->AddColumn ( "Last 12 months.Recv game" );
         pResult->AddColumn ( "Last 12 months.Sent game" );
-        pResult->AddColumn ( "Last 12 months.Resent game" );
+        if ( bShowSentLoss[2] )
+            pResult->AddColumn ( "Last 12 months.Sent loss" );
         pResult->AddColumn ( "Last 12 months.Sent http" );
         if ( bShowBlocked[2] )
             pResult->AddColumn ( "Last 12 months.Blocked" );
@@ -629,7 +634,8 @@ void CPerfStatBandwidthUsageImpl::GetStats ( CPerfStatResult* pResult, const std
                 {
                     row[c++] = CPerfStatManager::GetScaledByteString ( item.llGameRecv );
                     row[c++] = CPerfStatManager::GetScaledByteString ( item.llGameSent );
-                    row[c++] = CPerfStatManager::GetScaledByteString ( item.llGameResent );
+                    if ( bShowSentLoss[t] )
+                        row[c++] = item.llGameResent ? CPerfStatManager::GetPercentString ( item.llGameResent, item.llGameSent ) : "";
                     row[c++] = CPerfStatManager::GetScaledByteString ( item.llHttpSent );
                     if ( bShowBlocked[t] )
                         row[c++] = CPerfStatManager::GetScaledByteString ( item.llGameRecvBlocked );
@@ -641,7 +647,9 @@ void CPerfStatBandwidthUsageImpl::GetStats ( CPerfStatResult* pResult, const std
             {
                 if ( !bTotalsOnly )
                 {
-                    c += 5;
+                    c += 4;
+                    if ( bShowSentLoss[t] )
+                        c += 1;
                     if ( bShowBlocked[t] )
                         c += 1;
                 }
