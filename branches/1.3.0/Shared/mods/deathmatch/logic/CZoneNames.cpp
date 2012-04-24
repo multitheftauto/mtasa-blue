@@ -11,7 +11,7 @@
 
 static const char* szUnknownZone = "Unknown";
 
-static const SFixedArray < const char*, 8 > cityNameList = {
+static const SFixedArray < const char*, 8 > cityNameList = { {
                     "Tierra Robada",
                     "Bone County",
                     "Las Venturas",
@@ -20,7 +20,7 @@ static const SFixedArray < const char*, 8 > cityNameList = {
                     "Whetstone",
                     "Flint County",
                     "Los Santos",
-                };
+                } };
 
 static const SZone _zoneInfoList [] = {
         { -2353,  2275,     0, -2153,  2475,   200, "Bayside Marina" },

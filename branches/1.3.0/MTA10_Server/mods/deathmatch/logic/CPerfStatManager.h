@@ -29,6 +29,7 @@ public:
     static long long    GetPerSecond        ( long long llValue, long long llDeltaTickCount );
     static void         ToPerSecond         ( long long& llValue, long long llDeltaTickCount );
     static SString      GetPerSecondString  ( long long llValue, double dDeltaTickCount );
+    static SString      GetPercentString    ( long long llValue, long long llTotal );
 
     static CPerfStatManager* GetSingleton ( void );
 };

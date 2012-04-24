@@ -254,10 +254,9 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     m_StatusList.push_back ( StringPair ( "Players",                    SString ( "%d / %d", g_pGame->GetPlayerManager ()->Count (), pConfig->GetMaxPlayers () ) ) );
     m_StatusList.push_back ( StringPair ( "Bytes/sec incoming",         CPerfStatManager::GetScaledByteString ( llIncomingBytesPS ) ) );
     m_StatusList.push_back ( StringPair ( "Bytes/sec outgoing",         CPerfStatManager::GetScaledByteString ( llOutgoingBytesPS ) ) );
-    m_StatusList.push_back ( StringPair ( "Bytes/sec outgoing resent",  CPerfStatManager::GetScaledByteString ( llOutgoingBytesResentPS ) ) );
     m_StatusList.push_back ( StringPair ( "Packets/sec incoming",       strIncomingPacketsPS ) );
     m_StatusList.push_back ( StringPair ( "Packets/sec outgoing",       strOutgoingPacketsPS ) );
-    m_StatusList.push_back ( StringPair ( "Msgs/sec outgoing resent",   strOutgoingMessagesResentPS ) );
+    m_StatusList.push_back ( StringPair ( "Packet loss outgoing",       CPerfStatManager::GetPercentString ( llOutgoingBytesResentPS, llOutgoingBytesPS ) ) );
     m_StatusList.push_back ( StringPair ( "Approx network usage",       CPerfStatManager::GetScaledBitString ( llNetworkUsageBytesPS * 8LL ) + "/s" ) );
     m_OptionsList.push_back ( StringPair ( "MinClientVersion",          pConfig->GetMinimumClientVersion () ) );
     m_OptionsList.push_back ( StringPair ( "RecommendedClientVersion",  pConfig->GetRecommendedClientVersion () ) );
@@ -271,6 +270,8 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
 
     if ( bIncludeDebugInfo )
     {
+        m_StatusList.push_back ( StringPair ( "Bytes/sec outgoing resent",  CPerfStatManager::GetScaledByteString ( llOutgoingBytesResentPS ) ) );
+        m_StatusList.push_back ( StringPair ( "Msgs/sec outgoing resent",   strOutgoingMessagesResentPS ) );
         m_StatusList.push_back ( StringPair ( "Bytes/sec blocked",          CPerfStatManager::GetScaledByteString ( llIncomingBytesPSBlocked ) ) );
         m_StatusList.push_back ( StringPair ( "Packets/sec  blocked",       strIncomingPacketsPSBlocked ) );
         m_StatusList.push_back ( StringPair ( "Usage incl. blocked",        CPerfStatManager::GetScaledBitString ( llNetworkUsageBytesPSInclBlocked * 8LL ) + "/s" ) );
