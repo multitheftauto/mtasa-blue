@@ -24,6 +24,7 @@ namespace
     template<class T>
     static SString FormatNumberWithCommas(T value, int numberOfDecimalPlaces = 0)
     {
+#if 0
         static std::stringstream ss;
         static bool ss_init = false;
         static std::string empty_string;
@@ -33,6 +34,10 @@ namespace
 
         ss.precision(numberOfDecimalPlaces);
         ss << std::fixed << value;
+#else
+        std::stringstream ss;
+        ss << value;
+#endif
         return SString ( ss.str() );
     }
 
