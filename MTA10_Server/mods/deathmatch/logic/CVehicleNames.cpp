@@ -90,7 +90,7 @@ unsigned int CVehicleNames::GetVehicleModel ( const char* szName )
     for ( unsigned int i = 0; i <= 211; i++ )
     {
         if ( stricmp ( szName, VehicleNames [i].szName ) == 0 ||
-           ( stricmp ( szName, VehicleNames [i].szName_replaced ) == 0 ) )
+           ( VehicleNames [i].szName_replaced && stricmp ( szName, VehicleNames [i].szName_replaced ) == 0 ) )
         {
             return i + 400;
         }
