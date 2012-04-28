@@ -61,7 +61,7 @@ bool CPlayerListPacket::Write ( NetBitStreamInterface& BitStream ) const
         else
         {
             BitStream.Write ( ucNickLength );
-            BitStream.Write ( const_cast < char* > ( szNickPointer ), ucNickLength );
+            BitStream.Write ( szNickPointer, ucNickLength );
         }
 
         // Flags

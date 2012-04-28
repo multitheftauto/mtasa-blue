@@ -39,9 +39,7 @@ CConsole::~CConsole ( void )
 bool CConsole::HandleInput ( const char* szCommand, CClient* pClient, CClient* pEchoClient )
 {
     // Copy it
-    char szCommandBuffer [256];
-    szCommandBuffer [255] = 0;
-    strncpy ( szCommandBuffer, szCommand, 255 );
+    COPY_CSTR_TO_TEMP_BUFFER( szCommandBuffer, szCommand, 256 );
     stripControlCodes ( szCommandBuffer );
 
     // Split it into two parts: Key and argument
@@ -168,7 +166,7 @@ void CConsole::DeleteAllCommands ( void )
 }
 
 
-CConsoleCommand* CConsole::GetCommand ( char* szKey )
+CConsoleCommand* CConsole::GetCommand ( const char* szKey )
 {
     // See if we have a command matching the key
     list < CConsoleCommand* > ::const_iterator iter = m_Commands.begin ();

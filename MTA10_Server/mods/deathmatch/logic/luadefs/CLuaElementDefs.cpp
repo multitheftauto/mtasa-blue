@@ -852,10 +852,10 @@ int CLuaElementDefs::getElementZoneName ( lua_State* luaVM )
 
         if ( pElement )
         {
-            char szZoneName [ 128 ];
-            if ( CStaticFunctionDefinitions::GetElementZoneName ( pElement, szZoneName, 128, bCitiesOnly ) )
+            SString strZoneName;
+            if ( CStaticFunctionDefinitions::GetElementZoneName ( pElement, strZoneName, bCitiesOnly ) )
             {
-                lua_pushstring ( luaVM, szZoneName );
+                lua_pushstring ( luaVM, strZoneName );
                 return 1;
             }
         }

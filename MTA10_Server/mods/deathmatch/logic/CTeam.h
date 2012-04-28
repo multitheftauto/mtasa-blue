@@ -26,14 +26,14 @@ class CTeam: public CElement
 {
     friend class CTeamManager;
 public:    
-                            CTeam                   ( CTeamManager* pTeamManager, CElement* pParent, CXMLNode* pNode, char* szName = NULL, unsigned char ucRed = 0, unsigned char ucGreen = 0, unsigned char ucBlue = 0 );
+                            CTeam                   ( CTeamManager* pTeamManager, CElement* pParent, CXMLNode* pNode, const char* szName = NULL, unsigned char ucRed = 0, unsigned char ucGreen = 0, unsigned char ucBlue = 0 );
                             ~CTeam                  ( void );
 
     void                    Unlink                  ( void );
     bool                    ReadSpecialData         ( void );
 
-    inline char*            GetTeamName             ( void )                    { return m_szTeamName; }
-    void                    SetTeamName             ( char* szName );
+    const char*             GetTeamName             ( void )                    { return m_strTeamName; }
+    void                    SetTeamName             ( const char* szName );
 
     void                    AddPlayer               ( CPlayer* pPlayer, bool bChangePlayer = false );
     void                    RemovePlayer            ( CPlayer* pPlayer, bool bChangePlayer = false );
@@ -54,8 +54,8 @@ public:
 private:                        
     CTeamManager*           m_pTeamManager;
 
-    char*                   m_szTeamName;
-    std::list < CPlayer* >       m_Players;
+    SString                 m_strTeamName;
+    std::list < CPlayer* >  m_Players;
 
     unsigned char           m_ucRed;
     unsigned char           m_ucGreen;

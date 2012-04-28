@@ -25,7 +25,7 @@ bool CChatEchoPacket::Write ( NetBitStreamInterface& BitStream ) const
     if ( sizeMessage >= MIN_CHATECHO_LENGTH )
     {
         // Write the string
-        BitStream.Write ( const_cast < char* > ( m_strMessage.c_str() ), sizeMessage );
+        BitStream.Write ( m_strMessage.c_str(), sizeMessage );
         return true;
     }
 

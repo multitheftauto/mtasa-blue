@@ -189,22 +189,13 @@ void CPlayer::SetNick ( const char* szNick )
     if ( !m_strNick.empty () && m_strNick != szNick  )
     {
         // If changing, add the new name to the whowas list
-        char szIP [22];
-        g_pGame->GetConsole ()->GetWhoWas ()->Add ( szNick, inet_addr ( GetSourceIP( szIP ) ), GetSerial (), GetPlayerVersion () );
+        g_pGame->GetConsole ()->GetWhoWas ()->Add ( szNick, inet_addr ( GetSourceIP() ), GetSerial (), GetPlayerVersion () );
     }
 
     m_strNick.AssignLeft ( szNick, MAX_NICK_LENGTH );
 }
 
-char* CPlayer::GetSourceIP ( char* pBuffer )
-{
-    const char* szIP = GetSourceIPString ();
-
-    strcpy ( pBuffer, szIP );
-    return pBuffer;
-}
-
-const char* CPlayer::GetSourceIPString ( void )
+const char* CPlayer::GetSourceIP ( void )
 {
     if ( m_strIP.empty () )
     {

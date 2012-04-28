@@ -51,17 +51,13 @@ static void EndConsoleOutputCapture ( CClient* pClient, const SString& strIfNoOu
 }
 
 
-bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CClient* pClient, CClient* pEchoClient )
+bool CConsoleCommands::Update ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
     // To work on remote clients, 'update' needs ACL entry
     if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
         return false;
 
-    char szBuffer[256];
-    szBuffer[0] = '\0';
-    if ( szarguments )
-        strncpy ( szBuffer, szarguments, 256 );
-    szBuffer[255] = '\0';
+    COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
     char* szResourceName = strtok ( szBuffer, " " );
     char* szVersion = strtok ( NULL, "\0" );
@@ -213,7 +209,7 @@ bool CConsoleCommands::StartResource ( CConsole* pConsole, const char* szArgumen
 
     if ( szArguments && szArguments[0] )
     {
-        CResource * resource = g_pGame->GetResourceManager()->GetResource ( (char *)szArguments );
+        CResource * resource = g_pGame->GetResourceManager()->GetResource ( szArguments );
         if ( resource )
         {
             if ( pClient->GetNick () )
@@ -252,7 +248,7 @@ bool CConsoleCommands::RestartResource ( CConsole* pConsole, const char* szArgum
 {
     if ( szArguments && szArguments[0] )
     {
-        CResource * resource = g_pGame->GetResourceManager()->GetResource ( (char *)szArguments );
+        CResource * resource = g_pGame->GetResourceManager()->GetResource ( szArguments );
         if ( resource )
         {
             if ( pClient->GetNick () )
@@ -323,7 +319,7 @@ bool CConsoleCommands::ResourceInfo ( CConsole* pConsole, const char* szArgument
 
     if ( szArguments && szArguments[0] )
     {
-        CResource * resource = g_pGame->GetResourceManager()->GetResource ( (char *)szArguments );
+        CResource * resource = g_pGame->GetResourceManager()->GetResource ( szArguments );
         if ( resource )
         {
             resource->DisplayInfo();
@@ -339,7 +335,7 @@ bool CConsoleCommands::StopResource ( CConsole* pConsole, const char* szArgument
 {
     if ( szArguments && szArguments[0] )
     {
-        CResource * resource = g_pGame->GetResourceManager()->GetResource ( (char *)szArguments );
+        CResource * resource = g_pGame->GetResourceManager()->GetResource ( szArguments );
         if ( resource )
         {
             if ( pClient->GetNick () )
@@ -394,14 +390,9 @@ bool CConsoleCommands::StopAllResources ( CConsole* pConsole, const char* szArgu
 
 bool CConsoleCommands::InstallResource ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    char szBuffer[256];
-    szBuffer[0] = '\0';
+    return false;
 
-    if ( strlen ( szBuffer ) < 1  )
-        return false;
-
-    strncpy ( szBuffer, szArguments, 256 );
-    szBuffer[255] = '\0';
+    COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
     char* szURL = strtok ( szBuffer, " " );
     char* szName = strtok ( NULL, "\0" );
@@ -459,7 +450,7 @@ bool CConsoleCommands::CheckAllResources ( CConsole* pConsole, const char* szArg
 }
 
 
-bool CConsoleCommands::Say ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+bool CConsoleCommands::Say ( CConsole* pConsole, const char* szInArguments, CClient* pClient, CClient* pEchoClient )
 {
     // say <text>
 
@@ -467,7 +458,8 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szArguments, CClien
     if ( pClient->GetClientType () != CClient::CLIENT_PLAYER || !static_cast < CPlayer* > ( pClient )->IsMuted () )
     {
         // Strip any unwanted characters
-        stripControlCodes ( const_cast < char* > ( szArguments ) );
+        COPY_CSTR_TO_TEMP_BUFFER( szArguments, szInArguments, 256 );
+        stripControlCodes ( szArguments );
 
         // Got a message?
         if ( szArguments )
@@ -587,7 +579,7 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szArguments, CClien
 }
 
 
-bool CConsoleCommands::TeamSay ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+bool CConsoleCommands::TeamSay ( CConsole* pConsole, const char* szInArguments, CClient* pClient, CClient* pEchoClient )
 {
     // teamsay <text>
 
@@ -604,7 +596,8 @@ bool CConsoleCommands::TeamSay ( CConsole* pConsole, const char* szArguments, CC
             if ( pTeam )
             {
                 // Strip any unwanted characters
-                stripControlCodes ( const_cast < char* > ( szArguments ) );
+                COPY_CSTR_TO_TEMP_BUFFER( szArguments, szInArguments, 256 );
+                stripControlCodes ( szArguments );
 
                 // Got a message?
                 if ( szArguments )
@@ -678,7 +671,7 @@ bool CConsoleCommands::TeamSay ( CConsole* pConsole, const char* szArguments, CC
 }
 
 
-bool CConsoleCommands::ASay ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+bool CConsoleCommands::ASay ( CConsole* pConsole, const char* szInArguments, CClient* pClient, CClient* pEchoClient )
 {
     // asay <text>
 
@@ -686,7 +679,8 @@ bool CConsoleCommands::ASay ( CConsole* pConsole, const char* szArguments, CClie
     if ( pClient->GetClientType () != CClient::CLIENT_PLAYER || !static_cast < CPlayer* > ( pClient )->IsMuted () )
     {
         // Strip any unwanted characters
-        stripControlCodes ( const_cast < char* > ( szArguments ) );
+        COPY_CSTR_TO_TEMP_BUFFER( szArguments, szInArguments, 256 );
+        stripControlCodes ( szArguments );
 
         // Got a message?
         if ( szArguments )
@@ -760,7 +754,7 @@ bool CConsoleCommands::ASay ( CConsole* pConsole, const char* szArguments, CClie
 }
 
 
-bool CConsoleCommands::Msg ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+bool CConsoleCommands::Msg ( CConsole* pConsole, const char* szInArguments, CClient* pClient, CClient* pEchoClient )
 {
     // msg <player> <text>
 
@@ -768,16 +762,13 @@ bool CConsoleCommands::Msg ( CConsole* pConsole, const char* szArguments, CClien
     if ( pClient->GetClientType () != CClient::CLIENT_PLAYER || !static_cast < CPlayer* > ( pClient )->IsMuted () )
     {
         // Strip any unwanted characters
-        stripControlCodes ( const_cast < char* > ( szArguments ) );
+        COPY_CSTR_TO_TEMP_BUFFER( szArguments, szInArguments, 256 );
+        stripControlCodes ( szArguments );
 
         // Got a message?
         if ( szArguments )
         {
-            char szBuffer[256];
-            szBuffer[0] = '\0';
-
-            strncpy ( szBuffer, szArguments, 256 );
-            szBuffer[255] = '\0';
+            COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
             char* szPlayer = strtok ( szBuffer, " " );
             char* szMessage = strtok ( NULL, "\0" );
@@ -890,7 +881,7 @@ bool CConsoleCommands::Msg ( CConsole* pConsole, const char* szArguments, CClien
 }
 
 
-bool CConsoleCommands::AMsg ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+bool CConsoleCommands::AMsg ( CConsole* pConsole, const char* szInArguments, CClient* pClient, CClient* pEchoClient )
 {
     // amsg <admin> <text>
 
@@ -899,16 +890,13 @@ bool CConsoleCommands::AMsg ( CConsole* pConsole, const char* szArguments, CClie
     if ( pClient->GetClientType () != CClient::CLIENT_PLAYER || !static_cast < CPlayer* > ( pClient )->IsMuted () )
     {
         // Strip any unwanted characters
-        stripString ( const_cast < char* > ( szArguments ) );
+        COPY_CSTR_TO_TEMP_BUFFER( szArguments, szInArguments, 256 );
+        stripString( szArguments );
 
         // Got a message?
         if ( szArguments )
         {
-            char szBuffer[256];
-            szBuffer[0] = '\0';
-
-            strncpy ( szBuffer, szArguments, 256 );
-            szBuffer[255] = '\0';
+            COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
             char* szAdmin = strtok ( szBuffer, " " );
             char* szMessage = strtok ( NULL, "\0" );
@@ -1082,11 +1070,7 @@ bool CConsoleCommands::Nick ( CConsole* pConsole, const char* szArguments, CClie
         if ( szArguments )
         {
             // Copy the nickname
-            char szNewNick [64];
-            szNewNick[0] = '\0';
-
-            strncpy ( szNewNick, szArguments, 64 );
-            szNewNick[63] = '\0';
+            COPY_CSTR_TO_TEMP_BUFFER( szNewNick, szArguments, 64 );
 
             // Check its validity
             if ( IsNickValid ( szNewNick ) )
@@ -1136,25 +1120,13 @@ bool CConsoleCommands::Nick ( CConsole* pConsole, const char* szArguments, CClie
                         else
                         {
                             // Tell the player
-                            char szBuffer [128];
-                            szBuffer[0] = '\0';
-
-                            snprintf ( szBuffer, 128, "nick: Nickname is already %s", szNick );
-                            szBuffer[127] = '\0';
-
-                            pEchoClient->SendEcho ( szBuffer );
+                            pEchoClient->SendEcho ( SString ( "nick: Nickname is already %s", szNick ) );
                         }
                     }
                     else
                     {
                         // Tell the player
-                        char szBuffer [64];
-                        szBuffer[0] = '\0';
-
-                        snprintf ( szBuffer, 64, "nick: Nick must be between %u and %u characters", MIN_NICK_LENGTH, MAX_NICK_LENGTH );
-                        szBuffer[63] = '\0';
-
-                        pEchoClient->SendEcho ( szBuffer );
+                        pEchoClient->SendEcho ( SString ( "nick: Nick must be between %u and %u characters", MIN_NICK_LENGTH, MAX_NICK_LENGTH ) );
                     }
                 }
                 else
@@ -1190,16 +1162,13 @@ bool CConsoleCommands::LogIn ( CConsole* pConsole, const char* szArguments, CCli
     // login [<name>] <pass>
 
     // Grab the sender's nick
-    char* szNick = const_cast < char* > ( pClient->GetNick () );
-    char* szPassword = const_cast < char* > ( szArguments );
+    const char* szNick = pClient->GetNick ();
+    const char* szPassword = szArguments;
 
     // Got any arguments?
     if ( szArguments && szArguments [ 0 ] )
     {
-        char szTemp [ 256 ];
-        szTemp[0] = '\0';
-        strncpy ( szTemp, szArguments, 256 );
-        szTemp [ 255 ] = 0;
+        COPY_CSTR_TO_TEMP_BUFFER( szTemp, szArguments, 256 );
 
         char* szTempNick = strtok ( szTemp, " " );
         char* szTempPassword = strtok ( NULL, "\0" );
@@ -1248,9 +1217,7 @@ bool CConsoleCommands::ChgMyPass ( CConsole* pConsole, const char* szArguments, 
         if ( pClient->IsRegistered () )
         {
             // Copy the command
-            char szBuffer [256];
-            strncpy ( szBuffer, szArguments, 256 );
-            szBuffer [255] = 0;
+            COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
             // Split it up into nick and password
             char* szOldPassword = strtok ( szBuffer, " " );
@@ -1281,11 +1248,7 @@ bool CConsoleCommands::ChgMyPass ( CConsole* pConsole, const char* szArguments, 
                             pAccount->SetPassword ( szNewPassword );
 
                             // Tell the client
-                            char szMessage [128];
-                            snprintf ( szMessage, 128, "chgmypass: Your password was changed to '%s'", szNewPassword );
-                            szMessage[127] = '\0';
-
-                            pEchoClient->SendEcho ( szMessage );
+                            pEchoClient->SendEcho ( SString ( "chgmypass: Your password was changed to '%s'", szNewPassword ) );
                             CLogger::LogPrintf ( "ACCOUNTS: %s changed their account password", GetAdminNameForLog ( pClient ).c_str () );
                             return true;
                         }
@@ -1332,11 +1295,7 @@ bool CConsoleCommands::AddAccount ( CConsole* pConsole, const char* szArguments,
     if ( szArguments )
     {
         // Copy the argument buffer
-        char szBuffer [256];
-        szBuffer[0] = '\0';
-
-        strncpy ( szBuffer, szArguments, 256 );
-        szBuffer [255] = 0;
+        COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
         // Split it into nick and reason
         char* szNick = strtok ( szBuffer, " " );
@@ -1356,13 +1315,7 @@ bool CConsoleCommands::AddAccount ( CConsole* pConsole, const char* szArguments,
                     g_pGame->GetAccountManager ()->Register( pAccount );
 
                     // Tell the user
-                    char szMessage [128];
-                    szMessage[0] = '\0';
-
-                    snprintf ( szMessage, 128, "addaccount: Added account '%s' with password '%s'", szNick, szPassword );
-                    szMessage[127] = '\0';
-
-                    pClient->SendEcho ( szMessage );
+                    pClient->SendEcho ( SString ( "addaccount: Added account '%s' with password '%s'", szNick, szPassword ) );
 
                     // Tell the console
                     CLogger::LogPrintf ( "ACCOUNTS: %s added account '%s' with password '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szNick, szPassword );
@@ -1396,7 +1349,7 @@ bool CConsoleCommands::DelAccount ( CConsole* pConsole, const char* szArguments,
 {
     // delaccount <nick>
 
-    char* szNick = const_cast < char* > ( szArguments );
+    const char* szNick = szArguments;
 
     // Got any arguments?
     if ( szArguments )
@@ -1415,23 +1368,11 @@ bool CConsoleCommands::DelAccount ( CConsole* pConsole, const char* szArguments,
                     return false;
                 }
 
-                char szClientMessage [128];
-                szClientMessage[0] = '\0';
-
-                snprintf ( szClientMessage, 128, "logout: You were logged out of account '%s' due to it being deleted", szArguments );
-                szClientMessage[127] = '\0';
-
-                pAccountClient->SendEcho ( szClientMessage );
+                pAccountClient->SendEcho ( SString ( "logout: You were logged out of account '%s' due to it being deleted", szArguments ) );
             }
 
             // Tell the client
-            char szMessage [128];
-            szMessage[0] = '\0';
-
-            snprintf ( szMessage, 128, "delaccount: Account '%s' deleted", szArguments );
-            szMessage[127] = '\0';
-
-            pEchoClient->SendEcho ( szMessage );
+            pEchoClient->SendEcho ( SString ( "delaccount: Account '%s' deleted", szArguments ) );
 
             // Tell the console
             CLogger::LogPrintf ( "ACCOUNTS: %s deleted account '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szArguments );
@@ -1463,11 +1404,7 @@ bool CConsoleCommands::ChgPass ( CConsole* pConsole, const char* szArguments, CC
     if ( szArguments )
     {
         // Copy the command
-        char szBuffer [256];
-        szBuffer[0] = '\0';
-
-        strncpy ( szBuffer, szArguments, 256 );
-        szBuffer [255] = 0;
+        COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
         // Split it up into nick and password
         char* szNick = strtok ( szBuffer, " " );
@@ -1482,13 +1419,7 @@ bool CConsoleCommands::ChgPass ( CConsole* pConsole, const char* szArguments, CC
                 pAccount->SetPassword ( szPassword );
 
                 // Tell the client
-                char szMessage [128];
-                szMessage[0] = '\0';
-
-                snprintf ( szMessage, 128, "chgpass: %s's password changed to '%s'", szNick, szPassword );
-                szMessage[127] = '\0';
-
-                pEchoClient->SendEcho ( szMessage );
+                pEchoClient->SendEcho ( SString ( "chgpass: %s's password changed to '%s'", szNick, szPassword ) );
 
                 // Tell the console
                 CLogger::LogPrintf ( "ACCOUNTS: %s changed %s's password to '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szNick, szPassword );
@@ -1520,10 +1451,7 @@ bool CConsoleCommands::Shutdown ( CConsole* pConsole, const char* szArguments, C
     if ( szArguments && strlen ( szArguments ) > 0 )
     {
         // Copy to a buffer and strip it for bad characters
-        char szBuffer [256];
-        szBuffer[0] = '\0';
-        strncpy ( szBuffer, szArguments, 256 );
-        szBuffer [255] = 0;
+        COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
         // Output the action + reason to the console
         CLogger::LogPrintf ( "SHUTDOWN: Got shutdown command from %s (Reason: %s)\n", GetAdminNameForLog ( pClient ).c_str (), szBuffer );
@@ -1551,11 +1479,7 @@ bool CConsoleCommands::AExec ( CConsole* pConsole, const char* szArguments, CCli
         if ( szArguments && strlen ( szArguments ) > 0 )
         {
             // Copy the argument buffer
-            char szBuffer [256];
-            szBuffer[0] = '\0';
-
-            strncpy ( szBuffer, szArguments, 256 );
-            szBuffer [255] = 0;
+            COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
             // Split it into nick and reason
             char* szNick = strtok ( szBuffer, " " );
@@ -1618,17 +1542,7 @@ bool CConsoleCommands::WhoIs ( CConsole* pConsole, const char* szArguments, CCli
                 if ( pPlayer->IsJoined () )
                 {
                     // Echo him
-                    char szIP [32];
-                    szIP[0] = '\0';
-                    pPlayer->GetSourceIP ( szIP );
-
-                    // Populate a line about him and send it
-                    char szBuffer [256];
-                    szBuffer[0] = '\0';
-
-                    snprintf ( szBuffer, 256, "%s - %s:%u", pPlayer->GetNick (), szIP, pPlayer->GetSourcePort () );
-                    szBuffer[255] = '\0';
-                    pClient->SendEcho ( szBuffer );
+                    pClient->SendEcho ( SString ( "%s - %s:%u", pPlayer->GetNick (), pPlayer->GetSourceIP (), pPlayer->GetSourcePort () ) );
 
                     ++uiCount;
                 }
@@ -1647,16 +1561,8 @@ bool CConsoleCommands::WhoIs ( CConsole* pConsole, const char* szArguments, CCli
             if ( pPlayer && pPlayer->IsJoined () )
             {
                 // Echo him
-                char szIP [32];
-                szIP[0] = '\0';
-                pPlayer->GetSourceIP ( szIP );
+                pClient->SendEcho ( SString ( "%s - %s:%u", pPlayer->GetNick (), pPlayer->GetSourceIP (), pPlayer->GetSourcePort () ) );
 
-                // Populate a line about him and send it
-                char szBuffer [256];
-                szBuffer[0] = '\0';
-                snprintf ( szBuffer, 256, "%s - %s:%u", pPlayer->GetNick (), szIP, pPlayer->GetSourcePort () );
-                szBuffer[255] = '\0';
-                pClient->SendEcho ( szBuffer );
             }
             else
             {
@@ -1794,16 +1700,12 @@ bool CConsoleCommands::Sudo ( CConsole* pConsole, const char* szArguments, CClie
     // sudo <command>
 
     // Grab the nick
-    char* szNick = const_cast < char* > ( pClient->GetNick () );
+    const char* szNick = pClient->GetNick ();
 
     // Got any arguments?
     if ( szArguments && szArguments [ 0 ] )
     {
-        char szTemp [ 256 ];
-        szTemp[0] = '\0';
-
-        strncpy ( szTemp, szArguments, 256 );
-        szTemp [ 255 ] = 0;
+        COPY_CSTR_TO_TEMP_BUFFER( szTemp, szArguments, 256 );
 
         char* szFunction = strtok ( szTemp, " " );
 

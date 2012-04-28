@@ -186,7 +186,7 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
                 return m_pGuestAccount;
             }
 
-            CAccount * account = g_pGame->GetAccountManager()->Get ( (char *)authName.c_str());
+            CAccount * account = g_pGame->GetAccountManager()->Get ( authName.c_str());
             if ( account )
             {
                 // Check that the password is right

@@ -669,7 +669,7 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
                 // Write the content too if it's not empty
                 if ( usLength > 0 )
                 {
-                    bitStream.Write ( const_cast < char* > ( szTemp ), usLength );
+                    bitStream.Write ( szTemp, usLength );
                 }
             }
             else
@@ -686,7 +686,7 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
                 if ( uiLength > 0 )
                 {
                     bitStream.AlignWriteToByteBoundary ();
-                    bitStream.Write ( const_cast < char* > ( szTemp ), uiLength );
+                    bitStream.Write ( szTemp, uiLength );
                 }
             }
             break;

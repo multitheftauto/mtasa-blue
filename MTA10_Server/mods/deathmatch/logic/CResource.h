@@ -297,7 +297,7 @@ public:
     inline CXMLNode *       GetSettingsNode ( void ) { return m_pNodeSettings; }
     inline CXMLNode *       GetStorageNode ( void ) { return m_pNodeStorage; }
 
-    bool                    CallExportedFunction ( char * szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller );
+    bool                    CallExportedFunction ( const char * szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller );
 
     inline list<CResource *> *  GetDependents ( void ) { return &m_dependents; }
     inline int              GetDependentCount ( void ) { return m_dependents.size(); }

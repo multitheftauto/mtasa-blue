@@ -55,8 +55,8 @@ bool CBulletsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.Write ( m_cFlag );
         if ( m_cFlag == 1 )
         {
-            BitStream.Write ( (char *)&m_vecStart, sizeof ( CVector ) );
-            BitStream.Write ( (char *)&m_vecEnd, sizeof ( CVector ) );
+            BitStream.Write ( (const char *)&m_vecStart, sizeof ( CVector ) );
+            BitStream.Write ( (const char *)&m_vecEnd, sizeof ( CVector ) );
         }
         return true;
     }
