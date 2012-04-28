@@ -30,7 +30,7 @@ public:
     void                                AddCommand                  ( FCommandHandler* pHandler, const char* szCommand, bool bRestricted );
     void                                DeleteCommand               ( const char* szCommand );
     void                                DeleteAllCommands           ( void );
-    CConsoleCommand*                    GetCommand                  ( char* szKey );
+    CConsoleCommand*                    GetCommand                  ( const char* szKey );
 
     inline list < CConsoleCommand* > ::const_iterator CommandsBegin ( void )                { return m_Commands.begin (); };
     inline list < CConsoleCommand* > ::const_iterator CommandsEnd   ( void )                { return m_Commands.end (); };

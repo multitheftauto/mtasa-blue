@@ -62,7 +62,7 @@ bool CVoiceDataPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.Write ( ID );
             // Write the length as an unsigned short and then write the string
             BitStream.Write ( m_usActualDataLength );
-            BitStream.Write ( reinterpret_cast < char * > ( m_pBuffer ), m_usActualDataLength );
+            BitStream.Write ( reinterpret_cast < const char * > ( m_pBuffer ), m_usActualDataLength );
             return true;
     }
 

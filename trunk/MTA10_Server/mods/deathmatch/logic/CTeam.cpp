@@ -13,11 +13,9 @@
 
 #include "StdInc.h"
 
-CTeam::CTeam ( CTeamManager* pTeamManager, CElement* pParent, CXMLNode* pNode, char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue ): CElement ( pParent, pNode )
+CTeam::CTeam ( CTeamManager* pTeamManager, CElement* pParent, CXMLNode* pNode, const char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue ): CElement ( pParent, pNode )
 {
     m_pTeamManager = pTeamManager;
-
-    m_szTeamName = NULL;
 
     m_iType = CElement::TEAM;
     SetTypeName ( "team" );
@@ -34,7 +32,6 @@ CTeam::~CTeam ( void )
 {
     RemoveAllPlayers ();
     Unlink ();
-    delete [] m_szTeamName;
 }
 
 
@@ -98,16 +95,12 @@ bool CTeam::ReadSpecialData ( void )
 }
 
 
-void CTeam::SetTeamName ( char* szName )
+void CTeam::SetTeamName ( const char* szName )
 {
-    delete [] m_szTeamName;
-    m_szTeamName = NULL;
-
     if ( szName )
-    {
-        m_szTeamName = new char [ strlen ( szName ) + 1 ];
-        strcpy ( m_szTeamName, szName );
-    }
+        m_strTeamName = szName;
+    else
+        m_strTeamName = "";
 }
 
 

@@ -126,9 +126,7 @@ public:
     inline void                                 SetAkimboArmUp              ( bool bUp )                    { m_bAkimboArmUp = bUp; };
 
     inline NetServerPlayerID&                   GetSocket                   ( void )                        { return m_PlayerSocket; };
-    char*                                       GetSourceIP                 ( char* pBuffer );
-    const char*                                 GetSourceIPString           ( void );
-    inline unsigned long                        GetSourceIP                 ( void )                        { return m_PlayerSocket.GetBinaryAddress (); };
+    const char*                                 GetSourceIP                 ( void );
     inline unsigned short                       GetSourcePort               ( void )                        { return m_PlayerSocket.GetPort (); };
 
     void                                        SetPing                     ( uint uiPing )                 { m_uiPing = uiPing; }

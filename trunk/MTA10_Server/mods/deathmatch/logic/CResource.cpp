@@ -1513,10 +1513,8 @@ bool CResource::ReadIncludedHTML ( CXMLNode * root )
                 }
                 else
                 {
-                    char szBuffer[512];
-                    snprintf ( szBuffer, 511, "Couldn't find html %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
-                    m_strFailureReason = szBuffer;
-                    CLogger::ErrorPrintf ( "Couldn't find html %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
+                    m_strFailureReason = SString ( "Couldn't find html %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
+                    CLogger::ErrorPrintf ( m_strFailureReason );
                     return false;
                 }
             }
@@ -1579,10 +1577,8 @@ bool CResource::ReadIncludedConfigs ( CXMLNode * root )
                 }
                 else
                 {
-                    char szBuffer[512];
-                    snprintf ( szBuffer, 511, "Couldn't find config %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
-                    m_strFailureReason = szBuffer;
-                    CLogger::ErrorPrintf ( "Couldn't find config %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
+                    m_strFailureReason = SString ( "Couldn't find config %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
+                    CLogger::ErrorPrintf ( m_strFailureReason );
                     return false;
                 }
             }
@@ -1631,10 +1627,8 @@ bool CResource::ReadIncludedFiles ( CXMLNode * root )
                     m_resourceFiles.push_back ( new CResourceClientFileItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes, bDownload ) );
                 else
                 {
-                    char szBuffer[512];
-                    snprintf ( szBuffer, 511, "Couldn't find file %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
-                    m_strFailureReason = szBuffer;
-                    CLogger::ErrorPrintf ( "Couldn't find file %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
+                    m_strFailureReason = SString ( "Couldn't find file %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
+                    CLogger::ErrorPrintf ( m_strFailureReason );
                     return false;
                 }
             }
@@ -1782,10 +1776,8 @@ bool CResource::ReadIncludedScripts ( CXMLNode * root )
                 }
                 else
                 {
-                    char szBuffer[512];
-                    snprintf ( szBuffer, 511, "Couldn't find script %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
-                    m_strFailureReason = szBuffer;
-                    CLogger::ErrorPrintf ( "Couldn't find script %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
+                    m_strFailureReason = SString ( "Couldn't find script %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
+                    CLogger::ErrorPrintf (m_strFailureReason );
                     return false;
                 }
             }
@@ -1837,10 +1829,8 @@ bool CResource::ReadIncludedMaps ( CXMLNode * root )
                 }
                 else
                 {
-                    char szBuffer[512];
-                    snprintf ( szBuffer, 511, "Couldn't find map %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
-                    m_strFailureReason = szBuffer;
-                    CLogger::ErrorPrintf ( "Couldn't find map %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
+                    m_strFailureReason = SString ( "Couldn't find map %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
+                    CLogger::ErrorPrintf ( m_strFailureReason );
                     return false;
                 }
             }
@@ -2978,7 +2968,7 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
     return HTTPRESPONSECODE_404_NOTFOUND;
 }
 
-bool CResource::CallExportedFunction ( char * szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller )
+bool CResource::CallExportedFunction ( const char * szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller )
 {
     if ( !m_bActive )
         return false;
