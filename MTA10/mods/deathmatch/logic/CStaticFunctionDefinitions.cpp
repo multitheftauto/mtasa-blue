@@ -169,7 +169,7 @@ bool CStaticFunctionDefinitions::TriggerServerEvent ( const char* szName, CClien
     {
         unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
         pBitStream->WriteCompressed ( usNameLength );
-        pBitStream->Write ( const_cast < char* > ( szName ), usNameLength );
+        pBitStream->Write ( szName, usNameLength );
         pBitStream->Write ( CallWithEntity.GetID () );
         if ( !Arguments.WriteToBitStream ( *pBitStream ) )
         {
@@ -198,7 +198,7 @@ bool CStaticFunctionDefinitions::TriggerLatentServerEvent ( const char* szName, 
     {
         unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
         pBitStream->WriteCompressed ( usNameLength );
-        pBitStream->Write ( const_cast < char* > ( szName ), usNameLength );
+        pBitStream->Write ( szName, usNameLength );
         pBitStream->Write ( CallWithEntity.GetID () );
         if ( !Arguments.WriteToBitStream ( *pBitStream ) )
         {
@@ -875,7 +875,7 @@ CClientDummy* CStaticFunctionDefinitions::CreateElement ( CResource& Resource, c
     if ( strlen ( szTypeName ) > 0 && CClientEntity::GetTypeID ( szTypeName ) == CCLIENTUNKNOWN )
     {
         CClientDummy* pDummy = new CClientDummy ( m_pManager, INVALID_ELEMENT_ID,  szTypeName );
-        pDummy->SetName ( (char*) szID );
+        pDummy->SetName ( szID );
 
         pDummy->SetParent ( Resource.GetResourceDynamicEntity() );
         return pDummy;
@@ -1502,16 +1502,13 @@ bool CStaticFunctionDefinitions::GetPedTask ( CClientPed& Ped, bool bPrimary, un
 }
 
 
-bool CStaticFunctionDefinitions::GetPedClothes ( CClientPed & Ped, unsigned char ucType, char* szTextureReturn, char* szModelReturn )
+bool CStaticFunctionDefinitions::GetPedClothes ( CClientPed & Ped, unsigned char ucType, SString& strOutTexture, SString& strOutModel )
 {
     const SPlayerClothing* pClothing = Ped.GetClothes ()->GetClothing ( ucType );
     if ( pClothing )
     {
-        if ( szTextureReturn )
-            strcpy ( szTextureReturn, pClothing->szTexture );
-        if ( szModelReturn )
-            strcpy ( szModelReturn, pClothing->szModel );
-
+        strOutTexture = pClothing->szTexture;
+        strOutModel = pClothing->szModel;
         return true;
     }
 
@@ -1544,12 +1541,12 @@ bool CStaticFunctionDefinitions::IsPedDoingGangDriveby ( CClientPed & Ped, bool 
 }
 
 
-bool CStaticFunctionDefinitions::GetPedAnimation ( CClientPed & Ped, char * szBlockName, char * szAnimName, unsigned int uiLength )
+bool CStaticFunctionDefinitions::GetPedAnimation ( CClientPed & Ped, SString& strBlockName, SString& strAnimName )
 {
     if ( Ped.IsRunningAnimation () )
     {
-        strncpy ( szBlockName, Ped.GetAnimationBlock ()->GetName (), uiLength );
-        strncpy ( szAnimName, Ped.GetAnimationName (), uiLength );
+        strBlockName = Ped.GetAnimationBlock ()->GetName ();
+        strAnimName = Ped.GetAnimationName ();
         return true;
     }
     return false;
@@ -1614,7 +1611,7 @@ bool CStaticFunctionDefinitions::IsPedInVehicle ( CClientPed & Ped, bool & bInVe
     return true;
 }
 
-char* CStaticFunctionDefinitions::GetPedSimplestTask ( CClientPed& Ped )
+const char* CStaticFunctionDefinitions::GetPedSimplestTask ( CClientPed& Ped )
 {
     CTaskManager* pTaskManager = Ped.GetTaskManager ();
     if ( pTaskManager )
@@ -1717,12 +1714,9 @@ bool CStaticFunctionDefinitions::GetPlayerWantedLevel ( char & cWanted )
 }
 
 
-bool CStaticFunctionDefinitions::GetPlayerNametagText ( CClientPlayer & Player, char * szBuffer, unsigned int uiLength )
+bool CStaticFunctionDefinitions::GetPlayerNametagText ( CClientPlayer & Player, SString& strOutText )
 {
-    assert ( szBuffer );
-    assert ( uiLength );
-
-    strncpy ( szBuffer, Player.GetNick (), uiLength );
+    strOutText = Player.GetNametagText ();
     return true;
 }
 
@@ -1999,7 +1993,7 @@ bool CStaticFunctionDefinitions::SetPedMoveAnim ( CClientEntity& Entity, unsigne
 }
 
 
-bool CStaticFunctionDefinitions::AddPedClothes ( CClientEntity& Entity, char* szTexture, char* szModel, unsigned char ucType )
+bool CStaticFunctionDefinitions::AddPedClothes ( CClientEntity& Entity, const char* szTexture, const char* szModel, unsigned char ucType )
 {
     RUN_CHILDREN AddPedClothes ( **iter, szTexture, szModel, ucType );
     // Is he a player?
@@ -2160,15 +2154,14 @@ bool CStaticFunctionDefinitions::SetPedOnFire ( CClientEntity & Entity, bool bOn
 }
 
 
-bool CStaticFunctionDefinitions::GetBodyPartName ( unsigned char ucID, char* szName )
+bool CStaticFunctionDefinitions::GetBodyPartName ( unsigned char ucID, SString& strOutName )
 {
     if ( ucID <= 10 )
     {
         // Grab the name and check it's length
-        const char* szNamePointer = CClientPed::GetBodyPartName ( ucID );
-        if ( strlen ( szNamePointer ) > 0 )
+        strOutName = CClientPed::GetBodyPartName ( ucID );
+        if ( !strOutName.empty () )
         {
-            strncpy ( szName, szNamePointer, 256 );
             return true;
         }
     }
@@ -2177,18 +2170,15 @@ bool CStaticFunctionDefinitions::GetBodyPartName ( unsigned char ucID, char* szN
 }
 
 
-bool CStaticFunctionDefinitions::GetClothesByTypeIndex ( unsigned char ucType, unsigned char ucIndex, char* szTextureReturn, char* szModelReturn )
+bool CStaticFunctionDefinitions::GetClothesByTypeIndex ( unsigned char ucType, unsigned char ucIndex, SString& strOutTexture, SString& strOutModel )
 {
     const SPlayerClothing* pPlayerClothing = CClientPlayerClothes::GetClothingGroup ( ucType );
     if ( pPlayerClothing )
     {
         if ( ucIndex < CClientPlayerClothes::GetClothingGroupMax ( ucType ) )
         {
-            if ( szTextureReturn )
-                strcpy ( szTextureReturn, pPlayerClothing [ ucIndex ].szTexture );
-            if ( szModelReturn )
-                strcpy ( szModelReturn, pPlayerClothing [ ucIndex ].szModel );
-            
+            strOutTexture = pPlayerClothing [ ucIndex ].szTexture;
+            strOutModel = pPlayerClothing [ ucIndex ].szModel;           
             return true;
         }
     }
@@ -2197,7 +2187,7 @@ bool CStaticFunctionDefinitions::GetClothesByTypeIndex ( unsigned char ucType, u
 }
 
 
-bool CStaticFunctionDefinitions::GetTypeIndexFromClothes ( char* szTexture, char* szModel, unsigned char& ucTypeReturn, unsigned char& ucIndexReturn )
+bool CStaticFunctionDefinitions::GetTypeIndexFromClothes ( const char* szTexture, const char* szModel, unsigned char& ucTypeReturn, unsigned char& ucIndexReturn )
 {
     if ( szTexture == NULL && szModel == NULL )
         return false;
@@ -2225,15 +2215,12 @@ bool CStaticFunctionDefinitions::GetTypeIndexFromClothes ( char* szTexture, char
 }
 
 
-bool CStaticFunctionDefinitions::GetClothesTypeName ( unsigned char ucType, char* szNameReturn )
+bool CStaticFunctionDefinitions::GetClothesTypeName ( unsigned char ucType, SString& strOutName )
 {
-    assert ( szNameReturn );
-
     const char* szName = CClientPlayerClothes::GetClothingName ( ucType );
     if ( szName )
     {
-        strcpy ( szNameReturn, szName );
-
+        strOutName = szName;
         return true;
     }
 
@@ -2292,23 +2279,19 @@ bool CStaticFunctionDefinitions::GetVehicleModelFromName ( const char* szName, u
 }
 
 
-bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( unsigned char ucSlot, char* szName, unsigned short len )
+bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( unsigned char ucSlot, SString& strOutName )
 {
-    strncpy ( szName, CVehicleUpgrades::GetSlotName ( ucSlot ), len );
-    if (len)
-        szName[len-1] = '\0';
+    strOutName = CVehicleUpgrades::GetSlotName ( ucSlot );
     return true;
 }
 
 
-bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( unsigned short usUpgrade, char* szName, unsigned short len )
+bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( unsigned short usUpgrade, SString& strOutName )
 {
     unsigned char ucSlot;
     if ( CVehicleUpgrades::GetSlotFromUpgrade ( usUpgrade, ucSlot ) )
     {
-        strncpy ( szName, CVehicleUpgrades::GetSlotName ( ucSlot ), len );
-        if (len)
-            szName[len-1] = '\0';
+        strOutName = CVehicleUpgrades::GetSlotName ( ucSlot );
         return true;
     }
 
@@ -2316,14 +2299,9 @@ bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( unsigned short usUp
 }
 
 
-bool CStaticFunctionDefinitions::GetVehicleNameFromModel ( unsigned short usModel, char* szName, unsigned short len )
+bool CStaticFunctionDefinitions::GetVehicleNameFromModel ( unsigned short usModel, SString& strOutName )
 {
-    assert ( szName );
-
-    strncpy ( szName, CVehicleNames::GetVehicleName ( usModel ), len );
-    if (len)
-        szName[len-1] = '\0';
-
+    strOutName = CVehicleNames::GetVehicleName ( usModel );
     return true;
 }
 
@@ -5407,20 +5385,13 @@ bool CStaticFunctionDefinitions::GetWeather ( unsigned char& ucWeather, unsigned
 }
 
 
-bool CStaticFunctionDefinitions::GetZoneName ( CVector& vecPosition, char* szBuffer, unsigned int uiBufferLength, bool bCitiesOnly )
+bool CStaticFunctionDefinitions::GetZoneName ( CVector& vecPosition, SString& strOutBuffer, bool bCitiesOnly )
 {
-    assert ( szBuffer );
-    assert ( uiBufferLength );
-
-    const char* szZone = NULL;
     if ( bCitiesOnly )
-        szZone = m_pClientGame->GetZoneNames ()->GetCityName ( vecPosition );
+        strOutBuffer = m_pClientGame->GetZoneNames ()->GetCityName ( vecPosition );
     else
-        szZone = m_pClientGame->GetZoneNames ()->GetZoneName ( vecPosition );
+        strOutBuffer = m_pClientGame->GetZoneNames ()->GetZoneName ( vecPosition );
 
-    strncpy ( szBuffer, szZone, uiBufferLength );
-    if (uiBufferLength)
-        szBuffer [ uiBufferLength - 1 ] = 0;
     return true;
 }
 
@@ -6219,17 +6190,14 @@ CClientColShape* CStaticFunctionDefinitions::GetElementColShape ( CClientEntity*
 }
 
 
-bool CStaticFunctionDefinitions::GetWeaponNameFromID ( unsigned char ucID, char* szName, unsigned short len )
+bool CStaticFunctionDefinitions::GetWeaponNameFromID ( unsigned char ucID, SString& strOutName )
 {
     if ( ucID <= 59 )
     {
         // Grab the name and check it's length
-        const char* szNamePointer = CWeaponNames::GetWeaponName ( ucID );
-        if ( strlen ( szNamePointer ) > 0 )
+        strOutName = CWeaponNames::GetWeaponName ( ucID );
+        if ( !strOutName.empty () )
         {
-            strncpy ( szName, szNamePointer, len );
-            if (len)
-                szName[len-1] = '\0';
             return true;
         }
     }

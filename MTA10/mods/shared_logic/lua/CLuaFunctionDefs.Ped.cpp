@@ -349,7 +349,7 @@ int CLuaFunctionDefs::GetPedSimplestTask ( lua_State* luaVM )
         if ( pPed )
         {
             // Grab his simplest task and return it
-            char* szTaskName = CStaticFunctionDefinitions::GetPedSimplestTask ( *pPed );
+            const char* szTaskName = CStaticFunctionDefinitions::GetPedSimplestTask ( *pPed );
             if ( szTaskName )
             {
                 lua_pushstring ( luaVM, szTaskName );
@@ -890,11 +890,11 @@ int CLuaFunctionDefs::GetPedClothes ( lua_State* luaVM )
         unsigned char ucType = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
         if ( pPed )
         {
-            char szTexture [ 128 ], szModel [ 128 ];
-            if ( CStaticFunctionDefinitions::GetPedClothes ( *pPed, ucType, szTexture, szModel ) )
+            SString strTexture, strModel;
+            if ( CStaticFunctionDefinitions::GetPedClothes ( *pPed, ucType, strTexture, strModel ) )
             {
-                lua_pushstring ( luaVM, szTexture );
-                lua_pushstring ( luaVM, szModel );
+                lua_pushstring ( luaVM, strTexture );
+                lua_pushstring ( luaVM, strModel );
                 return 2;
             }
         }
@@ -968,11 +968,11 @@ int CLuaFunctionDefs::GetPedAnimation ( lua_State* luaVM )
         CClientPed * pPed = lua_toped ( luaVM, 1 );
         if ( pPed )
         {
-            char szBlockName [ 128 ], szAnimName [ 128 ];
-            if ( CStaticFunctionDefinitions::GetPedAnimation ( *pPed, szBlockName, szAnimName, 128 ))
+            SString strBlockName, strAnimName;
+            if ( CStaticFunctionDefinitions::GetPedAnimation ( *pPed, strBlockName, strAnimName ) )
             {
-                lua_pushstring ( luaVM, szBlockName );
-                lua_pushstring ( luaVM, szAnimName );
+                lua_pushstring ( luaVM, strBlockName );
+                lua_pushstring ( luaVM, strAnimName );
                 return 2;
             }
         }
@@ -1199,7 +1199,7 @@ int CLuaFunctionDefs::AddPedClothes ( lua_State* luaVM )
 
         if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::AddPedClothes ( *pEntity, const_cast < char* > ( szTexture ), const_cast < char* > ( szModel ), ucType ) )
+            if ( CStaticFunctionDefinitions::AddPedClothes ( *pEntity, szTexture, szModel, ucType ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

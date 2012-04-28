@@ -541,19 +541,19 @@ int CLuaFunctionDefs::GetVehicleUpgradeSlotName ( lua_State* luaVM )
 
         if ( ulNumber < 17 )
         {
-            char szUpgradeName [32];
-            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned char > ( ulNumber ), szUpgradeName, sizeof(szUpgradeName) ) )
+            SString strUpgradeName;
+            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned char > ( ulNumber ), strUpgradeName ) )
             {
-                lua_pushstring ( luaVM, szUpgradeName );
+                lua_pushstring ( luaVM, strUpgradeName );
                 return 1;
             }
         }
         else if ( ulNumber >= 1000 && ulNumber <= 1193 )
         {
-            char szUpgradeName [32];
-            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned short > ( ulNumber ), szUpgradeName, sizeof(szUpgradeName) ) )
+            SString strUpgradeName;
+            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned short > ( ulNumber ), strUpgradeName ) )
             {
-                lua_pushstring ( luaVM, szUpgradeName );
+                lua_pushstring ( luaVM, strUpgradeName );
                 return 1;
             }
         }
@@ -1146,11 +1146,11 @@ int CLuaFunctionDefs::GetVehicleNameFromModel ( lua_State* luaVM )
     if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
     {
         unsigned short usModel = static_cast < unsigned short > ( lua_tonumber ( luaVM, 1 ) );
-        char szVehicleName [32];
+        SString strVehicleName;
 
-        if ( CStaticFunctionDefinitions::GetVehicleNameFromModel ( usModel, szVehicleName, sizeof(szVehicleName) ) )
+        if ( CStaticFunctionDefinitions::GetVehicleNameFromModel ( usModel, strVehicleName ) )
         {
-            lua_pushstring ( luaVM, szVehicleName );
+            lua_pushstring ( luaVM, strVehicleName );
             return 1;
         }
     }

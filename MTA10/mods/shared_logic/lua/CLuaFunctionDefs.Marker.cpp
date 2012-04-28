@@ -148,10 +148,10 @@ int CLuaFunctionDefs::GetMarkerType ( lua_State* luaVM )
         CClientMarker* pMarker = lua_tomarker ( luaVM, 1 );
         if ( pMarker )
         {
-            char szMarkerType [64];
-            if ( CClientMarker::TypeToString ( pMarker->GetMarkerType (), szMarkerType ) )
+            SString strMarkerType;
+            if ( CClientMarker::TypeToString ( pMarker->GetMarkerType (), strMarkerType ) )
             {
-                lua_pushstring ( luaVM, szMarkerType );
+                lua_pushstring ( luaVM, strMarkerType );
                 return 1;
             }
         }
@@ -247,12 +247,12 @@ int CLuaFunctionDefs::GetMarkerIcon ( lua_State* luaVM )
         CClientMarker* pMarker = lua_tomarker ( luaVM, 1 );
         if ( pMarker )
         {
-            char szMarkerIcon [64];
             CClientCheckpoint* pCheckpoint = pMarker->GetCheckpoint ();
             if ( pCheckpoint )
             {
-                CClientCheckpoint::IconToString ( pCheckpoint->GetIcon (), szMarkerIcon );
-                lua_pushstring ( luaVM, szMarkerIcon );
+                SString strMarkerIcon;
+                CClientCheckpoint::IconToString ( pCheckpoint->GetIcon (), strMarkerIcon );
+                lua_pushstring ( luaVM, strMarkerIcon );
                 return 1;
             }
         }

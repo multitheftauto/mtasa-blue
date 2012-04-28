@@ -420,7 +420,7 @@ bool CLuaMain::CompileScriptFromFile ( const char* szFile, SString* pDest )
             if ( iSize < 3 || buffer[0] != -0x11 || buffer[1] != -0x45 || buffer[2] != -0x41 )
             {
                 //Maybe not UTF-8, if we have a >80% heuristic detection confidence, assume it is
-                return CompileScriptFromBuffer ( &buffer.at ( 0 ), iSize, szFile, GetUTF8Confidence ( (unsigned char*)&buffer.at ( 0 ), iSize ) >= 80, pDest );
+                return CompileScriptFromBuffer ( &buffer.at ( 0 ), iSize, szFile, GetUTF8Confidence ( (const unsigned char*)&buffer.at ( 0 ), iSize ) >= 80, pDest );
             }
             else if ( iSize != 3 ) //If there's a BOM, but the script is not empty, load ignoring the first 3 bytes
             {

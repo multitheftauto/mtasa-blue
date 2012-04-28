@@ -114,7 +114,6 @@ public:
 
     inline eClientEntityType    GetType                 ( void ) const                      { return CCLIENTVEHICLE; };
 
-    void                        GetName                 ( char* szBuf );
     inline const char*          GetNamePointer          ( void )                            { return m_pModelInfo->GetNameIfVehicle (); };
     inline eClientVehicleType   GetVehicleType          ( void )                            { return m_eVehicleType; };
 
@@ -575,9 +574,11 @@ protected:
     CTickCount                  m_LastPushedTime;
 
 public:
+#ifdef MTA_DEBUG
     CClientPlayer *             m_pLastSyncer;
     unsigned long               m_ulLastSyncTime;
-    char *                      m_szLastSyncType;
+    const char *                m_szLastSyncType;
+#endif
     SLastSyncedVehData*         m_LastSyncedData;
     SSirenInfo                  m_tSirenBeaconInfo;
 };

@@ -85,7 +85,7 @@ public:
     int                 GetTaskType             ( void );
     void                StopTimer               ( const CEvent* pEvent );
     bool                MakeAbortable           ( CPed* pPed, const int iPriority, const CEvent* pEvent );
-    char*               GetTaskName             ( void );
+    const char*         GetTaskName             ( void );
 
     // our function(s)
     void                SetInterface            ( CTaskSAInterface* pInterface ) { TaskInterface = pInterface; };
