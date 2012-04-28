@@ -39,7 +39,7 @@ CResourceManager::~CResourceManager ( void )
     }
 }
 
-CResource* CResourceManager::Add ( unsigned short usNetID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity )
+CResource* CResourceManager::Add ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity )
 {
     CResource* pResource = new CResource ( usNetID, szResourceName, pResourceEntity, pResourceDynamicEntity );
     if ( pResource )

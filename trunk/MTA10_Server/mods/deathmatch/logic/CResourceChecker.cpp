@@ -324,7 +324,7 @@ void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const stri
     }
 
     // If it's not a UTF8 script, does it contain foreign language characters that should be upgraded?
-    if ( !bCompiledScript && !bUTF8 && GetUTF8Confidence ( (unsigned char*)&strLuaSource.at ( 0 ), strLuaSource.length() ) < 80 )
+    if ( !bCompiledScript && !bUTF8 && GetUTF8Confidence ( (const unsigned char*)&strLuaSource.at ( 0 ), strLuaSource.length() ) < 80 )
     {
         std::wstring strUTF16Script = ANSIToUTF16 ( strLuaSource );
 #ifdef WIN32
@@ -531,26 +531,23 @@ void CResourceChecker::IssueLuaFunctionNameWarnings ( const string& strFunctionN
 
     if ( GetLuaFunctionNameUpgradeInfo ( strFunctionName, bClientScript, strWhat, strHow ) )
     {
-        char szTemp [ 256 ];
+        SString strTemp;
         if ( strWhat == "Replaced" )
         {
             m_ulDeprecatedWarningCount++;
-            snprintf ( szTemp, sizeof(szTemp), "%s is deprecated and may not work in future versions. Please replace with %s%s.", strFunctionName.c_str (), strHow.c_str (), (GetTickCount32()/60000)%7 ? "" : " before Tuesday" );
+            strTemp.Format ( "%s is deprecated and may not work in future versions. Please replace with %s%s.", strFunctionName.c_str (), strHow.c_str (), (GetTickCount32()/60000)%7 ? "" : " before Tuesday" );
         }
         else
         if ( strWhat == "Removed" )
         {
-            snprintf ( szTemp, sizeof(szTemp), "%s no longer works. %s", strFunctionName.c_str (), strHow.c_str () );
+            strTemp.Format ( "%s no longer works. %s", strFunctionName.c_str (), strHow.c_str () );
         }
         else
         {
-            snprintf ( szTemp, sizeof(szTemp), "%s - %s", strFunctionName.c_str (), strHow.c_str () );
+            strTemp.Format ( "%s - %s", strFunctionName.c_str (), strHow.c_str () );
         }
 
-        char szResult [ 512 ];
-        snprintf ( szResult, sizeof(szResult), "WARNING: %s/%s(Line %lu) [%s] %s\n", strResourceName.c_str (), strFileName.c_str (), ulLineNumber, bClientScript ? "Client" : "Server", szTemp );
-
-        CLogger::LogPrint ( szResult );
+        CLogger::LogPrint ( SString ( "WARNING: %s/%s(Line %lu) [%s] %s\n", strResourceName.c_str (), strFileName.c_str (), ulLineNumber, bClientScript ? "Client" : "Server", *strTemp ) );
     }
 }
 
@@ -656,9 +653,7 @@ bool CResourceChecker::RenameBackupFile( const string& strOrigFilename, const st
             CLogger::LogPrintf ( "Unable to rename %s to %s\n", strOrigFilename.c_str (), strBakFilename.c_str () );
             return false;
         }
-        char buffer[32];
-        snprintf( buffer, 32, "%d", i + 1 );
-        strBakFilename = strOrigFilename + strBakAppend + "_" + buffer;
+        strBakFilename = strOrigFilename + strBakAppend + "_" + SString ( "%d", i + 1 );
     }
     return true;
 }

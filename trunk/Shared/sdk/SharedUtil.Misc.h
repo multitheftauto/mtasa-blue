@@ -139,7 +139,7 @@ namespace SharedUtil
 
     std::wstring  ANSIToUTF16 (const std::string& s);
 
-    int  GetUTF8Confidence (unsigned char* input, int len);
+    int  GetUTF8Confidence (const unsigned char* input, int len);
 
 
     //

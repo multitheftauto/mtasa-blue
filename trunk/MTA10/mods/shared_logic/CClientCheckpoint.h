@@ -74,7 +74,7 @@ public:
     inline void                     SetTarget                       ( const CVector& vecTarget )        { m_vecTarget = vecTarget; }
 
     static unsigned char            StringToIcon                    ( const char* szString );
-    static bool                     IconToString                    ( unsigned char ucIcon, char* szString );
+    static bool                     IconToString                    ( unsigned char ucIcon, SString& strOutString );
     void                            ReCreateWithSameIdentifier      ( void );
 protected:
     bool                            IsStreamedIn                    ( void )                            { return m_bStreamedIn; };

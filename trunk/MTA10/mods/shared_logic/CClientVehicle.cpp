@@ -236,22 +236,6 @@ void CClientVehicle::Unlink ( void )
 }
 
 
-void CClientVehicle::GetName ( char* szBuf )
-{
-    // Get the name
-    const char* szName = m_pModelInfo->GetNameIfVehicle ();
-    if ( szName )
-    {
-        strcpy ( szBuf, szName );
-    }
-    else
-    {
-        // Shouldn't happen, copy over an empty string
-        szBuf[0] = '\0';
-    }
-}
-
-
 void CClientVehicle::GetPosition ( CVector& vecPosition ) const
 {
     if ( m_bIsFrozen )

@@ -23,7 +23,7 @@ class CClientTeam : public CClientEntity
     DECLARE_CLASS( CClientTeam, CClientEntity )
     friend class CClientTeamManager;
 public:    
-                                CClientTeam         ( CClientManager* pManager, ElementID ID, char* szName = NULL, unsigned char ucRed = 0, unsigned char ucGreen = 0, unsigned char ucBlue = 0 );
+                                CClientTeam         ( CClientManager* pManager, ElementID ID, const char* szName = NULL, unsigned char ucRed = 0, unsigned char ucGreen = 0, unsigned char ucBlue = 0 );
                                 ~CClientTeam        ( void );
 
     eClientEntityType           GetType             ( void ) const              { return CCLIENTTEAM; }

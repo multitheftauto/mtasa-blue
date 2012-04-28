@@ -457,13 +457,13 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szInArguments, CCli
     // If he isn't muted
     if ( pClient->GetClientType () != CClient::CLIENT_PLAYER || !static_cast < CPlayer* > ( pClient )->IsMuted () )
     {
-        // Strip any unwanted characters
-        COPY_CSTR_TO_TEMP_BUFFER( szArguments, szInArguments, 256 );
-        stripControlCodes ( szArguments );
-
         // Got a message?
-        if ( szArguments )
+        if ( szInArguments )
         {
+            // Strip any unwanted characters
+            COPY_CSTR_TO_TEMP_BUFFER( szArguments, szInArguments, 256 );
+            stripControlCodes ( szArguments );
+
             // Long/short enough?
             size_t sizeArguments = MbUTF8ToUTF16(szArguments).size();
 
@@ -595,13 +595,13 @@ bool CConsoleCommands::TeamSay ( CConsole* pConsole, const char* szInArguments, 
             CTeam* pTeam = pPlayer->GetTeam ();
             if ( pTeam )
             {
-                // Strip any unwanted characters
-                COPY_CSTR_TO_TEMP_BUFFER( szArguments, szInArguments, 256 );
-                stripControlCodes ( szArguments );
-
                 // Got a message?
-                if ( szArguments )
+                if ( szInArguments )
                 {
+                    // Strip any unwanted characters
+                    COPY_CSTR_TO_TEMP_BUFFER( szArguments, szInArguments, 256 );
+                    stripControlCodes ( szArguments );
+
                     // Long/short enough?
                     size_t sizeArguments = MbUTF8ToUTF16(szArguments).size();
 
@@ -678,13 +678,13 @@ bool CConsoleCommands::ASay ( CConsole* pConsole, const char* szInArguments, CCl
     // If he isn't muted
     if ( pClient->GetClientType () != CClient::CLIENT_PLAYER || !static_cast < CPlayer* > ( pClient )->IsMuted () )
     {
-        // Strip any unwanted characters
-        COPY_CSTR_TO_TEMP_BUFFER( szArguments, szInArguments, 256 );
-        stripControlCodes ( szArguments );
-
         // Got a message?
-        if ( szArguments )
+        if ( szInArguments )
         {
+            // Strip any unwanted characters
+            COPY_CSTR_TO_TEMP_BUFFER( szArguments, szInArguments, 256 );
+            stripControlCodes ( szArguments );
+
             // Long/short enough?
             size_t sizeArguments = MbUTF8ToUTF16(szArguments).size();
 

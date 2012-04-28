@@ -300,24 +300,24 @@ unsigned char CClientCheckpoint::StringToIcon ( const char* szString )
 }
 
 
-bool CClientCheckpoint::IconToString ( unsigned char ucIcon, char* szString )
+bool CClientCheckpoint::IconToString ( unsigned char ucIcon, SString& strOutString )
 {
     switch ( ucIcon )
     {
         case ICON_NONE:
-            strcpy ( szString, "none" );
+            strOutString = "none";
             return true;
 
         case ICON_ARROW:
-            strcpy ( szString, "arrow" );
+            strOutString = "arrow";
             return true;
 
         case ICON_FINISH:
-            strcpy ( szString, "finish" );
+            strOutString = "finish";
             return true;
 
         default:
-            strcpy ( szString, "invalid" );
+            strOutString = "invalid";
             return false;
     }
 }
