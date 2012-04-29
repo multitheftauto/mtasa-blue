@@ -1173,9 +1173,7 @@ void CGame::InitialDataStream ( CPlayer& Player )
     Player.SetStatus ( STATUS_JOINED );
 
     // Console
-    char szIP [64];
-    Player.GetSourceIP ( szIP );
-    CLogger::LogPrintf ( "JOIN: %s joined the game (IP: %s)\n", Player.GetNick (), szIP );
+    CLogger::LogPrintf ( "JOIN: %s joined the game (IP: %s)\n", Player.GetNick (), Player.GetSourceIP () );
 
     // Tell the other players about him
     CPlayerListPacket PlayerNotice;
@@ -1258,10 +1256,9 @@ void CGame::InitialDataStream ( CPlayer& Player )
     // If auto-login is enabled, try and log him in
     if ( m_pAccountManager->IsAutoLoginEnabled () )
     {
-        char szIP [ 25 ];
-        Player.GetSourceIP ( szIP );
+        std::string strIP = Player.GetSourceIP ();
         std::string strPlayerSerial = Player.GetSerial();
-        CAccount* pAccount = m_pAccountManager->Get ( Player.GetNick (), szIP );
+        CAccount* pAccount = m_pAccountManager->Get ( Player.GetNick (), strIP.c_str () );
         if ( pAccount )
         {
             if ( !pAccount->GetClient ( ) )
@@ -1270,7 +1267,7 @@ void CGame::InitialDataStream ( CPlayer& Player )
             }
             else
             {
-                CLogger::AuthPrintf ( "LOGIN: %s failed to login in as '%s' (IP: %s  Serial: %s) due to the account already being in use.\n", Player.GetNick (), pAccount->GetName ().c_str (), szIP, strPlayerSerial.c_str () );
+                CLogger::AuthPrintf ( "LOGIN: %s failed to login in as '%s' (IP: %s  Serial: %s) due to the account already being in use.\n", Player.GetNick (), pAccount->GetName ().c_str (), strIP.c_str (), strPlayerSerial.c_str () );
                 Player.SendEcho ( "auto-login: You could not login because your account is already in use." );
             }
         }
@@ -1557,8 +1554,8 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                 strPlayerVersion = SStringX ( strPlayerVersionTemp );
             }
 
-            char szIP [22];
-            SString strIPAndSerial( "IP: %s  Serial: %s  Version: %s", pPlayer->GetSourceIP ( szIP ), strSerial.c_str (), strPlayerVersion.c_str () );
+            SString strIP = pPlayer->GetSourceIP ();
+            SString strIPAndSerial( "IP: %s  Serial: %s  Version: %s", strIP.c_str (), strSerial.c_str (), strPlayerVersion.c_str () );
             if ( !CheckNickProvided ( szNick ) ) // check the nick is valid
             {
                 // Tell the console
@@ -1577,16 +1574,13 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                 CPlayer* pTempPlayer = m_pPlayerManager->Get ( szNick );
                 if ( pTempPlayer )
                 {
-                    char szIP [ 22 ], szTempIP [ 22 ];
-                    pPlayer->GetSourceIP ( szIP );
-                    pTempPlayer->GetSourceIP ( szTempIP );
                     // Same person? Quit the first and let this one join
-                    if ( strcmp ( szIP, szTempIP ) == 0 )
+                    if ( strcmp ( pPlayer->GetSourceIP (), pTempPlayer->GetSourceIP () ) == 0 )
                     {
                         // Two players could have the same IP, so see if the old player appears inactive before quitting them
                         if ( pTempPlayer->UhOhNetworkTrouble () )
                         {
-                            pTempPlayer->Send ( CPlayerDisconnectedPacket ( SString ( "Supplanted by %s from %s", szNick, szIP ) ) );
+                            pTempPlayer->Send ( CPlayerDisconnectedPacket ( SString ( "Supplanted by %s from %s", szNick, pPlayer->GetSourceIP () ) ) );
                             QuitPlayer ( *pTempPlayer, CClient::QUIT_QUIT );
                             pTempPlayer = NULL;
                         }
@@ -1656,7 +1650,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 }
 
                                 // Check the ip for banness
-                                if ( CBan* pBan = m_pBanManager->GetBanFromIP ( szIP ) )
+                                if ( CBan* pBan = m_pBanManager->GetBanFromIP ( strIP ) )
                                 {
                                     // Make a message including the ban duration
                                     SString strBanMessage;// = "Serial is banned";
@@ -1769,8 +1763,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
             else
             {
                 // Tell the console
-                char szIP [22];
-                CLogger::LogPrintf ( "CONNECT: %s failed to connect (Invalid nickname)\n", pPlayer->GetSourceIP ( szIP ) );
+                CLogger::LogPrintf ( "CONNECT: %s failed to connect (Invalid nickname)\n", pPlayer->GetSourceIP () );
 
                 // Tell the player the problem
                 DisconnectPlayer ( this, *pPlayer, "Disconnected: Invalid nickname" );
@@ -3533,15 +3526,13 @@ void CGame::Packet_PlayerModInfo ( CPlayerModInfoPacket & Packet )
 
 void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char* szError )
 {
-    char szIP [22];
-    SString strIPAndSerial( "IP: %s  Serial: %s  Version: %s", pPlayer->GetSourceIP ( szIP ), pPlayer->GetSerial ().c_str (), pPlayer->GetPlayerVersion ().c_str () );
+    SString strIPAndSerial( "IP: %s  Serial: %s  Version: %s", pPlayer->GetSourceIP (), pPlayer->GetSerial ().c_str (), pPlayer->GetPlayerVersion ().c_str () );
     if ( bSuccess )
     {
         // Call the onPlayerConnect event. If it returns false, disconnect the player
         CLuaArguments Arguments;
-        char szIP [22];
         Arguments.PushString ( pPlayer->GetNick () );
-        Arguments.PushString ( pPlayer->GetSourceIP ( szIP ) );
+        Arguments.PushString ( pPlayer->GetSourceIP () );
         Arguments.PushString ( pPlayer->GetSerialUser ().c_str() );
         Arguments.PushString ( pPlayer->GetSerial ().c_str() );
         Arguments.PushNumber ( pPlayer->GetMTAVersion () );

@@ -159,7 +159,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.WriteCompressed ( usNameLength );
             if ( usNameLength > 0 )
             {
-                BitStream.Write ( const_cast < char * > ( szName ), usNameLength );    
+                BitStream.Write ( szName, usNameLength );    
             }
 
             // Write the sync time context
@@ -641,7 +641,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     CTeam* pTeam = static_cast < CTeam* > ( pElement );
 
                     // Write the name
-                    char* szTeamName = pTeam->GetTeamName ();
+                    const char* szTeamName = pTeam->GetTeamName ();
                     unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szTeamName ) );
                     unsigned char ucRed, ucGreen, ucBlue;
                     pTeam->GetColor ( ucRed, ucGreen, ucBlue );
@@ -746,7 +746,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     const char* szTypeName = pDummy->GetTypeName ().c_str ();
                     unsigned short usTypeNameLength = static_cast < unsigned short > ( strlen ( szTypeName ) );
                     BitStream.WriteCompressed ( usTypeNameLength );
-                    BitStream.Write ( const_cast < char* > ( szTypeName ), usTypeNameLength );                      
+                    BitStream.Write ( szTypeName, usTypeNameLength );                      
 
                     // Position
                     position.data.vecPosition = pDummy->GetPosition();

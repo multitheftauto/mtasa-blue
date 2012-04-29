@@ -44,7 +44,7 @@ class CResource
 {  
 
 public:
-                            CResource       ( unsigned short usNetID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity );
+                            CResource       ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity );
                             ~CResource      ( void );
 
     inline unsigned short   GetNetID        ( void )                { return m_usNetID; };
@@ -60,14 +60,14 @@ public:
 
     CDownloadableResource*  QueueFile       ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum );
 
-    CDownloadableResource*  AddConfigFile   ( char *szFileName, CChecksum serverChecksum );
+    CDownloadableResource*  AddConfigFile   ( const char *szFileName, CChecksum serverChecksum );
 
     inline std::list < class CResourceConfigItem* >::iterator    ConfigIterBegin     ( void )        { return m_ConfigFiles.begin(); }
     inline std::list < class CResourceConfigItem* >::iterator    ConfigIterEnd       ( void )        { return m_ConfigFiles.end(); }
 
     CElementGroup *         GetElementGroup ( void )                { return m_pDefaultElementGroup; }
 
-    void                    AddExportedFunction (char *szFunctionName );
+    void                    AddExportedFunction ( const char * szFunctionName );
     bool                    CallExportedFunction ( const char * szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller );
 
     class CClientEntity*    GetResourceEntity ( void )              { return m_pResourceEntity; }

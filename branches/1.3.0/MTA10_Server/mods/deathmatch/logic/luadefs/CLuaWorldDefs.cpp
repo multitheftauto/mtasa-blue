@@ -141,10 +141,10 @@ int CLuaWorldDefs::getZoneName ( lua_State* luaVM )
         if ( lua_type ( luaVM, 4 ) == LUA_TBOOLEAN )
             bCitiesOnly = ( lua_toboolean ( luaVM, 4 ) ) ? true:false;
 
-        char szZoneName [ 128 ];
-        if ( CStaticFunctionDefinitions::GetZoneName ( vecPosition, szZoneName, 128, bCitiesOnly ) )
+        SString strZoneName;
+        if ( CStaticFunctionDefinitions::GetZoneName ( vecPosition, strZoneName, bCitiesOnly ) )
         {
-            lua_pushstring ( luaVM, szZoneName );
+            lua_pushstring ( luaVM, strZoneName );
             return 1;
         }
     }

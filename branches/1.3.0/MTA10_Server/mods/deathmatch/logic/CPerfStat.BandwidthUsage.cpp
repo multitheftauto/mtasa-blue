@@ -257,7 +257,7 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
     {
         for ( int r = 0 ; r < result.nRows ; r++ )
         {
-            SString strType = (char*)result.Data[r][0].pVal;
+            SString strType = (const char*)result.Data[r][0].pVal;
             uint uiIndex = result.Data[r][1].nVal;
             float GameRecv = Max ( 0.f, result.Data[r][2].fVal );
             float GameSent = Max ( 0.f, result.Data[r][3].fVal );

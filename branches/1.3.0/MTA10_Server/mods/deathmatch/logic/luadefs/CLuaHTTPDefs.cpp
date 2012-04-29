@@ -69,8 +69,8 @@ int CLuaHTTPDefs::httpSetResponseHeader ( lua_State* luaVM )
             if ( file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML )
             {
                 CResourceHTMLItem * html = (CResourceHTMLItem *)file;
-                char* szHeaderName = (char *) lua_tostring ( luaVM, 1 );
-                char* szHeaderValue = (char *) lua_tostring ( luaVM, 2 );
+                const char* szHeaderName = lua_tostring ( luaVM, 1 );
+                const char* szHeaderValue = lua_tostring ( luaVM, 2 );
                 html->SetResponseHeader ( szHeaderName, szHeaderValue );
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -99,8 +99,8 @@ int CLuaHTTPDefs::httpSetResponseCookie ( lua_State* luaVM )
             if ( file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML )
             {
                 CResourceHTMLItem * html = (CResourceHTMLItem *)file;
-                char* szHeaderName = (char *) lua_tostring ( luaVM, 1 );
-                char* szHeaderValue = (char *) lua_tostring ( luaVM, 2 );
+                const char* szHeaderName = lua_tostring ( luaVM, 1 );
+                const char* szHeaderValue = lua_tostring ( luaVM, 2 );
                 html->SetResponseCookie ( szHeaderName, szHeaderValue );
                 lua_pushboolean ( luaVM, true );
                 return 1;

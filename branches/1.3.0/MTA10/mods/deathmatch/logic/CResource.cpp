@@ -23,7 +23,7 @@ extern CClientGame* g_pClientGame;
 
 int CResource::m_iShowingCursor = 0;
 
-CResource::CResource ( unsigned short usNetID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity )
+CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity )
 {
     m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::RESOURCE );
     m_usNetID = usNetID;
@@ -158,7 +158,7 @@ CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceTy
 }
 
 
-CDownloadableResource* CResource::AddConfigFile ( char *szFileName, CChecksum serverChecksum )
+CDownloadableResource* CResource::AddConfigFile ( const char *szFileName, CChecksum serverChecksum )
 {
     // Create the config file and add it to the list
     SString strBuffer ( "%s\\resources\\%s\\%s", g_pClientGame->GetModRoot (), *m_strResourceName, szFileName );
@@ -172,7 +172,7 @@ CDownloadableResource* CResource::AddConfigFile ( char *szFileName, CChecksum se
     return pConfig;
 }
 
-void CResource::AddExportedFunction ( char *szFunctionName )
+void CResource::AddExportedFunction ( const char *szFunctionName )
 {
     m_exportedFunctions.push_back(new CExportedFunction ( szFunctionName ) );
 }
@@ -311,7 +311,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
                 //UTF-8 BOM?  Compare by checking the standard UTF-8 BOM of 3 characters (in signed format, hence negative)
                 if ( iSize < 3 || buffer[0] != -0x11 || buffer[1] != -0x45 || buffer[2] != -0x41 ) 
                     //Maybe not UTF-8, if we have a >80% heuristic detection confidence, assume it is
-                    m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), iSize, pResourceFile->GetName (), GetUTF8Confidence ( (unsigned char*)&buffer.at ( 0 ), iSize ) >= 80 );
+                    m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), iSize, pResourceFile->GetName (), GetUTF8Confidence ( (const unsigned char*)&buffer.at ( 0 ), iSize ) >= 80 );
                 else if ( iSize != 3 )  //If there's a BOM, but the script is not empty, load ignoring the first 3 bytes
                     m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 3 ), iSize-3, pResourceFile->GetName (), true );
             }

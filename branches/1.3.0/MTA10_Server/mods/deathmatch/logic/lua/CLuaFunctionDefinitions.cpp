@@ -743,10 +743,10 @@ int CLuaFunctionDefinitions::GetPlayerName ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        char szNick[256] = { '\0' };
-        if ( CStaticFunctionDefinitions::GetPlayerName ( pElement, szNick ) )
+        SString strNick;
+        if ( CStaticFunctionDefinitions::GetPlayerName ( pElement, strNick ) )
         {
-            lua_pushstring ( luaVM, szNick );
+            lua_pushstring ( luaVM, strNick );
             return 1;
         }
     }
@@ -768,10 +768,10 @@ int CLuaFunctionDefinitions::GetPlayerIP ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        char szIP [256] = { '\0' };
-        if ( CStaticFunctionDefinitions::GetPlayerIP ( pElement, szIP ) )
+        SString strIP;
+        if ( CStaticFunctionDefinitions::GetPlayerIP ( pElement, strIP ) )
         {
-            lua_pushstring ( luaVM, szIP );
+            lua_pushstring ( luaVM, strIP );
             return 1;
         }
     }
@@ -2239,11 +2239,11 @@ int CLuaFunctionDefinitions::GetPedClothes ( lua_State* luaVM )
         unsigned char ucType = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
         if ( pPed )
         {
-            char szTexture [ 128 ], szModel [ 128 ];
-            if ( CStaticFunctionDefinitions::GetPedClothes ( pPed, ucType, szTexture, szModel ) )
+            SString strTexture, strModel;
+            if ( CStaticFunctionDefinitions::GetPedClothes ( pPed, ucType, strTexture, strModel ) )
             {
-                lua_pushstring ( luaVM, szTexture );
-                lua_pushstring ( luaVM, szModel );
+                lua_pushstring ( luaVM, strTexture );
+                lua_pushstring ( luaVM, strModel );
                 return 2;
             }
         }
@@ -2315,7 +2315,7 @@ int CLuaFunctionDefinitions::CanPlayerUseFunction ( lua_State* luaVM )
          lua_type ( luaVM, 2 ) == LUA_TSTRING )
     {
         CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
-        char* szFunction = const_cast < char* > ( lua_tostring ( luaVM, 2 ) );
+        const char* szFunction = lua_tostring ( luaVM, 2 );
 
         if ( pPlayer )
         {
@@ -2507,10 +2507,10 @@ int CLuaFunctionDefinitions::GetPlayerNametagText ( lua_State* luaVM )
         CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
         if ( pPlayer )
         {
-            char szBuffer [ 256 ];
-            if ( CStaticFunctionDefinitions::GetPlayerNametagText ( pPlayer, szBuffer, 256 ) )
+            SString strText;
+            if ( CStaticFunctionDefinitions::GetPlayerNametagText ( pPlayer, strText ) )
             {
-                lua_pushstring ( luaVM, szBuffer );
+                lua_pushstring ( luaVM, strText );
                 return 1;
             }
         }
@@ -3103,7 +3103,7 @@ int CLuaFunctionDefinitions::AddPedClothes ( lua_State* luaVM )
 
         if ( pElement )
         {
-            if ( CStaticFunctionDefinitions::AddPedClothes ( pElement, const_cast < char* > ( szTexture ), const_cast < char* > ( szModel ), ucType ) )
+            if ( CStaticFunctionDefinitions::AddPedClothes ( pElement, szTexture, szModel, ucType ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -3141,7 +3141,7 @@ int CLuaFunctionDefinitions::RemovePedClothes ( lua_State* luaVM )
 
         if ( pElement )
         {
-            if ( CStaticFunctionDefinitions::RemovePedClothes ( pElement, ucType, const_cast < char* > ( szTexture ), const_cast < char* > ( szModel ) ) )
+            if ( CStaticFunctionDefinitions::RemovePedClothes ( pElement, ucType, szTexture, szModel ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -4464,10 +4464,10 @@ int CLuaFunctionDefinitions::GetVehicleName ( lua_State* luaVM )
         CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
         if ( pVehicle )
         {
-            char szVehicleName [32];
-            if ( CStaticFunctionDefinitions::GetVehicleName ( pVehicle, szVehicleName ) )
+            SString strVehicleName;
+            if ( CStaticFunctionDefinitions::GetVehicleName ( pVehicle, strVehicleName ) )
             {
-                lua_pushstring ( luaVM, szVehicleName );
+                lua_pushstring ( luaVM, strVehicleName );
                 return 1;
             }
         }
@@ -4488,11 +4488,11 @@ int CLuaFunctionDefinitions::GetVehicleNameFromModel ( lua_State* luaVM )
     if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
     {
         unsigned short usModel = static_cast < unsigned short > ( lua_tonumber ( luaVM, 1 ) );
-        char szVehicleName [32];
+        SString strVehicleName;
 
-        if ( CStaticFunctionDefinitions::GetVehicleNameFromModel ( usModel, szVehicleName ) )
+        if ( CStaticFunctionDefinitions::GetVehicleNameFromModel ( usModel, strVehicleName ) )
         {
-            lua_pushstring ( luaVM, szVehicleName );
+            lua_pushstring ( luaVM, strVehicleName );
             return 1;
         }
     }
@@ -4807,19 +4807,19 @@ int CLuaFunctionDefinitions::GetVehicleUpgradeSlotName ( lua_State* luaVM )
 
         if ( ulNumber < 17 )
         {
-            char szUpgradeName [32];
-            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned char > ( ulNumber ), szUpgradeName ) )
+            SString strUpgradeName;
+            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned char > ( ulNumber ), strUpgradeName ) )
             {
-                lua_pushstring ( luaVM, szUpgradeName );
+                lua_pushstring ( luaVM, strUpgradeName );
                 return 1;
             }
         }
         else if ( ulNumber >= 1000 && ulNumber <= 1193 )
         {
-            char szUpgradeName [32];
-            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned short > ( ulNumber ), szUpgradeName ) )
+            SString strUpgradeName;
+            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned short > ( ulNumber ), strUpgradeName ) )
             {
-                lua_pushstring ( luaVM, szUpgradeName );
+                lua_pushstring ( luaVM, strUpgradeName );
                 return 1;
             }
         }
@@ -8648,7 +8648,7 @@ int CLuaFunctionDefinitions::GetControlState ( lua_State* luaVM )
         if ( pPlayer )
         {
             bool bState;
-            if ( CStaticFunctionDefinitions::GetControlState ( pPlayer, const_cast < char* > ( szControl ), bState ) )
+            if ( CStaticFunctionDefinitions::GetControlState ( pPlayer, szControl, bState ) )
             {
                 lua_pushboolean ( luaVM, bState );
                 return 1;
@@ -8676,7 +8676,7 @@ int CLuaFunctionDefinitions::IsControlEnabled ( lua_State* luaVM )
         if ( pPlayer )
         {
             bool bEnabled;
-            if ( CStaticFunctionDefinitions::IsControlEnabled ( pPlayer, const_cast < char* > ( szControl ), bEnabled ) )
+            if ( CStaticFunctionDefinitions::IsControlEnabled ( pPlayer, szControl, bEnabled ) )
             {
                 lua_pushboolean ( luaVM, bEnabled );
                 return 1;
@@ -8705,7 +8705,7 @@ int CLuaFunctionDefinitions::SetControlState ( lua_State* luaVM )
 
         if ( pPlayer )
         {
-            if ( CStaticFunctionDefinitions::SetControlState ( pPlayer, const_cast < char* > ( szControl ), bState ) )
+            if ( CStaticFunctionDefinitions::SetControlState ( pPlayer, szControl, bState ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -8734,7 +8734,7 @@ int CLuaFunctionDefinitions::ToggleControl ( lua_State* luaVM )
 
         if ( pPlayer )
         {
-            if ( CStaticFunctionDefinitions::ToggleControl ( pPlayer, const_cast < char* > ( szControl ), bEnabled ) )
+            if ( CStaticFunctionDefinitions::ToggleControl ( pPlayer, szControl, bEnabled ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -8812,7 +8812,7 @@ int CLuaFunctionDefinitions::CreateTeam ( lua_State* luaVM )
             CResource* pResource = pLuaMain->GetResource();
             if ( pResource )
             {
-                CTeam* pTeam = CStaticFunctionDefinitions::CreateTeam ( pResource, const_cast < char* > ( szName ), ucRed, ucGreen, ucBlue );
+                CTeam* pTeam = CStaticFunctionDefinitions::CreateTeam ( pResource, szName, ucRed, ucGreen, ucBlue );
                 if ( pTeam )
                 {
                     CElementGroup * pGroup = pResource->GetElementGroup();
@@ -8862,10 +8862,10 @@ int CLuaFunctionDefinitions::GetTeamName ( lua_State* luaVM )
         CTeam* pTeam = lua_toteam ( luaVM, 1 );
         if ( pTeam )
         {
-            char szTeamName [ 128 ];
-            if ( CStaticFunctionDefinitions::GetTeamName ( pTeam, szTeamName, 128 ) )
+            SString strTeamName;
+            if ( CStaticFunctionDefinitions::GetTeamName ( pTeam, strTeamName ) )
             {
-                lua_pushstring ( luaVM, szTeamName );
+                lua_pushstring ( luaVM, strTeamName );
                 return 1;
             }
         }
@@ -9024,7 +9024,7 @@ int CLuaFunctionDefinitions::SetTeamName ( lua_State* luaVM )
 
         if ( pTeam )
         {
-            if ( CStaticFunctionDefinitions::SetTeamName ( pTeam, const_cast < char* > ( szName ) ) )
+            if ( CStaticFunctionDefinitions::SetTeamName ( pTeam, szName ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -9768,7 +9768,7 @@ int CLuaFunctionDefinitions::GetTypeIndexFromClothes ( lua_State* luaVM )
             szModel = lua_tostring ( luaVM, 2 );
 
         unsigned char ucType, ucIndex;
-        if ( CStaticFunctionDefinitions::GetTypeIndexFromClothes ( const_cast < char* > ( szTexture ), const_cast < char* > ( szModel ), ucType, ucIndex ) )
+        if ( CStaticFunctionDefinitions::GetTypeIndexFromClothes ( szTexture, szModel, ucType, ucIndex ) )
         {
             lua_pushnumber ( luaVM, ucType );
             lua_pushnumber ( luaVM, ucIndex );
@@ -11567,10 +11567,10 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
                         lua_pushnumber ( luaVM, cell.fVal );
                         break;
                     case SQLITE_BLOB:
-                        lua_pushlstring ( luaVM, (char *)cell.pVal, cell.nLength );
+                        lua_pushlstring ( luaVM, (const char *)cell.pVal, cell.nLength );
                         break;
                     case SQLITE_TEXT:
-                        lua_pushlstring ( luaVM, (char *)cell.pVal, cell.nLength - 1 );
+                        lua_pushlstring ( luaVM, (const char *)cell.pVal, cell.nLength - 1 );
                         break;
                     default:
                         lua_pushboolean ( luaVM, false );
@@ -11626,10 +11626,10 @@ int CLuaFunctionDefinitions::ExecuteSQLQuery ( lua_State* luaVM )
                             lua_pushnumber ( luaVM, cell.fVal );
                             break;
                         case SQLITE_BLOB:
-                            lua_pushlstring ( luaVM, (char *)cell.pVal, cell.nLength );
+                            lua_pushlstring ( luaVM, (const char *)cell.pVal, cell.nLength );
                             break;
                         case SQLITE_TEXT:
-                            lua_pushlstring ( luaVM, (char *)cell.pVal, cell.nLength - 1 );
+                            lua_pushlstring ( luaVM, (const char *)cell.pVal, cell.nLength - 1 );
                             break;
                         default:
                             lua_pushnil ( luaVM );
@@ -11696,10 +11696,10 @@ int CLuaFunctionDefinitions::ExecuteSQLSelect ( lua_State* luaVM )
                             lua_pushnumber ( luaVM, cell.fVal );
                             break;
                         case SQLITE_BLOB:
-                            lua_pushlstring ( luaVM, (char *)cell.pVal, cell.nLength );
+                            lua_pushlstring ( luaVM, (const char *)cell.pVal, cell.nLength );
                             break;
                         case SQLITE_TEXT:
-                            lua_pushlstring ( luaVM, (char *)cell.pVal, cell.nLength - 1 );
+                            lua_pushlstring ( luaVM, (const char *)cell.pVal, cell.nLength - 1 );
                             break;
                         default:
                             lua_pushnil ( luaVM );
@@ -12403,10 +12403,10 @@ int CLuaFunctionDefinitions::GetBanIP ( lua_State* luaVM )
 
         if ( pBan )
         {
-            char szIP [32];
-            if ( CStaticFunctionDefinitions::GetBanIP ( pBan, szIP, 31 ) )
+            SString strIP;
+            if ( CStaticFunctionDefinitions::GetBanIP ( pBan, strIP ) )
             {
-                lua_pushstring ( luaVM, szIP );
+                lua_pushstring ( luaVM, strIP );
                 return 1;
             }
         }
@@ -12427,10 +12427,10 @@ int CLuaFunctionDefinitions::GetBanSerial ( lua_State* luaVM )
 
         if ( pBan )
         {
-            char szSerial [64];
-            if ( CStaticFunctionDefinitions::GetBanSerial ( pBan, szSerial, 63 ) )
+            SString strSerial;
+            if ( CStaticFunctionDefinitions::GetBanSerial ( pBan, strSerial ) )
             {
-                lua_pushstring ( luaVM, szSerial );
+                lua_pushstring ( luaVM, strSerial );
                 return 1;
             }
         }
@@ -12451,10 +12451,10 @@ int CLuaFunctionDefinitions::GetBanUsername ( lua_State* luaVM )
 
         if ( pBan )
         {
-            char szUsername [32];
-            if ( CStaticFunctionDefinitions::GetBanUsername ( pBan, szUsername, 31 ) )
+            SString strUsername;
+            if ( CStaticFunctionDefinitions::GetBanUsername ( pBan, strUsername ) )
             {
-                lua_pushstring ( luaVM, szUsername );
+                lua_pushstring ( luaVM, strUsername );
                 return 1;
             }
         }
@@ -12475,10 +12475,10 @@ int CLuaFunctionDefinitions::GetBanNick ( lua_State* luaVM )
 
         if ( pBan )
         {
-            char szNick [32];
-            if ( CStaticFunctionDefinitions::GetBanNick ( pBan, szNick, 31 ) )
+            SString strNick;
+            if ( CStaticFunctionDefinitions::GetBanNick ( pBan, strNick ) )
             {
-                lua_pushstring ( luaVM, szNick );
+                lua_pushstring ( luaVM, strNick );
                 return 1;
             }
         }
@@ -12547,10 +12547,10 @@ int CLuaFunctionDefinitions::GetBanReason ( lua_State* luaVM )
 
         if ( pBan )
         {
-            char szReason [256];
-            if ( CStaticFunctionDefinitions::GetBanReason ( pBan, szReason, 255 ) )
+            SString strReason;
+            if ( CStaticFunctionDefinitions::GetBanReason ( pBan, strReason ) )
             {
-                lua_pushstring ( luaVM, szReason );
+                lua_pushstring ( luaVM, strReason );
                 return 1;
             }
         }
@@ -12571,10 +12571,10 @@ int CLuaFunctionDefinitions::GetBanAdmin ( lua_State* luaVM )
 
         if ( pBan )
         {
-            char szAdmin [32];
-            if ( CStaticFunctionDefinitions::GetBanAdmin ( pBan, szAdmin, 255 ) )
+            SString strAdmin;
+            if ( CStaticFunctionDefinitions::GetBanAdmin ( pBan, strAdmin ) )
             {
-                lua_pushstring ( luaVM, szAdmin );
+                lua_pushstring ( luaVM, strAdmin );
                 return 1;
             }
         }
@@ -12732,13 +12732,14 @@ int CLuaFunctionDefinitions::Set ( lua_State* luaVM )
     return 1;
 }
 
-#define PUSH_SETTING(x,buf) \
+/* #define PUSH_SETTING(x,buf) \
     pAttributes = &(x->GetAttributes ()); \
     Args.PushString ( pAttributes->Find ( "name" )->GetValue ().c_str () ); \
     buf = const_cast < char* > ( pAttributes->Find ( "value" )->GetValue ().c_str () ); \
     if ( !Args.ReadFromJSONString ( buf ) ) { \
         Args.PushString ( buf ); \
     }
+*/
 
 int CLuaFunctionDefinitions::Get ( lua_State* luaVM )
 {
@@ -12746,7 +12747,6 @@ int CLuaFunctionDefinitions::Get ( lua_State* luaVM )
 
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING ) {
         CLuaArguments Args;
-        CXMLAttributes *pAttributes;
         unsigned int uiIndex = 0;
         bool bDeleteNode;
 
@@ -12780,11 +12780,12 @@ int CLuaFunctionDefinitions::Get ( lua_State* luaVM )
                     return 1;
                 }
                 // We only have a single entry for a specific setting, so output a string
-                char *szDataValue = const_cast < char* > ( pAttribute->GetValue ().c_str () );
-                if ( !Args.ReadFromJSONString ( szDataValue ) ) {
+                const std::string& strDataValue = pAttribute->GetValue ();
+                if ( !Args.ReadFromJSONString ( strDataValue.c_str () ) ) {
                     // No valid JSON? Parse as plain text
-                    Args.PushString ( szDataValue );
+                    Args.PushString ( strDataValue );
                 }
+
                 Args.PushArguments ( luaVM );
                 uiArgCount = Args.Count ();
 
@@ -12797,9 +12798,15 @@ int CLuaFunctionDefinitions::Get ( lua_State* luaVM )
                 **/
             } else {
                 // We need to return multiply entries, so push all subnodes
-                char *szDataValue;
-                while ( ( pSubNode = pNode->FindSubNode ( "setting", uiIndex++ ) ) ) {
-                    PUSH_SETTING ( pSubNode, szDataValue );
+                while ( ( pSubNode = pNode->FindSubNode ( "setting", uiIndex++ ) ) )
+                {
+                    CXMLAttributes& attributes = pSubNode->GetAttributes ();
+                    Args.PushString ( attributes.Find ( "name" )->GetValue () );
+                    const std::string& strDataValue = attributes.Find ( "value" )->GetValue ();
+                    if ( !Args.ReadFromJSONString ( strDataValue.c_str () ) )
+                    {
+                        Args.PushString ( strDataValue );
+                    }
                 }
                 // Push a table and return
                 Args.PushAsTable ( luaVM );
@@ -13080,7 +13087,7 @@ int CLuaFunctionDefinitions::GetPerformanceStats ( lua_State* luaVM )
         {
             const SString& name = Result.ColumnName ( c );
             lua_pushnumber ( luaVM, c+1 );                      // row index number (starting at 1, not 0)
-            lua_pushlstring ( luaVM, (char *)name.c_str (), name.length() );
+            lua_pushlstring ( luaVM, name.c_str (), name.length() );
             lua_settable ( luaVM, -3 );
         }
 
@@ -13096,7 +13103,7 @@ int CLuaFunctionDefinitions::GetPerformanceStats ( lua_State* luaVM )
             {
                 SString& cell = Result.Data ( c, r );
                 lua_pushnumber ( luaVM, c+1 );
-                lua_pushlstring ( luaVM, (char *)cell.c_str (), cell.length () );
+                lua_pushlstring ( luaVM, cell.c_str (), cell.length () );
                 lua_settable ( luaVM, -3 );
             }
             lua_pop ( luaVM, 1 );                               // pop the inner table

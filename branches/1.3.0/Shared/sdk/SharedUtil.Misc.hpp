@@ -892,7 +892,7 @@ std::string SharedUtil::UTF16ToMbUTF8 (const std::wstring& input)
 }
 
 // Get UTF8 confidence
-int SharedUtil::GetUTF8Confidence (unsigned char* input, int len)
+int SharedUtil::GetUTF8Confidence (const unsigned char* input, int len)
 {
     return icu_getUTF8Confidence (input, len);
 }

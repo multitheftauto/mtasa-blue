@@ -119,13 +119,15 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
 }
 
 
-void COMMAND_ChatBox ( const char* szCmdLine )
+void COMMAND_ChatBox ( const char* szInCmdLine )
 {
-    if ( !(szCmdLine && szCmdLine[0]) )
+    if ( !(szInCmdLine && szInCmdLine[0]) )
         return;
 
+    COPY_CSTR_TO_TEMP_BUFFER( szCmdLine, szInCmdLine, 256 );
+
     // Split it up into command and rgb
-    char* szCommand = strtok ( const_cast < char* > ( szCmdLine ), " " );
+    char* szCommand = strtok ( szCmdLine, " " );
     char* szRed = strtok ( NULL, " " );
     char* szGreen = strtok ( NULL, " " );
     char* szBlue = strtok ( NULL, " " );

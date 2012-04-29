@@ -66,7 +66,7 @@ public:
     static bool                 IsElementWithinColShape             ( CElement* pElement, CColShape* pColShape, bool& bWithin );
     static bool                 IsElementWithinMarker               ( CElement* pElement, CMarker* pMarker, bool& bWithin );
     static bool                 GetElementDimension                 ( CElement* pElement, unsigned short& usDimension );
-    static bool                 GetElementZoneName                  ( CElement* pElement, char* szBuffer, unsigned int uiBufferLength, bool bCitiesOnly = false );
+    static bool                 GetElementZoneName                  ( CElement* pElement, SString& strOutName, bool bCitiesOnly = false );
     static bool                 IsElementAttached                   ( CElement* pElement );
     static CElement*            GetElementAttachedTo                ( CElement* pElement );
     static CColShape*           GetElementColShape                  ( CElement* pElement );
@@ -115,24 +115,24 @@ public:
     static CPlayer*             GetPlayerFromName                   ( const char* szNick );
     static bool                 GetPlayerPing                       ( CPlayer* pPlayer, unsigned int& uiPing );
     static bool                 GetPlayerMoney                      ( CPlayer* pPlayer, long& lMoney );
-    static bool                 GetPlayerSourceIP                   ( CPlayer* pPlayer, char* szIP );
+    static bool                 GetPlayerSourceIP                   ( CPlayer* pPlayer, SString& strOutIP );
     static CPlayer*             GetRandomPlayer                     ( void );
     static bool                 IsPlayerMuted                       ( CPlayer* pPlayer, bool& bMuted );
     static CTeam*               GetPlayerTeam                       ( CPlayer* pPlayer );
-    static bool                 CanPlayerUseFunction                ( CPlayer* pPlayer, char* szFunction, bool& bCanUse );
+    static bool                 CanPlayerUseFunction                ( CPlayer* pPlayer, const char* szFunction, bool& bCanUse );
     static bool                 IsPlayerDebuggerVisible             ( CPlayer* pPlayer, bool& bVisible );
     static bool                 GetPlayerWantedLevel                ( CPlayer* pPlayer, unsigned int& uiWantedLevel );
     static bool                 IsPlayerScoreboardForced            ( CPlayer* pPlayer, bool& bForced );
     static bool                 IsPlayerMapForced                   ( CPlayer* pPlayer, bool& bForced );
-    static bool                 GetPlayerNametagText                ( CPlayer* pPlayer, char* szBuffer, unsigned int uiBufferLength );
+    static bool                 GetPlayerNametagText                ( CPlayer* pPlayer, SString& strOutText );
     static bool                 GetPlayerNametagColor               ( CPlayer* pPlayer, unsigned char& ucR, unsigned char& ucG, unsigned char& ucB );
     static bool                 IsPlayerNametagShowing              ( CPlayer* pPlayer, bool& bShowing );
     static const std::string&   GetPlayerSerial                     ( CPlayer* pPlayer );
     static const std::string&   GetPlayerUserName                   ( CPlayer* pPlayer );
     static const std::string&   GetPlayerCommunityID                ( CPlayer* pPlayer );
     static bool                 GetPlayerBlurLevel                  ( CPlayer* pPlayer, unsigned char& ucLevel );
-    static bool                 GetPlayerName                       ( CElement* pElement, char* szName );
-    static bool                 GetPlayerIP                         ( CElement* pElement, char* szIP );
+    static bool                 GetPlayerName                       ( CElement* pElement, SString& strOutName );
+    static bool                 GetPlayerIP                         ( CElement* pElement, SString& strOutIP );
     static CAccount*            GetPlayerAccount                    ( CElement* pElement );
     static const SString&       GetPlayerVersion                    ( CPlayer* pPlayer );
 
@@ -164,7 +164,7 @@ public:
     static bool                 IsPedDucked                         ( CPed* pPed, bool& bDucked );
     static bool                 GetPedStat                          ( CPed* pPed, unsigned short usStat, float& fValue );
     static CElement*            GetPedTarget                        ( CPed* pPed );
-    static bool                 GetPedClothes                       ( CPed* pPed, unsigned char ucType, char* szTextureReturn, char* szModelReturn );
+    static bool                 GetPedClothes                       ( CPed* pPed, unsigned char ucType, SString& strOutTexture, SString& strOutModel );
     static bool                 DoesPedHaveJetPack                  ( CPed* pPed, bool& bHasJetPack );
     static bool                 IsPedOnGround                       ( CPed* pPed, bool& bOnGround );
     static bool                 GetPedFightingStyle                 ( CPed* pPed, unsigned char& ucStyle );
@@ -190,8 +190,8 @@ public:
     static bool                 KillPed                             ( CElement* pElement, CElement* pKiller = NULL, unsigned char ucKillerWeapon = 0xFF, unsigned char ucBodyPart = 0xFF, bool bStealth = false );
     static bool                 SetPedRotation                      ( CElement* pElement, float fRotation );
     static bool                 SetPedStat                          ( CElement* pElement, unsigned short usStat, float fValue );
-    static bool                 AddPedClothes                       ( CElement* pElement, char* szTexture, char* szModel, unsigned char ucType );
-    static bool                 RemovePedClothes                    ( CElement* pElement, unsigned char ucType, char* szTexture = NULL, char* szModel = NULL );
+    static bool                 AddPedClothes                       ( CElement* pElement, const char* szTexture, const char* szModel, unsigned char ucType );
+    static bool                 RemovePedClothes                    ( CElement* pElement, unsigned char ucType, const char* szTexture = NULL, const char* szModel = NULL );
     static bool                 GivePedJetPack                      ( CElement* pElement );
     static bool                 RemovePedJetPack                    ( CElement* pElement );
     static bool                 SetPedFightingStyle                 ( CElement* pElement, unsigned char ucStyle );
@@ -236,8 +236,8 @@ public:
     static bool                 GetVehicleColor                     ( CVehicle* pVehicle, CVehicleColor& color );
     static bool                 GetVehicleModelFromName             ( const char* szName, unsigned short& usID );
     static bool                 GetVehicleMaxPassengers             ( CVehicle* pVehicle, unsigned char& ucMaxPassengers );
-    static bool                 GetVehicleName                      ( CVehicle* pVehicle, char* szName );
-    static bool                 GetVehicleNameFromModel             ( unsigned short usModel, char* szName );
+    static bool                 GetVehicleName                      ( CVehicle* pVehicle, SString& strOutName );
+    static bool                 GetVehicleNameFromModel             ( unsigned short usModel, SString& strOutName );
     static CPed*                GetVehicleOccupant                  ( CVehicle* pVehicle, unsigned int uiSeat );
     static CPed*                GetVehicleController                ( CVehicle* pVehicle );
     static bool                 GetVehicleRotation                  ( CVehicle* pVehicle, CVector& vecRotation );
@@ -245,8 +245,8 @@ public:
     static bool                 GetVehicleTurretPosition            ( CVehicle* pVehicle, CVector2D& vecPosition );
     static bool                 IsVehicleLocked                     ( CVehicle* pVehicle, bool& bLocked );
     static bool                 GetVehicleUpgradeOnSlot             ( CVehicle* pVehicle, unsigned char ucSlot, unsigned short& usUpgrade );
-    static bool                 GetVehicleUpgradeSlotName           ( unsigned char ucSlot, char* szName );
-    static bool                 GetVehicleUpgradeSlotName           ( unsigned short usUpgrade, char* szName );
+    static bool                 GetVehicleUpgradeSlotName           ( unsigned char ucSlot, SString& strOutName );
+    static bool                 GetVehicleUpgradeSlotName           ( unsigned short usUpgrade, SString& strOutName );
     static bool                 GetVehicleDoorState                 ( CVehicle* pVehicle, unsigned char ucDoor, unsigned char& ucState );
     static bool                 GetVehicleWheelStates               ( CVehicle* pVehicle, unsigned char& ucFrontLeft, unsigned char& ucRearLeft, unsigned char& ucFrontRight, unsigned char& ucRearRight );
     static bool                 GetVehicleLightState                ( CVehicle* pVehicle, unsigned char ucLight, unsigned char& ucState );
@@ -458,7 +458,7 @@ public:
     // Ped body?
     static bool                 GetBodyPartName                     ( unsigned char ucID, char* szName );
     static bool                 GetClothesByTypeIndex               ( unsigned char ucType, unsigned char ucIndex, char* szTextureReturn, char* szModelReturn );
-    static bool                 GetTypeIndexFromClothes             ( char* szTexture, char* szModel, unsigned char& ucTypeReturn, unsigned char& ucIndexReturn );
+    static bool                 GetTypeIndexFromClothes             ( const char* szTexture, const char* szModel, unsigned char& ucTypeReturn, unsigned char& ucIndexReturn );
     static bool                 GetClothesTypeName                  ( unsigned char ucType, char* szNameReturn );
 
     // Input funcs
@@ -467,23 +467,23 @@ public:
     static bool                 UnbindKey                           ( CPlayer* pPlayer, const char* szKey, CLuaMain* pLuaMain, const char* szHitState = NULL, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
     static bool                 UnbindKey                           ( CPlayer* pPlayer, const char* szKey, const char* szHitState, const char* szCommandName, const char* szResource );
     static bool                 IsKeyBound                          ( CPlayer* pPlayer, const char* szKey, CLuaMain* pLuaMain, const char* szHitState, const CLuaFunctionRef& iLuaFunction, bool& bBound );
-    static bool                 GetControlState                     ( CPlayer* pPlayer, char* szControl, bool& bState );
-    static bool                 IsControlEnabled                    ( CPlayer* pPlayer, char* szControl, bool& bEnabled );
+    static bool                 GetControlState                     ( CPlayer* pPlayer, const char* szControl, bool& bState );
+    static bool                 IsControlEnabled                    ( CPlayer* pPlayer, const char* szControl, bool& bEnabled );
 
-    static bool                 SetControlState                     ( CPlayer* pPlayer, char* szControl, bool bState );
-    static bool                 ToggleControl                       ( CPlayer* pPlayer, char* szControl, bool bEnabled );
+    static bool                 SetControlState                     ( CPlayer* pPlayer, const char* szControl, bool bState );
+    static bool                 ToggleControl                       ( CPlayer* pPlayer, const char* szControl, bool bEnabled );
     static bool                 ToggleAllControls                   ( CPlayer* pPlayer, bool bGTAControls, bool bMTAControls, bool bEnabled );
 
     // Team get funcs
-    static CTeam*               CreateTeam                          ( CResource* pResource, char* szTeamName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
+    static CTeam*               CreateTeam                          ( CResource* pResource, const char* szTeamName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
     static CTeam*               GetTeamFromName                     ( const char* szTeamName );
-    static bool                 GetTeamName                         ( CTeam* pTeam, char* szBuffer, unsigned int uiBufferLength );
+    static bool                 GetTeamName                         ( CTeam* pTeam, SString& strOutName );
     static bool                 GetTeamColor                        ( CTeam* pTeam, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue );
     static bool                 CountPlayersInTeam                  ( CTeam* pTeam, unsigned int& uiCount );
     static bool                 GetTeamFriendlyFire                 ( CTeam* pTeam, bool& bFriendlyFire );
 
     // Team set funcs
-    static bool                 SetTeamName                         ( CTeam* pTeam, char* szTeamName );
+    static bool                 SetTeamName                         ( CTeam* pTeam, const char* szTeamName );
     static bool                 SetTeamColor                        ( CTeam* pTeam, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
     static bool                 SetPlayerTeam                       ( CPlayer* pPlayer, CTeam* pTeam );
     static bool                 SetTeamFriendlyFire                 ( CTeam* pTeam, bool bFriendlyFire );
@@ -510,7 +510,7 @@ public:
     // General world get funcs
     static bool                 GetTime                             ( unsigned char& ucHour, unsigned char& ucMinute );
     static bool                 GetWeather                          ( unsigned char& ucWeather, unsigned char& ucWeatherBlendingTo );
-    static bool                 GetZoneName                         ( CVector& vecPosition, char* szBuffer, unsigned int uiBufferLength, bool bCitiesOnly = false );
+    static bool                 GetZoneName                         ( CVector& vecPosition, SString& strOutName, bool bCitiesOnly = false );
     static bool                 GetGravity                          ( float& fGravity );
     static bool                 GetGameSpeed                        ( float& fSpeed );
     static bool                 GetWaveHeight                       ( float& fHeight );
@@ -625,12 +625,12 @@ public:
     static bool                 GetBans                             ( lua_State* luaVM );
     static bool                 ReloadBanList                       ( void );
 
-    static bool                 GetBanIP                            ( CBan* pBan, char* szIP, size_t size );
-    static bool                 GetBanSerial                        ( CBan* pBan, char* szSerial, size_t size );
-    static bool                 GetBanUsername                      ( CBan* pBan, char* szUsername, size_t size );
-    static bool                 GetBanNick                          ( CBan* pBan, char* szNick, size_t size );
-    static bool                 GetBanReason                        ( CBan* pBan, char* szReason, size_t size );
-    static bool                 GetBanAdmin                         ( CBan* pBan, char* szAdmin, size_t size );
+    static bool                 GetBanIP                            ( CBan* pBan, SString& strOutIP );
+    static bool                 GetBanSerial                        ( CBan* pBan, SString& strOutSerial );
+    static bool                 GetBanUsername                      ( CBan* pBan, SString& strOutUsername );
+    static bool                 GetBanNick                          ( CBan* pBan, SString& strOutNick );
+    static bool                 GetBanReason                        ( CBan* pBan, SString& strOutReason );
+    static bool                 GetBanAdmin                         ( CBan* pBan, SString& strOutAdmin );
 
     static bool                 GetBanTime                          ( CBan* pBan, time_t& time );
     static bool                 GetUnbanTime                        ( CBan* pBan, time_t& time );
@@ -648,7 +648,7 @@ public:
     static bool                 ResetMapInfo                        ( CElement* pElement );
 
     // Resource funcs
-    static CElement*            GetResourceMapRootElement           ( CResource* pResource, char* szMap );
+    static CElement*            GetResourceMapRootElement           ( CResource* pResource, const char* szMap );
     static CXMLNode*            AddResourceMap                      ( CResource* pResource, const std::string& strFilePath, const std::string& strMapName, int iDimension, CLuaMain* pLUA );
     static CXMLNode*            AddResourceConfig                   ( CResource* pResource, const std::string& strFilePath, const std::string& strConfigName, int iType, CLuaMain* pLUA );
     static bool                 RemoveResourceFile                  ( CResource* pResource, const char* szFilename );

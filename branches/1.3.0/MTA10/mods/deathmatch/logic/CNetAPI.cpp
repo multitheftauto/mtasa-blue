@@ -2108,8 +2108,8 @@ void CNetAPI::SendBulletSyncFire ( const CVector& vecStart, const CVector& vecEn
     // Write the bulletsync data
     pBitStream->Write ( (char)1 );      // Fire button pressed
 
-    pBitStream->Write ( (char*)&vecStart, sizeof ( CVector ) );
-    pBitStream->Write ( (char*)&vecEnd, sizeof ( CVector ) );
+    pBitStream->Write ( (const char*)&vecStart, sizeof ( CVector ) );
+    pBitStream->Write ( (const char*)&vecEnd, sizeof ( CVector ) );
 
     // Send the packet
     g_pNet->SendPacket ( PACKET_ID_PLAYER_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE );

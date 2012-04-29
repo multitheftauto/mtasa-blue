@@ -62,7 +62,7 @@ public:
     static bool                         GetElementRotation                  ( CClientEntity& Entity, CVector & vecRotation, const char* szRotationOrder );
     static bool                         GetElementVelocity                  ( CClientEntity& Entity, CVector& vecVelocity );
     static bool                         GetElementInterior                  ( CClientEntity& Entity, unsigned char& ucInterior );
-    static bool                         GetElementZoneName                  ( CClientEntity& Entity, char* szBuffer, unsigned int uiBufferLength, bool bCitiesOnly = false );
+    static bool                         GetElementZoneName                  ( CClientEntity& Entity, SString& strOutName, bool bCitiesOnly = false );
     static bool                         GetElementBoundingBox               ( CClientEntity& Entity, CVector &vecMin, CVector &vecMax );
     static bool                         GetElementRadius                    ( CClientEntity& Entity, float &fRadius );
     static CClientEntity*               GetElementAttachedTo                ( CClientEntity& Entity );
@@ -112,7 +112,7 @@ public:
     static CClientPlayer*               GetPlayerFromName                   ( const char* szNick );
     static bool                         GetPlayerMoney                      ( long& lMoney );
     static bool                         GetPlayerWantedLevel                ( char& cWanted );
-    static bool                         GetPlayerNametagText                ( CClientPlayer & Player, char *  szBuffer, unsigned int uiLength );
+    static bool                         GetPlayerNametagText                ( CClientPlayer & Player, SString& strOutText );
     static bool                         GetPlayerNametagColor               ( CClientPlayer & Player, unsigned char & ucR, unsigned char & ucG, unsigned char & ucB );
 
     // Player set funcs
@@ -130,13 +130,13 @@ public:
     static CClientEntity*               GetPedTarget                        ( CClientPed& Ped );
     static bool                         GetPedTargetCollision               ( CClientPed& Ped, CVector& vecOrigin );
     static bool                         GetPedTask                          ( CClientPed& Ped, bool bPrimary, unsigned int uiTaskType, std::vector < SString >& outTaskHierarchy );
-    static char*                        GetPedSimplestTask                  ( CClientPed& Ped );
+    static const char*                  GetPedSimplestTask                  ( CClientPed& Ped );
     static bool                         IsPedDoingTask                      ( CClientPed& Ped, const char* szTaskName, bool& bIsDoingTask );
     static bool                         GetPedBonePosition                  ( CClientPed& Ped, eBone bone, CVector & vecPosition );
-    static bool                         GetPedClothes                       ( CClientPed& Ped, unsigned char ucType, char* szTextureReturn, char* szModelReturn );
+    static bool                         GetPedClothes                       ( CClientPed& Ped, unsigned char ucType, SString& strOutTexture, SString& strOutModel );
     static bool                         GetPedControlState                  ( CClientPed& Ped, const char * szControl, bool & bState );
     static bool                         IsPedDoingGangDriveby               ( CClientPed& Ped, bool & bDoingGangDriveby );
-    static bool                         GetPedAnimation                     ( CClientPed& Ped, char * szBlockName, char * szAnimName, unsigned int uiLength );
+    static bool                         GetPedAnimation                     ( CClientPed& Ped, SString& strOutBlockName, SString& strOutAnimName );
     static bool                         GetPedMoveAnim                      ( CClientPed& Ped, unsigned int& iMoveAnim );
     static bool                         GetPedMoveState                     ( CClientPed & Ped, std::string& strMoveState );
     static bool                         IsPedHeadless                       ( CClientPed& Ped, bool & bHeadless );
@@ -159,7 +159,7 @@ public:
     static bool                         SetPedAnimation                     ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame );
     static bool                         SetPedAnimationProgress             ( CClientEntity& Entity, const char * szAnimName, float fProgress );
     static bool                         SetPedMoveAnim                      ( CClientEntity& Entity, unsigned int iMoveAnim );
-    static bool                         AddPedClothes                       ( CClientEntity& Entity, char* szTexture, char* szModel, unsigned char ucType );
+    static bool                         AddPedClothes                       ( CClientEntity& Entity, const char* szTexture, const char* szModel, unsigned char ucType );
     static bool                         RemovePedClothes                    ( CClientEntity& Entity, unsigned char ucType );
     static bool                         SetPedControlState                  ( CClientEntity& Entity, const char* szControl, bool bState );
     static bool                         SetPedDoingGangDriveby              ( CClientEntity& Entity, bool bGangDriveby );
@@ -172,19 +172,19 @@ public:
     static bool                         SetPedOnFire                        ( CClientEntity& Entity, bool bOnFire );
 
     // Extra Clothes functions
-    static bool                         GetBodyPartName                     ( unsigned char ucID, char* szName );
-    static bool                         GetClothesByTypeIndex               ( unsigned char ucType, unsigned char ucIndex, char* szTextureReturn, char* szModelReturn );
-    static bool                         GetTypeIndexFromClothes             ( char* szTexture, char* szModel, unsigned char& ucTypeReturn, unsigned char& ucIndexReturn );
-    static bool                         GetClothesTypeName                  ( unsigned char ucType, char* szNameReturn );
+    static bool                         GetBodyPartName                     ( unsigned char ucID, SString& strOutName );
+    static bool                         GetClothesByTypeIndex               ( unsigned char ucType, unsigned char ucIndex, SString& strOutTexture, SString& strOutModel );
+    static bool                         GetTypeIndexFromClothes             ( const char* szTexture, const char* szModel, unsigned char& ucTypeReturn, unsigned char& ucIndexReturn );
+    static bool                         GetClothesTypeName                  ( unsigned char ucType, SString& strOutName );
 
 
     // Vehicle get funcs
     static CClientVehicle*              CreateVehicle                       ( CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate = NULL, unsigned char ucVariant = 5, unsigned char ucVariant2 = 5 );
     static bool                         GetVehicleModelFromName             ( const char* szName, unsigned short& usModel );
-    static bool                         GetVehicleUpgradeSlotName           ( unsigned char ucSlot, char* szName, unsigned short len );
-    static bool                         GetVehicleUpgradeSlotName           ( unsigned short usUpgrade, char* szName, unsigned short len );
+    static bool                         GetVehicleUpgradeSlotName           ( unsigned char ucSlot, SString& strOutName );
+    static bool                         GetVehicleUpgradeSlotName           ( unsigned short usUpgrade, SString& strOutName );
     static bool                         GetVehicleDoorsLocked               ( CClientVehicle& Vehicle, bool& bLocked );
-    static bool                         GetVehicleNameFromModel             ( unsigned short usModel, char* szName, unsigned short len );
+    static bool                         GetVehicleNameFromModel             ( unsigned short usModel, SString& strOutName );
     static bool                         GetHelicopterRotorSpeed             ( CClientVehicle& Vehicle, float& fSpeed );
     static bool                         GetVehicleEngineState               ( CClientVehicle& Vehicle, bool& bState );
     static bool                         IsVehicleDamageProof                ( CClientVehicle& Vehicle, bool& bDamageProof );
@@ -438,7 +438,7 @@ public:
     static bool                         GetScreenFromWorldPosition          ( CVector& vecWorld, CVector& vecScreen, float fEdgeTolerance, bool bRelative );
     static bool                         GetWeather                          ( unsigned char& ucWeather, unsigned char& ucWeatherBlendingTo );
     static bool                         GetGravity                          ( float& fGravity );
-    static bool                         GetZoneName                         ( CVector& vecPosition, char* szBuffer, unsigned int uiBufferLength, bool bCitiesOnly = false );
+    static bool                         GetZoneName                         ( CVector& vecPosition, SString& strOutName, bool bCitiesOnly = false );
     static bool                         GetGameSpeed                        ( float& fSpeed );
     static bool                         GetMinuteDuration                   ( unsigned long& ulDelay );
     static bool                         GetWaveHeight                       ( float& fHeight );
@@ -514,7 +514,7 @@ public:
     static void                         RefreshColShapeColliders            ( CClientColShape *pColShape );
 
     // Weapon funcs
-    static bool                         GetWeaponNameFromID                 ( unsigned char ucID, char* szName, unsigned short len );
+    static bool                         GetWeaponNameFromID                 ( unsigned char ucID, SString& strOutName );
     static bool                         GetWeaponIDFromName                 ( const char* szName, unsigned char& ucID );
 
     // Util funcs

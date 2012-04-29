@@ -640,10 +640,10 @@ int CLuaFunctionDefs::GetZoneName ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        char szZoneName [ 128 ];
-        if ( CStaticFunctionDefinitions::GetZoneName ( vecPosition, szZoneName, 128, bCitiesOnly ) )
+        SString strZoneName;
+        if ( CStaticFunctionDefinitions::GetZoneName ( vecPosition, strZoneName, bCitiesOnly ) )
         {
-            lua_pushstring ( luaVM, szZoneName );
+            lua_pushstring ( luaVM, strZoneName );
             return 1;
         }
     }

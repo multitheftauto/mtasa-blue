@@ -36,8 +36,7 @@ void CPlayerManager::DoPulse ( void )
         if ( (*iter)->GetStatus () == STATUS_CONNECTED && GetTime () > (*iter)->GetTimeConnected () + 90000 )
         {
             // Tell the console he timed out due during connect
-            char szIP [64];
-            CLogger::LogPrintf ( "INFO: %s (%s) timed out during connect\n", (*iter)->GetNick (), (*iter)->GetSourceIP ( szIP ) );
+            CLogger::LogPrintf ( "INFO: %s (%s) timed out during connect\n", (*iter)->GetNick (), (*iter)->GetSourceIP () );
 
             // Remove him
             delete *iter;

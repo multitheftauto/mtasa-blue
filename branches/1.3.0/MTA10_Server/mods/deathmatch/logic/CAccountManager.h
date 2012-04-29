@@ -93,7 +93,7 @@ class CAccountManager: public CXMLConfig
 {
     friend class CAccount;
 public:
-                                CAccountManager             ( char* szFileName, SString strBuffer );
+                                CAccountManager             ( const char* szFileName, SString strBuffer );
                                 ~CAccountManager            ( void );
 
     void                        DoPulse                     ( void );

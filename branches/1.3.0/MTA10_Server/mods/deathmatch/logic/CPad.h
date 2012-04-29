@@ -162,12 +162,12 @@ public:
 
     void                        UpdateKeys                      ( void );
 
-    bool                        GetControlState                 ( char* szControl, bool& bState );
-    bool                        SetControlState                 ( char* szControl, bool bState );
-    static SGTAControl*         GetControlFromString            ( char* szControl );
+    bool                        GetControlState                 ( const char* szControl, bool& bState );
+    bool                        SetControlState                 ( const char* szControl, bool bState );
+    static SGTAControl*         GetControlFromString            ( const char* szControl );
 
-    bool                        IsControlEnabled                ( char* szControl, bool& bEnabled );
-    bool                        SetControlEnabled               ( char* szControl, bool bEnabled );
+    bool                        IsControlEnabled                ( const char* szControl, bool& bEnabled );
+    bool                        SetControlEnabled               ( const char* szControl, bool bEnabled );
 
     void                        SetAllControlsEnabled           ( bool bEnabled );
 

@@ -157,7 +157,7 @@ void CPad::UpdateKeys ( void )
 }
 
 
-bool CPad::GetControlState ( char* szControl, bool& bState )
+bool CPad::GetControlState ( const char* szControl, bool& bState )
 {
     for ( int i = 0 ; *g_gtaControls [ i ].szControl != '\0' ; i++ )
     {
@@ -179,7 +179,7 @@ bool CPad::GetControlState ( char* szControl, bool& bState )
 }
 
 
-bool CPad::SetControlState ( char* szControl, bool bState )
+bool CPad::SetControlState ( const char* szControl, bool bState )
 {
     for ( int i = 0 ; *g_gtaControls [ i ].szControl != '\0' ; i++ )
     {
@@ -195,7 +195,7 @@ bool CPad::SetControlState ( char* szControl, bool bState )
 }
 
 
-bool CPad::IsControlEnabled ( char* szControl, bool& bEnabled )
+bool CPad::IsControlEnabled ( const char* szControl, bool& bEnabled )
 {
     for ( int i = 0 ; *g_gtaControls [ i ].szControl != '\0' ; i++ )
     {
@@ -211,7 +211,7 @@ bool CPad::IsControlEnabled ( char* szControl, bool& bEnabled )
 }
 
 
-bool CPad::SetControlEnabled ( char* szControl, bool bEnabled )
+bool CPad::SetControlEnabled ( const char* szControl, bool bEnabled )
 {
     for ( int i = 0 ; *g_gtaControls [ i ].szControl != '\0' ; i++ )
     {
@@ -236,7 +236,7 @@ void CPad::SetAllControlsEnabled ( bool bEnabled )
 }
 
 
-SGTAControl* CPad::GetControlFromString ( char* szControl )
+SGTAControl* CPad::GetControlFromString ( const char* szControl )
 {
     for ( int i = 0 ; *g_gtaControls [ i ].szControl != '\0' ; i++ )
     {

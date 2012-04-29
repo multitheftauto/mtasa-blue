@@ -562,7 +562,7 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
             
             // Append user details
             SString strTemp = StringZeroPadout ( m_strLocalNick, MAX_PLAYER_NICK_LENGTH );
-            pBitStream->Write ( const_cast < const char* > ( *strTemp ), MAX_PLAYER_NICK_LENGTH );
+            pBitStream->Write ( strTemp.c_str (), MAX_PLAYER_NICK_LENGTH );
             pBitStream->Write ( reinterpret_cast < const char* > ( Password.data ), sizeof ( MD5 ) );
 
             // Append community information
@@ -2263,7 +2263,7 @@ void CClientGame::ProcessServerKeyBind ( CKeyFunctionBind* pBind )
     CBitStream bitStream;
     bitStream.pBitStream->WriteBit ( false );
     bitStream.pBitStream->WriteBit ( pBind->bHitState );
-    bitStream.pBitStream->Write ( const_cast < char * > ( szName ), ucNameLength );
+    bitStream.pBitStream->Write ( szName, ucNameLength );
     m_pNetAPI->RPC ( KEY_BIND, bitStream.pBitStream );
 }
 
@@ -2281,7 +2281,7 @@ void CClientGame::ProcessServerControlBind ( CControlFunctionBind* pBind )
     CBitStream bitStream;
     bitStream.pBitStream->WriteBit ( true );
     bitStream.pBitStream->WriteBit ( pBind->bHitState );
-    bitStream.pBitStream->Write ( const_cast < char * > ( szName ), ucNameLength );
+    bitStream.pBitStream->Write ( szName, ucNameLength );
     m_pNetAPI->RPC ( KEY_BIND, bitStream.pBitStream );
 }
 
@@ -2379,8 +2379,8 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
                         pColPoint->Destroy ();
                     }
 
-                    char* szButton = NULL;
-                    char* szState = NULL;
+                    const char* szButton = NULL;
+                    const char* szState = NULL;
                     switch ( ucButtonHit )
                     {
                         case 0: szButton = "left"; szState = "down";
@@ -3275,7 +3275,7 @@ void CClientGame::QuitPlayer ( CClientPlayer* pPlayer, eQuitReason Reason )
 {
     // Get the nick pointer and echo the quit message to the chat
     const char* szNick = pPlayer->GetNick ();
-    char* szReason = "Unknown";
+    const char* szReason = "Unknown";
     switch ( Reason )
     {
         case QUIT_QUIT: szReason = "Quit"; break;
@@ -4980,8 +4980,8 @@ bool CClientGame::OnMouseClick ( CGUIMouseEventArgs Args )
 {
     if ( !Args.pWindow ) return false;
 
-    char* szButton = NULL;
-    char* szState = NULL;
+    const char* szButton = NULL;
+    const char* szState = NULL;
     switch ( Args.button )
     {
     case CGUIMouse::LeftButton:
@@ -5024,8 +5024,8 @@ bool CClientGame::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
 {
     if ( !Args.pWindow ) return false;
 
-    char* szButton = NULL;
-    char* szState = NULL;
+    const char* szButton = NULL;
+    const char* szState = NULL;
     switch ( Args.button )
     {
     case CGUIMouse::LeftButton:

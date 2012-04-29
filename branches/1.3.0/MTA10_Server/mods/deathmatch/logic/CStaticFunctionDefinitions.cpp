@@ -630,22 +630,17 @@ bool CStaticFunctionDefinitions::GetElementDimension ( CElement* pElement, unsig
 }
 
 
-bool CStaticFunctionDefinitions::GetElementZoneName ( CElement* pElement, char* szBuffer, unsigned int uiBufferLength, bool bCitiesOnly )
+bool CStaticFunctionDefinitions::GetElementZoneName ( CElement* pElement, SString& strOutName, bool bCitiesOnly )
 {
     assert ( pElement );
-    assert ( szBuffer );
-    assert ( uiBufferLength );
 
     CVector vecPosition = pElement->GetPosition ();
 
-    const char* szZone = NULL;
     if ( bCitiesOnly )
-        szZone = g_pGame->GetZoneNames ()->GetCityName ( vecPosition );
+        strOutName = g_pGame->GetZoneNames ()->GetCityName ( vecPosition );
     else
-        szZone = g_pGame->GetZoneNames ()->GetZoneName ( vecPosition );
+        strOutName = g_pGame->GetZoneNames ()->GetZoneName ( vecPosition );
 
-    strncpy ( szBuffer, szZone, uiBufferLength );
-    szBuffer [ uiBufferLength - 1 ] = 0;
     return true;
 }
 
@@ -1852,21 +1847,20 @@ bool CStaticFunctionDefinitions::SetElementFrozen ( CElement* pElement, bool bFr
 }
 
 
-bool CStaticFunctionDefinitions::GetPlayerName ( CElement* pElement, char* szNick )
+bool CStaticFunctionDefinitions::GetPlayerName ( CElement* pElement, SString& strOutNick )
 {
     assert ( pElement );
-    assert ( szNick );
 
     switch ( pElement->GetType () )
     {
         case CElement::PLAYER:
         {
-            strncpy ( szNick, static_cast < CPlayer* > ( pElement )->GetNick (), 25 );
+            strOutNick = static_cast < CPlayer* > ( pElement )->GetNick ();
             break;
         }
         case CElement::CONSOLE:
         {
-            strcpy ( szNick, "Console" );
+            strOutNick = "Console";
             break;
         }
         default: return false;
@@ -1876,21 +1870,20 @@ bool CStaticFunctionDefinitions::GetPlayerName ( CElement* pElement, char* szNic
 }
 
 
-bool CStaticFunctionDefinitions::GetPlayerIP ( CElement* pElement, char* szIP )
+bool CStaticFunctionDefinitions::GetPlayerIP ( CElement* pElement, SString& strOutIP )
 {
     assert ( pElement );
-    assert ( szIP );
 
     switch ( pElement->GetType () )
     {
         case CElement::PLAYER:
         {
-            static_cast < CPlayer* > ( pElement )->GetSourceIP ( szIP );
+            strOutIP = static_cast < CPlayer* > ( pElement )->GetSourceIP ();
             break;
         }
         case CElement::CONSOLE:
         {
-            strcpy ( szIP, "127.0.0.1" );
+            strOutIP = "127.0.0.1";
             break;
         }
         default: return false;
@@ -2736,12 +2729,11 @@ bool CStaticFunctionDefinitions::GetPlayerPing ( CPlayer* pPlayer, unsigned int&
 }
 
 
-bool CStaticFunctionDefinitions::GetPlayerSourceIP ( CPlayer* pPlayer, char* szIP )
+bool CStaticFunctionDefinitions::GetPlayerSourceIP ( CPlayer* pPlayer, SString& strOutIP )
 {
     assert ( pPlayer );
-    assert ( szIP );
 
-    pPlayer->GetSourceIP ( szIP );
+    strOutIP = pPlayer->GetSourceIP ();
     return true;
 }
 
@@ -2792,7 +2784,7 @@ CTeam* CStaticFunctionDefinitions::GetPlayerTeam ( CPlayer* pPlayer )
 }
 
 
-bool CStaticFunctionDefinitions::CanPlayerUseFunction ( CPlayer* pPlayer, char* szFunction, bool& bCanUse )
+bool CStaticFunctionDefinitions::CanPlayerUseFunction ( CPlayer* pPlayer, const char* szFunction, bool& bCanUse )
 {
     assert ( pPlayer );
     assert ( szFunction );
@@ -2844,11 +2836,9 @@ bool CStaticFunctionDefinitions::IsPlayerMapForced ( CPlayer* pPlayer, bool& bFo
 }
 
 
-bool CStaticFunctionDefinitions::GetPlayerNametagText ( CPlayer* pPlayer, char* szBuffer, unsigned int uiBufferLength )
+bool CStaticFunctionDefinitions::GetPlayerNametagText ( CPlayer* pPlayer, SString& strOutText )
 {
     assert ( pPlayer );
-    assert ( szBuffer );
-    assert ( uiBufferLength );
 
     const char* szNametagText = pPlayer->GetNametagText ();
     if ( szNametagText == NULL )
@@ -2856,8 +2846,7 @@ bool CStaticFunctionDefinitions::GetPlayerNametagText ( CPlayer* pPlayer, char* 
 
     if ( szNametagText )
     {
-        strncpy ( szBuffer, szNametagText, uiBufferLength );
-        szBuffer [ uiBufferLength - 1 ] = 0;
+        strOutText = szNametagText;
         return true;
     }
 
@@ -3170,7 +3159,7 @@ bool CStaticFunctionDefinitions::SetPlayerNametagText ( CElement* pElement, cons
                 CBitStream BitStream;
                 BitStream.pBitStream->Write ( usTextLength );
                 if ( usTextLength > 0 )
-                    BitStream.pBitStream->Write ( const_cast < char* > ( szText ), usTextLength );
+                    BitStream.pBitStream->Write ( szText, usTextLength );
                 m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pPlayer, SET_PLAYER_NAMETAG_TEXT, *BitStream.pBitStream ) );
 
                 return true;
@@ -3321,13 +3310,13 @@ bool CStaticFunctionDefinitions::RedirectPlayer ( CElement* pElement, const char
 
         CBitStream BitStream;
         BitStream.pBitStream->Write ( ucHostLength );
-        BitStream.pBitStream->Write ( const_cast < char* > ( szHost ), ucHostLength );
+        BitStream.pBitStream->Write ( szHost, ucHostLength );
         BitStream.pBitStream->Write ( usPort );
         if ( szPassword )
         {
             unsigned char ucPasswordLength = static_cast < unsigned char > ( strlen ( szPassword ) );
             BitStream.pBitStream->Write ( ucPasswordLength );
-            BitStream.pBitStream->Write ( const_cast < char* > ( szPassword ), ucPasswordLength );
+            BitStream.pBitStream->Write ( szPassword, ucPasswordLength );
         }
         pPlayer->Send ( CLuaPacket ( FORCE_RECONNECT, *BitStream.pBitStream ) );
 
@@ -3398,18 +3387,15 @@ CElement* CStaticFunctionDefinitions::GetPedTarget ( CPed* pPed )
 }
 
 
-bool CStaticFunctionDefinitions::GetPedClothes ( CPed* pPed, unsigned char ucType, char* szTextureReturn, char* szModelReturn )
+bool CStaticFunctionDefinitions::GetPedClothes ( CPed* pPed, unsigned char ucType, SString& strOutTexture, SString& strOutModel )
 {
     assert ( pPed );
 
     const SPlayerClothing* pClothing = pPed->GetClothes ()->GetClothing ( ucType );
     if ( pClothing )
     {
-        if ( szTextureReturn )
-            strcpy ( szTextureReturn, pClothing->szTexture );
-        if ( szModelReturn )
-            strcpy ( szModelReturn, pClothing->szModel );
-
+        strOutTexture = pClothing->szTexture;
+        strOutModel = pClothing->szModel;
         return true;
     }
 
@@ -3723,7 +3709,7 @@ bool CStaticFunctionDefinitions::SetPedStat ( CElement* pElement, unsigned short
 }
 
 
-bool CStaticFunctionDefinitions::AddPedClothes ( CElement* pElement, char* szTexture, char* szModel, unsigned char ucType )
+bool CStaticFunctionDefinitions::AddPedClothes ( CElement* pElement, const char* szTexture, const char* szModel, unsigned char ucType )
 {
     assert ( pElement );
     assert ( szTexture );
@@ -3755,7 +3741,7 @@ bool CStaticFunctionDefinitions::AddPedClothes ( CElement* pElement, char* szTex
 }
 
 
-bool CStaticFunctionDefinitions::RemovePedClothes ( CElement* pElement, unsigned char ucType, char* szTexture, char* szModel )
+bool CStaticFunctionDefinitions::RemovePedClothes ( CElement* pElement, unsigned char ucType, const char* szTexture, const char* szModel )
 {
     assert ( pElement );
 
@@ -4824,21 +4810,18 @@ bool CStaticFunctionDefinitions::GetVehicleMaxPassengers ( CVehicle* pVehicle, u
 }
 
 
-bool CStaticFunctionDefinitions::GetVehicleName ( CVehicle* pVehicle, char* szName )
+bool CStaticFunctionDefinitions::GetVehicleName ( CVehicle* pVehicle, SString& strOutName )
 {
     assert ( pVehicle );
-    assert ( szName );
 
-    strncpy ( szName, CVehicleNames::GetVehicleName ( pVehicle->GetModel () ), 32 );
+    strOutName = CVehicleNames::GetVehicleName ( pVehicle->GetModel () );
     return true;
 }
 
 
-bool CStaticFunctionDefinitions::GetVehicleNameFromModel ( unsigned short usModel, char* szName )
+bool CStaticFunctionDefinitions::GetVehicleNameFromModel ( unsigned short usModel, SString& strOutName )
 {
-    assert ( szName );
-
-    strncpy ( szName, CVehicleNames::GetVehicleName ( usModel ), 32 );
+    strOutName = CVehicleNames::GetVehicleName ( usModel );
     return true;
 }
 
@@ -4910,19 +4893,19 @@ bool CStaticFunctionDefinitions::GetVehicleUpgradeOnSlot ( CVehicle* pVehicle, u
 }
 
 
-bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( unsigned char ucSlot, char* szName )
+bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( unsigned char ucSlot,SString& strOutName )
 {
-    strncpy ( szName, CVehicleUpgrades::GetSlotName ( ucSlot ), 32 );
+    strOutName = CVehicleUpgrades::GetSlotName ( ucSlot );
     return true;
 }
 
 
-bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( unsigned short usUpgrade, char* szName )
+bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( unsigned short usUpgrade, SString& strOutName )
 {
     unsigned char ucSlot;
     if ( CVehicleUpgrades::GetSlotFromUpgrade ( usUpgrade, ucSlot ) )
     {
-        strncpy ( szName, CVehicleUpgrades::GetSlotName ( ucSlot ), 32 );
+        strOutName = CVehicleUpgrades::GetSlotName ( ucSlot );
         return true;
     }
 
@@ -6457,7 +6440,7 @@ bool CStaticFunctionDefinitions::SetVehicleWheelStates ( CElement* pElement, int
                 if ( iRearRight != -1 )  pVehicle->m_ucWheelStates [ REAR_RIGHT_WHEEL ] = iRearRight;
 
                 CBitStream BitStream;
-                BitStream.pBitStream->Write ( ( char * ) &pVehicle->m_ucWheelStates[0], MAX_WHEELS );
+                BitStream.pBitStream->Write ( ( const char * ) &pVehicle->m_ucWheelStates[0], MAX_WHEELS );
                 m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_WHEEL_STATES, *BitStream.pBitStream ) );
 
                 return true;
@@ -8452,7 +8435,7 @@ bool CStaticFunctionDefinitions::BindKey ( CPlayer* pPlayer, const char* szKey, 
 
             CBitStream bitStream;
             bitStream.pBitStream->Write ( ucKeyLength );
-            bitStream.pBitStream->Write ( const_cast < char* > ( szKey ), ucKeyLength );
+            bitStream.pBitStream->Write ( szKey, ucKeyLength );
             bitStream.pBitStream->Write ( static_cast < unsigned char > ( ( bHitState ) ? 1 : 0 ) );
             pPlayer->Send ( CLuaPacket ( BIND_KEY, *bitStream.pBitStream ) );
 
@@ -8469,7 +8452,7 @@ bool CStaticFunctionDefinitions::BindKey ( CPlayer* pPlayer, const char* szKey, 
 
             CBitStream bitStream;
             bitStream.pBitStream->Write ( ucKeyLength );
-            bitStream.pBitStream->Write ( const_cast < char* > ( szKey ), ucKeyLength );
+            bitStream.pBitStream->Write ( szKey, ucKeyLength );
             bitStream.pBitStream->Write ( static_cast < unsigned char > ( ( bHitState ) ? 1 : 0 ) );
             pPlayer->Send ( CLuaPacket ( BIND_KEY, *bitStream.pBitStream ) );
 
@@ -8563,7 +8546,7 @@ bool CStaticFunctionDefinitions::UnbindKey ( CPlayer* pPlayer, const char* szKey
 
         CBitStream bitStream;
         bitStream.pBitStream->Write ( ucKeyLength );
-        bitStream.pBitStream->Write ( const_cast < char* > ( szKey ), ucKeyLength );
+        bitStream.pBitStream->Write ( szKey, ucKeyLength );
         bitStream.pBitStream->Write ( static_cast < unsigned char > ( ( bHitState ) ? 1 : 0 ) );
         pPlayer->Send ( CLuaPacket ( UNBIND_KEY, *bitStream.pBitStream ) );
 
@@ -8595,16 +8578,16 @@ bool CStaticFunctionDefinitions::UnbindKey ( CPlayer* pPlayer, const char* szKey
 
                 CBitStream bitStream;
                 bitStream.pBitStream->Write ( ucLength );
-                bitStream.pBitStream->Write ( const_cast < char* > ( szKey ), ucLength );
+                bitStream.pBitStream->Write ( szKey, ucLength );
                 bitStream.pBitStream->Write ( ucHitState );
 
                 ucLength = static_cast < unsigned char > ( strlen ( szCommandName ) );
                 bitStream.pBitStream->Write ( ucLength );
-                bitStream.pBitStream->Write ( const_cast < char* > ( szCommandName ), ucLength );
+                bitStream.pBitStream->Write ( szCommandName, ucLength );
 
                 ucLength = static_cast < unsigned char > ( strlen ( szResource ) );
                 bitStream.pBitStream->Write ( ucLength );
-                bitStream.pBitStream->Write ( const_cast < char* > ( szResource ), ucLength );
+                bitStream.pBitStream->Write ( szResource, ucLength );
 
                 pPlayer->Send ( CLuaPacket ( UNBIND_COMMAND, *bitStream.pBitStream ) );
                 return true;
@@ -8649,7 +8632,7 @@ bool CStaticFunctionDefinitions::IsKeyBound ( CPlayer* pPlayer, const char* szKe
 }
 
 
-bool CStaticFunctionDefinitions::GetControlState ( CPlayer* pPlayer, char* szControl, bool& bState )
+bool CStaticFunctionDefinitions::GetControlState ( CPlayer* pPlayer, const char* szControl, bool& bState )
 {
     assert ( pPlayer );
     assert ( szControl );
@@ -8658,7 +8641,7 @@ bool CStaticFunctionDefinitions::GetControlState ( CPlayer* pPlayer, char* szCon
 }
 
 
-bool CStaticFunctionDefinitions::IsControlEnabled ( CPlayer* pPlayer, char* szControl, bool& bEnabled )
+bool CStaticFunctionDefinitions::IsControlEnabled ( CPlayer* pPlayer, const char* szControl, bool& bEnabled )
 {
     assert ( pPlayer );
     assert ( szControl );
@@ -8667,7 +8650,7 @@ bool CStaticFunctionDefinitions::IsControlEnabled ( CPlayer* pPlayer, char* szCo
 }
 
 
-bool CStaticFunctionDefinitions::SetControlState ( CPlayer* pPlayer, char* szControl, bool bState )
+bool CStaticFunctionDefinitions::SetControlState ( CPlayer* pPlayer, const char* szControl, bool bState )
 {
     assert ( pPlayer );
     assert ( szControl );
@@ -8692,7 +8675,7 @@ bool CStaticFunctionDefinitions::SetControlState ( CPlayer* pPlayer, char* szCon
 }
 
 
-bool CStaticFunctionDefinitions::ToggleControl ( CPlayer* pPlayer, char* szControl, bool bEnabled )
+bool CStaticFunctionDefinitions::ToggleControl ( CPlayer* pPlayer, const char* szControl, bool bEnabled )
 {
     assert ( pPlayer );
     assert ( szControl );
@@ -8737,7 +8720,7 @@ bool CStaticFunctionDefinitions::ToggleAllControls ( CPlayer* pPlayer, bool bGTA
 }
 
 
-CTeam* CStaticFunctionDefinitions::CreateTeam ( CResource* pResource, char* szTeamName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue )
+CTeam* CStaticFunctionDefinitions::CreateTeam ( CResource* pResource, const char* szTeamName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue )
 {
     assert ( szTeamName );
 
@@ -8771,14 +8754,11 @@ CTeam* CStaticFunctionDefinitions::GetTeamFromName ( const char* szTeamName )
 }
 
 
-bool CStaticFunctionDefinitions::GetTeamName ( CTeam* pTeam, char* szBuffer, unsigned int uiBufferLength )
+bool CStaticFunctionDefinitions::GetTeamName ( CTeam* pTeam, SString& strOutName )
 {
     assert ( pTeam );
-    assert ( szBuffer );
-    assert ( uiBufferLength );
 
-    strncpy ( szBuffer, pTeam->GetTeamName (), uiBufferLength );
-    szBuffer [ uiBufferLength - 1 ] = 0;
+    strOutName = pTeam->GetTeamName ();
     return true;
 }
 
@@ -8810,7 +8790,7 @@ bool CStaticFunctionDefinitions::GetTeamFriendlyFire ( CTeam* pTeam, bool& bFrie
 }
 
 
-bool CStaticFunctionDefinitions::SetTeamName ( CTeam* pTeam, char* szTeamName )
+bool CStaticFunctionDefinitions::SetTeamName ( CTeam* pTeam, const char* szTeamName )
 {
     assert ( pTeam );
     assert ( szTeamName );
@@ -9247,7 +9227,7 @@ bool CStaticFunctionDefinitions::GetClothesByTypeIndex ( unsigned char ucType, u
 }
 
 
-bool CStaticFunctionDefinitions::GetTypeIndexFromClothes ( char* szTexture, char* szModel, unsigned char& ucTypeReturn, unsigned char& ucIndexReturn )
+bool CStaticFunctionDefinitions::GetTypeIndexFromClothes ( const char* szTexture, const char* szModel, unsigned char& ucTypeReturn, unsigned char& ucIndexReturn )
 {
     if ( szTexture == NULL && szModel == NULL )
         return false;
@@ -9388,19 +9368,13 @@ bool CStaticFunctionDefinitions::GetWeather ( unsigned char& ucWeather, unsigned
 }
 
 
-bool CStaticFunctionDefinitions::GetZoneName ( CVector& vecPosition, char* szBuffer, unsigned int uiBufferLength, bool bCitiesOnly )
+bool CStaticFunctionDefinitions::GetZoneName ( CVector& vecPosition, SString& strOutName,bool bCitiesOnly )
 {
-    assert ( szBuffer );
-    assert ( uiBufferLength );
-
-    const char* szZone = NULL;
     if ( bCitiesOnly )
-        szZone = g_pGame->GetZoneNames ()->GetCityName ( vecPosition );
+        strOutName = g_pGame->GetZoneNames ()->GetCityName ( vecPosition );
     else
-        szZone = g_pGame->GetZoneNames ()->GetZoneName ( vecPosition );
+        strOutName = g_pGame->GetZoneNames ()->GetZoneName ( vecPosition );
 
-    strncpy ( szBuffer, szZone, uiBufferLength );
-    szBuffer [ uiBufferLength - 1 ] = 0;
     return true;
 }
 
@@ -10402,13 +10376,7 @@ bool CStaticFunctionDefinitions::RemoveAccount ( CAccount* pAccount )
             if ( !g_pGame->GetAccountManager ()->LogOut ( pClient, NULL ) )
                 return false;
 
-            char szMessage [128];
-            szMessage[0] = '\0';
-
-            snprintf ( szMessage, 128, "You were logged out of your account due to it being deleted" );
-            szMessage[127] = '\0';
-
-            pClient->SendEcho ( szMessage );
+            pClient->SendEcho ( "You were logged out of your account due to it being deleted" );
         }
         g_pGame->GetAccountManager ()->RemoveAccount ( pAccount );
         delete pAccount;
@@ -10706,9 +10674,7 @@ CBan* CStaticFunctionDefinitions::AddBan ( SString strIP, SString strUsername, S
             // Check if the player's IP matches the specified one, if specified
             if ( bIPSpecified )
             {
-                char szPlayerIP [20];
-                ( *iter )->GetSourceIP ( szPlayerIP );
-                bBan = strcmp ( strIP.c_str(), szPlayerIP ) == 0;
+                bBan = ( strIP == ( *iter )->GetSourceIP () );
             }
 
             // Check if the player's username matches the specified one, if specified, and he wasn't banned over IP yet
@@ -10795,44 +10761,44 @@ bool CStaticFunctionDefinitions::ReloadBanList ( void )
 }
 
 
-bool CStaticFunctionDefinitions::GetBanIP ( CBan* pBan, char* szIP, size_t size )
+bool CStaticFunctionDefinitions::GetBanIP ( CBan* pBan, SString& strOutIP )
 {
     if ( !pBan->GetIP ().empty () )
     {
-        snprintf ( szIP, size, pBan->GetIP ().c_str() );
+        strOutIP = pBan->GetIP ();
         return true;
     }
     return false;
 }
 
 
-bool CStaticFunctionDefinitions::GetBanSerial ( CBan* pBan, char* szSerial, size_t size )
+bool CStaticFunctionDefinitions::GetBanSerial ( CBan* pBan, SString& strOutSerial )
 {
     if ( !pBan->GetSerial ().empty () )
     {
-        snprintf ( szSerial, size, pBan->GetSerial ().c_str() );
+        strOutSerial = pBan->GetSerial ();
         return true;
     }
     return false;
 }
 
 
-bool CStaticFunctionDefinitions::GetBanUsername ( CBan* pBan, char* szUsername, size_t size )
+bool CStaticFunctionDefinitions::GetBanUsername ( CBan* pBan, SString& strOutUsername )
 {
     if ( !pBan->GetAccount ().empty () )
     {
-        snprintf ( szUsername, size, pBan->GetAccount ().c_str() );
+        strOutUsername = pBan->GetAccount ();
         return true;
     }
     return false;
 }
 
 
-bool CStaticFunctionDefinitions::GetBanNick ( CBan* pBan, char* szNick, size_t size )
+bool CStaticFunctionDefinitions::GetBanNick ( CBan* pBan, SString& strOutNick )
 {
     if ( !pBan->GetNick ().empty () )
     {
-        snprintf ( szNick, size, pBan->GetNick ().c_str() );
+        strOutNick = pBan->GetNick ();
         return true;
     }
     return false;
@@ -10853,22 +10819,22 @@ bool CStaticFunctionDefinitions::GetUnbanTime ( CBan* pBan, time_t& time )
 }
 
 
-bool CStaticFunctionDefinitions::GetBanReason ( CBan* pBan, char* szReason, size_t size )
+bool CStaticFunctionDefinitions::GetBanReason ( CBan* pBan, SString& strOutReason )
 {
     if ( !pBan->GetReason ().empty () )
     {
-        snprintf ( szReason, size, pBan->GetReason ().c_str() );
+        strOutReason = pBan->GetReason ();
         return true;
     }
     return false;
 }
 
 
-bool CStaticFunctionDefinitions::GetBanAdmin ( CBan* pBan, char* szAdmin, size_t size )
+bool CStaticFunctionDefinitions::GetBanAdmin ( CBan* pBan, SString& strOutAdmin )
 {
     if ( !pBan->GetBanner ().empty () )
     {
-        snprintf ( szAdmin, size, pBan->GetBanner ().c_str() );
+        strOutAdmin = pBan->GetBanner ();
         return true;
     }
     return false;
@@ -10967,7 +10933,7 @@ bool CStaticFunctionDefinitions::ResetMapInfo ( CElement* pElement )
 }
 
 
-CElement* CStaticFunctionDefinitions::GetResourceMapRootElement ( CResource* pResource, char* szMap )
+CElement* CStaticFunctionDefinitions::GetResourceMapRootElement ( CResource* pResource, const char* szMap )
 {
     if ( pResource )
     {

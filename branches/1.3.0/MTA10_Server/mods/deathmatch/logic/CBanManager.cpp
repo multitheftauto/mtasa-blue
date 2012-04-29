@@ -65,14 +65,13 @@ CBan* CBanManager::AddBan ( CPlayer* pPlayer, const SString& strBanner, const SS
 {
     if ( pPlayer )
     {
-        char szIP[256] = { '\0' };
-        pPlayer->GetSourceIP ( szIP );
+        SString strIP = pPlayer->GetSourceIP ();
 
-        if ( IsValidIP ( szIP ) && !IsSpecificallyBanned ( szIP ) )
+        if ( IsValidIP ( strIP ) && !IsSpecificallyBanned ( strIP ) )
         {
             CBan* pBan = AddBan ( strBanner, strReason, tTimeOfUnban );
             pBan->SetNick ( pPlayer->GetNick() );
-            pBan->SetIP ( szIP );
+            pBan->SetIP ( strIP );
             return pBan;
         }
     }
