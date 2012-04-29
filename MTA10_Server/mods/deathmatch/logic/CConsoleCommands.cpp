@@ -761,13 +761,13 @@ bool CConsoleCommands::Msg ( CConsole* pConsole, const char* szInArguments, CCli
     // If he isn't muted
     if ( pClient->GetClientType () != CClient::CLIENT_PLAYER || !static_cast < CPlayer* > ( pClient )->IsMuted () )
     {
-        // Strip any unwanted characters
-        COPY_CSTR_TO_TEMP_BUFFER( szArguments, szInArguments, 256 );
-        stripControlCodes ( szArguments );
-
         // Got a message?
-        if ( szArguments )
+        if ( szInArguments )
         {
+            // Strip any unwanted characters
+            COPY_CSTR_TO_TEMP_BUFFER( szArguments, szInArguments, 256 );
+            stripControlCodes ( szArguments );
+
             COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
             char* szPlayer = strtok ( szBuffer, " " );
