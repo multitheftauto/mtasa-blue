@@ -101,7 +101,7 @@ void CCrashHandler::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
                 ExInfo.ClientPointers = FALSE;
 
                 // Write the dump
-                pDump ( GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &ExInfo, NULL, NULL );
+                pDump ( GetCurrentProcess(), GetCurrentProcessId(), hFile, (MINIDUMP_TYPE)( MiniDumpNormal | MiniDumpWithIndirectlyReferencedMemory ), &ExInfo, NULL, NULL );
 
                 // Close the dumpfile
                 CloseHandle ( hFile );
