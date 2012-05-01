@@ -445,6 +445,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CCameraSpatialDatabase.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CClient.cpp"
 					>
 				</File>
@@ -1320,6 +1324,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\net\CSimKeysyncPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\net\CSimPlayerManager.cpp"
 						>
 					</File>
@@ -1703,6 +1711,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CBuildingRemovalManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CCameraSpatialDatabase.h"
 					>
 				</File>
 				<File
@@ -2582,6 +2594,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\net\CSimControl.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\net\CSimKeysyncPacket.h"
 						>
 					</File>
 					<File

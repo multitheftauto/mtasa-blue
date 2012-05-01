@@ -35,7 +35,8 @@ public:
                                                               ushort PlayerLatency,
                                                               uchar PlayerSyncTimeContext,
                                                               uchar PlayerGotWeaponType,
-                                                              float WeaponRange );
+                                                              float WeaponRange,
+                                                              CControllerState& sharedControllerState );
 
     ePacketID               GetPacketID                     ( void ) const                  { return PACKET_ID_PLAYER_PURESYNC; };
     unsigned long           GetFlags                        ( void ) const                  { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
@@ -60,12 +61,12 @@ public:
     const uchar     m_PlayerSyncTimeContext;
     const uchar     m_PlayerGotWeaponType;
     const float     m_WeaponRange;
+    CControllerState& m_sharedControllerState;
 
     // Set in Read ()
     struct
     {
         uchar           ucTimeContext;
-        CControllerState        ControllerState;
         SPlayerPuresyncFlags    flags;
         ElementID       ContactElementID;
         CVector         Position;

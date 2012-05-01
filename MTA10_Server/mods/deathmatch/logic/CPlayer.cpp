@@ -18,6 +18,8 @@
 
 extern CGame * g_pGame;
 
+#define MAX_KEYSYNC_DISTANCE 400.0f
+
 CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket ) : CPed ( NULL, NULL, NULL, 0 )
 {
     CElementRefManager::AddElementRefs ( ELEMENT_REF_DEBUG ( this, "CPlayer" ), &m_pTeam, NULL );
@@ -90,19 +92,14 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
     m_ucBlurLevel = 36; // Default
 
-    m_llNextFarSyncTime = 0;
-
     // Sync stuff
     m_bSyncingVelocity = false;
     m_uiPuresyncPackets = 0;
 
     m_uiWeaponIncorrectCount = 0;
 
-    m_llNearListUpdateTime = 0;
-
     // Add us to the manager
     pPlayerManager->AddToList ( this );
-    m_iLastZoneDebug = 0;
 
     // DO NOT DEFAULT THIS TO THE CURRENT TIME OR YOU WILL BREAK EVERYTHING.
     // THIS IS USED BY LIGHT SYNC AND SHOULD NOT BE CHANGED>>> EVER.
@@ -171,8 +168,8 @@ void CPlayer::DoPulse ( void )
     {
         m_pPlayerTextManager->Process ();
 
-        if ( GetTickCount64_ () > m_llNearListUpdateTime + 300 )
-            UpdateOthersNearList ();
+        if ( GetTickCount64_ () > m_llPuresyncNearListUpdateTime + 300 )
+            UpdateOthersPuresyncNearList ();
     }
 }
 
@@ -568,36 +565,36 @@ void CPlayer::RemoveNametagOverrideColor ( void )
 
 
 // Is it time to send a pure sync to every other player ?
-bool CPlayer::IsTimeForFarSync ( void )
+bool CPlayer::IsTimeForPuresyncFar ( void )
 {
     long long llTime = GetTickCount64_ ();
-    if ( llTime > m_llNextFarSyncTime )
+    if ( llTime > m_llNextFarPuresyncTime )
     {
         int iSlowSyncRate = g_pBandwidthSettings->ZoneUpdateIntervals [ ZONE3 ];
-        m_llNextFarSyncTime = llTime + iSlowSyncRate;
-        m_llNextFarSyncTime += rand () % ( 1 + iSlowSyncRate / 10 );   // Extra bit to help distribute the load
+        m_llNextFarPuresyncTime = llTime + iSlowSyncRate;
+        m_llNextFarPuresyncTime += rand () % ( 1 + iSlowSyncRate / 10 );   // Extra bit to help distribute the load
 
         // No far sync if light sync is enabled
         if ( g_pBandwidthSettings->bLightSyncEnabled )
         {
             // Add stats
             // Record all far sync bytes/packets that would have been sent/skipped as skipped
-            int iNumPackets = m_FarPlayerList.size ();
+            int iNumPackets = m_PuresyncFarPlayerList.size ();
             int iNumSkipped = ( iNumPackets * iSlowSyncRate - iNumPackets * 1000 ) / 1000;
             g_pStats->lightsync.llSyncPacketsSkipped += iNumPackets;
-            g_pStats->lightsync.llSyncBytesSkipped += iNumPackets * GetApproxPureSyncPacketSize ();
+            g_pStats->lightsync.llSyncBytesSkipped += iNumPackets * GetApproxPuresyncPacketSize ();
             g_pStats->lightsync.llSyncPacketsSkipped += iNumSkipped;
-            g_pStats->lightsync.llSyncBytesSkipped += iNumSkipped * GetApproxPureSyncPacketSize ();
+            g_pStats->lightsync.llSyncBytesSkipped += iNumSkipped * GetApproxPuresyncPacketSize ();
             return false;   // No far sync if light sync is enabled
         }
 
         // Add stats
-        int iNumPackets = m_FarPlayerList.size ();
+        int iNumPackets = m_PuresyncFarPlayerList.size ();
         int iNumSkipped = ( iNumPackets * iSlowSyncRate - iNumPackets * 1000 ) / 1000;
         g_pStats->puresync.llSentPacketsByZone [ ZONE3 ] += iNumPackets;
-        g_pStats->puresync.llSentBytesByZone [ ZONE3 ] += iNumPackets * GetApproxPureSyncPacketSize ();
+        g_pStats->puresync.llSentBytesByZone [ ZONE3 ] += iNumPackets * GetApproxPuresyncPacketSize ();
         g_pStats->puresync.llSkippedPacketsByZone [ ZONE3 ] += iNumSkipped;
-        g_pStats->puresync.llSkippedBytesByZone [ ZONE3 ] += iNumSkipped * GetApproxPureSyncPacketSize ();
+        g_pStats->puresync.llSkippedBytesByZone [ ZONE3 ] += iNumSkipped * GetApproxPuresyncPacketSize ();
         return true;
     }
     return false;
@@ -640,9 +637,9 @@ bool CPlayer::GetWeaponCorrect ( void )
 
 
 // Put this player in other players nearlist, if errm... the player is near, enough
-void CPlayer::UpdateOthersNearList ( void )
+void CPlayer::UpdateOthersPuresyncNearList ( void )
 {
-    m_llNearListUpdateTime = GetTickCount64_ ();
+    m_llPuresyncNearListUpdateTime = GetTickCount64_ ();
 
     // If testing, put into every other players near list
     if ( g_pBandwidthSettings->bTestPretendEveryoneIsNear )
@@ -653,7 +650,7 @@ void CPlayer::UpdateOthersNearList ( void )
             CPlayer* pOtherPlayer = *iter;
             if ( pOtherPlayer != this && m_usDimension == pOtherPlayer->GetDimension () )
             {
-                pOtherPlayer->RefreshNearPlayer ( this );
+                pOtherPlayer->RefreshPuresyncNearPlayer ( this );
             }
         }
         return;
@@ -727,15 +724,64 @@ void CPlayer::UpdateOthersNearList ( void )
                     // Check dimension matches
                     if ( m_usDimension == pOtherPlayer->GetDimension () )
                     {
-                        pOtherPlayer->RefreshNearPlayer ( this );
+                        pOtherPlayer->RefreshPuresyncNearPlayer ( this );
 
                         // Lightsync needs it the other way round (for spectating)
                         if ( g_pBandwidthSettings->bLightSyncEnabled )
-                            this->RefreshNearPlayer ( pOtherPlayer );
+                            this->RefreshPuresyncNearPlayer ( pOtherPlayer );
                     }
                 }
             }
         }
+    }
+}
+
+
+// Update m_KeysyncNearPlayerList with players who are close enough, or who have a camera which is close enough
+void CPlayer::UpdateKeysyncNearList ( void )
+{
+    const CVector& vecPlayerPosition = GetPosition ();
+
+    // Add nearby players
+    CElementResult resultNearByPlayers;
+    GetSpatialDatabase()->SphereQuery ( resultNearByPlayers, CSphere ( vecPlayerPosition, MAX_KEYSYNC_DISTANCE ) );
+
+    for ( CElementResult::const_iterator it = resultNearByPlayers.begin () ; it != resultNearByPlayers.end (); ++it )
+    {
+        if ( (*it)->GetType () == CElement::PLAYER )
+        {
+            CPlayer* pOtherPlayer = (CPlayer*)*it;
+            if ( pOtherPlayer != this )
+            {
+                const CVector& vecOtherPlayerPos = pOtherPlayer->GetPosition ();
+                if ( ( vecPlayerPosition - vecOtherPlayerPos ).LengthSquared () < MAX_KEYSYNC_DISTANCE * MAX_KEYSYNC_DISTANCE )
+                    MapGet ( m_KeysyncNearPlayerList, pOtherPlayer ).iCount = 1;
+            }
+        }
+    }
+
+    // Add from nearby cameras
+    CCameraQueryResult resultNearByCameras;
+    GetCameraSpatialDatabase()->SphereQuery ( resultNearByCameras, CSphere ( vecPlayerPosition, MAX_KEYSYNC_DISTANCE ) );
+
+    for ( CCameraQueryResult::const_iterator it = resultNearByCameras.begin () ; it != resultNearByCameras.end (); ++it )
+    {
+        CPlayerCamera* pOtherCamera = *it;
+        if ( pOtherCamera->GetPlayer () != this )
+        {
+            const CVector& vecOtherCameraPos = pOtherCamera->GetPosition ();
+            if ( ( vecPlayerPosition - vecOtherCameraPos ).LengthSquared () < MAX_KEYSYNC_DISTANCE * MAX_KEYSYNC_DISTANCE )
+                MapGet ( m_KeysyncNearPlayerList, pOtherCamera->GetPlayer () ).iCount = 1;
+        }
+    }
+
+    // Remove old players 
+    for ( std::map < CPlayer*, SKeysyncNearInfo > ::iterator it = m_KeysyncNearPlayerList.begin (); it != m_KeysyncNearPlayerList.end (); )
+    {
+        if ( it->second.iCount-- < 1 )
+            m_KeysyncNearPlayerList.erase ( it++ );
+        else
+            ++it;
     }
 }
 
@@ -811,67 +857,79 @@ void CPlayer::SetCameraOrientation ( const CVector& vecPosition, const CVector& 
 //
 // Ensure other player stays in the near list
 //
-void CPlayer::RefreshNearPlayer ( CPlayer* pOther )
+void CPlayer::RefreshPuresyncNearPlayer ( CPlayer* pOther )
 {
-    SNearInfo* pInfo = MapFind ( m_NearPlayerList, pOther );
+    SPuresyncNearInfo* pInfo = MapFind ( m_PuresyncNearPlayerList, pOther );
     if ( !pInfo )
     {
         // Move from far list
-        MovePlayerToNearList ( pOther );
-        pInfo = MapFind ( m_NearPlayerList, pOther );
+        MovePlayerToPuresyncNearList ( pOther );
+        pInfo = MapFind ( m_PuresyncNearPlayerList, pOther );
     }
     pInfo->iCount = 5;
 }
 
 
-void CPlayer::AddPlayerToDistLists ( CPlayer* pOther )
+void CPlayer::AddPlayerToPuresyncDistLists ( CPlayer* pOther )
 {
-    dassert ( !MapContains ( m_NearPlayerList, pOther ) && !MapContains ( m_FarPlayerList, pOther ) );
-    SNearInfo info = { 0, 0 };
-    MapSet ( m_NearPlayerList, pOther, info );
+    dassert ( !MapContains ( m_PuresyncNearPlayerList, pOther ) && !MapContains ( m_PuresyncFarPlayerList, pOther ) );
+    SPuresyncNearInfo info = { 0, 0 };
+    MapSet ( m_PuresyncNearPlayerList, pOther, info );
 }
 
-void CPlayer::RemovePlayerFromDistLists ( CPlayer* pOther )
+void CPlayer::RemovePlayerFromPuresyncDistLists ( CPlayer* pOther )
 {
-    dassert ( MapContains ( m_NearPlayerList, pOther ) || MapContains ( m_FarPlayerList, pOther ) );
-    MapRemove ( m_NearPlayerList, pOther );
-    MapRemove ( m_FarPlayerList, pOther );
+    dassert ( MapContains ( m_PuresyncNearPlayerList, pOther ) || MapContains ( m_PuresyncFarPlayerList, pOther ) );
+    MapRemove ( m_PuresyncNearPlayerList, pOther );
+    MapRemove ( m_PuresyncFarPlayerList, pOther );
 }
 
-void CPlayer::MovePlayerToNearList ( CPlayer* pOther )
+void CPlayer::MovePlayerToPuresyncNearList ( CPlayer* pOther )
 {
-    dassert ( !MapContains ( m_NearPlayerList, pOther ) && MapContains ( m_FarPlayerList, pOther ) );
-    SNearInfo* pInfo = MapFind ( m_FarPlayerList, pOther );
-    MapSet ( m_NearPlayerList, pOther, *pInfo );
-    MapRemove ( m_FarPlayerList, pOther );
+    dassert ( !MapContains ( m_PuresyncNearPlayerList, pOther ) && MapContains ( m_PuresyncFarPlayerList, pOther ) );
+    SPuresyncNearInfo* pInfo = MapFind ( m_PuresyncFarPlayerList, pOther );
+    MapSet ( m_PuresyncNearPlayerList, pOther, *pInfo );
+    MapRemove ( m_PuresyncFarPlayerList, pOther );
 }
 
-void CPlayer::MovePlayerToFarList ( CPlayer* pOther )
+void CPlayer::MovePlayerToPuresyncFarList ( CPlayer* pOther )
 {
-    dassert ( MapContains ( m_NearPlayerList, pOther ) && !MapContains ( m_FarPlayerList, pOther ) );
-    SNearInfo* pInfo = MapFind ( m_NearPlayerList, pOther );
-    MapSet ( m_FarPlayerList, pOther, *pInfo );
-    MapRemove ( m_NearPlayerList, pOther );
+    dassert ( MapContains ( m_PuresyncNearPlayerList, pOther ) && !MapContains ( m_PuresyncFarPlayerList, pOther ) );
+    SPuresyncNearInfo* pInfo = MapFind ( m_PuresyncNearPlayerList, pOther );
+    MapSet ( m_PuresyncFarPlayerList, pOther, *pInfo );
+    MapRemove ( m_PuresyncNearPlayerList, pOther );
+}
+
+
+void CPlayer::AddPlayerToKeysyncDistLists ( CPlayer* pOther )
+{
+    dassert ( !MapContains ( m_KeysyncNearPlayerList, pOther ) );
+    MapSet ( m_KeysyncNearPlayerList, pOther, SKeysyncNearInfo () );
+}
+
+void CPlayer::RemovePlayerFromKeysyncDistLists ( CPlayer* pOther )
+{
+    MapRemove ( m_KeysyncNearPlayerList, pOther );
 }
 
 
 //
 // Dynamically increase the interval between near sync updates depending on stuffs
 //
-bool CPlayer::IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo )
+bool CPlayer::IsTimeToReceivePuresyncNearFrom ( CPlayer* pOther, SPuresyncNearInfo& nearInfo )
 {
     // Get correct camera position when dead
     if ( m_bIsDead )
         GetCamera ()->GetPosition ( m_vecCamPosition );
 
-    int iZone = GetSyncZone ( pOther );
+    int iZone = GetPuresyncZone ( pOther );
     nearInfo.iPrevZone = nearInfo.iZone;
     nearInfo.iZone = iZone;
 
     int iUpdateInterval = g_pBandwidthSettings->ZoneUpdateIntervals [ iZone ];
 
 #if MTA_DEBUG
-    if ( m_iLastZoneDebug != iZone )
+    if ( m_iLastPuresyncZoneDebug != iZone )
     {
         // Calc direction from our camera to the other player
         const CVector& vecOtherPosition = pOther->GetPosition ();
@@ -889,7 +947,7 @@ bool CPlayer::IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo
                 ,fDot
                 ,pOther->GetNick ()
                 ,GetNick ()
-                ,m_iLastZoneDebug
+                ,m_iLastPuresyncZoneDebug
                 ,iZone
                 ,iUpdateInterval
                 ,m_vecCamPosition.fX
@@ -900,7 +958,7 @@ bool CPlayer::IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo
                 ,m_vecCamFwd.fZ
             ) );
 
-        m_iLastZoneDebug = iZone;
+        m_iLastPuresyncZoneDebug = iZone;
     }
 #endif
 
@@ -910,14 +968,14 @@ bool CPlayer::IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo
     if ( llNextUpdateTime > llTimeNow )
     {
         g_pStats->puresync.llSkippedPacketsByZone[ iZone ]++;
-        g_pStats->puresync.llSkippedBytesByZone[ iZone ] += GetApproxPureSyncPacketSize ();
+        g_pStats->puresync.llSkippedBytesByZone[ iZone ] += GetApproxPuresyncPacketSize ();
         return false;
     }
 
     nearInfo.llLastUpdateTime = llTimeNow;
 
     g_pStats->puresync.llSentPacketsByZone[ iZone ]++;
-    g_pStats->puresync.llSentBytesByZone[ iZone ] += GetApproxPureSyncPacketSize ();
+    g_pStats->puresync.llSentBytesByZone[ iZone ] += GetApproxPuresyncPacketSize ();
     return true;
 }
 
@@ -925,7 +983,7 @@ bool CPlayer::IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo
 //
 // Get the size pure sync packet will be for stats only
 //
-int CPlayer::GetApproxPureSyncPacketSize ( void )
+int CPlayer::GetApproxPuresyncPacketSize ( void )
 {
     // vehicle passenger=15/driver=52, ped with weapon=34/no weapon=30
     return m_pVehicle ? ( m_uiVehicleSeat ? 15 : 52 ) : ( m_ucWeaponSlot ? 34 : 30 );
@@ -935,7 +993,7 @@ int CPlayer::GetApproxPureSyncPacketSize ( void )
 //
 // Deduce what zone the other player is in
 //
-int CPlayer::GetSyncZone ( CPlayer* pOther )
+int CPlayer::GetPuresyncZone ( CPlayer* pOther )
 {
     int iZone = 0;
 

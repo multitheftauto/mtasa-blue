@@ -44,13 +44,21 @@ enum eVoiceState
     VOICESTATE_TRANSMITTING,
 };
 
-struct SNearInfo
+struct SPuresyncNearInfo
 {
     int iCount;
     int iPrevZone;
     int iZone;
     long long llLastUpdateTime;
 };
+
+struct SKeysyncNearInfo
+{
+    SKeysyncNearInfo ( void ) : bPrevIsNear ( false ), iCount ( 0 ) {}
+    bool bPrevIsNear;
+    int iCount;
+};
+
 
 struct SScreenShotInfo
 {
@@ -225,7 +233,7 @@ public:
     inline unsigned char                        GetBlurLevel                ( void )                        { return m_ucBlurLevel; }
     inline void                                 SetBlurLevel                ( unsigned char ucBlurLevel )   { m_ucBlurLevel = ucBlurLevel; }
 
-    bool                                        IsTimeForFarSync            ( void );
+    bool                                        IsTimeForPuresyncFar        ( void );
 
     // Sync stuff
     inline void                                 SetSyncingVelocity          ( bool bSyncing )               { m_bSyncingVelocity = bSyncing; }
@@ -243,14 +251,19 @@ public:
     void                                        SetWeaponCorrect            ( bool bWeaponCorrect );
     bool                                        GetWeaponCorrect            ( void );
 
-    void                                        UpdateOthersNearList        ( void );
-    void                                        RefreshNearPlayer           ( CPlayer* pOther );
-    std::map < CPlayer*, SNearInfo >&           GetNearPlayerList           ( void )                        { return m_NearPlayerList; }
-    std::map < CPlayer*, SNearInfo >&           GetFarPlayerList            ( void )                        { return m_FarPlayerList; }
-    void                                        AddPlayerToDistLists        ( CPlayer* pOther );
-    void                                        RemovePlayerFromDistLists   ( CPlayer* pOther );
-    void                                        MovePlayerToNearList        ( CPlayer* pOther );
-    void                                        MovePlayerToFarList         ( CPlayer* pOther );
+    void                                        UpdateOthersPuresyncNearList        ( void );
+    void                                        RefreshPuresyncNearPlayer           ( CPlayer* pOther );
+    std::map < CPlayer*, SPuresyncNearInfo >&   GetPuresyncNearPlayerList           ( void )                        { return m_PuresyncNearPlayerList; }
+    std::map < CPlayer*, SPuresyncNearInfo >&   GetPuresyncFarPlayerList            ( void )                        { return m_PuresyncFarPlayerList; }
+    void                                        AddPlayerToPuresyncDistLists        ( CPlayer* pOther );
+    void                                        RemovePlayerFromPuresyncDistLists   ( CPlayer* pOther );
+    void                                        MovePlayerToPuresyncNearList        ( CPlayer* pOther );
+    void                                        MovePlayerToPuresyncFarList         ( CPlayer* pOther );
+
+    void                                        UpdateKeysyncNearList               ( void );
+    std::map < CPlayer*, SKeysyncNearInfo >&    GetKeysyncNearPlayerList            ( void )                        { return m_KeysyncNearPlayerList; }
+    void                                        AddPlayerToKeysyncDistLists         ( CPlayer* pOther );
+    void                                        RemovePlayerFromKeysyncDistLists    ( CPlayer* pOther );
 
     SScreenShotInfo&                            GetScreenShotInfo           ( void )                        { return m_ScreenShotInfo; }
 
@@ -316,9 +329,9 @@ public:
     bool                                        IsPlayerIgnoringElement     ( CElement* pElement );
 
     void                                        SetCameraOrientation        ( const CVector& vecPosition, const CVector& vecFwd );
-    bool                                        IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo );
-    int                                         GetSyncZone                 ( CPlayer* pOther );
-    int                                         GetApproxPureSyncPacketSize ( void );
+    bool                                        IsTimeToReceivePuresyncNearFrom ( CPlayer* pOther, SPuresyncNearInfo& nearInfo );
+    int                                         GetPuresyncZone                 ( CPlayer* pOther );
+    int                                         GetApproxPuresyncPacketSize ( void );
     const CVector&                              GetCamPosition              ( void )            { return m_vecCamPosition; };
     const CVector&                              GetCamFwd                   ( void )            { return m_vecCamFwd; };
 
@@ -403,7 +416,7 @@ private:
 
     unsigned char                               m_ucBlurLevel;
 
-    long long                                   m_llNextFarSyncTime;       
+    long long                                   m_llNextFarPuresyncTime;       
 
     // Voice
     eVoiceState                                 m_VoiceState;
@@ -420,13 +433,15 @@ private:
 
     uint                                        m_uiWeaponIncorrectCount;
 
-    std::map < CPlayer*, SNearInfo >            m_NearPlayerList;
-    std::map < CPlayer*, SNearInfo >            m_FarPlayerList;
-    long long                                   m_llNearListUpdateTime;
+    std::map < CPlayer*, SPuresyncNearInfo >    m_PuresyncNearPlayerList;
+    std::map < CPlayer*, SPuresyncNearInfo >    m_PuresyncFarPlayerList;
+    long long                                   m_llPuresyncNearListUpdateTime;
+
+    std::map < CPlayer*, SKeysyncNearInfo >     m_KeysyncNearPlayerList;
 
     CVector                                     m_vecCamPosition;
     CVector                                     m_vecCamFwd;
-    int                                         m_iLastZoneDebug;
+    int                                         m_iLastPuresyncZoneDebug;
 
     long long                                   m_llLastPositionHasChanged;
     SString                                     m_strIP;

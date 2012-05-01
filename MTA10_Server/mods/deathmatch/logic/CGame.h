@@ -357,6 +357,7 @@ public:
 private:
     void                        AddBuiltInEvents            ( void );
     void                        RelayPlayerPuresync         ( class CPacket& Packet );
+    void                        RelayKeysync                ( class CPacket& Packet );
 
     void                        ProcessTrafficLights        ( unsigned long ulCurrentTime );
 
