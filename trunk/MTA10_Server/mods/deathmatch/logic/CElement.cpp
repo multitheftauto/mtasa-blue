@@ -99,7 +99,7 @@ CElement::~CElement ( void )
     list < CPlayerCamera* > ::const_iterator iterFollowingCameras = m_FollowingCameras.begin ();
     for ( ; iterFollowingCameras != m_FollowingCameras.end (); iterFollowingCameras++ )
     {
-        (*iterFollowingCameras)->m_pTarget = NULL;
+        (*iterFollowingCameras)->SetTarget ( NULL );
     }
 
     if ( m_pAttachedTo )

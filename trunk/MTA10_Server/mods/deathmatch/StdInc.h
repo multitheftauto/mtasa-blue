@@ -167,6 +167,7 @@ struct SAclRequest;
 #include "CBlendedWeather.h"
 #include "CBlip.h"
 #include "CBlipManager.h"
+#include "CCameraSpatialDatabase.h"
 #include "CClient.h"
 #include "CClock.h"
 #include "CColCallback.h"

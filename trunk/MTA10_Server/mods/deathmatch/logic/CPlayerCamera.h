@@ -27,15 +27,14 @@ enum eCameraMode
 
 class CPlayerCamera
 {    
-    friend class CElement;
 public:
                             CPlayerCamera           ( CPlayer * pPlayer );
+                            ~CPlayerCamera          ( void );
 
-    inline eCameraMode      GetMode                 ( void ) const                  { return m_Mode; }
-    inline void             SetMode                 ( eCameraMode Mode )            { m_Mode = Mode; }
-    static void             GetMode                 ( eCameraMode Mode, char* szBuffer, size_t sizeBuffer );
-    static eCameraMode      GetMode                 ( const char * szMode );
+    eCameraMode             GetMode                 ( void ) const                  { return m_Mode; }
+    void                    SetMode                 ( eCameraMode Mode );
 
+    const CVector&          GetPosition             ( void ) const;
     void                    GetPosition             ( CVector& vecPosition ) const;
     void                    SetPosition             ( const CVector& vecPosition );
     
@@ -54,8 +53,10 @@ public:
 
     void                    SetRotation             ( CVector & vecRotation );
 
-    inline unsigned char    GetInterior             ( void ) const                  { return m_ucInterior; }
-    inline void             SetInterior             ( unsigned char ucInterior )    { m_ucInterior = ucInterior; }
+    unsigned char           GetInterior             ( void ) const                  { return m_ucInterior; }
+    void                    SetInterior             ( unsigned char ucInterior )    { m_ucInterior = ucInterior; }
+
+    CPlayer*                GetPlayer               ( void ) const                  { return m_pPlayer; }
 
 private:
     CPlayer *               m_pPlayer;
