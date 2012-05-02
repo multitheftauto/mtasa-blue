@@ -63,7 +63,7 @@ bool CSimKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
         return false;
 
     // If he's shooting or aiming
-    if ( m_sharedControllerState.ButtonCircle || m_sharedControllerState.RightShoulder1 )
+    if ( m_sharedControllerState.ButtonCircle || ( m_sharedControllerState.RightShoulder1 && BitStream.Version () >= 0x2C ) )
     {
         bool bHasWeapon = BitStream.ReadBit ();
 
@@ -187,7 +187,7 @@ bool CSimKeysyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     BitStream.Write ( &m_Cache.flags );
 
     // If he's shooting or aiming
-    if ( m_sharedControllerState.ButtonCircle || m_sharedControllerState.RightShoulder1 )
+    if ( m_sharedControllerState.ButtonCircle || ( m_sharedControllerState.RightShoulder1 && BitStream.Version () >= 0x2C ) )
     {
         // Write his current weapon slot
         unsigned int uiSlot = m_Cache.ucWeaponSlot;   // check m_Cache.bWeaponCorrect ! 
