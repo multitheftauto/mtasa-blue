@@ -60,7 +60,7 @@ bool CKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
         pSourcePlayer->SetChoking ( flags.data.bIsChoking );
 
         // If he's shooting or aiming
-        if ( ControllerState.ButtonCircle || ControllerState.RightShoulder1 )
+        if ( ControllerState.ButtonCircle || ( ControllerState.RightShoulder1 && BitStream.Version () >= 0x2C ) )
         {
             bool bHasWeapon = BitStream.ReadBit ();
 
@@ -213,7 +213,7 @@ bool CKeysyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.Write ( &flags );
 
         // If he's shooting or aiming
-        if ( ControllerState.ButtonCircle || ControllerState.RightShoulder1 )
+        if ( ControllerState.ButtonCircle || ( ControllerState.RightShoulder1 && BitStream.Version () >= 0x2C ) )
         {
             // Write his current weapon slot
             unsigned int uiSlot = pSourcePlayer->GetWeaponSlot ();
