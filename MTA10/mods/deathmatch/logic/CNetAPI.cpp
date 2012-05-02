@@ -480,6 +480,9 @@ bool CNetAPI::IsSmallKeySyncNeeded ( CClientPed* pPlayerModel )
             ControllerState.m_bPedWalk != LastControllerState.m_bPedWalk )
         return true;
 
+    if ( g_pNet->GetServerBitStreamVersion () < 0x2C )
+        return false;
+
     // Movement direction buttons change ?
     short LeftStickXDelta = abs ( ControllerState.LeftStickX - LastControllerState.LeftStickX );
     short LeftStickYDelta = abs ( ControllerState.LeftStickY - LastControllerState.LeftStickY );
@@ -643,7 +646,7 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
     CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
 
     // If he's shooting or aiming
-    if ( ControllerState.ButtonCircle || ControllerState.RightShoulder1 )
+    if ( ControllerState.ButtonCircle || ( ControllerState.RightShoulder1 && BitStream.Version () >= 0x2C ) )
     {
         // Read out his current weapon slot
         SWeaponSlotSync slot;
@@ -818,7 +821,7 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
     BitStream.Write ( &flags );
 
     // Are we shooting or aiming ?
-    if ( ControllerState.ButtonCircle || ControllerState.RightShoulder1 )
+    if ( ControllerState.ButtonCircle || ( ControllerState.RightShoulder1 && BitStream.Version () >= 0x2C ) )
     {
         // Grab the current weapon
         CWeapon * pPlayerWeapon = pPlayerModel->GetWeapon ();
