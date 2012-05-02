@@ -63,6 +63,7 @@ public:
     DECLARE_RPC ( RemoveWorldModel );
     DECLARE_RPC ( RestoreWorldModel );
     DECLARE_RPC ( RestoreAllWorldModels );
+    DECLARE_RPC ( SetSyncIntervals );
 };
 
 #endif

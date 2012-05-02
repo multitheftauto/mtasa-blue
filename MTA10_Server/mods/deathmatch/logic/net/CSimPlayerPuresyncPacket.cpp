@@ -97,8 +97,10 @@ bool CSimPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
     m_Cache.fArmor = armor.data.fValue;
 
     // Read out the camera rotation
-    if ( !BitStream.Read ( m_Cache.fCameraRotation ) )
+    SCameraRotationSync camRotation;
+    if ( !BitStream.Read ( &camRotation ) )
         return false;
+    m_Cache.fCameraRotation = camRotation.data.fRotation;
 
     // Read the camera orientation
     ReadCameraOrientation ( position.data.vecPosition, BitStream, m_Cache.vecCamPosition, m_Cache.vecCamFwd );
@@ -228,7 +230,9 @@ bool CSimPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     armor.data.fValue = m_Cache.fArmor;
     BitStream.Write ( &armor );
 
-    BitStream.Write ( m_Cache.fCameraRotation );
+    SCameraRotationSync camRotation;
+    camRotation.data.fRotation = m_Cache.fCameraRotation;
+    BitStream.Write ( &camRotation );
 
     if ( m_Cache.flags.data.bHasAWeapon )
     {

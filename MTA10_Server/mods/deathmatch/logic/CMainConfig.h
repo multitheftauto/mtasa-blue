@@ -30,6 +30,21 @@ class CMainConfig;
 
 #define MAX_MAP_NAME_LENGTH 64
 
+typedef void (*PFN_SettingChangeCallback) ( void );
+
+struct SIntSetting
+{
+    bool        bSettable;
+    bool        bSavable;
+    int         iMin;
+    int         iDefault;
+    int         iMax;
+    const char* szName;
+    int*        pVariable;
+    PFN_SettingChangeCallback changeCallback;
+};
+
+
 class CMainConfig: public CXMLConfig
 {
 public:
@@ -111,7 +126,8 @@ public:
     void                            SetTweakValue                   ( int iWhich, float fAmount );
     const SNetOptions&              GetNetOptions                   ( void )                    { return m_NetOptions; }
 
-    int                             GetLightSyncRate                ( void )                    { return m_iLightSyncRate; }
+    const std::vector < SIntSetting >& GetIntSettingList            ( void );
+    static void                     OnTickRateChange                ( void );
 
 private:
     void                            RegisterCommand                 ( const char* szName, FCommandHandler* pFunction, bool bRestricted );
@@ -175,7 +191,6 @@ private:
     std::map < SString, SString >   m_TransientSettings;
     SNetOptions                     m_NetOptions;
     int                             m_iNetReliabilityMode;
-    int                             m_iLightSyncRate;
 };
 
 #endif

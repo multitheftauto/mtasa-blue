@@ -192,6 +192,13 @@ namespace SharedUtil
         return static_cast < int > ( std::floor ( value + 0.5f ) );
     }
 
+    template < class T >
+    T WrapAround ( T fLow, T fValue, T fHigh )
+    {
+        const T fSize = fHigh - fLow;
+        return fValue - ( fSize * std::floor ( ( fValue - fLow ) / fSize ) );
+    }
+
 
     //
     // Evaluate a function that is described by a set of points

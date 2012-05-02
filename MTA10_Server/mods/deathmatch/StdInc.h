@@ -257,6 +257,7 @@ struct SAclRequest;
 #include "CTeamManager.h"
 #include "CTextDisplay.h"
 #include "CTextItem.h"
+#include "CTickRateSettings.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "CVehicle.h"
 #include "CVehicleColorManager.h"
