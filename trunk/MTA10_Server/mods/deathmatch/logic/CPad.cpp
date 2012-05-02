@@ -13,7 +13,7 @@
 
 #include "StdInc.h"
 
-SGTAControl g_gtaControls[] =
+static const SGTAControl g_gtaControls[] =
 {
     { "fire",                   FIRE,                   CONTROL_FOOT },
     { "next_weapon",            NEXT_WEAPON,            CONTROL_FOOT },
@@ -87,7 +87,6 @@ void CPad::SetCurrentControllerState ( const CControllerState& State )
 
 void CPad::NewControllerState ( const CControllerState& State )
 {
-    SetLastControllerState ( m_csCurrentState );
     SetCurrentControllerState ( State );
 }
 
@@ -161,7 +160,7 @@ bool CPad::GetControlState ( const char* szControl, bool& bState )
 {
     for ( int i = 0 ; *g_gtaControls [ i ].szControl != '\0' ; i++ )
     {
-        SGTAControl* temp = &g_gtaControls [ i ];
+        const SGTAControl* temp = &g_gtaControls [ i ];
         if ( stricmp ( temp->szControl, szControl ) == 0 )
         {
             if ( !m_bUpdatedKeys )
@@ -183,7 +182,7 @@ bool CPad::SetControlState ( const char* szControl, bool bState )
 {
     for ( int i = 0 ; *g_gtaControls [ i ].szControl != '\0' ; i++ )
     {
-        SGTAControl* temp = &g_gtaControls [ i ];
+        const SGTAControl* temp = &g_gtaControls [ i ];
         if ( stricmp ( temp->szControl, szControl ) == 0 )
         {
             m_ControlStates [ i ].bState = bState;
@@ -199,7 +198,7 @@ bool CPad::IsControlEnabled ( const char* szControl, bool& bEnabled )
 {
     for ( int i = 0 ; *g_gtaControls [ i ].szControl != '\0' ; i++ )
     {
-        SGTAControl* temp = &g_gtaControls [ i ];
+        const SGTAControl* temp = &g_gtaControls [ i ];
         if ( stricmp ( temp->szControl, szControl ) == 0 )
         {
             bEnabled = m_ControlStates [ i ].bEnabled;
@@ -215,7 +214,7 @@ bool CPad::SetControlEnabled ( const char* szControl, bool bEnabled )
 {
     for ( int i = 0 ; *g_gtaControls [ i ].szControl != '\0' ; i++ )
     {
-        SGTAControl* temp = &g_gtaControls [ i ];
+        const SGTAControl* temp = &g_gtaControls [ i ];
         if ( stricmp ( temp->szControl, szControl ) == 0 )
         {
             m_ControlStates [ i ].bEnabled = bEnabled;
@@ -236,11 +235,11 @@ void CPad::SetAllControlsEnabled ( bool bEnabled )
 }
 
 
-SGTAControl* CPad::GetControlFromString ( const char* szControl )
+const SGTAControl* CPad::GetControlFromString ( const char* szControl )
 {
     for ( int i = 0 ; *g_gtaControls [ i ].szControl != '\0' ; i++ )
     {
-        SGTAControl* temp = &g_gtaControls [ i ];
+        const SGTAControl* temp = &g_gtaControls [ i ];
         if ( stricmp ( temp->szControl, szControl ) == 0 )
             return temp;
     }

@@ -117,12 +117,13 @@ struct SIntegerSync : public ISyncStructure
 //////////////////////////////////////////
 struct SFloatAsBitsSyncBase : public ISyncStructure
 {
-    SFloatAsBitsSyncBase ( uint uiBits, float fMin, float fMax, bool bPreserveGreaterThanMin )
+    SFloatAsBitsSyncBase ( uint uiBits, float fMin, float fMax, bool bPreserveGreaterThanMin, bool bWrapInsteadOfClamp = false )
         : m_uiBits ( uiBits )
         , ulValueMax ( ( 1 << uiBits ) - 1 )
         , m_fMin ( fMin )
         , m_fMax ( fMax )
         , m_bPreserveGreaterThanMin ( bPreserveGreaterThanMin )
+        , m_bWrapInsteadOfClamp ( bWrapInsteadOfClamp )
     {
     }
 
@@ -142,8 +143,11 @@ struct SFloatAsBitsSyncBase : public ISyncStructure
 
     void Write ( NetBitStreamInterface& bitStream ) const
     {
+        float fValue = data.fValue;
+        if ( m_bWrapInsteadOfClamp )
+            fValue = WrapAround ( m_fMin, data.fValue, m_fMax );
         // Find position in range
-        float fAlpha = UnlerpClamped ( m_fMin, data.fValue, m_fMax );
+        float fAlpha = UnlerpClamped ( m_fMin, fValue, m_fMax );
         // Convert to bits
         unsigned long ulValue = Round ( ulValueMax * fAlpha );
 
@@ -165,14 +169,15 @@ private:
     const float m_fMin;
     const float m_fMax;
     const bool  m_bPreserveGreaterThanMin;
+    const bool  m_bWrapInsteadOfClamp;
 };
 
 // Template version
 template < unsigned int bits >
 struct SFloatAsBitsSync : public SFloatAsBitsSyncBase
 {
-    SFloatAsBitsSync ( float fMin, float fMax, bool bPreserveGreaterThanMin )
-        : SFloatAsBitsSyncBase ( bits, fMin, fMax, bPreserveGreaterThanMin )
+    SFloatAsBitsSync ( float fMin, float fMax, bool bPreserveGreaterThanMin, bool bWrapInsteadOfClamp = false )
+        : SFloatAsBitsSyncBase ( bits, fMin, fMax, bPreserveGreaterThanMin, bWrapInsteadOfClamp )
     {
     }
 };
@@ -611,6 +616,71 @@ struct SPedRotationSync : public ISyncStructure
 };
 
 
+struct SCameraRotationSync : public ISyncStructure
+{
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        if ( bitStream.Version () < 0x2C )
+            return bitStream.Read ( data.fRotation );
+
+        SFloatAsBitsSync < 12 > rotation ( -PI, PI, false, true );
+        if ( bitStream.Read ( &rotation ) )
+        {
+            data.fRotation = rotation.data.fValue;
+            return true;
+        }
+        return false;
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        if ( bitStream.Version () < 0x2C )
+            return bitStream.Write ( data.fRotation );
+
+        SFloatAsBitsSync < 12 > rotation ( -PI, PI, false, true );
+        rotation.data.fValue = data.fRotation;
+        bitStream.Write ( &rotation );
+    }
+
+    struct
+    {
+        float fRotation;
+    } data;
+};
+
+
+struct SKeysyncRotation : public ISyncStructure
+{
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        SFloatAsBitsSync < 12 > plrRotation ( -PI, PI, false, true );
+        SFloatAsBitsSync < 12 > camRotation ( -PI, PI, false, true );
+        if ( bitStream.Read ( &plrRotation ) &&
+             bitStream.Read ( &camRotation ) )
+        {
+            data.fPlayerRotation = plrRotation.data.fValue;
+            data.fCameraRotation = camRotation.data.fValue;
+            return true;
+        }
+        return false;
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        SFloatAsBitsSync < 12 > plrRotation ( -PI, PI, false, true );
+        SFloatAsBitsSync < 12 > camRotation ( -PI, PI, false, true );
+        plrRotation.data.fValue = data.fPlayerRotation;
+        camRotation.data.fValue = data.fCameraRotation;
+        bitStream.Write ( &plrRotation );
+        bitStream.Write ( &camRotation );
+    }
+
+    struct
+    {
+        float fPlayerRotation;
+        float fCameraRotation;
+    } data;
+};
+
+
 
 //////////////////////////////////////////
 //                                      //
@@ -890,11 +960,35 @@ struct SSmallKeysyncSync : public ISyncStructure
     // one byte of bandwidth per stick.
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        return bitStream.ReadBits ( (char *)&data, 8 );
+        bool bState;
+        char cLeftStickX;
+        char cLeftStickY;
+
+        if ( ( bState = bitStream.ReadBits ( (char *)&data, 8 ) ) )
+        {
+            if ( bitStream.Version () >= 0x2C )
+            {
+                if ( ( bState = bitStream.Read ( cLeftStickX ) ) )
+                {
+                    data.sLeftStickX = static_cast < short > ( (float)cLeftStickX * 128.0f/127.0f );
+                    if ( ( bState = bitStream.Read ( cLeftStickY ) ) )
+                        data.sLeftStickY = static_cast < short > ( (float)cLeftStickY * 128.0f/127.0f );
+                }
+            }
+        }
+
+        return bState;
     }
     void Write ( NetBitStreamInterface& bitStream ) const
     {
         bitStream.WriteBits ( (const char* )&data, 8 );
+        if ( bitStream.Version () >= 0x2C )
+        {
+            char cLeftStickX = static_cast < char > ( (float)data.sLeftStickX * 127.0f/128.0f );
+            bitStream.Write ( cLeftStickX );
+            char cLeftStickY = static_cast < char > ( (float)data.sLeftStickY * 127.0f/128.0f );
+            bitStream.Write ( cLeftStickY );
+        }
     }
 
     struct
@@ -907,6 +1001,8 @@ struct SSmallKeysyncSync : public ISyncStructure
         bool bButtonTriangle : 1;
         bool bShockButtonL : 1;
         bool bPedWalk : 1;
+        short sLeftStickX;
+        short sLeftStickY;
     } data;
 };
 

@@ -553,7 +553,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     SString strBandwidthSaving = m_pMainConfig->GetSetting ( "bandwidth_reduction" );
     strBandwidthSaving = strBandwidthSaving.Left ( 1 ).ToUpper () + strBandwidthSaving.SubStr ( 1 );
     if ( g_pBandwidthSettings->bLightSyncEnabled )
-        strBandwidthSaving += SString ( " with lightweight sync rate of %dms", m_pMainConfig->GetLightSyncRate () );
+        strBandwidthSaving += SString ( " with lightweight sync rate of %dms", g_TickRateSettings.iLightSync );
 
     // Show the server header
     CLogger::LogPrintfNoStamp ( "==================================================================\n" \
@@ -1180,6 +1180,9 @@ void CGame::InitialDataStream ( CPlayer& Player )
 
     // Console
     CLogger::LogPrintf ( "JOIN: %s joined the game (IP: %s)\n", Player.GetNick (), Player.GetSourceIP () );
+
+    // Tell him current sync rates
+    CStaticFunctionDefinitions::SendSyncIntervals ( &Player );
 
     // Tell the other players about him
     CPlayerListPacket PlayerNotice;

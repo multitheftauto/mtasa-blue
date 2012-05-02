@@ -135,7 +135,7 @@ enum eControlType
 
 struct SGTAControl
 {
-    const char szControl [25];
+    const char* szControl;
     eControllerAction action;
     eControlType controlType;
 };
@@ -155,16 +155,12 @@ public:
 
     const CControllerState&     GetCurrentControllerState       ( void )                            { return m_csCurrentState; }
     void                        SetCurrentControllerState       ( const CControllerState& State );
-    const CControllerState&     GetLastControllerState          ( void )                            { return m_csLastState; }
-    void                        SetLastControllerState          ( const CControllerState& State )   { m_csLastState.Copy ( State ); }
 
     void                        NewControllerState              ( const CControllerState& State );
 
-    void                        UpdateKeys                      ( void );
-
     bool                        GetControlState                 ( const char* szControl, bool& bState );
     bool                        SetControlState                 ( const char* szControl, bool bState );
-    static SGTAControl*         GetControlFromString            ( const char* szControl );
+    static const SGTAControl*   GetControlFromString            ( const char* szControl );
 
     bool                        IsControlEnabled                ( const char* szControl, bool& bEnabled );
     bool                        SetControlEnabled               ( const char* szControl, bool bEnabled );
@@ -172,10 +168,11 @@ public:
     void                        SetAllControlsEnabled           ( bool bEnabled );
 
 protected:
+    void                        UpdateKeys                      ( void );
+
     CPlayer*                    m_pPlayer;
 
     CControllerState            m_csCurrentState;
-    CControllerState            m_csLastState;
 
     SFixedArray < SGTAControlState, NUM_CONTROL_STATES >   m_ControlStates;
     bool                        m_bUpdatedKeys;

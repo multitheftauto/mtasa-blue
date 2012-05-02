@@ -18,7 +18,9 @@ CSimKeysyncPacket::CSimKeysyncPacket (    ElementID PlayerID,
                                           float fPlayerGotWeaponRange,
                                           bool bVehicleHasHydraulics,
                                           bool bVehicleIsPlaneOrHeli,
-                                          CControllerState& sharedControllerState )
+                                          CControllerState& sharedControllerState,
+                                          float fPlayerGotCameraRotation,
+                                          float fPlayerGotPlayerRotation )
     : m_PlayerID ( PlayerID )
     , m_bPlayerHasOccupiedVehicle ( bPlayerHasOccupiedVehicle )
     , m_usVehicleGotModel ( usVehicleGotModel )
@@ -27,6 +29,8 @@ CSimKeysyncPacket::CSimKeysyncPacket (    ElementID PlayerID,
     , m_bVehicleHasHydraulics ( bVehicleHasHydraulics )
     , m_bVehicleIsPlaneOrHeli ( bVehicleIsPlaneOrHeli )
     , m_sharedControllerState ( sharedControllerState )
+    , m_fPlayerGotCameraRotation ( fPlayerGotCameraRotation )
+    , m_fPlayerGotPlayerRotation ( fPlayerGotPlayerRotation )
 {
 }
 
@@ -37,8 +41,22 @@ CSimKeysyncPacket::CSimKeysyncPacket (    ElementID PlayerID,
 bool CSimKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
     // Read out the controller states
-    if ( !ReadSmallKeysync ( m_sharedControllerState, CControllerState (), BitStream ) )
+    if ( !ReadSmallKeysync ( m_sharedControllerState, BitStream ) )
         return false;
+
+    // Read rotations
+    if ( BitStream.Version () >= 0x2C )
+    {
+        SKeysyncRotation rotation;
+        BitStream.Read ( &rotation );
+        m_Cache.fPlayerRotation = rotation.data.fPlayerRotation;
+        m_Cache.fCameraRotation = rotation.data.fCameraRotation;
+    }
+    else
+    {
+        m_Cache.fPlayerRotation = m_fPlayerGotPlayerRotation;
+        m_Cache.fCameraRotation = m_fPlayerGotCameraRotation;
+    }
 
     // Flags
     if ( !BitStream.Read ( &m_Cache.flags ) )
@@ -154,7 +172,16 @@ bool CSimKeysyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     BitStream.Write ( m_PlayerID );
 
     // Write the keysync data
-    WriteSmallKeysync ( m_sharedControllerState, CControllerState (), BitStream );
+    WriteSmallKeysync ( m_sharedControllerState, BitStream );
+
+    // Write the rotations
+    if ( BitStream.Version () >= 0x2C )
+    {
+        SKeysyncRotation rotation;
+        rotation.data.fPlayerRotation = m_Cache.fPlayerRotation;
+        rotation.data.fCameraRotation = m_Cache.fCameraRotation;
+        BitStream.Write ( &rotation );
+    }
 
     // Write the flags
     BitStream.Write ( &m_Cache.flags );

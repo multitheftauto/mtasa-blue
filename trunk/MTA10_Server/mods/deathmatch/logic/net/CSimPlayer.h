@@ -46,6 +46,8 @@ public:
     // Used in CSimKeysyncPacket
     bool                        m_bVehicleHasHydraulics;
     bool                        m_bVehicleIsPlaneOrHeli;
+    float                       m_fCameraRotation;      // Not needed when all clients are >=0x2C bitstream version
+    float                       m_fPlayerRotation;      //                          ''
 
     // Flag
     bool                        m_bDoneFirstUpdate;
