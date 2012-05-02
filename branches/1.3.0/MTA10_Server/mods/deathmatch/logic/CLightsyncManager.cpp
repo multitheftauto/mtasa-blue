@@ -85,7 +85,7 @@ void CLightsyncManager::DoPulse ()
 
     // For limiting light sync processing
     long iLimitCounter = g_pBandwidthSettings->iLightSyncPlrsPerFrame;
-    int iLightsyncRate = g_pGame->GetConfig( )->GetLightSyncRate ( );
+    int iLightsyncRate = g_TickRateSettings.iLightSync;
     while ( m_Queue.size() > 0 && m_Queue.front().ullTime + iLightsyncRate <= GetTickCount64_ () && iLimitCounter > 0 )
     {
         SEntry entry = m_Queue.front ();
@@ -101,10 +101,10 @@ void CLightsyncManager::DoPulse ()
                 CLightsyncPacket packet;
 
                 // Use this players far list
-                const std::map < CPlayer*, SNearInfo >& farList = pPlayer->GetFarPlayerList ();
+                const std::map < CPlayer*, SPuresyncNearInfo >& farList = pPlayer->GetPuresyncFarPlayerList ();
 
                 // For each far player
-                for ( std::map < CPlayer*, SNearInfo > ::const_iterator it = farList.begin (); it != farList.end (); ++it )
+                for ( std::map < CPlayer*, SPuresyncNearInfo > ::const_iterator it = farList.begin (); it != farList.end (); ++it )
                 {
                     CPlayer* pCurrent = it->first;
                     dassert ( pPlayer != pCurrent );

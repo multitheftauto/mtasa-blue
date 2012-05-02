@@ -15,12 +15,15 @@ CSimPlayerPuresyncPacket::CSimPlayerPuresyncPacket ( ElementID PlayerID,
                                                      ushort PlayerLatency,
                                                      uchar PlayerSyncTimeContext,
                                                      uchar PlayerGotWeaponType,
-                                                     float WeaponRange )
+                                                     float WeaponRange,
+                                                     CControllerState& sharedControllerState )
+
     : m_PlayerID ( PlayerID )
     , m_PlayerLatency ( PlayerLatency )
     , m_PlayerSyncTimeContext ( PlayerSyncTimeContext )
     , m_PlayerGotWeaponType ( PlayerGotWeaponType )
     , m_WeaponRange ( WeaponRange )
+    , m_sharedControllerState ( sharedControllerState )
 {
 }
 
@@ -46,7 +49,7 @@ bool CSimPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
     }
 
     // Read out keys
-    ReadFullKeysync ( m_Cache.ControllerState, BitStream );
+    ReadFullKeysync ( m_sharedControllerState, BitStream );
 
     // Read the flags
     if ( !BitStream.Read ( &m_Cache.flags ) )
@@ -94,8 +97,10 @@ bool CSimPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
     m_Cache.fArmor = armor.data.fValue;
 
     // Read out the camera rotation
-    if ( !BitStream.Read ( m_Cache.fCameraRotation ) )
+    SCameraRotationSync camRotation;
+    if ( !BitStream.Read ( &camRotation ) )
         return false;
+    m_Cache.fCameraRotation = camRotation.data.fRotation;
 
     // Read the camera orientation
     ReadCameraOrientation ( position.data.vecPosition, BitStream, m_Cache.vecCamPosition, m_Cache.vecCamFwd );
@@ -139,7 +144,7 @@ bool CSimPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 return false;
 
             // Read out the aim data
-            SWeaponAimSync sync ( m_WeaponRange, ( m_Cache.ControllerState.RightShoulder1 || m_Cache.ControllerState.ButtonCircle ) );
+            SWeaponAimSync sync ( m_WeaponRange, ( m_sharedControllerState.RightShoulder1 || m_sharedControllerState.ButtonCircle ) );
             if ( !BitStream.Read ( &sync ) )
                 return false;
 
@@ -194,7 +199,7 @@ bool CSimPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     BitStream.Write ( m_Cache.ucTimeContext );
 
     BitStream.WriteCompressed ( m_PlayerLatency );
-    WriteFullKeysync ( m_Cache.ControllerState, BitStream );
+    WriteFullKeysync ( m_sharedControllerState, BitStream );
 
     BitStream.Write ( &m_Cache.flags );
 
@@ -225,7 +230,9 @@ bool CSimPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     armor.data.fValue = m_Cache.fArmor;
     BitStream.Write ( &armor );
 
-    BitStream.Write ( m_Cache.fCameraRotation );
+    SCameraRotationSync camRotation;
+    camRotation.data.fRotation = m_Cache.fCameraRotation;
+    BitStream.Write ( &camRotation );
 
     if ( m_Cache.flags.data.bHasAWeapon )
     {

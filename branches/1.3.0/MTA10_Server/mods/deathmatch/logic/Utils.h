@@ -168,8 +168,8 @@ inline float GetSmallestWrapUnsigned ( float fValue, float fHigh )
 // Escapes the HTML characters <, >, &, " and '. Don't forget to remove your buffer to avoid memory leaks.
 const char* HTMLEscapeString ( const char *szSource );
 
-bool ReadSmallKeysync ( CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream );
-void WriteSmallKeysync ( const CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream );
+bool ReadSmallKeysync ( CControllerState& ControllerState, NetBitStreamInterface& BitStream );
+void WriteSmallKeysync ( const CControllerState& ControllerState, NetBitStreamInterface& BitStream );
 bool ReadFullKeysync ( CControllerState& ControllerState, NetBitStreamInterface& BitStream );
 void WriteFullKeysync ( const CControllerState& ControllerState, NetBitStreamInterface& BitStream );
 void ReadCameraOrientation ( const CVector& vecBasePosition, NetBitStreamInterface& BitStream, CVector& vecOutCamPosition, CVector& vecOutCamFwd );

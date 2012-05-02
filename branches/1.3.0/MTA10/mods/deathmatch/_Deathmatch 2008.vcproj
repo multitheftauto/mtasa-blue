@@ -2647,6 +2647,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CTickRateSettings.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CZoneNames.h"
 					>
 				</File>

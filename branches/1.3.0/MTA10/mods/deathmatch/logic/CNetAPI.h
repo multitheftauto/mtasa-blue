@@ -28,10 +28,12 @@ class CNetAPI;
 #include "CInterpolator.h"
 #include "CBitStream.h"
 #include <ctime>
+#include "CTickRateSettings.h"
 
 // SYNC SETTINGS
-#define TICK_RATE 100
-#define CAM_SYNC_RATE 500
+#define TICK_RATE       ( g_TickRateSettings.iPureSync )
+#define CAM_SYNC_RATE   ( g_TickRateSettings.iCamSync )
+#define TICK_RATE_AIM   ( Min ( TICK_RATE, g_TickRateSettings.iKeySyncRotation ) )  // Keysync or puresync update the aim, so use the shortest interval
 
 enum eServerRPCFunctions
 {
@@ -80,8 +82,8 @@ private:
     void                    ReadVehiclePuresync             ( CClientPlayer* pPlayer, CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
     void                    WriteVehiclePuresync            ( CClientPed* pPed, CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
 
-    bool                    ReadSmallKeysync                ( CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream );
-    void                    WriteSmallKeysync               ( const CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream );
+    bool                    ReadSmallKeysync                ( CControllerState& ControllerState, NetBitStreamInterface& BitStream );
+    void                    WriteSmallKeysync               ( const CControllerState& ControllerState, NetBitStreamInterface& BitStream );
 
     bool                    ReadFullKeysync                 ( CControllerState& ControllerState, NetBitStreamInterface& BitStream );
     void                    WriteFullKeysync                ( const CControllerState& ControllerState, NetBitStreamInterface& BitStream );
@@ -94,6 +96,9 @@ private:
 
     void                    ReadLightweightSync             ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
     void                    ReadVehicleResync               ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
+
+    void                    GetLastSentControllerState      ( CControllerState* pControllerState, float* pfCameraRotation, float* pfLastAimY );
+    void                    SetLastSentControllerState      ( const CControllerState& ControllerState, float fCameraRotation, float fLastAimY );
 
 public:
     bool                    IsCameraSyncNeeded              ( void );
@@ -126,6 +131,11 @@ private:
 
     bool                    m_bBulletSyncLastSentFireButtonDown;
     bool                    m_bUsingBulletSync;
+
+    CElapsedTime            m_TimeSinceMouseOrAnalogStateSent;
+    CControllerState        m_LastSentControllerState;
+    float                   m_fLastSentCameraRotation;
+    float                   m_fLastSentAimY;
 };
 
 #endif

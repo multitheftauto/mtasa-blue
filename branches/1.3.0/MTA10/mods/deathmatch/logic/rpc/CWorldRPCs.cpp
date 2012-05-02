@@ -56,11 +56,10 @@ void CWorldRPCs::LoadFunctions ( void )
     AddHandler ( RESET_FOG_DISTANCE, ResetFogDistance, "ResetFogDistance" );
     AddHandler ( SET_WEAPON_PROPERTY, SetWeaponProperty, "SetWeaponProperty");
 
-
-
     AddHandler ( REMOVE_WORLD_MODEL, RemoveWorldModel, "RemoveWorldModel");
     AddHandler ( RESTORE_WORLD_MODEL, RestoreWorldModel, "RestoreWorldModel");
     AddHandler ( RESTORE_ALL_WORLD_MODELS, RestoreAllWorldModels, "RestoreAllWorldModels");
+    AddHandler ( SET_SYNC_INTERVALS, SetSyncIntervals, "SetSyncIntervals" );
 }
 
 
@@ -558,6 +557,8 @@ void CWorldRPCs::RemoveWorldModel ( NetBitStreamInterface& bitStream )
         g_pGame->GetWorld ( )->RemoveBuilding ( usModel, fRadius, fX, fY, fZ );
     }
 }
+
+
 void CWorldRPCs::RestoreWorldModel ( NetBitStreamInterface& bitStream )
 {
     unsigned short usModel = 0;
@@ -568,7 +569,22 @@ void CWorldRPCs::RestoreWorldModel ( NetBitStreamInterface& bitStream )
         g_pGame->GetWorld ( )->RestoreBuilding ( usModel, fRadius, fX, fY, fZ );
     }
 }
+
+
 void CWorldRPCs::RestoreAllWorldModels ( NetBitStreamInterface& bitStream )
 {
     g_pGame->GetWorld ( )->ClearRemovedBuildingLists ( );
+}
+
+
+void CWorldRPCs::SetSyncIntervals ( NetBitStreamInterface& bitStream )
+{
+    bitStream.Read ( g_TickRateSettings.iPureSync );
+    bitStream.Read ( g_TickRateSettings.iLightSync );
+    bitStream.Read ( g_TickRateSettings.iCamSync );
+    bitStream.Read ( g_TickRateSettings.iPedSync );
+    bitStream.Read ( g_TickRateSettings.iUnoccupiedVehicle );
+    bitStream.Read ( g_TickRateSettings.iObjectSync );
+    bitStream.Read ( g_TickRateSettings.iKeySyncRotation );
+    bitStream.Read ( g_TickRateSettings.iKeySyncAnalogMove );
 }

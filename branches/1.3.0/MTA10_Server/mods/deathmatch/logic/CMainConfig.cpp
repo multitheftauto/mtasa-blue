@@ -22,6 +22,7 @@
 extern CGame * g_pGame;
 
 CBandwidthSettings* g_pBandwidthSettings = new CBandwidthSettings ();
+CTickRateSettings g_TickRateSettings;
 
 using namespace std;
 
@@ -98,7 +99,6 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_iDebugFlag = 0;
     m_NetOptions.netTweak.fTweak1Amount = 1.0f;
     m_iNetReliabilityMode = 0;
-    m_iLightSyncRate = 1500;
 }
 
 
@@ -524,9 +524,22 @@ bool CMainConfig::Load ( void )
     GetInteger ( m_pRootNode, "net_type", m_iNetReliabilityMode );
     m_iNetReliabilityMode = Clamp ( 0, m_iNetReliabilityMode, 4 );
 
-    // lightsync_rate
-    iResult = GetInteger ( m_pRootNode, "lightsync_rate", m_iLightSyncRate );
-    m_iLightSyncRate = Clamp ( 200, m_iLightSyncRate, 4000 );
+    // Check settings in this list here
+    const std::vector < SIntSetting >& settingList = GetIntSettingList ();
+    for ( uint i = 0 ; i < settingList.size () ; i++ )
+    {
+        const SIntSetting& item = settingList[i];
+        int iValue = item.iDefault;
+        GetInteger ( m_pRootNode, item.szName, iValue );
+        *item.pVariable = Clamp ( item.iMin, iValue, item.iMax );
+    }
+
+    // Handle recently retired lightsync_rate
+    if ( m_pRootNode->FindSubNode ( "lightweight_sync_interval" ) == NULL )
+    {
+        GetInteger ( m_pRootNode, "lightsync_rate", g_TickRateSettings.iLightSync );
+        g_TickRateSettings.iLightSync = Clamp ( 200, g_TickRateSettings.iLightSync, 4000 );
+    }
 
     ApplyNetOptions ();
 
@@ -1315,24 +1328,74 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
             return true;
         }
     }
-    else
-        if ( strName == "lightsync_rate" )
+
+    // Check settings in this list here
+    const std::vector < SIntSetting >& settingList = GetIntSettingList ();
+    for ( uint i = 0 ; i < settingList.size () ; i++ )
+    {
+        const SIntSetting& item = settingList[i];
+        if ( item.bSettable && strName == item.szName )
         {
             int iValue = atoi ( strValue );
-            if ( iValue >= 100 && iValue <= 4000 )
+            if ( iValue >= item.iMin && iValue <= item.iMax )
             {
-                m_iLightSyncRate = iValue;
-                if ( bSave )
+                *item.pVariable = iValue;
+                if ( item.bSavable && bSave )
                 {
-                    SetString ( m_pRootNode, "lightsync_rate", SString ( "%d", m_iLightSyncRate ) );
+                    SetString ( m_pRootNode, item.szName, SString ( "%d", *item.pVariable ) );
                     Save ();
                 }
+
+                if ( item.changeCallback )
+                    item.changeCallback ();
+
                 return true;
             }
         }
+    }
 
     //
     // Everything else is read only, so can't be set
     //
     return false;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+//
+// Put some int settings into an array for referencing
+//
+//////////////////////////////////////////////////////////////////////
+const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
+{
+    static const SIntSetting settings[] =
+        {
+            //Set,  save,   min,    def,    max,    name,                                   variable,                                   callback
+            { true, true,   50,     100,    4000,   "player_sync_interval",                 &g_TickRateSettings.iPureSync,              &OnTickRateChange },
+            { true, true,   50,     1500,   4000,   "lightweight_sync_interval",            &g_TickRateSettings.iLightSync,             &OnTickRateChange },
+            { true, true,   50,     500,    4000,   "camera_sync_interval",                 &g_TickRateSettings.iCamSync,               &OnTickRateChange },
+            { true, true,   50,     400,    4000,   "ped_sync_interval",                    &g_TickRateSettings.iPedSync,               &OnTickRateChange },
+            { true, true,   50,     400,    4000,   "unoccupied_vehicle_sync_interval",     &g_TickRateSettings.iUnoccupiedVehicle,     &OnTickRateChange },
+            { true, true,   50,     100,    4000,   "keysync_mouse_sync_interval",          &g_TickRateSettings.iKeySyncRotation,       &OnTickRateChange },
+            { true, true,   50,     100,    4000,   "keysync_analog_sync_interval",         &g_TickRateSettings.iKeySyncAnalogMove,     &OnTickRateChange },
+        };
+
+    static std::vector < SIntSetting > settingsList;
+
+    if ( settingsList.empty () )
+        for ( uint i = 0 ; i < NUMELMS( settings ) ; i++ )
+            settingsList.push_back ( settings[i] );
+
+    return settingsList;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+//
+// Settings change callback
+//
+//////////////////////////////////////////////////////////////////////
+void CMainConfig::OnTickRateChange ( void )
+{
+    CStaticFunctionDefinitions::SendSyncIntervals ();
 }

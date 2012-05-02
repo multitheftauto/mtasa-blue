@@ -18,8 +18,8 @@ public:
                                             ~CSimPlayer                 ( void )                        { DEBUG_DESTROY_COUNT( "CSimPlayer" ); }
 
     bool                                    IsJoined                    ( void )                        { return m_iStatus == STATUS_JOINED; };
-    bool                                    HasOccupiedVehicle          ( void )                        { return m_bHasOccupiedVehicle; };
-    const std::vector < CSimPlayer* >&      GetSendList                 ( void )                        { return m_SendList; }
+    const std::vector < CSimPlayer* >&      GetPuresyncSendList         ( void )                        { return m_PuresyncSendList; }
+    const std::vector < CSimPlayer* >&      GetKeysyncSendList          ( void )                        { return m_KeysyncSendList; }
     unsigned short                          GetBitStreamVersion         ( void )                        { return m_usBitStreamVersion; };
     NetServerPlayerID&                      GetSocket                   ( void )                        { return m_PlayerSocket; };
 
@@ -27,8 +27,10 @@ public:
     int                         m_iStatus;
     unsigned short              m_usBitStreamVersion;
     NetServerPlayerID           m_PlayerSocket;
-    std::vector < CSimPlayer* > m_SendList;
+    std::vector < CSimPlayer* > m_PuresyncSendList;
+    std::vector < CSimPlayer* > m_KeysyncSendList;
     bool                        m_bHasOccupiedVehicle;
+    CControllerState            m_sharedControllerState;        // Updated by CSim*Packet code
 
     // Used in CSimPlayerPuresyncPacket and CSimVehiclePuresyncPacket
     ElementID                   m_PlayerID;
@@ -40,6 +42,12 @@ public:
     ushort                      m_usVehicleModel;
     uchar                       m_ucOccupiedVehicleSeat;
     float                       m_fWeaponRange;
+
+    // Used in CSimKeysyncPacket
+    bool                        m_bVehicleHasHydraulics;
+    bool                        m_bVehicleIsPlaneOrHeli;
+    float                       m_fCameraRotation;      // Not needed when all clients are >=0x2C bitstream version
+    float                       m_fPlayerRotation;      //                          ''
 
     // Flag
     bool                        m_bDoneFirstUpdate;

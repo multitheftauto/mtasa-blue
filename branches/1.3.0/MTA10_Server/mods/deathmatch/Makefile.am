@@ -57,6 +57,7 @@ LOGIC = \
 ./logic/CBlipManager.cpp \
 ./logic/CBuildingRemovalManager.cpp \
 ./logic/CBuildingRemoval.cpp \
+./logic/CCameraSpatialDatabase.cpp \
 ./logic/CClient.cpp \
 ./logic/CClock.cpp \
 ./logic/CColCircle.cpp \
@@ -274,7 +275,8 @@ LOGIC = \
 ./logic/net/CSimControl.cpp \
 ./logic/net/CSimPlayerManager.cpp \
 ./logic/net/CSimPlayerPuresyncPacket.cpp \
-./logic/net/CSimVehiclePuresyncPacket.cpp
+./logic/net/CSimVehiclePuresyncPacket.cpp \
+./logic/net/CSimKeysyncPacket.cpp
 
 if PRECOMPILE_HEADERS
 BUILT_SOURCES = StdInc.h.gch

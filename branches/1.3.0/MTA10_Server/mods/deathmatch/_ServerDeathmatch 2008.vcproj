@@ -445,6 +445,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CCameraSpatialDatabase.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CClient.cpp"
 					>
 				</File>
@@ -1312,6 +1316,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\net\CSimKeysyncPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\net\CSimPlayerManager.cpp"
 						>
 					</File>
@@ -1695,6 +1703,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CBuildingRemovalManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CCameraSpatialDatabase.h"
 					>
 				</File>
 				<File
@@ -2569,6 +2581,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\net\CSimKeysyncPacket.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\net\CSimPlayer.h"
 						>
 					</File>
@@ -2647,6 +2663,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLatentTransferManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CTickRateSettings.h"
 					>
 				</File>
 				<File

@@ -382,7 +382,7 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.WriteCompressed ( usLatency );
 
             // Write the keysync data
-            CControllerState ControllerState = pSourcePlayer->GetPad ()->GetCurrentControllerState ();
+            const CControllerState& ControllerState = pSourcePlayer->GetPad ()->GetCurrentControllerState ();
             WriteFullKeysync ( ControllerState, BitStream );
 
             // Write the vehicle matrix only if he's the driver

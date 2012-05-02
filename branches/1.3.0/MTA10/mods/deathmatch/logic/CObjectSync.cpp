@@ -17,7 +17,7 @@
 
 using std::list;
 
-#define OBJECT_SYNC_RATE 500
+#define OBJECT_SYNC_RATE   ( g_TickRateSettings.iObjectSync )
 
 CObjectSync::CObjectSync ( CClientObjectManager* pObjectManager )
 {

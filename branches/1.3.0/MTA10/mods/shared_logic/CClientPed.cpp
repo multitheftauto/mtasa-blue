@@ -2229,6 +2229,14 @@ bool CClientPed::KillTaskSecondary ( int iTaskPriority, bool bGracefully )
 }
 
 
+CVector CClientPed::GetAim ( void ) const
+{
+    if ( m_shotSyncData )
+        return CVector ( m_shotSyncData->m_fArmDirectionX, m_shotSyncData->m_fArmDirectionY, 0 );
+    return CVector ();
+}
+
+
 void CClientPed::SetAim ( float fArmDirectionX, float fArmDirectionY, unsigned char cInVehicleAimAnim )
 {
     if ( !m_bIsLocalPlayer )
@@ -4837,7 +4845,7 @@ void CClientPed::UpdateTargetPosition ( void )
         // Check if the distance to interpolate is too far.
         CVector vecVelocity;
         GetMoveSpeed ( vecVelocity );
-        float fThreshold = ( PED_INTERPOLATION_WARP_THRESHOLD + PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED * vecVelocity.Length () ) * g_pGame->GetGameSpeed ();
+        float fThreshold = ( PED_INTERPOLATION_WARP_THRESHOLD + PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED * vecVelocity.Length () ) * g_pGame->GetGameSpeed () * TICK_RATE / 100;
 
         // There is a reason to have this condition this way: To prevent NaNs generating new NaNs after interpolating (Comparing with NaNs always results to false).
         if ( ! ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () <= fThreshold ) )

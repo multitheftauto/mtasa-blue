@@ -21,7 +21,7 @@ using std::list;
 
 extern CClientGame* g_pClientGame;
 
-#define UNOCCUPIED_VEHICLE_SYNC_RATE 1000
+#define UNOCCUPIED_VEHICLE_SYNC_RATE   ( g_TickRateSettings.iUnoccupiedVehicle )
 
 CUnoccupiedVehicleSync::CUnoccupiedVehicleSync ( CClientVehicleManager* pVehicleManager )
 {
