@@ -40,7 +40,6 @@ public:
     static CClientObject*                   Get                         ( ElementID ID );
     CClientObject*                          Get                         ( CObject* pObject, bool bValidatePointer );
     CClientObject*                          GetSafe                     ( CEntity * pEntity );
-    CClientObject*                          GetSafeClientObjectFromGameEntity  ( CEntity* pObjectSA );
 
     static bool                             IsValidModel                ( unsigned long ulObjectModel );
     static bool                             IsBreakableModel            ( unsigned long ulObjectModel );
@@ -79,9 +78,6 @@ private:
     std::list < CClientObject* >            m_Objects;
     std::vector < CClientObject* >          m_StreamedIn;
     std::list < CClientObject* >            m_Attached;
-
-    std::map < CEntity*, CClientObject* >   m_GameObjectToClientObjectMap;
-    bool                                    m_bBuiltLookupMapThisFrame;
 };
 
 #endif

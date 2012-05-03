@@ -3145,6 +3145,9 @@ void CClientPed::_CreateModel ( void )
         // Put our pointer in the stored data and update the remote data with the new model pointer
         m_pPlayerPed->SetStoredPointer ( this );
 
+        // Add XRef
+        g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pPlayerPed );
+
         g_pMultiplayer->AddRemoteDataStorage ( m_pPlayerPed, m_remoteDataStorage );
 
         // Grab the task manager
@@ -3264,6 +3267,9 @@ void CClientPed::_CreateLocalModel ( void )
         // Put our pointer in its stored pointer
         m_pPlayerPed->SetStoredPointer ( this );
 
+        // Add XRef
+        g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pPlayerPed );
+
         // Add a reference to the model we're using
         m_pLoadedModelInfo = m_pModelInfo;
         m_pLoadedModelInfo->AddRef ( true );
@@ -3336,6 +3342,9 @@ void CClientPed::_DestroyModel ()
     // Invalidate
     m_pManager->InvalidateEntity ( this );
 
+    // Remove XRef
+    g_pClientGame->GetGameEntityXRefManager ()->RemoveEntityXRef ( this, m_pPlayerPed );
+
     // Remove the ped from the world
     g_pGame->GetPools ()->RemovePed ( m_pPlayerPed );
     m_pPlayerPed = NULL;
@@ -3375,6 +3384,9 @@ void CClientPed::_DestroyLocalModel ()
 
     // Invalidate
     m_pManager->InvalidateEntity ( this );
+
+    // Remove XRef
+    g_pClientGame->GetGameEntityXRefManager ()->RemoveEntityXRef ( this, m_pPlayerPed );
 
     // Make sure we are CJ again
     if ( m_pPlayerPed->GetModelIndex () != 0 )

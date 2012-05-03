@@ -478,6 +478,9 @@ void CClientObject::Create ( void )
                 // Put our pointer in its stored pointer
                 m_pObject->SetStoredPointer ( this );
 
+                // Add XRef
+                g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pObject );
+
                 // If set to true,this has the effect of forcing the object to be static at all times
                 m_pObject->SetStaticWaitingForCollision ( m_bIsStatic );
 
@@ -528,6 +531,9 @@ void CClientObject::Destroy ( void )
     {
         // Invalidate
         m_pManager->InvalidateEntity ( this );
+
+        // Remove XRef
+        g_pClientGame->GetGameEntityXRefManager ()->RemoveEntityXRef ( this, m_pObject );
 
         // Destroy the object
         g_pGame->GetPools ()->RemoveObject ( m_pObject );
