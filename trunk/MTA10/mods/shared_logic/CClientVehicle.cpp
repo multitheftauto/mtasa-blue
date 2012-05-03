@@ -2197,6 +2197,9 @@ void CClientVehicle::Create ( void )
 
         // Put our pointer in its custom data
         m_pVehicle->SetStoredPointer ( this );
+
+        // Add XRef
+        g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pVehicle );
         
         // Jump straight to the target position if we have one
         if ( HasTargetPosition () )
@@ -2482,6 +2485,9 @@ void CClientVehicle::Destroy ( void )
                 }
             }
         }
+
+        // Remove XRef
+        g_pClientGame->GetGameEntityXRefManager ()->RemoveEntityXRef ( this, m_pVehicle );
 
         // Destroy the vehicle
         g_pGame->GetPools ()->RemoveVehicle ( m_pVehicle );

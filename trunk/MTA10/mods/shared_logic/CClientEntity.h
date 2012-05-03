@@ -144,8 +144,6 @@ public:
 
     virtual bool                                CanBeDeleted            ( void )                    { return true; };
 
-    static inline int                           GetInstanceCount        ( void )                    { return iCount; };
-
     virtual eClientEntityType                   GetType                 ( void ) const = 0;
     inline bool                                 IsLocalEntity           ( void )                    { return m_ID >= MAX_SERVER_ELEMENTS; };
 
@@ -303,9 +301,6 @@ public:
 
     float                                       GetDistanceBetweenBoundingSpheres   ( CClientEntity* pOther );
 
-    template < class T >
-    static bool                                 IsValidEntity               ( T* pEntity );
-
 protected:
     CClientManager*                             m_pManager;
     CClientEntity*                              m_pParent;
@@ -346,13 +341,8 @@ protected:
     bool                                        m_bDoubleSided;
     bool                                        m_bDoubleSidedInit;
 
-private:
-    // Tracking
-    static int                                  iCount;
-    static std::set < CClientEntity* >          ms_ValidEntityMap;
-
-    // Optimization for getElementsByType starting at root
 public:
+    // Optimization for getElementsByType starting at root
     static void                     StartupEntitiesFromRoot ( );
 private:
     static bool                     IsFromRoot              ( CClientEntity* pEntity );
@@ -367,14 +357,5 @@ private:
 #endif
 
 };
-
-
-// Check entity is known and the correct class
-template < class T >
-bool CClientEntity::IsValidEntity ( T* pEntity )
-{
-    return MapContains ( ms_ValidEntityMap, pEntity )
-            && pEntity->IsA ( T::GetClassId () );
-}
 
 #endif

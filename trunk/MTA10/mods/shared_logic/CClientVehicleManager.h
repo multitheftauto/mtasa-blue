@@ -38,7 +38,6 @@ public:
     CClientVehicle*                 Get                     ( CVehicle* pVehicle, bool bValidatePointer );
     CClientVehicle*                 GetSafe                 ( CEntity * pEntity );
     CClientVehicle*                 GetClosest              ( CVector& vecPosition, float fRadius );
-    CClientVehicle*                 GetSafeClientVehicleFromGameEntity  ( CEntity* pVehicleSA );
 
     void                            DoPulse                 ( void );
 
@@ -86,9 +85,6 @@ private:
     CMappedArray < CClientVehicle* >  m_List;
     std::vector < CClientVehicle* >   m_StreamedIn;
     std::list < CClientVehicle* >   m_Attached;
-
-    std::map < CEntity*, CClientVehicle* > m_GameVehicleToClientVehicleMap;
-    bool                            m_bBuiltLookupMapThisFrame;
 };
 
 #endif

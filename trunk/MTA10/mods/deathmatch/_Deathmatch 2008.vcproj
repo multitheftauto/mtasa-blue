@@ -429,6 +429,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CGameEntityXRefManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CLocalServer.cpp"
 					>
 				</File>
@@ -1856,6 +1860,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CFoo.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CGameEntityXRefManager.h"
 					>
 				</File>
 				<File

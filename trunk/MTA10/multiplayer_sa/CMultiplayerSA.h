@@ -46,6 +46,7 @@ public:
     void                        InitHooks_ClothesSpeedUp ( void );
     void                        InitHooks_ClothesMemFix ( void );
     void                        InitHooks_FixBadAnimId ( void );
+    void                        InitHooks_HookDestructors ( void );
     CRemoteDataStorage *        CreateRemoteDataStorage     ();
     void                        DestroyRemoteDataStorage    ( CRemoteDataStorage* pData );
     void                        AddRemoteDataStorage        ( CPlayerPed* pPed, CRemoteDataStorage* pData );
@@ -86,6 +87,10 @@ public:
     void                        SetVehicleCollisionHandler  ( VehicleCollisionHandler * pHandler );
     void                        SetHeliKillHandler          ( HeliKillHandler * pHandler );
     void                        SetWaterCannonHitHandler    ( WaterCannonHitHandler * pHandler );
+    void                        SetGameObjectDestructHandler    ( GameObjectDestructHandler * pHandler );
+    void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler );
+    void                        SetGamePlayerDestructHandler    ( GamePlayerDestructHandler * pHandler );
+    void                        SetGameModelRemoveHandler       ( GameModelRemoveHandler * pHandler );
 
     void                        AllowMouseMovement          ( bool bAllow );
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );
