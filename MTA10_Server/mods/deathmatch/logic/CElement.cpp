@@ -96,10 +96,10 @@ CElement::~CElement ( void )
     RemoveAllCollisions ( true );
 
     // Null all camera elements referencing us
-    list < CPlayerCamera* > ::const_iterator iterFollowingCameras = m_FollowingCameras.begin ();
-    for ( ; iterFollowingCameras != m_FollowingCameras.end (); iterFollowingCameras++ )
+    std::list < CPlayerCamera* > cloneFollowingCameras = m_FollowingCameras;
+    for ( std::list < CPlayerCamera* > ::const_iterator iter = cloneFollowingCameras.begin () ; iter != cloneFollowingCameras.end () ; iter++ )
     {
-        (*iterFollowingCameras)->SetTarget ( NULL );
+        (*iter)->SetTarget ( NULL );
     }
 
     if ( m_pAttachedTo )
