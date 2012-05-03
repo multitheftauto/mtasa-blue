@@ -44,6 +44,10 @@ public:
 
     bool                            SetLogfile                      ( const char* szFilename, unsigned int uiLevel );
 
+    void                            PushLuaMain                     ( CLuaMain* pLuaMain );
+    void                            PopLuaMain                      ( CLuaMain* pLuaMain );
+    void                            OnLuaMainDestroy                ( CLuaMain* pLuaMain );
+
 private:
     void                            LogString                       ( const char* szPrePend, lua_State* luaVM, const char* szMessage, unsigned int uiMinimumDebugLevelunsigned, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255 );
     void                            PrintLog                        ( const char* szText );
@@ -52,6 +56,7 @@ private:
     unsigned int                    m_uiLogFileLevel;
     FILE*                           m_pLogFile;
     bool                            m_bTriggeringOnClientDebugMessage;
+    std::list < CLuaMain* >         m_LuaMainStack;
 };
 
 #endif

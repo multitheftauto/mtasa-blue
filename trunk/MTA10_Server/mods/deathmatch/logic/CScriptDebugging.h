@@ -47,6 +47,10 @@ public:
 
     inline void                     SetErrorLineAndFile             ( SString strOutput ) { m_strLineAndFile = strOutput; }
 
+    void                            PushLuaMain                     ( CLuaMain* pLuaMain );
+    void                            PopLuaMain                      ( CLuaMain* pLuaMain );
+    void                            OnLuaMainDestroy                ( CLuaMain* pLuaMain );
+
 private:
     void                            LogString                       ( const char* szPrePend, lua_State * luaVM, const char* szMessage, unsigned int uiMinimumDebugLevelunsigned, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255 );
 
@@ -60,6 +64,7 @@ private:
     list < class CPlayer* >         m_Players;
     bool                            m_bTriggeringOnDebugMessage;
     SString                         m_strLineAndFile;
+    std::list < CLuaMain* >         m_LuaMainStack;
 };
 
 #endif

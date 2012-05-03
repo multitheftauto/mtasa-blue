@@ -227,7 +227,7 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFuncti
     // Call the function with our arguments
     pLuaMain->ResetInstructionCount ();
 
-    int iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
+    int iret = pLuaMain->PCall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
     if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
     {
         SString strRes = ConformResourcePath ( lua_tostring( luaVM, -1 ) );
@@ -293,14 +293,8 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
 
     // Call the function with our arguments
     pLuaMain->ResetInstructionCount ();
-    int iret = 0;
-    try {
-        iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
-    }
-    catch ( ... )
-    {
-        return false;
-    }
+
+    int iret = pLuaMain->PCall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
     if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
     {
         std::string strRes = ConformResourcePath ( lua_tostring( luaVM, -1 ) );
