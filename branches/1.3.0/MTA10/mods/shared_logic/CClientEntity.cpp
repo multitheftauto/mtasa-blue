@@ -23,17 +23,9 @@ extern CClientGame* g_pClientGame;
 
 #pragma warning( disable : 4355 )   // warning C4355: 'this' : used in base member initializer list
 
-int CClientEntity::iCount = 0;
-std::set < CClientEntity* > CClientEntity::ms_ValidEntityMap;
-
 CClientEntity::CClientEntity ( ElementID ID )
         : ClassInit ( this )
 {
-    #ifdef MTA_DEBUG
-        ++iCount;
-    #endif
-    MapInsert ( ms_ValidEntityMap, this );
-
     // Init
     m_pManager = NULL;
     m_pParent = NULL;
@@ -68,15 +60,13 @@ CClientEntity::CClientEntity ( ElementID ID )
 
     m_pElementGroup = NULL;
     m_pModelInfo = NULL;
+
+    g_pClientGame->GetGameEntityXRefManager ()->OnClientEntityCreate ( this );
 }
 
 
 CClientEntity::~CClientEntity ( void )
 {
-    #ifdef MTA_DEBUG
-        --iCount;
-    #endif
-
     // Make sure we won't get deleted later by the element deleter if we've been requested so
     if ( m_bBeingDeleted )
     {
@@ -179,7 +169,7 @@ CClientEntity::~CClientEntity ( void )
     if ( !g_pClientGame->IsBeingDeleted () )
         CClientEntityRefManager::OnEntityDelete ( this );
 
-    MapRemove ( ms_ValidEntityMap, this );
+    g_pClientGame->GetGameEntityXRefManager ()->OnClientEntityDelete ( this );
 }
 
 

@@ -157,6 +157,9 @@ CClientGame::CClientGame ( bool bLocalPlay )
     // Startup "entities from root" optimization for getElementsByType
     CClientEntity::StartupEntitiesFromRoot ();
 
+    // Startup game entity tracking manager
+    m_pGameEntityXRefManager = NewGameEntityXRefManager ();
+
     // Initialize our root entity with an invalid id, we dont know the true id until map-start
     m_pRootEntity = new CClientDummy ( NULL, INVALID_ELEMENT_ID, "root" );
     m_pRootEntity->MakeSystemEntity ();
@@ -255,6 +258,10 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetVehicleCollisionHandler( CClientGame::StaticVehicleCollisionHandler );
     g_pMultiplayer->SetHeliKillHandler ( CClientGame::StaticHeliKillHandler );
     g_pMultiplayer->SetWaterCannonHitHandler ( CClientGame::StaticWaterCannonHandler );
+    g_pMultiplayer->SetGameObjectDestructHandler( CClientGame::StaticGameObjectDestructHandler );
+    g_pMultiplayer->SetGameVehicleDestructHandler( CClientGame::StaticGameVehicleDestructHandler );
+    g_pMultiplayer->SetGamePlayerDestructHandler( CClientGame::StaticGamePlayerDestructHandler );
+    g_pMultiplayer->SetGameModelRemoveHandler( CClientGame::StaticGameModelRemoveHandler );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( CClientGame::StaticKeyStrokeHandler );
@@ -391,6 +398,10 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetVehicleCollisionHandler( NULL );
     g_pMultiplayer->SetHeliKillHandler( NULL );
     g_pMultiplayer->SetWaterCannonHitHandler( NULL );
+    g_pMultiplayer->SetGameObjectDestructHandler( NULL );
+    g_pMultiplayer->SetGameVehicleDestructHandler( NULL );
+    g_pMultiplayer->SetGamePlayerDestructHandler( NULL );
+    g_pMultiplayer->SetGameModelRemoveHandler( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( NULL );
@@ -428,6 +439,7 @@ CClientGame::~CClientGame ( void )
 
     delete m_pRootEntity;
 
+    delete m_pGameEntityXRefManager;
     delete m_pZoneNames;
     delete m_pScriptKeyBinds;    
 
@@ -3504,6 +3516,26 @@ bool CClientGame::StaticWaterCannonHandler ( CVehicleSAInterface* pCannonVehicle
     return g_pClientGame->WaterCannonHitHandler ( pCannonVehicle, pHitPed );
 }
 
+void CClientGame::StaticGameObjectDestructHandler ( CEntitySAInterface* pObject )
+{
+    g_pClientGame->GameObjectDestructHandler ( pObject );
+}
+
+void CClientGame::StaticGameVehicleDestructHandler ( CEntitySAInterface* pVehicle )
+{
+    g_pClientGame->GameVehicleDestructHandler ( pVehicle );
+}
+
+void CClientGame::StaticGamePlayerDestructHandler ( CEntitySAInterface* pPlayer )
+{
+    g_pClientGame->GamePlayerDestructHandler ( pPlayer );
+}
+
+void CClientGame::StaticGameModelRemoveHandler ( ushort usModelId )
+{
+    g_pClientGame->GameModelRemoveHandler ( usModelId );
+}
+
 void CClientGame::DrawRadarAreasHandler ( void )
 {
     m_pRadarAreaManager->DoPulse ();
@@ -4166,6 +4198,29 @@ bool CClientGame::WaterCannonHitHandler ( CVehicleSAInterface* pCannonVehicle, C
     }
     return false;
 }
+
+// Validate known objects
+void CClientGame::GameObjectDestructHandler ( CEntitySAInterface* pObject )
+{
+    m_pGameEntityXRefManager->OnGameEntityDestruct ( pObject );
+}
+
+void CClientGame::GameVehicleDestructHandler ( CEntitySAInterface* pVehicle )
+{
+    m_pGameEntityXRefManager->OnGameEntityDestruct ( pVehicle );
+}
+
+void CClientGame::GamePlayerDestructHandler ( CEntitySAInterface* pPlayer )
+{
+    m_pGameEntityXRefManager->OnGameEntityDestruct ( pPlayer );
+}
+
+void CClientGame::GameModelRemoveHandler ( ushort usModelId )
+{
+    m_pGameEntityXRefManager->OnGameModelRemove ( usModelId );
+}
+
+
 bool CClientGame::StaticProcessMessage ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
     if ( g_pClientGame )

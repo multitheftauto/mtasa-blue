@@ -828,7 +828,13 @@ json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, std::map < CLua
             }
             else
             {
-                g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't convert argument list to JSON, only valid elements can be sent." );
+                if ( pElement )     // eg toJSON() with valid element
+                    g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't convert userdata argument to JSON, elements not allowed for this function." );
+                else
+                if ( !bSerialize )  // eg toJSON() with invalid element
+                    g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't convert userdata argument to JSON, only valid resources can be included for this function." );
+                else
+                    g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't convert userdata argument to JSON, only valid elements or resources can be included." );
                 return NULL;
             }
             break;

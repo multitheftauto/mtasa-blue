@@ -11103,21 +11103,24 @@ int CLuaFunctionDefinitions::RemoveRuleValue ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetPlayerAnnounceValue ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-         lua_type ( luaVM, 2 ) == LUA_TSTRING )
-    {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        std::string strKey = lua_tostring ( luaVM, 2 );
-        std::string strValue;
+// string getPlayerAnnounceValue ( element thePlayer, string key )
+    CPlayer* pPlayer; SString strKey;
 
-        if ( CStaticFunctionDefinitions::GetPlayerAnnounceValue ( pElement, strKey, strValue ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPlayer );
+    argStream.ReadString ( strKey );
+
+    if ( !argStream.HasErrors () )
+    {
+        SString strValue;
+        if ( CStaticFunctionDefinitions::GetPlayerAnnounceValue ( pPlayer, strKey, strValue ) )
         {
-            lua_pushstring ( luaVM, strValue.c_str () );
+            lua_pushstring ( luaVM, strValue );
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPlayerAnnounceValue" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getPlayerAnnounceValue", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -11126,22 +11129,25 @@ int CLuaFunctionDefinitions::GetPlayerAnnounceValue ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetPlayerAnnounceValue ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-         lua_type ( luaVM, 2 ) == LUA_TSTRING &&
-         lua_type ( luaVM, 3 ) == LUA_TSTRING )
-    {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        std::string strKey = lua_tostring ( luaVM, 2 );
-        std::string strValue = lua_tostring ( luaVM, 3 );
+// bool setPlayerAnnounceValue ( element thePlayer, string key, string value )
+    CPlayer* pPlayer; SString strKey; SString strValue;
 
-        if ( CStaticFunctionDefinitions::SetPlayerAnnounceValue ( pElement, strKey, strValue ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPlayer );
+    argStream.ReadString ( strKey );
+    argStream.ReadString ( strValue );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetPlayerAnnounceValue ( pPlayer, strKey, strValue ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPlayerAnnounceValue" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setPlayerAnnounceValue", *argStream.GetErrorMessage () ) );
+
 
     lua_pushboolean ( luaVM, false );
     return 1;

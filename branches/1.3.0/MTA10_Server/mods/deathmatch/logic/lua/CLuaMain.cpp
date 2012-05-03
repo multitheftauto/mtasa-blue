@@ -101,6 +101,7 @@ CLuaMain::~CLuaMain ( void )
     g_pGame->GetRemoteCalls()->Remove ( this );
     g_pGame->GetLuaCallbackManager ()->OnLuaMainDestroy ( this );
     g_pGame->GetLatentTransferManager ()->OnLuaMainDestroy ( this );
+    g_pGame->GetScriptDebugging()->OnLuaMainDestroy ( this );
 
     // Unload the current script
     UnloadScript ();
@@ -246,7 +247,7 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
         else
         {
             ResetInstructionCount ();
-            int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
+            int iret = this->PCall ( m_luaVM, 0, 0, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
@@ -317,7 +318,7 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
         else
         {
             ResetInstructionCount ();
-            int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
+            int iret = this->PCall ( m_luaVM, 0, 0, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
@@ -351,7 +352,7 @@ bool CLuaMain::LoadScript ( const char* szLUAScript )
         if ( !luaL_loadbuffer ( m_luaVM, szLUAScript, strlen(szLUAScript), NULL ) )
         {
             ResetInstructionCount ();
-            int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
+            int iret = this->PCall ( m_luaVM, 0, 0, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
@@ -669,4 +670,20 @@ const SString& CLuaMain::GetFunctionTag ( int iLuaFunction )
         pTag = MapFind ( m_FunctionTagMap, iLuaFunction );
     }
     return *pTag;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::PCall
+//
+// lua_pcall call wrapper
+//
+///////////////////////////////////////////////////////////////
+int CLuaMain::PCall ( lua_State *L, int nargs, int nresults, int errfunc )
+{
+    g_pGame->GetScriptDebugging()->PushLuaMain ( this );
+    int iret = lua_pcall ( L, nargs, nresults, errfunc );
+    g_pGame->GetScriptDebugging()->PopLuaMain ( this );
+    return iret;
 }
