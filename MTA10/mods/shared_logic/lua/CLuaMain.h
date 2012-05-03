@@ -92,6 +92,8 @@ public:
 
     void                            InitVM                  ( void );
     const SString&                  GetFunctionTag          ( int iLuaFunction );
+    int                             PCall                   ( lua_State *L, int nargs, int nresults, int errfunc );
+
 private:
     void                            InitSecurity            ( void );
 
