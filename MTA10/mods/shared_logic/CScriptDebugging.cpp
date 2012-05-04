@@ -330,8 +330,7 @@ void CScriptDebugging::PopLuaMain ( CLuaMain* pLuaMain )
     dassert ( !m_LuaMainStack.empty () );
     if ( !m_LuaMainStack.empty () )
     {
-        CLuaMain* last = m_LuaMainStack.back ();
-        dassert ( last == pLuaMain );
+        dassert ( m_LuaMainStack.back () == pLuaMain );
         m_LuaMainStack.pop_back ();
     }
 }
