@@ -324,7 +324,7 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
         for ( uint r = 0 ; r < type.itemList.size () ; r++ )
         {
             pDatabaseManager->Execf ( m_DatabaseConnection, 
-                                                "INSERT INTO " BW_STATS_TABLE_NAME " (`type`,`idx`,`GameRecv`,`GameRecvBlocked`,`GameSent`,`GameResent`,`HttpSent`) VALUES (?,?,?,?,?,?)"
+                                                "INSERT INTO " BW_STATS_TABLE_NAME " (`type`,`idx`,`GameRecv`,`GameRecvBlocked`,`GameSent`,`GameResent`,`HttpSent`) VALUES (?,?,?,?,?,?,?)"
                                                 , SQLITE_TEXT, *BWStatIndexToName ( t )
                                                 , SQLITE_INTEGER, r
                                                 , SQLITE_FLOAT, (float)type.itemList [ r ].llGameRecv

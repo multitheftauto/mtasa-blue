@@ -242,6 +242,10 @@ public:
     static volatile bool ms_bBlockIncomingSyncPackets;
     static volatile bool ms_bCriticalStopThreadNet;
     static volatile bool ms_bVerboseDebug;
+    static uint ms_uiFinishedListSize;
+    static uint ms_uiOutCommandQueueSize;
+    static uint ms_uiOutResultQueueSize;
+    static uint ms_uiInResultQueueSize;
 
     // Static functions
     static void     DoPulse                 ( void );
