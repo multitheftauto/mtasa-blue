@@ -11,6 +11,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "net/SimHeaders.h"
 
 namespace
 {
@@ -258,6 +259,16 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     m_StatusList.push_back ( StringPair ( "Packets/sec outgoing",       strOutgoingPacketsPS ) );
     m_StatusList.push_back ( StringPair ( "Packet loss outgoing",       CPerfStatManager::GetPercentString ( llOutgoingBytesResentPS, llOutgoingBytesPS ) ) );
     m_StatusList.push_back ( StringPair ( "Approx network usage",       CPerfStatManager::GetScaledBitString ( llNetworkUsageBytesPS * 8LL ) + "/s" ) );
+    if ( pConfig->GetThreadNetEnabled () )
+    {
+        m_StatusList.push_back ( StringPair ( "Msg queue incoming",       SString ( "%d", CNetBufferWatchDog::ms_uiInResultQueueSize ) ) );
+        if ( bIncludeDebugInfo )
+            m_StatusList.push_back ( StringPair ( "       finished incoming",       SString ( "%d", CNetBufferWatchDog::ms_uiFinishedListSize ) ) );
+        m_StatusList.push_back ( StringPair ( "Msg queue outgoing",       SString ( "%d", CNetBufferWatchDog::ms_uiOutCommandQueueSize ) ) );
+        if ( bIncludeDebugInfo )
+            m_StatusList.push_back ( StringPair ( "       finished outgoing",       SString ( "%d", CNetBufferWatchDog::ms_uiOutResultQueueSize ) ) );
+    }
+
     m_OptionsList.push_back ( StringPair ( "MinClientVersion",          pConfig->GetMinimumClientVersion () ) );
     m_OptionsList.push_back ( StringPair ( "RecommendedClientVersion",  pConfig->GetRecommendedClientVersion () ) );
     m_OptionsList.push_back ( StringPair ( "NetworkEncryptionEnabled",  SString ( "%d", pConfig->GetNetworkEncryptionEnabled () ) ) );
@@ -267,6 +278,22 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     m_OptionsList.push_back ( StringPair ( "BandwidthReductionMode",    pConfig->GetSetting ( "bandwidth_reduction" ) ) );
     m_OptionsList.push_back ( StringPair ( "LightSyncEnabled",          SString ( "%d", g_pBandwidthSettings->bLightSyncEnabled ) ) );
     m_OptionsList.push_back ( StringPair ( "ThreadNetEnabled",          SString ( "%d", pConfig->GetThreadNetEnabled () ) ) );
+
+    const static CTickRateSettings defaultRates;
+    if ( defaultRates.iPureSync != g_TickRateSettings.iPureSync )
+        m_OptionsList.push_back ( StringPair ( "Player sync interval",      SString ( "%d", g_TickRateSettings.iPureSync ) ) );
+    if ( defaultRates.iLightSync != g_TickRateSettings.iLightSync )
+        m_OptionsList.push_back ( StringPair ( "Lightweight sync interval", SString ( "%d", g_TickRateSettings.iLightSync ) ) );
+    if ( defaultRates.iCamSync != g_TickRateSettings.iCamSync )
+        m_OptionsList.push_back ( StringPair ( "Camera sync interval",      SString ( "%d", g_TickRateSettings.iCamSync ) ) );
+    if ( defaultRates.iPedSync != g_TickRateSettings.iPedSync )
+        m_OptionsList.push_back ( StringPair ( "Ped sync interval",         SString ( "%d", g_TickRateSettings.iPedSync ) ) );
+    if ( defaultRates.iUnoccupiedVehicle != g_TickRateSettings.iUnoccupiedVehicle )
+        m_OptionsList.push_back ( StringPair ( "Unocc. veh. sync interval",     SString ( "%d", g_TickRateSettings.iUnoccupiedVehicle ) ) );
+    if ( defaultRates.iKeySyncRotation != g_TickRateSettings.iKeySyncRotation )
+        m_OptionsList.push_back ( StringPair ( "Keysync mouse sync interval",   SString ( "%d", g_TickRateSettings.iKeySyncRotation ) ) );
+    if ( defaultRates.iKeySyncAnalogMove != g_TickRateSettings.iKeySyncAnalogMove )
+        m_OptionsList.push_back ( StringPair ( "Keysync analog sync interval",  SString ( "%d", g_TickRateSettings.iKeySyncAnalogMove ) ) );
 
     if ( bIncludeDebugInfo )
     {

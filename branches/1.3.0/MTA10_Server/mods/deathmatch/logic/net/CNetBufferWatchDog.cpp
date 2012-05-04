@@ -16,6 +16,11 @@ volatile bool CNetBufferWatchDog::ms_bBlockOutgoingSyncPackets = false;
 volatile bool CNetBufferWatchDog::ms_bBlockIncomingSyncPackets = false;
 volatile bool CNetBufferWatchDog::ms_bCriticalStopThreadNet = false;
 volatile bool CNetBufferWatchDog::ms_bVerboseDebug = false;
+uint CNetBufferWatchDog::ms_uiFinishedListSize = 0;
+uint CNetBufferWatchDog::ms_uiOutCommandQueueSize = 0;
+uint CNetBufferWatchDog::ms_uiOutResultQueueSize = 0;
+uint CNetBufferWatchDog::ms_uiInResultQueueSize = 0;
+
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -175,6 +180,12 @@ void CNetBufferWatchDog::DoChecks ( void )
     else
     if ( m_OutCommandQueueInfo.status == EQueueStatus::SUSPEND_SYNC )
         BlockIncomingSyncPackets ();
+
+    // Copy sizes for stats only (Unsafe)
+    ms_uiFinishedListSize = uiFinishedList;
+    ms_uiOutCommandQueueSize = uiOutCommandQueue;
+    ms_uiOutResultQueueSize = uiOutResultQueue;
+    ms_uiInResultQueueSize = uiInResultQueue;
 }
 
 
