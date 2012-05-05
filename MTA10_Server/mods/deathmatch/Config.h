@@ -100,7 +100,7 @@ public:
 #define MAX_VALID_WEATHER 255
 
 // Upper player limit
-#define MAX_PLAYER_COUNT 1024
+#define MAX_PLAYER_COUNT 4096
 #if MAX_PLAYER_COUNT > 65535
     #error MAX_PLAYER_COUNT "macro can't exceed 65535"
 #endif
