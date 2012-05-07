@@ -842,7 +842,12 @@ void CMultiplayerSA::InitHooks()
     MemSet ( (LPVOID)0x6B5B17, 0x90, 6 );
 
     // Increase VehicleStruct pool size
-    MemPut < BYTE > ( 0x5B8FE4, 0x7F );
+    MemPut < BYTE > ( 0x5B8342 + 0, 0x33 );     // xor eax, eax
+    MemPut < BYTE > ( 0x5B8342 + 1, 0xC0 );
+    MemPut < BYTE > ( 0x5B8342 + 2, 0xB0 );     // mov al, 0xFF
+    MemPut < BYTE > ( 0x5B8342 + 3, 0xFF );
+    MemPut < BYTE > ( 0x5B8342 + 4, 0x8B );     // mov edi, eax
+    MemPut < BYTE > ( 0x5B8342 + 5, 0xF8 );
     
     /*
     // CTaskSimpleCarDrive: Swaps driveby for gang-driveby for drivers
