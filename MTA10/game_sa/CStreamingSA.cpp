@@ -41,139 +41,82 @@ namespace
 }
 
 
+bool IsUpgradeModelId ( DWORD dwModelID )
+{
+    return dwModelID >= 1000 && dwModelID <= 1193;
+}
+
+
 void CStreamingSA::RequestModel( DWORD dwModelID, DWORD dwFlags )
 {
-    DWORD dwFunction = FUNC_CStreaming__RequestModel;
-    _asm
+    if ( IsUpgradeModelId ( dwModelID ) )
     {
-        push    dwFlags
-        push    dwModelID
-        call    dwFunction
-        add     esp, 8
+        DWORD dwFunc = FUNC_RequestVehicleUpgrade;
+        _asm
+        {
+            push    dwFlags
+            push    dwModelID
+            call    dwFunc
+            add     esp, 8
+        }
+    }
+    else
+    {
+        DWORD dwFunction = FUNC_CStreaming__RequestModel;
+        _asm
+        {
+            push    dwFlags
+            push    dwModelID
+            call    dwFunction
+            add     esp, 8
+        }
     }
 }
 
-void CStreamingSA::LoadAllRequestedModels ( BOOL bOnlyPriorityModels )
+
+void CStreamingSA::LoadAllRequestedModels ( BOOL bOnlyPriorityModels, const char* szTag )
 {
-    // Keep looping if bLoadingBigModel is true
-    // If still true after 1 second, force false and try again
-
-    // Record before state
-    SPassStats before;
-    before.Record ();
-
-    // Init loop vars
-    SPassStats previousPass = before;
-    SPassStats after;
-    int iNumRepeats = 0;
-    int iNumForces = 0;
-    int iNumModelsRequestedLowest = before.numModelsRequested;
-    CTickCount startTickCount = CTickCount::Now ();
-
-    while ( true )
+    DWORD dwFunction = FUNC_LoadAllRequestedModels;
+    DWORD dwOnlyPriorityModels = bOnlyPriorityModels;
+    _asm
     {
-        DWORD dwFunction = FUNC_LoadAllRequestedModels;
-        DWORD dwOnlyPriorityModels = bOnlyPriorityModels;
-        _asm
-        {
-            push    dwOnlyPriorityModels
-            call    dwFunction
-            add     esp, 4
-        }
-
-        // Record after state
-        after.Record ();
-
-        // Load worked ok?
-        if ( after.bLoadingBigModel == false &&
-             after.numPriorityRequests == 0 &&
-             ( after.numModelsRequested == 0 || bOnlyPriorityModels ) )
-        {
-            break;
-        }
-
-        // Decide what to do on load fail
-        if ( iNumRepeats > 3 && ( CTickCount::Now () - startTickCount ).ToLongLong () > 1000 )
-        {
-            if ( !after.bLoadingBigModel )
-                break;
-
-            MemPutFast < BYTE > ( VAR_CStreaming_bLoadingBigModel, 0 );
-            iNumForces++;
-        }
-
-        previousPass = after;
-        iNumRepeats++;
-    }
-
-    // Should log this?
-    if ( iNumRepeats > 0 || before.bLoadingBigModel )
-    {
-        SString strType ( "LoadAllRequestedModels(%d): ", bOnlyPriorityModels );
-        SString strStatus ( " Before[ bBig:%d numPri:%d numReq:%d mem:%d]"
-                            " After[ bBig:%d numPri:%d numReq:%d mem:%d]"
-                            " reps:%d"
-                            " force:%d"
-                            " time:%d"
-                            , before.bLoadingBigModel
-                            , before.numPriorityRequests
-                            , before.numModelsRequested
-                            , before.memoryUsed
-                            , after.bLoadingBigModel
-                            , after.numPriorityRequests
-                            , after.numModelsRequested
-                            , after.memoryUsed
-                            , iNumRepeats
-                            , iNumForces
-                            , (int)( CTickCount::Now () - startTickCount ).ToLongLong ()
-                        );
-        AddReportLog ( 6640, strType + strStatus );
-        LogEvent ( 640, strType, "", strStatus );
+        push    dwOnlyPriorityModels
+        call    dwFunction
+        add     esp, 4
     }
 }
 
 
 BOOL CStreamingSA::HasModelLoaded ( DWORD dwModelID )
 {
-    DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
-
-    BOOL bReturn = 0;
-    _asm
+    if ( IsUpgradeModelId ( dwModelID ) )
     {
-        push    dwModelID
-        call    dwFunc
-        movzx   eax, al
-        mov     bReturn, eax
-        pop     eax
+        bool bReturn;
+        DWORD dwFunc = FUNC_CStreaming__HasVehicleUpgradeLoaded;
+        _asm
+        {
+            push    dwModelID
+            call    dwFunc
+            add     esp, 0x4
+            mov     bReturn, al
+        }
+        return bReturn;
     }
-
-    return bReturn;
-}
-
-void CStreamingSA::RequestAnimations ( int iAnimationLibraryBlock, DWORD dwFlags )
-{
-    iAnimationLibraryBlock += 25575;
-    RequestModel( iAnimationLibraryBlock, dwFlags );
-}
-
-BOOL CStreamingSA::HaveAnimationsLoaded ( int iAnimationLibraryBlock )
-{
-    iAnimationLibraryBlock += 25575;
-    return HasModelLoaded( iAnimationLibraryBlock );
-}
-
-bool CStreamingSA::HasVehicleUpgradeLoaded ( int model )
-{
-    bool bReturn;
-    DWORD dwFunc = FUNC_CStreaming__HasVehicleUpgradeLoaded;
-    _asm
+    else
     {
-        push    model
-        call    dwFunc
-        add     esp, 0x4
-        mov     bReturn, al
+        DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
+        BOOL bReturn = 0;
+        _asm
+        {
+            push    dwModelID
+            call    dwFunc
+            movzx   eax, al
+            mov     bReturn, eax
+            pop     eax
+        }
+
+        return bReturn;
     }
-    return bReturn;
 }
 
 void CStreamingSA::RequestSpecialModel ( DWORD model, const char * szTexture, DWORD channel )

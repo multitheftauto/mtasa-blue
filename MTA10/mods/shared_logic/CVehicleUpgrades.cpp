@@ -315,12 +315,7 @@ void CVehicleUpgrades::ForceAddUpgrade ( unsigned short usUpgrade )
                 if ( !g_pGame->IsASyncLoadingEnabled () || !pModelInfo->IsLoaded () )
                 {
                     // Request and load now
-                    pModelInfo->RequestVehicleUpgrade ();
-
-                    g_pGame->GetStreaming()->LoadAllRequestedModels ( true );
-
-                    if ( !pModelInfo->IsLoaded () )
-                        g_pGame->GetStreaming()->LoadAllRequestedModels ();
+                    pModelInfo->Request( BLOCKING, "CVehicleUpgrades::ForceAddUpgrade" );
                 }
                 // Add the upgrade
                 pVehicle->AddVehicleUpgrade ( usUpgrade );

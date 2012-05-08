@@ -144,7 +144,9 @@ bool _cdecl OnCallCStreamingInfoAddToList ( int flags, SImgGTAItemInfo* pImgGTAI
         BYTE& bLoadingBigModel = *(BYTE*)VAR_CStreaming_bLoadingBigModel;
         if ( bLoadingBigModel )
         {
-            pGameInterface->GetStreaming()->LoadAllRequestedModels ();
+            pGameInterface->GetStreaming()->LoadAllRequestedModels ( true );
+            if ( bLoadingBigModel )
+                pGameInterface->GetStreaming()->LoadAllRequestedModels ( false );
             assert ( !bLoadingBigModel );
         }
 
