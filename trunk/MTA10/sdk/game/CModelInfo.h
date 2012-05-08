@@ -71,7 +71,7 @@ public:
 
     virtual char*           GetNameIfVehicle        () = 0;
 
-    virtual VOID            Request                 ( bool bAndLoad = false, bool bWaitForLoad = false, bool bHighPriority = false ) = 0;
+    virtual VOID            Request                 ( EModelRequestType requestType, const char* szTag/* = NULL*/ ) = 0;
     virtual VOID            Remove                  () = 0;
     virtual BYTE            GetLevelFromPosition    ( CVector * vecPosition ) = 0;
     virtual BOOL            IsLoaded                () = 0;
@@ -83,7 +83,7 @@ public:
     virtual void            SetLODDistance          ( float fDistance ) = 0;
     virtual void            RestreamIPL             () = 0;
 
-    virtual void            AddRef                  ( bool bWaitForLoad, bool bHighPriority = false ) = 0;
+    virtual void            ModelAddRef             ( EModelRequestType requestType, const char* szTag/* = NULL*/ ) = 0;
     virtual void            RemoveRef               ( bool bRemoveExtraGTARef = false ) = 0;
     virtual int             GetRefCount             () = 0;
 
@@ -96,9 +96,6 @@ public:
     virtual unsigned int    GetNumRemaps            ( void ) = 0;
     virtual void*           GetVehicleSuspensionData( void ) = 0;
     virtual void*           SetVehicleSuspensionData( void* pSuspensionLines ) = 0;
-
-    // ONLY use for upgrade models
-    virtual void            RequestVehicleUpgrade   ( void ) = 0;
 
     // ONLY use for peds
     virtual void            GetVoice                ( short* psVoiceType, short* psVoice ) = 0;

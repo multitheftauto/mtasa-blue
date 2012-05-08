@@ -16,3 +16,27 @@ int CAnimBlockSAInterface::GetIndex ( void )
 {
     return ( ( ( DWORD ) this - ARRAY_CAnimManager_AnimBlocks ) / 32 );
 }
+
+
+void CAnimBlockSA::Request ( EModelRequestType requestType )
+{
+    if ( IsLoaded () )
+        return;
+
+    DWORD dwModelID = GetIndex() + 25575;
+
+    if ( requestType == BLOCKING )
+    {
+        CModelInfo* pModelInfo = pGame->GetModelInfo ( dwModelID );
+        pGame->GetStreaming()->RequestModel ( dwModelID, 0x14 );
+        AddRef ();
+        pGame->GetStreaming()->LoadAllRequestedModels ( true );
+        assert ( IsLoaded() );
+        assert ( pGame->GetStreaming()->HasModelLoaded ( dwModelID ) );
+    }
+    else
+    {
+        pGame->GetStreaming()->RequestModel ( dwModelID, 0x04 );
+        AddRef ();
+    }
+}

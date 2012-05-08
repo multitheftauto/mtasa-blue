@@ -41,6 +41,7 @@ public:
     int                                 GetIndex                ( void )    { return m_pInterface->GetIndex (); }
     void                                AddRef                  ( void )    { m_pInterface->usRefs++; }
     unsigned short                      GetRefs                 ( void )    { return m_pInterface->usRefs; }
+    void                                Request                 ( EModelRequestType requestType );
     bool                                IsLoaded                ( void )    { return m_pInterface->bLoaded; }
 
 protected:

@@ -1256,7 +1256,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     {
         if ( pVehicle->IsStreamedIn () )
         {
-            g_pGame->GetStreaming()->LoadAllRequestedModels ();
+            pModelInfo->Request ( BLOCKING, "CClientPed::WarpIntoVehicle" );
         }
     }
 
@@ -2337,7 +2337,7 @@ void CClientPed::StreamedInPulse ( void )
         {
             m_iLoadAllModelsCounter--;
             if ( GetModelInfo () )
-                g_pGame->GetStreaming()->LoadAllRequestedModels();
+                g_pGame->GetStreaming()->LoadAllRequestedModels( false, "CClientPed::StreamedInPulse - m_iLoadAllModelsCounter" );
         }
 
 
@@ -3136,7 +3136,7 @@ void CClientPed::_CreateModel ( void )
     // Replace the loaded model info with the model we're going to load and
     // add a reference to it.
     m_pLoadedModelInfo = m_pModelInfo;
-    m_pLoadedModelInfo->AddRef ( true );
+    m_pLoadedModelInfo->ModelAddRef ( BLOCKING, "CClientPed::_CreateModel" );
 
     // Create the new ped
     m_pPlayerPed = dynamic_cast < CPlayerPed* > ( g_pGame->GetPools ()->AddPed ( static_cast < ePedModel > ( m_ulModel ) ) );
@@ -3272,7 +3272,7 @@ void CClientPed::_CreateLocalModel ( void )
 
         // Add a reference to the model we're using
         m_pLoadedModelInfo = m_pModelInfo;
-        m_pLoadedModelInfo->AddRef ( true );
+        m_pLoadedModelInfo->ModelAddRef ( BLOCKING, "CClientPed::_CreateLocalModel" );
 
         // Make sure we are CJ
         if ( m_pPlayerPed->GetModelIndex () != m_ulModel )
@@ -3448,7 +3448,7 @@ void CClientPed::_ChangeModel ( void )
             m_pLoadedModelInfo = m_pModelInfo;
 
             // Add reference to the model
-            m_pLoadedModelInfo->AddRef ( true );
+            m_pLoadedModelInfo->ModelAddRef ( BLOCKING, "CClientPed::_ChangeModel" );
 
             // Set the new player model and restore the interior
             m_pPlayerPed->SetModelIndex ( m_ulModel );
@@ -3506,7 +3506,7 @@ void CClientPed::ReCreateModel ( void )
         bool bSameModel = ( m_pLoadedModelInfo == m_pModelInfo );
         if ( bSameModel )
         {
-            m_pLoadedModelInfo->AddRef ( true );
+            m_pLoadedModelInfo->ModelAddRef ( BLOCKING, "CClientPed::ReCreateModel" );
         }
 
         // Destroy the old model
@@ -3577,15 +3577,31 @@ void CClientPed::StreamIn ( bool bInstantly )
         NotifyCreate ();
         return;
     }
-
-    // Request it
-    if ( !m_pPlayerPed && m_pRequester->Request ( static_cast < unsigned short > ( m_ulModel ), this ) )
+#if 0
+    // We need to create now?
+    if ( bInstantly )
     {
-        m_pModelInfo->MakeCustomModel ( );
-        // If it was loaded, create it immediately.
-        _CreateModel ();
+        // Request its model blocking
+        if ( !m_pPlayerPed && m_pRequester->RequestBlocking ( static_cast < unsigned short > ( m_ulModel ), "CClientVehicle::StreamIn - bInstantly" ) )
+        {
+            m_pModelInfo->MakeCustomModel ( );
+            // If it was loaded, create it immediately.
+            _CreateModel ();
+        }
+        else NotifyUnableToCreate ();
     }
-    else NotifyUnableToCreate ();
+    else
+#endif
+    {
+        // Request it
+        if ( !m_pPlayerPed && m_pRequester->Request ( static_cast < unsigned short > ( m_ulModel ), this ) )
+        {
+            m_pModelInfo->MakeCustomModel ( );
+            // If it was loaded, create it immediately.
+            _CreateModel ();
+        }
+        else NotifyUnableToCreate ();
+    }
 }
 
 
@@ -5106,19 +5122,8 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
         
         if( !pBlock->IsLoaded() )
         {
-            int iTimeToWait = 50;
-
-            g_pGame->GetStreaming()->RequestAnimations( pBlock->GetIndex(), 4 );
-            g_pGame->GetStreaming()->LoadAllRequestedModels( );
-
-            while( !pBlock->IsLoaded() && iTimeToWait != 0 )
-            {
-                iTimeToWait--;
-                Sleep(10);
-            }
-
-            if( iTimeToWait == 0 )
-                bLoaded = false;
+            pBlock->Request ( BLOCKING );
+            assert( pBlock->IsLoaded () );
         }
 
         if ( bLoaded )
@@ -5149,9 +5154,12 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
         }
         else
         {
+            assert ( 0 );
+/*
             // TODO: unload unreferenced blocks later on
             g_pGame->GetStreaming ()->RequestAnimations ( pBlock->GetIndex (), 8 );
             m_bRequestedAnimation = true;
+*/
         }
     }
     m_pAnimationBlock = pBlock;
@@ -5518,7 +5526,7 @@ void CClientPed::HandleWaitingForGroundToLoad ( void )
 
     // Load load load
     if ( GetModelInfo () )
-        g_pGame->GetStreaming()->LoadAllRequestedModels ();
+        g_pGame->GetStreaming()->LoadAllRequestedModels ( false, "CClientPed::HandleWaitingForGroundToLoad" );
 
     // Start out with a fairly big radius to check, and shrink it down over time
     float fUseRadius = 50.0f * ( 1.f - Max ( 0.f, m_fObjectsAroundTolerance ) );

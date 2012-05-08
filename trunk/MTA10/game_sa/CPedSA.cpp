@@ -379,7 +379,7 @@ CWeapon * CPedSA::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo, eWea
                 CModelInfo * pWeaponModel = pGame->GetModelInfo ( iModel );
                 if ( pWeaponModel )
                 {
-                    pWeaponModel->Request ( true, true );
+                    pWeaponModel->Request ( BLOCKING, "CPedSA::GiveWeapon" );
                     pWeaponModel->MakeCustomModel ();
                 }
             }

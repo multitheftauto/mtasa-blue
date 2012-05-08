@@ -47,7 +47,7 @@ bool CClientDFF::LoadDFF ( const char* szFile, unsigned short usModelId, bool bL
             return false;
 
         // Make sure previous model+collision is loaded
-        m_pManager->GetModelRequestManager ()->RequestBlocking ( usModelId );
+        m_pManager->GetModelRequestManager ()->RequestBlocking ( usModelId, "CClientDFF::LoadDFF" );
 
         // Attempt loading it
         m_pLoadedClump = g_pGame->GetRenderWare ()->ReadDFF ( szFile, usModelId, bLoadEmbeddedCollisions );
@@ -256,7 +256,7 @@ bool CClientDFF::ReplacePedModel ( unsigned short usModel )
 bool CClientDFF::ReplaceVehicleModel ( unsigned short usModel )
 {
     // Make sure previous model+collision is loaded
-    m_pManager->GetModelRequestManager ()->RequestBlocking ( usModel );
+    m_pManager->GetModelRequestManager ()->RequestBlocking ( usModel, "CClientDFF::ReplaceVehicleModel" );
 
     // Grab the model info for that model and replace the model
     CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModel );
