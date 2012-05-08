@@ -83,6 +83,8 @@ public:
     inline void                     SetHasConnectionTrouble ( bool bHasTrouble )                    { m_bHasConnectionTrouble = bHasTrouble; }
     inline ePuresyncType            GetLastPuresyncType     ( void )                                { return m_LastPuresyncType; }
     inline void                     SetLastPuresyncType     ( ePuresyncType LastPuresyncType )      { m_LastPuresyncType = LastPuresyncType; }
+    void                            SetLightsyncCalcedVelocity ( const CVector& vecVelocity )       { m_vecLightsyncCalcedVelocity = vecVelocity; }
+    const CVector&                  GetLightsyncCalcedVelocity ( void )                             { return m_vecLightsyncCalcedVelocity; }
     inline void                     IncrementPlayerSync     ( void )                                { ++m_uiPlayerSyncCount; }
     inline void                     IncrementKeySync        ( void )                                { ++m_uiKeySyncCount; }
     inline void                     IncrementVehicleSync    ( void )                                { ++m_uiVehicleSyncCount; }
@@ -158,6 +160,7 @@ private:
 
     CClientPlayerVoice*             m_voice;
     ePuresyncType                   m_LastPuresyncType;
+    CVector                         m_vecLightsyncCalcedVelocity;
 #ifdef MTA_DEBUG
 private:
     bool                            m_bShowingWepdata;
