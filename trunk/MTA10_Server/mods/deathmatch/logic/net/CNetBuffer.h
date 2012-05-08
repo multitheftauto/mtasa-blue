@@ -157,6 +157,7 @@ public:
     CNetJobData*                GetNewJobData               ( void );
     void                        ProcessIncoming             ( void );
     void                        SetAutoPulseEnabled         ( bool bEnable );
+    void                        AddPacketStat               ( CNetServer::ENetworkUsageDirection eDirection, uchar ucPacketID, int iPacketSize, TIMEUS elapsedTime );
 
     // Sync thread functions
     static void*                StaticThreadProc            ( void* pContext );
@@ -173,6 +174,8 @@ public:
     CThreadHandle*                      m_pServiceThreadHandle;
     CElapsedTime                        m_TimeThreadFPSLastCalced;
     float                               m_fSmoothThreadFPS;
+    CElapsedTime                        m_TimeSinceGetPacketStats;
+    SPacketStat                         m_PacketStatList [ 2 ] [ 256 ];
 
     // Sync thread variables
     CNetServer*                         m_pRealNetServer;

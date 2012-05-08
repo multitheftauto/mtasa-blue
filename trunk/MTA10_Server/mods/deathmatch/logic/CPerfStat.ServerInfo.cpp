@@ -13,6 +13,9 @@
 #include "StdInc.h"
 #include "net/SimHeaders.h"
 
+extern uint g_uiDatabaseThreadProcessorNumber;
+extern uint g_uiThreadnetProcessorNumber;
+
 namespace
 {
     //
@@ -306,6 +309,11 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         m_OptionsList.push_back ( StringPair ( "Max LS plrs/frame",         SString ( "%d", g_pBandwidthSettings->iLightSyncPlrsPerFrame ) ) );
         m_OptionsList.push_back ( StringPair ( "Test - Everyone near",      SString ( "%d", g_pBandwidthSettings->bTestPretendEveryoneIsNear ) ) );
         m_OptionsList.push_back ( StringPair ( "Test - Send multiplier",    SString ( "%d", g_pBandwidthSettings->iTestSendMultiplier ) ) );
+
+        m_OptionsList.push_back ( StringPair ( "Main (Logic) core #",       SString ( "%d", _GetCurrentProcessorNumber () ) ) );
+        m_OptionsList.push_back ( StringPair ( "Threadnet (Sync) core #",   SString ( "%d", g_uiThreadnetProcessorNumber ) ) );
+        m_OptionsList.push_back ( StringPair ( "Raknet thread core #",      SString ( "%d", m_PrevLiveStats.uiNetworkUpdateLoopProcessorNumber ) ) );
+        m_OptionsList.push_back ( StringPair ( "DB thread core #",          SString ( "%d", g_uiDatabaseThreadProcessorNumber ) ) );
     }    
 
     // Add columns

@@ -10,6 +10,8 @@
 #include "StdInc.h"
 #include "SimHeaders.h"
 
+uint g_uiThreadnetProcessorNumber = -1;
+
 namespace
 {
     // Used in StaticProcessPacket and elsewhere
@@ -19,7 +21,6 @@ namespace
     bool                    ms_bNetStatisticsLastSavedValid = false;
     NetStatistics           ms_NetStatisticsLastSaved;
     NetServerPlayerID       ms_NetStatisticsLastFor;
-    const SPacketStat*      ms_PacketStatsLastSaved = NULL;
     bool                    ms_bBandwidthStatisticsLastSavedValid = false;
     SBandwidthStatistics    ms_BandwidthStatisticsLastSaved;
 }
@@ -266,18 +267,13 @@ bool CNetServerBuffer::GetNetworkStatistics ( NetStatistics* pDest, const NetSer
 //
 // CNetServerBuffer::GetPacketStats
 //
-// Blocking on first call, bit dodgy after that
+// Uses stats gathered here
 //
 ///////////////////////////////////////////////////////////////////////////
 const SPacketStat* CNetServerBuffer::GetPacketStats ( void )
 {
-    if ( !ms_PacketStatsLastSaved )
-    {
-        SGetPacketStatsArgs* pArgs = new SGetPacketStatsArgs ();
-        AddCommandAndWait ( pArgs );
-        ms_PacketStatsLastSaved = pArgs->result;
-    }
-    return ms_PacketStatsLastSaved;
+    m_TimeSinceGetPacketStats.Reset ();
+    return m_PacketStatList [ 0 ];
 }
 
 
@@ -361,6 +357,8 @@ void CNetServerBuffer::DeallocateNetServerBitStream ( NetBitStreamInterface* bit
 ///////////////////////////////////////////////////////////////////////////
 bool CNetServerBuffer::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering  )
 {
+    AddPacketStat ( STATS_OUTGOING_TRAFFIC, ucPacketID, bitStream->GetNumberOfBitsUsed () / 8, 0 );
+
     bitStream->AddRef ();
     SSendPacketArgs* pArgs = new SSendPacketArgs ( ucPacketID, playerID, bitStream, bBroadcast, packetPriority, packetReliability, packetOrdering );
     AddCommandAndFree ( pArgs );
@@ -728,6 +726,16 @@ bool CNetServerBuffer::PollCommand ( CNetJobData* pJobData, uint uiTimeout )
 }
 
 
+// Update info about one packet
+void CNetServerBuffer::AddPacketStat ( CNetServer::ENetworkUsageDirection eDirection, uchar ucPacketID, int iPacketSize, TIMEUS elapsedTime )
+{
+    SPacketStat& stat = m_PacketStatList [ eDirection ] [ ucPacketID ];
+    stat.iCount++;
+    stat.iTotalBytes += iPacketSize;
+    stat.totalTime += elapsedTime;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////
 //
 // CNetServerBuffer::ProcessIncoming
@@ -737,6 +745,8 @@ bool CNetServerBuffer::PollCommand ( CNetJobData* pJobData, uint uiTimeout )
 ///////////////////////////////////////////////////////////////////////////
 void CNetServerBuffer::ProcessIncoming ( void )
 {
+    bool bTimePacketHandler = m_TimeSinceGetPacketStats.Get () < 10000;
+
     // Get incoming packets
     shared.m_Mutex.Lock ( EActionWho::MAIN, EActionWhere::ProcessIncoming );
     std::list < SProcessPacketArgs* > inResultQueue = shared.m_InResultQueue;
@@ -748,8 +758,16 @@ void CNetServerBuffer::ProcessIncoming ( void )
     {
         SProcessPacketArgs* pArgs = *iter;
 
+        // Stats
+        const int iPacketSize = ( pArgs->BitStream->GetNumberOfUnreadBits () + 8 + 7 ) / 8;
+        const TIMEUS startTime = bTimePacketHandler ? GetTimeUs () : 0;
+
         if ( m_pfnDMPacketHandler )
             m_pfnDMPacketHandler( pArgs->ucPacketID, pArgs->Socket, pArgs->BitStream, pArgs->pNetExtraInfo );
+
+        // Stats
+        const TIMEUS elapsedTime = ( bTimePacketHandler ? GetTimeUs () : 0 ) - startTime;
+        AddPacketStat ( STATS_INCOMING_TRAFFIC, pArgs->ucPacketID, iPacketSize, elapsedTime );
 
         SAFE_RELEASE( pArgs->pNetExtraInfo );
         SAFE_RELEASE( pArgs->BitStream );
@@ -764,9 +782,9 @@ void CNetServerBuffer::ProcessIncoming ( void )
         CNetJobData* pJobData = *iter;
         shared.m_FinishedList.erase ( iter++ );
         // Check not refed
-        assert ( !ListContains ( shared.m_OutCommandQueue, pJobData ) );
-        assert ( !ListContains ( shared.m_OutResultQueue, pJobData ) );
-        assert ( !MapContains ( shared.m_FinishedList, pJobData ) );
+        dassert ( !ListContains ( shared.m_OutCommandQueue, pJobData ) );
+        dassert ( !ListContains ( shared.m_OutResultQueue, pJobData ) );
+        dassert ( !MapContains ( shared.m_FinishedList, pJobData ) );
         SAFE_DELETE( pJobData );
     }
 
@@ -833,6 +851,7 @@ void* CNetServerBuffer::ThreadProc ( void )
         {
             shared.m_Mutex.Unlock ( EActionWho::SYNC, EActionWhere::ThreadProc2 );
             m_pRealNetServer->DoPulse ();
+            g_uiThreadnetProcessorNumber = _GetCurrentProcessorNumber ();
             shared.m_Mutex.Lock ( EActionWho::SYNC, EActionWhere::ThreadProc2 );
         }
 
