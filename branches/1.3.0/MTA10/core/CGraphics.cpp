@@ -1175,7 +1175,16 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
 
                 // Draw it
                 if ( m_pLineInterface->GetWidth () != Item.Line.fWidth )
-                    m_pLineInterface->SetWidth ( Item.Line.fWidth );
+                {
+                    if ( m_CurDrawMode != EDrawMode::DX_LINE )
+                        m_pLineInterface->SetWidth ( Item.Line.fWidth );
+                    else
+                    {
+                        m_pLineInterface->End ();
+                        m_pLineInterface->SetWidth ( Item.Line.fWidth );
+                        m_pLineInterface->Begin ();
+                    }
+                }
                 CheckModes ( EDrawMode::DX_LINE, Item.blendMode );
                 m_pLineInterface->Draw ( List, 2, ModifyColorForBlendMode ( Item.Line.ulColor, Item.blendMode ) );
             }

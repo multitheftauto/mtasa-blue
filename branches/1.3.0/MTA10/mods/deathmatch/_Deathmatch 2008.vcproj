@@ -381,6 +381,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CClientModelCacheManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CClientPerfStat.LibMemory.cpp"
 					>
 				</File>
@@ -1820,6 +1824,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CClientGame.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CClientModelCacheManager.h"
 					>
 				</File>
 				<File

@@ -362,7 +362,7 @@ void CRenderWareSA::ModelInfoTXDAddTextures ( std::list < RwTexture* >& textures
     {
         if ( !pTXD )
         {
-            pGame->GetModelInfo ( usModelID )->Request ( true, true );
+            pGame->GetModelInfo ( usModelID )->Request ( BLOCKING, "CRenderWareSA::ModelInfoTXDAddTextures" );
             CTxdStore_AddRef ( usTxdId );
             ( (void (__cdecl *)(unsigned short))FUNC_RemoveModel )( usModelID );
             pTXD = CTxdStore_GetTxd ( usTxdId );
@@ -884,7 +884,7 @@ void CRenderWareSA::GetModelTextureNames ( std::vector < SString >& outNameList,
     {
         // Try model load
         bLoadedModel = true;
-        pGame->GetModelInfo ( usModelId )->Request ( true, true );
+        pGame->GetModelInfo ( usModelId )->Request ( BLOCKING, "CRenderWareSA::GetModelTextureNames" );
         pTXD = CTxdStore_GetTxd ( usTxdId );
     }
 

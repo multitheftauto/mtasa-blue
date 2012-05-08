@@ -406,7 +406,7 @@ void CClientObject::StreamIn ( bool bInstantly )
     if ( bInstantly )
     {
         // Request the model blocking
-        if ( m_pModelRequester->RequestBlocking ( m_usModel ) )
+        if ( m_pModelRequester->RequestBlocking ( m_usModel, "CClientObject::StreamIn - bInstantly" ) )
         {
             // Create us
             Create ();
@@ -462,7 +462,7 @@ void CClientObject::Create ( void )
         if ( !CClientObjectManager::IsObjectLimitReached () )
         {
             // Add a reference to the object
-            m_pModelInfo->AddRef ( true );
+            m_pModelInfo->ModelAddRef ( BLOCKING, "CClientObject::Create" );
 
             // If the new object is not breakable, allow it into the vertical line test
             g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest ( !CClientObjectManager::IsBreakableModel ( m_usModel ) );

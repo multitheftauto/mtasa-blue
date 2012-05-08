@@ -1162,4 +1162,34 @@ namespace SharedUtil
             outList.push_back ( iter->first );
     }
 
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
+    // GetCurrentProcessorNumber for the current thread.
+    //
+    // Only a guide as it could change after the call has returned
+    //
+    ///////////////////////////////////////////////////////////////////////////
+    DWORD _GetCurrentProcessorNumber ( void )
+    {
+        DWORD dwProcessorNumber = -1;
+#ifdef WIN32
+        typedef DWORD (WINAPI *FUNC_GetCurrentProcessorNumber)( VOID ); 
+
+        // Dynamically load GetCurrentProcessorNumber, as it does not exist on XP
+        static FUNC_GetCurrentProcessorNumber pfn = NULL;
+        static bool bDone = false;
+        if ( !bDone )
+        {
+            HMODULE hModule = LoadLibraryA ( "Kernel32" );
+            pfn = static_cast < FUNC_GetCurrentProcessorNumber > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetCurrentProcessorNumber" ) ) );
+            bDone = true;
+        }
+
+        if ( pfn )
+            dwProcessorNumber = pfn ();
+#endif
+        return dwProcessorNumber;
+    }
+
 }

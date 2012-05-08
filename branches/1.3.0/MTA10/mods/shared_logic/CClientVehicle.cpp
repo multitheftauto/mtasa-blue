@@ -948,7 +948,7 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, bool bLoadImmedi
             // Preload the model
             if( !m_pModelInfo->IsLoaded () )
             {
-                m_pModelInfo->Request ( true, true );
+                m_pModelInfo->Request ( BLOCKING, "CClientVehicle::SetModelBlocking" );
                 m_pModelInfo->MakeCustomModel ();
             }
 
@@ -2084,7 +2084,7 @@ void CClientVehicle::StreamIn ( bool bInstantly )
     if ( bInstantly )
     {
         // Request its model blocking
-        if ( m_pModelRequester->RequestBlocking ( m_usModel ) )
+        if ( m_pModelRequester->RequestBlocking ( m_usModel, "CClientVehicle::StreamIn - bInstantly" ) )
         {
             // Create us
             Create ();
@@ -2159,7 +2159,7 @@ void CClientVehicle::Create ( void )
         }
 
         // Add a reference to the vehicle model we're creating.
-        m_pModelInfo->AddRef ( true );
+        m_pModelInfo->ModelAddRef ( BLOCKING, "CClientVehicle::Create" );
 
         // Might want to make this settable by users? Could just leave it like this, don't mind.
         // Doesn't appear to work with trucks - only cars - stored string is up to 8 chars, will be reset after
@@ -3724,7 +3724,7 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
 
     // Load load load
     if ( GetModelInfo () )
-        g_pGame->GetStreaming()->LoadAllRequestedModels ();
+        g_pGame->GetStreaming()->LoadAllRequestedModels ( false, "CClientVehicle::HandleWaitingForGroundToLoad" );
 
     // Start out with a fairly big radius to check, and shrink it down over time
     float fUseRadius = 50.0f * ( 1.f - Max ( 0.f, m_fObjectsAroundTolerance ) );

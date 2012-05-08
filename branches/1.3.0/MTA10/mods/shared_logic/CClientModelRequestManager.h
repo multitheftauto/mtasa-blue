@@ -39,7 +39,7 @@ public:
     bool                            HasRequested                    ( CClientEntity* pRequester );
     CModelInfo*                     GetRequestedModelInfo           ( CClientEntity* pRequester );
 
-    bool                            RequestBlocking                 ( unsigned short usModelID );
+    bool                            RequestBlocking                 ( unsigned short usModelID, const char* szTag );
 
     bool                            Request                         ( unsigned short usModelID, CClientEntity* pRequester );
     void                            Cancel                          ( CClientEntity* pRequester, bool bAllowQueue );

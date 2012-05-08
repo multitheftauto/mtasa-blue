@@ -114,6 +114,7 @@
 #include "net/Packets.h"
 #include "logic/CClientEntityRefManager.h"
 #include "logic/CGameEntityXRefManager.h"
+#include "logic/CClientModelCacheManager.h"
 #include "logic/CClientPerfStatManager.h"
 #include "logic/CDeathmatchVehicle.h"
 #include "logic/CResource.h"

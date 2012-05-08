@@ -159,6 +159,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     // Startup game entity tracking manager
     m_pGameEntityXRefManager = NewGameEntityXRefManager ();
+    m_pModelCacheManager = NewClientModelCacheManager ();
 
     // Initialize our root entity with an invalid id, we dont know the true id until map-start
     m_pRootEntity = new CClientDummy ( NULL, INVALID_ELEMENT_ID, "root" );
@@ -439,6 +440,7 @@ CClientGame::~CClientGame ( void )
 
     delete m_pRootEntity;
 
+    delete m_pModelCacheManager;
     delete m_pGameEntityXRefManager;
     delete m_pZoneNames;
     delete m_pScriptKeyBinds;    
@@ -862,6 +864,9 @@ void CClientGame::DoPulsePostFrame ( void )
             m_HeliCollisionsMap.clear ( );
             m_LastClearTime.Reset ( );
         }
+
+        GetModelCacheManager ()->DrawStats ();
+
         CClientPerfStatManager::GetSingleton ()->DoPulse ();
     }
 
@@ -986,6 +991,8 @@ void CClientGame::DoPulses ( void )
 #endif
     m_pLatentTransferManager->DoPulse ();
     m_pLuaManager->DoPulse ();
+
+    GetModelCacheManager ()->DoPulse ();
 
     #ifdef MTA_DEBUG
     UpdateMimics ();
