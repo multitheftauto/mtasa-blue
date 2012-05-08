@@ -984,7 +984,7 @@ int CMainConfig::GetPendingWorkToDoSleepTime ( void )
     if ( m_iPendingWorkToDoSleepTime != -1 )
     {
         if ( m_bThreadNetEnabled )
-            return Max ( 5, m_iPendingWorkToDoSleepTime );
+            return Max ( 0, m_iPendingWorkToDoSleepTime );
         else
             return m_iPendingWorkToDoSleepTime;
     }

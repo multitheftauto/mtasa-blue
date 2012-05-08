@@ -112,6 +112,8 @@ namespace SharedUtil
     // See implementation for details
     bool            IsMainThread                    ( void );
 
+    DWORD           _GetCurrentProcessorNumber      ( void );
+
     SString         EscapeString                    ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#' );
     SString         UnescapeString                  ( const SString& strText, char cSpecialChar = '#' );
 

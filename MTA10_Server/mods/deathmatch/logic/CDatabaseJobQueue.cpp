@@ -14,6 +14,7 @@
 #include "CDatabaseJobQueue.h"
 #include "SharedUtil.Thread.h"
 
+uint g_uiDatabaseThreadProcessorNumber = -1;
 
 ///////////////////////////////////////////////////////////////
 //
@@ -572,6 +573,8 @@ void* CDatabaseJobQueueImpl::ThreadProc ( void )
 
             // Process command
             ProcessCommand ( pJobData );
+
+            g_uiDatabaseThreadProcessorNumber = _GetCurrentProcessorNumber ();
 
             // Store result
             shared.m_Mutex.Lock ();
