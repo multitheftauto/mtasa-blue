@@ -2059,8 +2059,16 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
         pPlayer->LockArmor ( armor.data.fValue );
     }
 
+    CVector vecCalcedVelocity;
     if ( bReadPosition )
     {
+        // Calculate velocity
+        ulong ulElapsedTime = CClientTime::GetTime () - pPlayer->GetLastPuresyncTime ();
+        vecCalcedVelocity = pos.data.vecPosition - pPlayer->GetLastPuresyncPosition ();
+        float fDistance = vecCalcedVelocity.Normalize ();
+        float fSpeed = fDistance / Max( 0.01f, ulElapsedTime * 0.001f );
+        vecCalcedVelocity *= fSpeed;
+
         pPlayer->SetPosition ( pos.data.vecPosition );
         pPlayer->SetLastPuresyncPosition ( pos.data.vecPosition );
 
@@ -2089,6 +2097,9 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
                 pVehicle->SetHealth ( vehicleHealth.data.fValue );
         }
     }
+
+    // This is to help the model cacher predict what will be required soon
+    pPlayer->SetLightsyncCalcedVelocity ( vecCalcedVelocity );
 
     pPlayer->SetLastPuresyncTime ( CClientTime::GetTime () );
     pPlayer->IncrementPlayerSync ();

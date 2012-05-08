@@ -83,6 +83,7 @@ namespace SharedUtil
         // Conversion
         double      ToDouble        ( void ) const      { return static_cast < double > ( m_llTicks ); }
         long long   ToLongLong      ( void ) const      { return m_llTicks; }
+        int         ToInt           ( void ) const      { return static_cast < int > ( m_llTicks ); }
 
         // Static functions
         static CTickCount Now ( bool bUseModuleTickCount = false )

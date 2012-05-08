@@ -58,6 +58,7 @@
 #define HeliKill_List_Clear_Rate 500
 #define MIN_PUSH_ANTISPAM_RATE 1500
 class CGameEntityXRefManager;
+class CClientModelCacheManager;
 
 class CClientGame
 {
@@ -265,6 +266,7 @@ public:
 #endif
     inline CLatentTransferManager*      GetLatentTransferManager        ( void )        { return m_pLatentTransferManager; }
     inline CGameEntityXRefManager*      GetGameEntityXRefManager        ( void )        { return m_pGameEntityXRefManager; }
+    inline CClientModelCacheManager*    GetModelCacheManager            ( void )        { return m_pModelCacheManager; }
 
     inline CElementDeleter*             GetElementDeleter               ( void )        { return &m_ElementDeleter; }
 
@@ -566,6 +568,7 @@ private:
     bool                                m_bHudAreaNameDisabled;
     CSingularFileDownloadManager*       m_pSingularFileDownloadManager;
     CGameEntityXRefManager*             m_pGameEntityXRefManager;
+    CClientModelCacheManager*           m_pModelCacheManager;
 
     // Revised facilities
     CServer                             m_Server;
