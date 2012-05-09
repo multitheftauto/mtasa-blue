@@ -32,7 +32,7 @@ extern "C"
     #define LUA_CHECKSTACK(vm,space) lua_checkstack(vm, (space) )
 #else
     // Extra room in release to avoid trouble.
-    #define LUA_CHECKSTACK(vm,space) lua_checkstack(vm, (space)*2 )
+    #define LUA_CHECKSTACK(vm,space) lua_checkstack(vm, ((space)+2)*3 )
 #endif
 
 class CAccessControlList;

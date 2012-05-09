@@ -227,6 +227,8 @@ void CPerPlayerEntity::CreateEntity ( CPlayer* pPlayer )
 }
 
 
+// Optimizations off for this function to track crash
+#pragma optimize( "", off )
 void CPerPlayerEntity::DestroyEntity ( CPlayer* pPlayer )
 {
     // Are we visible?
@@ -249,10 +251,21 @@ void CPerPlayerEntity::DestroyEntity ( CPlayer* pPlayer )
         else
         {
             //CLogger::DebugPrintf ( "Destroyed %u (%s) for everyone (%u)\n", GetID (), GetName (), m_Players.size () );
+
+            // Check m_Players for crash
+            std::multimap < ushort, CPlayer* > groupMap;
+            for ( std::list < CPlayer* > ::iterator iter = m_Players.begin () ; iter != m_Players.end () ; ++iter )
+            {
+                CPlayer* pPlayer = *iter;
+                MapInsert ( groupMap, pPlayer->GetBitStreamVersion (), pPlayer );
+            }
+
             BroadcastOnlyVisible ( Packet );
         }
     }
 }
+
+#pragma optimize( "", on )
 
 
 void CPerPlayerEntity::BroadcastOnlyVisible ( const CPacket& Packet )

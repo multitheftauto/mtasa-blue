@@ -1898,6 +1898,8 @@ void CGame::Packet_PlayerTimeout ( CPlayerTimeoutPacket& Packet )
 // Relay this (pure sync) packet to all the other players using distance rules
 void CGame::RelayPlayerPuresync ( CPacket& Packet )
 {
+    CLOCK( "RelayPlayerPuresync", "Firstbit" );
+
     UpdateModuleTickCount64 ();
 
     // Make a list of players to send this packet to
@@ -1928,13 +1930,18 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
         }
     }
 
+    UNCLOCK( "RelayPlayerPuresync", "Firstbit" );
+
     //
     // Process near sync
     //
     {
+        CLOCK( "RelayPlayerPuresync", "UpdateOthersPuresyncNearList" );
         // Insert into other players puresync near list if appropriate
         pPlayer->UpdateOthersPuresyncNearList ();
+        UNCLOCK( "RelayPlayerPuresync", "UpdateOthersPuresyncNearList" );
 
+        CLOCK( "RelayPlayerPuresync", "ProcessNearList" );
         // Use this players puresync near list for sending packets
         std::map < CPlayer*, SPuresyncNearInfo >& nearList = pPlayer->GetPuresyncNearPlayerList ();
 
@@ -1982,21 +1989,28 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
                 }
             }
         }
+        UNCLOCK( "RelayPlayerPuresync", "ProcessNearList" );
 
+        CLOCK( "RelayPlayerPuresync", "MovePlayerToPuresyncFarList" );
         // Do pending near->far list moves
         for ( std::vector < CPlayer* > ::const_iterator iter = moveToFarListList.begin (); iter != moveToFarListList.end (); ++iter )
         {
             pPlayer->MovePlayerToPuresyncFarList ( *iter );
         }
+        UNCLOCK( "RelayPlayerPuresync", "MovePlayerToPuresyncFarList" );
     }
 
+    CLOCK( "RelayPlayerPuresync", "Broadcast" );
     // Relay packet
     if ( !sendList.empty () )
         for ( int i = 0 ; i < g_pBandwidthSettings->iTestSendMultiplier ; i++ )
             CPlayerManager::Broadcast ( Packet, sendList );
+    UNCLOCK( "RelayPlayerPuresync", "Broadcast" );
 
+    CLOCK( "RelayPlayerPuresync", "UpdatePuresyncSimPlayer" );
     // Update sim data
     CSimControl::UpdatePuresyncSimPlayer ( pPlayer, simSendList );
+    UNCLOCK( "RelayPlayerPuresync", "UpdatePuresyncSimPlayer" );
 }
 
 void CGame::Packet_PlayerPuresync ( CPlayerPuresyncPacket& Packet )
@@ -2016,11 +2030,15 @@ void CGame::Packet_PlayerPuresync ( CPlayerPuresyncPacket& Packet )
             if ( ( pPlayer->GetPuresyncCount () % 4 ) == 0 )
                 pPlayer->Send ( CReturnSyncPacket ( pPlayer ) );
 
+            CLOCK( "PlayerPuresync", "RelayPlayerPuresync" );
             // Relay to other players
             RelayPlayerPuresync ( Packet );
+            UNCLOCK( "PlayerPuresync", "RelayPlayerPuresync" );
 
+            CLOCK( "PlayerPuresync", "DoHitDetection" );
             // Run colpoint checks
             m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer );
+            UNCLOCK( "PlayerPuresync", "DoHitDetection" );
         }
     }
 }
@@ -2098,12 +2116,17 @@ void CGame::Packet_VehiclePuresync ( CVehiclePuresyncPacket& Packet )
             // Send a returnsync packet to the player that sent it
             pPlayer->Send ( CReturnSyncPacket ( pPlayer ) );
 
+            CLOCK( "VehiclePuresync", "RelayPlayerPuresync" );
             // Relay to other players
             RelayPlayerPuresync ( Packet );
+            CLOCK( "VehiclePuresync", "RelayPlayerPuresync" );
+
 
             // Run colpoint checks
+            CLOCK( "VehiclePuresync", "DoHitDetection" );
             m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer );
             m_pColManager->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );
+            CLOCK( "VehiclePuresync", "DoHitDetection" );
         }
     }
 }
