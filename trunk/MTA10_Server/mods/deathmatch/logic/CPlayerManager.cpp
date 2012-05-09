@@ -197,7 +197,7 @@ static void DoBroadcast ( const CPacket& Packet, const T& sendList )
 
     // Group players by bitstream version
     std::multimap < ushort, CPlayer* > groupMap;
-    for ( T::const_iterator iter = sendList.begin () ; iter != sendList.end () ; ++iter )
+    for ( typename T::const_iterator iter = sendList.begin () ; iter != sendList.end () ; ++iter )
     {
         CPlayer* pPlayer = *iter;
         MapInsert ( groupMap, pPlayer->GetBitStreamVersion (), pPlayer );
