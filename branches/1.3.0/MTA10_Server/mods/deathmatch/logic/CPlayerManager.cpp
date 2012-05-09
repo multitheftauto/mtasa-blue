@@ -153,21 +153,9 @@ void CPlayerManager::BroadcastOnlyJoined ( const CPacket& Packet, CPlayer* pSkip
 }
 
 
-
 // Send one packet to a list of players
-void CPlayerManager::Broadcast ( const CPacket& Packet, const std::set < CPlayer* >& sendList )
-{
-    Broadcast ( Packet, std::vector < CPlayer* > ( sendList.begin (), sendList.end () ) );
-}
-
-// Send one packet to a list of players
-void CPlayerManager::Broadcast ( const CPacket& Packet, const std::list < CPlayer* >& sendList )
-{
-    Broadcast ( Packet, std::vector < CPlayer* > ( sendList.begin (), sendList.end () ) );
-}
-
-// Send one packet to a list of players
-void CPlayerManager::Broadcast ( const CPacket& Packet, const std::vector < CPlayer* >& sendList )
+template < class T >
+static void DoBroadcast ( const CPacket& Packet, const T& sendList )
 {
     if ( !CNetBufferWatchDog::CanSendPacket ( Packet.GetPacketID () ) )
         return; 
@@ -209,7 +197,7 @@ void CPlayerManager::Broadcast ( const CPacket& Packet, const std::vector < CPla
 
     // Group players by bitstream version
     std::multimap < ushort, CPlayer* > groupMap;
-    for ( std::vector < CPlayer* >::const_iterator iter = sendList.begin () ; iter != sendList.end () ; ++iter )
+    for ( T::const_iterator iter = sendList.begin () ; iter != sendList.end () ; ++iter )
     {
         CPlayer* pPlayer = *iter;
         MapInsert ( groupMap, pPlayer->GetBitStreamVersion (), pPlayer );
@@ -250,6 +238,24 @@ void CPlayerManager::Broadcast ( const CPacket& Packet, const std::vector < CPla
     }
 }
 
+
+// Send one packet to a list of players
+void CPlayerManager::Broadcast ( const CPacket& Packet, const std::set < CPlayer* >& sendList )
+{
+    DoBroadcast ( Packet, sendList );
+}
+
+// Send one packet to a list of players
+void CPlayerManager::Broadcast ( const CPacket& Packet, const std::list < CPlayer* >& sendList )
+{
+    DoBroadcast ( Packet, sendList );
+}
+
+// Send one packet to a list of players
+void CPlayerManager::Broadcast ( const CPacket& Packet, const std::vector < CPlayer* >& sendList )
+{
+    DoBroadcast ( Packet, sendList );
+}
 
 
 bool CPlayerManager::IsValidPlayerModel ( unsigned short usPlayerModel )
