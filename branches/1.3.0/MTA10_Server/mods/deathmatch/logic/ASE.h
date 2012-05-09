@@ -63,6 +63,8 @@ public:
     const std::string&      QueryXfireLightCached    ( void );
     std::string             QueryXfireLight          ( void );
     unsigned long           GetMasterServerQueryCount ( void )          { return m_ulMasterServerQueryCount; }
+    uint                    GetTotalQueryCount      ( void )            { return m_uiNumQueriesTotal; }
+    uint                    GetQueriesPerMinute     ( void )            { return m_uiNumQueriesPerMinute; }
 
     CLanBroadcast*          InitLan             ( void );
 
@@ -120,13 +122,14 @@ private:
     long                    m_lXfireLightMinInterval;
     std::string             m_strXfireLightCached;
 
+    // Stats
     unsigned long           m_ulMasterServerQueryCount;
+    uint                    m_uiNumQueriesTotal;
+    uint                    m_uiNumQueriesPerMinute;
+    uint                    m_uiTotalAtMinuteStart;
+    CElapsedTime            m_MinuteTimer;
 
     CConnectHistory         m_QueryDosProtect;
-
-protected:
-    void                    GetStatusVals();
-
 };
 
 class CASERule

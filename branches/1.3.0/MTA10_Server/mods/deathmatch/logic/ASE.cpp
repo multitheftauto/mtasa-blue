@@ -47,6 +47,9 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     m_lXfireLightMinInterval = 10 * 1000;     // Update XFire light query cache after 10 seconds
 
     m_ulMasterServerQueryCount = 0;
+    m_uiNumQueriesTotal = 0;
+    m_uiNumQueriesPerMinute = 0;
+    m_uiTotalAtMinuteStart = 0;
 
     m_strGameType = "MTA:SA";
     m_strMapName = "None";
@@ -109,15 +112,19 @@ void ASE::DoPulse ( void )
     int nLen = sizeof ( sockaddr );
 #endif
 
-    char szBuffer[2];
-    int iBuffer = 0;
-
-    // We set the socket to non-blocking so we can just keep reading
-    iBuffer = recvfrom ( m_Socket, szBuffer, 1, 0, (sockaddr*)&SockAddr, &nLen );
-    if ( iBuffer > 0 )
+    for ( uint i = 0 ; i < 100 ; i++ )
     {
+        char szBuffer[2];
+
+        // We set the socket to non-blocking so we can just keep reading
+        int iBuffer = recvfrom ( m_Socket, szBuffer, 1, 0, (sockaddr*)&SockAddr, &nLen );
+        if ( iBuffer < 1 )
+            break;
+
+        m_uiNumQueriesTotal++;
+
         if ( m_QueryDosProtect.AddConnect ( inet_ntoa ( SockAddr.sin_addr ) ) )
-            return;
+            continue;
 
         std::string strReply;
 
@@ -149,8 +156,6 @@ void ASE::DoPulse ( void )
                 strReply = MTA_DM_ASE_VERSION;
                 break;
             }
-            default:
-                return;
         }
 
         // If our reply buffer isn't empty, send it
@@ -163,6 +168,14 @@ void ASE::DoPulse ( void )
                                 (sockaddr*)&SockAddr,
                                 nLen );
         }
+    }
+
+    // Update stats
+    if ( m_MinuteTimer.Get () >= 6000 )
+    {
+        m_MinuteTimer.Reset ();
+        m_uiNumQueriesPerMinute = m_uiNumQueriesTotal - m_uiTotalAtMinuteStart;
+        m_uiTotalAtMinuteStart = m_uiNumQueriesTotal;
     }
 }
 

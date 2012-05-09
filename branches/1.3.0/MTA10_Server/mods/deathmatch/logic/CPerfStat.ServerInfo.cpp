@@ -271,6 +271,8 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         if ( bIncludeDebugInfo )
             m_StatusList.push_back ( StringPair ( "       finished outgoing",       SString ( "%d", CNetBufferWatchDog::ms_uiOutResultQueueSize ) ) );
     }
+    if ( ASE* pAse = ASE::GetInstance() )
+        m_StatusList.push_back ( StringPair ( "ASE queries",            SString ( "%d (%d/min)", pAse->GetTotalQueryCount (), pAse->GetQueriesPerMinute () ) ) );
 
     m_OptionsList.push_back ( StringPair ( "MinClientVersion",          pConfig->GetMinimumClientVersion () ) );
     m_OptionsList.push_back ( StringPair ( "RecommendedClientVersion",  pConfig->GetRecommendedClientVersion () ) );
