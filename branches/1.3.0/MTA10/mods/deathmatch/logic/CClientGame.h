@@ -462,6 +462,7 @@ private:
     static bool                         StaticVehicleCollisionHandler   ( CVehicleSAInterface* pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity  );
     static bool                         StaticHeliKillHandler           ( CVehicleSAInterface* pHeli, CPedSAInterface* pPed );
     static bool                         StaticWaterCannonHandler        ( CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed );
+    static bool                         StaticWorldSoundHandler         ( uint uiGroup, uint uiIndex );
     static void                         StaticGameObjectDestructHandler     ( CEntitySAInterface* pObject );
     static void                         StaticGameVehicleDestructHandler    ( CEntitySAInterface* pVehicle );
     static void                         StaticGamePlayerDestructHandler     ( CEntitySAInterface* pPlayer );
@@ -483,6 +484,7 @@ private:
     bool                                VehicleCollisionHandler         ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity  );
     bool                                HeliKillHandler                 ( CVehicleSAInterface* pHeli, CPedSAInterface* pPed );
     bool                                WaterCannonHitHandler           ( CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed );
+    bool                                WorldSoundHandler               ( uint uiGroup, uint uiIndex );
     void                                GameObjectDestructHandler       ( CEntitySAInterface* pObject );
     void                                GameVehicleDestructHandler      ( CEntitySAInterface* pVehicle );
     void                                GamePlayerDestructHandler       ( CEntitySAInterface* pPlayer );

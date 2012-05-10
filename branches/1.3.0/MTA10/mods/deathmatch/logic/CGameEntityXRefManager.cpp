@@ -25,6 +25,7 @@ public:
     // CGameEntityXRefManager interface
     virtual void                AddEntityXRef                       ( CClientEntity* pEntity, CEntity* pEntitySA );
     virtual void                RemoveEntityXRef                    ( CClientEntity* pEntity, CEntity* pEntitySA );
+    virtual CClientEntity*      FindClientEntity                    ( CEntitySAInterface* pEntitySAInterface );
     virtual CClientEntity*      FindClientEntity                    ( CEntity* pEntitySA );
     virtual CClientObject*      FindClientObject                    ( CEntity* pObjectSA );
     virtual CClientPed*         FindClientPed                       ( CEntity* pPedSA );
@@ -120,6 +121,19 @@ void CGameEntityXRefManagerImpl::RemoveEntityXRef ( CClientEntity* pEntity, CEnt
     MapRemove ( m_ClientToGameMap, pEntity );
     MapRemove ( m_GameToClientMap, pEntitySA );
     MapRemove ( m_InterfaceToClientMap, pEntitySAInterface );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CGameEntityXRefManagerImpl::FindClientEntity
+//
+// Find the client entity that is using the supplied game entity interface
+//
+///////////////////////////////////////////////////////////////
+CClientEntity* CGameEntityXRefManagerImpl::FindClientEntity ( CEntitySAInterface* pEntitySAInterface )
+{
+    return MapFindRef ( m_InterfaceToClientMap, pEntitySAInterface );
 }
 
 

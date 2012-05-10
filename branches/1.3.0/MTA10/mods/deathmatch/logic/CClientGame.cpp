@@ -259,6 +259,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetVehicleCollisionHandler( CClientGame::StaticVehicleCollisionHandler );
     g_pMultiplayer->SetHeliKillHandler ( CClientGame::StaticHeliKillHandler );
     g_pMultiplayer->SetWaterCannonHitHandler ( CClientGame::StaticWaterCannonHandler );
+    g_pMultiplayer->SetWorldSoundHandler ( CClientGame::StaticWorldSoundHandler );
     g_pMultiplayer->SetGameObjectDestructHandler( CClientGame::StaticGameObjectDestructHandler );
     g_pMultiplayer->SetGameVehicleDestructHandler( CClientGame::StaticGameVehicleDestructHandler );
     g_pMultiplayer->SetGamePlayerDestructHandler( CClientGame::StaticGamePlayerDestructHandler );
@@ -399,6 +400,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetVehicleCollisionHandler( NULL );
     g_pMultiplayer->SetHeliKillHandler( NULL );
     g_pMultiplayer->SetWaterCannonHitHandler( NULL );
+    g_pMultiplayer->SetWorldSoundHandler( NULL );
     g_pMultiplayer->SetGameObjectDestructHandler( NULL );
     g_pMultiplayer->SetGameVehicleDestructHandler( NULL );
     g_pMultiplayer->SetGamePlayerDestructHandler( NULL );
@@ -2708,6 +2710,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientSoundStream", "success, length, streamName", NULL, false );
     m_Events.AddEvent ( "onClientSoundFinishedDownload", "length", NULL, false );
     m_Events.AddEvent ( "onClientSoundChangedMeta", "streamTitle", NULL, false );
+    m_Events.AddEvent ( "onClientWorldSound", "group, index", NULL, false );
 }
 
 
@@ -3543,6 +3546,11 @@ void CClientGame::StaticGameModelRemoveHandler ( ushort usModelId )
     g_pClientGame->GameModelRemoveHandler ( usModelId );
 }
 
+bool CClientGame::StaticWorldSoundHandler ( uint uiGroup, uint uiIndex )
+{
+    return g_pClientGame->WorldSoundHandler ( uiGroup, uiIndex );
+}
+
 void CClientGame::DrawRadarAreasHandler ( void )
 {
     m_pRadarAreaManager->DoPulse ();
@@ -4204,6 +4212,14 @@ bool CClientGame::WaterCannonHitHandler ( CVehicleSAInterface* pCannonVehicle, C
         }
     }
     return false;
+}
+
+bool CClientGame::WorldSoundHandler ( uint uiGroup, uint uiIndex )
+{
+    CLuaArguments Arguments;
+    Arguments.PushNumber ( uiGroup );
+    Arguments.PushNumber ( uiIndex );
+    return m_pRootEntity->CallEvent ( "onClientWorldSound", Arguments, false );
 }
 
 // Validate known objects
