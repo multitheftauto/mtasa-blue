@@ -125,6 +125,7 @@ void CMultiplayerSA::InitHooks_13 ( void )
     InitHooks_ClothesMemFix ();
     InitHooks_FixBadAnimId ();
     InitHooks_HookDestructors ();
+    InitHooks_WorldSound ();
 }
 
 void CMultiplayerSA::InitMemoryCopies_13 ( void )
