@@ -56,14 +56,23 @@ bool _cdecl OnCAESoundManagerRequestNewSound ( CAESound* pAESound )
 {
     if ( pWorldSoundHandler )
     {
-        if ( !pWorldSoundHandler ( pAESound->usGroup, pAESound->usIndex ) )
+        SSFXParams tParams = SSFXParams( pAESound->fVolume, pAESound->fPitch );
+        if ( !pWorldSoundHandler ( pAESound->usGroup, pAESound->usIndex, &tParams ) )
         {
             // Mute the sound if not required.
             pAESound->fVolume = 0.f;
 
+            // Return false added because *SOME* SFX need it and will not be muted e.g. weapons and explosions.
+            if ( pAESound->usGroup == 5 || ( pAESound->usGroup == 4 && pAESound->usIndex <= 4 ) )
+            {
+                return false;
+            }
             // We could return false here instead to avoid playing the sound altogether,
             // but some sound effects will keep restarting (car engine, fire etc)
+            return true;
         }
+        pAESound->fPitch = tParams.m_fPitch;
+        pAESound->fVolume = tParams.m_fVolume;
     }
     return true;
 }

@@ -332,6 +332,12 @@ CClientGame::CClientGame ( bool bLocalPlay )
     // Give a default value for the streaming memory
     if ( g_pCore->GetCVars()->Exists ( "streaming_memory" ) == false )
         g_pCore->GetCVars()->Set ( "streaming_memory", g_pCore->GetMaxStreamingMemory () );
+    // Assign a pitch variable for SFX a default value of 0.
+    m_fPitch = 0.0f;    
+    // Assign a volume variable for SFX a default value of -1.0.
+    m_fVolume = -1.0f;
+    // We are not running our event.
+    m_bSFXRunning = false;
 }
 
 
@@ -3568,9 +3574,9 @@ void CClientGame::StaticGameModelRemoveHandler ( ushort usModelId )
     g_pClientGame->GameModelRemoveHandler ( usModelId );
 }
 
-bool CClientGame::StaticWorldSoundHandler ( uint uiGroup, uint uiIndex )
+bool CClientGame::StaticWorldSoundHandler ( uint uiGroup, uint uiIndex, SSFXParams *fParams )
 {
-    return g_pClientGame->WorldSoundHandler ( uiGroup, uiIndex );
+    return g_pClientGame->WorldSoundHandler ( uiGroup, uiIndex, fParams );
 }
 
 void CClientGame::DrawRadarAreasHandler ( void )
@@ -4255,12 +4261,27 @@ bool CClientGame::WaterCannonHitHandler ( CVehicleSAInterface* pCannonVehicle, C
     return false;
 }
 
-bool CClientGame::WorldSoundHandler ( uint uiGroup, uint uiIndex )
+bool CClientGame::WorldSoundHandler ( uint uiGroup, uint uiIndex, SSFXParams* tParams )
 {
+    m_fPitch = 0.0f;
+    m_fVolume = -1.0f;
+    m_bSFXRunning = true;
     CLuaArguments Arguments;
     Arguments.PushNumber ( uiGroup );
     Arguments.PushNumber ( uiIndex );
-    return m_pRootEntity->CallEvent ( "onClientWorldSound", Arguments, false );
+    Arguments.PushNumber ( tParams->m_fPitch );
+    Arguments.PushNumber ( tParams->m_fVolume );
+    bool bReturn = m_pRootEntity->CallEvent ( "onClientWorldSound", Arguments, false );
+    m_bSFXRunning = false;
+    if ( m_fPitch > FLOAT_EPSILON )
+    {
+        tParams->m_fPitch = m_fPitch;
+    }
+    if ( m_fVolume >= 0 )
+    {
+        tParams->m_fVolume = m_fVolume;
+    }
+    return bReturn;
 }
 
 // Validate known objects
@@ -5710,7 +5731,7 @@ void CClientGame::SetDevSetting ( const SString& strCommand )
         eWeaponType weaponType;
         if ( StringToEnum ( parts[1], weaponType ) )
         {
-            SetWeaponTypeUsesBulletSync ( weaponType, atoi ( parts[2] ) );
+            SetWeaponTypeUsesBulletSync ( weaponType, atoi ( parts[2] ) == 1 );
             strMessage = SString ( "Local player bullet sync sending for %s is now %d"
                                                 ,*parts[1]
                                                 ,GetWeaponTypeUsesBulletSync ( weaponType )

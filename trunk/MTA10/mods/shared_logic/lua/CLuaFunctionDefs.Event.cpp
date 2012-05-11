@@ -348,3 +348,28 @@ int CLuaFunctionDefs::CancelLatentEvent ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::setSFXParams ( lua_State* luaVM )
+{
+    //  bool setSFXParams ( float fPitch, float fVolume )
+    SSFXParams tParams;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( tParams.m_fPitch );
+    argStream.ReadNumber ( tParams.m_fVolume );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::setSFXParams ( tParams ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setSFXParams", *argStream.GetErrorMessage () ) );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

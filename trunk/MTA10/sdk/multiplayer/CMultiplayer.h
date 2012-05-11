@@ -24,7 +24,7 @@
 
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
-
+struct SSFXParams;
 typedef bool ( ExplosionHandler ) ( class CEntity* pExplodingEntity, class CEntity* pCreator, const CVector& vecPosition, enum eExplosionType ExplosionType );
 typedef void ( PreContextSwitchHandler ) ( class CPlayerPed* pPlayer );
 typedef void ( PostContextSwitchHandler ) ( void );
@@ -52,12 +52,26 @@ typedef bool ( ProcessCollisionHandler ) ( class CEntitySAInterface* pThisInterf
 typedef bool ( VehicleCollisionHandler ) ( class CVehicleSAInterface* pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity );
 typedef bool ( HeliKillHandler ) ( class CVehicleSAInterface* pVehicle, class CPedSAInterface* pPed );
 typedef bool ( WaterCannonHitHandler ) ( class CVehicleSAInterface* pCannonVehicle, class CPedSAInterface* pHitPed );
-typedef bool ( WorldSoundHandler ) ( uint uiGroup, uint uiIndex );
+typedef bool ( WorldSoundHandler ) ( uint uiGroup, uint uiIndex, SSFXParams * fPitch );
 typedef void ( GameObjectDestructHandler ) ( CEntitySAInterface* pObject );
 typedef void ( GameVehicleDestructHandler ) ( CEntitySAInterface* pVehicle );
 typedef void ( GamePlayerDestructHandler ) ( CEntitySAInterface* pPlayer );
 typedef void ( GameModelRemoveHandler ) ( ushort usModelId );
-
+struct SSFXParams
+{
+    SSFXParams()
+    {
+        m_fVolume = 0.0f;
+        m_fPitch = -1.0f;
+    };
+    SSFXParams( float fVolume, float fPitch )
+    {
+        m_fVolume = fVolume;
+        m_fPitch = fPitch;
+    };
+    float m_fVolume;
+    float m_fPitch;
+};
 /**
  * This class contains information used for shot syncing, one exists per player.
  */
