@@ -21,6 +21,7 @@ extern CGame * g_pGame;
 #define MAX_KEYSYNC_DISTANCE 400.0f
 
 CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket ) : CPed ( NULL, NULL, NULL, 0 )
+    , m_UpdateNearListTimer ( 500, true )
 {
     CElementRefManager::AddElementRefs ( ELEMENT_REF_DEBUG ( this, "CPlayer" ), &m_pTeam, NULL );
     CElementRefManager::AddElementListRef ( ELEMENT_REF_DEBUG ( this, "CPlayer m_lstBroadcastList" ), &m_lstBroadcastList );
@@ -167,9 +168,6 @@ void CPlayer::DoPulse ( void )
     if ( GetStatus () == STATUS_JOINED )
     {
         m_pPlayerTextManager->Process ();
-
-        if ( GetTickCount64_ () > m_llPuresyncNearListUpdateTime + 300 )
-            UpdateOthersPuresyncNearList ();
     }
 }
 
@@ -579,7 +577,7 @@ bool CPlayer::IsTimeForPuresyncFar ( void )
         {
             // Add stats
             // Record all far sync bytes/packets that would have been sent/skipped as skipped
-            int iNumPackets = m_PuresyncFarPlayerList.size ();
+            int iNumPackets = m_FarViewerList.size ();
             int iNumSkipped = ( iNumPackets * iSlowSyncRate - iNumPackets * 1000 ) / 1000;
             g_pStats->lightsync.llSyncPacketsSkipped += iNumPackets;
             g_pStats->lightsync.llSyncBytesSkipped += iNumPackets * GetApproxPuresyncPacketSize ();
@@ -589,7 +587,7 @@ bool CPlayer::IsTimeForPuresyncFar ( void )
         }
 
         // Add stats
-        int iNumPackets = m_PuresyncFarPlayerList.size ();
+        int iNumPackets = m_FarViewerList.size ();
         int iNumSkipped = ( iNumPackets * iSlowSyncRate - iNumPackets * 1000 ) / 1000;
         g_pStats->puresync.llSentPacketsByZone [ ZONE3 ] += iNumPackets;
         g_pStats->puresync.llSentBytesByZone [ ZONE3 ] += iNumPackets * GetApproxPuresyncPacketSize ();
@@ -636,115 +634,67 @@ bool CPlayer::GetWeaponCorrect ( void )
 }
 
 
-// Put this player in other players nearlist, if errm... the player is near, enough
-void CPlayer::UpdateOthersPuresyncNearList ( void )
+void CPlayer::AddPlayerToDistLists ( CPlayer* pOther )
 {
-    m_llPuresyncNearListUpdateTime = GetTickCount64_ ();
-
-    // If testing, put into every other players near list
-    if ( g_pBandwidthSettings->bTestPretendEveryoneIsNear )
-    {
-        std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-        for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
-        {
-            CPlayer* pOtherPlayer = *iter;
-            if ( pOtherPlayer != this && m_usDimension == pOtherPlayer->GetDimension () )
-            {
-                pOtherPlayer->RefreshPuresyncNearPlayer ( this );
-            }
-        }
-        return;
-    }
-
-    // Get the two positions to check
-    const CVector& vecPlayerPosition = GetPosition ();
-    CVector vecCameraPosition;
-    GetCamera ()->GetPosition ( vecCameraPosition );
-
-    // Fill resultNearBoth with rough list of nearby players
-    CElementResult resultNearBoth;
-    {
-        // Calculate distance from player to his camera. (Note as spatial database is 2D, we can use the 2D distance here)
-        const float fCameraDistance = DistanceBetweenPoints2D ( vecCameraPosition, vecPlayerPosition );
-        if ( fCameraDistance < 40.f )
-        {
-            //
-            // If player near his camera (which is the usual case), we can do optimized things
-            //
-
-            // Do one query with a slightly bigger sphere
-            const CVector vecAvgPos = ( vecCameraPosition + vecPlayerPosition ) * 0.5f;
-            GetSpatialDatabase()->SphereQuery ( resultNearBoth, CSphere ( vecAvgPos, DISTANCE_FOR_SLOW_SYNCRATE + fCameraDistance * 0.5f ) );
-
-        }
-        else
-        {
-            //
-            // Bit more complicated if camera is not near player
-            //
-
-            // Perform queries on spatial database
-            CElementResult resultNearCamera;
-            GetSpatialDatabase()->SphereQuery ( resultNearCamera, CSphere ( vecCameraPosition, DISTANCE_FOR_SLOW_SYNCRATE ) );
-
-            CElementResult resultNearPlayer;
-            GetSpatialDatabase()->SphereQuery ( resultNearPlayer, CSphere ( vecPlayerPosition, DISTANCE_FOR_SLOW_SYNCRATE ) );
-
-            std::set < CPlayer* > mergedList;
-
-            // Merge
-            for ( CElementResult::const_iterator it = resultNearCamera.begin () ; it != resultNearCamera.end (); ++it )
-                if ( (*it)->GetType () == CElement::PLAYER )
-                    mergedList.insert ( (CPlayer*)*it );
-
-            for ( CElementResult::const_iterator it = resultNearPlayer.begin () ; it != resultNearPlayer.end (); ++it )
-                if ( (*it)->GetType () == CElement::PLAYER )
-                    mergedList.insert ( (CPlayer*)*it );
-
-            // Copy to resultNearBoth
-            for ( std::set < CPlayer* > ::iterator it = mergedList.begin (); it != mergedList.end (); ++it )
-                resultNearBoth.push_back ( *it );
-        }
-    }
-
-    // Accurately check distance to other players, and put this player in their near list
-    for ( CElementResult::const_iterator it = resultNearBoth.begin () ; it != resultNearBoth.end (); ++it )
-    {
-        if ( (*it)->GetType () == CElement::PLAYER )
-        {
-            CPlayer* pOtherPlayer = (CPlayer*)*it;
-            if ( pOtherPlayer != this )
-            {
-                const CVector& vecOtherPlayerPos = pOtherPlayer->GetPosition ();
-
-                // Check distance is accurate
-                if ( ( vecPlayerPosition - vecOtherPlayerPos ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE ||
-                     ( vecCameraPosition - vecOtherPlayerPos ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE )
-                {
-                    // Check dimension matches
-                    if ( m_usDimension == pOtherPlayer->GetDimension () )
-                    {
-                        pOtherPlayer->RefreshPuresyncNearPlayer ( this );
-
-                        // Lightsync needs it the other way round (for spectating)
-                        if ( g_pBandwidthSettings->bLightSyncEnabled )
-                            this->RefreshPuresyncNearPlayer ( pOtherPlayer );
-                    }
-                }
-            }
-        }
-    }
+    dassert ( !MapContains ( m_ViewerInfoMap, pOther ) && !MapContains ( m_NearViewerList, pOther ) && !MapContains ( m_NearViewerList, pOther ) );
+    SViewerInfo* pInfo = new SViewerInfo ();
+    pInfo->bIsInNearViewerList = true;
+    MapSet ( m_ViewerInfoMap, pOther, pInfo );
+    MapSet ( m_NearViewerList, pOther, pInfo );
 }
 
 
-// Update m_KeysyncNearPlayerList with players who are close enough, or who have a camera which is close enough
-void CPlayer::UpdateKeysyncNearList ( void )
+void CPlayer::RemovePlayerFromDistLists ( CPlayer* pOther )
 {
+    dassert ( MapContains ( m_ViewerInfoMap, pOther ) );
+    dassert ( MapContains ( m_FarViewerList, pOther ) || MapContains ( m_NearViewerList, pOther ) );
+    SViewerInfo* pInfo = MapFindRef ( m_ViewerInfoMap, pOther );
+    MapRemove ( m_ViewerInfoMap, pOther );
+    MapRemove ( m_FarViewerList, pOther );
+    MapRemove ( m_NearViewerList, pOther );
+    delete pInfo;
+}
+
+
+void CPlayer::RefreshNearViewer ( CPlayer* pOther )
+{
+    SViewerInfo* pInfo = MapFindRef ( m_ViewerInfoMap, pOther );
+    if ( !pInfo->bIsInNearViewerList )
+    {
+        pInfo->bIsInNearViewerList = true;
+        pInfo->bPrevIsNear = false;
+        MapRemove ( m_FarViewerList, pOther );
+        MapSet ( m_NearViewerList, pOther, pInfo );
+    }
+    pInfo->iMoveToFarCountDown = 5;
+}
+
+
+void CPlayer::MaybeUpdateNearList ( void )
+{
+    // If too long since last update
+    if ( m_UpdateNearListTimer.Get () > g_TickRateSettings.iNearListUpdate * 9 / 10 )
+        UpdateNearList ();
+    else
+    // or player has moved too far
+    if ( ( m_vecUpdateNearLastPosition - GetPosition () ).LengthSquared () > MOVEMENT_UPDATE_THRESH )
+        UpdateNearList ();
+}
+
+
+// Update m_NearViewerList with players who are close enough, or who have a camera which is close enough
+void CPlayer::UpdateNearList ( void )
+{
+    CLOCK( "RelayPlayerPuresync", "UpdateNearList" );
+
     const CVector& vecPlayerPosition = GetPosition ();
 
-    // Add nearby players
+    m_UpdateNearListTimer.Reset ();
+    m_vecUpdateNearLastPosition = vecPlayerPosition;
+
+    // Find nearby players
     CElementResult resultNearByPlayers;
-    GetSpatialDatabase()->SphereQuery ( resultNearByPlayers, CSphere ( vecPlayerPosition, MAX_KEYSYNC_DISTANCE ) );
+    GetSpatialDatabase()->SphereQuery ( resultNearByPlayers, CSphere ( vecPlayerPosition, DISTANCE_FOR_NEAR_VIEWER ) );
 
     for ( CElementResult::const_iterator it = resultNearByPlayers.begin () ; it != resultNearByPlayers.end (); ++it )
     {
@@ -753,37 +703,59 @@ void CPlayer::UpdateKeysyncNearList ( void )
             CPlayer* pOtherPlayer = (CPlayer*)*it;
             if ( pOtherPlayer != this )
             {
-                const CVector& vecOtherPlayerPos = pOtherPlayer->GetPosition ();
-                if ( ( vecPlayerPosition - vecOtherPlayerPos ).LengthSquared () < MAX_KEYSYNC_DISTANCE * MAX_KEYSYNC_DISTANCE )
-                    MapGet ( m_KeysyncNearPlayerList, pOtherPlayer ).iCount = 1;
+                if ( m_usDimension == pOtherPlayer->GetDimension () )
+                {
+                    const CVector& vecOtherPlayerPos = pOtherPlayer->GetPosition ();
+                    float fDistSq = ( vecPlayerPosition - vecOtherPlayerPos ).LengthSquared ();
+                    if ( fDistSq < DISTANCE_FOR_NEAR_VIEWER * DISTANCE_FOR_NEAR_VIEWER )
+                    {
+                        RefreshNearViewer ( pOtherPlayer );
+                    }
+                }
             }
         }
     }
 
-    // Add from nearby cameras
+    // Find nearby cameras
     CCameraQueryResult resultNearByCameras;
-    GetCameraSpatialDatabase()->SphereQuery ( resultNearByCameras, CSphere ( vecPlayerPosition, MAX_KEYSYNC_DISTANCE ) );
+    GetCameraSpatialDatabase()->SphereQuery ( resultNearByCameras, CSphere ( vecPlayerPosition, DISTANCE_FOR_NEAR_VIEWER ) );
 
     for ( CCameraQueryResult::const_iterator it = resultNearByCameras.begin () ; it != resultNearByCameras.end (); ++it )
     {
         CPlayerCamera* pOtherCamera = *it;
-        if ( pOtherCamera->GetPlayer () != this )
+        CPlayer* pOtherPlayer = pOtherCamera->GetPlayer ();
+        if ( pOtherPlayer != this )
         {
-            const CVector& vecOtherCameraPos = pOtherCamera->GetPosition ();
-            if ( ( vecPlayerPosition - vecOtherCameraPos ).LengthSquared () < MAX_KEYSYNC_DISTANCE * MAX_KEYSYNC_DISTANCE )
-                MapGet ( m_KeysyncNearPlayerList, pOtherCamera->GetPlayer () ).iCount = 1;
+            if ( m_usDimension == pOtherPlayer->GetDimension () )
+            {
+                const CVector& vecOtherCameraPos = pOtherCamera->GetPosition ();
+                float fDistSq = ( vecPlayerPosition - vecOtherCameraPos ).LengthSquared ();
+                if ( fDistSq < DISTANCE_FOR_NEAR_VIEWER * DISTANCE_FOR_NEAR_VIEWER )
+                {
+                    RefreshNearViewer ( pOtherPlayer );
+                }
+            }
         }
     }
 
-    // Remove old players 
-    for ( std::map < CPlayer*, SKeysyncNearInfo > ::iterator it = m_KeysyncNearPlayerList.begin (); it != m_KeysyncNearPlayerList.end (); )
+    // Move unrefreshed players to far list
+    for ( std::map < CPlayer*, SViewerInfo* > ::iterator it = m_NearViewerList.begin (); it != m_NearViewerList.end (); )
     {
-        if ( it->second.iCount-- < 1 )
-            m_KeysyncNearPlayerList.erase ( it++ );
+        if ( it->second->iMoveToFarCountDown-- < 1 )
+        {
+            CPlayer* pOther = it->first;
+            SViewerInfo* pInfo = it->second;
+            pInfo->bIsInNearViewerList = false;
+            MapSet ( m_FarViewerList, pOther, pInfo );
+            m_NearViewerList.erase ( it++ );
+        }
         else
             ++it;
     }
+
+    UNCLOCK( "RelayPlayerPuresync", "UpdateNearList" );
 }
+
 
 void CPlayer::SetVoiceBroadcastTo( CElement* pElement )
 {
@@ -855,76 +827,17 @@ void CPlayer::SetCameraOrientation ( const CVector& vecPosition, const CVector& 
 
 
 //
-// Ensure other player stays in the near list
-//
-void CPlayer::RefreshPuresyncNearPlayer ( CPlayer* pOther )
-{
-    SPuresyncNearInfo* pInfo = MapFind ( m_PuresyncNearPlayerList, pOther );
-    if ( !pInfo )
-    {
-        // Move from far list
-        MovePlayerToPuresyncNearList ( pOther );
-        pInfo = MapFind ( m_PuresyncNearPlayerList, pOther );
-    }
-    pInfo->iCount = 5;
-}
-
-
-void CPlayer::AddPlayerToPuresyncDistLists ( CPlayer* pOther )
-{
-    dassert ( !MapContains ( m_PuresyncNearPlayerList, pOther ) && !MapContains ( m_PuresyncFarPlayerList, pOther ) );
-    SPuresyncNearInfo info = { 0, 0 };
-    MapSet ( m_PuresyncNearPlayerList, pOther, info );
-}
-
-void CPlayer::RemovePlayerFromPuresyncDistLists ( CPlayer* pOther )
-{
-    dassert ( MapContains ( m_PuresyncNearPlayerList, pOther ) || MapContains ( m_PuresyncFarPlayerList, pOther ) );
-    MapRemove ( m_PuresyncNearPlayerList, pOther );
-    MapRemove ( m_PuresyncFarPlayerList, pOther );
-}
-
-void CPlayer::MovePlayerToPuresyncNearList ( CPlayer* pOther )
-{
-    dassert ( !MapContains ( m_PuresyncNearPlayerList, pOther ) && MapContains ( m_PuresyncFarPlayerList, pOther ) );
-    SPuresyncNearInfo* pInfo = MapFind ( m_PuresyncFarPlayerList, pOther );
-    MapSet ( m_PuresyncNearPlayerList, pOther, *pInfo );
-    MapRemove ( m_PuresyncFarPlayerList, pOther );
-}
-
-void CPlayer::MovePlayerToPuresyncFarList ( CPlayer* pOther )
-{
-    dassert ( MapContains ( m_PuresyncNearPlayerList, pOther ) && !MapContains ( m_PuresyncFarPlayerList, pOther ) );
-    SPuresyncNearInfo* pInfo = MapFind ( m_PuresyncNearPlayerList, pOther );
-    MapSet ( m_PuresyncFarPlayerList, pOther, *pInfo );
-    MapRemove ( m_PuresyncNearPlayerList, pOther );
-}
-
-
-void CPlayer::AddPlayerToKeysyncDistLists ( CPlayer* pOther )
-{
-    dassert ( !MapContains ( m_KeysyncNearPlayerList, pOther ) );
-    MapSet ( m_KeysyncNearPlayerList, pOther, SKeysyncNearInfo () );
-}
-
-void CPlayer::RemovePlayerFromKeysyncDistLists ( CPlayer* pOther )
-{
-    MapRemove ( m_KeysyncNearPlayerList, pOther );
-}
-
-
-//
 // Dynamically increase the interval between near sync updates depending on stuffs
 //
-bool CPlayer::IsTimeToReceivePuresyncNearFrom ( CPlayer* pOther, SPuresyncNearInfo& nearInfo )
+bool CPlayer::IsTimeToReceivePuresyncNearFrom ( CPlayer* pOther, SViewerInfo* pInfo )
 {
     // Get correct camera position when dead
     if ( m_bIsDead )
         GetCamera ()->GetPosition ( m_vecCamPosition );
 
     int iZone = GetPuresyncZone ( pOther );
-    nearInfo.iPrevZone = nearInfo.iZone;
-    nearInfo.iZone = iZone;
+    pInfo->iPrevZone = pInfo->iZone;
+    pInfo->iZone = iZone;
 
     int iUpdateInterval = g_pBandwidthSettings->ZoneUpdateIntervals [ iZone ];
 
@@ -963,7 +876,7 @@ bool CPlayer::IsTimeToReceivePuresyncNearFrom ( CPlayer* pOther, SPuresyncNearIn
 #endif
 
     long long llTimeNow = GetModuleTickCount64 ();
-    long long llNextUpdateTime = nearInfo.llLastUpdateTime + iUpdateInterval;
+    long long llNextUpdateTime = pInfo->llLastUpdateTime + iUpdateInterval;
 
     if ( llNextUpdateTime > llTimeNow )
     {
@@ -972,7 +885,7 @@ bool CPlayer::IsTimeToReceivePuresyncNearFrom ( CPlayer* pOther, SPuresyncNearIn
         return false;
     }
 
-    nearInfo.llLastUpdateTime = llTimeNow;
+    pInfo->llLastUpdateTime = llTimeNow;
 
     g_pStats->puresync.llSentPacketsByZone[ iZone ]++;
     g_pStats->puresync.llSentBytesByZone[ iZone ] += GetApproxPuresyncPacketSize ();
