@@ -52,7 +52,7 @@ typedef bool ( ProcessCollisionHandler ) ( class CEntitySAInterface* pThisInterf
 typedef bool ( VehicleCollisionHandler ) ( class CVehicleSAInterface* pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity );
 typedef bool ( HeliKillHandler ) ( class CVehicleSAInterface* pVehicle, class CPedSAInterface* pPed );
 typedef bool ( WaterCannonHitHandler ) ( class CVehicleSAInterface* pCannonVehicle, class CPedSAInterface* pHitPed );
-typedef bool ( WorldSoundHandler ) ( uint uiGroup, uint uiIndex, SSFXParams * fPitch );
+typedef bool ( WorldSoundHandler ) ( uint uiGroup, uint uiIndex, SSFXParams * tPitch );
 typedef void ( GameObjectDestructHandler ) ( CEntitySAInterface* pObject );
 typedef void ( GameVehicleDestructHandler ) ( CEntitySAInterface* pVehicle );
 typedef void ( GamePlayerDestructHandler ) ( CEntitySAInterface* pPlayer );
