@@ -21,6 +21,7 @@ public:
         iObjectSync = 500;
         iKeySyncRotation = 100;
         iKeySyncAnalogMove = 100;
+        iNearListUpdate = 100;
     }
 
     int iPureSync;
@@ -31,6 +32,7 @@ public:
     int iObjectSync;
     int iKeySyncRotation;
     int iKeySyncAnalogMove;
+    int iNearListUpdate;
 };
 
 extern CTickRateSettings g_TickRateSettings;
