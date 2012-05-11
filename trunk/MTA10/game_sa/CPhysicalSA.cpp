@@ -15,7 +15,45 @@
 
 #include "StdInc.h"
 
+
+void CPhysicalSA::RestoreLastGoodPhysicsState ( void )
+{
+    CEntitySA::RestoreLastGoodPhysicsState ();
+
+    CVector vecDefault;
+    SetTurnSpeed ( &vecDefault );
+    SetMoveSpeed ( &vecDefault );
+
+    CPhysicalSAInterface* pInterface = (CPhysicalSAInterface *)this->GetInterface();
+    pInterface->fDistanceTravelled = 0;
+    pInterface->fDamageImpulseMagnitude = 0;
+    pInterface->vecCollisionImpactVelocity = CVector ();
+    pInterface->vecCollisionPosition = CVector ();
+}
+
 CVector * CPhysicalSA::GetMoveSpeed(CVector * vecMoveSpeed)
+{
+    GetMoveSpeedInternal ( vecMoveSpeed );
+    if ( !IsValidPosition ( *vecMoveSpeed ) )
+    {
+        RestoreLastGoodPhysicsState ();
+        GetMoveSpeedInternal ( vecMoveSpeed );
+    }
+    return vecMoveSpeed;
+}
+
+CVector * CPhysicalSA::GetTurnSpeed(CVector * vecTurnSpeed)
+{
+    GetTurnSpeedInternal ( vecTurnSpeed );
+    if ( !IsValidPosition ( *vecTurnSpeed ) )
+    {
+        RestoreLastGoodPhysicsState ();
+        GetTurnSpeedInternal ( vecTurnSpeed );
+    }
+    return vecTurnSpeed;
+}
+
+CVector * CPhysicalSA::GetMoveSpeedInternal(CVector * vecMoveSpeed)
 {
     DEBUG_TRACE("CVector * CPhysicalSA::GetMoveSpeed(CVector * vecMoveSpeed)");
     DWORD dwFunc = FUNC_GetMoveSpeed;
@@ -31,7 +69,7 @@ CVector * CPhysicalSA::GetMoveSpeed(CVector * vecMoveSpeed)
     return vecMoveSpeed;
 }
 
-CVector * CPhysicalSA::GetTurnSpeed(CVector * vecTurnSpeed)
+CVector * CPhysicalSA::GetTurnSpeedInternal(CVector * vecTurnSpeed)
 {
     DEBUG_TRACE("CVector * CPhysicalSA::GetTurnSpeed(CVector * vecTurnSpeed)");
     DWORD dwFunc = FUNC_GetTurnSpeed;

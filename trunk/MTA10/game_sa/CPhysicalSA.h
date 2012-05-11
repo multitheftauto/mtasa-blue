@@ -82,8 +82,11 @@ public:
 class CPhysicalSA : public virtual CPhysical, public virtual CEntitySA
 {
 public:
+    virtual void RestoreLastGoodPhysicsState ( void );
     CVector *   GetMoveSpeed                ( CVector * vecMoveSpeed );
     CVector *   GetTurnSpeed                ( CVector * vecTurnSpeed );
+    CVector *   GetMoveSpeedInternal        ( CVector * vecMoveSpeed );
+    CVector *   GetTurnSpeedInternal        ( CVector * vecTurnSpeed );
     VOID        SetMoveSpeed                ( CVector * vecMoveSpeed );
     VOID        SetTurnSpeed                ( CVector * vecTurnSpeed );
 

@@ -361,6 +361,7 @@ public:
     void                SetType ( DWORD dwType );
     DWORD               * GetMemoryValue ( DWORD dwOffset );
 
+    virtual void        RestoreLastGoodPhysicsState ( void );
     FLOAT               GetCurrentRotation();
     FLOAT               GetTargetRotation();
     void                SetCurrentRotation(FLOAT fRotation);
