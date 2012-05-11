@@ -295,12 +295,10 @@ void CPlayerManager::AddToList ( CPlayer* pPlayer )
     for ( std::list < CPlayer* > ::const_iterator iter = m_Players.begin () ; iter != m_Players.end (); iter++ )
     {
         // Add other players to near/far lists
-        pPlayer->AddPlayerToPuresyncDistLists ( *iter );
-        pPlayer->AddPlayerToKeysyncDistLists ( *iter );
+        pPlayer->AddPlayerToDistLists ( *iter );
 
         // Add to other players near/far lists
-        (*iter)->AddPlayerToPuresyncDistLists ( pPlayer );
-        (*iter)->AddPlayerToKeysyncDistLists ( pPlayer );
+        (*iter)->AddPlayerToDistLists ( pPlayer );
     }
 
     m_Players.push_back ( pPlayer );
@@ -318,7 +316,6 @@ void CPlayerManager::RemoveFromList ( CPlayer* pPlayer )
     // Remove from other players near/far lists
     for ( std::list < CPlayer* > ::const_iterator iter = m_Players.begin () ; iter != m_Players.end (); iter++ )
     {
-        (*iter)->RemovePlayerFromPuresyncDistLists ( pPlayer );
-        (*iter)->RemovePlayerFromKeysyncDistLists ( pPlayer );
+        (*iter)->RemovePlayerFromDistLists ( pPlayer );
     }
 }

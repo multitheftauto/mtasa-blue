@@ -108,7 +108,7 @@ const SString& CPerfStatServerTimingImpl::GetCategoryName ( void )
 ///////////////////////////////////////////////////////////////
 void CPerfStatServerTimingImpl::DoPulse ( void )
 {
-    // Maybe turn off stats gathering if no body is watching
+    // Maybe turn off stats gathering if nobody is watching
     if ( m_bIsActive && m_TimeSinceLastViewed.Get () > 15000 )
         SetActive ( false );
 

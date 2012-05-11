@@ -44,21 +44,29 @@ enum eVoiceState
     VOICESTATE_TRANSMITTING,
 };
 
-struct SPuresyncNearInfo
+#define MOVEMENT_UPDATE_THRESH (5)
+#define DISTANCE_FOR_NEAR_VIEWER (310)
+
+struct SViewerInfo
 {
-    int iCount;
+    SViewerInfo ( void )
+        : bIsInNearViewerList ( false )
+        , iMoveToFarCountDown ( 0 )
+        , iPrevZone ( 0 )
+        , iZone ( 0 )
+        , llLastUpdateTime ( 0 )
+        , bPrevIsNear ( false )
+    {}
+
+    bool bIsInNearViewerList;
+    int iMoveToFarCountDown;
+
     int iPrevZone;
     int iZone;
     long long llLastUpdateTime;
-};
 
-struct SKeysyncNearInfo
-{
-    SKeysyncNearInfo ( void ) : bPrevIsNear ( false ), iCount ( 0 ) {}
     bool bPrevIsNear;
-    int iCount;
 };
-
 
 struct SScreenShotInfo
 {
@@ -251,19 +259,13 @@ public:
     void                                        SetWeaponCorrect            ( bool bWeaponCorrect );
     bool                                        GetWeaponCorrect            ( void );
 
-    void                                        UpdateOthersPuresyncNearList        ( void );
-    void                                        RefreshPuresyncNearPlayer           ( CPlayer* pOther );
-    std::map < CPlayer*, SPuresyncNearInfo >&   GetPuresyncNearPlayerList           ( void )                        { return m_PuresyncNearPlayerList; }
-    std::map < CPlayer*, SPuresyncNearInfo >&   GetPuresyncFarPlayerList            ( void )                        { return m_PuresyncFarPlayerList; }
-    void                                        AddPlayerToPuresyncDistLists        ( CPlayer* pOther );
-    void                                        RemovePlayerFromPuresyncDistLists   ( CPlayer* pOther );
-    void                                        MovePlayerToPuresyncNearList        ( CPlayer* pOther );
-    void                                        MovePlayerToPuresyncFarList         ( CPlayer* pOther );
-
-    void                                        UpdateKeysyncNearList               ( void );
-    std::map < CPlayer*, SKeysyncNearInfo >&    GetKeysyncNearPlayerList            ( void )                        { return m_KeysyncNearPlayerList; }
-    void                                        AddPlayerToKeysyncDistLists         ( CPlayer* pOther );
-    void                                        RemovePlayerFromKeysyncDistLists    ( CPlayer* pOther );
+    void                                        AddPlayerToDistLists        ( CPlayer* pOther );
+    void                                        RemovePlayerFromDistLists   ( CPlayer* pOther );
+    void                                        RefreshNearViewer           ( CPlayer* pOther );
+    void                                        MaybeUpdateNearList         ( void );
+    void                                        UpdateNearList              ( void );
+    std::map < CPlayer*, SViewerInfo* >&        GetNearViewerList           ( void )                        { return m_NearViewerList; }
+    std::map < CPlayer*, SViewerInfo* >&        GetFarViewerList            ( void )                        { return m_FarViewerList; }
 
     SScreenShotInfo&                            GetScreenShotInfo           ( void )                        { return m_ScreenShotInfo; }
 
@@ -329,7 +331,7 @@ public:
     bool                                        IsPlayerIgnoringElement     ( CElement* pElement );
 
     void                                        SetCameraOrientation        ( const CVector& vecPosition, const CVector& vecFwd );
-    bool                                        IsTimeToReceivePuresyncNearFrom ( CPlayer* pOther, SPuresyncNearInfo& nearInfo );
+    bool                                        IsTimeToReceivePuresyncNearFrom ( CPlayer* pOther, SViewerInfo* pInfo );
     int                                         GetPuresyncZone                 ( CPlayer* pOther );
     int                                         GetApproxPuresyncPacketSize ( void );
     const CVector&                              GetCamPosition              ( void )            { return m_vecCamPosition; };
@@ -433,11 +435,11 @@ private:
 
     uint                                        m_uiWeaponIncorrectCount;
 
-    std::map < CPlayer*, SPuresyncNearInfo >    m_PuresyncNearPlayerList;
-    std::map < CPlayer*, SPuresyncNearInfo >    m_PuresyncFarPlayerList;
-    long long                                   m_llPuresyncNearListUpdateTime;
-
-    std::map < CPlayer*, SKeysyncNearInfo >     m_KeysyncNearPlayerList;
+    std::map < CPlayer*, SViewerInfo* >         m_ViewerInfoMap;
+    std::map < CPlayer*, SViewerInfo* >         m_NearViewerList;
+    std::map < CPlayer*, SViewerInfo* >         m_FarViewerList;
+    CElapsedTime                                m_UpdateNearListTimer;
+    CVector                                     m_vecUpdateNearLastPosition;
 
     CVector                                     m_vecCamPosition;
     CVector                                     m_vecCamFwd;

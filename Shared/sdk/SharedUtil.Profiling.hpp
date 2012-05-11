@@ -229,9 +229,9 @@ namespace SharedUtil
             int prevBufferPosMax = m_BufferPosMax;
 
             // Grow quickly, shrink slowly
-            m_BufferPosMax = Max ( m_BufferPos * 2, m_BufferPosMax * 1000 / 1001 );
-            m_BufferPosMax = Clamp ( 10, m_BufferPosMax, ( prevBufferPosMax + 1000 ) * 2 );
-            if ( m_BufferPosMax > (int)m_ItemBufferArray.size () || m_BufferPosMax < (int)m_ItemBufferArray.size () / 2 )
+            m_BufferPosMax = Max ( m_BufferPos * 2, m_BufferPosMax * 10000 / 10001 );
+            m_BufferPosMax = Clamp ( 10, m_BufferPosMax, ( prevBufferPosMax + 1000 ) * 4 );
+            if ( m_BufferPosMax > (int)m_ItemBufferArray.size () || m_BufferPosMax < (int)m_ItemBufferArray.size () / 4 )
                 m_ItemBufferArray.resize ( m_BufferPosMax );
         }
 
@@ -325,7 +325,7 @@ namespace SharedUtil
                     if ( StartEvent.type != STATS_CLOCK || EndEvent.type != STATS_UNCLOCK )
                     {
                         // Error
-                        fTotalMs = 999;
+                        fTotalMs = 0;
                         continue;
                     }
 
