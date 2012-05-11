@@ -227,6 +227,15 @@ bool CStaticFunctionDefinitions::WasEventCancelled ( void )
     return m_pEvents->WasEventCancelled ();
 }
 
+bool CStaticFunctionDefinitions::setSFXParams ( SSFXParams tParams )
+{
+    if ( m_pClientGame->IsSFXEventRunning ( ) )
+    {
+        m_pClientGame->SetCurrentSFXParams ( tParams );
+        return true;
+    }
+    return false;
+}
 
 bool CStaticFunctionDefinitions::DownloadFile ( CResource* pResource, const char* szFile, CChecksum checksum )
 {

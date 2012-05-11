@@ -466,7 +466,7 @@ private:
     static bool                         StaticVehicleCollisionHandler   ( CVehicleSAInterface* pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity  );
     static bool                         StaticHeliKillHandler           ( CVehicleSAInterface* pHeli, CPedSAInterface* pPed );
     static bool                         StaticWaterCannonHandler        ( CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed );
-    static bool                         StaticWorldSoundHandler         ( uint uiGroup, uint uiIndex );
+    static bool                         StaticWorldSoundHandler         ( uint uiGroup, uint uiIndex, SSFXParams* tParams );
     static void                         StaticGameObjectDestructHandler     ( CEntitySAInterface* pObject );
     static void                         StaticGameVehicleDestructHandler    ( CEntitySAInterface* pVehicle );
     static void                         StaticGamePlayerDestructHandler     ( CEntitySAInterface* pPlayer );
@@ -488,7 +488,7 @@ private:
     bool                                VehicleCollisionHandler         ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity  );
     bool                                HeliKillHandler                 ( CVehicleSAInterface* pHeli, CPedSAInterface* pPed );
     bool                                WaterCannonHitHandler           ( CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed );
-    bool                                WorldSoundHandler               ( uint uiGroup, uint uiIndex );
+    bool                                WorldSoundHandler               ( uint uiGroup, uint uiIndex, SSFXParams* tParams );
     void                                GameObjectDestructHandler       ( CEntitySAInterface* pObject );
     void                                GameVehicleDestructHandler      ( CEntitySAInterface* pVehicle );
     void                                GamePlayerDestructHandler       ( CEntitySAInterface* pPlayer );
@@ -516,6 +516,9 @@ public:
 
     void                                SetSingularTransfers            ( bool bTransfer )  { m_bSingularTransfer = bTransfer; };
     void                                ShowTransferBox                 ( void )            { m_pTransferBox->Show (); };
+
+    void                                SetCurrentSFXParams             ( SSFXParams tParams )    { m_fPitch = tParams.m_fPitch; m_fVolume = tParams.m_fVolume; };
+    bool                                IsSFXEventRunning               ( void )                           { return m_bSFXRunning; };
 
 private:
     eStatus                             m_Status;
@@ -704,7 +707,8 @@ private:
     // Debug class. Empty in release.
 public:
     CFoo                                m_Foo;
-
+    float                               m_fPitch;
+    float                               m_fVolume;
 private:
 
     CEvents                             m_Events;
@@ -715,6 +719,7 @@ private:
     CElapsedTime                        m_LastClearTime;
     SString                             m_strServerVersionSortable;
     std::set < eWeaponType >            m_weaponTypesUsingBulletSync;
+    bool                                m_bSFXRunning;
 };
 
 extern CClientGame* g_pClientGame;

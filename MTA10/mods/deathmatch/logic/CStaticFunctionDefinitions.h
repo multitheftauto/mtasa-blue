@@ -44,6 +44,7 @@ public:
     static bool                         TriggerLatentServerEvent            ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, int bandwidth, CLuaMain* pLuaMain );
     static bool                         CancelEvent                         ( bool bCancel );
     static bool                         WasEventCancelled                   ( void );
+    static bool                         setSFXParams                         ( SSFXParams fPitch );
 
     // Misc funcs
     static bool                         DownloadFile                        ( CResource* pResource, const char* szFile, CChecksum checksum = CChecksum() );
