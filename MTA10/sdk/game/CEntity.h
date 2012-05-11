@@ -64,7 +64,7 @@ public:
     virtual VOID                        SetOrientation ( float fX, float fY, float fZ )=0;
     virtual VOID                        FixBoatOrientation ( void ) = 0;
     virtual CVector                     * GetPosition (  )=0;
-    virtual CMatrix                     * GetMatrix ( CMatrix * matrix ) const=0;
+    virtual CMatrix                     * GetMatrix ( CMatrix * matrix )=0;
     virtual VOID                        SetMatrix ( CMatrix * matrix )=0;
     virtual WORD                        GetModelIndex ()=0;
     virtual eEntityType                 GetEntityType ()=0;

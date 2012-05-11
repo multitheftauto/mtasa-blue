@@ -237,9 +237,12 @@ public:
     void                        SetUnderwater ( bool bUnderwater );
     bool                        GetUnderwater ( void );
 
-    CVector                     * GetPosition (  );
-    CMatrix                     * GetMatrix ( CMatrix * matrix ) const;
-    VOID                        SetMatrix ( CMatrix * matrix );
+    virtual void                RestoreLastGoodPhysicsState ( void );
+    CVector*                    GetPosition                 ( void );
+    CVector*                    GetPositionInternal         ( void );
+    CMatrix*                    GetMatrix                   ( CMatrix* matrix );
+    CMatrix*                    GetMatrixInternal           ( CMatrix* matrix );
+    VOID                        SetMatrix                   ( CMatrix* matrix );
     WORD                        GetModelIndex ();
     eEntityType                 GetEntityType ();
     bool                        IsOnScreen ();
@@ -296,25 +299,31 @@ private:
     static unsigned long        FUNC_RwFrameGetLTM;
 
     unsigned long               m_ulArrayID;
-
-/*  VOID                        InitFlags()
-    {
-        //this->GetInterface()->bIsStaticWaitingForCollision = true;
-        this->GetInterface()->nStatus = 4;
-        
-        DWORD dwThis = (DWORD)this->GetInterface();
-
-        DWORD dwFunc = 0x41D000;
-        _asm
-        {
-            push    dwThis
-            call    dwFunc
-            pop     eax
-        }
-
-    };*/
-
     void*                       m_pStoredPointer;
+    CVector                     m_LastGoodPosition;
 };
+
+
+//
+// Check for various number problems
+//
+inline bool IsValidPositionFloat ( const float f )
+{
+    if ( f < -100000 || f > 100000 || _isnan ( f ) )
+        return false;          
+    return true;
+}
+
+inline bool IsValidPosition ( const CVector& vec )
+{
+    return IsValidPositionFloat ( vec.fX ) && IsValidPositionFloat ( vec.fY ) && IsValidPositionFloat ( vec.fZ );
+}
+
+inline bool IsValidMatrix ( const CMatrix& mat )
+{
+    return IsValidPosition ( mat.vPos )
+        && IsValidPosition ( mat.vFront );
+}
+
 
 #endif
