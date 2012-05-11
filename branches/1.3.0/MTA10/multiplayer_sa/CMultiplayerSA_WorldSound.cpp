@@ -65,7 +65,6 @@ bool _cdecl OnCAESoundManagerRequestNewSound ( CAESound* pAESound )
             // but some sound effects will keep restarting (car engine, fire etc)
         }
     }
-    pAESound->fPitch *= 0.25f;
     return true;
 }
 
