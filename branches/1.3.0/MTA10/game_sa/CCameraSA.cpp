@@ -199,6 +199,55 @@ VOID CCameraSA::TakeControlAttachToEntity(CEntity * TargetEntity, CEntity * Atta
     }
 }
 
+// LSOD recovery
+void CCameraSA::RestoreLastGoodState ( void )
+{
+    CMatrix defmat;
+    SetMatrix ( &defmat );
+
+    CCameraSAInterface* pCameraInterface = GetInterface ();
+
+    pCameraInterface->m_CameraAverageSpeed = 0;
+    pCameraInterface->m_CameraSpeedSoFar = 0;
+    pCameraInterface->m_PreviousCameraPosition = CVector ();
+    pCameraInterface->m_vecGameCamPos = CVector ();
+    pCameraInterface->m_cameraMatrix.SetFromMatrixSkipPadding ( CMatrix () );
+    pCameraInterface->m_cameraMatrixOld.SetFromMatrixSkipPadding ( CMatrix () );
+    pCameraInterface->m_viewMatrix.SetFromMatrixSkipPadding ( CMatrix () );
+    pCameraInterface->m_matInverse.SetFromMatrixSkipPadding ( CMatrix () );
+    pCameraInterface->m_vecBottomFrustumNormal = CVector ( 0, -1, -1 );
+    pCameraInterface->m_vecTopFrustumNormal = CVector ( -1, -1, 0 );
+
+    for ( uint i = 0 ; i < MAX_CAMS ; i++ )
+    {
+        CCamSA* pCam = Cams[i];
+        if ( !pCam )
+            continue;
+
+        CCamSAInterface* pCamInterface = pCam->GetInterface ();
+        if ( !pCamInterface )
+            continue;
+
+        pCamInterface->m_fAlphaSpeedOverOneFrame = 0;
+        pCamInterface->m_fBetaSpeedOverOneFrame = 0;
+        pCamInterface->m_fTrueBeta = 1;
+        pCamInterface->m_fTrueAlpha = 1;
+        pCamInterface->Alpha = 1;
+        pCamInterface->Beta = 1;
+        pCamInterface->BetaSpeed = 0;
+        pCamInterface->SpeedVar = 0;
+
+        pCamInterface->m_cvecSourceSpeedOverOneFrame = CVector ( 0, 0, 0 );
+        pCamInterface->m_cvecTargetSpeedOverOneFrame = CVector ( 0, 0, 0 );
+        pCamInterface->Front = CVector ( 1, 0, 0 );
+        pCamInterface->Source = CVector ( 1, 0, 0 );
+        pCamInterface->SourceBeforeLookBehind = CVector ( 1, 0, 0 );
+        pCamInterface->Up = CVector ( 0, 0, 1 );
+        for ( uint i = 0 ; i < CAM_NUM_TARGET_HISTORY ; i++ )
+            pCamInterface->m_aTargetHistoryPos[i] = CVector ( 1, 0, 0 );
+    }
+}
+
 CMatrix * CCameraSA::GetMatrix ( CMatrix * matrix )
 {
     DEBUG_TRACE("CMatrix * CCameraSA::GetMatrix ( CMatrix * matrix )");
@@ -207,14 +256,20 @@ CMatrix * CCameraSA::GetMatrix ( CMatrix * matrix )
     CMatrix_Padded * pCamMatrix = &this->GetInterface()->m_cameraMatrix; // ->Placeable.matrix;
     if ( pCamMatrix )
     {
-        MemCpyFast (&matrix->vFront,     &pCamMatrix->vFront,    sizeof(CVector));
-        MemCpyFast (&matrix->vPos,           &pCamMatrix->vPos,          sizeof(CVector));
-        MemCpyFast (&matrix->vUp,            &pCamMatrix->vUp,           sizeof(CVector));
-        MemCpyFast (&matrix->vRight,         &pCamMatrix->vRight,            sizeof(CVector));   
+        matrix->vFront = pCamMatrix->vFront;
+        matrix->vPos = pCamMatrix->vPos;
+        matrix->vUp = pCamMatrix->vUp;
+        matrix->vRight = pCamMatrix->vRight;
+ 
+        if ( !IsValidMatrix ( *matrix ) )
+        {
+            RestoreLastGoodState ();
+            pCamMatrix->ConvertToMatrix ( *matrix );
+        }
     }
     else
     {
-        MemSetFast (matrix, 0, sizeof(CMatrix));
+        *matrix = CMatrix ();
     }
     return matrix;
 }
@@ -225,10 +280,10 @@ VOID CCameraSA::SetMatrix ( CMatrix * matrix )
     CMatrix_Padded * pCamMatrix = this->GetInterface()->Placeable.matrix;
     if ( pCamMatrix )
     {
-        MemCpyFast (&pCamMatrix->vFront,     &matrix->vFront,    sizeof(CVector));
-        MemCpyFast (&pCamMatrix->vPos,           &matrix->vPos,          sizeof(CVector));
-        MemCpyFast (&pCamMatrix->vUp,            &matrix->vUp,           sizeof(CVector));
-        MemCpyFast (&pCamMatrix->vRight,         &matrix->vRight,            sizeof(CVector));
+        pCamMatrix->vFront = matrix->vFront;
+        pCamMatrix->vPos = matrix->vPos;
+        pCamMatrix->vUp = matrix->vUp;
+        pCamMatrix->vRight = matrix->vRight;
     }   
 }
 

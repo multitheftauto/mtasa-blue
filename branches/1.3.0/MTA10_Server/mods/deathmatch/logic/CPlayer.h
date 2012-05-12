@@ -44,29 +44,36 @@ enum eVoiceState
     VOICESTATE_TRANSMITTING,
 };
 
-#define MOVEMENT_UPDATE_THRESH (5)
-#define DISTANCE_FOR_NEAR_VIEWER (310)
+#define MOVEMENT_UPDATE_THRESH      (5)
+#define DISTANCE_FOR_NEAR_VIEWER    (310)
 
 struct SViewerInfo
 {
     SViewerInfo ( void )
-        : bIsInNearViewerList ( false )
-        , iMoveToFarCountDown ( 0 )
+        : iMoveToFarCountDown ( 0 )
         , iPrevZone ( 0 )
         , iZone ( 0 )
         , llLastUpdateTime ( 0 )
         , bPrevIsNear ( false )
     {}
 
-    bool bIsInNearViewerList;
     int iMoveToFarCountDown;
 
+    // Used in puresync
     int iPrevZone;
     int iZone;
     long long llLastUpdateTime;
 
+    // Used in keysync
     bool bPrevIsNear;
 };
+
+#ifdef WIN32
+    typedef CFastHashMap < CPlayer*, SViewerInfo > SViewerMapType;
+#else
+    typedef std::map < CPlayer*, SViewerInfo > SViewerMapType;
+#endif
+
 
 struct SScreenShotInfo
 {
@@ -259,13 +266,16 @@ public:
     void                                        SetWeaponCorrect            ( bool bWeaponCorrect );
     bool                                        GetWeaponCorrect            ( void );
 
+    void                                        MaybeUpdateOthersNearList   ( void );
+    void                                        UpdateOthersNearList        ( void );
+    void                                        RefreshNearPlayer           ( CPlayer* pOther );
+    SViewerMapType&                             GetNearPlayerList           ( void )                        { return m_NearPlayerList; }
+    SViewerMapType&                             GetFarPlayerList            ( void )                        { return m_FarPlayerList; }
     void                                        AddPlayerToDistLists        ( CPlayer* pOther );
     void                                        RemovePlayerFromDistLists   ( CPlayer* pOther );
-    void                                        RefreshNearViewer           ( CPlayer* pOther );
-    void                                        MaybeUpdateNearList         ( void );
-    void                                        UpdateNearList              ( void );
-    std::map < CPlayer*, SViewerInfo* >&        GetNearViewerList           ( void )                        { return m_NearViewerList; }
-    std::map < CPlayer*, SViewerInfo* >&        GetFarViewerList            ( void )                        { return m_FarViewerList; }
+    void                                        MovePlayerToNearList        ( CPlayer* pOther );
+    void                                        MovePlayerToFarList         ( CPlayer* pOther );
+    bool                                        ShouldPlayerBeInNearList    ( CPlayer* pOther );
 
     SScreenShotInfo&                            GetScreenShotInfo           ( void )                        { return m_ScreenShotInfo; }
 
@@ -331,7 +341,7 @@ public:
     bool                                        IsPlayerIgnoringElement     ( CElement* pElement );
 
     void                                        SetCameraOrientation        ( const CVector& vecPosition, const CVector& vecFwd );
-    bool                                        IsTimeToReceivePuresyncNearFrom ( CPlayer* pOther, SViewerInfo* pInfo );
+    bool                                        IsTimeToReceivePuresyncNearFrom ( CPlayer* pOther, SViewerInfo& nearInfo );
     int                                         GetPuresyncZone                 ( CPlayer* pOther );
     int                                         GetApproxPuresyncPacketSize ( void );
     const CVector&                              GetCamPosition              ( void )            { return m_vecCamPosition; };
@@ -435,9 +445,8 @@ private:
 
     uint                                        m_uiWeaponIncorrectCount;
 
-    std::map < CPlayer*, SViewerInfo* >         m_ViewerInfoMap;
-    std::map < CPlayer*, SViewerInfo* >         m_NearViewerList;
-    std::map < CPlayer*, SViewerInfo* >         m_FarViewerList;
+    SViewerMapType                              m_NearPlayerList;
+    SViewerMapType                              m_FarPlayerList;
     CElapsedTime                                m_UpdateNearListTimer;
     CVector                                     m_vecUpdateNearLastPosition;
 

@@ -548,6 +548,7 @@ void CRenderWareSA::ReplaceVehicleModel ( RpClump * pNew, unsigned short usModel
         }
     }
 }
+
 // Replaces a weapon model
 void CRenderWareSA::ReplaceWeaponModel ( RpClump * pNew, unsigned short usModelID )
 {
@@ -566,6 +567,7 @@ void CRenderWareSA::ReplaceWeaponModel ( RpClump * pNew, unsigned short usModelI
         }
     }
 }
+
 void CRenderWareSA::ReplacePedModel ( RpClump * pNew, unsigned short usModelID )
 {
     // get the modelinfo array

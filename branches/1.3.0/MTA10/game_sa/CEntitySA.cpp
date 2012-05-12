@@ -54,6 +54,7 @@ VOID CEntitySA::SetPosition(float fX, float fY, float fZ)
         vecPos->fX = fX;
         vecPos->fY = fY;
         vecPos->fZ = fZ;
+        m_LastGoodPosition = *vecPos;
     }
 
     WORD wModelID = GetModelIndex();
@@ -231,7 +232,36 @@ VOID CEntitySA::SetPosition( CVector * vecPosition )
         SetPosition ( vecPosition->fX, vecPosition->fY, vecPosition->fZ );
 }
 
-CVector * CEntitySA::GetPosition( )
+
+void CEntitySA::RestoreLastGoodPhysicsState ( void )
+{
+    // Validate m_LastGoodPosition
+    if ( !IsValidPosition ( m_LastGoodPosition ) )
+        m_LastGoodPosition = CVector ( 6000, (float)( rand () % 2000 ), 1000 );
+
+    CMatrix matrix;
+    matrix.vPos = m_LastGoodPosition;
+    SetMatrix ( &matrix );
+    SetPosition ( &m_LastGoodPosition );
+}
+
+
+//
+// Get entity position. Fixes bad numbers
+//
+CVector* CEntitySA::GetPosition ( void )
+{
+    CVector* pPosition = GetPositionInternal ();
+    if ( !IsValidPosition ( *pPosition ) )
+    {
+        RestoreLastGoodPhysicsState ();
+        pPosition = GetPositionInternal ();
+    }
+    m_LastGoodPosition = *pPosition;
+    return pPosition;
+}
+
+CVector * CEntitySA::GetPositionInternal ( )
 {
     DEBUG_TRACE("CVector * CEntitySA::GetPosition( )");
     if ( m_pInterface->Placeable.matrix )
@@ -241,7 +271,25 @@ CVector * CEntitySA::GetPosition( )
 }
 
 
-CMatrix * CEntitySA::GetMatrix ( CMatrix * matrix ) const
+//
+// Get entity matrix. Fixes bad numbers
+//
+CMatrix* CEntitySA::GetMatrix ( CMatrix * matrix )
+{
+    CMatrix* pMatrix = GetMatrixInternal ( matrix );
+    if ( pMatrix )
+    {
+        if ( !IsValidMatrix ( *pMatrix ) )
+        {
+            RestoreLastGoodPhysicsState ();
+            pMatrix = GetMatrixInternal ( matrix );
+        }       
+        m_LastGoodPosition = pMatrix->vPos;
+    }
+    return pMatrix;
+}
+
+CMatrix * CEntitySA::GetMatrixInternal ( CMatrix * matrix )
 {
     DEBUG_TRACE("CMatrix * CEntitySA::GetMatrix ( CMatrix * matrix )");
     if ( m_pInterface->Placeable.matrix && matrix )
@@ -275,6 +323,7 @@ VOID CEntitySA::SetMatrix ( CMatrix * matrix )
         MemCpyFast (&m_pInterface->Placeable.matrix->vRight,         &matrix->vRight, sizeof(CVector));
 
         m_pInterface->Placeable.m_transform.m_translate = matrix->vPos;
+        m_LastGoodPosition = matrix->vPos;
 
         /*
         WORD wModelID = GetModelIndex();

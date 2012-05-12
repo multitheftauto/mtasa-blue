@@ -454,6 +454,13 @@ void CPedSA::ClearWeapons ( void )
     }
 }
 
+void CPedSA::RestoreLastGoodPhysicsState ( void )
+{
+    CPhysicalSA::RestoreLastGoodPhysicsState ();
+    SetCurrentRotation ( 0 );
+    SetTargetRotation ( 0 );
+}
+
 FLOAT CPedSA::GetCurrentRotation()
 {
     return GetPedInterface ()->fCurrentRotation;

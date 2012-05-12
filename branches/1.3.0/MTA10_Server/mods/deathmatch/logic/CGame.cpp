@@ -1908,15 +1908,15 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
         long long llTickCountNow = GetModuleTickCount64 ();
 
         // Use this players far list
-        std::map < CPlayer*, SViewerInfo* >& farList = pPlayer->GetFarViewerList ();
+        SViewerMapType& farList = pPlayer->GetFarPlayerList ();
 
         // For each far player
-        for ( std::map < CPlayer*, SViewerInfo* > ::iterator it = farList.begin (); it != farList.end (); ++it )
+        for ( SViewerMapType ::iterator it = farList.begin (); it != farList.end (); ++it )
         {
             CPlayer* pSendPlayer = it->first;
-            SViewerInfo* pInfo = it->second;
+            SViewerInfo& nearInfo = it->second;
 
-            pInfo->llLastUpdateTime = llTickCountNow;
+            nearInfo.llLastUpdateTime = llTickCountNow;
             sendList.push_back ( pSendPlayer );
         }
     }
@@ -1925,20 +1925,34 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
     // Process near sync
     //
     {
-        // Update list of players who need fast updates from us
-        pPlayer->MaybeUpdateNearList ();
+        // Insert into other players puresync near list if appropriate
+        pPlayer->MaybeUpdateOthersNearList ();
 
         CLOCK( "RelayPlayerPuresync", "ProcessNearList" );
         // Use this players puresync near list for sending packets
-        std::map < CPlayer*, SViewerInfo* >& nearList = pPlayer->GetNearViewerList ();
+        SViewerMapType& nearList = pPlayer->GetNearPlayerList ();
+
+        // Array for holding players that need moving to the puresync far list
+        std::vector < CPlayer* > moveToFarListList;
 
         // For each puresync near player
-        for ( std::map < CPlayer*, SViewerInfo* > ::iterator it = nearList.begin (); it != nearList.end (); ++it )
+        for ( SViewerMapType ::iterator it = nearList.begin (); it != nearList.end (); ++it )
         {
             CPlayer* pSendPlayer = it->first;
-            SViewerInfo* pInfo = it->second;
+            SViewerInfo& nearInfo = it->second;
+            if ( --nearInfo.iMoveToFarCountDown < 1 )
             {
-                bool bTimeForSync = pSendPlayer->IsTimeToReceivePuresyncNearFrom ( pPlayer, pInfo );
+                // Remove player from puresync near list (Has to be not near for 5 calls to get removed (The delay ensures timely updates of players moving far away))
+                if ( !pPlayer->ShouldPlayerBeInNearList ( pSendPlayer ) ) // Double check remove is required.
+                {
+                    moveToFarListList.push_back ( pSendPlayer );
+                    continue;
+                }
+                nearInfo.iMoveToFarCountDown = 5;
+            }
+
+            {
+                bool bTimeForSync = pSendPlayer->IsTimeToReceivePuresyncNearFrom ( pPlayer, nearInfo );
                 if ( !bUseSimSendList )
                 {
                     // Standard sending
@@ -1956,8 +1970,8 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
                     //      Moving from zone 0:     0        1+     No sync here, sim pure sync off
                     //      Not in zone0:           1+       1+     Do sync here  sim pure sync off
                     //
-                    bool bSyncHere = ( pInfo->iPrevZone > 0 );
-                    bool bSimSync = ( pInfo->iZone == 0 );
+                    bool bSyncHere = ( nearInfo.iPrevZone > 0 );
+                    bool bSimSync = ( nearInfo.iZone == 0 );
         
                     if ( bSyncHere && bTimeForSync )
                         sendList.push_back ( pSendPlayer );
@@ -1968,6 +1982,12 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
             }
         }
         UNCLOCK( "RelayPlayerPuresync", "ProcessNearList" );
+
+        // Do pending near->far list moves
+        for ( std::vector < CPlayer* > ::const_iterator iter = moveToFarListList.begin (); iter != moveToFarListList.end (); ++iter )
+        {
+            pPlayer->MovePlayerToFarList ( *iter );
+        }
     }
 
     // Relay packet
@@ -2131,13 +2151,13 @@ void CGame::RelayKeysync ( CPacket& Packet )
     //
     {
         // Update list of players who need the packet
-        pPlayer->MaybeUpdateNearList ();
+        pPlayer->MaybeUpdateOthersNearList ();
 
-        // Use this players near viewer list for sending packets
-        std::map < CPlayer*, SViewerInfo* >& nearList = pPlayer->GetNearViewerList ();
+        // Use this players keysync near list for sending packets
+        SViewerMapType& nearList = pPlayer->GetNearPlayerList ();
 
-        // For each near viewer
-        for ( std::map < CPlayer*, SViewerInfo* > ::iterator it = nearList.begin (); it != nearList.end (); ++it )
+        // For each keysync near player
+        for ( SViewerMapType ::iterator it = nearList.begin (); it != nearList.end (); ++it )
         {
             CPlayer* pSendPlayer = it->first;
             if ( !bUseSimSendList )
@@ -2147,7 +2167,7 @@ void CGame::RelayKeysync ( CPacket& Packet )
             }
             else
             {
-                SViewerInfo* pInfo = it->second;
+                SViewerInfo& nearInfo = it->second;
 
                 //
                 // Sim sync relays key sync packets to the other player when he is near
@@ -2156,10 +2176,10 @@ void CGame::RelayKeysync ( CPacket& Packet )
                 //      Moving into range:     false   true     Do sync here, sim keysync on
                 //      In range:              true    true     No sync here, sim keysync on
                 //
-                if ( !pInfo->bPrevIsNear )
+                if ( !nearInfo.bPrevIsNear )
                 {
                     sendList.push_back ( pSendPlayer );
-                    pInfo->bPrevIsNear = true;
+                    nearInfo.bPrevIsNear = true;
                 }
 
                 simSendList.push_back ( pSendPlayer );

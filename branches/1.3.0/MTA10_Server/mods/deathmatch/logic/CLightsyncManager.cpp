@@ -101,10 +101,10 @@ void CLightsyncManager::DoPulse ()
                 CLightsyncPacket packet;
 
                 // Use this players far list
-                const std::map < CPlayer*, SViewerInfo* >& farList = pPlayer->GetFarViewerList ();
+                const SViewerMapType& farList = pPlayer->GetFarPlayerList ();
 
                 // For each far player
-                for ( std::map < CPlayer*, SViewerInfo* > ::const_iterator it = farList.begin (); it != farList.end (); ++it )
+                for ( SViewerMapType ::const_iterator it = farList.begin (); it != farList.end (); ++it )
                 {
                     CPlayer* pCurrent = it->first;
                     dassert ( pPlayer != pCurrent );

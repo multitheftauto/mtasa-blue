@@ -551,7 +551,7 @@ void CClientEntity::DeleteAllCustomData ( CLuaMain* pLuaMain, bool bRecursive )
 
 bool CClientEntity::GetMatrix ( CMatrix& matrix ) const
 {
-    const CEntity* pEntity = GetGameEntity ();
+    CEntity* pEntity = const_cast < CEntity* > ( GetGameEntity () );
     if ( pEntity )
     {
         if ( pEntity->GetMatrix ( &matrix ) ) return true;

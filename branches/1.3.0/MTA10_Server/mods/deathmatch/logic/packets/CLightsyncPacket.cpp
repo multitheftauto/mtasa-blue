@@ -40,7 +40,7 @@ bool CLightsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         // Right we need to sync the position if there is no vehicle or he's in a vehicle and the difference between setPosition is less than or equal to the slow sync rate
         // i.e. make sure his position has been updated more than 0.001f in the last 1500ms plus a small margin for error (probably not needed).
         // This will ensure we only send positions when the position has changed.
-        bSyncPosition = ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 ) && llTicksDifference <= SLOW_SYNCRATE + 100;
+        bSyncPosition = ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 ) && llTicksDifference <= g_TickRateSettings.iLightSync + 100;
 
         BitStream.Write ( pPlayer->GetID () );
         BitStream.Write ( (unsigned char)pPlayer->GetSyncTimeContext () );
