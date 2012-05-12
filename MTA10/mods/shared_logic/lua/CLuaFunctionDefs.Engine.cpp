@@ -56,7 +56,7 @@ int CLuaFunctionDefs::EngineLoadCOL ( lua_State* luaVM )
                 {
                     // Delete it again. We failed
                     delete pCol;
-                    m_pScriptDebugging->LogCustom ( luaVM, "Unable to load COL '%s'", *strFile );
+                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", "engineLoadCOL", *strFile ) );
                 }
             }
             else
@@ -111,7 +111,7 @@ int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
                     {
                         // Delete it again
                         delete pDFF;
-                        m_pScriptDebugging->LogCustom ( luaVM, "Unable to load DFF '%s'", *strFile );
+                        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", "engineLoadDFF", *strFile ) );
                     }
                 }
                 else
@@ -170,7 +170,7 @@ int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
                 {
                     // Delete it again
                     delete pTXD;
-                    m_pScriptDebugging->LogCustom ( luaVM, "Unable to load TXD '%s'", *strFile );
+                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", "engineLoadTXD", *strFile ) );
                 }
             }
             else

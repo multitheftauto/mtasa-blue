@@ -68,7 +68,11 @@ struct SViewerInfo
     bool bPrevIsNear;
 };
 
-typedef CFastHashMap < CPlayer*, SViewerInfo > SViewerMapType;
+#ifdef WIN32
+    typedef CFastHashMap < CPlayer*, SViewerInfo > SViewerMapType;
+#else
+    typedef std::map < CPlayer*, SViewerInfo > SViewerMapType;
+#endif
 
 
 struct SScreenShotInfo
