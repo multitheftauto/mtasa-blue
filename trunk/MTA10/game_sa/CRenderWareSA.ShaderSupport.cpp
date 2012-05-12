@@ -13,6 +13,7 @@
 
 #include "StdInc.h"
 
+
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 //
@@ -213,10 +214,12 @@ void CRenderWareSA::StreamingAddedTexture ( ushort usTxdId, const SString& strTe
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::StreamingRemovedTxd ( ushort usTxdId )
 {
-    // Find all TexInfo's for this txd
-    for ( std::list < STexInfo > ::iterator iter = m_TexInfoList.begin () ; iter != m_TexInfoList.end () ; )
+    std::vector < STexInfo* > results;
+    MultiFind ( m_TexInfoMap, usTxdId, &results );
+
+    for ( std::vector < STexInfo* > ::iterator iter = results.begin () ; iter != results.end () ; ++iter )
     {
-        STexInfo* pTexInfo = &*iter;
+        STexInfo* pTexInfo = *iter;
         if ( pTexInfo->texTag.Matches ( usTxdId ) )
         {
             // If texinfo has a shadinfo, unassociate
@@ -226,10 +229,8 @@ void CRenderWareSA::StreamingRemovedTxd ( ushort usTxdId )
             }
 
             OnDestroyTexInfo ( pTexInfo );
-            iter = m_TexInfoList.erase ( iter );
+            MapRemovePair ( m_TexInfoMap, usTxdId, pTexInfo );
         }
-        else
-            ++iter;
     }
 }
 
@@ -271,9 +272,9 @@ void CRenderWareSA::ScriptAddedTxd ( RwTexDictionary *pTxd )
 void CRenderWareSA::ScriptRemovedTexture ( RwTexture* pTex )
 {
     // Find all TexInfo's for this txd
-    for ( std::list < STexInfo > ::iterator iter = m_TexInfoList.begin () ; iter != m_TexInfoList.end () ; )
+    for ( std::multimap < ushort, STexInfo* >::iterator iter = m_TexInfoMap.begin () ; iter != m_TexInfoMap.end () ; )
     {
-        STexInfo* pTexInfo = &*iter;
+        STexInfo* pTexInfo = iter->second;
         if ( pTexInfo->texTag.Matches ( pTex ) )
         {
             // If texinfo has a shadinfo, unassociate
@@ -283,7 +284,7 @@ void CRenderWareSA::ScriptRemovedTexture ( RwTexture* pTex )
             }
 
             OnDestroyTexInfo ( pTexInfo );
-            iter = m_TexInfoList.erase ( iter );
+            m_TexInfoMap.erase ( iter++ );
         }
         else
             ++iter;
@@ -333,9 +334,9 @@ bool CRenderWareSA::AddWorldTextureWatch ( CSHADERDUMMY* pShaderData, const char
     pShadInfo->AppendMatchType ( szMatch, true );
 
     // Step through texinfo list looking for all add matches
-    for ( std::list < STexInfo > ::iterator iter = m_TexInfoList.begin () ; iter != m_TexInfoList.end () ; ++iter )
+    for ( std::multimap < ushort, STexInfo* >::iterator iter = m_TexInfoMap.begin () ; iter != m_TexInfoMap.end () ; ++iter )
     {
-        STexInfo* pTexInfo = &*iter;
+        STexInfo* pTexInfo = iter->second;
 
         // No need to check if aleady associated
         if ( pShadInfo == pTexInfo->pAssociatedShadInfo )
@@ -573,8 +574,7 @@ void CRenderWareSA::FlushPendingAssociations ( void )
 STexInfo* CRenderWareSA::CreateTexInfo ( const STexTag& texTag, const SString& strTextureName, CD3DDUMMY* pD3DData )
 {
     // Create texinfo
-    m_TexInfoList.push_back ( STexInfo ( texTag, strTextureName, pD3DData ) );
-    STexInfo* pTexInfo = &m_TexInfoList.back ();
+    STexInfo* pTexInfo = new STexInfo ( texTag, strTextureName, pD3DData );
 
     // Add to lookup maps
 #if WITH_UNIQUE_CHECK
@@ -583,6 +583,10 @@ STexInfo* CRenderWareSA::CreateTexInfo ( const STexTag& texTag, const SString& s
         AddReportLog ( 5132, SString ( "CreateTexInfo duplicate %s", *strUniqueKey ) );
     MapSet ( m_UniqueTexInfoMap, strUniqueKey, pTexInfo );
 #endif
+
+    // Add to map
+    MapInsert ( m_TexInfoMap, pTexInfo->texTag.m_usTxdId, pTexInfo );
+
 
     // Add to D3DData/name lookup map. (Currently only used by GetTextureName (CRenderItemManager::GetVisibleTextureNames))
     MapSet ( m_D3DDataTexInfoMap, pTexInfo->pD3DData, pTexInfo );
@@ -613,6 +617,8 @@ void CRenderWareSA::OnDestroyTexInfo ( STexInfo* pTexInfo )
     // Remove from D3DData/name lookup map
     if ( MapFindRef ( m_D3DDataTexInfoMap, pTexInfo->pD3DData ) == pTexInfo )
         MapRemove ( m_D3DDataTexInfoMap, pTexInfo->pD3DData );
+
+    delete pTexInfo;
 }
 
 
