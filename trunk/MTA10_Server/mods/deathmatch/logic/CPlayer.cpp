@@ -1073,6 +1073,8 @@ void CPlayer::SetPlayerStat ( unsigned short usStat, float fValue )
 }
 
 
+#ifdef WIN32
+
 // For NearList/FarList hash maps
 CPlayer* GetEmptyMapKey ( CPlayer** )
 {
@@ -1083,3 +1085,5 @@ CPlayer* GetDeletedMapKey ( CPlayer** )
 {
     return (CPlayer*)2;
 }
+
+#endif
