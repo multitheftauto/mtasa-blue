@@ -1,0 +1,127 @@
+#000: KY_Rhodes
+#001: BA_AnaBass
+#002: BR_French HornZ
+#003: DR_Dry BD
+#004: FX_Morse
+#005: LD_Transortion
+#006: PA_Long Pad
+#007: ST_JarreStrings
+#008: SY_His Shadow's Breath
+#009: BA_Deepness
+#010: DR_808 SD
+#011: FX_Marsian Pan Flute
+#012: KY_Lullaby
+#013: LD_Morpher
+#014: PA_Jarresque
+#015: ST_Away
+#016: SY_Kicking Saw
+#017: BA_Hiphop BaZZ
+#018: DR_70s Woodblock
+#019: FX_Electrons
+#020: KY_Garage Organ
+#021: LD_Lonely Square Lead
+#022: PA_Strangeland
+#023: SY_Old Saw Percs
+#024: BA_SawBass
+#025: DR_808 Rides
+#026: FX_Powerbeam
+#027: KY_Glimpse Of a Clavi
+#028: LD_PWM Lead
+#029: PA_LoFi Choir
+#030: SY_Old Saws
+#031: BA_I like to move it
+#032: DR_Industrial VeloHammer
+#033: FX_Rave Siren
+#034: KY_Doj's Organ
+#035: LD_Phunny
+#036: PA_Fairies
+#037: SY_Nasty
+#038: BA_Squaredance
+#039: DR_Biiiig Drum
+#040: FX_Random Zaps
+#041: KY_What They Called Pian
+#042: LD_Debil? ICH?
+#043: SY_Formants From The Cry
+#044: BA_You broke me!
+#045: DR_Airy HH
+#046: FX_Tag You're It
+#047: LD_Slow Synthbrass
+#048: SY_Random Arp
+#049: BA_Analog Mod Bass
+#050: DR_HighSnare
+#051: FX_Whistling Wind
+#052: LD_Sweeping Dist
+#053: SY_Lofi Squares
+#054: BA_Not From This World
+#055: DR_808 BD 2
+#056: LD_Mod Perc
+#057: SY_Nice Saws
+#058: BA_Roaar!
+#059: DR_Big Dist Kick
+#060: FX_XPlosion
+#061: LD_Whistlotronic
+#062: SY_Tech Arp
+#063: BA_Mighty
+#064: DR_808 Rim
+#065: FX_Hell's Bell
+#066: LD_Farscape
+#067: SY_Lethal PWM
+#068: BA_Soaring
+#069: BR_Trombrato
+#070: DR_Noise
+#071: SY_Disturbing
+#072: BA_Bontempi
+#073: DR_FlangeHats
+#074: SY_Screeeam!
+#075: DR_Big Kick
+#076: SY_Synth Jew's Harp
+#077: DR_70s Snare
+#078: SY_Cheap Arp
+#079: DR_808 HHs 1
+#080: SY_VeloFuzz
+#081: DR_Hefty Snare
+#082: SY_yasg
+#083: DR_70s Synth Kick
+#084: DR_808 Hihats 2
+#085: DR_808 BD 1
+#086: DR_DistKick 1
+#087: DR_DistKick 2
+#088: DR_DistSnare
+#089: DR_Flanged 808 Ride
+#090: DR_Flanged 808 HHs + Dis
+#091: DR_Kick 1
+#092: DR_Kick 2
+#093: DR_March Snare
+#094: DR_Nice Synth HH
+#095: DR_Noisy Crash
+#096: DR_Noisy Open HH
+#097: DR_Pop BD
+#098: DR_Snappy Snare
+#099: DR_Vernbt Snare
+#100: Init Patch #100
+#101: Init Patch #101
+#102: Init Patch #102
+#103: Init Patch #103
+#104: Init Patch #104
+#105: Init Patch #105
+#106: Init Patch #106
+#107: Init Patch #107
+#108: Init Patch #108
+#109: Init Patch #109
+#110: Init Patch #110
+#111: Init Patch #111
+#112: Init Patch #112
+#113: Init Patch #113
+#114: Init Patch #114
+#115: Init Patch #115
+#116: Init Patch #116
+#117: Init Patch #117
+#118: Init Patch #118
+#119: Init Patch #119
+#120: Init Patch #120
+#121: Init Patch #121
+#122: Init Patch #122
+#123: Init Patch #123
+#124: Init Patch #124
+#125: Init Patch #125
+#126: Init Patch #126
