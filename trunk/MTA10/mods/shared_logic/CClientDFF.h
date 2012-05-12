@@ -16,7 +16,14 @@ class CClientDFF;
 
 #include <list>
 #include "CClientEntity.h"
-//#include "CClientDFFManager.h"
+
+struct SLoadedClumpInfo
+{
+    SLoadedClumpInfo ( void ) : bTriedLoad ( false ), pClump ( NULL ) {} 
+    bool     bTriedLoad;
+    RpClump* pClump;
+};
+
 
 class CClientDFF : public CClientEntity
 {
@@ -29,9 +36,7 @@ public:
 
     eClientEntityType               GetType                 ( void ) const              { return CCLIENTDFF; }
 
-    bool                            LoadDFF                 ( const char* szFile, unsigned short usModelId, bool bLoadEmbeddedCollisions );
-    void                            UnloadDFF               ( void );
-    inline bool                     IsLoaded                ( void )                    { return m_pLoadedClump != NULL; };
+    bool                            LoadDFF                 ( const char* szFile, unsigned short usModelId );
 
     bool                            ReplaceModel            ( unsigned short usModel );
 
@@ -46,16 +51,20 @@ public:
     void                            SetPosition             ( const CVector& vecPosition ) {};
 
 protected:
+    void                            UnloadDFF               ( void );
     void                            InternalRestoreModel    ( unsigned short usModel );
 
-    bool                            ReplaceObjectModel      ( unsigned short usModel );
-    bool                            ReplaceVehicleModel     ( unsigned short usModel );
-    bool                            ReplaceWeaponModel      ( unsigned short usModel );
-    bool                            ReplacePedModel         ( unsigned short usModel );
+    bool                            ReplaceObjectModel      ( RpClump* pClump, ushort usModel );
+    bool                            ReplaceVehicleModel     ( RpClump* pClump, ushort usModel );
+    bool                            ReplaceWeaponModel      ( RpClump* pClump, ushort usModel );
+    bool                            ReplacePedModel         ( RpClump* pClump, ushort usModel );
+
+    RpClump*                        GetLoadedClump          ( ushort usModelId );
 
     class CClientDFFManager*        m_pDFFManager;
 
-    RpClump*                        m_pLoadedClump;
+    SString                         m_strDffFilename;
+    std::map < ushort, SLoadedClumpInfo > m_LoadedClumpInfoMap;
 
     std::list < unsigned short >    m_Replaced;
 };

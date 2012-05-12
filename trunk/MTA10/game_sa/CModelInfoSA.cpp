@@ -947,6 +947,10 @@ void CModelInfoSA::SetCustomModel ( RpClump* pClump )
     if ( pClump == NULL )
         return;
 
+    // Unchanged?
+    if ( m_pCustomClump == pClump )
+        return;
+
     // Store the custom clump
     m_pCustomClump = pClump;
 
