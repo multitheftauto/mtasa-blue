@@ -258,10 +258,6 @@ void CClientPlayerClothes::AddClothes ( const char* szTexture, const char* szMod
 
 void CClientPlayerClothes::InternalAddClothes ( const SPlayerClothing * pClothing, unsigned char ucType )
 {
-#define SKIP_THINGS_FOR_TEST 1
-#ifdef SKIP_THINGS_FOR_TEST
-    return;
-#endif
     if ( m_pPlayerModel )
     {
         CPlayerPed* pPlayerPed = m_pPlayerModel->GetGamePlayer ();

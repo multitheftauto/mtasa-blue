@@ -125,10 +125,6 @@ void _declspec(naked) HOOK_PostCPedDress ()
 //////////////////////////////////////////////////////////////////////////////////////////
 void CMultiplayerSA::InitHooks_ClothesMemFix ( void )
 {
-#define SKIP_THINGS_FOR_TEST 1
-#ifdef SKIP_THINGS_FOR_TEST
-    return;
-#endif
     EZHookInstall ( CClothesDeleteRwObject );
     EZHookInstall ( PostCPedDress );
 
