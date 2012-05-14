@@ -105,6 +105,7 @@ void CDirect3DEvents9::OnRestore ( IDirect3DDevice9 *pDevice )
 
 void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 {
+    TIMING_CHECKPOINT( "+OnPresent1" );
     // Start a new scene. This isn't ideal and is not really recommended by MSDN.
     // I tried disabling EndScene from GTA and just end it after this code ourselves
     // before present, but that caused graphical issues randomly with the sky.
@@ -138,8 +139,10 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     // Tell everyone that the zbuffer will need clearing before use
     CGraphics::GetSingleton ().OnZBufferModified ();
 
+    TIMING_CHECKPOINT( "-OnPresent1" );
     // Notify core
     CCore::GetSingleton ().DoPostFramePulse ();
+    TIMING_CHECKPOINT( "+OnPresent2" );
 
     // Draw pre-GUI primitives
     CGraphics::GetSingleton ().DrawPreGUIQueue ();
@@ -243,6 +246,7 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
             pSurface = NULL;
         }
     }
+    TIMING_CHECKPOINT( "-OnPresent2" );
 }
 
 

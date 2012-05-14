@@ -149,6 +149,7 @@ void CRenderWareSA::InitTextureWatchHooks ( void )
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::PulseWorldTextureWatch ( void )
 {
+    TIMING_CHECKPOINT( "+TextureWatch" );
     FlushPendingAssociations ();
 
     // Go through ms_txdStreamEventList
@@ -186,6 +187,7 @@ void CRenderWareSA::PulseWorldTextureWatch ( void )
     }
 
     ms_txdStreamEventList.clear ();
+    TIMING_CHECKPOINT( "-TextureWatch" );
 }
 
 
@@ -214,6 +216,8 @@ void CRenderWareSA::StreamingAddedTexture ( ushort usTxdId, const SString& strTe
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::StreamingRemovedTxd ( ushort usTxdId )
 {
+    TIMING_CHECKPOINT( "+StreamingRemovedTxd" );
+
     std::vector < STexInfo* > results;
     MultiFind ( m_TexInfoMap, usTxdId, &results );
 
@@ -232,6 +236,8 @@ void CRenderWareSA::StreamingRemovedTxd ( ushort usTxdId )
             MapRemovePair ( m_TexInfoMap, usTxdId, pTexInfo );
         }
     }
+
+    TIMING_CHECKPOINT( "-StreamingRemovedTxd" );
 }
 
 
@@ -246,6 +252,7 @@ void CRenderWareSA::StreamingRemovedTxd ( ushort usTxdId )
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::ScriptAddedTxd ( RwTexDictionary *pTxd )
 {
+    TIMING_CHECKPOINT( "+ScriptAddedTxd" );
     std::vector < RwTexture* > textureList;
     GetTxdTextures ( textureList, pTxd );
     for ( std::vector < RwTexture* > ::iterator iter = textureList.begin () ; iter != textureList.end () ; iter++ )
@@ -258,6 +265,7 @@ void CRenderWareSA::ScriptAddedTxd ( RwTexDictionary *pTxd )
         STexInfo* pTexInfo = CreateTexInfo ( texture, szTextureName, pD3DData );
         UpdateAssociationForTexInfo ( pTexInfo );
     }
+    TIMING_CHECKPOINT( "-ScriptAddedTxd" );
 }
 
 
@@ -271,6 +279,7 @@ void CRenderWareSA::ScriptAddedTxd ( RwTexDictionary *pTxd )
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::ScriptRemovedTexture ( RwTexture* pTex )
 {
+    TIMING_CHECKPOINT( "+ScriptRemovedTexture" );
     // Find all TexInfo's for this txd
     for ( std::multimap < ushort, STexInfo* >::iterator iter = m_TexInfoMap.begin () ; iter != m_TexInfoMap.end () ; )
     {
@@ -289,6 +298,7 @@ void CRenderWareSA::ScriptRemovedTexture ( RwTexture* pTex )
         else
             ++iter;
     }
+    TIMING_CHECKPOINT( "-ScriptRemovedTexture" );
 }
 
 
@@ -325,6 +335,8 @@ void CRenderWareSA::InitWorldTextureWatch ( PFN_WATCH_CALLBACK pfnWatchCallback 
 ////////////////////////////////////////////////////////////////
 bool CRenderWareSA::AddWorldTextureWatch ( CSHADERDUMMY* pShaderData, const char* szMatch, float fShaderPriority )
 {
+    TIMING_CHECKPOINT( "+AddWorldTextureWatch" );
+
     FlushPendingAssociations ();
 
     // Get info for this shader
@@ -361,6 +373,7 @@ bool CRenderWareSA::AddWorldTextureWatch ( CSHADERDUMMY* pShaderData, const char
         }
     }
 
+    TIMING_CHECKPOINT( "-AddWorldTextureWatch" );
     return true;
 }
 
@@ -383,6 +396,7 @@ void CRenderWareSA::RemoveWorldTextureWatch ( CSHADERDUMMY* pShaderData, const c
     if ( !pShadInfo )
         return;
 
+    TIMING_CHECKPOINT( "+RemoveWorldTextureWatch" );
     if ( szMatch )
     {
         // Append subtractive match
@@ -402,6 +416,8 @@ void CRenderWareSA::RemoveWorldTextureWatch ( CSHADERDUMMY* pShaderData, const c
     }
 
     m_PendingShadInfoMap.insert ( pShadInfo );
+
+    TIMING_CHECKPOINT( "-RemoveWorldTextureWatch" );
 }
 
 
@@ -546,6 +562,8 @@ void CRenderWareSA::FlushPendingAssociations ( void )
     if ( m_PendingTexInfoMap.empty () )
         return;
 
+    TIMING_CHECKPOINT( "+FlushPendingAssociations" );
+
     // Process pending texinfos
     std::set < STexInfo* > pendingTexInfoMapCopy = m_PendingTexInfoMap;
     m_PendingTexInfoMap.clear ();
@@ -561,6 +579,8 @@ void CRenderWareSA::FlushPendingAssociations ( void )
         if ( pShadInfo->associatedTexInfoMap.empty () )
             DestroyShadInfo ( pShadInfo );
     }
+
+    TIMING_CHECKPOINT( "-FlushPendingAssociations" );
 }
 
 

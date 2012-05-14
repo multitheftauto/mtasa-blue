@@ -209,6 +209,9 @@ public:
     void                    EnsureFrameRateLimitApplied     ( void );
     void                    DoReliablePulse                 ( void );
 
+    void                    OnTimingCheckpoint              ( const char* szTag );
+    void                    OnTimingDetail                  ( const char* szTag, bool bForceLog = false );
+
     void                    CalculateStreamingMemoryRange   ( void );
     uint                    GetMinStreamingMemory           ( void );
     uint                    GetMaxStreamingMemory           ( void );

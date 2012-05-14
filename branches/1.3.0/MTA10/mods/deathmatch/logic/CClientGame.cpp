@@ -706,6 +706,7 @@ void CClientGame::DoPulsePreHUDRender ( bool bDidUnminimize, bool bDidRecreateRe
 
 void CClientGame::DoPulsePostFrame ( void )
 {
+    TIMING_CHECKPOINT( "+CClientGame::DoPulsePostFrame" );
     #ifdef DEBUG_KEYSTATES
         // Get the controller state
         CControllerState cs;
@@ -801,6 +802,17 @@ void CClientGame::DoPulsePostFrame ( void )
             unsigned int uiWidth = pGraphics->GetViewportWidth ();
             unsigned int uiPosY = uiHeight - 30;
             pGraphics->DrawText ( uiWidth - 155, uiPosY, 0x40ffffff, 1, "dx test mode enabled" );
+        }
+
+        // Draw notice text if diagnostic mode enabled
+        EDiagnosticDebugType diagnosticDebug = g_pCore->GetDiagnosticDebug ();
+        if ( diagnosticDebug == EDiagnosticDebug::FPS_6934 )
+        {
+            CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
+            unsigned int uiHeight = pGraphics->GetViewportHeight ();
+            unsigned int uiWidth = pGraphics->GetViewportWidth ();
+            unsigned int uiPosY = uiHeight - 30;
+            pGraphics->DrawText ( uiWidth - 185, uiPosY, 0xffffff00, 1, "Debug setting: #6934 FPS" );
         }
 
         // Adjust the streaming memory limit.
@@ -899,7 +911,11 @@ static SString AppendNetErrorCode ( const SString& strText )
 
 void CClientGame::DoPulses ( void )
 {
+    TIMING_CHECKPOINT( "-CClientGame::DoPulsePostFrame" );
+
     g_pCore->ApplyFrameRateLimit ();
+
+    TIMING_CHECKPOINT( "+CClientGame::DoPulses" );
 
     m_BuiltCollisionMapThisFrame = false;
 
@@ -983,7 +999,10 @@ void CClientGame::DoPulses ( void )
     }
 
     // Pulse the network interface
+    TIMING_CHECKPOINT( "+NetPulse" );
     g_pNet->DoPulse ();
+    TIMING_CHECKPOINT( "-NetPulse" );
+
     m_pManager->DoPulse ();
     m_pNetAPI->DoPulse ();
     m_pUnoccupiedVehicleSync->DoPulse ();
@@ -1264,6 +1283,8 @@ void CClientGame::DoPulses ( void )
 
     // Send screen shot data
     ProcessDelayedSendList ();
+
+    TIMING_CHECKPOINT( "-CClientGame::DoPulses" );
 }
 
 

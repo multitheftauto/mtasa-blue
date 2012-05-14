@@ -44,7 +44,6 @@ public:
     void                        InitHooks_13 ( void );
     void                        InitMemoryCopies_13 ( void );
     void                        InitHooks_ClothesSpeedUp ( void );
-    void                        InitHooks_ClothesMemFix ( void );
     void                        InitHooks_FixBadAnimId ( void );
     void                        InitHooks_HookDestructors ( void );
     void                        InitHooks_WorldSound ( void );
@@ -52,6 +51,7 @@ public:
     void                        DestroyRemoteDataStorage    ( CRemoteDataStorage* pData );
     void                        AddRemoteDataStorage        ( CPlayerPed* pPed, CRemoteDataStorage* pData );
     void                        RemoveRemoteDataStorage     ( CPlayerPed* pPed );
+    void                        EnableHooks_ClothesMemFix   ( bool bEnable );
 
     CPed *                      GetContextSwitchedPed       ( void );
 
@@ -205,6 +205,7 @@ private:
     CLimitsSA                   m_limits;
     bool                        m_bEnabledLODSystem;
     bool                        m_bEnabledAltWaterOrder;
+    bool                        m_bEnabledClothesMemFix;
     float                       m_fAircraftMaxHeight;
 
 /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);

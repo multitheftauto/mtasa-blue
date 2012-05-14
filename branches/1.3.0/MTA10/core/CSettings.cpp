@@ -917,8 +917,9 @@ void CSettings::CreateGUI ( void )
     m_pDebugSettingCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
     m_pDebugSettingCombo->AddItem ( "Default" )->SetData ( (void*)0 );
     m_pDebugSettingCombo->AddItem ( "#6734 Graphics" )->SetData ( (void*)EDiagnosticDebug::GRAPHICS_6734 );
-    m_pDebugSettingCombo->AddItem ( "#6778 BIDI" )->SetData ( (void*)EDiagnosticDebug::BIDI_6778 );
+    //m_pDebugSettingCombo->AddItem ( "#6778 BIDI" )->SetData ( (void*)EDiagnosticDebug::BIDI_6778 );
     m_pDebugSettingCombo->AddItem ( "#6732 D3D" )->SetData ( (void*)EDiagnosticDebug::D3D_6732 );
+    m_pDebugSettingCombo->AddItem ( "#6934 FPS" )->SetData ( (void*)EDiagnosticDebug::FPS_6934 );
     m_pDebugSettingCombo->SetReadOnly ( true );
 
     m_pDebugSettingLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Select default always.\n(This setting is not saved)" ) );

@@ -564,8 +564,10 @@ const SString& CLuaMain::GetFunctionTag ( int iLuaFunction )
 ///////////////////////////////////////////////////////////////
 int CLuaMain::PCall ( lua_State *L, int nargs, int nresults, int errfunc )
 {
+    TIMING_CHECKPOINT( "+pcall" );
     g_pClientGame->GetScriptDebugging()->PushLuaMain ( this );
     int iret = lua_pcall ( L, nargs, nresults, errfunc );
     g_pClientGame->GetScriptDebugging()->PopLuaMain ( this );
+    TIMING_CHECKPOINT( "-pcall" );
     return iret;
 }
