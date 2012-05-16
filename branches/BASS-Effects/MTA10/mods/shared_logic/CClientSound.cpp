@@ -446,12 +446,19 @@ float CClientSound::GetMaxDistance ( void )
 
 void CClientSound::ApplyFXModifications ( float fSampleRate, float fTempo, float fPitch, bool bReversed )
 {
+    m_SimulatedPlayPosition.SetLooped ( m_bLoop );
+    m_SimulatedPlayPosition.SetLength ( m_dLength );
+    m_SimulatedPlayPosition.SetPaused ( m_bPaused );
+    m_SimulatedPlayPosition.SetPlaybackSpeed( GetPlaybackSpeed () );
+    m_SimulatedPlayPosition.SetPlayPositionNow ( GetPlayPosition () );
+    m_SimulatedPlayPosition.SetValid ( true );
     Destroy();
     m_bReversed = bReversed;
     m_fSampleRate = fSampleRate;
     m_fTempo = fTempo;
     m_fPitch = fPitch;
     Create();
+    EndSimulationOfPlayPositionAndApply ( );
 }
 
 void CClientSound::GetFXModifications ( float &fSampleRate, float &fTempo, float &fPitch, bool &bReversed )
