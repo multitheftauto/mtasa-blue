@@ -15,6 +15,7 @@
 #include <tags.h>
 #include <bassmix.h>
 #include <basswma.h>
+#include <bass_fx.h>
 
 #define INVALID_FX_HANDLE (-1)  // Hope that BASS doesn't use this as a valid Fx handle
 
@@ -94,9 +95,18 @@ bool CBassAudio::BeginLoadingMedia ( void )
         //
         // For non streams, try to load the sound file
         //
-        m_pSound = BASS_StreamCreateFile ( false, m_strPath, 0, 0, lFlags );
+        // First x streams need to be decoders rather than "real" sounds but that's dependent on if we need streams or not so we need to adapt.
+        /*
+            We are the Borg. Lower your shields and surrender your ships. 
+            We will add your biological and technological distinctiveness to our own. 
+            Your culture will adapt to service us. 
+            Resistance is futile.
+        */
+        long lCreateFlags = BASS_MUSIC_PRESCAN|BASS_STREAM_DECODE;
+
+        m_pSound = BASS_StreamCreateFile ( false, m_strPath, 0, 0, lCreateFlags );
         if ( !m_pSound )
-            m_pSound = BASS_MusicLoad ( false, m_strPath, 0, 0, lFlags, 0 );  // Try again
+            m_pSound = BASS_MusicLoad ( false, m_strPath, 0, 0, BASS_MUSIC_RAMP|BASS_MUSIC_PRESCAN|BASS_STREAM_DECODE, 0 );  // Try again
         if ( !m_pSound && m_b3D )
             m_pSound = ConvertFileToMono ( m_strPath );                       // Last try if 3D
 
@@ -106,7 +116,22 @@ bool CBassAudio::BeginLoadingMedia ( void )
             g_pCore->GetConsole()->Printf ( "BASS ERROR %d in LoadMedia  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
             return false;
         }
-
+        m_pSound = BASS_FX_ReverseCreate ( m_pSound, 2.0f, BASS_STREAM_DECODE | BASS_FX_FREESOURCE );
+        BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_REVERSE_DIR, BASS_FX_RVS_FORWARD );
+        if ( !m_pSound )
+        {
+            g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_FX_ReverseCreate  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
+            return false;
+        }
+        m_pSound = BASS_FX_TempoCreate ( m_pSound, lFlags | BASS_FX_FREESOURCE );
+        if ( !m_pSound )
+        {
+            g_pCore->GetConsole()->Printf ( "BASS ERROR %d in CreateTempo  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
+            return false;
+        }
+        BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_TEMPO, &m_fTempo );
+        BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_TEMPO_PITCH, &m_fPitch );
+        BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_TEMPO_FREQ, &m_fSampleRate );
         // Validation of some sort
         if ( m_bLoop && BASS_ChannelFlags ( m_pSound, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP ) == -1 )
             g_pCore->GetConsole()->Printf ( "BASS ERROR %d in LoadMedia ChannelFlags LOOP  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
@@ -207,7 +232,6 @@ void CBassAudio::CompleteStreamConnect ( HSTREAM pSound )
         if ( !m_b3D )
             BASS_ChannelSetAttribute( pSound, BASS_ATTRIB_VOL, m_fVolume );
         ApplyFxEffects ();
-
         // Set a Callback function for download finished or connection closed prematurely
         BASS_ChannelSetSync ( pSound, BASS_SYNC_DOWNLOAD, 0, &DownloadSync, this );
         SetFinishedCallbacks ();
@@ -407,6 +431,29 @@ void CBassAudio::SetMaxDistance ( float fDistance )
     m_fMaxDistance = fDistance;
 }
 
+
+void CBassAudio::SetTempoValues ( float fSampleRate, float fTempo, float fPitch, bool bReverse )
+{
+    if ( fTempo != 0.0f )
+    {
+        m_fTempo = fTempo;
+    }
+    if ( fPitch != 0.0f )
+    {
+        m_fPitch = fPitch;
+    }
+    if ( fSampleRate != 0.0f )
+    {
+        m_fSampleRate = fSampleRate;
+    }
+    m_bReversed = bReverse;
+
+    // Update our attributes
+    BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_TEMPO, m_fTempo );
+    BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_TEMPO_PITCH, m_fPitch );
+    BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_TEMPO_FREQ, m_fSampleRate );
+    BASS_ChannelSetAttribute ( BASS_FX_TempoGetSource ( m_pSound ), BASS_ATTRIB_REVERSE_DIR, (float)(bReverse == false ? BASS_FX_RVS_FORWARD : BASS_FX_RVS_REVERSE) );
+}
 
 //
 // FxEffects
