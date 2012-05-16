@@ -2425,6 +2425,10 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     // unsigned char[3]     (3)     - cols
     // unsigned char        (1)     - friendly-fire
 
+#if MTA_DEBUG
+    retry:
+#endif
+
     // Heavy variables
     CVector vecPosition;
     CVector vecRotation;
@@ -2506,6 +2510,9 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             bitStream.Read ( buf, (ucNameLength > 1024) ? 1024 : ucNameLength );
                             // Raise a special assert, as we have to try and figure out this error.
                             assert ( 0 );
+                            // Replay the problem for debugging
+                            bitStream.ResetReadPointer ();
+                            goto retry;
                         #endif
 
                         delete pCustomData;

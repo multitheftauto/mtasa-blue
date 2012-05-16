@@ -97,6 +97,7 @@ namespace SharedUtil
             GRAPHICS_6734,
             BIDI_6778,
             D3D_6732,
+            FPS_6934,
         };
     };
 

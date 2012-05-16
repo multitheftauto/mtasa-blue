@@ -1094,6 +1094,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CTimingCheckpoints.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CVersionUpdater.h"
 				>
 			</File>

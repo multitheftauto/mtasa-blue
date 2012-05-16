@@ -258,6 +258,9 @@ void CClientPlayerClothes::AddClothes ( const char* szTexture, const char* szMod
 
 void CClientPlayerClothes::InternalAddClothes ( const SPlayerClothing * pClothing, unsigned char ucType )
 {
+    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::FPS_6934 )
+        return;
+
     if ( m_pPlayerModel )
     {
         CPlayerPed* pPlayerPed = m_pPlayerModel->GetGamePlayer ();

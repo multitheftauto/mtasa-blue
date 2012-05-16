@@ -236,6 +236,9 @@ CMapEvent* CMapEventManager::Get ( const char* szName )
 
 bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments, class CClientEntity* pSource, class CClientEntity* pThis )
 {
+    TIMEUS startTime = GetTimeUs ();
+    SString strStatus;
+
     // Check for multi-threading slipups
     assert ( IsMainThread () );
 
@@ -330,7 +333,13 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                         assert ( lua_gettop ( pState ) == luaStackPointer );
                     #endif
 
-                    CClientPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pMapEvent->GetVM (), szName, GetTimeUs() - startTime );
+                    TIMEUS deltaTimeUs = GetTimeUs() - startTime;
+
+                    if ( deltaTimeUs > 3000 ) 
+                        if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::FPS_6934 )
+                            strStatus += SString ( " (%s %d ms)", pMapEvent->GetVM ()->GetScriptName (), deltaTimeUs / 1000 );
+
+                    CClientPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pMapEvent->GetVM (), szName, deltaTimeUs );
                 }
             }
         }
@@ -343,6 +352,15 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
 
         // We're no longer iterating the list
         m_bIteratingList = false;
+    }
+
+    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::FPS_6934 )
+    {
+        TIMEUS deltaTimeUs = GetTimeUs() - startTime;
+        if ( deltaTimeUs > 5000 )
+        {
+            TIMING_DETAIL_FORCE( SString ( "CMapEventManager::Call ( %s, ... ) took %d ms ( %s )", szName, deltaTimeUs / 1000, *strStatus ) );
+        }
     }
 
     // Return whether we called atleast one func or not

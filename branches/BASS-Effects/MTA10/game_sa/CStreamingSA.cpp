@@ -76,6 +76,8 @@ void CStreamingSA::RequestModel( DWORD dwModelID, DWORD dwFlags )
 
 void CStreamingSA::LoadAllRequestedModels ( BOOL bOnlyPriorityModels, const char* szTag )
 {
+    TIMEUS startTime = GetTimeUs ();
+
     DWORD dwFunction = FUNC_LoadAllRequestedModels;
     DWORD dwOnlyPriorityModels = bOnlyPriorityModels;
     _asm
@@ -83,6 +85,13 @@ void CStreamingSA::LoadAllRequestedModels ( BOOL bOnlyPriorityModels, const char
         push    dwOnlyPriorityModels
         call    dwFunction
         add     esp, 4
+    }
+
+    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::FPS_6934 )
+    {
+        uint deltaTimeMs = ( GetTimeUs () - startTime ) / 1000;
+        if ( deltaTimeMs > 2 )
+            TIMING_DETAIL_FORCE( SString ( "LoadAllRequestedModels( %d, %s ) took %d ms", bOnlyPriorityModels, szTag, deltaTimeMs ) );
     }
 }
 

@@ -125,7 +125,7 @@ private:
     void                FlushPendingAssociations    ( void );
 
     // Watched world textures
-    std::list < STexInfo >                  m_TexInfoList;
+    std::multimap < ushort, STexInfo* >     m_TexInfoMap;
 
 #if WITH_UNIQUE_CHECK
     std::map < SString, STexInfo* >         m_UniqueTexInfoMap;
