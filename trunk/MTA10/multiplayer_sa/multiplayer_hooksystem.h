@@ -67,4 +67,11 @@ struct SHookInfo
 #define MAKE_HOOK_INFO(type)  SHookInfo ( HOOKPOS_##type, HOOK_##type, HOOKSIZE_##type )
 
 
+// Structure for holding poke info
+struct SPokeInfo
+{
+    DWORD dwAddress;
+    BYTE ucValue;
+};
+
 #endif

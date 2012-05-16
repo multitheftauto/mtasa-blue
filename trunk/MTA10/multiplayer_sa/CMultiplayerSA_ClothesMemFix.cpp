@@ -118,17 +118,71 @@ void _declspec(naked) HOOK_PostCPedDress ()
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-// Setup hooks for ClothesMemFix
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_ClothesMemFix ( void )
-{
-    EZHookInstall ( CClothesDeleteRwObject );
-    EZHookInstall ( PostCPedDress );
 
-    // Force rebuild every time
-    MemPut < BYTE > ( 0x5A6B84, 0xb3 );   // mov     bl, 1
-    MemPut < BYTE > ( 0x5A6B85, 0x01 );
+////////////////////////////////////////////////
+//
+// CMultiplayerSA::EnableHooks_ClothesMemFix
+//
+// Enable/disable hooks programmatically
+//
+////////////////////////////////////////////////
+void CMultiplayerSA::EnableHooks_ClothesMemFix ( bool bEnable )
+{
+    // Switch
+    if ( m_bEnabledClothesMemFix == bEnable )
+        return;
+    m_bEnabledClothesMemFix = bEnable;
+
+    // Memory saved here
+    static CBuffer savedMem;
+    SHookInfo hookInfoList[] = { MAKE_HOOK_INFO ( CClothesDeleteRwObject ),
+                                 MAKE_HOOK_INFO ( PostCPedDress ),
+                                };
+    SPokeInfo pokeInfoList[] = { { 0x5A6B84, 0xb3 },
+                                 { 0x5A6B85, 0x01 },
+                                };
+    
+
+    // Enable or not?
+    if ( bEnable )
+    {
+        CBufferWriteStream stream ( savedMem );
+        for ( uint i = 0 ; i < NUMELMS( hookInfoList ) ; i++ )
+        {
+            const SHookInfo& hookInfo = hookInfoList[i];
+            // Save memory before we blat it
+            stream.WriteBytes ( (void*)hookInfo.dwAddress, hookInfo.uiSize );
+            // Add hook
+            HookInstall ( hookInfo.dwAddress, hookInfo.dwHook, hookInfo.uiSize );
+        }
+        for ( uint i = 0 ; i < NUMELMS( pokeInfoList ) ; i++ )
+        {
+            const SPokeInfo& pokeInfo = pokeInfoList[i];
+            // Save memory before we blat it
+            stream.WriteBytes ( (void*)pokeInfo.dwAddress, 1 );
+            // Add poke
+            MemPut < BYTE > ( pokeInfo.dwAddress, pokeInfo.ucValue );
+        }
+    }
+    else
+    {
+        // Restore memory
+        CBufferReadStream stream ( savedMem );
+        for ( uint i = 0 ; i < NUMELMS( hookInfoList ) ; i++ )
+        {
+            const SHookInfo& hookInfo = hookInfoList[i];
+            BYTE temp[10];
+            assert ( sizeof(temp) >= hookInfo.uiSize );
+            stream.ReadBytes ( temp, hookInfo.uiSize );
+            MemCpy ( (void*)hookInfo.dwAddress, temp, hookInfo.uiSize );
+        }
+        for ( uint i = 0 ; i < NUMELMS( pokeInfoList ) ; i++ )
+        {
+            const SPokeInfo& pokeInfo = pokeInfoList[i];
+            BYTE temp[1];
+            stream.ReadBytes ( temp, 1 );
+            MemPut < BYTE > ( pokeInfo.dwAddress, temp[0] );
+        }
+    }
 }
+

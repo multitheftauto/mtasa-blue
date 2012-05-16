@@ -412,6 +412,8 @@ void CVersionUpdater::DoPulse ( void )
     if ( !m_bEnabled )
         return;
 
+    TIMING_CHECKPOINT( "+VersionUpdaterPulse" );
+
     EnsureLoadedConfigFromXML ();
 
     //
@@ -518,6 +520,8 @@ void CVersionUpdater::DoPulse ( void )
                     m_CurrentProgram.GotoLabel ( pInstruction->strGoto );
         }
     }
+
+    TIMING_CHECKPOINT( "-VersionUpdaterPulse" );
 }
 
 

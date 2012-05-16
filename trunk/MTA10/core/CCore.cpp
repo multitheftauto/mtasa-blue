@@ -22,6 +22,7 @@
 #include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
 #include "SharedUtil.hpp"
 #include <clocale>
+#include "CTimingCheckpoints.hpp"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -1039,17 +1040,21 @@ bool CCore::IsWindowMinimized ( void )
 
 void CCore::DoPreFramePulse ( )
 {
+    TIMING_CHECKPOINT( "+CorePreFrame" );
+
     m_pKeyBinds->DoPreFramePulse ();
 
     // Notify the mod manager
     m_pModManager->DoPulsePreFrame ();  
 
     m_pLocalGUI->DoPulse ();
+    TIMING_CHECKPOINT( "-CorePreFrame" );
 }
 
 
 void CCore::DoPostFramePulse ( )
 {
+    TIMING_CHECKPOINT( "+CorePostFrame1" );
     if ( m_bQuitOnPulse )
         Quit ();
 
@@ -1165,7 +1170,9 @@ void CCore::DoPostFramePulse ( )
     m_pKeyBinds->DoPostFramePulse ();
 
     // Notify the mod manager and the connect manager
+    TIMING_CHECKPOINT( "-CorePostFrame1" );
     m_pModManager->DoPulsePostFrame ();
+    TIMING_CHECKPOINT( "+CorePostFrame2" );
     GetMemStats ()->Draw ();
     m_pConnectManager->DoPulse ();
 
@@ -1201,6 +1208,7 @@ void CCore::DoPostFramePulse ( )
         if ( m_tXfireUpdate != 0 )
             m_tXfireUpdate = 0;
     }
+    TIMING_CHECKPOINT( "-CorePostFrame2" );
 }
 
 
@@ -1780,6 +1788,8 @@ void CCore::EnsureFrameRateLimitApplied ( void )
 //
 void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 {
+    ms_TimingCheckpoints.EndTimingCheckpoints ();
+
     // Frame rate limit stuff starts here
     m_bDoneFrameRateLimit = true;
 
@@ -1834,11 +1844,27 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 //
 void CCore::DoReliablePulse ( void )
 {
+    ms_TimingCheckpoints.BeginTimingCheckpoints ();
+
     // Non frame rate limit stuff
     if ( IsWindowMinimized () )
         m_iUnminimizeFrameCounter = 4;     // Tell script we have unminimized after a short delay
 
     UpdateModuleTickCount64 ();
+}
+
+
+//
+// Debug timings
+//
+void CCore::OnTimingCheckpoint ( const char* szTag )
+{
+    ms_TimingCheckpoints.OnTimingCheckpoint ( szTag );
+}
+
+void CCore::OnTimingDetail ( const char* szTag, bool bForce )
+{
+    ms_TimingCheckpoints.OnTimingDetail ( szTag, bForce );
 }
 
 
