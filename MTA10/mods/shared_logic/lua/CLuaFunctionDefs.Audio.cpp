@@ -308,6 +308,58 @@ int CLuaFunctionDefs::SetSoundSpeed ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::SetSoundProperties ( lua_State* luaVM )
+{
+    CClientSound* pSound = NULL;
+    bool bReversed = false;
+    float fSampleRate = 0.0f, fTempo = 0.0f, fPitch = 0.0f;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pSound );
+    argStream.ReadNumber ( fSampleRate );
+    argStream.ReadNumber ( fTempo );
+    argStream.ReadNumber ( fPitch );
+    argStream.ReadBool ( bReversed, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetSoundProperties ( *pSound, fSampleRate, fTempo, fPitch, bReversed ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setSoundProperties", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetSoundProperties ( lua_State* luaVM )
+{
+    CClientSound* pSound = NULL;
+    bool bReversed = false;
+    float fSampleRate = 0.0f, fTempo = 0.0f, fPitch = 0.0f;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pSound );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::GetSoundProperties ( *pSound, fSampleRate, fTempo, fPitch, bReversed ) )
+        {
+            lua_pushnumber ( luaVM, fSampleRate );
+            lua_pushnumber ( luaVM, fTempo );
+            lua_pushnumber ( luaVM, fPitch );
+            lua_pushboolean ( luaVM, bReversed );
+            return 4;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setSoundProperties", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefs::GetSoundSpeed ( lua_State* luaVM )
 {

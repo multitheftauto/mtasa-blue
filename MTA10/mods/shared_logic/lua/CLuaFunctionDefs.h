@@ -82,6 +82,8 @@ public:
     LUA_DECLARE ( GetSoundVolume );
     LUA_DECLARE ( SetSoundSpeed );
     LUA_DECLARE ( GetSoundSpeed );
+    LUA_DECLARE ( SetSoundProperties );
+    LUA_DECLARE ( GetSoundProperties );
     LUA_DECLARE ( SetSoundMinDistance );
     LUA_DECLARE ( GetSoundMinDistance );
     LUA_DECLARE ( SetSoundMaxDistance );

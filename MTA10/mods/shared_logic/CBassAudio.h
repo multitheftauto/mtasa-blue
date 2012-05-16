@@ -62,6 +62,9 @@ public:
     void                    SetVelocity             ( const CVector& vecVelocity );
     void                    SetMinDistance          ( float fDistance );
     void                    SetMaxDistance          ( float fDistance );
+    void                    SetTempoValues          ( float fSampleRate, float fTempo, float fPitch, bool bReverse );
+    void                    GetTempoValues          ( float &fSampleRate, float &fTempo, float &fPitch, bool &bReverse )        { fSampleRate = m_fSampleRate; fTempo = m_fTempo; fPitch = m_fPitch; bReverse = m_bReversed; };
+    void                    SetReversed             ( bool bReversed )                                          { m_bReversed = bReversed; };
     void                    SetFxEffects            ( int* pEnabledEffects, uint iNumElements );
     SString                 GetMetaTags             ( const SString& strFormat );
     bool                    IsFinished              ( void );
@@ -97,11 +100,15 @@ private:
 
     // Playback state
     bool                    m_bPaused;
+    bool                    m_bReversed;
     float                   m_fDefaultFrequency;
     float                   m_fVolume;
     float                   m_fMinDistance;
     float                   m_fMaxDistance;
     float                   m_fPlaybackSpeed;
+    float                   m_fPitch;
+    float                   m_fTempo;
+    float                   m_fSampleRate;
     CVector                 m_vecPosition;
     CVector                 m_vecVelocity;
 
