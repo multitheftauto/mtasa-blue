@@ -122,7 +122,7 @@ void CMultiplayerSA::InitHooks_13 ( void )
     HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound, 6 );
 
     InitHooks_ClothesSpeedUp ();
-    InitHooks_ClothesMemFix ();
+    EnableHooks_ClothesMemFix ( true );
     InitHooks_FixBadAnimId ();
     InitHooks_HookDestructors ();
     InitHooks_WorldSound ();

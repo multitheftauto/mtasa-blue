@@ -43,6 +43,20 @@ enum eCoreVersion
     MTACORE_20 = 1,
 };
 
+#ifndef WITH_TIMING_CHECKPOINTS
+    #define WITH_TIMING_CHECKPOINTS 1     // Comment this line to remove timing checkpoint code
+#endif
+
+#if WITH_TIMING_CHECKPOINTS
+    #define TIMING_CHECKPOINT(x)        g_pCore->OnTimingCheckpoint ( x )
+    #define TIMING_DETAIL(x)            g_pCore->OnTimingDetail ( x )
+    #define TIMING_DETAIL_FORCE(x)      g_pCore->OnTimingDetail ( x, true )
+#else
+    #define TIMING_CHECKPOINT(x)        {}
+    #define TIMING_DETAIL(x)            {}
+    #define TIMING_DETAIL_FORCE(x)      {}
+#endif
+
 class CCoreInterface
 {
 public:
@@ -112,6 +126,8 @@ public:
 
     virtual void                    SwitchRenderWindow              ( HWND hWnd, HWND hWndInput ) = 0;
     virtual void                    SetCenterCursor                 ( bool bEnabled ) = 0;
+    virtual void                    OnTimingCheckpoint              ( const char* szTag ) = 0;
+    virtual void                    OnTimingDetail                  ( const char* szTag, bool bForceLog = false ) = 0;
 
     // CGUI Callbacks
     virtual bool                    OnMouseClick                    ( CGUIMouseEventArgs Args ) = 0;
