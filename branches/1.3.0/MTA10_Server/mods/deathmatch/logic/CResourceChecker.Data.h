@@ -70,7 +70,8 @@ namespace
                                          { "getVehicleSirenParams",     "1.3.0-9.03968" },
                                          { "getVehicleSirens",          "1.3.0-9.03968" },
                                          { "setVehicleSirens",          "1.3.0-9.03968" },
-                                         { "onClientWorldSound",        "1.3.0-9.04082" },
+                                         { "getSoundProperties",        "1.3.0-9.04109" },
+                                         { "setSoundProperties",        "1.3.0-9.04109" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
