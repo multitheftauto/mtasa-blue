@@ -50,7 +50,7 @@ public:
                             CBassAudio              ( bool bStream, const SString& strPath, bool bLoop, bool b3D );
                             ~CBassAudio             ( void );
 
-    bool                    BeginLoadingMedia       ( bool bApplyPitch, bool bApplyTempo );
+    bool                    BeginLoadingMedia       ( void );
 
     void                    SetPaused               ( bool bPaused );
     void                    SetPlayPosition         ( double dPosition );
@@ -62,7 +62,7 @@ public:
     void                    SetVelocity             ( const CVector& vecVelocity );
     void                    SetMinDistance          ( float fDistance );
     void                    SetMaxDistance          ( float fDistance );
-    void                    SetTempoValues          ( float fSampleRate, float fTempo, float fPitch );
+    void                    SetTempoValues          ( float fSampleRate, float fTempo, float fPitch, bool bReverse );
     void                    GetTempoValues          ( float &fSampleRate, float &fTempo, float &fPitch, bool &bReverse )        { fSampleRate = m_fSampleRate; fTempo = m_fTempo; fPitch = m_fPitch; bReverse = m_bReversed; };
     void                    SetReversed             ( bool bReversed )                                          { m_bReversed = bReversed; };
     void                    SetFxEffects            ( int* pEnabledEffects, uint iNumElements );

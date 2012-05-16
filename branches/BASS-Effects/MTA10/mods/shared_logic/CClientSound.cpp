@@ -107,13 +107,8 @@ bool CClientSound::Create ( void )
     m_pAudio = new CBassAudio ( m_bStream, m_strPath, m_bLoop, m_b3D );
     m_bDoneCreate = true;
 
-    bool bTempoChanged = IsTempoChanged ( );
-    if ( bTempoChanged )
-    {
-        m_pAudio->SetTempoValues ( m_fSampleRate, m_fTempo, m_fPitch );
-    }
     // Load file/start connect
-    if ( !m_pAudio->BeginLoadingMedia ( m_bReversed, bTempoChanged ) )
+    if ( !m_pAudio->BeginLoadingMedia (  ) )
         return false;
 
     // Get and save length
@@ -136,6 +131,7 @@ bool CClientSound::Create ( void )
     m_pAudio->SetMinDistance ( m_fMinDistance );
     m_pAudio->SetMaxDistance ( m_fMaxDistance );
     m_pAudio->SetFxEffects ( &m_EnabledEffects[0], NUMELMS( m_EnabledEffects ) );
+    m_pAudio->SetTempoValues ( m_fSampleRate, m_fTempo, m_fPitch, m_bReversed );
 
     // Transfer play position if it was being simulated
     EndSimulationOfPlayPositionAndApply ();
@@ -446,35 +442,12 @@ float CClientSound::GetMaxDistance ( void )
 
 void CClientSound::ApplyFXModifications ( float fSampleRate, float fTempo, float fPitch, bool bReversed )
 {
-    // if we are streamed out don't update anything but our stored data let it stream back in with the values
-    if ( m_b3D && !m_pAudio )
-    {
-        m_bReversed = bReversed;
-        m_fSampleRate = fSampleRate;
-        m_fTempo = fTempo;
-        m_fPitch = fPitch;
-        return;
-    }
-    // Borrow ccw's simulated play position stuff so we get a clean replay vs restarting.
-    m_SimulatedPlayPosition.SetLooped ( m_bLoop );
-    m_SimulatedPlayPosition.SetLength ( m_dLength );
-    m_SimulatedPlayPosition.SetPaused ( m_bPaused );
-    m_SimulatedPlayPosition.SetPlaybackSpeed( GetPlaybackSpeed () );
-    m_SimulatedPlayPosition.SetPlayPositionNow ( GetPlayPosition () );
-    m_SimulatedPlayPosition.SetValid ( true );
-    // Destroy
-    Destroy();
-    // Update stored properties
     m_bReversed = bReversed;
     m_fSampleRate = fSampleRate;
     m_fTempo = fTempo;
     m_fPitch = fPitch;
-    // Create
-    Create();
-    // Apply stored values
-    EndSimulationOfPlayPositionAndApply ( );
-    // ???
-    // Profit
+    if ( m_pAudio )
+        m_pAudio->SetTempoValues ( fSampleRate, fTempo, fPitch, bReversed );
 }
 
 void CClientSound::GetFXModifications ( float &fSampleRate, float &fTempo, float &fPitch, bool &bReversed )

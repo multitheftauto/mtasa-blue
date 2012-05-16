@@ -63,7 +63,7 @@ CBassAudio::~CBassAudio ( void )
 //
 // This will return false for non streams if the file is not correct
 //
-bool CBassAudio::BeginLoadingMedia ( bool bReverse, bool bApplyTempo )
+bool CBassAudio::BeginLoadingMedia ( void )
 {
     assert ( !m_pSound && !m_bPendingPlay );
 
@@ -116,16 +116,12 @@ bool CBassAudio::BeginLoadingMedia ( bool bReverse, bool bApplyTempo )
             g_pCore->GetConsole()->Printf ( "BASS ERROR %d in LoadMedia  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
             return false;
         }
-        // Test again if we need to be a decoder
-        if ( bReverse )
+        m_pSound = BASS_FX_ReverseCreate ( m_pSound, 2.0f, BASS_STREAM_DECODE | BASS_FX_FREESOURCE );
+        BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_REVERSE_DIR, BASS_FX_RVS_FORWARD );
+        if ( !m_pSound )
         {
-
-            m_pSound = BASS_FX_ReverseCreate ( m_pSound, 2.0f, BASS_STREAM_DECODE | BASS_FX_FREESOURCE );
-            if ( !m_pSound )
-            {
-                g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_FX_ReverseCreate  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
-                return false;
-            }
+            g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_FX_ReverseCreate  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
+            return false;
         }
         m_pSound = BASS_FX_TempoCreate ( m_pSound, lFlags | BASS_FX_FREESOURCE );
         if ( !m_pSound )
@@ -133,18 +129,9 @@ bool CBassAudio::BeginLoadingMedia ( bool bReverse, bool bApplyTempo )
             g_pCore->GetConsole()->Printf ( "BASS ERROR %d in CreateTempo  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
             return false;
         }
-        if ( bApplyTempo )
-        {
-            BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_TEMPO, m_fTempo );
-            BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_TEMPO_PITCH, m_fPitch );
-            BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_TEMPO_FREQ, m_fSampleRate );
-        }
-        else
-        {
-            BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_TEMPO, &m_fTempo );
-            BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_TEMPO_PITCH, &m_fPitch );
-            BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_TEMPO_FREQ, &m_fSampleRate );
-        }
+        BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_TEMPO, &m_fTempo );
+        BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_TEMPO_PITCH, &m_fPitch );
+        BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_TEMPO_FREQ, &m_fSampleRate );
         // Validation of some sort
         if ( m_bLoop && BASS_ChannelFlags ( m_pSound, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP ) == -1 )
             g_pCore->GetConsole()->Printf ( "BASS ERROR %d in LoadMedia ChannelFlags LOOP  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
@@ -445,7 +432,7 @@ void CBassAudio::SetMaxDistance ( float fDistance )
 }
 
 
-void CBassAudio::SetTempoValues ( float fSampleRate, float fTempo, float fPitch )
+void CBassAudio::SetTempoValues ( float fSampleRate, float fTempo, float fPitch, bool bReverse )
 {
     if ( fTempo != 0.0f )
     {
@@ -459,6 +446,13 @@ void CBassAudio::SetTempoValues ( float fSampleRate, float fTempo, float fPitch 
     {
         m_fSampleRate = fSampleRate;
     }
+    m_bReversed = bReverse;
+
+    // Update our attributes
+    BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_TEMPO, m_fTempo );
+    BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_TEMPO_PITCH, m_fPitch );
+    BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_TEMPO_FREQ, m_fSampleRate );
+    BASS_ChannelSetAttribute ( BASS_FX_TempoGetSource ( m_pSound ), BASS_ATTRIB_REVERSE_DIR, (float)(bReverse == false ? BASS_FX_RVS_FORWARD : BASS_FX_RVS_REVERSE) );
 }
 
 //
