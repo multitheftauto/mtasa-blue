@@ -446,19 +446,35 @@ float CClientSound::GetMaxDistance ( void )
 
 void CClientSound::ApplyFXModifications ( float fSampleRate, float fTempo, float fPitch, bool bReversed )
 {
+    // if we are streamed out don't update anything but our stored data let it stream back in with the values
+    if ( m_b3D && !m_pAudio )
+    {
+        m_bReversed = bReversed;
+        m_fSampleRate = fSampleRate;
+        m_fTempo = fTempo;
+        m_fPitch = fPitch;
+        return;
+    }
+    // Borrow ccw's simulated play position stuff so we get a clean replay vs restarting.
     m_SimulatedPlayPosition.SetLooped ( m_bLoop );
     m_SimulatedPlayPosition.SetLength ( m_dLength );
     m_SimulatedPlayPosition.SetPaused ( m_bPaused );
     m_SimulatedPlayPosition.SetPlaybackSpeed( GetPlaybackSpeed () );
     m_SimulatedPlayPosition.SetPlayPositionNow ( GetPlayPosition () );
     m_SimulatedPlayPosition.SetValid ( true );
+    // Destroy
     Destroy();
+    // Update stored properties
     m_bReversed = bReversed;
     m_fSampleRate = fSampleRate;
     m_fTempo = fTempo;
     m_fPitch = fPitch;
+    // Create
     Create();
+    // Apply stored values
     EndSimulationOfPlayPositionAndApply ( );
+    // ???
+    // Profit
 }
 
 void CClientSound::GetFXModifications ( float &fSampleRate, float &fTempo, float &fPitch, bool &bReversed )
