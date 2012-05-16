@@ -131,6 +131,7 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\bassflac.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\bass_aac.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\bass_ac3.dll"
+	File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"

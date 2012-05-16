@@ -6385,6 +6385,23 @@ bool CStaticFunctionDefinitions::SetSoundSpeed ( CClientSound& Sound, float fSpe
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetSoundProperties ( CClientSound& Sound, float fSampleRate, float fTempo, float fPitch, bool bReversed )
+{
+    if ( Sound.IsSoundStream ( ) == false )
+    {
+        Sound.ApplyFXModifications( fSampleRate, fTempo, fPitch, bReversed );
+        return true;
+    }
+    // Streams not supported.
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetSoundProperties ( CClientSound& Sound, float &fSampleRate, float &fTempo, float &fPitch, bool &bReversed )
+{
+    Sound.GetFXModifications( fSampleRate, fTempo, fPitch, bReversed );
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::GetSoundSpeed ( CClientSound& Sound, float& fSpeed )
 {

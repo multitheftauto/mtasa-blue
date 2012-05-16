@@ -108,7 +108,7 @@ bool CClientSound::Create ( void )
     m_bDoneCreate = true;
 
     // Load file/start connect
-    if ( !m_pAudio->BeginLoadingMedia () )
+    if ( !m_pAudio->BeginLoadingMedia (  ) )
         return false;
 
     // Get and save length
@@ -131,6 +131,7 @@ bool CClientSound::Create ( void )
     m_pAudio->SetMinDistance ( m_fMinDistance );
     m_pAudio->SetMaxDistance ( m_fMaxDistance );
     m_pAudio->SetFxEffects ( &m_EnabledEffects[0], NUMELMS( m_EnabledEffects ) );
+    m_pAudio->SetTempoValues ( m_fSampleRate, m_fTempo, m_fPitch, m_bReversed );
 
     // Transfer play position if it was being simulated
     EndSimulationOfPlayPositionAndApply ();
@@ -421,6 +422,20 @@ float CClientSound::GetMaxDistance ( void )
     return m_fMaxDistance;
 }
 
+void CClientSound::ApplyFXModifications ( float fSampleRate, float fTempo, float fPitch, bool bReversed )
+{
+    m_bReversed = bReversed;
+    m_fSampleRate = fSampleRate;
+    m_fTempo = fTempo;
+    m_fPitch = fPitch;
+    if ( m_pAudio )
+        m_pAudio->SetTempoValues ( fSampleRate, fTempo, fPitch, bReversed );
+}
+
+void CClientSound::GetFXModifications ( float &fSampleRate, float &fTempo, float &fPitch, bool &bReversed )
+{
+    m_pAudio->GetTempoValues ( fSampleRate, fTempo, fPitch, bReversed );
+}
 
 ////////////////////////////////////////////////////////////
 //

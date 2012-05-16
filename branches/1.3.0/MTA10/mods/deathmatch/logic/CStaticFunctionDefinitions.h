@@ -553,6 +553,8 @@ public:
     static bool                         SetSoundVolume                      ( CClientSound& Sound, float fVolume );
     static bool                         GetSoundVolume                      ( CClientSound& Sound, float& fVolume );
     static bool                         SetSoundSpeed                       ( CClientSound& Sound, float fSpeed );
+    static bool                         SetSoundProperties                  ( CClientSound& Sound, float fSampleRate, float fTempo, float fPitch, bool bReversed );
+    static bool                         GetSoundProperties                  ( CClientSound& Sound, float &fSampleRate, float &fTempo, float &fPitch, bool &bReversed );
     static bool                         GetSoundSpeed                       ( CClientSound& Sound, float& fSpeed );
     static bool                         SetSoundMinDistance                 ( CClientSound& Sound, float fDistance );
     static bool                         GetSoundMinDistance                 ( CClientSound& Sound, float& fDistance );
