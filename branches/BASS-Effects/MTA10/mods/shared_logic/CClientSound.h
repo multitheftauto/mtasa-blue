@@ -79,6 +79,7 @@ public:
     bool                    IsFinished              ( void );
 
     bool                    IsSound3D               ( void )                            { return m_b3D; }
+    bool                    IsSoundStream           ( void )                            { return m_bStream; }
 
 protected:
     void                    Process3D               ( const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt );
