@@ -361,6 +361,40 @@ int CLuaFunctionDefs::GetSoundProperties ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetSoundFFTData ( lua_State* luaVM )
+{
+    CClientSound* pSound = NULL;
+    float* pData = NULL;
+    int iLength = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pSound );
+    argStream.ReadNumber ( iLength );
+
+    if ( !argStream.HasErrors () )
+    {
+        pData = CStaticFunctionDefinitions::GetSoundFFTData ( *pSound, iLength );
+        if ( pData != NULL )
+        {
+            // Create a new table
+            lua_newtable ( luaVM );
+            for (int i = 0; i < 1024;i++)
+            {
+                lua_pushnumber ( luaVM, i );
+                lua_pushnumber ( luaVM, pData[i] );
+                lua_settable ( luaVM, -3 );
+            }
+            // Deallocate our data array here after it's used.
+            delete [] pData;
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getSoundFFTData", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::GetSoundSpeed ( lua_State* luaVM )
 {
     if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
