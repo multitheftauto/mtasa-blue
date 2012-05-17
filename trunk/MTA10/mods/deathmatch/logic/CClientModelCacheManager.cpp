@@ -150,13 +150,13 @@ void CClientModelCacheManagerImpl::PreLoad ( void )
     m_bDonePreLoad = true;
 
     CTickCount startTicks = CTickCount::Now ();
-
+#if 0
     for ( uint i = 321 ; i <= 372 ; i++ )
     {
         AddModelRefCount ( i );
     }
     g_pGame->GetStreaming()->LoadAllRequestedModels ( false );
-
+#endif
     for ( uint i = 1000 ; i <= 1193 ; i++ )
     {
         AddModelRefCount ( i );
