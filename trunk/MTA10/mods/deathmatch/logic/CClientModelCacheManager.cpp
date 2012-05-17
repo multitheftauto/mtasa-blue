@@ -198,8 +198,8 @@ void CClientModelCacheManagerImpl::DoPulse ( void )
     SSamplePoint < float > pedPoints[] = { {65536, 9},  {98304, 18},   {131072, 36},   {262144, 72} };
     SSamplePoint < float > vehPoints[] = { {65536, 7},  {98304, 28},   {131072, 56},   {262144, 56} };
 
-    m_uiMaxCachedPedModels = EvalSamplePosition < float > ( pedPoints, NUMELMS ( pedPoints ), iStreamingMemoryAvailableKB );
-    m_uiMaxCachedVehicleModels = EvalSamplePosition < float > ( vehPoints, NUMELMS ( vehPoints ), iStreamingMemoryAvailableKB );
+    m_uiMaxCachedPedModels = (int)EvalSamplePosition < float > ( pedPoints, NUMELMS ( pedPoints ), (float)iStreamingMemoryAvailableKB );
+    m_uiMaxCachedVehicleModels = (int)EvalSamplePosition < float > ( vehPoints, NUMELMS ( vehPoints ), (float)iStreamingMemoryAvailableKB );
 
 
     // Assess which models will be needed in the next 2 seconds
@@ -326,7 +326,7 @@ void CClientModelCacheManagerImpl::ProcessPlayerList ( std::map < ushort, float 
     for (  std::vector < CClientPlayer* >::const_iterator iter = playerList.begin () ; iter != playerList.end (); ++iter )
     {
         CClientPlayer* pPlayer = *iter;
-        ushort usModelId = pPlayer->GetModel ();
+        ushort usModelId = (ushort)pPlayer->GetModel ();
 
         // Check if currently within distance
         {
@@ -400,7 +400,7 @@ void CClientModelCacheManagerImpl::ProcessPedList ( std::map < ushort, float >& 
     for (  std::vector < CClientPed* >::const_iterator iter = pedList.begin () ; iter != pedList.end (); ++iter )
     {
         CClientPed* pPed = *iter;
-        const ushort usModelId = pPed->GetModel ();
+        const ushort usModelId = (ushort)pPed->GetModel ();
 
         // Check if currently within distance
         {
@@ -618,7 +618,7 @@ void CClientModelCacheManagerImpl::UpdateModelCaching ( const std::map < ushort,
                 if ( uiTicksSinceLastNeeded > 0 )
                     MapSet ( maybeUncacheUnneededList, uiTicksSinceLastNeeded, usModelId );
                 else
-                    MapSet ( maybeUncacheNeededList, info.fClosestDistSq, usModelId );
+                    MapSet ( maybeUncacheNeededList, (int)info.fClosestDistSq, usModelId );
             }
             else
             {
