@@ -258,6 +258,11 @@ struct RwCamera
     RwBBox               viewBBox;
     RwV3d                frustum3D[8];
 };
+struct RwGeometry
+{
+    unsigned char   unknown1[14];
+    unsigned short  refs;
+};
 struct RpInterpolation
 {
     unsigned int     unknown1;

@@ -256,6 +256,7 @@ protected:
     SMemStatsInfo           m_MemStatsDelta;
     SMemStatsInfo           m_MemStatsMax;
     std::list < CDxTable >  m_TableList;
+    float                   m_fPosY;
 };
 
 
@@ -346,22 +347,40 @@ void CMemStats::Draw ( void )
         CreateTables ();
     }
 
+    float fResWidth = static_cast < float > ( g_pGraphics->GetViewportWidth () );
+    float fResHeight = static_cast < float > ( g_pGraphics->GetViewportHeight () );
+    float fTotalHeight = 0;
+
     // Draw tables
     if ( !m_TableList.empty () )
     {
-        float fResWidth = static_cast < float > ( g_pGraphics->GetViewportWidth () );
-        float fResHeight = static_cast < float > ( g_pGraphics->GetViewportHeight () );
 
         float fX = fResWidth - m_TableList.front ().GetPixelWidth () - 15;
-        float fY = 200;
+        float fY = 200 - m_fPosY;
 
         for ( std::list < CDxTable >::iterator iter = m_TableList.begin () ; iter != m_TableList.end () ; ++iter )
         {
             CDxTable& table = *iter;
             table.Draw ( fX, fY, 0x78000000, 10, 10, 8, 8 );
-            fY += 20;
-            fY += table.GetPixelHeight ();
+            float fHeight = table.GetPixelHeight () + 20;
+            fY += fHeight;
+            fTotalHeight += fHeight;
         }
+    }
+
+    // Handle scrolling
+    bool bHoldingPageUp = ( GetAsyncKeyState ( VK_PRIOR ) & 0x8000 ) != 0;
+    bool bHoldingPageDown = ( GetAsyncKeyState ( VK_NEXT ) & 0x8000 ) != 0;
+
+    if ( bHoldingPageUp )
+    {
+        m_fPosY = Max ( 0.f, m_fPosY - 10 );
+    }
+    if ( bHoldingPageDown )
+    {
+        float fScrollHeight = fTotalHeight - ( fResHeight - 200 );
+        if ( fScrollHeight > 0 )
+            m_fPosY = Min ( fScrollHeight, m_fPosY + 10 );
     }
 }
 
@@ -446,6 +465,9 @@ void CMemStats::SampleState ( SMemStatsInfo& memStatsInfo )
             else if ( i < 25755 )   memStatsInfo.modelInfo.uiAnims_25575_25754++;
         }
     }
+
+    CCore::GetSingleton ().GetMultiplayer ()->GetRwResourceStats ( memStatsInfo.rwResourceStats );
+    CCore::GetSingleton ().GetMultiplayer ()->GetClothesCacheStats ( memStatsInfo.clothesCacheStats );
 }
 
 
@@ -508,6 +530,16 @@ void CMemStats::UpdateIntervalStats ( void )
         deltaList[i]->iDestroyedBytes   = nowList[i]->iDestroyedBytes - prevList[i]->iDestroyedBytes;
         deltaList[i]->iLockedCount      = maxList[i]->iLockedCount;     // Use per-frame max for lock stats
     }
+
+    m_MemStatsDelta.rwResourceStats.uiTextures      = m_MemStatsNow.rwResourceStats.uiTextures   - m_MemStatsPrev.rwResourceStats.uiTextures;
+    m_MemStatsDelta.rwResourceStats.uiRasters       = m_MemStatsNow.rwResourceStats.uiRasters    - m_MemStatsPrev.rwResourceStats.uiRasters;
+    m_MemStatsDelta.rwResourceStats.uiGeometries    = m_MemStatsNow.rwResourceStats.uiGeometries - m_MemStatsPrev.rwResourceStats.uiGeometries;
+
+    m_MemStatsDelta.clothesCacheStats.uiCacheHit    = m_MemStatsNow.clothesCacheStats.uiCacheHit   - m_MemStatsPrev.clothesCacheStats.uiCacheHit;
+    m_MemStatsDelta.clothesCacheStats.uiCacheMiss   = m_MemStatsNow.clothesCacheStats.uiCacheMiss  - m_MemStatsPrev.clothesCacheStats.uiCacheMiss;
+    m_MemStatsDelta.clothesCacheStats.uiNumTotal    = m_MemStatsNow.clothesCacheStats.uiNumTotal   - m_MemStatsPrev.clothesCacheStats.uiNumTotal;
+    m_MemStatsDelta.clothesCacheStats.uiNumUnused   = m_MemStatsNow.clothesCacheStats.uiNumUnused  - m_MemStatsPrev.clothesCacheStats.uiNumUnused;
+    m_MemStatsDelta.clothesCacheStats.uiNumRemoved  = m_MemStatsNow.clothesCacheStats.uiNumRemoved - m_MemStatsPrev.clothesCacheStats.uiNumRemoved;
 
     //
     // Set 'prev' for next time
@@ -583,6 +615,16 @@ void CMemStats::CreateTables ( void )
                         LT_GREEN "-99999,"
                         GREY "0,"
                         LT_RED "999999,"
+                        ;
+
+    SString strNumberColorsWhite =
+                        WHITE "0,"
+                        WHITE "999999,"
+                        ;
+
+    SString strNumberColorsGrey =
+                        GREY "0,"
+                        GREY "999999,"
                         ;
 
     //
@@ -695,6 +737,48 @@ void CMemStats::CreateTables ( void )
 
     {
 /*
+    RW resources            Change    Count
+    Textures                            0
+    Rasters                             0
+    Geometries                          0
+*/
+        m_TableList.push_back ( CDxTable ( "|" ) );
+        CDxTable& table = m_TableList.back ();
+        table.SetColumnWidths( "140,50:R,60:R" );
+        table.SetNumberColors ( "^1", strNumberColorsModels );
+        table.AddRow ( HEADER1( "RW resources" ) "|" HEADER1( "Change" ) "|" HEADER1( "Count" ) );
+        table.AddRow ( SString ( "Textures|^1~.%d|%d", m_MemStatsDelta.rwResourceStats.uiTextures, m_MemStatsNow.rwResourceStats.uiTextures ) );
+        table.AddRow ( SString ( "Rasters|^1~.%d|%d", m_MemStatsDelta.rwResourceStats.uiRasters, m_MemStatsNow.rwResourceStats.uiRasters ) );
+        table.AddRow ( SString ( "Geometries|^1~.%d|%d", m_MemStatsDelta.rwResourceStats.uiGeometries, m_MemStatsNow.rwResourceStats.uiGeometries ) );
+    }
+
+    {
+/*
+    Clothes cache           Change    Count
+    Cache hit                           0
+    Cache miss                          0
+    Clothes in use                      0
+    Clothes ready for use               0
+    Old removed                         0
+*/
+        m_TableList.push_back ( CDxTable ( "|" ) );
+        CDxTable& table = m_TableList.back ();
+        table.SetColumnWidths( "140,50:R,60:R" );
+        table.SetNumberColors ( "^0", strNumberColorsWhite );
+        table.SetNumberColors ( "^1", strNumberColorsModels );
+        table.SetNumberColors ( "^3", strNumberColorsCreat );
+        table.SetNumberColors ( "^4", strNumberColorsLockStatic );
+        table.SetNumberColors ( "^5", strNumberColorsGrey );
+        table.AddRow ( HEADER1( "Clothes cache" ) "|" HEADER1( "Change" ) "|" HEADER1( "Count" ) );
+        table.AddRow ( SString ( "Cache hit|^3~ %d|^5~.%d", m_MemStatsDelta.clothesCacheStats.uiCacheHit, m_MemStatsNow.clothesCacheStats.uiCacheHit ) );
+        table.AddRow ( SString ( "Cache miss|^4~ %d|^5~.%d", m_MemStatsDelta.clothesCacheStats.uiCacheMiss, m_MemStatsNow.clothesCacheStats.uiCacheMiss ) );
+        table.AddRow ( SString ( "Clothes in use|^1~.%d|^0%d", m_MemStatsDelta.clothesCacheStats.uiNumTotal - m_MemStatsDelta.clothesCacheStats.uiNumUnused, m_MemStatsNow.clothesCacheStats.uiNumTotal - m_MemStatsNow.clothesCacheStats.uiNumUnused ) );
+        table.AddRow ( SString ( "Clothes ready for use|^1~.%d|%d", m_MemStatsDelta.clothesCacheStats.uiNumUnused, m_MemStatsNow.clothesCacheStats.uiNumUnused ) );
+        table.AddRow ( SString ( "Old removed|^1~.%d|^5%d", m_MemStatsDelta.clothesCacheStats.uiNumRemoved, m_MemStatsNow.clothesCacheStats.uiNumRemoved ) );
+    }
+
+    {
+/*
     Model usage                 Change   Amount
     0-288           Players         1       10
     289-399         Other1          1       10
@@ -710,7 +794,7 @@ void CMemStats::CreateTables ( void )
         CDxTable& table = m_TableList.back ();
         table.SetColumnWidths( "90,50,50:R,60:R" );
         table.SetNumberColors ( "^1", strNumberColorsModels );
-        table.AddRow ( HEADER1( "Models in use" ) "| |" HEADER1( "Change" ) "|" HEADER1( "Count" ) );
+        table.AddRow ( HEADER1( "Models in memory" ) "| |" HEADER1( "Change" ) "|" HEADER1( "Count" ) );
         table.AddRow ( SString ( "0-312|(Players)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiPlayerModels_0_312, m_MemStatsNow.modelInfo.uiPlayerModels_0_312 ) );
         table.AddRow ( SString ( "313-317| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_313_317, m_MemStatsNow.modelInfo.uiUnknown_313_317 ) );
         table.AddRow ( SString ( "318-372|(Weapons)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiWeaponModels_318_372, m_MemStatsNow.modelInfo.uiWeaponModels_318_372 ) );

@@ -47,6 +47,8 @@ public:
     void                        InitHooks_FixBadAnimId ( void );
     void                        InitHooks_HookDestructors ( void );
     void                        InitHooks_WorldSound ( void );
+    void                        InitHooks_RwResources ( void );
+    void                        InitHooks_ClothesCache ( void );
     CRemoteDataStorage *        CreateRemoteDataStorage     ();
     void                        DestroyRemoteDataStorage    ( CRemoteDataStorage* pData );
     void                        AddRemoteDataStorage        ( CPlayerPed* pPed, CRemoteDataStorage* pData );
@@ -196,6 +198,9 @@ public:
     void                        SetAircraftMaxHeight        ( float fHeight )           { m_fAircraftMaxHeight = fHeight; };
 
     void                        SetAutomaticVehicleStartupOnPedEnter    ( bool bSet );
+
+    virtual void                GetRwResourceStats          ( SRwResourceStats& outStats );
+    virtual void                GetClothesCacheStats        ( SClothesCacheStats& outStats );
 
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;
