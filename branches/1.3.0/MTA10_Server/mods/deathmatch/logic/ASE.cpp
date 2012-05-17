@@ -171,7 +171,7 @@ void ASE::DoPulse ( void )
     }
 
     // Update stats
-    if ( m_MinuteTimer.Get () >= 6000 )
+    if ( m_MinuteTimer.Get () >= 60000 )
     {
         m_MinuteTimer.Reset ();
         m_uiNumQueriesPerMinute = m_uiNumQueriesTotal - m_uiTotalAtMinuteStart;

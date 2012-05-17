@@ -20,7 +20,21 @@
 #include "CPopulationMP.h"
 #include "CLimits.h"
 
-#define DEFAULT_WAVES -1.0f
+struct SRwResourceStats
+{
+    uint uiTextures;
+    uint uiRasters;
+    uint uiGeometries;
+};
+
+struct SClothesCacheStats
+{
+    uint uiCacheHit;
+    uint uiCacheMiss;
+    uint uiNumTotal;
+    uint uiNumUnused;
+    uint uiNumRemoved;
+};
 
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
@@ -265,6 +279,9 @@ public:
 
     virtual float                       GetAircraftMaxHeight        ( void ) = 0;
     virtual void                        SetAircraftMaxHeight        ( float fHeight ) = 0;
+
+    virtual void                        GetRwResourceStats          ( SRwResourceStats& outStats ) = 0;
+    virtual void                        GetClothesCacheStats        ( SClothesCacheStats& outStats ) = 0;
 };
 
 #endif

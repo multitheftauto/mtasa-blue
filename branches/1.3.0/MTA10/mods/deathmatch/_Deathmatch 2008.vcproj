@@ -53,7 +53,7 @@
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
-				WarningLevel="1"
+				WarningLevel="3"
 				WarnAsError="false"
 				DebugInformationFormat="4"
 				DisableSpecificWarnings="4290;4996;4482"

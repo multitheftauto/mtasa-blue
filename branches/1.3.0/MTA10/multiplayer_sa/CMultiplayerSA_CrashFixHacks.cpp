@@ -757,6 +757,44 @@ void _declspec(naked) HOOK_CrashFix_Misc24 ()
 }
 
 
+////////////////////////////////////////////////////////////////////////
+// Handle CTaskSimpleCarOpenDoorFromOutside::ComputeAnimID having zero pointer to something
+// (Possibly due to a vehicle being removed)
+#define HOOKPOS_CrashFix_Misc25                             0x645FD9
+#define HOOKSIZE_CrashFix_Misc25                            13
+DWORD RETURN_CrashFix_Misc25 =                              0x645FE6;
+void _declspec(naked) HOOK_CrashFix_Misc25 ()
+{
+#if TEST_CRASH_FIXES
+    SIMULATE_ERROR_BEGIN( 10 )
+        _asm
+        {
+            mov     ecx,0
+        }
+    SIMULATE_ERROR_END
+#endif
+
+    _asm
+    {
+        // Check for zero pointer
+        cmp     ecx,0
+        jz      fix
+
+        // Continue standard path
+        mov     edx, [ecx+384h]
+        movzx   ecx, byte ptr [edx+0DEh]
+        jmp     RETURN_CrashFix_Misc25
+
+    fix:
+        // Do special thing
+        mov     edx, 0
+        mov     ecx, 0
+        jmp     RETURN_CrashFix_Misc25
+
+    }
+}
+
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks for CrashFixHacks
@@ -788,4 +826,5 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     EZHookInstall ( CrashFix_Misc22 );
     EZHookInstall ( CrashFix_Misc23 );
     EZHookInstall ( CrashFix_Misc24 );
+    EZHookInstall ( CrashFix_Misc25 );
 }
