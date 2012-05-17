@@ -434,7 +434,19 @@ void CClientSound::ApplyFXModifications ( float fSampleRate, float fTempo, float
 
 void CClientSound::GetFXModifications ( float &fSampleRate, float &fTempo, float &fPitch, bool &bReversed )
 {
-    m_pAudio->GetTempoValues ( fSampleRate, fTempo, fPitch, bReversed );
+    if ( m_pAudio )
+    {
+        m_pAudio->GetTempoValues ( fSampleRate, fTempo, fPitch, bReversed );
+    }
+}
+
+float* CClientSound::GetFFTData ( int iLength )
+{
+    if ( m_pAudio )
+    {
+        return m_pAudio->GetFFTData ( iLength );
+    }
+    return NULL;
 }
 
 ////////////////////////////////////////////////////////////

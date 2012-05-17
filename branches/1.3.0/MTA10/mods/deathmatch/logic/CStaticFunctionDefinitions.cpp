@@ -6402,6 +6402,10 @@ bool CStaticFunctionDefinitions::GetSoundProperties ( CClientSound& Sound, float
     return true;
 }
 
+float* CStaticFunctionDefinitions::GetSoundFFTData ( CClientSound& Sound, int iLength )
+{
+    return Sound.GetFFTData ( iLength );
+}
 
 bool CStaticFunctionDefinitions::GetSoundSpeed ( CClientSound& Sound, float& fSpeed )
 {

@@ -455,6 +455,39 @@ void CBassAudio::SetTempoValues ( float fSampleRate, float fTempo, float fPitch,
     BASS_ChannelSetAttribute ( BASS_FX_TempoGetSource ( m_pSound ), BASS_ATTRIB_REVERSE_DIR, (float)(bReverse == false ? BASS_FX_RVS_FORWARD : BASS_FX_RVS_REVERSE) );
 }
 
+float* CBassAudio::GetFFTData ( int iLength )
+{
+    if ( m_pSound )
+    {
+        long lFlags = BASS_DATA_FFT256;
+        if ( iLength == 256 )
+            lFlags = BASS_DATA_FFT256;
+        else if ( iLength == 512 )
+            lFlags = BASS_DATA_FFT512;
+        else if ( iLength == 1024 )
+            lFlags = BASS_DATA_FFT1024;
+        else if ( iLength == 2048 )
+            lFlags = BASS_DATA_FFT2048;
+        else if ( iLength == 4096 )
+            lFlags = BASS_DATA_FFT4096;
+        else if ( iLength == 8192 )
+            lFlags = BASS_DATA_FFT8192;
+        else if ( iLength == 16384 )
+            lFlags = BASS_DATA_FFT16384;
+        else 
+            return NULL;
+
+        float* pData = new float[ iLength ];
+        if ( BASS_ChannelGetData ( m_pSound, pData, lFlags ) != -1 )
+            return pData;
+        else
+        {
+            delete [] pData;
+            return NULL;
+        }
+    }
+}
+
 //
 // FxEffects
 //
