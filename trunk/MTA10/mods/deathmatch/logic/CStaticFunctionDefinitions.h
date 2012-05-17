@@ -561,6 +561,7 @@ public:
     static bool                         SetSoundSpeed                       ( CClientSound& Sound, float fSpeed );
     static bool                         SetSoundProperties                  ( CClientSound& Sound, float fSampleRate, float fTempo, float fPitch, bool bReversed );
     static bool                         GetSoundProperties                  ( CClientSound& Sound, float &fSampleRate, float &fTempo, float &fPitch, bool &bReversed );
+    static float*                       GetSoundFFTData                     ( CClientSound& Sound, int iLength );
     static bool                         GetSoundSpeed                       ( CClientSound& Sound, float& fSpeed );
     static bool                         SetSoundMinDistance                 ( CClientSound& Sound, float fDistance );
     static bool                         GetSoundMinDistance                 ( CClientSound& Sound, float& fDistance );

@@ -67,6 +67,7 @@ public:
     void                    ApplyFXModifications    ( float fSampleRate, float fTempo, float fPitch, bool bReversed );
     void                    GetFXModifications      ( float &fSampleRate, float &fTempo, float &fPitch, bool &bReversed );
     bool                    IsTempoChanged          ( void )                            { return m_fSampleRate != 0.0f || m_fSampleRate != 0.0f || m_fTempo != 0.0f; }
+    float*                  GetFFTData              ( int iLength );
 
     SString                 GetMetaTags             ( const SString& strFormat );
 

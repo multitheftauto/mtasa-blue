@@ -73,6 +73,8 @@ public:
     void                    AddQueuedEvent          ( eSoundEventType type, const SString& strString, double dNumber = 0.0, bool bBool = false );
     bool                    GetQueuedEvent          ( SSoundEventInfo& info );
     void                    ParseShoutcastMeta      ( const SString& strMeta );
+    float*                  GetFFTData              ( int iLength );
+    DWORD                   GetLevelData            ( void );
 
 protected:
     HSTREAM                 ConvertFileToMono       ( const SString& strPath );
