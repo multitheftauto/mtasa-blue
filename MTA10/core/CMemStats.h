@@ -18,6 +18,8 @@ struct SMemStatsInfo
     int iProcessMemSizeKB;
     int iStreamingMemoryUsed;
     int iStreamingMemoryAvailable;
+    SRwResourceStats rwResourceStats;
+    SClothesCacheStats clothesCacheStats;
 
     union {
         uint uiArray[];

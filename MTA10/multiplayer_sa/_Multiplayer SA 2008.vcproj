@@ -344,6 +344,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMultiplayerSA_ClothesCache.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CMultiplayerSA_ClothesMemFix.cpp"
 				>
 			</File>
@@ -365,6 +369,11 @@
 			</File>
 			<File
 				RelativePath=".\CMultiplayerSA_ObjectLODSystem.cpp"
+				>
+			</File>
+			<File
+
+				RelativePath=".\CMultiplayerSA_RwResources.cpp"
 				>
 			</File>
 			<File
