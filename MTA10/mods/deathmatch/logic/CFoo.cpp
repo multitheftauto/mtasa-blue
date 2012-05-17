@@ -173,7 +173,7 @@ void CFoo::Test ( const char* szString )
         {
             CClientVehicle* pVehicle = *pVehicleManager->IterBegin ();
 
-            float fdelta = atof ( szString + 7 );
+            float fdelta = (float)atof ( szString + 7 );
 
             CVector vecT;
             pVehicle->GetPosition ( vecT );
@@ -196,7 +196,7 @@ void CFoo::Test ( const char* szString )
 
             CVector vecT;
             pVehicle->GetRotationDegrees ( vecT );
-            vecT.fZ = atof ( szString + 7 );
+            vecT.fZ = (float)atof ( szString + 7 );
             pVehicle->SetTargetRotation ( vecT, TICK_RATE );
 
             g_pCore->ChatPrintf ( "Done %f", false, atof ( szString + 7 ) );
@@ -240,7 +240,7 @@ void CFoo::Test ( const char* szString )
         CClientVehicle* pVehicle = pLocal->GetOccupiedVehicle ();
         if ( pVehicle )
         {
-            pVehicle->GetGameVehicle ()->SetMass ( atof ( szString + 8 ) );
+            pVehicle->GetGameVehicle ()->SetMass ( (float)atof ( szString + 8 ) );
             g_pCore->ChatPrintf ( "Set mass to %f", false, pVehicle->GetGameVehicle ()->GetMass () );
         }
     }
@@ -400,7 +400,7 @@ void CFoo::Test ( const char* szString )
 
             CVector vecT;
             pVehicle->GetPosition ( vecT );
-            vecT.fZ = atof ( szString + 7 );
+            vecT.fZ = (float)atof ( szString + 7 );
             pVehicle->SetPosition ( vecT );
 
             g_pCore->ChatPrintf ( "Done", false );
@@ -506,7 +506,7 @@ void CFoo::Test ( const char* szString )
         for ( ; i < 139; i++ )
         {
             fprintf ( pFile, "==%s [%s] (%i)==\n", pGroups [i].szGroupName, pGroups [i].szSomething, i );
-            int i2 = 0;
+            uint i2 = 0;
             for ( ; i2 < pGroups [i].ulAnimCount; i2++ )
             {
                 const char* szAnimName = pGroups [i].pAnimNames [i2];
