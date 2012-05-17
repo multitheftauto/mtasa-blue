@@ -486,6 +486,7 @@ float* CBassAudio::GetFFTData ( int iLength )
             return NULL;
         }
     }
+    return NULL;
 }
 
 //
