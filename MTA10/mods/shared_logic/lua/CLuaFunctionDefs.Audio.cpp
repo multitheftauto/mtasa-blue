@@ -395,6 +395,53 @@ int CLuaFunctionDefs::GetSoundFFTData ( lua_State* luaVM )
     return 1;
 }
 
+
+int CLuaFunctionDefs::SetSoundPanEnabled ( lua_State* luaVM )
+{
+    CClientSound* pSound = NULL;
+    bool bEnabled = true;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pSound );
+    argStream.ReadBool ( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetSoundPanEnabled ( *pSound, bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setSoundPanningEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::IsSoundPanEnabled ( lua_State* luaVM )
+{
+    CClientSound* pSound = NULL;
+    bool bEnabled = true;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pSound );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::IsSoundPanEnabled ( *pSound ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "isSoundPanningEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::GetSoundSpeed ( lua_State* luaVM )
 {
     if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )

@@ -68,6 +68,8 @@ public:
     void                    GetFXModifications      ( float &fSampleRate, float &fTempo, float &fPitch, bool &bReversed );
     bool                    IsTempoChanged          ( void )                            { return m_fSampleRate != 0.0f || m_fSampleRate != 0.0f || m_fTempo != 0.0f; }
     float*                  GetFFTData              ( int iLength );
+    bool                    IsPanEnabled           ( void );
+    bool                    SetPanEnabled           ( bool bPan );
 
     SString                 GetMetaTags             ( const SString& strFormat );
 
@@ -113,6 +115,7 @@ private:
     float       m_fTempo;
     float       m_fSampleRate;
     bool        m_bReversed;
+    bool        m_bPan;
 
     // Saved state
     bool        m_bPaused;
