@@ -31,6 +31,7 @@ CBassAudio::CBassAudio ( bool bStream, const SString& strPath, bool bLoop, bool 
     m_fMaxDistance = 20.0f;
     m_fPlaybackSpeed = 1.0f;
     m_bPaused = false;
+    m_bPan = true;
 }
 
 
@@ -560,24 +561,32 @@ void CBassAudio::Process3D ( const CVector& vecPlayerPosition, const CVector& ve
 {
     assert ( m_b3D && m_pSound );
 
-    // Limit panning when getting close to the min distance
     float fDistance = DistanceBetweenPoints3D ( vecCameraPosition, m_vecPosition );
-    float fPanSharpness = UnlerpClamped ( m_fMinDistance, fDistance, m_fMinDistance * 2 );
-    float fPanLimit = Lerp ( 0.35f, fPanSharpness, 1.0f );
+    if ( m_bPan )
+    {
+        // Limit panning when getting close to the min distance
+        float fPanSharpness = UnlerpClamped ( m_fMinDistance, fDistance, m_fMinDistance * 2 );
+        float fPanLimit = Lerp ( 0.35f, fPanSharpness, 1.0f );
 
-    // Pan
-    CVector vecLook = vecLookAt - vecCameraPosition;
-    CVector vecSound = m_vecPosition - vecCameraPosition;
-    vecLook.fZ = vecSound.fZ = 0.0f;
-    vecLook.Normalize ();
-    vecSound.Normalize ();
+        // Pan
+        CVector vecLook = vecLookAt - vecCameraPosition;
+        CVector vecSound = m_vecPosition - vecCameraPosition;
+        vecLook.fZ = vecSound.fZ = 0.0f;
+        vecLook.Normalize ();
+        vecSound.Normalize ();
 
-    vecLook.CrossProduct ( &vecSound );
-    // The length of the cross product (which is simply fZ in this case)
-    // is equal to the sine of the angle between the vectors
-    float fPan = Clamp ( -fPanLimit, -vecLook.fZ, fPanLimit );
-    
-    BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_PAN, fPan );
+        vecLook.CrossProduct ( &vecSound );
+        // The length of the cross product (which is simply fZ in this case)
+        // is equal to the sine of the angle between the vectors
+        float fPan = Clamp ( -fPanLimit, -vecLook.fZ, fPanLimit );
+
+        BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_PAN, fPan );
+    }
+    else
+    {
+        // Revert to middle.
+        BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_PAN, 0.0f );
+    }
 
     // Volume
     float fDistDiff = m_fMaxDistance - m_fMinDistance;

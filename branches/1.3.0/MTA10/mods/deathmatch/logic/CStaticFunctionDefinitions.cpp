@@ -6407,6 +6407,17 @@ float* CStaticFunctionDefinitions::GetSoundFFTData ( CClientSound& Sound, int iL
     return Sound.GetFFTData ( iLength );
 }
 
+bool CStaticFunctionDefinitions::IsSoundPanEnabled ( CClientSound& Sound )
+{
+    return Sound.IsPanEnabled ( );
+}
+
+bool CStaticFunctionDefinitions::SetSoundPanEnabled ( CClientSound& Sound, bool bEnabled )
+{
+    Sound.SetPanEnabled ( bEnabled );
+    return true;
+}
+
 bool CStaticFunctionDefinitions::GetSoundSpeed ( CClientSound& Sound, float& fSpeed )
 {
     fSpeed = Sound.GetPlaybackSpeed ();

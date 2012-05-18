@@ -81,6 +81,8 @@ public:
     LUA_DECLARE ( SetSoundProperties );
     LUA_DECLARE ( GetSoundProperties );
     LUA_DECLARE ( GetSoundFFTData );
+    LUA_DECLARE ( SetSoundPanEnabled );
+    LUA_DECLARE ( IsSoundPanEnabled );
     LUA_DECLARE ( GetSoundLevelData );
     LUA_DECLARE ( SetSoundMinDistance );
     LUA_DECLARE ( GetSoundMinDistance );
