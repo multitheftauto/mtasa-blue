@@ -74,6 +74,8 @@ namespace
                                          { "getSoundProperties",        "1.3.0-9.04109" },
                                          { "setSoundProperties",        "1.3.0-9.04109" },
                                          { "getSoundFFTData",           "1.3.0-9.04123" },
+                                         { "setSoundPanningEnabled",    "1.3.0-9.04128" },
+                                         { "isSoundPanningEnabled",    "1.3.0-9.04128" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
