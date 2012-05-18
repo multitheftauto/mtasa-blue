@@ -591,8 +591,8 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed ( 
             // Push our position
             push eax
             // Edit our components to get Alpha fixing working.
-            mov ecx, dwBlue // Blue
-            mov eax, dwRed // Red
+            //mov ecx, dwBlue // Blue
+            //mov eax, dwRed // Red
             push 0FFh
             // Push our R,G,B components (inverse order)
             push ecx
@@ -650,8 +650,8 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue (
             push eax
             push 0FFh
             // Edit our components to get Alpha fixing working.
-            mov ecx, dwBlue // Blue
-            mov ebp, dwRed // Red
+            //mov ecx, dwBlue // Blue
+            //mov ebp, dwRed // Red
             // Push our R,G,B components (inverse order)
             push ecx
             push edx
