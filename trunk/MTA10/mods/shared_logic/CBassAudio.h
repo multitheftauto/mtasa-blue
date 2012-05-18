@@ -65,6 +65,8 @@ public:
     void                    SetTempoValues          ( float fSampleRate, float fTempo, float fPitch, bool bReverse );
     void                    GetTempoValues          ( float &fSampleRate, float &fTempo, float &fPitch, bool &bReverse )        { fSampleRate = m_fSampleRate; fTempo = m_fTempo; fPitch = m_fPitch; bReverse = m_bReversed; };
     void                    SetReversed             ( bool bReversed )                                          { m_bReversed = bReversed; };
+    bool                    GetPanEnabled           ( void )                                                    { return m_bPan; };
+    void                    SetPanEnabled           ( bool bPan )                                               { m_bPan = bPan; };
     void                    SetFxEffects            ( int* pEnabledEffects, uint iNumElements );
     SString                 GetMetaTags             ( const SString& strFormat );
     bool                    IsFinished              ( void );
@@ -74,7 +76,6 @@ public:
     bool                    GetQueuedEvent          ( SSoundEventInfo& info );
     void                    ParseShoutcastMeta      ( const SString& strMeta );
     float*                  GetFFTData              ( int iLength );
-    DWORD                   GetLevelData            ( void );
 
 protected:
     HSTREAM                 ConvertFileToMono       ( const SString& strPath );
@@ -103,6 +104,7 @@ private:
     // Playback state
     bool                    m_bPaused;
     bool                    m_bReversed;
+    bool                    m_bPan;
     float                   m_fDefaultFrequency;
     float                   m_fVolume;
     float                   m_fMinDistance;
