@@ -264,7 +264,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetVehicleCollisionHandler( CClientGame::StaticVehicleCollisionHandler );
     g_pMultiplayer->SetHeliKillHandler ( CClientGame::StaticHeliKillHandler );
     g_pMultiplayer->SetWaterCannonHitHandler ( CClientGame::StaticWaterCannonHandler );
-    g_pMultiplayer->SetWorldSoundHandler ( CClientGame::StaticWorldSoundHandler );
     g_pMultiplayer->SetGameObjectDestructHandler( CClientGame::StaticGameObjectDestructHandler );
     g_pMultiplayer->SetGameVehicleDestructHandler( CClientGame::StaticGameVehicleDestructHandler );
     g_pMultiplayer->SetGamePlayerDestructHandler( CClientGame::StaticGamePlayerDestructHandler );
@@ -332,12 +331,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     // Give a default value for the streaming memory
     if ( g_pCore->GetCVars()->Exists ( "streaming_memory" ) == false )
         g_pCore->GetCVars()->Set ( "streaming_memory", g_pCore->GetMaxStreamingMemory () );
-    // Assign a pitch variable for SFX a default value of 0.
-    m_fPitch = 0.0f;    
-    // Assign a volume variable for SFX a default value of -1.0.
-    m_fVolume = -1.0f;
-    // We are not running our event.
-    m_bSFXRunning = false;
 }
 
 
@@ -415,7 +408,6 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetVehicleCollisionHandler( NULL );
     g_pMultiplayer->SetHeliKillHandler( NULL );
     g_pMultiplayer->SetWaterCannonHitHandler( NULL );
-    g_pMultiplayer->SetWorldSoundHandler( NULL );
     g_pMultiplayer->SetGameObjectDestructHandler( NULL );
     g_pMultiplayer->SetGameVehicleDestructHandler( NULL );
     g_pMultiplayer->SetGamePlayerDestructHandler( NULL );
@@ -2756,7 +2748,6 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientSoundChangedMeta", "streamTitle", NULL, false );
     m_Events.AddEvent ( "onClientSoundStarted", "reason", NULL, false );
     m_Events.AddEvent ( "onClientSoundStopped", "reason", NULL, false );
-    m_Events.AddEvent ( "onClientWorldSound", "group, index", NULL, false );
 
     // Misc events
     m_Events.AddEvent ( "onClientFileDownloadComplete", "fileName, success", NULL, false );
@@ -3595,11 +3586,6 @@ void CClientGame::StaticGameModelRemoveHandler ( ushort usModelId )
     g_pClientGame->GameModelRemoveHandler ( usModelId );
 }
 
-bool CClientGame::StaticWorldSoundHandler ( uint uiGroup, uint uiIndex, SSFXParams *fParams )
-{
-    return g_pClientGame->WorldSoundHandler ( uiGroup, uiIndex, fParams );
-}
-
 void CClientGame::DrawRadarAreasHandler ( void )
 {
     m_pRadarAreaManager->DoPulse ();
@@ -4280,29 +4266,6 @@ bool CClientGame::WaterCannonHitHandler ( CVehicleSAInterface* pCannonVehicle, C
         }
     }
     return false;
-}
-
-bool CClientGame::WorldSoundHandler ( uint uiGroup, uint uiIndex, SSFXParams* tParams )
-{
-    m_fPitch = 0.0f;
-    m_fVolume = -1.0f;
-    m_bSFXRunning = true;
-    CLuaArguments Arguments;
-    Arguments.PushNumber ( uiGroup );
-    Arguments.PushNumber ( uiIndex );
-    Arguments.PushNumber ( tParams->m_fPitch );
-    Arguments.PushNumber ( tParams->m_fVolume );
-    bool bReturn = m_pRootEntity->CallEvent ( "onClientWorldSound", Arguments, false );
-    m_bSFXRunning = false;
-    if ( m_fPitch > FLOAT_EPSILON )
-    {
-        tParams->m_fPitch = m_fPitch;
-    }
-    if ( m_fVolume >= 0 )
-    {
-        tParams->m_fVolume = m_fVolume;
-    }
-    return bReturn;
 }
 
 // Validate known objects
