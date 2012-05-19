@@ -836,3 +836,71 @@ int CLuaFunctionDefs::ResetAmbientSounds ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::SetWorldSoundEnabled ( lua_State* luaVM )
+{
+//  setWorldSoundEnabled ( int group, [int index, ], bool enable )
+    int group; int index = -1; bool bEnabled;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( group );
+    if ( !argStream.NextIsBool () )
+        argStream.ReadNumber ( index );
+    argStream.ReadBool ( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetWorldSoundEnabled ( group, index, bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWorldSoundEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::IsWorldSoundEnabled ( lua_State* luaVM )
+{
+//  bool isWorldSoundEnabled ( int group, [int index] )
+    int group; int index;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( group );
+    argStream.ReadNumber ( index, -1 );
+
+    if ( !argStream.HasErrors () )
+    {
+        bool bResultEnabled;
+        if ( CStaticFunctionDefinitions::IsWorldSoundEnabled ( group, index, bResultEnabled ) )
+        {
+            lua_pushboolean ( luaVM, bResultEnabled );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "isWorldSoundEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::ResetWorldSounds ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::ResetWorldSounds () )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "resetWorldSounds" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

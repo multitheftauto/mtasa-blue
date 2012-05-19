@@ -376,10 +376,12 @@ public:
     bool                                IsDownloadingBigPacket          ( ) const                       { return m_bReceivingBigPacket; }
     bool                                IsBeingDeleted                  ( void )                        { return m_bBeingDeleted; }
 
-    void                                SetDevelopmentMode              ( bool bEnable )                { m_bDevelopmentMode = bEnable; } 
+    void                                SetDevelopmentMode              ( bool bEnable );
     bool                                GetDevelopmentMode              ( void )                        { return m_bDevelopmentMode; } 
     void                                SetShowCollision                ( bool bEnable )                { m_bShowCollision = bEnable; } 
     bool                                GetShowCollision                ( void )                        { return m_bShowCollision; } 
+    void                                SetShowSound                    ( bool bEnable )                { m_bShowSound = bEnable; } 
+    bool                                GetShowSound                    ( void )                        { return m_bShowSound; } 
 
     void                                TakePlayerScreenShot            ( uint uiSizeX, uint uiSizeY, const SString& strTag, uint uiQuality, uint uiMaxBandwidth, uint uiMaxPacketSize, const SString& strResourceName, uint uiServerSentTime );
     static void                         StaticGottenPlayerScreenShot    ( const CBuffer& buffer, uint uiTimeSpentInQueue );
@@ -462,11 +464,11 @@ private:
     static bool                         StaticVehicleCollisionHandler   ( CVehicleSAInterface* pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity  );
     static bool                         StaticHeliKillHandler           ( CVehicleSAInterface* pHeli, CPedSAInterface* pPed );
     static bool                         StaticWaterCannonHandler        ( CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed );
-    static bool                         StaticWorldSoundHandler         ( uint uiGroup, uint uiIndex );
     static void                         StaticGameObjectDestructHandler     ( CEntitySAInterface* pObject );
     static void                         StaticGameVehicleDestructHandler    ( CEntitySAInterface* pVehicle );
     static void                         StaticGamePlayerDestructHandler     ( CEntitySAInterface* pPlayer );
     static void                         StaticGameModelRemoveHandler        ( ushort usModelId );
+    static void                         StaticWorldSoundHandler        ( uint uiGroup, uint uiIndex );
 
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
     void                                FireHandler                     ( CFire* pFire );
@@ -484,11 +486,11 @@ private:
     bool                                VehicleCollisionHandler         ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity  );
     bool                                HeliKillHandler                 ( CVehicleSAInterface* pHeli, CPedSAInterface* pPed );
     bool                                WaterCannonHitHandler           ( CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed );
-    bool                                WorldSoundHandler               ( uint uiGroup, uint uiIndex );
     void                                GameObjectDestructHandler       ( CEntitySAInterface* pObject );
     void                                GameVehicleDestructHandler      ( CEntitySAInterface* pVehicle );
     void                                GamePlayerDestructHandler       ( CEntitySAInterface* pPlayer );
     void                                GameModelRemoveHandler          ( ushort usModelId );
+    void                                WorldSoundHandler               ( uint uiGroup, uint uiIndex );
 
     static bool                         StaticProcessMessage            ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     bool                                ProcessMessage                  ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
@@ -690,6 +692,7 @@ private:
     #endif
     bool                                m_bDevelopmentMode;
     bool                                m_bShowCollision;
+    bool                                m_bShowSound;
 
     // Debug class. Empty in release.
 public:

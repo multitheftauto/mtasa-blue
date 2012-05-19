@@ -649,6 +649,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setAmbientSoundEnabled", CLuaFunctionDefs::SetAmbientSoundEnabled );
     CLuaCFunctions::AddFunction ( "isAmbientSoundEnabled", CLuaFunctionDefs::IsAmbientSoundEnabled );
     CLuaCFunctions::AddFunction ( "resetAmbientSounds", CLuaFunctionDefs::ResetAmbientSounds );
+    CLuaCFunctions::AddFunction ( "setWorldSoundEnabled", CLuaFunctionDefs::SetWorldSoundEnabled );
+    CLuaCFunctions::AddFunction ( "isWorldSoundEnabled", CLuaFunctionDefs::IsWorldSoundEnabled );
+    CLuaCFunctions::AddFunction ( "resetWorldSounds", CLuaFunctionDefs::ResetWorldSounds );
 
     // Blip funcs
     CLuaCFunctions::AddFunction ( "createBlip", CLuaFunctionDefs::CreateBlip );

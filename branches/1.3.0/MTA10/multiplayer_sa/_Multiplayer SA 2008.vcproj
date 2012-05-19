@@ -377,10 +377,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CMultiplayerSA_WorldSound.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\COffsets.cpp"
 				>
 			</File>

@@ -1431,6 +1431,26 @@ namespace SharedUtil
     #define IMPLEMENT_FIXED_ARRAY( vartype, varname ) \
         SFixedArrayInit < vartype, NUMELMS( _##varname ) > varname ( _##varname, NUMELMS( _##varname ) )
 
+
+    //
+    //  Ranges of numbers. i.e. 100-4000, 5000-6999, 7000-7010
+    //
+    class CRanges
+    {
+    public:
+        void    SetRange                    ( uint uiStart, uint uiLength );
+        void    UnsetRange                  ( uint uiStart, uint uiLength );
+        bool    IsRangeSet                  ( uint uiStart, uint uiLength );    // Returns true if any part of the range already exists in the map
+
+    protected:
+        typedef std::map < uint, uint >::iterator IterType;
+
+        void    RemoveObscuredRanges        ( uint uiStart, uint uiLast );
+        bool    GetRangeOverlappingPoint    ( uint uiPoint, IterType& result );
+
+        std::map < uint, uint >     m_StartLastMap;
+    };
+
 };
 
 using namespace SharedUtil;

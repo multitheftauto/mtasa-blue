@@ -37,6 +37,40 @@
 #define CLASS_CAudioEngine                      0xB6BC90
 #define CLASS_AERadioTrackManager               0x8CB6F8
 #define CLASS_AECutsceneTrackManager            0x8AE554
+
+class CAEAudioEntity;
+
+class CAESound
+{
+public:
+    ushort  usGroup;    //+0
+    ushort  usIndex;    //+2
+    CAEAudioEntity*         pAudioEntity;   //+4
+    CEntitySAInterface*     pGameEntity;    //+8    Either a player or NULL
+    int     a;          //+c  = 3
+    float   b;          //+10 = -1.f
+    float   c;          //+14 = -50.f
+    float   fVolume;    //+18 = 1.f
+    float   fPitch;     //+1c = 1.f
+    uint    d;          //+20
+    CVector vec1;       //+24 = Position of player?
+    CVector vec2;       //+30 = Position of player?
+    int     e;          //+3c = 1,621         set from framecounter, no set pos if non zero
+    int     f;          //+40 = 300           time in milliseconds
+    int     g;          //+44 = 300           set from framecounter
+    float   h;          //+48 = 2997.3567f    start something?
+    float   j;          //+4c = 2997.3567f    current something?
+    float   k;          //+50 = 1.0f
+    ushort  l;          //+54 = 31488
+    ushort  m;          //+56 = 1005
+    int     n;          //+58 = 1
+    int     o;          //+5C = 0
+    float   p;          //+60 = -100.f
+    float   q;          //+64 = 1.f
+    ushort  r;          //+68 = 0         (1 on stop)
+    ushort  s;          //+6a = 114       
+};
+
 class CAudioSA : public CAudio
 {
 public:
@@ -59,8 +93,13 @@ public:
     void SetAmbientSoundEnabled ( eAmbientSoundType eType, bool bEnabled );
     bool IsAmbientSoundEnabled ( eAmbientSoundType eType );
     void ResetAmbientSounds ( void );
+    void SetWorldSoundEnabled ( uint uiGroup, uint uiIndex, bool bEnabled );
+    bool IsWorldSoundEnabled ( uint uiGroup, uint uiIndex );
+    void ResetWorldSounds ( void );
+    void SetWorldSoundHandler ( WorldSoundHandler * pHandler );
 
     void UpdateAmbientSoundSettings ( void );
+    bool OnWorldSound ( CAESound* pAESound );
 
     bool            m_bRadioOn;
     bool            m_bRadioMuted;
@@ -68,6 +107,8 @@ public:
     bool            m_bAmbientSoundsPaused;
     bool            m_bAmbientGeneralEnabled;
     bool            m_bAmbientGunfireEnabled;
+    CRanges         m_DisabledWorldSounds;
+    WorldSoundHandler* m_pWorldSoundHandler;
 };
 
 #endif
