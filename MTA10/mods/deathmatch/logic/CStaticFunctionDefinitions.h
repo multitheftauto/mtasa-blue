@@ -281,6 +281,9 @@ public:
     static bool                         SetAmbientSoundEnabled              ( eAmbientSoundType eType, bool bMute );
     static bool                         IsAmbientSoundEnabled               ( eAmbientSoundType eType, bool& bOutMute );
     static bool                         ResetAmbientSounds                  ( void );
+    static bool                         SetWorldSoundEnabled                ( uint uiGroup, uint uiIndex, bool bMute );
+    static bool                         IsWorldSoundEnabled                 ( uint uiGroup, uint uiIndex, bool& bOutMute );
+    static bool                         ResetWorldSounds                    ( void );
 
     // Blip funcs
     static CClientRadarMarker*          CreateBlip                          ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance );

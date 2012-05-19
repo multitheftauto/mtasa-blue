@@ -3670,6 +3670,27 @@ bool CStaticFunctionDefinitions::ResetAmbientSounds ( void )
 }
 
 
+bool CStaticFunctionDefinitions::SetWorldSoundEnabled ( uint uiGroup, uint uiIndex, bool bMute )
+{
+    g_pGame->GetAudio ()->SetWorldSoundEnabled ( uiGroup, uiIndex, bMute );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::IsWorldSoundEnabled ( uint uiGroup, uint uiIndex, bool& bOutMute )
+{
+    bOutMute = g_pGame->GetAudio ()->IsWorldSoundEnabled ( uiGroup, uiIndex );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::ResetWorldSounds ( void )
+{
+    g_pGame->GetAudio ()->ResetWorldSounds ();
+    return true;
+}
+
+
 CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance )
 {
     CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance );
