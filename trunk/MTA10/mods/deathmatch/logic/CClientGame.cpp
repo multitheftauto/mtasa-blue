@@ -412,6 +412,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetGameVehicleDestructHandler( NULL );
     g_pMultiplayer->SetGamePlayerDestructHandler( NULL );
     g_pMultiplayer->SetGameModelRemoveHandler( NULL );
+    g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( NULL );
@@ -4955,6 +4956,9 @@ void CClientGame::ResetMapInfo ( void )
     // Ambient sounds
     g_pGame->GetAudio ()->ResetAmbientSounds ();
 
+    // World sounds
+    g_pGame->GetAudio ()->ResetWorldSounds ();
+
     // Cheats
     g_pGame->ResetCheats ();
 
@@ -5754,3 +5758,48 @@ bool CClientGame::GetWeaponTypeUsesBulletSync ( eWeaponType weaponType )
 {
     return MapContains ( m_weaponTypesUsingBulletSync, weaponType );
 }
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::SetDevelopmentMode
+//
+// Special mode which enables commands such as showcol and showsound
+//
+//////////////////////////////////////////////////////////////////
+void CClientGame::SetDevelopmentMode ( bool bEnable )
+{
+    m_bDevelopmentMode = bEnable;
+
+    if ( m_bDevelopmentMode )
+        g_pGame->GetAudio ()->SetWorldSoundHandler ( CClientGame::StaticWorldSoundHandler );
+    else
+        g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::StaticWorldSoundHandler
+//
+// Handle callback from CAudioSA when a world sound is played
+//
+//////////////////////////////////////////////////////////////////
+void CClientGame::StaticWorldSoundHandler ( uint uiGroup, uint uiIndex )
+{
+    g_pClientGame->WorldSoundHandler ( uiGroup, uiIndex );
+} 
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::WorldSoundHandler
+//
+// Handle callback from CAudioSA when a world sound is played
+//
+//////////////////////////////////////////////////////////////////
+void CClientGame::WorldSoundHandler ( uint uiGroup, uint uiIndex )
+{
+    if ( m_bShowSound )
+        m_pScriptDebugging->LogInformation ( NULL, "%s - World sound group:%d index:%d", *GetLocalTimeString ( false, true ), uiGroup, uiIndex );
+} 

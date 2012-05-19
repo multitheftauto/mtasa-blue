@@ -405,6 +405,9 @@ public:
     LUA_DECLARE ( SetAmbientSoundEnabled );
     LUA_DECLARE ( IsAmbientSoundEnabled );
     LUA_DECLARE ( ResetAmbientSounds );
+    LUA_DECLARE ( SetWorldSoundEnabled );
+    LUA_DECLARE ( IsWorldSoundEnabled );
+    LUA_DECLARE ( ResetWorldSounds );
 
     // Blip funcs
     LUA_DECLARE ( CreateBlip );
