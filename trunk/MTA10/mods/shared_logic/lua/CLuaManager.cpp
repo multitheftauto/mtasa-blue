@@ -272,7 +272,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getLatentEventHandles", CLuaFunctionDefs::GetLatentEventHandles );
     CLuaCFunctions::AddFunction ( "getLatentEventStatus", CLuaFunctionDefs::GetLatentEventStatus );
     CLuaCFunctions::AddFunction ( "cancelLatentEvent", CLuaFunctionDefs::CancelLatentEvent );
-    CLuaCFunctions::AddFunction ( "setSFXParams", CLuaFunctionDefs::setSFXParams );
 
     // Output funcs
     CLuaCFunctions::AddFunction ( "outputConsole", CLuaFunctionDefs::OutputConsole );

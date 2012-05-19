@@ -3848,7 +3848,7 @@ void CClientVehicle::RemoveVehicleSirens ( void )
     for ( unsigned char i = 0; i < 7; i++ )
     {
         SetVehicleSirenPosition( i, CVector ( 0, 0, 0 ) );
-        SetVehicleSirenMinimumAlpha( i, 0 );
+        SetVehicleSirenMinimumAlpha( i, 0.0f );
         SetVehicleSirenColour( i, SColor ( ) );
     }
 }

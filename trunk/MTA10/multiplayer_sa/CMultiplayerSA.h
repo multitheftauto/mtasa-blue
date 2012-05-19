@@ -46,7 +46,6 @@ public:
     void                        InitHooks_ClothesSpeedUp ( void );
     void                        InitHooks_FixBadAnimId ( void );
     void                        InitHooks_HookDestructors ( void );
-    void                        InitHooks_WorldSound ( void );
     void                        InitHooks_RwResources ( void );
     void                        InitHooks_ClothesCache ( void );
     CRemoteDataStorage *        CreateRemoteDataStorage     ();
@@ -90,7 +89,6 @@ public:
     void                        SetVehicleCollisionHandler  ( VehicleCollisionHandler * pHandler );
     void                        SetHeliKillHandler          ( HeliKillHandler * pHandler );
     void                        SetWaterCannonHitHandler    ( WaterCannonHitHandler * pHandler );
-    void                        SetWorldSoundHandler        ( WorldSoundHandler * pHandler );
     void                        SetGameObjectDestructHandler    ( GameObjectDestructHandler * pHandler );
     void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler );
     void                        SetGamePlayerDestructHandler    ( GamePlayerDestructHandler * pHandler );

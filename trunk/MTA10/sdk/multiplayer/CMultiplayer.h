@@ -38,7 +38,7 @@ struct SClothesCacheStats
 
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
-struct SSFXParams;
+
 typedef bool ( ExplosionHandler ) ( class CEntity* pExplodingEntity, class CEntity* pCreator, const CVector& vecPosition, enum eExplosionType ExplosionType );
 typedef void ( PreContextSwitchHandler ) ( class CPlayerPed* pPlayer );
 typedef void ( PostContextSwitchHandler ) ( void );
@@ -66,26 +66,11 @@ typedef bool ( ProcessCollisionHandler ) ( class CEntitySAInterface* pThisInterf
 typedef bool ( VehicleCollisionHandler ) ( class CVehicleSAInterface* pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity );
 typedef bool ( HeliKillHandler ) ( class CVehicleSAInterface* pVehicle, class CPedSAInterface* pPed );
 typedef bool ( WaterCannonHitHandler ) ( class CVehicleSAInterface* pCannonVehicle, class CPedSAInterface* pHitPed );
-typedef bool ( WorldSoundHandler ) ( uint uiGroup, uint uiIndex, SSFXParams * tPitch );
 typedef void ( GameObjectDestructHandler ) ( CEntitySAInterface* pObject );
 typedef void ( GameVehicleDestructHandler ) ( CEntitySAInterface* pVehicle );
 typedef void ( GamePlayerDestructHandler ) ( CEntitySAInterface* pPlayer );
 typedef void ( GameModelRemoveHandler ) ( ushort usModelId );
-struct SSFXParams
-{
-    SSFXParams()
-    {
-        m_fVolume = 0.0f;
-        m_fPitch = -1.0f;
-    };
-    SSFXParams( float fVolume, float fPitch )
-    {
-        m_fVolume = fVolume;
-        m_fPitch = fPitch;
-    };
-    float m_fVolume;
-    float m_fPitch;
-};
+
 /**
  * This class contains information used for shot syncing, one exists per player.
  */
@@ -184,7 +169,6 @@ public:
     virtual void                        SetVehicleCollisionHandler  ( VehicleCollisionHandler * pHandler ) = 0;
     virtual void                        SetHeliKillHandler          ( HeliKillHandler * pHandler ) = 0;
     virtual void                        SetWaterCannonHitHandler    ( WaterCannonHitHandler * pHandler ) = 0;
-    virtual void                        SetWorldSoundHandler        ( WorldSoundHandler * pHandler ) = 0;
     virtual void                        SetGameObjectDestructHandler    ( GameObjectDestructHandler * pHandler ) = 0;
     virtual void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler ) = 0;
     virtual void                        SetGamePlayerDestructHandler    ( GamePlayerDestructHandler * pHandler ) = 0;
