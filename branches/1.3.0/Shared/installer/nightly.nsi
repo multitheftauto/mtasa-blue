@@ -426,6 +426,7 @@ DontInstallRedist:
 			File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\loader.dll"
             File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
+            File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
 
             !ifndef LIGHTBUILD
 
@@ -438,7 +439,6 @@ DontInstallRedist:
 				File "${FILES_ROOT}\MTA San Andreas\mta\bass_aac.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\bass_ac3.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 				File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
 				File "${FILES_ROOT}\MTA San Andreas\mta\pthreadVC2.dll"
