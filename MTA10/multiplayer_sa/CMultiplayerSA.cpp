@@ -28,6 +28,13 @@
 extern CCoreInterface* g_pCore;
 extern CMultiplayerSA* pMultiplayer;
 
+
+CEntitySAInterface* CMultiplayerSA::GetCurrentRenderingEntity   ( void )
+{
+    return NULL;
+}
+
+
 using namespace std;
 
 char* CMultiplayerSA::ms_PlayerImgCachePtr = NULL;
@@ -4426,8 +4433,6 @@ void _declspec(naked) HOOK_CGame_Process ()
 DWORD CALL_CGame_Process = 0x53BEE0;
 void _declspec(naked) HOOK_Idle ()
 {
-    pMultiplayer->EnableHooks_ClothesMemFix ( g_pCore->GetDiagnosticDebug () != EDiagnosticDebug::FPS_6934 );
-
     TIMING_CHECKPOINT( "+CGame_Process" );
     _asm
     {

@@ -10,6 +10,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+extern CCoreInterface* g_pCore;
 
 namespace
 {
@@ -270,6 +271,49 @@ void _declspec(naked) HOOK_RwGeometryDestroy ()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CallIdle
+//
+// Profile call to function 'Idle'
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_CallIdle_Pre( DWORD calledFrom )
+{
+    TIMING_CHECKPOINT( "+CallIdle1" );
+}
+
+void OnMY_CallIdle_Post( RwGeometry* pGeometry, DWORD calledFrom )
+{
+    TIMING_CHECKPOINT( "-CallIdle2" );
+}
+
+// Hook info
+#define HOOKPOS_CallIdle                         0x53ECBD
+#define HOOKSIZE_CallIdle                        5
+DWORD RETURN_CallIdle =                          0x53ECC2;
+DWORD DO_CallIdle =                          0x53E920;
+void _declspec(naked) HOOK_CallIdle()
+{
+    _asm
+    {
+        pushad
+        call    OnMY_CallIdle_Pre
+        popad
+
+        push    [esp+4*1]
+        call    DO_CallIdle
+        add     esp, 4*1
+
+        pushad
+        call    OnMY_CallIdle_Post
+        popad
+
+        jmp     RETURN_CallIdle
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::GetRwResourceStats
 //
 //
@@ -297,4 +341,5 @@ void CMultiplayerSA::InitHooks_RwResources ( void )
     EZHookInstall ( RwRasterDestroy );
     EZHookInstall ( RwGeometryCreate );
     EZHookInstall ( RwGeometryDestroy );
+    EZHookInstall ( CallIdle );
 }
