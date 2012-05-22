@@ -399,7 +399,7 @@ int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
 //  element dxCreateTexture( string pixels [, string textureFormat = "argb", bool mipmaps = true, string textureEdge = "wrap" ] )
 //  element dxCreateTexture( int width, int height [, string textureFormat = "argb", string textureEdge = "wrap", string textureType = "2d", int depth ] )
     SString strFilePath; CPixels pixels; int width; int height; ERenderFormat renderFormat; bool bMipMaps;
-    ETextureAddress textureAddress; ETextureType textureType; int depth;
+    ETextureAddress textureAddress; ETextureType textureType; int depth = 1;
 
     CScriptArgReader argStream ( luaVM );
     if ( !argStream.NextIsNumber () )
