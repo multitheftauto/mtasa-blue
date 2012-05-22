@@ -1218,3 +1218,67 @@ void CResourceManager::ReevaluateMinClientRequirement ( void )
     if ( strBefore != strAfter && !strAfter.empty () )
         CLogger::LogPrintf ( SString ( "Server minclientversion is now %s\n", *strAfter ) );
 }
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CResourceManager::ApplySyncMapElementDataOption
+//
+// If resource has a sync_map_element_data, add it to the list
+//
+/////////////////////////////////////////////////////////////////////////////
+void CResourceManager::ApplySyncMapElementDataOption ( CResource* pResource, bool bSyncMapElementData )
+{
+    MapSet ( m_SyncMapElementDataOptionMap, pResource, bSyncMapElementData );
+    ReevaluateSyncMapElementDataOption ();
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CResourceManager::RemoveSyncMapElementDataOption
+//
+// Remove any previous sync_map_element_data associated with the resource
+//
+/////////////////////////////////////////////////////////////////////////////
+void CResourceManager::RemoveSyncMapElementDataOption ( CResource* pResource )
+{
+    if ( MapContains ( m_SyncMapElementDataOptionMap, pResource ) )
+    {
+        MapRemove ( m_SyncMapElementDataOptionMap, pResource );
+        ReevaluateSyncMapElementDataOption ();
+    }
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CResourceManager::ReevaluateSyncMapElementDataOption
+//
+// Recalculate effective sync_map_element_data from all running resources
+//  and tell the config to apply it
+//
+/////////////////////////////////////////////////////////////////////////////
+void CResourceManager::ReevaluateSyncMapElementDataOption ( void )
+{
+    bool bSyncMapElementData = true;
+    for ( std::map < CResource*, bool >::iterator iter = m_SyncMapElementDataOptionMap.begin () ; iter != m_SyncMapElementDataOptionMap.end () ; ++iter )
+    {
+        if ( iter->second )
+        {
+            bSyncMapElementData = true;    // Any 'true' will stop the set
+            break;
+        }
+        else
+            bSyncMapElementData = false;     // Need at least one 'false' to set
+    }
+
+    // Apply
+    bool bBefore = g_pGame->GetConfig ()->GetSyncMapElementData ();
+    g_pGame->GetConfig ()->SetSyncMapElementData ( bSyncMapElementData );
+    bool bAfter = g_pGame->GetConfig ()->GetSyncMapElementData ();
+
+    // Log change
+    if ( bBefore != bAfter )
+        CLogger::LogPrintf ( SString ( "SyncMapElementData is now %s\n", bAfter ? "enabled" : "disabled" ) );
+}
