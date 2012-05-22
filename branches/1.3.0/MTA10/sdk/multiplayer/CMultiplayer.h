@@ -280,6 +280,7 @@ public:
 
     virtual void                        GetRwResourceStats          ( SRwResourceStats& outStats ) = 0;
     virtual void                        GetClothesCacheStats        ( SClothesCacheStats& outStats ) = 0;
+    virtual CEntitySAInterface*         GetRenderingGameEntity      ( void ) = 0;
 };
 
 #endif

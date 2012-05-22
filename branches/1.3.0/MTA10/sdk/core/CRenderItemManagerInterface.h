@@ -33,6 +33,7 @@ class CD3DDUMMY;
 class CSHADERDUMMY;
 class CEffectCloner;
 class CPixels;
+class CClientEntityBase;
 
 #define RDEFAULT            ((uint) -1)
 
@@ -128,8 +129,9 @@ public:
     virtual void                UpdateBackBufferCopy                ( void ) = 0;
     virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem, bool bResampleNow ) = 0;
     virtual CShaderItem*        GetAppliedShaderForD3DData          ( CD3DDUMMY* pD3DData ) = 0;
-    virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch ) = 0;
-    virtual bool                RemoveShaderItemFromWorldTexture    ( CShaderItem* pShaderItem, const SString& strTextureNameMatch ) = 0;
+    virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity ) = 0;
+    virtual bool                RemoveShaderItemFromWorldTexture    ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity ) = 0;
+    virtual void                RemoveClientEntityRefs              ( CClientEntityBase* pClientEntity ) = 0;
     virtual void                GetVisibleTextureNames              ( std::vector < SString >& outNameList, const SString& strTextureNameMatch, ushort usModelID ) = 0;
     virtual eDxTestMode         GetTestMode                         ( void ) = 0;
     virtual void                SetTestMode                         ( eDxTestMode testMode ) = 0;

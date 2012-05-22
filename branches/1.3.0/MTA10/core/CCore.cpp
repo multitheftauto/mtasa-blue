@@ -1788,6 +1788,7 @@ void CCore::EnsureFrameRateLimitApplied ( void )
 //
 void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 {
+    TIMING_CHECKPOINT( "-CallIdle1" );
     ms_TimingCheckpoints.EndTimingCheckpoints ();
 
     // Frame rate limit stuff starts here
@@ -1845,6 +1846,7 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 void CCore::DoReliablePulse ( void )
 {
     ms_TimingCheckpoints.BeginTimingCheckpoints ();
+    TIMING_CHECKPOINT( "+CallIdle2" );
 
     // Non frame rate limit stuff
     if ( IsWindowMinimized () )

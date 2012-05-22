@@ -669,6 +669,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderItemManager.TextureReplace.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CScreenGrabber.cpp"
 				>
 			</File>
@@ -1177,6 +1181,10 @@
 					>
 					<File
 						RelativePath="..\sdk\core\CClientBase.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\CClientEntityBase.h"
 						>
 					</File>
 					<File

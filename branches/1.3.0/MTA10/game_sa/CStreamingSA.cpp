@@ -87,7 +87,7 @@ void CStreamingSA::LoadAllRequestedModels ( BOOL bOnlyPriorityModels, const char
         add     esp, 4
     }
 
-    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::FPS_6934 )
+    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::LOG_TIMING_0000 )
     {
         uint deltaTimeMs = ( GetTimeUs () - startTime ) / 1000;
         if ( deltaTimeMs > 2 )

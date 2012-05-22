@@ -197,6 +197,7 @@ public:
 
     virtual void                GetRwResourceStats          ( SRwResourceStats& outStats );
     virtual void                GetClothesCacheStats        ( SClothesCacheStats& outStats );
+    virtual CEntitySAInterface* GetRenderingGameEntity      ( void );
 
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;

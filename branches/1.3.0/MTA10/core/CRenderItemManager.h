@@ -10,6 +10,8 @@
 *
 *****************************************************************************/
 
+struct SNameMatchInfo;
+
 //
 // CRenderItemManager
 //
@@ -36,8 +38,9 @@ public:
     virtual void                UpdateBackBufferCopy                ( void );
     virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem, bool bResampleNow );
     virtual CShaderItem*        GetAppliedShaderForD3DData          ( CD3DDUMMY* pD3DData );
-    virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch );
-    virtual bool                RemoveShaderItemFromWorldTexture    ( CShaderItem* pShaderItem, const SString& strTextureNameMatch );
+    virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity );
+    virtual bool                RemoveShaderItemFromWorldTexture    ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity );
+    virtual void                RemoveClientEntityRefs              ( CClientEntityBase* pClientEntity );
     virtual void                GetVisibleTextureNames              ( std::vector < SString >& outNameList, const SString& strTextureNameMatch, ushort usModelID );
     virtual eDxTestMode         GetTestMode                         ( void )                    { return m_TestMode; }
     virtual void                SetTestMode                         ( eDxTestMode testMode );
@@ -57,6 +60,9 @@ public:
     static void                 StaticWatchCallback                 ( CSHADERDUMMY* pShaderItem, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld );
     void                        UpdateMemoryUsage                   ( void );
     bool                        CanCreateRenderItem                 ( ClassId classId );
+    SNameMatchInfo*             GetNameMatchInfo                    ( const SString& strTextureNameMatch );
+    void                        RemoveNameMatchInfo                 ( SNameMatchInfo* pNameMatchInfo );
+    CClientEntityBase*          GetRenderingClientEntity            ( void );
 
     static int                  GetBitsPerPixel                     ( D3DFORMAT Format );
     static int                  CalcD3DResourceMemoryKBUsage        ( IDirect3DResource9* pD3DResource );
@@ -79,9 +85,10 @@ protected:
     std::set < CD3DDUMMY* >                     m_PrevFrameTextureUsage;
 
     // Shaders applied to world textures
-    std::map < CD3DDUMMY*, CSHADERDUMMY* >      m_D3DDataShaderMap;
+    std::map < CD3DDUMMY*, SNameMatchInfo* >    m_D3DDataShaderMap;
     class CRenderWare*                          m_pRenderWare;
     CEffectCloner*                              m_pEffectCloner;
+    std::map < SString, SNameMatchInfo* >       m_NameMatchInfoMap;
 
     eDxTestMode                                 m_TestMode;
     SString                                     m_strVideoCardName;

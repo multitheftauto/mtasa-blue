@@ -10,10 +10,12 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+extern CCoreInterface* g_pCore;
 
 namespace
 {
     SRwResourceStats ms_Stats;
+    CEntitySAInterface* ms_RenderingEntity = NULL;
 }
 
 
@@ -270,6 +272,96 @@ void _declspec(naked) HOOK_RwGeometryDestroy ()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CallIdle
+//
+// Profile call to function 'Idle'
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_CallIdle_Pre( DWORD calledFrom )
+{
+    TIMING_CHECKPOINT( "+CallIdle1" );
+}
+
+void OnMY_CallIdle_Post( RwGeometry* pGeometry, DWORD calledFrom )
+{
+    TIMING_CHECKPOINT( "-CallIdle2" );
+}
+
+// Hook info
+#define HOOKPOS_CallIdle                         0x53ECBD
+#define HOOKSIZE_CallIdle                        5
+DWORD RETURN_CallIdle =                          0x53ECC2;
+DWORD DO_CallIdle =                          0x53E920;
+void _declspec(naked) HOOK_CallIdle()
+{
+    _asm
+    {
+        pushad
+        call    OnMY_CallIdle_Pre
+        popad
+
+        push    [esp+4*1]
+        call    DO_CallIdle
+        add     esp, 4*1
+
+        pushad
+        call    OnMY_CallIdle_Post
+        popad
+
+        jmp     RETURN_CallIdle
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CEntity::Render
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_CEntity_Render_Pre( CEntitySAInterface* pEntity )
+{
+    ms_RenderingEntity = pEntity;
+}
+
+void OnMY_CEntity_Render_Post( CEntitySAInterface* pEntity )
+{
+}
+
+// Hook info
+#define HOOKPOS_CEntity_Render                         0x534310
+#define HOOKSIZE_CEntity_Render                        7
+DWORD RETURN_CEntity_Render =                          0x534317;
+void _declspec(naked) HOOK_CEntity_Render()
+{
+    _asm
+    {
+        pushad
+        push    ecx
+        call    OnMY_CEntity_Render_Pre
+        add     esp, 4*1
+        popad
+
+        call inner
+
+        pushad
+        push    ecx
+        call    OnMY_CEntity_Render_Post
+        add     esp, 4*1
+        popad
+        retn
+
+inner:
+        push    ecx  
+        push    esi  
+        mov     esi,ecx 
+        mov     eax,dword ptr [esi+18h] 
+        jmp     RETURN_CEntity_Render
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::GetRwResourceStats
 //
 //
@@ -277,6 +369,18 @@ void _declspec(naked) HOOK_RwGeometryDestroy ()
 void CMultiplayerSA::GetRwResourceStats ( SRwResourceStats& outStats )
 {
     outStats = ms_Stats;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CMultiplayerSA::GetRenderingGameEntity
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+CEntitySAInterface* CMultiplayerSA::GetRenderingGameEntity ( void )
+{
+    return ms_RenderingEntity;
 }
 
 
@@ -297,4 +401,6 @@ void CMultiplayerSA::InitHooks_RwResources ( void )
     EZHookInstall ( RwRasterDestroy );
     EZHookInstall ( RwGeometryCreate );
     EZHookInstall ( RwGeometryDestroy );
+    EZHookInstall ( CallIdle );
+    EZHookInstall ( CEntity_Render );
 }
