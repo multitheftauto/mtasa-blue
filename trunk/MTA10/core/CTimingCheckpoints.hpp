@@ -50,7 +50,7 @@ public:
     ////////////////////////////////////////
     void BeginTimingCheckpoints ( void )
     {
-        bool bEnabled = ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::FPS_6934 );
+        bool bEnabled = ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::LOG_TIMING_0000 );
 
         if ( bEnabled != m_bEnabled )
         {
@@ -58,7 +58,9 @@ public:
             if ( bEnabled )
             {
                 ClearLog ();
-                AppendLog ( "Started timing checkpoints" );
+                AppendLog ( SString ( "Started timing checkpoints [Ver:%d.%d.%d-%d.%05d] [Date:%s]"
+                                    ,MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD
+                                    ,*GetLocalTimeString ( true ).SplitLeft ( " " ) ) );
             }
             else
                 AppendLog ( "Stopped timing checkpoints" );

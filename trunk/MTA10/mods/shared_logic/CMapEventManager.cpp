@@ -336,7 +336,7 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                     TIMEUS deltaTimeUs = GetTimeUs() - startTime;
 
                     if ( deltaTimeUs > 3000 ) 
-                        if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::FPS_6934 )
+                        if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::LOG_TIMING_0000 )
                             strStatus += SString ( " (%s %d ms)", pMapEvent->GetVM ()->GetScriptName (), deltaTimeUs / 1000 );
 
                     CClientPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pMapEvent->GetVM (), szName, deltaTimeUs );
@@ -354,7 +354,7 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
         m_bIteratingList = false;
     }
 
-    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::FPS_6934 )
+    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::LOG_TIMING_0000 )
     {
         TIMEUS deltaTimeUs = GetTimeUs() - startTime;
         if ( deltaTimeUs > 5000 )

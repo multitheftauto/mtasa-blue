@@ -814,13 +814,13 @@ void CClientGame::DoPulsePostFrame ( void )
 
         // Draw notice text if diagnostic mode enabled
         EDiagnosticDebugType diagnosticDebug = g_pCore->GetDiagnosticDebug ();
-        if ( diagnosticDebug == EDiagnosticDebug::FPS_6934 )
+        if ( diagnosticDebug == EDiagnosticDebug::LOG_TIMING_0000 )
         {
             CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
             unsigned int uiHeight = pGraphics->GetViewportHeight ();
             unsigned int uiWidth = pGraphics->GetViewportWidth ();
             unsigned int uiPosY = uiHeight - 30;
-            pGraphics->DrawText ( uiWidth - 185, uiPosY, 0xffffff00, 1, "Debug setting: #6934 FPS" );
+            pGraphics->DrawText ( uiWidth - 185, uiPosY, 0xffffff00, 1, "Debug setting: #0000 Log timing" );
         }
 
         // Adjust the streaming memory limit.
