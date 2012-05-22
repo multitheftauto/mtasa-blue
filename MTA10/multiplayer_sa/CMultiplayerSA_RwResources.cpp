@@ -15,6 +15,7 @@ extern CCoreInterface* g_pCore;
 namespace
 {
     SRwResourceStats ms_Stats;
+    CEntitySAInterface* ms_RenderingEntity = NULL;
 }
 
 
@@ -314,6 +315,53 @@ void _declspec(naked) HOOK_CallIdle()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CEntity::Render
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_CEntity_Render_Pre( CEntitySAInterface* pEntity )
+{
+    ms_RenderingEntity = pEntity;
+}
+
+void OnMY_CEntity_Render_Post( CEntitySAInterface* pEntity )
+{
+}
+
+// Hook info
+#define HOOKPOS_CEntity_Render                         0x534310
+#define HOOKSIZE_CEntity_Render                        7
+DWORD RETURN_CEntity_Render =                          0x534317;
+void _declspec(naked) HOOK_CEntity_Render()
+{
+    _asm
+    {
+        pushad
+        push    ecx
+        call    OnMY_CEntity_Render_Pre
+        add     esp, 4*1
+        popad
+
+        call inner
+
+        pushad
+        push    ecx
+        call    OnMY_CEntity_Render_Post
+        add     esp, 4*1
+        popad
+        retn
+
+inner:
+        push    ecx  
+        push    esi  
+        mov     esi,ecx 
+        mov     eax,dword ptr [esi+18h] 
+        jmp     RETURN_CEntity_Render
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::GetRwResourceStats
 //
 //
@@ -321,6 +369,18 @@ void _declspec(naked) HOOK_CallIdle()
 void CMultiplayerSA::GetRwResourceStats ( SRwResourceStats& outStats )
 {
     outStats = ms_Stats;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CMultiplayerSA::GetRenderingGameEntity
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+CEntitySAInterface* CMultiplayerSA::GetRenderingGameEntity ( void )
+{
+    return ms_RenderingEntity;
 }
 
 
@@ -342,4 +402,5 @@ void CMultiplayerSA::InitHooks_RwResources ( void )
     EZHookInstall ( RwGeometryCreate );
     EZHookInstall ( RwGeometryDestroy );
     EZHookInstall ( CallIdle );
+    EZHookInstall ( CEntity_Render );
 }

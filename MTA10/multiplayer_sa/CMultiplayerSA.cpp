@@ -28,13 +28,6 @@
 extern CCoreInterface* g_pCore;
 extern CMultiplayerSA* pMultiplayer;
 
-
-CEntitySAInterface* CMultiplayerSA::GetCurrentRenderingEntity   ( void )
-{
-    return NULL;
-}
-
-
 using namespace std;
 
 char* CMultiplayerSA::ms_PlayerImgCachePtr = NULL;

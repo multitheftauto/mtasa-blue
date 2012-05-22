@@ -25,6 +25,7 @@ class CClientEntity;
 #include <assert.h>
 #include <list>
 #include <google/dense_hash_map>
+#include <core/CClientEntityBase.h>
 class CLuaFunctionRef;
 
 // Used to check fast version of getElementsByType
@@ -135,7 +136,7 @@ enum eCClientEntityClassTypes
 };
 
 
-class CClientEntity
+class CClientEntity : public CClientEntityBase
 {
     DECLARE_BASE_CLASS( CClientEntity )
 public:
