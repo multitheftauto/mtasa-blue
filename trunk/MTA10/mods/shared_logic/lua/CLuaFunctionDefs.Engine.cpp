@@ -484,16 +484,17 @@ int CLuaFunctionDefs::EngineReplaceVehiclePart ( lua_State* luaVM )
 
 int CLuaFunctionDefs::EngineApplyShaderToWorldTexture ( lua_State* luaVM )
 {
-//  bool engineApplyShaderToWorldTexture ( element shader, string textureName  )
-    CClientShader* pShader; SString strTextureNameMatch;
+//  bool engineApplyShaderToWorldTexture ( element shader, string textureName, [ element targetElement ] )
+    CClientShader* pShader; SString strTextureNameMatch; CClientEntity* pElement;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pShader );
     argStream.ReadString ( strTextureNameMatch );
+    argStream.ReadUserData ( pElement, NULL );
 
     if ( !argStream.HasErrors () )
     {
-        bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->ApplyShaderItemToWorldTexture ( pShader->GetShaderItem (), strTextureNameMatch );
+        bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->ApplyShaderItemToWorldTexture ( pShader->GetShaderItem (), strTextureNameMatch, pElement );
         lua_pushboolean ( luaVM, bResult );
         return 1;
     }
@@ -508,16 +509,17 @@ int CLuaFunctionDefs::EngineApplyShaderToWorldTexture ( lua_State* luaVM )
 
 int CLuaFunctionDefs::EngineRemoveShaderFromWorldTexture ( lua_State* luaVM )
 {
-//  bool engineRemoveShaderFromWorldTexture ( element shader, string textureName )
-    CClientShader* pShader; SString strTextureNameMatch;
+//  bool engineRemoveShaderFromWorldTexture ( element shader, string textureName, [ element targetElement ] )
+    CClientShader* pShader; SString strTextureNameMatch; CClientEntity* pElement;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pShader );
     argStream.ReadString ( strTextureNameMatch );
+    argStream.ReadUserData ( pElement, NULL );
 
     if ( !argStream.HasErrors () )
     {
-        bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->RemoveShaderItemFromWorldTexture ( pShader->GetShaderItem (), strTextureNameMatch );
+        bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->RemoveShaderItemFromWorldTexture ( pShader->GetShaderItem (), strTextureNameMatch, pElement );
         lua_pushboolean ( luaVM, bResult );
         return 1;
     }

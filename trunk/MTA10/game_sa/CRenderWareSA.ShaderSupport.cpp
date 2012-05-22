@@ -559,7 +559,7 @@ bool CRenderWareSA::IsFirstShadInfoHigherOrSamePriority ( SShadInfo* pShadInfoA,
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::FlushPendingAssociations ( void )
 {
-    if ( m_PendingTexInfoMap.empty () )
+    if ( m_PendingTexInfoMap.empty () && m_PendingShadInfoMap.empty () )
         return;
 
     TIMING_CHECKPOINT( "+FlushPendingAssociations" );

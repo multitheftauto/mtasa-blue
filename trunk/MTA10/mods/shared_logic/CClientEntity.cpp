@@ -170,6 +170,7 @@ CClientEntity::~CClientEntity ( void )
         CClientEntityRefManager::OnEntityDelete ( this );
 
     g_pClientGame->GetGameEntityXRefManager ()->OnClientEntityDelete ( this );
+    g_pCore->GetGraphics ()->GetRenderItemManager ()->RemoveClientEntityRefs ( this );
 }
 
 

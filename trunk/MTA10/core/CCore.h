@@ -39,6 +39,7 @@ class CCore;
 #include "CConsoleLogger.h"
 #include "CModManager.h"
 #include <core/CClientBase.h>
+#include <core/CClientEntityBase.h>
 #include <core/CCoreInterface.h>
 #include "CDirect3DData.h"
 #include "tracking/CTCPManager.h"
