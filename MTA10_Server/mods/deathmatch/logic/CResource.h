@@ -202,6 +202,9 @@ private:
     SString                 m_strMinClientReason;
     SString                 m_strMinServerReason;
 
+    bool                    m_bSyncMapElementData;
+    bool                    m_bSyncMapElementDataDefined;
+
     CChecksum               m_metaChecksum;     // Checksum of meta.xml last time this was loaded, generated in GenerateChecksums()
 
     unsigned short          m_usNetID; // resource ID    
