@@ -62,7 +62,7 @@ public:
     virtual                                 ~CNetServerBuffer               ( void );
 
     // CNetServer interface
-    virtual bool                            StartNetwork                    ( const char* szIP, unsigned short usServerPort, unsigned int uiAllowedPlayers );
+    virtual bool                            StartNetwork                    ( const char* szIP, unsigned short usServerPort, unsigned int uiAllowedPlayers, const char* szServerName );
     virtual void                            StopNetwork                     ( void );
     virtual void                            ResetNetwork                    ( void );
 
@@ -73,6 +73,7 @@ public:
     virtual bool                            GetNetworkStatistics            ( NetStatistics* pDest, const NetServerPlayerID& PlayerID );
     virtual const SPacketStat*              GetPacketStats                  ( void );
     virtual bool                            GetBandwidthStatistics          ( SBandwidthStatistics* pDest );
+    virtual void                            GetPingStatus                   ( SFixedString < 32 >* pstrStatus );
 
     virtual NetBitStreamInterface*          AllocateNetServerBitStream      ( unsigned short usBitStreamVersion );
     virtual void                            DeallocateNetServerBitStream    ( NetBitStreamInterface* bitStream );
@@ -94,6 +95,7 @@ public:
     virtual void                            SetChecks                       ( const char* szDisableComboACMap, const char* szDisableACMap, const char* szEnableSDMap, int iEnableClientChecks, bool bHideAC );
 
     virtual unsigned int                    GetPendingPacketCount           ( void );
+    virtual void                            GetNetRoute                     ( SFixedString < 32 >* pstrRoute );
 
     virtual bool                            InitServerId                    ( const char* szPath );
     virtual void                            SetEncryptionEnabled            ( bool bEncryptionEnabled );
@@ -123,7 +125,7 @@ public:
 
     typedef NetServerPlayerID NetServerPlayerIDRef;
 
-    DECLARE_FUNC_ARGS3R( bool,                  StartNetwork                    , const char*, szIP, unsigned short, usServerPort, unsigned int, uiAllowedPlayers );
+    DECLARE_FUNC_ARGS4R( bool,                  StartNetwork                    , const char*, szIP, unsigned short, usServerPort, unsigned int, uiAllowedPlayers, const char*, szServerName );
     DECLARE_FUNC_ARGS0 (                        StopNetwork                     );
     DECLARE_FUNC_ARGS0 (                        ResetNetwork                    );
     DECLARE_FUNC_ARGS0 (                        DoPulse                         );
@@ -131,6 +133,7 @@ public:
     DECLARE_FUNC_ARGS2R( bool,                  GetNetworkStatistics            , NetStatistics*, pDest, const NetServerPlayerIDRef, PlayerID );
     DECLARE_FUNC_ARGS0R( const SPacketStat*,    GetPacketStats                  );
     DECLARE_FUNC_ARGS1R( bool,                  GetBandwidthStatistics          , SBandwidthStatistics*, pDest );
+    DECLARE_FUNC_ARGS1 (                        GetPingStatus                   , SFixedString < 32 >*, pstrStatus );
     DECLARE_FUNC_ARGS7R( bool,                  SendPacket                      , unsigned char, ucPacketID, const NetServerPlayerIDRef, playerID, NetBitStreamInterface*, bitStream, bool, bBroadcast, NetServerPacketPriority, packetPriority, NetServerPacketReliability, packetReliability, ePacketOrdering, packetOrdering );
     DECLARE_FUNC_ARGS3 (                        GetPlayerIP                     , const NetServerPlayerIDRef, playerID, char*, strIP, unsigned short*, usPort );
     DECLARE_FUNC_ARGS1 (                        Kick                            , const NetServerPlayerIDRef, PlayerID );
@@ -140,6 +143,7 @@ public:
     DECLARE_FUNC_ARGS1 (                        ClearClientBitStreamVersion     , const NetServerPlayerIDRef, PlayerID );
     DECLARE_FUNC_ARGS5 (                        SetChecks                       , const char*, szDisableComboACMap, const char*, szDisableACMap, const char*, szEnableSDMap, int, iEnableClientChecks, bool, bHideAC );
     DECLARE_FUNC_ARGS0R( unsigned int,          GetPendingPacketCount           );
+    DECLARE_FUNC_ARGS1 (                        GetNetRoute                     , SFixedString < 32 >*, pstrRoute );
     DECLARE_FUNC_ARGS1R( bool,                  InitServerId                    , const char*, szPath );
     DECLARE_FUNC_ARGS1 (                        SetEncryptionEnabled            , bool, bEncryptionEnabled );
     DECLARE_FUNC_ARGS1 (                        ResendModPackets                , const NetServerPlayerIDRef, playerID );

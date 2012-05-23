@@ -374,6 +374,12 @@ std::string ASE::QueryLight ( void )
     SString strPlayerCount = SString ( "%d/%d", iJoinedPlayers, iMaxPlayers );
     SString strBuildType = SString ( "%d", MTASA_VERSION_TYPE );
     SString strBuildNumber = SString ( "%d", MTASA_VERSION_BUILD );
+    SFixedString < 32 > strPingStatusFixed;
+    SFixedString < 32 > strNetRouteFixed;
+    g_pNetServer->GetPingStatus ( &strPingStatusFixed );
+    g_pNetServer->GetNetRoute ( &strNetRouteFixed );
+    SString strPingStatus = strPingStatusFixed;
+    SString strNetRoute = strNetRouteFixed;
 
     reply << "EYE2";
     // game
@@ -389,7 +395,7 @@ std::string ASE::QueryLight ( void )
     reply << ( unsigned char ) ( m_strGameType.length() + 1 );
     reply << m_strGameType;
     // map name with backwardly compatible large player count, build type and build number
-    reply << ( unsigned char ) ( m_strMapName.length() + 1 + strPlayerCount.length () + 1 + strBuildType.length () + 1 + strBuildNumber.length () + 1 );
+    reply << ( unsigned char ) ( m_strMapName.length() + 1 + strPlayerCount.length () + 1 + strBuildType.length () + 1 + strBuildNumber.length () + 1 + strPingStatus.length () + 1 + strNetRoute.length () + 1 );
     reply << m_strMapName;
     reply << ( unsigned char ) 0;
     reply << strPlayerCount;
@@ -397,6 +403,10 @@ std::string ASE::QueryLight ( void )
     reply << strBuildType;
     reply << ( unsigned char ) 0;
     reply << strBuildNumber;
+    reply << ( unsigned char ) 0;
+    reply << strPingStatus;
+    reply << ( unsigned char ) 0;
+    reply << strNetRoute;
     // version
     std::string temp = MTA_DM_ASE_VERSION;
     reply << ( unsigned char ) ( temp.length() + 1 );
