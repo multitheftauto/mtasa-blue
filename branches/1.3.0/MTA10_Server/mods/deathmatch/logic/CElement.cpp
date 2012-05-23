@@ -467,7 +467,7 @@ void CElement::ReadCustomData ( CLuaMain* pLuaMain, CEvents* pEvents )
                 args.PushString ( pAttribute->GetValue ().c_str () );
 
             // Don't trigger onElementDataChanged event
-            SetCustomData ( pAttribute->GetName ().c_str (), *args[0], pLuaMain, true, NULL, false );
+            SetCustomData ( pAttribute->GetName ().c_str (), *args[0], pLuaMain, g_pGame->GetConfig ()->GetSyncMapElementData (), NULL, false );
         }
     }
 }

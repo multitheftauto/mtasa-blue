@@ -118,6 +118,10 @@ public:
     void                        RemoveMinClientRequirement      ( CResource* pResource );
     void                        ReevaluateMinClientRequirement  ( void );
 
+    void                        ApplySyncMapElementDataOption       ( CResource* pResource, bool bSyncMapElementData );
+    void                        RemoveSyncMapElementDataOption      ( CResource* pResource );
+    void                        ReevaluateSyncMapElementDataOption  ( void );
+
 private:
     SString                     m_strResourceDirectory;
     CMappedList < CResource* >  m_resources;
@@ -134,6 +138,7 @@ private:
     list<sResourceQueue>        m_resourceQueue;
 
     std::map < CResource*, SString >        m_MinClientRequirementMap;
+    std::map < CResource*, bool >           m_SyncMapElementDataOptionMap;
 };
 
 #endif

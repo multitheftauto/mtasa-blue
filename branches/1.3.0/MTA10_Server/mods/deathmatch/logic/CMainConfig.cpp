@@ -97,6 +97,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_iBackupInterval = 3;
     m_iBackupAmount = 5;
     m_iDebugFlag = 0;
+    m_bSyncMapElementData = true;
     m_NetOptions.netTweak.fTweak1Amount = 1.0f;
     m_iNetReliabilityMode = 0;
 }

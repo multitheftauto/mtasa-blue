@@ -113,6 +113,8 @@ public:
     int                             GetNoWorkToDoSleepTime          ( void );
     const SString&                  GetDbLogFilename                ( void )                    { return m_strDbLogFilename; }
     int                             GetDebugFlag                    ( void )                    { return m_iDebugFlag; }
+    bool                            GetSyncMapElementData           ( void ) const              { return m_bSyncMapElementData; }
+    void                            SetSyncMapElementData           ( bool bOn )                { m_bSyncMapElementData = bOn; }
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
@@ -188,6 +190,7 @@ private:
     int                             m_iNoWorkToDoSleepTime;
     bool                            m_bThreadNetEnabled;
     int                             m_iDebugFlag;
+    bool                            m_bSyncMapElementData;
     std::map < SString, SString >   m_TransientSettings;
     SNetOptions                     m_NetOptions;
     int                             m_iNetReliabilityMode;

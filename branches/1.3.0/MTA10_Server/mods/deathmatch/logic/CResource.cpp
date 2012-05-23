@@ -84,6 +84,9 @@ CResource::CResource ( CResourceManager * resourceManager, bool bIsZipped, const
     m_bClientFiles = true;
     m_bHasStarted = false;
 
+    m_bSyncMapElementData = true;
+    m_bSyncMapElementDataDefined = false;
+
     pthread_mutex_init(&m_mutex, NULL);
 
     m_bDoneUpgradeWarnings = false;
@@ -229,6 +232,16 @@ bool CResource::Load ( void )
                     RefreshAutoPermissions ( pNodeAclRequest );
                 else
                     RemoveAutoPermissions ();
+
+                // Find any map sync option
+                m_bSyncMapElementData = true;
+                m_bSyncMapElementDataDefined = false;
+                CXMLNode * pNodeSyncMapElementData = root->FindSubNode ( "sync_map_element_data", 0 );
+                if ( pNodeSyncMapElementData )
+                {
+                    m_bSyncMapElementData = StringToBool ( pNodeSyncMapElementData->GetTagContent ().c_str () );
+                    m_bSyncMapElementDataDefined = true;
+                }
 
                 // disabled for now
                 /*
@@ -791,6 +804,9 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         // Remember the time we started
         time ( &m_timeStarted );
 
+        if ( m_bSyncMapElementDataDefined )
+            m_resourceManager->ApplySyncMapElementDataOption ( this, m_bSyncMapElementData );
+
         // Start all our sub resourcefiles
         list < CResourceFile* > ::iterator iterf = m_resourceFiles.begin ();
         for ( ; iterf != m_resourceFiles.end (); iterf++ )
@@ -958,6 +974,7 @@ bool CResource::Stop ( bool bStopManually )
     if ( !m_bStopping && m_bLoaded && m_bActive && ( !m_bStartedManually || bStopManually ) )
     {
         m_resourceManager->RemoveMinClientRequirement ( this );
+        m_resourceManager->RemoveSyncMapElementDataOption ( this );
         m_bHasStarted = false;
         m_bStopping = true;
 
