@@ -23,6 +23,10 @@ namespace
     NetServerPlayerID       ms_NetStatisticsLastFor;
     bool                    ms_bBandwidthStatisticsLastSavedValid = false;
     SBandwidthStatistics    ms_BandwidthStatisticsLastSaved;
+    bool                    ms_bPingStatusLastSavedValid = false;
+    SFixedString < 32 >     ms_PingStatusLastSaved;
+    bool                    ms_bNetRouteLastSavedValid = false;
+    SFixedString < 32 >     ms_NetRouteLastSaved;
 }
 
 
@@ -120,9 +124,9 @@ void CNetServerBuffer::StopThread ( void )
 // BLOCKING
 //
 ///////////////////////////////////////////////////////////////////////////
-bool CNetServerBuffer::StartNetwork ( const char* szIP, unsigned short usServerPort, unsigned int uiAllowedPlayers )
+bool CNetServerBuffer::StartNetwork ( const char* szIP, unsigned short usServerPort, unsigned int uiAllowedPlayers, const char* szServerName )
 {
-    SStartNetworkArgs* pArgs = new SStartNetworkArgs ( szIP, usServerPort, uiAllowedPlayers );
+    SStartNetworkArgs* pArgs = new SStartNetworkArgs ( szIP, usServerPort, uiAllowedPlayers, szServerName );
     AddCommandAndWait ( pArgs );
     return pArgs->result;
 }
@@ -324,6 +328,50 @@ bool CNetServerBuffer::GetBandwidthStatistics ( SBandwidthStatistics* pDest )
 
 ///////////////////////////////////////////////////////////////////////////
 //
+// CNetServerBuffer::GetPingStatus
+//
+// Blocking on first call.
+// Subsequent calls are non blocking but return previous results
+//
+///////////////////////////////////////////////////////////////////////////
+void GetPingStatusCallback ( CNetJobData* pJobData, void* pContext )
+{
+    SFixedString < 32 >* pStore = (SFixedString < 32 >*)pContext;
+    if ( pJobData->stage == EJobStage::RESULT )
+    {
+        ms_pNetServerBuffer->PollCommand ( pJobData, -1 );
+        ms_PingStatusLastSaved = *pStore;
+    }
+    delete pStore;
+}
+
+void CNetServerBuffer::GetPingStatus ( SFixedString < 32 >* pstrStatus )
+{
+    // Blocking read required?
+    if ( !ms_bPingStatusLastSavedValid )
+    {
+        // Do blocking read 
+        SGetPingStatusArgs* pArgs = new SGetPingStatusArgs ( pstrStatus );
+        AddCommandAndWait ( pArgs );
+
+        // Save results
+        ms_PingStatusLastSaved = *pstrStatus;
+        ms_bPingStatusLastSavedValid = true;
+        return;
+    }
+
+    // Start a new async read,
+    SFixedString < 32 >* pStore = new SFixedString < 32 >();
+    SGetPingStatusArgs* pArgs = new SGetPingStatusArgs ( pStore );
+    AddCommandAndCallback ( pArgs, GetPingStatusCallback, pStore );
+
+    // but use results from previous
+    *pstrStatus = ms_PingStatusLastSaved;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
 // CNetServerBuffer::AllocateNetServerBitStream
 //
 // Thread safe
@@ -493,6 +541,50 @@ unsigned int CNetServerBuffer::GetPendingPacketCount ( void )
     uint uiCount = shared.m_InResultQueue.size ();
     shared.m_Mutex.Unlock ( EActionWho::MAIN, EActionWhere::GetPendingPacketCount );
     return uiCount;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// CNetServerBuffer::GetNetRoute
+//
+// Blocking on first call.
+// Subsequent calls are non blocking but return previous results
+//
+///////////////////////////////////////////////////////////////////////////
+void GetNetRouteCallback ( CNetJobData* pJobData, void* pContext )
+{
+    SFixedString < 32 >* pStore = (SFixedString < 32 >*)pContext;
+    if ( pJobData->stage == EJobStage::RESULT )
+    {
+        ms_pNetServerBuffer->PollCommand ( pJobData, -1 );
+        ms_NetRouteLastSaved = *pStore;
+    }
+    delete pStore;
+}
+
+void CNetServerBuffer::GetNetRoute ( SFixedString < 32 >* pstrRoute )
+{
+    // Blocking read required?
+    if ( !ms_bNetRouteLastSavedValid )
+    {
+        // Do blocking read 
+        SGetNetRouteArgs* pArgs = new SGetNetRouteArgs ( pstrRoute );
+        AddCommandAndWait ( pArgs );
+
+        // Save results
+        ms_NetRouteLastSaved = *pstrRoute;
+        ms_bNetRouteLastSavedValid = true;
+        return;
+    }
+
+    // Start a new async read,
+    SFixedString < 32 >* pStore = new SFixedString < 32 >();
+    SGetNetRouteArgs* pArgs = new SGetNetRouteArgs ( pStore );
+    AddCommandAndCallback ( pArgs, GetNetRouteCallback, pStore );
+
+    // but use results from previous
+    *pstrRoute = ms_NetRouteLastSaved;
 }
 
 
@@ -931,6 +1023,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
 #define CALLREALNET1R(ret,func,t1,n1)                                     CALLPRE(func) a.result = m_pRealNetServer->func ( a.n1 ); CALLPOST
 #define CALLREALNET2R(ret,func,t1,n1,t2,n2)                               CALLPRE(func) a.result = m_pRealNetServer->func ( a.n1, a.n2 ); CALLPOST
 #define CALLREALNET3R(ret,func,t1,n1,t2,n2,t3,n3)                         CALLPRE(func) a.result = m_pRealNetServer->func ( a.n1, a.n2, a.n3 ); CALLPOST
+#define CALLREALNET4R(ret,func,t1,n1,t2,n2,t3,n3,t4,n4)                   CALLPRE(func) a.result = m_pRealNetServer->func ( a.n1, a.n2, a.n3, a.n4 ); CALLPOST
 #define CALLREALNET7R(ret,func,t1,n1,t2,n2,t3,n3,t4,n4,t5,n5,t6,n6,t7,n7) CALLPRE(func) a.result = m_pRealNetServer->func ( a.n1, a.n2, a.n3, a.n4, a.n5, a.n6, a.n7 ); CALLPOST
 
 #define CALLPOST \
@@ -940,7 +1033,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
 
     switch ( pJobData->pArgs->type )
     {
-        CALLREALNET3R( bool,                StartNetwork                    , const char*, szIP, unsigned short, usServerPort, unsigned int, uiAllowedPlayers )
+        CALLREALNET4R( bool,                StartNetwork                    , const char*, szIP, unsigned short, usServerPort, unsigned int, uiAllowedPlayers, const char*, szServerName )
         CALLREALNET0 (                      StopNetwork                     )
         CALLREALNET0 (                      ResetNetwork                    )
         CALLREALNET0 (                      DoPulse                         )
@@ -948,6 +1041,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
         CALLREALNET2R( bool,                GetNetworkStatistics            , NetStatistics*, pDest, NetServerPlayerID&, PlayerID )
         CALLREALNET0R( const SPacketStat*,  GetPacketStats                  )
         CALLREALNET1R( bool,                GetBandwidthStatistics          , SBandwidthStatistics*, pDest )
+        CALLREALNET1 (                      GetPingStatus                   , SFixedString < 32 >*, pstrStatus )
         CALLREALNET7R( bool,                SendPacket                      , unsigned char, ucPacketID, const NetServerPlayerID&, playerID, NetBitStreamInterface*, bitStream, bool, bBroadcast, NetServerPacketPriority, packetPriority, NetServerPacketReliability, packetReliability, ePacketOrdering, packetOrdering )
         CALLREALNET3 (                      GetPlayerIP                     , const NetServerPlayerID&, playerID, char*, strIP, unsigned short*, usPort )
         CALLREALNET1 (                      Kick                            , const NetServerPlayerID &,PlayerID )
@@ -957,6 +1051,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
         CALLREALNET1 (                      ClearClientBitStreamVersion     , const NetServerPlayerID &,PlayerID )
         CALLREALNET5 (                      SetChecks                       , const char*, szDisableComboACMap, const char*, szDisableACMap, const char*, szEnableSDMap, int, iEnableClientChecks, bool, bHideAC );
         CALLREALNET0R( unsigned int,        GetPendingPacketCount           )
+        CALLREALNET1 (                      GetNetRoute                     , SFixedString < 32 >*, pstrRoute )
         CALLREALNET1R( bool,                InitServerId                    , const char*, szPath )
         CALLREALNET1 (                      SetEncryptionEnabled            , bool, bEncryptionEnabled )
         CALLREALNET1 (                      ResendModPackets                , const NetServerPlayerID&, playerID )

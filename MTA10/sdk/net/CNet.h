@@ -80,6 +80,7 @@ public:
 
     virtual const char*                 GetNextBuffer               ( void ) = 0;
     virtual const char*                 GetDiagnosticStatus         ( void ) = 0;
+    virtual void                        UpdatePingStatus            ( const char* szStatus, ushort& usDataRef ) = 0;
 
     virtual bool                        VerifySignature             ( const char* pData, unsigned long ulSize ) = 0;
 

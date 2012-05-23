@@ -595,6 +595,9 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
     else
         m_iBuildNumber = 0;
 
+    // Recover server ping status if present
+    const SString strPingStatus = strBuildNumber.Right ( strBuildNumber.length () - strlen ( strBuildNumber ) - 1 );
+    CCore::GetSingleton ().GetNetwork ()->UpdatePingStatus ( *strPingStatus, nPlayers );
 
     // Get player nicks
     vecPlayers.clear ();

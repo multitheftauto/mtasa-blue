@@ -58,7 +58,7 @@ public:
     };
 
     // szIP can be NULL if autochoosing is wanted.
-    virtual bool                            StartNetwork                    ( const char* szIP, unsigned short usServerPort, unsigned int uiAllowedPlayers ) = 0;
+    virtual bool                            StartNetwork                    ( const char* szIP, unsigned short usServerPort, unsigned int uiAllowedPlayers, const char* szServerName ) = 0;
     virtual void                            StopNetwork                     ( void ) = 0;
     virtual void                            ResetNetwork                    ( void ) = 0;
 
@@ -69,6 +69,7 @@ public:
     virtual bool                            GetNetworkStatistics            ( NetStatistics* pDest, const NetServerPlayerID& PlayerID ) = 0;
     virtual const SPacketStat*              GetPacketStats                  ( void ) = 0;
     virtual bool                            GetBandwidthStatistics          ( SBandwidthStatistics* pDest ) = 0;
+    virtual void                            GetPingStatus                   ( SFixedString < 32 >* pstrStatus ) = 0;
 
     virtual NetBitStreamInterface*          AllocateNetServerBitStream      ( unsigned short usBitStreamVersion ) = 0;
     virtual void                            DeallocateNetServerBitStream    ( NetBitStreamInterface* bitStream ) = 0;
@@ -90,6 +91,7 @@ public:
     virtual void                            SetChecks                       ( const char* szDisableComboACMap, const char* szDisableACMap, const char* szEnableSDMap, int iEnableClientChecks, bool bHideAC ) = 0;
 
     virtual unsigned int                    GetPendingPacketCount           ( void ) = 0;
+    virtual void                            GetNetRoute                     ( SFixedString < 32 >* pstrRoute ) = 0;
 
     virtual bool                            InitServerId                    ( const char* szPath ) = 0;
     virtual void                            SetEncryptionEnabled            ( bool bEncryptionEnabled ) = 0;
