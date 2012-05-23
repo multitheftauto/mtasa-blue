@@ -740,7 +740,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         CLogger::LogPrintf ( "Network encryption disabled\n" );
 
     // Try to start the network
-    if ( !g_pNetServer->StartNetwork ( strServerIP, usServerPort, uiMaxPlayers ) )
+    if ( !g_pNetServer->StartNetwork ( strServerIP, usServerPort, uiMaxPlayers, m_pMainConfig->GetServerName ().c_str () ) )
     {
         CLogger::ErrorPrintf ( "Could not bind the server on interface '%s' and port '%u'!\n", strServerIP.c_str (), usServerPort );
         return false;
