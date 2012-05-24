@@ -204,24 +204,58 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
         // Define a screen rectangle
         ScreenSize.top = ScreenSize.left = 0;
         ScreenSize.right = CDirect3DData::GetSingleton ().GetViewportWidth ();
-        ScreenSize.bottom = CDirect3DData::GetSingleton ().GetViewportHeight ();        
-        pDevice->GetRenderTarget ( 0, &pSurface );
+        ScreenSize.bottom = CDirect3DData::GetSingleton ().GetViewportHeight ();
 
-        // Create a new render target
-        if ( !pSurface || pDevice->CreateRenderTarget ( ScreenSize.right, ScreenSize.bottom, D3DFMT_A8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &ms_pSaveLockSurface, NULL ) != D3D_OK ) {
-            CCore::GetSingleton ().GetConsole ()->Printf("Couldn't create a new render target.");
-        } else {
-            unsigned long ulBeginTime = GetTickCount32 ();
+        do
+        {
+            HRESULT hr = pDevice->GetRenderTarget ( 0, &pSurface );
+            if ( FAILED( hr ) )
+            {
+                CCore::GetSingleton ().GetConsole ()->Printf ( "GetRenderTarget failed: %08x", hr );
+                break;
+            }
+
+            // Create a new render target
+            for ( uint i = 0 ; i < 3 ; i++ )
+            {
+                // 1st try -  i == 0  - 32 bit target
+                //            i == 0  - EvictManagedResources
+                // 2nd try -  i == 1  - 32 bit target
+                // 3rd try -  i == 2  - 16 bit target
+	            D3DFORMAT Format = i == 2 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
+
+                hr = pDevice->CreateRenderTarget ( ScreenSize.right, ScreenSize.bottom, Format, D3DMULTISAMPLE_NONE, 0, TRUE, &ms_pSaveLockSurface, NULL );
+                if( SUCCEEDED( hr ) )
+                    break;
+
+                // c'mon
+                if ( i == 0 )
+                    pDevice->EvictManagedResources ();
+            }
+
+            if ( FAILED( hr ) )
+            {
+                CCore::GetSingleton ().GetConsole ()->Printf ( "Couldn't create a new render target: %08x", hr );
+                break;
+            }
 
             // Copy data from surface to surface
-            if ( pDevice->StretchRect ( pSurface, &ScreenSize, ms_pSaveLockSurface, &ScreenSize, D3DTEXF_NONE ) != D3D_OK ) {
-                CCore::GetSingleton ().GetConsole ()->Printf("Couldn't copy the surface.");
+            hr = pDevice->StretchRect ( pSurface, &ScreenSize, ms_pSaveLockSurface, &ScreenSize, D3DTEXF_NONE );
+            if ( FAILED( hr ) )
+            {
+                CCore::GetSingleton ().GetConsole ()->Printf ( "Couldn't copy the surface: %08x", hr );
+                SAFE_RELEASE( ms_pSaveLockSurface );
+                break;
             }
 
             // Lock the surface
             D3DLOCKED_RECT LockedRect;
-            if ( ms_pSaveLockSurface->LockRect ( &LockedRect, NULL, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK ) != D3D_OK ) {
-                CCore::GetSingleton ().GetConsole ()->Printf("Couldn't lock the surface.");
+            hr = ms_pSaveLockSurface->LockRect ( &LockedRect, NULL, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK );
+            if ( FAILED( hr ) )
+            {
+                CCore::GetSingleton ().GetConsole ()->Printf ( "Couldn't lock the surface: %08x", hr );
+                SAFE_RELEASE( ms_pSaveLockSurface );
+                break;
             }
 
             // Call the pre-screenshot function 
@@ -233,9 +267,8 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 
             // Call the post-screenshot function
             CScreenShot::PostScreenShot ( strFileName );
-
-            CCore::GetSingleton ().GetConsole ()->Printf ( "Screenshot capture took %.2f seconds.", (float)(GetTickCount32 () - ulBeginTime) / 1000.0f );
         }
+        while ( false );
 
         CCore::GetSingleton().bScreenShot = false;
 
