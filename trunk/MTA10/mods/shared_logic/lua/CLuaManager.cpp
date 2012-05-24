@@ -368,6 +368,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setSoundProperties", CLuaFunctionDefs::SetSoundProperties );
     CLuaCFunctions::AddFunction ( "getSoundProperties", CLuaFunctionDefs::GetSoundProperties );
     CLuaCFunctions::AddFunction ( "getSoundFFTData", CLuaFunctionDefs::GetSoundFFTData );
+    CLuaCFunctions::AddFunction ( "getSoundWaveData", CLuaFunctionDefs::GetSoundWaveData );
+    CLuaCFunctions::AddFunction ( "getSoundLevelData", CLuaFunctionDefs::GetSoundLevelData );
+    CLuaCFunctions::AddFunction ( "getSoundBPM", CLuaFunctionDefs::GetSoundBPM );
     CLuaCFunctions::AddFunction ( "setSoundPanningEnabled", CLuaFunctionDefs::SetSoundPanEnabled );
     CLuaCFunctions::AddFunction ( "isSoundPanningEnabled", CLuaFunctionDefs::IsSoundPanEnabled );
     CLuaCFunctions::AddFunction ( "setSoundMinDistance", CLuaFunctionDefs::SetSoundMinDistance );

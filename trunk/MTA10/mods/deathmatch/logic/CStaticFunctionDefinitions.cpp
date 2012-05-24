@@ -6467,6 +6467,11 @@ float* CStaticFunctionDefinitions::GetSoundFFTData ( CClientSound& Sound, int iL
     return Sound.GetFFTData ( iLength );
 }
 
+float* CStaticFunctionDefinitions::GetSoundWaveData ( CClientSound& Sound, int iLength )
+{
+    return Sound.GetWaveData ( iLength );
+}
+
 bool CStaticFunctionDefinitions::IsSoundPanEnabled ( CClientSound& Sound )
 {
     return Sound.IsPanEnabled ( );
@@ -6476,6 +6481,20 @@ bool CStaticFunctionDefinitions::SetSoundPanEnabled ( CClientSound& Sound, bool 
 {
     Sound.SetPanEnabled ( bEnabled );
     return true;
+}
+
+bool CStaticFunctionDefinitions::GetSoundLevelData ( CClientSound& Sound, DWORD& dwLeft, DWORD& dwRight )
+{
+    DWORD dwData = Sound.GetLevelData ( );
+    dwLeft = LOWORD(dwData);
+    dwRight = HIWORD(dwData);
+    return dwData != 0;
+}
+
+bool CStaticFunctionDefinitions::GetSoundBPM ( CClientSound& Sound, float& fBPM )
+{
+    fBPM = Sound.GetSoundBPM ( );
+    return fBPM != 0.0f;
 }
 
 bool CStaticFunctionDefinitions::GetSoundSpeed ( CClientSound& Sound, float& fSpeed )
