@@ -81,7 +81,7 @@ public:
     float*                  GetFFTData              ( int iLength );
     float*                  GetWaveData              ( int iLength );
     DWORD                   GetLevelData            ( void );
-    float                   GetSoundBPM             ( void )                                                    { return m_fBPM;}
+    float                   GetSoundBPM             ( void );
     void                    SetSoundBPM             ( float fBPM )                                              { m_fBPM = fBPM;}
 
 protected:

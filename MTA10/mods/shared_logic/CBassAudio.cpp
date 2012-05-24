@@ -120,14 +120,7 @@ bool CBassAudio::BeginLoadingMedia ( void )
             g_pCore->GetConsole()->Printf ( "BASS ERROR %d in LoadMedia  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
             return false;
         }
-        // Get us a bpm by getting the max bpm over each minute so we get a good bpm value which fits.
-        double dStart = 0;
-        while ( dStart <= GetLength ( ))
-        {
-            float fData = BASS_FX_BPM_DecodeGet ( m_pSound, dStart, dStart + 60, 0, BASS_FX_FREESOURCE | BASS_FX_BPM_MULT2, NULL );
-            m_fBPM = max( fData, m_fBPM );
-            dStart += 60;
-        }
+
         m_pSound = BASS_FX_ReverseCreate ( m_pSound, 2.0f, BASS_STREAM_DECODE | BASS_FX_FREESOURCE | BASS_MUSIC_PRESCAN );
         BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_REVERSE_DIR, BASS_FX_RVS_FORWARD );
         // Sucks.
@@ -135,6 +128,7 @@ bool CBassAudio::BeginLoadingMedia ( void )
         {
             g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_FX_BPM_CallbackSet  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
         }*/
+
         if ( BASS_FX_BPM_BeatCallbackSet ( m_pSound, (BPMBEATPROC*)&BeatCallback, this ) == false )
         {
             g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_FX_BPM_BeatCallbackSet  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
@@ -597,6 +591,22 @@ DWORD CBassAudio::GetLevelData ( void )
             return dwData;
     }
     return 0;
+}
+
+float CBassAudio::GetSoundBPM ( void )
+{
+    if ( m_fBPM == 0.0f && !m_bStream )
+    {
+        // Get us a bpm by getting the max bpm over each minute so we get a good bpm value which fits.
+        double dStart = 0;
+        while ( dStart <= GetLength ( ))
+        {
+            float fData = BASS_FX_BPM_DecodeGet ( m_pSound, dStart, dStart + 60, 0, BASS_FX_FREESOURCE | BASS_FX_BPM_MULT2, NULL );
+            m_fBPM = max( fData, m_fBPM );
+            dStart += 60;
+        }
+    }
+    return m_fBPM;
 }
 
 //
