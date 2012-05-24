@@ -564,7 +564,10 @@ public:
     static bool                         SetSoundProperties                  ( CClientSound& Sound, float fSampleRate, float fTempo, float fPitch, bool bReversed );
     static bool                         GetSoundProperties                  ( CClientSound& Sound, float &fSampleRate, float &fTempo, float &fPitch, bool &bReversed );
     static float*                       GetSoundFFTData                     ( CClientSound& Sound, int iLength );
+    static float*                       GetSoundWaveData                    ( CClientSound& Sound, int iLength );
     static bool                         SetSoundPanEnabled                  ( CClientSound& Sound, bool bEnabled );
+    static bool                         GetSoundLevelData                   ( CClientSound& Sound, DWORD& dwLeft, DWORD& dwRight );
+    static bool                         GetSoundBPM                         ( CClientSound& Sound, float& fBPM );
     static bool                         IsSoundPanEnabled                   ( CClientSound& Sound );
     static bool                         GetSoundSpeed                       ( CClientSound& Sound, float& fSpeed );
     static bool                         SetSoundMinDistance                 ( CClientSound& Sound, float fDistance );
