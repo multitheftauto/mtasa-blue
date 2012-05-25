@@ -758,39 +758,39 @@ void _declspec(naked) HOOK_CrashFix_Misc24 ()
 
 
 ////////////////////////////////////////////////////////////////////////
-// Handle CTaskSimpleCarOpenDoorFromOutside::ComputeAnimID having zero pointer to something
-// (Possibly due to a vehicle being removed)
-#define HOOKPOS_CrashFix_Misc25                             0x645FD9
-#define HOOKSIZE_CrashFix_Misc25                            13
-DWORD RETURN_CrashFix_Misc25 =                              0x645FE6;
+// Handle CTaskSimpleCarOpenDoorFromOutside::FinishAnimCarOpenDoorFromOutsideCB having zero pointer to vehicle
+#define HOOKPOS_CrashFix_Misc25                             0x646026
+#define HOOKSIZE_CrashFix_Misc25                            5
+DWORD RETURN_CrashFix_Misc25 =                              0x64602B;
 void _declspec(naked) HOOK_CrashFix_Misc25 ()
 {
 #if TEST_CRASH_FIXES
     SIMULATE_ERROR_BEGIN( 10 )
         _asm
         {
-            mov     ecx,0
+            mov     eax, 0
+            mov     [esi+0x10], eax
         }
     SIMULATE_ERROR_END
 #endif
 
     _asm
     {
-        // Check for zero pointer
-        cmp     ecx,0
+        // Check for zero pointer to vehicle
+        mov     eax, [esi+0x10]
+        cmp     eax, 0
         jz      fix
 
         // Continue standard path
-        mov     edx, [ecx+384h]
-        movzx   ecx, byte ptr [edx+0DEh]
+        lea     eax,[esp+10h]
+        push    eax
         jmp     RETURN_CrashFix_Misc25
 
     fix:
         // Do special thing
-        mov     edx, 0
-        mov     ecx, 0
-        jmp     RETURN_CrashFix_Misc25
-
+        pop     esi
+        pop     ecx
+        retn
     }
 }
 
