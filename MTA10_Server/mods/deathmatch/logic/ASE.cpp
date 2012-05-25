@@ -378,8 +378,8 @@ std::string ASE::QueryLight ( void )
     SFixedString < 32 > strNetRouteFixed;
     g_pNetServer->GetPingStatus ( &strPingStatusFixed );
     g_pNetServer->GetNetRoute ( &strNetRouteFixed );
-    SString strPingStatus = strPingStatusFixed;
-    SString strNetRoute = strNetRouteFixed;
+    SString strPingStatus = (const char*)strPingStatusFixed;
+    SString strNetRoute = (const char*)strNetRouteFixed;
 
     reply << "EYE2";
     // game
