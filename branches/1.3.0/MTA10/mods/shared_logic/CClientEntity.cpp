@@ -698,6 +698,8 @@ bool CClientEntity::AddEvent ( CLuaMain* pLuaMain, const char* szName, const CLu
 
 bool CClientEntity::CallEvent ( const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren )
 {
+    TIMEUS startTime = GetTimeUs ();
+
     CEvents* pEvents = g_pClientGame->GetEvents();
 
     // Make sure our event-manager knows we're about to call an event
@@ -714,6 +716,13 @@ bool CClientEntity::CallEvent ( const char* szName, const CLuaArguments& Argumen
 
     // Tell the event manager that we're done calling the event
     pEvents->PostEventPulse ();
+
+    if ( IS_TIMING_CHECKPOINTS() )
+    {
+        TIMEUS deltaTimeUs = GetTimeUs () - startTime;
+        if ( deltaTimeUs > 10000 )
+            TIMING_DETAIL( SString ( "Event: %s [%d ms]", szName, deltaTimeUs / 1000 ) );
+    }
 
     // Return whether it got cancelled or not
     return ( !pEvents->WasEventCancelled () );

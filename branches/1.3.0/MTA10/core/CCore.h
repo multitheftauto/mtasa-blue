@@ -210,8 +210,9 @@ public:
     void                    EnsureFrameRateLimitApplied     ( void );
     void                    DoReliablePulse                 ( void );
 
+    bool                    IsTimingCheckpoints             ( void );
     void                    OnTimingCheckpoint              ( const char* szTag );
-    void                    OnTimingDetail                  ( const char* szTag, bool bForceLog = false );
+    void                    OnTimingDetail                  ( const char* szTag );
 
     void                    CalculateStreamingMemoryRange   ( void );
     uint                    GetMinStreamingMemory           ( void );

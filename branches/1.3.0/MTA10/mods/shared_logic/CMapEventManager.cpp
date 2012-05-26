@@ -336,7 +336,7 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                     TIMEUS deltaTimeUs = GetTimeUs() - startTime;
 
                     if ( deltaTimeUs > 3000 ) 
-                        if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::LOG_TIMING_0000 )
+                        if ( IS_TIMING_CHECKPOINTS() )
                             strStatus += SString ( " (%s %d ms)", pMapEvent->GetVM ()->GetScriptName (), deltaTimeUs / 1000 );
 
                     CClientPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pMapEvent->GetVM (), szName, deltaTimeUs );
@@ -354,13 +354,11 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
         m_bIteratingList = false;
     }
 
-    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::LOG_TIMING_0000 )
+    if ( IS_TIMING_CHECKPOINTS() )
     {
         TIMEUS deltaTimeUs = GetTimeUs() - startTime;
         if ( deltaTimeUs > 5000 )
-        {
-            TIMING_DETAIL_FORCE( SString ( "CMapEventManager::Call ( %s, ... ) took %d ms ( %s )", szName, deltaTimeUs / 1000, *strStatus ) );
-        }
+            TIMING_DETAIL( SString ( "CMapEventManager::Call ( %s, ... ) took %d ms ( %s )", szName, deltaTimeUs / 1000, *strStatus ) );
     }
 
     // Return whether we called atleast one func or not

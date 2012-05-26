@@ -28,8 +28,7 @@ public:
     TIMEUS  m_FrameStartTimeUs;
     TIMEUS  m_PrevFrameTimeUs;
     SString m_LogFileName;
-    SString m_strDetail;
-    SString m_strDetailForce;
+    std::vector < SString >         m_DetailLines;
     std::vector < SCheckpointItem > m_CheckpointList;
     std::vector < SString >         m_InsideList;
 
@@ -73,8 +72,7 @@ public:
         m_CheckpointsStartUs = GetTimeUs ();
         m_CheckpointList.clear ();
         m_InsideList.clear ();
-        m_strDetailForce = "";
-        m_strDetail = "";
+        m_DetailLines.clear ();
     }
 
 
@@ -88,15 +86,29 @@ public:
         TIMEUS frameTimeUs = GetTimeUs() - m_FrameStartTimeUs;
 
         // Record if frame over 30ms and over double previous frame
-        if ( frameTimeUs > (1000/30*1000) && frameTimeUs > m_PrevFrameTimeUs * 2 )
+        if ( frameTimeUs > ( 1000 / 30 * 1000 ) && frameTimeUs > m_PrevFrameTimeUs * 2 )
         {
             if ( m_bEnabled )
             {
-                AppendLog ( SString ( "--------------CCore::ApplyFrameRateLimit frame time: %1.3fms    (prev %1.3fms)", (float)frameTimeUs/1000.f, (float)m_PrevFrameTimeUs/1000.f ) );
+                uchar ucHour, ucMin;
+                CCore::GetSingleton ().GetGame ()->GetClock ()->Get ( &ucHour, &ucMin );
+
+                AppendLog ( SString ( ">Detected slow frame: %dms    (Prev frame was %dms)  (Game time %02d:%02d)", frameTimeUs / 1000, m_PrevFrameTimeUs / 1000, ucHour, ucMin ) );
                 DumpTimingCheckpoints();
             }
         }
         m_PrevFrameTimeUs = frameTimeUs;
+    }
+
+
+    ////////////////////////////////////////
+    //
+    // Check if timings are enabled
+    //
+    ////////////////////////////////////////
+    bool IsTimingCheckpoints ( void )
+    {
+        return m_bEnabled;
     }
 
 
@@ -122,15 +134,13 @@ public:
     // Called during frame at point of interest
     //
     ////////////////////////////////////////
-    void OnTimingDetail ( const char* szTag, bool bForce )
+    void OnTimingDetail ( const char* szTag )
     {
         if ( !m_bEnabled )
             return;
-        if ( bForce )
-            m_strDetailForce += szTag + SStringX ( "\n" );
-        else
-            m_strDetail += szTag + SStringX ( "\n" );
+        m_DetailLines.push_back ( szTag );
     }
+
 
     //
     // Timing sections
@@ -244,21 +254,16 @@ public:
             if ( info.totalTime < 5000 )
                 break;
             if ( info.iEnterCount == info.iLeaveCount )
-                strStatus += SString ( "%1.1fms [%d] %s   |  ", info.totalTime/1000.f, info.iEnterCount, *info.strName ) ;
+                strStatus += SString ( "[%s %dms (calls:%d)]   ", *info.strName, info.totalTime / 1000, info.iEnterCount ) ;
             else
-                strStatus += SString ( "%1.1fms [%d/%d] %s   |  ", info.totalTime/1000.f, info.iEnterCount, info.iLeaveCount, *info.strName ) ;
+                strStatus += SString ( "[%s %dms (calls:%d/%d)]   ", *info.strName, info.totalTime / 1000, info.iEnterCount, info.iLeaveCount ) ;
         }
-
-        if ( !m_strDetailForce.empty () )
-            AppendLog ( m_strDetailForce.TrimEnd ( "\n" ) );
 
         if ( !strStatus.empty () )
-        {
-            if ( !m_strDetail.empty () )
-                AppendLog ( m_strDetail.TrimEnd ( "\n" ) );
+            AppendLog ( SStringX ( "    Frame slow points: " ) + strStatus );
 
-            AppendLog ( strStatus );
-        }
+        for ( uint i = 0 ; i < m_DetailLines.size () ; i++ )
+            AppendLog ( SStringX ( "        " ) + m_DetailLines[i] );
     }
 
 
@@ -269,6 +274,7 @@ public:
     ////////////////////////////////////////
     void AppendLog ( const SString& strStatus )
     {
+        OutputDebugLine ( strStatus );
         FileAppend ( m_LogFileName, GetLocalTimeString ( false, true ) + " - " + strStatus + "\n", false );
     }
 
