@@ -319,10 +319,12 @@ bool ProcessVehicleSirenPosition ( )
                     fTime = fMinimumAlpha;
                 }
                 // Set our red based on 255 and our blue based on 255 and green based on 0.. default SA values of course.
-                if ( dwRed > 0 )
-                    dwRed = (DWORD)( 255 * fTime );
+                /*if ( dwRed > 0 )
+                    dwRed = (DWORD)( dwRed * fTime );
                 if ( dwBlue > 0 )
-                    dwBlue = (DWORD)( 255 * fTime );
+                    dwBlue = (DWORD)( dwBlue * fTime );
+                if ( dwGreen > 0 )
+                    dwGreen = (DWORD)( dwGreen * fTime );*/
                 bPointLights = false;
                 // return false so our hook knows we decided not to edit anything
                 return false;
@@ -549,15 +551,16 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed ( 
     _asm
     {
         // Grab our siren position vector
-        lea eax,[esp+130h]
+        lea eax, [esp+130h]
+        mov ebp, [esp+8Ch]
         pushad
         // Grab our vehicle interface
         mov pVehicleWithTheSiren, esi
         // move our position vector pointer into our position variable
         mov vecRelativeSirenPosition, eax
-        mov eax, [esp+8Ch]
-        mov dwBlue, eax
-        mov dwRed, 0h
+        mov dwRed, ebp
+        mov dwGreen, edx
+        mov dwBlue, ecx
     }
     bPointLights = false;
 
@@ -570,14 +573,14 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed ( 
             // Push our position
             push eax
             // move our R,G,B components into registers
-            mov eax, dwRed // Red
+            mov ebp, dwRed // Red
             mov edx, dwGreen // Green
             mov ecx, dwBlue // Blue
             push 0FFh
             // Push our R,G,B components (inverse order)
             push ecx
             push edx
-            push eax
+            push ebp
             // Return control
             JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual1
         }
@@ -590,13 +593,14 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed ( 
             // Push our position
             push eax
             // Edit our components to get Alpha fixing working.
-            //mov ecx, dwBlue // Blue
-            //mov eax, dwRed // Red
+            mov ebp, dwRed // Red
+            mov edx, dwGreen // Green
+            mov ecx, dwBlue // Blue
             push 0FFh
             // Push our R,G,B components (inverse order)
             push ecx
             push edx
-            push eax
+            push ebp
             // Return control
             JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionDual1
         }
@@ -615,7 +619,8 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue (
         // move our position vector pointer into our position variable
         mov vecRelativeSirenPosition, eax
         mov dwRed, ebp
-        mov dwBlue, 0h
+        mov dwGreen, edx
+        mov dwBlue, ecx
     }
     bPointLights = false;
 
@@ -649,8 +654,9 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue (
             push eax
             push 0FFh
             // Edit our components to get Alpha fixing working.
-            //mov ecx, dwBlue // Blue
-            //mov ebp, dwRed // Red
+            mov ecx, dwBlue // Blue
+            mov edx, dwGreen // Green
+            mov ebp, dwRed // Red
             // Push our R,G,B components (inverse order)
             push ecx
             push edx
