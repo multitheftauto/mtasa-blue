@@ -366,22 +366,38 @@ int CLuaFunctionDefs::GetSoundFFTData ( lua_State* luaVM )
     CClientSound* pSound = NULL;
     float* pData = NULL;
     int iLength = 0;
+    int iBands = 0;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pSound );
     argStream.ReadNumber ( iLength );
+    argStream.ReadNumber ( iBands, 0 );
 
     if ( !argStream.HasErrors () )
     {
-        pData = CStaticFunctionDefinitions::GetSoundFFTData ( *pSound, iLength );
+        pData = CStaticFunctionDefinitions::GetSoundFFTData ( *pSound, iLength, iBands );
         if ( pData != NULL )
         {
-            // Create a new table
-            lua_newtable ( luaVM );
-            for (int i = 0; i <= iLength / 2;i++)
+            if ( iBands == 0 )
             {
-                lua_pushnumber ( luaVM, i );
-                lua_pushnumber ( luaVM, pData[i] );
-                lua_settable ( luaVM, -3 );
+                // Create a new table
+                lua_newtable ( luaVM );
+                for ( int i = 0; i <= iLength / 2;i++ )
+                {
+                    lua_pushnumber ( luaVM, i );
+                    lua_pushnumber ( luaVM, pData[i] );
+                    lua_settable ( luaVM, -3 );
+                }
+            }
+            else
+            {
+                // Create a new table
+                lua_newtable ( luaVM );
+                for ( int i = 0; i <= iBands - 1;i++ )
+                {
+                    lua_pushnumber ( luaVM, i );
+                    lua_pushnumber ( luaVM, pData[i] );
+                    lua_settable ( luaVM, -3 );
+                }
             }
             // Deallocate our data array here after it's used.
             delete [] pData;

@@ -6462,9 +6462,59 @@ bool CStaticFunctionDefinitions::GetSoundProperties ( CClientSound& Sound, float
     return true;
 }
 
-float* CStaticFunctionDefinitions::GetSoundFFTData ( CClientSound& Sound, int iLength )
+float* CStaticFunctionDefinitions::GetSoundFFTData ( CClientSound& Sound, int iLength, int iBands )
 {
-    return Sound.GetFFTData ( iLength );
+    if ( iBands != 0 )
+    {
+        // Post Processing option
+        // i.e. Cram it all into iBands
+        // allocate our floats with room for bands
+        float* fDataNew = new float [ iBands ];
+        // Get our FFT Data
+        float* fData = Sound.GetFFTData ( iLength );
+        // Set our count
+        int bC = 0;
+        // Minus one from bands save us doing it every time iBands is used.
+        iBands--;
+        // while we are less than iBands
+        for ( int x = 0;x <= iBands;x++ ) 
+        {
+            // Peak = 0
+            float fPeak=0.0;
+
+            // Pick a range based on our counter
+            double bB = pow ( 2,x * 10.0 / iBands );
+
+            // if our range is greater than the # of data we have cap it
+            if ( bB > ( iLength / 2 ) - 1 )
+                bB = ( iLength / 2 ) - 1;
+
+            // if our range is less than or equal to our count make sure we have at least one thing to read
+            if ( bB <= bC )
+                bB = bC + 1;
+
+            // While our counter is less than the number of samples to read
+            while ( bC < bB )
+            {
+                // if our peak is lower than the data value
+                if ( fPeak < fData[ 1+bC ] )
+                {
+                    // Set our peak and fDataNew variables accordingly
+                    fDataNew [ x ]=fData [ 1+bC ];
+                    fPeak = fData [ 1 + bC ];
+                }
+                // Increment our counter
+                bC = bC + 1;
+            }
+        }
+        // Delte fData as it's not needed and return fDataNew
+        delete[] fData;
+        return fDataNew;
+    }
+    else
+    {
+        return Sound.GetFFTData ( iLength );
+    }
 }
 
 float* CStaticFunctionDefinitions::GetSoundWaveData ( CClientSound& Sound, int iLength )
