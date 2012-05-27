@@ -1859,14 +1859,19 @@ void CCore::DoReliablePulse ( void )
 //
 // Debug timings
 //
+bool CCore::IsTimingCheckpoints ( void )
+{
+    return ms_TimingCheckpoints.IsTimingCheckpoints ();
+}
+
 void CCore::OnTimingCheckpoint ( const char* szTag )
 {
     ms_TimingCheckpoints.OnTimingCheckpoint ( szTag );
 }
 
-void CCore::OnTimingDetail ( const char* szTag, bool bForce )
+void CCore::OnTimingDetail ( const char* szTag )
 {
-    ms_TimingCheckpoints.OnTimingDetail ( szTag, bForce );
+    ms_TimingCheckpoints.OnTimingDetail ( szTag );
 }
 
 
