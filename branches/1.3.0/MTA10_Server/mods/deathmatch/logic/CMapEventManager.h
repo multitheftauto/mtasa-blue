@@ -26,25 +26,27 @@ public:
                             ~CMapEventManager               ( void );
 
     bool                    Add                             ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod );
-    bool                    Delete                          ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
-    void                    Delete                          ( CMapEvent* pEvent );
-    void                    Delete                          ( CLuaMain* pLuaMain );
+    bool                    Delete                          ( CLuaMain* pLuaMain, const char* szName = NULL, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
     void                    DeleteAll                       ( void );
-
-    inline bool             Exists                          ( const char* szName )  { return Get ( szName ) != NULL; };
-    bool                    Exists                          ( CMapEvent* pEvent );
     bool                    HandleExists                    ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction );
-    CMapEvent*              Get                             ( const char* szName );
-    CMapEvent*              GetFromXML                      ( const char* szName );
+    bool                    HasEvents                       ( void ) const          { return m_bHasEvents; }
 
     bool                    Call                            ( const char* szName, const CLuaArguments& Arguments, class CElement* pSource, class CElement* pThis, class CPlayer* pCaller = NULL );
 
 private:
-    void                        TakeOutTheTrash                 ( void );
+    void                    TakeOutTheTrash                 ( void );
+    void                    AddInternal                     ( CMapEvent* pEvent );
 
-    std::list < CMapEvent* >    m_Events;
-    std::list < CMapEvent* >    m_TrashCan;
-    bool                        m_bIteratingList;
+    bool                                    m_bHasEvents;
+    bool                                    m_bIteratingList;
+    std::multimap < SString, CMapEvent* >   m_EventsMap;
+    std::list < CMapEvent* >                m_TrashCan;
+    std::list < CMapEvent* >                m_PendingAddList;
+
+    // Types for m_EventsMap access
+    typedef std::multimap < SString, CMapEvent* > ::const_iterator  EventsConstIter;
+    typedef std::multimap < SString, CMapEvent* > ::iterator        EventsIter;
+    typedef std::pair < EventsIter, EventsIter >                    EventsIterPair;
 };
 
 #endif
