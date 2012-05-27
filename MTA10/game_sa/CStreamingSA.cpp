@@ -87,11 +87,11 @@ void CStreamingSA::LoadAllRequestedModels ( BOOL bOnlyPriorityModels, const char
         add     esp, 4
     }
 
-    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::LOG_TIMING_0000 )
+    if ( IS_TIMING_CHECKPOINTS() )
     {
         uint deltaTimeMs = ( GetTimeUs () - startTime ) / 1000;
         if ( deltaTimeMs > 2 )
-            TIMING_DETAIL_FORCE( SString ( "LoadAllRequestedModels( %d, %s ) took %d ms", bOnlyPriorityModels, szTag, deltaTimeMs ) );
+            TIMING_DETAIL( SString ( "LoadAllRequestedModels( %d, %s ) took %d ms", bOnlyPriorityModels, szTag, deltaTimeMs ) );
     }
 }
 

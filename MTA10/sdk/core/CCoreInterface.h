@@ -48,13 +48,13 @@ enum eCoreVersion
 #endif
 
 #if WITH_TIMING_CHECKPOINTS
+    #define IS_TIMING_CHECKPOINTS()     g_pCore->IsTimingCheckpoints ()
     #define TIMING_CHECKPOINT(x)        g_pCore->OnTimingCheckpoint ( x )
     #define TIMING_DETAIL(x)            g_pCore->OnTimingDetail ( x )
-    #define TIMING_DETAIL_FORCE(x)      g_pCore->OnTimingDetail ( x, true )
 #else
+    #define IS_TIMING_CHECKPOINTS()     (false)
     #define TIMING_CHECKPOINT(x)        {}
     #define TIMING_DETAIL(x)            {}
-    #define TIMING_DETAIL_FORCE(x)      {}
 #endif
 
 class CCoreInterface
@@ -126,8 +126,9 @@ public:
 
     virtual void                    SwitchRenderWindow              ( HWND hWnd, HWND hWndInput ) = 0;
     virtual void                    SetCenterCursor                 ( bool bEnabled ) = 0;
+    virtual bool                    IsTimingCheckpoints             ( void ) = 0;
     virtual void                    OnTimingCheckpoint              ( const char* szTag ) = 0;
-    virtual void                    OnTimingDetail                  ( const char* szTag, bool bForceLog = false ) = 0;
+    virtual void                    OnTimingDetail                  ( const char* szTag ) = 0;
 
     // CGUI Callbacks
     virtual bool                    OnMouseClick                    ( CGUIMouseEventArgs Args ) = 0;
