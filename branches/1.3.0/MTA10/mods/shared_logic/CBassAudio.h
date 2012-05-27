@@ -17,6 +17,7 @@ enum eSoundEventType
     SOUND_EVENT_FINISHED_DOWNLOAD,
     SOUND_EVENT_CHANGED_META,
     SOUND_EVENT_STREAM_RESULT,
+    SOUND_EVENT_BEAT,
 };
 
 struct SSoundEventInfo
@@ -36,6 +37,8 @@ struct SSoundThreadVariables
     DWORD                   pSound;
     bool                    bStreamCreateResult;
     std::list < double >    onClientSoundFinishedDownloadQueue;
+    std::list < float >     onClientBPMQueue;
+    std::list < double >    onClientBeatQueue;
     std::list < SString >   onClientSoundChangedMetaQueue;
     CCriticalSection        criticalSection;
 
@@ -76,6 +79,10 @@ public:
     bool                    GetQueuedEvent          ( SSoundEventInfo& info );
     void                    ParseShoutcastMeta      ( const SString& strMeta );
     float*                  GetFFTData              ( int iLength );
+    float*                  GetWaveData              ( int iLength );
+    DWORD                   GetLevelData            ( void );
+    float                   GetSoundBPM             ( void );
+    void                    SetSoundBPM             ( float fBPM )                                              { m_fBPM = fBPM;}
 
 protected:
     HSTREAM                 ConvertFileToMono       ( const SString& strPath );
@@ -125,4 +132,5 @@ private:
     std::map < SString, SString > m_ConvertedTagMap;
 
     std::list < SSoundEventInfo > m_EventQueue;
+    float                   m_fBPM;
 };

@@ -451,6 +451,15 @@ float* CClientSound::GetFFTData ( int iLength )
     return NULL;
 }
 
+
+float* CClientSound::GetWaveData ( int iLength )
+{
+    if ( m_pAudio )
+    {
+        return m_pAudio->GetWaveData ( iLength );
+    }
+    return NULL;
+}
 bool CClientSound::SetPanEnabled ( bool bPan )
 {
     if ( m_pAudio && m_b3D )
@@ -472,6 +481,23 @@ bool CClientSound::IsPanEnabled ( void )
 }
 
 
+DWORD CClientSound::GetLevelData ( void )
+{
+    if ( m_pAudio )
+    {
+        return m_pAudio->GetLevelData ( );
+    }
+    return 0;
+}
+
+float CClientSound::GetSoundBPM ( void )
+{
+    if ( m_pAudio )
+    {
+        return m_pAudio->GetSoundBPM ( );
+    }
+    return 0.0f;
+}
 
 ////////////////////////////////////////////////////////////
 //
@@ -592,6 +618,13 @@ void CClientSound::Process3D ( const CVector& vecPlayerPosition, const CVector& 
                 Arguments.PushString ( eventInfo.strString );
             CallEvent ( "onClientSoundStream", Arguments, true );
             OutputDebugLine ( SString ( "[ClientSound] onClientSoundStream %d %f %s", eventInfo.bBool, eventInfo.dNumber, *eventInfo.strString ) );
+        }
+        else
+        if ( eventInfo.type == SOUND_EVENT_BEAT )
+        {
+            CLuaArguments Arguments;
+            Arguments.PushNumber ( eventInfo.dNumber );
+            CallEvent ( "onClientSoundBeat", Arguments, true );
         }
     }
 }

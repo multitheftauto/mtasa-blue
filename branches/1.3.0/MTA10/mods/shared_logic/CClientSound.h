@@ -68,8 +68,11 @@ public:
     void                    GetFXModifications      ( float &fSampleRate, float &fTempo, float &fPitch, bool &bReversed );
     bool                    IsTempoChanged          ( void )                            { return m_fSampleRate != 0.0f || m_fSampleRate != 0.0f || m_fTempo != 0.0f; }
     float*                  GetFFTData              ( int iLength );
-    bool                    IsPanEnabled           ( void );
+    float*                  GetWaveData             ( int iLength );
+    bool                    IsPanEnabled            ( void );
     bool                    SetPanEnabled           ( bool bPan );
+    DWORD                   GetLevelData            ( void );
+    float                   GetSoundBPM             ( void );
 
     SString                 GetMetaTags             ( const SString& strFormat );
 
