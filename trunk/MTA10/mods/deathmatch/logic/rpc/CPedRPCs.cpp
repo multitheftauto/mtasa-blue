@@ -110,7 +110,7 @@ void CPedRPCs::RemovePedClothes ( CClientEntity* pSource, NetBitStreamInterface&
             CClientPlayerClothes* pClothes = pPed->GetClothes ();
             if ( pClothes->RemoveClothes ( ucType, false ) )
             {
-                pPed->RebuildModel ( true );
+                pPed->RebuildModel ( true, true );
             }
         }
     }

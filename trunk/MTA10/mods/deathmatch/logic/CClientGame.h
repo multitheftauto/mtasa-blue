@@ -210,7 +210,8 @@ public:
     void                                DoPulsePostFrame                ( void );
     void                                DoPulses                        ( void );
 
-    DWORD                               GetFrameTimeSlice               ( void ) { return m_dwFrameTimeSlice; }
+    uint                                GetFrameTimeSlice               ( void ) { return m_uiFrameTimeSlice; }
+    uint                                GetFrameCount                   ( void ) { return m_uiFrameCount; }
 
     void                                HandleException                 ( CExceptionInformation* pExceptionInformation );
     static void                         HandleRadioNext                 ( CControlFunctionBind* );
@@ -664,8 +665,9 @@ private:
     unsigned long                       m_ulBigPacketBytesReceivedBase;
     CTransferBox*                       m_pBigPacketTransferBox;
 
-    DWORD                               m_dwFrameTimeSlice;     // how long it took (in ms) to process the current frame
-    DWORD                               m_dwLastFrameTick;      // time at which the previous frame was processed
+    uint                                m_uiFrameTimeSlice;     // how long it took (in ms) to process the current frame
+    uint                                m_uiLastFrameTick;      // time at which the previous frame was processed
+    uint                                m_uiFrameCount;         // Frame counter
 
     long long                           m_llLastTransgressionTime;
     SString                             m_strLastDiagnosticStatus;
