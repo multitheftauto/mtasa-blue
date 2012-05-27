@@ -6464,14 +6464,14 @@ bool CStaticFunctionDefinitions::GetSoundProperties ( CClientSound& Sound, float
 
 float* CStaticFunctionDefinitions::GetSoundFFTData ( CClientSound& Sound, int iLength, int iBands )
 {
-    if ( iBands != 0 )
+    // Get our FFT Data
+    float* fData = Sound.GetFFTData ( iLength );
+    if ( iBands != 0 && fData != NULL )
     {
         // Post Processing option
         // i.e. Cram it all into iBands
         // allocate our floats with room for bands
         float* fDataNew = new float [ iBands ];
-        // Get our FFT Data
-        float* fData = Sound.GetFFTData ( iLength );
         // Set our count
         int bC = 0;
         // Minus one from bands save us doing it every time iBands is used.
@@ -6513,7 +6513,7 @@ float* CStaticFunctionDefinitions::GetSoundFFTData ( CClientSound& Sound, int iL
     }
     else
     {
-        return Sound.GetFFTData ( iLength );
+        return fData;
     }
 }
 
