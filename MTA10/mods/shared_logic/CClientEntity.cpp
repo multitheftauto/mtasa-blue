@@ -733,7 +733,7 @@ void CClientEntity::CallEventNoParent ( const char* szName, const CLuaArguments&
 {
     // Call it on us if this isn't the same class it was raised on
     //TODO not sure why the null check is necessary (eAi)
-    if ( pSource != this && m_pEventManager != NULL )
+    if ( pSource != this && m_pEventManager != NULL && m_pEventManager->HasEvents () )
     {
         m_pEventManager->Call ( szName, Arguments, pSource, this );
     }
@@ -744,9 +744,14 @@ void CClientEntity::CallEventNoParent ( const char* szName, const CLuaArguments&
         CChildListType ::const_iterator iter = m_Children.begin ();
         for ( ; iter != m_Children.end (); iter++ )
         {
-            (*iter)->CallEventNoParent ( szName, Arguments, pSource );
-            if ( m_bBeingDeleted )
-                break;
+            CClientEntity* pEntity = *iter;
+
+            if ( !pEntity->m_pEventManager || pEntity->m_pEventManager->HasEvents () || !pEntity->m_Children.empty () )
+            {
+                pEntity->CallEventNoParent ( szName, Arguments, pSource );
+                if ( m_bBeingDeleted )
+                    break;
+            }
         }
     }
 }
@@ -755,7 +760,7 @@ void CClientEntity::CallEventNoParent ( const char* szName, const CLuaArguments&
 void CClientEntity::CallParentEvent ( const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource )
 {
     // Call the event on us
-    if ( m_pEventManager )
+    if ( m_pEventManager && m_pEventManager->HasEvents () )
     {
         m_pEventManager->Call ( szName, Arguments, pSource, this );
     }

@@ -1026,7 +1026,7 @@ void CElement::FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, lua_State* 
 void CElement::CallEventNoParent ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller )
 {
     // Call it on us if this isn't the same class it was raised on
-    if ( pSource != this )
+    if ( pSource != this && m_pEventManager->HasEvents () )
     {
         m_pEventManager->Call ( szName, Arguments, pSource, this, pCaller );
     }
@@ -1035,9 +1035,14 @@ void CElement::CallEventNoParent ( const char* szName, const CLuaArguments& Argu
     CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
-        (*iter)->CallEventNoParent ( szName, Arguments, pSource, pCaller );
-        if ( m_bIsBeingDeleted )
-            break;
+        CElement* pElement = *iter;
+
+        if ( !pElement->m_pEventManager || pElement->m_pEventManager->HasEvents () || !pElement->m_Children.empty () )
+        {
+            pElement->CallEventNoParent ( szName, Arguments, pSource, pCaller );
+            if ( m_bIsBeingDeleted )
+                break;
+        }
     }
 }
 
@@ -1045,7 +1050,10 @@ void CElement::CallEventNoParent ( const char* szName, const CLuaArguments& Argu
 void CElement::CallParentEvent ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller )
 {
     // Call the event on us
-    m_pEventManager->Call ( szName, Arguments, pSource, this, pCaller );
+    if ( m_pEventManager->HasEvents () )
+    {
+        m_pEventManager->Call ( szName, Arguments, pSource, this, pCaller );
+    }
 
     // Call parent's handler
     if ( m_pParent )
