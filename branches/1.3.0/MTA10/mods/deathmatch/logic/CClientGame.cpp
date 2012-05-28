@@ -227,10 +227,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     else
         m_ulTimeStart = CClientTime::GetTime ();
 
-    m_dwFrameTimeSlice = 0;
-    m_dwLastFrameTick = 0;
-    m_llLastTransgressionTime = 0;
-
     // MTA Voice
     m_pVoiceRecorder = new CVoiceRecorder();
 
@@ -3648,17 +3644,18 @@ void CClientGame::PostWorldProcessHandler ( void )
     m_pManager->GetMarkerManager ()->DoPulse ();
 
     // Update frame time slice
-    DWORD dwCurrentTick = GetTickCount32 ();
-    if ( m_dwLastFrameTick )
+    uint uiCurrentTick = GetTickCount32 ();
+    if ( m_uiLastFrameTick )
     {
-        m_dwFrameTimeSlice = dwCurrentTick - m_dwLastFrameTick;
+        m_uiFrameTimeSlice = uiCurrentTick - m_uiLastFrameTick;
+        m_uiFrameCount++;
 
         // Call onClientPreRender LUA event
         CLuaArguments Arguments;
-        Arguments.PushNumber ( m_dwFrameTimeSlice );
+        Arguments.PushNumber ( m_uiFrameTimeSlice );
         m_pRootEntity->CallEvent ( "onClientPreRender", Arguments, false );
     }
-    m_dwLastFrameTick = dwCurrentTick;
+    m_uiLastFrameTick = uiCurrentTick;
 }
 
 

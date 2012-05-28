@@ -288,7 +288,8 @@ public:
 
     void                        ResetToOutOfVehicleWeapon   ( void );
 
-    void                        RebuildModel                ( bool bForceClothes = false );
+    void                        RebuildModel                ( bool bForceClothes = false, bool bDelayChange = false );
+    void                        ProcessRebuildPlayer        ( void );
     void                        SetStat                     ( unsigned short usStat, float fValue );
     float                       GetStat                     ( unsigned short usStat );
     void                        ResetStats                  ( void );
@@ -576,6 +577,8 @@ public:
     float                       m_fLighting;
     unsigned char               m_ucEnteringDoor;
     unsigned char               m_ucLeavingDoor;
+    bool                        m_bPendingRebuildPlayer;
+    uint                        m_uiFrameLastRebuildPlayer;
 
     bool                        m_bBulletImpactData;
     CClientEntity*              m_pBulletImpactEntity;

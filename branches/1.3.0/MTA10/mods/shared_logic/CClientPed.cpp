@@ -2340,6 +2340,8 @@ void CClientPed::StreamedInPulse ( void )
                 g_pGame->GetStreaming()->LoadAllRequestedModels( false, "CClientPed::StreamedInPulse - m_iLoadAllModelsCounter" );
         }
 
+        if ( m_bPendingRebuildPlayer )
+            ProcessRebuildPlayer ();
 
         if ( m_bIsLocalPlayer )
         {
@@ -3354,6 +3356,9 @@ void CClientPed::_DestroyModel ()
     m_pLoadedModelInfo->RemoveRef ();
     m_pLoadedModelInfo = NULL;
 
+    // Any pending rebuild will not be required now
+    m_bPendingRebuildPlayer = false;
+
     NotifyDestroy ();
 }
 
@@ -3536,7 +3541,7 @@ void CClientPed::ModelRequestCallback ( CModelInfo* pModelInfo )
 }
 
 
-void CClientPed::RebuildModel ( bool bForceClothes )
+void CClientPed::RebuildModel ( bool bForceClothes, bool bDelayChange )
 {
     // We have a player
     if ( m_pPlayerPed )
@@ -3553,16 +3558,38 @@ void CClientPed::RebuildModel ( bool bForceClothes )
                 g_pLastRebuilt = this;
             }
 
+            m_bPendingRebuildPlayer = true;
+
+            // Apply immediately unless there is a chance more clothes states will change (e.g. via script)
+            if ( !bDelayChange )
+                ProcessRebuildPlayer ();
+        }
+    }
+}
+
+
+//
+// Process any pending build but avoid rebuilding more than once a frame
+//
+void CClientPed::ProcessRebuildPlayer ( void )
+{
+    if ( m_bPendingRebuildPlayer && m_uiFrameLastRebuildPlayer != g_pClientGame->GetFrameCount () )
+    {
+        m_bPendingRebuildPlayer = false;
+        m_uiFrameLastRebuildPlayer = g_pClientGame->GetFrameCount ();
+
+        if ( m_pPlayerPed )
+        {
             if ( m_bIsLocalPlayer )
             {
                 m_pPlayerPed->RebuildPlayer ();
             }
             else
             {
-                g_pMultiplayer->RebuildMultiplayerPlayer ( m_pPlayerPed );            
+                g_pMultiplayer->RebuildMultiplayerPlayer ( m_pPlayerPed );
             }
         }
-    }    
+    }
 }
 
 
