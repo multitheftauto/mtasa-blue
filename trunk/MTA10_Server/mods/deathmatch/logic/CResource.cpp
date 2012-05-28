@@ -2570,46 +2570,16 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
     // if we're trying to return a http file. Otherwize it's the MTA
     // client trying to download files.
     CAccessControlListManager * aclManager = g_pGame->GetACLManager();
-
-
-    //
-    // Old way
-    //
-
-    // e.g "resource.admin"
-    bool bHasResourceRight = aclManager->CanObjectUseRight ( account->GetName().c_str (),
+    if ( !aclManager->CanObjectUseRight ( account->GetName().c_str (),
                                             CAccessControlListGroupObject::OBJECT_TYPE_USER,
                                             m_strResourceName.c_str (),
                                             CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-                                            true );
-
-    // "general.http"
-    bool bHasGeneralHttpRight = aclManager->CanObjectUseRight ( account->GetName().c_str (),
+                                            true ) ||
+         !aclManager->CanObjectUseRight ( account->GetName().c_str (),
                                             CAccessControlListGroupObject::OBJECT_TYPE_USER,
                                             "http",
                                             CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                                            true );
-
-    // Old way. i.e. resource need to be specifically blocked for http access
-    bool bHasRightOldWay = bHasResourceRight && bHasGeneralHttpRight;
-
-
-    //
-    // New way
-    //
-
-    // e.g "resource.admin.http"
-    bool bHasResourceHttpRight = aclManager->CanObjectUseRight ( account->GetName().c_str (),
-                                            CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                            ( m_strResourceName + ".http" ).c_str (),
-                                            CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-                                            false );
-
-    // New way. i.e. resource need to be specifically allowed for http access
-    bool bHasRightNewWay = bHasResourceHttpRight;
-
-
-    if ( !bHasRightOldWay && !bHasRightNewWay )
+                                            true ) )
     {
         bAlreadyCalling = false;
         return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );;
