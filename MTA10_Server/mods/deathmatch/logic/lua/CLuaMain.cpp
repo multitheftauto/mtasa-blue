@@ -335,7 +335,15 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
                     g_pGame->GetScriptDebugging()->LogError ( strFile, iLine, strMsg );
                 }
                 else
+                {
+                    SString strResourcePath = ConformResourcePath ( szFileName );
+                    if ( !strRes.ContainsI ( ExtractFilename ( strResourcePath ) ) )
+                    {
+                        // Add filename to error message, if not already present
+                        strRes = SString ( "%s (global scope) - %s", *strResourcePath, *strRes );
+                    }
                     g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
+                }
             }
             return true;
         }
