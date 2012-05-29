@@ -1583,6 +1583,8 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                         if ( pTempPlayer->UhOhNetworkTrouble () )
                         {
                             pTempPlayer->Send ( CPlayerDisconnectedPacket ( SString ( "Supplanted by %s from %s", szNick, pPlayer->GetSourceIP () ) ) );
+                            // Tell the console
+                            CLogger::LogPrintf ( "DISCONNECT: %s Supplanted by (%s)\n", szNick, pTempPlayer->GetNick ( ) );
                             QuitPlayer ( *pTempPlayer, CClient::QUIT_QUIT );
                             pTempPlayer = NULL;
                         }
@@ -1770,6 +1772,17 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                 // Tell the player the problem
                 DisconnectPlayer ( this, *pPlayer, "Disconnected: Invalid nickname" );
             }
+        }
+        else
+        {
+            // Tell the console
+            CLogger::LogPrintf ( "CONNECT: %s failed to connect (Player Element Could not be created.)\n", pPlayer->GetSourceIP () );
+
+            // Tell the console
+            CLogger::LogPrint ( "URGENT: Report this error on bugs.mtasa.com error code: 6930-2\n" );
+
+            // Tell the player the problem
+            DisconnectPlayer ( this, *pPlayer, "Disconnected: Player Element Could not be created." );
         }
     }
 }
