@@ -1524,6 +1524,12 @@ bool CStaticFunctionDefinitions::GetPedControlState ( CClientPed & Ped, const ch
         Ped.GetControllerState ( cs );
         bool bOnFoot = ( !Ped.GetRealOccupiedVehicle () );
         bState = CClientPad::GetControlState ( szControl, cs, bOnFoot );
+        float fState;
+        if ( CClientPad::GetAnalogControlState ( szControl, cs, bOnFoot, fState ) )
+        {
+            bState = fState > 0;
+            return true;
+        }
         return true;
     }
     if ( Ped.m_Pad.GetControlState ( szControl, bState ) )
@@ -1533,6 +1539,38 @@ bool CStaticFunctionDefinitions::GetPedControlState ( CClientPed & Ped, const ch
     return false;
 }
 
+bool CStaticFunctionDefinitions::GetPedAnalogControlState ( CClientPed & Ped, const char * szControl, float & fState )
+{
+    if ( Ped.GetType () == CCLIENTPLAYER )
+    {
+        CControllerState cs;
+        Ped.GetControllerState ( cs );
+        bool bOnFoot = ( !Ped.GetRealOccupiedVehicle () );
+        if ( CClientPad::GetAnalogControlState ( szControl, cs, bOnFoot, fState ) )
+            return fState;
+
+        return true;
+    }
+    if ( Ped.m_Pad.GetControlState ( szControl, fState ) )
+    {
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetPedAnalogControlState ( CClientEntity & Entity, const char * szControl, float fState )
+{
+    RUN_CHILDREN SetPedControlState ( **iter, szControl, fState );
+    if ( IS_PED ( &Entity ) )
+    {
+        CClientPed& Ped = static_cast < CClientPed& > ( Entity );
+        if ( Ped.m_Pad.SetControlState ( szControl, fState ) )
+        {
+            return true;
+        }
+    }
+    return false;
+}
 
 bool CStaticFunctionDefinitions::IsPedDoingGangDriveby ( CClientPed & Ped, bool & bDoingGangDriveby )
 {
@@ -5996,7 +6034,11 @@ bool CStaticFunctionDefinitions::GetKeyState ( const char* szKey, bool& bState )
 bool CStaticFunctionDefinitions::GetControlState ( const char* szControl, bool& bState )
 {
     assert ( szControl );
-    
+
+    float fState;
+    if ( CStaticFunctionDefinitions::GetAnalogControlState ( szControl , fState ) )
+        return fState > 0;
+
     CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds ();
     SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szControl );
     if ( pControl )
