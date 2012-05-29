@@ -112,6 +112,7 @@ public:
     bool                            m_bRemoteBulletSyncFireButtonPressed;
     bool                            m_bRemoteBulletSyncEnabled;
 
+    bool                            m_bMessageShown;
 private:
     bool                            m_bIsLocalPlayer;
     SString                         m_strNick;
