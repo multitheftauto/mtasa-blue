@@ -80,8 +80,8 @@ namespace
                                          { "resetWorldSounds",          "1.3.0-9.04134" },
                                          { "onClientSoundBeat",         "1.3.0-9.04162" },
                                          { "getSoundBPM",               "1.3.0-9.04162" },
-                                         { "getSoundLevelData ",        "1.3.0-9.04162" },
-                                         { "getSoundWaveData ",         "1.3.0-9.04162" },
+                                         { "getSoundLevelData",         "1.3.0-9.04162" },
+                                         { "getSoundWaveData",          "1.3.0-9.04162" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
