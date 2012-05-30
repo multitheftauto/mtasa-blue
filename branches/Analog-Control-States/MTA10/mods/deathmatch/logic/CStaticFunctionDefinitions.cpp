@@ -1524,13 +1524,23 @@ bool CStaticFunctionDefinitions::GetPedControlState ( CClientPed & Ped, const ch
         Ped.GetControllerState ( cs );
         bool bOnFoot = ( !Ped.GetRealOccupiedVehicle () );
         bState = CClientPad::GetControlState ( szControl, cs, bOnFoot );
-        float fState;
-        if ( CClientPad::GetAnalogControlState ( szControl, cs, bOnFoot, fState ) )
+        float fState = 0;
+        unsigned int uiIndex;
+        // Check it's Analog
+        if ( CClientPad::GetAnalogControlIndex ( szControl, uiIndex ) )
         {
-            bState = fState > 0;
+            if ( CClientPad::GetAnalogControlState ( szControl, cs, bOnFoot, fState ) )
+            {
+                bState = fState > 0;
+                return true;
+            }
+        }
+        // or binary.
+        else
+        {
+            bState = CClientPad::GetControlState ( szControl, cs, bOnFoot );
             return true;
         }
-        return true;
     }
     if ( Ped.m_Pad.GetControlState ( szControl, bState ) )
     {
@@ -1546,8 +1556,12 @@ bool CStaticFunctionDefinitions::GetPedAnalogControlState ( CClientPed & Ped, co
         CControllerState cs;
         Ped.GetControllerState ( cs );
         bool bOnFoot = ( !Ped.GetRealOccupiedVehicle () );
-        if ( CClientPad::GetAnalogControlState ( szControl, cs, bOnFoot, fState ) )
-            return fState;
+        unsigned int uiIndex;
+        // check it's analog or use binary.
+        if ( CClientPad::GetAnalogControlIndex ( szControl, uiIndex ) )
+            CClientPad::GetAnalogControlState ( szControl, cs, bOnFoot, fState );
+        else
+            fState = CClientPad::GetControlState ( szControl, cs, bOnFoot ) == true ? 1.0f : 0.0f;
 
         return true;
     }
@@ -1560,7 +1574,8 @@ bool CStaticFunctionDefinitions::GetPedAnalogControlState ( CClientPed & Ped, co
 
 bool CStaticFunctionDefinitions::SetPedAnalogControlState ( CClientEntity & Entity, const char * szControl, float fState )
 {
-    RUN_CHILDREN SetPedControlState ( **iter, szControl, fState );
+    RUN_CHILDREN SetPedAnalogControlState ( **iter, szControl, fState );
+
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
@@ -6036,27 +6051,32 @@ bool CStaticFunctionDefinitions::GetControlState ( const char* szControl, bool& 
     assert ( szControl );
 
     float fState;
+    // Analog
     if ( CStaticFunctionDefinitions::GetAnalogControlState ( szControl , fState ) )
-        return fState > 0;
-
-    CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds ();
-    SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szControl );
-    if ( pControl )
     {
-        bState = pControl->bState;
-        
+        bState = fState > 0;
         return true;
     }
-    
+    // Binary
+    else
+    {
+        CControllerState cs;
+        CClientPlayer* pLocalPlayer = m_pPlayerManager->GetLocalPlayer ();
+        pLocalPlayer->GetControllerState( cs );
+        bool bOnFoot = ( !pLocalPlayer->GetRealOccupiedVehicle () );
+        bState = ( CClientPad::GetControlState ( szControl, cs, bOnFoot ) == true ? 1.0f : 0.0f ) > 0;
+        return true;
+    }
+
     return false;
 }
 
 bool CStaticFunctionDefinitions::GetAnalogControlState ( const char * szControl, float & fState )
 {
     CControllerState cs;
-    CClientPlayer* localPlayer = m_pPlayerManager->GetLocalPlayer ();
-    localPlayer->GetControllerState( cs );
-    bool bOnFoot = ( !localPlayer->GetRealOccupiedVehicle () );
+    CClientPlayer* pLocalPlayer = m_pPlayerManager->GetLocalPlayer ();
+    pLocalPlayer->GetControllerState( cs );
+    bool bOnFoot = ( !pLocalPlayer->GetRealOccupiedVehicle () );
     if ( CClientPad::GetAnalogControlState ( szControl, cs, bOnFoot, fState ) )
     {
         return true;
@@ -6086,15 +6106,18 @@ bool CStaticFunctionDefinitions::SetControlState ( const char* szControl, bool b
 {
     assert ( szControl );
 
-    CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds ();    
-    SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szControl );
-    if ( pControl )
+    if ( bState )
     {
-        pControl->bState = bState;
-        
+        if ( CClientPad::SetAnalogControlState ( szControl , 1.0 ) )
+        {
+            return true;
+        }
+    }
+    else
+    {
+        CClientPad::RemoveSetAnalogControlState ( szControl );
         return true;
     }
-
     return false;
 }
 

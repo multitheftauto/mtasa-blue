@@ -45,7 +45,7 @@ public:
 
     static void                     ProcessAllToggledControls   ( CControllerState & cs, bool bOnFoot );
     static bool                     ProcessToggledControl       ( const char * szName, CControllerState & cs, bool bOnFoot, bool bEnabled );
-    static bool                     GetControlState         ( const char * szName, CControllerState & State, bool bOnFoot );
+    static bool                     GetControlState             ( const char * szName, CControllerState & State, bool bOnFoot );
 
     static short*                   m_sScriptedStates;
     static bool*                    m_bScriptedReadyToReset;

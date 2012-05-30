@@ -2356,7 +2356,7 @@ void CClientPed::StreamedInPulse ( void )
 
             // Process our scripted control settings
             bool bOnFoot = pVehicle ? false : true;
-            CClientPad::ProcessAllToggledControls    ( Current, bOnFoot );
+            //CClientPad::ProcessAllToggledControls    ( Current, bOnFoot );
             CClientPad::ProcessSetAnalogControlState ( Current, bOnFoot );
         }
 
