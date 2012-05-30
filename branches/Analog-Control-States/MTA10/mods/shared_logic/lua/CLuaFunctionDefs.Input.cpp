@@ -254,18 +254,21 @@ int CLuaFunctionDefs::GetKeyState ( lua_State * luaVM )
 
 int CLuaFunctionDefs::GetControlState ( lua_State * luaVM )
 {
-    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
+    SString strControlState = "";
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strControlState );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        const char* szControl = lua_tostring ( luaVM, 1 );
         bool bState;
-        if ( CStaticFunctionDefinitions::GetControlState ( szControl , bState ) )
+        if ( CStaticFunctionDefinitions::GetControlState ( strControlState , bState ) )
         {
             lua_pushboolean ( luaVM, bState );
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getControlType" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getControlState", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -273,18 +276,22 @@ int CLuaFunctionDefs::GetControlState ( lua_State * luaVM )
 
 int CLuaFunctionDefs::GetAnalogControlState ( lua_State * luaVM )
 {
-    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
+    SString strControlState = "";
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strControlState );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        const char* szControl = lua_tostring ( luaVM, 1 );
         float fState;
-        if ( CStaticFunctionDefinitions::GetAnalogControlState ( szControl , fState ) )
+        if ( CStaticFunctionDefinitions::GetAnalogControlState ( strControlState , fState ) )
         {
             lua_pushnumber ( luaVM, fState );
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getAnalogControlState" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getAnalogControlState", *argStream.GetErrorMessage () ) );
+
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -292,21 +299,25 @@ int CLuaFunctionDefs::GetAnalogControlState ( lua_State * luaVM )
 
 int CLuaFunctionDefs::SetAnalogControlState ( lua_State * luaVM )
 {
-    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
+    SString strControlState = "";
+    float fState = 0.0f;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strControlState );
+
+    if ( !argStream.HasErrors () )
     {
-        const char* szControl = lua_tostring ( luaVM, 1 );
-        if ( lua_istype ( luaVM, 2, LUA_TNUMBER ) )
+        if ( argStream.NextIsNumber ( ) )
         {
-            float fState = lua_tonumber ( luaVM, 2 );
-            if ( CClientPad::SetAnalogControlState ( szControl , fState ) )
+            argStream.ReadNumber ( fState );
+            if ( CClientPad::SetAnalogControlState ( strControlState , fState ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
         }
-        else if ( lua_istype ( luaVM, 2, LUA_TNIL ) )
+        else if ( argStream.NextIsNil ( ) )
         {
-            CClientPad::RemoveSetAnalogControlState ( szControl );
+            CClientPad::RemoveSetAnalogControlState ( strControlState );
             lua_pushboolean ( luaVM, true );
             return 1;
         }
@@ -314,7 +325,7 @@ int CLuaFunctionDefs::SetAnalogControlState ( lua_State * luaVM )
             m_pScriptDebugging->LogBadType ( luaVM, "getAnalogControlState" );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getAnalogControlState" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setAnalogControlState", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -322,18 +333,21 @@ int CLuaFunctionDefs::SetAnalogControlState ( lua_State * luaVM )
 
 int CLuaFunctionDefs::IsControlEnabled ( lua_State * luaVM )
 {
-    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
+    SString strControlState = "";
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strControlState );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        const char* szControl = lua_tostring ( luaVM, 1 );
         bool bEnabled;
-        if ( CStaticFunctionDefinitions::IsControlEnabled ( szControl, bEnabled ) )
+        if ( CStaticFunctionDefinitions::IsControlEnabled ( strControlState, bEnabled ) )
         {
             lua_pushboolean ( luaVM, bEnabled );
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "isControlEnabled" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "isControlEnabled", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
