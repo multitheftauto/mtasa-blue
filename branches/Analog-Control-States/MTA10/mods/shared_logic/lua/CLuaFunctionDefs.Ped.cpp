@@ -994,7 +994,7 @@ int CLuaFunctionDefs::SetPedAnalogControlState ( lua_State* luaVM )
     {
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         const char * szControl = lua_tostring ( luaVM, 2 );
-        float fState = ( lua_tonumber ( luaVM, 3 ) );
+        float fState = ( float ) ( lua_tonumber ( luaVM, 3 ) );
         if ( pEntity )
         {
             if ( CStaticFunctionDefinitions::SetPedAnalogControlState ( *pEntity, szControl, fState ) )
