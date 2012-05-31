@@ -338,8 +338,10 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                 */
 
 
-                // Call GTA's window procedure.
-                return CallWindowProcW ( pThis->m_HookedWindowProc, hwnd, uMsg, wParam, lParam );
+                // If we handled mouse steering, don't let GTA.
+                //if ( !CCore::GetSingleton ().GetMouseControl()->ProcessMouseMove ( uMsg, wParam, lParam ) )
+                    // Call GTA's window procedure.
+                    return CallWindowProcW ( pThis->m_HookedWindowProc, hwnd, uMsg, wParam, lParam );
             }
 
             // Don't allow DefWindowProc if processed here. (Important for IME)

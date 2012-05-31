@@ -138,6 +138,7 @@ public:
     static bool                         GetPedBonePosition                  ( CClientPed& Ped, eBone bone, CVector & vecPosition );
     static bool                         GetPedClothes                       ( CClientPed& Ped, unsigned char ucType, SString& strOutTexture, SString& strOutModel );
     static bool                         GetPedControlState                  ( CClientPed& Ped, const char * szControl, bool & bState );
+    static bool                         GetPedAnalogControlState            ( CClientPed& Ped, const char * szControl, float & fState );
     static bool                         IsPedDoingGangDriveby               ( CClientPed& Ped, bool & bDoingGangDriveby );
     static bool                         GetPedAnimation                     ( CClientPed& Ped, SString& strOutBlockName, SString& strOutAnimName );
     static bool                         GetPedMoveAnim                      ( CClientPed& Ped, unsigned int& iMoveAnim );
@@ -165,6 +166,7 @@ public:
     static bool                         AddPedClothes                       ( CClientEntity& Entity, const char* szTexture, const char* szModel, unsigned char ucType );
     static bool                         RemovePedClothes                    ( CClientEntity& Entity, unsigned char ucType );
     static bool                         SetPedControlState                  ( CClientEntity& Entity, const char* szControl, bool bState );
+    static bool                         SetPedAnalogControlState            ( CClientEntity& Entity, const char* szControl, float fState );
     static bool                         SetPedDoingGangDriveby              ( CClientEntity& Entity, bool bGangDriveby );
     static bool                         SetPedLookAt                        ( CClientEntity& Entity, CVector & vecPosition, int iTime, int iBlend, CClientEntity * pTarget );
     static bool                         SetPedHeadless                      ( CClientEntity& Entity, bool bHeadless );
