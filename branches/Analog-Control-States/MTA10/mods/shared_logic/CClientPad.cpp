@@ -16,8 +16,8 @@
 
 #define CS_NAN -32768
 
-short* CClientPad::m_sScriptedStates = new short [ MAX_GTA_ANALOG_CONTROLS ];
-bool*  CClientPad::m_bScriptedReadyToReset = new bool [ MAX_GTA_ANALOG_CONTROLS ];
+SFixedArray < short, MAX_GTA_CONTROLS > CClientPad::m_sScriptedStates;
+SFixedArray < bool, MAX_GTA_CONTROLS > CClientPad::m_bScriptedReadyToReset;
 
 
 static const SFixedArray < const char*, MAX_GTA_CONTROLS > g_GTAControls =
@@ -163,42 +163,61 @@ void CClientPad::DoPulse ( CClientPed * pPed )
              if ( !bInVehicle )
             {
                 cs.ButtonCircle = ( m_fStates [ 0 ] ) ? 255 : 0; // Fire
-                cs.LeftStickY = ( ( m_fStates [ 3 ] && m_fStates [ 4 ] ) ||
+
+                cs.LeftStickY = ( short ) ( ( ( m_fStates [ 3 ] && m_fStates [ 4 ] ) ||
                                 ( !m_fStates [ 3 ] && !m_fStates [ 4 ] ) ) ? 0 :
-                                ( m_fStates [ 3 ] ) ? m_fStates [ 3 ]*-128 : m_fStates [ 4 ]*128;
-                cs.LeftStickX = ( ( m_fStates [ 5 ] && m_fStates [ 6 ] ) ||
+                                ( m_fStates [ 3 ] ) ? m_fStates [ 3 ]*-128 : m_fStates [ 4 ]*128 );
+
+                cs.LeftStickX = ( short ) (  ( ( m_fStates [ 5 ] && m_fStates [ 6 ] ) ||
                                 ( !m_fStates [ 5 ] && !m_fStates [ 6 ] ) ) ? 0 :
-                                ( m_fStates [ 5 ] ) ? m_fStates [ 5 ]*-128 : m_fStates [ 6 ]*128;
+                                ( m_fStates [ 5 ] ) ? m_fStates [ 5 ]*-128 : m_fStates [ 6 ]*128 );
+
                 cs.ButtonSquare = ( m_fStates [ 11 ] ) ? 255 : 0; // Jump
+
                 cs.ButtonCross = ( m_fStates [ 12 ] ) ? 255 : 0; // Sprint
+
                 cs.ShockButtonR = ( m_fStates [ 13 ] ) ? 255 : 0; // Look Behind
+
                 cs.ShockButtonL = ( m_fStates [ 14 ] ) ? 255 : 0; // Crouch
+
                 cs.LeftShoulder1 = ( m_fStates [ 15 ] ) ? 255 : 0; // Action
+
                 cs.m_bPedWalk = ( m_fStates [ 16 ] ) ? 255 : 0; // Walk
+
                 cs.RightShoulder1 = ( m_fStates [ 39 ] ) ? 255 : 0; // Aim Weapon
             }
             else
             {
                 cs.ButtonCircle = ( m_fStates [ 17 ] ) ? 255 : 0; // Fire
+
                 cs.LeftShoulder1 = ( m_fStates [ 18 ] ) ? 255 : 0; // Secondary Fire
-                cs.LeftStickX = ( ( m_fStates [ 19 ] && m_fStates [ 20 ] ) ||
+                cs.LeftStickX = ( short ) ( ( ( m_fStates [ 19 ] && m_fStates [ 20 ] ) ||
                                 ( !m_fStates [ 19 ] && !m_fStates [ 20 ] ) ) ? 0 :
-                                ( m_fStates [ 19 ] ) ? m_fStates [ 19 ]*-128 : m_fStates [ 20 ]*128;
-                cs.LeftStickY = ( ( m_fStates [ 21 ] && m_fStates [ 22 ] ) ||
+                                ( m_fStates [ 19 ] ) ? m_fStates [ 19 ]*-128 : m_fStates [ 20 ]*128 );
+
+                cs.LeftStickY = ( short ) ( ( ( m_fStates [ 21 ] && m_fStates [ 22 ] ) ||
                                 ( !m_fStates [ 21 ] && !m_fStates [ 22 ] ) ) ? 0 :
-                                ( m_fStates [ 21 ] ) ? m_fStates [ 21 ]*-128 : m_fStates [ 22 ]*128;
-                cs.ButtonCross = ( m_fStates [ 23 ] * 255 ); // Accelerate
-                cs.ButtonSquare = ( m_fStates [ 24 ] * 255 ); // Reverse
+                                ( m_fStates [ 21 ] ) ? m_fStates [ 21 ]*-128 : m_fStates [ 22 ]*128 );
+
+                cs.ButtonCross = ( short ) ( ( m_fStates [ 23 ] * 255 ) ); // Accelerate
+
+                cs.ButtonSquare = ( short ) ( ( m_fStates [ 24 ] * 255 ) ); // Reverse
+
                 cs.ShockButtonL = ( m_fStates [ 28 ] ) ? 255 : 0; // Horn
+
                 cs.RightShoulder1 = ( m_fStates [ 30 ] ) ? 255 : 0; // Handbrake
+
                 cs.LeftShoulder2 = ( m_fStates [ 31 ] || m_fStates [ 33 ] ) ? 255 : 0; // Look Left
-                cs.RightShoulder2 = ( m_fStates [ 32 ] || m_fStates [ 33 ] ) ? 255 : 0; // Look Right                
-                cs.RightStickX = ( ( m_fStates [ 35 ] && m_fStates [ 36 ] ) ||
+
+                cs.RightShoulder2 = ( m_fStates [ 32 ] || m_fStates [ 33 ] ) ? 255 : 0; // Look Right
+
+                cs.RightStickX = ( short ) ( ( ( m_fStates [ 35 ] && m_fStates [ 36 ] ) ||
                                 ( !m_fStates [ 35 ] && !m_fStates [ 36 ] ) ) ? 0 :
-                                ( m_fStates [ 35 ] ) ? m_fStates [ 35 ]*128 : m_fStates [ 36 ]*-128;
-                cs.RightStickY = ( ( m_fStates [ 37 ] && m_fStates [ 38 ] ) ||
+                                ( m_fStates [ 35 ] ) ? m_fStates [ 35 ]*128 : m_fStates [ 36 ]*-128 );
+
+                cs.RightStickY = ( short ) ( ( ( m_fStates [ 37 ] && m_fStates [ 38 ] ) ||
                                 ( !m_fStates [ 37 ] && !m_fStates [ 38 ] ) ) ? 0 :
-                                ( m_fStates [ 37 ] ) ? m_fStates [ 37 ]*128 : m_fStates [ 38 ]*-128;
+                                ( m_fStates [ 37 ] ) ? m_fStates [ 37 ]*128 : m_fStates [ 38 ]*-128 );
             }
         }
         pPed->SetControllerState ( cs );
@@ -357,20 +376,20 @@ bool CClientPad::SetAnalogControlState ( const char * szName, float fState )
     {       
         switch ( uiIndex )
         {
-            case 0: m_sScriptedStates [ uiIndex ] = fState * -128.0f ; return true; //Left
-            case 1: m_sScriptedStates [ uiIndex ] = fState * 128.0f ; return true;  //Right
-            case 2: m_sScriptedStates [ uiIndex ] = fState * -128.0f ; return true;  //Up
-            case 3: m_sScriptedStates [ uiIndex ] = fState * 128.0f ; return true;  //Down
-            case 4: m_sScriptedStates [ uiIndex ] = fState * -128.0f ; return true;  //Left
-            case 5: m_sScriptedStates [ uiIndex ] = fState * 128.0f ; return true;  //Right 
-            case 6: m_sScriptedStates [ uiIndex ] = fState * -128.0f ; return true;  //Up
-            case 7: m_sScriptedStates [ uiIndex ] = fState * 128.0f ; return true;  //Down
-            case 8: m_sScriptedStates [ uiIndex ] = fState * 255.0f ; return true;  //Accel
-            case 9: m_sScriptedStates [ uiIndex ] = fState * 255.0f ; return true;  //Reverse
-            case 10: m_sScriptedStates [ uiIndex ] = fState * -128.0f ; return true;  //Special Left
-            case 11: m_sScriptedStates [ uiIndex ] = fState * 128.0f ; return true;  //Special Right
-            case 12: m_sScriptedStates [ uiIndex ] = fState * -128.0f ; return true;  //Special Up
-            case 13: m_sScriptedStates [ uiIndex ] = fState * 128.0f ; return true;  //Special Down
+            case 0: m_sScriptedStates [ uiIndex ] = ( short ) ( fState * -128.0f ); return true; //Left
+            case 1: m_sScriptedStates [ uiIndex ] = ( short ) ( fState * 128.0f ); return true;  //Right
+            case 2: m_sScriptedStates [ uiIndex ] = ( short ) ( fState * -128.0f ); return true;  //Up
+            case 3: m_sScriptedStates [ uiIndex ] = ( short ) ( fState * 128.0f ); return true;  //Down
+            case 4: m_sScriptedStates [ uiIndex ] = ( short ) ( fState * -128.0f ); return true;  //Left
+            case 5: m_sScriptedStates [ uiIndex ] = ( short ) ( fState * 128.0f ); return true;  //Right 
+            case 6: m_sScriptedStates [ uiIndex ] = ( short ) ( fState * -128.0f ); return true;  //Up
+            case 7: m_sScriptedStates [ uiIndex ] = ( short ) ( fState * 128.0f ); return true;  //Down
+            case 8: m_sScriptedStates [ uiIndex ] = ( short ) ( fState * 255.0f ); return true;  //Accel
+            case 9: m_sScriptedStates [ uiIndex ] = ( short ) ( fState * 255.0f ); return true;  //Reverse
+            case 10: m_sScriptedStates [ uiIndex ] = ( short ) ( fState * -128.0f ); return true;  //Special Left
+            case 11: m_sScriptedStates [ uiIndex ] = ( short ) ( fState * 128.0f ); return true;  //Special Right
+            case 12: m_sScriptedStates [ uiIndex ] = ( short ) ( fState * -128.0f ); return true;  //Special Up
+            case 13: m_sScriptedStates [ uiIndex ] = ( short ) ( fState * 128.0f ); return true;  //Special Down
             default: return false;
         }
     }
