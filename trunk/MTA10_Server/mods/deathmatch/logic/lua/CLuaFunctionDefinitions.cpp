@@ -3383,7 +3383,7 @@ int CLuaFunctionDefinitions::SetPlayerNametagColor ( lua_State* luaVM )
         }
 
         // False passed instead? Remove the override.
-        else if ( iArgument2 == LUA_TSTRING &&
+        else if ( iArgument2 == LUA_TBOOLEAN &&
                   !( lua_toboolean ( luaVM, 2 ) ? true:false ) )
         {
             bRemoveOverride = true;
