@@ -191,74 +191,69 @@ int CLuaFunctionDefs::GetElementMatrix ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pEntity )
+        // Grab the position
+        CMatrix matrix;
+        if ( CStaticFunctionDefinitions::GetElementMatrix ( *pEntity, matrix ) )
         {
-            // Grab the position
-            CMatrix matrix;
-            if ( CStaticFunctionDefinitions::GetElementMatrix ( *pEntity, matrix ) )
-            {
-                // Apparently some scripts like the dirty syntax... should be 0.0f but was 1.0f post 1.3.2
-                float fData = bBadSyntax == true ? 1.0f : 0.0f;
+            // Apparently some scripts like the dirty syntax... should be 0.0f but was 1.0f post 1.3.2
+            float fData = bBadSyntax == true ? 1.0f : 0.0f;
 
-                // Return it
-                lua_createtable ( luaVM, 4, 0 );
+            // Return it
+            lua_createtable ( luaVM, 4, 0 );
 
-                // First row
-                lua_createtable ( luaVM, 4, 0 );
-                lua_pushnumber ( luaVM, matrix.vRight.fX );
-                lua_rawseti ( luaVM, -2, 1 );
-                lua_pushnumber ( luaVM, matrix.vRight.fY );
-                lua_rawseti ( luaVM, -2, 2 );
-                lua_pushnumber ( luaVM, matrix.vRight.fZ );
-                lua_rawseti ( luaVM, -2, 3 );
-                lua_pushnumber ( luaVM, fData );
-                lua_rawseti ( luaVM, -2, 4 );
-                lua_rawseti ( luaVM, -2, 1 );
+            // First row
+            lua_createtable ( luaVM, 4, 0 );
+            lua_pushnumber ( luaVM, matrix.vRight.fX );
+            lua_rawseti ( luaVM, -2, 1 );
+            lua_pushnumber ( luaVM, matrix.vRight.fY );
+            lua_rawseti ( luaVM, -2, 2 );
+            lua_pushnumber ( luaVM, matrix.vRight.fZ );
+            lua_rawseti ( luaVM, -2, 3 );
+            lua_pushnumber ( luaVM, fData );
+            lua_rawseti ( luaVM, -2, 4 );
+            lua_rawseti ( luaVM, -2, 1 );
 
-                // Second row
-                lua_createtable ( luaVM, 4, 0 );
-                lua_pushnumber ( luaVM, matrix.vFront.fX );
-                lua_rawseti ( luaVM, -2, 1 );
-                lua_pushnumber ( luaVM, matrix.vFront.fY );
-                lua_rawseti ( luaVM, -2, 2 );
-                lua_pushnumber ( luaVM, matrix.vFront.fZ );
-                lua_rawseti ( luaVM, -2, 3 );
-                lua_pushnumber ( luaVM, fData );
-                lua_rawseti ( luaVM, -2, 4 );
-                lua_rawseti ( luaVM, -2, 2 );
+            // Second row
+            lua_createtable ( luaVM, 4, 0 );
+            lua_pushnumber ( luaVM, matrix.vFront.fX );
+            lua_rawseti ( luaVM, -2, 1 );
+            lua_pushnumber ( luaVM, matrix.vFront.fY );
+            lua_rawseti ( luaVM, -2, 2 );
+            lua_pushnumber ( luaVM, matrix.vFront.fZ );
+            lua_rawseti ( luaVM, -2, 3 );
+            lua_pushnumber ( luaVM, fData );
+            lua_rawseti ( luaVM, -2, 4 );
+            lua_rawseti ( luaVM, -2, 2 );
 
-                // Third row
-                lua_createtable ( luaVM, 4, 0 );
-                lua_pushnumber ( luaVM, matrix.vUp.fX );
-                lua_rawseti ( luaVM, -2, 1 );
-                lua_pushnumber ( luaVM, matrix.vUp.fY );
-                lua_rawseti ( luaVM, -2, 2 );
-                lua_pushnumber ( luaVM, matrix.vUp.fZ );
-                lua_rawseti ( luaVM, -2, 3 );
-                lua_pushnumber ( luaVM, fData );
-                lua_rawseti ( luaVM, -2, 4 );
-                lua_rawseti ( luaVM, -2, 3 );
+            // Third row
+            lua_createtable ( luaVM, 4, 0 );
+            lua_pushnumber ( luaVM, matrix.vUp.fX );
+            lua_rawseti ( luaVM, -2, 1 );
+            lua_pushnumber ( luaVM, matrix.vUp.fY );
+            lua_rawseti ( luaVM, -2, 2 );
+            lua_pushnumber ( luaVM, matrix.vUp.fZ );
+            lua_rawseti ( luaVM, -2, 3 );
+            lua_pushnumber ( luaVM, fData );
+            lua_rawseti ( luaVM, -2, 4 );
+            lua_rawseti ( luaVM, -2, 3 );
 
-                // Fourth row
-                lua_createtable ( luaVM, 4, 0 );
-                lua_pushnumber ( luaVM, matrix.vPos.fX );
-                lua_rawseti ( luaVM, -2, 1 );
-                lua_pushnumber ( luaVM, matrix.vPos.fY );
-                lua_rawseti ( luaVM, -2, 2 );
-                lua_pushnumber ( luaVM, matrix.vPos.fZ );
-                lua_rawseti ( luaVM, -2, 3 );
-                lua_pushnumber ( luaVM, 1.0f );
-                lua_rawseti ( luaVM, -2, 4 );
-                lua_rawseti ( luaVM, -2, 4 );
+            // Fourth row
+            lua_createtable ( luaVM, 4, 0 );
+            lua_pushnumber ( luaVM, matrix.vPos.fX );
+            lua_rawseti ( luaVM, -2, 1 );
+            lua_pushnumber ( luaVM, matrix.vPos.fY );
+            lua_rawseti ( luaVM, -2, 2 );
+            lua_pushnumber ( luaVM, matrix.vPos.fZ );
+            lua_rawseti ( luaVM, -2, 3 );
+            lua_pushnumber ( luaVM, 1.0f );
+            lua_rawseti ( luaVM, -2, 4 );
+            lua_rawseti ( luaVM, -2, 4 );
 
-                return 1;
-            }
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createObject", "Invalid element" ) );
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createObject", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getElementMatrix", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
