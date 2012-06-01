@@ -276,7 +276,8 @@ LOGIC = \
 ./logic/net/CSimPlayerManager.cpp \
 ./logic/net/CSimPlayerPuresyncPacket.cpp \
 ./logic/net/CSimVehiclePuresyncPacket.cpp \
-./logic/net/CSimKeysyncPacket.cpp
+./logic/net/CSimKeysyncPacket.cpp \
+./logic/net/CSimBulletsyncPacket.cpp
 
 if PRECOMPILE_HEADERS
 BUILT_SOURCES = StdInc.h.gch

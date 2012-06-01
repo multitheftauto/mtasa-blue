@@ -2186,10 +2186,10 @@ void CGame::RelayKeysync ( CPacket& Packet )
                 //      Moving into range:     false   true     Do sync here, sim keysync on
                 //      In range:              true    true     No sync here, sim keysync on
                 //
-                if ( !nearInfo.bPrevIsNear )
+                if ( !nearInfo.bPrevIsNearForKeySync )
                 {
                     sendList.push_back ( pSendPlayer );
-                    nearInfo.bPrevIsNear = true;
+                    nearInfo.bPrevIsNearForKeySync = true;
                 }
 
                 simSendList.push_back ( pSendPlayer );
@@ -2212,37 +2212,69 @@ void CGame::Packet_Bulletsync ( CBulletsyncPacket& Packet )
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
     if ( pPlayer && pPlayer->IsJoined () )
     {
-        // Make a list of players to send this packet to
-        std::vector < CPlayer* > sendList;
+        // Relay to other players
+        RelayBulletsync ( Packet );
+    }
+}
 
-        // Grab the position of the source player
-        const CVector& vecSourcePosition = pPlayer->GetPosition ();
 
-        // Loop through all the players
-        CPlayer* pSendPlayer;
-        std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-        for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
+// Relay this (bullet sync) packet to other players using distance rules
+void CGame::RelayBulletsync ( CPacket& Packet )
+{
+    // Make a list of players to send this packet to
+    std::vector < CPlayer* > sendList;
+    std::vector < CPlayer* > simSendList;
+    bool bUseSimSendList = CSimControl::IsSimSystemEnabled ();
+
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+
+    //
+    // Process near sync
+    //
+    {
+        // Update list of players who need the packet
+        pPlayer->MaybeUpdateOthersNearList ();
+
+        // Use this players bulletsync near list for sending packets
+        SViewerMapType& nearList = pPlayer->GetNearPlayerList ();
+
+        // For each bulletsync near player
+        for ( SViewerMapType ::iterator it = nearList.begin (); it != nearList.end (); ++it )
         {
-            pSendPlayer = *iter;
-
-            // Not the player we got the packet from?
-            if ( pSendPlayer != pPlayer )
+            CPlayer* pSendPlayer = it->first;
+            if ( !bUseSimSendList )
             {
-                // Grab this player's camera position
-                CVector vecCameraPosition;
-                pSendPlayer->GetCamera ()->GetPosition ( vecCameraPosition );
+                // Standard sending
+                sendList.push_back ( pSendPlayer );
+            }
+            else
+            {
+                SViewerInfo& nearInfo = it->second;
 
-                // Is this players camera close enough to warrant bulletsync?
-                if ( IsPointNearPoint3D ( vecSourcePosition, vecCameraPosition, MAX_BULLETSYNC_DISTANCE ) )
+                //
+                // Sim sync relays bullet sync packets to the other player when he is near
+                // Enabling/disabling sim bulletsync will only take effect for the next bullet sync packet, so:
+                //                           prevNear nowNear
+                //      Moving into range:     false   true     Do sync here, sim bulletsync on
+                //      In range:              true    true     No sync here, sim bulletsync on
+                //
+                if ( !nearInfo.bPrevIsNearForBulletSync )
                 {
-                    // Send the packet to him
                     sendList.push_back ( pSendPlayer );
+                    nearInfo.bPrevIsNearForBulletSync = true;
                 }
+
+                simSendList.push_back ( pSendPlayer );
             }
         }
-
-        CPlayerManager::Broadcast ( Packet, sendList );
     }
+
+    // Relay packet
+    if ( !sendList.empty () )
+        CPlayerManager::Broadcast ( Packet, sendList );
+
+    // Update sim data
+    CSimControl::UpdateBulletsyncSimPlayer ( pPlayer, simSendList );
 }
 
 

@@ -1130,6 +1130,15 @@ void CNetServerBuffer::ProcessPacket ( unsigned char ucPacketID, const NetServer
         // Reset bitstream pointer so game can also read the packet data
         BitStream->ResetReadPointer ();
     }
+    else
+    if ( ucPacketID == PACKET_ID_PLAYER_BULLETSYNC )
+    {
+        // See about handling the packet relaying here
+        m_pSimPlayerManager->HandleBulletSync ( Socket, BitStream );
+
+        // Reset bitstream pointer so game can also read the packet data
+        BitStream->ResetReadPointer ();
+    }
 
     if ( !CNetBufferWatchDog::CanReceivePacket ( ucPacketID ) )
        return;
