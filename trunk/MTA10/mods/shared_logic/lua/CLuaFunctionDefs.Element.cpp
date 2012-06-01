@@ -182,17 +182,24 @@ int CLuaFunctionDefs::GetElementData ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetElementMatrix ( lua_State* luaVM )
 {
-    // Verify the argument
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    CClientEntity* pEntity = NULL;
+    bool bBadSyntax;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadBool ( bBadSyntax, true );
+
+    // Verify the arguments
+    if ( !argStream.HasErrors ( ) )
     {
-        // Grab the element, verify it
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
             // Grab the position
             CMatrix matrix;
             if ( CStaticFunctionDefinitions::GetElementMatrix ( *pEntity, matrix ) )
-            {            
+            {
+                // Apparently some scripts like the dirty syntax... should be 0.0f but was 1.0f post 1.3.2
+                float fData = bBadSyntax == true ? 1.0f : 0.0f;
+
                 // Return it
                 lua_createtable ( luaVM, 4, 0 );
 
@@ -204,7 +211,7 @@ int CLuaFunctionDefs::GetElementMatrix ( lua_State* luaVM )
                 lua_rawseti ( luaVM, -2, 2 );
                 lua_pushnumber ( luaVM, matrix.vRight.fZ );
                 lua_rawseti ( luaVM, -2, 3 );
-                lua_pushnumber ( luaVM, 1.0f );
+                lua_pushnumber ( luaVM, fData );
                 lua_rawseti ( luaVM, -2, 4 );
                 lua_rawseti ( luaVM, -2, 1 );
 
@@ -216,7 +223,7 @@ int CLuaFunctionDefs::GetElementMatrix ( lua_State* luaVM )
                 lua_rawseti ( luaVM, -2, 2 );
                 lua_pushnumber ( luaVM, matrix.vFront.fZ );
                 lua_rawseti ( luaVM, -2, 3 );
-                lua_pushnumber ( luaVM, 1.0f );
+                lua_pushnumber ( luaVM, fData );
                 lua_rawseti ( luaVM, -2, 4 );
                 lua_rawseti ( luaVM, -2, 2 );
 
@@ -228,7 +235,7 @@ int CLuaFunctionDefs::GetElementMatrix ( lua_State* luaVM )
                 lua_rawseti ( luaVM, -2, 2 );
                 lua_pushnumber ( luaVM, matrix.vUp.fZ );
                 lua_rawseti ( luaVM, -2, 3 );
-                lua_pushnumber ( luaVM, 1.0f );
+                lua_pushnumber ( luaVM, fData );
                 lua_rawseti ( luaVM, -2, 4 );
                 lua_rawseti ( luaVM, -2, 3 );
 
@@ -248,10 +255,10 @@ int CLuaFunctionDefs::GetElementMatrix ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementMatrix", "element", 1 );
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createObject", "Invalid element" ) );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getElementMatrix" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createObject", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
