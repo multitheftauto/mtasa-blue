@@ -17,8 +17,8 @@ CSingularFileDownload::CSingularFileDownload ( CResource* pResource, const char 
     // Store the name
     m_strName = szName;
 
-    // Store the  name (short)
-    m_strNameShort = szName;
+    // Store the name (short)
+    m_strNameShort = szNameShort;
 
     // store the resource
     m_pResource = pResource;
