@@ -22,4 +22,5 @@ public:
     static void RemoveSimPlayer             ( CPlayer* pPlayer );
     static void UpdatePuresyncSimPlayer     ( CPlayer* pPlayer, const std::vector < CPlayer* >& simSendList );
     static void UpdateKeysyncSimPlayer      ( CPlayer* pPlayer, const std::vector < CPlayer* >& simSendList );
+    static void UpdateBulletsyncSimPlayer   ( CPlayer* pPlayer, const std::vector < CPlayer* >& simSendList );
 };

@@ -947,14 +947,10 @@ void CModelInfoSA::SetCustomModel ( RpClump* pClump )
     if ( pClump == NULL )
         return;
 
-    // Unchanged?
-    if ( m_pCustomClump == pClump )
-        return;
-
     // Store the custom clump
     m_pCustomClump = pClump;
 
-    // Replace the vehicle model if we're loaded.
+    // Replace the model if we're loaded.
     if ( IsLoaded () )
     {
         // Are we a vehicle?

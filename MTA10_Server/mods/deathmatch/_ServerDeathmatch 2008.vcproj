@@ -1320,6 +1320,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\net\CSimBulletsyncPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\net\CSimControl.cpp"
 						>
 					</File>
@@ -2590,6 +2594,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\net\CNetBufferWatchDog.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\net\CSimBulletsyncPacket.h"
 						>
 					</File>
 					<File

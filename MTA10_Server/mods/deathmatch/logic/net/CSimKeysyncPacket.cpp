@@ -58,6 +58,13 @@ bool CSimKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
         m_Cache.fCameraRotation = m_fPlayerGotCameraRotation;
     }
 
+    // Confirm the bulletsync state (in case packets got lost)
+    if ( BitStream.Version () >= 0x2D )
+    {
+        BitStream.ReadBit ( m_Cache.bUseBulletSync );
+        BitStream.ReadBit ( m_Cache.bBulletSyncFireButtonDown );
+    }
+
     // Flags
     if ( !BitStream.Read ( &m_Cache.flags ) )
         return false;
@@ -181,6 +188,13 @@ bool CSimKeysyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         rotation.data.fPlayerRotation = m_Cache.fPlayerRotation;
         rotation.data.fCameraRotation = m_Cache.fCameraRotation;
         BitStream.Write ( &rotation );
+    }
+
+    // Confirm the bulletsync state (in case packets got lost)
+    if ( BitStream.Version () >= 0x2D )
+    {
+        BitStream.WriteBit ( m_Cache.bUseBulletSync );
+        BitStream.WriteBit ( m_Cache.bBulletSyncFireButtonDown );
     }
 
     // Write the flags
