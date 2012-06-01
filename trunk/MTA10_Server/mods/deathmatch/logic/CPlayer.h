@@ -54,7 +54,8 @@ struct SViewerInfo
         , iPrevZone ( 0 )
         , iZone ( 0 )
         , llLastUpdateTime ( 0 )
-        , bPrevIsNear ( false )
+        , bPrevIsNearForKeySync ( false )
+        , bPrevIsNearForBulletSync ( false )
     {}
 
     int iMoveToFarCountDown;
@@ -64,8 +65,8 @@ struct SViewerInfo
     int iZone;
     long long llLastUpdateTime;
 
-    // Used in keysync
-    bool bPrevIsNear;
+    bool bPrevIsNearForKeySync;         // Used in keysync
+    bool bPrevIsNearForBulletSync;      // Used in bulletsync
 };
 
 #ifdef WIN32

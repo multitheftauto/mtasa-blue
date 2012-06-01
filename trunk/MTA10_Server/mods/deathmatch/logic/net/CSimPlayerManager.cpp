@@ -94,6 +94,7 @@ void CSimPlayerManager::RemoveSimPlayer ( CPlayer* pPlayer )
         CSimPlayer* pOtherSim = *iter;
         ListRemove ( pOtherSim->m_PuresyncSendList, pSim );
         ListRemove ( pOtherSim->m_KeysyncSendList, pSim );
+        ListRemove ( pOtherSim->m_BulletsyncSendList, pSim );
     }
 
     SAFE_DELETE( pSim );
@@ -111,7 +112,7 @@ void CSimPlayerManager::RemoveSimPlayer ( CPlayer* pPlayer )
 // Update matching sim player object with new datum
 //
 ///////////////////////////////////////////////////////////////////////////
-void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::vector < CPlayer* >* pPuresyncSendList, const std::vector < CPlayer* >* pKeysyncSendList )
+void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::vector < CPlayer* >* pPuresyncSendList, const std::vector < CPlayer* >* pKeysyncSendList, const std::vector < CPlayer* >* pBulletsyncSendList )
 {
     LockSimSystem ();     // TODO - only lock the CSimPlayer
 
@@ -174,7 +175,18 @@ void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::vector < 
             if ( pSendSimPlayer && pSendSimPlayer->m_bDoneFirstUpdate )
                 pSim->m_KeysyncSendList.push_back ( pSendSimPlayer );
         }
+    }
 
+    // Update Bulletsync send list
+    if ( pBulletsyncSendList )
+    {
+        pSim->m_BulletsyncSendList.clear ();
+        for ( std::vector < CPlayer* > ::const_iterator iter = pBulletsyncSendList->begin (); iter != pBulletsyncSendList->end (); ++iter )
+        {
+            CSimPlayer* pSendSimPlayer = (*iter)->m_pSimPlayer;
+            if ( pSendSimPlayer && pSendSimPlayer->m_bDoneFirstUpdate )
+                pSim->m_BulletsyncSendList.push_back ( pSendSimPlayer );
+        }
     }
 
     // Set this flag
@@ -357,6 +369,44 @@ bool CSimPlayerManager::HandleKeySync ( const NetServerPlayerID& Socket, NetBitS
         {
             // Relay it to nearbyers
             Broadcast ( *pPacket, pSourceSimPlayer->GetKeysyncSendList () );
+        }
+
+        delete pPacket;
+    }
+
+    UnlockSimSystem ();
+    return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CSimPlayerManager::HandleBulletSync
+//
+// Thread:              sync
+// CS should be locked: no
+//
+///////////////////////////////////////////////////////////////
+bool CSimPlayerManager::HandleBulletSync ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream )
+{
+    if ( !CNetBufferWatchDog::CanSendPacket ( PACKET_ID_PLAYER_BULLETSYNC ) )
+        return true;
+
+    LockSimSystem ();     // Prevent player additions and deletions
+
+    // Grab the source player
+    CSimPlayer* pSourceSimPlayer = Get ( Socket );
+
+    // Check is good for bullet sync
+    if ( pSourceSimPlayer && pSourceSimPlayer->IsJoined () )
+    {
+        // Read the incoming packet data
+        CSimBulletsyncPacket* pPacket = new CSimBulletsyncPacket ( pSourceSimPlayer->m_PlayerID );
+
+        if ( pPacket->Read ( *BitStream ) )
+        {
+            // Relay it to nearbyers
+            Broadcast ( *pPacket, pSourceSimPlayer->GetBulletsyncSendList () );
         }
 
         delete pPacket;

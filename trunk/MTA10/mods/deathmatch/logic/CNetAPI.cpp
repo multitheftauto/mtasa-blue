@@ -638,6 +638,13 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
         ControllerState.LeftStickY = CurrentControllerState.LeftStickY;
     }
 
+    // Confirm the bulletsync state (in case packets got lost)
+    if ( BitStream.Version () >= 0x2D )
+    {
+        BitStream.ReadBit ( pPlayer->m_bRemoteBulletSyncEnabled );
+        BitStream.ReadBit ( pPlayer->m_bRemoteBulletSyncFireButtonPressed );
+    }
+
     // Flags
     SKeysyncFlags flags;
     BitStream.Read ( &flags );
@@ -808,6 +815,15 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
         rotation.data.fPlayerRotation = pPlayerModel->GetCurrentRotation ();
         rotation.data.fCameraRotation = pPlayerModel->GetCameraRotation ();
         BitStream.Write ( &rotation );
+    }
+
+    // Confirm the bulletsync state (in case packets got lost)
+    if ( BitStream.Version () >= 0x2D )
+    {
+        bool bUseBulletSync = g_pClientGame->GetWeaponTypeUsesBulletSync ( pPlayerModel->GetCurrentWeaponType () );
+        bool bBulletSyncFireButtonDown = m_bBulletSyncLastSentFireButtonDown;
+        BitStream.WriteBit ( bUseBulletSync );
+        BitStream.WriteBit ( bBulletSyncFireButtonDown );
     }
 
     // Flags
@@ -2236,7 +2252,7 @@ void CNetAPI::SendBulletSyncFire ( const CVector& vecStart, const CVector& vecEn
     pBitStream->Write ( (const char*)&vecEnd, sizeof ( CVector ) );
 
     // Send the packet
-    g_pNet->SendPacket ( PACKET_ID_PLAYER_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE );
+    g_pNet->SendPacket ( PACKET_ID_PLAYER_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
     g_pNet->DeallocateNetBitStream ( pBitStream );
 }
 
@@ -2267,7 +2283,7 @@ void CNetAPI::MaybeSendBulletSyncFireRelease ( void )
     pBitStream->Write ( (char)0 );      // Fire button up
 
     // Send the packet
-    g_pNet->SendPacket ( PACKET_ID_PLAYER_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE );
+    g_pNet->SendPacket ( PACKET_ID_PLAYER_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
     g_pNet->DeallocateNetBitStream ( pBitStream );
 }
 
@@ -2295,7 +2311,7 @@ void CNetAPI::MaybeSendBulletSyncEnabled ( void )
         pBitStream->Write ( (char)3 );      // Bullet sync on
 
     // Send the packet
-    g_pNet->SendPacket ( PACKET_ID_PLAYER_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE );
+    g_pNet->SendPacket ( PACKET_ID_PLAYER_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
     g_pNet->DeallocateNetBitStream ( pBitStream );
 }
 

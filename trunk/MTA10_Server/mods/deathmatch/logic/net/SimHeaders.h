@@ -18,5 +18,6 @@ class CSimPlayerManager;
 #include "CSimPlayerPuresyncPacket.h"
 #include "CSimVehiclePuresyncPacket.h"
 #include "CSimKeysyncPacket.h"
+#include "CSimBulletsyncPacket.h"
 
 extern CNetServer* g_pRealNetServer;

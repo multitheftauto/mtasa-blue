@@ -59,7 +59,9 @@ public:
 
 protected:
     CElement*                           m_pSourceElement;
-    NetServerPlayerID                   m_Source;    
+    NetServerPlayerID                   m_Source;
+    bool                                m_bUseBulletSync;
+    bool                                m_bBulletSyncFireButtonDown;
 };
 
 #endif

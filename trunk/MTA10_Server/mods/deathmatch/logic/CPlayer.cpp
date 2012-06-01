@@ -877,7 +877,8 @@ void CPlayer::RefreshNearPlayer ( CPlayer* pOther )
         // Move from far list
         MovePlayerToNearList ( pOther );
         pInfo = MapFind ( m_NearPlayerList, pOther );
-        pInfo->bPrevIsNear = false;
+        pInfo->bPrevIsNearForKeySync = false;
+        pInfo->bPrevIsNearForBulletSync = false;
     }
     pInfo->iMoveToFarCountDown = 5;
 }

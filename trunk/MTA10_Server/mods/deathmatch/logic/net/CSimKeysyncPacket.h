@@ -66,6 +66,9 @@ public:
 
         SVehicleTurretSync turretSync;
 
+        bool            bUseBulletSync;
+        bool            bBulletSyncFireButtonDown;
+
     } m_Cache;
 
 };
