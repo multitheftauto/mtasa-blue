@@ -2343,6 +2343,9 @@ void CClientPed::StreamedInPulse ( void )
         if ( m_bPendingRebuildPlayer )
             ProcessRebuildPlayer ();
 
+        CControllerState Current;
+        GetControllerState ( Current );
+
         if ( m_bIsLocalPlayer )
         {
             // Check if the ped got in fire without the script control
@@ -2350,6 +2353,11 @@ void CClientPed::StreamedInPulse ( void )
 
             // Do our stealth aiming stuff
             SetStealthAiming ( ShouldBeStealthAiming () );
+
+            // Process our scripted control settings
+            bool bOnFoot = pVehicle ? false : true;
+            CClientPad::ProcessAllToggledControls    ( Current, bOnFoot );
+            CClientPad::ProcessSetAnalogControlState ( Current, bOnFoot );
         }
 
         // Is the player stealth aiming?
@@ -2389,8 +2397,6 @@ void CClientPed::StreamedInPulse ( void )
             }
         }
         
-        CControllerState Current;
-        GetControllerState ( Current );
         unsigned long ulNow = CClientTime::GetTime (); 
         //MS checks must take into account the gamespeed
         float fSpeedRatio = (1.0f/g_pGame->GetGameSpeed ()); 

@@ -935,6 +935,35 @@ int CLuaFunctionDefs::GetPedControlState ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetPedAnalogControlState ( lua_State* luaVM )
+{
+    SString strControlState = "";
+    float fState = 0.0f;
+    CClientPed* pPed = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPed );
+    argStream.ReadString ( strControlState );
+    
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( pPed )
+        {
+            float fState;
+            if ( CStaticFunctionDefinitions::GetPedAnalogControlState ( *pPed, strControlState, fState ) )
+            {
+                lua_pushnumber ( luaVM, fState );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedAnalogControlState", "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getPedAnalogControlState" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefs::IsPedDoingGangDriveby ( lua_State* luaVM )
 {
@@ -960,6 +989,36 @@ int CLuaFunctionDefs::IsPedDoingGangDriveby ( lua_State* luaVM )
     return 1;
 }
 
+
+int CLuaFunctionDefs::SetPedAnalogControlState ( lua_State* luaVM )
+{
+    SString strControlState = "";
+    float fState = 0.0f;
+    CClientEntity* pEntity = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadString ( strControlState );
+    argStream.ReadNumber ( fState );
+    
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( pEntity )
+        {
+            if ( CStaticFunctionDefinitions::SetPedAnalogControlState ( *pEntity, strControlState, fState ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAnalogControlState", "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setPedAnalogControlState" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefs::GetPedAnimation ( lua_State* luaVM )
 {

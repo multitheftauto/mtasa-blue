@@ -137,8 +137,8 @@ void CSettings::CreateGUI ( void )
     m_pInvertMouse->GetPosition ( vecTemp, false );
     m_pInvertMouse->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
-    m_pSteerWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, "Steer with mouse", true ) );
-    m_pSteerWithMouse->SetPosition ( CVector2D ( vecTemp.fX + 320, vecTemp.fY ) );
+    /*m_pSteerWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, "Steer with mouse", true ) );
+    m_pSteerWithMouse->SetPosition ( CVector2D ( vecTemp.fX + 320, vecTemp.fY ) );*/
 
     m_pLabelMouseSensitivity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Mouse sensitivity:" ) );
     m_pLabelMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16.0f ) );
@@ -154,9 +154,9 @@ void CSettings::CreateGUI ( void )
     m_pLabelMouseSensitivityValue->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY ) );
     m_pLabelMouseSensitivityValue->AutoSize ( "100%" );
 
-    m_pFlyWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, "Fly with mouse", true ) );
+    /*m_pFlyWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabControls, "Fly with mouse", true ) );
     m_pFlyWithMouse->SetPosition ( CVector2D ( vecTemp.fX + 320, vecTemp.fY ) );
-    m_pFlyWithMouse->GetPosition ( vecTemp, false );
+    m_pFlyWithMouse->GetPosition ( vecTemp, false );*/
 
     //Joypad options
     m_pControlsJoypadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabControls, "Joypad options" ) );
@@ -1443,8 +1443,8 @@ bool CSettings::OnJoypadDefaultClick ( CGUIElement* pElement )
     // Load the default mouse settings
     CControllerConfigManager * pController = g_pCore->GetGame ()->GetControllerConfigManager ();   
 
-    m_pFlyWithMouse->SetSelected ( pController->GetFlyWithMouse () );
-    m_pSteerWithMouse->SetSelected ( pController->GetSteerWithMouse () );
+    //m_pFlyWithMouse->SetSelected ( pController->GetFlyWithMouse () );
+    //m_pSteerWithMouse->SetSelected ( pController->GetSteerWithMouse () );
     m_pInvertMouse->SetSelected ( pController->IsMouseInverted () );
 
     // Update the GUI
@@ -2133,8 +2133,8 @@ void CSettings::LoadData ( void )
 
     // Controls
     CVARS_GET ( "invert_mouse", bVar ); m_pInvertMouse->SetSelected ( bVar );
-    CVARS_GET ( "steer_with_mouse", bVar ); m_pSteerWithMouse->SetSelected ( bVar );
-    CVARS_GET ( "fly_with_mouse", bVar ); m_pFlyWithMouse->SetSelected ( bVar );
+    //CVARS_GET ( "steer_with_mouse", bVar ); m_pSteerWithMouse->SetSelected ( bVar );
+    //CVARS_GET ( "fly_with_mouse", bVar ); m_pFlyWithMouse->SetSelected ( bVar );
     CVARS_GET ( "classic_controls", bVar ); m_pClassicControls->SetSelected ( bVar );
 
     CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
