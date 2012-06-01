@@ -2398,10 +2398,10 @@ void CSettings::SaveData ( void )
     CControllerConfigManager * pController = g_pCore->GetGame ()->GetControllerConfigManager ();   
     CVARS_SET ( "invert_mouse", m_pInvertMouse->GetSelected () );
     pController->SetMouseInverted ( m_pInvertMouse->GetSelected () );
-    CVARS_SET ( "steer_with_mouse", m_pSteerWithMouse->GetSelected () );
+    /*CVARS_SET ( "steer_with_mouse", m_pSteerWithMouse->GetSelected () );
     pController->SetSteerWithMouse ( m_pSteerWithMouse->GetSelected () );
     CVARS_SET ( "fly_with_mouse", m_pFlyWithMouse->GetSelected () );
-    pController->SetFlyWithMouse ( m_pFlyWithMouse->GetSelected () );
+    pController->SetFlyWithMouse ( m_pFlyWithMouse->GetSelected () );*/
 
     bool bClassicControls = m_pClassicControls->GetSelected ();
     CVARS_SET ( "classic_controls", bClassicControls );
