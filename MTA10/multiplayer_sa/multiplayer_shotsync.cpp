@@ -1017,36 +1017,52 @@ static void CheckInVehicleDamage()
 // If using bullet sync, send the bullet vectors to the other players
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMy_CWeapon_FireInstantHit_Mid ( CVector* pvecStart, CVector* pvecEnd )
+void OnMy_CWeapon_FireInstantHit_Mid ( CEntitySAInterface* pEntity, CVector pvecStart, CVector pvecEnd, bool bFlag )
 {
-    CPed * pTargetingPed = m_pools->GetPed ( (DWORD *)pShootingPed );
+    CPed * pTargetingPed = m_pools->GetPed ( (DWORD *)pEntity );
     if ( IsLocalPlayer ( pTargetingPed ) )
     {
         if ( m_pBulletFireHandler )
-            m_pBulletFireHandler ( pTargetingPed, pvecStart, pvecEnd );
+            m_pBulletFireHandler ( pTargetingPed, &pvecStart, &pvecEnd );
     }
 }
 
 // Hook info
-#define HOOKPOS_CWeapon_FireInstantHit_Mid                         0x7406C7
+#define HOOKPOS_CWeapon_FireInstantHit_Mid                         0x740B89
 #define HOOKSIZE_CWeapon_FireInstantHit_Mid                        5
-DWORD RETURN_CWeapon_FireInstantHit_Mid =                          0x7406CC;
+DWORD RETURN_CWeapon_FireInstantHit_Mid =                          0x740B8E;
 void _declspec(naked) HOOK_CWeapon_FireInstantHit_Mid ()
 {
     _asm
     {
         pushad
-        lea     edx,[esp+32+10h] 
-        push    edx  
-        lea     eax,[esp+32+3Ch] 
-        push    eax  
+
+        mov         ecx,dword ptr [esp+14h+32]
+        push        eax
+
+        mov         eax,dword ptr [esp+14h+32]
+        sub         esp,0Ch
+        mov         edx,esp
+        mov         dword ptr [edx],eax
+        mov         eax,dword ptr [esp+28h+32]
+        mov         dword ptr [edx+4],ecx
+        mov         dword ptr [edx+8],eax
+        mov         edx,dword ptr [esp+3Ch+32]
+        mov         eax,dword ptr [esp+40h+32]
+        sub         esp,0Ch
+        mov         ecx,esp
+        mov         dword ptr [ecx],edx
+        mov         edx,dword ptr [esp+50h+32]
+        mov         dword ptr [ecx+4],eax
+        mov         dword ptr [ecx+8],edx
+        push        edi
         call    OnMy_CWeapon_FireInstantHit_Mid
-        add     esp, 4*2
+        add     esp, 4*8
         popad
 
         // Do original code and continue
-        lea     edx,[esp+10h] 
-        push    edx  
+        mov         ecx,dword ptr [esp+14h] 
+        push        eax 
         jmp     RETURN_CWeapon_FireInstantHit_Mid
     }
 }
