@@ -2213,7 +2213,7 @@ void CNetAPI::ReadBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& Bi
         pPlayer->m_shotSyncData->m_bRemoteBulletSyncVectorsValid = true;
         pPlayer->m_bRemoteBulletSyncFireButtonPressed = true;
 
-        if ( !pPlayer->IsUsingGun () )
+        if ( true || !pPlayer->IsUsingGun () )
         {
             pPlayer->KillAnimation ();
             pPlayer->UseGun ( vecEnd, NULL );
