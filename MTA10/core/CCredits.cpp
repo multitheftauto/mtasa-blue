@@ -126,6 +126,7 @@ const char* g_szCredits = "== Multi Theft Auto: San Andreas v" MTA_DM_BUILDTAG_S
                           "Embedded HTTP Server (http://ehs.fritz-elfert.de/)\n"
                           "zlib (http://zlib.net/)\n"
                           "bzip2 (http://bzip.org/)\n"
+                          "UnRAR (http://www.rarlab.com/)\n"
                           ;
 
 
