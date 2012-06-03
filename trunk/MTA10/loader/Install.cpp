@@ -11,6 +11,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "../../vendor/unrar/dll.hpp"
 
 
 bool TerminateProcessFromPathFilename ( const SString& strPathFilename )
@@ -200,6 +201,54 @@ bool InstallFiles ( bool bSilent )
 
 //////////////////////////////////////////////////////////
 //
+// ExtractFiles
+//
+// Extract files from supplied archive filename
+//
+//////////////////////////////////////////////////////////
+bool ExtractFiles ( const SString& strFile )
+{
+    // Open archive
+    RAROpenArchiveData archiveData;
+    memset ( &archiveData, 0, sizeof ( archiveData ) );
+    archiveData.ArcName = (char*)*strFile;
+    archiveData.OpenMode = RAR_OM_EXTRACT;
+    HANDLE hArcData = RAROpenArchive ( &archiveData );
+
+    if ( !hArcData )
+        return false;
+
+    bool bOk = false;
+
+    // Do each file
+    while ( true )
+    {
+        // Read file header
+        RARHeaderData headerData;
+        memset ( &headerData, 0, sizeof ( headerData ) );
+        int iStatus = RARReadHeader ( hArcData, &headerData );
+
+        if ( iStatus != 0 )
+        {
+            if ( iStatus == ERAR_END_ARCHIVE )
+                bOk = true;
+            break;
+        }
+
+        // Read file data
+        iStatus = RARProcessFile ( hArcData, RAR_EXTRACT, NULL, NULL );
+
+        if ( iStatus != 0 )
+            break;
+    }
+
+    RARCloseArchive ( hArcData );
+    return bOk;
+}
+
+
+//////////////////////////////////////////////////////////
+//
 // CheckOnRestartCommand
 //
 // Changes current directory if required
@@ -237,8 +286,13 @@ SString CheckOnRestartCommand ( void )
             if ( strOperation != "silent" )
                StartPseudoProgress( g_hInstance, "MTA: San Andreas", "Extracting files..." );
 
-            // Run self extracting archive to extract files into the temp directory
-            ShellExecuteBlocking ( "open", strFile, "-s" );
+            // Try to extract the files
+            if ( !ExtractFiles ( strFile ) )
+            {
+                // If extract failed and update file is an exe, try to run it
+                if ( ExtractExtention ( strFile ).CompareI ( "exe" ) )
+                    ShellExecuteBlocking ( "open", strFile, "-s" );
+            }
 
             // Stop progress bar
             StopPseudoProgress();
