@@ -3465,7 +3465,23 @@ void CClientPed::_ChangeModel ( void )
             m_pPlayerPed->SetModelIndex ( m_ulModel );
 
             // Rebuild the player after a skin change
-            RebuildModel ();
+            if ( m_ulModel == 0 )
+            {
+                // When the local player changes to CJ, the clothes geometry gets an extra ref from somewhere, causing a memory leak.
+                // So make sure clothes geometry is built now...
+                m_pClothes->AddAllToModel ();
+                m_pPlayerPed->RebuildPlayer ();
+
+                // ...and decrement the extra ref
+                m_pPlayerPed->RemoveGeometryRef ();
+            }
+            else
+            {
+                // When the local player changes to another (non CJ) model, the geometry gets an extra ref from somewhere, causing a memory leak.
+                // So decrement the extra ref here
+                m_pPlayerPed->RemoveGeometryRef ();
+            }
+
 
             // Remove reference to the old model we used (Flag extra GTA reference to be removed as well)
             pLoadedModel->RemoveRef ( true );
