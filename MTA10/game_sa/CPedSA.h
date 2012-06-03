@@ -332,6 +332,7 @@ public:
     CPedSAInterface *   GetPedInterface ( void ) { return ( CPedSAInterface * ) GetInterface (); }
     void                Init();
     void                SetModelIndex ( DWORD dwModelIndex );
+    void                RemoveGeometryRef ( void );
     void                AttachPedToBike(CEntity * entity, CVector * vector, unsigned short sUnk, FLOAT fUnk, FLOAT fUnk2, eWeaponType weaponType);
     void                AttachPedToEntity(DWORD dwEntityInterface, CVector * vector, unsigned short sDirection, FLOAT fRotationLimit, eWeaponType weaponType, bool bChangeCamera);
     void                DetachPedFromEntity ( void );

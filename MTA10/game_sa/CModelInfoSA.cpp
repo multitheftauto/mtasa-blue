@@ -485,18 +485,6 @@ BOOL CModelInfoSA::DoIsLoaded ( )
     return bLoaded;
 }
 
-// A (ped) model removed using this still uses up memory somewhere. (Don't think it's the txd or col)
-void CModelInfoSA::InternalRemoveGTARef ( void )
-{
-    DWORD dwFunction = FUNC_RemoveRef;
-    CBaseModelInfoSAInterface* pInterface = m_pInterface;
-    _asm
-    {
-        mov     ecx, pInterface
-        call    dwFunction
-    }
-}
-
 BYTE CModelInfoSA::GetFlags ( )
 {
     DWORD dwFunc = FUNC_GetModelFlags;
@@ -750,94 +738,19 @@ void CModelInfoSA::RemoveRef ( bool bRemoveExtraGTARef )
 
     // Handle extra ref if requested
     if ( bRemoveExtraGTARef )
-        MaybeRemoveExtraGTARef ();
-
-    // Unload it if 0 references left and we're not CJ model.
-    // And if we're loaded.
-    if ( m_dwReferences == 0 &&
-         m_dwModelID != 0 &&
-         IsLoaded () )
     {
-        Remove ();
-    }
-}
-
-//
-// Notes on changing model for the local player only
-// -------------------------------------------------
-// When changing model for the local player, the model ref count is not decremented correctly. (Due to the ped not being re-created.)
-// Eventually, after many changes of local player skin, we run out of entries in COL_MODEL_POOL
-//
-// So, when changing model for the local player, an extra reference must be removed to allow the old model to be unloaded.
-//
-// However, manually removing the extra reference creates a memory leak when the model is unloaded.
-//
-// Therefore, to keep the memory loss to a minimum, the removal of the extra reference is delayed.
-//
-// The delay scheme implemented to do this consists of two queues:
-//      The first queue is filled up with the first 5 models that are used for the local player. Once full the queue is not changed until MTA is restarted.
-//      The second queue is FILO, with the last out having it's extra reference removed.
-//
-
-std::vector < CModelInfoSA* >   ms_FirstDelayQueue;     // Don't remove ref for first 5 unique models
-std::list < CModelInfoSA* >     ms_SecondDelayQueue;    // Then delay remove for 5 changes
-
-void CModelInfoSA::MaybeRemoveExtraGTARef ( void )
-{
-    // Safety check
-    if ( m_pInterface->usNumberOfRefs < 1 )
-        return;
-
-    //
-    // Handle first queue
-    //
-    if ( ListContains ( ms_FirstDelayQueue, this ) )
-    {
-        // If already delaying a previous extra ref, we can remove this extra ref now
-        InternalRemoveGTARef ();
-        return;
-    }
-
-    if ( ms_FirstDelayQueue.size () < 5 )
-    {
-        // Fill initial queue
-        ms_FirstDelayQueue.push_back ( this );
-        return;
-    }
-
-    //
-    // Handle second queue
-    //
-    if ( ListContains ( ms_SecondDelayQueue, this ) )
-    {
-        // If already delaying a previous extra ref, we can remove this extra ref now
-        InternalRemoveGTARef ();
-
-        // Bring item to front
-        ListRemove ( ms_SecondDelayQueue, this );
-        ms_SecondDelayQueue.push_back ( this );
-    }
-    else
-    {
-        // Top up secondary queue
-        ms_SecondDelayQueue.push_back ( this );
-        
-        // Remove extra ref from the oldest queue item
-        if ( ms_SecondDelayQueue.size () > 5 )
+        // Remove ref added by GTA.
+        if ( m_pInterface->usNumberOfRefs > 1 )
         {
-            CModelInfoSA* pOldModelInfo = ms_SecondDelayQueue.front ();
-            ms_SecondDelayQueue.pop_front ();
-            pOldModelInfo->DoRemoveExtraGTARef ();
+            DWORD dwFunction = FUNC_RemoveRef;
+            CBaseModelInfoSAInterface* pInterface = m_pInterface;
+            _asm
+            {
+                mov     ecx, pInterface
+                call    dwFunction
+            }
         }
     }
-}
-
-// Remove extra GTA ref and handle actual model unload if then required
-void CModelInfoSA::DoRemoveExtraGTARef ( void )
-{
-    // Remove ref added by GTA.
-    if ( m_pInterface->usNumberOfRefs > 0 )
-        InternalRemoveGTARef ();
 
     // Unload it if 0 references left and we're not CJ model.
     // And if we're loaded.
@@ -845,7 +758,6 @@ void CModelInfoSA::DoRemoveExtraGTARef ( void )
          m_dwModelID != 0 &&
          IsLoaded () )
     {
-        m_pInterface->usNumberOfRefs++; // Hack because Remove() decrements this
         Remove ();
     }
 }
