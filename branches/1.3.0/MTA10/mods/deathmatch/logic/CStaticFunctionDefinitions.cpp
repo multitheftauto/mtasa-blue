@@ -6070,18 +6070,45 @@ bool CStaticFunctionDefinitions::IsControlEnabled ( const char* szControl, bool&
 bool CStaticFunctionDefinitions::SetControlState ( const char* szControl, bool bState )
 {
     assert ( szControl );
+    unsigned int uiIndex;
 
     if ( bState )
     {
-        if ( CClientPad::SetAnalogControlState ( szControl , 1.0 ) )
+        if ( CClientPad::GetAnalogControlIndex ( szControl, uiIndex ) )
         {
-            return true;
+            if ( CClientPad::SetAnalogControlState ( szControl , 1.0 ) )
+            {
+                return true;
+            }
+        }
+        else
+        {
+            CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds ();
+            SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szControl );
+            if ( pControl )
+            {
+                pControl->bState = bState;
+                return true;
+            }
         }
     }
     else
     {
-        CClientPad::RemoveSetAnalogControlState ( szControl );
-        return true;
+        if ( CClientPad::GetAnalogControlIndex ( szControl, uiIndex ) )
+        {
+            CClientPad::RemoveSetAnalogControlState ( szControl );
+            return true;
+        }
+        else
+        {
+            CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds ();
+            SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szControl );
+            if ( pControl )
+            {
+                pControl->bState = bState;
+                return true;
+            }
+        }
     }
     return false;
 }

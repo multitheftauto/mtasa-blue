@@ -49,6 +49,8 @@ public:
 
     static SFixedArray              < short, MAX_GTA_CONTROLS > m_sScriptedStates;
     static SFixedArray              < bool, MAX_GTA_ANALOG_CONTROLS > m_bScriptedReadyToReset;
+    static bool                     m_bFlyWithMouse;
+    static bool                     m_bSteerWithMouse;
 
 protected:
     SFixedArray                     < float, MAX_GTA_CONTROLS >  m_fStates;
