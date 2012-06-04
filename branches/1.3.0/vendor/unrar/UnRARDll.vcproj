@@ -161,8 +161,8 @@
 		</Configuration>
 		<Configuration
 			Name="Nightly|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="build\unrardll32\$(ConfigurationName)"
+			IntermediateDirectory="..\..\obj\vendor\unrardll32"
 			ConfigurationType="4"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
