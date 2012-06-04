@@ -18,6 +18,8 @@
 
 SFixedArray < short, MAX_GTA_CONTROLS > CClientPad::m_sScriptedStates;
 SFixedArray < bool, MAX_GTA_ANALOG_CONTROLS > CClientPad::m_bScriptedReadyToReset;
+bool CClientPad::m_bFlyWithMouse;
+bool CClientPad::m_bSteerWithMouse;
 
 
 static const SFixedArray < const char*, MAX_GTA_CONTROLS > g_GTAControls =
@@ -308,6 +310,7 @@ bool CClientPad::GetControlState ( const char * szName, CControllerState & State
             }
         }
     }
+
     return false;
 }
 
@@ -381,6 +384,7 @@ bool CClientPad::GetAnalogControlState ( const char * szName, CControllerState &
             }
         }
     }
+
     return false;
 }
 // Set the analog control state and store them temporarilly before they are actually applied.  Used for players.
@@ -390,7 +394,7 @@ bool CClientPad::SetAnalogControlState ( const char * szName, float fState )
     fState = Clamp < float > ( 0, fState, 1 );
     unsigned int uiIndex;
     if ( GetAnalogControlIndex ( szName, uiIndex ) )
-    {       
+    {
         switch ( uiIndex )
         {
             case 0: m_sScriptedStates [ uiIndex ] = ( short ) ( fState * -128.0f ); m_sScriptedStates [ 1 ] = 0; return true;       //Left
@@ -410,6 +414,7 @@ bool CClientPad::SetAnalogControlState ( const char * szName, float fState )
             default: return false;
         }
     }
+
     return false;
 }
 
@@ -470,20 +475,45 @@ void CClientPad::ProcessControl ( short & usControlValue, unsigned int uiIndex, 
 // Process toggled controls and apply them directly to the pad state.  Used for players when keyboard input blocking is insufficient.
 void CClientPad::ProcessAllToggledControls ( CControllerState & cs, bool bOnFoot )
 {
-    ProcessToggledControl ( "left",                     cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "left" ) );
-    ProcessToggledControl ( "right",                    cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "right" ) );
-    ProcessToggledControl ( "forwards",                 cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "forwards" ) );
-    ProcessToggledControl ( "backwards",                cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "backwards" ) );
-    ProcessToggledControl ( "vehicle_left",             cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "vehicle_left" ) );
-    ProcessToggledControl ( "vehicle_right",            cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "vehicle_right" ) );
-    ProcessToggledControl ( "steer_forward",            cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "steer_forward" ) );
-    ProcessToggledControl ( "steer_back",               cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "steer_back" ) );
+    bool bDisableControllerLeftRight = false; 
+    bDisableControllerLeftRight |= ProcessToggledControl ( "left",                     cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "left" ) );
+    bDisableControllerLeftRight |= ProcessToggledControl ( "right",                    cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "right" ) );
+    bDisableControllerLeftRight |= ProcessToggledControl ( "forwards",                 cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "forwards" ) );
+    bDisableControllerLeftRight |= ProcessToggledControl ( "backwards",                cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "backwards" ) );
+    bDisableControllerLeftRight |= ProcessToggledControl ( "vehicle_left",             cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "vehicle_left" ) );
+    bDisableControllerLeftRight |= ProcessToggledControl ( "vehicle_right",            cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "vehicle_right" ) );
+    bDisableControllerLeftRight |= ProcessToggledControl ( "steer_forward",            cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "steer_forward" ) );
+    bDisableControllerLeftRight |= ProcessToggledControl ( "steer_back",               cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "steer_back" ) );
     ProcessToggledControl ( "accelerate",               cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "accelerate" ) );
     ProcessToggledControl ( "brake_reverse",            cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "brake_reverse" ) );
     ProcessToggledControl ( "special_control_left",     cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "special_control_left" ) );
     ProcessToggledControl ( "special_control_right",    cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "special_control_right" ) );
     ProcessToggledControl ( "special_control_up",       cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "special_control_up" ) );
-    ProcessToggledControl ( "special_control_down",     cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "special_control_down" ) );   
+    ProcessToggledControl ( "special_control_down",     cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "special_control_down" ) );
+    if ( bDisableControllerLeftRight )
+    {
+        CControllerConfigManager * pController = g_pGame->GetControllerConfigManager ();
+        m_bSteerWithMouse = pController->GetFlyWithMouse ( );
+        m_bFlyWithMouse = pController->GetSteerWithMouse ( );
+        if ( m_bFlyWithMouse || m_bSteerWithMouse )
+        {
+            pController->SetFlyWithMouse ( false );
+            pController->SetSteerWithMouse ( false );
+        }
+    }
+    else
+    {
+        if ( m_bSteerWithMouse )
+        {
+            CControllerConfigManager * pController = g_pGame->GetControllerConfigManager ();
+            pController->SetSteerWithMouse ( true );
+        }
+        if ( m_bFlyWithMouse )
+        {
+            CControllerConfigManager * pController = g_pGame->GetControllerConfigManager ();
+            pController->SetFlyWithMouse ( true );
+        }
+    }
 }
 
 bool CClientPad::ProcessToggledControl ( const char * szName, CControllerState & cs, bool bOnFoot, bool bEnabled )
