@@ -270,7 +270,6 @@ public:
     BYTE                            GetLevelFromPosition    ( CVector * vecPosition );
     BOOL                            IsLoaded                ( void );
     BOOL                            DoIsLoaded              ( void );
-    void                            InternalRemoveGTARef    ( void );
     BYTE                            GetFlags                ( void );
     CBoundingBox *                  GetBoundingBox          ( void );
     bool                            IsValid                 ( void );
@@ -285,8 +284,6 @@ public:
     void                            ModelAddRef             ( EModelRequestType requestType, const char* szTag );
     int                             GetRefCount             ( void );
     void                            RemoveRef               ( bool bRemoveExtraGTARef = false );
-    void                            MaybeRemoveExtraGTARef  ( void );
-    void                            DoRemoveExtraGTARef     ( void );
 
     // CVehicleModelInfo specific
     short                           GetAvailableVehicleMod  ( unsigned short usSlot );

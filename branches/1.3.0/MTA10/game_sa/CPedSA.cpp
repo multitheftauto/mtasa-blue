@@ -109,6 +109,17 @@ void CPedSA::SetModelIndex ( DWORD dwModelIndex )
     }
 }
 
+// Hacky thing done for the local player when changing model
+void CPedSA::RemoveGeometryRef ( void )
+{
+    RpClump* pClump = (RpClump*)GetInterface ()->m_pRwObject;
+    RpAtomic* pAtomic = (RpAtomic*)( ( pClump->atomics.root.next ) - 0x8 );
+    RpGeometry* pGeometry = pAtomic->geometry;
+    if ( pGeometry->refs > 1 )
+        pGeometry->refs--;
+}
+
+
 bool CPedSA::IsInWater ( void )
 {
     DEBUG_TRACE("bool CPedSA::IsInWater ()");
