@@ -283,18 +283,25 @@ CClumpStore ms_clumpStore;
 //
 //
 ////////////////////////////////////////////////
-RpClump* _cdecl OnCClothesBuilderCreateSkinnedClumpPre ( RpClump* pRpClump, RwTexDictionary* pRwTexDictionary, CPedClothesDesc* pOutClothesDesc, CPedClothesDesc* pInClothesDesc, bool bAlwaysFalse )
+RpClump* _cdecl OnCClothesBuilderCreateSkinnedClumpPre ( RpClump* pRpClump, RwTexDictionary* pRwTexDictionary, CPedClothesDesc* pNewClothesDesc, CPedClothesDesc* pPrevClothesDesc, bool bAlwaysFalse )
 {
-    return ms_clumpStore.FindMatchAndUse ( pOutClothesDesc );
+    // If torso, head, hands, legs or feet are NULL, set to the default value
+    DWORD defaults [] = { 0x2ff481ca, 0x6e99e4d7, 0x6e850eb7, 0x347251c1, 0xf79d4684 };
+
+    for ( uint i = 0 ; i < NUMELMS ( defaults ) ; i++ )
+        if ( !pNewClothesDesc->things1[i] )
+            pNewClothesDesc->things1[i] = defaults[i];
+
+    return ms_clumpStore.FindMatchAndUse ( pNewClothesDesc );
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //
-void _cdecl OnCClothesBuilderCreateSkinnedClumpPost ( RpClump* pRpClumpResult, RpClump* pRpClump, RwTexDictionary* pRwTexDictionary, CPedClothesDesc* pOutClothesDesc, CPedClothesDesc* pInClothesDesc, bool bAlwaysFalse )
+void _cdecl OnCClothesBuilderCreateSkinnedClumpPost ( RpClump* pRpClumpResult, RpClump* pRpClump, RwTexDictionary* pRwTexDictionary, CPedClothesDesc* pNewClothesDesc, CPedClothesDesc* pPrevClothesDesc, bool bAlwaysFalse )
 {
     if ( pRpClumpResult )
-        ms_clumpStore.SaveClump ( pRpClumpResult, pOutClothesDesc );
+        ms_clumpStore.SaveClump ( pRpClumpResult, pNewClothesDesc );
 }
 
 
