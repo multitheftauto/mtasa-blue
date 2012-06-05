@@ -105,6 +105,7 @@ public:
     CElement*                                   FindChildByType             ( const char* szType, unsigned int uiIndex, bool bRecursive );
     void                                        FindAllChildrenByType       ( const char* szType, lua_State* pLua );
     void                                        GetChildren                 ( lua_State* pLua );
+    void                                        GetChildrenByType           ( const char* szType, lua_State* pLua );
     bool                                        IsMyChild                   ( CElement* pElement, bool bRecursive );
     bool                                        IsMyParent                  ( CElement* pElement, bool bRecursive );
     void                                        ClearChildren               ( void );

@@ -1005,6 +1005,29 @@ void CClientEntity::GetChildren ( lua_State* luaVM )
 }
 
 
+void CClientEntity::GetChildrenByType ( const char* szType, lua_State* luaVM )
+{
+    assert ( szType );
+    assert ( luaVM );
+
+    // Add all our children to the table on top of the given lua main's stack
+    unsigned int uiIndex = 0;
+    unsigned int uiTypeHash = HashString ( szType );
+    CChildListType ::const_iterator iter = m_Children.begin ();
+    for ( ; iter != m_Children.end (); iter++ )
+    {
+        // Name matches?
+        if ( (*iter)->GetTypeHash() == uiTypeHash )
+        {
+            // Add it to the table
+            lua_pushnumber ( luaVM, ++uiIndex );
+            lua_pushelement ( luaVM, *iter );
+            lua_settable ( luaVM, -3 );
+        }
+    }
+}
+
+
 bool CClientEntity::CollisionExists ( CClientColShape* pShape )
 {
     list < CClientColShape* > ::iterator iter = m_Collisions.begin ();

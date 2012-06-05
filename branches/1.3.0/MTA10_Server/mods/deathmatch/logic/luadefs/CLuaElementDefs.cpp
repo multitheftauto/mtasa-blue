@@ -262,12 +262,27 @@ int CLuaElementDefs::getElementChildren ( lua_State* luaVM )
             CElement* pElement = lua_toelement ( luaVM, 1 );
             if ( pElement )
             {
-                // Create a new table
-                lua_newtable ( luaVM );
-
-                // Add all the elements with a matching type to it
-                pElement->GetChildren ( luaVM );
-                return 1;
+                if ( lua_type ( luaVM, 2 ) == LUA_TNONE )
+                {
+                    // Create a new table
+                    lua_newtable ( luaVM );
+    
+                    // Add all the elements with a matching type to it
+                    pElement->GetChildren ( luaVM );
+                    return 1;
+                }
+                else if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
+                {
+                    const char* szType = lua_tostring ( luaVM, 2 );
+                    // Create a new table
+                    lua_newtable ( luaVM );
+    
+                    // Add all the elements with a matching type to it
+                    pElement->GetChildrenByType ( szType, luaVM );
+                    return 1;
+                }
+                else
+                    m_pScriptDebugging->LogBadType ( luaVM, "getElementChildren" );
             }
             else
                 m_pScriptDebugging->LogBadPointer ( luaVM, "getElementChildren", "element", 1 );

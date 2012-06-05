@@ -272,6 +272,29 @@ void CElement::GetChildren ( lua_State* pLua )
 }
 
 
+void CElement::GetChildrenByType ( const char* szType, lua_State* pLua )
+{
+    assert ( szType );
+    assert ( pLua );
+
+    // Add all our children to the table on top of the given lua main's stack
+    unsigned int uiIndex = 0;
+    unsigned int uiTypeHash = HashString ( szType );
+    CChildListType ::const_iterator iter = m_Children.begin ();
+    for ( ; iter != m_Children.end (); iter++ )
+    {
+        // Name matches?
+        if ( (*iter)->GetTypeHash() == uiTypeHash )
+        {
+            // Add it to the table
+            lua_pushnumber ( pLua, ++uiIndex );
+            lua_pushelement ( pLua, *iter );
+            lua_settable ( pLua, -3 );
+        }
+    }
+}
+
+
 // Also returns true if the element is the same
 bool CElement::IsMyChild ( CElement* pElement, bool bRecursive )
 {
