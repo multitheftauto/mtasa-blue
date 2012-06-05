@@ -357,8 +357,8 @@ bool CAccessControlListManager::InternalCanObjectUseRight ( const char* szObject
             list < CAccessControlList* > ::iterator acl = (*group)->IterBeginACL ();
             for ( ; acl != (*group)->IterEndACL (); acl++ )
             {
-                // Grab the right with this name (allow wildcard matching here)
-                CAccessControlListRight* pRight = (*acl)->GetRight ( szRightName, eRightType, true );
+                // Grab the right with this name
+                CAccessControlListRight* pRight = (*acl)->GetRight ( szRightName, eRightType );
                 if ( pRight )
                 {
                     // If he has access, return that he can use this object. Otherwize keep looking

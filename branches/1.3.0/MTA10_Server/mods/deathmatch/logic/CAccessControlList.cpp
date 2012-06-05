@@ -51,11 +51,9 @@ CAccessControlListRight* CAccessControlList::AddRight ( const char* szRightName,
 }
 
 
-CAccessControlListRight* CAccessControlList::GetRight ( const char* szRightName, CAccessControlListRight::ERightType eRightType, bool bAllowWildcardMatch )
+CAccessControlListRight* CAccessControlList::GetRight ( const char* szRightName, CAccessControlListRight::ERightType eRightType )
 {
-    static unsigned int uiStarHash = HashString ( "*" );
     unsigned int uiHash = HashString ( szRightName );
-    CAccessControlListRight* pWildcardMatch = NULL;
 
     list < CAccessControlListRight* > ::iterator iter = m_Rights.begin ();
     for ( ; iter != m_Rights.end (); iter++ )
@@ -68,17 +66,9 @@ CAccessControlListRight* CAccessControlList::GetRight ( const char* szRightName,
                 // Exact match
                 return pACLRight;
             }
-            else
-            if ( bAllowWildcardMatch && pACLRight->GetRightNameHash () == uiStarHash )
-            {
-                // Save first wildcard match to be used if no exact matches
-                if ( !pWildcardMatch )
-                    pWildcardMatch = pACLRight;
-            }
         }
     }
-
-    return pWildcardMatch;
+    return NULL;
 }
 
 

@@ -2561,19 +2561,36 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
     // if we're trying to return a http file. Otherwize it's the MTA
     // client trying to download files.
     CAccessControlListManager * aclManager = g_pGame->GetACLManager();
-    if ( !aclManager->CanObjectUseRight ( account->GetName().c_str (),
+
+    // Old way part 1
+    // Check for "resource.blah" being specifically denied
+    bool bResourceBlah = aclManager->CanObjectUseRight ( account->GetName().c_str (),
                                             CAccessControlListGroupObject::OBJECT_TYPE_USER,
                                             m_strResourceName.c_str (),
                                             CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-                                            true ) ||
-         !aclManager->CanObjectUseRight ( account->GetName().c_str (),
+                                            true );
+
+    // Old way part 2
+    // Check for "general.http" being specifically denied
+    bool bGeneralHttp = aclManager->CanObjectUseRight ( account->GetName().c_str (),
                                             CAccessControlListGroupObject::OBJECT_TYPE_USER,
                                             "http",
                                             CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                                            true ) )
+                                            true );
+
+    // New way
+    // Check for "resource.blah.http" being specifically allowed
+    bool bResourceBlahHttp = aclManager->CanObjectUseRight ( account->GetName().c_str (),
+                                            CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                                            SString ( "%s.http", m_strResourceName.c_str () ),
+                                            CAccessControlListRight::RIGHT_TYPE_RESOURCE,
+                                            false );
+
+    // If denied with both 'new way' and 'old way' then stop here
+    if ( !bResourceBlahHttp && ( !bResourceBlah || !bGeneralHttp ) )
     {
         bAlreadyCalling = false;
-        return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );;
+        return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
     }
 
     #define MAX_INPUT_VARIABLES       25
@@ -2875,36 +2892,50 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
                         // if we're trying to return a http file. Otherwise it's the MTA
                         // client trying to download files.
                         CAccessControlListManager * aclManager = g_pGame->GetACLManager();
-                        if ( aclManager->CanObjectUseRight ( account->GetName().c_str (),
+
+                        // Old way part 1
+                        // Check for "resource.blah" being specifically denied
+                        bool bResourceBlah = aclManager->CanObjectUseRight ( account->GetName().c_str (),
                                                             CAccessControlListGroupObject::OBJECT_TYPE_USER,
                                                             m_strResourceName.c_str (),
                                                             CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-                                                            true ) &&
-                            aclManager->CanObjectUseRight ( account->GetName().c_str (),
+                                                            true );
+                        // Old way part 2
+                        // Check for "general.http" being specifically denied
+                        bool bGeneralHttp = aclManager->CanObjectUseRight ( account->GetName().c_str (),
                                                             CAccessControlListGroupObject::OBJECT_TYPE_USER,
                                                             "http",
                                                             CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                                                            true ) )
-                        {
-                            SString strResourceFileName ( "%s.file.%s", m_strResourceName.c_str (), pHtml->GetName() );
+                                                            true );
 
-                            if ( aclManager->CanObjectUseRight ( account->GetName().c_str (),
-                                                                CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                                                strResourceFileName.c_str (),
-                                                                CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-                                                                !pHtml->IsRestricted () ) )
-                            {
-                                return pHtml->Request ( ipoHttpRequest, ipoHttpResponse, account );
-                            }
-                            else
-                            {
-                                return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
-                            }
-                        }
-                        else
+                        // New way
+                        // Check for "resource.blah.http" being specifically allowed
+                        bool bResourceBlahHttp = aclManager->CanObjectUseRight ( account->GetName().c_str (),
+                                                            CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                                                            SString ( "%s.http", m_strResourceName.c_str () ),
+                                                            CAccessControlListRight::RIGHT_TYPE_RESOURCE,
+                                                            false );
+
+                        // If denied with both 'new way' and 'old way' then stop here
+                        if ( !bResourceBlahHttp && ( !bResourceBlah || !bGeneralHttp ) )
                         {
                             return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
                         }
+
+                        assert ( bResourceBlahHttp || ( bResourceBlah && bGeneralHttp ) );
+
+                        SString strResourceFileName ( "%s.file.%s", m_strResourceName.c_str (), pHtml->GetName() );
+
+                        if ( aclManager->CanObjectUseRight ( account->GetName().c_str (),
+                                                            CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                                                            strResourceFileName.c_str (),
+                                                            CAccessControlListRight::RIGHT_TYPE_RESOURCE,
+                                                            !pHtml->IsRestricted () ) )
+                        {
+                            return pHtml->Request ( ipoHttpRequest, ipoHttpResponse, account );
+                        }
+
+                        return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
                     }
                     else
                     {
@@ -2930,15 +2961,28 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
             // if we're trying to return a http file. Otherwize it's the MTA
             // client trying to download files.
             CAccessControlListManager * aclManager = g_pGame->GetACLManager();
-            if ( !aclManager->CanObjectUseRight (   account->GetName().c_str (),
+
+            // Old way
+            // Check for "general.http" being specifically denied
+            bool bGeneralHttp = aclManager->CanObjectUseRight (   account->GetName().c_str (),
                                                     CAccessControlListGroupObject::OBJECT_TYPE_USER,
                                                     "http",
                                                     CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                                                    true ) )
+                                                    true );
+
+            // New way
+            // Check for "resource.blah.http" being specifically allowed
+            bool bResourceBlahHttp = aclManager->CanObjectUseRight ( account->GetName().c_str (),
+                                                    CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                                                    SString ( "%s.http", m_strResourceName.c_str () ),
+                                                    CAccessControlListRight::RIGHT_TYPE_RESOURCE,
+                                                    false );
+
+            // If denied with both 'new way' and 'old way' then stop here
+            if ( !bResourceBlahHttp && !bGeneralHttp )
             {
                 return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
             }
-
 
             if ( pFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML )
             {
