@@ -1332,7 +1332,7 @@ int CLuaElementDefs::setElementPosition ( lua_State* luaVM )
         argStream.ReadNumber ( vecPosition.fZ, 0 );
     else
         argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadNumber ( bWarp, true );
+    argStream.ReadBool ( bWarp, true );
 
     if ( !argStream.HasErrors () )
     {
