@@ -3866,3 +3866,56 @@ bool CGame::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& play
     return true;
 }
 
+
+//////////////////////////////////////////////////////////////////
+//
+// CGame::SetDevSetting
+//
+// For testing features
+//
+//////////////////////////////////////////////////////////////////
+void CGame::SetDevSetting ( const SString& strCommand )
+{
+    std::vector < SString > parts;
+    (strCommand + ",,,").Split ( ",", parts );
+
+    SString strMessage = "Unknown setting";
+
+    if ( parts[0] == "bullet-sync" )
+    {
+        eWeaponType weaponType;
+        if ( StringToEnum ( parts[1], weaponType ) )
+        {
+            bool bEnable = ( atoi ( parts[2] ) == 1 );
+            // Update settings map
+            if ( bEnable )
+                MapInsert ( m_weaponTypesUsingBulletSync, weaponType );
+            else
+                MapRemove ( m_weaponTypesUsingBulletSync, weaponType );
+
+            strMessage = SString ( "Bullet sync for %s is now %d" ,*parts[1] ,bEnable );
+
+            // Tell joined players about the new bullet sync settings
+            SendBulletSyncSettings ( NULL );
+        }
+    }
+
+    CLogger::LogPrintf ( strMessage + "\n" );
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CGame::SendBulletSyncSettings
+//
+// If player is NULL, send to all joined players
+//
+//////////////////////////////////////////////////////////////////
+void CGame::SendBulletSyncSettings ( CPlayer* pPlayer )
+{
+    CBulletsyncSettingsPacket packet ( m_weaponTypesUsingBulletSync );
+    if ( pPlayer )
+        pPlayer->Send ( packet );
+    else
+        m_pPlayerManager->BroadcastOnlyJoined ( packet );
+}

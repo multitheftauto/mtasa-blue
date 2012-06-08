@@ -483,7 +483,7 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
 
         // Extra thing to show bulletsync in use
         SString strNick = szNick;
-        if ( pPlayer->m_bRemoteBulletSyncEnabled )
+        if ( g_pClientGame->GetWeaponTypeUsesBulletSync ( pPlayer->GetCurrentWeaponType () ) )
             strNick += " *";
 
         // Draw his name

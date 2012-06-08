@@ -392,7 +392,7 @@ public:
     void                                ProcessDelayedSendList          ( void );
 
     void                                SetDevSetting                   ( const SString& strCommand );
-    void                                SetWeaponTypeUsesBulletSync     ( eWeaponType weaponType, bool bEnable );
+    void                                SetWeaponTypesUsingBulletSync   ( const std::set < eWeaponType >& weaponTypesUsingBulletSync );
     bool                                GetWeaponTypeUsesBulletSync     ( eWeaponType weaponType );
 
     SString                             GetHTTPURL                      ( void ) { return m_strHTTPDownloadURL; };

@@ -277,3 +277,24 @@ void CClientPlayer::SetNametagText ( const char * szText )
         m_strNametag = szText;
     }
 }
+
+
+void CClientPlayer::DischargeWeapon ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd )
+{
+    if ( m_pPlayerPed )
+    {
+        // Check weapon matches and is enabled for bullet sync
+        if ( weaponType == GetCurrentWeaponType () &&
+             g_pClientGame->GetWeaponTypeUsesBulletSync ( weaponType ) )
+        {
+            // Set bullet start and end points
+            #if 0   // TODO fix this - Positions are out
+                m_shotSyncData->m_vecRemoteBulletSyncStart = vecStart;
+                m_shotSyncData->m_vecRemoteBulletSyncEnd = vecEnd;
+                m_shotSyncData->m_bRemoteBulletSyncVectorsValid = true;
+            #endif
+
+            m_pPlayerPed->GetPedIntelligence ()->DischargeCurrentWeapon ( false );
+        }
+    }
+}

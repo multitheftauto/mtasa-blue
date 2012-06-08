@@ -14,25 +14,26 @@
 CBulletsyncPacket::CBulletsyncPacket ( CPlayer * pPlayer )
 {
     m_pSourceElement = pPlayer;
-    m_cFlag = 0;
+    m_WeaponType = WEAPONTYPE_UNARMED;
 }
 
 bool CBulletsyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
+    // Ignore old bullet sync stuff
+    if ( BitStream.Version () < 0x2E )
+        return false;
+
     // Got a player?
     if ( m_pSourceElement )
     {
-        if ( !BitStream.Read ( m_cFlag ) )
-            return false;
-
-        if ( m_cFlag == 1 )
+        char cWeaponType;
+        if ( BitStream.Read ( cWeaponType ) )
         {
-            BitStream.Read ( (char *)&m_vecStart, sizeof ( CVector ) );
-            if ( !BitStream.Read ( (char *)&m_vecEnd, sizeof ( CVector ) ) )
-                return false;
+            m_WeaponType = (eWeaponType)cWeaponType;
+            if ( BitStream.Read ( (char *)&m_vecStart, sizeof ( CVector ) ) &&
+                 BitStream.Read ( (char *)&m_vecEnd, sizeof ( CVector ) ) )
+                return true;
         }
-
-        return true;
     }
 
     return false;
@@ -42,6 +43,10 @@ bool CBulletsyncPacket::Read ( NetBitStreamInterface& BitStream )
 // Note: Relays a previous Read()
 bool CBulletsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
+    // Don't send to older clients
+    if ( BitStream.Version () < 0x2E )
+        return false;
+
     // Got a player to write?
     if ( m_pSourceElement )
     {
@@ -52,12 +57,9 @@ bool CBulletsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.Write ( PlayerID );
 
         // Write the bulletsync data
-        BitStream.Write ( m_cFlag );
-        if ( m_cFlag == 1 )
-        {
-            BitStream.Write ( (const char *)&m_vecStart, sizeof ( CVector ) );
-            BitStream.Write ( (const char *)&m_vecEnd, sizeof ( CVector ) );
-        }
+        BitStream.Write ( (char)m_WeaponType );
+        BitStream.Write ( (const char *)&m_vecStart, sizeof ( CVector ) );
+        BitStream.Write ( (const char *)&m_vecEnd, sizeof ( CVector ) );
         return true;
     }
 

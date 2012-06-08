@@ -59,7 +59,7 @@ public:
 
     void                    AddInterpolation                ( const CVector& vecPosition );
     bool                    GetInterpolation                ( CVector& vecPosition, unsigned short usLatency );
-    void                    SendBulletSyncFire              ( const CVector& vecStart, const CVector& vecEnd );
+    void                    SendBulletSyncFire              ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd );
 
     static bool             IsWeaponIDAkimbo                ( unsigned char ucWeaponID );
     static bool             IsDriveByWeapon                 ( unsigned char ucWeaponID );
@@ -73,8 +73,6 @@ private:
 
     void                    ModifyControllerStateForBulletSync ( CClientPlayer* pPlayer, CControllerState& ControllerState );
     void                    ReadBulletsync                  ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
-    void                    MaybeSendBulletSyncFireRelease  ( void );
-    void                    MaybeSendBulletSyncEnabled      ( void );
 
     void                    ReadPlayerPuresync              ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
     void                    WritePlayerPuresync             ( CClientPlayer* pPed, NetBitStreamInterface& BitStream );
@@ -128,9 +126,6 @@ private:
 
     bool                    m_bIncreaseTimeoutTime;
     CElapsedTime            m_IncreaseTimeoutTimeTimer;
-
-    bool                    m_bBulletSyncLastSentFireButtonDown;
-    bool                    m_bUsingBulletSync;
 
     CElapsedTime            m_TimeSinceMouseOrAnalogStateSent;
     CControllerState        m_LastSentControllerState;
