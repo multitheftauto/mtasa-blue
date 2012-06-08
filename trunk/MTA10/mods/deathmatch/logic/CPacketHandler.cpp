@@ -194,6 +194,10 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_LatentTransfer ( bitStream );
             return true;
 
+        case PACKET_ID_BULLETSYNC_SETTINGS:
+            Packet_BulletSyncSettings ( bitStream );
+            return true;
+
         default:             break;
     }
 
@@ -4630,4 +4634,21 @@ void CPacketHandler::Packet_UpdateInfo ( NetBitStreamInterface& bitStream )
 void CPacketHandler::Packet_LatentTransfer ( NetBitStreamInterface& bitStream )
 {
     g_pClientGame->GetLatentTransferManager ()->OnReceive ( 0, &bitStream );
+}
+
+
+void CPacketHandler::Packet_BulletSyncSettings ( NetBitStreamInterface& bitStream )
+{
+    uchar ucNumWeapons = 0;
+    if ( bitStream.Read ( ucNumWeapons ) )
+    {
+        std::set < eWeaponType > weaponTypesUsingBulletSync;
+        for ( uint i = 0 ; i < ucNumWeapons ; i++ )
+        {
+            uchar ucWeaponType = 0;
+            if ( bitStream.Read ( ucWeaponType ) )
+                MapInsert ( weaponTypesUsingBulletSync, (eWeaponType)ucWeaponType );
+        }
+        g_pClientGame->SetWeaponTypesUsingBulletSync ( weaponTypesUsingBulletSync );
+    }
 }

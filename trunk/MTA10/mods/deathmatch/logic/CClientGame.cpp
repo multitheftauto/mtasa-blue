@@ -4659,8 +4659,9 @@ void CClientGame::BulletFire ( CPed* pInitiator, const CVector* pStartPosition, 
     if ( pLocalPlayer && pLocalPlayer->GetGamePlayer () == pInitiator )
     {
         // Maybe send bulletsync packet for the firing of this bullet
-        if ( g_pClientGame->GetWeaponTypeUsesBulletSync ( pLocalPlayer->GetCurrentWeaponType () ) )
-            g_pClientGame->m_pNetAPI->SendBulletSyncFire ( *pStartPosition, *pEndPosition );
+        eWeaponType weaponType = pLocalPlayer->GetCurrentWeaponType ();
+        if ( g_pClientGame->GetWeaponTypeUsesBulletSync ( weaponType ) )
+            g_pClientGame->m_pNetAPI->SendBulletSyncFire ( weaponType, *pStartPosition, *pEndPosition );
     }
 }
 
@@ -5717,15 +5718,7 @@ void CClientGame::SetDevSetting ( const SString& strCommand )
 
     if ( parts[0] == "bullet-sync" )
     {
-        eWeaponType weaponType;
-        if ( StringToEnum ( parts[1], weaponType ) )
-        {
-            SetWeaponTypeUsesBulletSync ( weaponType, atoi ( parts[2] ) == 1 );
-            strMessage = SString ( "Local player bullet sync sending for %s is now %d"
-                                                ,*parts[1]
-                                                ,GetWeaponTypeUsesBulletSync ( weaponType )
-                                    );
-        }
+        // Not used
     }
 
     g_pCore->GetConsole ()->Echo ( strMessage );
@@ -5734,17 +5727,14 @@ void CClientGame::SetDevSetting ( const SString& strCommand )
 
 //////////////////////////////////////////////////////////////////
 //
-// CClientGame::SetWeaponTypeUsesBulletSync
+// CClientGame::SetWeaponTypesUsingBulletSync
 //
 // Set whether the local player will send bulletsync messages for the supplied weapon type
 //
 //////////////////////////////////////////////////////////////////
-void CClientGame::SetWeaponTypeUsesBulletSync ( eWeaponType weaponType, bool bEnable )
+void CClientGame::SetWeaponTypesUsingBulletSync ( const std::set < eWeaponType >& weaponTypesUsingBulletSync )
 {
-    if ( bEnable )
-        MapInsert ( m_weaponTypesUsingBulletSync, weaponType );
-    else
-        MapRemove ( m_weaponTypesUsingBulletSync, weaponType );
+    m_weaponTypesUsingBulletSync = weaponTypesUsingBulletSync;
 }
 
 

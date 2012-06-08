@@ -22,17 +22,21 @@ CSimBulletsyncPacket::CSimBulletsyncPacket ( ElementID PlayerID )
 //
 bool CSimBulletsyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
-    if ( !BitStream.Read ( m_Cache.cFlag ) )
+    // Ignore old bullet sync stuff
+    if ( BitStream.Version () < 0x2E )
         return false;
 
-    if ( m_Cache.cFlag == 1 )
+    char cWeaponType;
+    if ( BitStream.Read ( cWeaponType ) )
     {
-        BitStream.Read ( (char *)&m_Cache.vecStart, sizeof ( CVector ) );
-        if ( !BitStream.Read ( (char *)&m_Cache.vecEnd, sizeof ( CVector ) ) )
-            return false;
+        m_Cache.weaponType = (eWeaponType)cWeaponType;
+
+        if ( BitStream.Read ( (char *)&m_Cache.vecStart, sizeof ( CVector ) ) &&
+             BitStream.Read ( (char *)&m_Cache.vecEnd, sizeof ( CVector ) ) )
+            return true;
     }
 
-    return true;
+    return false;
 }
 
 
@@ -41,15 +45,16 @@ bool CSimBulletsyncPacket::Read ( NetBitStreamInterface& BitStream )
 //
 bool CSimBulletsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
+    // Don't send to older clients
+    if ( BitStream.Version () < 0x2E )
+        return false;
+
     // Write the source player id
     BitStream.Write ( m_PlayerID );
 
     // Write the bulletsync data
-    BitStream.Write ( m_Cache.cFlag );
-    if ( m_Cache.cFlag == 1 )
-    {
-        BitStream.Write ( (const char *)&m_Cache.vecStart, sizeof ( CVector ) );
-        BitStream.Write ( (const char *)&m_Cache.vecEnd, sizeof ( CVector ) );
-    }
+    BitStream.Write ( (char)m_Cache.weaponType );
+    BitStream.Write ( (const char *)&m_Cache.vecStart, sizeof ( CVector ) );
+    BitStream.Write ( (const char *)&m_Cache.vecEnd, sizeof ( CVector ) );
     return true;
 }

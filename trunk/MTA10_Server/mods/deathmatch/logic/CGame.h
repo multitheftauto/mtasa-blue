@@ -48,6 +48,7 @@ class CGame;
 #include "packets/CVehicleResyncPacket.h"
 #include "packets/CKeysyncPacket.h"
 #include "packets/CBulletsyncPacket.h"
+#include "packets/CBulletsyncSettingsPacket.h"
 #include "packets/CVehicleInOutPacket.h"
 #include "packets/CVehicleDamageSyncPacket.h"
 #include "packets/CVehicleTrailerPacket.h"
@@ -354,6 +355,9 @@ public:
     void                        EnableLatentSends           ( bool bEnabled, int iBandwidth = 0, CLuaMain* pLuaMain = NULL );
     bool                        SendPacket                  ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
 
+    void                        SetDevSetting               ( const SString& strCommand );
+    void                        SendBulletSyncSettings      ( CPlayer* pPlayer );
+
 private:
     void                        AddBuiltInEvents            ( void );
     void                        RelayPlayerPuresync         ( class CPacket& Packet );
@@ -522,6 +526,8 @@ private:
     bool                        m_bLatentSendsEnabled;
     int                         m_iLatentSendsBandwidth;
     CLuaMain*                   m_pLatentSendsLuaMain;
+
+    std::set < eWeaponType >    m_weaponTypesUsingBulletSync;
 };
 
 #endif

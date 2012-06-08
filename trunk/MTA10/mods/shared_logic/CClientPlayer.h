@@ -109,8 +109,7 @@ public:
 
     inline CClientManager*          GetManager              ( void )                                { return m_pManager; }
 
-    bool                            m_bRemoteBulletSyncFireButtonPressed;
-    bool                            m_bRemoteBulletSyncEnabled;
+    void                            DischargeWeapon         ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd );
 
 private:
     bool                            m_bIsLocalPlayer;

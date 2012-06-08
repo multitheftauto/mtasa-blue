@@ -27,6 +27,7 @@ public:
     virtual CEvent *            GetCurrentEvent ( void )=0;
     virtual CVehicleScanner *   GetVehicleScanner( void )=0;
     virtual bool                TestForStealthKill ( CPed * pPed, bool bUnk ) = 0;
+    virtual void                DischargeCurrentWeapon ( bool bAllowReloadAnimation ) = 0;
 };
 
 #endif
