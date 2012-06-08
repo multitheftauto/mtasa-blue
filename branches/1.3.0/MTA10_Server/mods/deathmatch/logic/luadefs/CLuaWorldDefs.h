@@ -76,6 +76,7 @@ public:
     static int      setFarClipDistance                  ( lua_State* luaVM );
     static int      setFogDistance                      ( lua_State* luaVM );
     static int      setAircraftMaxHeight                ( lua_State* luaVM );
+    static int      setDevelopmentMode                  ( lua_State* luaVM );
 
     // Reset
     static int      resetSkyGradient                    ( lua_State* luaVM );

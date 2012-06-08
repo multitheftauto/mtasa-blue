@@ -222,6 +222,7 @@ LOGIC = \
 ./logic/packets/CElementRPCPacket.cpp \
 ./logic/packets/CKeysyncPacket.cpp \
 ./logic/packets/CBulletsyncPacket.cpp \
+./logic/packets/CBulletsyncSettingsPacket.cpp \
 ./logic/packets/CLightsyncPacket.cpp \
 ./logic/packets/CLuaEventPacket.cpp \
 ./logic/packets/CLuaPacket.cpp \

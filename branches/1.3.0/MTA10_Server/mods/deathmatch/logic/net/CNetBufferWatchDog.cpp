@@ -424,7 +424,6 @@ bool CNetBufferWatchDog::IsUnreliableSyncPacket ( uchar ucPacketID )
         case PACKET_ID_UNOCCUPIED_VEHICLE_SYNC:
         case PACKET_ID_PED_SYNC:
         case PACKET_ID_CAMERA_SYNC:
-        case PACKET_ID_PLAYER_BULLETSYNC:
             return true;
         default:
             return false;

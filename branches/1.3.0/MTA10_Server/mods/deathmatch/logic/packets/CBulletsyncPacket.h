@@ -16,12 +16,12 @@ public:
                                             CBulletsyncPacket           ( class CPlayer* pPlayer );
 
     inline ePacketID                        GetPacketID                 ( void ) const                  { return PACKET_ID_PLAYER_BULLETSYNC; };
-    unsigned long                           GetFlags                    ( void ) const                  { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    unsigned long                           GetFlags                    ( void ) const                  { return PACKET_MEDIUM_PRIORITY | PACKET_RELIABLE; };
 
     bool                                    Read                        ( NetBitStreamInterface& BitStream );
     bool                                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
-    char                    m_cFlag;
+    eWeaponType             m_WeaponType;
     CVector                 m_vecStart;
     CVector                 m_vecEnd;
 };

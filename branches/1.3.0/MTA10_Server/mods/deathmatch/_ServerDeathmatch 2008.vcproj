@@ -944,6 +944,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CBulletsyncSettingsPacket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CBulletsyncSettingsPacket.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CCameraSyncPacket.cpp"
 						>
 					</File>

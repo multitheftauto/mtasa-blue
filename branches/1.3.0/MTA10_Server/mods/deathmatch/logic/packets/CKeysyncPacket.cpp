@@ -19,8 +19,6 @@
 CKeysyncPacket::CKeysyncPacket ( CPlayer * pPlayer )
 {
     m_pSourceElement = pPlayer;
-    m_bUseBulletSync = false;
-    m_bBulletSyncFireButtonDown = false;
 }
 
 
@@ -52,11 +50,12 @@ bool CKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
             fCameraRotation = pSourcePlayer->GetCameraRotation ();
         }
 
-        // Confirm the bulletsync state (in case packets got lost)
-        if ( BitStream.Version () >= 0x2D )
+        // Skip old bullet sync data
+        if ( BitStream.Version () == 0x2D )
         {
-            BitStream.ReadBit ( m_bUseBulletSync );
-            BitStream.ReadBit ( m_bBulletSyncFireButtonDown );
+            bool bDummy;
+            BitStream.ReadBit ( bDummy );
+            BitStream.ReadBit ( bDummy );
         }
 
         // Flags
@@ -211,11 +210,12 @@ bool CKeysyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.Write ( &rotation );
         }
 
-        // Confirm the bulletsync state (in case packets got lost)
-        if ( BitStream.Version () >= 0x2D )
+        // Skip old bullet sync data
+        if ( BitStream.Version () == 0x2D )
         {
-            BitStream.WriteBit ( m_bUseBulletSync );
-            BitStream.WriteBit ( m_bBulletSyncFireButtonDown );
+            bool bDummy = 0;
+            BitStream.WriteBit ( bDummy );
+            BitStream.WriteBit ( bDummy );
         }
 
         // Flags

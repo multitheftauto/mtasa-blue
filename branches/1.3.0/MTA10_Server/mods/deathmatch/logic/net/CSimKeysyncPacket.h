@@ -65,10 +65,6 @@ public:
         uchar           ucDriveByDirection;
 
         SVehicleTurretSync turretSync;
-
-        bool            bUseBulletSync;
-        bool            bBulletSyncFireButtonDown;
-
     } m_Cache;
 
 };
