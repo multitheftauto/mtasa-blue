@@ -143,6 +143,12 @@ void CMultiplayerSA::InitMemoryCopies_13 ( void )
     // Prevent garages deleting vehicles
     MemPut < BYTE > ( 0x0449C50, 0xC3 );
     MemPut < BYTE > ( 0x0449D10, 0xC3 );
+
+    // Move birds up a bit so they don't fly through solid objects quite so often
+    MemPut < float > ( 0x71240e, 10.f + 10.f );
+    MemPut < float > ( 0x712413, 2.f  + 10.f );
+    MemPut < float > ( 0x712447, 13.f + 10.f );
+    MemPut < float > ( 0x71244c, 4.f  + 10.f );
 }
 
 // Siren Stuff
