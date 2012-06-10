@@ -1735,10 +1735,10 @@ void CVehicleSA::RecalculateHandling ( void )
         }
     }
     pInt->dwHandlingFlags = uiHandlingFlags;
-    pInt->fMass = m_pHandlingData->GetInterface ()->fMass;
-    pInt->fTurnMass = m_pHandlingData->GetInterface ()->fTurnMass;// * pGame->GetHandlingManager()->GetTurnMassMultiplier();
-    pInt->vecCenterOfMass = &m_pHandlingData->GetInterface()->vecCenterOfMass;
-    pInt->fBuoyancyConstant = m_pHandlingData->GetInterface()->fUnknown2;
+    pInt->m_fMass = m_pHandlingData->GetInterface ()->fMass;
+    pInt->m_fTurnMass = m_pHandlingData->GetInterface ()->fTurnMass;// * pGame->GetHandlingManager()->GetTurnMassMultiplier();
+    pInt->m_vecCenterOfMass = m_pHandlingData->GetInterface()->vecCenterOfMass;
+    pInt->m_fBuoyancyConstant = m_pHandlingData->GetInterface()->fUnknown2;
     /*if (m_pHandlingData->GetInterface()->fDragCoeff >= pGame->GetHandlingManager()->GetBasicDragCoeff())
         GetVehicleInterface ()->fDragCoeff = pGame->GetHandlingManager()->GetBasicDragCoeff();
     else*/

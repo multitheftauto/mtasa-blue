@@ -104,7 +104,6 @@ public:
     virtual bool                        IsStaticWaitingForCollision ( void ) = 0;
     virtual void                        SetStaticWaitingForCollision ( bool bStatic ) = 0;
 
-    virtual void                        GetImmunities ( bool & bNoClip, bool & bFrozen, bool & bBulletProof, bool & bFlameProof, bool & bUnk, bool & bUnk2, bool & bCollisionProof, bool & bExplosionProof ) = 0;
     virtual unsigned long               GetArrayID ( void ) = 0;
 };
 

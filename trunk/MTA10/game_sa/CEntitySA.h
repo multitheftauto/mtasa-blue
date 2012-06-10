@@ -36,13 +36,8 @@
 #define FUNC_IsOnScreen                                     0x534540
 #define FUNC_IsVisible                                      0x536BC0
 
-
-
 // not in CEntity really
 #define FUNC_RpAnimBlendClumpGetAssociation                 0x4D6870
-
-// replace with enum from R*
-#define STATUS_ABANDONED                    4
 
 class CEntitySAInterfaceVTBL
 {   
@@ -75,10 +70,51 @@ public:
 /** 
  * \todo Move CReferences (and others below?) into it's own file
  */
+class CReference
+{
+public:
+    CReference * pNext;
+    class CEntitySAInterface ** ppEntity;
+};
+
 class CReferences
 {
-    CEntity     * pEntity;
+public:
+    CReference m_refs[3000];
+    CReference *m_pFreeList;
 };
+
+class CMatrixEx
+{
+public:
+    CMatrix_Padded matrix;
+    CMatrix * pMatrix; // usually not initialized
+    void * haveRwMatrix; // unknown pointer
+};
+
+class XYZ
+{
+public:
+    CMatrixEx matrix;
+    class CPlaceableSAInterface * pRef;
+    XYZ * pPrev;
+    XYZ * pNext;
+};
+C_ASSERT(sizeof(XYZ) == 0x54);
+
+class XYZStore
+{
+public:
+    XYZ head;
+    XYZ tail;
+    XYZ allocatedListHead;
+    XYZ allocatedListTail;
+    XYZ freeListHead;
+    XYZ freeListTail;
+    XYZ * pPool;
+};
+C_ASSERT(sizeof(XYZStore) == 0x1FC);
+
 
 class CSimpleTransformSAInterface   // 16 bytes
 {
@@ -91,7 +127,7 @@ class CPlaceableSAInterface // 20 bytes
 {
 public:
     CSimpleTransformSAInterface     m_transform;
-    CMatrix_Padded                  * matrix;
+    CMatrix_Padded                  * matrix; // This is actually XYZ*, change later
 };
 
 class CEntitySAInterface;
@@ -164,12 +200,46 @@ public:
     BYTE nStatus : 5;               // control status       // 54
     //********* END CEntityInfo **********//
 
-    //58-66 padded
-    BYTE pad[8];
-    BYTE nImmunities;
-    BYTE pad2 [ 1 ];
+	uint8 m_pad0;
+	
+    float pad1; // 56
+    uint32 pad2; // 60
+ 
+    uint32 b0x01 : 1; // 64
+    uint32 bApplyGravity : 1;
+    uint32 bDisableFriction : 1;
+    uint32 bCollidable : 1; 
+    uint32 b0x10 : 1;
+    uint32 bDisableMovement : 1;
+    uint32 b0x40 : 1;
+    uint32 b0x80 : 1;
 
-    /* IMPORTANT: KEEP "pad" in CVehicle UP-TO-DATE if you add something here (or eventually pad someplace else) */
+    uint32 bSubmergedInWater : 1; // 65
+    uint32 bOnSolidSurface : 1;
+    uint32 bBroken : 1;
+    uint32 b0x800 : 1; // ref @ 0x6F5CF0
+    uint32 b0x1000 : 1;//
+    uint32 b0x2000 : 1;//
+    uint32 b0x4000 : 1;//
+    uint32 b0x8000 : 1;//
+
+    uint32 b0x10000 : 1; // 66
+    uint32 b0x20000 : 1; // ref @ CPhysical__processCollision
+    uint32 bBulletProof : 1;
+    uint32 bFireProof : 1;
+    uint32 bCollisionProof : 1;
+    uint32 bMeeleProof : 1;
+    uint32 bInvulnerable : 1;
+    uint32 bExplosionProof : 1;
+
+    uint32 b0x1000000 : 1; // 67
+    uint32 bAttachedToEntity : 1;
+    uint32 b0x4000000 : 1;
+    uint32 bTouchingWater : 1;
+    uint32 bEnableCollision : 1;
+    uint32 bDestroyed : 1;
+    uint32 b0x40000000 : 1;
+    uint32 b0x80000000 : 1;
 
     //
     // Functions to hide member variable misuse
@@ -210,6 +280,7 @@ public:
         return -1;
     }
 };
+C_ASSERT(sizeof(CEntitySAInterface) == 0x44);
 
 class CEntitySA : public virtual CEntity
 {
@@ -255,9 +326,7 @@ public:
     void                        SetAreaCode ( BYTE areaCode );
 
     FLOAT                       GetDistanceFromCentreOfMassToBaseOfModel();
-    /**
-     * \todo Find enum for SetEntityStatus
-     */
+	
     VOID                        SetEntityStatus( eEntityStatus bStatus );
     eEntityStatus               GetEntityStatus( );
 
@@ -288,8 +357,6 @@ public:
 
     bool                        IsStaticWaitingForCollision  ( void )        { return m_pInterface->bIsStaticWaitingForCollision; }
     void                        SetStaticWaitingForCollision  ( bool bStatic ) { m_pInterface->bIsStaticWaitingForCollision  = bStatic; }
-
-    void                        GetImmunities   ( bool & bNoClip, bool & bFrozen, bool & bBulletProof, bool & bFlameProof, bool & bUnk, bool & bUnk2, bool & bCollisionProof, bool & bExplosionProof );
 
     inline unsigned long        GetArrayID      ( void ) { return m_ulArrayID; }
     inline void                 SetArrayID      ( unsigned long ulID ) { m_ulArrayID = ulID; }
