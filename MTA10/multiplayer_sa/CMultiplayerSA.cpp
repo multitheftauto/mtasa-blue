@@ -5904,7 +5904,7 @@ void TriggerVehicleDamageEvent ( )
 {
     if ( pCollisionVehicle )
     {
-        CEntitySAInterface * pEntity = pCollisionVehicle->damageEntity;
+        CEntitySAInterface * pEntity = pCollisionVehicle->m_pCollidedEntity;
         if ( pEntity )
         {
             // Not handled because it triggers too much
@@ -5916,11 +5916,11 @@ void TriggerVehicleDamageEvent ( )
                     if ( pEntity->nType == ENTITY_TYPE_VEHICLE )
                     {
                         CVehicleSAInterface * pInterface = static_cast < CVehicleSAInterface* > ( pEntity );
-                        m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->fDamageImpulseMagnitude, pInterface->fDamageImpulseMagnitude, pCollisionVehicle->byBodyPartHit, pCollisionVehicle->vecCollisionPosition, pCollisionVehicle->vecCollisionImpactVelocity );
+                        m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude, pInterface->m_fDamageImpulseMagnitude, pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity );
                     }
                     else
                     {
-                        m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->fDamageImpulseMagnitude, 0.0f, pCollisionVehicle->byBodyPartHit, pCollisionVehicle->vecCollisionPosition, pCollisionVehicle->vecCollisionImpactVelocity );
+                        m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude, 0.0f, pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity );
                     }
                     TIMING_CHECKPOINT( "-TriggerVehDamEvent" );
                 }

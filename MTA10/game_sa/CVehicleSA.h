@@ -358,8 +358,6 @@ class CAutoPilot
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
 public:
-    //char        pad [1158];     /* IMPORTANT: KEEP THIS UP-TO-DATE */
-    //FLOAT       fDamage;
     CAEVehicleAudioEntity m_VehicleAudioEntity; // 312
 
     int padaudio[108];
