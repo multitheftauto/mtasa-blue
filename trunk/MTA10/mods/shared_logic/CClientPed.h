@@ -288,7 +288,7 @@ public:
 
     void                        ResetToOutOfVehicleWeapon   ( void );
 
-    void                        RebuildModel                ( bool bForceClothes = false, bool bDelayChange = false );
+    void                        RebuildModel                ( bool bDelayChange = false );
     void                        ProcessRebuildPlayer        ( void );
     void                        SetStat                     ( unsigned short usStat, float fValue );
     float                       GetStat                     ( unsigned short usStat );
