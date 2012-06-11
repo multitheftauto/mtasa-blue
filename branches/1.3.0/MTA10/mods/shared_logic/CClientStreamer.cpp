@@ -177,9 +177,12 @@ void CClientStreamer::DoPulse ( CVector & vecPosition )
             // Grab our new sector
             OnEnterSector ( m_pRow->FindOrCreateSector ( vecPosition, m_pSector ) );
         }
-        SetExpDistances ( &m_ActiveElements );
-        m_ActiveElements.sort ( CompareExpDistance );
     }
+
+    // Update distances every frame
+    SetExpDistances ( &m_ActiveElements );
+    m_ActiveElements.sort ( CompareExpDistance );
+
     Restream ();
 }
 

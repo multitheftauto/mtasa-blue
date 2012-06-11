@@ -328,6 +328,9 @@ void CClientModelCacheManagerImpl::ProcessPlayerList ( std::map < ushort, float 
         CClientPlayer* pPlayer = *iter;
         ushort usModelId = (ushort)pPlayer->GetModel ();
 
+        if ( usModelId < 7 || usModelId > 312 )
+            continue;
+
         // Check if currently within distance
         {
             // Check distance
@@ -402,6 +405,9 @@ void CClientModelCacheManagerImpl::ProcessPedList ( std::map < ushort, float >& 
         CClientPed* pPed = *iter;
         const ushort usModelId = (ushort)pPed->GetModel ();
 
+        if ( usModelId < 7 || usModelId > 312 )
+            continue;
+
         // Check if currently within distance
         {
             // Check distance
@@ -412,7 +418,6 @@ void CClientModelCacheManagerImpl::ProcessPedList ( std::map < ushort, float >& 
             {
                 // Add model to needed list
                 InsertIntoNeedCacheList ( outNeedCacheList, usModelId, fDistSq );
-                //MapInsert ( outNeedCacheList, usModelId );
                 AddProcessStat ( "p", true, PURESYNC_TYPE_NONE, usModelId, vecPosition, vecPosition );
                 continue;
             }
@@ -441,7 +446,6 @@ void CClientModelCacheManagerImpl::ProcessPedList ( std::map < ushort, float >& 
                 {
                     // Add model to needed list
                     InsertIntoNeedCacheList ( outNeedCacheList, usModelId, fDistSq );
-                    //MapInsert ( outNeedCacheList, usModelId );
                     AddProcessStat ( "l", true, PURESYNC_TYPE_NONE, usModelId, vecPosition, vecNewPosition );
                     continue;
                 }
@@ -465,6 +469,9 @@ void CClientModelCacheManagerImpl::ProcessVehicleList ( std::map < ushort, float
     {
         CClientVehicle* pVehicle = *iter;
         const ushort usModelId = pVehicle->GetModel ();
+
+        if ( usModelId < 400 || usModelId > 611 )
+            continue;
 
         // Check if currently within distance
         {
@@ -699,8 +706,6 @@ void CClientModelCacheManagerImpl::AddModelRefCount ( ushort usModelId )
     CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModelId );
     if ( pModelInfo )
         pModelInfo->ModelAddRef ( NON_BLOCKING, "cache" );
-    else
-        pModelInfo = pModelInfo;
 }
 
 

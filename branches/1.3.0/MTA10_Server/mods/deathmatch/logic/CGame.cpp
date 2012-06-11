@@ -1177,6 +1177,9 @@ void CGame::InitialDataStream ( CPlayer& Player )
     // Tell him current sync rates
     CStaticFunctionDefinitions::SendSyncIntervals ( &Player );
 
+    // Tell him current bullet sync enabled weapons
+    SendBulletSyncSettings ( &Player );
+
     // Tell the other players about him
     CPlayerListPacket PlayerNotice;
     PlayerNotice.AddPlayer ( &Player );

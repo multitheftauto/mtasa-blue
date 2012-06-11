@@ -3334,7 +3334,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                                 delete [] szModel;
                                 delete [] szTexture;
                             }
-                            pPed->RebuildModel ( true );
+                            pPed->RebuildModel ();
                         }
                     }
 
@@ -4213,7 +4213,7 @@ void CPacketHandler::Packet_PlayerClothes ( NetBitStreamInterface& bitStream )
                 delete [] szModel;
                 delete [] szTexture;
             }
-            pPed->RebuildModel ( true );
+            pPed->RebuildModel ();
         }
     }
 }

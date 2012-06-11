@@ -558,21 +558,6 @@ void CEntitySA::SetAreaCode ( BYTE areaCode )
     m_pInterface->m_areaCode = areaCode;
 }
 
-
-void CEntitySA::GetImmunities ( bool & bNoClip, bool & bFrozen, bool & bBulletProof, bool & bFlameProof, bool & bUnk, bool & bUnk2, bool & bCollisionProof, bool & bExplosionProof )
-{
-    unsigned char ucImmunities = m_pInterface->nImmunities;
-    bNoClip = ( ucImmunities & 0x1 ) ? true:false;
-    bFrozen = ( ucImmunities & 0x2 ) ? true:false;
-    bBulletProof = ( ucImmunities & 0x4 ) ? true:false;
-    bFlameProof = ( ucImmunities & 0x8 ) ? true:false;
-    bUnk = ( ucImmunities & 0x10 ) ? true:false;
-    bUnk2 = ( ucImmunities & 0x20 ) ? true:false;
-    bCollisionProof = ( ucImmunities & 0x40 ) ? true:false;
-    bExplosionProof = ( ucImmunities & 0x80 ) ? true:false;
-}
-
-
 void CEntitySA::SetUnderwater ( bool bUnderwater )
 {
     m_pInterface->bUnderwater = bUnderwater;

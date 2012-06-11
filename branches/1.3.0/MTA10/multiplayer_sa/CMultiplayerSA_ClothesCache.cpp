@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "..\game_sa\gamesa_renderware.h"
 
+#define CLOTHES_REF_TEST    1       // Debug clothes geometry refs
 
 ////////////////////////////////////////////////
 //
@@ -138,7 +139,16 @@ public:
         {
             SSavedClumpInfo& info = *iter;
             RpGeometry* pGeometry = ( ( RpAtomic* ) ( ( info.pClump->atomics.root.next ) - 0x8 ) )->geometry;
+#ifdef CLOTHES_REF_TEST
+            if ( pGeometry->refs < 21 )
+            {
+                AddReportLog( 7521, SString ( "Clothes geometry refs below expected value: %d", pGeometry->refs ) );
+                pGeometry->refs = 21;
+            }
+            if ( pGeometry->refs == 21 )
+#else
             if ( pGeometry->refs == 1 )
+#endif
             {
                 uiNumCached++;
                 if ( !info.bUnused )
@@ -176,6 +186,11 @@ public:
 
         SSavedClumpInfo info;
         info.pClump = pClumpCopy;
+#ifdef CLOTHES_REF_TEST
+        RpGeometry* pGeometry = ( ( RpAtomic* ) ( ( info.pClump->atomics.root.next ) - 0x8 ) )->geometry;
+        pGeometry->refs += 20;
+#endif
+
         info.clothedDesc = *pClothesDesc;
         info.bUnused = false;
         savedClumpList.push_back ( info );
@@ -235,6 +250,11 @@ public:
             return false;
 
         const SSavedClumpInfo& info = *uiBestIndex;
+
+#ifdef CLOTHES_REF_TEST
+        RpGeometry* pGeometry = ( ( RpAtomic* ) ( ( info.pClump->atomics.root.next ) - 0x8 ) )->geometry;
+        pGeometry->refs -= 20;
+#endif
         RpClumpDestroy ( info.pClump );
         assert ( info.bUnused );
         m_Stats.uiNumTotal--;
