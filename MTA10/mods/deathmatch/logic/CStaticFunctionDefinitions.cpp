@@ -2054,7 +2054,7 @@ bool CStaticFunctionDefinitions::AddPedClothes ( CClientEntity& Entity, const ch
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
         Ped.GetClothes()->AddClothes ( szTexture, szModel, ucType, false );
-        Ped.RebuildModel ( true, true );
+        Ped.RebuildModel ( true );
         return true;
     }
 
@@ -2070,7 +2070,7 @@ bool CStaticFunctionDefinitions::RemovePedClothes ( CClientEntity& Entity, unsig
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
         Ped.GetClothes()->RemoveClothes ( ucType, false );
-        Ped.RebuildModel ( true, true );
+        Ped.RebuildModel ( true );
         return true;
     }
 

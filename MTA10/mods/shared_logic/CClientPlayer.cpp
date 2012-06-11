@@ -249,7 +249,7 @@ void CClientPlayer::Reset ( void )
     SetFightingStyle ( STYLE_GRAB_KICK );
 
     // rebuild
-    RebuildModel ( true );
+    RebuildModel ();
 
     // Nametag
     SetNametagText ( m_strNick );

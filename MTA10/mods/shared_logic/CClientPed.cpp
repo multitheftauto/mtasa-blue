@@ -60,8 +60,6 @@ static const SFixedArray < SBodyPartName, 10 > BodyPartNames =
     {"Left Arm"}, {"Right Arm"}, {"Left Leg"}, {"Right Leg"}, {"Head"}
 } };
 
-// HACK: saves unneccesary loading of clothes textures
-CClientPed* g_pLastRebuilt = NULL;
 
 CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, ElementID ID ) : ClassInit ( this ), CClientStreamElement ( pManager->GetPlayerStreamer (), ID ), CAntiCheatModule ( pManager->GetAntiCheat () )
 {
@@ -317,10 +315,6 @@ CClientPed::~CClientPed ( void )
     }
 
     m_SyncBuffer.clear ();
-
-    // Make sure we're not referenced by the last rebuilt variable
-    if ( g_pLastRebuilt == this )
-        g_pLastRebuilt = NULL;
 
     if ( m_interp.pTargetOriginSource )
     {
@@ -3567,7 +3561,7 @@ void CClientPed::ModelRequestCallback ( CModelInfo* pModelInfo )
 }
 
 
-void CClientPed::RebuildModel ( bool bForceClothes, bool bDelayChange )
+void CClientPed::RebuildModel ( bool bDelayChange )
 {
     // We have a player
     if ( m_pPlayerPed )
@@ -3575,14 +3569,8 @@ void CClientPed::RebuildModel ( bool bForceClothes, bool bDelayChange )
         // We are CJ?
         if ( m_ulModel == 0 )
         {
-            // Re-add the clothes if its a CJ model
-            if ( g_pLastRebuilt != this || bForceClothes )
-            {
-                // Adds only the neccesary textures
-                m_pClothes->AddAllToModel ();
-
-                g_pLastRebuilt = this;
-            }
+            // Adds only the neccesary textures
+            m_pClothes->AddAllToModel ();
 
             m_bPendingRebuildPlayer = true;
 
@@ -3599,21 +3587,20 @@ void CClientPed::RebuildModel ( bool bForceClothes, bool bDelayChange )
 //
 void CClientPed::ProcessRebuildPlayer ( void )
 {
+    assert ( m_pPlayerPed );
+
     if ( m_bPendingRebuildPlayer && m_uiFrameLastRebuildPlayer != g_pClientGame->GetFrameCount () )
     {
         m_bPendingRebuildPlayer = false;
         m_uiFrameLastRebuildPlayer = g_pClientGame->GetFrameCount ();
 
-        if ( m_pPlayerPed )
+        if ( m_bIsLocalPlayer )
         {
-            if ( m_bIsLocalPlayer )
-            {
-                m_pPlayerPed->RebuildPlayer ();
-            }
-            else
-            {
-                g_pMultiplayer->RebuildMultiplayerPlayer ( m_pPlayerPed );
-            }
+            m_pPlayerPed->RebuildPlayer ();
+        }
+        else
+        {
+            g_pMultiplayer->RebuildMultiplayerPlayer ( m_pPlayerPed );
         }
     }
 }
