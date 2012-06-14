@@ -406,7 +406,7 @@ public:
 
     struct SAdapterState
     {
-        CStaticString < 128 > Name;
+        SFixedString < 128 > Name;
         int InstalledMemoryKB;
         int MaxAnisotropicSetting;
     };
@@ -422,8 +422,29 @@ public:
         eD3DCallType callType;
         uint uiNumArgs;
         int args [ 10 ];
-        CStaticString < 32 > strShaderName;
+        SFixedString < 32 > strShaderName;
         bool bShaderRequiresNormals;
+    };
+
+    struct SResourceMemory
+    {
+        int iCurrentCount;
+        int iCurrentBytes;
+        int iCreatedCount;
+        int iCreatedBytes;
+        int iDestroyedCount;
+        int iDestroyedBytes;
+        int iLockedCount;
+    };
+
+    struct SMemoryState
+    {
+        SResourceMemory StaticVertexBuffer;
+        SResourceMemory DynamicVertexBuffer;
+        SResourceMemory StaticIndexBuffer;
+        SResourceMemory DynamicIndexBuffer;
+        SResourceMemory StaticTexture;
+        SResourceMemory DynamicTexture;
     };
 
     struct SStreamSourceState
@@ -456,6 +477,7 @@ public:
         D3DCAPS9                        DeviceCaps;
         SD3DVertexDeclState             VertexDeclState;
         SAdapterState                   AdapterState;
+        SMemoryState                    MemoryState;
         SCallState                      CallState;
         SStreamSourceState              VertexStreams[16];
     };

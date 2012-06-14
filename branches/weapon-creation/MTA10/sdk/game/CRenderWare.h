@@ -27,7 +27,7 @@ class CRenderWare {
     virtual void                ModelInfoTXDAddTextures     ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bMakeCopy = true, std::list < RwTexture* >* pReplacedTextures = NULL, std::list < RwTexture* >* pAddedTextures = NULL, bool bAddRef = true ) = 0;
     virtual void                ModelInfoTXDRemoveTextures  ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bDestroy = true, bool bKeepRaster = false, bool bRemoveRef = true ) = 0;
     virtual RwTexDictionary *   ReadTXD                     ( const char *szTXD ) = 0;
-    virtual RpClump *           ReadDFF                     ( const char *szDFF, unsigned short usModelID ) = 0;
+    virtual RpClump *           ReadDFF                     ( const char *szDFF, unsigned short usModelID, bool bLoadEmbeddedCollisions ) = 0;
     virtual CColModel *         ReadCOL                     ( const char * szCOLFile ) = 0;
     virtual void                DestroyDFF                  ( RpClump * pClump ) = 0;
     virtual void                DestroyTXD                  ( RwTexDictionary * pTXD ) = 0;

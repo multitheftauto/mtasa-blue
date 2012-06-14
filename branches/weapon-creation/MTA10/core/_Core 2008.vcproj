@@ -45,8 +45,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
-				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;INITGUID"
+				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;"
+				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -80,12 +80,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlibd_2008.lib libpng2008d.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9d.lib winmm.lib Imagehlp.lib ws2_32.lib gdi32.lib Userenv.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlibd_2008.lib libpng2008d.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9d.lib winmm.lib Imagehlp.lib ws2_32.lib gdi32.lib Userenv.lib Imm32.lib pthreadVC2.lib jpegd.lib Psapi.lib"
 				ShowProgress="0"
-				OutputFile="C:\Program Files\MTA San Andreas 1.3\mta\core_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.4\mta\core_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib"
+				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib;../../vendor/pthreads/lib;../../vendor/jpeg/lib"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/core_.pdb"
@@ -153,8 +153,8 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
-				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID"
+				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;"
+				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
@@ -183,11 +183,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlib_2008.lib libpng2008.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib"
-				OutputFile="C:\Program Files\MTA San Andreas 1.3\MTA\core.dll"
+				AdditionalDependencies="strmiids.lib libv2.lib zlib_2008.lib libpng2008.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib Imm32.lib pthreadVC2.lib jpeg.lib Psapi.lib"
+				OutputFile="C:\Program Files\MTA San Andreas 1.4\MTA\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib"
+				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib;../../vendor/pthreads/lib;../../vendor/jpeg/lib"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
@@ -258,8 +258,8 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
-				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID"
+				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;"
+				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
@@ -288,11 +288,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlib_2008.lib libpng2008.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlib_2008.lib libpng2008.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib Imm32.lib pthreadVC2.lib jpeg.lib Psapi.lib"
 				OutputFile="..\..\output\MTA San Andreas\mta\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib"
+				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib;../../vendor/pthreads/lib;../../vendor/jpeg/lib"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
@@ -373,6 +373,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CCompressorJobQueue.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CConnectManager.cpp"
 				>
 			</File>
@@ -382,6 +386,10 @@
 			</File>
 			<File
 				RelativePath=".\CConsoleHistory.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CConsoleLogger.cpp"
 				>
 			</File>
 			<File
@@ -441,6 +449,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CFileFormatJpeg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CFileFormatPng.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CFilePathTranslator.cpp"
 				>
 			</File>
@@ -493,6 +509,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMaterialLine3DBatcher.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CMemStats.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CMessageLoopHook.cpp"
 				>
 			</File>
@@ -505,6 +529,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMouseControl.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CNewsBrowser.cpp"
 				>
 			</File>
@@ -514,6 +542,14 @@
 			</File>
 			<File
 				RelativePath="CPEHookUtils.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CPixelsManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CPixelsManager_VolumeTexture.cpp"
 				>
 			</File>
 			<File
@@ -550,6 +586,14 @@
 			</File>
 			<File
 				RelativePath="CProxyDirect3DDevice9.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CProxyDirect3DIndexBuffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CProxyDirect3DTexture.cpp"
 				>
 			</File>
 			<File
@@ -626,6 +670,14 @@
 			</File>
 			<File
 				RelativePath=".\CRenderItemManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItemManager.TextureReplace.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CScreenGrabber.cpp"
 				>
 			</File>
 			<File
@@ -778,6 +830,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CCompressorJobQueue.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CConnectManager.h"
 				>
 			</File>
@@ -787,6 +843,10 @@
 			</File>
 			<File
 				RelativePath=".\CConsoleHistory.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CConsoleLogger.h"
 				>
 			</File>
 			<File
@@ -850,6 +910,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CFileFormat.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CFilePathTranslator.h"
 				>
 			</File>
@@ -906,6 +970,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMaterialLine3DBatcher.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CMemStats.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CMessageBox.h"
 				>
 			</File>
@@ -922,6 +994,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMouseControl.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CNewsBrowser.h"
 				>
 			</File>
@@ -934,6 +1010,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CPixelsManager.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CProxyDirect3D9.h"
 				>
 			</File>
@@ -943,6 +1023,14 @@
 			</File>
 			<File
 				RelativePath=".\CProxyDirect3DDevice9.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CProxyDirect3DIndexBuffer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CProxyDirect3DTexture.h"
 				>
 			</File>
 			<File
@@ -1015,6 +1103,10 @@
 			</File>
 			<File
 				RelativePath=".\CTileBatcher.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CTimingCheckpoints.hpp"
 				>
 			</File>
 			<File
@@ -1100,6 +1192,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\sdk\core\CClientEntityBase.h"
+						>
+					</File>
+					<File
 						RelativePath="..\sdk\core\CCommandsInterface.h"
 						>
 					</File>
@@ -1136,7 +1232,15 @@
 						>
 					</File>
 					<File
+						RelativePath="..\sdk\core\CPixelsManagerInterface.h"
+						>
+					</File>
+					<File
 						RelativePath="..\sdk\core\CRenderItemManagerInterface.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\CScreenGrabberInterface.h"
 						>
 					</File>
 					<File

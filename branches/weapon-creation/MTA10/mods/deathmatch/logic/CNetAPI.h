@@ -28,10 +28,12 @@ class CNetAPI;
 #include "CInterpolator.h"
 #include "CBitStream.h"
 #include <ctime>
+#include "CTickRateSettings.h"
 
 // SYNC SETTINGS
-#define TICK_RATE 100
-#define CAM_SYNC_RATE 500
+#define TICK_RATE       ( g_TickRateSettings.iPureSync )
+#define CAM_SYNC_RATE   ( g_TickRateSettings.iCamSync )
+#define TICK_RATE_AIM   ( Min ( TICK_RATE, g_TickRateSettings.iKeySyncRotation ) )  // Keysync or puresync update the aim, so use the shortest interval
 
 enum eServerRPCFunctions
 {
@@ -47,6 +49,7 @@ enum eServerRPCFunctions
 class CNetAPI
 {
 public:
+    ZERO_ON_NEW
                             CNetAPI                         ( CClientManager * pManager);
 
     void                    DoPulse                         ( void );
@@ -56,6 +59,7 @@ public:
 
     void                    AddInterpolation                ( const CVector& vecPosition );
     bool                    GetInterpolation                ( CVector& vecPosition, unsigned short usLatency );
+    void                    SendBulletSyncFire              ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd );
 
     static bool             IsWeaponIDAkimbo                ( unsigned char ucWeaponID );
     static bool             IsDriveByWeapon                 ( unsigned char ucWeaponID );
@@ -67,14 +71,17 @@ private:
     void                    ReadKeysync                     ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
     void                    WriteKeysync                    ( CClientPed* pPed, NetBitStreamInterface& BitStream );
 
+    void                    ModifyControllerStateForBulletSync ( CClientPlayer* pPlayer, CControllerState& ControllerState );
+    void                    ReadBulletsync                  ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
+
     void                    ReadPlayerPuresync              ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
     void                    WritePlayerPuresync             ( CClientPlayer* pPed, NetBitStreamInterface& BitStream );
 
     void                    ReadVehiclePuresync             ( CClientPlayer* pPlayer, CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
     void                    WriteVehiclePuresync            ( CClientPed* pPed, CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
 
-    bool                    ReadSmallKeysync                ( CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream );
-    void                    WriteSmallKeysync               ( const CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream );
+    bool                    ReadSmallKeysync                ( CControllerState& ControllerState, NetBitStreamInterface& BitStream );
+    void                    WriteSmallKeysync               ( const CControllerState& ControllerState, NetBitStreamInterface& BitStream );
 
     bool                    ReadFullKeysync                 ( CControllerState& ControllerState, NetBitStreamInterface& BitStream );
     void                    WriteFullKeysync                ( const CControllerState& ControllerState, NetBitStreamInterface& BitStream );
@@ -88,11 +95,14 @@ private:
     void                    ReadLightweightSync             ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
     void                    ReadVehicleResync               ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
 
+    void                    GetLastSentControllerState      ( CControllerState* pControllerState, float* pfCameraRotation, float* pfLastAimY );
+    void                    SetLastSentControllerState      ( const CControllerState& ControllerState, float fCameraRotation, float fLastAimY );
+
 public:
     bool                    IsCameraSyncNeeded              ( void );
     void                    WriteCameraSync                 ( NetBitStreamInterface& BitStream );
 
-    void                    RPC                             ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream = NULL, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
+    void                    RPC                             ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream = NULL );
 
 private:
     CClientManager*         m_pManager;
@@ -113,6 +123,14 @@ private:
     CVector                 m_vecLastSentCameraLookAt;
 
     CInterpolator<CVector>  m_Interpolator;
+
+    bool                    m_bIncreaseTimeoutTime;
+    CElapsedTime            m_IncreaseTimeoutTimeTimer;
+
+    CElapsedTime            m_TimeSinceMouseOrAnalogStateSent;
+    CControllerState        m_LastSentControllerState;
+    float                   m_fLastSentCameraRotation;
+    float                   m_fLastSentAimY;
 };
 
 #endif

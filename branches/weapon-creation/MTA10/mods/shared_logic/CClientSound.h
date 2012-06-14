@@ -64,6 +64,16 @@ public:
     void                    SetMaxDistance          ( float fDistance );
     float                   GetMaxDistance          ( void );
 
+    void                    ApplyFXModifications    ( float fSampleRate, float fTempo, float fPitch, bool bReversed );
+    void                    GetFXModifications      ( float &fSampleRate, float &fTempo, float &fPitch, bool &bReversed );
+    bool                    IsTempoChanged          ( void )                            { return m_fSampleRate != 0.0f || m_fSampleRate != 0.0f || m_fTempo != 0.0f; }
+    float*                  GetFFTData              ( int iLength );
+    float*                  GetWaveData             ( int iLength );
+    bool                    IsPanEnabled            ( void );
+    bool                    SetPanEnabled           ( bool bPan );
+    DWORD                   GetLevelData            ( void );
+    float                   GetSoundBPM             ( void );
+
     SString                 GetMetaTags             ( const SString& strFormat );
 
     bool                    SetFxEffect             ( uint uiFxEffect, bool bEnable );
@@ -75,6 +85,7 @@ public:
     bool                    IsFinished              ( void );
 
     bool                    IsSound3D               ( void )                            { return m_b3D; }
+    bool                    IsSoundStream           ( void )                            { return m_bStream; }
 
 protected:
     void                    Process3D               ( const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt );
@@ -102,6 +113,13 @@ private:
     double      m_dLength;
     std::map < SString, SString >  m_SavedTags;
 
+    // Playback altering stuff
+    float       m_fPitch;
+    float       m_fTempo;
+    float       m_fSampleRate;
+    bool        m_bReversed;
+    bool        m_bPan;
+
     // Saved state
     bool        m_bPaused;
     float       m_fVolume;
@@ -110,7 +128,7 @@ private:
     CVector     m_vecVelocity;
     float       m_fMinDistance;
     float       m_fMaxDistance;
-    int         m_EnabledEffects[9];
+    SFixedArray < int, 9 >  m_EnabledEffects;
 };
 
 #endif

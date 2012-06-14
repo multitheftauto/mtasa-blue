@@ -75,8 +75,6 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner )
     // Set up the name of our script
     m_ulFunctionEnterTime = 0;
     m_iOwner = OWNER_SERVER;
-    m_szScriptName [0] = 0;
-    m_szScriptName [MAX_SCRIPTNAME_LENGTH] = 0;
     
     m_pResource = pResourceOwner;
 
@@ -87,6 +85,9 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner )
 
 CLuaMain::~CLuaMain ( void )
 {
+    g_pClientGame->GetLatentTransferManager ()->OnLuaMainDestroy ( this );
+    g_pClientGame->GetScriptDebugging()->OnLuaMainDestroy ( this );
+
     // Unload the current script
     UnloadScript ();
     m_bBeingDeleted = true;
@@ -174,10 +175,10 @@ void CLuaMain::InstructionCountHook ( lua_State* luaVM, lua_Debug* pDebug )
         if ( timeGetTime () >= pLuaMain->m_ulFunctionEnterTime + HOOK_MAXIMUM_TIME )
         {
             // Print it in the console
-            CLogger::ErrorPrintf ( "Infinite/too long execution (%s)", pLuaMain->GetScriptNamePointer () );
+            CLogger::ErrorPrintf ( "Infinite/too long execution (%s)", pLuaMain->GetScriptName () );
             
             SString strAbortInf = "Aborting; infinite running script in ";
-            strAbortInf += pLuaMain->GetScriptNamePointer ();
+            strAbortInf += pLuaMain->GetScriptName ();
             
             // Error out
             lua_pushstring ( luaVM, strAbortInf );
@@ -210,7 +211,7 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
         else
         {
             ResetInstructionCount ();
-            int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
+            int iret = this->PCall ( m_luaVM, 0, 0, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
@@ -275,7 +276,7 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
         else
         {
             ResetInstructionCount ();
-            int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
+            int iret = this->PCall ( m_luaVM, 0, 0, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
@@ -292,7 +293,15 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
                     g_pClientGame->GetScriptDebugging()->LogError ( strFile, iLine, strMsg );
                 }
                 else
+                {
+                    SString strResourcePath = ConformResourcePath ( szFileName );
+                    if ( !strRes.ContainsI ( ExtractFilename ( strResourcePath ) ) )
+                    {
+                        // Add filename to error message, if not already present
+                        strRes = SString ( "%s (global scope) - %s", *strResourcePath, *strRes );
+                    }
                     g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
+                }
             }
             return true;
         }
@@ -310,7 +319,7 @@ bool CLuaMain::LoadScript ( const char* szLUAScript )
         if ( !luaL_loadbuffer ( m_luaVM, szLUAScript, strlen(szLUAScript), NULL ) )
         {
             ResetInstructionCount ();
-            int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
+            int iret = this->PCall ( m_luaVM, 0, 0, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
@@ -327,6 +336,48 @@ bool CLuaMain::LoadScript ( const char* szLUAScript )
         return false;
 
     return true;
+}
+
+static int lua_dump_writer ( lua_State* luaVM, const void* data, size_t size, void* myUserData )
+{
+    (void)luaVM;
+    SString* pDest = (SString *)myUserData;
+    pDest->append ( (const char *)data, size );
+    return 0;
+}
+
+bool CLuaMain::CompileScriptFromFile ( const char* szFile, SString* pDest )
+{
+    if ( m_luaVM )
+    {
+        // Load the script
+        if ( luaL_loadfile ( m_luaVM, szFile ) )
+        {
+            // Print the error
+            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+            if ( strRes.length () )
+            {
+                CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );
+                g_pClientGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", strRes.c_str () );
+            }
+            else
+            {
+                CLogger::LogPrint ( "SCRIPT ERROR: Unknown\n" );
+                g_pClientGame->GetScriptDebugging()->LogInformation ( m_luaVM, "Loading script failed for unknown reason" );
+            }
+        }
+        else
+        {
+            pDest->assign ( "" );
+            if ( lua_dump(m_luaVM, lua_dump_writer, pDest) != 0 )
+                return false;
+            lua_pop ( m_luaVM, 1 );
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void CLuaMain::Start ( void )
@@ -509,4 +560,22 @@ const SString& CLuaMain::GetFunctionTag ( int iLuaFunction )
         pTag = MapFind ( m_FunctionTagMap, iLuaFunction );
     }
     return *pTag;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::PCall
+//
+// lua_pcall call wrapper
+//
+///////////////////////////////////////////////////////////////
+int CLuaMain::PCall ( lua_State *L, int nargs, int nresults, int errfunc )
+{
+    TIMING_CHECKPOINT( "+pcall" );
+    g_pClientGame->GetScriptDebugging()->PushLuaMain ( this );
+    int iret = lua_pcall ( L, nargs, nresults, errfunc );
+    g_pClientGame->GetScriptDebugging()->PopLuaMain ( this );
+    TIMING_CHECKPOINT( "-pcall" );
+    return iret;
 }

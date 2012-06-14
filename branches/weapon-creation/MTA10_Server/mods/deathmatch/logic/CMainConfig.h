@@ -30,6 +30,21 @@ class CMainConfig;
 
 #define MAX_MAP_NAME_LENGTH 64
 
+typedef void (*PFN_SettingChangeCallback) ( void );
+
+struct SIntSetting
+{
+    bool        bSettable;
+    bool        bSavable;
+    int         iMin;
+    int         iDefault;
+    int         iMax;
+    const char* szName;
+    int*        pVariable;
+    PFN_SettingChangeCallback changeCallback;
+};
+
+
 class CMainConfig: public CXMLConfig
 {
 public:
@@ -81,7 +96,7 @@ public:
     bool                            IsBelowMinimumClient            ( const char* szVersion )   { return GetMinimumClientVersion () > szVersion; }
     bool                            IsBelowRecommendedClient        ( const char* szVersion )   { return m_strRecommendedClientVersion.length () && m_strRecommendedClientVersion > szVersion; }
     void                            SetMinimumClientVersionOverride ( const SString& strOverride ) { m_strMinClientVersionOverride = strOverride; }
-    const SString&                  GetMinimumClientVersion         ( void )                    { return m_strMinClientVersionOverride > m_strMinClientVersion ? m_strMinClientVersionOverride : m_strMinClientVersion; }
+    SString                         GetMinimumClientVersion         ( void );
     const SString&                  GetRecommendedClientVersion     ( void )                    { return m_strRecommendedClientVersion; }
     inline bool                     IsAutoLoginEnabled              ( )                         { return m_bAutoLogin; }
     const SString&                  GetIdFile                       ( void )                    { return m_strIdFile; }
@@ -98,14 +113,23 @@ public:
     int                             GetNoWorkToDoSleepTime          ( void );
     const SString&                  GetDbLogFilename                ( void )                    { return m_strDbLogFilename; }
     int                             GetDebugFlag                    ( void )                    { return m_iDebugFlag; }
+    bool                            GetSyncMapElementData           ( void ) const              { return m_bSyncMapElementData; }
+    void                            SetSyncMapElementData           ( bool bOn )                { m_bSyncMapElementData = bOn; }
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
     bool                            SetSetting                      ( const SString& configSetting, const SString& strValue, bool bSave );
 
     void                            SetCommandLineParser            ( CCommandLineParser* pCommandLineParser );
+    void                            ApplyNetOptions                 ( void );
     void                            ApplyBandwidthReductionMode     ( void );
     void                            ApplyThreadNetEnabled           ( void );
+    void                            SetFakeLag                      ( int iPacketLoss, int iExtraPing, int iExtraPingVary, int iKBPSLimit );
+    void                            SetTweakValue                   ( int iWhich, float fAmount );
+    const SNetOptions&              GetNetOptions                   ( void )                    { return m_NetOptions; }
+
+    const std::vector < SIntSetting >& GetIntSettingList            ( void );
+    static void                     OnTickRateChange                ( void );
 
 private:
     void                            RegisterCommand                 ( const char* szName, FCommandHandler* pFunction, bool bRestricted );
@@ -166,7 +190,10 @@ private:
     int                             m_iNoWorkToDoSleepTime;
     bool                            m_bThreadNetEnabled;
     int                             m_iDebugFlag;
+    bool                            m_bSyncMapElementData;
     std::map < SString, SString >   m_TransientSettings;
+    SNetOptions                     m_NetOptions;
+    int                             m_iNetReliabilityMode;
 };
 
 #endif

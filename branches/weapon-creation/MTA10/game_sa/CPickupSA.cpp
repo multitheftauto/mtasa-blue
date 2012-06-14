@@ -168,7 +168,7 @@ VOID CPickupSA::GetRidOfObjects()
 {
     DEBUG_TRACE("VOID CPickupSA::GetRidOfObjects()");
     if(this->GetInterface()->pObject)
-        ((CWorldSA *)pGame->GetWorld())->Remove(this->GetInterface()->pObject);
+        ((CWorldSA *)pGame->GetWorld())->Remove(this->GetInterface()->pObject, CPickup_Destructor);
     
     if(this->object)
     {

@@ -19,6 +19,8 @@
 #include <cstdio>
 #include <cstring>
 
+#include <zlib.h>
+
 // SDK includes
 #define MTA_CLIENT
 #include "SharedUtil.h"
@@ -39,7 +41,9 @@
 #include <CBox.h>
 #include <ijsify.h>
 #include <Common.h>
+#include "Enums.h"
 #include "net/SyncStructures.h"
+#include "CIdArray.h"
 
 // Shared logic includes
 #include <Utils.h>
@@ -77,8 +81,6 @@
 #include <CClientTexture.h>
 #include <CClientShader.h>
 #include <CCustomData.h>
-#include <CConfig.h>
-#include <CDOMConfig.h>
 #include <CElementArray.h>
 #include <CLogger.h>
 #include <CMapEventManager.h>
@@ -100,6 +102,7 @@
 // Shared includes
 #include "TInterpolation.h"
 #include "CPositionRotationAnimation.h"
+#include "CLatentTransferManager.h"
 
 // Deathmatch includes
 #include "Client.h"
@@ -110,6 +113,8 @@
 #include "logic/CClientGame.h"
 #include "net/Packets.h"
 #include "logic/CClientEntityRefManager.h"
+#include "logic/CGameEntityXRefManager.h"
+#include "logic/CClientModelCacheManager.h"
 #include "logic/CClientPerfStatManager.h"
 #include "logic/CDeathmatchVehicle.h"
 #include "logic/CResource.h"

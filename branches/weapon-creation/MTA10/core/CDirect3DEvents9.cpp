@@ -16,6 +16,8 @@
 #define DECLARE_PROFILER_SECTION_CDirect3DEvents9
 #include "profiler/SharedUtil.Profiler.h"
 #include "CProxyDirect3DVertexBuffer.h"
+#include "CProxyDirect3DIndexBuffer.h"
+#include "CProxyDirect3DTexture.h"
 #include "CAdditionalVertexStreamManager.h"
 #include "CVertexStreamBoundingBoxManager.h"
 #include "CProxyDirect3DVertexDeclaration.h"
@@ -28,7 +30,7 @@ static int                 ms_bSaveStarted      = 0;
 static long long           ms_LastSaveTime      = 0;
 // Other variables
 static uint                ms_RequiredAnisotropicLevel = 1;
-
+static EDiagnosticDebugType ms_DiagnosticDebug = EDiagnosticDebug::NONE;
 
 void CDirect3DEvents9::OnDirect3DDeviceCreate  ( IDirect3DDevice9 *pDevice )
 {
@@ -103,6 +105,7 @@ void CDirect3DEvents9::OnRestore ( IDirect3DDevice9 *pDevice )
 
 void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 {
+    TIMING_CHECKPOINT( "+OnPresent1" );
     // Start a new scene. This isn't ideal and is not really recommended by MSDN.
     // I tried disabling EndScene from GTA and just end it after this code ourselves
     // before present, but that caused graphical issues randomly with the sky.
@@ -136,11 +139,16 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     // Tell everyone that the zbuffer will need clearing before use
     CGraphics::GetSingleton ().OnZBufferModified ();
 
+    TIMING_CHECKPOINT( "-OnPresent1" );
     // Notify core
     CCore::GetSingleton ().DoPostFramePulse ();
+    TIMING_CHECKPOINT( "+OnPresent2" );
 
     // Draw pre-GUI primitives
     CGraphics::GetSingleton ().DrawPreGUIQueue ();
+
+    // Maybe grab screen for upload
+    CGraphics::GetSingleton ().GetScreenGrabber ()->DoPulse ();
 
     // Draw the GUI
     CLocalGUI::GetSingleton().Draw ();
@@ -165,6 +173,8 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     int iAnisotropic;
     CVARS_GET ( "anisotropic", iAnisotropic );
     ms_RequiredAnisotropicLevel = 1 << iAnisotropic;
+    ms_DiagnosticDebug = CCore::GetSingleton ().GetDiagnosticDebug ();
+    CCore::GetSingleton().GetGUI ()->SetBidiEnabled ( ms_DiagnosticDebug != EDiagnosticDebug::BIDI_6778 );
     
     // Tidyup after last screenshot
     if ( ms_bSaveStarted )
@@ -194,24 +204,58 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
         // Define a screen rectangle
         ScreenSize.top = ScreenSize.left = 0;
         ScreenSize.right = CDirect3DData::GetSingleton ().GetViewportWidth ();
-        ScreenSize.bottom = CDirect3DData::GetSingleton ().GetViewportHeight ();        
-        pDevice->GetRenderTarget ( 0, &pSurface );
+        ScreenSize.bottom = CDirect3DData::GetSingleton ().GetViewportHeight ();
 
-        // Create a new render target
-        if ( !pSurface || pDevice->CreateRenderTarget ( ScreenSize.right, ScreenSize.bottom, D3DFMT_A8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &ms_pSaveLockSurface, NULL ) != D3D_OK ) {
-            CCore::GetSingleton ().GetConsole ()->Printf("Couldn't create a new render target.");
-        } else {
-            unsigned long ulBeginTime = GetTickCount32 ();
+        do
+        {
+            HRESULT hr = pDevice->GetRenderTarget ( 0, &pSurface );
+            if ( FAILED( hr ) )
+            {
+                CCore::GetSingleton ().GetConsole ()->Printf ( "GetRenderTarget failed: %08x", hr );
+                break;
+            }
+
+            // Create a new render target
+            for ( uint i = 0 ; i < 3 ; i++ )
+            {
+                // 1st try -  i == 0  - 32 bit target
+                //            i == 0  - EvictManagedResources
+                // 2nd try -  i == 1  - 32 bit target
+                // 3rd try -  i == 2  - 16 bit target
+	            D3DFORMAT Format = i == 2 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
+
+                hr = pDevice->CreateRenderTarget ( ScreenSize.right, ScreenSize.bottom, Format, D3DMULTISAMPLE_NONE, 0, TRUE, &ms_pSaveLockSurface, NULL );
+                if( SUCCEEDED( hr ) )
+                    break;
+
+                // c'mon
+                if ( i == 0 )
+                    pDevice->EvictManagedResources ();
+            }
+
+            if ( FAILED( hr ) )
+            {
+                CCore::GetSingleton ().GetConsole ()->Printf ( "Couldn't create a new render target: %08x", hr );
+                break;
+            }
 
             // Copy data from surface to surface
-            if ( pDevice->StretchRect ( pSurface, &ScreenSize, ms_pSaveLockSurface, &ScreenSize, D3DTEXF_NONE ) != D3D_OK ) {
-                CCore::GetSingleton ().GetConsole ()->Printf("Couldn't copy the surface.");
+            hr = pDevice->StretchRect ( pSurface, &ScreenSize, ms_pSaveLockSurface, &ScreenSize, D3DTEXF_NONE );
+            if ( FAILED( hr ) )
+            {
+                CCore::GetSingleton ().GetConsole ()->Printf ( "Couldn't copy the surface: %08x", hr );
+                SAFE_RELEASE( ms_pSaveLockSurface );
+                break;
             }
 
             // Lock the surface
             D3DLOCKED_RECT LockedRect;
-            if ( ms_pSaveLockSurface->LockRect ( &LockedRect, NULL, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK ) != D3D_OK ) {
-                CCore::GetSingleton ().GetConsole ()->Printf("Couldn't lock the surface.");
+            hr = ms_pSaveLockSurface->LockRect ( &LockedRect, NULL, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK );
+            if ( FAILED( hr ) )
+            {
+                CCore::GetSingleton ().GetConsole ()->Printf ( "Couldn't lock the surface: %08x", hr );
+                SAFE_RELEASE( ms_pSaveLockSurface );
+                break;
             }
 
             // Call the pre-screenshot function 
@@ -223,9 +267,8 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 
             // Call the post-screenshot function
             CScreenShot::PostScreenShot ( strFileName );
-
-            CCore::GetSingleton ().GetConsole ()->Printf ( "Screenshot capture took %.2f seconds.", (float)(GetTickCount32 () - ulBeginTime) / 1000.0f );
         }
+        while ( false );
 
         CCore::GetSingleton().bScreenShot = false;
 
@@ -236,6 +279,7 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
             pSurface = NULL;
         }
     }
+    TIMING_CHECKPOINT( "-OnPresent2" );
 }
 
 
@@ -248,6 +292,9 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 /////////////////////////////////////////////////////////////
 HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,UINT StartVertex,UINT PrimitiveCount )
 {
+    if ( ms_DiagnosticDebug == EDiagnosticDebug::GRAPHICS_6734 )
+        return pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
+
     // Any shader for this texture ?
     CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
 
@@ -313,6 +360,9 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
 /////////////////////////////////////////////////////////////
 HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount )
 {
+    if ( ms_DiagnosticDebug == EDiagnosticDebug::GRAPHICS_6734 )
+        return pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+
     // Apply anisotropic filtering if required
     if ( ms_RequiredAnisotropicLevel > 1 )
     {
@@ -450,6 +500,9 @@ bool AreVertexStreamsAreBigEnough ( IDirect3DDevice9* pDevice, WORD viMinBased, 
 /////////////////////////////////////////////////////////////
 HRESULT CDirect3DEvents9::DrawPrimitiveGuarded ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,UINT StartVertex,UINT PrimitiveCount )
 {
+    if ( ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732 )
+        return pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
+
     HRESULT hr = D3D_OK;
 
     // Check vertices used will be within the supplied vertex buffer bounds
@@ -487,6 +540,9 @@ HRESULT CDirect3DEvents9::DrawPrimitiveGuarded ( IDirect3DDevice9 *pDevice, D3DP
 /////////////////////////////////////////////////////////////
 HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount )
 {
+    if ( ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732 )
+        return pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+
     HRESULT hr = D3D_OK;
 
     // Check vertices used will be within the supplied vertex buffer bounds
@@ -523,12 +579,87 @@ HRESULT CDirect3DEvents9::CreateVertexBuffer ( IDirect3DDevice9 *pDevice, UINT L
     if ( ( Usage & D3DUSAGE_DYNAMIC ) == 0 )
         Usage &= -1 - D3DUSAGE_WRITEONLY;
 
-    hr = pDevice->CreateVertexBuffer ( Length, Usage, FVF, Pool, ppVertexBuffer, pSharedHandle );
-    if ( FAILED(hr) )
-        return hr;
+    for ( uint i = 0 ; i < 2 ; i++ )
+    {
+        hr = pDevice->CreateVertexBuffer ( Length, Usage, FVF, Pool, ppVertexBuffer, pSharedHandle );
+        if( SUCCEEDED( hr ) )
+            break;
+
+        if ( hr != D3DERR_OUTOFVIDEOMEMORY || i > 0 )
+        {
+            CCore::GetSingleton ().LogEvent ( 610, "CreateVertexBuffer", "", SString ( "hr:%x Length:%x Usage:%x FVF:%x Pool:%x", hr, Length, Usage, FVF, Pool ) );
+            return hr;
+        }
+
+        pDevice->EvictManagedResources ();
+    }
 
     // Create proxy
-	*ppVertexBuffer = new CProxyDirect3DVertexBuffer ( pDevice, *ppVertexBuffer, Length, Usage, FVF, Pool );
+    *ppVertexBuffer = new CProxyDirect3DVertexBuffer ( pDevice, *ppVertexBuffer, Length, Usage, FVF, Pool );
+    return hr;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::CreateIndexBuffer
+//
+//
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::CreateIndexBuffer ( IDirect3DDevice9 *pDevice, UINT Length, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, IDirect3DIndexBuffer9** ppIndexBuffer, HANDLE* pSharedHandle )
+{
+    HRESULT hr;
+
+    for ( uint i = 0 ; i < 2 ; i++ )
+    {
+        hr = pDevice->CreateIndexBuffer ( Length, Usage, Format, Pool, ppIndexBuffer, pSharedHandle );
+        if( SUCCEEDED( hr ) )
+            break;
+
+        if ( hr != D3DERR_OUTOFVIDEOMEMORY || i > 0 )
+        {
+            CCore::GetSingleton ().LogEvent ( 611, "CreateIndexBuffer", "", SString ( "hr:%x Length:%x Usage:%x Format:%x Pool:%x", hr, Length, Usage, Format, Pool ) );
+            return hr;
+        }
+
+        pDevice->EvictManagedResources ();
+    }
+
+    // Create proxy so we can track when it's finished with
+    *ppIndexBuffer = new CProxyDirect3DIndexBuffer ( pDevice, *ppIndexBuffer, Length, Usage, Format, Pool );
+    return hr;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::CreateTexture
+//
+//
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::CreateTexture ( IDirect3DDevice9 *pDevice, UINT Width, UINT Height, UINT Levels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, IDirect3DTexture9** ppTexture, HANDLE* pSharedHandle )
+{
+    HRESULT hr;
+
+    for ( uint i = 0 ; i < 2 ; i++ )
+    {
+        hr = pDevice->CreateTexture ( Width, Height, Levels, Usage, Format, Pool, ppTexture, pSharedHandle );
+        if( SUCCEEDED( hr ) )
+            break;
+
+        if ( hr != D3DERR_OUTOFVIDEOMEMORY || i > 0 )
+        {
+            CCore::GetSingleton ().LogEvent ( 612, "CreateTexture", "", SString ( "hr:%x W:%x H:%x L:%x Usage:%x Format:%x Pool:%x", hr, Width, Height, Levels, Usage, Format, Pool ) );
+            return hr;
+        }
+
+        pDevice->EvictManagedResources ();
+    }
+
+    // Create proxy so we can track when it's finished with
+    *ppTexture = new CProxyDirect3DTexture ( pDevice, *ppTexture, Width, Height, Levels, Usage, Format, Pool );
     return hr;
 }
 
@@ -540,7 +671,7 @@ HRESULT CDirect3DEvents9::CreateVertexBuffer ( IDirect3DDevice9 *pDevice, UINT L
 // Ensures the correct object gets sent to D3D
 //
 /////////////////////////////////////////////////////////////
-HRESULT CDirect3DEvents9::SetStreamSource(IDirect3DDevice9 *pDevice, UINT StreamNumber,IDirect3DVertexBuffer9* pStreamData,UINT OffsetInBytes,UINT Stride)
+IDirect3DVertexBuffer9* CDirect3DEvents9::GetRealVertexBuffer ( IDirect3DVertexBuffer9* pStreamData )
 {
 	if( pStreamData )
 	{
@@ -553,7 +684,53 @@ HRESULT CDirect3DEvents9::SetStreamSource(IDirect3DDevice9 *pDevice, UINT Stream
             pStreamData = pProxy->GetOriginal ();
     }
 
-	return pDevice->SetStreamSource( StreamNumber, pStreamData, OffsetInBytes, Stride );
+	return pStreamData;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::SetIndices
+//
+// Ensures the correct object gets sent to D3D
+//
+/////////////////////////////////////////////////////////////
+IDirect3DIndexBuffer9* CDirect3DEvents9::GetRealIndexBuffer  ( IDirect3DIndexBuffer9* pIndexData )
+{
+	if( pIndexData )
+	{
+        // See if it's a proxy
+	    CProxyDirect3DIndexBuffer* pProxy = NULL;
+        pIndexData->QueryInterface ( CProxyDirect3DIndexBuffer_GUID, (void**)&pProxy );
+
+        // If so, use the original index buffer
+        if ( pProxy )
+            pIndexData = pProxy->GetOriginal ();
+    }
+    return pIndexData;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::SetTexture
+//
+// Ensures the correct object gets sent to D3D
+//
+/////////////////////////////////////////////////////////////
+IDirect3DBaseTexture9* CDirect3DEvents9::GetRealTexture ( IDirect3DBaseTexture9* pTexture )
+{
+	if( pTexture )
+	{
+        // See if it's a proxy
+	    CProxyDirect3DTexture* pProxy = NULL;
+        pTexture->QueryInterface ( CProxyDirect3DTexture_GUID, (void**)&pProxy );
+
+        // If so, use the original texture
+        if ( pProxy )
+            pTexture = pProxy->GetOriginal ();
+    }
+    return pTexture;
 }
 
 

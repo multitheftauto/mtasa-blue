@@ -128,6 +128,7 @@ public:
     inline CTheCarGenerators        * GetTheCarGenerators()     { DEBUG_TRACE("CTheCarGenerators  * GetTheCarGenerators()");return m_pTheCarGenerators; };
     inline CAERadioTrackManager     * GetAERadioTrackManager()  { DEBUG_TRACE("CAERadioTrackManager * GetAERadioTrackManager()");return m_pCAERadioTrackManager; };
     inline CAudioEngine             * GetAudioEngine()          { DEBUG_TRACE("CAudio     * GetAudioEngine()");return m_pAudioEngine; };
+    inline CAudioEngine             * GetAudio()                { DEBUG_TRACE("CAudio     * GetAudioEngine()");return m_pAudioEngine; };
     inline CMenuManager             * GetMenuManager()          { DEBUG_TRACE("CMenuManager         * GetMenuManager()");return m_pMenuManager; };
     inline CText                    * GetText()                 { DEBUG_TRACE("CText                    * GetText()");return m_pText; };
     inline CStats                   * GetStats()                { DEBUG_TRACE("CStats                   * GetStats()");return m_pStats; };

@@ -82,8 +82,6 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
     // Set up the name of our script
     m_ulFunctionEnterTime = 0;
     m_iOwner = OWNER_SERVER;
-    m_szScriptName [0] = 0;
-    m_szScriptName [MAX_SCRIPTNAME_LENGTH] = 0;
 
     m_pObjectManager = pObjectManager;
     m_pPlayerManager = pPlayerManager;
@@ -101,6 +99,9 @@ CLuaMain::~CLuaMain ( void )
 {
     // remove all current remote calls originating from this VM
     g_pGame->GetRemoteCalls()->Remove ( this );
+    g_pGame->GetLuaCallbackManager ()->OnLuaMainDestroy ( this );
+    g_pGame->GetLatentTransferManager ()->OnLuaMainDestroy ( this );
+    g_pGame->GetScriptDebugging()->OnLuaMainDestroy ( this );
 
     // Unload the current script
     UnloadScript ();
@@ -210,10 +211,10 @@ void CLuaMain::InstructionCountHook ( lua_State* luaVM, lua_Debug* pDebug )
         if ( GetTime () >= pLuaMain->m_ulFunctionEnterTime + HOOK_MAXIMUM_TIME )
         {
             // Print it in the console
-            CLogger::ErrorPrintf ( "Infinite/too long execution (%s)\n", pLuaMain->GetScriptNamePointer () );
+            CLogger::ErrorPrintf ( "Infinite/too long execution (%s)\n", pLuaMain->GetScriptName () );
             
             SString strAbortInf = "Aborting; infinite running script in ";
-            strAbortInf += pLuaMain->GetScriptNamePointer ();
+            strAbortInf += pLuaMain->GetScriptName ();
             
             // Error out
             lua_pushstring ( luaVM, strAbortInf );
@@ -246,7 +247,7 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
         else
         {
             ResetInstructionCount ();
-            int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
+            int iret = this->PCall ( m_luaVM, 0, 0, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
@@ -317,7 +318,7 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
         else
         {
             ResetInstructionCount ();
-            int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
+            int iret = this->PCall ( m_luaVM, 0, 0, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
@@ -334,7 +335,15 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
                     g_pGame->GetScriptDebugging()->LogError ( strFile, iLine, strMsg );
                 }
                 else
+                {
+                    SString strResourcePath = ConformResourcePath ( szFileName );
+                    if ( !strRes.ContainsI ( ExtractFilename ( strResourcePath ) ) )
+                    {
+                        // Add filename to error message, if not already present
+                        strRes = SString ( "%s (global scope) - %s", *strResourcePath, *strRes );
+                    }
                     g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
+                }
             }
             return true;
         }
@@ -351,7 +360,7 @@ bool CLuaMain::LoadScript ( const char* szLUAScript )
         if ( !luaL_loadbuffer ( m_luaVM, szLUAScript, strlen(szLUAScript), NULL ) )
         {
             ResetInstructionCount ();
-            int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
+            int iret = this->PCall ( m_luaVM, 0, 0, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
@@ -395,6 +404,97 @@ void CLuaMain::UnloadScript ( void )
         lua_close( m_luaVM );
         m_luaVM = NULL;
     }
+}
+
+static int lua_dump_writer ( lua_State* luaVM, const void* data, size_t size, void* myUserData )
+{
+    (void)luaVM;
+    SString* pDest = (SString *)myUserData;
+    pDest->append ( (const char *)data, size );
+    return 0;
+}
+
+bool CLuaMain::CompileScriptFromFile ( const char* szFile, SString* pDest )
+{
+    if ( m_luaVM )
+    {
+        // Load the file
+        std::vector < char > buffer;
+        FileLoad ( szFile, buffer );
+        unsigned int iSize = buffer.size();
+
+        //UTF-8 BOM?  Compare by checking the standard UTF-8 BOM of 3 characters (in signed format, hence negative)
+        if ( iSize > 0 ) 
+        {
+            if ( iSize < 3 || buffer[0] != -0x11 || buffer[1] != -0x45 || buffer[2] != -0x41 )
+            {
+                //Maybe not UTF-8, if we have a >80% heuristic detection confidence, assume it is
+                return CompileScriptFromBuffer ( &buffer.at ( 0 ), iSize, szFile, GetUTF8Confidence ( (const unsigned char*)&buffer.at ( 0 ), iSize ) >= 80, pDest );
+            }
+            else if ( iSize != 3 ) //If there's a BOM, but the script is not empty, load ignoring the first 3 bytes
+            {
+                return CompileScriptFromBuffer ( &buffer.at ( 3 ), iSize-3, szFile, true, pDest );
+            }
+        }
+    }
+    return false;
+}
+
+
+bool CLuaMain::CompileScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize, const char* szFileName, bool bUTF8, SString* pDest )
+{
+    if ( m_luaVM )
+    {
+        // Are we not marked as UTF-8 already, and not precompiled?
+        std::string strUTFScript;
+        if ( !bUTF8 && ( uiSize < 5 || cpBuffer[0] != 27 || cpBuffer[1] != 'L' || cpBuffer[2] != 'u' || cpBuffer[3] != 'a' || cpBuffer[4] != 'Q' ) )
+        {
+            std::string strBuffer = std::string(cpBuffer, uiSize);
+#ifdef WIN32
+            std::setlocale(LC_CTYPE,""); // Temporarilly use locales to read the script
+            strUTFScript = UTF16ToMbUTF8(ANSIToUTF16( strBuffer ));
+            std::setlocale(LC_CTYPE,"C");
+#else
+            strUTFScript = UTF16ToMbUTF8(ANSIToUTF16( strBuffer ));
+#endif
+
+            if ( uiSize != strUTFScript.size() )
+            {
+                uiSize = strUTFScript.size();
+                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Script '%s' is not encoded in UTF-8.  Loading as ANSI...", ConformResourcePath(szFileName).c_str() );
+            }
+        }
+        else
+            strUTFScript = std::string(cpBuffer, uiSize);
+
+        // Load the script
+        if ( luaL_loadbuffer ( m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString ( "@%s", szFileName ) ) )
+        {
+            // Print the error
+            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+            if ( strRes.length () )
+            {
+                CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );
+                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", strRes.c_str () );
+            }
+            else
+            {
+                CLogger::LogPrint ( "SCRIPT ERROR: Unknown\n" );
+                g_pGame->GetScriptDebugging()->LogInformation ( m_luaVM, "Loading script failed for unknown reason" );
+            }
+        }
+        else
+        {
+            pDest->assign ( "" );
+            if ( lua_dump(m_luaVM, lua_dump_writer, pDest) != 0 )
+                return false;
+            lua_pop ( m_luaVM, 1 );
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 
@@ -506,33 +606,18 @@ void CLuaMain::DestroyTextItem ( CTextItem * pTextItem )
 }
 
 
-bool CLuaMain::TextDisplayExists ( CTextDisplay* pDisplay )
+CTextDisplay* CLuaMain::GetTextDisplayFromScriptID ( uint uiScriptID )
 {
-    list < CTextDisplay* > ::const_iterator iter = m_Displays.begin ();
-    for ( ; iter != m_Displays.end (); iter++ )
-    {
-        if ( *iter == pDisplay )
-        {
-            return true;
-        }
-    }
-
-    return false;
+    CTextDisplay* pTextDisplay = (CTextDisplay*) CIdArray::FindEntry ( uiScriptID, EIdClass::TEXT_DISPLAY );
+    dassert ( !pTextDisplay || ListContains ( m_Displays, pTextDisplay ) );
+    return pTextDisplay;
 }
 
-
-bool CLuaMain::TextItemExists ( CTextItem* pTextItem )
+CTextItem* CLuaMain::GetTextItemFromScriptID ( uint uiScriptID )
 {
-    list < CTextItem* > ::const_iterator iter = m_TextItems.begin ();
-    for ( ; iter != m_TextItems.end (); iter++ )
-    {
-        if ( *iter == pTextItem )
-        {
-            return true;
-        }
-    }
-
-    return false;
+    CTextItem* pTextItem = (CTextItem*) CIdArray::FindEntry ( uiScriptID, EIdClass::TEXT_ITEM );
+    dassert ( !pTextItem || ListContains ( m_TextItems, pTextItem ) );
+    return pTextItem;
 }
 
 
@@ -593,4 +678,20 @@ const SString& CLuaMain::GetFunctionTag ( int iLuaFunction )
         pTag = MapFind ( m_FunctionTagMap, iLuaFunction );
     }
     return *pTag;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::PCall
+//
+// lua_pcall call wrapper
+//
+///////////////////////////////////////////////////////////////
+int CLuaMain::PCall ( lua_State *L, int nargs, int nresults, int errfunc )
+{
+    g_pGame->GetScriptDebugging()->PushLuaMain ( this );
+    int iret = lua_pcall ( L, nargs, nresults, errfunc );
+    g_pGame->GetScriptDebugging()->PopLuaMain ( this );
+    return iret;
 }

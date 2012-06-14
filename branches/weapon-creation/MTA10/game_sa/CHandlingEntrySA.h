@@ -16,6 +16,7 @@
 
 #include <game/CHandlingEntry.h>
 #include "Common.h"
+#define FUNC_HandlingDataMgr_ConvertBikeDataToGameUnits 0x6F5290
 #define FUNC_HandlingDataMgr_ConvertDataToGameUnits 0x6F5080
 // http://www.gtamodding.com/index.php?title=Handling.cfg#GTA_San_Andreas
 // http://www.gtamodding.com/index.php?title=Memory_Addresses_%28SA%29#Handling
@@ -146,7 +147,7 @@ public:
     unsigned char   GetAnimGroup                    ( void ) const    { return m_Handling.ucAnimGroup; };
 
     eVehicleTypes   GetModel                        ( void ) const    { return static_cast < eVehicleTypes > ( m_Handling.iVehicleID ); };
-    bool            HasSuspensionChanged            ( void ) const    { return m_bChanged; };
+    bool            HasSuspensionChanged            ( void ) const    { return true; };
 
     // Set functions
     void            SetMass                         ( float fMass )                 { m_Handling.fMass = fMass; };
@@ -192,7 +193,7 @@ public:
     void            SetTailLight                    ( eLightType Style )            { m_Handling.ucTailLight = Style; };
     void            SetAnimGroup                    ( unsigned char ucGroup )       { m_Handling.ucAnimGroup = ucGroup; };
 
-    void            Recalculate                     ( void );
+    void            Recalculate                     ( unsigned short usModel );
 
     tHandlingDataSA*    GetInterface                ( void )                        { return m_pHandlingSA; };
 

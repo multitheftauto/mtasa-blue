@@ -27,6 +27,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     SetTypeName ( "vehicle" );
     m_eVehicleType = CVehicleManager::GetVehicleType ( m_usModel );
     m_fHealth = DEFAULT_VEHICLE_HEALTH;
+    m_fLastSyncedHealthHealth = DEFAULT_VEHICLE_HEALTH;
     m_ulHealthChangeTime = 0;
     m_ulBlowTime = 0;
     m_ulIdleTime = GetTickCount32 ();
@@ -39,9 +40,9 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_bUnoccupiedSyncable = true;
     m_pSyncer = NULL;
     GetInitialDoorStates ( m_ucDoorStates );
-    memset ( m_ucWheelStates, 0, sizeof ( m_ucWheelStates ) );
-    memset ( m_ucPanelStates, 0, sizeof ( m_ucPanelStates ) );
-    memset ( m_ucLightStates, 0, sizeof ( m_ucLightStates ) );
+    memset ( &m_ucWheelStates[0], 0, sizeof ( m_ucWheelStates ) );
+    memset ( &m_ucPanelStates[0], 0, sizeof ( m_ucPanelStates ) );
+    memset ( &m_ucLightStates[0], 0, sizeof ( m_ucLightStates ) );
     m_ucOverrideLights = 0;
     m_pTowedVehicle = NULL;
     m_pTowedByVehicle = NULL;
@@ -95,6 +96,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
 
     // Generate the handling data
     GenerateHandlingData ();
+    m_tSirenBeaconInfo.m_bOverrideSirens = false;
 }
 
 
@@ -380,8 +382,13 @@ void CVehicle::GetRotation ( CVector & vecRotation )
 
 void CVehicle::GetRotationDegrees ( CVector & vecRotation )
 {
-    if ( m_pAttachedTo ) GetAttachedRotation ( vecRotation );
-    else vecRotation = m_vecRotationDegrees;
+    if ( m_pAttachedTo )
+    {
+        GetAttachedRotation ( vecRotation );
+        ConvertRadiansToDegrees ( vecRotation );
+    }
+    else
+        vecRotation = m_vecRotationDegrees;
 }
 
 
@@ -653,9 +660,9 @@ void CVehicle::SpawnAt ( const CVector& vecPosition, const CVector& vecRotation 
     SetBlowTime ( 0 );
     SetIdleTime ( 0 );
     GetInitialDoorStates ( m_ucDoorStates );
-    memset ( m_ucWheelStates, 0, sizeof ( m_ucWheelStates ) );
-    memset ( m_ucPanelStates, 0, sizeof ( m_ucPanelStates ) );
-    memset ( m_ucLightStates, 0, sizeof ( m_ucLightStates ) );
+    memset ( &m_ucWheelStates[0], 0, sizeof ( m_ucWheelStates ) );
+    memset ( &m_ucPanelStates[0], 0, sizeof ( m_ucPanelStates ) );
+    memset ( &m_ucLightStates[0], 0, sizeof ( m_ucLightStates ) );
     SetLandingGearDown ( true );
     SetAdjustableProperty ( 0 );
     SetTowedByVehicle ( NULL );
@@ -718,7 +725,7 @@ void CVehicle::SetPaintjob ( unsigned char ucPaintjob )
 }
 
 
-void CVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
+void CVehicle::GetInitialDoorStates ( SFixedArray < unsigned char, MAX_DOORS >& ucOutDoorStates )
 {
     switch ( m_usModel )
     {
@@ -738,23 +745,56 @@ void CVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
         case VT_RCTIGER:
         case VT_TRACTOR:
         case VT_VORTEX:
-            memset ( pucDoorStates, DT_DOOR_MISSING, 6 );
+            memset ( &ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS );
 
             // Keep the bonet and boot intact
-            pucDoorStates [ 0 ] = pucDoorStates [ 1 ] = DT_DOOR_INTACT;
+            ucOutDoorStates [ 0 ] = ucOutDoorStates [ 1 ] = DT_DOOR_INTACT;
             break;
         default:
-            memset ( pucDoorStates, DT_DOOR_INTACT, 6 );
+            memset ( &ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS );
     }
 }
 
 
-void CVehicle::GenerateHandlingData ()
+void CVehicle::GenerateHandlingData ( void )
 {
     // Make a new CHandlingEntry
-    m_pHandlingEntry = new CHandlingEntry( );
+    m_pHandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData ( );
     // Apply the model handling info
     m_pHandlingEntry->ApplyHandlingData( g_pGame->GetHandlingManager ()->GetModelHandlingData ( static_cast < eVehicleTypes > ( m_usModel ) ) );
 
     m_bHandlingChanged = false;
+}
+
+void CVehicle::SetVehicleSirenPosition ( unsigned char ucSirenID, CVector vecPos )
+{
+    m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions = vecPos;
+}
+
+void CVehicle::SetVehicleSirenMinimumAlpha( unsigned char ucSirenID, DWORD dwPercentage )
+{
+    m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha = dwPercentage;
+}
+
+void CVehicle::SetVehicleSirenColour ( unsigned char ucSirenID, SColor tVehicleSirenColour )
+{
+    m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour;
+}
+
+void CVehicle::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent )
+{
+    m_tSirenBeaconInfo.m_b360Flag = bEnable360; 
+    m_tSirenBeaconInfo.m_bDoLOSCheck = bEnableLOSCheck; 
+    m_tSirenBeaconInfo.m_bUseRandomiser = bEnableRandomiser;
+    m_tSirenBeaconInfo.m_bSirenSilent = bEnableSilent;
+}
+void CVehicle::RemoveVehicleSirens ( void )
+{
+    for ( int i = 0; i <= 7; i++ )
+    {
+        m_tSirenBeaconInfo.m_tSirenInfo [ i ] = SSirenBeaconInfo ( );
+        SetVehicleSirenPosition( i, CVector ( 0, 0, 0 ) );
+        SetVehicleSirenMinimumAlpha( i, 0 );
+        SetVehicleSirenColour( i, SColor ( ) );
+    }
 }

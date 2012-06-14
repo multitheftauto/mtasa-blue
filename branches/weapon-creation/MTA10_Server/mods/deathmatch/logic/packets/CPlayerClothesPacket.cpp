@@ -74,7 +74,7 @@ void CPlayerClothesPacket::Add ( CPlayerClothes* pClothes )
 {
     for ( unsigned char ucType = 0 ; ucType < PLAYER_CLOTHING_SLOTS ; ucType++ )
     {
-        SPlayerClothing* pClothing = pClothes->GetClothing ( ucType );
+        const SPlayerClothing* pClothing = pClothes->GetClothing ( ucType );
         if ( pClothing )
         {
             Add ( pClothing->szTexture, pClothing->szModel, ucType );

@@ -14,12 +14,12 @@
 
 using namespace std;
 
-CClientEntity* CElementIDs::m_Elements [MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS];
+SFixedArray < CClientEntity*, MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS > CElementIDs::m_Elements;
 CStack < ElementID, MAX_CLIENT_ELEMENTS - 2 > CElementIDs::m_ClientStack;
 
 void CElementIDs::Initialize ( void )
 {
-    memset ( m_Elements, 0, sizeof ( m_Elements ) );
+    memset ( &m_Elements[0], 0, sizeof ( m_Elements ) );
 }
 
 

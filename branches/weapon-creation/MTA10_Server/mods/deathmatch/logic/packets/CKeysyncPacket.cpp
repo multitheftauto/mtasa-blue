@@ -21,6 +21,7 @@ CKeysyncPacket::CKeysyncPacket ( CPlayer * pPlayer )
     m_pSourceElement = pPlayer;
 }
 
+
 bool CKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
     // Got a player to write?
@@ -30,9 +31,32 @@ bool CKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
 
         // Read out the controller states
         CControllerState ControllerState;
-        CControllerState LastControllerState = pSourcePlayer->GetPad ()->GetLastControllerState ();
-        if ( !ReadSmallKeysync ( ControllerState, LastControllerState, BitStream ) )
+        if ( !ReadSmallKeysync ( ControllerState, BitStream ) )
             return false;
+
+        // Read the rotations
+        float fPlayerCurrentRotation;
+        float fCameraRotation;
+        if ( BitStream.Version () >= 0x2C )
+        {
+            SKeysyncRotation rotation;
+            BitStream.Read ( &rotation );
+            fPlayerCurrentRotation = rotation.data.fPlayerRotation;
+            fCameraRotation = rotation.data.fCameraRotation;
+        }
+        else
+        {
+            fPlayerCurrentRotation = pSourcePlayer->GetRotation ();
+            fCameraRotation = pSourcePlayer->GetCameraRotation ();
+        }
+
+        // Skip old bullet sync data
+        if ( BitStream.Version () == 0x2D )
+        {
+            bool bDummy;
+            BitStream.ReadBit ( bDummy );
+            BitStream.ReadBit ( bDummy );
+        }
 
         // Flags
         SKeysyncFlags flags;
@@ -43,8 +67,8 @@ bool CKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
         pSourcePlayer->SetDucked ( flags.data.bIsDucked );
         pSourcePlayer->SetChoking ( flags.data.bIsChoking );
 
-        // If he's shooting
-        if ( ControllerState.ButtonCircle )
+        // If he's shooting or aiming
+        if ( ControllerState.ButtonCircle || ( ControllerState.RightShoulder1 && BitStream.Version () >= 0x2C ) )
         {
             bool bHasWeapon = BitStream.ReadBit ();
 
@@ -149,7 +173,11 @@ bool CKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
 
         // Set the controller states
         pSourcePlayer->GetPad ()->NewControllerState ( ControllerState );
-
+        if ( BitStream.Version () >= 0x2C )
+        {
+            pSourcePlayer->SetRotation ( fPlayerCurrentRotation );
+            pSourcePlayer->SetCameraRotation ( fCameraRotation );
+        }
         return true;
     }
     
@@ -171,8 +199,24 @@ bool CKeysyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 
         // Write the keysync data
         const CControllerState& ControllerState = pSourcePlayer->GetPad ()->GetCurrentControllerState ();
-        const CControllerState& LastControllerState = pSourcePlayer->GetPad ()->GetLastControllerState ();
-        WriteSmallKeysync ( ControllerState, LastControllerState, BitStream );
+        WriteSmallKeysync ( ControllerState, BitStream );
+
+        // Write the rotations
+        if ( BitStream.Version () >= 0x2C )
+        {
+            SKeysyncRotation rotation;
+            rotation.data.fPlayerRotation = pSourcePlayer->GetRotation ();
+            rotation.data.fCameraRotation = pSourcePlayer->GetCameraRotation ();
+            BitStream.Write ( &rotation );
+        }
+
+        // Skip old bullet sync data
+        if ( BitStream.Version () == 0x2D )
+        {
+            bool bDummy = 0;
+            BitStream.WriteBit ( bDummy );
+            BitStream.WriteBit ( bDummy );
+        }
 
         // Flags
         SKeysyncFlags flags;
@@ -184,8 +228,8 @@ bool CKeysyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         // Write the flags
         BitStream.Write ( &flags );
 
-        // If he's shooting
-        if ( ControllerState.ButtonCircle )
+        // If he's shooting or aiming
+        if ( ControllerState.ButtonCircle || ( ControllerState.RightShoulder1 && BitStream.Version () >= 0x2C ) )
         {
             // Write his current weapon slot
             unsigned int uiSlot = pSourcePlayer->GetWeaponSlot ();

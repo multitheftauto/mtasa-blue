@@ -50,8 +50,6 @@ public:
                                       float fWidth,
                                       ulong ulColor );
 
-        void    OnChangingRenderTarget ( uint uiNewViewportSizeX, uint uiNewViewportSizeY );
-
 protected:
     bool                        m_bZTest;
     IDirect3DDevice9*           m_pDevice;

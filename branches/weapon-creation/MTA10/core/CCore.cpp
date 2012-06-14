@@ -22,6 +22,7 @@
 #include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
 #include "SharedUtil.hpp"
 #include <clocale>
+#include "CTimingCheckpoints.hpp"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -100,6 +101,8 @@ CCore::CCore ( void )
     // Set our locale to the C locale, except for character handling which is the system's default
     std::setlocale(LC_ALL,"C");
     std::setlocale(LC_CTYPE,"");
+    // check LC_COLLATE is the old-time raw ASCII sort order
+    assert ( strcoll( "a", "B" ) > 0 );
 
     // Parse the command line
     const char* pszNoValOptions[] =
@@ -111,6 +114,7 @@ CCore::CCore ( void )
 
     // Create a logger instance.
     m_pLogger                   = new CLogger ( );
+    m_pConsoleLogger            = new CConsoleLogger ( );
 
     // Create interaction objects.
     m_pCommands                 = new CCommands;
@@ -119,6 +123,7 @@ CCore::CCore ( void )
     // Create the GUI manager and the graphics lib wrapper
     m_pLocalGUI                 = new CLocalGUI;
     m_pGraphics                 = new CGraphics ( m_pLocalGUI );
+    g_pGraphics                 = m_pGraphics;
     m_pGUI                      = NULL;
 
     // Create the mod manager
@@ -134,6 +139,7 @@ CCore::CCore ( void )
     m_bCursorToggleControls = false;
     m_bLastFocused = true;
     m_bWaitToSetNick = false;
+    m_DiagnosticDebug = EDiagnosticDebug::NONE;
 
     // Initialize time
     CClientTime::InitializeTime ();
@@ -144,6 +150,8 @@ CCore::CCore ( void )
     WriteDebugEvent ( "CCore::CCore" );
 
     m_pKeyBinds = new CKeyBinds ( this );
+
+    m_pMouseControl = new CMouseControl();
 
     // Create our hook objects.
     //m_pFileSystemHook           = new CFileSystemHook ( );
@@ -175,6 +183,8 @@ CCore::CCore ( void )
     m_uiNewNickWaitFrames = 0;
     m_iUnminimizeFrameCounter = 0;
     m_bDidRecreateRenderTargets = false;
+    m_fMinStreamingMemory = 0;
+    m_fMaxStreamingMemory = 0;
 }
 
 CCore::~CCore ( void )
@@ -224,8 +234,12 @@ CCore::~CCore ( void )
     // Delete keybinds
     delete m_pKeyBinds;
 
+    // Delete Mouse Control
+    delete m_pMouseControl;
+
     // Delete the logger
     delete m_pLogger;
+    delete m_pConsoleLogger;
 
     //Delete the Current Server
     delete m_pCurrentServer;
@@ -722,16 +736,24 @@ void CCore::ShowServerInfo ( unsigned int WindowType )
 
 void CCore::ApplyHooks ( )
 { 
+    WriteDebugEvent ( "CCore::ApplyHooks" );
     ApplyLoadingCrashPatch ();
 
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook ( );
-    m_pDirect3DHookManager->ApplyHook ( );
+    //m_pDirect3DHookManager->ApplyHook ( );
     //m_pFileSystemHook->ApplyHook ( );
     m_pSetCursorPosHook->ApplyHook ( );
 
     // Redirect basic files.
     //m_pFileSystemHook->RedirectFile ( "main.scm", "../../mta/gtafiles/main.scm" );
+}
+
+void CCore::ApplyHooks2 ( )
+{ 
+    WriteDebugEvent ( "CCore::ApplyHooks2" );
+    // Try this one a little later
+    m_pDirect3DHookManager->ApplyHook ( );
 }
 
 
@@ -851,6 +873,10 @@ void CCore::CreateGame ( )
         BrowseToSolution ( "downgrade" );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
+
+    // Apply hiding device selection dialog
+    bool bDeviceSelectionDialogEnabled = GetApplicationSettingInt ( "device-selection-disabled" ) ? false : true;
+    m_pGame->GetSettings ()->SetSelectDeviceDialogEnabled ( bDeviceSelectionDialogEnabled );
 }
 
 
@@ -1019,17 +1045,21 @@ bool CCore::IsWindowMinimized ( void )
 
 void CCore::DoPreFramePulse ( )
 {
+    TIMING_CHECKPOINT( "+CorePreFrame" );
+
     m_pKeyBinds->DoPreFramePulse ();
 
     // Notify the mod manager
     m_pModManager->DoPulsePreFrame ();  
 
     m_pLocalGUI->DoPulse ();
+    TIMING_CHECKPOINT( "-CorePreFrame" );
 }
 
 
 void CCore::DoPostFramePulse ( )
 {
+    TIMING_CHECKPOINT( "+CorePostFrame1" );
     if ( m_bQuitOnPulse )
         Quit ();
 
@@ -1145,7 +1175,10 @@ void CCore::DoPostFramePulse ( )
     m_pKeyBinds->DoPostFramePulse ();
 
     // Notify the mod manager and the connect manager
+    TIMING_CHECKPOINT( "-CorePostFrame1" );
     m_pModManager->DoPulsePostFrame ();
+    TIMING_CHECKPOINT( "+CorePostFrame2" );
+    GetMemStats ()->Draw ();
     m_pConnectManager->DoPulse ();
 
     m_Community.DoPulse ();
@@ -1180,6 +1213,7 @@ void CCore::DoPostFramePulse ( )
         if ( m_tXfireUpdate != 0 )
             m_tXfireUpdate = 0;
     }
+    TIMING_CHECKPOINT( "-CorePostFrame2" );
 }
 
 
@@ -1232,9 +1266,10 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "debugscrolldown",   "scrolls the debug view downwards", CCommandFuncs::DebugScrollDown );
 
     m_pCommands->Add ( "test",              "",                                 CCommandFuncs::Test );
+    m_pCommands->Add ( "showmemstat",       "shows the memory statistics",      CCommandFuncs::ShowMemStat );
 
-#ifdef MTA_DEBUG
-    //m_pCommands->Add ( "pools",               "read out the pool values",         CCommandFuncs::PoolRelocations );
+#if defined(MTA_DEBUG) || defined(MTA_BETA)
+    m_pCommands->Add ( "fakelag",           "",                                 CCommandFuncs::FakeLag );
 #endif
 }
 
@@ -1336,6 +1371,15 @@ bool CCore::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
     
     return bHandled;
 }
+
+
+bool CCore::WasLaunchedWithConnectURI ( void )
+{
+    if ( m_szCommandLineArgs && strnicmp ( m_szCommandLineArgs, "mtasa://", 8 ) == 0 )
+        return true;
+    return false;
+}
+
 
 void CCore::ParseCommandLine ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions )
 {
@@ -1590,8 +1634,8 @@ void CCore::UpdateRecentlyPlayed()
     {
         CServerBrowser* pServerBrowser = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ();
         CServerList* pRecentList = pServerBrowser->GetRecentList ();
-        pRecentList->Remove ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
-        pRecentList->AddUnique ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET, true );
+        pRecentList->Remove ( Address, uiPort );
+        pRecentList->AddUnique ( Address, uiPort, true );
        
         pServerBrowser->SaveRecentlyPlayedList();
         if ( !m_pConnectManager->m_strLastPassword.empty() )
@@ -1601,13 +1645,14 @@ void CCore::UpdateRecentlyPlayed()
     //Save our configuration file
     CCore::GetSingleton ().SaveConfig ();
 }
-void CCore::SetCurrentServer( in_addr Addr, unsigned short usQueryPort )
+
+void CCore::SetCurrentServer( in_addr Addr, unsigned short usGamePort )
 {
     //Set the current server info so we can query it with ASE for xfire
     m_pCurrentServer->Address = Addr;
-    m_pCurrentServer->usQueryPort = usQueryPort;
-
+    m_pCurrentServer->usGamePort = usGamePort;
 }
+
 SString CCore::UpdateXfire( void )
 {
     //Check if a current server exists
@@ -1748,6 +1793,9 @@ void CCore::EnsureFrameRateLimitApplied ( void )
 //
 void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 {
+    TIMING_CHECKPOINT( "-CallIdle1" );
+    ms_TimingCheckpoints.EndTimingCheckpoints ();
+
     // Frame rate limit stuff starts here
     m_bDoneFrameRateLimit = true;
 
@@ -1802,11 +1850,33 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 //
 void CCore::DoReliablePulse ( void )
 {
+    ms_TimingCheckpoints.BeginTimingCheckpoints ();
+    TIMING_CHECKPOINT( "+CallIdle2" );
+
     // Non frame rate limit stuff
     if ( IsWindowMinimized () )
         m_iUnminimizeFrameCounter = 4;     // Tell script we have unminimized after a short delay
 
     UpdateModuleTickCount64 ();
+}
+
+
+//
+// Debug timings
+//
+bool CCore::IsTimingCheckpoints ( void )
+{
+    return ms_TimingCheckpoints.IsTimingCheckpoints ();
+}
+
+void CCore::OnTimingCheckpoint ( const char* szTag )
+{
+    ms_TimingCheckpoints.OnTimingCheckpoint ( szTag );
+}
+
+void CCore::OnTimingDetail ( const char* szTag )
+{
+    ms_TimingCheckpoints.OnTimingDetail ( szTag );
 }
 
 
@@ -1817,6 +1887,43 @@ void CCore::OnDeviceRestore ( void )
 {
     m_iUnminimizeFrameCounter = 4;     // Tell script we have restored after 4 frames to avoid double sends
     m_bDidRecreateRenderTargets = true;
+}
+
+
+//
+// OnPreFxRender
+//
+void CCore::OnPreFxRender ( void )
+{
+    // Don't do nothing if nothing won't be drawn
+    if ( !CGraphics::GetSingleton ().HasMaterialLine3DQueueItems () )
+        return;
+
+    IDirect3DDevice9* pDevice = CGraphics::GetSingleton ().GetDevice ();
+
+    // Create a state block.
+    IDirect3DStateBlock9 * pDeviceState = NULL;
+    pDevice->CreateStateBlock ( D3DSBT_ALL, &pDeviceState );
+    D3DXMATRIX matProjection;
+    pDevice->GetTransform ( D3DTS_PROJECTION, &matProjection );
+
+    // Make sure linear sampling is enabled
+    pDevice->SetSamplerState ( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
+    pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
+    pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
+
+    // Make sure stencil is off to avoid problems with flame effects
+    pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
+
+    CGraphics::GetSingleton ().DrawMaterialLine3DQueue ();
+
+    // Restore the render states
+    pDevice->SetTransform ( D3DTS_PROJECTION, &matProjection );
+    if ( pDeviceState )
+    {
+        pDeviceState->Apply ( );
+        pDeviceState->Release ( );
+    }
 }
 
 
@@ -1841,8 +1948,8 @@ void CCore::OnPreHUDRender ( void )
     // Make sure stencil is off to avoid problems with flame effects
     pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
 
-    // Maybe capture screen
-    CGraphics::GetSingleton ().GetRenderItemManager ()->UpdateBackBufferCopy ();
+    // Maybe capture screen and other stuff
+    CGraphics::GetSingleton ().GetRenderItemManager ()->DoPulse ();
 
     // Handle script stuffs
     if ( m_iUnminimizeFrameCounter-- && !m_iUnminimizeFrameCounter )
@@ -1867,17 +1974,64 @@ void CCore::OnPreHUDRender ( void )
 
 
 //
+// CCore::CalculateStreamingMemoryRange
+//
+// Streaming memory range based on system installed memory:
+//
+//     System RAM MB     min     max
+//           512     =   64      96
+//          1024     =   96     128
+//          2048     =  128     256
+//
+// Also:
+//   Max should be no more than 2 * installed video memory
+//   Min should be no more than 1 * installed video memory
+//   Max should be no less than 96MB
+//   Gap between min and max should be no less than 32MB
+//
+void CCore::CalculateStreamingMemoryRange ( void )
+{
+    // Only need to do this once
+    if ( m_fMinStreamingMemory != 0 )
+        return;
+
+    // Get system info
+    int iSystemRamMB = static_cast < int > ( GetWMITotalPhysicalMemory () / 1024LL / 1024LL );
+    int iVideoMemoryMB = g_pDeviceState->AdapterState.InstalledMemoryKB / 1024;
+
+    // Calc min and max from lookup table
+    SSamplePoint < float > minPoints[] = { {512, 64},  {1024, 96},   {2048, 128} };
+    SSamplePoint < float > maxPoints[] = { {512, 96},  {1024, 128},  {2048, 256} };
+
+    float fMinAmount = EvalSamplePosition < float > ( minPoints, NUMELMS ( minPoints ), iSystemRamMB );
+    float fMaxAmount = EvalSamplePosition < float > ( maxPoints, NUMELMS ( maxPoints ), iSystemRamMB );
+
+    // Apply cap dependant on video memory
+    fMaxAmount = Min ( fMaxAmount, iVideoMemoryMB * 2.f );
+    fMinAmount = Min ( fMinAmount, iVideoMemoryMB * 1.f );
+
+    // Apply 96MB lower limit
+    fMaxAmount = Max ( fMaxAmount, 96.f );
+
+    // Apply gap limit
+    fMinAmount = fMaxAmount - Max ( fMaxAmount - fMinAmount, 32.f );
+
+    m_fMinStreamingMemory = fMinAmount;
+    m_fMaxStreamingMemory = fMaxAmount;
+}
+
+
+//
 // GetMinStreamingMemory
 //
 uint CCore::GetMinStreamingMemory ( void )
 {
-    uint uiAmount = 50;
+    CalculateStreamingMemoryRange ();
 
 #ifdef MTA_DEBUG
-    uiAmount = 1;
+    return 1;
 #endif
-
-    return Min ( uiAmount, GetMaxStreamingMemory () );
+    return m_fMinStreamingMemory;
 }
 
 
@@ -1886,8 +2040,8 @@ uint CCore::GetMinStreamingMemory ( void )
 //
 uint CCore::GetMaxStreamingMemory ( void )
 {
-    uint iMemoryMB = g_pDeviceState->AdapterState.InstalledMemoryKB / 1024;
-    return Max < uint > ( 64, iMemoryMB );
+    CalculateStreamingMemoryRange ();
+    return m_fMaxStreamingMemory;
 }
 
 
@@ -1920,4 +2074,14 @@ bool CCore::GetDebugIdEnabled ( uint uiDebugId )
 {
     static CFilterMap debugIdFilterMap ( GetVersionUpdater ()->GetDebugFilterString () );
     return !debugIdFilterMap.IsFiltered ( uiDebugId );
+}
+
+EDiagnosticDebugType CCore::GetDiagnosticDebug ( void )
+{
+    return m_DiagnosticDebug;
+}
+
+void CCore::SetDiagnosticDebug ( EDiagnosticDebugType value )
+{
+    m_DiagnosticDebug = value;
 }

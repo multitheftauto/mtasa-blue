@@ -83,6 +83,7 @@ namespace SharedUtil
         // Conversion
         double      ToDouble        ( void ) const      { return static_cast < double > ( m_llTicks ); }
         long long   ToLongLong      ( void ) const      { return m_llTicks; }
+        int         ToInt           ( void ) const      { return static_cast < int > ( m_llTicks ); }
 
         // Static functions
         static CTickCount Now ( bool bUseModuleTickCount = false )
@@ -104,6 +105,7 @@ namespace SharedUtil
         bool        m_bUseModuleTickCount;
     public:
 
+        // MaxIncrement should be set higher than the expected tick interval between Get() calls
         CElapsedTime ( long lMaxIncrement = 500, bool bUseModuleTickCount = false )
             : m_llMaxIncrement ( lMaxIncrement )
             , m_bUseModuleTickCount ( bUseModuleTickCount )
@@ -126,6 +128,8 @@ namespace SharedUtil
         }
 
     protected:
+        CElapsedTime ( const CElapsedTime& );       // Not implemented
+
         long long DoGetTickCount ( void )
         {
             return m_bUseModuleTickCount ? GetModuleTickCount64 () : GetTickCount64_ ();

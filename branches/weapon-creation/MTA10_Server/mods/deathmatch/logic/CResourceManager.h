@@ -66,7 +66,7 @@ public:
     CResource *                 Load                            ( bool bIsZipped, const char * szAbsPath, const char * szResourceName );
     void                        Unload                          ( CResource * resource );
     CResource *                 GetResource                     ( const char * szResourceName );
-    bool                        Exists                          ( CResource* pResource );
+    CResource*                  GetResourceFromScriptID         ( uint uiScriptID );
     void                        UnloadRemovedResources          ( void );
     void                        CheckResourceDependencies       ( void );
     void                        ListResourcesLoaded             ( void );
@@ -80,7 +80,7 @@ public:
     inline unsigned int         GetResourceFailedCount          ( void )            { return m_uiResourceFailedCount; }
     void                        OnPlayerJoin                    ( CPlayer& Player );
     
-    char *                      GetResourceDirectory            ( void );
+    const char*                 GetResourceDirectory            ( void );
 
     bool                        StartResource                   ( CResource* pResource, list < CResource* > * dependents = NULL, bool bStartedManually = false, bool bStartIncludedResources = true, bool bConfigs = true, bool bMaps = true, bool bScripts = true, bool bHTML = true, bool bClientConfigs = true, bool bClientScripts = true, bool bClientFiles = true );
     bool                        Reload                          ( CResource* pResource );
@@ -118,8 +118,12 @@ public:
     void                        RemoveMinClientRequirement      ( CResource* pResource );
     void                        ReevaluateMinClientRequirement  ( void );
 
+    void                        ApplySyncMapElementDataOption       ( CResource* pResource, bool bSyncMapElementData );
+    void                        RemoveSyncMapElementDataOption      ( CResource* pResource );
+    void                        ReevaluateSyncMapElementDataOption  ( void );
+
 private:
-    char                        m_szResourceDirectory[260];
+    SString                     m_strResourceDirectory;
     CMappedList < CResource* >  m_resources;
     unsigned int                m_uiResourceLoadedCount;
     unsigned int                m_uiResourceFailedCount;
@@ -134,6 +138,7 @@ private:
     list<sResourceQueue>        m_resourceQueue;
 
     std::map < CResource*, SString >        m_MinClientRequirementMap;
+    std::map < CResource*, bool >           m_SyncMapElementDataOptionMap;
 };
 
 #endif

@@ -212,6 +212,10 @@ void CTileBatcher::Flush ( void )
         uint VertexStreamZeroStride         = sizeof(SPDTVertex);
         m_pDevice->SetFVF ( SPDTVertex::FVF );
 
+        // Set texture addressing mode
+        m_pDevice->SetSamplerState( 0, D3DSAMP_ADDRESSU, m_pCurrentMaterial->m_TextureAddress );
+        m_pDevice->SetSamplerState( 0, D3DSAMP_ADDRESSV, m_pCurrentMaterial->m_TextureAddress );
+
         // Draw
         if ( CTextureItem* pTextureItem = DynamicCast < CTextureItem > ( m_pCurrentMaterial ) )
         {
@@ -254,8 +258,9 @@ void CTileBatcher::Flush ( void )
         }
 
         // Clean up
-        m_Indices.clear ();
-        m_Vertices.clear ();
+        ListClearAndReserve ( m_Indices );
+        ListClearAndReserve ( m_Vertices );
+
         SetCurrentMaterial ( NULL );
         m_fCurrentRotation = 0;
         m_fCurrentRotCenX = 0;

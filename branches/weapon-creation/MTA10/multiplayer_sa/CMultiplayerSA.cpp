@@ -25,6 +25,8 @@
 #include "..\game_sa\CBuildingSA.h"
 #include "..\game_sa\CPedSA.h"
 #include "..\game_sa\common.h"
+extern CCoreInterface* g_pCore;
+extern CMultiplayerSA* pMultiplayer;
 
 using namespace std;
 
@@ -173,110 +175,6 @@ DWORD** VAR_TagInfoArray                                    = (DWORD **)0xA9A8C0
 #define HOOKPOS_CPhysical_ProcessCollisionSectorList        0x54BB93
 DWORD RETURN_CPhysical_ProcessCollisionSectorList =         0x54BB9A;
 
-#define HOOKPOS_CrashFix_Misc1                              0x5D9A6E
-DWORD RETURN_CrashFix_Misc1 =                               0x5D9A74;
-
-#define HOOKPOS_CrashFix_Misc2                              0x6B18B0
-DWORD RETURN_CrashFix_Misc2a =                              0x6B18B9;
-DWORD RETURN_CrashFix_Misc2b =                              0x6B1F6C;
-
-#define HOOKPOS_CrashFix_Misc3                              0x645FD9
-DWORD RETURN_CrashFix_Misc3 =                               0x645FDF;
-void CPlayerPed__ProcessControl_Abort();
-
-#define HOOKPOS_CrashFix_Misc4                              0x4F02D2
-DWORD RETURN_CrashFix_Misc4a =                              0x4F02D7;
-DWORD RETURN_CrashFix_Misc4b =                              0x4F0B07;
-
-#define HOOKPOS_CrashFix_Misc5                              0x5DF949
-DWORD RETURN_CrashFix_Misc5a =                              0x5DF950;
-DWORD RETURN_CrashFix_Misc5b =                              0x5DFCC4;
-
-#define HOOKPOS_CrashFix_Misc6                              0x4D1750
-DWORD RETURN_CrashFix_Misc6a =                              0x4D1755;
-DWORD RETURN_CrashFix_Misc6b =                              0x4D1A44;
-
-#define HOOKPOS_CrashFix_Misc7                              0x417BF8
-DWORD RETURN_CrashFix_Misc7a =                              0x417BFD;
-DWORD RETURN_CrashFix_Misc7b =                              0x417BFF;
-
-#define HOOKPOS_CrashFix_Misc8                              0x73485D
-DWORD RETURN_CrashFix_Misc8a =                              0x734862;
-DWORD RETURN_CrashFix_Misc8b =                              0x734871;
-
-#define HOOKPOS_CrashFix_Misc9                              0x738B64
-DWORD RETURN_CrashFix_Misc9a =                              0x738B6A;
-DWORD RETURN_CrashFix_Misc9b =                              0x73983A;
-
-#define HOOKPOS_CrashFix_Misc10                             0x5334FE
-DWORD RETURN_CrashFix_Misc10a =                             0x533504;
-DWORD RETURN_CrashFix_Misc10b =                             0x533539;
-
-#define HOOKPOS_CrashFix_Misc11                             0x4D2C62
-DWORD RETURN_CrashFix_Misc11a =                             0x4D2C67;
-DWORD RETURN_CrashFix_Misc11b =                             0x4D2E03;
-
-#define HOOKPOS_CrashFix_Misc12                             0x4D41C5
-DWORD RETURN_CrashFix_Misc12a =                             0x4D41CA;
-DWORD RETURN_CrashFix_Misc12b =                             0x4D4222;
-
-#define HOOKPOS_CrashFix_Misc13                             0x4D464E
-DWORD RETURN_CrashFix_Misc13a =                             0x4D4654;
-DWORD RETURN_CrashFix_Misc13b =                             0x4D4764;
-
-#define HOOKPOS_CrashFix_Misc14                              0x4DD4B5
-DWORD RETURN_CrashFix_Misc14 =                               0x4DD4BB;
-
-#define HOOKPOS_FreezeFix_Misc15_US                         0x156CDAE
-#define HOOKPOS_FreezeFix_Misc15_EU                         0x156CDEE
-DWORD RETURN_FreezeFix_Misc15_US =                          0x156CDB4;
-DWORD RETURN_FreezeFix_Misc15_EU =                          0x156CDF4;
-DWORD RETURN_FreezeFix_Misc15_BOTH =                        0;
-
-#define HOOKPOS_CrashFix_Misc16                              0x5E5815
-DWORD RETURN_CrashFix_Misc16 =                               0x5E581B;
-
-#define HOOKPOS_CrashFix_Misc17                              0x5E5815
-DWORD RETURN_CrashFix_Misc17 =                               0x5E581B;
-
-#define HOOKPOS_CrashFix_Misc17_US                          0x7F120E
-#define HOOKPOS_CrashFix_Misc17_EU                          0x7F124E
-DWORD RETURN_CrashFix_Misc17a_US =                          0x7F1214;
-DWORD RETURN_CrashFix_Misc17a_EU =                          0x7F1254;
-DWORD RETURN_CrashFix_Misc17a_BOTH =                        0;
-DWORD RETURN_CrashFix_Misc17b_US =                          0x7F1236;
-DWORD RETURN_CrashFix_Misc17b_EU =                          0x7F1276;
-DWORD RETURN_CrashFix_Misc17b_BOTH =                        0;
-
-#define HOOKPOS_CrashFix_Misc18                              0x4C7DAD
-DWORD RETURN_CrashFix_Misc18 =                               0x4C7DB4;
-
-#define HOOKPOS_CrashFix_Misc19_US                          0x7F0BF7
-#define HOOKPOS_CrashFix_Misc19_EU                          0x7F0C37
-DWORD RETURN_CrashFix_Misc19a_US =                          0x7F0BFD;
-DWORD RETURN_CrashFix_Misc19a_EU =                          0x7F0C3D;
-DWORD RETURN_CrashFix_Misc19a_BOTH =                        0;
-DWORD RETURN_CrashFix_Misc19b_US =                          0x7F0C20;
-DWORD RETURN_CrashFix_Misc19b_EU =                          0x7F0C60;
-DWORD RETURN_CrashFix_Misc19b_BOTH =                        0;
-
-#define HOOKPOS_CrashFix_Misc20                              0x54F3B0
-DWORD RETURN_CrashFix_Misc20 =                               0x54F3B6;
-
-#define HOOKPOS_CrashFix_Misc21                              0x648EF6
-DWORD RETURN_CrashFix_Misc21 =                               0x648EFC;
-
-#define HOOKPOS_CrashFix_Misc22                              0x4CEF08
-DWORD RETURN_CrashFix_Misc22 =                               0x4CEF25;
-
-#define HOOKPOS_CrashFix_Misc23                              0x6E3D10
-DWORD RETURN_CrashFix_Misc23 =                               0x6E3D17;
-
-#define HOOKPOS_CrashFix_Misc24_US                          0x7F0DC8
-#define HOOKPOS_CrashFix_Misc24_EU                          0x7F0E08
-DWORD RETURN_CrashFix_Misc24_US =                           0x7F0DCE;
-DWORD RETURN_CrashFix_Misc24_EU =                           0x7F0E0E;
-DWORD RETURN_CrashFix_Misc24_BOTH =                         0;
 
 #define HOOKPOS_CheckAnimMatrix_US                          0x7C5A5C
 #define HOOKPOS_CheckAnimMatrix_EU                          0x7C5A9C
@@ -302,37 +200,13 @@ DWORD RETURN_CHandlingData_isNotFWD =               0x6A04C3;
 #define CALL_CMonsterTruck_ProcessEntityCollision           0x6C8B9E
 DWORD RETURN_ProcessEntityCollision =                             0x4185C0;
 
+#define HOOKPOS_PreFxRender                                     0x049E650
+DWORD RETURN_PreFxRender_US =                                   0x0404D1E;
+DWORD RETURN_PreFxRender_EU =                                   0x0405855;
+DWORD RETURN_PreFxRender_BOTH =                                 0;
+
 #define HOOKPOS_PreHUDRender                                      0x053EAD8
 DWORD RETURN_PreHUDRender =                                       0x053EADD;
-
-#define HOOKPOS_LoadingPlayerImgDir                         0x5A69E3
-DWORD RETURN_LoadingPlayerImgDira =                         0x5A69E8;
-DWORD RETURN_LoadingPlayerImgDirb =                         0x5A6A06;
-
-#define HOOKPOS_CallCStreamingInfoAddToList                 0x408962
-DWORD FUNC_CStreamingInfoAddToList              = 0x407480;
-DWORD RETURN_CallCStreamingInfoAddToLista       = 0x408967;
-DWORD RETURN_CallCStreamingInfoAddToListb       = 0x408990;
-
-#define HOOKPOS_CStreamingLoadRequestedModels_US            0x15670A0
-#define HOOKPOS_CStreamingLoadRequestedModels_EU            0x1567090
-DWORD RETURN_CStreamingLoadRequestedModelsa_US =    0x15670A5;
-DWORD RETURN_CStreamingLoadRequestedModelsa_EU =    0x1567095;
-DWORD RETURN_CStreamingLoadRequestedModelsa_BOTH =  0;
-DWORD RETURN_CStreamingLoadRequestedModelsb_US =    0x156711B;
-DWORD RETURN_CStreamingLoadRequestedModelsb_EU =    0x156710B;
-DWORD RETURN_CStreamingLoadRequestedModelsb_BOTH =  0;
-DWORD CStreaming__ConvertBufferToObject =           0x040C6B0;
-
-#define HOOKPOS_CRenderer_SetupEntityVisibility     0x554230    // 8 bytes
-DWORD RETURN_CRenderer_SetupEntityVisibility =      0x554238;
-
-#define HOOKPOS_CWorldScan_ScanWorld                0x55555E    // 5 bytes
-DWORD RETURN_CWorldScan_ScanWorlda =                0x555563;
-DWORD RETURN_CWorldScan_ScanWorldb =                0x72CAE0;
-
-#define HOOKPOS_CVisibilityPlugins_CalculateFadingAtomicAlpha   0x732500    // 5 bytes
-DWORD RETURN_CVisibilityPlugins_CalculateFadingAtomicAlpha =    0x732505;
 
 #define HOOKPOS_LoadIPLInstance                                    0x4061E8
 DWORD CALL_LoadIPLInstance   =                                     0x538090;
@@ -376,8 +250,24 @@ DWORD JMP_RETN_Cancelled_CPopulation_ConvertToDummyObject = 0x614715;
 DWORD JMP_CEntity_IsOnScreen_FixObjectsScale = 0x53457C;
 
 #define HOOKPOS_CEventVehicleDamageCollision                    0x6A7657
-DWORD CALL_CEventDamageCollision = 0x6A765D;
 DWORD JMP_CEventVehicleDamageCollision_RETN = 0x6A765D;
+
+#define HOOKPOS_CEventVehicleDamageCollision_Plane              0x6CC4B3
+DWORD JMP_CEventVehicleDamageCollision_Plane_RETN = 0x6CC4B8;
+
+#define HOOKPOS_CEventVehicleDamageCollision_Bike               0x6B8EC6
+DWORD JMP_CEventVehicleDamageCollision_Bike_RETN = 0x6B8ECC;
+
+#define HOOKPOS_CClothes_RebuildPlayer                      0x5A82C0
+DWORD RETURN_CClothes_RebuildPlayera                        = 0x5A82C8;
+DWORD RETURN_CClothes_RebuildPlayerb                        = 0x5A837F;
+
+#define HOOKPOS_CProjectileInfo_FindPlayerPed               0x739321
+#define HOOKPOS_CProjectileInfo_FindPlayerVehicle           0x739570
+
+#define HOOKPOS_CHeli_ProcessHeliKill                       0x6DB201
+DWORD RETURN_CHeli_ProcessHeliKill_RETN_Cancel = 0x6DB9E0;
+DWORD RETURN_CHeli_ProcessHeliKill_RETN_Cont_Zero = 0x6DB207;
 
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
@@ -421,6 +311,7 @@ PostContextSwitchHandler* m_pPostContextSwitchHandler = NULL;
 PreWeaponFireHandler* m_pPreWeaponFireHandler = NULL;
 PostWeaponFireHandler* m_pPostWeaponFireHandler = NULL;
 BulletImpactHandler* m_pBulletImpactHandler = NULL;
+BulletFireHandler* m_pBulletFireHandler = NULL;
 DamageHandler* m_pDamageHandler = NULL;
 FireHandler* m_pFireHandler = NULL;
 ProjectileHandler* m_pProjectileHandler = NULL;
@@ -434,11 +325,13 @@ Render3DStuffHandler * m_pRender3DStuffHandler = NULL;
 PreWorldProcessHandler * m_pPreWorldProcessHandler = NULL;
 PostWorldProcessHandler * m_pPostWorldProcessHandler = NULL;
 IdleHandler * m_pIdleHandler = NULL;
+PreFxRenderHandler * m_pPreFxRenderHandler = NULL;
+PreHudRenderHandler * m_pPreHudRenderHandler = NULL;
 AddAnimationHandler* m_pAddAnimationHandler = NULL;
 BlendAnimationHandler* m_pBlendAnimationHandler = NULL;
 ProcessCollisionHandler* m_pProcessCollisionHandler = NULL;
 VehicleCollisionHandler* m_pVehicleCollisionHandler = NULL;
-
+HeliKillHandler* m_pHeliKillHandler = NULL;
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
 
@@ -527,21 +420,13 @@ void HOOK_VehColCB ();
 void HOOK_VehCol ();
 void HOOK_isVehDriveTypeNotRWD ();
 void HOOK_isVehDriveTypeNotFWD ();
-void HOOK_PreHUDRender();
+void HOOK_PreFxRender ();
+void HOOK_PreHUDRender ();
 
 void HOOK_CTrafficLights_GetPrimaryLightState ();
 void HOOK_CTrafficLights_GetSecondaryLightState ();
 
 void HOOK_CAutomobile__ProcessSwingingDoor ();
-
-void HOOK_ProcessVehicleCollision ();
-void HOOK_LoadingPlayerImgDir ();
-void HOOK_CallCStreamingInfoAddToList ();
-void HOOK_CStreamingLoadRequestedModels ();
-
-void HOOK_CRenderer_SetupEntityVisibility ();
-void HOOK_CWorldScan_ScanWorld ();
-void HOOK_CVisibilityPlugins_CalculateFadingAtomicAlpha ();
 
 void vehicle_lights_init ();
 
@@ -569,6 +454,15 @@ void HOOK_CEntity_IsOnScreen_FixObjectScale ();
 
 void HOOK_CEventVehicleDamageCollision ( );
 
+void HOOK_CEventVehicleDamageCollision_Plane ( );
+
+void HOOK_CEventVehicleDamageCollision_Bike ( );
+
+void HOOK_CClothes_RebuildPlayer ();
+
+void HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlayerVehicle ();
+
+void HOOK_CHeli_ProcessHeliKill ();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -681,69 +575,24 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8 );
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
     HookInstall(HOOKPOS_CPhysical_ProcessCollisionSectorList, (DWORD)HOOK_CPhysical_ProcessCollisionSectorList, 7 );
-    HookInstall(HOOKPOS_CrashFix_Misc1, (DWORD)HOOK_CrashFix_Misc1, 6 );
-    HookInstall(HOOKPOS_CrashFix_Misc2, (DWORD)HOOK_CrashFix_Misc2, 9 );
-    HookInstall(HOOKPOS_CrashFix_Misc3, (DWORD)HOOK_CrashFix_Misc3, 6 );
-    HookInstall(HOOKPOS_CrashFix_Misc4, (DWORD)HOOK_CrashFix_Misc4, 5 );
-    HookInstall(HOOKPOS_CrashFix_Misc5, (DWORD)HOOK_CrashFix_Misc5, 7 );
-    HookInstall(HOOKPOS_CrashFix_Misc6, (DWORD)HOOK_CrashFix_Misc6, 5 );
-    HookInstall(HOOKPOS_CrashFix_Misc7, (DWORD)HOOK_CrashFix_Misc7, 5 );
-    HookInstall(HOOKPOS_CrashFix_Misc8, (DWORD)HOOK_CrashFix_Misc8, 5 );
-    HookInstall(HOOKPOS_CrashFix_Misc9, (DWORD)HOOK_CrashFix_Misc9, 6 );
-    HookInstall(HOOKPOS_CrashFix_Misc10, (DWORD)HOOK_CrashFix_Misc10, 6 );
-    HookInstall(HOOKPOS_CrashFix_Misc11, (DWORD)HOOK_CrashFix_Misc11, 5 );
-    HookInstall(HOOKPOS_CrashFix_Misc12, (DWORD)HOOK_CrashFix_Misc12, 5 );
-    HookInstall(HOOKPOS_CrashFix_Misc13, (DWORD)HOOK_CrashFix_Misc13, 6 );
-    HookInstall(HOOKPOS_CrashFix_Misc14, (DWORD)HOOK_CrashFix_Misc14, 6 );
     if ( version == VERSION_US_10 )
     {
-        HookInstall(HOOKPOS_FreezeFix_Misc15_US, (DWORD)HOOK_FreezeFix_Misc15, 6 );
-        HookInstall(HOOKPOS_CrashFix_Misc17_US, (DWORD)HOOK_CrashFix_Misc17, 6 );
-        HookInstall(HOOKPOS_CrashFix_Misc19_US, (DWORD)HOOK_CrashFix_Misc19, 6 );
-        HookInstall(HOOKPOS_CrashFix_Misc24_US, (DWORD)HOOK_CrashFix_Misc24, 6 );
         HookInstall(HOOKPOS_CheckAnimMatrix_US, (DWORD)HOOK_CheckAnimMatrix, 5 );
-        HookInstall(HOOKPOS_CStreamingLoadRequestedModels_US, (DWORD)HOOK_CStreamingLoadRequestedModels, 5 );
-        RETURN_FreezeFix_Misc15_BOTH = RETURN_FreezeFix_Misc15_US;
-        RETURN_CrashFix_Misc17a_BOTH = RETURN_CrashFix_Misc17a_US;
-        RETURN_CrashFix_Misc17b_BOTH = RETURN_CrashFix_Misc17b_US;
-        RETURN_CrashFix_Misc19a_BOTH = RETURN_CrashFix_Misc19a_US;
-        RETURN_CrashFix_Misc19b_BOTH = RETURN_CrashFix_Misc19b_US;
-        RETURN_CrashFix_Misc24_BOTH = RETURN_CrashFix_Misc24_US;
         RETURN_CheckAnimMatrix_BOTH = RETURN_CheckAnimMatrix_US;
-        RETURN_CStreamingLoadRequestedModelsa_BOTH = RETURN_CStreamingLoadRequestedModelsa_US;
-        RETURN_CStreamingLoadRequestedModelsb_BOTH = RETURN_CStreamingLoadRequestedModelsb_US;
+        RETURN_PreFxRender_BOTH = RETURN_PreFxRender_US;
     }
     if ( version == VERSION_EU_10 )
     {
-        HookInstall(HOOKPOS_FreezeFix_Misc15_EU, (DWORD)HOOK_FreezeFix_Misc15, 6 );
-        HookInstall(HOOKPOS_CrashFix_Misc17_EU, (DWORD)HOOK_CrashFix_Misc17, 6 );
-        HookInstall(HOOKPOS_CrashFix_Misc19_EU, (DWORD)HOOK_CrashFix_Misc19, 6 );
-        HookInstall(HOOKPOS_CrashFix_Misc24_EU, (DWORD)HOOK_CrashFix_Misc24, 6 );
         HookInstall(HOOKPOS_CheckAnimMatrix_EU, (DWORD)HOOK_CheckAnimMatrix, 5 );
-        HookInstall(HOOKPOS_CStreamingLoadRequestedModels_EU, (DWORD)HOOK_CStreamingLoadRequestedModels, 5 );
-        RETURN_FreezeFix_Misc15_BOTH = RETURN_FreezeFix_Misc15_EU;
-        RETURN_CrashFix_Misc17a_BOTH = RETURN_CrashFix_Misc17a_EU;
-        RETURN_CrashFix_Misc17b_BOTH = RETURN_CrashFix_Misc17b_EU;
-        RETURN_CrashFix_Misc19a_BOTH = RETURN_CrashFix_Misc19a_EU;
-        RETURN_CrashFix_Misc19b_BOTH = RETURN_CrashFix_Misc19b_EU;
-        RETURN_CrashFix_Misc24_BOTH = RETURN_CrashFix_Misc24_EU;
         RETURN_CheckAnimMatrix_BOTH = RETURN_CheckAnimMatrix_EU;
-        RETURN_CStreamingLoadRequestedModelsa_BOTH = RETURN_CStreamingLoadRequestedModelsa_EU;
-        RETURN_CStreamingLoadRequestedModelsb_BOTH = RETURN_CStreamingLoadRequestedModelsb_EU;
+        RETURN_PreFxRender_BOTH = RETURN_PreFxRender_EU;
     }
-    HookInstall(HOOKPOS_CrashFix_Misc16, (DWORD)HOOK_CrashFix_Misc16, 6 );
-    HookInstall(HOOKPOS_CrashFix_Misc18, (DWORD)HOOK_CrashFix_Misc18, 7 );
-    HookInstall(HOOKPOS_CrashFix_Misc20, (DWORD)HOOK_CrashFix_Misc20, 6 );
-    HookInstall(HOOKPOS_CrashFix_Misc21, (DWORD)HOOK_CrashFix_Misc21, 6 );
-    HookInstall(HOOKPOS_CrashFix_Misc22, (DWORD)HOOK_CrashFix_Misc22, 6 );
-    HookInstall(HOOKPOS_CrashFix_Misc23, (DWORD)HOOK_CrashFix_Misc23, 7 );
 
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29 );
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9 );
+    HookInstall(HOOKPOS_PreFxRender, (DWORD)HOOK_PreFxRender, 5 );
     HookInstall(HOOKPOS_PreHUDRender, (DWORD)HOOK_PreHUDRender, 5 );
     HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7 );
-    HookInstall(HOOKPOS_LoadingPlayerImgDir, (DWORD)HOOK_LoadingPlayerImgDir, 5 );
-    HookInstall(HOOKPOS_CallCStreamingInfoAddToList, (DWORD)HOOK_CallCStreamingInfoAddToList, 5 );
 
     HookInstall(HOOKPOS_CHandlingData_isNotRWD, (DWORD)HOOK_isVehDriveTypeNotRWD, 7 );
     HookInstall(HOOKPOS_CHandlingData_isNotFWD, (DWORD)HOOK_isVehDriveTypeNotFWD, 7 );
@@ -783,10 +632,24 @@ void CMultiplayerSA::InitHooks()
     HookInstall ( HOOKPOS_CWorld_ADD_CPopulation_ConvertToDummyObject, (DWORD)HOOK_CWorld_Add_CPopulation_ConvertToDummyObject, 6 );
     
     HookInstall ( HOOKPOS_ConvertToObject_CPopulationManageDummy, (DWORD)HOOK_ConvertToObject_CPopulationManageDummy, 6 );
+    // End of building removal hooks
 
+    // Vehicle Collision Event Hooks
     HookInstall ( HOOKPOS_CEventVehicleDamageCollision, (DWORD)HOOK_CEventVehicleDamageCollision, 6 );
 
-    // End of building removal hooks
+    HookInstall ( HOOKPOS_CEventVehicleDamageCollision_Plane, (DWORD)HOOK_CEventVehicleDamageCollision_Plane, 5 );
+
+    HookInstall ( HOOKPOS_CEventVehicleDamageCollision_Bike, (DWORD)HOOK_CEventVehicleDamageCollision_Bike, 6 );
+    // End of Vehicle Collision Event Hooks
+
+    // Spider CJ fix
+    HookInstall ( HOOKPOS_CClothes_RebuildPlayer, (DWORD)HOOK_CClothes_RebuildPlayer, 8 );
+
+    // Fix for projectiles firing too fast locally.
+    HookInstallCall ( (DWORD)HOOKPOS_CProjectileInfo_FindPlayerPed, (DWORD)HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlayerVehicle );
+    HookInstallCall ( (DWORD)HOOKPOS_CProjectileInfo_FindPlayerVehicle, (DWORD)HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlayerVehicle );
+
+    HookInstall( (DWORD)HOOKPOS_CHeli_ProcessHeliKill, (DWORD)HOOK_CHeli_ProcessHeliKill, 6);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -981,7 +844,12 @@ void CMultiplayerSA::InitHooks()
     MemSet ( (LPVOID)0x6B5B17, 0x90, 6 );
 
     // Increase VehicleStruct pool size
-    MemPut < BYTE > ( 0x5B8FE4, 0x7F );
+    MemPut < BYTE > ( 0x5B8342 + 0, 0x33 );     // xor eax, eax
+    MemPut < BYTE > ( 0x5B8342 + 1, 0xC0 );
+    MemPut < BYTE > ( 0x5B8342 + 2, 0xB0 );     // mov al, 0xFF
+    MemPut < BYTE > ( 0x5B8342 + 3, 0xFF );
+    MemPut < BYTE > ( 0x5B8342 + 4, 0x8B );     // mov edi, eax
+    MemPut < BYTE > ( 0x5B8342 + 5, 0xF8 );
     
     /*
     // CTaskSimpleCarDrive: Swaps driveby for gang-driveby for drivers
@@ -1316,6 +1184,13 @@ void CMultiplayerSA::InitHooks()
 
     // Avoid GTA setting vehicle first color to white after changing the paintjob
     MemSet ( (void *)0x6D65C5, 0x90, 11 );
+	
+	// Disable GTA vehicle detachment at rotation awkwardness
+    MemPut < BYTE > ( 0x547441, 0xE9 );
+    MemPut < BYTE > ( 0x547442, 0xFA );
+    MemPut < BYTE > ( 0x547443, 0x02 );
+    MemPut < BYTE > ( 0x547444, 0x00 );
+    MemPut < BYTE > ( 0x547445, 0x00 );
 
     // Disable idle cam
     MemPut < BYTE > ( 0x522C80, 0xC3 );
@@ -1466,11 +1341,16 @@ void CMultiplayerSA::InitHooks()
     // Double the size of CPlaceable matrix array to fix a crash after CMatrixLinkList::AddToList1
     MemPut < int > ( 0x54F3A1, 1800 );
 
-    SetSuspensionEnabled ( false );
+    SetSuspensionEnabled ( true );
 
     // Aircraft Max Height checks are at 0x6D2614 and 0x6D2625 edit the check to use our own float.
     MemPut ( 0x6D2614, &m_fAircraftMaxHeight );
     MemPut ( 0x6D2625, &m_fAircraftMaxHeight );
+
+    InitHooks_CrashFixHacks ();
+
+    // Init our 1.3 hooks.
+    Init_13 ();
 }
 
 
@@ -1646,9 +1526,17 @@ void CMultiplayerSA::DisableZoneNames ( bool bDisabled )
 void CMultiplayerSA::DisableBirds ( bool bDisabled )
 {
     if ( bDisabled )
+    {
+        // return out of render and update to make sure birds already created aren't rendered at least.. also no point in calling render if there is nothing to render I guess
+        MemPut < BYTE > ( 0x712810, 0xC3 );
         MemPut < BYTE > ( 0x712330, 0xC3 );
+    }
     else
+    {
+        // restore previous first bytes render and update to normal
+        MemPut < BYTE > ( 0x712810, 0x64 );
         MemPut < BYTE > ( 0x712330, 0xA1 );
+    }
 }
 
 void CMultiplayerSA::DisableQuickReload ( bool bDisabled )
@@ -2076,6 +1964,16 @@ void CMultiplayerSA::SetIdleHandler ( IdleHandler * pHandler )
     m_pIdleHandler = pHandler;
 }
 
+void CMultiplayerSA::SetPreFxRenderHandler ( PreFxRenderHandler * pHandler )
+{
+    m_pPreFxRenderHandler = pHandler;
+}
+
+void CMultiplayerSA::SetPreHudRenderHandler ( PreHudRenderHandler * pHandler )
+{
+    m_pPreHudRenderHandler = pHandler;
+}
+
 void CMultiplayerSA::SetAddAnimationHandler ( AddAnimationHandler * pHandler )
 {
     m_pAddAnimationHandler = pHandler;
@@ -2090,9 +1988,15 @@ void CMultiplayerSA::SetProcessCollisionHandler ( ProcessCollisionHandler * pHan
 {
     m_pProcessCollisionHandler = pHandler;
 }
+
 void CMultiplayerSA::SetVehicleCollisionHandler ( VehicleCollisionHandler * pHandler )
 {
     m_pVehicleCollisionHandler = pHandler;
+}
+
+void CMultiplayerSA::SetHeliKillHandler ( HeliKillHandler * pHandler )
+{
+    m_pHeliKillHandler = pHandler;
 }
 void CMultiplayerSA::HideRadar ( bool bHide )
 {
@@ -3349,6 +3253,7 @@ void _declspec(naked) HOOK_CObject_PostRender ()
         pushad
     }
 
+    TIMING_CHECKPOINT( "-ObjRndr" );
     RestoreAlphaValues ( );
 
     _asm
@@ -3368,6 +3273,7 @@ void _declspec(naked) HOOK_CObject_Render ()
         pushad 
     }
 
+    TIMING_CHECKPOINT( "+ObjRndr" );
     SetObjectAlpha ( );
 
     _asm
@@ -3660,6 +3566,11 @@ void CMultiplayerSA::SetBulletImpactHandler ( BulletImpactHandler* pHandler )
     m_pBulletImpactHandler = pHandler;
 }
 
+void CMultiplayerSA::SetBulletFireHandler ( BulletFireHandler* pHandler )
+{
+    m_pBulletFireHandler = pHandler;
+}
+
 void CMultiplayerSA::Reset ( void )
 {
     bHideRadar = false;
@@ -3722,6 +3633,8 @@ void CMultiplayerSA::ConvertMatrixToEulerAngles ( const CMatrix& Matrix, float& 
 
 void CMultiplayerSA::RebuildMultiplayerPlayer ( CPed * player )
 {
+    TIMING_CHECKPOINT( "+RebuldMulplrPlr" );
+
     CPlayerPed* playerPed = dynamic_cast < CPlayerPed* > ( player );
     CRemoteDataStorageSA * data = NULL;
 
@@ -3749,6 +3662,7 @@ void CMultiplayerSA::RebuildMultiplayerPlayer ( CPed * player )
         MemCpyFast ( (void *)0xb79000, &localStats.StatTypesInt, sizeof(int) * MAX_INT_STATS );
         MemCpyFast ( (void *)0xb78f10, &localStats.StatReactionValue, sizeof(float) * MAX_REACTION_STATS );
     }
+    TIMING_CHECKPOINT( "-RebuldMulplrPlr" );
 }
 
 
@@ -4487,6 +4401,7 @@ void _declspec(naked) HOOK_CGame_Process ()
         pushad
     }
 
+    TIMING_CHECKPOINT( "+CWorld_Process" );
     if ( m_pPreWorldProcessHandler ) m_pPreWorldProcessHandler ();
 
     _asm
@@ -4498,6 +4413,7 @@ void _declspec(naked) HOOK_CGame_Process ()
     }
 
     if ( m_pPostWorldProcessHandler ) m_pPostWorldProcessHandler ();
+    TIMING_CHECKPOINT( "-CWorld_Process" );
 
     _asm
     {
@@ -4510,13 +4426,18 @@ void _declspec(naked) HOOK_CGame_Process ()
 DWORD CALL_CGame_Process = 0x53BEE0;
 void _declspec(naked) HOOK_Idle ()
 {
+    TIMING_CHECKPOINT( "+CGame_Process" );
     _asm
     {
         call    CALL_CGame_Process
         pushad
     }
 
+    TIMING_CHECKPOINT( "-CGame_Process" );
+
+    TIMING_CHECKPOINT( "+Idle" );
     if ( m_pIdleHandler ) m_pIdleHandler ();
+    TIMING_CHECKPOINT( "-Idle" );
 
     _asm
     {
@@ -4525,6 +4446,50 @@ void _declspec(naked) HOOK_Idle ()
         jmp     RETURN_Idle
     }
 }
+
+
+// Hooked from 0049E650 5 bytes
+void _declspec(naked) HOOK_PreFxRender ()
+{
+    _asm
+    {
+        pushad
+        mov     eax,[esp+32+4*2]
+        cmp     eax,0
+        jne skip
+    }
+
+    if ( m_pPreFxRenderHandler )
+        m_pPreFxRenderHandler ();
+
+    _asm
+    {
+skip:
+        popad
+        jmp     RETURN_PreFxRender_BOTH  // 00404D1E / 00405855
+    }
+}
+
+
+// Hooked from 0053EAD8  5 bytes
+void _declspec(naked) HOOK_PreHUDRender ()
+{
+    _asm
+    {
+        pushad
+    }
+
+    if ( m_pPreHudRenderHandler )
+        m_pPreHudRenderHandler ();
+
+    _asm
+    {
+        popad
+        mov     eax, ds:0B6F0B8h
+        jmp     RETURN_PreHUDRender  // 0053EADD
+    }
+}
+
 
 // ---------------------------------------------------
 
@@ -5301,643 +5266,6 @@ void _declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList ()
     }
 }
 
-//
-// Test macros for CrashFixes
-//
-#ifdef MTA_DEBUG
-
-#define SIMULATE_ERROR_BEGIN( chance ) \
-{ \
-    _asm { pushad } \
-    if ( rand() % 100 < (chance) ) \
-    { \
-        _asm popad
-
-
-#define SIMULATE_ERROR_END \
-        _asm pushad \
-    } \
-    _asm popad \
-}
-
-#endif
-
-#define TEST_CRASH_FIXES 0
-
-
-//
-// Support for crash stats
-//
-void OnCrashAverted ( uint uiId );
-
-void _cdecl CrashAverted ( DWORD id )
-{
-    OnCrashAverted ( id );
-}
-
-#define CRASH_AVERTED(id) \
-    } \
-    _asm pushad \
-    _asm mov eax, id \
-    _asm push eax \
-    _asm call CrashAverted \
-    _asm add esp, 4 \
-    _asm popad \
-    _asm \
-    {
-
-
-
-void _declspec(naked) HOOK_CrashFix_Misc1 ()
-{
-    _asm
-    {
-        // Hooked from 0x5D9A6E
-        mov     eax,dword ptr [esp+18h]
-        test    eax,eax 
-        je      cont
-
-        mov     eax,dword ptr ds:[008D12CCh] 
-        mov     ecx,dword ptr [eax+esi]     // If [eax+esi] is 0, it causes a crash
-        test    ecx,ecx
-        jne     cont
-        CRASH_AVERTED( 1 )
-    cont:
-        jmp     RETURN_CrashFix_Misc1   // 0x5D9A74
-    }
-}
-
-
-void _declspec(naked) HOOK_CrashFix_Misc2 ()
-{
-    _asm
-    {
-        // Hooked from 006B18B0
-        test    eax,eax 
-        je      cont        // Skip much code if eax is zero (vehicle has no colmodel)
-
-        mov     eax,dword ptr [eax+2Ch] 
-        mov     cl,byte ptr [esi+429h]
-        jmp     RETURN_CrashFix_Misc2a
-    cont:
-        CRASH_AVERTED( 2 )
-        jmp     RETURN_CrashFix_Misc2b
-    }
-}
-
-
-void _declspec(naked) HOOK_CrashFix_Misc3 ()
-{
-    _asm
-    {
-        // Hooked from 00645FD9
-        test    ecx,ecx 
-        je      cont        // Skip much code if ecx is zero (ped has no something)
-
-        mov     edx,dword ptr [ecx+384h]
-        jmp     RETURN_CrashFix_Misc3
-    cont:
-        CRASH_AVERTED( 3 )
-        jmp     CPlayerPed__ProcessControl_Abort
-    }
-}
-
-
-void _declspec(naked) HOOK_CrashFix_Misc4 ()
-{
-    _asm
-    {
-        // Hooked from 004F02D2
-        test    ecx,ecx 
-        je      cont        // Skip much code if ecx is zero (avoid divide by zero in soundmanager::service)
-
-        cdq  
-        idiv    ecx  
-        add     edx, ebp  
-        jmp     RETURN_CrashFix_Misc4a
-    cont:
-        CRASH_AVERTED( 4 )
-        jmp     RETURN_CrashFix_Misc4b
-    }
-}
-
-
-void _declspec(naked) HOOK_CrashFix_Misc5 ()
-{
-    _asm
-    {
-        // Hooked from 005DF949
-        mov     edi, dword ptr [ecx*4+0A9B0C8h]
-        mov     edi, dword ptr [edi+5Ch]     
-        test    edi, edi 
-        je      cont        // Skip much code if edi is zero (ped has no model)
-
-        mov     edi, dword ptr [ecx*4+0A9B0C8h]
-        jmp     RETURN_CrashFix_Misc5a  // 005DF950
-    cont:
-        CRASH_AVERTED( 5 )
-        pop edi
-        jmp     RETURN_CrashFix_Misc5b  // 005DFCC4
-    }
-}
-
-
-// #5465 2/2
-void _declspec(naked) HOOK_CrashFix_Misc6 ()
-{
-    _asm
-    {
-        // Hooked from 4D1750  5 bytes
-        test    ecx, ecx 
-        je      cont        // Skip much code if ecx is zero (ped has no anim something)
-
-        mov     eax, dword ptr [ecx+10h]
-        test    eax, eax
-        jmp     RETURN_CrashFix_Misc6a  // 004D1755
-    cont:
-        CRASH_AVERTED( 6 )
-        jmp     RETURN_CrashFix_Misc6b  // 004D1A44
-    }
-}
-
-
-// #5466
-void _declspec(naked) HOOK_CrashFix_Misc7 ()
-{
-    _asm
-    {
-        // Hooked from 417BF8  5 bytes
-        test    ecx, ecx 
-        je      cont        // Skip much code if ecx is zero (no colmodel)
-
-        mov     esi, dword ptr [ecx+2Ch] 
-        test    esi, esi
-        jmp     RETURN_CrashFix_Misc7a  // 417BFD
-    cont:
-        CRASH_AVERTED( 7 )
-        jmp     RETURN_CrashFix_Misc7b  // 417BFF
-    }
-}
-
-
-// #5468  1/3
-void _declspec(naked) HOOK_CrashFix_Misc8 ()
-{
-    _asm
-    {
-        // Hooked from 73485D  5 bytes
-        test    ecx, ecx 
-        je      cont        // Skip much code if ecx is zero (no 2d effect plugin)
-
-        mov     ecx, dword ptr [edx+ecx] 
-        test    ecx, ecx 
-        jmp     RETURN_CrashFix_Misc8a  // 734862
-    cont:
-        CRASH_AVERTED( 8 )
-        jmp     RETURN_CrashFix_Misc8b  // 734871
-    }
-}
-
-
-// #5468  2/3
-void _declspec(naked) HOOK_CrashFix_Misc9 ()
-{
-    _asm
-    {
-        // Hooked from 738B64  6 bytes
-        test    esi, esi 
-        je      cont        // Skip much code if esi is zero (invalid projectile)
-
-        mov     eax, dword ptr [esi+40h] 
-        test    ah, 1
-        jmp     RETURN_CrashFix_Misc9a  // 738B6A
-    cont:
-        CRASH_AVERTED( 9 )
-        jmp     RETURN_CrashFix_Misc9b  // 73983A
-    }
-}
-
-
-// #5468  3/3
-void _declspec(naked) HOOK_CrashFix_Misc10 ()
-{
-    _asm
-    {
-        // Hooked from 5334FE  6 bytes
-        cmp     ecx, 0x80
-        jb      cont  // Skip much code if ecx is small (invalid vector pointer)
-
-        mov     edx, dword ptr [ecx] 
-        mov     dword ptr [esp], edx
-        jmp     RETURN_CrashFix_Misc10a  // 533504
-    cont:
-        CRASH_AVERTED( 10 )
-        mov     ecx, dword ptr [esp+1Ch]
-        mov     dword ptr [ecx],0
-        mov     dword ptr [ecx+4],0
-        mov     dword ptr [ecx+8],0
-        jmp     RETURN_CrashFix_Misc10b  //533539
-    }
-}
-
-
-// #5576
-void _declspec(naked) HOOK_CrashFix_Misc11 ()
-{
-    _asm
-    {
-        // Hooked from 0x4D2C62  5 bytes
-        test    ecx, ecx 
-        je      cont  // Skip much code if ecx is zero (invalid anim somthing)
-
-        mov     eax, dword ptr [ecx+10h] 
-        test    eax, eax 
-        jmp     RETURN_CrashFix_Misc11a  // 4D2C67
-    cont:
-        CRASH_AVERTED( 11 )
-        jmp     RETURN_CrashFix_Misc11b  // 4D2E03
-    }
-}
-
-
-// #5530
-void _declspec(naked) HOOK_CrashFix_Misc12 ()
-{
-    _asm
-    {
-        // Hooked from 0x4D41C5  5 bytes
-        test    edi, edi 
-        je      cont  // Skip much code if edi is zero (invalid anim somthing)
-
-        mov     al, byte ptr [edi+0Bh] 
-        test    al, al 
-        jmp     RETURN_CrashFix_Misc12a  // 4D41CA
-    cont:
-        CRASH_AVERTED( 12 )
-        jmp     RETURN_CrashFix_Misc12b  // 4D4222
-    }
-}
-
-
-void _declspec(naked) HOOK_CrashFix_Misc13 ()
-{
-    _asm
-    {
-        // Hooked from 0x4D464E  6 bytes
-        cmp     eax, 0x2480
-        jb      cont  // Skip much code if eax is less than 0x480 (invalid anim)
-
-        mov     al, byte ptr [eax+0Ah] 
-        shr     al, 5
-        jmp     RETURN_CrashFix_Misc13a  // 4D4654
-    cont:
-        CRASH_AVERTED( 13 )
-        jmp     RETURN_CrashFix_Misc13b  // 4D478c
-    }
-}
-
-
-// hooked at 4DD4B5
-void _declspec(naked) HOOK_CrashFix_Misc14 ()
-{
-    _asm
-    {
-        mov     eax, dword ptr ds:[0BD00F8h]
-        cmp     eax, 0
-        je      cont  // Skip much code if eax is zero ( Audio event volumes table not initialized )
-
-        sub     esp, 0D4h
-        jmp     RETURN_CrashFix_Misc14  // 4DD4BB
-    cont:
-        CRASH_AVERTED( 14 )
-        add     esp, 12
-        retn    12
-    }
-}
-
-
-void _cdecl DoWait ( HANDLE hHandle )
-{
-    DWORD dwWait = 4000;
-    DWORD dwResult = WaitForSingleObject ( hHandle, dwWait );
-    if ( dwResult == WAIT_TIMEOUT )
-    {
-        AddReportLog ( 6211, SString ( "WaitForSingleObject timed out with %08x and %dms", hHandle, dwWait ) );
-        // This thread lock bug in GTA will have to be fixed one day.
-        // Until then, a 5 second freeze should be long enough for the loading thread to have finished it's job.
-#if 0
-        _wassert ( _CRT_WIDE("\
-            Press IGNORE  ('I' Key) \n\
-            Press IGNORE  ('I' Key) \n\
-            Press IGNORE  ('I' Key) \n\
-            Press IGNORE  ('I' Key) \n\
-            ")
-         , _CRT_WIDE(__FILE__), __LINE__);
-#endif
-        dwResult = WaitForSingleObject ( hHandle, 1000 );
-    }
-}
-
-// hooked at 0156CDAE - 6 bytes
-void _declspec(naked) HOOK_FreezeFix_Misc15 ()
-{
-    _asm
-    {
-        pop eax
-        pop edx
-        pushad
-
-        push eax
-        call DoWait
-        add esp, 4
-
-        popad
-        jmp     RETURN_FreezeFix_Misc15_BOTH  // 156CDB4
-    }
-}
-
-
-// Handle RpAnimBlendClumpGetFirstAssociation returning NULL
-// hooked at 5E5815 6 bytes
-void _declspec(naked) HOOK_CrashFix_Misc16 ()
-{
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 10 )
-        _asm
-        {
-            mov     eax, 0
-        }
-    SIMULATE_ERROR_END
-#endif
-
-    _asm
-    {
-        cmp     eax, 0
-        je      cont  // Skip much code if eax is zero ( RpAnimBlendClumpGetFirstAssociation returns NULL )
-
-        // continue standard path
-        movsx   ecx, word ptr [eax+2Ch]
-        xor     edi, edi
-        jmp     RETURN_CrashFix_Misc16  // 5E581B
-
-    cont:
-        CRASH_AVERTED( 16 )
-        add     esp, 96
-        retn
-    }
-}
-
-
-// Handle RwFrameSetStaticPluginsSize having NULL member at 0x90
-// hooked at 7F120E/7F124E 6 bytes
-void _declspec(naked) HOOK_CrashFix_Misc17 ()
-{
-    _asm
-    {
-        cmp     eax, 0
-        je      cont  // Skip much code if eax is zero
-
-        // continue standard path
-        mov     eax, [eax+90h]
-        jmp     RETURN_CrashFix_Misc17a_BOTH  // 7F1214/7F1254
-
-    cont:
-        CRASH_AVERTED( 17 )
-        jmp     RETURN_CrashFix_Misc17b_BOTH  // 7F1236/7F1276
-    }
-}
-
-
-// Handle GetWheelPosition having wrong data
-// hooked at 4C7DAD 7 bytes
-void _declspec(naked) HOOK_CrashFix_Misc18 ()
-{
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 10 )
-        _asm
-        {
-            mov     ebp, 0
-        }
-    SIMULATE_ERROR_END
-#endif
-
-    _asm
-    {
-        cmp     ebp, 0
-        je      cont  // Skip much code if ebp is zero
-
-        // continue standard path
-        mov         edx,dword ptr [ebp+40h] 
-        mov         eax,dword ptr [esp+10h] 
-        jmp     RETURN_CrashFix_Misc18  // 4C7DB4
-
-    cont:
-        CRASH_AVERTED( 18 )
-        mov         edx,0 
-        mov         eax,dword ptr [esp+10h]
-        mov         dword ptr [eax],edx 
-        mov         dword ptr [eax+4],edx 
-        pop         esi  
-        mov         dword ptr [eax+8],edx 
-        pop         ebp  
-        ret         0Ch  
-    }
-}
-
-
-
-// Handle RwFrameCloneHierarchy having wrong data
-// hooked at 7F0BF7/7F0C37 6 bytes
-void _declspec(naked) HOOK_CrashFix_Misc19 ()
-{
-    _asm
-    {
-        cmp     esi, 0
-        je      cont  // Skip much code if esi is zero
-
-        // continue standard path
-        mov     eax, [esi+98h] 
-        jmp     RETURN_CrashFix_Misc19a_BOTH  // 7F0BFD/7F0C3D
-
-    cont:
-        CRASH_AVERTED( 19 )
-        mov         edx,dword ptr [ecx+98h] 
-        test        edx,edx
-        jmp     RETURN_CrashFix_Misc19b_BOTH  // 7F0C20/7F0C60
-    }
-}
-
-
-// Handle CPlaceable::RemoveMatrix having wrong data
-// hooked at 54F3B0 6 bytes
-void _declspec(naked) HOOK_CrashFix_Misc20 ()
-{
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 10 )
-        _asm
-        {
-            mov     ecx, 0
-        }
-    SIMULATE_ERROR_END
-#endif
-    _asm
-    {
-        cmp     ecx, 0
-        je      cont        // Skip much code if ecx is zero
-
-        // continue standard path
-        sub     esp, 10h 
-        mov     eax, [ecx+14h] 
-        jmp     RETURN_CrashFix_Misc20      // 54F3B6
-
-    cont:
-        CRASH_AVERTED( 20 )
-        retn
-    }
-}
-
-
-// Handle CTaskSimpleCarFallOut::FinishAnimFallOutCB having wrong data
-// hooked at 648EF6 6 bytes
-void _declspec(naked) HOOK_CrashFix_Misc21 ()
-{
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 10 )
-        _asm
-        {
-            mov     ecx, 0x10
-        }
-    SIMULATE_ERROR_END
-#endif
-
-    _asm
-    {
-        cmp     ecx, 0x480
-        jb      cont  // Skip much code if ecx is low
-
-        // continue standard path
-        mov     edx, [ecx+590h]
-        jmp     RETURN_CrashFix_Misc21  // 648EFC
-
-    cont:
-        CRASH_AVERTED( 21 )
-        retn
-    }
-}
-
-
-
-// Handle CAnimBlendAssociation::Init having wrong data
-// hooked at 4CEF08 6 bytes
-void _declspec(naked) HOOK_CrashFix_Misc22 ()
-{
-    _asm
-    {
-        mov         edx,dword ptr [edi+0Ch] 
-    }
-
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 10 )
-        _asm
-        {
-            mov     edx, 0x10
-        }
-    SIMULATE_ERROR_END
-#endif
-
-    _asm
-    {
-        cmp     edx, 0x480
-        jb      altcode  // Fill output with zeros if edx is low
-
-        // do standard code
-    lp1:
-        mov         edx,dword ptr [edi+0Ch] 
-        mov         edx,dword ptr [edx+eax*4] 
-        mov         ebx,dword ptr [esi+10h] 
-        mov         dword ptr [ebx+ecx+10h],edx 
-        mov         edx,dword ptr [esi+10h] 
-        mov         dword ptr [edx+ecx+14h],esi 
-        movsx       edx,word ptr [esi+0Ch] 
-        inc         eax  
-        add         ecx,18h 
-        cmp         eax,edx 
-        jl          lp1 
-        jmp     RETURN_CrashFix_Misc22  // 4CEF25
-
-        // do alternate code
-    altcode:
-        CRASH_AVERTED( 22 )
-        mov     edx,0
-        mov         ebx,dword ptr [esi+10h] 
-        mov         dword ptr [ebx+ecx+10h],edx 
-        mov         dword ptr [ebx+ecx+14h],edx 
-        movsx       edx,word ptr [esi+0Ch] 
-        inc         eax  
-        add         ecx,18h 
-        cmp         eax,edx 
-        jl          altcode 
-        jmp     RETURN_CrashFix_Misc22  // 4CEF25
-    }
-}
-
-
-// Handle CVehicleAnimGroup::ComputeAnimDoorOffsets having wrong door index
-// hooked at 6E3D10 7 bytes
-void _declspec(naked) HOOK_CrashFix_Misc23 ()
-{
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 10 )
-        _asm
-        {
-            mov     edx,0xffff0000
-            mov     [esp+8], edx
-        }
-    SIMULATE_ERROR_END
-#endif
-
-    _asm
-    {
-        // Ensure door index is reasonable
-        mov     edx, [esp+8]
-        cmp     edx,16
-        jb      ok
-
-        // zero if out of range
-        mov     edx,0
-        mov     [esp+8], edx
-        CRASH_AVERTED( 23 )
-
-    ok:
-        // continue standard path
-        mov     edx, [esp+8]
-        lea     eax, [edx+edx*2]
-        jmp     RETURN_CrashFix_Misc23  // 6E3D17
-    }
-}
-
-
-// Handle _RwFrameForAllChildren being called with NULL
-// hooked at 7F0DC8/7F0E08 6 bytes
-void _declspec(naked) HOOK_CrashFix_Misc24 ()
-{
-    _asm
-    {
-        cmp     ebp, 0x480
-        jb      cont  // Skip code if ebp is low
-
-        // continue standard path
-        mov     eax, [ebp+98h]
-        jmp     RETURN_CrashFix_Misc24_BOTH  // 7F0DCE/7F0E0E
-
-    cont:
-        CRASH_AVERTED( 24 )
-        mov     ebp, 0
-        mov     eax, 0
-        jmp     RETURN_CrashFix_Misc24_BOTH  // 7F0DCE/7F0E0E
-    }
-}
-
 
 // If matrix looks bad, fix it
 void _cdecl CheckMatrix ( float* pMatrix )
@@ -6118,7 +5446,8 @@ bool CheckHasSuspensionChanged ( void )
     {
         // Check our suspension interface has a valid vehicle and return the suspension changed marker
         CVehicle* pVehicle = pSuspensionInterface->m_pVehicle;
-        if ( pVehicle )
+        CModelInfo* pModelInfo = pGameInterface->GetModelInfo ( pVehicle->GetModelIndex () );
+        if ( pVehicle && pModelInfo && ( pModelInfo->IsCar() || pModelInfo->IsMonsterTruck() ) )
             return pVehicle->GetHandlingData()->HasSuspensionChanged ( );
         else
             return false;
@@ -6186,554 +5515,28 @@ void _declspec(naked) HOOK_ProcessVehicleCollision ()
 }
 
 
-void OnPreHUDRender ( void );
-
-void _declspec(naked) HOOK_PreHUDRender ()
-{
-    _asm
-    {
-        pushad
-    }
-        //call PreHUDRender
-    OnPreHUDRender ();
-
-    _asm
-    {
-        popad
-
-        // Hooked from 0053EAD8  5 bytes
-        mov     eax, ds:0B6F0B8h
-
-        jmp     RETURN_PreHUDRender  // 0053EADD
-    }
-}
-
-
 void CMultiplayerSA::SetSuspensionEnabled ( bool bEnabled )
 {
-    if ( bEnabled )
+    //if ( bEnabled )
     {
         // Hook Install
         m_bSuspensionEnabled = true;
         HookInstallCall ( CALL_CAutomobile_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
-        HookInstallCall ( CALL_CBike_ProcessEntityCollision1, (DWORD)HOOK_ProcessVehicleCollision );
-        HookInstallCall ( CALL_CBike_ProcessEntityCollision2, (DWORD)HOOK_ProcessVehicleCollision );
+        //HookInstallCall ( CALL_CBike_ProcessEntityCollision1, (DWORD)HOOK_ProcessVehicleCollision );
+        //HookInstallCall ( CALL_CBike_ProcessEntityCollision2, (DWORD)HOOK_ProcessVehicleCollision );
         HookInstallCall ( CALL_CMonsterTruck_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
     }
-    else
-    {
-        // Hook Uninstall
-        m_bSuspensionEnabled = false;
-        HookInstallCall ( CALL_CAutomobile_ProcessEntityCollision, RETURN_ProcessEntityCollision );
-        HookInstallCall ( CALL_CBike_ProcessEntityCollision1, RETURN_ProcessEntityCollision );
-        HookInstallCall ( CALL_CBike_ProcessEntityCollision2, RETURN_ProcessEntityCollision );
-        HookInstallCall ( CALL_CMonsterTruck_ProcessEntityCollision, RETURN_ProcessEntityCollision );
-    }
+//     else
+//     {
+//         // Hook Uninstall
+//         m_bSuspensionEnabled = false;
+//         HookInstallCall ( CALL_CAutomobile_ProcessEntityCollision, RETURN_ProcessEntityCollision );
+//         HookInstallCall ( CALL_CBike_ProcessEntityCollision1, RETURN_ProcessEntityCollision );
+//         HookInstallCall ( CALL_CBike_ProcessEntityCollision2, RETURN_ProcessEntityCollision );
+//         HookInstallCall ( CALL_CMonsterTruck_ProcessEntityCollision, RETURN_ProcessEntityCollision );
+//     }
 }
 
-
-// Enable caching and faster loading of clothes files
-void CMultiplayerSA::SetFastClothesLoading ( EFastClothesLoading fastClothesLoading )
-{
-    if ( m_FastClothesLoading == fastClothesLoading )
-        return;
-
-    m_FastClothesLoading = fastClothesLoading;
-
-    // Handle auto setting
-    if ( fastClothesLoading == FAST_CLOTHES_AUTO )
-    {
-        // Disable if less than 512MB installed ram
-        long long llSystemRamKB = GetWMITotalPhysicalMemory () / 1024LL;
-        if ( llSystemRamKB > 0 && llSystemRamKB < 512 * 1024 )
-           fastClothesLoading = FAST_CLOTHES_OFF;
-    }
-
-    if ( fastClothesLoading != FAST_CLOTHES_OFF )
-    {
-        // Load and cache player.img
-        SString strGTASAPath = GetCommonRegistryValue ( "", "GTA:SA Path" );
-        SString strFilename = PathJoin ( strGTASAPath, "models", "player.img" );
-        FileLoad ( strFilename, m_PlayerImgCache );
-    }
-    else
-    {
-        // Remove cached data
-        m_PlayerImgCache.clear ();
-    }
-
-    // Update the cache pointer
-    if ( !m_PlayerImgCache.empty () )
-        ms_PlayerImgCachePtr = &m_PlayerImgCache[0];
-    else
-        ms_PlayerImgCachePtr = NULL;
-}
-
-
-//
-// Skip loading the directory data from player.img if it has already been loaded.
-// Speeds up clothes a bit, but is only part of a solution - The actual files from inside player.img are still loaded each time
-//
-bool _cdecl IsPlayerImgDirLoaded ( void )
-{
-    // When player.img dir is loaded, it looks this this:
-    // 0x00BC12C0  00bbcdc8 00000226
-    DWORD* ptr1 = (DWORD*)0x00BC12C0;
-    if ( ptr1[0] == 0x00BBCDC8 && ptr1[1] == 0x0000226 )
-    {
-        return true;
-    }
-    return false;
-}
-
-void _declspec(naked) HOOK_LoadingPlayerImgDir()
-{
-// hook from 005A69E3 5 bytes
-    _asm
-    {
-        pushad
-        call    IsPlayerImgDirLoaded
-        cmp     al, 0
-        jnz     skip
-        popad
-
-        // Standard code to load img directory
-        push    0BBCDC8h 
-        jmp     RETURN_LoadingPlayerImgDira     // 5A69E8
-
-        // Skip loading img directory
-skip:
-        popad
-        jmp     RETURN_LoadingPlayerImgDirb     // 5A6A06
-    }
-}
-
-
-////////////////////////////////////////////////
-//
-// Hook CStreaming::RequestFile
-//
-//
-//
-////////////////////////////////////////////////
-namespace
-{
-    struct SImgGTAItemInfo
-    {
-        ushort    usNext;
-        ushort    usPrev;
-
-        ushort  uiUnknown1;         // Parent ?
-        uchar   uiUnknown2;         // 0x12 when loading, 0x02 when finished loading
-        uchar   ucImgId;
-
-        int     iBlockOffset;
-        int     iBlockCount;
-        uint    uiLoadflag;         // 0-not loaded  2-requested  3-loaded  1-processed
-    };
-
-    int     iReturnFileId;
-    char*   pReturnBuffer;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// If request is for a file inside player.img (imgId 5) and uiLoadflag is 0 or 1
-// then force use of our cached player.img data
-//
-bool _cdecl OnCallCStreamingInfoAddToList ( int flags, SImgGTAItemInfo* pImgGTAInfo )
-{
-    if ( !CMultiplayerSA::ms_PlayerImgCachePtr )
-        return false;
-
-    if ( pImgGTAInfo->ucImgId == 5 )
-    {
-        int iFileId = ((int)pImgGTAInfo - 0x08E4CC0) / 20;
-
-        // Cached enabled setting here as it doesn't usually change
-        static bool bLogClothesLoad = GetDebugIdEnabled ( 501 );
-        if ( bLogClothesLoad )
-        {
-            SString strMessage ( "id:%d np:%04x %04x un1:%08x un2:%08x img:%d os:%d #:%d flg:%d"
-                                    , iFileId
-                                    , pImgGTAInfo->usNext
-                                    , pImgGTAInfo->usPrev
-                                    , pImgGTAInfo->uiUnknown1
-                                    , pImgGTAInfo->uiUnknown2
-                                    , pImgGTAInfo->ucImgId
-                                    , pImgGTAInfo->iBlockOffset
-                                    , pImgGTAInfo->iBlockCount
-                                    , pImgGTAInfo->uiLoadflag
-                                );
-
-            LogEvent ( 501, "Clothes Load", "", strMessage );
-        }
-
-        iReturnFileId = iFileId;
-        pReturnBuffer = CMultiplayerSA::ms_PlayerImgCachePtr + pImgGTAInfo->iBlockOffset * 2048;
-
-        // Update flags
-        pImgGTAInfo->uiLoadflag = 3;
-
-        // TODO - Check ms_numModelsRequested and ms_numPriorityRequests
-
-        // Remove priorty flag, as not counted in ms_numPriorityRequests
-        pImgGTAInfo->uiUnknown2 &= ~ 0x10;
-
-        return true;
-    }
-
-    return false;
-}
-
-
-void _declspec(naked) HOOK_CallCStreamingInfoAddToList()
-{
-// hook from 408962 5 bytes
-    _asm
-    {
-        pushad
-        push    ecx
-        push    ebx
-        call    OnCallCStreamingInfoAddToList
-        add     esp, 4*2
-        cmp     al, 0
-        jnz     skip
-
-        // Continue with standard code
-        popad
-        call    FUNC_CStreamingInfoAddToList
-        jmp     RETURN_CallCStreamingInfoAddToLista     // 408967
-
-
-        // Handle load here
-skip:
-        popad
-        pushad
-
-        mov     eax, 0
-        push    eax
-        mov     eax, iReturnFileId
-        push    eax
-        mov     eax, pReturnBuffer
-        push    eax
-        call    CStreaming__ConvertBufferToObject      // 40C6B0
-        add     esp, 4*3
-
-        popad
-        add     esp, 4*1
-        jmp     RETURN_CallCStreamingInfoAddToListb     // 408990
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-// Return true to skip
-bool _cdecl ShouldSkipLoadRequestedModels ( DWORD calledFrom )
-{
-    if ( !CMultiplayerSA::ms_PlayerImgCachePtr )
-        return false;
-
-    // Skip LoadRequestedModels if called from:
-    //      CClothesBuilder::ConstructGeometryArray      5A55A0 - 5A56B6
-    //      CClothesBuilder::LoadAndPutOnClothes         5A5F70 - 5A6039
-    //      CClothesBuilder::ConstructTextures           5A6040 - 5A6520
-    if ( calledFrom > 0x5A55A0 && calledFrom < 0x5A6520 )
-        return true;
-
-    return false;
-}
-
-
-void _declspec(naked) HOOK_CStreamingLoadRequestedModels()
-{
-// hook from 015670A0/01567090 5 bytes
-    _asm
-    {
-        pushad
-        push    [esp+32+4*0]
-        call    ShouldSkipLoadRequestedModels
-        add     esp, 4*1
-        cmp     al, 0
-        jnz     skip
-
-        // Continue with standard code
-        popad
-        mov     al,byte ptr ds:[008E4A58h]
-        jmp     RETURN_CStreamingLoadRequestedModelsa_BOTH     // 015663B5/015663A5
-
-        // Skip LoadRequestedModels
-skip:
-        popad
-        jmp     RETURN_CStreamingLoadRequestedModelsb_BOTH     // 0156711B/0156710B
-    }
-}
-
-
-////////////////////////////////////////////////
-//
-// CMultiplayerSA::EnableLODSystem
-//
-//
-////////////////////////////////////////////////
-void CMultiplayerSA::SetLODSystemEnabled ( bool bEnable )
-{
-    // Switch
-    if ( m_bEnabledLODSystem == bEnable )
-        return;
-    m_bEnabledLODSystem = bEnable;
-
-    // Memory saved here
-    static CBuffer savedMem;
-    struct {
-        DWORD dwAddress;
-        uint uiSize;
-    } memoryList[] = {  { HOOKPOS_CRenderer_SetupEntityVisibility, 8 },
-                        { HOOKPOS_CWorldScan_ScanWorld, 6 },
-                        { HOOKPOS_CVisibilityPlugins_CalculateFadingAtomicAlpha, 5 } };
-
-    // Enable or not?
-    if ( bEnable )
-    {
-        // Save memory before we blat it
-        CBufferWriteStream stream ( savedMem );
-        for ( uint i = 0 ; i < NUMELMS( memoryList ) ; i++ )
-            stream.WriteBytes ( (void*)memoryList[i].dwAddress, memoryList[i].uiSize );
-
-        // Add hooks and things
-        HookInstall(HOOKPOS_CRenderer_SetupEntityVisibility, (DWORD)HOOK_CRenderer_SetupEntityVisibility, 8 );
-        HookInstall(HOOKPOS_CWorldScan_ScanWorld, (DWORD)HOOK_CWorldScan_ScanWorld, 5 );
-        HookInstall(HOOKPOS_CVisibilityPlugins_CalculateFadingAtomicAlpha, (DWORD)HOOK_CVisibilityPlugins_CalculateFadingAtomicAlpha, 5 );
-    }
-    else
-    {
-        // Restore memory
-        CBufferReadStream stream ( savedMem );
-        for ( uint i = 0 ; i < NUMELMS( memoryList ) ; i++ )
-        {
-            BYTE temp[10];
-            assert ( sizeof(temp) >= memoryList[i].uiSize );
-            stream.ReadBytes ( temp, memoryList[i].uiSize );
-            MemCpy ( (void*)memoryList[i].dwAddress, temp, memoryList[i].uiSize );
-        }
-    }
-}
-
-
-////////////////////////////////////////////////
-//
-// CRenderer_SetupEntityVisibility helpers
-//
-////////////////////////////////////////////////
-namespace
-{
-    #define     ARRAY_ModelInfo                 0xA9B0C8
-    #define     LOW_LOD_DRAW_DISTANCE_SCALE     5
-
-
-    void SetGlobalDrawDistanceScale ( float fValue )
-    {
-        *(float*)0x858FD8 = 300.f * fValue;
-    }
-
-    float GetDrawDistanceSetting ( void )
-    {
-        return *(float*)0xB6F118;
-    }
-
-    float CalculateLowLodFadeAlpha ( CBaseModelInfoSAInterface* pModelInfo, float fDist )
-    {
-        float fModelDrawDistance = pModelInfo->fLodDistanceUnscaled * LOW_LOD_DRAW_DISTANCE_SCALE + 20.f;
-        float fFadeWidth = 20.f + fModelDrawDistance / 50.f;
-        float fFadeFar = fModelDrawDistance;
-        float fFadeNear = fFadeFar - fFadeWidth;
-        return UnlerpClamped ( fFadeFar, fDist, fFadeNear );
-    }
-
-    struct
-    {
-        bool bValid;
-        float fLodDistanceUnscaled;
-        CBaseModelInfoSAInterface* pModelInfo;
-    } saved = { false, 0.f, NULL };
-}
-
-
-////////////////////////////////////////////////
-//
-// CRenderer_SetupEntityVisibility
-//
-////////////////////////////////////////////////
-void OnMY_CRenderer_SetupEntityVisibility_Pre( CEntitySAInterface* pEntity, float& fValue )
-{
-    if ( pEntity->IsLowLodEntity () )
-    {
-        SetGlobalDrawDistanceScale ( LOW_LOD_DRAW_DISTANCE_SCALE * 2 );
-        saved.pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[pEntity->m_nModelIndex];
-        saved.fLodDistanceUnscaled = saved.pModelInfo->fLodDistanceUnscaled;
-        saved.pModelInfo->fLodDistanceUnscaled *= LOW_LOD_DRAW_DISTANCE_SCALE / GetDrawDistanceSetting ();
-        saved.bValid = true;
-    }
-    else
-        saved.bValid = false;
-}
-
-void OnMY_CRenderer_SetupEntityVisibility_Post( int result, CEntitySAInterface* pEntity, float& fDist )
-{
-    if ( saved.bValid )
-    {
-        SetGlobalDrawDistanceScale ( 1 );
-        saved.pModelInfo->fLodDistanceUnscaled = saved.fLodDistanceUnscaled;
-        saved.bValid = false;
-
-        // Doing any distance fading?
-        if ( result == 0 && CalculateLowLodFadeAlpha ( saved.pModelInfo, fDist ) < 1.0f )
-            pEntity->bDistanceFade = 1;
-        else
-            pEntity->bDistanceFade = 0;
-
-        pEntity->SetEntityVisibilityResult ( result );
-    }
-    else
-    if ( pEntity->IsHighLodEntity () )
-    {
-        pEntity->SetEntityVisibilityResult ( result );
-    }
-}
-
-void _declspec(naked) HOOK_CRenderer_SetupEntityVisibility()
-{
-// hook from 554230 8 bytes
-    _asm
-    {
-////////////////////
-        pushad
-        push    [esp+32+4*2]
-        push    [esp+32+4*2]
-        call    OnMY_CRenderer_SetupEntityVisibility_Pre
-        add     esp, 4*2
-        popad
-
-////////////////////
-        push    [esp+4*2]
-        push    [esp+4*2]
-        call    second
-        add     esp, 4*2
-
-////////////////////
-        pushad
-        push    [esp+32+4*2]
-        push    [esp+32+4*2]
-        push    eax
-        call    OnMY_CRenderer_SetupEntityVisibility_Post
-        add     esp, 4*2+4
-        popad
-
-        retn
-
-second:
-        sub     esp,14h 
-        push    esi  
-        mov     esi,dword ptr [esp+1Ch] 
-        jmp     RETURN_CRenderer_SetupEntityVisibility   // 0x554238
-    }
-}
-
-
-////////////////////////////////////////////////
-//
-// CWorldScan_ScanWorld
-//
-////////////////////////////////////////////////
-void OnMY_CWorldScan_ScanWorld_Pre( CVector2D* pVec, int iValue, void (__cdecl *func)(int, int) )
-{
-    // Scale scan area
-    const CVector2D& vecOrigin = pVec[0];
-
-    for ( uint i = 1 ; i < 5 ; i++ )
-    {
-        CVector2D vecDiff = pVec[i] - vecOrigin;
-        vecDiff *= LOW_LOD_DRAW_DISTANCE_SCALE * 2;
-        pVec[i] = vecDiff + vecOrigin;
-    }
-}
-
-void _declspec(naked) HOOK_CWorldScan_ScanWorld()
-{
-// hook from 55555E 5 bytes
-    _asm
-    {
-        call    second
-        jmp     RETURN_CWorldScan_ScanWorlda   // 555563
-
-second:
-        pushad
-        push    [esp+32+4*3]
-        push    [esp+32+4*3]
-        push    [esp+32+4*3]
-        call    OnMY_CWorldScan_ScanWorld_Pre
-        add     esp, 4*3
-        popad
-
-        jmp     RETURN_CWorldScan_ScanWorldb   // 72CAE0
-    }
-}
-
-
-////////////////////////////////////////////////
-//
-//
-//
-////////////////////////////////////////////////
-int OnMY_CVisibilityPlugins_CalculateFadingAtomicAlpha_Pre( CBaseModelInfoSAInterface* pModelInfo, CEntitySAInterface* pEntity, float fDist )
-{
-    if ( pEntity->IsLowLodEntity () )
-    {
-        // Apply custom distance fade
-        float fAlpha = CalculateLowLodFadeAlpha ( pModelInfo, fDist );
-        fAlpha *= pModelInfo->ucAlpha;
-        return Clamp < int > ( 0, (int)fAlpha, 255 );
-    }
-    return -1;
-}
-
-
-void _declspec(naked) HOOK_CVisibilityPlugins_CalculateFadingAtomicAlpha()
-{
-// hook from 732500 5 bytes
-    _asm
-    {
-        pushad
-        push    [esp+32+4*3]
-        push    [esp+32+4*3]
-        push    [esp+32+4*3]
-        call    OnMY_CVisibilityPlugins_CalculateFadingAtomicAlpha_Pre
-        mov     [esp+0],eax
-        add     esp, 4*3
-        popad
-        mov     eax,[esp-32-4*3]
-
-        cmp     eax, 0xffffffff
-        jne     usecustom
-
-        // Use standard code
-        push    [esp+4*3]
-        push    [esp+4*3]
-        push    [esp+4*3]
-        call    second
-        add     esp, 4*3
-
-usecustom:
-        retn
-
-second:
-        push    ecx
-        mov     ecx, [esp+8]
-        jmp     RETURN_CVisibilityPlugins_CalculateFadingAtomicAlpha                // 732505
-
-    }
-}
 
 // Variables
 SIPLInst* pEntityWorldAdd = NULL;
@@ -6765,7 +5568,9 @@ bool CheckRemovedModelNoSet ( )
 }
 bool CheckRemovedModel ( )
 {
+    TIMING_CHECKPOINT( "+CheckRemovedModel" );
     bNextHookSetModel = CheckRemovedModelNoSet ( );
+    TIMING_CHECKPOINT( "-CheckRemovedModel" );
     return bNextHookSetModel;
 }
 // Hook 1
@@ -6790,6 +5595,7 @@ void _declspec(naked) HOOK_LoadIPLInstance ()
 
 void HideEntitySomehow ( )
 {
+    TIMING_CHECKPOINT( "+HideEntitySomehow" );
     // Did we get instructed to set the model
     if ( bNextHookSetModel && pLODInterface )
     {
@@ -6803,13 +5609,14 @@ void HideEntitySomehow ( )
             // Add the LOD to the list
             pBuildingRemoval->AddBinaryBuilding ( pInterface );
             // Remove the model from the world
-            pGameInterface->GetWorld ( )->Remove ( pInterface );
+            pGameInterface->GetWorld ( )->Remove ( pInterface, BuildingRemoval );
             // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
             //pInterface = pInterface->m_pLod;
         }
     }
     // Reset our next hook variable
     bNextHookSetModel = false;
+    TIMING_CHECKPOINT( "-HideEntitySomehow" );
 }
 // Hook 2
 void _declspec(naked) HOOK_CWorld_LOD_SETUP ()
@@ -6888,21 +5695,23 @@ void _declspec(naked) Hook_CWorld_ADD_CPopulation_ConvertToRealObject ( )
 
 void RemoveObjectIfNeeded ( )
 {
+    TIMING_CHECKPOINT( "+RemoveObjectIfNeeded" );
     SBuildingRemoval* pBuildingRemoval = pGameInterface->GetWorld ( )->GetBuildingRemoval ( pLODInterface );
     if ( pBuildingRemoval != NULL )
     {
         if ( (DWORD)(pBuildingAdd->vtbl) != VTBL_CPlaceable )
         {
             pBuildingRemoval->AddDataBuilding ( pBuildingAdd );
-            pGameInterface->GetWorld ( )->Remove( pBuildingAdd );
+            pGameInterface->GetWorld ( )->Remove( pBuildingAdd, BuildingRemoval3 );
         }
 
         if ( (DWORD)(pLODInterface->vtbl) != VTBL_CPlaceable )
         {
             pBuildingRemoval->AddDataBuilding ( pLODInterface );
-            pGameInterface->GetWorld ( )->Remove( pLODInterface );
+            pGameInterface->GetWorld ( )->Remove( pLODInterface, BuildingRemoval4 );
         }
     }
+    TIMING_CHECKPOINT( "-RemoveObjectIfNeeded" );
 }
 
 // on stream in -> create and remove it from the world just after so we can restore easily
@@ -6951,9 +5760,11 @@ void _declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObject ( )
         mov pBuildingAdd, edi
         mov pLODInterface, edi
     }
+    TIMING_CHECKPOINT( "+RemovePointerToBuilding" );
     RemovePointerToBuilding ( );
     StorePointerToBuilding ( );
     RemoveObjectIfNeeded ( );
+    TIMING_CHECKPOINT( "-RemovePointerToBuilding" );
     _asm
     {
         popad
@@ -6969,7 +5780,7 @@ void RemoveDummyIfReplaced ( )
         if ( (DWORD)(pBuildingAdd->vtbl) != VTBL_CPlaceable )
         {
             pBuildingRemoval->AddDataBuilding ( pBuildingAdd );
-            pGameInterface->GetWorld ( )->Remove( pBuildingAdd );
+            pGameInterface->GetWorld ( )->Remove( pBuildingAdd, BuildingRemoval5 );
         }
     }
 }
@@ -6983,9 +5794,12 @@ void _declspec(naked) HOOK_CWorld_Add_CPopulation_ConvertToDummyObject ( )
         mov pLODInterface, edi
         mov pBuildingAdd, edi
     }
+
+    TIMING_CHECKPOINT( "+CheckForRemoval" );
     StorePointerToBuilding ( );
     if ( CheckForRemoval ( ) )
     {
+        TIMING_CHECKPOINT( "-CheckForRemoval" );
         _asm
         {
             popad
@@ -6994,6 +5808,7 @@ void _declspec(naked) HOOK_CWorld_Add_CPopulation_ConvertToDummyObject ( )
     }
     else
     {
+        TIMING_CHECKPOINT( "-CheckForRemoval" );
         _asm
         {
             popad
@@ -7089,15 +5904,25 @@ void TriggerVehicleDamageEvent ( )
 {
     if ( pCollisionVehicle )
     {
-        CEntitySAInterface * pEntity = pCollisionVehicle->damageEntity;
+        CEntitySAInterface * pEntity = pCollisionVehicle->m_pCollidedEntity;
         if ( pEntity )
         {
             // Not handled because it triggers too much
-            if ( pEntity->nType != ENTITY_TYPE_BUILDING )
+            //if ( pEntity->nType != ENTITY_TYPE_BUILDING )
             {
                 if ( m_pVehicleCollisionHandler )
                 {
-                    m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pCollisionVehicle->fDamageImpulseMagnitude, pCollisionVehicle->byBodyPartHit, pCollisionVehicle->vecCollisionPosition, pCollisionVehicle->vecCollisionImpactVelocity );
+                    TIMING_CHECKPOINT( "+TriggerVehDamEvent" );
+                    if ( pEntity->nType == ENTITY_TYPE_VEHICLE )
+                    {
+                        CVehicleSAInterface * pInterface = static_cast < CVehicleSAInterface* > ( pEntity );
+                        m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude, pInterface->m_fDamageImpulseMagnitude, pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity );
+                    }
+                    else
+                    {
+                        m_pVehicleCollisionHandler ( pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude, 0.0f, pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity );
+                    }
+                    TIMING_CHECKPOINT( "-TriggerVehDamEvent" );
                 }
             }
         }
@@ -7106,8 +5931,35 @@ void TriggerVehicleDamageEvent ( )
 
 void _declspec(naked) HOOK_CEventVehicleDamageCollision ( )
 {
+    // .006A7657 64 A1 00 00 00 00                       mov     eax, large fs:0 < Hook >
+    // .006A765D 50                                      push    eax < Jmp Back >
+
     // ecx = this ptr
-    // pVehicle->damageEntity = damage entity obvs
+    // pVehicle->damageEntity = damage entity
+    _asm
+    {
+        pushad
+        mov pCollisionVehicle, ecx
+    }
+    TriggerVehicleDamageEvent ( );
+    
+    // do the replaced code and return back as if nothing happened.
+    _asm
+    {
+        popad
+        mov eax, fs:0
+        jmp JMP_CEventVehicleDamageCollision_RETN
+    }
+}
+
+DWORD dwPlaneDamageThreadshold = 0x8D33E4;
+void _declspec(naked) HOOK_CEventVehicleDamageCollision_Plane ( )
+{
+    // .006CC4B3 A1 E4 33 8D 00                            mov     eax, ds:?PLANE_DAMAGE_THRESHHOLD@@3MA
+    //  006CC4B8 53                                        push    ebx < Jmp Back >
+
+    // ecx = this ptr
+    // pVehicle->damageEntity = damage entity
     _asm
     {
         pushad
@@ -7115,11 +5967,135 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision ( )
     }
     TriggerVehicleDamageEvent ( );
 
-    // move 0 to eax as the previous code did and jump back like nothing happened... like a boss
+    // do the replaced code and return back as if nothing happened.
     _asm
     {
         popad
-        mov eax, fs:0
-        jmp JMP_CEventVehicleDamageCollision_RETN
+        mov eax, DWORD PTR DS:[8D33E4h]
+        jmp JMP_CEventVehicleDamageCollision_Plane_RETN
+    }
+}
+
+void _declspec(naked) HOOK_CEventVehicleDamageCollision_Bike ( )
+{
+    // .006B8EC6 DC 1D F8 9E 85 00                       fcomp   ds:__real@0000000000000000 < Hook >
+    //  006B8ECC 8B F1                                   mov     esi, ecx < Jmp Back >
+
+    // ecx = this ptr
+    // pVehicle->damageEntity = damage entity
+    _asm
+    {
+        pushad
+        mov pCollisionVehicle, ecx
+    }
+    TriggerVehicleDamageEvent ( );
+
+    // do the replaced code and return back as if nothing happened.
+    _asm
+    {
+        popad
+        fcomp DWORD PTR DS:[859EF8h]
+        jmp JMP_CEventVehicleDamageCollision_Bike_RETN
+    }
+}
+//////////////////////////////////////////////////////////////////////////////////////////
+// Only allow rebuild player on CJ - Stops other models getting corrupted (spider CJ)
+// hooked at 5A82C0 8 bytes
+void _declspec(naked) HOOK_CClothes_RebuildPlayer ()
+{
+    _asm
+    {
+        push    esi
+        mov     esi, [esp+8]
+        movsx   eax, word ptr [esi+34]
+        cmp     eax, 0
+        jne     cont        // Not CJ, so skip
+
+        // continue standard path
+        mov     eax, [esi+18h]
+        jmp     RETURN_CClothes_RebuildPlayera  // 005A82C8
+
+    cont:
+        jmp     RETURN_CClothes_RebuildPlayerb  // 005A837F
+    }
+}
+
+
+void _declspec(naked) HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlayerVehicle ()
+{
+    // 00739559 E8 B2 4C E3 FF                          call    FindPlayerPed < HOOK >
+    // 00739570 E8 5B 4B E3 FF                          call    FindPlayerVehicle < HOOK >
+    // Checks if the creator is the local player ped or the creator is the local player peds vehicle else decreases the velocity substantially.
+    // We are forcing it to think the creator is not the local player ped or his vehicle for this specific check
+    _asm
+    {
+        xor eax, eax
+        retn
+    }
+}
+
+
+void CMultiplayerSA::SetAutomaticVehicleStartupOnPedEnter ( bool bSet )
+{
+    static BYTE originalCode [ 6 ] = { 0 };
+    if ( originalCode[0] == '\0' )
+        MemCpyFast ( &originalCode[0], (const void *)0x64BC0D, 6 );
+
+    if ( bSet )
+        MemCpyFast ( (char *)0x64BC0D, originalCode, 6 );
+    else
+        MemSetFast ( (char *)0x64BC0D, 0x90, 6 );
+}
+
+// Storage
+CVehicleSAInterface * pHeliKiller = NULL;
+CPedSAInterface * pPedKilledByHeli = NULL;
+bool CallHeliKillEvent ( )
+{
+    // Is our handler alive
+    if ( m_pHeliKillHandler )
+    {
+        // Return our handlers return
+        return m_pHeliKillHandler ( pHeliKiller, pPedKilledByHeli );
+    }
+    // Return true else
+    return true;
+}
+
+void _declspec(naked) HOOK_CHeli_ProcessHeliKill ( )
+{
+    // 006DB201 0F 85 30 02 00 00                         jnz     loc_6DB437 < HOOK >
+    // 006DB207 8B 47 14                                  mov     eax, [edi+14h] < RETURN CONTINUE >
+    // 006DB9E0 8B 44 24 6C                               mov     eax, [esp+1C8h+var_15C] < RETURN CANCEL >
+    // Hook is in Process Heli blades I think it's processing a Heli's blades against peds inside a collision shape.
+    // We hook just after the check if he's touched the blade as before that it's just got the results of if he's near enough the heli to hit the blades
+    // esi = Heli
+    // edi = ped
+    _asm
+    {
+        pushad
+        mov pHeliKiller, esi
+        mov pPedKilledByHeli, edi
+    }
+    // Call our event
+    if ( CallHeliKillEvent ( ) == false )
+    {
+        _asm
+        {
+            popad
+            // Go to the end of the while loop and let it start again
+            jmp RETURN_CHeli_ProcessHeliKill_RETN_Cancel
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            // do our JNZ
+            jnz 6DB437h
+            // if it failed do our continue
+            jmp RETURN_CHeli_ProcessHeliKill_RETN_Cont_Zero
+        }
     }
 }

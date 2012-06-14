@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/libspeex;../../../vendor/portaudio;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/src;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers"
+				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/libspeex;../../../vendor/portaudio;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/src;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../Shared/mods/deathmatch/logic"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -53,7 +53,7 @@
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
-				WarningLevel="1"
+				WarningLevel="3"
 				WarnAsError="false"
 				DebugInformationFormat="4"
 				DisableSpecificWarnings="4290;4996;4482"
@@ -72,9 +72,9 @@
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="libv2.lib lua5.1d.lib libspeexd.lib bass.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib ws2_32.lib zlibd_2008.lib Iphlpapi.lib jsonD2008.lib"
+				AdditionalDependencies="libv2.lib lua5.1d.lib libspeexd.lib bass.lib bass_fx.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib ws2_32.lib zlibd_2008.lib Iphlpapi.lib jsonD2008.lib"
 				ShowProgress="0"
-				OutputFile="C:\Program Files\MTA San Andreas 1.3\mods\deathmatch\Client_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.4\mods\deathmatch\Client_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../vendor/libspeex;../../../vendor/bass/lib;../../../vendor/lua/lib;../../../vendor/libv2/lib;../../../vendor/zlib/lib;&quot;../../../vendor/json-c/lib&quot;"
@@ -140,7 +140,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/libspeex;../../../vendor/portaudio;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/src;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers"
+				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/libspeex;../../../vendor/portaudio;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/src;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../Shared/mods/deathmatch/logic"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -165,8 +165,8 @@
 				IgnoreImportLibrary="false"
 				LinkLibraryDependencies="false"
 				AdditionalOptions="/FIXED:NO"
-				AdditionalDependencies="libv2.lib lua5.1.lib libspeex.lib bass.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib wsock32.lib zlib_2008.lib json2008.lib"
-				OutputFile="C:\Program Files\MTA San Andreas 1.3\mods\deathmatch\Client.dll"
+				AdditionalDependencies="libv2.lib lua5.1.lib libspeex.lib bass.lib bass_fx.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib wsock32.lib zlib_2008.lib json2008.lib"
+				OutputFile="C:\Program Files\MTA San Andreas 1.4\mods\deathmatch\Client.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../vendor/libspeex;../../../vendor/bass/lib;../../../vendor/lua/lib;../../../vendor/libv2/lib;../../../vendor/zlib/lib;&quot;../../../vendor/json-c/lib&quot;"
@@ -238,7 +238,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/libspeex;../../../vendor/portaudio;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/src;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers"
+				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/libspeex;../../../vendor/portaudio;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/src;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../Shared/mods/deathmatch/logic"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -263,7 +263,7 @@
 				IgnoreImportLibrary="false"
 				LinkLibraryDependencies="false"
 				AdditionalOptions="/FIXED:NO"
-				AdditionalDependencies="libv2.lib lua5.1.lib libspeex.lib bass.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib wsock32.lib zlib_2008.lib json2008.lib"
+				AdditionalDependencies="libv2.lib lua5.1.lib libspeex.lib bass.lib bass_fx.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib wsock32.lib zlib_2008.lib json2008.lib"
 				OutputFile="..\..\..\output\MTA San Andreas\mods\deathmatch\client.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -316,10 +316,6 @@
 			>
 			<File
 				RelativePath=".\CClient.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\shared_logic\CClientWeaponManager.cpp"
 				>
 			</File>
 			<File
@@ -385,6 +381,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CClientModelCacheManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CClientPerfStat.LibMemory.cpp"
 					>
 				</File>
@@ -430,6 +430,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CFoo.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CGameEntityXRefManager.cpp"
 					>
 				</File>
 				<File
@@ -538,6 +542,14 @@
 				</File>
 				<File
 					RelativePath=".\logic\CServerIdManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CSingularFileDownload.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CSingularFileDownloadManager.cpp"
 					>
 				</File>
 				<File
@@ -957,15 +969,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CConfig.cpp"
+					RelativePath="..\shared_logic\CClientWeaponManager.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\shared_logic\CCustomData.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CDOMConfig.cpp"
 					>
 				</File>
 				<File
@@ -1029,10 +1037,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CVariableBuffer.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CVehicleNames.cpp"
 					>
 				</File>
@@ -1042,10 +1046,6 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CWeaponNames.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CZoneNames.cpp"
 					>
 				</File>
 				<File
@@ -1749,13 +1749,41 @@
 				Name="shared"
 				>
 				<File
-					RelativePath="..\..\..\Shared\animation\CEasingCurve.cpp"
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CIdArray.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Shared\animation\CPositionRotationAnimation.cpp"
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLatentReceiver.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLatentSendQueue.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CZoneNames.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\Enums.cpp"
+					>
+				</File>
+				<Filter
+					Name="animation"
+					>
+					<File
+						RelativePath="..\..\..\Shared\animation\CEasingCurve.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\Shared\animation\CPositionRotationAnimation.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1811,6 +1839,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CClientModelCacheManager.h"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CClientPerfStatManager.h"
 					>
 				</File>
@@ -1844,6 +1876,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CFoo.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CGameEntityXRefManager.h"
 					>
 				</File>
 				<File
@@ -1916,6 +1952,14 @@
 				</File>
 				<File
 					RelativePath=".\logic\CServerIdManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CSingularFileDownload.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CSingularFileDownloadManager.h"
 					>
 				</File>
 				<File
@@ -2487,15 +2531,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CConfig.h"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CCustomData.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CDOMConfig.h"
 					>
 				</File>
 				<File
@@ -2539,10 +2575,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CVariableBuffer.h"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CVehicleNames.h"
 					>
 				</File>
@@ -2552,10 +2584,6 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CWeaponNames.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CZoneNames.h"
 					>
 				</File>
 				<File
@@ -2651,17 +2679,41 @@
 				Name="shared"
 				>
 				<File
-					RelativePath="..\..\..\Shared\animation\CEasingCurve.h"
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CIdArray.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Shared\animation\CPositionRotationAnimation.h"
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLatentTransferManager.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Shared\animation\TInterpolation.h"
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CTickRateSettings.h"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CZoneNames.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\Enums.h"
+					>
+				</File>
+				<Filter
+					Name="animation"
+					>
+					<File
+						RelativePath="..\..\..\Shared\animation\CEasingCurve.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\Shared\animation\CPositionRotationAnimation.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\Shared\animation\TInterpolation.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 	</Files>

@@ -128,6 +128,7 @@ private:
     bool                    m_bChatboxVisible;
     bool                    m_pDebugViewVisible;
     bool                    m_bGUIHasInput;
+    int                     m_uiActiveCompositionSize;
 
     int                     m_LastSettingsRevision; // the revision number the last time we saw the skin change
     SString                 m_LastSkinName;

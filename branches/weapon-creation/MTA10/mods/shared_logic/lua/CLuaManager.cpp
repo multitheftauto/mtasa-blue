@@ -157,7 +157,7 @@ CLuaMain* CLuaManager::GetVirtualMachine ( const char* szFilename )
     list < CLuaMain* >::const_iterator iter = m_virtualMachines.begin ();
     for ( ; iter != m_virtualMachines.end (); iter++ )
     {
-        if ( strcmp ( szFilename, (*iter)->GetScriptNamePointer () ) == 0 )
+        if ( strcmp ( szFilename, (*iter)->GetScriptName () ) == 0 )
         {
             return *iter;
         }
@@ -268,6 +268,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "triggerServerEvent", CLuaFunctionDefs::TriggerServerEvent );
     CLuaCFunctions::AddFunction ( "cancelEvent", CLuaFunctionDefs::CancelEvent );
     CLuaCFunctions::AddFunction ( "wasEventCancelled", CLuaFunctionDefs::WasEventCancelled );
+    CLuaCFunctions::AddFunction ( "triggerLatentServerEvent", CLuaFunctionDefs::TriggerLatentServerEvent );
+    CLuaCFunctions::AddFunction ( "getLatentEventHandles", CLuaFunctionDefs::GetLatentEventHandles );
+    CLuaCFunctions::AddFunction ( "getLatentEventStatus", CLuaFunctionDefs::GetLatentEventStatus );
+    CLuaCFunctions::AddFunction ( "cancelLatentEvent", CLuaFunctionDefs::CancelLatentEvent );
 
     // Output funcs
     CLuaCFunctions::AddFunction ( "outputConsole", CLuaFunctionDefs::OutputConsole );
@@ -361,6 +365,14 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getSoundVolume", CLuaFunctionDefs::GetSoundVolume );
     CLuaCFunctions::AddFunction ( "setSoundSpeed", CLuaFunctionDefs::SetSoundSpeed );
     CLuaCFunctions::AddFunction ( "getSoundSpeed", CLuaFunctionDefs::GetSoundSpeed );
+    CLuaCFunctions::AddFunction ( "setSoundProperties", CLuaFunctionDefs::SetSoundProperties );
+    CLuaCFunctions::AddFunction ( "getSoundProperties", CLuaFunctionDefs::GetSoundProperties );
+    CLuaCFunctions::AddFunction ( "getSoundFFTData", CLuaFunctionDefs::GetSoundFFTData );
+    CLuaCFunctions::AddFunction ( "getSoundWaveData", CLuaFunctionDefs::GetSoundWaveData );
+    CLuaCFunctions::AddFunction ( "getSoundLevelData", CLuaFunctionDefs::GetSoundLevelData );
+    CLuaCFunctions::AddFunction ( "getSoundBPM", CLuaFunctionDefs::GetSoundBPM );
+    CLuaCFunctions::AddFunction ( "setSoundPanningEnabled", CLuaFunctionDefs::SetSoundPanEnabled );
+    CLuaCFunctions::AddFunction ( "isSoundPanningEnabled", CLuaFunctionDefs::IsSoundPanEnabled );
     CLuaCFunctions::AddFunction ( "setSoundMinDistance", CLuaFunctionDefs::SetSoundMinDistance );
     CLuaCFunctions::AddFunction ( "getSoundMinDistance", CLuaFunctionDefs::GetSoundMinDistance );
     CLuaCFunctions::AddFunction ( "setSoundMaxDistance", CLuaFunctionDefs::SetSoundMaxDistance );
@@ -430,6 +442,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPedBonePosition", CLuaFunctionDefs::GetPedBonePosition );
     CLuaCFunctions::AddFunction ( "getPedClothes", CLuaFunctionDefs::GetPedClothes );
     CLuaCFunctions::AddFunction ( "getPedControlState", CLuaFunctionDefs::GetPedControlState );
+    CLuaCFunctions::AddFunction ( "getPedAnalogControlState", CLuaFunctionDefs::GetPedAnalogControlState );
+
     CLuaCFunctions::AddFunction ( "isPedDoingGangDriveby", CLuaFunctionDefs::IsPedDoingGangDriveby );
     CLuaCFunctions::AddFunction ( "getPedAnimation", CLuaFunctionDefs::GetPedAnimation );
     CLuaCFunctions::AddFunction ( "getPedMoveState", CLuaFunctionDefs::GetPedMoveState );
@@ -448,6 +462,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "addPedClothes", CLuaFunctionDefs::AddPedClothes );
     CLuaCFunctions::AddFunction ( "removePedClothes", CLuaFunctionDefs::RemovePedClothes );
     CLuaCFunctions::AddFunction ( "setPedControlState", CLuaFunctionDefs::SetPedControlState );
+    CLuaCFunctions::AddFunction ( "setPedAnalogControlState", CLuaFunctionDefs::SetPedAnalogControlState );
     CLuaCFunctions::AddFunction ( "setPedDoingGangDriveby", CLuaFunctionDefs::SetPedDoingGangDriveby );
     CLuaCFunctions::AddFunction ( "setPedLookAt", CLuaFunctionDefs::SetPedLookAt );
     CLuaCFunctions::AddFunction ( "setPedHeadless", CLuaFunctionDefs::SetPedHeadless );
@@ -512,6 +527,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getVehicleHandling", CLuaFunctionDefs::GetVehicleHandling );
     CLuaCFunctions::AddFunction ( "getOriginalHandling", CLuaFunctionDefs::GetOriginalHandling );
     CLuaCFunctions::AddFunction ( "getVehicleDoorOpenRatio", CLuaFunctionDefs::GetVehicleDoorOpenRatio );
+    CLuaCFunctions::AddFunction ( "getVehicleSirens", CLuaFunctionDefs::GetVehicleSirens );
+    CLuaCFunctions::AddFunction ( "getVehicleSirenParams", CLuaFunctionDefs::GetVehicleSirenParams );
 
     // Vehicle set funcs
     CLuaCFunctions::AddFunction ( "createVehicle", CLuaFunctionDefs::CreateVehicle );
@@ -549,6 +566,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleHeadLightColor", CLuaFunctionDefs::SetVehicleHeadLightColor );
     CLuaCFunctions::AddFunction ( "setVehicleTurretPosition", CLuaFunctionDefs::SetVehicleTurretPosition );
     CLuaCFunctions::AddFunction ( "setVehicleDoorOpenRatio", CLuaFunctionDefs::SetVehicleDoorOpenRatio );
+    CLuaCFunctions::AddFunction ( "setVehicleSirens", CLuaFunctionDefs::SetVehicleSirens );
 
     // Object create/destroy funcs
     CLuaCFunctions::AddFunction ( "createObject", CLuaFunctionDefs::CreateObject );
@@ -556,12 +574,14 @@ void CLuaManager::LoadCFunctions ( void )
     // Object get funcs
     CLuaCFunctions::AddFunction ( "isObjectStatic", CLuaFunctionDefs::IsObjectStatic );
     CLuaCFunctions::AddFunction ( "getObjectScale", CLuaFunctionDefs::GetObjectScale );
+    CLuaCFunctions::AddFunction ( "isObjectBreakable", CLuaFunctionDefs::IsObjectBreakable );
 
     // Object set funcs
     CLuaCFunctions::AddFunction ( "moveObject", CLuaFunctionDefs::MoveObject );
     CLuaCFunctions::AddFunction ( "stopObject", CLuaFunctionDefs::StopObject );
     CLuaCFunctions::AddFunction ( "setObjectScale", CLuaFunctionDefs::SetObjectScale );
     CLuaCFunctions::AddFunction ( "setObjectStatic", CLuaFunctionDefs::SetObjectStatic );
+    CLuaCFunctions::AddFunction ( "setObjectBreakable", CLuaFunctionDefs::SetObjectBreakable );
 
     // Explosion funcs
     CLuaCFunctions::AddFunction ( "createExplosion", CLuaFunctionDefs::CreateExplosion );
@@ -596,6 +616,8 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Drawing funcs
     CLuaCFunctions::AddFunction ( "dxDrawLine", CLuaFunctionDefs::dxDrawLine );
+    CLuaCFunctions::AddFunction ( "dxDrawMaterialLine3D", CLuaFunctionDefs::dxDrawMaterialLine3D );
+    CLuaCFunctions::AddFunction ( "dxDrawMaterialSectionLine3D", CLuaFunctionDefs::dxDrawMaterialSectionLine3D );
     CLuaCFunctions::AddFunction ( "dxDrawLine3D", CLuaFunctionDefs::dxDrawLine3D );
     CLuaCFunctions::AddFunction ( "dxDrawText", CLuaFunctionDefs::dxDrawText );
     CLuaCFunctions::AddFunction ( "dxDrawRectangle", CLuaFunctionDefs::dxDrawRectangle );
@@ -616,6 +638,15 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxUpdateScreenSource", CLuaFunctionDefs::dxUpdateScreenSource );
     CLuaCFunctions::AddFunction ( "dxGetStatus", CLuaFunctionDefs::dxGetStatus );
     CLuaCFunctions::AddFunction ( "dxSetTestMode", CLuaFunctionDefs::dxSetTestMode );
+    CLuaCFunctions::AddFunction ( "dxGetTexturePixels", CLuaFunctionDefs::dxGetTexturePixels );
+    CLuaCFunctions::AddFunction ( "dxSetTexturePixels", CLuaFunctionDefs::dxSetTexturePixels );
+    CLuaCFunctions::AddFunction ( "dxGetPixelsSize", CLuaFunctionDefs::dxGetPixelsSize );
+    CLuaCFunctions::AddFunction ( "dxGetPixelsFormat", CLuaFunctionDefs::dxGetPixelsFormat );
+    CLuaCFunctions::AddFunction ( "dxConvertPixels", CLuaFunctionDefs::dxConvertPixels );
+    CLuaCFunctions::AddFunction ( "dxGetPixelColor", CLuaFunctionDefs::dxGetPixelColor );
+    CLuaCFunctions::AddFunction ( "dxSetPixelColor", CLuaFunctionDefs::dxSetPixelColor );
+    CLuaCFunctions::AddFunction ( "dxSetBlendMode", CLuaFunctionDefs::dxSetBlendMode );
+    CLuaCFunctions::AddFunction ( "dxGetBlendMode", CLuaFunctionDefs::dxGetBlendMode );
 
     // Audio funcs
     CLuaCFunctions::AddFunction ( "playSoundFrontEnd", CLuaFunctionDefs::PlaySoundFrontEnd );
@@ -624,6 +655,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setAmbientSoundEnabled", CLuaFunctionDefs::SetAmbientSoundEnabled );
     CLuaCFunctions::AddFunction ( "isAmbientSoundEnabled", CLuaFunctionDefs::IsAmbientSoundEnabled );
     CLuaCFunctions::AddFunction ( "resetAmbientSounds", CLuaFunctionDefs::ResetAmbientSounds );
+    CLuaCFunctions::AddFunction ( "setWorldSoundEnabled", CLuaFunctionDefs::SetWorldSoundEnabled );
+    CLuaCFunctions::AddFunction ( "isWorldSoundEnabled", CLuaFunctionDefs::IsWorldSoundEnabled );
+    CLuaCFunctions::AddFunction ( "resetWorldSounds", CLuaFunctionDefs::ResetWorldSounds );
 
     // Blip funcs
     CLuaCFunctions::AddFunction ( "createBlip", CLuaFunctionDefs::CreateBlip );
@@ -686,8 +720,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getCameraTarget", CLuaFunctionDefs::GetCameraTarget );
     CLuaCFunctions::AddFunction ( "getCameraInterior", CLuaFunctionDefs::GetCameraInterior );
     CLuaCFunctions::AddFunction ( "getCameraGoggleEffect", CLuaFunctionDefs::GetCameraGoggleEffect );
+    CLuaCFunctions::AddFunction ( "getCameraRotation", CLuaFunctionDefs::GetCameraRotation );
 
     // Cam set funcs
+    CLuaCFunctions::AddFunction ( "setCameraRotation", CLuaFunctionDefs::SetCameraRotation );
     CLuaCFunctions::AddFunction ( "setCameraMatrix", CLuaFunctionDefs::SetCameraMatrix );
     CLuaCFunctions::AddFunction ( "setCameraTarget", CLuaFunctionDefs::SetCameraTarget );
     CLuaCFunctions::AddFunction ( "setCameraInterior", CLuaFunctionDefs::SetCameraInterior );
@@ -850,6 +886,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "deref", CLuaFunctionDefs::Dereference );
     CLuaCFunctions::AddFunction ( "getColorFromString", CLuaFunctionDefs::GetColorFromString );
     CLuaCFunctions::AddFunction ( "getValidPedModels", CLuaFunctionDefs::GetValidPedModels );
+    CLuaCFunctions::AddFunction ( "downloadFile", CLuaFunctionDefs::DownloadFile );
 
     // World get functions
     CLuaCFunctions::AddFunction ( "getTime", CLuaFunctionDefs::GetTime_ );    
@@ -886,6 +923,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getSunColor", CLuaFunctionDefs::GetSunColor );
     CLuaCFunctions::AddFunction ( "getSunSize", CLuaFunctionDefs::GetSunSize );
     CLuaCFunctions::AddFunction ( "getAircraftMaxHeight", CLuaFunctionDefs::GetAircraftMaxHeight );
+    CLuaCFunctions::AddFunction ( "getOcclusionsEnabled", CLuaFunctionDefs::GetOcclusionsEnabled );
     CLuaCFunctions::AddFunction ( "getCloudsEnabled", CLuaFunctionDefs::GetCloudsEnabled );
     CLuaCFunctions::AddFunction ( "getRainLevel", CLuaFunctionDefs::GetRainLevel );
 
@@ -931,7 +969,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "restoreAllWorldModels", CLuaFunctionDefs::RestoreWorldBuildings );
     CLuaCFunctions::AddFunction ( "restoreWorldModel", CLuaFunctionDefs::RestoreWorldBuilding );
     CLuaCFunctions::AddFunction ( "setAircraftMaxHeight", CLuaFunctionDefs::SetAircraftMaxHeight );
+    CLuaCFunctions::AddFunction ( "setOcclusionsEnabled", CLuaFunctionDefs::SetOcclusionsEnabled );
     CLuaCFunctions::AddFunction ( "createSWATRope", CLuaFunctionDefs::CreateSWATRope );
+    CLuaCFunctions::AddFunction ( "setBirdsEnabled", CLuaFunctionDefs::SetBirdsEnabled );
+    CLuaCFunctions::AddFunction ( "getBirdsEnabled", CLuaFunctionDefs::GetBirdsEnabled );
 
     // Input functions
     CLuaCFunctions::AddFunction ( "bindKey", CLuaFunctionDefs::BindKey );
@@ -939,6 +980,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getKeyState", CLuaFunctionDefs::GetKeyState );    
     CLuaCFunctions::AddFunction ( "getControlState", CLuaFunctionDefs::GetControlState );
     CLuaCFunctions::AddFunction ( "getAnalogControlState", CLuaFunctionDefs::GetAnalogControlState );
+    CLuaCFunctions::AddFunction ( "setAnalogControlState", CLuaFunctionDefs::SetAnalogControlState );
     CLuaCFunctions::AddFunction ( "isControlEnabled", CLuaFunctionDefs::IsControlEnabled );
     CLuaCFunctions::AddFunction ( "getBoundKeys", CLuaFunctionDefs::GetBoundKeys );
     CLuaCFunctions::AddFunction ( "getFunctionsBoundToKey", CLuaFunctionDefs::GetFunctionsBoundToKey );

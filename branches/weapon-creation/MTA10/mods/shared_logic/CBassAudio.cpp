@@ -15,6 +15,10 @@
 #include <tags.h>
 #include <bassmix.h>
 #include <basswma.h>
+#include <bass_fx.h>
+
+void CALLBACK BPMCallback ( int handle, float bpm, void* user );
+void CALLBACK BeatCallback ( DWORD chan, double beatpos, void *user );
 
 #define INVALID_FX_HANDLE (-1)  // Hope that BASS doesn't use this as a valid Fx handle
 
@@ -30,6 +34,7 @@ CBassAudio::CBassAudio ( bool bStream, const SString& strPath, bool bLoop, bool 
     m_fMaxDistance = 20.0f;
     m_fPlaybackSpeed = 1.0f;
     m_bPaused = false;
+    m_bPan = true;
 }
 
 
@@ -94,9 +99,18 @@ bool CBassAudio::BeginLoadingMedia ( void )
         //
         // For non streams, try to load the sound file
         //
-        m_pSound = BASS_StreamCreateFile ( false, m_strPath, 0, 0, lFlags );
+        // First x streams need to be decoders rather than "real" sounds but that's dependent on if we need streams or not so we need to adapt.
+        /*
+            We are the Borg. Lower your shields and surrender your ships. 
+            We will add your biological and technological distinctiveness to our own. 
+            Your culture will adapt to service us. 
+            Resistance is futile.
+        */
+        long lCreateFlags = BASS_MUSIC_PRESCAN|BASS_STREAM_DECODE;
+
+        m_pSound = BASS_StreamCreateFile ( false, m_strPath, 0, 0, lCreateFlags );
         if ( !m_pSound )
-            m_pSound = BASS_MusicLoad ( false, m_strPath, 0, 0, lFlags, 0 );  // Try again
+            m_pSound = BASS_MusicLoad ( false, m_strPath, 0, 0, BASS_MUSIC_RAMP|BASS_MUSIC_PRESCAN|BASS_STREAM_DECODE, 0 );  // Try again
         if ( !m_pSound && m_b3D )
             m_pSound = ConvertFileToMono ( m_strPath );                       // Last try if 3D
 
@@ -107,6 +121,34 @@ bool CBassAudio::BeginLoadingMedia ( void )
             return false;
         }
 
+        m_pSound = BASS_FX_ReverseCreate ( m_pSound, 2.0f, BASS_STREAM_DECODE | BASS_FX_FREESOURCE | BASS_MUSIC_PRESCAN );
+        BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_REVERSE_DIR, BASS_FX_RVS_FORWARD );
+        // Sucks.
+        /*if ( BASS_FX_BPM_CallbackSet ( m_pSound, (BPMPROC*)&BPMCallback, 60, 0, BASS_FX_BPM_MULT2, this ) == false )
+        {
+            g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_FX_BPM_CallbackSet  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
+        }*/
+
+        if ( BASS_FX_BPM_BeatCallbackSet ( m_pSound, (BPMBEATPROC*)&BeatCallback, this ) == false )
+        {
+            g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_FX_BPM_BeatCallbackSet  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
+        }
+        
+
+        if ( !m_pSound )
+        {
+            g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_FX_ReverseCreate  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
+            return false;
+        }
+        m_pSound = BASS_FX_TempoCreate ( m_pSound, lFlags | BASS_FX_FREESOURCE );
+        if ( !m_pSound )
+        {
+            g_pCore->GetConsole()->Printf ( "BASS ERROR %d in CreateTempo  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
+            return false;
+        }
+        BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_TEMPO, &m_fTempo );
+        BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_TEMPO_PITCH, &m_fPitch );
+        BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_TEMPO_FREQ, &m_fSampleRate );
         // Validation of some sort
         if ( m_bLoop && BASS_ChannelFlags ( m_pSound, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP ) == -1 )
             g_pCore->GetConsole()->Printf ( "BASS ERROR %d in LoadMedia ChannelFlags LOOP  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
@@ -169,14 +211,49 @@ void CALLBACK MetaSync( HSYNC handle, DWORD channel, DWORD data, void *user )
     DWORD pSound = pBassAudio->m_pVars->pSound;
     pBassAudio->m_pVars->criticalSection.Unlock ();
 
-    SString strMeta = BASS_ChannelGetTags( pSound, BASS_TAG_META );
-
-    if ( !strMeta.empty () )
+    const char* szMeta = BASS_ChannelGetTags( pSound, BASS_TAG_META );
+    if ( szMeta )
     {
-    	pBassAudio->m_pVars->criticalSection.Lock ();
-    	pBassAudio->m_pVars->onClientSoundChangedMetaQueue.push_back ( strMeta );
-    	pBassAudio->m_pVars->criticalSection.Unlock ();
-	}
+        SString strMeta = szMeta;
+        if ( !strMeta.empty () )
+        {
+            pBassAudio->m_pVars->criticalSection.Lock ();
+            pBassAudio->m_pVars->onClientSoundChangedMetaQueue.push_back ( strMeta );
+            pBassAudio->m_pVars->criticalSection.Unlock ();
+        }
+    }
+}
+
+void CALLBACK BPMCallback ( int handle, float bpm, void* user )
+{
+    CBassAudio* pBassAudio = static_cast <CBassAudio*> ( user );
+    if ( pBassAudio )
+    {
+        if ( pBassAudio->m_pVars )
+        {
+            pBassAudio->m_pVars->criticalSection.Lock ();
+            pBassAudio->m_pVars->onClientBPMQueue.push_back ( bpm );
+            pBassAudio->m_pVars->criticalSection.Unlock ();
+        }
+        else
+        {
+            pBassAudio->SetSoundBPM( bpm );
+        }
+    }
+}
+
+void CALLBACK BeatCallback ( DWORD chan, double beatpos, void *user )
+{
+    CBassAudio* pBassAudio = static_cast <CBassAudio*> ( user );
+    if ( pBassAudio )
+    {
+        if ( pBassAudio->m_pVars )
+        {
+            pBassAudio->m_pVars->criticalSection.Lock ();
+            pBassAudio->m_pVars->onClientBeatQueue.push_back ( beatpos );
+            pBassAudio->m_pVars->criticalSection.Unlock ();
+        }
+    }
 }
 
 void CBassAudio::PlayStreamIntern ( void* arguments )
@@ -207,32 +284,43 @@ void CBassAudio::CompleteStreamConnect ( HSTREAM pSound )
         if ( !m_b3D )
             BASS_ChannelSetAttribute( pSound, BASS_ATTRIB_VOL, m_fVolume );
         ApplyFxEffects ();
-
         // Set a Callback function for download finished or connection closed prematurely
         BASS_ChannelSetSync ( pSound, BASS_SYNC_DOWNLOAD, 0, &DownloadSync, this );
         SetFinishedCallbacks ();
 
+        if ( BASS_FX_BPM_CallbackSet ( pSound, (BPMPROC*)&BPMCallback, 1, 0, 0, this ) == false )
+        {
+            g_pCore->GetConsole()->Print ( "BASS ERROR in BASS_FX_BPM_CallbackSet" );
+        }
+        if ( BASS_FX_BPM_BeatCallbackSet ( pSound, (BPMBEATPROC*)&BeatCallback, this ) == false )
+        {
+            g_pCore->GetConsole()->Print ( "BASS ERROR in BASS_FX_BPM_BeatCallbackSet" );
+        }
         // get the broadcast name
         const char* szIcy;
+        szIcy = BASS_ChannelGetTags ( pSound, BASS_TAG_ICY );
         if ( 
             ( szIcy = BASS_ChannelGetTags ( pSound, BASS_TAG_ICY ) )
          || ( szIcy = BASS_ChannelGetTags ( pSound, BASS_TAG_WMA ) )
          || ( szIcy = BASS_ChannelGetTags ( pSound, BASS_TAG_HTTP ) )
             )
         {
-            for ( ; *szIcy; szIcy += strlen ( szIcy ) + 1 )
+            if ( szIcy ) 
             {
-                if ( !strnicmp ( szIcy, "icy-name:", 9 ) ) // ICY / HTTP
+                for ( ; *szIcy; szIcy += strlen ( szIcy ) + 1 )
                 {
-                    m_strStreamName = szIcy + 9;
-                    break;
+                    if ( !strnicmp ( szIcy, "icy-name:", 9 ) ) // ICY / HTTP
+                    {
+                        m_strStreamName = szIcy + 9;
+                        break;
+                    }
+                    else if ( !strnicmp ( szIcy, "title=", 6 ) ) // WMA
+                    {
+                        m_strStreamName = szIcy + 6;
+                        break;
+                    }
+                    //g_pCore->GetConsole()->Printf ( "BASS STREAM INFO  %s", szIcy );
                 }
-                else if ( !strnicmp ( szIcy, "title=", 6 ) ) // WMA
-                {
-                    m_strStreamName = szIcy + 6;
-                    break;
-                }
-                //g_pCore->GetConsole()->Printf ( "BASS STREAM INFO  %s", szIcy );
             }
         }
         // set sync for stream titles
@@ -357,14 +445,20 @@ SString CBassAudio::GetMetaTags( const SString& strFormat )
     else
     if ( m_pSound )
     {
-        strMetaTags = TAGS_Read( m_pSound, strFormat );
-
-        if ( strMetaTags == "" )
+        if ( strFormat != "" )
         {
-            // Try using data from from shoutcast meta
-            SString* pstrResult = MapFind ( m_ConvertedTagMap, strFormat );
-            if ( pstrResult )
-                strMetaTags = *pstrResult;
+            const char* szTags = TAGS_Read( m_pSound, strFormat );
+            if ( szTags ) 
+            {
+                strMetaTags = szTags;
+                if ( strMetaTags == "" )
+                {
+                    // Try using data from from shoutcast meta
+                    SString* pstrResult = MapFind ( m_ConvertedTagMap, strFormat );
+                    if ( pstrResult )
+                        strMetaTags = *pstrResult;
+                }
+            }
         }
 
     }
@@ -407,6 +501,115 @@ void CBassAudio::SetMaxDistance ( float fDistance )
     m_fMaxDistance = fDistance;
 }
 
+
+void CBassAudio::SetTempoValues ( float fSampleRate, float fTempo, float fPitch, bool bReverse )
+{
+    if ( fTempo != m_fTempo )
+    {
+        m_fTempo = fTempo;
+    }
+    if ( fPitch != m_fPitch )
+    {
+        m_fPitch = fPitch;
+    }
+    if ( fSampleRate != m_fSampleRate )
+    {
+        m_fSampleRate = fSampleRate;
+    }
+    m_bReversed = bReverse;
+
+    // Update our attributes
+    BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_TEMPO, m_fTempo );
+    BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_TEMPO_PITCH, m_fPitch );
+    BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_TEMPO_FREQ, m_fSampleRate );
+    BASS_ChannelSetAttribute ( BASS_FX_TempoGetSource ( m_pSound ), BASS_ATTRIB_REVERSE_DIR, (float)(bReverse == false ? BASS_FX_RVS_FORWARD : BASS_FX_RVS_REVERSE) );
+}
+
+float* CBassAudio::GetFFTData ( int iLength )
+{
+    if ( m_pSound )
+    {
+        long lFlags = BASS_DATA_FFT256;
+        if ( iLength == 256 )
+            lFlags = BASS_DATA_FFT256;
+        else if ( iLength == 512 )
+            lFlags = BASS_DATA_FFT512;
+        else if ( iLength == 1024 )
+            lFlags = BASS_DATA_FFT1024;
+        else if ( iLength == 2048 )
+            lFlags = BASS_DATA_FFT2048;
+        else if ( iLength == 4096 )
+            lFlags = BASS_DATA_FFT4096;
+        else if ( iLength == 8192 )
+            lFlags = BASS_DATA_FFT8192;
+        else if ( iLength == 16384 )
+            lFlags = BASS_DATA_FFT16384;
+        else 
+            return NULL;
+
+        float* pData = new float[ iLength ];
+        if ( BASS_ChannelGetData ( m_pSound, pData, lFlags ) != -1 )
+            return pData;
+        else
+        {
+            delete [] pData;
+            return NULL;
+        }
+    }
+    return NULL;
+}
+
+float* CBassAudio::GetWaveData ( int iLength )
+{
+    if ( m_pSound )
+    {
+        long lFlags = 0;
+        if ( iLength == 128 || iLength == 256 || iLength == 512 || iLength == 1024 || iLength == 2048 || iLength == 4096 || iLength == 8192 || iLength == 16384 )
+        {
+            lFlags = 4*iLength|BASS_DATA_FLOAT;
+        }
+        else 
+            return NULL;
+
+        float* pData = new float [ iLength ];
+        if ( BASS_ChannelGetData ( m_pSound, pData, lFlags ) != -1 )
+            return pData;
+        else
+        {
+            delete [] pData;
+            return NULL;
+        }
+    }
+    return NULL;
+}
+DWORD CBassAudio::GetLevelData ( void )
+{
+    if ( m_pSound )
+    {
+        DWORD dwData = BASS_ChannelGetLevel ( m_pSound );
+        if ( dwData != 0 )
+            return dwData;
+    }
+    return 0;
+}
+
+float CBassAudio::GetSoundBPM ( void )
+{
+    if ( m_fBPM == 0.0f && !m_bStream )
+    {
+        // Get us a bpm by getting the max bpm over each minute so we get a good bpm value which fits.
+        double dStart = 0;
+        while ( dStart <= GetLength ( ))
+        {
+            float fData = BASS_FX_BPM_DecodeGet ( BASS_FX_TempoGetSource ( m_pSound ) , dStart, dStart + 60, 0, BASS_FX_FREESOURCE | BASS_FX_BPM_MULT2, NULL );
+            
+            g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_FX_BPM_DecodeGet  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop );
+            m_fBPM = max( fData, m_fBPM );
+            dStart += 60;
+        }
+    }
+    return m_fBPM;
+}
 
 //
 // FxEffects
@@ -479,24 +682,32 @@ void CBassAudio::Process3D ( const CVector& vecPlayerPosition, const CVector& ve
 {
     assert ( m_b3D && m_pSound );
 
-    // Limit panning when getting close to the min distance
-    float fDistance = DistanceBetweenPoints3D ( vecPlayerPosition, m_vecPosition );
-    float fPanSharpness = UnlerpClamped ( m_fMinDistance, fDistance, m_fMinDistance * 2 );
-    float fPanLimit = Lerp ( 0.35f, fPanSharpness, 1.0f );
+    float fDistance = DistanceBetweenPoints3D ( vecCameraPosition, m_vecPosition );
+    if ( m_bPan )
+    {
+        // Limit panning when getting close to the min distance
+        float fPanSharpness = UnlerpClamped ( m_fMinDistance, fDistance, m_fMinDistance * 2 );
+        float fPanLimit = Lerp ( 0.35f, fPanSharpness, 1.0f );
 
-    // Pan
-    CVector vecLook = vecLookAt - vecCameraPosition;
-    CVector vecSound = m_vecPosition - vecCameraPosition;
-    vecLook.fZ = vecSound.fZ = 0.0f;
-    vecLook.Normalize ();
-    vecSound.Normalize ();
+        // Pan
+        CVector vecLook = vecLookAt - vecCameraPosition;
+        CVector vecSound = m_vecPosition - vecCameraPosition;
+        vecLook.fZ = vecSound.fZ = 0.0f;
+        vecLook.Normalize ();
+        vecSound.Normalize ();
 
-    vecLook.CrossProduct ( &vecSound );
-    // The length of the cross product (which is simply fZ in this case)
-    // is equal to the sine of the angle between the vectors
-    float fPan = Clamp ( -fPanLimit, -vecLook.fZ, fPanLimit );
-    
-    BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_PAN, fPan );
+        vecLook.CrossProduct ( &vecSound );
+        // The length of the cross product (which is simply fZ in this case)
+        // is equal to the sine of the angle between the vectors
+        float fPan = Clamp ( -fPanLimit, -vecLook.fZ, fPanLimit );
+
+        BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_PAN, fPan );
+    }
+    else
+    {
+        // Revert to middle.
+        BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_PAN, 0.0f );
+    }
 
     // Volume
     float fDistDiff = m_fMaxDistance - m_fMinDistance;
@@ -524,6 +735,8 @@ void CBassAudio::ServiceVars ( void )
     bool bStreamCreateResult = false;
     std::list < double > onClientSoundFinishedDownloadQueue;
     std::list < SString > onClientSoundChangedMetaQueue;
+    std::list < float > onClientBPMQueue;
+    std::list < double > onClientBeatQueue;
 
     // Lock vars
     m_pVars->criticalSection.Lock ();
@@ -533,11 +746,15 @@ void CBassAudio::ServiceVars ( void )
     bStreamCreateResult = m_pVars->bStreamCreateResult;
     onClientSoundFinishedDownloadQueue = m_pVars->onClientSoundFinishedDownloadQueue;
     onClientSoundChangedMetaQueue = m_pVars->onClientSoundChangedMetaQueue;
+    onClientBPMQueue = m_pVars->onClientBPMQueue;
+    onClientBeatQueue = m_pVars->onClientBeatQueue;
 
     // Clear vars
     m_pVars->bStreamCreateResult = false;
     m_pVars->onClientSoundFinishedDownloadQueue.clear ();
     m_pVars->onClientSoundChangedMetaQueue.clear ();
+    m_pVars->onClientBPMQueue.clear ();
+    m_pVars->onClientBeatQueue.clear ();
 
     // Unlock vars
     m_pVars->criticalSection.Unlock ();
@@ -560,6 +777,22 @@ void CBassAudio::ServiceVars ( void )
         ParseShoutcastMeta ( strMeta );
         AddQueuedEvent ( SOUND_EVENT_CHANGED_META, m_strStreamTitle );
         onClientSoundChangedMetaQueue.pop_front ();
+    }
+
+    // Handle bpm saving queue
+    while ( !onClientBPMQueue.empty () )
+    {
+        float fBPM = onClientBPMQueue.front ();
+        m_fBPM = fBPM;
+        onClientBPMQueue.pop_front ();
+    }
+
+    // Handle onClientBeatQueue queue
+    while ( !onClientBeatQueue.empty () )
+    {
+        double dBPM = onClientBeatQueue.front ();
+        AddQueuedEvent ( SOUND_EVENT_BEAT, "", dBPM );
+        onClientBeatQueue.pop_front ();
     }
 }
 

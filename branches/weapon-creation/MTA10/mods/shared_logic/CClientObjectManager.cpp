@@ -158,41 +158,13 @@ CClientObject* CClientObjectManager::Get ( ElementID ID )
 
 CClientObject* CClientObjectManager::Get ( CObject* pObject, bool bValidatePointer )
 {
-    if ( !pObject ) return NULL;
-
-    if ( bValidatePointer )
-    {
-        vector < CClientObject* > ::const_iterator iter = m_StreamedIn.begin ();
-        for ( ; iter != m_StreamedIn.end (); iter++ )
-        {
-            if ( (*iter)->GetGameObject () == pObject )
-            {
-                return *iter;
-            }
-        }
-    }
-    else
-    {
-        return reinterpret_cast < CClientObject* > ( pObject->GetStoredPointer () );
-    }
-    return NULL;
+    return g_pClientGame->GetGameEntityXRefManager ()->FindClientObject ( pObject );
 }
 
 
 CClientObject* CClientObjectManager::GetSafe ( CEntity * pEntity )
 {
-    if ( !pEntity ) return NULL;
-
-
-    vector < CClientObject* > ::const_iterator iter = m_StreamedIn.begin ();
-    for ( ; iter != m_StreamedIn.end (); iter++ )
-    {
-        if ( dynamic_cast < CEntity * > ( (*iter)->GetGameObject () ) == pEntity )
-        {
-            return *iter;
-        }
-    }
-    return NULL;
+    return g_pClientGame->GetGameEntityXRefManager ()->FindClientObject ( pEntity );
 }
 
 

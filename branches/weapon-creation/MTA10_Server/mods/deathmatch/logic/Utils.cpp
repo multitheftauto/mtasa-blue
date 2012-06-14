@@ -384,13 +384,8 @@ void DisconnectPlayer ( CGame* pGame, CPlayer& Player, const char* szMessage )
 
 void DisconnectConnectionDesync ( CGame* pGame, CPlayer& Player, unsigned int uiCode )
 {
-    // Populate a disconnection message
-    char szBuffer [128];
-    snprintf ( szBuffer, sizeof ( szBuffer ), "Disconnected: Connection desync (%u)", uiCode );
-    szBuffer [127] = 0;
-
-    // Send it to the disconnected player
-    Player.Send ( CPlayerDisconnectedPacket ( szBuffer ) );
+    // Send message to the disconnected player
+    Player.Send ( CPlayerDisconnectedPacket ( SString ( "Disconnected: Connection desync (%u)", uiCode ) ) );
 
     // Quit him
     pGame->QuitPlayer ( Player, CClient::QUIT_CONNECTION_DESYNC );
@@ -443,6 +438,10 @@ bool IsValidFilePath ( const char *szDir )
     if ( szDir == NULL ) return false;
 
     unsigned int uiLen = strlen ( szDir );
+
+    if ( uiLen > 0 && szDir [ uiLen - 1 ] == '/' ) // will return false if ending with an invalid character, mainly used for linux (#6871)
+        return false;
+
     unsigned char c, c_d;
     
     // iterate through the char array
@@ -605,7 +604,7 @@ bool XMLColorToInt ( const char* szColor, unsigned char& ucRed, unsigned char& u
 }
 
 
-bool ReadSmallKeysync ( CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream )
+bool ReadSmallKeysync ( CControllerState& ControllerState, NetBitStreamInterface& BitStream )
 {
     SSmallKeysyncSync keys;
     if ( !BitStream.Read ( &keys ) )
@@ -620,12 +619,17 @@ bool ReadSmallKeysync ( CControllerState& ControllerState, const CControllerStat
     ControllerState.ButtonTriangle  = keys.data.bButtonTriangle;
     ControllerState.ShockButtonL    = keys.data.bShockButtonL;
     ControllerState.m_bPedWalk      = keys.data.bPedWalk;
+    if ( BitStream.Version () >= 0x2C )
+    {
+        ControllerState.LeftStickX      = keys.data.sLeftStickX;
+        ControllerState.LeftStickY      = keys.data.sLeftStickY;
+    }
 
     return true;
 }
 
 
-void WriteSmallKeysync ( const CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream )
+void WriteSmallKeysync ( const CControllerState& ControllerState, NetBitStreamInterface& BitStream )
 {
     SSmallKeysyncSync keys;
     keys.data.bLeftShoulder1    = ( ControllerState.LeftShoulder1 != 0 );       // Action / Secondary-Fire
@@ -636,6 +640,8 @@ void WriteSmallKeysync ( const CControllerState& ControllerState, const CControl
     keys.data.bButtonTriangle   = ( ControllerState.ButtonTriangle != 0 );      // Enter/Exit/Special-Attack / Enter/exit
     keys.data.bShockButtonL     = ( ControllerState.ShockButtonL != 0 );        // Crouch / Horn
     keys.data.bPedWalk          = ( ControllerState.m_bPedWalk != 0 );          // Walk / -
+    keys.data.sLeftStickX       = ControllerState.LeftStickX;
+    keys.data.sLeftStickY       = ControllerState.LeftStickY;
 
     // Write it
     BitStream.Write ( &keys );
@@ -691,7 +697,7 @@ void ReadCameraOrientation ( const CVector& vecBasePosition, NetBitStreamInterfa
     //
     // Read rotations
     //
-    const static float fPI = 3.14159265f;
+    const float fPI = 3.14159265f;
     SFloatAsBitsSync < 8 > rotation ( -fPI, fPI, false );
 
     BitStream.Read ( &rotation );

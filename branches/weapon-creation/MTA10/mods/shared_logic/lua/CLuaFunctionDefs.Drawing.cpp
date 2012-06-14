@@ -21,134 +21,161 @@
 
 int CLuaFunctionDefs::dxDrawLine ( lua_State* luaVM )
 {
-    // dxDrawLine ( int x,int y,int x2,int y2,int color, [float width=1,bool postGUI=false] )
-    // Grab all argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
-    int iArgument6 = lua_type ( luaVM, 6 );
-    int iArgument7 = lua_type ( luaVM, 7 );
+//  bool dxDrawLine ( int startX, int startY, int endX, int endY, int color, [float width=1, bool postGUI=false] )
+    float fStartX; float fStartY; float fEndX; float fEndY; uint ulColor; float fWidth; bool bPostGUI;
 
-    // Check required arguments. Should all be numbers.
-    if ( ( iArgument1 != LUA_TNUMBER && iArgument1 != LUA_TSTRING ) ||
-        ( iArgument2 != LUA_TNUMBER && iArgument2 != LUA_TSTRING ) || 
-        ( iArgument3 != LUA_TNUMBER && iArgument3 != LUA_TSTRING ) ||
-        ( iArgument4 != LUA_TNUMBER && iArgument4 != LUA_TSTRING ) ||
-        ( iArgument5 != LUA_TNUMBER && iArgument5 != LUA_TSTRING ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( fStartX );
+    argStream.ReadNumber ( fStartY );
+    argStream.ReadNumber ( fEndX );
+    argStream.ReadNumber ( fEndY );
+    argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
+    argStream.ReadNumber ( fWidth, 1 );
+    argStream.ReadBool ( bPostGUI, false );
+
+    if ( !argStream.HasErrors () )
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "dxDrawLine" );
-        lua_pushboolean ( luaVM, false );
+        g_pCore->GetGraphics ()->DrawLineQueued ( fStartX, fStartY, fEndX, fEndY, fWidth, ulColor, bPostGUI );
+        lua_pushboolean ( luaVM, true );
         return 1;
-    }    
-
-    // Got a line width too?
-    float fWidth = 1.0f;
-    if ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING )
-    {
-        fWidth = static_cast < float > ( lua_tonumber ( luaVM, 6 ) );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawLine", *argStream.GetErrorMessage () ) );
 
-    // Got a post gui specifier?
-    bool bPostGUI = false;
-    if ( iArgument7 == LUA_TBOOLEAN )
-    {
-        bPostGUI = ( lua_toboolean ( luaVM, 7 ) ) ? true:false;
-    }
-
-    // Grab the arguments
-    float fX1 = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
-    float fY1 = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
-    float fX2 = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
-    float fY2 = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
-    unsigned long ulColor = static_cast < unsigned long > ( lua_tonumber ( luaVM, 5 ) );
-
-    // Draw it
-    g_pCore->GetGraphics ()->DrawLineQueued ( fX1, fY1, fX2, fY2,fWidth, ulColor, bPostGUI );
-
-    // Success
-    lua_pushboolean ( luaVM, true );
+    // Failed
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 
 
 int CLuaFunctionDefs::dxDrawLine3D ( lua_State* luaVM )
 {
-    // dxDrawLine3D ( float x,float y,float z,float x2,float y2,float z2,int color, [float width,bool postGUI,float zBuffer] )
+// bool dxDrawLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, int color[, int width, bool postGUI ] )
+    CVector vecBegin; CVector vecEnd; uint ulColor; float fWidth; bool bPostGUI;
 
-    // Grab all argument types
-    int iArgument1 = lua_type ( luaVM, 1 ); // X1
-    int iArgument2 = lua_type ( luaVM, 2 ); // Y1
-    int iArgument3 = lua_type ( luaVM, 3 ); // Z1
-    int iArgument4 = lua_type ( luaVM, 4 ); // X2
-    int iArgument5 = lua_type ( luaVM, 5 ); // Y2
-    int iArgument6 = lua_type ( luaVM, 6 ); // Z2
-    int iArgument7 = lua_type ( luaVM, 7 ); // Color
-    int iArgument8 = lua_type ( luaVM, 8 ); // Width
-    int iArgument9 = lua_type ( luaVM, 9 ); // Reserved: Post GUI
-    int iArgument10 = lua_type ( luaVM, 10 ); // Reserved: Z-buffer
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( vecBegin.fX );
+    argStream.ReadNumber ( vecBegin.fY );
+    argStream.ReadNumber ( vecBegin.fZ );
+    argStream.ReadNumber ( vecEnd.fX );
+    argStream.ReadNumber ( vecEnd.fY );
+    argStream.ReadNumber ( vecEnd.fZ );
+    argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
+    argStream.ReadNumber ( fWidth, 1 );
+    argStream.ReadBool ( bPostGUI, false );
 
-    // Check required arguments. Should all be numbers.
-    if ( ( iArgument1 != LUA_TNUMBER && iArgument1 != LUA_TSTRING ) ||
-        ( iArgument2 != LUA_TNUMBER && iArgument2 != LUA_TSTRING ) || 
-        ( iArgument3 != LUA_TNUMBER && iArgument3 != LUA_TSTRING ) ||
-        ( iArgument4 != LUA_TNUMBER && iArgument4 != LUA_TSTRING ) ||
-        ( iArgument5 != LUA_TNUMBER && iArgument5 != LUA_TSTRING ) ||
-        ( iArgument6 != LUA_TNUMBER && iArgument6 != LUA_TSTRING ) ||
-        ( iArgument7 != LUA_TNUMBER && iArgument7 != LUA_TSTRING ))
+    if ( !argStream.HasErrors () )
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "dxDrawLine3D" );
-        lua_pushboolean ( luaVM, false );
+        g_pCore->GetGraphics ()->DrawLine3DQueued ( vecBegin, vecEnd, fWidth, ulColor, bPostGUI );
+        lua_pushboolean ( luaVM, true );
         return 1;
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawLine3D", *argStream.GetErrorMessage () ) );
 
-    // Got a line width too?
-    float fWidth = 1.0f;
-    if ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING )
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxDrawMaterialLine3D ( lua_State* luaVM )
+{
+// bool dxDrawMaterialLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, element material, int width [, int color = white,
+//                          float faceX, float faceY, float faceZ ] )
+    CVector vecBegin; CVector vecEnd; CClientMaterial* pMaterial; float fWidth; uint ulColor;
+    CVector vecFaceToward; bool bUseFaceToward = false;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( vecBegin.fX );
+    argStream.ReadNumber ( vecBegin.fY );
+    argStream.ReadNumber ( vecBegin.fZ );
+    argStream.ReadNumber ( vecEnd.fX );
+    argStream.ReadNumber ( vecEnd.fY );
+    argStream.ReadNumber ( vecEnd.fZ );
+    argStream.ReadUserData ( pMaterial );
+    argStream.ReadNumber ( fWidth );
+    argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
+    if ( argStream.NextCouldBeNumber () )
     {
-        fWidth = static_cast < float > ( lua_tonumber ( luaVM, 8 ) );
+        argStream.ReadNumber ( vecFaceToward.fX );
+        argStream.ReadNumber ( vecFaceToward.fY );
+        argStream.ReadNumber ( vecFaceToward.fZ );
+        bUseFaceToward = true;
     }
 
-    // Got a post gui specifier?
-    bool bPostGUI = false;
-    if ( iArgument9 == LUA_TBOOLEAN )
+    if ( !argStream.HasErrors () )
     {
-        bPostGUI = ( lua_toboolean ( luaVM, 9 ) ) ? true : false;
+        g_pCore->GetGraphics ()->DrawMaterialLine3DQueued ( vecBegin, vecEnd, fWidth, ulColor, pMaterial->GetMaterialItem (), 0, 0, 1, 1, true, bUseFaceToward, vecFaceToward );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawMaterialLine3D", *argStream.GetErrorMessage () ) );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxDrawMaterialSectionLine3D ( lua_State* luaVM )
+{
+// bool dxDrawMaterialSectionLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, float u, float v, float usize, float vsize,
+//                                  element material, int width, [ int color = white, float faceX, float faceY, float faceZ ] )
+    CVector vecBegin; CVector vecEnd; float fU; float fV; float fSizeU; float fSizeV;
+    CClientMaterial* pMaterial; float fWidth; uint ulColor; CVector vecFaceToward; bool bUseFaceToward = false;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( vecBegin.fX );
+    argStream.ReadNumber ( vecBegin.fY );
+    argStream.ReadNumber ( vecBegin.fZ );
+    argStream.ReadNumber ( vecEnd.fX );
+    argStream.ReadNumber ( vecEnd.fY );
+    argStream.ReadNumber ( vecEnd.fZ );
+    argStream.ReadNumber ( fU );
+    argStream.ReadNumber ( fV );
+    argStream.ReadNumber ( fSizeU );
+    argStream.ReadNumber ( fSizeV );
+    argStream.ReadUserData ( pMaterial );
+    argStream.ReadNumber ( fWidth );
+    argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
+    if ( argStream.NextCouldBeNumber () )
+    {
+        argStream.ReadNumber ( vecFaceToward.fX );
+        argStream.ReadNumber ( vecFaceToward.fY );
+        argStream.ReadNumber ( vecFaceToward.fZ );
+        bUseFaceToward = true;
     }
 
-    // Grab the arguments
-    CVector vecBegin, vecEnd;
-    vecBegin.fX = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
-    vecBegin.fY = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
-    vecBegin.fZ = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
-    vecEnd.fX = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
-    vecEnd.fY = static_cast < float > ( lua_tonumber ( luaVM, 5 ) );
-    vecEnd.fZ = static_cast < float > ( lua_tonumber ( luaVM, 6 ) );
-    unsigned long ulColor = static_cast < unsigned long > ( lua_tonumber ( luaVM, 7 ) );
+    if ( !argStream.HasErrors () )
+    {
+        g_pCore->GetGraphics ()->DrawMaterialLine3DQueued ( vecBegin, vecEnd, fWidth, ulColor, pMaterial->GetMaterialItem (), fU, fV, fSizeU, fSizeV, false, bUseFaceToward, vecFaceToward );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawMaterialSectionLine3D", *argStream.GetErrorMessage () ) );
 
-    // Draw it
-    g_pCore->GetGraphics ()->DrawLine3DQueued ( vecBegin, vecEnd, fWidth, ulColor, bPostGUI );
-
-    // Success
-    lua_pushboolean ( luaVM, true );
+    // Failed
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 
 
 int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
 {
-//  bool dxDrawText ( string text, int left, int top [, int right=left, int bottom=top, int color=white, float scale=1, mixed font="default", 
-//      string alignX="left", string alignY="top", bool clip=false, bool wordBreak=false, bool postGUI] )
-    SString strText; int iLeft; int iTop; int iRight; int iBottom; ulong ulColor; float fScaleX; float fScaleY; SString strFontName; CClientDxFont* pDxFontElement;
-    eDXHorizontalAlign alignX; eDXVerticalAlign alignY; bool bClip; bool bWordBreak; bool bPostGUI;
+//  bool dxDrawText ( string text, float left, float top [, float right=left, float bottom=top, int color=white, float scale=1, mixed font="default", 
+//      string alignX="left", string alignY="top", bool clip=false, bool wordBreak=false, bool postGUI=false, bool colorCoded=false, bool subPixelPositioning=false] )
+    SString strText; float fLeft; float fTop; float fRight; float fBottom; ulong ulColor; float fScaleX; float fScaleY; SString strFontName; CClientDxFont* pDxFontElement;
+    eDXHorizontalAlign alignX; eDXVerticalAlign alignY; bool bClip; bool bWordBreak; bool bPostGUI; bool bColorCoded; bool bSubPixelPositioning;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strText );
-    argStream.ReadNumber ( iLeft );
-    argStream.ReadNumber ( iTop );
-    argStream.ReadNumber ( iRight, iLeft );
-    argStream.ReadNumber ( iBottom, iTop );
+    argStream.ReadNumber ( fLeft );
+    argStream.ReadNumber ( fTop );
+    argStream.ReadNumber ( fRight, fLeft );
+    argStream.ReadNumber ( fBottom, fTop );
     argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
     argStream.ReadNumber ( fScaleX, 1 );
     if ( argStream.NextIsNumber () )
@@ -161,6 +188,8 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
     argStream.ReadBool ( bClip, false );
     argStream.ReadBool ( bWordBreak, false );
     argStream.ReadBool ( bPostGUI, false );
+    argStream.ReadBool ( bColorCoded, false );
+    argStream.ReadBool ( bSubPixelPositioning, false );
 
     if ( !argStream.HasErrors () )
     {
@@ -173,7 +202,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
         if ( bWordBreak )           ulFormat |= DT_WORDBREAK;
         if ( !bClip )               ulFormat |= DT_NOCLIP;
 
-        CStaticFunctionDefinitions::DrawText ( iLeft, iTop, iRight, iBottom, ulColor, strText, fScaleX, fScaleY, ulFormat, pD3DXFont, bPostGUI );
+        CStaticFunctionDefinitions::DrawText ( fLeft, fTop, fRight, fBottom, ulColor, strText, fScaleX, fScaleY, ulFormat, pD3DXFont, bPostGUI, bColorCoded, bSubPixelPositioning );
 
         lua_pushboolean ( luaVM, true );
         return 1;
@@ -189,50 +218,26 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxDrawRectangle ( lua_State* luaVM )
 {
-    // dxDrawRectangle ( int x,int y,float width,float height,[int color=0xffffffff] )
+// bool dxDrawRectangle ( int startX, int startY, float width, float height [, int color = white, bool postGUI = false] )
+    float fStartX; float fStartY; float fWidth; float fHeight; uint ulColor; bool bPostGUI;
 
-    // Grab all argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) && 
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) && 
-        ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) && 
-        ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( fStartX );
+    argStream.ReadNumber ( fStartY );
+    argStream.ReadNumber ( fWidth );
+    argStream.ReadNumber ( fHeight );
+    argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
+    argStream.ReadBool ( bPostGUI, false );
+
+
+    if ( !argStream.HasErrors () )
     {
-        int iX = static_cast < int > ( lua_tonumber ( luaVM, 1 ) );
-        int iY = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
-        int iWidth = static_cast < int > ( lua_tonumber ( luaVM, 3 ) );
-        int iHeight = static_cast < int > ( lua_tonumber ( luaVM, 4 ) );
-        unsigned long ulColor = 0xFFFFFFFF;
-
-        int iArgument5 = lua_type ( luaVM, 5 );
-        if ( ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) )
-        {
-            ulColor = static_cast < unsigned long > ( lua_tonumber ( luaVM, 5 ) );
-        }
-
-        // Got a post gui specifier?
-        bool bPostGUI = false;
-        int iArgument6 = lua_type ( luaVM, 6 );
-        if ( iArgument6 == LUA_TBOOLEAN )
-        {
-            bPostGUI = ( lua_toboolean ( luaVM, 6 ) ) ? true:false;
-        }
-
-        g_pCore->GetGraphics ()->DrawRectQueued ( static_cast < float > ( iX ),
-                                                  static_cast < float > ( iY ),
-                                                  static_cast < float > ( iWidth ),
-                                                  static_cast < float > ( iHeight ),
-                                                  ulColor, bPostGUI );
-
-        // Success
+        g_pCore->GetGraphics ()->DrawRectQueued ( fStartX, fStartY, fWidth, fHeight, ulColor, bPostGUI );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "dxDrawRectangle" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawRectangle", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -390,11 +395,52 @@ int CLuaFunctionDefs::dxGetFontHeight ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
 {
-//  element dxCreateTexture( string filepath )
-    SString strFilePath;
+//  element dxCreateTexture( string filepath [, string textureFormat = "argb", bool mipmaps = true, string textureEdge = "wrap" ] )
+//  element dxCreateTexture( string pixels [, string textureFormat = "argb", bool mipmaps = true, string textureEdge = "wrap" ] )
+//  element dxCreateTexture( int width, int height [, string textureFormat = "argb", string textureEdge = "wrap", string textureType = "2d", int depth ] )
+    SString strFilePath; CPixels pixels; int width; int height; ERenderFormat renderFormat; bool bMipMaps;
+    ETextureAddress textureAddress; ETextureType textureType; int depth = 1;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strFilePath );
+    if ( !argStream.NextIsNumber () )
+    {
+        argStream.ReadCharStringRef ( pixels.externalData );
+        if ( !g_pCore->GetGraphics ()->GetPixelsManager ()->IsPixels ( pixels ) )
+        {
+            // element dxCreateTexture( string filepath [, string textureFormat = "argb", bool mipmaps = true, string textureEdge = "wrap" ] )
+            pixels = CPixels ();
+            argStream = CScriptArgReader ( luaVM );
+            argStream.ReadString ( strFilePath );
+            argStream.ReadEnumString ( renderFormat, RFORMAT_UNKNOWN );
+            argStream.ReadBool ( bMipMaps, true );
+            argStream.ReadEnumString ( textureAddress, TADDRESS_WRAP );
+        }
+        else
+        {
+            // element dxCreateTexture( string pixels [, string textureFormat = "argb", bool mipmaps = true, string textureEdge = "wrap" ] )
+            argStream.ReadEnumString ( renderFormat, RFORMAT_UNKNOWN );
+            argStream.ReadBool ( bMipMaps, true );
+            argStream.ReadEnumString ( textureAddress, TADDRESS_WRAP );
+        }
+    }
+    else
+    {
+        // element dxCreateTexture( int width, int height [, string textureFormat = "argb", string textureEdge = "wrap", string textureType = "2d", int depth ] )
+        argStream.ReadNumber ( width );
+        argStream.ReadNumber ( height );
+        argStream.ReadEnumString ( renderFormat, RFORMAT_UNKNOWN );
+        if ( argStream.NextIsEnumString ( textureType ) )
+        {
+           // r4019 to r4037 had incorrect argument order
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxCreateTexture", "invalid texture-edge type at argument 4" ) );
+            textureAddress = TADDRESS_WRAP;
+        }
+        else
+            argStream.ReadEnumString ( textureAddress, TADDRESS_WRAP );
+        argStream.ReadEnumString ( textureType, TTYPE_TEXTURE );
+        if ( textureType == TTYPE_VOLUMETEXTURE )
+            argStream.ReadNumber ( depth );
+    }
 
     if ( !argStream.HasErrors () )
     {
@@ -402,26 +448,54 @@ int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
         if ( pLuaMain )
         {
             CResource* pParentResource = pLuaMain->GetResource ();
-            CResource* pFileResource = pParentResource;
-            SString strPath, strMetaPath;
-            if ( CResourceManager::ParseResourcePathInput( strFilePath, pFileResource, strPath, strMetaPath ) )
+
+            if ( !strFilePath.empty () )
             {
-                if ( FileExists ( strPath ) )
+                // From file
+                CResource* pFileResource = pParentResource;
+                SString strPath, strMetaPath;
+                if ( CResourceManager::ParseResourcePathInput( strFilePath, pFileResource, strPath, strMetaPath ) )
                 {
-                    CClientTexture* pTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateTexture ( strPath );
-                    if ( pTexture )
+                    if ( FileExists ( strPath ) )
                     {
-                        // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
-                        pTexture->SetParent ( pParentResource->GetResourceDynamicEntity () );
+                        CClientTexture* pTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateTexture ( strPath, NULL, bMipMaps, RDEFAULT, RDEFAULT, renderFormat, textureAddress );
+                        if ( pTexture )
+                        {
+                            // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+                            pTexture->SetParent ( pParentResource->GetResourceDynamicEntity () );
+                        }
+                        lua_pushelement ( luaVM, pTexture );
+                        return 1;
                     }
-                    lua_pushelement ( luaVM, pTexture );
-                    return 1;
+                    else
+                        m_pScriptDebugging->LogBadPointer ( luaVM, "dxCreateTexture", "file-path", 1 );
                 }
                 else
                     m_pScriptDebugging->LogBadPointer ( luaVM, "dxCreateTexture", "file-path", 1 );
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "dxCreateTexture", "file-path", 1 );
+            if ( pixels.GetSize () )
+            {
+                // From pixels
+                CClientTexture* pTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateTexture ( "", &pixels, bMipMaps, RDEFAULT, RDEFAULT, renderFormat, textureAddress );
+                if ( pTexture )
+                {
+                    pTexture->SetParent ( pParentResource->GetResourceDynamicEntity () );
+                }
+                lua_pushelement ( luaVM, pTexture );
+                return 1;
+            }
+            else
+            {
+                // Blank sized
+                CClientTexture* pTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateTexture ( "", NULL, false, width, height, renderFormat, textureAddress, textureType, depth );
+                if ( pTexture )
+                {
+                    pTexture->SetParent ( pParentResource->GetResourceDynamicEntity () );
+                }
+                lua_pushelement ( luaVM, pTexture );
+                return 1;
+            }
         }
     }
     else
@@ -562,7 +636,7 @@ int CLuaFunctionDefs::dxCreateScreenSource ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxGetMaterialSize ( lua_State* luaVM )
 {
-//  int, int dxGetMaterialSize( element material )
+//  int, int [, int] dxGetMaterialSize( element material )
     CClientMaterial* pMaterial; SString strName;
 
     CScriptArgReader argStream ( luaVM );
@@ -572,6 +646,14 @@ int CLuaFunctionDefs::dxGetMaterialSize ( lua_State* luaVM )
     {
         lua_pushnumber ( luaVM, pMaterial->GetMaterialItem ()->m_uiSizeX );
         lua_pushnumber ( luaVM, pMaterial->GetMaterialItem ()->m_uiSizeY );
+        if ( CFileTextureItem* pTextureItem = DynamicCast < CFileTextureItem > ( pMaterial->GetMaterialItem () ) )
+        {
+            if ( pTextureItem->m_TextureType == TTYPE_VOLUMETEXTURE )
+            {
+                lua_pushnumber ( luaVM, pTextureItem->m_uiVolumeDepth );
+                return 3;
+            }
+        }
         return 2;
     }
     else
@@ -760,15 +842,16 @@ int CLuaFunctionDefs::dxSetRenderTarget ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxUpdateScreenSource ( lua_State* luaVM )
 {
-//  bool dxUpdateScreenSource( element screenSource )
-    CClientScreenSource* pScreenSource;
+//  bool dxUpdateScreenSource( element screenSource [, bool resampleNow] )
+    CClientScreenSource* pScreenSource; bool bResampleNow;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pScreenSource );
+    argStream.ReadBool ( bResampleNow, false );
 
     if ( !argStream.HasErrors () )
     {
-        g_pCore->GetGraphics ()->GetRenderItemManager ()->UpdateScreenSource ( pScreenSource->GetScreenSourceItem () );
+        g_pCore->GetGraphics ()->GetRenderItemManager ()->UpdateScreenSource ( pScreenSource->GetScreenSourceItem (), bResampleNow );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
@@ -916,6 +999,10 @@ int CLuaFunctionDefs::dxGetStatus ( lua_State* luaVM )
         lua_pushnumber ( luaVM, dxStatus.settings.iStreamingMemory );
         lua_settable   ( luaVM, -3 );
 
+        lua_pushstring ( luaVM, "AllowScreenUpload" );
+        lua_pushboolean ( luaVM, dxStatus.settings.bAllowScreenUpload );
+        lua_settable   ( luaVM, -3 );
+
         return 1;
     }
     else
@@ -923,5 +1010,249 @@ int CLuaFunctionDefs::dxGetStatus ( lua_State* luaVM )
 
     // error: bad arguments
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxGetTexturePixels ( lua_State* luaVM )
+{
+//  string dxGetTexturePixels( [ int surfaceIndex, ] element texture [, int x, int y, int width, int height ] )
+    CClientTexture* pTexture; int x; int y; int width; int height;
+    int surfaceIndex = 0;
+
+    CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsNumber () )
+        argStream.ReadNumber ( surfaceIndex );
+    argStream.ReadUserData ( pTexture );
+    argStream.ReadNumber ( x, 0 );
+    argStream.ReadNumber ( y, 0 );
+    argStream.ReadNumber ( width, 0 );
+    argStream.ReadNumber ( height, 0 );
+
+    if ( !argStream.HasErrors () )
+    {
+        RECT rc = { x, y, x + width, y + height };
+        CPixels pixels;
+        if ( g_pCore->GetGraphics ()->GetPixelsManager ()->GetTexturePixels ( pTexture->GetTextureItem ()->m_pD3DTexture, pixels, height ? &rc : NULL, surfaceIndex ) )
+        {
+            lua_pushlstring ( luaVM, pixels.GetData (), pixels.GetSize () );
+            return 1;           
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxGetTexturePixels", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxSetTexturePixels ( lua_State* luaVM )
+{
+//  string dxGetTexturePixels( [ int sufaceIndex, ] element texture, string pixels [, int x, int y, int width, int height ] )
+    CClientTexture* pTexture; CPixels pixels; int x; int y; int width; int height;
+    int surfaceIndex = 0;
+
+    CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsNumber () )
+        argStream.ReadNumber ( surfaceIndex );
+    argStream.ReadUserData ( pTexture );
+    argStream.ReadCharStringRef ( pixels.externalData );
+    argStream.ReadNumber ( x, 0 );
+    argStream.ReadNumber ( y, 0 );
+    argStream.ReadNumber ( width, 0 );
+    argStream.ReadNumber ( height, 0 );
+
+    if ( !argStream.HasErrors () )
+    {
+        RECT rc = { x, y, x + width, y + height };
+        if ( g_pCore->GetGraphics ()->GetPixelsManager ()->SetTexturePixels ( pTexture->GetTextureItem ()->m_pD3DTexture, pixels, height ? &rc : NULL, surfaceIndex ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;           
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetTexturePixels", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxGetPixelsSize ( lua_State* luaVM )
+{
+//  int x,y dxGetPixelsSize( string pixels )
+    CPixels pixels;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadCharStringRef ( pixels.externalData );
+
+    if ( !argStream.HasErrors () )
+    {
+        uint uiSizeX;
+        uint uiSizeY;
+        if ( g_pCore->GetGraphics ()->GetPixelsManager ()->GetPixelsSize ( pixels, uiSizeX, uiSizeY ) )
+        {
+            lua_pushinteger ( luaVM, uiSizeX );
+            lua_pushinteger ( luaVM, uiSizeY );
+            return 2;           
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxGetPixelsSize", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxGetPixelsFormat ( lua_State* luaVM )
+{
+//  string dxGetPixelsFormat( string pixels )
+    CPixels pixels;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadCharStringRef ( pixels.externalData );
+
+    if ( !argStream.HasErrors () )
+    {
+        EPixelsFormatType format = g_pCore->GetGraphics ()->GetPixelsManager ()->GetPixelsFormat ( pixels );
+        if ( format != EPixelsFormat::UNKNOWN )
+        {
+            lua_pushstring ( luaVM, EnumToString ( format ) );
+            return 1;           
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxGetPixelsFormat", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxConvertPixels ( lua_State* luaVM )
+{
+//  string dxConvertPixels( string pixels, string pixelFormat [, int quality] )
+    CPixels pixels; EPixelsFormatType format; int quality;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadCharStringRef ( pixels.externalData );
+    argStream.ReadEnumString ( format );
+    argStream.ReadNumber ( quality, 80 );
+
+    if ( !argStream.HasErrors () )
+    {
+        CPixels newPixels;
+        if ( g_pCore->GetGraphics ()->GetPixelsManager ()->ChangePixelsFormat ( pixels, newPixels, format, quality ) )
+        {
+            lua_pushlstring ( luaVM, newPixels.GetData (), newPixels.GetSize () );
+            return 1;           
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxConvertPixels", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxGetPixelColor ( lua_State* luaVM )
+{
+//  int r,g,b,a dxGetPixelColor( string pixels, int x, int y )
+    CPixels pixels; int x; int y;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadCharStringRef ( pixels.externalData );
+    argStream.ReadNumber ( x );
+    argStream.ReadNumber ( y );
+
+    if ( !argStream.HasErrors () )
+    {
+        SColor color;
+        if ( g_pCore->GetGraphics ()->GetPixelsManager ()->GetPixelColor ( pixels, x, y, color ) )
+        {
+            lua_pushnumber ( luaVM, color.R );
+            lua_pushnumber ( luaVM, color.G );
+            lua_pushnumber ( luaVM, color.B );
+            lua_pushnumber ( luaVM, color.A );
+            return 4;           
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxGetPixelColor", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxSetPixelColor ( lua_State* luaVM )
+{
+//  bool dxSetPixelColor( string pixels, int x, int y, int r, int g, int b [, int a] )
+    CPixels pixels; int x; int y; SColor color;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadCharStringRef ( pixels.externalData );
+    argStream.ReadNumber ( x );
+    argStream.ReadNumber ( y );
+    argStream.ReadNumber ( color.R );
+    argStream.ReadNumber ( color.G );
+    argStream.ReadNumber ( color.B );
+    argStream.ReadNumber ( color.A, 255 );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( g_pCore->GetGraphics ()->GetPixelsManager ()->SetPixelColor ( pixels, x, y, color ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;           
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetPixelColor", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxSetBlendMode ( lua_State* luaVM )
+{
+//  bool dxSetBlendMode ( string blendMode )
+    EBlendModeType blendMode;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( blendMode, EBlendMode::BLEND );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pCore->GetGraphics ()->SetBlendMode ( blendMode );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetBlendMode", *argStream.GetErrorMessage () ) );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxGetBlendMode ( lua_State* luaVM )
+{
+//  string dxGetBlendMode ()
+    EBlendModeType blendMode = g_pCore->GetGraphics ()->GetBlendMode ();
+    lua_pushstring ( luaVM, EnumToString ( blendMode ) );
     return 1;
 }

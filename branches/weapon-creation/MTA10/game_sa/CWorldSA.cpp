@@ -21,7 +21,7 @@ CWorldSA::CWorldSA ( )
     m_pDataBuildings = new std::multimap < unsigned short, sDataBuildingRemoval* >;
 }
 
-void CWorldSA::Add ( CEntity * pEntity )
+void CWorldSA::Add ( CEntity * pEntity, eDebugCaller CallerId )
 {
     DEBUG_TRACE("VOID CWorldSA::Add ( CEntity * pEntity )");
 
@@ -29,6 +29,12 @@ void CWorldSA::Add ( CEntity * pEntity )
 
     if ( pEntitySA )
     {
+        CEntitySAInterface * pInterface = pEntitySA->GetInterface();
+        if ( (DWORD)pInterface->vtbl == VTBL_CPlaceable )
+        {
+            SString strMessage ( "Caller: %i ", CallerId );
+            LogEvent ( 506, "CWorld::Add ( CEntity * ) Crash", "", strMessage );
+        }
         DWORD dwEntity = (DWORD) pEntitySA->GetInterface();
         DWORD dwFunction = FUNC_Add;
         _asm
@@ -41,10 +47,15 @@ void CWorldSA::Add ( CEntity * pEntity )
 }
 
 
-void CWorldSA::Add ( CEntitySAInterface * entityInterface )
+void CWorldSA::Add ( CEntitySAInterface * entityInterface, eDebugCaller CallerId )
 {
     DEBUG_TRACE("VOID CWorldSA::Add ( CEntitySAInterface * entityInterface )");
     DWORD dwFunction = FUNC_Add;
+    if ( (DWORD)entityInterface->vtbl == VTBL_CPlaceable )
+    {
+        SString strMessage ( "Caller: %i ", CallerId );
+        LogEvent ( 506, "CWorld::Add ( CEntitySAInterface * ) Crash", "", strMessage );
+    }
     _asm
     {
         push    entityInterface
@@ -53,7 +64,7 @@ void CWorldSA::Add ( CEntitySAInterface * entityInterface )
     }
 }
 
-void CWorldSA::Remove ( CEntity * pEntity )
+void CWorldSA::Remove ( CEntity * pEntity, eDebugCaller CallerId )
 {
     DEBUG_TRACE("VOID CWorldSA::Remove ( CEntity * entity )");
 
@@ -61,7 +72,13 @@ void CWorldSA::Remove ( CEntity * pEntity )
 
     if ( pEntitySA )
     {
-        DWORD dwEntity = (DWORD)pEntitySA->GetInterface();
+        CEntitySAInterface * pInterface = pEntitySA->GetInterface();
+        if ( (DWORD)pInterface->vtbl == VTBL_CPlaceable )
+        {
+            SString strMessage ( "Caller: %i ", CallerId );
+            LogEvent ( 507, "CWorld::Remove ( CEntity * ) Crash", "", strMessage );
+        }
+        DWORD dwEntity = (DWORD)pInterface;
         DWORD dwFunction = FUNC_Remove;
         _asm
         {
@@ -72,9 +89,14 @@ void CWorldSA::Remove ( CEntity * pEntity )
     }
 }
 
-void CWorldSA::Remove ( CEntitySAInterface * entityInterface )
+void CWorldSA::Remove ( CEntitySAInterface * entityInterface, eDebugCaller CallerId )
 {
     DEBUG_TRACE("VOID CWorldSA::Remove ( CEntitySAInterface * entityInterface )");
+    if ( (DWORD)entityInterface->vtbl == VTBL_CPlaceable )
+    {
+        SString strMessage ( "Caller: %i ", CallerId );
+        LogEvent ( 507, "CWorld::Remove ( CEntitySAInterface * ) Crash", "", strMessage );
+    }
     DWORD dwFunction = FUNC_Remove;
     _asm
     {
@@ -454,6 +476,26 @@ float CWorldSA::GetAircraftMaxHeight ( void )
     return g_pCore->GetMultiplayer ( )->GetAircraftMaxHeight ( );
 }
 
+void CWorldSA::SetOcclusionsEnabled ( bool bEnabled )
+{
+    if ( !bEnabled )
+    {
+        MemPut < BYTE > ( FUNC_COcclusion_ProcessBeforeRendering, 0xC3 );   // retn
+        MemPutFast < int > ( VAR_COcclusion_NumActiveOccluders, 0 );
+    }
+    else
+    {
+        MemPut < BYTE > ( FUNC_COcclusion_ProcessBeforeRendering, 0x51 );   // Standard value
+    }
+}
+
+bool CWorldSA::GetOcclusionsEnabled ( void )
+{
+    if ( *(BYTE*)FUNC_COcclusion_ProcessBeforeRendering == 0x51 )           // Is standard value ?
+        return true;
+    return false;
+}
+
 void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, float fX, float fY, float fZ )
 {    
     // New building Removal
@@ -504,7 +546,7 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
                                 // Add the Data Building to the list
                                 pRemoval->AddDataBuilding ( pInterface );
                                 // Remove the model from the world
-                                Remove ( pInterface );
+                                Remove ( pInterface, BuildingRemoval2 );
                                 bFound = true;
 
                             }
@@ -565,7 +607,7 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
                                 // Don't call this on entities being removed.
                                 if ( (DWORD)(pEntity->vtbl) != VTBL_CPlaceable )
                                 {
-                                    Add ( pEntity );
+                                    Add ( pEntity, Building_Restore );
                                 }
                             }
                             // Remove it from the binary list
@@ -592,7 +634,7 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
                             {
                                 if ( (DWORD)(pEntity->vtbl) != VTBL_CPlaceable )
                                 {
-                                    Add ( pEntity );
+                                    Add ( pEntity, Building_Restore2 );
                                 }
                             }
                             pFind->m_pDataRemoveList->erase ( entityIter++ );
@@ -746,7 +788,7 @@ void CWorldSA::ClearRemovedBuildingLists ( )
                             // Don't call this on entities being removed.
                             if ( (DWORD)(pEntity->vtbl) != VTBL_CPlaceable )
                             {
-                                Add ( pEntity );
+                                Add ( pEntity, BuildingRemovalReset );
                             }
                         }
                     }
@@ -769,7 +811,7 @@ void CWorldSA::ClearRemovedBuildingLists ( )
                             // Don't call this on entities being removed.
                             if ( (DWORD)(pEntity->vtbl) != VTBL_CPlaceable )
                             {
-                                Add ( pEntity );
+                                Add ( pEntity, BuildingRemovalReset2 );
                             }
                         }
                     }

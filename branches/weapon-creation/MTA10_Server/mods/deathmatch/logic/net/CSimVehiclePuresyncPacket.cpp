@@ -16,7 +16,8 @@
                                                         ushort usVehicleGotModel,
                                                         uchar ucPlayerGotOccupiedVehicleSeat,
                                                         uchar ucPlayerGotWeaponType,
-                                                        float fPlayerGotWeaponRange )
+                                                        float fPlayerGotWeaponRange,
+                                                        CControllerState& sharedControllerState )
     : m_PlayerID ( PlayerID )
     , m_usPlayerLatency ( usPlayerLatency )
     , m_ucPlayerSyncTimeContext ( ucPlayerSyncTimeContext )
@@ -25,6 +26,7 @@
     , m_ucPlayerGotOccupiedVehicleSeat ( ucPlayerGotOccupiedVehicleSeat )
     , m_ucPlayerGotWeaponType ( ucPlayerGotWeaponType )
     , m_fPlayerGotWeaponRange ( fPlayerGotWeaponRange )
+    , m_sharedControllerState ( sharedControllerState )
 {
 }
 
@@ -53,7 +55,7 @@ bool CSimVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         }
 
         // Read out the keysync data
-        if ( !ReadFullKeysync ( m_Cache.ControllerState, BitStream ) )
+        if ( !ReadFullKeysync ( m_sharedControllerState, BitStream ) )
             return false;
 
         // Read out its position
@@ -207,8 +209,8 @@ bool CSimVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         // if it's an aircraft.
         if ( m_Cache.flags.data.bIsAircraft )
         {
-            m_Cache.ControllerState.LeftShoulder2 = BitStream.ReadBit () * 255;
-            m_Cache.ControllerState.RightShoulder2 = BitStream.ReadBit () * 255;
+            m_sharedControllerState.LeftShoulder2 = BitStream.ReadBit () * 255;
+            m_sharedControllerState.RightShoulder2 = BitStream.ReadBit () * 255;
         }
 
         // Success
@@ -237,7 +239,7 @@ bool CSimVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.WriteCompressed ( m_usPlayerLatency );
 
         // Write the keysync data
-        WriteFullKeysync ( m_Cache.ControllerState, BitStream );
+        WriteFullKeysync ( m_sharedControllerState, BitStream );
 
         // Write the vehicle matrix only if he's the driver
         CVector vecTemp;
@@ -323,8 +325,8 @@ bool CSimVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         // it's an aircraft.
         if ( m_Cache.flags.data.bIsAircraft )
         {
-            BitStream.WriteBit ( m_Cache.ControllerState.LeftShoulder2 != 0 );
-            BitStream.WriteBit ( m_Cache.ControllerState.RightShoulder2 != 0 );
+            BitStream.WriteBit ( m_sharedControllerState.LeftShoulder2 != 0 );
+            BitStream.WriteBit ( m_sharedControllerState.RightShoulder2 != 0 );
         }
 
         // Success

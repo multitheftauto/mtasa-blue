@@ -197,6 +197,9 @@ void CModManager::Unload ( void )
         // Unregister the commands it had registered
         CCore::GetSingleton ().GetCommands ()->DeleteAll ();
 
+        // Stop all screen grabs
+        CGraphics::GetSingleton ().GetScreenGrabber ()->ClearScreenShotQueue ();
+
         // Free the Client DLL
         FreeLibrary ( m_hClientDLL );
         m_hClientDLL = NULL;
@@ -292,7 +295,7 @@ void CModManager::DoPulsePostFrame ( void )
     if ( m_pClientBase )
         CCore::GetSingleton ().EnsureFrameRateLimitApplied ();  // Catch missed frames
     else
-        CCore::GetSingleton ().ApplyFrameRateLimit ( 60 );      // Limit when not connected
+        CCore::GetSingleton ().ApplyFrameRateLimit ( 88 );      // Limit when not connected
 
     // Load/unload requested?
     if ( m_bUnloadRequested )

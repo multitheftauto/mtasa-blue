@@ -55,6 +55,7 @@ public:
 
     //
     static int      CallRemote                          ( lua_State* luaVM );
+    static int      FetchRemote                         ( lua_State* luaVM );
 
     // Event functions
     static int      AddEvent                            ( lua_State* luaVM );
@@ -65,6 +66,10 @@ public:
     static int      CancelEvent                         ( lua_State* luaVM );
     static int      GetCancelReason                     ( lua_State* luaVM );
     static int      WasEventCancelled                   ( lua_State* luaVM );
+    static int      TriggerLatentClientEvent            ( lua_State* luaVM );
+    static int      GetLatentEventHandles               ( lua_State* luaVM );
+    static int      GetLatentEventStatus                ( lua_State* luaVM );
+    static int      CancelLatentEvent                   ( lua_State* luaVM );
 
     // Player get functions
     static int      GetPlayerCount                      ( lua_State* luaVM );
@@ -114,6 +119,7 @@ public:
     static int      RedirectPlayer                      ( lua_State* luaVM );
     static int      SetPlayerName                       ( lua_State* luaVM );
     static int      DetonateSatchels                    ( lua_State* luaVM );
+    static int      TakePlayerScreenShot                ( lua_State* luaVM );
 
     // Ped get functions
     static int      CreatePed                           ( lua_State* luaVM );
@@ -266,6 +272,11 @@ public:
     static int      SetVehicleTurretPosition            ( lua_State* luaVM );
     static int      SetVehicleDoorOpenRatio             ( lua_State* luaVM );
     static int      SetVehicleVariant                   ( lua_State* luaVM );
+    static int      GiveVehicleSirens                   ( lua_State* luaVM );
+    static int      RemoveVehicleSirens                 ( lua_State* luaVM );
+    static int      SetVehicleSirens                    ( lua_State* luaVM );
+    static int      GetVehicleSirens                    ( lua_State* luaVM );
+    static int      GetVehicleSirenParams               ( lua_State* luaVM );
 
     // Marker create/destroy functions
     static int      CreateMarker                        ( lua_State* luaVM );
@@ -497,6 +508,7 @@ public:
     static int      GetAccountPlayer                    ( lua_State* luaVM );
     static int      IsGuestAccount                      ( lua_State* luaVM );
     static int      GetAccountData                      ( lua_State* luaVM );
+    static int      GetAllAccountData                   ( lua_State* luaVM );
 
     // Account set funcs
     static int      AddAccount                          ( lua_State* luaVM );
@@ -517,6 +529,7 @@ public:
     static int      RemoveBan                           ( lua_State* luaVM );
 
     static int      GetBans                             ( lua_State* luaVM );
+    static int      ReloadBanList                       ( lua_State* luaVM );
 
     static int      GetBanIP                            ( lua_State* luaVM );
     static int      GetBanSerial                        ( lua_State* luaVM );

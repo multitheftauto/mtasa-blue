@@ -63,22 +63,22 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     g_pCore->GetCommands ()->Add ( "\x64\x61\x72\x6B\x73\x31\x64\x33","",                                               COMMAND_Eaeg );
     
     // Key commands (registered as 'mod commands', can be disabled)
-    g_pCore->GetCommands ()->Add ( "chatbox",                   "defines the chatbox color (r g b)",                    COMMAND_ChatBox, true );
-    g_pCore->GetCommands ()->Add ( "voiceptt",                  "transmits voice to other players",                     COMMAND_VoicePushToTalk, true );
-    g_pCore->GetCommands ()->Add ( "enter_passenger",           "enters a car as passenger",                            COMMAND_EnterPassenger, true );
-    g_pCore->GetCommands ()->Add ( "radio_next",                "next radio channel",                                   COMMAND_RadioNext, true );
-    g_pCore->GetCommands ()->Add ( "radio_previous",            "previous radio channel",                               COMMAND_RadioPrevious, true );
-    g_pCore->GetCommands ()->Add ( "radar",                     "enables the radar view",                               COMMAND_RadarMap, true );
-    g_pCore->GetCommands ()->Add ( "radar_zoom_in",             "zooms the radar in",                                   COMMAND_RadarZoomIn, true );
-    g_pCore->GetCommands ()->Add ( "radar_zoom_out",            "zooms the radar out",                                  COMMAND_RadarZoomOut, true );
-    g_pCore->GetCommands ()->Add ( "radar_move_north",          "moves the radar north",                                COMMAND_RadarMoveNorth, true );
-    g_pCore->GetCommands ()->Add ( "radar_move_south",          "moves the radar south",                                COMMAND_RadarMoveSouth, true );
-    g_pCore->GetCommands ()->Add ( "radar_move_east",           "moves the radar east",                                 COMMAND_RadarMoveEast, true );
-    g_pCore->GetCommands ()->Add ( "radar_move_west",           "moves the radar west",                                 COMMAND_RadarMoveWest, true );
-    g_pCore->GetCommands ()->Add ( "radar_attach",              "attaches the radar",                                   COMMAND_RadarAttach, true );
-    g_pCore->GetCommands ()->Add ( "radar_opacity_down",        "reduces radar opacity",                                COMMAND_RadarOpacityDown, true );
-    g_pCore->GetCommands ()->Add ( "radar_opacity_up",          "increases radar opacity",                              COMMAND_RadarOpacityUp, true );
-    g_pCore->GetCommands ()->Add ( "radar_help",                "toggles radar help test",                              COMMAND_RadarHelp, true );
+    g_pCore->GetCommands ()->Add ( "chatbox",                   "open the chat input",                                  COMMAND_ChatBox, true, true );
+    g_pCore->GetCommands ()->Add ( "voiceptt",                  "transmits voice to other players",                     COMMAND_VoicePushToTalk, true, true );
+    g_pCore->GetCommands ()->Add ( "enter_passenger",           "enters a car as passenger",                            COMMAND_EnterPassenger, true, true );
+    g_pCore->GetCommands ()->Add ( "radio_next",                "next radio channel",                                   COMMAND_RadioNext, true, true );
+    g_pCore->GetCommands ()->Add ( "radio_previous",            "previous radio channel",                               COMMAND_RadioPrevious, true, true );
+    g_pCore->GetCommands ()->Add ( "radar",                     "enables the radar view",                               COMMAND_RadarMap, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_zoom_in",             "zooms the radar in",                                   COMMAND_RadarZoomIn, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_zoom_out",            "zooms the radar out",                                  COMMAND_RadarZoomOut, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_move_north",          "moves the radar north",                                COMMAND_RadarMoveNorth, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_move_south",          "moves the radar south",                                COMMAND_RadarMoveSouth, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_move_east",           "moves the radar east",                                 COMMAND_RadarMoveEast, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_move_west",           "moves the radar west",                                 COMMAND_RadarMoveWest, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_attach",              "attaches the radar",                                   COMMAND_RadarAttach, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_opacity_down",        "reduces radar opacity",                                COMMAND_RadarOpacityDown, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_opacity_up",          "increases radar opacity",                              COMMAND_RadarOpacityUp, true, true );
+    g_pCore->GetCommands ()->Add ( "radar_help",                "toggles radar help text",                              COMMAND_RadarHelp, true, true );
     g_pCore->GetCommands ()->Add ( "msg_target",                "sends a message to the targetted player",              COMMAND_MessageTarget, true );
     g_pCore->GetCommands ()->Add ( "vehicle_next_weapon",       "changes to the next weapon whilst in a vehicle",       COMMAND_VehicleNextWeapon, true );
     g_pCore->GetCommands ()->Add ( "vehicle_previous_weapon",   "changes to the previous weapon whilst in a vehicle",   COMMAND_VehiclePreviousWeapon, true );
@@ -92,6 +92,7 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
 
     // Development mode
     g_pCore->GetCommands ()->Add ( "showcol",                   "(Development mode) shows the colshapes",               COMMAND_ShowCollision );
+    g_pCore->GetCommands ()->Add ( "showsound",                 "(Development mode) prints world sound ids into the debug window",  COMMAND_ShowSound );
 
 #ifdef MTA_DEBUG
     g_pCore->GetCommands ()->Add ( "showsync",          "show sync data",                                   COMMAND_ShowSyncData );
@@ -104,7 +105,6 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     // Debug commands
     #if defined (MTA_DEBUG) || defined(MTA_BETA)
         g_pCore->GetCommands ()->Add ( "showsyncing",       "shows syncing information",                        COMMAND_ShowSyncing );
-        g_pCore->GetCommands ()->Add ( "fakelag",           "enables fake lag",                                 COMMAND_FakeLag );
     #endif
 
 #ifdef MTA_WEPSYNCDBG
@@ -274,4 +274,10 @@ bool CClient::HandleException ( CExceptionInformation* pExceptionInformation )
         // We want to be able to debug using the debugger in debug-mode
         return true;
     #endif
+}
+
+
+CClientEntityBase* CClient::FindClientEntity ( CEntitySAInterface* pEntitySAInterface )
+{
+    return g_pClientGame->GetGameEntityXRefManager ()->FindClientEntity ( pEntitySAInterface );
 }

@@ -69,7 +69,6 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
     m_pCustomData = new CCustomData;
 
     m_pAttachedTo = NULL;
-    m_szAttachToID [ 0 ] = 0;
 }
 
 
@@ -97,10 +96,10 @@ CElement::~CElement ( void )
     RemoveAllCollisions ( true );
 
     // Null all camera elements referencing us
-    list < CPlayerCamera* > ::const_iterator iterFollowingCameras = m_FollowingCameras.begin ();
-    for ( ; iterFollowingCameras != m_FollowingCameras.end (); iterFollowingCameras++ )
+    std::list < CPlayerCamera* > cloneFollowingCameras = m_FollowingCameras;
+    for ( std::list < CPlayerCamera* > ::const_iterator iter = cloneFollowingCameras.begin () ; iter != cloneFollowingCameras.end () ; iter++ )
     {
-        (*iterFollowingCameras)->m_pTarget = NULL;
+        (*iter)->SetTarget ( NULL );
     }
 
     if ( m_pAttachedTo )
@@ -122,6 +121,10 @@ CElement::~CElement ( void )
         if ( pPed->m_pContactElement == this )
             pPed->m_pContactElement = NULL;
     }
+
+    // Hack to fix crash
+    if ( IS_PLAYER ( this ) )
+        CPerPlayerEntity::StaticOnPlayerDelete ( (CPlayer*)this );
 
     // Remove from spatial database
     GetSpatialDatabase ()->RemoveEntity ( this );
@@ -269,6 +272,29 @@ void CElement::GetChildren ( lua_State* pLua )
 }
 
 
+void CElement::GetChildrenByType ( const char* szType, lua_State* pLua )
+{
+    assert ( szType );
+    assert ( pLua );
+
+    // Add all our children to the table on top of the given lua main's stack
+    unsigned int uiIndex = 0;
+    unsigned int uiTypeHash = HashString ( szType );
+    CChildListType ::const_iterator iter = m_Children.begin ();
+    for ( ; iter != m_Children.end (); iter++ )
+    {
+        // Name matches?
+        if ( (*iter)->GetTypeHash() == uiTypeHash )
+        {
+            // Add it to the table
+            lua_pushnumber ( pLua, ++uiIndex );
+            lua_pushelement ( pLua, *iter );
+            lua_settable ( pLua, -3 );
+        }
+    }
+}
+
+
 // Also returns true if the element is the same
 bool CElement::IsMyChild ( CElement* pElement, bool bRecursive )
 {
@@ -386,9 +412,9 @@ void CElement::SetXMLNode ( CXMLNode* pNode )
 };
 
 
-bool CElement::AddEvent ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated )
+bool CElement::AddEvent ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod )
 {
-    return m_pEventManager->Add ( pLuaMain, szName, iLuaFunction, bPropagated );
+    return m_pEventManager->Add ( pLuaMain, szName, iLuaFunction, bPropagated, eventPriority, fPriorityMod );
 }
 
 
@@ -464,7 +490,7 @@ void CElement::ReadCustomData ( CLuaMain* pLuaMain, CEvents* pEvents )
                 args.PushString ( pAttribute->GetValue ().c_str () );
 
             // Don't trigger onElementDataChanged event
-            SetCustomData ( pAttribute->GetName ().c_str (), *args[0], pLuaMain, true, NULL, false );
+            SetCustomData ( pAttribute->GetName ().c_str (), *args[0], pLuaMain, g_pGame->GetConfig ()->GetSyncMapElementData (), NULL, false );
         }
     }
 }
@@ -799,7 +825,9 @@ bool CElement::LoadFromCustomData ( CLuaMain* pLuaMain, CEvents* pEvents )
     m_strName = szBuf;
 
     // Grab the attaching custom data
-    GetCustomDataString ( "attachTo", m_szAttachToID, MAX_ELEMENT_NAME_LENGTH, true );
+    szBuf[0] = 0;
+    GetCustomDataString ( "attachTo", szBuf, MAX_ELEMENT_NAME_LENGTH, true );
+    m_strAttachToID = szBuf;
     GetCustomDataFloat ( "attachX", m_vecAttachedPosition.fX, true );
     GetCustomDataFloat ( "attachY", m_vecAttachedPosition.fY, true );
     GetCustomDataFloat ( "attachZ", m_vecAttachedPosition.fZ, true );
@@ -998,7 +1026,7 @@ void CElement::FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, lua_State* 
 void CElement::CallEventNoParent ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller )
 {
     // Call it on us if this isn't the same class it was raised on
-    if ( pSource != this )
+    if ( pSource != this && m_pEventManager->HasEvents () )
     {
         m_pEventManager->Call ( szName, Arguments, pSource, this, pCaller );
     }
@@ -1007,9 +1035,14 @@ void CElement::CallEventNoParent ( const char* szName, const CLuaArguments& Argu
     CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
-        (*iter)->CallEventNoParent ( szName, Arguments, pSource, pCaller );
-        if ( m_bIsBeingDeleted )
-            break;
+        CElement* pElement = *iter;
+
+        if ( !pElement->m_pEventManager || pElement->m_pEventManager->HasEvents () || !pElement->m_Children.empty () )
+        {
+            pElement->CallEventNoParent ( szName, Arguments, pSource, pCaller );
+            if ( m_bIsBeingDeleted )
+                break;
+        }
     }
 }
 
@@ -1017,7 +1050,10 @@ void CElement::CallEventNoParent ( const char* szName, const CLuaArguments& Argu
 void CElement::CallParentEvent ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller )
 {
     // Call the event on us
-    m_pEventManager->Call ( szName, Arguments, pSource, this, pCaller );
+    if ( m_pEventManager->HasEvents () )
+    {
+        m_pEventManager->Call ( szName, Arguments, pSource, this, pCaller );
+    }
 
     // Call parent's handler
     if ( m_pParent )

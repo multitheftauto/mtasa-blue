@@ -26,6 +26,11 @@ DECLARE_ENUM( eDxTestMode )
 DECLARE_ENUM( eWeaponType )
 DECLARE_ENUM( eWeaponProperty )
 DECLARE_ENUM( eWeaponSkill )
+DECLARE_ENUM( ERenderFormat );
+DECLARE_ENUM( ETextureType );
+DECLARE_ENUM( ETextureAddress );
+DECLARE_ENUM( EPixelsFormatType );
+DECLARE_ENUM( EBlendModeType )
 DECLARE_ENUM( eWeaponState )
 
 enum eDXHorizontalAlign
@@ -110,7 +115,6 @@ inline SString GetClassTypeName ( CClientDxFont* )          { return "dx-font"; 
 inline SString GetClassTypeName ( CClientGuiFont* )         { return "gui-font"; }
 inline SString GetClassTypeName ( CClientMaterial* )        { return "material"; }
 inline SString GetClassTypeName ( CClientTexture* )         { return "texture"; }
-inline SString GetClassTypeName ( CClientWeapon* )          { return "weapon"; }
 
 inline SString GetClassTypeName ( CGUIButton* )      { return "gui-button"; }
 inline SString GetClassTypeName ( CGUICheckBox* )    { return "gui-checkbox"; }
@@ -132,6 +136,7 @@ inline SString GetClassTypeName ( CResource* )              { return "resource-d
 inline SString GetClassTypeName ( CXMLNode* )               { return "xml-node"; }
 inline SString GetClassTypeName ( CLuaTimer* )              { return "lua-timer"; }
 inline SString GetClassTypeName ( CEntity* )                { return "entity"; }
+inline SString GetClassTypeName ( CClientWeapon* )          { return "weapon"; }
 
 
 //
@@ -140,10 +145,7 @@ inline SString GetClassTypeName ( CEntity* )                { return "entity"; }
 template < class T >
 CResource* UserDataCast ( CResource*, void* ptr, lua_State* )
 {
-    CResource* pResource = reinterpret_cast < CResource* > ( ptr );
-    if ( CLuaDefs::m_pResourceManager->Exists ( pResource ) )
-        return pResource;
-    return NULL;
+    return g_pClientGame->GetResourceManager ()->GetResourceFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
 }
 
 
@@ -167,9 +169,7 @@ CLuaTimer* UserDataCast ( CLuaTimer*, void* ptr, lua_State* luaVM )
     CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine ( luaVM );
     if ( pLuaMain )
     {
-        CLuaTimer* pLuaTimer = reinterpret_cast < CLuaTimer* > ( ptr );
-        if ( pLuaMain->GetTimerManager ()->Exists ( pLuaTimer ) )
-            return pLuaTimer;
+        return pLuaMain->GetTimerManager ()->GetTimerFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
     }
     return NULL;
 }

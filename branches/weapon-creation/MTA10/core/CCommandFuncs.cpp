@@ -437,9 +437,23 @@ void CCommandFuncs::DebugClear ( const char* szParameters )
 
 void CCommandFuncs::Test ( const char* szParameters )
 {
-    char szBuffer[2048] = "";
-    CCore::GetSingleton ().GetNetwork ()->ResetStub ( 'test', szParameters, szBuffer );
-    CCore::GetSingleton ().GetConsole ()->Print ( szBuffer );
+    if ( SStringX ( szParameters ) == "ca" )
+    {
+        SString strStats = CCrashDumpWriter::GetCrashAvertedStatsSoFar ();
+        SString strMsg = SString ( "Crash averted stats:\n%s", strStats.empty () ? "None" : *strStats );
+        CCore::GetSingleton ().GetConsole ()->Print ( strMsg );
+    }
+    else
+    if ( SStringX ( szParameters ) == "crashme" )
+    {
+        std::string strNick;
+        CVARS_GET ( "nick", strNick );
+        if ( strNick == szParameters )
+        {
+            int* pData = NULL;
+            *pData = 0;
+        }
+    }
 }
 
 void CCommandFuncs::Serial ( const char* szParameters )
@@ -450,4 +464,38 @@ void CCommandFuncs::Serial ( const char* szParameters )
 
     // Print it
     CCore::GetSingleton ().GetConsole ()->Printf ( "* Your serial is: %s", szSerial );
+}
+
+
+void CCommandFuncs::FakeLag ( const char *szCmdLine )
+{
+#if defined(MTA_DEBUG) || defined(MTA_BETA)
+
+    std::vector < SString > parts;
+    SStringX ( szCmdLine ).Split ( " ", parts );
+
+    if ( parts.size () < 3 )
+    {
+        g_pCore->GetConsole ()->Print ( "fakelag <packet loss> <extra ping> <ping variance> [ <KBPS limit> ]" );
+        return;
+    }
+
+    int iPacketLoss = atoi ( parts[0] );
+    int iExtraPing = atoi ( parts[1] );
+    int iExtraPingVary = atoi ( parts[2] );
+    int iKBPSLimit = 0;
+    if ( parts.size () > 3 )
+        iKBPSLimit = atoi ( parts[3] );
+
+    g_pCore->GetNetwork ()->SetFakeLag ( iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit );
+    g_pCore->GetConsole ()->Print ( SString ( "Client send lag is now: %d%% packet loss and %d extra ping with %d extra ping variance and %d KBPS limit", iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit ) );
+
+#endif
+}
+
+void CCommandFuncs::ShowMemStat ( const char* szParameters )
+{
+    int iCmd = ( szParameters && szParameters [ 0 ] ) ? atoi ( szParameters ) : -1;
+    bool bShow = ( iCmd == 1 ) ? true : ( iCmd == 0 ) ? false : !GetMemStats ()->IsEnabled ();
+    GetMemStats ()->SetEnabled ( bShow );
 }

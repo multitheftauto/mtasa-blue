@@ -30,13 +30,13 @@ namespace
     //
     void CreateSphereFaces ( std::vector < SFace >& faceList, int iIterations )
     {
-        int numFaces = pow ( 4.0, iIterations ) * 8;
+        int numFaces = (int)( pow ( 4.0, iIterations ) * 8 );
         faceList.empty ();
         faceList.reserve ( numFaces );
 
         // Initial octahedron
-        CVector vecPoints[] = { CVector(0,0,1),  CVector(0,0,-1),  CVector(-1,-1,0),  CVector(1,-1,0),  CVector(1,1,0), CVector(-1,1,0) };
-        const WORD indices[] = { 0, 3, 4,  0, 4, 5,  0, 5, 2,  0, 2, 3,  1, 4, 3,  1, 5, 4,  1, 2, 5,  1, 3, 2 };
+        static SFixedArray < CVector, 6 > vecPoints = { CVector(0,0,1),  CVector(0,0,-1),  CVector(-1,-1,0),  CVector(1,-1,0),  CVector(1,1,0), CVector(-1,1,0) };
+        static const SFixedArray < WORD, 24 > indices = { 0, 3, 4,  0, 4, 5,  0, 5, 2,  0, 2, 3,  1, 4, 3,  1, 5, 4,  1, 2, 5,  1, 3, 2 };
 
         for ( uint i = 0 ; i < NUMELMS( vecPoints ) ; i ++ )
             vecPoints[ i ].Normalize ();

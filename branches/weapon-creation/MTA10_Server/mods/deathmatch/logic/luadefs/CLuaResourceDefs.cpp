@@ -650,7 +650,7 @@ int CLuaResourceDefs::getResourceFromName ( lua_State* luaVM )
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
     {
         const char* szResource = lua_tostring ( luaVM, 1 );
-        CResource* pResource = m_pResourceManager->GetResource ( const_cast < char* > ( szResource ) );
+        CResource* pResource = m_pResourceManager->GetResource ( szResource );
         if ( pResource )
         {
             lua_pushresource ( luaVM, pResource );
@@ -766,7 +766,7 @@ int CLuaResourceDefs::setResourceInfo ( lua_State* luaVM )
                         const char * szInfoKey = lua_tostring ( luaVM, 2 );
                         const char * szInfoValue = NULL;
                         if ( iArgument3 == LUA_TSTRING ) szInfoValue = lua_tostring ( luaVM, 3 );
-                        pResource->SetInfoValue ( (char*)szInfoKey, (char*)szInfoValue );
+                        pResource->SetInfoValue ( szInfoKey, szInfoValue );
 
                         lua_pushboolean ( luaVM, true );
                         return 1;
@@ -1017,7 +1017,7 @@ int CLuaResourceDefs::getResourceMapRootElement ( lua_State* luaVM )
             {
                 if ( szMap )
                 {
-                    CElement* pMapRoot = CStaticFunctionDefinitions::GetResourceMapRootElement ( pResource, const_cast < char* > ( szMap ) );
+                    CElement* pMapRoot = CStaticFunctionDefinitions::GetResourceMapRootElement ( pResource, szMap );
                     if ( pMapRoot )
                     {
                         lua_pushelement ( luaVM, pMapRoot );
@@ -1059,11 +1059,11 @@ int CLuaResourceDefs::getResourceExportedFunctions ( lua_State* luaVM )
     {
         lua_newtable ( luaVM );
         unsigned int uiIndex = 0;
-        list<CExportedFunction *>::iterator iterd = resource->IterBeginExportedFunctions();
+        list < CExportedFunction >::iterator iterd = resource->IterBeginExportedFunctions();
         for ( ; iterd != resource->IterEndExportedFunctions(); iterd++ )
         {
             lua_pushnumber ( luaVM, ++uiIndex );
-            lua_pushstring ( luaVM, (*iterd)->GetFunctionName ().c_str () );
+            lua_pushstring ( luaVM, iterd->GetFunctionName ().c_str () );
             lua_settable ( luaVM, -3 );
         }
         return 1;
@@ -1081,7 +1081,7 @@ int CLuaResourceDefs::call ( lua_State* luaVM )
          lua_type ( luaVM, 2 ) == LUA_TSTRING )
     {
         CResource* resource = lua_toresource ( luaVM, 1 );
-        char* szFunctionName = (char *) lua_tostring ( luaVM, 2 );
+        const char* szFunctionName = lua_tostring ( luaVM, 2 );
 
         // Is this an internal function that's restricted? To make sure you can't
         // call an MTA function in an external resource that's restricted and not

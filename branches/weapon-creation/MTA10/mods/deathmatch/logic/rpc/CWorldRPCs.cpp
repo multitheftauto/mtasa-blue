@@ -39,6 +39,7 @@ void CWorldRPCs::LoadFunctions ( void )
     AddHandler ( SET_TRAFFIC_LIGHT_STATE, SetTrafficLightState, "SetTrafficLightState" );
     AddHandler ( SET_JETPACK_MAXHEIGHT, SetJetpackMaxHeight, "SetJetpackMaxHeight" );
     AddHandler ( SET_AIRCRAFT_MAXHEIGHT, SetAircraftMaxHeight, "SetAircraftMaxHeight" );
+    AddHandler ( SET_OCCLUSIONS_ENABLED, SetOcclusionsEnabled, "SetOcclusionsEnabled" );
 
     AddHandler ( SET_INTERIOR_SOUNDS_ENABLED, SetInteriorSoundsEnabled, "SetInteriorSoundsEnabled" );
     AddHandler ( SET_RAIN_LEVEL, SetRainLevel, "SetRainLevel" );
@@ -54,6 +55,11 @@ void CWorldRPCs::LoadFunctions ( void )
     AddHandler ( RESET_FAR_CLIP_DISTANCE, ResetFarClipDistance, "ResetFarClipDistance" );
     AddHandler ( RESET_FOG_DISTANCE, ResetFogDistance, "ResetFogDistance" );
     AddHandler ( SET_WEAPON_PROPERTY, SetWeaponProperty, "SetWeaponProperty");
+
+    AddHandler ( REMOVE_WORLD_MODEL, RemoveWorldModel, "RemoveWorldModel");
+    AddHandler ( RESTORE_WORLD_MODEL, RestoreWorldModel, "RestoreWorldModel");
+    AddHandler ( RESTORE_ALL_WORLD_MODELS, RestoreAllWorldModels, "RestoreAllWorldModels");
+    AddHandler ( SET_SYNC_INTERVALS, SetSyncIntervals, "SetSyncIntervals" );
 }
 
 
@@ -353,6 +359,16 @@ void CWorldRPCs::SetAircraftMaxHeight ( NetBitStreamInterface& bitStream )
     }
 }
 
+void CWorldRPCs::SetOcclusionsEnabled ( NetBitStreamInterface& bitStream )
+{
+    bool bEnabled;
+
+    if ( bitStream.ReadBit ( bEnabled ) )
+    {
+        g_pGame->GetWorld ()->SetOcclusionsEnabled ( bEnabled );
+    }
+}
+
 void CWorldRPCs::ResetRainLevel ( NetBitStreamInterface& bitStream )
 {
     g_pGame->GetWeather ()->ResetAmountOfRain ( );
@@ -528,4 +544,47 @@ void CWorldRPCs::SetWeaponProperty ( NetBitStreamInterface& bitStream )
                 }
         }
     }
+}
+
+
+void CWorldRPCs::RemoveWorldModel ( NetBitStreamInterface& bitStream )
+{
+    unsigned short usModel = 0;
+    float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+
+    if ( bitStream.Read ( usModel ) && bitStream.Read ( fRadius ) && bitStream.Read ( fX ) && bitStream.Read ( fY ) && bitStream.Read ( fZ ) )
+    {
+        g_pGame->GetWorld ( )->RemoveBuilding ( usModel, fRadius, fX, fY, fZ );
+    }
+}
+
+
+void CWorldRPCs::RestoreWorldModel ( NetBitStreamInterface& bitStream )
+{
+    unsigned short usModel = 0;
+    float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+
+    if ( bitStream.Read ( usModel ) && bitStream.Read ( fRadius ) && bitStream.Read ( fX ) && bitStream.Read ( fY ) && bitStream.Read ( fZ ) )
+    {
+        g_pGame->GetWorld ( )->RestoreBuilding ( usModel, fRadius, fX, fY, fZ );
+    }
+}
+
+
+void CWorldRPCs::RestoreAllWorldModels ( NetBitStreamInterface& bitStream )
+{
+    g_pGame->GetWorld ( )->ClearRemovedBuildingLists ( );
+}
+
+
+void CWorldRPCs::SetSyncIntervals ( NetBitStreamInterface& bitStream )
+{
+    bitStream.Read ( g_TickRateSettings.iPureSync );
+    bitStream.Read ( g_TickRateSettings.iLightSync );
+    bitStream.Read ( g_TickRateSettings.iCamSync );
+    bitStream.Read ( g_TickRateSettings.iPedSync );
+    bitStream.Read ( g_TickRateSettings.iUnoccupiedVehicle );
+    bitStream.Read ( g_TickRateSettings.iObjectSync );
+    bitStream.Read ( g_TickRateSettings.iKeySyncRotation );
+    bitStream.Read ( g_TickRateSettings.iKeySyncAnalogMove );
 }

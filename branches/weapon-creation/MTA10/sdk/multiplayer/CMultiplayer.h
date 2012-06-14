@@ -20,7 +20,21 @@
 #include "CPopulationMP.h"
 #include "CLimits.h"
 
-#define DEFAULT_WAVES -1.0f
+struct SRwResourceStats
+{
+    uint uiTextures;
+    uint uiRasters;
+    uint uiGeometries;
+};
+
+struct SClothesCacheStats
+{
+    uint uiCacheHit;
+    uint uiCacheMiss;
+    uint uiNumTotal;
+    uint uiNumUnused;
+    uint uiNumRemoved;
+};
 
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
@@ -31,6 +45,7 @@ typedef void ( PostContextSwitchHandler ) ( void );
 typedef void ( PreWeaponFireHandler ) ( class CPlayerPed* pPlayer );
 typedef void ( PostWeaponFireHandler ) ( void );
 typedef void ( BulletImpactHandler ) ( class CPed* pInitiator, class CEntity* pVictim, const CVector* pvecStartPosition, const CVector* pvecEndPosition );
+typedef void ( BulletFireHandler ) ( class CPed* pInitiator, const CVector* pvecStartPosition, const CVector* pvecEndPosition );
 typedef bool ( DamageHandler ) ( class CPed* pDamagePed, class CEventDamage * pEvent );
 typedef void ( FireHandler ) ( class CFire* pFire );
 typedef bool ( ProjectileStopHandler ) ( class CEntity * owner, enum eWeaponType weaponType, class CVector * origin, float fForce, class CVector * target, class CEntity * targetEntity );
@@ -43,10 +58,18 @@ typedef bool ( ChokingHandler ) ( unsigned char ucWeaponType );
 typedef void ( PreWorldProcessHandler ) ( void );
 typedef void ( PostWorldProcessHandler ) ( void );
 typedef void ( IdleHandler ) ( void );
+typedef void ( PreFxRenderHandler ) ( void );
+typedef void ( PreHudRenderHandler ) ( void );
 typedef void ( AddAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
 typedef void ( BlendAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
 typedef bool ( ProcessCollisionHandler ) ( class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface );
-typedef bool ( VehicleCollisionHandler ) ( class CVehicleSAInterface* pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, float fDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity );
+typedef bool ( VehicleCollisionHandler ) ( class CVehicleSAInterface* pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity );
+typedef bool ( HeliKillHandler ) ( class CVehicleSAInterface* pVehicle, class CPedSAInterface* pPed );
+typedef bool ( WaterCannonHitHandler ) ( class CVehicleSAInterface* pCannonVehicle, class CPedSAInterface* pHitPed );
+typedef void ( GameObjectDestructHandler ) ( CEntitySAInterface* pObject );
+typedef void ( GameVehicleDestructHandler ) ( CEntitySAInterface* pVehicle );
+typedef void ( GamePlayerDestructHandler ) ( CEntitySAInterface* pPlayer );
+typedef void ( GameModelRemoveHandler ) ( ushort usModelId );
 
 /**
  * This class contains information used for shot syncing, one exists per player.
@@ -63,6 +86,10 @@ public:
     char m_cInVehicleAimDirection; // 0 = forwards, 1 = left, 2 = back, 3 = right
     // use origin
     bool m_bUseOrigin;
+
+    bool m_bRemoteBulletSyncVectorsValid;
+    CVector m_vecRemoteBulletSyncStart;
+    CVector m_vecRemoteBulletSyncEnd;
 };
 
 class CStatsData
@@ -134,10 +161,18 @@ public:
     virtual void                        SetPreWorldProcessHandler   ( PreWorldProcessHandler * pHandler ) = 0;
     virtual void                        SetPostWorldProcessHandler  ( PostWorldProcessHandler * pHandler ) = 0;
     virtual void                        SetIdleHandler              ( IdleHandler * pHandler ) = 0;
+    virtual void                        SetPreFxRenderHandler       ( PreFxRenderHandler * pHandler ) = 0;
+    virtual void                        SetPreHudRenderHandler      ( PreHudRenderHandler * pHandler ) = 0;
     virtual void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler ) = 0;
     virtual void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler ) = 0;
     virtual void                        SetProcessCollisionHandler  ( ProcessCollisionHandler * pHandler ) = 0;
     virtual void                        SetVehicleCollisionHandler  ( VehicleCollisionHandler * pHandler ) = 0;
+    virtual void                        SetHeliKillHandler          ( HeliKillHandler * pHandler ) = 0;
+    virtual void                        SetWaterCannonHitHandler    ( WaterCannonHitHandler * pHandler ) = 0;
+    virtual void                        SetGameObjectDestructHandler    ( GameObjectDestructHandler * pHandler ) = 0;
+    virtual void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler ) = 0;
+    virtual void                        SetGamePlayerDestructHandler    ( GamePlayerDestructHandler * pHandler ) = 0;
+    virtual void                        SetGameModelRemoveHandler       ( GameModelRemoveHandler * pHandler ) = 0;
 
     virtual void                        AllowMouseMovement          ( bool bAllow ) = 0;
     virtual void                        DoSoundHacksOnLostFocus     ( bool bLostFocus ) = 0;
@@ -189,6 +224,7 @@ public:
     virtual void                        SetPreWeaponFireHandler     ( PreWeaponFireHandler* pHandler ) = 0;
     virtual void                        SetPostWeaponFireHandler    ( PostWeaponFireHandler* pHandler ) = 0;
     virtual void                        SetBulletImpactHandler      ( BulletImpactHandler* pHandler ) = 0;
+    virtual void                        SetBulletFireHandler        ( BulletFireHandler* pHandler ) = 0;
     virtual void                        SetDrawRadarAreasHandler    ( DrawRadarAreasHandler * pRadarAreasHandler ) = 0;
     virtual void                        SetRender3DStuffHandler     ( Render3DStuffHandler * pHandler ) = 0;
 
@@ -241,6 +277,12 @@ public:
 
     virtual float                       GetAircraftMaxHeight        ( void ) = 0;
     virtual void                        SetAircraftMaxHeight        ( float fHeight ) = 0;
+
+    virtual void                        SetAutomaticVehicleStartupOnPedEnter    ( bool bSet ) = 0;
+
+    virtual void                        GetRwResourceStats          ( SRwResourceStats& outStats ) = 0;
+    virtual void                        GetClothesCacheStats        ( SClothesCacheStats& outStats ) = 0;
+    virtual CEntitySAInterface*         GetRenderingGameEntity      ( void ) = 0;
 };
 
 #endif

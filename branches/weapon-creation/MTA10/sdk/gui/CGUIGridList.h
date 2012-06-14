@@ -100,6 +100,7 @@ public:
     virtual void                    SetSortColumnHandler    ( GUI_CALLBACK Callback ) = 0;
 
     virtual void                    SetIgnoreTextSpacer     ( bool bIgnoreTextSpacer ) = 0;
+    virtual void                    SetVerticalScrollPosition ( float fPosition ) = 0;
 };
 
 #endif

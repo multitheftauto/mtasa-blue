@@ -76,7 +76,7 @@ public:
     void                                SetSortColumnHandler    ( GUI_CALLBACK Callback );
 
     void                                SetIgnoreTextSpacer     ( bool bIgnoreTextSpacer ) { m_bIgnoreTextSpacer = bIgnoreTextSpacer; };
-
+    void                                SetVerticalScrollPosition ( float fPosition );
     eCGUIType                           GetType                 ( void ) { return CGUI_GRIDLIST; };
 
     #include "CGUIElement_Inc.h"

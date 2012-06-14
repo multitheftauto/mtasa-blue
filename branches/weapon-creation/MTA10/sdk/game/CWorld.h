@@ -112,12 +112,39 @@ struct sDataBuildingRemoval
     int m_iCount;
 };
 
+enum eDebugCaller
+{
+    CEntity_SetMatrix,
+    CEntity_SetOrientation,
+    CEntity_FixBoatOrientation,
+    BuildingRemoval,
+    BuildingRemoval2,
+    BuildingRemoval3,
+    BuildingRemoval4,
+    BuildingRemoval5,
+    Building_Restore,
+    Building_Restore2,
+    BuildingRemovalReset,
+    BuildingRemovalReset2,
+    CVehicle_Destructor,
+    CPlayerPed_Constructor,
+    CPlayerPed_Destructor,
+    CPickup_Constructor,
+    CPickup_Destructor,
+    CObject_Constructor,
+    CObject_Destructor,
+    CCivPed_Constructor,
+    CCivPed_Destructor,
+    CBuilding_Destructor,
+
+};
+
 class CWorld
 {
 public:
-    virtual void        Add                         ( CEntity * entity ) = 0;
-    virtual void        Remove                      ( CEntity * entity ) = 0;
-    virtual void        Remove                      ( CEntitySAInterface * entityInterface ) = 0;
+    virtual void        Add                         ( CEntity * entity, eDebugCaller CallerId ) = 0;
+    virtual void        Remove                      ( CEntity * entity, eDebugCaller CallerId ) = 0;
+    virtual void        Remove                      ( CEntitySAInterface * entityInterface, eDebugCaller CallerId ) = 0;
     virtual bool        ProcessLineOfSight          ( const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, CEntity ** CollisionEntity, const SLineOfSightFlags flags = SLineOfSightFlags(), SLineOfSightBuildingResult* pBuildingResult = NULL ) = 0;
     // THIS FUNCTION IS INCOMPLETE AND SHOULD NOT BE USED ----------v
     virtual bool        TestLineSphere              ( CVector * vecStart, CVector * vecEnd, CVector * vecSphereCenter, float fSphereRadius, CColPoint ** colCollision ) = 0;
@@ -134,6 +161,8 @@ public:
     virtual float       GetJetpackMaxHeight         ( void ) = 0;
     virtual void        SetAircraftMaxHeight        ( float fHeight ) = 0;
     virtual float       GetAircraftMaxHeight        ( void ) = 0;
+    virtual void        SetOcclusionsEnabled        ( bool bEnabled ) = 0;
+    virtual bool        GetOcclusionsEnabled        ( void ) = 0;
     virtual void        RemoveBuilding              ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ) = 0;
     virtual bool        IsRemovedModelInRadius      ( SIPLInst* pInst ) = 0;
     virtual bool        IsModelRemoved              ( unsigned short usModelID ) = 0;

@@ -107,6 +107,7 @@ public:
     CElement*                                   FindChildByType             ( const char* szType, unsigned int uiIndex, bool bRecursive );
     void                                        FindAllChildrenByType       ( const char* szType, lua_State* pLua );
     void                                        GetChildren                 ( lua_State* pLua );
+    void                                        GetChildrenByType           ( const char* szType, lua_State* pLua );
     bool                                        IsMyChild                   ( CElement* pElement, bool bRecursive );
     bool                                        IsMyParent                  ( CElement* pElement, bool bRecursive );
     void                                        ClearChildren               ( void );
@@ -121,7 +122,7 @@ public:
     CElement*                                   SetParentObject             ( CElement* pParent, bool bUpdatePerPlayerEntities = true );
     void                                        SetXMLNode                  ( CXMLNode* pNode );
 
-    bool                                        AddEvent                    ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated );
+    bool                                        AddEvent                    ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod );
     bool                                        CallEvent                   ( const char* szName, const CLuaArguments& Arguments, CPlayer* pCaller = NULL );
     bool                                        DeleteEvent                 ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
     void                                        DeleteEvents                ( CLuaMain* pLuaMain, bool bRecursive );
@@ -188,7 +189,7 @@ public:
     inline void                                 RemoveAttachedElement       ( CElement* pElement )          { if ( !m_AttachedElements.empty() ) m_AttachedElements.remove ( pElement ); }
     std::list < CElement* > ::iterator          AttachedElementsBegin       ( void )                        { return m_AttachedElements.begin (); }
     std::list < CElement* > ::iterator          AttachedElementsEnd         ( void )                        { return m_AttachedElements.end (); }
-    inline char*                                GetAttachToID               ( void )                        { return m_szAttachToID; }
+    const char*                                 GetAttachToID               ( void )                        { return m_strAttachToID; }
     bool                                        IsElementAttached           ( CElement* pElement );
     virtual bool                                IsAttachable                ( void );
     virtual bool                                IsAttachToable              ( void );
@@ -261,7 +262,7 @@ protected:
     CVector                                     m_vecAttachedPosition;
     CVector                                     m_vecAttachedRotation;
     std::list < CElement* >                     m_AttachedElements;
-    char                                        m_szAttachToID [ MAX_ELEMENT_NAME_LENGTH + 1 ];
+    SString                                     m_strAttachToID;
 
     CElementGroup*                              m_pElementGroup;
 

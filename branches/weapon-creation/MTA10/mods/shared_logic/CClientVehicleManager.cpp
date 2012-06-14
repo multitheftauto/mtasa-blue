@@ -19,7 +19,8 @@ using std::list;
 using std::vector;
 
 // List over all vehicles with their passenger max counts
-unsigned char g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1, 1, 3, 1, 1,              // 400->415
+const SFixedArray < unsigned char, 212 > g_ucMaxPassengers = {
+                                       3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1, 1, 3, 1, 1,              // 400->415
                                        3, 1, 3, 1, 3, 3, 1, 1, 1, 0, 3, 3, 3, 1, 0, 8,              // 416->431
                                        0, 1, 1, 255, 1, 8, 3, 1, 3, 0, 1, 1, 1, 3, 0, 1,            // 432->447
                                        0, 1, 255, 1, 0, 0, 0, 1, 1, 1, 3, 3, 1, 1, 1,               // 448->462
@@ -43,7 +44,7 @@ unsigned char g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1, 1, 3,
 #define VEHICLE_HAS_TAXI_LIGHTS         0x020UL //32
 #define VEHICLE_HAS_SEARCH_LIGHT        0x040UL //64
 
-unsigned long g_ulVehicleAttributes [] = {
+static const SFixedArray < unsigned long, 212 > g_ulVehicleAttributes = {
   0, 0, 0, 0, 0, 0, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 32, 0, 0, 2, 0,    // 400-424
   0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0,    // 425-449
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     // 450-474
@@ -55,7 +56,7 @@ unsigned long g_ulVehicleAttributes [] = {
   0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-unsigned char g_ucVariants [212];
+static SFixedArray < unsigned char, 212 > g_ucVariants;
 
 CClientVehicleManager::CClientVehicleManager ( CClientManager* pManager )
 {
@@ -65,8 +66,9 @@ CClientVehicleManager::CClientVehicleManager ( CClientManager* pManager )
     // Initialize members
     m_pManager = pManager;
     m_bCanRemoveFromList = true;
+
     int iVehicleID = 0;
-for ( int i = 0; i <= 212; i++ )
+    for ( int i = 0; i < 212; i++ )
     {
         g_ucVariants[i] = 255;
         iVehicleID = i + 400;
@@ -407,42 +409,13 @@ CClientVehicle* CClientVehicleManager::Get ( ElementID ID )
 
 CClientVehicle* CClientVehicleManager::Get ( CVehicle* pVehicle, bool bValidatePointer )
 {
-    if ( !pVehicle ) return NULL;
-
-    if ( bValidatePointer )
-    {
-        vector < CClientVehicle* > ::const_iterator iter = m_StreamedIn.begin ();
-        for ( ; iter != m_StreamedIn.end (); iter++ )
-        {
-            if ( (*iter)->GetGameVehicle () == pVehicle )
-            {
-                return *iter;
-            }
-        }
-    }
-    else
-    {
-        return reinterpret_cast < CClientVehicle* > ( pVehicle->GetStoredPointer () );
-    }
-    return NULL;
+    return g_pClientGame->GetGameEntityXRefManager ()->FindClientVehicle ( pVehicle );
 }
 
 
 CClientVehicle* CClientVehicleManager::GetSafe ( CEntity * pEntity )
 {
-    if ( !pEntity ) return NULL;
-
-
-    vector < CClientVehicle* > ::const_iterator iter = m_StreamedIn.begin ();
-    for ( ; iter != m_StreamedIn.end (); iter++ )
-    {
-        if ( dynamic_cast < CEntity * > ( (*iter)->GetGameVehicle () ) == pEntity )
-        {
-            return *iter;
-        }
-    }
-
-    return NULL;
+    return g_pClientGame->GetGameEntityXRefManager ()->FindClientVehicle ( pEntity );
 }
 
 
@@ -531,16 +504,13 @@ void CClientVehicleManager::GetRandomVariation ( unsigned short usModel, unsigne
     // Valid model?
     if ( IsValidModel( usModel ) && g_ucVariants[ usModel - 400 ] != 255 )
     {
-        // BF400 || caddy || ???
-        if ( usModel == 581 || usModel == 457 || usModel == 512 )
+        // caddy || cropduster
+        if ( usModel == 457 || usModel == 512 )
         {
-            // e.g. 581 ( BF400 )
-            // first 3 properties are Exhaust
-            // last 2 are fairings.
-
-
+            // 255, 0, 1, 2
             ucVariant = ( rand ( ) % 4 ) - 1;
 
+            // 3, 4, 5
             ucVariant2 = ( rand ( ) % 3 );
             ucVariant2 += 3;
             return;
@@ -549,22 +519,28 @@ void CClientVehicleManager::GetRandomVariation ( unsigned short usModel, unsigne
         else if ( usModel == 535 )
         {
             // Slamvan has steering wheel "extras" we want one of those so default cannot be an option.
-            ucVariant = rand ( ) % g_ucVariants [usModel - 400];
+            ucVariant = ( rand ( ) % ( g_ucVariants [usModel - 400] + 1 ) );
             return;
         }
-        // NRG 500
-        else if ( usModel == 522 )
+        // NRG 500 || BF400
+        else if ( usModel == 522 || usModel == 581 )
         {
+            // e.g. 581 ( BF400 )
+            // first 3 properties are Exhaust
+            // last 2 are fairings.
+
+            // 255, 0, 1, 2
             ucVariant = ( rand ( ) % 4 ) - 1;
 
+            // 3, 4
             ucVariant2 = ( rand ( ) % 2 );
             ucVariant2 += 3;
+            return;
         }
-        // e.g. ( rand () % ( 5 + 1 ) ) - 1
+        // e.g. ( rand () % ( 5 + 2 ) ) - 1
         // Can generate 6 then minus 1 = 5
         // Can generate 0 then minus 1 = -1 (255) (default model with nothing)
-        ucVariant = ( rand ( ) % (g_ucVariants [usModel - 400] + 1) );
-        ucVariant2 = ucVariant;
+        ucVariant = ( rand ( ) % (g_ucVariants [usModel - 400] + 2) ) - 1;
     }
 }
 

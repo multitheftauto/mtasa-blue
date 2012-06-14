@@ -45,4 +45,7 @@ public:
 
 protected:
     IDirect3DVertexBuffer9* m_pOriginal;
+    int                     m_iMemUsed;
+    DWORD                   m_dwUsage;
+    CProxyDirect3DDevice9::SResourceMemory&     m_stats;
 };

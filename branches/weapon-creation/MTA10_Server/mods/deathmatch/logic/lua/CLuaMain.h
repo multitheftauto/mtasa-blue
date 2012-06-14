@@ -59,12 +59,6 @@ public:
                                                               CResource* pResourceOwner );
                                     ~CLuaMain               ( void );
 
-    int                             GetClientType           ( void ) { return CClient::CLIENT_SCRIPT; };
-    const char*                     GetNick                 ( void ) { return m_szScriptName; };
-
-    void                            SendEcho                ( const char* szEcho ) {};
-    void                            SendConsole             ( const char* szEcho ) {};
-
     inline int                      GetOwner                ( void )                        { return m_iOwner; };
     inline void                     SetOwner                ( int iOwner )                  { m_iOwner = iOwner; };
 
@@ -72,14 +66,15 @@ public:
     bool                            LoadScriptFromBuffer    ( const char* cpBuffer, unsigned int uiSize, const char* szFileName, bool bUTF8 );
     bool                            LoadScript              ( const char* szLUAScript );
     void                            UnloadScript            ( void );
+    bool                            CompileScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize, const char* szFileName, bool bUTF8, SString* pDest );
+    bool                            CompileScriptFromFile   ( const char* szFile, SString* pDest );
 
     void                            Start                   ( void );
 
     void                            DoPulse                 ( void );
 
-    void                            GetScriptName           ( char* szLuaScript ) const     { strcpy ( szLuaScript, m_szScriptName ); };
-    inline const char*              GetScriptNamePointer    ( void ) const                  { return m_szScriptName; };
-    void                            SetScriptName           ( const char* szName )          { strncpy ( m_szScriptName, szName, MAX_SCRIPTNAME_LENGTH ); };
+    inline const char*              GetScriptName           ( void ) const                  { return m_strScriptName; }
+    void                            SetScriptName           ( const char* szName )          { m_strScriptName.AssignLeft ( szName, MAX_SCRIPTNAME_LENGTH ); }
 
     void                            RegisterFunction        ( const char* szFunction, lua_CFunction function );
 
@@ -108,8 +103,8 @@ public:
     CTextItem *                     CreateTextItem          ( const char* szText, float fX, float fY, eTextPriority priority = PRIORITY_LOW, const SColor color = -1, float fScale = 1.0f, unsigned char format = 0, unsigned char ucShadowAlpha = 0 );
     void                            DestroyTextItem         ( CTextItem * pTextItem );
 
-    bool                            TextDisplayExists       ( CTextDisplay* pDisplay );
-    bool                            TextItemExists          ( CTextItem* pTextItem );
+    CTextDisplay*                   GetTextDisplayFromScriptID    ( uint uiScriptID );
+    CTextItem*                      GetTextItemFromScriptID       ( uint uiScriptID );
 
     bool                            BeingDeleted            ( void );
     inline lua_State *              GetVirtualMachine       ( void ) const                  { return m_luaVM; };
@@ -125,12 +120,14 @@ public:
 
     void                            InitVM                  ( void );
     const SString&                  GetFunctionTag          ( int iFunctionNumber );
+    int                             PCall                   ( lua_State *L, int nargs, int nresults, int errfunc );
+
 private:
     void                            InitSecurity            ( void );
 
     static void                     InstructionCountHook    ( lua_State* luaVM, lua_Debug* pDebug );
 
-    char                            m_szScriptName [MAX_SCRIPTNAME_LENGTH + 1];
+    SString                         m_strScriptName;
     int                             m_iOwner;
 
     lua_State*                      m_luaVM;

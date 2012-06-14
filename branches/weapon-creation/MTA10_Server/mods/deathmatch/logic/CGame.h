@@ -47,17 +47,21 @@ class CGame;
 #include "packets/CLightsyncPacket.h"
 #include "packets/CVehicleResyncPacket.h"
 #include "packets/CKeysyncPacket.h"
+#include "packets/CBulletsyncPacket.h"
+#include "packets/CBulletsyncSettingsPacket.h"
 #include "packets/CVehicleInOutPacket.h"
 #include "packets/CVehicleDamageSyncPacket.h"
 #include "packets/CVehicleTrailerPacket.h"
 #include "packets/CVoiceDataPacket.h"
 #include "packets/CLuaEventPacket.h"
+#include "packets/CDestroySatchelsPacket.h"
 #include "packets/CDetonateSatchelsPacket.h"
 #include "packets/CCustomDataPacket.h"
 #include "packets/CCameraSyncPacket.h"
 #include "packets/CPlayerTransgressionPacket.h"
 #include "packets/CPlayerDiagnosticPacket.h"
 #include "packets/CPlayerModInfoPacket.h"
+#include "packets/CPlayerScreenShotPacket.h"
 
 #include "CRPCFunctions.h"
 
@@ -85,6 +89,7 @@ class CMarkerManager;
 class CObjectManager;
 class CPacket;
 class CPacketTranslator;
+class CLatentTransferManager;
 class CPedManager;
 class CPickupManager;
 class CPlayer;
@@ -92,6 +97,7 @@ class CPlayerManager;
 class CRadarAreaManager;
 class CRegisteredCommands;
 class CDatabaseManager;
+class CLuaCallbackManager;
 class CRegistryManager;
 class CRegistry;
 class CRemoteCalls;
@@ -109,6 +115,8 @@ class CLanBroadcast;
 class CWaterManager;
 
 class CWeaponStatManager;
+class CBuildingRemovalManager;
+
 
 // Packet forward declarations
 class CCommandPacket;
@@ -129,6 +137,8 @@ class CVehiclePuresyncPacket;
 class CVehicleTrailerPacket;
 class CVoiceDataPacket;
 class CWeaponDamageCheckPacket;
+
+typedef SFixedArray < bool, MAX_GARAGES > SGarageStates;
 
 class CGame
 {
@@ -181,7 +191,7 @@ public:
     bool                        Start                       ( int iArgumentCount, char* szArguments [] );
     void                        Stop                        ( void );
 
-    static bool                 StaticProcessPacket         ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo );
+    static bool                 StaticProcessPacket         ( unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo );
     bool                        ProcessPacket               ( CPacket& Packet );
 
     inline void                 SetIsFinished               ( bool bFinished )  { m_bIsFinished = bFinished; };
@@ -201,12 +211,14 @@ public:
 #endif
     inline CConsole*                GetConsole                  ( void )        { return m_pConsole; }
     inline CDatabaseManager*        GetDatabaseManager          ( void )        { return m_pDatabaseManager; }
+    inline CLuaCallbackManager*     GetLuaCallbackManager       ( void )        { return m_pLuaCallbackManager; }
     inline CRegistryManager*        GetRegistryManager          ( void )        { return m_pRegistryManager; }
     inline CRegistry*               GetRegistry                 ( void )        { return m_pRegistry; }
     inline CAccountManager*         GetAccountManager           ( void )        { return m_pAccountManager; }
     inline CScriptDebugging*        GetScriptDebugging          ( void )        { return m_pScriptDebugging; }
     inline CEvents*                 GetEvents                   ( void )        { return &m_Events; }
     inline CColManager*             GetColManager               ( void )        { return m_pColManager; }
+    inline CLatentTransferManager*  GetLatentTransferManager    ( void )        { return m_pLatentTransferManager; }
     inline CPedManager*             GetPedManager               ( void )        { return m_pPedManager; }
     inline CResourceManager*        GetResourceManager          ( void )        { return m_pResourceManager; }
     inline CMarkerManager*          GetMarkerManager            ( void )        { return m_pMarkerManager; }
@@ -227,6 +239,7 @@ public:
     inline CWaterManager*           GetWaterManager             ( void )        { return m_pWaterManager; }
     inline CLightsyncManager*       GetLightSyncManager         ( void )        { return &m_lightsyncManager; }
     inline CWeaponStatManager*      GetWeaponStatManager        ( void )        { return m_pWeaponStatsManager; }
+    inline CBuildingRemovalManager* GetBuildingRemovalManager   ( void )        { return m_pBuildingRemovalManager; }
 
     void                        JoinPlayer                  ( CPlayer& Player );
     void                        InitialDataStream           ( CPlayer& Player );
@@ -309,7 +322,10 @@ public:
     inline float                GetAircraftMaxHeight        ( void ) { return m_fAircraftMaxHeight; }
     inline void                 SetAircraftMaxHeight        ( float fMaxHeight ) { m_fAircraftMaxHeight = fMaxHeight; }
 
-    inline bool*                GetGarageStates             ( void )        { return m_bGarageStates; }
+    inline bool                 GetOcclusionsEnabled        ( void ) { return m_bOcclusionsEnabled ; }
+    inline void                 SetOcclusionsEnabled        ( bool bOcclusionsEnabled ) { m_bOcclusionsEnabled = bOcclusionsEnabled; }
+
+    SGarageStates&              GetGarageStates             ( void )        { return m_bGarageStates; }
 
     void                        Lock                        ( void );
     void                        Unlock                      ( void );
@@ -336,14 +352,21 @@ public:
     void                        SetSyncFPS                  ( int iSyncFPS ) { m_iSyncFPS = iSyncFPS; }
 
     void                        HandleBackup                ( void );
+    void                        EnableLatentSends           ( bool bEnabled, int iBandwidth = 0, CLuaMain* pLuaMain = NULL );
+    bool                        SendPacket                  ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
+
+    void                        SetDevSetting               ( const SString& strCommand );
+    void                        SendBulletSyncSettings      ( CPlayer* pPlayer );
 
 private:
     void                        AddBuiltInEvents            ( void );
     void                        RelayPlayerPuresync         ( class CPacket& Packet );
+    void                        RelayKeysync                ( class CPacket& Packet );
+    void                        RelayBulletsync             ( class CPacket& Packet );
 
     void                        ProcessTrafficLights        ( unsigned long ulCurrentTime );
 
-    void                        Packet_PlayerJoin           ( NetServerPlayerID& Source );
+    void                        Packet_PlayerJoin           ( const NetServerPlayerID& Source );
     void                        Packet_PlayerJoinData       ( class CPlayerJoinDataPacket& Packet );
     void                        Packet_PedWasted            ( class CPedWastedPacket& Packet );
     void                        Packet_PlayerWasted         ( class CPlayerWastedPacket& Packet );
@@ -351,12 +374,14 @@ private:
     void                        Packet_PlayerTimeout        ( class CPlayerTimeoutPacket& Packet );
     void                        Packet_PlayerPuresync       ( class CPlayerPuresyncPacket& Packet );
     void                        Packet_DetonateSatchels     ( class CDetonateSatchelsPacket& Packet );
+    void                        Packet_DestroySatchels     ( class CDestroySatchelsPacket& Packet );
     void                        Packet_ExplosionSync        ( class CExplosionSyncPacket& Packet );
     void                        Packet_ProjectileSync       ( class CProjectileSyncPacket& Packet );
     void                        Packet_Command              ( class CCommandPacket& Packet );
     void                        Packet_VehicleDamageSync    ( class CVehicleDamageSyncPacket& Packet );
     void                        Packet_VehiclePuresync      ( class CVehiclePuresyncPacket& Packet );
     void                        Packet_Keysync              ( class CKeysyncPacket& Packet );
+    void                        Packet_Bulletsync           ( class CBulletsyncPacket& Packet );
     void                        Packet_Vehicle_InOut        ( class CVehicleInOutPacket& Packet );
     void                        Packet_VehicleTrailer       ( class CVehicleTrailerPacket& Packet );
     void                        Packet_LuaEvent             ( class CLuaEventPacket& Packet );
@@ -367,6 +392,7 @@ private:
     void                        Packet_PlayerTransgression  ( class CPlayerTransgressionPacket& Packet );
     void                        Packet_PlayerDiagnostic     ( class CPlayerDiagnosticPacket& Packet );
     void                        Packet_PlayerModInfo        ( class CPlayerModInfoPacket & Packet );
+    void                        Packet_PlayerScreenShot     ( class CPlayerScreenShotPacket & Packet );
 
     static void                 PlayerCompleteConnect       ( CPlayer* pPlayer, bool bSuccess, const char* szError );
 
@@ -406,9 +432,11 @@ private:
     CCommandLineParser              m_CommandLineParser;
     CRegisteredCommands*            m_pRegisteredCommands;
     CDatabaseManager*               m_pDatabaseManager;
+    CLuaCallbackManager*            m_pLuaCallbackManager;
     CRegistryManager*               m_pRegistryManager;
     CRegistry*                      m_pRegistry;
     CAccountManager*                m_pAccountManager;
+    CLatentTransferManager*         m_pLatentTransferManager;
     CPedManager*                    m_pPedManager;
     CResourceManager*               m_pResourceManager;
     CAccessControlListManager*      m_pACLManager;
@@ -421,6 +449,8 @@ private:
     CWaterManager*                  m_pWaterManager;
 
     CWeaponStatManager*             m_pWeaponStatsManager;
+    CBuildingRemovalManager*        m_pBuildingRemovalManager;
+
     CSerialManager                  m_SerialManager;
 
 
@@ -433,6 +463,7 @@ private:
     float                       m_fGameSpeed;
     float                       m_fJetpackMaxHeight;
     float                       m_fAircraftMaxHeight;
+    bool                        m_bOcclusionsEnabled;
 
     unsigned char               m_ucTrafficLightState;
     bool                        m_bTrafficLightsLocked;
@@ -468,7 +499,7 @@ private:
     bool                        m_bOverrideFogDistance;
     float                       m_fFogDistance;
 
-    bool                        m_bGarageStates[MAX_GARAGES];
+    SGarageStates               m_bGarageStates;
 
     // FPS statistics
     unsigned long               m_ulLastFPSTime;
@@ -476,7 +507,7 @@ private:
     unsigned short              m_usFPS;
     int                         m_iSyncFPS;
     std::map<std::string,eGlitchType> m_GlitchNames;
-    bool                        m_Glitches[NUM_GLITCHES];
+    SFixedArray < bool, NUM_GLITCHES > m_Glitches;
 
     // This is ticked to true when the app should end
     bool                        m_bIsFinished;
@@ -491,6 +522,12 @@ private:
     CLightsyncManager           m_lightsyncManager;
 
     bool                        m_bServerFullyUp;       // No http operations should be allowed unless this is true
+
+    bool                        m_bLatentSendsEnabled;
+    int                         m_iLatentSendsBandwidth;
+    CLuaMain*                   m_pLatentSendsLuaMain;
+
+    std::set < eWeaponType >    m_weaponTypesUsingBulletSync;
 };
 
 #endif

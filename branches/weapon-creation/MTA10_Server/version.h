@@ -16,7 +16,7 @@
 
 // New version info
 #define MTASA_VERSION_MAJOR         1
-#define MTASA_VERSION_MINOR         3
+#define MTASA_VERSION_MINOR         4
 #define MTASA_VERSION_MAINTENANCE   0
 #define MTASA_VERSION_TYPE          VERSION_TYPE_CUSTOM
 #define MTASA_VERSION_BUILD         0
@@ -78,9 +78,9 @@
 
 #define _ASE_VERSION QUOTE_DEFINE(MTASA_VERSION_MAJOR) "." QUOTE_DEFINE(MTASA_VERSION_MINOR)
 #define _NETCODE_VERSION_BRANCH_ID      0x4         // Use 0x1 - 0xF to indicate an incompatible branch is being used (0x0 is reserved, 0x4 is trunk)
-#define _SERVER_NET_MODULE_VERSION      0x043       // (0x000 - 0xfff) Lvl9 wizards only
-#define _NETCODE_VERSION                0x1CD       // (0x000 - 0xfff) Increment when net messages change (pre-release)
-#define MTA_DM_BITSTREAM_VERSION        0x023       // (0x000 - 0xfff) Increment when net messages change (post-release). (Changing will also require additional backward compatibility code).
+#define _SERVER_NET_MODULE_VERSION      0x077       // (0x000 - 0xfff) Lvl9 wizards only
+#define _NETCODE_VERSION                0x1D4       // (0x000 - 0xfff) Increment when net messages change (pre-release)
+#define MTA_DM_BITSTREAM_VERSION        0x02E       // (0x000 - 0xfff) Increment when net messages change (post-release). (Changing will also require additional backward compatibility code).
 
 // To avoid user confusion, make sure the ASE version matches only if communication is possible
 #if defined(MTA_DM_CONNECT_FROM_PUBLIC)

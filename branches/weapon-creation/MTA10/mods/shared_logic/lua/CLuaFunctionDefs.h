@@ -60,6 +60,13 @@ public:
     LUA_DECLARE ( TriggerServerEvent );
     LUA_DECLARE ( CancelEvent );
     LUA_DECLARE ( WasEventCancelled );
+    LUA_DECLARE ( TriggerLatentServerEvent );
+    LUA_DECLARE ( GetLatentEventHandles );
+    LUA_DECLARE ( GetLatentEventStatus );
+    LUA_DECLARE ( CancelLatentEvent );
+
+    // Misc functions
+    LUA_DECLARE ( DownloadFile );
 
     // Sound effects and synth functions
     LUA_DECLARE ( PlaySound );
@@ -74,6 +81,14 @@ public:
     LUA_DECLARE ( GetSoundVolume );
     LUA_DECLARE ( SetSoundSpeed );
     LUA_DECLARE ( GetSoundSpeed );
+    LUA_DECLARE ( SetSoundProperties );
+    LUA_DECLARE ( GetSoundProperties );
+    LUA_DECLARE ( GetSoundFFTData );
+    LUA_DECLARE ( GetSoundWaveData );
+    LUA_DECLARE ( SetSoundPanEnabled );
+    LUA_DECLARE ( IsSoundPanEnabled );
+    LUA_DECLARE ( GetSoundLevelData );
+    LUA_DECLARE ( GetSoundBPM );
     LUA_DECLARE ( SetSoundMinDistance );
     LUA_DECLARE ( GetSoundMinDistance );
     LUA_DECLARE ( SetSoundMaxDistance );
@@ -223,6 +238,7 @@ public:
     LUA_DECLARE ( GetPedBonePosition );
     LUA_DECLARE ( GetPedClothes );
     LUA_DECLARE ( GetPedControlState );
+    LUA_DECLARE ( GetPedAnalogControlState );
     LUA_DECLARE ( IsPedSunbathing );
     LUA_DECLARE ( IsPedDoingGangDriveby );
     LUA_DECLARE ( GetPedAnimation );
@@ -245,6 +261,7 @@ public:
     LUA_DECLARE ( AddPedClothes );
     LUA_DECLARE ( RemovePedClothes );
     LUA_DECLARE ( SetPedControlState );
+    LUA_DECLARE ( SetPedAnalogControlState );
     LUA_DECLARE ( SetPedSunbathing );
     LUA_DECLARE ( SetPedDoingGangDriveby );
     LUA_DECLARE ( SetPedLookAt );
@@ -359,6 +376,9 @@ public:
     LUA_DECLARE ( SetVehicleHeadLightColor );
     LUA_DECLARE ( SetVehicleTurretPosition );
     LUA_DECLARE ( SetVehicleDoorOpenRatio );
+    LUA_DECLARE ( SetVehicleSirens );
+    LUA_DECLARE ( GetVehicleSirens );
+    LUA_DECLARE ( GetVehicleSirenParams );
 
     // Object create funcs
     LUA_DECLARE ( CreateObject );
@@ -366,6 +386,7 @@ public:
     // Object get funcs
     LUA_DECLARE ( IsObjectStatic );
     LUA_DECLARE ( GetObjectScale );
+    LUA_DECLARE ( IsObjectBreakable );
 
     // Object set funcs
     LUA_DECLARE ( SetObjectRotation );
@@ -373,6 +394,7 @@ public:
     LUA_DECLARE ( StopObject );
     LUA_DECLARE ( SetObjectScale );
     LUA_DECLARE ( SetObjectStatic );
+    LUA_DECLARE ( SetObjectBreakable );
 
     // Explosion functions
     LUA_DECLARE ( CreateExplosion );
@@ -387,6 +409,9 @@ public:
     LUA_DECLARE ( SetAmbientSoundEnabled );
     LUA_DECLARE ( IsAmbientSoundEnabled );
     LUA_DECLARE ( ResetAmbientSounds );
+    LUA_DECLARE ( SetWorldSoundEnabled );
+    LUA_DECLARE ( IsWorldSoundEnabled );
+    LUA_DECLARE ( ResetWorldSounds );
 
     // Blip funcs
     LUA_DECLARE ( CreateBlip );
@@ -449,8 +474,10 @@ public:
     LUA_DECLARE ( GetCameraTarget );
     LUA_DECLARE ( GetCameraInterior );
     LUA_DECLARE ( GetCameraGoggleEffect );
+    LUA_DECLARE ( GetCameraRotation );
 
     // Cam set funcs
+    LUA_DECLARE ( SetCameraRotation );
     LUA_DECLARE ( SetCameraMatrix );
     LUA_DECLARE ( SetCameraTarget );
     LUA_DECLARE ( SetCameraInterior );
@@ -493,6 +520,8 @@ public:
     // Drawing funcs (low-level)
     LUA_DECLARE ( dxDrawLine );
     LUA_DECLARE ( dxDrawLine3D );
+    LUA_DECLARE ( dxDrawMaterialLine3D );
+    LUA_DECLARE ( dxDrawMaterialSectionLine3D );
     LUA_DECLARE ( dxDrawText );
     LUA_DECLARE ( dxDrawRectangle );
     LUA_DECLARE ( dxDrawImage );
@@ -512,6 +541,15 @@ public:
     LUA_DECLARE ( dxUpdateScreenSource );
     LUA_DECLARE ( dxGetStatus );
     LUA_DECLARE ( dxSetTestMode );
+    LUA_DECLARE ( dxGetTexturePixels );
+    LUA_DECLARE ( dxSetTexturePixels );
+    LUA_DECLARE ( dxGetPixelsSize );
+    LUA_DECLARE ( dxGetPixelsFormat );
+    LUA_DECLARE ( dxConvertPixels );
+    LUA_DECLARE ( dxGetPixelColor );
+    LUA_DECLARE ( dxSetPixelColor );
+    LUA_DECLARE ( dxSetBlendMode );
+    LUA_DECLARE ( dxGetBlendMode );
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
@@ -674,6 +712,7 @@ public:
     LUA_DECLARE ( AreTrafficLightsLocked );
     LUA_DECLARE ( GetJetpackMaxHeight );
     LUA_DECLARE ( GetAircraftMaxHeight );
+    LUA_DECLARE ( GetOcclusionsEnabled );
 
     LUA_DECLARE ( SetTime );
     LUA_DECLARE ( GetSkyGradient );
@@ -726,7 +765,10 @@ public:
     LUA_DECLARE ( RestoreWorldBuildings );
     LUA_DECLARE ( RestoreWorldBuilding );
     LUA_DECLARE ( SetAircraftMaxHeight );
+    LUA_DECLARE ( SetOcclusionsEnabled );
     LUA_DECLARE ( CreateSWATRope );
+    LUA_DECLARE ( SetBirdsEnabled );
+    LUA_DECLARE ( GetBirdsEnabled );
 
     // Input functions
     LUA_DECLARE ( BindKey );
@@ -734,6 +776,7 @@ public:
     LUA_DECLARE ( GetKeyState );
     LUA_DECLARE ( GetControlState );
     LUA_DECLARE ( GetAnalogControlState );
+    LUA_DECLARE ( SetAnalogControlState );
     LUA_DECLARE ( IsControlEnabled );
     LUA_DECLARE ( GetBoundKeys );
     LUA_DECLARE ( GetFunctionsBoundToKey );

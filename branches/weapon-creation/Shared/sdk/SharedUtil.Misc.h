@@ -112,6 +112,8 @@ namespace SharedUtil
     // See implementation for details
     bool            IsMainThread                    ( void );
 
+    DWORD           _GetCurrentProcessorNumber      ( void );
+
     SString         EscapeString                    ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#' );
     SString         UnescapeString                  ( const SString& strText, char cSpecialChar = '#' );
 
@@ -139,7 +141,7 @@ namespace SharedUtil
 
     std::wstring  ANSIToUTF16 (const std::string& s);
 
-    int  GetUTF8Confidence (unsigned char* input, int len);
+    int  GetUTF8Confidence (const unsigned char* input, int len);
 
 
     //
@@ -168,7 +170,7 @@ namespace SharedUtil
     template< class T >
     T Lerp ( const T& from, float fAlpha, const T& to )
     {
-        return ( to - from ) * fAlpha + from;
+        return (T)( ( to - from ) * fAlpha + from );
     }
 
     // Find the relative position of Pos between From and To
@@ -192,6 +194,45 @@ namespace SharedUtil
         return static_cast < int > ( std::floor ( value + 0.5f ) );
     }
 
+    template < class T >
+    T WrapAround ( T fLow, T fValue, T fHigh )
+    {
+        const T fSize = fHigh - fLow;
+        return fValue - ( fSize * std::floor ( ( fValue - fLow ) / fSize ) );
+    }
+
+
+    //
+    // Evaluate a function that is described by a set of points
+    //
+    template < class T >
+    struct SSamplePoint
+    {
+        T in, out;
+    };
+
+    template < class T >
+    T EvalSamplePosition ( const SSamplePoint < T >* pPoints, uint uiNumPoints, const T& samplePosition )
+    {
+        // Before first point
+        if ( samplePosition < pPoints[ 0 ].in )
+            return pPoints[ 0 ].out;
+
+        // Between points
+        for ( uint i = 1 ; i < uiNumPoints ; i++ )
+        {
+            if ( samplePosition < pPoints[ i ].in )
+            {
+                // Find position between input points
+                T pos = UnlerpClamped ( pPoints[ i - 1 ].in, samplePosition, pPoints[ i ].in );
+                // Map to output points
+                return Lerp ( pPoints[ i - 1 ].out, pos, pPoints[ i ].out );
+            }
+        }
+
+        // After last point
+        return pPoints[ uiNumPoints - 1 ].out;
+    }
 
 
     //
@@ -267,6 +308,15 @@ namespace SharedUtil
     void ListAppend ( std::vector < T >& itemList, const std::vector < T >& other )
     {
         itemList.insert( itemList.end(), other.begin(), other.end() );
+    }
+
+    // Clear and reserve memory for the same size
+    template < class T >
+    void ListClearAndReserve ( std::vector < T >& itemList )
+    {
+        size_t prevSize = itemList.size ();
+        itemList.clear ();
+        itemList.reserve ( prevSize );
     }
 
 
@@ -496,17 +546,17 @@ namespace SharedUtil
     // Fixed sized string buffer
     //
     template < int MAX_LENGTH >
-    class CStaticString
+    class SFixedString
     {
         char szData [ MAX_LENGTH + 1 ];
     public:
-        CStaticString ( void )
+        SFixedString ( void )
         {
             szData[0] = 0;
         }
 
         // In  
-        CStaticString& operator= ( const char* szOther )
+        SFixedString& operator= ( const char* szOther )
         {
             STRNCPY( szData, szOther, MAX_LENGTH + 1 );
             return *this;
@@ -724,7 +774,25 @@ namespace SharedUtil
     template < class T >
     class CMappedArray : public CMappedContainer < T, std::vector < T > >
     {
+    public:
+        const T& operator[] ( int idx ) const   { return CMappedContainer < T, std::vector < T > >::m_List[idx]; }
+        T& operator[] ( int idx )               { return CMappedContainer < T, std::vector < T > >::m_List[idx]; }
     };
+
+
+    // Returns true if the item is in the itemList
+    template < class U, class T >
+    bool ListContains ( const CMappedList < U >& itemList, const T& item )
+    {
+        return itemList.Contains ( item );
+    }
+
+    // Returns true if the item is in the itemList
+    template < class U, class T >
+    bool ListContains ( const CMappedArray < U >& itemList, const T& item )
+    {
+        return itemList.Contains ( item );
+    }
 
 
     ///////////////////////////////////////////////////////////////
@@ -1316,6 +1384,71 @@ namespace SharedUtil
 
             delete this;
         }
+    };
+
+
+
+    //
+    // Fixed size array
+    //
+    // Replacement for e.g.  int var[100]
+    // Checks bounds during debug
+    //
+    template < class T, int SIZE >
+    struct SFixedArray
+    {
+        T& operator[] ( uint uiIndex )
+        {
+            dassert ( uiIndex < SIZE );
+            return data [ uiIndex ];
+        }
+
+        const T& operator[] ( uint uiIndex ) const
+        {
+            dassert ( uiIndex < SIZE );
+            return data [ uiIndex ];
+        }
+
+        T data [ SIZE ];
+    };
+
+
+    //
+    // Fixed size array with a constructer
+    // so it can be used with the IMPLEMENT_FIXED_ARRAY macro
+    //
+    template < class T, int SIZE >
+    struct SFixedArrayInit : SFixedArray < T, SIZE >
+    {
+        SFixedArrayInit ( const T* pInitData, uint uiInitCount )
+        {
+            dassert ( SIZE == uiInitCount );
+            memcpy ( SFixedArray < T, SIZE >::data, pInitData, sizeof ( SFixedArray < T, SIZE >::data ) );
+        }
+    };
+
+    // Use this macro if the size of the initializer list is unknown
+    #define IMPLEMENT_FIXED_ARRAY( vartype, varname ) \
+        SFixedArrayInit < vartype, NUMELMS( _##varname ) > varname ( _##varname, NUMELMS( _##varname ) )
+
+
+    //
+    //  Ranges of numbers. i.e. 100-4000, 5000-6999, 7000-7010
+    //
+    class CRanges
+    {
+    public:
+        void    SetRange                    ( uint uiStart, uint uiLength );
+        void    UnsetRange                  ( uint uiStart, uint uiLength );
+        bool    IsRangeSet                  ( uint uiStart, uint uiLength );    // Returns true if any part of the range already exists in the map
+
+    protected:
+        typedef std::map < uint, uint >::iterator IterType;
+
+        void    RemoveObscuredRanges        ( uint uiStart, uint uiLast );
+        bool    GetRangeOverlappingPoint    ( uint uiPoint, IterType& result );
+
+        std::map < uint, uint >     m_StartLastMap;
     };
 
 };

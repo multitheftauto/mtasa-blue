@@ -170,26 +170,9 @@ CClientProjectile* lua_toprojectile ( lua_State* luaVM, int iArgument )
     return NULL;
 }
 
-CLuaTimer* lua_totimer ( lua_State* luaVM, int iArgument )
-{
-    CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
-    {
-        CLuaTimer* pElement = reinterpret_cast < CLuaTimer* > ( lua_touserdata ( luaVM, iArgument ) );
-        if ( pLuaMain->GetTimerManager ()->Exists ( pElement ) )
-            return pElement;
-    }
-
-    return NULL;
-}
-
 CResource* lua_toresource ( lua_State* luaVM, int iArgument )
 {
-    CResource* pResource = reinterpret_cast < CResource* > ( lua_touserdata ( luaVM, iArgument ) );
-    if ( CLuaDefs::m_pResourceManager->Exists ( pResource ) )
-        return pResource;
-
-    return NULL;
+    return g_pClientGame->GetResourceManager ()->GetResourceFromScriptID ( reinterpret_cast < unsigned long > ( lua_touserdata ( luaVM, iArgument ) ) );
 }
 
 CClientSound* lua_tosound ( lua_State* luaVM, int iArgument )
@@ -277,14 +260,14 @@ void lua_pushelement ( lua_State* luaVM, CClientEntity* pElement )
     lua_pushnil ( luaVM );
 }
 
-void lua_pushresource ( lua_State* luaVM, CResource* pElement )
+void lua_pushresource ( lua_State* luaVM, CResource* pResource )
 {
-    lua_pushlightuserdata ( luaVM, pElement );
+    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pResource->GetScriptID () ) );
 }
 
-void lua_pushtimer ( lua_State* luaVM, CLuaTimer* pElement )
+void lua_pushtimer ( lua_State* luaVM, CLuaTimer* pTimer )
 {
-    lua_pushlightuserdata ( luaVM, pElement );
+    lua_pushlightuserdata ( luaVM, reinterpret_cast < void* > ( pTimer->GetScriptID () ) );
 }
 
 void lua_pushxmlnode ( lua_State* luaVM, CXMLNode* pElement )
@@ -300,4 +283,23 @@ CClientRadarArea* lua_toradararea ( lua_State* luaVM, int iArgument )
         return static_cast < CClientRadarArea* > ( pElement );
     else
         return NULL;
+}
+
+
+// Just do a type check vs LUA_TNONE before calling this, or bant
+const char* lua_makestring ( lua_State* luaVM, int iArgument )
+{
+    if ( lua_type ( luaVM, iArgument ) == LUA_TSTRING )
+    {
+        return lua_tostring ( luaVM, iArgument );
+    }
+    lua_pushvalue ( luaVM, iArgument );
+    lua_getglobal ( luaVM, "tostring" );
+    lua_pushvalue ( luaVM, -2 );
+    lua_call ( luaVM, 1, 1 );
+
+    const char* szString = lua_tostring ( luaVM, -1 );
+    lua_pop ( luaVM, 2 );
+
+    return szString;
 }

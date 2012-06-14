@@ -92,7 +92,9 @@ void CSimPlayerManager::RemoveSimPlayer ( CPlayer* pPlayer )
     for ( std::set < CSimPlayer* > ::const_iterator iter = m_AllSimPlayerMap.begin () ; iter != m_AllSimPlayerMap.end (); iter++ )
     {
         CSimPlayer* pOtherSim = *iter;
-        ListRemove ( pOtherSim->m_SendList, pSim );
+        ListRemove ( pOtherSim->m_PuresyncSendList, pSim );
+        ListRemove ( pOtherSim->m_KeysyncSendList, pSim );
+        ListRemove ( pOtherSim->m_BulletsyncSendList, pSim );
     }
 
     SAFE_DELETE( pSim );
@@ -110,7 +112,7 @@ void CSimPlayerManager::RemoveSimPlayer ( CPlayer* pPlayer )
 // Update matching sim player object with new datum
 //
 ///////////////////////////////////////////////////////////////////////////
-void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::vector < CPlayer* >& simSendList )
+void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::vector < CPlayer* >* pPuresyncSendList, const std::vector < CPlayer* >* pKeysyncSendList, const std::vector < CPlayer* >* pBulletsyncSendList )
 {
     LockSimSystem ();     // TODO - only lock the CSimPlayer
 
@@ -144,14 +146,47 @@ void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::vector < 
     pSim->m_ucSyncTimeContext       = pPlayer->GetSyncTimeContext ();
     pSim->m_ucOccupiedVehicleSeat   = pPlayer->GetOccupiedVehicleSeat ();
     pSim->m_fWeaponRange            = fWeaponRange;
+    pSim->m_bVehicleHasHydraulics   = pVehicle ? pVehicle->GetUpgrades ()->HasUpgrade ( 1087 ) : false;
+    pSim->m_bVehicleIsPlaneOrHeli   = pVehicle ? pVehicle->GetVehicleType () == VEHICLE_PLANE || pVehicle->GetVehicleType () == VEHICLE_HELI : false;
+    pSim->m_sharedControllerState.Copy ( pPlayer->GetPad ()->GetCurrentControllerState () );
+    pSim->m_fCameraRotation         = pPlayer->GetCameraRotation ();
+    pSim->m_fPlayerRotation         = pPlayer->GetRotation ();
 
-    // Copy send list
-    pSim->m_SendList.clear ();
-    for ( std::vector < CPlayer* > ::const_iterator iter = simSendList.begin (); iter != simSendList.end (); ++iter )
+    // Update Puresync send list
+    if ( pPuresyncSendList )
     {
-        CSimPlayer* pSendSimPlayer = (*iter)->m_pSimPlayer;
-        if ( pSendSimPlayer && pSendSimPlayer->m_bDoneFirstUpdate )
-            pSim->m_SendList.push_back ( pSendSimPlayer );
+        pSim->m_PuresyncSendList.clear ();
+        for ( std::vector < CPlayer* > ::const_iterator iter = pPuresyncSendList->begin (); iter != pPuresyncSendList->end (); ++iter )
+        {
+            CSimPlayer* pSendSimPlayer = (*iter)->m_pSimPlayer;
+            if ( pSendSimPlayer && pSendSimPlayer->m_bDoneFirstUpdate )
+                pSim->m_PuresyncSendList.push_back ( pSendSimPlayer );
+        }
+
+    }
+
+    // Update Keysync send list
+    if ( pKeysyncSendList )
+    {
+        pSim->m_KeysyncSendList.clear ();
+        for ( std::vector < CPlayer* > ::const_iterator iter = pKeysyncSendList->begin (); iter != pKeysyncSendList->end (); ++iter )
+        {
+            CSimPlayer* pSendSimPlayer = (*iter)->m_pSimPlayer;
+            if ( pSendSimPlayer && pSendSimPlayer->m_bDoneFirstUpdate )
+                pSim->m_KeysyncSendList.push_back ( pSendSimPlayer );
+        }
+    }
+
+    // Update Bulletsync send list
+    if ( pBulletsyncSendList )
+    {
+        pSim->m_BulletsyncSendList.clear ();
+        for ( std::vector < CPlayer* > ::const_iterator iter = pBulletsyncSendList->begin (); iter != pBulletsyncSendList->end (); ++iter )
+        {
+            CSimPlayer* pSendSimPlayer = (*iter)->m_pSimPlayer;
+            if ( pSendSimPlayer && pSendSimPlayer->m_bDoneFirstUpdate )
+                pSim->m_BulletsyncSendList.push_back ( pSendSimPlayer );
+        }
     }
 
     // Set this flag
@@ -217,7 +252,7 @@ void CSimPlayerManager::UnlockSimSystem ( void )
 // CS should be locked: no
 //
 ///////////////////////////////////////////////////////////////
-bool CSimPlayerManager::HandlePlayerPureSync ( NetServerPlayerID& Socket, NetBitStreamInterface* BitStream )
+bool CSimPlayerManager::HandlePlayerPureSync ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream )
 {
     if ( !CNetBufferWatchDog::CanSendPacket ( PACKET_ID_PLAYER_PURESYNC ) )
         return true;
@@ -235,12 +270,13 @@ bool CSimPlayerManager::HandlePlayerPureSync ( NetServerPlayerID& Socket, NetBit
                                                                            pSourceSimPlayer->m_usLatency,
                                                                            pSourceSimPlayer->m_ucSyncTimeContext,
                                                                            pSourceSimPlayer->m_ucWeaponType,
-                                                                           pSourceSimPlayer->m_fWeaponRange );
+                                                                           pSourceSimPlayer->m_fWeaponRange,
+                                                                           pSourceSimPlayer->m_sharedControllerState );
         if ( pPacket->Read ( *BitStream ) )
         {
             // Relay it to nearbyers
             for ( int i = 0 ; i < g_pBandwidthSettings->iTestSendMultiplier ; i++ )
-                Broadcast ( *pPacket, pSourceSimPlayer->GetSendList () );
+                Broadcast ( *pPacket, pSourceSimPlayer->GetPuresyncSendList () );
         }
 
         delete pPacket;
@@ -259,7 +295,7 @@ bool CSimPlayerManager::HandlePlayerPureSync ( NetServerPlayerID& Socket, NetBit
 // CS should be locked: no
 //
 ///////////////////////////////////////////////////////////////
-bool CSimPlayerManager::HandleVehiclePureSync ( NetServerPlayerID& Socket, NetBitStreamInterface* BitStream )
+bool CSimPlayerManager::HandleVehiclePureSync ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream )
 {
     if ( !CNetBufferWatchDog::CanSendPacket ( PACKET_ID_PLAYER_VEHICLE_PURESYNC ) )
         return true;
@@ -280,11 +316,97 @@ bool CSimPlayerManager::HandleVehiclePureSync ( NetServerPlayerID& Socket, NetBi
                                                                              pSourceSimPlayer->m_usVehicleModel,
                                                                              pSourceSimPlayer->m_ucOccupiedVehicleSeat,
                                                                              pSourceSimPlayer->m_ucWeaponType,
-                                                                             pSourceSimPlayer->m_fWeaponRange );
+                                                                             pSourceSimPlayer->m_fWeaponRange,
+                                                                             pSourceSimPlayer->m_sharedControllerState );
         if ( pPacket->Read ( *BitStream ) )
         {
             // Relay it to nearbyers
-            Broadcast ( *pPacket, pSourceSimPlayer->GetSendList () );
+            Broadcast ( *pPacket, pSourceSimPlayer->GetPuresyncSendList () );
+        }
+
+        delete pPacket;
+    }
+
+    UnlockSimSystem ();
+    return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CSimPlayerManager::HandleKeySync
+//
+// Thread:              sync
+// CS should be locked: no
+//
+///////////////////////////////////////////////////////////////
+bool CSimPlayerManager::HandleKeySync ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream )
+{
+    if ( !CNetBufferWatchDog::CanSendPacket ( PACKET_ID_PLAYER_KEYSYNC ) )
+        return true;
+
+    LockSimSystem ();     // Prevent player additions and deletions
+
+    // Grab the source player
+    CSimPlayer* pSourceSimPlayer = Get ( Socket );
+
+    // Check is good for key sync
+    if ( pSourceSimPlayer && pSourceSimPlayer->IsJoined () )
+    {
+        // Read the incoming packet data
+        CSimKeysyncPacket* pPacket = new CSimKeysyncPacket ( pSourceSimPlayer->m_PlayerID,
+                                                             pSourceSimPlayer->m_bHasOccupiedVehicle,
+                                                             pSourceSimPlayer->m_usVehicleModel,
+                                                             pSourceSimPlayer->m_ucWeaponType,
+                                                             pSourceSimPlayer->m_fWeaponRange,
+                                                             pSourceSimPlayer->m_bVehicleHasHydraulics,
+                                                             pSourceSimPlayer->m_bVehicleIsPlaneOrHeli,
+                                                             pSourceSimPlayer->m_sharedControllerState,
+                                                             pSourceSimPlayer->m_fCameraRotation,
+                                                             pSourceSimPlayer->m_fPlayerRotation );
+
+        if ( pPacket->Read ( *BitStream ) )
+        {
+            // Relay it to nearbyers
+            Broadcast ( *pPacket, pSourceSimPlayer->GetKeysyncSendList () );
+        }
+
+        delete pPacket;
+    }
+
+    UnlockSimSystem ();
+    return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CSimPlayerManager::HandleBulletSync
+//
+// Thread:              sync
+// CS should be locked: no
+//
+///////////////////////////////////////////////////////////////
+bool CSimPlayerManager::HandleBulletSync ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream )
+{
+    if ( !CNetBufferWatchDog::CanSendPacket ( PACKET_ID_PLAYER_BULLETSYNC ) )
+        return true;
+
+    LockSimSystem ();     // Prevent player additions and deletions
+
+    // Grab the source player
+    CSimPlayer* pSourceSimPlayer = Get ( Socket );
+
+    // Check is good for bullet sync
+    if ( pSourceSimPlayer && pSourceSimPlayer->IsJoined () )
+    {
+        // Read the incoming packet data
+        CSimBulletsyncPacket* pPacket = new CSimBulletsyncPacket ( pSourceSimPlayer->m_PlayerID );
+
+        if ( pPacket->Read ( *BitStream ) )
+        {
+            // Relay it to nearbyers
+            Broadcast ( *pPacket, pSourceSimPlayer->GetBulletsyncSendList () );
         }
 
         delete pPacket;
@@ -305,7 +427,7 @@ bool CSimPlayerManager::HandleVehiclePureSync ( NetServerPlayerID& Socket, NetBi
 // Get a sim player from a player socket
 //
 ///////////////////////////////////////////////////////////////////////////
-CSimPlayer* CSimPlayerManager::Get ( NetServerPlayerID& PlayerSocket )
+CSimPlayer* CSimPlayerManager::Get ( const NetServerPlayerID& PlayerSocket )
 {
     dassert ( m_bIsLocked );
     return MapFindRef ( m_SocketSimMap, PlayerSocket );
@@ -362,7 +484,7 @@ void CSimPlayerManager::Broadcast ( const CSimPacket& Packet, const std::vector 
     }
     else if ( ulFlags & PACKET_LOW_PRIORITY )
     {
-        //packetPriority = PACKET_PRIORITY_LOW;
+        packetPriority = PACKET_PRIORITY_LOW;
     }
 
     // Group players by bitstream version

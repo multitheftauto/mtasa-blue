@@ -24,8 +24,6 @@ CObject::CObject ( CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectMa
     // Init
     m_iType = CElement::OBJECT;
     SetTypeName ( "object" );
-    m_szName [0] = 0;
-    m_szName [MAX_ELEMENT_NAME_LENGTH] = 0;
 
     m_pObjectManager = pObjectManager;
     m_usModel = 0xFFFF;
@@ -33,7 +31,6 @@ CObject::CObject ( CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectMa
     m_ucAlpha = 255;
     m_fScale  = 1;
     m_fHealth = 1000.0f;
-    m_bBreakable = true;
     m_bSyncable = true;
     m_pSyncer = NULL;
     m_bIsStatic = false;
@@ -50,9 +47,6 @@ CObject::CObject ( const CObject& Copy ) : CElement ( Copy.m_pParent, Copy.m_pXM
     , m_pLowLodObject ( Copy.m_pLowLodObject )
 {
     // Init
-    m_szName [0] = 0;
-    m_szName [MAX_ELEMENT_NAME_LENGTH] = 0;
-
     m_pObjectManager = Copy.m_pObjectManager;
     m_usModel = Copy.m_usModel;
     m_vecPosition = Copy.m_vecPosition;

@@ -29,7 +29,7 @@ using std::vector;
 
 extern CClientGame* g_pClientGame;
 
-bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled )
+bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled, bool bIsScriptedBind )
 {
     // Has the core already handled this command?
     if ( !bHandled )
@@ -105,7 +105,7 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
         pBitStream->Write ( strClumpedCommand.c_str(), static_cast < int > ( strlen ( strClumpedCommand.c_str() ) ) );
 
         // Send the packet to the server and free it
-        g_pNet->SendPacket ( PACKET_ID_COMMAND, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE, PACKET_ORDERING_CHAT );
+        g_pNet->SendPacket ( PACKET_ID_COMMAND, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_CHAT );
         g_pNet->DeallocateNetBitStream ( pBitStream );
 
         return true;
@@ -119,13 +119,15 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
 }
 
 
-void COMMAND_ChatBox ( const char* szCmdLine )
+void COMMAND_ChatBox ( const char* szInCmdLine )
 {
-    if ( !(szCmdLine && szCmdLine[0]) )
+    if ( !(szInCmdLine && szInCmdLine[0]) )
         return;
 
+    COPY_CSTR_TO_TEMP_BUFFER( szCmdLine, szInCmdLine, 256 );
+
     // Split it up into command and rgb
-    char* szCommand = strtok ( const_cast < char* > ( szCmdLine ), " " );
+    char* szCommand = strtok ( szCmdLine, " " );
     char* szRed = strtok ( NULL, " " );
     char* szGreen = strtok ( NULL, " " );
     char* szBlue = strtok ( NULL, " " );
@@ -771,31 +773,6 @@ void COMMAND_ShowSyncing ( const char *szCmdLine )
     g_pClientGame->ShowSyncingInfo ( atoi ( szCmdLine ) == 1 );
 }
 
-void COMMAND_FakeLag ( const char *szCmdLine )
-{
-    char szBuffer [256];
-    char* szExtraPing = NULL;
-    char* szExtraPingVary = NULL;
-
-    if ( !(szCmdLine && szCmdLine[0]) )
-        return;
-
-    strncpy ( szBuffer, szCmdLine, 256 );
-    szBuffer[255] = 0;
-    szExtraPing = strtok ( szBuffer, " " );
-    szExtraPingVary = strtok ( NULL, " " );
-    
-    if ( !(szExtraPing && szExtraPingVary) )
-    {
-        g_pCore->GetConsole ()->Echo ( "Bad syntax" );
-        return;
-    }
-
-    g_pNet->SetFakeLag ( 0, atoi ( szExtraPing ), atoi ( szExtraPingVary ) );
-    g_pCore->GetConsole ()->Printf ( "Fake lag set to %s extra ping with %s extra ping variance", szExtraPing, szExtraPingVary );
-}
-
-
 #endif
 
 #ifdef MTA_DEBUG
@@ -1058,4 +1035,15 @@ void COMMAND_ShowCollision ( const char* szCmdLine )
     g_pCore->GetConsole ()->Printf ( "showcol is now set to %d", bShow ? 1 : 0 );
     if ( bShow && !g_pClientGame->GetDevelopmentMode () )
         g_pCore->GetConsole ()->Print ( "showcol will have no effect because development mode is off" );
+}
+
+
+void COMMAND_ShowSound ( const char* szCmdLine )
+{
+    int iCmd = ( szCmdLine && szCmdLine [ 0 ] ) ? atoi ( szCmdLine ) : -1;
+    bool bShow = ( iCmd == 1 ) ? true : ( iCmd == 0 ) ? false : !g_pClientGame->GetShowSound ();
+    g_pClientGame->SetShowSound ( bShow );
+    g_pCore->GetConsole ()->Printf ( "showsound is now set to %d", bShow ? 1 : 0 );
+    if ( bShow && !g_pClientGame->GetDevelopmentMode () )
+        g_pCore->GetConsole ()->Print ( "showsound will have no effect because development mode is off" );
 }

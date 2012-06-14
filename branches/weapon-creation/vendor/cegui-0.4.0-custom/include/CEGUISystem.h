@@ -827,6 +827,8 @@ public:
 	bool	injectTimePulse(float timeElapsed);
 
 
+    static void                     SetBidiEnabled              ( bool bEnabled ) { ms_bBidiEnabled = bEnabled; }
+    static bool                     ms_bBidiEnabled;
 private:
     // unimplemented constructors / assignment
     System(const System& obj);

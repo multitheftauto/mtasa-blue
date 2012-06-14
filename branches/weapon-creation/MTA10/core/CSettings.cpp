@@ -67,6 +67,7 @@ void CSettings::CreateGUI ( void )
     m_bCaptureKey = false;
     m_dwFrameCount = 0;
     m_bShownVolumetricShadowsWarning = false;
+    m_bShownAllowScreenUploadMessage = false;
     CVector2D vecTemp;
 
     // Create the window
@@ -356,6 +357,11 @@ void CSettings::CreateGUI ( void )
     m_pAutoRefreshBrowser->GetPosition ( vecTemp, false );
     m_pAutoRefreshBrowser->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
+    m_pCheckBoxAllowScreenUpload = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, "Allow screen upload", true ) );
+    m_pCheckBoxAllowScreenUpload->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
+    m_pCheckBoxAllowScreenUpload->GetPosition ( vecTemp, false );
+    m_pCheckBoxAllowScreenUpload->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, "Use customized GTA:SA files", true ) );
     m_pCheckBoxCustomizedSAFiles->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
     m_pCheckBoxCustomizedSAFiles->GetPosition ( vecTemp, false );
@@ -484,12 +490,12 @@ void CSettings::CreateGUI ( void )
     m_pComboResolution->SetReadOnly ( true );
 
     m_pCheckBoxWindowed = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Windowed", true ) );
-    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY - 3.0f ) );
+    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY - 3.0f ) );
     m_pCheckBoxWindowed->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     float fPosY =  vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Full Screen Minimize", true ) );
-    m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, fPosY + 13.0f ) );
+    m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, fPosY + 13.0f ) );
     m_pCheckBoxMinimize->SetSize ( CVector2D ( 224.0f, 16.0f ) );
     if ( !GetVideoModeManager ()->IsMultiMonitor () )
     {
@@ -498,7 +504,7 @@ void CSettings::CreateGUI ( void )
     }
 
     m_pCheckBoxDisableAero = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Disable Aero Desktop", true ) );
-    m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 29.0f ) );
+    m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 29.0f ) );
     m_pCheckBoxDisableAero->SetSize ( CVector2D ( 224.0f, 16.0f ) );
     if ( GetApplicationSetting ( "os-version" ) < "6.1" || GetApplicationSettingInt ( "aero-changeable" ) == 0 )
     {
@@ -506,8 +512,17 @@ void CSettings::CreateGUI ( void )
         fPosY -= 16.0f;
     }
 
+    m_pCheckBoxDeviceSelectionDialog = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Enable Device Selection Dialog", true ) );
+    m_pCheckBoxDeviceSelectionDialog->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, fPosY + 45.0f ) );
+    m_pCheckBoxDeviceSelectionDialog->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    if ( !GetVideoModeManager ()->IsMultiMonitor () )
+    {
+        m_pCheckBoxDeviceSelectionDialog->SetVisible ( false );
+        fPosY -= 16.0f;
+    }
+
     m_pCheckBoxMipMapping = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Mip Mapping", true ) );
-    m_pCheckBoxMipMapping->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 45.0f ) );
+    m_pCheckBoxMipMapping->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 45.0f ) );
     m_pCheckBoxMipMapping->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 #ifndef MIP_MAPPING_SETTING_APPEARS_TO_DO_SOMETHING
     m_pCheckBoxMipMapping->SetVisible ( false );
@@ -559,11 +574,11 @@ void CSettings::CreateGUI ( void )
     m_pComboFxQuality->SetReadOnly ( true );
 
     m_pCheckBoxVolumetricShadows = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Volumetric Shadows", true ) );
-    m_pCheckBoxVolumetricShadows->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 2.0f ) );
+    m_pCheckBoxVolumetricShadows->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 2.0f ) );
     m_pCheckBoxVolumetricShadows->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pCheckBoxGrass = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Grass effect", true ) );
-    m_pCheckBoxGrass->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 22.0f ) );
+    m_pCheckBoxGrass->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 22.0f ) );
     m_pCheckBoxGrass->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pAnisotropicLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Anisotropic filtering:" ) );
@@ -617,23 +632,6 @@ void CSettings::CreateGUI ( void )
     m_pComboAspectRatio->AddItem ( "16:10" )->SetData ( (void*)ASPECT_RATIO_16_10 );
     m_pComboAspectRatio->AddItem ( "16:9" )->SetData ( (void*)ASPECT_RATIO_16_9 );
     m_pComboAspectRatio->SetReadOnly ( true );
-
-    m_pStreamingMemoryLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Usable video memory:" ) );
-    m_pStreamingMemoryLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
-    m_pStreamingMemoryLabel->GetPosition ( vecTemp, false );
-    m_pStreamingMemoryLabel->AutoSize ( "Usable video memory:" );
-
-    unsigned int uiMinMemory = g_pCore->GetMinStreamingMemory ();
-    unsigned int uiMaxMemory = g_pCore->GetMaxStreamingMemory ();
-
-    m_pStreamingMemory = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
-    m_pStreamingMemory->SetPosition ( CVector2D ( vecTemp.fX + 130.0f, vecTemp.fY ) );
-    m_pStreamingMemory->SetSize ( CVector2D ( 160.0f, 20.0f ) );
-    m_pStreamingMemory->SetProperty ( "StepSize", SString("%.07lf", 1.0 / (uiMaxMemory - uiMinMemory)) );
-
-    m_pStreamingMemoryValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "0 MB") );
-    m_pStreamingMemoryValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY ) );
-    m_pStreamingMemoryValueLabel->AutoSize ( "9999 MB " );
 
     m_pMapRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Map rendering options" ) );
     m_pMapRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 38.0f ) );
@@ -909,24 +907,6 @@ void CSettings::CreateGUI ( void )
     m_pSingleDownloadLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
 
-    // Network encryption setting
-    m_pNetworkEncryptionLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Network encryption:" ) );
-    m_pNetworkEncryptionLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
-    m_pNetworkEncryptionLabel->AutoSize ( m_pNetworkEncryptionLabel->GetText ().c_str () );
-
-    m_pNetworkEncryptionCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
-    m_pNetworkEncryptionCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
-    m_pNetworkEncryptionCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
-    m_pNetworkEncryptionCombo->AddItem ( "Off" )->SetData ( (void*)0 );
-    m_pNetworkEncryptionCombo->AddItem ( "Default" )->SetData ( (void*)1 );
-    m_pNetworkEncryptionCombo->SetReadOnly ( true );
-
-    m_pNetworkEncryptionLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Some ISPs may have\ntrouble with encryption" ) );
-    m_pNetworkEncryptionLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
-    m_pNetworkEncryptionLabelInfo->SetFont ( "default-bold-small" );
-    m_pNetworkEncryptionLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 40-4;
-
     // Debug setting
     m_pDebugSettingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Debug setting:" ) );
     m_pDebugSettingLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
@@ -936,7 +916,10 @@ void CSettings::CreateGUI ( void )
     m_pDebugSettingCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
     m_pDebugSettingCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
     m_pDebugSettingCombo->AddItem ( "Default" )->SetData ( (void*)0 );
-    m_pDebugSettingCombo->AddItem ( "#6323 Network" )->SetData ( (void*)1 );
+    m_pDebugSettingCombo->AddItem ( "#6734 Graphics" )->SetData ( (void*)EDiagnosticDebug::GRAPHICS_6734 );
+    //m_pDebugSettingCombo->AddItem ( "#6778 BIDI" )->SetData ( (void*)EDiagnosticDebug::BIDI_6778 );
+    m_pDebugSettingCombo->AddItem ( "#6732 D3D" )->SetData ( (void*)EDiagnosticDebug::D3D_6732 );
+    m_pDebugSettingCombo->AddItem ( "#0000 Log timing" )->SetData ( (void*)EDiagnosticDebug::LOG_TIMING_0000 );
     m_pDebugSettingCombo->SetReadOnly ( true );
 
     m_pDebugSettingLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Select default always.\n(This setting is not saved)" ) );
@@ -947,6 +930,29 @@ void CSettings::CreateGUI ( void )
 
     m_pDebugSettingCombo->SetText ( "Default" );
     SetApplicationSetting ( "diagnostics", "debug-setting", "none" );
+
+    // Streaming memory
+    m_pStreamingMemoryLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Streaming memory:" ) );
+    m_pStreamingMemoryLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY + 0.0f ) );
+    m_pStreamingMemoryLabel->AutoSize ( "Streaming memory:" );
+
+    unsigned int uiMinMemory = g_pCore->GetMinStreamingMemory ();
+    unsigned int uiMaxMemory = g_pCore->GetMaxStreamingMemory ();
+
+    m_pStreamingMemory = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAdvanced ) );
+    m_pStreamingMemory->SetPosition ( CVector2D ( vecTemp.fX + 140.0f, vecTemp.fY - 0.f ) );
+    m_pStreamingMemory->SetSize ( CVector2D ( 130.0f, 20.0f ) );
+    m_pStreamingMemory->SetProperty ( "StepSize", SString("%.07lf", 1.0 / (uiMaxMemory - uiMinMemory)) );
+
+    m_pStreamingMemoryValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "0 MB") );
+    m_pStreamingMemoryValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 280.0f, vecTemp.fY ) );
+    m_pStreamingMemoryValueLabel->AutoSize ( "999 MB" );
+
+    m_pStreamingMemoryLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Maximum is usually best" ) );
+    m_pStreamingMemoryLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 0.f ) );
+    m_pStreamingMemoryLabelInfo->SetFont ( "default-bold-small" );
+    m_pStreamingMemoryLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 40-4;
 
     // Auto updater section label
     m_pAdvancedUpdaterLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Auto updater" ) );
@@ -1002,6 +1008,7 @@ void CSettings::CreateGUI ( void )
     m_pComboFxQuality->SetSelectionHandler ( GUI_CALLBACK( &CSettings::OnFxQualityChanged, this ) );
     m_pCheckBoxVolumetricShadows->SetClickHandler ( GUI_CALLBACK( &CSettings::OnVolumetricShadowsClick, this ) );
     m_pStreamingMemory->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnStreamingMemoryChanged, this ) );
+    m_pCheckBoxAllowScreenUpload->SetClickHandler ( GUI_CALLBACK( &CSettings::OnAllowScreenUploadClick, this ) );
     m_pCheckBoxCustomizedSAFiles->SetClickHandler ( GUI_CALLBACK( &CSettings::OnCustomizedSAFilesClick, this ) );
     /*
     // Give a warning if no community account settings were stored in config
@@ -1169,6 +1176,15 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     CVARS_GET("volumetric_shadows", bVolumetricShadowsEnabled);
     m_pCheckBoxVolumetricShadows->SetSelected ( bVolumetricShadowsEnabled );
     m_pCheckBoxVolumetricShadows->SetEnabled ( FxQuality != 0 );
+
+    // Device selection dialog
+    bool bDeviceSelectionDialogEnabled = GetApplicationSettingInt ( "device-selection-disabled" ) ? false : true;
+    m_pCheckBoxDeviceSelectionDialog->SetSelected ( bDeviceSelectionDialogEnabled );
+
+    // Allow screen upload
+    bool bAllowScreenUploadEnabled;
+    CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
+    m_pCheckBoxAllowScreenUpload->SetSelected ( bAllowScreenUploadEnabled );
 
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected ( GetApplicationSettingInt ( "customized-sa-files-request" ) != 0 );
@@ -2197,6 +2213,15 @@ void CSettings::LoadData ( void )
 	m_pCheckBoxVolumetricShadows->SetSelected ( bVolumetricShadowsEnabled );
 	m_pCheckBoxVolumetricShadows->SetEnabled ( FxQuality != 0 );
 
+    // Device selection dialog
+    bool bDeviceSelectionDialogEnabled = GetApplicationSettingInt ( "device-selection-disabled" ) ? false : true;
+    m_pCheckBoxDeviceSelectionDialog->SetSelected ( bDeviceSelectionDialogEnabled );
+
+    // Allow screen upload
+    bool bAllowScreenUploadEnabled;
+    CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
+    m_pCheckBoxAllowScreenUpload->SetSelected ( bAllowScreenUploadEnabled );
+
     // Customized sa files
 	m_pCheckBoxCustomizedSAFiles->SetSelected ( GetApplicationSettingInt ( "customized-sa-files-request" ) != 0 );
 	m_pCheckBoxCustomizedSAFiles->SetVisible ( GetApplicationSettingInt ( "customized-sa-files-show" ) != 0 );
@@ -2279,11 +2304,6 @@ void CSettings::LoadData ( void )
     CVARS_GET ( "single_download", iVar );
     if ( iVar == 0 ) m_pSingleDownloadCombo->SetText ( "Default" );
     else if ( iVar == 1 ) m_pSingleDownloadCombo->SetText ( "On" );
-
-    // Network encryption
-    CVARS_GET ( "network_encryption", iVar );
-    if ( iVar == 0 ) m_pNetworkEncryptionCombo->SetText ( "Off" );
-    else if ( iVar == 1 ) m_pNetworkEncryptionCombo->SetText ( "Default" );
 
     // Update build type
     CVARS_GET ( "update_build_type", iVar );
@@ -2487,6 +2507,14 @@ void CSettings::SaveData ( void )
     CVARS_SET ( "volumetric_shadows", bVolumetricShadowsEnabled );
 	gameSettings->SetVolumetricShadowsEnabled ( bVolumetricShadowsEnabled );
 
+    // Device selection dialog
+    bool bDeviceSelectionDialogEnabled = m_pCheckBoxDeviceSelectionDialog->GetSelected ();
+    SetApplicationSettingInt ( "device-selection-disabled", bDeviceSelectionDialogEnabled ? 0 : 1 );
+
+    // Allow screen upload
+    bool bAllowScreenUploadEnabled = m_pCheckBoxAllowScreenUpload->GetSelected ();
+    CVARS_SET ( "allow_screen_upload", bAllowScreenUploadEnabled );
+
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected ();
     CVARS_SET ( "grass", bGrassEnabled );
@@ -2532,21 +2560,11 @@ void CSettings::SaveData ( void )
         CVARS_SET ( "single_download", iSelected );
     }
 
-    // Network encryption
-    if ( CGUIListItem* pSelected = m_pNetworkEncryptionCombo->GetSelectedItem () )
-    {
-        int iSelected = ( int ) pSelected->GetData();
-        CVARS_SET ( "network_encryption", iSelected );
-    }
-
     // Debug setting
     if ( CGUIListItem* pSelected = m_pDebugSettingCombo->GetSelectedItem () )
     {
-        int iSelected = ( int ) pSelected->GetData();
-        SString strDebugSetting = "none";
-        if ( iSelected == 1 )
-            strDebugSetting = "net";    // #6323 Network
-        SetApplicationSetting ( "diagnostics", "debug-setting", strDebugSetting );
+        EDiagnosticDebugType iSelected = ( EDiagnosticDebugType )(int) pSelected->GetData();
+        g_pCore->SetDiagnosticDebug ( iSelected );
     }
 
     // Update build type
@@ -3176,6 +3194,23 @@ bool CSettings::OnVolumetricShadowsClick ( CGUIElement* pElement )
     }
     return true;
 }
+
+//
+// AllowScreenUpload
+//
+bool CSettings::OnAllowScreenUploadClick ( CGUIElement* pElement )
+{
+    if ( !m_pCheckBoxAllowScreenUpload->GetSelected () && !m_bShownAllowScreenUploadMessage )
+    {
+        m_bShownAllowScreenUploadMessage = true;
+        SString strMessage;
+        strMessage += "Screen upload is required by some servers for anti-cheat purposes.";
+        strMessage += "\n\n(The chat box and GUI is excluded from the upload)\n";
+        CCore::GetSingleton ().ShowMessageBox ( "SCREEN UPLOAD INFORMATION", strMessage, MB_BUTTON_OK | MB_ICON_INFO );
+    }
+    return true;
+}
+
 
 //
 // CustomizedSAFiles

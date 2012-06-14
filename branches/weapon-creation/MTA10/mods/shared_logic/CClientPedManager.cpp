@@ -72,62 +72,13 @@ CClientPed* CClientPedManager::Get ( ElementID ID, bool bCheckPlayers )
 
 CClientPed* CClientPedManager::Get ( CPlayerPed* pPlayer, bool bValidatePointer, bool bCheckPlayers )
 {
-    if ( !pPlayer ) return NULL;
-
-    if ( bValidatePointer )
-    {
-        vector < CClientPed* > ::const_iterator iter = m_StreamedIn.begin ();
-        for ( ; iter != m_StreamedIn.end (); iter++ )
-        {
-            if ( (*iter)->GetGamePlayer () == pPlayer )
-            {
-                return *iter;
-            }
-        }
-    }
-    else
-    {
-        CClientPed* pPed = reinterpret_cast < CClientPed* > ( pPlayer->GetStoredPointer () );
-        if ( pPed->GetType () == CCLIENTPED || bCheckPlayers )
-        {
-            return pPed;
-        }
-    }
-    return NULL;
-}
-
-
-CClientPed* CClientPedManager::Get ( RpClump * pClump, bool bCheckPlayers )
-{
-    if ( !pClump ) return NULL;
-
-    CClientPed * pPed = NULL;
-    vector < CClientPed* > ::const_iterator iter = m_StreamedIn.begin ();
-    for ( ; iter != m_StreamedIn.end (); iter++ )
-    {
-        pPed = *iter;
-        if ( pPed->GetClump () == pClump && ( pPed->GetType () == CCLIENTPED || bCheckPlayers ) )
-        {
-            return pPed;
-        }
-    }
-    return NULL;
+    return g_pClientGame->GetGameEntityXRefManager ()->FindClientPed ( pPlayer );
 }
 
 
 CClientPed* CClientPedManager::GetSafe ( CEntity * pEntity, bool bCheckPlayers )
 {
-    if ( !pEntity ) return NULL;
-
-    vector < CClientPed* > ::const_iterator iter = m_StreamedIn.begin ();
-    for ( ; iter != m_StreamedIn.end (); iter++ )
-    {
-        if ( dynamic_cast < CEntity * > ( (*iter)->GetGamePlayer () ) == pEntity )
-        {
-            return *iter;
-        }
-    }
-    return NULL;
+    return g_pClientGame->GetGameEntityXRefManager ()->FindClientPed ( pEntity );
 }
 
 

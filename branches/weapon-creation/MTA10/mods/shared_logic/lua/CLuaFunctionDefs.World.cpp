@@ -636,14 +636,14 @@ int CLuaFunctionDefs::GetZoneName ( lua_State* luaVM )
     argStream.ReadNumber ( vecPosition.fX );
     argStream.ReadNumber ( vecPosition.fY );
     argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadBool ( bCitiesOnly, true );
+    argStream.ReadBool ( bCitiesOnly, false );
 
     if ( !argStream.HasErrors () )
     {
-        char szZoneName [ 128 ];
-        if ( CStaticFunctionDefinitions::GetZoneName ( vecPosition, szZoneName, 128, bCitiesOnly ) )
+        SString strZoneName;
+        if ( CStaticFunctionDefinitions::GetZoneName ( vecPosition, strZoneName, bCitiesOnly ) )
         {
-            lua_pushstring ( luaVM, szZoneName );
+            lua_pushstring ( luaVM, strZoneName );
             return 1;
         }
     }
@@ -1370,6 +1370,30 @@ int CLuaFunctionDefs::SetAircraftMaxHeight ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::SetOcclusionsEnabled ( lua_State* luaVM )
+{
+//  bool setOcclusionsEnabled ( bool enabled )
+    bool bEnabled;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadBool ( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetOcclusionsEnabled ( bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setOcclusionsEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::IsWorldSpecialPropertyEnabled ( lua_State* luaVM )
 {
 //  bool isWorldSpecialPropertyEnabled ( string propname )
@@ -1447,6 +1471,12 @@ int CLuaFunctionDefs::GetJetpackMaxHeight ( lua_State* luaVM )
 int CLuaFunctionDefs::GetAircraftMaxHeight ( lua_State* luaVM )
 {
     lua_pushnumber ( luaVM, g_pGame->GetWorld ()->GetAircraftMaxHeight ( ) );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetOcclusionsEnabled ( lua_State* luaVM )
+{
+    lua_pushboolean ( luaVM, g_pGame->GetWorld ()->GetOcclusionsEnabled ( ) );
     return 1;
 }
 
@@ -1851,6 +1881,40 @@ int CLuaFunctionDefs::CreateSWATRope ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "CreateSWATRope", *argStream.GetErrorMessage () ) );
 
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::SetBirdsEnabled ( lua_State* luaVM )
+{
+    bool bEnabled = false;
+    CScriptArgReader argStream ( luaVM );
+
+    argStream.ReadBool( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetBirdsEnabled ( bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setBirdsEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetBirdsEnabled ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::GetBirdsEnabled ( ) )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
     lua_pushboolean ( luaVM, false );
     return 1;
 }

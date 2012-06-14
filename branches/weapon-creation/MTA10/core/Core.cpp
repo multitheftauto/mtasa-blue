@@ -15,6 +15,7 @@
 using std::string;
 
 CCore* g_pCore = NULL;
+CGraphics* g_pGraphics = NULL;
 bool IsRealDeal ( void );
 
 int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)

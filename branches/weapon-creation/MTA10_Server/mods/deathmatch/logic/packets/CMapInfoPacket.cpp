@@ -29,7 +29,7 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
                                  float fWaveHeight,
                                  const SWorldWaterLevelInfo& worldWaterLevelInfo,
                                  bool bHasSkyGradient,
-                                 bool* pbGarageStates,
+                                 const SGarageStates& garageStates,
                                  unsigned char ucSkyGradientTR,
                                  unsigned char ucSkyGradientTG,
                                  unsigned char ucSkyGradientTB,
@@ -81,7 +81,7 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
     m_fWaveHeight = fWaveHeight;
     m_WorldWaterLevelInfo = worldWaterLevelInfo;
     m_bHasSkyGradient = bHasSkyGradient;
-    m_pbGarageStates = pbGarageStates;
+    m_pGarageStates = &garageStates;
     m_ucSkyGradientTR = ucSkyGradientTR;
     m_ucSkyGradientTG = ucSkyGradientTG;
     m_ucSkyGradientTB = ucSkyGradientTB;
@@ -182,7 +182,8 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     // Write the garage states
     for ( unsigned char i = 0 ; i < MAX_GARAGES ; i++ )
     {
-        BitStream.WriteBit( static_cast < unsigned char > ( m_pbGarageStates[i] ) );
+        const SGarageStates& garageStates = *m_pGarageStates;
+        BitStream.WriteBit( garageStates[i] );
     }
 
     // Write the fun bugs state
@@ -312,6 +313,25 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
             WeaponProperty.data.anim_breakout_time = pWeaponStat->GetWeaponAnimBreakoutTime();
             BitStream.Write( &WeaponProperty );
         }
+    }
+
+    multimap< unsigned short, CBuildingRemoval* >::const_iterator iter = g_pGame->GetBuildingRemovalManager ( )->IterBegin();
+    for (; iter != g_pGame->GetBuildingRemovalManager ( )->IterEnd();++iter)
+    {
+        CBuildingRemoval * pBuildingRemoval = (*iter).second;
+        BitStream.WriteBit( true );
+        BitStream.Write( pBuildingRemoval->GetModel ( ) );
+        BitStream.Write( pBuildingRemoval->GetRadius ( ) );
+        BitStream.Write( pBuildingRemoval->GetPosition ( ).fX );
+        BitStream.Write( pBuildingRemoval->GetPosition ( ).fY );
+        BitStream.Write( pBuildingRemoval->GetPosition ( ).fZ );
+    }
+    BitStream.WriteBit( false );
+
+    if ( BitStream.Version () >= 0x25 )
+    {
+        bool bOcclusionsEnabled = g_pGame->GetOcclusionsEnabled ();
+        BitStream.WriteBit( bOcclusionsEnabled );
     }
 
     return true;

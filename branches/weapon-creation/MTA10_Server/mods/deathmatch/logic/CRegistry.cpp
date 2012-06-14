@@ -70,7 +70,7 @@ bool CRegistry::IntegrityCheck ( void )
 {
     // Do check
     CRegistryResult result;
-    bool bOk = Query( &result, "PRAGMA integrity_check(3)" );
+    bool bOk = Query( &result, "PRAGMA integrity_check" );
 
     // Get result as a string
     SString strResult;

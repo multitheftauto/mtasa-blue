@@ -16,16 +16,18 @@ public:
     // Main thread methods
     void            AddSimPlayer            ( CPlayer* pPlayer );
     void            RemoveSimPlayer         ( CPlayer* pPlayer );
-    void            UpdateSimPlayer         ( CPlayer* pPlayer, const std::vector < CPlayer* >& simSendList );
+    void            UpdateSimPlayer         ( CPlayer* pPlayer, const std::vector < CPlayer* >* pPuresyncSendList, const std::vector < CPlayer* >* pKeysyncSendList, const std::vector < CPlayer* >* pBulletsyncSendList );
 
     // Any thread methods
     void            LockSimSystem           ( void );
     void            UnlockSimSystem         ( void );
 
     // Sync thread methods
-    bool            HandlePlayerPureSync    ( NetServerPlayerID& Socket, NetBitStreamInterface* BitStream );
-    bool            HandleVehiclePureSync   ( NetServerPlayerID& Socket, NetBitStreamInterface* BitStream );
-    CSimPlayer*     Get                     ( NetServerPlayerID& PlayerSocket );
+    bool            HandlePlayerPureSync    ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream );
+    bool            HandleVehiclePureSync   ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream );
+    bool            HandleKeySync           ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream );
+    bool            HandleBulletSync        ( const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream );
+    CSimPlayer*     Get                     ( const NetServerPlayerID& PlayerSocket );
     void            Broadcast               ( const CSimPacket& Packet, const std::vector < CSimPlayer* >& sendList );
 
 protected:

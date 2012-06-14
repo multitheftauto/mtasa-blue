@@ -196,6 +196,14 @@ void CVehicleSA::Init ( void )
     m_bSwingingDoorsAllowed = false;
 
     CopyGlobalSuspensionLinesToPrivate ();
+    m_tSirenInfo.m_bOverrideSirens = false;
+    m_tSirenInfo.m_bSirenSilent = false;
+
+    for ( unsigned int i = 0; i < 8; i++ )
+    {
+        m_tSirenInfo.m_tSirenInfo[i].m_dwMinSirenAlpha = 0;
+    }
+    
 }
 
 // DESTRUCTOR
@@ -216,7 +224,7 @@ CVehicleSA::~CVehicleSA()
 
             if ( m_pSuspensionLines )
             {
-                delete m_pSuspensionLines;
+                delete [] m_pSuspensionLines;
                 m_pSuspensionLines = NULL;
             }
             
@@ -229,7 +237,7 @@ CVehicleSA::~CVehicleSA()
             }
 
             CWorldSA* pWorld = (CWorldSA *)pGame->GetWorld();
-            pWorld->Remove ( m_pInterface );
+            pWorld->Remove ( m_pInterface, CVehicle_Destructor );
             pWorld->RemoveReferencesToDeletedObject ( m_pInterface );
 
             
@@ -1675,7 +1683,7 @@ void CVehicleSA::RecalculateHandling ( void )
     if ( !m_pHandlingData )
         return;
 
-    m_pHandlingData->Recalculate ();
+    m_pHandlingData->Recalculate ( GetModelIndex ( ) );
     
     // Recalculate the suspension lines
     RecalculateSuspensionLines ();
@@ -1727,10 +1735,10 @@ void CVehicleSA::RecalculateHandling ( void )
         }
     }
     pInt->dwHandlingFlags = uiHandlingFlags;
-    pInt->fMass = m_pHandlingData->GetInterface ()->fMass;
-    pInt->fTurnMass = m_pHandlingData->GetInterface ()->fTurnMass;// * pGame->GetHandlingManager()->GetTurnMassMultiplier();
-    pInt->vecCenterOfMass = &m_pHandlingData->GetInterface()->vecCenterOfMass;
-    pInt->fBuoyancyConstant = m_pHandlingData->GetInterface()->fUnknown2;
+    pInt->m_fMass = m_pHandlingData->GetInterface ()->fMass;
+    pInt->m_fTurnMass = m_pHandlingData->GetInterface ()->fTurnMass;// * pGame->GetHandlingManager()->GetTurnMassMultiplier();
+    pInt->m_vecCenterOfMass = m_pHandlingData->GetInterface()->vecCenterOfMass;
+    pInt->m_fBuoyancyConstant = m_pHandlingData->GetInterface()->fUnknown2;
     /*if (m_pHandlingData->GetInterface()->fDragCoeff >= pGame->GetHandlingManager()->GetBasicDragCoeff())
         GetVehicleInterface ()->fDragCoeff = pGame->GetHandlingManager()->GetBasicDragCoeff();
     else*/
@@ -1961,7 +1969,21 @@ void* CVehicleSA::GetPrivateSuspensionLines ( void )
     {
         CModelInfo* pModelInfo = pGame->GetModelInfo ( GetModelIndex() );
         CColDataSA* pColData = pModelInfo->GetInterface ()->pColModel->pColData;
-        m_pSuspensionLines = new BYTE[pColData->ucNumWheels * 0x20];
+        if ( pModelInfo->IsMonsterTruck ( ) )
+        {
+            // Monster truck suspension data is 0x90 BYTES rather than 0x80 (some extra stuff I guess)
+            m_pSuspensionLines = new BYTE[ 0x90 ];
+        }
+        else if ( pModelInfo->IsBike ( ) )
+        {
+            // Bike Suspension data is 0x80 BYTES rather than 0x40 (Some extra stuff I guess)
+            m_pSuspensionLines = new BYTE[ 0x80 ];
+        }
+        else
+        {
+            // CAutomobile allocates wheels * 32 (0x20)
+            m_pSuspensionLines = new BYTE[ pColData->ucNumWheels * 0x20 ];
+        }
     }
 
     return m_pSuspensionLines;
@@ -1971,32 +1993,78 @@ void CVehicleSA::CopyGlobalSuspensionLinesToPrivate ( void )
 {
     CModelInfo* pModelInfo = pGame->GetModelInfo ( GetModelIndex () );
     CColDataSA* pColData = pModelInfo->GetInterface ()->pColModel->pColData;
-    if ( pColData->pSuspensionLines )
-        memcpy ( GetPrivateSuspensionLines (), pColData->pSuspensionLines, pColData->ucNumWheels * 0x20 );
+    if ( pModelInfo->IsMonsterTruck() )
+    {
+        // Monster trucks are 0x90 bytes not 0x80
+        if ( pColData->pSuspensionLines )
+            memcpy ( GetPrivateSuspensionLines (), pColData->pSuspensionLines, 0x90 );
+    }
+    else if ( pModelInfo->IsBike ( ) )
+    {
+        // Bikes are 0x80 bytes not 0x40
+        if ( pColData->pSuspensionLines )
+            memcpy ( GetPrivateSuspensionLines (), pColData->pSuspensionLines, 0x80 );
+    }
+    else
+    {
+        // CAutomobile allocates wheels * 32 (0x20)
+        if ( pColData->pSuspensionLines )
+            memcpy ( GetPrivateSuspensionLines (), pColData->pSuspensionLines, pColData->ucNumWheels * 0x20 );
+    }
 }
 
 void CVehicleSA::RecalculateSuspensionLines ( void )
 {
     CHandlingEntry * pHandlingEntry = GetHandlingData ( );
     // if suspension is master disabled or suspension hasn't changed return.
-    if ( g_pCore->GetMultiplayer ()->IsSuspensionEnabled () == false || pHandlingEntry->HasSuspensionChanged ( ) == false )
-        return;
+    //if ( g_pCore->GetMultiplayer ()->IsSuspensionEnabled () == false || pHandlingEntry->HasSuspensionChanged ( ) == false )
+    //{
+    //    return;
+    //}
 
-    CVehicleSAInterface* pInt = GetVehicleInterface ();
     DWORD dwModel = GetModelIndex ();
     CModelInfo* pModelInfo = pGame->GetModelInfo ( dwModel );
-    // Trains (Their trailers do as well!) and boats crash obviously.
-    if ( pModelInfo->IsBoat () || pModelInfo->IsTrain () || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590 || dwModel == 557 || dwModel == 444 || dwModel == 556 || dwModel == 573 )
-        return;
-
-    CVehicleSAInterfaceVTBL* pVtbl = reinterpret_cast < CVehicleSAInterfaceVTBL* > ( pInt->vtbl );
-    DWORD dwSetupSuspensionLines = pVtbl->SetupSuspensionLines;
-    DWORD dwThis = (DWORD)pInt;
-    _asm
+    if ( pModelInfo && pModelInfo->IsMonsterTruck() || pModelInfo->IsCar() )
     {
-        mov ecx, dwThis
-        call dwSetupSuspensionLines
-    }
+        CVehicleSAInterface* pInt = GetVehicleInterface ();
+        // Trains (Their trailers do as well!)
+        if ( pModelInfo->IsTrain () || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590 )
+            return;
 
-    CopyGlobalSuspensionLinesToPrivate ();
+        CVehicleSAInterfaceVTBL* pVtbl = reinterpret_cast < CVehicleSAInterfaceVTBL* > ( pInt->vtbl );
+        DWORD dwSetupSuspensionLines = pVtbl->SetupSuspensionLines;
+        DWORD dwThis = (DWORD)pInt;
+        _asm
+        {
+            mov ecx, dwThis
+            call dwSetupSuspensionLines
+        }
+
+        CopyGlobalSuspensionLinesToPrivate ();
+    }
+}
+
+void CVehicleSA::GiveVehicleSirens ( unsigned char ucSirenType, unsigned char ucSirenCount )
+{
+    m_tSirenInfo.m_bOverrideSirens = true;
+    m_tSirenInfo.m_ucSirenType = ucSirenType;
+    m_tSirenInfo.m_ucSirenCount = ucSirenCount;
+}
+
+void CVehicleSA::SetVehicleSirenPosition ( unsigned char ucSirenID, CVector vecPos )
+{
+    m_tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions = vecPos;
+}
+
+void CVehicleSA::GetVehicleSirenPosition ( unsigned char ucSirenID, CVector & vecPos )
+{
+    vecPos = m_tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions;
+}
+
+void CVehicleSA::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent )
+{
+     m_tSirenInfo.m_b360Flag = bEnable360; 
+     m_tSirenInfo.m_bDoLOSCheck = bEnableLOSCheck; 
+     m_tSirenInfo.m_bUseRandomiser = bEnableRandomiser;
+     m_tSirenInfo.m_bSirenSilent = bEnableSilent;
 }

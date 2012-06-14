@@ -114,6 +114,26 @@ enum eVehicleType
     VEHICLE_TRAILER
 };
 
+struct SSirenBeaconInfo
+{
+    CVector                     m_vecSirenPositions;
+    SColor                      m_RGBBeaconColour;
+    DWORD                       m_dwMinSirenAlpha;
+};
+struct SSirenInfo
+{
+    // Flags
+    bool                        m_b360Flag;
+    bool                        m_bDoLOSCheck;
+    bool                        m_bUseRandomiser;
+    bool                        m_bSirenSilent;
+    // End of flags
+    bool                        m_bOverrideSirens;
+    unsigned char               m_ucSirenType;
+    unsigned char               m_ucSirenCount;
+    SFixedArray < SSirenBeaconInfo, 8 >    m_tSirenInfo;
+};
+
 class CVehicle : public CElement
 {
     friend class CPlayer;
@@ -148,7 +168,7 @@ public:
 
     const CVector&                  GetPosition             ( void );
     void                            SetPosition             ( const CVector& vecPosition );
-    inline void                     GetRotation             ( CVector& vecRotation );
+    void                            GetRotation             ( CVector& vecRotation );
     void                            GetRotationDegrees      ( CVector& vecRotation );
     void                            SetRotationDegrees      ( const CVector& vecRotation );
 
@@ -163,6 +183,8 @@ public:
     inline void                     SetHealth               ( float fHealth )               { m_fHealth = fHealth; };
     inline unsigned long            GetHealthChangeTime     ( void )                        { return m_ulHealthChangeTime; }
     inline void                     SetHealthChangeTime     ( unsigned long ulTime )        { m_ulHealthChangeTime = ulTime; }
+    inline float                    GetLastSyncedHealth     ( void )                        { return m_fLastSyncedHealthHealth; };
+    inline void                     SetLastSyncedHealth     ( float fHealth )               { m_fLastSyncedHealthHealth = fHealth; };
     
     inline unsigned long            GetBlowTime             ( void )                        { return m_ulBlowTime; };
     inline void                     SetBlowTime             ( unsigned long ulBlowTime )    { m_ulBlowTime = ulBlowTime; };
@@ -247,7 +269,7 @@ public:
     inline unsigned char            GetAlpha                ( void )                        { return m_ucAlpha; }
     inline void                     SetAlpha                ( unsigned char ucAlpha )       { m_ucAlpha = ucAlpha; }
 
-    void                            GetInitialDoorStates    ( unsigned char * pucDoorStates );
+    void                            GetInitialDoorStates    ( SFixedArray < unsigned char, MAX_DOORS >& ucOutDoorStates );
 
     inline CPlayer *                GetJackingPlayer        ( void )                        { return m_pJackingPlayer; }
     inline void                     SetJackingPlayer        ( CPlayer * pPlayer )           { m_pJackingPlayer = pPlayer; }
@@ -298,11 +320,20 @@ public:
     void                            GenerateHandlingData    ( void );
     CHandlingEntry*                 GetHandlingData         ( void )                      { return m_pHandlingEntry; }
 
+    uint                            GetTimeSinceLastPush    ( void )                      { return (uint)( CTickCount::Now () - m_LastPushedTime ).ToLongLong (); }
+    void                            ResetLastPushTime       ( void )                      { m_LastPushedTime = CTickCount::Now (); }
+
+    inline bool                     DoesVehicleHaveSirens   ( void )                      { return m_tSirenBeaconInfo.m_bOverrideSirens; }
+    void                            RemoveVehicleSirens     ( void );
+    void                            SetVehicleSirenPosition     ( unsigned char ucSirenID, CVector vecPos );
+    void                            SetVehicleSirenMinimumAlpha ( unsigned char ucSirenID, DWORD dwPercentage );
+    void                            SetVehicleSirenColour       ( unsigned char ucSirenID, SColor tVehicleSirenColour );
+    void                            SetVehicleFlags             ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent );
 private:
     class CVehicleManager*          m_pVehicleManager;
 
     CPlayer*                        m_pSyncer;
-    CPed*                           m_pOccupants [MAX_VEHICLE_SEATS];
+    SFixedArray < CPed*, MAX_VEHICLE_SEATS >   m_pOccupants;
 
     unsigned short                  m_usModel;
     eVehicleType                    m_eVehicleType;
@@ -312,6 +343,7 @@ private:
     CVector                         m_vecVelocityMeters;
     CVector                         m_vecTurnSpeed;
     float                           m_fHealth;
+    float                           m_fLastSyncedHealthHealth;
     unsigned long                   m_ulHealthChangeTime;
     unsigned long                   m_ulBlowTime;
     unsigned long                   m_ulIdleTime;
@@ -333,7 +365,7 @@ private:
     char                            m_szRegPlate [9];
     unsigned char                   m_ucPaintjob;
 
-    float                           m_fDoorOpenRatio [ 6 ];
+    SFixedArray < float, 6 >        m_fDoorOpenRatio;
     bool                            m_bLocked;
     bool                            m_bDoorsUndamageable;
     bool                            m_bEngineOn;
@@ -374,12 +406,15 @@ private:
     unsigned char                   m_ucVariant;
     unsigned char                   m_ucVariant2;
 
+    CTickCount                      m_LastPushedTime;
+
 public: // 'Safe' variables (that have no need for accessors)
     bool                            m_bDamageProof;
-    unsigned char                   m_ucDoorStates [MAX_DOORS];
-    unsigned char                   m_ucWheelStates [MAX_WHEELS];
-    unsigned char                   m_ucPanelStates [MAX_PANELS];
-    unsigned char                   m_ucLightStates [MAX_LIGHTS];
+    SFixedArray < unsigned char, MAX_DOORS >   m_ucDoorStates;
+    SFixedArray < unsigned char, MAX_WHEELS >  m_ucWheelStates;
+    SFixedArray < unsigned char, MAX_PANELS >  m_ucPanelStates;
+    SFixedArray < unsigned char, MAX_LIGHTS >  m_ucLightStates;
+    SSirenInfo                      m_tSirenBeaconInfo;
 };
 
 #endif

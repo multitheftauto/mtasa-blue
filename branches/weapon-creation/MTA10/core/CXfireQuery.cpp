@@ -122,7 +122,7 @@ void CXfireServerInfo::Query ( void )
     memset ( &addr, 0, sizeof(addr) );
     addr.sin_family = AF_INET;
     addr.sin_addr = Address;
-    addr.sin_port = htons ( usQueryPort );
+    addr.sin_port = htons ( GetQueryPort () );
 
     int ret = sendto ( m_Socket, "x", 1, 0, (sockaddr *) &addr, sizeof(addr) );
     if ( ret == 1 )

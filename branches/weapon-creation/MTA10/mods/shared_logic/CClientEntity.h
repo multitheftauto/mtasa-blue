@@ -25,6 +25,7 @@ class CClientEntity;
 #include <assert.h>
 #include <list>
 #include <google/dense_hash_map>
+#include <core/CClientEntityBase.h>
 class CLuaFunctionRef;
 
 // Used to check fast version of getElementsByType
@@ -136,7 +137,7 @@ enum eCClientEntityClassTypes
 };
 
 
-class CClientEntity
+class CClientEntity : public CClientEntityBase
 {
     DECLARE_BASE_CLASS( CClientEntity )
 public:
@@ -144,8 +145,6 @@ public:
     virtual                                     ~CClientEntity          ( void );
 
     virtual bool                                CanBeDeleted            ( void )                    { return true; };
-
-    static inline int                           GetInstanceCount        ( void )                    { return iCount; };
 
     virtual eClientEntityType                   GetType                 ( void ) const = 0;
     inline bool                                 IsLocalEntity           ( void )                    { return m_ID >= MAX_SERVER_ELEMENTS; };
@@ -167,10 +166,10 @@ public:
     inline void                                 SetSyncTimeContext      ( unsigned char ucContext ) { m_ucSyncTimeContext = ucContext; };
     bool                                        CanUpdateSync           ( unsigned char ucRemote );
 
-    inline char*                                GetName                 ( void )                    { return m_szName; };
-    inline void                                 SetName                 ( const char* szName )      { assert ( szName ); strncpy ( m_szName, szName, MAX_ELEMENT_NAME_LENGTH ); };
+    inline const char*                          GetName                 ( void )                    { return m_strName; }
+    inline void                                 SetName                 ( const char* szName )      { m_strName.AssignLeft ( szName, MAX_ELEMENT_NAME_LENGTH ); }
 
-    inline const char*                          GetTypeName             ( void )                    { return m_szTypeName; };
+    inline const char*                          GetTypeName             ( void )                    { return m_strTypeName; };
     inline unsigned int                         GetTypeHash             ( void )                    { return m_uiTypeHash; };
     void                                        SetTypeName             ( const char* szName );
 
@@ -230,7 +229,7 @@ public:
     virtual bool                                IsAttachToable          ( void );
     virtual void                                DoAttaching             ( void );
 
-    bool                                        AddEvent                ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated );
+    bool                                        AddEvent                ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod );
     bool                                        CallEvent               ( const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren );
     void                                        CallEventNoParent       ( const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource );
     void                                        CallParentEvent         ( const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource );
@@ -251,6 +250,7 @@ public:
     inline unsigned int                         CountChildren           ( void )                        { return static_cast < unsigned int > ( m_Children.size () ); };
 
     void                                        GetChildren             ( lua_State* luaVM );
+    void                                        GetChildrenByType       ( const char* szType, lua_State* luaVM );
 
     void                                        AddCollision                ( CClientColShape* pShape )     { m_Collisions.push_back ( pShape ); }
     void                                        RemoveCollision             ( CClientColShape* pShape )     { if ( !m_Collisions.empty() ) m_Collisions.remove ( pShape ); }
@@ -320,8 +320,8 @@ protected:
 
 private:
     unsigned int                                m_uiTypeHash;
-    char                                        m_szTypeName [MAX_TYPENAME_LENGTH + 1];
-    char                                        m_szName [MAX_ELEMENT_NAME_LENGTH + 1];
+    SString                                     m_strTypeName;
+    SString                                     m_strName;
 
 protected:
     unsigned char                               m_ucSyncTimeContext;
@@ -345,11 +345,8 @@ protected:
     bool                                        m_bDoubleSidedInit;
     bool                                        m_bWorldIgnored;
 
-private:
-    static int                                  iCount;
-
-    // Optimization for getElementsByType starting at root
 public:
+    // Optimization for getElementsByType starting at root
     static void                     StartupEntitiesFromRoot ( );
 private:
     static bool                     IsFromRoot              ( CClientEntity* pEntity );

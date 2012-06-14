@@ -56,6 +56,7 @@ IMPLEMENT_ENUM_BEGIN( ePacketID )
     ADD_ENUM1( PACKET_ID_FIRE )
     ADD_ENUM1( PACKET_ID_PROJECTILE )
     ADD_ENUM1( PACKET_ID_DETONATE_SATCHELS )
+    ADD_ENUM1( PACKET_ID_DESTROY_SATCHELS )
     ADD_ENUM1( PACKET_ID_COMMAND )
     ADD_ENUM1( PACKET_ID_CHAT_ECHO )
     ADD_ENUM1( PACKET_ID_CONSOLE_ECHO )
@@ -139,7 +140,7 @@ public:
     SString                     m_strCategoryName;
     SPacketStat                 m_PrevPacketStats [ 2 ] [ 256 ];
     SPacketStat                 m_PacketStats [ 2 ] [ 256 ];
-    long long                   m_ShownPacketStats [ 256 ];
+    SFixedArray < long long, 256 > m_ShownPacketStats;
 };
 
 

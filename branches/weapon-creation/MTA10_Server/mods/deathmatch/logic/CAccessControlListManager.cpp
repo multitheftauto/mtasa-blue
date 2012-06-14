@@ -472,33 +472,20 @@ void CAccessControlListManager::ClearGroups ( void )
 }
 
 
-bool CAccessControlListManager::VerifyGroup ( class CAccessControlListGroup* pGroup )
+CAccessControlList* CAccessControlListManager::GetACLFromScriptID ( uint uiScriptID )
 {
-    // Return true if it exists
-    list < CAccessControlListGroup* > ::iterator iter = m_Groups.begin ();
-    for ( ; iter != m_Groups.end (); iter++ )
-    {
-        if ( *iter == pGroup )
-            return true;
-    }
-
-    return false;
+    CAccessControlList* pACL = (CAccessControlList*) CIdArray::FindEntry ( uiScriptID, EIdClass::ACL );
+    dassert ( !pACL || ListContains ( m_ACLs, pACL ) );
+    return pACL;
 }
 
 
-bool CAccessControlListManager::VerifyACL ( class CAccessControlList* pACL )
+CAccessControlListGroup* CAccessControlListManager::GetGroupFromScriptID ( uint uiScriptID )
 {
-    // Return true if it exists
-    list < CAccessControlList* > ::iterator iter = m_ACLs.begin ();
-    for ( ; iter != m_ACLs.end (); iter++ )
-    {
-        if ( *iter == pACL )
-            return true;
-    }
-
-    return false;
+    CAccessControlListGroup* pGroup = (CAccessControlListGroup*) CIdArray::FindEntry ( uiScriptID, EIdClass::ACL_GROUP );
+    dassert ( !pGroup || ListContains ( m_Groups, pGroup ) );
+    return pGroup;
 }
-
 
 void CAccessControlListManager::RemoveACLDependencies ( class CAccessControlList* pACL )
 {

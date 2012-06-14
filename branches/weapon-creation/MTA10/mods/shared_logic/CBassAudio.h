@@ -17,6 +17,7 @@ enum eSoundEventType
     SOUND_EVENT_FINISHED_DOWNLOAD,
     SOUND_EVENT_CHANGED_META,
     SOUND_EVENT_STREAM_RESULT,
+    SOUND_EVENT_BEAT,
 };
 
 struct SSoundEventInfo
@@ -36,6 +37,8 @@ struct SSoundThreadVariables
     DWORD                   pSound;
     bool                    bStreamCreateResult;
     std::list < double >    onClientSoundFinishedDownloadQueue;
+    std::list < float >     onClientBPMQueue;
+    std::list < double >    onClientBeatQueue;
     std::list < SString >   onClientSoundChangedMetaQueue;
     CCriticalSection        criticalSection;
 
@@ -62,6 +65,11 @@ public:
     void                    SetVelocity             ( const CVector& vecVelocity );
     void                    SetMinDistance          ( float fDistance );
     void                    SetMaxDistance          ( float fDistance );
+    void                    SetTempoValues          ( float fSampleRate, float fTempo, float fPitch, bool bReverse );
+    void                    GetTempoValues          ( float &fSampleRate, float &fTempo, float &fPitch, bool &bReverse )        { fSampleRate = m_fSampleRate; fTempo = m_fTempo; fPitch = m_fPitch; bReverse = m_bReversed; };
+    void                    SetReversed             ( bool bReversed )                                          { m_bReversed = bReversed; };
+    bool                    GetPanEnabled           ( void )                                                    { return m_bPan; };
+    void                    SetPanEnabled           ( bool bPan )                                               { m_bPan = bPan; };
     void                    SetFxEffects            ( int* pEnabledEffects, uint iNumElements );
     SString                 GetMetaTags             ( const SString& strFormat );
     bool                    IsFinished              ( void );
@@ -70,6 +78,11 @@ public:
     void                    AddQueuedEvent          ( eSoundEventType type, const SString& strString, double dNumber = 0.0, bool bBool = false );
     bool                    GetQueuedEvent          ( SSoundEventInfo& info );
     void                    ParseShoutcastMeta      ( const SString& strMeta );
+    float*                  GetFFTData              ( int iLength );
+    float*                  GetWaveData              ( int iLength );
+    DWORD                   GetLevelData            ( void );
+    float                   GetSoundBPM             ( void );
+    void                    SetSoundBPM             ( float fBPM )                                              { m_fBPM = fBPM;}
 
 protected:
     HSTREAM                 ConvertFileToMono       ( const SString& strPath );
@@ -97,16 +110,21 @@ private:
 
     // Playback state
     bool                    m_bPaused;
+    bool                    m_bReversed;
+    bool                    m_bPan;
     float                   m_fDefaultFrequency;
     float                   m_fVolume;
     float                   m_fMinDistance;
     float                   m_fMaxDistance;
     float                   m_fPlaybackSpeed;
+    float                   m_fPitch;
+    float                   m_fTempo;
+    float                   m_fSampleRate;
     CVector                 m_vecPosition;
     CVector                 m_vecVelocity;
 
-    int                     m_EnabledEffects[9];
-    HFX                     m_FxEffects[9];
+    SFixedArray < int, 9 >  m_EnabledEffects;
+    SFixedArray < HFX, 9 >  m_FxEffects;
 
     // Info
     SString                 m_strStreamName;
@@ -114,4 +132,5 @@ private:
     std::map < SString, SString > m_ConvertedTagMap;
 
     std::list < SSoundEventInfo > m_EventQueue;
+    float                   m_fBPM;
 };

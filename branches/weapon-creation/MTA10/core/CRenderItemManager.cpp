@@ -110,10 +110,10 @@ void CRenderItemManager::OnResetDevice ( void )
 // TODO: Make underlying data for textures shared
 //
 ////////////////////////////////////////////////////////////////
-CTextureItem* CRenderItemManager::CreateTexture ( const SString& strFullFilePath, bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format )
+CTextureItem* CRenderItemManager::CreateTexture ( const SString& strFullFilePath, const CPixels* pPixels, bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format, ETextureAddress textureAddress, ETextureType textureType, uint uiVolumeDepth )
 {
     CFileTextureItem* pTextureItem = new CFileTextureItem ();
-    pTextureItem->PostConstruct ( this, strFullFilePath, bMipMaps, uiSizeX, uiSizeY, format );
+    pTextureItem->PostConstruct ( this, strFullFilePath, pPixels, bMipMaps, uiSizeX, uiSizeY, format, textureAddress, textureType, uiVolumeDepth );
 
     if ( !pTextureItem->IsValid () )
     {
@@ -309,6 +309,26 @@ void CRenderItemManager::NotifyDestructRenderItem ( CRenderItem* pItem )
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderItemManager::DoPulse
+//
+// Update stuff
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::DoPulse ( void )
+{
+    m_pRenderWare->PulseWorldTextureWatch ();
+
+    m_PrevFrameTextureUsage = m_FrameTextureUsage;
+    m_FrameTextureUsage.clear ();
+
+    m_pEffectCloner->DoPulse ();
+
+    UpdateBackBufferCopy ();
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderItemManager::UpdateBackBufferCopy
 //
 // Save back buffer pixels in our special place
@@ -316,21 +336,6 @@ void CRenderItemManager::NotifyDestructRenderItem ( CRenderItem* pItem )
 ////////////////////////////////////////////////////////////////
 void CRenderItemManager::UpdateBackBufferCopy ( void )
 {
-    // Do this here for now
-    m_pRenderWare->PulseWorldTextureWatch ();
-
-    // and this
-    m_PrevFrameTextureUsage = m_FrameTextureUsage;
-    m_FrameTextureUsage.clear ();
-
-    // and this
-    m_pEffectCloner->DoPulse ();
-
-
-    //
-    // UpdateBackBufferCopy
-    //
-
     if ( m_bBackBufferCopyMaybeNeedsResize )
         UpdateBackBufferCopySize ();
 
@@ -363,8 +368,29 @@ void CRenderItemManager::UpdateBackBufferCopy ( void )
 // TODO - Optimize the case where the screen source is the same size as the back buffer copy (i.e. Use back buffer copy resources instead)
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::UpdateScreenSource ( CScreenSourceItem* pScreenSourceItem )
+void CRenderItemManager::UpdateScreenSource ( CScreenSourceItem* pScreenSourceItem, bool bResampleNow )
 {
+    if ( bResampleNow )
+    {
+        // Tell graphics things are about to change
+        CGraphics::GetSingleton().OnChangingRenderTarget ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY );
+
+        // Try to get the back buffer
+	    IDirect3DSurface9* pD3DBackBufferSurface = NULL;
+        m_pDevice->GetBackBuffer ( 0, 0, D3DBACKBUFFER_TYPE_MONO, &pD3DBackBufferSurface );
+        if ( !pD3DBackBufferSurface )
+            return;
+
+        // Copy back buffer into our private render target
+        D3DTEXTUREFILTERTYPE FilterType = D3DTEXF_LINEAR;
+        HRESULT hr = m_pDevice->StretchRect( pD3DBackBufferSurface, NULL, pScreenSourceItem->m_pD3DRenderTargetSurface, NULL, FilterType );
+
+        // Clean up
+	    SAFE_RELEASE( pD3DBackBufferSurface );
+        return;
+    }
+
+
     // Only do update if back buffer copy has changed
     if ( pScreenSourceItem->m_uiRevision == m_uiBackBufferCopyRevision )
         return;
@@ -524,176 +550,6 @@ void CRenderItemManager::ChangeRenderTarget ( uint uiSizeX, uint uiSizeY, IDirec
 }
 
 
-
-//
-//
-// Apply shaders to GTA objects
-//
-//
-
-////////////////////////////////////////////////////////////////
-//
-// CRenderItemManager::GetAppliedShaderForD3DData
-//
-// Find which shader item is being used to render this D3DData
-//
-////////////////////////////////////////////////////////////////
-CShaderItem* CRenderItemManager::GetAppliedShaderForD3DData ( CD3DDUMMY* pD3DData )
-{
-    // Save texture usage for later
-    MapInsert ( m_FrameTextureUsage, pD3DData );
-
-    // Find matching shader
-    CShaderItem** ppShaderItem = (CShaderItem**)MapFind ( m_D3DDataShaderMap, pD3DData );
-    if ( ppShaderItem )
-        return *ppShaderItem;
-    return NULL;
-}
-
-
-////////////////////////////////////////////////////////////////
-//
-// CRenderItemManager::GetVisibleTextureNames
-//
-// Get the names of all streamed in world textures, filtered by name and/or model
-//
-////////////////////////////////////////////////////////////////
-void CRenderItemManager::GetVisibleTextureNames ( std::vector < SString >& outNameList, const SString& strTextureNameMatch, ushort usModelID )
-{
-    // If modelid supplied, get the model texture names into a map
-    std::set < SString > modelTextureNameMap;
-    if ( usModelID )
-    {
-        std::vector < SString > modelTextureNameList;
-        m_pRenderWare->GetModelTextureNames ( modelTextureNameList, usModelID );
-        for ( std::vector < SString >::const_iterator iter = modelTextureNameList.begin () ; iter != modelTextureNameList.end () ; ++iter )
-            modelTextureNameMap.insert ( (*iter).ToLower () );
-    }
-
-    SString strTextureNameMatchLower = strTextureNameMatch.ToLower ();
-
-    std::set < SString > resultMap;
-
-    // For each texture that was used in the previous frame
-    for ( std::set < CD3DDUMMY* >::const_iterator iter = m_PrevFrameTextureUsage.begin () ; iter != m_PrevFrameTextureUsage.end () ; ++iter )
-    {
-        // Get the texture name
-        SString strTextureName = m_pRenderWare->GetTextureName ( *iter );
-        SString strTextureNameLower = strTextureName.ToLower ();
-
-        if ( strTextureName.empty () )
-            continue;
-
-        // Filter by wildcard match
-        if ( !WildcardMatch ( strTextureNameMatchLower, strTextureNameLower ) )
-            continue;
-
-        // Filter by model
-        if ( usModelID )
-            if ( !MapContains ( modelTextureNameMap, strTextureNameLower ) )
-                continue;
-
-        resultMap.insert ( strTextureName );
-    }
-
-    for ( std::set < SString >::const_iterator iter = resultMap.begin () ; iter != resultMap.end () ; ++iter )
-    {
-        outNameList.push_back ( *iter );
-    }
-}
-
-
-////////////////////////////////////////////////////////////////
-//
-// CRenderItemManager::ApplyShaderItemToWorldTexture
-//
-// Add an association between the shader item and a world texture match
-//
-////////////////////////////////////////////////////////////////
-bool CRenderItemManager::ApplyShaderItemToWorldTexture ( CShaderItem* pShaderItem, const SString& strTextureNameMatch )
-{
-    assert ( pShaderItem );
-
-    // Add new match at the end
-    return m_pRenderWare->AddWorldTextureWatch ( (CSHADERDUMMY*)pShaderItem, strTextureNameMatch, pShaderItem->m_fPriority );
-}
-
-
-////////////////////////////////////////////////////////////////
-//
-// CRenderItemManager::RemoveShaderItemFromWorldTexture
-//
-// Remove an association between the shader item and the world texture
-//
-////////////////////////////////////////////////////////////////
-bool CRenderItemManager::RemoveShaderItemFromWorldTexture ( CShaderItem* pShaderItem, const SString& strTextureNameMatch )
-{
-    assert ( pShaderItem );
-
-    m_pRenderWare->RemoveWorldTextureWatch ( (CSHADERDUMMY*)pShaderItem, strTextureNameMatch );
-    return true;
-}
-
-
-////////////////////////////////////////////////////////////////
-//
-// CRenderItemManager::RemoveShaderItemFromWatchLists
-//
-// Ensure the shader item is not being referred to by the texture replacement system
-//
-////////////////////////////////////////////////////////////////
-void CRenderItemManager::RemoveShaderItemFromWatchLists ( CShaderItem* pShaderItem )
-{
-    //
-    // Remove shader item from all world textures
-    //
-    m_pRenderWare->RemoveWorldTextureWatchByContext ( (CSHADERDUMMY*)pShaderItem );
-
-    //
-    // Remove shader item from D3DData map
-    //
-    for ( std::map < CD3DDUMMY*, CSHADERDUMMY* >::iterator dataIter = m_D3DDataShaderMap.begin () ; dataIter != m_D3DDataShaderMap.end () ; )
-    {
-        if ( pShaderItem == (CShaderItem*)dataIter->second )
-            m_D3DDataShaderMap.erase ( dataIter++ );
-        else
-            ++dataIter;
-    }
-}
-
-
-////////////////////////////////////////////////////////////////
-//
-// CRenderItemManager::WatchCallback
-//
-// Notification that the pD3DData is being changed for this context
-//
-////////////////////////////////////////////////////////////////
-void CRenderItemManager::WatchCallback ( CSHADERDUMMY* pShaderItem, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld )
-{
-    // Remove old pointer
-    if ( pD3DDataOld )
-        MapRemove ( m_D3DDataShaderMap, pD3DDataOld );
-
-    // Add new pointer
-    if ( pD3DDataNew )
-        MapSet ( m_D3DDataShaderMap, pD3DDataNew, pShaderItem );
-}
-
-
-////////////////////////////////////////////////////////////////
-//
-// CRenderItemManager::StaticWatchCallback
-//
-//
-//
-////////////////////////////////////////////////////////////////
-void CRenderItemManager::StaticWatchCallback ( CSHADERDUMMY* pShaderItem, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld )
-{
-    ( ( CRenderItemManager* ) CGraphics::GetSingleton ().GetRenderItemManager () )->WatchCallback ( pShaderItem, pD3DDataNew, pD3DDataOld );
-}
-
-
 ////////////////////////////////////////////////////////////////
 //
 // CRenderItemManager::CanCreateRenderItem
@@ -808,11 +664,13 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     outStatus.settings.iFXQuality = gameSettings->GetFXQuality(); ;
     outStatus.settings.iDrawDistance = ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f * 100;
     outStatus.settings.bVolumetricShadows = false;
+    outStatus.settings.bAllowScreenUpload = true;
     outStatus.settings.iStreamingMemory = 0;
 
     CVARS_GET ( "streaming_memory",     outStatus.settings.iStreamingMemory );
     CVARS_GET ( "display_windowed",     outStatus.settings.bWindowed );
     CVARS_GET ( "volumetric_shadows",   outStatus.settings.bVolumetricShadows );
+    CVARS_GET ( "allow_screen_upload",  outStatus.settings.bAllowScreenUpload );
 
     // Modify if using test mode
     if ( m_TestMode == DX_TEST_MODE_NO_MEM )

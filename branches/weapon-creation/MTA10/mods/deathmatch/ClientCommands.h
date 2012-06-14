@@ -15,7 +15,7 @@
 #ifndef __CLIENTCOMMANDS_H
 #define __CLIENTCOMMANDS_H
 
-bool COMMAND_Executed              ( const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled );
+bool COMMAND_Executed               ( const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled, bool bIsScriptedBind );
 
 void COMMAND_Help                   ( const char* szCmdLine );
 void COMMAND_Disconnect             ( const char* szCmdLine );
@@ -54,7 +54,6 @@ void COMMAND_ShowSyncData           ( const char* szCmdLine );
 
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
     void COMMAND_ShowSyncing        ( const char* szCmdLine );
-    void COMMAND_FakeLag            ( const char* szCmdLine );
 #endif
 
 #ifdef MTA_DEBUG
@@ -88,5 +87,6 @@ void COMMAND_ShowSyncData           ( const char* szCmdLine );
 
     // Commands enabled when development mode in on
     void COMMAND_ShowCollision      ( const char* szCmdLine );
+    void COMMAND_ShowSound          ( const char* szCmdLine );
 
 #endif

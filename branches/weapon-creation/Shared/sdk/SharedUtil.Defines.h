@@ -39,6 +39,13 @@
         }
 #endif
 
+//
+// Copy null terminated string to a temporary buffer on the stack
+//
+#define COPY_CSTR_TO_TEMP_BUFFER( tempname, src, maxsize ) \
+    char tempname [maxsize]; \
+    STRNCPY( tempname, src, maxsize );
+
 #ifndef _MSC_VER
     #define _isnan isnan
 #endif
@@ -81,3 +88,12 @@
 // Note: Struct should have simple member variables and no virtual functions.
 #define ZERO_POD_STRUCT(ptr) \
         memset ( ptr, 0, sizeof(*(ptr)) )
+
+// Inline callback definition for std::sort
+#define sort_inline(a,b,c) \
+        { \
+            struct local { \
+                static bool SortPredicate c \
+            }; \
+            std::sort ( a, b, local::SortPredicate ); \
+        }

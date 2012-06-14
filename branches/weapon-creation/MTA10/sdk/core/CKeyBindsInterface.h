@@ -99,7 +99,7 @@ public:
     char*           szCommand;
     char*           szArguments;
     char*           szResource;
-    char*           szDefaultKey;
+    SString         strDefaultKey;
 };
 
 class CKeyFunctionBind: public CKeyBindWithState

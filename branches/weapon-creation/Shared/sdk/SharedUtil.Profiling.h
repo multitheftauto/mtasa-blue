@@ -42,7 +42,7 @@ namespace SharedUtil
 
                 CStatEvents     ( void );
         void    SetEnabled      ( bool bEnabled );
-        void    ClearBuffer     ( bool bCanResize );
+        bool    ClearBuffer     ( bool bCanResize );
         void    Sample          ( class SStatCollection& m_StatCollection );
 
         void Add ( const char* szSection, const char* szName, eStatEventType type )

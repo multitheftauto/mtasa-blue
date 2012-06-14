@@ -109,6 +109,17 @@ void CPedSA::SetModelIndex ( DWORD dwModelIndex )
     }
 }
 
+// Hacky thing done for the local player when changing model
+void CPedSA::RemoveGeometryRef ( void )
+{
+    RpClump* pClump = (RpClump*)GetInterface ()->m_pRwObject;
+    RpAtomic* pAtomic = (RpAtomic*)( ( pClump->atomics.root.next ) - 0x8 );
+    RpGeometry* pGeometry = pAtomic->geometry;
+    if ( pGeometry->refs > 1 )
+        pGeometry->refs--;
+}
+
+
 bool CPedSA::IsInWater ( void )
 {
     DEBUG_TRACE("bool CPedSA::IsInWater ()");
@@ -379,7 +390,7 @@ CWeapon * CPedSA::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo, eWea
                 CModelInfo * pWeaponModel = pGame->GetModelInfo ( iModel );
                 if ( pWeaponModel )
                 {
-                    pWeaponModel->Request ( true, true );
+                    pWeaponModel->Request ( BLOCKING, "CPedSA::GiveWeapon" );
                     pWeaponModel->MakeCustomModel ();
                 }
             }
@@ -452,6 +463,13 @@ void CPedSA::ClearWeapons ( void )
             m_pWeapons [i]->Remove ();            
         }
     }
+}
+
+void CPedSA::RestoreLastGoodPhysicsState ( void )
+{
+    CPhysicalSA::RestoreLastGoodPhysicsState ();
+    SetCurrentRotation ( 0 );
+    SetTargetRotation ( 0 );
 }
 
 FLOAT CPedSA::GetCurrentRotation()
@@ -635,7 +653,7 @@ void CPedSA::SetGogglesState ( bool bIsWearingThem )
     }
 }
 
-void CPedSA::SetClothesTextureAndModel ( char * szTexture, char * szModel, int textureType )
+void CPedSA::SetClothesTextureAndModel ( const char* szTexture, const char* szModel, int textureType )
 {
     DWORD dwFunc = FUNC_CPedClothesDesc__SetTextureAndModel;
     //DWORD dwThis = (DWORD)this->GetInterface()->PlayerPedData.m_pClothes;

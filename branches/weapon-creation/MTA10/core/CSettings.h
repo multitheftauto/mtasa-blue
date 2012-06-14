@@ -152,6 +152,8 @@ protected:
     CGUIComboBox*       m_pComboAspectRatio;
     CGUILabel*          m_pAspectRatioLabel;
 	CGUICheckBox*       m_pCheckBoxVolumetricShadows;
+	CGUICheckBox*       m_pCheckBoxDeviceSelectionDialog;
+	CGUICheckBox*       m_pCheckBoxAllowScreenUpload;
 	CGUICheckBox*       m_pCheckBoxCustomizedSAFiles;
 	CGUICheckBox*       m_pCheckBoxGrass;
     CGUILabel*          m_pDrawDistanceLabel;
@@ -171,6 +173,7 @@ protected:
     CGUILabel*          m_pStreamingMemoryLabel;
     CGUIScrollBar*      m_pStreamingMemory;
     CGUILabel*          m_pStreamingMemoryValueLabel;
+    CGUILabel*          m_pStreamingMemoryLabelInfo;
     CGUIButton*         m_pVideoDefButton;
 
     CGUILabel*          m_pAsyncLabelInfo;
@@ -187,9 +190,6 @@ protected:
     CGUILabel*          m_pSingleDownloadLabelInfo;
     CGUILabel*          m_pSingleDownloadLabel;
     CGUIComboBox*       m_pSingleDownloadCombo;
-    CGUILabel*          m_pNetworkEncryptionLabelInfo;
-    CGUILabel*          m_pNetworkEncryptionLabel;
-    CGUIComboBox*       m_pNetworkEncryptionCombo;
     CGUILabel*          m_pDebugSettingLabelInfo;
     CGUILabel*          m_pDebugSettingLabel;
     CGUIComboBox*       m_pDebugSettingCombo;
@@ -317,6 +317,7 @@ protected:
 
     bool                OnFxQualityChanged      ( CGUIElement* pElement );
     bool                OnVolumetricShadowsClick ( CGUIElement* pElement );
+    bool                OnAllowScreenUploadClick ( CGUIElement* pElement );
     bool                OnCustomizedSAFilesClick ( CGUIElement* pElement );
 
 private:
@@ -352,6 +353,7 @@ private:
 
     DWORD               m_dwFrameCount;
     bool                m_bShownVolumetricShadowsWarning;
+    bool                m_bShownAllowScreenUploadMessage;
     int                 m_iMaxAnisotropic;
 
     std::list < SKeyBindSection *> m_pKeyBindSections;

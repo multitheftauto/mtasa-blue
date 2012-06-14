@@ -226,6 +226,7 @@ public:
     CQueueInfo                  m_OutCommandQueueInfo;
     CQueueInfo                  m_OutResultQueueInfo;
     CQueueInfo                  m_InResultQueueInfo;
+    uint                        m_uiGamePlayerCount;
 
     // Shared variables
     struct
@@ -241,6 +242,10 @@ public:
     static volatile bool ms_bBlockIncomingSyncPackets;
     static volatile bool ms_bCriticalStopThreadNet;
     static volatile bool ms_bVerboseDebug;
+    static uint ms_uiFinishedListSize;
+    static uint ms_uiOutCommandQueueSize;
+    static uint ms_uiOutResultQueueSize;
+    static uint ms_uiInResultQueueSize;
 
     // Static functions
     static void     DoPulse                 ( void );

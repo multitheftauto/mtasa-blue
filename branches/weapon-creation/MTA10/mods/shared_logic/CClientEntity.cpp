@@ -23,15 +23,9 @@ extern CClientGame* g_pClientGame;
 
 #pragma warning( disable : 4355 )   // warning C4355: 'this' : used in base member initializer list
 
-int CClientEntity::iCount = 0;
-
 CClientEntity::CClientEntity ( ElementID ID )
         : ClassInit ( this )
 {
-    #ifdef MTA_DEBUG
-        ++iCount;
-    #endif
-
     // Init
     m_pManager = NULL;
     m_pParent = NULL;
@@ -57,30 +51,25 @@ CClientEntity::CClientEntity ( ElementID ID )
 
     m_pAttachedToEntity = NULL;
 
-    strncpy ( m_szTypeName, "unknown", MAX_TYPENAME_LENGTH );
-    m_szTypeName [MAX_TYPENAME_LENGTH] = 0;
-    m_uiTypeHash = HashString ( m_szTypeName );
+    m_strTypeName = "unknown";
+    m_uiTypeHash = HashString ( m_strTypeName );
     if ( IsFromRoot ( m_pParent ) )
         CClientEntity::AddEntityFromRoot ( m_uiTypeHash, this );
-
-    m_szName [0] = 0;
-    m_szName [MAX_ELEMENT_NAME_LENGTH] = 0;
 
     m_bBeingDeleted = false;
 
     m_pElementGroup = NULL;
     m_pModelInfo = NULL;
 
+    g_pClientGame->GetGameEntityXRefManager ()->OnClientEntityCreate ( this );
+
     m_bWorldIgnored = false;
+
 }
 
 
 CClientEntity::~CClientEntity ( void )
 {
-    #ifdef MTA_DEBUG
-        --iCount;
-    #endif
-
     // Make sure we won't get deleted later by the element deleter if we've been requested so
     if ( m_bBeingDeleted )
     {
@@ -182,13 +171,23 @@ CClientEntity::~CClientEntity ( void )
 
     if ( !g_pClientGame->IsBeingDeleted () )
         CClientEntityRefManager::OnEntityDelete ( this );
+
+    g_pClientGame->GetGameEntityXRefManager ()->OnClientEntityDelete ( this );
+    g_pCore->GetGraphics ()->GetRenderItemManager ()->RemoveClientEntityRefs ( this );
 }
+
+
+// Static function
+//bool CClientEntity::IsValidEntity ( CClientEntity* pEntity )
+//{
+//    return MapContains ( ms_ValidEntityMap, pEntity );
+//}
 
 
 void CClientEntity::SetTypeName ( const char* szName )
 {
     CClientEntity::RemoveEntityFromRoot ( m_uiTypeHash, this );
-    strncpy ( m_szTypeName, szName, MAX_TYPENAME_LENGTH );
+    m_strTypeName.AssignLeft ( szName, MAX_TYPENAME_LENGTH );
     m_uiTypeHash = HashString ( szName );
     if ( IsFromRoot ( m_pParent ) )
         CClientEntity::AddEntityFromRoot ( m_uiTypeHash, this );
@@ -556,7 +555,7 @@ void CClientEntity::DeleteAllCustomData ( CLuaMain* pLuaMain, bool bRecursive )
 
 bool CClientEntity::GetMatrix ( CMatrix& matrix ) const
 {
-    const CEntity* pEntity = GetGameEntity ();
+    CEntity* pEntity = const_cast < CEntity* > ( GetGameEntity () );
     if ( pEntity )
     {
         if ( pEntity->GetMatrix ( &matrix ) ) return true;
@@ -694,14 +693,16 @@ void CClientEntity::SetAttachedOffsets ( CVector & vecPosition, CVector & vecRot
 }
 
 
-bool CClientEntity::AddEvent ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated )
+bool CClientEntity::AddEvent ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod )
 {
-    return m_pEventManager->Add ( pLuaMain, szName, iLuaFunction, bPropagated );
+    return m_pEventManager->Add ( pLuaMain, szName, iLuaFunction, bPropagated, eventPriority, fPriorityMod );
 }
 
 
 bool CClientEntity::CallEvent ( const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren )
 {
+    TIMEUS startTime = GetTimeUs ();
+
     CEvents* pEvents = g_pClientGame->GetEvents();
 
     // Make sure our event-manager knows we're about to call an event
@@ -719,6 +720,13 @@ bool CClientEntity::CallEvent ( const char* szName, const CLuaArguments& Argumen
     // Tell the event manager that we're done calling the event
     pEvents->PostEventPulse ();
 
+    if ( IS_TIMING_CHECKPOINTS() )
+    {
+        TIMEUS deltaTimeUs = GetTimeUs () - startTime;
+        if ( deltaTimeUs > 10000 )
+            TIMING_DETAIL( SString ( "Event: %s [%d ms]", szName, deltaTimeUs / 1000 ) );
+    }
+
     // Return whether it got cancelled or not
     return ( !pEvents->WasEventCancelled () );
 }
@@ -728,7 +736,7 @@ void CClientEntity::CallEventNoParent ( const char* szName, const CLuaArguments&
 {
     // Call it on us if this isn't the same class it was raised on
     //TODO not sure why the null check is necessary (eAi)
-    if ( pSource != this && m_pEventManager != NULL )
+    if ( pSource != this && m_pEventManager != NULL && m_pEventManager->HasEvents () )
     {
         m_pEventManager->Call ( szName, Arguments, pSource, this );
     }
@@ -739,9 +747,14 @@ void CClientEntity::CallEventNoParent ( const char* szName, const CLuaArguments&
         CChildListType ::const_iterator iter = m_Children.begin ();
         for ( ; iter != m_Children.end (); iter++ )
         {
-            (*iter)->CallEventNoParent ( szName, Arguments, pSource );
-            if ( m_bBeingDeleted )
-                break;
+            CClientEntity* pEntity = *iter;
+
+            if ( !pEntity->m_pEventManager || pEntity->m_pEventManager->HasEvents () || !pEntity->m_Children.empty () )
+            {
+                pEntity->CallEventNoParent ( szName, Arguments, pSource );
+                if ( m_bBeingDeleted )
+                    break;
+            }
         }
     }
 }
@@ -750,7 +763,7 @@ void CClientEntity::CallEventNoParent ( const char* szName, const CLuaArguments&
 void CClientEntity::CallParentEvent ( const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource )
 {
     // Call the event on us
-    if ( m_pEventManager )
+    if ( m_pEventManager && m_pEventManager->HasEvents () )
     {
         m_pEventManager->Call ( szName, Arguments, pSource, this );
     }
@@ -815,7 +828,7 @@ CClientEntity* CClientEntity::FindChild ( const char* szName, unsigned int uiInd
 
     // Is it our name?
     unsigned int uiCurrentIndex = 0;
-    if ( strcmp ( szName, m_szName ) == 0 )
+    if ( strcmp ( szName, m_strName ) == 0 )
     {
         if ( uiIndex == 0 )
         {
@@ -991,6 +1004,29 @@ void CClientEntity::GetChildren ( lua_State* luaVM )
         lua_pushnumber ( luaVM, ++uiIndex );
         lua_pushelement ( luaVM, *iter );
         lua_settable ( luaVM, -3 );
+    }
+}
+
+
+void CClientEntity::GetChildrenByType ( const char* szType, lua_State* luaVM )
+{
+    assert ( szType );
+    assert ( luaVM );
+
+    // Add all our children to the table on top of the given lua main's stack
+    unsigned int uiIndex = 0;
+    unsigned int uiTypeHash = HashString ( szType );
+    CChildListType ::const_iterator iter = m_Children.begin ();
+    for ( ; iter != m_Children.end (); iter++ )
+    {
+        // Name matches?
+        if ( (*iter)->GetTypeHash() == uiTypeHash )
+        {
+            // Add it to the table
+            lua_pushnumber ( luaVM, ++uiIndex );
+            lua_pushelement ( luaVM, *iter );
+            lua_settable ( luaVM, -3 );
+        }
     }
 }
 
@@ -1265,6 +1301,23 @@ RpClump * CClientEntity::GetClump ( void )
     return NULL;
 }
 
+void CClientEntity::WorldIgnore ( bool bIgnore )
+{
+    CEntity * pEntity = GetGameEntity ();
+    if ( bIgnore )
+    {
+        if ( pEntity )
+        {
+            g_pGame->GetWorld ()->IgnoreEntity ( pEntity );
+        }
+    }
+    else
+    {
+        g_pGame->GetWorld ()->IgnoreEntity ( NULL );
+    }
+    m_bWorldIgnored = bIgnore;
+}
+
 
 // Entities from root optimization for getElementsByType
 typedef CFastList < CClientEntity > CFromRootListType;
@@ -1510,20 +1563,4 @@ float CClientEntity::GetDistanceBetweenBoundingSpheres ( CClientEntity* pOther )
     CSphere sphere = GetWorldBoundingSphere ();
     CSphere otherSphere = pOther->GetWorldBoundingSphere ();
     return ( sphere.vecPosition - otherSphere.vecPosition ).Length () - sphere.fRadius - otherSphere.fRadius;
-}
-void CClientEntity::WorldIgnore ( bool bIgnore )
-{
-    CEntity * pEntity = GetGameEntity ();
-    if ( bIgnore )
-    {
-        if ( pEntity )
-        {
-            g_pGame->GetWorld ()->IgnoreEntity ( pEntity );
-        }
-    }
-    else
-    {
-        g_pGame->GetWorld ()->IgnoreEntity ( NULL );
-    }
-    m_bWorldIgnored = bIgnore;
 }

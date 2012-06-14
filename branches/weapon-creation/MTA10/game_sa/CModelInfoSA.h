@@ -231,6 +231,7 @@ protected:
     CBaseModelInfoSAInterface *     m_pInterface;
     DWORD                           m_dwModelID;
     DWORD                           m_dwReferences;
+    DWORD                           m_dwPendingInterfaceRef;
     CColModel*                      m_pCustomColModel;
     CColModelSAInterface*           m_pOriginalColModelInterface;
     RpClump*                        m_pCustomClump;
@@ -264,11 +265,11 @@ public:
 
     char *                          GetNameIfVehicle        ( void );
 
-    VOID                            Request                 ( bool bAndLoad = false, bool bWaitForLoad = false, bool bHighPriority = false );
+    VOID                            Request                 ( EModelRequestType requestType, const char* szTag );
     VOID                            Remove                  ( void );
     BYTE                            GetLevelFromPosition    ( CVector * vecPosition );
     BOOL                            IsLoaded                ( void );
-    void                            InternalRemoveGTARef    ( void );
+    BOOL                            DoIsLoaded              ( void );
     BYTE                            GetFlags                ( void );
     CBoundingBox *                  GetBoundingBox          ( void );
     bool                            IsValid                 ( void );
@@ -280,11 +281,9 @@ public:
     void                            RestreamIPL             ( void );
     static void                     StaticFlushPendingRestreamIPL ( void );
 
-    void                            AddRef                  ( bool bWaitForLoad, bool bHighPriority = false );
+    void                            ModelAddRef             ( EModelRequestType requestType, const char* szTag );
     int                             GetRefCount             ( void );
     void                            RemoveRef               ( bool bRemoveExtraGTARef = false );
-    void                            MaybeRemoveExtraGTARef  ( void );
-    void                            DoRemoveExtraGTARef     ( void );
 
     // CVehicleModelInfo specific
     short                           GetAvailableVehicleMod  ( unsigned short usSlot );
@@ -293,9 +292,6 @@ public:
     unsigned int                    GetNumRemaps            ( void );
     void*                           GetVehicleSuspensionData( void );
     void*                           SetVehicleSuspensionData( void* pSuspensionLines );
-
-    // Upgrades only!
-    void                            RequestVehicleUpgrade   ( void );
 
     // ONLY use for peds
     void                            GetVoice                ( short* psVoiceType, short* psVoice );
@@ -316,7 +312,6 @@ public:
 
     // CModelInfoSA methods
     void                            MakePedModel            ( char * szTexture );
-    void                            Sure2Load               ( DWORD dwFlags );
 
 };
 

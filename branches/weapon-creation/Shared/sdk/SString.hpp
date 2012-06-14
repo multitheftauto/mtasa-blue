@@ -429,3 +429,8 @@ SString SString::Join ( const SString& strDelim, const std::vector < SString >& 
     }
     return strResult;
 }
+
+void SString::AssignLeft ( const char* szOther, uint uiMaxLength )
+{
+    assign ( SStringX ( szOther ).Left ( uiMaxLength ) );
+}

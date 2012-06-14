@@ -16,16 +16,15 @@
 
 CAccessControlList::CAccessControlList ( const char* szACLName, CAccessControlListManager* pACLManager )
 {
-    m_szACLName[0] = '\0';
-    snprintf ( m_szACLName, MAX_ACL_NAME_LENGTH, "%s", szACLName );
-    m_szACLName[MAX_ACL_NAME_LENGTH-1] = '\0';
-
+    m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::ACL );
+    m_strACLName = szACLName;
     m_pACLManager = pACLManager;
 }
 
 
 CAccessControlList::~CAccessControlList ( void )
 {
+    CIdArray::PushUniqueId ( this, EIdClass::ACL, m_uiScriptID );
     list < CAccessControlListRight* > ::iterator iter = m_Rights.begin ();
     for ( ; iter != m_Rights.end (); iter++ )
     {
@@ -59,12 +58,16 @@ CAccessControlListRight* CAccessControlList::GetRight ( const char* szRightName,
     list < CAccessControlListRight* > ::iterator iter = m_Rights.begin ();
     for ( ; iter != m_Rights.end (); iter++ )
     {
-        if ( (*iter)->GetRightNameHash () == uiHash && eRightType == (*iter)->GetRightType () )
+        CAccessControlListRight* pACLRight = *iter;
+        if ( eRightType == pACLRight->GetRightType () )
         {
-            return *iter;
+            if ( pACLRight->GetRightNameHash () == uiHash && SStringX ( szRightName ) == pACLRight->GetRightName () )
+            {
+                // Exact match
+                return pACLRight;
+            }
         }
     }
-
     return NULL;
 }
 
@@ -77,7 +80,8 @@ bool CAccessControlList::RemoveRight ( const char* szRightName, CAccessControlLi
     for ( ; iter != m_Rights.end (); iter++ )
     {
         CAccessControlListRight* pACLRight = *iter;
-        if ( pACLRight->GetRightNameHash () == uiHash && eRightType == pACLRight->GetRightType () )
+        if ( pACLRight->GetRightNameHash () == uiHash && eRightType == pACLRight->GetRightType ()
+             && SStringX ( szRightName ) == pACLRight->GetRightName () )
         {
             m_Rights.remove ( pACLRight );
             delete pACLRight;
@@ -100,7 +104,7 @@ void CAccessControlList::WriteToXMLNode ( CXMLNode* pNode )
 
     // Create attribute for the name and set it
     CXMLAttribute* pAttribute = pSubNode->GetAttributes ().Create ( "name" );
-    pAttribute->SetValue ( m_szACLName );
+    pAttribute->SetValue ( m_strACLName );
 
     // Loop through each right and write it to the ACL
     list < CAccessControlListRight* > ::iterator iter = m_Rights.begin ();

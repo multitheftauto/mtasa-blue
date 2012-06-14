@@ -18,11 +18,12 @@
 class CVoiceEndPacket : public CPacket
 {
 public:
-    CVoiceEndPacket            ( void );
+    CVoiceEndPacket            ( class CPlayer* pPlayer = NULL );
     ~CVoiceEndPacket            ( );
 
-    ePacketID               GetPacketID                 ( void ) const;
-    unsigned long           GetFlags                    ( void ) const;
+    ePacketID               GetPacketID                 ( void ) const              { return PACKET_ID_VOICE_END; }
+    unsigned long           GetFlags                    ( void ) const              { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
+    virtual ePacketOrdering GetPacketOrdering           ( void ) const              { return PACKET_ORDERING_VOICE; }
 
     bool                    Read                        ( NetBitStreamInterface& BitStream );
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;

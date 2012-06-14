@@ -22,6 +22,7 @@
 extern CGame * g_pGame;
 
 CBandwidthSettings* g_pBandwidthSettings = new CBandwidthSettings ();
+CTickRateSettings g_TickRateSettings;
 
 using namespace std;
 
@@ -96,6 +97,9 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_iBackupInterval = 3;
     m_iBackupAmount = 5;
     m_iDebugFlag = 0;
+    m_bSyncMapElementData = true;
+    m_NetOptions.netTweak.fTweak1Amount = 1.0f;
+    m_iNetReliabilityMode = 0;
 }
 
 
@@ -314,7 +318,22 @@ bool CMainConfig::Load ( void )
                 }
         }
 
-        g_pNetServer->SetChecks ( m_DisableComboACMap, disableACMap, enableSDMap, m_iEnableClientChecks, iHideAC != 0 );
+        CArgMap argMap;
+        for ( std::set < SString >::iterator it = m_DisableComboACMap.begin () ; it != m_DisableComboACMap.end () ; ++it )
+            argMap.Set ( *it, "" );
+        SString strDisableComboACMap = argMap.ToString ();
+
+        argMap = CArgMap ();
+        for ( std::set < SString >::iterator it = disableACMap.begin () ; it != disableACMap.end () ; ++it )
+            argMap.Set ( *it, "" );
+        SString strDisableACMap = argMap.ToString ();
+
+        argMap = CArgMap ();
+        for ( std::set < SString >::iterator it = enableSDMap.begin () ; it != enableSDMap.end () ; ++it )
+            argMap.Set ( *it, "" );
+        SString strEnableSDMap = argMap.ToString ();
+
+        g_pNetServer->SetChecks ( strDisableComboACMap, strDisableACMap, strEnableSDMap, m_iEnableClientChecks, iHideAC != 0 );
     }
 
     {
@@ -380,28 +399,14 @@ bool CMainConfig::Load ( void )
     }
 
     // Grab the Sample Rate for Voice
+    iTemp = m_uiVoiceSampleRate;
     iResult = GetInteger ( m_pRootNode, "voice_samplerate", iTemp, 0, 2 );
-    if ( iResult == IS_SUCCESS )
-    {
-        m_uiVoiceSampleRate = iTemp;
-    }
-    else
-    {
-        if ( iResult != DOESNT_EXIST )
-            CLogger::ErrorPrintf ( "voice_samplerate rate must be between 0 and 2, defaulting to %u\n", m_uiVoiceSampleRate );
-    }
+    m_uiVoiceSampleRate = Clamp ( 0, iTemp, 2 );
 
     // Grab the Quality for Voice
+    iTemp = m_ucVoiceQuality;
     iResult = GetInteger ( m_pRootNode, "voice_quality", iTemp, 0, 10 );
-    if ( iResult == IS_SUCCESS )
-    {
-        m_ucVoiceQuality = iTemp;
-    }
-    else
-    {
-        if ( iResult != DOESNT_EXIST )
-            CLogger::ErrorPrintf ( "voice_quality must be between 0 and 10, defaulting to %u\n", m_ucVoiceQuality );
-    }
+    m_ucVoiceQuality = Clamp ( 0, iTemp, 10 );
 
     // Grab the bitrate for Voice [optional]
     iResult = GetInteger ( m_pRootNode, "voice_bitrate", iTemp );
@@ -516,6 +521,29 @@ bool CMainConfig::Load ( void )
     GetBoolean ( m_pRootNode, "threadnet", m_bThreadNetEnabled );
     ApplyThreadNetEnabled ();
 
+    // net_type
+    GetInteger ( m_pRootNode, "net_type", m_iNetReliabilityMode );
+    m_iNetReliabilityMode = Clamp ( 0, m_iNetReliabilityMode, 4 );
+
+    // Check settings in this list here
+    const std::vector < SIntSetting >& settingList = GetIntSettingList ();
+    for ( uint i = 0 ; i < settingList.size () ; i++ )
+    {
+        const SIntSetting& item = settingList[i];
+        int iValue = item.iDefault;
+        GetInteger ( m_pRootNode, item.szName, iValue );
+        *item.pVariable = Clamp ( item.iMin, iValue, item.iMax );
+    }
+
+    // Handle recently retired lightsync_rate
+    if ( m_pRootNode->FindSubNode ( "lightweight_sync_interval" ) == NULL )
+    {
+        GetInteger ( m_pRootNode, "lightsync_rate", g_TickRateSettings.iLightSync );
+        g_TickRateSettings.iLightSync = Clamp ( 200, g_TickRateSettings.iLightSync, 4000 );
+    }
+
+    ApplyNetOptions ();
+
     return true;
 }
 
@@ -539,6 +567,36 @@ void CMainConfig::ApplyBandwidthReductionMode ( void )
         m_strBandwidthReductionMode = "none";
         g_pBandwidthSettings->SetNone ();
     }
+}
+
+void CMainConfig::SetFakeLag ( int iPacketLoss, int iExtraPing, int iExtraPingVary, int iKBPSLimit )
+{
+    m_NetOptions.netSim.bValid = true;
+    m_NetOptions.netSim.iPacketLoss = iPacketLoss;
+    m_NetOptions.netSim.iExtraPing = iExtraPing;
+    m_NetOptions.netSim.iExtraPingVariance = iExtraPingVary;
+    m_NetOptions.netSim.iKBPSLimit = iKBPSLimit;
+    ApplyNetOptions ();
+}
+
+
+void CMainConfig::SetTweakValue ( int iWhich, float fAmount )
+{
+    m_NetOptions.netTweak.bValid = true;
+    if ( iWhich == 0 )
+        m_NetOptions.netTweak.fTweak1Amount = Clamp ( 0.f, fAmount, 1.f );
+    if ( iWhich == 1 )
+        m_NetOptions.netTweak.fTweak2Amount = Clamp ( 0.f, fAmount, 1.f );
+
+    ApplyNetOptions ();
+}
+
+
+void CMainConfig::ApplyNetOptions ( void )
+{
+    m_NetOptions.netType.bValid = true;
+    m_NetOptions.netType.reliabilityMode = m_iNetReliabilityMode;
+    g_pNetServer->SetNetOptions ( m_NetOptions );
 }
 
 
@@ -627,7 +685,7 @@ bool CMainConfig::LoadExtended ( void )
 
                 if ( IsValidFilePath ( strBuffer.c_str () ) )
                 {
-                    m_pLuaManager->GetLuaModuleManager ()->_LoadModule ( strBuffer.c_str (), strFilename, false );
+                    m_pLuaManager->GetLuaModuleManager ()->LoadModule ( strBuffer.c_str (), strFilename, false );
                 }
             }
         }
@@ -771,20 +829,24 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "help", CConsoleCommands::Help, false );
 
     RegisterCommand ( "loadmodule", CConsoleCommands::LoadModule, false );
-    //RegisterCommand ( "unloadmodule", CConsoleCommands::UnloadModule, false );
-    //RegisterCommand ( "reloadmodule", CConsoleCommands::ReloadModule, false );
+    RegisterCommand ( "unloadmodule", CConsoleCommands::UnloadModule, false );
+    RegisterCommand ( "reloadmodule", CConsoleCommands::ReloadModule, false );
 
     RegisterCommand ( "ver", CConsoleCommands::Ver, false );
     RegisterCommand ( "sver", CConsoleCommands::Ver, false );
     RegisterCommand ( "ase", CConsoleCommands::Ase, false );
     RegisterCommand ( "openports", CConsoleCommands::OpenPortsTest, false );
-    RegisterCommand ( "test", CConsoleCommands::Test, false );
+    RegisterCommand ( "stest", CConsoleCommands::Test, false );
 
     RegisterCommand ( "checkls", CConsoleCommands::CheckLightSync, false );
     RegisterCommand ( "debugdb", CConsoleCommands::SetDbLogLevel, false );
 
-    RegisterCommand ( "aclrequest", CConsoleCommands::AclRequest, false );
+    RegisterCommand ( "reloadbans", CConsoleCommands::ReloadBans, false );
 
+    RegisterCommand ( "aclrequest", CConsoleCommands::AclRequest, false );
+#if defined(MTA_DEBUG) || defined(MTA_BETA)
+    RegisterCommand ( "sfakelag", CConsoleCommands::FakeLag, false );
+#endif
     return true;
 }
 
@@ -923,7 +985,7 @@ int CMainConfig::GetPendingWorkToDoSleepTime ( void )
     if ( m_iPendingWorkToDoSleepTime != -1 )
     {
         if ( m_bThreadNetEnabled )
-            return Max ( 5, m_iPendingWorkToDoSleepTime );
+            return Max ( 0, m_iPendingWorkToDoSleepTime );
         else
             return m_iPendingWorkToDoSleepTime;
     }
@@ -950,6 +1012,18 @@ int CMainConfig::GetNoWorkToDoSleepTime ( void )
         return 10;
 }
 
+
+SString CMainConfig::GetMinimumClientVersion ( void )
+{
+    SString strMinReq = m_strMinClientVersionOverride > m_strMinClientVersion ? m_strMinClientVersionOverride : m_strMinClientVersion;
+#ifndef MTA_DEBUG
+    // For forcing a minclient requirement
+    SString strMinReqForRelease = "1.4.0-0.00000";
+    if ( strMinReqForRelease > strMinReq )
+        strMinReq = strMinReqForRelease;
+#endif
+    return strMinReq;
+}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -1038,6 +1112,12 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
     if ( strName == "test_everyone_near" )
     {
         strValue = SString ( "%d", g_pBandwidthSettings->bTestPretendEveryoneIsNear );
+        return true;
+    }
+    else
+    if ( strName == "verifyclientsettings" )
+    {
+        strValue = SString ( "%d", m_iEnableClientChecks );
         return true;
     }
     else
@@ -1181,13 +1261,6 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
         }
     }
     else
-    if ( strName == "bandwidth_debug" )
-    {
-        // Transient settings go in their own map, so they don't get saved
-        MapSet ( m_TransientSettings, "bandwidth_debug", strValue );
-        return true;
-    }
-    else
     if ( strName == "lightsync" )
     {
         if ( strValue == "0" || strValue == "1" )
@@ -1242,9 +1315,90 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
             return true;
         }
     }
+    else
+    if ( strName == "net_type" )
+    {
+        int iValue = atoi ( strValue );
+        if ( iValue >= 0 && iValue <= 4 )
+        {
+            m_iNetReliabilityMode = iValue;
+            if ( bSave )
+            {
+                SetString ( m_pRootNode, "net_type", SString ( "%d", m_iNetReliabilityMode ) );
+                Save ();
+            }
+            return true;
+        }
+    }
+
+    // Check settings in this list here
+    const std::vector < SIntSetting >& settingList = GetIntSettingList ();
+    for ( uint i = 0 ; i < settingList.size () ; i++ )
+    {
+        const SIntSetting& item = settingList[i];
+        if ( item.bSettable && strName == item.szName )
+        {
+            int iValue = atoi ( strValue );
+            if ( iValue >= item.iMin && iValue <= item.iMax )
+            {
+                *item.pVariable = iValue;
+                if ( item.bSavable && bSave )
+                {
+                    SetString ( m_pRootNode, item.szName, SString ( "%d", *item.pVariable ) );
+                    Save ();
+                }
+
+                if ( item.changeCallback )
+                    item.changeCallback ();
+
+                return true;
+            }
+        }
+    }
 
     //
     // Everything else is read only, so can't be set
     //
     return false;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+//
+// Put some int settings into an array for referencing
+//
+//////////////////////////////////////////////////////////////////////
+const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
+{
+    static const SIntSetting settings[] =
+        {
+            //Set,  save,   min,    def,    max,    name,                                   variable,                                   callback
+            { true, true,   50,     100,    4000,   "player_sync_interval",                 &g_TickRateSettings.iPureSync,              &OnTickRateChange },
+            { true, true,   50,     1500,   4000,   "lightweight_sync_interval",            &g_TickRateSettings.iLightSync,             &OnTickRateChange },
+            { true, true,   50,     500,    4000,   "camera_sync_interval",                 &g_TickRateSettings.iCamSync,               &OnTickRateChange },
+            { true, true,   50,     400,    4000,   "ped_sync_interval",                    &g_TickRateSettings.iPedSync,               &OnTickRateChange },
+            { true, true,   50,     400,    4000,   "unoccupied_vehicle_sync_interval",     &g_TickRateSettings.iUnoccupiedVehicle,     &OnTickRateChange },
+            { true, true,   50,     100,    4000,   "keysync_mouse_sync_interval",          &g_TickRateSettings.iKeySyncRotation,       &OnTickRateChange },
+            { true, true,   50,     100,    4000,   "keysync_analog_sync_interval",         &g_TickRateSettings.iKeySyncAnalogMove,     &OnTickRateChange },
+            { true, true,   50,     100,    4000,   "donkey_work_interval",                 &g_TickRateSettings.iNearListUpdate,        &OnTickRateChange },
+        };
+
+    static std::vector < SIntSetting > settingsList;
+
+    if ( settingsList.empty () )
+        for ( uint i = 0 ; i < NUMELMS( settings ) ; i++ )
+            settingsList.push_back ( settings[i] );
+
+    return settingsList;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+//
+// Settings change callback
+//
+//////////////////////////////////////////////////////////////////////
+void CMainConfig::OnTickRateChange ( void )
+{
+    CStaticFunctionDefinitions::SendSyncIntervals ();
 }

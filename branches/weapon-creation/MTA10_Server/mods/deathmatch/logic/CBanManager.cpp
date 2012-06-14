@@ -46,7 +46,7 @@ void CBanManager::DoPulse ( void )
                 {
                     // Trigger the event
                     CLuaArguments Arguments;
-                    Arguments.PushUserData ( *iter );
+                    Arguments.PushBan ( *iter );
                     g_pGame->GetMapManager()->GetRootElement()->CallEvent ( "onUnban", Arguments );
 
                     RemoveBan ( *iter );
@@ -65,17 +65,13 @@ CBan* CBanManager::AddBan ( CPlayer* pPlayer, const SString& strBanner, const SS
 {
     if ( pPlayer )
     {
-        char szIP[256] = { '\0' };
-        pPlayer->GetSourceIP ( szIP );
+        SString strIP = pPlayer->GetSourceIP ();
 
-        if ( IsValidIP ( szIP ) && !IsSpecificallyBanned ( szIP ) )
+        if ( IsValidIP ( strIP ) && !IsSpecificallyBanned ( strIP ) )
         {
             CBan* pBan = AddBan ( strBanner, strReason, tTimeOfUnban );
             pBan->SetNick ( pPlayer->GetNick() );
-            pBan->SetIP ( szIP );
-
-            g_pNetServer->AddBan ( szIP );
-
+            pBan->SetIP ( strIP );
             return pBan;
         }
     }
@@ -90,9 +86,6 @@ CBan* CBanManager::AddBan ( const SString& strIP, const SString& strBanner, cons
     {
         CBan* pBan = AddBan ( strBanner, strReason, tTimeOfUnban );
         pBan->SetIP ( strIP );
-
-        g_pNetServer->AddBan ( strIP.c_str() );
-
         return pBan;
     }
 
@@ -188,15 +181,11 @@ CBan* CBanManager::AddBan ( const SString& strBanner, const SString& strReason, 
 }
 
 
-bool CBanManager::Exists ( CBan* pBan )
+CBan* CBanManager::GetBanFromScriptID ( uint uiScriptID )
 {
-    return m_BanManager.Contains ( pBan );
-}
-
-
-bool CBanManager::IsBanned ( const char* szIP )
-{
-    return g_pNetServer->IsBanned ( szIP );
+    CBan* pBan = (CBan*) CIdArray::FindEntry ( uiScriptID, EIdClass::BAN );
+    dassert ( !pBan || ListContains ( m_BanManager, pBan ) );
+    return pBan;
 }
 
 
@@ -249,9 +238,7 @@ void CBanManager::RemoveBan ( CBan* pBan )
 {
     if ( pBan )
     {
-        if ( !pBan->GetIP ().empty() )
-            g_pNetServer->RemoveBan ( pBan->GetIP ().c_str () );
-        if ( !m_BanManager.empty() ) m_BanManager.remove ( pBan );
+        m_BanManager.remove ( pBan );
         delete pBan;
     }
     SaveBanList ();
@@ -307,6 +294,99 @@ CBan* CBanManager::GetBan ( const char* szNick, unsigned int uiOccurrance )
         }
     }
 
+    return NULL;
+}
+
+
+// Include wildcard checks
+CBan* CBanManager::GetBanFromIP ( const char* szIP )
+{
+    list < CBan* >::const_iterator iter = m_BanManager.begin ();
+    for ( ; iter != m_BanManager.end (); iter++ )
+    {
+        bool bMatch = false, bFindNextOctet = false;
+        int iBan = 0, iOctetCount = 1;
+        const SString& strIP = (*iter)->GetIP ().c_str ();
+
+        if ( strIP.Contains ( "*" ) )
+        {
+            for ( uint i = 0 ; i < 17 ; i++ )
+            {
+                char a = szIP[i];
+                char b = strIP[iBan];
+                if ( b == '.' )
+                {
+                    // End of octet so increment
+                    iOctetCount++;
+                }
+                if ( bFindNextOctet )
+                {
+                    if ( a == '.' )
+                    {
+                        bFindNextOctet = false;
+                        // Increment iBan to get to next octet as well
+                        iBan++;
+                    }
+                }
+                else if ( a == b )
+                {
+                    // matched char
+                    // iBan can only be incremented at specific times or it won't work properly
+                    iBan++;
+                }
+                else
+                {
+                    // iBan can only be incremented at specific times or it won't work properly
+                    iBan++;
+                    if ( !a )
+                    {
+                        // end of source IP range
+                        if ( !b )
+                        {
+                            // end of banned IP range also, end check
+                            break;
+                        }
+                        // banned range not ended so make false and end this check
+                        bMatch = false;
+                        break;
+                    }
+                    else if ( b == '*' )
+                    {
+                        // wildcard char
+                        if ( iOctetCount == 4 )
+                        {
+                            // wildcard found at last octet, nothing further to check
+                            break;
+                        }
+                        if ( a != '.' )
+                        {
+                            // need to find the next octet as we are still looking at an IP
+                            bFindNextOctet = true;
+                        }
+                    }
+                    else
+                    {
+                        // doesn't match so make false and end this check
+                        bMatch = false;
+                        break;
+                    }
+                }
+            }
+            if ( bMatch )
+            {
+                // ban found, return it
+                return *iter;
+            }
+        }
+        else
+        {
+            if ( strIP == szIP )
+            {
+                return *iter;   // Full match
+            }
+        }
+    }
+    // return NULL as no match found
     return NULL;
 }
 
@@ -411,7 +491,6 @@ bool CBanManager::LoadBanList ( void )
                     if ( IsValidIP ( strIP.c_str() ) )
                     {
                         pBan->SetIP ( strIP );
-                        g_pNetServer->AddBan ( strIP.c_str() );
                     }
                     pBan->SetAccount ( strAccount );
                     pBan->SetSerial ( strSerial );
@@ -431,6 +510,13 @@ bool CBanManager::LoadBanList ( void )
 
     delete pFile;
     return true;
+}
+
+
+bool CBanManager::ReloadBanList ( void )
+{
+    RemoveAllBans();
+    return LoadBanList();
 }
 
 

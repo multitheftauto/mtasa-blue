@@ -132,6 +132,8 @@ public:
     bool                    IsGrassEnabled              ( void );
     void                    SetGrassEnabled             ( bool bEnable );
 
+    void                    SetSelectDeviceDialogEnabled    ( bool bEnable );
+
     void                    Save                        ( void );
 
 private:

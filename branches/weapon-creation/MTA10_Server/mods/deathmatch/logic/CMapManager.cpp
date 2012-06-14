@@ -29,6 +29,7 @@ CMapManager::CMapManager ( CBlipManager* pBlipManager,
                            CTeamManager* pTeamManager,
                            CPedManager* pPedManager,
                            CColManager* pColManager,
+                           CWaterManager* pWaterManager,
                            CClock* pClock,
                            CLuaManager* pLuaManager,
                            CGroups* pGroups,
@@ -47,6 +48,7 @@ CMapManager::CMapManager ( CBlipManager* pBlipManager,
     m_pTeamManager = pTeamManager;
     m_pPedManager = pPedManager;
     m_pColManager = pColManager;
+    m_pWaterManager = pWaterManager;
     m_pServerClock = pClock;
     m_pLuaManager = pLuaManager;
     m_pGroups = pGroups;
@@ -198,6 +200,9 @@ void CMapManager::BroadcastMapInformation ( void )
 
 void CMapManager::SendMapInformation ( CPlayer& Player )
 {
+    CTimeUsMarker < 20 > marker;
+    marker.Set ( "Start" );
+
     // Start an entity list packet
     CEntityAddPacket EntityPacket;    
 
@@ -212,12 +217,16 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
         }
     }
 
+    marker.Set ( "Dummys" );
+
     // Add the objects to the packet
     CObjectListType::const_iterator iterObjects = m_pObjectManager->IterBegin ();
     for ( ; iterObjects != m_pObjectManager->IterEnd (); iterObjects++ )
     {
         EntityPacket.Add ( *iterObjects );
     }
+
+    marker.Set ( "Objects" );
 
     // Add the pickups to the packet
     list < CPickup* > ::const_iterator iterPickups = m_pPickupManager->IterBegin ();
@@ -226,12 +235,16 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
         EntityPacket.Add ( *iterPickups );
     }
 
+    marker.Set ( "Pickups" );
+
     // Add the vehicles to the packet
     list < CVehicle* > ::const_iterator iterVehicles = m_pVehicleManager->IterBegin ();
     for ( ; iterVehicles != m_pVehicleManager->IterEnd (); iterVehicles++ )
     {
         EntityPacket.Add ( *iterVehicles );
     }
+
+    marker.Set ( "Vehicles" );
 
     // Add the teams to the packet
     list < CTeam* > ::const_iterator iterTeams = m_pTeamManager->IterBegin ();
@@ -240,12 +253,16 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
         EntityPacket.Add ( *iterTeams );
     }
 
+    marker.Set ( "Teams" );
+
     // Add the peds to the packet
     list < CPed* > ::const_iterator iterPeds = m_pPedManager->IterBegin ();
     for ( ; iterPeds != m_pPedManager->IterEnd (); iterPeds++ )
     {
         EntityPacket.Add ( *iterPeds );
     }
+
+    marker.Set ( "Peds" );
 
     // Add the colshapes to the packet
     vector < CColShape* > ::const_iterator iterColShapes = m_pColManager->IterBegin ();
@@ -258,6 +275,8 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
         }
     }
 
+    marker.Set ( "ColShapes" );
+
     // Add the water polys to the packet
     CWaterManager* pWaterManager = g_pGame->GetWaterManager ();
     list < CWater* > ::const_iterator iterWater = pWaterManager->IterBegin ();
@@ -267,11 +286,17 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
         EntityPacket.Add ( pWater );
     }
 
+    marker.Set ( "Water" );
+
     // Send it
     Player.Send ( EntityPacket );
 
+    marker.Set ( "SendEntityPacket" );
+
     // Send per-player entities
     SendPerPlayerEntities ( Player );
+
+    marker.Set ( "SendPerPlayerEntities" );
 
     // Send the trailer attachments
     CVehicle* pVehicle;
@@ -288,11 +313,20 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
             Player.Send ( AttachPacket );
         }
     }
+
+    marker.Set ( "SendAttachPackets" );
+
+    // Add debug info if wanted
+    if ( CPerfStatDebugInfo::GetSingleton ()->IsActive ( "SendMapInformation" ) )
+        CPerfStatDebugInfo::GetSingleton ()->AddLine ( "SendMapInformation", marker.GetString () );
 }
 
 
 void CMapManager::SendBlips ( CPlayer& Player )
 {
+    CTimeUsMarker < 20 > marker;
+    marker.Set ( "Start" );
+
     // Add all blips to an entity add packet
     CEntityAddPacket Packet;
 
@@ -306,8 +340,16 @@ void CMapManager::SendBlips ( CPlayer& Player )
         }
     }
 
+    marker.Set ( "Compile" );
+
     // Tell the player
     Player.Send ( Packet );
+
+    marker.Set ( "Send" );
+
+    // Add debug info if wanted
+    if ( CPerfStatDebugInfo::GetSingleton ()->IsActive ( "SendBlips" ) )
+        CPerfStatDebugInfo::GetSingleton ()->AddLine ( "SendBlips", marker.GetString () );
 }
 
 
@@ -395,6 +437,9 @@ void CMapManager::BroadcastElementChildren ( CElement* pElement, CEntityAddPacke
 
 void CMapManager::OnPlayerJoin ( CPlayer& Player )
 {
+    CTimeUsMarker < 20 > marker;
+    marker.Set ( "Start" );
+
     // Grab the time now
     unsigned char ucClockHour, ucClockMin;
     m_pServerClock->Get ( ucClockHour, ucClockMin );
@@ -435,7 +480,7 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     unsigned short usFPSLimit = g_pGame->GetConfig()->GetFPSLimit();
 
     // Garage states
-    bool* pbGarageStates = g_pGame->GetGarageStates();
+    const SGarageStates& garageStates = g_pGame->GetGarageStates();
     bool bCloudsEnabled = g_pGame->GetCloudsEnabled();
 
     // Water color
@@ -474,6 +519,8 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     bool bOverrideFogDistance = g_pGame->HasFogDistance ( );
     float fFogDistance = g_pGame->GetFogDistance ( );
 
+    marker.Set ( "FirstBit" );
+
     // Send the packet to the given player
     Player.Send ( CMapInfoPacket ( ucCurrentWeather,
                                    ucWeatherBlendingTo,
@@ -488,7 +535,7 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    fWaveHeight,
                                    worldWaterLevelInfo,
                                    bHasSkyGradient,
-                                   pbGarageStates,
+                                   garageStates,
                                    ucTopRed,
                                    ucTopGreen,
                                    ucTopBlue,
@@ -521,8 +568,16 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    fFogDistance,
                                    fAircraftMaxHeight ) );
 
+    marker.Set ( "SendMapInfoPacket" );
+
     // Send him all the elements
     SendMapInformation ( Player );
+
+    marker.Set ( "SendMapInformation" );
+
+    // Add debug info if wanted
+    if ( CPerfStatDebugInfo::GetSingleton ()->IsActive ( "SendMapElements" ) )
+        CPerfStatDebugInfo::GetSingleton ()->AddLine ( "SendMapElements", marker.GetString () );
 }
 
 
@@ -856,10 +911,10 @@ bool CMapManager::HandleNode ( CResource& Loader, CXMLNode& Node, CElement* pPar
     {
         CBlip* pBlip = m_pBlipManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
         pNode = pBlip;
-        if ( pBlip )
+        /*if ( pBlip )
         {
             pBlip->SetIsSynced ( bIsDuringStart );
-        }
+        }*/
     }
     else if ( strBuffer.compare ( "pickup" ) == 0 )
     {
@@ -890,6 +945,10 @@ bool CMapManager::HandleNode ( CResource& Loader, CXMLNode& Node, CElement* pPar
     else if ( strBuffer.compare ( "ped" ) == 0 )
     {
         pNode = m_pPedManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
+    }
+    else if ( strBuffer.compare ( "water" ) == 0 )
+    {
+        pNode = m_pWaterManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
     }
     else if ( strBuffer.empty () )
     {
@@ -939,7 +998,7 @@ void CMapManager::LinkupElements ( void )
     {
         CVehicle* pVehicle = *iterVehicles;
 
-        char* szAttachToID = pVehicle->GetAttachToID ();
+        const char* szAttachToID = pVehicle->GetAttachToID ();
         if ( szAttachToID [ 0 ] )
         {
             CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
@@ -953,7 +1012,7 @@ void CMapManager::LinkupElements ( void )
     {
         CPlayer* pPlayer = *iterPlayers;
         // Link up all the attaching elements
-        char* szAttachToID = pPlayer->GetAttachToID ();
+        const char* szAttachToID = pPlayer->GetAttachToID ();
         if ( szAttachToID [ 0 ] )
         {
             CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
@@ -967,7 +1026,7 @@ void CMapManager::LinkupElements ( void )
     {
         CObject* pObject = *iterObjects;
         // Link up all the attaching elements
-        char* szAttachToID = pObject->GetAttachToID ();
+        const char* szAttachToID = pObject->GetAttachToID ();
         if ( szAttachToID [ 0 ] )
         {
             CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
@@ -981,7 +1040,7 @@ void CMapManager::LinkupElements ( void )
     {
         CBlip* pBlip = *iterBlips;
         // Link up all the attaching elements
-        char* szAttachToID = pBlip->GetAttachToID ();
+        const char* szAttachToID = pBlip->GetAttachToID ();
         if ( szAttachToID [ 0 ] )
         {
             CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );

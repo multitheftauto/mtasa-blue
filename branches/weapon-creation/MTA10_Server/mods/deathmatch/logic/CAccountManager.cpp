@@ -15,7 +15,7 @@
 
 #include "StdInc.h"
 
-CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLConfig ( szFileName )
+CAccountManager::CAccountManager ( const char* szFileName, SString strBuffer ): CXMLConfig ( szFileName )
     , m_AccountProtect( 6, 30000, 60000 * 1 )     // Max of 6 attempts per 30 seconds, then 1 minute ignore
 {
     m_bRemoveFromList = true;
@@ -103,7 +103,7 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
         bool bLoadXMLMissing = true;
         for (int i = 0;i < result.nRows;i++) 
         {
-            SString strSetting = (char *)result.Data[i][0].pVal;
+            SString strSetting = (const char *)result.Data[i][0].pVal;
 
             //Do we have a result for XMLParsed
             if ( strSetting == "XMLParsed" ) 
@@ -354,7 +354,7 @@ bool CAccountManager::Load( void )
     {
         //Fill User ID, Name & Password (Required data)
         iUserID = result.Data[i][0].nVal;
-        strName = (char *)result.Data[i][1].pVal;
+        strName = (const char *)result.Data[i][1].pVal;
 
         // Check for overlong names and incorrect escapement
         bool bChanged = false;
@@ -381,16 +381,16 @@ bool CAccountManager::Load( void )
         strPassword = "";
         // If we have an password
         if ( result.Data[i][2].pVal )
-            strPassword = (char *)result.Data[i][2].pVal;
+            strPassword = (const char *)result.Data[i][2].pVal;
 
         //if we have an IP
         if ( result.Data[i][3].pVal ) {
             //Fill the IP variable
-            strIP = (char *)result.Data[i][3].pVal;
+            strIP = (const char *)result.Data[i][3].pVal;
             //If we have a Serial
             if ( result.Data[i][4].pVal ) {
                 //Fill the serial variable
-                strSerial = (char *)result.Data[i][4].pVal;
+                strSerial = (const char *)result.Data[i][4].pVal;
                 //Create a new account with the specified information
                 pAccount = new CAccount ( this, true, strName, strPassword, strIP, iUserID, strSerial );
             }
@@ -542,9 +542,11 @@ CAccount* CAccountManager::Get ( const char* szName, const char* szIP )
 }
 
 
-bool CAccountManager::Exists ( CAccount* pAccount )
+CAccount* CAccountManager::GetAccountFromScriptID ( uint uiScriptID )
 {
-    return m_List.contains ( pAccount );
+    CAccount* pAccount = (CAccount*) CIdArray::FindEntry ( uiScriptID, EIdClass::ACCOUNT );
+    dassert ( !pAccount || ListContains ( m_List, pAccount ) );
+    return pAccount;
 }
 
 
@@ -597,8 +599,7 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, const char
     if ( pClient->GetClientType () == CClient::CLIENT_PLAYER )
     {
         CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
-        char szIP [32] = { "\0" };
-        strPlayerIP = pPlayer->GetSourceIP ( szIP );
+        strPlayerIP = pPlayer->GetSourceIP ();
         strPlayerName = pPlayer->GetNick ();
         strPlayerSerial = pPlayer->GetSerial ();
     }
@@ -648,13 +649,11 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, CAccount* 
     {
         CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
 
-        char szIP [ 25 ];
-        pPlayer->GetSourceIP ( szIP );
-        // Set IP in account
-        pAccount->SetIP ( szIP );
         // Get the players details
-        strPlayerIP = szIP;
+        strPlayerIP = pPlayer->GetSourceIP () ;
         strPlayerSerial = pPlayer->GetSerial ();
+        // Set in account
+        pAccount->SetIP ( strPlayerIP );
         pAccount->SetSerial ( strPlayerSerial );
     }
 
@@ -726,6 +725,13 @@ bool CAccountManager::LogOut ( CClient* pClient, CClient* pEchoClient )
         return false;
     }
 
+    if ( pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    {
+        if ( pEchoClient )
+            pEchoClient->SendEcho ( "logout: Console may not log out" );
+        return false;
+    }
+
     CAccount* pCurrentAccount = pClient->GetAccount ();
     pCurrentAccount->SetClient ( NULL );
 
@@ -789,25 +795,32 @@ CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, const char* s
     //Store the returned amount of rows
     int iResults = result.nRows;
 
+    // Default result is nil
+    CLuaArgument* pResult = new CLuaArgument ();
+
     //Do we have any results?
-    if ( iResults > 0 ) {
+    if ( iResults > 0 )
+    {
         int iType = result.Data[0][1].nVal;
         //Account data is stored as text so we don't need to check what type it is just return it
-        if ( iType == LUA_TNIL )
-            return new CLuaArgument;
         if ( iType == LUA_TBOOLEAN )
         {
-            SString strResult = (char *)result.Data[0][0].pVal;
-            return new CLuaArgument ( strResult == "true" ? true : false );
+            SString strResult = (const char *)result.Data[0][0].pVal;
+            pResult->ReadBool ( strResult == "true" );
         }
-        if ( iType == LUA_TNUMBER )
-            return new CLuaArgument ( strtod ( (char *)result.Data[0][0].pVal, NULL ) );
         else
-            return new CLuaArgument ( std::string ( (char *)result.Data[0][0].pVal ) );
+        if ( iType == LUA_TNUMBER )
+            pResult->ReadNumber ( strtod ( (const char *)result.Data[0][0].pVal, NULL ) );
+        else
+            pResult->ReadString ( (const char *)result.Data[0][0].pVal );
+    }
+    else
+    {
+        //No results
+        pResult->ReadBool ( false );
     }
 
-    //No results
-    return new CLuaArgument ( false );
+    return pResult;
 }
 
 bool CAccountManager::SetAccountData( CAccount* pAccount, const char* szKey, const SString& strValue, int iType )
@@ -854,9 +867,9 @@ bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAcco
         for ( int i = 0;i < iResults;i++ ) 
         {
             //Get our key
-            strKey = (char *)result.Data[i][0].pVal;
+            strKey = (const char *)result.Data[i][0].pVal;
             //Get our value
-            strValue = (char *)result.Data[i][1].pVal;
+            strValue = (const char *)result.Data[i][1].pVal;
             int iType = result.Data[i][2].nVal;
             //Select the id and userid where the user is the to account and the key is strKey
             CRegistryResult subResult;
@@ -874,6 +887,63 @@ bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAcco
         return false;
     
     return true;
+}
+
+
+bool CAccountManager::GetAllAccountData( CAccount* pAccount, lua_State* pLua )
+{
+    //Get the user ID
+    int iUserID = pAccount->GetID();
+    //create a new registry result for the query return
+    CRegistryResult result;
+    SString strKey;
+
+    //Select the value and type from the database where the user is our user and the key is the required key
+    m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT key,value,type from userdata where userid=?", SQLITE_INTEGER, iUserID );
+
+    //Store the returned amount of rows
+    int iResults = result.nRows;
+
+    //Do we have any results?
+    if ( iResults > 0 ) 
+    {
+        //Loop through until i is the same as the number of rows
+        for ( int i = 0;i < iResults;i++ ) 
+        {
+            //Get our key
+            strKey = (const char *)result.Data[i][0].pVal;
+            //Get our type
+            int iType = result.Data[i][2].nVal;
+            //Account data is stored as text so we don't need to check what type it is just return it
+            if ( iType == LUA_TNIL )
+            {
+                lua_pushstring ( pLua, strKey );
+                lua_pushnil ( pLua );
+                lua_settable ( pLua, -3 );
+            }
+            if ( iType == LUA_TBOOLEAN )
+            {
+                SString strResult = (const char *)result.Data[i][1].pVal;
+                lua_pushstring ( pLua, strKey );
+                lua_pushboolean ( pLua, strResult == "true" ? true : false );
+                lua_settable ( pLua, -3 );
+            }
+            if ( iType == LUA_TNUMBER )
+            {
+                lua_pushstring ( pLua, strKey );
+                lua_pushnumber ( pLua, strtod ( (const char*)result.Data[i][1].pVal, NULL ) );
+                lua_settable ( pLua, -3 );
+            }
+            else
+            {
+                lua_pushstring ( pLua, strKey );
+                lua_pushstring ( pLua, ( (const char*)result.Data[i][1].pVal ) );
+                lua_settable ( pLua, -3 );
+            }
+        }
+        return true;
+    }
+    return false;
 }
 
 
@@ -932,10 +1002,6 @@ void CAccountManager::DbCallback ( CDbJobData* pJobData )
     {
         if ( pJobData->result.status == EJobResult::FAIL ) 
             CLogger::LogPrintf ( "ERROR: While updating account with '%s': %s.\n", *pJobData->command.strData, *pJobData->result.strReason );
-#ifdef MTA_DEBUG
-        else
-            CLogger::LogPrintf ( "DEBUGINFO: Query completed: '%s'\n", *pJobData->command.strData );
-#endif
     }
     else
     {

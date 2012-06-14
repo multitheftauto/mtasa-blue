@@ -36,18 +36,6 @@ CVoiceDataPacket::~CVoiceDataPacket ( )
 }
 
 
-ePacketID CVoiceDataPacket::GetPacketID ( void ) const
-{
-    return static_cast < ePacketID > ( PACKET_ID_VOICE_DATA );
-}
-
-
-unsigned long CVoiceDataPacket::GetFlags ( void ) const
-{
-    return 0;
-}
-
-
 bool CVoiceDataPacket::Read ( NetBitStreamInterface& BitStream )
 {
     if ( m_pBuffer )
@@ -74,7 +62,7 @@ bool CVoiceDataPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.Write ( ID );
             // Write the length as an unsigned short and then write the string
             BitStream.Write ( m_usActualDataLength );
-            BitStream.Write ( reinterpret_cast < char * > ( m_pBuffer ), m_usActualDataLength );
+            BitStream.Write ( reinterpret_cast < const char * > ( m_pBuffer ), m_usActualDataLength );
             return true;
     }
 

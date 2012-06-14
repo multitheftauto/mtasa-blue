@@ -17,20 +17,22 @@ char szUpgradeNameEmpty [] = "";
 
 struct SUpgradeName
 {
-    char szName [32];
+    const char* szName;
 };
 
-SUpgradeName UpgradeNames [17] =
-{ {"Hood"}, {"Vent"}, {"Spoiler"}, {"Sideskirt"}, {"Front Bullbars"},
-{"Rear Bullbars"}, {"Headlights"}, {"Roof"}, {"Nitro"}, {"Hydraulics"}, 
-{"Stereo"}, {"Unknown"}, {"Wheels"}, {"Exhaust"}, {"Front Bumper"},
-{"Rear Bumper"}, {"Misc"} };
+static const SFixedArray < SUpgradeName, 17 > UpgradeNames =
+{ {
+    {"Hood"}, {"Vent"}, {"Spoiler"}, {"Sideskirt"}, {"Front Bullbars"},
+    {"Rear Bullbars"}, {"Headlights"}, {"Roof"}, {"Nitro"}, {"Hydraulics"}, 
+    {"Stereo"}, {"Unknown"}, {"Wheels"}, {"Exhaust"}, {"Front Bumper"},
+    {"Rear Bumper"}, {"Misc"}
+} };
 
 
 CVehicleUpgrades::CVehicleUpgrades ( CClientVehicle* pVehicle )
 {
     m_pVehicle = pVehicle;
-    memset ( m_SlotStates, 0, sizeof ( m_SlotStates ) );
+    memset ( &m_SlotStates[0], 0, sizeof ( m_SlotStates ) );
 }
 
 
@@ -313,9 +315,7 @@ void CVehicleUpgrades::ForceAddUpgrade ( unsigned short usUpgrade )
                 if ( !g_pGame->IsASyncLoadingEnabled () || !pModelInfo->IsLoaded () )
                 {
                     // Request and load now
-                    pModelInfo->RequestVehicleUpgrade ();
-
-                    g_pGame->GetStreaming()->LoadAllRequestedModels ();
+                    pModelInfo->Request( BLOCKING, "CVehicleUpgrades::ForceAddUpgrade" );
                 }
                 // Add the upgrade
                 pVehicle->AddVehicleUpgrade ( usUpgrade );

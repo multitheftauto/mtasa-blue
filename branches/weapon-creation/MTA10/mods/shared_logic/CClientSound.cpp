@@ -27,6 +27,7 @@ CClientSound::CClientSound ( CClientManager* pManager, ElementID ID ) : ClassIni
     m_fMinDistance = 5.0f;
     m_fMaxDistance = 20.0f;
     m_fPlaybackSpeed = 1.0f;
+    m_bPan = true;
 }
 
 CClientSound::~CClientSound ( void )
@@ -108,7 +109,7 @@ bool CClientSound::Create ( void )
     m_bDoneCreate = true;
 
     // Load file/start connect
-    if ( !m_pAudio->BeginLoadingMedia () )
+    if ( !m_pAudio->BeginLoadingMedia (  ) )
         return false;
 
     // Get and save length
@@ -130,7 +131,9 @@ bool CClientSound::Create ( void )
     m_pAudio->SetVelocity ( m_vecVelocity );
     m_pAudio->SetMinDistance ( m_fMinDistance );
     m_pAudio->SetMaxDistance ( m_fMaxDistance );
-    m_pAudio->SetFxEffects ( m_EnabledEffects, NUMELMS( m_EnabledEffects ) );
+    m_pAudio->SetFxEffects ( &m_EnabledEffects[0], NUMELMS( m_EnabledEffects ) );
+    m_pAudio->SetTempoValues ( m_fSampleRate, m_fTempo, m_fPitch, m_bReversed );
+    m_pAudio->SetPanEnabled ( m_bPan );
 
     // Transfer play position if it was being simulated
     EndSimulationOfPlayPositionAndApply ();
@@ -379,6 +382,24 @@ void CClientSound::GetVelocity ( CVector& vecVelocity )
 
 void CClientSound::SetPaused ( bool bPaused )
 {
+    if ( m_bPaused != bPaused )
+    {
+        if ( bPaused )
+        {
+            // call onClientSoundStopped
+            CLuaArguments Arguments;
+            Arguments.PushString ( "paused" );     // Reason
+            this->CallEvent ( "onClientSoundStopped", Arguments, false );
+        }
+        else
+        {
+            // call onClientSoundStarted
+            CLuaArguments Arguments;
+            Arguments.PushString ( "resumed" );     // Reason
+            this->CallEvent ( "onClientSoundStarted", Arguments, false );
+        }
+    }
+
     m_bPaused = bPaused;
 
     m_SimulatedPlayPosition.SetPaused ( bPaused );
@@ -421,6 +442,80 @@ float CClientSound::GetMaxDistance ( void )
     return m_fMaxDistance;
 }
 
+void CClientSound::ApplyFXModifications ( float fSampleRate, float fTempo, float fPitch, bool bReversed )
+{
+    m_bReversed = bReversed;
+    m_fSampleRate = fSampleRate;
+    m_fTempo = fTempo;
+    m_fPitch = fPitch;
+    if ( m_pAudio )
+        m_pAudio->SetTempoValues ( fSampleRate, fTempo, fPitch, bReversed );
+}
+
+void CClientSound::GetFXModifications ( float &fSampleRate, float &fTempo, float &fPitch, bool &bReversed )
+{
+    if ( m_pAudio )
+    {
+        m_pAudio->GetTempoValues ( fSampleRate, fTempo, fPitch, bReversed );
+    }
+}
+
+float* CClientSound::GetFFTData ( int iLength )
+{
+    if ( m_pAudio )
+    {
+        return m_pAudio->GetFFTData ( iLength );
+    }
+    return NULL;
+}
+
+
+float* CClientSound::GetWaveData ( int iLength )
+{
+    if ( m_pAudio )
+    {
+        return m_pAudio->GetWaveData ( iLength );
+    }
+    return NULL;
+}
+bool CClientSound::SetPanEnabled ( bool bPan )
+{
+    if ( m_pAudio && m_b3D )
+    {
+        m_pAudio->SetPanEnabled ( bPan );
+        m_bPan = bPan;
+        return true;
+    }
+    return false;
+}
+
+bool CClientSound::IsPanEnabled ( void )
+{
+    if ( m_pAudio )
+    {
+        return m_pAudio->GetPanEnabled ( );
+    }
+    return m_bPan;
+}
+
+
+DWORD CClientSound::GetLevelData ( void )
+{
+    if ( m_pAudio )
+    {
+        return m_pAudio->GetLevelData ( );
+    }
+    return 0;
+}
+
+float CClientSound::GetSoundBPM ( void )
+{
+    if ( m_pAudio )
+    {
+        return m_pAudio->GetSoundBPM ( );
+    }
+    return 0.0f;
+}
 
 ////////////////////////////////////////////////////////////
 //
@@ -464,7 +559,7 @@ bool CClientSound::SetFxEffect ( uint uiFxEffect, bool bEnable )
     m_EnabledEffects[uiFxEffect] = bEnable;
 
     if ( m_pAudio )
-        m_pAudio->SetFxEffects ( m_EnabledEffects, NUMELMS( m_EnabledEffects ) );
+        m_pAudio->SetFxEffects ( &m_EnabledEffects[0], NUMELMS( m_EnabledEffects ) );
 
     return true;
 }
@@ -541,6 +636,13 @@ void CClientSound::Process3D ( const CVector& vecPlayerPosition, const CVector& 
                 Arguments.PushString ( eventInfo.strString );
             CallEvent ( "onClientSoundStream", Arguments, true );
             OutputDebugLine ( SString ( "[ClientSound] onClientSoundStream %d %f %s", eventInfo.bBool, eventInfo.dNumber, *eventInfo.strString ) );
+        }
+        else
+        if ( eventInfo.type == SOUND_EVENT_BEAT )
+        {
+            CLuaArguments Arguments;
+            Arguments.PushNumber ( eventInfo.dNumber );
+            CallEvent ( "onClientSoundBeat", Arguments, true );
         }
     }
 }

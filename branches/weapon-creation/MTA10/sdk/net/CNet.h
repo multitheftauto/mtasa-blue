@@ -37,7 +37,7 @@ public:
     virtual bool                        StartNetwork                ( const char* szServerHost, unsigned short usServerPort, const char* szServerPassword = NULL ) = 0;
     virtual void                        StopNetwork                 ( void ) = 0;
 
-    virtual void                        SetFakeLag                  ( unsigned short usMaxPacketsOnWire, unsigned short usMinExtraPing, unsigned short usExtraPingVariance ) = 0;
+    virtual void                        SetFakeLag                  ( unsigned short usPacketLoss, unsigned short usMinExtraPing, unsigned short usExtraPingVariance, int iKBPSLimit ) = 0;
 
     virtual bool                        IsConnected                 ( void ) = 0;
 
@@ -47,7 +47,7 @@ public:
 
     virtual NetBitStreamInterface*      AllocateNetBitStream        ( void ) = 0;
     virtual void                        DeallocateNetBitStream      ( NetBitStreamInterface* bitStream ) = 0;
-    virtual bool                        SendPacket                  ( unsigned char ucPacketID, NetBitStreamInterface* bitStream, NetPacketPriority packetPriority = PACKET_PRIORITY_HIGH, NetPacketReliability packetReliability = PACKET_RELIABILITY_RELIABLE_ORDERED, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT ) = 0;
+    virtual bool                        SendPacket                  ( unsigned char ucPacketID, NetBitStreamInterface* bitStream, NetPacketPriority packetPriority, NetPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT ) = 0;
 
     virtual void                        SetClientPort               ( unsigned short usClientPort ) = 0;
     virtual const char *                GetConnectedServer          ( void )=0;
@@ -80,6 +80,7 @@ public:
 
     virtual const char*                 GetNextBuffer               ( void ) = 0;
     virtual const char*                 GetDiagnosticStatus         ( void ) = 0;
+    virtual void                        UpdatePingStatus            ( const char* szStatus, ushort& usDataRef ) = 0;
 
     virtual bool                        VerifySignature             ( const char* pData, unsigned long ulSize ) = 0;
 
@@ -89,8 +90,8 @@ public:
     virtual const char*                 GetCurrentServerId          ( void ) = 0;
     virtual bool                        CheckFile                   ( const char* szType, const char* szFilename ) = 0;
 
-    virtual void                        SetEncryptionEnabled        ( bool bEncryptionEnabled ) = 0;
     virtual uint                        GetExtendedErrorCode        ( void ) = 0;
+    virtual void                        SetTimeoutTime              ( uint uiTimeoutTime ) = 0;
 };
 
 #endif

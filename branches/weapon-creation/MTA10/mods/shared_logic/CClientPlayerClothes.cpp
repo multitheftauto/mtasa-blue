@@ -12,14 +12,14 @@
 
 #include <StdInc.h>
 
-SPlayerClothingType g_clothesNames [ PLAYER_CLOTHING_SLOTS ] =
+static const SPlayerClothingType g_clothesNames [ PLAYER_CLOTHING_SLOTS ] =
 { { "Torso" }, { "Hair" }, { "Legs" }, { "Shoes" }, { "Left Upper Arm" },
 { "Left Lower Arm" }, { "Right Upper Arm" }, { "Right Lower Arm" },
 { "Back Top" }, { "Left Chest" }, { "Right Chest" }, { "Stomach" },
 { "Lower Back" }, { "Extra1" }, { "Extra2" }, { "Extra3" }, { "Extra4" }, 
 { "Suit" } };
 
-SPlayerClothing g_TorsoClothing [ TORSO_CLOTHING_MAX + 1 ] =
+static const SPlayerClothing g_TorsoClothing [ TORSO_CLOTHING_MAX + 1 ] =
 { { "player_torso", "torso" }, { "vestblack", "vest" }, { "vest", "vest" },
 { "tshirt2horiz", "tshirt2" }, { "tshirtwhite", "tshirt" },
 { "tshirtilovels", "tshirt" }, { "tshirtblunts", "tshirt" },
@@ -51,7 +51,7 @@ SPlayerClothing g_TorsoClothing [ TORSO_CLOTHING_MAX + 1 ] =
 { "suit1yellow", "suit1" }, { "suit2grn", "suit2" }, { "tuxedo", "suit2" },
 { "suit1gang", "suit1" }, { "letter", "sleevt" }, { NULL, NULL } };
 
-SPlayerClothing g_HairClothing [ HAIR_CLOTHING_MAX + 1 ] =
+static const SPlayerClothing g_HairClothing [ HAIR_CLOTHING_MAX + 1 ] =
 { { "player_face", "head" }, { "hairblond", "head" }, { "hairred", "head" },
 { "hairblue", "head" }, { "hairgreen", "head" }, { "hairpink", "head" },
 { "bald", "head" }, { "baldbeard", "head" }, { "baldtash", "head" },
@@ -65,7 +65,7 @@ SPlayerClothing g_HairClothing [ HAIR_CLOTHING_MAX + 1 ] =
 { "flattop", "flattop" }, { "elvishair", "elvishair" }, { "beard", "head" },
 { "tash", "head" }, { "goatee", "head" }, { "afrogoatee", "afro" }, { NULL, NULL } };
 
-SPlayerClothing g_LegsClothing [ LEGS_CLOTHING_MAX + 1 ] =
+static const SPlayerClothing g_LegsClothing [ LEGS_CLOTHING_MAX + 1 ] =
 { { "player_legs", "legs" }, { "worktrcamogrn", "worktr" },
 { "worktrcamogry", "worktr" }, { "worktrgrey", "worktr" }, { "worktrkhaki", "worktr" },
 { "tracktr", "tracktr" }, { "tracktreris", "tracktr" },
@@ -89,7 +89,7 @@ SPlayerClothing g_LegsClothing [ LEGS_CLOTHING_MAX + 1 ] =
 { "suit1trgreen", "suit1tr" }, { "suit1trblk2", "suit1tr" },
 { "suit1trgang", "suit1tr" }, { NULL, NULL } };
 
-SPlayerClothing g_ShoesClothing [ SHOES_CLOTHING_MAX + 1 ] =
+static const SPlayerClothing g_ShoesClothing [ SHOES_CLOTHING_MAX + 1 ] =
 { { "foot", "feet" }, { "cowboyboot2", "biker" }, { "bask2semi", "bask1" },
 { "bask1eris", "bask1" }, { "sneakerbincgang", "sneaker" },
 { "sneakerbincblu", "sneaker" }, { "sneakerbincblk", "sneaker" },
@@ -109,61 +109,61 @@ SPlayerClothing g_ShoesClothing [ SHOES_CLOTHING_MAX + 1 ] =
 { "shoedressblk", "shoe" }, { "shoedressbrn", "shoe" }, { "shoespatz", "shoe" },
 { NULL, NULL } };
 
-SPlayerClothing g_LeftUpperArmClothing [ LEFT_UPPER_ARM_CLOTHING_MAX + 1 ] =
+static const SPlayerClothing g_LeftUpperArmClothing [ LEFT_UPPER_ARM_CLOTHING_MAX + 1 ] =
 { { "4weed", "4WEED" }, { "4rip", "4RIP" }, { "4spider", "4SPIDER" }, { NULL, NULL } };
 
-SPlayerClothing g_LeftLowerArmClothing [ LEFT_LOWER_ARM_CLOTHING_MAX + 1 ] =
+static const SPlayerClothing g_LeftLowerArmClothing [ LEFT_LOWER_ARM_CLOTHING_MAX + 1 ] =
 { { "5gun", "5GUN" }, { "5cross", "5CROSS" }, { "5cross2", "5CROSS2" },
 { "5cross3", "5CROSS3" }, { NULL, NULL } };
 
-SPlayerClothing g_RightUpperArmClothing [ RIGHT_UPPER_ARM_CLOTHING_MAX + 1 ] =
+static const SPlayerClothing g_RightUpperArmClothing [ RIGHT_UPPER_ARM_CLOTHING_MAX + 1 ] =
 { { "6aztec", "6AZTEC" }, { "6crown", "6CROWN" }, { "6clown", "6CLOWN" },
 { "6africa", "6AFRICA" }, { NULL, NULL } };
 
-SPlayerClothing g_RightLowerArmClothing [ RIGHT_LOWER_ARM_CLOTHING_MAX + 1 ] =
+static const SPlayerClothing g_RightLowerArmClothing [ RIGHT_LOWER_ARM_CLOTHING_MAX + 1 ] =
 { { "7cross", "7CROSS" }, { "7cross2", "7CROSS2" }, { "7cross3", "7CROSS3" },
 { "7mary", "7MARY" }, { NULL, NULL } };
 
-SPlayerClothing g_BackTopClothing [ BACK_TOP_CLOTHING_MAX + 1 ] =
+static const SPlayerClothing g_BackTopClothing [ BACK_TOP_CLOTHING_MAX + 1 ] =
 { { "8sa", "8SA" }, { "8sa2", "8SA2" }, { "8sa3", "8SA3" },
 { "8westside", "8WESTSD" }, { "8santos", "8SANTOS" },
 { "8poker", "8POKER" }, { "8gun", "8GUN" }, { NULL, NULL } };
 
-SPlayerClothing g_LeftChestClothing [ LEFT_CHEST_CLOTHING_MAX + 1 ] =
+static const SPlayerClothing g_LeftChestClothing [ LEFT_CHEST_CLOTHING_MAX + 1 ] =
 { { "9crown", "9CROWN" }, { "9gun", "9GUN" }, { "9gun2", "9GUN2" },
 { "9homeboy", "9HOMBY" }, { "9bullet", "9BULLT" }, { "9rasta", "9RASTA" },
 { NULL, NULL } }; 
 
-SPlayerClothing g_RightChestClothing [ RIGHT_CHEST_CLOTHING_MAX + 1 ] =
+static const SPlayerClothing g_RightChestClothing [ RIGHT_CHEST_CLOTHING_MAX + 1 ] =
 { { "10ls", "10LS" }, { "10ls2", "10LS2" }, { "10ls3", "10LS3" },
 { "10ls4", "10LS4" }, { "10ls5", "10LS5" }, { "10og", "10OG" },
 { "10weed", "10WEED" }, { NULL, NULL } };
 
-SPlayerClothing g_StomachClothing [ STOMACH_CLOTHING_MAX + 1 ] =
+static const SPlayerClothing g_StomachClothing [ STOMACH_CLOTHING_MAX + 1 ] =
 { { "11grove", "11GROVE" }, { "11grove2", "11GROV2" },
 { "11grove3", "11GROV3" }, { "11dice", "11DICE" }, { "11dice2", "11DICE2" },
 { "11jail", "11JAIL" }, { "11godsgift", "11GGIFT" }, { NULL, NULL } };
 
-SPlayerClothing g_LowerBackClothing [ LOWER_BACK_CLOTHING_MAX + 1 ] =
+static const SPlayerClothing g_LowerBackClothing [ LOWER_BACK_CLOTHING_MAX + 1 ] =
 { { "12angels", "12ANGEL" }, { "12mayabird", "12MAYBR" },
 { "12dagger", "12DAGER" }, { "12bandit", "12BNDIT" },
 { "12cross7", "12CROSS" }, { "12mayaface", "12MYFAC" }, { NULL, NULL } };
 
-SPlayerClothing g_Extra1Clothing [ EXTRA1_CLOTHING_MAX + 1 ] =
+static const SPlayerClothing g_Extra1Clothing [ EXTRA1_CLOTHING_MAX + 1 ] =
 { { "dogtag", "neck" }, { "neckafrica", "neck" }, { "stopwatch", "neck" },
 { "necksaints", "neck" }, { "neckhash", "neck" }, { "necksilver", "neck2" },
 { "neckgold", "neck2" }, { "neckropes", "neck2" }, { "neckropeg", "neck2" },
 { "neckls", "neck" }, { "neckdollar", "neck" }, { "neckcross", "neck" },
 { NULL, NULL } };
 
-SPlayerClothing g_Extra2Clothing [ EXTRA2_CLOTHING_MAX + 1 ] =
+static const SPlayerClothing g_Extra2Clothing [ EXTRA2_CLOTHING_MAX + 1 ] =
 { { "watchpink", "watch" }, { "watchyellow", "watch" },
 { "watchpro", "watch" }, { "watchpro2", "watch" }, { "watchsub1", "watch" },
 { "watchsub2", "watch" }, { "watchzip1", "watch" }, { "watchzip2", "watch" },
 { "watchgno", "watch" }, { "watchgno2", "watch" }, { "watchcro", "watch" },
 { "watchcro2", "watch" }, { NULL, NULL } };
 
-SPlayerClothing g_Extra3Clothing [ EXTRA3_CLOTHING_MAX + 1 ] =
+static const SPlayerClothing g_Extra3Clothing [ EXTRA3_CLOTHING_MAX + 1 ] =
 { { "groucho", "grouchos" }, { "zorro", "zorromask" },
 { "eyepatch", "eyepatch" }, { "glasses01", "glasses01" },
 { "glasses04", "glasses04" }, { "bandred3", "bandmask" },
@@ -174,7 +174,7 @@ SPlayerClothing g_Extra3Clothing [ EXTRA3_CLOTHING_MAX + 1 ] =
 { "glasses03dark", "glasses03" }, { "glasses05dark", "glasses03" },
 { "glasses05", "glasses03" }, { NULL, NULL } };
 
-SPlayerClothing g_Extra4Clothing [ EXTRA4_CLOTHING_MAX + 1 ] =
+static const SPlayerClothing g_Extra4Clothing [ EXTRA4_CLOTHING_MAX + 1 ] =
 { { "bandred", "bandana" }, { "bandblue", "bandana" },
 { "bandgang", "bandana" }, { "bandblack", "bandana" },
 { "bandred2", "bandknots" }, { "bandblue2", "bandknots" },
@@ -200,25 +200,25 @@ SPlayerClothing g_Extra4Clothing [ EXTRA4_CLOTHING_MAX + 1 ] =
 { "bowleryellow", "bowler" }, { "boater", "boater" }, { "bowlergang", "bowler" }, 
 { "boaterblk", "boater" }, { NULL, NULL } };
 
-SPlayerClothing g_SuitClothing [ SUIT_CLOTHING_MAX + 1 ] =
+static const SPlayerClothing g_SuitClothing [ SUIT_CLOTHING_MAX + 1 ] =
 { { "gimpleg", "gimpleg" }, { "valet", "valet" }, { "countrytr", "countrytr" },
 { "croupier", "valet" }, { "policetr", "policetr" }, { "balaclava", "balaclava" },
 { "pimptr", "pimptr" }, { "garageleg", "garagetr" }, { "medictr", "medictr" },
 { NULL, NULL } };
 
 // This represents GTA's 1 clothing block
-SPlayerClothing * CClientPlayerClothes::m_GlobalClothes [ PLAYER_CLOTHING_SLOTS ];
+SFixedArray < const SPlayerClothing*, PLAYER_CLOTHING_SLOTS > CClientPlayerClothes::m_GlobalClothes;
 bool CClientPlayerClothes::m_bStaticInit = true;
 
 CClientPlayerClothes::CClientPlayerClothes ( CClientPed* pPlayerModel )
 {
     m_pPlayerModel = pPlayerModel;
-    memset ( m_Clothes, 0, sizeof ( m_Clothes ) );
+    memset ( &m_Clothes[0], 0, sizeof ( m_Clothes ) );
 
     if ( m_bStaticInit )
     {
         m_bStaticInit = false;
-        memset ( m_GlobalClothes, 0, sizeof ( m_GlobalClothes ) );
+        memset ( &m_GlobalClothes[0], 0, sizeof ( m_GlobalClothes ) );
     }
 }
 
@@ -229,7 +229,7 @@ CClientPlayerClothes::~CClientPlayerClothes ( void )
 }
 
 
-SPlayerClothing* CClientPlayerClothes::GetClothing ( unsigned char ucType )
+const SPlayerClothing* CClientPlayerClothes::GetClothing ( unsigned char ucType )
 {
     if ( ucType < PLAYER_CLOTHING_SLOTS )
     {
@@ -240,9 +240,9 @@ SPlayerClothing* CClientPlayerClothes::GetClothing ( unsigned char ucType )
 }
 
 
-void CClientPlayerClothes::AddClothes ( char* szTexture, char* szModel, unsigned char ucType, bool bAddToModel )
+void CClientPlayerClothes::AddClothes ( const char* szTexture, const char* szModel, unsigned char ucType, bool bAddToModel )
 {
-    SPlayerClothing * pClothing = GetClothing ( szTexture, szModel, ucType );
+    const SPlayerClothing * pClothing = GetClothing ( szTexture, szModel, ucType );
     if ( pClothing && pClothing != m_Clothes [ ucType ] )
     {
         RemoveClothes ( ucType, bAddToModel );
@@ -256,7 +256,7 @@ void CClientPlayerClothes::AddClothes ( char* szTexture, char* szModel, unsigned
 }
 
 
-void CClientPlayerClothes::InternalAddClothes ( SPlayerClothing * pClothing, unsigned char ucType )
+void CClientPlayerClothes::InternalAddClothes ( const SPlayerClothing * pClothing, unsigned char ucType )
 {
     if ( m_pPlayerModel )
     {
@@ -286,7 +286,7 @@ bool CClientPlayerClothes::RemoveClothes ( unsigned char ucType, bool bRemoveFro
         // Can we replace them with empty-type clothes (eg: player_torso)
         if ( HasEmptyClothing ( ucType ) )
         {
-            SPlayerClothing * pGroup = GetClothingGroup ( ucType );
+            const SPlayerClothing* pGroup = GetClothingGroup ( ucType );
             m_Clothes [ ucType ] = &pGroup [ 0 ];
         }
         else
@@ -314,8 +314,8 @@ void CClientPlayerClothes::AddAllToModel ( void )
         {         
             for ( unsigned char ucType = 0 ; ucType < PLAYER_CLOTHING_SLOTS ; ucType++ )
             {
-                SPlayerClothing* pPrevious = m_GlobalClothes [ ucType ];
-                SPlayerClothing* pCurrent = m_Clothes [ ucType ];
+                const SPlayerClothing* pPrevious = m_GlobalClothes [ ucType ];
+                const SPlayerClothing* pCurrent = m_Clothes [ ucType ];
                 if ( pCurrent )
                 {
                     if ( !pPrevious || pPrevious != pCurrent )
@@ -359,13 +359,13 @@ bool CClientPlayerClothes::HasEmptyClothing ( unsigned char ucType )
 }
 
 
-bool CClientPlayerClothes::IsEmptyClothing ( SPlayerClothing * pClothing, unsigned char ucType )
+bool CClientPlayerClothes::IsEmptyClothing ( const SPlayerClothing * pClothing, unsigned char ucType )
 {
     if ( pClothing )
     {
         if ( ucType <= 3 )
         {
-            SPlayerClothing* pGroup = GetClothingGroup ( ucType );
+            const SPlayerClothing* pGroup = GetClothingGroup ( ucType );
             if ( pClothing == &pGroup [ 0 ] )
             {
                 return true;
@@ -375,7 +375,7 @@ bool CClientPlayerClothes::IsEmptyClothing ( SPlayerClothing * pClothing, unsign
     return false;
 }
 
-char* CClientPlayerClothes::GetClothingName ( unsigned char ucType )
+const char* CClientPlayerClothes::GetClothingName ( unsigned char ucType )
 {
     if ( ucType < PLAYER_CLOTHING_SLOTS )
     {
@@ -385,7 +385,7 @@ char* CClientPlayerClothes::GetClothingName ( unsigned char ucType )
 }
 
 
-SPlayerClothing* CClientPlayerClothes::GetClothingGroup ( unsigned char ucType )
+const SPlayerClothing* CClientPlayerClothes::GetClothingGroup ( unsigned char ucType )
 {
     if ( ucType < PLAYER_CLOTHING_SLOTS )
     {
@@ -407,15 +407,15 @@ SPlayerClothing* CClientPlayerClothes::GetClothingGroup ( unsigned char ucType )
 }
 
 
-SPlayerClothing * CClientPlayerClothes::GetClothing ( char * szTexture, char * szModel, unsigned char ucType )
+const SPlayerClothing * CClientPlayerClothes::GetClothing ( const char* szTexture, const char* szModel, unsigned char ucType )
 {
     if ( szTexture && szModel && ucType < PLAYER_CLOTHING_SLOTS )
     {
-        SPlayerClothing * pGroup = GetClothingGroup ( ucType );
+        const SPlayerClothing * pGroup = GetClothingGroup ( ucType );
         int iMax = GetClothingGroupMax ( ucType );
         for ( int i = 0 ; i < iMax ; i++ )
         {
-            SPlayerClothing * pClothing = &pGroup [ i ];
+            const SPlayerClothing * pClothing = &pGroup [ i ];
             if ( !stricmp ( szTexture, pClothing->szTexture ) &&
                  !stricmp ( szModel, pClothing->szModel ) )
             {

@@ -18,7 +18,7 @@
 
 struct SWhoWasEntry
 {
-    char            szNick [MAX_NICK_LENGTH + 1];
+    SString         strNick;
     unsigned long   ulIP;
     std::string     strSerial;
     SString         strPlayerVersion;

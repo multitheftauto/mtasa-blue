@@ -22,7 +22,7 @@
 #include <net/SyncStructures.h>
 
 extern CClientGame* g_pClientGame;
-
+CTickRateSettings g_TickRateSettings;
 
 CNetAPI::CNetAPI ( CClientManager* pManager )
 {
@@ -37,6 +37,7 @@ CNetAPI::CNetAPI ( CClientManager* pManager )
     m_pLastSentCameraTarget = NULL;
     m_ulLastCameraSyncTime = 0;
     m_bStoredReturnSync = false;
+    m_bIncreaseTimeoutTime = false;
 }
 
 
@@ -57,7 +58,7 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
                     ReadLightweightSync ( pPlayer, BitStream );
                 }
                 else
-                    g_pCore->GetConsole ()->Print ( "Player not found." );
+                    OutputDebugLine ( "[Sync] Player not found" );
             }
             return true;
         }
@@ -133,6 +134,24 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
                 {
                     // Read out the keysync data
                     ReadKeysync ( pPlayer, BitStream );
+                }
+            }
+
+            return true;
+        }
+
+        case PACKET_ID_PLAYER_BULLETSYNC:
+        {
+            // Read out the player ID
+            ElementID PlayerID;
+            if ( BitStream.Read ( PlayerID ) )
+            {
+                // Grab the player
+                CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
+                if ( pPlayer )
+                {
+                    // Read out the bulletsync data
+                    ReadBulletsync ( pPlayer, BitStream );
                 }
             }
 
@@ -271,6 +290,21 @@ void CNetAPI::DoPulse ( void )
     // If we're ingame
     if ( m_pManager->IsGameLoaded () )
     {
+        // Increase timeout time if downloading something
+        if ( g_pClientGame->IsDownloadingBigPacket () || g_pNet->GetHTTPDownloadManager ()->IsDownloading () )
+        {
+            m_bIncreaseTimeoutTime = true;
+            m_IncreaseTimeoutTimeTimer.Reset ();
+        }
+        else
+        if ( m_bIncreaseTimeoutTime )
+        {
+            // Extra 5 seconds after download has finished before restoring default timeout time
+            if ( m_IncreaseTimeoutTimeTimer.Get () > 5000 )
+                m_bIncreaseTimeoutTime = false;
+        }
+        g_pNet->SetTimeoutTime ( m_bIncreaseTimeoutTime ? 30000 : 10000 );
+
         // Grab the local player
         CClientPlayer* pPlayer = m_pPlayerManager->GetLocalPlayer ();
         if ( pPlayer && !pPlayer->IsDeadOnNetwork () )
@@ -297,7 +331,7 @@ void CNetAPI::DoPulse ( void )
                         WriteVehiclePuresync ( pPlayer, pVehicle, *pBitStream );
 
                         // Send the packet and destroy it
-                        g_pNet->SendPacket( PACKET_ID_PLAYER_VEHICLE_PURESYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, PACKET_ORDERING_DEFAULT );
+                        g_pNet->SendPacket( PACKET_ID_PLAYER_VEHICLE_PURESYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
                         g_pNet->DeallocateNetBitStream ( pBitStream );
                     }
 
@@ -320,7 +354,7 @@ void CNetAPI::DoPulse ( void )
                             WritePlayerPuresync ( pPlayer, *pBitStream );
 
                             // Send the packet and destroy it
-                            g_pNet->SendPacket( PACKET_ID_PLAYER_PURESYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED, PACKET_ORDERING_DEFAULT );
+                            g_pNet->SendPacket( PACKET_ID_PLAYER_PURESYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
                             g_pNet->DeallocateNetBitStream ( pBitStream );
                         }
                     }
@@ -339,7 +373,7 @@ void CNetAPI::DoPulse ( void )
                         WriteKeysync ( pPlayer, *pBitStream );
 
                         // Send the packet
-                        g_pNet->SendPacket ( PACKET_ID_PLAYER_KEYSYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
+                        g_pNet->SendPacket ( PACKET_ID_PLAYER_KEYSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
                         g_pNet->DeallocateNetBitStream ( pBitStream );
                     }
                 }
@@ -352,7 +386,8 @@ void CNetAPI::DoPulse ( void )
                     ( m_ulLastSyncReturnTime != 0 ) &&
                     ( ulCurrentTime <= m_ulLastPuresyncTime + 5000 ) &&
                     ( ulCurrentTime >= m_ulLastSyncReturnTime + 10000 ) &&
-                    ( !g_pClientGame->IsGettingIntoVehicle () ) )
+                    ( !g_pClientGame->IsGettingIntoVehicle () ) &&
+                    ( !m_bIncreaseTimeoutTime ) )
             {
                 // No vehicle or vehicle in seat 0?
                 if ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 )
@@ -402,7 +437,7 @@ void CNetAPI::DoPulse ( void )
                     WriteCameraSync ( *pBitStream );
 
                     // Send the packet and destroy it
-                    g_pNet->SendPacket ( PACKET_ID_CAMERA_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DEFAULT );
+                    g_pNet->SendPacket ( PACKET_ID_CAMERA_SYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
                     g_pNet->DeallocateNetBitStream ( pBitStream );
                 }
             }
@@ -414,30 +449,103 @@ void CNetAPI::DoPulse ( void )
 bool CNetAPI::IsSmallKeySyncNeeded ( CClientPed* pPlayerModel )
 {
     // Grab the current and the old controllerstate
-    CControllerState ControllerState, LastControllerState;
+    CControllerState ControllerState;
     pPlayerModel->GetControllerState ( ControllerState );
-    pPlayerModel->GetLastControllerState ( LastControllerState );
 
-    bool bPlaneRudderSync = false;
+    CControllerState LastControllerState;
+    float fLastCameraRotation, fLastAimY;
+    GetLastSentControllerState ( &LastControllerState, &fLastCameraRotation, &fLastAimY );
+
     CClientVehicle* pVehicle = pPlayerModel->GetOccupiedVehicle ();
     if ( pVehicle && 
          ( pVehicle->GetVehicleType () == CLIENTVEHICLE_PLANE ||
            pVehicle->GetVehicleType () == CLIENTVEHICLE_HELI ) )
     {
-        bPlaneRudderSync = ( ControllerState.LeftShoulder2 != LastControllerState.LeftShoulder2 ||
-                             ControllerState.RightShoulder2 != LastControllerState.RightShoulder2 );
+        if ( ControllerState.LeftShoulder2 != LastControllerState.LeftShoulder2 ||
+                             ControllerState.RightShoulder2 != LastControllerState.RightShoulder2 )
+            return true;
     }
 
     // Compare the parts we sync
-    return ( bPlaneRudderSync ||
-             ControllerState.LeftShoulder1 != LastControllerState.LeftShoulder1 ||
-             ControllerState.RightShoulder1 != LastControllerState.RightShoulder1 ||
-             ControllerState.ButtonSquare != LastControllerState.ButtonSquare ||
-             ControllerState.ButtonCross != LastControllerState.ButtonCross ||
-             ControllerState.ButtonCircle != LastControllerState.ButtonCircle ||
-             ControllerState.ButtonTriangle != LastControllerState.ButtonTriangle ||
-             ControllerState.ShockButtonL != LastControllerState.ShockButtonL ||
-             ControllerState.m_bPedWalk != LastControllerState.m_bPedWalk );
+    if (    ControllerState.LeftShoulder1 != LastControllerState.LeftShoulder1 ||
+            ControllerState.RightShoulder1 != LastControllerState.RightShoulder1 ||
+            ControllerState.ButtonSquare != LastControllerState.ButtonSquare ||
+            ControllerState.ButtonCross != LastControllerState.ButtonCross ||
+            ControllerState.ButtonCircle != LastControllerState.ButtonCircle ||
+            ControllerState.ButtonTriangle != LastControllerState.ButtonTriangle ||
+            ControllerState.ShockButtonL != LastControllerState.ShockButtonL ||
+            ControllerState.m_bPedWalk != LastControllerState.m_bPedWalk )
+        return true;
+
+    if ( g_pNet->GetServerBitStreamVersion () < 0x2C )
+        return false;
+
+    // Movement direction buttons change ?
+    short LeftStickXDelta = abs ( ControllerState.LeftStickX - LastControllerState.LeftStickX );
+    short LeftStickYDelta = abs ( ControllerState.LeftStickY - LastControllerState.LeftStickY );
+    if ( LeftStickXDelta > 32 || LeftStickYDelta > 32 )
+    {
+        // If movement within -127 to -1 or 1 to 127, then apply analog update limits
+        if (
+            ( ControllerState.LeftStickX >= -127 && ControllerState.LeftStickX <= -1 &&
+             ControllerState.LeftStickY >= -127 && ControllerState.LeftStickY <= -1 &&
+             LastControllerState.LeftStickX >= -127 && LastControllerState.LeftStickX <= -1 &&
+             LastControllerState.LeftStickY >= -127 && LastControllerState.LeftStickY <= -1 )
+            ||
+            ( ControllerState.LeftStickX >= 1 && ControllerState.LeftStickX <= 127 &&
+             ControllerState.LeftStickY >= 1 && ControllerState.LeftStickY <= 127 &&
+             LastControllerState.LeftStickX >= 1 && LastControllerState.LeftStickX <= 127 &&
+             LastControllerState.LeftStickY >= 1 && LastControllerState.LeftStickY <= 127 )
+           )
+        {
+            // Analog movement is restricted to within axis direction.
+            //  - Only continue if KeySyncMove has a shorter update interval than puresync
+            if ( g_TickRateSettings.iKeySyncAnalogMove < g_TickRateSettings.iPureSync )
+                // Only allow if enough time since last keysync
+                if ( m_TimeSinceMouseOrAnalogStateSent.Get () >= g_TickRateSettings.iKeySyncAnalogMove )
+                    return true;
+        }
+        else
+            return true;
+    }
+
+    // Only continue if KeySyncRotation has a shorter update interval than puresync
+    if ( g_TickRateSettings.iKeySyncRotation < g_TickRateSettings.iPureSync )
+    {
+        // Only allow if enough time since last keysync
+        if ( m_TimeSinceMouseOrAnalogStateSent.Get () >= g_TickRateSettings.iKeySyncRotation )
+        {
+            // Camera orbiting?
+            float fCameraRotationDelta = WrapAround ( -PI, fLastCameraRotation - pPlayerModel->GetCameraRotation (), PI );
+            if ( abs ( fCameraRotationDelta ) > 0.05f )
+            {
+                if ( !pVehicle )
+                {
+                    // Camera orbiting + Movement direction button held?
+                    if ( abs ( ControllerState.LeftStickX ) > 32 )
+                        return true;
+                    if ( abs ( ControllerState.LeftStickY ) > 32 )
+                        return true;
+                }
+
+                // Camera orbiting + Aiming button held?
+                if ( ControllerState.RightShoulder1 )
+                    return true;
+            }
+
+            // Aiming up and down?
+            float fAimY = pPlayerModel->GetAim ().fY;
+            float fAimYDelta = WrapAround ( -PI, fLastAimY - fAimY, PI );
+            if ( abs ( fAimYDelta ) > 0.05f )
+            {
+                 // Aiming up and down + Aiming button held?
+                if ( ControllerState.RightShoulder1 )
+                    return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 
@@ -502,22 +610,38 @@ bool CNetAPI::IsCameraSyncNeeded ()
 
 void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream )
 {
-    // Grab the old controller state
-    CControllerState LastControllerState;
-    pPlayer->GetLastControllerState ( LastControllerState );
-
-    // Grab the current controller state
-    CControllerState CurrentControllerState;
-    pPlayer->GetControllerState ( CurrentControllerState );
-
     // Read out the small keysync data
     CControllerState ControllerState;
-    ReadSmallKeysync ( ControllerState, LastControllerState, BitStream );
+    ReadSmallKeysync ( ControllerState, BitStream );
 
-    // We don't sync the direction keys in keysync, so we set them
-    // to the current ones.
-    ControllerState.LeftStickX = CurrentControllerState.LeftStickX;
-    ControllerState.LeftStickY = CurrentControllerState.LeftStickY;
+    // Read the rotations
+    float fPlayerRotation;
+    float fCameraRotation;
+    if ( BitStream.Version () >= 0x2C )
+    {
+        SKeysyncRotation rotation;
+        BitStream.Read ( &rotation );
+        fPlayerRotation = rotation.data.fPlayerRotation;
+        fCameraRotation = rotation.data.fCameraRotation;
+    }
+    else
+    {
+        // Older versions don't sync these, so we set them to the current values.
+        fPlayerRotation = pPlayer->GetCurrentRotation ();
+        fCameraRotation = pPlayer->GetCameraRotation ();
+        CControllerState CurrentControllerState;
+        pPlayer->GetControllerState ( CurrentControllerState );
+        ControllerState.LeftStickX = CurrentControllerState.LeftStickX;
+        ControllerState.LeftStickY = CurrentControllerState.LeftStickY;
+    }
+
+    // Skip old bullet sync data
+    if ( BitStream.Version () == 0x2D )
+    {
+        bool bDummy;
+        BitStream.ReadBit ( bDummy );
+        BitStream.ReadBit ( bDummy );
+    }
 
     // Flags
     SKeysyncFlags flags;
@@ -526,8 +650,8 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
     // Grab the occupied vehicle
     CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
 
-    // If he's shooting
-    if ( ControllerState.ButtonCircle )
+    // If he's shooting or aiming
+    if ( ControllerState.ButtonCircle || ( ControllerState.RightShoulder1 && BitStream.Version () >= 0x2C ) )
     {
         // Read out his current weapon slot
         SWeaponSlotSync slot;
@@ -566,7 +690,7 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
                 }
                 else
                 {
-                    pPlayer->AddChangeWeapon ( TICK_RATE, static_cast < eWeaponSlot > ( uiSlot ), usWeaponAmmo );
+                    pPlayer->AddChangeWeapon ( TICK_RATE_AIM, static_cast < eWeaponSlot > ( uiSlot ), usWeaponAmmo );
                 }
             }
             else
@@ -577,7 +701,7 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
                 }
                 else
                 {
-                    pPlayer->AddChangeWeapon ( TICK_RATE, WEAPONSLOT_TYPE_UNARMED, 1 );
+                    pPlayer->AddChangeWeapon ( TICK_RATE_AIM, WEAPONSLOT_TYPE_UNARMED, 1 );
                 }
             }
 
@@ -598,17 +722,17 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
             // Set the aim data (immediately if in vehicle, otherwize delayed/interpolated)
             if ( pVehicle )
             {
-                pPlayer->SetAimingData ( TICK_RATE, aim.data.vecTarget, aim.data.fArm, 0.0f, ucDriveByAim, &(aim.data.vecOrigin), false );
+                pPlayer->SetAimingData ( TICK_RATE_AIM, aim.data.vecTarget, aim.data.fArm, 0.0f, ucDriveByAim, &(aim.data.vecOrigin), false );
             }
             else
             {
-                pPlayer->SetTargetTarget ( TICK_RATE, aim.data.vecOrigin, aim.data.vecTarget );
-                pPlayer->SetAimInterpolated ( TICK_RATE, pPlayer->GetCurrentRotation (), aim.data.fArm, flags.data.bAkimboTargetUp, ucDriveByAim );
+                pPlayer->SetTargetTarget ( TICK_RATE_AIM, aim.data.vecOrigin, aim.data.vecTarget );
+                pPlayer->SetAimInterpolated ( TICK_RATE_AIM, fPlayerRotation, aim.data.fArm, flags.data.bAkimboTargetUp, ucDriveByAim );
             }
         }
         else if ( uiSlot != 0 )
         {
-            pPlayer->AddChangeWeapon ( TICK_RATE, static_cast < eWeaponSlot > ( uiSlot ), 1 );
+            pPlayer->AddChangeWeapon ( TICK_RATE_AIM, static_cast < eWeaponSlot > ( uiSlot ), 1 );
         }
         else
         {
@@ -656,7 +780,13 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
         pPlayer->SetChoking ( flags.data.bIsChoking );       
     }
 
+    ModifyControllerStateForBulletSync ( pPlayer, ControllerState );
     pPlayer->SetControllerState ( ControllerState );
+    if ( BitStream.Version () >= 0x2C )
+    {
+        pPlayer->SetCameraRotation ( fCameraRotation );
+        pPlayer->SetTargetRotation ( fPlayerRotation );
+    }
 
     // Increment keysync counter
     pPlayer->IncrementKeySync ();
@@ -667,13 +797,28 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
 {
     // Grab the local controllerstates
     CControllerState ControllerState;
-    CControllerState LastControllerState;
     pPlayerModel->GetControllerState ( ControllerState );
-    pPlayerModel->GetLastControllerState ( LastControllerState );
     CClientVehicle* pVehicle = pPlayerModel->GetOccupiedVehicle ();
 
     // Write them to the bitstream
-    WriteSmallKeysync ( ControllerState, LastControllerState, BitStream );
+    WriteSmallKeysync ( ControllerState, BitStream );
+
+    // Write the rotations
+    if ( BitStream.Version () >= 0x2C )
+    {
+        SKeysyncRotation rotation;
+        rotation.data.fPlayerRotation = pPlayerModel->GetCurrentRotation ();
+        rotation.data.fCameraRotation = pPlayerModel->GetCameraRotation ();
+        BitStream.Write ( &rotation );
+    }
+
+    // Skip old bullet sync data
+    if ( BitStream.Version () == 0x2D )
+    {
+        bool bDummy = 0;
+        BitStream.WriteBit ( bDummy );
+        BitStream.WriteBit ( bDummy );
+    }
 
     // Flags
     SKeysyncFlags flags;
@@ -685,8 +830,8 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
     // Write the flags
     BitStream.Write ( &flags );
 
-    // Are we shooting?
-    if ( ControllerState.ButtonCircle )
+    // Are we shooting or aiming ?
+    if ( ControllerState.ButtonCircle || ( ControllerState.RightShoulder1 && BitStream.Version () >= 0x2C ) )
     {
         // Grab the current weapon
         CWeapon * pPlayerWeapon = pPlayerModel->GetWeapon ();
@@ -757,6 +902,8 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
             BitStream.WriteBit ( ControllerState.RightShoulder2 != 0 );
         }
     }
+
+    SetLastSentControllerState ( ControllerState, pPlayerModel->GetCameraRotation (), pPlayerModel->GetAim ().fY );
 }
 
 
@@ -835,9 +982,10 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     pPlayer->SetArmor ( armor.data.fValue );
     pPlayer->LockArmor ( armor.data.fValue );
 
-    // Read out the camera rotation
-    float fCameraRotation;
-    BitStream.Read ( fCameraRotation );    
+    // Read the camera rotation (Determines base for left stick movement)
+    SCameraRotationSync camRotation;
+    BitStream.Read ( &camRotation );
+    float fCameraRotation = camRotation.data.fRotation;
 
     // Current weapon id
     if ( flags.data.bHasAWeapon )
@@ -873,11 +1021,11 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
             // Valid current weapon id?
             if ( CClientPickupManager::IsValidWeaponID ( ucCurrentWeapon ) )
             {
-                pPlayer->AddChangeWeapon ( TICK_RATE, static_cast < eWeaponSlot > ( uiSlot ), usWeaponAmmo );
+                pPlayer->AddChangeWeapon ( TICK_RATE_AIM, static_cast < eWeaponSlot > ( uiSlot ), usWeaponAmmo );
             }
             else
             {
-                pPlayer->AddChangeWeapon ( TICK_RATE, WEAPONSLOT_TYPE_UNARMED, 0 );
+                pPlayer->AddChangeWeapon ( TICK_RATE_AIM, WEAPONSLOT_TYPE_UNARMED, 0 );
             }
 
             // Make sure that if he doesn't have an akimbo weapon his hands up state is false
@@ -891,13 +1039,13 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
             BitStream.Read ( &aim );
 
             // Interpolate the aiming
-            pPlayer->SetAimInterpolated ( TICK_RATE, rotation.data.fRotation, aim.data.fArm, flags.data.bAkimboTargetUp, 0 );
+            pPlayer->SetAimInterpolated ( TICK_RATE_AIM, rotation.data.fRotation, aim.data.fArm, flags.data.bAkimboTargetUp, 0 );
 
             // Read the aim data only if he's shooting or aiming
             if ( aim.isFull() )
             {
                 // Interpolate the source/target vectors
-                pPlayer->SetTargetTarget ( TICK_RATE, aim.data.vecOrigin, aim.data.vecTarget );
+                pPlayer->SetTargetTarget ( TICK_RATE_AIM, aim.data.vecOrigin, aim.data.vecTarget );
             }
         }
         else
@@ -932,6 +1080,7 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     }
 
     // Set move speed, controller state and camera rotation + duck state
+    ModifyControllerStateForBulletSync ( pPlayer, ControllerState );
     pPlayer->SetControllerState ( ControllerState );
     pPlayer->SetCameraRotation ( fCameraRotation );
     pPlayer->Duck ( flags.data.bIsDucked );
@@ -943,6 +1092,7 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     pPlayer->SetLastPuresyncTime ( CClientTime::GetTime () );
     pPlayer->SetLastPuresyncPosition ( position.data.vecPosition );
     pPlayer->IncrementPlayerSync ();
+    pPlayer->SetLastPuresyncType ( PURESYNC_TYPE_PURESYNC );
 }
 
 
@@ -960,7 +1110,7 @@ void WriteCameraOrientation ( const CVector& vecPositionBase, NetBitStreamInterf
     //
     // Write rotations
     //
-    const static float fPI = 3.14159265f;
+    const float fPI = 3.14159265f;
     SFloatAsBitsSync < 8 > rotation ( -fPI, fPI, false );
 
     rotation.data.fValue = fCamRotZ;
@@ -1118,8 +1268,10 @@ void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInt
     armor.data.fValue = pPlayerModel->GetArmor ();
     BitStream.Write ( &armor );
 
-    // Write the camera rotation
-    BitStream.Write ( g_pGame->GetCamera ()->GetCameraRotation () );
+    // Write the camera rotation (Determines base for left stick movement)
+    SCameraRotationSync camRotation;
+    camRotation.data.fRotation = pPlayerModel->GetCameraRotation ();
+    BitStream.Write ( &camRotation );
 
     // Write the camera orientation
     WriteCameraOrientation ( vecPosition, BitStream );
@@ -1180,6 +1332,9 @@ void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInt
     }    
     else
         BitStream.WriteBit ( false );
+
+    // For detecting if keysync will be needed next time
+    SetLastSentControllerState ( ControllerState, pPlayerModel->GetCameraRotation (), pPlayerModel->GetAim ().fY );
 
     // Write the sent position to the interpolator
     AddInterpolation ( vecActualPosition );
@@ -1286,7 +1441,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
     int iModelID = pVehicle->GetModel ();
     if ( uiSeat == 0 )
     {
-        if ( CClientVehicleManager::HasSirens ( iModelID ) )
+        if ( CClientVehicleManager::HasSirens ( iModelID ) || pVehicle->DoesVehicleHaveSirens ( ) )
         {
             pVehicle->SetSirenOrAlarmActive ( flags.data.bIsSirenOrAlarmActive );
         }
@@ -1411,6 +1566,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
     pPlayer->SetLastPuresyncPosition ( vecPosition );
     pPlayer->SetLastPuresyncTime ( CClientTime::GetTime () );
     pPlayer->IncrementVehicleSync ();
+    pPlayer->SetLastPuresyncType ( PURESYNC_TYPE_PURESYNC );
 }
 
 
@@ -1581,7 +1737,7 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
 }
 
 
-bool CNetAPI::ReadSmallKeysync ( CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream )
+bool CNetAPI::ReadSmallKeysync ( CControllerState& ControllerState, NetBitStreamInterface& BitStream )
 {
     SSmallKeysyncSync keys;
     if ( !BitStream.Read ( &keys ) )
@@ -1596,12 +1752,16 @@ bool CNetAPI::ReadSmallKeysync ( CControllerState& ControllerState, const CContr
     ControllerState.ButtonTriangle  = 255 * keys.data.bButtonTriangle;
     ControllerState.ShockButtonL    = 255 * keys.data.bShockButtonL;
     ControllerState.m_bPedWalk      = 255 * keys.data.bPedWalk;
-
+    if ( BitStream.Version () >= 0x2C )
+    {
+        ControllerState.LeftStickX      = keys.data.sLeftStickX;
+        ControllerState.LeftStickY      = keys.data.sLeftStickY;
+    }
     return true;
 }
 
 
-void CNetAPI::WriteSmallKeysync ( const CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream )
+void CNetAPI::WriteSmallKeysync ( const CControllerState& ControllerState, NetBitStreamInterface& BitStream )
 {
     SSmallKeysyncSync keys;
     keys.data.bLeftShoulder1    = ( ControllerState.LeftShoulder1 != 0 );       // Action / Secondary-Fire
@@ -1612,6 +1772,8 @@ void CNetAPI::WriteSmallKeysync ( const CControllerState& ControllerState, const
     keys.data.bButtonTriangle   = ( ControllerState.ButtonTriangle != 0 );      // Enter/Exit/Special-Attack / Enter/exit
     keys.data.bShockButtonL     = ( ControllerState.ShockButtonL != 0 );        // Crouch / Horn
     keys.data.bPedWalk          = ( ControllerState.m_bPedWalk != 0 );          // Walk / -
+    keys.data.sLeftStickX       = ControllerState.LeftStickX;
+    keys.data.sLeftStickY       = ControllerState.LeftStickY;
 
     // Write it
     BitStream.Write ( &keys );
@@ -1787,7 +1949,7 @@ void CNetAPI::WriteCameraSync ( NetBitStreamInterface& BitStream )
 }
 
 
-void CNetAPI::RPC ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream, ePacketOrdering packetOrdering )
+void CNetAPI::RPC ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream )
 {
     NetBitStreamInterface* pRPCBitStream = g_pNet->AllocateNetBitStream ();
     if ( pRPCBitStream )
@@ -1814,7 +1976,7 @@ void CNetAPI::RPC ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream, 
             pBitStream->ResetReadPointer ();
         }
 
-        g_pNet->SendPacket ( PACKET_ID_RPC, pRPCBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED, packetOrdering );
+        g_pNet->SendPacket ( PACKET_ID_RPC, pRPCBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
         g_pNet->DeallocateNetBitStream ( pRPCBitStream );
     }
 }
@@ -1907,8 +2069,16 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
         pPlayer->LockArmor ( armor.data.fValue );
     }
 
+    CVector vecCalcedVelocity;
     if ( bReadPosition )
     {
+        // Calculate velocity
+        ulong ulElapsedTime = CClientTime::GetTime () - pPlayer->GetLastPuresyncTime ();
+        vecCalcedVelocity = pos.data.vecPosition - pPlayer->GetLastPuresyncPosition ();
+        float fDistance = vecCalcedVelocity.Normalize ();
+        float fSpeed = fDistance / Max( 0.01f, ulElapsedTime * 0.001f );
+        vecCalcedVelocity *= fSpeed;
+
         pPlayer->SetPosition ( pos.data.vecPosition );
         pPlayer->SetLastPuresyncPosition ( pos.data.vecPosition );
 
@@ -1938,8 +2108,12 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
         }
     }
 
+    // This is to help the model cacher predict what will be required soon
+    pPlayer->SetLightsyncCalcedVelocity ( vecCalcedVelocity );
+
     pPlayer->SetLastPuresyncTime ( CClientTime::GetTime () );
     pPlayer->IncrementPlayerSync ();
+    pPlayer->SetLastPuresyncType ( PURESYNC_TYPE_LIGHTSYNC );
 }
 
 void CNetAPI::ReadVehicleResync ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream )
@@ -1976,4 +2150,85 @@ void CNetAPI::ReadVehicleResync ( CClientVehicle* pVehicle, NetBitStreamInterfac
     // Apply the correct move and turnspeed
     pVehicle->SetMoveSpeed ( velocity.data.vecVelocity );
     pVehicle->SetTurnSpeed ( turnSpeed.data.vecVelocity );
+}
+
+
+//
+// Allow bulletsync to modify fire button pressed state for remote players
+//
+void CNetAPI::ModifyControllerStateForBulletSync ( CClientPlayer* pPlayer, CControllerState& ControllerState )
+{
+    if ( ControllerState.ButtonCircle != 0 )
+    {
+        // If bullet sync is enabled for the current weapon, remove fire button presses
+        eWeaponType weaponType = pPlayer->GetCurrentWeaponType ();
+        if ( g_pClientGame->GetWeaponTypeUsesBulletSync ( weaponType ) )
+            ControllerState.ButtonCircle = 0;
+    }
+}
+
+
+//
+// Read bulletsync packet for a remote player
+//
+void CNetAPI::ReadBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream )
+{
+    // Ignore old bullet sync stuff
+
+    if ( BitStream.Version () < 0x02E )
+        return;
+
+    // Read the bulletsync data
+    uchar ucWeapon = 0;
+    BitStream.Read ( ucWeapon );
+    eWeaponType weaponType = (eWeaponType)ucWeapon;
+
+    CVector vecStart, vecEnd;
+    BitStream.Read ( (char*)&vecStart, sizeof ( CVector ) );
+    BitStream.Read ( (char*)&vecEnd, sizeof ( CVector ) );
+
+    pPlayer->DischargeWeapon ( weaponType, vecStart, vecEnd );
+}
+
+
+//
+// Send bulletsync fire button press packet to remote players
+//
+void CNetAPI::SendBulletSyncFire ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd )
+{
+    // Ignore old bullet sync stuff
+    if ( g_pNet->GetServerBitStreamVersion () < 0x2E )
+        return;
+
+    // Send a bulletsync packet
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+
+    // Write the bulletsync data
+    pBitStream->Write ( (char)weaponType );
+
+    pBitStream->Write ( (const char*)&vecStart, sizeof ( CVector ) );
+    pBitStream->Write ( (const char*)&vecEnd, sizeof ( CVector ) );
+
+    // Send the packet
+    g_pNet->SendPacket ( PACKET_ID_PLAYER_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE );
+    g_pNet->DeallocateNetBitStream ( pBitStream );
+}
+
+
+//
+// Used to detect changes for keysync
+//
+void CNetAPI::GetLastSentControllerState ( CControllerState* pControllerState, float* pfCameraRotation, float* pfLastAimY )
+{
+    *pControllerState = m_LastSentControllerState;
+    *pfCameraRotation = m_fLastSentCameraRotation;
+    *pfLastAimY = m_fLastSentAimY;
+}
+
+void CNetAPI::SetLastSentControllerState ( const CControllerState& ControllerState, float fCameraRotation, float fLastAimY )
+{
+    m_TimeSinceMouseOrAnalogStateSent.Reset ();
+    m_LastSentControllerState = ControllerState;
+    m_fLastSentCameraRotation = fCameraRotation;
+    m_fLastSentAimY = fLastAimY;
 }

@@ -76,12 +76,21 @@ struct SDelayedSyncVehicleData
 
 struct SLastSyncedVehData
 {
+    SLastSyncedVehData ( void )
+    {
+        // Initialize to a known state
+        memset ( this, 0, sizeof ( *this ) );
+    }
+
     CVector             vecPosition;
     CVector             vecRotation;
     CVector             vecMoveSpeed;
     CVector             vecTurnSpeed;
     float               fHealth;
     ElementID           Trailer;
+    bool                bEngineOn;
+    bool                bDerailed;
+    bool                bIsInWater;
 };
 
 class CClientProjectile;
@@ -105,7 +114,6 @@ public:
 
     inline eClientEntityType    GetType                 ( void ) const                      { return CCLIENTVEHICLE; };
 
-    void                        GetName                 ( char* szBuf );
     inline const char*          GetNamePointer          ( void )                            { return m_pModelInfo->GetNameIfVehicle (); };
     inline eClientVehicleType   GetVehicleType          ( void )                            { return m_eVehicleType; };
 
@@ -333,7 +341,7 @@ public:
     void                        Interpolate             ( void );
     void                        UpdateKeysync           ( void );
 
-    void                        GetInitialDoorStates    ( unsigned char * pucDoorStates );
+    void                        GetInitialDoorStates    ( SFixedArray < unsigned char, MAX_DOORS >& ucOutDoorStates );
 
     void                        AddMatrix               ( CMatrix& Matrix, double dTime, unsigned short usTickRate );
     void                        AddVelocity             ( CVector& vecVelocity );
@@ -398,6 +406,18 @@ public:
     CHandlingEntry*             GetHandlingData         ( void );
     const CHandlingEntry*       GetOriginalHandlingData ( void )    { return m_pOriginalHandlingEntry; }
 
+    uint                            GetTimeSinceLastPush    ( void )                      { return (uint)( CTickCount::Now () - m_LastPushedTime ).ToLongLong (); }
+    void                            ResetLastPushTime       ( void )                      { m_LastPushedTime = CTickCount::Now (); }
+
+    bool                        DoesVehicleHaveSirens       ( void ) { return m_tSirenBeaconInfo.m_bOverrideSirens; }
+
+    bool                        GiveVehicleSirens           ( unsigned char ucSirenType, unsigned char ucSirenCount );
+    void                        SetVehicleSirenPosition     ( unsigned char ucSirenID, CVector vecPos );
+    void                        SetVehicleSirenMinimumAlpha ( unsigned char ucSirenID, DWORD dwPercentage );
+    void                        SetVehicleSirenColour       ( unsigned char ucSirenID, SColor tVehicleSirenColour );
+    void                        SetVehicleFlags             ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent );
+    void                        RemoveVehicleSirens         ( void );
+
 protected:
     void                        StreamIn                ( bool bInstantly );
     void                        StreamOut               ( void );
@@ -421,9 +441,9 @@ protected:
     bool                        m_bIsVirtualized;
     CVehicle*                   m_pVehicle;
     CClientPed*                 m_pDriver;
-    CClientPed*                 m_pPassengers [8];
+    SFixedArray < CClientPed*, 8 >  m_pPassengers;
     CClientPed*                 m_pOccupyingDriver;
-    CClientPed*                 m_pOccupyingPassengers [8];
+    SFixedArray < CClientPed*, 8 >  m_pOccupyingPassengers;
     RpClump*                    m_pClump;
     short                       m_usRemoveTimer;
 
@@ -448,14 +468,14 @@ protected:
     bool                        m_bLandingGearDown;
     bool                        m_bHasAdjustableProperty;
     unsigned short              m_usAdjustablePropertyValue;
-    bool                        m_bAllowDoorRatioSetting [ 6 ];
-    float                       m_fDoorOpenRatio [ 6 ];
+    SFixedArray < bool, 6 >     m_bAllowDoorRatioSetting;
+    SFixedArray < float, 6 >    m_fDoorOpenRatio;
     struct
     {
-        float                   fStart  [ 6 ];
-        float                   fTarget [ 6 ];
-        unsigned long           ulStartTime [ 6 ];
-        unsigned long           ulTargetTime [ 6 ];
+        SFixedArray < float, 6 >            fStart;
+        SFixedArray < float, 6 >            fTarget;
+        SFixedArray < unsigned long, 6 >    ulStartTime;
+        SFixedArray < unsigned long, 6 >    ulTargetTime;
     } m_doorInterp;
     bool                        m_bSwingingDoorsAllowed;
     bool                        m_bDoorsLocked;
@@ -466,10 +486,10 @@ protected:
     bool                        m_bScriptCanBeDamaged;
     bool                        m_bSyncUnoccupiedDamage;
     bool                        m_bTyresCanBurst;
-    unsigned char               m_ucDoorStates [MAX_DOORS];
-    unsigned char               m_ucWheelStates [MAX_WHEELS];
-    unsigned char               m_ucPanelStates [MAX_PANELS];
-    unsigned char               m_ucLightStates [MAX_LIGHTS];
+    SFixedArray < unsigned char, MAX_DOORS >   m_ucDoorStates;
+    SFixedArray < unsigned char, MAX_WHEELS >  m_ucWheelStates;
+    SFixedArray < unsigned char, MAX_PANELS >  m_ucPanelStates;
+    SFixedArray < unsigned char, MAX_LIGHTS >  m_ucLightStates;
     bool                        m_bJustBlewUp;
     eEntityStatus               m_NormalStatus;
     bool                        m_bColorSaved;
@@ -551,11 +571,16 @@ protected:
     unsigned char               m_ucVariation;
     unsigned char               m_ucVariation2;
 
+    CTickCount                  m_LastPushedTime;
+
 public:
+#ifdef MTA_DEBUG
     CClientPlayer *             m_pLastSyncer;
     unsigned long               m_ulLastSyncTime;
-    char *                      m_szLastSyncType;
+    const char *                m_szLastSyncType;
+#endif
     SLastSyncedVehData*         m_LastSyncedData;
+    SSirenInfo                  m_tSirenBeaconInfo;
 };
 
 #endif

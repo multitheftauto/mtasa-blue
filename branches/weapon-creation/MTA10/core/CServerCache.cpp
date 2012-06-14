@@ -427,7 +427,7 @@ bool CServerCache::GenerateServerList ( CServerList *pList )
         if ( info.nMaxPlayers == 0 || info.uiCacheNoReplyCount > 3 )
             continue;
 
-        ushort usGamePort = key.usGamePort + SERVER_LIST_QUERY_PORT_OFFSET;
+        ushort usGamePort = key.usGamePort;
         if ( usGamePort > 0 )
         {
             pList->AddUnique ( (in_addr&)key.ulIp, usGamePort );

@@ -23,7 +23,7 @@
 class CClientManager;
 class CClientVehicle;
 
-extern unsigned char g_ucMaxPassengers [];
+extern const SFixedArray < unsigned char, 212 > g_ucMaxPassengers;
 
 class CClientVehicleManager
 {
@@ -85,7 +85,6 @@ private:
     CMappedArray < CClientVehicle* >  m_List;
     std::vector < CClientVehicle* >   m_StreamedIn;
     std::list < CClientVehicle* >   m_Attached;
-
 };
 
 #endif

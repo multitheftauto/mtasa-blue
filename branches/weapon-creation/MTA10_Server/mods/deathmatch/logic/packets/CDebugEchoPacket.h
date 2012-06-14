@@ -28,15 +28,16 @@ public:
                                                           unsigned char ucRed = 255,
                                                           unsigned char ucGreen = 255,
                                                           unsigned char ucBlue = 255                                                          
-                                                           )    { strncpy ( m_szMessage, szMessage, MAX_DEBUGECHO_LENGTH ); m_szMessage [MAX_DEBUGECHO_LENGTH] = 0; m_ucRed = ucRed; m_ucGreen = ucGreen; m_ucBlue = ucBlue; m_uiLevel = uiLevel; };
+                                                           )    { m_strMessage.AssignLeft( szMessage, MAX_DEBUGECHO_LENGTH );  m_ucRed = ucRed; m_ucGreen = ucGreen; m_ucBlue = ucBlue; m_uiLevel = uiLevel; }
 
     inline ePacketID                GetPacketID                 ( void ) const              { return PACKET_ID_DEBUG_ECHO; };
-    inline unsigned long            GetFlags                    ( void ) const              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline unsigned long            GetFlags                    ( void ) const              { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    virtual ePacketOrdering         GetPacketOrdering           ( void ) const              { return PACKET_ORDERING_CHAT; }
 
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
-    inline const char*      GetMessage                  ( void )                    { return m_szMessage; };
-    void                    SetMessage                  ( const char* szMessage )   { strncpy ( m_szMessage, szMessage, MAX_CHATECHO_LENGTH ); };
+    inline const char*      GetMessage                  ( void )                    { return m_strMessage; };
+    void                    SetMessage                  ( const char* szMessage )   { m_strMessage.AssignLeft( szMessage, MAX_CHATECHO_LENGTH ); }
     inline unsigned int     GetLevel                    ( void )                    { return m_uiLevel; }
     inline void             SetLevel                    ( unsigned int uiLevel )    { m_uiLevel = uiLevel; }
     inline void             SetColor                    ( unsigned char ucRed,
@@ -48,7 +49,7 @@ private:
     unsigned char           m_ucGreen;
     unsigned char           m_ucBlue;
     unsigned int            m_uiLevel;
-    char                    m_szMessage [MAX_DEBUGECHO_LENGTH + 1];
+    SString                 m_strMessage;
 };
 
 #endif

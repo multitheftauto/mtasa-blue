@@ -42,6 +42,7 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getFarClipDistance", CLuaWorldDefs::getFarClipDistance );
     CLuaCFunctions::AddFunction ( "getFogDistance", CLuaWorldDefs::getFogDistance );
     CLuaCFunctions::AddFunction ( "getAircraftMaxHeight", CLuaWorldDefs::getAircraftMaxHeight );
+    CLuaCFunctions::AddFunction ( "getOcclusionsEnabled", CLuaWorldDefs::getOcclusionsEnabled );
 
     // Set
     CLuaCFunctions::AddFunction ( "setTime", CLuaWorldDefs::setTime );
@@ -68,6 +69,8 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setFarClipDistance", CLuaWorldDefs::setFarClipDistance );
     CLuaCFunctions::AddFunction ( "setFogDistance", CLuaWorldDefs::setFogDistance );
     CLuaCFunctions::AddFunction ( "setAircraftMaxHeight", CLuaWorldDefs::setAircraftMaxHeight );
+    CLuaCFunctions::AddFunction ( "setOcclusionsEnabled", CLuaWorldDefs::setOcclusionsEnabled );
+    CLuaCFunctions::AddFunction ( "setDevelopmentMode", CLuaWorldDefs::setDevelopmentMode );
 
     // Reset
     CLuaCFunctions::AddFunction ( "resetSkyGradient", CLuaWorldDefs::resetSkyGradient );
@@ -78,6 +81,9 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "resetWindVelocity", CLuaWorldDefs::resetWindVelocity );
     CLuaCFunctions::AddFunction ( "resetFarClipDistance", CLuaWorldDefs::resetFarClipDistance );
     CLuaCFunctions::AddFunction ( "resetFogDistance", CLuaWorldDefs::resetFogDistance );
+    CLuaCFunctions::AddFunction ( "removeWorldModel", CLuaWorldDefs::RemoveWorldModel );
+    CLuaCFunctions::AddFunction ( "restoreWorldModel", CLuaWorldDefs::RestoreWorldModel );
+    CLuaCFunctions::AddFunction ( "restoreAllWorldModels", CLuaWorldDefs::RestoreAllWorldModels );
 }
 
 
@@ -136,10 +142,10 @@ int CLuaWorldDefs::getZoneName ( lua_State* luaVM )
         if ( lua_type ( luaVM, 4 ) == LUA_TBOOLEAN )
             bCitiesOnly = ( lua_toboolean ( luaVM, 4 ) ) ? true:false;
 
-        char szZoneName [ 128 ];
-        if ( CStaticFunctionDefinitions::GetZoneName ( vecPosition, szZoneName, 128, bCitiesOnly ) )
+        SString strZoneName;
+        if ( CStaticFunctionDefinitions::GetZoneName ( vecPosition, strZoneName, bCitiesOnly ) )
         {
-            lua_pushstring ( luaVM, szZoneName );
+            lua_pushstring ( luaVM, strZoneName );
             return 1;
         }
     }
@@ -989,6 +995,63 @@ int CLuaWorldDefs::resetFogDistance ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaWorldDefs::RemoveWorldModel ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+
+    unsigned short usModel = 0;
+    float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+    argStream.ReadNumber ( usModel );
+    argStream.ReadNumber ( fRadius );
+    argStream.ReadNumber ( fX );
+    argStream.ReadNumber ( fY );
+    argStream.ReadNumber ( fZ );
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( CStaticFunctionDefinitions::RemoveWorldModel ( usModel, fRadius, fX, fY, fZ ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::RestoreWorldModel ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+
+    unsigned short usModel = 0;
+    float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+    argStream.ReadNumber ( usModel );
+    argStream.ReadNumber ( fRadius );
+    argStream.ReadNumber ( fX );
+    argStream.ReadNumber ( fY );
+    argStream.ReadNumber ( fZ );
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( CStaticFunctionDefinitions::RestoreWorldModel ( usModel, fRadius, fX, fY, fZ ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::RestoreAllWorldModels ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::RestoreAllWorldModels ( ) )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaWorldDefs::setFPSLimit ( lua_State* luaVM )
 {
     int iArgument1 = lua_type ( luaVM, 1 );
@@ -1165,3 +1228,58 @@ int CLuaWorldDefs::getAircraftMaxHeight ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaWorldDefs::setOcclusionsEnabled ( lua_State* luaVM )
+{
+//  bool setOcclusionsEnabled ( bool enabled )
+    bool bEnabled;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadBool( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetOcclusionsEnabled ( bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setOcclusionsEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::getOcclusionsEnabled ( lua_State* luaVM )
+{
+    bool bEnabled;
+    if ( CStaticFunctionDefinitions::GetOcclusionsEnabled ( bEnabled ) )
+    {
+        lua_pushboolean ( luaVM, bEnabled );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::setDevelopmentMode ( lua_State* luaVM )
+{
+//  bool setDevelopmentMode ( string command )
+    SString strCommand;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strCommand );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pGame->SetDevSetting ( strCommand );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setDevelopmentMode", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

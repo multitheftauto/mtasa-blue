@@ -59,6 +59,9 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 
     m_bNotifyServerBrowser = bNotifyServerBrowser;
 
+    // Hide certain questions
+    CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->OnConnect ();
+
     // Hide the server queue
     CServerInfo::GetSingletonPtr()->Hide( );
 
@@ -110,11 +113,6 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     // Set our packet handler
     pNet->RegisterPacketHandler ( CConnectManager::StaticProcessPacket );
 
-    // Set encryption option
-    int iVar;
-    CVARS_GET ( "network_encryption", iVar );
-    pNet->SetEncryptionEnabled ( iVar != 0 );
-
     // Try to start a network to connect
     if ( m_usPort && !pNet->StartNetwork ( m_strHost.c_str (), m_usPort ) )
     {
@@ -126,9 +124,13 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     m_bIsConnecting = true;
     m_tConnectStarted = time ( NULL );
 
+    // Load server password
+    if ( m_strPassword.empty () )
+        m_strPassword = CServerBrowser::GetSingletonPtr()->GetServerPassword ( m_strHost + ":" + SString ( "%u", m_usPort ) );
+
     // Start server version detection
     SAFE_DELETE ( m_pServerItem );
-    m_pServerItem = new CServerListItem ( m_Address, m_usPort + SERVER_LIST_QUERY_PORT_OFFSET );
+    m_pServerItem = new CServerListItem ( m_Address, m_usPort );
     m_pServerItem->m_iTimeoutLength = 2000;
     m_bIsDetectingVersion = true;
 
@@ -157,7 +159,7 @@ bool CConnectManager::Reconnect ( const char* szHost, unsigned short usPort, con
     {
         m_strHost = szHost;
     }
-    if ( szPassword )
+    if ( szPassword && szPassword[0] )
     {
         m_strPassword = szPassword;
     }
@@ -261,7 +263,7 @@ void CConnectManager::DoPulse ( void )
                 SString strError;
                 switch ( ucError )
                 {
-                    case RID_PUBLIC_KEY_MISMATCH:
+                    case RID_RSA_PUBLIC_KEY_MISMATCH:
                         strError = "Disconnected: unknown protocol error";  // encryption key mismatch
                         break;
                     case RID_REMOTE_DISCONNECTION_NOTIFICATION:
@@ -365,7 +367,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                 }
 
                 //Set the current server info and Add the ASE Offset to the Query port)
-                CCore::GetSingleton().SetCurrentServer ( g_pConnectManager->m_Address, g_pConnectManager->m_usPort + 123 );
+                CCore::GetSingleton().SetCurrentServer ( g_pConnectManager->m_Address, g_pConnectManager->m_usPort );
 
                 SetApplicationSettingInt ( "last-server-ip", g_pConnectManager->m_Address.s_addr );
                 SetApplicationSettingInt ( "last-server-port", g_pConnectManager->m_usPort );

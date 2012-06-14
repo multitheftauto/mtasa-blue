@@ -17,7 +17,6 @@ CClientDFF::CClientDFF ( CClientManager* pManager, ElementID ID ) : ClassInit ( 
     m_pManager = pManager;
     m_pDFFManager = pManager->GetDFFManager ();
 
-    m_pLoadedClump = NULL;
     SetTypeName ( "dff" );
 
     // Add us to DFF manager list
@@ -33,47 +32,80 @@ CClientDFF::~CClientDFF ( void )
     // Restore all our models
     RestoreModels ();
 
-    // Unload our DFF
+    // Unload our clumps
     UnloadDFF ();
 }
 
 
-bool CClientDFF::LoadDFF ( const char* szFile, unsigned short usCollisionModel )
+// Get a clump which has been loaded to replace the specified model id
+RpClump* CClientDFF::GetLoadedClump ( ushort usModelId )
 {
-    // We can't have two clumps loaded.
-    if ( !m_pLoadedClump )
+    if ( usModelId == 0 )
+        return NULL;
+
+    SLoadedClumpInfo& info = MapGet ( m_LoadedClumpInfoMap, usModelId );
+
+    if ( !info.bTriedLoad )
     {
-        if ( !g_pCore->GetNetwork ()->CheckFile ( "dff", szFile ) )
-            return false;
+        info.bTriedLoad = true;
+
+        // Make sure previous model+collision is loaded
+        m_pManager->GetModelRequestManager ()->RequestBlocking ( usModelId, "CClientDFF::LoadDFF" );
 
         // Attempt loading it
-        m_pLoadedClump = g_pGame->GetRenderWare ()->ReadDFF ( szFile, usCollisionModel );
-
-        // Return whether we succeeded or not
-        return ( m_pLoadedClump != NULL );
+        info.pClump = g_pGame->GetRenderWare ()->ReadDFF ( m_strDffFilename, usModelId, CClientVehicleManager::IsValidModel ( usModelId ) );
     }
 
-    // We failed
-    return false;
+    return info.pClump;
+}
+
+
+bool CClientDFF::LoadDFF ( const char* szFile, unsigned short usModelId )
+{
+    // Should only be called once, directly after construction
+    assert ( m_strDffFilename.empty () );
+
+    m_strDffFilename = szFile;
+    if ( m_strDffFilename.empty () )
+        return false;
+
+    if ( !FileExists ( m_strDffFilename ) )
+        return false;
+
+    if ( !g_pCore->GetNetwork ()->CheckFile ( "dff", m_strDffFilename ) )
+        return false;
+
+    // Do load now if a model id was supplied
+    if ( usModelId != 0 )
+    {
+        if ( GetLoadedClump ( usModelId ) == NULL )
+            return false;
+    }
+
+    return true;
 }
 
 
 void CClientDFF::UnloadDFF ( void )
 {
-    // We have a clump loaded?
-    if ( m_pLoadedClump )
+    for ( std::map < ushort, SLoadedClumpInfo >::iterator iter = m_LoadedClumpInfoMap.begin () ; iter != m_LoadedClumpInfoMap.end () ; ++iter )
     {
-        // Destroy it and null it
-        g_pGame->GetRenderWare ()->DestroyDFF ( m_pLoadedClump );
-        m_pLoadedClump = NULL;
+        SLoadedClumpInfo& info = iter->second;
+        if ( info.pClump )
+            g_pGame->GetRenderWare ()->DestroyDFF ( info.pClump );
     }
+
+    m_LoadedClumpInfoMap.clear ();
 }
 
 
 bool CClientDFF::ReplaceModel ( unsigned short usModel )
 {
+    // Get clump loaded for this model id
+    RpClump* pClump = GetLoadedClump ( usModel );
+
     // We have a DFF?
-    if ( m_pLoadedClump )
+    if ( pClump )
     {
         // Have someone already replaced that model?
         CClientDFF* pReplaced = m_pDFFManager->GetElementThatReplaced ( usModel );
@@ -88,19 +120,19 @@ bool CClientDFF::ReplaceModel ( unsigned short usModel )
         // Is it an object model?
         if ( CClientObjectManager::IsValidModel ( usModel ) )
         {
-            return ReplaceObjectModel ( usModel );
+            return ReplaceObjectModel ( pClump, usModel );
         }
 
         // Is it a vehicle model?
         else if ( CClientVehicleManager::IsValidModel ( usModel ) )
         {
-            return ReplaceVehicleModel ( usModel );
+            return ReplaceVehicleModel ( pClump, usModel );
         }
 
         else
         {
             // Weapon model replacement - Figure out how to reload weapons here!
-            return ReplaceWeaponModel ( usModel );
+            return ReplaceWeaponModel ( pClump, usModel );
         }
     }
 
@@ -193,7 +225,7 @@ void CClientDFF::InternalRestoreModel ( unsigned short usModel )
 }
 
 
-bool CClientDFF::ReplaceObjectModel ( unsigned short usModel )
+bool CClientDFF::ReplaceObjectModel ( RpClump* pClump, ushort usModel )
 {
     // Stream out all the object models with matching ID.
     // Streamer will stream them back in async after a frame
@@ -203,7 +235,7 @@ bool CClientDFF::ReplaceObjectModel ( unsigned short usModel )
 
     // Grab the model info for that model and replace the model
     CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModel );
-    pModelInfo->SetCustomModel ( m_pLoadedClump );
+    pModelInfo->SetCustomModel ( pClump );
 
     // Remember that we've replaced that object model
     m_Replaced.push_back ( usModel );
@@ -212,7 +244,7 @@ bool CClientDFF::ReplaceObjectModel ( unsigned short usModel )
     return true;
 }
 
-bool CClientDFF::ReplaceWeaponModel ( unsigned short usModel )
+bool CClientDFF::ReplaceWeaponModel ( RpClump* pClump, ushort usModel )
 {
     // Stream out all the weapon models with matching ID.
     // Streamer will stream them back in async after a frame
@@ -222,7 +254,7 @@ bool CClientDFF::ReplaceWeaponModel ( unsigned short usModel )
 
     // Grab the model info for that model and replace the model
     CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModel );
-    pModelInfo->SetCustomModel ( m_pLoadedClump );
+    pModelInfo->SetCustomModel ( pClump );
 
     // Remember that we've replaced that weapon model
     m_Replaced.push_back ( usModel );
@@ -231,7 +263,7 @@ bool CClientDFF::ReplaceWeaponModel ( unsigned short usModel )
     return true;
 }
 
-bool CClientDFF::ReplacePedModel ( unsigned short usModel )
+bool CClientDFF::ReplacePedModel ( RpClump* pClump, ushort usModel )
 {
     // Stream out all the weapon models with matching ID.
     // Streamer will stream them back in async after a frame
@@ -241,7 +273,7 @@ bool CClientDFF::ReplacePedModel ( unsigned short usModel )
 
     // Grab the model info for that model and replace the model
     CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModel );
-    pModelInfo->SetCustomModel ( m_pLoadedClump );
+    pModelInfo->SetCustomModel ( pClump );
 
     // Remember that we've replaced that weapon model
     m_Replaced.push_back ( usModel );
@@ -250,19 +282,22 @@ bool CClientDFF::ReplacePedModel ( unsigned short usModel )
     return true;
 }
 
-bool CClientDFF::ReplaceVehicleModel ( unsigned short usModel )
+bool CClientDFF::ReplaceVehicleModel ( RpClump* pClump, ushort usModel )
 {
+    // Make sure previous model+collision is loaded
+    m_pManager->GetModelRequestManager ()->RequestBlocking ( usModel, "CClientDFF::ReplaceVehicleModel" );
+
+    // Grab the model info for that model and replace the model
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModel );
+    pModelInfo->SetCustomModel ( pClump );
+
+    // Remember that we've replaced that vehicle model
+    m_Replaced.push_back ( usModel );
+
     // Stream out all the vehicle models with matching ID.
     // Streamer will stream them back in async after a frame
     // or so.
     m_pManager->GetVehicleManager ()->RestreamVehicles ( usModel );
-
-    // Grab the model info for that model and replace the model
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModel );
-    pModelInfo->SetCustomModel ( m_pLoadedClump );
-
-    // Remember that we've replaced that vehicle model
-    m_Replaced.push_back ( usModel );
 
     // Success
     return true;

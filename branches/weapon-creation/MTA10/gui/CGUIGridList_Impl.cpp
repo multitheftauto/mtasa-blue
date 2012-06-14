@@ -701,3 +701,13 @@ CGUIListItem_Impl* CGUIGridList_Impl::GetListItem ( CEGUI::ListboxItem* pItem )
 
     return it->second;
 }
+
+
+void CGUIGridList_Impl::SetVerticalScrollPosition ( float fPosition )
+{
+    CEGUI::Scrollbar* pScrollbar = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow )->d_vertScrollbar;
+    if ( pScrollbar )
+    {
+        pScrollbar->setScrollPosition ( fPosition );
+    }
+}

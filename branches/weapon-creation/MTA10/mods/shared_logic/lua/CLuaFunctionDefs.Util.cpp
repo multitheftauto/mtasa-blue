@@ -427,7 +427,7 @@ int CLuaFunctionDefs::GetColorFromString ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getDistanceBetweenPoints2D", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getColorFromString", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -653,18 +653,14 @@ int CLuaFunctionDefs::GetNetworkStats ( lua_State* luaVM )
     NetStatistics stats;
     if ( g_pNet->GetNetworkStatistics ( &stats ) )
     {
-        uint uiNumMessagesInSendBuffer = 0;
-        for ( int i = 0; i < PACKET_PRIORITY_COUNT; ++i )
-            uiNumMessagesInSendBuffer += stats.messageInSendBuffer[i];
-
         lua_createtable ( luaVM, 0, 11 );
 
         lua_pushstring ( luaVM, "bytesReceived" );
-        lua_pushnumber ( luaVM, static_cast < double > ( stats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] ) );
+        lua_pushnumber ( luaVM, static_cast < double > ( stats.bytesReceived ) );
         lua_settable   ( luaVM, -3 );
 
         lua_pushstring ( luaVM, "bytesSent" );
-        lua_pushnumber ( luaVM, static_cast < double > ( stats.runningTotal [ NS_ACTUAL_BYTES_SENT ] ) );
+        lua_pushnumber ( luaVM, static_cast < double > ( stats.bytesSent ) );
         lua_settable   ( luaVM, -3 );
 
         lua_pushstring ( luaVM, "packetsReceived" );
@@ -684,7 +680,7 @@ int CLuaFunctionDefs::GetNetworkStats ( lua_State* luaVM )
         lua_settable   ( luaVM, -3 );
 
         lua_pushstring ( luaVM, "messagesInSendBuffer" );
-        lua_pushnumber ( luaVM, uiNumMessagesInSendBuffer );
+        lua_pushnumber ( luaVM, stats.messagesInSendBuffer );
         lua_settable   ( luaVM, -3 );
 
         lua_pushstring ( luaVM, "messagesInResendBuffer" );
@@ -885,7 +881,7 @@ int CLuaFunctionDefs::GetPerformanceStats ( lua_State* luaVM )
         {
             const SString& name = Result.ColumnName ( c );
             lua_pushnumber ( luaVM, c+1 );                      // row index number (starting at 1, not 0)
-            lua_pushlstring ( luaVM, (char *)name.c_str (), name.length() );
+            lua_pushlstring ( luaVM, name.c_str (), name.length() );
             lua_settable ( luaVM, -3 );
         }
 
@@ -901,7 +897,7 @@ int CLuaFunctionDefs::GetPerformanceStats ( lua_State* luaVM )
             {
                 SString& cell = Result.Data ( c, r );
                 lua_pushnumber ( luaVM, c+1 );
-                lua_pushlstring ( luaVM, (char *)cell.c_str (), cell.length () );
+                lua_pushlstring ( luaVM, cell.c_str (), cell.length () );
                 lua_settable ( luaVM, -3 );
             }
             lua_pop ( luaVM, 1 );                               // pop the inner table
@@ -919,9 +915,17 @@ int CLuaFunctionDefs::GetPerformanceStats ( lua_State* luaVM )
 int CLuaFunctionDefs::SetDevelopmentMode ( lua_State* luaVM )
 {
 //  bool setDevelopmentMode ( bool enable )
-    bool bEnable;
+//  bool setDevelopmentMode ( string command )
+    bool bEnable; SString strCommand;
 
     CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsString () )
+    {
+        argStream.ReadString ( strCommand );
+        g_pClientGame->SetDevSetting ( strCommand );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
     argStream.ReadBool ( bEnable );
 
     if ( !argStream.HasErrors () )
@@ -943,5 +947,43 @@ int CLuaFunctionDefs::GetDevelopmentMode ( lua_State* luaVM )
 //  bool getDevelopmentMode ()
     bool bResult = g_pClientGame->GetDevelopmentMode ();
     lua_pushboolean ( luaVM, bResult );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::DownloadFile ( lua_State* luaVM )
+{
+    // Grab our VM
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        // Grab its resource
+        CResource * pResource = pLuaMain->GetResource();
+        if ( pResource )
+        {
+            const char* szFile = {0};
+            int iArgument = lua_type ( luaVM, 1 );
+            if ( iArgument == LUA_TSTRING )
+            {
+                szFile = lua_tostring ( luaVM, 1 );
+                std::list < CResourceFile* > ::const_iterator iter = pResource->IterBeginResourceFiles();
+                for ( ; iter != pResource->IterEndResourceFiles() ; iter++ ) 
+                {
+                    if ( strcmp ( szFile, (*iter)->GetShortName() ) == 0 )
+                    {
+                        if ( CStaticFunctionDefinitions::DownloadFile ( pResource, szFile, (*iter)->GetServerChecksum() ) )
+                        {
+                            lua_pushboolean ( luaVM, true );
+                            return 1;
+                        }
+                    }
+                }
+                m_pScriptDebugging->LogCustom ( luaVM, 255, 255, 255, "downloadFile: File doesn't exist" );
+            }
+            else
+                m_pScriptDebugging->LogBadType ( luaVM, "downloadFile" );
+        }
+    }
+    lua_pushboolean ( luaVM, false );
     return 1;
 }

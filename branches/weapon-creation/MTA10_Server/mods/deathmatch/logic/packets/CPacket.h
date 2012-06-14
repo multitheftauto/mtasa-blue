@@ -30,6 +30,9 @@ enum
     PACKET_SEQUENCED = 2,
     PACKET_HIGH_PRIORITY = 4,
     PACKET_LOW_PRIORITY = 8,
+
+    PACKET_UNRELIABLE = 0,
+    PACKET_MEDIUM_PRIORITY = 0,
 };
 
 class CPacket
@@ -56,7 +59,7 @@ public:
 
 protected:
     CElement*                           m_pSourceElement;
-    NetServerPlayerID                   m_Source;    
+    NetServerPlayerID                   m_Source;
 };
 
 #endif

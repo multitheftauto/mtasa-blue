@@ -19,4 +19,11 @@ namespace SharedUtil
         enum { COUNT = 1 + NumberOfSignificantBits<(N >> 1)>::COUNT };
     };
     template <> struct NumberOfSignificantBits<0> { enum { COUNT = 0 }; };
+
+
+    template < class T >
+    T Square ( const T& value )
+    {
+        return value * value;
+    }
 }

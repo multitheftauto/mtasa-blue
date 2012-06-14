@@ -151,7 +151,7 @@ bool CResource::RefreshAutoPermissions ( CXMLNode* pNodeAclRequest )
     // If any rights are pending, print message
     if ( bHasPending )
     {
-        CLogger::LogPrintf ( "Resource '%s' requests some acl rights. Use the command 'aclrequest review %s'\n", GetName ().c_str (), GetName ().c_str () );
+        CLogger::LogPrintf ( "Resource '%s' requests some acl rights. Use the command 'aclrequest list %s'\n", GetName ().c_str (), GetName ().c_str () );
     }
 
     return bHasPending;

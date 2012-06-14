@@ -41,7 +41,7 @@ CLuaManager::CLuaManager ( CObjectManager* pObjectManager,
 
     // Create our lua dynamic module manager
     m_pLuaModuleManager = new CLuaModuleManager ( this );
-    m_pLuaModuleManager->_SetScriptDebugging ( g_pGame->GetScriptDebugging() );
+    m_pLuaModuleManager->SetScriptDebugging ( g_pGame->GetScriptDebugging() );
 
     // Load our C Functions into LUA and hook callback
     CLuaCFunctions::InitializeHashMaps ();
@@ -92,7 +92,7 @@ CLuaMain * CLuaManager::CreateVirtualMachine ( CResource* pResourceOwner )
     m_virtualMachines.push_back ( vm );
     vm->InitVM ();
 
-    m_pLuaModuleManager->_RegisterFunctions ( vm->GetVirtualMachine() );
+    m_pLuaModuleManager->RegisterFunctions ( vm->GetVirtualMachine() );
 
     return vm;
 }
@@ -128,7 +128,7 @@ void CLuaManager::DoPulse ( void )
     {
         (*iter)->DoPulse();
     }
-    m_pLuaModuleManager->_DoPulse ();
+    m_pLuaModuleManager->DoPulse ();
 }
 
 CLuaMain* CLuaManager::GetVirtualMachine ( lua_State* luaVM )
@@ -146,25 +146,6 @@ CLuaMain* CLuaManager::GetVirtualMachine ( lua_State* luaVM )
     for ( ; iter != m_virtualMachines.end (); iter++ )
     {
         if ( luaVM == (*iter)->GetVirtualMachine () )
-        {
-            return *iter;
-        }
-    }
-
-    // Doesn't exist
-    return NULL;
-}
-
-
-CLuaMain* CLuaManager::GetVirtualMachine ( const char* szFilename )
-{
-    assert ( szFilename );
-
-    // Find a matching VM in our list
-    list < CLuaMain* >::const_iterator iter = m_virtualMachines.begin ();
-    for ( ; iter != m_virtualMachines.end (); iter++ )
-    {
-        if ( strcmp ( szFilename, (*iter)->GetScriptNamePointer () ) == 0 )
         {
             return *iter;
         }
@@ -237,6 +218,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "cancelEvent", CLuaFunctionDefinitions::CancelEvent );
     CLuaCFunctions::AddFunction ( "wasEventCancelled", CLuaFunctionDefinitions::WasEventCancelled );
     CLuaCFunctions::AddFunction ( "getCancelReason", CLuaFunctionDefinitions::GetCancelReason );
+    CLuaCFunctions::AddFunction ( "triggerLatentClientEvent", CLuaFunctionDefinitions::TriggerLatentClientEvent );
+    CLuaCFunctions::AddFunction ( "getLatentEventHandles", CLuaFunctionDefinitions::GetLatentEventHandles );
+    CLuaCFunctions::AddFunction ( "getLatentEventStatus", CLuaFunctionDefinitions::GetLatentEventStatus );
+    CLuaCFunctions::AddFunction ( "cancelLatentEvent", CLuaFunctionDefinitions::CancelLatentEvent );
 
     // Ped funcs
     CLuaCFunctions::AddFunction ( "createPed", CLuaFunctionDefinitions::CreatePed );
@@ -289,6 +274,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPlayerName", CLuaFunctionDefinitions::SetPlayerName );
     CLuaCFunctions::AddFunction ( "detonateSatchels", CLuaFunctionDefinitions::DetonateSatchels );
     CLuaCFunctions::AddFunction ( "setWeaponProperty", CLuaFunctionDefinitions::SetWeaponProperty );
+    CLuaCFunctions::AddFunction ( "takePlayerScreenShot", CLuaFunctionDefinitions::TakePlayerScreenShot );
 
     // Ped get functions
     CLuaCFunctions::AddFunction ( "getPedWeaponSlot", CLuaFunctionDefinitions::GetPedWeaponSlot );
@@ -442,6 +428,11 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleTurretPosition", CLuaFunctionDefinitions::SetVehicleTurretPosition );
     CLuaCFunctions::AddFunction ( "setVehicleDoorOpenRatio", CLuaFunctionDefinitions::SetVehicleDoorOpenRatio );
     CLuaCFunctions::AddFunction ( "setVehicleVariant", CLuaFunctionDefinitions::SetVehicleVariant );
+    CLuaCFunctions::AddFunction ( "addVehicleSirens", CLuaFunctionDefinitions::GiveVehicleSirens );
+    CLuaCFunctions::AddFunction ( "removeVehicleSirens", CLuaFunctionDefinitions::RemoveVehicleSirens );
+    CLuaCFunctions::AddFunction ( "setVehicleSirens", CLuaFunctionDefinitions::SetVehicleSirens );
+    CLuaCFunctions::AddFunction ( "getVehicleSirens", CLuaFunctionDefinitions::GetVehicleSirens );
+    CLuaCFunctions::AddFunction ( "getVehicleSirenParams", CLuaFunctionDefinitions::GetVehicleSirenParams );
 
     // Marker functions
     CLuaCFunctions::AddFunction ( "createMarker", CLuaFunctionDefinitions::CreateMarker );
@@ -681,6 +672,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getAccountPlayer", CLuaFunctionDefinitions::GetAccountPlayer );
     CLuaCFunctions::AddFunction ( "isGuestAccount", CLuaFunctionDefinitions::IsGuestAccount );
     CLuaCFunctions::AddFunction ( "getAccountData", CLuaFunctionDefinitions::GetAccountData );
+    CLuaCFunctions::AddFunction ( "getAllAccountData", CLuaFunctionDefinitions::GetAllAccountData );
     CLuaCFunctions::AddFunction ( "getAccount", CLuaFunctionDefinitions::GetAccount );
     CLuaCFunctions::AddFunction ( "getAccounts", CLuaFunctionDefinitions::GetAccounts );
 
@@ -703,6 +695,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "removeBan", CLuaFunctionDefinitions::RemoveBan );
 
     CLuaCFunctions::AddFunction ( "getBans", CLuaFunctionDefinitions::GetBans );
+    CLuaCFunctions::AddFunction ( "reloadBans", CLuaFunctionDefinitions::ReloadBanList );
 
     CLuaCFunctions::AddFunction ( "getBanIP", CLuaFunctionDefinitions::GetBanIP );
     CLuaCFunctions::AddFunction ( "getBanSerial", CLuaFunctionDefinitions::GetBanSerial );
@@ -728,6 +721,7 @@ void CLuaManager::LoadCFunctions ( void )
     */
 
     CLuaCFunctions::AddFunction ( "callRemote", CLuaFunctionDefinitions::CallRemote );
+    CLuaCFunctions::AddFunction ( "fetchRemote", CLuaFunctionDefinitions::FetchRemote );
 
     // Cursor get funcs
     CLuaCFunctions::AddFunction ( "isCursorShowing", CLuaFunctionDefinitions::IsCursorShowing );

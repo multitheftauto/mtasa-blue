@@ -15,7 +15,7 @@
 struct {
     ushort usID;
     const char* szName;
-} static bigFOTable[] = {
+} static const bigFOTable[] = {
     9557, "lake_sfw", 8487, "ballyswtr01_lvs", 8324, "vgsbboardsigns10", 7926, "vgnabatoir2", 7708, "vegaswestbmb02", 6972, "shamparklvl1",
     6964, "venefountwat02", 5844, "lawnmart_alpha", 5791, "shutters02_LAwN", 5786, "shutters01_LAwN", 5639, "LAEdirtapha", 5375, "alphbrk91_las2",
     5374, "alphbrk9_las2", 5373, "alphbrk8_las2", 5372, "alphbrk7_las2", 5371, "alphbrk6_las2", 5370, "alphbrk5_las2", 5369, "alphbrk4_las2",
@@ -1760,6 +1760,15 @@ void CModelNames::InitializeMaps ( void )
     {
         ushort usID = bigFOTable[i].usID;
         const char* szName = bigFOTable[i].szName;
+        MapSet ( ms_ModelIDNameMap, usID, szName );
+        MapSet ( ms_NameModelIDMap, SStringX ( szName ).ToLower (), usID );
+    }
+
+    // Include vehicle names as well
+    for ( uint i = 400 ; i <= 610 ; i++ )
+    {
+        ushort usID = i;
+        const char* szName = CVehicleNames::GetVehicleName ( i );
         MapSet ( ms_ModelIDNameMap, usID, szName );
         MapSet ( ms_NameModelIDMap, SStringX ( szName ).ToLower (), usID );
     }

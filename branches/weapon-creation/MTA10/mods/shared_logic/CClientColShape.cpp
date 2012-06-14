@@ -76,9 +76,12 @@ bool CClientColShape::IsAttachable ( void )
 
 void CClientColShape::SetPosition ( const CVector& vecPosition )
 {
-    m_vecPosition = vecPosition;
-    UpdateSpatialData ();
-    CStaticFunctionDefinitions::RefreshColShapeColliders ( this );
+    if ( vecPosition != m_vecPosition )
+    {
+        m_vecPosition = vecPosition;
+        UpdateSpatialData ();
+        CStaticFunctionDefinitions::RefreshColShapeColliders ( this );
+    }
 };
 
 

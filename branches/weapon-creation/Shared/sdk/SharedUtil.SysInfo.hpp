@@ -314,20 +314,30 @@ long long SharedUtil::GetWMIVideoAdapterMemorySize ( const SString& strDisplay )
 
         // Get WMI info about all video controllers
         SQueryWMIResult result;
-        QueryWMI ( result, "Win32_VideoController", "PNPDeviceID,AdapterRAM" );
+        QueryWMI ( result, "Win32_VideoController", "PNPDeviceID,AdapterRAM,Availability" );
 
         // Check each controller for a device id match
         for ( uint i = 0 ; i < result.size () ; i++ )
         {
             const SString& PNPDeviceID = result[i][0];
             const SString& AdapterRAM = result[i][1];
+            const SString& Availability = result[i][2];
+
+            long long llAdapterRAM = _atoi64 ( AdapterRAM );
+            int iAvailability = atoi ( Availability );
 
             if ( llResult == 0 )
-                llResult = _atoi64 ( AdapterRAM );
+                llResult = llAdapterRAM;
 
-            if ( llResult != 0 )
+            if ( iAvailability == 3 )
+                llResult = Max ( llResult, llAdapterRAM );
+
+            if ( llAdapterRAM != 0 )
                 if ( PNPDeviceID.BeginsWithI ( strDeviceId ) )
+                {
+                    llResult = llAdapterRAM;
                     break;  // Found match
+                }
         }
     }
 

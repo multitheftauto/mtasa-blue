@@ -67,11 +67,14 @@ public:
     void                _UseProvidedURLs                    ( void );
     void                _UseDataFiles2URLs                   ( void );
     void                _UseReportLogURLs                   ( void );
+    void                _UseCrashDumpQueryURLs              ( void );
     void                _UseCrashDumpURLs                   ( void );
     void                _UseSidegradeURLs                   ( void );
     void                _UseNewsUpdateURLs                  ( void );
     void                _UseReportLogPostContent            ( void );
     void                _UseCrashDumpPostContent            ( void );
+    void                _ShouldSendCrashDump                ( void );
+    void                _ResetLastCrashDump                 ( void );
     void                _ActionReconnect                    ( void );
     void                _DialogHide                         ( void );
     void                _End                                ( void );
@@ -106,6 +109,7 @@ public:
     void                _DialogSidegradeLaunchQuestion      ( void );
     void                _DialogSidegradeQueryError          ( void );
 
+    void                _ProcessCrashDumpQuery              ( void );
     void                _ProcessMasterFetch                 ( void );
     void                _ProcessPatchFileQuery              ( void );
     void                _ProcessPatchFileDownload           ( void );
@@ -408,6 +412,8 @@ void CVersionUpdater::DoPulse ( void )
     if ( !m_bEnabled )
         return;
 
+    TIMING_CHECKPOINT( "+VersionUpdaterPulse" );
+
     EnsureLoadedConfigFromXML ();
 
     //
@@ -438,7 +444,7 @@ void CVersionUpdater::DoPulse ( void )
     //
     // Time for periodic check?
     //
-    if ( !m_bCheckedTimeForVersionCheck && !IsBusy () )
+    if ( !m_bCheckedTimeForVersionCheck && !IsBusy () && !CCore::GetSingleton().WasLaunchedWithConnectURI () )
     {
         m_bCheckedTimeForVersionCheck = true;
 
@@ -514,6 +520,8 @@ void CVersionUpdater::DoPulse ( void )
                     m_CurrentProgram.GotoLabel ( pInstruction->strGoto );
         }
     }
+
+    TIMING_CHECKPOINT( "-VersionUpdaterPulse" );
 }
 
 
@@ -1135,10 +1143,17 @@ void CVersionUpdater::InitPrograms ()
         MapSet ( m_ProgramMap, strProgramName, CProgram () );
         CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
 
+        ADDINST (   _ShouldSendCrashDump );                     // Have we already sent a matching dump?
+        ADDCOND ( "if ProcessResponse.!ok goto end" );
+        ADDINST (   _UseCrashDumpQueryURLs );
+        ADDINST (   _StartDownload );
+        ADDINST (   _ProcessCrashDumpQuery );                   // Does the server want this dump?
+        ADDCOND ( "if ProcessResponse.!ok goto end" );
         ADDINST (   _UseCrashDumpURLs );                        // Use CRASH_DUMP_URL*
         ADDINST (   _UseCrashDumpPostContent );                 // Use crash dump source
         ADDINST (   _StartSendPost );                           // Send data
         ADDLABL ( "end:" );
+        ADDINST (   _ResetLastCrashDump );
         ADDINST (     _End );
     }
 
@@ -1693,6 +1708,7 @@ void CVersionUpdater::_DialogUpdateQuestion ( void )
     GetQuestionBox ().SetButton ( 0, m_JobInfo.strNo );
     GetQuestionBox ().SetButton ( 1, m_JobInfo.strYes );
     GetQuestionBox ().Show ();
+    GetQuestionBox ().SetAutoCloseOnConnect ( true );
     Push ( _PollQuestionNoYes );
 }
 
@@ -2561,38 +2577,17 @@ void CVersionUpdater::_UseReportLogPostContent ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CVersionUpdater::_UseCrashDumpURLs
+// CVersionUpdater::_ShouldSendCrashDump
 //
-//
+// Check if upload is required by client
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_UseCrashDumpURLs ( void )
+void CVersionUpdater::_ShouldSendCrashDump ( void )
 {
-    m_JobInfo = SJobInfo ();
-    m_JobInfo.serverList = MakeServerList ( m_MasterConfig.crashdump.serverInfoMap );
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// CVersionUpdater::_UseCrashDumpPostContent
-//
-//
-//
-///////////////////////////////////////////////////////////////
-void CVersionUpdater::_UseCrashDumpPostContent ( void )
-{
-    // Get filename to send
-    SString strPathFilename = GetApplicationSetting ( "diagnostics", "last-dump-save" );
-    if ( !strPathFilename.length () )
-        return;
-    SetApplicationSetting ( "diagnostics", "last-dump-save", "" );
-
-    // Get user pref
-    if ( GetApplicationSetting ( "diagnostics", "send-dumps" ) == "no" )
-        return;
+    m_ConditionMap.SetCondition ( "ProcessResponse", "" );
 
     // Add to history
+    SString strPathFilename = GetApplicationSetting ( "diagnostics", "last-dump-save" );
 
     // Extract module and address from filename
     std::vector < SString > parts;
@@ -2640,8 +2635,96 @@ void CVersionUpdater::_UseCrashDumpPostContent ( void )
             history.erase ( history.begin (), history.begin () + iNumToRemove );
 
         CCore::GetSingleton ().SaveConfig ();
-    }
 
+        m_ConditionMap.SetCondition ( "ProcessResponse", "ok" );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_ResetLastCrashDump
+//
+// Make sure last-dump-save is ignored next time
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_ResetLastCrashDump ( void )
+{
+    SetApplicationSetting ( "diagnostics", "last-dump-save", "" );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_UseCrashDumpQueryURLs
+//
+// Check if upload is needed by server
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_UseCrashDumpQueryURLs ( void )
+{
+    m_JobInfo = SJobInfo ();
+    m_JobInfo.serverList = MakeServerList ( m_MasterConfig.crashdump.serverInfoMap );
+
+    SString strPathFilename = GetApplicationSetting ( "diagnostics", "last-dump-save" );
+    strPathFilename.Split ( PATH_SEPERATOR, NULL, &m_JobInfo.strPostFilename, -1 );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_ProcessCrashDumpQuery
+//
+// Called after completing a CrashDumpQuery
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_ProcessCrashDumpQuery ( void )
+{
+    m_ConditionMap.SetCondition ( "ProcessResponse", "" );
+
+    if ( m_JobInfo.downloadBuffer.size () == 0 )
+        return;
+
+    SString strResponse ( &m_JobInfo.downloadBuffer[0], m_JobInfo.downloadBuffer.size () );
+
+    // Is the dump file wanted?
+    if ( strResponse.BeginsWithI ( "yes" ) )
+        m_ConditionMap.SetCondition ( "ProcessResponse", "ok" );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_UseCrashDumpURLs
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_UseCrashDumpURLs ( void )
+{
+    m_JobInfo = SJobInfo ();
+    m_JobInfo.serverList = MakeServerList ( m_MasterConfig.crashdump.serverInfoMap );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_UseCrashDumpPostContent
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_UseCrashDumpPostContent ( void )
+{
+    // Get filename to send
+    SString strPathFilename = GetApplicationSetting ( "diagnostics", "last-dump-save" );
+    if ( !strPathFilename.length () )
+        return;
+    SetApplicationSetting ( "diagnostics", "last-dump-save", "" );
+
+    // Get user pref
+    if ( GetApplicationSetting ( "diagnostics", "send-dumps" ) == "no" )
+        return;
 
     // Load into post buffer
     if ( FileLoad ( strPathFilename, m_JobInfo.postContent ) )
@@ -2786,6 +2869,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     strQueryURL = strQueryURL.Replace ( "%REFER%", m_strServerSaysHost );
     strQueryURL = strQueryURL.Replace ( "%WANTVER%", m_strSidegradeVersion );
     strQueryURL = strQueryURL.Replace ( "%LASTNEWS%", m_VarConfig.news_lastNewsDate );
+    strQueryURL = strQueryURL.Replace ( "%FILE%", m_JobInfo.strPostFilename );
 
     // Perform the HTTP request
     m_HTTP.Get ( strQueryURL );
@@ -2836,9 +2920,9 @@ int CVersionUpdater::DoPollDownload ( void )
     }
 
     // Got something
-    char* pData = buffer.GetData ();
-    if ( pData )
+    if ( buffer.GetSize () > 0 )
     {
+        char* pData = buffer.GetData ();
         unsigned int uiSize = buffer.GetSize ();
         m_JobInfo.downloadBuffer.resize ( buffer.GetSize () );
         memcpy ( &m_JobInfo.downloadBuffer[0], pData, uiSize );

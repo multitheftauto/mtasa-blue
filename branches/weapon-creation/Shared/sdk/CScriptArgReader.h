@@ -158,6 +158,26 @@ public:
 
 
     //
+    // Read next string as a string reference
+    //
+    bool ReadCharStringRef ( SCharStringRef& outValue )
+    {
+        int iArgument = lua_type ( m_luaVM, m_iIndex );
+        if ( iArgument == LUA_TSTRING )
+        {
+            outValue.pData = (char*)lua_tolstring ( m_luaVM, m_iIndex++, &outValue.uiSize );
+            return true;
+        }
+
+        outValue.pData = NULL;
+        outValue.uiSize = 0;
+        SetTypeError ( "string" );
+        m_iIndex++;
+        return false;
+    }
+
+
+    //
     // Read next string as an enum
     //
     template < class T >
@@ -390,6 +410,62 @@ public:
         }
         return false;
     }
+
+
+    //
+    // Conditional reads. Default required in case condition is not met.
+    //
+    bool ReadIfNextIsBool ( bool& bOutValue, const bool bDefaultValue )
+    {
+        if ( NextIsBool () )
+            return ReadBool ( bOutValue, bDefaultValue );
+        bOutValue = bDefaultValue;
+        return false;
+    }
+
+    template < class T >
+    bool ReadIfNextIsUserData ( T*& outValue, T* defaultValue  )
+    {
+        if ( NextIsUserData () )
+            return ReadUserData ( outValue, defaultValue );
+        outValue = defaultValue;
+        return false;
+    }
+
+    template < class T, class U >
+    bool ReadIfNextIsNumber ( T& outValue, const U& defaultValue )
+    {
+        if ( NextIsNumber () )
+            return ReadNumber ( outValue, defaultValue );
+        outValue = defaultValue;
+        return false;
+    }
+
+    bool ReadIfNextIsString ( SString& outValue, const char* defaultValue )
+    {
+        if ( NextIsString () )
+            return ReadString ( outValue, defaultValue );
+        outValue = defaultValue;
+        return false;
+    }
+
+    template < class T, class U >
+    bool ReadIfNextCouldBeNumber ( T& outValue, const U& defaultValue )
+    {
+        if ( NextCouldBeNumber () )
+            return ReadNumber ( outValue, defaultValue );
+        outValue = defaultValue;
+        return false;
+    }
+
+    bool ReadIfNextCouldBeString ( SString& outValue, const char* defaultValue )
+    {
+        if ( NextCouldBeString () )
+            return ReadString ( outValue, defaultValue );
+        outValue = defaultValue;
+        return false;
+    }
+
 
     //
     // SetTypeError

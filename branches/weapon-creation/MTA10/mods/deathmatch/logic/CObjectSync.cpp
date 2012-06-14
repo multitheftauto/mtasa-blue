@@ -17,7 +17,7 @@
 
 using std::list;
 
-#define OBJECT_SYNC_RATE 500
+#define OBJECT_SYNC_RATE   ( g_TickRateSettings.iObjectSync )
 
 CObjectSync::CObjectSync ( CClientObjectManager* pObjectManager )
 {
@@ -211,7 +211,7 @@ void CObjectSync::Sync ( void )
         }
 
         // Send the packet
-        g_pNet->SendPacket ( PACKET_ID_OBJECT_SYNC, bitStream.pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
+        g_pNet->SendPacket ( PACKET_ID_OBJECT_SYNC, bitStream.pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
     }
 }
 

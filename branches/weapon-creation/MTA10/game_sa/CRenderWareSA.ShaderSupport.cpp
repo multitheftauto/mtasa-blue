@@ -13,6 +13,7 @@
 
 #include "StdInc.h"
 
+
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 //
@@ -32,11 +33,22 @@ DWORD RETURN_CTxdStore_RemoveTxd =          0x731E96;
 //
 struct STxdStreamEvent
 {
+    STxdStreamEvent ( bool bAdded, ushort usTxdId ) : bAdded ( bAdded ), usTxdId ( usTxdId ) {}
+
+    bool operator < ( const STxdStreamEvent& other ) const
+    {
+        return usTxdId < other.usTxdId || ( usTxdId == other.usTxdId && bAdded == false && other.bAdded == true );
+    }
+    bool operator == ( const STxdStreamEvent& other ) const
+    {
+        return usTxdId == other.usTxdId && bAdded == other.bAdded;
+    }
+
     bool bAdded;
     ushort usTxdId;
 };
 
-static std::vector < STxdStreamEvent > ms_txdStreamEventList;
+static CMappedArray < STxdStreamEvent > ms_txdStreamEventList;
 
 
 ////////////////////////////////////////////////////////////////
@@ -44,10 +56,12 @@ static std::vector < STxdStreamEvent > ms_txdStreamEventList;
 ////////////////////////////////////////////////////////////////
 void _cdecl OnStreamingAddedTxd ( DWORD dwTxdId )
 {
-    STxdStreamEvent action;
-    action.bAdded = true;
-    action.usTxdId = (ushort)dwTxdId;
-    ms_txdStreamEventList.push_back ( action );
+    ushort usTxdId = (ushort)dwTxdId;
+    // Ensure there are no previous events for this txd
+    ms_txdStreamEventList.remove ( STxdStreamEvent ( false, usTxdId ) );
+    ms_txdStreamEventList.remove ( STxdStreamEvent ( true, usTxdId ) );
+    // Append 'added'
+    ms_txdStreamEventList.push_back ( STxdStreamEvent ( true, usTxdId ) );
 }
 
 // called from streaming on TXD create
@@ -76,10 +90,12 @@ void _declspec(naked) HOOK_CTxdStore_SetupTxdParent ()
 ////////////////////////////////////////////////////////////////
 void _cdecl OnStreamingRemoveTxd ( DWORD dwTxdId )
 {
-    STxdStreamEvent action;
-    action.bAdded = false;
-    action.usTxdId = (ushort)dwTxdId - 20000;
-    ms_txdStreamEventList.push_back ( action );
+    ushort usTxdId = (ushort)dwTxdId - 20000;
+    // Ensure there are no previous events for this txd
+    ms_txdStreamEventList.remove ( STxdStreamEvent ( true, usTxdId ) );
+    ms_txdStreamEventList.remove ( STxdStreamEvent ( false, usTxdId ) );
+    // Append 'removed'
+    ms_txdStreamEventList.push_back ( STxdStreamEvent ( false, usTxdId ) );
 }
 
 // called from streaming on TXD destroy
@@ -133,6 +149,7 @@ void CRenderWareSA::InitTextureWatchHooks ( void )
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::PulseWorldTextureWatch ( void )
 {
+    TIMING_CHECKPOINT( "+TextureWatch" );
     FlushPendingAssociations ();
 
     // Go through ms_txdStreamEventList
@@ -170,6 +187,7 @@ void CRenderWareSA::PulseWorldTextureWatch ( void )
     }
 
     ms_txdStreamEventList.clear ();
+    TIMING_CHECKPOINT( "-TextureWatch" );
 }
 
 
@@ -198,11 +216,15 @@ void CRenderWareSA::StreamingAddedTexture ( ushort usTxdId, const SString& strTe
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::StreamingRemovedTxd ( ushort usTxdId )
 {
-    // Find all TexInfo's for this txd
-    for ( std::list < STexInfo > ::iterator iter = m_TexInfoList.begin () ; iter != m_TexInfoList.end () ; )
+    TIMING_CHECKPOINT( "+StreamingRemovedTxd" );
+
+    std::vector < STexInfo* > results;
+    MultiFind ( m_TexInfoMap, usTxdId, &results );
+
+    for ( std::vector < STexInfo* > ::iterator iter = results.begin () ; iter != results.end () ; ++iter )
     {
-        STexInfo* pTexInfo = &*iter;
-        if ( pTexInfo->usTxdId == usTxdId )
+        STexInfo* pTexInfo = *iter;
+        if ( pTexInfo->texTag.Matches ( usTxdId ) )
         {
             // If texinfo has a shadinfo, unassociate
             if ( SShadInfo* pShadInfo = pTexInfo->pAssociatedShadInfo )
@@ -211,11 +233,72 @@ void CRenderWareSA::StreamingRemovedTxd ( ushort usTxdId )
             }
 
             OnDestroyTexInfo ( pTexInfo );
-            iter = m_TexInfoList.erase ( iter );
+            MapRemovePair ( m_TexInfoMap, usTxdId, pTexInfo );
+        }
+    }
+
+    TIMING_CHECKPOINT( "-StreamingRemovedTxd" );
+}
+
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::ScriptAddedTxd
+//
+// Called when a TXD is loaded outside of streaming
+// Create texinfos for the textures and find a best match shaders for them
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::ScriptAddedTxd ( RwTexDictionary *pTxd )
+{
+    TIMING_CHECKPOINT( "+ScriptAddedTxd" );
+    std::vector < RwTexture* > textureList;
+    GetTxdTextures ( textureList, pTxd );
+    for ( std::vector < RwTexture* > ::iterator iter = textureList.begin () ; iter != textureList.end () ; iter++ )
+    {
+        RwTexture* texture = *iter;
+        const char* szTextureName = texture->name;
+        CD3DDUMMY* pD3DData = texture->raster ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
+
+        // Added texture
+        STexInfo* pTexInfo = CreateTexInfo ( texture, szTextureName, pD3DData );
+        UpdateAssociationForTexInfo ( pTexInfo );
+    }
+    TIMING_CHECKPOINT( "-ScriptAddedTxd" );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::ScriptRemovedTexture
+//
+// Called when a texture is destroyed outside of streaming
+// Delete texinfo for that texture
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::ScriptRemovedTexture ( RwTexture* pTex )
+{
+    TIMING_CHECKPOINT( "+ScriptRemovedTexture" );
+    // Find all TexInfo's for this txd
+    for ( std::multimap < ushort, STexInfo* >::iterator iter = m_TexInfoMap.begin () ; iter != m_TexInfoMap.end () ; )
+    {
+        STexInfo* pTexInfo = iter->second;
+        if ( pTexInfo->texTag.Matches ( pTex ) )
+        {
+            // If texinfo has a shadinfo, unassociate
+            if ( SShadInfo* pShadInfo = pTexInfo->pAssociatedShadInfo )
+            {
+                BreakAssociation ( pShadInfo, pTexInfo );
+            }
+
+            OnDestroyTexInfo ( pTexInfo );
+            m_TexInfoMap.erase ( iter++ );
         }
         else
             ++iter;
     }
+    TIMING_CHECKPOINT( "-ScriptRemovedTexture" );
 }
 
 
@@ -252,6 +335,8 @@ void CRenderWareSA::InitWorldTextureWatch ( PFN_WATCH_CALLBACK pfnWatchCallback 
 ////////////////////////////////////////////////////////////////
 bool CRenderWareSA::AddWorldTextureWatch ( CSHADERDUMMY* pShaderData, const char* szMatch, float fShaderPriority )
 {
+    TIMING_CHECKPOINT( "+AddWorldTextureWatch" );
+
     FlushPendingAssociations ();
 
     // Get info for this shader
@@ -261,9 +346,9 @@ bool CRenderWareSA::AddWorldTextureWatch ( CSHADERDUMMY* pShaderData, const char
     pShadInfo->AppendMatchType ( szMatch, true );
 
     // Step through texinfo list looking for all add matches
-    for ( std::list < STexInfo > ::iterator iter = m_TexInfoList.begin () ; iter != m_TexInfoList.end () ; ++iter )
+    for ( std::multimap < ushort, STexInfo* >::iterator iter = m_TexInfoMap.begin () ; iter != m_TexInfoMap.end () ; ++iter )
     {
-        STexInfo* pTexInfo = &*iter;
+        STexInfo* pTexInfo = iter->second;
 
         // No need to check if aleady associated
         if ( pShadInfo == pTexInfo->pAssociatedShadInfo )
@@ -288,6 +373,7 @@ bool CRenderWareSA::AddWorldTextureWatch ( CSHADERDUMMY* pShaderData, const char
         }
     }
 
+    TIMING_CHECKPOINT( "-AddWorldTextureWatch" );
     return true;
 }
 
@@ -310,6 +396,7 @@ void CRenderWareSA::RemoveWorldTextureWatch ( CSHADERDUMMY* pShaderData, const c
     if ( !pShadInfo )
         return;
 
+    TIMING_CHECKPOINT( "+RemoveWorldTextureWatch" );
     if ( szMatch )
     {
         // Append subtractive match
@@ -329,6 +416,8 @@ void CRenderWareSA::RemoveWorldTextureWatch ( CSHADERDUMMY* pShaderData, const c
     }
 
     m_PendingShadInfoMap.insert ( pShadInfo );
+
+    TIMING_CHECKPOINT( "-RemoveWorldTextureWatch" );
 }
 
 
@@ -470,24 +559,28 @@ bool CRenderWareSA::IsFirstShadInfoHigherOrSamePriority ( SShadInfo* pShadInfoA,
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::FlushPendingAssociations ( void )
 {
-    if ( m_PendingTexInfoMap.empty () )
+    if ( m_PendingTexInfoMap.empty () && m_PendingShadInfoMap.empty () )
         return;
 
+    TIMING_CHECKPOINT( "+FlushPendingAssociations" );
+
     // Process pending texinfos
-    for ( std::set < STexInfo* > ::iterator iter = m_PendingTexInfoMap.begin () ; iter != m_PendingTexInfoMap.end () ; ++iter )
+    std::set < STexInfo* > pendingTexInfoMapCopy = m_PendingTexInfoMap;
+    m_PendingTexInfoMap.clear ();
+    for ( std::set < STexInfo* > ::iterator iter = pendingTexInfoMapCopy.begin () ; iter != pendingTexInfoMapCopy.end () ; ++iter )
         UpdateAssociationForTexInfo ( *iter );
 
-    m_PendingTexInfoMap.clear ();
-
     // Check if any pending shadinfos are now empty
-    for ( std::set < SShadInfo* > ::iterator iter = m_PendingShadInfoMap.begin () ; iter != m_PendingShadInfoMap.end () ; ++iter )
+    std::set < SShadInfo* > pendingShadInfoMapCopy = m_PendingShadInfoMap;
+    m_PendingShadInfoMap.clear ();
+    for ( std::set < SShadInfo* > ::iterator iter = pendingShadInfoMapCopy.begin () ; iter != pendingShadInfoMapCopy.end () ; ++iter )
     {
         SShadInfo* pShadInfo = *iter;
         if ( pShadInfo->associatedTexInfoMap.empty () )
-            OnDestroyShadInfo ( pShadInfo );
+            DestroyShadInfo ( pShadInfo );
     }
 
-    m_PendingShadInfoMap.clear ();
+    TIMING_CHECKPOINT( "-FlushPendingAssociations" );
 }
 
 
@@ -498,20 +591,24 @@ void CRenderWareSA::FlushPendingAssociations ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-STexInfo* CRenderWareSA::CreateTexInfo ( ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData )
+STexInfo* CRenderWareSA::CreateTexInfo ( const STexTag& texTag, const SString& strTextureName, CD3DDUMMY* pD3DData )
 {
     // Create texinfo
-    m_TexInfoList.push_back ( STexInfo ( usTxdId, strTextureName, pD3DData ) );
-    STexInfo* pTexInfo = &m_TexInfoList.back ();
+    STexInfo* pTexInfo = new STexInfo ( texTag, strTextureName, pD3DData );
 
     // Add to lookup maps
-    SString strUniqueKey ( "%d_%s", pTexInfo->usTxdId, *pTexInfo->strTextureName );
+#if WITH_UNIQUE_CHECK
+    SString strUniqueKey ( "%d_%08x_%s", pTexInfo->texTag.m_usTxdId, pTexInfo->texTag.m_pTex, *pTexInfo->strTextureName );
     if ( MapContains ( m_UniqueTexInfoMap, strUniqueKey ) )
         AddReportLog ( 5132, SString ( "CreateTexInfo duplicate %s", *strUniqueKey ) );
     MapSet ( m_UniqueTexInfoMap, strUniqueKey, pTexInfo );
+#endif
 
-	// This assert fails when using engine txd replace functions - TODO find out why
-    //assert ( !MapContains ( m_D3DDataTexInfoMap, pTexInfo->pD3DData ) );
+    // Add to map
+    MapInsert ( m_TexInfoMap, pTexInfo->texTag.m_usTxdId, pTexInfo );
+
+
+    // Add to D3DData/name lookup map. (Currently only used by GetTextureName (CRenderItemManager::GetVisibleTextureNames))
     MapSet ( m_D3DDataTexInfoMap, pTexInfo->pD3DData, pTexInfo );
     return pTexInfo;
 }
@@ -526,15 +623,22 @@ STexInfo* CRenderWareSA::CreateTexInfo ( ushort usTxdId, const SString& strTextu
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::OnDestroyTexInfo ( STexInfo* pTexInfo )
 {
+    assert ( pTexInfo->pAssociatedShadInfo == NULL );
+
     // Remove from lookup maps
-    SString strUniqueKey ( "%d_%s", pTexInfo->usTxdId, *pTexInfo->strTextureName );
+#if WITH_UNIQUE_CHECK
+    SString strUniqueKey ( "%d_%08x_%s", pTexInfo->texTag.m_usTxdId, pTexInfo->texTag.m_pTex, *pTexInfo->strTextureName );
     if ( !MapContains ( m_UniqueTexInfoMap, strUniqueKey ) )
         AddReportLog ( 5133, SString ( "OnDestroyTexInfo missing %s", *strUniqueKey ) );
     MapRemove ( m_UniqueTexInfoMap, strUniqueKey );
+#endif
+    MapRemove ( m_PendingTexInfoMap, pTexInfo );
 
-	// This assert fails when using engine txd replace functions - TODO find out why
-    //assert ( MapContains ( m_D3DDataTexInfoMap, pTexInfo->pD3DData ) );
-    MapRemove ( m_D3DDataTexInfoMap, pTexInfo->pD3DData );
+    // Remove from D3DData/name lookup map
+    if ( MapFindRef ( m_D3DDataTexInfoMap, pTexInfo->pD3DData ) == pTexInfo )
+        MapRemove ( m_D3DDataTexInfoMap, pTexInfo->pD3DData );
+
+    delete pTexInfo;
 }
 
 
@@ -565,16 +669,20 @@ SShadInfo* CRenderWareSA::GetShadInfo ( CSHADERDUMMY* pShaderData, bool bAddIfRe
 
 ////////////////////////////////////////////////////////////////
 //
-// CRenderWareSA::OnDestroyShadInfo
+// CRenderWareSA::DestroyShadInfo
 //
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::OnDestroyShadInfo ( SShadInfo* pShadInfo )
+void CRenderWareSA::DestroyShadInfo ( SShadInfo* pShadInfo )
 {
+    assert ( pShadInfo->associatedTexInfoMap.empty () );
+
     // Remove from lookup maps
     assert ( MapContains ( m_ShadInfoMap, pShadInfo->pShaderData ) );
     MapRemove ( m_ShadInfoMap, pShadInfo->pShaderData );
+
+    MapRemove ( m_PendingShadInfoMap, pShadInfo );
 
     //  Remove from order map
     for ( std::multimap < float, SShadInfo* > ::iterator iter = m_OrderMap.begin () ; iter != m_OrderMap.end () ; )

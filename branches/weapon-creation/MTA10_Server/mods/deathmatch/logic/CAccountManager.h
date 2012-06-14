@@ -78,6 +78,12 @@ protected:
     std::multimap < SString, CAccount* > m_NameAccountMap;
 };
 
+// Returns true if the item is in the itemList
+template < class T >
+bool ListContains ( const CMappedAccountList& itemList, const T& item )
+{
+    return itemList.contains ( item );
+}
 
 
 //
@@ -87,7 +93,7 @@ class CAccountManager: public CXMLConfig
 {
     friend class CAccount;
 public:
-                                CAccountManager             ( char* szFileName, SString strBuffer );
+                                CAccountManager             ( const char* szFileName, SString strBuffer );
                                 ~CAccountManager            ( void );
 
     void                        DoPulse                     ( void );
@@ -104,7 +110,8 @@ public:
 
     CAccount*                   Get                         ( const char* szName, bool bRegistered = true );
     CAccount*                   Get                         ( const char* szName, const char* szIP );
-    bool                        Exists                      ( CAccount* pAccount );
+    CAccount*                   GetAccountFromScriptID      ( uint uiScriptID );
+
     bool                        LogIn                       ( CClient* pClient, CClient* pEchoClient, const char* szNick, const char* szPassword );
     bool                        LogIn                       ( CClient* pClient, CClient* pEchoClient, CAccount* pAccount, bool bAutoLogin = false );
     bool                        LogOut                      ( CClient* pClient, CClient* pEchoClient );
@@ -115,6 +122,7 @@ public:
     CLuaArgument*               GetAccountData              ( CAccount* pAccount, const char* szKey );
     bool                        SetAccountData              ( CAccount* pAccount, const char* szKey, const SString& strValue, int iType );
     bool                        CopyAccountData             ( CAccount* pFromAccount, CAccount* pToAccount );
+    bool                        GetAllAccountData           ( CAccount* pAccount, lua_State* pLua );
 
     bool                        ConvertXMLToSQL             ( const char* szFileName );
     bool                        LoadXML                     ( CXMLNode* pParent );

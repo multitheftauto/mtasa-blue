@@ -22,7 +22,7 @@ public:
                             CProjectileSyncPacket       ( void );
                             
     inline ePacketID                GetPacketID         ( void ) const                  { return PACKET_ID_PROJECTILE; };
-    inline unsigned long            GetFlags            ( void ) const                  { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline unsigned long            GetFlags            ( void ) const                  { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Read                        ( NetBitStreamInterface& BitStream );
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;

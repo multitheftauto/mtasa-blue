@@ -218,16 +218,20 @@ namespace SharedUtil
     // Prep for the next set of samples
     //
     ////////////////////////////////////////////////
-    void CStatEvents::ClearBuffer ( bool bCanResize )
+    bool CStatEvents::ClearBuffer ( bool bCanResize )
     {
         assert ( m_BufferPos <= (int)m_ItemBufferArray.size () );
 
+        bool bHitBufferLimit = ( m_BufferPos == m_BufferPosMaxUsing );
+
         if ( bCanResize )
         {
+            int prevBufferPosMax = m_BufferPosMax;
+
             // Grow quickly, shrink slowly
-            m_BufferPosMax = Max ( m_BufferPos * 2, m_BufferPosMax * 1000 / 1001 );
-            m_BufferPosMax = Clamp ( 10000, m_BufferPosMax, 1000000 );
-            if ( m_BufferPosMax != (int)m_ItemBufferArray.size () )
+            m_BufferPosMax = Max ( m_BufferPos * 2, m_BufferPosMax * 10000 / 10001 );
+            m_BufferPosMax = Clamp ( 10, m_BufferPosMax, ( prevBufferPosMax + 1000 ) * 4 );
+            if ( m_BufferPosMax > (int)m_ItemBufferArray.size () || m_BufferPosMax < (int)m_ItemBufferArray.size () / 4 )
                 m_ItemBufferArray.resize ( m_BufferPosMax );
         }
 
@@ -235,6 +239,8 @@ namespace SharedUtil
         m_BufferPos = 0;
 
         m_BufferPosMaxUsing = m_bEnabled ? m_BufferPosMax : 0;
+
+        return bHitBufferLimit;
     }
 
 
@@ -280,7 +286,7 @@ namespace SharedUtil
         }
 
         // Clear input buffer
-        ClearBuffer( false );
+        bool bHitBufferLimit = ClearBuffer( true );
 
         //
         // Put events into a SStatCollection
@@ -319,7 +325,7 @@ namespace SharedUtil
                     if ( StartEvent.type != STATS_CLOCK || EndEvent.type != STATS_UNCLOCK )
                     {
                         // Error
-                        fTotalMs = 999;
+                        fTotalMs = 0;
                         continue;
                     }
 
@@ -335,6 +341,12 @@ namespace SharedUtil
                 item.iCounter   += iHitCount;
                 item.fMs        += fTotalMs;
             }    
+        }
+
+        if ( bHitBufferLimit )
+        {
+            // Clear any problems caused by running out of buffer space
+            ClearBuffer( false );
         }
     }
 

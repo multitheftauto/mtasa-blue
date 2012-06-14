@@ -27,6 +27,8 @@
 #define FUNC_HasCollisionBeenLoaded                         0x410CE0 // ##SA##
 #define FUNC_RemoveBuildingsNotInArea                       0x4094B0 // ##SA##
 #define FUNC_RemoveReferencesToDeletedObject                0x565510 // ##SA##
+#define FUNC_COcclusion_ProcessBeforeRendering              0x7201C0
+#define VAR_COcclusion_NumActiveOccluders                   0xC73CC0
 
 // CCol...
 #define FUNC_CColLine_Constructor                           0x40EF50 // ##SA##
@@ -52,10 +54,10 @@ class CWorldSA : public CWorld
 {
 public:
     CWorldSA ( );
-    void        Add                       ( CEntity * entity );
-    void        Add                       ( CEntitySAInterface * entityInterface );
-    void        Remove                    ( CEntity * entity );
-    void        Remove                    ( CEntitySAInterface * entityInterface );
+    void        Add                       ( CEntity * entity, eDebugCaller CallerId );
+    void        Add                       ( CEntitySAInterface * entityInterface, eDebugCaller CallerId );
+    void        Remove                    ( CEntity * entity, eDebugCaller CallerId );
+    void        Remove                    ( CEntitySAInterface * entityInterface, eDebugCaller CallerId );
     void        RemoveReferencesToDeletedObject ( CEntitySAInterface * entity );
     bool        ProcessLineOfSight        ( const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, CEntity ** CollisionEntity, const SLineOfSightFlags flags, SLineOfSightBuildingResult* pBuildingResult );
     bool        TestLineSphere            ( CVector * vecStart, CVector * vecEnd, CVector * vecSphereCenter, float fSphereRadius, CColPoint ** colCollision );
@@ -73,6 +75,8 @@ public:
     float       GetJetpackMaxHeight       ( void );
     void        SetAircraftMaxHeight      ( float fHeight );
     float       GetAircraftMaxHeight      ( void );
+    void        SetOcclusionsEnabled      ( bool bEnabled );
+    bool        GetOcclusionsEnabled      ( void );
 
     /**
      * \todo Add FindObjectsKindaColliding (see 0x430577)

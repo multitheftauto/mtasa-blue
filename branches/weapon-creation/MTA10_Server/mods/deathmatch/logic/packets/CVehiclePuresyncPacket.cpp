@@ -99,7 +99,8 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 SVehicleHealthSync health;
                 if ( !BitStream.Read ( &health ) )
                     return false;
-                float fPreviousHealth = pVehicle->GetHealth ();                
+
+                float fPreviousHealth = pVehicle->GetLastSyncedHealth ( );
                 float fHealth = health.data.fValue;
 
                 // Less than last time?
@@ -117,6 +118,9 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                     }
                 }
                 pVehicle->SetHealth ( fHealth );
+                // Stops sync + fixVehicle/setElementHealth conflicts triggering onVehicleDamage by having a seperate stored float keeping track of ONLY what comes in via sync
+                // - Caz
+                pVehicle->SetLastSyncedHealth( fHealth );
 
                 // Trailer chain
                 CVehicle* pTowedByVehicle = pVehicle;
@@ -378,7 +382,7 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.WriteCompressed ( usLatency );
 
             // Write the keysync data
-            CControllerState ControllerState = pSourcePlayer->GetPad ()->GetCurrentControllerState ();
+            const CControllerState& ControllerState = pSourcePlayer->GetPad ()->GetCurrentControllerState ();
             WriteFullKeysync ( ControllerState, BitStream );
 
             // Write the vehicle matrix only if he's the driver

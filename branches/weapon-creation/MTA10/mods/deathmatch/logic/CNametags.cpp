@@ -481,14 +481,19 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
         const char* szNick = pPlayer->GetNametagText ();
         if ( !szNick || !szNick [0] ) szNick = pPlayer->GetNick ();
 
+        // Extra thing to show bulletsync in use
+        SString strNick = szNick;
+        if ( g_pClientGame->GetWeaponTypeUsesBulletSync ( pPlayer->GetCurrentWeaponType () ) )
+            strNick += " *";
+
         // Draw his name
         unsigned char ucR, ucG, ucB;
         pPlayer->GetNametagColor ( ucR, ucG, ucB );
         // Draw shadow first
         int iScreenPosX = static_cast < int > ( vecScreenPosition.fX );
         int iScreenPosY = static_cast < int > ( vecScreenPosition.fY );
-        pGraphics->DrawText ( iScreenPosX + 1, iScreenPosY+ 1, iScreenPosX + 1, iScreenPosY + 1, COLOR_ARGB ( 255, 0, 0, 0 ), szNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
-        pGraphics->DrawText ( iScreenPosX, iScreenPosY, iScreenPosX, iScreenPosY, COLOR_ARGB ( 255, ucR, ucG, ucB ), szNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+        pGraphics->DrawText ( iScreenPosX + 1, iScreenPosY+ 1, iScreenPosX + 1, iScreenPosY + 1, COLOR_ARGB ( 255, 0, 0, 0 ), strNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+        pGraphics->DrawText ( iScreenPosX, iScreenPosY, iScreenPosX, iScreenPosY, COLOR_ARGB ( 255, ucR, ucG, ucB ), strNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
 
         // We need to draw health tags?
         if ( m_bDrawHealth )

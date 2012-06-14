@@ -23,7 +23,7 @@ class CClientTeam : public CClientEntity
     DECLARE_CLASS( CClientTeam, CClientEntity )
     friend class CClientTeamManager;
 public:    
-                                CClientTeam         ( CClientManager* pManager, ElementID ID, char* szName = NULL, unsigned char ucRed = 0, unsigned char ucGreen = 0, unsigned char ucBlue = 0 );
+                                CClientTeam         ( CClientManager* pManager, ElementID ID, const char* szName = NULL, unsigned char ucRed = 0, unsigned char ucGreen = 0, unsigned char ucBlue = 0 );
                                 ~CClientTeam        ( void );
 
     eClientEntityType           GetType             ( void ) const              { return CCLIENTTEAM; }
@@ -32,8 +32,8 @@ public:
 
     inline unsigned char        GetID               ( void )                    { return m_ucID; }
 
-    inline char*                GetTeamName         ( void )                    { return m_szTeamName; }
-    void                        SetTeamName         ( char* szName );
+    const char*                 GetTeamName         ( void )                    { return m_strTeamName; }
+    void                        SetTeamName         ( const char* szName );
 
     void                        GetColor            ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue );
     void                        SetColor            ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
@@ -59,7 +59,7 @@ protected:
     CClientTeamManager*         m_pTeamManager;
 
     unsigned char               m_ucID;
-    char*                       m_szTeamName;
+    SString                     m_strTeamName;
 
     unsigned char               m_ucRed;
     unsigned char               m_ucGreen;

@@ -393,5 +393,15 @@ bool CSettingsSA::IsGrassEnabled ( void )
 
 void CSettingsSA::SetGrassEnabled ( bool bEnable )
 {
-    MemPutFast < BYTE > ( 0x05DBAED, bEnable ? 0x85 : 0x33 );
+    MemPut < BYTE > ( 0x05DBAED, bEnable ? 0x85 : 0x33 );
+}
+
+////////////////////////////////////////////////
+//
+// Select device dialog for multi-monitor setups
+//
+////////////////////////////////////////////////
+void CSettingsSA::SetSelectDeviceDialogEnabled ( bool bEnable )
+{
+    MemPut < BYTE > ( 0x74621F, bEnable ? 0x01 : 0x42 );
 }

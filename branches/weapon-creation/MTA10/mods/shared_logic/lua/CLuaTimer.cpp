@@ -16,6 +16,7 @@
 
 CLuaTimer::CLuaTimer ( const CLuaFunctionRef& iLuaFunction, const CLuaArguments& Arguments )
 {
+    m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::TIMER );
     m_uiRepeats = 1;
     m_bBeingDeleted = false;
     m_iLuaFunction = iLuaFunction;
@@ -25,6 +26,7 @@ CLuaTimer::CLuaTimer ( const CLuaFunctionRef& iLuaFunction, const CLuaArguments&
 
 CLuaTimer::~CLuaTimer ( void )
 {
+    CIdArray::PushUniqueId ( this, EIdClass::TIMER, m_uiScriptID );
     delete m_pArguments;
     m_pArguments = NULL;
 }

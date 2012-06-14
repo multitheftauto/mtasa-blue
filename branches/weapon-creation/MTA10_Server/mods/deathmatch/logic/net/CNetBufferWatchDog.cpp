@@ -16,6 +16,11 @@ volatile bool CNetBufferWatchDog::ms_bBlockOutgoingSyncPackets = false;
 volatile bool CNetBufferWatchDog::ms_bBlockIncomingSyncPackets = false;
 volatile bool CNetBufferWatchDog::ms_bCriticalStopThreadNet = false;
 volatile bool CNetBufferWatchDog::ms_bVerboseDebug = false;
+uint CNetBufferWatchDog::ms_uiFinishedListSize = 0;
+uint CNetBufferWatchDog::ms_uiOutCommandQueueSize = 0;
+uint CNetBufferWatchDog::ms_uiOutResultQueueSize = 0;
+uint CNetBufferWatchDog::ms_uiInResultQueueSize = 0;
+
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -155,7 +160,7 @@ void CNetBufferWatchDog::DoChecks ( void )
     uint uiOutCommandQueue;
     uint uiOutResultQueue;
     uint uiInResultQueue;
-    m_pNetBuffer->GetQueueSizes ( uiFinishedList, uiOutCommandQueue, uiOutResultQueue, uiInResultQueue );
+    m_pNetBuffer->GetQueueSizes ( uiFinishedList, uiOutCommandQueue, uiOutResultQueue, uiInResultQueue, m_uiGamePlayerCount );
 
     // Update queue status
     UpdateQueueInfo ( m_FinishedListQueueInfo, uiFinishedList, "FinishedList" );
@@ -175,6 +180,12 @@ void CNetBufferWatchDog::DoChecks ( void )
     else
     if ( m_OutCommandQueueInfo.status == EQueueStatus::SUSPEND_SYNC )
         BlockIncomingSyncPackets ();
+
+    // Copy sizes for stats only (Unsafe)
+    ms_uiFinishedListSize = uiFinishedList;
+    ms_uiOutCommandQueueSize = uiOutCommandQueue;
+    ms_uiOutResultQueueSize = uiOutResultQueue;
+    ms_uiInResultQueueSize = uiInResultQueue;
 }
 
 
@@ -231,11 +242,13 @@ void CNetBufferWatchDog::CheckActionHistory ( CActionHistory& history, const cha
 ///////////////////////////////////////////////////////////////
 void CNetBufferWatchDog::UpdateQueueInfo ( CQueueInfo& queueInfo, int iQueueSize, const char* szTag )
 {
-    const int iThreshLevel1 = 100000;
-    const int iThreshLevel2 = 200000;
-    const int iThreshLevel3 = 300000;
-    const int iThreshLevel4 = 400000;
-    const int iThreshLevel5 = 500000;
+    // Increase thresh levels when more players
+    int iPlayerCountFactor = Clamp  < int > ( 1, 1 + m_uiGamePlayerCount / 100, 5 );
+    const int iThreshLevel1 = 100000 * iPlayerCountFactor;
+    const int iThreshLevel2 = 200000 * iPlayerCountFactor;
+    const int iThreshLevel3 = 300000 * iPlayerCountFactor;
+    const int iThreshLevel4 = 400000 * iPlayerCountFactor;
+    const int iThreshLevel5 = 500000 * iPlayerCountFactor;
 
     queueInfo.m_SizeHistory.AddPoint ( iQueueSize );
     if ( queueInfo.status == EQueueStatus::STATUS_OK )
@@ -244,7 +257,7 @@ void CNetBufferWatchDog::UpdateQueueInfo ( CQueueInfo& queueInfo, int iQueueSize
         //      stop related queue until it is below 100,000
         if ( queueInfo.m_SizeHistory.GetLowestPointSince( 5 ) > iThreshLevel2 )
         {
-            CLogger::LogPrintf ( "%s > 200,000pkts. This is due to server overload or another problem\n", szTag );
+            CLogger::LogPrintf ( "%s > %d pkts. This is due to server overload or another problem\n", szTag, iThreshLevel2 );
             queueInfo.status = EQueueStatus::SUSPEND_SYNC;
         }
     }
@@ -258,11 +271,11 @@ void CNetBufferWatchDog::UpdateQueueInfo ( CQueueInfo& queueInfo, int iQueueSize
             queueInfo.status = EQueueStatus::STATUS_OK;
         }
 
-        //  if Queue > 300,000 for 10 seconds
+        //  if Queue > 300,000 for 30 seconds
         //      terminate threadnet
-        if ( queueInfo.m_SizeHistory.GetLowestPointSince( 10 ) > iThreshLevel3 )
+        if ( queueInfo.m_SizeHistory.GetLowestPointSince( 30 ) > iThreshLevel3 )
         {
-            CLogger::ErrorPrintf ( "%s > 300,000pkts for 10 seconds\n", szTag );
+            CLogger::ErrorPrintf ( "%s > %d pkts for 30 seconds\n", szTag, iThreshLevel3 );
             CLogger::ErrorPrintf ( "Something is wrong - Switching from threaded sync mode\n" );
             queueInfo.status = EQueueStatus::STOP_THREAD_NET;
             ms_bCriticalStopThreadNet = true;
@@ -271,11 +284,11 @@ void CNetBufferWatchDog::UpdateQueueInfo ( CQueueInfo& queueInfo, int iQueueSize
     else
     if ( queueInfo.status == EQueueStatus::STOP_THREAD_NET )
     {
-        //  if Queue > 400,000 for 15 seconds
+        //  if Queue > 400,000 for 60 seconds
         //      shutdown
-        if ( queueInfo.m_SizeHistory.GetLowestPointSince( 15 ) > iThreshLevel4 )
+        if ( queueInfo.m_SizeHistory.GetLowestPointSince( 60 ) > iThreshLevel4 )
         {
-            CLogger::ErrorPrintf ( "%s > 400,000pkts for 15 seconds\n", szTag );
+            CLogger::ErrorPrintf ( "%s > %d pkts for 60 seconds\n", szTag, iThreshLevel4 );
             CLogger::ErrorPrintf ( "Something is very wrong - Shutting down server\n" );
             queueInfo.status = EQueueStatus::SHUTDOWN;
             g_pGame->SetIsFinished ( true );
@@ -284,11 +297,11 @@ void CNetBufferWatchDog::UpdateQueueInfo ( CQueueInfo& queueInfo, int iQueueSize
     else
     if ( queueInfo.status == EQueueStatus::SHUTDOWN )
     {
-        //  if Queue > 500,000 for 20 seconds
+        //  if Queue > 500,000 for 90 seconds
         //      terminate server
-        if ( queueInfo.m_SizeHistory.GetLowestPointSince( 20 ) > iThreshLevel5 )
+        if ( queueInfo.m_SizeHistory.GetLowestPointSince( 90 ) > iThreshLevel5 )
         {
-            CLogger::ErrorPrintf ( "%s > 500,000pkts for 20 seconds\n", szTag );
+            CLogger::ErrorPrintf ( "%s > %d pkts for 90 seconds\n", szTag, iThreshLevel5 );
             CLogger::ErrorPrintf ( "Something is badly wrong right here - Terminating server\n" );
             queueInfo.status = EQueueStatus::TERMINATE;
 #ifdef WIN32
@@ -458,7 +471,7 @@ bool CNetBufferWatchDog::CanReceivePacket ( uchar ucPacketID )
 //
 ///////////////////////////////////////////////////////////////
 #ifdef MTA_DEBUG
-static DWORD dwThreadIds[3] = { -1, -1, -1 };
+static SFixedArray < DWORD, 3 > dwThreadIds = { -1, -1, -1 };
 #endif
 void SetCurrentThreadType ( EActionWhoType type )
 {

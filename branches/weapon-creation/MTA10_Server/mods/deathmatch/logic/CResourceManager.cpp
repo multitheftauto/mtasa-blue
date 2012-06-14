@@ -43,7 +43,7 @@ CResourceManager::CResourceManager ( void )
     m_uiResourceLoadedCount = 0;
     m_uiResourceFailedCount = 0;
 
-    sprintf ( m_szResourceDirectory, "%s/resources", g_pServerInterface->GetServerModPath () );
+    m_strResourceDirectory.Format ( "%s/resources", g_pServerInterface->GetServerModPath () );
 }
 
 CResourceManager::~CResourceManager ( void )
@@ -231,9 +231,9 @@ void CResourceManager::CheckAll ( void )
         (*iter)->LogUpgradeWarnings ();
 }
 
-char * CResourceManager::GetResourceDirectory ( void )
+const char* CResourceManager::GetResourceDirectory ( void )
 {
-    return m_szResourceDirectory;
+    return m_strResourceDirectory;
 }
 
 // first, go through each resource then link up to other resources, any that fail are noted
@@ -387,7 +387,7 @@ CResource * CResourceManager::Load ( bool bIsZipped, const char * szAbsPath, con
         if ( s_bNotFirstTime )
             CLogger::LogPrintf("New resource '%s' loaded\n", loadedResource->GetName().c_str () );
         unsigned short usID = GenerateID ();
-        loadedResource->SetID ( usID );
+        loadedResource->SetNetID ( usID );
         AddResourceToLists ( loadedResource );
         m_bResourceListChanged = true;
     }
@@ -404,9 +404,11 @@ CResource * CResourceManager::GetResource ( const char * szResourceName )
 }
 
 
-bool CResourceManager::Exists ( CResource* pResource )
+CResource* CResourceManager::GetResourceFromScriptID ( uint uiScriptID )
 {
-    return m_resources.Contains ( pResource );
+    CResource* pResource = (CResource*) CIdArray::FindEntry ( uiScriptID, EIdClass::RESOURCE );
+    dassert ( !pResource || ListContains ( m_resources, pResource ) );
+    return pResource;
 }
 
 
@@ -417,7 +419,7 @@ unsigned short CResourceManager::GenerateID ( void )
     list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
-        idMap[ ( *iter )->GetID () ] = true;
+        idMap[ ( *iter )->GetNetID () ] = true;
     }
 
     // Find an unused ID
@@ -596,7 +598,7 @@ bool CResourceManager::Reload ( CResource* pResource )
         m_bResourceListChanged = true;
 
         // Generate a new ID for it
-        pResource->SetID ( GenerateID () );
+        pResource->SetNetID ( GenerateID () );
     }
     else
     {
@@ -1089,6 +1091,8 @@ bool CResourceManager::MoveDirToTrash ( const SString& strPathDirName )
 {
     // Get path to unique trash sub-directory
     SString strDestPathDirName = MakeUniquePath ( PathJoin ( GetResourceTrashDir (), ExtractFilename ( strPathDirName.TrimEnd ( "\\" ).TrimEnd ( "/" ) ) ) );
+    // Make sure the trash directory exists and create if it does not
+    MakeSureDirExists ( GetResourceTrashDir () + "/" );
     // Try move
     return FileRename ( strPathDirName, strDestPathDirName );
 }
@@ -1213,4 +1217,68 @@ void CResourceManager::ReevaluateMinClientRequirement ( void )
     // Log change
     if ( strBefore != strAfter && !strAfter.empty () )
         CLogger::LogPrintf ( SString ( "Server minclientversion is now %s\n", *strAfter ) );
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CResourceManager::ApplySyncMapElementDataOption
+//
+// If resource has a sync_map_element_data, add it to the list
+//
+/////////////////////////////////////////////////////////////////////////////
+void CResourceManager::ApplySyncMapElementDataOption ( CResource* pResource, bool bSyncMapElementData )
+{
+    MapSet ( m_SyncMapElementDataOptionMap, pResource, bSyncMapElementData );
+    ReevaluateSyncMapElementDataOption ();
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CResourceManager::RemoveSyncMapElementDataOption
+//
+// Remove any previous sync_map_element_data associated with the resource
+//
+/////////////////////////////////////////////////////////////////////////////
+void CResourceManager::RemoveSyncMapElementDataOption ( CResource* pResource )
+{
+    if ( MapContains ( m_SyncMapElementDataOptionMap, pResource ) )
+    {
+        MapRemove ( m_SyncMapElementDataOptionMap, pResource );
+        ReevaluateSyncMapElementDataOption ();
+    }
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CResourceManager::ReevaluateSyncMapElementDataOption
+//
+// Recalculate effective sync_map_element_data from all running resources
+//  and tell the config to apply it
+//
+/////////////////////////////////////////////////////////////////////////////
+void CResourceManager::ReevaluateSyncMapElementDataOption ( void )
+{
+    bool bSyncMapElementData = true;
+    for ( std::map < CResource*, bool >::iterator iter = m_SyncMapElementDataOptionMap.begin () ; iter != m_SyncMapElementDataOptionMap.end () ; ++iter )
+    {
+        if ( iter->second )
+        {
+            bSyncMapElementData = true;    // Any 'true' will stop the set
+            break;
+        }
+        else
+            bSyncMapElementData = false;     // Need at least one 'false' to set
+    }
+
+    // Apply
+    bool bBefore = g_pGame->GetConfig ()->GetSyncMapElementData ();
+    g_pGame->GetConfig ()->SetSyncMapElementData ( bSyncMapElementData );
+    bool bAfter = g_pGame->GetConfig ()->GetSyncMapElementData ();
+
+    // Log change
+    if ( bBefore != bAfter )
+        CLogger::LogPrintf ( SString ( "SyncMapElementData is now %s\n", bAfter ? "enabled" : "disabled" ) );
 }

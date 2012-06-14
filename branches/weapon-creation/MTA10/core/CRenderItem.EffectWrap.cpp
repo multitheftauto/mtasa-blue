@@ -947,7 +947,7 @@ void CEffectWrapImpl::ApplyMappedHandles ( void )
         IDirect3DBaseTexture9* const* ppTexture = &g_pDeviceState->TextureState[ var.iStage ].Texture;
         if ( var.iType == RegMap::Texture2Texture )
         {
-            m_pD3DEffect->SetTexture ( var.hHandle, *ppTexture );
+            m_pD3DEffect->SetTexture ( var.hHandle, CDirect3DEvents9::GetRealTexture ( *ppTexture ) );
         }
         else
             assert ( 0 );

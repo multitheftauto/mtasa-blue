@@ -30,7 +30,7 @@ public:
 protected:
     bool                    ParseListVer0               ( CServerListItemList& itemList );
     bool                    ParseListVer2               ( CServerListItemList& itemList );
-    CServerListItem*        GetServerListItem           ( CServerListItemList& itemList, in_addr Address, ushort usQueryPort );
+    CServerListItem*        GetServerListItem           ( CServerListItemList& itemList, in_addr Address, ushort usGamePort );
 
     long long               m_llLastRefreshTime;
     SString                 m_strStage;
@@ -199,7 +199,7 @@ bool CRemoteMasterServer::ParseListVer0 ( CServerListItemList& itemList )
         stream.Read ( usQueryPort );
 
         // Add or find item to update
-        CServerListItem* pItem = GetServerListItem ( itemList, Address, usQueryPort );
+        CServerListItem* pItem = GetServerListItem ( itemList, Address, usQueryPort - SERVER_LIST_QUERY_PORT_OFFSET );
 
         if ( pItem->ShouldAllowDataQuality ( SERVER_INFO_ASE_0 ) )
         {
@@ -299,7 +299,7 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
         stream.Read ( usGamePort );
 
         // Add or find item to update
-        CServerListItem* pItem = GetServerListItem ( itemList, Address, usGamePort + 123 );
+        CServerListItem* pItem = GetServerListItem ( itemList, Address, usGamePort );
 
         if ( pItem->ShouldAllowDataQuality ( uiDataQuality ) )
         {
@@ -390,12 +390,12 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
 // Find or add list item for the address and port
 //
 ///////////////////////////////////////////////////////////////
-CServerListItem* CRemoteMasterServer::GetServerListItem ( CServerListItemList& itemList, in_addr Address, ushort usQueryPort )
+CServerListItem* CRemoteMasterServer::GetServerListItem ( CServerListItemList& itemList, in_addr Address, ushort usGamePort )
 {
-    CServerListItem* pItem = itemList.Find ( Address, usQueryPort );
+    CServerListItem* pItem = itemList.Find ( Address, usGamePort );
     if ( pItem )
         return pItem;
 
-    return itemList.Add ( Address, usQueryPort );
+    return itemList.Add ( Address, usGamePort );
 }
 

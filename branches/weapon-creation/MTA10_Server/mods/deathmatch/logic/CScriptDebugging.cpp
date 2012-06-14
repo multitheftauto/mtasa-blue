@@ -271,6 +271,10 @@ void CScriptDebugging::LogString ( const char* szPrePend, lua_State * luaVM, con
     SString strFile = "";
     int     iLine   = -1;
 
+    // Get a VM from somewhere
+    if ( !luaVM && !m_LuaMainStack.empty () )
+        luaVM = m_LuaMainStack.back ()->GetVM ();
+
     if ( luaVM && lua_getstack ( luaVM, 1, &debugInfo ) )
     {
         lua_getinfo ( luaVM, "nlS", &debugInfo );
@@ -296,7 +300,7 @@ void CScriptDebugging::LogString ( const char* szPrePend, lua_State * luaVM, con
     }
     else
     {
-        strText = SString ( "%s%s", szPrePend, szMessage );
+        strText = SString ( "%s%s%s", szPrePend, m_strLineAndFile.c_str(), szMessage );
     }
 
     // Create a different message if type is "INFO"
@@ -394,4 +398,27 @@ void CScriptDebugging::Broadcast ( const CPacket& Packet, unsigned int uiMinimum
             (*iter)->Send ( Packet );
         }
     }
+}
+
+
+// Keep a stack of called VMs to give global warnings/errors a context
+void CScriptDebugging::PushLuaMain ( CLuaMain* pLuaMain )
+{
+    m_LuaMainStack.push_back ( pLuaMain );
+}
+
+void CScriptDebugging::PopLuaMain ( CLuaMain* pLuaMain )
+{
+    dassert ( !m_LuaMainStack.empty () );
+    if ( !m_LuaMainStack.empty () )
+    {
+        dassert ( m_LuaMainStack.back () == pLuaMain );
+        m_LuaMainStack.pop_back ();
+    }
+}
+
+void CScriptDebugging::OnLuaMainDestroy ( CLuaMain* pLuaMain )
+{
+    dassert ( !ListContains ( m_LuaMainStack, pLuaMain ) );
+    ListRemove ( m_LuaMainStack, pLuaMain );
 }

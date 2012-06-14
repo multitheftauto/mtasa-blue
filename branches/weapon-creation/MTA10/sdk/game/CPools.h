@@ -77,7 +77,7 @@ public:
     virtual unsigned long   GetVehicleCount         ( ) = 0;
 
     // Objects pool
-    virtual CObject*        AddObject               ( DWORD dwModelID, bool bLowLod ) = 0;
+    virtual CObject*        AddObject               ( DWORD dwModelID, bool bLowLod, bool bBreakable ) = 0;
     virtual void            RemoveObject            ( CObject* pObject, bool bDelete = true ) = 0;
     virtual void            RemoveObject            ( unsigned long ulID, bool bDelete = true ) = 0;
     virtual CObject*        GetObject               ( unsigned long ulID ) = 0;

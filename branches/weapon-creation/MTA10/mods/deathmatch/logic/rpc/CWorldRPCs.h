@@ -52,6 +52,7 @@ public:
     DECLARE_RPC ( SetFarClipDistance );
     DECLARE_RPC ( SetFogDistance );
     DECLARE_RPC ( SetAircraftMaxHeight );
+    DECLARE_RPC ( SetOcclusionsEnabled );
     DECLARE_RPC ( ResetRainLevel );
     DECLARE_RPC ( ResetSunSize );
     DECLARE_RPC ( ResetSunColor );
@@ -59,6 +60,10 @@ public:
     DECLARE_RPC ( ResetFarClipDistance );
     DECLARE_RPC ( ResetFogDistance );
     DECLARE_RPC ( SetWeaponProperty );
+    DECLARE_RPC ( RemoveWorldModel );
+    DECLARE_RPC ( RestoreWorldModel );
+    DECLARE_RPC ( RestoreAllWorldModels );
+    DECLARE_RPC ( SetSyncIntervals );
 };
 
 #endif

@@ -26,25 +26,28 @@ class CGraphics;
 
 class CTileBatcher;
 class CLine3DBatcher;
+class CMaterialLine3DBatcher;
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
 
-namespace EBlendMode
+namespace EDrawMode
 {
-    enum EBlendModeType
+    enum EDrawModeType
     {
-        BLEND = 100,            // Alpha blend
-        ADD = 1000,             // Color add                          (used for making composite textures with a premultiplied source)
-        MODULATE_ADD = 10000,   // Modulate color with alpha then add (used for making composite textures with a non-premultiplied source)
+        NONE,
+        DX_LINE,
+        DX_SPRITE,
+        TILE_BATCHER,
     };
 }
+using EDrawMode::EDrawModeType;
 
-using EBlendMode::EBlendModeType;
 
 class CGraphics : public CGraphicsInterface, public CSingleton < CGraphics >
 {
     friend class CDirect3DEvents9;
 public:
+    ZERO_ON_NEW
                         CGraphics               ( CLocalGUI* pGUI );
                         ~CGraphics              ( void );
 
@@ -61,10 +64,12 @@ public:
     void                DrawLine3D              ( const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f );
     void                DrawRectangle           ( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor );
 
-    void                SetBlendMode            ( EBlendModeType blendMode = EBlendMode::BLEND );
-    SColor              ModifyColorForBlendMode ( SColor color );
-    void                BeginDrawBatch          ( void );
+    void                SetBlendMode            ( EBlendModeType blendMode );
+    EBlendModeType      GetBlendMode            ( void );
+    SColor              ModifyColorForBlendMode ( SColor color, EBlendModeType blendMode );
+    void                BeginDrawBatch          ( EBlendModeType blendMode = EBlendMode::NONE );
     void                EndDrawBatch            ( void );
+    void                SetBlendModeRenderStates ( EBlendModeType blendMode );
 
     unsigned int        GetViewportWidth        ( void );
     unsigned int        GetViewportHeight       ( void );
@@ -82,6 +87,7 @@ public:
     float               GetDXFontHeight         ( float fScale = 1.0f, ID3DXFont * pDXFont = NULL );
     float               GetDXCharacterWidth     ( char c, float fScale = 1.0f, ID3DXFont * pDXFont = NULL );
     float               GetDXTextExtent         ( const char * szText, float fScale = 1.0f, ID3DXFont * pDXFont = NULL );
+    float               GetDXTextExtentW        ( const wchar_t* wszText, float fScale = 1.0f, LPD3DXFONT pDXFont = NULL );
 
     // Textures
     void                DrawTexture             ( CTextureItem* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, float fRotation = 0.0f, float fCenterX = 0.0f, float fCenterY = 0.0f, DWORD dwColor = 0xFFFFFFFF );
@@ -96,11 +102,23 @@ public:
                                                   unsigned long ulColor,
                                                   bool bPostGUI );
 
-    void                DrawLine3DQueued        ( const CVector& vecBegin,
-                                                  const CVector& vecEnd,
-                                                  float fWidth,
-                                                  unsigned long ulColor,
-                                                  bool bPostGUI );
+    void                DrawLine3DQueued       ( const CVector& vecBegin,
+                                                 const CVector& vecEnd,
+                                                 float fWidth,
+                                                 unsigned long ulColor,
+                                                 bool bPostGUI );
+
+    void                DrawMaterialLine3DQueued
+                                               ( const CVector& vecBegin,
+                                                 const CVector& vecEnd,
+                                                 float fWidth,
+                                                 unsigned long ulColor,
+                                                 CMaterialItem* pMaterial,
+                                                 float fU = 0, float fV = 0,
+                                                 float fSizeU = 1, float fSizeV = 1, 
+                                                 bool bRelativeUV = true,
+                                                 bool bUseFaceToward = false,
+                                                 const CVector& vecFaceToward = CVector () );
 
     void                DrawRectQueued          ( float fX, float fY,
                                                   float fWidth, float fHeight,
@@ -119,15 +137,18 @@ public:
                                                   unsigned long ulColor,
                                                   bool bPostGUI );
 
-    void                DrawTextQueued          ( int iLeft, int iTop,
-                                                  int iRight, int iBottom,
+    void                DrawTextQueued          ( float iLeft, float iTop,
+                                                  float iRight, float iBottom,
                                                   unsigned long dwColor,
                                                   const char* wszText,
                                                   float fScaleX,
                                                   float fScaleY,
                                                   unsigned long ulFormat,
                                                   ID3DXFont * pDXFont = NULL,
-                                                  bool bPostGUI = false );
+                                                  bool bPostGUI = false,
+                                                  bool bColorCoded = false,
+                                                  bool bSubPixelPositioning = false );
+
 
     bool                CanSetRenderTarget      ( void )                { return m_bSetRenderTargetEnabled; }
     void                EnableSetRenderTarget   ( bool bEnable );
@@ -135,34 +156,45 @@ public:
 
     // Subsystems
     CRenderItemManagerInterface* GetRenderItemManager   ( void )        { return m_pRenderItemManager; }
+    CScreenGrabberInterface*     GetScreenGrabber       ( void )        { return m_pScreenGrabber; }
+    CPixelsManagerInterface*     GetPixelsManager       ( void )        { return m_pPixelsManager; }
 
     // To draw queued up drawings
     void                DrawPreGUIQueue         ( void );
     void                DrawPostGUIQueue        ( void );
-    
+    void                DrawMaterialLine3DQueue ( void );
+    bool                HasMaterialLine3DQueueItems ( void );
+
 private:
     void                OnDeviceCreate          ( IDirect3DDevice9 * pDevice );
     void                OnDeviceInvalidate      ( IDirect3DDevice9 * pDevice );
     void                OnDeviceRestore         ( IDirect3DDevice9 * pDevice );
     void                OnZBufferModified       ( void );
     ID3DXFont*          MaybeGetBigFont         ( ID3DXFont* pDXFont, float& fScaleX, float& fScaleY );
+    void                CheckModes              ( EDrawModeType newDrawMode, EBlendModeType newBlendMode = EBlendMode::NONE );
+    void                DrawColorCodedTextLine  ( float fLeft, float fRight, float fY, SColor& currentColor, const wchar_t* wszText,
+                                                  float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning );
 
     CLocalGUI*          m_pGUI;
 
     int                 m_iDebugQueueRefs;
     int                 m_iDrawBatchRefCount;
-    EBlendModeType      m_BlendMode;
-    EBlendModeType      m_BatchBlendMode;
+    EBlendModeType      m_ActiveBlendMode;
+    EDrawModeType       m_CurDrawMode;
+    EBlendModeType      m_CurBlendMode;
 
     LPD3DXSPRITE        m_pDXSprite;
     IDirect3DTexture9 * m_pDXPixelTexture;
 
     IDirect3DDevice9 *  m_pDevice;
 
-    CRenderItemManager* m_pRenderItemManager;
-    CTileBatcher*       m_pTileBatcher;
-    CLine3DBatcher*     m_pLine3DBatcherPreGUI;
-    CLine3DBatcher*     m_pLine3DBatcherPostGUI;
+    CRenderItemManager*         m_pRenderItemManager;
+    CScreenGrabberInterface*    m_pScreenGrabber;
+    CPixelsManagerInterface*    m_pPixelsManager;
+    CTileBatcher*               m_pTileBatcher;
+    CLine3DBatcher*             m_pLine3DBatcherPreGUI;
+    CLine3DBatcher*             m_pLine3DBatcherPostGUI;
+    CMaterialLine3DBatcher*     m_pMaterialLine3DBatcher;
     bool                m_bSetRenderTargetEnabled;
 
     // Fonts
@@ -180,7 +212,6 @@ private:
         QUEUE_LINE,
         QUEUE_TEXT,
         QUEUE_RECT,
-        QUEUE_CIRCLE,
         QUEUE_TEXTURE,
         QUEUE_SHADER,
     };
@@ -197,10 +228,10 @@ private:
 
     struct sDrawQueueText
     {
-        int             iLeft;
-        int             iTop;
-        int             iRight;
-        int             iBottom;
+        float           fLeft;
+        float           fTop;
+        float           fRight;
+        float           fBottom;
         unsigned long   ulColor;
         float           fScaleX;
         float           fScaleY;
@@ -214,14 +245,6 @@ private:
         float           fY;
         float           fWidth;
         float           fHeight;
-        unsigned long   ulColor;
-    };
-
-    struct sDrawQueueCircle
-    {
-        float           fX;
-        float           fY;
-        float           fRadius;
         unsigned long   ulColor;
     };
 
@@ -246,7 +269,8 @@ private:
     struct sDrawQueueItem
     {
         eDrawQueueType      eType;
-        std::wstring        strText;
+        EBlendModeType      blendMode;
+        std::wstring        wstrText;
 
         // Queue item data based on the eType.
         union
@@ -254,7 +278,6 @@ private:
             sDrawQueueLine          Line;
             sDrawQueueText          Text;
             sDrawQueueRect          Rect;
-            sDrawQueueCircle        Circle;
             sDrawQueueTexture       Texture;
         };
     };
@@ -271,7 +294,6 @@ private:
     std::vector < sDrawQueueItem >      m_PreGUIQueue;
     std::vector < sDrawQueueItem >      m_PostGUIQueue;
 
-    void                                HandleDrawQueueModeChange ( uint curMode, uint newMode );
     void                                AddQueueItem            ( const sDrawQueueItem& Item, bool bPostGUI );
     void                                DrawQueueItem           ( const sDrawQueueItem& Item );
     void                                DrawQueue               ( std::vector < sDrawQueueItem >& Queue );

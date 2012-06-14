@@ -349,7 +349,7 @@ int CLuaFunctionDefs::GetPedSimplestTask ( lua_State* luaVM )
         if ( pPed )
         {
             // Grab his simplest task and return it
-            char* szTaskName = CStaticFunctionDefinitions::GetPedSimplestTask ( *pPed );
+            const char* szTaskName = CStaticFunctionDefinitions::GetPedSimplestTask ( *pPed );
             if ( szTaskName )
             {
                 lua_pushstring ( luaVM, szTaskName );
@@ -890,11 +890,11 @@ int CLuaFunctionDefs::GetPedClothes ( lua_State* luaVM )
         unsigned char ucType = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
         if ( pPed )
         {
-            char szTexture [ 128 ], szModel [ 128 ];
-            if ( CStaticFunctionDefinitions::GetPedClothes ( *pPed, ucType, szTexture, szModel ) )
+            SString strTexture, strModel;
+            if ( CStaticFunctionDefinitions::GetPedClothes ( *pPed, ucType, strTexture, strModel ) )
             {
-                lua_pushstring ( luaVM, szTexture );
-                lua_pushstring ( luaVM, szModel );
+                lua_pushstring ( luaVM, strTexture );
+                lua_pushstring ( luaVM, strModel );
                 return 2;
             }
         }
@@ -935,6 +935,35 @@ int CLuaFunctionDefs::GetPedControlState ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetPedAnalogControlState ( lua_State* luaVM )
+{
+    SString strControlState = "";
+    float fState = 0.0f;
+    CClientPed* pPed = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPed );
+    argStream.ReadString ( strControlState );
+    
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( pPed )
+        {
+            float fState;
+            if ( CStaticFunctionDefinitions::GetPedAnalogControlState ( *pPed, strControlState, fState ) )
+            {
+                lua_pushnumber ( luaVM, fState );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedAnalogControlState", "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getPedAnalogControlState" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefs::IsPedDoingGangDriveby ( lua_State* luaVM )
 {
@@ -961,6 +990,36 @@ int CLuaFunctionDefs::IsPedDoingGangDriveby ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::SetPedAnalogControlState ( lua_State* luaVM )
+{
+    SString strControlState = "";
+    float fState = 0.0f;
+    CClientEntity* pEntity = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadString ( strControlState );
+    argStream.ReadNumber ( fState );
+    
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( pEntity )
+        {
+            if ( CStaticFunctionDefinitions::SetPedAnalogControlState ( *pEntity, strControlState, fState ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAnalogControlState", "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setPedAnalogControlState" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::GetPedAnimation ( lua_State* luaVM )
 {
     if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )
@@ -968,11 +1027,11 @@ int CLuaFunctionDefs::GetPedAnimation ( lua_State* luaVM )
         CClientPed * pPed = lua_toped ( luaVM, 1 );
         if ( pPed )
         {
-            char szBlockName [ 128 ], szAnimName [ 128 ];
-            if ( CStaticFunctionDefinitions::GetPedAnimation ( *pPed, szBlockName, szAnimName, 128 ))
+            SString strBlockName, strAnimName;
+            if ( CStaticFunctionDefinitions::GetPedAnimation ( *pPed, strBlockName, strAnimName ) )
             {
-                lua_pushstring ( luaVM, szBlockName );
-                lua_pushstring ( luaVM, szAnimName );
+                lua_pushstring ( luaVM, strBlockName );
+                lua_pushstring ( luaVM, strAnimName );
                 return 2;
             }
         }
@@ -1199,7 +1258,7 @@ int CLuaFunctionDefs::AddPedClothes ( lua_State* luaVM )
 
         if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::AddPedClothes ( *pEntity, const_cast < char* > ( szTexture ), const_cast < char* > ( szModel ), ucType ) )
+            if ( CStaticFunctionDefinitions::AddPedClothes ( *pEntity, szTexture, szModel, ucType ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -1614,14 +1673,27 @@ int CLuaFunctionDefs::SetPedAnimationProgress( lua_State* luaVM )
         {
             const char * szAnimName = NULL;
             float fProgress = 0.0f;
-            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) szAnimName = lua_tostring ( luaVM, 2 );
-            if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER ) fProgress = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
-
-            if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( *pEntity, szAnimName, fProgress ) )
+            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) 
             {
-                lua_pushboolean ( luaVM, true );
-                return 1;
+                szAnimName = lua_tostring ( luaVM, 2 );
+                if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER ) fProgress = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
+
+                if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( *pEntity, szAnimName, fProgress ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
             }
+            else if ( lua_type ( luaVM, 2 ) == LUA_TNONE || lua_type ( luaVM, 2 ) == LUA_TNIL )
+            {
+                if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( *pEntity, szAnimName, fProgress ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+                m_pScriptDebugging->LogBadType ( luaVM, "setPedAnimationProgress" );
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAnimationProgress", "element", 1 );

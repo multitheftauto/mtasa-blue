@@ -49,13 +49,17 @@ enum eAnimIDs
 
 #define STEALTH_KILL_RANGE 2.5f
 
-struct SBodyPartName { char szName [32]; };
-SBodyPartName BodyPartNames [10] =
-{ {"Unknown"}, {"Unknown"}, {"Unknown"}, {"Torso"}, {"Ass"},
-{"Left Arm"}, {"Right Arm"}, {"Left Leg"}, {"Right Leg"}, {"Head"} };
+struct SBodyPartName
+{
+    const char* szName;
+};
 
-// HACK: saves unneccesary loading of clothes textures
-CClientPed* g_pLastRebuilt = NULL;
+static const SFixedArray < SBodyPartName, 10 > BodyPartNames =
+{ {
+    {"Unknown"}, {"Unknown"}, {"Unknown"}, {"Torso"}, {"Ass"},
+    {"Left Arm"}, {"Right Arm"}, {"Left Leg"}, {"Right Leg"}, {"Head"}
+} };
+
 
 CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, ElementID ID ) : ClassInit ( this ), CClientStreamElement ( pManager->GetPlayerStreamer (), ID ), CAntiCheatModule ( pManager->GetAntiCheat () )
 {
@@ -155,7 +159,6 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bDestroyingSatchels = false;
     m_bDoingGangDriveby = false;
     m_pAnimationBlock = NULL;
-    m_szAnimationName = NULL;
     m_bRequestedAnimation = false;
     m_iTimeAnimation = -1;
     m_bLoopAnimation = false;    
@@ -312,10 +315,6 @@ CClientPed::~CClientPed ( void )
     }
 
     m_SyncBuffer.clear ();
-
-    // Make sure we're not referenced by the last rebuilt variable
-    if ( g_pLastRebuilt == this )
-        g_pLastRebuilt = NULL;
 
     if ( m_interp.pTargetOriginSource )
     {
@@ -1251,7 +1250,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     {
         if ( pVehicle->IsStreamedIn () )
         {
-            g_pGame->GetStreaming()->LoadAllRequestedModels ();
+            pModelInfo->Request ( BLOCKING, "CClientPed::WarpIntoVehicle" );
         }
     }
 
@@ -2224,6 +2223,14 @@ bool CClientPed::KillTaskSecondary ( int iTaskPriority, bool bGracefully )
 }
 
 
+CVector CClientPed::GetAim ( void ) const
+{
+    if ( m_shotSyncData )
+        return CVector ( m_shotSyncData->m_fArmDirectionX, m_shotSyncData->m_fArmDirectionY, 0 );
+    return CVector ();
+}
+
+
 void CClientPed::SetAim ( float fArmDirectionX, float fArmDirectionY, unsigned char cInVehicleAimAnim )
 {
     if ( !m_bIsLocalPlayer )
@@ -2324,9 +2331,14 @@ void CClientPed::StreamedInPulse ( void )
         {
             m_iLoadAllModelsCounter--;
             if ( GetModelInfo () )
-                g_pGame->GetStreaming()->LoadAllRequestedModels();
+                g_pGame->GetStreaming()->LoadAllRequestedModels( false, "CClientPed::StreamedInPulse - m_iLoadAllModelsCounter" );
         }
 
+        if ( m_bPendingRebuildPlayer )
+            ProcessRebuildPlayer ();
+
+        CControllerState Current;
+        GetControllerState ( Current );
 
         if ( m_bIsLocalPlayer )
         {
@@ -2335,6 +2347,11 @@ void CClientPed::StreamedInPulse ( void )
 
             // Do our stealth aiming stuff
             SetStealthAiming ( ShouldBeStealthAiming () );
+
+            // Process our scripted control settings
+            bool bOnFoot = pVehicle ? false : true;
+            CClientPad::ProcessAllToggledControls    ( Current, bOnFoot );
+            CClientPad::ProcessSetAnalogControlState ( Current, bOnFoot );
         }
 
         // Is the player stealth aiming?
@@ -2374,8 +2391,6 @@ void CClientPed::StreamedInPulse ( void )
             }
         }
         
-        CControllerState Current;
-        GetControllerState ( Current );
         unsigned long ulNow = CClientTime::GetTime (); 
         //MS checks must take into account the gamespeed
         float fSpeedRatio = (1.0f/g_pGame->GetGameSpeed ()); 
@@ -2547,8 +2562,27 @@ void CClientPed::StreamedInPulse ( void )
                 }
             }
 
+
+            // * Fix for warp glitches when sprinting and blocking simultaneously
+            // This is applied locally, and prevents you using the backwards key while sprint-blocking
+            CTask * pTask = m_pTaskManager->GetSimplestActiveTask ();
+            if ( ( pTask && pTask->GetTaskType () == TASK_SIMPLE_PLAYER_ON_FOOT ) &&
+                 ( GetWeapon()->GetSlot() == WEAPONSLOT_TYPE_UNARMED ) &&
+                 ( Current.RightShoulder1 != 0 ) &&
+                 ( Current.ButtonSquare != 0 ) &&
+                 ( Current.ButtonCross != 0 ) )
+            {  // We are block jogging
+                if ( Current.LeftStickY > 0 )  
+                    // We're pressing target+jump+sprint+backwards.  Using the backwards key in this situation is prone to bugs, swap it with forwards
+                    Current.LeftStickY = -Current.LeftStickY;
+                else if ( Current.LeftStickY == 0 )
+                    // We're pressing target+jump+sprint 
+                    // This causes some sliding, so let's disable this glitchy animation
+                    Current.ButtonCross = 0;
+            }
+
             // * Check for entering a vehicle whilst using a gun
-            CTask * pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
+            pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
             if ( pTask )
             {
                 int iTaskType = pTask->GetTaskType ();
@@ -2752,11 +2786,9 @@ void CClientPed::StreamedInPulse ( void )
                 m_bRequestedAnimation = false;
 
                 // Copy our name incase it gets deleted
-                char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
-                strcpy ( szAnimName, m_szAnimationName );
+                SString strAnimName = m_strAnimationName;
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
-                delete [] szAnimName;                
+                RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
             }            
         }
 
@@ -3106,7 +3138,7 @@ void CClientPed::_CreateModel ( void )
     // Replace the loaded model info with the model we're going to load and
     // add a reference to it.
     m_pLoadedModelInfo = m_pModelInfo;
-    m_pLoadedModelInfo->AddRef ( true );
+    m_pLoadedModelInfo->ModelAddRef ( BLOCKING, "CClientPed::_CreateModel" );
 
     // Create the new ped
     m_pPlayerPed = dynamic_cast < CPlayerPed* > ( g_pGame->GetPools ()->AddPed ( static_cast < ePedModel > ( m_ulModel ) ) );
@@ -3114,6 +3146,9 @@ void CClientPed::_CreateModel ( void )
     {
         // Put our pointer in the stored data and update the remote data with the new model pointer
         m_pPlayerPed->SetStoredPointer ( this );
+
+        // Add XRef
+        g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pPlayerPed );
 
         g_pMultiplayer->AddRemoteDataStorage ( m_pPlayerPed, m_remoteDataStorage );
 
@@ -3196,11 +3231,9 @@ void CClientPed::_CreateModel ( void )
         if ( m_bLoopAnimation && m_pAnimationBlock )
         {
             // Copy our anim name incase it gets deleted
-            char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
-            strcpy ( szAnimName, m_szAnimationName );
+            SString strAnimName = m_strAnimationName;
             // Run our animation
-            RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
-            delete [] szAnimName;
+            RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
         }
 
         // Set the voice that corresponds to our model
@@ -3236,9 +3269,12 @@ void CClientPed::_CreateLocalModel ( void )
         // Put our pointer in its stored pointer
         m_pPlayerPed->SetStoredPointer ( this );
 
+        // Add XRef
+        g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pPlayerPed );
+
         // Add a reference to the model we're using
         m_pLoadedModelInfo = m_pModelInfo;
-        m_pLoadedModelInfo->AddRef ( true );
+        m_pLoadedModelInfo->ModelAddRef ( BLOCKING, "CClientPed::_CreateLocalModel" );
 
         // Make sure we are CJ
         if ( m_pPlayerPed->GetModelIndex () != m_ulModel )
@@ -3308,6 +3344,9 @@ void CClientPed::_DestroyModel ()
     // Invalidate
     m_pManager->InvalidateEntity ( this );
 
+    // Remove XRef
+    g_pClientGame->GetGameEntityXRefManager ()->RemoveEntityXRef ( this, m_pPlayerPed );
+
     // Remove the ped from the world
     g_pGame->GetPools ()->RemovePed ( m_pPlayerPed );
     m_pPlayerPed = NULL;
@@ -3316,6 +3355,9 @@ void CClientPed::_DestroyModel ()
     // Remove the reference to its model
     m_pLoadedModelInfo->RemoveRef ();
     m_pLoadedModelInfo = NULL;
+
+    // Any pending rebuild will not be required now
+    m_bPendingRebuildPlayer = false;
 
     NotifyDestroy ();
 }
@@ -3348,6 +3390,9 @@ void CClientPed::_DestroyLocalModel ()
     // Invalidate
     m_pManager->InvalidateEntity ( this );
 
+    // Remove XRef
+    g_pClientGame->GetGameEntityXRefManager ()->RemoveEntityXRef ( this, m_pPlayerPed );
+
     // Make sure we are CJ again
     if ( m_pPlayerPed->GetModelIndex () != 0 )
     {
@@ -3369,6 +3414,8 @@ void CClientPed::_ChangeModel ( void )
     // Different model than before?
     if ( m_pPlayerPed->GetModelIndex () != m_ulModel )
     {
+        g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter ( false );
+
         // We need to reset visual stats when changing from CJ model
         if ( m_pPlayerPed->GetModelIndex () == 0 )
         {
@@ -3406,13 +3453,29 @@ void CClientPed::_ChangeModel ( void )
             m_pLoadedModelInfo = m_pModelInfo;
 
             // Add reference to the model
-            m_pLoadedModelInfo->AddRef ( true );
+            m_pLoadedModelInfo->ModelAddRef ( BLOCKING, "CClientPed::_ChangeModel" );
 
             // Set the new player model and restore the interior
             m_pPlayerPed->SetModelIndex ( m_ulModel );
 
             // Rebuild the player after a skin change
-            RebuildModel ();
+            if ( m_ulModel == 0 )
+            {
+                // When the local player changes to CJ, the clothes geometry gets an extra ref from somewhere, causing a memory leak.
+                // So make sure clothes geometry is built now...
+                m_pClothes->AddAllToModel ();
+                m_pPlayerPed->RebuildPlayer ();
+
+                // ...and decrement the extra ref
+                m_pPlayerPed->RemoveGeometryRef ();
+            }
+            else
+            {
+                // When the local player changes to another (non CJ) model, the geometry gets an extra ref from somewhere, causing a memory leak.
+                // So decrement the extra ref here
+                m_pPlayerPed->RemoveGeometryRef ();
+            }
+
 
             // Remove reference to the old model we used (Flag extra GTA reference to be removed as well)
             pLoadedModel->RemoveRef ( true );
@@ -3429,11 +3492,9 @@ void CClientPed::_ChangeModel ( void )
             if ( m_bLoopAnimation && m_pAnimationBlock )
             {
                 // Copy our anim name incase it gets deleted
-                char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
-                strcpy ( szAnimName, m_szAnimationName );
+                SString strAnimName = m_strAnimationName;
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
-                delete [] szAnimName;
+                RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
             }
 
             // Set the voice that corresponds to the new model
@@ -3451,6 +3512,8 @@ void CClientPed::_ChangeModel ( void )
             // Create the new with the new skin
             _CreateModel ();
         }
+
+        g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter ( true );
     }
 }
 
@@ -3464,7 +3527,7 @@ void CClientPed::ReCreateModel ( void )
         bool bSameModel = ( m_pLoadedModelInfo == m_pModelInfo );
         if ( bSameModel )
         {
-            m_pLoadedModelInfo->AddRef ( true );
+            m_pLoadedModelInfo->ModelAddRef ( BLOCKING, "CClientPed::ReCreateModel" );
         }
 
         // Destroy the old model
@@ -3498,7 +3561,7 @@ void CClientPed::ModelRequestCallback ( CModelInfo* pModelInfo )
 }
 
 
-void CClientPed::RebuildModel ( bool bForceClothes )
+void CClientPed::RebuildModel ( bool bDelayChange )
 {
     // We have a player
     if ( m_pPlayerPed )
@@ -3506,25 +3569,40 @@ void CClientPed::RebuildModel ( bool bForceClothes )
         // We are CJ?
         if ( m_ulModel == 0 )
         {
-            // Re-add the clothes if its a CJ model
-            if ( g_pLastRebuilt != this || bForceClothes )
-            {
-                // Adds only the neccesary textures
-                m_pClothes->AddAllToModel ();
+            // Adds only the neccesary textures
+            m_pClothes->AddAllToModel ();
 
-                g_pLastRebuilt = this;
-            }
+            m_bPendingRebuildPlayer = true;
 
-            if ( m_bIsLocalPlayer )
-            {
-                m_pPlayerPed->RebuildPlayer ();
-            }
-            else
-            {
-                g_pMultiplayer->RebuildMultiplayerPlayer ( m_pPlayerPed );            
-            }
+            // Apply immediately unless there is a chance more clothes states will change (e.g. via script)
+            if ( !bDelayChange )
+                ProcessRebuildPlayer ();
         }
-    }    
+    }
+}
+
+
+//
+// Process any pending build but avoid rebuilding more than once a frame
+//
+void CClientPed::ProcessRebuildPlayer ( void )
+{
+    assert ( m_pPlayerPed );
+
+    if ( m_bPendingRebuildPlayer && m_uiFrameLastRebuildPlayer != g_pClientGame->GetFrameCount () )
+    {
+        m_bPendingRebuildPlayer = false;
+        m_uiFrameLastRebuildPlayer = g_pClientGame->GetFrameCount ();
+
+        if ( m_bIsLocalPlayer )
+        {
+            m_pPlayerPed->RebuildPlayer ();
+        }
+        else
+        {
+            g_pMultiplayer->RebuildMultiplayerPlayer ( m_pPlayerPed );
+        }
+    }
 }
 
 
@@ -3535,15 +3613,31 @@ void CClientPed::StreamIn ( bool bInstantly )
         NotifyCreate ();
         return;
     }
-
-    // Request it
-    if ( !m_pPlayerPed && m_pRequester->Request ( static_cast < unsigned short > ( m_ulModel ), this ) )
+#if 0
+    // We need to create now?
+    if ( bInstantly )
     {
-        m_pModelInfo->MakeCustomModel ( );
-        // If it was loaded, create it immediately.
-        _CreateModel ();
+        // Request its model blocking
+        if ( !m_pPlayerPed && m_pRequester->RequestBlocking ( static_cast < unsigned short > ( m_ulModel ), "CClientVehicle::StreamIn - bInstantly" ) )
+        {
+            m_pModelInfo->MakeCustomModel ( );
+            // If it was loaded, create it immediately.
+            _CreateModel ();
+        }
+        else NotifyUnableToCreate ();
     }
-    else NotifyUnableToCreate ();
+    else
+#endif
+    {
+        // Request it
+        if ( !m_pPlayerPed && m_pRequester->Request ( static_cast < unsigned short > ( m_ulModel ), this ) )
+        {
+            m_pModelInfo->MakeCustomModel ( );
+            // If it was loaded, create it immediately.
+            _CreateModel ();
+        }
+        else NotifyUnableToCreate ();
+    }
 }
 
 
@@ -4690,7 +4784,7 @@ void CClientPed::Respawn ( CVector * pvecPosition, bool bRestoreState, bool bCam
 }
 
 
-char* CClientPed::GetBodyPartName ( unsigned char ucID )
+const char* CClientPed::GetBodyPartName ( unsigned char ucID )
 {
     if ( ucID <= 10 )
     {
@@ -4819,7 +4913,7 @@ void CClientPed::UpdateTargetPosition ( void )
         // Check if the distance to interpolate is too far.
         CVector vecVelocity;
         GetMoveSpeed ( vecVelocity );
-        float fThreshold = ( PED_INTERPOLATION_WARP_THRESHOLD + PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED * vecVelocity.Length () ) * g_pGame->GetGameSpeed ();
+        float fThreshold = ( PED_INTERPOLATION_WARP_THRESHOLD + PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED * vecVelocity.Length () ) * g_pGame->GetGameSpeed () * TICK_RATE / 100;
 
         // There is a reason to have this condition this way: To prevent NaNs generating new NaNs after interpolating (Comparing with NaNs always results to false).
         if ( ! ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () <= fThreshold ) )
@@ -5064,19 +5158,8 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
         
         if( !pBlock->IsLoaded() )
         {
-            int iTimeToWait = 50;
-
-            g_pGame->GetStreaming()->RequestAnimations( pBlock->GetIndex(), 4 );
-            g_pGame->GetStreaming()->LoadAllRequestedModels( );
-
-            while( !pBlock->IsLoaded() && iTimeToWait != 0 )
-            {
-                iTimeToWait--;
-                Sleep(10);
-            }
-
-            if( iTimeToWait == 0 )
-                bLoaded = false;
+            pBlock->Request ( BLOCKING );
+            assert( pBlock->IsLoaded () );
         }
 
         if ( bLoaded )
@@ -5107,14 +5190,16 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
         }
         else
         {
+            assert ( 0 );
+/*
             // TODO: unload unreferenced blocks later on
             g_pGame->GetStreaming ()->RequestAnimations ( pBlock->GetIndex (), 8 );
             m_bRequestedAnimation = true;
+*/
         }
     }
     m_pAnimationBlock = pBlock;
-    m_szAnimationName = new char [ strlen ( szAnimName ) + 1 ];
-    strcpy ( m_szAnimationName, szAnimName ); 
+    m_strAnimationName = szAnimName; 
     m_iTimeAnimation = iTime;
     m_bLoopAnimation = bLoop;
     m_bUpdatePositionAnimation = bUpdatePosition;
@@ -5140,11 +5225,7 @@ void CClientPed::KillAnimation ( void )
         }
     }
     m_pAnimationBlock = NULL;
-    if ( m_szAnimationName )
-    {
-        delete [] m_szAnimationName;
-        m_szAnimationName = NULL;
-    }
+    m_strAnimationName = "";
     m_bRequestedAnimation = false;
 }
 
@@ -5481,7 +5562,7 @@ void CClientPed::HandleWaitingForGroundToLoad ( void )
 
     // Load load load
     if ( GetModelInfo () )
-        g_pGame->GetStreaming()->LoadAllRequestedModels ();
+        g_pGame->GetStreaming()->LoadAllRequestedModels ( false, "CClientPed::HandleWaitingForGroundToLoad" );
 
     // Start out with a fairly big radius to check, and shrink it down over time
     float fUseRadius = 50.0f * ( 1.f - Max ( 0.f, m_fObjectsAroundTolerance ) );

@@ -244,7 +244,7 @@ void CCrashDumpWriter::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptio
                 ExInfo.ClientPointers = FALSE;
 
                 // Write the dump
-                pDump ( GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &ExInfo, NULL, NULL );
+                pDump ( GetCurrentProcess(), GetCurrentProcessId(), hFile, (MINIDUMP_TYPE)( MiniDumpNormal | MiniDumpWithIndirectlyReferencedMemory ), &ExInfo, NULL, NULL );
 
                 // Close the dumpfile
                 CloseHandle ( hFile );
@@ -361,6 +361,13 @@ void CCrashDumpWriter::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptio
                 GetMiscInfo ( miscInfo );
                 AppendToDumpFile ( strPathFilename, miscInfo, 'MSCs', 'MSCe' );
                 SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-misc" );
+
+                // Try to append memory info to dump file
+                SetApplicationSetting ( "diagnostics", "last-dump-extra", "try-mem" );
+                CBuffer memInfo;
+                GetMemoryInfo ( memInfo );
+                AppendToDumpFile ( strPathFilename, memInfo, 'MEMs', 'MEMe' );
+                SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-mem" );
             }
         }
 
@@ -763,4 +770,80 @@ void CCrashDumpWriter::GetMiscInfo ( CBuffer& buffer )
     unsigned char ucB = *reinterpret_cast < unsigned char* > ( 0x748ADE );
     stream.Write ( ucA );
     stream.Write ( ucB );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CCrashDumpWriter::GetMemoryInfo
+//
+// Static function
+// Same stuff as from showmemstat command
+//
+///////////////////////////////////////////////////////////////
+void CCrashDumpWriter::GetMemoryInfo ( CBuffer& buffer )
+{
+    CBufferWriteStream stream ( buffer );
+
+    // Write info version
+    stream.Write ( 1 );
+
+    SMemStatsInfo memStatsNow;
+    GetMemStats ()->SampleState ( memStatsNow );
+
+    // GTA video memory
+    static const CProxyDirect3DDevice9::SResourceMemory* const nowList[] = {    &memStatsNow.d3dMemory.StaticVertexBuffer, &memStatsNow.d3dMemory.DynamicVertexBuffer,
+                                                                                &memStatsNow.d3dMemory.StaticIndexBuffer, &memStatsNow.d3dMemory.DynamicIndexBuffer,
+                                                                                &memStatsNow.d3dMemory.StaticTexture, &memStatsNow.d3dMemory.DynamicTexture };
+    int iNumLines = NUMELMS( nowList );
+    stream.Write ( iNumLines );
+    for ( int i = 0 ; i < iNumLines ; i++ )
+    {
+        stream.Write ( nowList[i]->iLockedCount );
+        stream.Write ( nowList[i]->iCreatedCount );
+        stream.Write ( nowList[i]->iDestroyedCount );
+        stream.Write ( nowList[i]->iCurrentCount );
+        stream.Write ( nowList[i]->iCurrentBytes );
+    }
+
+    // Game memory
+    stream.Write ( 3 );
+    stream.Write ( memStatsNow.iProcessMemSizeKB );
+    stream.Write ( memStatsNow.iStreamingMemoryUsed );
+    stream.Write ( memStatsNow.iStreamingMemoryAvailable );
+
+    // Model usage
+    iNumLines = sizeof ( memStatsNow.modelInfo ) / sizeof ( uint );
+    stream.Write ( iNumLines );
+    for ( int i = 0 ; i < iNumLines ; i++ )
+    {
+        stream.Write ( memStatsNow.modelInfo.uiArray[i] );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CCrashDumpWriter::GetCrashAvertedStatsSoFar
+//
+// Static function
+// Grab the crash averted stats
+//
+///////////////////////////////////////////////////////////////
+SString CCrashDumpWriter::GetCrashAvertedStatsSoFar ()
+{
+    SString strResult;
+    ms_uiTickCountBase = GetTickCount32 ();
+
+    int iIndex = 1;
+    for ( std::map < int, SCrashAvertedInfo >::iterator iter = ms_CrashAvertedMap.begin () ; iter != ms_CrashAvertedMap.end () ; ++iter )
+    {
+        strResult += SString ( "%d) Age:%5d Type:%2d Count:%d\n"
+                                            , iIndex++
+                                            , ms_uiTickCountBase - iter->second.uiTickCount
+                                            , iter->first
+                                            , iter->second.uiUsageCount
+                                            );
+    }
+    return strResult;
 }

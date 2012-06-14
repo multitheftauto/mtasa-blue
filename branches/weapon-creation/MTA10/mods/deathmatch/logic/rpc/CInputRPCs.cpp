@@ -228,15 +228,8 @@ void CInputRPCs::SetControlState ( NetBitStreamInterface& bitStream )
         {
             if ( *szControl )
             {
-                CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds ();
-                if ( pKeyBinds )
-                {
-                    SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szControl );
-                    if ( pControl )
-                    {
-                        pControl->bState = ucState == 1;
-                    }
-                }
+                
+                CStaticFunctionDefinitions::SetControlState ( szControl, ucState == 1 );
             }
         }
         delete [] szControl;
@@ -256,7 +249,7 @@ void CInputRPCs::ForceReconnect ( NetBitStreamInterface& bitStream )
 
         bitStream.Read ( szHost, ucHost );
 
-        if ( szHost && bitStream.Read ( usPort ) )
+        if ( szHost[0] && bitStream.Read ( usPort ) )
         {
             if ( bitStream.Read ( ucPassword ) )
             {
@@ -265,12 +258,14 @@ void CInputRPCs::ForceReconnect ( NetBitStreamInterface& bitStream )
 
                 bitStream.Read ( szPassword, ucPassword );
 
-                if ( szPassword )
+                if ( szPassword[0] )
                 {
                     g_pCore->Reconnect ( szHost, usPort, szPassword, false );
+                    delete [] szPassword;
                     delete [] szHost;
                     return;
                 }
+                delete [] szPassword;
             }
 
             g_pCore->Reconnect ( szHost, usPort, NULL );
@@ -289,7 +284,7 @@ void CInputRPCs::ShowCursor ( NetBitStreamInterface& bitStream )
          bitStream.Read ( usResource ) &&
          bitStream.Read ( ucToggleControls ) )
     {
-        CResource* pResource = g_pClientGame->GetResourceManager ()->GetResource ( usResource );
+        CResource* pResource = g_pClientGame->GetResourceManager ()->GetResourceFromNetID ( usResource );
         if ( pResource )
         {
             pResource->ShowCursor ( ucShow == 1, ucToggleControls == 1 );

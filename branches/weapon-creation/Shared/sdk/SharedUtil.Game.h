@@ -88,4 +88,19 @@ namespace SharedUtil
         bool        bInsideBuilding;
     };
 
+
+    namespace EDiagnosticDebug
+    {
+        enum EDiagnosticDebugType
+        {
+            NONE,
+            GRAPHICS_6734,
+            BIDI_6778,
+            D3D_6732,
+            LOG_TIMING_0000,
+        };
+    };
+
+    using EDiagnosticDebug::EDiagnosticDebugType;
+
 }

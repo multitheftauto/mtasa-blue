@@ -67,6 +67,7 @@ static CVector* pBulletImpactEndPosition;
 extern PreWeaponFireHandler* m_pPreWeaponFireHandler;
 extern PostWeaponFireHandler* m_pPostWeaponFireHandler;
 extern BulletImpactHandler* m_pBulletImpactHandler;
+extern BulletFireHandler* m_pBulletFireHandler;
 extern DamageHandler* m_pDamageHandler;
 extern FireHandler* m_pFireHandler;
 extern ProjectileHandler* m_pProjectileHandler;
@@ -79,6 +80,8 @@ DWORD RETURN_CProjectile__CProjectile = 0x4037B3;
 CPools * m_pools = 0;
 
 #define VAR_CWorld_IncludeCarTyres 0xb7cd70 // Used for CWorld_ProcessLineOfSight
+
+void InitFireInstantHit_MidHooks ( void );
 
 VOID InitShotsyncHooks()
 {
@@ -102,6 +105,7 @@ VOID InitShotsyncHooks()
     HookInstall ( HOOKPOS_CWeapon_FireInstantHit_IsPlayer, (DWORD)HOOK_CWeapon_FireInstantHit_IsPlayer, 7 );
     HookInstall ( HOOKPOS_CWeapon_DoBulletImpact, (DWORD)HOOK_CWeapon_DoBulletImpact, 7 );
 
+    InitFireInstantHit_MidHooks ();
     /*  
     MemPut < BYTE > ( 0x73FDEC, 0x90 );
     MemPut < BYTE > ( 0x73FDED, 0xE9 );
@@ -1004,6 +1008,106 @@ static void CheckInVehicleDamage()
     }
 }
 
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CWeapon_FireInstantHit_Mid
+//
+// Called when the local player fires a bullet
+// If using bullet sync, send the bullet vectors to the other players
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMy_CWeapon_FireInstantHit_Mid ( CEntitySAInterface* pEntity, CVector pvecStart, CVector pvecEnd, bool bFlag )
+{
+    CPed * pTargetingPed = m_pools->GetPed ( (DWORD *)pEntity );
+    if ( IsLocalPlayer ( pTargetingPed ) )
+    {
+        if ( m_pBulletFireHandler )
+            m_pBulletFireHandler ( pTargetingPed, &pvecStart, &pvecEnd );
+    }
+}
+
+// Hook info
+#define HOOKPOS_CWeapon_FireInstantHit_Mid                         0x740B89
+#define HOOKSIZE_CWeapon_FireInstantHit_Mid                        5
+DWORD RETURN_CWeapon_FireInstantHit_Mid =                          0x740B8E;
+void _declspec(naked) HOOK_CWeapon_FireInstantHit_Mid ()
+{
+    _asm
+    {
+        pushad
+
+        mov         ecx,dword ptr [esp+14h+32]
+        push        eax
+
+        mov         eax,dword ptr [esp+14h+32]
+        sub         esp,0Ch
+        mov         edx,esp
+        mov         dword ptr [edx],eax
+        mov         eax,dword ptr [esp+28h+32]
+        mov         dword ptr [edx+4],ecx
+        mov         dword ptr [edx+8],eax
+        mov         edx,dword ptr [esp+3Ch+32]
+        mov         eax,dword ptr [esp+40h+32]
+        sub         esp,0Ch
+        mov         ecx,esp
+        mov         dword ptr [ecx],edx
+        mov         edx,dword ptr [esp+50h+32]
+        mov         dword ptr [ecx+4],eax
+        mov         dword ptr [ecx+8],edx
+        push        edi
+        call    OnMy_CWeapon_FireInstantHit_Mid
+        add     esp, 4*8
+        popad
+
+        // Do original code and continue
+        mov         ecx,dword ptr [esp+14h] 
+        push        eax 
+        jmp     RETURN_CWeapon_FireInstantHit_Mid
+    }
+}
+
+// Hook install
+VOID InitFireInstantHit_MidHooks()
+{
+    HookInstall ( HOOKPOS_CWeapon_FireInstantHit_Mid, (DWORD)HOOK_CWeapon_FireInstantHit_Mid, HOOKSIZE_CWeapon_FireInstantHit_Mid );
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// HandleRemoteInstantHit
+//
+// Called when a remote player fires a bullet
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void HandleRemoteInstantHit( void )
+{
+    CPed * pTargetingPed = m_pools->GetPed ( (DWORD *)pShootingPed );
+    CPlayerPed* pTargetingPlayerPed = dynamic_cast < CPlayerPed* > ( pTargetingPed );
+    if ( !pTargetingPlayerPed ) return;
+
+    if ( !IsLocalPlayer( pTargetingPed ) )
+    {
+        CRemoteDataStorageSA * data = CRemoteDataSA::GetRemoteDataStorage ( pTargetingPlayerPed );
+        if ( data )
+        {
+            if ( data->ProcessPlayerWeapon () )
+            {
+                // Replace start and end vectors if we have any bullet sync information
+                if ( data->m_shotSyncData.m_bRemoteBulletSyncVectorsValid )
+                {
+                    *pInstantHitStart = data->m_shotSyncData.m_vecRemoteBulletSyncStart;
+                    *pInstantHitEnd = data->m_shotSyncData.m_vecRemoteBulletSyncEnd;
+                    data->m_shotSyncData.m_bRemoteBulletSyncVectorsValid = false;
+                }
+            }
+        }
+    }
+}
+
+
+
 void _cdecl DoFireInstantHitPokes ( void )
 {
     MemPutFast < unsigned char > ( VAR_CWorld_IncludeCarTyres, 1 );
@@ -1059,6 +1163,8 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit ()
 
     // Make sure we include car tyres in our ProcessLineOfSight check
     _asm call DoFireInstantHitPokes
+
+    HandleRemoteInstantHit ();
 
     _asm
     {

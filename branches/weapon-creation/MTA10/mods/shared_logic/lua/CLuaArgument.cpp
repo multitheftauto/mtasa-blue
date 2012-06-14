@@ -44,40 +44,6 @@ CLuaArgument::CLuaArgument ( void )
 }
 
 
-CLuaArgument::CLuaArgument ( bool bBool )
-{
-    m_pTableData = NULL;
-    Read ( bBool );
-}
-
-
-CLuaArgument::CLuaArgument ( double dNumber )
-{
-    m_pTableData = NULL;
-    Read ( dNumber );
-}
-
-
-CLuaArgument::CLuaArgument ( const std::string& strString )
-{
-    m_pTableData = NULL;
-    Read ( strString );
-}
-
-CLuaArgument::CLuaArgument ( void* pUserData )
-{
-    m_pTableData = NULL;
-    Read ( pUserData );
-}
-
-
-CLuaArgument::CLuaArgument ( CClientEntity* pElement )
-{
-    m_pTableData = NULL;
-    Read ( pElement );
-}
-
-
 CLuaArgument::CLuaArgument ( const CLuaArgument& Argument, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables )
 {
     // Initialize and call our = on the argument
@@ -334,7 +300,7 @@ void CLuaArgument::Read ( lua_State* luaVM, int iArgument, std::map < const void
 }
 
 
-void CLuaArgument::Read ( bool bBool )
+void CLuaArgument::ReadBool ( bool bBool )
 {
     m_strString = "";
     m_iType = LUA_TBOOLEAN;
@@ -343,7 +309,7 @@ void CLuaArgument::Read ( bool bBool )
 }
 
 
-void CLuaArgument::Read ( double dNumber )
+void CLuaArgument::ReadNumber ( double dNumber )
 {
     m_strString = "";
     m_iType = LUA_TNUMBER;
@@ -352,7 +318,7 @@ void CLuaArgument::Read ( double dNumber )
 }
 
 
-void CLuaArgument::Read ( const std::string& strString )
+void CLuaArgument::ReadString ( const std::string& strString )
 {
     m_iType = LUA_TSTRING;
     DeleteTableData ();
@@ -360,16 +326,16 @@ void CLuaArgument::Read ( const std::string& strString )
 }
 
 
-void CLuaArgument::Read ( void* pUserData )
+void CLuaArgument::ReadScriptID ( uint uiScriptID )
 {
     m_strString = "";
     DeleteTableData ();
     m_iType = LUA_TLIGHTUSERDATA;
-    m_pLightUserData = pUserData;
+    m_pLightUserData = reinterpret_cast < void* > ( uiScriptID );
 }
 
 
-void CLuaArgument::Read ( CClientEntity* pElement )
+void CLuaArgument::ReadElement ( CClientEntity* pElement )
 {
     m_strString = "";
     DeleteTableData ();
@@ -389,15 +355,6 @@ void CLuaArgument::ReadElementID ( ElementID ID )
     DeleteTableData ();
     m_iType = LUA_TLIGHTUSERDATA;
     m_pLightUserData = (void*) reinterpret_cast<unsigned int *>(ID.Value());
-}
-
-
-void CLuaArgument::ReadUserData ( void* pUserData )
-{
-    m_strString = "";
-    DeleteTableData ();
-    m_iType = LUA_TLIGHTUSERDATA;
-    m_pLightUserData = pUserData;
 }
 
 
@@ -492,7 +449,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
             {
                 bool bValue;
                 if ( bitStream.ReadBit ( bValue ) )
-                    Read(bValue);
+                    ReadBool ( bValue );
                 break;
             }
 
@@ -504,13 +461,13 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
                 {
                     float fNum;
                     if ( bitStream.Read ( fNum ) )
-                        Read ( (double) fNum );
+                        ReadNumber ( fNum );
                 }
                 else
                 {
                     long lNum;
                     if ( bitStream.ReadCompressed ( lNum ) )
-                        Read ( (double) lNum );
+                        ReadNumber ( lNum );
                 }
                 break;
             }
@@ -553,14 +510,41 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
                     if ( bitStream.Read ( szValue, usLength ) )
                     {
                         // Put it into us
-                        Read ( std::string ( szValue, usLength ) );
+                        ReadString ( std::string ( szValue, usLength ) );
                     }
 
                     // Delete the buffer
                     delete [] szValue;
                 }
                 else
-                    Read ( std::string ( "" ) );
+                    ReadString ( "" );
+
+                break;
+            }
+
+            // Long string type
+            case LUA_TSTRING_LONG:
+            {
+                // Read out the string length
+                uint uiLength;
+                if ( bitStream.ReadCompressed ( uiLength ) && uiLength )
+                {
+                    bitStream.AlignReadToByteBoundary ();
+
+                    // Allocate a buffer and read the string into it
+                    char* szValue = new char [ uiLength + 1 ];
+                    assert ( szValue );
+                    if ( bitStream.Read ( szValue, uiLength ) )
+                    {
+                        // Put it into us
+                        ReadString ( std::string ( szValue, uiLength ) );
+                    }
+
+                    // Delete the buffer
+                    delete [] szValue;
+                }
+                else
+                    ReadString ( "" );
 
                 break;
             }
@@ -671,17 +655,25 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
                 // Write the content too if it's not empty
                 if ( usLength > 0 )
                 {
-                    bitStream.Write ( const_cast < char* > ( szTemp ), usLength );
+                    bitStream.Write ( szTemp, usLength );
                 }
             }
             else
             {
-                // Too long string
-                LogUnableToPacketize ( "Couldn't packetize argument list. Invalid string specified, limit is 65535 characters." );
+                // This is a long string argument
+                type.data.ucType = LUA_TSTRING_LONG;
+                bitStream.Write ( &type );
 
-                // Write a nil though so other side won't get out of sync
-                bitStream.Write ( (unsigned char) LUA_TNIL );
-                return false;
+                // Write its length
+                uint uiLength = sizeTemp;
+                bitStream.WriteCompressed ( uiLength );
+
+                // Write the content too if it's not empty
+                if ( uiLength > 0 )
+                {
+                    bitStream.AlignWriteToByteBoundary ();
+                    bitStream.Write ( szTemp, uiLength );
+                }
             }
             break;
         }
@@ -815,8 +807,8 @@ json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, std::map < CLua
         case LUA_TLIGHTUSERDATA:
         {
             CClientEntity* pElement = GetElement ();
-            CResource* pResource = reinterpret_cast < CResource* > ( GetLightUserData() );
-            
+            CResource* pResource = g_pClientGame->GetResourceManager ()->GetResourceFromScriptID ( reinterpret_cast < unsigned long > ( GetLightUserData () ) );
+
             // Elements are dynamic, so storing them is potentially unsafe
             if ( pElement && bSerialize )
             {
@@ -832,7 +824,13 @@ json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, std::map < CLua
             }
             else
             {
-                g_pClientGame->GetScriptDebugging()->LogError ( NULL, "Couldn't convert argument list to JSON, only valid elements can be sent." );
+                if ( pElement )     // eg toJSON() with valid element
+                    g_pClientGame->GetScriptDebugging()->LogError ( NULL, "Couldn't convert userdata argument to JSON, elements not allowed for this function." );
+                else
+                if ( !bSerialize )  // eg toJSON() with invalid element
+                    g_pClientGame->GetScriptDebugging()->LogError ( NULL, "Couldn't convert userdata argument to JSON, only valid resources can be included for this function." );
+                else
+                    g_pClientGame->GetScriptDebugging()->LogError ( NULL, "Couldn't convert userdata argument to JSON, only valid elements or resources can be included." );
                 return NULL;
             }
             break;
@@ -946,15 +944,15 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                 break;
             case json_type_boolean:
                 if ( json_object_get_boolean ( object ) == TRUE )
-                    Read(true);
+                    ReadBool ( true );
                 else
-                    Read(false);
+                    ReadBool ( false );
                 break;
             case json_type_double:
-                Read(json_object_get_double ( object ));
+                ReadNumber ( json_object_get_double ( object ) );
                 break;
             case json_type_int:
-                Read((double)json_object_get_int ( object ));
+                ReadNumber ( json_object_get_int ( object ) );
                 break;
             case json_type_object:
                 m_pTableData = new CLuaArguments();
@@ -983,7 +981,7 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                                 element = CElementIDs::GetElement(id);
                             if ( element )
                             {
-                                Read ( element );
+                                ReadElement ( element );
                             }
                             else 
                             {
@@ -998,7 +996,7 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                             CResource * resource = g_pClientGame->GetResourceManager()->GetResource(szString+3);
                             if ( resource )
                             {
-                                ReadUserData ((void *)resource);
+                                ReadScriptID ( resource->GetScriptID () );
                             }
                             else 
                             {
@@ -1026,7 +1024,7 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                     }
                 }
                 else
-                    Read(std::string ( szString ));
+                    ReadString ( szString );
                 break;
                 }
             default:

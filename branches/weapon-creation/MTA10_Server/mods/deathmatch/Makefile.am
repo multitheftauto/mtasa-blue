@@ -12,6 +12,7 @@ INCLUDES += -I$(srcdir)/../../../vendor/json-c/
 INCLUDES += -I$(srcdir)/../../../vendor/bob_withers/
 INCLUDES += -I$(srcdir)/../../../vendor/bochs/
 INCLUDES += -I$(srcdir)/../../../Shared/animation/
+INCLUDES += -I$(srcdir)/../../../Shared/mods/deathmatch/logic/
 INCLUDES += -I$(ZIPDIR)/
 INCLUDES += -I$(LUADIR)/src
 INCLUDES += -I$(LUABDIR)/src
@@ -23,6 +24,12 @@ INCLUDES += $(PCRE_CFLAGS)
 UTILS = \
 	../../../Shared/animation/CEasingCurve.cpp \
 	../../../Shared/animation/CPositionRotationAnimation.cpp \
+	../../../Shared/mods/deathmatch/logic/CLatentReceiver.cpp \
+	../../../Shared/mods/deathmatch/logic/CLatentSendQueue.cpp \
+	../../../Shared/mods/deathmatch/logic/CLatentTransferManager.cpp \
+	../../../Shared/mods/deathmatch/logic/CZoneNames.cpp \
+	../../../Shared/mods/deathmatch/logic/Enums.cpp \
+	../../../Shared/mods/deathmatch/logic/CIdArray.cpp \
 	./utils/CHTTPClient.cpp ./utils/CHTTPRequest.cpp \
 	./utils/CHTTPResponse.cpp \
 	./utils/CTCPClientSocketImpl.cpp \
@@ -48,6 +55,9 @@ LOGIC = \
 ./logic/CBlendedWeather.cpp \
 ./logic/CBlip.cpp \
 ./logic/CBlipManager.cpp \
+./logic/CBuildingRemovalManager.cpp \
+./logic/CBuildingRemoval.cpp \
+./logic/CCameraSpatialDatabase.cpp \
 ./logic/CClient.cpp \
 ./logic/CClock.cpp \
 ./logic/CColCircle.cpp \
@@ -60,7 +70,6 @@ LOGIC = \
 ./logic/CColTube.cpp \
 ./logic/CCommandFile.cpp \
 ./logic/CCommandLineParser.cpp \
-./logic/CConfig.cpp \
 ./logic/CConnectHistory.cpp \
 ./logic/CConsole.cpp \
 ./logic/CConsoleClient.cpp \
@@ -170,7 +179,6 @@ LOGIC = \
 ./logic/CWeaponStatManager.cpp \
 ./logic/CWhoWas.cpp \
 ./logic/CXMLConfig.cpp \
-./logic/CZoneNames.cpp \
 ./logic/TaskNames.cpp \
 ./logic/Utils.cpp \
 ./logic/lua/CLuaArgument.cpp \
@@ -181,6 +189,7 @@ LOGIC = \
 ./logic/lua/CLuaFunctionRef.cpp \
 ./logic/lua/CLuaMain.cpp \
 ./logic/lua/CLuaManager.cpp \
+./logic/lua/CLuaModule.cpp \
 ./logic/lua/CLuaModuleManager.cpp \
 ./logic/lua/CLuaTimer.cpp \
 ./logic/lua/CLuaTimerManager.cpp \
@@ -196,7 +205,7 @@ LOGIC = \
 ./logic/luadefs/CLuaPickupDefs.cpp \
 ./logic/luadefs/CLuaResourceDefs.cpp \
 ./logic/luadefs/CLuaTextDefs.cpp \
-	./logic/luadefs/CLuaVoiceDefs.cpp \
+./logic/luadefs/CLuaVoiceDefs.cpp \
 ./logic/luadefs/CLuaWorldDefs.cpp \
 ./logic/luadefs/CLuaXMLDefs.cpp \
 ./logic/packets/CCameraSyncPacket.cpp \
@@ -205,6 +214,7 @@ LOGIC = \
 ./logic/packets/CConsoleEchoPacket.cpp \
 ./logic/packets/CCustomDataPacket.cpp \
 ./logic/packets/CDebugEchoPacket.cpp \
+./logic/packets/CDestroySatchelsPacket.cpp \
 ./logic/packets/CDetonateSatchelsPacket.cpp \
 ./logic/packets/CEntityAddPacket.cpp \
 ./logic/packets/CEntityRemovePacket.cpp \
@@ -212,6 +222,8 @@ LOGIC = \
 ./logic/packets/CFireSyncPacket.cpp \
 ./logic/packets/CElementRPCPacket.cpp \
 ./logic/packets/CKeysyncPacket.cpp \
+./logic/packets/CBulletsyncPacket.cpp \
+./logic/packets/CBulletsyncSettingsPacket.cpp \
 ./logic/packets/CLightsyncPacket.cpp \
 ./logic/packets/CLuaEventPacket.cpp \
 ./logic/packets/CLuaPacket.cpp \
@@ -235,6 +247,7 @@ LOGIC = \
 ./logic/packets/CPlayerListPacket.cpp \
 ./logic/packets/CPlayerPuresyncPacket.cpp \
 ./logic/packets/CPlayerModInfoPacket.cpp \
+./logic/packets/CPlayerScreenShotPacket.cpp \
 ./logic/packets/CPlayerQuitPacket.cpp \
 ./logic/packets/CPlayerSpawnPacket.cpp \
 ./logic/packets/CPlayerStatsPacket.cpp \
@@ -242,11 +255,13 @@ LOGIC = \
 ./logic/packets/CPlayerTimeoutPacket.cpp \
 ./logic/packets/CPlayerWastedPacket.cpp \
 ./logic/packets/CProjectileSyncPacket.cpp \
+./logic/packets/CResourceClientScriptsPacket.cpp \
 ./logic/packets/CResourceStartPacket.cpp \
 ./logic/packets/CResourceStopPacket.cpp \
 ./logic/packets/CReturnSyncPacket.cpp \
 ./logic/packets/CServerTextItemPacket.cpp \
 ./logic/packets/CUpdateInfoPacket.cpp \
+./logic/packets/CUnoccupiedVehiclePushPacket.cpp \
 ./logic/packets/CUnoccupiedVehicleStartSyncPacket.cpp \
 ./logic/packets/CUnoccupiedVehicleSyncPacket.cpp \
 ./logic/packets/CVehicleDamageSyncPacket.cpp \
@@ -262,7 +277,9 @@ LOGIC = \
 ./logic/net/CSimControl.cpp \
 ./logic/net/CSimPlayerManager.cpp \
 ./logic/net/CSimPlayerPuresyncPacket.cpp \
-./logic/net/CSimVehiclePuresyncPacket.cpp
+./logic/net/CSimVehiclePuresyncPacket.cpp \
+./logic/net/CSimKeysyncPacket.cpp \
+./logic/net/CSimBulletsyncPacket.cpp
 
 if PRECOMPILE_HEADERS
 BUILT_SOURCES = StdInc.h.gch

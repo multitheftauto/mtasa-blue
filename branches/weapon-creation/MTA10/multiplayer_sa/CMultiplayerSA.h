@@ -39,10 +39,20 @@ public:
 
     CMultiplayerSA();
     void                        InitHooks();
+    void                        InitHooks_CrashFixHacks();
+    void                        Init_13 ( void );
+    void                        InitHooks_13 ( void );
+    void                        InitMemoryCopies_13 ( void );
+    void                        InitHooks_ClothesSpeedUp ( void );
+    void                        InitHooks_FixBadAnimId ( void );
+    void                        InitHooks_HookDestructors ( void );
+    void                        InitHooks_RwResources ( void );
+    void                        InitHooks_ClothesCache ( void );
     CRemoteDataStorage *        CreateRemoteDataStorage     ();
     void                        DestroyRemoteDataStorage    ( CRemoteDataStorage* pData );
     void                        AddRemoteDataStorage        ( CPlayerPed* pPed, CRemoteDataStorage* pData );
     void                        RemoveRemoteDataStorage     ( CPlayerPed* pPed );
+    void                        EnableHooks_ClothesMemFix   ( bool bEnable );
 
     CPed *                      GetContextSwitchedPed       ( void );
 
@@ -71,10 +81,18 @@ public:
     void                        SetPreWorldProcessHandler   ( PreWorldProcessHandler * pHandler );
     void                        SetPostWorldProcessHandler  ( PostWorldProcessHandler * pHandler );
     void                        SetIdleHandler              ( IdleHandler * pHandler );
+    void                        SetPreFxRenderHandler       ( PreFxRenderHandler * pHandler );
+    void                        SetPreHudRenderHandler      ( PreHudRenderHandler * pHandler );
     void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler );
     void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler );
     void                        SetProcessCollisionHandler  ( ProcessCollisionHandler * pHandler );
     void                        SetVehicleCollisionHandler  ( VehicleCollisionHandler * pHandler );
+    void                        SetHeliKillHandler          ( HeliKillHandler * pHandler );
+    void                        SetWaterCannonHitHandler    ( WaterCannonHitHandler * pHandler );
+    void                        SetGameObjectDestructHandler    ( GameObjectDestructHandler * pHandler );
+    void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler );
+    void                        SetGamePlayerDestructHandler    ( GamePlayerDestructHandler * pHandler );
+    void                        SetGameModelRemoveHandler       ( GameModelRemoveHandler * pHandler );
 
     void                        AllowMouseMovement          ( bool bAllow );
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );
@@ -123,6 +141,7 @@ public:
     void                        SetPreWeaponFireHandler     ( PreWeaponFireHandler* pHandler );
     void                        SetPostWeaponFireHandler    ( PostWeaponFireHandler* pHandler );
     void                        SetBulletImpactHandler      ( BulletImpactHandler* pHandler );
+    void                        SetBulletFireHandler        ( BulletFireHandler* pHandler );
     void                        SetDrawRadarAreasHandler    ( DrawRadarAreasHandler * pRadarAreasHandler );
     void                        SetRender3DStuffHandler     ( Render3DStuffHandler * pHandler );
 
@@ -176,6 +195,12 @@ public:
     float                       GetAircraftMaxHeight        ( void )                    { return m_fAircraftMaxHeight; };
     void                        SetAircraftMaxHeight        ( float fHeight )           { m_fAircraftMaxHeight = fHeight; };
 
+    void                        SetAutomaticVehicleStartupOnPedEnter    ( bool bSet );
+
+    virtual void                GetRwResourceStats          ( SRwResourceStats& outStats );
+    virtual void                GetClothesCacheStats        ( SClothesCacheStats& outStats );
+    virtual CEntitySAInterface* GetRenderingGameEntity      ( void );
+
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;
     static char*                ms_PlayerImgCachePtr;
@@ -186,6 +211,7 @@ private:
     CLimitsSA                   m_limits;
     bool                        m_bEnabledLODSystem;
     bool                        m_bEnabledAltWaterOrder;
+    bool                        m_bEnabledClothesMemFix;
     float                       m_fAircraftMaxHeight;
 
 /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);

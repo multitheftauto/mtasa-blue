@@ -42,7 +42,7 @@ public:
                                                       float fWaveHeight,
                                                       const SWorldWaterLevelInfo& worldWaterLevelInfo,
                                                       bool bHasSkyGradient,
-                                                      bool* pbGarageStates,
+                                                      const SGarageStates& garageStates,
                                                       unsigned char ucSkyGradientTR,
                                                       unsigned char ucSkyGradientTG,
                                                       unsigned char ucSkyGradientTB,
@@ -82,7 +82,7 @@ public:
                                                       float fAircraftMaxHeight = 800 );
 
     inline ePacketID        GetPacketID             ( void ) const              { return PACKET_ID_MAP_INFO; };
-    inline unsigned long    GetFlags                ( void ) const              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline unsigned long    GetFlags                ( void ) const              { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Write                   ( NetBitStreamInterface& BitStream ) const;
 
@@ -105,7 +105,7 @@ private:
     bool                    m_bHasHeatHaze;
     SHeatHazeSettings       m_HeatHazeSettings;
     unsigned short          m_usFPSLimit;
-    bool*                   m_pbGarageStates;
+    const SGarageStates*    m_pGarageStates;
     bool                    m_bCloudsEnabled;
     float                   m_fJetpackMaxHeight;
     bool                    m_bOverrideWaterColor;

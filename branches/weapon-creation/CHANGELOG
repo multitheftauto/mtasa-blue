@@ -1,5 +1,47 @@
 Changelog for Multi Theft Auto
 
+Multi Theft Auto : San Andreas - 1.3
+====================================
+
+Goal: Extend 1.2 and eliminate bugs and introduce features that did not make 1.2.
+
+- 0005147: [General] Problems with corona markers and interiors not appearing (ryden) - resolved.
+- 0006780: [Client] Request: Online players count at bottom left corner on server browser (ryden) - resolved.
+- 0006589: [Client] Map download breaks often on large transfers (ccw) - resolved.
+- 0005891: [Scripting] Several vehicles will not work with vehicle events and functions (Cazomino05) - resolved.
+- 0003252: [Synchronization] Heat seekers sync isn't accurate (Cazomino05) - resolved.
+ - 0004988: [Synchronization] createProjectile() velocity desync between clients (Cazomino05) - resolved.
+- 0004295: [Client] Custom imported objects texture is white sometimes (ccw) - resolved.
+- 0002501: [General] stopping certain gamemodes causes laffy-taffy cj or textureless player bug (ChrML) - resolved.
+- 0001327: [General] Laffy Taffy/Roadkill CJ Model (ccw) - resolved.
+- 0006405: [Client] Chinese/Japanese letters doesn't showing (ccw) - resolved.
+- 0006789: [Multi Theft Auto : San Andreas] error: kick trainer AC #4 O6IL.ncD2 (ccw) - resolved.
+- 0006675: [Client] Warp Glitch (Talidan) - resolved.
+- 0006778: [Client] Korean characters are broken only when it was typed in chatbox. (ccw) - resolved.
+- 0006299: [Vehicles] [1.1] Always falling off bikes and motorbikes (Cazomino05) - resolved.
+- 0006773: [Server] Server crashes when being flooded (ccw) - resolved.
+- 0006754: [Server] Crash when turning threadnet off (ccw) - resolved.
+- 0006751: [Client] Starting MTA for the first time in some scenarios will cause the client not to receive bikes (ccw) - resolved.
+- 0006735: [Server] Localisation support is broken! tonumber("12.12") returns nil! (ccw) - resolved.
+- 0006727: [Server] Random extra lines and strange numbers in console (ccw) - resolved.
+- 0006726: [Client] Server with more than 300 players or less disappears from server browser and favourites (ccw) - resolved.
+- 0006700: [Client] Crash when doing nothing in server browser (ccw) - resolved.
+- 0006670: [Client] Objects scaled with setObjectScale aren't rendered when the unscaled bounding box goes off-screen (ryden) - resolved.
+- 0006645: [Server] Some vehicles become indestructible when a certain door is open (ryden) - resolved.
+- 0006729: [Installer] Installer forces you to install core resources (ccw) - resolved.
+- 0005711: [Client] Request for a function: onClientVehicleCollision (Cazomino05) - resolved.
+- 0006765: [Server] Add or fix MySQL stored procedures to built-in SQL functions (ccw) - resolved.
+- 0005824: [Scripting] [Request] Add function for unloading and reloading San Andreas map (Cazomino05) - resolved.
+
+Resources:
+
+
+- 0005934: [Optional] Freeroam: Add location bookmarking and store it clientside (arranTuna) - resolved.
+- 0006775: [Resources] Freeroam:sorting bug (arranTuna) - resolved.
+- 0006522: [Resources] No "Set Nick" ACL right and permission check in "admin" resource (arranTuna) - resolved.
+- 0006725: [Resources] Few errors and warnings of resources #2 (arranTuna) - resolved.
+
+
 Multi Theft Auto : San Andreas - 1.2
 ====================================
 

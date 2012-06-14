@@ -321,17 +321,17 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CClientPerfStatResult* pR
     for ( CLuaMainMemoryMap::iterator iter = AllLuaMemory.LuaMainMemoryMap.begin () ; iter != AllLuaMemory.LuaMainMemoryMap.end () ; ++iter )
     {
         CLuaMainMemory& LuaMainMemory = iter->second;
-        SString resname = iter->first->GetScriptNamePointer ();
+        const SString strResName = iter->first->GetScriptName ();
 
         // Apply filter
-        if ( strFilter != "" && resname.find ( strFilter ) == SString::npos )
+        if ( strFilter != "" && strResName.find ( strFilter ) == SString::npos )
             continue;
 
         // Add row
         SString* row = pResult->AddRow ();
 
         int c = 0;
-        row[c++] = resname;
+        row[c++] = strResName;
 
         if ( labs ( LuaMainMemory.Delta ) >= 1 )
         {

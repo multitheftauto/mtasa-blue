@@ -36,7 +36,7 @@ public:
                                                               unsigned int uiBitrate );
 
     inline ePacketID        GetPacketID             ( void ) const      { return PACKET_ID_SERVER_JOINEDGAME; };
-    inline unsigned long    GetFlags                ( void ) const      { return PACKET_RELIABLE | PACKET_SEQUENCED | PACKET_HIGH_PRIORITY; };
+    inline unsigned long    GetFlags                ( void ) const      { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Write                           ( NetBitStreamInterface& BitStream ) const;
 
@@ -46,7 +46,7 @@ private:
     ElementID               m_RootElementID;
     eHTTPDownloadType       m_ucHTTPDownloadType;
     unsigned short          m_usHTTPDownloadPort;
-    char                    m_szHTTPDownloadURL [MAX_HTTP_DOWNLOAD_URL + 1];
+    SString                 m_strHTTPDownloadURL;
     int                     m_iHTTPMaxConnectionsPerClient;
     int                     m_iEnableClientChecks;
     bool                    m_bVoiceEnabled;

@@ -83,6 +83,8 @@ void CServerList::Pulse ( void )
     unsigned int uiRepliesParsed = 0;
     unsigned int uiNoReplies = 0;
     unsigned int uiActiveServers = 0;
+    unsigned int uiTotalSlots = 0;
+    unsigned int uiOccupiedSlots = 0;
     bool bRemoveNonResponding = RemoveNonResponding ();
 
     // If a query is going to be done this pass, try to find high priority items first
@@ -93,7 +95,7 @@ void CServerList::Pulse ( void )
 
         for ( std::vector < SAddressPort >::iterator iter = endpointList.begin (); iter != endpointList.end (); ++iter )
         {
-            CServerListItem* pServer = m_Servers.Find ( (in_addr&)iter->m_ulIp, iter->m_usPort+123 );
+            CServerListItem* pServer = m_Servers.Find ( (in_addr&)iter->m_ulIp, iter->m_usPort );
             if ( pServer && pServer->WaitingToSendQuery () )
             {
                 std::string strResult = pServer->Pulse ( (int)( uiQueriesSent /*+ uiQueriesResent*/ ) < iNumQueries, bRemoveNonResponding );
@@ -126,7 +128,11 @@ void CServerList::Pulse ( void )
             uiNoReplies++;
 
         if ( pServer->nMaxPlayers && !pServer->bMaybeOffline && !pServer->MaybeWontRespond () )
+        {
             uiActiveServers++;
+            uiTotalSlots += pServer->nMaxPlayers;
+            uiOccupiedSlots += pServer->nPlayers;
+        }
     }
 
     // Check whether we are done scanning
@@ -144,7 +150,15 @@ void CServerList::Pulse ( void )
         m_iPass = 0;
     }
 
-    ss << "   " << uiActiveServers << " server";
+    ss << "   ";
+    if ( uiTotalSlots > 0 )
+    {
+        ss << uiOccupiedSlots << " player";
+        if ( uiOccupiedSlots != 1 )
+            ss << "s";
+        ss << " on ";
+    }
+    ss << uiActiveServers << " server";
     if ( uiActiveServers != 1 )
         ss << "s";
     if ( m_iPass )
@@ -156,17 +170,17 @@ void CServerList::Pulse ( void )
 
 
 // Return true if did add
-bool CServerList::AddUnique ( in_addr Address, ushort usQueryPort, bool addAtFront )
+bool CServerList::AddUnique ( in_addr Address, ushort usGamePort, bool addAtFront )
 {
-    if ( m_Servers.Find ( Address, usQueryPort ) )
+    if ( m_Servers.Find ( Address, usGamePort ) )
         return false;
-    m_Servers.Add ( Address, usQueryPort, addAtFront );
+    m_Servers.Add ( Address, usGamePort, addAtFront );
     return true;
 }
 
-bool CServerList::Remove ( in_addr Address, ushort usQueryPort )
+bool CServerList::Remove ( in_addr Address, ushort usGamePort )
 {
-    return m_Servers.Remove ( Address, usQueryPort );
+    return m_Servers.Remove ( Address, usGamePort );
 }
 
 
@@ -298,7 +312,8 @@ void CServerListLAN::Pulse ( void )
             if ( strncmp ( szBuffer, SERVER_LIST_SERVER_BROADCAST_STR, strlen ( SERVER_LIST_SERVER_BROADCAST_STR ) ) == 0 ) {
                 unsigned short usPort = ( unsigned short ) atoi ( &szBuffer[strlen ( SERVER_LIST_SERVER_BROADCAST_STR ) + 1] );
                 // Add the server if doesn't already exist
-                AddUnique ( m_Remote.sin_addr, usPort );
+                AddUnique ( m_Remote.sin_addr, usPort - SERVER_LIST_QUERY_PORT_OFFSET_LAN );
+                CServerBrowser::GetSingleton ().AddKnownLanServer ( m_Remote.sin_addr );
             }
 
     // Scan our already known servers
@@ -428,13 +443,20 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery, bool bRemoveNonRespondi
 }
 
 
+unsigned short CServerListItem::GetQueryPort ( void )
+{
+    if ( CServerBrowser::GetSingleton ().IsKnownLanServer ( Address ) )
+        return usGamePort + SERVER_LIST_QUERY_PORT_OFFSET_LAN;
+    return usGamePort + SERVER_LIST_QUERY_PORT_OFFSET;
+}
+
 void CServerListItem::Query ( void )
 {   // Performs a query according to ASE protocol
     sockaddr_in addr;
     memset ( &addr, 0, sizeof(addr) );
     addr.sin_family = AF_INET;
     addr.sin_addr = Address;
-    addr.sin_port = htons ( usQueryPort );
+    addr.sin_port = htons ( GetQueryPort () );
 
     // Initialize socket on demand
     if ( m_Socket == INVALID_SOCKET )
@@ -546,7 +568,7 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
         nMaxPlayers = (unsigned char)szBuffer[i++];
 
     // Recover large player count if present
-    SString strPlayerCount = strMapTemp.Right ( strMapTemp.length () - strlen ( strMapTemp ) - 1 );
+    const SString strPlayerCount = strMapTemp.Right ( strMapTemp.length () - strlen ( strMapTemp ) - 1 );
     if ( !strPlayerCount.empty () )
     {
         SString strJoinedPlayers, strMaxPlayers;
@@ -558,6 +580,24 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
                 nMaxPlayers = atoi ( strMaxPlayers );
         }
     }
+
+    // Recover server build type if present
+    const SString strBuildType = strPlayerCount.Right ( strPlayerCount.length () - strlen ( strPlayerCount ) - 1 );
+    if ( !strBuildType.empty () )
+        m_iBuildType = atoi ( strBuildType );
+    else
+        m_iBuildType = 1;
+
+    // Recover server build number if present
+    const SString strBuildNumber = strBuildType.Right ( strBuildType.length () - strlen ( strBuildType ) - 1 );
+    if ( !strBuildNumber.empty () )
+        m_iBuildNumber = atoi ( strBuildNumber );
+    else
+        m_iBuildNumber = 0;
+
+    // Recover server ping status if present
+    const SString strPingStatus = strBuildNumber.Right ( strBuildNumber.length () - strlen ( strBuildNumber ) - 1 );
+    CCore::GetSingleton ().GetNetwork ()->UpdatePingStatus ( *strPingStatus, nPlayers );
 
     // Get player nicks
     vecPlayers.clear ();

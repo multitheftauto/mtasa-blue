@@ -36,10 +36,7 @@ public:
     inline explicit                 CAccessControlListGroupObject       ( const char* szName, EObjectType eObjectType )
                                     {
                                         m_uiHashId = GenerateHashId ( szName, eObjectType );
-
-                                        snprintf ( m_szName, 256, "%s", szName );
-                                        m_szName [ 255 ] = 0;
-
+                                        m_strName = szName;
                                         m_eObjectType = eObjectType;
                                     }
 
@@ -47,18 +44,16 @@ public:
 
     static inline unsigned int      GenerateHashId                      ( const char* szName, EObjectType eObjectType )
                                     {
-                                        char szID [ 256 ];
-                                        snprintf ( szID, 256, "%s_%d", szName, (unsigned int) eObjectType );
-                                        szID [ 255 ] = 0;
-                                        return ( HashString( szID ) & (unsigned int)0x7FFFFFFF );
+                                        SString strID ( "%s_%d", szName, (unsigned int) eObjectType );
+                                        return ( HashString( strID ) & (unsigned int)0x7FFFFFFF );
                                     }
 
-    inline const char*              GetObjectName                       ( void )        { return m_szName; };
+    inline const char*              GetObjectName                       ( void )        { return m_strName; };
     inline EObjectType              GetObjectType                       ( void )        { return m_eObjectType; };
     inline unsigned int             GetObjectHashId                     ( void )        { return m_uiHashId; };
 
 private:
-    char                            m_szName                            [ 256 ];
+    SString                         m_strName;
     EObjectType                     m_eObjectType;
     unsigned int                    m_uiHashId;
 
@@ -70,7 +65,7 @@ public:
                                                     CAccessControlListGroup     ( const char* szGroupName );
                                                     ~CAccessControlListGroup    ( void );
 
-    inline const char*                              GetGroupName                ( void )        { return m_szGroupName; };
+    inline const char*                              GetGroupName                ( void )        { return m_strGroupName; };
 
     CAccessControlListGroupObject*                  AddObject                   ( const char* szObjectName, CAccessControlListGroupObject::EObjectType eObjectType );
     bool                                            FindObjectMatch             ( const char* szObjectName, CAccessControlListGroupObject::EObjectType eObjectType );
@@ -87,6 +82,7 @@ public:
     list < class CAccessControlListGroupObject* > ::iterator IterEndObjects     ( void )        { return m_Objects.end (); };
 
     void                                            WriteToXMLNode              ( CXMLNode* pNode );
+    uint                                            GetScriptID                 ( void ) const  { return m_uiScriptID; }
 
 private:
     void                                            OnChange                    ( void );
@@ -100,12 +96,13 @@ private:
     typedef google::dense_hash_map < unsigned int, class CAccessControlListGroupObject* >
                                                     ObjectMap;
 
-    char                                            m_szGroupName               [ 256 ];
+    SString                                         m_strGroupName;
     
     ACLsList                                        m_ACLs;
 
     ObjectList                                      m_Objects;
     ObjectMap                                       m_ObjectsById;
+    uint                                            m_uiScriptID;
 };
 
 #endif

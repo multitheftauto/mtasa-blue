@@ -31,7 +31,7 @@ CResourceManager::~CResourceManager ( void )
         CResource* pResource = m_resources.back ();
 
         CLuaArguments Arguments;
-        Arguments.PushUserData ( pResource );
+        Arguments.PushResource ( pResource );
         pResource->GetResourceEntity ()->CallEvent ( "onClientResourceStop", Arguments, true );
         delete pResource;
 
@@ -39,9 +39,9 @@ CResourceManager::~CResourceManager ( void )
     }
 }
 
-CResource* CResourceManager::Add ( unsigned short usID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity )
+CResource* CResourceManager::Add ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity )
 {
-    CResource* pResource = new CResource ( usID, szResourceName, pResourceEntity, pResourceDynamicEntity );
+    CResource* pResource = new CResource ( usNetID, szResourceName, pResourceEntity, pResourceDynamicEntity );
     if ( pResource )
     {
         m_resources.push_back ( pResource );
@@ -51,15 +51,23 @@ CResource* CResourceManager::Add ( unsigned short usID, char* szResourceName, CC
 }
 
 
-CResource* CResourceManager::GetResource ( unsigned short usID )
+CResource* CResourceManager::GetResourceFromNetID ( unsigned short usNetID )
 {
     list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
-        if ( ( *iter )->GetID() == usID )
+        if ( ( *iter )->GetNetID() == usNetID )
             return ( *iter );
     }
     return NULL;
+}
+
+
+CResource* CResourceManager::GetResourceFromScriptID ( uint uiScriptID )
+{
+    CResource* pResource = (CResource*) CIdArray::FindEntry ( uiScriptID, EIdClass::RESOURCE );
+    dassert ( !pResource || ListContains ( m_resources, pResource ) );
+    return pResource;
 }
 
 
@@ -86,9 +94,9 @@ void CResourceManager::LoadUnavailableResources ( CClientEntity *pRootEntity )
 }
 
 
-bool CResourceManager::RemoveResource ( unsigned short usID )
+bool CResourceManager::RemoveResource ( unsigned short usNetID )
 {
-    CResource* pResource = GetResource ( usID );
+    CResource* pResource = GetResourceFromNetID ( usNetID );
     if ( pResource )
     {
         Remove ( pResource );

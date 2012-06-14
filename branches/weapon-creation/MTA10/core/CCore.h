@@ -36,13 +36,16 @@ class CCore;
 #include "CSetCursorPosHook.h"
 #include "CMessageLoopHook.h"
 #include "CLogger.h"
+#include "CConsoleLogger.h"
 #include "CModManager.h"
 #include <core/CClientBase.h>
+#include <core/CClientEntityBase.h>
 #include <core/CCoreInterface.h>
 #include "CDirect3DData.h"
 #include "tracking/CTCPManager.h"
 #include "CClientVariables.h"
 #include "CKeyBinds.h"
+#include "CMouseControl.h"
 #include "CScreenShot.h"
 #include "CCommunity.h"
 #include <xml/CXML.h>
@@ -53,7 +56,7 @@ class CCore;
 #include <dinput.h>
 
 #define BLUE_VERSION_STRING     "Multi Theft Auto v" MTA_DM_BUILDTAG_LONG "\n" \
-                                "Copyright (C) 2003 - 2011 Multi Theft Auto" \
+                                "Copyright (C) 2003 - 2012 Multi Theft Auto" \
 
 // Configuration file path (relative to Grand Theft Auto directory)
 #define MTA_CONFIG_PATH             "mta/coreconfig.xml"
@@ -73,6 +76,9 @@ class CCore;
 #define CONFIG_FAVOURITE_LIST_TAG   "favourite_server"
 #define CONFIG_RECENT_LIST_TAG      "recently_played_server"
 #define CONFIG_HISTORY_LIST_TAG     "connected_server"
+
+extern class CCore* g_pCore;
+extern class CGraphics* g_pGraphics;
 
 class CCore : public CCoreInterface, public CSingleton < CCore >
 {
@@ -95,6 +101,7 @@ public:
     CXMLNode*               GetConfig                       ( void );
     CClientVariables*       GetCVars                        ( void )                { return &m_ClientVariables; };
     CKeyBindsInterface*     GetKeyBinds                     ( void );
+    CMouseControl*          GetMouseControl                 ( void )                { return m_pMouseControl; };
     CLocalGUI*              GetLocalGUI                     ( void );
     CCommunityInterface*    GetCommunity                    ( void )                { return &m_Community; };
 
@@ -170,6 +177,7 @@ public:
 
     // Hooks
     void                    ApplyHooks                      ( void );
+    void                    ApplyHooks2                     ( void );
     HWND                    GetHookedWindow                 ( void );
     void                    SwitchRenderWindow              ( HWND hWnd, HWND hWndInput );
     void                    CallSetCursorPos                ( int X, int Y ) { m_pSetCursorPosHook->CallSetCursorPos(X,Y); }
@@ -204,6 +212,11 @@ public:
     void                    EnsureFrameRateLimitApplied     ( void );
     void                    DoReliablePulse                 ( void );
 
+    bool                    IsTimingCheckpoints             ( void );
+    void                    OnTimingCheckpoint              ( const char* szTag );
+    void                    OnTimingDetail                  ( const char* szTag );
+
+    void                    CalculateStreamingMemoryRange   ( void );
     uint                    GetMinStreamingMemory           ( void );
     uint                    GetMaxStreamingMemory           ( void );
 
@@ -215,17 +228,21 @@ public:
     const char *            GetCommandLineArgs              ( void ) { return m_szCommandLineArgs; }
     void                    RequestNewNickOnStart           ( void ) { m_bWaitToSetNick = true; };
     bool                    WillRequestNewNickOnStart       ( void ) { return m_bWaitToSetNick; };
+    bool                    WasLaunchedWithConnectURI       ( void );
 
     //XFire
     SString                 UpdateXfire                     ( void );
-    void                    SetCurrentServer                ( in_addr Addr, unsigned short usQueryPort );
+    void                    SetCurrentServer                ( in_addr Addr, unsigned short usGamePort );
     void                    SetXfireData                    ( std::string strServerName, std::string strVersion, bool bPassworded, std::string strGamemode, std::string strMap, std::string strPlayerName, std::string strPlayerCount );
 
+    void                    OnPreFxRender                   ( void );
     void                    OnPreHUDRender                  ( void );
     void                    OnDeviceRestore                 ( void );
     void                    OnCrashAverted                  ( uint uiId );
     void                    LogEvent                        ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody );
     bool                    GetDebugIdEnabled               ( uint uiDebugId );
+    EDiagnosticDebugType    GetDiagnosticDebug              ( void );
+    void                    SetDiagnosticDebug              ( EDiagnosticDebugType value );
 
 private:
     // Core devices.
@@ -271,9 +288,11 @@ private:
 
     // Logger utility interface.
     CLogger *                   m_pLogger;
+    CConsoleLogger *            m_pConsoleLogger;
 
     CKeyBinds*                  m_pKeyBinds;
-
+    CMouseControl*              m_pMouseControl;
+    
     bool                        m_bFirstFrame;
     bool                        m_bIsOfflineMod;
     bool                        m_bCursorToggleControls;
@@ -300,6 +319,9 @@ private:
     double                      m_dPrevOverrun;
     bool                        m_bWaitToSetNick;
     uint                        m_uiNewNickWaitFrames;
+    EDiagnosticDebugType        m_DiagnosticDebug;
+    float                       m_fMinStreamingMemory;
+    float                       m_fMaxStreamingMemory;
 
     // Command line
     static void                 ParseCommandLine                ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions = NULL );

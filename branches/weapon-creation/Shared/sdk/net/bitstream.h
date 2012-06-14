@@ -124,6 +124,9 @@ public:
     // GetNumberOfUnreadBits appears to round up to the next byte boundary, when reading
     virtual int         GetNumberOfUnreadBits       ( void ) const = 0;
 
+    virtual void        AlignWriteToByteBoundary    ( void ) const = 0;
+    virtual void        AlignReadToByteBoundary     ( void ) const = 0;
+
     // Helper template methods that are not actually part
     // of the interface but get inline compiled.
 
@@ -155,6 +158,7 @@ public:
     // Write characters from a std::string
     void WriteStringCharacters ( const std::string& value, unsigned short usLength )
     {
+        dassert ( usLength <= value.length () );
         // Send the data
         if ( usLength )
             Write ( &value.at ( 0 ), usLength );

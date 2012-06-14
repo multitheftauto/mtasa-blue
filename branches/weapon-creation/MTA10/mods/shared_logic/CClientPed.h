@@ -263,6 +263,7 @@ public:
     CVector*                    GetTransformedBonePosition  ( eBone bone, CVector& vecPosition ) const;
 
     inline void                 GetAim                      ( float& fDirectionX, float& fDirectionY )  { if ( m_shotSyncData ) { fDirectionX = m_shotSyncData->m_fArmDirectionX; fDirectionY = m_shotSyncData->m_fArmDirectionY; } };
+    CVector                     GetAim                      ( void ) const;
     inline const CVector&       GetAimSource                ( void )                                    { return m_shotSyncData->m_vecShotOrigin; };
     inline const CVector&       GetAimTarget                ( void )                                    { return m_shotSyncData->m_vecShotTarget; };
     inline unsigned char        GetVehicleAimAnim           ( void )                                    { return m_shotSyncData->m_cInVehicleAimDirection; };
@@ -287,7 +288,8 @@ public:
 
     void                        ResetToOutOfVehicleWeapon   ( void );
 
-    void                        RebuildModel                ( bool bForceClothes = false );
+    void                        RebuildModel                ( bool bDelayChange = false );
+    void                        ProcessRebuildPlayer        ( void );
     void                        SetStat                     ( unsigned short usStat, float fValue );
     float                       GetStat                     ( unsigned short usStat );
     void                        ResetStats                  ( void );
@@ -373,7 +375,7 @@ public:
     bool                        UseGun                  ( CVector vecTarget, CClientEntity * pEntity );
 
     bool                        IsAttachToable            ( void );
-    static char*                GetBodyPartName         ( unsigned char ucID );
+    static const char*          GetBodyPartName         ( unsigned char ucID );
 
     bool                        IsDoingGangDriveby      ( void );
     void                        SetDoingGangDriveby     ( bool bDriveby );
@@ -383,7 +385,7 @@ public:
     void                        RunNamedAnimation       ( CAnimBlock * pBlock, const char * szAnimName, int iTime = -1, bool bLoop = true, bool bUpdatePosition = true, bool bInterruptable = false, bool bFreezeLastFrame = true, bool bRunInSequence = false, bool bOffsetPed = false, bool bHoldLastFrame = false );
     void                        KillAnimation           ( void );
     inline CAnimBlock *         GetAnimationBlock       ( void )                                        { return m_pAnimationBlock; }
-    inline char *               GetAnimationName        ( void )                                        { return m_szAnimationName; }
+    const char*                 GetAnimationName        ( void )                                        { return m_strAnimationName; }
 
     bool                        IsUsingGun              ( void );
 
@@ -539,7 +541,7 @@ public:
     CVector                     m_vecMoveSpeed;
     CVector                     m_vecTurnSpeed;
     eWeaponSlot                 m_CurrentWeaponSlot;
-    eWeaponType                 m_WeaponTypes [ WEAPONSLOT_MAX ];
+    SFixedArray < eWeaponType, WEAPONSLOT_MAX > m_WeaponTypes;
     bool                        m_bHasJetPack;
     CClientPlayerClothes*       m_pClothes;
     eFightingStyle              m_FightingStyle;
@@ -555,7 +557,7 @@ public:
     bool                        m_bDestroyingSatchels;
     bool                        m_bDoingGangDriveby;
     CAnimBlock *                m_pAnimationBlock;
-    char *                      m_szAnimationName;
+    SString                     m_strAnimationName;
     bool                        m_bRequestedAnimation;
     int                         m_iTimeAnimation;
     bool                        m_bLoopAnimation;
@@ -575,6 +577,8 @@ public:
     float                       m_fLighting;
     unsigned char               m_ucEnteringDoor;
     unsigned char               m_ucLeavingDoor;
+    bool                        m_bPendingRebuildPlayer;
+    uint                        m_uiFrameLastRebuildPlayer;
 
     bool                        m_bBulletImpactData;
     CClientEntity*              m_pBulletImpactEntity;

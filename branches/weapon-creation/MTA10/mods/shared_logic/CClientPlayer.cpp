@@ -28,8 +28,6 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
     m_bNametagColorOverridden = false;
     m_uiPing = 0;
 
-    m_szNick [ 0 ] = '\0';
-
     m_usLatency = 0;
 
     m_uiPlayerSyncCount = 0;
@@ -77,7 +75,7 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
     m_ucNametagColorG = 255;
     m_ucNametagColorB = 255;
     m_ulLastNametagShow = 0;
-    SetNametagText ( m_szNick );
+    SetNametagText ( m_strNick );
     
     // Create the static icon (defaults to a warning icon for network trouble)
     m_pStatusIcon = g_pCore->GetGUI ()->CreateStaticImage ();
@@ -97,6 +95,7 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
 #ifdef MTA_DEBUG
     m_bShowingWepdata = false;
 #endif
+    m_LastPuresyncType = PURESYNC_TYPE_NONE;
 }
 
 
@@ -144,8 +143,7 @@ void CClientPlayer::SetNick ( const char* szNick )
     // Valid pointer?
     if ( szNick )
     {
-        strncpy ( m_szNick, szNick, MAX_PLAYER_NICK_LENGTH );
-        m_szNick [ MAX_PLAYER_NICK_LENGTH ] = '\0';
+        m_strNick.AssignLeft ( szNick, MAX_PLAYER_NICK_LENGTH );
 
         if ( m_strNametag.empty () )
             m_strNametag = szNick;
@@ -251,10 +249,10 @@ void CClientPlayer::Reset ( void )
     SetFightingStyle ( STYLE_GRAB_KICK );
 
     // rebuild
-    RebuildModel ( true );
+    RebuildModel ();
 
     // Nametag
-    SetNametagText ( m_szNick );
+    SetNametagText ( m_strNick );
     m_bNametagShowing = true;
 
     // Otherwize default to white
@@ -277,5 +275,26 @@ void CClientPlayer::SetNametagText ( const char * szText )
     if ( szText )
     {
         m_strNametag = szText;
+    }
+}
+
+
+void CClientPlayer::DischargeWeapon ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd )
+{
+    if ( m_pPlayerPed )
+    {
+        // Check weapon matches and is enabled for bullet sync
+        if ( weaponType == GetCurrentWeaponType () &&
+             g_pClientGame->GetWeaponTypeUsesBulletSync ( weaponType ) )
+        {
+            // Set bullet start and end points
+            #if 0   // TODO fix this - Positions are out
+                m_shotSyncData->m_vecRemoteBulletSyncStart = vecStart;
+                m_shotSyncData->m_vecRemoteBulletSyncEnd = vecEnd;
+                m_shotSyncData->m_bRemoteBulletSyncVectorsValid = true;
+            #endif
+
+            m_pPlayerPed->GetPedIntelligence ()->DischargeCurrentWeapon ( false );
+        }
     }
 }

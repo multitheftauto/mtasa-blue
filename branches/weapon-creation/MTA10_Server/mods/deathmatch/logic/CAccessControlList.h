@@ -27,7 +27,7 @@ public:
                                                 CAccessControlList          ( const char* szACLName, class CAccessControlListManager* pACLManager );
                                                 ~CAccessControlList         ( void );
 
-    inline const char*                          GetName                     ( void )        { return m_szACLName; };
+    inline const char*                          GetName                     ( void )        { return m_strACLName; };
 
     CAccessControlListRight*                    AddRight                    ( const char* szRightName, CAccessControlListRight::ERightType eRightType, bool bAccess );
     CAccessControlListRight*                    GetRight                    ( const char* szRightName, CAccessControlListRight::ERightType eRightType );
@@ -39,14 +39,16 @@ public:
     inline list < CAccessControlListRight* >  ::const_iterator  IterEnd     ( void ) { return m_Rights.end (); };
 
     bool                                        CanBeModifiedByScript       ( void );
+    uint                                        GetScriptID                 ( void ) const  { return m_uiScriptID; }
+
 private:
     void                                        OnChange                    ( void );
 
-    char                                        m_szACLName                 [ MAX_ACL_NAME_LENGTH ];
+    SString                                     m_strACLName;
     list < CAccessControlListRight* >           m_Rights;
 
     class CAccessControlListManager*            m_pACLManager;
-
+    uint                                        m_uiScriptID;
 };
 
 #endif

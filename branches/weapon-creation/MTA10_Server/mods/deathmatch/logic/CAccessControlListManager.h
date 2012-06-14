@@ -47,8 +47,8 @@ public:
     void                                        ClearACLs                   ( void );
     void                                        ClearGroups                 ( void );
 
-    bool                                        VerifyGroup                 ( class CAccessControlListGroup* pGroup );
-    bool                                        VerifyACL                   ( class CAccessControlList* pACL );
+    CAccessControlListGroup*                    GetGroupFromScriptID        ( uint uiScriptID );
+    CAccessControlList*                         GetACLFromScriptID          ( uint uiScriptID );
 
     list < class CAccessControlList* > ::const_iterator             ACL_Begin       ( void )    { return m_ACLs.begin (); };
     list < class CAccessControlList* > ::const_iterator             ACL_End         ( void )    { return m_ACLs.end (); };

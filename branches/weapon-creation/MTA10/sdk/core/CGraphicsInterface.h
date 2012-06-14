@@ -33,6 +33,18 @@ enum eFontType
     NUM_FONTS
 };
 
+namespace EBlendMode
+{
+    enum EBlendModeType
+    {
+        NONE,
+        BLEND,              // Alpha blend
+        ADD,                // Color add                          (used for making composite textures with a premultiplied source)
+        MODULATE_ADD,       // Modulate color with alpha then add (used for making composite textures with a non-premultiplied source)
+    };
+}
+using EBlendMode::EBlendModeType;
+
 class CGraphicsInterface
 {
 public:
@@ -46,6 +58,9 @@ public:
 
     virtual void                    DrawLine3D          ( const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f ) = 0;
     virtual void                    DrawRectangle       ( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor ) = 0;
+
+    virtual void                    SetBlendMode        ( EBlendModeType blendMode ) = 0;
+    virtual EBlendModeType          GetBlendMode        ( void ) = 0;
 
     virtual unsigned int            GetViewportWidth    ( void ) = 0;
     virtual unsigned int            GetViewportHeight   ( void ) = 0;
@@ -68,11 +83,24 @@ public:
                                                           float fWidth,
                                                           unsigned long ulColor,
                                                           bool bPostGUI ) = 0;
+
     virtual void                    DrawLine3DQueued    ( const CVector& vecBegin,
                                                           const CVector& vecEnd,
                                                           float fWidth,
                                                           unsigned long ulColor,
                                                           bool bPostGUI ) = 0;
+
+    virtual void                    DrawMaterialLine3DQueued
+                                                        ( const CVector& vecBegin,
+                                                          const CVector& vecEnd,
+                                                          float fWidth,
+                                                          unsigned long ulColor,
+                                                          CMaterialItem* pMaterial,
+                                                          float fU = 0, float fV = 0,
+                                                          float fSizeU = 1, float fSizeV = 1, 
+                                                          bool bRelativeUV = true,
+                                                          bool bUseFaceToward = false,
+                                                          const CVector& vecFaceToward = CVector () ) = 0;
 
     virtual void                    DrawRectQueued      ( float fX, float fY,
                                                           float fWidth, float fHeight,
@@ -91,19 +119,23 @@ public:
                                                           unsigned long ulColor,
                                                           bool bPostGUI ) = 0;
 
-    virtual void                    DrawTextQueued      ( int iLeft, int iTop,
-                                                          int iRight, int iBottom,
+    virtual void                    DrawTextQueued      ( float fLeft, float fTop,
+                                                          float fRight, float fBottom,
                                                           unsigned long dwColor,
                                                           const char* wszText,
                                                           float fScaleX,
                                                           float fScaleY,
                                                           unsigned long ulFormat,
                                                           ID3DXFont * pDXFont,
-                                                          bool bPostGUI ) = 0;
+                                                          bool bPostGUI,
+                                                          bool bColorCoded = false,
+                                                          bool bSubPixelPositioning = false ) = 0;
 
     virtual void                    EnableSetRenderTarget       ( bool bEnable ) = 0;
     // Subsystems
     virtual CRenderItemManagerInterface*   GetRenderItemManager  ( void ) = 0;
+    virtual CScreenGrabberInterface*       GetScreenGrabber     ( void ) = 0;
+    virtual CPixelsManagerInterface*       GetPixelsManager     ( void ) = 0;
 };
 
 #endif

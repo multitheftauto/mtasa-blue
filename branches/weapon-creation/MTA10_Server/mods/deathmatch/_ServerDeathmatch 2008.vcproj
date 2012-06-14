@@ -54,7 +54,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;&quot;../../../vendor/json-c/shipped_for_mta&quot;"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;&quot;../../../vendor/json-c/shipped_for_mta&quot;;../../../Shared/mods/deathmatch/logic"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -84,7 +84,7 @@
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
 				AdditionalDependencies="lua5.1.lib wsock32.lib sqlite3.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre_2008.lib json2008.lib"
-				OutputFile="C:\Program Files\MTA San Andreas 1.3\server/mods/deathmatch/deathmatch.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.4\server/mods/deathmatch/deathmatch.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib;&quot;../../../vendor/json-c/lib&quot;;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/sqlite/lib;../../../vendor/zlib/lib"
@@ -157,7 +157,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;&quot;../../../vendor/json-c/shipped_for_mta&quot;"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;&quot;../../../vendor/json-c/shipped_for_mta&quot;;../../../Shared/mods/deathmatch/logic"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
@@ -189,7 +189,7 @@
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
 				AdditionalDependencies="lua5.1d.lib wsock32.lib sqlite3d.lib zlibd_2008.lib ehsd_2008.lib pthreadVC2.lib pmed_2008.lib pcred_2008.lib jsonD2008.lib"
-				OutputFile="C:\Program Files\MTA San Andreas 1.3\server/mods/deathmatch/deathmatch_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.4\server/mods/deathmatch/deathmatch_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib;&quot;../../../vendor/json-c/lib&quot;;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/sqlite/lib;../../../vendor/zlib/lib"
@@ -262,7 +262,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;&quot;../../../vendor/json-c/shipped_for_mta&quot;"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;&quot;../../../vendor/json-c/shipped_for_mta&quot;;../../../Shared/mods/deathmatch/logic"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -434,6 +434,18 @@
 				</File>
 				<File
 					RelativePath=".\logic\CBlipManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CBuildingRemoval.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CBuildingRemovalManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CCameraSpatialDatabase.cpp"
 					>
 				</File>
 				<File
@@ -917,10 +929,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CZoneNames.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\TaskNames.cpp"
 					>
 				</File>
@@ -931,6 +939,18 @@
 				<Filter
 					Name="packets"
 					>
+					<File
+						RelativePath=".\logic\packets\CBulletsyncPacket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CBulletsyncSettingsPacket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CBulletsyncSettingsPacket.h"
+						>
+					</File>
 					<File
 						RelativePath=".\logic\packets\CCameraSyncPacket.cpp"
 						>
@@ -953,6 +973,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CDebugEchoPacket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CDestroySatchelsPacket.cpp"
 						>
 					</File>
 					<File
@@ -1080,6 +1104,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPlayerScreenShotPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPlayerSpawnPacket.cpp"
 						>
 					</File>
@@ -1104,6 +1132,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CResourceClientScriptsPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CResourceStartPacket.cpp"
 						>
 					</File>
@@ -1117,6 +1149,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CServerTextItemPacket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CUnoccupiedVehiclePushPacket.cpp"
 						>
 					</File>
 					<File
@@ -1197,6 +1233,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\lua\CLuaManager.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaModule.cpp"
 						>
 					</File>
 					<File
@@ -1288,7 +1328,15 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\net\CSimBulletsyncPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\net\CSimControl.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\net\CSimKeysyncPacket.cpp"
 						>
 					</File>
 					<File
@@ -1533,13 +1581,41 @@
 				Name="shared"
 				>
 				<File
-					RelativePath="..\..\..\Shared\animation\CEasingCurve.cpp"
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CIdArray.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Shared\animation\CPositionRotationAnimation.cpp"
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLatentReceiver.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLatentSendQueue.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CZoneNames.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\Enums.cpp"
+					>
+				</File>
+				<Filter
+					Name="animation"
+					>
+					<File
+						RelativePath="..\..\..\Shared\animation\CEasingCurve.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\Shared\animation\CPositionRotationAnimation.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1639,6 +1715,18 @@
 				</File>
 				<File
 					RelativePath=".\logic\CBlipManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CBuildingRemoval.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CBuildingRemovalManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CCameraSpatialDatabase.h"
 					>
 				</File>
 				<File
@@ -1930,6 +2018,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CResourceChecker.Data.h"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CResourceChecker.h"
 					>
 				</File>
@@ -2078,10 +2170,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CZoneNames.h"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\Element.h"
 					>
 				</File>
@@ -2100,6 +2188,10 @@
 				<Filter
 					Name="packets"
 					>
+					<File
+						RelativePath=".\logic\packets\CBulletsyncPacket.h"
+						>
+					</File>
 					<File
 						RelativePath=".\logic\packets\CCameraSyncPacket.h"
 						>
@@ -2122,6 +2214,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CDebugEchoPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CDestroySatchelsPacket.h"
 						>
 					</File>
 					<File
@@ -2261,6 +2357,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPlayerScreenShotPacket.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPlayerSpawnPacket.h"
 						>
 					</File>
@@ -2285,6 +2385,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CResourceClientScriptsPacket.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CResourceStartPacket.h"
 						>
 					</File>
@@ -2298,6 +2402,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CServerTextItemPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CUnoccupiedVehiclePushPacket.h"
 						>
 					</File>
 					<File
@@ -2349,10 +2457,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\packets\PacketIODeclarators.h"
-						>
-					</File>
-					<File
 						RelativePath="..\..\..\Shared\sdk\net\Packets.h"
 						>
 					</File>
@@ -2394,6 +2498,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\lua\CLuaManager.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaModule.h"
 						>
 					</File>
 					<File
@@ -2497,7 +2605,15 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\net\CSimBulletsyncPacket.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\net\CSimControl.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\net\CSimKeysyncPacket.h"
 						>
 					</File>
 					<File
@@ -2574,17 +2690,41 @@
 				Name="shared"
 				>
 				<File
-					RelativePath="..\..\..\Shared\animation\CEasingCurve.h"
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CIdArray.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Shared\animation\CPositionRotationAnimation.h"
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CLatentTransferManager.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Shared\animation\TInterpolation.h"
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CTickRateSettings.h"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\CZoneNames.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\mods\deathmatch\logic\Enums.h"
+					>
+				</File>
+				<Filter
+					Name="animation"
+					>
+					<File
+						RelativePath="..\..\..\Shared\animation\CEasingCurve.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\Shared\animation\CPositionRotationAnimation.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\Shared\animation\TInterpolation.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter

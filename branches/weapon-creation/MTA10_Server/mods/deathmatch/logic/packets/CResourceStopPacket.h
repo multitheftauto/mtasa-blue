@@ -21,7 +21,7 @@ public:
                             CResourceStopPacket         ( unsigned short usID );
 
     inline ePacketID        GetPacketID                 ( void ) const      { return PACKET_ID_RESOURCE_STOP; };
-    inline unsigned long    GetFlags                    ( void ) const      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline unsigned long    GetFlags                    ( void ) const      { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 

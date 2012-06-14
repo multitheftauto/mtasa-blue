@@ -30,25 +30,26 @@
 class CExportedFunction
 {
 private:
-    char            m_szFunctionName[MAX_FUNCTION_NAME_LENGTH];
+    SString            m_strFunctionName;
 public:
-    CExportedFunction ( char * szFunctionName )
+    CExportedFunction ( const char* szFunctionName )
     {
-        strncpy ( m_szFunctionName, szFunctionName, MAX_FUNCTION_NAME_LENGTH - 1 );
+        m_strFunctionName.AssignLeft ( szFunctionName, MAX_FUNCTION_NAME_LENGTH );
     };
 
-    inline char *   GetFunctionName ( void ) { return m_szFunctionName; }
+    const char* GetFunctionName ( void ) { return m_strFunctionName; }
 };
 
 class CResource
 {  
 
 public:
-                            CResource       ( unsigned short usID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity );
+                            CResource       ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity );
                             ~CResource      ( void );
 
-    inline unsigned short   GetID           ( void )                { return m_usID; };
-    inline char*            GetName         ( void )                { return m_szResourceName; };
+    inline unsigned short   GetNetID        ( void )                { return m_usNetID; };
+    uint                    GetScriptID     ( void ) const          { return m_uiScriptID; };
+    const char*             GetName         ( void )                { return m_strResourceName; };
     inline CLuaMain*        GetVM           ( void )                { return m_pLuaVM; };
     inline bool             GetActive       ( void )                { return m_bActive; };
 
@@ -57,16 +58,16 @@ public:
     bool                    InDownloadQueue     ( void )            { return m_bInDownloadQueue; };
     bool                    SetInDownloadQueue  ( bool bIn )        { m_bInDownloadQueue = bIn; };
 
-    CDownloadableResource*  QueueFile       ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum );
+    CDownloadableResource*  QueueFile       ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum, bool bAutoDownload = true );
 
-    CDownloadableResource*  AddConfigFile   ( char *szFileName, CChecksum serverChecksum );
+    CDownloadableResource*  AddConfigFile   ( const char *szFileName, CChecksum serverChecksum );
 
     inline std::list < class CResourceConfigItem* >::iterator    ConfigIterBegin     ( void )        { return m_ConfigFiles.begin(); }
     inline std::list < class CResourceConfigItem* >::iterator    ConfigIterEnd       ( void )        { return m_ConfigFiles.end(); }
 
     CElementGroup *         GetElementGroup ( void )                { return m_pDefaultElementGroup; }
 
-    void                    AddExportedFunction (char *szFunctionName );
+    void                    AddExportedFunction ( const char * szFunctionName );
     bool                    CallExportedFunction ( const char * szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller );
 
     class CClientEntity*    GetResourceEntity ( void )              { return m_pResourceEntity; }
@@ -89,9 +90,16 @@ public:
     inline std::list < CExportedFunction* >::iterator    IterBeginExportedFunctions   ( void )        { return m_exportedFunctions.begin(); }
     inline std::list < CExportedFunction* >::iterator    IterEndExportedFunctions     ( void )        { return m_exportedFunctions.end(); }
 
+    inline std::list < CResourceFile* >::iterator    IterBeginResourceFiles   ( void )        { return m_ResourceFiles.begin(); }
+    inline std::list < CResourceFile* >::iterator    IterEndResourceFiles     ( void )        { return m_ResourceFiles.end(); }
+
+    void                    SetRemainingProtectedScripts    ( unsigned short usRemaining ) { m_usRemainingProtectedScripts = usRemaining; }
+    void                    LoadProtectedScript             ( const char* chunk, unsigned int length );
+
 private:
-    unsigned short          m_usID;
-    char                    m_szResourceName [ MAX_RESOURCE_NAME_LENGTH ];
+    unsigned short          m_usNetID;
+    uint                    m_uiScriptID;
+    SString                 m_strResourceName;
     CLuaMain*               m_pLuaVM;
     CLuaManager*            m_pLuaManager;
     class CClientEntity*    m_pRootEntity;
@@ -103,6 +111,8 @@ private:
     class CClientEntity*    m_pResourceGUIEntity;
     class CClientEntity*    m_pResourceTXDRoot;
     bool                    m_bInDownloadQueue;
+    unsigned short          m_usRemainingProtectedScripts;
+    bool                    m_bLoadAfterReceivingProtectedScripts;
 
     // To control cursor show/hide
     static int              m_iShowingCursor;

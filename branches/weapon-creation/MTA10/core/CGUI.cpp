@@ -37,6 +37,7 @@ CLocalGUI::CLocalGUI ( void )
     m_bChatboxVisible = true;
     m_pDebugViewVisible = false;
     m_bGUIHasInput = false;
+    m_uiActiveCompositionSize = 0;
 
     m_bVisibleWindows = false;
     m_iVisibleWindows = 0;
@@ -657,9 +658,75 @@ bool CLocalGUI::ProcessMessage ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
                 return false;
             }
 
+            case WM_IME_COMPOSITION:
+            {
+                if ( lParam & GCS_RESULTSTR )
+                {
+                    HIMC himc = ImmGetContext ( hwnd );
+
+                    // Get composition result
+                    ushort buffer[256];
+                    LONG numBytes = ImmGetCompositionStringW ( himc, GCS_RESULTSTR, buffer, sizeof ( buffer ) - 2 );
+                    int iNumCharacters = numBytes / sizeof ( ushort );
+
+                    // Erase output from previous composition state
+                    for ( int i = 0 ; i < m_uiActiveCompositionSize ; i++ )
+                    {
+                        pGUI->ProcessCharacter ( '\x08' );
+                        pGUI->ProcessKeyboardInput ( 14, true );
+                    }
+
+                    // Output composition result
+                    for ( int i = 0 ; i < iNumCharacters ; i++ )
+                        if ( buffer[i] )
+                            pGUI->ProcessCharacter ( buffer[i] );
+
+                    ImmReleaseContext ( hwnd, himc );
+
+                    m_uiActiveCompositionSize = 0;
+                }
+                else if( lParam & GCS_COMPSTR ) 
+                {
+                    HIMC himc = ImmGetContext ( hwnd );
+
+                    // Get composition state
+                    ushort buffer[256];
+                    LONG numBytes = ImmGetCompositionStringW ( himc, GCS_COMPSTR, buffer, sizeof ( buffer ) - 2 );
+                    int iNumCharacters = numBytes / sizeof ( ushort );
+
+                    // Erase output from previous composition state
+                    for ( int i = 0 ; i < m_uiActiveCompositionSize ; i++ )
+                    {
+                        pGUI->ProcessCharacter ( '\x08' );
+                        pGUI->ProcessKeyboardInput ( 14, true );
+                    }
+
+                    // Output new composition state
+                    for ( int i = 0 ; i < iNumCharacters ; i++ )
+                        if ( buffer[i] )
+                            pGUI->ProcessCharacter ( buffer[i] );
+
+                    ImmReleaseContext ( hwnd, himc );
+
+                    m_uiActiveCompositionSize = iNumCharacters;
+                }
+            }
+            break;
+
+            case WM_IME_CHAR:
+            case WM_IME_KEYDOWN:
+            {
+                // Stop these here
+                return true;
+            }
+            break;
+
             case WM_CHAR:
+            {
                 pGUI->ProcessCharacter ( wParam );
                 return true;
+            }
+            break;
         }
     }
 

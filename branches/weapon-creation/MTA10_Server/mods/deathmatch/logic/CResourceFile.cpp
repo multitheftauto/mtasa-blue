@@ -20,7 +20,7 @@
 #include "StdInc.h"
 
 CResourceFile::CResourceFile ( CResource * resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes * xmlAttributes ) 
-{ 
+{
     m_strResourceFileName = szResourceFileName; 
 
     // Stupid hack to automatically change all forward slashes to back slashes to get around internal http sub dir issue
@@ -61,7 +61,7 @@ CResourceFile::~CResourceFile ( void )
 ResponseCode CResourceFile::Request ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse )
 {
     // HACK - Use http-client-files if possible as the resources directory may have been changed since the resource was loaded.
-    SString strDstFilePath = string ( g_pServerInterface->GetServerModPath () ) + "/resource-cache/http-client-files/" + m_resource->GetName() + "/" + this->GetName();
+    SString strDstFilePath = GetCachedPathFilename ();
 
     FILE * file = fopen ( strDstFilePath.c_str (), "rb" );
     if ( !file )
@@ -95,3 +95,11 @@ ResponseCode CResourceFile::Request ( HttpRequest * ipoHttpRequest, HttpResponse
     }
 }
 
+
+SString CResourceFile::GetCachedPathFilename ( bool bForceUnprotectedPath )
+{
+    if ( IsProtected() == false || bForceUnprotectedPath )
+        return PathJoin ( g_pServerInterface->GetServerModPath (), "resource-cache", "http-client-files", m_resource->GetName(), GetName () );
+    else
+        return PathJoin ( g_pServerInterface->GetServerModPath (), "resource-cache", "http-client-files-protected", m_resource->GetName(), GetName () );
+}

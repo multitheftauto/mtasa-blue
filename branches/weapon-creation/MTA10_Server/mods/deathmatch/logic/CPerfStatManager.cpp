@@ -331,3 +331,23 @@ SString CPerfStatManager::GetPerSecondString ( long long llValue, double dDeltaT
     double dValue = llValue * 1000 / dDeltaTickCount;
     return SString ( dValue < 5 ? "%1.1f" : "%1.0f", dValue );
 }
+
+
+///////////////////////////////////////////////////////////////
+//
+// CPerfStatManager::GetPercentString
+//
+//
+//
+///////////////////////////////////////////////////////////////
+SString CPerfStatManager::GetPercentString ( long long llValue, long long llTotal )
+{
+    llTotal = Max ( 1LL, llTotal );
+    double dValue = llValue * 100 / (double)llTotal;
+    dValue = Clamp ( 0.0, dValue, 100.0 );
+    if ( dValue < 1 )
+        return SString ( "%1.2f %%", dValue );
+    if ( dValue < 5 )
+        return SString ( "%1.1f %%", dValue );
+    return SString ( "%1.0f %%", dValue );
+}

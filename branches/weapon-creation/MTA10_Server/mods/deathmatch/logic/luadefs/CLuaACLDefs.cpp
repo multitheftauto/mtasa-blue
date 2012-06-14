@@ -17,7 +17,7 @@
 static const char* GetResourceName ( lua_State* luaVM )
 {
     CLuaMain * luaMain = g_pGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
-    return luaMain ? luaMain->GetScriptNamePointer () : "";
+    return luaMain ? luaMain->GetScriptName () : "";
 }
 
 
@@ -209,13 +209,13 @@ int CLuaACLDefs::aclGetRight ( lua_State* luaVM )
     {
         // Grab the arguments
         CAccessControlList* pACL = lua_toacl ( luaVM, 1 );
-        char* szRight = (char*) lua_tostring ( luaVM, 2 );
+        const char* szRight = lua_tostring ( luaVM, 2 );
 
         // Verify the ACL pointer
         if ( pACL )
         {
             // Grab the type from the name passed
-            char* szRightAftedDot = szRight;
+            const char* szRightAftedDot = szRight;
             CAccessControlListRight::ERightType eType;
             if ( StringBeginsWith ( szRight, "command." ) )
             {
@@ -269,14 +269,14 @@ int CLuaACLDefs::aclSetRight ( lua_State* luaVM )
     {
         // Grab the arguments
         CAccessControlList* pACL = lua_toacl ( luaVM, 1 );
-        char* szRight = (char*) lua_tostring ( luaVM, 2 );
+        const char* szRight = lua_tostring ( luaVM, 2 );
         bool bAccess = lua_toboolean ( luaVM, 3 ) ?true:false;
 
         // Verify the ACL pointer
         if ( pACL && pACL->CanBeModifiedByScript () )
         {
             // Grab the type from the name passed
-            char* szRightAftedDot = szRight;
+            const char* szRightAftedDot = szRight;
             CAccessControlListRight::ERightType eType;
             if ( StringBeginsWith ( szRight, "command." ) )
             {
@@ -429,13 +429,13 @@ int CLuaACLDefs::aclRemoveRight ( lua_State* luaVM )
     {
         // Grab the argument strings
         CAccessControlList* pACL = lua_toacl ( luaVM, 1 );
-        char* szRight = (char*) lua_tostring ( luaVM, 2 );
+        const char* szRight = lua_tostring ( luaVM, 2 );
 
         // Verify the ACL pointer
         if ( pACL )
         {
             // Grab the type from the name passed
-            char* szRightAftedDot = szRight;
+            const char* szRightAftedDot = szRight;
             CAccessControlListRight::ERightType eType;
             if ( StringBeginsWith ( szRight, "command." ) )
             {
@@ -489,7 +489,7 @@ int CLuaACLDefs::aclCreateGroup ( lua_State* luaVM )
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
     {
         // Grab the argument strings
-        char* szGroup = (char*) lua_tostring ( luaVM, 1 );
+        const char* szGroup = lua_tostring ( luaVM, 1 );
 
         // Find the ACL specified
         CAccessControlListGroup* pGroup = m_pACLManager->GetGroup ( szGroup );
@@ -546,7 +546,7 @@ int CLuaACLDefs::aclGetGroup ( lua_State* luaVM )
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
     {
         // Grab the argument strings
-        char* szGroup = (char*) lua_tostring ( luaVM, 1 );
+        const char* szGroup = lua_tostring ( luaVM, 1 );
 
         // Find the ACL specified
         CAccessControlListGroup* pGroup = m_pACLManager->GetGroup ( szGroup );
@@ -964,7 +964,7 @@ int CLuaACLDefs::isObjectInACLGroup ( lua_State* luaVM )
         CAccessControlListGroup* pGroup = lua_toaclgroup ( luaVM, 2 );
         CAccessControlListGroupObject::EObjectType GroupObjectType;
 
-        if ( pGroup && m_pACLManager->VerifyGroup ( pGroup ) )
+        if ( pGroup )
         {
             if ( StringBeginsWith ( szObject, "resource." ) ) {
                 szObject += 9;

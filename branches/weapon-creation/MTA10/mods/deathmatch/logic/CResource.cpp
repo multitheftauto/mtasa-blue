@@ -23,21 +23,19 @@ extern CClientGame* g_pClientGame;
 
 int CResource::m_iShowingCursor = 0;
 
-CResource::CResource ( unsigned short usID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity )
+CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity )
 {
-    m_usID = usID;
+    m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::RESOURCE );
+    m_usNetID = usNetID;
     m_bActive = false;
     m_bInDownloadQueue = false;
     m_bShowingCursor = false;
+    m_usRemainingProtectedScripts = 0;
+    m_bLoadAfterReceivingProtectedScripts = false;
 
     if ( szResourceName )
-    {
-        strncpy ( m_szResourceName, szResourceName, MAX_RESOURCE_NAME_LENGTH );
-        if ( MAX_RESOURCE_NAME_LENGTH )
-        {
-            m_szResourceName [ MAX_RESOURCE_NAME_LENGTH-1 ] = 0;
-        }
-    }
+        m_strResourceName.AssignLeft ( szResourceName, MAX_RESOURCE_NAME_LENGTH );
+
     m_pLuaManager = g_pClientGame->GetLuaManager();
     m_pRootEntity = g_pClientGame->GetRootEntity ();
     m_pDefaultElementGroup = new CElementGroup ( this );
@@ -65,8 +63,8 @@ CResource::CResource ( unsigned short usID, char* szResourceName, CClientEntity*
     m_pResourceTXDRoot = new CClientDummy ( g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "txdroot" );
     m_pResourceTXDRoot->MakeSystemEntity ();
 
-    m_strResourceDirectoryPath = SString ( "%s/resources/%s", g_pClientGame->GetModRoot (), m_szResourceName );
-    m_strResourcePrivateDirectoryPath = PathJoin ( CServerIdManager::GetSingleton ()->GetConnectionPrivateDirectory (), m_szResourceName );
+    m_strResourceDirectoryPath = SString ( "%s/resources/%s", g_pClientGame->GetModRoot (), *m_strResourceName );
+    m_strResourcePrivateDirectoryPath = PathJoin ( CServerIdManager::GetSingleton ()->GetConnectionPrivateDirectory (), m_strResourceName );
 
     m_pLuaVM = m_pLuaManager->CreateVirtualMachine ( this );
     if ( m_pLuaVM )
@@ -78,6 +76,7 @@ CResource::CResource ( unsigned short usID, char* szResourceName, CClientEntity*
 
 CResource::~CResource ( void )
 {
+    CIdArray::PushUniqueId ( this, EIdClass::RESOURCE, m_uiScriptID );
     // Make sure we don't force the cursor on
     ShowCursor ( false );
 
@@ -87,7 +86,7 @@ CResource::~CResource ( void )
 
     // Remove all keybinds on this VM
     g_pClientGame->GetScriptKeyBinds ()->RemoveAllKeys ( m_pLuaVM );
-    g_pCore->GetKeyBinds()->SetAllCommandsActive ( m_szResourceName, false );
+    g_pCore->GetKeyBinds()->SetAllCommandsActive ( m_strResourceName, false );
 
     // Destroy the txd root so all dff elements are deleted except those moved out
     g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceTXDRoot );
@@ -144,12 +143,12 @@ CResource::~CResource ( void )
     m_exportedFunctions.empty();
 }
 
-CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum )
+CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum, bool bAutoDownload )
 {
     // Create the resource file and add it to the list
-    SString strBuffer ( "%s\\resources\\%s\\%s", g_pClientGame->GetModRoot (), m_szResourceName, szFileName );
+    SString strBuffer ( "%s\\resources\\%s\\%s", g_pClientGame->GetModRoot (), *m_strResourceName, szFileName );
 
-    CResourceFile* pResourceFile = new CResourceFile ( resourceType, szFileName, strBuffer, serverChecksum );
+    CResourceFile* pResourceFile = new CResourceFile ( resourceType, szFileName, strBuffer, serverChecksum, bAutoDownload );
     if ( pResourceFile )
     {
         m_ResourceFiles.push_back ( pResourceFile );
@@ -159,10 +158,10 @@ CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceTy
 }
 
 
-CDownloadableResource* CResource::AddConfigFile ( char *szFileName, CChecksum serverChecksum )
+CDownloadableResource* CResource::AddConfigFile ( const char *szFileName, CChecksum serverChecksum )
 {
     // Create the config file and add it to the list
-    SString strBuffer ( "%s\\resources\\%s\\%s", g_pClientGame->GetModRoot (), m_szResourceName, szFileName );
+    SString strBuffer ( "%s\\resources\\%s\\%s", g_pClientGame->GetModRoot (), *m_strResourceName, szFileName );
     
     CResourceConfigItem* pConfig = new CResourceConfigItem ( this, szFileName, strBuffer, serverChecksum );
     if ( pConfig )
@@ -173,7 +172,7 @@ CDownloadableResource* CResource::AddConfigFile ( char *szFileName, CChecksum se
     return pConfig;
 }
 
-void CResource::AddExportedFunction ( char *szFunctionName )
+void CResource::AddExportedFunction ( const char *szFunctionName )
 {
     m_exportedFunctions.push_back(new CExportedFunction ( szFunctionName ) );
 }
@@ -265,6 +264,13 @@ static bool CheckFileForCorruption( string strPath )
 void CResource::Load ( CClientEntity *pRootEntity )
 {
     m_pRootEntity = pRootEntity;
+
+    if ( m_usRemainingProtectedScripts > 0 )
+    {
+        m_bLoadAfterReceivingProtectedScripts = true;
+        return;
+    }
+
     if ( m_pRootEntity )
     {
         // Set the GUI parent to the resource root entity
@@ -274,7 +280,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
         m_pResourceTXDRoot->SetParent ( m_pResourceEntity );
     }
 
-    CLogger::LogPrintf ( "> Starting resource '%s'", m_szResourceName );
+    CLogger::LogPrintf ( "> Starting resource '%s'", *m_strResourceName );
 
     char szBuffer [ MAX_PATH ] = { 0 };
     list < CResourceConfigItem* >::iterator iterc = m_ConfigFiles.begin ();
@@ -282,7 +288,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
     {
         if ( !(*iterc)->Start() )
         {
-            CLogger::LogPrintf ( "Failed to start resource item %s in %s\n", (*iterc)->GetName(), m_szResourceName );
+            CLogger::LogPrintf ( "Failed to start resource item %s in %s\n", (*iterc)->GetName(), *m_strResourceName );
         }
     }
 
@@ -305,20 +311,20 @@ void CResource::Load ( CClientEntity *pRootEntity )
                 //UTF-8 BOM?  Compare by checking the standard UTF-8 BOM of 3 characters (in signed format, hence negative)
                 if ( iSize < 3 || buffer[0] != -0x11 || buffer[1] != -0x45 || buffer[2] != -0x41 ) 
                     //Maybe not UTF-8, if we have a >80% heuristic detection confidence, assume it is
-                    m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), iSize, pResourceFile->GetName (), GetUTF8Confidence ( (unsigned char*)&buffer.at ( 0 ), iSize ) >= 80 );
+                    m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), iSize, pResourceFile->GetName (), GetUTF8Confidence ( (const unsigned char*)&buffer.at ( 0 ), iSize ) >= 80 );
                 else if ( iSize != 3 )  //If there's a BOM, but the script is not empty, load ignoring the first 3 bytes
                     m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 3 ), iSize-3, pResourceFile->GetName (), true );
             }
             else
             {
-                SString strBuffer ( "ERROR: File '%s' in resource '%s' - CRC mismatch.", pResourceFile->GetShortName (), m_szResourceName );
+                SString strBuffer ( "ERROR: File '%s' in resource '%s' - CRC mismatch.", pResourceFile->GetShortName (), *m_strResourceName );
                 g_pCore->ChatEchoColor ( strBuffer, 255, 0, 0 );
             }
         }
         else
         if ( CheckFileForCorruption ( pResourceFile->GetName () ) )
         {
-            SString strBuffer ( "WARNING: File '%s' in resource '%s' is invalid.", pResourceFile->GetShortName (), m_szResourceName );
+            SString strBuffer ( "WARNING: File '%s' in resource '%s' is invalid.", pResourceFile->GetShortName (), *m_strResourceName );
             g_pCore->DebugEchoColor ( strBuffer, 255, 0, 0 );
         }
     }
@@ -331,7 +337,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
     {
         // Call the Lua "onClientResourceStart" event
         CLuaArguments Arguments;
-        Arguments.PushUserData ( this );
+        Arguments.PushResource ( this );
         m_pResourceEntity->CallEvent ( "onClientResourceStart", Arguments, true );
     }
     else
@@ -380,4 +386,19 @@ SString CResource::GetResourceDirectoryPath ( eAccessType accessType )
     if ( accessType == ACCESS_PRIVATE )
         return m_strResourcePrivateDirectoryPath;
     return m_strResourceDirectoryPath;
+}
+
+void CResource::LoadProtectedScript ( const char* chunk, unsigned int len )
+{
+    if ( m_usRemainingProtectedScripts > 0 )
+    {
+        --m_usRemainingProtectedScripts;
+        GetVM()->LoadScriptFromBuffer ( chunk, len, "(unknown)", false );
+
+        if ( m_usRemainingProtectedScripts == 0 && m_bLoadAfterReceivingProtectedScripts )
+        {
+            m_bLoadAfterReceivingProtectedScripts = false;
+            Load ( m_pRootEntity );
+        }
+    }
 }

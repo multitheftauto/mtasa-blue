@@ -14,7 +14,8 @@
 
 #include "StdInc.h"
 
-static unsigned char g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1, 1, 3, 1, 1,       // 400->415
+static const SFixedArray < unsigned char, 212 > g_ucMaxPassengers = { {
+                                       3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1, 1, 3, 1, 1,              // 400->415
                                        3, 1, 3, 1, 3, 3, 1, 1, 1, 0, 3, 3, 3, 1, 0, 8,              // 416->431
                                        0, 1, 1, 255, 1, 8, 3, 1, 3, 0, 1, 1, 1, 3, 0, 1,            // 432->447
                                        0, 1, 255, 1, 0, 0, 0, 1, 1, 1, 3, 3, 1, 1, 1,               // 448->462
@@ -27,7 +28,8 @@ static unsigned char g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1
                                        1, 1, 3, 3, 1, 1, 0, 1, 3, 3, 0, 255, 1, 0, 0,               // 558->572
                                        1, 0, 1, 1, 1, 1, 3, 3, 1, 3, 0, 255, 3, 1, 1, 1,            // 573->588
                                        1, 255, 255, 1, 1, 1, 0, 3, 3, 3, 1, 1, 1, 1, 1,             // 589->604
-                                       3, 1, 255, 255, 255, 3, 255, 255 };                          // 605->611
+                                       3, 1, 255, 255, 255, 3, 255, 255 } };                          // 605->611
+
 
 // List over all vehicles with their special attributes
 #define VEHICLE_HAS_TURRENT             0x001UL //1
@@ -38,7 +40,7 @@ static unsigned char g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1
 #define VEHICLE_HAS_TAXI_LIGHTS         0x020UL //32
 #define VEHICLE_HAS_SEARCH_LIGHT        0x040UL //64
 
-unsigned long g_ulVehicleAttributes [] = {
+static const SFixedArray < unsigned long, 212 > g_ulVehicleAttributes = { {
   0, 0, 0, 0, 0, 0, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 32, 0, 0, 2, 0,    // 400-424
   0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0,    // 425-449
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 450-474
@@ -48,10 +50,10 @@ unsigned long g_ulVehicleAttributes [] = {
   0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 550-574
   0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 2, 2, 2, 2,   // 575-599
   0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
+} };
 
 
-static eVehicleType gs_vehicleTypes [] = {
+static const SFixedArray < eVehicleType, 212 > gs_vehicleTypes = { {
     VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_MONSTERTRUCK,
     VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR,
     VEHICLE_CAR, VEHICLE_CAR, VEHICLE_HELI, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR,
@@ -80,9 +82,9 @@ static eVehicleType gs_vehicleTypes [] = {
     VEHICLE_TRAILER, VEHICLE_PLANE, VEHICLE_PLANE, VEHICLE_CAR, VEHICLE_BOAT, VEHICLE_CAR, VEHICLE_CAR,
     VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR,
     VEHICLE_TRAILER, VEHICLE_TRAILER, VEHICLE_TRAILER, VEHICLE_CAR, VEHICLE_TRAILER, VEHICLE_TRAILER
-};
+} };
 
-unsigned char g_ucVariants [212];
+static SFixedArray < unsigned char, 212 > g_ucVariants;
 
 CVehicleManager::CVehicleManager ( void )
 {
@@ -94,7 +96,7 @@ CVehicleManager::CVehicleManager ( void )
     m_bDontRemoveFromList = false;
 
     int iVehicleID = 0;
-    for ( int i = 0; i <= 212; i++ )
+    for ( int i = 0; i < 212; i++ )
     {
         g_ucVariants[i] = 255;
         iVehicleID = i + 400;
@@ -503,16 +505,13 @@ void CVehicleManager::GetRandomVariation ( unsigned short usModel, unsigned char
     // Valid model?
     if ( IsValidModel( usModel ) && g_ucVariants[ usModel - 400 ] != 255 )
     {
-        // BF400 || caddy || ???
-        if ( usModel == 581 || usModel == 457 || usModel == 512 )
+        // caddy || cropduster
+        if ( usModel == 457 || usModel == 512 )
         {
-            // e.g. 581 ( BF400 )
-            // first 3 properties are Exhaust
-            // last 2 are fairings.
-
-
+            // 255, 0, 1, 2
             ucVariant = ( rand ( ) % 4 ) - 1;
 
+            // 3, 4, 5
             ucVariant2 = ( rand ( ) % 3 );
             ucVariant2 += 3;
             return;
@@ -521,21 +520,28 @@ void CVehicleManager::GetRandomVariation ( unsigned short usModel, unsigned char
         else if ( usModel == 535 )
         {
             // Slamvan has steering wheel "extras" we want one of those so default cannot be an option.
-            ucVariant = rand ( ) % g_ucVariants [usModel - 400];
+            ucVariant = ( rand ( ) % ( g_ucVariants [usModel - 400] + 1 ) );
             return;
         }
-        // NRG 500
-        else if ( usModel == 522 )
+        // NRG 500 || BF400
+        else if ( usModel == 522 || usModel == 581 )
         {
+            // e.g. 581 ( BF400 )
+            // first 3 properties are Exhaust
+            // last 2 are fairings.
+
+            // 255, 0, 1, 2
             ucVariant = ( rand ( ) % 4 ) - 1;
 
+            // 3, 4
             ucVariant2 = ( rand ( ) % 2 );
             ucVariant2 += 3;
+            return;
         }
-        // e.g. ( rand () % ( 5 + 1 ) ) - 1
+        // e.g. ( rand () % ( 5 + 2 ) ) - 1
         // Can generate 6 then minus 1 = 5
         // Can generate 0 then minus 1 = -1 (255) (default model with nothing)
-        ucVariant = ( rand ( ) % (g_ucVariants [usModel - 400] + 1) );
+        ucVariant = ( rand ( ) % (g_ucVariants [usModel - 400] + 2) ) - 1;
     }
 }
 

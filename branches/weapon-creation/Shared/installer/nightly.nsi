@@ -6,14 +6,11 @@
 !include UAC.nsh
 !include GameExplorer.nsh
 !include WinVer.nsh
+!include nsArray.nsh
 
 XPStyle on
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
-
-!define TEMP1 $R0
-!define TEMP2 $R1
-!define TEMP3 $R2
 
 Var GTA_DIR
 Var Install_Dir
@@ -22,12 +19,12 @@ Var CreateDesktopIcon
 Var RedistInstalled
 
 ; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\GDFImp.gdf.xml
-!define GUID "{DEEC1E88-94A4-412C-B64A-1D772535AD58}"
+!define GUID "{DF780162-2450-4665-9BA2-EAB14ED640A3}"
 
 
 !ifndef MAJOR_VER
     !define MAJOR_VER "1"
-    !define MINOR_VER "3"
+    !define MINOR_VER "4"
     !define MAINT_VER "0"
 !endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
@@ -98,7 +95,7 @@ Var RedistInstalled
 !define MUI_WELCOMEPAGE_TITLE_3LINES
 !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
 It is recommended that you close all other applications before starting Setup.\n\n\
-[Admin access will be requested for Vista and up]\n\n\
+[Admin access may be requested for Vista and up]\n\n\
 Click Next to continue."
 !define MUI_PAGE_CUSTOMFUNCTION_PRE "WelcomePreProc"
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW "WelcomeShowProc"
@@ -114,10 +111,12 @@ Click Next to continue."
 !insertmacro MUI_PAGE_COMPONENTS
 
 ; Game directory page
-!define MUI_PAGE_CUSTOMFUNCTION_SHOW "DirectoryShowProc"
-!define MUI_PAGE_CUSTOMFUNCTION_LEAVE "DirectoryLeaveProc"
-!define MUI_DIRECTORYPAGE_VARIABLE				$INSTDIR
-!insertmacro MUI_PAGE_DIRECTORY
+#!define MUI_PAGE_CUSTOMFUNCTION_SHOW "DirectoryShowProc"
+#!define MUI_PAGE_CUSTOMFUNCTION_LEAVE "DirectoryLeaveProc"
+#!define MUI_CUSTOMFUNCTION_ABORT "DirectoryAbort"
+#!define MUI_DIRECTORYPAGE_VARIABLE				$INSTDIR
+#!insertmacro MUI_PAGE_DIRECTORY
+Page custom CustomDirectoryPage DirectoryLeaveProc
 
 !ifdef CLIENT_SETUP
 	!define MUI_PAGE_CUSTOMFUNCTION_PRE				SkipDirectoryPage
@@ -152,14 +151,14 @@ LangString DESC_Section2 ${LANG_ENGLISH}			"The MTA:SA modification, allowing yo
 LangString DESC_SectionGroupServer ${LANG_ENGLISH}  "The Multi Theft Auto Server. This allows you to host games from your computer. This requires a fast internet connection."
 LangString DESC_Section4 ${LANG_ENGLISH}			"The Multi Theft Auto server. This is a required component."
 LangString DESC_Section5 ${LANG_ENGLISH}			"The MTA:SA modification for the server."
-;LangString DESC_Section6 ${LANG_ENGLISH}			"This is a set of required resources for your server."
-;LangString DESC_Section7 ${LANG_ENGLISH}			"This is an optional set of gamemodes and maps for your server."
-;LangString DESC_Section8 ${LANG_ENGLISH}			"The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
-;LangString DESC_Section9 ${LANG_ENGLISH}			"This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
+LangString DESC_Section6 ${LANG_ENGLISH}			"This is a set of required resources for your server."
+LangString DESC_Section7 ${LANG_ENGLISH}			"This is an optional set of gamemodes and maps for your server."
+LangString DESC_Section8 ${LANG_ENGLISH}			"The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
+LangString DESC_Section9 ${LANG_ENGLISH}			"This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
 LangString DESC_Section10 ${LANG_ENGLISH}			"Create a Start Menu group for installed applications"
 LangString DESC_Section11 ${LANG_ENGLISH}			"Create a Desktop Shortcut for the MTA:SA Client."
 ;LangString DESC_Blank ${LANG_ENGLISH}			""
-;LangString DESC_SectionGroupDev ${LANG_ENGLISH}		"Development code and tools that aid in the creation of mods for Multi Theft Auto"
+LangString DESC_SectionGroupDev ${LANG_ENGLISH}		"Development code and tools that aid in the creation of mods for Multi Theft Auto"
 LangString DESC_SectionGroupClient ${LANG_ENGLISH}  "The client is the program you run to play on a Multi Theft Auto server"
 
 
@@ -173,8 +172,7 @@ Function LaunchLink
 	!endif
 FunctionEnd
 
-Function .OnInstFailed
-	;UAC::Unload ;Must call unload!
+Function .onInstFailed
 FunctionEnd
 
 Function .onInit
@@ -387,11 +385,31 @@ DontInstallRedist:
 			#############################################################
 			# Make the directory "$INSTDIR" read write accessible by all users
 			# Make the directory "$APPDATA\MTA San Andreas All" read write accessible by all users
+            # Make the directory "$GTA_DIR" read write accessible by all users
 
             ${If} ${AtLeastWinVista}
                 DetailPrint "Updating permissions. This could take a few minutes..."
+
+                # Fix permissions for MTA install directory
                 FastPerms::FullAccessPlox "$INSTDIR"
                 FastPerms::FullAccessPlox "$APPDATA\MTA San Andreas All"
+
+                # Remove MTA virtual store
+                StrCpy $0 $INSTDIR
+                !insertmacro UAC_AsUser_Call Function RemoveVirtualStore ${UAC_SYNCREGISTERS}
+                StrCpy $0 $INSTDIR
+                Call RemoveVirtualStore
+
+                IfFileExists $GTA_DIR\gta_sa.exe 0 PathBad
+                    # Fix permissions for GTA install directory
+                    FastPerms::FullAccessPlox "$GTA_DIR"
+
+                    # Remove GTA virtual store
+                    StrCpy $0 $GTA_DIR
+                    !insertmacro UAC_AsUser_Call Function RemoveVirtualStore ${UAC_SYNCREGISTERS}
+                    StrCpy $0 $GTA_DIR
+                    Call RemoveVirtualStore
+                PathBad:
             ${EndIf}
 			#############################################################
 
@@ -407,6 +425,8 @@ DontInstallRedist:
 			File "${FILES_ROOT}\MTA San Andreas\mta\netc.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\loader.dll"
+            File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
+            File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
 
             !ifndef LIGHTBUILD
 
@@ -419,9 +439,9 @@ DontInstallRedist:
 				File "${FILES_ROOT}\MTA San Andreas\mta\bass_aac.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\bass_ac3.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 				File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
+				File "${FILES_ROOT}\MTA San Andreas\mta\pthreadVC2.dll"
 
                 SetOutPath "$INSTDIR\skins\Classic"
                 File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"
@@ -433,7 +453,13 @@ DontInstallRedist:
                 File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.is.xml"
                 File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.lnf.xml"
                 File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.png"
-                File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.xml"                
+                File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.xml"
+                
+                SetOutPath "$INSTDIR\skins\Lighter black"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.is.xml"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.lnf.xml"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.png"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.xml"
 
 				SetOutPath "$INSTDIR\MTA\cgui"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Falagard.xsd"
@@ -549,7 +575,7 @@ DontInstallRedist:
 
 	!ifndef LIGHTBUILD
 		Section "Core resources" SEC06
-		SectionIn 1 2 RO ; section is required
+		SectionIn 1 2 ; RO section is now optional
 			SetOutPath "$INSTDIR\server\mods\deathmatch\resources\"
             File "${SERVER_FILES_ROOT}\mods\deathmatch\resources\Directory layout readme.txt"
 
@@ -686,15 +712,15 @@ SectionEnd
 	;!insertmacro MUI_DESCRIPTION_TEXT ${SECGMODS} $(DESC_SectionGroupMods)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC04} $(DESC_Section4)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC05} $(DESC_Section5)
-	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC06} $(DESC_Section6)
-	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC07} $(DESC_Section7)
-	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC08} $(DESC_Section8)
-	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC09} $(DESC_Section9)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC06} $(DESC_Section6)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC07} $(DESC_Section7)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC08} $(DESC_Section8)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09} $(DESC_Section9)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC10} $(DESC_Section10)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC11} $(DESC_Section11)
 	;!insertmacro MUI_DESCRIPTION_TEXT ${SECBLANK} $(DESC_Blank)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SECGSERVER} $(DESC_SectionGroupServer)
-	;!insertmacro MUI_DESCRIPTION_TEXT ${SECGDEV} $(DESC_SectionGroupDev)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SECGDEV} $(DESC_SectionGroupDev)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SECGCLIENT} $(DESC_SectionGroupClient)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
@@ -1302,6 +1328,22 @@ Function "DirectoryShowProc"
 FunctionEnd
 
 
+;****************************************************************
+;
+; Remove virtual store version of path
+;
+;****************************************************************
+; In $0 = install path
+Function RemoveVirtualStore
+    StrCpy $2 $0 "" 3     # Skip first 3 chars
+    StrCpy $3 "$LOCALAPPDATA\VirtualStore\$2"
+    StrCpy $4 "$0\FromVirtualStore"
+    IfFileExists $3 0 NoVirtualStore
+        CopyFiles $3\*.* $4
+        RmDir /r "$3"
+    NoVirtualStore:
+FunctionEnd
+
 
 ;****************************************************************
 ;
@@ -1396,4 +1438,243 @@ Function "GTADirectoryLeaveProc"
         cont1:
     cont:
 
+FunctionEnd
+
+
+;****************************************************************
+;
+; Custom MTA directory page
+;
+; To make sure the directory exists when 'Browse...' is clicked
+;
+;****************************************************************
+Var Dialog
+Var UpgradeLabel
+Var BrowseButton
+Var DirRequest
+!define LT_GREY "0xf0f0f0"
+!define MID_GREY "0x808080"
+
+Function CustomDirectoryPage
+
+	nsDialogs::Create 1018
+	Pop $Dialog
+	${If} $Dialog == error
+		Abort
+	${EndIf}
+
+    GetDlgItem $0 $HWNDPARENT 1037
+    ${NSD_SetText} $0 "Choose Install Location"
+    GetDlgItem $0 $HWNDPARENT 1038
+    ${NSD_SetText} $0 "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
+
+	${NSD_CreateLabel} 0 0 100% 50u "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n\
+To install in a different folder, click Browse and select another folder.$\n$\n Click Next to continue."
+	Pop $0
+
+	${NSD_CreateLabel} 20 190 100% 12u ""
+	Pop $UpgradeLabel
+    SetCtlColors $UpgradeLabel ${MID_GREY} ${LT_GREY}
+    Call CustomDirectoryPageSetUpgradeMessage
+
+	${NSD_CreateGroupBox} 0 115 100% 37u "Destination Folder"
+	Pop $0
+	${NSD_CreateDirRequest} 15 139 72% 12u $INSTDIR
+	Pop $DirRequest
+	${NSD_CreateBrowseButton} 77% 135 20% 15u "Browse..."
+	Pop $BrowseButton
+    ${NSD_OnClick} $BrowseButton CustomDirectoryPageBrowseButtonClick
+    ${NSD_OnChange} $DirRequest CustomDirectoryPageDirRequestChange
+
+    Call DirectoryShowProc
+    nsDialogs::Show
+FunctionEnd
+
+Function CustomDirectoryPageDirRequestChange
+    ${NSD_GetText} $DirRequest $0
+	${If} $0 != error
+		StrCpy $INSTDIR $0
+        Call CustomDirectoryPageSetUpgradeMessage
+	${EndIf}
+FunctionEnd
+
+Function CustomDirectoryPageBrowseButtonClick
+    ${NSD_GetText} $DirRequest $0
+
+    Call CreateDirectoryAndRememberWhichOnesWeDid
+
+    nsDialogs::SelectFolderDialog "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:" $0
+	Pop $0
+
+    Call RemoveDirectoriesWhichWeDid
+
+	${If} $0 != error
+		StrCpy $INSTDIR $0
+        ${NSD_SetText} $DirRequest $0
+        Call CustomDirectoryPageSetUpgradeMessage
+	${EndIf}
+FunctionEnd
+
+Function CustomDirectoryPageSetUpgradeMessage
+	Push $INSTDIR 
+	Call GetInstallType
+	Pop $0
+	Pop $1
+
+    ${NSD_SetText} $UpgradeLabel ""
+	${If} $0 == "overwrite"
+        ${NSD_SetText} $UpgradeLabel "Warning: A different major version of MTA ($1) already exists at that path."
+	${Endif}
+	${If} $0 == "upgrade"
+        ${NSD_SetText} $UpgradeLabel "Existing installation detected. Will perform in-place upgrade."
+	${Endif}
+FunctionEnd
+
+
+;****************************************************************
+;
+; Keep track of temp directories created
+;
+;****************************************************************
+Var SAVED_PATH_TO
+Var SAVED_CREATE_DEPTH
+
+; In $0 = path
+Function CreateDirectoryAndRememberWhichOnesWeDid
+    Push $0
+    Push $1
+    Push $2
+    Push $8
+    StrCpy $8 $0
+
+    StrCpy $0 $8
+    Call HowManyDepthsNotExist
+
+    StrCpy $SAVED_PATH_TO $8
+    StrCpy $SAVED_CREATE_DEPTH $2
+
+    #MessageBox mb_TopMost "CreateDirectoryAndRememberWhichOnesWeDid $\n\
+    #        path-to=$SAVED_PATH_TO $\n\
+    #        create-depth=$SAVED_CREATE_DEPTH $\n\
+    #        "
+
+    CreateDirectory $SAVED_PATH_TO
+
+    Pop $8
+    Pop $2
+    Pop $1
+    Pop $0
+FunctionEnd
+
+; In $0 = path
+; Out $2 = result
+Function HowManyDepthsNotExist
+    Push $0
+    Push $1
+    Push $8
+    Push $9
+    StrCpy $8 $0
+    StrCpy $9 0
+    ${Do}
+        StrCpy $0 $8
+        StrCpy $1 $9
+        Call RemoveEndsFromPath
+
+        StrCpy $0 $2
+        Call DoesDirExist
+
+        #MessageBox mb_TopMost "HowManyDepthsNotExist $\n\
+        #        8-path=$8 $\n\
+        #        9-count=$9 $\n\
+        #        2-path-shrunk=$2 $\n\
+        #        1-dir-exist=$1 $\n\
+        #        "
+
+        IntOp $9 $9 + 1
+    ${LoopUntil} $1 = 1
+
+    IntOp $2 $9 - 1
+    Pop $9
+    Pop $8
+    Pop $1
+    Pop $0
+FunctionEnd
+
+Function RemoveDirectoriesWhichWeDid
+    Push $0
+    Push $1
+    Push $2
+    Push $3
+
+    ${If} $SAVED_PATH_TO != ""
+
+        #MessageBox mb_TopMost "RemoveDirectoriesWhichWeDid $\n\
+        #        path=$SAVED_PATH_TO $\n\
+        #        depth=$SAVED_CREATE_DEPTH $\n\
+        #        "
+
+        IntOp $3 $SAVED_CREATE_DEPTH - 1
+        ${ForEach} $2 0 $3 + 1
+            StrCpy $0 $SAVED_PATH_TO
+            StrCpy $1 $2
+            Call RemoveDirectoryAtNegDepth
+
+        ${Next}
+
+    ${EndIf}
+
+    StrCpy $SAVED_PATH_TO ""
+    StrCpy $SAVED_CREATE_DEPTH ""
+
+    Pop $3
+    Pop $2
+    Pop $1
+    Pop $0
+FunctionEnd
+
+; In $0 = path
+; In $1 = how many end bits to remove
+Function RemoveDirectoryAtNegDepth
+    Push $2
+        Call RemoveEndsFromPath
+
+        #MessageBox mb_TopMost "RemoveDirectoryAtNegDepth $\n\
+        #        2-result=$2 $\n\
+        #       "
+
+        RmDir $2
+    Pop $2
+FunctionEnd
+
+; In $0 = path
+; In $1 = how many end bits to remove
+; Out $2 = result
+Function RemoveEndsFromPath
+    nsArray::Clear my_array
+    nsArray::Split my_array $0 \ /noempty
+
+    ${ForEach} $2 1 $1 + 1
+        nsArray::Remove my_array /at=-1
+    ${Next}
+
+    nsArray::Join my_array \ /noempty
+    Pop $2
+FunctionEnd
+
+; In $0 = path
+; Out $0 = result
+Function ConformDirectoryPath
+    nsArray::Clear my_array
+    nsArray::Split my_array $0 \ /noempty
+    nsArray::Join my_array \ /noempty
+    Pop $0
+FunctionEnd
+
+; In $0 = path
+; Out $1 = result 0/1
+Function DoesDirExist
+    StrCpy $1 1
+    IfFileExists "$0\*.*" alreadyexists
+        StrCpy $1 0
+    alreadyexists:
 FunctionEnd

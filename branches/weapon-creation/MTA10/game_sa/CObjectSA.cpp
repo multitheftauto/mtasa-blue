@@ -40,7 +40,7 @@ CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)
     CheckForGangTag ();
 }
 
-CObjectSA::CObjectSA( DWORD dwModel )
+CObjectSA::CObjectSA( DWORD dwModel, bool bBreakable )
 {
     DEBUG_TRACE("CObjectSA::CObjectSA( DWORD dwModel )");
 
@@ -137,12 +137,18 @@ CObjectSA::CObjectSA( DWORD dwModel )
     {
         this->SetInterface((CEntitySAInterface *)dwObjectPtr);
 
-        world->Add( m_pInterface );
+        world->Add( m_pInterface, CObject_Constructor );
 
         // Setup some flags
         this->BeingDeleted = FALSE;
         this->DoNotRemoveFromGame = FALSE;
         MemPutFast < BYTE > ( dwObjectPtr + 316, 6 );
+        if ( !bBreakable )
+        {
+            // Set our immunities
+            // Sum of all flags checked @ CPhysical__CanPhysicalBeDamaged 
+            MemPutFast < int > ( dwObjectPtr + 64, 0x00BC0000 );
+        }
         m_pInterface->bStreamingDontDelete = true;
     }
     else
@@ -157,7 +163,10 @@ CObjectSA::CObjectSA( DWORD dwModel )
     m_ucAlpha = 255;
 
     if ( m_pInterface )
+    {
         CheckForGangTag ();
+    }
+
 }
 
 CObjectSA::~CObjectSA( )
@@ -172,7 +181,7 @@ CObjectSA::~CObjectSA( )
             if ( (DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable )
             {
                 CWorldSA * world = (CWorldSA *)pGame->GetWorld();
-                world->Remove(this->GetInterface());
+                world->Remove(this->GetInterface(), CObject_Destructor);
             
                 DWORD dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
                 _asm    

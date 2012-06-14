@@ -34,7 +34,7 @@ public:
 
     void                                        WriteToXMLNode              ( CXMLNode* pNode );
 
-    inline const char*                          GetRightName                ( void )            { return m_szRightName; };
+    inline const char*                          GetRightName                ( void )            { return m_strRightName; };
     inline unsigned int                         GetRightNameHash            ( void )            { return m_uiNameHash; };
     inline ERightType                           GetRightType                ( void )            { return m_eRightType; };
 
@@ -47,7 +47,7 @@ public:
 private:
     void                                        OnChange                    ( void );
 
-    char                                        m_szRightName               [ MAX_ACL_RIGHT_NAME_LENGTH ];
+    SString                                     m_strRightName;
     unsigned int                                m_uiNameHash;
     ERightType                                  m_eRightType;
     bool                                        m_bAccess;

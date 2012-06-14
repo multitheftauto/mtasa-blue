@@ -23,7 +23,7 @@ CLightsyncManager::~CLightsyncManager ()
 void CLightsyncManager::RegisterPlayer ( CPlayer* pPlayer )
 {
     SEntry entry;
-    entry.ullTime = GetTickCount64_ () + SLOW_SYNCRATE;
+    entry.ullTime = GetTickCount64_ ();
     entry.pPlayer = pPlayer;
     entry.eType = SYNC_PLAYER;
     entry.uiContext = 0; // Unused
@@ -85,8 +85,8 @@ void CLightsyncManager::DoPulse ()
 
     // For limiting light sync processing
     long iLimitCounter = g_pBandwidthSettings->iLightSyncPlrsPerFrame;
-
-    while ( m_Queue.size() > 0 && m_Queue.front().ullTime <= GetTickCount64_ () && iLimitCounter > 0 )
+    int iLightsyncRate = g_TickRateSettings.iLightSync;
+    while ( m_Queue.size() > 0 && m_Queue.front().ullTime + iLightsyncRate <= GetTickCount64_ () && iLimitCounter > 0 )
     {
         SEntry entry = m_Queue.front ();
         CPlayer* pPlayer = entry.pPlayer;
@@ -101,10 +101,10 @@ void CLightsyncManager::DoPulse ()
                 CLightsyncPacket packet;
 
                 // Use this players far list
-                const std::map < CPlayer*, SNearInfo >& farList = pPlayer->GetFarPlayerList ();
+                const SViewerMapType& farList = pPlayer->GetFarPlayerList ();
 
                 // For each far player
-                for ( std::map < CPlayer*, SNearInfo > ::const_iterator it = farList.begin (); it != farList.end (); ++it )
+                for ( SViewerMapType ::const_iterator it = farList.begin (); it != farList.end (); ++it )
                 {
                     CPlayer* pCurrent = it->first;
                     dassert ( pPlayer != pCurrent );

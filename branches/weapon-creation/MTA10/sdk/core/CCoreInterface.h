@@ -16,6 +16,8 @@
 #include "CCommandsInterface.h"
 #include "CCommunityInterface.h"
 #include "CRenderItemManagerInterface.h"
+#include "CScreenGrabberInterface.h"
+#include "CPixelsManagerInterface.h"
 #include "CGraphicsInterface.h"
 #include "CModManagerInterface.h"
 #include "CKeyBindsInterface.h"
@@ -40,6 +42,20 @@ enum eCoreVersion
 {
     MTACORE_20 = 1,
 };
+
+#ifndef WITH_TIMING_CHECKPOINTS
+    #define WITH_TIMING_CHECKPOINTS 1     // Comment this line to remove timing checkpoint code
+#endif
+
+#if WITH_TIMING_CHECKPOINTS
+    #define IS_TIMING_CHECKPOINTS()     g_pCore->IsTimingCheckpoints ()
+    #define TIMING_CHECKPOINT(x)        g_pCore->OnTimingCheckpoint ( x )
+    #define TIMING_DETAIL(x)            g_pCore->OnTimingDetail ( x )
+#else
+    #define IS_TIMING_CHECKPOINTS()     (false)
+    #define TIMING_CHECKPOINT(x)        {}
+    #define TIMING_DETAIL(x)            {}
+#endif
 
 class CCoreInterface
 {
@@ -110,6 +126,9 @@ public:
 
     virtual void                    SwitchRenderWindow              ( HWND hWnd, HWND hWndInput ) = 0;
     virtual void                    SetCenterCursor                 ( bool bEnabled ) = 0;
+    virtual bool                    IsTimingCheckpoints             ( void ) = 0;
+    virtual void                    OnTimingCheckpoint              ( const char* szTag ) = 0;
+    virtual void                    OnTimingDetail                  ( const char* szTag ) = 0;
 
     // CGUI Callbacks
     virtual bool                    OnMouseClick                    ( CGUIMouseEventArgs Args ) = 0;
@@ -125,12 +144,15 @@ public:
     virtual void                    ApplyFrameRateLimit             ( uint uiOverrideRate = -1 ) = 0;
     virtual void                    EnsureFrameRateLimitApplied     ( void ) = 0;
 
+    virtual void                    OnPreFxRender                   ( void ) = 0;
     virtual void                    OnPreHUDRender                  ( void ) = 0;
     virtual uint                    GetMinStreamingMemory           ( void ) = 0;
     virtual uint                    GetMaxStreamingMemory           ( void ) = 0;
     virtual void                    OnCrashAverted                  ( uint uiId ) = 0;
     virtual void                    LogEvent                        ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody ) = 0;
     virtual bool                    GetDebugIdEnabled               ( uint uiDebugId ) = 0;
+    virtual EDiagnosticDebugType    GetDiagnosticDebug              ( void ) = 0;
+    virtual void                    SetDiagnosticDebug              ( EDiagnosticDebugType value ) = 0;
 };
 
 #endif

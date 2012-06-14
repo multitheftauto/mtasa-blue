@@ -23,7 +23,7 @@ class CPlayerJoinDataPacket : public CPacket
 public:
     virtual bool            RequiresSourcePlayer        ( void ) const                      { return false; }
     inline ePacketID        GetPacketID                 ( void ) const                      { return static_cast < ePacketID > ( PACKET_ID_PLAYER_JOINDATA ); };
-    inline unsigned long    GetFlags                    ( void ) const                      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline unsigned long    GetFlags                    ( void ) const                      { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Read                        ( NetBitStreamInterface& BitStream );
 
@@ -37,14 +37,14 @@ public:
     inline unsigned short   GetBitStreamVersion         ( void )                            { return m_usBitStreamVersion; };
     inline const SString&   GetPlayerVersion            ( void )                            { return m_strPlayerVersion; };
 
-    inline const char*      GetNick                     ( void )                            { return m_szNick; };
-    inline void             SetNick                     ( const char* szNick )              { strncpy ( m_szNick, szNick, MAX_NICK_LENGTH ); };
+    inline const char*      GetNick                     ( void )                            { return m_strNick; };
+    inline void             SetNick                     ( const char* szNick )              { m_strNick.AssignLeft( szNick, MAX_NICK_LENGTH ); };
 
     inline const MD5&       GetPassword                 ( void )                            { return m_Password; };
     inline void             SetPassword                 ( const MD5& Password )             { m_Password = Password; };
 
-    inline char*            GetSerialUser               ( void )                            { return m_szSerialUser; };
-    inline void             SetSerialUser               ( const char* szSerialUser )        { strncpy ( m_szSerialUser, szSerialUser, MAX_SERIAL_LENGTH ); };
+    inline const char*      GetSerialUser               ( void )                            { return m_strSerialUser; }
+    inline void             SetSerialUser               ( const char* szSerialUser )        { m_strSerialUser.AssignLeft( szSerialUser, MAX_SERIAL_LENGTH ); }
 
     inline bool             IsOptionalUpdateInfoRequired ( void )                           { return m_bOptionalUpdateInfoRequired; }
 
@@ -54,9 +54,9 @@ private:
     unsigned short          m_usBitStreamVersion;
     unsigned char           m_ucGameVersion;
     bool                    m_bOptionalUpdateInfoRequired;
-    char                    m_szNick [MAX_NICK_LENGTH + 1];
+    SString                 m_strNick;
     MD5                     m_Password;
-    char                    m_szSerialUser[MAX_SERIAL_LENGTH + 1];
+    SString                 m_strSerialUser;
     SString                 m_strPlayerVersion;
 };
 

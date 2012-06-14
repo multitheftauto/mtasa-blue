@@ -36,7 +36,7 @@ extern CClientGame* g_pClientGame;
 
 CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigned short usModel, unsigned char ucVariation, unsigned char ucVariation2 ) : ClassInit ( this ), CClientStreamElement ( pManager->GetVehicleStreamer (), ID )
 {
-    CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientVehicle" ), &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink, &m_pTowedVehicle, &m_pTowedByVehicle, &m_pPickedUpWinchEntity, &m_pLastSyncer, NULL );
+    CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientVehicle" ), &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink, &m_pTowedVehicle, &m_pTowedByVehicle, &m_pPickedUpWinchEntity, NULL );
 
     // Initialize members
     m_pManager = pManager;
@@ -62,8 +62,8 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     // Set our default properties
     m_pDriver = NULL;
     m_pOccupyingDriver = NULL;
-    memset ( m_pPassengers, 0, sizeof ( m_pPassengers ) );
-    memset ( m_pOccupyingPassengers, 0, sizeof ( m_pOccupyingPassengers ) );
+    memset ( &m_pPassengers[0], 0, sizeof ( m_pPassengers ) );
+    memset ( &m_pOccupyingPassengers[0], 0, sizeof ( m_pOccupyingPassengers ) );
     m_pPreviousLink = NULL;
     m_pNextLink = NULL;
     m_Matrix.vFront.fY = 1.0f;
@@ -103,9 +103,9 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_fGroundCheckTolerance = 0.f;
     m_fObjectsAroundTolerance = 0.f;
     GetInitialDoorStates ( m_ucDoorStates );
-    memset ( m_ucWheelStates, 0, sizeof ( m_ucWheelStates ) );
-    memset ( m_ucPanelStates, 0, sizeof ( m_ucPanelStates ) );
-    memset ( m_ucLightStates, 0, sizeof ( m_ucLightStates ) );
+    memset ( &m_ucWheelStates[0], 0, sizeof ( m_ucWheelStates ) );
+    memset ( &m_ucPanelStates[0], 0, sizeof ( m_ucPanelStates ) );
+    memset ( &m_ucLightStates[0], 0, sizeof ( m_ucLightStates ) );
     m_bCanBeDamaged = true;
     m_bSyncUnoccupiedDamage = false;
     m_bScriptCanBeDamaged = true;
@@ -155,6 +155,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
 
     // Add this vehicle to the vehicle list
     m_pVehicleManager->AddToList ( this );
+    m_tSirenBeaconInfo.m_bSirenSilent = false;
 }
 
 
@@ -223,7 +224,7 @@ CClientVehicle::~CClientVehicle ( void )
 
     delete m_pUpgrades;
     delete m_pHandlingEntry;
-    CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink, &m_pTowedVehicle, &m_pTowedByVehicle, &m_pPickedUpWinchEntity, &m_pLastSyncer, NULL );
+    CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink, &m_pTowedVehicle, &m_pTowedByVehicle, &m_pPickedUpWinchEntity, NULL );
 }
 
 
@@ -232,22 +233,6 @@ void CClientVehicle::Unlink ( void )
     m_pVehicleManager->RemoveFromList ( this );
     m_pVehicleManager->m_Attached.remove ( this );
     ListRemove( m_pVehicleManager->m_StreamedIn, this );
-}
-
-
-void CClientVehicle::GetName ( char* szBuf )
-{
-    // Get the name
-    const char* szName = m_pModelInfo->GetNameIfVehicle ();
-    if ( szName )
-    {
-        strcpy ( szBuf, szName );
-    }
-    else
-    {
-        // Shouldn't happen, copy over an empty string
-        szBuf[0] = '\0';
-    }
 }
 
 
@@ -799,7 +784,7 @@ void CClientVehicle::Fix ( void )
 
     SetHealth ( DEFAULT_VEHICLE_HEALTH );
 
-    unsigned char ucDoorStates [ MAX_DOORS ];
+    SFixedArray < unsigned char, MAX_DOORS >   ucDoorStates;
     GetInitialDoorStates ( ucDoorStates );
     for ( int i = 0 ; i < MAX_DOORS ; i++ ) SetDoorStatus ( i, ucDoorStates [ i ] );
     for ( int i = 0 ; i < MAX_PANELS ; i++ ) SetPanelStatus ( i, 0 );
@@ -939,7 +924,7 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, bool bLoadImmedi
         if ( bResetWheelAndDoorStates )
         {
             GetInitialDoorStates ( m_ucDoorStates );
-            memset ( m_ucWheelStates, 0, sizeof ( m_ucWheelStates ) );
+            memset ( &m_ucWheelStates[0], 0, sizeof ( m_ucWheelStates ) );
         }
 
         // Check if we have landing gears and adjustable properties
@@ -955,14 +940,15 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, bool bLoadImmedi
         m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData ( (eVehicleTypes)usModel );
         m_pHandlingEntry->Assign ( m_pOriginalHandlingEntry );
         ApplyHandling ();
-
+        
+        SetSirenOrAlarmActive ( false );
         // Create the vehicle if we're streamed in
         if ( IsStreamedIn () )
         {
             // Preload the model
             if( !m_pModelInfo->IsLoaded () )
             {
-                m_pModelInfo->Request ( true, true );
+                m_pModelInfo->Request ( BLOCKING, "CClientVehicle::SetModelBlocking" );
                 m_pModelInfo->MakeCustomModel ();
             }
 
@@ -2098,7 +2084,7 @@ void CClientVehicle::StreamIn ( bool bInstantly )
     if ( bInstantly )
     {
         // Request its model blocking
-        if ( m_pModelRequester->RequestBlocking ( m_usModel ) )
+        if ( m_pModelRequester->RequestBlocking ( m_usModel, "CClientVehicle::StreamIn - bInstantly" ) )
         {
             // Create us
             Create ();
@@ -2173,7 +2159,7 @@ void CClientVehicle::Create ( void )
         }
 
         // Add a reference to the vehicle model we're creating.
-        m_pModelInfo->AddRef ( true );
+        m_pModelInfo->ModelAddRef ( BLOCKING, "CClientVehicle::Create" );
 
         // Might want to make this settable by users? Could just leave it like this, don't mind.
         // Doesn't appear to work with trucks - only cars - stored string is up to 8 chars, will be reset after
@@ -2205,6 +2191,9 @@ void CClientVehicle::Create ( void )
 
         // Put our pointer in its custom data
         m_pVehicle->SetStoredPointer ( this );
+
+        // Add XRef
+        g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pVehicle );
         
         // Jump straight to the target position if we have one
         if ( HasTargetPosition () )
@@ -2228,6 +2217,18 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetVisible ( m_bVisible );
         m_pVehicle->SetUsesCollision ( m_bIsCollisionEnabled );
         m_pVehicle->SetEngineBroken ( m_bEngineBroken );
+
+        if ( m_tSirenBeaconInfo.m_bOverrideSirens )
+        {
+            GiveVehicleSirens( m_tSirenBeaconInfo.m_ucSirenType, m_tSirenBeaconInfo.m_ucSirenCount );
+            for ( unsigned char i = 0; i < m_tSirenBeaconInfo.m_ucSirenCount; i++ )
+            {
+                m_pVehicle->SetVehicleSirenPosition( i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_vecSirenPositions );
+                m_pVehicle->SetVehicleSirenMinimumAlpha( i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_dwMinSirenAlpha );
+                m_pVehicle->SetVehicleSirenColour( i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_RGBBeaconColour );
+            }
+            SetVehicleFlags ( m_tSirenBeaconInfo.m_b360Flag, m_tSirenBeaconInfo.m_bUseRandomiser, m_tSirenBeaconInfo.m_bDoLOSCheck, m_tSirenBeaconInfo.m_bSirenSilent );
+        }
         m_pVehicle->SetSirenOrAlarmActive ( m_bSireneOrAlarmActive );
         SetLandingGearDown ( m_bLandingGearDown );
         _SetAdjustablePropertyValue ( m_usAdjustablePropertyValue );
@@ -2478,6 +2479,9 @@ void CClientVehicle::Destroy ( void )
                 }
             }
         }
+
+        // Remove XRef
+        g_pClientGame->GetGameEntityXRefManager ()->RemoveEntityXRef ( this, m_pVehicle );
 
         // Destroy the vehicle
         g_pGame->GetPools ()->RemoveVehicle ( m_pVehicle );
@@ -2987,7 +2991,7 @@ void CClientVehicle::Interpolate ( void )
 }
 
 
-void CClientVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
+void CClientVehicle::GetInitialDoorStates ( SFixedArray < unsigned char, MAX_DOORS >& ucOutDoorStates )
 {
     switch ( m_usModel )
     {
@@ -3007,13 +3011,13 @@ void CClientVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
         case VT_RCTIGER:
         case VT_TRACTOR:
         case VT_VORTEX:
-            memset ( pucDoorStates, DT_DOOR_MISSING, 6 );
+            memset ( &ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS );
 
             // Keep the bonet and boot intact
-            pucDoorStates [ 0 ] = pucDoorStates [ 1 ] = DT_DOOR_INTACT;
+            ucOutDoorStates [ 0 ] = ucOutDoorStates [ 1 ] = DT_DOOR_INTACT;
             break;        
         default:
-            memset ( pucDoorStates, DT_DOOR_INTACT, 6 );
+            memset ( &ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS );
     }
 }
 
@@ -3154,7 +3158,7 @@ void CClientVehicle::UpdateTargetPosition ( void )
         // Check if the distance to interpolate is too far.
         CVector vecVelocity;
         GetMoveSpeed ( vecVelocity );
-        float fThreshold = ( VEHICLE_INTERPOLATION_WARP_THRESHOLD + VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED * vecVelocity.Length () ) * g_pGame->GetGameSpeed ();
+        float fThreshold = ( VEHICLE_INTERPOLATION_WARP_THRESHOLD + VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED * vecVelocity.Length () ) * g_pGame->GetGameSpeed () * TICK_RATE / 100;
 
         // There is a reason to have this condition this way: To prevent NaNs generating new NaNs after interpolating (Comparing with NaNs always results to false).
         if ( ! ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () <= fThreshold ) )
@@ -3720,7 +3724,7 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
 
     // Load load load
     if ( GetModelInfo () )
-        g_pGame->GetStreaming()->LoadAllRequestedModels ();
+        g_pGame->GetStreaming()->LoadAllRequestedModels ( false, "CClientVehicle::HandleWaitingForGroundToLoad" );
 
     // Start out with a fairly big radius to check, and shrink it down over time
     float fUseRadius = 50.0f * ( 1.f - Max ( 0.f, m_fObjectsAroundTolerance ) );
@@ -3781,4 +3785,70 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
         for ( unsigned int i = 0 ; i < lineList.size () ; i++ )
             g_pCore->GetGraphics ()->DrawText ( 10, 230 + i * 10, -1, 1, lineList[i] );
     #endif
+}
+
+bool CClientVehicle::GiveVehicleSirens ( unsigned char ucSirenType, unsigned char ucSirenCount )
+{
+    m_tSirenBeaconInfo.m_bOverrideSirens = true;
+    m_tSirenBeaconInfo.m_ucSirenType = ucSirenType;
+    m_tSirenBeaconInfo.m_ucSirenCount = ucSirenCount;
+    if ( m_pVehicle )
+    {
+        m_pVehicle->GiveVehicleSirens ( ucSirenType, ucSirenCount );
+    }
+    return true;
+}
+void CClientVehicle::SetVehicleSirenPosition ( unsigned char ucSirenID, CVector vecPos )
+{
+    m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions = vecPos;
+    if ( m_pVehicle )
+    {
+        m_pVehicle->SetVehicleSirenPosition ( ucSirenID, vecPos );
+    }
+}
+
+void CClientVehicle::SetVehicleSirenMinimumAlpha( unsigned char ucSirenID, DWORD dwPercentage )
+{
+    m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha = dwPercentage;
+    if ( m_pVehicle )
+    {
+        m_pVehicle->SetVehicleSirenMinimumAlpha ( ucSirenID, dwPercentage );
+    }
+}
+
+void CClientVehicle::SetVehicleSirenColour ( unsigned char ucSirenID, SColor tVehicleSirenColour )
+{
+    m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour;
+    if ( m_pVehicle )
+    {
+        m_pVehicle->SetVehicleSirenColour ( ucSirenID, tVehicleSirenColour );
+    }
+}
+
+void CClientVehicle::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent )
+{
+     m_tSirenBeaconInfo.m_b360Flag = bEnable360; 
+     m_tSirenBeaconInfo.m_bDoLOSCheck = bEnableLOSCheck; 
+     m_tSirenBeaconInfo.m_bUseRandomiser = bEnableRandomiser;
+     m_tSirenBeaconInfo.m_bSirenSilent = bEnableSilent;
+     if ( m_pVehicle )
+     {
+        m_pVehicle->SetVehicleFlags ( bEnable360, bEnableRandomiser, bEnableLOSCheck, bEnableSilent );
+     }
+}
+
+void CClientVehicle::RemoveVehicleSirens ( void )
+{
+    if ( m_pVehicle )
+    {
+        m_pVehicle->RemoveVehicleSirens ( );
+    }
+    m_tSirenBeaconInfo.m_bOverrideSirens = false;
+    SetSirenOrAlarmActive ( false );
+    for ( unsigned char i = 0; i < 7; i++ )
+    {
+        SetVehicleSirenPosition( i, CVector ( 0, 0, 0 ) );
+        SetVehicleSirenMinimumAlpha( i, 0 );
+        SetVehicleSirenColour( i, SColor ( ) );
+    }
 }

@@ -97,7 +97,7 @@ CTextItem* CPlayerTextManager::GetTextItemOnQueue ( CTextItem* textItem )
     list < CTextItem* > ::iterator iter = m_highQueue.begin ();
     for ( ; iter != m_highQueue.end (); iter++ )
     {
-        if ( (*iter)->GetID() == textItem->GetID() )
+        if ( (*iter)->GetUniqueID() == textItem->GetUniqueID() )
         {
             return (*iter);
         }
@@ -105,7 +105,7 @@ CTextItem* CPlayerTextManager::GetTextItemOnQueue ( CTextItem* textItem )
 
     for ( iter = m_mediumQueue.begin (); iter != m_mediumQueue.end (); iter++ )
     {
-        if ( (*iter)->GetID() == textItem->GetID() )
+        if ( (*iter)->GetUniqueID() == textItem->GetUniqueID() )
         {
             return (*iter);
         }
@@ -113,7 +113,7 @@ CTextItem* CPlayerTextManager::GetTextItemOnQueue ( CTextItem* textItem )
 
     for ( iter = m_lowQueue.begin (); iter != m_lowQueue.end (); iter++ )
     {
-        if ( (*iter)->GetID() == textItem->GetID() )
+        if ( (*iter)->GetUniqueID() == textItem->GetUniqueID() )
         {
             return (*iter);
         }

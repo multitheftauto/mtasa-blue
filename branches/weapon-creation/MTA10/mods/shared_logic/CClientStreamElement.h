@@ -66,7 +66,7 @@ private:
 public:
     float                       m_fCachedRadius;
     int                         m_iCachedRadiusCounter;
-    CVector                     m_vecCachedBoundingBox[2];
+    SFixedArray < CVector, 2 >  m_vecCachedBoundingBox;
     int                         m_iCachedBoundingBoxCounter;
 };
 

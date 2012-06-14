@@ -11,6 +11,10 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "net/SimHeaders.h"
+
+extern uint g_uiDatabaseThreadProcessorNumber;
+extern uint g_uiThreadnetProcessorNumber;
 
 namespace
 {
@@ -63,8 +67,12 @@ public:
     CTickCount                  m_DeltaTickCount;
     long long                   m_llDeltaGameBytesSent;
     long long                   m_llDeltaGameBytesRecv;
+    long long                   m_llDeltaGameBytesRecvBlocked;
     long long                   m_llDeltaGamePacketsSent;
     long long                   m_llDeltaGamePacketsRecv;
+    long long                   m_llDeltaGamePacketsRecvBlocked;
+    long long                   m_llDeltaGameBytesResent;
+    long long                   m_llDeltaGameMessagesResent;
     std::vector < StringPair >  m_InfoList;
     std::vector < StringPair >  m_StatusList;
     std::vector < StringPair >  m_OptionsList;
@@ -164,8 +172,12 @@ void CPerfStatServerInfoImpl::RecordStats ( void )
     // Save sample period deltas
     m_llDeltaGameBytesSent = Max < long long > ( 0LL, liveStats.llOutgoingUDPByteCount - m_PrevLiveStats.llOutgoingUDPByteCount );
     m_llDeltaGameBytesRecv = Max < long long > ( 0LL, liveStats.llIncomingUDPByteCount - m_PrevLiveStats.llIncomingUDPByteCount );
+    m_llDeltaGameBytesRecvBlocked = Max < long long > ( 0LL, liveStats.llIncomingUDPByteCountBlocked - m_PrevLiveStats.llIncomingUDPByteCountBlocked );
     m_llDeltaGamePacketsSent = Max < long long > ( 0LL, liveStats.llOutgoingUDPPacketCount - m_PrevLiveStats.llOutgoingUDPPacketCount );
     m_llDeltaGamePacketsRecv = Max < long long > ( 0LL, liveStats.llIncomingUDPPacketCount - m_PrevLiveStats.llIncomingUDPPacketCount );
+    m_llDeltaGamePacketsRecvBlocked = Max < long long > ( 0LL, liveStats.llIncomingUDPPacketCountBlocked - m_PrevLiveStats.llIncomingUDPPacketCountBlocked );
+    m_llDeltaGameBytesResent = Max < long long > ( 0LL, liveStats.llOutgoingUDPByteResentCount - m_PrevLiveStats.llOutgoingUDPByteResentCount );
+    m_llDeltaGameMessagesResent = Max < long long > ( 0LL, liveStats.llOutgoingUDPMessageResentCount - m_PrevLiveStats.llOutgoingUDPMessageResentCount );
     m_PrevLiveStats = liveStats;
 
     // Save sample period length
@@ -184,16 +196,39 @@ void CPerfStatServerInfoImpl::RecordStats ( void )
 ///////////////////////////////////////////////////////////////
 void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter )
 {
+    //
+    // Set option flags
+    //
+    bool bHelp = MapContains ( strOptionMap, "h" );
+    bool bIncludeDebugInfo = MapContains ( strOptionMap, "d" );
+
+    //
+    // Process help
+    //
+    if ( bHelp )
+    {
+        pResult->AddColumn ( "Server info help" );
+        pResult->AddRow ()[0] ="Option h - This help";
+        pResult->AddRow ()[0] ="Option d - Include debug info";
+        return;
+    }
+
     // Calculate current rates
     long long llIncomingBytesPS = CPerfStatManager::GetPerSecond ( m_llDeltaGameBytesRecv, m_DeltaTickCount.ToLongLong () );
+    long long llIncomingBytesPSBlocked = CPerfStatManager::GetPerSecond ( m_llDeltaGameBytesRecvBlocked, m_DeltaTickCount.ToLongLong () );
     long long llOutgoingBytesPS = CPerfStatManager::GetPerSecond ( m_llDeltaGameBytesSent, m_DeltaTickCount.ToLongLong () );
+    long long llOutgoingBytesResentPS = CPerfStatManager::GetPerSecond ( m_llDeltaGameBytesResent, m_DeltaTickCount.ToLongLong () );
     SString strIncomingPacketsPS = CPerfStatManager::GetPerSecondString ( m_llDeltaGamePacketsRecv, m_DeltaTickCount.ToDouble () );
+    SString strIncomingPacketsPSBlocked = CPerfStatManager::GetPerSecondString ( m_llDeltaGamePacketsRecvBlocked, m_DeltaTickCount.ToDouble () );
     SString strOutgoingPacketsPS = CPerfStatManager::GetPerSecondString ( m_llDeltaGamePacketsSent, m_DeltaTickCount.ToDouble () );
+    SString strOutgoingMessagesResentPS = CPerfStatManager::GetPerSecondString ( m_llDeltaGameMessagesResent, m_DeltaTickCount.ToDouble () );
 
     // Estimate total network usage
     long long llIncomingPacketsPS = CPerfStatManager::GetPerSecond ( m_llDeltaGamePacketsRecv, m_DeltaTickCount.ToLongLong () );
+    long long llIncomingPacketsPSBlocked = CPerfStatManager::GetPerSecond ( m_llDeltaGamePacketsRecvBlocked, m_DeltaTickCount.ToLongLong () );
     long long llOutgoingPacketsPS = CPerfStatManager::GetPerSecond ( m_llDeltaGamePacketsSent, m_DeltaTickCount.ToLongLong () );
     long long llNetworkUsageBytesPS = ( llIncomingPacketsPS + llOutgoingPacketsPS ) * UDP_PACKET_OVERHEAD + llIncomingBytesPS + llOutgoingBytesPS;
+    long long llNetworkUsageBytesPSInclBlocked = ( llIncomingPacketsPS + llIncomingPacketsPSBlocked + llOutgoingPacketsPS ) * UDP_PACKET_OVERHEAD + llIncomingBytesPS + llIncomingBytesPSBlocked + llOutgoingBytesPS;
 
     // Calculate uptime
     time_t tUptime = time ( NULL ) - m_tStartTime;
@@ -225,7 +260,20 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     m_StatusList.push_back ( StringPair ( "Bytes/sec outgoing",         CPerfStatManager::GetScaledByteString ( llOutgoingBytesPS ) ) );
     m_StatusList.push_back ( StringPair ( "Packets/sec incoming",       strIncomingPacketsPS ) );
     m_StatusList.push_back ( StringPair ( "Packets/sec outgoing",       strOutgoingPacketsPS ) );
+    m_StatusList.push_back ( StringPair ( "Packet loss outgoing",       CPerfStatManager::GetPercentString ( llOutgoingBytesResentPS, llOutgoingBytesPS ) ) );
     m_StatusList.push_back ( StringPair ( "Approx network usage",       CPerfStatManager::GetScaledBitString ( llNetworkUsageBytesPS * 8LL ) + "/s" ) );
+    if ( pConfig->GetThreadNetEnabled () )
+    {
+        m_StatusList.push_back ( StringPair ( "Msg queue incoming",       SString ( "%d", CNetBufferWatchDog::ms_uiInResultQueueSize ) ) );
+        if ( bIncludeDebugInfo )
+            m_StatusList.push_back ( StringPair ( "       finished incoming",       SString ( "%d", CNetBufferWatchDog::ms_uiFinishedListSize ) ) );
+        m_StatusList.push_back ( StringPair ( "Msg queue outgoing",       SString ( "%d", CNetBufferWatchDog::ms_uiOutCommandQueueSize ) ) );
+        if ( bIncludeDebugInfo )
+            m_StatusList.push_back ( StringPair ( "       finished outgoing",       SString ( "%d", CNetBufferWatchDog::ms_uiOutResultQueueSize ) ) );
+    }
+    if ( ASE* pAse = ASE::GetInstance() )
+        m_StatusList.push_back ( StringPair ( "ASE queries",            SString ( "%d (%d/min)", pAse->GetTotalQueryCount (), pAse->GetQueriesPerMinute () ) ) );
+
     m_OptionsList.push_back ( StringPair ( "MinClientVersion",          pConfig->GetMinimumClientVersion () ) );
     m_OptionsList.push_back ( StringPair ( "RecommendedClientVersion",  pConfig->GetRecommendedClientVersion () ) );
     m_OptionsList.push_back ( StringPair ( "NetworkEncryptionEnabled",  SString ( "%d", pConfig->GetNetworkEncryptionEnabled () ) ) );
@@ -235,24 +283,42 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     m_OptionsList.push_back ( StringPair ( "BandwidthReductionMode",    pConfig->GetSetting ( "bandwidth_reduction" ) ) );
     m_OptionsList.push_back ( StringPair ( "LightSyncEnabled",          SString ( "%d", g_pBandwidthSettings->bLightSyncEnabled ) ) );
     m_OptionsList.push_back ( StringPair ( "ThreadNetEnabled",          SString ( "%d", pConfig->GetThreadNetEnabled () ) ) );
-    m_OptionsList.push_back ( StringPair ( "Max LS plrs/frame",         SString ( "%d", g_pBandwidthSettings->iLightSyncPlrsPerFrame ) ) );
-    m_OptionsList.push_back ( StringPair ( "Test - Everyone near",      SString ( "%d", g_pBandwidthSettings->bTestPretendEveryoneIsNear ) ) );
-    m_OptionsList.push_back ( StringPair ( "Test - Send multiplier",    SString ( "%d", g_pBandwidthSettings->iTestSendMultiplier ) ) );
 
-    //
-    // Set option flags
-    //
-    bool bHelp = MapContains ( strOptionMap, "h" );
+    const static CTickRateSettings defaultRates;
+    if ( defaultRates.iPureSync != g_TickRateSettings.iPureSync )
+        m_OptionsList.push_back ( StringPair ( "Player sync interval",      SString ( "%d", g_TickRateSettings.iPureSync ) ) );
+    if ( defaultRates.iLightSync != g_TickRateSettings.iLightSync )
+        m_OptionsList.push_back ( StringPair ( "Lightweight sync interval", SString ( "%d", g_TickRateSettings.iLightSync ) ) );
+    if ( defaultRates.iCamSync != g_TickRateSettings.iCamSync )
+        m_OptionsList.push_back ( StringPair ( "Camera sync interval",      SString ( "%d", g_TickRateSettings.iCamSync ) ) );
+    if ( defaultRates.iPedSync != g_TickRateSettings.iPedSync )
+        m_OptionsList.push_back ( StringPair ( "Ped sync interval",         SString ( "%d", g_TickRateSettings.iPedSync ) ) );
+    if ( defaultRates.iUnoccupiedVehicle != g_TickRateSettings.iUnoccupiedVehicle )
+        m_OptionsList.push_back ( StringPair ( "Unocc. veh. sync interval",     SString ( "%d", g_TickRateSettings.iUnoccupiedVehicle ) ) );
+    if ( defaultRates.iKeySyncRotation != g_TickRateSettings.iKeySyncRotation )
+        m_OptionsList.push_back ( StringPair ( "Keysync mouse sync interval",   SString ( "%d", g_TickRateSettings.iKeySyncRotation ) ) );
+    if ( defaultRates.iKeySyncAnalogMove != g_TickRateSettings.iKeySyncAnalogMove )
+        m_OptionsList.push_back ( StringPair ( "Keysync analog sync interval",  SString ( "%d", g_TickRateSettings.iKeySyncAnalogMove ) ) );
+    if ( defaultRates.iKeySyncAnalogMove != g_TickRateSettings.iNearListUpdate )
+        m_OptionsList.push_back ( StringPair ( "Update near interval",      SString ( "%d", g_TickRateSettings.iNearListUpdate ) ) );
 
-    //
-    // Process help
-    //
-    if ( bHelp )
+    if ( bIncludeDebugInfo )
     {
-        pResult->AddColumn ( "Server info help" );
-        pResult->AddRow ()[0] ="Option h - This help";
-        return;
-    }
+        m_StatusList.push_back ( StringPair ( "Bytes/sec outgoing resent",  CPerfStatManager::GetScaledByteString ( llOutgoingBytesResentPS ) ) );
+        m_StatusList.push_back ( StringPair ( "Msgs/sec outgoing resent",   strOutgoingMessagesResentPS ) );
+        m_StatusList.push_back ( StringPair ( "Bytes/sec blocked",          CPerfStatManager::GetScaledByteString ( llIncomingBytesPSBlocked ) ) );
+        m_StatusList.push_back ( StringPair ( "Packets/sec  blocked",       strIncomingPacketsPSBlocked ) );
+        m_StatusList.push_back ( StringPair ( "Usage incl. blocked",        CPerfStatManager::GetScaledBitString ( llNetworkUsageBytesPSInclBlocked * 8LL ) + "/s" ) );
+
+        m_OptionsList.push_back ( StringPair ( "Max LS plrs/frame",         SString ( "%d", g_pBandwidthSettings->iLightSyncPlrsPerFrame ) ) );
+        m_OptionsList.push_back ( StringPair ( "Test - Everyone near",      SString ( "%d", g_pBandwidthSettings->bTestPretendEveryoneIsNear ) ) );
+        m_OptionsList.push_back ( StringPair ( "Test - Send multiplier",    SString ( "%d", g_pBandwidthSettings->iTestSendMultiplier ) ) );
+
+        m_OptionsList.push_back ( StringPair ( "Main (Logic) core #",       SString ( "%d", _GetCurrentProcessorNumber () ) ) );
+        m_OptionsList.push_back ( StringPair ( "Threadnet (Sync) core #",   SString ( "%d", g_uiThreadnetProcessorNumber ) ) );
+        m_OptionsList.push_back ( StringPair ( "Raknet thread core #",      SString ( "%d", m_PrevLiveStats.uiNetworkUpdateLoopProcessorNumber ) ) );
+        m_OptionsList.push_back ( StringPair ( "DB thread core #",          SString ( "%d", g_uiDatabaseThreadProcessorNumber ) ) );
+    }    
 
     // Add columns
     pResult->AddColumn ( "Info.Name" );

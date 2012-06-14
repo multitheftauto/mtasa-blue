@@ -897,7 +897,7 @@ void CServerBrowser::CreateHistoryList ( void )
                 in_addr Address;
                 if ( CServerListItem::Parse ( strAddress.c_str(), Address ) )
                 {
-                    m_ServersHistory.AddUnique ( Address, atoi(strPort.c_str()) + SERVER_LIST_QUERY_PORT_OFFSET );
+                    m_ServersHistory.AddUnique ( Address, atoi(strPort.c_str()) );
                     CreateHistoryList (); // Restart with our new list.
                     return;
                 }
@@ -1245,12 +1245,12 @@ void CServerBrowser::NotifyServerExists ( in_addr Address, ushort usPort )
 {
     // If the connect button was pressed, and the server exists, add it to the history
     CServerList* pHistoryList = GetHistoryList ();
-    pHistoryList->Remove ( Address, usPort + SERVER_LIST_QUERY_PORT_OFFSET );
-    pHistoryList->AddUnique ( Address, usPort + SERVER_LIST_QUERY_PORT_OFFSET );
+    pHistoryList->Remove ( Address, usPort );
+    pHistoryList->AddUnique ( Address, usPort );
     while ( pHistoryList->GetServerCount () > 11 )
     {
         CServerListItem* pLast = *pHistoryList->IteratorBegin ();
-        pHistoryList->Remove ( pLast->Address, pLast->usQueryPort );
+        pHistoryList->Remove ( pLast->Address, pLast->usGamePort );
     }
     CreateHistoryList ();
     SaveRecentlyPlayedList ();
@@ -1350,8 +1350,6 @@ bool CServerBrowser::OnFavouritesClick ( CGUIElement* pElement )
     // If there are more than 0 items selected in the browser
     if ( strHost.size() > 0 && usPort )
     {
-        usPort += SERVER_LIST_QUERY_PORT_OFFSET;
-
         in_addr Address;
 
         CServerListItem::Parse ( strHost.c_str(), Address );
@@ -1661,7 +1659,7 @@ bool CServerBrowser::LoadServerList ( CXMLNode* pNode, const std::string& strTag
             if ( pHostAttribute && pPortAttribute ) {
                 if ( CServerListItem::Parse ( pHostAttribute->GetValue ().c_str (), Address ) )
                 {
-                    iPort = atoi ( pPortAttribute->GetValue ().c_str () ) + SERVER_LIST_QUERY_PORT_OFFSET;
+                    iPort = atoi ( pPortAttribute->GetValue ().c_str () );
                     if ( iPort > 0 )
                         pList->AddUnique ( Address, iPort );
                 }
@@ -2213,6 +2211,7 @@ bool CServerBrowser::OnServerListChangeRow ( CGUIKeyEventArgs Args )
             if ( SelectedItem > 0 )
             {
                 m_pServerList [ Type ]->SetSelectedItem ( SelectedItem - 1 , 1, true );
+                OnClick ( m_pServerPlayerList [ Type ] ); // hacky
             }
             break;
         }
@@ -2221,6 +2220,7 @@ bool CServerBrowser::OnServerListChangeRow ( CGUIKeyEventArgs Args )
             if ( SelectedItem < ( iMax - 1 ) )
             {
                 m_pServerList [ Type ]->SetSelectedItem ( SelectedItem + 1 , 1, true );
+                OnClick ( m_pServerPlayerList [ Type ] ); // hacky
             }
             break;
         }
@@ -2231,3 +2231,15 @@ bool CServerBrowser::OnServerListChangeRow ( CGUIKeyEventArgs Args )
     return true;
 }
 
+
+// Keep track of LAN servers so we can query the correct port for them
+void CServerBrowser::AddKnownLanServer ( in_addr Address )
+{
+    MapInsert ( m_KnownLanServerAddressMap, Address.s_addr );
+}
+
+
+bool CServerBrowser::IsKnownLanServer ( in_addr Address )
+{
+    return MapContains ( m_KnownLanServerAddressMap, Address.s_addr );
+}

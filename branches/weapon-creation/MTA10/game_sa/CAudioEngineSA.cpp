@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:		Multi Theft Auto v1.0
-*  LICENSE:		See LICENSE in the top level directory
-*  FILE:		game_sa/CAudioEngineSA.cpp
-*  PURPOSE:		Audio manager
-*  DEVELOPERS:	Ed Lyons <eai@opencoding.net>
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/CAudioEngineSA.cpp
+*  PURPOSE:     Audio manager
+*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *               Christian Myhre Lundheim <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -17,17 +17,35 @@
 DWORD RETURN_CAEAmbienceTrackManager_CheckForPause =        0x4D6E27;
 void HOOK_CAEAmbienceTrackManager_CheckForPause ();
 
+#define HOOKPOS_CAESoundManager_RequestNewSound       0x4EFB10
+DWORD RETURN_CAESoundManager_RequestNewSound =        0x4EFB15;
+void HOOK_CAESoundManager_RequestNewSound();
+
+CAudioEngineSA* g_pAudioSA = NULL;
 
 CAudioEngineSA::CAudioEngineSA ( CAudioEngineSAInterface * pInterface )
 {
+    m_pInterface = pInterface;
+    g_pAudioSA = this;
     m_bRadioOn = false;
     m_bRadioMuted = false;
     m_ucRadioChannel = 0;
     m_bAmbientSoundsPaused = false;
     m_bAmbientGeneralEnabled = true;
     m_bAmbientGunfireEnabled = true;
-    m_pInterface = pInterface;
+    m_pWorldSoundHandler = NULL;
+
     HookInstall ( HOOKPOS_CAEAmbienceTrackManager_CheckForPause, (DWORD)HOOK_CAEAmbienceTrackManager_CheckForPause, 6 );
+
+    // Make room for hook
+    MemPut < BYTE > ( 0x4EFB15 + 0, 0x0F );     // movsx   eax, si
+    MemPut < BYTE > ( 0x4EFB15 + 1, 0xBF );
+    MemPut < BYTE > ( 0x4EFB15 + 2, 0xC6 );
+    MemPut < BYTE > ( 0x4EFB15 + 3, 0x6B );     // imul    eax, 74h
+    MemPut < BYTE > ( 0x4EFB15 + 4, 0xC0 );
+    MemPut < BYTE > ( 0x4EFB15 + 5, 0x74 );
+    MemPut < BYTE > ( 0x4EFB29, 0xEB );         // Move jump forward one byte
+    HookInstall ( HOOKPOS_CAESoundManager_RequestNewSound, (DWORD)HOOK_CAESoundManager_RequestNewSound, 5 );
 }
 
 VOID CAudioEngineSA::StopRadio()
@@ -221,7 +239,7 @@ VOID CAudioEngineSA::PlayBeatTrack ( short iTrack )
 {
     if  ( *(DWORD *)VAR_AudioEventVolumes != 0 ) // may prevent a crash
     {
-        DEBUG_TRACE("VOID CAudioSA::PlayBeatTrack ( short iTrack )");
+        DEBUG_TRACE("VOID CAudioEngineSA::PlayBeatTrack ( short iTrack )");
         DWORD dwFunc = FUNC_PreloadBeatTrack;
         DWORD dwTrack = iTrack;
         _asm
@@ -416,7 +434,7 @@ bool _cdecl IsAmbientSoundGeneralEnabled ( void )
 {
     if ( pGame )
     {
-        return pGame->GetAudioEngine ()->IsAmbientSoundEnabled ( AMBIENT_SOUND_GENERAL );
+        return pGame->GetAudio ()->IsAmbientSoundEnabled ( AMBIENT_SOUND_GENERAL );
     }
     return false;
 }
@@ -437,6 +455,82 @@ void _declspec(naked) HOOK_CAEAmbienceTrackManager_CheckForPause ()
         mov     edi, [esp+08h]
         xor     ecx, ecx
         jmp     RETURN_CAEAmbienceTrackManager_CheckForPause  // 4D6E27
+    }
+}
+
+//
+// WorldSound functions
+//
+
+// uiIndex = -1 for all in group
+void CAudioEngineSA::SetWorldSoundEnabled ( uint uiGroup, uint uiIndex, bool bEnabled )
+{
+    uint uiFirst = ( uiGroup << 8 ) + ( uiIndex != -1 ? uiIndex : 0 );
+    uint uiLast  = ( uiGroup << 8 ) + ( uiIndex != -1 ? uiIndex : 255 );
+    if ( !bEnabled )
+        m_DisabledWorldSounds.SetRange ( uiFirst, uiLast - uiFirst + 1 );
+    else
+        m_DisabledWorldSounds.UnsetRange ( uiFirst, uiLast - uiFirst + 1 );
+}
+
+// uiIndex = -1 for all in group
+bool CAudioEngineSA::IsWorldSoundEnabled ( uint uiGroup, uint uiIndex )
+{
+    uint uiFirst = ( uiGroup << 8 ) + ( uiIndex != -1 ? uiIndex : 0 );
+    uint uiLast  = ( uiGroup << 8 ) + ( uiIndex != -1 ? uiIndex : 255 );
+    return !m_DisabledWorldSounds.IsRangeSet ( uiFirst, uiLast - uiFirst + 1 );
+}
+
+void CAudioEngineSA::ResetWorldSounds ( void )
+{
+    m_DisabledWorldSounds = CRanges ();
+}
+
+void CAudioEngineSA::SetWorldSoundHandler ( WorldSoundHandler * pHandler )
+{
+    m_pWorldSoundHandler = pHandler;
+}
+
+bool CAudioEngineSA::OnWorldSound ( CAESound* pAESound )
+{
+    if ( !IsWorldSoundEnabled ( pAESound->usGroup, pAESound->usIndex ) )
+        return false;
+
+    if ( m_pWorldSoundHandler )
+        m_pWorldSoundHandler ( pAESound->usGroup, pAESound->usIndex );
+
+    return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+// Return false to skip sound
+bool _cdecl On_CAESoundManager_RequestNewSound ( CAESound* pAESound )
+{
+    return g_pAudioSA->OnWorldSound ( pAESound );
+}
+
+void _declspec(naked) HOOK_CAESoundManager_RequestNewSound()
+{
+    _asm
+    {
+        pushad
+        push    [esp+32+4*1]
+        call    On_CAESoundManager_RequestNewSound
+        add     esp, 4*1
+        cmp     al, 0
+        jz      skip
+        popad
+
+        // Continue with standard code
+        push    esi
+        push    edi
+        xor     esi, esi
+        jmp     RETURN_CAESoundManager_RequestNewSound
+       
+skip:   // Skip playing sound
+        popad
+        xor     eax, eax
+        retn    4
     }
 }
 

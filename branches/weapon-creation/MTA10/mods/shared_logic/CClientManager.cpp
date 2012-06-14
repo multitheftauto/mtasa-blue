@@ -269,63 +269,13 @@ void CClientManager::UnreferenceEntity ( CClientEntity* pEntity )
 
 CClientEntity * CClientManager::FindEntity ( CEntity * pGameEntity, bool bValidatePointer )
 {
-    CClientEntity* pEntity = NULL;
-    if ( pGameEntity )
-    {
-        if ( bValidatePointer )
-        {
-            // Dont check CEntity::GetEntityType, it may be an invalid pointer
-            if ( pEntity = m_pPedManager->Get ( dynamic_cast < CPlayerPed* > ( pGameEntity ), true, true ) )
-                return pEntity;
-
-            if ( pEntity = m_pVehicleManager->Get ( dynamic_cast < CVehicle* > ( pGameEntity ), true ) )
-                return pEntity;
-
-            if ( pEntity = m_pObjectManager->Get ( dynamic_cast < CObject* > ( pGameEntity ), true ) )
-                return pEntity;
-        }
-        else
-        {
-            eEntityType entityType = pGameEntity->GetEntityType ();
-            switch ( entityType )
-            {
-                case ENTITY_TYPE_VEHICLE:
-                {
-                    pEntity = m_pVehicleManager->Get ( dynamic_cast < CVehicle* > ( pGameEntity ), false );
-                    break;
-                }
-                case ENTITY_TYPE_PED:
-                {
-                    pEntity = m_pPedManager->Get ( dynamic_cast < CPlayerPed* > ( pGameEntity ), false, true );
-                    break;
-                }
-                case ENTITY_TYPE_OBJECT:
-                {
-                    pEntity = m_pObjectManager->Get ( dynamic_cast < CObject* > ( pGameEntity ), false );
-                    break;
-                }
-            }
-        }
-    }
-    return pEntity;
+    return g_pClientGame->GetGameEntityXRefManager ()->FindClientEntity ( pGameEntity );
 }
 
 
 CClientEntity * CClientManager::FindEntitySafe ( CEntity * pGameEntity )
 {
-    CClientEntity* pEntity = NULL;
-    if ( pGameEntity )
-    {
-        if ( pEntity = m_pPedManager->GetSafe ( pGameEntity, true ) )
-            return pEntity;
-
-        if ( pEntity = m_pVehicleManager->GetSafe ( pGameEntity ) )
-            return pEntity;
-
-        if ( pEntity = m_pObjectManager->GetSafe ( pGameEntity ) )
-            return pEntity;        
-    }
-    return pEntity;
+    return g_pClientGame->GetGameEntityXRefManager ()->FindClientEntity ( pGameEntity );
 }
 
 

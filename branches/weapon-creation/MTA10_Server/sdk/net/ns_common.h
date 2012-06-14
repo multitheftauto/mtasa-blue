@@ -33,7 +33,7 @@ typedef struct __static_server_data_t
 {
 } static_server_data_t, *pstatic_server_data_t;
 
-typedef bool (*PPACKETHANDLER) ( unsigned char, NetServerPlayerID&, NetBitStreamInterface*, SNetExtraInfo* );
+typedef bool (*PPACKETHANDLER) ( unsigned char, const NetServerPlayerID&, NetBitStreamInterface*, SNetExtraInfo* );
 
 enum NetServerPacketPriority
 {
@@ -52,63 +52,91 @@ enum NetServerPacketReliability
     PACKET_RELIABILITY_RELIABLE_SEQUENCED   //     Can drop packets
 };
 
-enum NSPerSecondMetrics
+// Copy of raknet statistics
+struct NetRawStatistics
 {
-	NS_USER_MESSAGE_BYTES_PUSHED,
-	NS_USER_MESSAGE_BYTES_SENT,
-	NS_USER_MESSAGE_BYTES_RESENT,
-	NS_USER_MESSAGE_BYTES_RECEIVED_PROCESSED,
-	NS_USER_MESSAGE_BYTES_RECEIVED_IGNORED,
-	NS_ACTUAL_BYTES_SENT,
-	NS_ACTUAL_BYTES_RECEIVED,
-	NS_PERSECOND_METRICS_COUNT
+    unsigned messageSendBuffer[ 4 ];
+    unsigned messagesSent[ 4 ];
+    long long messageDataBitsSent[ 4 ];
+    long long messageTotalBitsSent[ 4 ];
+    unsigned packetsContainingOnlyAcknowlegements;
+    unsigned acknowlegementsSent;
+    unsigned acknowlegementsPending;
+    long long acknowlegementBitsSent;
+    unsigned packetsContainingOnlyAcknowlegementsAndResends;
+    unsigned messageResends;
+    long long messageDataBitsResent;
+    long long messagesTotalBitsResent;
+    unsigned messagesOnResendQueue;
+    unsigned numberOfUnsplitMessages;
+    unsigned numberOfSplitMessages;
+    unsigned totalSplits;
+    unsigned packetsSent;
+    long long encryptionBitsSent;
+    long long totalBitsSent;
+    unsigned sequencedMessagesOutOfOrder;
+    unsigned sequencedMessagesInOrder;
+    unsigned orderedMessagesOutOfOrder;
+    unsigned orderedMessagesInOrder;
+    unsigned packetsReceived;
+    unsigned packetsWithBadCRCReceived;
+    long long bitsReceived;
+    long long bitsWithBadCRCReceived;
+    unsigned acknowlegementsReceived;
+    unsigned duplicateAcknowlegementsReceived;
+    unsigned messagesReceived;
+    unsigned invalidMessagesReceived;
+    unsigned duplicateMessagesReceived;
+    unsigned messagesWaitingForReassembly;
+    unsigned internalOutputQueueSize;
+    double bitsPerSecond;
+    long long connectionStartTime;
+    bool bandwidthExceeded;
 };
 
 struct NetStatistics
 {
-	unsigned long long valueOverLastSecond[NS_PERSECOND_METRICS_COUNT];
-	unsigned long long runningTotal[NS_PERSECOND_METRICS_COUNT];
-	
-	time_t connectionStartTime;
+    // Needed for getNetworkStats()
+    unsigned long long  bytesReceived;
+    unsigned long long  bytesSent;
+    uint    packetsReceived;
+    uint    packetsSent;
+    float   packetlossTotal;
+    float   packetlossLastSecond;
+    uint    messagesInSendBuffer;
+    uint    messagesInResendBuffer;
+    bool    isLimitedByCongestionControl;
+    bool    isLimitedByOutgoingBandwidthLimit;
+    int     encryptionStatus;
 
-    unsigned int packetsSent, packetsReceived;
-
-	unsigned long long BPSLimitByCongestionControl;
-	bool isLimitedByCongestionControl;
-
-	unsigned long long BPSLimitByOutgoingBandwidthLimit;
-	bool isLimitedByOutgoingBandwidthLimit;
-
-	unsigned int messageInSendBuffer[PACKET_PRIORITY_COUNT];
-	double bytesInSendBuffer[PACKET_PRIORITY_COUNT];
-
-	unsigned int messagesInResendBuffer;
-	unsigned long long bytesInResendBuffer;
-
-	float packetlossLastSecond, packetlossTotal;
-    float compressionRatio, decompressionRatio;
-
-    int encryptionStatus;
+    // Copy of raknet statistics
+    NetRawStatistics raw;
 };
 
 struct SBandwidthStatistics
 {
     long long llOutgoingUDPByteCount;
     long long llIncomingUDPByteCount;
+    long long llIncomingUDPByteCountBlocked;
     long long llOutgoingUDPPacketCount;
     long long llIncomingUDPPacketCount;
+    long long llIncomingUDPPacketCountBlocked;
+    long long llOutgoingUDPByteResentCount;
+    long long llOutgoingUDPMessageResentCount;
+    uint uiNetworkUpdateLoopProcessorNumber;
 };
 
 enum ePacketOrdering
 {
     PACKET_ORDERING_DEFAULT = 0,
     PACKET_ORDERING_CHAT,
-    PACKET_ORDERING_FILETRANSFER,
-    PACKET_ORDERING_LUA,
-    PACKET_ORDERING_PURESYNC,
-    PACKET_ORDERING_LIGHTSYNC,
-    PACKET_ORDERING_OTHERSYNC
+    PACKET_ORDERING_DATA_TRANSFER,
+    PACKET_ORDERING_VOICE,
 };
 
-#endif
+// Typedefs to make shared code easier
+typedef NetServerPlayerID NetPlayerID;
+typedef NetServerPacketPriority NetPacketPriority;
+typedef NetServerPacketReliability NetPacketReliability;
 
+#endif

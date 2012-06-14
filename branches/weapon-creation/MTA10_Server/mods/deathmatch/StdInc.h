@@ -43,8 +43,10 @@ struct SAclRequest;
 #include "CMatrix.h"
 #include "CQuat.h"
 #include "SharedUtil.h"
+#include "Enums.h"
 #include <bochs_internal/crc32.h>
 #include "CChecksum.h"
+#include "CIdArray.h"
 
 // Packet includes
 #include "net/Packets.h"
@@ -91,12 +93,14 @@ struct SAclRequest;
 #include "packets/CProjectileSyncPacket.h"
 #include "packets/CResourceStartPacket.h"
 #include "packets/CResourceStopPacket.h"
+#include "packets/CResourceClientScriptsPacket.h"
 #include "packets/CReturnSyncPacket.h"
 #include "packets/CServerTextItemPacket.h"
 #include "packets/CUpdateInfoPacket.h"
 #include "packets/CUnoccupiedVehicleStartSyncPacket.h"
 #include "packets/CUnoccupiedVehicleStopSyncPacket.h"
 #include "packets/CUnoccupiedVehicleSyncPacket.h"
+#include "packets/CUnoccupiedVehiclePushPacket.h"
 #include "packets/CVehicleDamageSyncPacket.h"
 #include "packets/CVehicleInOutPacket.h"
 #include "packets/CVehiclePuresyncPacket.h"
@@ -106,7 +110,6 @@ struct SAclRequest;
 #include "packets/CVehicleTrailerPacket.h"
 #include "packets/CVoiceDataPacket.h"
 #include "packets/CVoiceEndPacket.h"
-#include "packets/PacketIODeclarators.h"
 
 // Lua function definition includes
 #include "luadefs/CLuaACLDefs.h"
@@ -146,6 +149,7 @@ struct SAclRequest;
 // Shared includes
 #include "TInterpolation.h"
 #include "CPositionRotationAnimation.h"
+#include "CLatentTransferManager.h"
 
 // Logic includes
 #include "ASE.h"
@@ -163,6 +167,7 @@ struct SAclRequest;
 #include "CBlendedWeather.h"
 #include "CBlip.h"
 #include "CBlipManager.h"
+#include "CCameraSpatialDatabase.h"
 #include "CClient.h"
 #include "CClock.h"
 #include "CColCallback.h"
@@ -177,7 +182,6 @@ struct SAclRequest;
 #include "CCommandFile.h"
 #include "CCommandLineParser.h"
 #include "CCommon.h"
-#include "CConfig.h"
 #include "CConnectHistory.h"
 #include "CConsole.h"
 #include "CConsoleClient.h"
@@ -253,6 +257,7 @@ struct SAclRequest;
 #include "CTeamManager.h"
 #include "CTextDisplay.h"
 #include "CTextItem.h"
+#include "CTickRateSettings.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "CVehicle.h"
 #include "CVehicleColorManager.h"
@@ -270,12 +275,10 @@ struct SAclRequest;
 #include "Utils.h"
 #include "logic/CWeaponStat.h"
 #include "logic/CWeaponStatManager.h"
+#include "logic/CBuildingRemoval.h"
+#include "logic/CBuildingRemovalManager.h"
 
 #include "CStaticFunctionDefinitions.h"
-
-// Shared includes
-//#include "CEasingCurve.h"
-//#include "CPositionRotationAnimation.h"
 
 // Utility includes
 #include "utils/CHTTPClient.h"

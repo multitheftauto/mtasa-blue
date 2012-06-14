@@ -51,7 +51,7 @@ void CClientPacketRecorder::StartPlayback ( const char* szInput, bool bFrameBase
     // Delete the filename
     if ( m_szFilename )
     {
-        delete m_szFilename;
+        delete [] m_szFilename;
         m_szFilename = NULL;
     }
 
@@ -84,7 +84,7 @@ void CClientPacketRecorder::StartRecord ( const char* szOutput, bool bFrameBased
     // Delete the filename
     if ( m_szFilename )
     {
-        delete m_szFilename;
+        delete [] m_szFilename;
         m_szFilename = NULL;
     }
 

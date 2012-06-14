@@ -43,7 +43,7 @@ CCommands::~CCommands ( void )
 }
 
 
-void CCommands::Add ( const char* szCommand, const char* szDescription, PFNCOMMANDHANDLER pfnHandler, bool bModCommand )
+void CCommands::Add ( const char* szCommand, const char* szDescription, PFNCOMMANDHANDLER pfnHandler, bool bModCommand, bool bAllowScriptedBind )
 {
     COMMANDENTRY* pCommand = new COMMANDENTRY;
 
@@ -59,6 +59,7 @@ void CCommands::Add ( const char* szCommand, const char* szDescription, PFNCOMMA
 
     // Set the mod bool
     pCommand->bModCommand = bModCommand;
+    pCommand->bAllowScriptedBind = bAllowScriptedBind;
 
     // Set the enabled bool
     pCommand->bEnabled = true;
@@ -91,7 +92,7 @@ bool CCommands::Execute ( const char* szCommandLine )
 }
 
 
-bool CCommands::Execute ( const char* szCommand, const char* szParametersIn, bool bHandleRemotely )
+bool CCommands::Execute ( const char* szCommand, const char* szParametersIn, bool bHandleRemotely, bool bIsScriptedBind )
 {
     // Copy szParametersIn so the contents can be changed
     char* szParameters = NULL;
@@ -104,7 +105,7 @@ bool CCommands::Execute ( const char* szCommand, const char* szParametersIn, boo
 
     // HACK: if its a 'chatboxsay' command, use the next parameter
     // Is the command "say" and the arguments start with /? (command comes from the chatbox)
-    if ( !stricmp ( szCommand, "chatboxsay" ) )
+    if ( !bIsScriptedBind && !stricmp ( szCommand, "chatboxsay" ) )
     {
         if ( szParameters )
         {
@@ -137,7 +138,8 @@ bool CCommands::Execute ( const char* szCommand, const char* szParametersIn, boo
         if ( !pEntry->bModCommand || pEntry->bEnabled )
         {
             // Execute it
-            ExecuteHandler ( pEntry->pfnCmdFunc, szParameters );
+            if ( !bIsScriptedBind || pEntry->bAllowScriptedBind )
+                ExecuteHandler ( pEntry->pfnCmdFunc, szParameters );
             return true;
         }
     }
@@ -149,7 +151,7 @@ bool CCommands::Execute ( const char* szCommand, const char* szParametersIn, boo
     if (val.find(" = ") != std::string::npos) {
         key = val.substr ( 0, nOpIndex-1 );
     }
-    if ( CClientVariables::GetSingleton ().Exists ( key ) ) {
+    if ( CClientVariables::GetSingleton ().Exists ( key ) && !bIsScriptedBind ) {
         std::stringstream ss;
 
         // Determine whether this is an atomic get or set query
@@ -169,7 +171,7 @@ bool CCommands::Execute ( const char* szCommand, const char* szParametersIn, boo
     }
 
     // HACK: if its a 'nick' command, save it here
-    if ( !stricmp ( szCommand, "nick" ) && szParameters )
+    if ( !stricmp ( szCommand, "nick" ) && szParameters && !bIsScriptedBind )
     {
         if ( CCore::GetSingleton ().IsValidNick ( szParameters ) )
         {
@@ -180,13 +182,14 @@ bool CCommands::Execute ( const char* szCommand, const char* szParametersIn, boo
     // Try to execute the handler
     if ( m_pfnExecuteHandler )
     {
-        if ( m_pfnExecuteHandler ( szCommand, szParameters, bHandleRemotely, ( pEntry != NULL ) ) )
+        if ( m_pfnExecuteHandler ( szCommand, szParameters, bHandleRemotely, ( pEntry != NULL ), bIsScriptedBind ) )
             return true;
     }
 
     // Unknown command
     val = std::string ( "Unknown command or cvar: " ) + szCommand;
-    CCore::GetSingleton ().GetConsole ()->Print ( val.c_str () );
+    if ( !bIsScriptedBind )
+        CCore::GetSingleton ().GetConsole ()->Print ( val.c_str () );
     return false;
 }
 

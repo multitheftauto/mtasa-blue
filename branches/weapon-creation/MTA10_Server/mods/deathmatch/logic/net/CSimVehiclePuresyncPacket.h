@@ -26,10 +26,11 @@ public:
                                                               ushort usVehicleGotModel,
                                                               uchar ucPlayerGotOccupiedVehicleSeat,
                                                               uchar ucPlayerGotWeaponType,
-                                                              float fPlayerGotWeaponRange );
+                                                              float fPlayerGotWeaponRange,
+                                                              CControllerState& sharedControllerState );
 
     inline ePacketID            GetPacketID                 ( void ) const                  { return PACKET_ID_PLAYER_VEHICLE_PURESYNC; };
-    inline unsigned long        GetFlags                    ( void ) const                  { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
+    inline unsigned long        GetFlags                    ( void ) const                  { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 
     bool                        Read                        ( NetBitStreamInterface& BitStream );
     bool                        Write                       ( NetBitStreamInterface& BitStream ) const;
@@ -57,13 +58,13 @@ private:
     const uchar     m_ucPlayerGotOccupiedVehicleSeat;
     const uchar     m_ucPlayerGotWeaponType;
     const float     m_fPlayerGotWeaponRange;
+    CControllerState& m_sharedControllerState;
 
     // Set in Read()
     struct
     {
         uchar           ucTimeContext;
 
-        CControllerState ControllerState;
         CVector         PlrPosition;
         CVector         vecCamPosition;
         CVector         vecCamFwd;
@@ -95,7 +96,7 @@ private:
         float           fTurretY;
         ushort          usAdjustableProperty;
 
-        float           fDoorOpenRatio[4];
+        SFixedArray < float, 4 >    fDoorOpenRatio;
     } m_Cache;
 };
 

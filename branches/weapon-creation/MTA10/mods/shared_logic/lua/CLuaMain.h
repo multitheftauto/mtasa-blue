@@ -60,14 +60,14 @@ public:
     bool                            LoadScriptFromBuffer    ( const char* cpBuffer, unsigned int uiSize, const char* szFileName, bool bUTF8 );
     bool                            LoadScript              ( const char* szLUAScript );
     void                            UnloadScript            ( void );
+    bool                            CompileScriptFromFile   ( const char* szFile, SString* pDest );
 
     void                            Start                   ( void );
 
     void                            DoPulse                 ( void );
 
-    void                            GetScriptName           ( char* szLuaScript ) const     { strcpy ( szLuaScript, m_szScriptName ); };
-    inline const char*              GetScriptNamePointer    ( void ) const                  { return m_szScriptName; };
-    void                            SetScriptName           ( const char* szName )          { strncpy ( m_szScriptName, szName, MAX_SCRIPTNAME_LENGTH ); };
+    const char*                     GetScriptName           ( void ) const                  { return m_strScriptName; }
+    void                            SetScriptName           ( const char* szName )          { m_strScriptName.AssignLeft ( szName, MAX_SCRIPTNAME_LENGTH ); }
 
     void                            RegisterFunction        ( const char* szFunction, lua_CFunction function );
 
@@ -92,12 +92,14 @@ public:
 
     void                            InitVM                  ( void );
     const SString&                  GetFunctionTag          ( int iLuaFunction );
+    int                             PCall                   ( lua_State *L, int nargs, int nresults, int errfunc );
+
 private:
     void                            InitSecurity            ( void );
 
     static void                     InstructionCountHook    ( lua_State* luaVM, lua_Debug* pDebug );
 
-    char                            m_szScriptName [MAX_SCRIPTNAME_LENGTH + 1];
+    SString                         m_strScriptName;
     int                             m_iOwner;
 
     lua_State*                      m_luaVM;

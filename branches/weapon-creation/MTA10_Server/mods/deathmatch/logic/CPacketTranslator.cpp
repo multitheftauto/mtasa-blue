@@ -27,7 +27,7 @@ CPacketTranslator::~CPacketTranslator ( void )
 }
 
 
-CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID PacketID, NetBitStreamInterface& BitStream, SNetExtraInfo* pNetExtraInfo )
+CPacket* CPacketTranslator::Translate ( const NetServerPlayerID& Socket, ePacketID PacketID, NetBitStreamInterface& BitStream, SNetExtraInfo* pNetExtraInfo )
 {
     // Create the packet class
     CPacket* pTemp = NULL;
@@ -69,8 +69,16 @@ CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID Pac
             pTemp = new CKeysyncPacket;
             break;
 
+        case PACKET_ID_PLAYER_BULLETSYNC:
+            pTemp = new CBulletsyncPacket;
+            break;
+
         case PACKET_ID_DETONATE_SATCHELS:
             pTemp = new CDetonateSatchelsPacket;
+            break;
+
+        case PACKET_ID_DESTROY_SATCHELS:
+            pTemp = new CDestroySatchelsPacket;
             break;
 
         case PACKET_ID_COMMAND:
@@ -139,6 +147,14 @@ CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID Pac
 
         case PACKET_ID_PLAYER_MODINFO:
             pTemp = new CPlayerModInfoPacket;
+            break;
+
+        case PACKET_ID_PLAYER_SCREENSHOT:
+            pTemp = new CPlayerScreenShotPacket;
+            break;
+
+        case PACKET_ID_VEHICLE_PUSH_SYNC:
+            pTemp = new CUnoccupiedVehiclePushPacket;
             break;
 
         default: break;

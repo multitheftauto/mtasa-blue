@@ -28,8 +28,8 @@ CSyncDebug::CSyncDebug ( CClientManager* pManager )
     m_ulLastUpdateTime = CClientTime::GetTime ();
     m_uiLastPacketsSent = m_uiPacketsSent = stats.packetsSent;
     m_uiLastPacketsReceived = m_uiPacketsReceived = stats.packetsReceived;
-    m_uiLastBitsReceived = m_uiBitsReceived = stats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] * 8;
-    m_uiLastBitsSent = m_uiBitsSent = stats.runningTotal [ NS_ACTUAL_BYTES_SENT ] * 8;
+    m_uiLastBitsReceived = m_uiBitsReceived = (uint)stats.bytesReceived * 8;//  stats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] * 8;
+    m_uiLastBitsSent = m_uiBitsSent = (uint)stats.bytesSent * 8;//stats.runningTotal [ NS_ACTUAL_BYTES_SENT ] * 8;
 
     m_usFakeLagVariance = 0;
     m_usFakeLagPing = 0;
@@ -120,10 +120,10 @@ void CSyncDebug::OnDraw ( void )
 
     // ******* GENERAL NET DATA *******
     // Bytes sent totally
-    SString strBytesSent = GetDataUnit ( stats.runningTotal [ NS_ACTUAL_BYTES_SENT ] );
+    SString strBytesSent = GetDataUnit ( stats.bytesSent );
 
     // Bytes received totally
-    SString strBytesRecv = GetDataUnit ( stats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] );
+    SString strBytesRecv = GetDataUnit ( stats.bytesReceived );
 
     // Receive rate
     SString strRecvRate  = GetDataUnit ( ( m_uiBitsReceived - m_uiLastBitsReceived ) / 8 );
@@ -181,8 +181,8 @@ void CSyncDebug::OnUpdate ( void )
 
     m_uiPacketsSent = stats.packetsSent;
     m_uiPacketsReceived = stats.packetsReceived;
-    m_uiBitsReceived = stats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] * 8;
-    m_uiBitsSent = stats.runningTotal [ NS_ACTUAL_BYTES_SENT ] * 8;
+    m_uiBitsReceived = (uint)stats.bytesReceived * 8;
+    m_uiBitsSent = (uint)stats.bytesSent * 8;
 }
 
 

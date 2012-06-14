@@ -406,7 +406,7 @@ void CClientObject::StreamIn ( bool bInstantly )
     if ( bInstantly )
     {
         // Request the model blocking
-        if ( m_pModelRequester->RequestBlocking ( m_usModel ) )
+        if ( m_pModelRequester->RequestBlocking ( m_usModel, "CClientObject::StreamIn - bInstantly" ) )
         {
             // Create us
             Create ();
@@ -462,13 +462,13 @@ void CClientObject::Create ( void )
         if ( !CClientObjectManager::IsObjectLimitReached () )
         {
             // Add a reference to the object
-            m_pModelInfo->AddRef ( true );
+            m_pModelInfo->ModelAddRef ( BLOCKING, "CClientObject::Create" );
 
             // If the new object is not breakable, allow it into the vertical line test
             g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest ( !CClientObjectManager::IsBreakableModel ( m_usModel ) );
 
             // Create the object
-            m_pObject = g_pGame->GetPools ()->AddObject ( m_usModel, m_bIsLowLod );
+            m_pObject = g_pGame->GetPools ()->AddObject ( m_usModel, m_bIsLowLod, m_bBreakable );
 
             // Restore default behaviour
             g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest ( false );
@@ -477,6 +477,9 @@ void CClientObject::Create ( void )
             {                
                 // Put our pointer in its stored pointer
                 m_pObject->SetStoredPointer ( this );
+
+                // Add XRef
+                g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pObject );
 
                 // If set to true,this has the effect of forcing the object to be static at all times
                 m_pObject->SetStaticWaitingForCollision ( m_bIsStatic );
@@ -528,6 +531,9 @@ void CClientObject::Destroy ( void )
     {
         // Invalidate
         m_pManager->InvalidateEntity ( this );
+
+        // Remove XRef
+        g_pClientGame->GetGameEntityXRefManager ()->RemoveEntityXRef ( this, m_pObject );
 
         // Destroy the object
         g_pGame->GetPools ()->RemoveObject ( m_pObject );
@@ -645,4 +651,17 @@ CSphere CClientObject::GetWorldBoundingSphere ( void )
     }
     sphere.vecPosition += GetStreamPosition ();
     return sphere;
+}
+
+bool CClientObject::SetBreakable ( bool bBreakable )
+{
+    // Are we breakable and have we changed
+    if ( CClientObjectManager::IsBreakableModel ( m_usModel ) && m_bBreakable != bBreakable )
+    {
+        m_bBreakable = bBreakable;
+        // Re-create us
+        ReCreate ( );
+        return true;
+    }
+    return false;
 }

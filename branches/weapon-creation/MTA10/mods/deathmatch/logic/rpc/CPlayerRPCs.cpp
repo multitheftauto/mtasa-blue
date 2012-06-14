@@ -25,6 +25,7 @@ void CPlayerRPCs::LoadFunctions ( void )
     AddHandler ( SET_PLAYER_NAMETAG_COLOR, SetPlayerNametagColor, "SetPlayerNametagColor" );
     AddHandler ( SET_PLAYER_NAMETAG_SHOWING, SetPlayerNametagShowing, "SetPlayerNametagShowing" ); 
     AddHandler ( SET_PLAYER_TEAM, SetPlayerTeam, "SetPlayerTeam" );
+    AddHandler ( TAKE_PLAYER_SCREEN_SHOT, TakePlayerScreenShot, "TakePlayerScreenShot" );
 }
 
 
@@ -182,5 +183,29 @@ void CPlayerRPCs::SetPlayerTeam ( CClientEntity* pSource, NetBitStreamInterface&
         {
             pPlayer->SetTeam ( pTeam, true );
         }
+    }
+}
+
+
+void CPlayerRPCs::TakePlayerScreenShot ( NetBitStreamInterface& bitStream )
+{
+    ushort usSizeX;
+    ushort usSizeY;
+    SString strTag;
+    uchar ucQuality;
+    uint uiMaxBandwidth;
+    ushort usMaxPacketSize;
+    SString strResourceName;
+    uint uiServerSentTime;
+    if ( bitStream.Read ( usSizeX ) &&
+         bitStream.Read ( usSizeY ) &&
+         bitStream.ReadString ( strTag ) &&
+         bitStream.Read ( ucQuality ) &&
+         bitStream.Read ( uiMaxBandwidth ) &&
+         bitStream.Read ( usMaxPacketSize ) &&
+         bitStream.ReadString ( strResourceName ) &&
+         bitStream.Read ( uiServerSentTime ) )
+    {
+        m_pClientGame->TakePlayerScreenShot ( usSizeX, usSizeY, strTag, ucQuality, uiMaxBandwidth, usMaxPacketSize, strResourceName, uiServerSentTime );        
     }
 }

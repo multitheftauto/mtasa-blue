@@ -32,17 +32,36 @@ class CRenderItemManager;
 class CD3DDUMMY;
 class CSHADERDUMMY;
 class CEffectCloner;
+class CPixels;
+class CClientEntityBase;
 
 #define RDEFAULT            ((uint) -1)
 
 enum ERenderFormat
 {
     RFORMAT_UNKNOWN,
+    RFORMAT_ARGB                 = 21,          // D3DFMT_A8R8G8B8
     RFORMAT_DXT1                 = '1TXD',
     RFORMAT_DXT2                 = '2TXD',
     RFORMAT_DXT3                 = '3TXD',
     RFORMAT_DXT4                 = '4TXD',
     RFORMAT_DXT5                 = '5TXD',
+};
+
+enum ETextureType
+{
+    TTYPE_TEXTURE                =  3,
+    TTYPE_VOLUMETEXTURE          =  4,
+    TTYPE_CUBETEXTURE            =  5,
+};
+
+enum ETextureAddress
+{
+    TADDRESS_WRAP               = 1,
+    TADDRESS_MIRROR             = 2,
+    TADDRESS_CLAMP              = 3,
+    TADDRESS_BORDER             = 4,
+    TADDRESS_MIRRORONCE         = 5,
 };
 
 enum eDxTestMode
@@ -78,6 +97,7 @@ struct SDxStatus
         int             iFXQuality;
         int             iDrawDistance;
         bool            bVolumetricShadows;
+        bool            bAllowScreenUpload;
         int             iStreamingMemory;
     } settings;
 };
@@ -96,9 +116,10 @@ public:
     virtual                     ~CRenderItemManagerInterface        ( void ) {}
 
     // CRenderItemManagerInterface
+    virtual void                DoPulse                             ( void ) = 0;
     virtual CDxFontItem*        CreateDxFont                        ( const SString& strFullFilePath, uint uiSize, bool bBold ) = 0;
     virtual CGuiFontItem*       CreateGuiFont                       ( const SString& strFullFilePath, const SString& strFontName, uint uiSize ) = 0;
-    virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN ) = 0;
+    virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath, const CPixels* pPixels = NULL, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP, ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1 ) = 0;
     virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug ) = 0;
     virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false ) = 0;
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY ) = 0;
@@ -106,10 +127,11 @@ public:
     virtual bool                SaveDefaultRenderTarget             ( void ) = 0;
     virtual bool                RestoreDefaultRenderTarget          ( void ) = 0;
     virtual void                UpdateBackBufferCopy                ( void ) = 0;
-    virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem ) = 0;
+    virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem, bool bResampleNow ) = 0;
     virtual CShaderItem*        GetAppliedShaderForD3DData          ( CD3DDUMMY* pD3DData ) = 0;
-    virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch ) = 0;
-    virtual bool                RemoveShaderItemFromWorldTexture    ( CShaderItem* pShaderItem, const SString& strTextureNameMatch ) = 0;
+    virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity ) = 0;
+    virtual bool                RemoveShaderItemFromWorldTexture    ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity ) = 0;
+    virtual void                RemoveClientEntityRefs              ( CClientEntityBase* pClientEntity ) = 0;
     virtual void                GetVisibleTextureNames              ( std::vector < SString >& outNameList, const SString& strTextureNameMatch, ushort usModelID ) = 0;
     virtual eDxTestMode         GetTestMode                         ( void ) = 0;
     virtual void                SetTestMode                         ( eDxTestMode testMode ) = 0;
@@ -286,10 +308,11 @@ CEffectWrap* NewEffectWrap ( CRenderItemManager* pManager, const SString& strFil
 class CMaterialItem : public CRenderItem
 {
     DECLARE_CLASS( CMaterialItem, CRenderItem )
-                    CMaterialItem           ( void ) : ClassInit ( this ) {}
+                    CMaterialItem           ( void ) : ClassInit ( this ), m_TextureAddress ( TADDRESS_WRAP ) {}
 
     uint                m_uiSizeX;
     uint                m_uiSizeY;
+    ETextureAddress     m_TextureAddress;
 };
 
 
@@ -387,13 +410,18 @@ class CFileTextureItem : public CTextureItem
 {
     DECLARE_CLASS( CFileTextureItem, CTextureItem )
                     CFileTextureItem        ( void ) : ClassInit ( this ) {}
-    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN );
+    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, const CPixels* pPixels, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP, ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1 );
     virtual void    PreDestruct             ( void );
     virtual bool    IsValid                 ( void );
     virtual void    OnLostDevice            ( void );
     virtual void    OnResetDevice           ( void );
-    void            CreateUnderlyingData    ( const SString& strFilename, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN );
+    void            CreateUnderlyingData    ( const SString& strFilename, bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format );
+    void            CreateUnderlyingData    ( const CPixels* pPixels, bool bMipMaps, ERenderFormat format );
+    void            CreateUnderlyingData    ( bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format, ETextureType textureType, uint uiVolumeDepth );
     void            ReleaseUnderlyingData   ( void );
+
+    uint                    m_uiVolumeDepth;
+    ETextureType            m_TextureType;
 };
 
 
@@ -413,10 +441,12 @@ class CRenderTargetItem : public CTextureItem
     virtual void    OnResetDevice           ( void );
     void            CreateUnderlyingData    ( void );
     void            ReleaseUnderlyingData   ( void );
+    void            ReadPixels              ( CBuffer& outBuffer );
 
     bool                m_bWithAlphaChannel;
     IDirect3DSurface9*  m_pD3DRenderTargetSurface;
     IDirect3DSurface9*  m_pD3DZStencilSurface;
+    IDirect3DSurface9*  m_pD3DReadSurface;
 };
 
 

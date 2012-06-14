@@ -17,7 +17,7 @@ Var Install_Dir
 
 !ifndef MAJOR_VER
     !define MAJOR_VER "1"
-    !define MINOR_VER "3"
+    !define MINOR_VER "4"
     !define MAINT_VER "0"
 !endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
@@ -131,10 +131,12 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\bassflac.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\bass_aac.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\bass_ac3.dll"
+	File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 	File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
+	File "${FILES_ROOT}\MTA San Andreas\mta\pthreadVC2.dll"
 
 	SetOutPath "$INSTDIR\skins\Classic"
     File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"
@@ -147,6 +149,12 @@ Section "Data files" SEC01
     File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.lnf.xml"
     File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.png"
     File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.xml"
+                
+    SetOutPath "$INSTDIR\skins\Lighter black"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.is.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.lnf.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.png"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.xml"
 	
 	SetOutPath "$INSTDIR\MTA\cgui"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Falagard.xsd"

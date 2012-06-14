@@ -14,6 +14,7 @@
 #include "CDatabaseJobQueue.h"
 #include "SharedUtil.Thread.h"
 
+uint g_uiDatabaseThreadProcessorNumber = -1;
 
 ///////////////////////////////////////////////////////////////
 //
@@ -60,7 +61,6 @@ protected:
     void                        LogString                   ( const SString& strText );
 
     // Main thread variables
-    SDbJobId                            m_JobHandleCounter;
     CThreadHandle*                      m_pServiceThreadHandle;
     std::map < SDbJobId, CDbJobData* >  m_ActiveJobHandles;
     std::set < CDbJobData* >            m_IgnoreResultList;
@@ -181,17 +181,9 @@ void CDatabaseJobQueueImpl::StopThread ( void )
 ///////////////////////////////////////////////////////////////
 CDbJobData* CDatabaseJobQueueImpl::GetNewJobData ( void )
 {
-    do
-    {
-        m_JobHandleCounter++;
-        m_JobHandleCounter &= 0x000FFFFF;
-        m_JobHandleCounter |= 0x00100000;
-        // TODO - check when all (1,048,575) ids are in use
-    }
-    while ( MapContains ( m_ActiveJobHandles, m_JobHandleCounter ) );
-
     g_pStats->iDbJobDataCount++;
-    CDbJobData* pJobData = new CDbJobData ( m_JobHandleCounter );
+    CDbJobData* pJobData = new CDbJobData ();
+    assert ( !MapContains ( m_ActiveJobHandles, pJobData->GetId () ) );
     MapSet ( m_ActiveJobHandles, pJobData->GetId (), pJobData );
     return pJobData;
 }
@@ -581,6 +573,8 @@ void* CDatabaseJobQueueImpl::ThreadProc ( void )
 
             // Process command
             ProcessCommand ( pJobData );
+
+            g_uiDatabaseThreadProcessorNumber = _GetCurrentProcessorNumber ();
 
             // Store result
             shared.m_Mutex.Lock ();

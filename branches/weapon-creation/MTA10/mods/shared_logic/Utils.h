@@ -189,6 +189,15 @@ inline float GetOffsetDegrees ( float a, float b )
     return c;
 }
 
+// Assuming fValue is the result of a difference calculation, calculate
+// the shortest positive distance after wrapping
+inline float GetSmallestWrapUnsigned ( float fValue, float fHigh )
+{
+    float fWrapped =  fValue - ( fHigh * floor ( static_cast < float > ( fValue / fHigh ) ) );
+    if ( fWrapped > fHigh / 2 )
+        fWrapped = fHigh - fWrapped;
+    return fWrapped;
+}
 
 bool            DoesFileExist               ( const char* szFilename );
 

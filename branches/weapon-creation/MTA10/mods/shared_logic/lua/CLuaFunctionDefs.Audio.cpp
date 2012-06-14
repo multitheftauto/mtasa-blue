@@ -50,6 +50,11 @@ int CLuaFunctionDefs::PlaySound ( lua_State* luaVM )
                     CClientSound* pSound = CStaticFunctionDefinitions::PlaySound ( pResource, strSound, bIsURL, bLoop );
                     if ( pSound )
                     {
+                        // call onClientSoundStarted
+                        CLuaArguments Arguments;
+                        Arguments.PushString ( "play" );     // Reason
+                        pSound->CallEvent ( "onClientSoundStarted", Arguments, false );
+
                         lua_pushelement ( luaVM, pSound );
                         return 1;
                     }
@@ -104,6 +109,11 @@ int CLuaFunctionDefs::PlaySound3D ( lua_State* luaVM )
                     CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D ( pResource, strSound, bIsURL, vecPosition, bLoop );
                     if ( pSound )
                     {
+                        // call onClientSoundStarted
+                        CLuaArguments Arguments;
+                        Arguments.PushString ( "play" );     // Reason
+                        pSound->CallEvent ( "onClientSoundStarted", Arguments, false );
+
                         lua_pushelement ( luaVM, pSound );
                         return 1;
                     }
@@ -298,6 +308,233 @@ int CLuaFunctionDefs::SetSoundSpeed ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::SetSoundProperties ( lua_State* luaVM )
+{
+    CClientSound* pSound = NULL;
+    bool bReversed = false;
+    float fSampleRate = 0.0f, fTempo = 0.0f, fPitch = 0.0f;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pSound );
+    argStream.ReadNumber ( fSampleRate );
+    argStream.ReadNumber ( fTempo );
+    argStream.ReadNumber ( fPitch );
+    argStream.ReadBool ( bReversed, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetSoundProperties ( *pSound, fSampleRate, fTempo, fPitch, bReversed ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setSoundProperties", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetSoundProperties ( lua_State* luaVM )
+{
+    CClientSound* pSound = NULL;
+    bool bReversed = false;
+    float fSampleRate = 0.0f, fTempo = 0.0f, fPitch = 0.0f;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pSound );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::GetSoundProperties ( *pSound, fSampleRate, fTempo, fPitch, bReversed ) )
+        {
+            lua_pushnumber ( luaVM, fSampleRate );
+            lua_pushnumber ( luaVM, fTempo );
+            lua_pushnumber ( luaVM, fPitch );
+            lua_pushboolean ( luaVM, bReversed );
+            return 4;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getSoundProperties", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetSoundFFTData ( lua_State* luaVM )
+{
+    CClientSound* pSound = NULL;
+    float* pData = NULL;
+    int iLength = 0;
+    int iBands = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pSound );
+    argStream.ReadNumber ( iLength );
+    argStream.ReadNumber ( iBands, 0 );
+
+    if ( !argStream.HasErrors () )
+    {
+        pData = CStaticFunctionDefinitions::GetSoundFFTData ( *pSound, iLength, iBands );
+        if ( pData != NULL )
+        {
+            if ( iBands == 0 )
+            {
+                // Create a new table
+                lua_newtable ( luaVM );
+                for ( int i = 0; i <= iLength / 2;i++ )
+                {
+                    lua_pushnumber ( luaVM, i );
+                    lua_pushnumber ( luaVM, pData[i] );
+                    lua_settable ( luaVM, -3 );
+                }
+            }
+            else
+            {
+                // Create a new table
+                lua_newtable ( luaVM );
+                for ( int i = 0; i <= iBands - 1;i++ )
+                {
+                    lua_pushnumber ( luaVM, i );
+                    lua_pushnumber ( luaVM, pData[i] );
+                    lua_settable ( luaVM, -3 );
+                }
+            }
+            // Deallocate our data array here after it's used.
+            delete [] pData;
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getSoundFFTData", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetSoundWaveData ( lua_State* luaVM )
+{
+    CClientSound* pSound = NULL;
+    float* pData = NULL;
+    int iLength = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pSound );
+    argStream.ReadNumber ( iLength );
+
+    if ( !argStream.HasErrors () )
+    {
+        pData = CStaticFunctionDefinitions::GetSoundWaveData ( *pSound, iLength );
+        if ( pData != NULL )
+        {
+            // Create a new table
+            lua_newtable ( luaVM );
+            for (int i = 0; i < iLength;i++)
+            {
+                lua_pushnumber ( luaVM, i );
+                lua_pushnumber ( luaVM, pData[i] );
+                lua_settable ( luaVM, -3 );
+            }
+            // Deallocate our data array here after it's used.
+            delete [] pData;
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getSoundWaveData", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetSoundLevelData ( lua_State* luaVM )
+{
+    CClientSound* pSound = NULL;
+    DWORD dwLeft = 0, dwRight = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pSound );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::GetSoundLevelData ( *pSound, dwLeft, dwRight ) )
+        {
+            lua_pushnumber ( luaVM, dwLeft );
+            lua_pushnumber ( luaVM, dwRight );
+            return 2;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getSoundLevelData", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetSoundBPM ( lua_State* luaVM )
+{
+    CClientSound* pSound = NULL;
+    float fBPM = 0.0f;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pSound );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::GetSoundBPM ( *pSound, fBPM ) )
+        {
+            lua_pushnumber ( luaVM, fBPM );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getSoundBPM", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetSoundPanEnabled ( lua_State* luaVM )
+{
+    CClientSound* pSound = NULL;
+    bool bEnabled = true;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pSound );
+    argStream.ReadBool ( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetSoundPanEnabled ( *pSound, bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setSoundPanningEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::IsSoundPanEnabled ( lua_State* luaVM )
+{
+    CClientSound* pSound = NULL;
+    bool bEnabled = true;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pSound );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::IsSoundPanEnabled ( *pSound ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "isSoundPanningEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefs::GetSoundSpeed ( lua_State* luaVM )
 {
@@ -699,6 +936,74 @@ int CLuaFunctionDefs::ResetAmbientSounds ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "resetAmbientSounds" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::SetWorldSoundEnabled ( lua_State* luaVM )
+{
+//  setWorldSoundEnabled ( int group, [int index, ], bool enable )
+    int group; int index = -1; bool bEnabled;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( group );
+    if ( !argStream.NextIsBool () )
+        argStream.ReadNumber ( index );
+    argStream.ReadBool ( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetWorldSoundEnabled ( group, index, bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWorldSoundEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::IsWorldSoundEnabled ( lua_State* luaVM )
+{
+//  bool isWorldSoundEnabled ( int group, [int index] )
+    int group; int index;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( group );
+    argStream.ReadNumber ( index, -1 );
+
+    if ( !argStream.HasErrors () )
+    {
+        bool bResultEnabled;
+        if ( CStaticFunctionDefinitions::IsWorldSoundEnabled ( group, index, bResultEnabled ) )
+        {
+            lua_pushboolean ( luaVM, bResultEnabled );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "isWorldSoundEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::ResetWorldSounds ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::ResetWorldSounds () )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "resetWorldSounds" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

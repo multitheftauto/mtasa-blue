@@ -111,6 +111,7 @@ public:
     virtual CPad                * GetPad()=0;
     virtual CAERadioTrackManager* GetAERadioTrackManager()=0;
     virtual CAudioEngine        * GetAudioEngine()=0;
+    virtual CAudioEngine        * GetAudio()=0;
     virtual CMenuManager        * GetMenuManager()=0;
     virtual CText               * GetText()=0;
     virtual CStats              * GetStats()=0;

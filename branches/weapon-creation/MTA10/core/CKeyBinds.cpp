@@ -524,7 +524,7 @@ bool CKeyBinds::Call ( CKeyBind* pKeyBind )
             {
                 CCommandBind* pBind = static_cast < CCommandBind* > ( pKeyBind );
                 if ( pBind->bActive )
-                    m_pCore->GetCommands ()->Execute ( pBind->szCommand, pBind->szArguments );
+                    m_pCore->GetCommands ()->Execute ( pBind->szCommand, pBind->szArguments, false, pBind->szResource != NULL );
                 break;
             }
             case KEY_BIND_FUNCTION:
@@ -573,12 +573,9 @@ bool CKeyBinds::AddCommand ( const char* szKey, const char* szCommand, const cha
             strcpy ( bind->szResource, szResource );
 
             if ( bAltKey )
-                bind->szDefaultKey = "";
+                bind->strDefaultKey = "";
             else
-            {
-                bind->szDefaultKey = new char [ strlen ( szKey ) + 1 ];
-                strcpy ( bind->szDefaultKey, szKey );
-            }
+                bind->strDefaultKey = szKey;
         }
         bind->bHitState = bState;
         bind->bState = false;
@@ -2191,6 +2188,7 @@ void CKeyBinds::DoPostFramePulse ( void )
         cs.Select = ( g_bcControls [ 10 ].bState ) ? 255 : 0; // Change View   
 
         GetJoystickManager ()->ApplyAxes ( cs, bInVehicle );
+        //m_pCore->GetMouseControl()->ApplyAxes ( cs );
     }
         
     m_pCore->GetGame ()->GetPad ()->SetCurrentControllerState ( &cs );
@@ -2404,7 +2402,7 @@ bool CKeyBinds::SaveToXML ( CXMLNode* pMainNode )
                         pA->SetValue ( szResource );
 
                         //If its still the default key dont bother saving it
-                        if ( !strcmp ( pBind->szDefaultKey, szKey ) )
+                        if ( !strcmp ( pBind->strDefaultKey, szKey ) )
                             pNode->GetParent()->DeleteSubNode(pNode);
                     }
                 }

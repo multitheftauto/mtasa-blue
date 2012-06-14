@@ -43,8 +43,7 @@ bool CRegisteredCommands::AddCommand ( CLuaMain* pLuaMain, const char* szKey, co
     // Create the entry
     pCommand = new SCommand;
     pCommand->pLuaMain = pLuaMain;
-    strncpy ( pCommand->szKey, szKey, MAX_REGISTERED_COMMAND_LENGTH );
-    pCommand->szKey [MAX_REGISTERED_COMMAND_LENGTH] = 0;
+    pCommand->strKey.AssignLeft ( szKey, MAX_REGISTERED_COMMAND_LENGTH );
     pCommand->iLuaFunction = iLuaFunction;
     pCommand->bCaseSensitive = bCaseSensitive;
 
@@ -67,9 +66,9 @@ bool CRegisteredCommands::RemoveCommand ( CLuaMain* pLuaMain, const char* szKey 
     while ( iter != m_Commands.end () )
     {
         if ( (*iter)->bCaseSensitive )
-            iCompareResult = strcmp ( (*iter)->szKey, szKey );
+            iCompareResult = strcmp ( (*iter)->strKey, szKey );
         else
-            iCompareResult = stricmp ( (*iter)->szKey, szKey );
+            iCompareResult = stricmp ( (*iter)->strKey, szKey );
 
         // Matching vm's and names?
         if ( (*iter)->pLuaMain == pLuaMain && iCompareResult == 0 )
@@ -152,9 +151,9 @@ bool CRegisteredCommands::ProcessCommand ( const char* szKey, const char* szArgu
     for ( ; iter != m_Commands.end (); iter++ )
     {
         if ( (*iter)->bCaseSensitive )
-            iCompareResult = strcmp ( (*iter)->szKey, szKey );
+            iCompareResult = strcmp ( (*iter)->strKey, szKey );
         else
-            iCompareResult = stricmp ( (*iter)->szKey, szKey );
+            iCompareResult = stricmp ( (*iter)->strKey, szKey );
 
         // Matching names?
         if ( iCompareResult == 0 )
@@ -183,9 +182,9 @@ CRegisteredCommands::SCommand* CRegisteredCommands::GetCommand ( const char* szK
     for ( ; iter != m_Commands.end (); iter++ )
     {
         if ( (*iter)->bCaseSensitive )
-            iCompareResult = strcmp ( (*iter)->szKey, szKey );
+            iCompareResult = strcmp ( (*iter)->strKey, szKey );
         else
-            iCompareResult = stricmp ( (*iter)->szKey, szKey );
+            iCompareResult = stricmp ( (*iter)->strKey, szKey );
 
         // Matching name and no given VM or matching VM
         if ( iCompareResult == 0 && ( !pLuaMain || pLuaMain == (*iter)->pLuaMain ) )

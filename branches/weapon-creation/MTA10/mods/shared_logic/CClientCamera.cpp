@@ -190,6 +190,17 @@ void CClientCamera::SetRotation ( const CVector& vecRotation )
 }
 
 
+void CClientCamera::GetRotation( float &fX, float &fY )
+{
+	m_pCamera->GetRotation( fX, fY );
+}
+
+void CClientCamera::SetRotation( float fX, float fY )
+{
+	m_pCamera->SetRotation( fX, fY );
+}
+
+
 void CClientCamera::GetTarget ( CVector & vecTarget ) const
 {
     if ( m_bFixed ) vecTarget = m_vecFixedTarget;
