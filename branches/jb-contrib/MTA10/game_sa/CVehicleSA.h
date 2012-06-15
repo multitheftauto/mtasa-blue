@@ -360,8 +360,6 @@ class CVehicleSAInterface : public CPhysicalSAInterface
 public:
     CAEVehicleAudioEntity m_VehicleAudioEntity; // 312
 
-    int padaudio[108];
-
     tHandlingDataSA* pHandlingData;                             // +900
     BYTE padyo[4];
     DWORD dwHandlingFlags;

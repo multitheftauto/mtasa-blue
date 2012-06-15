@@ -31,6 +31,45 @@
 class CPhysicalSAInterface : public CEntitySAInterface
 {
 public:
+    float pad1; // 56
+    uint32_t pad2; // 60
+
+    uint32_t b0x01 : 1; // 64
+    uint32_t bApplyGravity : 1;
+    uint32_t bDisableFriction : 1;
+    uint32_t bCollidable : 1; 
+    uint32_t b0x10 : 1;
+    uint32_t bDisableMovement : 1;
+    uint32_t b0x40 : 1;
+    uint32_t b0x80 : 1;
+
+    uint32_t bSubmergedInWater : 1; // 65
+    uint32_t bOnSolidSurface : 1;
+    uint32_t bBroken : 1;
+    uint32_t b0x800 : 1; // ref @ 0x6F5CF0
+    uint32_t b0x1000 : 1;//
+    uint32_t b0x2000 : 1;//
+    uint32_t b0x4000 : 1;//
+    uint32_t b0x8000 : 1;//
+
+    uint32_t b0x10000 : 1; // 66
+    uint32_t b0x20000 : 1; // ref @ CPhysical__processCollision
+    uint32_t bBulletProof : 1;
+    uint32_t bFireProof : 1;
+    uint32_t bCollisionProof : 1;
+    uint32_t bMeeleProof : 1;
+    uint32_t bInvulnerable : 1;
+    uint32_t bExplosionProof : 1;
+
+    uint32_t b0x1000000 : 1; // 67
+    uint32_t bAttachedToEntity : 1;
+    uint32_t b0x4000000 : 1;
+    uint32_t bTouchingWater : 1;
+    uint32_t bEnableCollision : 1;
+    uint32_t bDestroyed : 1;
+    uint32_t b0x40000000 : 1;
+    uint32_t b0x80000000 : 1;
+
     CVector    m_vecLinearVelocity; // 68
     CVector    m_vecAngularVelocity; // 80
     CVector    m_vecCollisionLinearVelocity; // 92
@@ -44,12 +83,12 @@ public:
     float m_fElasticity; // 156
     float m_fBuoyancyConstant; // 160
     CVector m_vecCenterOfMass; // 164
-    uint32 * m_pCollisionList; // 176
-    uint32 * m_pMovingList; // 180
-    uint8 m_ucColFlag1; // 184
-    uint8 m_ucCollisionState; // 185
-    uint8 m_ucCollisionContactSurfaceType; // 186
-    uint8 m_ucColFlag4; // 187
+    uint32_t * m_pCollisionList; // 176
+    uint32_t * m_pMovingList; // 180
+    uint8_t m_ucColFlag1; // 184
+    uint8_t m_ucCollisionState; // 185
+    uint8_t m_ucCollisionContactSurfaceType; // 186
+    uint8_t m_ucColFlag4; // 187
     CEntity* pLastContactedEntity[4]; // 188
     float m_field_cc; // 204
     float m_pad4c; // 208
@@ -58,15 +97,15 @@ public:
     CEntitySAInterface * m_pCollidedEntity; // 220
     CVector m_vecCollisionImpactVelocity; // 224
     CVector m_vecCollisionPosition; // 236
-    uint16 m_usPieceType; // 248
-    uint16 m_pad3; // 250
+    uint16_t m_usPieceType; // 248
+    uint16_t m_pad3; // 250
     CEntitySAInterface * m_pAttachedEntity;   // 252
     CVector m_vecAttachedOffset;    // 256
     CVector m_vecAttachedRotation;    // 268
     CVector m_vecUnk;    // 280
-    uint32 m_pad4[2]; // 292
-    float m_fLighting; // 300           // col lighting? CPhysical::GetLightingFromCol
-    float m_fLighting2; // 304          // added to col lighting in CPhysical::GetTotalLighting
+    uint32_t m_pad4[2]; // 292
+    float m_fLighting; // 300
+    float m_fLighting2; // 304
     DWORD *m_pShadowData; // 308
 };
 C_ASSERT(sizeof(CPhysicalSAInterface) == 0x138);
