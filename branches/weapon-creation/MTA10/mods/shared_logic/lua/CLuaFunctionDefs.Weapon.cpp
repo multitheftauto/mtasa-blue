@@ -85,13 +85,16 @@ int CLuaFunctionDefs::GetWeaponIDFromName ( lua_State* luaVM )
 int CLuaFunctionDefs::CreateWeapon ( lua_State* luaVM )
 {
     CVector vecPos;
+    eWeaponType weaponType;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( vecPos.fX );
+    argStream.ReadNumber ( vecPos.fX );
     argStream.ReadNumber ( vecPos.fY );
-    argStream.ReadNumber ( vecPos.fZ );
+    argStream.ReadEnumString ( weaponType );
+
     if ( !argStream.HasErrors () )
     {
-        CClientWeapon * pWeapon = CStaticFunctionDefinitions::CreateWeapon ( vecPos );
+        CClientWeapon * pWeapon = CStaticFunctionDefinitions::CreateWeapon ( weaponType, vecPos );
         if ( pWeapon )
         {
             lua_pushelement ( luaVM, pWeapon );
@@ -119,7 +122,7 @@ int CLuaFunctionDefs::FireWeapon ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "createWeapon" );
+        m_pScriptDebugging->LogBadType ( luaVM, "fireWeapon" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -144,7 +147,7 @@ int CLuaFunctionDefs::SetWeaponAimPosition ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "createWeapon" );
+        m_pScriptDebugging->LogBadType ( luaVM, "setWeaponAimPosition" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -169,7 +172,7 @@ int CLuaFunctionDefs::SetWeaponState ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "createWeapon" );
+        m_pScriptDebugging->LogBadType ( luaVM, "setWeaponState" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

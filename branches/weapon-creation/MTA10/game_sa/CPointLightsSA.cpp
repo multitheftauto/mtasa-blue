@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 
-void CPointLightsSA::AddLight ( unsigned char ucType, CVector vec_2, CVector vec_3, float fRed, float fGreen, float fBlue, float f_7, unsigned char uc_8, bool b_9, CEntity * pEntity )
+void CPointLightsSA::AddLight ( unsigned char ucType, CVector vec_2, CVector vec_3, float fRed, float fGreen, float fBlue, float f_7, unsigned char uc_8, bool bCreatesShadow, CEntity * pEntity )
 {
     DWORD dwEntityInterface = 0;
     if ( pEntity ) dwEntityInterface = ( DWORD ) pEntity->GetInterface ();
@@ -22,7 +22,7 @@ void CPointLightsSA::AddLight ( unsigned char ucType, CVector vec_2, CVector vec
     _asm
     {
         push    dwEntityInterface
-        push    b_9
+        push    bCreatesShadow
         push    uc_8
         push    f_7
         push    fBlue
@@ -34,7 +34,7 @@ void CPointLightsSA::AddLight ( unsigned char ucType, CVector vec_2, CVector vec
         push    f_2z
         push    f_2y
         push    f_2x
-        push    ucType        
+        push    ucType
         call    dwFunc
         add     esp, 56
     }

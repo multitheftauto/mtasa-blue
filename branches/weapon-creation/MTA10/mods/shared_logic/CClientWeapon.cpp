@@ -36,6 +36,31 @@ CClientWeapon::~CClientWeapon ( void )
 
 void CClientWeapon::DoPulse ( void )
 {
+    if ( m_pAttachedToEntity )
+    {
+        CVector vecRotation, vecMyRotation;
+        GetRotationDegrees( vecMyRotation );
+        switch ( m_pAttachedToEntity->GetType ( ) )
+        {
+            case CCLIENTVEHICLE:
+            {
+                CClientVehicle * pVehicle = (CClientVehicle*)m_pAttachedToEntity;
+                pVehicle->GetRotationDegrees ( vecRotation );
+            }
+            case CCLIENTOBJECT:
+            {
+                CClientObject * pObject = (CClientObject*)m_pAttachedToEntity;
+                pObject->GetRotationDegrees ( vecRotation );
+            }
+            case CCLIENTPED:
+            {
+                CClientPed * pPed = (CClientPed*)m_pAttachedToEntity;
+                pPed->GetRotationDegrees ( vecRotation );
+            }
+        }
+        vecRotation.fZ -= ConvertRadiansToDegrees ( m_vecAttachedRotation.fZ );
+        SetRotationDegrees( vecRotation );
+    }
     if ( m_bHasTargetDirection )
     {
         CVector vecDirection = m_vecLastDirection;
@@ -80,16 +105,20 @@ void CClientWeapon::Fire ( void )
     if ( !m_pWeapon || !m_pObject ) return;
     switch ( m_Type )
     {
+        case WEAPONTYPE_PISTOL:
         case WEAPONTYPE_PISTOL_SILENCED:
-        case WEAPONTYPE_M4:
-        case WEAPONTYPE_AK47:
-        case WEAPONTYPE_PISTOL: 
         case WEAPONTYPE_DESERT_EAGLE:
+        case WEAPONTYPE_SHOTGUN: 
+        case WEAPONTYPE_SAWNOFF_SHOTGUN:
+        case WEAPONTYPE_SPAS12_SHOTGUN:
         case WEAPONTYPE_MICRO_UZI:
         case WEAPONTYPE_MP5:
+        case WEAPONTYPE_AK47:
+        case WEAPONTYPE_M4:
         case WEAPONTYPE_TEC9:
         case WEAPONTYPE_COUNTRYRIFLE:
         case WEAPONTYPE_SNIPERRIFLE:
+        case WEAPONTYPE_MINIGUN:
         {
             CVector vecOrigin, vecRotation;
             GetPosition ( vecOrigin );
@@ -128,18 +157,19 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
     g_pGame->GetAudioEngine ()->ReportWeaponEvent ( WEAPON_EVENT_FIRE, m_Type, m_pObject );
 
     CClientEntity * pAttachedTo = GetAttachedTo ();    
-    if ( pAttachedTo ) pAttachedTo->WorldIgnore ( true );
+    // Crashes with vehicle mounted epicness.
+    //if ( pAttachedTo ) pAttachedTo->WorldIgnore ( true );
 
     CEntity * pColEntity = NULL;
     CColPoint * pColPoint = NULL;
     SLineOfSightFlags flags;
-    SLineOfSightBuildingResult * pBuildingResult;
-    if ( g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pColEntity, flags, pBuildingResult ) )
+    SLineOfSightBuildingResult pBuildingResult;
+    if ( g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pColEntity, flags, &pBuildingResult ) )
     {
         vecTarget = *pColPoint->GetPosition ();
     }
 
-    if ( pAttachedTo ) pAttachedTo->WorldIgnore ( false );
+    //if ( pAttachedTo ) pAttachedTo->WorldIgnore ( false );
 
     CVector vecCollision;
     if ( g_pGame->GetWaterManager ()->TestLineAgainstWater ( vecOrigin, vecTarget, &vecCollision ) )

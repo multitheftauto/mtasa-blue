@@ -20,7 +20,7 @@
 class CPointLightsSA : public CPointLights
 {
 public:
-    void                        AddLight                ( unsigned char ucType, CVector vec_2, CVector vec_3, float fRed, float fGreen, float fBlue, float f_7, unsigned char uc_8, bool b_9, CEntity * pEntity );
+    void                        AddLight                ( unsigned char ucType, CVector vec_2, CVector vec_3, float fRed, float fGreen, float fBlue, float f_7, unsigned char uc_8, bool bCreatesShadow, CEntity * pEntity );
 };
 
 #endif

@@ -6326,9 +6326,9 @@ bool CStaticFunctionDefinitions::GetWeaponIDFromName ( const char* szName, unsig
     return ucID != 0xFF;
 }
 
-CClientWeapon* CStaticFunctionDefinitions::CreateWeapon ( CVector vecPosition )
+CClientWeapon* CStaticFunctionDefinitions::CreateWeapon ( eWeaponType weaponType, CVector vecPosition )
 {
-    CClientWeapon * pWeapon = new CClientWeapon ( m_pManager, INVALID_ELEMENT_ID, WEAPONTYPE_M4 );
+    CClientWeapon * pWeapon = new CClientWeapon ( m_pManager, INVALID_ELEMENT_ID, weaponType );
     pWeapon->SetPosition ( vecPosition );
     return pWeapon;
 }
@@ -6347,7 +6347,7 @@ bool CStaticFunctionDefinitions::SetAimPosition ( CClientWeapon * pWeapon, CVect
 {
     if ( pWeapon )
     {
-        pWeapon->SetTargetDirection ( vecPosition );
+        pWeapon->SetRotationDegrees ( vecPosition );
         return true;
     }
     return false;

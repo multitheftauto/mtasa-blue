@@ -526,7 +526,7 @@ public:
     // Weapon funcs
     static bool                         GetWeaponNameFromID                 ( unsigned char ucID, SString& strOutName );
     static bool                         GetWeaponIDFromName                 ( const char* szName, unsigned char& ucID );
-    static CClientWeapon*               CreateWeapon                        ( CVector vecPosition );
+    static CClientWeapon*               CreateWeapon                        ( eWeaponType weaponType, CVector vecPosition );
     static bool                         FireWeapon                          ( CClientWeapon * pWeapon );
     static bool                         SetAimPosition                      ( CClientWeapon * pWeapon, CVector vecPosition );
     static bool                         SetWeaponState                      ( CClientWeapon * pWeapon, eWeaponState weaponState );
