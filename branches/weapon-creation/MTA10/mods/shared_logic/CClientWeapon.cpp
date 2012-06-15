@@ -150,7 +150,7 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
     
     g_pGame->GetPointLights ()->AddLight ( PLTYPE_POINTLIGHT, vecOrigin, CVector (), 3.0f, 0.22f, 0.25f, 0, 0, 0, 0 );
     
-    if ( GetAttachedTo () ) g_pGame->GetFx ()->TriggerGunshot ( m_pObject, vecOrigin, vecDirection, false );
+    if ( GetAttachedTo () ) g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, false );
     else g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
 
     m_pWeapon->AddGunshell ( m_pObject, &vecOrigin, &CVector2D ( 0, -1 ), 0.45f );
