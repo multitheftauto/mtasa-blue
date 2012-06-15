@@ -21,10 +21,12 @@
 
 int CLuaFunctionDefs::GetWeaponNameFromID ( lua_State* luaVM )
 {
-    int iArgument1 = lua_type ( luaVM, 1 );
-    if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
+    unsigned char ucID = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber( ucID );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        unsigned char ucID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
 
         SString strBuffer;
         if ( CStaticFunctionDefinitions::GetWeaponNameFromID ( ucID, strBuffer ) )
@@ -34,7 +36,7 @@ int CLuaFunctionDefs::GetWeaponNameFromID ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getWeaponNameFromID" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponNameFromID", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -42,19 +44,21 @@ int CLuaFunctionDefs::GetWeaponNameFromID ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetSlotFromWeapon ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER || lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    unsigned char ucWeaponID = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber( ucWeaponID );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        unsigned char ucWeaponID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
         char cSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
         if ( cSlot >= 0 )
             lua_pushnumber ( luaVM, cSlot );
         else
             lua_pushboolean ( luaVM, false );
-        //lua_pushnumber ( luaVM, CWeaponNames::GetSlotFromWeapon ( ucWeaponID ) );
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getSlotFromWeapon" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getSlotFromWeapon", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -63,19 +67,21 @@ int CLuaFunctionDefs::GetSlotFromWeapon ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetWeaponIDFromName ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    SString strName = "";
+    unsigned char ucID = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString( strName );
+    argStream.ReadNumber ( ucID );
+    if ( !argStream.HasErrors ( ) )
     {
-        const char* szName = lua_tostring ( luaVM, 1 );
-        unsigned char ucID;
-
-        if ( CStaticFunctionDefinitions::GetWeaponIDFromName ( szName, ucID ) )
+        if ( CStaticFunctionDefinitions::GetWeaponIDFromName ( strName, ucID ) )
         {
             lua_pushnumber ( luaVM, ucID );
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getWeaponIDFromName" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponIDFromName", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -102,7 +108,7 @@ int CLuaFunctionDefs::CreateWeapon ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "createWeapon" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createWeapon", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -122,7 +128,7 @@ int CLuaFunctionDefs::FireWeapon ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "fireWeapon" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fireWeapon", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -140,14 +146,14 @@ int CLuaFunctionDefs::SetWeaponAimPosition ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( CStaticFunctionDefinitions::SetWeaponRotation ( pWeapon, vecPos ) )
+        if ( CStaticFunctionDefinitions::SetAimPosition ( pWeapon, vecPos ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setWeaponAimPosition" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponAimPosition", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -172,7 +178,7 @@ int CLuaFunctionDefs::SetWeaponState ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setWeaponState" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponState", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
