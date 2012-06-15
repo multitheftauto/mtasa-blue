@@ -19,29 +19,21 @@
 class CColPointSAInterface
 {
 public:
-    CVector Position;
-    FLOAT fUnknown1;
-    CVector Normal;
-    FLOAT fUnknown2;
-    BYTE bSurfaceTypeA;
-    BYTE bPieceTypeA;
-    BYTE bLightingA;
-    BYTE bSurfaceTypeB;
-    BYTE bPieceTypeB;
-    BYTE bLightingB;
-    FLOAT fDepth;
-/*
-    +0 Position (12 Bytes  Vector)
-    +12?
-    +16 Normal (12 Bytes  Vector)
-    +32 SurfaceTypeA
-    +33 PieceTypeA
-    +34 LightingA (assumed)
-    +35 SurfaceTypeB 
-    +36 PieceTypeB
-    +37 LightingB 
-    +40 Depth (float)*/
+	CVector Position; // 0
+	float fUnknown1; // 12 
+	CVector Normal; // 16
+	float fUnknown2; // 28
+	uint8 bSurfaceTypeA; // 32
+	uint8 bPieceTypeA; // 33
+	uint8 bLightingA; // 34
+	uint8 bSurfaceTypeB; // 35
+	uint8 bPieceTypeB; // 36
+	uint8 bLightingB; // 37
+	uint8 pad1; // 38
+	uint8 pad2; // 39
+	float fDepth; // 40
 };
+C_ASSERT(sizeof(CColPointSAInterface) == 0x2C);
 
 class CColPointSA : public CColPoint
 {
