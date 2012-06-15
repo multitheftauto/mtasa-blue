@@ -88,8 +88,8 @@ int CLuaFunctionDefs::CreateWeapon ( lua_State* luaVM )
     eWeaponType weaponType;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( vecPos.fX );
-    argStream.ReadNumber ( vecPos.fX );
     argStream.ReadNumber ( vecPos.fY );
+    argStream.ReadNumber ( vecPos.fZ );
     argStream.ReadEnumString ( weaponType );
 
     if ( !argStream.HasErrors () )
@@ -140,7 +140,7 @@ int CLuaFunctionDefs::SetWeaponAimPosition ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( CStaticFunctionDefinitions::SetAimPosition ( pWeapon, vecPos ) )
+        if ( CStaticFunctionDefinitions::SetWeaponRotation ( pWeapon, vecPos ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;

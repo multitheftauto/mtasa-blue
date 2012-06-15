@@ -21,7 +21,7 @@ CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponT
     m_pWeapon = NULL;
     m_pWeaponInfo = g_pGame->GetWeaponInfo ( m_Type );
     m_bHasTargetDirection = false;
-
+    SetStatic ( true );
     Create ();
 }
 
