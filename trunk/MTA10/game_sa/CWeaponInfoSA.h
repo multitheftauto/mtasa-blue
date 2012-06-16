@@ -21,6 +21,24 @@
 #include <CVector.h>
 #include "Common.h"
 
+// Flame shot array for flamethrower flames and maybe molotovs
+#define ARRAY_CFlameShotInfo                0xC89690
+#define MAX_FLAME_SHOT_INFOS                64
+
+class CFlameShotInfo
+{
+public:
+    eWeaponType         weaponType;
+    CVector             vecPosition;
+    CVector             vecSize;
+    float               fRadius;
+    CEntitySAInterface* pInstigator;
+    float               fLifeSpan;
+    uint8               ucFlag1;
+    uint8               ucFlag2;
+    uint16              usPad;
+};
+
 class CWeaponInfoSAInterface // 112 byte long class
 {
 public:

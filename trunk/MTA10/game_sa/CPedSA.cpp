@@ -54,6 +54,15 @@ CPedSA::~CPedSA ( void )
         if ( this->m_pWeapons[i] )
             delete this->m_pWeapons[i];
     }
+
+    // Make sure this ped is not refed in the flame shot info array
+    CFlameShotInfo* pInfo = (CFlameShotInfo*)ARRAY_CFlameShotInfo;
+    for ( uint i = 0 ; i < MAX_FLAME_SHOT_INFOS ; i++ )
+    {
+        if ( pInfo->pInstigator == m_pInterface )
+            pInfo->pInstigator = NULL;
+        pInfo++;
+    }
 }
 
 // used to init weapons at the moment, called by CPlayerPedSA when its been constructed
