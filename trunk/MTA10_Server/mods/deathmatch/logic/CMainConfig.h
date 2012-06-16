@@ -115,6 +115,7 @@ public:
     int                             GetDebugFlag                    ( void )                    { return m_iDebugFlag; }
     bool                            GetSyncMapElementData           ( void ) const              { return m_bSyncMapElementData; }
     void                            SetSyncMapElementData           ( bool bOn )                { m_bSyncMapElementData = bOn; }
+    bool                            GetBulletSyncEnabled            ( void ) const              { return m_bBulletSyncEnabled; }
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
@@ -191,6 +192,7 @@ private:
     bool                            m_bThreadNetEnabled;
     int                             m_iDebugFlag;
     bool                            m_bSyncMapElementData;
+    int                             m_bBulletSyncEnabled;
     std::map < SString, SString >   m_TransientSettings;
     SNetOptions                     m_NetOptions;
     int                             m_iNetReliabilityMode;
