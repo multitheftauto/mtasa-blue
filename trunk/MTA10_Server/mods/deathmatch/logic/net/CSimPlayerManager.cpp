@@ -275,8 +275,7 @@ bool CSimPlayerManager::HandlePlayerPureSync ( const NetServerPlayerID& Socket, 
         if ( pPacket->Read ( *BitStream ) )
         {
             // Relay it to nearbyers
-            for ( int i = 0 ; i < g_pBandwidthSettings->iTestSendMultiplier ; i++ )
-                Broadcast ( *pPacket, pSourceSimPlayer->GetPuresyncSendList () );
+            Broadcast ( *pPacket, pSourceSimPlayer->GetPuresyncSendList () );
         }
 
         delete pPacket;

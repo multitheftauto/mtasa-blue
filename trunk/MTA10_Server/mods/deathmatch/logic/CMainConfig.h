@@ -112,10 +112,9 @@ public:
     int                             GetPendingWorkToDoSleepTime     ( void );
     int                             GetNoWorkToDoSleepTime          ( void );
     const SString&                  GetDbLogFilename                ( void )                    { return m_strDbLogFilename; }
-    int                             GetDebugFlag                    ( void )                    { return m_iDebugFlag; }
     bool                            GetSyncMapElementData           ( void ) const              { return m_bSyncMapElementData; }
     void                            SetSyncMapElementData           ( bool bOn )                { m_bSyncMapElementData = bOn; }
-    bool                            GetBulletSyncEnabled            ( void ) const              { return m_bBulletSyncEnabled; }
+    bool                            GetBulletSyncEnabled            ( void ) const              { return m_bBulletSyncEnabled != 0; }
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
@@ -126,7 +125,6 @@ public:
     void                            ApplyBandwidthReductionMode     ( void );
     void                            ApplyThreadNetEnabled           ( void );
     void                            SetFakeLag                      ( int iPacketLoss, int iExtraPing, int iExtraPingVary, int iKBPSLimit );
-    void                            SetTweakValue                   ( int iWhich, float fAmount );
     const SNetOptions&              GetNetOptions                   ( void )                    { return m_NetOptions; }
 
     const std::vector < SIntSetting >& GetIntSettingList            ( void );
@@ -190,12 +188,10 @@ private:
     int                             m_iPendingWorkToDoSleepTime;
     int                             m_iNoWorkToDoSleepTime;
     bool                            m_bThreadNetEnabled;
-    int                             m_iDebugFlag;
     bool                            m_bSyncMapElementData;
     int                             m_bBulletSyncEnabled;
     std::map < SString, SString >   m_TransientSettings;
     SNetOptions                     m_NetOptions;
-    int                             m_iNetReliabilityMode;
 };
 
 #endif
