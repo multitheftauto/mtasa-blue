@@ -2017,8 +2017,7 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
     if ( !sendList.empty () )
     {
         CLOCK( "RelayPlayerPuresync", "Broadcast" );
-        for ( int i = 0 ; i < g_pBandwidthSettings->iTestSendMultiplier ; i++ )
-            CPlayerManager::Broadcast ( Packet, sendList );
+        CPlayerManager::Broadcast ( Packet, sendList );
         UNCLOCK( "RelayPlayerPuresync", "Broadcast" );
     }
 
@@ -3868,18 +3867,6 @@ bool CGame::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& play
     else
         GetLatentTransferManager ()->AddSend ( playerID, ucPacketID, pBitStream, m_iLatentSendsBandwidth, m_pLatentSendsLuaMain );
     return true;
-}
-
-
-//////////////////////////////////////////////////////////////////
-//
-// CGame::SetDevSetting
-//
-// For testing features
-//
-//////////////////////////////////////////////////////////////////
-void CGame::SetDevSetting ( const SString& strCommand )
-{
 }
 
 

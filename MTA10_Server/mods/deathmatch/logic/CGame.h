@@ -355,7 +355,6 @@ public:
     void                        EnableLatentSends           ( bool bEnabled, int iBandwidth = 0, CLuaMain* pLuaMain = NULL );
     bool                        SendPacket                  ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
 
-    void                        SetDevSetting               ( const SString& strCommand );
     void                        SendBulletSyncSettings      ( CPlayer* pPlayer = NULL );
 
 private:
