@@ -1047,12 +1047,12 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit_Mid ()
         mov         eax,dword ptr [esp+28h+32]
         mov         dword ptr [edx+4],ecx
         mov         dword ptr [edx+8],eax
-        mov         edx,dword ptr [esp+3Ch+32]
-        mov         eax,dword ptr [esp+40h+32]
+        mov         edx,dword ptr [esp+3Ch+32+12]
+        mov         eax,dword ptr [esp+40h+32+12]
         sub         esp,0Ch
         mov         ecx,esp
         mov         dword ptr [ecx],edx
-        mov         edx,dword ptr [esp+50h+32]
+        mov         edx,dword ptr [esp+50h+32+12]
         mov         dword ptr [ecx+4],eax
         mov         dword ptr [ecx+8],edx
         push        edi

@@ -356,7 +356,7 @@ public:
     bool                        SendPacket                  ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
 
     void                        SetDevSetting               ( const SString& strCommand );
-    void                        SendBulletSyncSettings      ( CPlayer* pPlayer );
+    void                        SendBulletSyncSettings      ( CPlayer* pPlayer = NULL );
 
 private:
     void                        AddBuiltInEvents            ( void );
@@ -526,8 +526,6 @@ private:
     bool                        m_bLatentSendsEnabled;
     int                         m_iLatentSendsBandwidth;
     CLuaMain*                   m_pLatentSendsLuaMain;
-
-    std::set < eWeaponType >    m_weaponTypesUsingBulletSync;
 };
 
 #endif
