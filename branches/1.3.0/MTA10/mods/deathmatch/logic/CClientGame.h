@@ -389,7 +389,6 @@ public:
     void                                GottenPlayerScreenShot          ( const CBuffer& buffer, uint uiTimeSpentInQueue );
     void                                ProcessDelayedSendList          ( void );
 
-    void                                SetDevSetting                   ( const SString& strCommand );
     void                                SetWeaponTypesUsingBulletSync   ( const std::set < eWeaponType >& weaponTypesUsingBulletSync );
     bool                                GetWeaponTypeUsesBulletSync     ( eWeaponType weaponType );
 

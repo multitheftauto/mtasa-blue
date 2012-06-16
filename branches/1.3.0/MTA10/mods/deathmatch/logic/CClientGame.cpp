@@ -5643,29 +5643,6 @@ void CClientGame::ProcessDelayedSendList ( void )
 
 //////////////////////////////////////////////////////////////////
 //
-// CClientGame::SetDevSetting
-//
-// For testing features
-//
-//////////////////////////////////////////////////////////////////
-void CClientGame::SetDevSetting ( const SString& strCommand )
-{
-    std::vector < SString > parts;
-    (strCommand + ",,,").Split ( ",", parts );
-
-    SString strMessage = "Unknown setting";
-
-    if ( parts[0] == "bullet-sync" )
-    {
-        // Not used
-    }
-
-    g_pCore->GetConsole ()->Echo ( strMessage );
-}
-
-
-//////////////////////////////////////////////////////////////////
-//
 // CClientGame::SetWeaponTypesUsingBulletSync
 //
 // Set whether the local player will send bulletsync messages for the supplied weapon type

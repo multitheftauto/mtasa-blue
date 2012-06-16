@@ -25,14 +25,11 @@ public:
     CBandwidthSettings ( void )
     {
         SetNone ();
-        bTestPretendEveryoneIsNear = false;
-        iTestSendMultiplier = 1;
     }
 
     void SetNone ( void )
     {
         EnableLightSync ( false );
-        iLightSyncPlrsPerFrame = 20;
         fZone0Radius = 50;
         fZone1Angle = 135;
         fZone2Angle = 225;
@@ -47,7 +44,6 @@ public:
     void SetMedium ( void )
     {
         EnableLightSync ( false );
-        iLightSyncPlrsPerFrame = 15;
         fZone0Radius = 50;
         fZone1Angle = 135;
         fZone2Angle = 225;
@@ -62,7 +58,6 @@ public:
     void SetMaximum ( void )
     {
         EnableLightSync ( true );
-        iLightSyncPlrsPerFrame = 10;
         fZone0Radius = 20;
         fZone1Angle = 115;
         fZone2Angle = 185;
@@ -96,11 +91,6 @@ public:
     SFixedArray < int, ZONE_MAX > ZoneUpdateIntervals;   // First is always 0, next is Zone1 interval then Zone2 and Zone3
     int iMaxZoneIfOtherCanSee;
     bool bLightSyncEnabled;
-    int iLightSyncPlrsPerFrame;
-
-    // Testing
-    bool bTestPretendEveryoneIsNear;
-    int iTestSendMultiplier;
 };
 
 extern CBandwidthSettings* g_pBandwidthSettings;

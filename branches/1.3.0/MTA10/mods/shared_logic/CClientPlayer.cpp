@@ -289,11 +289,9 @@ void CClientPlayer::DischargeWeapon ( eWeaponType weaponType, const CVector& vec
              g_pClientGame->GetWeaponTypeUsesBulletSync ( weaponType ) )
         {
             // Set bullet start and end points
-            #if 0   // TODO fix this - Positions are out
-                m_shotSyncData->m_vecRemoteBulletSyncStart = vecStart;
-                m_shotSyncData->m_vecRemoteBulletSyncEnd = vecEnd;
-                m_shotSyncData->m_bRemoteBulletSyncVectorsValid = true;
-            #endif
+            m_shotSyncData->m_vecRemoteBulletSyncStart = vecStart;
+            m_shotSyncData->m_vecRemoteBulletSyncEnd = vecEnd;
+            m_shotSyncData->m_bRemoteBulletSyncVectorsValid = true;
 
             m_pPlayerPed->GetPedIntelligence ()->DischargeCurrentWeapon ( false );
         }

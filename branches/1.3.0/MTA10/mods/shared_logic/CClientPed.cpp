@@ -5150,12 +5150,13 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
     // Are we streamed in?
     if ( m_pPlayerPed )
     {  
-        bool bLoaded = true;
+        bool bLoaded = false;
         
         if( !pBlock->IsLoaded() )
         {
-            pBlock->Request ( BLOCKING );
-            assert( pBlock->IsLoaded () );
+            pBlock->Request ( BLOCKING, true );
+            if( pBlock->IsLoaded() )
+                bLoaded = true;
         }
 
         if ( bLoaded )
@@ -5186,7 +5187,9 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
         }
         else
         {
-            assert ( 0 );
+            SString strMessage ( "%s %d (%s)", pBlock->GetName (), pBlock->GetIndex (), szAnimName ); 
+            g_pCore->LogEvent ( 543, "Blocking anim load fail", "", strMessage );
+            AddReportLog ( 5431, SString ( "Failed to load animation %s", *strMessage ) );           
 /*
             // TODO: unload unreferenced blocks later on
             g_pGame->GetStreaming ()->RequestAnimations ( pBlock->GetIndex (), 8 );

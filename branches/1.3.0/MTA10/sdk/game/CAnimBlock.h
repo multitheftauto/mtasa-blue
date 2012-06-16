@@ -28,7 +28,7 @@ public:
     virtual int                                 GetIndex                ( void ) = 0;
     virtual void                                AddRef                  ( void ) = 0;
     virtual unsigned short                      GetRefs                 ( void ) = 0;
-    virtual void                                Request                 ( EModelRequestType requestType ) = 0;
+    virtual void                                Request                 ( EModelRequestType requestType, bool bAllowBlockingFail = false ) = 0;
     virtual bool                                IsLoaded                ( void ) = 0;
 };
 

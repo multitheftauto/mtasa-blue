@@ -2007,8 +2007,7 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
     if ( !sendList.empty () )
     {
         CLOCK( "RelayPlayerPuresync", "Broadcast" );
-        for ( int i = 0 ; i < g_pBandwidthSettings->iTestSendMultiplier ; i++ )
-            CPlayerManager::Broadcast ( Packet, sendList );
+        CPlayerManager::Broadcast ( Packet, sendList );
         UNCLOCK( "RelayPlayerPuresync", "Broadcast" );
     }
 
@@ -3685,6 +3684,7 @@ void CGame::SetGlitchEnabled ( const std::string& strGlitch, bool bEnabled )
     eGlitchType cGlitch = m_GlitchNames[strGlitch];
     assert ( cGlitch >= 0 && cGlitch < NUM_GLITCHES );
     m_Glitches[cGlitch] = bEnabled;
+    SendBulletSyncSettings ();
 }
 
 bool CGame::IsGlitchEnabled ( const std::string& strGlitch )
@@ -3848,51 +3848,43 @@ bool CGame::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& play
 
 //////////////////////////////////////////////////////////////////
 //
-// CGame::SetDevSetting
-//
-// For testing features
-//
-//////////////////////////////////////////////////////////////////
-void CGame::SetDevSetting ( const SString& strCommand )
-{
-    std::vector < SString > parts;
-    (strCommand + ",,,").Split ( ",", parts );
-
-    SString strMessage = "Unknown setting";
-
-    if ( parts[0] == "bullet-sync" )
-    {
-        eWeaponType weaponType;
-        if ( StringToEnum ( parts[1], weaponType ) )
-        {
-            bool bEnable = ( atoi ( parts[2] ) == 1 );
-            // Update settings map
-            if ( bEnable )
-                MapInsert ( m_weaponTypesUsingBulletSync, weaponType );
-            else
-                MapRemove ( m_weaponTypesUsingBulletSync, weaponType );
-
-            strMessage = SString ( "Bullet sync for %s is now %d" ,*parts[1] ,bEnable );
-
-            // Tell joined players about the new bullet sync settings
-            SendBulletSyncSettings ( NULL );
-        }
-    }
-
-    CLogger::LogPrintf ( strMessage + "\n" );
-}
-
-
-//////////////////////////////////////////////////////////////////
-//
 // CGame::SendBulletSyncSettings
 //
+// Determine and send required state of bullet sync
 // If player is NULL, send to all joined players
 //
 //////////////////////////////////////////////////////////////////
 void CGame::SendBulletSyncSettings ( CPlayer* pPlayer )
 {
-    CBulletsyncSettingsPacket packet ( m_weaponTypesUsingBulletSync );
+    // Determine
+    bool bConfigSaysEnable = m_pMainConfig->GetBulletSyncEnabled ();
+    bool bGlitchesSayEnable = ( m_Glitches [ GLITCH_FASTFIRE ] || m_Glitches [ GLITCH_CROUCHBUG ] );
+    bool bEnable = bConfigSaysEnable || bGlitchesSayEnable;
+
+    std::set < eWeaponType > weaponTypesUsingBulletSync;
+
+    // Set
+    if ( bEnable )
+    {
+        // List of weapons to enable bullet sync for. (Sniper rifle doesn't work and minigun causes too many packets)
+        eWeaponType weaponList[] = {    WEAPONTYPE_PISTOL,
+                                        WEAPONTYPE_PISTOL_SILENCED,
+                                        WEAPONTYPE_DESERT_EAGLE,
+                                        WEAPONTYPE_SHOTGUN,
+                                        WEAPONTYPE_SAWNOFF_SHOTGUN,
+                                        WEAPONTYPE_SPAS12_SHOTGUN,
+                                        WEAPONTYPE_MICRO_UZI,
+                                        WEAPONTYPE_MP5,
+                                        WEAPONTYPE_AK47,
+                                        WEAPONTYPE_M4,
+                                        WEAPONTYPE_TEC9,
+                                        WEAPONTYPE_COUNTRYRIFLE };
+
+        for ( uint i = 0 ; i < NUMELMS( weaponList ) ; i++ )
+            MapInsert ( weaponTypesUsingBulletSync, weaponList[i] );
+    }
+
+    CBulletsyncSettingsPacket packet ( weaponTypesUsingBulletSync );
     if ( pPlayer )
         pPlayer->Send ( packet );
     else

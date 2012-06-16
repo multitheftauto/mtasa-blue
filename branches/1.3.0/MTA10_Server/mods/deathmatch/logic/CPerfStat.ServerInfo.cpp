@@ -310,10 +310,6 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         m_StatusList.push_back ( StringPair ( "Packets/sec  blocked",       strIncomingPacketsPSBlocked ) );
         m_StatusList.push_back ( StringPair ( "Usage incl. blocked",        CPerfStatManager::GetScaledBitString ( llNetworkUsageBytesPSInclBlocked * 8LL ) + "/s" ) );
 
-        m_OptionsList.push_back ( StringPair ( "Max LS plrs/frame",         SString ( "%d", g_pBandwidthSettings->iLightSyncPlrsPerFrame ) ) );
-        m_OptionsList.push_back ( StringPair ( "Test - Everyone near",      SString ( "%d", g_pBandwidthSettings->bTestPretendEveryoneIsNear ) ) );
-        m_OptionsList.push_back ( StringPair ( "Test - Send multiplier",    SString ( "%d", g_pBandwidthSettings->iTestSendMultiplier ) ) );
-
         m_OptionsList.push_back ( StringPair ( "Main (Logic) core #",       SString ( "%d", _GetCurrentProcessorNumber () ) ) );
         m_OptionsList.push_back ( StringPair ( "Threadnet (Sync) core #",   SString ( "%d", g_uiThreadnetProcessorNumber ) ) );
         m_OptionsList.push_back ( StringPair ( "Raknet thread core #",      SString ( "%d", m_PrevLiveStats.uiNetworkUpdateLoopProcessorNumber ) ) );

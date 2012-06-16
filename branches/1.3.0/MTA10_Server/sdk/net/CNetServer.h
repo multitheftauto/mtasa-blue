@@ -35,17 +35,6 @@ struct SNetOptions
         int iExtraPingVariance;
         int iKBPSLimit;
     } netSim;
-
-    struct {
-        bool bValid;
-        float fTweak1Amount;
-        float fTweak2Amount;
-    } netTweak;
-
-    struct {
-        bool bValid;
-        int reliabilityMode;
-    } netType;
 };
 
 class CNetServer
