@@ -44,29 +44,6 @@ CClientWeapon::~CClientWeapon ( void )
 
 void CClientWeapon::DoPulse ( void )
 {
-    if ( m_pAttachedToEntity )
-    {
-        CVector vecRotation, vecMyRotation;
-        GetRotationDegrees( vecMyRotation );
-        switch ( m_pAttachedToEntity->GetType ( ) )
-        {
-            case CCLIENTVEHICLE:
-            {
-                CClientVehicle * pVehicle = (CClientVehicle*)m_pAttachedToEntity;
-                pVehicle->GetRotationDegrees ( vecRotation );
-            }
-            case CCLIENTOBJECT:
-            {
-                CClientObject * pObject = (CClientObject*)m_pAttachedToEntity;
-                pObject->GetRotationDegrees ( vecRotation );
-            }
-            case CCLIENTPED:
-            {
-                CClientPed * pPed = (CClientPed*)m_pAttachedToEntity;
-                pPed->GetRotationDegrees ( vecRotation );
-            }
-        }
-    }
     if ( m_bHasTargetDirection )
     {
         CVector vecDirection = m_vecLastDirection;
@@ -130,26 +107,13 @@ void CClientWeapon::Fire ( void )
             GetPosition ( vecOrigin );
             if ( m_pAttachedToEntity )
             {
-                switch ( m_pAttachedToEntity->GetType ( ) )
-                {
-                    case CCLIENTVEHICLE:
-                    {
-                        CClientVehicle * pVehicle = (CClientVehicle*)m_pAttachedToEntity;
-                        pVehicle->GetRotationRadians ( vecRotation );
-                    }
-                    case CCLIENTOBJECT:
-                    {
-                        CClientObject * pObject = (CClientObject*)m_pAttachedToEntity;
-                        pObject->GetRotationRadians ( vecRotation );
-                    }
-                    case CCLIENTPED:
-                    {
-                        CClientPed * pPed = (CClientPed*)m_pAttachedToEntity;
-                        pPed->GetRotationRadians ( vecRotation );
-                    }
-                }
-                
-                vecRotation -= m_vecAttachedRotation;
+
+                GetRotationRadians ( vecRotation );
+                // Fixes vehicle rotation.... god.
+                vecRotation.fX = ConvertDegreesToRadians( 360.0f - ConvertRadiansToDegrees ( vecRotation.fX ) );
+                vecRotation.fY = ConvertDegreesToRadians( 360.0f - ConvertRadiansToDegrees ( vecRotation.fY ) );
+                vecRotation.fZ = ConvertDegreesToRadians( 360.0f - ConvertRadiansToDegrees ( vecRotation.fZ ) );
+                vecRotation = -vecRotation;
             }
             else
             {
