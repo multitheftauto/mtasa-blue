@@ -117,6 +117,7 @@ public:
     void                        ApplyMinClientRequirement       ( CResource* pResource, const SString& strMinClientRequirement );
     void                        RemoveMinClientRequirement      ( CResource* pResource );
     void                        ReevaluateMinClientRequirement  ( void );
+    SString                     GetMinClientRequirement         ( void )            { return m_strMinClientRequirement; }
 
     void                        ApplySyncMapElementDataOption       ( CResource* pResource, bool bSyncMapElementData );
     void                        RemoveSyncMapElementDataOption      ( CResource* pResource );
@@ -137,6 +138,7 @@ private:
 
     list<sResourceQueue>        m_resourceQueue;
 
+    SString                                 m_strMinClientRequirement;
     std::map < CResource*, SString >        m_MinClientRequirementMap;
     std::map < CResource*, bool >           m_SyncMapElementDataOptionMap;
 };

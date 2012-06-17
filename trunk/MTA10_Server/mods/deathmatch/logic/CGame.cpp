@@ -27,6 +27,8 @@
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
 #define MAX_PROJECTILE_SYNC_DISTANCE 400.0f
 
+#define BULLET_SYNC_MIN_CLIENT_VERSION  "1.3.0-9.04224"
+
 #define RUN_CHILDREN CChildListType::const_iterator iter=pElement->IterBegin();for(;iter!=pElement->IterEnd();iter++)
 
 CGame* g_pGame = NULL;
@@ -1620,19 +1622,19 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 pPlayer->SetPlayerVersion ( strPlayerVersion );
 
                                 // Check if client must update
-                                if ( GetConfig ()->IsBelowMinimumClient ( pPlayer->GetPlayerVersion () ) )
+                                if ( IsBelowMinimumClient ( pPlayer->GetPlayerVersion () ) )
                                 {
                                     // Tell the console
                                     CLogger::LogPrintf ( "CONNECT: %s failed to connect (Client version is below minimum) (%s)\n", szNick, strIPAndSerial.c_str () );
 
                                     // Tell the player
-                                    pPlayer->Send ( CUpdateInfoPacket ( "Mandatory", GetConfig ()->GetMinimumClientVersion () ) );
+                                    pPlayer->Send ( CUpdateInfoPacket ( "Mandatory", CalculateMinClientRequirement () ) );
                                     DisconnectPlayer ( this, *pPlayer, "" );
                                     return;
                                 }
 
                                 // Check if client should optionally update
-                                if ( Packet.IsOptionalUpdateInfoRequired () && GetConfig ()->IsBelowRecommendedClient ( pPlayer->GetPlayerVersion () ) )
+                                if ( Packet.IsOptionalUpdateInfoRequired () && IsBelowRecommendedClient ( pPlayer->GetPlayerVersion () ) )
                                 {
                                     // Tell the console
                                     CLogger::LogPrintf ( "CONNECT: %s advised to update (Client version is below recommended) (%s)\n", szNick, strIPAndSerial.c_str () );
@@ -3709,6 +3711,7 @@ void CGame::SetGlitchEnabled ( const std::string& strGlitch, bool bEnabled )
     assert ( cGlitch >= 0 && cGlitch < NUM_GLITCHES );
     m_Glitches[cGlitch] = bEnabled;
     SendBulletSyncSettings ();
+    CalculateMinClientRequirement ();
 }
 
 bool CGame::IsGlitchEnabled ( const std::string& strGlitch )
@@ -3872,6 +3875,21 @@ bool CGame::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& play
 
 //////////////////////////////////////////////////////////////////
 //
+// CGame::IsBulletSyncActive
+//
+// Determine the state of bullet sync
+//
+//////////////////////////////////////////////////////////////////
+bool CGame::IsBulletSyncActive ( void )
+{
+    bool bConfigSaysEnable = m_pMainConfig->GetBulletSyncEnabled ();
+    bool bGlitchesSayEnable = ( m_Glitches [ GLITCH_FASTFIRE ] || m_Glitches [ GLITCH_CROUCHBUG ] );
+    return bConfigSaysEnable || bGlitchesSayEnable;
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
 // CGame::SendBulletSyncSettings
 //
 // Determine and send required state of bullet sync
@@ -3880,15 +3898,9 @@ bool CGame::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& play
 //////////////////////////////////////////////////////////////////
 void CGame::SendBulletSyncSettings ( CPlayer* pPlayer )
 {
-    // Determine
-    bool bConfigSaysEnable = m_pMainConfig->GetBulletSyncEnabled ();
-    bool bGlitchesSayEnable = ( m_Glitches [ GLITCH_FASTFIRE ] || m_Glitches [ GLITCH_CROUCHBUG ] );
-    bool bEnable = bConfigSaysEnable || bGlitchesSayEnable;
-
     std::set < eWeaponType > weaponTypesUsingBulletSync;
 
-    // Set
-    if ( bEnable )
+    if ( IsBulletSyncActive () )
     {
         // List of weapons to enable bullet sync for. (Sniper rifle doesn't work and minigun causes too many packets)
         eWeaponType weaponList[] = {    WEAPONTYPE_PISTOL,
@@ -3913,4 +3925,98 @@ void CGame::SendBulletSyncSettings ( CPlayer* pPlayer )
         pPlayer->Send ( packet );
     else
         m_pPlayerManager->BroadcastOnlyJoined ( packet );
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CGame::IsBelowMinimumClient
+//
+// Check if supplied version string is below current minimum requirement
+//
+//////////////////////////////////////////////////////////////////
+bool CGame::IsBelowMinimumClient ( const SString& strVersion )
+{
+    return strVersion < CalculateMinClientRequirement ();
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CGame::IsBelowRecommendedClient
+//
+// Check if supplied version string is below recommended
+//
+//////////////////////////////////////////////////////////////////
+bool CGame::IsBelowRecommendedClient ( const SString& strVersion )
+{
+    return strVersion < m_pMainConfig->GetRecommendedClientVersion ();
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CGame::CalculateMinClientRequirement
+//
+// Determine min client version setting to apply for connecting players
+//
+//////////////////////////////////////////////////////////////////
+SString CGame::CalculateMinClientRequirement ( void )
+{
+    SString strMinClientRequirementFromConfig = m_pMainConfig->GetMinClientVersion ();
+    SString strMinClientRequirementFromResources = m_pResourceManager->GetMinClientRequirement ();
+
+    SString strNewMin;
+
+    if ( strNewMin < strMinClientRequirementFromConfig )
+        strNewMin = strMinClientRequirementFromConfig;
+
+    if ( strNewMin < strMinClientRequirementFromResources )
+        strNewMin = strMinClientRequirementFromResources;
+
+    if ( g_pGame->IsBulletSyncActive () )
+    {
+        if ( strNewMin < BULLET_SYNC_MIN_CLIENT_VERSION )
+            strNewMin = BULLET_SYNC_MIN_CLIENT_VERSION;
+    }
+
+    if ( strNewMin != m_strPrevMinClientConnectRequirement )
+    {
+        m_strPrevMinClientConnectRequirement = strNewMin;
+        if ( !strNewMin.empty () )
+            CLogger::LogPrintf ( SString ( "Server minclientversion is now %s\n", *strNewMin ) );
+    }
+
+    // Do kick check as well
+    {
+        SString strKickMin;
+
+        if ( g_pGame->IsBulletSyncActive () )
+        {
+            if ( strKickMin < BULLET_SYNC_MIN_CLIENT_VERSION )
+                strKickMin = BULLET_SYNC_MIN_CLIENT_VERSION;
+        }
+
+        if ( strKickMin != m_strPrevMinClientKickRequirement )
+        {
+            m_strPrevMinClientKickRequirement = strKickMin;
+
+            // Do kicking
+            uint uiNumIncompatiblePlayers = 0;
+            for ( std::list < CPlayer* > ::const_iterator iter = g_pGame->GetPlayerManager ()->IterBegin () ; iter != g_pGame->GetPlayerManager ()->IterEnd () ; iter++ )
+            {
+                CPlayer* pPlayer = *iter;
+                if ( strKickMin > pPlayer->GetPlayerVersion () )
+                {
+                    CStaticFunctionDefinitions::RedirectPlayer ( pPlayer, "", 0, NULL );
+                    uiNumIncompatiblePlayers++;
+                }
+            }
+
+            if ( uiNumIncompatiblePlayers > 0 )
+                CLogger::LogPrintf ( SString ( "Forced %d player(s) to reconnect so they can update to %s\n", uiNumIncompatiblePlayers, *strKickMin ) );
+        }
+    }
+
+    return strNewMin;
 }
