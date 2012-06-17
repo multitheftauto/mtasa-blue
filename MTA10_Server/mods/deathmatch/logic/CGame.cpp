@@ -3969,11 +3969,6 @@ SString CGame::CalculateMinClientRequirement ( void )
 
     SString strNewMin;
 
-#ifndef MTA_DEBUG
-    if ( strNewMin < RELEASE_MIN_CLIENT_VERSION )
-        strNewMin = RELEASE_MIN_CLIENT_VERSION;
-#endif
-
     if ( strNewMin < strMinClientRequirementFromConfig )
         strNewMin = strMinClientRequirementFromConfig;
 
@@ -4023,6 +4018,11 @@ SString CGame::CalculateMinClientRequirement ( void )
                 CLogger::LogPrintf ( SString ( "Forced %d player(s) to reconnect so they can update to %s\n", uiNumIncompatiblePlayers, *strKickMin ) );
         }
     }
+
+#ifndef MTA_DEBUG
+    if ( strNewMin < RELEASE_MIN_CLIENT_VERSION )
+        strNewMin = RELEASE_MIN_CLIENT_VERSION;
+#endif
 
     return strNewMin;
 }
