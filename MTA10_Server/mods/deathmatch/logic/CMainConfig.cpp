@@ -987,19 +987,6 @@ int CMainConfig::GetNoWorkToDoSleepTime ( void )
 }
 
 
-SString CMainConfig::GetMinimumClientVersion ( void )
-{
-    SString strMinReq = m_strMinClientVersionOverride > m_strMinClientVersion ? m_strMinClientVersionOverride : m_strMinClientVersion;
-#ifndef MTA_DEBUG
-    // For forcing a minclient requirement
-    SString strMinReqForRelease = "1.4.0-0.00000";
-    if ( strMinReqForRelease > strMinReq )
-        strMinReq = strMinReqForRelease;
-#endif
-    return strMinReq;
-}
-
-
 //////////////////////////////////////////////////////////////////////
 //
 // Fetch any single setting from the server config
@@ -1312,4 +1299,5 @@ void CMainConfig::OnTickRateChange ( void )
 {
     CStaticFunctionDefinitions::SendSyncIntervals ();
     g_pGame->SendBulletSyncSettings ();
+    g_pGame->CalculateMinClientRequirement ();
 }
