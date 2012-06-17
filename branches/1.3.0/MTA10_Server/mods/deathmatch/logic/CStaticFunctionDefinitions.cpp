@@ -3308,6 +3308,17 @@ bool CStaticFunctionDefinitions::RedirectPlayer ( CElement* pElement, const char
 
         unsigned char ucHostLength = static_cast < unsigned char > ( strlen ( szHost ) );
 
+        if ( ucHostLength == 0 )
+        {
+            if ( pPlayer->GetBitStreamVersion () < 0x2E )
+            {
+                // Reconnect to same server didn't work before bitstream 0x2E, so disconnect with a message
+                pPlayer->Send ( CPlayerDisconnectedPacket ( "Please reconnect" ) );
+                g_pGame->QuitPlayer ( *pPlayer );
+                return true;
+            }
+        }
+
         CBitStream BitStream;
         BitStream.pBitStream->Write ( ucHostLength );
         BitStream.pBitStream->Write ( szHost, ucHostLength );

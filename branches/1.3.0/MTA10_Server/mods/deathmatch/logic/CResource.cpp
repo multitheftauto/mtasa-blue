@@ -213,17 +213,17 @@ bool CResource::Load ( void )
                     m_pNodeSettings = pNodeSettings->CopyNode ( NULL );
 
                 // Find the client and server version requirements
-                m_strMinClientReqFromConfig = "";
-                m_strMinServerReqFromConfig = "";
+                m_strMinClientReqFromMetaXml = "";
+                m_strMinServerReqFromMetaXml = "";
                 CXMLNode * pNodeMinMtaVersion = root->FindSubNode ( "min_mta_version", 0 );
                 if ( pNodeMinMtaVersion && MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE )
                 {
                     if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "server" ) )
-                        m_strMinServerReqFromConfig = pAttr->GetValue ();
+                        m_strMinServerReqFromMetaXml = pAttr->GetValue ();
                     if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "client" ) )
-                        m_strMinClientReqFromConfig = pAttr->GetValue ();
+                        m_strMinClientReqFromMetaXml = pAttr->GetValue ();
                     if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "both" ) )
-                        m_strMinServerReqFromConfig = m_strMinClientReqFromConfig = pAttr->GetValue ();
+                        m_strMinServerReqFromMetaXml = m_strMinClientReqFromMetaXml = pAttr->GetValue ();
                 }
 
                 // Find the acl requets
@@ -665,7 +665,7 @@ void CResource::ApplyUpgradeModifications ( void )
 //
 void CResource::LogUpgradeWarnings ( void )
 {
-    CResourceChecker ().LogUpgradeWarnings ( this, m_strResourceZip, m_strMinClientReqCalculated, m_strMinServerReqCalculated, m_strMinClientReason, m_strMinServerReason );
+    CResourceChecker ().LogUpgradeWarnings ( this, m_strResourceZip, m_strMinClientReqFromSource, m_strMinServerReqFromSource, m_strMinClientReason, m_strMinServerReason );
     SString strStatus;
     if ( !GetCompatibilityStatus ( strStatus ) )
     {
@@ -681,7 +681,7 @@ void CResource::LogUpgradeWarnings ( void )
 bool CResource::GetCompatibilityStatus ( SString& strOutStatus )
 {
     // Check declared version strings are valid
-    if ( !IsValidVersionString ( m_strMinServerReqFromConfig ) || !IsValidVersionString ( m_strMinClientReqFromConfig ) )
+    if ( !IsValidVersionString ( m_strMinServerReqFromMetaXml ) || !IsValidVersionString ( m_strMinClientReqFromMetaXml ) )
     {
         strOutStatus = "<min_mta_version> section in the meta.xml contains invalid version strings";
         return false;
@@ -689,27 +689,27 @@ bool CResource::GetCompatibilityStatus ( SString& strOutStatus )
 
     // Check this server can run this resource
     SString strServerVersion = CStaticFunctionDefinitions::GetVersionSortable ();
-    if ( m_strMinServerReqFromConfig > strServerVersion )
+    if ( m_strMinServerReqFromMetaXml > strServerVersion )
     {
-        strOutStatus = SString ( "this server version is too low (%s required)", *m_strMinServerReqFromConfig );
+        strOutStatus = SString ( "this server version is too low (%s required)", *m_strMinServerReqFromMetaXml );
         return false;
     }
 
     // This should not happen
-    if ( m_strMinServerReqCalculated > strServerVersion )
+    if ( m_strMinServerReqFromSource > strServerVersion )
     {
         strOutStatus = "server has come back from the future";
         return false;
     }
 
     // Check if calculated version is higher than declared version
-    if ( m_strMinClientReqCalculated > m_strMinClientReqFromConfig || m_strMinServerReqCalculated > m_strMinServerReqFromConfig )
+    if ( m_strMinClientReqFromSource > m_strMinClientReqFromMetaXml || m_strMinServerReqFromSource > m_strMinServerReqFromMetaXml )
     {
         strOutStatus = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
-        if ( !m_strMinClientReqCalculated.empty () )
-            strOutStatus += SString ( "client %s because of '%s')", *m_strMinClientReqCalculated, *m_strMinClientReason );
+        if ( !m_strMinClientReqFromSource.empty () )
+            strOutStatus += SString ( "client %s because of '%s')", *m_strMinClientReqFromSource, *m_strMinClientReason );
         else
-            strOutStatus += SString ( "server %s because of '%s')", *m_strMinServerReqCalculated, *m_strMinServerReason );
+            strOutStatus += SString ( "server %s because of '%s')", *m_strMinServerReqFromSource, *m_strMinServerReason );
         return false;
     }
 
@@ -717,12 +717,12 @@ bool CResource::GetCompatibilityStatus ( SString& strOutStatus )
     {
         uint uiNumIncompatiblePlayers = 0;
         for ( std::list < CPlayer* > ::const_iterator iter = g_pGame->GetPlayerManager ()->IterBegin () ; iter != g_pGame->GetPlayerManager ()->IterEnd () ; iter++ )
-            if ( m_strMinClientReqFromConfig > (*iter)->GetPlayerVersion () )
+            if ( m_strMinClientReqFromMetaXml > (*iter)->GetPlayerVersion () )
                 uiNumIncompatiblePlayers++;
 
         if ( uiNumIncompatiblePlayers > 0 )
         {
-            strOutStatus += SString ( "%d connected player(s) below required client version %s", uiNumIncompatiblePlayers, *m_strMinClientReqFromConfig );
+            strOutStatus += SString ( "%d connected player(s) below required client version %s", uiNumIncompatiblePlayers, *m_strMinClientReqFromMetaXml );
             return false;
         }
     }
@@ -747,7 +747,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         if ( !m_bDoneUpgradeWarnings )
         {
             m_bDoneUpgradeWarnings = true;
-            CResourceChecker ().LogUpgradeWarnings ( this, m_strResourceZip, m_strMinClientReqCalculated, m_strMinServerReqCalculated, m_strMinClientReason, m_strMinServerReason );
+            CResourceChecker ().LogUpgradeWarnings ( this, m_strResourceZip, m_strMinClientReqFromSource, m_strMinServerReqFromSource, m_strMinClientReason, m_strMinServerReason );
         }
 
         // MTA version check
@@ -938,7 +938,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         m_bClientFiles = bClientFiles;
 
         m_bHasStarted = true;
-        m_resourceManager->ApplyMinClientRequirement ( this, m_strMinClientReqFromConfig );
+        m_resourceManager->ApplyMinClientRequirement ( this, m_strMinClientReqFromMetaXml );
 
         // Broadcast new resourceelement that is loaded and tell the players that a new resource was started
         g_pGame->GetMapManager()->BroadcastElements ( m_pResourceElement, true );

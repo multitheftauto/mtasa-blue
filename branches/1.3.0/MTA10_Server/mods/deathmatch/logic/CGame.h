@@ -354,7 +354,12 @@ public:
     void                        EnableLatentSends           ( bool bEnabled, int iBandwidth = 0, CLuaMain* pLuaMain = NULL );
     bool                        SendPacket                  ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
 
+    bool                        IsBulletSyncActive          ( void );
     void                        SendBulletSyncSettings      ( CPlayer* pPlayer = NULL );
+
+    SString                     CalculateMinClientRequirement   ( void );
+    bool                        IsBelowMinimumClient            ( const SString& strVersion );
+    bool                        IsBelowRecommendedClient        ( const SString& strVersion );
 
 private:
     void                        AddBuiltInEvents            ( void );
@@ -523,6 +528,9 @@ private:
     bool                        m_bLatentSendsEnabled;
     int                         m_iLatentSendsBandwidth;
     CLuaMain*                   m_pLatentSendsLuaMain;
+
+    SString                     m_strPrevMinClientKickRequirement;
+    SString                     m_strPrevMinClientConnectRequirement;
 };
 
 #endif

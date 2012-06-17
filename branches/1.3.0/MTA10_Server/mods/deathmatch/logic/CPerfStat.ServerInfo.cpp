@@ -274,7 +274,7 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     if ( ASE* pAse = ASE::GetInstance() )
         m_StatusList.push_back ( StringPair ( "ASE queries",            SString ( "%d (%d/min)", pAse->GetTotalQueryCount (), pAse->GetQueriesPerMinute () ) ) );
 
-    m_OptionsList.push_back ( StringPair ( "MinClientVersion",          pConfig->GetMinimumClientVersion () ) );
+    m_OptionsList.push_back ( StringPair ( "MinClientVersion",          g_pGame->CalculateMinClientRequirement () ) );
     m_OptionsList.push_back ( StringPair ( "RecommendedClientVersion",  pConfig->GetRecommendedClientVersion () ) );
     m_OptionsList.push_back ( StringPair ( "NetworkEncryptionEnabled",  SString ( "%d", pConfig->GetNetworkEncryptionEnabled () ) ) );
     m_OptionsList.push_back ( StringPair ( "VoiceEnabled",              SString ( "%d", pConfig->IsVoiceEnabled () ) ) );
