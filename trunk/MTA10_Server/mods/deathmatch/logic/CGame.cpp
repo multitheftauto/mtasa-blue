@@ -27,6 +27,7 @@
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
 #define MAX_PROJECTILE_SYNC_DISTANCE 400.0f
 
+#define RELEASE_MIN_CLIENT_VERSION      "1.4.0-0.00000"
 #define BULLET_SYNC_MIN_CLIENT_VERSION  "1.3.0-9.04224"
 
 #define RUN_CHILDREN CChildListType::const_iterator iter=pElement->IterBegin();for(;iter!=pElement->IterEnd();iter++)
@@ -3967,6 +3968,11 @@ SString CGame::CalculateMinClientRequirement ( void )
     SString strMinClientRequirementFromResources = m_pResourceManager->GetMinClientRequirement ();
 
     SString strNewMin;
+
+#ifndef MTA_DEBUG
+    if ( strNewMin < RELEASE_MIN_CLIENT_VERSION )
+        strNewMin = RELEASE_MIN_CLIENT_VERSION;
+#endif
 
     if ( strNewMin < strMinClientRequirementFromConfig )
         strNewMin = strMinClientRequirementFromConfig;
