@@ -100,11 +100,25 @@ int CLuaFunctionDefs::CreateWeapon ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CClientWeapon * pWeapon = CStaticFunctionDefinitions::CreateWeapon ( weaponType, vecPos );
-        if ( pWeapon )
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            lua_pushelement ( luaVM, pWeapon );
-            return 1;
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( pResource )
+            {
+                CClientWeapon * pWeapon = CStaticFunctionDefinitions::CreateWeapon ( *pResource, weaponType, vecPos );
+                if ( pWeapon )
+                {
+                    CElementGroup * pGroup = pResource->GetElementGroup();
+                    if ( pGroup )
+                    {
+                        pGroup->Add ( ( CClientEntity* ) pWeapon );
+                    }
+
+                    lua_pushelement ( luaVM, pWeapon );
+                    return 1;
+                }
+            }
         }
     }
     else
@@ -159,8 +173,6 @@ int CLuaFunctionDefs::SetWeaponAimPosition ( lua_State* luaVM )
     return 1;
 }
 
-
-
 int CLuaFunctionDefs::SetWeaponState ( lua_State* luaVM )
 {
     CClientWeapon * pWeapon;
@@ -183,4 +195,3 @@ int CLuaFunctionDefs::SetWeaponState ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-

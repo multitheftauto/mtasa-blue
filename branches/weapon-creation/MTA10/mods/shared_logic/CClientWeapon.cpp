@@ -58,8 +58,6 @@ void CClientWeapon::DoPulse ( void )
                 pPed->GetRotationDegrees ( vecRotation );
             }
         }
-        vecRotation.fZ -= ConvertRadiansToDegrees ( m_vecAttachedRotation.fZ );
-        SetRotationDegrees( vecRotation );
     }
     if ( m_bHasTargetDirection )
     {
@@ -122,8 +120,36 @@ void CClientWeapon::Fire ( void )
         {
             CVector vecOrigin, vecRotation;
             GetPosition ( vecOrigin );
-            GetRotationRadians ( vecRotation );
-            vecRotation = -vecRotation;
+            if ( m_pAttachedToEntity )
+            {
+                switch ( m_pAttachedToEntity->GetType ( ) )
+                {
+                    case CCLIENTVEHICLE:
+                    {
+                        CClientVehicle * pVehicle = (CClientVehicle*)m_pAttachedToEntity;
+                        pVehicle->GetRotationRadians ( vecRotation );
+                    }
+                    case CCLIENTOBJECT:
+                    {
+                        CClientObject * pObject = (CClientObject*)m_pAttachedToEntity;
+                        pObject->GetRotationRadians ( vecRotation );
+                    }
+                    case CCLIENTPED:
+                    {
+                        CClientPed * pPed = (CClientPed*)m_pAttachedToEntity;
+                        pPed->GetRotationRadians ( vecRotation );
+                    }
+                }
+                
+                vecRotation -= m_vecAttachedRotation;
+            }
+            else
+            {
+                GetRotationRadians ( vecRotation );
+
+                vecRotation = -vecRotation;
+            }
+            
 
             CVector vecFireOffset = *m_pWeaponInfo->GetFireOffset ();
             RotateVector ( vecFireOffset, vecRotation );

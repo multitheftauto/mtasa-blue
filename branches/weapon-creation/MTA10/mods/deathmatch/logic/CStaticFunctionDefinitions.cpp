@@ -6326,10 +6326,11 @@ bool CStaticFunctionDefinitions::GetWeaponIDFromName ( const char* szName, unsig
     return ucID != 0xFF;
 }
 
-CClientWeapon* CStaticFunctionDefinitions::CreateWeapon ( eWeaponType weaponType, CVector vecPosition )
+CClientWeapon* CStaticFunctionDefinitions::CreateWeapon ( CResource& Resource, eWeaponType weaponType, CVector vecPosition )
 {
     CClientWeapon * pWeapon = new CClientWeapon ( m_pManager, INVALID_ELEMENT_ID, weaponType );
     pWeapon->SetPosition ( vecPosition );
+    pWeapon->SetParent ( Resource.GetResourceDynamicEntity () );
     return pWeapon;
 }
 
