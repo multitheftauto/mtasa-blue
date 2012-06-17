@@ -23,6 +23,12 @@ CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponT
     m_bHasTargetDirection = false;
     SetStatic ( true );
     Create ();
+    m_pMarker = new CClientMarker ( pManager, INVALID_ELEMENT_ID, 4 );
+    m_pMarker->SetColor( SColor( 0xFF00FF00 ) );
+    m_pMarker->SetSize ( 0.5f );
+    m_pMarker2 = new CClientMarker ( pManager, INVALID_ELEMENT_ID, 4 );
+    m_pMarker2->SetColor( SColor( 0xFFFF0000 ) );
+    m_pMarker2->SetSize ( 0.5f );
 }
 
 
@@ -31,6 +37,8 @@ CClientWeapon::~CClientWeapon ( void )
     m_pManager->GetWeaponManager ()->RemoveFromList ( this );
 
     Destroy ();
+    delete m_pMarker;
+    delete m_pMarker2;
 }
 
 
@@ -157,10 +165,11 @@ void CClientWeapon::Fire ( void )
 
             float fDistance = m_pWeaponInfo->GetWeaponRange ();
             CVector vecDirection ( 1, 0, 0 );
-            RotateVector ( vecDirection, vecRotation );
             vecDirection *= fDistance;
+            RotateVector ( vecDirection, vecRotation );
             CVector vecTarget = vecOrigin + vecDirection;
-
+            
+            m_pMarker->SetPosition ( vecTarget );
             FireInstantHit ( vecOrigin, vecTarget );
             break;
         }
@@ -203,6 +212,7 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
         g_pGame->GetFx ()->TriggerBulletSplash ( vecCollision );
         g_pGame->GetAudioEngine ()->ReportBulletHit ( NULL, SURFACE_TYPE_WATER_SHALLOW, &vecCollision, 0.0f );
     }    
+    m_pMarker2->SetPosition ( vecTarget );
 
     m_pWeapon->DoBulletImpact ( m_pObject, pColEntity, &vecOrigin, &vecTarget, pColPoint, 1 );
     if ( pColEntity && pColEntity->GetEntityType () == ENTITY_TYPE_PED )

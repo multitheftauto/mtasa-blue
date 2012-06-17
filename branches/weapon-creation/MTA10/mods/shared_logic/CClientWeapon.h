@@ -52,6 +52,8 @@ private:
     CVector                 m_vecTargetDirection;
     CVector                 m_vecLastDirection;
     bool                    m_bHasTargetDirection;
+    CClientMarker *         m_pMarker;
+    CClientMarker *         m_pMarker2;
 };
 
 #endif
