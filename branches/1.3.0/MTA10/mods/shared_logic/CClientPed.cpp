@@ -5150,16 +5150,12 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
     // Are we streamed in?
     if ( m_pPlayerPed )
     {  
-        bool bLoaded = false;
-        
         if( !pBlock->IsLoaded() )
         {
             pBlock->Request ( BLOCKING, true );
-            if( pBlock->IsLoaded() )
-                bLoaded = true;
         }
 
-        if ( bLoaded )
+        if ( pBlock->IsLoaded() )
         {
             int flags = 0x10; // // Stops jaw fucking up, some speaking flag maybe   
             if ( bLoop ) flags |= 0x2; // flag that triggers the loop (Maccer)
