@@ -24,10 +24,13 @@ public:
      *              - (at ctor) calls Particle Activator
      *  Particle Emitters have base in CParticleEmitterSAInterface* and extends it.
      */
-    class CParticleEmitterSAInterface* pParticleEmitters;
+    class CParticleEmitterSAInterface** pParticleEmitters; // array of CParticleEmitterSAInterface*
     uint32 pad2;
     uint16 usLodStart;
     uint16 usLodEnd;
-    uint32 pad4;
+    uint8 bHasFlatParticleEmitter;
+    uint8 bHasHeatHazeParticleEmitter;
+    uint8 pad6;
+    uint8 pad7;
 };
 C_ASSERT(sizeof(CParticleManagerSAInterface) == 0x14);

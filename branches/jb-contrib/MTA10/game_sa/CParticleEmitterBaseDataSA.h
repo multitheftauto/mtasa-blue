@@ -35,7 +35,8 @@ public:
     uint8 bUseAlpha;
     uint32* pCompressedMatrix; // sizeof = 0x18
     RwTexture* pTextures[4];
-    uint32 pad2[4];
+    uint32 pad2;
+    uint32 pad3[3]; // class instance
     CParticleManager particleManager;
 };
 C_ASSERT(sizeof(CParticleEmitterBaseDataSAInterface) == 0x40);
