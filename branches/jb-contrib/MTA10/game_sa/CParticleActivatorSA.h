@@ -13,6 +13,12 @@
 #pragma once
 
 // TODO: Add VTBLs and all Activators
+class CParticleActivatorSAInterfaceVTBL
+{
+public:
+    uint32 SCALAR_DELETING_DESTRUCTOR;
+    uint32 ReadData;
+};
 
 // <Particle Activator Base Class>
 class CParticleActivatorSAInterface
@@ -21,9 +27,9 @@ public:
     uint32* vtbl;
     uint8 bLooped;
     uint8 ucNumKeys;
-    uint8 pad1;
+    uint8 ucValuesCount;
     uint8 pad2;
-    uint32* uiTimeArray;
-    uint32* uiValueArray;
+    uint32* uiTimeArray; // uint32 uiTimeArray[ucNumKeys];
+    uint32** uiValue2DArray; // uint32 uiValue2DArray[ucValuesCount][ucNumKeys];
 };
 

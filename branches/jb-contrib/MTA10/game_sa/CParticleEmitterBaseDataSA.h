@@ -28,7 +28,7 @@ public:
 class CParticleEmitterBaseDataSAInterface
 {
 public:
-    uint32* vtbl;
+    CParticleEmitterBaseDataSAInterface* vtbl;
     uint8 pad1;
     uint8 ucSrcBlendID; // D3DBLEND ; do not use that because we need
     uint8 ucDestBlendID; // D3DBLEND ; byte and D3DBLEND is forced DWORD

@@ -13,13 +13,21 @@
 #pragma once
 
 // TODO: Add VTBLs and all Activators
+class CParticleEmitterSAInterfaceVTBL
+{
+public:
+    uint32 SCALAR_DELETING_DESTRUCTOR;
+    uint32 ReadData;
+    uint32 Activate;
+};
 
 // <Particle Emitter Base Class>
 class CParticleEmitterSAInterface
 {
 public:
-    uint32* vtbl;
+    CParticleEmitterSAInterfaceVTBL* vtbl;
     uint16 usID; // get ID<->Name mapping @ CParticleSystemManagerSA.h
-    uint16 pad1;
+    uint8 ucTimemodePrt; // do (not) keyframes type anim
+    uint8 pad1;
 };
 C_ASSERT(sizeof(CParticleEmitterSAInterface) == 0x8);

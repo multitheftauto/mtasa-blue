@@ -565,10 +565,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CParticleEmitterInfoSA.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\CParticleEmitterManagerSA.cpp"
 				>
 			</File>
@@ -1147,10 +1143,6 @@
 			</File>
 			<File
 				RelativePath=".\CParticleEmitterBaseDataSA.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CParticleEmitterInfoSA.h"
 				>
 			</File>
 			<File
