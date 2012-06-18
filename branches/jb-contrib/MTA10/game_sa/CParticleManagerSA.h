@@ -18,7 +18,7 @@
 class CParticleManagerSAInterface
 {
 public:
-    uint32 pad1;
+    uint32 count;
     /***
      *  ACTUAL; Particle Emitter
      *              - (at ctor) calls Particle Activator ( some emitters use another one's activators)
@@ -26,7 +26,8 @@ public:
      */
     class CParticleEmitterSAInterface* pParticleEmitters;
     uint32 pad2;
-    uint32 pad3;
+    uint16 usLodStart;
+    uint16 usLodEnd;
     uint32 pad4;
 };
 C_ASSERT(sizeof(CParticleManagerSAInterface) == 0x14);

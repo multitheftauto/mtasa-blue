@@ -22,11 +22,9 @@ public:
     uint8 ucSrcBlendID; // D3DBLEND ; do not use that because we need
     uint8 ucDestBlendID; // D3DBLEND ; byte and D3DBLEND is forced DWORD
     uint8 bUseAlpha;
-    uint32* pCompressedMatrix;
+    uint32* pCompressedMatrix; // sizeof = 0x18
     RwTexture* pTextures[4];
-    uint32 pad2[7];
-    uint16 usLodStart;
-    uint16 usLodEnd;
-    uint32 pad3;
+    uint32 pad2[4];
+    CParticleManager particleManager;
 };
 C_ASSERT(sizeof(CParticleEmitterBaseDataSAInterface) == 0x40);

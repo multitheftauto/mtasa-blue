@@ -24,7 +24,7 @@ public:
     float fLength2;
     uint16 usCullDistance;
     uint8 ucPlayMode;
-    uint8 ucParticleEmittersCount;
-    uint32 pParticleEmitters; // TODO: Clarify
+    uint8 ucParticleEmitterBaseDataCount;
+    class CParticleEmitterBaseDataSAInterface* pParticleEmitterBaseDataArray; // allocated array of CParticleEmitterBaseData pointers
     RwSphere* pBoundingSphere;
 };
