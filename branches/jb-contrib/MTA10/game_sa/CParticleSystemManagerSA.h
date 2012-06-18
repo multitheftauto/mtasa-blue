@@ -16,13 +16,24 @@
 #include <game/CParticleSystemManager.h>
 
 /* <TEMP DOCS> */
+/*
 // TODO: Find more sensible names for some classes(CParticleManager)
 // TODO: Cleanup old unused CParticle stuff
 
-
+General Info:
+    effects.fxp loading procedures
+        005C2420 CParticleData::getEffectsFxp
+            005C1F50 CParticleData::ReadEffectsFile
+                005C05F0 ReadEffectsFxp_1
+                005C2010 CParticleEmitter::LoadData
+                005C25F0 CParticleEmitter::LoadData_LOD
+                005C0B70 ReadEffectsFxp_2
+                (virtual: load CParticleEmitters by calling their VTBLs at + 0x04 ( CParticleEmitter::LoadData )
+                          which in turns calls its CParticleActivator VTBLs at + 0x04 ( CParticleActivator::LoadData ) )
+                    
 // Particle Emitters & Activators
 //      ID<->Name map
-/*
+
  [ID]         [NAME]
 0x1001 = FX_INFO_EMRATE_DATA
 0x1004 = FX_INFO_EMSIZE_DATA
