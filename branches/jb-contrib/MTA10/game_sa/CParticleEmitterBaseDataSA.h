@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "CParticleManagerSA.h"
+
 class CParticleEmitterBaseDataSAInterfaceVTBL
 {
 public:
@@ -21,7 +23,15 @@ public:
     uint32 AllocateParticleEmitterManager;
     uint32 Unknown1;
     uint32 RenderAll;
-    uint32 Unknown2;
+    uint32 FindParticleFx_InParticleStorageList;
+};
+
+class CParticleStorageListSAInterface
+{
+public:
+    class CParticleStorageSAInterface* pHead;
+    uint32 pad1;
+    uint32 pad2;
 };
 
 // FX_PRIM_BASE_DATA section in effects.fxp
@@ -36,7 +46,7 @@ public:
     uint32* pCompressedMatrix; // sizeof = 0x18
     RwTexture* pTextures[4];
     uint32 pad2;
-    uint32 pad3[3]; // class instance
-    CParticleManager particleManager;
+    CParticleStorageListSAInterface ParticleStorageList;
+    CParticleManagerSAInterface particleManager;
 };
 C_ASSERT(sizeof(CParticleEmitterBaseDataSAInterface) == 0x40);

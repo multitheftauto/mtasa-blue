@@ -501,6 +501,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CFxSystemSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CGameSA.cpp"
 				>
 			</File>
@@ -594,6 +598,10 @@
 			</File>
 			<File
 				RelativePath="CParticleSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CParticleStorageSA.cpp"
 				>
 			</File>
 			<File
@@ -1078,6 +1086,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CFxSystemSA.h"
+				>
+			</File>
+			<File
 				RelativePath="CGameSA.h"
 				>
 			</File>
@@ -1175,6 +1187,10 @@
 			</File>
 			<File
 				RelativePath="CParticleSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CParticleStorageSA.h"
 				>
 			</File>
 			<File

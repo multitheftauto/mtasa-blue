@@ -12,18 +12,16 @@
 
 #pragma once
 
-#include "CRenderWareSA.h"
-
-#define FUNC_CParticleInfo__Init					0x4AB270
-#define FUNC_CParticleInfo__Set						0x4AB290				
-// ^duplicate @ 004AB2D0
-
-class CParticleInfoSAInterface
+class CFxSystemSAInterface
 {
 public:
-    RwColorFloat colour;
-    float fSize;
-    float pad1;
-    float fDurationFactor;
+    uint32 pad1;
+    uint32 pad2;
+    uint32 uiFxSystemHash;
+    uint32 pad3[3];
+    uint16 pad4;
+    uint8 pad5;
+    uint8 uiParticleEmitterManagerCount;
+    uint32 pad6[4];
 };
-// C_ASSERT(sizeof(CParticleInfoSAInterface) == 0x1C); // NEEDS CHECKING
+// C_ASSERT(sizeof(CFxSystemSAInterface) == 0x???); find correct size
