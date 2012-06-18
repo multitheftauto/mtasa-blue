@@ -162,6 +162,15 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
     CEntity * pColEntity = NULL;
     CColPoint * pColPoint = NULL;
     SLineOfSightFlags flags;
+    flags.bShootThroughStuff = false;
+    flags.bIgnoreSomeObjectsForCamera = false;
+    flags.bSeeThroughStuff = true;
+    flags.bCheckDummies = true;
+    flags.bCheckObjects = true;
+    flags.bCheckPeds = true;
+    flags.bCheckVehicles = true;
+    flags.bCheckBuildings = true;
+    flags.bCheckCarTires = true;
     SLineOfSightBuildingResult pBuildingResult;
     if ( g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pColEntity, flags, &pBuildingResult ) )
     {
