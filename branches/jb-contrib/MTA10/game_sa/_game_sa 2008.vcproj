@@ -557,6 +557,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CParticleActivatorSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CParticleEmitterSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CParticleFxSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CParticleInfoSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CParticleObjectSA.cpp"
 				>
 			</File>
@@ -1103,6 +1119,22 @@
 			</File>
 			<File
 				RelativePath="CPadSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CParticleActivatorSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CParticleEmitterSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CParticleFxSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CParticleInfoSA.h"
 				>
 			</File>
 			<File

@@ -106,3 +106,6 @@
 #include "CWeaponStatManagerSA.h"
 #include "CShadowDataSA.h"
 #include "CBuoyancySA.h"
+#include "CParticleInfoSA.h"
+#include "CParticleActivatorSA.h"
+#include "CParticleEmitterSA.h"
