@@ -12,18 +12,21 @@
 
 #pragma once
 
-// TODO: Add VTBLs and all Activators
-
-// <Particle Activator Base Class>
-class CParticleActivatorSAInterface
+// FX_PRIM_BASE_DATA section in effects.fxp
+// move this into its own file later
+class CParticleEmitterBaseDataSAInterface
 {
 public:
     uint32* vtbl;
-    uint8 bLooped;
-    uint8 ucNumKeys;
     uint8 pad1;
-    uint8 pad2;
-    uint32* uiTimeArray;
-    uint32* uiValueArray;
+    uint8 ucSrcBlendID; // D3DBLEND ; do not use that because we need
+    uint8 ucDestBlendID; // D3DBLEND ; byte and D3DBLEND is forced DWORD
+    uint8 bUseAlpha;
+    uint32* pCompressedMatrix;
+    RwTexture* pTextures[4];
+    uint32 pad2[7];
+    uint16 usLodStart;
+    uint16 usLodEnd;
+    uint32 pad3;
 };
-
+C_ASSERT(sizeof(CParticleEmitterBaseDataSAInterface) == 0x40);

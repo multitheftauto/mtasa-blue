@@ -10,20 +10,4 @@
 *
 *****************************************************************************/
 
-#pragma once
-
-// TODO: Add VTBLs and all Activators
-
-// <Particle Activator Base Class>
-class CParticleActivatorSAInterface
-{
-public:
-    uint32* vtbl;
-    uint8 bLooped;
-    uint8 ucNumKeys;
-    uint8 pad1;
-    uint8 pad2;
-    uint32* uiTimeArray;
-    uint32* uiValueArray;
-};
-
+#include "StdInc.h"

@@ -12,18 +12,12 @@
 
 #pragma once
 
-// TODO: Add VTBLs and all Activators
-
-// <Particle Activator Base Class>
-class CParticleActivatorSAInterface
+class CParticleEmitterInfoSAInterface
 {
 public:
-    uint32* vtbl;
-    uint8 bLooped;
-    uint8 ucNumKeys;
-    uint8 pad1;
-    uint8 pad2;
-    uint32* uiTimeArray;
-    uint32* uiValueArray;
+    uint32 infoCount;
+    uint32* pEmitterInfoData;
+    uint8 pad1[4];
+    uint32 pad2[4];
 };
 

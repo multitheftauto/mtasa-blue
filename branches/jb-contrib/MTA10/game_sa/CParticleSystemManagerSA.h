@@ -16,7 +16,12 @@
 #include <game/CParticleSystemManager.h>
 
 /* <TEMP DOCS> */
+// TODO: Find more sensible names for some classes(CParticleManager)
+// TODO: Cleanup old unused CParticle stuff
+
+
 // Particle Emitters & Activators
+//      ID<->Name map
 /*
  [ID]         [NAME]
 0x1001 = FX_INFO_EMRATE_DATA

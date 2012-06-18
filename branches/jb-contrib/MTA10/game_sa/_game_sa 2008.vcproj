@@ -561,6 +561,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CParticleEmitterBaseDataSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CParticleEmitterInfoSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CParticleEmitterManagerSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CParticleEmitterSA.cpp"
 				>
 			</File>
@@ -569,7 +581,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CParticleHeaderSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CParticleInfoSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CParticleManagerSA.cpp"
 				>
 			</File>
 			<File
@@ -1126,6 +1146,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CParticleEmitterBaseDataSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CParticleEmitterInfoSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CParticleEmitterManagerSA.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CParticleEmitterSA.h"
 				>
 			</File>
@@ -1134,7 +1166,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CParticleHeaderSA.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CParticleInfoSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CParticleManagerSA.h"
 				>
 			</File>
 			<File

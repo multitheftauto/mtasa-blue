@@ -12,18 +12,19 @@
 
 #pragma once
 
-// TODO: Add VTBLs and all Activators
-
-// <Particle Activator Base Class>
-class CParticleActivatorSAInterface
+// The part !!ABOVE!! FX_PRIM_EMITTER_DATA in effects.fxp
+class CParticleHeaderSAInterface
 {
 public:
-    uint32* vtbl;
-    uint8 bLooped;
-    uint8 ucNumKeys;
-    uint8 pad1;
-    uint8 pad2;
-    uint32* uiTimeArray;
-    uint32* uiValueArray;
+    uint32 pad1;
+    uint32 pad2;
+    class CParticleFxSAInterface* pParticleFx;
+    float fLength;
+    float fIntervalMin;
+    float fLength2;
+    uint16 usCullDistance;
+    uint8 ucPlayMode;
+    uint8 ucParticleEmittersCount;
+    uint32 pParticleEmitters; // TODO: Clarify
+    RwSphere* pBoundingSphere;
 };
-
