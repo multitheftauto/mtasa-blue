@@ -19,8 +19,10 @@
 class CPed;
 class CColPoint;
 class CVector2D;
+class CVector;
 enum ePedPieceTypes;
-
+struct SLineOfSightFlags;
+struct SLineOfSightBuildingResult;
 class CWeapon
 {
 public:
@@ -42,8 +44,9 @@ public:
     virtual void            Update              ( CPed * pPed ) = 0;
     virtual bool            Fire                ( CEntity * pFiringEntity, CVector * pvecOrigin, CVector * pvecOffset, CEntity * pTargetEntity, CVector * pvec_1, CVector * pvec2 ) = 0;
     virtual void            AddGunshell         ( CEntity * pFiringEntity, CVector * pvecOrigin, CVector2D * pvecDirection, float fSize ) = 0;
-    virtual void            DoBulletImpact      ( CEntity * pFiringEntity, CEntity * pEntity, CVector * pvecOrigin, CVector * pvecTarget, CColPoint * pColPoint, int i_1 ) = 0;
+    virtual void            DoBulletImpact      ( CEntity * pFiringEntity, CEntitySAInterface * pEntityInterface, CVector * pvecOrigin, CVector * pvecTarget, CColPoint * pColPoint, int i_1 ) = 0;
     virtual unsigned char   GenerateDamageEvent ( CPed * pPed, CEntity * pResponsible, eWeaponType weaponType, int iDamagePerHit, ePedPieceTypes hitZone, int i_2 ) = 0;
+    virtual bool            ProcessLineOfSight  ( const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, CEntity ** CollisionEntity, const SLineOfSightFlags flags, SLineOfSightBuildingResult* pBuildingResult ) = 0;
 };
 
 #endif

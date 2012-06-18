@@ -29,6 +29,9 @@
 #define FUNC_CWeapon_DoBulletImpact                     0x73b550
 #define FUNC_CWeapon_GenerateDamageEvent                0x73a530
 
+#define FUNC_CBirds_CheckForHit                         0x707550
+#define FUNC_CShadows_CheckForHit                       0x712E40
+
 extern CGameSA * pGame;
 
 class CWeaponSAInterface
@@ -71,8 +74,9 @@ public:
     void                    Update              ( CPed * pPed );
     bool                    Fire                ( CEntity * pFiringEntity, CVector * pvecOrigin, CVector * pvecOffset, CEntity * pTargetEntity, CVector * pvec_1, CVector * pvec_2 );
     void                    AddGunshell         ( CEntity * pFiringEntity, CVector * pvecOrigin, CVector2D * pvecDirection, float fSize );
-    void                    DoBulletImpact      ( CEntity * pFiringEntity, CEntity * pEntity, CVector * pvecOrigin, CVector * pvecTarget, CColPoint * pColPoint, int i_1 );
+    void                    DoBulletImpact      ( CEntity * pFiringEntity, CEntitySAInterface * pEntityInterface, CVector * pvecOrigin, CVector * pvecTarget, CColPoint * pColPoint, int i_1 );
     unsigned char           GenerateDamageEvent ( CPed * pPed, CEntity * pResponsible, eWeaponType weaponType, int iDamagePerHit, ePedPieceTypes hitZone, int i_2 );
+    bool                    ProcessLineOfSight  ( const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, CEntity ** CollisionEntity, const SLineOfSightFlags flags, SLineOfSightBuildingResult* pBuildingResult );
 
 };
 

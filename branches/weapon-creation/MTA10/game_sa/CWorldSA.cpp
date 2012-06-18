@@ -237,6 +237,7 @@ bool CWorldSA::ProcessLineOfSight(const CVector * vecStart, const CVector * vecE
                 else
                     pBuildingResult->usLODModelID = 0;
 
+                pBuildingResult->pInterface = targetEntity;
                 pBuildingResult->vecPosition = targetEntity->Placeable.m_transform.m_translate;
                 if ( targetEntity->Placeable.matrix )
                 {
@@ -244,6 +245,17 @@ bool CWorldSA::ProcessLineOfSight(const CVector * vecStart, const CVector * vecE
                     ConvertMatrixToEulerAngles ( *targetEntity->Placeable.matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
                     vecRotation = -vecRotation;
                 }
+            }
+            if ( targetEntity && targetEntity->nType == ENTITY_TYPE_OBJECT )
+            {
+                pBuildingResult->bValid = true;
+                pBuildingResult->usModelID = targetEntity->m_nModelIndex;
+                if ( targetEntity->m_pLod )
+                    pBuildingResult->usLODModelID = targetEntity->m_pLod->m_nModelIndex;
+                else
+                    pBuildingResult->usLODModelID = 0;
+
+                pBuildingResult->pInterface = targetEntity;
             }
         }
     }

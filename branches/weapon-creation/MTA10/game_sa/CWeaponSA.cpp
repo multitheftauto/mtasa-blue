@@ -196,12 +196,11 @@ void CWeaponSA::AddGunshell ( CEntity * pFiringEntity, CVector * pvecOrigin, CVe
 }
 
 
-void CWeaponSA::DoBulletImpact ( CEntity * pFiringEntity, CEntity * pEntity, CVector * pvecOrigin, CVector * pvecTarget, CColPoint * pColPoint, int i_1 )
+void CWeaponSA::DoBulletImpact ( CEntity * pFiringEntity, CEntitySAInterface * pEntityInterface, CVector * pvecOrigin, CVector * pvecTarget, CColPoint * pColPoint, int i_1 )
 {
     DWORD dwEntityInterface = 0;
     if ( pFiringEntity ) dwEntityInterface = ( DWORD ) pFiringEntity->GetInterface ();
-    DWORD dwEntityInterface_2 = 0;
-    if ( pEntity ) dwEntityInterface_2 = ( DWORD ) pEntity->GetInterface ();
+    DWORD dwEntityInterface_2 = (DWORD)pEntityInterface;
     DWORD dwColPointInterface = 0;
     if ( pColPoint ) dwColPointInterface = ( DWORD )  pColPoint->GetInterface ();
     DWORD dwThis = ( DWORD ) internalInterface;
@@ -240,4 +239,33 @@ unsigned char CWeaponSA::GenerateDamageEvent ( CPed * pPed, CEntity * pResponsib
         mov     ucReturn, eax
     }
     return ( unsigned char ) ucReturn;
+}
+
+
+
+bool CWeaponSA::ProcessLineOfSight ( const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, 
+                                             CEntity ** CollisionEntity,
+                                             const SLineOfSightFlags flags,
+                                             SLineOfSightBuildingResult* pBuildingResult )
+{
+    DWORD dwFunction = FUNC_CBirds_CheckForHit;
+    _asm
+    {
+        push vecEnd
+        push vecStart
+        call dwFunction
+    }
+    dwFunction = FUNC_CShadows_CheckForHit;
+    _asm
+    {
+        push vecEnd
+        push vecStart
+        call dwFunction
+    }
+    bool bReturn = g_pCore->GetGame()->GetWorld()->ProcessLineOfSight( vecStart, vecEnd, colCollision, CollisionEntity, flags, pBuildingResult );
+    _asm
+    {
+        add esp, 10h
+    }
+    return  bReturn;
 }

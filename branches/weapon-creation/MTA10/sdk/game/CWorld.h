@@ -13,6 +13,7 @@
 #define __CGAME_WORLD
 
 #include "CEntity.h"
+#include "CBuilding.h"
 #include "CColPoint.h"
 
 struct SLineOfSightFlags
@@ -49,6 +50,7 @@ struct SLineOfSightBuildingResult
     ushort usLODModelID;
     CVector vecPosition;
     CVector vecRotation;
+    CEntitySAInterface * pInterface;
 };
 
 struct SBuildingRemoval

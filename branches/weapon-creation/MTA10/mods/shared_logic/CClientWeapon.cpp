@@ -164,7 +164,7 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
     SLineOfSightFlags flags;
     flags.bShootThroughStuff = false;
     flags.bIgnoreSomeObjectsForCamera = false;
-    flags.bSeeThroughStuff = true;
+    flags.bSeeThroughStuff = false;
     flags.bCheckDummies = true;
     flags.bCheckObjects = true;
     flags.bCheckPeds = true;
@@ -172,7 +172,7 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
     flags.bCheckBuildings = true;
     flags.bCheckCarTires = true;
     SLineOfSightBuildingResult pBuildingResult;
-    if ( g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pColEntity, flags, &pBuildingResult ) )
+    if ( m_pWeapon->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pColEntity, flags, &pBuildingResult ) )
     {
         vecTarget = *pColPoint->GetPosition ();
     }
@@ -187,7 +187,13 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
     }    
     m_pMarker2->SetPosition ( vecTarget );
 
-    m_pWeapon->DoBulletImpact ( m_pObject, pColEntity, &vecOrigin, &vecTarget, pColPoint, 1 );
+    CEntitySAInterface * pInterface = NULL;
+    if ( !pColEntity )
+        pInterface = pBuildingResult.pInterface;
+    else
+        pInterface = pColEntity->GetInterface();
+    
+    m_pWeapon->DoBulletImpact ( m_pObject, pInterface, &vecOrigin, &vecTarget, pColPoint, 1 );
     if ( pColEntity && pColEntity->GetEntityType () == ENTITY_TYPE_PED )
     {
         ePedPieceTypes hitZone = ( ePedPieceTypes ) pColPoint->GetPieceTypeB ();
