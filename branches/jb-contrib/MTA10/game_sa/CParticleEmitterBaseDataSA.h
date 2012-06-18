@@ -12,8 +12,19 @@
 
 #pragma once
 
+class CParticleEmitterBaseDataSAInterfaceVTBL
+{
+public:
+    uint32 SCALAR_DELETING_DESTRUCTOR;
+    uint32 LoadData_LOD;
+    uint32 ReadTextures;
+    uint32 AllocateParticleEmitterManager;
+    uint32 Unknown1;
+    uint32 RenderAll;
+    uint32 Unknown2;
+};
+
 // FX_PRIM_BASE_DATA section in effects.fxp
-// move this into its own file later
 class CParticleEmitterBaseDataSAInterface
 {
 public:
