@@ -116,3 +116,4 @@
 #include "CParticleManagerSA.h"
 #include "CParticleStorageSA.h"
 #include "CFxSystemSA.h"
+#include "CGlassSA.h"

@@ -517,6 +517,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CGlassSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CHandlingEntrySA.cpp"
 				>
 			</File>
@@ -1099,6 +1103,10 @@
 			</File>
 			<File
 				RelativePath="CGaragesSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CGlassSA.h"
 				>
 			</File>
 			<File
