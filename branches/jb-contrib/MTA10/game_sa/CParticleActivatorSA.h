@@ -12,7 +12,7 @@
 
 #pragma once
 
-// TODO: Add VTBLs and all Activators
+// TODO: Add all Activators
 class CParticleActivatorSAInterfaceVTBL
 {
 public:
@@ -29,7 +29,6 @@ public:
     uint8 ucNumKeys;
     uint8 ucValuesCount;
     uint8 pad2;
-    uint32* uiTimeArray; // uint32 uiTimeArray[ucNumKeys];
-    uint32** uiValue2DArray; // uint32 uiValue2DArray[ucValuesCount][ucNumKeys];
+    uint16* uiTimeArray; // uint32 uiTimeArray[ucNumKeys];
+    uint16** uiValue2DArray; // uint32 uiValue2DArray[ucValuesCount][ucNumKeys];
 };
-

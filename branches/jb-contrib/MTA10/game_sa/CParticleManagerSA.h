@@ -21,7 +21,7 @@ public:
     uint32 count;
     /***
      *  ACTUAL; Particle Emitter
-     *              - (at ctor) calls Particle Activator ( some emitters use another one's activators)
+     *              - (at ctor) calls Particle Activator
      *  Particle Emitters have base in CParticleEmitterSAInterface* and extends it.
      */
     class CParticleEmitterSAInterface* pParticleEmitters;

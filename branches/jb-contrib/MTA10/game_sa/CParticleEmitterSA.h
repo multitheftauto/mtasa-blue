@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "CParticleActivatorSA.h"
+
 // TODO: Add VTBLs and all Activators
 class CParticleEmitterSAInterfaceVTBL
 {
@@ -27,7 +29,8 @@ class CParticleEmitterSAInterface
 public:
     CParticleEmitterSAInterfaceVTBL* vtbl;
     uint16 usID; // get ID<->Name mapping @ CParticleSystemManagerSA.h
-    uint8 ucTimemodePrt; // do (not) keyframes type anim
+    uint8 ucTimemodePrt;
     uint8 pad1;
+    CParticleActivatorSAInterface Activator;
 };
-C_ASSERT(sizeof(CParticleEmitterSAInterface) == 0x8);
+C_ASSERT(sizeof(CParticleEmitterSAInterface) == 0x18);
