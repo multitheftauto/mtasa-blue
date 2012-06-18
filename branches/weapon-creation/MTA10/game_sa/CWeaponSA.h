@@ -29,8 +29,8 @@
 #define FUNC_CWeapon_DoBulletImpact                     0x73b550
 #define FUNC_CWeapon_GenerateDamageEvent                0x73a530
 
-#define FUNC_CBirds_CheckForHit                         0x707550
-#define FUNC_CShadows_CheckForHit                       0x712E40
+#define FUNC_CBirds_CheckForHit                         0x712E40
+#define FUNC_CShadows_CheckForHit                       0x707550
 
 extern CGameSA * pGame;
 
