@@ -172,7 +172,9 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
     flags.bCheckBuildings = true;
     flags.bCheckCarTires = true;
     SLineOfSightBuildingResult pBuildingResult;
-    if ( m_pWeapon->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pColEntity, flags, &pBuildingResult ) )
+    CEntitySAInterface * pEntity = NULL;
+    
+    if ( m_pWeapon->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pColEntity, flags, &pBuildingResult, m_Type, &pEntity ) )
     {
         vecTarget = *pColPoint->GetPosition ();
     }
@@ -186,14 +188,8 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
         g_pGame->GetAudioEngine ()->ReportBulletHit ( NULL, SURFACE_TYPE_WATER_SHALLOW, &vecCollision, 0.0f );
     }    
     m_pMarker2->SetPosition ( vecTarget );
-
-    CEntitySAInterface * pInterface = NULL;
-    if ( !pColEntity )
-        pInterface = pBuildingResult.pInterface;
-    else
-        pInterface = pColEntity->GetInterface();
     
-    m_pWeapon->DoBulletImpact ( m_pObject, pInterface, &vecOrigin, &vecTarget, pColPoint, 1 );
+    m_pWeapon->DoBulletImpact ( m_pObject, pEntity, &vecOrigin, &vecTarget, pColPoint, 0 );
     if ( pColEntity && pColEntity->GetEntityType () == ENTITY_TYPE_PED )
     {
         ePedPieceTypes hitZone = ( ePedPieceTypes ) pColPoint->GetPieceTypeB ();

@@ -246,7 +246,9 @@ unsigned char CWeaponSA::GenerateDamageEvent ( CPed * pPed, CEntity * pResponsib
 bool CWeaponSA::ProcessLineOfSight ( const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, 
                                              CEntity ** CollisionEntity,
                                              const SLineOfSightFlags flags,
-                                             SLineOfSightBuildingResult* pBuildingResult )
+                                             SLineOfSightBuildingResult* pBuildingResult, 
+                                             eWeaponType weaponType, 
+                                             CEntitySAInterface ** pEntity )
 {
     DWORD dwFunction = FUNC_CBirds_CheckForHit;
     _asm
@@ -266,6 +268,35 @@ bool CWeaponSA::ProcessLineOfSight ( const CVector * vecStart, const CVector * v
     _asm
     {
         add esp, 10h
+    }
+
+    if ( bReturn )
+    {
+        if ( *CollisionEntity )
+        {
+            *pEntity = (*CollisionEntity)->GetInterface();
+        }
+        else
+        {
+            if ( pBuildingResult->bValid )
+                *pEntity = pBuildingResult->pInterface;
+        }
+    }
+    if ( *CollisionEntity && (*pEntity) )
+    {
+        CEntitySAInterface * pHitInterface = *pEntity;
+        DWORD dwFunc = FUNC_CWeapon_CheckForShootingVehicleOccupant;
+        _asm
+        {
+            push vecEnd
+            push vecStart
+            push weaponType
+            push colCollision
+            lea eax, pHitInterface
+            push eax
+            call dwFunc
+            add esp, 14h
+        }
     }
     return  bReturn;
 }
