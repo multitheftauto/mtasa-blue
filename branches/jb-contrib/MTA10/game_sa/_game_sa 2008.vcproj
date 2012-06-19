@@ -741,6 +741,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CSeaAnimalSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CSettingsSA.cpp"
 				>
 			</File>
@@ -1359,6 +1363,10 @@
 			</File>
 			<File
 				RelativePath=".\CRopesSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CSeaAnimalSA.h"
 				>
 			</File>
 			<File
