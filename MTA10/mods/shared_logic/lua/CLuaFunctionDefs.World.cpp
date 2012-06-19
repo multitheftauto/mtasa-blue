@@ -124,7 +124,8 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
 {
 //  bool float float float element float float float int int int processLineOfSight ( float startX, float startY, float startZ, float endX, float endY, float endZ,
 //      [ bool checkBuildings = true, bool checkVehicles = true, bool checkPlayers = true, bool checkObjects = true, bool checkDummies = true,
-//        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, element ignoredElement = nil, bool returnBuildingInfo = false ] )
+//        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, element ignoredElement = nil, bool returnBuildingInfo = false,
+//        bCheckCarTires = false ] )
     CVector vecStart; CVector vecEnd;
     SLineOfSightFlags flags; CEntity* pIgnoredEntity; bool bIncludeBuildingInfo;
 
@@ -145,6 +146,7 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
     argStream.ReadBool ( flags.bShootThroughStuff, false );
     argStream.ReadUserData ( pIgnoredEntity, NULL );
     argStream.ReadBool ( bIncludeBuildingInfo, false );
+    argStream.ReadBool ( flags.bCheckCarTires, false );
 
     if ( !argStream.HasErrors () )
     {
