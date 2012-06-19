@@ -397,6 +397,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CBreakableInfoSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CBuildingSA.cpp"
 				>
 			</File>
@@ -765,6 +769,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CTrainSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CVehicleSA.cpp"
 				>
 			</File>
@@ -967,6 +975,10 @@
 			</File>
 			<File
 				RelativePath=".\CBoundingBoxSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CBreakableInfoSA.h"
 				>
 			</File>
 			<File
@@ -1363,6 +1375,10 @@
 			</File>
 			<File
 				RelativePath="CTrailerSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CTrainSA.h"
 				>
 			</File>
 			<File
