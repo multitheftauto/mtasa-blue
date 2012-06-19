@@ -545,6 +545,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CInteriorFurnitureSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CKeyGenSA.cpp"
 				>
 			</File>
@@ -673,6 +677,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CPlantSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CPlayerInfoSA.cpp"
 				>
 			</File>
@@ -686,6 +694,10 @@
 			</File>
 			<File
 				RelativePath=".\CPopulationSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CProceduralObjectSA.cpp"
 				>
 			</File>
 			<File
@@ -1150,6 +1162,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CInteriorFurnitureSA.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CKeyGenSA.h"
 				>
 			</File>
@@ -1282,6 +1298,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CPlantSA.h"
+				>
+			</File>
+			<File
 				RelativePath="CPlayerInfoSA.h"
 				>
 			</File>
@@ -1295,6 +1315,10 @@
 			</File>
 			<File
 				RelativePath=".\CPopulationSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CProceduralObjectSA.h"
 				>
 			</File>
 			<File
