@@ -26,6 +26,7 @@ struct SLineOfSightFlags
         , bSeeThroughStuff ( false )
         , bIgnoreSomeObjectsForCamera ( false )
         , bShootThroughStuff ( false )
+        , bCheckCarTires ( false )
     {}
     bool bCheckBuildings;
     bool bCheckVehicles;
@@ -35,6 +36,7 @@ struct SLineOfSightFlags
     bool bSeeThroughStuff;
     bool bIgnoreSomeObjectsForCamera;
     bool bShootThroughStuff;            // not used for IsLineOfSightClear
+    bool bCheckCarTires;
 };
 
 struct SLineOfSightBuildingResult
@@ -47,6 +49,7 @@ struct SLineOfSightBuildingResult
     ushort usLODModelID;
     CVector vecPosition;
     CVector vecRotation;
+    CEntitySAInterface * pInterface;
 };
 
 struct SBuildingRemoval

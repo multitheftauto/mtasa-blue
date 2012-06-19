@@ -45,6 +45,7 @@
 #define VAR_fJetpackMaxHeight                               0x8703D8
 #define VAR_fAircraftMaxHeight                              0x8594DC // Touch this directly and you are an idiot it's clearly in the data section and the xrefs map is massive :|
 #define VTBL_CBUILDING                                      0x8585C8
+#define VAR_CWorld_bIncludeCarTires                         0xB7CD70
 
 #include <game/CWorld.h>
 #include "CEntitySA.h"
