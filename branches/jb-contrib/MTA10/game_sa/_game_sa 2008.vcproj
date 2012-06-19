@@ -385,6 +385,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CBirdsSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CBmxSA.cpp"
 				>
 			</File>
@@ -943,6 +947,10 @@
 			</File>
 			<File
 				RelativePath="CBikeSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CBirdsSA.h"
 				>
 			</File>
 			<File

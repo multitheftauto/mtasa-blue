@@ -318,15 +318,50 @@ struct CTrainFlags
 };
 
 
-// TODO: Size?
 class CAEVehicleAudioEntity
 {
-    BYTE pad1[154];
 public:
-    BYTE bCurrentRadioStation;
-private:
-    BYTE pad2;
+	uint32 pad1; // 0
+	class CVehicleSAInterface* pReferrer; // 4
+	uint32 pad2[29]; // 8
+	uint16 pad3[2];
+	uint16 pad4[2];
+	uint8 pad5[2];
+	uint16 pad6[2];
+	uint8 pad7[2];
+	uint32 pad8[4];
+	uint8 pad9[4];
+	uint32 pad10[2];
+	uint8 pad11;
+	uint8 bIsPedInVehicle;
+	uint8 pad12[6];
+	uint32 pad13;
+	uint8 pad14[2];
+	uint16 pad15[3];
+	uint32 pad16;
+	uint8 pad17[4];
+	uint32 pad18[2];
+	uint8 bHasSirens;
+	uint8 pad19[3];
+	uint32 pad20[4];
+	uint16 pad21[4];
+	uint32 pad22[24];
+	uint32 uiTimeSinceChangedEngineSound;
+	uint16 pad23[4];
+	uint32 pad24;
+	uint16 pad25[2];
+	uint32 pad26;
+	uint16 pad27[2];
+	uint32 pad28;
+	uint16 pad29[2];
+	uint32 pad30;
+	uint16 pad31[2];
+	uint32 pad32[52];
+	uint8 pad33[4];
+	uint32 pad34;
 };
+// needs checking
+C_ASSERT(sizeof(CAEVehicleAudioEntity) == 0x24C);
 
 class CAutoPilot
 {
@@ -338,6 +373,7 @@ class CAutoPilot
 /**
  * \todo GAME RELEASE: Update CVehicleSAInterface
  */
+#pragma message("!! DANGER !! @ Do not use @ Reconstruction in progress.. !! DANGER !!")
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
 public:
