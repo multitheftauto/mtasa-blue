@@ -363,11 +363,33 @@ public:
 // needs checking
 C_ASSERT(sizeof(CAEVehicleAudioEntity) == 0x24C);
 
+// refs
+//  @ 0042F870 CCarCtrl::JoinCarWithRoadSystemGotoCoords
 class CAutoPilot
 {
-    BYTE pad[56];
+    uint32 pad1[7];
+    uint32 uiStartTime;
+    uint32 pad2[2];
+    uint8 pad3[4];
+    uint32 pad4[5];
+    uint8 pad5[4];
+    uint32 pad6;
+    // decompose when all flags known 
+    // [6] = bFollowPath
+    uint32 flags;
+    uint8 pad7[2];
+    uint8 ucFollowRadius;
+    uint8 pad8[5];
+    uint32 pad9[2];
+    CVector vecDestination;
+    uint32 NodeList[8];
+    uint16 Steps;
+    uint8 pad10;
+    uint8 pad11;
+    class CEntitySAInterface* pTargetEntity;
+    uint32 pad12[2];
 };
-C_ASSERT(sizeof(CAutoPilot) == 56);
+C_ASSERT(sizeof(CAutoPilot) == 0x98);
 
 #define MAX_UPGRADES_ATTACHED 15 // perhaps?
 
@@ -383,13 +405,7 @@ public:
     tHandlingDataSA* pHandlingData; // 900
     void* pFlyingHandlingData; // 904
     uint32 dwHandlingFlags; // 908
-    uint32 pad52321 [21]; // 912
-
-    uint32 dwUnknown1201; // 996
-    uint32 dwUnknown1202; // 1000
-    uint32 hFlagsLocal; // 1004
-
-    CAutoPilot AutoPilot; // 1008
+    CAutoPilot AutoPilot;
     CVehicleFlags m_nVehicleFlags; // 1064?
     uint32 m_TimeOfCreation; // 1068
 
