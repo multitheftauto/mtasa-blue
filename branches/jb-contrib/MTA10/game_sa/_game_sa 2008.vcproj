@@ -533,6 +533,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CHeliSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CHudSA.cpp"
 				>
 			</File>
@@ -1123,6 +1127,10 @@
 			</File>
 			<File
 				RelativePath="CHandlingManagerSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CHeliSA.h"
 				>
 			</File>
 			<File

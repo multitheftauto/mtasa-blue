@@ -20,6 +20,7 @@ class CBmxSAInterface : public CBikeSAInterface
 {
     // fill this
 };
+C_ASSERT(sizeof(CBmxSAInterface) == 0x838);
 
 class CBmxSA : public virtual CBmx, public virtual CBikeSA
 {

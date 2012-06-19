@@ -367,6 +367,7 @@ class CAutoPilot
 {
     BYTE pad[56];
 };
+C_ASSERT(sizeof(CAutoPilot) == 56);
 
 #define MAX_UPGRADES_ATTACHED 15 // perhaps?
 
@@ -379,40 +380,44 @@ class CVehicleSAInterface : public CPhysicalSAInterface
 public:
     CAEVehicleAudioEntity m_VehicleAudioEntity; // 312
 
-    tHandlingDataSA* pHandlingData;                             // +900
-    BYTE padyo[4];
-    DWORD dwHandlingFlags;
-    int pad52321 [21];
+    tHandlingDataSA* pHandlingData; // 900
+    void* pFlyingHandlingData; // 904
+    uint32 dwHandlingFlags; // 908
+    uint32 pad52321 [21]; // 912
 
-    DWORD dwUnknown1201;                                        // +996
-    DWORD dwUnknown1202;                                        // +1000
-    unsigned int hFlagsLocal;                                         // +1004
+    uint32 dwUnknown1201; // 996
+    uint32 dwUnknown1202; // 1000
+    uint32 hFlagsLocal; // 1004
 
-    CAutoPilot AutoPilot; // +1008
-    CVehicleFlags m_nVehicleFlags; // +1064?
-    unsigned int m_TimeOfCreation; // GetTimeInMilliseconds when this vehicle was created.
+    CAutoPilot AutoPilot; // 1008
+    CVehicleFlags m_nVehicleFlags; // 1064?
+    uint32 m_TimeOfCreation; // 1068
 
-    unsigned char m_colour1, m_colour2, m_colour3, m_colour4;
-    char m_comp1, m_comp2;
-    short m_upgrades[MAX_UPGRADES_ATTACHED]; // 1082
-    float m_wheelScale;//1112
+    uint8 m_colour1; // 1072
+    uint8 m_colour2; // 1073
+    uint8 m_colour3; // 1074
+    uint8 m_colour4; // 1075
+    uint8 m_variation1; // 1076
+    uint8 m_variation2; // 1077
+    int16 m_upgrades[MAX_UPGRADES_ATTACHED]; // 1078
+    float m_wheelScale; // 1108
 
-    unsigned short CarAlarmState; //1116
-    unsigned short ForcedRandomSeed; // if this is non-zero the random wander gets deterministic
+    uint16 CarAlarmState; // 1112
+    uint16 ForcedRandomSeed; // 1116 (if this is non-zero the random wander gets deterministic)
     
-    CPedSAInterface *pDriver;
-    CPedSAInterface *pPassengers[MAX_PASSENGERS];
-    unsigned char m_nNumPassengers;
-    unsigned char m_nNumGettingIn;
-    unsigned char m_nGettingInFlags;
-    unsigned char m_nGettingOutFlags;
-    unsigned char m_nMaxPassengers;
-    unsigned char m_windowsOpenFlags;
-    char m_nNitroBoosts;
+    CPedSAInterface *pDriver; // 1120
+    CPedSAInterface *pPassengers[MAX_PASSENGERS]; // 1124
+    uint8 m_nNumPassengers; // 1156
+    uint8 m_nNumGettingIn; // 1157
+    uint8 m_nGettingInFlags; // 1158
+    uint8 m_nGettingOutFlags; // 1159
+    uint8 m_nMaxPassengers; // 1160
+    uint8 m_windowsOpenFlags; // 1161
+    int8 m_nNitroBoosts; // 1162
 
-    unsigned char m_nSpecialColModel;
-    CEntity *pEntityWeAreOnForVisibilityCheck;
-    CFire *m_pFire;
+    uint8 m_nSpecialColModel; // 1166 (see object.dat for possible values)
+    CEntity *pEntityWeAreOnForVisibilityCheck; // 1167
+    CFire *m_pFire; // 1171
 
     float m_fSteerAngle; // +1172
     float m_f2ndSteerAngle; // used for steering 2nd set of wheels or elevators etc..
@@ -463,7 +468,19 @@ public:
     unsigned int m_isUsingHornOrSecondarySiren;
 
     //1304
-    BYTE Padding220[136];
+    uint32 padX[24];
+    class CParticleFx* pOverheatParticle;
+    class CParticleFx* pFireParticle;
+    class CParticleFx* pDustParticle;
+    uint32 dwRenderLights;
+    RwTexture* pLicensePlateTexture;
+    uint32 padX1;
+    uint32 uiCarType;
+    uint32 padX2;
+    uint16 pTexDictEntryIndex;
+    uint16 padX3;
+    uint32 padX4;
+    void *pDamageManagers[6];
 
     //1440
     unsigned char m_ucTrackNodeID;  // Current node on train tracks
@@ -500,24 +517,25 @@ public:
     // 1612
     RwFrame * pChassis;
     RwFrame * pWheelFrontRight;
-    BYTE padding271[4];
+    RwFrame * pWheelFrontRightSpecial;
     RwFrame * pWheelRearRight;
     RwFrame * pWheelFrontLeft;
-    BYTE padding272[4];
+    RwFrame * pWheelFrontLeftSpecial;
     RwFrame * pWheelRearLeft;
     RwFrame * pDoors [ 4 ];
     RwFrame * pBumpers [ 2 ];
-    BYTE padding273[8];
+    RwFrame * pUnk1;
+    RwFrame * pUnk2;
     RwFrame * pBonet;
     RwFrame * pBoot;
     RwFrame * pWindscreen;
     RwFrame * pExhaust;
-
-    BYTE padding280[576];
+    RwFrame * pSpecialParts[5];
+   // BYTE padding280[576];
     // 2276
-    float m_fBurningTime;
+   // float m_fBurningTime;
 };
-
+C_ASSERT(sizeof(CVehicleSAInterface) == 0x6AC);
 
 class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {

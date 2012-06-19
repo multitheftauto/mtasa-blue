@@ -19,8 +19,9 @@
 
 class CQuadBikeSAInterface : public CAutomobileSAInterface
 {
-    // fill this
+    
 };
+C_ASSERT(sizeof(CQuadBikeSAInterface) == 0x9BC);
 
 class CQuadBikeSA : public virtual CQuadBike, public virtual CAutomobileSA
 {

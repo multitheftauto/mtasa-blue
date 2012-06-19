@@ -19,13 +19,14 @@
 
 class CMonsterTruckSAInterface : public CAutomobileSAInterface
 {
-    // fill this
+    
 };
+C_ASSERT(sizeof(CMonsterTruckSAInterface) == 0x99C);
 
 class CMonsterTruckSA : public CMonsterTruck, public CAutomobileSA
 {
 private:
-//  CBoatSAInterface        * internalInterface;
+//  CMonsterTruckSAInterface        * internalInterface;
 public:
     CMonsterTruckSA( CMonsterTruckSAInterface * monstertruck );
     CMonsterTruckSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 );
