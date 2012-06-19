@@ -186,7 +186,8 @@ bool DoesVehicleHaveSiren ( )
         pVehicleWithTheSiren->m_nModelIndex == 528 || pVehicleWithTheSiren->m_nModelIndex == 407 ||
         pVehicleWithTheSiren->m_nModelIndex == 416 || pVehicleWithTheSiren->m_nModelIndex == 433 ||
         pVehicleWithTheSiren->m_nModelIndex == 427 || pVehicleWithTheSiren->m_nModelIndex == 544 ||
-        pVehicleWithTheSiren->m_nModelIndex == 523 || pVehicleWithTheSiren->m_nModelIndex == 432 );
+        pVehicleWithTheSiren->m_nModelIndex == 523 || pVehicleWithTheSiren->m_nModelIndex == 432 || 
+        pVehicleWithTheSiren->m_nModelIndex == 423 || pVehicleWithTheSiren->m_nModelIndex == 420 );
 }
 void GetVehicleSirenType ( )
 {
@@ -777,7 +778,7 @@ bool DisableVehicleSiren ( )
     if ( pVehicleWithTheSiren && pVehicleWithTheSiren->vtbl != NULL )
     {
         CVehicle * pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)pVehicleWithTheSiren );
-        if ( pVehicle && pVehicle->IsSirenSilentEffectEnabled ( ) )
+        if ( ( pVehicle && pVehicle->IsSirenSilentEffectEnabled ( ) ) || pVehicle->GetModelIndex ( ) == 420 )
         {
             return true;
         }
