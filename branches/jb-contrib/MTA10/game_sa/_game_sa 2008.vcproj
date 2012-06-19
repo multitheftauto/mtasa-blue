@@ -721,6 +721,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRegisteredMotionBlurStreakSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CRemoteSA.cpp"
 				>
 			</File>
@@ -750,6 +754,10 @@
 			</File>
 			<File
 				RelativePath=".\CShadowDataSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CShadowSA.cpp"
 				>
 			</File>
 			<File
@@ -1346,6 +1354,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRegisteredMotionBlurStreakSA.h"
+				>
+			</File>
+			<File
 				RelativePath="CRemoteSA.h"
 				>
 			</File>
@@ -1375,6 +1387,10 @@
 			</File>
 			<File
 				RelativePath=".\CShadowDataSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CShadowSA.h"
 				>
 			</File>
 			<File
