@@ -41,6 +41,7 @@ public:
     void                    SetDirection            ( CVector & vecDirection );
     void                    SetTargetDirection      ( CVector & vecDirection );
     void                    LookAt                  ( CVector & vecPosition, bool bInterpolate = false );
+    void                    SetDamage               ( short sDamage )   { m_sDamage = sDamage; }
 
 private:
     CClientManager *        m_pManager;
@@ -54,6 +55,7 @@ private:
     bool                    m_bHasTargetDirection;
     CClientMarker *         m_pMarker;
     CClientMarker *         m_pMarker2;
+    short                   m_sDamage;
 };
 
 #endif

@@ -132,9 +132,12 @@ void CClientWeapon::Fire ( void )
             vecDirection *= fDistance;
             RotateVector ( vecDirection, vecRotation );
             CVector vecTarget = vecOrigin + vecDirection;
-            
+            short sDamage = m_pWeaponInfo->GetDamagePerHit ( );
+            m_pWeaponInfo->SetDamagePerHit ( m_sDamage );
             m_pMarker->SetPosition ( vecTarget );
             FireInstantHit ( vecOrigin, vecTarget );
+            m_pWeaponInfo->SetDamagePerHit ( sDamage );
+
             break;
         }
         default: break;

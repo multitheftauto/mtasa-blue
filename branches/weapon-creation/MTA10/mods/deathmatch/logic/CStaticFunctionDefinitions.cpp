@@ -6344,11 +6344,11 @@ bool CStaticFunctionDefinitions::FireWeapon ( CClientWeapon * pWeapon )
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetAimPosition ( CClientWeapon * pWeapon, CVector vecPosition )
+bool CStaticFunctionDefinitions::SetAimPosition ( CClientWeapon * pWeapon, short sDamage )
 {
     if ( pWeapon )
     {
-        pWeapon->SetRotationDegrees ( vecPosition );
+        pWeapon->SetDamage ( sDamage );
         return true;
     }
     return false;

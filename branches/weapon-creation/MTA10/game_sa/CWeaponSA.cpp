@@ -282,16 +282,17 @@ bool CWeaponSA::ProcessLineOfSight ( const CVector * vecStart, const CVector * v
                 *pEntity = pBuildingResult->pInterface;
         }
     }
-    if ( *CollisionEntity && (*pEntity) )
+    if ( *pEntity && (*pEntity)->nType == ENTITY_TYPE_VEHICLE )
     {
         CEntitySAInterface * pHitInterface = *pEntity;
+        CColPointSAInterface * pColPointSAInterface = (*colCollision)->GetInterface();
         DWORD dwFunc = FUNC_CWeapon_CheckForShootingVehicleOccupant;
         _asm
         {
             push vecEnd
             push vecStart
             push weaponType
-            push colCollision
+            push pColPointSAInterface
             lea eax, pHitInterface
             push eax
             call dwFunc

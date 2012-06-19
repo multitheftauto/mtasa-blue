@@ -836,7 +836,7 @@ public:
     LUA_DECLARE ( GetSlotFromWeapon );
     LUA_DECLARE ( CreateWeapon );
     LUA_DECLARE ( FireWeapon );
-    LUA_DECLARE ( SetWeaponAimPosition );
+    LUA_DECLARE ( SetWeaponDamage );
     LUA_DECLARE ( SetWeaponState );
 
     // Command funcs
