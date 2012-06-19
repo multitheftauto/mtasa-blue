@@ -31,9 +31,6 @@ static float fTest = 1;
 
 extern CCore* g_pCore;
 bool g_bBoundsChecker = false;
-DWORD* g_Table = new DWORD[65535];
-DWORD* g_TableSize = new DWORD[65535];
-DWORD g_dwTable = 0;
 
 BOOL AC_RestrictAccess( VOID )
 {
