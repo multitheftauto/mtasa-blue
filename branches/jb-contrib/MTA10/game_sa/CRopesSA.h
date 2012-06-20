@@ -24,6 +24,8 @@
 
 #define ARRAY_CRopes                        0xB768B8
 
+extern CGameSA* g_pGame;
+
 class CRopesSAInterface
 {
 public:

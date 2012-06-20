@@ -31,13 +31,13 @@ class CAnimManagerSA;
 class CAnimBlendAssocGroupSAInterface
 {
 public:
-    CAnimBlockSAInterface*                  pAnimBlock;
-    CAnimBlendStaticAssociationSAInterface* pAssociationsArray;
-    int                                     iNumAnimations;
-    int                                     iIDOffset;
-    AssocGroupId                            groupID;
+    CAnimBlockSAInterface*                  pAnimBlock; // 0
+    CAnimBlendStaticAssociationSAInterface* pAssociationsArray; // 4
+    int                                     iNumAnimations; // 8
+    int                                     iIDOffset; // 12
+    AssocGroupId                            groupID; // 16
 };
-
+C_ASSERT(sizeof(CAnimBlendAssocGroupSAInterface) == 0x14);
 
 class CAnimBlendAssocGroupSA : public CAnimBlendAssocGroup
 {

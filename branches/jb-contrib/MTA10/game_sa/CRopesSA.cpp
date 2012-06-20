@@ -12,9 +12,11 @@
 
 #include "StdInc.h"
 
+DWORD dwDurationAddress = (DWORD)0x558D1D;
+
 int CRopesSA::CreateRopeForSwatPed ( const CVector & vecPosition, DWORD dwDuration )
 {
-/*
+
     int iReturn;
     DWORD dwFunc = FUNC_CRopes_CreateRopeForSwatPed;
     CVector * pvecPosition = const_cast < CVector * > ( &vecPosition );
@@ -30,7 +32,7 @@ int CRopesSA::CreateRopeForSwatPed ( const CVector & vecPosition, DWORD dwDurati
     // Set it back for SA in case we ever do some other implementation.
     MemPut((DWORD*)(dwDurationAddress), 4000);
     return iReturn;
-*//*
+/*
     CEntity* pRopeEntity = reinterpret_cast<CEntity*>((*(CEntity*)0xB781F8) + 100);
     CRopesSAInterface* pRope = CRopeSA::Create(pRopeEntity, RopeTypeSwat, vecPosition, true, 0, 0, 0, dwDuration);
     if(pRope > 0)
@@ -41,8 +43,8 @@ int CRopesSA::CreateRopeForSwatPed ( const CVector & vecPosition, DWORD dwDurati
     else
     {
         return (int)-1;
-    }*/
-    return 0;
+    }
+    */
 }
 
 // Move later into CCameraSA

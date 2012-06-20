@@ -34,8 +34,9 @@ public:
     bool                                            bRunningCompressed;
     int                                             iAnimBlockID;
     float                                           fTotalTime;
-    //class CLink<class CAnimBlendHierarchy *> *      pLinkPtr;
+    /*class CLink<class CAnimBlendHierarchy *> * */ void*      pLinkPtr;
 };
+C_ASSERT(sizeof(CAnimBlendHierarchySAInterface) == 0x18);
 
 class CAnimBlendHierarchySA : public CAnimBlendHierarchy
 {
