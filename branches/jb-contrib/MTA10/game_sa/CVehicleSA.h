@@ -376,7 +376,6 @@ C_ASSERT(sizeof(CAutoPilot) == 0x98);
 
 #define MAX_UPGRADES_ATTACHED 15 // perhaps?
 
-#pragma message("!! DANGER !! @ Do not use @ Reconstruction in progress.. !! DANGER !!")
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
 public:
@@ -448,7 +447,7 @@ public:
 
     //1216
     float m_nHealth; // 1000.0f = full health. 0 -> explode
- // dafaq is this
+
     /*** BEGIN SECTION that was added by us ***/
     BYTE Padding200[45]; //1220
     CVehicle* m_pVehicle; //1268
@@ -725,7 +724,5 @@ private:
     void                        RecalculateSuspensionLines          ( void );
     void                        CopyGlobalSuspensionLinesToPrivate  ( void );
 };
-
-#undef REDIRECT_TO_CLASS
 
 #endif
