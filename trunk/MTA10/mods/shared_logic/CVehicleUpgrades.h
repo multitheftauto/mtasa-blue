@@ -49,6 +49,8 @@ public:
     void                    ReAddAll                    ( void );
     void                    RemoveAll                   ( bool bRipFromVehicle );
 
+    void                    RestreamVehicleUpgrades     ( unsigned short usModel );
+
 protected:
     SSlotStates             m_SlotStates;
     CClientVehicle*         m_pVehicle;

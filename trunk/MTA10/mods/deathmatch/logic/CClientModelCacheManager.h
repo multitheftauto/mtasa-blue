@@ -28,6 +28,7 @@ public:
     virtual void                DoPulse                             ( void ) = 0;
     virtual void                GetStats                            ( std::vector < SModelCacheStatItem >& outList ) = 0;
     virtual void                DrawStats                           ( void ) = 0;
+    virtual void                OnRestreamModel                     ( ushort usModelId ) = 0;
 };
 
 CClientModelCacheManager* NewClientModelCacheManager ( void );

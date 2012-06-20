@@ -121,6 +121,8 @@ void CClientPedManager::OnDestruction ( CClientPed * pPed )
 
 void CClientPedManager::RestreamPeds ( unsigned short usModel )
 {
+    g_pClientGame->GetModelCacheManager ()->OnRestreamModel ( usModel );
+
     // Store the affected vehicles
     CClientPed* pPed;
     std::vector < CClientPed* > ::const_iterator iter = IterBegin ();
