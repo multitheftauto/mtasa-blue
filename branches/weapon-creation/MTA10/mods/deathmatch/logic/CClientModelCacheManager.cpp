@@ -57,6 +57,7 @@ public:
     virtual void                DoPulse                             ( void );
     virtual void                GetStats                            ( std::vector < SModelCacheStatItem >& outList );
     virtual void                DrawStats                           ( void );
+    virtual void                OnRestreamModel                     ( ushort usModelId );
 
     // CClientModelCacheManagerImpl methods
                                 CClientModelCacheManagerImpl        ( void );
@@ -153,7 +154,8 @@ void CClientModelCacheManagerImpl::PreLoad ( void )
 #if 0
     for ( uint i = 321 ; i <= 372 ; i++ )
     {
-        AddModelRefCount ( i );
+        if ( CClientPedManager::IsValidWeaponModel ( i ) )
+            AddModelRefCount ( i );
     }
     g_pGame->GetStreaming()->LoadAllRequestedModels ( false );
 #endif
@@ -804,4 +806,34 @@ void CClientModelCacheManagerImpl::GetStats ( std::vector < SModelCacheStatItem 
 ///////////////////////////////////////////////////////////////
 void CClientModelCacheManagerImpl::DrawStats ( void )
 {
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CClientModelCacheManagerImpl::OnRestreamModel
+//
+// Uncache here, now.
+//
+///////////////////////////////////////////////////////////////
+void CClientModelCacheManagerImpl::OnRestreamModel ( ushort usModelId )
+{
+    std::map < ushort, SModelCacheInfo >* mapList[] = { &m_PedModelCacheInfoMap, &m_VehicleModelCacheInfoMap };
+
+    for ( uint i = 0 ; i < NUMELMS( mapList ) ; i++ )
+    {
+        std::map < ushort, SModelCacheInfo >& cacheInfoMap = *mapList[i];
+
+        SModelCacheInfo* pInfo = MapFind ( cacheInfoMap, usModelId );
+        if ( pInfo )
+        {
+            if ( pInfo->bIsModelCachedHere )
+            {
+                SubModelRefCount ( usModelId );
+                pInfo->bIsModelCachedHere = false;
+                MapRemove ( cacheInfoMap, usModelId );
+                OutputDebugLine ( SString ( "[Cache] End caching model %d", usModelId ) );
+            }
+        }
+    }
 }

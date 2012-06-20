@@ -249,7 +249,7 @@ void CInputRPCs::ForceReconnect ( NetBitStreamInterface& bitStream )
 
         bitStream.Read ( szHost, ucHost );
 
-        if ( szHost[0] && bitStream.Read ( usPort ) )
+        if ( bitStream.Read ( usPort ) )
         {
             if ( bitStream.Read ( ucPassword ) )
             {

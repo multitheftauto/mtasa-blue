@@ -195,10 +195,10 @@ private:
     CXMLNode *              m_pNodeSettings;        // Settings XML node, read from meta.xml and copied into it's own instance
     CXMLNode *              m_pNodeStorage;         // Dummy XML node used for temporary storage of stuff returned by CSettings::Get
 
-    SString                 m_strMinClientReqFromConfig;     // Min MTA client version as declared in meta.xml
-    SString                 m_strMinServerReqFromConfig;     // Min MTA server version as declared in meta.xml
-    SString                 m_strMinClientReqCalculated;     // Min MTA client version as calculated by scanning the script source
-    SString                 m_strMinServerReqCalculated;     // Min MTA server version as calculated by scanning the script source
+    SString                 m_strMinClientReqFromMetaXml;    // Min MTA client version as declared in meta.xml
+    SString                 m_strMinServerReqFromMetaXml;    // Min MTA server version as declared in meta.xml
+    SString                 m_strMinClientReqFromSource;     // Min MTA client version as calculated by scanning the script source
+    SString                 m_strMinServerReqFromSource;     // Min MTA server version as calculated by scanning the script source
     SString                 m_strMinClientReason;
     SString                 m_strMinServerReason;
 

@@ -699,21 +699,6 @@ void CPlayer::UpdateOthersNearList ( void )
 {
     m_UpdateNearListTimer.Reset ();
 
-    // If testing, put into every other players near list
-    if ( g_pBandwidthSettings->bTestPretendEveryoneIsNear )
-    {
-        std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-        for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
-        {
-            CPlayer* pOtherPlayer = *iter;
-            if ( pOtherPlayer != this && m_usDimension == pOtherPlayer->GetDimension () )
-            {
-                pOtherPlayer->RefreshNearPlayer ( this );
-            }
-        }
-        return;
-    }
-
     // Get the two positions to check
     const CVector& vecPlayerPosition = GetPosition ();
     CVector vecCameraPosition;

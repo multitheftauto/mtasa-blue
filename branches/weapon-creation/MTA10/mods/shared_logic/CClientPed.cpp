@@ -5154,15 +5154,12 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
     // Are we streamed in?
     if ( m_pPlayerPed )
     {  
-        bool bLoaded = true;
-        
         if( !pBlock->IsLoaded() )
         {
-            pBlock->Request ( BLOCKING );
-            assert( pBlock->IsLoaded () );
+            pBlock->Request ( BLOCKING, true );
         }
 
-        if ( bLoaded )
+        if ( pBlock->IsLoaded() )
         {
             int flags = 0x10; // // Stops jaw fucking up, some speaking flag maybe   
             if ( bLoop ) flags |= 0x2; // flag that triggers the loop (Maccer)
@@ -5190,7 +5187,9 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
         }
         else
         {
-            assert ( 0 );
+            SString strMessage ( "%s %d (%s)", pBlock->GetName (), pBlock->GetIndex (), szAnimName ); 
+            g_pCore->LogEvent ( 543, "Blocking anim load fail", "", strMessage );
+            AddReportLog ( 5431, SString ( "Failed to load animation %s", *strMessage ) );           
 /*
             // TODO: unload unreferenced blocks later on
             g_pGame->GetStreaming ()->RequestAnimations ( pBlock->GetIndex (), 8 );

@@ -603,7 +603,9 @@ void CModelInfoSA::SetLODDistance ( float fDistance )
 
 void CModelInfoSA::RestreamIPL ()
 {
-    MapSet ( ms_RestreamTxdIDMap, GetTextureDictionaryID (), 0 );
+    // IPLs should not contain peds, weapons, vehicles and vehicle upgrades
+    if ( m_dwModelID > 611 && ( m_dwModelID < 1000 || m_dwModelID > 1193 ) )
+        MapSet ( ms_RestreamTxdIDMap, GetTextureDictionaryID (), 0 );
 }
 
 void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )

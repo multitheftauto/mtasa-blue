@@ -64,6 +64,7 @@ public:
     static bool                     IsVehicleLimitReached   ( void );
 
     void                            RestreamVehicles        ( unsigned short usModel );
+    void                            RestreamVehicleUpgrades ( unsigned short usModel );
 
     std::vector < CClientVehicle* > ::const_iterator            IterBegin           ( void )    { return m_List.begin (); };
     std::vector < CClientVehicle* > ::const_iterator            IterEnd             ( void )    { return m_List.end (); };

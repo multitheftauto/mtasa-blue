@@ -563,7 +563,6 @@ void CEntitySA::SetUnderwater ( bool bUnderwater )
     m_pInterface->bUnderwater = bUnderwater;
 }
 
-
 bool CEntitySA::GetUnderwater ( void )
 {
     return m_pInterface->bUnderwater;

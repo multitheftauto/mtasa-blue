@@ -141,3 +141,17 @@ void CClientPickupManager::RemoveFromList ( CClientPickup* pPickup )
         if ( !m_List.empty() ) m_List.remove ( pPickup );
     }
 }
+
+
+void CClientPickupManager::RestreamPickups ( unsigned short usModel )
+{    
+    for ( std::list < CClientPickup* > ::const_iterator iter = IterBegin () ; iter != IterEnd (); iter++ )
+    {
+        CClientPickup* pPickup = *iter;
+
+        if ( pPickup->IsStreamedIn () && pPickup->GetModel () == usModel )
+        {
+            pPickup->StreamOutForABit ();
+        }
+    }
+}
