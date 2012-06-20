@@ -397,6 +397,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CBuoyancySA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CCameraSA.cpp"
 				>
 			</File>
@@ -673,6 +677,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CShadowDataSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CStatsSA.cpp"
 				>
 			</File>
@@ -907,6 +915,10 @@
 			</File>
 			<File
 				RelativePath="CBuildingSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CBuoyancySA.h"
 				>
 			</File>
 			<File
@@ -1211,6 +1223,10 @@
 			</File>
 			<File
 				RelativePath=".\CSettingsSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CShadowDataSA.h"
 				>
 			</File>
 			<File

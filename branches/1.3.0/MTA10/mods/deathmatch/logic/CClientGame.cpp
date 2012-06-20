@@ -3530,9 +3530,9 @@ bool CClientGame::StaticProcessCollisionHandler ( CEntitySAInterface* pThisInter
     return g_pClientGame->ProcessCollisionHandler ( pThisInterface, pOtherInterface );
 }
 
-bool CClientGame::StaticVehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity )
+bool CClientGame::StaticVehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity )
 {
-    return g_pClientGame->VehicleCollisionHandler( pCollidingVehicle, pCollidedVehicle, iModelIndex, fDamageImpulseMag, fCollidingDamageImpulseMag, byBodyPartHit, vecCollisionPos, vecCollisionVelocity );
+    return g_pClientGame->VehicleCollisionHandler( pCollidingVehicle, pCollidedVehicle, iModelIndex, fDamageImpulseMag, fCollidingDamageImpulseMag, usPieceType, vecCollisionPos, vecCollisionVelocity );
 }
 
 bool CClientGame::StaticHeliKillHandler ( CVehicleSAInterface* pHeliInterface, CPedSAInterface* pPed )
@@ -4042,7 +4042,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
     return true;
 }
 
-bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedWith, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, BYTE byBodyPartHit, CVector vecCollisionPos, CVector vecCollisionVelocity )
+bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedWith, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity )
 {
     if ( pCollidingVehicle && pCollidedWith )
     {
@@ -4082,7 +4082,7 @@ bool CClientGame::VehicleCollisionHandler ( CVehicleSAInterface* pCollidingVehic
                 Arguments.PushNil ( );
             }
             Arguments.PushNumber ( fDamageImpulseMag );
-            Arguments.PushNumber ( byBodyPartHit );
+            Arguments.PushNumber ( usPieceType );
             Arguments.PushNumber ( vecCollisionPos.fX );
             Arguments.PushNumber ( vecCollisionPos.fY );
             Arguments.PushNumber ( vecCollisionPos.fZ );

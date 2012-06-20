@@ -327,6 +327,19 @@ void CVehicleUpgrades::ForceAddUpgrade ( unsigned short usUpgrade )
     }
 }
 
+// Not really a restream.
+// Call after changing from/to a custom model to see the result immediately
+void CVehicleUpgrades::RestreamVehicleUpgrades ( unsigned short usUpgrade )
+{
+    unsigned char ucSlot;
+    if ( GetSlotFromUpgrade ( usUpgrade, ucSlot ) )
+    {
+        if ( m_SlotStates [ ucSlot ] == usUpgrade )
+            ForceAddUpgrade ( usUpgrade );
+    }
+}
+
+
 bool CVehicleUpgrades::HasUpgrade ( unsigned short usUpgrade )
 {
     unsigned char ucSlot = 0;

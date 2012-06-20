@@ -19,12 +19,10 @@
 #define FUNC_CBuilding_operator_new     0x404090
 #define FUNC_CBuilding_Constructor      0x403E00
 
-#define SIZEOF_CBuilding                56
-
 class CBuildingSAInterface : public CEntitySAInterface
 {
-
 };
+C_ASSERT(sizeof(CBuildingSAInterface) == sizeof(CEntitySAInterface));
 
 class CBuildingSA : public virtual CBuilding, public virtual CEntitySA
 {

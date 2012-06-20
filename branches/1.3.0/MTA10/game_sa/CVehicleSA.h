@@ -317,23 +317,6 @@ struct CTrainFlags
     unsigned char unknown7 : 8;
 };
 
-/*
-#ifndef CPEDSA_DEFINED
-#define CPedSA void
-#endif
-
-#ifndef CPEDSAINTERFACE_DEFINED
-#define CPedSAInterface void
-#endif
-
-#ifdef CVehicleSA
-#undef CVehicleSA
-#endif
-
-#ifdef CVehicleSAInterface
-#undef CVehicleSAInterface
-#endif
-*/
 
 // TODO: Size?
 class CAEVehicleAudioEntity
