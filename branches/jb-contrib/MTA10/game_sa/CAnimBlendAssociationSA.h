@@ -24,9 +24,12 @@ class CAnimBlendHierarchySAInterface;
 class CAnimBlendAssociationSAInterface
 {
 public:
-    BYTE                                pad [ 14 ]; // 0                                      // 0
-    short                               sAnimGroup; // 14                                    // 14
-    DWORD *                             pAnimBlendNodeArray; // 16 [[ CAnimBlendNode pp?          // 16
+    void*                               vtbl; // 0
+    uint32                              pad1; // 4
+    uint32                              pad2; // 8
+    uint16                              uiAnimBlendNodeCount; // 12
+    short                               sAnimGroup; // 14
+    DWORD *                             pAnimBlendNodeArray; // 16 [[ CAnimBlendNode pp?
     CAnimBlendHierarchySAInterface *    pAnimHierarchy;  // 20
     float                               fBlendAmount;                                       // 24
     float                               fBlendDelta;                                        // 28
@@ -35,9 +38,10 @@ public:
     float                               fTimeStep;                                          // 40
     short                               sAnimID;                                            // 44
     short                               sFlags;     // or1 = started?, or64 = referenced?   // 46
-    DWORD *                             pCallback;         // 48
-    uint32                              pad1;
-    uint32                              pad2;
+    // callback stuff
+    uint32                              pad3; // kind of a regulator var
+    uint32*                             pCallback;
+    uint32                              uiCallbackArg; // it's passed to callback
 };
 C_ASSERT(sizeof(CAnimBlendAssociationSAInterface) == 0x3C);
 

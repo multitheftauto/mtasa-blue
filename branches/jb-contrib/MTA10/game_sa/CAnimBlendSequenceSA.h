@@ -18,11 +18,13 @@
 class CAnimBlendSequenceSAInterface
 {
 public:
-    unsigned int                    iHashKey;       // Get/SetBoneTag accesses the first? 2 bytes here
-    short                           sFlags; // 4    // or16=bHasBoneTag
+    unsigned int                    iHashKey;   // 0 [[Get/SetBoneTag accesses the first? 2 bytes here
+    short                           sFlags; // 4 [[or16=bHasBoneTag
     short                           sNumKeyFrames; // 6
-    class CAnimBlendKeyFrame *      pKeyFrames; // ?
+    class CAnimBlendKeyFrame *      pKeyFrames; // 8
 };
+C_ASSERT(sizeof(CAnimBlendSequenceSAInterface) == 0xC);
+
 
 class CAnimBlendSequenceSA : public CAnimBlendSequence
 {
