@@ -551,8 +551,7 @@ public:
     // 2276
    // float m_fBurningTime;
 };
-// cut to before DamageManager as CTrain does not utilize it, thus ... ('nuff said)
-//C_ASSERT(sizeof(CVehicleSAInterface) == 0x6AC);
+C_ASSERT(sizeof(CVehicleSAInterface) == 0x5A0);
 
 class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {

@@ -17,4 +17,4 @@ class CTrainSAInterface : public CPhysicalSAInterface
 {
 public:
 };
-//C_ASSERT(sizeof(CTrainSAInterface) == sizeof(CVehicleSAInterface));
+C_ASSERT(sizeof(CTrainSAInterface) == 0x10C);

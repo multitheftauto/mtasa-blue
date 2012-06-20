@@ -62,7 +62,7 @@ bool AreVerticesVisible(CCameraSAInterface* pCamera, CVector& vecTargetPos, floa
     }
     return uiRet == 1;
 }
-
+#if 0
 void CRopesSAInterface::Draw()
 {
 	CVector &vecRopeCenter = m_vecSegments[ROPES_COUNT / 2];
@@ -124,3 +124,4 @@ void CRopesSAInterface::Draw()
 		}
 	}
 }
+#endif
