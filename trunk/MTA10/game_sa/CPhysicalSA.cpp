@@ -327,7 +327,6 @@ void CPhysicalSA::GetAttachedOffsets ( CVector & vecPosition, CVector & vecRotat
     }
 }
 
-
 void CPhysicalSA::SetAttachedOffsets ( CVector & vecPosition, CVector & vecRotation )
 {
     CPhysicalSAInterface * pInterface = (CPhysicalSAInterface *)this->GetInterface();

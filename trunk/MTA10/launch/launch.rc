@@ -1,13 +1,16 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
+#include "vcexpress_rc_fix.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
+#if !defined USING_VCEXPRESS
 #include "afxres.h"
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
