@@ -12,3 +12,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+
+void                        CWeaponInfoSA::SetFireOffset               ( CVector * vecFireOffset )   
+{ 
+    MemCpyFast (&internalInterface->m_vecFireOffset, vecFireOffset, sizeof(CVector)); 
+}

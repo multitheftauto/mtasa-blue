@@ -31,3 +31,4 @@
 #include "COffsets.h"
 #include "CPopulationSA.h"
 #include "CRemoteDataSA.h"
+#include "CMultiplayerSA_ClothesCache.h"

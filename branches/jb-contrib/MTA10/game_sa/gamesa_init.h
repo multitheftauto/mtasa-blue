@@ -104,4 +104,5 @@ void MemOrFast ( U ptr, const T value )
 bool GetDebugIdEnabled ( uint uiDebugId );
 void LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody );
 
+
 #endif

@@ -110,7 +110,7 @@ public:
     void                        SetTargetRange              ( float fRange )                { internalInterface->m_fTargetRange = fRange; };
 
     CVector *                   GetFireOffset               ( void )                        { return &internalInterface->m_vecFireOffset; };
-    void                        SetFireOffset               ( CVector * vecFireOffset )     { MemCpyFast (&internalInterface->m_vecFireOffset, vecFireOffset, sizeof(CVector)); };
+    void                        SetFireOffset               ( CVector * vecFireOffset );
 
     short                       GetDamagePerHit             ( void )                        { return internalInterface->m_nDamage; };
     void                        SetDamagePerHit             ( short sDamagePerHit )         { internalInterface->m_nDamage = sDamagePerHit; };

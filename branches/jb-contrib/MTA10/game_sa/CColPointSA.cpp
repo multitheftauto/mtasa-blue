@@ -15,4 +15,14 @@
 CColPointSA::CColPointSA()
 { 
     this->internalInterface = new CColPointSAInterface(); 
-};
+}
+
+VOID CColPointSA::SetPosition(CVector * vecPosition)  
+{ 
+    MemCpyFast (&this->GetInterface()->Position, vecPosition, sizeof(CVector)); 
+}
+
+VOID CColPointSA::SetNormal(CVector * vecNormal) 
+{ 
+    MemCpyFast (&this->GetInterface()->Normal, vecNormal, sizeof(CVector)); 
+}

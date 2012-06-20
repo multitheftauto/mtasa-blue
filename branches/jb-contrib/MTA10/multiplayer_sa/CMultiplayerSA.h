@@ -23,8 +23,8 @@
 #include "CPopulationSA.h"
 #include "multiplayersa_init.h"
 #include "CLimitsSA.h"
-
 #include "CRemoteDataSA.h"
+
 class CRemoteDataSA;
 
 class CMultiplayerSA : public CMultiplayer

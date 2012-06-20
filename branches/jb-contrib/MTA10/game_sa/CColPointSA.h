@@ -45,10 +45,10 @@ public:
     CColPointSA(CColPointSAInterface * pInterface ) { this->internalInterface = pInterface; };
 
     CVector * GetPosition()  { return &this->GetInterface()->Position; };
-    VOID SetPosition(CVector * vecPosition)  { MemCpyFast (&this->GetInterface()->Position, vecPosition, sizeof(CVector)); };
+    VOID SetPosition(CVector * vecPosition);
 
     CVector * GetNormal() { return &this->GetInterface()->Normal; };
-    VOID SetNormal(CVector * vecNormal) { MemCpyFast (&this->GetInterface()->Normal, vecNormal, sizeof(CVector)); };
+    VOID SetNormal(CVector * vecNormal);
 
     BYTE GetSurfaceTypeA() { return this->GetInterface()->bSurfaceTypeA; };
     BYTE GetSurfaceTypeB() { return this->GetInterface()->bSurfaceTypeB; };
