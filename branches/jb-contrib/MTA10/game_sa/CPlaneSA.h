@@ -19,10 +19,21 @@
 
 class CPlaneSAInterface : public CAutomobileSAInterface
 {
-    // + 2508 = undercarrige possition (float - 1.0 = up, 0.0 = down)
-    // fill this
+    uint32 pad1[8];
+    float fMaxAltitude;
+    uint32 pad2;
+    float fMinAltitude;
+    uint32 pad3[6];
+    float fLandingGearPos; // [0.0, 1.0]
+    uint32 pad4;
+    class CParticleFx** ppSpecialPlaneParticles; // may be array of CParticleFx* , needs more checking
+    uint32 pad5[4];
+    class CParticleFx* pThrustersParticles[4];
+    class CParticleFx* pEngineFireParticle;
+    class CFxSystem* pFxSystem; // check its function
+    uint8 pad6[4];
 };
-//C_ASSERT(sizeof(CPlaneSAInterface) == 0xA04);
+C_ASSERT(sizeof(CPlaneSAInterface) == 0xA04);
 
 class CPlaneSA : public virtual CPlane, public virtual CAutomobileSA
 {

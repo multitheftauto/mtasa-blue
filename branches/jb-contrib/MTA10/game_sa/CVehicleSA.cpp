@@ -1116,202 +1116,6 @@ DWORD * CVehicleSA::GetMemoryValue ( DWORD dwOffset )
         return NULL;
 }
 
-/*
-
-bool CVehicleSA::isInRect(FLOAT fX1, FLOAT fY1, FLOAT fX2, FLOAT fY2, bool bShowHotspot)
-{
-    return (bool)CallScriptFunction(GTAVC_SCM_IS_CAR_IN_RECT_STILL,&this->internalID,&fX1,&fY1,&fX2,&fY2,&bShowHotspot);
-}
-
-//-----------------------------------------------------------
-
-bool CVehicleSA::isInCube(CVector * v3dCorner1, CVector * v3dCorner2, bool bShowHotspot)
-{
-    return (bool)CallScriptFunction(GTAVC_SCM_IS_CAR_IN_CUBE_STILL,&this->internalID,*v3dCorner1,*v3dCorner2,&bShowHotspot);
-}
-
-//-----------------------------------------------------------
-
-bool CVehicleSA::isNearPoint(FLOAT fX, FLOAT fY, FLOAT fRadiusX, FLOAT fRadiusY, bool bShowHotspot, bool bStill)
-{
-    return (bool)CallScriptFunction(GTAVC_SCM_IS_CAR_NEAR_POINT,&this->internalID,&fX,&fY,&fRadiusX,&fRadiusY,&bShowHotspot,&bStill);
-}
-
-//-----------------------------------------------------------
-
-bool CVehicleSA::isNearPoint3D(FLOAT fX, FLOAT fY, FLOAT fZ, FLOAT fRadiusX, FLOAT fRadiusY, FLOAT fRadiusZ, bool bShowHotspot, bool bStill)
-{
-    return (bool)CallScriptFunction(GTAVC_SCM_IS_CAR_NEAR_POINT_3D,&this->internalID,&fX,&fY,&fZ,&fRadiusX,&fRadiusY,&fRadiusZ,&bShowHotspot,&bStill);
-}
-
-//-----------------------------------------------------------
-
-bool CVehicleSA::isStopped()
-{
-    return (bool)CallScriptFunction(GTAVC_SCM_IS_CAR_STOPPED,&this->internalID);
-}
-
-//-----------------------------------------------------------
-
-bool CVehicleSA::isWrecked()
-{
-    return (bool)CallScriptFunction(GTAVC_SCM_IS_CAR_WRECKED,&this->internalID);
-}
-
-//-----------------------------------------------------------
-
-bool CVehicleSA::isOnLand()
-{
-    return (bool)CallScriptFunction(GTAVC_SCM_IS_CAR_ON_LAND,&this->internalID);
-}
-
-//-----------------------------------------------------------
-
-bool CVehicleSA::isCrushed()
-{
-    return (bool)CallScriptFunction(GTAVC_SCM_IS_CAR_CRUSHED,&this->internalID);
-}
-
-//-----------------------------------------------------------
-
-bool CVehicleSA::isOnRoof()
-{
-    return (bool)CallScriptFunction(GTAVC_SCM_IS_CAR_FLIPPED,&this->internalID);
-}
-
-//-----------------------------------------------------------
-
-bool CVehicleSA::isAirbourne()
-{
-    return (bool)CallScriptFunction(GTAVC_SCM_IS_AIRBORNE,&this->internalID);
-}
-
-//-----------------------------------------------------------
-
-bool CVehicleSA::isUpsidedown()
-{
-    return (bool)CallScriptFunction(GTAVC_SCM_IS_CAR_UPSIDEDOWN,&this->internalID);
-}
-
-//-----------------------------------------------------------
-
-bool CVehicleSA::isStuck()
-{
-    return (bool)CallScriptFunction(GTAVC_SCM_IS_CAR_STUCK,&this->internalID);
-}
-
-//-----------------------------------------------------------
-
-bool CVehicleSA::isSunk()
-{
-    return (bool)CallScriptFunction(GTAVC_SCM_HAS_CAR_SUNK,&this->internalID);
-}
-
-//-----------------------------------------------------------
-
-bool CVehicleSA::isBoundingSphereVisible()
-{
-    return (bool)CallScriptFunction(GTAVC_SCM_IS_CAR_BOUNDING_SPHERE_VISIBLE,&this->internalID);
-}
-
-//-----------------------------------------------------------
-
-bool CVehicleSA::isDamaged()
-{
-    return (bool)CallScriptFunction(GTAVC_SCM_IS_CAR_DAMAGED,&this->internalID);
-}
-
-//-----------------------------------------------------------
-
-bool CVehicleSA::isBombActive()
-{
-    return (bool)CallScriptFunction(GTAVC_SCM_IS_CAR_BOMB_STATUS,&this->internalID);
-}
-
-//-----------------------------------------------------------
-
-bool CVehicleSA::isPassengerSeatFree()
-{
-    return (bool)CallScriptFunction(GTAVC_SCM_IS_CAR_PASSENGER_SEAT_FREE,&this->internalID);
-}
-
-//-----------------------------------------------------------
-
-DWORD CVehicleSA::passengerCount()
-{
-    return ((CVehicleSAInterface *)this->GetInterface())->PassengerCount;
-}
-
-//-----------------------------------------------------------
-
-DWORD CVehicleSA::maxPassengers()
-{
-    DWORD dwMaxPassengers = 0;
-    CallScriptFunction(GTAVC_SCM_GET_CAR_MAX_PASSENGERS,&this->internalID, &dwMaxPassengers);
-    return dwMaxPassengers;
-}
-
-//-----------------------------------------------------------
-
-void CVehicleSA::setDensity(DWORD dwDensity)
-{
-    CallScriptFunction(GTAVC_SCM_SET_CAR_DENSITY,&this->internalID,&dwDensity);
-}
-
-//-----------------------------------------------------------
-
-void CVehicleSA::makeHeavy(bool bHeavy)
-{
-    CallScriptFunction(GTAVC_SCM_MAKE_CAR_HEAVY,&this->internalID,&bHeavy);
-}
-*/
-//-----------------------------------------------------------
-/**
- * \todo Make a eDoorState enum
- */
-/*
-void CVehicleSA::setDoorsStatus(DWORD dwStatus)
-{
-    CallScriptFunction(GTAVC_SCM_SET_CAR_DOOR_STATUS,&this->internalID,&dwStatus);
-}
-
-//-----------------------------------------------------------
-
-void CVehicleSA::setTaxiLight(bool bOn)
-{
-    CallScriptFunction(GTAVC_SCM_SET_CAR_TAXIAVAILABLE,&this->internalID,&bOn);
-}
-
-//-----------------------------------------------------------
-
-void CVehicleSA::setSpeed(FLOAT fSpeed)
-{
-    CallScriptFunction(GTAVC_SCM_SET_CAR_SPEED,&this->internalID,&fSpeed);
-}
-
-//-----------------------------------------------------------
-
-FLOAT CVehicleSA::getSpeed()
-{
-    FLOAT fReturn;
-    CallScriptFunction(GTAVC_SCM_GET_CAR_SPEED,&this->internalID, &fReturn);
-    return fReturn;
-}
-
-//-----------------------------------------------------------
-
-void CVehicleSA::setSpeedInstantly(FLOAT fSpeed)
-{
-    CallScriptFunction(GTAVC_SCM_SET_CAR_SPEED_INSTANTLY,&this->internalID,&fSpeed);
-}
-//-----------------------------------------------------------
-
-void CVehicleSA::setImmunities(bool bBullet, bool bFire, bool bExplosion, bool bDamage, bool bUnknown)
-{
-    CallScriptFunction(GTAVC_SCM_SET_CAR_IMMUNITIES,&this->internalID,&bBullet,&bFire,&bExplosion,&bDamage,&bUnknown);
-}
-*/
-
 //-----------------------------------------------------------
 FLOAT CVehicleSA::GetHealth()
 {
@@ -1333,6 +1137,8 @@ void CVehicleSA::SetHealth( FLOAT fHealth )
 
 void CVehicleSA::SetLandingGearDown ( bool bLandingGearDown )
 {
+#pragma message("Move this to CPlaneSA!!")
+    /*
     // This is the C code corresponding to the gta_sa
     // asm code at address 0x6CB39A.
     CVehicleSAInterface* pInterface = this->GetVehicleInterface ();
@@ -1357,31 +1163,38 @@ void CVehicleSA::SetLandingGearDown ( bool bLandingGearDown )
                 fPosition = ( fTimeStep * flt_871904 ) - 1.0f;
         }
     }
+    */
 }
 
 float CVehicleSA::GetLandingGearPosition ( )
 {
+    #pragma message("Move this to CPlaneSA!!")
     DWORD dwThis = (DWORD)this->GetInterface();
     return *(float *)(dwThis + 2508);
 }
 
 void CVehicleSA::SetLandingGearPosition ( float fPosition )
 {
-    DWORD dwThis = (DWORD)this->GetInterface();
-    MemPutFast < float > ( dwThis + 2508, fPosition );
+    #pragma message("Move this to CPlaneSA!!")
+    //DWORD dwThis = (DWORD)this->GetInterface();
+    //MemPutFast < float > ( dwThis + 2508, fPosition );
 }
 
 bool CVehicleSA::IsLandingGearDown ( )
 {
+    #pragma message("Move this to CPlaneSA!!")
+    /*
     DWORD dwThis = (DWORD)this->GetInterface();
     if ( *(float *)(dwThis + 2508) <= 0.0f )
         return true;
     else
-        return false;
+        return false;*/
+    return false;
 }
 
 void CVehicleSA::Fix ( void )
 {
+#pragma message("Do this similar like with CVehicleSA::Blow just below, use virtual table")
     DEBUG_TRACE("void CVehicleSA::Fix ( void )");
     DWORD dwThis = (DWORD) GetInterface();
 
