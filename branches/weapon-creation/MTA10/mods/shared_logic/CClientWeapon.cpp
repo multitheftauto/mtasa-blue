@@ -29,6 +29,7 @@ CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponT
     m_pMarker2 = new CClientMarker ( pManager, INVALID_ELEMENT_ID, 4 );
     m_pMarker2->SetColor( SColor( 0xFFFF0000 ) );
     m_pMarker2->SetSize ( 0.5f );
+    m_sDamage = m_pWeaponInfo->GetDamagePerHit ( );
 }
 
 
@@ -91,9 +92,9 @@ void CClientWeapon::Fire ( void )
         case WEAPONTYPE_PISTOL:
         case WEAPONTYPE_PISTOL_SILENCED:
         case WEAPONTYPE_DESERT_EAGLE:
-        case WEAPONTYPE_SHOTGUN: 
+        /*case WEAPONTYPE_SHOTGUN: 
         case WEAPONTYPE_SAWNOFF_SHOTGUN:
-        case WEAPONTYPE_SPAS12_SHOTGUN:
+        case WEAPONTYPE_SPAS12_SHOTGUN:*/
         case WEAPONTYPE_MICRO_UZI:
         case WEAPONTYPE_MP5:
         case WEAPONTYPE_AK47:
