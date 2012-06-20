@@ -15,6 +15,8 @@
 
 #include "StdInc.h"
 
+extern CGameSA * pGame;
+
 CWeaponSA::CWeaponSA( CWeaponSAInterface * weaponInterface, CPed * ped, eWeaponSlot weaponSlot )
 {
     DEBUG_TRACE("CWeaponSA::CWeaponSA( CWeaponSAInterface * weaponInterface, CPed * ped, DWORD dwSlot )");
@@ -111,4 +113,9 @@ void CWeaponSA::Remove ()
         }
         owner->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_UNARMED );
     }
+}
+
+CWeaponInfo     * CWeaponSA::GetInfo( eWeaponSkill skill )
+{ 
+    return pGame->GetWeaponInfo( internalInterface->m_eWeaponType, skill ); 
 }

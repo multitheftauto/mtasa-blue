@@ -22,7 +22,7 @@ class CPlaneSAInterface : public CAutomobileSAInterface
     // + 2508 = undercarrige possition (float - 1.0 = up, 0.0 = down)
     // fill this
 };
-C_ASSERT(sizeof(CPlaneSAInterface) == 0xA04);
+//C_ASSERT(sizeof(CPlaneSAInterface) == 0xA04);
 
 class CPlaneSA : public virtual CPlane, public virtual CAutomobileSA
 {

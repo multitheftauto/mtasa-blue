@@ -11,8 +11,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CGAMESA_COLMODELSA
-#define __CGAMESA_COLMODELSA
+#pragma once
 
 #include <windows.h>
 #include <game/CColModel.h>
@@ -105,5 +104,3 @@ private:
     CColModelSAInterface *          m_pInterface;
     bool                            m_bDestroyInterface;
 };
-
-#endif

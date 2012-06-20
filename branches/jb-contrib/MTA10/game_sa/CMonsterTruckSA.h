@@ -21,7 +21,7 @@ class CMonsterTruckSAInterface : public CAutomobileSAInterface
 {
     
 };
-C_ASSERT(sizeof(CMonsterTruckSAInterface) == 0x99C);
+//C_ASSERT(sizeof(CMonsterTruckSAInterface) == 0x99C);
 
 class CMonsterTruckSA : public CMonsterTruck, public CAutomobileSA
 {

@@ -18,9 +18,9 @@
 
 #include <list>
 
-class CPopulationSA : public CPopulation
-{
-
-};
+//class CPopulationSA : public CPopulation
+//{
+//
+//};
 
 #endif

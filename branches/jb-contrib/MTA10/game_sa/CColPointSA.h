@@ -15,6 +15,7 @@
 
 #include <game/CColPoint.h>
 #include <CVector.h>
+#include "gamesa_init.h"
 
 class CColPointSAInterface
 {

@@ -22,7 +22,7 @@ class CBikeSAInterface : public CVehicleSAInterface
 {
 
 };
-C_ASSERT(sizeof(CBikeSAInterface) == 0x814);
+//C_ASSERT(sizeof(CBikeSAInterface) == 0x814);
 
 class CBikeSA : public virtual CBike, public virtual CVehicleSA
 {

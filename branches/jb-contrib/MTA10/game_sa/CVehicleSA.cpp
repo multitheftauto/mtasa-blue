@@ -1305,8 +1305,10 @@ void CVehicleSA::SetHealth( FLOAT fHealth )
 {
     CVehicleSAInterface * vehicle = (CVehicleSAInterface *)this->GetInterface();
     vehicle->m_nHealth = fHealth;
+#pragma message("JoeBullet notic: __FIX__")
     if ( fHealth >= 250.0f )
-        vehicle->m_fBurningTime = 0.0f;
+        ;
+//        vehicle->m_fBurningTime = 0.0f;
 }
 
 // SHould be plane funcs

@@ -13,16 +13,13 @@
 *
 *****************************************************************************/
 
-#ifndef __CGAMESA_MODELINFO
-#define __CGAMESA_MODELINFO
+#pragma once
 
 #include <game/CModelInfo.h>
 #include <game/Common.h>
 
 #include "CColModelSA.h"
 #include "CRenderWareSA.h"
-class CPedModelInfoSA;
-class CPedModelInfoSAInterface;
 
 #define     ARRAY_ModelLoaded               0x8E4CD0 // ##SA##
 
@@ -242,7 +239,7 @@ public:
                                     CModelInfoSA            ( DWORD dwModelID );
 
     CBaseModelInfoSAInterface *     GetInterface             ( void );
-    CPedModelInfoSAInterface *      GetPedModelInfoInterface ( void )              { return reinterpret_cast < CPedModelInfoSAInterface * > ( GetInterface () ); }
+    class CPedModelInfoSAInterface *      GetPedModelInfoInterface ( void )              { return reinterpret_cast < CPedModelInfoSAInterface * > ( GetInterface () ); }
 
     DWORD                           GetModel                ( void )               { return m_dwModelID; }
     uint                            GetAnimFileIndex        ( void );
@@ -314,5 +311,3 @@ public:
     void                            MakePedModel            ( char * szTexture );
 
 };
-
-#endif

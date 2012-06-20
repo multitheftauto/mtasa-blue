@@ -98,7 +98,7 @@ public:
     class CParticleFx* pNitroParticles[2];
     uint32 pad12[2];
 };
-C_ASSERT(sizeof(CAutomobileSAInterface) == 0x988);
+//C_ASSERT(sizeof(CAutomobileSAInterface) == 0x988);
 
 class CAutomobileSA : public virtual CAutomobile, public virtual CVehicleSA
 {

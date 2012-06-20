@@ -14,16 +14,21 @@
 #define __CRopesSA_H
 
 #include <game/CRopes.h>
+#include "CRenderWareSA.h"
+//#include "../core/CCore.h"
 
-#define ROPES_COUNT	8
+#define ROPES_COUNT	                        8
+#define SEGMENT_COUNT                       32
 
 #define FUNC_CRopes_CreateRopeForSwatPed    0x558d10
 
-#define ARRAY_CRopes	0xB768B8
+#define ARRAY_CRopes	                    0xB768B8
 
 class CRopesSAInterface
 {
 public:
+    void Draw();
+
 	CVector m_vecSegments[32];
 	CVector m_vecSegmentsReleased[32];
 	CEntitySAInterface * m_pRopeEntity;

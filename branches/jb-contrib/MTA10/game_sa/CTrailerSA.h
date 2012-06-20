@@ -21,7 +21,7 @@ class CTrailerSAInterface : public CAutomobileSAInterface
 {
     // fill this
 };
-C_ASSERT(sizeof(CTrailerSAInterface) == 0x9F4);
+//C_ASSERT(sizeof(CTrailerSAInterface) == 0x9F4);
 
 class CTrailerSA : public virtual CTrailer, public virtual CAutomobileSA
 {

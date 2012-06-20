@@ -11,20 +11,16 @@
 
 #pragma once
 
-#include "CRenderWareSA.h"
+#include <CVector.h>
 
+#define NUM_STREAKS 3
+ 
 class CRegisteredMotionBlurStreakSAInterface
 {
 public:
-    class CEntity* pEntity;
-    RwColor colour;
-    CVector vecStart;
-    CVector vecUnk1;
-    CVector vecUnk2;
-    CVector vecEnd;
-    CVector vecUnk3;
-    CVector vecUnk4;
-    uint8 ucExists;
-    uint8 pad1[3];
+        class CEntity* pParent;
+        uint8 R, G, B, A;
+        CVector FirstPoints[NUM_STREAKS];       // The actual coordinates of one side of the streaks
+        CVector SecondPoints[NUM_STREAKS];      // Other side
+        uint8    bUsed[NUM_STREAKS];
 };
-

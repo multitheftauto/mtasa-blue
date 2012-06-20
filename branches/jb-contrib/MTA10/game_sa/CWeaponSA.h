@@ -23,8 +23,6 @@
 #define FUNC_Shutdown                                   0x73A380
 #define FUNC_CWeapon_CheckForShootingVehicleOccupant    0x73f480
 
-extern CGameSA * pGame;
-
 class CWeaponSAInterface
 {
 public:
@@ -58,7 +56,7 @@ public:
     eWeaponSlot     GetSlot();
 
     VOID            SetAsCurrentWeapon();
-    CWeaponInfo     * GetInfo( eWeaponSkill skill ) { return pGame->GetWeaponInfo( internalInterface->m_eWeaponType, skill ); };
+    CWeaponInfo     * GetInfo( eWeaponSkill skill );
 
     void            Remove ();
 };

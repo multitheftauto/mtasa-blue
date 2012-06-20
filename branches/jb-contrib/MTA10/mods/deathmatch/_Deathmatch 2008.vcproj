@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Client - Deathmatch"
 	ProjectGUID="{F661CA1A-A296-4505-9583-3BEC58FB79C5}"
 	RootNamespace="Client - Deathmatch"
@@ -316,6 +316,10 @@
 			>
 			<File
 				RelativePath=".\CClient.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\shared_logic\CClientRopes.cpp"
 				>
 			</File>
 			<File
@@ -886,6 +890,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientRenderElementManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientRopes.h"
 					>
 				</File>
 				<File

@@ -38,7 +38,9 @@ CAutomobileSA::CAutomobileSA( eVehicleTypes dwModelID, unsigned char ucVariation
 */
         // create our mirror classes
         for(int i =0;i<MAX_DOORS;i++)
-            this->door[i] = new CDoorSA(&((CAutomobileSAInterface *)this->GetInterface())->doors[i]);
+            ;
+#pragma message(__FILE__" JoeBullet NOTICE: __FIX__")
+//            this->door[i] = new CDoorSA(&((CAutomobileSAInterface *)this->GetInterface())->doors[i]);
     /*}
     else
         _asm int 3*/

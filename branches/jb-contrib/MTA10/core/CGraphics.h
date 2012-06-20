@@ -22,7 +22,7 @@ class CGraphics;
 #include <gui/CGUI.h>
 #include "CGUI.h"
 #include "CSingleton.h"
-#include <CRenderItemManager.h>
+#include "CRenderItemManager.h"
 
 class CTileBatcher;
 class CLine3DBatcher;

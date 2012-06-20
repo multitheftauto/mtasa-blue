@@ -20,7 +20,7 @@ class CBoatSAInterface : public CVehicleSAInterface
 {
     // fill this
 };
-C_ASSERT(sizeof(CBoatSAInterface) == 0x7E8);
+//C_ASSERT(sizeof(CBoatSAInterface) == 0x7E8);
 
 class CBoatSA : public virtual CBoat, public virtual CVehicleSA
 {
