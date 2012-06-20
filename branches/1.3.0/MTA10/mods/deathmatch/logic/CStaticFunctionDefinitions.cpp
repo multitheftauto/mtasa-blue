@@ -2162,7 +2162,7 @@ bool CStaticFunctionDefinitions::SetPedAimTarget ( CClientEntity & Entity, CVect
         Ped.GetPosition ( vecOrigin );
 
         // Arm direction
-        float fArmX = atan2 ( vecTarget.fX - vecOrigin.fX, vecTarget.fY - vecOrigin.fY ),
+        float fArmX = -atan2 ( vecTarget.fX - vecOrigin.fX, vecTarget.fY - vecOrigin.fY ),
               fArmY = -atan2 ( vecTarget.fZ - vecOrigin.fZ, DistanceBetweenPoints2D ( vecTarget, vecOrigin ) );
 
         // TODO: use gun muzzle for origin
