@@ -21,7 +21,7 @@
 
 int CLuaFunctionDefs::GetTok ( lua_State* luaVM )
 {
-    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER ) || ( lua_type ( luaVM, 3 ) != LUA_TNUMBER ) )
+    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER ) || ( lua_type ( luaVM, 3 ) != LUA_TNUMBER ) && ( lua_type ( luaVM, 3 ) != LUA_TSTRING ) )
     {
         m_pScriptDebugging->LogBadType ( luaVM, "gettok" );
 
@@ -29,10 +29,18 @@ int CLuaFunctionDefs::GetTok ( lua_State* luaVM )
         return 1;
     }
 
+    SString strDelimiter;
+    if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+    {
+        unsigned int uiCharacter = static_cast < unsigned int > ( lua_tonumber ( luaVM, 3 ) );
+        wchar_t wUNICODE[2] = { uiCharacter, '\0' };
+        strDelimiter = UTF16ToMbUTF8(wUNICODE);
+    }
+    else  // It's already a string
+        strDelimiter = lua_tostring ( luaVM, 3 );
+
     const char* szText = lua_tostring ( luaVM, 1 );
     int iToken = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
-    int iDelimiter = static_cast < int > ( lua_tonumber ( luaVM, 3 ) );
-
     unsigned int uiCount = 0;
 
     if ( iToken > 0 && iToken < 1024 )
@@ -40,8 +48,6 @@ int CLuaFunctionDefs::GetTok ( lua_State* luaVM )
         // Copy the string
         char* strText = new char [ strlen ( szText ) + 1 ];
         strcpy ( strText, szText );
-
-        SString strDelimiter ( "%c", iDelimiter );
 
         unsigned int uiCount = 1;
         char* szToken = strtok ( strText, strDelimiter );
@@ -80,7 +86,7 @@ int CLuaFunctionDefs::GetTok ( lua_State* luaVM )
 
 int CLuaFunctionDefs::Split ( lua_State* luaVM )
 {
-    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER ) )
+    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER && ( lua_type ( luaVM, 2 ) != LUA_TSTRING ) ) )
     {
         m_pScriptDebugging->LogBadType ( luaVM, "split" );
 
@@ -88,14 +94,21 @@ int CLuaFunctionDefs::Split ( lua_State* luaVM )
         return 1;
     }
 
+    SString strDelimiter;
+    if ( lua_type ( luaVM, 2 ) == LUA_TNUMBER )
+    {
+        unsigned int uiCharacter = static_cast < unsigned int > ( lua_tonumber ( luaVM, 2 ) );
+        wchar_t wUNICODE[2] = { uiCharacter, '\0' };
+        strDelimiter = UTF16ToMbUTF8(wUNICODE);
+    }
+    else  // It's already a string
+        strDelimiter = lua_tostring ( luaVM, 2 );
+
     const char* szText = lua_tostring ( luaVM, 1 );
-    int iDelimiter = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
 
     // Copy the string
     char* strText = new char [ strlen ( szText ) + 1 ];
     strcpy ( strText, szText );
-
-    SString strDelimiter ( "%c", iDelimiter );
 
     unsigned int uiCount = 0;
     char* szToken = strtok ( strText, strDelimiter );
@@ -126,21 +139,39 @@ int CLuaFunctionDefs::Split ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetTimer ( lua_State* luaVM )
 {
-    CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( luaMain )
+//  timer setTimer ( function theFunction, int timeInterval, int timesToExecute, [ var arguments... ] )
+    CLuaFunctionRef iLuaFunction; double dTimeInterval; uint uiTimesToExecute; CLuaArguments Arguments;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadFunction ( iLuaFunction );
+    argStream.ReadNumber ( dTimeInterval );
+    argStream.ReadNumber ( uiTimesToExecute );
+    argStream.ReadLuaArguments ( Arguments );
+    argStream.ReadFunctionComplete ();
+
+    if ( !argStream.HasErrors () )
     {
-        if ( lua_type ( luaVM, 1 ) == LUA_TFUNCTION )
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
         {
-            CLuaTimer* pLuaTimer = luaMain->GetTimerManager ()->AddTimer ( luaVM );
+            // Check for the minimum interval
+            if ( dTimeInterval < LUA_TIMER_MIN_INTERVAL )
+            {
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setTimer", "Interval is below 50" ) );
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
+
+            CLuaTimer* pLuaTimer = luaMain->GetTimerManager ()->AddTimer ( iLuaFunction, CTickCount ( dTimeInterval ), uiTimesToExecute, Arguments );
             if ( pLuaTimer )
             {
                 lua_pushtimer ( luaVM, pLuaTimer );
                 return 1;
             }
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "setTimer" );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setTimer", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -149,20 +180,25 @@ int CLuaFunctionDefs::SetTimer ( lua_State* luaVM )
 
 int CLuaFunctionDefs::KillTimer ( lua_State* luaVM )
 {
-    CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( luaMain )
+//  bool killTimer ( timer theTimer )
+    CLuaTimer* pLuaTimer;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pLuaTimer );
+
+    if ( !argStream.HasErrors () )
     {
-        CLuaTimer* pLuaTimer = lua_totimer ( luaVM, 1 );
-        if ( pLuaTimer )
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
         {
             luaMain->GetTimerManager ()->RemoveTimer ( pLuaTimer );
 
             lua_pushboolean ( luaVM, true );
             return 1;
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "killTimer" );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "killTimer", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -171,20 +207,25 @@ int CLuaFunctionDefs::KillTimer ( lua_State* luaVM )
 
 int CLuaFunctionDefs::ResetTimer ( lua_State* luaVM )
 {
-    CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( luaMain )
+//  bool resetTimer ( timer theTimer )
+    CLuaTimer* pLuaTimer;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pLuaTimer );
+
+    if ( !argStream.HasErrors () )
     {
-        CLuaTimer* pLuaTimer = lua_totimer ( luaVM, 1 );
-        if ( pLuaTimer )
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
         {
             luaMain->GetTimerManager ()->ResetTimer ( pLuaTimer );
 
             lua_pushboolean ( luaVM, true );
             return 1;
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "resetTimer" );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "resetTimer", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -193,23 +234,28 @@ int CLuaFunctionDefs::ResetTimer ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetTimers ( lua_State* luaVM )
 {
-    // Find our VM
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
-    {
-        unsigned long ulTime = 0;
-        int iArgument1 = lua_type ( luaVM, 1 );
-        if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
-        {
-            ulTime = static_cast < unsigned long > ( lua_tonumber ( luaVM, 1 ) );
-        }            
-        // Create a new table
-        lua_newtable ( luaVM );
+//  table getTimers ( [ time ] )
+    double dTime;
 
-        // Add all the timers with less than ulTime left
-        pLuaMain->GetTimerManager ()->GetTimers ( ulTime, pLuaMain );
-        return 1;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( dTime, 0 );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Find our VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            // Create a new table
+            lua_newtable ( luaVM );
+
+            // Add all the timers with less than ulTime left
+            pLuaMain->GetTimerManager ()->GetTimers ( CTickCount ( dTime ), pLuaMain );
+            return 1;
+        }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getTimers", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -218,15 +264,16 @@ int CLuaFunctionDefs::GetTimers ( lua_State* luaVM )
 
 int CLuaFunctionDefs::IsTimer ( lua_State* luaVM )
 {
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+//  bool isTimer ( timer theTimer )
+    CLuaTimer* pLuaTimer;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pLuaTimer );
+
+    if ( !argStream.HasErrors () )
     {
-        CLuaTimer* pLuaTimer = lua_totimer ( luaVM, 1 );
-        if ( pLuaTimer )
-        {
-            lua_pushboolean ( luaVM, pLuaMain->GetTimerManager ()->Exists ( pLuaTimer ) );
-            return 1;
-        }
+        lua_pushboolean ( luaVM, true );
+        return 1;
     }
 
     lua_pushboolean ( luaVM, false );
@@ -235,20 +282,21 @@ int CLuaFunctionDefs::IsTimer ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetTimerDetails ( lua_State* luaVM )
 {
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+//  int, int, int getTimerDetails ( timer theTimer )
+    CLuaTimer* pLuaTimer;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pLuaTimer );
+
+    if ( !argStream.HasErrors () )
     {
-        CLuaTimer* pLuaTimer = lua_totimer ( luaVM, 1 );
-        if ( pLuaTimer )
-        {
-            lua_pushnumber( luaVM, pLuaTimer->GetTimeLeft () );
-            lua_pushnumber( luaVM, pLuaTimer->GetRepeats () );
-            lua_pushnumber( luaVM, pLuaTimer->GetDelay () );
-            return 3;
-        }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "getTimerDetails" );
+        lua_pushnumber( luaVM, pLuaTimer->GetTimeLeft ().ToDouble () );
+        lua_pushnumber( luaVM, pLuaTimer->GetRepeats () );
+        lua_pushnumber( luaVM, pLuaTimer->GetDelay ().ToDouble () );
+        return 3;
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getTimerDetails", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -306,36 +354,21 @@ int CLuaFunctionDefs::GetCTime ( lua_State* luaVM )
 }
 int CLuaFunctionDefs::tocolor ( lua_State* luaVM )
 {
-    // Grab argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
+//  int tocolor ( int red, int green, int blue [, int alpha = 255] )
+    int iRed; int iGreen; int iBlue; int iAlpha;
 
-    // Got first argument?
-    if ( iArgument1 == LUA_TNUMBER )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( iRed );
+    argStream.ReadNumber ( iGreen );
+    argStream.ReadNumber ( iBlue );
+    argStream.ReadNumber ( iAlpha, 255 );
+
+    if ( !argStream.HasErrors () )
     {
-        // Got second and third? (R,G,B)
-        if ( iArgument2 == LUA_TNUMBER &&
-            iArgument3 == LUA_TNUMBER )
-        {
-            // Read red, green and blue
-            unsigned char ucRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
-            unsigned char ucGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-            unsigned char ucBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
-
-            // Got a fourth too? (R,G,B,A) Defaults to 255.
-            unsigned char ucAlpha = 255;
-            if ( iArgument4 == LUA_TNUMBER )
-            {
-                ucAlpha = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
-            }
-
-            // Make it into an unsigned long
-            unsigned long ulColor = COLOR_RGBA ( ucRed, ucGreen, ucBlue, ucAlpha );
-            lua_pushinteger ( luaVM, static_cast < lua_Integer > ( ulColor ) );
-            return 1;
-        }
+        // Make it into an unsigned long
+        unsigned long ulColor = COLOR_RGBA ( iRed, iGreen, iBlue, iAlpha );
+        lua_pushinteger ( luaVM, static_cast < lua_Integer > ( ulColor ) );
+        return 1;
     }
 
     // Make it black so funcs dont break
@@ -375,13 +408,16 @@ int CLuaFunctionDefs::Dereference ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetColorFromString ( lua_State* luaVM )
 {
-    unsigned char ucColorRed, ucColorGreen, ucColorBlue, ucColorAlpha;
-    int iArgument1 = lua_type ( luaVM, 1 );
-    if ( iArgument1 == LUA_TSTRING )
-    {
-        const char* szColor = lua_tostring ( luaVM, 1 );
+//  int int int int getColorFromString ( string theColor )
+    SString strColor ;
 
-        if ( XMLColorToInt ( szColor, ucColorRed, ucColorGreen, ucColorBlue, ucColorAlpha ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strColor );
+
+    if ( !argStream.HasErrors () )
+    {
+        unsigned char ucColorRed, ucColorGreen, ucColorBlue, ucColorAlpha;
+        if ( XMLColorToInt ( strColor, ucColorRed, ucColorGreen, ucColorBlue, ucColorAlpha ) )
         {
             lua_pushnumber ( luaVM, ucColorRed );
             lua_pushnumber ( luaVM, ucColorGreen );
@@ -390,6 +426,9 @@ int CLuaFunctionDefs::GetColorFromString ( lua_State* luaVM )
             return 4;
         }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getColorFromString", *argStream.GetErrorMessage () ) );
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -399,7 +438,7 @@ int CLuaFunctionDefs::GetValidPedModels ( lua_State* luaVM )
 {
     int iIndex = 0;
     lua_newtable ( luaVM );
-    for( int i = 0; i < 289; i++)
+    for( int i = 0; i <= 312; i++)
     {
         if ( CClientPlayerManager::IsValidModel(i) )
         {
@@ -415,26 +454,23 @@ int CLuaFunctionDefs::GetValidPedModels ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetDistanceBetweenPoints2D ( lua_State* luaVM )
 {
-    // We got 6 valid float arguments?
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) &&
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-        ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
-        ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
-    {
-        // Put them into two vectors
-        CVector vecPointA ( static_cast < float > ( atof ( lua_tostring ( luaVM, 1 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 2 ) ) ), 0.0f );
-        CVector vecPointB ( static_cast < float > ( atof ( lua_tostring ( luaVM, 3 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 4 ) ) ), 0.0f );
+//  float getDistanceBetweenPoints2D ( float x1, float y1, float x2, float y2 )
+    CVector vecPointA; CVector vecPointB;
 
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( vecPointA.fX );
+    argStream.ReadNumber ( vecPointA.fY );
+    argStream.ReadNumber ( vecPointB.fX );
+    argStream.ReadNumber ( vecPointB.fY );
+
+    if ( !argStream.HasErrors () )
+    {
         // Return the distance
         lua_pushnumber ( luaVM, DistanceBetweenPoints2D ( vecPointA, vecPointB ) );
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getDistanceBetweenPoints2D" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getDistanceBetweenPoints2D", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -443,30 +479,25 @@ int CLuaFunctionDefs::GetDistanceBetweenPoints2D ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetDistanceBetweenPoints3D ( lua_State* luaVM )
 {
-    // We got 6 valid float arguments?
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
-    int iArgument6 = lua_type ( luaVM, 6 );
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) &&
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-        ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
-        ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) &&
-        ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) &&
-        ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) )
-    {
-        // Put them into two vectors
-        CVector vecPointA ( static_cast < float > ( atof ( lua_tostring ( luaVM, 1 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 2 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 3 ) ) ) );
-        CVector vecPointB ( static_cast < float > ( atof ( lua_tostring ( luaVM, 4 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 5 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 6 ) ) ) );
+//  float getDistanceBetweenPoints3D ( float x1, float y1, float z1, float x2, float y2, float z2 )
+    CVector vecPointA; CVector vecPointB;
 
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( vecPointA.fX );
+    argStream.ReadNumber ( vecPointA.fY );
+    argStream.ReadNumber ( vecPointA.fZ );
+    argStream.ReadNumber ( vecPointB.fX );
+    argStream.ReadNumber ( vecPointB.fY );
+    argStream.ReadNumber ( vecPointB.fZ );
+
+    if ( !argStream.HasErrors () )
+    {
         // Return the distance
         lua_pushnumber ( luaVM, DistanceBetweenPoints3D ( vecPointA, vecPointB ) );
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getDistanceBetweenPoints3D" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getDistanceBetweenPoints3D", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -474,47 +505,19 @@ int CLuaFunctionDefs::GetDistanceBetweenPoints3D ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetEasingValue ( lua_State* luaVM )
 {
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
+//  float getEasingValue( float fProgress, string strEasingType [, float fEasingPeriod, float fEasingAmplitude, float fEasingOvershoot] )
+    float fProgress; CEasingCurve::eType easingType; float fEasingPeriod; float fEasingAmplitude; float fEasingOvershoot;
 
-    if ( ( iArgument1 != LUA_TNUMBER && iArgument1 != LUA_TSTRING ) || iArgument2 != LUA_TSTRING )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( fProgress );
+    argStream.ReadEnumString ( easingType );
+    argStream.ReadNumber ( fEasingPeriod, 0.3f );
+    argStream.ReadNumber ( fEasingAmplitude, 1.0f );
+    argStream.ReadNumber ( fEasingOvershoot, 1.70158f );
+
+    if ( argStream.HasErrors () )
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "getEasingValue" );
-        lua_pushboolean ( luaVM, false );
-        return 1;
-    }
-    
-    float fProgress = static_cast < float > ( atof ( lua_tostring ( luaVM, 1 ) ) );
-
-    const char* szEasingType = "Linear";
-    double fEasingPeriod = 0.3f;
-    double fEasingAmplitude = 1.0f;
-    double fEasingOvershoot = 1.70158f;
-
-    szEasingType = lua_tostring ( luaVM, 2 );
-
-    int iArgument3 = lua_type ( luaVM, 3 );
-    if ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING )
-    {
-        fEasingPeriod = atof ( lua_tostring ( luaVM, 3 ) ); 
-
-        int iArgument4 = lua_type ( luaVM, 4 );
-        if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
-        {
-            fEasingAmplitude = atof ( lua_tostring ( luaVM, 4 ) ); 
-
-            int iArgument5 = lua_type ( luaVM, 5 );
-            if ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING )
-            {
-                fEasingOvershoot = atof ( lua_tostring ( luaVM, 5 ) ); 
-            }
-        }
-    }
-
-    CEasingCurve::eType easingType = CEasingCurve::GetEasingTypeFromString ( szEasingType );
-    if ( easingType == CEasingCurve::EASING_INVALID )
-    {
-        m_pScriptDebugging->LogError ( luaVM, "getEasingValue - Unknown easing type '%s'", szEasingType);
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getEasingValue", *argStream.GetErrorMessage () ) );
         lua_pushboolean ( luaVM, false );
         return 1;
     }
@@ -527,63 +530,30 @@ int CLuaFunctionDefs::GetEasingValue ( lua_State* luaVM )
 
 int CLuaFunctionDefs::InterpolateBetween ( lua_State* luaVM )
 {
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
-    int iArgument6 = lua_type ( luaVM, 6 );
-    int iArgument7 = lua_type ( luaVM, 7 );
-    int iArgument8 = lua_type ( luaVM, 8 );
+//  float float float interpolateBetween ( float x1, float y1, float z1, 
+//      float x2, float y2, float z2, 
+//      float fProgress, string strEasingType, 
+//      [ float fEasingPeriod, float fEasingAmplitude, float fEasingOvershoot ] )
+    CVector vecPointA; CVector vecPointB;
+    float fProgress; CEasingCurve::eType easingType;
+    float fEasingPeriod; float fEasingAmplitude; float fEasingOvershoot;
 
-    if (    ( iArgument1 != LUA_TNUMBER && iArgument1 != LUA_TSTRING ) &&
-        ( iArgument2 != LUA_TNUMBER && iArgument2 != LUA_TSTRING ) &&
-        ( iArgument3 != LUA_TNUMBER && iArgument3 != LUA_TSTRING ) &&
-        ( iArgument4 != LUA_TNUMBER && iArgument4 != LUA_TSTRING ) &&
-        ( iArgument5 != LUA_TNUMBER && iArgument5 != LUA_TSTRING ) &&
-        ( iArgument6 != LUA_TNUMBER && iArgument6 != LUA_TSTRING ) &&
-        ( iArgument7 != LUA_TNUMBER && iArgument7 != LUA_TSTRING ) &&
-        ( iArgument8 != LUA_TSTRING ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( vecPointA.fX );
+    argStream.ReadNumber ( vecPointA.fY );
+    argStream.ReadNumber ( vecPointA.fZ );
+    argStream.ReadNumber ( vecPointB.fX );
+    argStream.ReadNumber ( vecPointB.fY );
+    argStream.ReadNumber ( vecPointB.fZ );
+    argStream.ReadNumber ( fProgress );
+    argStream.ReadEnumString ( easingType );
+    argStream.ReadNumber ( fEasingPeriod, 0.3f );
+    argStream.ReadNumber ( fEasingAmplitude, 1.0f );
+    argStream.ReadNumber ( fEasingOvershoot, 1.70158f );
+
+    if ( argStream.HasErrors () )
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "interpolateBetween" );
-        lua_pushboolean ( luaVM, false );
-        return 1;
-    }
-
-    CVector vecPointA ( static_cast < float > ( atof ( lua_tostring ( luaVM, 1 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 2 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 3 ) ) ) );
-    CVector vecPointB ( static_cast < float > ( atof ( lua_tostring ( luaVM, 4 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 5 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 6 ) ) ) );
-
-    float fProgress = static_cast < float > ( atof ( lua_tostring ( luaVM, 7 ) ) );
-
-    const char* szEasingType = "Linear";
-    double fEasingPeriod = 0.3f;
-    double fEasingAmplitude = 1.0f;
-    double fEasingOvershoot = 1.70158f;
-
-    szEasingType = lua_tostring ( luaVM, 8 );
-
-    int iArgument9 = lua_type ( luaVM, 9 );
-    if ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING )
-    {
-        fEasingPeriod = atof ( lua_tostring ( luaVM, 9 ) ); 
-
-        int iArgument10 = lua_type ( luaVM, 10 );
-        if ( iArgument10 == LUA_TNUMBER || iArgument10 == LUA_TSTRING )
-        {
-            fEasingAmplitude = atof ( lua_tostring ( luaVM, 10 ) ); 
-
-            int iArgument11 = lua_type ( luaVM, 11 );
-            if ( iArgument11 == LUA_TNUMBER || iArgument11 == LUA_TSTRING )
-            {
-                fEasingOvershoot = atof ( lua_tostring ( luaVM, 11 ) ); 
-            }
-        }
-    }
-
-    CEasingCurve::eType easingType = CEasingCurve::GetEasingTypeFromString ( szEasingType );
-    if ( easingType == CEasingCurve::EASING_INVALID )
-    {
-        m_pScriptDebugging->LogError ( luaVM, "interpolateBetween - Unknown easing type '%s'", szEasingType);
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "interpolateBetween", *argStream.GetErrorMessage () ) );
         lua_pushboolean ( luaVM, false );
         return 1;
     }
@@ -616,23 +586,23 @@ int CLuaFunctionDefs::Md5 ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaFunctionDefs::GetNetworkUsageData ( lua_State* luaVM )
 {
-    unsigned long ulBits [ 256 ];
-    unsigned long ulCount [ 256 ];
+    SPacketStat m_PacketStats [ 2 ] [ 256 ];
+    memcpy ( m_PacketStats, g_pNet->GetPacketStats (), sizeof ( m_PacketStats ) );
 
     lua_createtable ( luaVM, 0, 2 );
 
     lua_pushstring ( luaVM, "in" );
     lua_createtable ( luaVM, 0, 2 );
     {
-        g_pNet->GetNetworkUsageData ( CNet::STATS_INCOMING_TRAFFIC, ulBits, ulCount );
-        
         lua_pushstring ( luaVM, "bits" );
         lua_createtable ( luaVM, 255, 1 );
         for ( unsigned int i = 0; i < 256; ++i )
         {
-            lua_pushnumber ( luaVM, ulBits[i] );
+            const SPacketStat& statIn = m_PacketStats [ CNet::STATS_INCOMING_TRAFFIC ] [ i ];
+            lua_pushnumber ( luaVM, statIn.iTotalBytes * 8 );
             lua_rawseti ( luaVM, -2, i );
         }
         lua_rawset ( luaVM, -3 );
@@ -641,7 +611,8 @@ int CLuaFunctionDefs::GetNetworkUsageData ( lua_State* luaVM )
         lua_createtable ( luaVM, 255, 1 );
         for ( unsigned int i = 0; i < 256; ++i )
         {
-            lua_pushnumber ( luaVM, ulCount[i] );
+            const SPacketStat& statIn = m_PacketStats [ CNet::STATS_INCOMING_TRAFFIC ] [ i ];
+            lua_pushnumber ( luaVM, statIn.iCount );
             lua_rawseti ( luaVM, -2, i );
         }
         lua_rawset ( luaVM, -3 );
@@ -651,13 +622,12 @@ int CLuaFunctionDefs::GetNetworkUsageData ( lua_State* luaVM )
     lua_pushstring ( luaVM, "out" );
     lua_createtable ( luaVM, 0, 2 );
     {
-        g_pNet->GetNetworkUsageData ( CNet::STATS_OUTGOING_TRAFFIC, ulBits, ulCount );
-
         lua_pushstring ( luaVM, "bits" );
         lua_createtable ( luaVM, 255, 1 );
         for ( unsigned int i = 0; i < 256; ++i )
         {
-            lua_pushnumber ( luaVM, ulBits[i] );
+            const SPacketStat& statOut = m_PacketStats [ CNet::STATS_OUTGOING_TRAFFIC ] [ i ];
+            lua_pushnumber ( luaVM, statOut.iTotalBytes * 8 );
             lua_rawseti ( luaVM, -2, i );
         }
         lua_rawset ( luaVM, -3 );
@@ -666,7 +636,8 @@ int CLuaFunctionDefs::GetNetworkUsageData ( lua_State* luaVM )
         lua_createtable ( luaVM, 255, 1 );
         for ( unsigned int i = 0; i < 256; ++i )
         {
-            lua_pushnumber ( luaVM, ulCount[i] );
+            const SPacketStat& statOut = m_PacketStats [ CNet::STATS_OUTGOING_TRAFFIC ] [ i ];
+            lua_pushnumber ( luaVM, statOut.iCount );
             lua_rawseti ( luaVM, -2, i );
         }
         lua_rawset ( luaVM, -3 );
@@ -677,9 +648,68 @@ int CLuaFunctionDefs::GetNetworkUsageData ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GetNetworkStats ( lua_State* luaVM )
+{
+    NetStatistics stats;
+    if ( g_pNet->GetNetworkStatistics ( &stats ) )
+    {
+        lua_createtable ( luaVM, 0, 11 );
+
+        lua_pushstring ( luaVM, "bytesReceived" );
+        lua_pushnumber ( luaVM, static_cast < double > ( stats.bytesReceived ) );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "bytesSent" );
+        lua_pushnumber ( luaVM, static_cast < double > ( stats.bytesSent ) );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "packetsReceived" );
+        lua_pushnumber ( luaVM, stats.packetsReceived );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "packetsSent" );
+        lua_pushnumber ( luaVM, stats.packetsSent );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "packetlossTotal" );
+        lua_pushnumber ( luaVM, stats.packetlossTotal );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "packetlossLastSecond" );
+        lua_pushnumber ( luaVM, stats.packetlossLastSecond );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "messagesInSendBuffer" );
+        lua_pushnumber ( luaVM, stats.messagesInSendBuffer );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "messagesInResendBuffer" );
+        lua_pushnumber ( luaVM, stats.messagesInResendBuffer );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "isLimitedByCongestionControl" );
+        lua_pushnumber ( luaVM, stats.isLimitedByCongestionControl ? 1 : 0 );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "isLimitedByOutgoingBandwidthLimit" );
+        lua_pushnumber ( luaVM, stats.isLimitedByOutgoingBandwidthLimit ? 1 : 0 );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "encryptionStatus" );
+        lua_pushnumber ( luaVM, stats.encryptionStatus );
+        lua_settable   ( luaVM, -3 );
+
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GetVersion ( lua_State* luaVM )
 {
-    lua_createtable ( luaVM, 0, 6 );
+    lua_createtable ( luaVM, 0, 8 );
 
     lua_pushstring ( luaVM, "number" );
     lua_pushnumber ( luaVM, CStaticFunctionDefinitions::GetVersion () );
@@ -833,19 +863,17 @@ int CLuaFunctionDefs::UtfCode ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetPerformanceStats ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+//  table getPerformanceStats ( string category, string options, string filter )
+    SString strCategory, strOptions, strFilter;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strCategory );
+    argStream.ReadString ( strOptions, "" );
+    argStream.ReadString ( strFilter, "" );
+
+    if ( !argStream.HasErrors () )
     {
         CClientPerfStatResult Result;
-        SString strCategory = lua_tostring ( luaVM, 1 );
-        SString strOptions;
-        SString strFilter;
-
-        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
-            strOptions = lua_tostring ( luaVM, 2 );
-
-        if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
-            strFilter = lua_tostring ( luaVM, 3 );
-
         CClientPerfStatManager::GetSingleton ()->GetStats ( &Result, strCategory, strOptions, strFilter );
 
         lua_newtable ( luaVM );
@@ -853,7 +881,7 @@ int CLuaFunctionDefs::GetPerformanceStats ( lua_State* luaVM )
         {
             const SString& name = Result.ColumnName ( c );
             lua_pushnumber ( luaVM, c+1 );                      // row index number (starting at 1, not 0)
-            lua_pushlstring ( luaVM, (char *)name.c_str (), name.length() );
+            lua_pushlstring ( luaVM, name.c_str (), name.length() );
             lua_settable ( luaVM, -3 );
         }
 
@@ -869,7 +897,7 @@ int CLuaFunctionDefs::GetPerformanceStats ( lua_State* luaVM )
             {
                 SString& cell = Result.Data ( c, r );
                 lua_pushnumber ( luaVM, c+1 );
-                lua_pushlstring ( luaVM, (char *)cell.c_str (), cell.length () );
+                lua_pushlstring ( luaVM, cell.c_str (), cell.length () );
                 lua_settable ( luaVM, -3 );
             }
             lua_pop ( luaVM, 1 );                               // pop the inner table
@@ -877,8 +905,85 @@ int CLuaFunctionDefs::GetPerformanceStats ( lua_State* luaVM )
         return 2;
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPerformanceStats" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getPerformanceStats", *argStream.GetErrorMessage () ) );
 
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::SetDevelopmentMode ( lua_State* luaVM )
+{
+//  bool setDevelopmentMode ( bool enable )
+//  bool setDevelopmentMode ( string command )
+    bool bEnable; SString strCommand;
+
+    CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsString () )
+    {
+        argStream.ReadString ( strCommand );
+        //g_pClientGame->SetDevSetting ( strCommand );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    argStream.ReadBool ( bEnable );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pClientGame->SetDevelopmentMode ( bEnable );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setDevelopmentMode", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GetDevelopmentMode ( lua_State* luaVM )
+{
+//  bool getDevelopmentMode ()
+    bool bResult = g_pClientGame->GetDevelopmentMode ();
+    lua_pushboolean ( luaVM, bResult );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::DownloadFile ( lua_State* luaVM )
+{
+    // Grab our VM
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        // Grab its resource
+        CResource * pResource = pLuaMain->GetResource();
+        if ( pResource )
+        {
+            const char* szFile = {0};
+            int iArgument = lua_type ( luaVM, 1 );
+            if ( iArgument == LUA_TSTRING )
+            {
+                szFile = lua_tostring ( luaVM, 1 );
+                std::list < CResourceFile* > ::const_iterator iter = pResource->IterBeginResourceFiles();
+                for ( ; iter != pResource->IterEndResourceFiles() ; iter++ ) 
+                {
+                    if ( strcmp ( szFile, (*iter)->GetShortName() ) == 0 )
+                    {
+                        if ( CStaticFunctionDefinitions::DownloadFile ( pResource, szFile, (*iter)->GetServerChecksum() ) )
+                        {
+                            lua_pushboolean ( luaVM, true );
+                            return 1;
+                        }
+                    }
+                }
+                m_pScriptDebugging->LogCustom ( luaVM, 255, 255, 255, "downloadFile: File doesn't exist" );
+            }
+            else
+                m_pScriptDebugging->LogBadType ( luaVM, "downloadFile" );
+        }
+    }
     lua_pushboolean ( luaVM, false );
     return 1;
 }

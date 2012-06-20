@@ -9,6 +9,8 @@
 *
 *****************************************************************************/
 
+#pragma once
+
 // Min and max number of characters in player serial
 #define MIN_SERIAL_LENGTH 1
 #define MAX_SERIAL_LENGTH 32
@@ -24,10 +26,37 @@
 #define MAX_TYPENAME_LENGTH 32
 #define MAX_ELEMENT_NAME_LENGTH 64
 
-// Allow 100k server elements and 100k client elements
-#define MAX_SERVER_ELEMENTS 100000
-#define MAX_CLIENT_ELEMENTS 100000
-typedef unsigned int ElementID;
+// Allow 2^17 server elements and 2^17 client elements
+#define MAX_SERVER_ELEMENTS 131072
+#define MAX_CLIENT_ELEMENTS 131072
+
+#if (MAX_SERVER_ELEMENTS&(MAX_SERVER_ELEMENTS-1)) != 0
+    #error MAX_SERVER_ELEMENTS "Macro must be power of 2"
+#endif
+
+// ElementID structure
+struct ElementID
+{
+public:
+    ElementID ( const unsigned int& value = INVALID_ELEMENT_ID ) : m_value(value) {}
+    ElementID& operator= ( const unsigned int& value ) { m_value = value; return *this; }
+    bool operator== ( const ElementID& ID ) const { return m_value == ID.m_value; }
+    bool operator!= ( const ElementID& ID ) const { return m_value != ID.m_value; }
+    bool operator> ( const ElementID& ID ) const { return m_value > ID.m_value; }
+    bool operator>= ( const ElementID& ID ) const { return m_value >= ID.m_value; }
+    bool operator< ( const ElementID& ID ) const { return m_value < ID.m_value; }
+    bool operator<= ( const ElementID& ID ) const { return m_value <= ID.m_value; }
+    ElementID& operator+= ( const ElementID& ID ) { m_value += ID.m_value; return *this; }
+    ElementID& operator-= ( const ElementID& ID ) { m_value += ID.m_value; return *this; }
+    ElementID operator+ ( const ElementID& ID ) const { return m_value + ID.m_value; }
+    ElementID operator- ( const ElementID& ID ) const { return m_value - ID.m_value; }
+    ElementID operator++ ( int ) { ElementID ret ( m_value ); ++m_value; return ret; }
+    ElementID& operator++ () { ++m_value; return *this; }
+    unsigned int& Value () { return m_value; }
+    const unsigned int& Value () const { return m_value; }
+private:
+    unsigned int m_value;
+};
 
 // Event name characteristics
 #define MAX_EVENT_NAME_LENGTH 512
@@ -53,3 +82,6 @@ typedef unsigned int ElementID;
 #else
 #define _DECLSPEC_EX extern "C" 
 #endif
+
+// Maximum number of players that can be packed in a single lightweight puresync packet
+#define LIGHTSYNC_MAX_PLAYERS               32

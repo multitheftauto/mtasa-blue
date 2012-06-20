@@ -25,9 +25,6 @@ CServerInfo::CServerInfo ( void )
     // Initialize
     m_ulLastUpdateTime = CClientTime::GetTime ();
 
-    m_szPassword = NULL;
-    m_szHost = NULL;
-
     // Obtain our screen resolution
     CVector2D vecResolution = CCore::GetSingleton().GetGUI()->GetResolution();
 
@@ -147,12 +144,14 @@ CServerInfo::CServerInfo ( void )
     m_pButtonClose->SetPosition ( CVector2D ( INFO_WINDOW_DEFAULTWIDTH-(INFO_BUTTON_WIDTH*2)-(1.5f*INFO_WINDOW_HSPACING), DrawPosY-=INFO_BUTTON_HEIGHT ), false );
     m_pButtonClose->SetSize ( CVector2D ( INFO_BUTTON_WIDTH, INFO_BUTTON_HEIGHT ), false );
     m_pButtonClose->SetClickHandler ( GUI_CALLBACK ( &CServerInfo::OnCloseClicked, this ) );
+    m_pButtonClose->SetZOrderingEnabled ( false );
 
     // Join Game button
     m_pButtonJoinGame = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Join Game" ) );
     m_pButtonJoinGame->SetPosition ( CVector2D ( INFO_WINDOW_DEFAULTWIDTH-INFO_BUTTON_WIDTH-INFO_WINDOW_HSPACING, DrawPosY ), false );
     m_pButtonJoinGame->SetSize ( CVector2D ( INFO_BUTTON_WIDTH, INFO_BUTTON_HEIGHT ), false );
     m_pButtonJoinGame->SetClickHandler ( GUI_CALLBACK ( &CServerInfo::OnJoinGameClicked, this ) );
+    m_pButtonJoinGame->SetZOrderingEnabled ( false );
 
     // Password entry editbox
     m_pEnterPasswordEdit = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pWindow, "" ) );
@@ -239,9 +238,6 @@ CServerInfo::~CServerInfo ( void )
 
     delete m_pEnterPasswordEdit;
     m_pEnterPasswordEdit = 0;
-
-    if ( m_szPassword )
-        delete m_szPassword;
 }
 
 bool CServerInfo::OnCloseClicked ( CGUIElement* pElement )
@@ -335,19 +331,8 @@ void CServerInfo::SetServerInformation( const char* szHost, unsigned short usPor
     // Store the parameters in our class instance for later use
     m_usPort = usPort;
 
-    // cleanup previous password
-    if ( m_szPassword )
-        delete m_szPassword;
-
-    m_szPassword = new char[strlen(szPassword) + 1];
-    strcpy((char*)m_szPassword, szPassword);
-
-    // cleanup previous host
-    if ( m_szHost )
-        delete m_szHost;
-
-    m_szHost = new char[strlen(szHost) + 1];
-    strcpy((char*)m_szHost, szHost);
+    m_strPassword = szPassword;
+    m_strHost = szHost;
 
     // Create a winsock address endpoint and parse the IP into it
     in_addr Address;
@@ -355,7 +340,6 @@ void CServerInfo::SetServerInformation( const char* szHost, unsigned short usPor
 
     // Set our server query's address, query port and game port
     m_Server.Address = Address;
-    m_Server.usQueryPort = usPort + SERVER_LIST_QUERY_PORT_OFFSET;
     m_Server.usGamePort = usPort;
 
     if ( pInitialServerListItem )  // If we have a pointer to an already scanned server, we initially set text to this
@@ -460,7 +444,7 @@ void CServerInfo::Connect( void )
     // Hide the window
     m_pWindow->SetVisible( false );
 
-    std::string strPassword = m_szPassword;
+    std::string strPassword = m_strPassword;
     if ( m_pCurrentWindowType == eWindowTypes::SERVER_INFO_PASSWORD )
         strPassword = m_pEnterPasswordEdit->GetText();
     else if ( m_Server.bPassworded )  // If we're not in a passworded window, but the server is passworded
@@ -476,7 +460,7 @@ void CServerInfo::Connect( void )
     }
 
     // Let's attempt to join
-    CCore::GetSingleton ().GetConnectManager ()->Connect ( m_szHost, m_usPort, strNick.c_str (), strPassword.c_str() );
+    CCore::GetSingleton ().GetConnectManager ()->Connect ( m_strHost, m_usPort, strNick.c_str (), strPassword.c_str() );
 }
 
 void CServerInfo::ResetServerGUI ( CServerListItem* pServer )

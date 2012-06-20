@@ -55,6 +55,7 @@ public:
 
     //
     static int      CallRemote                          ( lua_State* luaVM );
+    static int      FetchRemote                         ( lua_State* luaVM );
 
     // Event functions
     static int      AddEvent                            ( lua_State* luaVM );
@@ -65,6 +66,10 @@ public:
     static int      CancelEvent                         ( lua_State* luaVM );
     static int      GetCancelReason                     ( lua_State* luaVM );
     static int      WasEventCancelled                   ( lua_State* luaVM );
+    static int      TriggerLatentClientEvent            ( lua_State* luaVM );
+    static int      GetLatentEventHandles               ( lua_State* luaVM );
+    static int      GetLatentEventStatus                ( lua_State* luaVM );
+    static int      CancelLatentEvent                   ( lua_State* luaVM );
 
     // Player get functions
     static int      GetPlayerCount                      ( lua_State* luaVM );
@@ -81,6 +86,7 @@ public:
     static int      GetPlayerWantedLevel                ( lua_State* luaVM );
     static int      GetAlivePlayers                     ( lua_State* luaVM );
     static int      GetDeadPlayers                      ( lua_State* luaVM );
+    static int      GetPlayerIdleTime                   ( lua_State* luaVM );
     static int      IsPlayerScoreboardForced            ( lua_State* luaVM );
     static int      IsPlayerMapForced                   ( lua_State* luaVM );
     static int      GetPlayerNametagText                ( lua_State* luaVM );
@@ -112,6 +118,8 @@ public:
     static int      SetPlayerBlurLevel                  ( lua_State* luaVM );
     static int      RedirectPlayer                      ( lua_State* luaVM );
     static int      SetPlayerName                       ( lua_State* luaVM );
+    static int      DetonateSatchels                    ( lua_State* luaVM );
+    static int      TakePlayerScreenShot                ( lua_State* luaVM );
 
     // Ped get functions
     static int      CreatePed                           ( lua_State* luaVM );
@@ -138,6 +146,8 @@ public:
     static int      GetPedOccupiedVehicle               ( lua_State* luaVM );
     static int      GetPedOccupiedVehicleSeat           ( lua_State* luaVM );
     static int      IsPedInVehicle                      ( lua_State* luaVM );
+    static int      GetWeaponProperty                   ( lua_State* luaVM );
+    static int      GetOriginalWeaponProperty           ( lua_State* luaVM );
 
     // Player set functions
     static int      SetPedArmor                         ( lua_State* luaVM );    
@@ -156,11 +166,13 @@ public:
     static int      RemovePedFromVehicle                ( lua_State* luaVM );
     static int      SetPedDoingGangDriveby              ( lua_State* luaVM );
     static int      SetPedAnimation                     ( lua_State* luaVM );
+    static int      SetPedAnimationProgress             ( lua_State* luaVM );
     static int      SetPedWeaponSlot                    ( lua_State* luaVM );
     static int      SetPedOnFire                        ( lua_State* luaVM );
     static int      SetPedHeadless                      ( lua_State* luaVM );
     static int      SetPedFrozen                        ( lua_State* luaVM );
     static int      reloadPedWeapon                     ( lua_State* luaVM );
+    static int      SetWeaponProperty                   ( lua_State* luaVM );
 
     // Weapon give/take functions
     static int      GiveWeapon                          ( lua_State* luaVM );
@@ -174,6 +186,7 @@ public:
 
     // Vehicle get functions
     static int      GetVehicleType                      ( lua_State* luaVM );
+    static int      GetVehicleVariant                   ( lua_State* luaVM );
     static int      GetVehicleColor                     ( lua_State* luaVM );
     static int      GetVehicleModelFromName             ( lua_State* luaVM );
     static int      GetVehicleLandingGearDown           ( lua_State* luaVM );
@@ -258,6 +271,12 @@ public:
     static int      SetVehicleHeadLightColor            ( lua_State* luaVM );
     static int      SetVehicleTurretPosition            ( lua_State* luaVM );
     static int      SetVehicleDoorOpenRatio             ( lua_State* luaVM );
+    static int      SetVehicleVariant                   ( lua_State* luaVM );
+    static int      GiveVehicleSirens                   ( lua_State* luaVM );
+    static int      RemoveVehicleSirens                 ( lua_State* luaVM );
+    static int      SetVehicleSirens                    ( lua_State* luaVM );
+    static int      GetVehicleSirens                    ( lua_State* luaVM );
+    static int      GetVehicleSirenParams               ( lua_State* luaVM );
 
     // Marker create/destroy functions
     static int      CreateMarker                        ( lua_State* luaVM );
@@ -380,6 +399,7 @@ public:
     // Water funcs
     static int      CreateWater                         ( lua_State* luaVM );
     static int      SetWaterLevel                       ( lua_State* luaVM );
+    static int      ResetWaterLevel                     ( lua_State* luaVM );
     static int      GetWaterVertexPosition              ( lua_State* luaVM );
     static int      SetWaterVertexPosition              ( lua_State* luaVM );
     static int      GetWaterColor                       ( lua_State* luaVM );
@@ -401,6 +421,7 @@ public:
 
     // Standard server functions
     static int      GetMaxPlayers                       ( lua_State* luaVM );
+    static int      SetMaxPlayers                       ( lua_State* luaVM );
     static int      OutputChatBox                       ( lua_State* luaVM );
     static int      OutputConsole                       ( lua_State* luaVM );
     static int      OutputDebugString                   ( lua_State* luaVM );
@@ -410,6 +431,8 @@ public:
     static int      GetServerIP                         ( lua_State* luaVM );
     static int      GetServerPassword                   ( lua_State* luaVM );
     static int      SetServerPassword                   ( lua_State* luaVM );
+    static int      GetServerConfigSetting              ( lua_State* luaVM );
+    static int      SetServerConfigSetting              ( lua_State* luaVM );
 
     static int      shutdown                            ( lua_State* luaVM );
 
@@ -459,6 +482,14 @@ public:
     static int      RemoveRuleValue                     ( lua_State* luaVM );
     static int      GetPlayerAnnounceValue              ( lua_State* luaVM );
     static int      SetPlayerAnnounceValue              ( lua_State* luaVM );
+    static int      ResendPlayerModInfo                 ( lua_State* luaVM );
+
+    // Database funcs
+    static int      DbConnect                           ( lua_State* luaVM );
+    static int      DbExec                              ( lua_State* luaVM );
+    static int      DbQuery                             ( lua_State* luaVM );
+    static int      DbFree                              ( lua_State* luaVM );
+    static int      DbPoll                              ( lua_State* luaVM );
 
     // Registry funcs
     static int      ExecuteSQLCreateTable               ( lua_State* luaVM );
@@ -477,6 +508,7 @@ public:
     static int      GetAccountPlayer                    ( lua_State* luaVM );
     static int      IsGuestAccount                      ( lua_State* luaVM );
     static int      GetAccountData                      ( lua_State* luaVM );
+    static int      GetAllAccountData                   ( lua_State* luaVM );
 
     // Account set funcs
     static int      AddAccount                          ( lua_State* luaVM );
@@ -497,6 +529,7 @@ public:
     static int      RemoveBan                           ( lua_State* luaVM );
 
     static int      GetBans                             ( lua_State* luaVM );
+    static int      ReloadBanList                       ( lua_State* luaVM );
 
     static int      GetBanIP                            ( lua_State* luaVM );
     static int      GetBanSerial                        ( lua_State* luaVM );
@@ -527,6 +560,7 @@ public:
     // Utility
     static int      Md5                                 ( lua_State* luaVM );
     static int      GetNetworkUsageData                 ( lua_State* luaVM );
+    static int      GetNetworkStats                     ( lua_State* luaVM );
     static int      GetVersion                          ( lua_State* luaVM );
     static int      GetModules                          ( lua_State* luaVM );
     static int      GetModuleInfo                       ( lua_State* luaVM );

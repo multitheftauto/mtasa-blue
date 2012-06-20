@@ -28,7 +28,7 @@
     #include <cstdio>
 
     // Type, function and normal defines
-    #define socklen_t int
+    typedef int socklen_t;
 
     #define MTA_OS_STRING "Windows"
 #else
@@ -157,7 +157,7 @@ public:
 #define MAX_VALID_WEATHER 255
 
 // Upper player limit
-#define MAX_PLAYER_COUNT 65535
+#define MAX_PLAYER_COUNT 4096
 #if MAX_PLAYER_COUNT > 65535
     #error MAX_PLAYER_COUNT "macro can't exceed 65535"
 #endif

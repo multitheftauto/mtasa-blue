@@ -30,7 +30,9 @@ class CRegistry
                                 ~CRegistry              ( void );
 public:
 
+    void                        SuspendBatching         ( uint uiTicks );
     void                        Load                    ( const std::string& strFileName );
+    bool                        IntegrityCheck          ( void );
 
     void                        CreateTable             ( const std::string& strTable, const std::string& strDefinition, bool bSilent = false );
     void                        DropTable               ( const std::string& strTable );
@@ -44,10 +46,12 @@ public:
     bool                        Query                   ( const char* szQuery, ... );
     bool                        Query                   ( CRegistryResult* pResult, const char* szQuery, ... );
 
-    const std::string&          GetLastError            ( void ) { return m_strLastError; }
+    const SString&              GetLastError            ( void ) { return m_strLastErrorMessage; }
 
 protected:
-
+    bool                        SetLastErrorMessage     ( const std::string& strLastErrorMessage, const std::string& strQuery );
+    bool                        Exec                    ( const std::string& strQuery );
+    bool                        ExecInternal            ( const char* szQuery  );
     bool                        Query                   ( CRegistryResult* pResult, const char* szQuery, va_list vl );
     bool                        QueryInternal           ( const char* szQuery, CRegistryResult* pResult );
     void                        BeginAutomaticTransaction ( void );
@@ -56,11 +60,13 @@ protected:
     sqlite3                     *m_db;
     bool                        m_bOpened;
     bool                        m_bInAutomaticTransaction;
+    long long                   m_llSuspendBatchingEndTime;
+    SString                     m_strLastErrorMessage;
+    SString                     m_strLastErrorQuery;
+    SString                     m_strFileName;
 
 private:
     bool                        Query                   ( const char* szQuery, CRegistryResult* pResult );  // Not defined to catch incorrect usage
-    std::string                 m_strLastError;
-
 };
 
 struct CRegistryResultCell
@@ -88,6 +94,24 @@ struct CRegistryResultCell
                                 {
                                     if ( pVal )
                                         delete [] pVal;
+                                }
+
+                                CRegistryResultCell& operator = ( const CRegistryResultCell& cell )
+                                {
+                                    if ( pVal )
+                                        delete [] pVal;
+
+                                    nType = cell.nType;
+                                    nLength = cell.nLength;
+                                    nVal = cell.nVal;
+                                    fVal = cell.fVal;
+                                    pVal = NULL;
+                                    if ( (nType == SQLITE_BLOB || nType == SQLITE_TEXT) && cell.pVal && nLength > 0 )
+                                    {
+                                        pVal = new unsigned char [ nLength ];
+                                        memcpy ( pVal, cell.pVal, nLength );
+                                    }
+                                    return *this;
                                 }
 
     int                         nType;      // Type identifier, SQLITE_*

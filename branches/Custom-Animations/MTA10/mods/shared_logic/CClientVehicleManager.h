@@ -23,7 +23,7 @@
 class CClientManager;
 class CClientVehicle;
 
-extern unsigned char g_ucMaxPassengers [];
+extern const SFixedArray < unsigned char, 212 > g_ucMaxPassengers;
 
 class CClientVehicleManager
 {
@@ -46,6 +46,7 @@ public:
     static eClientVehicleType       GetVehicleType          ( unsigned long ulModel );
     static unsigned char            GetMaxPassengerCount    ( unsigned long ulModel );
     static unsigned char            ConvertIndexToGameSeat  ( unsigned long ulModel, unsigned char ucIndex );
+    static void                     GetRandomVariation      ( unsigned short usModel, unsigned char &ucVariant, unsigned char &ucVariant2 );
 
     static bool                     HasTurret               ( unsigned long ulModel );
     static bool                     HasSirens               ( unsigned long ulModel );
@@ -63,6 +64,7 @@ public:
     static bool                     IsVehicleLimitReached   ( void );
 
     void                            RestreamVehicles        ( unsigned short usModel );
+    void                            RestreamVehicleUpgrades ( unsigned short usModel );
 
     std::vector < CClientVehicle* > ::const_iterator            IterBegin           ( void )    { return m_List.begin (); };
     std::vector < CClientVehicle* > ::const_iterator            IterEnd             ( void )    { return m_List.end (); };
@@ -84,7 +86,6 @@ private:
     CMappedArray < CClientVehicle* >  m_List;
     std::vector < CClientVehicle* >   m_StreamedIn;
     std::list < CClientVehicle* >   m_Attached;
-
 };
 
 #endif

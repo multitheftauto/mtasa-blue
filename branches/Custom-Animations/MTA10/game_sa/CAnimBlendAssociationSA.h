@@ -51,6 +51,8 @@ public:
     inline float                        GetBlendAmount          ( void )            { return m_pInterface->fBlendAmount; }
     inline void                         SetBlendAmount          ( float fAmount )   { m_pInterface->fBlendAmount = fAmount; }
 
+    void                                SetCurrentProgress      ( float fProgress );
+
 protected:
     CAnimBlendAssociationSAInterface *  m_pInterface;
 };

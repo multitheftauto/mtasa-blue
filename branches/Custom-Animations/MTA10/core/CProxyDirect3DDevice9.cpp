@@ -13,6 +13,8 @@
 #include "StdInc.h"
 
 #include <stdexcept>
+CProxyDirect3DDevice9* g_pProxyDevice = NULL;
+CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState = NULL;
 
 // Proxy constructor and destructor.
 CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
@@ -29,6 +31,53 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
     // Get CDirect3DData pointer.
     m_pData = CDirect3DData::GetSingletonPtr ( );
 
+    g_pProxyDevice = this;
+    g_pDeviceState = &DeviceState;
+    pDevice->GetDeviceCaps ( &g_pDeviceState->DeviceCaps );
+
+    //
+    // Get video card installed memory
+    //
+    D3DDEVICE_CREATION_PARAMETERS creationParameters;
+    m_pDevice->GetCreationParameters ( &creationParameters );
+    int iAdapter = creationParameters.AdapterOrdinal;
+
+    IDirect3D9* pD3D9 = NULL;
+    m_pDevice->GetDirect3D ( &pD3D9 );
+
+    D3DADAPTER_IDENTIFIER9 adaptIdent;
+    ZeroMemory( &adaptIdent, sizeof( D3DADAPTER_IDENTIFIER9 ) );
+    pD3D9->GetAdapterIdentifier( iAdapter, 0, &adaptIdent );
+    SString strVideoCardName = adaptIdent.Description;
+
+    int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize ( adaptIdent.DeviceName ) / 1024;
+
+    // Just incase, fallback to using texture memory stats
+    if ( iVideoCardMemoryKBTotal < 16 )
+        iVideoCardMemoryKBTotal = m_pDevice->GetAvailableTextureMem () / 1024;
+
+    g_pDeviceState->AdapterState.InstalledMemoryKB = iVideoCardMemoryKBTotal;
+
+    //
+    // Get video card name
+    //
+    g_pDeviceState->AdapterState.Name = adaptIdent.Description;
+
+    //
+    // Get max anisotropic setting
+    //
+    g_pDeviceState->AdapterState.MaxAnisotropicSetting = 0;
+
+    // Make sure device can do anisotropic minification and trilinear filtering
+    if ( ( g_pDeviceState->DeviceCaps.TextureFilterCaps & D3DPTFILTERCAPS_MINFANISOTROPIC )
+         && ( g_pDeviceState->DeviceCaps.TextureFilterCaps & D3DPTFILTERCAPS_MIPFLINEAR ) )
+    {
+        int iLevel = Max < int > ( 1, g_pDeviceState->DeviceCaps.MaxAnisotropy );
+        // Convert level 1/2/4/8/16 into setting 0/1/2/3/4
+        while ( iLevel >>= 1 )
+            g_pDeviceState->AdapterState.MaxAnisotropicSetting++;
+    }
+
     // Call event handler
     CDirect3DEvents9::OnDirect3DDeviceCreate ( pDevice );
 }
@@ -36,6 +85,8 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
 CProxyDirect3DDevice9::~CProxyDirect3DDevice9 ( )
 {
     WriteDebugEvent ( "CProxyDirect3DDevice9::~CProxyDirect3DDevice9" );
+    g_pDeviceState = NULL;
+    g_pProxyDevice = NULL;
 }
 
 /*** IUnknown methods ***/
@@ -183,6 +234,41 @@ HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAM
     // Call our event handler.
     CDirect3DEvents9::OnRestore ( m_pDevice );
 
+
+    WriteDebugEvent ( SString ( "    BackBufferWidth:%d  Height:%d  Format:%d  Count:%d"
+                                ,pPresentationParameters->BackBufferWidth
+                                ,pPresentationParameters->BackBufferHeight
+                                ,pPresentationParameters->BackBufferFormat
+                                ,pPresentationParameters->BackBufferCount
+                           ) );
+
+    WriteDebugEvent ( SString ( "    MultiSampleType:%d  Quality:%d"
+                                ,pPresentationParameters->MultiSampleType
+                                ,pPresentationParameters->MultiSampleQuality
+                           ) );
+
+    WriteDebugEvent ( SString ( "    SwapEffect:%d  Windowed:%d  EnableAutoDepthStencil:%d  AutoDepthStencilFormat:%d  Flags:0x%x"
+                                ,pPresentationParameters->SwapEffect
+                                ,pPresentationParameters->Windowed
+                                ,pPresentationParameters->EnableAutoDepthStencil
+                                ,pPresentationParameters->AutoDepthStencilFormat
+                                ,pPresentationParameters->Flags
+                           ) );
+
+    WriteDebugEvent ( SString ( "    FullScreen_RefreshRateInHz:%d  PresentationInterval:0x%08x"
+                                ,pPresentationParameters->FullScreen_RefreshRateInHz
+                                ,pPresentationParameters->PresentationInterval
+                           ) );
+
+    D3DDEVICE_CREATION_PARAMETERS parameters;
+    m_pDevice->GetCreationParameters ( &parameters );
+
+    WriteDebugEvent ( SString ( "    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x"
+                                ,parameters.AdapterOrdinal
+                                ,parameters.DeviceType
+                                ,parameters.BehaviorFlags
+                            ) );
+
     return hResult;   
 }
 
@@ -225,7 +311,7 @@ VOID    CProxyDirect3DDevice9::GetGammaRamp                   ( UINT iSwapChain,
 
 HRESULT CProxyDirect3DDevice9::CreateTexture                  ( UINT Width,UINT Height,UINT Levels,DWORD Usage,D3DFORMAT Format,D3DPOOL Pool,IDirect3DTexture9** ppTexture,HANDLE* pSharedHandle )
 {
-    return m_pDevice->CreateTexture ( Width, Height, Levels, Usage, Format, Pool, ppTexture, pSharedHandle );
+    return CDirect3DEvents9::CreateTexture ( m_pDevice, Width, Height, Levels, Usage, Format, Pool, ppTexture, pSharedHandle );
 }
 
 HRESULT CProxyDirect3DDevice9::CreateVolumeTexture            ( UINT Width,UINT Height,UINT Depth,UINT Levels,DWORD Usage,D3DFORMAT Format,D3DPOOL Pool,IDirect3DVolumeTexture9** ppVolumeTexture,HANDLE* pSharedHandle )
@@ -240,12 +326,12 @@ HRESULT CProxyDirect3DDevice9::CreateCubeTexture              ( UINT EdgeLength,
 
 HRESULT CProxyDirect3DDevice9::CreateVertexBuffer             ( UINT Length,DWORD Usage,DWORD FVF,D3DPOOL Pool,IDirect3DVertexBuffer9** ppVertexBuffer,HANDLE* pSharedHandle )
 {
-    return m_pDevice->CreateVertexBuffer ( Length, Usage, FVF, Pool, ppVertexBuffer, pSharedHandle );
+    return CDirect3DEvents9::CreateVertexBuffer ( m_pDevice, Length, Usage, FVF, Pool, ppVertexBuffer, pSharedHandle );
 }
 
 HRESULT CProxyDirect3DDevice9::CreateIndexBuffer              ( UINT Length,DWORD Usage,D3DFORMAT Format,D3DPOOL Pool,IDirect3DIndexBuffer9** ppIndexBuffer,HANDLE* pSharedHandle )
 {
-    return m_pDevice->CreateIndexBuffer ( Length, Usage, Format, Pool, ppIndexBuffer, pSharedHandle );
+    return CDirect3DEvents9::CreateIndexBuffer ( m_pDevice, Length, Usage, Format, Pool, ppIndexBuffer, pSharedHandle );
 }
 
 HRESULT CProxyDirect3DDevice9::CreateRenderTarget             ( UINT Width,UINT Height,D3DFORMAT Format,D3DMULTISAMPLE_TYPE MultiSample,DWORD MultisampleQuality,BOOL Lockable,IDirect3DSurface9** ppSurface,HANDLE* pSharedHandle )
@@ -316,7 +402,6 @@ HRESULT CProxyDirect3DDevice9::GetDepthStencilSurface         ( IDirect3DSurface
 HRESULT CProxyDirect3DDevice9::BeginScene                     ( VOID )
 {
     HRESULT hResult;
-    DWORD   dwNumPasses = 1;
 
     // Call the real routine.
     hResult = m_pDevice->BeginScene ( );
@@ -361,6 +446,9 @@ HRESULT CProxyDirect3DDevice9::SetTransform                   ( D3DTRANSFORMSTAT
     // Store the matrix
     m_pData->StoreTransform ( State, pMatrix );
 
+    if ( State < NUMELMS( DeviceState.TransformState.Raw ) )
+        DeviceState.TransformState.Raw[State] = *pMatrix;
+
     // Call original
     return m_pDevice->SetTransform ( State, pMatrix );
 }
@@ -391,6 +479,7 @@ HRESULT CProxyDirect3DDevice9::GetViewport                    ( D3DVIEWPORT9* pV
 
 HRESULT CProxyDirect3DDevice9::SetMaterial                    ( CONST D3DMATERIAL9* pMaterial )
 {
+    DeviceState.Material = *pMaterial;
     return m_pDevice->SetMaterial ( pMaterial );
 }
 
@@ -401,6 +490,8 @@ HRESULT CProxyDirect3DDevice9::GetMaterial                    ( D3DMATERIAL9* pM
 
 HRESULT CProxyDirect3DDevice9::SetLight                       ( DWORD Index,CONST D3DLIGHT9* pLight )
 {
+    if ( Index < NUMELMS( DeviceState.Lights ) )
+        DeviceState.Lights[Index] = *pLight;
     return m_pDevice->SetLight ( Index, pLight );
 }
 
@@ -411,6 +502,8 @@ HRESULT CProxyDirect3DDevice9::GetLight                       ( DWORD Index,D3DL
 
 HRESULT CProxyDirect3DDevice9::LightEnable                    ( DWORD Index,BOOL Enable )
 {
+    if ( Index < NUMELMS( DeviceState.LightEnableState ) )
+        DeviceState.LightEnableState[Index].Enable = Enable;
     return m_pDevice->LightEnable ( Index, Enable );
 }
 
@@ -431,6 +524,8 @@ HRESULT CProxyDirect3DDevice9::GetClipPlane                   ( DWORD Index,floa
 
 HRESULT CProxyDirect3DDevice9::SetRenderState                 ( D3DRENDERSTATETYPE State,DWORD Value )
 {
+    if ( State< NUMELMS( DeviceState.RenderState.Raw ) )
+        DeviceState.RenderState.Raw[State] = Value;
     return m_pDevice->SetRenderState ( State, Value );
 }
 
@@ -471,7 +566,9 @@ HRESULT CProxyDirect3DDevice9::GetTexture                     ( DWORD Stage,IDir
 
 HRESULT CProxyDirect3DDevice9::SetTexture                     ( DWORD Stage,IDirect3DBaseTexture9* pTexture )
 {
-    return m_pDevice->SetTexture ( Stage, pTexture );
+    if ( Stage < NUMELMS( DeviceState.TextureState ) )
+        DeviceState.TextureState[Stage].Texture = pTexture;
+    return m_pDevice->SetTexture ( Stage, CDirect3DEvents9::GetRealTexture ( pTexture ) );
 }
 
 HRESULT CProxyDirect3DDevice9::GetTextureStageState           ( DWORD Stage,D3DTEXTURESTAGESTATETYPE Type,DWORD* pValue )
@@ -481,6 +578,9 @@ HRESULT CProxyDirect3DDevice9::GetTextureStageState           ( DWORD Stage,D3DT
 
 HRESULT CProxyDirect3DDevice9::SetTextureStageState           ( DWORD Stage,D3DTEXTURESTAGESTATETYPE Type,DWORD Value )
 {
+    if ( Stage < NUMELMS( DeviceState.StageState ) )
+        if ( Type < NUMELMS( DeviceState.StageState[Stage].Raw ) )
+            DeviceState.StageState[Stage].Raw[Type] = Value;
     return m_pDevice->SetTextureStageState ( Stage, Type, Value );
 }
 
@@ -491,6 +591,9 @@ HRESULT CProxyDirect3DDevice9::GetSamplerState                ( DWORD Sampler,D3
 
 HRESULT CProxyDirect3DDevice9::SetSamplerState                ( DWORD Sampler,D3DSAMPLERSTATETYPE Type,DWORD Value )
 {
+    if ( Sampler < NUMELMS( DeviceState.SamplerState ) )
+        if ( Type < NUMELMS( DeviceState.SamplerState[Sampler].Raw ) )
+            DeviceState.SamplerState[Sampler].Raw[Type] = Value;
     return m_pDevice->SetSamplerState ( Sampler, Type, Value );
 }
 
@@ -551,12 +654,19 @@ FLOAT   CProxyDirect3DDevice9::GetNPatchMode                  ( VOID )
 
 HRESULT CProxyDirect3DDevice9::DrawPrimitive                  ( D3DPRIMITIVETYPE PrimitiveType,UINT StartVertex,UINT PrimitiveCount )
 {
-    return m_pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
+    SetCallType ( SCallState::DRAW_PRIMITIVE, 3, PrimitiveType, StartVertex, PrimitiveCount );
+    HRESULT hr = CDirect3DEvents9::OnDrawPrimitive ( m_pDevice, PrimitiveType, StartVertex, PrimitiveCount );
+    SetCallType ( SCallState::NONE );
+    return hr;
 }
+
 
 HRESULT CProxyDirect3DDevice9::DrawIndexedPrimitive           ( D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount )
 {
-    return m_pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+    SetCallType ( SCallState::DRAW_INDEXED_PRIMITIVE, 6, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+    HRESULT hr = CDirect3DEvents9::OnDrawIndexedPrimitive ( m_pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+    SetCallType ( SCallState::NONE );
+    return hr;
 }
 
 HRESULT CProxyDirect3DDevice9::DrawPrimitiveUP                ( D3DPRIMITIVETYPE PrimitiveType,UINT PrimitiveCount,CONST void* pVertexStreamZeroData,UINT VertexStreamZeroStride )
@@ -576,12 +686,13 @@ HRESULT CProxyDirect3DDevice9::ProcessVertices                ( UINT SrcStartInd
 
 HRESULT CProxyDirect3DDevice9::CreateVertexDeclaration        ( CONST D3DVERTEXELEMENT9* pVertexElements,IDirect3DVertexDeclaration9** ppDecl )
 {
-    return m_pDevice->CreateVertexDeclaration ( pVertexElements, ppDecl );
+    return CDirect3DEvents9::CreateVertexDeclaration ( m_pDevice, pVertexElements, ppDecl );
 }
 
 HRESULT CProxyDirect3DDevice9::SetVertexDeclaration           ( IDirect3DVertexDeclaration9* pDecl )
 {
-    return m_pDevice->SetVertexDeclaration ( pDecl );
+    DeviceState.VertexDeclaration = pDecl;
+    return CDirect3DEvents9::SetVertexDeclaration ( m_pDevice, pDecl );
 }
 
 HRESULT CProxyDirect3DDevice9::GetVertexDeclaration           ( IDirect3DVertexDeclaration9** ppDecl )
@@ -606,6 +717,7 @@ HRESULT CProxyDirect3DDevice9::CreateVertexShader             ( CONST DWORD* pFu
 
 HRESULT CProxyDirect3DDevice9::SetVertexShader                ( IDirect3DVertexShader9* pShader )
 {
+    DeviceState.VertexShader = pShader;
     return m_pDevice->SetVertexShader ( pShader );
 }
 
@@ -646,7 +758,13 @@ HRESULT CProxyDirect3DDevice9::GetVertexShaderConstantB       ( UINT StartRegist
 
 HRESULT CProxyDirect3DDevice9::SetStreamSource                ( UINT StreamNumber,IDirect3DVertexBuffer9* pStreamData,UINT OffsetInBytes,UINT Stride )
 {
-    return m_pDevice->SetStreamSource ( StreamNumber, pStreamData, OffsetInBytes, Stride );
+    if ( StreamNumber < NUMELMS( DeviceState.VertexStreams ) )
+    {
+        DeviceState.VertexStreams[StreamNumber].StreamData = pStreamData;
+        DeviceState.VertexStreams[StreamNumber].StreamOffset = OffsetInBytes;
+        DeviceState.VertexStreams[StreamNumber].StreamStride = Stride;
+    }
+    return m_pDevice->SetStreamSource ( StreamNumber, CDirect3DEvents9::GetRealVertexBuffer ( pStreamData ), OffsetInBytes, Stride );
 }
 
 HRESULT CProxyDirect3DDevice9::GetStreamSource                ( UINT StreamNumber,IDirect3DVertexBuffer9** ppStreamData,UINT* pOffsetInBytes,UINT* pStride )
@@ -666,7 +784,8 @@ HRESULT CProxyDirect3DDevice9::GetStreamSourceFreq            ( UINT StreamNumbe
 
 HRESULT CProxyDirect3DDevice9::SetIndices                     ( IDirect3DIndexBuffer9* pIndexData )
 {
-    return m_pDevice->SetIndices ( pIndexData );
+    DeviceState.IndexBufferData = pIndexData;
+    return m_pDevice->SetIndices ( CDirect3DEvents9::GetRealIndexBuffer ( pIndexData ) );
 }
 
 HRESULT CProxyDirect3DDevice9::GetIndices                     ( IDirect3DIndexBuffer9** ppIndexData )
@@ -681,6 +800,7 @@ HRESULT CProxyDirect3DDevice9::CreatePixelShader              ( CONST DWORD* pFu
 
 HRESULT CProxyDirect3DDevice9::SetPixelShader                 ( IDirect3DPixelShader9* pShader )
 {
+    DeviceState.PixelShader = pShader;
     return m_pDevice->SetPixelShader ( pShader );
 }
 
@@ -739,4 +859,18 @@ HRESULT CProxyDirect3DDevice9::CreateQuery                    ( D3DQUERYTYPE Typ
     return m_pDevice->CreateQuery ( Type, ppQuery );
 }
 
+// For debugging
+void CProxyDirect3DDevice9::SetCallType ( SCallState::eD3DCallType callType, uint uiNumArgs, ... )
+{
+    DeviceState.CallState.callType = callType;
+    DeviceState.CallState.uiNumArgs = uiNumArgs;
+    if ( uiNumArgs )
+    {
+        va_list vl;
+        va_start(vl,uiNumArgs);
+        for ( uint i = 0 ; i < uiNumArgs && i < NUMELMS( DeviceState.CallState.args ) ; i++ )
+            DeviceState.CallState.args[i] = va_arg ( vl, int );
+        va_end(vl);
+    }
+}
 

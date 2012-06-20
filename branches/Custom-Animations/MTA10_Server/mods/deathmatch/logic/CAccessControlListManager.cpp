@@ -14,10 +14,14 @@
 
 #include "StdInc.h"
 
+
 CAccessControlListManager::CAccessControlListManager ( void ) : CXMLConfig ( NULL )
 {
     m_pXML = NULL;
     m_pRootNode = NULL;
+    m_llLastTimeReadCacheCleared = 0;
+    m_bReadCacheDirty = false;
+    m_bNeedsSave = false;
 }
 
 
@@ -36,7 +40,7 @@ CAccessControlListManager::~CAccessControlListManager ( void )
 }
 
 
-bool CAccessControlListManager::Load ( const char* szFilename )
+bool CAccessControlListManager::Load ( void )
 {
     // Eventually destroy the previously loaded xml
     if ( m_pXML )
@@ -45,7 +49,7 @@ bool CAccessControlListManager::Load ( const char* szFilename )
     }
 
     // Load the XML
-    m_pXML = g_pServerInterface->GetXML ()->CreateXML ( szFilename );
+    m_pXML = g_pServerInterface->GetXML ()->CreateXML ( GetFileName ().c_str () );
     if ( !m_pXML )
     {
         CLogger::ErrorPrintf ( "Error loading Access Control List file\n" );
@@ -135,6 +139,13 @@ bool CAccessControlListManager::Load ( const char* szFilename )
                                 pRight = pACL->AddRight ( &szRightName[8], CAccessControlListRight::RIGHT_TYPE_GENERAL, bAccess );
                             }
                             else continue;
+
+                            // Set all the extra attributes
+                            for ( uint i = 0 ; i < pSubSubNode->GetAttributes ().Count () ; i++ )
+                            {
+                                CXMLAttribute* pAttribute = pSubSubNode->GetAttributes ().Get ( i );
+                                pRight->SetAttributeValue ( pAttribute->GetName (), pAttribute->GetValue () );
+                            }
                         }
                     }
                 }
@@ -198,12 +209,16 @@ bool CAccessControlListManager::Load ( const char* szFilename )
         }
     }
 
+    m_bNeedsSave = false;
     return true;
 }
 
 
-bool CAccessControlListManager::Save ( const char* szFilename )
+bool CAccessControlListManager::Save ( void )
 {
+    m_bNeedsSave = false;
+    m_AutoSaveTimer.Reset ();
+
     // We have it loaded?
     if ( m_pXML )
     {
@@ -229,7 +244,9 @@ bool CAccessControlListManager::Save ( const char* szFilename )
             }
 
             // Save the XML
-            return m_pXML->Write ();
+            if ( m_pXML->Write () )
+                return true;
+            CLogger::ErrorPrintf ( "Error saving '%s'\n", GetFileName ().c_str () );
         }
     }
 
@@ -269,7 +286,58 @@ CAccessControlList* CAccessControlListManager::GetACL ( const char* szACLName )
 }
 
 
+void CAccessControlListManager::DoPulse ( void )
+{
+    // Clear cache every 12 hours or if dirty
+    if ( m_bReadCacheDirty || GetTickCount64_ () - m_llLastTimeReadCacheCleared > 1000 * 60 * 60 * 12 )
+        ClearReadCache ();
+
+    // Save when needed, but no more than once every 10 seconds
+    if ( m_AutoSaveTimer.Get () > 10000 && m_bNeedsSave )
+        Save ();
+}
+
+
+void CAccessControlListManager::ClearReadCache ( void )
+{
+    m_bReadCacheDirty = false;
+    m_llLastTimeReadCacheCleared = GetTickCount64_ ();
+    m_ReadCacheMap.clear ();      
+}
+
+
 bool CAccessControlListManager::CanObjectUseRight ( const char* szObjectName,
+                                                    CAccessControlListGroupObject::EObjectType eObjectType,
+                                                    const char* szRightName,
+                                                    CAccessControlListRight::ERightType eRightType,
+                                                    bool bDefaultAccessRight )
+{
+    // Clear cache if required
+    if ( m_bReadCacheDirty )
+        ClearReadCache ();
+
+    // If object is resource, try cache
+    if ( eObjectType == CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE )
+    {
+        // Make unique key for this query
+        SString strKey ( "%s %s %d %d", szObjectName, szRightName, eRightType, bDefaultAccessRight );
+        // Check if this query has been done before
+        bool* pResult = MapFind( m_ReadCacheMap, strKey );
+        if ( !pResult )
+        {
+            // If not, do query now and add result to the cache
+            bool bResult = InternalCanObjectUseRight ( szObjectName, eObjectType, szRightName, eRightType, bDefaultAccessRight );
+            MapSet ( m_ReadCacheMap, strKey, bResult );
+            pResult = MapFind( m_ReadCacheMap, strKey );
+        }
+        // Return cached result
+        return *pResult;
+    }
+    return InternalCanObjectUseRight ( szObjectName, eObjectType, szRightName, eRightType, bDefaultAccessRight );
+}
+
+
+bool CAccessControlListManager::InternalCanObjectUseRight ( const char* szObjectName,
                                                     CAccessControlListGroupObject::EObjectType eObjectType,
                                                     const char* szRightName,
                                                     CAccessControlListRight::ERightType eRightType,
@@ -326,6 +394,7 @@ CAccessControlListGroup* CAccessControlListManager::AddGroup ( const char* szGro
         // Create it and put it back in our list
         pGroup = new CAccessControlListGroup ( szGroupName );
         m_Groups.push_back ( pGroup );
+        OnChange ();
     }
 
     return pGroup;
@@ -341,6 +410,7 @@ CAccessControlList* CAccessControlListManager::AddACL ( const char* szACLName )
         // Create it and put it back in our list
         pACL = new CAccessControlList ( szACLName, this );
         m_ACLs.push_back ( pACL );
+        OnChange ();
     }
 
     return pACL;
@@ -354,6 +424,7 @@ void CAccessControlListManager::DeleteGroup ( class CAccessControlListGroup* pGr
     // Delete the class and remove it from the list
     delete pGroup;
     m_Groups.remove ( pGroup );
+    OnChange ();
 }
 
 
@@ -367,6 +438,7 @@ void CAccessControlListManager::DeleteACL ( class CAccessControlList* pACL )
     // Delete the class and remove it from the list
     delete pACL;
     m_ACLs.remove ( pACL );
+    OnChange ();
 }
 
 
@@ -381,6 +453,7 @@ void CAccessControlListManager::ClearACLs ( void )
 
     // Clear the list
     m_ACLs.clear ();
+    OnChange ();
 }
 
 
@@ -395,36 +468,24 @@ void CAccessControlListManager::ClearGroups ( void )
 
     // Clear the list
     m_Groups.clear ();
+    OnChange ();
 }
 
 
-bool CAccessControlListManager::VerifyGroup ( class CAccessControlListGroup* pGroup )
+CAccessControlList* CAccessControlListManager::GetACLFromScriptID ( uint uiScriptID )
 {
-    // Return true if it exists
-    list < CAccessControlListGroup* > ::iterator iter = m_Groups.begin ();
-    for ( ; iter != m_Groups.end (); iter++ )
-    {
-        if ( *iter == pGroup )
-            return true;
-    }
-
-    return false;
+    CAccessControlList* pACL = (CAccessControlList*) CIdArray::FindEntry ( uiScriptID, EIdClass::ACL );
+    dassert ( !pACL || ListContains ( m_ACLs, pACL ) );
+    return pACL;
 }
 
 
-bool CAccessControlListManager::VerifyACL ( class CAccessControlList* pACL )
+CAccessControlListGroup* CAccessControlListManager::GetGroupFromScriptID ( uint uiScriptID )
 {
-    // Return true if it exists
-    list < CAccessControlList* > ::iterator iter = m_ACLs.begin ();
-    for ( ; iter != m_ACLs.end (); iter++ )
-    {
-        if ( *iter == pACL )
-            return true;
-    }
-
-    return false;
+    CAccessControlListGroup* pGroup = (CAccessControlListGroup*) CIdArray::FindEntry ( uiScriptID, EIdClass::ACL_GROUP );
+    dassert ( !pGroup || ListContains ( m_Groups, pGroup ) );
+    return pGroup;
 }
-
 
 void CAccessControlListManager::RemoveACLDependencies ( class CAccessControlList* pACL )
 {
@@ -434,6 +495,7 @@ void CAccessControlListManager::RemoveACLDependencies ( class CAccessControlList
     {
         (*iter)->RemoveACL ( pACL );
     }
+    OnChange ();
 }
 
 
@@ -488,3 +550,11 @@ const char* CAccessControlListManager::ExtractRightName ( const char* szRightNam
     return NULL;
 }
 
+//
+// Called when an item within the ACL is modified
+//
+void CAccessControlListManager::OnChange ( void )
+{
+    m_bReadCacheDirty = true;
+    m_bNeedsSave = true;
+}

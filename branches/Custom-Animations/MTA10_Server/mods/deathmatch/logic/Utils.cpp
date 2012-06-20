@@ -28,8 +28,8 @@
         char *ret = a;
         while (*a != '\0')
         {
-            if (islower (*a))
-                *a = toupper (*a);
+            if (islower ((uchar)*a))
+                *a = toupper ((uchar)*a);
             ++a;
         }
         return ret;
@@ -384,13 +384,8 @@ void DisconnectPlayer ( CGame* pGame, CPlayer& Player, const char* szMessage )
 
 void DisconnectConnectionDesync ( CGame* pGame, CPlayer& Player, unsigned int uiCode )
 {
-    // Populate a disconnection message
-    char szBuffer [128];
-    snprintf ( szBuffer, sizeof ( szBuffer ), "Disconnected: Connection desync (%u)", uiCode );
-    szBuffer [127] = 0;
-
-    // Send it to the disconnected player
-    Player.Send ( CPlayerDisconnectedPacket ( szBuffer ) );
+    // Send message to the disconnected player
+    Player.Send ( CPlayerDisconnectedPacket ( SString ( "Disconnected: Connection desync (%u)", uiCode ) ) );
 
     // Quit him
     pGame->QuitPlayer ( Player, CClient::QUIT_CONNECTION_DESYNC );
@@ -443,6 +438,10 @@ bool IsValidFilePath ( const char *szDir )
     if ( szDir == NULL ) return false;
 
     unsigned int uiLen = strlen ( szDir );
+
+    if ( uiLen > 0 && szDir [ uiLen - 1 ] == '/' ) // will return false if ending with an invalid character, mainly used for linux (#6871)
+        return false;
+
     unsigned char c, c_d;
     
     // iterate through the char array
@@ -605,7 +604,7 @@ bool XMLColorToInt ( const char* szColor, unsigned char& ucRed, unsigned char& u
 }
 
 
-bool ReadSmallKeysync ( CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream )
+bool ReadSmallKeysync ( CControllerState& ControllerState, NetBitStreamInterface& BitStream )
 {
     SSmallKeysyncSync keys;
     if ( !BitStream.Read ( &keys ) )
@@ -620,12 +619,17 @@ bool ReadSmallKeysync ( CControllerState& ControllerState, const CControllerStat
     ControllerState.ButtonTriangle  = keys.data.bButtonTriangle;
     ControllerState.ShockButtonL    = keys.data.bShockButtonL;
     ControllerState.m_bPedWalk      = keys.data.bPedWalk;
+    if ( BitStream.Version () >= 0x2C )
+    {
+        ControllerState.LeftStickX      = keys.data.sLeftStickX;
+        ControllerState.LeftStickY      = keys.data.sLeftStickY;
+    }
 
     return true;
 }
 
 
-void WriteSmallKeysync ( const CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream )
+void WriteSmallKeysync ( const CControllerState& ControllerState, NetBitStreamInterface& BitStream )
 {
     SSmallKeysyncSync keys;
     keys.data.bLeftShoulder1    = ( ControllerState.LeftShoulder1 != 0 );       // Action / Secondary-Fire
@@ -636,6 +640,8 @@ void WriteSmallKeysync ( const CControllerState& ControllerState, const CControl
     keys.data.bButtonTriangle   = ( ControllerState.ButtonTriangle != 0 );      // Enter/Exit/Special-Attack / Enter/exit
     keys.data.bShockButtonL     = ( ControllerState.ShockButtonL != 0 );        // Crouch / Horn
     keys.data.bPedWalk          = ( ControllerState.m_bPedWalk != 0 );          // Walk / -
+    keys.data.sLeftStickX       = ControllerState.LeftStickX;
+    keys.data.sLeftStickY       = ControllerState.LeftStickY;
 
     // Write it
     BitStream.Write ( &keys );
@@ -684,6 +690,76 @@ void WriteFullKeysync ( const CControllerState& ControllerState, NetBitStreamInt
     // Write it
     BitStream.Write ( &keys );
 }
+
+
+void ReadCameraOrientation ( const CVector& vecBasePosition, NetBitStreamInterface& BitStream, CVector& vecOutCamPosition, CVector& vecOutCamFwd )
+{
+    //
+    // Read rotations
+    //
+    const float fPI = 3.14159265f;
+    SFloatAsBitsSync < 8 > rotation ( -fPI, fPI, false );
+
+    BitStream.Read ( &rotation );
+    float fCamRotZ = rotation.data.fValue;
+
+    BitStream.Read ( &rotation );
+    float fCamRotX = rotation.data.fValue;
+
+
+    // Remake direction
+    float fCosCamRotX = cos ( fCamRotX );
+    vecOutCamFwd.fX = fCosCamRotX * sin ( fCamRotZ );
+    vecOutCamFwd.fY = fCosCamRotX * cos ( fCamRotZ );
+    vecOutCamFwd.fZ = sin ( fCamRotX );
+
+    //
+    // Read offset
+    //
+
+    // Lookup table used when sending
+    struct {
+        uint uiNumBits;
+        float fRange;
+    } bitCountTable[4] = {
+                            { 3, 4.0f },        // 3 bits is +-4        12 bits total
+                            { 5, 16.0f },       // 5 bits is +-16       18 bits total
+                            { 9, 256.0f },      // 9 bits is +-256      30 bits total
+                            { 14, 8192.0f },    // 14 bits is +-8192    45 bits total
+                        };
+    // Read flag
+    bool bUseAbsolutePosition = false;
+    BitStream.ReadBit ( bUseAbsolutePosition );
+
+    // Read table look up index for num of bits
+    uchar idx = 0;
+    BitStream.ReadBits ( (char*)&idx, 2 );
+
+    const uint uiNumBits = bitCountTable[idx].uiNumBits;
+    const float fRange = bitCountTable[idx].fRange;
+
+
+    // Read each component
+    SFloatAsBitsSyncBase position ( uiNumBits, -fRange, fRange, false );
+
+    CVector vecUsePosition;
+    BitStream.Read ( &position );
+    vecUsePosition.fX = position.data.fValue;
+
+    BitStream.Read ( &position );
+    vecUsePosition.fY = position.data.fValue;
+
+    BitStream.Read ( &position );
+    vecUsePosition.fZ = position.data.fValue;
+
+    // Remake position
+    if ( bUseAbsolutePosition )
+        vecOutCamPosition = vecUsePosition;
+    else
+        vecOutCamPosition = vecBasePosition - vecUsePosition;
+}
+
+
 bool IsNametagValid ( const char* szNick )
 {
     // Grab the size of the nick. Check that it's not to long or short
@@ -816,36 +892,6 @@ const char* HTMLEscapeString ( const char *szSource )
     return szBuffer;
 }
 
-
-// Copies a single file.
-bool FileCopy ( const char* szPathNameSrc, const char* szPathDst )
-{
-    FILE* fhSrc = fopen ( szPathNameSrc, "rb" );
-    if ( !fhSrc )
-    {
-        return false;
-    }
-
-    FILE* fhDst = fopen ( szPathDst, "wb" );
-    if ( !fhDst )
-    {
-        fclose ( fhSrc );
-        return false;
-    }
-
-    char cBuffer[16384];
-    while ( true )
-    {
-        size_t dataLength = fread ( cBuffer, 1, 16384, fhSrc );
-        if ( dataLength == 0 )
-            break;
-        fwrite ( cBuffer, 1, dataLength, fhDst );
-    }
-
-    fclose ( fhSrc );
-    fclose ( fhDst );
-    return true;
-}
 
 eEulerRotationOrder    EulerRotationOrderFromString(const char* szString)
 {

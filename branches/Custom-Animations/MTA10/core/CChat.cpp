@@ -12,6 +12,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CGame.h>
 
 using std::vector;
 
@@ -19,7 +20,7 @@ extern CCore* g_pCore;
 
 CChat * g_pChat = NULL;
 
-CChat::CChat ( CGUI* pManager, CVector2D & vecPosition )
+CChat::CChat ( CGUI* pManager, const CVector2D & vecPosition )
 {    
     g_pChat = this;
     m_pManager = pManager;  
@@ -27,8 +28,7 @@ CChat::CChat ( CGUI* pManager, CVector2D & vecPosition )
     // Calculate relative position (assuming a 800x600 native resolution for our defined CCHAT_* values)
     CVector2D vecResolution = m_pManager->GetResolution ();
     m_vecScale = CVector2D ( vecResolution.fX / 800.0f, vecResolution.fY / 600.0f );
-    vecPosition = vecPosition * vecResolution;
-    m_vecBackgroundPosition = vecPosition;
+    m_vecBackgroundPosition = vecPosition * vecResolution;
 
     // Initialize variables
     m_iScrollState = 0;
@@ -52,6 +52,9 @@ CChat::CChat ( CGUI* pManager, CVector2D & vecPosition )
     m_fCssStyleOverrideAlpha = 0.0f;
     m_fBackgroundAlpha = 0.0f;
     m_fInputBackgroundAlpha = 0.f;
+    m_pCacheTexture = NULL;
+    m_iCacheTextureRevision = 0;
+    m_iReportCount = 0;
 
     // Background area
     m_pBackground = m_pManager->CreateStaticImage ();
@@ -165,7 +168,10 @@ void CChat::LoadCVars ( void )
 }
 
 
-void CChat::Draw ( void )
+//
+// Draw
+//
+void CChat::Draw ( bool bUseCacheTexture )
 {
     // Are we visible?
     if ( !m_bVisible )
@@ -178,6 +184,125 @@ void CChat::Draw ( void )
         UpdateGUI ();
     }
 
+    // Get drawList for the chat box text
+    SDrawList drawList;
+    GetDrawList ( drawList );
+
+    // Calc some size info
+    CVector2D chatTopLeft ( drawList.renderBounds.fX1, drawList.renderBounds.fY1 );
+    CVector2D chatBotRight ( drawList.renderBounds.fX2, drawList.renderBounds.fY2 );
+    CVector2D chatSize = chatBotRight - chatTopLeft;
+    CRect2D chatBounds ( 0, 0, chatSize.fX, chatSize.fY );
+
+    // If we are not using a cache texture, just render the text directly to the screen
+    if ( !bUseCacheTexture )
+    {
+        DrawDrawList ( drawList, chatTopLeft );
+        return;
+    }
+
+    CGraphics* pGraphics = CGraphics::GetSingletonPtr ();
+
+    // Validate rendertarget
+    if ( m_pCacheTexture && chatSize != m_RenderTargetChatSize )
+    {
+        SAFE_RELEASE( m_pCacheTexture );
+    }
+    // Create rendertarget if required
+    if ( !m_pCacheTexture && ( CTickCount::Now () - m_lastRenderTargetCreationFail ).ToLongLong () > 60000 )
+    {
+        // Make sure render target size is reasonable
+        int iRenderTargetSizeX = Clamp < int > ( 8, chatSize.fX, pGraphics->GetViewportWidth () );
+        int iRenderTargetSizeY = Clamp < int > ( 8, chatSize.fY, pGraphics->GetViewportHeight () );
+        m_pCacheTexture = pGraphics->GetRenderItemManager ()->CreateRenderTarget ( iRenderTargetSizeX, iRenderTargetSizeY, true, true );
+        if ( m_pCacheTexture )
+            m_RenderTargetChatSize = chatSize;
+        else
+        {
+            m_lastRenderTargetCreationFail = CTickCount::Now ();
+
+            // Maybe log render target creation fail
+            if ( m_iReportCount < 5 )
+            {
+                m_iReportCount++;
+                SString strAdapterName = g_pDeviceState->AdapterState.Name;
+                AddReportLog ( 6532, SString ( "Chat rt chatSize:%2.0f %2.0f   rtsize:%d %d   card:%s"
+                                        ,chatSize.fX, chatSize.fY
+                                        ,iRenderTargetSizeX, iRenderTargetSizeY
+                                        ,*strAdapterName
+                                        ) );
+            }
+        }
+        m_iCacheTextureRevision = -1;   // Make sure the graphics will be updated
+    }
+
+    // If we can't get a rendertarget for some reason, just render the text directly to the screen
+    if ( !m_pCacheTexture )
+    {
+        DrawDrawList ( drawList, chatTopLeft );
+        return;
+    }
+
+    // Update the cached graphics if the draw list has changed, or the render target has been recreated
+    if ( m_PrevDrawList != drawList || m_pCacheTexture->GetRevision () != m_iCacheTextureRevision )
+    {
+        m_PrevDrawList = drawList;
+        m_iCacheTextureRevision = m_pCacheTexture->GetRevision ();
+
+        pGraphics->EnableSetRenderTarget ( true );
+        pGraphics->GetRenderItemManager ()->SetRenderTarget ( m_pCacheTexture, true );
+
+        // Draw new stuff
+        pGraphics->SetBlendMode ( EBlendMode::MODULATE_ADD );
+        DrawDrawList ( drawList );
+        pGraphics->SetBlendMode ( EBlendMode::BLEND );
+
+        pGraphics->GetRenderItemManager ()->RestoreDefaultRenderTarget ();
+        pGraphics->EnableSetRenderTarget ( false );
+    }
+
+    // Draw the cache texture
+    pGraphics->SetBlendMode ( EBlendMode::ADD );
+    pGraphics->DrawTexture ( m_pCacheTexture, chatTopLeft.fX, chatTopLeft.fY );
+    pGraphics->SetBlendMode ( EBlendMode::BLEND );
+}
+
+
+//
+// DrawDrawList
+//
+// Draw the contents of the drawList
+//
+void CChat::DrawDrawList ( const SDrawList& drawList, const CVector2D& topLeftOffset )
+{
+    CGraphics::GetSingleton ().BeginDrawBatch ();
+
+    CVector2D chatTopLeft ( drawList.renderBounds.fX1, drawList.renderBounds.fY1 );
+    CVector2D chatBotRight ( drawList.renderBounds.fX2, drawList.renderBounds.fY2 );
+    CVector2D chatSize = chatBotRight - chatTopLeft;
+    CRect2D chatBounds ( 0, 0, chatSize.fX, chatSize.fY );
+
+    chatBounds.fX1 += topLeftOffset.fX;
+    chatBounds.fY1 += topLeftOffset.fY;
+    chatBounds.fX2 += topLeftOffset.fX;
+    chatBounds.fY2 += topLeftOffset.fY;
+
+    for ( uint i = 0 ; i < drawList.lineItemList.size () ; i++ )
+    {
+        const SDrawListLineItem& item = drawList.lineItemList[i];
+        m_Lines [ item.uiLine ].Draw ( item.vecPosition - chatTopLeft + topLeftOffset, item.ucAlpha, drawList.bShadow, chatBounds );
+    }
+
+    CGraphics::GetSingleton ().EndDrawBatch ();
+}
+
+//
+// GetDrawList
+//
+// Get list of text lines to draw
+//
+void CChat::GetDrawList ( SDrawList& outDrawList )
+{
     float fLineDifference = CChat::GetFontHeight ( m_vecScale.fY );
     CVector2D vecPosition ( m_vecBackgroundPosition.fX + ( 5.0f * m_vecScale.fX ), m_vecBackgroundPosition.fY + m_vecBackgroundSize.fY - ( fLineDifference * 1.25f ) );
     unsigned long ulTime = GetTickCount32 ();
@@ -206,6 +331,9 @@ void CChat::Draw ( void )
     // Used for render clipping in CChat::DrawTextString
     CRect2D RenderBounds ( m_vecBackgroundPosition.fX, m_vecBackgroundPosition.fY + 1, m_vecBackgroundPosition.fX + m_vecBackgroundSize.fX, m_vecBackgroundPosition.fY + m_vecBackgroundSize.fY );
 
+    outDrawList.renderBounds = RenderBounds;
+    outDrawList.bShadow = bShadow;
+
     // Smooth scroll
     int iLineScroll;
     float fPixelScroll;
@@ -229,7 +357,13 @@ void CChat::Draw ( void )
         fLineAlpha += ( 1.0f - fLineAlpha ) * m_fCssStyleOverrideAlpha;
 
         if ( fLineAlpha > 0.f )
-            m_Lines [ uiLine ].Draw ( vecPosition, static_cast < unsigned char >( fLineAlpha * 255.0f ), bShadow, RenderBounds );
+        {
+            SDrawListLineItem item;
+            item.uiLine = uiLine;
+            item.vecPosition = vecPosition;
+            item.ucAlpha = static_cast < unsigned char >( fLineAlpha * 255.0f );
+            outDrawList.lineItemList.push_back( item );
+        }
 
         vecPosition.fY -= fLineDifference;
 
@@ -359,10 +493,15 @@ void CChat::Output ( const char* szText, bool bColorCoded )
     CChatLine* pLine = NULL;
     const char* szRemainingText = szText;
     CColor color = m_TextColor;
+
+    // Allow smooth scroll when text is added if game FX Quality is not low
+    CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
+    if ( gameSettings->GetFXQuality() > 0 )
+        m_fSmoothScroll -= 1.0f;
+
     do
     {
         m_uiMostRecentLine = (m_uiMostRecentLine == 0 ? CHAT_MAX_LINES - 1 : m_uiMostRecentLine - 1);
-        m_fSmoothScroll -= 1.0f;
         pLine = &m_Lines [ m_uiMostRecentLine ];
         szRemainingText = pLine->Format ( szRemainingText,
             ( m_vecBackgroundSize.fX - ( 10.0f * m_vecScale.fX ) ), color, bColorCoded );
@@ -401,7 +540,7 @@ void CChat::ClearInput ( void )
 {
     m_strInputText.clear ();
     m_InputLine.Clear ();
-    m_vecInputSize = CVector2D ( m_vecBackgroundSize.fX, ( GetFontHeight ( m_vecScale.fY ) * ( ( float ) m_InputLine.m_ExtraLines.size () + 1.25f ) ) );
+    m_vecInputSize = CalcInputSize ();
     if ( m_pInput )
         m_pInput->SetSize ( m_vecInputSize );
 }
@@ -575,16 +714,23 @@ void CChat::UpdateGUI ( void )
         m_fNativeWidth * m_vecScale.fX,
         CChat::GetFontHeight ( m_vecScale.fY ) * (float(m_uiNumLines) + 0.5f)
     );
+    m_vecBackgroundSize.fX = Round ( m_vecBackgroundSize.fX );
+    m_vecBackgroundSize.fY = Round ( m_vecBackgroundSize.fY );
+    m_vecBackgroundPosition.fX = Round ( m_vecBackgroundPosition.fX );
+    m_vecBackgroundPosition.fY = Round ( m_vecBackgroundPosition.fY );
     m_pBackground->SetSize ( m_vecBackgroundSize );
 
     m_vecInputPosition = CVector2D (
         m_vecBackgroundPosition.fX,
         m_vecBackgroundPosition.fY + m_vecBackgroundSize.fY
     );
-    m_vecInputSize = CVector2D (
-        m_vecBackgroundSize.fX,
-        CChat::GetFontHeight ( m_vecScale.fY ) * 1.25f
-    );
+
+    // Make sure there is enough room for all the lines
+    uint uiMaxNumLines = g_pCore->GetGraphics ()->GetViewportHeight () / Max ( 1.f, CChat::GetFontHeight ( m_vecScale.fY ) ) - 3;
+    if ( m_uiNumLines > uiMaxNumLines )
+        SetNumLines ( uiMaxNumLines );
+
+    m_vecInputSize = CalcInputSize ();
     if ( m_pInput )
     {
         m_pInput->SetPosition ( m_vecInputPosition );
@@ -625,6 +771,11 @@ void CChat::SetInputPrefix ( const char* szPrefix )
     m_InputLine.m_Prefix.SetText ( szPrefix );
 }
 
+CVector2D CChat::CalcInputSize ( void )
+{
+    return CVector2D ( m_vecBackgroundSize.fX, ( GetFontHeight ( m_vecScale.fY ) * ( ( float ) m_InputLine.m_ExtraLines.size () + 1.25f ) ) );
+}
+
 void CChat::SetInputText ( const char* szText )
 {
     m_InputLine.Clear ();
@@ -650,7 +801,7 @@ void CChat::SetInputText ( const char* szText )
     if ( szRemainingText )
         m_strInputText.resize ( szRemainingText - szText );
 
-    m_vecInputSize = CVector2D ( m_vecBackgroundSize.fX, ( CChat::GetFontHeight ( m_vecScale.fY ) * ( ( float ) m_InputLine.m_ExtraLines.size () + 1.25f ) ) );
+    m_vecInputSize = CalcInputSize ();
     if ( m_pInput )
         m_pInput->SetSize ( m_vecInputSize );
 }
@@ -686,19 +837,6 @@ float CChat::GetFontHeight ( float fScale )
         return g_pChat->m_pFont->GetFontHeight ( fScale );
     }
     return g_pCore->GetGraphics ()->GetDXFontHeight ( fScale, g_pChat->m_pDXFont );
-}
-
-
-float CChat::GetCharacterWidth ( int iChar, float fScale )
-{
-    if ( !g_pChat )
-        return 0.0f;
-
-    if ( g_pChat->m_bUseCEGUI )
-    {
-        return g_pChat->m_pFont->GetCharacterWidth ( iChar, fScale );
-    }
-    return g_pCore->GetGraphics ()->GetDXCharacterWidth ( ( char ) iChar, fScale, g_pChat->m_pDXFont );
 }
 
 
@@ -779,15 +917,46 @@ bool CChatLine::IsColorCode ( const char* szColorCode )
     return bValid;
 }
 
-
-const char* CChatLine::Format ( const char* szString, float fWidth, CColor& color, bool bColorCoded )
+bool CChatLine::IsColorCodeW ( const wchar_t* wszColorCode )
 {
-    float fCurrentWidth = 0.0f;
+    if ( *wszColorCode != L'#' )
+        return false;
+
+    for ( uint i = 0 ; i < 6 ; i++ )
+    {
+        wchar_t c = wszColorCode [ i + 1 ];
+        if ( !iswdigit ( c ) && (c < 'A' || c > 'F') && (c < 'a' || c > 'f') )
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+
+//
+// Calculate the equivalent ansi string pointer of szPosition.
+//
+const char* CalcAnsiPtr ( const char* szStringAnsi, const wchar_t* szPosition )
+{
+    int iOrigSize = strlen ( szStringAnsi );
+    int iEndSize = UTF16ToMbUTF8 ( szPosition ).length();
+    int iOffset = iOrigSize - iEndSize;
+    return szStringAnsi + iOffset;
+}
+
+
+const char* CChatLine::Format ( const char* szStringAnsi, float fWidth, CColor& color, bool bColorCoded )
+{
+    std::wstring wString = MbUTF8ToUTF16 ( szStringAnsi );
+    const wchar_t* szString = wString.c_str ();
+
+    float fPrevSectionsWidth = 0.0f;
     m_Sections.clear ();
 
-    const char* szSectionStart = szString;
-    const char* szSectionEnd = szString;
-    const char* szLastWrapPoint = szString;
+    const wchar_t* szSectionStart = szString;
+    const wchar_t* szSectionEnd = szString;
+    const wchar_t* szLastWrapPoint = szString;
     bool bLastSection = false;
     while ( !bLastSection )      // iterate over sections
     {
@@ -800,22 +969,24 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
 
         szSectionStart = szSectionEnd;
         szLastWrapPoint = szSectionStart;
-        unsigned int uiSeekPos = 1;
+        unsigned int uiSeekPos = 0;
+        std::wstring strSectionStart = szSectionStart;
 
         while ( true )      // find end of this section
         {
-            unsigned int uiCharWidth = CChat::GetTextExtent ( std::string(szString).substr(0,uiSeekPos).c_str(), g_pChat->m_vecScale.fX );
+            float fSectionWidth = CChat::GetTextExtent ( UTF16ToMbUTF8 ( strSectionStart.substr ( 0 , uiSeekPos ) ).c_str (), g_pChat->m_vecScale.fX );
 
-            if ( *szSectionEnd == '\0' || *szSectionEnd == '\n' || uiCharWidth > fWidth )
+            if ( *szSectionEnd == '\0' || *szSectionEnd == '\n' || fPrevSectionsWidth + fSectionWidth > fWidth )
             {
                 bLastSection = true;
                 break;
             }
-            if ( bColorCoded && IsColorCode ( szSectionEnd ) )
+            if ( bColorCoded && IsColorCode ( UTF16ToMbUTF8 ( szSectionEnd ).c_str () ) )
             {
                 unsigned long ulColor = 0;
-                sscanf ( szSectionEnd + 1, "%06x", &ulColor );
+                sscanf ( UTF16ToMbUTF8 ( szSectionEnd ).c_str () + 1, "%06x", &ulColor );
                 color = ulColor;
+                fPrevSectionsWidth += fSectionWidth;
                 break;
             }
             if ( isspace ( (unsigned char)*szSectionEnd ) || ispunct ( (unsigned char)*szSectionEnd ) )
@@ -825,7 +996,7 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
             szSectionEnd++;
             uiSeekPos++;
         }
-        section.m_strText.assign ( szSectionStart, szSectionEnd - szSectionStart );
+        section.m_strText = UTF16ToMbUTF8 ( strSectionStart.substr ( 0 , uiSeekPos ) );
     }
 
     if ( *szSectionEnd == '\0' )
@@ -834,7 +1005,7 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
     }
     else if( *szSectionEnd == '\n' )
     {
-        return szSectionEnd + 1;
+        return CalcAnsiPtr ( szStringAnsi, szSectionEnd + 1 );
     }
     else
     {
@@ -846,7 +1017,7 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
             {
                 // The line consists of one huge word. Leave the one section we created as it
                 // is (with the huge word cut off) and return szRemaining as the rest of the word
-                return szSectionEnd;
+                return CalcAnsiPtr ( szStringAnsi, szSectionEnd );
             }
             else
             {
@@ -857,14 +1028,17 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
         else
         {
             // Wrapping point is in the middle of a section, truncate
-            (*(m_Sections.end () - 1)).m_strText.resize ( szLastWrapPoint - szSectionStart );
+            CChatLineSection& last = *( m_Sections.end () - 1 );
+            std::wstring wstrTemp = MbUTF8ToUTF16 ( last.m_strText );
+            wstrTemp.resize ( szLastWrapPoint - szSectionStart );
+            last.m_strText = UTF16ToMbUTF8 ( wstrTemp );
         }
-        return szLastWrapPoint;
+        return CalcAnsiPtr ( szStringAnsi, szLastWrapPoint );
     }
 }
 
 
-void CChatLine::Draw ( CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds )
+void CChatLine::Draw ( const CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds )
 {
     float fCurrentX = vecPosition.fX;
     std::vector < CChatLineSection >::iterator iter = m_Sections.begin ();
@@ -965,7 +1139,7 @@ CChatLineSection& CChatLineSection::operator = ( const CChatLineSection& other )
     return *this;
 }
 
-void CChatLineSection::Draw ( CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds )
+void CChatLineSection::Draw ( const CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds )
 {
     if ( !m_strText.empty () && ucAlpha > 0 )
     {
@@ -984,12 +1158,8 @@ float CChatLineSection::GetWidth ()
 {
     if ( m_fCachedWidth < 0.0f || m_strText.size () != m_uiCachedLength )
     {
-        m_fCachedWidth = 0.0f;
-        for ( unsigned int i = 0; i < m_strText.size (); i++ )
-        {
-            m_fCachedWidth += CChat::GetCharacterWidth ( m_strText [ i ], g_pChat->m_vecScale.fX );            
-        }
+        m_fCachedWidth = CChat::GetTextExtent ( m_strText.c_str (), g_pChat->m_vecScale.fX ) / Max ( 0.01f, g_pChat->m_vecScale.fX );
         m_uiCachedLength = m_strText.size ();
     }
-    return m_fCachedWidth;
+    return m_fCachedWidth * g_pChat->m_vecScale.fX;
 }

@@ -18,6 +18,9 @@ FILE* CLogger::m_pLogFile = NULL;
 FILE* CLogger::m_pAuthFile = NULL;
 eLogLevel CLogger::m_MinLogLevel = LOGLEVEL_LOW;
 bool CLogger::m_bPrintingDots = false;
+SString CLogger::m_strCaptureBuffer;
+bool CLogger::m_bCaptureConsole = false;
+CCriticalSection CLogger::m_CaptureBufferMutex;
 
 #define MAX_STRING_LENGTH 2048
 void CLogger::LogPrintf ( const char* szFormat, ... )
@@ -207,6 +210,24 @@ void CLogger::ProgressDotsEnd ( void )
     }
 }
 
+void CLogger::BeginConsoleOutputCapture ( void )
+{
+    m_CaptureBufferMutex.Lock ();
+    m_strCaptureBuffer.clear ();
+    m_bCaptureConsole = true;
+    m_CaptureBufferMutex.Unlock ();
+}
+
+SString CLogger::EndConsoleOutputCapture ( void )
+{
+    m_CaptureBufferMutex.Lock ();
+    SString strTemp = m_strCaptureBuffer;
+    m_bCaptureConsole = false;
+    m_strCaptureBuffer.clear ();
+    m_CaptureBufferMutex.Unlock ();
+    return strTemp;
+}
+
 // Handle where to send the message
 void CLogger::HandleLogPrint ( bool bTimeStamp, const char* szPrePend, const char* szMessage, bool bToConsole, bool bToLogFile, bool bToAuthFile, eLogLevel logLevel )
 {
@@ -242,6 +263,17 @@ void CLogger::HandleLogPrint ( bool bTimeStamp, const char* szPrePend, const cha
     // Maybe print it in the console
     if ( bToConsole )
         g_pServerInterface->Printf ( "%s", strOutputShort.c_str () );
+
+    // Maybe print to temp buffer
+    if ( bToConsole && m_bCaptureConsole )
+    {
+        m_CaptureBufferMutex.Lock ();
+        m_strCaptureBuffer += szPrePend;
+        m_strCaptureBuffer += szMessage;
+        if ( m_strCaptureBuffer.length () > 1000 )
+            m_bCaptureConsole = false;
+        m_CaptureBufferMutex.Unlock ();
+    }
 
     // Maybe print it to the log file
     if ( bToLogFile && m_pLogFile )

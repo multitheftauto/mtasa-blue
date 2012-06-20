@@ -32,13 +32,23 @@ CHTTPD::CHTTPD ( void )
 
 CHTTPD::~CHTTPD ()
 {
+    StopHTTPD ();
+}
+
+
+bool CHTTPD::StopHTTPD ( void )
+{
     // Stop the server if we started it
     if ( m_bStartedServer )
     {
         // Stop the server
         StopServer ();
+        m_bStartedServer = false;
+        return true;
     }
+    return false;
 }
+
 
 bool CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
 {
@@ -81,6 +91,13 @@ bool CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
 ResponseCode CHTTPD::HandleRequest ( HttpRequest * ipoHttpRequest,
                                          HttpResponse * ipoHttpResponse )
 {
+    if ( !g_pGame->IsServerFullyUp () )
+    {
+        SStringX strWait ( "The server is not ready. Please try again in a minute." );
+        ipoHttpResponse->SetBody ( strWait.c_str (), strWait.size () );
+        return HTTPRESPONSECODE_200_OK;
+    }
+
     CAccount * account = CheckAuthentication ( ipoHttpRequest );
 
     if ( account )
@@ -169,7 +186,7 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
                 return m_pGuestAccount;
             }
 
-            CAccount * account = g_pGame->GetAccountManager()->Get ( (char *)authName.c_str());
+            CAccount * account = g_pGame->GetAccountManager()->Get ( authName.c_str());
             if ( account )
             {
                 // Check that the password is right

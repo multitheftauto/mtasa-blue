@@ -39,7 +39,7 @@ Modified csrutf8.cpp from ICU for the purposes of MTA.
 Heuristically detect whether a file is in UTF-8 or not.
 */
 
-int icu_getUTF8Confidence (unsigned char* input, int len) {
+int icu_getUTF8Confidence (const unsigned char* input, int len) {
     bool hasBOM = false;
     int numValid = 0;
     int numInvalid = 0;

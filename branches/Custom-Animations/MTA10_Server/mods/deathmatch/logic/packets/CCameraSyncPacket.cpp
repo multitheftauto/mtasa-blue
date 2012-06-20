@@ -32,6 +32,6 @@ bool CCameraSyncPacket::Read ( NetBitStreamInterface& BitStream )
     }
     else
     {
-        return BitStream.ReadCompressed ( m_TargetID );
+        return BitStream.Read ( m_TargetID );
     }
 }

@@ -16,30 +16,31 @@ char szUpgradeNameEmpty [] = "";
 
 struct SUpgradeName
 {
-    char szName [32];
+    const char* szName;
 };
 
-SUpgradeName UpgradeNames [17] =
-{ {"Hood"}, {"Vent"}, {"Spoiler"}, {"Sideskirt"}, {"Front Bullbars"},
-{"Rear Bullbars"}, {"Headlights"}, {"Roof"}, {"Nitro"}, {"Hydraulics"}, 
-{"Stereo"}, {"Unknown"}, {"Wheels"}, {"Exhaust"}, {"Front Bumper"},
-{"Rear Bumper"}, {"Misc"} };
+static const SFixedArray < SUpgradeName, VEHICLE_UPGRADE_SLOTS > UpgradeNames = 
+{ {
+    {"Hood"}, {"Vent"}, {"Spoiler"}, {"Sideskirt"}, {"Front Bullbars"},
+    {"Rear Bullbars"}, {"Headlights"}, {"Roof"}, {"Nitro"}, {"Hydraulics"}, 
+    {"Stereo"}, {"Unknown"}, {"Wheels"}, {"Exhaust"}, {"Front Bumper"},
+    {"Rear Bumper"}, {"Misc"}
+} };
 
 
 CVehicleUpgrades::CVehicleUpgrades ( CVehicle* pVehicle )
 {
     m_pVehicle = pVehicle;
-    memset ( m_SlotStates, 0, sizeof ( m_SlotStates ) );
+    memset ( &m_SlotStates[0], 0, sizeof ( m_SlotStates ) );
 }
 
 CVehicleUpgrades::CVehicleUpgrades ( CVehicle* pVehicle, CVehicleUpgrades* pUpgrades )
 {
     m_pVehicle = pVehicle;
-    memset ( m_SlotStates, 0, sizeof ( m_SlotStates ) );
+    memset ( &m_SlotStates[0], 0, sizeof ( m_SlotStates ) );
     if ( pUpgrades )
     {
-        unsigned short* usSlotStates = pUpgrades->GetSlotStates ();
-        memcpy ( m_SlotStates, usSlotStates, sizeof ( m_SlotStates ) );
+        m_SlotStates = pUpgrades->GetSlotStates ();
     }
 }
 
@@ -51,17 +52,18 @@ bool CVehicleUpgrades::IsUpgradeCompatible ( unsigned short usUpgrade )
     // No upgrades for trains
     if ( usModel == 537 ||
          usModel == 538 ||
-         usModel == 449 )
+         usModel == 449 ||
+         usModel == 569 ||
+         usModel == 570 ||
+         usModel == 590  )
     {
         return false;
     }
 
-    /* TODO: add this
-    eClientVehicleType vehicleType = m_pVehicle->GetVehicleType ();
-    if ( vehicleType == CLIENTVEHICLE_BOAT || vehicleType == CLIENTVEHICLE_PLANE ||
-         vehicleType == CLIENTVEHICLE_BIKE )
+    eVehicleType vehicleType = m_pVehicle->GetVehicleType ();
+    if ( vehicleType == VEHICLE_BOAT || vehicleType == VEHICLE_PLANE ||
+         vehicleType == VEHICLE_BIKE || vehicleType == VEHICLE_BMX )
          return false;
-         */
 
     unsigned short us = usUpgrade;
     if ( us == VEHICLEUPGRADE_NITRO_5X || us == VEHICLEUPGRADE_NITRO_2X ||

@@ -65,7 +65,6 @@ CTCPClientSocket* CTCPManager::CreateClient ( void )
         {
             // Create the socket and initialize it
             CTCPClientSocketImpl* pSocket = new CTCPClientSocketImpl;
-            CCore::GetSingleton().GetConsole()->Printf("Async socket #%u was created.\n", i);
             if ( !pSocket->Initialize ( i ) )
             {
                 // Copy the error details, delete it and return NULL
@@ -95,7 +94,6 @@ bool CTCPManager::DestroyClient ( CTCPClientSocket* pClient )
         if ( m_pSocket[i] != NULL )
         {
             if ( m_pSocket[i] == pClient ) {
-                CCore::GetSingleton().GetConsole()->Printf("Async socket #%u was destroyed.\n", i);
                 SAFE_RELEASE( m_pSocket[i] )
                 return true;
             }

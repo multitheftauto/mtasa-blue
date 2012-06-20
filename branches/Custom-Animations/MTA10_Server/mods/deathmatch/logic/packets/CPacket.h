@@ -30,6 +30,9 @@ enum
     PACKET_SEQUENCED = 2,
     PACKET_HIGH_PRIORITY = 4,
     PACKET_LOW_PRIORITY = 8,
+
+    PACKET_UNRELIABLE = 0,
+    PACKET_MEDIUM_PRIORITY = 0,
 };
 
 class CPacket
@@ -40,6 +43,7 @@ public:
 
     virtual bool                        RequiresSourcePlayer ( void ) const                                     { return true; }
     virtual ePacketID                   GetPacketID         ( void ) const = 0;
+    virtual ePacketOrdering             GetPacketOrdering   ( void ) const { return PACKET_ORDERING_DEFAULT; }
     virtual unsigned long               GetFlags            ( void ) const = 0;
 
     virtual bool                        Read                ( NetBitStreamInterface& BitStream )                { return false; };
@@ -53,12 +57,9 @@ public:
     inline unsigned long                GetSourceIP         ( void ) const                                      { return m_Source.GetBinaryAddress (); };
     inline unsigned short               GetSourcePort       ( void ) const                                      { return m_Source.GetPort (); };
 
-    virtual void                        Send                ( CPlayer* pPlayer ) const;
-private:
-    
 protected:
     CElement*                           m_pSourceElement;
-    NetServerPlayerID                   m_Source;    
+    NetServerPlayerID                   m_Source;
 };
 
 #endif

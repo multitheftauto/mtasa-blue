@@ -13,9 +13,11 @@
 #include "StdInc.h"
 #include "net/SyncStructures.h"
 
+#ifdef WITH_OBJECT_SYNC
+
 using std::list;
 
-#define OBJECT_SYNC_RATE 500
+#define OBJECT_SYNC_RATE   ( g_TickRateSettings.iObjectSync )
 
 CObjectSync::CObjectSync ( CClientObjectManager* pObjectManager )
 {
@@ -91,7 +93,7 @@ void CObjectSync::Packet_ObjectStartSync ( NetBitStreamInterface& BitStream )
 {
     // Read out the ID
     ElementID ID;
-    if ( BitStream.ReadCompressed ( ID ) )
+    if ( BitStream.Read ( ID ) )
     {
         // Grab the object
         CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( m_pObjectManager->Get ( ID ) );
@@ -102,7 +104,10 @@ void CObjectSync::Packet_ObjectStartSync ( NetBitStreamInterface& BitStream )
             SRotationRadiansSync rotation;
             if ( BitStream.Read ( &position ) && BitStream.Read ( &rotation ) )
             {
+                // Disabled due to problem when attached in the editor - issue #5886
+                #if 0
                 pObject->SetOrientation ( position.data.vecPosition, rotation.data.vecRotation );
+                #endif
             }
             // No velocity due to issue #3522
 
@@ -123,7 +128,7 @@ void CObjectSync::Packet_ObjectStopSync ( NetBitStreamInterface& BitStream )
 {
     // Read out the ID
     ElementID ID;
-    if ( BitStream.ReadCompressed ( ID ) )
+    if ( BitStream.Read ( ID ) )
     {
         // Grab the object
         CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( m_pObjectManager->Get ( ID ) );
@@ -142,7 +147,7 @@ void CObjectSync::Packet_ObjectSync ( NetBitStreamInterface& BitStream )
     {
         // Read out the ID
         ElementID ID;
-        if ( !BitStream.ReadCompressed ( ID ) )
+        if ( !BitStream.Read ( ID ) )
             return;
 
         // Read out the sync time context. See CClientEntity for documentation on that.
@@ -206,7 +211,7 @@ void CObjectSync::Sync ( void )
         }
 
         // Send the packet
-        g_pNet->SendPacket ( PACKET_ID_OBJECT_SYNC, bitStream.pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
+        g_pNet->SendPacket ( PACKET_ID_OBJECT_SYNC, bitStream.pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
     }
 }
 
@@ -229,7 +234,7 @@ void CObjectSync::WriteObjectInformation ( NetBitStreamInterface* pBitStream, CD
         return;
 
     // Write the ID
-    pBitStream->WriteCompressed ( pObject->GetID () );
+    pBitStream->Write ( pObject->GetID () );
 
     // Write the sync time context
     pBitStream->Write ( pObject->GetSyncTimeContext () );
@@ -266,3 +271,5 @@ void CObjectSync::WriteObjectInformation ( NetBitStreamInterface* pBitStream, CD
         pObject->m_LastSyncedData.fHealth = health.data.fValue;
     }
 }
+
+#endif

@@ -437,15 +437,9 @@ void CGUIElement_Impl::FillProperties ( void )
         CEGUI::String strKey = itPropertySet.getCurrentKey ();
         CEGUI::String strValue = m_pWindow->getProperty ( strKey );
 
-        const char *szKey = strKey.c_str ();
-        const char *szValue = strValue.c_str ();
-
         CGUIProperty* pProperty = new CGUIProperty;
-        pProperty->szKey = new char[strlen ( szKey ) + 1];
-        pProperty->szValue = new char[strlen ( szValue ) + 1];
-
-        strcpy ( pProperty->szKey, szKey );
-        strcpy ( pProperty->szValue, szValue );
+        pProperty->strKey = strKey.c_str ();
+        pProperty->strValue = strValue.c_str ();
 
         m_Properties.push_back ( pProperty );
         itPropertySet++;
@@ -459,8 +453,6 @@ void CGUIElement_Impl::EmptyProperties ( void )
         CGUIPropertyIter iterEnd = m_Properties.end ();
         for ( ; iter != iterEnd; iter++ ) {
             if (*iter) {
-                delete (*iter)->szKey;
-                delete (*iter)->szValue;
                 delete (*iter);
             }
         }
@@ -545,6 +537,24 @@ void CGUIElement_Impl::SetDeactivateHandler ( GUI_CALLBACK Callback )
 }
 
 
+void CGUIElement_Impl::SetKeyDownHandler ( GUI_CALLBACK Callback )
+{
+    m_OnKeyDown = Callback;
+}
+
+
+void CGUIElement_Impl::SetEnterKeyHandler ( GUI_CALLBACK Callback )
+{
+    m_OnEnter = Callback;
+}
+
+
+void CGUIElement_Impl::SetKeyDownHandler ( const GUI_CALLBACK_KEY & Callback )
+{
+    m_OnKeyDownWithArgs = Callback;
+}
+
+
 
 void CGUIElement_Impl::AddEvents ( void )
 {
@@ -557,6 +567,7 @@ void CGUIElement_Impl::AddEvents ( void )
     m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseButtonDown, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnMouseButtonDown, this ) );
     m_pWindow->subscribeEvent ( CEGUI::Window::EventActivated, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnActivated, this ) );
     m_pWindow->subscribeEvent ( CEGUI::Window::EventDeactivated, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnDeactivated, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Window::EventKeyDown, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnKeyDown, this ) );
 }
 
 
@@ -618,6 +629,50 @@ bool CGUIElement_Impl::Event_OnDeactivated ( const CEGUI::EventArgs& e )
 {
     if ( m_OnDeactivate )
         m_OnDeactivate ( reinterpret_cast < CGUIElement* > ( this ) );
+    return true;
+}
+
+bool CGUIElement_Impl::Event_OnKeyDown ( const CEGUI::EventArgs& e )
+{
+    const CEGUI::KeyEventArgs& Args = reinterpret_cast < const CEGUI::KeyEventArgs& > ( e );
+    CGUIElement * pCGUIElement      = reinterpret_cast < CGUIElement* > ( this );
+
+    if ( m_OnKeyDown )
+    {
+        m_OnKeyDown ( pCGUIElement );
+    }
+
+    if ( m_OnKeyDownWithArgs )
+    {
+        CGUIKeyEventArgs NewArgs;
+
+        // copy the variables
+        NewArgs.codepoint = Args.codepoint;
+        NewArgs.scancode = (CGUIKeys::Scan) Args.scancode;
+        NewArgs.sysKeys = Args.sysKeys;
+
+        // get the CGUIElement
+        CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( ( Args.window )->getUserData () );
+        NewArgs.pWindow = pElement;
+        
+        m_OnKeyDownWithArgs ( NewArgs );
+    }
+
+    if ( m_OnEnter )
+    {
+        switch ( Args.scancode )
+        {
+            // Return key
+            case CEGUI::Key::NumpadEnter:
+            case CEGUI::Key::Return:
+            {
+                // Fire the event
+                m_OnEnter ( pCGUIElement );
+                break;
+            }
+        }
+    }
+
     return true;
 }
 

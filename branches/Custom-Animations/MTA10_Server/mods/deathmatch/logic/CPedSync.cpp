@@ -59,7 +59,7 @@ void CPedSync::OverrideSyncer ( CPed* pPed, CPlayer* pPlayer )
         StopSync ( pPed );
     }
 
-    if ( pPlayer )
+    if ( pPlayer && !pPed->IsBeingDeleted () )
         StartSync ( pPlayer, pPed );
 }
 
@@ -68,11 +68,13 @@ void CPedSync::Update ( unsigned long ulCurrentTime )
 {
     // Update all the ped's sync states
     list < CPed* > ::const_iterator iter = m_pPedManager->IterBegin ();
-    for ( ; iter != m_pPedManager->IterEnd (); iter++ )
+    for ( ; iter != m_pPedManager->IterEnd (); )
     {
         // It is a ped, yet not a player
         if ( IS_PED ( *iter ) && !IS_PLAYER ( *iter ) )
-            UpdatePed ( *iter );
+            UpdatePed ( *( iter++ ) );
+        else
+            iter++;
     }
 }
 
@@ -103,8 +105,11 @@ void CPedSync::UpdatePed ( CPed* pPed )
             // Stop him from syncing it
             StopSync ( pPed );
 
-            // Find a new syncer for it
-            FindSyncer ( pPed );
+            if ( !pPed->IsBeingDeleted () )
+            {
+                // Find a new syncer for it
+                FindSyncer ( pPed );
+            }
         }
     }
     else

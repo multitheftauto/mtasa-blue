@@ -36,6 +36,7 @@ protected:
     SString         _InstallFiles                   ( void );
     SString         _ChangeToAdmin                  ( void );
     SString         _ShowCopyFailDialog             ( void );
+    SString         _ProcessLayoutChecks            ( void );
     SString         _ProcessAeroChecks              ( void );
     SString         _ChangeFromAdmin                ( void );
     SString         _InstallNewsItems               ( void );

@@ -40,6 +40,7 @@ public:
     DECLARE_COMMAND_HANDLER ( Bind );
     DECLARE_COMMAND_HANDLER ( Unbind );
     DECLARE_COMMAND_HANDLER ( Binds );
+    DECLARE_COMMAND_HANDLER ( Serial );
     DECLARE_COMMAND_HANDLER ( CopyGTAControls );
     DECLARE_COMMAND_HANDLER ( HUD );
     DECLARE_COMMAND_HANDLER ( ScreenShot );
@@ -51,6 +52,10 @@ public:
     DECLARE_COMMAND_HANDLER ( ChatScrollDown );
     DECLARE_COMMAND_HANDLER ( DebugScrollUp );
     DECLARE_COMMAND_HANDLER ( DebugScrollDown );
+
+    DECLARE_COMMAND_HANDLER ( Test );
+    DECLARE_COMMAND_HANDLER ( ShowMemStat )
+    DECLARE_COMMAND_HANDLER ( FakeLag );
 };
 
 #endif

@@ -41,7 +41,8 @@ CSettings::CSettings ( CResourceManager* pResourceManager )
         // Create a new root node
         m_pNodeGlobalSettings = m_pFile->CreateRootNode ( ROOTNODE_SETTINGS );
 
-        m_pFile->Write ();
+        if ( !m_pFile->Write () )
+            CLogger::ErrorPrintf ( "Error saving '%s'\n", FILENAME_SETTINGS );
     }
 }
 
@@ -117,7 +118,7 @@ CXMLNode* CSettings::Get ( CXMLNode *pSource, CXMLNode *pStorage, const char *sz
             if ( strContent.empty () ) continue;
 
             // Parse the settings name and store the resource name in szResource
-            if ( !GetResourceName ( const_cast < const char* > ( strContent.c_str () ), szResource, MAX_RESOURCE_LENGTH - 1 ) ) {
+            if ( !GetResourceName ( strContent.c_str (), szResource, MAX_RESOURCE_LENGTH - 1 ) ) {
                 // If there was no resource name, copy the owner's name
                 strncpy ( szResource, szSourceResource, MAX_RESOURCE_LENGTH - 1 );
             } else {
@@ -341,8 +342,9 @@ bool CSettings::Set ( const char *szLocalResource, const char *szSetting, const 
             g_pGame->GetMapManager ()->GetRootElement ()->CallEvent ( "onSettingChange", Arguments );
 
             // Save the XML file
-            m_pFile->Write ();
-            return true;
+            if ( m_pFile->Write () )
+                return true;
+            CLogger::ErrorPrintf ( "Error saving '%s'\n", FILENAME_SETTINGS );
         }
     }
 

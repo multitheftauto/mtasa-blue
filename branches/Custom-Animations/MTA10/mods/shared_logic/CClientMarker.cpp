@@ -22,7 +22,7 @@ extern CClientGame* g_pClientGame;
 
 unsigned int CClientMarker::m_uiStreamedInMarkers = 0;
 
-CClientMarker::CClientMarker ( CClientManager* pManager, ElementID ID, int iMarkerType ) : CClientStreamElement ( pManager->GetMarkerStreamer (), ID )
+CClientMarker::CClientMarker ( CClientManager* pManager, ElementID ID, int iMarkerType ) : ClassInit ( this ), CClientStreamElement ( pManager->GetMarkerStreamer (), ID )
 {
     // Init
     m_pManager = pManager;
@@ -335,32 +335,32 @@ int CClientMarker::StringToType ( const char* szString )
 }
 
 
-bool CClientMarker::TypeToString ( unsigned int uiType, char* szString )
+bool CClientMarker::TypeToString ( unsigned int uiType, SString& strOutString )
 {
     switch ( uiType )
     {
         case MARKER_CHECKPOINT:
-            strcpy ( szString, "checkpoint" );
+            strOutString = "checkpoint";
             return true;
 
         case MARKER_RING:
-            strcpy ( szString, "ring" );
+            strOutString = "ring";
             return true;
 
         case MARKER_CYLINDER:
-            strcpy ( szString, "cylinder" );
+            strOutString = "cylinder";
             return true;
 
         case MARKER_ARROW:
-            strcpy ( szString, "arrow" );
+            strOutString = "arrow";
             return true;
 
         case MARKER_CORONA:
-            strcpy ( szString, "corona" );
+            strOutString = "corona";
             return true;
 
         default:
-            strcpy ( szString, "invalid" );
+            strOutString = "invalid";
             return false;
     }
 }

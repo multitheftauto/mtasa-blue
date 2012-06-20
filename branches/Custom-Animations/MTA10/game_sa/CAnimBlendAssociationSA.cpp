@@ -18,3 +18,17 @@ CAnimBlendHierarchy * CAnimBlendAssociationSA::GetAnimHierarchy ( void )
 {
     return pGame->GetAnimManager ()->GetAnimBlendHierarchy ( m_pInterface->pAnimHierarchy );
 }
+
+void CAnimBlendAssociationSA::SetCurrentProgress ( float fProgress )
+{
+    float fTime = m_pInterface->pAnimHierarchy->fTotalTime * fProgress;
+
+    DWORD DwFunc = 0x4CEA80;
+    DWORD DwThisInterface = reinterpret_cast<DWORD> (m_pInterface);
+    _asm
+    {
+        mov     ecx, DwThisInterface
+        push    fTime
+        call    DwFunc
+    };
+}

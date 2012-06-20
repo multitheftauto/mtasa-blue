@@ -18,8 +18,13 @@
 
 class CDeathmatchObject : public CClientObject
 {
+    DECLARE_CLASS( CDeathmatchObject, CClientObject )
 public:
+#ifdef WITH_OBJECT_SYNC
                                         CDeathmatchObject               ( CClientManager* pManager, class CMovingObjectsManager* pMovingObjectsManager, class CObjectSync* pObjectSync, ElementID ID, unsigned short usModel );
+#else
+                                        CDeathmatchObject               ( CClientManager* pManager, class CMovingObjectsManager* pMovingObjectsManager, ElementID ID, unsigned short usModel, bool bLowLod );
+#endif
                                         ~CDeathmatchObject              ( void );
 
     // CClientEntity interface
@@ -40,8 +45,9 @@ public:
 
 protected:
     class CMovingObjectsManager*        m_pMovingObjectsManager;
+#ifdef WITH_OBJECT_SYNC
     class CObjectSync*                  m_pObjectSync;
-
+#endif
     void                                _StopMovement                    ( bool a_bUnregister );
    
     CPositionRotationAnimation*         m_pMoveAnimation;

@@ -11,11 +11,14 @@
 *****************************************************************************/
 
 #include "CGameSA.h"
+#include <multiplayer/CMultiplayer.h>
+#include <core/CCoreInterface.h>
 
 #ifndef __CGAMESA_INIT
 #define __CGAMESA_INIT
 
 extern CGameSA * pGame;
+extern CCoreInterface * g_pCore;
 
 //
 // Use MemSet/Cpy/Put/Add for the following memory regions:
@@ -30,9 +33,9 @@ extern CGameSA * pGame;
 // 0x609D00 - 0x60F1FF
 // 0x60F300 - 0x686FFF
 // 0x687100 - 0x6AE9FF
-// 0x6AEB00 - 0x742AFF
-// 0x742C00 - 0x729AFF
-// 0x729C00 - 0x8A4000
+// 0x6AEB00 - 0x729AFF
+// 0x729C00 - 0x742AFF
+// 0x742C00 - 0x8A4000
 //
 
 void MemSet ( void* dwDest, int cValue, uint uiAmount );
@@ -97,5 +100,8 @@ void MemOrFast ( U ptr, const T value )
 {
     *(T*)ptr |= value;
 }
+
+bool GetDebugIdEnabled ( uint uiDebugId );
+void LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody );
 
 #endif

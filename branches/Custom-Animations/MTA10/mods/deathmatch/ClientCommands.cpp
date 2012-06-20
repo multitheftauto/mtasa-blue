@@ -21,7 +21,6 @@ using std::vector;
 #include <Tlhelp32.h>
 #include <Psapi.h>
 #include <shlwapi.h>
-#include <CClientCRC32Hasher.h>
 #include <Utils.h>
 #endif
 
@@ -30,7 +29,7 @@ using std::vector;
 
 extern CClientGame* g_pClientGame;
 
-bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled )
+bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled, bool bIsScriptedBind )
 {
     // Has the core already handled this command?
     if ( !bHandled )
@@ -85,7 +84,7 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
 
         // Convert to Unicode, and clamp it to a maximum command length
         std::wstring strClumpedCommandUTF = MbUTF8ToUTF16(strClumpedCommand.c_str());
-        strClumpedCommandUTF.substr(0,MAX_COMMAND_LENGTH);
+        strClumpedCommandUTF = strClumpedCommandUTF.substr(0,MAX_COMMAND_LENGTH);
         strClumpedCommand = UTF16ToMbUTF8(strClumpedCommandUTF);
 
         g_pClientGame->GetRegisteredCommands ()->ProcessCommand ( szCommandBufferPointer, szArguments );
@@ -106,7 +105,7 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
         pBitStream->Write ( strClumpedCommand.c_str(), static_cast < int > ( strlen ( strClumpedCommand.c_str() ) ) );
 
         // Send the packet to the server and free it
-        g_pNet->SendPacket ( PACKET_ID_COMMAND, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE, PACKET_ORDERING_CHAT );
+        g_pNet->SendPacket ( PACKET_ID_COMMAND, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_CHAT );
         g_pNet->DeallocateNetBitStream ( pBitStream );
 
         return true;
@@ -120,13 +119,15 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
 }
 
 
-void COMMAND_ChatBox ( const char* szCmdLine )
+void COMMAND_ChatBox ( const char* szInCmdLine )
 {
-    if ( !(szCmdLine && szCmdLine[0]) )
+    if ( !(szInCmdLine && szInCmdLine[0]) )
         return;
 
+    COPY_CSTR_TO_TEMP_BUFFER( szCmdLine, szInCmdLine, 256 );
+
     // Split it up into command and rgb
-    char* szCommand = strtok ( const_cast < char* > ( szCmdLine ), " " );
+    char* szCommand = strtok ( szCmdLine, " " );
     char* szRed = strtok ( NULL, " " );
     char* szGreen = strtok ( NULL, " " );
     char* szBlue = strtok ( NULL, " " );
@@ -161,7 +162,7 @@ void COMMAND_Disconnect ( const char *szCmdLine )
 void COMMAND_ShowNametags ( const char* szCmdLine )
 {
     int iCmd = ( szCmdLine && szCmdLine [ 0 ] ) ? atoi ( szCmdLine ) : -1;
-    bool bShow = ( iCmd == 1 ) ? true : ( iCmd == 0 ) ? false : !g_pCore->IsChatVisible ();
+    bool bShow = ( iCmd == 1 ) ? true : ( iCmd == 0 ) ? false : !g_pClientGame->GetNametags ()->IsVisible ();
     g_pClientGame->GetNametags ()->SetVisible ( bShow );
 }
 
@@ -174,10 +175,8 @@ void COMMAND_ShowChat ( const char* szCmdLine )
 
 void COMMAND_ShowNetstat ( const char* szCmdLine )
 {
-    if ( szCmdLine && szCmdLine [ 0 ] )
-    {
-        g_pClientGame->ShowNetstat ( atoi ( szCmdLine ) == 1 );
-    }
+    int iCmd = ( szCmdLine && szCmdLine [ 0 ] ) ? atoi ( szCmdLine ) : -1;
+    g_pClientGame->ShowNetstat ( iCmd );
 }
 
 void COMMAND_Eaeg ( const char* szCmdLine )
@@ -360,8 +359,33 @@ void COMMAND_RadarAttach ( const char* szCmdLine )
     }
 }
 
-void COMMAND_RadarTransparency ( const char* szCmdLine )
+void COMMAND_RadarOpacityDown ( const char* szCmdLine )
 {
+    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap ();
+    if ( pRadarMap->IsRadarShowing () )
+    {
+        int iAlpha;
+        g_pCore->GetCVars ()->Get ( "mapalpha", iAlpha );
+        iAlpha = Max ( 0, iAlpha - 20 );
+        g_pCore->GetCVars ()->Set ( "mapalpha", iAlpha );
+    }
+}
+
+void COMMAND_RadarOpacityUp ( const char* szCmdLine )
+{
+    CRadarMap* pRadarMap = g_pClientGame->GetRadarMap ();
+    if ( pRadarMap->IsRadarShowing () )
+    {
+        int iAlpha;
+        g_pCore->GetCVars ()->Get ( "mapalpha", iAlpha );
+        iAlpha = Min ( 255, iAlpha + 20 );
+        g_pCore->GetCVars ()->Set ( "mapalpha", iAlpha );
+    }
+}
+
+void COMMAND_RadarHelp ( const char* szCmdLine )
+{
+    g_pClientGame->GetRadarMap ()->ToggleHelpText ();
 }
 
 void COMMAND_MessageTarget ( const char* szCmdLine )
@@ -734,37 +758,20 @@ void COMMAND_ShowSyncData ( const char* szCmdLine )
     }
 }
 
+void COMMAND_VoicePushToTalk ( const char* szCmdLine)
+{
+    if ( g_pClientGame->GetVoiceRecorder()->IsEnabled() )
+        g_pClientGame->GetVoiceRecorder()-> UpdatePTTState ( atoi(szCmdLine) );
+    else
+        g_pCore->GetConsole ()->Print ( "voiceptt: This server does not have voice enabled" );
+}
+
 #if defined (MTA_DEBUG) || defined (MTA_BETA)
 
 void COMMAND_ShowSyncing ( const char *szCmdLine )
 {
     g_pClientGame->ShowSyncingInfo ( atoi ( szCmdLine ) == 1 );
 }
-
-void COMMAND_FakeLag ( const char *szCmdLine )
-{
-    char szBuffer [256];
-    char* szExtraPing = NULL;
-    char* szExtraPingVary = NULL;
-
-    if ( !(szCmdLine && szCmdLine[0]) )
-        return;
-
-    strncpy ( szBuffer, szCmdLine, 256 );
-    szBuffer[255] = 0;
-    szExtraPing = strtok ( szBuffer, " " );
-    szExtraPingVary = strtok ( NULL, " " );
-    
-    if ( !(szExtraPing && szExtraPingVary) )
-    {
-        g_pCore->GetConsole ()->Echo ( "Bad syntax" );
-        return;
-    }
-
-    g_pNet->SetFakeLag ( 0, atoi ( szExtraPing ), atoi ( szExtraPingVary ) );
-    g_pCore->GetConsole ()->Printf ( "Fake lag set to %s extra ping with %s extra ping variance", szExtraPing, szExtraPingVary );
-}
-
 
 #endif
 
@@ -909,119 +916,6 @@ void COMMAND_Watch ( const char *szCmdLine )
 }
 
 
-void COMMAND_Hash ( const char *szCmdLine )
-{
-    // Copy the cmd line
-    char* szTemp = new char [ strlen ( szCmdLine ) + 1 ];
-    strcpy ( szTemp, szCmdLine );
-
-    // Split up the arguments
-    char* szOffset = strtok ( szTemp, " " );
-    char* szLength = strtok ( NULL, " " );
-    if ( !szOffset || !szLength )
-    {
-        delete [] szTemp;
-        return;
-    }
-
-    // Convert to integer
-    unsigned long ulOffset = atol ( szOffset );
-    unsigned int uiLength = atoi ( szLength );
-
-    // Delete the temp buffer
-    delete [] szTemp;
-
-    // Create a hasher
-    CClientCRC32Hasher Hasher;
-    CRC32 Result;
-
-    // Try hashing the specified area
-    try
-    {
-        if ( Hasher.Calculate ( reinterpret_cast < const char* > ( ulOffset ), uiLength, Result ) )
-        {
-            // Print it
-            g_pCore->GetConsole ()->Printf ( "Hash at 0x%08X, size %u:\n0x%08X", ulOffset, uiLength, Result );
-            return;
-        }
-    }
-    catch ( ... )
-    {}
-
-    // Failed
-    g_pCore->GetConsole ()->Printf ( "Hashing 0x%08X, size %u failed!", ulOffset, uiLength );
-}
-
-
-void COMMAND_HashArray ( const char *szCmdLine )
-{
-    // Copy the cmd line
-    char* szTemp = new char [ strlen ( szCmdLine ) + 1 ];
-    strcpy ( szTemp, szCmdLine );
-
-    // Split up the arguments
-    char* szOffset = strtok ( szTemp, " " );
-    char* szSize = strtok ( NULL, " " );
-    char* szArrayLength = strtok ( NULL, " " );
-    char* szArrayPad = strtok ( NULL, " " );
-    if ( !szOffset || !szSize || !szArrayLength )
-    {
-        delete [] szTemp;
-        return;
-    }
-
-    // Convert to integer
-    unsigned long ulOffset = atol ( szOffset );
-    unsigned int uiSize = atoi ( szSize );
-    unsigned int uiArrayLength = atoi ( szArrayLength );
-
-    unsigned int uiArrayPad = 0;
-    if ( szArrayPad )
-    {
-        uiArrayPad = atoi ( szArrayPad );
-    }
-
-    // Delete the temp buffer
-    delete [] szTemp;
-
-    // Create a hasher
-    CClientCRC32Hasher Hasher;
-    Hasher.Start ();
-
-    // Try hashing the specified area
-    bool bSuccess = false;
-    try
-    {
-        // Hash each segment in the array
-        for ( unsigned int i = 0; i < uiArrayLength; i++ )
-        {
-            Hasher.Append ( reinterpret_cast < const char* > ( ulOffset + ( ( uiSize + uiArrayPad ) * i ) ), uiSize );
-        }
-
-        // Success
-        bSuccess = true;
-    }
-    catch ( ... )
-    {}
-
-    // Success?
-    if ( bSuccess )
-    {
-        // Finish the hashing and grab the hash
-        CRC32 crcResult;
-        Hasher.Finish ( crcResult );
-
-        // Print the hash in the console
-        g_pCore->GetConsole ()->Printf ( "Hashing array at 0x%08X [length: %u, size: %u, pad: %u]:\n0x%08X", ulOffset, uiArrayLength, uiSize, uiArrayPad, crcResult );
-    }
-    else
-    {
-        // Failed
-        g_pCore->GetConsole ()->Printf ( "Hashing array at 0x%08X [length: %u, size: %u, pad: %u]: failed!", ulOffset, uiArrayLength, uiSize, uiArrayPad );
-    }
-}
-
-
 void COMMAND_Modules ( const char *szCmdLine )
 {
     // Get the base address of the requested module
@@ -1131,3 +1025,25 @@ void COMMAND_Debug4 ( const char* szCmdLine )
     return;
 }
 #endif
+
+
+void COMMAND_ShowCollision ( const char* szCmdLine )
+{
+    int iCmd = ( szCmdLine && szCmdLine [ 0 ] ) ? atoi ( szCmdLine ) : -1;
+    bool bShow = ( iCmd == 1 ) ? true : ( iCmd == 0 ) ? false : !g_pClientGame->GetShowCollision ();
+    g_pClientGame->SetShowCollision ( bShow );
+    g_pCore->GetConsole ()->Printf ( "showcol is now set to %d", bShow ? 1 : 0 );
+    if ( bShow && !g_pClientGame->GetDevelopmentMode () )
+        g_pCore->GetConsole ()->Print ( "showcol will have no effect because development mode is off" );
+}
+
+
+void COMMAND_ShowSound ( const char* szCmdLine )
+{
+    int iCmd = ( szCmdLine && szCmdLine [ 0 ] ) ? atoi ( szCmdLine ) : -1;
+    bool bShow = ( iCmd == 1 ) ? true : ( iCmd == 0 ) ? false : !g_pClientGame->GetShowSound ();
+    g_pClientGame->SetShowSound ( bShow );
+    g_pCore->GetConsole ()->Printf ( "showsound is now set to %d", bShow ? 1 : 0 );
+    if ( bShow && !g_pClientGame->GetDevelopmentMode () )
+        g_pCore->GetConsole ()->Print ( "showsound will have no effect because development mode is off" );
+}

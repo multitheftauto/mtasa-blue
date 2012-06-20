@@ -17,6 +17,7 @@
 using namespace std;
 
 extern CCore* g_pCore;
+std::set < CServerListItem* > CServerListItem::ms_ValidServerListItemMap;
 
 CServerList::CServerList ( void )
 {
@@ -82,6 +83,9 @@ void CServerList::Pulse ( void )
     unsigned int uiRepliesParsed = 0;
     unsigned int uiNoReplies = 0;
     unsigned int uiActiveServers = 0;
+    unsigned int uiTotalSlots = 0;
+    unsigned int uiOccupiedSlots = 0;
+    bool bRemoveNonResponding = RemoveNonResponding ();
 
     // If a query is going to be done this pass, try to find high priority items first
     if ( iNumQueries > 0 )
@@ -91,10 +95,10 @@ void CServerList::Pulse ( void )
 
         for ( std::vector < SAddressPort >::iterator iter = endpointList.begin (); iter != endpointList.end (); ++iter )
         {
-            CServerListItem* pServer = m_Servers.Find ( (in_addr&)iter->m_ulIp, iter->m_usPort+123 );
+            CServerListItem* pServer = m_Servers.Find ( (in_addr&)iter->m_ulIp, iter->m_usPort );
             if ( pServer && pServer->WaitingToSendQuery () )
             {
-                std::string strResult = pServer->Pulse ( (int)( uiQueriesSent /*+ uiQueriesResent*/ ) < iNumQueries );
+                std::string strResult = pServer->Pulse ( (int)( uiQueriesSent /*+ uiQueriesResent*/ ) < iNumQueries, bRemoveNonResponding );
                 assert ( strResult == "SentQuery" );
                 uiQueriesSent++;
                 if ( (int)uiQueriesSent >= iNumQueries )
@@ -108,7 +112,7 @@ void CServerList::Pulse ( void )
     {
         CServerListItem * pServer = *i;
         uint uiPrevRevision = pServer->uiRevision;
-        std::string strResult = pServer->Pulse ( (int)( uiQueriesSent /*+ uiQueriesResent*/ ) < iNumQueries );
+        std::string strResult = pServer->Pulse ( (int)( uiQueriesSent /*+ uiQueriesResent*/ ) < iNumQueries, bRemoveNonResponding );
         if ( uiPrevRevision != pServer->uiRevision )
             m_bUpdated |= true;         // Flag GUI update
         if ( strResult == "SentQuery" )
@@ -124,7 +128,11 @@ void CServerList::Pulse ( void )
             uiNoReplies++;
 
         if ( pServer->nMaxPlayers && !pServer->bMaybeOffline && !pServer->MaybeWontRespond () )
+        {
             uiActiveServers++;
+            uiTotalSlots += pServer->nMaxPlayers;
+            uiOccupiedSlots += pServer->nPlayers;
+        }
     }
 
     // Check whether we are done scanning
@@ -134,7 +142,7 @@ void CServerList::Pulse ( void )
     m_nScanned += uiRepliesParsed;
     m_nSkipped += uiNoReplies;
 #if MTA_DEBUG
-    //OutputDebugLine ( SString ( "%08x  Size: %d  m_nScanned:%d  m_nSkipped:%d [%d]  iNumQueries: %d", this, m_Servers.size(), m_nScanned, m_nSkipped, m_nScanned+m_nSkipped, iNumQueries ) );
+    //OutputDebugLine ( SString ( "[Browser] %08x  Size: %d  m_nScanned:%d  m_nSkipped:%d [%d]  iNumQueries: %d", this, m_Servers.size(), m_nScanned, m_nSkipped, m_nScanned+m_nSkipped, iNumQueries ) );
 #endif
 
     if ( m_nScanned + m_nSkipped == m_Servers.size () ) {
@@ -142,7 +150,15 @@ void CServerList::Pulse ( void )
         m_iPass = 0;
     }
 
-    ss << "   " << uiActiveServers << " server";
+    ss << "   ";
+    if ( uiTotalSlots > 0 )
+    {
+        ss << uiOccupiedSlots << " player";
+        if ( uiOccupiedSlots != 1 )
+            ss << "s";
+        ss << " on ";
+    }
+    ss << uiActiveServers << " server";
     if ( uiActiveServers != 1 )
         ss << "s";
     if ( m_iPass )
@@ -154,17 +170,17 @@ void CServerList::Pulse ( void )
 
 
 // Return true if did add
-bool CServerList::AddUnique ( in_addr Address, ushort usQueryPort, bool addAtFront )
+bool CServerList::AddUnique ( in_addr Address, ushort usGamePort, bool addAtFront )
 {
-    if ( m_Servers.Find ( Address, usQueryPort ) )
+    if ( m_Servers.Find ( Address, usGamePort ) )
         return false;
-    m_Servers.Add ( Address, usQueryPort, addAtFront );
+    m_Servers.Add ( Address, usGamePort, addAtFront );
     return true;
 }
 
-bool CServerList::Remove ( in_addr Address, ushort usQueryPort )
+bool CServerList::Remove ( in_addr Address, ushort usGamePort )
 {
-    return m_Servers.Remove ( Address, usQueryPort );
+    return m_Servers.Remove ( Address, usGamePort );
 }
 
 
@@ -211,6 +227,21 @@ void CServerListInternet::Refresh ( void )
 }
 
 
+
+static bool SortByASEVersionCallback ( const CServerListItem* const d1, const CServerListItem* const d2 )
+{
+    return d1->strVersionSortKey < d2->strVersionSortKey;
+};
+
+//
+// Ensure serverlist is sorted by MTA ASE version
+//
+void CServerList::SortByASEVersion ( void )
+{
+    m_Servers.GetList ().sort ( SortByASEVersionCallback );
+}
+
+
 void CServerListInternet::Pulse ( void )
 {   // We also need to take care of the master server list here
     unsigned long ulTime = m_ElapsedTime.Get ();
@@ -230,6 +261,7 @@ void CServerListInternet::Pulse ( void )
             {
                 m_iPass++;
                 GetServerCache ()->GetServerListCachedInfo ( this );
+                SortByASEVersion ();
             } else {
                 // Abort
                 m_strStatus = "Master server list could not be parsed.";
@@ -248,6 +280,7 @@ void CServerListInternet::Pulse ( void )
             // If query failed, load from backup
             GetServerCache ()->GenerateServerList ( this );
             GetServerCache ()->GetServerListCachedInfo ( this );
+            SortByASEVersion ();
             m_strStatus2 = string ( "  (Backup server list)" );
             m_iPass = 2;
         }
@@ -279,7 +312,8 @@ void CServerListLAN::Pulse ( void )
             if ( strncmp ( szBuffer, SERVER_LIST_SERVER_BROADCAST_STR, strlen ( SERVER_LIST_SERVER_BROADCAST_STR ) ) == 0 ) {
                 unsigned short usPort = ( unsigned short ) atoi ( &szBuffer[strlen ( SERVER_LIST_SERVER_BROADCAST_STR ) + 1] );
                 // Add the server if doesn't already exist
-                AddUnique ( m_Remote.sin_addr, usPort );
+                AddUnique ( m_Remote.sin_addr, usPort - SERVER_LIST_QUERY_PORT_OFFSET_LAN );
+                CServerBrowser::GetSingleton ().AddKnownLanServer ( m_Remote.sin_addr );
             }
 
     // Scan our already known servers
@@ -329,7 +363,7 @@ void CServerListLAN::Discover ( void )
 }
 
 
-std::string CServerListItem::Pulse ( bool bCanSendQuery )
+std::string CServerListItem::Pulse ( bool bCanSendQuery, bool bRemoveNonResponding )
 {   // Queries the server on it's query port (ASE protocol)
     // and returns whether it is done scanning
     if ( bScanned || bSkipped ) return "Done";
@@ -363,8 +397,11 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery )
 
         if ( m_ElapsedTime.Get () > SERVER_LIST_ITEM_TIMEOUT )
         {
-            bMaybeOffline = true;       // Flag to help 'Include offline' browser option
-            nPlayers = 0;               // We don't have player names, so zero this now
+            if ( bRemoveNonResponding )
+            {
+                bMaybeOffline = true;       // Flag to help 'Include offline' browser option
+                nPlayers = 0;               // We don't have player names, so zero this now
+            }
             uiRevision++;               // To flag browser gui update
             uint uiMaxRetries = GetDataQuality () <= SERVER_INFO_ASE_0 || MaybeWontRespond () ? 0 : 1;
 
@@ -373,9 +410,6 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery )
                 // Try again
                 uiQueryRetryCount++;
                 uiRevision++;           // To flag browser gui update
-#if MTA_DEBUG
-                //strGameMode = SString ( "%d/%d Q:%d", uiQueryRetryCount, uiMaxRetries, GetDataQuality () );
-#endif
                 if ( GetDataQuality () > SERVER_INFO_ASE_0 )
                     GetServerCache ()->SetServerCachedInfo ( this );
                 Query ();
@@ -384,15 +418,22 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery )
             else
             {
                 // Give up
-                uiCacheNoReplyCount++;  // Keep a persistent count of failures. (When uiCacheNoReplyCount gets to 3, the server is removed from the Server Cache)
-                bSkipped = true;
-                uiRevision++;           // To flag browser gui update#if MTA_DEBUG
-#if MTA_DEBUG
-                //strGameMode = SString ( "noreply %d/%d Q:%d", uiQueryRetryCount, uiMaxRetries, GetDataQuality () );
-#endif
                 CloseSocket ();
-                if ( GetDataQuality () > SERVER_INFO_ASE_0 )
-                    GetServerCache ()->SetServerCachedInfo ( this );
+                uiRevision++;           // To flag browser gui update
+
+                if ( bRemoveNonResponding )
+                {
+                    uiCacheNoReplyCount++;  // Keep a persistent count of failures. (When uiCacheNoReplyCount gets to 3, the server is removed from the Server Cache)
+                    bSkipped = true;
+                    if ( GetDataQuality () > SERVER_INFO_ASE_0 )
+                        GetServerCache ()->SetServerCachedInfo ( this );
+                }
+                else
+                {
+                    // Pretend everything is fine until network access is confirmed
+                    bScanned = true;
+                    bMaybeOffline = false;
+                }
                 return "NoReply";
             }
         }
@@ -402,13 +443,20 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery )
 }
 
 
+unsigned short CServerListItem::GetQueryPort ( void )
+{
+    if ( CServerBrowser::GetSingleton ().IsKnownLanServer ( Address ) )
+        return usGamePort + SERVER_LIST_QUERY_PORT_OFFSET_LAN;
+    return usGamePort + SERVER_LIST_QUERY_PORT_OFFSET;
+}
+
 void CServerListItem::Query ( void )
 {   // Performs a query according to ASE protocol
     sockaddr_in addr;
     memset ( &addr, 0, sizeof(addr) );
     addr.sin_family = AF_INET;
     addr.sin_addr = Address;
-    addr.sin_port = htons ( usQueryPort );
+    addr.sin_port = htons ( GetQueryPort () );
 
     // Initialize socket on demand
     if ( m_Socket == INVALID_SOCKET )
@@ -428,7 +476,7 @@ bool ReadString ( std::string &strRead, const char * szBuffer, unsigned int &i, 
     if ( i <= nLength )
     {
         unsigned char len = szBuffer[i];
-        if ( i + len <= nLength )
+        if ( i + len <= nLength && len > 0 )
         {
             const char *ptr = &szBuffer[i + 1];
             i += len;
@@ -520,7 +568,7 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
         nMaxPlayers = (unsigned char)szBuffer[i++];
 
     // Recover large player count if present
-    SString strPlayerCount = strMapTemp.Right ( strMapTemp.length () - strlen ( strMapTemp ) - 1 );
+    const SString strPlayerCount = strMapTemp.Right ( strMapTemp.length () - strlen ( strMapTemp ) - 1 );
     if ( !strPlayerCount.empty () )
     {
         SString strJoinedPlayers, strMaxPlayers;
@@ -533,20 +581,45 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
         }
     }
 
+    // Recover server build type if present
+    const SString strBuildType = strPlayerCount.Right ( strPlayerCount.length () - strlen ( strPlayerCount ) - 1 );
+    if ( !strBuildType.empty () )
+        m_iBuildType = atoi ( strBuildType );
+    else
+        m_iBuildType = 1;
+
+    // Recover server build number if present
+    const SString strBuildNumber = strBuildType.Right ( strBuildType.length () - strlen ( strBuildType ) - 1 );
+    if ( !strBuildNumber.empty () )
+        m_iBuildNumber = atoi ( strBuildNumber );
+    else
+        m_iBuildNumber = 0;
+
+    // Recover server ping status if present
+    const SString strPingStatus = strBuildNumber.Right ( strBuildNumber.length () - strlen ( strBuildNumber ) - 1 );
+    CCore::GetSingleton ().GetNetwork ()->UpdatePingStatus ( *strPingStatus, nPlayers );
+
     // Get player nicks
     vecPlayers.clear ();
     while ( i < nLength )
     {
         std::string strPlayer;
-
-        if ( ReadString ( strPlayer, szBuffer, i, nLength ) )
+        try
         {
-            // Remove color code, unless that results in an empty string
-            std::string strResult = RemoveColorCode ( strPlayer.c_str () );
-            if ( strResult.length () == 0 )
-                strResult = strPlayer;
-            if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PLAYER_LIST ) == false )
-                vecPlayers.push_back ( strResult );
+            if ( ReadString ( strPlayer, szBuffer, i, nLength ) )
+            {
+                // Remove color code, unless that results in an empty string
+                std::string strResult = RemoveColorCode ( strPlayer.c_str () );
+                if ( strResult.length () == 0 )
+                    strResult = strPlayer;
+                if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PLAYER_LIST ) == false )
+                    vecPlayers.push_back ( strResult );
+            }
+        }
+        catch ( ... )
+        {
+            // yeah that's what I thought.
+            return false;
         }
     }
 
@@ -565,7 +638,7 @@ void CServerListItem::ResetForRefresh ( void )
     m_ElapsedTime.Reset ();
     uiQueryRetryCount = 0;
 
-    if ( m_iDataQuality > SERVER_INFO_ASE_2 )
-        m_iDataQuality = SERVER_INFO_ASE_2;
+    if ( m_iDataQuality >= SERVER_INFO_QUERY )
+        m_iDataQuality = SERVER_INFO_QUERY - 1;
     bMaybeOffline = false;
 }

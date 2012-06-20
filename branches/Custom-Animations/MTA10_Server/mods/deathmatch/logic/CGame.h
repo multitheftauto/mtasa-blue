@@ -25,6 +25,7 @@ class CGame;
 #ifndef __CGAME_H
 #define __CGAME_H
 
+#include "CCommon.h"
 #include <net/CNetServer.h>
 #include "CClient.h"
 #include "CEvents.h"
@@ -43,25 +44,30 @@ class CGame;
 #include "packets/CPlayerTimeoutPacket.h"
 #include "packets/CPlayerPuresyncPacket.h"
 #include "packets/CVehiclePuresyncPacket.h"
+#include "packets/CLightsyncPacket.h"
+#include "packets/CVehicleResyncPacket.h"
 #include "packets/CKeysyncPacket.h"
+#include "packets/CBulletsyncPacket.h"
+#include "packets/CBulletsyncSettingsPacket.h"
 #include "packets/CVehicleInOutPacket.h"
 #include "packets/CVehicleDamageSyncPacket.h"
 #include "packets/CVehicleTrailerPacket.h"
 #include "packets/CVoiceDataPacket.h"
 #include "packets/CLuaEventPacket.h"
+#include "packets/CDestroySatchelsPacket.h"
 #include "packets/CDetonateSatchelsPacket.h"
 #include "packets/CCustomDataPacket.h"
 #include "packets/CCameraSyncPacket.h"
 #include "packets/CPlayerTransgressionPacket.h"
 #include "packets/CPlayerDiagnosticPacket.h"
+#include "packets/CPlayerModInfoPacket.h"
+#include "packets/CPlayerScreenShotPacket.h"
 
 #include "CRPCFunctions.h"
 
 #include "lua/CLuaManager.h"
 
-#ifdef MTA_VOICE
-#include "../../../Voice/VoiceServerAPI.h"
-#endif
+#include "CLightsyncManager.h"
 
 // Forward declarations
 class ASE;
@@ -83,12 +89,15 @@ class CMarkerManager;
 class CObjectManager;
 class CPacket;
 class CPacketTranslator;
+class CLatentTransferManager;
 class CPedManager;
 class CPickupManager;
 class CPlayer;
 class CPlayerManager;
 class CRadarAreaManager;
 class CRegisteredCommands;
+class CDatabaseManager;
+class CLuaCallbackManager;
 class CRegistryManager;
 class CRegistry;
 class CRemoteCalls;
@@ -104,6 +113,10 @@ class CVehicleManager;
 class CZoneNames;
 class CLanBroadcast;
 class CWaterManager;
+
+class CWeaponStatManager;
+class CBuildingRemovalManager;
+
 
 // Packet forward declarations
 class CCommandPacket;
@@ -125,9 +138,12 @@ class CVehicleTrailerPacket;
 class CVoiceDataPacket;
 class CWeaponDamageCheckPacket;
 
+typedef SFixedArray < bool, MAX_GARAGES > SGarageStates;
+
 class CGame
 {
 public:
+    ZERO_ON_NEW         // To be sure everything is cleared
     enum
     {
         VEHICLE_REQUEST_IN,
@@ -160,18 +176,8 @@ public:
         GLITCH_FASTFIRE,
         GLITCH_FASTMOVE,
         GLITCH_CROUCHBUG,
-    };
-    enum eVehicleInOutFailReasons
-    {
-        VEHICLE_INOUT_FAIL_INVALID = 0,
-        VEHICLE_INOUT_FAIL_SCRIPT,
-        VEHICLE_INOUT_FAIL_SCRIPT_2,
-        VEHICLE_INOUT_FAIL_JACKED_ACTION,
-        VEHICLE_INOUT_FAIL_SEAT,
-        VEHICLE_INOUT_FAIL_DISTANCE,
-        VEHICLE_INOUT_FAIL_IN_VEHICLE,
-        VEHICLE_INOUT_FAIL_ACTION,
-        VEHICLE_INOUT_FAIL_TRAILER,
+        GLITCH_CLOSEDAMAGE,
+        NUM_GLITCHES
     };
 public:
                                 CGame                       ( void );
@@ -185,7 +191,7 @@ public:
     bool                        Start                       ( int iArgumentCount, char* szArguments [] );
     void                        Stop                        ( void );
 
-    static bool                 StaticProcessPacket         ( unsigned char ucPacketID, NetServerPlayerID& Socket, NetBitStreamInterface& BitStream );
+    static bool                 StaticProcessPacket         ( unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo );
     bool                        ProcessPacket               ( CPacket& Packet );
 
     inline void                 SetIsFinished               ( bool bFinished )  { m_bIsFinished = bFinished; };
@@ -200,14 +206,19 @@ public:
     inline CTeamManager*            GetTeamManager              ( void )        { return m_pTeamManager; }
     inline CUnoccupiedVehicleSync*  GetUnoccupiedVehicleSync    ( void )        { return m_pUnoccupiedVehicleSync; }
     inline CPedSync*                GetPedSync                  ( void )        { return m_pPedSync; }
+#ifdef WITH_OBJECT_SYNC
     inline CObjectSync*             GetObjectSync               ( void )        { return m_pObjectSync; }
+#endif
     inline CConsole*                GetConsole                  ( void )        { return m_pConsole; }
+    inline CDatabaseManager*        GetDatabaseManager          ( void )        { return m_pDatabaseManager; }
+    inline CLuaCallbackManager*     GetLuaCallbackManager       ( void )        { return m_pLuaCallbackManager; }
     inline CRegistryManager*        GetRegistryManager          ( void )        { return m_pRegistryManager; }
     inline CRegistry*               GetRegistry                 ( void )        { return m_pRegistry; }
     inline CAccountManager*         GetAccountManager           ( void )        { return m_pAccountManager; }
     inline CScriptDebugging*        GetScriptDebugging          ( void )        { return m_pScriptDebugging; }
     inline CEvents*                 GetEvents                   ( void )        { return &m_Events; }
     inline CColManager*             GetColManager               ( void )        { return m_pColManager; }
+    inline CLatentTransferManager*  GetLatentTransferManager    ( void )        { return m_pLatentTransferManager; }
     inline CPedManager*             GetPedManager               ( void )        { return m_pPedManager; }
     inline CResourceManager*        GetResourceManager          ( void )        { return m_pResourceManager; }
     inline CMarkerManager*          GetMarkerManager            ( void )        { return m_pMarkerManager; }
@@ -226,6 +237,9 @@ public:
     inline CClock*                  GetClock                    ( void )        { return m_pClock; }
     inline CSerialManager*          GetSerialManager            ( void )        { return &m_SerialManager; }
     inline CWaterManager*           GetWaterManager             ( void )        { return m_pWaterManager; }
+    inline CLightsyncManager*       GetLightSyncManager         ( void )        { return &m_lightsyncManager; }
+    inline CWeaponStatManager*      GetWeaponStatManager        ( void )        { return m_pWeaponStatsManager; }
+    inline CBuildingRemovalManager* GetBuildingRemovalManager   ( void )        { return m_pBuildingRemovalManager; }
 
     void                        JoinPlayer                  ( CPlayer& Player );
     void                        InitialDataStream           ( CPlayer& Player );
@@ -260,7 +274,7 @@ public:
     inline void                 GetHeatHaze                 ( SHeatHazeSettings& heatHazeSettings )         { heatHazeSettings = m_HeatHazeSettings; }
     inline void                 SetHeatHaze                 ( const SHeatHazeSettings& heatHazeSettings )   { m_HeatHazeSettings = heatHazeSettings; }
 
-    inline bool                 AreInteriorSoundsEnabled    ( void )        { return m_bInteriorSoundsEnabled; }
+    inline bool                 GetInteriorSoundsEnabled    ( void )        { return m_bInteriorSoundsEnabled; }
     inline void                 SetInteriorSoundsEnabled    ( bool bEnable )    { m_bInteriorSoundsEnabled = bEnable; }
 
     inline bool                 HasWaterColor               ( void )        { return m_bOverrideWaterColor; }
@@ -305,7 +319,13 @@ public:
     inline float                GetFogDistance              ( void )        { return m_fFogDistance; }
     inline void                 SetFogDistance              ( float& fFogDistance ) { m_fFogDistance = fFogDistance; }
 
-    inline bool*                GetGarageStates             ( void )        { return m_bGarageStates; }
+    inline float                GetAircraftMaxHeight        ( void ) { return m_fAircraftMaxHeight; }
+    inline void                 SetAircraftMaxHeight        ( float fMaxHeight ) { m_fAircraftMaxHeight = fMaxHeight; }
+
+    inline bool                 GetOcclusionsEnabled        ( void ) { return m_bOcclusionsEnabled ; }
+    inline void                 SetOcclusionsEnabled        ( bool bOcclusionsEnabled ) { m_bOcclusionsEnabled = bOcclusionsEnabled; }
+
+    SGarageStates&              GetGarageStates             ( void )        { return m_bGarageStates; }
 
     void                        Lock                        ( void );
     void                        Unlock                      ( void );
@@ -325,12 +345,32 @@ public:
     void                        PulseMasterServerAnnounce   ( void );
     void                        StartOpenPortsTest          ( void );
 
+    bool                        IsServerFullyUp             ( void )        { return m_bServerFullyUp; }
+
+    ushort                      GetServerFPS                ( void )        { return m_usFPS; }
+    int                         GetSyncFPS                  ( void )        { return m_iSyncFPS; }
+    void                        SetSyncFPS                  ( int iSyncFPS ) { m_iSyncFPS = iSyncFPS; }
+
+    void                        HandleBackup                ( void );
+    void                        EnableLatentSends           ( bool bEnabled, int iBandwidth = 0, CLuaMain* pLuaMain = NULL );
+    bool                        SendPacket                  ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
+
+    bool                        IsBulletSyncActive          ( void );
+    void                        SendBulletSyncSettings      ( CPlayer* pPlayer = NULL );
+
+    SString                     CalculateMinClientRequirement   ( void );
+    bool                        IsBelowMinimumClient            ( const SString& strVersion );
+    bool                        IsBelowRecommendedClient        ( const SString& strVersion );
+
 private:
     void                        AddBuiltInEvents            ( void );
+    void                        RelayPlayerPuresync         ( class CPacket& Packet );
+    void                        RelayKeysync                ( class CPacket& Packet );
+    void                        RelayBulletsync             ( class CPacket& Packet );
 
     void                        ProcessTrafficLights        ( unsigned long ulCurrentTime );
 
-    void                        Packet_PlayerJoin           ( NetServerPlayerID& Source );
+    void                        Packet_PlayerJoin           ( const NetServerPlayerID& Source );
     void                        Packet_PlayerJoinData       ( class CPlayerJoinDataPacket& Packet );
     void                        Packet_PedWasted            ( class CPedWastedPacket& Packet );
     void                        Packet_PlayerWasted         ( class CPlayerWastedPacket& Packet );
@@ -338,20 +378,25 @@ private:
     void                        Packet_PlayerTimeout        ( class CPlayerTimeoutPacket& Packet );
     void                        Packet_PlayerPuresync       ( class CPlayerPuresyncPacket& Packet );
     void                        Packet_DetonateSatchels     ( class CDetonateSatchelsPacket& Packet );
+    void                        Packet_DestroySatchels     ( class CDestroySatchelsPacket& Packet );
     void                        Packet_ExplosionSync        ( class CExplosionSyncPacket& Packet );
     void                        Packet_ProjectileSync       ( class CProjectileSyncPacket& Packet );
     void                        Packet_Command              ( class CCommandPacket& Packet );
     void                        Packet_VehicleDamageSync    ( class CVehicleDamageSyncPacket& Packet );
     void                        Packet_VehiclePuresync      ( class CVehiclePuresyncPacket& Packet );
     void                        Packet_Keysync              ( class CKeysyncPacket& Packet );
+    void                        Packet_Bulletsync           ( class CBulletsyncPacket& Packet );
     void                        Packet_Vehicle_InOut        ( class CVehicleInOutPacket& Packet );
     void                        Packet_VehicleTrailer       ( class CVehicleTrailerPacket& Packet );
     void                        Packet_LuaEvent             ( class CLuaEventPacket& Packet );
     void                        Packet_CustomData           ( class CCustomDataPacket& Packet );
     void                        Packet_Voice_Data           ( class CVoiceDataPacket& Packet );
+    void                        Packet_Voice_End            ( class CVoiceEndPacket& Packet );
     void                        Packet_CameraSync           ( class CCameraSyncPacket& Packet );
     void                        Packet_PlayerTransgression  ( class CPlayerTransgressionPacket& Packet );
     void                        Packet_PlayerDiagnostic     ( class CPlayerDiagnosticPacket& Packet );
+    void                        Packet_PlayerModInfo        ( class CPlayerModInfoPacket & Packet );
+    void                        Packet_PlayerScreenShot     ( class CPlayerScreenShotPacket & Packet );
 
     static void                 PlayerCompleteConnect       ( CPlayer* pPlayer, bool bSuccess, const char* szError );
 
@@ -380,7 +425,9 @@ private:
     CConsole*                       m_pConsole;
     CUnoccupiedVehicleSync*         m_pUnoccupiedVehicleSync;
     CPedSync*                       m_pPedSync;
+#ifdef WITH_OBJECT_SYNC
     CObjectSync*                    m_pObjectSync;
+#endif
     CMarkerManager*                 m_pMarkerManager;
     CClock*                         m_pClock;
     CBanManager*                    m_pBanManager;
@@ -388,9 +435,12 @@ private:
     CWhoWas                         m_WhoWas;
     CCommandLineParser              m_CommandLineParser;
     CRegisteredCommands*            m_pRegisteredCommands;
+    CDatabaseManager*               m_pDatabaseManager;
+    CLuaCallbackManager*            m_pLuaCallbackManager;
     CRegistryManager*               m_pRegistryManager;
     CRegistry*                      m_pRegistry;
     CAccountManager*                m_pAccountManager;
+    CLatentTransferManager*         m_pLatentTransferManager;
     CPedManager*                    m_pPedManager;
     CResourceManager*               m_pResourceManager;
     CAccessControlListManager*      m_pACLManager;
@@ -402,11 +452,11 @@ private:
     CLanBroadcast*                  m_pLanBroadcast;
     CWaterManager*                  m_pWaterManager;
 
+    CWeaponStatManager*             m_pWeaponStatsManager;
+    CBuildingRemovalManager*        m_pBuildingRemovalManager;
+
     CSerialManager                  m_SerialManager;
 
-#ifdef MTA_VOICE
-    CVoiceServer*               m_pVoiceServer;
-#endif
 
     char*                       m_szCurrentFileName;
 
@@ -416,6 +466,8 @@ private:
     float                       m_fGravity;
     float                       m_fGameSpeed;
     float                       m_fJetpackMaxHeight;
+    float                       m_fAircraftMaxHeight;
+    bool                        m_bOcclusionsEnabled;
 
     unsigned char               m_ucTrafficLightState;
     bool                        m_bTrafficLightsLocked;
@@ -451,14 +503,15 @@ private:
     bool                        m_bOverrideFogDistance;
     float                       m_fFogDistance;
 
-    bool                        m_bGarageStates[MAX_GARAGES];
+    SGarageStates               m_bGarageStates;
 
     // FPS statistics
     unsigned long               m_ulLastFPSTime;
     unsigned short              m_usFrames;
     unsigned short              m_usFPS;
+    int                         m_iSyncFPS;
     std::map<std::string,eGlitchType> m_GlitchNames;
-    bool                        m_Glitches[4];
+    SFixedArray < bool, NUM_GLITCHES > m_Glitches;
 
     // This is ticked to true when the app should end
     bool                        m_bIsFinished;
@@ -469,6 +522,17 @@ private:
 
     long long                   m_llLastAnnouceTime;
     class COpenPortsTester*     m_pOpenPortsTester;
+
+    CLightsyncManager           m_lightsyncManager;
+
+    bool                        m_bServerFullyUp;       // No http operations should be allowed unless this is true
+
+    bool                        m_bLatentSendsEnabled;
+    int                         m_iLatentSendsBandwidth;
+    CLuaMain*                   m_pLatentSendsLuaMain;
+
+    SString                     m_strPrevMinClientKickRequirement;
+    SString                     m_strPrevMinClientConnectRequirement;
 };
 
 #endif

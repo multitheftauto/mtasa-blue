@@ -47,6 +47,7 @@
 #define FUNC_DrawRadar              0x58A330
 #define FUNC_DrawRadioName          0x4E9E50
 #define FUNC_DrawWantedLevel        0x58D9A0
+#define FUNC_DrawCrosshair          0x58E020
 
 #define CODE_ShowMoney              0x58F47D
 
@@ -58,6 +59,7 @@ public:
     VOID                SetVehicleName( char * szName );
     VOID                SetZoneName( char * szName );
     VOID                Disable ( bool bDisabled );
+    bool                IsDisabled ( void );
     VOID                DrawBarChart ( float fX, float fY, DWORD dwWidth, DWORD dwHeight, float fPercentage, DWORD dwForeColor, DWORD dwBorderColor );
     bool                CalcScreenCoors ( CVector * vecPosition1, CVector * vecPosition2, float * fX, float * fY, bool bSetting1, bool bSetting2 );
     void                Draw2DPolygon ( float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, float fX4, float fY4, DWORD dwColor );
@@ -75,6 +77,7 @@ public:
     void                DisableClock ( bool bDisabled );
     void                DisableRadioName ( bool bDisabled );
     void                DisableWantedLevel ( bool bDisabled );
+    void                DisableCrosshair ( bool bDisabled );
     void                DisableAll ( bool bDisabled );
 };
 

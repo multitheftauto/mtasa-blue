@@ -154,13 +154,14 @@ public:
     virtual void            Respawn (CVector * position,bool bCameraCut)=0;
 
     virtual void            SetModelIndex       ( unsigned long ulModel ) = 0;
+    virtual void            RemoveGeometryRef   ( void ) = 0;
 
     virtual FLOAT           GetHealth ()=0;
     virtual void            SetHealth ( float fHealth )=0;
     virtual float           GetArmor () = 0;
     virtual void            SetArmor ( float fArmor ) = 0;
     virtual bool            AddProjectile ( eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity )=0;
-    virtual CWeapon *       GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )=0;
+    virtual CWeapon *       GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo, eWeaponSkill weaponSkill )=0;
     virtual CWeapon *       GetWeapon ( eWeaponSlot weaponSlot )=0;
     virtual CWeapon *       GetWeapon ( eWeaponType weaponType )=0;
     virtual void            ClearWeapons        ( void ) = 0;
@@ -194,7 +195,7 @@ public:
     virtual bool            IsWearingGoggles ( void )=0;
     virtual void            SetGogglesState ( bool bIsWearingThem )=0;
 
-    virtual void            SetClothesTextureAndModel ( char * szModel, char * szModelLocationName, int iTexture ) = 0;
+    virtual void            SetClothesTextureAndModel ( const char* szModel, const char* szModelLocationName, int iTexture ) = 0;
     virtual void            RebuildPlayer ( void ) = 0;
 
     virtual eFightingStyle  GetFightingStyle ( void ) = 0;

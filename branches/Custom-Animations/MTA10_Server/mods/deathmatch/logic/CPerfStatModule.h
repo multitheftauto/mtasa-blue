@@ -10,8 +10,34 @@
 *
 *****************************************************************************/
 
-typedef unsigned long TIMEUS;
-TIMEUS GetTimeUs ( void );
+//
+// Use global struct instead of calls for efficient gathering of certain stats
+//
+struct SStatData
+{
+    ZERO_ON_NEW
+
+    struct {
+        SFixedArray < long long, ZONE_MAX > llSentPacketsByZone;
+        SFixedArray < long long, ZONE_MAX > llSentBytesByZone;
+        SFixedArray < long long, ZONE_MAX > llSkippedPacketsByZone;
+        SFixedArray < long long, ZONE_MAX > llSkippedBytesByZone;
+    } puresync;
+
+    struct {
+        long long llSyncPacketsSkipped;
+        long long llSyncBytesSkipped;
+        long long llLightSyncPacketsSent;
+        long long llLightSyncBytesSent;
+    } lightsync;
+
+    bool bFunctionTimingActive;
+    int iDbJobDataCount;
+    int iDbConnectionCount;
+};
+
+extern SStatData* g_pStats;
+
 
 //
 // CPerfStatResult
@@ -167,4 +193,147 @@ public:
     // CPerfStatPacketUsage
 
     static CPerfStatPacketUsage*  GetSingleton      ( void );
+};
+
+
+//
+// CPerfStatBandwidthUsage
+//
+class CPerfStatBandwidthUsage : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    // CPerfStatBandwidthUsage
+
+    static CPerfStatBandwidthUsage*  GetSingleton      ( void );
+};
+
+
+//
+// CPerfStatSqliteTiming
+//
+class CPerfStatSqliteTiming : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    // CPerfStatSqliteTiming
+    virtual void                OnSqliteOpen        ( CRegistry* pRegistry, const SString& strFileName ) = 0;
+    virtual void                OnSqliteClose       ( CRegistry* pRegistry ) = 0;
+    virtual void                UpdateSqliteTiming  ( CRegistry* pRegistry, const char* szQuery, TIMEUS timeUs ) = 0;
+    virtual void                SetCurrentResource  ( lua_State* luaVM ) = 0;
+
+    static CPerfStatSqliteTiming*  GetSingleton        ( void );
+};
+
+
+//
+// CPerfStatBandwidthReduction
+//
+class CPerfStatBandwidthReduction : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    // CPerfStatBandwidthReduction
+
+    static CPerfStatBandwidthReduction*  GetSingleton      ( void );
+};
+
+
+//
+// CPerfStatServerInfo
+//
+class CPerfStatServerInfo : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    // CPerfStatServerInfo
+
+    static CPerfStatServerInfo*  GetSingleton      ( void );
+};
+
+
+//
+// CPerfStatServerTiming
+//
+class CPerfStatServerTiming : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    static CPerfStatServerTiming*  GetSingleton        ( void );
+};
+
+
+//
+// CPerfStatFunctionTiming
+//
+class CPerfStatFunctionTiming : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    // CPerfStatFunctionTiming
+    virtual void                UpdateTiming        ( const char* szFunctionName, TIMEUS timeUs ) = 0;
+
+    static CPerfStatFunctionTiming*  GetSingleton        ( void );
+};
+
+
+//
+// CPerfStatDebugInfo
+//
+class CPerfStatDebugInfo : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    // CPerfStatDebugInfo
+    virtual bool                IsActive            ( const char* szSectionName = NULL ) = 0;
+    virtual void                AddLine             ( const SString& strSection, const SString& strData ) = 0;
+
+    static CPerfStatDebugInfo*  GetSingleton      ( void );
+};
+
+
+//
+// CPerfStatDebugTable
+//
+class CPerfStatDebugTable : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    // CPerfStatDebugInfo
+    virtual void                RemoveLines         ( const SString& strKeyMatch ) = 0;
+    virtual void                UpdateLine          ( const SString& strKey, int iLifeTimeMs, ... ) = 0;
+
+    static CPerfStatDebugTable*  GetSingleton      ( void );
 };

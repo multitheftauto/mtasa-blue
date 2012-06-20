@@ -353,11 +353,11 @@ void CCommandFuncs::Reconnect ( const char* szParameters )
         // Start the connect
         if ( CCore::GetSingleton ().GetConnectManager ()->Reconnect ( strHost.c_str(), usPort, strPassword.c_str(), false ) )
         {
-            CCore::GetSingleton ().GetConsole ()->Printf ( "connect: Connecting to %s:%u...", strHost, usPort );
+            CCore::GetSingleton ().GetConsole ()->Printf ( "connect: Connecting to %s:%u...", strHost.c_str(), usPort );
         }
         else
         {
-            CCore::GetSingleton ().GetConsole ()->Printf ( "connect: could not connect to %s:%u!", strHost, usPort );
+            CCore::GetSingleton ().GetConsole ()->Printf ( "connect: could not connect to %s:%u!", strHost.c_str(), usPort );
         }
     }
     else
@@ -396,8 +396,8 @@ void CCommandFuncs::CopyGTAControls ( const char* szParameters )
 void CCommandFuncs::HUD ( const char* szParameters )
 {
     int iCmd = ( szParameters && szParameters [ 0 ] ) ? atoi ( szParameters ) : -1;
-    bool bDisabled = ( iCmd == 1 ) ? false : true;
-    CCore::GetSingleton ().GetGame ()->GetHud ()->Disable ( bDisabled );
+    bool bShow = ( iCmd == 1 ) ? true : ( iCmd == 0 ) ? false : g_pCore->GetGame ()->GetHud ()->IsDisabled ();
+    g_pCore->GetGame ()->GetHud ()->Disable ( !bShow );
 }
 
 void CCommandFuncs::SaveConfig ( const char* szParameters )
@@ -433,4 +433,69 @@ void CCommandFuncs::DebugScrollDown ( const char* szParameters )
 void CCommandFuncs::DebugClear ( const char* szParameters )
 {
     CCore::GetSingleton ().GetLocalGUI ()->GetDebugView ()->Clear ();
+}
+
+void CCommandFuncs::Test ( const char* szParameters )
+{
+    if ( SStringX ( szParameters ) == "ca" )
+    {
+        SString strStats = CCrashDumpWriter::GetCrashAvertedStatsSoFar ();
+        SString strMsg = SString ( "Crash averted stats:\n%s", strStats.empty () ? "None" : *strStats );
+        CCore::GetSingleton ().GetConsole ()->Print ( strMsg );
+    }
+    else
+    if ( SStringX ( szParameters ) == "crashme" )
+    {
+        std::string strNick;
+        CVARS_GET ( "nick", strNick );
+        if ( strNick == szParameters )
+        {
+            int* pData = NULL;
+            *pData = 0;
+        }
+    }
+}
+
+void CCommandFuncs::Serial ( const char* szParameters )
+{
+    // Get our serial
+    char szSerial [ 64 ];
+    g_pCore->GetNetwork ()->GetSerial (szSerial, sizeof ( szSerial ));
+
+    // Print it
+    CCore::GetSingleton ().GetConsole ()->Printf ( "* Your serial is: %s", szSerial );
+}
+
+
+void CCommandFuncs::FakeLag ( const char *szCmdLine )
+{
+#if defined(MTA_DEBUG) || defined(MTA_BETA)
+
+    std::vector < SString > parts;
+    SStringX ( szCmdLine ).Split ( " ", parts );
+
+    if ( parts.size () < 3 )
+    {
+        g_pCore->GetConsole ()->Print ( "fakelag <packet loss> <extra ping> <ping variance> [ <KBPS limit> ]" );
+        return;
+    }
+
+    int iPacketLoss = atoi ( parts[0] );
+    int iExtraPing = atoi ( parts[1] );
+    int iExtraPingVary = atoi ( parts[2] );
+    int iKBPSLimit = 0;
+    if ( parts.size () > 3 )
+        iKBPSLimit = atoi ( parts[3] );
+
+    g_pCore->GetNetwork ()->SetFakeLag ( iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit );
+    g_pCore->GetConsole ()->Print ( SString ( "Client send lag is now: %d%% packet loss and %d extra ping with %d extra ping variance and %d KBPS limit", iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit ) );
+
+#endif
+}
+
+void CCommandFuncs::ShowMemStat ( const char* szParameters )
+{
+    int iCmd = ( szParameters && szParameters [ 0 ] ) ? atoi ( szParameters ) : -1;
+    bool bShow = ( iCmd == 1 ) ? true : ( iCmd == 0 ) ? false : !GetMemStats ()->IsEnabled ();
+    GetMemStats ()->SetEnabled ( bShow );
 }

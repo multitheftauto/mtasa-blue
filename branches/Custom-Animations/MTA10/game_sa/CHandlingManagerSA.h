@@ -30,6 +30,9 @@ public:
 
     eHandlingProperty           GetPropertyEnumFromName         ( std::string strName );
 
+    void                        CheckSuspensionChanges          ( CHandlingEntry* pEntry );
+    void                        RemoveChangedVehicle            ( void );
+
 private:
     void                        InitializeDefaultHandlings      ( void );
 
@@ -40,6 +43,7 @@ private:
     static CHandlingEntrySA*    m_pOriginalEntries [HT_MAX];
 
     std::map < std::string, eHandlingProperty > m_HandlingNames;
+    int iChangedVehicles;
 };
 
 #endif

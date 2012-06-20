@@ -32,6 +32,7 @@ public:
     static bool         ResourceInfo        ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         InstallResource     ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         UpgradeResources    ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         CheckAllResources   ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 
     static bool         Say             ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         TeamSay         ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
@@ -68,6 +69,12 @@ public:
     static bool         Ver             ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         Ase             ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         OpenPortsTest   ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         SetDbLogLevel   ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+
+    static bool         ReloadBans      ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+
+    static bool         AclRequest      ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         FakeLag         ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 };
 
 #endif

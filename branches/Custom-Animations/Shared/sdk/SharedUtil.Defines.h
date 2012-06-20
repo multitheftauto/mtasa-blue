@@ -39,6 +39,13 @@
         }
 #endif
 
+//
+// Copy null terminated string to a temporary buffer on the stack
+//
+#define COPY_CSTR_TO_TEMP_BUFFER( tempname, src, maxsize ) \
+    char tempname [maxsize]; \
+    STRNCPY( tempname, src, maxsize );
+
 #ifndef _MSC_VER
     #define _isnan isnan
 #endif
@@ -71,3 +78,27 @@
 #else
     #define dassert(_Expression)     ((void)0)
 #endif
+
+#define SAFE_DELETE(p) { if(p) { delete (p); (p)=NULL; } }
+#define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }
+
+#define PI (3.14159265358979323846f)
+
+// Clear all member variables to zero for a struct.
+// Note: Struct should have simple member variables and no virtual functions.
+#define ZERO_POD_STRUCT(ptr) \
+        memset ( ptr, 0, sizeof(*(ptr)) )
+
+// Crazy thing
+#define LOCAL_FUNCTION_START    struct local {
+#define LOCAL_FUNCTION_END      };
+#define LOCAL_FUNCTION          local
+
+// Inline callback definition for std::sort
+#define sort_inline(a,b,c) \
+        { \
+            LOCAL_FUNCTION_START \
+                static bool SortPredicate c \
+            LOCAL_FUNCTION_END \
+            std::sort ( a, b, LOCAL_FUNCTION::SortPredicate ); \
+        }

@@ -25,47 +25,37 @@ CPlayerCamera::CPlayerCamera ( CPlayer * pPlayer )
 
     m_fRoll = 0.0f;
     m_fFOV = 70.0f;
+
+    GetCameraSpatialDatabase ()->UpdateItem ( this );
 }
 
 
-void CPlayerCamera::GetMode ( eCameraMode Mode, char* szBuffer, size_t sizeBuffer )
+CPlayerCamera::~CPlayerCamera ( void )
 {
-    switch ( Mode )
+    GetCameraSpatialDatabase ()->RemoveItem ( this );
+}
+
+
+void CPlayerCamera::SetMode ( eCameraMode Mode )
+{
+    if ( m_Mode != Mode )
     {
-        case CAMERAMODE_PLAYER:
-        {
-            strncpy ( szBuffer, "player", sizeBuffer );
-            szBuffer [sizeBuffer - 1] = 0;
-            break;
-        }
-
-        case CAMERAMODE_FIXED:
-        {
-            strncpy ( szBuffer, "fixed", sizeBuffer );
-            szBuffer [sizeBuffer - 1] = 0;
-            break;
-        }
-
-        default:
-        {
-            strncpy ( szBuffer, "invalid", sizeBuffer );
-            szBuffer [sizeBuffer - 1] = 0;
-            break;
-        }
+        m_Mode = Mode;
+        if ( m_Mode == CAMERAMODE_FIXED )
+            GetCameraSpatialDatabase ()->UpdateItem ( this );
+        else
+            GetCameraSpatialDatabase ()->RemoveItem ( this );
     }
 }
 
-
-eCameraMode CPlayerCamera::GetMode ( const char * szMode )
+const CVector& CPlayerCamera::GetPosition ( void ) const
 {
-    if ( !stricmp ( szMode, "player" ) )
-        return CAMERAMODE_PLAYER;
-    if ( !stricmp ( szMode, "fixed" ) )
-        return CAMERAMODE_FIXED;
-
-    return CAMERAMODE_INVALID;
+    if ( m_Mode == CAMERAMODE_PLAYER && m_pTarget )
+    {
+        return m_pTarget->GetPosition ();
+    }
+    return m_vecPosition;
 }
-
 
 void CPlayerCamera::GetPosition ( CVector & vecPosition ) const
 {
@@ -85,6 +75,7 @@ void CPlayerCamera::SetPosition ( const CVector& vecPosition )
     if ( m_Mode == CAMERAMODE_FIXED )
     {
         m_vecPosition = vecPosition;
+        GetCameraSpatialDatabase ()->UpdateItem ( this );
     }
 }
 
@@ -117,14 +108,15 @@ void CPlayerCamera::SetMatrix ( const CVector& vecPosition, const CVector& vecLo
     {
         m_vecPosition = vecPosition;
         m_vecLookAt = vecLookAt;
+        GetCameraSpatialDatabase ()->UpdateItem ( this );
     }
 }
 
 
 void CPlayerCamera::SetTarget ( CElement* pElement )
 {
-    // We should always have a target here
-    assert ( pElement );
+    if ( !pElement )
+        pElement = m_pPlayer;
 
     if ( m_pTarget ) m_pTarget->m_FollowingCameras.remove ( this );
     if ( pElement ) pElement->m_FollowingCameras.push_back ( this );

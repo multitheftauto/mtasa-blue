@@ -12,8 +12,12 @@
 
 #include "StdInc.h"
 
+std::set < CPerPlayerEntity* > CPerPlayerEntity::ms_AllPerPlayerEntityMap;
+
+
 CPerPlayerEntity::CPerPlayerEntity ( CElement* pParent, CXMLNode* pNode ) : CElement ( pParent, pNode )
 {
+    MapInsert ( ms_AllPerPlayerEntityMap, this );
     m_bIsSynced = false;
     AddVisibleToReference ( g_pGame->GetMapManager ()->GetRootElement () );
 };
@@ -29,6 +33,7 @@ CPerPlayerEntity::~CPerPlayerEntity ( void )
     {
         if ( !(*iter)->m_ElementReferenced.empty() ) (*iter)->m_ElementReferenced.remove ( this );
     }
+    MapRemove ( ms_AllPerPlayerEntityMap, this );
 }
 
 
@@ -74,6 +79,9 @@ void CPerPlayerEntity::OnReferencedSubtreeRemove ( CElement* pElement )
 
 void CPerPlayerEntity::UpdatePerPlayer ( void )
 {
+    if ( m_PlayersAdded.empty () && m_PlayersRemoved.empty () )    // This check reduces cpu usage when loading large maps (due to recursion)
+        return;
+
     // Remove entries that match in both added and removed lists
     RemoveIdenticalEntries ( m_PlayersAdded, m_PlayersRemoved );
 
@@ -179,15 +187,14 @@ bool CPerPlayerEntity::IsVisibleToReferenced ( CElement* pElement )
 bool CPerPlayerEntity::IsVisibleToPlayer ( CPlayer& Player )
 {
     // Return true if we're visible to the given player
-    list < CPlayer* > ::const_iterator iter = m_Players.begin ();
-    for ( ; iter != m_Players.end (); iter++ )
+    map < ElementID, CPlayer* > ::const_iterator iter = m_PlayersMap.find ( Player.GetID ( ) );
+    if ( iter != m_PlayersMap.end ( ) )
     {
-        if ( *iter == &Player )
+        if ( &Player == (*iter).second )
         {
             return true;
         }
     }
-
     return false;
 }
 
@@ -220,6 +227,8 @@ void CPerPlayerEntity::CreateEntity ( CPlayer* pPlayer )
 }
 
 
+// Optimizations off for this function to track crash
+#pragma optimize( "", off )
 void CPerPlayerEntity::DestroyEntity ( CPlayer* pPlayer )
 {
     // Are we visible?
@@ -242,10 +251,21 @@ void CPerPlayerEntity::DestroyEntity ( CPlayer* pPlayer )
         else
         {
             //CLogger::DebugPrintf ( "Destroyed %u (%s) for everyone (%u)\n", GetID (), GetName (), m_Players.size () );
+
+            // Check m_Players for crash
+            std::multimap < ushort, CPlayer* > groupMap;
+            for ( std::list < CPlayer* > ::iterator iter = m_Players.begin () ; iter != m_Players.end () ; ++iter )
+            {
+                CPlayer* pPlayer = *iter;
+                MapInsert ( groupMap, pPlayer->GetBitStreamVersion (), pPlayer );
+            }
+
             BroadcastOnlyVisible ( Packet );
         }
     }
 }
+
+#pragma optimize( "", on )
 
 
 void CPerPlayerEntity::BroadcastOnlyVisible ( const CPacket& Packet )
@@ -254,11 +274,7 @@ void CPerPlayerEntity::BroadcastOnlyVisible ( const CPacket& Packet )
     if ( m_bIsSynced )
     {
         // Send it to all players we're visible to
-        list < CPlayer* > ::const_iterator iter = m_Players.begin ();
-        for ( ; iter != m_Players.end (); iter++ )
-        {
-            (*iter)->Send ( Packet );
-        }
+        CPlayerManager::Broadcast ( Packet, m_Players );
     }
 }
 
@@ -312,7 +328,9 @@ void CPerPlayerEntity::AddPlayersBelow ( CElement* pElement, list < CPlayer* >& 
     CChildListType ::const_iterator iterChildren = pElement->IterBegin ();
     for ( ; iterChildren != pElement->IterEnd (); iterChildren++ )
     {
-        AddPlayersBelow ( *iterChildren, Added );
+        CElement* pElement = *iterChildren;
+        if ( pElement->CountChildren () || IS_PLAYER ( pElement ) )    // This check reduces cpu usage when loading large maps (due to recursion)
+            AddPlayersBelow ( pElement, Added );
     }
 }
 
@@ -339,7 +357,9 @@ void CPerPlayerEntity::RemovePlayersBelow ( CElement* pElement, list < CPlayer* 
     CChildListType ::const_iterator iterChildren = pElement->IterBegin ();
     for ( ; iterChildren != pElement->IterEnd (); iterChildren++ )
     {
-        RemovePlayersBelow ( *iterChildren, Removed );
+        CElement* pElement = *iterChildren;
+        if ( pElement->CountChildren () || IS_PLAYER ( pElement ) )    // This check reduces cpu usage when unloading large maps (due to recursion)
+            RemovePlayersBelow ( pElement, Removed );
     }
 }
 
@@ -361,4 +381,26 @@ void CPerPlayerEntity::RemovePlayerReference ( CPlayer* pPlayer )
             iter++;
         }
     }
+    m_PlayersMap.erase ( pPlayer->GetID ( ) );
+}
+
+
+//
+// Hacks to stop crash
+//
+void CPerPlayerEntity::StaticOnPlayerDelete ( CPlayer* pPlayer )
+{
+    for ( std::set < CPerPlayerEntity* >::iterator iter = ms_AllPerPlayerEntityMap.begin (); iter != ms_AllPerPlayerEntityMap.begin () ; ++iter )
+    {
+        (*iter)->OnPlayerDelete ( pPlayer );
+    }
+}
+
+
+void CPerPlayerEntity::OnPlayerDelete ( CPlayer* pPlayer )
+{
+    MapRemove ( m_PlayersMap, pPlayer->GetID ( ) );
+    ListRemove ( m_Players, pPlayer );
+    ListRemove ( m_PlayersAdded, pPlayer );
+    ListRemove ( m_PlayersRemoved, pPlayer );
 }

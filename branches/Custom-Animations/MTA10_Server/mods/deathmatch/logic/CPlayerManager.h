@@ -41,36 +41,30 @@ public:
     unsigned int                                CountWithStatus                 ( int iStatus );
     bool                                        Exists                          ( CPlayer* pPlayer );
 
-    CPlayer*                                    Get                             ( NetServerPlayerID& PlayerSocket );
+    CPlayer*                                    Get                             ( const NetServerPlayerID& PlayerSocket );
     CPlayer*                                    Get                             ( const char* szNick, bool bCaseSensitive = false );
-
-    CPlayer*                                    GetBefore                       ( ElementID PlayerID );
-    CPlayer*                                    GetAfter                        ( ElementID PlayerID );
 
     inline std::list < CPlayer* > ::const_iterator  IterBegin                   ( void )                                            { return m_Players.begin (); };
     inline std::list < CPlayer* > ::const_iterator  IterEnd                     ( void )                                            { return m_Players.end (); };
-    inline std::list < CPlayer* > ::const_iterator  IterGet                     ( CPlayer* pPlayer );
-    inline std::list < CPlayer* > ::const_iterator  IterGet                     ( ElementID PlayerID );
 
-    void                                        Broadcast                       ( const CPacket& Packet, CPlayer* pSkip = NULL );
-    void                                        Broadcast                       ( const CPacket& Packet, std::list < CPlayer * > & playersList );
     void                                        BroadcastOnlyJoined             ( const CPacket& Packet, CPlayer* pSkip = NULL );
+
+    static void                                 Broadcast                       ( const CPacket& Packet, const std::set < CPlayer* >& sendList );
+    static void                                 Broadcast                       ( const CPacket& Packet, const std::list < CPlayer* >& sendList );
+    static void                                 Broadcast                       ( const CPacket& Packet, const std::vector < CPlayer* >& sendList );
 
     static bool                                 IsValidPlayerModel              ( unsigned short usPlayerModel );
 
     void                                        ResetAll                        ( void );
 
-    void                                        ClearSyncTime                   ( CPlayer& Player );
-    void                                        ClearSyncTimes                  ( void );
-
 private:
-    inline void                                 AddToList                       ( CPlayer* pPlayer )                                { m_Players.push_back ( pPlayer ); };
+    void                                        AddToList                       ( CPlayer* pPlayer );
     void                                        RemoveFromList                  ( CPlayer* pPlayer );
 
     class CScriptDebugging*                     m_pScriptDebugging;
 
     CMappedList < CPlayer* >                    m_Players;
-    bool                                        m_bCanRemoveFromList;
+    std::map < NetServerPlayerID, CPlayer* >    m_SocketPlayerMap;
 };
 
 #endif

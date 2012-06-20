@@ -21,7 +21,7 @@ using std::list;
 
 extern CClientGame* g_pClientGame;
 
-#define UNOCCUPIED_VEHICLE_SYNC_RATE 1000
+#define UNOCCUPIED_VEHICLE_SYNC_RATE   ( g_TickRateSettings.iUnoccupiedVehicle )
 
 CUnoccupiedVehicleSync::CUnoccupiedVehicleSync ( CClientVehicleManager* pVehicleManager )
 {
@@ -257,7 +257,7 @@ void CUnoccupiedVehicleSync::UpdateStates ( void )
 
             // Send and destroy the packet
             if ( bAnyVehicleAdded )
-                g_pNet->SendPacket ( PACKET_ID_UNOCCUPIED_VEHICLE_SYNC, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
+                g_pNet->SendPacket ( PACKET_ID_UNOCCUPIED_VEHICLE_SYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED );
             g_pNet->DeallocateNetBitStream ( pBitStream );
         }
     }
@@ -305,13 +305,9 @@ bool CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
             pVehicle->m_LastSyncedData->vecPosition = vehicle.data.vecPosition;
         }
 
-        const CVector& vecLastVelocity = pVehicle->m_LastSyncedData->vecMoveSpeed;
-        if ( vecLastVelocity != vehicle.data.vecVelocity &&
-             (
-               fabs ( vehicle.data.vecVelocity.fX ) > FLOAT_EPSILON ||
-               fabs ( vehicle.data.vecVelocity.fY ) > FLOAT_EPSILON ||
-               fabs ( vehicle.data.vecVelocity.fZ ) > FLOAT_EPSILON
-             )
+        if ( fabs ( vehicle.data.vecVelocity.fX ) > FLOAT_EPSILON ||
+             fabs ( vehicle.data.vecVelocity.fY ) > FLOAT_EPSILON ||
+             fabs ( vehicle.data.vecVelocity.fZ ) > 0.1f
            )
         {
             bSyncVehicle = true;
@@ -321,14 +317,19 @@ bool CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
     }
     else
     {
-        if ( pVehicle->m_LastSyncedData->vecPosition != vehicle.data.vecPosition )
+        const CVector& vecLastPosition = pVehicle->m_LastSyncedData->vecPosition;
+        if ( fabs ( vecLastPosition.fX - vehicle.data.vecPosition.fX ) > FLOAT_EPSILON ||
+             fabs ( vecLastPosition.fY - vehicle.data.vecPosition.fY ) > FLOAT_EPSILON ||
+             fabs ( vecLastPosition.fZ - vehicle.data.vecPosition.fZ ) > 0.1f  )
         {
             bSyncVehicle = true;
             vehicle.data.bSyncPosition = true;
             pVehicle->m_LastSyncedData->vecPosition = vehicle.data.vecPosition;
         }
 
-        if ( pVehicle->m_LastSyncedData->vecMoveSpeed != vehicle.data.vecVelocity )
+        if ( fabs ( vehicle.data.vecVelocity.fX ) > FLOAT_EPSILON ||
+             fabs ( vehicle.data.vecVelocity.fY ) > FLOAT_EPSILON ||
+             fabs ( vehicle.data.vecVelocity.fZ ) > 0.1f )
         {
             bSyncVehicle = true;
             vehicle.data.bSyncVelocity = true;
@@ -336,7 +337,10 @@ bool CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
         }
     }
 
-    if ( pVehicle->m_LastSyncedData->vecRotation != vehicle.data.vecRotation )
+    const CVector& vecLastRotation = pVehicle->m_LastSyncedData->vecRotation;
+    if ( GetSmallestWrapUnsigned ( vecLastRotation.fX - vehicle.data.vecRotation.fX, 360 ) > MIN_ROTATION_DIFF ||
+         GetSmallestWrapUnsigned ( vecLastRotation.fY - vehicle.data.vecRotation.fY, 360 ) > MIN_ROTATION_DIFF ||
+         GetSmallestWrapUnsigned ( vecLastRotation.fZ - vehicle.data.vecRotation.fZ, 360 ) > MIN_ROTATION_DIFF )
     {
         bSyncVehicle = true;
         vehicle.data.bSyncRotation = true;
@@ -364,22 +368,25 @@ bool CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
         pVehicle->m_LastSyncedData->Trailer = vehicle.data.trailer;
     }
 
-    if ( pVehicle->IsEngineOn () )
+    if ( pVehicle->m_LastSyncedData->bEngineOn != pVehicle->IsEngineOn () )
     {
         bSyncVehicle = true;
-        vehicle.data.bEngineOn = true;
+        vehicle.data.bEngineOn = pVehicle->IsEngineOn ();
+        pVehicle->m_LastSyncedData->bEngineOn = vehicle.data.bEngineOn;
     }
 
-    if ( pVehicle->IsDerailed () )
+    if ( pVehicle->m_LastSyncedData->bDerailed != pVehicle->IsDerailed () )
     {
         bSyncVehicle = true;
-        vehicle.data.bDerailed = true;
+        vehicle.data.bDerailed = pVehicle->IsDerailed ();
+        pVehicle->m_LastSyncedData->bDerailed = vehicle.data.bDerailed;
     }
 
-    if ( pVehicle->IsInWater () )
+    if ( pVehicle->m_LastSyncedData->bIsInWater != pVehicle->IsInWater () )
     {
         bSyncVehicle = true;
-        vehicle.data.bIsInWater = true;
+        vehicle.data.bIsInWater = pVehicle->IsInWater ();
+        pVehicle->m_LastSyncedData->bIsInWater = vehicle.data.bIsInWater;
     }
 
     // If nothing has changed we dont sync the vehicle

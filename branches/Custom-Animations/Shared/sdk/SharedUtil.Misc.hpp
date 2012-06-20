@@ -13,13 +13,14 @@
 *****************************************************************************/
 
 #include "UTF8.h"
-#include "minibidi.c"
 #include "CNickGen.h"
 #include "UTF8Detect.cpp"
 #ifdef WIN32
     #include <direct.h>
     #include <shellapi.h>
 #endif
+
+CCriticalSection CRefCountable::ms_CS;
 
 #ifdef MTA_CLIENT
 #ifdef WIN32
@@ -114,63 +115,110 @@ static bool DeleteRegistryKey ( HKEY hkRoot, const char* szSubKey )
 }
 
 
+
+
 //
-// GetVersionAppendString
+// GetMajorVersionString
 //
-SString SharedUtil::GetVersionAppendString ( const SString& strUsingASEVersion )
+SString SharedUtil::GetMajorVersionString ( void )
 {
-    SString strVersionAppend = SString ( " %s", strUsingASEVersion.empty () ? MTA_DM_ASE_VERSION : *strUsingASEVersion );
+    return SStringX ( MTA_DM_ASE_VERSION ).Left ( 3 );
+}
 
-    // Remove nightly appendage
-    strVersionAppend = strVersionAppend.TrimEnd ( "n" );
-
-    // 1.0 has no version number in the path
-    if ( strVersionAppend == " 1.0" )
-        strVersionAppend = "";
-
-    return strVersionAppend;
+//
+// GetSystemRegistryValue
+//
+SString SharedUtil::GetSystemRegistryValue ( uint hKey, const SString& strPath, const SString& strName )
+{
+    return ReadRegistryStringValue ( (HKEY)hKey, strPath, strName, NULL );
 }
 
 
+
+// Old layout:
+//              HKCU Software\\Multi Theft Auto: San Andreas\\             - For 1.0
+//              HKCU Software\\Multi Theft Auto: San Andreas 1.1\\         - For 1.1
 //
-// MakeRegistryPath
-//
-// Turns "Settings"
-// into  "Software\\Multi Theft Auto: San Andreas 1.1\\Settings"
-// 
-static SString MakeRegistryPath ( const SString& strInPath )
+static SString MakeVersionRegistryPathLegacy ( const SString& strVersion, const SString& strPath )
 {
-    SString strPath = strInPath;
-    SString strUsingASEVersion = MTA_DM_ASE_VERSION;
+    SString strResult = "Software\\Multi Theft Auto: San Andreas";
+    if ( strVersion != "1.0" )
+        strResult += " " + strVersion;
 
-    // Use version from path instead?
-    if ( strPath.Left ( 3 ) == "..\\" )
-    {
-        strPath.Right ( strPath.length () - 3 ).Split ( "\\", &strUsingASEVersion, &strPath );
-    }
-
-    SString strResult = PathJoin ( "Software\\Multi Theft Auto: San Andreas" + GetVersionAppendString ( strUsingASEVersion ), strPath );
+    strResult = PathJoin ( strResult, strPath );
     strResult = strResult.TrimEnd ( "\\" );
     return strResult;
+}
+
+
+// Get/set registry values for a version using the old (HKCU) layout
+void SharedUtil::SetVersionRegistryValueLegacy ( const SString& strVersion, const SString& strPath, const SString& strName, const SString& strValue )
+{
+    WriteRegistryStringValue ( HKEY_CURRENT_USER, MakeVersionRegistryPathLegacy ( strVersion, strPath ), strName, strValue );
+}
+
+SString SharedUtil::GetVersionRegistryValueLegacy ( const SString& strVersion, const SString& strPath, const SString& strName )
+{
+    return ReadRegistryStringValue ( HKEY_CURRENT_USER, MakeVersionRegistryPathLegacy ( strVersion, strPath ), strName, NULL );
+}
+
+
+
+//
+// New layout:
+//              HKLM Software\\Multi Theft Auto: San Andreas All\\Common    - For all versions
+//              HKLM Software\\Multi Theft Auto: San Andreas All\\1.1       - For 1.1
+//              HKLM Software\\Multi Theft Auto: San Andreas All\\1.2       - For 1.2
+//
+static SString MakeVersionRegistryPath ( const SString& strVersion, const SString& strPath )
+{
+    SString strResult = PathJoin ( "Software\\Multi Theft Auto: San Andreas All", strVersion, strPath );
+    return strResult.TrimEnd ( "\\" );
 }
 
 //
 // Registry values
 // 
-void SharedUtil::SetRegistryValue ( const SString& strPath, const SString& strKey, const SString& strValue )
+// Get/set registry values for the current version
+void SharedUtil::SetRegistryValue ( const SString& strPath, const SString& strName, const SString& strValue )
 {
-    WriteRegistryStringValue ( HKEY_CURRENT_USER, MakeRegistryPath ( strPath ), strKey, strValue );
+    WriteRegistryStringValue ( HKEY_LOCAL_MACHINE, MakeVersionRegistryPath ( GetMajorVersionString (), strPath ), strName, strValue );
 }
 
-SString SharedUtil::GetRegistryValue ( const SString& strPath, const SString& strKey )
+SString SharedUtil::GetRegistryValue ( const SString& strPath, const SString& strName )
 {
-    return ReadRegistryStringValue ( HKEY_CURRENT_USER, MakeRegistryPath ( strPath ), strKey, NULL );
+    return ReadRegistryStringValue ( HKEY_LOCAL_MACHINE, MakeVersionRegistryPath ( GetMajorVersionString (), strPath ), strName, NULL );
 }
 
-bool DeleteRegistryValue ( const SString& strPathKey )
+bool SharedUtil::RemoveRegistryKey ( const SString& strPath )
 {
-    return DeleteRegistryKey ( HKEY_CURRENT_USER, strPathKey );
+    return DeleteRegistryKey ( HKEY_LOCAL_MACHINE, MakeVersionRegistryPath ( GetMajorVersionString (), strPath ) );
 }
+
+// Get/set registry values for a version
+void SharedUtil::SetVersionRegistryValue ( const SString& strVersion, const SString& strPath, const SString& strName, const SString& strValue )
+{
+    WriteRegistryStringValue ( HKEY_LOCAL_MACHINE, MakeVersionRegistryPath ( strVersion, strPath ), strName, strValue );
+}
+
+SString SharedUtil::GetVersionRegistryValue ( const SString& strVersion, const SString& strPath, const SString& strName )
+{
+    return ReadRegistryStringValue ( HKEY_LOCAL_MACHINE, MakeVersionRegistryPath ( strVersion, strPath ), strName, NULL );
+}
+
+// Get/set registry values for all versions (common)
+void SharedUtil::SetCommonRegistryValue ( const SString& strPath, const SString& strName, const SString& strValue )
+{
+    WriteRegistryStringValue ( HKEY_LOCAL_MACHINE, MakeVersionRegistryPath ( "Common", strPath ), strName, strValue );
+}
+
+SString SharedUtil::GetCommonRegistryValue ( const SString& strPath, const SString& strName )
+{
+    return ReadRegistryStringValue ( HKEY_LOCAL_MACHINE, MakeVersionRegistryPath ( "Common", strPath ), strName, NULL );
+}
+
+
+
 
 
 //
@@ -233,67 +281,59 @@ bool SharedUtil::GetOnRestartCommand ( SString& strOperation, SString& strFile, 
 //
 // Get/set string
 //
-void SharedUtil::SetApplicationSetting ( const SString& strPath, const SString& strKey, const SString& strValue )
+void SharedUtil::SetApplicationSetting ( const SString& strPath, const SString& strName, const SString& strValue )
 {
-    SetRegistryValue ( PathJoin ( "Settings", strPath ), strKey, strValue );
+    SetRegistryValue ( PathJoin ( "Settings", strPath ), strName, strValue );
 }
 
-SString SharedUtil::GetApplicationSetting ( const SString& strPath, const SString& strKey )
+SString SharedUtil::GetApplicationSetting ( const SString& strPath, const SString& strName )
 {
-    return GetRegistryValue ( PathJoin ( "Settings", strPath ), strKey );
+    return GetRegistryValue ( PathJoin ( "Settings", strPath ), strName );
 }
+
+// Delete a setting key
+bool SharedUtil::RemoveApplicationSettingKey ( const SString& strPath )
+{
+    return RemoveRegistryKey ( PathJoin ( "Settings", strPath ) );
+}
+
 
 //
 // Get/set int
 //
-void SharedUtil::SetApplicationSettingInt ( const SString& strPath, const SString& strKey, int iValue )
+void SharedUtil::SetApplicationSettingInt ( const SString& strPath, const SString& strName, int iValue )
 {
-    SetApplicationSetting ( strPath, strKey, SString ( "%d", iValue ) );
+    SetApplicationSetting ( strPath, strName, SString ( "%d", iValue ) );
 }
 
-int SharedUtil::GetApplicationSettingInt ( const SString& strPath, const SString& strKey )
+int SharedUtil::GetApplicationSettingInt ( const SString& strPath, const SString& strName )
 {
-    return atoi ( GetApplicationSetting ( strPath, strKey ) );
+    return atoi ( GetApplicationSetting ( strPath, strName ) );
 }
 
-//
-// Get/set string - Combined path and key i.e. "group.key"
-//
-SString SharedUtil::GetApplicationSetting ( const SString& strPathKey )
-{
-    SString strPath;
-    SString strKey = strPathKey.SplitRight ( ".", &strPath, -1 );
-    if ( !strPath.length () )
-        strPath = "general";
-    return GetApplicationSetting ( strPath, strKey );
-}
 
-void SharedUtil::SetApplicationSetting ( const SString& strPathKey, const SString& strValue )
-{
-    SString strPath;
-    SString strKey = strPathKey.SplitRight ( ".", &strPath, -1 );
-    if ( !strPath.length () )
-        strPath = "general";
-    SetApplicationSetting ( strPath, strKey, strValue );
-}
 
 //
-// Get/set int - Combined path and key i.e. "group.key"
+// Get/set string - Which uses 'general' key
 //
-void SharedUtil::SetApplicationSettingInt ( const SString& strPathKey, int iValue )
+void SharedUtil::SetApplicationSetting ( const SString& strName, const SString& strValue )
 {
-    SetApplicationSetting ( strPathKey, SString ( "%d", iValue ) );
+    SetApplicationSetting ( "general", strName, strValue );
 }
 
-int SharedUtil::GetApplicationSettingInt ( const SString& strPathKey )
+SString SharedUtil::GetApplicationSetting ( const SString& strName )
 {
-    return atoi ( GetApplicationSetting ( strPathKey ) );
+    return GetApplicationSetting ( "general", strName );
 }
 
-// Delete a setting key
-static bool DeleteApplicationSettingKey ( const SString& strPathKey )
+void SharedUtil::SetApplicationSettingInt ( const SString& strName, int iValue )
 {
-    return DeleteRegistryValue ( "Settings." + strPathKey );
+    SetApplicationSettingInt ( "general", strName, iValue );
+}
+
+int SharedUtil::GetApplicationSettingInt ( const SString& strName )
+{
+    return GetApplicationSettingInt ( "general", strName );
 }
 
 
@@ -304,7 +344,7 @@ static bool DeleteApplicationSettingKey ( const SString& strPathKey )
 
 void SharedUtil::WatchDogReset ( void )
 {
-    DeleteApplicationSettingKey ( "watchdog" );
+    RemoveApplicationSettingKey ( "watchdog" );
 }
 
 // Section
@@ -459,26 +499,26 @@ static SString GetReportLogHeaderText ( void )
 
 void SharedUtil::AddReportLog ( uint uiId, const SString& strText )
 {
-    SString strPathFilename = PathJoin ( GetMTALocalAppDataPath (), "report.log" );
+    SString strPathFilename = PathJoin ( GetMTADataPath (), "report.log" );
     MakeSureDirExists ( strPathFilename );
 
     SString strMessage ( "%u: %s %s - %s\n", uiId, GetTimeString ( true, false ).c_str (), GetReportLogHeaderText ().c_str (), strText.c_str () );
     FileAppend ( strPathFilename, &strMessage.at ( 0 ), strMessage.length () );
 #if MTA_DEBUG
-    OutputDebugString ( SStringX ( "ReportLog: " ) + strMessage );
+    OutputDebugLine ( SStringX ( "[ReportLog] " ) + strMessage );
 #endif
 }
 
 void SharedUtil::SetReportLogContents ( const SString& strText )
 {
-    SString strPathFilename = PathJoin ( GetMTALocalAppDataPath (), "report.log" );
+    SString strPathFilename = PathJoin ( GetMTADataPath (), "report.log" );
     MakeSureDirExists ( strPathFilename );
     FileSave ( strPathFilename, strText.length () ? &strText.at ( 0 ) : NULL, strText.length () );
 }
 
 SString SharedUtil::GetReportLogContents ( void )
 {
-    SString strReportFilename = PathJoin ( GetMTALocalAppDataPath (), "report.log" );
+    SString strReportFilename = PathJoin ( GetMTADataPath (), "report.log" );
     // Load file into a string
     std::vector < char > buffer;
     FileLoad ( strReportFilename, buffer );
@@ -517,6 +557,7 @@ SString SharedUtil::GetSystemErrorMessage ( uint uiError, bool bRemoveNewlines, 
 
     return strResult;
 }
+
 
 #endif
 
@@ -719,6 +760,29 @@ SString SharedUtil::UnescapeString ( const SString& strText, char cSpecialChar )
 
 #endif
 
+//
+// Ensure rand() seed gets set to a new unique value
+//
+void SharedUtil::RandomizeRandomSeed ( void )
+{
+    srand ( rand () + GetTickCount32 () );
+}
+
+
+//
+// Return true if currently executing the main thread.
+// Main thread being defined as the thread the function is first called from.
+//
+bool SharedUtil::IsMainThread ( void )
+{
+#ifdef WIN32
+    static DWORD dwMainThread = GetCurrentThreadId ();
+    return GetCurrentThreadId () == dwMainThread;
+#else
+    static pthread_t dwMainThread = pthread_self ();
+    return pthread_equal ( pthread_self (), dwMainThread ) != 0;
+#endif
+}
 
 
 //
@@ -828,7 +892,7 @@ std::string SharedUtil::UTF16ToMbUTF8 (const std::wstring& input)
 }
 
 // Get UTF8 confidence
-int SharedUtil::GetUTF8Confidence (unsigned char* input, int len)
+int SharedUtil::GetUTF8Confidence (const unsigned char* input, int len)
 {
     return icu_getUTF8Confidence (input, len);
 }
@@ -843,38 +907,9 @@ std::wstring SharedUtil::ANSIToUTF16 ( const std::string& input )
     mbstowcs ( wcsOutput, input.c_str(), input.length() );
     wcsOutput[len] = NULL; //Null terminate the string
     std::wstring strOutput(wcsOutput);
-    delete wcsOutput;
+    delete [] wcsOutput;
     return strOutput;
 }
-
-std::wstring SharedUtil::GetBidiString (const std::wstring input)
-{
-    int iCount = input.size();
-    wchar_t* wcsLineBidi = new wchar_t[iCount + 1];
-    memcpy ( wcsLineBidi, input.c_str(), ( iCount + 1 ) * sizeof ( wchar_t ) );
-    doBidi ( wcsLineBidi, iCount, 1, 1 );  //Process our UTF string through MiniBidi, for Bidirectionalism
-    std::wstring strLineBidi(wcsLineBidi);
-    delete wcsLineBidi;
-    return strLineBidi;
-}
-
-
-#ifdef MTA_DEBUG
-//
-// Output timestamped line into the debugger
-//
-void SharedUtil::OutputDebugLine ( const char* szMessage )
-{
-    SString strMessage = GetLocalTimeString ( false, true ) + " - " + szMessage;
-    if ( strMessage.length () > 0 && strMessage[ strMessage.length () - 1 ] != '\n' )
-        strMessage += "\n";
-#ifdef _WIN32
-    OutputDebugString ( strMessage );
-#else
-    // Other platforms here
-#endif
-}
-#endif
 
 
 //
@@ -886,8 +921,8 @@ bool SharedUtil::IsValidVersionString ( const SString& strVersion )
     uint uiLength = Min ( strCheck.length (), strVersion.length () );
     for ( unsigned int i = 0 ; i < uiLength ; i++ )
     {
-        char c = strVersion[i];
-        char d = strCheck[i];
+        uchar c = strVersion[i];
+        uchar d = strCheck[i];
         if ( !isdigit( c ) || !isdigit( d ) )
             if ( c != d )
                 return false;
@@ -899,30 +934,40 @@ bool SharedUtil::IsValidVersionString ( const SString& strVersion )
 //
 // Try to make a path relative to the 'resources/' directory
 //
-SString SharedUtil::ConformResourcePath ( const char* szRes )
+SString SharedUtil::ConformResourcePath ( const char* szRes, bool bConvertToUnixPathSep )
 {
     // Remove up to first '/resources/'
     // else
     // remove up to first '/resource-cache/unzipped/'
+    // else
+    // remove up to first '/http-client-protected-files/'
     // else
     // remove up to first '/deathmatch/'
     // else
     // if starts with '...'
     //  remove up to first '/'
 
-    SString strDelimList[] = { "/resources/", "/resource-cache/unzipped/", "/deathmatch/" };
+    SString strDelimList[] = { "/resources/", "/resource-cache/unzipped/", "/http-client-files-protected/", "/deathmatch/" };
     SString strText = szRes ? szRes : "";
+    char cPathSep;
+
+    // Handle which path sep char
 #ifdef WIN32
-    char cPathSep = '\\';
-    for ( unsigned int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
-        strDelimList[i] = strDelimList[i].Replace ( "/", "\\" );
-    strText = strText.Replace ( "/", "\\" );
-#else
-    char cPathSep = '/';
-    for ( unsigned int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
-        strDelimList[i] = strDelimList[i].Replace ( "\\", "/" );
-    strText = strText.Replace ( "\\", "/" );
+    if ( !bConvertToUnixPathSep )
+    {
+        cPathSep = '\\';
+        for ( unsigned int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
+            strDelimList[i] = strDelimList[i].Replace ( "/", "\\" );
+        strText = strText.Replace ( "/", "\\" );
+    }
+    else
 #endif
+    {
+        cPathSep = '/';
+        for ( unsigned int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
+            strDelimList[i] = strDelimList[i].Replace ( "\\", "/" );
+        strText = strText.Replace ( "\\", "/" );
+    }
 
     for ( unsigned int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
     {
@@ -956,6 +1001,12 @@ namespace SharedUtil
         , m_strPartsSep ( strPartsSep )
     {
         m_strDisallowedChars = strExtraDisallowedChars + m_strArgSep + m_strPartsSep;
+        m_cEscapeCharacter = '#';
+    }
+
+    void CArgMap::SetEscapeCharacter ( char cEscapeCharacter )
+    {
+        m_cEscapeCharacter = cEscapeCharacter;
     }
 
     void CArgMap::Merge ( const CArgMap& other, bool bAllowMultiValues )
@@ -1016,12 +1067,12 @@ namespace SharedUtil
 
     SString CArgMap::Escape ( const SString& strIn ) const
     {
-        return EscapeString ( strIn, m_strDisallowedChars );
+        return EscapeString ( strIn, m_strDisallowedChars, m_cEscapeCharacter );
     } 
 
     SString CArgMap::Unescape ( const SString& strIn ) const
     {
-        return UnescapeString ( strIn );
+        return UnescapeString ( strIn, m_cEscapeCharacter );
     } 
 
 
@@ -1109,6 +1160,161 @@ namespace SharedUtil
     {
         for ( std::multimap < SString, SString > ::const_iterator iter = m_Map.begin () ; iter != m_Map.end () ; ++iter )
             outList.push_back ( iter->first );
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    //
+    // GetCurrentProcessorNumber for the current thread.
+    //
+    // Only a guide as it could change after the call has returned
+    //
+    ///////////////////////////////////////////////////////////////////////////
+    DWORD _GetCurrentProcessorNumber ( void )
+    {
+        DWORD dwProcessorNumber = -1;
+#ifdef WIN32
+        typedef DWORD (WINAPI *FUNC_GetCurrentProcessorNumber)( VOID ); 
+
+        // Dynamically load GetCurrentProcessorNumber, as it does not exist on XP
+        static FUNC_GetCurrentProcessorNumber pfn = NULL;
+        static bool bDone = false;
+        if ( !bDone )
+        {
+            HMODULE hModule = LoadLibraryA ( "Kernel32" );
+            pfn = static_cast < FUNC_GetCurrentProcessorNumber > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetCurrentProcessorNumber" ) ) );
+            bDone = true;
+        }
+
+        if ( pfn )
+            dwProcessorNumber = pfn ();
+#endif
+        return dwProcessorNumber;
+    }
+
+
+    //
+    // class CRanges
+    //
+    //  Ranges of numbers. i.e.   100-4000, 5000-6999, 7000-7010
+    //
+    void CRanges::SetRange ( uint uiStart, uint uiLength )
+    {
+        if ( uiLength < 1 )
+            return;
+        uint uiLast = uiStart + uiLength - 1;
+
+        // Make a hole
+        UnsetRange ( uiStart, uiLength );
+
+        // Insert
+        m_StartLastMap [ uiStart ] = uiLast;
+
+        // Maybe join adjacent ranges one day
+    }
+
+    void CRanges::UnsetRange ( uint uiStart, uint uiLength )
+    {
+        if ( uiLength < 1 )
+            return;
+        uint uiLast = uiStart + uiLength - 1;
+ 
+        RemoveObscuredRanges ( uiStart, uiLast );
+
+        IterType iterOverlap;
+        if ( GetRangeOverlappingPoint ( uiStart, iterOverlap ) )
+        {
+            uint uiOverlapPrevLast = iterOverlap->second;
+
+            // Modify overlapping range last point
+            uint uiNewLast = uiStart - 1;
+            iterOverlap->second = uiNewLast;
+
+            if ( uiOverlapPrevLast > uiLast )
+            {
+                // Need to add range after hole
+                uint uiNewStart = uiLast + 1;
+                m_StartLastMap[ uiNewStart ] = uiOverlapPrevLast;
+            }
+        }
+
+        if ( GetRangeOverlappingPoint ( uiLast, iterOverlap ) )
+        {
+            // Modify overlapping range start point
+            uint uiNewStart = uiLast + 1;
+            uint uiOldLast = iterOverlap->second;
+            m_StartLastMap.erase ( iterOverlap );
+            m_StartLastMap[ uiNewStart ] = uiOldLast;
+        }
+    }
+
+    // Returns true if any part of the range already exists in the map
+    bool CRanges::IsRangeSet ( uint uiStart, uint uiLength )
+    {
+        if ( uiLength < 1 )
+            return false;
+        uint uiLast = uiStart + uiLength - 1;
+
+        IterType iter = m_StartLastMap.lower_bound ( uiStart );
+        // iter is on or after start
+
+        if ( iter != m_StartLastMap.end () )
+        {
+            // If start of found range is before or at query last, then range is used
+            if ( iter->first <= uiLast )
+                return true;
+        }
+
+        if ( iter != m_StartLastMap.begin () )
+        {
+            iter--;
+            // iter is now before start
+
+            // If last of found range is after or at query start, then range is used
+            if ( iter->second >= uiStart )
+                return true;
+        }
+
+        return false;
+    }
+
+    void CRanges::RemoveObscuredRanges ( uint uiStart, uint uiLast )
+    {
+        while ( true )
+        {
+            IterType iter = m_StartLastMap.lower_bound ( uiStart );
+            // iter is on or after start
+
+            if ( iter == m_StartLastMap.end () )
+                return;
+
+            // If last of found range is after query last, then range is not obscured
+            if ( iter->second > uiLast )
+                return;
+
+            // Remove obscured
+            m_StartLastMap.erase ( iter );
+        }
+    }
+
+    bool CRanges::GetRangeOverlappingPoint ( uint uiPoint, IterType& result )
+    {
+        IterType iter = m_StartLastMap.lower_bound ( uiPoint );
+        // iter is on or after point - So it can't overlap the point
+
+        if ( iter != m_StartLastMap.begin () )
+        {
+            iter--;
+            // iter is now before point
+
+            // If last of found range is after or at query point, then range is overlapping
+            if ( iter->second >= uiPoint )
+            {
+                result = iter;
+                return true;
+            }
+        }
+        return false;
     }
 
 }

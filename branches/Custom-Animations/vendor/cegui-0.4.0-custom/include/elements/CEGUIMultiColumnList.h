@@ -1219,7 +1219,7 @@ public:
 	virtual ~MultiColumnList(void);
 
 
-protected:
+public:
 	/*************************************************************************
 		Implementation Functions (abstract interface)
 	*************************************************************************/

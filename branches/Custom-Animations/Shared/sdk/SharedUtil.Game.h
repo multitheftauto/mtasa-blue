@@ -13,8 +13,23 @@
 namespace SharedUtil
 {
 
-    bool            GetTrafficLightStateFromStrings ( const char* szColorNS, const char* szColorEW,
-                                                      unsigned char& ucOutput );
+    namespace TrafficLight
+    {
+        enum EColor
+        {
+            GREEN,
+            YELLOW,
+            RED
+        };
+    
+        enum EState
+        {
+            AUTO,
+            DISABLED,
+        };
+    }
+
+    unsigned char   GetTrafficLightStateFromColors ( TrafficLight::EColor eColorNS, TrafficLight::EColor eColorEW );
 
     class CVehicleColor
     {
@@ -72,5 +87,20 @@ namespace SharedUtil
         ushort      usRenderSizeY;      //     0 to 1000
         bool        bInsideBuilding;
     };
+
+
+    namespace EDiagnosticDebug
+    {
+        enum EDiagnosticDebugType
+        {
+            NONE,
+            GRAPHICS_6734,
+            BIDI_6778,
+            D3D_6732,
+            LOG_TIMING_0000,
+        };
+    };
+
+    using EDiagnosticDebug::EDiagnosticDebugType;
 
 }

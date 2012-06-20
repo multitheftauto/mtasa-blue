@@ -11,7 +11,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include <utils/CMD5Hasher.h>
 #include "CVersionUpdater.Util.hpp"
 #include "CNewsBrowser.h"
 
@@ -40,8 +39,10 @@ public:
     virtual void        InitiateManualCheck                 ( void );
     virtual void        GetAseServerList                    ( std::vector < SString >& outResult );
     virtual void        InitiateSidegradeLaunch             ( const SString& strVersion, const SString& strHost, ushort usPort, const SString& strName, const SString& strPassword );
-    virtual void        GetBlockedVersionMap                ( std::map < SString, int >& outBlockedVersionMap );
+    virtual void        GetBrowseVersionMaps                ( std::map < SString, int >& outBlockedVersionMap, std::map < SString, int >& outAllowedVersionMap );
     virtual void        GetNewsSettings                     ( SString& strOutOldestPost, uint& uiOutMaxHistoryLength );
+    virtual const SString&  GetDebugFilterString            ( void );
+
 
     // CVersionUpdater functions
     bool                EnsureLoadedConfigFromXML           ( void );
@@ -57,20 +58,23 @@ public:
     void                ResetEverything                     ( void );
     CReportWrap*        GetReportWrap                       ( void );
     static std::vector < SString > MakeServerList           ( const CDataInfoSet& infoMap );
-    void                UpdateTroubleURL                    ( void );
+    void                PostChangeMasterConfig              ( void );
     void                OnPossibleConfigProblem             ( void );
 
     // Commands
     void                _UseMasterFetchURLs                 ( void );
     void                _UseVersionQueryURLs                ( void );
     void                _UseProvidedURLs                    ( void );
-    void                _UseDataFilesURLs                   ( void );
+    void                _UseDataFiles2URLs                   ( void );
     void                _UseReportLogURLs                   ( void );
+    void                _UseCrashDumpQueryURLs              ( void );
     void                _UseCrashDumpURLs                   ( void );
     void                _UseSidegradeURLs                   ( void );
     void                _UseNewsUpdateURLs                  ( void );
     void                _UseReportLogPostContent            ( void );
     void                _UseCrashDumpPostContent            ( void );
+    void                _ShouldSendCrashDump                ( void );
+    void                _ResetLastCrashDump                 ( void );
     void                _ActionReconnect                    ( void );
     void                _DialogHide                         ( void );
     void                _End                                ( void );
@@ -105,6 +109,7 @@ public:
     void                _DialogSidegradeLaunchQuestion      ( void );
     void                _DialogSidegradeQueryError          ( void );
 
+    void                _ProcessCrashDumpQuery              ( void );
     void                _ProcessMasterFetch                 ( void );
     void                _ProcessPatchFileQuery              ( void );
     void                _ProcessPatchFileDownload           ( void );
@@ -274,20 +279,26 @@ bool CVersionUpdater::EnsureLoadedConfigFromXML ( void )
         XMLAccess.GetSubNodeValue ( "version.interval",             m_MasterConfig.version.interval );
         XMLAccess.GetSubNodeValue ( "report.serverlist",            m_MasterConfig.report.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "report.interval",              m_MasterConfig.report.interval );
+        XMLAccess.GetSubNodeValue ( "report.filter2",               m_MasterConfig.report.strFilter );
+        XMLAccess.GetSubNodeValue ( "report.minsize",               m_MasterConfig.report.iMinSize );
+        XMLAccess.GetSubNodeValue ( "report.maxsize",               m_MasterConfig.report.iMaxSize );
         XMLAccess.GetSubNodeValue ( "crashdump.serverlist",         m_MasterConfig.crashdump.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "crashdump.duplicates",         m_MasterConfig.crashdump.iDuplicates );
         XMLAccess.GetSubNodeValue ( "crashdump.maxhistorylength",   m_MasterConfig.crashdump.iMaxHistoryLength );
         XMLAccess.GetSubNodeValue ( "gtadatafiles.serverlist",      m_MasterConfig.gtadatafiles.serverInfoMap );
+        XMLAccess.GetSubNodeValue ( "gtadatafiles2.serverlist",     m_MasterConfig.gtadatafiles2.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "trouble.serverlist",           m_MasterConfig.trouble.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "ase.serverlist",               m_MasterConfig.ase.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "sidegrade.serverlist",         m_MasterConfig.sidegrade.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "sidegrade.nobrowselist",       m_MasterConfig.sidegrade.nobrowseInfoMap );
+        XMLAccess.GetSubNodeValue ( "sidegrade.onlybrowselist",     m_MasterConfig.sidegrade.onlybrowseInfoMap );
         XMLAccess.GetSubNodeValue ( "news.serverlist",              m_MasterConfig.news.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "news.interval",                m_MasterConfig.news.interval );
         XMLAccess.GetSubNodeValue ( "news.oldestpost",              m_MasterConfig.news.strOldestPost );
         XMLAccess.GetSubNodeValue ( "news.maxhistorylength",        m_MasterConfig.news.iMaxHistoryLength );
+        XMLAccess.GetSubNodeValue ( "misc.debug.filter2",           m_MasterConfig.misc.debug.strFilter );
 
-        UpdateTroubleURL ();
+        PostChangeMasterConfig ();
     }
 
     return true;
@@ -336,18 +347,24 @@ bool CVersionUpdater::SaveConfigToXML ( void )
         XMLAccess.SetSubNodeValue ( "version.interval",             m_MasterConfig.version.interval );
         XMLAccess.SetSubNodeValue ( "report.serverlist",            m_MasterConfig.report.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "report.interval",              m_MasterConfig.report.interval );
+        XMLAccess.SetSubNodeValue ( "report.filter2",               m_MasterConfig.report.strFilter );
+        XMLAccess.SetSubNodeValue ( "report.minsize",               m_MasterConfig.report.iMinSize );
+        XMLAccess.SetSubNodeValue ( "report.maxsize",               m_MasterConfig.report.iMaxSize );
         XMLAccess.SetSubNodeValue ( "crashdump.serverlist",         m_MasterConfig.crashdump.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "crashdump.duplicates",         m_MasterConfig.crashdump.iDuplicates );
         XMLAccess.SetSubNodeValue ( "crashdump.maxhistorylength",   m_MasterConfig.crashdump.iMaxHistoryLength );
         XMLAccess.SetSubNodeValue ( "gtadatafiles.serverlist",      m_MasterConfig.gtadatafiles.serverInfoMap );
+        XMLAccess.SetSubNodeValue ( "gtadatafiles2.serverlist",     m_MasterConfig.gtadatafiles2.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "trouble.serverlist",           m_MasterConfig.trouble.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "ase.serverlist",               m_MasterConfig.ase.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "sidegrade.serverlist",         m_MasterConfig.sidegrade.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "sidegrade.nobrowselist",       m_MasterConfig.sidegrade.nobrowseInfoMap );
+        XMLAccess.SetSubNodeValue ( "sidegrade.onlybrowselist",     m_MasterConfig.sidegrade.onlybrowseInfoMap );
         XMLAccess.SetSubNodeValue ( "news.serverlist",              m_MasterConfig.news.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "news.interval",                m_MasterConfig.news.interval );
         XMLAccess.SetSubNodeValue ( "news.oldestpost",              m_MasterConfig.news.strOldestPost );
         XMLAccess.SetSubNodeValue ( "news.maxhistorylength",        m_MasterConfig.news.iMaxHistoryLength );
+        XMLAccess.SetSubNodeValue ( "misc.debug.filter2",           m_MasterConfig.misc.debug.strFilter );
     }
 
     return true;
@@ -395,6 +412,8 @@ void CVersionUpdater::DoPulse ( void )
     if ( !m_bEnabled )
         return;
 
+    TIMING_CHECKPOINT( "+VersionUpdaterPulse" );
+
     EnsureLoadedConfigFromXML ();
 
     //
@@ -413,7 +432,7 @@ void CVersionUpdater::DoPulse ( void )
             m_MasterConfig.master.interval.SetFromString ( "7d" );
 
         time_t secondsSinceCheck = CDateTime::Now ().ToSeconds () - m_VarConfig.master_lastCheckTime.ToSeconds ();
-        OutputDebugLine ( SString ( "master timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.master.interval.ToSeconds () - secondsSinceCheck) ) );
+        OutputDebugLine ( SString ( "[Updater] master timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.master.interval.ToSeconds () - secondsSinceCheck) ) );
 
         // Only check once a week
         if ( secondsSinceCheck > m_MasterConfig.master.interval.ToSeconds () || secondsSinceCheck < 0 )
@@ -425,7 +444,7 @@ void CVersionUpdater::DoPulse ( void )
     //
     // Time for periodic check?
     //
-    if ( !m_bCheckedTimeForVersionCheck && !IsBusy () )
+    if ( !m_bCheckedTimeForVersionCheck && !IsBusy () && !CCore::GetSingleton().WasLaunchedWithConnectURI () )
     {
         m_bCheckedTimeForVersionCheck = true;
 
@@ -434,7 +453,7 @@ void CVersionUpdater::DoPulse ( void )
             m_VarConfig.version_lastCheckTime.SetFromSeconds ( 0 );
 
         time_t secondsSinceCheck = CDateTime::Now ().ToSeconds () - m_VarConfig.version_lastCheckTime.ToSeconds ();
-        OutputDebugLine ( SString ( "version timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.version.interval.ToSeconds () - secondsSinceCheck) ) );
+        OutputDebugLine ( SString ( "[Updater] version timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.version.interval.ToSeconds () - secondsSinceCheck) ) );
 
         // Only check once a day
         if ( secondsSinceCheck > m_MasterConfig.version.interval.ToSeconds () || secondsSinceCheck < 0 )
@@ -451,7 +470,7 @@ void CVersionUpdater::DoPulse ( void )
         m_bCheckedTimeForNewsUpdate = true;
 
         time_t secondsSinceCheck = CDateTime::Now ().ToSeconds () - m_VarConfig.news_lastCheckTime.ToSeconds ();
-        OutputDebugLine ( SString ( "news timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.news.interval.ToSeconds () - secondsSinceCheck) ) );
+        OutputDebugLine ( SString ( "[Updater] news timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.news.interval.ToSeconds () - secondsSinceCheck) ) );
 
         // Only check once an interval
         if ( secondsSinceCheck > m_MasterConfig.news.interval.ToSeconds () || secondsSinceCheck < 0 )
@@ -501,6 +520,8 @@ void CVersionUpdater::DoPulse ( void )
                     m_CurrentProgram.GotoLabel ( pInstruction->strGoto );
         }
     }
+
+    TIMING_CHECKPOINT( "-VersionUpdaterPulse" );
 }
 
 
@@ -637,38 +658,81 @@ void CVersionUpdater::GetAseServerList ( std::vector < SString >& outResult )
 
 ///////////////////////////////////////////////////////////////
 //
-// CVersionUpdater::GetBlockedVersionMap
+// CVersionUpdater::GetBrowseVersionMaps
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::GetBlockedVersionMap ( std::map < SString, int >& outBlockedVersionMap )
+void CVersionUpdater::GetBrowseVersionMaps ( std::map < SString, int >& outBlockedVersionMap, std::map < SString, int >& outAllowedVersionMap )
 {
     EnsureLoadedConfigFromXML ();
 
     outBlockedVersionMap.clear ();
+    outAllowedVersionMap.clear ();
 
     //
-    // Find list for our version
+    // Blocked - Find list for our version
     //
-    const CDataInfoSet& dataInfoSet = m_MasterConfig.sidegrade.nobrowseInfoMap;
-    for ( uint i = 0 ; i < dataInfoSet.size () ; i++ )
     {
-        const SDataInfoItem& line = dataInfoSet[i];
-        const SString* pstrVersion = MapFind ( line.attributeMap, "version" );
-        if ( pstrVersion && *pstrVersion == MTA_DM_ASE_VERSION )
+        const CDataInfoSet& dataInfoSet = m_MasterConfig.sidegrade.nobrowseInfoMap;
+        for ( uint i = 0 ; i < dataInfoSet.size () ; i++ )
         {
-            std::vector < SString > blockedVersionList;
-            line.strValue.Split ( ";", blockedVersionList );
-
-            for ( uint i = 0 ; i < blockedVersionList.size () ; i++ )
+            const SDataInfoItem& line = dataInfoSet[i];
+            const SString* pstrVersion = MapFind ( line.attributeMap, "version" );
+            if ( pstrVersion && *pstrVersion == MTA_DM_ASE_VERSION )
             {
-                outBlockedVersionMap[ blockedVersionList[i] ] = 1;
-            }
+                // Found list for our version
+                std::vector < SString > blockedVersionList;
+                line.strValue.Split ( ";", blockedVersionList );
 
-            break;
+                for ( uint i = 0 ; i < blockedVersionList.size () ; i++ )
+                {
+                    outBlockedVersionMap[ blockedVersionList[i] ] = 1;
+                }
+
+                break;
+            }
         }
     }
+
+    //
+    // Allowed - Find list for our version
+    //
+    {
+        const CDataInfoSet& dataInfoSet = m_MasterConfig.sidegrade.onlybrowseInfoMap;
+        for ( uint i = 0 ; i < dataInfoSet.size () ; i++ )
+        {
+            const SDataInfoItem& line = dataInfoSet[i];
+            const SString* pstrVersion = MapFind ( line.attributeMap, "version" );
+            if ( pstrVersion && *pstrVersion == MTA_DM_ASE_VERSION )
+            {
+                // Found list for our version
+                std::vector < SString > allowedVersionList;
+                line.strValue.Split ( ";", allowedVersionList );
+
+                for ( uint i = 0 ; i < allowedVersionList.size () ; i++ )
+                {
+                    outAllowedVersionMap[ allowedVersionList[i] ] = 1;
+                }
+
+                break;
+            }
+        }
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::GetDebugFilterString
+//
+//
+//
+///////////////////////////////////////////////////////////////
+const SString& CVersionUpdater::GetDebugFilterString ( void )
+{
+    EnsureLoadedConfigFromXML ();
+    return m_MasterConfig.misc.debug.strFilter;
 }
 
 
@@ -703,7 +767,13 @@ void CVersionUpdater::ResetEverything ()
 ///////////////////////////////////////////////////////////////
 bool CVersionUpdater::IsBusy ( void )
 {
-    return m_Stack.size () || ( m_CurrentProgram.IsValid () );
+    if ( m_Stack.size () || ( m_CurrentProgram.IsValid () ) )
+        return true;
+    if ( GetQuestionBox ().IsVisible () )
+        return true;
+    if ( CCore::GetSingleton ().WillRequestNewNickOnStart() )
+        return true;
+    return false;
 }
 
 
@@ -717,6 +787,8 @@ bool CVersionUpdater::IsBusy ( void )
 std::vector < SString > CVersionUpdater::MakeServerList ( const CDataInfoSet& dataInfoSetIn )
 {
     std::vector < SString > serverList;
+
+    RandomizeRandomSeed ();
 
     //
     // Sort out server order
@@ -745,9 +817,47 @@ std::vector < SString > CVersionUpdater::MakeServerList ( const CDataInfoSet& da
             }
         }
 
+        // If servers have the same priority, keep one and put the other(s) at the back of the list
+        CDataInfoSet keepList;
+        CDataInfoSet tailList;
+        for ( int iFirst = 0 ; iFirst < iSize ; iFirst++ )
+        {
+            // First item in range
+            const SDataInfoItem& a = dataInfoSet[iFirst];
+            int iPriorityA = MapFind ( a.attributeMap, "priority" ) ? atoi ( *MapFind ( a.attributeMap, "priority" ) ) : 5;
+
+            // Find last item in range
+            int iLast;
+            for ( iLast = iFirst ; iLast < iSize - 1 ; iLast++ )
+            {
+                const SDataInfoItem& b = dataInfoSet[ iLast + 1 ];
+                int iPriorityB = MapFind ( b.attributeMap, "priority" ) ? atoi ( *MapFind ( b.attributeMap, "priority" ) ) : 5;
+                if ( iPriorityA != iPriorityB )
+                    break;
+            }
+
+            // Choose random server to keep in range, put the others at the back
+            int iRangeSize = iLast - iFirst + 1;
+            int iKeepIdx = rand () % ( iRangeSize );
+
+            for ( int i = 0 ; i < iRangeSize ; i++ )
+            {
+                if ( i == iKeepIdx )
+                    keepList.push_back ( dataInfoSet[ iFirst + i ] );
+                else
+                    tailList.push_back ( dataInfoSet[ iFirst + i ] );
+            }
+
+            // continue with first item in the next priority range
+            iFirst = iLast;
+        }
+
         // Output values into the result list
-        for ( int i = 0 ; i < iSize ; i++ )
-            serverList.push_back ( dataInfoSet[i].strValue );
+        for ( uint i = 0 ; i < keepList.size () ; i++ )
+            serverList.push_back ( keepList[i].strValue );
+
+        for ( uint i = 0 ; i < tailList.size () ; i++ )
+            serverList.push_back ( tailList[i].strValue );
     }
 
     return serverList;
@@ -980,18 +1090,18 @@ void CVersionUpdater::InitPrograms ()
         MapSet ( m_ProgramMap, strProgramName, CProgram () );
         CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
 
-        ADDINST (   _UseDataFilesURLs );                        // Use DATA_FILES_URL*
+        ADDINST (   _UseDataFiles2URLs );                        // Use DATA_FILES_URL*
         ADDINST (   _DialogDataFilesQuestion );                 // Show "Data files wrong" dialog
         ADDCOND ( "if QuestionResponse.!Yes goto end" );        // If user says 'No', then goto end:
         ADDINST (   _DialogChecking );                          // Show "Checking..." message
         ADDINST (   _StartDownload );                          // Fetch file info from server
         ADDINST (   _ProcessPatchFileQuery );
-        ADDCOND ( "if ProcessResponse.!datafiles goto error1" );  // If server says 'No files' then goto error1:
+        ADDCOND ( "if ProcessResponse.!files goto error1" );  // If server says 'No files' then goto error1:
         ADDINST (   _DialogDownloading );                       // Show "Downloading..." message
         ADDINST (   _UseProvidedURLs );
         ADDINST (   _StartDownload );                       // Fetch file binary from mirror
         ADDINST (   _ProcessPatchFileDownload );
-        ADDINST (   _DialogDataFilesResult );                   // Show "Update ok/failed" message
+        ADDINST (   _DialogUpdateResult );                   // Show "Update ok/failed" message
         ADDINST (   _End );
 
         ADDLABL ( "error1:" );
@@ -1033,10 +1143,17 @@ void CVersionUpdater::InitPrograms ()
         MapSet ( m_ProgramMap, strProgramName, CProgram () );
         CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
 
+        ADDINST (   _ShouldSendCrashDump );                     // Have we already sent a matching dump?
+        ADDCOND ( "if ProcessResponse.!ok goto end" );
+        ADDINST (   _UseCrashDumpQueryURLs );
+        ADDINST (   _StartDownload );
+        ADDINST (   _ProcessCrashDumpQuery );                   // Does the server want this dump?
+        ADDCOND ( "if ProcessResponse.!ok goto end" );
         ADDINST (   _UseCrashDumpURLs );                        // Use CRASH_DUMP_URL*
         ADDINST (   _UseCrashDumpPostContent );                 // Use crash dump source
         ADDINST (   _StartSendPost );                           // Send data
         ADDLABL ( "end:" );
+        ADDINST (   _ResetLastCrashDump );
         ADDINST (     _End );
     }
 
@@ -1164,7 +1281,7 @@ void CVersionUpdater::CheckPrograms ()
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::RunProgram ( const SString& strProgramName )
 {
-    OutputDebugLine ( SString ( "RunProgram %s", strProgramName.c_str () ) );
+    OutputDebugLine ( SString ( "[Updater] RunProgram %s", strProgramName.c_str () ) );
     ResetEverything ();
     CProgram* pProgram = MapFind ( m_ProgramMap, strProgramName );
     if ( pProgram )
@@ -1200,27 +1317,26 @@ void CVersionUpdater::_CheckSidegradeRequirements ( void )
     // Is version allowed to be launched?
 
     // Find reg settings for other version
-    SString strRegPath ( "..\\%s", *m_strSidegradeVersion );
+    m_strSidegradePath = GetVersionRegistryValue ( m_strSidegradeVersion, "", "Last Run Path" );
+    SString strLaunchHash = GetVersionRegistryValue ( m_strSidegradeVersion, "", "Last Run Path Hash" );
+    SString strLaunchVersion = GetVersionRegistryValue ( m_strSidegradeVersion, "", "Last Run Path Version" );
 
-    m_strSidegradePath = GetRegistryValue ( strRegPath, "Last Run Path" );
-    SString strLaunchHash = GetRegistryValue ( strRegPath, "Last Run Path Hash" );
-    SString strLaunchVersion = GetRegistryValue ( strRegPath, "Last Run Path Version" );
-
-    // Validate strLaunchVersion
+    // Validate
     bool bVersionMatch = ( strLaunchVersion == m_strSidegradeVersion );
+    bool bLaunchPathValid = ( strLaunchHash == CMD5Hasher::CalculateHexString ( m_strSidegradePath ) );
 
-    // Validate strLaunchPath
-    bool bLaunchPathValid = false;
+    if ( !bVersionMatch || !bLaunchPathValid )
     {
-        MD5 md5;
-        CMD5Hasher Hasher;
-        if ( Hasher.Calculate ( m_strSidegradePath, md5 ) )
+        // Try again with datum from legacy registry settings
+        if ( m_strSidegradeVersion == "1.0" )
         {
-            char szHashResult[33];
-            Hasher.ConvertToHex ( md5, szHashResult );
+            m_strSidegradePath = GetVersionRegistryValueLegacy ( m_strSidegradeVersion, "", "Last Run Path" );
+            strLaunchHash = GetVersionRegistryValueLegacy ( m_strSidegradeVersion, "", "Last Run Path Hash" );
+            strLaunchVersion = GetVersionRegistryValueLegacy ( m_strSidegradeVersion, "", "Last Run Path Version" );
 
-            if ( strLaunchHash == szHashResult )
-                bLaunchPathValid = true;
+            // Re-validate
+            bVersionMatch = ( strLaunchVersion == m_strSidegradeVersion );
+            bLaunchPathValid = ( strLaunchHash == CMD5Hasher::CalculateHexString ( m_strSidegradePath ) );
         }
     }
 
@@ -1369,7 +1485,7 @@ void CVersionUpdater::_ExitGame ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_ResetVersionCheckTimer ( void )
 {
-    OutputDebugLine ( SStringX ( "_ResetVersionCheckTimer" ) );
+    OutputDebugLine ( SStringX ( "[Updater] _ResetVersionCheckTimer" ) );
     m_VarConfig.version_lastCheckTime = CDateTime::Now ();
 }
 
@@ -1383,7 +1499,7 @@ void CVersionUpdater::_ResetVersionCheckTimer ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_ResetNewsCheckTimer ( void )
 {
-    OutputDebugLine ( SStringX ( "_ResetNewsCheckTimer" ) );
+    OutputDebugLine ( SStringX ( "[Updater] _ResetNewsCheckTimer" ) );
     m_VarConfig.news_lastCheckTime = CDateTime::Now ();
 }
 
@@ -1592,6 +1708,7 @@ void CVersionUpdater::_DialogUpdateQuestion ( void )
     GetQuestionBox ().SetButton ( 0, m_JobInfo.strNo );
     GetQuestionBox ().SetButton ( 1, m_JobInfo.strYes );
     GetQuestionBox ().Show ();
+    GetQuestionBox ().SetAutoCloseOnConnect ( true );
     Push ( _PollQuestionNoYes );
 }
 
@@ -1775,14 +1892,32 @@ void CVersionUpdater::_QUpdateNewsResult ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_DialogDataFilesQuestion ( void )
 {
+    // If using customized SA files, advise user to stop using customized SA files
+    if ( GetApplicationSettingInt ( "customized-sa-files-using" ) )
+    {
+        GetQuestionBox ().Reset ();
+        GetQuestionBox ().SetTitle ( "CUSTOMIZED GTA:SA FILES" );
+        SString strMessage;
+        strMessage += "This server is blocking your customized GTA:SA files.";
+        strMessage += "\n\nTo join this server please uncheck:";
+        strMessage += "\nSettings->Multiplayer->Use customized GTA:SA files";
+        strMessage += "\n\n";
+        GetQuestionBox ().SetMessage ( strMessage );
+        GetQuestionBox ().SetButton ( 0, "Ok" );
+        GetQuestionBox ().Show ();
+        Push ( _PollAnyButton );
+        m_ConditionMap.SetCondition ( "QuestionResponse", "No" );
+        return;
+    }
+
     // Display message
     GetQuestionBox ().Reset ();
     GetQuestionBox ().SetTitle ( "ERROR" );
-    GetQuestionBox ().SetMessage ( "San Andreas data files have been modified\n\n\nDo you want to automatically fix this problem?" );
-    GetQuestionBox ().SetButton ( 0, "No" );
-    GetQuestionBox ().SetButton ( 1, "Yes" );
+    GetQuestionBox ().SetMessage ( "Some MTA:SA data files are missing.\n\n\nPlease reinstall MTA:SA" );
+    GetQuestionBox ().SetButton ( 0, "Ok" );
     GetQuestionBox ().Show ();
-    Push ( _PollQuestionNoYes );
+    Push ( _PollAnyButton );
+    m_ConditionMap.SetCondition ( "QuestionResponse", "No" );
 }
 
 
@@ -1903,7 +2038,7 @@ void CVersionUpdater::_ProcessPatchFileQuery ( void )
 
     if ( m_JobInfo.downloadBuffer.size () == 0 )
     {
-        OutputDebugLine ( "Empty download buffer" );
+        OutputDebugLine ( "[Error] Empty download buffer" );
         return;
     }
 
@@ -1938,7 +2073,7 @@ void CVersionUpdater::_ProcessPatchFileQuery ( void )
     if ( strNotifyMasterRevision.length () && strNotifyMasterRevision > m_MasterConfig.master.strRevision )
     {
         // Only do next bit when 'notify revision' increases (prevents superfluous downloads when notify revision is (incorrectly) higher than actual revision)
-        if ( strNotifyMasterRevision < m_VarConfig.master_highestNotifyRevision )
+        if ( m_VarConfig.master_highestNotifyRevision.empty () || strNotifyMasterRevision < m_VarConfig.master_highestNotifyRevision )
         {
             m_VarConfig.master_highestNotifyRevision = strNotifyMasterRevision;
 
@@ -1953,8 +2088,8 @@ void CVersionUpdater::_ProcessPatchFileQuery ( void )
     if ( m_JobInfo.strStatus == "" )
         OnPossibleConfigProblem ();
 
-    // Maybe modify report settings
-    if ( strReportSettingsFilter.length () )
+    // Modify report settings if data here, and none in master config
+    if ( !strReportSettingsFilter.empty () && m_MasterConfig.report.strFilter.empty () )
     {
         SString strReportSettings = SString ( "filter2@%s;min@%s;max@%s", strReportSettingsFilter.c_str (), strReportSettingsMin.c_str (), strReportSettingsMax.c_str () ); 
         GetReportWrap ()->SetSettings ( strReportSettings );
@@ -2015,18 +2150,24 @@ void CVersionUpdater::_ProcessMasterFetch ( void )
     XMLAccess.GetSubNodeValue ( "version.interval",             newMasterConfig.version.interval );
     XMLAccess.GetSubNodeValue ( "report.serverlist",            newMasterConfig.report.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "report.interval",              newMasterConfig.report.interval );
+    XMLAccess.GetSubNodeValue ( "report.filter2",               newMasterConfig.report.strFilter );
+    XMLAccess.GetSubNodeValue ( "report.minsize",               newMasterConfig.report.iMinSize );
+    XMLAccess.GetSubNodeValue ( "report.maxsize",               newMasterConfig.report.iMaxSize );
     XMLAccess.GetSubNodeValue ( "crashdump.serverlist",         newMasterConfig.crashdump.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "crashdump.duplicates",         newMasterConfig.crashdump.iDuplicates );
     XMLAccess.GetSubNodeValue ( "crashdump.maxhistorylength",   newMasterConfig.crashdump.iMaxHistoryLength );
     XMLAccess.GetSubNodeValue ( "gtadatafiles.serverlist",      newMasterConfig.gtadatafiles.serverInfoMap );
+    XMLAccess.GetSubNodeValue ( "gtadatafiles2.serverlist",     newMasterConfig.gtadatafiles2.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "trouble.serverlist",           newMasterConfig.trouble.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "ase.serverlist",               newMasterConfig.ase.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "sidegrade.serverlist",         newMasterConfig.sidegrade.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "sidegrade.nobrowselist",       newMasterConfig.sidegrade.nobrowseInfoMap );
+    XMLAccess.GetSubNodeValue ( "sidegrade.onlybrowselist",     newMasterConfig.sidegrade.onlybrowseInfoMap );
     XMLAccess.GetSubNodeValue ( "news.serverlist",              newMasterConfig.news.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "news.interval",                newMasterConfig.news.interval );
     XMLAccess.GetSubNodeValue ( "news.oldestpost",              newMasterConfig.news.strOldestPost );
     XMLAccess.GetSubNodeValue ( "news.maxhistorylength",        newMasterConfig.news.iMaxHistoryLength );
+    XMLAccess.GetSubNodeValue ( "misc.debug.filter2",           newMasterConfig.misc.debug.strFilter );
 
     if ( newMasterConfig.IsValid () )
     {
@@ -2034,7 +2175,7 @@ void CVersionUpdater::_ProcessMasterFetch ( void )
             m_VarConfig = SUpdaterVarConfig ();
 
         m_MasterConfig = newMasterConfig;
-        UpdateTroubleURL ();
+        PostChangeMasterConfig ();
         m_ConditionMap.SetCondition ( "ProcessResponse", "ok" );
     }
 }
@@ -2042,16 +2183,27 @@ void CVersionUpdater::_ProcessMasterFetch ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CVersionUpdater::UpdateTroubleURL
+// CVersionUpdater::PostChangeMasterConfig
 //
-// Select a valid server incase there is trouble
+// Transfer certain settings from the master config
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::UpdateTroubleURL ( void )
+void CVersionUpdater::PostChangeMasterConfig ( void )
 {
+    // Update trouble url for far away modules
     std::vector < SString > serverList = MakeServerList ( m_MasterConfig.trouble.serverInfoMap );
     if ( serverList.size () && serverList[0].length () > 4 )
         SetApplicationSetting ( "trouble-url", serverList[0] );
+
+    // Update debug filter for far away modules
+    SetApplicationSetting ( "debugfilter", m_MasterConfig.misc.debug.strFilter  );
+
+    // Maybe modify report settings
+    if ( !m_MasterConfig.report.strFilter.empty () )
+    {
+        SString strReportSettings = SString ( "filter2@%s;min@%d;max@%d", *m_MasterConfig.report.strFilter, (int)m_MasterConfig.report.iMinSize, (int)m_MasterConfig.report.iMaxSize ); 
+        GetReportWrap ()->SetSettings ( strReportSettings );
+    }
 }
 
 
@@ -2116,15 +2268,17 @@ void CVersionUpdater::_UseProvidedURLs ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CVersionUpdater::_UseDataFilesURLs
+// CVersionUpdater::_UseDataFiles2URLs
 //
 // Called before starting the file download
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_UseDataFilesURLs ( void )
+void CVersionUpdater::_UseDataFiles2URLs ( void )
 {
     m_JobInfo = SJobInfo ();
-    m_JobInfo.serverList = MakeServerList ( m_MasterConfig.gtadatafiles.serverInfoMap );
+    m_JobInfo.serverList = MakeServerList ( m_MasterConfig.gtadatafiles2.serverInfoMap );
+    if ( m_JobInfo.serverList.empty () )
+        m_JobInfo.serverList.push_back ( "http://updatesa.mtasa.com/sa/gtadatafiles2/?v=%VERSION%&amp;id=%ID%" );
 }
 
 
@@ -2184,7 +2338,7 @@ void CVersionUpdater::_ProcessPatchFileDownload ( void )
     SString strPathFilename;
     {
         std::list < SString > saveLocationList;
-        saveLocationList.push_back ( PathJoin ( GetMTALocalAppDataPath (), "upcache", m_JobInfo.strFilename ) );
+        saveLocationList.push_back ( PathJoin ( GetMTADataPath (), "upcache", m_JobInfo.strFilename ) );
         saveLocationList.push_back ( PathJoin ( GetMTATempPath (), "upcache", m_JobInfo.strFilename ) );
         saveLocationList.push_back ( GetMTATempPath () + m_JobInfo.strFilename );
         saveLocationList.push_back ( PathJoin ( "\\temp", m_JobInfo.strFilename ) );
@@ -2233,7 +2387,7 @@ void CVersionUpdater::_StartDownload ( void )
     {
         // See if file already exists in upcache
         std::list < SString > saveLocationList;
-        saveLocationList.push_back ( PathJoin ( GetMTALocalAppDataPath (), "upcache", m_JobInfo.strFilename ) );
+        saveLocationList.push_back ( PathJoin ( GetMTADataPath (), "upcache", m_JobInfo.strFilename ) );
         saveLocationList.push_back ( PathJoin ( GetMTATempPath (), "upcache", m_JobInfo.strFilename ) );
         saveLocationList.push_back ( GetMTATempPath () + m_JobInfo.strFilename );
         saveLocationList.push_back ( PathJoin ( "\\temp", m_JobInfo.strFilename ) );
@@ -2423,6 +2577,124 @@ void CVersionUpdater::_UseReportLogPostContent ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// CVersionUpdater::_ShouldSendCrashDump
+//
+// Check if upload is required by client
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_ShouldSendCrashDump ( void )
+{
+    m_ConditionMap.SetCondition ( "ProcessResponse", "" );
+
+    // Add to history
+    SString strPathFilename = GetApplicationSetting ( "diagnostics", "last-dump-save" );
+
+    // Extract module and address from filename
+    std::vector < SString > parts;
+    strPathFilename.Split ( "_", parts );
+    if ( parts.size () > DUMP_PART_TIME )
+    {
+        SString strVersionAndModuleAndOffset = parts[DUMP_PART_VERSION] + "_" + parts[DUMP_PART_MODULE] + "_" + parts[DUMP_PART_OFFSET];
+        SString strDateAndTime = parts[DUMP_PART_DATE] + "_" + parts[DUMP_PART_TIME];
+        strDateAndTime.Split ( ".", &strDateAndTime, NULL );
+
+        // Check history for duplicates
+        CDataInfoSet& history = m_VarConfig.crashdump_history;
+        int iDuplicates = 0;
+        for ( uint i = 0 ; i < history.size () ; i++ )
+            if ( strVersionAndModuleAndOffset == history[i].GetAttribute ( "tag" ) )
+                iDuplicates++;
+
+        // Add to history
+        if ( iDuplicates <= m_MasterConfig.crashdump.iDuplicates )
+        {
+            SDataInfoItem item;
+            item.strName = "dump";
+            item.SetAttribute( "tag", strVersionAndModuleAndOffset );
+            item.SetAttribute( "date", strDateAndTime );
+            history.push_back ( item );
+        }
+        else
+            return;
+
+        // Sort by date
+        for ( int i = 0 ; i < (int)history.size () - 1 ; i++ )
+        {
+            SDataInfoItem& a = history[i];
+            SDataInfoItem& b = history[i+1];
+            if ( a.GetAttribute ( "date" ) > b.GetAttribute ( "date" ) )
+            {
+                std::swap ( a, b );
+                i = Max ( i - 2, -1 );
+            }
+        }
+
+        // Remove oldest if required
+        int iNumToRemove = history.size () - m_MasterConfig.crashdump.iMaxHistoryLength;
+        if ( iNumToRemove > 0 )
+            history.erase ( history.begin (), history.begin () + iNumToRemove );
+
+        CCore::GetSingleton ().SaveConfig ();
+
+        m_ConditionMap.SetCondition ( "ProcessResponse", "ok" );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_ResetLastCrashDump
+//
+// Make sure last-dump-save is ignored next time
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_ResetLastCrashDump ( void )
+{
+    SetApplicationSetting ( "diagnostics", "last-dump-save", "" );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_UseCrashDumpQueryURLs
+//
+// Check if upload is needed by server
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_UseCrashDumpQueryURLs ( void )
+{
+    m_JobInfo = SJobInfo ();
+    m_JobInfo.serverList = MakeServerList ( m_MasterConfig.crashdump.serverInfoMap );
+
+    SString strPathFilename = GetApplicationSetting ( "diagnostics", "last-dump-save" );
+    strPathFilename.Split ( PATH_SEPERATOR, NULL, &m_JobInfo.strPostFilename, -1 );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_ProcessCrashDumpQuery
+//
+// Called after completing a CrashDumpQuery
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_ProcessCrashDumpQuery ( void )
+{
+    m_ConditionMap.SetCondition ( "ProcessResponse", "" );
+
+    if ( m_JobInfo.downloadBuffer.size () == 0 )
+        return;
+
+    SString strResponse ( &m_JobInfo.downloadBuffer[0], m_JobInfo.downloadBuffer.size () );
+
+    // Is the dump file wanted?
+    if ( strResponse.BeginsWithI ( "yes" ) )
+        m_ConditionMap.SetCondition ( "ProcessResponse", "ok" );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CVersionUpdater::_UseCrashDumpURLs
 //
 //
@@ -2453,56 +2725,6 @@ void CVersionUpdater::_UseCrashDumpPostContent ( void )
     // Get user pref
     if ( GetApplicationSetting ( "diagnostics", "send-dumps" ) == "no" )
         return;
-
-    // Add to history
-
-    // Extract module and address from filename
-    std::vector < SString > parts;
-    strPathFilename.Split ( "_", parts );
-    if ( parts.size () > 7 )
-    {
-        SString strModuleAndOffset = parts[2] + "_" + parts[3];
-        SString strDateAndTime = parts[6] + "_" + parts[7];
-        strDateAndTime.Split ( ".", &strDateAndTime, NULL );
-
-        // Check history for duplicates
-        CDataInfoSet& history = m_VarConfig.crashdump_history;
-        int iDuplicates = 0;
-        for ( uint i = 0 ; i < history.size () ; i++ )
-            if ( strModuleAndOffset == history[i].strName )
-                iDuplicates++;
-
-        // Add to history
-        if ( iDuplicates <= m_MasterConfig.crashdump.iDuplicates )
-        {
-            SDataInfoItem item;
-            item.strName = strModuleAndOffset;
-            item.strValue = strDateAndTime;
-            history.push_back ( item );
-        }
-        else
-            return;
-
-        // Sort by date
-        for ( int i = 0 ; i < (int)history.size () - 1 ; i++ )
-        {
-            SDataInfoItem& a = history[i];
-            SDataInfoItem& b = history[i+1];
-            if ( a.strValue > b.strValue )
-            {
-                std::swap ( a, b );
-                i = Max ( i - 2, -1 );
-            }
-        }
-
-        // Remove oldest if required
-        int iNumToRemove = history.size () - m_MasterConfig.crashdump.iMaxHistoryLength;
-        if ( iNumToRemove > 0 )
-            history.erase ( history.begin (), history.begin () + iNumToRemove );
-
-        CCore::GetSingleton ().SaveConfig ();
-    }
-
 
     // Load into post buffer
     if ( FileLoad ( strPathFilename, m_JobInfo.postContent ) )
@@ -2647,11 +2869,12 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     strQueryURL = strQueryURL.Replace ( "%REFER%", m_strServerSaysHost );
     strQueryURL = strQueryURL.Replace ( "%WANTVER%", m_strSidegradeVersion );
     strQueryURL = strQueryURL.Replace ( "%LASTNEWS%", m_VarConfig.news_lastNewsDate );
+    strQueryURL = strQueryURL.Replace ( "%FILE%", m_JobInfo.strPostFilename );
 
     // Perform the HTTP request
     m_HTTP.Get ( strQueryURL );
     m_strLastQueryURL = strQueryURL;
-    OutputDebugLine( SString ( "DoSendDownloadRequestToNextServer %d/%d %s", m_JobInfo.iCurrent, m_JobInfo.serverList.size (), strQueryURL.c_str () ) );
+    OutputDebugLine( SString ( "[Updater] DoSendDownloadRequestToNextServer %d/%d %s", m_JobInfo.iCurrent, m_JobInfo.serverList.size (), strQueryURL.c_str () ) );
     return RES_OK;
 }
 
@@ -2697,9 +2920,9 @@ int CVersionUpdater::DoPollDownload ( void )
     }
 
     // Got something
-    char* pData = buffer.GetData ();
-    if ( pData )
+    if ( buffer.GetSize () > 0 )
     {
+        char* pData = buffer.GetData ();
         unsigned int uiSize = buffer.GetSize ();
         m_JobInfo.downloadBuffer.resize ( buffer.GetSize () );
         memcpy ( &m_JobInfo.downloadBuffer[0], pData, uiSize );

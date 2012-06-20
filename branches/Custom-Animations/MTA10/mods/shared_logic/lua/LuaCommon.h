@@ -79,6 +79,8 @@ void                    lua_pushresource    ( lua_State* luaVM, CResource* pElem
 void                    lua_pushtimer       ( lua_State* luaVM, CLuaTimer* pElement );
 void                    lua_pushxmlnode     ( lua_State* luaVM, CXMLNode* pElement );
 
+const char*             lua_makestring      ( lua_State* luaVM, int iArgument );
+
 #define lua_istype(luavm, number,type) (lua_type(luavm,number) == type)
 
 #endif

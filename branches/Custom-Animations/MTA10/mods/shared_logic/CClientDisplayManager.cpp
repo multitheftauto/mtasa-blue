@@ -57,12 +57,6 @@ void CClientDisplayManager::DrawText2D ( const char* szCaption, const CVector& v
 }
 
 
-void CClientDisplayManager::DrawText3D ( const char* szCaption, const CVector& vecPosition, float fScale, RGBA rgbaColor )
-{
-    g_pCore->GetGraphics ()->DrawText3DA ( vecPosition.fX, vecPosition.fY, vecPosition.fZ, rgbaColor, fScale, "%s", szCaption );
-}
-
-
 void CClientDisplayManager::AddToList ( CClientDisplay* pDisplay )
 {
     m_List.push_back ( pDisplay );

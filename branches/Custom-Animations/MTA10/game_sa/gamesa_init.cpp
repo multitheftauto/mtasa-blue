@@ -16,6 +16,7 @@
 
 CGameSA* pGame = NULL;
 CNet* g_pNet = NULL;
+CCoreInterface* g_pCore = NULL;
 
 //-----------------------------------------------------------
 // This function uses the initialized data sections of the executables
@@ -31,6 +32,7 @@ CGame * GetGameInterface( CCoreInterface* pCore )
     assert ( g_pNet );
 
     pGame = new CGameSA;
+    g_pCore = pCore;
 
     return (CGame *)pGame;
 }
@@ -46,4 +48,14 @@ void MemSet ( void* dwDest, int cValue, uint uiAmount )
 void MemCpy ( void* dwDest, const void* dwSrc, uint uiAmount )
 {
     memcpy ( dwDest, dwSrc, uiAmount );
+}
+
+bool GetDebugIdEnabled ( uint uiDebugId )
+{
+    return g_pCore->GetDebugIdEnabled ( uiDebugId );  
+}
+
+void LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody )
+{
+    g_pCore->LogEvent ( uiDebugId, szType, szContext, szBody );  
 }

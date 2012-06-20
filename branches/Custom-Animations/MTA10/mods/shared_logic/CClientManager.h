@@ -36,6 +36,7 @@ class CClientManager;
 #include "CClientStreamer.h"
 #include "CClientTeamManager.h"
 #include "CClientSoundManager.h"
+#include "CClientRenderElementManager.h"
 #include "CClientDisplayManager.h"
 #include "CClientTime.h"
 #include "CClientVehicleManager.h"
@@ -51,6 +52,7 @@ class CClientExplosionManager;
 class CClientManager
 {
 public:
+    ZERO_ON_NEW
                                         CClientManager              ( void );
                                         ~CClientManager             ( void );
 
@@ -69,6 +71,7 @@ public:
     inline CClientModelRequestManager*  GetModelRequestManager      ( void )        { return m_pModelRequestManager; }
     inline CClientObjectManager*        GetObjectManager            ( void )        { return m_pObjectManager; }
     inline CClientStreamer*             GetObjectStreamer           ( void )        { return m_pObjectStreamer; }
+    inline CClientStreamer*             GetObjectLodStreamer        ( void )        { return m_pObjectLodStreamer; }
     inline CClientPathManager*          GetPathManager              ( void )        { return m_pPathManager; }
     inline CClientPickupManager*        GetPickupManager            ( void )        { return m_pPickupManager; }
     inline CClientStreamer*             GetPickupStreamer           ( void )        { return m_pPickupStreamer; }
@@ -77,6 +80,7 @@ public:
     inline CClientRadarAreaManager*     GetRadarAreaManager         ( void )        { return m_pRadarAreaManager; }
     inline CClientRadarMarkerManager*   GetRadarMarkerManager       ( void )        { return m_pRadarMarkerManager; }
     inline CClientSoundManager*         GetSoundManager             ( void )        { return m_pSoundManager; }
+    inline CClientRenderElementManager* GetRenderElementManager     ( void )        { return m_pRenderElementManager; }
     inline CClientTeamManager*          GetTeamManager              ( void )        { return m_pTeamManager; }
     inline CClientDisplayManager*       GetDisplayManager           ( void )        { return m_pDisplayManager; }
     inline CClientVehicleManager*       GetVehicleManager           ( void )        { return m_pVehicleManager; }
@@ -103,6 +107,8 @@ public:
     CClientEntity *                     FindEntitySafe              ( CEntity * pGameEntity );
 
     void                                OnUpdateStreamPosition      ( CClientStreamElement* pElement );
+    void                                OnLowLODElementCreated      ( void );
+    void                                OnLowLODElementDestroyed    ( void );
 
 private:
     CAntiCheat                          m_AntiCheat;
@@ -123,7 +129,9 @@ private:
     CClientRadarAreaManager*            m_pRadarAreaManager;
     CClientRadarMarkerManager*          m_pRadarMarkerManager;
     CClientSoundManager*                m_pSoundManager;
+    CClientRenderElementManager*        m_pRenderElementManager;
     CClientStreamer*                    m_pObjectStreamer;
+    CClientStreamer*                    m_pObjectLodStreamer;
     CClientTeamManager*                 m_pTeamManager;
     CClientDisplayManager*              m_pDisplayManager;
     CClientVehicleManager*              m_pVehicleManager;
@@ -139,6 +147,7 @@ private:
     CClientPacketRecorder*              m_pPacketRecorder;
     bool                                m_bBeingDeleted;
     bool                                m_bGameUnloadedFlag;
+    int                                 m_iNumLowLODElements;
 };
 
 #endif

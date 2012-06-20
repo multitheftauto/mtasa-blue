@@ -64,7 +64,7 @@ void CGUIFont_Impl::DrawTextString ( const char *szText, CRect2D DrawArea, float
     else
         fmt = CEGUI::LeftAligned;
 
-    m_pFont->drawText ( szText ? CEGUI::String ( szText ) : CEGUI::String (), CEGUI::Rect ( DrawArea.fX1, DrawArea.fY1, DrawArea.fX2, DrawArea.fY2 ), fZ, CEGUI::Rect ( ClipRect.fX1, ClipRect.fY1, ClipRect.fX2, ClipRect.fY2 ), fmt, CEGUI::ColourRect ( CEGUI::colour ( ( CEGUI::argb_t ) ulColor ) ), fScaleX, fScaleY );
+    m_pFont->drawText ( szText ? CGUI_Impl::GetUTFString( szText ) : CEGUI::String (), CEGUI::Rect ( DrawArea.fX1, DrawArea.fY1, DrawArea.fX2, DrawArea.fY2 ), fZ, CEGUI::Rect ( ClipRect.fX1, ClipRect.fY1, ClipRect.fX2, ClipRect.fY2 ), fmt, CEGUI::ColourRect ( CEGUI::colour ( ( CEGUI::argb_t ) ulColor ) ), fScaleX, fScaleY );
 }
 
 bool CGUIFont_Impl::IsAntiAliasingEnabled ( void )

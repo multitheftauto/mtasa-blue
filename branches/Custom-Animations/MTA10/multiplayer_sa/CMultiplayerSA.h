@@ -8,6 +8,7 @@
 *               Christian Myhre Lundheim <>
 *               Jax <>
 *               Peter Beverloo <>
+*               Alberto Alonso <rydencillo@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -21,6 +22,7 @@
 
 #include "CPopulationSA.h"
 #include "multiplayersa_init.h"
+#include "CLimitsSA.h"
 
 #include "CRemoteDataSA.h"
 class CRemoteDataSA;
@@ -33,12 +35,24 @@ private:
     CRemoteDataSA               * RemoteData;
     CPopulationSA               * Population;
 public:
+    ZERO_ON_NEW
+
     CMultiplayerSA();
     void                        InitHooks();
+    void                        InitHooks_CrashFixHacks();
+    void                        Init_13 ( void );
+    void                        InitHooks_13 ( void );
+    void                        InitMemoryCopies_13 ( void );
+    void                        InitHooks_ClothesSpeedUp ( void );
+    void                        InitHooks_FixBadAnimId ( void );
+    void                        InitHooks_HookDestructors ( void );
+    void                        InitHooks_RwResources ( void );
+    void                        InitHooks_ClothesCache ( void );
     CRemoteDataStorage *        CreateRemoteDataStorage     ();
     void                        DestroyRemoteDataStorage    ( CRemoteDataStorage* pData );
     void                        AddRemoteDataStorage        ( CPlayerPed* pPed, CRemoteDataStorage* pData );
     void                        RemoveRemoteDataStorage     ( CPlayerPed* pPed );
+    void                        EnableHooks_ClothesMemFix   ( bool bEnable );
 
     CPed *                      GetContextSwitchedPed       ( void );
 
@@ -52,6 +66,7 @@ public:
     void                        DisableZoneNames            ( bool bDisabled );
     void                        DisableBirds                ( bool bDisabled );
     void                        DisableQuickReload          ( bool bDisable );
+    void                        DisableCloseRangeDamage     ( bool bDisable );
 
     bool                        GetExplosionsDisabled       ();
     void                        DisableExplosions           ( bool bDisabled );
@@ -66,9 +81,18 @@ public:
     void                        SetPreWorldProcessHandler   ( PreWorldProcessHandler * pHandler );
     void                        SetPostWorldProcessHandler  ( PostWorldProcessHandler * pHandler );
     void                        SetIdleHandler              ( IdleHandler * pHandler );
+    void                        SetPreFxRenderHandler       ( PreFxRenderHandler * pHandler );
+    void                        SetPreHudRenderHandler      ( PreHudRenderHandler * pHandler );
     void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler );
     void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler );
     void                        SetProcessCollisionHandler  ( ProcessCollisionHandler * pHandler );
+    void                        SetVehicleCollisionHandler  ( VehicleCollisionHandler * pHandler );
+    void                        SetHeliKillHandler          ( HeliKillHandler * pHandler );
+    void                        SetWaterCannonHitHandler    ( WaterCannonHitHandler * pHandler );
+    void                        SetGameObjectDestructHandler    ( GameObjectDestructHandler * pHandler );
+    void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler );
+    void                        SetGamePlayerDestructHandler    ( GamePlayerDestructHandler * pHandler );
+    void                        SetGameModelRemoveHandler       ( GameModelRemoveHandler * pHandler );
 
     void                        AllowMouseMovement          ( bool bAllow );
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );
@@ -85,7 +109,7 @@ public:
     void                        ResetWater                  ();
     void                        SetCloudsEnabled            ( bool bDisabled );
     void                        RebuildMultiplayerPlayer    ( CPed * player );
-    bool                        AreInteriorSoundsEnabled    ();
+    bool                        GetInteriorSoundsEnabled    ();
     void                        SetInteriorSoundsEnabled    ( bool bEnabled );
     void                        SetWindVelocity             ( float fX, float fY, float fZ );
     void                        GetWindVelocity             ( float& fX, float& fY, float& fZ );
@@ -117,6 +141,7 @@ public:
     void                        SetPreWeaponFireHandler     ( PreWeaponFireHandler* pHandler );
     void                        SetPostWeaponFireHandler    ( PostWeaponFireHandler* pHandler );
     void                        SetBulletImpactHandler      ( BulletImpactHandler* pHandler );
+    void                        SetBulletFireHandler        ( BulletFireHandler* pHandler );
     void                        SetDrawRadarAreasHandler    ( DrawRadarAreasHandler * pRadarAreasHandler );
     void                        SetRender3DStuffHandler     ( Render3DStuffHandler * pHandler );
 
@@ -158,8 +183,36 @@ public:
     void                        AllowCreatedObjectsInVerticalLineTest ( bool bOn );
     void                        DeleteAndDisableGangTags    ();
     
+    CLimits*                    GetLimits () { return &m_limits; }
+
+    void                        SetSuspensionEnabled        ( bool bEnabled );
+    bool                        IsSuspensionEnabled         ( void )                    { return m_bSuspensionEnabled; };
+
+    virtual void                SetFastClothesLoading       ( EFastClothesLoading fastClothesLoading );
+    virtual void                SetLODSystemEnabled         ( bool bEnable );
+    virtual void                SetAltWaterOrderEnabled     ( bool bEnable );
+
+    float                       GetAircraftMaxHeight        ( void )                    { return m_fAircraftMaxHeight; };
+    void                        SetAircraftMaxHeight        ( float fHeight )           { m_fAircraftMaxHeight = fHeight; };
+
+    void                        SetAutomaticVehicleStartupOnPedEnter    ( bool bSet );
+
+    virtual void                GetRwResourceStats          ( SRwResourceStats& outStats );
+    virtual void                GetClothesCacheStats        ( SClothesCacheStats& outStats );
+    virtual CEntitySAInterface* GetRenderingGameEntity      ( void );
+
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;
+    static char*                ms_PlayerImgCachePtr;
+private:
+    bool                        m_bSuspensionEnabled;
+    std::vector < char >        m_PlayerImgCache;
+    EFastClothesLoading         m_FastClothesLoading;
+    CLimitsSA                   m_limits;
+    bool                        m_bEnabledLODSystem;
+    bool                        m_bEnabledAltWaterOrder;
+    bool                        m_bEnabledClothesMemFix;
+    float                       m_fAircraftMaxHeight;
 
 /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
     VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);

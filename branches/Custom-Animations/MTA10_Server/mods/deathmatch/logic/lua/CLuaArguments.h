@@ -32,17 +32,19 @@ extern "C"
     #define LUA_CHECKSTACK(vm,space) lua_checkstack(vm, (space) )
 #else
     // Extra room in release to avoid trouble.
-    #define LUA_CHECKSTACK(vm,space) lua_checkstack(vm, (space)*2 )
+    #define LUA_CHECKSTACK(vm,space) lua_checkstack(vm, ((space)+2)*3 )
 #endif
 
 class CAccessControlList;
 class CAccessControlListGroup;
 class CAccount;
+class CBan;
 class CElement;
 class CLuaTimer;
 class CResource;
 class CTextDisplay;
 class CTextItem;
+class CDbJobData;
 
 class CLuaArguments;
 
@@ -73,8 +75,8 @@ public:
     CLuaArgument*                                       PushBoolean         ( bool bBool );
     CLuaArgument*                                       PushNumber          ( double dNumber );
     CLuaArgument*                                       PushString          ( const std::string& strString );
-    CLuaArgument*                                       PushUserData        ( void* pUserData );
     CLuaArgument*                                       PushElement         ( CElement* pElement );
+    CLuaArgument*                                       PushBan             ( CBan* pBan );
     CLuaArgument*                                       PushACL             ( CAccessControlList* pACL );
     CLuaArgument*                                       PushACLGroup        ( CAccessControlListGroup* pACLGroup );
     CLuaArgument*                                       PushAccount         ( CAccount* pAccount );
@@ -82,6 +84,7 @@ public:
     CLuaArgument*                                       PushTextDisplay     ( CTextDisplay* pTextDisplay );
     CLuaArgument*                                       PushTextItem        ( CTextItem* pTextItem );
     CLuaArgument*                                       PushTimer           ( CLuaTimer* pLuaTimer );
+    CLuaArgument*                                       PushDbQuery         ( CDbJobData* pJobData );
 
     CLuaArgument*                                       PushArgument        ( const CLuaArgument& argument );
     CLuaArgument*                                       PushTable           ( CLuaArguments * table );

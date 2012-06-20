@@ -64,7 +64,7 @@ public:
     virtual VOID                        SetOrientation ( float fX, float fY, float fZ )=0;
     virtual VOID                        FixBoatOrientation ( void ) = 0;
     virtual CVector                     * GetPosition (  )=0;
-    virtual CMatrix                     * GetMatrix ( CMatrix * matrix ) const=0;
+    virtual CMatrix                     * GetMatrix ( CMatrix * matrix )=0;
     virtual VOID                        SetMatrix ( CMatrix * matrix )=0;
     virtual WORD                        GetModelIndex ()=0;
     virtual eEntityType                 GetEntityType ()=0;
@@ -72,6 +72,7 @@ public:
     virtual VOID                        SetEntityStatus( eEntityStatus bStatus )=0;
     virtual eEntityStatus               GetEntityStatus( )=0;
     virtual bool                        IsOnScreen ()=0;
+    virtual bool                        IsFullyVisible ()=0;
     virtual void                        SetUnderwater ( bool bUnderwater )=0;
     virtual bool                        GetUnderwater ( void )=0;
     virtual RwFrame *                   GetFrameFromId ( int id )=0;
@@ -103,7 +104,6 @@ public:
     virtual bool                        IsStaticWaitingForCollision ( void ) = 0;
     virtual void                        SetStaticWaitingForCollision ( bool bStatic ) = 0;
 
-    virtual void                        GetImmunities ( bool & bNoClip, bool & bFrozen, bool & bBulletProof, bool & bFlameProof, bool & bUnk, bool & bUnk2, bool & bCollisionProof, bool & bExplosionProof ) = 0;
     virtual unsigned long               GetArrayID ( void ) = 0;
 };
 

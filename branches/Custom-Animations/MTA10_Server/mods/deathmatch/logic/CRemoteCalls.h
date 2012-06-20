@@ -21,21 +21,24 @@ class CRemoteCall
 {
 private:
     class CResource *   m_resource;
-    char *              m_szResourceName;
-    char *              m_szFunctionName;
-    char *              m_szServerHost;
     std::string         m_strData;
+    bool                m_bPostBinary;
+    bool                m_bIsFetch;
     class CLuaMain *    m_VM;
     CLuaFunctionRef     m_iFunction;
-    char                m_szURL[512];
+    SString             m_strURL;
+    CLuaArguments       m_FetchArguments;
 
 public:
-                        CRemoteCall ( char * szServerHost, char * szResourceName, char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
-                        CRemoteCall ( char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
+                        CRemoteCall ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
+                        CRemoteCall ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
+                        CRemoteCall ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
                         ~CRemoteCall ();
     void                MakeCall();
     static void         ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error);
     CLuaMain *          GetVM() {return m_VM;};
+    bool                IsFetch() {return m_bIsFetch;}
+    CLuaArguments&      GetFetchArguments() {return m_FetchArguments;}
 };
 
 /*
@@ -51,8 +54,9 @@ public:
                         CRemoteCalls();
                         ~CRemoteCalls();
 
-    void                Call ( char * szServerHost, char * szResourceName, char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
-    void                Call ( char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
+    void                Call ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
+    void                Call ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
+    void                Call ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
     void                Remove ( CLuaMain * luaMain );
     void                Remove ( CRemoteCall * call );
     bool                CallExists ( CRemoteCall * call );

@@ -34,7 +34,17 @@ bool CDynamicLibrary::Load ( const char* szFilename )
 
     // Load the new library
     #ifdef WIN32
-        m_hModule = LoadLibrary ( szFilename );
+        // Search at the same path for dependencies (path must be abslolute)
+        m_hModule = LoadLibraryEx ( szFilename, NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
+
+        if ( !m_hModule )
+        {
+            DWORD dwError = GetLastError ();
+            char szError [ 2048 ] = { 0 };
+            FormatMessage ( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, dwError, LANG_NEUTRAL, szError, sizeof ( szError ), NULL );
+            CLogger::ErrorPrintf ( "Could not load %s - %s", szFilename, szError );
+        }
+
     #else
         m_hModule = dlopen ( szFilename, RTLD_NOW );
     

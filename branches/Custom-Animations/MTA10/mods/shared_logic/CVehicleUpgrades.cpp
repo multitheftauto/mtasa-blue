@@ -17,20 +17,22 @@ char szUpgradeNameEmpty [] = "";
 
 struct SUpgradeName
 {
-    char szName [32];
+    const char* szName;
 };
 
-SUpgradeName UpgradeNames [17] =
-{ {"Hood"}, {"Vent"}, {"Spoiler"}, {"Sideskirt"}, {"Front Bullbars"},
-{"Rear Bullbars"}, {"Headlights"}, {"Roof"}, {"Nitro"}, {"Hydraulics"}, 
-{"Stereo"}, {"Unknown"}, {"Wheels"}, {"Exhaust"}, {"Front Bumper"},
-{"Rear Bumper"}, {"Misc"} };
+static const SFixedArray < SUpgradeName, 17 > UpgradeNames =
+{ {
+    {"Hood"}, {"Vent"}, {"Spoiler"}, {"Sideskirt"}, {"Front Bullbars"},
+    {"Rear Bullbars"}, {"Headlights"}, {"Roof"}, {"Nitro"}, {"Hydraulics"}, 
+    {"Stereo"}, {"Unknown"}, {"Wheels"}, {"Exhaust"}, {"Front Bumper"},
+    {"Rear Bumper"}, {"Misc"}
+} };
 
 
 CVehicleUpgrades::CVehicleUpgrades ( CClientVehicle* pVehicle )
 {
     m_pVehicle = pVehicle;
-    memset ( m_SlotStates, 0, sizeof ( m_SlotStates ) );
+    memset ( &m_SlotStates[0], 0, sizeof ( m_SlotStates ) );
 }
 
 
@@ -47,7 +49,10 @@ bool CVehicleUpgrades::IsUpgradeCompatible ( unsigned short usUpgrade )
     // No upgrades for trains
     if ( usModel == 537 ||
          usModel == 538 ||
-         usModel == 449 )
+         usModel == 449 ||
+         usModel == 569 ||
+         usModel == 570 ||
+         usModel == 590  )
     {
         return false;
     }
@@ -310,9 +315,7 @@ void CVehicleUpgrades::ForceAddUpgrade ( unsigned short usUpgrade )
                 if ( !g_pGame->IsASyncLoadingEnabled () || !pModelInfo->IsLoaded () )
                 {
                     // Request and load now
-                    pModelInfo->RequestVehicleUpgrade ();
-
-                    g_pGame->GetStreaming()->LoadAllRequestedModels ();
+                    pModelInfo->Request( BLOCKING, "CVehicleUpgrades::ForceAddUpgrade" );
                 }
                 // Add the upgrade
                 pVehicle->AddVehicleUpgrade ( usUpgrade );
@@ -323,6 +326,19 @@ void CVehicleUpgrades::ForceAddUpgrade ( unsigned short usUpgrade )
         m_SlotStates [ ucSlot ] = usUpgrade;
     }
 }
+
+// Not really a restream.
+// Call after changing from/to a custom model to see the result immediately
+void CVehicleUpgrades::RestreamVehicleUpgrades ( unsigned short usUpgrade )
+{
+    unsigned char ucSlot;
+    if ( GetSlotFromUpgrade ( usUpgrade, ucSlot ) )
+    {
+        if ( m_SlotStates [ ucSlot ] == usUpgrade )
+            ForceAddUpgrade ( usUpgrade );
+    }
+}
+
 
 bool CVehicleUpgrades::HasUpgrade ( unsigned short usUpgrade )
 {

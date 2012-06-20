@@ -127,7 +127,6 @@ public:
     void                                        SetWeaponAmmoInClip         ( unsigned short uscAmmoInClip, unsigned char ucSlot = 0xFF );
     unsigned short                              GetWeaponTotalAmmo          ( unsigned char ucSlot = 0xFF );
     void                                        SetWeaponTotalAmmo          ( unsigned short usTotalAmmo, unsigned char ucSlot = 0xFF );
-    float                                       GetWeaponRange              ( unsigned char ucSlot = 0xFF );
 
     float                                       GetMaxHealth                ( void );
     inline float                                GetHealth                   ( void )                            { return m_fHealth; }
@@ -141,7 +140,6 @@ public:
     
     inline float                                GetPlayerStat               ( unsigned short usStat )       { return ( usStat < NUM_PLAYER_STATS ) ? m_fStats [ usStat ] : 0; }
     inline void                                 SetPlayerStat               ( unsigned short usStat, float fValue ) { if ( usStat < NUM_PLAYER_STATS ) m_fStats [ usStat ] = fValue; } 
-    inline float*                               GetPlayerStats              ( void )                        { return m_fStats; }
 
     inline CPlayerClothes*                      GetClothes                  ( void )                        { return m_pClothes; }
 
@@ -189,19 +187,15 @@ public:
     inline float                                GetGravity                  ( void )                        { return m_fGravity; }
     inline void                                 SetGravity                  ( float fGravity )              { m_fGravity = fGravity; }
 
-//    inline CVehicle*                            GetOccupyingVehicle         ( void )                        { return m_pOccupyingVehicle; };
     inline CVehicle*                            GetOccupiedVehicle          ( void )                        { return m_pVehicle; };
-//    inline unsigned int                         GetOccupyingVehicleSeat     ( void )                        { return m_uiOccupyingVehicleSeat; };
     inline unsigned int                         GetOccupiedVehicleSeat      ( void )                        { return m_uiVehicleSeat; };
-//    void                                        SetOccupyingVehicle         ( CVehicle* pVehicle, unsigned int uiSeat );
     CVehicle*                                   SetOccupiedVehicle          ( CVehicle* pVehicle, unsigned int uiSeat );
     inline unsigned long                        GetVehicleActionStartTime   ( void )                        { return m_ulVehicleActionStartTime; };
 
     inline unsigned int                         GetVehicleAction            ( void )                        { return m_uiVehicleAction; };
     void                                        SetVehicleAction            ( unsigned int uiAction );
-    inline CVehicle *                           GetEnteringVehicle          ( void )                        { return m_pEnteringVehicle; }
-    inline unsigned int                         GetEnteringVehicleSeat      ( void )                        { return m_uiEnteringVehicleSeat; }
-    inline void                                 SetEnteringVehicle          ( CVehicle * pVehicle, unsigned int uiSeat ) { m_pEnteringVehicle = pVehicle; m_uiEnteringVehicleSeat = uiSeat; }
+    inline CVehicle *                           GetJackingVehicle           ( void )                        { return m_pJackingVehicle; }
+    inline void                                 SetJackingVehicle           ( CVehicle * pVehicle )         { m_pJackingVehicle = pVehicle; }
 
     bool                                        IsAttachToable              ( void );
 
@@ -241,14 +235,14 @@ protected:
     unsigned long                               m_ulHealthChangeTime;
     float                                       m_fArmor;
     unsigned long                               m_ulArmorChangeTime;
-    float                                       m_fStats [ NUM_PLAYER_STATS ];
+    SFixedArray < float, NUM_PLAYER_STATS >    m_fStats;
     CPlayerClothes*                             m_pClothes;
     bool                                        m_bHasJetPack;
     bool                                        m_bInWater;
     bool                                        m_bOnGround;
     bool                                        m_bIsPlayer;
     CPlayerTasks*                               m_pTasks;
-    CWeapon                                     m_Weapons [ WEAPON_SLOTS ];
+    SFixedArray < CWeapon, WEAPON_SLOTS >      m_Weapons;
     unsigned char                               m_ucWeaponSlot;
     unsigned char                               m_ucCurrentWeaponState;
     unsigned char                               m_ucAlpha;
@@ -269,13 +263,10 @@ protected:
     bool                                        m_bStealthAiming;
 
     CVehicle*                                   m_pVehicle;
-/*    CVehicle*                                   m_pOccupyingVehicle;
-    unsigned int                                m_uiOccupyingVehicleSeat;*/
     unsigned int                                m_uiVehicleSeat;
     unsigned int                                m_uiVehicleAction;
     unsigned long                               m_ulVehicleActionStartTime;
-    CVehicle*                                   m_pEnteringVehicle;
-    unsigned int                                m_uiEnteringVehicleSeat;
+    CVehicle*                                   m_pJackingVehicle;
 
     bool                                        m_bSyncable;
     bool                                        m_bCollisionsEnabled;

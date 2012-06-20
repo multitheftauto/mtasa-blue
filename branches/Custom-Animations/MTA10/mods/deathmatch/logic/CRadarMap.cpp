@@ -18,6 +18,15 @@
 using SharedUtil::CalcMTASAPath;
 using std::list;
 
+enum
+{
+    MARKER_SQUARE_INDEX         = 0,
+    MARKER_UP_TRIANGLE_INDEX    = 1,
+    MARKER_DOWN_TRIANGLE_INDEX  = 2,
+    MARKER_FIRST_SPRITE_INDEX   = 3,
+    MARKER_LAST_SPRITE_INDEX    = MARKER_FIRST_SPRITE_INDEX + RADAR_MARKER_LIMIT - 1,
+};
+
 CRadarMap::CRadarMap ( CClientManager* pManager )
 {
     // Setup our managers
@@ -29,6 +38,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     m_bIsRadarEnabled = false;
     m_bForcedState = false;
     m_bIsAttachedToLocal = false;
+    m_bHideHelpText = false;
 
     // Set the movement bools
     m_bIsMovingNorth = false;
@@ -37,113 +47,68 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     m_bIsMovingWest = false;
     m_bTextVisible = false;
 
-    // Set the initial alpha to the alpha from the users options
-    int iVar;
-    g_pCore->GetCVars()->Get ( "mapalpha", iVar );
-    m_iRadarAlpha = iVar;
-
     // Set the update time to the current time
     m_ulUpdateTime = GetTickCount32 ();
 
     // Get the window sizes and set the map variables to default zoom/movement
     m_uiHeight = g_pCore->GetGraphics ()->GetViewportHeight ();
     m_uiWidth = g_pCore->GetGraphics ()->GetViewportWidth ();
-    m_ucZoom = 1;
+    m_fZoom = 1;
     m_iHorizontalMovement = 0;
     m_iVerticalMovement = 0;
     SetupMapVariables ();
 
     // Create the radar and local player blip images
-    m_pRadarImage = g_pCore->GetGraphics()->LoadTexture ( CalcMTASAPath("MTA\\cgui\\images\\radar.jpg"), RADAR_TEXTURE_WIDTH, RADAR_TEXTURE_HEIGHT );
-    m_pLocalPlayerBlip = g_pCore->GetGraphics()->LoadTexture ( CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png")  );
+    m_pRadarImage = g_pCore->GetGraphics()->GetRenderItemManager ()->CreateTexture ( CalcMTASAPath("MTA\\cgui\\images\\radar.jpg"), NULL, false, 1024, 1024, RFORMAT_DXT1 );
+    m_pLocalPlayerBlip = g_pCore->GetGraphics()->GetRenderItemManager ()->CreateTexture ( CalcMTASAPath("MTA\\cgui\\images\\radarset\\02.png") );
 
-    // Create the text display for the mode text
-    m_pModeText = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
-    m_pModeText->SetCaption ( "Current Mode: Free Move" );
-    m_pModeText->SetColor ( SColorRGBA ( 255, 255, 255, 200 ) );
-    m_pModeText->SetPosition ( CVector ( 0.50f, 0.92f, 0 ) );
-    m_pModeText->SetFormat ( DT_CENTER | DT_VCENTER );
-    m_pModeText->SetScale ( 1.5f );
-    m_pModeText->SetVisible ( false );
-
-    m_pHelpTextZooming = NULL;
-    m_pHelpTextMovement = NULL;
-    m_pHelpTextAttachment = NULL;
-
-    // retrieve the key binds
-    //   zooming
-    CCommandBind * cbZoomOut = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_zoom_out", 0, 0, 0, false, 0 );
-    if ( !cbZoomOut )
-        return;
-    const SBindableKey *bkZoomOut = cbZoomOut->boundKey;
-
-    CCommandBind * cbZoomIn = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_zoom_in", 0, 0, 0, false, 0 );
-    if ( !cbZoomIn )
-        return;
-    const SBindableKey *bkZoomIn = cbZoomIn->boundKey;
-
-    //   movement
-    CCommandBind * cbMoveNorth = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_move_north", 0, 0, 0, false, 0 );
-    if ( !cbMoveNorth )
-        return;
-    const SBindableKey *bkMoveNorth = cbMoveNorth->boundKey;
-
-    CCommandBind * cbMoveEast = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_move_east", 0, 0, 0, false, 0 );
-    if ( !cbMoveEast )
-        return;
-    const SBindableKey *bkMoveEast = cbMoveEast->boundKey;
-
-    CCommandBind * cbMoveSouth = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_move_south", 0, 0, 0, false, 0 );
-    if ( !cbMoveSouth )
-        return;
-    const SBindableKey *bkMoveSouth = cbMoveSouth->boundKey;
-
-    CCommandBind * cbMoveWest = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_move_west", 0, 0, 0, false, 0 );
-    if ( !cbMoveWest )
-        return;
-    const SBindableKey *bkMoveWest = cbMoveWest->boundKey;
-
-    //   toggle map mode
-    CCommandBind * cbAttachRadar = g_pCore->GetKeyBinds () -> GetBindFromCommand ( "radar_attach", 0, 0, 0, false, 0 );
-    if ( !cbAttachRadar )
-        return;
-    const SBindableKey *bkAttachRadar = cbAttachRadar->boundKey;
+    // Create the marker textures
+    CreateMarkerTextures ();
 
     // Create the text displays for the help text
-    m_pHelpTextZooming = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
-    m_pHelpTextZooming->SetCaption ( SString("Press %s/%s to zoom in/out.", bkZoomIn->szKey, bkZoomOut->szKey).c_str () );
-    m_pHelpTextZooming->SetColor( SColorRGBA ( 255, 255, 255, 255 ) );
-    m_pHelpTextZooming->SetPosition ( CVector ( 0.50f, 0.05f, 0 ) );
-    m_pHelpTextZooming->SetFormat ( DT_CENTER | DT_VCENTER );
-    m_pHelpTextZooming->SetScale ( 1.0f );
-    m_pHelpTextZooming->SetVisible ( false );
+    struct {
+        SColor color;
+        float fPosY;
+        float fScale;
+        SString strMessage;
+    } messageList [] = {
+        { SColorRGBA ( 255, 255, 255, 200 ), 0.92f, 1.5f, "Current Mode: Kill all humans" },
+        { SColorRGBA ( 255, 255, 255, 255 ), 0.95f, 1.0f, SString ( "Press %s to change mode.", *GetBoundKeyName ( "radar_attach" ) ) },
+        { SColorRGBA ( 255, 255, 255, 255 ), 0.05f, 1.0f, SString ( "Press %s/%s to zoom in/out.", *GetBoundKeyName ( "radar_zoom_in" ), *GetBoundKeyName ( "radar_zoom_out" ) ) },
+        { SColorRGBA ( 255, 255, 255, 255 ), 0.08f, 1.0f, SString ( "Press %s, %s, %s, %s to navigate the map.", *GetBoundKeyName ( "radar_move_north" ), *GetBoundKeyName ( "radar_move_east" ), *GetBoundKeyName ( "radar_move_south" ), *GetBoundKeyName ( "radar_move_west" ) ) },
+        { SColorRGBA ( 255, 255, 255, 255 ), 0.11f, 1.0f, SString ( "Press %s/%s to change opacity.", *GetBoundKeyName ( "radar_opacity_down" ), *GetBoundKeyName ( "radar_opacity_up" ) ) },
+        { SColorRGBA ( 255, 255, 255, 255 ), 0.14f, 1.0f, SString ( "Press %s to hide the map.", *GetBoundKeyName ( "radar" ) ) },
+        { SColorRGBA ( 255, 255, 255, 255 ), 0.17f, 1.0f, SString ( "Press %s to hide this help text.", *GetBoundKeyName ( "radar_help" ) ) },
+    };
 
-    m_pHelpTextMovement = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
-    m_pHelpTextMovement->SetCaption ( SString("Press %s, %s, %s, %s to navigate the map.", bkMoveNorth->szKey, bkMoveEast->szKey, bkMoveSouth->szKey, bkMoveWest->szKey).c_str() );
-    m_pHelpTextMovement->SetColor( SColorRGBA ( 255, 255, 255, 255 ) );
-    m_pHelpTextMovement->SetPosition ( CVector ( 0.50f, 0.08f, 0 ) );
-    m_pHelpTextMovement->SetFormat ( DT_CENTER | DT_VCENTER );
-    m_pHelpTextMovement->SetScale ( 1.0f );
-    m_pHelpTextMovement->SetVisible ( false );
+    for ( uint i = 0 ; i < NUMELMS( messageList ) ; i++ )
+    {
+        CClientTextDisplay* pTextDisplay = new CClientTextDisplay ( m_pManager->GetDisplayManager () );
+        pTextDisplay->SetCaption ( messageList[i].strMessage );
+        pTextDisplay->SetColor( messageList[i].color );
+        pTextDisplay->SetPosition ( CVector ( 0.50f, messageList[i].fPosY, 0 ) );
+        pTextDisplay->SetFormat ( DT_CENTER | DT_VCENTER );
+        pTextDisplay->SetScale ( messageList[i].fScale );
+        pTextDisplay->SetVisible ( false );
 
-    m_pHelpTextAttachment = new CClientTextDisplay ( m_pManager->GetDisplayManager (), 0xFFFFFFFF, false );
-    m_pHelpTextAttachment->SetCaption ( SString("Press %s to change mode.", bkAttachRadar->szKey).c_str() );
-    m_pHelpTextAttachment->SetColor( SColorRGBA ( 255, 255, 255, 255 ) );
-    m_pHelpTextAttachment->SetPosition ( CVector ( 0.50f, 0.11f, 0 ) );
-    m_pHelpTextAttachment->SetFormat ( DT_CENTER | DT_VCENTER );
-    m_pHelpTextAttachment->SetScale ( 1.0f );
-    m_pHelpTextAttachment->SetVisible ( false );
+        m_HelpTextList.push_back ( pTextDisplay );
+    }
+
+    // Default to attached to player
+    SetAttachedToLocalPlayer ( true );
 }
 
 
 CRadarMap::~CRadarMap ( void )
 {
     // Delete our images
-    if ( m_pRadarImage )
-        m_pRadarImage->Release();
+    SAFE_RELEASE( m_pRadarImage );
+    SAFE_RELEASE( m_pLocalPlayerBlip );
 
-    if ( m_pLocalPlayerBlip )
-        m_pLocalPlayerBlip->Release();
+    for ( uint i = 0 ; i < m_MarkerTextureList.size () ; i++ )
+        SAFE_RELEASE( m_MarkerTextureList[i] );
+
+    m_MarkerTextureList.clear ();
 
     // Don't need to delete the help texts as those are destroyed by the display manager
 }
@@ -154,11 +119,6 @@ void CRadarMap::DoPulse ( void )
     // If our radar image exists
     if ( IsRadarShowing () )
     {
-        // Get the alpha from the options, incase it has changed
-        int iVar;
-        g_pCore->GetCVars()->Get ( "mapalpha", iVar );
-        m_iRadarAlpha = iVar;
-
         // If we are following the local player blip
         if ( m_bIsAttachedToLocal )
         {
@@ -194,18 +154,99 @@ void CRadarMap::DoPulse ( void )
 }
 
 
+//
+// Precreate all the textures for the radar map markers
+//
+void CRadarMap::CreateMarkerTextures ( void )
+{
+    assert ( m_MarkerTextureList.empty () );
+    SString strRadarSetDirectory = CalcMTASAPath ( "MTA\\cgui\\images\\radarset\\" );
+
+    // Load the 3 shapes
+    const char* shapeFileNames[] = { "square.png", "up.png", "down.png" };
+    for ( uint i = 0 ; i < NUMELMS( shapeFileNames ) ; i++ )
+    {
+        CTextureItem* pTextureItem = g_pCore->GetGraphics()->GetRenderItemManager ()->CreateTexture ( PathJoin ( strRadarSetDirectory, shapeFileNames[i] ) );
+        m_MarkerTextureList.push_back ( pTextureItem );
+    }
+
+    assert ( m_MarkerTextureList.size () == MARKER_FIRST_SPRITE_INDEX );
+
+    // Load the icons
+    for ( uint i = 0 ; i < RADAR_MARKER_LIMIT ; i++ )
+    {
+        CTextureItem* pTextureItem = g_pCore->GetGraphics()->GetRenderItemManager ()->CreateTexture ( PathJoin ( strRadarSetDirectory, SString ( "%02u.png", i + 1 ) ) );
+        m_MarkerTextureList.push_back ( pTextureItem );
+    }
+
+    assert ( m_MarkerTextureList.size () == MARKER_LAST_SPRITE_INDEX + 1 );
+}
+
+
+//
+// Get a texture for a marker, including scale and color
+//
+CTextureItem* CRadarMap::GetMarkerTexture ( CClientRadarMarker* pMarker, float fLocalZ, float* pfScale, SColor* pColor )
+{
+    float fScale = pMarker->GetScale ();
+    ulong ulSprite = pMarker->GetSprite ();
+    SColor color = pMarker->GetColor ();
+
+    // Make list index
+    uint uiListIndex = 0;
+
+    if ( ulSprite )
+    {
+        // ulSprite >= 1 and <= 63
+        // Remap to texture list index
+        uiListIndex = ulSprite - 1 + MARKER_FIRST_SPRITE_INDEX;
+        color = SColorARGB ( 255, 255, 255, 255 );
+        fScale = 1;
+    }
+    else
+    {
+        // ulSprite == 0 so draw a square or triangle depending on relative z position
+        CVector vecMarker;
+        pMarker->GetPosition ( vecMarker );
+
+        if ( fLocalZ > vecMarker.fZ + 4.0f )
+            uiListIndex = MARKER_DOWN_TRIANGLE_INDEX;   // We're higher than this marker, so draw the arrow pointing down
+        else
+        if ( fLocalZ < vecMarker.fZ - 4.0f )
+            uiListIndex = MARKER_UP_TRIANGLE_INDEX;     // We're lower than this entity, so draw the arrow pointing up
+        else
+            uiListIndex = MARKER_SQUARE_INDEX;          // We're at the same level so draw a square
+
+        fScale /= 4;
+    }
+
+    *pfScale = fScale;
+    *pColor = color;
+
+    if ( uiListIndex >= m_MarkerTextureList.size () )
+        return NULL;
+
+    return m_MarkerTextureList [ uiListIndex ];
+}
+
+
 void CRadarMap::DoRender ( void )
 {
-    // If our radar image exists
-    if ( IsRadarShowing () )
+    bool bIsRadarShowing = IsRadarShowing ();
+
+    // Render if showing
+    if ( bIsRadarShowing )
     {
+        // Get the alpha value from the settings
+        int iRadarAlpha;
+        g_pCore->GetCVars()->Get ( "mapalpha", iRadarAlpha );
 
         g_pCore->GetGraphics()->DrawTexture ( m_pRadarImage, static_cast < float > ( m_iMapMinX ),
                                                              static_cast < float > ( m_iMapMinY ),
-                                                             m_fMapSize / RADAR_TEXTURE_WIDTH,
-                                                             m_fMapSize / RADAR_TEXTURE_HEIGHT,
+                                                             m_fMapSize / m_pRadarImage->m_uiSizeX,
+                                                             m_fMapSize / m_pRadarImage->m_uiSizeY,
                                                              0.0f, 0.0f, 0.0f,
-                                                             m_iRadarAlpha );
+                                                             SColorARGB ( iRadarAlpha, 255, 255, 255 ) );
 
         // Grab the info for the local player blip
         CVector2D vecLocalPos;
@@ -262,157 +303,31 @@ void CRadarMap::DoRender ( void )
             if ( (*markerIter)->IsVisible () && (*markerIter)->GetDimension() == usDimension )
             {
                 // Grab the marker image and calculate the position to put it on the screen
-                CVector2D vecPos;
-                IDirect3DTexture9* pImage = (*markerIter)->GetMapMarkerImage ();
+                float fScale = 1;
+                SColor color;
+                CTextureItem* pTexture = GetMarkerTexture ( *markerIter, vecLocal.fZ, &fScale, &color );
 
-                // Scale the marker to the right size
-                float fScale = (*markerIter)->GetScale ();
-
-                switch ( (*markerIter)->GetMapMarkerState () )
+                if ( pTexture )
                 {
-                    case CClientRadarMarker::MAP_MARKER_SQUARE:
-                    {
-                        fScale = fScale / 5.0f;
-                        break;
-                    }
-                    case CClientRadarMarker::MAP_MARKER_TRIANGLE_UP:
-                    {
-                        fScale = fScale / 4.0f;
-                        break;
-                    }
-                    case CClientRadarMarker::MAP_MARKER_TRIANGLE_DOWN:
-                    {
-                        fScale = fScale / 4.0f;
-                        break;
-                    }
-                    default:
-                    {
-                        fScale = 1.0f;
-                        break;
-                    }
-                }
-
-                CalculateEntityOnScreenPosition ( *markerIter, vecPos );
-
-                // If it is a picture icon not a blip
-                if ( (*markerIter)->GetSprite () != 0 )
-                {
-                    // If the picture exists
-                    if ( pImage )
-                    {
-                        // Set the size, position etc and show it here
-                        g_pCore->GetGraphics()->DrawTexture ( pImage, vecPos.fX, vecPos.fY, fScale, fScale, 0.0f, 0.5f, 0.5f );
-                    }
-                    else
-                    {
-                        // The image has not yet been created, let's create it
-                        (*markerIter)->SetSprite ( (*markerIter)->GetSprite () );
-
-                        // Retrieve the newly created image from the marker element
-                        pImage = (*markerIter)->GetMapMarkerImage ();
-
-                        // Set the size, position etc and show it here
-                        g_pCore->GetGraphics()->DrawTexture ( pImage, vecPos.fX, vecPos.fY, fScale, fScale, 0.0f, 0.5f, 0.5f );
-                    }
-                }
-                else
-                {
-                    // If the radar blip hasn't been created
-                    if ( !pImage )
-                    {
-                        // Create it and set it to a square blip
-                        (*markerIter)->SetMapMarkerState ( CClientRadarMarker::MAP_MARKER_SQUARE );
-                    }
-
-                    CVector vecMarker;
-                    (*markerIter)->GetPosition ( vecMarker );
-
-                    CClientRadarMarker::EMapMarkerState eMapMarkerState = (*markerIter)->GetMapMarkerState ();
-
-                    // We're higher than this marker, so draw the arrow pointing down
-                    if ( vecLocal.fZ > vecMarker.fZ + 4.0f )
-                    {
-                        // If this is not the right blip
-                        if ( eMapMarkerState != CClientRadarMarker::MAP_MARKER_TRIANGLE_DOWN )
-                        {
-                            // Set it to the right blip
-                            (*markerIter)->SetMapMarkerState ( CClientRadarMarker::MAP_MARKER_TRIANGLE_DOWN );
-                        }
-                    }
-
-                    // We're lower than this entity, so draw the arrow pointing up
-                    else if ( vecLocal.fZ < vecMarker.fZ - 4.0f )
-                    {
-                        // If this is not the right blip
-                        if ( eMapMarkerState != CClientRadarMarker::MAP_MARKER_TRIANGLE_UP )
-                        {
-                            // Set it to the right blip
-                            (*markerIter)->SetMapMarkerState ( CClientRadarMarker::MAP_MARKER_TRIANGLE_UP );
-                        }
-                    }
-
-                    // We're at the same level so draw a square
-                    else
-                    {
-                        // If this is not the right blip
-                        if ( eMapMarkerState != CClientRadarMarker::MAP_MARKER_SQUARE )
-                        {
-                            // Set it to the right blip
-                            (*markerIter)->SetMapMarkerState ( CClientRadarMarker::MAP_MARKER_SQUARE );
-                        }
-                    }
-
-                    // Grab the image pointer
-                    pImage = (*markerIter)->GetMapMarkerImage ();
-
-                    // If the image exists
-                    if ( pImage )
-                    {
-                        // Set the size, position etc and show it here
-                        g_pCore->GetGraphics()->DrawTexture ( pImage, vecPos.fX, vecPos.fY, fScale, fScale, 0.0f, 0.5f, 0.5f );
-                    }
+                    CVector2D vecPos;
+                    CalculateEntityOnScreenPosition ( *markerIter, vecPos );
+                    g_pCore->GetGraphics()->DrawTexture ( pTexture, vecPos.fX, vecPos.fY, fScale, fScale, 0.0f, 0.5f, 0.5f, color );
                 }
             }
         }
 
         g_pCore->GetGraphics()->DrawTexture ( m_pLocalPlayerBlip, vecLocalPos.fX, vecLocalPos.fY, 1.0, 1.0, vecLocalRot.fZ, 0.5f, 0.5f );
-
-        if ( !m_bTextVisible )
-        {
-            m_bTextVisible = true;
-            m_pModeText->SetVisible ( true );
-            if ( m_pHelpTextZooming )
-                m_pHelpTextZooming->SetVisible ( true );
-            if ( m_pHelpTextMovement )
-                m_pHelpTextMovement->SetVisible ( true );
-            if ( m_pHelpTextAttachment )
-                m_pHelpTextAttachment->SetVisible ( true );
-        }
-
-        if ( m_bTextVisible )
-        {
-            m_pModeText->Render ();
-            if ( m_pHelpTextZooming )
-                m_pHelpTextZooming->Render ();
-            if ( m_pHelpTextMovement )
-                m_pHelpTextMovement->Render ();
-            if ( m_pHelpTextAttachment )
-                m_pHelpTextAttachment->Render ();
-        }
     }
-    else
+
+    // Update visibility of help text
+    bool bRequiredTextVisible = bIsRadarShowing && !m_bHideHelpText;
+    if ( bRequiredTextVisible != m_bTextVisible )
     {
-        if ( m_bTextVisible )
-        {
-            m_bTextVisible = false;
-            m_pModeText->SetVisible ( false );
-            if ( m_pHelpTextZooming )
-                m_pHelpTextZooming->SetVisible ( false );
-            if ( m_pHelpTextMovement )
-                m_pHelpTextMovement->SetVisible ( false );
-            if ( m_pHelpTextAttachment )
-                m_pHelpTextAttachment->SetVisible ( false );
-        }
+        m_bTextVisible = bRequiredTextVisible;
+        for ( uint i = 0 ; i < m_HelpTextList.size () ; i++ )
+            m_HelpTextList[i]->SetVisible ( m_bTextVisible );
+
+        SetupMapVariables ();
     }
 }
 
@@ -526,73 +441,60 @@ bool CRadarMap::CalculateEntityOnScreenPosition ( CVector vecPosition, CVector2D
 void CRadarMap::SetupMapVariables ( void )
 {
     // Calculate the map size and the middle of the screen coords
-    m_fMapSize = static_cast < float > ( m_uiHeight * m_ucZoom );
+    m_fMapSize = static_cast < float > ( m_uiHeight * m_fZoom );
     int iMiddleX = static_cast < int > ( m_uiWidth / 2 );
     int iMiddleY = static_cast < int > ( m_uiHeight / 2 );
 
-    // If we are attached to the local player
-    if ( m_bIsAttachedToLocal )
+    // If we are attached to the local player and zoomed in at all
+    if ( m_bIsAttachedToLocal && m_fZoom > 1 )
     {
-        // If we are zoomed in at all
-        if ( m_ucZoom > 1 )
-        {
-            // Get the local player position
-            CVector vec;
-            CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager ()->GetLocalPlayer ();
-            if ( pLocalPlayer )
-                pLocalPlayer->GetPosition ( vec );
+        // Get the local player position
+        CVector vec;
+        CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager ()->GetLocalPlayer ();
+        if ( pLocalPlayer )
+            pLocalPlayer->GetPosition ( vec );
 
-            // Calculate the maps min and max vector positions putting the local player in the middle of the map
-            m_iMapMinX = static_cast < int > ( iMiddleX - ( iMiddleY * m_ucZoom ) - ( ( vec.fX * m_fMapSize ) / 6000.0f ) );
+        // Calculate the maps min and max vector positions putting the local player in the middle of the map
+        m_iMapMinX = static_cast < int > ( iMiddleX - ( iMiddleY * m_fZoom ) - ( ( vec.fX * m_fMapSize ) / 6000.0f ) );
+        m_iMapMaxX = static_cast < int > ( m_iMapMinX + m_fMapSize );
+        m_iMapMinY = static_cast < int > ( iMiddleY - ( iMiddleY * m_fZoom ) + ( ( vec.fY * m_fMapSize ) / 6000.0f ) );
+        m_iMapMaxY = static_cast < int > ( m_iMapMinY + m_fMapSize );
+
+        // If we are moving the map too far then stop centering the local player blip
+        if ( m_iMapMinX > 0 )
+        {
+            m_iMapMinX = 0;
             m_iMapMaxX = static_cast < int > ( m_iMapMinX + m_fMapSize );
-            m_iMapMinY = static_cast < int > ( iMiddleY - ( iMiddleY * m_ucZoom ) + ( ( vec.fY * m_fMapSize ) / 6000.0f ) );
-            m_iMapMaxY = static_cast < int > ( m_iMapMinY + m_fMapSize );
-
-            // If we are moving the map too far then stop centering the local player blip
-            if ( m_iMapMinX > 0 )
-            {
-                m_iMapMinX = 0;
-                m_iMapMaxX = static_cast < int > ( m_iMapMinX + m_fMapSize );
-            }
-            else if ( m_iMapMaxX <= static_cast < int > ( m_uiWidth ) )
-            {
-                m_iMapMaxX = m_uiWidth;
-                m_iMapMinX = static_cast < int > ( m_iMapMaxX - m_fMapSize );
-            }
-
-            if ( m_iMapMinY > 0 )
-            {
-                m_iMapMinY = 0;
-                m_iMapMaxY = static_cast < int > ( m_iMapMinY + m_fMapSize );
-            }
-            else if ( m_iMapMaxY <= static_cast < int > ( m_uiHeight ) )
-            {
-                m_iMapMaxY = m_uiHeight;
-                m_iMapMinY = static_cast < int > ( m_iMapMaxY - m_fMapSize );
-            }
         }
-        // If we are not zoomed in
-        else
+        else if ( m_iMapMaxX <= static_cast < int > ( m_uiWidth ) )
         {
-            // Set the map to the middle of the screen
-            m_iMapMinX = static_cast < int > ( iMiddleX - iMiddleY );
-            m_iMapMaxX = static_cast < int > ( iMiddleX + iMiddleY );
-            m_iMapMinY = static_cast < int > ( iMiddleY - iMiddleY );
-            m_iMapMaxY = static_cast < int > ( iMiddleY + iMiddleY );
+            m_iMapMaxX = m_uiWidth;
+            m_iMapMinX = static_cast < int > ( m_iMapMaxX - m_fMapSize );
+        }
+
+        if ( m_iMapMinY > 0 )
+        {
+            m_iMapMinY = 0;
+            m_iMapMaxY = static_cast < int > ( m_iMapMinY + m_fMapSize );
+        }
+        else if ( m_iMapMaxY <= static_cast < int > ( m_uiHeight ) )
+        {
+            m_iMapMaxY = m_uiHeight;
+            m_iMapMinY = static_cast < int > ( m_iMapMaxY - m_fMapSize );
         }
 
     }
-    // If we are in free roam mode
+    // If we are in free roam mode or not zoomed in
     else
     {
         // Set the maps min and max vector positions relative to the movement selected
-        m_iMapMinX = static_cast < int > ( iMiddleX - ( iMiddleY * m_ucZoom ) - ( ( m_iHorizontalMovement * m_fMapSize ) / 6000.0f ) );
+        m_iMapMinX = static_cast < int > ( iMiddleX - ( iMiddleY * m_fZoom ) - ( ( m_iHorizontalMovement * m_fMapSize ) / 6000.0f ) );
         m_iMapMaxX = static_cast < int > ( m_iMapMinX + m_fMapSize );
-        m_iMapMinY = static_cast < int > ( iMiddleY - ( iMiddleY * m_ucZoom ) + ( ( m_iVerticalMovement * m_fMapSize ) / 6000.0f )  );
+        m_iMapMinY = static_cast < int > ( iMiddleY - ( iMiddleY * m_fZoom ) + ( ( m_iVerticalMovement * m_fMapSize ) / 6000.0f )  );
         m_iMapMaxY = static_cast < int > ( m_iMapMinY + m_fMapSize );
 
         // If we are zoomed in
-        if ( m_ucZoom > 1 )
+        if ( m_fZoom > 1 )
         {
             if ( m_iMapMinX >= 0 )
             {
@@ -624,14 +526,21 @@ void CRadarMap::SetupMapVariables ( void )
             m_iVerticalMovement = 0;
         }
     }
+
+    // Show mode only when zoomed in
+    if ( !m_HelpTextList.empty () )
+    {
+        m_HelpTextList[0]->SetVisible ( m_fZoom > 1 && m_bTextVisible );
+        m_HelpTextList[1]->SetVisible ( m_fZoom > 1 && m_bTextVisible );
+    }
 }
 
 
 void CRadarMap::ZoomIn ( void )
 {
-    if ( m_ucZoom <= 4 )
+    if ( m_fZoom <= 4 )
     {
-        m_ucZoom = m_ucZoom * 2;
+        m_fZoom = m_fZoom * 2;
         SetupMapVariables ();
     }
 }
@@ -639,11 +548,11 @@ void CRadarMap::ZoomIn ( void )
 
 void CRadarMap::ZoomOut ( void )
 {
-    if ( m_ucZoom >= 2 )
+    if ( m_fZoom >= 1 )
     {
-        m_ucZoom = m_ucZoom / 2;
+        m_fZoom = m_fZoom / 2;
 
-        if ( m_ucZoom > 1 )
+        if ( m_fZoom > 1 )
         {
             m_iVerticalMovement = static_cast < int > ( m_iVerticalMovement / 1.7f );
             m_iHorizontalMovement = static_cast < int > ( m_iHorizontalMovement / 1.7f );
@@ -668,7 +577,7 @@ void CRadarMap::MoveNorth ( void )
 {
     if ( !m_bIsAttachedToLocal )
     {
-        if ( m_ucZoom > 1 )
+        if ( m_fZoom > 1 )
         {
             if ( m_iMapMinY >= 0 )
             {
@@ -689,7 +598,7 @@ void CRadarMap::MoveSouth ( void )
 {
     if ( !m_bIsAttachedToLocal )
     {
-        if ( m_ucZoom > 1 )
+        if ( m_fZoom > 1 )
         {
             if ( m_iMapMaxY <= static_cast < int > ( m_uiHeight ) )
             {
@@ -710,7 +619,7 @@ void CRadarMap::MoveEast ( void )
 {
     if ( !m_bIsAttachedToLocal )
     {
-        if ( m_ucZoom > 1 )
+        if ( m_fZoom > 1 )
         {
             if ( m_iMapMaxX <= static_cast < int > ( m_uiWidth ) )
             {
@@ -731,7 +640,7 @@ void CRadarMap::MoveWest ( void )
 {
     if ( !m_bIsAttachedToLocal )
     {
-        if ( m_ucZoom > 1 )
+        if ( m_fZoom > 1 )
         {
             if ( m_iMapMinX >= 0 )
             {
@@ -755,11 +664,11 @@ void CRadarMap::SetAttachedToLocalPlayer ( bool bIsAttachedToLocal )
 
     if ( m_bIsAttachedToLocal )
     {
-        m_pModeText->SetCaption ( "Current Mode: Attached to local player" );
+        m_HelpTextList[0]->SetCaption ( "Current Mode: Attached to local player" );
     }
     else
     {
-        m_pModeText->SetCaption ( "Current Mode: Free Move" );
+        m_HelpTextList[0]->SetCaption ( "Current Mode: Free Move" );
     }
 }
 
@@ -791,7 +700,15 @@ bool CRadarMap::GetBoundingBox ( CVector &vecMin, CVector &vecMax )
     }
 }
 
-void CRadarMap::SetRadarAlpha ( int iRadarAlpha )
+void CRadarMap::ToggleHelpText ( void )
 {
-    m_iRadarAlpha = iRadarAlpha;
+    m_bHideHelpText = !m_bHideHelpText;
+}
+
+SString CRadarMap::GetBoundKeyName ( const SString& strCommand )
+{
+    CCommandBind* pCommandBind = g_pCore->GetKeyBinds () -> GetBindFromCommand ( strCommand, 0, 0, 0, false, 0 );
+    if ( !pCommandBind )
+        return strCommand;
+    return pCommandBind->boundKey->szKey;
 }

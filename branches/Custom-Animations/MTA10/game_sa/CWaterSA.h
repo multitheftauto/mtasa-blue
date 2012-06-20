@@ -59,8 +59,8 @@ public:
 class CWaterVertexSA : public CWaterVertex
 {
 public:
-                                     CWaterVertexSA    () { m_pInterface = NULL; }
-                                     CWaterVertexSA    ( CWaterVertexSAInterface* pInterface ) { m_pInterface = pInterface; }
+                                     CWaterVertexSA    ();
+                                     CWaterVertexSA    ( CWaterVertexSAInterface* pInterface );
 
     CWaterVertexSAInterface*         GetInterface      () { return m_pInterface; }
     void                             SetInterface      ( CWaterVertexSAInterface* pInterface ) { m_pInterface = pInterface; }
@@ -68,9 +68,16 @@ public:
     WORD                             GetID             ();
 
     void                             GetPosition       ( CVector& vec );
-    bool                             SetPosition       ( CVector& vec, void* pChangeSource = NULL );
+    bool                             SetPosition       ( const CVector& vec, void* pChangeSource = NULL );
+
+    void                             OnChangeLevel      ( float fOldZ, float fNewZ );
+    void                             Init               ( bool bIsWorldWaterVertex );
+    void                             Reset              ( void );
+    bool                             IsWorldNonSeaLevel ( void );
 
 protected:
+    bool                             m_bIsWorldWaterVertex;
+    float                            m_fDefaultZ;
     CWaterVertexSAInterface*         m_pInterface;
 };
 

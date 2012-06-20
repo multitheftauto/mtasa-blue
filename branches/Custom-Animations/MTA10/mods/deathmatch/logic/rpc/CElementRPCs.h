@@ -37,6 +37,7 @@ public:
     DECLARE_ELEMENT_RPC ( SetElementDoubleSided );
     DECLARE_ELEMENT_RPC ( SetElementCollisionsEnabled );
     DECLARE_ELEMENT_RPC ( SetElementFrozen );
+    DECLARE_ELEMENT_RPC ( SetLowLodElement );
 };
 
 #endif

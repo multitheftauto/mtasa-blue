@@ -53,7 +53,7 @@ public:
     CTaskComplexEnterBoatAsDriver*      CreateTaskComplexEnterBoatAsDriver      ( CVehicle * pVehicle );
     CTaskComplexUseMobilePhone*         CreateTaskComplexUseMobilePhone         ( const int iDuration = -1 );
 
-    CTaskComplexLeaveCar*               CreateTaskComplexLeaveCar               ( CVehicle* pVehicle, const int iTargetDoor=0, const int iDelayTime=0, const bool bSensibleLeaveCar=true, const bool bForceGetOut=false );
+    CTaskComplexLeaveCar*               CreateTaskComplexLeaveCar               ( CVehicle* pVehicle, const int iTargetDoor=0xFF, const int iDelayTime=0, const bool bSensibleLeaveCar=true, const bool bForceGetOut=false );
     CTaskSimpleDuck*                    CreateTaskSimpleDuck                    ( eDuckControlTypes nDuckControl, unsigned short nLengthOfDuck=0, unsigned short nUseShotsWhizzingEvents=-1 );
     CTaskSimpleChoking*                 CreateTaskSimpleChoking                 ( CPed* pAttacker, bool bIsTearGas );
 

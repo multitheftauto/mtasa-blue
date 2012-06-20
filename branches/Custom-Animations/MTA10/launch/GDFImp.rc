@@ -1,6 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 //  Resource File for : GDFImp
 #include "GDFImp.h"
+#include "vcexpress_rc_fix.h"
 
 // The following line is a workaround for a redefinition warning in sal.h
 // when using Visual Studio 2005 compilers and includes.  Comment out the
@@ -15,7 +16,9 @@
 
 #define APSTUDIO_READONLY_SYMBOLS
 
+#if !defined USING_VCEXPRESS
 #include <afxres.h>
+#endif
 
 #undef APSTUDIO_READONLY_SYMBOLS
 

@@ -24,6 +24,8 @@ void CPlayerRPCs::LoadFunctions ( void )
     AddHandler ( REMOVE_PLAYER_NAMETAG_COLOR, RemovePlayerNametagColor, "RemovePlayerNametagColor" );
     AddHandler ( SET_PLAYER_NAMETAG_COLOR, SetPlayerNametagColor, "SetPlayerNametagColor" );
     AddHandler ( SET_PLAYER_NAMETAG_SHOWING, SetPlayerNametagShowing, "SetPlayerNametagShowing" ); 
+    AddHandler ( SET_PLAYER_TEAM, SetPlayerTeam, "SetPlayerTeam" );
+    AddHandler ( TAKE_PLAYER_SCREEN_SHOT, TakePlayerScreenShot, "TakePlayerScreenShot" );
 }
 
 
@@ -46,7 +48,7 @@ void CPlayerRPCs::ShowPlayerHudComponent ( NetBitStreamInterface& bitStream )
     {
         bool bDisabled = ( ucShow != 1 );
         enum eHudComponent { HUD_AMMO = 0, HUD_WEAPON, HUD_HEALTH, HUD_BREATH,
-                             HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK, HUD_RADIO, HUD_WANTED, HUD_ALL };
+                             HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK, HUD_RADIO, HUD_WANTED, HUD_CROSSHAIR, HUD_ALL };
         switch ( ucComponent )
         {
             case HUD_AMMO:
@@ -86,7 +88,11 @@ void CPlayerRPCs::ShowPlayerHudComponent ( NetBitStreamInterface& bitStream )
             case HUD_WANTED:
                 g_pGame->GetHud ()->DisableWantedLevel ( bDisabled );
                 break;
+            case HUD_CROSSHAIR:
+                g_pGame->GetHud ()->DisableCrosshair ( bDisabled );
+                break;
             case HUD_ALL:
+                g_pClientGame->SetHudAreaNameDisabled ( bDisabled );
                 g_pGame->GetHud ()->DisableAll ( bDisabled );
                 break;
         }
@@ -163,5 +169,43 @@ void CPlayerRPCs::SetPlayerNametagShowing ( CClientEntity* pSource, NetBitStream
         {
             pPlayer->SetNametagShowing ( ( ucShowing == 1 ) );
         }
+    }
+}
+
+void CPlayerRPCs::SetPlayerTeam ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+{
+    ElementID TeamID;
+    if ( bitStream.Read ( TeamID ) )
+    {
+        CClientTeam* pTeam = m_pTeamManager->GetTeam ( TeamID );
+        CClientPlayer* pPlayer = m_pPlayerManager->Get ( pSource->GetID () );
+        if ( pPlayer )
+        {
+            pPlayer->SetTeam ( pTeam, true );
+        }
+    }
+}
+
+
+void CPlayerRPCs::TakePlayerScreenShot ( NetBitStreamInterface& bitStream )
+{
+    ushort usSizeX;
+    ushort usSizeY;
+    SString strTag;
+    uchar ucQuality;
+    uint uiMaxBandwidth;
+    ushort usMaxPacketSize;
+    SString strResourceName;
+    uint uiServerSentTime;
+    if ( bitStream.Read ( usSizeX ) &&
+         bitStream.Read ( usSizeY ) &&
+         bitStream.ReadString ( strTag ) &&
+         bitStream.Read ( ucQuality ) &&
+         bitStream.Read ( uiMaxBandwidth ) &&
+         bitStream.Read ( usMaxPacketSize ) &&
+         bitStream.ReadString ( strResourceName ) &&
+         bitStream.Read ( uiServerSentTime ) )
+    {
+        m_pClientGame->TakePlayerScreenShot ( usSizeX, usSizeY, strTag, ucQuality, uiMaxBandwidth, usMaxPacketSize, strResourceName, uiServerSentTime );        
     }
 }

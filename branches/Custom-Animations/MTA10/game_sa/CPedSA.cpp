@@ -54,6 +54,15 @@ CPedSA::~CPedSA ( void )
         if ( this->m_pWeapons[i] )
             delete this->m_pWeapons[i];
     }
+
+    // Make sure this ped is not refed in the flame shot info array
+    CFlameShotInfo* pInfo = (CFlameShotInfo*)ARRAY_CFlameShotInfo;
+    for ( uint i = 0 ; i < MAX_FLAME_SHOT_INFOS ; i++ )
+    {
+        if ( pInfo->pInstigator == m_pInterface )
+            pInfo->pInstigator = NULL;
+        pInfo++;
+    }
 }
 
 // used to init weapons at the moment, called by CPlayerPedSA when its been constructed
@@ -108,6 +117,17 @@ void CPedSA::SetModelIndex ( DWORD dwModelIndex )
         GetPedInterface ()->pedSound.m_bIsFemale = ( dwType == 5 || dwType == 22 );
     }
 }
+
+// Hacky thing done for the local player when changing model
+void CPedSA::RemoveGeometryRef ( void )
+{
+    RpClump* pClump = (RpClump*)GetInterface ()->m_pRwObject;
+    RpAtomic* pAtomic = (RpAtomic*)( ( pClump->atomics.root.next ) - 0x8 );
+    RpGeometry* pGeometry = pAtomic->geometry;
+    if ( pGeometry->refs > 1 )
+        pGeometry->refs--;
+}
+
 
 bool CPedSA::IsInWater ( void )
 {
@@ -365,26 +385,28 @@ void CPedSA::ClearWeapon ( eWeaponType weaponType )
     }
 }
 
-CWeapon * CPedSA::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
+CWeapon * CPedSA::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo, eWeaponSkill skill )
 {
     if ( weaponType != WEAPONTYPE_UNARMED )
     {
-        CWeaponInfo* pInfo = pGame->GetWeaponInfo ( weaponType );
+        CWeaponInfo* pInfo = pGame->GetWeaponInfo ( weaponType, skill );
         if ( pInfo )
         {
             int iModel = pInfo->GetModel();
+
             if ( iModel )
             {
                 CModelInfo * pWeaponModel = pGame->GetModelInfo ( iModel );
                 if ( pWeaponModel )
                 {
-                    pWeaponModel->Request ( true, true );
+                    pWeaponModel->Request ( BLOCKING, "CPedSA::GiveWeapon" );
+                    pWeaponModel->MakeCustomModel ();
                 }
             }
             // If the weapon is satchels, load the detonator too
             if ( weaponType == WEAPONTYPE_REMOTE_SATCHEL_CHARGE )
             {
-                int iModel = pGame->GetWeaponInfo ( WEAPONTYPE_DETONATOR )->GetModel();
+                /*int iModel = pGame->GetWeaponInfo ( WEAPONTYPE_DETONATOR )->GetModel();
                 if ( iModel )
                 {
                     CModelInfo * pWeaponModel = pGame->GetModelInfo ( iModel );
@@ -392,7 +414,9 @@ CWeapon * CPedSA::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
                     {
                         pWeaponModel->Request ( true, true );
                     }
-                }
+                }*/
+                // Load the weapon and give it properly so getPedWeapon shows the weapon is there.
+                GiveWeapon( WEAPONTYPE_DETONATOR, 1, WEAPONSKILL_STD );
             }
         }
     }
@@ -410,13 +434,7 @@ CWeapon * CPedSA::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
         mov     dwReturn, eax
     }
 
-    // ryden: Hack to increase the sniper range
     CWeapon* pWeapon = GetWeapon ( (eWeaponSlot)dwReturn );
-    if ( weaponType == WEAPONTYPE_SNIPERRIFLE )
-    {
-        pWeapon->GetInfo ()->SetWeaponRange ( 300.0f );
-        pWeapon->GetInfo ()->SetTargetRange ( 250.0f );
-    }
 
     return pWeapon;
 }
@@ -456,6 +474,13 @@ void CPedSA::ClearWeapons ( void )
     }
 }
 
+void CPedSA::RestoreLastGoodPhysicsState ( void )
+{
+    CPhysicalSA::RestoreLastGoodPhysicsState ();
+    SetCurrentRotation ( 0 );
+    SetTargetRotation ( 0 );
+}
+
 FLOAT CPedSA::GetCurrentRotation()
 {
     return GetPedInterface ()->fCurrentRotation;
@@ -493,7 +518,7 @@ void CPedSA::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
         if ( weaponSlot != GetCurrentWeaponSlot () )
         {
             CWeapon * pWeapon = GetWeapon ( currentSlot );
-            if ( pWeapon ) RemoveWeaponModel ( pWeapon->GetInfo ()->GetModel () );
+            if ( pWeapon ) RemoveWeaponModel ( pWeapon->GetInfo ( WEAPONSKILL_STD )->GetModel () );
 
             CPedSAInterface * thisPed = (CPedSAInterface *)this->GetInterface();
          
@@ -637,7 +662,7 @@ void CPedSA::SetGogglesState ( bool bIsWearingThem )
     }
 }
 
-void CPedSA::SetClothesTextureAndModel ( char * szTexture, char * szModel, int textureType )
+void CPedSA::SetClothesTextureAndModel ( const char* szTexture, const char* szModel, int textureType )
 {
     DWORD dwFunc = FUNC_CPedClothesDesc__SetTextureAndModel;
     //DWORD dwThis = (DWORD)this->GetInterface()->PlayerPedData.m_pClothes;

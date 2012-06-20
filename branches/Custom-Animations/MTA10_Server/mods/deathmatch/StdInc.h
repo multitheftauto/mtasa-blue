@@ -1,3 +1,6 @@
+#define SHARED_UTIL_WITH_HASH_MAP
+#define SHARED_UTIL_WITH_FAST_HASH_MAP
+
 #ifdef WIN32
 #pragma message("Compiling precompiled header.\n")
 
@@ -23,6 +26,10 @@
 #include <google/dense_hash_map>
 #include <google/sparse_hash_map>
 
+// Forward declarations
+class CAclRightName;
+struct SAclRequest;
+
 // SDK includes
 #include "MTAPlatform.h"
 #include <xml/CXML.h>
@@ -36,9 +43,10 @@
 #include "CMatrix.h"
 #include "CQuat.h"
 #include "SharedUtil.h"
+#include "Enums.h"
 #include <bochs_internal/crc32.h>
-#include "CMD5Hasher.h"
 #include "CChecksum.h"
+#include "CIdArray.h"
 
 // Packet includes
 #include "net/Packets.h"
@@ -85,19 +93,23 @@
 #include "packets/CProjectileSyncPacket.h"
 #include "packets/CResourceStartPacket.h"
 #include "packets/CResourceStopPacket.h"
+#include "packets/CResourceClientScriptsPacket.h"
 #include "packets/CReturnSyncPacket.h"
 #include "packets/CServerTextItemPacket.h"
 #include "packets/CUpdateInfoPacket.h"
 #include "packets/CUnoccupiedVehicleStartSyncPacket.h"
 #include "packets/CUnoccupiedVehicleStopSyncPacket.h"
 #include "packets/CUnoccupiedVehicleSyncPacket.h"
+#include "packets/CUnoccupiedVehiclePushPacket.h"
 #include "packets/CVehicleDamageSyncPacket.h"
 #include "packets/CVehicleInOutPacket.h"
 #include "packets/CVehiclePuresyncPacket.h"
+#include "packets/CLightsyncPacket.h"
+#include "packets/CVehicleResyncPacket.h"
 #include "packets/CVehicleSpawnPacket.h"
 #include "packets/CVehicleTrailerPacket.h"
 #include "packets/CVoiceDataPacket.h"
-#include "packets/PacketIODeclarators.h"
+#include "packets/CVoiceEndPacket.h"
 
 // Lua function definition includes
 #include "luadefs/CLuaACLDefs.h"
@@ -111,11 +123,15 @@
 #include "luadefs/CLuaResourceDefs.h"
 #include "luadefs/CLuaTextDefs.h"
 #include "luadefs/CLuaWorldDefs.h"
+#include "luadefs/CLuaVoiceDefs.h"
 #include "luadefs/CLuaXMLDefs.h"
 
 // Lua includes
 #include "lua/LuaCommon.h"
 #include "lua/CLuaMain.h"
+#include "CEasingCurve.h"
+#include "lua/CLuaFunctionParseHelpers.h"
+#include "CScriptArgReader.h"
 #include "lua/CLuaManager.h"
 #include "lua/CLuaTimerManager.h"
 #include "lua/CLuaTimer.h"
@@ -124,11 +140,16 @@
 #include "lua/CLuaArgument.h"
 #include "lua/CLuaCFunctions.h"
 #include "lua/CLuaArguments.h"
+#include "lua/CLuaCallback.h"
+#include "lua/LuaUtils.h"
+
+// Sim includes
+#include "net/CSimControl.h"
 
 // Shared includes
-#include "CEasingCurve.h"
 #include "TInterpolation.h"
 #include "CPositionRotationAnimation.h"
+#include "CLatentTransferManager.h"
 
 // Logic includes
 #include "ASE.h"
@@ -139,11 +160,14 @@
 #include "CAccessControlListRight.h"
 #include "CAccount.h"
 #include "CAccountManager.h"
+#include "CAclRightName.h"
 #include "CBan.h"
 #include "CBanManager.h"
+#include "CBandwidthSettings.h"
 #include "CBlendedWeather.h"
 #include "CBlip.h"
 #include "CBlipManager.h"
+#include "CCameraSpatialDatabase.h"
 #include "CClient.h"
 #include "CClock.h"
 #include "CColCallback.h"
@@ -158,7 +182,6 @@
 #include "CCommandFile.h"
 #include "CCommandLineParser.h"
 #include "CCommon.h"
-#include "CConfig.h"
 #include "CConnectHistory.h"
 #include "CConsole.h"
 #include "CConsoleClient.h"
@@ -170,6 +193,7 @@
 #include "CElementDeleter.h"
 #include "CElementGroup.h"
 #include "CElementIDs.h"
+#include "CElementRefManager.h"
 #include "CEvents.h"
 #include "CGame.h"
 #include "CGroups.h"
@@ -178,6 +202,7 @@
 #include "CHandlingManager.h"
 #include "CKeyBinds.h"
 #include "CLanBroadcast.h"
+#include "CLightsyncManager.h"
 #include "CLogger.h"
 #include "CMainConfig.h"
 #include "CMapEvent.h"
@@ -232,6 +257,7 @@
 #include "CTeamManager.h"
 #include "CTextDisplay.h"
 #include "CTextItem.h"
+#include "CTickRateSettings.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "CVehicle.h"
 #include "CVehicleColorManager.h"
@@ -247,12 +273,12 @@
 #include "CZoneNames.h"
 #include "TaskNames.h"
 #include "Utils.h"
+#include "logic/CWeaponStat.h"
+#include "logic/CWeaponStatManager.h"
+#include "logic/CBuildingRemoval.h"
+#include "logic/CBuildingRemovalManager.h"
 
 #include "CStaticFunctionDefinitions.h"
-
-// Shared includes
-#include "CEasingCurve.h"
-#include "CPositionRotationAnimation.h"
 
 // Utility includes
 #include "utils/CHTTPClient.h"
@@ -266,6 +292,7 @@
 #include "utils/CTCPServerSocketImpl.h"
 #include "utils/CTCPSocket.h"
 #include "utils/CTCPSocketImpl.h"
+#include "utils/CZipMaker.h"
 #include <base64.h>
 
 // Module includes

@@ -90,6 +90,7 @@ typedef int                 (__cdecl *RwStreamClose_t)                      (RwS
 typedef int                 (__cdecl *RpClumpDestroy_t)                     (RpClump *clump);
 typedef RpClump*                (__cdecl *RpClumpForAllAtomics_t)               (RpClump *clump, void* callback, void* pData);
 typedef RwTexDictionary*        (__cdecl *RwTexDictionaryStreamRead_t)          (RwStream *stream);
+typedef RwTexDictionary*        (__cdecl *RwTexDictionaryGtaStreamRead_t)       (RwStream *stream);
 typedef RwRaster*               (__cdecl *RwRasterUnlock_t)                     (RwRaster *raster);
 typedef RwRaster*               (__cdecl *RwRasterLock_t)                       (RwRaster *raster, unsigned char level, int lockmode);
 typedef RwRaster*               (__cdecl *RwRasterCreate_t)                     (int width, int height, int depth, int flags);
@@ -113,6 +114,7 @@ RwFrameAddChild_t                       RwFrameAddChild                         
 RpClumpAddAtomic_t                      RpClumpAddAtomic                        = (RpClumpAddAtomic_t)                      0xDEAD;
 RpAtomicSetFrame_t                      RpAtomicSetFrame                        = (RpAtomicSetFrame_t)                      0xDEAD;
 RwTexDictionaryStreamRead_t             RwTexDictionaryStreamRead               = (RwTexDictionaryStreamRead_t)             0xDEAD;
+RwTexDictionaryGtaStreamRead_t          RwTexDictionaryGtaStreamRead            = (RwTexDictionaryGtaStreamRead_t)          0xDEAD;
 RwTexDictionaryGetCurrent_t             RwTexDictionaryGetCurrent               = (RwTexDictionaryGetCurrent_t)             0xDEAD;
 RwTexDictionarySetCurrent_t             RwTexDictionarySetCurrent               = (RwTexDictionarySetCurrent_t)             0xDEAD;
 RwTexDictionaryForAllTextures_t         RwTexDictionaryForAllTextures           = (RwTexDictionaryForAllTextures_t)         0xDEAD;

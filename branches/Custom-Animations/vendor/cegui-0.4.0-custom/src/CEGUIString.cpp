@@ -25,6 +25,7 @@
 *************************************************************************/
 #include "StdInc.h"
 #include "CEGUIString.h"
+#include "CEGUIStringBidi.h"
 
 #include <iostream>
 
@@ -137,6 +138,38 @@ utf8* String::build_utf8_buff(void) const
     return d_encodedbuff;
 }
 
+//Get the bidirectional version of the string
+String String::bidify(void) const
+{
+#ifdef DETECT_ARRAY_ISSUES
+    doBidiTest ();
+#endif
+    if ( !System::ms_bBidiEnabled )
+        return *this;
+
+    String tmp = *this;
+
+    // Apply in sections seperated by \n
+    size_type pos = 0;
+    while ( true )
+    {
+        size_type newpos = tmp.find ( '\n', pos );
+        if ( newpos == String::npos )
+        {
+            doBidi(tmp.ptr() + pos, tmp.length() - pos, true, true);
+            break;
+        }
+        else
+        if ( newpos - pos > 0 )
+        {
+            doBidi(tmp.ptr() + pos, newpos - pos, true, true);
+            tmp[newpos] = '\n';     // Restore \n (doBidi replaces it with a zero)
+        }
+        pos = newpos + 1;
+    }
+
+    return tmp;
+}
 
 
 //////////////////////////////////////////////////////////////////////////

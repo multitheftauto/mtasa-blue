@@ -25,6 +25,7 @@ extern "C"
 
 #include <net/bitstream.h>
 #include "CLuaArgument.h"
+#include "json.h"
 #include <vector>
 #include "CLuaFunctionRef.h"
 
@@ -33,7 +34,7 @@ extern "C"
     #define LUA_CHECKSTACK(vm,space) lua_checkstack(vm, (space) )
 #else
     // Extra room in release to avoid trouble.
-    #define LUA_CHECKSTACK(vm,space) lua_checkstack(vm, (space)*2 )
+    #define LUA_CHECKSTACK(vm,space) lua_checkstack(vm, ((space)+2)*3 )
 #endif
 
 class CLuaArguments;
@@ -65,16 +66,21 @@ public:
     CLuaArgument*                                       PushBoolean         ( bool bBool );
     CLuaArgument*                                       PushNumber          ( double dNumber );
     CLuaArgument*                                       PushString          ( const std::string& strString );
-    CLuaArgument*                                       PushUserData        ( void* pUserData );
     CLuaArgument*                                       PushElement         ( CClientEntity* pElement );
     CLuaArgument*                                       PushArgument        ( const CLuaArgument& argument );
-    CLuaArgument*                                       PushTable           ( CLuaArguments * table );
+    CLuaArgument*                                       PushResource        ( CResource* pResource );
 
     void                                                DeleteArguments     ( void );
 
     bool                                                ReadFromBitStream   ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
     bool                                                WriteToBitStream    ( NetBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL ) const;
     void                                                ValidateTableKeys   ( void );
+    bool                                                ReadFromJSONString  ( const char* szJSON );
+    bool                                                WriteToJSONString   ( std::string& strJSON, bool bSerialize = false );
+    json_object *                                       WriteTableToJSONObject ( bool bSerialize = false, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL );
+    json_object *                                       WriteToJSONArray    ( bool bSerialize );
+    bool                                                ReadFromJSONObject  ( json_object * object, std::vector < CLuaArguments* > * pKnownTables = NULL );
+    bool                                                ReadFromJSONArray   ( json_object * object, std::vector < CLuaArguments* > * pKnownTables = NULL );
 
     unsigned int                                        Count               ( void ) const          { return static_cast < unsigned int > ( m_Arguments.size () ); };
     std::vector < CLuaArgument* > ::const_iterator      IterBegin           ( void )                { return m_Arguments.begin (); };

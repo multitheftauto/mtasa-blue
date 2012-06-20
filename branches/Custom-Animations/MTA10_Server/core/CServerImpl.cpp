@@ -180,6 +180,10 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
     {
     // Initialize the console handlers
 #ifdef WIN32
+        // Set our locale to the C locale, as Unicode output only functions in this locale
+        std::setlocale(LC_ALL,"C");
+        assert ( strcoll( "a", "B" ) > 0 );
+
         // Get the console handle
         m_hConsole = GetStdHandle ( STD_OUTPUT_HANDLE );
 
@@ -200,6 +204,9 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 #else
         // support user locales
         std::setlocale(LC_ALL, "");
+        std::setlocale(LC_NUMERIC, "C");
+        std::setlocale(LC_COLLATE, "C");
+        assert ( strcoll( "a", "B" ) > 0 );
 
         // Initialize the window and any necessary curses options
         initscr ( );
@@ -419,7 +426,11 @@ void CServerImpl::MainLoop ( void )
         }
 
         // Limit the pulses to avoid heavy CPU usage
-        Sleep ( 10 );
+        int iSleepMs;
+        if ( m_pModManager->PendingWorkToDo ( iSleepMs ) )
+            Sleep ( Clamp ( 0, iSleepMs, 50 ) );
+        else
+            Sleep ( 10 );
     }
 
 #ifdef WIN32

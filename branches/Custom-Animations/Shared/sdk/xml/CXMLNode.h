@@ -59,6 +59,8 @@ public:
     virtual bool                CopyChildrenInto    ( CXMLNode* pDestination, bool bRecursive ) = 0;
 
     virtual bool                IsValid             ( void ) = 0;
+
+    virtual SString             GetAttributeValue   ( const SString& strAttributeName ) = 0;
 };
 
 #endif

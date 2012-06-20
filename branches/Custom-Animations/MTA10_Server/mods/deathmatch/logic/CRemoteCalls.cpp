@@ -31,14 +31,19 @@ CRemoteCalls::~CRemoteCalls()
 }
 
 
-void CRemoteCalls::Call ( char * szServerHost, char * szResourceName, char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction )
+void CRemoteCalls::Call ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction )
 {
     m_calls.push_back ( new CRemoteCall ( szServerHost, szResourceName, szFunctionName, arguments, luaMain, iFunction ) );
 }
 
-void CRemoteCalls::Call ( char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction )
+void CRemoteCalls::Call ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction )
 {
     m_calls.push_back ( new CRemoteCall ( szURL, arguments, luaMain, iFunction ) );
+}
+
+void CRemoteCalls::Call ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction )
+{
+    m_calls.push_back ( new CRemoteCall ( szURL, fetchArguments, strPostData, bPostBinary, luaMain, iFunction ) );
 }
 
 void CRemoteCalls::Remove ( CLuaMain * lua )
@@ -80,32 +85,47 @@ bool CRemoteCalls::CallExists ( CRemoteCall * call )
 
 ////////////////////////////////////////////////////////////////////////////////
 
-CRemoteCall::CRemoteCall ( char * szServerHost, char * szResourceName, char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction )
+CRemoteCall::CRemoteCall ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction )
 {
-    m_szServerHost = szServerHost;
-    m_szResourceName = szResourceName;
-    m_szFunctionName = szFunctionName;
     m_VM = luaMain;
     m_iFunction = iFunction;
 
     arguments->WriteToJSONString ( m_strData, true );
-   
-    snprintf ( m_szURL, 511, "http://%s/%s/call/%s", m_szServerHost, m_szResourceName, m_szFunctionName );
-    m_szURL[511] = '\0';
+    m_bPostBinary = false;
+    m_bIsFetch = false;
+
+    m_strURL = SString ( "http://%s/%s/call/%s", szServerHost, szResourceName, szFunctionName );
 
     MakeCall();
 }
 
 //arbitary URL version
-CRemoteCall::CRemoteCall ( char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction )
+CRemoteCall::CRemoteCall ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction )
 {
     m_VM = luaMain;
     m_iFunction = iFunction;
 
     arguments->WriteToJSONString ( m_strData, true );
-    
-    strncpy ( m_szURL, szURL, 511 );
-    m_szURL[511] = '\0';
+    m_bPostBinary = false;
+    m_bIsFetch = false;
+
+    m_strURL = szURL;
+
+    MakeCall();
+}
+
+//Fetch version
+CRemoteCall::CRemoteCall ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction )
+    : m_FetchArguments ( *fetchArguments )
+{
+    m_VM = luaMain;
+    m_iFunction = iFunction;
+
+    m_strData = strPostData;
+    m_bPostBinary = bPostBinary;
+    m_bIsFetch = true;
+
+    m_strURL = szURL;
 
     MakeCall();
 }
@@ -118,7 +138,7 @@ CRemoteCall::~CRemoteCall ()
 void CRemoteCall::MakeCall()
 {
     CNetHTTPDownloadManagerInterface * downloadManager = g_pNetServer->GetHTTPDownloadManager();
-    downloadManager->QueueFile ( m_szURL, NULL, 0, m_strData.c_str (), this, ProgressCallback );
+    downloadManager->QueueFile ( m_strURL, NULL, 0, m_strData.c_str (), m_strData.length (), m_bPostBinary, this, ProgressCallback );
     if ( !downloadManager->IsDownloading() )
         downloadManager->StartDownloadingQueuedFiles();
 }
@@ -133,7 +153,16 @@ void CRemoteCall::ProgressCallback(double sizeJustDownloaded, double totalDownlo
         {
             //printf("RECIEVED: %s\n", data);
             CLuaArguments arguments;
-            arguments.ReadFromJSONString ( data );
+            if ( call->IsFetch () )
+            {
+                arguments.PushString ( std::string ( data, dataLength ) );
+                arguments.PushNumber ( 0 );
+                for ( uint i = 0 ; i < call->GetFetchArguments ().Count () ; i++ )
+                    arguments.PushArgument ( *( call->GetFetchArguments ()[i] ) );
+            }
+            else
+                arguments.ReadFromJSONString ( data );
+
             arguments.Call ( call->m_VM, call->m_iFunction);   
 
             g_pGame->GetRemoteCalls()->Remove(call); // delete ourselves
@@ -147,6 +176,10 @@ void CRemoteCall::ProgressCallback(double sizeJustDownloaded, double totalDownlo
             CLuaArguments arguments;
             arguments.PushString("ERROR");
             arguments.PushNumber(error);
+            if ( call->IsFetch () )
+                for ( uint i = 0 ; i < call->GetFetchArguments ().Count () ; i++ )
+                    arguments.PushArgument ( *( call->GetFetchArguments ()[i] ) );
+
             arguments.Call ( call->m_VM, call->m_iFunction);   
 
             g_pGame->GetRemoteCalls()->Remove(call); // delete ourselves

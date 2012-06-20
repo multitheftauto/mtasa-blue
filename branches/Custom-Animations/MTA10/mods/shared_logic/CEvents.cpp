@@ -24,16 +24,6 @@ CEvents::CEvents ( void )
 CEvents::~CEvents ( void )
 {
     RemoveAllEvents ();
-
-    SExtinctEvent * pEvent = NULL;
-    list < SExtinctEvent * > ::iterator iter = m_ExtinctEvents.begin ();
-    for ( ; iter != m_ExtinctEvents.end () ; iter++ )
-    {
-         pEvent = *iter;
-         delete [] pEvent->szName;
-         delete [] pEvent->szNewName;
-         delete pEvent;
-    }
 }
 
 
@@ -160,32 +150,4 @@ void CEvents::CancelEvent ( bool bCancelled )
 bool CEvents::WasEventCancelled ( void )
 {
     return m_bWasEventCancelled;
-}
-
-
-void CEvents::AddExtinctEvent ( const char * szName, const char * szNewName )
-{
-    SExtinctEvent * pEvent = new SExtinctEvent;
-    pEvent->szName = new char [ strlen ( szName ) + 1 ];
-    strcpy ( pEvent->szName, szName );
-    pEvent->szNewName = new char [ strlen ( szNewName ) + 1 ];
-    strcpy ( pEvent->szNewName, szNewName );
-    m_ExtinctEvents.push_back ( pEvent );
-}
-
-
-bool CEvents::IsExtinctEvent ( const char * szName, char * szNewName, unsigned int uiLength )
-{
-    SExtinctEvent * pEvent = NULL;
-    list < SExtinctEvent * > ::iterator iter = m_ExtinctEvents.begin ();
-    for ( ; iter != m_ExtinctEvents.end () ; iter++ )
-    {
-        pEvent = *iter;
-        if ( !strcmp ( pEvent->szName, szName ) )
-        {
-            strncpy ( szNewName, pEvent->szNewName, uiLength );
-            return true;
-        }
-    }
-    return false;
 }

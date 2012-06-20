@@ -349,7 +349,7 @@ int CLuaFunctionDefs::GetPedSimplestTask ( lua_State* luaVM )
         if ( pPed )
         {
             // Grab his simplest task and return it
-            char* szTaskName = CStaticFunctionDefinitions::GetPedSimplestTask ( *pPed );
+            const char* szTaskName = CStaticFunctionDefinitions::GetPedSimplestTask ( *pPed );
             if ( szTaskName )
             {
                 lua_pushstring ( luaVM, szTaskName );
@@ -890,11 +890,11 @@ int CLuaFunctionDefs::GetPedClothes ( lua_State* luaVM )
         unsigned char ucType = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
         if ( pPed )
         {
-            char szTexture [ 128 ], szModel [ 128 ];
-            if ( CStaticFunctionDefinitions::GetPedClothes ( *pPed, ucType, szTexture, szModel ) )
+            SString strTexture, strModel;
+            if ( CStaticFunctionDefinitions::GetPedClothes ( *pPed, ucType, strTexture, strModel ) )
             {
-                lua_pushstring ( luaVM, szTexture );
-                lua_pushstring ( luaVM, szModel );
+                lua_pushstring ( luaVM, strTexture );
+                lua_pushstring ( luaVM, strModel );
                 return 2;
             }
         }
@@ -935,6 +935,35 @@ int CLuaFunctionDefs::GetPedControlState ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetPedAnalogControlState ( lua_State* luaVM )
+{
+    SString strControlState = "";
+    float fState = 0.0f;
+    CClientPed* pPed = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPed );
+    argStream.ReadString ( strControlState );
+    
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( pPed )
+        {
+            float fState;
+            if ( CStaticFunctionDefinitions::GetPedAnalogControlState ( *pPed, strControlState, fState ) )
+            {
+                lua_pushnumber ( luaVM, fState );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedAnalogControlState", "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getPedAnalogControlState" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefs::IsPedDoingGangDriveby ( lua_State* luaVM )
 {
@@ -961,6 +990,36 @@ int CLuaFunctionDefs::IsPedDoingGangDriveby ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::SetPedAnalogControlState ( lua_State* luaVM )
+{
+    SString strControlState = "";
+    float fState = 0.0f;
+    CClientEntity* pEntity = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadString ( strControlState );
+    argStream.ReadNumber ( fState );
+    
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( pEntity )
+        {
+            if ( CStaticFunctionDefinitions::SetPedAnalogControlState ( *pEntity, strControlState, fState ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAnalogControlState", "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setPedAnalogControlState" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::GetPedAnimation ( lua_State* luaVM )
 {
     if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )
@@ -968,11 +1027,11 @@ int CLuaFunctionDefs::GetPedAnimation ( lua_State* luaVM )
         CClientPed * pPed = lua_toped ( luaVM, 1 );
         if ( pPed )
         {
-            char szBlockName [ 128 ], szAnimName [ 128 ];
-            if ( CStaticFunctionDefinitions::GetPedAnimation ( *pPed, szBlockName, szAnimName, 128 ))
+            SString strBlockName, strAnimName;
+            if ( CStaticFunctionDefinitions::GetPedAnimation ( *pPed, strBlockName, strAnimName ) )
             {
-                lua_pushstring ( luaVM, szBlockName );
-                lua_pushstring ( luaVM, szAnimName );
+                lua_pushstring ( luaVM, strBlockName );
+                lua_pushstring ( luaVM, strAnimName );
                 return 2;
             }
         }
@@ -1199,7 +1258,7 @@ int CLuaFunctionDefs::AddPedClothes ( lua_State* luaVM )
 
         if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::AddPedClothes ( *pEntity, const_cast < char* > ( szTexture ), const_cast < char* > ( szModel ), ucType ) )
+            if ( CStaticFunctionDefinitions::AddPedClothes ( *pEntity, szTexture, szModel, ucType ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -1603,6 +1662,50 @@ int CLuaFunctionDefs::SetPedAnimation ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::SetPedAnimationProgress( lua_State* luaVM )
+{
+    // Check types
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    {
+        // Grab the element
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
+        {
+            const char * szAnimName = NULL;
+            float fProgress = 0.0f;
+            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) 
+            {
+                szAnimName = lua_tostring ( luaVM, 2 );
+                if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER ) fProgress = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
+
+                if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( *pEntity, szAnimName, fProgress ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else if ( lua_type ( luaVM, 2 ) == LUA_TNONE || lua_type ( luaVM, 2 ) == LUA_TNIL )
+            {
+                if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( *pEntity, szAnimName, fProgress ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+                m_pScriptDebugging->LogBadType ( luaVM, "setPedAnimationProgress" );
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAnimationProgress", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setPedAnimationProgress" );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefs::SetPedMoveAnim ( lua_State* luaVM )
 {
@@ -1672,6 +1775,274 @@ int CLuaFunctionDefs::CreatePed ( lua_State* luaVM )
             }
         }
     }
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::DetonateSatchels ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::DetonateSatchels() )
+    {
+        lua_pushboolean( luaVM, true );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
+{
+    eWeaponSkill eWepSkill = eWeaponSkill::WEAPONSKILL_STD;
+    eWeaponType eWep = eWeaponType::WEAPONTYPE_UNARMED;
+    eWeaponProperty eProp = eWeaponProperty::WEAPON_INVALID_PROPERTY;
+    
+    CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsEnumString ( eWep ) )
+    {
+        argStream.ReadEnumString ( eWep );
+    }
+    else
+    {
+        int iTemp = 0;
+        argStream.ReadNumber ( iTemp );
+        if ( iTemp >= WEAPONTYPE_MIN && iTemp <= WEAPONTYPE_MAX )
+        {
+            eWep = (eWeaponType) iTemp;
+        }
+        else
+        {
+            // Failed
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponProperty", "invalid weapon type at argument 1" ) );
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
+    }
+    if ( argStream.NextIsEnumString ( eWepSkill ) )
+    {
+        argStream.ReadEnumString ( eWepSkill );
+    }
+    else
+    {
+        int iTemp = 0;
+        argStream.ReadNumber ( iTemp );
+        if ( iTemp >= WEAPONSKILL_POOR && iTemp <= WEAPONSKILL_PRO )
+        {
+            eWepSkill = (eWeaponSkill) iTemp;
+        }
+        else
+        {
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponProperty", "invalid skill type at argument 2" ) );
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
+    }
+    argStream.ReadEnumString ( eProp );
+    if ( !argStream.HasErrors () )
+    {
+        switch ( eProp )
+        {
+            case WEAPON_WEAPON_RANGE:
+            case WEAPON_TARGET_RANGE:
+            case WEAPON_ACCURACY:
+            case WEAPON_FIRING_SPEED:
+            case WEAPON_LIFE_SPAN:
+            case WEAPON_SPREAD:
+            case WEAPON_MOVE_SPEED:
+            // Get only
+            case WEAPON_REQ_SKILL_LEVEL:
+            case WEAPON_ANIM_LOOP_START:
+            case WEAPON_ANIM_LOOP_STOP:
+            case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+            case WEAPON_ANIM2_LOOP_START:
+            case WEAPON_ANIM2_LOOP_STOP:
+            case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+            case WEAPON_ANIM_BREAKOUT_TIME:
+            case WEAPON_RADIUS:
+            {
+                float fWeaponInfo = 0.0f;
+
+                if ( CStaticFunctionDefinitions::GetWeaponProperty ( eProp, eWep, eWepSkill, fWeaponInfo ) )
+                {
+                    lua_pushnumber ( luaVM, fWeaponInfo );
+                    return 1;
+                }
+                break;
+            }
+            case WEAPON_DAMAGE:
+            case WEAPON_MAX_CLIP_AMMO:
+            case WEAPON_FLAGS:
+            case WEAPON_ANIM_GROUP:
+            case WEAPON_FIRETYPE:
+            case WEAPON_MODEL:
+            case WEAPON_MODEL2:
+            case WEAPON_SLOT:
+            case WEAPON_AIM_OFFSET:
+            case WEAPON_SKILL_LEVEL:
+            case WEAPON_DEFAULT_COMBO:
+            case WEAPON_COMBOS_AVAILABLE:
+            {
+                short sWeaponInfo = 0;
+
+                if ( CStaticFunctionDefinitions::GetWeaponProperty ( eProp, eWep, eWepSkill, sWeaponInfo ) )
+                {
+                    lua_pushinteger ( luaVM, sWeaponInfo );
+                    return 1;
+                }
+                break;
+            }
+            case WEAPON_FIRE_OFFSET:
+            {
+                CVector vecWeaponInfo;
+
+                if ( CStaticFunctionDefinitions::GetWeaponProperty ( eProp, eWep, eWepSkill, vecWeaponInfo ) )
+                {
+                    lua_pushnumber ( luaVM, vecWeaponInfo.fX );
+                    lua_pushnumber ( luaVM, vecWeaponInfo.fY );
+                    lua_pushnumber ( luaVM, vecWeaponInfo.fZ );
+                    return 3;
+                }
+                break;
+            }
+            default:
+            {
+                break;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponProperty", *argStream.GetErrorMessage () ) );
+
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetOriginalWeaponProperty ( lua_State* luaVM )
+{
+    eWeaponSkill eWepSkill = eWeaponSkill::WEAPONSKILL_STD;
+    eWeaponType eWep = eWeaponType::WEAPONTYPE_UNARMED;
+    eWeaponProperty eProp = eWeaponProperty::WEAPON_INVALID_PROPERTY;
+
+    CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsEnumString ( eWep ) )
+    {
+        argStream.ReadEnumString ( eWep );
+    }
+    else
+    {
+        int iTemp = 0;
+        argStream.ReadNumber ( iTemp );
+        if ( iTemp >= WEAPONTYPE_MIN && iTemp <= WEAPONTYPE_MAX )
+        {
+            eWep = (eWeaponType) iTemp;
+        }
+        else
+        {
+            // Failed
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getOriginalWeaponProperty", "invalid weapon type at argument 1" ) );
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
+    }
+    if ( argStream.NextIsEnumString ( eWepSkill ) )
+    {
+        argStream.ReadEnumString ( eWepSkill );
+    }
+    else
+    {
+        int iTemp = 0;
+        argStream.ReadNumber ( iTemp );
+        if ( iTemp >= WEAPONSKILL_POOR && iTemp <= WEAPONSKILL_PRO )
+        {
+            eWepSkill = (eWeaponSkill) iTemp;
+        }
+        else
+        {
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getOriginalWeaponProperty", "invalid skill type at argument 2" ) );
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
+    }
+    argStream.ReadEnumString ( eProp );
+    if ( !argStream.HasErrors () )
+    {
+        switch ( eProp )
+        {
+        case WEAPON_WEAPON_RANGE:
+        case WEAPON_TARGET_RANGE:
+        case WEAPON_ACCURACY:
+        case WEAPON_FIRING_SPEED:
+        case WEAPON_LIFE_SPAN:
+        case WEAPON_SPREAD:
+        case WEAPON_MOVE_SPEED:
+            // Get only
+        case WEAPON_REQ_SKILL_LEVEL:
+        case WEAPON_ANIM_LOOP_START:
+        case WEAPON_ANIM_LOOP_STOP:
+        case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+        case WEAPON_ANIM2_LOOP_START:
+        case WEAPON_ANIM2_LOOP_STOP:
+        case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+        case WEAPON_ANIM_BREAKOUT_TIME:
+        case WEAPON_RADIUS:
+            {
+                float fWeaponInfo = 0.0f;
+
+                if ( CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eProp, eWep, eWepSkill, fWeaponInfo ) )
+                {
+                    lua_pushnumber ( luaVM, fWeaponInfo );
+                    return 1;
+                }
+                break;
+            }
+        case WEAPON_DAMAGE:
+        case WEAPON_MAX_CLIP_AMMO:
+        case WEAPON_FLAGS:
+        case WEAPON_ANIM_GROUP:
+        case WEAPON_FIRETYPE:
+        case WEAPON_MODEL:
+        case WEAPON_MODEL2:
+        case WEAPON_SLOT:
+        case WEAPON_AIM_OFFSET:
+        case WEAPON_SKILL_LEVEL:
+        case WEAPON_DEFAULT_COMBO:
+        case WEAPON_COMBOS_AVAILABLE:
+            {
+                short sWeaponInfo = 0;
+
+                if ( CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eProp, eWep, eWepSkill, sWeaponInfo ) )
+                {
+                    lua_pushinteger ( luaVM, sWeaponInfo );
+                    return 1;
+                }
+                break;
+            }
+        case WEAPON_FIRE_OFFSET:
+            {
+                CVector vecWeaponInfo;
+
+                if ( CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eProp, eWep, eWepSkill, vecWeaponInfo ) )
+                {
+                    lua_pushnumber ( luaVM, vecWeaponInfo.fX );
+                    lua_pushnumber ( luaVM, vecWeaponInfo.fY );
+                    lua_pushnumber ( luaVM, vecWeaponInfo.fZ );
+                    return 3;
+                }
+                break;
+            }
+        default:
+            {
+                break;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getOriginalWeaponProperty", *argStream.GetErrorMessage () ) );
+
 
     // Failed
     lua_pushboolean ( luaVM, false );

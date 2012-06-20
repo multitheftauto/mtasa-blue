@@ -27,8 +27,8 @@ public:
     void                        SetFileName         ( const char* szFileName );
     inline CXMLFile*            GetFile             ( void )                    { return m_pFile; }
 
-    virtual bool                Load                ( const char* szFileName = NULL ) = 0;
-    virtual bool                Save                ( const char* szFileName = NULL ) = 0;
+    virtual bool                Load                ( void ) = 0;
+    virtual bool                Save                ( void ) = 0;
 
 protected:
     enum

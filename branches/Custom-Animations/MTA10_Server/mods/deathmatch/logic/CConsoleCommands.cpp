@@ -15,11 +15,10 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include <CMD5Hasher.h>
 
 extern CGame* g_pGame;
 
-// Helper function
+// Helper functions
 static string GetAdminNameForLog ( CClient* pClient )
 {
     string strName = pClient->GetNick ();
@@ -29,13 +28,36 @@ static string GetAdminNameForLog ( CClient* pClient )
     return SString ( "%s(%s)", strName.c_str (), strAccountName.c_str () );
 }
 
-bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CClient* pClient, CClient* pEchoClient )
+static void BeginConsoleOutputCapture ( CClient* pClient )
 {
-    char szBuffer[256];
-    szBuffer[0] = '\0';
-    if ( szarguments )
-        strncpy ( szBuffer, szarguments, 256 );
-    szBuffer[255] = '\0';
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
+        CLogger::BeginConsoleOutputCapture ();
+}
+
+static void EndConsoleOutputCapture ( CClient* pClient, const SString& strIfNoOutput = "" )
+{
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
+    {
+        std::vector < SString > lines;
+        CLogger::EndConsoleOutputCapture ().Split ( "\n", lines );
+
+        if ( lines.size () == 1 && lines[0].empty () )
+            lines[0] = strIfNoOutput;
+
+        for ( uint i = 0 ; i < lines.size () ; i++ )
+            if ( !lines[i].empty () )
+                pClient->SendConsole ( lines[i] );
+    }
+}
+
+
+bool CConsoleCommands::Update ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    // To work on remote clients, 'update' needs ACL entry
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
+        return false;
+
+    COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
     char* szResourceName = strtok ( szBuffer, " " );
     char* szVersion = strtok ( NULL, "\0" );
@@ -97,7 +119,7 @@ bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CCl
                 if ( existingResource && currentVersionMajor == (*iter)->GetMajor() && currentVersionMinor == (*iter)->GetMinor() &&
                     currentVersionRevision == (*iter)->GetRevision() && currentVersionState == (*iter)->GetState()  )
                 {
-                    if ( existingResource->GetLastChecksum() == (*iter)->GetChecksum() )
+                    if ( existingResource->GetLastMetaChecksum() == (*iter)->GetChecksum() )
                         szIsCurrent[0] = '>';
                     else
                         szIsCurrent[0] = '?';
@@ -183,12 +205,11 @@ bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CCl
 
 bool CConsoleCommands::StartResource ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    char szResponse [ 256 ];
-    szResponse[0] = '\0';
+    SString strResponse;
 
     if ( szArguments && szArguments[0] )
     {
-        CResource * resource = g_pGame->GetResourceManager()->GetResource ( (char *)szArguments );
+        CResource * resource = g_pGame->GetResourceManager()->GetResource ( szArguments );
         if ( resource )
         {
             if ( pClient->GetNick () )
@@ -200,27 +221,26 @@ bool CConsoleCommands::StartResource ( CConsole* pConsole, const char* szArgumen
                 {
                     if ( g_pGame->GetResourceManager()->StartResource ( resource, NULL, true ) )
                     {
-                        snprintf ( szResponse, 256, "start: Resource '%s' started", szArguments );
+                        strResponse = SString ( "start: Resource '%s' started", szArguments );
                     }
                     else
                     {
-                        snprintf ( szResponse, 256, "start: Resource '%s' start was requested", szArguments );
+                        strResponse = SString ( "start: Resource '%s' start was requested (%s)", szArguments, resource->GetFailureReason ().c_str () );
                     }
                 }
                 else
-                    snprintf ( szResponse, 256, "start: Resource is already running" );
+                    strResponse = "start: Resource is already running";
             }
             else
-                snprintf ( szResponse, 256, "start: Resource is loaded, but has errors" );
+                strResponse = SString ( "start: Resource is loaded, but has errors (%s)", resource->GetFailureReason ().c_str () );
         }
         else
-            snprintf ( szResponse, 256, "start: Resource could not be found" );
+            strResponse = "start: Resource could not be found";
     }
     else
-        snprintf ( szResponse, 256, "* Syntax: start <resource-name>" );
+        strResponse = "* Syntax: start <resource-name>";
 
-    szResponse[255] = '\0';
-    pEchoClient->SendConsole ( szResponse );
+    pEchoClient->SendConsole ( strResponse );
     return true;
 }
 
@@ -228,7 +248,7 @@ bool CConsoleCommands::RestartResource ( CConsole* pConsole, const char* szArgum
 {
     if ( szArguments && szArguments[0] )
     {
-        CResource * resource = g_pGame->GetResourceManager()->GetResource ( (char *)szArguments );
+        CResource * resource = g_pGame->GetResourceManager()->GetResource ( szArguments );
         if ( resource )
         {
             if ( pClient->GetNick () )
@@ -254,7 +274,7 @@ bool CConsoleCommands::RestartResource ( CConsole* pConsole, const char* szArgum
                     pEchoClient->SendConsole ( "restart: Resource is not running" );
             }
             else
-                pEchoClient->SendConsole ( "restart: Resource is loaded, but has errors" );
+                pEchoClient->SendConsole ( SString ( "restart: Resource is loaded, but has errors (%s)", resource->GetFailureReason ().c_str () ) );
         }
         else
             pEchoClient->SendConsole ( "restart: Resource could not be found" );
@@ -267,27 +287,39 @@ bool CConsoleCommands::RestartResource ( CConsole* pConsole, const char* szArgum
 
 bool CConsoleCommands::RefreshResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    g_pGame->GetResourceManager()->Refresh();
+    BeginConsoleOutputCapture ( pEchoClient );
+    g_pGame->GetResourceManager ()->Refresh ( false );
+    EndConsoleOutputCapture ( pEchoClient, "refresh completed" );
     return true;
 }
 
 bool CConsoleCommands::RefreshAllResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    g_pGame->GetResourceManager()->Refresh(true);
+    BeginConsoleOutputCapture ( pEchoClient );
+    g_pGame->GetResourceManager ()->Refresh ( true );
+    EndConsoleOutputCapture ( pEchoClient, "refreshall completed" );
     return true;
 }
 
 bool CConsoleCommands::ListResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
+    // To work on remote clients, 'list' needs ACL entry + console capture
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
+        return false;
+
     g_pGame->GetResourceManager()->ListResourcesLoaded();
     return true;
 }
 
 bool CConsoleCommands::ResourceInfo ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
+    // To work on remote clients, 'info' needs ACL entry + console capture
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
+        return false;
+
     if ( szArguments && szArguments[0] )
     {
-        CResource * resource = g_pGame->GetResourceManager()->GetResource ( (char *)szArguments );
+        CResource * resource = g_pGame->GetResourceManager()->GetResource ( szArguments );
         if ( resource )
         {
             resource->DisplayInfo();
@@ -303,7 +335,7 @@ bool CConsoleCommands::StopResource ( CConsole* pConsole, const char* szArgument
 {
     if ( szArguments && szArguments[0] )
     {
-        CResource * resource = g_pGame->GetResourceManager()->GetResource ( (char *)szArguments );
+        CResource * resource = g_pGame->GetResourceManager()->GetResource ( szArguments );
         if ( resource )
         {
             if ( pClient->GetNick () )
@@ -329,7 +361,7 @@ bool CConsoleCommands::StopResource ( CConsole* pConsole, const char* szArgument
                     pEchoClient->SendConsole ( "stop: Resource is not running" );
             }
             else
-                pEchoClient->SendConsole( "stop: Resource is loaded, but has errors" );
+                pEchoClient->SendConsole ( SString ( "stop: Resource is loaded, but has errors (%s)", resource->GetFailureReason ().c_str () ) );
         }
         else
             pEchoClient->SendConsole ( "stop: Resource could not be found" );
@@ -358,14 +390,9 @@ bool CConsoleCommands::StopAllResources ( CConsole* pConsole, const char* szArgu
 
 bool CConsoleCommands::InstallResource ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    char szBuffer[256];
-    szBuffer[0] = '\0';
+    return false;
 
-    if ( strlen ( szBuffer ) < 1  )
-        return false;
-
-    strncpy ( szBuffer, szArguments, 256 );
-    szBuffer[255] = '\0';
+    COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
     char* szURL = strtok ( szBuffer, " " );
     char* szName = strtok ( NULL, "\0" );
@@ -403,24 +430,40 @@ bool CConsoleCommands::InstallResource ( CConsole* pConsole, const char* szArgum
 
 bool CConsoleCommands::UpgradeResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    g_pGame->GetResourceManager()->Upgrade();
+    // To work on remote clients, 'upgrade' needs ACL entry + console capture
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
+        return false;
+    g_pGame->GetResourceManager ()->UpgradeAll ();
+    pEchoClient->SendEcho ( "Upgrade completed. Refreshing all resources..." );
+    g_pGame->GetResourceManager ()->Refresh ( true );
+    return true;
+}
+
+bool CConsoleCommands::CheckAllResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    // To work on remote clients, 'checkall' needs ACL entry + console capture
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
+        return false;
+    g_pGame->GetResourceManager ()->CheckAll ();
+    pEchoClient->SendEcho ( "Check completed" );
     return true;
 }
 
 
-bool CConsoleCommands::Say ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+bool CConsoleCommands::Say ( CConsole* pConsole, const char* szInArguments, CClient* pClient, CClient* pEchoClient )
 {
     // say <text>
 
     // If he isn't muted
     if ( pClient->GetClientType () != CClient::CLIENT_PLAYER || !static_cast < CPlayer* > ( pClient )->IsMuted () )
     {
-        // Strip any unwanted characters
-        stripControlCodes ( const_cast < char* > ( szArguments ) );
-
         // Got a message?
-        if ( szArguments )
+        if ( szInArguments )
         {
+            // Strip any unwanted characters
+            COPY_CSTR_TO_TEMP_BUFFER( szArguments, szInArguments, 256 );
+            stripControlCodes ( szArguments );
+
             // Long/short enough?
             size_t sizeArguments = MbUTF8ToUTF16(szArguments).size();
 
@@ -461,6 +504,12 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szArguments, CClien
 
                                 // Broadcast the message to all clients
                                 pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( CChatEchoPacket ( strEcho, ucR, ucG, ucB, true ) );
+
+                                // Call onChatMessage if players chat message was delivered
+                                CLuaArguments Arguments2;
+                                Arguments2.PushString ( szArguments );
+                                Arguments2.PushElement ( pPlayer );
+                                static_cast < CPlayer* > ( pClient )->CallEvent ( "onChatMessage", Arguments2 );
                             }
 
                             break;
@@ -530,7 +579,7 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szArguments, CClien
 }
 
 
-bool CConsoleCommands::TeamSay ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+bool CConsoleCommands::TeamSay ( CConsole* pConsole, const char* szInArguments, CClient* pClient, CClient* pEchoClient )
 {
     // teamsay <text>
 
@@ -546,12 +595,13 @@ bool CConsoleCommands::TeamSay ( CConsole* pConsole, const char* szArguments, CC
             CTeam* pTeam = pPlayer->GetTeam ();
             if ( pTeam )
             {
-                // Strip any unwanted characters
-                stripControlCodes ( const_cast < char* > ( szArguments ) );
-
                 // Got a message?
-                if ( szArguments )
+                if ( szInArguments )
                 {
+                    // Strip any unwanted characters
+                    COPY_CSTR_TO_TEMP_BUFFER( szArguments, szInArguments, 256 );
+                    stripControlCodes ( szArguments );
+
                     // Long/short enough?
                     size_t sizeArguments = MbUTF8ToUTF16(szArguments).size();
 
@@ -585,6 +635,11 @@ bool CConsoleCommands::TeamSay ( CConsole* pConsole, const char* szArguments, CC
                                 {
                                     (*iter)->Send ( CChatEchoPacket ( strEcho, ucRed, ucGreen, ucBlue, true ) );
                                 }
+                                // Call onChatMessage if players chat message was delivered
+                                CLuaArguments Arguments2;
+                                Arguments2.PushString ( szArguments );
+                                Arguments2.PushElement ( pTeam );
+                                static_cast < CPlayer* > ( pClient )->CallEvent ( "onChatMessage", Arguments2 );
                             }
 
                             // Success
@@ -616,19 +671,20 @@ bool CConsoleCommands::TeamSay ( CConsole* pConsole, const char* szArguments, CC
 }
 
 
-bool CConsoleCommands::ASay ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+bool CConsoleCommands::ASay ( CConsole* pConsole, const char* szInArguments, CClient* pClient, CClient* pEchoClient )
 {
     // asay <text>
 
     // If he isn't muted
     if ( pClient->GetClientType () != CClient::CLIENT_PLAYER || !static_cast < CPlayer* > ( pClient )->IsMuted () )
     {
-        // Strip any unwanted characters
-        stripControlCodes ( const_cast < char* > ( szArguments ) );
-
         // Got a message?
-        if ( szArguments )
+        if ( szInArguments )
         {
+            // Strip any unwanted characters
+            COPY_CSTR_TO_TEMP_BUFFER( szArguments, szInArguments, 256 );
+            stripControlCodes ( szArguments );
+
             // Long/short enough?
             size_t sizeArguments = MbUTF8ToUTF16(szArguments).size();
 
@@ -698,24 +754,21 @@ bool CConsoleCommands::ASay ( CConsole* pConsole, const char* szArguments, CClie
 }
 
 
-bool CConsoleCommands::Msg ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+bool CConsoleCommands::Msg ( CConsole* pConsole, const char* szInArguments, CClient* pClient, CClient* pEchoClient )
 {
     // msg <player> <text>
 
     // If he isn't muted
     if ( pClient->GetClientType () != CClient::CLIENT_PLAYER || !static_cast < CPlayer* > ( pClient )->IsMuted () )
     {
-        // Strip any unwanted characters
-        stripControlCodes ( const_cast < char* > ( szArguments ) );
-
         // Got a message?
-        if ( szArguments )
+        if ( szInArguments )
         {
-            char szBuffer[256];
-            szBuffer[0] = '\0';
+            // Strip any unwanted characters
+            COPY_CSTR_TO_TEMP_BUFFER( szArguments, szInArguments, 256 );
+            stripControlCodes ( szArguments );
 
-            strncpy ( szBuffer, szArguments, 256 );
-            szBuffer[255] = '\0';
+            COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
             char* szPlayer = strtok ( szBuffer, " " );
             char* szMessage = strtok ( NULL, "\0" );
@@ -828,7 +881,7 @@ bool CConsoleCommands::Msg ( CConsole* pConsole, const char* szArguments, CClien
 }
 
 
-bool CConsoleCommands::AMsg ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+bool CConsoleCommands::AMsg ( CConsole* pConsole, const char* szInArguments, CClient* pClient, CClient* pEchoClient )
 {
     // amsg <admin> <text>
 
@@ -837,16 +890,13 @@ bool CConsoleCommands::AMsg ( CConsole* pConsole, const char* szArguments, CClie
     if ( pClient->GetClientType () != CClient::CLIENT_PLAYER || !static_cast < CPlayer* > ( pClient )->IsMuted () )
     {
         // Strip any unwanted characters
-        stripString ( const_cast < char* > ( szArguments ) );
+        COPY_CSTR_TO_TEMP_BUFFER( szArguments, szInArguments, 256 );
+        stripString( szArguments );
 
         // Got a message?
         if ( szArguments )
         {
-            char szBuffer[256];
-            szBuffer[0] = '\0';
-
-            strncpy ( szBuffer, szArguments, 256 );
-            szBuffer[255] = '\0';
+            COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
             char* szAdmin = strtok ( szBuffer, " " );
             char* szMessage = strtok ( NULL, "\0" );
@@ -984,6 +1034,13 @@ bool CConsoleCommands::Me ( CConsole* pConsole, const char* szArguments, CClient
 
                             // Broadcast the message to all clients
                             pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( CChatEchoPacket ( strEcho, CHATCOLOR_ME ) );
+
+                            // Call onChatMessage if players chat message was delivered
+                            CPlayer * pPlayer = static_cast < CPlayer* > ( pClient );
+                            CLuaArguments Arguments2;
+                            Arguments2.PushString ( szArguments );
+                            Arguments2.PushElement ( pPlayer );
+                            static_cast < CPlayer* > ( pClient )->CallEvent ( "onChatMessage", Arguments2 );
                         }
                     }
 
@@ -1013,11 +1070,7 @@ bool CConsoleCommands::Nick ( CConsole* pConsole, const char* szArguments, CClie
         if ( szArguments )
         {
             // Copy the nickname
-            char szNewNick [64];
-            szNewNick[0] = '\0';
-
-            strncpy ( szNewNick, szArguments, 64 );
-            szNewNick[63] = '\0';
+            COPY_CSTR_TO_TEMP_BUFFER( szNewNick, szArguments, 64 );
 
             // Check its validity
             if ( IsNickValid ( szNewNick ) )
@@ -1067,25 +1120,13 @@ bool CConsoleCommands::Nick ( CConsole* pConsole, const char* szArguments, CClie
                         else
                         {
                             // Tell the player
-                            char szBuffer [128];
-                            szBuffer[0] = '\0';
-
-                            snprintf ( szBuffer, 128, "nick: Nickname is already %s", szNick );
-                            szBuffer[127] = '\0';
-
-                            pEchoClient->SendEcho ( szBuffer );
+                            pEchoClient->SendEcho ( SString ( "nick: Nickname is already %s", szNick ) );
                         }
                     }
                     else
                     {
                         // Tell the player
-                        char szBuffer [64];
-                        szBuffer[0] = '\0';
-
-                        snprintf ( szBuffer, 64, "nick: Nick must be between %u and %u characters", MIN_NICK_LENGTH, MAX_NICK_LENGTH );
-                        szBuffer[63] = '\0';
-
-                        pEchoClient->SendEcho ( szBuffer );
+                        pEchoClient->SendEcho ( SString ( "nick: Nick must be between %u and %u characters", MIN_NICK_LENGTH, MAX_NICK_LENGTH ) );
                     }
                 }
                 else
@@ -1121,16 +1162,13 @@ bool CConsoleCommands::LogIn ( CConsole* pConsole, const char* szArguments, CCli
     // login [<name>] <pass>
 
     // Grab the sender's nick
-    char* szNick = const_cast < char* > ( pClient->GetNick () );
-    char* szPassword = const_cast < char* > ( szArguments );
+    const char* szNick = pClient->GetNick ();
+    const char* szPassword = szArguments;
 
     // Got any arguments?
     if ( szArguments && szArguments [ 0 ] )
     {
-        char szTemp [ 256 ];
-        szTemp[0] = '\0';
-        strncpy ( szTemp, szArguments, 256 );
-        szTemp [ 255 ] = 0;
+        COPY_CSTR_TO_TEMP_BUFFER( szTemp, szArguments, 256 );
 
         char* szTempNick = strtok ( szTemp, " " );
         char* szTempPassword = strtok ( NULL, "\0" );
@@ -1179,9 +1217,7 @@ bool CConsoleCommands::ChgMyPass ( CConsole* pConsole, const char* szArguments, 
         if ( pClient->IsRegistered () )
         {
             // Copy the command
-            char szBuffer [256];
-            strncpy ( szBuffer, szArguments, 256 );
-            szBuffer [255] = 0;
+            COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
             // Split it up into nick and password
             char* szOldPassword = strtok ( szBuffer, " " );
@@ -1212,11 +1248,7 @@ bool CConsoleCommands::ChgMyPass ( CConsole* pConsole, const char* szArguments, 
                             pAccount->SetPassword ( szNewPassword );
 
                             // Tell the client
-                            char szMessage [128];
-                            snprintf ( szMessage, 128, "chgmypass: Your password was changed to '%s'", szNewPassword );
-                            szMessage[127] = '\0';
-
-                            pEchoClient->SendEcho ( szMessage );
+                            pEchoClient->SendEcho ( SString ( "chgmypass: Your password was changed to '%s'", szNewPassword ) );
                             CLogger::LogPrintf ( "ACCOUNTS: %s changed their account password", GetAdminNameForLog ( pClient ).c_str () );
                             return true;
                         }
@@ -1263,11 +1295,7 @@ bool CConsoleCommands::AddAccount ( CConsole* pConsole, const char* szArguments,
     if ( szArguments )
     {
         // Copy the argument buffer
-        char szBuffer [256];
-        szBuffer[0] = '\0';
-
-        strncpy ( szBuffer, szArguments, 256 );
-        szBuffer [255] = 0;
+        COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
         // Split it into nick and reason
         char* szNick = strtok ( szBuffer, " " );
@@ -1287,13 +1315,7 @@ bool CConsoleCommands::AddAccount ( CConsole* pConsole, const char* szArguments,
                     g_pGame->GetAccountManager ()->Register( pAccount );
 
                     // Tell the user
-                    char szMessage [128];
-                    szMessage[0] = '\0';
-
-                    snprintf ( szMessage, 128, "addaccount: Added account '%s' with password '%s'", szNick, szPassword );
-                    szMessage[127] = '\0';
-
-                    pClient->SendEcho ( szMessage );
+                    pClient->SendEcho ( SString ( "addaccount: Added account '%s' with password '%s'", szNick, szPassword ) );
 
                     // Tell the console
                     CLogger::LogPrintf ( "ACCOUNTS: %s added account '%s' with password '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szNick, szPassword );
@@ -1327,7 +1349,7 @@ bool CConsoleCommands::DelAccount ( CConsole* pConsole, const char* szArguments,
 {
     // delaccount <nick>
 
-    char* szNick = const_cast < char* > ( szArguments );
+    const char* szNick = szArguments;
 
     // Got any arguments?
     if ( szArguments )
@@ -1340,25 +1362,17 @@ bool CConsoleCommands::DelAccount ( CConsole* pConsole, const char* szArguments,
 
             if ( pAccountClient )
             {
-                g_pGame->GetAccountManager ()->LogOut ( pAccountClient, NULL );
+                if ( !g_pGame->GetAccountManager ()->LogOut ( pAccountClient, NULL ) )
+                {
+                    pEchoClient->SendEcho ( "delaccount: Unable to delete account as unable to log out client. (Maybe onPlayerLogout is cancelled)" );
+                    return false;
+                }
 
-                char szClientMessage [128];
-                szClientMessage[0] = '\0';
-
-                snprintf ( szClientMessage, 128, "logout: You were logged out of account '%s' due to it being deleted", szArguments );
-                szClientMessage[127] = '\0';
-
-                pAccountClient->SendEcho ( szClientMessage );
+                pAccountClient->SendEcho ( SString ( "logout: You were logged out of account '%s' due to it being deleted", szArguments ) );
             }
 
             // Tell the client
-            char szMessage [128];
-            szMessage[0] = '\0';
-
-            snprintf ( szMessage, 128, "delaccount: Account '%s' deleted", szArguments );
-            szMessage[127] = '\0';
-
-            pEchoClient->SendEcho ( szMessage );
+            pEchoClient->SendEcho ( SString ( "delaccount: Account '%s' deleted", szArguments ) );
 
             // Tell the console
             CLogger::LogPrintf ( "ACCOUNTS: %s deleted account '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szArguments );
@@ -1390,11 +1404,7 @@ bool CConsoleCommands::ChgPass ( CConsole* pConsole, const char* szArguments, CC
     if ( szArguments )
     {
         // Copy the command
-        char szBuffer [256];
-        szBuffer[0] = '\0';
-
-        strncpy ( szBuffer, szArguments, 256 );
-        szBuffer [255] = 0;
+        COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
         // Split it up into nick and password
         char* szNick = strtok ( szBuffer, " " );
@@ -1409,13 +1419,7 @@ bool CConsoleCommands::ChgPass ( CConsole* pConsole, const char* szArguments, CC
                 pAccount->SetPassword ( szPassword );
 
                 // Tell the client
-                char szMessage [128];
-                szMessage[0] = '\0';
-
-                snprintf ( szMessage, 128, "chgpass: %s's password changed to '%s'", szNick, szPassword );
-                szMessage[127] = '\0';
-
-                pEchoClient->SendEcho ( szMessage );
+                pEchoClient->SendEcho ( SString ( "chgpass: %s's password changed to '%s'", szNick, szPassword ) );
 
                 // Tell the console
                 CLogger::LogPrintf ( "ACCOUNTS: %s changed %s's password to '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szNick, szPassword );
@@ -1447,10 +1451,7 @@ bool CConsoleCommands::Shutdown ( CConsole* pConsole, const char* szArguments, C
     if ( szArguments && strlen ( szArguments ) > 0 )
     {
         // Copy to a buffer and strip it for bad characters
-        char szBuffer [256];
-        szBuffer[0] = '\0';
-        strncpy ( szBuffer, szArguments, 256 );
-        szBuffer [255] = 0;
+        COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
         // Output the action + reason to the console
         CLogger::LogPrintf ( "SHUTDOWN: Got shutdown command from %s (Reason: %s)\n", GetAdminNameForLog ( pClient ).c_str (), szBuffer );
@@ -1478,11 +1479,7 @@ bool CConsoleCommands::AExec ( CConsole* pConsole, const char* szArguments, CCli
         if ( szArguments && strlen ( szArguments ) > 0 )
         {
             // Copy the argument buffer
-            char szBuffer [256];
-            szBuffer[0] = '\0';
-
-            strncpy ( szBuffer, szArguments, 256 );
-            szBuffer [255] = 0;
+            COPY_CSTR_TO_TEMP_BUFFER( szBuffer, szArguments, 256 );
 
             // Split it into nick and reason
             char* szNick = strtok ( szBuffer, " " );
@@ -1545,17 +1542,7 @@ bool CConsoleCommands::WhoIs ( CConsole* pConsole, const char* szArguments, CCli
                 if ( pPlayer->IsJoined () )
                 {
                     // Echo him
-                    char szIP [32];
-                    szIP[0] = '\0';
-                    pPlayer->GetSourceIP ( szIP );
-
-                    // Populate a line about him and send it
-                    char szBuffer [256];
-                    szBuffer[0] = '\0';
-
-                    snprintf ( szBuffer, 256, "%s - %s:%u", pPlayer->GetNick (), szIP, pPlayer->GetSourcePort () );
-                    szBuffer[255] = '\0';
-                    pClient->SendEcho ( szBuffer );
+                    pClient->SendEcho ( SString ( "%s - %s:%u", pPlayer->GetNick (), pPlayer->GetSourceIP (), pPlayer->GetSourcePort () ) );
 
                     ++uiCount;
                 }
@@ -1574,16 +1561,8 @@ bool CConsoleCommands::WhoIs ( CConsole* pConsole, const char* szArguments, CCli
             if ( pPlayer && pPlayer->IsJoined () )
             {
                 // Echo him
-                char szIP [32];
-                szIP[0] = '\0';
-                pPlayer->GetSourceIP ( szIP );
+                pClient->SendEcho ( SString ( "%s - %s:%u", pPlayer->GetNick (), pPlayer->GetSourceIP (), pPlayer->GetSourcePort () ) );
 
-                // Populate a line about him and send it
-                char szBuffer [256];
-                szBuffer[0] = '\0';
-                snprintf ( szBuffer, 256, "%s - %s:%u", pPlayer->GetNick (), szIP, pPlayer->GetSourcePort () );
-                szBuffer[255] = '\0';
-                pClient->SendEcho ( szBuffer );
             }
             else
             {
@@ -1605,12 +1584,8 @@ bool CConsoleCommands::WhoWas ( CConsole* pConsole, const char* szArguments, CCl
     // Got any arguments?
     if ( szArguments && strlen ( szArguments ) > 0 )
     {
-        // Make lower case
-        string strArguments ( szArguments );
-        std::transform ( strArguments.begin(), strArguments.end(), strArguments.begin(), ::tolower );
-
         // Is the nick requested anyone?
-        bool bAnyone = ( strArguments == "*" );
+        bool bAnyone = ( SStringX ( szArguments ) == "*" );
 
         // Start iterating the whowas list
         CWhoWas* pWhoWas = pConsole->GetWhoWas ();
@@ -1621,12 +1596,8 @@ bool CConsoleCommands::WhoWas ( CConsole* pConsole, const char* szArguments, CCl
             list < SWhoWasEntry > ::const_iterator iter = pWhoWas->IterBegin ();
             for ( ; iter != pWhoWas->IterEnd (); iter++ )
             {
-                // Make player name lower case
-                string strNick ( iter->szNick );
-                std::transform ( strNick.begin(), strNick.end(), strNick.begin(), ::tolower );
-
                 // Matches?
-                if ( bAnyone || strNick.find ( strArguments ) != string::npos )
+                if ( bAnyone || iter->strNick.ContainsI ( szArguments ) )
                 {
                     // Haven't got too many entries printed?
                     if ( ++uiCount <= 20 )
@@ -1637,7 +1608,7 @@ bool CConsoleCommands::WhoWas ( CConsole* pConsole, const char* szArguments, CCl
                         LongToDottedIP ( iter->ulIP, szIP );
 
                         // Populate a line about him
-                        pClient->SendEcho ( SString ( "%s  -  IP:%s  serial:%s  version:%s", iter->szNick, szIP, iter->strSerial.c_str (), iter->strPlayerVersion.c_str () ) );
+                        pClient->SendEcho ( SString ( "%s  -  IP:%s  serial:%s  version:%s", *iter->strNick, szIP, iter->strSerial.c_str (), iter->strPlayerVersion.c_str () ) );
                     }
                     else
                     {
@@ -1729,16 +1700,12 @@ bool CConsoleCommands::Sudo ( CConsole* pConsole, const char* szArguments, CClie
     // sudo <command>
 
     // Grab the nick
-    char* szNick = const_cast < char* > ( pClient->GetNick () );
+    const char* szNick = pClient->GetNick ();
 
     // Got any arguments?
     if ( szArguments && szArguments [ 0 ] )
     {
-        char szTemp [ 256 ];
-        szTemp[0] = '\0';
-
-        strncpy ( szTemp, szArguments, 256 );
-        szTemp [ 255 ] = 0;
+        COPY_CSTR_TO_TEMP_BUFFER( szTemp, szArguments, 256 );
 
         char* szFunction = strtok ( szTemp, " " );
 
@@ -1796,8 +1763,20 @@ bool CConsoleCommands::Help ( CConsole* pConsole, const char* szArguments, CClie
 }
 
 
-bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+bool CConsoleCommands::ReloadBans ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
+    if ( g_pGame->GetBanManager()->ReloadBanList() )
+    {
+        pClient->SendEcho ( "reloadbans: Ban List successfully reloaded" );
+        return true;
+    }
+    pClient->SendEcho ( "reloadbans: Ban List failed to reload, fix any errors and run again" );
+    return false;
+}
+
+
+bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{   
     if ( szArguments && szArguments[0] )
     {
         if ( pClient->GetNick () )
@@ -1806,10 +1785,57 @@ bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments,
         SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
 
         // These modules are late loaded
-        if ( !g_pGame->GetLuaManager ()->GetLuaModuleManager ()->_LoadModule ( szArguments, strFilename, true ) )
+        int iSuccess = g_pGame->GetLuaManager ()->GetLuaModuleManager ()->LoadModule ( szArguments, strFilename, true );
+        switch ( iSuccess )
         {
-                pEchoClient->SendConsole ( "stop: Resource could not be found" );
+            case 1:
+            {
+                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
+                pEchoClient->SendConsole ( "loadmodule: Couldn't find module file" );
                 return true;
+            }
+            case 2:
+            {
+                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
+                pEchoClient->SendConsole ( "loadmodule: Couldn't find InitModule function in module" );
+                return true;
+            }
+            case 3:
+            {
+                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
+                pEchoClient->SendConsole ( "loadmodule: Couldn't find DoPulse function in module" );
+                return true;
+            }
+            case 4:
+            {
+                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
+                pEchoClient->SendConsole ( "loadmodule: Couldn't find ShutdownModule function in module" );
+                return true;
+            }
+            case 5:
+            {
+                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
+                pEchoClient->SendConsole ( "loadmodule: Couldn't find RegisterFunctions function in module" );
+                return true;
+            }
+            case 6:
+            {
+                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
+                pEchoClient->SendConsole ( "loadmodule: Couldn't find ResourceStopping function in module" );
+                return true;
+            }
+            case 7:
+            {
+                pEchoClient->SendConsole ( "loadmodule: Module failed to load" );
+                pEchoClient->SendConsole ( "loadmodule: Couldn't find ResourceStopped function in module" );
+                return true;
+            }
+            case 8:
+            {
+                pEchoClient->SendConsole ( "loadmodule: Module already loaded" );
+                return true;
+            }
+            default: break;
         }
     }
     else
@@ -1820,44 +1846,91 @@ bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments,
 
 
 bool CConsoleCommands::UnloadModule ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
-{
+{   
     if ( szArguments && szArguments[0] )
     {
         if ( pClient->GetNick () )
             CLogger::LogPrintf ( "unloadmodule: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
 
-        SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
-
-        /*if ( !g_pGame->GetLuaManager()->GetLuaModuleManager()->_UnloadModule ( szArguments, strFilename ) )
+        if ( g_pGame->GetLuaManager()->GetLuaModuleManager()->UnloadModule ( szArguments ) != 0 )
         {
-                pEchoClient->SendConsole ( "stop: Resource could not be found" );
-                return true;
-        }*/
+            pEchoClient->SendConsole ( "unloadmodule: Module failed to unload" );
+            pEchoClient->SendConsole ( "unloadmodule: Couldn't find a module by that name" );
+            return true;
+        }
     }
     else
-        pEchoClient->SendConsole ( "* Syntax: loadmodule <module-name-with-extension>" );
+        pEchoClient->SendConsole ( "* Syntax: unloadmodule <module-name-with-extension>" );
 
     return false;
 }
 
 
 bool CConsoleCommands::ReloadModule ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
-{
+{   
     if ( szArguments && szArguments[0] )
     {
         if ( pClient->GetNick () )
-            CLogger::LogPrintf ( "loadmodule: Requested by %s\n", pClient->GetNick () );
+            CLogger::LogPrintf ( "reloadmodule: Requested by %s\n", pClient->GetNick () );
 
         SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
 
-        /*if ( !g_pGame->GetLuaManager()->GetLuaModuleManager()->_ReloadModule ( szArguments, strFilename ) )
+        int iSuccess = g_pGame->GetLuaManager()->GetLuaModuleManager()->ReloadModule ( szArguments, strFilename, true );
+        switch ( iSuccess )
         {
-                pEchoClient->SendConsole ( "stop: Resource could not be found" );
+            case 1:
+            {
+                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
+                pEchoClient->SendConsole ( "reloadmodule: Couldn't find module file" );
                 return true;
-        }*/
+            }
+            case 2:
+            {
+                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
+                pEchoClient->SendConsole ( "reloadmodule: Couldn't find InitModule function in module" );
+                return true;
+            }
+            case 3:
+            {
+                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
+                pEchoClient->SendConsole ( "reloadmodule: Couldn't find DoPulse function in module" );
+                return true;
+            }
+            case 4:
+            {
+                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
+                pEchoClient->SendConsole ( "reloadmodule: Couldn't find ShutdownModule function in module" );
+                return true;
+            }
+            case 5:
+            {
+                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
+                pEchoClient->SendConsole ( "reloadmodule: Couldn't find RegisterFunctions function in module" );
+                return true;
+            }
+            case 6:
+            {
+                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
+                pEchoClient->SendConsole ( "reloadmodule: Couldn't find ResourceStopping function in module" );
+                return true;
+            }
+            case 7:
+            {
+                pEchoClient->SendConsole ( "reloadmodule: Module unloaded but failed on load" );
+                pEchoClient->SendConsole ( "reloadmodule: Couldn't find ResourceStopped function in module" );
+                return true;
+            }
+            case 9:
+            {
+                pEchoClient->SendConsole ( "reloadmodule: Module failed to unload" );
+                pEchoClient->SendConsole ( "reloadmodule: Couldn't find a module by that name" );
+                return true;
+            }
+            default:;
+        }
     }
     else
-        pEchoClient->SendConsole ( "* Syntax: loadmodule <module-name-with-extension>" );
+        pEchoClient->SendConsole ( "* Syntax: reloadmodule <module-name-with-extension>" );
 
     return false;
 }
@@ -1891,4 +1964,140 @@ bool CConsoleCommands::OpenPortsTest ( CConsole* pConsole, const char* szArgumen
         return true;
     }
     return false;
+}
+
+
+bool CConsoleCommands::SetDbLogLevel ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    {
+        if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "debugdb", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
+        {
+            pEchoClient->SendConsole ( "debugdb: You do not have sufficient rights to use this command." );
+            return false;
+        }
+    }
+
+    if ( SStringX ( szArguments ).empty () )
+    {
+        pEchoClient->SendConsole ( "Usage: debugdb [0-2]" );
+    }
+    else
+    {
+        EJobLogLevelType logLevel = static_cast < EJobLogLevelType > ( atoi ( szArguments ) );
+        logLevel = Clamp ( EJobLogLevel::NONE, logLevel, EJobLogLevel::ALL );
+        g_pGame->GetDatabaseManager ()->SetLogLevel ( logLevel, g_pGame->GetConfig ()->GetDbLogFilename () );
+        const char* logLevelNames[] = { "Off", "Errors only", "All queries" };
+        pEchoClient->SendConsole ( SString ( "Database logging level is now %d (%s)", logLevel, logLevelNames[logLevel] ) );
+    }
+    return true;
+}
+
+
+bool DoAclRequest ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    {
+        if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "aclrequest", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
+        {
+            pEchoClient->SendConsole ( "aclrequest: You do not have sufficient rights to use this command." );
+            return false;
+        }
+    }
+
+    std::vector < SString > parts;
+    SStringX ( szArguments ).Split ( " ", parts );
+    const SString& strAction       = parts.size () > 0 ? parts[0] : "";
+    const SString& strResourceName = parts.size () > 1 ? parts[1] : "";
+    const SString& strRightName    = parts.size () > 2 ? parts[2] : "";
+
+    bool bList  = strAction == "list";
+    bool bAllow = strAction == "allow";
+    bool bDeny  = strAction == "deny";
+
+    if ( bList && strResourceName.empty () )
+    {
+        bool bAnyOutput = false;
+        std::list < CResource* > ::const_iterator iter = g_pGame->GetResourceManager()->IterBegin ();
+        for ( ; iter != g_pGame->GetResourceManager()->IterEnd (); iter++ )
+        {
+            bAnyOutput |= (*iter)->HandleAclRequestListCommand ( false );
+        }
+
+        if ( !bAnyOutput )
+            pEchoClient->SendConsole ( "aclrequest: No loaded resources have any requests" );  
+        return true;
+    }
+    else
+    if ( bList | bAllow | bDeny )
+    {
+        CResource* pResource = g_pGame->GetResourceManager()->GetResource ( strResourceName );
+        if ( !pResource )
+        {
+            pEchoClient->SendConsole ( SString ( "Unknown resource '%s'", *strResourceName ) );
+            return false;
+        }
+
+        if ( bList )
+        {
+            if ( !pResource->HandleAclRequestListCommand ( true ) )
+                pEchoClient->SendConsole ( "aclrequest: No requests" );
+            return true;
+        }
+        else
+        {
+            if ( !pResource->HandleAclRequestChangeCommand ( strRightName, bAllow, GetAdminNameForLog ( pClient ) ) )
+                pEchoClient->SendConsole ( "aclrequest: No change required" );
+            return true;
+        }
+    }
+
+    pEchoClient->SendConsole ( "Usage: aclrequest [list|allow|deny] <resource> [<right>|all]" );
+    return false;
+}
+
+
+bool CConsoleCommands::AclRequest ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    BeginConsoleOutputCapture ( pEchoClient );
+    DoAclRequest ( pConsole, szArguments, pClient, pEchoClient );
+    EndConsoleOutputCapture ( pEchoClient, "" );
+    return true;
+}
+
+
+bool CConsoleCommands::FakeLag ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+#if defined(MTA_DEBUG) || defined(MTA_BETA)
+
+    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    {
+        if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "sfakelag", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
+        {
+            pEchoClient->SendConsole ( "sfakelag: You do not have sufficient rights to use this command." );
+            return false;
+        }
+    }
+
+    std::vector < SString > parts;
+    SStringX ( szArguments ).Split ( " ", parts );
+
+    if ( parts.size () < 3 )
+    {
+        pEchoClient->SendConsole ( "sfakelag <packet loss> <extra ping> <ping variance> [ <KBPS limit> ]" );
+        return false;
+    }
+
+    int iPacketLoss = atoi ( parts[0] );
+    int iExtraPing = atoi ( parts[1] );
+    int iExtraPingVary = atoi ( parts[2] );
+    int iKBPSLimit = 0;
+    if ( parts.size () > 3 )
+        iKBPSLimit = atoi ( parts[3] );
+
+    g_pGame->GetConfig ()->SetFakeLag ( iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit );
+    pEchoClient->SendConsole ( SString ( "Server send lag is now: %d%% packet loss and %d extra ping with %d extra ping variance and %d KBPS limit", iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit ) );
+
+#endif
+    return true;
 }

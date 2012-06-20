@@ -129,6 +129,11 @@ public:
     eAspectRatio            GetAspectRatio              ( void );
     void                    SetAspectRatio              ( eAspectRatio aspectRatio );
 
+    bool                    IsGrassEnabled              ( void );
+    void                    SetGrassEnabled             ( bool bEnable );
+
+    void                    SetSelectDeviceDialogEnabled    ( bool bEnable );
+
     void                    Save                        ( void );
 
 private:

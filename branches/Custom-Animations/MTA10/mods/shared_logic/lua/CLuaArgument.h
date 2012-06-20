@@ -22,21 +22,18 @@ extern "C"
 }
 #include <net/bitstream.h>
 #include <string>
+#include "json.h"
 
 class CClientEntity;
 class CLuaArguments;
 
 #define LUA_TTABLEREF 9
+#define LUA_TSTRING_LONG 10
 
 class CLuaArgument
 {
 public:
                             CLuaArgument        ( void );
-                            CLuaArgument        ( bool bBool );
-                            CLuaArgument        ( double dNumber );
-                            CLuaArgument        ( const std::string& strString );
-                            CLuaArgument        ( void* pUserData );
-                            CLuaArgument        ( CClientEntity* pElement );
                             CLuaArgument        ( const CLuaArgument& Argument, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables = NULL );
                             CLuaArgument        ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
                             CLuaArgument        ( lua_State* luaVM, int iArgument, std::map < const void*, CLuaArguments* > * pKnownTables = NULL );
@@ -47,11 +44,11 @@ public:
     bool                    operator !=         ( const CLuaArgument& Argument );
 
     void                    Read                ( lua_State* luaVM, int iArgument, std::map < const void*, CLuaArguments* > * pKnownTables = NULL );
-    void                    Read                ( bool bBool );
-    void                    Read                ( double dNumber );
-    void                    Read                ( const std::string& strString );
-    void                    Read                ( void* pUserData );
-    void                    Read                ( CClientEntity* pElement );
+    void                    ReadBool            ( bool bBool );
+    void                    ReadNumber          ( double dNumber );
+    void                    ReadString          ( const std::string& strString );
+    void                    ReadElement         ( CClientEntity* pElement );
+    void                    ReadScriptID        ( uint uiScriptID );
     void                    ReadElementID       ( ElementID ID );
 
     void                    Push                ( lua_State* luaVM, std::map < CLuaArguments*, int > * pKnownTables = NULL ) const;
@@ -66,6 +63,9 @@ public:
 
     bool                    ReadFromBitStream   ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
     bool                    WriteToBitStream    ( NetBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL ) const;
+    json_object*            WriteToJSONObject   ( bool bSerialize = false, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL );
+    bool                    ReadFromJSONObject  ( json_object* object, std::vector < CLuaArguments* > * pKnownTables = NULL );
+    char *                  WriteToString       ( char * szBuffer, int length );
 
 private:
     void                    LogUnableToPacketize    ( const char* szMessage ) const;

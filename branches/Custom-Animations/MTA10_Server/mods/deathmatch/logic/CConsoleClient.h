@@ -25,7 +25,7 @@ public:
     virtual                 ~CConsoleClient         ( void )                { };
 
     inline int              GetClientType           ( void )                { return CClient::CLIENT_CONSOLE; };
-    inline const char*      GetNick                 ( void )                { return m_szNick; };
+    inline const char*      GetNick                 ( void )                { return m_strNick; };
 
     inline void             SendEcho                ( const char* szEcho )  { CLogger::LogPrintf ( "%s\n", szEcho ); };
     inline void             SendConsole             ( const char* szEcho )  { CLogger::LogPrintf ( "%s\n", szEcho ); };
@@ -35,7 +35,7 @@ public:
 
 
 protected:
-    char                    m_szNick [16];
+    SString                 m_strNick;
     CConsole*               m_pConsole;
 
 };

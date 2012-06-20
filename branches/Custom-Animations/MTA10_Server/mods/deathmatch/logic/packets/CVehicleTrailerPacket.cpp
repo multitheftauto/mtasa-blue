@@ -31,8 +31,8 @@ bool CVehicleTrailerPacket::Read ( NetBitStreamInterface& BitStream )
     SRotationDegreesSync rotation ( false );
     SVelocitySync turn;
 
-    if ( BitStream.ReadCompressed ( m_Vehicle ) &&
-         BitStream.ReadCompressed ( m_AttachedVehicle ) &&
+    if ( BitStream.Read ( m_Vehicle ) &&
+         BitStream.Read ( m_AttachedVehicle ) &&
          BitStream.ReadBit ( m_bAttached ) &&
          ( !m_bAttached ||
            ( BitStream.Read ( &position ) &&
@@ -56,8 +56,8 @@ bool CVehicleTrailerPacket::Read ( NetBitStreamInterface& BitStream )
 
 bool CVehicleTrailerPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
-    BitStream.WriteCompressed ( m_Vehicle );
-    BitStream.WriteCompressed ( m_AttachedVehicle );
+    BitStream.Write ( m_Vehicle );
+    BitStream.Write ( m_AttachedVehicle );
     BitStream.WriteBit ( m_bAttached );
 
     if ( m_bAttached )

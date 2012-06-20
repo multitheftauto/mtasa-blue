@@ -50,7 +50,7 @@ public:
 
     
     // Vehicles pool
-    CVehicle*               AddVehicle          ( eVehicleTypes eVehicleType );
+    CVehicle*               AddVehicle          ( eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2 );
     CVehicle*               AddVehicle          ( DWORD* pGameInterface );
 private:
     bool                    AddVehicleToPool    ( CVehicleSA* pVehicle );
@@ -66,8 +66,7 @@ public:
     void                    DeleteAllVehicles   ( );
 
     // Objects pool
-    CObject*                AddObject           ( DWORD dwModelID );
-    CObject*                AddObject           ( DWORD* pGameInterface );
+    CObject*                AddObject           ( DWORD dwModelID, bool bLowLod, bool bBreakable );
 private:
     bool                    AddObjectToPool     ( CObjectSA* pObject );
 public:

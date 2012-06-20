@@ -15,9 +15,12 @@
 
 using std::list;
 
-CClientStreamElement::CClientStreamElement ( CClientStreamer * pStreamer, ElementID ID ) : CClientEntity ( ID )
+CClientStreamElement::CClientStreamElement ( CClientStreamer * pStreamer, ElementID ID ) : ClassInit ( this ), CClientEntity ( ID )
 {
     m_pStreamer = pStreamer;    
+    m_pStreamRow = NULL;
+    m_pStreamSector = NULL;
+    m_fExpDistance = 0.0f;
     m_bStreamedIn = false;
     m_bAttemptingToStreamIn = false;
     m_usStreamReferences = 0; m_usStreamReferencesScript = 0;
@@ -73,17 +76,20 @@ void CClientStreamElement::InternalStreamOut ( void )
         m_bStreamedIn = false;
 
         // Stream out attached elements
+        CClientObject* thisObject = DynamicCast < CClientObject > ( this );
         list < CClientEntity* >::iterator i = m_AttachedEntities.begin();
         for (; i != m_AttachedEntities.end(); i++)
         {
             CClientStreamElement* attachedElement = dynamic_cast< CClientStreamElement* > (*i);
             if ( attachedElement )
             {
+                // Don't stream out low LOD version
+                CClientObject* attachedObject = DynamicCast < CClientObject > (*i);
+                if ( attachedObject && thisObject && attachedObject->IsLowLod () != thisObject->IsLowLod () )
+                    continue;
                 attachedElement->InternalStreamOut();
             }
         }
-
-        m_pStreamer->NotifyElementStreamedOut ( this );
 
         CLuaArguments Arguments;
         CallEvent ( "onClientElementStreamOut", Arguments, true );
@@ -100,8 +106,6 @@ void CClientStreamElement::NotifyCreate ( void )
 
     m_bStreamedIn = true;
     m_bAttemptingToStreamIn = false;
-
-    m_pStreamer->NotifyElementStreamedIn ( this );
 
     CLuaArguments Arguments;
     CallEvent ( "onClientElementStreamIn", Arguments, true );
@@ -138,7 +142,7 @@ void CClientStreamElement::RemoveStreamReference ( bool bScript )
     // Have we removed the last reference?
     if ( ( m_usStreamReferences + m_usStreamReferencesScript ) == 0 )
     {
-        m_pStreamer->OnElementUnforceStreamIn ( this );
+        m_pStreamer->OnElementForceStreamOut ( this );
     }
 }
 

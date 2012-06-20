@@ -438,7 +438,7 @@ namespace CEGUI
                     return fontObj->getBaseline() + d_padding;
                     break;
                 case FMT_HORZ_EXTENT:
-                    return fontObj->getTextExtent(d_text.empty() ? sourceWindow.getText() : d_text) + d_padding;
+                    return fontObj->getTextExtent(d_text.empty() ? sourceWindow.getText(true) : d_text) + d_padding;
                     break;
                 default:
                     throw InvalidRequestException("FontDim::getValue - unknown or unsupported FontMetricType encountered.");

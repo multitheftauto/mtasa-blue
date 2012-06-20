@@ -26,40 +26,53 @@ CElementGroup::~CElementGroup()
 {
     list < CElement* > ::iterator iter;
 
-    if ( !g_pGame->IsBeingDeleted () )
+    // Delete all the elements
+    if ( !m_elements.empty () )
     {
-        CEntityRemovePacket removePacket;
-
-        for ( iter = m_elements.begin (); iter != m_elements.end (); iter++ )
+        if ( !g_pGame->IsBeingDeleted () )
         {
-            CElement * pElement = (*iter);
+            CEntityRemovePacket removePacket;
 
-            // Tell everyone to destroy it if this is not a per-player entity
-            if ( pElement->IsPerPlayerEntity() )
+            for ( iter = m_elements.begin (); iter != m_elements.end (); iter++ )
             {
-                // Unsync it (will destroy it for those that know about it)
-                CPerPlayerEntity* pEntity = static_cast < CPerPlayerEntity* > ( pElement );
-                pEntity->Sync ( false );
+                CElement * pElement = (*iter);
+
+                switch ( pElement->GetType () )
+                {
+                    case CElement::DATABASE_CONNECTION:
+                    case CElement::SCRIPTFILE:
+                        continue;
+                }
+                // Tell everyone to destroy it if this is not a per-player entity
+                if ( pElement->IsPerPlayerEntity() )
+                {
+                    // Unsync it (will destroy it for those that know about it)
+                    CPerPlayerEntity* pEntity = static_cast < CPerPlayerEntity* > ( pElement );
+                    pEntity->Sync ( false );
+                }
+                else
+                {
+                    // Tell everyone to destroy it
+                    removePacket.Add ( pElement );
+                }
             }
-            else
-            {
-                // Tell everyone to destroy it
-                removePacket.Add ( pElement );
-            }
+
+            g_pGame->GetPlayerManager()->BroadcastOnlyJoined ( removePacket );
         }
 
-        g_pGame->GetPlayerManager()->BroadcastOnlyJoined ( removePacket );
-    }
 
-    // Delete all the elements
-    CElementDeleter * deleter = g_pGame->GetElementDeleter();
-    CElement * pElement = NULL;
-    for ( iter = m_elements.begin (); iter != m_elements.end (); iter++ )
-    {
-        pElement = *iter;
-        pElement->SetElementGroup ( NULL );
-        pElement->DeleteAllEvents ();
-        deleter->Delete ( pElement );
+        CElementDeleter * deleter = g_pGame->GetElementDeleter();
+        CElement * pElement = NULL;
+        for ( iter = m_elements.begin (); iter != m_elements.end (); iter++ )
+        {
+            pElement = *iter;
+            pElement->SetElementGroup ( NULL );
+            pElement->DeleteAllEvents ();
+            deleter->Delete ( pElement, true, false );
+        }
+
+        // Do this at the end for speed
+        g_pGame->GetMapManager ()->GetRootElement ()->UpdatePerPlayerEntities ();
     }
 }
 

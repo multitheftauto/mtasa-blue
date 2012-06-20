@@ -23,6 +23,8 @@ extern "C"
 
 CLuaFunctionRef         luaM_toref              ( lua_State *luaVM, int iArgument );
 
+#define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < unsigned long > (x) )
+
 // Lua pop macros for our datatypes
 class CElement*         lua_toelement           ( lua_State* luaVM, int iArgument );
 class CAccount*         lua_toaccount           ( lua_State* luaVM, int iArgument );
@@ -59,6 +61,10 @@ void                    lua_pushtextitem        ( lua_State* luaVM, class CTextI
 void                    lua_pushtimer           ( lua_State* luaVM, class CLuaTimer* pTimer );
 void                    lua_pushxmlnode         ( lua_State* luaVM, class CXMLNode* pNode );
 void                    lua_pushban             ( lua_State* luaVM, class CBan* pBan );
+void                    lua_pushquery           ( lua_State* luaVM, class CDbJobData* pJobData );
+
+// Converts any type to string
+const char*             lua_makestring          ( lua_State* luaVM, int iArgument );
 
 // Include the RPC functions enum
 #include "net/rpc_enums.h"

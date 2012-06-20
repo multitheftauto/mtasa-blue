@@ -40,7 +40,7 @@ bool CResourceConfigItem::Start ( void )
 {
     // Does the file even exist?
     WIN32_FIND_DATA fdInfo;
-    HANDLE hFind = FindFirstFile( m_szName, &fdInfo );
+    HANDLE hFind = FindFirstFile( m_strName, &fdInfo );
     if ( INVALID_HANDLE_VALUE != hFind )
     {
         // Close the find

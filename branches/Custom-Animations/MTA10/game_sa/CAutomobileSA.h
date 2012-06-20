@@ -169,6 +169,7 @@ public:
     FLOAT       GasPedalAudioRevs;  // 1480
     DWORD       m_aWheelState[4];   // 1484
 };
+// C_ASSERT(sizeof(CAutomobileSAInterface) == 0x988);
 
 class CAutomobileSA : public virtual CAutomobile, public virtual CVehicleSA
 {
@@ -177,7 +178,7 @@ private:
 
     CDoorSA                 * door[MAX_DOORS];
 public:
-                            CAutomobileSA( eVehicleTypes dwModelID );
+                            CAutomobileSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 );
                             CAutomobileSA( CAutomobileSAInterface * automobile );
                             ~CAutomobileSA ( void );
 

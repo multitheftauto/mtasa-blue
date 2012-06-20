@@ -28,7 +28,7 @@ class CObject : public CElement
     friend class CPlayer;
 
 public:
-    explicit                    CObject                 ( CElement* pParent, CXMLNode* pNode, class CObjectManager* pObjectManager );
+    explicit                    CObject                 ( CElement* pParent, CXMLNode* pNode, class CObjectManager* pObjectManager, bool bIsLowLod );
     explicit                    CObject                 ( const CObject& Copy );
                                 ~CObject                ( void );
 
@@ -68,18 +68,18 @@ public:
     inline float                GetHealth               ( void )                        { return m_fHealth; }
     inline void                 SetHealth               ( float fHealth )               { m_fHealth = fHealth; }
 
-    inline bool                 IsBreakable             ( void )                        { return m_pObjectManager->IsBreakableModel ( m_usModel ) && m_bBreakable; }
-    inline void                 SetBreakable            ( bool bBreakable )             { m_bBreakable = bBreakable; }
-
     inline bool                 IsSyncable              ( void )                        { return m_bSyncable; }
     inline void                 SetSyncable             ( bool bSyncable )              { m_bSyncable = bSyncable; }
 
     inline CPlayer*             GetSyncer               ( void )                        { return m_pSyncer; }
     void                        SetSyncer               ( CPlayer* pPlayer );
 
+    bool                        IsLowLod                ( void );
+    bool                        SetLowLodObject         ( CObject* pLowLodObject );
+    CObject*                    GetLowLodObject         ( void );
+
 private:
     CObjectManager*             m_pObjectManager;
-    char                        m_szName [MAX_ELEMENT_NAME_LENGTH + 1];
     CVector                     m_vecRotation;
     unsigned char               m_ucAlpha;
     unsigned short              m_usModel;
@@ -92,6 +92,10 @@ private:
 
 protected:
     bool                        m_bCollisionsEnabled;
+
+    const bool                  m_bIsLowLod;            // true if this object is low LOD
+    CObject*                    m_pLowLodObject;        // Pointer to low LOD version of this object
+    std::vector < CObject* >    m_HighLodObjectList;    // List of objects that use this object as a low LOD version
 
 public:
     CPositionRotationAnimation* m_pMoveAnimation;

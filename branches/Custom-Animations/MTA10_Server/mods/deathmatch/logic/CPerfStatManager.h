@@ -23,5 +23,13 @@ public:
     virtual void        DoPulse             ( void ) = 0;
     virtual void        GetStats            ( CPerfStatResult* pOutResult, const SString& strCategory, const SString& strOptions, const SString& strFilter ) = 0;
 
+    // Utility
+    static SString      GetScaledByteString ( long long Amount );
+    static SString      GetScaledBitString  ( long long Amount );
+    static long long    GetPerSecond        ( long long llValue, long long llDeltaTickCount );
+    static void         ToPerSecond         ( long long& llValue, long long llDeltaTickCount );
+    static SString      GetPerSecondString  ( long long llValue, double dDeltaTickCount );
+    static SString      GetPercentString    ( long long llValue, long long llTotal );
+
     static CPerfStatManager* GetSingleton ( void );
 };

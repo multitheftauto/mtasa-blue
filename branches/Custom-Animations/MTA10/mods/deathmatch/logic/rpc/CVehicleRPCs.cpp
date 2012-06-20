@@ -46,6 +46,10 @@ void CVehicleRPCs::LoadFunctions ( void )
     AddHandler ( SET_VEHICLE_HEADLIGHT_COLOR, SetVehicleHeadLightColor, "SetVehicleHeadLightColor" );
     AddHandler ( SET_VEHICLE_TURRET_POSITION, SetVehicleTurretPosition, "SetVehicleTurretPosition" );
     AddHandler ( SET_VEHICLE_DOOR_OPEN_RATIO, SetVehicleDoorOpenRatio, "SetVehicleDoorOpenRatio" );
+    AddHandler ( SET_VEHICLE_VARIANT, SetVehicleVariant, "SetVehicleVariant" );
+    AddHandler ( GIVE_VEHICLE_SIRENS, GiveVehicleSirens, "giveVehicleSirens");
+    AddHandler ( REMOVE_VEHICLE_SIRENS, RemoveVehicleSirens, "removeVehicleSirens");
+    AddHandler ( SET_VEHICLE_SIRENS, SetVehicleSirens, "setVehicleSirens");
 }
 
 
@@ -75,7 +79,7 @@ void CVehicleRPCs::FixVehicle ( CClientEntity* pSource, NetBitStreamInterface& b
 
 void CVehicleRPCs::BlowVehicle ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    // Read out the vehicle id and whether to explode or not
+    // Read out the vehicle id
     unsigned char ucTimeContext;
     if ( bitStream.Read ( ucTimeContext ) )
     {
@@ -570,5 +574,61 @@ void CVehicleRPCs::SetVehicleDoorOpenRatio ( CClientEntity* pSource, NetBitStrea
         {
             pVehicle->SetDoorOpenRatio ( ucDoor, angle.data.fRatio, uiTime, true );
         }
+    }
+}
+
+void CVehicleRPCs::SetVehicleVariant ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+{
+    unsigned char ucVariant = 0;
+    unsigned char ucVariant2 = 0;
+    if ( bitStream.Read ( ucVariant ) &&
+         bitStream.Read ( ucVariant2 ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        if ( pVehicle )
+        {
+            pVehicle->SetVariant ( ucVariant, ucVariant2 );
+        }
+    }
+}
+
+void CVehicleRPCs::GiveVehicleSirens ( CClientEntity* pSourceEntity, NetBitStreamInterface& bitStream )
+{
+    SVehicleSirenAddSync sirenData;
+    if ( bitStream.Read ( &sirenData ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSourceEntity->GetID () );
+        if ( pVehicle )
+        {
+            if ( sirenData.data.m_ucSirenCount >= 0 )
+            {
+                pVehicle->GiveVehicleSirens( sirenData.data.m_ucSirenType, sirenData.data.m_ucSirenCount );
+                pVehicle->SetVehicleFlags ( sirenData.data.m_b360Flag, sirenData.data.m_bUseRandomiser, sirenData.data.m_bDoLOSCheck, sirenData.data.m_bEnableSilent );
+            }
+        }
+    }
+}
+
+void CVehicleRPCs::SetVehicleSirens ( CClientEntity* pSourceEntity, NetBitStreamInterface& bitStream )
+{
+    SVehicleSirenSync sirenData;
+    if ( bitStream.Read ( &sirenData ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSourceEntity->GetID () );
+        if ( pVehicle )
+        {
+            pVehicle->SetVehicleSirenPosition ( sirenData.data.m_ucSirenID, sirenData.data.m_vecSirenPositions );
+            pVehicle->SetVehicleSirenMinimumAlpha ( sirenData.data.m_ucSirenID, sirenData.data.m_dwSirenMinAlpha );
+            pVehicle->SetVehicleSirenColour ( sirenData.data.m_ucSirenID, sirenData.data.m_colSirenColour );
+        }
+    }
+}
+
+void CVehicleRPCs::RemoveVehicleSirens ( CClientEntity* pSourceEntity, NetBitStreamInterface& bitStream )
+{
+    CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSourceEntity->GetID () );
+    if ( pVehicle )
+    {
+        pVehicle->RemoveVehicleSirens ( );
     }
 }

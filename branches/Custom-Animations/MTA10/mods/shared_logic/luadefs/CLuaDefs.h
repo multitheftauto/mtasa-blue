@@ -42,6 +42,8 @@ public:
                                                           CLuaManager* pLuaManager,
                                                           CScriptDebugging* pScriptDebugging );
 
+    static int                          CanUseFunction ( lua_CFunction f, lua_State* luaVM );
+
 // This is just for the LUA funcs. Please don't public this and use it other
 // places in the client.
 public:

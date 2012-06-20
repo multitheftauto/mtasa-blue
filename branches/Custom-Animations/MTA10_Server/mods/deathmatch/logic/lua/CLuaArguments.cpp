@@ -153,15 +153,32 @@ void CLuaArguments::PushArguments ( lua_State* luaVM ) const
 
 void CLuaArguments::PushAsTable ( lua_State* luaVM, std::map < CLuaArguments*, int > * pKnownTables )
 {
+    // Ensure there is enough space on the Lua stack
+    LUA_CHECKSTACK ( luaVM, 4 );
+
     bool bKnownTablesCreated = false;
     if ( !pKnownTables )
     {
         pKnownTables = new std::map < CLuaArguments*, int > ();
         bKnownTablesCreated = true;
+
+		lua_newtable ( luaVM );
+		// using registry to make it fail safe, else we'd have to carry
+		// either lua top or current depth variable between calls
+		lua_setfield ( luaVM, LUA_REGISTRYINDEX, "cache" );
     }
 
     lua_newtable ( luaVM );
-    pKnownTables->insert ( std::make_pair ( (CLuaArguments *)this, lua_gettop(luaVM) ) );
+
+	// push it onto the known tables
+	int size = pKnownTables->size();
+	lua_getfield ( luaVM, LUA_REGISTRYINDEX, "cache" );
+	lua_pushnumber ( luaVM, ++size );
+	lua_pushvalue ( luaVM, -3 );
+	lua_settable ( luaVM, -3 );
+	lua_pop ( luaVM, 1 );
+    pKnownTables->insert ( std::make_pair ( (CLuaArguments *)this, size ) );
+
     vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
     for ( ; iter != m_Arguments.end () && (iter+1) != m_Arguments.end (); iter ++ )
     {
@@ -172,7 +189,12 @@ void CLuaArguments::PushAsTable ( lua_State* luaVM, std::map < CLuaArguments*, i
     }
 
     if ( bKnownTablesCreated )
+	{
+		// clear the cache
+		lua_pushnil ( luaVM );
+		lua_setfield ( luaVM, LUA_REGISTRYINDEX, "cache" );
         delete pKnownTables;
+	}
 }
 
 
@@ -205,13 +227,7 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFuncti
     // Call the function with our arguments
     pLuaMain->ResetInstructionCount ();
 
-#ifndef WIN32
-    std::setlocale(LC_ALL, "C");
-#endif
-    int iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
-#ifndef WIN32
-    std::setlocale(LC_ALL, "");
-#endif
+    int iret = pLuaMain->PCall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
     if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
     {
         SString strRes = ConformResourcePath ( lua_tostring( luaVM, -1 ) );
@@ -277,20 +293,8 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
 
     // Call the function with our arguments
     pLuaMain->ResetInstructionCount ();
-    int iret = 0;
-    try {
-#ifndef WIN32
-        std::setlocale(LC_ALL, "C");
-#endif
-        iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
-#ifndef WIN32
-        std::setlocale(LC_ALL, "");
-#endif
-    }
-    catch ( ... )
-    {
-        return false;
-    }
+
+    int iret = pLuaMain->PCall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
     if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
     {
         std::string strRes = ConformResourcePath ( lua_tostring( luaVM, -1 ) );
@@ -362,7 +366,7 @@ vector < char * > * CLuaArguments::WriteToCharVector ( vector < char * > * value
                 CElement* pElement = (*iter)->GetElement ();
                 if ( VERIFY_ELEMENT(pElement) )
                 {
-                    snprintf ( szValue, 9, "E#%d", (int)pElement->GetID() );
+                    snprintf ( szValue, 9, "E#%d", (int)pElement->GetID().Value() );
                 }
                 else
                 {
@@ -393,7 +397,8 @@ CLuaArgument* CLuaArguments::PushNil ( void )
 
 CLuaArgument* CLuaArguments::PushBoolean ( bool bBool )
 {
-    CLuaArgument* pArgument = new CLuaArgument ( bBool );
+    CLuaArgument* pArgument = new CLuaArgument ();
+    pArgument->ReadBool ( bBool );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -402,14 +407,15 @@ CLuaArgument* CLuaArguments::PushBoolean ( bool bBool )
 CLuaArgument* CLuaArguments::PushTable ( CLuaArguments * table )
 {
     CLuaArgument* pArgument = new CLuaArgument (  );
-    pArgument->Read(table);
+    pArgument->ReadTable ( table );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
 
 CLuaArgument* CLuaArguments::PushNumber ( double dNumber )
 {
-    CLuaArgument* pArgument = new CLuaArgument ( dNumber );
+    CLuaArgument* pArgument = new CLuaArgument ();
+    pArgument->ReadNumber ( dNumber );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -423,16 +429,8 @@ CLuaArgument* CLuaArguments::PushArgument ( const CLuaArgument & argument )
 
 CLuaArgument* CLuaArguments::PushString ( const std::string& strString )
 {
-    CLuaArgument* pArgument = new CLuaArgument ( strString );
-    m_Arguments.push_back ( pArgument );
-    return pArgument;
-}
-
-
-CLuaArgument* CLuaArguments::PushUserData ( void* pUserData )
-{
-    CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadUserData ( pUserData );
+    CLuaArgument* pArgument = new CLuaArgument ();
+    pArgument->ReadString ( strString );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -440,7 +438,17 @@ CLuaArgument* CLuaArguments::PushUserData ( void* pUserData )
 
 CLuaArgument* CLuaArguments::PushElement ( CElement* pElement )
 {
-    CLuaArgument* pArgument = new CLuaArgument ( pElement );
+    CLuaArgument* pArgument = new CLuaArgument ();
+    pArgument->ReadElement ( pElement );
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+
+CLuaArgument* CLuaArguments::PushBan ( CBan* pBan )
+{
+    CLuaArgument* pArgument = new CLuaArgument;
+    pArgument->ReadScriptID ( pBan->GetScriptID () );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -449,7 +457,7 @@ CLuaArgument* CLuaArguments::PushElement ( CElement* pElement )
 CLuaArgument* CLuaArguments::PushACL ( CAccessControlList* pACL )
 {
     CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadUserData ( pACL );
+    pArgument->ReadScriptID ( pACL->GetScriptID () );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -458,7 +466,7 @@ CLuaArgument* CLuaArguments::PushACL ( CAccessControlList* pACL )
 CLuaArgument* CLuaArguments::PushACLGroup ( CAccessControlListGroup* pACLGroup )
 {
     CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadUserData ( pACLGroup );
+    pArgument->ReadScriptID ( pACLGroup->GetScriptID () );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -467,7 +475,7 @@ CLuaArgument* CLuaArguments::PushACLGroup ( CAccessControlListGroup* pACLGroup )
 CLuaArgument* CLuaArguments::PushAccount ( CAccount* pAccount )
 {
     CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadUserData ( pAccount );
+    pArgument->ReadScriptID ( pAccount->GetScriptID () );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -476,7 +484,7 @@ CLuaArgument* CLuaArguments::PushAccount ( CAccount* pAccount )
 CLuaArgument* CLuaArguments::PushResource ( CResource* pResource )
 {
     CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadUserData ( pResource );
+    pArgument->ReadScriptID ( pResource->GetScriptID () );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -485,7 +493,7 @@ CLuaArgument* CLuaArguments::PushResource ( CResource* pResource )
 CLuaArgument* CLuaArguments::PushTextDisplay ( CTextDisplay* pTextDisplay )
 {
     CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadUserData ( pTextDisplay );
+    pArgument->ReadScriptID ( pTextDisplay->GetScriptID () );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -494,7 +502,7 @@ CLuaArgument* CLuaArguments::PushTextDisplay ( CTextDisplay* pTextDisplay )
 CLuaArgument* CLuaArguments::PushTextItem ( CTextItem* pTextItem )
 {
     CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadUserData ( pTextItem );
+    pArgument->ReadScriptID ( pTextItem->GetScriptID () );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -503,7 +511,16 @@ CLuaArgument* CLuaArguments::PushTextItem ( CTextItem* pTextItem )
 CLuaArgument* CLuaArguments::PushTimer ( CLuaTimer* pLuaTimer )
 {
     CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadUserData ( pLuaTimer );
+    pArgument->ReadScriptID ( pLuaTimer->GetScriptID () );
+    m_Arguments.push_back ( pArgument );
+    return pArgument;
+}
+
+
+CLuaArgument* CLuaArguments::PushDbQuery ( CDbJobData* pJobData )
+{
+    CLuaArgument* pArgument = new CLuaArgument;
+    pArgument->ReadScriptID ( pJobData->GetId () );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }
@@ -744,6 +761,17 @@ json_object * CLuaArguments::WriteTableToJSONObject ( bool bSerialize, std::map 
 
 bool CLuaArguments::ReadFromJSONString ( const char* szJSON )
 {
+    // Fast isJSON check: Check first non-white space character is '[' or '{'
+    for ( const char* ptr = szJSON ; true ; )
+    {
+        char c = *ptr++;
+        if ( c == '[' || c == '{' )
+            break;
+        if ( isspace( (uchar)c ) )
+            continue;
+        return false;
+    }
+
     json_object* object = json_tokener_parse ( szJSON );
     if ( !is_error(object) )
     {
@@ -792,7 +820,8 @@ bool CLuaArguments::ReadFromJSONObject ( json_object * object, std::vector < CLu
             bool bSuccess = true;
             json_object_object_foreach(object, key, val) 
             {
-                CLuaArgument* pArgument = new CLuaArgument ( key );
+                CLuaArgument* pArgument = new CLuaArgument ();
+                pArgument->ReadString ( key );
                 m_Arguments.push_back ( pArgument ); // push the key first
                 pArgument = new CLuaArgument ( );
                 bSuccess = pArgument->ReadFromJSONObject ( val, pKnownTables ); // then the value
@@ -830,7 +859,8 @@ bool CLuaArguments::ReadFromJSONArray ( json_object * object, std::vector < CLua
             for(int i=0; i < json_object_array_length(object); i++) 
             {
                 json_object *arrayObject = json_object_array_get_idx(object, i);
-                CLuaArgument* pArgument = new CLuaArgument ((double)i+1); // push the key
+                CLuaArgument* pArgument = new CLuaArgument ();
+                pArgument->ReadNumber ( i + 1 );    // push the key
                 m_Arguments.push_back ( pArgument );
 
                 pArgument = new CLuaArgument();

@@ -16,7 +16,7 @@
 std::map < unsigned short, std::list < RwTexture* > > CClientTXD::ms_ReplacedTXDTextures;
 std::map < unsigned short, std::list < RwTexture* > > CClientTXD::ms_AddedTXDTextures;
 
-CClientTXD::CClientTXD ( class CClientManager* pManager, ElementID ID ) : CClientEntity ( ID )
+CClientTXD::CClientTXD ( class CClientManager* pManager, ElementID ID ) : ClassInit ( this ), CClientEntity ( ID )
 {
     // Init
     m_pManager = pManager;
@@ -46,6 +46,9 @@ bool CClientTXD::LoadTXD ( const char* szFile, bool bFilteringEnabled )
     // Are we not already loaded?
     if ( m_Textures.empty () )
     {
+        if ( !g_pCore->GetNetwork ()->CheckFile ( "txd", szFile ) )
+            return false;
+
         // Try to load it
         RwTexDictionary* pTXD = g_pGame->GetRenderWare ()->ReadTXD ( szFile );
         if ( pTXD )
@@ -224,7 +227,17 @@ void CClientTXD::Restream ( unsigned short usModelID )
     }
     else if ( CClientObjectManager::IsValidModel ( usModelID ) )
     {
+        if ( CClientPedManager::IsValidWeaponModel ( usModelID ) )
+        {
+            m_pManager->GetPedManager ()->RestreamWeapon ( usModelID );
+            m_pManager->GetPickupManager ()->RestreamPickups ( usModelID );
+        }
         m_pManager->GetObjectManager ()->RestreamObjects ( usModelID );
+        g_pGame->GetModelInfo ( usModelID )->RestreamIPL ();
     }
-    g_pGame->GetModelInfo ( usModelID )->RestreamIPL ();
+    else if ( CClientPlayerManager::IsValidModel ( usModelID ) )
+    {
+        m_pManager->GetPedManager ()->RestreamPeds ( usModelID );
+    }
+
 }

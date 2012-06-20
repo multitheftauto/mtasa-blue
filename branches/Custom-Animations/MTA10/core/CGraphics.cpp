@@ -14,6 +14,10 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "CTileBatcher.h"
+#include "CLine3DBatcher.h"
+#include "CMaterialLine3DBatcher.h"
+extern CCore* g_pCore;
 
 using namespace std;
 
@@ -33,10 +37,21 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
     m_pLineInterface = NULL;
     m_pDXSprite = NULL;
 
-    m_pRenderTarget = NULL;
-    m_pOriginalTarget = NULL;
+    m_iDebugQueueRefs = 0;
+    m_iDrawBatchRefCount = 0;
+    m_ActiveBlendMode = EBlendMode::BLEND;
+    m_CurDrawMode = EDrawMode::NONE;
+    m_CurBlendMode = EBlendMode::BLEND;
 
-    m_bIsDrawing = false;
+    m_pRenderItemManager = new CRenderItemManager ();
+    m_pTileBatcher = new CTileBatcher ();
+    m_pLine3DBatcherPreGUI = new CLine3DBatcher ( true );
+    m_pLine3DBatcherPostGUI = new CLine3DBatcher ( false );
+    m_pMaterialLine3DBatcher = new CMaterialLine3DBatcher ();
+
+    m_bSetRenderTargetEnabled = false;
+    m_pScreenGrabber = NewScreenGrabber ();
+    m_pPixelsManager = NewPixelsManager ();
 }
 
 
@@ -45,45 +60,17 @@ CGraphics::~CGraphics ( void )
     if ( m_pLineInterface )
         m_pLineInterface->Release ();
 
-    DestroyFonts ();
-    ExpireCachedTextures ( true );
+    DestroyStandardDXFonts ();
+
+    SAFE_DELETE ( m_pRenderItemManager );
+    SAFE_DELETE ( m_pTileBatcher );
+    SAFE_DELETE ( m_pLine3DBatcherPreGUI );
+    SAFE_DELETE ( m_pLine3DBatcherPostGUI );
+    SAFE_DELETE ( m_pMaterialLine3DBatcher );
+    SAFE_DELETE ( m_pScreenGrabber );
+    SAFE_DELETE ( m_pPixelsManager );
 }
 
-
-void CGraphics::BeginDrawing ( void )
-{
-    if ( !m_bIsDrawing )
-    {
-        m_pGUI->GetRenderingLibrary ()->UTIL_CaptureDeviceState ( );
-        m_pGUI->GetRenderingLibrary ()->BeginDrawing ();
-        
-        if ( m_pRenderTarget ) {
-            // Set the render target we want
-            HRESULT x = m_pDevice->SetRenderTarget ( 0, m_pRenderTarget );
-            assert ( x == D3D_OK );
-
-            // Clear the buffer
-            m_pDevice->Clear ( 0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, D3DCOLOR_XRGB(0,0,0), 1, 0 );
-        } else
-            m_pDevice->SetRenderTarget ( 0, m_pOriginalTarget );
-
-        m_bIsDrawing = true;
-    }
-}
-
-void CGraphics::EndDrawing ( void )
-{
-    if ( m_bIsDrawing )
-    {
-        if ( m_pRenderTarget ) {
-            // Set the render target back to the original one
-            m_pDevice->SetRenderTarget ( 0, m_pOriginalTarget );
-        }
-        m_pGUI->GetRenderingLibrary ()->EndDrawing ();
-        m_pGUI->GetRenderingLibrary ()->UTIL_RestoreDeviceState ( );
-        m_bIsDrawing = false;
-    }
-}
 
 void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, LPD3DXFONT pDXFont )
 {   
@@ -93,15 +80,10 @@ void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, uns
 
     // If no font was specified, use the default font
     if ( !pDXFont )
-    pDXFont = GetFont ();
+        pDXFont = GetFont ();
 
     // We're using a big font to keep it looking nice, so get the actual scale
-    if ( fScaleX > 1.1f || fScaleY > 1.1f )
-    {
-        pDXFont = GetBigFont ( pDXFont );
-        fScaleX /= 4.0f;
-        fScaleY /= 4.0f;
-    }
+    pDXFont = MaybeGetBigFont ( pDXFont, fScaleX, fScaleY );
 
     // Check for a valid font
     if ( pDXFont )
@@ -119,15 +101,16 @@ void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, uns
         D3DXVECTOR2 scalingCentre ( 0.5f, 0.5f );
         D3DXVECTOR2 scaling ( fScaleX, fScaleY );
 
-        m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
+        BeginDrawBatch ();
             D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, NULL );
+            CheckModes ( EDrawMode::DX_SPRITE, m_ActiveBlendMode );
             m_pDXSprite->SetTransform ( &matrix );  
             
             // Convert to UTF16
             std::wstring strText = MbUTF8ToUTF16(szText);
 
             pDXFont->DrawTextW ( m_pDXSprite, strText.c_str(), -1, &rect, ulFormat, ulColor );
-        m_pDXSprite->End ();
+        EndDrawBatch ();
     }        
 }
 
@@ -144,107 +127,228 @@ void CGraphics::DrawText ( int iX, int iY, unsigned long dwColor, float fScale, 
 }
 
 
-void CGraphics::DrawText2DA ( int uiX, int uiY, unsigned long ulColor, float fScale, const char* szDisplayText, ... )
-{
-    char szBuffer [ 1024 ];
-    va_list ap;
-    va_start ( ap, szDisplayText );
-    VSNPRINTF ( szBuffer, 1024, szDisplayText, ap );
-    va_end ( ap );
-
-    // Start drawing
-    BeginSingleDrawing ();
-
-    // Draw the text
-    m_pGUI->GetRenderingLibrary ()->DrawText2D ( static_cast < float > ( uiX ), static_cast < float > ( uiY ), ulColor, szBuffer, fScale );
-
-    // End drawing
-    EndSingleDrawing ();
-}
-
-
-void CGraphics::DrawText3DA ( float fX, float fY, float fZ, unsigned long ulColor, float fScale, const char* szDisplayText, ... )
-{
-    char szBuffer [ 1024 ];
-    va_list ap;
-    va_start ( ap, szDisplayText );
-    VSNPRINTF ( szBuffer, 1024, szDisplayText, ap );
-    va_end ( ap );
-
-    // Initialize ViewMatrix
-    D3DMATRIX ViewMatrix;
-    memset ( &ViewMatrix, 0, sizeof ( D3DMATRIX ) );
-
-    // Get the view matrix for billboarding calculation by DrawText3D.
-    CDirect3DData::GetSingleton ( ).GetTransform ( D3DTS_VIEW, &ViewMatrix );
-    //assert ( 0 ); // StoreTransform uses a pretty significant amount of processing
-
-    // Start drawing
-    BeginSingleDrawing ( );
-
-    // Draw this text.
-    m_pGUI->GetRenderingLibrary ( )->DrawText3D ( fX,
-                                                  fY,
-                                                  fZ,
-                                                  &ViewMatrix,
-                                                  ulColor, 
-                                                  szBuffer, 
-                                                  fScale );
-    // End drawing
-    EndSingleDrawing ( );
-}
-
-
-void CGraphics::Draw3DBox ( float fX, float fY, float fZ, float fL, float fW, float fH, DWORD dwColor, bool bWireframe )
-{
-    BeginSingleDrawing ( );
-
-    m_pGUI->GetRenderingLibrary ()->Render3DBox ( fX, fY, fZ, fL, fW, fH, dwColor, bWireframe );
-
-    EndSingleDrawing ( );
-}
-
-
-void CGraphics::DrawLine ( float fX1, float fY1, float fX2, float fY2, unsigned long ulColor )
-{
-   // Start drawing
-    BeginSingleDrawing ( );
-
-    // Draw the line
-    m_pGUI->GetRenderingLibrary ()->DrawLine ( D3DXVECTOR3 ( fX1, fY1, 0 ), D3DXVECTOR3 ( fX2, fY2, 0 ), ulColor );
-
-    // End drawing
-    EndSingleDrawing ( );
-}
-
-
 void CGraphics::DrawLine3D ( const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth )
 {
-    BeginSingleDrawing ();
-
-    m_pGUI->GetRenderingLibrary ()->DrawLine3D (
-        D3DXVECTOR3 ( vecBegin.fX, vecBegin.fY, vecBegin.fZ ),
-        D3DXVECTOR3 ( vecEnd.fX, vecEnd.fY, vecEnd.fZ ),
-        fWidth / 75.0f,
-        NULL,
-        ulColor
-    );
-
-    EndSingleDrawing ();
+    DrawLine3DQueued ( vecBegin, vecEnd, fWidth, ulColor, true );
 }
 
 
 void CGraphics::DrawRectangle ( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor )
 {      
-    m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
+    BeginDrawBatch ();
     D3DXMATRIX matrix;
     D3DXVECTOR2 scalingCentre ( 0.5f, 0.5f );
     D3DXVECTOR2 scaling ( fWidth, fHeight );
     D3DXVECTOR2 position ( fX, fY );
     D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, &position );
+    CheckModes ( EDrawMode::DX_SPRITE, m_ActiveBlendMode );
     m_pDXSprite->SetTransform ( &matrix );
     m_pDXSprite->Draw ( m_pDXPixelTexture, NULL, NULL, NULL, ulColor );
-    m_pDXSprite->End ();
+    EndDrawBatch ();
+}
+
+
+//
+// Set/get current blend mode
+// 
+void CGraphics::SetBlendMode ( EBlendModeType blendMode )
+{
+    m_ActiveBlendMode = blendMode;
+}
+
+EBlendModeType CGraphics::GetBlendMode ( void )
+{
+    return m_ActiveBlendMode;
+}
+
+//
+// Modify diffuse color if blend mode requires it
+// 
+SColor CGraphics::ModifyColorForBlendMode ( SColor color, EBlendModeType blendMode )
+{
+    if ( blendMode == EBlendMode::MODULATE_ADD )
+    {
+        // Apply modulation to diffuse color also
+        color.R = color.R * color.A / 256;
+        color.G = color.G * color.A / 256;
+        color.B = color.B * color.A / 256;
+    }
+    return color;
+}
+
+
+//
+// SetBlendModeRenderStates
+// 
+void CGraphics::SetBlendModeRenderStates ( EBlendModeType blendMode )
+{
+    switch ( blendMode )
+    {
+        case EBlendMode::BLEND:
+        {
+            // Draw NonPM texture
+            m_pDevice->SetRenderState ( D3DRS_ZENABLE,          D3DZB_FALSE );
+            m_pDevice->SetRenderState ( D3DRS_CULLMODE,         D3DCULL_NONE );
+            m_pDevice->SetRenderState ( D3DRS_SHADEMODE,        D3DSHADE_GOURAUD );
+            m_pDevice->SetRenderState ( D3DRS_ALPHABLENDENABLE, TRUE );
+            m_pDevice->SetRenderState ( D3DRS_SRCBLEND,         D3DBLEND_SRCALPHA );
+            m_pDevice->SetRenderState ( D3DRS_DESTBLEND,        D3DBLEND_INVSRCALPHA );
+            m_pDevice->SetRenderState ( D3DRS_ALPHATESTENABLE,  TRUE );
+            m_pDevice->SetRenderState ( D3DRS_ALPHAREF,         0x01 );
+            m_pDevice->SetRenderState ( D3DRS_ALPHAFUNC,        D3DCMP_GREATEREQUAL );
+            m_pDevice->SetRenderState ( D3DRS_LIGHTING,         FALSE);
+
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLOROP,        D3DTOP_MODULATE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLORARG1,      D3DTA_DIFFUSE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLORARG2,      D3DTA_TEXTURE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAOP,        D3DTOP_MODULATE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAARG1,      D3DTA_DIFFUSE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAARG2,      D3DTA_TEXTURE );
+
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_COLOROP,        D3DTOP_DISABLE );
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_ALPHAOP,        D3DTOP_DISABLE );
+        }
+        break;
+
+        case EBlendMode::MODULATE_ADD:
+        {
+            // Draw NonPM texture as PM texture
+            m_pDevice->SetRenderState ( D3DRS_ZENABLE,          D3DZB_FALSE );
+            m_pDevice->SetRenderState ( D3DRS_CULLMODE,         D3DCULL_NONE );
+            m_pDevice->SetRenderState ( D3DRS_SHADEMODE,        D3DSHADE_GOURAUD );
+            m_pDevice->SetRenderState ( D3DRS_ALPHABLENDENABLE, TRUE );
+            m_pDevice->SetRenderState ( D3DRS_SRCBLEND,         D3DBLEND_ONE );
+            m_pDevice->SetRenderState ( D3DRS_DESTBLEND,        D3DBLEND_INVSRCALPHA );
+            m_pDevice->SetRenderState ( D3DRS_ALPHATESTENABLE,  TRUE );
+            m_pDevice->SetRenderState ( D3DRS_ALPHAREF,         0x01 );
+            m_pDevice->SetRenderState ( D3DRS_ALPHAFUNC,        D3DCMP_GREATEREQUAL );
+            m_pDevice->SetRenderState ( D3DRS_LIGHTING,         FALSE);
+            m_pDevice->SetRenderState ( D3DRS_TEXTUREFACTOR,    0 );
+
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
+
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_COLOROP,   D3DTOP_BLENDCURRENTALPHA );
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_COLORARG1, D3DTA_CURRENT );
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_COLORARG2, D3DTA_TFACTOR );
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_ALPHAOP,   D3DTOP_SELECTARG1 );
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_ALPHAARG1, D3DTA_CURRENT );
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
+
+            m_pDevice->SetTextureStageState ( 2, D3DTSS_COLOROP, D3DTOP_DISABLE );
+            m_pDevice->SetTextureStageState ( 2, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
+
+        }
+        break;
+
+        case EBlendMode::ADD:
+        {
+            // Draw PM texture
+            m_pDevice->SetRenderState ( D3DRS_ZENABLE,          D3DZB_FALSE );
+            m_pDevice->SetRenderState ( D3DRS_CULLMODE,         D3DCULL_NONE );
+            m_pDevice->SetRenderState ( D3DRS_SHADEMODE,        D3DSHADE_GOURAUD );
+            m_pDevice->SetRenderState ( D3DRS_ALPHABLENDENABLE, TRUE );
+            m_pDevice->SetRenderState ( D3DRS_SRCBLEND,         D3DBLEND_ONE );
+            m_pDevice->SetRenderState ( D3DRS_DESTBLEND,        D3DBLEND_INVSRCALPHA );
+            m_pDevice->SetRenderState ( D3DRS_ALPHATESTENABLE,  TRUE );
+            m_pDevice->SetRenderState ( D3DRS_ALPHAREF,         0x01 );
+            m_pDevice->SetRenderState ( D3DRS_ALPHAFUNC,        D3DCMP_GREATEREQUAL );
+            m_pDevice->SetRenderState ( D3DRS_LIGHTING,         FALSE );
+
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
+
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_COLOROP, D3DTOP_DISABLE );
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
+
+        }
+        break;
+
+        default:
+            break;
+    }
+}
+
+
+//
+// BeginDrawBatch
+//
+// Batching is automatic, and it is vital to to flush the last set of operations.
+// Surrounding drawing calls with BeginDrawBatch() and EndDrawBatch() will ensure everything goes to plan.
+//
+void CGraphics::BeginDrawBatch ( EBlendModeType xxblendMode )
+{
+    m_iDrawBatchRefCount++;
+}
+
+//
+// EndDrawBatch
+//
+void CGraphics::EndDrawBatch ( void )
+{
+    if ( --m_iDrawBatchRefCount == 0 )
+        CheckModes ( EDrawMode::NONE, EBlendMode::BLEND );
+    m_iDrawBatchRefCount = Max ( 0, m_iDrawBatchRefCount );
+}
+
+
+//
+// Flush buffers if a change in drawing mode if occurring.
+//
+void CGraphics::CheckModes ( EDrawModeType newDrawMode, EBlendModeType newBlendMode )
+{
+    bool bDrawModeChanging = ( m_CurDrawMode != newDrawMode );
+    bool bBlendModeChanging = ( m_CurBlendMode != newBlendMode );
+    // Draw mode changing?
+    if ( bDrawModeChanging || bBlendModeChanging )
+    {
+        // Flush old
+        if ( m_CurDrawMode == EDrawMode::DX_SPRITE )
+        {
+            m_pDevice->SetSamplerState( 0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP );
+            m_pDevice->SetSamplerState( 0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP );
+            m_pDXSprite->End ();
+        }
+        else
+        if ( m_CurDrawMode == EDrawMode::DX_LINE )
+        {
+            m_pLineInterface->End ();
+        }
+        else
+        if ( m_CurDrawMode == EDrawMode::TILE_BATCHER )
+        {
+            m_pTileBatcher->Flush ();
+        }
+
+
+        // Start new
+        if ( newDrawMode == EDrawMode::DX_SPRITE )
+        {
+            m_pDXSprite->Begin ( D3DXSPRITE_DONOTSAVESTATE | D3DXSPRITE_DONOTMODIFY_RENDERSTATE );
+        }
+        else
+        if ( newDrawMode == EDrawMode::DX_LINE )
+        {
+            m_pLineInterface->Begin ();
+        }
+    }
+
+    // Blend mode changing?
+    if ( bDrawModeChanging || bBlendModeChanging )
+    {
+        SetBlendModeRenderStates ( newBlendMode );
+    }
+
+    m_CurDrawMode = newDrawMode;
+    m_CurBlendMode = newBlendMode;
 }
 
 
@@ -297,27 +401,6 @@ void CGraphics::CalcScreenCoors ( CVector * vecWorld, CVector * vecScreen )
 }
 
 
-void CGraphics::Render3DSprite ( float fX, float fY, float fZ, float fScale, unsigned long ulColor )
-{
-    // Initialize ViewMatrix
-    D3DXMATRIX ViewMatrix;
-    memset ( &ViewMatrix, 0, sizeof ( D3DXMATRIX ) );
-
-    // Get the view matrix for billboarding calculation by DrawText3D.
-    CDirect3DData::GetSingleton ( ).GetTransform ( D3DTS_VIEW, &ViewMatrix );
-    //assert ( 0 ); // StoreTransform uses a pretty significant amount of processing
-
-    // Begin drawing
-    BeginSingleDrawing ();
-
-    // Render it
-    m_pGUI->GetRenderingLibrary ()->Render3DSprite ( NULL, 1.0f, &D3DXVECTOR3 ( fX, fY, fZ ), &ViewMatrix, ulColor );
-
-    // End drawing
-    EndSingleDrawing ();
-}
-
-
 unsigned int CGraphics::GetViewportWidth ( void )
 {
     return CDirect3DData::GetSingleton ().GetViewportWidth ();
@@ -335,11 +418,7 @@ float CGraphics::GetDXFontHeight ( float fScale, LPD3DXFONT pDXFont )
     if ( !pDXFont )
         pDXFont = GetFont ();
 
-    if ( fScale > 1.1f )
-    {
-        pDXFont = GetBigFont ( pDXFont );
-        fScale /= 4.0f;
-    }
+    pDXFont = MaybeGetBigFont ( pDXFont, fScale, fScale );
 
     if ( pDXFont )
     {
@@ -356,11 +435,7 @@ float CGraphics::GetDXCharacterWidth ( char c, float fScale, LPD3DXFONT pDXFont 
     if ( !pDXFont )
         pDXFont = GetFont ();
 
-    if ( fScale > 1.1f )
-    {
-        pDXFont = GetBigFont ( pDXFont );
-        fScale /= 4.0f;
-    }
+    pDXFont = MaybeGetBigFont ( pDXFont, fScale, fScale );
 
     if ( pDXFont )
     {
@@ -379,11 +454,7 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
     if ( !pDXFont )
         pDXFont = GetFont ();
 
-    if ( fScale > 1.1f )
-    {
-        pDXFont = GetBigFont ( pDXFont );
-        fScale /= 4.0f;
-    }
+    pDXFont = MaybeGetBigFont ( pDXFont, fScale, fScale );
 
     if ( pDXFont )
     {
@@ -398,6 +469,27 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
     }
     return 0.0f;
 }
+
+
+float CGraphics::GetDXTextExtentW ( const wchar_t* wszText, float fScale, LPD3DXFONT pDXFont )
+{
+    if ( !pDXFont )
+        pDXFont = GetFont ();
+
+    pDXFont = MaybeGetBigFont ( pDXFont, fScale, fScale );
+
+    if ( pDXFont )
+    {
+        HDC dc = pDXFont->GetDC ();
+        SIZE size;
+
+        GetTextExtentPoint32W ( dc, wszText, wcslen ( wszText ), &size );
+
+        return ( ( float ) size.cx * fScale );
+    }
+    return 0.0f;
+}
+
 
 ID3DXFont * CGraphics::GetFont ( eFontType fontType )
 {
@@ -424,39 +516,6 @@ eFontType CGraphics::GetFontType ( const char* szFontName )
 }
 
 
-void CGraphics::BeginSingleDrawing ( void )
-{
-    // This function is used to determine if we need to capture the device state and begin drawing or not
-    // and must be called before ANY drawing inside this class. This function will capture the device states
-    // only if they aren't already captured through a BeginDrawing () call made by the client if it's going
-    // to do multiple operations (thus saving the time it takes to do this).
-
-    // We might consider doing a BeginDrawing () before any call to a client function and EndDrawing ()
-    // after, in other words we don't have to worry about the states not getting restored back to GTA.
-    // - ChrML
-
-    // Start drawing?
-    if ( !m_bIsDrawing )
-    {
-        m_pGUI->GetRenderingLibrary ( )->UTIL_CaptureDeviceState ( );
-        m_pGUI->GetRenderingLibrary ()->BeginDrawing ();
-    }
-}
-
-
-void CGraphics::EndSingleDrawing ( void )
-{
-    // See comment in BeginSingleDrawing ()
-
-    // End drawing?
-    if ( !m_bIsDrawing )
-    {
-        m_pGUI->GetRenderingLibrary ()->EndDrawing ();
-        m_pGUI->GetRenderingLibrary ( )->UTIL_RestoreDeviceState ( );
-    }
-}
-
-
 void CGraphics::SetCursorPosition ( int iX, int iY, DWORD Flags )
 {
     m_pDevice->SetCursorPosition ( iX, iY, Flags );
@@ -472,6 +531,7 @@ void CGraphics::DrawLineQueued ( float fX1, float fY1,
     // Set up a queue item
     sDrawQueueItem Item;
     Item.eType = QUEUE_LINE;
+    Item.blendMode = m_ActiveBlendMode;
     Item.Line.fX1 = fX1;
     Item.Line.fY1 = fY1;
     Item.Line.fX2 = fX2;
@@ -490,21 +550,40 @@ void CGraphics::DrawLine3DQueued ( const CVector& vecBegin,
                                    unsigned long ulColor,
                                    bool bPostGUI )
 {
-    // Set up a queue item
-    sDrawQueueItem Item;
-    Item.eType = QUEUE_LINE3D;
-    Item.Line3D.fX1 = vecBegin.fX;
-    Item.Line3D.fY1 = vecBegin.fY;
-    Item.Line3D.fZ1 = vecBegin.fZ;
-    Item.Line3D.fX2 = vecEnd.fX;
-    Item.Line3D.fY2 = vecEnd.fY;
-    Item.Line3D.fZ2 = vecEnd.fZ;
-    Item.Line3D.fWidth = fWidth;
-    Item.Line3D.ulColor = ulColor;
+    if ( g_pCore->IsWindowMinimized () )
+        return;
 
     // Add it to the queue
-    AddQueueItem ( Item, bPostGUI );
+    if ( bPostGUI )
+        m_pLine3DBatcherPostGUI->AddLine3D ( vecBegin, vecEnd, fWidth, ulColor ); 
+    else
+        m_pLine3DBatcherPreGUI->AddLine3D ( vecBegin, vecEnd, fWidth, ulColor ); 
 }
+
+void CGraphics::DrawMaterialLine3DQueued ( const CVector& vecBegin,
+                                           const CVector& vecEnd,
+                                           float fWidth,
+                                           unsigned long ulColor,
+                                           CMaterialItem* pMaterial,
+                                           float fU, float fV,
+                                           float fSizeU, float fSizeV, 
+                                           bool bRelativeUV,
+                                           bool bUseFaceToward,
+                                           const CVector& vecFaceToward )
+{
+    if ( g_pCore->IsWindowMinimized () )
+        return;
+
+    if ( CShaderItem* pShaderItem = DynamicCast < CShaderItem >( pMaterial ) )
+    {
+        // If material is a shader, use its current instance
+        pMaterial = pShaderItem->m_pShaderInstance;
+    }
+
+    // Add it to the queue
+    m_pMaterialLine3DBatcher->AddLine3D ( vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bUseFaceToward, vecFaceToward ); 
+}
+
 
 
 void CGraphics::DrawRectQueued ( float fX, float fY,
@@ -515,6 +594,7 @@ void CGraphics::DrawRectQueued ( float fX, float fY,
     // Set up a queue item
     sDrawQueueItem Item;
     Item.eType = QUEUE_RECT;
+    Item.blendMode = m_ActiveBlendMode;
     Item.Rect.fX = fX;
     Item.Rect.fY = fY;
     Item.Rect.fWidth = fWidth;
@@ -526,21 +606,22 @@ void CGraphics::DrawRectQueued ( float fX, float fY,
 }
 
 
-bool CGraphics::DrawTextureQueued ( float fX, float fY,
+void CGraphics::DrawTextureQueued ( float fX, float fY,
                                  float fWidth, float fHeight,
                                  float fU, float fV,
                                  float fSizeU, float fSizeV,
                                  bool bRelativeUV,
-                                 const string& strFilename,
+                                 CMaterialItem* pMaterial,
                                  float fRotation,
                                  float fRotCenOffX,
                                  float fRotCenOffY,
                                  unsigned long ulColor,
                                  bool bPostGUI )
 {
+
     // Set up a queue item
     sDrawQueueItem Item;
-    Item.eType = QUEUE_TEXTURE;
+    Item.blendMode = m_ActiveBlendMode;
     Item.Texture.fX = fX;
     Item.Texture.fY = fY;
     Item.Texture.fWidth = fWidth;
@@ -550,30 +631,48 @@ bool CGraphics::DrawTextureQueued ( float fX, float fY,
     Item.Texture.fSizeU = fSizeU;
     Item.Texture.fSizeV = fSizeV;
     Item.Texture.bRelativeUV = bRelativeUV;
-    Item.Texture.info = CacheTexture( strFilename );
     Item.Texture.fRotation = fRotation;
     Item.Texture.fRotCenOffX = fRotCenOffX;
     Item.Texture.fRotCenOffY = fRotCenOffY;
     Item.Texture.ulColor = ulColor;
 
-    if ( !Item.Texture.info.d3dTexture )
-        return false;
+    if ( CShaderItem* pShaderItem = DynamicCast < CShaderItem >( pMaterial ) )
+    {
+        // If material is a shader, use its current instance
+        Item.Texture.pMaterial = pShaderItem->m_pShaderInstance;
+        Item.eType = QUEUE_SHADER;
+    }
+    else
+    {
+        // Otherwise material must be a texture
+        Item.Texture.pMaterial = pMaterial;
+
+        // Use tilebatcher if non-default texture addessing is needed
+        if ( pMaterial->m_TextureAddress == TADDRESS_WRAP )
+            Item.eType = QUEUE_TEXTURE;
+        else
+            Item.eType = QUEUE_SHADER;
+    }
+
+    // Keep material valid while in the queue
+    AddQueueRef ( Item.Texture.pMaterial );
 
     // Add it to the queue
     AddQueueItem ( Item, bPostGUI );
-    return true;
 }
 
 
-void CGraphics::DrawTextQueued ( int iLeft, int iTop,
-                                 int iRight, int iBottom,
+void CGraphics::DrawTextQueued ( float fLeft, float fTop,
+                                 float fRight, float fBottom,
                                  unsigned long dwColor,
                                  const char* szText,
                                  float fScaleX,
                                  float fScaleY,
                                  unsigned long ulFormat,
                                  ID3DXFont * pDXFont,
-                                 bool bPostGUI )
+                                 bool bPostGUI,
+                                 bool bColorCoded,
+                                 bool bSubPixelPositioning )
 {
     if ( !szText || !m_pDXSprite )
         return;
@@ -581,28 +680,43 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
     if ( !pDXFont ) pDXFont = GetFont ();
 
     // We're using a big font to keep it looking nice, so get the actual scale
-    if ( fScaleX > 1.1f || fScaleY > 1.1f )
-    {
-        pDXFont = GetBigFont ( pDXFont );
-        fScaleX /= 4.0f;
-        fScaleY /= 4.0f;
-    }
+    pDXFont = MaybeGetBigFont ( pDXFont, fScaleX, fScaleY );
 
+    if ( !pDXFont )
+        return;
 
-    if ( pDXFont )
+    if ( !bColorCoded )
     {
-        iLeft = unsigned int ( ( float ) iLeft * ( 1.0f / fScaleX ) );
-        iTop = unsigned int ( ( float ) iTop * ( 1.0f / fScaleY ) );
-        iRight = unsigned int ( ( float ) iRight * ( 1.0f / fScaleX ) );
-        iBottom = unsigned int ( ( float ) iBottom * ( 1.0f / fScaleY ) );
+        //
+        // Simple case without color coding
+        //
+
+        if ( fScaleX != 1.0f || fScaleY != 1.0f )
+        {
+            const float fRcpScaleX = 1 / fScaleX;
+            const float fRcpScaleY = 1 / fScaleY;
+            fLeft *= fRcpScaleX;
+            fTop *= fRcpScaleY;
+            fRight *= fRcpScaleX;
+            fBottom *= fRcpScaleY;
+        }
+
+        if ( !bSubPixelPositioning )
+        {
+            fLeft = floor ( fLeft );
+            fTop = floor ( fTop );
+            fRight = floor ( fRight );
+            fBottom = floor ( fBottom );
+        }
 
         sDrawQueueItem Item;
         Item.eType = QUEUE_TEXT;
+        Item.blendMode = m_ActiveBlendMode;
 
-        Item.Text.iLeft = iLeft;
-        Item.Text.iTop = iTop;
-        Item.Text.iRight = iRight;
-        Item.Text.iBottom = iBottom;
+        Item.Text.fLeft = fLeft;
+        Item.Text.fTop = fTop;
+        Item.Text.fRight = fRight;
+        Item.Text.fBottom = fBottom;
         Item.Text.ulColor = dwColor;
         Item.Text.fScaleX = fScaleX;
         Item.Text.fScaleY = fScaleY;
@@ -610,14 +724,178 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
         Item.Text.pDXFont = pDXFont;
 
         // Convert to wstring        
-        Item.strText = MbUTF8ToUTF16(szText);
+        Item.wstrText = MbUTF8ToUTF16 ( szText );
+
+        // Keep font valid while in the queue incase it's a custom font
+        AddQueueRef ( Item.Text.pDXFont );
 
         // Add it to the queue
         AddQueueItem ( Item, bPostGUI );
+        return;
+    }
+    else
+    {
+        //
+        // Complex case with color coding
+        //
+
+        // Do everything as a wide string from this point
+        std::wstring wstrText = MbUTF8ToUTF16 ( szText );   
+
+        // Break into lines
+        CSplitStringW splitLines ( wstrText, L"\n" );
+        int iNumLines = splitLines.size ();
+
+        float fLineHeight = GetDXFontHeight ( fScaleY, pDXFont );
+        float fTotalHeight = iNumLines * fLineHeight;
+
+        // Y position of text
+        float fY;
+        if ( ulFormat & DT_BOTTOM )
+            fY = fBottom - fTotalHeight;
+        else
+        if ( ulFormat & DT_VCENTER )
+            fY = ( fBottom + fTop - fTotalHeight ) * 0.5f;
+        else
+            fY = fTop;  // DT_TOP
+
+        // Process each line
+        SColor currentColor = dwColor;
+        for ( uint i = 0 ; i < splitLines.size () ; i++ )
+        {
+            DrawColorCodedTextLine ( fLeft, fRight, fY, currentColor, splitLines[i], fScaleX, fScaleY, ulFormat, pDXFont, bPostGUI, bSubPixelPositioning );
+            fY += fLineHeight;
+        }
     }
 }
 
-bool CGraphics::LoadFonts ( void )
+
+void CGraphics::DrawColorCodedTextLine ( float fLeft, float fRight, float fY, SColor& currentColor, const wchar_t* wszText,
+                                         float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning )
+{
+    struct STextSection
+    {
+        std::wstring wstrText;
+        float fWidth;
+        SColor color;
+    };
+
+    std::list < STextSection > sectionList;
+
+    // Break line into color sections
+    float fTotalWidth = 0;
+    const wchar_t* wszSectionPos = wszText;
+    do
+    {
+        unsigned int uiSeekPos = 0;
+        const wchar_t* wszSectionStart = wszSectionPos;
+        SColor nextColor = currentColor;
+        while ( *wszSectionPos != '\0' )      // find end of this section
+        {
+            if ( CChatLine::IsColorCodeW ( wszSectionPos ) )
+            {
+                unsigned long ulColor = 0;
+                swscanf ( wszSectionPos + 1, L"%06x", &ulColor );
+                nextColor = ulColor;
+                wszSectionPos += 7;
+                break;
+            }
+            wszSectionPos++;
+            uiSeekPos++;
+        }
+
+        if ( uiSeekPos > 0 )
+        {
+            // Add section
+            if ( !sectionList.empty () && sectionList.back ().color == currentColor )
+            {
+                // Append to last section if color has not changed
+                std::wstring strExtraText = std::wstring ( wszSectionStart, uiSeekPos );
+                float fExtraWidth = GetDXTextExtentW ( strExtraText.c_str (), fScaleX, pDXFont );
+
+                STextSection& section = sectionList.back ();
+                section.wstrText += strExtraText;
+                section.fWidth += fExtraWidth;
+                dassert ( section.color == currentColor );
+
+                fTotalWidth += fExtraWidth;
+            }
+            else
+            {
+                // Add a new section
+                sectionList.push_back ( STextSection () );
+                STextSection& section = sectionList.back ();
+                section.wstrText = std::wstring ( wszSectionStart, uiSeekPos );
+                section.fWidth = GetDXTextExtentW ( section.wstrText.c_str (), fScaleX, pDXFont );
+                section.color = currentColor;
+
+                fTotalWidth += section.fWidth;
+            }
+        }
+
+        nextColor.A = currentColor.A;
+        currentColor = nextColor;
+    }
+    while ( *wszSectionPos != '\0' );
+
+    // X position of text
+    float fX;
+    if ( ulFormat & DT_RIGHT )
+        fX = fRight - fTotalWidth;
+    else
+    if ( ulFormat & DT_CENTER )
+        fX = ( fRight + fLeft - fTotalWidth ) * 0.5f;
+    else
+        fX = fLeft;  // DT_LEFT
+
+    // Draw all the color sections
+    for ( std::list < STextSection >::const_iterator iter = sectionList.begin () ; iter != sectionList.end () ; ++iter )
+    {
+        const STextSection& section = *iter;
+
+        float fLeft = fX;
+        float fTop = fY;
+
+        if ( fScaleX != 1.0f || fScaleY != 1.0f )
+        {
+            fLeft /= fScaleX;
+            fTop /= fScaleY;
+        }
+
+        if ( !bSubPixelPositioning )
+        {
+            fLeft = floor ( fLeft );
+            fTop = floor ( fTop );
+        }
+
+        sDrawQueueItem Item;
+        Item.eType = QUEUE_TEXT;
+        Item.blendMode = m_ActiveBlendMode;
+
+        Item.Text.fLeft = fLeft;
+        Item.Text.fTop = fTop;
+        Item.Text.fRight = fLeft;
+        Item.Text.fBottom = fTop;
+        Item.Text.ulColor = section.color;
+        Item.Text.fScaleX = fScaleX;
+        Item.Text.fScaleY = fScaleY;
+        Item.Text.ulFormat = DT_NOCLIP;
+        Item.Text.pDXFont = pDXFont;
+
+        Item.wstrText = section.wstrText;
+
+        // Keep font valid while in the queue incase it's a custom font
+        AddQueueRef ( Item.Text.pDXFont );
+
+        // Add it to the queue
+        AddQueueItem ( Item, bPostGUI );
+
+        fX += section.fWidth;
+    }
+}
+
+
+bool CGraphics::LoadStandardDXFonts ( void )
 {
     // Add our custom font resources
     if ( m_FontResourceNames.empty () )
@@ -682,44 +960,34 @@ bool CGraphics::LoadFonts ( void )
     return true;
 }
 
-bool CGraphics::LoadFont ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** pDXSmallFont, ID3DXFont** pDXBigFont )
+bool CGraphics::LoadAdditionalDXFont ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont )
 {
     int iLoaded = AddFontResourceEx ( strFontPath.c_str (), FR_PRIVATE, 0 );
 
     int iWeight = bBold ? FW_BOLD : FW_NORMAL;
-    ID3DXFont *pNewDXSmallFont = NULL;
-    ID3DXFont *pNewDXBigFont = NULL;
+    *ppD3DXFont = NULL;
 
     bool bSuccess = true;
     // Normal size
     if( !SUCCEEDED ( D3DXCreateFont ( m_pDevice, uiHeight, 0, iWeight, 1,
         FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, strFontName.c_str(),
-        &pNewDXSmallFont ) ) )
+        ppD3DXFont ) ) )
     {
         CLogger::GetSingleton ().ErrorPrintf( "Could not create Direct3D font '%s'", strFontName.c_str() );
         bSuccess = false;
     }
 
-    // Big size (4x)
-    if( !SUCCEEDED ( D3DXCreateFont ( m_pDevice, uiHeight*4, 0, iWeight, 1,
-        FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, strFontName.c_str(),
-        &pNewDXBigFont ) ) )
-    {
-        CLogger::GetSingleton ().ErrorPrintf( "Could not create Direct3D big font '%s'", strFontName.c_str() );
-        bSuccess = false;
-    }
-    *pDXSmallFont = pNewDXSmallFont;
-    *pDXBigFont = pNewDXBigFont;
-
-    return bSuccess && SUCCEEDED ( D3DXCreateSprite ( m_pDevice, &m_pDXSprite ) ) && ( iLoaded == 1 );
+    return bSuccess && ( iLoaded == 1 );
 }
 
-bool CGraphics::DestroyFont ( std::string strFontPath )
+bool CGraphics::DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont *pD3DXFont )
 {
-    return RemoveFontResourceEx ( strFontPath.c_str (), FR_PRIVATE, 0 ) ? true : false; 
+    bool bResult = RemoveFontResourceEx ( strFontPath.c_str (), FR_PRIVATE, 0 ) != 0;
+    SAFE_RELEASE( pD3DXFont );
+    return bResult;
 }
 
-bool CGraphics::DestroyFonts ( void )
+bool CGraphics::DestroyStandardDXFonts ( void )
 {
     // Remove our custom font resources (needs to be identical to LoadFonts)
     for ( uint i = 0 ; i < m_FontResourceNames.size () ; i++ )
@@ -727,93 +995,60 @@ bool CGraphics::DestroyFonts ( void )
         RemoveFontResourceEx ( CalcMTASAPath ( "MTA\\cgui\\" + m_FontResourceNames[i] ), FR_PRIVATE, 0 );
     }
 
+    for ( int i = 0; i < NUM_FONTS; i++ )
+    {
+        SAFE_RELEASE( m_pDXFonts[i] );
+        SAFE_RELEASE( m_pBigDXFonts[i] );
+    }
+
+    // Release 
     return true;
 }
 
-IDirect3DTexture9* CGraphics::CreateTexture ( DWORD* dwBitMap, unsigned int uiWidth, unsigned int uiHeight )
+void CGraphics::DrawTexture ( CTextureItem* pTexture, float fX, float fY, float fScaleX, float fScaleY, float fRotation, float fCenterX, float fCenterY, DWORD dwColor )
 {
-    IDirect3DTexture9* texture = NULL;
-    D3DXCreateTexture ( m_pDevice, uiWidth, uiHeight, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &texture );
-
-    D3DLOCKED_RECT lRect;
-    texture->LockRect ( 0, &lRect, 0, 0 );
-
-    BYTE* pTexture;
-    pTexture = static_cast < BYTE* > ( lRect.pBits );
-
-    DWORD color, pitch;
-    pitch = lRect.Pitch;
-    for ( UINT c = 0; c < uiHeight; c++ )
-    {
-        for ( UINT r = 0; r < uiWidth; r++ )
-        {
-            color = dwBitMap[uiWidth*c+r];
-            pTexture[r*4+c*pitch+0] = static_cast < BYTE > ( color );
-            pTexture[r*4+c*pitch+1] = static_cast < BYTE > ( color >> 8 );
-            pTexture[r*4+c*pitch+2] = static_cast < BYTE > ( color >> 16 );
-            pTexture[r*4+c*pitch+3] = static_cast < BYTE > ( color >> 24 );
-        }
-    }
-
-    lRect.pBits = pTexture;
-
-    texture->UnlockRect ( 0 );
-    return texture;
-}
-
-IDirect3DTexture9* CGraphics::LoadTexture ( const char* szFile )
-{
-    IDirect3DTexture9* texture = NULL;
-    D3DXCreateTextureFromFile ( m_pDevice, szFile, &texture );
-    return texture;
-}
-
-IDirect3DTexture9* CGraphics::LoadTexture ( const char* szFile, unsigned int uiWidth, unsigned int uiHeight )
-{
-    IDirect3DTexture9* texture = NULL;
-    D3DXCreateTextureFromFileEx ( m_pDevice, szFile, uiWidth, uiHeight, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, NULL, NULL, &texture );
-    return texture;
-}
-
-extern CCore* g_pCore;
-void CGraphics::DrawTexture ( IDirect3DTexture9* texture, float fX, float fY, float fScaleX, float fScaleY, float fRotation, float fCenterX, float fCenterY, unsigned char ucAlpha )
-{
-    if ( !texture )
+    if ( !pTexture )
         return;
-    m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
-    D3DSURFACE_DESC textureDesc;
-    texture->GetLevelDesc( 0, &textureDesc );
+
+    const float fSurfaceWidth  = pTexture->m_uiSurfaceSizeX;
+    const float fSurfaceHeight = pTexture->m_uiSurfaceSizeY;
+    const float fFileWidth     = pTexture->m_uiSizeX;
+    const float fFileHeight    = pTexture->m_uiSizeY;
+
+    BeginDrawBatch ();
     D3DXMATRIX matrix;
-    D3DXVECTOR2 scaling ( fScaleX, fScaleY );
-    D3DXVECTOR2 rotationCenter  ( ( float ) textureDesc.Width * fCenterX, ( float ) textureDesc.Height * fCenterY );
-    D3DXVECTOR2 position ( fX - ( float ) textureDesc.Width * fScaleX * fCenterX, fY - ( float ) textureDesc.Height * fScaleY * fCenterY );
+    D3DXVECTOR2 scaling ( fScaleX * fFileWidth / fSurfaceWidth, fScaleY * fFileHeight / fSurfaceHeight );
+    D3DXVECTOR2 rotationCenter  ( fFileWidth * fScaleX * fCenterX, fFileHeight * fScaleX * fCenterY );
+    D3DXVECTOR2 position ( fX - fFileWidth * fScaleX * fCenterX, fY - fFileHeight * fScaleY * fCenterY );
     D3DXMatrixTransformation2D ( &matrix, NULL, NULL, &scaling, &rotationCenter, fRotation * 6.2832f / 360.f, &position );
+    CheckModes ( EDrawMode::DX_SPRITE, m_ActiveBlendMode );
     m_pDXSprite->SetTransform ( &matrix );
-    m_pDXSprite->Draw ( texture, NULL, NULL, NULL, D3DCOLOR_ARGB ( ucAlpha, 255, 255, 255 ) );
-    m_pDXSprite->End ();
+    m_pDXSprite->Draw ( (IDirect3DTexture9*)pTexture->m_pD3DTexture, NULL, NULL, NULL, /*ModifyColorForBlendMode (*/ dwColor/*, blendMode )*/ );
+    EndDrawBatch ();
 }
 
 void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
 {
     m_pDevice = pDevice;
 
-    LoadFonts ();
-
-    // Get the original render target
-    assert ( !m_pOriginalTarget );
-    assert ( m_pDevice->GetRenderTarget ( 0, &m_pOriginalTarget ) == D3D_OK );
+    LoadStandardDXFonts ();
 
     // Create drawing devices
     D3DXCreateLine ( pDevice, &m_pLineInterface );
     D3DXCreateTextureFromFileInMemory ( pDevice, g_szPixel, sizeof ( g_szPixel ), &m_pDXPixelTexture );
+
+    m_pTileBatcher->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pLine3DBatcherPreGUI->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pLine3DBatcherPostGUI->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pMaterialLine3DBatcher->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pRenderItemManager->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pScreenGrabber->OnDeviceCreate ( pDevice );
+    m_pPixelsManager->OnDeviceCreate ( pDevice );
 }
 
 
 void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
 {
-    assert ( m_pOriginalTarget );
-    SAFE_RELEASE ( m_pOriginalTarget );
-
     for ( int i = 0; i < NUM_FONTS; i++ )
     {
         if( m_pDXFonts[i] ) m_pDXFonts[i]->OnLostDevice ();
@@ -825,15 +1060,13 @@ void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
 
     if ( m_pLineInterface )
         m_pLineInterface->OnLostDevice ();
+
+    m_pRenderItemManager->OnLostDevice ();
 }
 
 
 void CGraphics::OnDeviceRestore ( IDirect3DDevice9 * pDevice )
 {
-    // Get the original render target
-    assert ( !m_pOriginalTarget );
-    assert ( m_pDevice->GetRenderTarget ( 0, &m_pOriginalTarget ) == D3D_OK );
-
     for ( int i = 0; i < NUM_FONTS; i++ )
     {
         if( m_pDXFonts[i] ) m_pDXFonts[i]->OnResetDevice ();
@@ -845,11 +1078,20 @@ void CGraphics::OnDeviceRestore ( IDirect3DDevice9 * pDevice )
 
     if ( m_pLineInterface )
         m_pLineInterface->OnResetDevice ();
+
+    m_pRenderItemManager->OnResetDevice ();
+}
+
+
+void CGraphics::OnZBufferModified ( void )
+{
+    m_pTileBatcher->OnZBufferModified ();
 }
 
 
 void CGraphics::DrawPreGUIQueue ( void )
 {
+    m_pLine3DBatcherPreGUI->Flush ();
     DrawQueue ( m_PreGUIQueue );
 }
 
@@ -857,70 +1099,60 @@ void CGraphics::DrawPreGUIQueue ( void )
 void CGraphics::DrawPostGUIQueue ( void )
 {
     DrawQueue ( m_PostGUIQueue );
+    m_pLine3DBatcherPostGUI->Flush ();
 
-    // Clean out unused textures here
-    ExpireCachedTextures ();
+    // Both queues should be empty now, and there should be no outstanding refs
+    assert ( m_PreGUIQueue.empty () && m_iDebugQueueRefs == 0 );
 }
 
-bool CGraphics::IsDrawQueueItemSprite ( const sDrawQueueItem& Item )
+void CGraphics::DrawMaterialLine3DQueue ( void )
 {
-    return Item.eType == QUEUE_TEXT || Item.eType == QUEUE_RECT ||
-           Item.eType == QUEUE_CIRCLE || Item.eType == QUEUE_TEXTURE;
+    m_pMaterialLine3DBatcher->Flush ();
 }
+
+bool CGraphics::HasMaterialLine3DQueueItems ( void )
+{
+    return m_pMaterialLine3DBatcher->HasItems ();
+}
+
 
 void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )
 {
+    BeginDrawBatch ();
     // Items to draw?
     if ( Queue.size () > 0 )
     {
-        BeginSingleDrawing ();
-
         // Loop through it
-        bool bSpriteMode = false;
         std::vector < sDrawQueueItem >::iterator iter = Queue.begin ();
         for ( ; iter != Queue.end (); iter++ )
         {
-            if ( IsDrawQueueItemSprite ( *iter ) != bSpriteMode )
-            {
-                bSpriteMode = IsDrawQueueItemSprite ( *iter );
-                if ( bSpriteMode )
-                {
-                    m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND );
-                    m_pDevice->SetSamplerState ( 0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP );
-                    m_pDevice->SetSamplerState ( 0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP );
-                }
-                else
-                    m_pDXSprite->End ();
-            }
             // Draw the item
             DrawQueueItem ( *iter );
         }
-        if ( bSpriteMode )
-            m_pDXSprite->End ();
-
-        EndSingleDrawing ();
 
         // Clear the list
         Queue.clear ();
     }
+    EndDrawBatch ();
 }
 
 
 void CGraphics::AddQueueItem ( const sDrawQueueItem& Item, bool bPostGUI )
 {
-    // Prevent queuing when minimized
-    if ( g_pCore->IsWindowMinimized () )
-    {
-        m_PostGUIQueue.clear ();
-        m_PreGUIQueue.clear ();
-        return;
-    }
-
     // Add it to the correct queue
     if ( bPostGUI && !CCore::GetSingleton ().IsMenuVisible() ) //Don't draw over the main menu.  Ever.
         m_PostGUIQueue.push_back ( Item );
     else
         m_PreGUIQueue.push_back ( Item );
+
+    // Prevent queuing when minimized
+    if ( g_pCore->IsWindowMinimized () )
+    {
+        ClearDrawQueue ( m_PreGUIQueue );
+        ClearDrawQueue ( m_PostGUIQueue );
+        assert ( m_iDebugQueueRefs == 0 );
+        return;
+    }
 }
 
 
@@ -942,22 +1174,21 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
                 List [1].y = Item.Line.fY2;
 
                 // Draw it
-                m_pLineInterface->SetWidth ( Item.Line.fWidth );
-                m_pLineInterface->Draw ( List, 2, Item.Line.ulColor );
+                if ( m_pLineInterface->GetWidth () != Item.Line.fWidth )
+                {
+                    if ( m_CurDrawMode != EDrawMode::DX_LINE )
+                        m_pLineInterface->SetWidth ( Item.Line.fWidth );
+                    else
+                    {
+                        m_pLineInterface->End ();
+                        m_pLineInterface->SetWidth ( Item.Line.fWidth );
+                        m_pLineInterface->Begin ();
+                    }
+                }
+                CheckModes ( EDrawMode::DX_LINE, Item.blendMode );
+                m_pLineInterface->Draw ( List, 2, ModifyColorForBlendMode ( Item.Line.ulColor, Item.blendMode ) );
             }
 
-            break;
-        }
-        // 3D Line type?
-        case QUEUE_LINE3D:
-        {
-            m_pGUI->GetRenderingLibrary ()->DrawLine3D (
-                D3DXVECTOR3 ( Item.Line3D.fX1, Item.Line3D.fY1, Item.Line3D.fZ1 ),
-                D3DXVECTOR3 ( Item.Line3D.fX2, Item.Line3D.fY2, Item.Line3D.fZ2 ),
-                Item.Line3D.fWidth / 75.0f,
-                NULL,
-                Item.Line3D.ulColor
-            );
             break;
         }
         // Rectangle type?
@@ -968,128 +1199,171 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
             D3DXVECTOR2 scaling ( Item.Rect.fWidth, Item.Rect.fHeight );
             D3DXVECTOR2 position ( Item.Rect.fX, Item.Rect.fY );
             D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, &position );
+            CheckModes ( EDrawMode::DX_SPRITE, Item.blendMode );
             m_pDXSprite->SetTransform ( &matrix );
-            m_pDXSprite->Draw ( m_pDXPixelTexture, NULL, NULL, NULL, Item.Rect.ulColor );
+            m_pDXSprite->Draw ( m_pDXPixelTexture, NULL, NULL, NULL, /*ModifyColorForBlendMode (*/ Item.Rect.ulColor/*, Item.blendMode )*/ );
             break;
         }
         case QUEUE_TEXT:
         {
             RECT rect;        
-            SetRect ( &rect, Item.Text.iLeft, Item.Text.iTop, Item.Text.iRight, Item.Text.iBottom );  
+            SetRect ( &rect, Item.Text.fLeft, Item.Text.fTop, Item.Text.fRight, Item.Text.fBottom );  
+            const float fPosFracX = Item.Text.fLeft - rect.left;
+            const float fPosFracY = Item.Text.fTop - rect.top;
             D3DXMATRIX matrix;
             D3DXVECTOR2 scalingCentre ( 0.5f, 0.5f );
             D3DXVECTOR2 scaling ( Item.Text.fScaleX, Item.Text.fScaleY );
-            D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, NULL );
+            D3DXVECTOR2 translation ( fPosFracX * Item.Text.fScaleX, fPosFracY * Item.Text.fScaleY );   // Sub-pixel positioning
+            D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, &translation );
+            CheckModes ( EDrawMode::DX_SPRITE, Item.blendMode );
             m_pDXSprite->SetTransform ( &matrix );        
-            Item.Text.pDXFont->DrawTextW ( m_pDXSprite, Item.strText.c_str (), -1, &rect, Item.Text.ulFormat, Item.Text.ulColor );
+            Item.Text.pDXFont->DrawTextW ( m_pDXSprite, Item.wstrText.c_str (), -1, &rect, Item.Text.ulFormat, /*ModifyColorForBlendMode (*/ Item.Text.ulColor/*, Item.blendMode )*/ );
+            RemoveQueueRef ( Item.Text.pDXFont );
             break;
         }
         case QUEUE_TEXTURE:
         {
-            RECT cutImagePos;
-            const float fSurfaceWidth  = Item.Texture.info.uiSurfaceWidth;
-            const float fSurfaceHeight = Item.Texture.info.uiSurfaceHeight;
-            const float fFileWidth     = Item.Texture.info.uiFileWidth;
-            const float fFileHeight    = Item.Texture.info.uiFileHeight;
-            cutImagePos.left    = ( Item.Texture.fU )                       * ( Item.Texture.bRelativeUV ? fSurfaceWidth  : fSurfaceWidth  / fFileWidth );
-            cutImagePos.top     = ( Item.Texture.fV )                       * ( Item.Texture.bRelativeUV ? fSurfaceHeight : fSurfaceHeight / fFileHeight );
-            cutImagePos.right   = ( Item.Texture.fU + Item.Texture.fSizeU ) * ( Item.Texture.bRelativeUV ? fSurfaceWidth  : fSurfaceWidth  / fFileWidth );
-            cutImagePos.bottom  = ( Item.Texture.fV + Item.Texture.fSizeV ) * ( Item.Texture.bRelativeUV ? fSurfaceHeight : fSurfaceHeight / fFileHeight );
-            const float fCutWidth  = cutImagePos.right - cutImagePos.left;
-            const float fCutHeight = cutImagePos.bottom - cutImagePos.top;
-            const D3DXVECTOR2 scaling         ( Item.Texture.fWidth / fCutWidth, Item.Texture.fHeight / fCutHeight );
-            const D3DXVECTOR2 rotationCenter  ( Item.Texture.fWidth * 0.5f + Item.Texture.fRotCenOffX, Item.Texture.fHeight * 0.5f + Item.Texture.fRotCenOffY );
-            const D3DXVECTOR2 position        ( Item.Texture.fX, Item.Texture.fY );
-            const float fRotationRad  = Item.Texture.fRotation * (6.2832f/360.f);
-            D3DXMATRIX matrix;
-            D3DXMatrixTransformation2D  ( &matrix, NULL, 0.0f, &scaling, &rotationCenter, fRotationRad, &position );
-            m_pDXSprite->SetTransform ( &matrix );
-            m_pDXSprite->Draw ( Item.Texture.info.d3dTexture, &cutImagePos, NULL, NULL, Item.Texture.ulColor );
+            if ( CTextureItem* pTexture = DynamicCast < CTextureItem > ( Item.Texture.pMaterial ) )
+            {
+                const sDrawQueueTexture& t = Item.Texture;
+                RECT cutImagePos;
+                const float fSurfaceWidth  = pTexture->m_uiSurfaceSizeX;
+                const float fSurfaceHeight = pTexture->m_uiSurfaceSizeY;
+                const float fFileWidth     = Item.Texture.pMaterial->m_uiSizeX;
+                const float fFileHeight    = Item.Texture.pMaterial->m_uiSizeY;
+                cutImagePos.left    = ( Item.Texture.fU )                       * ( Item.Texture.bRelativeUV ? fSurfaceWidth  : fSurfaceWidth  / fFileWidth );
+                cutImagePos.top     = ( Item.Texture.fV )                       * ( Item.Texture.bRelativeUV ? fSurfaceHeight : fSurfaceHeight / fFileHeight );
+                cutImagePos.right   = ( Item.Texture.fU + Item.Texture.fSizeU ) * ( Item.Texture.bRelativeUV ? fSurfaceWidth  : fSurfaceWidth  / fFileWidth );
+                cutImagePos.bottom  = ( Item.Texture.fV + Item.Texture.fSizeV ) * ( Item.Texture.bRelativeUV ? fSurfaceHeight : fSurfaceHeight / fFileHeight );
+                const float fCutWidth  = cutImagePos.right - cutImagePos.left;
+                const float fCutHeight = cutImagePos.bottom - cutImagePos.top;
+                const D3DXVECTOR2 scaling         ( Item.Texture.fWidth / fCutWidth, Item.Texture.fHeight / fCutHeight );
+                const D3DXVECTOR2 rotationCenter  ( Item.Texture.fWidth * 0.5f + Item.Texture.fRotCenOffX, Item.Texture.fHeight * 0.5f + Item.Texture.fRotCenOffY );
+                const D3DXVECTOR2 position        ( Item.Texture.fX, Item.Texture.fY );
+                const float fRotationRad  = Item.Texture.fRotation * (6.2832f/360.f);
+                D3DXMATRIX matrix;
+                D3DXMatrixTransformation2D  ( &matrix, NULL, 0.0f, &scaling, &rotationCenter, fRotationRad, &position );
+                CheckModes ( EDrawMode::DX_SPRITE, Item.blendMode );
+                m_pDXSprite->SetTransform ( &matrix );
+                m_pDXSprite->Draw ( (IDirect3DTexture9*)pTexture->m_pD3DTexture, &cutImagePos, NULL, NULL, /*ModifyColorForBlendMode (*/ Item.Texture.ulColor/*, Item.blendMode )*/ );
+            }
+            RemoveQueueRef ( Item.Texture.pMaterial );
             break;
         }
-        // Circle type?
-        case QUEUE_CIRCLE:
+        case QUEUE_SHADER:
         {
+            const sDrawQueueTexture& t = Item.Texture;
+            float fU1 = t.fU;
+            float fV1 = t.fV;
+            float fU2 = ( t.fU + t.fSizeU );
+            float fV2 = ( t.fV + t.fSizeV );
+            if ( !t.bRelativeUV )
+            {
+                // If UV's are absolute pixels, then scale the range to 0.0f - 1.0f.
+                float fUScale = 1.0f / (float)t.pMaterial->m_uiSizeX;
+                float fVScale = 1.0f / (float)t.pMaterial->m_uiSizeY;
+                fU1 *= fUScale;
+                fV1 *= fVScale;
+                fU2 *= fUScale;
+                fV2 *= fVScale;
+            }
+            CheckModes ( EDrawMode::TILE_BATCHER );
+            m_pTileBatcher->AddTile ( t.fX, t.fY, t.fX+t.fWidth, t.fY+t.fHeight, fU1, fV1, fU2, fV2, t.pMaterial, t.fRotation, t.fRotCenOffX, t.fRotCenOffY, t.ulColor );
+            RemoveQueueRef ( Item.Texture.pMaterial );
             break;
         }
     }
 }
 
 
-// Cache a texture for current and future use.
-SCachedTextureInfo& CGraphics::CacheTexture ( const string& strFilename )
+//
+// Maybe change to a higher resolution font
+//
+ID3DXFont* CGraphics::MaybeGetBigFont ( ID3DXFont* pDXFont, float& fScaleX, float& fScaleY )
 {
-    // Find exisiting
-    map < string, SCachedTextureInfo >::iterator iter = m_CachedTextureInfoMap.find ( strFilename );
-
-    if ( iter == m_CachedTextureInfoMap.end () )
+    if ( fScaleX > 1.1f || fScaleY > 1.1f )
     {
-        // Add if not found
-        m_CachedTextureInfoMap[strFilename] = SCachedTextureInfo();
-        iter = m_CachedTextureInfoMap.find ( strFilename );
-
-        SCachedTextureInfo& info = iter->second;
-        info.d3dTexture = LoadTexture( strFilename.c_str () );
-        info.uiFileWidth = 1;
-        info.uiFileHeight = 1;
-        info.uiSurfaceWidth = 1;
-        info.uiSurfaceHeight = 1;
-
-        if ( info.d3dTexture )
+        for ( int i = 0; i < NUM_FONTS; i++ )
         {
-            D3DXIMAGE_INFO imageInfo;
-            if ( SUCCEEDED ( D3DXGetImageInfoFromFile( strFilename.c_str (), &imageInfo ) ) )
+            if ( m_pDXFonts [ i ] == pDXFont )
             {
-                info.uiFileWidth = imageInfo.Width;
-                info.uiFileHeight = imageInfo.Height;
-            }
-            D3DSURFACE_DESC surfaceDesc;
-            if ( SUCCEEDED ( info.d3dTexture->GetLevelDesc( 0, &surfaceDesc ) ) )
-            {
-                info.uiSurfaceWidth = surfaceDesc.Width;
-                info.uiSurfaceHeight = surfaceDesc.Height;
+                // Adjust scale to compensate for higher res font
+                fScaleX *= 0.25f;
+                if ( &fScaleX != &fScaleY )     // Check fScaleY is not the same variable
+                    fScaleY *= 0.25f;
+                return m_pBigDXFonts [ i ];
             }
         }
-    }
-
-    SCachedTextureInfo& info = iter->second;
-    info.ulTimeLastUsed = GetTickCount32();
-
-    return info;
-}
-
-
-// Remove any cached texures that have not been used for a little while.
-void CGraphics::ExpireCachedTextures ( bool bExpireAll )
-{
-    // Expire unused cached textures
-    // 1 cached texture     = 15 seconds till expire
-    // 50 cached textures   = 8 seconds till expire
-    // 100 cached textures  = 1 second till expire
-    long ulNumTextures              = m_CachedTextureInfoMap.size ();
-    unsigned long ulMaxAgeSeconds   = Max < long > ( 1, 15 - (ulNumTextures * 15 / 100) );
-
-    map < string, SCachedTextureInfo > ::iterator iter = m_CachedTextureInfoMap.begin ();
-    while ( iter != m_CachedTextureInfoMap.end () )
-    {
-        SCachedTextureInfo& info    = iter->second;
-        unsigned long ulAge         = GetTickCount32() - info.ulTimeLastUsed;
-        if ( ulAge > ulMaxAgeSeconds * 1000 || bExpireAll )
-        {
-            SAFE_RELEASE ( info.d3dTexture );
-            iter = m_CachedTextureInfoMap.erase ( iter );
-        }
-        else
-            ++iter;
-    }
-}
-
-ID3DXFont* CGraphics::GetBigFont ( ID3DXFont* pDXFont )
-{
-    for ( int i = 0; i < NUM_FONTS; i++ )
-    {
-        if ( m_pDXFonts [ i ] == pDXFont )
-            return m_pBigDXFonts [ i ];
     }
     return pDXFont;
+}
+
+
+//
+// Clear queue, releasing render items where necessary
+//
+void CGraphics::ClearDrawQueue ( std::vector < sDrawQueueItem >& Queue )
+{
+    for ( std::vector < sDrawQueueItem >::const_iterator iter = Queue.begin () ; iter != Queue.end (); iter++ )
+    {
+        const sDrawQueueItem& item = *iter;
+        if ( item.eType == QUEUE_TEXTURE || item.eType == QUEUE_SHADER )
+            RemoveQueueRef ( item.Texture.pMaterial );
+        else
+        if ( item.eType == QUEUE_TEXT )
+            RemoveQueueRef ( item.Text.pDXFont );
+    }
+    Queue.clear ();
+}
+
+
+//
+// Use ref counting to prevent render items from being deleted while in the queue
+//
+void CGraphics::AddQueueRef ( CRenderItem* pRenderItem )
+{
+    pRenderItem->AddRef ();
+    m_iDebugQueueRefs++;    // For debugging
+}
+
+void CGraphics::RemoveQueueRef ( CRenderItem* pRenderItem )
+{
+    pRenderItem->Release ();
+    m_iDebugQueueRefs--;    // For debugging
+}
+
+void CGraphics::AddQueueRef ( IUnknown* pUnknown )
+{
+    pUnknown->AddRef ();
+    m_iDebugQueueRefs++;    // For debugging
+}
+
+void CGraphics::RemoveQueueRef ( IUnknown* pUnknown )
+{
+    pUnknown->Release ();
+    m_iDebugQueueRefs--;    // For debugging
+}
+
+
+// Entering or leaving a section where the rendertarget can be changed from script
+void CGraphics::EnableSetRenderTarget ( bool bEnable )
+{
+    // Must be changing
+    assert ( m_bSetRenderTargetEnabled != bEnable );
+
+    if ( !bEnable )
+        m_pRenderItemManager->RestoreDefaultRenderTarget ();
+    else
+        m_pRenderItemManager->SaveDefaultRenderTarget ();
+
+    m_bSetRenderTargetEnabled = bEnable;
+}
+
+// Notification that the render target will be changing
+void CGraphics::OnChangingRenderTarget ( uint uiNewViewportSizeX, uint uiNewViewportSizeY )
+{
+    // Flush dx draws
+    DrawPreGUIQueue ();
+    // Inform tile batcher
+    m_pTileBatcher->OnChangingRenderTarget ( uiNewViewportSizeX, uiNewViewportSizeY );
 }

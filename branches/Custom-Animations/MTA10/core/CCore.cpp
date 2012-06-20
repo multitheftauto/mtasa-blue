@@ -21,6 +21,8 @@
 #include <Aclapi.h>
 #include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
 #include "SharedUtil.hpp"
+#include <clocale>
+#include "CTimingCheckpoints.hpp"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -29,9 +31,6 @@ static float fTest = 1;
 
 extern CCore* g_pCore;
 bool g_bBoundsChecker = false;
-DWORD* g_Table = new DWORD[65535];
-DWORD* g_TableSize = new DWORD[65535];
-DWORD g_dwTable = 0;
 
 BOOL AC_RestrictAccess( VOID )
 {
@@ -96,37 +95,11 @@ CCore::CCore ( void )
     
     m_pConfigFile = NULL;
 
-    // NULL the path buffers
-    memset ( m_szInstallRoot, 0, MAX_PATH );
-    memset ( m_szGTAInstallRoot, 0, MAX_PATH );
-
-    SString strInstallRoot = GetMTASABaseDir ();
-
-    SString strGTAInstallRoot = GetRegistryValue ( "..\\1.0", "GTA:SA Path" );
-    if ( strGTAInstallRoot.empty () )
-    {
-        MessageBox ( 0, "There is no GTA path specified in the registry, please reinstall.", "Error", MB_OK );
-        TerminateProcess ( GetCurrentProcess (), 9 );
-    }
-
-    STRNCPY ( m_szInstallRoot, strInstallRoot, sizeof ( m_szInstallRoot ) );
-    STRNCPY ( m_szGTAInstallRoot, strGTAInstallRoot, sizeof ( m_szGTAInstallRoot ) );
-
-    // Remove the trailing / from the installroot incase it has
-    size_t sizeInstallRoot = strlen ( m_szInstallRoot );
-    if ( m_szInstallRoot [ sizeInstallRoot - 1 ] == '/' ||
-         m_szInstallRoot [ sizeInstallRoot - 1 ] == '\\' )
-    {
-        m_szInstallRoot [ sizeInstallRoot - 1 ] = 0;
-    }
-
-    // Remove the trailing / from the installroot incase it has
-    size_t sizeGTAInstallRoot = strlen ( m_szGTAInstallRoot );
-    if ( m_szGTAInstallRoot [ sizeGTAInstallRoot - 1 ] == '/' ||
-         m_szGTAInstallRoot [ sizeGTAInstallRoot - 1 ] == '\\' )
-    {
-        m_szGTAInstallRoot [ sizeGTAInstallRoot - 1 ] = 0;
-    }
+    // Set our locale to the C locale, except for character handling which is the system's default
+    std::setlocale(LC_ALL,"C");
+    std::setlocale(LC_CTYPE,"");
+    // check LC_COLLATE is the old-time raw ASCII sort order
+    assert ( strcoll( "a", "B" ) > 0 );
 
     // Parse the command line
     const char* pszNoValOptions[] =
@@ -138,6 +111,7 @@ CCore::CCore ( void )
 
     // Create a logger instance.
     m_pLogger                   = new CLogger ( );
+    m_pConsoleLogger            = new CConsoleLogger ( );
 
     // Create interaction objects.
     m_pCommands                 = new CCommands;
@@ -146,6 +120,7 @@ CCore::CCore ( void )
     // Create the GUI manager and the graphics lib wrapper
     m_pLocalGUI                 = new CLocalGUI;
     m_pGraphics                 = new CGraphics ( m_pLocalGUI );
+    g_pGraphics                 = m_pGraphics;
     m_pGUI                      = NULL;
 
     // Create the mod manager
@@ -161,6 +136,7 @@ CCore::CCore ( void )
     m_bCursorToggleControls = false;
     m_bLastFocused = true;
     m_bWaitToSetNick = false;
+    m_DiagnosticDebug = EDiagnosticDebug::NONE;
 
     // Initialize time
     CClientTime::InitializeTime ();
@@ -171,6 +147,8 @@ CCore::CCore ( void )
     WriteDebugEvent ( "CCore::CCore" );
 
     m_pKeyBinds = new CKeyBinds ( this );
+
+    m_pMouseControl = new CMouseControl();
 
     // Create our hook objects.
     //m_pFileSystemHook           = new CFileSystemHook ( );
@@ -200,6 +178,10 @@ CCore::CCore ( void )
     m_dLastTimeMs = 0;
     m_dPrevOverrun = 0;
     m_uiNewNickWaitFrames = 0;
+    m_iUnminimizeFrameCounter = 0;
+    m_bDidRecreateRenderTargets = false;
+    m_fMinStreamingMemory = 0;
+    m_fMaxStreamingMemory = 0;
 }
 
 CCore::~CCore ( void )
@@ -249,8 +231,12 @@ CCore::~CCore ( void )
     // Delete keybinds
     delete m_pKeyBinds;
 
+    // Delete Mouse Control
+    delete m_pMouseControl;
+
     // Delete the logger
     delete m_pLogger;
+    delete m_pConsoleLogger;
 
     //Delete the Current Server
     delete m_pCurrentServer;
@@ -623,6 +609,8 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "async_loading",    iVal ); m_pGame->SetAsyncLoadingFromSettings ( iVal == 1, iVal == 2 );
     CVARS_GET ( "volumetric_shadows", bval ); m_pGame->GetSettings ()->SetVolumetricShadowsEnabled ( bval );
     CVARS_GET ( "aspect_ratio",     iVal ); m_pGame->GetSettings ()->SetAspectRatio ( (eAspectRatio)iVal );
+    CVARS_GET ( "grass",            bval ); m_pGame->GetSettings ()->SetGrassEnabled ( bval );
+    CVARS_GET ( "fast_clothes_loading", iVal ); m_pMultiplayer->SetFastClothesLoading ( (CMultiplayer::EFastClothesLoading)iVal );
 }
 
 void CCore::ApplyCommunityState ( void )
@@ -658,20 +646,8 @@ void CCore::SetOfflineMod ( bool bOffline )
 
 const char* CCore::GetModInstallRoot ( const char* szModName )
 {
-    m_strModInstallRoot = SString ( "%s\\mods\\%s", GetInstallRoot(), szModName );
+    m_strModInstallRoot = CalcMTASAPath ( PathJoin ( "mods", szModName ) );
     return m_strModInstallRoot;
-}
-
-
-const char* CCore::GetInstallRoot ( )
-{
-    return m_szInstallRoot;
-}
-
-
-const char* CCore::GetGTAInstallRoot ( void )
-{
-    return m_szGTAInstallRoot;
 }
 
 
@@ -757,16 +733,24 @@ void CCore::ShowServerInfo ( unsigned int WindowType )
 
 void CCore::ApplyHooks ( )
 { 
+    WriteDebugEvent ( "CCore::ApplyHooks" );
     ApplyLoadingCrashPatch ();
 
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook ( );
-    m_pDirect3DHookManager->ApplyHook ( );
+    //m_pDirect3DHookManager->ApplyHook ( );
     //m_pFileSystemHook->ApplyHook ( );
     m_pSetCursorPosHook->ApplyHook ( );
 
     // Redirect basic files.
     //m_pFileSystemHook->RedirectFile ( "main.scm", "../../mta/gtafiles/main.scm" );
+}
+
+void CCore::ApplyHooks2 ( )
+{ 
+    WriteDebugEvent ( "CCore::ApplyHooks2" );
+    // Try this one a little later
+    m_pDirect3DHookManager->ApplyHook ( );
 }
 
 
@@ -886,6 +870,10 @@ void CCore::CreateGame ( )
         BrowseToSolution ( "downgrade" );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
+
+    // Apply hiding device selection dialog
+    bool bDeviceSelectionDialogEnabled = GetApplicationSettingInt ( "device-selection-disabled" ) ? false : true;
+    m_pGame->GetSettings ()->SetSelectDeviceDialogEnabled ( bDeviceSelectionDialogEnabled );
 }
 
 
@@ -910,7 +898,7 @@ void CCore::InitGUI ( IUnknown* pDevice )
     m_pGUI->SetWorkingDirectory ( CalcMTASAPath ( "MTA" ) );
 
     // and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
-    std::string strScreenShotPath = GetInstallRoot () + std::string ( "\\screenshots" );
+    std::string strScreenShotPath = CalcMTASAPath ( "screenshots" );
     CVARS_SET ( "screenshot_path", strScreenShotPath );
     CScreenShot::SetPath ( strScreenShotPath.c_str() );
 }
@@ -1054,17 +1042,21 @@ bool CCore::IsWindowMinimized ( void )
 
 void CCore::DoPreFramePulse ( )
 {
+    TIMING_CHECKPOINT( "+CorePreFrame" );
+
     m_pKeyBinds->DoPreFramePulse ();
 
     // Notify the mod manager
     m_pModManager->DoPulsePreFrame ();  
 
     m_pLocalGUI->DoPulse ();
+    TIMING_CHECKPOINT( "-CorePreFrame" );
 }
 
 
 void CCore::DoPostFramePulse ( )
 {
+    TIMING_CHECKPOINT( "+CorePostFrame1" );
     if ( m_bQuitOnPulse )
         Quit ();
 
@@ -1078,6 +1070,9 @@ void CCore::DoPostFramePulse ( )
     if ( bFirstPulse )
     {
         bFirstPulse = false;
+
+        // Validate CVARS
+        CClientVariables::GetSingleton().ValidateValues ();
 
         // Apply all settings
         ApplyConsoleSettings ();
@@ -1108,6 +1103,9 @@ void CCore::DoPostFramePulse ( )
             if ( m_bFirstFrame )
             {
                 m_bFirstFrame = false;
+
+                // Disable vsync while it's all dark
+                m_pGame->DisableVSync ();
 
                 // Parse the command line
                 // Does it begin with mtasa://?
@@ -1174,7 +1172,10 @@ void CCore::DoPostFramePulse ( )
     m_pKeyBinds->DoPostFramePulse ();
 
     // Notify the mod manager and the connect manager
+    TIMING_CHECKPOINT( "-CorePostFrame1" );
     m_pModManager->DoPulsePostFrame ();
+    TIMING_CHECKPOINT( "+CorePostFrame2" );
+    GetMemStats ()->Draw ();
     m_pConnectManager->DoPulse ();
 
     m_Community.DoPulse ();
@@ -1209,6 +1210,7 @@ void CCore::DoPostFramePulse ( )
         if ( m_tXfireUpdate != 0 )
             m_tXfireUpdate = 0;
     }
+    TIMING_CHECKPOINT( "-CorePostFrame2" );
 }
 
 
@@ -1237,6 +1239,7 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "time",              "shows the time",                   CCommandFuncs::Time );
     m_pCommands->Add ( "showhud",           "shows the hud",                    CCommandFuncs::HUD );
     m_pCommands->Add ( "binds",             "shows all the binds",              CCommandFuncs::Binds );
+    m_pCommands->Add ( "serial",            "shows your serial",                CCommandFuncs::Serial );
 
 #if 0
     m_pCommands->Add ( "vid",               "changes the video settings (id)",  CCommandFuncs::Vid );
@@ -1259,8 +1262,11 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "debugscrollup",     "scrolls the debug view upwards",   CCommandFuncs::DebugScrollUp );
     m_pCommands->Add ( "debugscrolldown",   "scrolls the debug view downwards", CCommandFuncs::DebugScrollDown );
 
-#ifdef MTA_DEBUG
-    //m_pCommands->Add ( "pools",               "read out the pool values",         CCommandFuncs::PoolRelocations );
+    m_pCommands->Add ( "test",              "",                                 CCommandFuncs::Test );
+    m_pCommands->Add ( "showmemstat",       "shows the memory statistics",      CCommandFuncs::ShowMemStat );
+
+#if defined(MTA_DEBUG) || defined(MTA_BETA)
+    m_pCommands->Add ( "fakelag",           "",                                 CCommandFuncs::FakeLag );
 #endif
 }
 
@@ -1321,6 +1327,9 @@ void CCore::Quit ( bool bInstantly )
 {
     if ( bInstantly )
     {
+        // Show that we are quiting (for the crash dump filename)
+        SetApplicationSettingInt ( "last-server-ip", 1 );
+
         // Destroy the client
         CModManager::GetSingleton ().Unload ();
 
@@ -1359,6 +1368,15 @@ bool CCore::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
     
     return bHandled;
 }
+
+
+bool CCore::WasLaunchedWithConnectURI ( void )
+{
+    if ( m_szCommandLineArgs && strnicmp ( m_szCommandLineArgs, "mtasa://", 8 ) == 0 )
+        return true;
+    return false;
+}
+
 
 void CCore::ParseCommandLine ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions )
 {
@@ -1613,21 +1631,9 @@ void CCore::UpdateRecentlyPlayed()
     {
         CServerBrowser* pServerBrowser = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ();
         CServerList* pRecentList = pServerBrowser->GetRecentList ();
-        pRecentList->Remove ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
-        pRecentList->AddUnique ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET, true );
-
-        // Update our address history if need be
-        if (    pServerBrowser->m_bManualConnect 
-             && strHost == pServerBrowser->m_strManualHost  
-             && uiPort == pServerBrowser->m_usManualPort
-           )
-        {
-            CServerList* pHistoryList = pServerBrowser->GetHistoryList ();
-            pHistoryList->Remove ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
-            pHistoryList->AddUnique ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET ); 
-            pServerBrowser->CreateHistoryList();
-        }
-        
+        pRecentList->Remove ( Address, uiPort );
+        pRecentList->AddUnique ( Address, uiPort, true );
+       
         pServerBrowser->SaveRecentlyPlayedList();
         if ( !m_pConnectManager->m_strLastPassword.empty() )
             pServerBrowser->SetServerPassword ( strHost + ":" + SString("%u",uiPort), m_pConnectManager->m_strLastPassword );
@@ -1636,13 +1642,14 @@ void CCore::UpdateRecentlyPlayed()
     //Save our configuration file
     CCore::GetSingleton ().SaveConfig ();
 }
-void CCore::SetCurrentServer( in_addr Addr, unsigned short usQueryPort )
+
+void CCore::SetCurrentServer( in_addr Addr, unsigned short usGamePort )
 {
     //Set the current server info so we can query it with ASE for xfire
     m_pCurrentServer->Address = Addr;
-    m_pCurrentServer->usQueryPort = usQueryPort;
-
+    m_pCurrentServer->usGamePort = usGamePort;
 }
+
 SString CCore::UpdateXfire( void )
 {
     //Check if a current server exists
@@ -1779,14 +1786,20 @@ void CCore::EnsureFrameRateLimitApplied ( void )
 //
 // Do FPS limiting
 //
+// This is called once a frame even if minimized
+//
 void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 {
+    TIMING_CHECKPOINT( "-CallIdle1" );
+    ms_TimingCheckpoints.EndTimingCheckpoints ();
+
+    // Frame rate limit stuff starts here
     m_bDoneFrameRateLimit = true;
 
     uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
 
     if ( uiUseRate < 1 )
-        return;
+        return DoReliablePulse ();
 
     // Calc required time in ms between frames
     const double dTargetTimeToUse = 1000.0 / uiUseRate;
@@ -1822,4 +1835,250 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
     m_dPrevOverrun = Clamp ( dTargetTimeToUse * -0.9f, m_dPrevOverrun, dTargetTimeToUse * 0.1f );
 
     m_dLastTimeMs = dTimeMs;
+
+    DoReliablePulse ();
+}
+
+
+//
+// DoReliablePulse
+//
+// This is called once a frame even if minimized
+//
+void CCore::DoReliablePulse ( void )
+{
+    ms_TimingCheckpoints.BeginTimingCheckpoints ();
+    TIMING_CHECKPOINT( "+CallIdle2" );
+
+    // Non frame rate limit stuff
+    if ( IsWindowMinimized () )
+        m_iUnminimizeFrameCounter = 4;     // Tell script we have unminimized after a short delay
+
+    UpdateModuleTickCount64 ();
+}
+
+
+//
+// Debug timings
+//
+bool CCore::IsTimingCheckpoints ( void )
+{
+    return ms_TimingCheckpoints.IsTimingCheckpoints ();
+}
+
+void CCore::OnTimingCheckpoint ( const char* szTag )
+{
+    ms_TimingCheckpoints.OnTimingCheckpoint ( szTag );
+}
+
+void CCore::OnTimingDetail ( const char* szTag )
+{
+    ms_TimingCheckpoints.OnTimingDetail ( szTag );
+}
+
+
+//
+// OnDeviceRestore
+//
+void CCore::OnDeviceRestore ( void )
+{
+    m_iUnminimizeFrameCounter = 4;     // Tell script we have restored after 4 frames to avoid double sends
+    m_bDidRecreateRenderTargets = true;
+}
+
+
+//
+// OnPreFxRender
+//
+void CCore::OnPreFxRender ( void )
+{
+    // Don't do nothing if nothing won't be drawn
+    if ( !CGraphics::GetSingleton ().HasMaterialLine3DQueueItems () )
+        return;
+
+    IDirect3DDevice9* pDevice = CGraphics::GetSingleton ().GetDevice ();
+
+    // Create a state block.
+    IDirect3DStateBlock9 * pDeviceState = NULL;
+    pDevice->CreateStateBlock ( D3DSBT_ALL, &pDeviceState );
+    D3DXMATRIX matProjection;
+    pDevice->GetTransform ( D3DTS_PROJECTION, &matProjection );
+
+    // Make sure linear sampling is enabled
+    pDevice->SetSamplerState ( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
+    pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
+    pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
+
+    // Make sure stencil is off to avoid problems with flame effects
+    pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
+
+    CGraphics::GetSingleton ().DrawMaterialLine3DQueue ();
+
+    // Restore the render states
+    pDevice->SetTransform ( D3DTS_PROJECTION, &matProjection );
+    if ( pDeviceState )
+    {
+        pDeviceState->Apply ( );
+        pDeviceState->Release ( );
+    }
+}
+
+
+//
+// OnPreHUDRender
+//
+void CCore::OnPreHUDRender ( void )
+{
+    IDirect3DDevice9* pDevice = CGraphics::GetSingleton ().GetDevice ();
+
+    // Create a state block.
+    IDirect3DStateBlock9 * pDeviceState = NULL;
+    pDevice->CreateStateBlock ( D3DSBT_ALL, &pDeviceState );
+    D3DXMATRIX matProjection;
+    pDevice->GetTransform ( D3DTS_PROJECTION, &matProjection );
+
+    // Make sure linear sampling is enabled
+    pDevice->SetSamplerState ( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
+    pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
+    pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
+
+    // Make sure stencil is off to avoid problems with flame effects
+    pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
+
+    // Maybe capture screen and other stuff
+    CGraphics::GetSingleton ().GetRenderItemManager ()->DoPulse ();
+
+    // Handle script stuffs
+    if ( m_iUnminimizeFrameCounter-- && !m_iUnminimizeFrameCounter )
+    {
+        m_pModManager->DoPulsePreHUDRender ( true, m_bDidRecreateRenderTargets );
+        m_bDidRecreateRenderTargets = false;
+    }
+    else
+        m_pModManager->DoPulsePreHUDRender ( false, false );
+
+    // Draw pre-GUI primitives
+    CGraphics::GetSingleton ().DrawPreGUIQueue ();
+
+    // Restore the render states
+    pDevice->SetTransform ( D3DTS_PROJECTION, &matProjection );
+    if ( pDeviceState )
+    {
+        pDeviceState->Apply ( );
+        pDeviceState->Release ( );
+    }
+}
+
+
+//
+// CCore::CalculateStreamingMemoryRange
+//
+// Streaming memory range based on system installed memory:
+//
+//     System RAM MB     min     max
+//           512     =   64      96
+//          1024     =   96     128
+//          2048     =  128     256
+//
+// Also:
+//   Max should be no more than 2 * installed video memory
+//   Min should be no more than 1 * installed video memory
+//   Max should be no less than 96MB
+//   Gap between min and max should be no less than 32MB
+//
+void CCore::CalculateStreamingMemoryRange ( void )
+{
+    // Only need to do this once
+    if ( m_fMinStreamingMemory != 0 )
+        return;
+
+    // Get system info
+    int iSystemRamMB = static_cast < int > ( GetWMITotalPhysicalMemory () / 1024LL / 1024LL );
+    int iVideoMemoryMB = g_pDeviceState->AdapterState.InstalledMemoryKB / 1024;
+
+    // Calc min and max from lookup table
+    SSamplePoint < float > minPoints[] = { {512, 64},  {1024, 96},   {2048, 128} };
+    SSamplePoint < float > maxPoints[] = { {512, 96},  {1024, 128},  {2048, 256} };
+
+    float fMinAmount = EvalSamplePosition < float > ( minPoints, NUMELMS ( minPoints ), iSystemRamMB );
+    float fMaxAmount = EvalSamplePosition < float > ( maxPoints, NUMELMS ( maxPoints ), iSystemRamMB );
+
+    // Apply cap dependant on video memory
+    fMaxAmount = Min ( fMaxAmount, iVideoMemoryMB * 2.f );
+    fMinAmount = Min ( fMinAmount, iVideoMemoryMB * 1.f );
+
+    // Apply 96MB lower limit
+    fMaxAmount = Max ( fMaxAmount, 96.f );
+
+    // Apply gap limit
+    fMinAmount = fMaxAmount - Max ( fMaxAmount - fMinAmount, 32.f );
+
+    m_fMinStreamingMemory = fMinAmount;
+    m_fMaxStreamingMemory = fMaxAmount;
+}
+
+
+//
+// GetMinStreamingMemory
+//
+uint CCore::GetMinStreamingMemory ( void )
+{
+    CalculateStreamingMemoryRange ();
+
+#ifdef MTA_DEBUG
+    return 1;
+#endif
+    return m_fMinStreamingMemory;
+}
+
+
+//
+// GetMaxStreamingMemory
+//
+uint CCore::GetMaxStreamingMemory ( void )
+{
+    CalculateStreamingMemoryRange ();
+    return m_fMaxStreamingMemory;
+}
+
+
+//
+// OnCrashAverted
+// 
+void CCore::OnCrashAverted ( uint uiId )
+{
+    CCrashDumpWriter::OnCrashAverted ( uiId );
+}
+
+
+//
+// LogEvent
+// 
+void CCore::LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody )
+{
+    if ( GetDebugIdEnabled ( uiDebugId ) )
+    {
+        CCrashDumpWriter::LogEvent ( szType, szContext, szBody );
+        OutputDebugLine ( SString ( "[LogEvent] %d %s %s %s", uiDebugId, szType, szContext, szBody ) );
+    }
+}
+
+
+//
+// GetDebugIdEnabled
+// 
+bool CCore::GetDebugIdEnabled ( uint uiDebugId )
+{
+    static CFilterMap debugIdFilterMap ( GetVersionUpdater ()->GetDebugFilterString () );
+    return !debugIdFilterMap.IsFiltered ( uiDebugId );
+}
+
+EDiagnosticDebugType CCore::GetDiagnosticDebug ( void )
+{
+    return m_DiagnosticDebug;
+}
+
+void CCore::SetDiagnosticDebug ( EDiagnosticDebugType value )
+{
+    m_DiagnosticDebug = value;
 }

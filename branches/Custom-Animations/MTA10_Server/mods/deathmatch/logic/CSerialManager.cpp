@@ -119,7 +119,7 @@ CSerialVerification::CSerialVerification ( CPlayer* pPlayer, SERIALVERIFICATIONC
 
         // Use CURL to perform the POST
         CNetHTTPDownloadManagerInterface * pHTTP = g_pNetServer->GetHTTPDownloadManager ();
-        pHTTP->QueueFile ( SERIAL_VERIFICATION_URL, NULL, 0, strPostData.c_str (), this, ProgressCallback );
+        pHTTP->QueueFile ( SERIAL_VERIFICATION_URL, NULL, 0, strPostData.c_str (), 0, false, this, ProgressCallback );
         if ( !pHTTP->IsDownloading () )
             pHTTP->StartDownloadingQueuedFiles ();
     }

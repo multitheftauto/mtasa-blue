@@ -14,15 +14,9 @@
 
 #include <StdInc.h>
 
-// Very hacky
-//#include "../deathmatch/logic/CClientGame.h"
-
 #define PI_2 6.283185307179586476925286766559f
-#ifndef PI
-#define PI 3.1415926535897932384626433832795f
-#endif
 
-CClientCamera::CClientCamera ( CClientManager* pManager ) : CClientEntity ( INVALID_ELEMENT_ID )
+CClientCamera::CClientCamera ( CClientManager* pManager ) : ClassInit ( this ), CClientEntity ( INVALID_ELEMENT_ID )
 {
     CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientCamera" ), &m_pFocusedPlayer, &m_pFocusedEntity, NULL );
 
@@ -193,6 +187,17 @@ void CClientCamera::SetRotation ( const CVector& vecRotation )
 
     // Set the calculated vector as the target
     SetTarget ( vecPosition );
+}
+
+
+void CClientCamera::GetRotation( float &fX, float &fY )
+{
+	m_pCamera->GetRotation( fX, fY );
+}
+
+void CClientCamera::SetRotation( float fX, float fY )
+{
+	m_pCamera->SetRotation( fX, fY );
 }
 
 
@@ -409,14 +414,14 @@ void CClientCamera::RestoreEntity ( CClientEntity* pEntity )
 }
 
 
-void CClientCamera::SetCameraView ( eVehicleCamMode eMode )
+void CClientCamera::SetCameraViewMode ( eVehicleCamMode eMode )
 {
-    m_pCamera->SetCameraView ( eMode );
+    m_pCamera->SetCameraViewMode ( eMode );
 }
 
-eVehicleCamMode CClientCamera::GetCameraView ()
+eVehicleCamMode CClientCamera::GetCameraViewMode ()
 {
-    return (eVehicleCamMode)m_pCamera->GetCameraView();
+    return (eVehicleCamMode)m_pCamera->GetCameraViewMode();
 }
 
 

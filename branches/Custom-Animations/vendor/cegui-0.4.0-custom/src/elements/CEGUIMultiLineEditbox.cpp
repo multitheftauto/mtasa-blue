@@ -108,7 +108,8 @@ MultiLineEditbox::MultiLineEditbox(const String& type, const String& name) :
 	addMultiLineEditboxProperties();
 
 	// we always need a terminating \n
-	d_text.append(1, '\n');
+	d_text_raw.append(1, '\n');
+    d_text = d_text_raw.bidify ();
 }
 
 
@@ -313,9 +314,10 @@ void MultiLineEditbox::setMaxTextLength(size_t max_len)
 		onMaximumTextLengthChanged(args);
 
 		// trim string
-		if (d_text.length() > d_maxTextLen)
+		if (d_text_raw.length() > d_maxTextLen)
 		{
-			d_text.resize(d_maxTextLen);
+			d_text_raw.resize(d_maxTextLen);
+			d_text = d_text_raw.bidify ();
 			onTextChanged(args);
 		}
 
@@ -888,7 +890,7 @@ void MultiLineEditbox::eraseSelectedText(bool modify_text)
 		if (modify_text)
 		{
 			d_text_raw.erase(getSelectionStartIndex(), getSelectionLength());
-            d_text = String((CEGUI::utf8*)UTF16ToMbUTF8(GetBidiString(MbUTF8ToUTF16(d_text_raw.c_str()))).c_str());
+            d_text = d_text_raw.bidify();
 
 			// trigger notification that text has changed.
 			WindowEventArgs args(this);
@@ -916,7 +918,7 @@ void MultiLineEditbox::handleBackspace(void)
 		{
 			d_text_raw.erase(d_caratPos - 1, 1);
 			setCaratIndex(d_caratPos - 1);
-            d_text = String((CEGUI::utf8*)UTF16ToMbUTF8(GetBidiString(MbUTF8ToUTF16(d_text_raw.c_str()))).c_str());
+            d_text = d_text_raw.bidify();
 
 			WindowEventArgs args(this);
 			onTextChanged(args);
@@ -941,7 +943,7 @@ void MultiLineEditbox::handleDelete(void)
 		{
 			d_text_raw.erase(d_caratPos, 1);
 			ensureCaratIsVisible();
-            d_text = String((CEGUI::utf8*)UTF16ToMbUTF8(GetBidiString(MbUTF8ToUTF16(d_text_raw.c_str()))).c_str());
+            d_text = d_text_raw.bidify();
 
 			WindowEventArgs args(this);
 			onTextChanged(args);
@@ -1215,10 +1217,12 @@ void MultiLineEditbox::handleNewLine(uint sysKeys)
 		eraseSelectedText();
 
 		// if there is room
-		if (d_text.length() - 1 < d_maxTextLen)
+		if (d_text_raw.length() - 1 < d_maxTextLen)
 		{
-			d_text.insert(getCaratIndex(), 1, 0x0a);
+			d_text_raw.insert(getCaratIndex(), 1, 0x0a);
+            d_text = d_text_raw.bidify ();
 			d_caratPos++;
+
 
 			WindowEventArgs args(this);
 			onTextChanged(args);
@@ -1323,7 +1327,9 @@ void MultiLineEditbox::onMouseTripleClicked(MouseEventArgs& e)
 		// erroneous situation and select up to end at end of text.
 		if (paraEnd == String::npos)
 		{
-			d_text.append(1, '\n');
+	        d_text_raw.append(1, '\n');
+            d_text = d_text_raw.bidify ();
+
 			paraEnd = d_text.length() - 1;
 		}
 
@@ -1390,7 +1396,7 @@ void MultiLineEditbox::onCharacter(KeyEventArgs& e)
 			d_caratPos++;
 
             // Trigger our text setting
-            d_text = String((CEGUI::utf8*)UTF16ToMbUTF8(GetBidiString(MbUTF8ToUTF16(d_text_raw.c_str()))).c_str());
+            d_text = d_text_raw.bidify();
 
 			WindowEventArgs args(this);
 			onTextChanged(args);
@@ -1512,7 +1518,10 @@ void MultiLineEditbox::onTextChanged(WindowEventArgs& e)
 {
     // ensure last character is a new line
     if ((d_text.length() == 0) || (d_text[d_text.length() - 1] != '\n'))
-        d_text.append(1, '\n');
+    {
+    	d_text_raw.append(1, '\n');
+        d_text = d_text_raw.bidify ();
+    }
 
     // clear selection
     clearSelection();

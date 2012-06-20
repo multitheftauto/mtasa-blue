@@ -16,6 +16,7 @@
 
 class CCivilianPed : public virtual CPed
 {
+public:
     virtual                 ~CCivilianPed ( void ) {};
 };
 

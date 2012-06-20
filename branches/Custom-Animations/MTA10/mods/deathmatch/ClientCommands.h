@@ -15,7 +15,7 @@
 #ifndef __CLIENTCOMMANDS_H
 #define __CLIENTCOMMANDS_H
 
-bool COMMAND_Executed              ( const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled );
+bool COMMAND_Executed               ( const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled, bool bIsScriptedBind );
 
 void COMMAND_Help                   ( const char* szCmdLine );
 void COMMAND_Disconnect             ( const char* szCmdLine );
@@ -36,12 +36,15 @@ void COMMAND_RadarMoveSouth         ( const char* szCmdLine );
 void COMMAND_RadarMoveEast          ( const char* szCmdLine );
 void COMMAND_RadarMoveWest          ( const char* szCmdLine );
 void COMMAND_RadarAttach            ( const char* szCmdLine );
-void COMMAND_RadarTransparency      ( const char* szCmdLine );
+void COMMAND_RadarOpacityDown       ( const char* szCmdLine );
+void COMMAND_RadarOpacityUp         ( const char* szCmdLine );
+void COMMAND_RadarHelp              ( const char* szCmdLine );
 void COMMAND_MessageTarget          ( const char* szCmdLine );
 void COMMAND_VehicleNextWeapon      ( const char* szCmdLine );
 void COMMAND_VehiclePreviousWeapon  ( const char* szCmdLine );
 void COMMAND_TextScale              ( const char* szCmdLine );
 void COMMAND_ChatBox                ( const char* szCmdLine );
+void COMMAND_VoicePushToTalk        ( const char* szCmdLine );
 
 // DISABLE THESE BEFORE RELEASE
 #ifdef MTA_DEBUG
@@ -51,7 +54,6 @@ void COMMAND_ShowSyncData           ( const char* szCmdLine );
 
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
     void COMMAND_ShowSyncing        ( const char* szCmdLine );
-    void COMMAND_FakeLag            ( const char* szCmdLine );
 #endif
 
 #ifdef MTA_DEBUG
@@ -75,8 +77,6 @@ void COMMAND_ShowSyncData           ( const char* szCmdLine );
     void COMMAND_ShowInterpolation  ( const char* szCmdLine );
 
     void COMMAND_Watch              ( const char* szCmdLine );
-    void COMMAND_Hash               ( const char* szCmdLine );
-    void COMMAND_HashArray          ( const char* szCmdLine );
     void COMMAND_Modules            ( const char* szCmdLine );
 
     void COMMAND_Debug              ( const char* szCmdLine );
@@ -84,5 +84,9 @@ void COMMAND_ShowSyncData           ( const char* szCmdLine );
     void COMMAND_Debug3             ( const char* szCmdLine );
     void COMMAND_Debug4             ( const char* szCmdLine );
 #endif
+
+    // Commands enabled when development mode in on
+    void COMMAND_ShowCollision      ( const char* szCmdLine );
+    void COMMAND_ShowSound          ( const char* szCmdLine );
 
 #endif

@@ -38,6 +38,8 @@ void CWorldRPCs::LoadFunctions ( void )
     AddHandler ( SET_CLOUDS_ENABLED, SetCloudsEnabled, "SetCloudsEnabled" );
     AddHandler ( SET_TRAFFIC_LIGHT_STATE, SetTrafficLightState, "SetTrafficLightState" );
     AddHandler ( SET_JETPACK_MAXHEIGHT, SetJetpackMaxHeight, "SetJetpackMaxHeight" );
+    AddHandler ( SET_AIRCRAFT_MAXHEIGHT, SetAircraftMaxHeight, "SetAircraftMaxHeight" );
+    AddHandler ( SET_OCCLUSIONS_ENABLED, SetOcclusionsEnabled, "SetOcclusionsEnabled" );
 
     AddHandler ( SET_INTERIOR_SOUNDS_ENABLED, SetInteriorSoundsEnabled, "SetInteriorSoundsEnabled" );
     AddHandler ( SET_RAIN_LEVEL, SetRainLevel, "SetRainLevel" );
@@ -52,6 +54,12 @@ void CWorldRPCs::LoadFunctions ( void )
     AddHandler ( RESET_WIND_VELOCITY, ResetWindVelocity, "ResetWindVelocity" );
     AddHandler ( RESET_FAR_CLIP_DISTANCE, ResetFarClipDistance, "ResetFarClipDistance" );
     AddHandler ( RESET_FOG_DISTANCE, ResetFogDistance, "ResetFogDistance" );
+    AddHandler ( SET_WEAPON_PROPERTY, SetWeaponProperty, "SetWeaponProperty");
+
+    AddHandler ( REMOVE_WORLD_MODEL, RemoveWorldModel, "RemoveWorldModel");
+    AddHandler ( RESTORE_WORLD_MODEL, RestoreWorldModel, "RestoreWorldModel");
+    AddHandler ( RESTORE_ALL_WORLD_MODELS, RestoreAllWorldModels, "RestoreAllWorldModels");
+    AddHandler ( SET_SYNC_INTERVALS, SetSyncIntervals, "SetSyncIntervals" );
 }
 
 
@@ -195,7 +203,7 @@ void CWorldRPCs::SetWantedLevel ( NetBitStreamInterface& bitStream )
 
     if ( bitStream.Read ( ucWantedLevel ) )
     {
-        g_pGame->GetPlayerInfo()->GetWanted()->SetWantedLevel ( ucWantedLevel );
+        m_pClientGame->SetWanted ( ucWantedLevel );
     }
 }
 
@@ -341,6 +349,26 @@ void CWorldRPCs::SetFogDistance ( NetBitStreamInterface& bitStream )
     }
 }
 
+void CWorldRPCs::SetAircraftMaxHeight ( NetBitStreamInterface& bitStream )
+{
+    float fMaxHeight;
+
+    if ( bitStream.Read ( fMaxHeight ) )
+    {
+        g_pGame->GetWorld ()->SetAircraftMaxHeight ( fMaxHeight );
+    }
+}
+
+void CWorldRPCs::SetOcclusionsEnabled ( NetBitStreamInterface& bitStream )
+{
+    bool bEnabled;
+
+    if ( bitStream.ReadBit ( bEnabled ) )
+    {
+        g_pGame->GetWorld ()->SetOcclusionsEnabled ( bEnabled );
+    }
+}
+
 void CWorldRPCs::ResetRainLevel ( NetBitStreamInterface& bitStream )
 {
     g_pGame->GetWeather ()->ResetAmountOfRain ( );
@@ -369,4 +397,194 @@ void CWorldRPCs::ResetFarClipDistance ( NetBitStreamInterface& bitStream )
 void CWorldRPCs::ResetFogDistance ( NetBitStreamInterface& bitStream )
 {
     g_pMultiplayer->RestoreFogDistance ( );
+}
+
+void CWorldRPCs::SetWeaponProperty ( NetBitStreamInterface& bitStream )
+{
+    unsigned char ucWeapon = 0;
+    unsigned char ucProperty = 0;
+    unsigned char ucWeaponSkill = 0;
+    float fData = 0.0f;
+    short sData = 0;
+    if ( bitStream.Read ( ucWeapon ) && bitStream.Read ( ucProperty ) && bitStream.Read ( ucWeaponSkill ) )
+    {
+        CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( static_cast < eWeaponType > ( ucWeapon ), static_cast < eWeaponSkill > ( ucWeaponSkill ) );
+        CWeaponStat* pOriginalWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats( static_cast < eWeaponType > ( ucWeapon ), static_cast < eWeaponSkill > ( ucWeaponSkill ) );
+        switch ( ucProperty )
+        {
+            case WEAPON_WEAPON_RANGE:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetWeaponRange ( fData );
+                    break;
+                }
+            case WEAPON_TARGET_RANGE:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetTargetRange ( fData );
+                    break;
+                }
+            case WEAPON_ACCURACY:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetAccuracy ( fData );
+                    break;
+                }
+            case WEAPON_LIFE_SPAN:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetLifeSpan ( fData );
+                    break;
+                }
+            case WEAPON_FIRING_SPEED:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetFiringSpeed ( fData );
+                    break;
+                }
+            case WEAPON_MOVE_SPEED:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetMoveSpeed ( fData );
+                    break;
+                }
+            case WEAPON_ANIM_LOOP_START:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetWeaponAnimLoopStart ( fData );
+                    break;
+                }
+            case WEAPON_ANIM_LOOP_STOP:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetWeaponAnimLoopStop ( fData );
+                    break;
+                }
+            case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetWeaponAnimLoopFireTime ( fData );
+                    break;
+                }
+
+            case WEAPON_ANIM2_LOOP_START:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetWeaponAnim2LoopStart ( fData );
+                    break;
+                }
+            case WEAPON_ANIM2_LOOP_STOP:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetWeaponAnim2LoopStop ( fData );
+                    break;
+                }
+            case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetWeaponAnim2LoopFireTime ( fData );
+                    break;
+                }
+
+            case WEAPON_ANIM_BREAKOUT_TIME:
+                {
+                    bitStream.Read ( fData );
+                    pWeaponInfo->SetWeaponAnimBreakoutTime ( fData );
+                    break;
+                }
+            case WEAPON_DAMAGE:
+                {
+                    bitStream.Read ( sData );
+                    pWeaponInfo->SetDamagePerHit ( sData );
+                    break;
+                }
+            case WEAPON_MAX_CLIP_AMMO:
+                {
+                    bitStream.Read ( sData );
+                    pWeaponInfo->SetMaximumClipAmmo ( sData );
+                    break;
+                }
+            case WEAPON_FLAGS:
+                {
+                    bitStream.Read ( sData );
+                    if ( pWeaponInfo->IsFlagSet ( sData ) )
+                    {
+                        if ( sData == 0x800 )
+                        {
+                            // if it can support this anim group
+                            if ( ( ucWeapon >= WEAPONTYPE_PISTOL && ucWeapon <= WEAPONTYPE_SNIPERRIFLE ) || ucWeapon == WEAPONTYPE_MINIGUN )
+                            {
+                                // Revert anim group to default
+                                pWeaponInfo->SetAnimGroup ( pOriginalWeaponInfo->GetAnimGroup ( ) );
+                            }
+                        }
+                        pWeaponInfo->ClearFlag ( sData );
+                    }
+                    else
+                    {
+                        if ( sData == 0x800 )
+                        {
+                            // if it can support this anim group
+                            if ( ( ucWeapon >= WEAPONTYPE_PISTOL && ucWeapon <= WEAPONTYPE_SNIPERRIFLE ) || ucWeapon == WEAPONTYPE_MINIGUN )
+                            {
+                                // sawn off shotgun anim group
+                                pWeaponInfo->SetAnimGroup ( 17 );
+                            }
+                        }
+                        pWeaponInfo->SetFlag ( sData );
+                    }
+
+                    break;
+                }
+            case WEAPON_ANIM_GROUP:
+                {
+                    bitStream.Read ( sData );
+                    pWeaponInfo->SetAnimGroup ( sData );
+                    break;
+                }
+        }
+    }
+}
+
+
+void CWorldRPCs::RemoveWorldModel ( NetBitStreamInterface& bitStream )
+{
+    unsigned short usModel = 0;
+    float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+
+    if ( bitStream.Read ( usModel ) && bitStream.Read ( fRadius ) && bitStream.Read ( fX ) && bitStream.Read ( fY ) && bitStream.Read ( fZ ) )
+    {
+        g_pGame->GetWorld ( )->RemoveBuilding ( usModel, fRadius, fX, fY, fZ );
+    }
+}
+
+
+void CWorldRPCs::RestoreWorldModel ( NetBitStreamInterface& bitStream )
+{
+    unsigned short usModel = 0;
+    float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+
+    if ( bitStream.Read ( usModel ) && bitStream.Read ( fRadius ) && bitStream.Read ( fX ) && bitStream.Read ( fY ) && bitStream.Read ( fZ ) )
+    {
+        g_pGame->GetWorld ( )->RestoreBuilding ( usModel, fRadius, fX, fY, fZ );
+    }
+}
+
+
+void CWorldRPCs::RestoreAllWorldModels ( NetBitStreamInterface& bitStream )
+{
+    g_pGame->GetWorld ( )->ClearRemovedBuildingLists ( );
+}
+
+
+void CWorldRPCs::SetSyncIntervals ( NetBitStreamInterface& bitStream )
+{
+    bitStream.Read ( g_TickRateSettings.iPureSync );
+    bitStream.Read ( g_TickRateSettings.iLightSync );
+    bitStream.Read ( g_TickRateSettings.iCamSync );
+    bitStream.Read ( g_TickRateSettings.iPedSync );
+    bitStream.Read ( g_TickRateSettings.iUnoccupiedVehicle );
+    bitStream.Read ( g_TickRateSettings.iObjectSync );
+    bitStream.Read ( g_TickRateSettings.iKeySyncRotation );
+    bitStream.Read ( g_TickRateSettings.iKeySyncAnalogMove );
 }

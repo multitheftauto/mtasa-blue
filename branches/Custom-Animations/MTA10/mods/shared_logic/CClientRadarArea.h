@@ -25,6 +25,7 @@ class CClientRadarAreaManager;
 
 class CClientRadarArea : public CClientEntity
 {
+    DECLARE_CLASS( CClientRadarArea, CClientEntity )
     friend class CClientRadarAreaManager;
 
 public:

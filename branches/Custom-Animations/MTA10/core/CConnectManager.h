@@ -25,12 +25,14 @@ public:
                     CConnectManager     ( void );
                     ~CConnectManager    ( void );
 
-    bool            Connect             ( const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword );
+    bool            Connect             ( const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser = false );
     bool            Reconnect           ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true );
 
     bool            Abort               ( void );
 
     void            DoPulse             ( void );
+
+    void            OnServerExists      ( void );
 
     static bool     StaticProcessPacket ( unsigned char ucPacketID, class NetBitStreamInterface& bitStream );
 
@@ -40,6 +42,7 @@ public:
 private:
     bool            Event_OnCancelClick ( CGUIElement * pElement );
 
+    in_addr         m_Address;
     std::string     m_strHost;
     unsigned short  m_usPort;
     std::string     m_strNick;
@@ -53,6 +56,7 @@ private:
     GUI_CALLBACK*   m_pOnCancelClick;
 
     CServerListItem* m_pServerItem;
+    bool            m_bNotifyServerBrowser;
 
     bool CheckNickProvided ( const char* szNick );
 };

@@ -49,15 +49,19 @@ enum eAnimIDs
 
 #define STEALTH_KILL_RANGE 2.5f
 
-struct SBodyPartName { char szName [32]; };
-SBodyPartName BodyPartNames [10] =
-{ {"Unknown"}, {"Unknown"}, {"Unknown"}, {"Torso"}, {"Ass"},
-{"Left Arm"}, {"Right Arm"}, {"Left Leg"}, {"Right Leg"}, {"Head"} };
+struct SBodyPartName
+{
+    const char* szName;
+};
 
-// HACK: saves unneccesary loading of clothes textures
-CClientPed* g_pLastRebuilt = NULL;
+static const SFixedArray < SBodyPartName, 10 > BodyPartNames =
+{ {
+    {"Unknown"}, {"Unknown"}, {"Unknown"}, {"Torso"}, {"Ass"},
+    {"Left Arm"}, {"Right Arm"}, {"Left Leg"}, {"Right Leg"}, {"Head"}
+} };
 
-CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, ElementID ID ) : CClientStreamElement ( pManager->GetPlayerStreamer (), ID ), CAntiCheatModule ( pManager->GetAntiCheat () )
+
+CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, ElementID ID ) : ClassInit ( this ), CClientStreamElement ( pManager->GetPlayerStreamer (), ID ), CAntiCheatModule ( pManager->GetAntiCheat () )
 {
     SetTypeName ( "ped" );
 
@@ -69,7 +73,7 @@ CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, Elem
 }
 
 
-CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer ) : CClientStreamElement ( pManager->GetPlayerStreamer (), ID ), CAntiCheatModule ( pManager->GetAntiCheat () )
+CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer ) : ClassInit ( this ), CClientStreamElement ( pManager->GetPlayerStreamer (), ID ), CAntiCheatModule ( pManager->GetAntiCheat () )
 {
     // Init
     Init ( pManager, ulModelID, bIsLocalPlayer );
@@ -126,6 +130,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_ulEndTarget = 0;
     m_bForceGettingIn = false;
     m_bForceGettingOut = false;
+    m_ucLeavingDoor = 0xFF;
     m_bDucked = false;
     m_bWearingGoggles = false;
     m_bVisible = true;
@@ -154,7 +159,6 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bDestroyingSatchels = false;
     m_bDoingGangDriveby = false;
     m_pAnimationBlock = NULL;
-    m_szAnimationName = NULL;
     m_bRequestedAnimation = false;
     m_iTimeAnimation = -1;
     m_bLoopAnimation = false;    
@@ -174,6 +178,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_fLighting = 0.0f;
     m_bBulletImpactData = false;
     m_ucEnteringDoor = 0xFF;
+    m_ucLeavingDoor = 0xFF;
 
     // Time based interpolation
     m_interp.pTargetOriginSource = NULL;
@@ -230,6 +235,10 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
 
         SetArmor ( 0.0f );
     }
+    m_eStoredWeaponID = (eWeaponType)0;
+    m_dwStoredAmmo = 0;
+    m_dwStoredClipAmmo = 0;
+    m_bStoredCurrentWeapon = false;
 }
 
 
@@ -306,10 +315,6 @@ CClientPed::~CClientPed ( void )
     }
 
     m_SyncBuffer.clear ();
-
-    // Make sure we're not referenced by the last rebuilt variable
-    if ( g_pLastRebuilt == this )
-        g_pLastRebuilt = NULL;
 
     if ( m_interp.pTargetOriginSource )
     {
@@ -892,7 +897,7 @@ void CClientPed::SetTargetTarget ( unsigned long ulDelay, const CVector& vecSour
 }
 
 
-bool CClientPed::SetModel ( unsigned long ulModel )
+bool CClientPed::SetModel ( unsigned long ulModel, bool bTemp )
 {
     // Valid model?
     if ( CClientPlayerManager::IsValidModel ( ulModel ) )
@@ -900,6 +905,9 @@ bool CClientPed::SetModel ( unsigned long ulModel )
         // Different model from what we have now?
         if ( m_ulModel != ulModel )
         {
+            if ( bTemp )
+                m_ulStoredModel = m_ulModel;
+
             // Set the model we're changing to
             m_ulModel = ulModel;
             m_pModelInfo = g_pGame->GetModelInfo ( ulModel );
@@ -911,6 +919,7 @@ bool CClientPed::SetModel ( unsigned long ulModel )
                 // Request the model
                 if ( m_pRequester->Request ( static_cast < unsigned short > ( ulModel ), this ) )
                 {
+                    m_pModelInfo->MakeCustomModel ( );
                     // Change the model immediately if it was loaded
                     _ChangeModel ();
                 }
@@ -1177,21 +1186,26 @@ bool CClientPed::GetClosestDoor ( CClientVehicle* pVehicle, bool bCheckDriverDoo
 }
 
 
-void CClientPed::GetOutOfVehicle ( void )
+void CClientPed::GetOutOfVehicle ( unsigned char ucDoor )
 {
+    if ( ucDoor != 0xFF )
+        m_ucLeavingDoor = ucDoor + 2;
+    else
+        m_ucLeavingDoor = 0xFF;
+    m_bForceGettingOut = true;
+
     // Get the current vehicle you're in
     CClientVehicle* pVehicle = GetRealOccupiedVehicle ();
     if ( pVehicle )
     {
         //m_pOccupyingVehicle = pVehicle;
-
         if ( m_pPlayerPed )
         {
             CVehicle* pGameVehicle = pVehicle->m_pVehicle;
             
             if ( pGameVehicle )
             {
-                CTaskComplexLeaveCar * pOutTask = g_pGame->GetTasks ()->CreateTaskComplexLeaveCar ( pGameVehicle );
+                CTaskComplexLeaveCar * pOutTask = g_pGame->GetTasks ()->CreateTaskComplexLeaveCar ( pGameVehicle, m_ucLeavingDoor );
                 if ( pOutTask )
                 {
                     pOutTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY, true );
@@ -1203,10 +1217,11 @@ void CClientPed::GetOutOfVehicle ( void )
                     }
                 }
             }
+
+            if ( m_ucLeavingDoor != 0xFF )
+                pVehicle->AllowDoorRatioSetting ( m_ucLeavingDoor, false );
         }
     }
-
-    m_bForceGettingOut = true;
 
     ResetInterpolation ();
     ResetToOutOfVehicleWeapon();
@@ -1220,7 +1235,7 @@ void CClientPed::GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat,
     RemoveFromVehicle ();
 
     // Do it
-    _GetIntoVehicle ( pVehicle, uiSeat );
+    _GetIntoVehicle ( pVehicle, uiSeat, ucDoor );
     m_uiOccupiedVehicleSeat = uiSeat;
     m_ucEnteringDoor = ucDoor;
     m_bForceGettingIn = true;
@@ -1235,7 +1250,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     {
         if ( pVehicle->IsStreamedIn () )
         {
-            g_pGame->GetStreaming()->LoadAllRequestedModels ();
+            pModelInfo->Request ( BLOCKING, "CClientPed::WarpIntoVehicle" );
         }
     }
 
@@ -1270,6 +1285,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     //m_uiOccupyingSeat = uiSeat;
     m_bForceGettingIn = false;
     m_bForceGettingOut = false;
+    m_ucLeavingDoor = 0xFF;
 
     // Store our current seat
     if ( m_pPlayerPed ) m_pPlayerPed->SetOccupiedSeat ( ( unsigned char ) uiSeat );
@@ -1295,7 +1311,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
         }
 
         // Update the vehicle and us so we know we've occupied it
-        CClientVehicle::SetPedOccupiedVehicle( this, pVehicle, 0 );
+        CClientVehicle::SetPedOccupiedVehicle( this, pVehicle, 0, 0xFF );
     }
     else
     {
@@ -1332,7 +1348,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
             }
 
             // Update us so we know we've occupied it
-            CClientVehicle::SetPedOccupiedVehicle( this, pVehicle, uiSeat );
+            CClientVehicle::SetPedOccupiedVehicle( this, pVehicle, uiSeat, 0xFF );
         }
         else
             return;
@@ -1431,6 +1447,7 @@ CClientVehicle * CClientPed::RemoveFromVehicle ( bool bIgnoreIfGettingOut )
 
     m_bForceGettingIn = false;
     m_bForceGettingOut = false;
+    m_ucLeavingDoor = 0xFF;
 
     return pVehicle;
 }
@@ -1796,16 +1813,24 @@ CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
     CWeapon* pWeapon = NULL;
     if ( m_pPlayerPed )
     {   
+        CWeaponInfo* pWeaponInfo = NULL;
         // Grab our current ammo in clip
         pWeapon = GetWeapon ( weaponType );
         unsigned int uiPreviousAmmoTotal = 0, uiPreviousAmmoInClip = 0;
+        eWeaponSkill weaponSkill = WEAPONSKILL_STD;
         if ( pWeapon )
         {
             uiPreviousAmmoTotal = pWeapon->GetAmmoTotal ();
-            uiPreviousAmmoInClip = pWeapon->GetAmmoInClip ();            
+            uiPreviousAmmoInClip = pWeapon->GetAmmoInClip ();
         }
 
-        pWeapon = m_pPlayerPed->GiveWeapon ( weaponType, uiAmmo );
+        if ( weaponType >= WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_TEC9 )
+        {
+            float fSkill = GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( weaponType ) );
+            weaponSkill = g_pGame->GetWeaponStatManager ( )->GetWeaponSkillFromSkillLevel ( weaponType, fSkill );            
+        }
+
+        pWeapon = m_pPlayerPed->GiveWeapon ( weaponType, uiAmmo, weaponSkill );
         
         // Restore clip ammo?
         if ( uiPreviousAmmoInClip )
@@ -1815,7 +1840,17 @@ CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
         }            
     }
 
-    CWeaponInfo* pInfo = g_pGame->GetWeaponInfo ( weaponType );
+    CWeaponInfo* pInfo = NULL;
+    if ( weaponType >= eWeaponType::WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_TEC9  )
+    {
+        float fStat = GetStat ( g_pGame->GetStats ( )->GetSkillStatIndex ( weaponType ) );
+        eWeaponSkill weaponSkill = g_pGame->GetWeaponStatManager ( )->GetWeaponSkillFromSkillLevel ( weaponType, fStat );
+        pInfo = g_pGame->GetWeaponInfo ( weaponType, weaponSkill );
+    }
+    else
+    {
+        pInfo = g_pGame->GetWeaponInfo ( weaponType );
+    }
     if ( pInfo )
     {
         m_CurrentWeaponSlot = pInfo->GetSlot ();
@@ -2188,6 +2223,14 @@ bool CClientPed::KillTaskSecondary ( int iTaskPriority, bool bGracefully )
 }
 
 
+CVector CClientPed::GetAim ( void ) const
+{
+    if ( m_shotSyncData )
+        return CVector ( m_shotSyncData->m_fArmDirectionX, m_shotSyncData->m_fArmDirectionY, 0 );
+    return CVector ();
+}
+
+
 void CClientPed::SetAim ( float fArmDirectionX, float fArmDirectionY, unsigned char cInVehicleAimAnim )
 {
     if ( !m_bIsLocalPlayer )
@@ -2288,9 +2331,14 @@ void CClientPed::StreamedInPulse ( void )
         {
             m_iLoadAllModelsCounter--;
             if ( GetModelInfo () )
-                g_pGame->GetStreaming()->LoadAllRequestedModels();
+                g_pGame->GetStreaming()->LoadAllRequestedModels( false, "CClientPed::StreamedInPulse - m_iLoadAllModelsCounter" );
         }
 
+        if ( m_bPendingRebuildPlayer )
+            ProcessRebuildPlayer ();
+
+        CControllerState Current;
+        GetControllerState ( Current );
 
         if ( m_bIsLocalPlayer )
         {
@@ -2299,6 +2347,11 @@ void CClientPed::StreamedInPulse ( void )
 
             // Do our stealth aiming stuff
             SetStealthAiming ( ShouldBeStealthAiming () );
+
+            // Process our scripted control settings
+            bool bOnFoot = pVehicle ? false : true;
+            CClientPad::ProcessAllToggledControls    ( Current, bOnFoot );
+            CClientPad::ProcessSetAnalogControlState ( Current, bOnFoot );
         }
 
         // Is the player stealth aiming?
@@ -2338,8 +2391,6 @@ void CClientPed::StreamedInPulse ( void )
             }
         }
         
-        CControllerState Current;
-        GetControllerState ( Current );
         unsigned long ulNow = CClientTime::GetTime (); 
         //MS checks must take into account the gamespeed
         float fSpeedRatio = (1.0f/g_pGame->GetGameSpeed ()); 
@@ -2389,8 +2440,8 @@ void CClientPed::StreamedInPulse ( void )
             // This fixes a weapon desync bug involving aiming and sprinting packets arriving simultaneously
             eWeaponType iCurrentWeapon = GetCurrentWeaponType ();
             if ( Current.RightShoulder1 != 0 && 
-                ( iCurrentWeapon == 29 || iCurrentWeapon == 24 || iCurrentWeapon == 23 || iCurrentWeapon == 41 || iCurrentWeapon == 42 ) )
-            {
+             ( iCurrentWeapon == 29 || iCurrentWeapon == 24 || iCurrentWeapon == 23 || iCurrentWeapon == 41 || iCurrentWeapon == 42 ) )
+            { 
                 Current.ButtonCircle = 0;
                 Current.LeftShoulder1 = 0;
             }
@@ -2498,8 +2549,11 @@ void CClientPed::StreamedInPulse ( void )
                 eWeaponSlot slot = pWeapon->GetSlot ();
                 if ( slot != WEAPONSLOT_TYPE_UNARMED && slot != WEAPONSLOT_TYPE_MELEE )
                 {
+                    eWeaponType eWeapon = pWeapon->GetType ( );
                     // No Ammo left?
-                    if ( pWeapon->GetAmmoTotal () == 0 )
+                    float fSkill = GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( eWeapon ) );
+                    CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager ( )->GetWeaponStatsFromSkillLevel ( eWeapon, fSkill );
+                    if ( ( pWeapon->GetAmmoInClip ( ) == 0 && pWeaponStat->GetMaximumClipAmmo ( ) > 0 ) || pWeapon->GetAmmoTotal () == 0 )
                     {
                         // Make sure our fire key isn't pressed
                         Current.ButtonCircle = 0;
@@ -2508,8 +2562,27 @@ void CClientPed::StreamedInPulse ( void )
                 }
             }
 
+
+            // * Fix for warp glitches when sprinting and blocking simultaneously
+            // This is applied locally, and prevents you using the backwards key while sprint-blocking
+            CTask * pTask = m_pTaskManager->GetSimplestActiveTask ();
+            if ( ( pTask && pTask->GetTaskType () == TASK_SIMPLE_PLAYER_ON_FOOT ) &&
+                 ( GetWeapon()->GetSlot() == WEAPONSLOT_TYPE_UNARMED ) &&
+                 ( Current.RightShoulder1 != 0 ) &&
+                 ( Current.ButtonSquare != 0 ) &&
+                 ( Current.ButtonCross != 0 ) )
+            {  // We are block jogging
+                if ( Current.LeftStickY > 0 )  
+                    // We're pressing target+jump+sprint+backwards.  Using the backwards key in this situation is prone to bugs, swap it with forwards
+                    Current.LeftStickY = -Current.LeftStickY;
+                else if ( Current.LeftStickY == 0 )
+                    // We're pressing target+jump+sprint 
+                    // This causes some sliding, so let's disable this glitchy animation
+                    Current.ButtonCross = 0;
+            }
+
             // * Check for entering a vehicle whilst using a gun
-            CTask * pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
+            pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
             if ( pTask )
             {
                 int iTaskType = pTask->GetTaskType ();
@@ -2533,25 +2606,12 @@ void CClientPed::StreamedInPulse ( void )
             pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_DUCK );
             if ( !pTask || pTask->GetTaskType () != TASK_SIMPLE_DUCK )
             {
+                eWeaponType eWeapon = GetCurrentWeaponType ( );
+                float fSkill = GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( eWeapon ) );
+                CWeaponStat * pWeaponStat = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel ( eWeapon, fSkill ) ;
                 // Apply fix for aimable weapons only
-                switch ( GetCurrentWeaponType () )
+                if ( pWeaponStat && pWeaponStat->IsFlagSet ( WEAPONTYPE_CANAIMWITHARM ) == false  )
                 {
-                    case 23:    // Silenced Pistol
-                    case 24:    // Desert Eagle
-                    case 25:    // Shotgun
-                    case 27:    // SPAZ-12 Combat Shotgun
-                    case 29:    // MP5
-                    case 30:    // AK-47
-                    case 31:    // M4
-                    case 33:    // Country Rifle
-                    case 34:    // Sniper Rifle
-                    case 35:    // Rocket Launcher
-                    case 36:    // Heat-Seeking RPG
-                    case 37:    // Flamethrower
-                    case 38:    // Minigun
-                    case 41:    // Spraycan
-                    case 42:    // Fire Extinguisher
-                    case 43:    // Camera
                         // See which way input wants to go
                         const bool bInputRight = Current.LeftStickX >  6;
                         const bool bInputLeft  = Current.LeftStickX < -6;
@@ -2658,12 +2718,12 @@ void CClientPed::StreamedInPulse ( void )
                             if ( iTaskType != TASK_COMPLEX_ENTER_CAR_AS_DRIVER &&
                                 iTaskType != TASK_COMPLEX_ENTER_CAR_AS_PASSENGER )
                             {
-                                _GetIntoVehicle ( m_pOccupyingVehicle, m_uiOccupiedVehicleSeat );
+                                _GetIntoVehicle ( m_pOccupyingVehicle, m_uiOccupiedVehicleSeat, m_ucEnteringDoor );
                             }
                         }
                         else
                         {
-                            _GetIntoVehicle ( m_pOccupyingVehicle, m_uiOccupiedVehicleSeat );
+                            _GetIntoVehicle ( m_pOccupyingVehicle, m_uiOccupiedVehicleSeat, m_ucEnteringDoor );
                         }
                     }
                 }
@@ -2678,12 +2738,13 @@ void CClientPed::StreamedInPulse ( void )
                         CTask* pTask = GetCurrentPrimaryTask ();
                         if ( !pTask || pTask->GetTaskType () != TASK_COMPLEX_LEAVE_CAR )
                         {
-                            GetOutOfVehicle ();
+                            GetOutOfVehicle ( m_ucLeavingDoor );
                         }
                     }
                     else
                     {
                         m_bForceGettingOut = false;
+                        m_ucLeavingDoor = 0xFF;
                     }
                 }
 
@@ -2725,11 +2786,9 @@ void CClientPed::StreamedInPulse ( void )
                 m_bRequestedAnimation = false;
 
                 // Copy our name incase it gets deleted
-                char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
-                strcpy ( szAnimName, m_szAnimationName );
+                SString strAnimName = m_strAnimationName;
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
-                delete [] szAnimName;                
+                RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
             }            
         }
 
@@ -2751,6 +2810,35 @@ void CClientPed::StreamedInPulse ( void )
 
             // Update our streaming position
             UpdateStreamPosition ( vecPosition );
+        }
+        // Fix for unloading ped models which are currently streamed in (DO NOT REMOVE or players will not reset to the default models!)
+        if ( m_ulStoredModel > 0 && m_ulModel == 0 )
+        {
+            // Make sure the scripter hasn't fixed this himself as well by changing from CJ back. (unlikely but who knows).
+            if ( m_ulModel == 0 )
+            {
+                // Give him back his previous model
+                SetModel ( m_ulStoredModel );
+            }
+            // Reset the stored model
+            m_ulStoredModel = 0;
+        }
+        // Fix for unloading weapon models which are currently streamed in (DO NOT REMOVE or weapons will not reset to the default models!)
+        if ( m_eStoredWeaponID > 0 )
+        {
+            // Give our Weapon back after deleting to reload the model
+            CWeapon * pWeapon = GiveWeapon ( m_eStoredWeaponID, m_dwStoredAmmo );
+
+            // Reset our states
+            pWeapon->SetAmmoInClip ( m_dwStoredClipAmmo );
+            if ( m_bStoredCurrentWeapon )
+                pWeapon->SetAsCurrentWeapon ( );
+
+            // Reset for next time.
+            m_eStoredWeaponID = (eWeaponType)0;
+            m_dwStoredAmmo = 0;
+            m_dwStoredClipAmmo = 0;
+            m_bStoredCurrentWeapon = false;
         }
     }
 }
@@ -3050,7 +3138,7 @@ void CClientPed::_CreateModel ( void )
     // Replace the loaded model info with the model we're going to load and
     // add a reference to it.
     m_pLoadedModelInfo = m_pModelInfo;
-    m_pLoadedModelInfo->AddRef ( true );
+    m_pLoadedModelInfo->ModelAddRef ( BLOCKING, "CClientPed::_CreateModel" );
 
     // Create the new ped
     m_pPlayerPed = dynamic_cast < CPlayerPed* > ( g_pGame->GetPools ()->AddPed ( static_cast < ePedModel > ( m_ulModel ) ) );
@@ -3058,6 +3146,9 @@ void CClientPed::_CreateModel ( void )
     {
         // Put our pointer in the stored data and update the remote data with the new model pointer
         m_pPlayerPed->SetStoredPointer ( this );
+
+        // Add XRef
+        g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pPlayerPed );
 
         g_pMultiplayer->AddRemoteDataStorage ( m_pPlayerPed, m_remoteDataStorage );
 
@@ -3140,11 +3231,9 @@ void CClientPed::_CreateModel ( void )
         if ( m_bLoopAnimation && m_pAnimationBlock )
         {
             // Copy our anim name incase it gets deleted
-            char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
-            strcpy ( szAnimName, m_szAnimationName );
+            SString strAnimName = m_strAnimationName;
             // Run our animation
-            RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
-            delete [] szAnimName;
+            RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
         }
 
         // Set the voice that corresponds to our model
@@ -3180,9 +3269,12 @@ void CClientPed::_CreateLocalModel ( void )
         // Put our pointer in its stored pointer
         m_pPlayerPed->SetStoredPointer ( this );
 
+        // Add XRef
+        g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pPlayerPed );
+
         // Add a reference to the model we're using
         m_pLoadedModelInfo = m_pModelInfo;
-        m_pLoadedModelInfo->AddRef ( true );
+        m_pLoadedModelInfo->ModelAddRef ( BLOCKING, "CClientPed::_CreateLocalModel" );
 
         // Make sure we are CJ
         if ( m_pPlayerPed->GetModelIndex () != m_ulModel )
@@ -3252,6 +3344,9 @@ void CClientPed::_DestroyModel ()
     // Invalidate
     m_pManager->InvalidateEntity ( this );
 
+    // Remove XRef
+    g_pClientGame->GetGameEntityXRefManager ()->RemoveEntityXRef ( this, m_pPlayerPed );
+
     // Remove the ped from the world
     g_pGame->GetPools ()->RemovePed ( m_pPlayerPed );
     m_pPlayerPed = NULL;
@@ -3260,6 +3355,9 @@ void CClientPed::_DestroyModel ()
     // Remove the reference to its model
     m_pLoadedModelInfo->RemoveRef ();
     m_pLoadedModelInfo = NULL;
+
+    // Any pending rebuild will not be required now
+    m_bPendingRebuildPlayer = false;
 
     NotifyDestroy ();
 }
@@ -3292,6 +3390,9 @@ void CClientPed::_DestroyLocalModel ()
     // Invalidate
     m_pManager->InvalidateEntity ( this );
 
+    // Remove XRef
+    g_pClientGame->GetGameEntityXRefManager ()->RemoveEntityXRef ( this, m_pPlayerPed );
+
     // Make sure we are CJ again
     if ( m_pPlayerPed->GetModelIndex () != 0 )
     {
@@ -3313,6 +3414,8 @@ void CClientPed::_ChangeModel ( void )
     // Different model than before?
     if ( m_pPlayerPed->GetModelIndex () != m_ulModel )
     {
+        g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter ( false );
+
         // We need to reset visual stats when changing from CJ model
         if ( m_pPlayerPed->GetModelIndex () == 0 )
         {
@@ -3350,13 +3453,29 @@ void CClientPed::_ChangeModel ( void )
             m_pLoadedModelInfo = m_pModelInfo;
 
             // Add reference to the model
-            m_pLoadedModelInfo->AddRef ( true );
+            m_pLoadedModelInfo->ModelAddRef ( BLOCKING, "CClientPed::_ChangeModel" );
 
             // Set the new player model and restore the interior
             m_pPlayerPed->SetModelIndex ( m_ulModel );
 
             // Rebuild the player after a skin change
-            RebuildModel ();
+            if ( m_ulModel == 0 )
+            {
+                // When the local player changes to CJ, the clothes geometry gets an extra ref from somewhere, causing a memory leak.
+                // So make sure clothes geometry is built now...
+                m_pClothes->AddAllToModel ();
+                m_pPlayerPed->RebuildPlayer ();
+
+                // ...and decrement the extra ref
+                m_pPlayerPed->RemoveGeometryRef ();
+            }
+            else
+            {
+                // When the local player changes to another (non CJ) model, the geometry gets an extra ref from somewhere, causing a memory leak.
+                // So decrement the extra ref here
+                m_pPlayerPed->RemoveGeometryRef ();
+            }
+
 
             // Remove reference to the old model we used (Flag extra GTA reference to be removed as well)
             pLoadedModel->RemoveRef ( true );
@@ -3373,11 +3492,9 @@ void CClientPed::_ChangeModel ( void )
             if ( m_bLoopAnimation && m_pAnimationBlock )
             {
                 // Copy our anim name incase it gets deleted
-                char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
-                strcpy ( szAnimName, m_szAnimationName );
+                SString strAnimName = m_strAnimationName;
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
-                delete [] szAnimName;
+                RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
             }
 
             // Set the voice that corresponds to the new model
@@ -3395,6 +3512,8 @@ void CClientPed::_ChangeModel ( void )
             // Create the new with the new skin
             _CreateModel ();
         }
+
+        g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter ( true );
     }
 }
 
@@ -3408,7 +3527,7 @@ void CClientPed::ReCreateModel ( void )
         bool bSameModel = ( m_pLoadedModelInfo == m_pModelInfo );
         if ( bSameModel )
         {
-            m_pLoadedModelInfo->AddRef ( true );
+            m_pLoadedModelInfo->ModelAddRef ( BLOCKING, "CClientPed::ReCreateModel" );
         }
 
         // Destroy the old model
@@ -3442,7 +3561,7 @@ void CClientPed::ModelRequestCallback ( CModelInfo* pModelInfo )
 }
 
 
-void CClientPed::RebuildModel ( bool bForceClothes )
+void CClientPed::RebuildModel ( bool bDelayChange )
 {
     // We have a player
     if ( m_pPlayerPed )
@@ -3450,25 +3569,40 @@ void CClientPed::RebuildModel ( bool bForceClothes )
         // We are CJ?
         if ( m_ulModel == 0 )
         {
-            // Re-add the clothes if its a CJ model
-            if ( g_pLastRebuilt != this || bForceClothes )
-            {
-                // Adds only the neccesary textures
-                m_pClothes->AddAllToModel ();
+            // Adds only the neccesary textures
+            m_pClothes->AddAllToModel ();
 
-                g_pLastRebuilt = this;
-            }
+            m_bPendingRebuildPlayer = true;
 
-            if ( m_bIsLocalPlayer )
-            {
-                m_pPlayerPed->RebuildPlayer ();
-            }
-            else
-            {
-                g_pMultiplayer->RebuildMultiplayerPlayer ( m_pPlayerPed );            
-            }
+            // Apply immediately unless there is a chance more clothes states will change (e.g. via script)
+            if ( !bDelayChange )
+                ProcessRebuildPlayer ();
         }
-    }    
+    }
+}
+
+
+//
+// Process any pending build but avoid rebuilding more than once a frame
+//
+void CClientPed::ProcessRebuildPlayer ( void )
+{
+    assert ( m_pPlayerPed );
+
+    if ( m_bPendingRebuildPlayer && m_uiFrameLastRebuildPlayer != g_pClientGame->GetFrameCount () )
+    {
+        m_bPendingRebuildPlayer = false;
+        m_uiFrameLastRebuildPlayer = g_pClientGame->GetFrameCount ();
+
+        if ( m_bIsLocalPlayer )
+        {
+            m_pPlayerPed->RebuildPlayer ();
+        }
+        else
+        {
+            g_pMultiplayer->RebuildMultiplayerPlayer ( m_pPlayerPed );
+        }
+    }
 }
 
 
@@ -3479,14 +3613,31 @@ void CClientPed::StreamIn ( bool bInstantly )
         NotifyCreate ();
         return;
     }
-
-    // Request it
-    if ( !m_pPlayerPed && m_pRequester->Request ( static_cast < unsigned short > ( m_ulModel ), this ) )
+#if 0
+    // We need to create now?
+    if ( bInstantly )
     {
-        // If it was loaded, create it immediately.
-        _CreateModel ();
+        // Request its model blocking
+        if ( !m_pPlayerPed && m_pRequester->RequestBlocking ( static_cast < unsigned short > ( m_ulModel ), "CClientVehicle::StreamIn - bInstantly" ) )
+        {
+            m_pModelInfo->MakeCustomModel ( );
+            // If it was loaded, create it immediately.
+            _CreateModel ();
+        }
+        else NotifyUnableToCreate ();
     }
-    else NotifyUnableToCreate ();
+    else
+#endif
+    {
+        // Request it
+        if ( !m_pPlayerPed && m_pRequester->Request ( static_cast < unsigned short > ( m_ulModel ), this ) )
+        {
+            m_pModelInfo->MakeCustomModel ( );
+            // If it was loaded, create it immediately.
+            _CreateModel ();
+        }
+        else NotifyUnableToCreate ();
+    }
 }
 
 
@@ -3505,6 +3656,22 @@ void CClientPed::StreamOut ( void )
     }
 }
 
+void CClientPed::StreamOutWeaponForABit ( eWeaponSlot eSlot )
+{
+    // Get the Weapon
+    CWeapon * pWeapon = GetWeapon ( eSlot );
+    if ( pWeapon )
+    {
+        // Store our states i.e. clip Ammo, Ammo, type and if it's the current weapon
+        m_dwStoredClipAmmo = pWeapon->GetAmmoInClip ( );
+        m_dwStoredAmmo = pWeapon->GetAmmoTotal ( );
+        m_eStoredWeaponID = pWeapon->GetType();
+        m_bStoredCurrentWeapon = GetCurrentWeaponType () == m_eStoredWeaponID;
+
+        // Remove it
+        pWeapon->Remove ();
+    }
+}
 
 void CClientPed::InternalWarpIntoVehicle ( CVehicle* pGameVehicle )
 {
@@ -3791,7 +3958,7 @@ bool CClientPed::IsMovingGoggles ( bool & bPuttingOn )
 }
 
 
-void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat )
+void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor )
 {
     assert ( m_pOccupiedVehicle == NULL );
     assert ( m_pOccupyingVehicle == NULL || m_pOccupyingVehicle == pVehicle );
@@ -3828,13 +3995,14 @@ void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
                 CTaskComplexEnterCarAsDriver* pInTask = g_pGame->GetTasks ()->CreateTaskComplexEnterCarAsDriver ( pGameVehicle );
                 if ( pInTask )
                 {
+                    pInTask->SetTargetDoor ( ucDoor );
                     pInTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY, true );
                 }
             }
         }
 
         // Tell the vehicle that we're occupying it
-        CClientVehicle::SetPedOccupyingVehicle ( this, pVehicle, uiSeat );
+        CClientVehicle::SetPedOccupyingVehicle ( this, pVehicle, uiSeat, ucDoor );
     }
     else
     {
@@ -3861,14 +4029,15 @@ void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
                     // Create the task for walking him in
                     CTaskComplexEnterCarAsPassenger* pInTask = g_pGame->GetTasks ()->CreateTaskComplexEnterCarAsPassenger ( pGameVehicle, ucSeat, false );
                     if ( pInTask )
-                    {                        
+                    {
+                        pInTask->SetTargetDoor ( ucDoor );
                         pInTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY, true );
                     }
                 }
             }
 
             // Tell the vehicle we're occupying it
-            CClientVehicle::SetPedOccupyingVehicle ( this, pVehicle, uiSeat );
+            CClientVehicle::SetPedOccupyingVehicle ( this, pVehicle, uiSeat, ucDoor );
         }
     }
 }
@@ -4038,6 +4207,11 @@ bool CClientPed::SetCurrentRadioChannel ( unsigned char ucChannel )
             Arguments.PushNumber ( ucChannel );
             if ( !CallEvent ( "onClientPlayerRadioSwitch", Arguments, true ) )
             {
+                // if we cancel the radio channel setting at 12 then when they go through previous it will get to 0, then the next time it is used set to 13 in preperation to set to 12 but if it is cancelled it stays at 13.
+                // Issue 6113 - Caz
+                if ( m_ucRadioChannel == 13 )
+                    m_ucRadioChannel = 0;
+
                 return false;
             }
         }
@@ -4067,7 +4241,8 @@ bool CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
     float fRotation = GetCurrentRotation ();
 
     // Grab the target range of the current weapon
-    CWeaponInfo* pCurrentWeaponInfo = pWeapon->GetInfo ();
+    float fSkill = GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( pWeapon->GetType () ) );
+    CWeaponStat* pCurrentWeaponInfo = g_pGame->GetWeaponStatManager ( )->GetWeaponStatsFromSkillLevel ( pWeapon->GetType (), fSkill );
     float fRange = pCurrentWeaponInfo->GetWeaponRange ();
 
     // Grab the gun muzzle position
@@ -4078,7 +4253,7 @@ bool CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
     CVector vecOrigin, vecTarget;
     if ( m_bIsLocalPlayer )
     {
-        if ( ucWeaponType == WEAPONTYPE_SNIPERRIFLE )
+        if ( pCurrentWeaponInfo->IsFlagSet ( WEAPONTYPE_FIRSTPERSON ) )
         {
             // Grab the active cam
             CCamera* pCamera = g_pGame->GetCamera ();
@@ -4091,6 +4266,9 @@ bool CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
             // Jax: advance along the line 2 units (seems to decrease the chance of corrupt bullet vectors)
             vecOrigin += ( vecFront * 2.0f );
             vecTarget = vecOrigin + ( vecFront * fRange );
+
+            // Apply shoot through walls fix
+            vecOrigin = AdjustShotOriginForWalls ( vecOrigin, vecTarget, 2.5f );
         }
         else
         { 
@@ -4106,6 +4284,8 @@ bool CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
             else if ( Controller.RightShoulder1 == 255 )    // First-person weapons, crosshair active: sync the crosshair
             {
                 g_pGame->GetCamera ()->Find3rdPersonCamTargetVector ( fRange, &vecGunMuzzle, &vecOrigin, &vecTarget );
+                // Apply shoot through walls fix
+                vecOrigin = AdjustShotOriginForWalls ( vecOrigin, vecTarget, 0.5f );
             }
             else if ( pVehicle )                            // Drive-by/vehicle weapons: camera origin as origin, performing collision tests
             {
@@ -4159,6 +4339,44 @@ bool CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
     if ( fAimX ) *fAimX = m_shotSyncData->m_fArmDirectionX;
     if ( fAimY ) *fAimY = m_shotSyncData->m_fArmDirectionY;
     return true;
+}
+
+
+//
+// Fix firing through walls by pulling back shot origin when next to a wall
+//
+CVector CClientPed::AdjustShotOriginForWalls ( const CVector& vecOrigin, const CVector& vecTarget, float fMaxPullBack )
+{
+    CVector vecResultOrigin = vecOrigin;
+
+    // Do a short line of sight check from the max pullback position
+    CVector vecFront = ( vecTarget - vecOrigin );
+    vecFront.Normalize ();
+    CVector vecTempOrigin = vecOrigin - vecFront * fMaxPullBack;
+    CVector vecTempTarget = vecOrigin + vecFront * 1;
+
+    g_pGame->GetWorld ()->IgnoreEntity ( m_pPlayerPed );
+    CColPoint* pCollision;   
+    bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecTempOrigin, &vecTempTarget, &pCollision, NULL );
+    g_pGame->GetWorld ()->IgnoreEntity ( NULL );
+
+    if ( pCollision )
+    {
+        if ( bCollision )
+        {
+            float fDist = ( *pCollision->GetPosition() - vecTempOrigin ).Length ();
+
+            if ( fDist < fMaxPullBack )
+            {
+                // If wall is hit, move origin back to the wall
+                float fFrontMul = fDist - fMaxPullBack;
+                vecResultOrigin = vecOrigin + ( vecFront * fFrontMul );
+            }
+        }
+        pCollision->Destroy();
+    }
+
+    return vecResultOrigin;
 }
 
 
@@ -4566,7 +4784,7 @@ void CClientPed::Respawn ( CVector * pvecPosition, bool bRestoreState, bool bCam
 }
 
 
-char* CClientPed::GetBodyPartName ( unsigned char ucID )
+const char* CClientPed::GetBodyPartName ( unsigned char ucID )
 {
     if ( ucID <= 10 )
     {
@@ -4695,8 +4913,10 @@ void CClientPed::UpdateTargetPosition ( void )
         // Check if the distance to interpolate is too far.
         CVector vecVelocity;
         GetMoveSpeed ( vecVelocity );
-        float fThreshold = ( PED_INTERPOLATION_WARP_THRESHOLD + PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED * vecVelocity.Length () ) * g_pGame->GetGameSpeed ();
-        if ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () > fThreshold )
+        float fThreshold = ( PED_INTERPOLATION_WARP_THRESHOLD + PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED * vecVelocity.Length () ) * g_pGame->GetGameSpeed () * TICK_RATE / 100;
+
+        // There is a reason to have this condition this way: To prevent NaNs generating new NaNs after interpolating (Comparing with NaNs always results to false).
+        if ( ! ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () <= fThreshold ) )
         {
             // Abort all interpolation
             m_interp.pos.ulFinishTime = 0;
@@ -4934,26 +5154,12 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
     // Are we streamed in?
     if ( m_pPlayerPed )
     {  
-        bool bLoaded = true;
-        
         if( !pBlock->IsLoaded() )
         {
-            int iTimeToWait = 50;
-
-            g_pGame->GetStreaming()->RequestAnimations( pBlock->GetIndex(), 4 );
-            g_pGame->GetStreaming()->LoadAllRequestedModels( );
-
-            while( !pBlock->IsLoaded() && iTimeToWait != 0 )
-            {
-                iTimeToWait--;
-                Sleep(10);
-            }
-
-            if( iTimeToWait == 0 )
-                bLoaded = false;
+            pBlock->Request ( BLOCKING, true );
         }
 
-        if ( bLoaded )
+        if ( pBlock->IsLoaded() )
         {
             int flags = 0x10; // // Stops jaw fucking up, some speaking flag maybe   
             if ( bLoop ) flags |= 0x2; // flag that triggers the loop (Maccer)
@@ -4981,14 +5187,18 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
         }
         else
         {
+            SString strMessage ( "%s %d (%s)", pBlock->GetName (), pBlock->GetIndex (), szAnimName ); 
+            g_pCore->LogEvent ( 543, "Blocking anim load fail", "", strMessage );
+            AddReportLog ( 5431, SString ( "Failed to load animation %s", *strMessage ) );           
+/*
             // TODO: unload unreferenced blocks later on
             g_pGame->GetStreaming ()->RequestAnimations ( pBlock->GetIndex (), 8 );
             m_bRequestedAnimation = true;
+*/
         }
     }
     m_pAnimationBlock = pBlock;
-    m_szAnimationName = new char [ strlen ( szAnimName ) + 1 ];
-    strcpy ( m_szAnimationName, szAnimName ); 
+    m_strAnimationName = szAnimName; 
     m_iTimeAnimation = iTime;
     m_bLoopAnimation = bLoop;
     m_bUpdatePositionAnimation = bUpdatePosition;
@@ -5014,11 +5224,7 @@ void CClientPed::KillAnimation ( void )
         }
     }
     m_pAnimationBlock = NULL;
-    if ( m_szAnimationName )
-    {
-        delete [] m_szAnimationName;
-        m_szAnimationName = NULL;
-    }
+    m_strAnimationName = "";
     m_bRequestedAnimation = false;
 }
 
@@ -5343,7 +5549,7 @@ void CClientPed::HandleWaitingForGroundToLoad ( void )
         // If not near any MTA objects, then don't bother waiting
         SetFrozenWaitingForGroundToLoad ( false );
         #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-            OutputDebugLine ( "  FreezeUntilCollisionLoaded - Early stop" );
+            OutputDebugLine ( "[AsyncLoading]   FreezeUntilCollisionLoaded - Early stop" );
         #endif 
         return;
     }
@@ -5355,7 +5561,7 @@ void CClientPed::HandleWaitingForGroundToLoad ( void )
 
     // Load load load
     if ( GetModelInfo () )
-        g_pGame->GetStreaming()->LoadAllRequestedModels ();
+        g_pGame->GetStreaming()->LoadAllRequestedModels ( false, "CClientPed::HandleWaitingForGroundToLoad" );
 
     // Start out with a fairly big radius to check, and shrink it down over time
     float fUseRadius = 50.0f * ( 1.f - Max ( 0.f, m_fObjectsAroundTolerance ) );
@@ -5408,7 +5614,7 @@ void CClientPed::HandleWaitingForGroundToLoad ( void )
     }
 
     #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-        OutputDebugLine ( status );
+        OutputDebugLine ( SStringX ( "[AsyncLoading] " ) ++ status );
         g_pCore->GetGraphics ()->DrawText ( 10, 220, -1, 1, status );
 
         std::vector < SString > lineList;

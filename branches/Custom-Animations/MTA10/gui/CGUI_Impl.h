@@ -67,6 +67,7 @@ public:
                                     ~CGUI_Impl                  ( void );
 
     void                            SetSkin                     ( const char* szName );
+    void                            SetBidiEnabled              ( bool bEnabled );
 
     void                            Draw                        ( void );
     void                            Invalidate                  ( void );
@@ -82,10 +83,9 @@ public:
     bool                            GetGUIInputEnabled          ( void );
     void                            SetGUIInputMode             ( eInputMode a_eMode );
     eInputMode                      GetGUIInputMode             ( void ); 
-    eInputMode                      GetInputModeFromString      ( const std::string& a_rstrMode ) const;
-    bool                            GetStringFromInputMode      ( eInputMode a_eMode, std::string& a_rstrResult ) const;
-    static CEGUI::String            GetUTFString                ( std::string strInput );
-    static CEGUI::String            GetUTFString                ( std::wstring strInput );
+    static CEGUI::String            GetUTFString                ( const char* szInput );
+    static CEGUI::String            GetUTFString                ( const std::string& strInput );
+    static CEGUI::String            GetUTFString                ( const CEGUI::String& strInput );      // Not defined
 
     //
     CGUIMessageBox*                 CreateMessageBox            ( const char* szTitle, const char* szMessage, unsigned int uiFlags );
@@ -124,8 +124,9 @@ public:
     CGUITabPanel*                   CreateTabPanel              ( CGUITab* pParent );
     CGUITabPanel*                   CreateTabPanel              ( void );
 
-    CGUIScrollPane*                 CreateScrollPane            ( CGUIElement* pParent = NULL );
-    CGUIScrollPane*                 CreateScrollPane            ( CGUITab* pParent = NULL );
+    CGUIScrollPane*                 CreateScrollPane            ( CGUIElement* pParent );
+    CGUIScrollPane*                 CreateScrollPane            ( CGUITab* pParent );
+    CGUIScrollPane*                 CreateScrollPane            ( void );
 
     CGUIScrollBar*                  CreateScrollBar             ( bool bHorizontal, CGUIElement* pParent = NULL );
     CGUIScrollBar*                  CreateScrollBar             ( bool bHorizontal, CGUITab* pParent = NULL );
@@ -227,6 +228,7 @@ private:
     CGUIComboBox*                   _CreateComboBox             ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "" );
 	
     void                            SubscribeToMouseEvents();
+    CGUIFont*                       CreateFntFromWinFont        ( const char* szFontName, const char* szFontWinReg, const char* szFontWinFile, unsigned int uSize = 8, unsigned int uFlags = 0, bool bAutoScale = false );
 
     IDirect3DDevice9*               m_pDevice;
 

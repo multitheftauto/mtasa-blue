@@ -36,13 +36,8 @@
 #define FUNC_IsOnScreen                                     0x534540
 #define FUNC_IsVisible                                      0x536BC0
 
-
-
 // not in CEntity really
 #define FUNC_RpAnimBlendClumpGetAssociation                 0x4D6870
-
-// replace with enum from R*
-#define STATUS_ABANDONED                    4
 
 class CEntitySAInterfaceVTBL
 {   
@@ -75,10 +70,51 @@ public:
 /** 
  * \todo Move CReferences (and others below?) into it's own file
  */
+class CReference
+{
+public:
+    CReference * pNext;
+    class CEntitySAInterface ** ppEntity;
+};
+
 class CReferences
 {
-    CEntity     * pEntity;
+public:
+    CReference m_refs[3000];
+    CReference *m_pFreeList;
 };
+
+class CMatrixEx
+{
+public:
+    CMatrix_Padded matrix;
+    CMatrix * pMatrix; // usually not initialized
+    void * haveRwMatrix; // unknown pointer
+};
+
+class XYZ
+{
+public:
+    CMatrixEx matrix;
+    class CPlaceableSAInterface * pRef;
+    XYZ * pPrev;
+    XYZ * pNext;
+};
+C_ASSERT(sizeof(XYZ) == 0x54);
+
+class XYZStore
+{
+public:
+    XYZ head;
+    XYZ tail;
+    XYZ allocatedListHead;
+    XYZ allocatedListTail;
+    XYZ freeListHead;
+    XYZ freeListTail;
+    XYZ * pPool;
+};
+C_ASSERT(sizeof(XYZStore) == 0x1FC);
+
 
 class CSimpleTransformSAInterface   // 16 bytes
 {
@@ -91,10 +127,8 @@ class CPlaceableSAInterface // 20 bytes
 {
 public:
     CSimpleTransformSAInterface     m_transform;
-    CMatrix_Padded                  * matrix;
+    CMatrix_Padded                  * matrix; // This is actually XYZ*, change later
 };
-
-class CEntitySAInterface;
 
 class CEntitySAInterface
 {
@@ -164,19 +198,54 @@ public:
     BYTE nStatus : 5;               // control status       // 54
     //********* END CEntityInfo **********//
 
-    //58-66 padded
-    BYTE pad[8];
-    BYTE nImmunities;
-    BYTE pad2 [ 1 ];
+	uint8 m_pad0; // 55
 
-    /* IMPORTANT: KEEP "pad" in CVehicle UP-TO-DATE if you add something here (or eventually pad someplace else) */
+    //
+    // Functions to hide member variable misuse
+    //
+
+    // Sets
+    void SetIsLowLodEntity ( void )
+    {
+        numLodChildrenRendered = 0x40;
+    }
+
+    void SetIsHighLodEntity ( void )
+    {
+        numLodChildrenRendered = 0x60;
+    }
+
+    void SetEntityVisibilityResult ( int result )
+    {
+        if ( numLodChildrenRendered & 0x60 )
+            numLodChildrenRendered = ( numLodChildrenRendered & 0x60 ) | ( result & 0x1f );
+    }
+
+    // Gets
+    bool IsLowLodEntity ( void ) const
+    {
+        return ( numLodChildrenRendered & 0x60 ) == 0x40;
+    }
+
+    bool IsHighLodEntity ( void ) const
+    {
+        return ( numLodChildrenRendered & 0x60 ) == 0x60;
+    }
+
+    int GetEntityVisibilityResult ( void ) const
+    {
+        if ( numLodChildrenRendered & 0x60 )
+            return numLodChildrenRendered & 0x1f;
+        return -1;
+    }
 };
+C_ASSERT(sizeof(CEntitySAInterface) == 0x38);
 
 class CEntitySA : public virtual CEntity
 {
     friend class COffsets;
 public:
-                                CEntitySA           ( void ) { m_pStoredPointer = NULL; m_ulArrayID = 0; };
+                                CEntitySA           ( void );
 
     CEntitySAInterface*         m_pInterface;
 
@@ -198,12 +267,16 @@ public:
     void                        SetUnderwater ( bool bUnderwater );
     bool                        GetUnderwater ( void );
 
-    CVector                     * GetPosition (  );
-    CMatrix                     * GetMatrix ( CMatrix * matrix ) const;
-    VOID                        SetMatrix ( CMatrix * matrix );
+    virtual void                RestoreLastGoodPhysicsState ( void );
+    CVector*                    GetPosition                 ( void );
+    CVector*                    GetPositionInternal         ( void );
+    CMatrix*                    GetMatrix                   ( CMatrix* matrix );
+    CMatrix*                    GetMatrixInternal           ( CMatrix* matrix );
+    VOID                        SetMatrix                   ( CMatrix* matrix );
     WORD                        GetModelIndex ();
     eEntityType                 GetEntityType ();
     bool                        IsOnScreen ();
+    bool                        IsFullyVisible ();
 
     bool                        IsVisible ( void );
     void                        SetVisible ( bool bVisible );
@@ -212,9 +285,7 @@ public:
     void                        SetAreaCode ( BYTE areaCode );
 
     FLOAT                       GetDistanceFromCentreOfMassToBaseOfModel();
-    /**
-     * \todo Find enum for SetEntityStatus
-     */
+	
     VOID                        SetEntityStatus( eEntityStatus bStatus );
     eEntityStatus               GetEntityStatus( );
 
@@ -246,8 +317,6 @@ public:
     bool                        IsStaticWaitingForCollision  ( void )        { return m_pInterface->bIsStaticWaitingForCollision; }
     void                        SetStaticWaitingForCollision  ( bool bStatic ) { m_pInterface->bIsStaticWaitingForCollision  = bStatic; }
 
-    void                        GetImmunities   ( bool & bNoClip, bool & bFrozen, bool & bBulletProof, bool & bFlameProof, bool & bUnk, bool & bUnk2, bool & bCollisionProof, bool & bExplosionProof );
-
     inline unsigned long        GetArrayID      ( void ) { return m_ulArrayID; }
     inline void                 SetArrayID      ( unsigned long ulID ) { m_ulArrayID = ulID; }
 
@@ -256,25 +325,31 @@ private:
     static unsigned long        FUNC_RwFrameGetLTM;
 
     unsigned long               m_ulArrayID;
-
-/*  VOID                        InitFlags()
-    {
-        //this->GetInterface()->bIsStaticWaitingForCollision = true;
-        this->GetInterface()->nStatus = 4;
-        
-        DWORD dwThis = (DWORD)this->GetInterface();
-
-        DWORD dwFunc = 0x41D000;
-        _asm
-        {
-            push    dwThis
-            call    dwFunc
-            pop     eax
-        }
-
-    };*/
-
     void*                       m_pStoredPointer;
+    CVector                     m_LastGoodPosition;
 };
+
+
+//
+// Check for various number problems
+//
+inline bool IsValidPositionFloat ( const float f )
+{
+    if ( f < -100000 || f > 100000 || _isnan ( f ) )
+        return false;          
+    return true;
+}
+
+inline bool IsValidPosition ( const CVector& vec )
+{
+    return IsValidPositionFloat ( vec.fX ) && IsValidPositionFloat ( vec.fY ) && IsValidPositionFloat ( vec.fZ );
+}
+
+inline bool IsValidMatrix ( const CMatrix& mat )
+{
+    return IsValidPosition ( mat.vPos )
+        && IsValidPosition ( mat.vFront );
+}
+
 
 #endif

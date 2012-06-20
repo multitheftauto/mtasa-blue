@@ -26,10 +26,10 @@ int CLuaFunctionDefs::GetBodyPartName ( lua_State* luaVM )
     {
         unsigned char ucID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
 
-        char szBuffer [256];
-        if ( CStaticFunctionDefinitions::GetBodyPartName ( ucID, szBuffer ) )
+        SString strBuffer;
+        if ( CStaticFunctionDefinitions::GetBodyPartName ( ucID, strBuffer ) )
         {
-            lua_pushstring ( luaVM, szBuffer );
+            lua_pushstring ( luaVM, strBuffer );
             return 1;
         }
     }
@@ -51,11 +51,11 @@ int CLuaFunctionDefs::GetClothesByTypeIndex ( lua_State* luaVM )
         unsigned char ucType = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
         unsigned char ucIndex = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
 
-        char szTexture [ 128 ], szModel [ 128 ];
-        if ( CStaticFunctionDefinitions::GetClothesByTypeIndex ( ucType, ucIndex, szTexture, szModel ) )
+        SString strTexture, strModel;
+        if ( CStaticFunctionDefinitions::GetClothesByTypeIndex ( ucType, ucIndex, strTexture, strModel ) )
         {
-            lua_pushstring ( luaVM, szTexture );
-            lua_pushstring ( luaVM, szModel );
+            lua_pushstring ( luaVM, strTexture );
+            lua_pushstring ( luaVM, strModel );
             return 2;
         }
     }
@@ -77,7 +77,7 @@ int CLuaFunctionDefs::GetTypeIndexFromClothes ( lua_State* luaVM )
             szModel = lua_tostring ( luaVM, 2 );
 
         unsigned char ucType, ucIndex;
-        if ( CStaticFunctionDefinitions::GetTypeIndexFromClothes ( const_cast < char* > ( szTexture ), const_cast < char* > ( szModel ), ucType, ucIndex ) )
+        if ( CStaticFunctionDefinitions::GetTypeIndexFromClothes ( szTexture, szModel, ucType, ucIndex ) )
         {
             lua_pushnumber ( luaVM, ucType );
             lua_pushnumber ( luaVM, ucIndex );
@@ -99,10 +99,10 @@ int CLuaFunctionDefs::GetClothesTypeName ( lua_State* luaVM )
     {
         unsigned char ucType = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
 
-        char szName [ 40 ];
-        if ( CStaticFunctionDefinitions::GetClothesTypeName ( ucType, szName ) )
+        SString strName;
+        if ( CStaticFunctionDefinitions::GetClothesTypeName ( ucType, strName ) )
         {
-            lua_pushstring ( luaVM, szName );
+            lua_pushstring ( luaVM, strName );
             return 1;
         }
     }

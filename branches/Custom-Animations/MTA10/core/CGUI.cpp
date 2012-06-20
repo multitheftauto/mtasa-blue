@@ -37,6 +37,7 @@ CLocalGUI::CLocalGUI ( void )
     m_bChatboxVisible = true;
     m_pDebugViewVisible = false;
     m_bGUIHasInput = false;
+    m_uiActiveCompositionSize = 0;
 
     m_bVisibleWindows = false;
     m_iVisibleWindows = 0;
@@ -147,6 +148,10 @@ void CLocalGUI::CreateWindows ( bool bGameIsAlreadyLoaded )
 
     // Return the old current dir.
     SetCurrentDirectory ( szCurDir );
+
+    // Create our news headlines if we're already ingame
+    if ( bGameIsAlreadyLoaded )
+        m_pMainMenu->GetNewsBrowser()->CreateHeadlines();
 }
 
 
@@ -177,30 +182,6 @@ void CLocalGUI::CreateObjects ( IUnknown* pDevice )
     FileTranslator.GetCurrentWorkingDirectory ( WorkingDirectory );
     GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
     SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
-    
-    // Create graphical wrapper object.
-    WriteDebugEvent ( "Creating renderer wrapper..." );
-    m_pRendererLibrary = new CD3DMGEng ( reinterpret_cast < LPDIRECT3DDEVICE9 > ( pDevice ) );
-
-    // And lot it's fonts
-    WriteDebugEvent ( "Loading font texture..." );
-    if ( m_pRendererLibrary->LoadFontTextureFromFile ( "cgui\\sans.tga" ) )
-    {
-        WriteDebugEvent ( "Font texture load successful!" );
-    }
-    else
-    {
-        WriteDebugEvent ( "Font texture load failure!" );
-    }
-
-    if ( m_pRendererLibrary->LoadFontInfoFromFile ( "cgui\\sans.dat" ) )
-    {
-        WriteDebugEvent ( "Font data load successful!" );
-    }
-    else
-    {
-        WriteDebugEvent ( "Font data load failure!" );
-    }
 
     CreateWindows ( false );
 
@@ -224,14 +205,7 @@ void CLocalGUI::DestroyObjects ( void )
     DestroyWindows ();
 
     // Destroy and NULL all elements
-    SAFE_DELETE ( m_pRendererLibrary );
     SAFE_DELETE ( m_pLabelVersionTag );
-}
-
-
-CD3DMGEng* CLocalGUI::GetRenderingLibrary ( void )
-{
-    return m_pRendererLibrary;
 }
 
 
@@ -299,9 +273,9 @@ void CLocalGUI::Draw ( void )
     UpdateCursor ();
 
     // Draw the chat
-    m_pChat->Draw ();
+    m_pChat->Draw ( true );
     // Draw the debugger
-    m_pDebugView->Draw ();
+    m_pDebugView->Draw ( false );
 
     // If we're not at the loadingscreen
     static bool bDelayedFrame = false;
@@ -339,16 +313,6 @@ void CLocalGUI::Invalidate ( void )
     {
         WriteDebugEvent ( "WARNING: CLocalGUI::Invalidate() called, but CLocalGUI::CreateObjects() isn't!" );
     }
-
-    // Invalidate the renderer library
-    if ( m_pRendererLibrary )
-    {
-        m_pRendererLibrary->OnInvalidateDevice ( );
-    }
-    else
-    {
-        WriteDebugEvent ( "WARNING: CLocalGUI::Invalidate() called, but CLocalGUI::CreateObjects() isn't!" );
-    }
 }
 
 
@@ -374,16 +338,6 @@ void CLocalGUI::Restore ( void )
 
         // Restore the GUI
         pGUI->Restore ();
-
-        // Restore our renderer.
-        if ( m_pRendererLibrary )
-        {
-            m_pRendererLibrary->OnRestoreDevice ( );
-        }
-        else
-        {
-            WriteDebugEvent ( "WARNING: CLocalGUI::Restore() called, but CLocalGUI::CreateObjects() isn't!" );
-        }
 
         // Restore the current directory to default.
         SetCurrentDirectory ( szCurDir );
@@ -704,9 +658,75 @@ bool CLocalGUI::ProcessMessage ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
                 return false;
             }
 
+            case WM_IME_COMPOSITION:
+            {
+                if ( lParam & GCS_RESULTSTR )
+                {
+                    HIMC himc = ImmGetContext ( hwnd );
+
+                    // Get composition result
+                    ushort buffer[256];
+                    LONG numBytes = ImmGetCompositionStringW ( himc, GCS_RESULTSTR, buffer, sizeof ( buffer ) - 2 );
+                    int iNumCharacters = numBytes / sizeof ( ushort );
+
+                    // Erase output from previous composition state
+                    for ( int i = 0 ; i < m_uiActiveCompositionSize ; i++ )
+                    {
+                        pGUI->ProcessCharacter ( '\x08' );
+                        pGUI->ProcessKeyboardInput ( 14, true );
+                    }
+
+                    // Output composition result
+                    for ( int i = 0 ; i < iNumCharacters ; i++ )
+                        if ( buffer[i] )
+                            pGUI->ProcessCharacter ( buffer[i] );
+
+                    ImmReleaseContext ( hwnd, himc );
+
+                    m_uiActiveCompositionSize = 0;
+                }
+                else if( lParam & GCS_COMPSTR ) 
+                {
+                    HIMC himc = ImmGetContext ( hwnd );
+
+                    // Get composition state
+                    ushort buffer[256];
+                    LONG numBytes = ImmGetCompositionStringW ( himc, GCS_COMPSTR, buffer, sizeof ( buffer ) - 2 );
+                    int iNumCharacters = numBytes / sizeof ( ushort );
+
+                    // Erase output from previous composition state
+                    for ( int i = 0 ; i < m_uiActiveCompositionSize ; i++ )
+                    {
+                        pGUI->ProcessCharacter ( '\x08' );
+                        pGUI->ProcessKeyboardInput ( 14, true );
+                    }
+
+                    // Output new composition state
+                    for ( int i = 0 ; i < iNumCharacters ; i++ )
+                        if ( buffer[i] )
+                            pGUI->ProcessCharacter ( buffer[i] );
+
+                    ImmReleaseContext ( hwnd, himc );
+
+                    m_uiActiveCompositionSize = iNumCharacters;
+                }
+            }
+            break;
+
+            case WM_IME_CHAR:
+            case WM_IME_KEYDOWN:
+            {
+                // Stop these here
+                return true;
+            }
+            break;
+
             case WM_CHAR:
+            {
                 pGUI->ProcessCharacter ( wParam );
                 return true;
+            }
+            break;
         }
     }
 

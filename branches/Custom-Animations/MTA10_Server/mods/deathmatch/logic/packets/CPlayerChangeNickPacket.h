@@ -23,15 +23,15 @@ public:
     explicit                CPlayerChangeNickPacket     ( const char* szNewNick );
 
     inline ePacketID        GetPacketID                 ( void ) const          { return PACKET_ID_PLAYER_CHANGE_NICK; };
-    inline unsigned long    GetFlags                    ( void ) const          { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline unsigned long    GetFlags                    ( void ) const          { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
-    inline const char*      GetNewNick                  ( void )                    { return m_szNewNick; };
-    inline void             SetNewNick                  ( const char* szNewNick )   { strncpy ( m_szNewNick, szNewNick, MAX_NICK_LENGTH ); };
+    inline const char*      GetNewNick                  ( void )                    { return m_strNewNick; }
+    inline void             SetNewNick                  ( const char* szNewNick )   { m_strNewNick.AssignLeft( szNewNick, MAX_NICK_LENGTH ); }
 
 private:
-    char                    m_szNewNick [MAX_NICK_LENGTH + 1];
+    SString                 m_strNewNick;
 };
 
 #endif

@@ -55,6 +55,7 @@ namespace
 class CPerfStatLuaMemoryImpl : public CPerfStatLuaMemory
 {
 public:
+    ZERO_ON_NEW
                                 CPerfStatLuaMemoryImpl  ( void );
     virtual                     ~CPerfStatLuaMemoryImpl ( void );
 
@@ -266,6 +267,8 @@ void CPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CPerfStatResult* pResult, const
     pResult->AddColumn ( "Elements" );
     pResult->AddColumn ( "TextDisplays" );
     pResult->AddColumn ( "TextItems" );
+    pResult->AddColumn ( "DB Queries" );
+    pResult->AddColumn ( "DB Connections" );
 
     // Calc totals
     if ( strFilter == "" )
@@ -296,23 +299,28 @@ void CPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CPerfStatResult* pResult, const
 
         row[c++] = SString ( "%d KB", calcedCurrent );
         row[c++] = SString ( "%d KB", calcedMax );
+
+        // Some extra 'all VM' things
+        c += 6;
+        row[c++] = !g_pStats->iDbJobDataCount ? "-" : SString ( "%d", g_pStats->iDbJobDataCount );
+        row[c++] = g_pStats->iDbConnectionCount - 2 == 0 ? "-" : SString ( "%d", g_pStats->iDbConnectionCount - 2 );
     }
 
     // For each VM
     for ( CLuaMainMemoryMap::iterator iter = AllLuaMemory.LuaMainMemoryMap.begin () ; iter != AllLuaMemory.LuaMainMemoryMap.end () ; ++iter )
     {
         CLuaMainMemory& LuaMainMemory = iter->second;
-        SString resname = iter->first->GetScriptNamePointer ();
+        const SString& strResName = iter->first->GetScriptName ();
 
         // Apply filter
-        if ( strFilter != "" && resname.find ( strFilter ) == SString::npos )
+        if ( strFilter != "" && strResName.find ( strFilter ) == SString::npos )
             continue;
 
         // Add row
         SString* row = pResult->AddRow ();
 
         int c = 0;
-        row[c++] = resname;
+        row[c++] = strResName;
 
         if ( labs ( LuaMainMemory.Delta ) >= 1 )
         {

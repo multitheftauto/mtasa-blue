@@ -24,6 +24,7 @@ extern "C"
 ASE* ASE::_instance = NULL;
 
 ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP, bool bLan )
+    : m_QueryDosProtect( 5, 6000, 7000 )        // Max of 5 queries per 6 seconds, then 7 second ignore
 {
     _instance = this;
 
@@ -46,6 +47,9 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     m_lXfireLightMinInterval = 10 * 1000;     // Update XFire light query cache after 10 seconds
 
     m_ulMasterServerQueryCount = 0;
+    m_uiNumQueriesTotal = 0;
+    m_uiNumQueriesPerMinute = 0;
+    m_uiTotalAtMinuteStart = 0;
 
     m_strGameType = "MTA:SA";
     m_strMapName = "None";
@@ -108,13 +112,20 @@ void ASE::DoPulse ( void )
     int nLen = sizeof ( sockaddr );
 #endif
 
-    char szBuffer[2];
-    int iBuffer = 0;
-
-    // We set the socket to non-blocking so we can just keep reading
-    iBuffer = recvfrom ( m_Socket, szBuffer, 1, 0, (sockaddr*)&SockAddr, &nLen );
-    if ( iBuffer > 0 )
+    for ( uint i = 0 ; i < 100 ; i++ )
     {
+        char szBuffer[2];
+
+        // We set the socket to non-blocking so we can just keep reading
+        int iBuffer = recvfrom ( m_Socket, szBuffer, 1, 0, (sockaddr*)&SockAddr, &nLen );
+        if ( iBuffer < 1 )
+            break;
+
+        m_uiNumQueriesTotal++;
+
+        if ( m_QueryDosProtect.AddConnect ( inet_ntoa ( SockAddr.sin_addr ) ) )
+            continue;
+
         std::string strReply;
 
         switch ( szBuffer[0] )
@@ -145,8 +156,6 @@ void ASE::DoPulse ( void )
                 strReply = MTA_DM_ASE_VERSION;
                 break;
             }
-            default:
-                return;
         }
 
         // If our reply buffer isn't empty, send it
@@ -159,6 +168,14 @@ void ASE::DoPulse ( void )
                                 (sockaddr*)&SockAddr,
                                 nLen );
         }
+    }
+
+    // Update stats
+    if ( m_MinuteTimer.Get () >= 60000 )
+    {
+        m_MinuteTimer.Reset ();
+        m_uiNumQueriesPerMinute = m_uiNumQueriesTotal - m_uiTotalAtMinuteStart;
+        m_uiTotalAtMinuteStart = m_uiNumQueriesTotal;
     }
 }
 
@@ -355,6 +372,14 @@ std::string ASE::QueryLight ( void )
     int iJoinedPlayers = m_pPlayerManager->CountJoined ();
     int iMaxPlayers = m_pMainConfig->GetMaxPlayers ();
     SString strPlayerCount = SString ( "%d/%d", iJoinedPlayers, iMaxPlayers );
+    SString strBuildType = SString ( "%d", MTASA_VERSION_TYPE );
+    SString strBuildNumber = SString ( "%d", MTASA_VERSION_BUILD );
+    SFixedString < 32 > strPingStatusFixed;
+    SFixedString < 32 > strNetRouteFixed;
+    g_pNetServer->GetPingStatus ( &strPingStatusFixed );
+    g_pNetServer->GetNetRoute ( &strNetRouteFixed );
+    SString strPingStatus = (const char*)strPingStatusFixed;
+    SString strNetRoute = (const char*)strNetRouteFixed;
 
     reply << "EYE2";
     // game
@@ -369,11 +394,19 @@ std::string ASE::QueryLight ( void )
     // game type
     reply << ( unsigned char ) ( m_strGameType.length() + 1 );
     reply << m_strGameType;
-    // map name with backwardly compatible large player count
-    reply << ( unsigned char ) ( m_strMapName.length() + 1 + strPlayerCount.length () + 1 );
+    // map name with backwardly compatible large player count, build type and build number
+    reply << ( unsigned char ) ( m_strMapName.length() + 1 + strPlayerCount.length () + 1 + strBuildType.length () + 1 + strBuildNumber.length () + 1 + strPingStatus.length () + 1 + strNetRoute.length () + 1 );
     reply << m_strMapName;
     reply << ( unsigned char ) 0;
     reply << strPlayerCount;
+    reply << ( unsigned char ) 0;
+    reply << strBuildType;
+    reply << ( unsigned char ) 0;
+    reply << strBuildNumber;
+    reply << ( unsigned char ) 0;
+    reply << strPingStatus;
+    reply << ( unsigned char ) 0;
+    reply << strNetRoute;
     // version
     std::string temp = MTA_DM_ASE_VERSION;
     reply << ( unsigned char ) ( temp.length() + 1 );
@@ -390,6 +423,10 @@ std::string ASE::QueryLight ( void )
     // players
     CPlayer* pPlayer = NULL;
 
+    // Keep the packet under 1350 bytes to try to avoid fragmentation 
+    int iBytesLeft = 1340 - reply.tellp ();
+    int iPlayersLeft = m_pPlayerManager->CountJoined ();
+
     list < CPlayer* > ::const_iterator pIter = m_pPlayerManager->IterBegin ();
     for ( ; pIter != m_pPlayerManager->IterEnd (); pIter++ )
     {
@@ -400,6 +437,12 @@ std::string ASE::QueryLight ( void )
             std::string strPlayerName = RemoveColorCode ( pPlayer->GetNick () );
             if ( strPlayerName.length () == 0 )
                 strPlayerName = pPlayer->GetNick ();
+
+            // Check if we can fit more names
+            iBytesLeft -= strPlayerName.length () + 1;
+            if ( iBytesLeft < iPlayersLeft-- )
+                strPlayerName = "";
+
             reply << ( unsigned char ) ( strPlayerName.length () + 1 );
             reply << strPlayerName.c_str ();
         }
@@ -417,18 +460,26 @@ CLanBroadcast* ASE::InitLan ( void )
 
 void ASE::SetGameType ( const char * szGameType )
 {
-    m_strGameType = szGameType;
+    m_strGameType = SStringX ( szGameType ).Left ( MAX_ASE_GAME_TYPE_LENGTH );
 }
 
 
 void ASE::SetMapName ( const char * szMapName )
 {
-    m_strMapName = szMapName;
+    m_strMapName = SStringX ( szMapName ).Left ( MAX_ASE_MAP_NAME_LENGTH );
 }
 
 
 const char* ASE::GetRuleValue ( const char* szKey )
 {
+    // Limit szKey length
+    SString strKeyTemp;
+    if ( szKey && strlen ( szKey ) > MAX_RULE_KEY_LENGTH )
+    {
+        strKeyTemp = SStringX ( szKey ).Left ( MAX_RULE_KEY_LENGTH );
+        szKey = *strKeyTemp;
+    }
+
     list < CASERule* > ::iterator iter = m_Rules.begin ();
     for ( ; iter != m_Rules.end () ; iter++ )
     {
@@ -443,8 +494,24 @@ const char* ASE::GetRuleValue ( const char* szKey )
 
 void ASE::SetRuleValue ( const char* szKey, const char* szValue )
 {
+    // Limit szKey length
+    SString strKeyTemp;
+    if ( szKey && strlen ( szKey ) > MAX_RULE_KEY_LENGTH )
+    {
+        strKeyTemp = SStringX ( szKey ).Left ( MAX_RULE_KEY_LENGTH );
+        szKey = *strKeyTemp;
+    }
+
     if ( szKey && szKey [ 0 ] )
     {
+        // Limit szValue to 200 characters
+        SString strValueTemp;
+        if ( szValue && strlen ( szValue ) > MAX_RULE_VALUE_LENGTH )
+        {
+            strValueTemp = SStringX ( szValue ).Left ( MAX_RULE_VALUE_LENGTH );
+            szValue = *strValueTemp;
+        }
+
         list < CASERule* > ::iterator iter = m_Rules.begin ();
         for ( ; iter != m_Rules.end () ; iter++ )
         {
@@ -472,6 +539,14 @@ void ASE::SetRuleValue ( const char* szKey, const char* szValue )
 
 bool ASE::RemoveRuleValue ( const char* szKey )
 {
+    // Limit szKey length
+    SString strKeyTemp;
+    if ( szKey && strlen ( szKey ) > MAX_RULE_KEY_LENGTH )
+    {
+        strKeyTemp = SStringX ( szKey ).Left ( MAX_RULE_KEY_LENGTH );
+        szKey = *strKeyTemp;
+    }
+
     list < CASERule* > ::iterator iter = m_Rules.begin ();
     for ( ; iter != m_Rules.end () ; iter++ )
     {

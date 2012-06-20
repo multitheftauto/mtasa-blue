@@ -56,6 +56,7 @@ int CLuaFunctionDefs::EngineLoadCOL ( lua_State* luaVM )
                 {
                     // Delete it again. We failed
                     delete pCol;
+                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", "engineLoadCOL", *strFile ) );
                 }
             }
             else
@@ -84,10 +85,10 @@ int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
             
             SString strPath;
             // Is this a legal filepath?
-            if ( lua_istype ( luaVM, 2, LUA_TNUMBER ) && CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+            if ( ( lua_istype ( luaVM, 2, LUA_TNUMBER ) || lua_istype ( luaVM, 2, LUA_TSTRING ) ) && CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
             {
                 // Check the model ID
-                unsigned short usModelID = static_cast < unsigned short > ( lua_tonumber ( luaVM, 2 ) );
+                unsigned short usModelID = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 2 ) );
                 if ( usModelID == 0 || CClientDFFManager::IsReplacableModel ( usModelID ) )
                 {
                     // Grab the resource root entity
@@ -110,6 +111,7 @@ int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
                     {
                         // Delete it again
                         delete pDFF;
+                        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", "engineLoadDFF", *strFile ) );
                     }
                 }
                 else
@@ -168,6 +170,7 @@ int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
                 {
                     // Delete it again
                     delete pTXD;
+                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", "engineLoadTXD", *strFile ) );
                 }
             }
             else
@@ -185,7 +188,7 @@ int CLuaFunctionDefs::EngineReplaceCOL ( lua_State* luaVM )
 {
     // Grab the DFF and model ID
     CClientColModel* pCol = ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) ? lua_tocolmodel ( luaVM, 1 ) : NULL );
-    unsigned short usModel = ( lua_istype ( luaVM, 2, LUA_TNUMBER ) ? ( static_cast < unsigned short > ( lua_tonumber ( luaVM, 2 ) ) ) : 0 );
+    unsigned short usModel = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 2 ) );
 
     // Valid collision model?
     if ( pCol )
@@ -218,7 +221,7 @@ int CLuaFunctionDefs::EngineRestoreCOL ( lua_State* luaVM )
     int iArgument1 = lua_type ( luaVM, 1 );
     if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
     {
-        unsigned short usModelID = static_cast < unsigned short > ( lua_tonumber ( luaVM, 1 ) );
+        unsigned short usModelID = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 1 ) );
 
         if ( m_pColModelManager->RestoreModel ( usModelID ) )
         {
@@ -240,7 +243,7 @@ int CLuaFunctionDefs::EngineImportTXD ( lua_State* luaVM )
 {
     // Grab the TXD and the model ID
     CClientTXD* pTXD = ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) ? lua_totxd ( luaVM, 1 ) : NULL );
-    unsigned short usModelID = ( lua_istype ( luaVM, 2, LUA_TNUMBER ) ? ( static_cast < unsigned short > ( lua_tonumber ( luaVM, 2 ) ) ) : 0 );
+    unsigned short usModelID = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 2 ) );
 
     // Valid txd?
     if ( pTXD )
@@ -272,7 +275,7 @@ int CLuaFunctionDefs::EngineReplaceModel ( lua_State* luaVM )
 {
     // Grab the DFF and model ID
     CClientDFF* pDFF = ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) ? lua_todff ( luaVM, 1 ) : NULL );
-    unsigned short usModelID = ( lua_istype ( luaVM, 2, LUA_TNUMBER ) ? ( static_cast < unsigned short > ( lua_tonumber ( luaVM, 2 ) ) ) : 0 );
+    unsigned short usModelID = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 2 ) );
 
     // Valid client DFF?
     if ( pDFF )
@@ -302,7 +305,7 @@ int CLuaFunctionDefs::EngineReplaceModel ( lua_State* luaVM )
 int CLuaFunctionDefs::EngineRestoreModel ( lua_State* luaVM )
 {
     // Grab the model ID
-    unsigned short usModelID = ( lua_istype ( luaVM, 1, LUA_TNUMBER ) ? ( static_cast < unsigned short > ( lua_tonumber ( luaVM, 1 ) ) ) : 0 );
+    unsigned short usModelID = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 1 ) );
 
     // Valid client DFF and model?
     if ( CClientDFFManager::IsReplacableModel ( usModelID )  )
@@ -333,7 +336,7 @@ int CLuaFunctionDefs::EngineSetModelLODDistance ( lua_State* luaVM )
     if ( ( iArgument1 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
     {
-        unsigned short usModelID = static_cast < unsigned short > ( lua_tonumber ( luaVM, 1 ) );
+        unsigned short usModelID = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 1 )  );
         float fDistance = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
         CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModelID );
         if ( pModelInfo && fDistance > 0.0f )
@@ -557,3 +560,178 @@ int CLuaFunctionDefs::EngineReplaceVehiclePart ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::EngineApplyShaderToWorldTexture ( lua_State* luaVM )
+{
+//  bool engineApplyShaderToWorldTexture ( element shader, string textureName, [ element targetElement ] )
+    CClientShader* pShader; SString strTextureNameMatch; CClientEntity* pElement;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pShader );
+    argStream.ReadString ( strTextureNameMatch );
+    argStream.ReadUserData ( pElement, NULL );
+
+    if ( !argStream.HasErrors () )
+    {
+        bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->ApplyShaderItemToWorldTexture ( pShader->GetShaderItem (), strTextureNameMatch, pElement );
+        lua_pushboolean ( luaVM, bResult );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineApplyShaderToWorldTexture", *argStream.GetErrorMessage () ) );
+
+    // We failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::EngineRemoveShaderFromWorldTexture ( lua_State* luaVM )
+{
+//  bool engineRemoveShaderFromWorldTexture ( element shader, string textureName, [ element targetElement ] )
+    CClientShader* pShader; SString strTextureNameMatch; CClientEntity* pElement;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pShader );
+    argStream.ReadString ( strTextureNameMatch );
+    argStream.ReadUserData ( pElement, NULL );
+
+    if ( !argStream.HasErrors () )
+    {
+        bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->RemoveShaderItemFromWorldTexture ( pShader->GetShaderItem (), strTextureNameMatch, pElement );
+        lua_pushboolean ( luaVM, bResult );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineRemoveShaderFromWorldTexture", *argStream.GetErrorMessage () ) );
+
+    // We failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::EngineGetModelNameFromID ( lua_State* luaVM )
+{
+//  string engineGetModelNameFromID ( int modelID )
+    int iModelID;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( iModelID );
+
+    if ( !argStream.HasErrors () )
+    {
+        SString strModelName = CModelNames::GetModelName ( iModelID );
+        if ( !strModelName.empty () )
+        {
+            lua_pushstring ( luaVM, strModelName );
+            return 1;
+        }
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetModelNameFromID", "Expected valid model ID at argument 1" ) );
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetModelNameFromID", *argStream.GetErrorMessage () ) );
+
+    // We failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::EngineGetModelIDFromName ( lua_State* luaVM )
+{
+    //  int engineGetModelIDFromName ( string modelName )
+    SString strModelName;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strModelName );
+
+    if ( !argStream.HasErrors () )
+    {
+        int iModelID = CModelNames::GetModelID ( strModelName );
+        if ( iModelID )
+        {
+            lua_pushnumber ( luaVM, iModelID );
+            return 1;
+        }
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetModelIDFromName", "Expected valid model name at argument 1" ) );
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetModelIDFromName", *argStream.GetErrorMessage () ) );
+
+    // We failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+// Only works if the model is loaded. EngineGetVisibleTextureNames should be used instead
+int CLuaFunctionDefs::EngineGetModelTextureNames ( lua_State* luaVM )
+{
+//  table engineGetModelTextureNames ( string modelName )
+    SString strModelName;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strModelName, "" );
+
+    if ( !argStream.HasErrors () )
+    {
+        ushort usModelID = CModelNames::ResolveModelID ( strModelName );
+        if ( usModelID )
+        {
+            std::vector < SString > nameList;
+            g_pGame->GetRenderWare ()->GetModelTextureNames ( nameList, usModelID );
+
+            lua_newtable ( luaVM );
+            for ( uint i = 0 ; i < nameList.size () ; i++ )
+            {                
+                lua_pushnumber ( luaVM, i + 1 );
+                lua_pushstring ( luaVM, nameList [ i ] );
+                lua_settable ( luaVM, -3 );
+            }
+            return 1;
+        }
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetModelTextureNames", "Expected valid model ID or name at argument 1" ) );
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetModelTextureNames", *argStream.GetErrorMessage () ) );
+
+    // We failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::EngineGetVisibleTextureNames ( lua_State* luaVM )
+{
+//  table engineGetVisibleTextureNames ( string wildcardMatch = "*" [, string modelName )
+    SString strTextureNameMatch; SString strModelName;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strTextureNameMatch, "*" );
+    argStream.ReadString ( strModelName, "" );
+
+    if ( !argStream.HasErrors () )
+    {
+        ushort usModelID = CModelNames::ResolveModelID ( strModelName );
+        if ( usModelID || strModelName == "" )
+        {
+            std::vector < SString > nameList;
+            g_pCore->GetGraphics ()->GetRenderItemManager ()->GetVisibleTextureNames ( nameList, strTextureNameMatch, usModelID );
+
+            lua_newtable ( luaVM );
+            for ( uint i = 0 ; i < nameList.size () ; i++ )
+            {                
+                lua_pushnumber ( luaVM, i + 1 );
+                lua_pushstring ( luaVM, nameList [ i ] );
+                lua_settable ( luaVM, -3 );
+            }
+            return 1;
+        }
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetVisibleTextureNames", "Expected valid model ID or name at argument 1" ) );
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetVisibleTextureNames", *argStream.GetErrorMessage () ) );
+
+    // We failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

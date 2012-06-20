@@ -19,10 +19,10 @@
 
 #include "StdInc.h"
 
-int CLuaFunctionDefs::GetCameraView ( lua_State* luaVM )
+int CLuaFunctionDefs::GetCameraViewMode ( lua_State* luaVM )
 {
     unsigned short ucMode;
-    if ( CStaticFunctionDefinitions::GetCameraView ( ucMode ) )
+    if ( CStaticFunctionDefinitions::GetCameraViewMode ( ucMode ) )
     {
         lua_pushnumber ( luaVM, ucMode );
         return 1;
@@ -98,6 +98,22 @@ int CLuaFunctionDefs::GetCameraGoggleEffect ( lua_State *luaVM )
 }
 
 
+int CLuaFunctionDefs::GetCameraRotation ( lua_State* luaVM )
+{
+	float fX, fY;
+
+	if ( CStaticFunctionDefinitions::GetCameraRotation( fX, fY ) )
+	{
+		lua_pushnumber( luaVM, fmod( ConvertRadiansToDegrees( fX ) + 90.0f, 360.0f ) );
+		lua_pushnumber( luaVM, fmod( ConvertRadiansToDegrees( fY ) + 90.0f, 360.0f ) );
+		return 2;
+	}
+	
+	lua_pushboolean( luaVM, false );
+	return 1;
+}
+
+
 int CLuaFunctionDefs::SetCameraMatrix ( lua_State* luaVM )
 {
     // Verify the parameter types
@@ -157,6 +173,28 @@ int CLuaFunctionDefs::SetCameraMatrix ( lua_State* luaVM )
 
     lua_pushboolean ( luaVM, false );
     return 1;
+}
+
+
+int CLuaFunctionDefs::SetCameraRotation ( lua_State* luaVM )
+{
+	if ( lua_type( luaVM, 1 ) == LUA_TNUMBER && lua_type( luaVM, 2 ) == LUA_TNUMBER )
+	{
+		float
+			fX = static_cast < float > ( lua_tonumber( luaVM, 1 ) ),
+			fY = static_cast < float > ( lua_tonumber( luaVM, 2 ) );
+			
+		if ( CStaticFunctionDefinitions::SetCameraRotation( ConvertDegreesToRadians( fmod( fX - 90.0f, 360.f ) ), ConvertDegreesToRadiansNoWrap( fmod( fY, 360.0f ) - 90.0f ) ) )
+        {
+            lua_pushboolean( luaVM, true );
+            return 1;
+        }
+	}
+	else
+		m_pScriptDebugging->LogBadType( luaVM, "setCameraRotation" );
+	
+	lua_pushboolean( luaVM, false );
+	return 1;
 }
 
 
@@ -267,11 +305,11 @@ int CLuaFunctionDefs::SetCameraClip ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::SetCameraView ( lua_State* luaVM )
+int CLuaFunctionDefs::SetCameraViewMode ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
     {
-        CStaticFunctionDefinitions::SetCameraView ( static_cast <unsigned short> ( lua_tonumber ( luaVM, 1 ) ) );
+        CStaticFunctionDefinitions::SetCameraViewMode ( static_cast <unsigned short> ( lua_tonumber ( luaVM, 1 ) ) );
 
         lua_pushboolean ( luaVM, true );
         return 1;

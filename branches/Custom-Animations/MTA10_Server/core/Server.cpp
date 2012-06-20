@@ -28,6 +28,11 @@ CThreadCommandQueue g_CommandQueue;
 
 MTAEXPORT int Run ( int iArgumentCount, char* szArguments [] )
 {
+    #ifdef WIN32
+        // Disable critical error message boxes
+        SetErrorMode ( SEM_FAILCRITICALERRORS );
+    #endif
+
     // Create the server
     #ifdef WIN32
         CServerImpl Server ( &g_CommandQueue );

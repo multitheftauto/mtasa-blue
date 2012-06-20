@@ -27,7 +27,7 @@ class CPlayer;
 #include "CPad.h"
 #include "CObject.h"
 #include "packets/CPacket.h"
-
+#include "packets/CPlayerStatsPacket.h"
 class CKeyBinds;
 class CPlayerCamera;
 
@@ -38,19 +38,65 @@ enum
     STATUS_JOINED,
 };
 
+enum eVoiceState
+{
+    VOICESTATE_IDLE = 0,
+    VOICESTATE_TRANSMITTING,
+};
+
+#define MOVEMENT_UPDATE_THRESH      (5)
+#define DISTANCE_FOR_NEAR_VIEWER    (310)
+
+struct SViewerInfo
+{
+    SViewerInfo ( void )
+        : iMoveToFarCountDown ( 0 )
+        , iPrevZone ( 0 )
+        , iZone ( 0 )
+        , llLastUpdateTime ( 0 )
+        , bPrevIsNearForKeySync ( false )
+        , bPrevIsNearForBulletSync ( false )
+    {}
+
+    int iMoveToFarCountDown;
+
+    // Used in puresync
+    int iPrevZone;
+    int iZone;
+    long long llLastUpdateTime;
+
+    bool bPrevIsNearForKeySync;         // Used in keysync
+    bool bPrevIsNearForBulletSync;      // Used in bulletsync
+};
+
+#ifdef WIN32
+    typedef CFastHashMap < CPlayer*, SViewerInfo > SViewerMapType;
+#else
+    typedef std::map < CPlayer*, SViewerInfo > SViewerMapType;
+#endif
+
+
+struct SScreenShotInfo
+{
+    bool        bInProgress;
+    ushort      usNextPartNumber;
+    ushort      usScreenShotId;
+    long long   llTimeStamp;
+    uint        uiTotalBytes;
+    ushort      usTotalParts;
+    SString     strResourceName;
+    SString     strTag;
+    CBuffer     buffer;
+};
+
+
 class CPlayer : public CPed, public CClient
 {
     friend class CElement;
     friend class CScriptDebugging;
 
-    struct sPlayerSyncData
-    {
-        CPlayer*        pPlayer;
-        unsigned long   ulLastSent;
-        unsigned long   ulSwitchingToSlowSyncRate;
-    };
-
 public:
+    ZERO_ON_NEW
                                                 CPlayer                     ( class CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket );
                                                 ~CPlayer                    ( void );
 
@@ -65,7 +111,7 @@ public:
     inline int                                  GetClientType               ( void )                                { return CClient::CLIENT_PLAYER; };
     inline unsigned long                        GetTimeConnected            ( void ) const                          { return m_ulTimeConnected; };
 
-    inline const char*                          GetNick                     ( void )                                { return m_szNick; };
+    inline const char*                          GetNick                     ( void )                                { return m_strNick; };
     void                                        SetNick                     ( const char* szNick );
 
     inline int                                  GetGameVersion              ( void )                                { return m_iGameVersion; };
@@ -104,10 +150,11 @@ public:
     inline void                                 SetAkimboArmUp              ( bool bUp )                    { m_bAkimboArmUp = bUp; };
 
     inline NetServerPlayerID&                   GetSocket                   ( void )                        { return m_PlayerSocket; };
-    char*                                       GetSourceIP                 ( char* pBuffer );
-    inline unsigned long                        GetSourceIP                 ( void )                        { return m_PlayerSocket.GetBinaryAddress (); };
+    const char*                                 GetSourceIP                 ( void );
     inline unsigned short                       GetSourcePort               ( void )                        { return m_PlayerSocket.GetPort (); };
-    inline unsigned int                         GetPing                     ( void )                        { return g_pNetServer->GetPing ( m_PlayerSocket ); };
+
+    void                                        SetPing                     ( uint uiPing )                 { m_uiPing = uiPing; }
+    unsigned int                                GetPing                     ( void )                        { return m_uiPing; }
 
     inline unsigned char                        GetLoginAttempts            ( void )                        { return m_ucLoginAttempts; };
     inline void                                 SetLoginAttempts            ( unsigned char ucLoginAttempts )   { m_ucLoginAttempts = ucLoginAttempts; };
@@ -115,7 +162,7 @@ public:
     inline time_t                               GetNickChangeTime           ( void )                        { return m_tNickChange; };
     inline void                                 SetNickChangeTime           ( time_t tNickChange )          { m_tNickChange = tNickChange; };
 
-    void                                        Send                        ( const CPacket& Packet );
+    uint                                        Send                        ( const CPacket& Packet );
     void                                        SendEcho                    ( const char* szEcho );
     void                                        SendConsole                 ( const char* szEcho );
 
@@ -202,9 +249,7 @@ public:
     inline unsigned char                        GetBlurLevel                ( void )                        { return m_ucBlurLevel; }
     inline void                                 SetBlurLevel                ( unsigned char ucBlurLevel )   { m_ucBlurLevel = ucBlurLevel; }
 
-    bool                                        IsTimeToSendSyncFrom        ( CPlayer& Player, unsigned long ulTimeNow );
-    void                                        ClearSyncTime               ( CPlayer& Player );
-    void                                        ClearSyncTimes              ( void );    
+    bool                                        IsTimeForPuresyncFar        ( void );
 
     // Sync stuff
     inline void                                 SetSyncingVelocity          ( bool bSyncing )               { m_bSyncingVelocity = bSyncing; }
@@ -212,8 +257,8 @@ public:
     inline void                                 IncrementPuresync           ( void )                        { m_uiPuresyncPackets++; }
     inline unsigned int                         GetPuresyncCount            ( void ) const                  { return m_uiPuresyncPackets; }
 
-    void                                        NotifyReceivedSync        ( void )                        { m_ulLastReceivedSyncTime = GetTickCount32 (); }
-    unsigned long                               GetTicksSinceLastReceivedSync ( void ) const              { return GetTickCount32 () - m_ulLastReceivedSyncTime; }
+    void                                        NotifyReceivedSync          ( void )                        { m_lastReceivedSyncTime = CTickCount::Now (); }
+    bool                                        UhOhNetworkTrouble          ( void )                        { return ( CTickCount::Now () - m_lastReceivedSyncTime ).ToLongLong () > 5000; }
 
     const std::string&                          GetAnnounceValue            ( const std::string& strKey ) const;
     void                                        SetAnnounceValue            ( const std::string& strKey, const std::string& strValue );
@@ -222,7 +267,92 @@ public:
     void                                        SetWeaponCorrect            ( bool bWeaponCorrect );
     bool                                        GetWeaponCorrect            ( void );
 
+    void                                        MaybeUpdateOthersNearList   ( void );
+    void                                        UpdateOthersNearList        ( void );
+    void                                        RefreshNearPlayer           ( CPlayer* pOther );
+    SViewerMapType&                             GetNearPlayerList           ( void )                        { return m_NearPlayerList; }
+    SViewerMapType&                             GetFarPlayerList            ( void )                        { return m_FarPlayerList; }
+    void                                        AddPlayerToDistLists        ( CPlayer* pOther );
+    void                                        RemovePlayerFromDistLists   ( CPlayer* pOther );
+    void                                        MovePlayerToNearList        ( CPlayer* pOther );
+    void                                        MovePlayerToFarList         ( CPlayer* pOther );
+    bool                                        ShouldPlayerBeInNearList    ( CPlayer* pOther );
+
+    SScreenShotInfo&                            GetScreenShotInfo           ( void )                        { return m_ScreenShotInfo; }
+
+    CPlayerStatsPacket*                         GetPlayerStatsPacket        ( void )                        { return m_pPlayerStatsPacket; }
+    void                                        SetPlayerStat               ( unsigned short usID, float fValue );
+public:
+
+    //
+    // Light Sync
+    //
+    struct SLightweightSyncData
+    {
+        SLightweightSyncData ()
+        {
+            health.uiContext = 0;
+            health.bSync = false;
+            vehicleHealth.uiContext = 0;
+            vehicleHealth.bSync = false;
+            m_bSyncPosition = false;
+        }
+
+        struct
+        {
+            float           fLastHealth;
+            float           fLastArmor;
+            bool            bSync;
+            unsigned int    uiContext;
+        } health;
+
+        struct
+        {
+            CVehicle*       lastVehicle;
+            float           fLastHealth;
+            bool            bSync;
+            unsigned int    uiContext;
+        } vehicleHealth;
+
+        bool m_bSyncPosition;
+    };
+    SLightweightSyncData&                       GetLightweightSyncData      ( void )                      { return m_lightweightSyncData; }
+
+    void                                        SetPosition                 ( const CVector &vecPosition );
+    long long                                   GetPositionLastChanged      ( void )                        { return m_llLastPositionHasChanged; }
+    void                                        MarkPositionAsChanged       ( void )                        { m_llLastPositionHasChanged = GetTickCount64_ (); }
+
+    //
+    // End Light Sync
+    //
+
+    eVoiceState                                 GetVoiceState               ( void )                      { return m_VoiceState; }
+    void                                        SetVoiceState               ( eVoiceState State )         { m_VoiceState = State; }
+
+    std::list < CElement* > ::const_iterator    IterBroadcastListBegin      ( void )                      { return m_lstBroadcastList.begin (); };
+    std::list < CElement* > ::const_iterator    IterBroadcastListEnd        ( void )                      { return m_lstBroadcastList.end (); };
+    bool                                        IsVoiceMuted                ( void )                      { return m_lstBroadcastList.empty (); }
+    void                                        SetVoiceBroadcastTo         ( CElement* pElement );
+    void                                        SetVoiceBroadcastTo         ( const std::list < CElement* >& lstElements );
+
+    void                                        SetVoiceIgnoredElement      ( CElement* pElement );
+    void                                        SetVoiceIgnoredList         ( const std::list < CElement* >& lstElements );
+    std::list < CElement* > ::const_iterator    IterIgnoredListBegin        ( void )                      { return m_lstIgnoredList.begin (); };
+    std::list < CElement* > ::const_iterator    IterIgnoredListEnd          ( void )                      { return m_lstIgnoredList.end (); };
+    bool                                        IsPlayerIgnoringElement     ( CElement* pElement );
+
+    void                                        SetCameraOrientation        ( const CVector& vecPosition, const CVector& vecFwd );
+    bool                                        IsTimeToReceivePuresyncNearFrom ( CPlayer* pOther, SViewerInfo& nearInfo );
+    int                                         GetPuresyncZone                 ( CPlayer* pOther );
+    int                                         GetApproxPuresyncPacketSize ( void );
+    const CVector&                              GetCamPosition              ( void )            { return m_vecCamPosition; };
+    const CVector&                              GetCamFwd                   ( void )            { return m_vecCamFwd; };
+
+
+    class CSimPlayer*                           m_pSimPlayer;
 private:
+    SLightweightSyncData                        m_lightweightSyncData;
+
     void                                        WriteCameraModePacket       ( void );
     void                                        WriteCameraPositionPacket   ( void );
 
@@ -231,7 +361,7 @@ private:
 
     CPlayerTextManager*                         m_pPlayerTextManager;
 
-    char                                        m_szNick [MAX_NICK_LENGTH + 1];
+    SString                                     m_strNick;
     bool                                        m_bDoNotSendEntities;
     int                                         m_iGameVersion;
     unsigned short                              m_usMTAVersion;
@@ -254,6 +384,7 @@ private:
     unsigned long                               m_ulTimeConnected;
 
     NetServerPlayerID                           m_PlayerSocket;
+    uint                                        m_uiPing;
 
     time_t                                      m_tNickChange;
 
@@ -298,17 +429,38 @@ private:
 
     unsigned char                               m_ucBlurLevel;
 
-    std::list < sPlayerSyncData* >              m_SyncTimes;
+    long long                                   m_llNextFarPuresyncTime;       
+
+    // Voice
+    eVoiceState                                 m_VoiceState;
+    std::list < CElement* >                     m_lstBroadcastList;
+    std::list < CElement* >                     m_lstIgnoredList;
 
     // Sync stuff
     bool                                        m_bSyncingVelocity;
     unsigned int                                m_uiPuresyncPackets;
 
-    unsigned long                               m_ulLastReceivedSyncTime;
+    CTickCount                                  m_lastReceivedSyncTime;
 
     std::map < std::string, std::string >       m_AnnounceValues;
 
     uint                                        m_uiWeaponIncorrectCount;
+
+    SViewerMapType                              m_NearPlayerList;
+    SViewerMapType                              m_FarPlayerList;
+    CElapsedTime                                m_UpdateNearListTimer;
+    CVector                                     m_vecUpdateNearLastPosition;
+
+    CVector                                     m_vecCamPosition;
+    CVector                                     m_vecCamFwd;
+    int                                         m_iLastPuresyncZoneDebug;
+
+    long long                                   m_llLastPositionHasChanged;
+    SString                                     m_strIP;
+
+    SScreenShotInfo                             m_ScreenShotInfo;
+
+    CPlayerStatsPacket*                         m_pPlayerStatsPacket;
 };
 
 #endif

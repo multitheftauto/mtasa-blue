@@ -56,7 +56,6 @@ CGUIWindow_Impl::CGUIWindow_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const 
 
     // Register our events
     m_pWindow->subscribeEvent ( CEGUI::FrameWindow::EventCloseClicked, CEGUI::Event::Subscriber ( &CGUIWindow_Impl::Event_OnCloseClick, this ) );
-    m_pWindow->subscribeEvent ( CEGUI::FrameWindow::EventKeyDown, CEGUI::Event::Subscriber ( &CGUIWindow_Impl::Event_OnKeyDown, this ) );
     AddEvents ();
 
     // Disable rolling up, because we don't need it and it causes a freeze
@@ -147,46 +146,9 @@ void CGUIWindow_Impl::SetCloseClickHandler ( GUI_CALLBACK Callback )
 }
 
 
-void CGUIWindow_Impl::SetKeyDownHandler ( GUI_CALLBACK Callback )
-{
-    m_OnKeyDown = Callback;
-}
-
-
-void CGUIWindow_Impl::SetEnterKeyHandler ( GUI_CALLBACK Callback )
-{
-    m_OnEnter = Callback;
-}
-
-
 bool CGUIWindow_Impl::Event_OnCloseClick ( const CEGUI::EventArgs& e )
 {
     if ( m_OnCloseClick )
         m_OnCloseClick ( reinterpret_cast < CGUIElement* > ( this ) );
-    return true;
-}
-
-
-bool CGUIWindow_Impl::Event_OnKeyDown ( const CEGUI::EventArgs& e )
-{
-    CGUIElement * pCGUIElement = reinterpret_cast < CGUIElement* > ( this );
-    if ( m_OnKeyDown )
-        m_OnKeyDown ( pCGUIElement );
-
-    if ( m_OnEnter )
-    {
-        const CEGUI::KeyEventArgs& Args = reinterpret_cast < const CEGUI::KeyEventArgs& > ( e );
-        switch ( Args.scancode )
-        {
-            // Return key
-            case CEGUI::Key::NumpadEnter:
-            case CEGUI::Key::Return:
-            {
-                // Fire the event
-                m_OnEnter ( pCGUIElement );
-                break;
-            }
-        }
-    }
     return true;
 }

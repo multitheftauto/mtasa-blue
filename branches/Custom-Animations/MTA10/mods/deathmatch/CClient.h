@@ -27,12 +27,15 @@ public:
     void        ClientShutdown                  ( void );  
 
     void        PreFrameExecutionHandler        ( void );
+    void        PreHUDRenderExecutionHandler    ( bool bDidUnminimize, bool bDidRecreateRenderTargets );
     void        PostFrameExecutionHandler       ( void );
 
     bool        ProcessCommand                  ( const char* szCommandLine );
     //bool        ProcessInput                    ( CInputMessage* pInputMessage );
 
     bool        HandleException                 ( CExceptionInformation* pExceptionInformation );
+
+    CClientEntityBase* FindClientEntity         ( CEntitySAInterface* pEntitySAInterface );
 };
 
 #endif

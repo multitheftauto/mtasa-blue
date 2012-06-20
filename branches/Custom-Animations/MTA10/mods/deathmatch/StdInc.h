@@ -19,6 +19,8 @@
 #include <cstdio>
 #include <cstring>
 
+#include <zlib.h>
+
 // SDK includes
 #define MTA_CLIENT
 #include "SharedUtil.h"
@@ -39,7 +41,9 @@
 #include <CBox.h>
 #include <ijsify.h>
 #include <Common.h>
+#include "Enums.h"
 #include "net/SyncStructures.h"
+#include "CIdArray.h"
 
 // Shared logic includes
 #include <Utils.h>
@@ -55,42 +59,50 @@
 #include <CClientColPolygon.h>
 #include <CClientColTube.h>
 #include <CClientCorona.h>
-#include <CClientCRC32Hasher.h>
 #include <CClientDFF.h>
-#include <CClientDisplayGroup.h>
 #include <CClientDummy.h>
 #include <CClientEntity.h>
 #include <CClientSpatialDatabase.h>
 #include <CClientExplosionManager.h>
 #include <CClientPed.h>
 #include <CClientPlayerClothes.h>
+#include <CClientPlayerVoice.h>
 #include <CClientProjectileManager.h>
+#include <CClientStreamSector.h>
+#include <CClientStreamSectorRow.h>
 #include <CClientTask.h>
 #include <CClientTXD.h>
 #include <CClientWater.h>
 #include <CClientIFP.h>
+#include <CClientRenderElement.h>
+#include <CClientDxFont.h>
+#include <CClientGuiFont.h>
+#include <CClientMaterial.h>
+#include <CClientTexture.h>
+#include <CClientShader.h>
 #include <CCustomData.h>
-#include <CConfig.h>
-#include <CDOMConfig.h>
 #include <CElementArray.h>
 #include <CLogger.h>
 #include <CMapEventManager.h>
+#include <CModelNames.h>
 #include <CScriptFile.h>
 #include <CWeaponNames.h>
 #include <CVehicleNames.h>
-#include <utils/CMD5Hasher.h>
 #include <lua/CLuaCFunctions.h>
 #include <lua/CLuaArguments.h>
 #include <lua/CLuaMain.h>
+#include "CEasingCurve.h"
+#include <lua/CLuaFunctionParseHelpers.h>
+#include <CScriptArgReader.h>
 #include <luadefs/CLuaDefs.h>
 #include <luadefs/CLuaTaskDefs.h>
 #include <luadefs/CLuaFxDefs.h>
 #include <luadefs/CLuaFileDefs.h>
 
 // Shared includes
-#include "CEasingCurve.h"
 #include "TInterpolation.h"
 #include "CPositionRotationAnimation.h"
+#include "CLatentTransferManager.h"
 
 // Deathmatch includes
 #include "Client.h"
@@ -101,6 +113,8 @@
 #include "logic/CClientGame.h"
 #include "net/Packets.h"
 #include "logic/CClientEntityRefManager.h"
+#include "logic/CGameEntityXRefManager.h"
+#include "logic/CClientModelCacheManager.h"
 #include "logic/CClientPerfStatManager.h"
 #include "logic/CDeathmatchVehicle.h"
 #include "logic/CResource.h"

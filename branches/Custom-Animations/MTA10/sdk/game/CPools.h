@@ -65,7 +65,7 @@ class CPools
 {
 public:
     // Vehicles pool
-    virtual CVehicle*       AddVehicle              ( eVehicleTypes eVehicleType ) = 0;
+    virtual CVehicle*       AddVehicle              ( eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2 ) = 0;
     virtual CVehicle*       AddVehicle              ( DWORD* pGameInterface ) = 0;
     virtual void            RemoveVehicle           ( CVehicle* pVehicle, bool bDelete = true ) = 0;
     virtual void            RemoveVehicle           ( unsigned long ulID, bool bDelete = true ) = 0;
@@ -77,8 +77,7 @@ public:
     virtual unsigned long   GetVehicleCount         ( ) = 0;
 
     // Objects pool
-    virtual CObject*        AddObject               ( DWORD dwModelID ) = 0;
-    virtual CObject*        AddObject               ( DWORD* pGameInterface ) = 0;
+    virtual CObject*        AddObject               ( DWORD dwModelID, bool bLowLod, bool bBreakable ) = 0;
     virtual void            RemoveObject            ( CObject* pObject, bool bDelete = true ) = 0;
     virtual void            RemoveObject            ( unsigned long ulID, bool bDelete = true ) = 0;
     virtual CObject*        GetObject               ( unsigned long ulID ) = 0;

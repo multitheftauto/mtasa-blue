@@ -27,9 +27,9 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
                                  float fGravity,
                                  float fGameSpeed,
                                  float fWaveHeight,
-                                 float fWaterLevel,
+                                 const SWorldWaterLevelInfo& worldWaterLevelInfo,
                                  bool bHasSkyGradient,
-                                 bool* pbGarageStates,
+                                 const SGarageStates& garageStates,
                                  unsigned char ucSkyGradientTR,
                                  unsigned char ucSkyGradientTG,
                                  unsigned char ucSkyGradientTB,
@@ -65,7 +65,8 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
                                  bool bOverrideFarClipDistance,
                                  float fFarClip,
                                  bool bOverrideFogDistance,
-                                 float fFogDistance)
+                                 float fFogDistance,
+                                 float fAircraftMaxHeight )
 {
     m_ucWeather = ucWeather;
     m_ucWeatherBlendingTo = ucWeatherBlendingTo;
@@ -78,9 +79,9 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
     m_fGravity = fGravity;
     m_fGameSpeed = fGameSpeed;
     m_fWaveHeight = fWaveHeight;
-    m_fWaterLevel = fWaterLevel;
+    m_WorldWaterLevelInfo = worldWaterLevelInfo;
     m_bHasSkyGradient = bHasSkyGradient;
-    m_pbGarageStates = pbGarageStates;
+    m_pGarageStates = &garageStates;
     m_ucSkyGradientTR = ucSkyGradientTR;
     m_ucSkyGradientTG = ucSkyGradientTG;
     m_ucSkyGradientTB = ucSkyGradientTB;
@@ -117,6 +118,7 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
     m_fFarClip = fFarClip;
     m_bOverrideFogDistance = bOverrideFogDistance;
     m_fFogDistance = fFogDistance;
+    m_fAircraftMaxHeight = fAircraftMaxHeight;
 }
 
 
@@ -169,14 +171,19 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.Write ( m_fGameSpeed );
     }
     BitStream.Write ( m_fWaveHeight );
-    BitStream.Write ( m_fWaterLevel );
+    // Write world water level
+    BitStream.Write ( m_WorldWaterLevelInfo.fSeaLevel );
+    BitStream.WriteBit ( m_WorldWaterLevelInfo.bNonSeaLevelSet );
+    if ( m_WorldWaterLevelInfo.bNonSeaLevelSet )
+        BitStream.Write ( m_WorldWaterLevelInfo.fNonSeaLevel );
 
     BitStream.WriteCompressed ( m_usFPSLimit );
 
     // Write the garage states
     for ( unsigned char i = 0 ; i < MAX_GARAGES ; i++ )
     {
-        BitStream.WriteBit( static_cast < unsigned char > ( m_pbGarageStates[i] ) );
+        const SGarageStates& garageStates = *m_pGarageStates;
+        BitStream.WriteBit( garageStates[i] );
     }
 
     // Write the fun bugs state
@@ -185,6 +192,7 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     funBugs.data.bFastFire    = g_pGame->IsGlitchEnabled ( CGame::GLITCH_FASTFIRE );
     funBugs.data.bFastMove    = g_pGame->IsGlitchEnabled ( CGame::GLITCH_FASTMOVE );
     funBugs.data.bCrouchBug   = g_pGame->IsGlitchEnabled ( CGame::GLITCH_CROUCHBUG );
+    funBugs.data.bCloseRangeDamage = g_pGame->IsGlitchEnabled ( CGame::GLITCH_CLOSEDAMAGE );
     BitStream.Write ( &funBugs );
 
     BitStream.Write ( m_fJetpackMaxHeight );
@@ -248,6 +256,82 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     if ( m_bOverrideFogDistance )
     {
         BitStream.Write ( m_fFogDistance );
+    }
+
+    BitStream.Write ( m_fAircraftMaxHeight );
+
+    for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_EXTINGUISHER;i++)
+    {
+        sWeaponPropertySync WeaponProperty;
+        CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager ()->GetWeaponStats( (eWeaponType)i );
+        BitStream.WriteBit ( true );
+        WeaponProperty.data.weaponType = (int)pWeaponStat->GetWeaponType();
+        WeaponProperty.data.fAccuracy = pWeaponStat->GetAccuracy();
+        WeaponProperty.data.fMoveSpeed = pWeaponStat->GetMoveSpeed();
+        WeaponProperty.data.fTargetRange = pWeaponStat->GetTargetRange();
+        WeaponProperty.data.fWeaponRange = pWeaponStat->GetWeaponRange();
+        WeaponProperty.data.nAmmo = pWeaponStat->GetMaximumClipAmmo();
+        WeaponProperty.data.nDamage = pWeaponStat->GetDamagePerHit();
+        WeaponProperty.data.nFlags = pWeaponStat->GetFlags();
+
+        WeaponProperty.data.anim_loop_start = pWeaponStat->GetWeaponAnimLoopStart();
+        WeaponProperty.data.anim_loop_stop = pWeaponStat->GetWeaponAnimLoopStop();
+        WeaponProperty.data.anim_loop_bullet_fire = pWeaponStat->GetWeaponAnimLoopFireTime();
+
+        WeaponProperty.data.anim2_loop_start = pWeaponStat->GetWeaponAnim2LoopStart();
+        WeaponProperty.data.anim2_loop_stop = pWeaponStat->GetWeaponAnim2LoopStop();
+        WeaponProperty.data.anim2_loop_bullet_fire = pWeaponStat->GetWeaponAnim2LoopFireTime();
+
+        WeaponProperty.data.anim_breakout_time = pWeaponStat->GetWeaponAnimBreakoutTime();
+        BitStream.Write( &WeaponProperty );
+    }
+
+    for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_TEC9;i++)
+    {
+        sWeaponPropertySync WeaponProperty;
+        BitStream.WriteBit ( true );
+        for (int j = 0; j <= 2;j++)
+        {
+            CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager ()->GetWeaponStats( (eWeaponType)i, (eWeaponSkill)j );
+            WeaponProperty.data.weaponType = (int)pWeaponStat->GetWeaponType();
+            WeaponProperty.data.fAccuracy = pWeaponStat->GetAccuracy();
+            WeaponProperty.data.fMoveSpeed = pWeaponStat->GetMoveSpeed();
+            WeaponProperty.data.fTargetRange = pWeaponStat->GetTargetRange();
+            WeaponProperty.data.fWeaponRange = pWeaponStat->GetWeaponRange();
+            WeaponProperty.data.nAmmo = pWeaponStat->GetMaximumClipAmmo();
+            WeaponProperty.data.nDamage = pWeaponStat->GetDamagePerHit();
+            WeaponProperty.data.nFlags = pWeaponStat->GetFlags();
+
+            WeaponProperty.data.anim_loop_start = pWeaponStat->GetWeaponAnimLoopStart();
+            WeaponProperty.data.anim_loop_stop = pWeaponStat->GetWeaponAnimLoopStop();
+            WeaponProperty.data.anim_loop_bullet_fire = pWeaponStat->GetWeaponAnimLoopFireTime();
+
+            WeaponProperty.data.anim2_loop_start = pWeaponStat->GetWeaponAnim2LoopStart();
+            WeaponProperty.data.anim2_loop_stop = pWeaponStat->GetWeaponAnim2LoopStop();
+            WeaponProperty.data.anim2_loop_bullet_fire = pWeaponStat->GetWeaponAnim2LoopFireTime();
+
+            WeaponProperty.data.anim_breakout_time = pWeaponStat->GetWeaponAnimBreakoutTime();
+            BitStream.Write( &WeaponProperty );
+        }
+    }
+
+    multimap< unsigned short, CBuildingRemoval* >::const_iterator iter = g_pGame->GetBuildingRemovalManager ( )->IterBegin();
+    for (; iter != g_pGame->GetBuildingRemovalManager ( )->IterEnd();++iter)
+    {
+        CBuildingRemoval * pBuildingRemoval = (*iter).second;
+        BitStream.WriteBit( true );
+        BitStream.Write( pBuildingRemoval->GetModel ( ) );
+        BitStream.Write( pBuildingRemoval->GetRadius ( ) );
+        BitStream.Write( pBuildingRemoval->GetPosition ( ).fX );
+        BitStream.Write( pBuildingRemoval->GetPosition ( ).fY );
+        BitStream.Write( pBuildingRemoval->GetPosition ( ).fZ );
+    }
+    BitStream.WriteBit( false );
+
+    if ( BitStream.Version () >= 0x25 )
+    {
+        bool bOcclusionsEnabled = g_pGame->GetOcclusionsEnabled ();
+        BitStream.WriteBit( bOcclusionsEnabled );
     }
 
     return true;

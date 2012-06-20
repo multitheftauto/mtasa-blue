@@ -12,6 +12,7 @@
 #pragma once
 
 #include "Common.h"
+#include "../Common.h"
 #include <string>
 #ifndef WIN32
     #include <alloca.h>
@@ -19,11 +20,14 @@
 
 struct ISyncStructure;
 
-class NetBitStreamInterface
+class NetBitStreamInterface : public CRefCountable
 {
+    NetBitStreamInterface      ( const NetBitStreamInterface& );
+    const NetBitStreamInterface& operator= ( const NetBitStreamInterface& );
+protected:
+                        NetBitStreamInterface       ( void ) { DEBUG_CREATE_COUNT( "NetBitStreamInterface" ); }
+    virtual             ~NetBitStreamInterface      ( void ) { DEBUG_DESTROY_COUNT( "NetBitStreamInterface" ); }
 public:
-    virtual             ~NetBitStreamInterface      ( void ) {};
-
     virtual int         GetReadOffsetAsBits         ( void ) = 0;
 
     virtual void        Reset                       ( void ) = 0;
@@ -120,6 +124,9 @@ public:
     // GetNumberOfUnreadBits appears to round up to the next byte boundary, when reading
     virtual int         GetNumberOfUnreadBits       ( void ) const = 0;
 
+    virtual void        AlignWriteToByteBoundary    ( void ) const = 0;
+    virtual void        AlignReadToByteBoundary     ( void ) const = 0;
+
     // Helper template methods that are not actually part
     // of the interface but get inline compiled.
 
@@ -147,29 +154,22 @@ public:
         return false;
     }
 
-    // Write a string
-    void WriteString(const std::string& value)
+
+    // Write characters from a std::string
+    void WriteStringCharacters ( const std::string& value, unsigned short usLength )
     {
-        // Send the length
-        unsigned short usLength = value.length ();
-        Write ( usLength );
+        dassert ( usLength <= value.length () );
         // Send the data
         if ( usLength )
             Write ( &value.at ( 0 ), usLength );
     }
 
-    // Read a string
-    bool ReadString(std::string& result)
+    // Read characters into a std::string
+    bool ReadStringCharacters ( std::string& result, unsigned short usLength )
     {
         result = "";
-
-        // Get the length
-        unsigned short usLength = 0;
-        if ( !Read ( usLength ) )
-            return false;
-
         if ( usLength )
-            {
+        {
             // Read the data
             char* buffer = static_cast < char* > ( alloca ( usLength ) );
             if ( !Read ( buffer, usLength ) )
@@ -178,6 +178,62 @@ public:
             result = std::string ( buffer, usLength );
         }
         return true;
+    }
+
+
+    // Write a string (incl. ushort size header)
+    void WriteString ( const std::string& value )
+    {
+        // Write the length
+        unsigned short usLength = value.length ();
+        Write ( usLength );
+
+        // Write the characters
+        return WriteStringCharacters ( value, usLength );
+    }
+
+    // Read a string (incl. ushort size header)
+    bool ReadString ( std::string& result )
+    {
+        result = "";
+
+        // Read the length
+        unsigned short usLength = 0;
+        if ( !Read ( usLength ) )
+            return false;
+
+        // Read the characters
+        return ReadStringCharacters ( result, usLength );
+    }
+
+    #ifdef MTA_CLIENT
+        #define MAX_ELEMENTS    MAX_CLIENT_ELEMENTS
+    #else
+        #define MAX_ELEMENTS    MAX_SERVER_ELEMENTS
+    #endif
+
+    // Write an element ID
+    void Write(const ElementID& ID)
+    {
+        static const unsigned int bitcount = NumberOfSignificantBits < ( MAX_ELEMENTS - 1 ) >::COUNT;
+        const unsigned int& IDref = ID.Value ();
+        WriteBits ( reinterpret_cast < const unsigned char* > ( &IDref ), bitcount );
+    }
+
+    // Read an element ID
+    bool Read(ElementID& ID)
+    {
+        static const unsigned int bitcount = NumberOfSignificantBits < ( MAX_ELEMENTS - 1 ) > ::COUNT;
+        unsigned int& IDref = ID.Value ();
+        IDref = 0;
+        bool bResult = ReadBits ( reinterpret_cast < unsigned char* > ( &IDref ), bitcount );
+
+        // If max value, change to INVALID_ELEMENT_ID
+        static const unsigned int maxValue = ( 1 << bitcount ) - 1;
+        if ( IDref == maxValue )
+            IDref = INVALID_ELEMENT_ID;
+
+        return bResult;
     }
 
     virtual unsigned short Version                  ( void ) const = 0;

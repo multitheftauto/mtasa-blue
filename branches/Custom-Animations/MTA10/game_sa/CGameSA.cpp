@@ -106,19 +106,39 @@ CGameSA::CGameSA()
     this->m_pRopes                  = new CRopesSA;
     this->m_pFx                     = new CFxSA ( (CFxSAInterface *)CLASS_CFx );
     this->m_pWaterManager           = new CWaterManagerSA ();
+    this->m_pWeaponStatsManager     = new CWeaponStatManagerSA ();
 
     // Normal weapon types (WEAPONSKILL_STD)
     for ( int i = 0; i < NUM_WeaponInfosStdSkill; i++)
-        WeaponInfos[i] = new CWeaponInfoSA((CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + i*CLASSSIZE_WeaponInfo), (eWeaponType)(WEAPONTYPE_PISTOL + i));
+    {
+        eWeaponType weaponType = (eWeaponType)(WEAPONTYPE_PISTOL + i);
+        WeaponInfos[i] = new CWeaponInfoSA( (CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + i*CLASSSIZE_WeaponInfo), weaponType );
+        m_pWeaponStatsManager->CreateWeaponStat ( WeaponInfos[i], (eWeaponType)(weaponType - WEAPONTYPE_PISTOL), WEAPONSKILL_STD );
+    }
 
     // Extra weapon types for skills (WEAPONSKILL_POOR,WEAPONSKILL_PRO,WEAPONSKILL_SPECIAL)
     int index;
+    eWeaponSkill weaponSkill = eWeaponSkill::WEAPONSKILL_POOR;
     for ( int skill = 0; skill < 3 ; skill++ )
     {
+        //STD is created first, then it creates "extra weapon types" (poor, pro, special?) but in the enum 1 = STD which meant the STD weapon skill contained pro info
+        if ( skill >= 1 )
+        {
+            if ( skill == 1 )
+            {
+                weaponSkill = eWeaponSkill::WEAPONSKILL_PRO;
+            }
+            if ( skill == 2 )
+            {
+                weaponSkill = eWeaponSkill::WEAPONSKILL_SPECIAL;
+            }
+        }
         for ( int i = 0; i < NUM_WeaponInfosOtherSkill; i++ )
         {
+            eWeaponType weaponType = (eWeaponType)(WEAPONTYPE_PISTOL + i);
             index = NUM_WeaponInfosStdSkill + skill*NUM_WeaponInfosOtherSkill + i;
-            WeaponInfos[index] = new CWeaponInfoSA((CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + index*CLASSSIZE_WeaponInfo), (eWeaponType)(WEAPONTYPE_PISTOL + i));
+            WeaponInfos[index] = new CWeaponInfoSA( (CWeaponInfoSAInterface *)(ARRAY_WeaponInfo + index*CLASSSIZE_WeaponInfo), weaponType );
+            m_pWeaponStatsManager->CreateWeaponStat ( WeaponInfos[index], weaponType, weaponSkill );
         }
     }
 
@@ -150,6 +170,8 @@ CGameSA::CGameSA()
     // Change pool sizes here
     m_pPools->SetPoolCapacity ( TASK_POOL, 5000 );  // Default is 500
     m_pPools->SetPoolCapacity ( OBJECT_POOL, 700 );  // Default is 350
+    m_pPools->SetPoolCapacity ( EVENT_POOL, 5000 );
+    m_pPools->SetPoolCapacity ( COL_MODEL_POOL, 12000 );  // Default is 10150
 }
 
 CGameSA::~CGameSA ( void )
@@ -564,6 +586,7 @@ bool CGameSA::VerifySADataFileNames ()
            !strcmp ( *(char **)0x5BD839, "DATA" ) &&
            !strcmp ( *(char **)0x5BD84C, "HANDLING.CFG" ) &&
            !strcmp ( *(char **)0x5BEEE8, "DATA\\melee.dat" ) &&
+           !strcmp ( *(char **)0x4D563E, "ANIM\\PED.IFP" ) &&
            !strcmp ( *(char **)0x5B925B, "DATA\\OBJECT.DAT" ) &&
            !strcmp ( *(char **)0x55D0FC, "data\\surface.dat" ) &&
            !strcmp ( *(char **)0x55F2BB, "data\\surfaud.dat" ) &&
@@ -662,4 +685,12 @@ bool CGameSA::HasCreditScreenFadedOut ( void )
 void CGameSA::FlushPendingRestreamIPL ( void )
 {
     CModelInfoSA::StaticFlushPendingRestreamIPL ();
+}
+
+// Disable VSync by forcing what normally happends at the end of the loading screens
+// Note #1: This causes the D3D device to be reset after the next frame
+// Note #2: Some players do not need this to disable VSync. (Possibly because their video card driver settings override it somewhere)
+void CGameSA::DisableVSync ( void )
+{
+    MemPutFast < BYTE > ( 0xBAB318, 0 );
 }

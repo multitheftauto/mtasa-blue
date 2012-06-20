@@ -65,6 +65,7 @@
 // Start of CEGUI namespace section
 namespace CEGUI
 {
+bool System::ms_bBidiEnabled = true;
 const String System::EventNamespace("System");
 
 /*!
@@ -489,11 +490,19 @@ void System::renderGUI(void)
 	// drawn directly to the display every frame.
 	//////////////////////////////////////////////////////////////////////////
 
+    // Update cache timer
+    for ( FontManager::FontIterator fontIt = d_fontManager->getIterator() ; !fontIt.isAtEnd() ; ++fontIt )
+        (*fontIt)->pulse ();
+
 	if (d_gui_redraw)
 	{
 		d_renderer->resetZValue();
 		d_renderer->setQueueingEnabled(true);
 		d_renderer->clearRenderList();
+
+        // Build fonts while the render list is empty
+        for ( FontManager::FontIterator fontIt = d_fontManager->getIterator() ; !fontIt.isAtEnd() ; ++fontIt )
+            (*fontIt)->onClearRenderList ();
 
 		if (d_activeSheet != NULL)
 		{
@@ -511,6 +520,11 @@ void System::renderGUI(void)
 
     // do final destruction on dead-pool windows
     WindowManager::getSingleton().cleanDeadPool();
+
+    // Flag for redraw to rebuild fonts if needed
+    for ( FontManager::FontIterator fontIt = d_fontManager->getIterator() ; !fontIt.isAtEnd() ; ++fontIt )
+        if ( (*fontIt)->needsClearRenderList () )
+            d_gui_redraw = true;
 }
 
 
@@ -1013,6 +1027,7 @@ bool System::injectKeyUp(uint key_code)
 
 /*************************************************************************
 	Method that injects a typed character event into the system.
+    > Make sure the glyph is loaded for this font by calling setText on the place where it is used
 *************************************************************************/
 bool System::injectChar(utf32 code_point)
 {
@@ -1024,17 +1039,6 @@ bool System::injectChar(utf32 code_point)
 		args.sysKeys = d_sysKeys;
 
 		Window* dest = getKeyboardTargetWindow();
-
-        // Make sure the glyph is loaded for this font
-        if ( dest != NULL )
-        {
-            const Font* destFont = dest->getFont(true);
-            String newGlyphCache = destFont->OnGlyphDrawn(code_point);
-            if ( newGlyphCache != "" )
-            {
-                destFont->extendFontGlyphs ( newGlyphCache );
-            }
-        }
 
 		// loop backwards until event is handled or we run out of windows.
 		while ((dest != NULL) && (!args.handled))

@@ -18,8 +18,6 @@
 #include "lua/CLuaArguments.h"
 #include <list>
 
-#define NUMBER_OF_KEYS 123
-
 enum eKeyBindType
 {
     KEY_BIND_FUNCTION = 0,
@@ -29,12 +27,12 @@ enum eKeyBindType
 
 struct SBindableKey
 {
-    char szKey [ 20 ];
+    const char* szKey;
 };
 
 struct SBindableGTAControl
 {
-    char szControl [ 25 ];
+    const char* szControl;
 };
 
 class CKeyBind
@@ -44,7 +42,7 @@ public:
     virtual                 ~CKeyBind       ( void )    {}
     inline bool             IsBeingDeleted ( void ) { return beingDeleted; }
     
-    SBindableKey*           boundKey;
+    const SBindableKey*           boundKey;
     CLuaMain*               luaMain;
     bool                    beingDeleted;
     virtual eKeyBindType    GetType         ( void ) = 0;
@@ -78,7 +76,7 @@ class CControlFunctionBind: public CKeyBindWithState, public CFunctionBind
 {
 public:
     inline eKeyBindType     GetType              ( void )    { return KEY_BIND_CONTROL_FUNCTION; }
-    SBindableGTAControl*    boundControl;
+    const SBindableGTAControl*    boundControl;
 };
 
 class CKeyBinds
@@ -87,8 +85,8 @@ public:
                                 CKeyBinds               ( class CPlayer* pPlayer );
                                 ~CKeyBinds              ( void );
 
-    static SBindableKey*        GetBindableFromKey      ( const char* szKey );
-    static SBindableGTAControl* GetBindableFromControl  ( const char* szControl );
+    static const SBindableKey*        GetBindableFromKey      ( const char* szKey );
+    static const SBindableGTAControl* GetBindableFromControl  ( const char* szControl );
 
     // Basic funcs
     void                        Add                     ( CKeyBind* pKeyBind );
@@ -101,19 +99,19 @@ public:
 
     // Key-function bind funcs
     bool                        AddKeyFunction          ( const char* szKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
-    bool                        AddKeyFunction          ( SBindableKey* pKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
+    bool                        AddKeyFunction          ( const SBindableKey* pKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
     bool                        RemoveKeyFunction       ( const char* szKey, CLuaMain* pLuaMain, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
     bool                        KeyFunctionExists       ( const char* szKey, CLuaMain* pLuaMain = NULL, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
 
     // Control-function bind funcs
     bool                        AddControlFunction      ( const char* szControl, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
-    bool                        AddControlFunction      ( SBindableGTAControl* pControl, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
+    bool                        AddControlFunction      ( const SBindableGTAControl* pControl, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
     bool                        RemoveControlFunction   ( const char* szControl, CLuaMain* pLuaMain, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
     bool                        ControlFunctionExists   ( const char* szControl, CLuaMain* pLuaMain = NULL, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
 
     void                        RemoveAllKeys           ( CLuaMain* pLuaMain );
 
-    static bool                 IsMouse                 ( SBindableKey* pKey );
+    static bool                 IsMouse                 ( const SBindableKey* pKey );
     void                        RemoveDeletedBinds      ( void );
 
 protected:

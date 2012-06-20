@@ -21,6 +21,8 @@ public:
 
     virtual const CHandlingEntry*   GetOriginalHandlingData ( enum eVehicleTypes eModel ) = 0;
     virtual eHandlingProperty       GetPropertyEnumFromName ( std::string strName ) = 0;
+    virtual void                    RemoveChangedVehicle    ( void ) = 0;
+    virtual void                    CheckSuspensionChanges  ( CHandlingEntry* pEntry ) = 0;
 };
 
 #endif

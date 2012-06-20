@@ -94,7 +94,7 @@ CPlayerPedSA::CPlayerPedSA( ePedModel pedType )
     GetPlayerPedInterface ()->fRotationSpeed = 7.5;
     m_pInterface->bStreamingDontDelete = true;
     m_pInterface->bDontStream = true;
-    world->Add ( m_pInterface );
+    world->Add ( m_pInterface, CPlayerPed_Constructor );
 }
 
 
@@ -108,8 +108,10 @@ CPlayerPedSA::CPlayerPedSA ( CPlayerPedSAInterface * pPlayer )
     CPoolsSA * pools = (CPoolsSA *)pGame->GetPools();
     this->internalID =  pools->GetPedRef ( (DWORD *)this->GetInterface () );
     this->SetType ( PLAYER_PED );
+    this->BeingDeleted = FALSE;
 
     m_bIsLocal = true;
+    DoNotRemoveFromGame = true;
     m_pData = GetPlayerPedInterface ()->pPlayerData;
     m_pWanted = NULL;
 
@@ -140,7 +142,7 @@ CPlayerPedSA::~CPlayerPedSA ( void )
         if ( (DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable )
         {
             CWorldSA * world = (CWorldSA *)pGame->GetWorld();
-            world->Remove ( m_pInterface );
+            world->Remove ( m_pInterface, CPlayerPed_Destructor );
         
             DWORD dwThis = (DWORD) m_pInterface;
             DWORD dwFunc = m_pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent

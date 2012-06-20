@@ -15,7 +15,8 @@
 CProxyDirectInputDevice8::CProxyDirectInputDevice8 ( IDirectInputDevice8A* pDevice )
 {
     WriteDebugEvent ( "CProxyDirectInputDevice8::CProxyDirectInputDevice8" );
-    
+    CCore::GetSingleton().ApplyHooks2 ( );
+
     // Notify the event handler
     CDirectInputEvents8::OnDirectInputDeviceCreate ( pDevice );
 

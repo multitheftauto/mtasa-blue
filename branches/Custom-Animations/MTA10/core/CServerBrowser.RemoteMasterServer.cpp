@@ -30,7 +30,7 @@ public:
 protected:
     bool                    ParseListVer0               ( CServerListItemList& itemList );
     bool                    ParseListVer2               ( CServerListItemList& itemList );
-    CServerListItem*        GetServerListItem           ( CServerListItemList& itemList, in_addr Address, ushort usQueryPort );
+    CServerListItem*        GetServerListItem           ( CServerListItemList& itemList, in_addr Address, ushort usGamePort );
 
     long long               m_llLastRefreshTime;
     SString                 m_strStage;
@@ -199,7 +199,7 @@ bool CRemoteMasterServer::ParseListVer0 ( CServerListItemList& itemList )
         stream.Read ( usQueryPort );
 
         // Add or find item to update
-        CServerListItem* pItem = GetServerListItem ( itemList, Address, usQueryPort );
+        CServerListItem* pItem = GetServerListItem ( itemList, Address, usQueryPort - SERVER_LIST_QUERY_PORT_OFFSET );
 
         if ( pItem->ShouldAllowDataQuality ( SERVER_INFO_ASE_0 ) )
         {
@@ -211,7 +211,7 @@ bool CRemoteMasterServer::ParseListVer0 ( CServerListItemList& itemList )
     }
 
 #if MTA_DEBUG
-    OutputDebugLine ( SString ( "%d servers (%d added, %d updated) from %s", uiNumServers, itemList.size () - uiNumServersBefore, uiNumServersUpdated, *m_strURL ) );
+    OutputDebugLine ( SString ( "[Browser] %d servers (%d added, %d updated) from %s", uiNumServers, itemList.size () - uiNumServersBefore, uiNumServersUpdated, *m_strURL ) );
 #endif
 
     return true;
@@ -257,6 +257,12 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
     bool bHasPlayers        = ( uiFlags & 0x0800 ) != 0;
     bool bHasRespondingFlag = ( uiFlags & 0x1000 ) != 0;
     bool bHasRestrictionFlags = ( uiFlags & 0x2000 ) != 0;
+    bool bHasSearchIgnoreSections = ( uiFlags & 0x4000 ) != 0;
+
+    // Rate quality of data supplied here
+    uint uiDataQuality = SERVER_INFO_ASE_2;
+    if ( bHasSearchIgnoreSections )
+        uiDataQuality = SERVER_INFO_ASE_2b;
 
     // Read sequence number
     uint uiSequenceNumber = 0;
@@ -293,11 +299,11 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
         stream.Read ( usGamePort );
 
         // Add or find item to update
-        CServerListItem* pItem = GetServerListItem ( itemList, Address, usGamePort + 123 );
+        CServerListItem* pItem = GetServerListItem ( itemList, Address, usGamePort );
 
-        if ( pItem->ShouldAllowDataQuality ( SERVER_INFO_ASE_2 ) )
+        if ( pItem->ShouldAllowDataQuality ( uiDataQuality ) )
         {
-            pItem->SetDataQuality ( SERVER_INFO_ASE_2 );
+            pItem->SetDataQuality ( uiDataQuality );
 
             if ( bHasPlayerCount )          stream.Read ( pItem->nPlayers );
             if ( bHasMaxPlayerCount )       stream.Read ( pItem->nMaxPlayers );
@@ -311,6 +317,8 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
 
             if ( bHasPlayers )
             {
+                pItem->vecPlayers.clear ();
+
                 ushort usPlayerListSize = 0;
                 stream.Read ( usPlayerListSize );
 
@@ -332,6 +340,25 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
                 stream.Read ( pItem->uiMasterServerSaysRestrictions );
             }
 
+            if ( bHasSearchIgnoreSections )
+            {
+                // Construct searchable name
+                pItem->strSearchableName = pItem->strName;
+                uchar ucNumItems = 0;
+                stream.Read ( ucNumItems );
+                while ( ucNumItems-- )
+                {
+                    // Read section of name to remove
+                    uchar ucOffset = 0;
+                    uchar ucLength = 0;
+                    stream.Read ( ucOffset );
+                    stream.Read ( ucLength );
+                    for ( uint i = ucOffset ; i < (uint)( ucOffset + ucLength ) ; i++ )
+                        if ( i < pItem->strSearchableName.length () )
+                            pItem->strSearchableName[i] = '\1';
+                }
+            }
+
             pItem->PostChange ();
 
 #if MTA_DEBUG
@@ -347,9 +374,9 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
     }
 
 #if MTA_DEBUG
-    OutputDebugLine ( SString ( "%d servers (%d added, %d updated) from %s", uiNumServers, itemList.size () - uiNumServersBefore, uiNumServersUpdated, *m_strURL ) );
+    OutputDebugLine ( SString ( "[Browser] %d servers (%d added, %d updated) from %s", uiNumServers, itemList.size () - uiNumServersBefore, uiNumServersUpdated, *m_strURL ) );
     for ( std::map < SString, SItem >::iterator iter = totalMap.begin () ; iter != totalMap.end () ; ++iter )
-        OutputDebugLine ( SString ( "version '%s' - %d total  %d noresponse", *iter->first, iter->second.iTotal, iter->second.iNoResponse ) );
+        OutputDebugLine ( SString ( "[Browser] version '%s' - %d total  %d noresponse", *iter->first, iter->second.iTotal, iter->second.iNoResponse ) );
 #endif
 
     return true;
@@ -363,12 +390,12 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
 // Find or add list item for the address and port
 //
 ///////////////////////////////////////////////////////////////
-CServerListItem* CRemoteMasterServer::GetServerListItem ( CServerListItemList& itemList, in_addr Address, ushort usQueryPort )
+CServerListItem* CRemoteMasterServer::GetServerListItem ( CServerListItemList& itemList, in_addr Address, ushort usGamePort )
 {
-    CServerListItem* pItem = itemList.Find ( Address, usQueryPort );
+    CServerListItem* pItem = itemList.Find ( Address, usGamePort );
     if ( pItem )
         return pItem;
 
-    return itemList.Add ( Address, usQueryPort );
+    return itemList.Add ( Address, usGamePort );
 }
 

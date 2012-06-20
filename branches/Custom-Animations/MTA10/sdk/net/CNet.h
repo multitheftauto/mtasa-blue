@@ -17,6 +17,13 @@
 #include "net/bitstream.h"
 #include "CNetHTTPDownloadManagerInterface.h"
 
+struct SPacketStat
+{
+    int iCount;
+    int iTotalBytes;
+    TIMEUS totalTime;
+};
+
 class CNet
 {
 public:
@@ -30,37 +37,23 @@ public:
     virtual bool                        StartNetwork                ( const char* szServerHost, unsigned short usServerPort, const char* szServerPassword = NULL ) = 0;
     virtual void                        StopNetwork                 ( void ) = 0;
 
-    virtual void                        SetFakeLag                  ( unsigned short usMaxPacketsOnWire, unsigned short usMinExtraPing, unsigned short usExtraPingVariance ) = 0;
+    virtual void                        SetFakeLag                  ( unsigned short usPacketLoss, unsigned short usMinExtraPing, unsigned short usExtraPingVariance, int iKBPSLimit ) = 0;
 
     virtual bool                        IsConnected                 ( void ) = 0;
 
     virtual void                        DoPulse                     ( void ) = 0;
 
-    virtual void                        RegisterPacketHandler       ( PPACKETHANDLER pfnPacketHandler, bool bIsPrimaryPacketHandler = true ) = 0;
+    virtual void                        RegisterPacketHandler       ( PPACKETHANDLER pfnPacketHandler ) = 0;
 
     virtual NetBitStreamInterface*      AllocateNetBitStream        ( void ) = 0;
     virtual void                        DeallocateNetBitStream      ( NetBitStreamInterface* bitStream ) = 0;
-    virtual bool                        SendPacket                  ( unsigned char ucPacketID, NetBitStreamInterface* bitStream, NetPacketPriority packetPriority = PACKET_PRIORITY_HIGH, NetPacketReliability packetReliability = PACKET_RELIABILITY_RELIABLE, NetPacketOrdering packetOrdering = PACKET_ORDERING_GAME ) = 0;
+    virtual bool                        SendPacket                  ( unsigned char ucPacketID, NetBitStreamInterface* bitStream, NetPacketPriority packetPriority, NetPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT ) = 0;
 
     virtual void                        SetClientPort               ( unsigned short usClientPort ) = 0;
     virtual const char *                GetConnectedServer          ( void )=0;
 
-    virtual unsigned int                GetMessagesInSendBuffer     ( void ) = 0;
-    virtual unsigned int                GetMessagesSent             ( void ) = 0;
-    virtual unsigned int                GetMessagesWaitingAck       ( void ) = 0;
-    virtual unsigned int                GetMessagesResent           ( void ) = 0;
-    virtual unsigned int                GetAcknowledgesSent         ( void ) = 0;
-    virtual unsigned int                GetAcknowledgesPending      ( void ) = 0;
-    virtual unsigned int                GetAcknowledgesReceived     ( void ) = 0;
-    virtual unsigned int                GetPacketsSent              ( void ) = 0;
-    virtual float                       GetPacketLoss               ( void ) = 0;
-    virtual unsigned int                GetGoodPacketsReceived      ( void ) = 0;
-    virtual unsigned int                GetBadPacketsReceived       ( void ) = 0;
-    virtual unsigned int                GetBitsSent                 ( void ) = 0;
-    virtual unsigned int                GetBitsReceived             ( void ) = 0;
-    virtual float                       GetCompressionRatio         ( void ) = 0;
-    virtual float                       GetDecompressionRatio       ( void ) = 0;
-    virtual void                        GetNetworkUsageData         ( ENetworkUsageDirection dir, unsigned long ulTotalBits[256], unsigned long ulCount[256] ) = 0;
+    virtual bool                        GetNetworkStatistics        ( NetStatistics* pDest ) = 0;
+    virtual const SPacketStat*          GetPacketStats              ( void ) = 0;
 
     virtual int                         GetPing                     ( void ) = 0;
     virtual unsigned long               GetTime                     ( void ) = 0;
@@ -87,11 +80,18 @@ public:
 
     virtual const char*                 GetNextBuffer               ( void ) = 0;
     virtual const char*                 GetDiagnosticStatus         ( void ) = 0;
+    virtual void                        UpdatePingStatus            ( const char* szStatus, ushort& usDataRef ) = 0;
 
     virtual bool                        VerifySignature             ( const char* pData, unsigned long ulSize ) = 0;
 
     virtual void                        ResetStub                   ( DWORD dwType, ... ) = 0;
     virtual void                        ResetStub                   ( DWORD dwType, va_list ) = 0;
+
+    virtual const char*                 GetCurrentServerId          ( void ) = 0;
+    virtual bool                        CheckFile                   ( const char* szType, const char* szFilename ) = 0;
+
+    virtual uint                        GetExtendedErrorCode        ( void ) = 0;
+    virtual void                        SetTimeoutTime              ( uint uiTimeoutTime ) = 0;
 };
 
 #endif

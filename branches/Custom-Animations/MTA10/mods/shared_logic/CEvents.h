@@ -25,12 +25,6 @@ struct SEvent
     bool                bAllowRemoteTrigger;
 };
 
-struct SExtinctEvent
-{
-    char * szName;
-    char * szNewName;
-};
-
 class CEvents
 {
 public:
@@ -56,16 +50,12 @@ public:
     void                        CancelEvent         ( bool bCancelled = true );
     bool                        WasEventCancelled   ( void );
 
-    void                        AddExtinctEvent     ( const char * szName, const char * szNewName );
-    bool                        IsExtinctEvent      ( const char * szName, char * szNewName, unsigned int uiLength );
-
 private:
     void                            RemoveAllEvents     ( void );
     std::list < SEvent* >           m_Events;
     std::vector < int >             m_CancelledList;
     bool                            m_bEventCancelled;
     bool                            m_bWasEventCancelled;
-    std::list < SExtinctEvent * >   m_ExtinctEvents;
 };
 
 #endif

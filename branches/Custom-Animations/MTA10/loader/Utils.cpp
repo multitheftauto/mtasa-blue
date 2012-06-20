@@ -16,17 +16,18 @@
 #include <strsafe.h>
 #include <Tlhelp32.h>
 #define BUFSIZE 512
-#include "../sdk/utils/CMD5Hasher.cpp"  // :O
 
 static bool bCancelPressed = false;
 static bool bOkPressed = false;
+static bool bOtherPressed = false;
+static int iOtherCode = 0;
 static HWND hwndSplash = NULL;
 static unsigned long ulSplashStartTime = 0;
 static HWND hwndProgressDialog = NULL;
 static unsigned long ulProgressStartTime = 0;
 static SString g_strMTASAPath;
-SString GetWMIOSVersion ( void );
 static HWND hwndCrashedDialog = NULL;
+static HWND hwndD3dDllDialog = NULL;
 HANDLE g_hMutex = NULL;
 HMODULE hLibraryModule = NULL;
 
@@ -397,6 +398,12 @@ int CALLBACK DialogProc ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
                 case IDOK:
                     bOkPressed = true;
                     return TRUE; 
+                default:
+                    if ( iOtherCode && iOtherCode == LOWORD(wParam) )
+                    {
+                        bOtherPressed = true;
+                        return TRUE; 
+                    }
             } 
     } 
     return FALSE; 
@@ -505,6 +512,12 @@ void SetMTASAPathSource ( bool bReadFromRegistry )
         SetRegistryValue ( "", "Last Run Path Hash", strHash );
         SetRegistryValue ( "", "Last Run Path Version", MTA_DM_ASE_VERSION );
 
+        // Also save for legacy 1.0 to see
+        SString strThisVersion = SStringX ( MTA_DM_ASE_VERSION ).TrimEnd ( "n" );
+        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path", szBuffer );
+        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path Hash", strHash );
+        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path Version", MTA_DM_ASE_VERSION );
+
         // Strip the module name out of the path.
         PathRemoveFileSpec ( szBuffer );
 
@@ -592,47 +605,61 @@ SString DoUserAssistedSearch ( void )
 ///////////////////////////////////////////////////////////////
 ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
 {
-    // Note: "SOFTWARE\Multi Theft Auto: San Andreas" is the shared multi-version location for "GTA:SA Path"
+    // Registry places to look
+    std::vector < SString > pathList;
 
-    // Try "SOFTWARE\Multi Theft Auto: San Andreas" first   ( "..\\1.0" resolves to "SOFTWARE\Multi Theft Auto: San Andreas" )
-    SString strRegPath = GetRegistryValue ( "..\\1.0", "GTA:SA Path" );
+    // Try HKLM "SOFTWARE\\Multi Theft Auto: San Andreas All\\Common\\"
+    pathList.push_back ( GetCommonRegistryValue ( "", "GTA:SA Path" ) );
+    // Then HKCU "SOFTWARE\\Multi Theft Auto: San Andreas 1.0\\"
+    pathList.push_back ( GetVersionRegistryValueLegacy ( "1.0", "", "GTA:SA Path" ) );
+    // Then HKCU "SOFTWARE\\Multi Theft Auto: San Andreas 1.1\\"
+    pathList.push_back ( GetVersionRegistryValueLegacy ( "1.1", "", "GTA:SA Path Backup" ) );
 
-    // Update/restore from backup location
+
+    // Unicode character check on first one
+    if ( strlen( pathList[0].c_str () ) )
     {
-        SString strRegPathBackup = GetRegistryValue ( "", "GTA:SA Path Backup" );
-        if ( strRegPath.empty () )
-            strRegPath = strRegPathBackup;
-        else
-        if ( strRegPath != strRegPathBackup )
-            SetRegistryValue ( "", "GTA:SA Path Backup", strRegPath );
+        // Check for replacement characters (?), to see if there are any (unsupported) unicode characters
+        if ( strchr ( pathList[0].c_str (), '?' ) > 0 )
+            return GAME_PATH_UNICODE_CHARS;
     }
 
-    // Manual skip if CTRL is held
-    if ( ( GetAsyncKeyState ( VK_CONTROL ) & 0x8000 ) == 0 )
-    {
-        if ( strlen( strRegPath.c_str () ) )
-        {
-            // Check for replacement characters (?), to see if there are any (unsupported) unicode characters
-            if ( strchr ( strRegPath.c_str (), '?' ) > 0 )
-                return GAME_PATH_UNICODE_CHARS;
 
-            SString strExePath ( "%s\\%s", strRegPath.c_str (), MTA_GTAEXE_NAME );
-            if ( FileExists( strExePath  ) )
-            {
-                strOutResult = strRegPath;
-                return GAME_PATH_OK;
-            }
-            strExePath = SString( "%s\\%s", strRegPath.c_str (), MTA_GTASTEAMEXE_NAME );
-            if ( FileExists( strExePath  ) )
-            {
-                return GAME_PATH_STEAM;
-            }
+    // Then step through looking for an existing file
+    bool bFoundSteamExe = false;
+    SString strRegPath;
+    for ( uint i = 0 ; i < pathList.size (); i++ )
+    {
+        if ( FileExists( PathJoin ( pathList[i], MTA_GTAEXE_NAME ) ) )
+        {
+            strRegPath = pathList[i];
+            break;
         }
+        if ( FileExists( PathJoin ( pathList[i], MTA_GTASTEAMEXE_NAME ) ) )
+        {
+            bFoundSteamExe = true;
+        }
+    }
+
+    // Found an exe?
+    if ( !strRegPath.empty () )
+    {
+        strOutResult = strRegPath;
+        // Update registry.
+        SetCommonRegistryValue ( "", "GTA:SA Path", strOutResult );
+        return GAME_PATH_OK;
+    }
+
+    // Found a steam exe?
+    if ( bFoundSteamExe )
+    {
+        return GAME_PATH_STEAM;
     }
 
     // Try to find?
     if ( !bFindIfMissing )
         return GAME_PATH_MISSING;
+
 
     // Ask user to browse for GTA
     BROWSEINFO bi = { 0 };
@@ -658,22 +685,26 @@ ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
     }
 
     // Check browse result
-    if ( !FileExists( PathJoin ( strOutResult.c_str (), MTA_GTAEXE_NAME ) ) )
+    if ( !FileExists( PathJoin ( strOutResult, MTA_GTAEXE_NAME ) ) )
     {
+        if ( FileExists( PathJoin ( strOutResult, MTA_GTASTEAMEXE_NAME ) ) )
+            return GAME_PATH_STEAM;
+
         // If browse didn't help, try another method
         strOutResult = DoUserAssistedSearch ();
 
-        if ( !FileExists( PathJoin ( strOutResult.c_str (), MTA_GTAEXE_NAME ) ) )
+        if ( !FileExists( PathJoin ( strOutResult, MTA_GTAEXE_NAME ) ) )
         {
+            if ( FileExists( PathJoin ( strOutResult, MTA_GTASTEAMEXE_NAME ) ) )
+                return GAME_PATH_STEAM;
+
             // If still not found, give up
             return GAME_PATH_MISSING;
         }
     }
 
     // File found. Update registry.
-    SetRegistryValue ( "..\\1.0", "GTA:SA Path", strOutResult );
-    SetRegistryValue ( "", "GTA:SA Path Backup", strOutResult );
-
+    SetCommonRegistryValue ( "", "GTA:SA Path", strOutResult );
     return GAME_PATH_OK;
 }
 
@@ -790,6 +821,8 @@ SString ShowCrashedDialog( HINSTANCE hInstance, const SString& strMessage )
         HideSplash ();
         bCancelPressed = false;
         bOkPressed = false;
+        bOtherPressed = false;
+        iOtherCode = 0;
         hwndCrashedDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_CRASHED_DIALOG), 0, DialogProc );
         SetWindowText ( GetDlgItem( hwndCrashedDialog, IDC_CRASH_INFO_EDIT ), strMessage );
         SendDlgItemMessage( hwndCrashedDialog, IDC_SEND_DUMP_CHECK, BM_SETCHECK, GetApplicationSetting ( "diagnostics", "send-dumps" ) != "no" ? BST_CHECKED : BST_UNCHECKED, 0 );
@@ -830,6 +863,95 @@ void HideCrashedDialog ( void )
     }
 }
 
+
+///////////////////////////////////////////////////////////////
+//
+// d3d dll dialog
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void ShowD3dDllDialog( HINSTANCE hInstance, const SString& strPath )
+{
+    // Calc hash of target file
+    SString strFileHash;
+    MD5 md5;
+    CMD5Hasher Hasher;
+    if ( Hasher.Calculate ( strPath, md5 ) )
+    {
+        char szHashResult[33];
+        Hasher.ConvertToHex ( md5, szHashResult );
+        strFileHash = szHashResult;
+    }
+
+	// Maybe skip dialog
+    if ( GetApplicationSetting ( "diagnostics", "d3d9-dll-last-hash" ) == strFileHash )
+    {
+        if ( GetApplicationSetting ( "diagnostics", "d3d9-dll-not-again" ) == "yes" )
+            return;
+    }
+
+	// Create and show dialog
+    if ( !hwndD3dDllDialog )
+    {
+        HideSplash ();
+        bCancelPressed = false;
+        bOkPressed = false;
+        bOtherPressed = false;
+        iOtherCode = IDC_BUTTON_SHOW_DIR;
+        hwndD3dDllDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_D3DDLL_DIALOG), 0, DialogProc );
+        SetWindowText ( GetDlgItem( hwndD3dDllDialog, IDC_EDIT_D3DDLL_PATH ), strPath );
+    }
+    SetForegroundWindow ( hwndD3dDllDialog );
+    SetWindowPos ( hwndD3dDllDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+
+	// Wait for input
+    while ( !bCancelPressed && !bOkPressed && !bOtherPressed )
+    {
+        MSG msg;
+        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
+        {
+            if( GetMessage( &msg, NULL, 0, 0 ) )
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+        Sleep( 10 );
+    }
+
+	// Process input
+    LRESULT res = SendMessageA( GetDlgItem( hwndD3dDllDialog, IDC_CHECK_NOT_AGAIN ), BM_GETCHECK, 0, 0 );
+    SetApplicationSetting ( "diagnostics", "d3d9-dll-last-hash", strFileHash );
+    SetApplicationSetting ( "diagnostics", "d3d9-dll-not-again", res ? "yes" : "no" );
+
+    if ( bCancelPressed )
+    {
+        ExitProcess(0);
+    }
+    if ( bOtherPressed )
+    {
+        if ( ITEMIDLIST *pidl = ILCreateFromPath ( strPath ) )
+        {
+            SHOpenFolderAndSelectItems ( pidl, 0, 0, 0 );
+            ILFree ( pidl );
+        }
+        else
+            ShellExecuteNonBlocking ( "open", ExtractPath ( strPath ) );
+
+        ExitProcess(0);
+    }
+}
+
+
+void HideD3dDllDialog ( void )
+{
+    if ( hwndD3dDllDialog )
+    {
+        DestroyWindow ( hwndD3dDllDialog );
+        hwndD3dDllDialog = NULL;
+    }
+}
 
 
 
@@ -1036,248 +1158,6 @@ bool IsVistaOrHigher ( void )
 }
 
 
-//
-// QueryWMI
-//
-// Code based on the example from:
-// ms-help://MS.VSCC.v90/MS.MSDNQTR.v90.en/wmisdk/wmi/example__getting_wmi_data_from_the_local_computer.htm
-//
-
-#define _WIN32_DCOM
-using namespace std;
-#include <comdef.h>
-#include <Wbemidl.h>
-
-# pragma comment(lib, "wbemuuid.lib")
-
-
-#define DECODE_NAME_WMI(txt) DECODE_TEXT(txt,0xB5)
-
-/////////////////////////////////////////////////////////////////////
-//
-// QueryWMI
-//
-//
-//
-/////////////////////////////////////////////////////////////////////
-static bool QueryWMI ( const SString& strQuery, const SString& strKeys, std::vector < std::vector < SString > >& vecResults )
-{
-    HRESULT hres;
-
-    // Step 1: --------------------------------------------------
-    // Initialize COM. ------------------------------------------
-
-    // This has already been done somewhere else.
-
-    hres = CoInitializeEx(0, COINIT_MULTITHREADED);
-    if (FAILED(hres))
-    {
-        OutputDebugString ( SString ( "Failed to initialize COM library. Error code = %x\n", hres ) );
-        return "";
-    }
-
-    // Step 2: --------------------------------------------------
-    // Set general COM security levels --------------------------
-    // Note: If you are using Windows 2000, you need to specify -
-    // the default authentication credentials for a user by using
-    // a SOLE_AUTHENTICATION_LIST structure in the pAuthList ----
-    // parameter of CoInitializeSecurity ------------------------
-
-    hres =  CoInitializeSecurity(
-        NULL, 
-        -1,                          // COM authentication
-        NULL,                        // Authentication services
-        NULL,                        // Reserved
-        RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication 
-        RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation  
-        NULL,                        // Authentication info
-        EOAC_NONE,                   // Additional capabilities 
-        NULL                         // Reserved
-        );
-                      
-    // Error here can be non fatal
-
-//    if (FAILED(hres))
-//    {
-//#if MTA_DEBUG
-//        OutputDebugString ( SString ( "QueryWMI - Failed to initialize security. Error code = %x\n", hres ) );
-//#endif
-//        return "";
-//    }
-    
-    // Step 3: ---------------------------------------------------
-    // Obtain the initial locator to WMI -------------------------
-
-    IWbemLocator *pLoc = NULL;
-
-    hres = CoCreateInstance(
-        CLSID_WbemLocator,             
-        0, 
-        CLSCTX_INPROC_SERVER, 
-        IID_IWbemLocator, (LPVOID *) &pLoc);
- 
-    if (FAILED(hres))
-    {
-#if MTA_DEBUG
-        OutputDebugString ( SString ( "QueryWMI - Failed to create IWbemLocator object. Error code = %x\n", hres ) );
-#endif
-        return false;
-    }
-
-    // Step 4: -----------------------------------------------------
-    // Connect to WMI through the IWbemLocator::ConnectServer method
-
-    IWbemServices *pSvc = NULL;
-
-
-    // Connect to the root\cimv2 namespace with
-    // the current user and obtain pointer pSvc
-    // to make IWbemServices calls.
-    hres = pLoc->ConnectServer(
-         _bstr_t( "ROOT\\CIMV2" ), // Object path of WMI namespace
-         NULL,                    // User name. NULL = current user
-         NULL,                    // User password. NULL = current
-         0,                       // Locale. NULL indicates current
-         NULL,                    // Security flags.
-         0,                       // Authority (e.g. Kerberos)
-         0,                       // Context object 
-         &pSvc                    // pointer to IWbemServices proxy
-         );
-   
-    if (FAILED(hres))
-    {
-        pLoc->Release();     
-#if MTA_DEBUG
-        OutputDebugString ( SString ( "QueryWMI - Could not connect. Error code = %x\n", hres ) );
-#endif
-        return false;
-    }
-
-    // Step 5: --------------------------------------------------
-    // Set security levels on the proxy -------------------------
-
-    hres = CoSetProxyBlanket(
-       pSvc,                        // Indicates the proxy to set
-       RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx
-       RPC_C_AUTHZ_NONE,            // RPC_C_AUTHZ_xxx
-       NULL,                        // Server principal name 
-       RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx 
-       RPC_C_IMP_LEVEL_IMPERSONATE, // RPC_C_IMP_LEVEL_xxx
-       NULL,                        // client identity
-       EOAC_NONE                    // proxy capabilities 
-    );
-
-    if (FAILED(hres))
-    {
-        pSvc->Release();
-        pLoc->Release();     
-#if MTA_DEBUG
-        OutputDebugString ( SString ( "QueryWMI - Could not set proxy blanket. Error code = %x\n", hres ) );
-#endif
-        return false;
-    }
-
-    // Step 6: --------------------------------------------------
-    // Use the IWbemServices pointer to make requests of WMI ----
-    IEnumWbemClassObject* pEnumerator = NULL;
-    hres = pSvc->ExecQuery(
-        bstr_t("WQL"),
-        bstr_t( "SELECT * FROM " ) + bstr_t ( strQuery ),
-        WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, 
-        NULL,
-        &pEnumerator);
-    
-    if (FAILED(hres))
-    {
-        pSvc->Release();
-        pLoc->Release();
-#if MTA_DEBUG
-        OutputDebugString ( SString ( "QueryWMI - Query failed. Error code = %x\n", hres ) );
-#endif
-        return false;
-    }
-
-    // Step 7: -------------------------------------------------
-    // Get the data from the query in step 6 -------------------
- 
-    IWbemClassObject *pclsObj;
-    ULONG uReturn = 0;
-
-    // Get list of keys to find values for
-    std::vector < SString > vecKeys;
-    SString ( strKeys ).Split ( ",", vecKeys );
-
-    // Reserve 20 rows for results
-    vecResults.reserve ( 20 );
-
-    // Fill each row
-    while (pEnumerator)
-    {
-        HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1, 
-            &pclsObj, &uReturn);
-
-        if(0 == uReturn)
-        {
-            break;
-        }
-
-        VARIANT vtProp;
-
-        // Add result row
-        vecResults.insert ( vecResults.end (), std::vector < SString > () );
-        vecResults.back().reserve ( vecKeys.size () );
-
-        // Fill each cell
-        for ( unsigned int i = 0 ; i < vecKeys.size () ; i++ )
-        {
-            string strKey = vecKeys[i];
-            string strValue;
-
-            wstring wstrKey( strKey.begin (), strKey.end () );
-            hr = pclsObj->Get ( wstrKey.c_str (), 0, &vtProp, 0, 0 );
-
-            VariantChangeType( &vtProp, &vtProp, 0, VT_BSTR );
-            if ( vtProp.vt == VT_BSTR )
-                strValue = _bstr_t ( vtProp.bstrVal );
-            VariantClear ( &vtProp );
-
-            vecResults.back().insert ( vecResults.back().end (), strValue );
-        }
-
-        pclsObj->Release();
-    }
-
-    // Cleanup
-    // ========
-    
-    pSvc->Release();
-    pLoc->Release();
-    pEnumerator->Release();
-
-    return true;
-}
-
-
-/////////////////////////////////////////////////////////////////////
-//
-// GetWMIOSVersion
-//
-//
-//
-/////////////////////////////////////////////////////////////////////
-SString GetWMIOSVersion ( void )
-{
-    std::vector < std::vector < SString > > vecResults;
-
-    QueryWMI ( "Win32_OperatingSystem", "Version", vecResults );
-
-    if ( vecResults.empty () )
-        return "";
-
-    const SString& strVersion  = vecResults[0][0];
-    return strVersion;
-}
-
 
 static SString HashBuffer ( char* pData, uint uiLength )
 {
@@ -1379,6 +1259,12 @@ void UpdateMTAVersionApplicationSetting ( void )
         PFNGETNETREV pfnGetNetRel = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRel" ) ) );
         if ( pfnGetNetRel )
             usNetRel = pfnGetNetRel ();
+    }
+    else
+    {
+        SString strError = GetSystemErrorMessage ( GetLastError () );            
+        MessageBox ( 0, SString ( "Error loading %s module! (%s)", *strFilename.ToLower (), *strError ), "Error", MB_OK|MB_ICONEXCLAMATION );
+        BrowseToSolution ( strFilename + "-not-loadable", true, true );
     }
 
     SetApplicationSetting ( "mta-version-ext", SString ( "%d.%d.%d-%d.%05d.%c.%03d"
@@ -1573,7 +1459,7 @@ void CleanDownloadCache ( void )
 
     // Search possible cache locations
     std::list < SString > cacheLocationList;
-    cacheLocationList.push_back ( PathJoin ( GetMTALocalAppDataPath (), "upcache" ) );
+    cacheLocationList.push_back ( PathJoin ( GetMTADataPath (), "upcache" ) );
     cacheLocationList.push_back ( PathJoin ( GetMTATempPath (), "upcache" ) );
     cacheLocationList.push_back ( GetMTATempPath () );
 
@@ -1601,4 +1487,197 @@ void CleanDownloadCache ( void )
             }
         }
     }
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// IsDirectoryEmpty
+//
+// Returns true if directory does not exist, or it is empty
+//
+//////////////////////////////////////////////////////////
+bool IsDirectoryEmpty ( const SString& strSrcBase )
+{
+    return FindFiles ( PathJoin ( strSrcBase, "*" ), true, true ).empty ();
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// GetDiskFreeSpace
+//
+// Get free disk space in bytes
+//
+//////////////////////////////////////////////////////////
+long long GetDiskFreeSpace ( SString strSrcBase )
+{
+    for ( uint i = 0 ; i < 100 ; i++ )
+    {
+        ULARGE_INTEGER FreeBytesAvailable;
+        if ( GetDiskFreeSpaceEx ( strSrcBase, &FreeBytesAvailable, NULL, NULL ) )
+            return FreeBytesAvailable.QuadPart;
+
+        strSrcBase = ExtractPath( strSrcBase );
+    }
+    return 0;
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// DirectoryCopy
+//
+// Recursive directory copy
+//
+//
+//////////////////////////////////////////////////////////
+void DirectoryCopy ( SString strSrcBase, SString strDestBase, bool bShowProgressDialog = false, int iMinFreeSpaceMB = 1 )
+{
+    // Setup diskspace checking
+    bool bCheckFreeSpace = false;
+    long long llFreeBytesAvailable = GetDiskFreeSpace ( strDestBase );
+    if ( llFreeBytesAvailable != 0 )
+        bCheckFreeSpace = ( llFreeBytesAvailable < ( iMinFreeSpaceMB + 10000 ) * 0x100000LL );    // Only check if initial freespace is less than 10GB
+
+    if ( bShowProgressDialog )
+        ShowProgressDialog( g_hInstance, "Copying files...", true );
+
+    strSrcBase = PathConform ( strSrcBase ).TrimEnd ( PATH_SEPERATOR );
+    strDestBase = PathConform ( strDestBase ).TrimEnd ( PATH_SEPERATOR );
+
+    float fProgress = 0;
+    float fUseProgress = 0;
+    std::list < SString > toDoList;
+    toDoList.push_back ( "" );
+    while ( toDoList.size () )
+    {
+        fProgress += 0.5f;
+        fUseProgress = fProgress;
+        if ( fUseProgress > 50 )
+            fUseProgress = Min ( 100.f, pow ( fUseProgress - 50, 0.6f ) + 50 );
+
+        SString strPathHereBaseRel = toDoList.front ();
+        toDoList.pop_front ();
+
+        SString strPathHereSrc = PathJoin ( strSrcBase, strPathHereBaseRel );
+        SString strPathHereDest = PathJoin ( strDestBase, strPathHereBaseRel );
+
+        std::vector < SString > fileListHere = FindFiles ( PathJoin ( strPathHereSrc, "*" ), true, false );
+        std::vector < SString > dirListHere = FindFiles ( PathJoin ( strPathHereSrc, "*" ), false, true );
+
+        // Copy the files at this level
+        for ( unsigned int i = 0 ; i < fileListHere.size (); i++ )
+        {
+            SString filePathNameSrc = PathJoin ( strPathHereSrc, fileListHere[i] );
+            SString filePathNameDest = PathJoin ( strPathHereDest, fileListHere[i] );
+            if ( bShowProgressDialog )
+                if ( UpdateProgress ( (int)fUseProgress, 100, SString ( "...%s", *PathJoin ( strPathHereBaseRel, fileListHere[i] ) ) ) )
+                    goto stop_copy;
+
+            // Check enough disk space
+            if ( bCheckFreeSpace )
+            {
+                llFreeBytesAvailable -= FileSize ( filePathNameSrc );
+                if ( llFreeBytesAvailable / 0x100000LL < iMinFreeSpaceMB )
+                    goto stop_copy;
+            }
+
+            FileCopy ( filePathNameSrc, filePathNameDest, true );
+        }
+
+        // Add the directories at this level
+        for ( unsigned int i = 0 ; i < dirListHere.size (); i++ )
+        {
+            SString dirPathNameBaseRel = PathJoin ( strPathHereBaseRel, dirListHere[i] );
+            toDoList.push_back ( dirPathNameBaseRel );
+        }
+    }
+
+stop_copy:
+    if ( bShowProgressDialog )
+    {
+        // Reassuring messages
+        if ( toDoList.size () )
+        {
+            Sleep ( 1000 );
+            UpdateProgress ( (int)fUseProgress, 100, "Copy finished early. Everything OK." );
+            Sleep ( 2000 );
+        }
+        else
+        {
+            fUseProgress = Max ( 90.f, fUseProgress );
+            UpdateProgress ( (int)fUseProgress, 100, "Finishing..." );
+            Sleep ( 1000 );
+            UpdateProgress ( 100, 100, "Done!" );
+            Sleep ( 2000 );
+        }
+
+        HideProgressDialog ();
+    }
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// MaybeShowCopySettingsDialog
+//
+// For new installs, give the user an option to copy
+// settings from a previous version
+//
+//////////////////////////////////////////////////////////
+void MaybeShowCopySettingsDialog ( void )
+{
+    // Check if coreconfig.xml is present
+    const SString strMTASAPath = GetMTASAPath ();
+    SString strCurrentConfig = PathJoin ( GetMTASAPath (), "mta", "coreconfig.xml" );
+    if ( FileExists ( strCurrentConfig ) )
+        return;
+
+    // Check if coreconfig.xml from previous version is present
+    SString strCurrentVersion = SString ( "%d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR );
+    SString strPreviousVersion = SString ( "%d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR - 1 );
+    SString strPreviousPath = GetVersionRegistryValue ( strPreviousVersion, "", "Last Run Location" );
+    if ( strPreviousPath.empty () )
+        return;
+    SString strPreviousConfig = PathJoin ( strPreviousPath, "mta", "coreconfig.xml" );
+    if ( !FileExists ( strPreviousConfig ) )
+        return;
+
+    HideSplash ();  // Hide standard MTA splash
+
+    // Show dialog
+    SString strMessage;
+    strMessage += "New installation of " + strCurrentVersion + " detected.\n";
+    strMessage += "\n";
+    strMessage += "Do you want to copy your settings from " + strPreviousVersion + " ?";
+    int iResponse = MessageBox ( NULL, strMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION );
+    if ( iResponse != IDYES )
+        return;
+
+    // Copy settings from previous version
+    FileCopy ( strPreviousConfig, strCurrentConfig );
+
+    // Copy registry setting for aero-enabled
+    SString strAeroEnabled = GetVersionRegistryValue ( strPreviousVersion, PathJoin ( "Settings", "general" ) , "aero-enabled" );
+    SetApplicationSetting ( "aero-enabled", strAeroEnabled );
+
+    // Copy some directories if empty
+    SString strCurrentNewsDir = PathJoin ( GetMTADataPath (), "news" );
+    SString strCurrentPrivDir = PathJoin ( GetMTASAPath (), "mods", "deathmatch", "priv" );
+    SString strCurrentResourcesDir = PathJoin ( GetMTASAPath (), "mods", "deathmatch", "resources" );
+
+    SString strPreviousDataPath = PathJoin ( GetSystemCommonAppDataPath(), "MTA San Andreas All", strPreviousVersion );
+    SString strPreviousNewsDir = PathJoin ( strPreviousDataPath, "news" );
+    SString strPreviousPrivDir = PathJoin ( strPreviousPath, "mods", "deathmatch", "priv" );
+    SString strPreviousResourcesDir = PathJoin ( strPreviousPath, "mods", "deathmatch", "resources" );
+
+    if ( IsDirectoryEmpty( strCurrentNewsDir ) && DirectoryExists( strPreviousNewsDir ) )
+        DirectoryCopy ( strPreviousNewsDir, strCurrentNewsDir );
+
+    if ( IsDirectoryEmpty( strCurrentPrivDir ) && DirectoryExists( strPreviousPrivDir ) )
+        DirectoryCopy ( strPreviousPrivDir, strCurrentPrivDir );
+
+    if ( IsDirectoryEmpty( strCurrentResourcesDir ) && DirectoryExists( strPreviousResourcesDir ) )
+        DirectoryCopy ( strPreviousResourcesDir, strCurrentResourcesDir, true, 100 );
 }

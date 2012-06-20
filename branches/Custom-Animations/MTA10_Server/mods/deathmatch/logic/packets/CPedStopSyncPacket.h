@@ -20,8 +20,8 @@ class CPedStopSyncPacket : public CPacket
 public:
     inline                  CPedStopSyncPacket                      ( ElementID ID )                                    { m_ID = ID; };
 
-    inline ePacketID        GetPacketID                             ( void ) const                                      { return PACKET_ID_PED_STOPSYNC; };
-    inline unsigned long    GetFlags                                ( void ) const                                      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline ePacketID                GetPacketID                     ( void ) const                                      { return PACKET_ID_PED_STOPSYNC; };
+    inline unsigned long            GetFlags                        ( void ) const                                      { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     inline bool             Write                                   ( NetBitStreamInterface& BitStream ) const          { BitStream.Write ( m_ID ); return true; };
 

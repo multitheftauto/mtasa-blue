@@ -19,12 +19,11 @@
 
 extern CGame* g_pGame;
 
+#if defined(_MSC_VER)
 #pragma warning( disable : 4355 )   // warning C4355: 'this' : used in base member initializer list
+#endif
 
 CElement::CElement ( CElement* pParent, CXMLNode* pNode )
-        : m_FromRootNode ( this )
-        , m_ChildrenNode ( this )
-        , m_Children ( &CElement::m_ChildrenNode )
 {
     // Allocate us an unique ID
     m_ID = CElementIDs::PopUniqueID ( this );
@@ -70,7 +69,6 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
     m_pCustomData = new CCustomData;
 
     m_pAttachedTo = NULL;
-    m_szAttachToID [ 0 ] = 0;
 }
 
 
@@ -98,10 +96,10 @@ CElement::~CElement ( void )
     RemoveAllCollisions ( true );
 
     // Null all camera elements referencing us
-    list < CPlayerCamera* > ::const_iterator iterFollowingCameras = m_FollowingCameras.begin ();
-    for ( ; iterFollowingCameras != m_FollowingCameras.end (); iterFollowingCameras++ )
+    std::list < CPlayerCamera* > cloneFollowingCameras = m_FollowingCameras;
+    for ( std::list < CPlayerCamera* > ::const_iterator iter = cloneFollowingCameras.begin () ; iter != cloneFollowingCameras.end () ; iter++ )
     {
-        (*iterFollowingCameras)->m_pTarget = NULL;
+        (*iter)->SetTarget ( NULL );
     }
 
     if ( m_pAttachedTo )
@@ -124,6 +122,10 @@ CElement::~CElement ( void )
             pPed->m_pContactElement = NULL;
     }
 
+    // Hack to fix crash
+    if ( IS_PLAYER ( this ) )
+        CPerPlayerEntity::StaticOnPlayerDelete ( (CPlayer*)this );
+
     // Remove from spatial database
     GetSpatialDatabase ()->RemoveEntity ( this );
 
@@ -136,9 +138,7 @@ CElement::~CElement ( void )
     // Ensure nothing has inadvertently set a parent
     assert ( m_pParent == NULL );
 
-    // Ensure intrusive list nodes have been isolated
-    assert ( m_FromRootNode.m_pOuterItem == this && !m_FromRootNode.m_pPrev && !m_FromRootNode.m_pNext );
-    assert ( m_ChildrenNode.m_pOuterItem == this && !m_ChildrenNode.m_pPrev && !m_ChildrenNode.m_pNext );
+    CElementRefManager::OnElementDelete ( this );
 }
 
 
@@ -225,6 +225,35 @@ void CElement::FindAllChildrenByType ( const char* szType, lua_State* pLua )
     }
 }
 
+// TODO - Make this use GetEntitiesFromRoot
+void CElement::GetDescendants ( std::vector < CElement* >& outResult, bool bIncludeThis )
+{
+    if ( bIncludeThis )
+        outResult.push_back ( this );
+
+    for ( CChildListType::const_iterator iter = m_Children.begin () ; iter != m_Children.end () ; ++iter )
+    {
+        CElement* pChild = *iter;
+        outResult.push_back ( pChild );
+        pChild->GetDescendants ( outResult, false );
+    }
+}
+
+// TODO - Make this use GetEntitiesFromRoot
+void CElement::GetDescendantsByType ( std::vector < CElement* >& outResult, bool bIncludeThis, int type )
+{
+    if ( bIncludeThis && GetType () == type )
+        outResult.push_back ( this );
+
+    for ( CChildListType::const_iterator iter = m_Children.begin () ; iter != m_Children.end () ; ++iter )
+    {
+        CElement* pChild = *iter;
+        if ( pChild->GetType () == type )
+            outResult.push_back ( pChild );
+        pChild->GetDescendantsByType ( outResult, false, type );
+    }
+}
+
 
 void CElement::GetChildren ( lua_State* pLua )
 {
@@ -243,31 +272,46 @@ void CElement::GetChildren ( lua_State* pLua )
 }
 
 
+void CElement::GetChildrenByType ( const char* szType, lua_State* pLua )
+{
+    assert ( szType );
+    assert ( pLua );
+
+    // Add all our children to the table on top of the given lua main's stack
+    unsigned int uiIndex = 0;
+    unsigned int uiTypeHash = HashString ( szType );
+    CChildListType ::const_iterator iter = m_Children.begin ();
+    for ( ; iter != m_Children.end (); iter++ )
+    {
+        // Name matches?
+        if ( (*iter)->GetTypeHash() == uiTypeHash )
+        {
+            // Add it to the table
+            lua_pushnumber ( pLua, ++uiIndex );
+            lua_pushelement ( pLua, *iter );
+            lua_settable ( pLua, -3 );
+        }
+    }
+}
+
+
+// Also returns true if the element is the same
 bool CElement::IsMyChild ( CElement* pElement, bool bRecursive )
 {
-    // Since VERIFY_ELEMENT is calling us, the pEntity argument could be NULL
-    if ( pElement == NULL ) return false;
+    return pElement && pElement->IsMyParent ( this, bRecursive );
+}
 
+
+// Also returns true if the element is the same
+bool CElement::IsMyParent ( CElement* pElement, bool bRecursive )
+{
     // Is he us?
     if ( pElement == this )
         return true;
 
-    // Is he our child directly?
-    CChildListType ::const_iterator iter = m_Children.begin ();
-    for ( ; iter != m_Children.end (); iter++ )
-    {
-        // Return true if this is our child. If not check if he's one of our children's children if we were asked to do a recursive search.
-        if ( *iter == pElement )
-        {
-            return true;
-        }
-        else if ( bRecursive && (*iter)->IsMyChild ( pElement, true ) )
-        {
-            return true;
-        }
-    }
+    if ( bRecursive && pElement && m_pParent && m_pParent->IsMyParent ( pElement, true ) )
+        return true;
 
-    // He's not under us
     return false;
 }
 
@@ -278,12 +322,19 @@ void CElement::ClearChildren ( void )
     assert ( m_pParent != this );
 
     // Process our children - Move up to our parent
-    while ( m_Children.size () )
-        (*m_Children.begin())->SetParentObject ( m_pParent );
+    if ( !m_Children.empty  () )    // This check reduces cpu usage when unloading large maps (due to recursion)
+    {
+        while ( !m_Children.empty () )
+            (*m_Children.begin())->SetParentObject ( m_pParent, false );
+
+        // Do this at the end for speed
+        if ( CElement* pRoot = GetRootElement () )
+            pRoot->UpdatePerPlayerEntities ();
+    }
 }
 
 
-CElement* CElement::SetParentObject ( CElement* pParent )
+CElement* CElement::SetParentObject ( CElement* pParent, bool bUpdatePerPlayerEntities )
 {
     // Different parent?
     if ( pParent != m_pParent )
@@ -336,7 +387,8 @@ CElement* CElement::SetParentObject ( CElement* pParent )
         }
 
         // Update all per-player references from the root and down
-        pRoot->UpdatePerPlayerEntities ();
+        if ( bUpdatePerPlayerEntities )
+            pRoot->UpdatePerPlayerEntities ();
     }
 
     return pParent;
@@ -360,9 +412,9 @@ void CElement::SetXMLNode ( CXMLNode* pNode )
 };
 
 
-bool CElement::AddEvent ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated )
+bool CElement::AddEvent ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod )
 {
-    return m_pEventManager->Add ( pLuaMain, szName, iLuaFunction, bPropagated );
+    return m_pEventManager->Add ( pLuaMain, szName, iLuaFunction, bPropagated, eventPriority, fPriorityMod );
 }
 
 
@@ -436,7 +488,9 @@ void CElement::ReadCustomData ( CLuaMain* pLuaMain, CEvents* pEvents )
             CLuaArguments args;
             if ( !args.ReadFromJSONString ( pAttribute->GetValue ().c_str() ) )
                 args.PushString ( pAttribute->GetValue ().c_str () );
-            SetCustomData ( pAttribute->GetName ().c_str (), *args[0], pLuaMain );
+
+            // Don't trigger onElementDataChanged event
+            SetCustomData ( pAttribute->GetName ().c_str (), *args[0], pLuaMain, g_pGame->GetConfig ()->GetSyncMapElementData (), NULL, false );
         }
     }
 }
@@ -647,9 +701,15 @@ bool CElement::GetCustomDataBool ( const char* szName, bool& bOut, bool bInherit
 }
 
 
-void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized, CPlayer* pClient )
+void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized, CPlayer* pClient, bool bTriggerEvent )
 {
     assert ( szName );
+    if ( strlen ( szName ) > MAX_CUSTOMDATA_NAME_LENGTH )
+    {
+        // Don't allow it to be set if the name is too long
+        CLogger::ErrorPrintf ( "Custom data name too long (%s)\n", *SStringX ( szName ).Left ( MAX_CUSTOMDATA_NAME_LENGTH + 1 ) );
+        return;
+    }
 
     // Grab the old variable
     CLuaArgument oldVariable;
@@ -662,12 +722,15 @@ void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable,
     // Set the new data
     m_pCustomData->Set ( szName, Variable, pLuaMain, bSynchronized );
 
-    // Trigger the onElementDataChange event on us
-    CLuaArguments Arguments;
-    Arguments.PushString ( szName );
-    Arguments.PushArgument ( oldVariable );
-    Arguments.PushArgument ( Variable );
-    CallEvent ( "onElementDataChange", Arguments, pClient );
+    if ( bTriggerEvent )
+    {
+        // Trigger the onElementDataChange event on us
+        CLuaArguments Arguments;
+        Arguments.PushString ( szName );
+        Arguments.PushArgument ( oldVariable );
+        Arguments.PushArgument ( Variable );
+        CallEvent ( "onElementDataChange", Arguments, pClient );
+    }
 }
 
 
@@ -762,7 +825,9 @@ bool CElement::LoadFromCustomData ( CLuaMain* pLuaMain, CEvents* pEvents )
     m_strName = szBuf;
 
     // Grab the attaching custom data
-    GetCustomDataString ( "attachTo", m_szAttachToID, MAX_ELEMENT_NAME_LENGTH, true );
+    szBuf[0] = 0;
+    GetCustomDataString ( "attachTo", szBuf, MAX_ELEMENT_NAME_LENGTH, true );
+    m_strAttachToID = szBuf;
     GetCustomDataFloat ( "attachX", m_vecAttachedPosition.fX, true );
     GetCustomDataFloat ( "attachY", m_vecAttachedPosition.fY, true );
     GetCustomDataFloat ( "attachZ", m_vecAttachedPosition.fZ, true );
@@ -775,10 +840,13 @@ bool CElement::LoadFromCustomData ( CLuaMain* pLuaMain, CEvents* pEvents )
 void CElement::OnSubtreeAdd ( CElement* pElement )
 {
     // Call the event on the elements that references us
-    list < CPerPlayerEntity* > ::const_iterator iter = m_ElementReferenced.begin ();
-    for ( ; iter != m_ElementReferenced.end (); iter++ )
+    if ( !m_ElementReferenced.empty () )    // This check reduces cpu usage when loading large maps (due to recursion)
     {
-        (*iter)->OnReferencedSubtreeAdd ( pElement );
+        list < CPerPlayerEntity* > ::const_iterator iter = m_ElementReferenced.begin ();
+        for ( ; iter != m_ElementReferenced.end (); iter++ )
+        {
+            (*iter)->OnReferencedSubtreeAdd ( pElement );
+        }
     }
 
     // Call the event on our parent
@@ -792,10 +860,13 @@ void CElement::OnSubtreeAdd ( CElement* pElement )
 void CElement::OnSubtreeRemove ( CElement* pElement )
 {
     // Call the event on the elements that references us
-    list < CPerPlayerEntity* > ::const_iterator iter = m_ElementReferenced.begin ();
-    for ( ; iter != m_ElementReferenced.end (); iter++ )
+    if ( !m_ElementReferenced.empty () )    // This check reduces cpu usage when unloading large maps (due to recursion)
     {
-        (*iter)->OnReferencedSubtreeRemove ( pElement );
+        list < CPerPlayerEntity* > ::const_iterator iter = m_ElementReferenced.begin ();
+        for ( ; iter != m_ElementReferenced.end (); iter++ )
+        {
+            (*iter)->OnReferencedSubtreeRemove ( pElement );
+        }
     }
 
     // Call the event on our parent
@@ -955,7 +1026,7 @@ void CElement::FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, lua_State* 
 void CElement::CallEventNoParent ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller )
 {
     // Call it on us if this isn't the same class it was raised on
-    if ( pSource != this )
+    if ( pSource != this && m_pEventManager->HasEvents () )
     {
         m_pEventManager->Call ( szName, Arguments, pSource, this, pCaller );
     }
@@ -964,9 +1035,14 @@ void CElement::CallEventNoParent ( const char* szName, const CLuaArguments& Argu
     CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
-        (*iter)->CallEventNoParent ( szName, Arguments, pSource, pCaller );
-        if ( m_bIsBeingDeleted )
-            break;
+        CElement* pElement = *iter;
+
+        if ( !pElement->m_pEventManager || pElement->m_pEventManager->HasEvents () || !pElement->m_Children.empty () )
+        {
+            pElement->CallEventNoParent ( szName, Arguments, pSource, pCaller );
+            if ( m_bIsBeingDeleted )
+                break;
+        }
     }
 }
 
@@ -974,7 +1050,10 @@ void CElement::CallEventNoParent ( const char* szName, const CLuaArguments& Argu
 void CElement::CallParentEvent ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller )
 {
     // Call the event on us
-    m_pEventManager->Call ( szName, Arguments, pSource, this, pCaller );
+    if ( m_pEventManager->HasEvents () )
+    {
+        m_pEventManager->Call ( szName, Arguments, pSource, this, pCaller );
+    }
 
     // Call parent's handler
     if ( m_pParent )
@@ -1168,7 +1247,7 @@ bool CElement::CanUpdateSync ( unsigned char ucRemote )
 
 
 // Entities from root optimization for getElementsByType
-typedef CIntrusiveListExt < CElement, &CElement::m_FromRootNode > CFromRootListType;
+typedef CFastList < CElement > CFromRootListType;
 typedef google::dense_hash_map < unsigned int, CFromRootListType > t_mapEntitiesFromRoot;
 static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
 static bool                     ms_bEntitiesFromRootInitialized = false;

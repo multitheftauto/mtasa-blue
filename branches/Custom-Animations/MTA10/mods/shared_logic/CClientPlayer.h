@@ -24,14 +24,21 @@ class CClientPlayer;
 
 #include "CClientCommon.h"
 #include "CClientPed.h"
+#include "CClientPlayerVoice.h"
 
 #define NUM_PLAYER_STATS 343
 
 class CClientPlayerManager;
 class CClientTeam;
-
+enum ePuresyncType
+{
+    PURESYNC_TYPE_NONE,
+    PURESYNC_TYPE_LIGHTSYNC,
+    PURESYNC_TYPE_PURESYNC,
+};
 class CClientPlayer : public CClientPed
 {
+    DECLARE_CLASS( CClientPlayer, CClientPed )
     friend class CClientPlayerManager;
 
 public:
@@ -41,9 +48,8 @@ public:
     void                            Unlink                  ( void );
 
     eClientEntityType               GetType                 ( void ) const                          { return CCLIENTPLAYER; }
-    eClientEntityType               GetBaseType             ( void ) const                          { return CCLIENTPED; }
 
-    const char*                     GetNick                 ( void ) const                          { return m_szNick; }
+    const char*                     GetNick                 ( void ) const                          { return m_strNick; }
     void                            SetNick                 ( const char* szNick );
 
     inline unsigned int             GetPing                 ( void )                                { return ( m_bIsLocalPlayer ) ? g_pNet->GetPing () : m_uiPing; }
@@ -75,7 +81,10 @@ public:
     inline void                     SetLastPuresyncPosition ( const CVector& vecPosition )          { m_vecLastPuresyncPosition = vecPosition; }
     inline bool                     HasConnectionTrouble    ( void )                                { return m_bHasConnectionTrouble; }
     inline void                     SetHasConnectionTrouble ( bool bHasTrouble )                    { m_bHasConnectionTrouble = bHasTrouble; }
-
+    inline ePuresyncType            GetLastPuresyncType     ( void )                                { return m_LastPuresyncType; }
+    inline void                     SetLastPuresyncType     ( ePuresyncType LastPuresyncType )      { m_LastPuresyncType = LastPuresyncType; }
+    void                            SetLightsyncCalcedVelocity ( const CVector& vecVelocity )       { m_vecLightsyncCalcedVelocity = vecVelocity; }
+    const CVector&                  GetLightsyncCalcedVelocity ( void )                             { return m_vecLightsyncCalcedVelocity; }
     inline void                     IncrementPlayerSync     ( void )                                { ++m_uiPlayerSyncCount; }
     inline void                     IncrementKeySync        ( void )                                { ++m_uiKeySyncCount; }
     inline void                     IncrementVehicleSync    ( void )                                { ++m_uiVehicleSyncCount; }
@@ -88,6 +97,8 @@ public:
     void                            SetTeam                 ( CClientTeam* pTeam, bool bChangeTeam = false);
     bool                            IsOnMyTeam              ( CClientPlayer* pPlayer );
 
+    CClientPlayerVoice*             GetVoice                ( void )                                { return m_voice; }
+
     inline float                    GetNametagDistance      ( void )                                { return m_fNametagDistance; }
     inline void                     SetNametagDistance      ( float fDistance )                     { m_fNametagDistance = fDistance; }
 
@@ -98,9 +109,11 @@ public:
 
     inline CClientManager*          GetManager              ( void )                                { return m_pManager; }
 
+    void                            DischargeWeapon         ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd );
+
 private:
     bool                            m_bIsLocalPlayer;
-    char                            m_szNick [ MAX_PLAYER_NICK_LENGTH + 1 ];
+    SString                         m_strNick;
 
     unsigned int                    m_uiPing;
 
@@ -144,6 +157,9 @@ private:
 
     bool                            m_bNetworkDead;
 
+    CClientPlayerVoice*             m_voice;
+    ePuresyncType                   m_LastPuresyncType;
+    CVector                         m_vecLightsyncCalcedVelocity;
 #ifdef MTA_DEBUG
 private:
     bool                            m_bShowingWepdata;

@@ -45,7 +45,8 @@ CGUIComboBox_Impl::CGUIComboBox_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, co
 
     //Add out changed event
     m_pWindow->subscribeEvent ( CEGUI::Combobox::EventListSelectionAccepted, CEGUI::Event::Subscriber ( &CGUIComboBox_Impl::Event_OnSelectionAccepted, this ) );
-    
+    m_pWindow->subscribeEvent ( CEGUI::Combobox::EventDropListRemoved, CEGUI::Event::Subscriber ( &CGUIComboBox_Impl::Event_OnDropListRemoved, this ) );
+
     AddEvents ();
 
     // If a parent is specified, add it to it's children list, if not, add it as a child to the pManager
@@ -160,8 +161,18 @@ const char* CGUIComboBox_Impl::GetItemText ( int index )
 {
     try
     {
-        CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) ->getListboxItemFromIndex ( index );
-        return pItem->getText( ).c_str( );
+        if( index == -1 )
+        {
+            return m_pWindow->getText( ).c_str( );
+        }
+        else
+        {
+            CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) ->getListboxItemFromIndex ( index );
+            if( pItem != NULL )
+            {
+                return pItem->getText( ).c_str( );
+            }
+        }
     }
     catch(...)
     {
@@ -266,11 +277,37 @@ void CGUIComboBox_Impl::SetSelectionHandler ( GUI_CALLBACK Callback  )
     m_OnSelectChange = Callback;
 }
 
+void CGUIComboBox_Impl::SetDropListRemoveHandler ( GUI_CALLBACK Callback  )
+{
+    m_OnDropListRemoved = Callback;
+}
+
 
 bool CGUIComboBox_Impl::Event_OnSelectionAccepted ( const CEGUI::EventArgs& e )
 {
     if ( m_OnSelectChange )
         m_OnSelectChange ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
+}
+
+
+bool CGUIComboBox_Impl::Event_OnDropListRemoved ( const CEGUI::EventArgs& e )
+{
+    if ( m_OnDropListRemoved )
+        m_OnDropListRemoved ( reinterpret_cast < CGUIElement* > ( this ) );
+    return true;
+}
+
+
+void CGUIComboBox_Impl::ShowDropList ( void )
+{
+    reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> showDropList ();
+    reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> setSingleClickEnabled ( true );
+}
+
+
+void CGUIComboBox_Impl::HideDropList ( void )
+{
+    reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> hideDropList ();
 }
 

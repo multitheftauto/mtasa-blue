@@ -33,9 +33,3 @@ CPlayer * CPacket::GetSourcePlayer ( void )
 {
     return static_cast < CPlayer * > ( m_pSourceElement );
 }
-
-
-void CPacket::Send ( CPlayer* pPlayer ) const
-{
-    pPlayer->Send ( *this );
-}

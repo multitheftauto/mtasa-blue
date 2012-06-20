@@ -24,6 +24,7 @@ CQuestionBox::CQuestionBox ( void )
     m_CallbackParameter = 0;
     m_uiActiveButtons = 0;
     m_uiActiveEditboxes = 0;
+    m_bAutoCloseOnConnect = false;
 
     CGUI *pManager = g_pCore->GetGUI ();
 
@@ -64,7 +65,7 @@ void CQuestionBox::Show ( void )
     float fEditSpacer = 10.0f;
 
     float fMsgWidth = Max ( 400.f, m_pMessage->GetTextExtent () + 50.f );
-    float fMsgHeight = Max < float > ( 3, uiNumLines ) * m_pMessage->GetFontHeight ();
+    float fMsgHeight = Max < float > ( 3, uiNumLines ) * ( m_pMessage->GetFontHeight () + 1 );
     float fWinWidth = Max ( fMsgWidth, m_uiActiveButtons * ( 112 + 10.f ) );
     float fWinHeight = 50 + fMsgHeight + 50 + 30 + ( m_uiActiveEditboxes * ( fEditHeight + 2*fEditSpacer ) ) ;
 
@@ -111,6 +112,7 @@ void CQuestionBox::Reset ( void )
 {
     Hide ();
     m_uiLastButton = -1;
+    m_bAutoCloseOnConnect = false;
     m_strMsg = "";
     SetTitle ( "" );
     SetMessage ( "" );
@@ -152,6 +154,7 @@ void CQuestionBox::SetButton ( unsigned int uiButton, const SString& strText )
         pButton->SetClickHandler ( GUI_CALLBACK ( &CQuestionBox::OnButtonClick, this ) );
         pButton->SetUserData ( reinterpret_cast < void* > ( m_ButtonList.size () ) );
         pButton->SetVisible ( false );
+        pButton->SetZOrderingEnabled ( false );
         m_ButtonList.push_back ( pButton );
     }
 
@@ -216,3 +219,14 @@ bool CQuestionBox::OnButtonClick ( CGUIElement* pElement )
 }
 
 
+void CQuestionBox::SetAutoCloseOnConnect ( bool bEnable )
+{
+    m_bAutoCloseOnConnect = bEnable;
+}
+
+
+void CQuestionBox::OnConnect ( void )
+{
+    if ( m_bAutoCloseOnConnect )
+        Hide ();
+}

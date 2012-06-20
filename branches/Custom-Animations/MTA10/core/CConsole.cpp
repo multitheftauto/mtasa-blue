@@ -18,7 +18,7 @@
 using SharedUtil::CalcMTASAPath;
 using std::string;
 
-#define CONSOLE_HISTORY_LENGTH 64
+#define CONSOLE_HISTORY_LENGTH 128
 #define CONSOLE_SIZE 4096
 
 #define NATIVE_RES_X    1152.0f
@@ -53,7 +53,7 @@ CConsole::CConsole ( CGUI* pManager, CGUIElement* pParent )
     m_pHistory->SetTextChangedHandler ( GUI_CALLBACK ( &CConsole::History_OnTextChanged, this ) );
 
     // Load the console history from a file
-    m_pConsoleHistory->LoadFromFile ( CalcMTASAPath ( "\\MTA\\console.log" ), true );
+    m_pConsoleHistory->LoadFromFile ( CalcMTASAPath ( "\\MTA\\console.log" ) );
 }
 
 CConsole::~CConsole ( void )
@@ -90,6 +90,7 @@ void CConsole::Echo ( const char* szText )
     {
         m_pHistory->SetVerticalScrollPosition ( fScroll );
     }
+    CConsoleLogger::GetSingleton().LinePrintf ( "[Output] : %s", szText );
 }
 
 
@@ -233,6 +234,9 @@ bool CConsole::Edit_OnTextAccepted ( CGUIElement* pElement )
     // Add the text to the history buffer.
     //Echo ( strInput.c_str () );
 
+    // Write to console log
+    CConsoleLogger::GetSingleton().LinePrintf ( "[Input]  : %s", strInput.c_str() );
+
     // Parse out the command name and command line.
     GetCommandInfo ( strInput.c_str (), strCmd, strCmdLine );
 
@@ -264,6 +268,12 @@ void CConsole::GetCommandInfo ( const string &strIn, string & strCmdOut, string 
 
 void CConsole::SetNextHistoryText ( void )
 {
+    // Don't set history back if we aren't focused.
+    if ( !m_pInput->IsActive ( ) )
+    {
+        return;
+    }
+
     // Next index
     if ( m_iHistoryIndex == CONSOLE_HISTORY_LENGTH )
     {        
@@ -305,6 +315,12 @@ void CConsole::SetNextHistoryText ( void )
 
 void CConsole::SetPreviousHistoryText ( void )
 {
+    // Don't set history back if we aren't focused.
+    if ( !m_pInput->IsActive ( ) )
+    {
+        return;
+    }
+
     // Previous index
     if ( m_iHistoryIndex <= 0 )
     {

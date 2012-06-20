@@ -96,3 +96,6 @@ void SetMouseLeaveHandler ( GUI_CALLBACK Callback )         { CGUIElement_Impl::
 void SetMouseButtonDownHandler ( GUI_CALLBACK Callback )    { CGUIElement_Impl::SetMouseButtonDownHandler ( Callback ); };
 void SetActivateHandler ( GUI_CALLBACK Callback )           { CGUIElement_Impl::SetActivateHandler ( Callback ); };
 void SetDeactivateHandler ( GUI_CALLBACK Callback )         { CGUIElement_Impl::SetDeactivateHandler ( Callback ); };
+void SetKeyDownHandler ( GUI_CALLBACK Callback )            { CGUIElement_Impl::SetKeyDownHandler ( Callback ); };
+void SetKeyDownHandler ( const GUI_CALLBACK_KEY & Callback ){ CGUIElement_Impl::SetKeyDownHandler ( Callback ); };
+void SetEnterKeyHandler ( GUI_CALLBACK Callback )           { CGUIElement_Impl::SetEnterKeyHandler ( Callback ); };

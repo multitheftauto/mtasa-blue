@@ -24,20 +24,18 @@ void CNetworkStats::Reset ( void )
 {
     m_ulLastUpdateTime = CClientTime::GetTime ();
 
-    unsigned int uiPacketsSent = g_pNet->GetPacketsSent ();
-    unsigned int uiPacketsReceived = g_pNet->GetGoodPacketsReceived () + g_pNet->GetBadPacketsReceived ();
-    unsigned int uiBitsReceived = g_pNet->GetBitsReceived ();
-    unsigned int uiBitsSent = g_pNet->GetBitsSent ();
+    NetStatistics stats;
+    g_pNet->GetNetworkStatistics ( &stats );
 
-    m_uiPacketsSent = uiPacketsSent;
-    m_uiPacketsReceived = uiPacketsReceived;
-    m_uiBitsReceived = uiBitsReceived;
-    m_uiBitsSent = uiBitsSent;
+    m_fPacketSendRate = 0;
+    m_fPacketReceiveRate = 0;
+    m_fByteSendRate = 0;
+    m_fByteReceiveRate = 0;
 
-    m_uiLastPacketsSent = uiPacketsSent;
-    m_uiLastPacketsReceived = uiPacketsReceived;
-    m_uiLastBitsReceived = uiBitsReceived;
-    m_uiLastBitsSent = uiBitsSent;
+    m_uiLastPacketsSent = stats.packetsSent;
+    m_uiLastPacketsReceived = stats.packetsReceived;
+    m_ullLastBytesSent = stats.bytesSent;
+    m_ullLastBytesReceived = stats.bytesReceived;
 }
 
 void CNetworkStats::Draw ( void )
@@ -48,82 +46,146 @@ void CNetworkStats::Draw ( void )
         Update();
     }
 
+    NetStatistics stats;
+    g_pNet->GetNetworkStatistics ( &stats );
+
     // Draw the background
     float fResWidth = static_cast < float > ( g_pCore->GetGraphics ()->GetViewportWidth () );
     float fResHeight = static_cast < float > ( g_pCore->GetGraphics ()->GetViewportHeight () );
-    g_pGame->GetHud ()->Draw2DPolygon ( 0.75f * fResWidth, 0.30f * fResHeight,
-                                        1.0f * fResWidth, 0.30f * fResHeight,
-                                        0.75f * fResWidth, 0.63f * fResHeight,
-                                        1.0f * fResWidth, 0.63f * fResHeight,
-                                        0x78000000 );
 
     // Grab the bytes sent/recv and datarate in the proper unit
-    SString strBytesSent = GetDataUnit ( g_pNet->GetBitsSent () / 8 );
-    SString strBytesRecv = GetDataUnit ( g_pNet->GetBitsReceived () / 8 );
-    SString strRecvRate  = GetDataUnit ( ( m_uiBitsReceived - m_uiLastBitsReceived ) / 8 );
-    SString strSendRate  = GetDataUnit ( ( m_uiBitsSent - m_uiLastBitsSent ) / 8 );
+    SString strBytesSent = GetDataUnit ( stats.bytesSent );
+    SString strBytesRecv = GetDataUnit ( stats.bytesReceived );
+    SString strRecvRate  = GetDataUnit ( Round ( m_fByteReceiveRate ) );
+    SString strSendRate  = GetDataUnit ( Round ( m_fByteSendRate ) );
 
-    // Populate a string to print
-    SString strBuffer (
+    SString strBuffer;
+
+    // Select a string to print
+    bool bHoldingCtrl = ( GetAsyncKeyState ( VK_CONTROL ) & 0x8000 ) != 0;
+    if ( !bHoldingCtrl )
+    {
+        strBuffer = SString (
                 "Ping: %u ms\n"
                 "Messages in send buffer: %u\n"
-                "Messages sent: %u\n"
-                "Messages waiting ack: %u\n"
-                "Messages resent: %u\n"
-                "Acknowledges recv: %u\n"
-                "Acknowledges sent: %u\n"
-                "Acknowledges pending: %u\n"
+                "Messages in resend buffer: %u\n"
                 "Packets recv: %u\n"
                 "Packets sent: %u\n"
-                "Packet loss: %.2f%%\n"
+                "Overall packet loss: %.2f%%\n"
+                "Current packet loss: %.2f%%\n"
                 "Bytes recv: %s\n"
                 "Bytes sent: %s\n"
-                "Datarate: %s/s / %s/s\n"
-                "Packet rate: %u / %u\n"
-                "Compression ratio: %.3f%%\n"
-                "Decompression ratio: %.3f%%",
-
+                "Datarate in/out: %s/s / %s/s\n"
+                "Packet rate in/out: %u / %u\n"
+                "BPS limit by CC: %llu\n"
+                "BPS limit by OB: %llu\n"
+                "Encryption: %s\n"
+                "Client: %s\n"
+                "Server: %s\n",
                 g_pNet->GetPing (),
-
-                g_pNet->GetMessagesInSendBuffer (),
-                g_pNet->GetMessagesSent (),
-                g_pNet->GetMessagesWaitingAck (),
-                g_pNet->GetMessagesResent (),
-
-                g_pNet->GetAcknowledgesReceived (),
-                g_pNet->GetAcknowledgesSent (),
-                g_pNet->GetAcknowledgesPending (),
-
-                g_pNet->GetGoodPacketsReceived () + g_pNet->GetBadPacketsReceived (),
-                g_pNet->GetPacketsSent (),
-                g_pNet->GetPacketLoss (),
-
+                stats.messagesInSendBuffer,
+                stats.messagesInResendBuffer,
+                stats.packetsReceived,
+                stats.packetsSent,              
+                stats.packetlossTotal,
+                stats.packetlossLastSecond,
                 strBytesRecv.c_str (),
                 strBytesSent.c_str (),
                 strRecvRate.c_str (),
                 strSendRate.c_str (),
-                m_uiPacketsReceived - m_uiLastPacketsReceived,
-                m_uiPacketsSent - m_uiLastPacketsSent,
-                
-                g_pNet->GetCompressionRatio () * 100.0f,
-                g_pNet->GetDecompressionRatio () * 100.0f );
+                (unsigned int)floor(m_fPacketReceiveRate + 0.5f),
+                (unsigned int)floor(m_fPacketSendRate + 0.5f),                   
+                stats.isLimitedByCongestionControl ? 1ULL : 0ULL,
+                stats.isLimitedByOutgoingBandwidthLimit ? 1ULL : 0ULL,
+                stats.encryptionStatus ? stats.encryptionStatus == 1 ? "On" : "Unknown" : "Off",
+                *CStaticFunctionDefinitions::GetVersionSortable(),
+                *g_pClientGame->GetServerVersionSortable ()
+                );
+    }
+    else
+    {
+        NetRawStatistics& r = stats.raw;
+        strBuffer += SString ( "messageSendBuffer %d,%d,%d,%d\n", r.messageSendBuffer[0], r.messageSendBuffer[1], r.messageSendBuffer[2], r.messageSendBuffer[3] );
+        strBuffer += SString ( "messagesSent %d,%d,%d,%d\n", r.messagesSent[0], r.messagesSent[1], r.messagesSent[2], r.messagesSent[3] );
+        strBuffer += SString ( "messageDataBitsSent %lld,%lld,%lld,%lld\n", r.messageDataBitsSent[0], r.messageDataBitsSent[1], r.messageDataBitsSent[2], r.messageDataBitsSent[3] );
+        strBuffer += SString ( "messageTotalBitsSent %lld,%lld,%lld,%lld\n", r.messageTotalBitsSent[0], r.messageTotalBitsSent[1], r.messageTotalBitsSent[2], r.messageTotalBitsSent[3] );
+        strBuffer += SString ( "packetsContainingOnlyAcknowlegements %d\n", r.packetsContainingOnlyAcknowlegements );
+        strBuffer += SString ( "acknowlegementsSent %d\n", r.acknowlegementsSent );
+        strBuffer += SString ( "acknowlegementsPending %d\n", r.acknowlegementsPending );
+        strBuffer += SString ( "acknowlegementBitsSent %lld\n", r.acknowlegementBitsSent );
+        strBuffer += SString ( "packetsContainingOnlyAcksAndResends %d\n", r.packetsContainingOnlyAcknowlegementsAndResends );
+        strBuffer += SString ( "messageResends %d\n", r.messageResends );
+        strBuffer += SString ( "messageDataBitsResent %lld\n", r.messageDataBitsResent );
+        strBuffer += SString ( "messagesTotalBitsResent %lld\n", r.messagesTotalBitsResent );
+        strBuffer += SString ( "messagesOnResendQueue %d\n", r.messagesOnResendQueue );
+        strBuffer += SString ( "numberOfUnsplitMessages %d\n", r.numberOfUnsplitMessages );
+        strBuffer += SString ( "numberOfSplitMessages %d\n", r.numberOfSplitMessages );
+        strBuffer += SString ( "totalSplits %d\n", r.totalSplits );
+        strBuffer += SString ( "packetsSent %d\n", r.packetsSent );
+        strBuffer += SString ( "encryptionBitsSent %lld\n", r.encryptionBitsSent );
+        strBuffer += SString ( "totalBitsSent %lld\n", r.totalBitsSent );
+        strBuffer += SString ( "sequencedMessagesOutOfOrder %d\n", r.sequencedMessagesOutOfOrder );
+        strBuffer += SString ( "sequencedMessagesInOrder %d\n", r.sequencedMessagesInOrder );
+        strBuffer += SString ( "orderedMessagesOutOfOrder %d\n", r.orderedMessagesOutOfOrder );
+        strBuffer += SString ( "orderedMessagesInOrder %d\n", r.orderedMessagesInOrder );
+        strBuffer += SString ( "packetsReceived %d\n", r.packetsReceived );
+        strBuffer += SString ( "packetsWithBadCRCReceived %d\n", r.packetsWithBadCRCReceived );
+        strBuffer += SString ( "bitsReceived %lld\n", r.bitsReceived );
+        strBuffer += SString ( "bitsWithBadCRCReceived %lld\n", r.bitsWithBadCRCReceived );
+        strBuffer += SString ( "acknowlegementsReceived %d\n", r.acknowlegementsReceived );
+        strBuffer += SString ( "duplicateAcknowlegementsReceived %d\n", r.duplicateAcknowlegementsReceived );
+        strBuffer += SString ( "messagesReceived %d\n", r.messagesReceived );
+        strBuffer += SString ( "invalidMessagesReceived %d\n", r.invalidMessagesReceived );
+        strBuffer += SString ( "duplicateMessagesReceived %d\n", r.duplicateMessagesReceived );
+        strBuffer += SString ( "messagesWaitingForReassembly %d\n", r.messagesWaitingForReassembly );
+        strBuffer += SString ( "internalOutputQueueSize %d\n", r.internalOutputQueueSize );
+        strBuffer += SString ( "bitsPerSecond %0.0f\n", r.bitsPerSecond );
+        strBuffer += SString ( "connectionStartTime %lld\n", r.connectionStartTime );
+        strBuffer += SString ( "bandwidthExceeded %d\n", r.bandwidthExceeded );
+    }
 
-    // Print it
-    m_pDisplayManager->DrawText2D ( strBuffer, CVector ( 0.76f, 0.31f, 0 ), 1.0f, 0xFFFFFFFF );
+    int iNumLines = 0;
+    for ( int i = strBuffer.length () - 1 ; i >= 0 ; i-- )
+        if ( strBuffer[i] == '\n' )
+            iNumLines++;
+
+    float fBackWidth = 310;
+    float fBackHeight = (float)( iNumLines * 15 );
+    float fX = fResWidth - fBackWidth;
+    float fY = 0.40f * fResHeight - iNumLines * 4;
+
+    g_pCore->GetGraphics ()->DrawRectQueued ( 
+                                        fX - 10, fY - 10,
+                                        fBackWidth + 10, fBackHeight + 20,
+                                        0x78000000, true );
+
+    g_pCore->GetGraphics ()->DrawTextQueued ( fX, fY,
+                                              fX, fY,
+                                              0xFFFFFFFF,
+                                              strBuffer,
+                                              1,
+                                              1,
+                                              DT_NOCLIP,
+                                              NULL,
+                                              true );
 }
 
 
 void CNetworkStats::Update ( void )
 {
+    NetStatistics stats;
+    g_pNet->GetNetworkStatistics ( &stats );
+
+    float delay = static_cast < float > ( CClientTime::GetTime () - m_ulLastUpdateTime );
     m_ulLastUpdateTime = CClientTime::GetTime ();
 
-    m_uiLastPacketsSent = m_uiPacketsSent;
-    m_uiLastPacketsReceived = m_uiPacketsReceived;
-    m_uiLastBitsReceived = m_uiBitsReceived;
-    m_uiLastBitsSent = m_uiBitsSent;
+    m_fPacketSendRate = ( stats.packetsSent - m_uiLastPacketsSent ) * 1000 / delay;
+    m_fPacketReceiveRate = ( stats.packetsReceived - m_uiLastPacketsReceived ) * 1000 / delay;
+    m_fByteSendRate = ( stats.bytesSent - m_ullLastBytesSent ) * 1000 / delay;
+    m_fByteReceiveRate = ( stats.bytesReceived - m_ullLastBytesReceived ) * 1000 / delay;
 
-    m_uiPacketsSent = g_pNet->GetPacketsSent ();
-    m_uiPacketsReceived = g_pNet->GetGoodPacketsReceived () + g_pNet->GetBadPacketsReceived ();
-    m_uiBitsReceived = g_pNet->GetBitsReceived ();
-    m_uiBitsSent = g_pNet->GetBitsSent ();
+    m_uiLastPacketsSent = stats.packetsSent;
+    m_uiLastPacketsReceived = stats.packetsReceived;
+    m_ullLastBytesSent = stats.bytesSent;
+    m_ullLastBytesReceived = stats.bytesReceived;
 }

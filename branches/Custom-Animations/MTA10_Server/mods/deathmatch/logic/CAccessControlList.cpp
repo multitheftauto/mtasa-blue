@@ -16,16 +16,15 @@
 
 CAccessControlList::CAccessControlList ( const char* szACLName, CAccessControlListManager* pACLManager )
 {
-    m_szACLName[0] = '\0';
-    snprintf ( m_szACLName, MAX_ACL_NAME_LENGTH, "%s", szACLName );
-    m_szACLName[MAX_ACL_NAME_LENGTH-1] = '\0';
-
+    m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::ACL );
+    m_strACLName = szACLName;
     m_pACLManager = pACLManager;
 }
 
 
 CAccessControlList::~CAccessControlList ( void )
 {
+    CIdArray::PushUniqueId ( this, EIdClass::ACL, m_uiScriptID );
     list < CAccessControlListRight* > ::iterator iter = m_Rights.begin ();
     for ( ; iter != m_Rights.end (); iter++ )
     {
@@ -33,6 +32,7 @@ CAccessControlList::~CAccessControlList ( void )
     }
 
     m_Rights.clear ();
+    OnChange ();
 }
 
 
@@ -44,6 +44,7 @@ CAccessControlListRight* CAccessControlList::AddRight ( const char* szRightName,
     {
         pRight = new CAccessControlListRight ( szRightName, eRightType, bAccess, m_pACLManager );
         m_Rights.push_back ( pRight );
+        OnChange ();
     }
 
     return pRight;
@@ -57,12 +58,16 @@ CAccessControlListRight* CAccessControlList::GetRight ( const char* szRightName,
     list < CAccessControlListRight* > ::iterator iter = m_Rights.begin ();
     for ( ; iter != m_Rights.end (); iter++ )
     {
-        if ( (*iter)->GetRightNameHash () == uiHash && eRightType == (*iter)->GetRightType () )
+        CAccessControlListRight* pACLRight = *iter;
+        if ( eRightType == pACLRight->GetRightType () )
         {
-            return *iter;
+            if ( pACLRight->GetRightNameHash () == uiHash && SStringX ( szRightName ) == pACLRight->GetRightName () )
+            {
+                // Exact match
+                return pACLRight;
+            }
         }
     }
-
     return NULL;
 }
 
@@ -75,10 +80,12 @@ bool CAccessControlList::RemoveRight ( const char* szRightName, CAccessControlLi
     for ( ; iter != m_Rights.end (); iter++ )
     {
         CAccessControlListRight* pACLRight = *iter;
-        if ( pACLRight->GetRightNameHash () == uiHash && eRightType == pACLRight->GetRightType () )
+        if ( pACLRight->GetRightNameHash () == uiHash && eRightType == pACLRight->GetRightType ()
+             && SStringX ( szRightName ) == pACLRight->GetRightName () )
         {
             m_Rights.remove ( pACLRight );
             delete pACLRight;
+            OnChange ();
             return true;
         }
     }
@@ -97,54 +104,26 @@ void CAccessControlList::WriteToXMLNode ( CXMLNode* pNode )
 
     // Create attribute for the name and set it
     CXMLAttribute* pAttribute = pSubNode->GetAttributes ().Create ( "name" );
-    pAttribute->SetValue ( m_szACLName );
+    pAttribute->SetValue ( m_strACLName );
 
     // Loop through each right and write it to the ACL
     list < CAccessControlListRight* > ::iterator iter = m_Rights.begin ();
     for ( ; iter != m_Rights.end (); iter++ )
     {
         CAccessControlListRight* pRight = *iter;
-
-        // Find out the right type string
-        char szRightType [255];
-        switch ( pRight->GetRightType () )
-        {
-            case CAccessControlListRight::RIGHT_TYPE_COMMAND:
-                strcpy ( szRightType, "command" );
-                break;
-
-            case CAccessControlListRight::RIGHT_TYPE_FUNCTION:
-                strcpy ( szRightType, "function" );
-                break;
-
-            case CAccessControlListRight::RIGHT_TYPE_GENERAL:
-                strcpy ( szRightType, "general" );
-                break;
-
-            case CAccessControlListRight::RIGHT_TYPE_RESOURCE:
-                strcpy ( szRightType, "resource" );
-                break;
-
-            default:
-                strcpy ( szRightType, "error" );
-                break;
-        }
-
-        // Append a dot append the name of the node
-        strcat ( szRightType, "." );
-        strncat ( szRightType, pRight->GetRightName (), 255 );
-
-        // Create the subnode for this object and write the name attribute we generated
-        CXMLNode* pRightNode = pSubNode->CreateSubNode ( "right" );
-        pAttribute = pRightNode->GetAttributes ().Create ( "name" );
-        pAttribute->SetValue ( szRightType );
-
-        // Create the access attribute
-        pAttribute = pRightNode->GetAttributes ().Create ( "access" );
-        if ( pRight->GetRightAccess () )
-            pAttribute->SetValue ( "true" );
-        else
-            pAttribute->SetValue ( "false" );
+        pRight->WriteToXMLNode ( pSubNode );
     }
 }
 
+
+void CAccessControlList::OnChange ( void )
+{
+    g_pGame->GetACLManager ()->OnChange ();
+}
+
+
+bool CAccessControlList::CanBeModifiedByScript ( void )
+{
+    // If this isn't horrible, I don't know what is
+    return !SStringX ( GetName () ).BeginsWith ( "autoACL_" );
+}

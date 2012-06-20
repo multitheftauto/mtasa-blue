@@ -56,7 +56,7 @@ void CNewsBrowser::InitNewsItemList ( void )
     m_NewsitemList.clear ();
 
     // Find all sub-directories in 'news' directory
-    SString strAllNewsDir = PathJoin ( GetMTALocalAppDataPath (), "news" );
+    SString strAllNewsDir = PathJoin ( GetMTADataPath (), "news" );
     std::vector < SString > directoryList = FindFiles ( strAllNewsDir + "\\*", false, true );
     std::sort ( directoryList.begin (), directoryList.end () );
 
@@ -171,6 +171,7 @@ void CNewsBrowser::CreateGUI ( void )
     //  OK button
     m_pButtonOK = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "OK" ) );
     m_pButtonOK->SetPosition ( CVector2D ( 560.0f - 60, 480.0f - 30 ) );
+    m_pButtonOK->SetZOrderingEnabled ( false );
 
     // Set up the events
     m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CNewsBrowser::OnOKButtonClick, this ) );

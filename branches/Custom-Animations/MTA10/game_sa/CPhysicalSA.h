@@ -28,56 +28,96 @@
 
 #define PHYSICAL_MAXNOOFCOLLISIONRECORDS        6
 
-class CPhysicalSAInterface : public CEntitySAInterface // begin +68 (244 bytes total?)
+class CPhysicalSAInterface : public CEntitySAInterface
 {
 public:
-/* IMPORTANT: KEEP "pad" in CVehicle UP-TO-DATE if you add something here (or eventually pad someplace else) */
-    CVector * vecVelocity;
-    CVector * vecSpin;
-    CVector * vecUnk3;
-    CVector * vecUnk4;
-    CVector * vecUnk5;
-    CVector * vecUnk6;
-    float pad [12];
-    float fMass;
-    float fTurnMass;
+    float pad1; // 56
+    uint32 pad2; // 60
 
-    DWORD dwUnk; // 148
-    DWORD dwPhysUnk1; // 152
+    uint32 b0x01 : 1; // 64
+    uint32 bApplyGravity : 1;
+    uint32 bDisableFriction : 1;
+    uint32 bCollidable : 1; 
+    uint32 b0x10 : 1;
+    uint32 bDisableMovement : 1;
+    uint32 b0x40 : 1;
+    uint32 b0x80 : 1;
 
-    float fElasticity; // 156
-    float fBuoyancyConstant; // 160
-    CVector * vecCenterOfMass; // 164
+    uint32 bSubmergedInWater : 1; // 65
+    uint32 bOnSolidSurface : 1;
+    uint32 bBroken : 1;
+    uint32 b0x800 : 1; // ref @ 0x6F5CF0
+    uint32 b0x1000 : 1;//
+    uint32 b0x2000 : 1;//
+    uint32 b0x4000 : 1;//
+    uint32 b0x8000 : 1;//
 
-    DWORD dwUnk2; // 176
-    DWORD * unkCPtrNodeDoubleLink; // 180
+    uint32 b0x10000 : 1; // 66
+    uint32 b0x20000 : 1; // ref @ CPhysical__processCollision
+    uint32 bBulletProof : 1;
+    uint32 bFireProof : 1;
+    uint32 bCollisionProof : 1;
+    uint32 bMeeleProof : 1;
+    uint32 bInvulnerable : 1;
+    uint32 bExplosionProof : 1;
 
-    BYTE byUnk: 8; 
-    BYTE byCollisionRecords: 8; // 185
-    BYTE byUnk2: 8;
-    BYTE byUnk3: 8;
+    uint32 b0x1000000 : 1; // 67
+    uint32 bAttachedToEntity : 1;
+    uint32 b0x4000000 : 1;
+    uint32 bTouchingWater : 1;
+    uint32 bEnableCollision : 1;
+    uint32 bDestroyed : 1;
+    uint32 b0x40000000 : 1;
+    uint32 b0x80000000 : 1;
 
-    float pad4 [8];
-
-    float fDistanceTravelled; // 212
-    float fDamageImpulseMagnitude; //216
-    CEntitySAInterface * damageEntity; // 220
-
-    BYTE pad2[28];
-    CEntitySAInterface * pAttachedEntity;   // 252
-    CVector vecAttachedPosition;    // 256
-    CVector vecAttachedRotation;    // 268
-    BYTE pad3[20];  // 280
-    float fLighting;        // col lighting? CPhysical::GetLightingFromCol
-    float fLighting_2;      // added to col lighting in CPhysical::GetTotalLighting
-    BYTE pad3a[4];
+    CVector    m_vecLinearVelocity; // 68
+    CVector    m_vecAngularVelocity; // 80
+    CVector    m_vecCollisionLinearVelocity; // 92
+    CVector    m_vecCollisionAngularVelocity; // 104
+    CVector    m_vecOffsetUnk5; // 116
+    CVector    m_vecOffsetUnk6; // 128
+    float m_fMass; // 140
+    float m_fTurnMass; // 144
+    float m_pad1; // 148
+    float m_fAirResistance; // 152
+    float m_fElasticity; // 156
+    float m_fBuoyancyConstant; // 160
+    CVector m_vecCenterOfMass; // 164
+    uint32 * m_pCollisionList; // 176
+    uint32 * m_pMovingList; // 180
+    uint8 m_ucColFlag1; // 184
+    uint8 m_ucCollisionState; // 185
+    uint8 m_ucCollisionContactSurfaceType; // 186
+    uint8 m_ucColFlag4; // 187
+    CEntity* pLastContactedEntity[4]; // 188
+    float m_field_cc; // 204
+    float m_pad4c; // 208
+    float m_pad4d; // 212
+    float m_fDamageImpulseMagnitude; // 216
+    CEntitySAInterface * m_pCollidedEntity; // 220
+    CVector m_vecCollisionImpactVelocity; // 224
+    CVector m_vecCollisionPosition; // 236
+    uint16 m_usPieceType; // 248
+    uint16 m_pad3; // 250
+    CEntitySAInterface * m_pAttachedEntity;   // 252
+    CVector m_vecAttachedOffset;    // 256
+    CVector m_vecAttachedRotation;    // 268
+    CVector m_vecUnk;    // 280
+    uint32 m_pad4[2]; // 292
+    float m_fLighting; // 300
+    float m_fLighting2; // 304
+    class CShadowDataSA *m_pShadowData; // 308
 };
+C_ASSERT(sizeof(CPhysicalSAInterface) == 0x138);
 
 class CPhysicalSA : public virtual CPhysical, public virtual CEntitySA
 {
 public:
+    virtual void RestoreLastGoodPhysicsState ( void );
     CVector *   GetMoveSpeed                ( CVector * vecMoveSpeed );
     CVector *   GetTurnSpeed                ( CVector * vecTurnSpeed );
+    CVector *   GetMoveSpeedInternal        ( CVector * vecMoveSpeed );
+    CVector *   GetTurnSpeedInternal        ( CVector * vecTurnSpeed );
     VOID        SetMoveSpeed                ( CVector * vecMoveSpeed );
     VOID        SetTurnSpeed                ( CVector * vecTurnSpeed );
 

@@ -40,7 +40,7 @@ struct SKeyBindSection
         // convert to upper case
         for ( unsigned int i = 0; i < strlen(szTitle); i++ )
         {
-            if ( isalpha(szTitle[i]) )
+            if ( isalpha((uchar)szTitle[i]) )
                 this->szTitle[i] = toupper(szTitle[i]);
             else
                 this->szTitle[i] = szTitle[i];
@@ -94,6 +94,9 @@ public:
                         CSettings               ( void );
                         ~CSettings              ( void );
 
+    void                CreateGUI               ( void );
+    void                DestroyGUI              ( void );
+
     bool                ProcessMessage          ( UINT uMsg, WPARAM wParam, LPARAM lParam );
 
     void                Update                  ( void );
@@ -109,6 +112,10 @@ public:
     inline bool         IsCapturingKey          ( void )            { return m_bCaptureKey; }
     void                UpdateCaptureAxis       ();
     void                UpdateJoypadTab         ();
+
+    void                UpdateAudioTab          ();
+
+    void                UpdateVideoTab          ( bool bIsVideoModeChanged = false );
 
     void                AddKeyBindSection       ( char * szSectionName );
     void                RemoveKeyBindSection    ( char * szSectionName );
@@ -145,21 +152,36 @@ protected:
     CGUIComboBox*       m_pComboAspectRatio;
     CGUILabel*          m_pAspectRatioLabel;
 	CGUICheckBox*       m_pCheckBoxVolumetricShadows;
+	CGUICheckBox*       m_pCheckBoxDeviceSelectionDialog;
+	CGUICheckBox*       m_pCheckBoxAllowScreenUpload;
+	CGUICheckBox*       m_pCheckBoxCustomizedSAFiles;
+	CGUICheckBox*       m_pCheckBoxGrass;
     CGUILabel*          m_pDrawDistanceLabel;
     CGUIScrollBar*      m_pDrawDistance;
     CGUILabel*          m_pDrawDistanceValueLabel;
     CGUILabel*          m_pBrightnessLabel;
     CGUIScrollBar*      m_pBrightness;
     CGUILabel*          m_pBrightnessValueLabel;
+    CGUILabel*          m_pAnisotropicLabel;
+    CGUIScrollBar*      m_pAnisotropic;
+    CGUILabel*          m_pAnisotropicValueLabel;
     CGUIComboBox*       m_pComboAntiAliasing;
     CGUILabel*          m_pAntiAliasingLabel;
     CGUILabel*          m_pMapAlphaLabel;
     CGUIScrollBar*      m_pMapAlpha;
     CGUILabel*          m_pMapAlphaValueLabel;
+    CGUILabel*          m_pStreamingMemoryLabel;
+    CGUIScrollBar*      m_pStreamingMemory;
+    CGUILabel*          m_pStreamingMemoryValueLabel;
+    CGUILabel*          m_pStreamingMemoryLabelInfo;
+    CGUIButton*         m_pVideoDefButton;
 
     CGUILabel*          m_pAsyncLabelInfo;
     CGUILabel*          m_pAsyncLabel;
     CGUIComboBox*       m_pAsyncCombo;
+    CGUILabel*          m_pFastClothesLabelInfo;
+    CGUILabel*          m_pFastClothesLabel;
+    CGUIComboBox*       m_pFastClothesCombo;
     CGUILabel*          m_pAudioGeneralLabel;
     CGUILabel*          m_pUserTrackGeneralLabel;
     CGUILabel*          m_pBrowserSpeedLabelInfo;
@@ -168,9 +190,9 @@ protected:
     CGUILabel*          m_pSingleDownloadLabelInfo;
     CGUILabel*          m_pSingleDownloadLabel;
     CGUIComboBox*       m_pSingleDownloadCombo;
-    CGUILabel*          m_pCodePathLabelInfo;
-    CGUILabel*          m_pCodePathLabel;
-    CGUIComboBox*       m_pCodePathCombo;
+    CGUILabel*          m_pDebugSettingLabelInfo;
+    CGUILabel*          m_pDebugSettingLabel;
+    CGUIComboBox*       m_pDebugSettingCombo;
     CGUILabel*          m_pUpdateBuildTypeLabelInfo;
     CGUILabel*          m_pUpdateBuildTypeLabel;
     CGUIComboBox*       m_pUpdateBuildTypeCombo;
@@ -181,18 +203,22 @@ protected:
     CGUILabel*          m_pLabelRadioVolume;
     CGUILabel*          m_pLabelSFXVolume;
     CGUILabel*          m_pLabelMTAVolume;
+    CGUILabel*          m_pLabelVoiceVolume;
     CGUILabel*          m_pLabelRadioVolumeValue;
     CGUILabel*          m_pLabelSFXVolumeValue;
     CGUILabel*          m_pLabelMTAVolumeValue;
+    CGUILabel*          m_pLabelVoiceVolumeValue;
     CGUIScrollBar*      m_pAudioRadioVolume;
     CGUIScrollBar*      m_pAudioSFXVolume;
     CGUIScrollBar*      m_pAudioMTAVolume;
+    CGUIScrollBar*      m_pAudioVoiceVolume;
     CGUICheckBox*       m_pCheckBoxAudioEqualizer;
     CGUICheckBox*       m_pCheckBoxAudioAutotune;
     CGUILabel*          m_pAudioUsertrackLabel;
     CGUICheckBox*       m_pCheckBoxUserAutoscan;
     CGUILabel*          m_pLabelUserTrackMode;
     CGUIComboBox*       m_pComboUsertrackMode;
+    CGUIButton*         m_pAudioDefButton;
 
     CGUIGridList*       m_pBindsList;
     CGUIButton*         m_pBindsDefButton;
@@ -243,8 +269,6 @@ protected:
     CGUILabel*          m_pChatBlueValue    [ ChatColorTypes::CHAT_COLOR_MAX ];
     CGUILabel*          m_pChatAlphaValue   [ ChatColorTypes::CHAT_COLOR_MAX ];
 
-    CGUIScrollPane*     m_pInterfacePaneScroller;
-
     CGUIScrollPane*     m_pPaneChatFont;
     CGUIRadioButton*    m_pRadioChatFont    [ ChatFonts::CHAT_FONT_MAX ];
 
@@ -260,8 +284,10 @@ protected:
 
     bool                OnJoypadTextChanged     ( CGUIElement* pElement );
     bool                OnAxisSelectClick       ( CGUIElement* pElement );
+    bool                OnAudioDefaultClick     ( CGUIElement* pElement );
     bool                OnJoypadDefaultClick    ( CGUIElement* pElement );
     bool                OnBindsDefaultClick     ( CGUIElement* pElement );
+    bool                OnVideoDefaultClick     ( CGUIElement* pElement );
     bool                OnBindsListClick        ( CGUIElement* pElement );
     bool                OnOKButtonClick         ( CGUIElement* pElement );
     bool                OnCancelButtonClick     ( CGUIElement* pElement );
@@ -269,10 +295,13 @@ protected:
     bool                OnRegisterButtonClick   ( CGUIElement* pElement );
     bool                OnDrawDistanceChanged   ( CGUIElement* pElement );
     bool                OnBrightnessChanged     ( CGUIElement* pElement );
+    bool                OnAnisotropicChanged     ( CGUIElement* pElement );
+    bool                OnStreamingMemoryChanged( CGUIElement* pElement );
     bool                OnMapAlphaChanged       ( CGUIElement* pElement );
     bool                OnRadioVolumeChanged    ( CGUIElement* pElement );
     bool                OnSFXVolumeChanged      ( CGUIElement* pElement );
     bool                OnMTAVolumeChanged      ( CGUIElement* pElement );
+    bool                OnVoiceVolumeChanged    ( CGUIElement* pElement );
     bool                OnChatRedChanged        ( CGUIElement* pElement );
     bool                OnChatGreenChanged      ( CGUIElement* pElement );
     bool                OnChatBlueChanged       ( CGUIElement* pElement );
@@ -288,6 +317,8 @@ protected:
 
     bool                OnFxQualityChanged      ( CGUIElement* pElement );
     bool                OnVolumetricShadowsClick ( CGUIElement* pElement );
+    bool                OnAllowScreenUploadClick ( CGUIElement* pElement );
+    bool                OnCustomizedSAFilesClick ( CGUIElement* pElement );
 
 private:
     void                ProcessKeyBinds         ( void );
@@ -316,11 +347,14 @@ private:
     unsigned char       m_ucOldRadioVolume;
     unsigned char       m_ucOldSFXVolume;
     float               m_fOldMTAVolume;
+    float               m_fOldVoiceVolume;
 
     CGUIListItem*	    m_pSelectedBind;
 
     DWORD               m_dwFrameCount;
     bool                m_bShownVolumetricShadowsWarning;
+    bool                m_bShownAllowScreenUploadMessage;
+    int                 m_iMaxAnisotropic;
 
     std::list < SKeyBindSection *> m_pKeyBindSections;
 

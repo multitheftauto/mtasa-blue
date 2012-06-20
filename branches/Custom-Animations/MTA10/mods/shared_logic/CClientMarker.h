@@ -25,8 +25,9 @@
 
 class CClientMarkerManager;
 
-class CClientMarker: public CClientStreamElement, private CClientColCallback
+class CClientMarker : public CClientStreamElement, private CClientColCallback
 {
+    DECLARE_CLASS( CClientMarker, CClientStreamElement )
     friend class CClientMarkerManager;
     friend class CClientColShape;
 
@@ -74,7 +75,7 @@ public:
     void                        SetSize                 ( float fSize );
 
     static int                  StringToType            ( const char* szString );
-    static bool                 TypeToString            ( unsigned int uiType, char* szString );
+    static bool                 TypeToString            ( unsigned int uiType, SString& strOutString );
 
     static bool                 IsLimitReached          ( void );
 

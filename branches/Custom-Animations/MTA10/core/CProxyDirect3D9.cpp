@@ -131,11 +131,7 @@ HRESULT    CProxyDirect3D9::CheckDeviceFormatConversion ( UINT Adapter, D3DDEVTY
 
 HRESULT    CProxyDirect3D9::GetDeviceCaps               ( UINT Adapter, D3DDEVTYPE DeviceType, D3DCAPS9* pCaps )
 {   
-    HRESULT hResult;
-
-    hResult = m_pDevice->GetDeviceCaps ( Adapter, DeviceType, pCaps );
-
-    return hResult;
+    return m_pDevice->GetDeviceCaps ( Adapter, DeviceType, pCaps );
 }
 
 HMONITOR   CProxyDirect3D9::GetAdapterMonitor           ( UINT Adapter )
@@ -148,6 +144,41 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
     HRESULT hResult;
 
     WriteDebugEvent ( "CProxyDirect3D9::CreateDevice" );
+
+    WriteDebugEvent ( SString ( "    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x"
+                                ,Adapter
+                                ,DeviceType
+                                ,BehaviorFlags
+                            ) );
+
+    // Make sure DirectX Get calls will work
+    BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
+
+    WriteDebugEvent ( SString ( "    BackBufferWidth:%d  Height:%d  Format:%d  Count:%d"
+                                ,pPresentationParameters->BackBufferWidth
+                                ,pPresentationParameters->BackBufferHeight
+                                ,pPresentationParameters->BackBufferFormat
+                                ,pPresentationParameters->BackBufferCount
+                           ) );
+
+    WriteDebugEvent ( SString ( "    MultiSampleType:%d  Quality:%d"
+                                ,pPresentationParameters->MultiSampleType
+                                ,pPresentationParameters->MultiSampleQuality
+                           ) );
+
+    WriteDebugEvent ( SString ( "    SwapEffect:%d  Windowed:%d  EnableAutoDepthStencil:%d  AutoDepthStencilFormat:%d  Flags:0x%x"
+                                ,pPresentationParameters->SwapEffect
+                                ,pPresentationParameters->Windowed
+                                ,pPresentationParameters->EnableAutoDepthStencil
+                                ,pPresentationParameters->AutoDepthStencilFormat
+                                ,pPresentationParameters->Flags
+                           ) );
+
+    WriteDebugEvent ( SString ( "    FullScreen_RefreshRateInHz:%d  PresentationInterval:0x%08x"
+                                ,pPresentationParameters->FullScreen_RefreshRateInHz
+                                ,pPresentationParameters->PresentationInterval
+                           ) );
+
 
     // Change the window title to MTA: San Andreas
     #ifdef MTA_DEBUG
@@ -182,6 +213,17 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
         
         // Now create the proxy device.
         *ppReturnedDeviceInterface = new CProxyDirect3DDevice9 ( *ppReturnedDeviceInterface );
+
+        D3DDEVICE_CREATION_PARAMETERS parameters;
+        (*ppReturnedDeviceInterface)->GetCreationParameters ( &parameters );
+
+        WriteDebugEvent ( SString ( "    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x"
+                                    ,parameters.AdapterOrdinal
+                                    ,parameters.DeviceType
+                                    ,parameters.BehaviorFlags
+                                ) );
     }
+
+
     return hResult;
 }

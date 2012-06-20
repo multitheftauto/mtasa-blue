@@ -33,6 +33,7 @@ void CPedRPCs::LoadFunctions ( void )
     AddHandler ( REMOVE_PED_FROM_VEHICLE, RemovePedFromVehicle, "RemovePedFromVehicle" );
     AddHandler ( SET_PED_DOING_GANG_DRIVEBY, SetPedDoingGangDriveby, "SetPedDoingGangDriveby" );
     AddHandler ( SET_PED_ANIMATION, SetPedAnimation, "SetPedAnimation" );
+    AddHandler ( SET_PED_ANIMATION_PROGRESS, SetPedAnimationProgress, "SetPedAnimationProgress" );
     AddHandler ( SET_PED_ON_FIRE, SetPedOnFire, "SetPedOnFire" );
     AddHandler ( SET_PED_HEADLESS, SetPedHeadless, "SetPedHeadless" );
     AddHandler ( SET_PED_FROZEN, SetPedFrozen, "SetPedFrozen" );
@@ -189,7 +190,7 @@ void CPedRPCs::WarpPedIntoVehicle ( CClientEntity* pSource, NetBitStreamInterfac
     ElementID VehicleID;
     unsigned char ucSeat;
     unsigned char ucTimeContext;
-    if ( bitStream.ReadCompressed ( VehicleID ) &&
+    if ( bitStream.Read ( VehicleID ) &&
          bitStream.Read ( ucSeat ) &&
          bitStream.Read ( ucTimeContext ) )
     {
@@ -251,12 +252,23 @@ void CPedRPCs::RemovePedFromVehicle ( CClientEntity* pSource, NetBitStreamInterf
         {
             // Get the ped / player's occupied vehicle data before pulling it out
             CClientVehicle* pVehicle = pPed->GetOccupiedVehicle();
+            unsigned int    uiSeat   = pPed->GetOccupiedVehicleSeat();
+            bool bCancellingWhileEntering = ( pPed->m_bIsLocalPlayer && pPed->IsEnteringVehicle() ); // Special case here that could cause network trouble.
 
-            // Make sure the vehicle exists (otherwise warping into specific vehicles will crash)
-            if ( pVehicle )
-            {
-                unsigned int uiSeat = pPed->GetOccupiedVehicleSeat();
-
+            // Occupied vehicle can be NULL here while entering (Walking up to a vehicle in preparation to getting in/opening the doors) - Caz
+            if ( pVehicle || bCancellingWhileEntering )
+            {                
+                if ( bCancellingWhileEntering )
+                {
+                    // Cancel vehicle entry
+                    pPed->GetTaskManager()->RemoveTask ( TASK_PRIORITY_PRIMARY );
+                    // pVehicle is *MORE than likely* NULL here because there is no occupied vehicle yet, only the occupying vehicle is right but check it anyway
+                    if ( pVehicle == NULL )
+                        pVehicle = pPed->GetOccupyingVehicle();
+                    
+                    if ( pVehicle == NULL ) // Every time I've tested this the occupying Vehicle has been correct, but if it doesn't exist let's not try and call an event on it!
+                        return;
+                }
                 pPed->SetSyncTimeContext ( ucTimeContext );
 
                 // Remove the player from his vehicle
@@ -339,6 +351,42 @@ void CPedRPCs::SetPedAnimation ( CClientEntity* pSource, NetBitStreamInterface& 
                         if ( pBlock )
                         {
                             pPed->RunNamedAnimation ( pBlock, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame );
+                        }
+                    }
+                }
+            }
+            else
+            {
+                pPed->KillAnimation ();
+            }
+        }
+    }
+}
+
+void CPedRPCs::SetPedAnimationProgress ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+{
+    // Read out the player and vehicle id
+    char szAnimName [ 64 ];
+    unsigned char ucAnimSize;
+    float fProgress;
+
+    if ( bitStream.Read ( ucAnimSize ) )
+    {
+        // Grab the ped
+        CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
+        if ( pPed )
+        {
+            if ( ucAnimSize > 0 )
+            {
+                if ( bitStream.Read ( szAnimName, ucAnimSize ) )
+                {
+                    szAnimName [ ucAnimSize ] = 0;
+                    if ( bitStream.Read ( fProgress ) )
+                    {
+                        CAnimBlendAssociation* pA = g_pGame->GetAnimManager ()->RpAnimBlendClumpGetAssociation ( pPed->GetClump (), szAnimName );
+                        if ( pA )
+                        {
+                            pA->SetCurrentProgress ( fProgress );
                         }
                     }
                 }

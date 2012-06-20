@@ -26,10 +26,10 @@ int CLuaFunctionDefs::GetWeaponNameFromID ( lua_State* luaVM )
     {
         unsigned char ucID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
 
-        char szBuffer [256];
-        if ( CStaticFunctionDefinitions::GetWeaponNameFromID ( ucID, szBuffer, sizeof(szBuffer) ) )
+        SString strBuffer;
+        if ( CStaticFunctionDefinitions::GetWeaponNameFromID ( ucID, strBuffer ) )
         {
-            lua_pushstring ( luaVM, szBuffer );
+            lua_pushstring ( luaVM, strBuffer );
             return 1;
         }
     }

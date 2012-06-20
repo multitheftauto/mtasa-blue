@@ -112,24 +112,29 @@ public:
     bool                IsAddressBarAwaitingInput  ( void );
     void                SetNextHistoryText      ( bool bDown );
 
+    void                OnQuickConnectButtonClick ( void );
+    void                NotifyServerExists      ( in_addr Address, ushort usPort );
+
+    void                AddKnownLanServer       ( in_addr Address );
+    bool                IsKnownLanServer        ( in_addr Address );
+
 protected:
     bool                OnMouseClick            ( CGUIMouseEventArgs Args );
     bool                OnMouseDoubleClick      ( CGUIMouseEventArgs Args );
 
-    void                CreateHistoryList               ( void );
+    void                CreateHistoryList       ( void );
+    bool                CanBrowseVersion        ( const SString& strVersion );
 
     int                 m_iSelectedServer[ SERVER_BROWSER_TYPE_COUNT ];
 
     const char*         m_szSearchTypePath[ SearchTypes::MAX_SEARCH_TYPES ];
     CGUIStaticImage*    m_pSearchIcons[ SearchTypes::MAX_SEARCH_TYPES ];
 
-    bool                m_bManualConnect;
-    std::string         m_strManualHost;
-    unsigned int        m_usManualPort;
-
     CVector2D           m_WidgetSize;
 
     // Window widgets
+    CGUIWindow*         m_pFrame;
+    CGUIElement*        m_pTopWindow;
     CGUITabPanel*       m_pPanel;
     CGUIStaticImage*    m_pLockedIcon;
 
@@ -171,7 +176,7 @@ protected:
 
     CGUIComboBox*       m_pComboSearchType  [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIEdit*           m_pEditSearch  [ SERVER_BROWSER_TYPE_COUNT ];
-	CGUILabel*          m_pLabelSearchDescription  [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUILabel*          m_pLabelSearchDescription  [ SERVER_BROWSER_TYPE_COUNT ];
 
 
     
@@ -180,6 +185,7 @@ protected:
 
     CGUILabel*          m_pServerListStatus [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIButton*         m_pButtonBack [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIButton*         m_pButtonGeneralHelp [ SERVER_BROWSER_TYPE_COUNT ];
 
     // Server list columns
     CGUIHandle          m_hVersion [ SERVER_BROWSER_TYPE_COUNT ];
@@ -193,6 +199,12 @@ protected:
 
     // Player list columns
     CGUIHandle          m_hPlayerName [ SERVER_BROWSER_TYPE_COUNT ];
+
+    // Flash searchbox
+    struct {
+        uint uiCount;
+        uint uiNextTime;
+    } m_FlashSearchBox  [ SERVER_BROWSER_TYPE_COUNT ];
 
 private:
     enum
@@ -215,18 +227,25 @@ private:
     bool                    OnInfoClick                     ( CGUIElement* pElement );
     bool                    OnFavouritesClick               ( CGUIElement* pElement );
     bool                    OnBackClick                     ( CGUIElement* pElement );
+    bool                    OnGeneralHelpClick              ( CGUIElement* pElement );
+    bool                    OnGeneralHelpDeactivate         ( CGUIElement* pElement );
     bool                    OnAddressChanged                ( CGUIElement* pElement );
     bool                    OnFilterChanged                 ( CGUIElement* pElement );
     bool                    OnTabChanged                    ( CGUIElement* pElement );
     bool                    OnHistorySelected               ( CGUIElement* pElement );
+    bool                    OnHistoryDropListRemove         ( CGUIElement* pElement );
+
     bool                    OnSearchTypeSelected            ( CGUIElement* pElement );
 
-    bool					OnSearchFocused					( CGUIElement* pElement );
-    bool					OnSearchDefocused			    ( CGUIElement* pElement );
-    bool					OnAddressFocused				( CGUIElement* pElement );
-    bool					OnAddressDefocused				( CGUIElement* pElement );
+    bool                    OnSearchFocused                 ( CGUIElement* pElement );
+    bool                    OnSearchDefocused               ( CGUIElement* pElement );
+    bool                    OnAddressFocused                ( CGUIElement* pElement );
+    bool                    OnAddressDefocused              ( CGUIElement* pElement );
+
+    bool                    OnServerListChangeRow           ( CGUIKeyEventArgs Args );
 
     ServerBrowserType       GetCurrentServerBrowserType     ( void );
+    ServerBrowserType       GetCurrentServerBrowserTypeForSave ( void );
 
     CServerListInternet     m_ServersInternet;
     CServerListLAN          m_ServersLAN;
@@ -235,12 +254,23 @@ private:
     CServerList             m_ServersHistory;
 
     unsigned long           m_ulLastUpdateTime;
-    bool                    m_firstTimeBrowseServer;
-    bool                    m_bOptionsLoaded;
-    unsigned int            m_uiCurrentSearchType;          
+    bool                    m_bFirstTimeBrowseServer;
+    bool                    m_bOptionsLoaded;        
     ServerBrowserType       m_PrevServerBrowserType;
 
     std::map < SString, int > m_blockedVersionMap;
+    std::map < SString, int > m_allowedVersionMap;
+
+    CGUIWindow*             m_pQuickConnectHelpWindow;
+    bool                    m_bFocusTextEdit;
+
+    uint                    m_uiShownQuickConnectHelpCount;
+    uint                    m_uiIsUsingTempTab;
+    ServerBrowserType       m_BeforeTempServerBrowserType;
+    CGUIWindow*             m_pGeneralHelpWindow;
+    long long               m_llLastGeneralHelpTime;
+
+    std::set < ulong >      m_KnownLanServerAddressMap;
 };
 
 #endif

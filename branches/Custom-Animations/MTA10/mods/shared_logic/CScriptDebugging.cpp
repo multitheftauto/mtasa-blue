@@ -215,6 +215,10 @@ void CScriptDebugging::LogString ( const char* szPrePend, lua_State* luaVM, cons
     SString strFile = "";
     int     iLine   = -1;
 
+    // Get a VM from somewhere
+    if ( !luaVM && !m_LuaMainStack.empty () )
+        luaVM = m_LuaMainStack.back ()->GetVM ();
+
     if ( luaVM && lua_getstack ( luaVM, 1, &debugInfo ) )
     {
         lua_getinfo ( luaVM, "nlS", &debugInfo );
@@ -312,4 +316,27 @@ void CScriptDebugging::PrintLog ( const char* szText )
         fprintf ( m_pLogFile, "%s %s\n", szBuffer, szText );
         fflush ( m_pLogFile );
     }
+}
+
+
+// Keep a stack of called VMs to give global warnings/errors a context
+void CScriptDebugging::PushLuaMain ( CLuaMain* pLuaMain )
+{
+    m_LuaMainStack.push_back ( pLuaMain );
+}
+
+void CScriptDebugging::PopLuaMain ( CLuaMain* pLuaMain )
+{
+    dassert ( !m_LuaMainStack.empty () );
+    if ( !m_LuaMainStack.empty () )
+    {
+        dassert ( m_LuaMainStack.back () == pLuaMain );
+        m_LuaMainStack.pop_back ();
+    }
+}
+
+void CScriptDebugging::OnLuaMainDestroy ( CLuaMain* pLuaMain )
+{
+    dassert ( !ListContains ( m_LuaMainStack, pLuaMain ) );
+    ListRemove ( m_LuaMainStack, pLuaMain );
 }

@@ -896,22 +896,15 @@ void Window::setClippedByParent(bool setting)
 /*************************************************************************
 	Set the current text string for the Window.
 *************************************************************************/
-void Window::setText(const String& text, bool bidify)
+void Window::setText(const String& text)
 {
+    if ( text == d_text_raw )
+        return;
     d_text_raw = text;
-    if ( !bidify )
-    {
-        if ( text == d_text )
-            return;
-	    d_text = text;
-    }
-    else
-    {
-        String bidiText = String((CEGUI::utf8*)UTF16ToMbUTF8(GetBidiString(MbUTF8ToUTF16(text.c_str()))).c_str());  //Really ugly but CEGUI strings suck
-        if ( bidiText == d_text )
-            return;
-        d_text = bidiText;
-    }
+    d_text = d_text_raw.bidify ();
+
+    if ( getFont () )
+        const_cast < Font* > ( getFont () )->insertStringForGlyphs ( d_text ); // Refresh our glyph set if there are new characters
 
     WindowEventArgs args(this);
 	onTextChanged(args);
@@ -996,6 +989,9 @@ void Window::setAreaRect(const Rect& area)
 *************************************************************************/
 void Window::setFont(const Font* font)
 {
+    if ( !d_font && font && !d_text.empty() )
+        const_cast < Font* > ( font )->insertStringForGlyphs ( d_text ); // Refresh our glyph set if there are new characters
+
 	d_font = font;
     WindowEventArgs args(this);
 	onFontChanged(args);

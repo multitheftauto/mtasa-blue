@@ -106,15 +106,19 @@ CModelInfo* CClientModelRequestManager::GetRequestedModelInfo ( CClientEntity* p
 }
 
 
-bool CClientModelRequestManager::RequestBlocking ( unsigned short usModelID )
+bool CClientModelRequestManager::RequestBlocking ( unsigned short usModelID, const char* szTag )
 {
     // Grab the model info
     CModelInfo* pInfo = g_pGame->GetModelInfo ( usModelID );
     if ( pInfo )
     {
-        pInfo->Request ( TRUE, TRUE );
-        pInfo->MakeCustomModel ();
-        return true;
+        pInfo->Request ( BLOCKING, szTag );
+        if ( pInfo->IsLoaded () )
+        {
+            pInfo->MakeCustomModel ();
+            return true;
+        }
+        OutputDebugLine ( SString ( "[Models] RequestBlocking failed for id %d", usModelID ) );
     }
 
     // Bad model ID probably.
@@ -167,7 +171,7 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
                     pEntry->dwTimeRequested = timeGetTime ();
 
                     // Start loading the new model.
-                    pInfo->AddRef ( false );
+                    pInfo->ModelAddRef ( NON_BLOCKING, "CClientModelRequestManager::Request" );
 
                     // He has to wait for it.
                     return false;
@@ -184,13 +188,8 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
                 return true;
             }
 
-            // Boost loading priority if the object is close to the local player
-            bool bHighPriority = false;
-            if ( pRequester->GetDistanceBetweenBoundingSpheres ( g_pClientGame->GetLocalPlayer () ) < 20 )
-                bHighPriority = true;
-
             // Request it
-            pInfo->AddRef ( false, bHighPriority );
+            pInfo->ModelAddRef ( NON_BLOCKING, "CClientModelRequestManager::Request #2" );
 
             // Add him to the list over models we're waiting for.
             pEntry = new SClientModelRequest;
@@ -300,9 +299,9 @@ void CClientModelRequestManager::DoPulse ( void )
                     // Request it again. Don't add reference, or we screw up the
                     // reference count.
                     if ( g_pGame->IsASyncLoadingEnabled () )
-                        pEntry->pModel->Request ( FALSE, FALSE );
+                        pEntry->pModel->Request ( NON_BLOCKING, "CClientModelRequestManager::DoPulse #1" );
                     else
-                        pEntry->pModel->Request ( TRUE, FALSE );
+                        pEntry->pModel->Request ( BLOCKING, "CClientModelRequestManager::DoPulse #2" );
 
                     // Remember now as the time we requested it.
                     pEntry->dwTimeRequested = dwTimeNow;

@@ -18,10 +18,6 @@
 #ifndef __UTILS_H
 #define __UTILS_H
 
-#ifndef PI
-#define PI 3.14159265358979323846264338327950f
-#endif
-
 
 // Vector math
 inline float DistanceBetweenPoints2D ( const CVector& vecPosition1, const CVector& vecPosition2 )
@@ -193,6 +189,15 @@ inline float GetOffsetDegrees ( float a, float b )
     return c;
 }
 
+// Assuming fValue is the result of a difference calculation, calculate
+// the shortest positive distance after wrapping
+inline float GetSmallestWrapUnsigned ( float fValue, float fHigh )
+{
+    float fWrapped =  fValue - ( fHigh * floor ( static_cast < float > ( fValue / fHigh ) ) );
+    if ( fWrapped > fHigh / 2 )
+        fWrapped = fHigh - fWrapped;
+    return fWrapped;
+}
 
 bool            DoesFileExist               ( const char* szFilename );
 
@@ -217,7 +222,7 @@ float           GetRandomFloat              ( void );
 
 unsigned int    HashString                  ( const char* szString );
 
-SString         GetDataUnit                 ( unsigned int uiInput );
+SString         GetDataUnit                 ( unsigned long long ullInput );
 
 unsigned int    HexToInt                    ( const char* szHex );
 bool            XMLColorToInt               ( const char* szColor, unsigned long& ulColor );

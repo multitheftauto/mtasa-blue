@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Client - Game SA"
 	ProjectGUID="{E13D1441-438B-4A03-AB79-5E8EF08EE414}"
+	RootNamespace="Client - Game SA"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -83,7 +84,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Program Files\MTA San Andreas 1.1\MTA\game_sa.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.4\MTA\game_sa.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -186,7 +187,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Program Files\MTA San Andreas 1.1\mta\game_sa_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.4\mta\game_sa_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -393,6 +394,10 @@
 			</File>
 			<File
 				RelativePath="CBuildingSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CBuoyancySA.cpp"
 				>
 			</File>
 			<File
@@ -656,6 +661,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderWareSA.ShaderSupport.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CRestartSA.cpp"
 				>
 			</File>
@@ -665,6 +674,10 @@
 			</File>
 			<File
 				RelativePath=".\CSettingsSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CShadowDataSA.cpp"
 				>
 			</File>
 			<File
@@ -729,6 +742,14 @@
 			</File>
 			<File
 				RelativePath="CWeaponSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CWeaponStatManagerSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CWeaponStatSA.cpp"
 				>
 			</File>
 			<File
@@ -889,7 +910,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CBoundingBoxSA.h"
+				>
+			</File>
+			<File
 				RelativePath="CBuildingSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CBuoyancySA.h"
 				>
 			</File>
 			<File
@@ -925,11 +954,35 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CColBoxSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CColLineSA.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CColModelSA.h"
 				>
 			</File>
 			<File
 				RelativePath=".\CColPointSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CColSphereSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CColTrianglePlaneSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CColTriangleSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CCompressedVectorSA.h"
 				>
 			</File>
 			<File
@@ -1157,6 +1210,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderWareSA.ShaderSupport.h"
+				>
+			</File>
+			<File
 				RelativePath="CRestartSA.h"
 				>
 			</File>
@@ -1166,6 +1223,10 @@
 			</File>
 			<File
 				RelativePath=".\CSettingsSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CShadowDataSA.h"
 				>
 			</File>
 			<File
@@ -1230,6 +1291,14 @@
 			</File>
 			<File
 				RelativePath="CWeaponSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CWeaponStatManagerSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CWeaponStatSA.h"
 				>
 			</File>
 			<File

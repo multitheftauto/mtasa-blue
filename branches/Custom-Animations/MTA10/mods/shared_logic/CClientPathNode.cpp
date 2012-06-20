@@ -16,7 +16,7 @@ using std::list;
 
 CClientPathNode::CClientPathNode ( CClientManager* pManager, CVector& vecPosition,
                                    CVector& vecRotation, int iTime, ElementID ID, ePathNodeStyle PathStyle,
-                                   CClientPathNode* pNextNode ) : CClientEntity ( ID )
+                                   CClientPathNode* pNextNode ) : ClassInit ( this ), CClientEntity ( ID )
 {
     m_pManager = pManager;
     m_pPathManager = pManager->GetPathManager ();

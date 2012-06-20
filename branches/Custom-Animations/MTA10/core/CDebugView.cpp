@@ -16,7 +16,7 @@
 extern CCore* g_pCore;
 extern CChat* g_pChat;
 
-CDebugView::CDebugView ( CGUI * pManager, CVector2D & vecPosition ) : CChat ()
+CDebugView::CDebugView ( CGUI * pManager, const CVector2D & vecPosition ) : CChat ()
 {
     CChat * pChat = g_pChat;
     g_pChat = this;
@@ -25,8 +25,7 @@ CDebugView::CDebugView ( CGUI * pManager, CVector2D & vecPosition ) : CChat ()
 
     CVector2D vecResolution = m_pManager->GetResolution ();
     m_vecScale = CVector2D ( vecResolution.fX / 800.0f, vecResolution.fY / 600.0f );
-    vecPosition = vecPosition * vecResolution;
-    m_vecBackgroundPosition = vecPosition;
+    m_vecBackgroundPosition = vecPosition * vecResolution;
 
     m_bUseCEGUI = false;
     m_ulChatLineLife = 0;
@@ -75,7 +74,7 @@ CDebugView::CDebugView ( CGUI * pManager, CVector2D & vecPosition ) : CChat ()
 }
 
 
-void CDebugView::Draw ( void )
+void CDebugView::Draw ( bool bUseCacheTexture )
 {
     // Are we visible?
     if ( !m_bVisible )
@@ -92,7 +91,7 @@ void CDebugView::Draw ( void )
     m_vecBackgroundPosition = vecPosition * vecResolution - CVector2D ( 0, height );
     m_pBackground->SetPosition ( m_vecBackgroundPosition );
 
-    CChat::Draw ();
+    CChat::Draw ( bUseCacheTexture );
     g_pChat = pChat;
 }
 

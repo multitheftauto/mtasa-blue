@@ -28,11 +28,12 @@ struct SLastSyncedObjectData
 
 class CClientObject : public CClientStreamElement
 {
+    DECLARE_CLASS( CClientObject, CClientStreamElement )
     friend class CClientObjectManager;
     friend class CClientPed;
 
 public:
-                                    CClientObject           ( class CClientManager* pManager, ElementID ID, unsigned short usModel );
+                                    CClientObject           ( class CClientManager* pManager, ElementID ID, unsigned short usModel, bool bLowLod );
                                     ~CClientObject          ( void );
 
     void                            Unlink                  ( void );
@@ -70,6 +71,10 @@ public:
     inline unsigned short           GetModel                ( void ) const                      { return m_usModel; };
     void                            SetModel                ( unsigned short usModel );
 
+    bool                            IsLowLod                ( void );
+    bool                            SetLowLodObject         ( CClientObject* pLowLodObject );
+    CClientObject*                  GetLowLodObject         ( void );
+
     void                            Render                  ( void );
 
     inline bool                     IsStatic                ( void )                            { return m_bIsStatic; }
@@ -87,9 +92,11 @@ public:
     void                            SetHealth               ( float fHealth );
 
     inline bool                     IsBreakable             ( void )                            { return m_pObjectManager->IsBreakableModel ( m_usModel ) && m_bBreakable; };
-    inline void                     SetBreakable            ( bool bBreakable )                 { m_bBreakable = bBreakable; };
+    bool                            SetBreakable            ( bool bBreakable );
 
     void                            ReCreate                ( void );
+    void                            UpdateVisibility        ( void );
+
 protected:
     void                            StreamIn                ( bool bInstantly );
     void                            StreamOut               ( void );
@@ -118,6 +125,11 @@ protected:
     bool                                m_bBreakable;
 
     CVector                             m_vecMoveSpeed;
+
+    const bool                          m_bIsLowLod;            // true if this object is low LOD
+    CClientObject*                      m_pLowLodObject;        // Pointer to low LOD version of this object
+    std::vector < CClientObject* >      m_HighLodObjectList;    // List of objects that use this object as a low LOD version
+    bool                                m_IsHiddenLowLod;       // true if this object is low LOD and should not be drawn
 
 public:
     CObject*                            m_pObject;

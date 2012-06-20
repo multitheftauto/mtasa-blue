@@ -28,7 +28,7 @@ bool CDetonateSatchelsPacket::Write ( NetBitStreamInterface& BitStream ) const
     // Write the source player and latency if any.
     if ( m_pSourceElement )
     {
-        BitStream.WriteCompressed ( m_pSourceElement->GetID () );
+        BitStream.Write ( m_pSourceElement->GetID () );
 
         unsigned short usLatency = static_cast < CPlayer * > ( m_pSourceElement )->GetPing ();
         BitStream.WriteCompressed ( usLatency );

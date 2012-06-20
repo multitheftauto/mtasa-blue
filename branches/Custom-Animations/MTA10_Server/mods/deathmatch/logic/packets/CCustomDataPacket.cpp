@@ -29,7 +29,7 @@ CCustomDataPacket::~CCustomDataPacket ( void )
 bool CCustomDataPacket::Read ( NetBitStreamInterface& BitStream )
 {
     unsigned short usNameLength;
-    if ( BitStream.ReadCompressed ( m_ElementID ) &&
+    if ( BitStream.Read ( m_ElementID ) &&
          BitStream.ReadCompressed ( usNameLength ) && 
          usNameLength > 0 )
     {

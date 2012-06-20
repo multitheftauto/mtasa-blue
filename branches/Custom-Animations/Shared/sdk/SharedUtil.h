@@ -37,6 +37,7 @@ typedef signed char         int8;       //  8
 typedef unsigned char       BYTE;       //  8
 typedef unsigned short      WORD;       //  16
 typedef unsigned long       DWORD;      //  32      32      64
+typedef float               FLOAT;      //  32
 
 // Type: considerations:
 // a) long (and therefore DWORD) is 64 bits when compiled using 64 bit GCC 
@@ -48,9 +49,10 @@ typedef unsigned long       DWORD;      //  32      32      64
 #include <list>
 #include <vector>
 #include <map>
+#include <set>
 #include <deque>
 #include <algorithm>
-#include <limits>
+#include <limits.h>
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -58,11 +60,25 @@ typedef unsigned long       DWORD;      //  32      32      64
 #include <stdarg.h>
 #include <assert.h>
 #include "SString.h"
+#include "SharedUtil.Map.h"
+#if defined(SHARED_UTIL_WITH_HASH_MAP) || defined(SHARED_UTIL_WITH_FAST_HASH_MAP)
+    #include "SharedUtil.HashMap.h"
+#endif
+#if defined(SHARED_UTIL_WITH_FAST_HASH_MAP)
+    #include "SharedUtil.FastHashMap.h"
+#endif
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.File.h"
 #include "SharedUtil.Time.h"
 #include "SharedUtil.Buffer.h"
 #include "SharedUtil.Game.h"
+#include "SharedUtil.Math.h"
+#include "SharedUtil.ClassIdent.h"
+#include "SharedUtil.Hash.h"
+#include "SharedUtil.SysInfo.h"
+#include "SharedUtil.Profiling.h"
+#include "SharedUtil.Logging.h"
+#include "CFastList.h"
 
 #ifdef _MSC_VER
 #define snprintf _snprintf

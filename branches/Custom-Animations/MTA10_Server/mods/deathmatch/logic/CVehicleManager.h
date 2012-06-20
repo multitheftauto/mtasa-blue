@@ -33,7 +33,7 @@ public:
                                         CVehicleManager             ( void );
                                         ~CVehicleManager            ( void );
 
-    CVehicle*                           Create                      ( unsigned short usModel, CElement* pParent, CXMLNode* pNode = NULL );
+    CVehicle*                           Create                      ( unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2, CElement* pParent, CXMLNode* pNode = NULL );
     CVehicle*                           CreateFromXML               ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents );
     void                                DeleteAll                   ( void );
 
@@ -54,6 +54,7 @@ public:
     static bool                         HasDamageModel              ( unsigned short usModel );
     static bool                         HasDamageModel              ( enum eVehicleType Type );
     static bool                         HasDoors                    ( unsigned short usModel );
+    static void                         GetRandomVariation          ( unsigned short usModel, unsigned char &ucVariant, unsigned char &ucVariant2 );
 
     inline CVehicleColorManager*        GetColorManager             ( void )                            { return &m_ColorManager; };
     CVehicleColor                       GetRandomColor              ( unsigned short usModel );

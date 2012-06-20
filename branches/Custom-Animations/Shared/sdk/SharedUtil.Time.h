@@ -45,6 +45,53 @@ namespace SharedUtil
     // Get the local time as a sortable string.
     SString     GetLocalTimeString ( bool bDate = false, bool bMilliseconds = false );
 
+    // Get time in microseconds
+    typedef ulong TIMEUS;
+    TIMEUS      GetTimeUs ( void );
+
+    // Get tick count cached per module
+    long long   GetModuleTickCount64 ( void );
+    void        UpdateModuleTickCount64 ( void );
+
+
+    //
+    // Encapsulate a tick count value
+    //
+    class CTickCount
+    {
+        long long m_llTicks;
+    public:
+        // Constructors
+                 CTickCount ( void )                : m_llTicks ( 0 ) {}
+        explicit CTickCount ( long long llTicks )   : m_llTicks ( llTicks ) {}
+        explicit CTickCount ( double dTicks )       : m_llTicks ( static_cast < long long > ( dTicks ) ) {}
+
+        // Operators
+        CTickCount operator+ ( const CTickCount& other ) const  { return CTickCount ( m_llTicks + other.m_llTicks ); }
+        CTickCount operator- ( const CTickCount& other ) const  { return CTickCount ( m_llTicks - other.m_llTicks ); }
+        CTickCount& operator+= ( const CTickCount& other )      { m_llTicks += other.m_llTicks; return *this; }
+        CTickCount& operator-= ( const CTickCount& other )      { m_llTicks -= other.m_llTicks; return *this; }
+
+        // Comparison
+        bool operator < ( const CTickCount& other ) const       { return m_llTicks < other.m_llTicks; }
+        bool operator > ( const CTickCount& other ) const       { return m_llTicks > other.m_llTicks; }
+        bool operator <= ( const CTickCount& other ) const      { return m_llTicks <= other.m_llTicks; }
+        bool operator >= ( const CTickCount& other ) const      { return m_llTicks >= other.m_llTicks; }
+        bool operator == ( const CTickCount& other ) const      { return m_llTicks == other.m_llTicks; }
+        bool operator != ( const CTickCount& other ) const      { return m_llTicks != other.m_llTicks; }
+
+        // Conversion
+        double      ToDouble        ( void ) const      { return static_cast < double > ( m_llTicks ); }
+        long long   ToLongLong      ( void ) const      { return m_llTicks; }
+        int         ToInt           ( void ) const      { return static_cast < int > ( m_llTicks ); }
+
+        // Static functions
+        static CTickCount Now ( bool bUseModuleTickCount = false )
+        {
+            return CTickCount ( bUseModuleTickCount ? GetModuleTickCount64 () : GetTickCount64_ () );
+        }
+    };
+
 
     //
     // Simple class to measure time passing
@@ -53,29 +100,83 @@ namespace SharedUtil
     class CElapsedTime
     {
         long long   m_llUpdateTime;
-        long        m_lElapsedTime;
-        long        m_lMaxIncrement;
+        long long   m_llElapsedTime;
+        long long   m_llMaxIncrement;
+        bool        m_bUseModuleTickCount;
     public:
 
-        CElapsedTime ( long lMaxIncrement = 500 )
-            : m_lMaxIncrement ( lMaxIncrement )
+        // MaxIncrement should be set higher than the expected tick interval between Get() calls
+        CElapsedTime ( long lMaxIncrement = 500, bool bUseModuleTickCount = false )
+            : m_llMaxIncrement ( lMaxIncrement )
+            , m_bUseModuleTickCount ( bUseModuleTickCount )
         {
             Reset ();
         }
 
         void Reset ( void )
         {
-            m_llUpdateTime = GetTickCount64_ ();
-            m_lElapsedTime = 0;
+            m_llUpdateTime = DoGetTickCount ();
+            m_llElapsedTime = 0;
         }
 
-        long Get ( void )
+        long long Get ( void )
         {
-            long long llTime = GetTickCount64_ ();
-            m_lElapsedTime += Min ( m_lMaxIncrement, static_cast < long > ( llTime - m_llUpdateTime ) );
+            long long llTime = DoGetTickCount ();
+            m_llElapsedTime += Min ( m_llMaxIncrement, llTime - m_llUpdateTime );
             m_llUpdateTime = llTime;
-            return m_lElapsedTime;
+            return m_llElapsedTime;
         }
+
+    protected:
+        CElapsedTime ( const CElapsedTime& );       // Not implemented
+
+        long long DoGetTickCount ( void )
+        {
+            return m_bUseModuleTickCount ? GetModuleTickCount64 () : GetTickCount64_ ();
+        }
+    };
+
+
+    //
+    // Timing sections of code
+    //
+    template < int RESERVE_NUM_ITEMS = 20 >
+    class CTimeUsMarker
+    {
+    public:
+        struct SItem
+        {
+            const char* szDesc;
+            TIMEUS timeUs;
+        };
+
+        CTimeUsMarker ( void )
+        {
+            itemList.reserve ( RESERVE_NUM_ITEMS );
+        }
+
+        void Set ( const char* szDesc )
+        {
+            itemList.push_back ( SItem () );
+            SItem& item = itemList.back ();
+            item.timeUs = GetTimeUs ();
+            item.szDesc = szDesc;
+        }
+
+        SString GetString ( void ) const
+        {
+            SString strStatus;
+            for ( uint i = 1 ; i < itemList.size () ; i++ )
+            {
+                const SItem& itemPrev = itemList[i-1];
+                const SItem& item = itemList[i];
+                strStatus += SString ( "[%0.2fms %s] ", ( item.timeUs - itemPrev.timeUs ) / 1000.f, item.szDesc ); 
+            }
+            return strStatus;
+        }
+
+     protected:
+        std::vector < SItem > itemList;
     };
 
 }

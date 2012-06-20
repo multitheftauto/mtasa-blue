@@ -22,6 +22,7 @@ CHandlingEntrySA::CHandlingEntrySA ( void )
 
     // We have no original data
     m_pOriginalData = NULL;
+    m_bChanged = true;
 }
 
 
@@ -32,11 +33,16 @@ CHandlingEntrySA::CHandlingEntrySA ( tHandlingDataSA* pOriginal )
     m_pOriginalData = NULL;
     m_bDeleteInterface = false;
     memcpy ( &m_Handling, pOriginal, sizeof ( tHandlingDataSA ) );
+    m_bChanged = true;
 }
 
 
 CHandlingEntrySA::~CHandlingEntrySA ( void )
 {
+    if ( m_bChanged )
+    {
+        pGame->GetHandlingManager()->RemoveChangedVehicle ( );
+    }
     if ( m_bDeleteInterface )
     {
         delete m_pHandlingSA;
@@ -50,10 +56,15 @@ void CHandlingEntrySA::Assign ( const CHandlingEntry* pData )
     // Copy the data
     const CHandlingEntrySA* pEntrySA = static_cast < const CHandlingEntrySA* > ( pData );
     m_Handling = pEntrySA->m_Handling;
+    if ( m_bChanged )
+    {
+        pGame->GetHandlingManager()->RemoveChangedVehicle ( );
+    }
+    pGame->GetHandlingManager()->CheckSuspensionChanges ( this );
 }
 
 
-void CHandlingEntrySA::Recalculate ( void )
+void CHandlingEntrySA::Recalculate ( unsigned short usModel )
 {
     // Real GTA class?
     if ( m_pHandlingSA )
@@ -61,7 +72,62 @@ void CHandlingEntrySA::Recalculate ( void )
         // Copy our stored field to GTA's
         memcpy ( m_pHandlingSA, &m_Handling, sizeof ( m_Handling ) );
 
-        // Call GTA's function that calculates the final values from the read values
-        ( (void (_stdcall *)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits )( m_pHandlingSA );
+        CModelInfo* pModelInfo = pGame->GetModelInfo ( usModel );
+//         bool bIsBike = false;
+//         if ( pModelInfo )
+//         {
+//             bIsBike = ( pModelInfo->IsBike() || pModelInfo->IsBmx() );
+//         }
+//         // Bikes and BMX's both use Bike data.
+//         if ( bIsBike )
+//         {
+//             // Call GTA's function that calculates the final values from the read values
+//             ( (void (_stdcall *)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits )( m_pHandlingSA );
+//             // Call GTA's function that calculates the final values from the read values
+//             ( (void (_stdcall *)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertBikeDataToGameUnits )( m_pHandlingSA );
+//         }
+//         else
+        //if ( pModelInfo && pModelInfo->IsMonsterTruck() || pModelInfo->IsCar() )
+        {
+            // Call GTA's function that calculates the final values from the read values
+            ( (void (_stdcall *)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits )( m_pHandlingSA );
+        }
     }
+}
+
+// Moved to cpp to check suspension changes against default values to make sure the handling hasn't changed.
+void CHandlingEntrySA::SetSuspensionForceLevel ( float fForce )
+{ 
+    m_Handling.fSuspensionForceLevel = fForce; 
+    pGame->GetHandlingManager ( )->CheckSuspensionChanges ( this );
+}
+void CHandlingEntrySA::SetSuspensionDamping ( float fDamping )
+{ 
+    m_Handling.fSuspensionDamping = fDamping; 
+    pGame->GetHandlingManager ( )->CheckSuspensionChanges ( this );
+}
+void CHandlingEntrySA::SetSuspensionHighSpeedDamping ( float fDamping )
+{ 
+    m_Handling.fSuspensionHighSpdDamping = fDamping; 
+    pGame->GetHandlingManager ( )->CheckSuspensionChanges ( this );
+}
+void CHandlingEntrySA::SetSuspensionUpperLimit ( float fUpperLimit )
+{
+    m_Handling.fSuspensionUpperLimit = fUpperLimit; 
+    pGame->GetHandlingManager ( )->CheckSuspensionChanges ( this );
+}
+void CHandlingEntrySA::SetSuspensionLowerLimit ( float fLowerLimit ) 
+{ 
+    m_Handling.fSuspensionLowerLimit = fLowerLimit; 
+    pGame->GetHandlingManager ( )->CheckSuspensionChanges ( this );
+}
+void CHandlingEntrySA::SetSuspensionFrontRearBias ( float fBias )
+{ 
+    m_Handling.fSuspensionFrontRearBias = fBias; 
+    pGame->GetHandlingManager ( )->CheckSuspensionChanges ( this );
+}
+void CHandlingEntrySA::SetSuspensionAntiDiveMultiplier ( float fAntidive )
+{ 
+    m_Handling.fSuspensionAntiDiveMultiplier = fAntidive; 
+    pGame->GetHandlingManager ( )->CheckSuspensionChanges ( this );
 }

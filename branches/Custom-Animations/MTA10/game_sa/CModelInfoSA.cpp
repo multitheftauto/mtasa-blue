@@ -26,6 +26,7 @@ CModelInfoSA::CModelInfoSA ( void )
     m_pInterface = NULL;
     this->m_dwModelID = 0xFFFFFFFF;
     m_dwReferences = 0;
+    m_dwPendingInterfaceRef = 0;
     m_pOriginalColModelInterface = NULL;
     m_pCustomClump = NULL;
     m_pCustomColModel = NULL;
@@ -37,6 +38,7 @@ CModelInfoSA::CModelInfoSA ( DWORD dwModelID )
     this->m_dwModelID = dwModelID;
     m_pInterface = ppModelInfo [ m_dwModelID ];
     m_dwReferences = 0;
+    m_dwPendingInterfaceRef = 0;
     m_pOriginalColModelInterface = NULL;
     m_pCustomClump = NULL;
     m_pCustomColModel = NULL;
@@ -246,6 +248,27 @@ BOOL CModelInfoSA::IsVehicle ( )
     return m_dwModelID >= 400 && m_dwModelID <= 611;
 }   
 
+bool CModelInfoSA::IsPlayerModel ( )
+{
+    return ( m_dwModelID == 0 ||
+             m_dwModelID == 1 ||
+             m_dwModelID == 2 ||
+             m_dwModelID == 7 ||
+             (m_dwModelID >= 9 &&
+             m_dwModelID != 208 &&
+             m_dwModelID != 149 &&
+             m_dwModelID != 119 &&
+             m_dwModelID != 86 &&
+             m_dwModelID != 74 &&
+             m_dwModelID != 65 &&
+             m_dwModelID != 42 &&
+             m_dwModelID <= 272) ||
+             (m_dwModelID >= 274 &&
+             m_dwModelID <= 288) ||
+             (m_dwModelID >= 290 &&
+             m_dwModelID <= 312 ) );
+}
+
 BOOL CModelInfoSA::IsUpgrade ( void )
 {
     return m_dwModelID >= 1000 && m_dwModelID <= 1193;
@@ -289,7 +312,25 @@ char * CModelInfoSA::GetNameIfVehicle ( )
 //  return NULL;
 }
 
-VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad, bool bHighPriority )
+uint CModelInfoSA::GetAnimFileIndex ( void )
+{
+    DWORD dwFunc = m_pInterface->VFTBL->GetAnimFileIndex;
+    DWORD dwThis = (DWORD) m_pInterface;
+    uint uiReturn = 0;
+    if ( dwFunc )
+    {
+        _asm
+        {
+            mov     ecx, dwThis
+            call    dwFunc
+            mov     uiReturn, eax
+        }
+    }
+    return uiReturn;
+}
+
+
+VOID CModelInfoSA::Request( EModelRequestType requestType, const char* szTag )
 {
     DEBUG_TRACE("VOID CModelInfoSA::Request( BOOL bAndLoad, BOOL bWaitForLoad )");
     // don't bother loading it if it already is
@@ -299,30 +340,60 @@ VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad, bool bHighPriority
     if ( m_dwModelID <= 288 && m_dwModelID != 7 && !pGame->GetModelInfo ( 7 )->IsLoaded () )
     {
         // Skin 7 must be loaded in order for other skins to work. No, really. (#4010)
-        pGame->GetModelInfo ( 7 )->Request ( bAndLoad, false );
+        pGame->GetModelInfo ( 7 )->Request ( requestType, "Model 7" );
     }
 
-    DWORD dwFlags;
-    if ( bHighPriority )
-        dwFlags = 0x16;
-    else
-        dwFlags = 6;
-    pGame->GetStreaming()->RequestModel(m_dwModelID, dwFlags);
-
-    int iTimeToWait = 50;
-
-    if(bAndLoad)
+    // Bikes can sometimes get stuck when loading unless the anim file is handled like what is does here
+    // Don't change the code below unless you can test it (by recreating the problem it solves)
+    if ( IsVehicle () )
     {
-        pGame->GetStreaming()->LoadAllRequestedModels();
-        
-        if(bWaitForLoad)
+        uint uiAnimFileIndex = GetAnimFileIndex ();
+        if ( uiAnimFileIndex != 0xffffffff )
         {
-            while(!this->IsLoaded() && iTimeToWait != 0)
+            uint uiAnimId = uiAnimFileIndex + 25575;
+            CModelInfoSA* pAnim = static_cast < CModelInfoSA* > ( pGame->GetModelInfo ( uiAnimId ) );
+            if ( !pAnim )
             {
-                iTimeToWait--;
-                Sleep(10);
+                if ( uiAnimId != 25714 )
+                    LogEvent ( 505, "Model no anim", "", SString ( "%d (%d)", m_dwModelID, uiAnimId ) );
+            }
+            else
+            if ( !pAnim->IsLoaded() )
+            {
+                OutputDebugLine ( SString ( "[Models] Requesting anim file %d for model %d", uiAnimId, m_dwModelID ) );
+                pAnim->Request ( requestType, szTag );
             }
         }
+    }
+
+    if ( requestType == BLOCKING )
+    {
+        pGame->GetStreaming()->RequestModel ( m_dwModelID, 0x16 );
+        pGame->GetStreaming()->LoadAllRequestedModels ( true, szTag );
+        if ( !IsLoaded() )
+        {
+            // Try 3 more times, final time without high priority flag
+            int iCount = 0;
+            while ( iCount++ < 3 && !IsLoaded() )
+            {
+                bool bOnlyPriorityModels = ( iCount < 3 );
+                pGame->GetStreaming()->LoadAllRequestedModels ( bOnlyPriorityModels, szTag );
+            }
+            if ( !IsLoaded() )
+            {
+                AddReportLog ( 6641, SString ( "Blocking load fail: %d (%s)", m_dwModelID, szTag ) );
+                LogEvent ( 641, "Blocking load fail", "", SString ( "%d (%s)", m_dwModelID, szTag ) );
+            }
+            else
+            {
+                AddReportLog ( 6642, SString ( "Blocking load: %d (%s) (Took %d attempts)", m_dwModelID, szTag, iCount ) );
+                LogEvent ( 642, "Blocking load", "", SString ( "%d (%s) (Took %d attempts)", m_dwModelID, szTag, iCount ) );
+            }
+        }
+    }
+    else
+    {
+        pGame->GetStreaming()->RequestModel ( m_dwModelID, 0x06 );
     }
 }
 
@@ -383,26 +454,35 @@ BYTE CModelInfoSA::GetLevelFromPosition ( CVector * vecPosition )
 
 BOOL CModelInfoSA::IsLoaded ( )
 {
+    if ( DoIsLoaded () )
+    {
+        if ( m_dwPendingInterfaceRef )
+        {
+            assert ( m_dwReferences > 0 );
+            m_pInterface = ppModelInfo [ m_dwModelID ];
+            m_pInterface->usNumberOfRefs++;
+            m_dwPendingInterfaceRef = 0;
+        }
+        return true;
+    }
+    return false;
+}
+
+BOOL CModelInfoSA::DoIsLoaded ( )
+{
     DEBUG_TRACE("BOOL CModelInfoSA::IsLoaded ( )");
-    if ( IsUpgrade () )
-        return pGame->GetStreaming ()->HasVehicleUpgradeLoaded ( m_dwModelID );
 
     //return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + 20*dwModelID);
     BOOL bLoaded = pGame->GetStreaming()->HasModelLoaded(m_dwModelID);
     m_pInterface = ppModelInfo [ m_dwModelID ];
-    return bLoaded;
-}
 
-// A (ped) model removed using this still uses up memory somewhere. (Don't think it's the txd or col)
-void CModelInfoSA::InternalRemoveGTARef ( void )
-{
-    DWORD dwFunction = FUNC_RemoveRef;
-    CBaseModelInfoSAInterface* pInterface = m_pInterface;
-    _asm
+    if ( bLoaded && m_dwModelID < 20000 )
     {
-        mov     ecx, pInterface
-        call    dwFunction
+        // Check rw object is there
+        if ( !m_pInterface || !m_pInterface->pRwObject )
+            return false;
     }
+    return bLoaded;
 }
 
 BYTE CModelInfoSA::GetFlags ( )
@@ -514,6 +594,8 @@ void CModelInfoSA::SetLODDistance ( float fDistance )
     // Ensure fDistance is in range
     fDistance = Min ( fDistance, fMaximumValue );
 #endif
+    // Limit to 325.f as is goes horrible after that
+    fDistance = Min ( fDistance, 325.f );
     m_pInterface = ppModelInfo [ m_dwModelID ];
     if ( m_pInterface )
         m_pInterface->fLodDistanceUnscaled = fDistance;
@@ -521,7 +603,9 @@ void CModelInfoSA::SetLODDistance ( float fDistance )
 
 void CModelInfoSA::RestreamIPL ()
 {
-    MapSet ( ms_RestreamTxdIDMap, GetTextureDictionaryID (), 0 );
+    // IPLs should not contain peds, weapons, vehicles and vehicle upgrades
+    if ( m_dwModelID > 611 && ( m_dwModelID < 1000 || m_dwModelID > 1193 ) )
+        MapSet ( ms_RestreamTxdIDMap, GetTextureDictionaryID (), 0 );
 }
 
 void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
@@ -607,23 +691,29 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
     }
 }
 
-void CModelInfoSA::AddRef ( bool bWaitForLoad, bool bHighPriority )
+void CModelInfoSA::ModelAddRef ( EModelRequestType requestType, const char* szTag )
 {
     // Are we not loaded?
     if ( !IsLoaded () )
     {
         // Request it. Wait for it to load if we're asked to.
         if ( pGame && pGame->IsASyncLoadingEnabled () )
-            Request ( bWaitForLoad, bWaitForLoad, bHighPriority );
+            Request ( requestType, szTag );
         else
-            Request ( true, bWaitForLoad, bHighPriority );
+            Request ( BLOCKING, szTag );
     }
 
     // Increment the references.
     if ( m_dwReferences == 0 )
     {
-        m_pInterface = ppModelInfo [ m_dwModelID ];
-        m_pInterface->usNumberOfRefs++;
+        assert ( !m_dwPendingInterfaceRef );
+        if ( IsLoaded () )
+        {
+            m_pInterface = ppModelInfo [ m_dwModelID ];
+            m_pInterface->usNumberOfRefs++;
+        }
+        else
+            m_dwPendingInterfaceRef = 1;
     }
 
     m_dwReferences++;
@@ -636,100 +726,33 @@ int CModelInfoSA::GetRefCount ()
 
 void CModelInfoSA::RemoveRef ( bool bRemoveExtraGTARef )
 {
+    assert ( m_dwReferences > 0 );
+
     // Decrement the references
     if ( m_dwReferences > 0 )
         m_dwReferences--;
 
+    if ( m_dwReferences == 0 && m_dwPendingInterfaceRef )
+    {
+        m_dwPendingInterfaceRef = 0;
+        return;
+    }
+
     // Handle extra ref if requested
     if ( bRemoveExtraGTARef )
-        MaybeRemoveExtraGTARef ();
-
-    // Unload it if 0 references left and we're not CJ model.
-    // And if we're loaded.
-    if ( m_dwReferences == 0 &&
-         m_dwModelID != 0 &&
-         IsLoaded () )
     {
-        Remove ();
-    }
-}
-
-//
-// Notes on changing model for the local player only
-// -------------------------------------------------
-// When changing model for the local player, the model ref count is not decremented correctly. (Due to the ped not being re-created.)
-// Eventually, after many changes of local player skin, we run out of entries in COL_MODEL_POOL
-//
-// So, when changing model for the local player, an extra reference must be removed to allow the old model to be unloaded.
-//
-// However, manually removing the extra reference creates a memory leak when the model is unloaded.
-//
-// Therefore, to keep the memory loss to a minimum, the removal of the extra reference is delayed.
-//
-// The delay scheme implemented to do this consists of two queues:
-//      The first queue is filled up with the first 5 models that are used for the local player. Once full the queue is not changed until MTA is restarted.
-//      The second queue is FILO, with the last out having it's extra reference removed.
-//
-
-std::vector < CModelInfoSA* >   ms_FirstDelayQueue;     // Don't remove ref for first 5 unique models
-std::list < CModelInfoSA* >     ms_SecondDelayQueue;    // Then delay remove for 5 changes
-
-void CModelInfoSA::MaybeRemoveExtraGTARef ( void )
-{
-    // Safety check
-    if ( m_pInterface->usNumberOfRefs < 1 )
-        return;
-
-    //
-    // Handle first queue
-    //
-    if ( ListContains ( ms_FirstDelayQueue, this ) )
-    {
-        // If already delaying a previous extra ref, we can remove this extra ref now
-        InternalRemoveGTARef ();
-        return;
-    }
-
-    if ( ms_FirstDelayQueue.size () < 5 )
-    {
-        // Fill initial queue
-        ms_FirstDelayQueue.push_back ( this );
-        return;
-    }
-
-    //
-    // Handle second queue
-    //
-    if ( ListContains ( ms_SecondDelayQueue, this ) )
-    {
-        // If already delaying a previous extra ref, we can remove this extra ref now
-        InternalRemoveGTARef ();
-
-        // Bring item to front
-        ListRemove ( ms_SecondDelayQueue, this );
-        ms_SecondDelayQueue.push_back ( this );
-    }
-    else
-    {
-        // Top up secondary queue
-        ms_SecondDelayQueue.push_back ( this );
-        
-        // Remove extra ref from the oldest queue item
-        if ( ms_SecondDelayQueue.size () > 5 )
+        // Remove ref added by GTA.
+        if ( m_pInterface->usNumberOfRefs > 1 )
         {
-            CModelInfoSA* pOldModelInfo = ms_SecondDelayQueue.front ();
-            ms_SecondDelayQueue.pop_front ();
-            pOldModelInfo->DoRemoveExtraGTARef ();
+            DWORD dwFunction = FUNC_RemoveRef;
+            CBaseModelInfoSAInterface* pInterface = m_pInterface;
+            _asm
+            {
+                mov     ecx, pInterface
+                call    dwFunction
+            }
         }
     }
-}
-
-// Remove extra GTA ref and handle actual model unload if then required
-void CModelInfoSA::DoRemoveExtraGTARef ( void )
-{
-    // Remove ref added by GTA.
-    if ( m_pInterface->usNumberOfRefs > 0 )
-        InternalRemoveGTARef ();
 
     // Unload it if 0 references left and we're not CJ model.
     // And if we're loaded.
@@ -737,7 +760,6 @@ void CModelInfoSA::DoRemoveExtraGTARef ( void )
          m_dwModelID != 0 &&
          IsLoaded () )
     {
-        m_pInterface->usNumberOfRefs++; // Hack because Remove() decrements this
         Remove ();
     }
 }
@@ -833,19 +855,6 @@ void* CModelInfoSA::SetVehicleSuspensionData ( void* pSuspensionLines )
     return pOrigSuspensionLines;
 }
 
-void CModelInfoSA::RequestVehicleUpgrade ( void )
-{
-    DWORD dwFunc = FUNC_RequestVehicleUpgrade;
-    DWORD ModelID = m_dwModelID;
-    _asm
-    {
-        push    10
-        push    ModelID
-        call    dwFunc
-        add     esp, 8
-    }
-}
-
 void CModelInfoSA::SetCustomModel ( RpClump* pClump )
 {
     // Error
@@ -855,13 +864,22 @@ void CModelInfoSA::SetCustomModel ( RpClump* pClump )
     // Store the custom clump
     m_pCustomClump = pClump;
 
-    // Replace the vehicle model if we're loaded.
+    // Replace the model if we're loaded.
     if ( IsLoaded () )
     {
         // Are we a vehicle?
         if ( IsVehicle () )
         {
             pGame->GetRenderWare ()->ReplaceVehicleModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
+        }
+        else if ( m_dwModelID >= 331 && m_dwModelID <= 369 )
+        {
+            // We are a weapon.
+            pGame->GetRenderWare ()->ReplaceWeaponModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
+        }
+        else if ( IsPlayerModel ( ) )
+        {
+            pGame->GetRenderWare ()->ReplacePedModel ( pClump, static_cast < unsigned short > ( m_dwModelID ) );
         }
         else
         {

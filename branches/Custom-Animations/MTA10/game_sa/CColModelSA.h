@@ -5,6 +5,7 @@
 *  FILE:        game_sa/CColModelSA.h
 *  PURPOSE:     Header file for collision model entity class
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
+*               Alberto Alonso <rydencillo@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -21,6 +22,45 @@
 
 typedef struct
 {
+    CVector     vecMin;
+    CVector     vecMax;
+    CVector     vecOffset;
+    FLOAT       fRadius;
+} CBoundingBoxSA;
+
+
+typedef struct
+{
+    CVector     vecCenter;
+    float       fRadius;
+} CColSphereSA;
+
+
+typedef struct
+{
+    CVector     min;
+    CVector     max;
+} CColBoxSA;
+
+
+typedef struct
+{
+    unsigned short  v1;
+    unsigned short  v2;
+    unsigned short  v3;
+    BYTE            unknown1;
+    BYTE            unknown2;
+} CColTriangleSA;
+
+
+typedef struct
+{
+    BYTE pad0 [ 12 ];
+} CColTrianglePlaneSA;
+
+
+typedef struct
+{
     char version[4];
     DWORD size;
     char name[0x18];
@@ -28,19 +68,26 @@ typedef struct
 
 typedef struct
 {
-    DWORD                           pad0;
-    WORD                            pad1;
+    WORD                            numColSpheres;
+    WORD                            numColBoxes;
+    WORD                            numColTriangles;
     BYTE                            ucNumWheels;
-    BYTE                            pad2;
-    DWORD                           pad3;
-    DWORD                           pad4;
+    BYTE                            pad3;
+    CColSphereSA*                   pColSpheres;
+    CColBoxSA*                      pColBoxes;
     void*                           pSuspensionLines;
+    void*                           pUnknown;
+    CColTriangleSA*                 pColTriangles;
+    CColTrianglePlaneSA*            pColTrianglePlanes;
 } CColDataSA;
 
 class CColModelSAInterface
 {
 public:
-    BYTE                            pad [ 44 ];
+    CBoundingBoxSA                  boundingBox;
+    BYTE                            level;
+    BYTE                            unknownFlags;
+    BYTE                            pad [ 2 ];
     CColDataSA*                     pColData;
 };
 

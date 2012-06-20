@@ -45,8 +45,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
-				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;INITGUID"
+				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;"
+				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -80,12 +80,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlibd_2008.lib libpng2008d.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9d.lib winmm.lib Imagehlp.lib ws2_32.lib gdi32.lib Userenv.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlibd_2008.lib libpng2008d.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9d.lib winmm.lib Imagehlp.lib ws2_32.lib gdi32.lib Userenv.lib Imm32.lib pthreadVC2.lib jpegd.lib Psapi.lib"
 				ShowProgress="0"
-				OutputFile="C:\Program Files\MTA San Andreas 1.1\mta\core_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.4\mta\core_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib"
+				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib;../../vendor/pthreads/lib;../../vendor/jpeg/lib"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/core_.pdb"
@@ -153,8 +153,8 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
-				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID"
+				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;"
+				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
@@ -183,11 +183,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlib_2008.lib libpng2008.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib"
-				OutputFile="C:\Program Files\MTA San Andreas 1.1\MTA\core.dll"
+				AdditionalDependencies="strmiids.lib libv2.lib zlib_2008.lib libpng2008.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib Imm32.lib pthreadVC2.lib jpeg.lib Psapi.lib"
+				OutputFile="C:\Program Files\MTA San Andreas 1.4\MTA\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib"
+				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib;../../vendor/pthreads/lib;../../vendor/jpeg/lib"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
@@ -258,8 +258,8 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
-				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID"
+				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;"
+				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
@@ -288,11 +288,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlib_2008.lib libpng2008.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlib_2008.lib libpng2008.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib Imm32.lib pthreadVC2.lib jpeg.lib Psapi.lib"
 				OutputFile="..\..\output\MTA San Andreas\mta\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib"
+				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib;../../vendor/pthreads/lib;../../vendor/jpeg/lib"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
@@ -337,6 +337,10 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath=".\CAdditionalVertexStreamManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CChat.cpp"
 				>
 			</File>
@@ -369,6 +373,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CCompressorJobQueue.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CConnectManager.cpp"
 				>
 			</File>
@@ -381,7 +389,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CConsoleLogger.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CCore.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CCrashDumpWriter.cpp"
 				>
 			</File>
 			<File
@@ -433,6 +449,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CFileFormatJpeg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CFileFormatPng.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CFilePathTranslator.cpp"
 				>
 			</File>
@@ -469,6 +493,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CLine3DBatcher.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CLogger.cpp"
 				>
 			</File>
@@ -478,6 +506,14 @@
 			</File>
 			<File
 				RelativePath=".\CMainMenuScene.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CMaterialLine3DBatcher.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CMemStats.cpp"
 				>
 			</File>
 			<File
@@ -493,6 +529,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMouseControl.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CNewsBrowser.cpp"
 				>
 			</File>
@@ -502,6 +542,14 @@
 			</File>
 			<File
 				RelativePath="CPEHookUtils.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CPixelsManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CPixelsManager_VolumeTexture.cpp"
 				>
 			</File>
 			<File
@@ -541,6 +589,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CProxyDirect3DIndexBuffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CProxyDirect3DTexture.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CProxyDirect3DVertexBuffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CProxyDirect3DVertexDeclaration.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CProxyDirectInput8.cpp"
 				>
 			</File>
@@ -558,6 +622,62 @@
 			</File>
 			<File
 				RelativePath=".\CrashHandler.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.DxFont.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.EffectCloner.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.EffectTemplate.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.EffectWrap.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.FileTexture.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.GuiFont.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.RenderTarget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.ScreenSource.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.Shader.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.ShaderInstance.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItemManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItemManager.TextureReplace.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CScreenGrabber.cpp"
 				>
 			</File>
 			<File
@@ -581,10 +701,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CServerCache.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CServerInfo.cpp"
 				>
 			</File>
@@ -601,7 +717,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CTileBatcher.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CVersionUpdater.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CVertexStreamBoundingBoxManager.cpp"
 				>
 			</File>
 			<File
@@ -645,14 +769,6 @@
 				>
 			</File>
 			<Filter
-				Name="d3d"
-				>
-				<File
-					RelativePath=".\d3d\CD3DMGE_D3D9.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="tracking"
 				>
 				<File
@@ -672,43 +788,15 @@
 					>
 				</File>
 			</Filter>
-			<Filter
-				Name="utils"
-				>
-				<File
-					RelativePath="..\sdk\utils\CMD5Hasher.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Nightly|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl"
 			>
+			<File
+				RelativePath=".\CAdditionalVertexStreamManager.h"
+				>
+			</File>
 			<File
 				RelativePath=".\CChat.h"
 				>
@@ -742,6 +830,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CCompressorJobQueue.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CConnectManager.h"
 				>
 			</File>
@@ -754,7 +846,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CConsoleLogger.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CCore.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CCrashDumpWriter.h"
 				>
 			</File>
 			<File
@@ -810,6 +910,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CFileFormat.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CFilePathTranslator.h"
 				>
 			</File>
@@ -846,6 +950,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CLine3DBatcher.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CLogger.h"
 				>
 			</File>
@@ -859,6 +967,14 @@
 			</File>
 			<File
 				RelativePath=".\CMainMenuScene.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CMaterialLine3DBatcher.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CMemStats.h"
 				>
 			</File>
 			<File
@@ -878,6 +994,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMouseControl.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CNewsBrowser.h"
 				>
 			</File>
@@ -890,6 +1010,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CPixelsManager.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CProxyDirect3D9.h"
 				>
 			</File>
@@ -899,6 +1023,22 @@
 			</File>
 			<File
 				RelativePath=".\CProxyDirect3DDevice9.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CProxyDirect3DIndexBuffer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CProxyDirect3DTexture.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CProxyDirect3DVertexBuffer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CProxyDirect3DVertexDeclaration.h"
 				>
 			</File>
 			<File
@@ -918,6 +1058,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderItem.EffectCloner.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItemManager.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CScreenShot.h"
 				>
 			</File>
@@ -931,6 +1079,10 @@
 			</File>
 			<File
 				RelativePath=".\CServerBrowser.RemoteMasterServer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CServerCache.h"
 				>
 			</File>
 			<File
@@ -950,11 +1102,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CTileBatcher.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CTimingCheckpoints.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CVersionUpdater.h"
 				>
 			</File>
 			<File
 				RelativePath=".\CVersionUpdater.Util.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CVertexStreamBoundingBoxManager.h"
 				>
 			</File>
 			<File
@@ -967,10 +1131,6 @@
 			</File>
 			<File
 				RelativePath=".\StdInc.h"
-				>
-			</File>
-			<File
-				RelativePath=".\UtilityMacros.h"
 				>
 			</File>
 			<File
@@ -1032,6 +1192,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\sdk\core\CClientEntityBase.h"
+						>
+					</File>
+					<File
 						RelativePath="..\sdk\core\CCommandsInterface.h"
 						>
 					</File>
@@ -1065,6 +1229,18 @@
 					</File>
 					<File
 						RelativePath="..\sdk\core\CModManagerInterface.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\CPixelsManagerInterface.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\CRenderItemManagerInterface.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\CScreenGrabberInterface.h"
 						>
 					</File>
 					<File
@@ -1484,6 +1660,14 @@
 						>
 					</File>
 					<File
+						RelativePath="..\sdk\game\CWeaponStat.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\game\CWeaponStatManager.h"
+						>
+					</File>
+					<File
 						RelativePath="..\..\MTA10\sdk\game\CWeather.h"
 						>
 					</File>
@@ -1565,6 +1749,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\CFastList.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\CMatrix.h"
 					>
 				</File>
@@ -1586,6 +1774,10 @@
 				</File>
 				<File
 					RelativePath="..\..\Shared\sdk\CRect2D.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\CScriptArgReader.h"
 					>
 				</File>
 				<File
@@ -1617,7 +1809,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.ClassIdent.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.Defines.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.FastHashMap.h"
 					>
 				</File>
 				<File
@@ -1641,7 +1841,39 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Hash.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Hash.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.HashMap.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Logging.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Logging.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Map.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Math.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Math.hpp"
 					>
 				</File>
 				<File
@@ -1653,7 +1885,27 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Profiling.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Profiling.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.SysInfo.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.SysInfo.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.Tests.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Thread.h"
 					>
 				</File>
 				<File

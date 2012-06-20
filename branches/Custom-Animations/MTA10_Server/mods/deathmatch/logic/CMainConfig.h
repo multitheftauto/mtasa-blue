@@ -30,25 +30,47 @@ class CMainConfig;
 
 #define MAX_MAP_NAME_LENGTH 64
 
+typedef void (*PFN_SettingChangeCallback) ( void );
+
+struct SIntSetting
+{
+    bool        bSettable;
+    bool        bSavable;
+    int         iMin;
+    int         iDefault;
+    int         iMax;
+    const char* szName;
+    int*        pVariable;
+    PFN_SettingChangeCallback changeCallback;
+};
+
+
 class CMainConfig: public CXMLConfig
 {
 public:
                                     CMainConfig                     ( CConsole* pConsole, class CLuaManager* pLuaMain );
 
-    bool                            Load                            ( const char* szFileName = NULL );
+    bool                            Load                            ( void );
     bool                            LoadExtended                    ( void );
-    bool                            Save                            ( const char* szFileName = NULL );
+    bool                            Save                            ( void );
 
     inline const std::string&       GetServerName                   ( void )        { return m_strServerName; };
     std::string                     GetServerIP                     ( void );
     unsigned short                  GetServerPort                   ( void );
     unsigned int                    GetMaxPlayers                   ( void );
+    unsigned int                    GetHardMaxPlayers               ( void );
+    void                            SetSoftMaxPlayers               ( unsigned int v ) { m_uiSoftMaxPlayers = v; }
     inline bool                     IsHTTPEnabled                   ( void )        { return m_bHTTPEnabled; };
 
-    bool                            IsValidPassword                 ( const char* szPassword, unsigned int& cUnsupportedIndex );
+    bool                            IsValidPassword                 ( const char* szPassword );
     inline bool                     HasPassword                     ( void )        { return !m_strPassword.empty (); };
     inline const std::string&       GetPassword                     ( void )        { return m_strPassword; };
-    void                            SetPassword                     ( const char* szPassword );
+    bool                            SetPassword                     ( const char* szPassword, bool bSave );
+
+    bool                            IsVoiceEnabled                  ( void );
+    unsigned int                    GetVoiceSampleRate              ( void )        { return m_uiVoiceSampleRate; };
+    unsigned int                    GetVoiceQuality                 ( void )        { return m_ucVoiceQuality; };
+    unsigned int                    GetVoiceBitrate                 ( void )        { return m_uiVoiceBitrate; };
 
     inline bool                     GetASEEnabled                   ( void )        { return m_bAseEnabled; };
     unsigned short                  GetHTTPPort                     ( void );
@@ -69,18 +91,41 @@ public:
     inline bool                     GetAutoUpdateIncludedResourcesEnabled   ( void )        { return m_bAutoUpdateIncludedResources; };
     inline bool                     GetDontBroadcastLan             ( void )        { return m_bDontBroadcastLan; };
     inline bool                     GetSerialVerificationEnabled    ( void )        { return m_bVerifySerials; };
-    bool                            IsDisableAC                     ( const char* szTagAC )     { return MapContains ( m_DisableACMap, szTagAC ); };
+    bool                            IsDisableAC                     ( const char* szTagAC )     { return MapContains ( m_DisableComboACMap, szTagAC ); };
     bool                            IsEnableDiagnostic              ( const char* szTag )       { return MapContains ( m_EnableDiagnosticMap, szTag ); };
-    bool                            IsBelowMinimumClient            ( const char* szVersion )   { return m_strMinClientVersion.length () && m_strMinClientVersion > szVersion; }
-    bool                            IsBelowRecommendedClient        ( const char* szVersion )   { return m_strRecommendedClientVersion.length () && m_strRecommendedClientVersion > szVersion; }
-    const SString&                  GetMinimumClientVersion         ( void )                    { return m_strMinClientVersion; }
+    SString                         GetMinClientVersion             ( void )                    { return m_strMinClientVersion; }
     const SString&                  GetRecommendedClientVersion     ( void )                    { return m_strRecommendedClientVersion; }
     inline bool                     IsAutoLoginEnabled              ( )                         { return m_bAutoLogin; }
+    const SString&                  GetIdFile                       ( void )                    { return m_strIdFile; }
+    bool                            GetNetworkEncryptionEnabled     ( void )                    { return m_bNetworkEncryptionEnabled; }
+    bool                            GetThreadNetEnabled             ( void )                    { return m_bThreadNetEnabled; }
+    const SString&                  GetGlobalDatabasesPath          ( void )                    { return m_strGlobalDatabasesPath; }
+    const SString&                  GetSystemDatabasesPath          ( void )                    { return m_strSystemDatabasesPath; }
+    const SString&                  GetBackupPath                   ( void )                    { return m_strBackupPath; }
+    int                             GetBackupInterval               ( void )                    { return m_iBackupInterval; }
+    int                             GetBackupAmount                 ( void )                    { return m_iBackupAmount; }
+    inline unsigned short           GetFPSLimit                     ( void )                    { return m_usFPSLimit; };
+    bool                            SetFPSLimit                     ( unsigned short usFPS, bool bSave );
+    int                             GetPendingWorkToDoSleepTime     ( void );
+    int                             GetNoWorkToDoSleepTime          ( void );
+    const SString&                  GetDbLogFilename                ( void )                    { return m_strDbLogFilename; }
+    bool                            GetSyncMapElementData           ( void ) const              { return m_bSyncMapElementData; }
+    void                            SetSyncMapElementData           ( bool bOn )                { m_bSyncMapElementData = bOn; }
+    bool                            GetBulletSyncEnabled            ( void ) const              { return m_bBulletSyncEnabled != 0; }
 
-    inline unsigned short           GetFPSLimit                     ( void )        { return m_usFPSLimit; };
-    void                            SetFPSLimit                     ( unsigned short usFPS );
+    SString                         GetSetting                      ( const SString& configSetting );
+    bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
+    bool                            SetSetting                      ( const SString& configSetting, const SString& strValue, bool bSave );
 
     void                            SetCommandLineParser            ( CCommandLineParser* pCommandLineParser );
+    void                            ApplyNetOptions                 ( void );
+    void                            ApplyBandwidthReductionMode     ( void );
+    void                            ApplyThreadNetEnabled           ( void );
+    void                            SetFakeLag                      ( int iPacketLoss, int iExtraPing, int iExtraPingVary, int iKBPSLimit );
+    const SNetOptions&              GetNetOptions                   ( void )                    { return m_NetOptions; }
+
+    const std::vector < SIntSetting >& GetIntSettingList            ( void );
+    static void                     OnTickRateChange                ( void );
 
 private:
     void                            RegisterCommand                 ( const char* szName, FCommandHandler* pFunction, bool bRestricted );
@@ -90,10 +135,16 @@ private:
     CXMLNode*                       m_pRootNode;
     CCommandLineParser*             m_pCommandLineParser;
 
+    unsigned int                    m_uiVoiceSampleRate;
+    unsigned char                   m_ucVoiceQuality;
+    unsigned int                    m_uiVoiceBitrate;
+
+    bool                            m_bVoiceEnabled;
     std::string                     m_strServerIP;
     std::string                     m_strServerName;
     unsigned short                  m_usServerPort;
     unsigned int                    m_uiMaxPlayers;
+    unsigned int                    m_uiSoftMaxPlayers;
     bool                            m_bHTTPEnabled;
     std::string                     m_strPassword;
     bool                            m_bAseEnabled;
@@ -116,11 +167,27 @@ private:
     bool                            m_bVerifySerials;
     unsigned short                  m_usFPSLimit;
     bool                            m_bDontBroadcastLan;
-    std::map < SString, int >       m_DisableACMap;
-    std::map < SString, int >       m_EnableDiagnosticMap;
+    std::set < SString >            m_DisableComboACMap;
+    std::set < SString >            m_EnableDiagnosticMap;
     SString                         m_strMinClientVersion;
     SString                         m_strRecommendedClientVersion;
     bool                            m_bAutoLogin;
+    SString                         m_strIdFile;
+    SString                         m_strGlobalDatabasesPath;
+    SString                         m_strSystemDatabasesPath;
+    SString                         m_strBackupPath;
+    SString                         m_strDbLogFilename;
+    int                             m_iBackupInterval;
+    int                             m_iBackupAmount;
+    bool                            m_bNetworkEncryptionEnabled;
+    SString                         m_strBandwidthReductionMode;
+    int                             m_iPendingWorkToDoSleepTime;
+    int                             m_iNoWorkToDoSleepTime;
+    bool                            m_bThreadNetEnabled;
+    bool                            m_bSyncMapElementData;
+    int                             m_bBulletSyncEnabled;
+    std::map < SString, SString >   m_TransientSettings;
+    SNetOptions                     m_NetOptions;
 };
 
 #endif

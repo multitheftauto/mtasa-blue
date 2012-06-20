@@ -231,7 +231,11 @@ SDefaultCommandBind g_dcbDefaultCommands[] =
     { "num_6",   true,  "radar_move_east",  NULL },
     { "num_4",   true,  "radar_move_west",  NULL },
     { "num_0",   true,  "radar_attach",     NULL },
-    
+    { "num_div", true,  "radar_opacity_down", NULL },
+    { "num_mul", true,  "radar_opacity_up", NULL },
+    { "num_1",   true,  "radar_help",       NULL },
+    { "z",       true,  "voiceptt",         "1" },
+    { "z",       false, "voiceptt",         "0" },
     { "pgup",    true,  "chatscrollup",     "1" },
     { "pgup",    false, "chatscrollup",     "0" },
     { "pgdn",    true,  "chatscrolldown",   "-1" },
@@ -520,7 +524,7 @@ bool CKeyBinds::Call ( CKeyBind* pKeyBind )
             {
                 CCommandBind* pBind = static_cast < CCommandBind* > ( pKeyBind );
                 if ( pBind->bActive )
-                    m_pCore->GetCommands ()->Execute ( pBind->szCommand, pBind->szArguments );
+                    m_pCore->GetCommands ()->Execute ( pBind->szCommand, pBind->szArguments, false, pBind->szResource != NULL );
                 break;
             }
             case KEY_BIND_FUNCTION:
@@ -569,12 +573,9 @@ bool CKeyBinds::AddCommand ( const char* szKey, const char* szCommand, const cha
             strcpy ( bind->szResource, szResource );
 
             if ( bAltKey )
-                bind->szDefaultKey = "";
+                bind->strDefaultKey = "";
             else
-            {
-                bind->szDefaultKey = new char [ strlen ( szKey ) + 1 ];
-                strcpy ( bind->szDefaultKey, szKey );
-            }
+                bind->strDefaultKey = szKey;
         }
         bind->bHitState = bState;
         bind->bState = false;
@@ -611,12 +612,13 @@ bool CKeyBinds::AddCommand ( const SBindableKey* pKey, const char* szCommand, co
 }
 
 
-bool CKeyBinds::RemoveCommand ( const char* szKey, const char* szCommand, bool bCheckState, bool bState, const char* szResource )
+bool CKeyBinds::RemoveCommand ( const char* szKey, const char* szCommand, bool bCheckState, bool bState )
 {
     if ( szKey == NULL || szCommand == NULL ) return false;
 
+    bool bFound = false;
     list < CKeyBind* > ::iterator iter = m_pList->begin ();
-    for ( ; iter != m_pList->end (); iter++ )
+    for ( ; iter != m_pList->end (); )
     {
         if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == KEY_BIND_COMMAND )
         {
@@ -627,15 +629,9 @@ bool CKeyBinds::RemoveCommand ( const char* szKey, const char* szCommand, bool b
                 {
                     if ( !bCheckState || pBind->bHitState == bState )
                     {
-#if 1   // crash fix
-                        // szResource is always NULL here
-                        assert ( szResource == NULL );
-
-                        Remove ( *iter );
-                        return true;
-#else
                         if ( !pBind->szResource )
                         {
+                            bFound = true;
                             if ( m_bProcessingKeyStroke )
                             {
                                 pBind->beingDeleted = true;
@@ -643,22 +639,18 @@ bool CKeyBinds::RemoveCommand ( const char* szKey, const char* szCommand, bool b
                             else
                             {
                                 delete pBind;
-                                m_pList->erase ( iter );
+                                iter = m_pList->erase ( iter );
+                                continue;
                             }
-                            return true;
                         }
-                        else if ( strcmp ( szResource, pBind->szResource ) == 0 )
-                        {
-                            pBind->bActive = false;
-                        }
-#endif
                     }
                 }
             }
         }
+        iter++;
     }
 
-    return false;
+    return bFound;
 }
 
 
@@ -2196,6 +2188,7 @@ void CKeyBinds::DoPostFramePulse ( void )
         cs.Select = ( g_bcControls [ 10 ].bState ) ? 255 : 0; // Change View   
 
         GetJoystickManager ()->ApplyAxes ( cs, bInVehicle );
+        //m_pCore->GetMouseControl()->ApplyAxes ( cs );
     }
         
     m_pCore->GetGame ()->GetPad ()->SetCurrentControllerState ( &cs );
@@ -2409,7 +2402,7 @@ bool CKeyBinds::SaveToXML ( CXMLNode* pMainNode )
                         pA->SetValue ( szResource );
 
                         //If its still the default key dont bother saving it
-                        if ( !strcmp ( pBind->szDefaultKey, szKey ) )
+                        if ( !strcmp ( pBind->strDefaultKey, szKey ) )
                             pNode->GetParent()->DeleteSubNode(pNode);
                     }
                 }
@@ -2643,16 +2636,18 @@ void CKeyBinds::BindCommand ( const char* szCmdLine )
                 if ( szCommand )
                 {
                     char* szArguments = strtok ( NULL, "\0" );
+                    SString strKeyState ( "%s", bState? "down" : "up" );
+                    SString strCommandAndArguments ( "%s%s%s", szCommand, szArguments ? " " : "", szArguments ? szArguments : "" );
 
-                    if ( !CommandExists ( szKey, szCommand, true, bState ) )
+                    if ( !CommandExists ( szKey, szCommand, true, bState, szArguments ) )
                     {
                         if ( AddCommand ( szKey, szCommand, szArguments, bState ) )
-                            pConsole->Printf ( "* Bound key '%s' '%s' to command '%s'", szKey, ( bState ) ? "down" : "up", szCommand );
+                            pConsole->Printf ( "* Bound key '%s' '%s' to command '%s'", szKey, *strKeyState, *strCommandAndArguments );
                         else
-                            pConsole->Printf ( "* Failed to bind '%s' to command '%s'", szKey, szCommand );
+                            pConsole->Printf ( "* Failed to bind '%s' '%s' to command '%s'", szKey, *strKeyState, *strCommandAndArguments );
                     }
                     else
-                        pConsole->Printf ( "* '%s' key already bound to command '%s'", szKey, szCommand );
+                        pConsole->Printf ( "* '%s' '%s' key already bound to command '%s'", szKey, *strKeyState, *strCommandAndArguments );
                 }
                 else
                     pConsole->Print ( szError );

@@ -76,3 +76,98 @@ bool CCarEnterExitSA::GetNearestCarPassengerDoor ( CPed * pPed, CVehicle * pVehi
 
     return bReturn;
 }
+
+int CCarEnterExitSA::ComputeTargetDoorToExit(CPed *pPed, CVehicle *pVehicle)
+{
+    DWORD dwFunc = FUNC_ComputeTargetDoorToExit;
+    int door = -1;
+
+    CPedSA* pPedSA = dynamic_cast < CPedSA* > ( pPed );
+    CVehicleSA* pVehicleSA = dynamic_cast < CVehicleSA* > ( pVehicle );
+
+    if ( pPedSA && pVehicleSA )
+    {
+        CPedSAInterface * pPedInterface = pPedSA->GetPedInterface ();
+        CVehicleSAInterface * pVehicleInterface = pVehicleSA->GetVehicleInterface();
+        _asm
+        {
+            push    pPedInterface
+            push    pVehicleInterface
+            call    dwFunc
+            add     esp, 8
+            mov     door, eax
+        }
+
+        switch ( door )
+        {
+            case 0x10: door = 0; break;
+            case 0x11: door = 1; break;
+            case 0x0A: door = 2; break;
+            case 0x08: door = 3; break;
+            case 0x0B: door = 4; break;
+            case 0x09: door = 5; break;
+            default: door = -1; break;
+        }
+
+        if ( door >= 2 && door <= 5 )
+        {
+            // Try to find a door with room to leave
+            if ( IsRoomForPedToLeaveCar ( pVehicle, door, 0 ) == false )
+            {
+                int newDoor = -1;
+                switch ( door )
+                {
+                    case 2:
+                      if ( !pVehicle->GetPassenger(1) )
+                          newDoor = 3;
+                      break;
+                    case 3:
+                      if ( !pVehicle->GetPassenger(0) )
+                          newDoor = 2;
+                      break;
+                    case 4:
+                      if ( !pVehicle->GetPassenger(3) )
+                          newDoor = 5;
+                      break;
+                    case 5:
+                      if ( !pVehicle->GetPassenger(2) )
+                          newDoor = 4;
+                      break;
+                }
+
+                if ( newDoor != -1 && IsRoomForPedToLeaveCar ( pVehicle, newDoor, 0 ) == true )
+                    door = newDoor;
+            }
+        }
+    }
+
+    return door;
+}
+
+bool CCarEnterExitSA::IsRoomForPedToLeaveCar ( CVehicle* pVehicle, int iDoor, CVector* pUnknown )
+{
+    DWORD dwFunc = FUNC_IsRoomForPedToLeaveCar;
+    bool bRet = true;
+
+    if ( iDoor >= 0 && iDoor <= 5 )
+    {
+        static int s_iCarNodeIndexes [6] = { 0x10, 0x11, 0x0A, 0x08, 0x0B, 0x09 };
+        CVehicleSA* pVehicleSA = dynamic_cast < CVehicleSA* > ( pVehicle );
+        DWORD dwIdx = s_iCarNodeIndexes [ iDoor ];
+        if ( pVehicleSA )
+        {
+            CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
+            _asm
+            {
+                push    pUnknown
+                push    dwIdx
+                push    pVehicleInterface
+                call    dwFunc
+                add     esp, 12
+                mov     bRet, al
+            }
+        }
+    }
+
+    return bRet;
+}

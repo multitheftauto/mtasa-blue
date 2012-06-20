@@ -41,8 +41,13 @@ void CClientPlayerManager::DoPulse ( void )
     for ( ; iter != m_Players.end (); ++iter )
     {
         pPlayer = *iter;
+
         if ( !pPlayer->IsLocalPlayer () )
         {
+            // Pulse voice data if voice is enabled
+            if ( g_pClientGame->GetVoiceRecorder()->IsEnabled() && pPlayer->GetVoice() )
+                pPlayer->GetVoice()->DoPulse();
+
             // Flag him with connection error if its been too long since last puresync and force his position
             unsigned long ulLastPuresyncTime = pPlayer->GetLastPuresyncTime ();
             bool bHasConnectionTrouble = ( ulLastPuresyncTime != 0 && ulCurrentTime >= ulLastPuresyncTime + REMOTE_PLAYER_CONNECTION_TROUBLE_TIME );

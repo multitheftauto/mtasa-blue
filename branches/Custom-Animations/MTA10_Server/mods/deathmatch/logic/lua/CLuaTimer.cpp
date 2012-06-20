@@ -16,6 +16,8 @@
 
 CLuaTimer::CLuaTimer ( const CLuaFunctionRef& iLuaFunction, const CLuaArguments& Arguments )
 {
+    m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::TIMER );
+    m_uiRepeats = 1;
     m_iLuaFunction = iLuaFunction;
     m_Arguments = Arguments;
     m_bBeingDeleted = false;
@@ -24,6 +26,7 @@ CLuaTimer::CLuaTimer ( const CLuaFunctionRef& iLuaFunction, const CLuaArguments&
 
 CLuaTimer::~CLuaTimer ( void )
 {
+    CIdArray::PushUniqueId ( this, EIdClass::TIMER, m_uiScriptID );
 }
 
 
@@ -36,9 +39,9 @@ void CLuaTimer::ExecuteTimer ( CLuaMain* pLuaMain )
 }
 
 
-unsigned long CLuaTimer::GetTimeLeft ( void )
+CTickCount CLuaTimer::GetTimeLeft ( void )
 {
-    unsigned long ulCurrentTime = GetTime ();
-    unsigned long ulTimeLeft = m_ulStartTime + m_ulDelay - ulCurrentTime;
-    return ulTimeLeft;
+    CTickCount llCurrentTime = CTickCount::Now ();
+    CTickCount llTimeLeft = m_llStartTime + m_llDelay - llCurrentTime;
+    return llTimeLeft;
 }

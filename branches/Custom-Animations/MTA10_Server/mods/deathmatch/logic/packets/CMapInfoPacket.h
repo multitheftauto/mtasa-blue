@@ -19,6 +19,13 @@
 
 #include "CPacket.h"
 
+struct SWorldWaterLevelInfo
+{
+    bool bNonSeaLevelSet;
+    float fSeaLevel;
+    float fNonSeaLevel;
+};
+
 class CMapInfoPacket : public CPacket
 {
 public:
@@ -33,9 +40,9 @@ public:
                                                       float fGravity,
                                                       float fGameSpeed,
                                                       float fWaveHeight,
-                                                      float fWaterLevel,
+                                                      const SWorldWaterLevelInfo& worldWaterLevelInfo,
                                                       bool bHasSkyGradient,
-                                                      bool* pbGarageStates,
+                                                      const SGarageStates& garageStates,
                                                       unsigned char ucSkyGradientTR,
                                                       unsigned char ucSkyGradientTG,
                                                       unsigned char ucSkyGradientTB,
@@ -71,10 +78,11 @@ public:
                                                       bool bOverrideFarClipDistance = false,
                                                       float fFarClip = 0,
                                                       bool bOverrideFogDistance = false,
-                                                      float fFogDistance = 0);
+                                                      float fFogDistance = 0,
+                                                      float fAircraftMaxHeight = 800 );
 
     inline ePacketID        GetPacketID             ( void ) const              { return PACKET_ID_MAP_INFO; };
-    inline unsigned long    GetFlags                ( void ) const              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
+    inline unsigned long    GetFlags                ( void ) const              { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Write                   ( NetBitStreamInterface& BitStream ) const;
 
@@ -90,14 +98,14 @@ private:
     float                   m_fGravity;
     float                   m_fGameSpeed;
     float                   m_fWaveHeight;
-    float                   m_fWaterLevel;
+    SWorldWaterLevelInfo    m_WorldWaterLevelInfo;
     bool                    m_bHasSkyGradient;
     unsigned char           m_ucSkyGradientTR, m_ucSkyGradientTG, m_ucSkyGradientTB;
     unsigned char           m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;
     bool                    m_bHasHeatHaze;
     SHeatHazeSettings       m_HeatHazeSettings;
     unsigned short          m_usFPSLimit;
-    bool*                   m_pbGarageStates;
+    const SGarageStates*    m_pGarageStates;
     bool                    m_bCloudsEnabled;
     float                   m_fJetpackMaxHeight;
     bool                    m_bOverrideWaterColor;
@@ -125,6 +133,7 @@ private:
     float                   m_fFarClip;
     bool                    m_bOverrideFogDistance;
     float                   m_fFogDistance;
+    float                   m_fAircraftMaxHeight;
 };
 
 #endif

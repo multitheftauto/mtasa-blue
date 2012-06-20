@@ -38,7 +38,6 @@ static CClientTeamManager*                          m_pTeamManager;
 static CGUI*                                        m_pGUI;
 static CClientGUIManager*                           m_pGUIManager;
 static CScriptKeyBinds*                             m_pScriptKeyBinds;
-static CScriptFontLoader*                           m_pScriptFontLoader;
 static CClientMarkerManager*                        m_pMarkerManager;
 static CClientPickupManager*                        m_pPickupManager;
 static CMovingObjectsManager*                       m_pMovingObjectsManager;
@@ -77,7 +76,6 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions (
     m_pGUI = pCore->GetGUI ();
     m_pGUIManager = pManager->GetGUIManager ();
     m_pScriptKeyBinds = m_pClientGame->GetScriptKeyBinds ();
-    m_pScriptFontLoader = m_pClientGame->GetScriptFontLoader();
     m_pMarkerManager = pManager->GetMarkerManager ();
     m_pPickupManager = pManager->GetPickupManager ();
     m_pMovingObjectsManager = m_pClientGame->GetMovingObjectsManager ();
@@ -110,19 +108,15 @@ bool CStaticFunctionDefinitions::AddEvent ( CLuaMain& LuaMain, const char* szNam
 }
 
 
-bool CStaticFunctionDefinitions::AddEventHandler ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated )
+bool CStaticFunctionDefinitions::AddEventHandler ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod )
 {
     assert ( szName );
-    
-    // Is this an old event name? get its new one (added this for backwards compatibility)
-    char szUpdatedName [ 64 ];
-    if ( m_pEvents->IsExtinctEvent ( szName, szUpdatedName, 64 ) ) szName = szUpdatedName;
 
     // We got an event with that name?
     if ( m_pEvents->Exists ( szName ) )
     {
         // Add the event handler
-        if ( Entity.AddEvent ( &LuaMain, szName, iLuaFunction, bPropagated ) )
+        if ( Entity.AddEvent ( &LuaMain, szName, iLuaFunction, bPropagated, eventPriority, fPriorityMod ) )
             return true;
     }
 
@@ -130,13 +124,9 @@ bool CStaticFunctionDefinitions::AddEventHandler ( CLuaMain& LuaMain, char* szNa
 }
 
 
-bool CStaticFunctionDefinitions::RemoveEventHandler ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction )
+bool CStaticFunctionDefinitions::RemoveEventHandler ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction )
 {
     assert ( szName );
-
-    // Is this an old event name? get its new one (added this for backwards compatibility)
-    char szUpdatedName [ 64 ];
-    if ( m_pEvents->IsExtinctEvent ( szName, szUpdatedName, 64 ) ) szName = szUpdatedName;
 
     // We got an event and handler with that name?
     if ( m_pEvents->Exists ( szName ) )
@@ -179,14 +169,43 @@ bool CStaticFunctionDefinitions::TriggerServerEvent ( const char* szName, CClien
     {
         unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
         pBitStream->WriteCompressed ( usNameLength );
-        pBitStream->Write ( const_cast < char* > ( szName ), usNameLength );
-        pBitStream->WriteCompressed ( CallWithEntity.GetID () );
+        pBitStream->Write ( szName, usNameLength );
+        pBitStream->Write ( CallWithEntity.GetID () );
         if ( !Arguments.WriteToBitStream ( *pBitStream ) )
         {
             g_pNet->DeallocateNetBitStream ( pBitStream );
             return false;
         }
-        g_pNet->SendPacket ( PACKET_ID_LUA_EVENT, pBitStream );
+        g_pNet->SendPacket ( PACKET_ID_LUA_EVENT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
+        g_pNet->DeallocateNetBitStream ( pBitStream );
+
+        return true;
+    }
+
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::TriggerLatentServerEvent ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain )
+{
+    assert ( szName );
+
+    if ( CallWithEntity.IsLocalEntity ()  )
+        return false;
+
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+    if ( pBitStream )
+    {
+        unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
+        pBitStream->WriteCompressed ( usNameLength );
+        pBitStream->Write ( szName, usNameLength );
+        pBitStream->Write ( CallWithEntity.GetID () );
+        if ( !Arguments.WriteToBitStream ( *pBitStream ) )
+        {
+            g_pNet->DeallocateNetBitStream ( pBitStream );
+            return false;
+        }
+        g_pClientGame->GetLatentTransferManager ()->AddSend ( 0, PACKET_ID_LUA_EVENT, pBitStream, iBandwidth, pLuaMain );
         g_pNet->DeallocateNetBitStream ( pBitStream );
 
         return true;
@@ -206,6 +225,24 @@ bool CStaticFunctionDefinitions::CancelEvent ( bool bCancel )
 bool CStaticFunctionDefinitions::WasEventCancelled ( void )
 {
     return m_pEvents->WasEventCancelled ();
+}
+
+
+bool CStaticFunctionDefinitions::DownloadFile ( CResource* pResource, const char* szFile, CChecksum checksum )
+{
+    SString strHTTPDownloadURLFull ( "%s/%s/%s", g_pClientGame->GetHTTPURL().c_str(), pResource->GetName(), szFile );
+    SString strPath ( "%s\\resources\\%s\\%s", g_pClientGame->GetModRoot (),pResource->GetName(), szFile ); 
+    // Call SingularFileDownloadManager
+    g_pClientGame->GetSingularFileDownloadManager()->AddFile ( pResource, strPath.c_str(), szFile, strHTTPDownloadURLFull, checksum );
+
+    // Start Download
+    CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork ()->GetHTTPDownloadManager ();
+    if ( !pHTTP->IsDownloading () )
+    {
+        pHTTP->StartDownloadingQueuedFiles ();
+        g_pClientGame->SetSingularTransfers ( true );
+    }
+    return true;
 }
 
 
@@ -232,7 +269,7 @@ bool CStaticFunctionDefinitions::OutputChatBox ( const char* szText, unsigned ch
 
 bool CStaticFunctionDefinitions::SetClipboard ( SString& strText )
 {
-    std::wstring strUTF = GetBidiString ( MbUTF8ToUTF16 ( strText.c_str() ) );
+    std::wstring strUTF = MbUTF8ToUTF16 ( strText );
 
     // Open and empty the clipboard
     OpenClipboard ( NULL );
@@ -264,7 +301,7 @@ bool CStaticFunctionDefinitions::GetClipboard ( SString& strText )
 
     if ( szBuffer )
     {
-        strText = UTF16ToMbUTF8 ( GetBidiString ( szBuffer ) ).c_str();
+        strText = UTF16ToMbUTF8 ( szBuffer );
         return true;
     }
 
@@ -582,6 +619,7 @@ bool CStaticFunctionDefinitions::GetElementDistanceFromCentreOfMassToBaseOfModel
 bool CStaticFunctionDefinitions::GetElementAttachedOffsets ( CClientEntity & Entity, CVector & vecPosition, CVector & vecRotation )
 {
     Entity.GetAttachedOffsets ( vecPosition, vecRotation );
+    ConvertRadiansToDegrees ( vecRotation );
     return true;
 }
 
@@ -727,6 +765,7 @@ bool CStaticFunctionDefinitions::IsElementSyncer ( CClientEntity& Entity, bool &
                 bIsSyncer = m_pClientGame->GetUnoccupiedVehicleSync()->Exists ( Vehicle );
             break;
         }
+#ifdef WITH_OBJECT_SYNC
         case CCLIENTOBJECT:
         {
             CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( &Entity );
@@ -734,6 +773,7 @@ bool CStaticFunctionDefinitions::IsElementSyncer ( CClientEntity& Entity, bool &
                 bIsSyncer = m_pClientGame->GetObjectSync ()->Exists ( pObject );
             break;
         }
+#endif
         default: return false;
     }
     return true;
@@ -835,7 +875,7 @@ CClientDummy* CStaticFunctionDefinitions::CreateElement ( CResource& Resource, c
     if ( strlen ( szTypeName ) > 0 && CClientEntity::GetTypeID ( szTypeName ) == CCLIENTUNKNOWN )
     {
         CClientDummy* pDummy = new CClientDummy ( m_pManager, INVALID_ELEMENT_ID,  szTypeName );
-        pDummy->SetName ( (char*) szID );
+        pDummy->SetName ( szID );
 
         pDummy->SetParent ( Resource.GetResourceDynamicEntity() );
         return pDummy;
@@ -897,6 +937,7 @@ bool CStaticFunctionDefinitions::SetElementID ( CClientEntity& Entity, const cha
 bool CStaticFunctionDefinitions::SetElementData ( CClientEntity& Entity, const char* szName, CLuaArgument& Variable, CLuaMain& LuaMain, bool bSynchronize )
 {
     assert ( szName );
+    assert ( strlen ( szName ) <= MAX_CUSTOMDATA_NAME_LENGTH );
 
     CLuaArgument * pCurrentVariable = Entity.GetCustomData ( szName, false );
     if ( !pCurrentVariable || Variable != *pCurrentVariable )
@@ -908,14 +949,14 @@ bool CStaticFunctionDefinitions::SetElementData ( CClientEntity& Entity, const c
             if ( pBitStream )
             {
                 // Write element ID, name length and the name. Also write the variable.
-                pBitStream->WriteCompressed ( Entity.GetID () );
+                pBitStream->Write ( Entity.GetID () );
                 unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
                 pBitStream->WriteCompressed ( usNameLength );
-                pBitStream->Write ( const_cast < char* > ( szName ), usNameLength );    
+                pBitStream->Write ( szName, usNameLength );
                 Variable.WriteToBitStream ( *pBitStream );
 
                 // Send the packet and deallocate
-                g_pNet->SendPacket ( PACKET_ID_CUSTOM_DATA, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE, PACKET_ORDERING_CHAT );
+                g_pNet->SendPacket ( PACKET_ID_CUSTOM_DATA, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
                 g_pNet->DeallocateNetBitStream ( pBitStream );
 
                 // Set its custom data
@@ -1134,6 +1175,8 @@ bool CStaticFunctionDefinitions::SetElementInterior ( CClientEntity& Entity, uns
 
 bool CStaticFunctionDefinitions::SetElementDimension ( CClientEntity& Entity, unsigned short usDimension )
 {
+    RUN_CHILDREN SetElementDimension ( **iter, usDimension );
+
     switch ( Entity.GetType () )
     {
         // Client side elements
@@ -1186,24 +1229,28 @@ bool CStaticFunctionDefinitions::AttachElements ( CClientEntity& Entity, CClient
 {
     RUN_CHILDREN AttachElements ( **iter, AttachedToEntity, vecPosition, vecRotation );
 
-    // Are they the same element?
-    if ( &Entity != &AttachedToEntity )
+    // Check the elements we are attaching are not already connected
+    std::set < CClientEntity* > history;
+    for ( CClientEntity* pCurrent = &AttachedToEntity ; pCurrent ; pCurrent = pCurrent->GetAttachedTo () )
     {
-        // Make sure they aren't already attached to eachother in reverse
-        if ( AttachedToEntity.GetAttachedTo () != &Entity )
-        {
-            // Can these elements be attached?
-            if ( Entity.IsAttachToable () && AttachedToEntity.IsAttachable () && Entity.GetDimension() == AttachedToEntity.GetDimension() )
-            {
-                ConvertDegreesToRadians ( vecRotation );
-
-                Entity.SetAttachedOffsets ( vecPosition, vecRotation );
-                Entity.AttachTo ( &AttachedToEntity );
-
-                return true;
-            }
-        }
+        if ( pCurrent == &Entity )
+            return false;
+        if ( MapContains ( history, pCurrent ) )
+            break;  // This should not be possible, but you never know
+        MapInsert ( history, pCurrent );
     }
+
+    // Can these elements be attached?
+    if ( Entity.IsAttachToable () && AttachedToEntity.IsAttachable () && Entity.GetDimension() == AttachedToEntity.GetDimension() )
+    {
+        ConvertDegreesToRadians ( vecRotation );
+
+        Entity.SetAttachedOffsets ( vecPosition, vecRotation );
+        Entity.AttachTo ( &AttachedToEntity );
+
+        return true;
+    }
+
     return false;
 }
 
@@ -1230,6 +1277,7 @@ bool CStaticFunctionDefinitions::SetElementAttachedOffsets ( CClientEntity & Ent
 {
     RUN_CHILDREN SetElementAttachedOffsets ( **iter, vecPosition, vecRotation );
 
+    ConvertDegreesToRadians ( vecRotation );
     Entity.SetAttachedOffsets ( vecPosition, vecRotation );
     return true;
 }
@@ -1347,6 +1395,14 @@ bool CStaticFunctionDefinitions::SetElementModel ( CClientEntity& Entity, unsign
             Object.SetModel ( usModel );
             break;
         }
+        case CCLIENTPROJECTILE:
+        {
+            CClientProjectile& Projectile = static_cast < CClientProjectile& > ( Entity );
+            if ( Projectile.GetGameEntity() && Projectile.GetGameEntity()->GetModelIndex () == usModel ) return false;
+            if ( !CClientObjectManager::IsValidModel ( usModel ) ) return false;
+            Projectile.SetModel ( usModel );
+            break;
+        }
         default: return false;
     }
     return true;
@@ -1446,16 +1502,13 @@ bool CStaticFunctionDefinitions::GetPedTask ( CClientPed& Ped, bool bPrimary, un
 }
 
 
-bool CStaticFunctionDefinitions::GetPedClothes ( CClientPed & Ped, unsigned char ucType, char* szTextureReturn, char* szModelReturn )
+bool CStaticFunctionDefinitions::GetPedClothes ( CClientPed & Ped, unsigned char ucType, SString& strOutTexture, SString& strOutModel )
 {
-    SPlayerClothing* pClothing = Ped.GetClothes ()->GetClothing ( ucType );
+    const SPlayerClothing* pClothing = Ped.GetClothes ()->GetClothing ( ucType );
     if ( pClothing )
     {
-        if ( szTextureReturn )
-            strcpy ( szTextureReturn, pClothing->szTexture );
-        if ( szModelReturn )
-            strcpy ( szModelReturn, pClothing->szModel );
-
+        strOutTexture = pClothing->szTexture;
+        strOutModel = pClothing->szModel;
         return true;
     }
 
@@ -1471,7 +1524,23 @@ bool CStaticFunctionDefinitions::GetPedControlState ( CClientPed & Ped, const ch
         Ped.GetControllerState ( cs );
         bool bOnFoot = ( !Ped.GetRealOccupiedVehicle () );
         bState = CClientPad::GetControlState ( szControl, cs, bOnFoot );
-        return true;
+        float fState = 0;
+        unsigned int uiIndex;
+        // Check it's Analog
+        if ( CClientPad::GetAnalogControlIndex ( szControl, uiIndex ) )
+        {
+            if ( CClientPad::GetAnalogControlState ( szControl, cs, bOnFoot, fState ) )
+            {
+                bState = fState > 0;
+                return true;
+            }
+        }
+        // or binary.
+        else
+        {
+            bState = CClientPad::GetControlState ( szControl, cs, bOnFoot );
+            return true;
+        }
     }
     if ( Ped.m_Pad.GetControlState ( szControl, bState ) )
     {
@@ -1480,6 +1549,43 @@ bool CStaticFunctionDefinitions::GetPedControlState ( CClientPed & Ped, const ch
     return false;
 }
 
+bool CStaticFunctionDefinitions::GetPedAnalogControlState ( CClientPed & Ped, const char * szControl, float & fState )
+{
+    if ( Ped.GetType () == CCLIENTPLAYER )
+    {
+        CControllerState cs;
+        Ped.GetControllerState ( cs );
+        bool bOnFoot = ( !Ped.GetRealOccupiedVehicle () );
+        unsigned int uiIndex;
+        // check it's analog or use binary.
+        if ( CClientPad::GetAnalogControlIndex ( szControl, uiIndex ) )
+            CClientPad::GetAnalogControlState ( szControl, cs, bOnFoot, fState );
+        else
+            fState = CClientPad::GetControlState ( szControl, cs, bOnFoot ) == true ? 1.0f : 0.0f;
+
+        return true;
+    }
+    if ( Ped.m_Pad.GetControlState ( szControl, fState ) )
+    {
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetPedAnalogControlState ( CClientEntity & Entity, const char * szControl, float fState )
+{
+    RUN_CHILDREN SetPedAnalogControlState ( **iter, szControl, fState );
+
+    if ( IS_PED ( &Entity ) )
+    {
+        CClientPed& Ped = static_cast < CClientPed& > ( Entity );
+        if ( Ped.m_Pad.SetControlState ( szControl, fState ) )
+        {
+            return true;
+        }
+    }
+    return false;
+}
 
 bool CStaticFunctionDefinitions::IsPedDoingGangDriveby ( CClientPed & Ped, bool & bDoingGangDriveby )
 {
@@ -1488,12 +1594,12 @@ bool CStaticFunctionDefinitions::IsPedDoingGangDriveby ( CClientPed & Ped, bool 
 }
 
 
-bool CStaticFunctionDefinitions::GetPedAnimation ( CClientPed & Ped, char * szBlockName, char * szAnimName, unsigned int uiLength )
+bool CStaticFunctionDefinitions::GetPedAnimation ( CClientPed & Ped, SString& strBlockName, SString& strAnimName )
 {
     if ( Ped.IsRunningAnimation () )
     {
-        strncpy ( szBlockName, Ped.GetAnimationBlock ()->GetName (), uiLength );
-        strncpy ( szAnimName, Ped.GetAnimationName (), uiLength );
+        strBlockName = Ped.GetAnimationBlock ()->GetName ();
+        strAnimName = Ped.GetAnimationName ();
         return true;
     }
     return false;
@@ -1558,7 +1664,7 @@ bool CStaticFunctionDefinitions::IsPedInVehicle ( CClientPed & Ped, bool & bInVe
     return true;
 }
 
-char* CStaticFunctionDefinitions::GetPedSimplestTask ( CClientPed& Ped )
+const char* CStaticFunctionDefinitions::GetPedSimplestTask ( CClientPed& Ped )
 {
     CTaskManager* pTaskManager = Ped.GetTaskManager ();
     if ( pTaskManager )
@@ -1661,12 +1767,9 @@ bool CStaticFunctionDefinitions::GetPlayerWantedLevel ( char & cWanted )
 }
 
 
-bool CStaticFunctionDefinitions::GetPlayerNametagText ( CClientPlayer & Player, char * szBuffer, unsigned int uiLength )
+bool CStaticFunctionDefinitions::GetPlayerNametagText ( CClientPlayer & Player, SString& strOutText )
 {
-    assert ( szBuffer );
-    assert ( uiLength );
-
-    strncpy ( szBuffer, Player.GetNick (), uiLength );
+    strOutText = Player.GetNametagText ();
     return true;
 }
 
@@ -1691,11 +1794,11 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot ( CClientEntity& Entity, int i
 }
 
 
-bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( unsigned char ucComponent, bool bShow )
+bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( eHudComponent component, bool bShow )
 {
-    enum eHudComponent { HUD_AMMO = 0, HUD_WEAPON, HUD_HEALTH, HUD_BREATH,
-                             HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK, HUD_RADIO, HUD_WANTED, HUD_ALL };
-    switch ( ucComponent )
+    //enum eHudComponent { HUD_AMMO = 0, HUD_WEAPON, HUD_HEALTH, HUD_BREATH,
+    //                         HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK, HUD_RADIO, HUD_WANTED, HUD_CROSSHAIR, HUD_ALL };
+    switch ( component )
     {
         case HUD_AMMO:
             g_pGame->GetHud ()->DisableAmmo ( !bShow );
@@ -1734,7 +1837,11 @@ bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( unsigned char ucCompon
         case HUD_WANTED:
             g_pGame->GetHud ()->DisableWantedLevel ( !bShow );
             return true;
+        case HUD_CROSSHAIR:
+            g_pGame->GetHud ()->DisableCrosshair ( !bShow );
+            return true;
         case HUD_ALL:
+            g_pClientGame->SetHudAreaNameDisabled ( !bShow );
             g_pGame->GetHud ()->DisableAll ( !bShow );
             return true;
     }
@@ -1763,7 +1870,7 @@ bool CStaticFunctionDefinitions::TakePlayerMoney ( long lMoney )
 }
 
 
-bool CStaticFunctionDefinitions::SetPlayerNametagText ( CClientEntity& Entity, char * szText )
+bool CStaticFunctionDefinitions::SetPlayerNametagText ( CClientEntity& Entity, const char * szText )
 {
     assert ( szText );
     RUN_CHILDREN SetPlayerNametagText ( **iter, szText );
@@ -1779,15 +1886,18 @@ bool CStaticFunctionDefinitions::SetPlayerNametagText ( CClientEntity& Entity, c
 }
 
 
-bool CStaticFunctionDefinitions::SetPlayerNametagColor ( CClientEntity& Entity, unsigned char ucR, unsigned char ucG, unsigned char ucB )
+bool CStaticFunctionDefinitions::SetPlayerNametagColor ( CClientEntity& Entity, bool bRemoveOverride, unsigned char ucR, unsigned char ucG, unsigned char ucB )
 {
-    RUN_CHILDREN SetPlayerNametagColor ( **iter, ucR, ucG, ucB );
+    RUN_CHILDREN SetPlayerNametagColor ( **iter, bRemoveOverride, ucR, ucG, ucB );
 
     if ( IS_PLAYER ( &Entity ) )
     {
         CClientPlayer& Player = static_cast < CClientPlayer& > ( Entity );
 
-        Player.SetNametagOverrideColor ( ucR, ucG, ucB );
+        if ( bRemoveOverride )
+            Player.RemoveNametagOverrideColor ();
+        else
+            Player.SetNametagOverrideColor ( ucR, ucG, ucB );
         return true;
     }
     return false;
@@ -1889,6 +1999,34 @@ bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const 
 }
 
 
+bool CStaticFunctionDefinitions::SetPedAnimationProgress ( CClientEntity& Entity, const char * szAnimName, float fProgress )
+{    
+    RUN_CHILDREN SetPedAnimationProgress ( **iter, szAnimName, fProgress );
+
+    if ( IS_PED ( &Entity ) )
+    {
+        CClientPed& Ped = static_cast < CClientPed& > ( Entity );
+        if ( szAnimName )
+        {
+            CAnimBlendAssociation* pA = g_pGame->GetAnimManager ()->RpAnimBlendClumpGetAssociation ( Ped.GetClump (), szAnimName );
+
+            if ( pA )
+            {
+                pA->SetCurrentProgress ( fProgress );
+                return true;
+            }
+        }
+        else
+        {
+            Ped.KillAnimation();
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
 bool CStaticFunctionDefinitions::SetPedMoveAnim ( CClientEntity& Entity, unsigned int iMoveAnim )
 {    
     RUN_CHILDREN SetPedMoveAnim ( **iter, iMoveAnim );
@@ -1908,7 +2046,7 @@ bool CStaticFunctionDefinitions::SetPedMoveAnim ( CClientEntity& Entity, unsigne
 }
 
 
-bool CStaticFunctionDefinitions::AddPedClothes ( CClientEntity& Entity, char* szTexture, char* szModel, unsigned char ucType )
+bool CStaticFunctionDefinitions::AddPedClothes ( CClientEntity& Entity, const char* szTexture, const char* szModel, unsigned char ucType )
 {
     RUN_CHILDREN AddPedClothes ( **iter, szTexture, szModel, ucType );
     // Is he a player?
@@ -2044,7 +2182,7 @@ bool CStaticFunctionDefinitions::SetPedAimTarget ( CClientEntity & Entity, CVect
         Ped.GetPosition ( vecOrigin );
 
         // Arm direction
-        float fArmX = atan2 ( vecTarget.fX - vecOrigin.fX, vecTarget.fY - vecOrigin.fY ),
+        float fArmX = -atan2 ( vecTarget.fX - vecOrigin.fX, vecTarget.fY - vecOrigin.fY ),
               fArmY = -atan2 ( vecTarget.fZ - vecOrigin.fZ, DistanceBetweenPoints2D ( vecTarget, vecOrigin ) );
 
         // TODO: use gun muzzle for origin
@@ -2069,15 +2207,14 @@ bool CStaticFunctionDefinitions::SetPedOnFire ( CClientEntity & Entity, bool bOn
 }
 
 
-bool CStaticFunctionDefinitions::GetBodyPartName ( unsigned char ucID, char* szName )
+bool CStaticFunctionDefinitions::GetBodyPartName ( unsigned char ucID, SString& strOutName )
 {
     if ( ucID <= 10 )
     {
         // Grab the name and check it's length
-        const char* szNamePointer = CClientPed::GetBodyPartName ( ucID );
-        if ( strlen ( szNamePointer ) > 0 )
+        strOutName = CClientPed::GetBodyPartName ( ucID );
+        if ( !strOutName.empty () )
         {
-            strncpy ( szName, szNamePointer, 256 );
             return true;
         }
     }
@@ -2086,18 +2223,15 @@ bool CStaticFunctionDefinitions::GetBodyPartName ( unsigned char ucID, char* szN
 }
 
 
-bool CStaticFunctionDefinitions::GetClothesByTypeIndex ( unsigned char ucType, unsigned char ucIndex, char* szTextureReturn, char* szModelReturn )
+bool CStaticFunctionDefinitions::GetClothesByTypeIndex ( unsigned char ucType, unsigned char ucIndex, SString& strOutTexture, SString& strOutModel )
 {
-    SPlayerClothing* pPlayerClothing = CClientPlayerClothes::GetClothingGroup ( ucType );
+    const SPlayerClothing* pPlayerClothing = CClientPlayerClothes::GetClothingGroup ( ucType );
     if ( pPlayerClothing )
     {
         if ( ucIndex < CClientPlayerClothes::GetClothingGroupMax ( ucType ) )
         {
-            if ( szTextureReturn )
-                strcpy ( szTextureReturn, pPlayerClothing [ ucIndex ].szTexture );
-            if ( szModelReturn )
-                strcpy ( szModelReturn, pPlayerClothing [ ucIndex ].szModel );
-            
+            strOutTexture = pPlayerClothing [ ucIndex ].szTexture;
+            strOutModel = pPlayerClothing [ ucIndex ].szModel;           
             return true;
         }
     }
@@ -2106,14 +2240,14 @@ bool CStaticFunctionDefinitions::GetClothesByTypeIndex ( unsigned char ucType, u
 }
 
 
-bool CStaticFunctionDefinitions::GetTypeIndexFromClothes ( char* szTexture, char* szModel, unsigned char& ucTypeReturn, unsigned char& ucIndexReturn )
+bool CStaticFunctionDefinitions::GetTypeIndexFromClothes ( const char* szTexture, const char* szModel, unsigned char& ucTypeReturn, unsigned char& ucIndexReturn )
 {
     if ( szTexture == NULL && szModel == NULL )
         return false;
 
     for ( unsigned char ucType = 0 ; ucType < PLAYER_CLOTHING_SLOTS ; ucType++ )
     {
-        SPlayerClothing* pPlayerClothing = CClientPlayerClothes::GetClothingGroup ( ucType );
+        const SPlayerClothing* pPlayerClothing = CClientPlayerClothes::GetClothingGroup ( ucType );
         if ( pPlayerClothing )
         {
             for ( unsigned char ucIter = 0 ; pPlayerClothing [ ucIter ].szTexture != NULL ; ucIter++ )
@@ -2134,15 +2268,12 @@ bool CStaticFunctionDefinitions::GetTypeIndexFromClothes ( char* szTexture, char
 }
 
 
-bool CStaticFunctionDefinitions::GetClothesTypeName ( unsigned char ucType, char* szNameReturn )
+bool CStaticFunctionDefinitions::GetClothesTypeName ( unsigned char ucType, SString& strOutName )
 {
-    assert ( szNameReturn );
-
-    char* szName = CClientPlayerClothes::GetClothingName ( ucType );
+    const char* szName = CClientPlayerClothes::GetClothingName ( ucType );
     if ( szName )
     {
-        strcpy ( szNameReturn, szName );
-
+        strOutName = szName;
         return true;
     }
 
@@ -2201,23 +2332,19 @@ bool CStaticFunctionDefinitions::GetVehicleModelFromName ( const char* szName, u
 }
 
 
-bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( unsigned char ucSlot, char* szName, unsigned short len )
+bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( unsigned char ucSlot, SString& strOutName )
 {
-    strncpy ( szName, CVehicleUpgrades::GetSlotName ( ucSlot ), len );
-    if (len)
-        szName[len-1] = '\0';
+    strOutName = CVehicleUpgrades::GetSlotName ( ucSlot );
     return true;
 }
 
 
-bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( unsigned short usUpgrade, char* szName, unsigned short len )
+bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( unsigned short usUpgrade, SString& strOutName )
 {
     unsigned char ucSlot;
     if ( CVehicleUpgrades::GetSlotFromUpgrade ( usUpgrade, ucSlot ) )
     {
-        strncpy ( szName, CVehicleUpgrades::GetSlotName ( ucSlot ), len );
-        if (len)
-            szName[len-1] = '\0';
+        strOutName = CVehicleUpgrades::GetSlotName ( ucSlot );
         return true;
     }
 
@@ -2225,14 +2352,9 @@ bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( unsigned short usUp
 }
 
 
-bool CStaticFunctionDefinitions::GetVehicleNameFromModel ( unsigned short usModel, char* szName, unsigned short len )
+bool CStaticFunctionDefinitions::GetVehicleNameFromModel ( unsigned short usModel, SString& strOutName )
 {
-    assert ( szName );
-
-    strncpy ( szName, CVehicleNames::GetVehicleName ( usModel ), len );
-    if (len)
-        szName[len-1] = '\0';
-
+    strOutName = CVehicleNames::GetVehicleName ( usModel );
     return true;
 }
 
@@ -2296,11 +2418,16 @@ bool CStaticFunctionDefinitions::GetTrainSpeed ( CClientVehicle& Vehicle, float&
 }
 
 
-CClientVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate )
+CClientVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2 )
 {
-    if ( CClientVehicleManager::IsValidModel ( usModel ) )
+    if ( CClientVehicleManager::IsValidModel ( usModel ) && ( ucVariant <= 5 || ucVariant == 255 ) && ( ucVariant2 <= 5 || ucVariant2 == 255 ) )
     {
-        CClientVehicle* pVehicle = new CDeathmatchVehicle ( m_pManager, NULL, INVALID_ELEMENT_ID, usModel );
+        unsigned char ucVariation = ucVariant;
+        unsigned char ucVariation2 = ucVariant2;
+        if ( ucVariant2 == 255 && ucVariant == 255 )
+            CClientVehicleManager::GetRandomVariation ( usModel, ucVariation, ucVariation2 );
+
+        CClientVehicle* pVehicle = new CDeathmatchVehicle ( m_pManager, NULL, INVALID_ELEMENT_ID, usModel, ucVariation, ucVariation2 );
         if ( pVehicle )
         {
             pVehicle->SetParent ( Resource.GetResourceDynamicEntity() );
@@ -2355,6 +2482,13 @@ bool CStaticFunctionDefinitions::IsVehicleBlown ( CClientVehicle& Vehicle, bool&
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetVehicleVariant ( CClientVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2 )
+{
+    assert ( pVehicle );
+    ucVariant = pVehicle->GetVariant ();
+    ucVariant2 = pVehicle->GetVariant2 ();
+    return true;
+}
 
 bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CClientVehicle& Vehicle, SColor& outColor )
 {
@@ -2470,12 +2604,14 @@ bool CStaticFunctionDefinitions::SetVehicleSirensOn ( CClientEntity& Entity, boo
         CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
 
         // Has Sirens and different state than before?
-        if ( CClientVehicleManager::HasSirens ( Vehicle.GetModel () ) &&
-             bSirensOn != Vehicle.IsSirenOrAlarmActive () )
+        if ( CClientVehicleManager::HasSirens ( Vehicle.GetModel () ) || Vehicle.DoesVehicleHaveSirens ( ) )
         {
-            // Set the new state
-            Vehicle.SetSirenOrAlarmActive ( bSirensOn );
-            return true;
+            if ( bSirensOn != Vehicle.IsSirenOrAlarmActive () )
+            {
+                // Set the new state
+                Vehicle.SetSirenOrAlarmActive ( bSirensOn );
+                return true;
+            }
         }
     }
 
@@ -2533,8 +2669,6 @@ bool CStaticFunctionDefinitions::AddAllVehicleUpgrades ( CClientEntity& Entity )
         CVehicleUpgrades* pUpgrades = Vehicle.GetUpgrades ();
         if ( pUpgrades )
         {
-            unsigned short* usUpgrades = pUpgrades->GetSlotStates ();
-
             pUpgrades->AddAllUpgrades ();
             return true;
         }
@@ -2953,6 +3087,24 @@ bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio ( CClientEntity& Entity
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetVehicleSirens ( CClientVehicle& Vehicle, unsigned char ucSirenID, SSirenInfo tSirenInfo )
+{
+    eClientVehicleType vehicleType = CClientVehicleManager::GetVehicleType( Vehicle.GetModel ( ) );
+    // Won't work with below.
+    if ( vehicleType != CLIENTVEHICLE_PLANE && vehicleType != CLIENTVEHICLE_BOAT && vehicleType != CLIENTVEHICLE_TRAILER && vehicleType != CLIENTVEHICLE_HELI && vehicleType != CLIENTVEHICLE_BIKE && vehicleType != CLIENTVEHICLE_BMX )
+    {
+        if ( ucSirenID >= 0 && ucSirenID <= 7 )
+        {
+            Vehicle.SetVehicleSirenPosition ( ucSirenID, tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions );
+            Vehicle.SetVehicleSirenColour ( ucSirenID, tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour );
+            Vehicle.SetVehicleSirenMinimumAlpha ( ucSirenID, tSirenInfo.m_tSirenInfo[ ucSirenID ].m_dwMinSirenAlpha );
+            return true;
+        }
+
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetElementCollisionsEnabled ( CClientEntity& Entity, bool bEnabled )
 {
     switch ( Entity.GetType () )
@@ -3043,11 +3195,74 @@ bool CStaticFunctionDefinitions::SetElementFrozen ( CClientEntity& Entity, bool 
 }
 
 
-CClientObject* CStaticFunctionDefinitions::CreateObject ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation )
+bool CStaticFunctionDefinitions::SetLowLodElement ( CClientEntity& Entity, CClientEntity* pLowLodEntity )
+{
+    RUN_CHILDREN SetLowLodElement ( **iter, pLowLodEntity );
+
+    switch ( Entity.GetType () )
+    {
+        case CCLIENTOBJECT:
+        {
+            CClientObject& Object = static_cast < CClientObject& > ( Entity );
+            CClientObject* pLowLodObject = static_cast < CClientObject* > ( pLowLodEntity );
+            if ( !Object.SetLowLodObject ( pLowLodObject ) )
+                return false;
+            break;
+        }
+        default: return false;
+    }
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetLowLodElement ( CClientEntity& Entity, CClientEntity*& pOutLowLodEntity )
+{
+    pOutLowLodEntity = NULL;
+
+    switch ( Entity.GetType () )
+    {
+        case CCLIENTOBJECT:
+        {
+            CClientObject& Object = static_cast < CClientObject& > ( Entity );
+            pOutLowLodEntity = Object.GetLowLodObject ();
+            break;
+        }
+        default: return false;
+    }
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::IsElementLowLod ( CClientEntity& Entity, bool& bOutIsLowLod )
+{
+    bOutIsLowLod = false;
+
+    switch ( Entity.GetType () )
+    {
+        case CCLIENTOBJECT:
+        {
+            CClientObject& Object = static_cast < CClientObject& > ( Entity );
+            bOutIsLowLod = Object.IsLowLod ();
+            break;
+        }
+        default: return false;
+    }
+
+    return true;
+}
+
+
+CClientObject* CStaticFunctionDefinitions::CreateObject ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod )
 {
     if ( CClientObjectManager::IsValidModel ( usModelID ) )
     {
+#ifdef WITH_OBJECT_SYNC
         CClientObject* pObject = new CDeathmatchObject ( m_pManager, m_pMovingObjectsManager, m_pClientGame->GetObjectSync (), INVALID_ELEMENT_ID, usModelID );
+#else
+        CClientObject* pObject = new CDeathmatchObject ( m_pManager, m_pMovingObjectsManager, INVALID_ELEMENT_ID, usModelID, bLowLod );
+#endif
         if ( pObject )
         {
             pObject->SetParent ( Resource.GetResourceDynamicEntity () );
@@ -3075,6 +3290,11 @@ bool CStaticFunctionDefinitions::GetObjectScale ( CClientObject & Object, float&
     return true;
 }
 
+bool CStaticFunctionDefinitions::IsObjectBreakable ( CClientObject& Object, bool& bBreakable )
+{
+    bBreakable = Object.IsBreakable ( );
+    return true;
+}
 
 bool CStaticFunctionDefinitions::SetObjectRotation ( CClientEntity& Entity, const CVector& vecRotation )
 {
@@ -3094,9 +3314,9 @@ bool CStaticFunctionDefinitions::SetObjectRotation ( CClientEntity& Entity, cons
 }
 
 
-bool CStaticFunctionDefinitions::MoveObject ( CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation, const char* a_szEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot )
+bool CStaticFunctionDefinitions::MoveObject ( CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation, CEasingCurve::eType a_eEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot )
 {
-    RUN_CHILDREN MoveObject ( **iter, ulTime, vecPosition, vecDeltaRotation, a_szEasingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot );
+    RUN_CHILDREN MoveObject ( **iter, ulTime, vecPosition, vecDeltaRotation, a_eEasingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot );
 
     if ( IS_OBJECT ( &Entity ) )
     {
@@ -3111,8 +3331,7 @@ bool CStaticFunctionDefinitions::MoveObject ( CClientEntity& Entity, unsigned lo
         CVector vecDeltaRadians = vecDeltaRotation;
         ConvertDegreesToRadiansNoWrap ( vecDeltaRadians );
 
-        CEasingCurve::eType easingType = CEasingCurve::GetEasingTypeFromString ( a_szEasingType );
-        if (easingType == CEasingCurve::EASING_INVALID )
+        if ( a_eEasingType == CEasingCurve::EASING_INVALID )
         {
             return false;
         }
@@ -3120,7 +3339,7 @@ bool CStaticFunctionDefinitions::MoveObject ( CClientEntity& Entity, unsigned lo
         CPositionRotationAnimation animation;
         animation.SetSourceValue ( SPositionRotation ( vecSourcePosition, vecSourceRotation ) );
         animation.SetTargetValue ( SPositionRotation ( vecPosition, vecDeltaRadians ), true );
-        animation.SetEasing ( easingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot );
+        animation.SetEasing ( a_eEasingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot );
         animation.SetDuration ( ulTime );
 
         Object.StartMovement ( animation );
@@ -3176,6 +3395,18 @@ bool CStaticFunctionDefinitions::SetObjectStatic ( CClientEntity& Entity, bool b
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetObjectBreakable ( CClientEntity& Entity, bool bBreakable )
+{
+    RUN_CHILDREN SetObjectBreakable ( **iter, bBreakable );
+
+    if ( IS_OBJECT ( &Entity ) )
+    {
+        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
+        Object.SetBreakable ( bBreakable );
+        return true;
+    }
+    return false;
+}
 
 CClientRadarArea* CStaticFunctionDefinitions::CreateRadarArea ( CResource& Resource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color )
 {
@@ -3418,6 +3649,24 @@ bool CStaticFunctionDefinitions::CreateExplosion ( CVector& vecPosition, unsigne
     return true;
 }
 
+bool CStaticFunctionDefinitions::DetonateSatchels ( void )
+{
+    CClientPlayer *pLocalPlayer = GetLocalPlayer ();
+    // does the local player exist and if so does he have any projectiles to destroy?
+    if ( pLocalPlayer && pLocalPlayer->CountProjectiles ( WEAPONTYPE_REMOTE_SATCHEL_CHARGE ) > 0 )
+    {
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+        if ( pBitStream )
+        {
+            g_pNet->SendPacket ( PACKET_ID_DETONATE_SATCHELS, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
+            g_pNet->DeallocateNetBitStream ( pBitStream );
+            return true;
+        }
+    }
+    return false;
+}
+
+
 bool CStaticFunctionDefinitions::CreateFire ( CVector& vecPosition, float fSize )
 {
     return g_pGame->GetFireManager ()->StartFire ( vecPosition, fSize ) != NULL;
@@ -3449,6 +3698,48 @@ bool CStaticFunctionDefinitions::PreloadMissionAudio ( unsigned short usSound, u
 {
     g_pCore->ChatPrintf ( "Preload %u into slot %u", false, usSound, usSlot );
     g_pGame->GetAudio ()->PreloadMissionAudio ( usSound, usSlot );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetAmbientSoundEnabled ( eAmbientSoundType eType, bool bMute )
+{
+    g_pGame->GetAudio ()->SetAmbientSoundEnabled ( eType, bMute );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::IsAmbientSoundEnabled ( eAmbientSoundType eType, bool& bOutMute )
+{
+    bOutMute = g_pGame->GetAudio ()->IsAmbientSoundEnabled ( eType );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::ResetAmbientSounds ( void )
+{
+    g_pGame->GetAudio ()->ResetAmbientSounds ();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetWorldSoundEnabled ( uint uiGroup, uint uiIndex, bool bMute )
+{
+    g_pGame->GetAudio ()->SetWorldSoundEnabled ( uiGroup, uiIndex, bMute );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::IsWorldSoundEnabled ( uint uiGroup, uint uiIndex, bool& bOutMute )
+{
+    bOutMute = g_pGame->GetAudio ()->IsWorldSoundEnabled ( uiGroup, uiIndex );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::ResetWorldSounds ( void )
+{
+    g_pGame->GetAudio ()->ResetWorldSounds ();
     return true;
 }
 
@@ -3745,6 +4036,21 @@ bool CStaticFunctionDefinitions::GetCameraInterior ( unsigned char & ucInterior 
 }
 
 
+bool CStaticFunctionDefinitions::GetCameraRotation( float &fTargetX, float &fTargetY )
+{
+	m_pCamera->GetRotation( fTargetX, fTargetY );
+	
+	return true;
+}
+
+bool CStaticFunctionDefinitions::SetCameraRotation( float fX, float fY )
+{
+	m_pCamera->SetRotation( fX, fY );
+	
+	return true;
+}
+
+
 bool CStaticFunctionDefinitions::SetCameraMatrix ( CVector& vecPosition, CVector* pvecLookAt, float fRoll, float fFOV )
 {
     if ( !m_pCamera->IsInFixedMode () )        
@@ -3822,21 +4128,21 @@ bool CStaticFunctionDefinitions::FadeCamera ( bool bFadeIn, float fFadeTime, uns
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetCameraView ( unsigned short ucMode )
+bool CStaticFunctionDefinitions::SetCameraViewMode ( unsigned short ucMode )
 {
-    m_pCamera->SetCameraView ( (eVehicleCamMode) ucMode );
+    m_pCamera->SetCameraViewMode ( (eVehicleCamMode) ucMode );
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetCameraView ( unsigned short& ucMode )
+bool CStaticFunctionDefinitions::GetCameraViewMode ( unsigned short& ucMode )
 {
-    ucMode = m_pCamera->GetCameraView();
+    ucMode = m_pCamera->GetCameraViewMode();
     return true;
 }
 
 bool CStaticFunctionDefinitions::GetCursorPosition ( CVector2D& vecCursor, CVector& vecWorld )
 {
-    if ( m_pClientGame->AreCursorEventsEnabled () )
+    if ( m_pClientGame->AreCursorEventsEnabled () || GUIGetInputEnabled () )
     {
         tagPOINT point;
         GetCursorPos ( &point );
@@ -3870,43 +4176,33 @@ bool CStaticFunctionDefinitions::GetCursorPosition ( CVector2D& vecCursor, CVect
 }
 
 
-void CStaticFunctionDefinitions::DrawText ( int iLeft, int iTop,
-                                 int iRight, int iBottom,
+void CStaticFunctionDefinitions::DrawText ( float fLeft, float fTop,
+                                 float fRight, float fBottom,
                                  unsigned long dwColor,
                                  const char* szText,
                                  float fScaleX,
                                  float fScaleY,
                                  unsigned long ulFormat,
-                                 const char* szFont,
-                                 bool bPostGUI, CResource* pResource )
+                                 ID3DXFont* pDXFont,
+                                 bool bPostGUI,
+                                 bool bColorCoded,
+                                 bool bSubPixelPositioning )
 {
-    SString strFile = szFont;
-    SString strPath, strMetaPath;
-    ID3DXFont *pFont = NULL;
-    if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath, strMetaPath ) )
-    {
-        if ( m_pScriptFontLoader->GetDXFont(&pFont, strPath, strMetaPath, pResource, fScaleX, fScaleY) )
-        {
-            g_pCore->GetGraphics ()->DrawTextQueued ( iLeft, iTop, iRight, iBottom, dwColor, szText, fScaleX, fScaleY, ulFormat, pFont, bPostGUI );
-            return;
-        }
-    }
-
-               
-    eFontType fontType = g_pCore->GetGraphics ()->GetFontType ( const_cast < char * > ( szFont ) );
-    pFont = g_pCore->GetGraphics ()->GetFont ( fontType );
-    g_pCore->GetGraphics ()->DrawTextQueued ( iLeft, iTop, iRight, iBottom, dwColor, szText, fScaleX, fScaleY, ulFormat, pFont, bPostGUI );
+    g_pCore->GetGraphics ()->DrawTextQueued ( fLeft, fTop, fRight, fBottom, dwColor, szText, fScaleX, fScaleY, ulFormat, pDXFont, bPostGUI, bColorCoded, bSubPixelPositioning );
 }
 
-bool CStaticFunctionDefinitions::LoadFont ( std::string strFullFilePath, bool bBold, unsigned int uiSize, std::string strMetaPath, CResource* pResource )
+
+// Find custom font from an element, or a standard font from a name.
+ID3DXFont* CStaticFunctionDefinitions::ResolveD3DXFont ( const SString& strFontName, CClientDxFont* pDxFontElement )
 {
-    return m_pScriptFontLoader->LoadFont(strFullFilePath, bBold, uiSize, strMetaPath, pResource );
+    if ( pDxFontElement )
+        return pDxFontElement->GetD3DXFont ();
+
+    CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
+    eFontType fontType = pGraphics->GetFontType ( strFontName );
+    return pGraphics->GetFont ( fontType );
 }
 
-bool CStaticFunctionDefinitions::UnloadFont ( std::string strFullFilePath, std::string strMetaPath, CResource* pResource )
-{
-    return m_pScriptFontLoader->UnloadFont(strFullFilePath, strMetaPath, pResource );
-}
 
 bool CStaticFunctionDefinitions::IsCursorShowing ( bool& bShowing )
 {
@@ -3920,23 +4216,14 @@ bool CStaticFunctionDefinitions::GUIGetInputEnabled ( void )
     return m_pGUI->GetGUIInputEnabled ();
 }
 
-bool CStaticFunctionDefinitions::GUISetInputMode ( const std::string& a_rstrInputMode )
+void CStaticFunctionDefinitions::GUISetInputMode ( eInputMode inputMode )
 {
-    eInputMode inputMode = m_pGUI->GetInputModeFromString ( a_rstrInputMode );
-    if ( inputMode == INPUTMODE_INVALID )
-    {
-        return false;
-    }
-    else
-    {
-        m_pGUI->SetGUIInputMode ( inputMode );
-        return true;
-    }
+    m_pGUI->SetGUIInputMode ( inputMode );
 }
 
-bool CStaticFunctionDefinitions::GUIGetInputMode ( std::string& a_rstrResult )
+eInputMode CStaticFunctionDefinitions::GUIGetInputMode ( void )
 {
-    return m_pGUI->GetStringFromInputMode ( m_pGUI->GetGUIInputMode(), a_rstrResult );
+    return m_pGUI->GetGUIInputMode();
 }
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateWindow ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative )
@@ -4012,10 +4299,6 @@ bool CStaticFunctionDefinitions::GUIStaticImageLoadImage ( CClientEntity& Entity
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateLabel ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
 {
-    // If there's a parent, make sure it's a GUI widget that can be a parent
-    // ChrML: This has broken a lot of scripts
-    //if ( pParent && !IS_CGUIELEMENT_VALID_PARENT ( pParent ) ) return NULL;
-
     CGUIElement *pElement = m_pGUI->CreateLabel ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
     pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
     pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
@@ -4204,6 +4487,10 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateTab ( CLuaMain& LuaMain,
     if ( !pParent ) return NULL;
 
     CGUIElement *pGUIParent = pParent->GetCGUIElement ();
+
+    // Make sure the parent element is a TabPanel
+    if ( pGUIParent->GetType () != CGUI_TABPANEL ) return NULL;
+
     CGUIElement *pTab = static_cast < CGUITabPanel* > ( pGUIParent ) -> CreateTab ( szCaption );
     CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pTab );
     pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
@@ -4434,29 +4721,6 @@ void CStaticFunctionDefinitions::GUISetText ( CClientEntity& Entity, const char*
         GUIElement.GetCGUIElement ()->SetText ( szText );
     }
 }
-
-
-bool CStaticFunctionDefinitions::GUISetFont ( CClientEntity& Entity, const char* szFont )
-{
-    bool bResult = false;
-
-    // Are we a CGUI element?
-    if ( IS_GUI ( &Entity ) )
-    {
-        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
-
-        // Set the font
-        bResult = GUIElement.GetCGUIElement ()->SetFont ( szFont );
-    }
-    return bResult;
-}
-
-bool CStaticFunctionDefinitions::GUIUnloadFont ( std::string strFullFilePath, std::string strMetaPath, CResource* pResource )
-{
-    return m_pScriptFontLoader->UnloadFont(strFullFilePath, strMetaPath, pResource );
-}
-
-
 
 void CStaticFunctionDefinitions::GUISetSize ( CClientEntity& Entity, const CVector2D& vecSize, bool bRelative )
 {
@@ -4964,44 +5228,6 @@ void CStaticFunctionDefinitions::GUIWindowSetSizable ( CClientEntity& Entity, bo
 }
 
 
-void CStaticFunctionDefinitions::GUIWindowSetCloseButtonEnabled ( CClientEntity& Entity, bool bFlag )
-{
-    RUN_CHILDREN GUIWindowSetCloseButtonEnabled ( **iter, bFlag );
-
-    // Are we a CGUI element?
-    if ( IS_GUI ( &Entity ) )
-    {
-        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
-
-        // Are we a CGUI window?
-        if ( IS_CGUIELEMENT_WINDOW ( &GUIElement ) )
-        {
-            // Set the closebutton enabled
-            static_cast < CGUIWindow* > ( GUIElement.GetCGUIElement () ) -> SetCloseButtonEnabled ( bFlag );
-        }
-    }
-}
-
-
-void CStaticFunctionDefinitions::GUIWindowSetTitleBarEnabled ( CClientEntity& Entity, bool bFlag )
-{
-    RUN_CHILDREN GUIWindowSetTitleBarEnabled ( **iter, bFlag );
-
-    // Are we a CGUI element?
-    if ( IS_GUI ( &Entity ) )
-    {
-        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
-
-        // Are we a CGUI window?
-        if ( IS_CGUIELEMENT_WINDOW ( &GUIElement ) )
-        {
-            // Set the titlebar enabled
-            static_cast < CGUIWindow* > ( GUIElement.GetCGUIElement () ) -> SetTitlebarEnabled ( bFlag );
-        }
-    }
-}
-
-
 void CStaticFunctionDefinitions::GUILabelSetColor ( CClientEntity& Entity, int iR, int iG, int iB )
 {
     RUN_CHILDREN GUILabelSetColor ( **iter, iR, iG, iB );
@@ -5075,7 +5301,7 @@ bool CStaticFunctionDefinitions::SetTime ( unsigned char ucHour, unsigned char u
 }
 
 
-bool CStaticFunctionDefinitions::ProcessLineOfSight ( CVector& vecStart, CVector& vecEnd, bool& bCollision, CColPoint** pColPoint, CClientEntity** pColEntity, bool bCheckBuildings, bool bCheckVehicles, bool bCheckPeds, bool bCheckObjects, bool bCheckDummies, bool bSeeThroughStuff, bool bIgnoreSomeObjectsForCamera, bool bShootThroughStuff, CEntity* pIgnoredEntity )
+bool CStaticFunctionDefinitions::ProcessLineOfSight ( const CVector& vecStart, const CVector& vecEnd, bool& bCollision, CColPoint** pColPoint, CClientEntity** pColEntity, const SLineOfSightFlags& flags, CEntity* pIgnoredEntity, SLineOfSightBuildingResult* pBuildingResult )
 {
     assert ( pColPoint );
     assert ( pColEntity );
@@ -5084,7 +5310,7 @@ bool CStaticFunctionDefinitions::ProcessLineOfSight ( CVector& vecStart, CVector
         g_pGame->GetWorld ()->IgnoreEntity ( pIgnoredEntity );
 
     CEntity* pColGameEntity = 0;
-    bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecStart, &vecEnd, pColPoint, &pColGameEntity, bCheckBuildings, bCheckVehicles, bCheckPeds, bCheckObjects, bCheckDummies, bSeeThroughStuff, bIgnoreSomeObjectsForCamera, bShootThroughStuff );
+    bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecStart, &vecEnd, pColPoint, &pColGameEntity, flags, pBuildingResult );
     
     if ( pIgnoredEntity )
         g_pGame->GetWorld ()->IgnoreEntity ( NULL );
@@ -5095,12 +5321,12 @@ bool CStaticFunctionDefinitions::ProcessLineOfSight ( CVector& vecStart, CVector
 }
 
 
-bool CStaticFunctionDefinitions::IsLineOfSightClear ( CVector& vecStart, CVector& vecEnd, bool& bIsClear, bool bCheckBuildings, bool bCheckVehicles, bool bCheckPeds, bool bCheckObjects, bool bCheckDummies, bool bSeeThroughStuff, bool bIgnoreSomeObjectsForCamera, CEntity* pIgnoredEntity )
+bool CStaticFunctionDefinitions::IsLineOfSightClear ( const CVector& vecStart, const CVector& vecEnd, bool& bIsClear, const SLineOfSightFlags& flags, CEntity* pIgnoredEntity )
 {
     if ( pIgnoredEntity )
         g_pGame->GetWorld ()->IgnoreEntity ( pIgnoredEntity );
 
-    bIsClear = g_pGame->GetWorld ()->IsLineOfSightClear ( &vecStart, &vecEnd, bCheckBuildings, bCheckVehicles, bCheckPeds, bCheckObjects, bCheckDummies, bSeeThroughStuff, bIgnoreSomeObjectsForCamera );
+    bIsClear = g_pGame->GetWorld ()->IsLineOfSightClear ( &vecStart, &vecEnd, flags );
     
     if ( pIgnoredEntity )
         g_pGame->GetWorld ()->IgnoreEntity ( NULL );
@@ -5152,26 +5378,30 @@ bool CStaticFunctionDefinitions::GetWaterVertexPosition ( CClientWater* pWater, 
 }
 
 
-bool CStaticFunctionDefinitions::SetWaterLevel ( CVector* pvecPosition, float fLevel, void* pChangeSource )
+bool CStaticFunctionDefinitions::SetWorldWaterLevel ( float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel )
 {
-    return g_pGame->GetWaterManager ()->SetWaterLevel ( pvecPosition, fLevel, pChangeSource );
+    return g_pClientGame->GetManager ()->GetWaterManager ()->SetWorldWaterLevel ( fLevel, pChangeSource, bIncludeWorldNonSeaLevel );
 }
 
-
-bool CStaticFunctionDefinitions::SetWaterLevel ( CClientWater* pWater, float fLevel, void* pChangeSource )
+bool CStaticFunctionDefinitions::SetPositionWaterLevel ( const CVector& vecPosition, float fLevel, void* pChangeSource )
 {
-    if ( pWater )
-    {
-        CVector vecPosition;
-        pWater->GetPosition ( vecPosition );
-        vecPosition.fZ = fLevel;
-        pWater->SetPosition ( vecPosition );
-        return true;
-    }
-    else
-    {
-        return g_pGame->GetWaterManager ()->SetWaterLevel ( (CVector *)NULL, fLevel, pChangeSource );
-    }
+    return g_pClientGame->GetManager ()->GetWaterManager ()->SetPositionWaterLevel ( vecPosition, fLevel, pChangeSource );
+}
+
+bool CStaticFunctionDefinitions::SetElementWaterLevel ( CClientWater* pWater, float fLevel, void* pChangeSource )
+{
+    return g_pClientGame->GetManager ()->GetWaterManager ()->SetElementWaterLevel ( pWater, fLevel, pChangeSource );
+}
+
+bool CStaticFunctionDefinitions::SetAllElementWaterLevel ( float fLevel, void* pChangeSource )
+{
+    return g_pClientGame->GetManager ()->GetWaterManager ()->SetAllElementWaterLevel ( fLevel, pChangeSource );
+}
+
+bool CStaticFunctionDefinitions::ResetWorldWaterLevel ( void )
+{
+    g_pClientGame->GetManager ()->GetWaterManager ()->ResetWorldWaterLevel ();
+    return true;
 }
 
 
@@ -5229,20 +5459,13 @@ bool CStaticFunctionDefinitions::GetWeather ( unsigned char& ucWeather, unsigned
 }
 
 
-bool CStaticFunctionDefinitions::GetZoneName ( CVector& vecPosition, char* szBuffer, unsigned int uiBufferLength, bool bCitiesOnly )
+bool CStaticFunctionDefinitions::GetZoneName ( CVector& vecPosition, SString& strOutBuffer, bool bCitiesOnly )
 {
-    assert ( szBuffer );
-    assert ( uiBufferLength );
-
-    const char* szZone = NULL;
     if ( bCitiesOnly )
-        szZone = m_pClientGame->GetZoneNames ()->GetCityName ( vecPosition );
+        strOutBuffer = m_pClientGame->GetZoneNames ()->GetCityName ( vecPosition );
     else
-        szZone = m_pClientGame->GetZoneNames ()->GetZoneName ( vecPosition );
+        strOutBuffer = m_pClientGame->GetZoneNames ()->GetZoneName ( vecPosition );
 
-    strncpy ( szBuffer, szZone, uiBufferLength );
-    if (uiBufferLength)
-        szBuffer [ uiBufferLength - 1 ] = 0;
     return true;
 }
 
@@ -5341,6 +5564,23 @@ bool CStaticFunctionDefinitions::SetJetpackMaxHeight ( float fHeight )
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetAircraftMaxHeight ( float fHeight )
+{
+    if ( fHeight >= 0 /*&& fHeight <= 9001*/ )
+    {
+        g_pGame->GetWorld ()->SetAircraftMaxHeight ( fHeight );
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetOcclusionsEnabled ( bool bEnabled )
+{
+    g_pGame->GetWorld ()->SetOcclusionsEnabled ( bEnabled );
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetTrafficLightState ( unsigned char ucState )
 {
     if ( ucState >= 0 && ucState < 10 )
@@ -5393,6 +5633,22 @@ bool CStaticFunctionDefinitions::AreTrafficLightsLocked ( bool& bLocked )
     return true;
 }
 
+bool CStaticFunctionDefinitions::RemoveWorldBuilding ( unsigned short usModelToRemove, float fRadius, float fX, float fY, float fZ )
+{
+    g_pGame->GetWorld()->RemoveBuilding ( usModelToRemove, fRadius, fX, fY, fZ );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::RestoreWorldBuildings ( void )
+{
+    g_pGame->GetWorld()->ClearRemovedBuildingLists ( );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::RestoreWorldBuilding ( unsigned short usModelToRestore, float fRadius, float fX, float fY, float fZ )
+{
+    return g_pGame->GetWorld()->RestoreBuilding ( usModelToRestore, fRadius, fX, fY, fZ );
+}
 
 bool CStaticFunctionDefinitions::GetSkyGradient ( unsigned char& ucTopRed, unsigned char& ucTopGreen, unsigned char& ucTopBlue, unsigned char& ucBottomRed, unsigned char& ucBottomGreen, unsigned char& ucBottomBlue )
 {
@@ -5575,6 +5831,23 @@ bool CStaticFunctionDefinitions::GetCloudsEnabled ( )
     return g_pClientGame->GetCloudsEnabled ();
 }
 
+bool CStaticFunctionDefinitions::CreateSWATRope ( CVector vecPosition, DWORD dwDuration )
+{
+    g_pGame->GetRopes ()->CreateRopeForSwatPed ( vecPosition, dwDuration );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetBirdsEnabled ( bool bEnabled )
+{
+    g_pMultiplayer->DisableBirds( !bEnabled );
+    g_pClientGame->SetBirdsEnabled ( bEnabled );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetBirdsEnabled ( void )
+{
+    return g_pClientGame->GetBirdsEnabled();
+}
 
 bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments )
 {
@@ -5586,11 +5859,11 @@ bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitS
 
     CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds ();
     const SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
-    SScriptBindableKey* pScriptKey = NULL;
+    const SScriptBindableKey* pScriptKey = NULL;
     if ( pKey )
         pScriptKey = m_pScriptKeyBinds->GetBindableFromKey ( szKey );
     SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szKey );
-    SScriptBindableGTAControl* pScriptControl = NULL;
+    const SScriptBindableGTAControl* pScriptControl = NULL;
     if ( pControl )
         pScriptControl = m_pScriptKeyBinds->GetBindableFromControl ( szKey );
 
@@ -5671,11 +5944,11 @@ bool CStaticFunctionDefinitions::UnbindKey ( const char* szKey, CLuaMain* pLuaMa
 
     CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds ();
     const SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
-    SScriptBindableKey* pScriptKey = NULL;
+    const SScriptBindableKey* pScriptKey = NULL;
     if ( pKey )
         pScriptKey = m_pScriptKeyBinds->GetBindableFromKey ( szKey );
     SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szKey );
-    SScriptBindableGTAControl* pScriptControl = NULL;
+    const SScriptBindableGTAControl* pScriptControl = NULL;
     if ( pControl )
         pScriptControl = m_pScriptKeyBinds->GetBindableFromControl ( szKey );
 
@@ -5776,25 +6049,34 @@ bool CStaticFunctionDefinitions::GetKeyState ( const char* szKey, bool& bState )
 bool CStaticFunctionDefinitions::GetControlState ( const char* szControl, bool& bState )
 {
     assert ( szControl );
-    
-    CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds ();
-    SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szControl );
-    if ( pControl )
+
+    float fState;
+    // Analog
+    if ( CStaticFunctionDefinitions::GetAnalogControlState ( szControl , fState ) )
     {
-        bState = pControl->bState;
-        
+        bState = fState > 0;
         return true;
     }
-    
+    // Binary
+    else
+    {
+        CControllerState cs;
+        CClientPlayer* pLocalPlayer = m_pPlayerManager->GetLocalPlayer ();
+        pLocalPlayer->GetControllerState( cs );
+        bool bOnFoot = ( !pLocalPlayer->GetRealOccupiedVehicle () );
+        bState = ( CClientPad::GetControlState ( szControl, cs, bOnFoot ) == true ? 1.0f : 0.0f ) > 0;
+        return true;
+    }
+
     return false;
 }
 
 bool CStaticFunctionDefinitions::GetAnalogControlState ( const char * szControl, float & fState )
 {
     CControllerState cs;
-    CClientPlayer* localPlayer = m_pPlayerManager->GetLocalPlayer ();
-    localPlayer->GetControllerState( cs );
-    bool bOnFoot = ( !localPlayer->GetRealOccupiedVehicle () );
+    CClientPlayer* pLocalPlayer = m_pPlayerManager->GetLocalPlayer ();
+    pLocalPlayer->GetControllerState( cs );
+    bool bOnFoot = ( !pLocalPlayer->GetRealOccupiedVehicle () );
     if ( CClientPad::GetAnalogControlState ( szControl, cs, bOnFoot, fState ) )
     {
         return true;
@@ -5823,16 +6105,46 @@ bool CStaticFunctionDefinitions::IsControlEnabled ( const char* szControl, bool&
 bool CStaticFunctionDefinitions::SetControlState ( const char* szControl, bool bState )
 {
     assert ( szControl );
+    unsigned int uiIndex;
 
-    CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds ();    
-    SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szControl );
-    if ( pControl )
+    if ( bState )
     {
-        pControl->bState = bState;
-        
-        return true;
+        if ( CClientPad::GetAnalogControlIndex ( szControl, uiIndex ) )
+        {
+            if ( CClientPad::SetAnalogControlState ( szControl , 1.0 ) )
+            {
+                return true;
+            }
+        }
+        else
+        {
+            CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds ();
+            SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szControl );
+            if ( pControl )
+            {
+                pControl->bState = bState;
+                return true;
+            }
+        }
     }
-
+    else
+    {
+        if ( CClientPad::GetAnalogControlIndex ( szControl, uiIndex ) )
+        {
+            CClientPad::RemoveSetAnalogControlState ( szControl );
+            return true;
+        }
+        else
+        {
+            CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds ();
+            SBindableGTAControl* pControl = pKeyBinds->GetBindableFromControl ( szControl );
+            if ( pControl )
+            {
+                pControl->bState = bState;
+                return true;
+            }
+        }
+    }
     return false;
 }
 
@@ -5991,17 +6303,14 @@ CClientColShape* CStaticFunctionDefinitions::GetElementColShape ( CClientEntity*
 }
 
 
-bool CStaticFunctionDefinitions::GetWeaponNameFromID ( unsigned char ucID, char* szName, unsigned short len )
+bool CStaticFunctionDefinitions::GetWeaponNameFromID ( unsigned char ucID, SString& strOutName )
 {
     if ( ucID <= 59 )
     {
         // Grab the name and check it's length
-        const char* szNamePointer = CWeaponNames::GetWeaponName ( ucID );
-        if ( strlen ( szNamePointer ) > 0 )
+        strOutName = CWeaponNames::GetWeaponName ( ucID );
+        if ( !strOutName.empty () )
         {
-            strncpy ( szName, szNamePointer, len );
-            if (len)
-                szName[len-1] = '\0';
             return true;
         }
     }
@@ -6164,28 +6473,32 @@ CClientSound* CStaticFunctionDefinitions::PlaySound3D ( CResource* pResource, co
 
 bool CStaticFunctionDefinitions::StopSound ( CClientSound& Sound )
 {
-    Sound.Stop ();
+    // call onClientSoundStopped
+    CLuaArguments Arguments;
+    Arguments.PushString ( "destroyed" );     // Reason
+    Sound.CallEvent ( "onClientSoundStopped", Arguments, false );
+    g_pClientGame->GetElementDeleter()->Delete ( &Sound );
     return true;
 }
 
 
-bool CStaticFunctionDefinitions::SetSoundPosition ( CClientSound& Sound, unsigned int uiPosition )
+bool CStaticFunctionDefinitions::SetSoundPosition ( CClientSound& Sound, double dPosition )
 {
-    Sound.SetPlayPosition ( uiPosition );
+    Sound.SetPlayPosition ( dPosition );
     return true;
 }
 
 
-bool CStaticFunctionDefinitions::GetSoundPosition ( CClientSound& Sound, unsigned int& uiPosition )
+bool CStaticFunctionDefinitions::GetSoundPosition ( CClientSound& Sound, double& dPosition )
 {
-    uiPosition = Sound.GetPlayPosition ();
+    dPosition = Sound.GetPlayPosition ();
     return true;
 }
 
 
-bool CStaticFunctionDefinitions::GetSoundLength ( CClientSound& Sound, unsigned int& uiLength )
+bool CStaticFunctionDefinitions::GetSoundLength ( CClientSound& Sound, double& dLength )
 {
-    uiLength = Sound.GetLength ();
+    dLength = Sound.GetLength ();
     return true;
 }
 
@@ -6224,6 +6537,107 @@ bool CStaticFunctionDefinitions::SetSoundSpeed ( CClientSound& Sound, float fSpe
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetSoundProperties ( CClientSound& Sound, float fSampleRate, float fTempo, float fPitch, bool bReversed )
+{
+    if ( Sound.IsSoundStream ( ) == false )
+    {
+        Sound.ApplyFXModifications( fSampleRate, fTempo, fPitch, bReversed );
+        return true;
+    }
+    // Streams not supported.
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetSoundProperties ( CClientSound& Sound, float &fSampleRate, float &fTempo, float &fPitch, bool &bReversed )
+{
+    Sound.GetFXModifications( fSampleRate, fTempo, fPitch, bReversed );
+    return true;
+}
+
+float* CStaticFunctionDefinitions::GetSoundFFTData ( CClientSound& Sound, int iLength, int iBands )
+{
+    // Get our FFT Data
+    float* fData = Sound.GetFFTData ( iLength );
+    if ( iBands != 0 && fData != NULL )
+    {
+        // Post Processing option
+        // i.e. Cram it all into iBands
+        // allocate our floats with room for bands
+        float* fDataNew = new float [ iBands ];
+        // Set our count
+        int bC = 0;
+        // Minus one from bands save us doing it every time iBands is used.
+        iBands--;
+        // while we are less than iBands
+        for ( int x = 0;x <= iBands;x++ ) 
+        {
+            // Peak = 0
+            float fPeak=0.0;
+
+            // Pick a range based on our counter
+            double bB = pow ( 2,x * 10.0 / iBands );
+
+            // if our range is greater than the # of data we have cap it
+            if ( bB > ( iLength / 2 ) - 1 )
+                bB = ( iLength / 2 ) - 1;
+
+            // if our range is less than or equal to our count make sure we have at least one thing to read
+            if ( bB <= bC )
+                bB = bC + 1;
+
+            // While our counter is less than the number of samples to read
+            while ( bC < bB )
+            {
+                // if our peak is lower than the data value
+                if ( fPeak < fData[ 1+bC ] )
+                {
+                    // Set our peak and fDataNew variables accordingly
+                    fDataNew [ x ]=fData [ 1+bC ];
+                    fPeak = fData [ 1 + bC ];
+                }
+                // Increment our counter
+                bC = bC + 1;
+            }
+        }
+        // Delte fData as it's not needed and return fDataNew
+        delete[] fData;
+        return fDataNew;
+    }
+    else
+    {
+        return fData;
+    }
+}
+
+float* CStaticFunctionDefinitions::GetSoundWaveData ( CClientSound& Sound, int iLength )
+{
+    return Sound.GetWaveData ( iLength );
+}
+
+bool CStaticFunctionDefinitions::IsSoundPanEnabled ( CClientSound& Sound )
+{
+    return Sound.IsPanEnabled ( );
+}
+
+bool CStaticFunctionDefinitions::SetSoundPanEnabled ( CClientSound& Sound, bool bEnabled )
+{
+    Sound.SetPanEnabled ( bEnabled );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetSoundLevelData ( CClientSound& Sound, DWORD& dwLeft, DWORD& dwRight )
+{
+    DWORD dwData = Sound.GetLevelData ( );
+    dwLeft = LOWORD(dwData);
+    dwRight = HIWORD(dwData);
+    return dwData != 0;
+}
+
+bool CStaticFunctionDefinitions::GetSoundBPM ( CClientSound& Sound, float& fBPM )
+{
+    fBPM = Sound.GetSoundBPM ( );
+    return fBPM != 0.0f;
+}
 
 bool CStaticFunctionDefinitions::GetSoundSpeed ( CClientSound& Sound, float& fSpeed )
 {
@@ -6275,51 +6689,6 @@ bool CStaticFunctionDefinitions::SetSoundEffectEnabled ( CClientSound& Sound, co
 
     return false;
 }
-
-#ifdef MTA_VOICE
-/**
- * Used by clients to set the enabled state of the voice system.  
- * Enabling the voice system starts recording of voice data from the
- * microphone.
- * 
- * @param bEnabled The enabled state of the mic.
- *
- * @return This method always returns true.
- */
-bool CStaticFunctionDefinitions::SetVoiceInputEnabled ( bool bEnabled )
-{
-    CVoice * pVoice = m_pClientGame->GetVoice();
-
-    // Voice module may not be loaded.
-    if ( NULL != pVoice )
-    {
-        pVoice->EnableInput ( bEnabled );
-    }
-
-    return true;
-}
-
-/**
- * Sets all players muted.
- * 
- * @param bEnabled The muted enable state.
- *
- * @return This function always returns true.
- */
-
-bool CStaticFunctionDefinitions::SetVoiceMuteAllEnabled ( bool bEnabled )
-{
-    CVoice * pVoice = m_pClientGame->GetVoice();
-
-    // Voice module may not be loaded.
-    if ( NULL != pVoice )
-    {
-        pVoice->SetMuted ( bEnabled );
-    }
-
-    return true;
-}
-#endif
 
 /** Version functions **/
 unsigned long CStaticFunctionDefinitions::GetVersion ()
@@ -6382,14 +6751,14 @@ eHandlingProperty CStaticFunctionDefinitions::GetVehicleHandlingEnum ( std::stri
     {
         return eProperty;
     }
-    return eHandlingProperty::HANDLING_MAX;
+    return HANDLING_MAX;
 }
 
 bool CStaticFunctionDefinitions::GetVehicleHandling ( CClientVehicle* pVehicle, eHandlingProperty eProperty, CVector& vecValue )
 {
     assert ( pVehicle );
 
-    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ( );
     if ( eProperty == HANDLING_CENTEROFMASS )
     {
         vecValue = pEntry->GetCenterOfMass ();
@@ -6402,9 +6771,11 @@ bool CStaticFunctionDefinitions::GetVehicleHandling ( CClientVehicle* pVehicle, 
 {
     assert ( pVehicle );
 
-    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ( );
     if ( GetEntryHandling ( pEntry, eProperty, fValue ) )
+    {
         return true;
+    }
 
     return false;
 }
@@ -6414,9 +6785,11 @@ bool CStaticFunctionDefinitions::GetVehicleHandling ( CClientVehicle* pVehicle, 
 {
     assert ( pVehicle );
 
-    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ( );
     if ( GetEntryHandling ( pEntry, eProperty, strValue ) )
+    {
         return true;
+    }
 
     return false;
 }
@@ -6425,10 +6798,11 @@ bool CStaticFunctionDefinitions::GetVehicleHandling ( CClientVehicle* pVehicle, 
 {
     assert ( pVehicle );
 
-    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ( );
     if ( GetEntryHandling ( pEntry, eProperty, uiValue ) )
+    {
         return true;
-
+    }
     return false;
 }
 
@@ -6436,10 +6810,11 @@ bool CStaticFunctionDefinitions::GetVehicleHandling ( CClientVehicle* pVehicle, 
 {
     assert ( pVehicle );
 
-    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ( );
     if ( GetEntryHandling ( pEntry, eProperty, ucValue ) )
+    {
         return true;
-
+    }
     return false;
 }
 
@@ -6630,6 +7005,434 @@ bool CStaticFunctionDefinitions::GetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             default:
                 return false;
+        }
+    }
+    else
+        return false;
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float & fData )
+{
+    if ( eProperty == WEAPON_INVALID_PROPERTY )
+        return false;
+
+
+    CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( eWeapon, eSkillLevel );
+    if ( pWeaponInfo )
+    {
+        switch ( eProperty )
+        {
+            case WEAPON_WEAPON_RANGE:
+            {
+                fData = pWeaponInfo->GetWeaponRange ( );
+                break;
+            }
+            case WEAPON_TARGET_RANGE:
+            {
+                fData = pWeaponInfo->GetTargetRange ( );
+                break;
+            }
+            case WEAPON_ACCURACY:
+            {
+                fData = pWeaponInfo->GetAccuracy ( );
+                break;
+            }
+            case WEAPON_DAMAGE:
+            {
+                fData = pWeaponInfo->GetDamagePerHit ( );
+                break;
+            }
+            case WEAPON_LIFE_SPAN:
+            {
+                fData = pWeaponInfo->GetLifeSpan ( );
+                break;
+            }
+            case WEAPON_FIRING_SPEED:
+            {
+                fData = pWeaponInfo->GetFiringSpeed ( );
+                break;
+            }
+            case WEAPON_MOVE_SPEED:
+            {
+                fData = pWeaponInfo->GetMoveSpeed ( );
+                break;
+            }
+            case WEAPON_SPREAD:
+            {
+                fData = pWeaponInfo->GetSpread ( );
+                break;
+            }
+            case WEAPON_REQ_SKILL_LEVEL:
+            {
+                fData = pWeaponInfo->GetRequiredStatLevel ( );
+                break;
+            }
+            case WEAPON_ANIM_LOOP_START:
+            {
+                fData = pWeaponInfo->GetWeaponAnimLoopStart ( );
+                break;
+            }
+            case WEAPON_ANIM_LOOP_STOP:
+            {
+                fData = pWeaponInfo->GetWeaponAnimLoopStop ( );
+                break;
+            }
+            case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+            {
+                fData = pWeaponInfo->GetWeaponAnimLoopFireTime ( );
+                break;
+            }
+            case WEAPON_ANIM2_LOOP_START:
+            {
+                fData = pWeaponInfo->GetWeaponAnim2LoopStart ( );
+                break;
+            }
+            case WEAPON_ANIM2_LOOP_STOP:
+            {
+                fData = pWeaponInfo->GetWeaponAnim2LoopStop ( );
+                break;
+            }
+            case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+            {
+                fData = pWeaponInfo->GetWeaponAnim2LoopFireTime ( );
+                break;
+            }
+            case WEAPON_ANIM_BREAKOUT_TIME:
+            {
+                fData = pWeaponInfo->GetWeaponAnimBreakoutTime ( );
+                break;
+            }
+            case WEAPON_RADIUS:
+            {
+                fData = pWeaponInfo->GetWeaponRadius ( );
+                break;
+            }
+            default:
+                return false;
+        }
+    }
+    else
+        return false;
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData )
+{
+    if ( eProperty == WEAPON_INVALID_PROPERTY )
+        return false;
+
+
+    CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( eWeapon, eSkillLevel );
+    if ( pWeaponInfo )
+    {
+        switch ( eProperty )
+        {
+            case WEAPON_DAMAGE:
+            {
+                sData = pWeaponInfo->GetDamagePerHit ( );
+                break;
+            }
+            case WEAPON_MAX_CLIP_AMMO:
+            {
+                sData = pWeaponInfo->GetMaximumClipAmmo ( );
+                break;
+            }
+            case WEAPON_ANIM_GROUP:
+            {
+                sData = (short)pWeaponInfo->GetAnimGroup ( );
+                break;
+            }
+            case WEAPON_FLAGS:
+            {
+                sData = pWeaponInfo->GetFlags ( );
+                break;
+            }
+            case WEAPON_FIRETYPE:
+            {
+                sData = pWeaponInfo->GetFireType ( );
+                break;
+            }
+            case WEAPON_MODEL:
+            {
+                sData = pWeaponInfo->GetModel ( );
+                break;
+            }
+            case WEAPON_MODEL2:
+            {
+                sData = pWeaponInfo->GetModel2 ( );
+                break;
+            }
+            case WEAPON_SLOT:
+            {
+                sData = pWeaponInfo->GetSlot ( );
+                break;
+            }
+            case WEAPON_AIM_OFFSET:
+            {
+                sData = pWeaponInfo->GetAimOffsetIndex ( );
+                break;
+            }
+            case WEAPON_SKILL_LEVEL:
+            {
+                sData = pWeaponInfo->GetSkill ( );
+                break;
+            }
+            case WEAPON_DEFAULT_COMBO:
+            {
+                sData = pWeaponInfo->GetDefaultCombo ( );
+                break;
+            }
+            case WEAPON_COMBOS_AVAILABLE:
+            {
+                sData = pWeaponInfo->GetCombosAvailable ( );
+                break;
+            }
+                
+            default:
+                return false;
+        }
+    }
+    else
+        return false;
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector & vecData )
+{
+    if ( eProperty == WEAPON_INVALID_PROPERTY )
+        return false;
+
+    CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats( eWeapon, eSkillLevel );
+    if ( pWeaponInfo )
+    {
+        switch ( eProperty )
+        {
+            case WEAPON_FIRE_OFFSET:
+            {
+                vecData = *pWeaponInfo->GetFireOffset ( );
+                break;
+            }
+            default:
+                return false;
+        }
+    }
+    else
+        return false;
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float & fData )
+{
+    if ( eProperty == WEAPON_INVALID_PROPERTY )
+        return false;
+
+
+    CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats( eWeapon, eSkillLevel );
+    if ( pWeaponInfo )
+    {
+        switch ( eProperty )
+        {
+        case WEAPON_WEAPON_RANGE:
+            {
+                fData = pWeaponInfo->GetWeaponRange ( );
+                break;
+            }
+        case WEAPON_TARGET_RANGE:
+            {
+                fData = pWeaponInfo->GetTargetRange ( );
+                break;
+            }
+        case WEAPON_ACCURACY:
+            {
+                fData = pWeaponInfo->GetAccuracy ( );
+                break;
+            }
+        case WEAPON_DAMAGE:
+            {
+                fData = pWeaponInfo->GetDamagePerHit ( );
+                break;
+            }
+        case WEAPON_LIFE_SPAN:
+            {
+                fData = pWeaponInfo->GetLifeSpan ( );
+                break;
+            }
+        case WEAPON_FIRING_SPEED:
+            {
+                fData = pWeaponInfo->GetFiringSpeed ( );
+                break;
+            }
+        case WEAPON_MOVE_SPEED:
+            {
+                fData = pWeaponInfo->GetMoveSpeed ( );
+                break;
+            }
+        case WEAPON_SPREAD:
+            {
+                fData = pWeaponInfo->GetSpread ( );
+                break;
+            }
+            
+        case WEAPON_REQ_SKILL_LEVEL:
+            {
+                fData = pWeaponInfo->GetRequiredStatLevel ( );
+                break;
+            }
+        case WEAPON_ANIM_LOOP_START:
+            {
+                fData = pWeaponInfo->GetWeaponAnimLoopStart ( );
+                break;
+            }
+        case WEAPON_ANIM_LOOP_STOP:
+            {
+                fData = pWeaponInfo->GetWeaponAnimLoopStop ( );
+                break;
+            }
+        case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+            {
+                fData = pWeaponInfo->GetWeaponAnimLoopFireTime ( );
+                break;
+            }
+        case WEAPON_ANIM2_LOOP_START:
+            {
+                fData = pWeaponInfo->GetWeaponAnim2LoopStart ( );
+                break;
+            }
+        case WEAPON_ANIM2_LOOP_STOP:
+            {
+                fData = pWeaponInfo->GetWeaponAnim2LoopStop ( );
+                break;
+            }
+        case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+            {
+                fData = pWeaponInfo->GetWeaponAnim2LoopFireTime ( );
+                break;
+            }
+        case WEAPON_ANIM_BREAKOUT_TIME:
+            {
+                fData = pWeaponInfo->GetWeaponAnimBreakoutTime ( );
+                break;
+            }
+        case WEAPON_RADIUS:
+            {
+                fData = pWeaponInfo->GetWeaponRadius ( );
+                break;
+            }
+        default:
+            return false;
+        }
+    }
+    else
+        return false;
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData )
+{
+    if ( eProperty == WEAPON_INVALID_PROPERTY )
+        return false;
+
+
+    CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats( eWeapon, eSkillLevel );
+    if ( pWeaponInfo )
+    {
+        switch ( eProperty )
+        {
+        case WEAPON_DAMAGE:
+            {
+                sData = pWeaponInfo->GetDamagePerHit ( );
+                break;
+            }
+        case WEAPON_MAX_CLIP_AMMO:
+            {
+                sData = pWeaponInfo->GetMaximumClipAmmo ( );
+                break;
+            }
+        case WEAPON_ANIM_GROUP:
+            {
+                sData = (short)pWeaponInfo->GetAnimGroup ( );
+                break;
+            }
+        case WEAPON_FLAGS:
+            {
+                sData = pWeaponInfo->GetFlags ( );
+                break;
+            }
+        case WEAPON_FIRETYPE:
+            {
+                sData = pWeaponInfo->GetFireType ( );
+                break;
+            }
+        case WEAPON_MODEL:
+            {
+                sData = pWeaponInfo->GetModel ( );
+                break;
+            }
+        case WEAPON_MODEL2:
+            {
+                sData = pWeaponInfo->GetModel2 ( );
+                break;
+            }
+        case WEAPON_SLOT:
+            {
+                sData = pWeaponInfo->GetSlot ( );
+                break;
+            }
+        case WEAPON_AIM_OFFSET:
+            {
+                sData = pWeaponInfo->GetAimOffsetIndex ( );
+                break;
+            }
+        case WEAPON_SKILL_LEVEL:
+            {
+                sData = pWeaponInfo->GetSkill ( );
+                break;
+            }
+        case WEAPON_DEFAULT_COMBO:
+            {
+                sData = pWeaponInfo->GetDefaultCombo ( );
+                break;
+            }
+        case WEAPON_COMBOS_AVAILABLE:
+            {
+                sData = pWeaponInfo->GetCombosAvailable ( );
+                break;
+            }
+
+        default:
+            return false;
+        }
+    }
+    else
+        return false;
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector & vecData )
+{
+    if ( eProperty == WEAPON_INVALID_PROPERTY )
+        return false;
+
+    CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats( eWeapon, eSkillLevel );
+    if ( pWeaponInfo )
+    {
+        switch ( eProperty )
+        {
+        case WEAPON_FIRE_OFFSET:
+            {
+                vecData = *pWeaponInfo->GetFireOffset ( );
+                break;
+            }
+        default:
+            return false;
         }
     }
     else

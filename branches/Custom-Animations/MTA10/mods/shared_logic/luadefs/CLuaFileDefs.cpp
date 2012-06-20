@@ -37,22 +37,25 @@ void CLuaFileDefs::LoadFunctions ( void )
 
 int CLuaFileDefs::fileCreate ( lua_State* luaVM )
 {
-    // Grab our lua VM
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
-    {
-        // Check argument types
-        if ( argtype ( 1, LUA_TSTRING ) )
-        {
-            // Grab the filename
-            std::string strFile = lua_tostring ( luaVM, 1 );
-            std::string strAbsPath;
+//  file fileCreate ( string filePath )
+    SString filePath;
 
-            // We have a resource argument?
-            CResource* pThisResource = pLuaMain->GetResource ();
-            CResource* pResource = pThisResource;
-            if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, strAbsPath ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( filePath );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Grab our lua VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            std::string strAbsPath;
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath ) )
             {
+                // Make sure the destination folder exist so we can create the file
+                MakeSureDirExists ( strAbsPath.c_str () );
+
                 // Create the file to create
                 CScriptFile* pFile = new CScriptFile ( strAbsPath.c_str (), DEFAULT_MAX_FILESIZE );
                 assert ( pFile );
@@ -89,9 +92,9 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
                 }
             }
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "fileCreate" );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fileCreate", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -101,42 +104,31 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
 
 int CLuaFileDefs::fileExists ( lua_State* luaVM )
 {
-    // Grab our lua VM
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+//  bool fileExists ( string filePath )
+    SString filePath;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( filePath );
+
+    if ( !argStream.HasErrors () )
     {
-        // Check argument types
-        if ( argtype ( 1, LUA_TSTRING ) )
+        // Grab our lua VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            // Grab the filename
-            std::string strFile = lua_tostring ( luaVM, 1 );
             std::string strAbsPath;
-
-            // We have a resource argument?
-            CResource* pThisResource = pLuaMain->GetResource ();
-            CResource* pResource = pThisResource;
-            if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, strAbsPath ) )
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath ) )
             {
-                // Try to open the file (Isn't there a better way to check if a file exists rather than opening it?)
-                FILE* temp = fopen ( strAbsPath.c_str(), "r" );
-
-                // Does file exist?
-                if ( temp )
-                {
-                    fclose ( temp );
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
-                else
-                {
-                    lua_pushboolean ( luaVM, false );
-                    return 1;
-                }
+                bool bResult = FileExists ( strAbsPath );
+                lua_pushboolean ( luaVM, bResult );
+                return 1;
             }
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "fileExists" );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fileExists", *argStream.GetErrorMessage () ) );
+
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -146,36 +138,29 @@ int CLuaFileDefs::fileExists ( lua_State* luaVM )
 
 int CLuaFileDefs::fileOpen ( lua_State* luaVM )
 {
-    // Grab our lua VM
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+//  file fileOpen ( string filePath [, bool readOnly = false ] )
+    SString filePath; bool readOnly;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( filePath );
+    argStream.ReadBool ( readOnly, false );
+
+    if ( !argStream.HasErrors () )
     {
-        // Check argument types
-        if ( argtype ( 1, LUA_TSTRING ) )
+        // Grab our lua VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            // We have a read only argument?
-            bool bReadOnly = false;
-            if ( argtype ( 2, LUA_TBOOLEAN ) )
-            {
-                bReadOnly = lua_toboolean ( luaVM, 2 ) ? true:false;
-            }
-
-            // Grab the filename
-            std::string strFile = lua_tostring ( luaVM, 1 );
             std::string strAbsPath;
-
-            // We have a resource argument?
-            CResource* pThisResource = pLuaMain->GetResource ();
-            CResource* pResource = pThisResource;
-            if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, strAbsPath ) )
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath ) )
             {
                 // Create the file to create
                 CScriptFile* pFile = new CScriptFile ( strAbsPath.c_str (), DEFAULT_MAX_FILESIZE );
                 assert ( pFile );
 
                 // Try to load it
-                if ( ( bReadOnly && pFile->Load ( CScriptFile::MODE_READ ) ) ||
-                    ( !bReadOnly && pFile->Load ( CScriptFile::MODE_READWRITE ) ) )
+                if ( pFile->Load ( readOnly ? CScriptFile::MODE_READ : CScriptFile::MODE_READWRITE ) )
                 {
                     // Make it a child of the resource's file root
                     pFile->SetParent ( pResource->GetResourceDynamicEntity () );
@@ -206,9 +191,9 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
                 }
             }
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "fileOpen" );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fileOpen", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -495,25 +480,23 @@ int CLuaFileDefs::fileClose ( lua_State* luaVM )
 
 int CLuaFileDefs::fileDelete ( lua_State* luaVM )
 {
-    // Grab our lua VM
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
-    {
-        // Check argument types
-        if ( argtype ( 1, LUA_TSTRING ) )
-        {
-            // Grab the filename
-            std::string strFile = lua_tostring ( luaVM, 1 );
-            std::string strPath;
+//  bool fileDelete ( string filePath )
+    SString filePath;
 
-            // We have a resource argument?
-            CResource* pThisResource = pLuaMain->GetResource ();
-            CResource* pResource = pThisResource;
-            if ( CResourceManager::ParseResourcePathInput ( strFile, pResource, strPath ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( filePath );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Grab our lua VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            std::string strPath;
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strPath ) )
             {
-                // Make sure the dir exists so we can remove the file
-                MakeSureDirExists ( strPath.c_str () );
-                if ( remove ( strPath.c_str () ) == 0 )
+                if ( FileDelete ( strPath.c_str () ) )
                 {
                     // If file removed return success
                     lua_pushboolean ( luaVM, true );
@@ -526,9 +509,9 @@ int CLuaFileDefs::fileDelete ( lua_State* luaVM )
                 }
             }
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "fileDelete" );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fileDelete", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -536,16 +519,19 @@ int CLuaFileDefs::fileDelete ( lua_State* luaVM )
 
 int CLuaFileDefs::fileRename ( lua_State* luaVM )
 {
-    // Grab our lua VM
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+//  bool fileRename ( string filePath, string newFilePath )
+    SString filePath; SString newFilePath;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( filePath );
+    argStream.ReadString ( newFilePath );
+
+    if ( !argStream.HasErrors () )
     {
-        // Check arguments types
-        if ( argtype ( 1, LUA_TSTRING ) && argtype ( 2, LUA_TSTRING ) )
+        // Grab our lua VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            // Grab the filenames
-            std::string strCurFile = lua_tostring ( luaVM, 1 );
-            std::string strNewFile = lua_tostring ( luaVM, 2 );
             std::string strCurAbsPath;
             std::string strNewAbsPath;
 
@@ -553,8 +539,8 @@ int CLuaFileDefs::fileRename ( lua_State* luaVM )
             CResource* pThisResource = pLuaMain->GetResource ();
             CResource* pCurResource = pThisResource;
             CResource* pNewResource = pThisResource;
-            if ( CResourceManager::ParseResourcePathInput ( strCurFile, pCurResource, strCurAbsPath ) &&
-                 CResourceManager::ParseResourcePathInput ( strNewFile, pNewResource, strNewAbsPath ) )
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pCurResource, strCurAbsPath ) &&
+                 CResourceManager::ParseResourcePathInput ( newFilePath, pNewResource, strNewAbsPath ) )
             {
                  // Does source file exist?
                 if ( FileExists ( strCurAbsPath.c_str() ) )
@@ -587,9 +573,9 @@ int CLuaFileDefs::fileRename ( lua_State* luaVM )
                 }
             }
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "fileRename" );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fileRename", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );

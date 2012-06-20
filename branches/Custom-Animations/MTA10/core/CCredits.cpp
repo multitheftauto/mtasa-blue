@@ -29,12 +29,26 @@ const char* g_szCredits = "== Multi Theft Auto: San Andreas v" MTA_DM_BUILDTAG_S
                           "Adge \"Jax\" Cutler\n"
                           "Cecill \"ijs\" Etheredge\n"
                           "Sebas \"x86\" Lamers\n"
+                          "Raphael \"Mr.Hankey\" Leiteritz\n"
                           "Ed \"eAi\" Lyons\n"
                           "Christian \"ChrML\" Myhre Lundheim\n"
                           "Arushan \"aru\" Raj\n"
                           "Frank \"Aim\" Spijkerman\n"
                           "Kevin \"Kevuwk\" Whiteside\n"
                           "Richard \"Cazomino05\" Whitlock\n"
+                          "Gamesnert\n"
+                          "\n"
+                          "\n"
+
+                          "Contributors\n"
+                          "\n"
+
+                          "Arran\n"
+                          "Remp\n"
+                          "MX_Master\n"
+                          "Iztas\n"
+                          "impulze\n"
+                          "\n"
                           "\n"
 
                           "Game Design / Scripting\n"
@@ -48,24 +62,36 @@ const char* g_szCredits = "== Multi Theft Auto: San Andreas v" MTA_DM_BUILDTAG_S
                           "Norbert \"norby89\" Juhos\n"
                           "Kris \"KWKSND\" Kulchisky\n"
                           "Dustin \"Ransom\" Morren\n"
-                          "\n"
-                       
                           "erorr404\n"
                           "MeKorea\n"
+                          "\n"
                           "\n"
 
                           "Patch contributors\n"
                           "\n"
                           
+                          "Lukasz \"W\" Biegaj\n"
                           "Florian \"Flobu\" Busse\n"
                           "Philip \"Fenix\" Farquharson\n"
                           "Robin \"robhol\" Holm\n"
-                          "Raphael \"Mr.Hankey\" Leiteritz\n"
                           "Adam \"50p\" Telega\n"
-                          "\n"
-
-                          "Gamesnert\n"
+                          "Gothem\n"
+                          "rafalh\n"
+                          "Totto8492\n"
+                          "CubedDeath\n"
+                          "GRascm\n"
+                          "NeO_D-Power\n"
+                          "Dragon\n"
+                          "DirtY_iCE\n"
+                          "Zango\n"
+                          "Callum\n"
                           "lucasc190\n"
+                          "samt2497\n"
+                          "MCvarial\n"
+                          "tvc\n"
+                          "Audifire\n"
+                          "Kayl\n"
+                          "\n"
                           "\n"
 
                           "Special Thanks\n"
@@ -78,7 +104,31 @@ const char* g_szCredits = "== Multi Theft Auto: San Andreas v" MTA_DM_BUILDTAG_S
                           "Chris \"Cray\" McArthur\n"
                           "Hans \"Blokker\" Roes\n"
                           "Kent \"Kent747\" Simon\n"
-                          "\n";
+                          "Matthew \"Towncivilian\" Wolfe\n"
+                          "Adamix\n"
+                          "Aibo\n"
+                          "Pugwipe\n"
+                          "The_GTA\n"
+                          "Phatlooser\n"
+                          "\n"
+                          "\n"
+                         
+                          "\n"
+                          "This software makes use of the following libraries and software:\n"
+                          "RakNet (http://www.jenkinssoftware.com)\n"
+                          "SA Limit adjuster source code (Credits to Sacky)\n"
+                          "CEGUI (http://www.cegui.org.uk/wiki/index.php/Main_Page)\n"
+                          "cURL (http://curl.haxx.se/)\n"
+                          "libpcre (http://www.pcre.org/)\n"
+                          "Lua (http://www.lua.org/)\n"
+                          "SQLite (http://www.sqlite.org/)\n"
+                          "libpng (http://www.libpng.org/)\n"
+                          "Embedded HTTP Server (http://ehs.fritz-elfert.de/)\n"
+                          "zlib (http://zlib.net/)\n"
+                          "bzip2 (http://bzip.org/)\n"
+                          "UnRAR (http://www.rarlab.com/)\n"
+                          ;
+
 
 namespace CCreditsGUI
 {
@@ -156,6 +206,7 @@ CCredits::CCredits ( void )
     m_pButtonOK->SetPosition ( CVector2D ( 0.77f, 0.90f ), true );
     m_pButtonOK->SetSize ( CVector2D ( 112.0f, 21.0f ) );       // relative 0.20, 0.07
     m_pButtonOK->SetVisible ( true );
+    m_pButtonOK->SetAlwaysOnTop ( true );
 
     // Set up the event handlers
     m_pButtonOK->SetClickHandler ( GUI_CALLBACK ( &CCredits::OnOKButtonClick, this ) );

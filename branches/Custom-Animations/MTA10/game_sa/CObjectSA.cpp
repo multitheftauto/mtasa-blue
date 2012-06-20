@@ -40,7 +40,7 @@ CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)
     CheckForGangTag ();
 }
 
-CObjectSA::CObjectSA( DWORD dwModel )
+CObjectSA::CObjectSA( DWORD dwModel, bool bBreakable )
 {
     DEBUG_TRACE("CObjectSA::CObjectSA( DWORD dwModel )");
 
@@ -137,12 +137,18 @@ CObjectSA::CObjectSA( DWORD dwModel )
     {
         this->SetInterface((CEntitySAInterface *)dwObjectPtr);
 
-        world->Add( m_pInterface );
+        world->Add( m_pInterface, CObject_Constructor );
 
         // Setup some flags
         this->BeingDeleted = FALSE;
         this->DoNotRemoveFromGame = FALSE;
         MemPutFast < BYTE > ( dwObjectPtr + 316, 6 );
+        if ( !bBreakable )
+        {
+            // Set our immunities
+            // Sum of all flags checked @ CPhysical__CanPhysicalBeDamaged 
+            MemPutFast < int > ( dwObjectPtr + 64, 0x00BC0000 );
+        }
         m_pInterface->bStreamingDontDelete = true;
     }
     else
@@ -157,7 +163,10 @@ CObjectSA::CObjectSA( DWORD dwModel )
     m_ucAlpha = 255;
 
     if ( m_pInterface )
+    {
         CheckForGangTag ();
+    }
+
 }
 
 CObjectSA::~CObjectSA( )
@@ -169,40 +178,35 @@ CObjectSA::~CObjectSA( )
         DWORD dwInterface = (DWORD)this->GetInterface();
         if ( dwInterface )
         {       
-            CWorldSA * world = (CWorldSA *)pGame->GetWorld();
-            world->Remove(this->GetInterface());
-        
-            DWORD dwThis = (DWORD)this->GetInterface();
-            DWORD dwFunc = this->GetInterface()->vtbl->Remove;
-            _asm
+            if ( (DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable )
             {
-                mov     ecx, dwThis
-                call    dwFunc
-            }
-
-            dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
-            _asm    
-            {
-                mov     ecx, dwThis
-                push    1           //delete too
-                call    dwFunc
-            }
+                CWorldSA * world = (CWorldSA *)pGame->GetWorld();
+                world->Remove(this->GetInterface(), CObject_Destructor);
+            
+                DWORD dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
+                _asm    
+                {
+                    mov     ecx, dwInterface
+                    push    1           //delete too
+                    call    dwFunc
+                }
         
 #ifdef MTA_USE_BUILDINGS_AS_OBJECTS
-            DWORD dwModelID = this->internalInterface->m_nModelIndex;
-            // REMOVE ref to colstore thingy
-            dwFunc = 0x4107D0;
-            _asm
-            {
-                mov     eax, dwModelID
-                mov     eax, 0xA9B0C8[eax*4]
-                mov     eax, [eax+20]
-                movzx   eax, byte ptr [eax+40]
-                push    eax
-                call    dwFunc
-                add     esp, 4
-            }
+                DWORD dwModelID = this->internalInterface->m_nModelIndex;
+                // REMOVE ref to colstore thingy
+                dwFunc = 0x4107D0;
+                _asm
+                {
+                    mov     eax, dwModelID
+                    mov     eax, 0xA9B0C8[eax*4]
+                    mov     eax, [eax+20]
+                    movzx   eax, byte ptr [eax+40]
+                    push    eax
+                    call    dwFunc
+                    add     esp, 4
+                }
 #endif
+            }
         }
 
         this->BeingDeleted = true;

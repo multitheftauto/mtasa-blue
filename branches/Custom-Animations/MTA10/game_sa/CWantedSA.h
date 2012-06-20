@@ -97,6 +97,7 @@ public:
     // Exported methods
     void                    SetMaximumWantedLevel ( DWORD dwWantedLevel );
     void                    SetWantedLevel ( DWORD dwWantedLevel );
+    void                    SetWantedLevelNoFlash ( DWORD dwWantedLevel );
     char                    GetWantedLevel ( void )                                             { return this->internalInterface->m_WantedLevel; };
     void                    SetWantedLevelNoDrop ( DWORD dwWantedLevel );
 };

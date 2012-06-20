@@ -136,16 +136,6 @@ void CClientSpatialDatabaseImpl::SphereQuery ( CClientEntityResult& outResult, c
 
     // Find all entiites which overlap the box
     m_Tree.Search( &box.vecMin.fX, &box.vecMax.fX, outResult );
-
-    #ifdef SPATIAL_DATABASE_DEBUG_OUTPUTA
-        OutputDebugLine ( SString ( "SpatialDatabase::SphereQuery %d results for %2.0f,%2.0f,%2.0f  %2.2f"
-                                            ,outResult.size ()
-                                            ,sphere.vecPosition.fX
-                                            ,sphere.vecPosition.fY
-                                            ,sphere.vecPosition.fZ
-                                            ,sphere.fRadius
-                                            ) );
-    #endif
 }
 
 
@@ -177,11 +167,6 @@ void CClientSpatialDatabaseImpl::AllQuery ( CClientEntityResult& outResult )
 ///////////////////////////////////////////////////////////////
 void CClientSpatialDatabaseImpl::FlushUpdateQueue ( void )
 {
-    #ifdef SPATIAL_DATABASE_DEBUG_OUTPUTA
-        int iTotalToUpdate = m_UpdateQueue.size ();
-        int iTotalUpdated = 0;
-    #endif
-
     std::map < CClientEntity*, int > updateQueueCopy = m_UpdateQueue;
     m_UpdateQueue.clear ();
     for ( std::map < CClientEntity*, int >::iterator it = updateQueueCopy.begin (); it != updateQueueCopy.end (); ++it )
@@ -215,24 +200,7 @@ void CClientSpatialDatabaseImpl::FlushUpdateQueue ( void )
 
         // Update info map
         MapSet ( m_InfoMap, pEntity, newInfo );
-        #ifdef SPATIAL_DATABASE_DEBUG_OUTPUTA
-            iTotalUpdated++;
-            OutputDebugLine ( SString ( "SpatialDatabase::UpdateEntity %08x  %2.0f,%2.0f,%2.0f   %2.0f,%2.0f,%2.0f"
-                                                ,pEntity
-                                                ,info.box.vecMin.fX
-                                                ,info.box.vecMin.fY
-                                                ,info.box.vecMin.fZ
-                                                ,info.box.vecMax.fX
-                                                ,info.box.vecMax.fY
-                                                ,info.box.vecMax.fZ
-                                                ) );
-        #endif
     }
-
-    #ifdef SPATIAL_DATABASE_DEBUG_OUTPUTB
-        if ( iTotalToUpdate )
-            OutputDebugLine ( SString ( "SpatialDatabase::FlushUpdateQueue  TotalToUpdate: %d   TotalUpdated: %d  m_InfoMap: %d    tree: %d  ", iTotalToUpdate, iTotalUpdated, m_InfoMap.size (), m_Tree.Count () ) );
-    #endif
 }
 
 

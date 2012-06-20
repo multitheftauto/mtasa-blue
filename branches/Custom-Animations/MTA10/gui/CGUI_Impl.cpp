@@ -20,6 +20,11 @@ using std::list;
 #define CGUI_MTA_DEFAULT_FONT       "tahoma.ttf"        // %WINDIR%/font/<...>
 #define CGUI_MTA_DEFAULT_FONT_BOLD  "tahomabd.ttf"      // %WINDIR%/font/<...>
 #define CGUI_MTA_CLEAR_FONT         "verdana.ttf"       // %WINDIR%/font/<...>
+
+#define CGUI_MTA_DEFAULT_REG        "Tahoma (TrueType)"
+#define CGUI_MTA_DEFAULT_REG_BOLD   "Tahoma Bold (TrueType)"
+#define CGUI_MTA_CLEAR_REG          "Verdana (TrueType)"
+
 #define CGUI_MTA_SUBSTITUTE_FONT    "cgui/unifont-5.1.20080907.ttf"  // GTA/MTA/<...>
 #define CGUI_MTA_SANS_FONT          "cgui/sans.ttf"     // GTA/MTA/<...>
 #define CGUI_SA_HEADER_FONT         "cgui/saheader.ttf" // GTA/MTA/<...>
@@ -70,15 +75,14 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
 
     m_pFontManager->setSubstituteFont ( CGUI_MTA_SUBSTITUTE_FONT, 9 );
 
+    // Window fonts first
+    m_pDefaultFont = (CGUIFont_Impl*) CreateFntFromWinFont ( "default-normal", CGUI_MTA_DEFAULT_REG, CGUI_MTA_DEFAULT_FONT, 9, 0 );
+    m_pSmallFont = (CGUIFont_Impl*) CreateFntFromWinFont ( "default-small", CGUI_MTA_DEFAULT_REG, CGUI_MTA_DEFAULT_FONT, 7, 0 );
+    m_pBoldFont = (CGUIFont_Impl*) CreateFntFromWinFont ( "default-bold-small", CGUI_MTA_DEFAULT_REG_BOLD, CGUI_MTA_DEFAULT_FONT_BOLD, 8, 0 );
+    m_pClearFont = (CGUIFont_Impl*) CreateFntFromWinFont ( "clear-normal", CGUI_MTA_CLEAR_REG, CGUI_MTA_CLEAR_FONT, 9 );
+
 	try
 	{
-
-        m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", PathJoin ( strFontsPath, CGUI_MTA_DEFAULT_FONT ), 9, 0 );
-        m_pSmallFont = (CGUIFont_Impl*) CreateFnt ( "default-small", PathJoin ( strFontsPath, CGUI_MTA_DEFAULT_FONT ), 7, 0 );
-
-        m_pBoldFont = (CGUIFont_Impl*) CreateFnt ( "default-bold-small", PathJoin ( strFontsPath, CGUI_MTA_DEFAULT_FONT_BOLD ), 8, 0 );
-
-        m_pClearFont = (CGUIFont_Impl*) CreateFnt ( "clear-normal", PathJoin ( strFontsPath, CGUI_MTA_CLEAR_FONT ), 9 );
         m_pSAHeaderFont = (CGUIFont_Impl*) CreateFnt ( "sa-header", CGUI_SA_HEADER_FONT, CGUI_SA_HEADER_SIZE, 0, true );
         m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, true );
         m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, false );
@@ -149,6 +153,13 @@ void CGUI_Impl::SetSkin ( const char* szName )
     // The transfer box is not visible by default
     m_bTransferBoxVisible = false;
 }
+
+
+void CGUI_Impl::SetBidiEnabled ( bool bEnabled )
+{
+    m_pSystem->SetBidiEnabled ( bEnabled );
+}
+
 
 void CGUI_Impl::SubscribeToMouseEvents()
 {
@@ -312,61 +323,16 @@ eInputMode CGUI_Impl::GetGUIInputMode( void )
     return m_eInputMode;
 }
 
-eInputMode CGUI_Impl::GetInputModeFromString ( const std::string& a_rstrMode ) const
+CEGUI::String CGUI_Impl::GetUTFString ( const char* szInput )
 {
-    const char* szMode = a_rstrMode.c_str();
-    if ( stricmp(szMode, "allow_binds") == 0 )
-    {
-        return INPUTMODE_ALLOW_BINDS;
-    }
-    else if ( stricmp(szMode, "no_binds") == 0 )
-    {
-        return INPUTMODE_NO_BINDS;
-    }
-    else if ( stricmp(szMode, "no_binds_when_editing") == 0 )
-    {
-        return INPUTMODE_NO_BINDS_ON_EDIT;
-    }
-    else
-    {
-        return INPUTMODE_INVALID;
-    }
+    CEGUI::String strUTF = (CEGUI::utf8*)szInput; //Convert into a CEGUI String
+    return strUTF;
 }
 
- 
-bool CGUI_Impl::GetStringFromInputMode ( eInputMode a_eMode, std::string& a_rstrResult ) const
+CEGUI::String CGUI_Impl::GetUTFString ( const std::string& strInput )
 {
-    switch (a_eMode)
-    {
-    case INPUTMODE_ALLOW_BINDS:
-        {
-            a_rstrResult = "allow_binds";
-            return true;
-        }
-    case INPUTMODE_NO_BINDS:            
-        {
-            a_rstrResult = "no_binds";
-            return true;
-        }
-    case INPUTMODE_NO_BINDS_ON_EDIT:    
-        {
-            a_rstrResult = "no_binds_when_editing";
-            return true;
-        }
-    default:                           
-        return false;
-    }
-}
-
-CEGUI::String CGUI_Impl::GetUTFString ( const std::string strInput )
-{
-    std::wstring strUTF = MbUTF8ToUTF16(strInput); //Convert to a typical wide string
-    return GetUTFString ( strUTF );
-}
-
-CEGUI::String CGUI_Impl::GetUTFString ( const std::wstring strLine )
-{
-    return CEGUI::String((CEGUI::utf8*)UTF16ToMbUTF8(GetBidiString(strLine)).c_str()); //Convert into a CEGUI String
+    CEGUI::String strUTF = (CEGUI::utf8*)strInput.c_str(); //Convert into a CEGUI String
+    return strUTF;
 }
 
 void CGUI_Impl::ProcessCharacter ( unsigned long ulCharacter )
@@ -408,6 +374,41 @@ CGUIEdit* CGUI_Impl::_CreateEdit ( CGUIElement_Impl* pParent, const char* szText
 CGUIFont* CGUI_Impl::CreateFnt ( const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, bool bAutoScale )
 {
     return new CGUIFont_Impl ( this, szFontName, szFontFile, uSize, uFlags, bAutoScale );
+}
+
+CGUIFont* CGUI_Impl::CreateFntFromWinFont ( const char* szFontName, const char* szFontWinReg, const char* szFontWinFile, unsigned int uSize, unsigned int uFlags, bool bAutoScale )
+{
+    SString strFontWinRegName = GetSystemRegistryValue ( (uint)HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", szFontWinReg );
+    SString strWinFontsPath = PathJoin ( SharedUtil::GetWindowsDirectory (), "fonts" );
+
+    // Compile a list of places to look
+    std::vector < SString > lookList;
+    lookList.push_back ( PathJoin ( strWinFontsPath, strFontWinRegName ) );
+    lookList.push_back ( PathJoin ( "cgui", szFontWinFile ) );
+    lookList.push_back ( PathJoin ( strWinFontsPath, szFontWinFile ) );
+
+    // Try each place
+    CGUIFont* pResult = NULL;
+    for ( uint i = 0 ; i < lookList.size () ; i++ )
+    {
+        if ( FileExists ( lookList[i] ) )
+        {
+	        try
+	        {
+                pResult = (CGUIFont_Impl*) CreateFnt ( szFontName, lookList[i], uSize, uFlags, bAutoScale );
+	        }
+	        catch ( CEGUI::InvalidRequestException e ) {}
+        }
+
+        if ( pResult )
+            break;
+    }
+    if ( !pResult )
+    {
+        BrowseToSolution ( "create-fonts", true, true, true, SString ( "Error loading font!\n\n(%s)", szFontWinFile ) );
+    }
+
+    return pResult;
 }
 
 
@@ -517,7 +518,7 @@ bool CGUI_Impl::LoadImageset ( const SString& strFilename )
 {
     try
     {
-        return GetImageSetManager()->createImageset ( strFilename ) != NULL;
+        return GetImageSetManager()->createImageset ( strFilename, "", true ) != NULL;
     }
 	catch (CEGUI::AlreadyExistsException exc)
     {
@@ -728,7 +729,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                 if ( strTemp.length () > 0 )
                 {
                     // Convert it to Unicode
-                    std::wstring strUTF = GetBidiString(MbUTF8ToUTF16(strTemp.c_str()));
+                    std::wstring strUTF = MbUTF8ToUTF16(strTemp.c_str());
 
                     // Open and empty the clipboard
                     OpenClipboard ( NULL );
@@ -788,7 +789,6 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                             iSelectionLength = WndEdit->getSelectionLength();
                             iMaxLength = WndEdit->getMaxTextLength();
                             iCaratIndex = WndEdit->getCaratIndex();
-                            strEditText = WndEdit->getText();
                         }
                         else
                         {
@@ -804,11 +804,10 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                             iSelectionLength = WndEdit->getSelectionLength();
                             iMaxLength = WndEdit->getMaxTextLength();
                             iCaratIndex = WndEdit->getCaratIndex();
-                            strEditText = WndEdit->getText();
                             bReplaceNewLines = false;
                         }
 
-                        std::wstring strClipboardText = GetBidiString(ClipboardBuffer);
+                        std::wstring strClipboardText = ClipboardBuffer;
                         size_t iNewlineIndex;
 
                         // Remove the newlines inserting spaces instead
@@ -1496,6 +1495,11 @@ CGUITabPanel* CGUI_Impl::CreateTabPanel ( CGUITab* pParent )
 CGUITabPanel* CGUI_Impl::CreateTabPanel ( void )
 {
     return _CreateTabPanel ( NULL );
+}
+
+CGUIScrollPane* CGUI_Impl::CreateScrollPane ( void )
+{
+    return _CreateScrollPane ( NULL );
 }
 
 CGUIScrollPane* CGUI_Impl::CreateScrollPane ( CGUIElement* pParent )

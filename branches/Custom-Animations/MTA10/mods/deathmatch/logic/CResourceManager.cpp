@@ -31,7 +31,7 @@ CResourceManager::~CResourceManager ( void )
         CResource* pResource = m_resources.back ();
 
         CLuaArguments Arguments;
-        Arguments.PushUserData ( pResource );
+        Arguments.PushResource ( pResource );
         pResource->GetResourceEntity ()->CallEvent ( "onClientResourceStop", Arguments, true );
         delete pResource;
 
@@ -39,9 +39,9 @@ CResourceManager::~CResourceManager ( void )
     }
 }
 
-CResource* CResourceManager::Add ( unsigned short usID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity )
+CResource* CResourceManager::Add ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity )
 {
-    CResource* pResource = new CResource ( usID, szResourceName, pResourceEntity, pResourceDynamicEntity );
+    CResource* pResource = new CResource ( usNetID, szResourceName, pResourceEntity, pResourceDynamicEntity );
     if ( pResource )
     {
         m_resources.push_back ( pResource );
@@ -51,15 +51,23 @@ CResource* CResourceManager::Add ( unsigned short usID, char* szResourceName, CC
 }
 
 
-CResource* CResourceManager::GetResource ( unsigned short usID )
+CResource* CResourceManager::GetResourceFromNetID ( unsigned short usNetID )
 {
     list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
-        if ( ( *iter )->GetID() == usID )
+        if ( ( *iter )->GetNetID() == usNetID )
             return ( *iter );
     }
     return NULL;
+}
+
+
+CResource* CResourceManager::GetResourceFromScriptID ( uint uiScriptID )
+{
+    CResource* pResource = (CResource*) CIdArray::FindEntry ( uiScriptID, EIdClass::RESOURCE );
+    dassert ( !pResource || ListContains ( m_resources, pResource ) );
+    return pResource;
 }
 
 
@@ -68,7 +76,7 @@ CResource* CResourceManager::GetResource ( const char* szResourceName )
     list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
-        if ( strcmp ( ( *iter )->GetName(), szResourceName ) == 0 )
+        if ( stricmp ( ( *iter )->GetName(), szResourceName ) == 0 )
             return ( *iter );
     }
     return NULL;
@@ -86,9 +94,9 @@ void CResourceManager::LoadUnavailableResources ( CClientEntity *pRootEntity )
 }
 
 
-bool CResourceManager::RemoveResource ( unsigned short usID )
+bool CResourceManager::RemoveResource ( unsigned short usNetID )
 {
-    CResource* pResource = GetResource ( usID );
+    CResource* pResource = GetResourceFromNetID ( usNetID );
     if ( pResource )
     {
         Remove ( pResource );
@@ -132,6 +140,14 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
 bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath )
 {
     ReplaceOccurrencesInString ( strInput, "\\", "/" );
+    eAccessType accessType = ACCESS_PUBLIC;
+
+    if ( strInput[0] == '@' )
+    {
+        accessType = ACCESS_PRIVATE;
+        strInput = strInput.substr ( 1 );
+    }
+
     if ( strInput[0] == ':' )
     {
         unsigned int iEnd = strInput.find_first_of("/");
@@ -144,7 +160,7 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
                 strMetaPath = strInput.substr(iEnd+1);
                 if ( IsValidFilePath ( strMetaPath.c_str() ) )
                 {
-                    strPath = pResource->GetResourceDirectoryPath() + std::string("/") + strMetaPath;
+                    strPath = PathJoin ( pResource->GetResourceDirectoryPath ( accessType ), strMetaPath );
                     return true;
                 }
             }
@@ -152,7 +168,7 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
     }
     else if ( pResource && IsValidFilePath ( strInput.c_str() ) )
     {
-        strPath = pResource->GetResourceDirectoryPath() + std::string("/") + strInput;
+        strPath = PathJoin ( pResource->GetResourceDirectoryPath ( accessType ), strInput );
         strMetaPath = strInput;
         return true;
     }

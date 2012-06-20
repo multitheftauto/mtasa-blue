@@ -190,7 +190,8 @@ bool CResourceMapItem::HandleNode ( CXMLNode& Node, CElement* pParent, vector < 
     }
     else if ( strBuffer.compare ( "object" ) == 0 )
     {
-        pNode = m_pObjectManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
+        bool bIsLowLod = false;
+        pNode = m_pObjectManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents, bIsLowLod );
     }
     else if ( strBuffer.compare ( "blip" ) == 0 )
     {
@@ -296,7 +297,7 @@ void CResourceMapItem::LinkupElements ( void )
     {
         CVehicle* pVehicle = *iterVehicles;
 
-        char* szAttachToID = pVehicle->GetAttachToID ();
+        const char* szAttachToID = pVehicle->GetAttachToID ();
         if ( szAttachToID [ 0 ] )
         {
             CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
@@ -309,7 +310,7 @@ void CResourceMapItem::LinkupElements ( void )
     for ( ; iterPlayers != m_pPlayerManager->IterEnd (); iterPlayers++ )
     {
         CPlayer* pPlayer = *iterPlayers;
-        char* szAttachToID = pPlayer->GetAttachToID ();
+        const char* szAttachToID = pPlayer->GetAttachToID ();
         if ( szAttachToID [ 0 ] )
         {
             CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
@@ -318,11 +319,11 @@ void CResourceMapItem::LinkupElements ( void )
         }
     }
 
-    list < CObject* > ::const_iterator iterObjects = m_pObjectManager->IterBegin ();
+    CObjectListType::const_iterator iterObjects = m_pObjectManager->IterBegin ();
     for ( ; iterObjects != m_pObjectManager->IterEnd (); iterObjects++ )
     {
         CObject* pObject = *iterObjects;
-        char* szAttachToID = pObject->GetAttachToID ();
+        const char* szAttachToID = pObject->GetAttachToID ();
         if ( szAttachToID [ 0 ] )
         {
             CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
@@ -335,7 +336,7 @@ void CResourceMapItem::LinkupElements ( void )
     for ( ; iterBlips != m_pBlipManager->IterEnd (); iterBlips++ )
     {
         CBlip* pBlip = *iterBlips;
-        char* szAttachToID = pBlip->GetAttachToID ();
+        const char* szAttachToID = pBlip->GetAttachToID ();
         if ( szAttachToID [ 0 ] )
         {
             CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );

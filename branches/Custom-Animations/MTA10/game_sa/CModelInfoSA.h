@@ -30,6 +30,8 @@ class CPedModelInfoSAInterface;
 
 // CModelInfo/ARRAY_ModelInfo __thiscall to load/replace vehicle models
 #define     FUNC_LoadVehicleModel           0x4C95C0
+#define     FUNC_LoadWeaponModel            0x4C9910
+#define     FUNC_LoadPedModel               0x4C7340
 
 #define     DWORD_AtomicsReplacerModelID    0xB71840
 #define     FUNC_AtomicsReplacer            0x537150
@@ -70,6 +72,7 @@ class CPedModelInfoSAInterface;
  */
 class CBaseModelInfo_SA_VTBL
 {
+public:
     DWORD           Destructor;
     DWORD           AsAtomicModelInfoPtr;           // (void)
     DWORD           AsDamageAtomicModelInfoPtr;     // (void)
@@ -228,6 +231,7 @@ protected:
     CBaseModelInfoSAInterface *     m_pInterface;
     DWORD                           m_dwModelID;
     DWORD                           m_dwReferences;
+    DWORD                           m_dwPendingInterfaceRef;
     CColModel*                      m_pCustomColModel;
     CColModelSAInterface*           m_pOriginalColModelInterface;
     RpClump*                        m_pCustomClump;
@@ -241,6 +245,9 @@ public:
     CPedModelInfoSAInterface *      GetPedModelInfoInterface ( void )              { return reinterpret_cast < CPedModelInfoSAInterface * > ( GetInterface () ); }
 
     DWORD                           GetModel                ( void )               { return m_dwModelID; }
+    uint                            GetAnimFileIndex        ( void );
+
+    bool                            IsPlayerModel           ( void );
 
     BOOL                            IsBoat                  ( void );
     BOOL                            IsCar                   ( void );
@@ -258,11 +265,11 @@ public:
 
     char *                          GetNameIfVehicle        ( void );
 
-    VOID                            Request                 ( bool bAndLoad = false, bool bWaitForLoad = false, bool bHighPriority = false );
+    VOID                            Request                 ( EModelRequestType requestType, const char* szTag );
     VOID                            Remove                  ( void );
     BYTE                            GetLevelFromPosition    ( CVector * vecPosition );
     BOOL                            IsLoaded                ( void );
-    void                            InternalRemoveGTARef    ( void );
+    BOOL                            DoIsLoaded              ( void );
     BYTE                            GetFlags                ( void );
     CBoundingBox *                  GetBoundingBox          ( void );
     bool                            IsValid                 ( void );
@@ -274,11 +281,9 @@ public:
     void                            RestreamIPL             ( void );
     static void                     StaticFlushPendingRestreamIPL ( void );
 
-    void                            AddRef                  ( bool bWaitForLoad, bool bHighPriority = false );
+    void                            ModelAddRef             ( EModelRequestType requestType, const char* szTag );
     int                             GetRefCount             ( void );
     void                            RemoveRef               ( bool bRemoveExtraGTARef = false );
-    void                            MaybeRemoveExtraGTARef  ( void );
-    void                            DoRemoveExtraGTARef     ( void );
 
     // CVehicleModelInfo specific
     short                           GetAvailableVehicleMod  ( unsigned short usSlot );
@@ -287,9 +292,6 @@ public:
     unsigned int                    GetNumRemaps            ( void );
     void*                           GetVehicleSuspensionData( void );
     void*                           SetVehicleSuspensionData( void* pSuspensionLines );
-
-    // Upgrades only!
-    void                            RequestVehicleUpgrade   ( void );
 
     // ONLY use for peds
     void                            GetVoice                ( short* psVoiceType, short* psVoice );
@@ -308,7 +310,9 @@ public:
 
     inline RwObject*                GetRwObject             ( void ) { return m_pInterface ? m_pInterface->pRwObject : NULL; }
 
+    // CModelInfoSA methods
     void                            MakePedModel            ( char * szTexture );
+
 };
 
 #endif

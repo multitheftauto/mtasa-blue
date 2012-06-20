@@ -63,11 +63,10 @@ public:
                                 CResourceManager                ( void );
                                 ~CResourceManager               ( void );
 
-    CResource *                 Load                            ( const char * szResourceName );
+    CResource *                 Load                            ( bool bIsZipped, const char * szAbsPath, const char * szResourceName );
     void                        Unload                          ( CResource * resource );
     CResource *                 GetResource                     ( const char * szResourceName );
-    CResource *                 GetResource                     ( unsigned short usID );
-    bool                        Exists                          ( CResource* pResource );
+    CResource*                  GetResourceFromScriptID         ( uint uiScriptID );
     void                        UnloadRemovedResources          ( void );
     void                        CheckResourceDependencies       ( void );
     void                        ListResourcesLoaded             ( void );
@@ -75,12 +74,13 @@ public:
     std::list < CResource* > ::const_iterator  IterEnd          ( void )            { return m_resources.end (); };
 
     bool                        Refresh                         ( bool bRefreshAll = false );
-    void                        Upgrade                         ( void );
+    void                        UpgradeAll                      ( void );
+    void                        CheckAll                        ( void );
     inline unsigned int         GetResourceLoadedCount          ( void )            { return m_uiResourceLoadedCount; }
     inline unsigned int         GetResourceFailedCount          ( void )            { return m_uiResourceFailedCount; }
     void                        OnPlayerJoin                    ( CPlayer& Player );
     
-    char *                      GetResourceDirectory            ( void );
+    const char*                 GetResourceDirectory            ( void );
 
     bool                        StartResource                   ( CResource* pResource, list < CResource* > * dependents = NULL, bool bStartedManually = false, bool bStartIncludedResources = true, bool bConfigs = true, bool bMaps = true, bool bScripts = true, bool bHTML = true, bool bClientConfigs = true, bool bClientScripts = true, bool bClientFiles = true );
     bool                        Reload                          ( CResource* pResource );
@@ -97,21 +97,50 @@ public:
     CResource*                  GetResourceFromLuaState         ( struct lua_State* luaVM );
     bool                        Install                         ( char * szURL, char * szName );
 
-    CResource*                  CreateResource                  ( char* szResourceName );
-    CResource*                  CopyResource                    ( CResource* pSourceResource, const char* szNewResourceName );
+    CResource*                  CreateResource                  ( const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus );
+    CResource*                  CopyResource                    ( CResource* pSourceResource, const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus );
+    CResource*                  RenameResource                  ( CResource* pSourceResource, const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus );
+    bool                        DeleteResource                  ( const SString& strResourceName, SString& strOutStatus );
+
+    SString                     GetResourceTrashDir             ( void );
+    bool                        MoveDirToTrash                  ( const SString& strPathDirName );
+    SString                     GetResourceOrganizationalPath   ( CResource* pResource );
 
     static bool                 ParseResourcePathInput          ( std::string strInput, CResource*& pResource, std::string* pstrPath, std::string* pstrMetaPath );
 
+    void                        NotifyResourceVMOpen            ( CResource* pResource, CLuaMain* pVM );
+    void                        NotifyResourceVMClose           ( CResource* pResource, CLuaMain* pVM );
+
+    void                        AddResourceToLists              ( CResource* pResource );
+    void                        RemoveResourceFromLists         ( CResource* pResource );
+
+    void                        ApplyMinClientRequirement       ( CResource* pResource, const SString& strMinClientRequirement );
+    void                        RemoveMinClientRequirement      ( CResource* pResource );
+    void                        ReevaluateMinClientRequirement  ( void );
+    SString                     GetMinClientRequirement         ( void )            { return m_strMinClientRequirement; }
+
+    void                        ApplySyncMapElementDataOption       ( CResource* pResource, bool bSyncMapElementData );
+    void                        RemoveSyncMapElementDataOption      ( CResource* pResource );
+    void                        ReevaluateSyncMapElementDataOption  ( void );
 
 private:
-    char                        m_szResourceDirectory[260];
+    SString                     m_strResourceDirectory;
     CMappedList < CResource* >  m_resources;
     unsigned int                m_uiResourceLoadedCount;
     unsigned int                m_uiResourceFailedCount;
     bool                        m_bResourceListChanged;
     list<CResource *>           m_resourcesToStartAfterRefresh;
 
+    // Maps to speed things up
+    std::map < CResource*, lua_State* >     m_ResourceLuaStateMap;
+    std::map < lua_State*, CResource* >     m_LuaStateResourceMap;
+    std::map < SString, CResource* >        m_NameResourceMap;
+
     list<sResourceQueue>        m_resourceQueue;
+
+    SString                                 m_strMinClientRequirement;
+    std::map < CResource*, SString >        m_MinClientRequirementMap;
+    std::map < CResource*, bool >           m_SyncMapElementDataOptionMap;
 };
 
 #endif

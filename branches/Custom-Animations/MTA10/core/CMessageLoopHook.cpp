@@ -121,6 +121,26 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 
     if ( hwnd != pThis->GetHookedWindowHandle () ) return NULL;
 
+    // Handle IME if input is not for the GUI
+    if ( !g_pCore->GetLocalGUI ()->InputGoesToGUI () )
+    {
+        if ( uMsg == WM_KEYDOWN )
+        {
+            // Recover virtual key
+            if ( wParam == VK_PROCESSKEY )
+                wParam = MapVirtualKey ( lParam >> 16, MAPVK_VSC_TO_VK_EX );
+        }
+
+        if ( uMsg == WM_IME_STARTCOMPOSITION || uMsg == WM_IME_ENDCOMPOSITION || uMsg == WM_IME_COMPOSITION )
+        {
+            // Cancel, stop, block and ignore
+            HIMC himc = ImmGetContext ( hwnd );
+            ImmNotifyIME ( himc, NI_COMPOSITIONSTR, CPS_CANCEL, 0 );
+            ImmReleaseContext ( hwnd, himc );
+            return true;
+        }
+    }
+   
     // Make sure our pointers are valid.
     if ( pThis != NULL && CLocalGUI::GetSingletonPtr ( ) != NULL && CCore::GetSingleton ().GetGame () )
     {
@@ -178,6 +198,12 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                             return true;
                         }
                     }
+                    else
+                    if ( uMsg == WM_KEYDOWN && wParam == VK_ESCAPE && !g_pCore->IsConnected () )
+                    {
+                        // If Escape is pressed and we're not playing ingame, hide certain windows
+                        CLocalGUI::GetSingleton ().GetMainMenu ()->OnEscapePressedOffLine ();
+                    }
 
                     // If F8 is pressed, we show/hide the console
                     if ( ( uMsg == WM_KEYDOWN && wParam == VK_F8 ) || ( uMsg == WM_CHAR && wParam == '`' ) )
@@ -209,7 +235,6 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                             if ( wParam == VK_TAB )
                             {
                                 CLocalGUI::GetSingleton ().GetConsole ()->SetNextAutoCompleteMatch ();
-                                return true; 
                             }
                             else
                             {
@@ -254,9 +279,6 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 
             // Lead the message through the keybinds message processor
             g_pCore->GetKeyBinds ()->ProcessMessage ( hwnd, uMsg, wParam, lParam );
-
-            // Lead the message through main menu scene, so any scenes can be aborted
-            CMainMenuScene::GetSingletonPtr ()->ProcessMessage ( hwnd, uMsg, wParam, lParam );
 
             bool bProcessed = false, bClientProcessed = false;          
 
@@ -316,9 +338,14 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                 */
 
 
-                // Call GTA's window procedure.
-                return CallWindowProcW ( pThis->m_HookedWindowProc, hwnd, uMsg, wParam, lParam );
+                // If we handled mouse steering, don't let GTA.
+                //if ( !CCore::GetSingleton ().GetMouseControl()->ProcessMouseMove ( uMsg, wParam, lParam ) )
+                    // Call GTA's window procedure.
+                    return CallWindowProcW ( pThis->m_HookedWindowProc, hwnd, uMsg, wParam, lParam );
             }
+
+            // Don't allow DefWindowProc if processed here. (Important for IME)
+            return true; 
         }
     }
 

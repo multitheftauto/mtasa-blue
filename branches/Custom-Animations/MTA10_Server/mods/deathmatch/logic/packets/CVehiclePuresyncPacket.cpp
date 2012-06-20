@@ -51,11 +51,16 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 return false;
             pSourcePlayer->SetPosition ( position.data.vecPosition );
 
+            // Read the camera orientation
+            CVector vecCamPosition, vecCamFwd;
+            ReadCameraOrientation ( position.data.vecPosition, BitStream, vecCamPosition, vecCamFwd );
+            pSourcePlayer->SetCameraOrientation ( vecCamPosition, vecCamFwd );
+
             // Jax: don't allow any outdated packets through
-            unsigned char ucSeat;
-            if ( !BitStream.Read ( ucSeat ) )
+            SOccupiedSeatSync seat;
+            if ( !BitStream.Read ( &seat ) )
                 return false;
-            if ( ucSeat != pSourcePlayer->GetOccupiedVehicleSeat () )
+            if ( seat.data.ucSeat != pSourcePlayer->GetOccupiedVehicleSeat () )
             {
                 // Mis-matching seats can happen when we warp into a different one,
                 // which will screw up the whole packet
@@ -94,7 +99,8 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 SVehicleHealthSync health;
                 if ( !BitStream.Read ( &health ) )
                     return false;
-                float fPreviousHealth = pVehicle->GetHealth ();                
+
+                float fPreviousHealth = pVehicle->GetLastSyncedHealth ( );
                 float fHealth = health.data.fValue;
 
                 // Less than last time?
@@ -112,6 +118,9 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                     }
                 }
                 pVehicle->SetHealth ( fHealth );
+                // Stops sync + fixVehicle/setElementHealth conflicts triggering onVehicleDamage by having a seperate stored float keeping track of ONLY what comes in via sync
+                // - Caz
+                pVehicle->SetLastSyncedHealth( fHealth );
 
                 // Trailer chain
                 CVehicle* pTowedByVehicle = pVehicle;
@@ -123,7 +132,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
                 while ( bHasTrailer )
                 {
-                    BitStream.ReadCompressed ( TrailerID );
+                    BitStream.Read ( TrailerID );
                     CElement* pElement = CElementIDs::GetElement ( TrailerID );
                     if ( pElement )
                         pTrailer = static_cast < CVehicle* > ( pElement );
@@ -274,6 +283,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             pSourcePlayer->SetWearingGoggles ( flags.data.bIsWearingGoggles );
             pSourcePlayer->SetDoingGangDriveby ( flags.data.bIsDoingGangDriveby );            
 
+
             // Weapon sync
             if ( flags.data.bHasAWeapon )
             {
@@ -285,6 +295,11 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
                 if ( flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo ( slot.data.uiSlot ) )
                 {
+                    
+                    eWeaponType eWeapon = static_cast < eWeaponType > ( pSourcePlayer->GetWeaponType ( slot.data.uiSlot ) );
+                    float fSkill = pSourcePlayer->GetPlayerStat ( CWeaponStatManager::GetSkillStatIndex ( eWeapon ) );
+                    float fWeaponRange = g_pGame->GetWeaponStatManager ( )->GetWeaponRangeFromSkillLevel ( eWeapon, fSkill );
+
                     // Read the ammo states
                     SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), false, true );
                     if ( !BitStream.Read ( &ammo ) )
@@ -292,7 +307,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                     pSourcePlayer->SetWeaponAmmoInClip ( ammo.data.usAmmoInClip );
 
                     // Read aim data
-                    SWeaponAimSync aim ( pSourcePlayer->GetWeaponRange (), true );
+                    SWeaponAimSync aim ( fWeaponRange, true );
                     if ( !BitStream.Read ( &aim ) )
                         return false;
                     pSourcePlayer->SetAimDirection ( aim.data.fArm );
@@ -367,7 +382,7 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.WriteCompressed ( usLatency );
 
             // Write the keysync data
-            CControllerState ControllerState = pSourcePlayer->GetPad ()->GetCurrentControllerState ();
+            const CControllerState& ControllerState = pSourcePlayer->GetPad ()->GetCurrentControllerState ();
             WriteFullKeysync ( ControllerState, BitStream );
 
             // Write the vehicle matrix only if he's the driver

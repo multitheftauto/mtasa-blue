@@ -104,14 +104,14 @@ inline bool CPoolsSA::AddVehicleToPool ( CVehicleSA* pVehicle )
     return true;
 }
 
-CVehicle* CPoolsSA::AddVehicle ( eVehicleTypes eVehicleType )
+CVehicle* CPoolsSA::AddVehicle ( eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2 )
 {
     DEBUG_TRACE("CVehicle* CPoolsSA::AddVehicle ( eVehicleTypes eVehicleType )");
     CVehicleSA* pVehicle = NULL;
 
     if ( m_vehiclePool.ulCount < MAX_VEHICLES )
     {
-        pVehicle = new CVehicleSA ( eVehicleType );
+        pVehicle = new CVehicleSA ( eVehicleType, ucVariation, ucVariation2 );
         if ( ! AddVehicleToPool ( pVehicle ) )
         {
             delete pVehicle;
@@ -361,7 +361,7 @@ inline bool CPoolsSA::AddObjectToPool ( CObjectSA* pObject )
     return true;
 }
 
-CObject* CPoolsSA::AddObject ( DWORD dwModelID )
+CObject* CPoolsSA::AddObject ( DWORD dwModelID, bool bLowLod, bool bBreakable )
 {
     DEBUG_TRACE("CObject * CPoolsSA::AddObject ( DWORD dwModelID )");
 
@@ -369,45 +369,23 @@ CObject* CPoolsSA::AddObject ( DWORD dwModelID )
 
     if ( m_objectPool.ulCount < MAX_OBJECTS )
     {
-        pObject = new CObjectSA ( dwModelID );
+        pObject = new CObjectSA ( dwModelID, bBreakable );
+
+        if ( bLowLod )
+        {
+            pObject->m_pInterface->bUsesCollision = 0;
+            pObject->m_pInterface->bDontCastShadowsOn = 1; 
+            // Set super hacky flag to indicate this is a special low lod object
+            pObject->m_pInterface->SetIsLowLodEntity ();
+        }
+        else
+            pObject->m_pInterface->SetIsHighLodEntity ();
+
 
         if ( ! AddObjectToPool ( pObject ) )
         {
             delete pObject;
             pObject = NULL;
-        }
-    }
-
-    return pObject;
-}
-
-CObject* CPoolsSA::AddObject ( DWORD* pGameInterface )
-{
-    DEBUG_TRACE("CObject* CPoolsSA::AddObject ( DWORD* pGameInterface )");
-
-    CObjectSA* pObject = NULL;
-
-    if ( m_objectPool.ulCount < MAX_OBJECTS )
-    {
-        CObjectSAInterface* pInterface = reinterpret_cast < CObjectSAInterface* > ( pGameInterface );
-        if ( pInterface )
-        {
-            // Make sure that it's not already in the objects pool
-            objectPool_t::mapType::iterator iter = m_objectPool.map.find ( pInterface );
-            if ( iter != m_objectPool.map.end () )
-            {
-                pObject = (*iter).second;
-            }
-            else
-            {
-                // Create it
-                pObject = new CObjectSA ( pInterface );
-                if ( ! AddObjectToPool ( pObject ) )
-                {
-                    delete pObject;
-                    pObject = NULL;
-                }
-            }
         }
     }
 
@@ -1039,7 +1017,8 @@ CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSiz
 
     // Stops the train from moving at ludacrist speeds right after creation
     // due to some glitch in the node finding in CreateMissionTrain
-    trainHead->SetMoveSpeed ( &CVector ( 0, 0, 0 ) );
+    CVector vec(0, 0, 0);
+    trainHead->SetMoveSpeed ( &vec );
 
     return trainHead;
 }
@@ -1078,9 +1057,9 @@ int CPoolsSA::GetPoolDefaultCapacity ( ePools pool )
         case OBJECT_POOL:               return 350;          // Modded to 700   @ CGameSA.cpp
         case DUMMY_POOL:                return 2500;
         case VEHICLE_POOL:              return 110;
-        case COL_MODEL_POOL:            return 10150;
+        case COL_MODEL_POOL:            return 10150;        // Modded to 12000  @ CGameSA.cpp
         case TASK_POOL:                 return 500;          // Modded to 5000   @ CGameSA.cpp
-        case EVENT_POOL:                return 200;          // Modded to 9001   @ CMultiplayerSA.cpp
+        case EVENT_POOL:                return 200;          // Modded to 5000   @ CGameSA.cpp
         case TASK_ALLOCATOR_POOL:       return 16;
         case PED_INTELLIGENCE_POOL:     return 140;
         case PED_ATTRACTOR_POOL:        return 64;
@@ -1088,7 +1067,7 @@ int CPoolsSA::GetPoolDefaultCapacity ( ePools pool )
         case NODE_ROUTE_POOL:           return 64;
         case PATROL_ROUTE_POOL:         return 32;
         case POINT_ROUTE_POOL:          return 64;
-        case POINTER_DOUBLE_LINK_POOL:  return 3200;         // Modded to 4000   @ CMultiplayerSA.cpp
+        case POINTER_DOUBLE_LINK_POOL:  return 3200;         // Modded to 8000   @ CMultiplayerSA.cpp
         case POINTER_SINGLE_LINK_POOL:  return 70000;
     }
     return 0;

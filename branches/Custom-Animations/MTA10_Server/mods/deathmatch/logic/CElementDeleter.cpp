@@ -16,27 +16,38 @@
 
 extern CGame * g_pGame;
 
-void CElementDeleter::Delete ( class CElement* pElement, bool bUnlink )
+void CElementDeleter::Delete ( class CElement* pElement, bool bUnlink, bool bUpdatePerPlayerEntities )
 {
-    if ( pElement && !IsBeingDeleted ( pElement ) )
+    if ( pElement )
     {
-        // Before we do anything, fire the on-destroy event
-        CLuaArguments Arguments;
-        pElement->CallEvent ( "onElementDestroy", Arguments );
-
-        // Add it to our list
-        if ( !pElement->IsBeingDeleted () )
+        if ( !IsBeingDeleted ( pElement ) )
         {
-            m_List.push_back ( pElement );
+            // Before we do anything, fire the on-destroy event
+            CLuaArguments Arguments;
+            pElement->CallEvent ( "onElementDestroy", Arguments );
+
+            // Add it to our list
+            if ( !pElement->IsBeingDeleted () )
+            {
+                m_List.push_back ( pElement );
+            }
+
+            // Flag it as being deleted and unlink it from the tree/managers
+            pElement->SetIsBeingDeleted ( true );
+            pElement->ClearChildren ();
+            pElement->SetParentObject ( NULL, bUpdatePerPlayerEntities );
+
+            if ( bUnlink )
+                pElement->Unlink ();
         }
-
-        // Flag it as being deleted and unlink it from the tree/managers
-        pElement->SetIsBeingDeleted ( true );
-        pElement->ClearChildren ();
-        pElement->SetParentObject ( NULL );
-
-        if ( bUnlink )
-            pElement->Unlink ();
+        else
+        {
+            if ( pElement->GetType ( ) == CElement::PLAYER )
+            {
+                // Tell the console
+                CLogger::LogPrint ( "URGENT: Report this error on bugs.mtasa.com error code: 6930-1\n" );
+            }
+        }
     }
 }
 
@@ -55,14 +66,5 @@ void CElementDeleter::Unreference ( CElement* pElement )
 
 bool CElementDeleter::IsBeingDeleted ( CElement* pElement )
 {
-    list < CElement* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        if ( pElement == *iter )
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return ListContains ( m_List, pElement );
 }

@@ -29,7 +29,7 @@
 
 class CClientVariables : public CCVarsInterface, public CSingleton < CClientVariables >
 {
-    // Sanity macros
+    // Sanity macros   << Who ever did this is idiot
     #define SAN     if(!m_pStorage) return
     #define SANGET  if(!Node(strVariable)) return false
 
@@ -57,11 +57,17 @@ public:
     void            Set                     ( const std::string& strVariable, CVector2D val );
     void            Set                     ( const std::string& strVariable, CColor val );
 
+    void            ClampValue              ( const std::string& strVariable, int iMinValue, int iMaxValue );
+    void            ClampValue              ( const std::string& strVariable, float fMinValue, float fMaxValue );
+    void            ClampValue              ( const std::string& strVariable, CColor minValue, CColor maxValue );
+    void            ClampValue              ( const std::string& strVariable, CVector2D minValue, CVector2D maxValue );
+
     bool            Exists                  ( const std::string& strVariable );
 
     bool            Load                    ( void );
     bool            IsLoaded                ( void ) { return m_bLoaded; }
     int             GetRevision             ( void ) { return m_iRevision; }
+    void            ValidateValues          ( void );
 
 private:
     CXMLNode*       Node                    ( const std::string& strVariable );

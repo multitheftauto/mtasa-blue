@@ -76,18 +76,28 @@ struct SDelayedSyncVehicleData
 
 struct SLastSyncedVehData
 {
+    SLastSyncedVehData ( void )
+    {
+        // Initialize to a known state
+        memset ( this, 0, sizeof ( *this ) );
+    }
+
     CVector             vecPosition;
     CVector             vecRotation;
     CVector             vecMoveSpeed;
     CVector             vecTurnSpeed;
     float               fHealth;
     ElementID           Trailer;
+    bool                bEngineOn;
+    bool                bDerailed;
+    bool                bIsInWater;
 };
 
 class CClientProjectile;
 
 class CClientVehicle : public CClientStreamElement
 {
+    DECLARE_CLASS( CClientVehicle, CClientStreamElement )
     friend class CClientCamera;
     friend class CClientPed;
     friend class CClientVehicleManager;
@@ -95,7 +105,7 @@ class CClientVehicle : public CClientStreamElement
 
 protected: // Use CDeathmatchVehicle constructor for now. Will get removed later when this class is
            // cleaned up.
-                                CClientVehicle          ( CClientManager* pManager, ElementID ID, unsigned short usModel );
+                                CClientVehicle          ( CClientManager* pManager, ElementID ID, unsigned short usModel, unsigned char ucVariation, unsigned char ucVariation2 );
 
 public:
                                 ~CClientVehicle         ( void );
@@ -104,7 +114,6 @@ public:
 
     inline eClientEntityType    GetType                 ( void ) const                      { return CCLIENTVEHICLE; };
 
-    void                        GetName                 ( char* szBuf );
     inline const char*          GetNamePointer          ( void )                            { return m_pModelInfo->GetNameIfVehicle (); };
     inline eClientVehicleType   GetVehicleType          ( void )                            { return m_eVehicleType; };
 
@@ -140,12 +149,14 @@ public:
     float                       GetDoorOpenRatio        ( unsigned char ucDoor );
     void                        SetSwingingDoorsAllowed ( bool bAllowed );
     bool                        AreSwingingDoorsAllowed () const;
+    void                        AllowDoorRatioSetting   ( unsigned char ucDoor, bool bAllow );
     bool                        AreDoorsLocked          ( void );
     void                        SetDoorsLocked          ( bool bLocked );
 
 private:
     void                        SetDoorOpenRatioInterpolated    ( unsigned char ucDoor, float fRatio, unsigned long ulDelay );
     void                        ResetDoorInterpolation          ();
+    void                        CancelDoorInterpolation         ( unsigned char ucDoor );
     void                        ProcessDoorInterpolation        ();
 
 public:
@@ -166,6 +177,11 @@ public:
 
     inline unsigned short       GetModel                ( void )                            { return m_usModel; };
     void                        SetModelBlocking        ( unsigned short usModel, bool bLoadImmediately = false );
+
+    inline unsigned char        GetVariant              ( void )                        { return m_ucVariation; };
+    inline unsigned char        GetVariant2             ( void )                        { return m_ucVariation2; };
+
+    void                        SetVariant              ( unsigned char ucVariant, unsigned char ucVariant2 );
 
     bool                        IsEngineBroken          ( void );
     void                        SetEngineBroken         ( bool bEngineBroken );
@@ -325,7 +341,7 @@ public:
     void                        Interpolate             ( void );
     void                        UpdateKeysync           ( void );
 
-    void                        GetInitialDoorStates    ( unsigned char * pucDoorStates );
+    void                        GetInitialDoorStates    ( SFixedArray < unsigned char, MAX_DOORS >& ucOutDoorStates );
 
     void                        AddMatrix               ( CMatrix& Matrix, double dTime, unsigned short usTickRate );
     void                        AddVelocity             ( CVector& vecVelocity );
@@ -380,8 +396,8 @@ public:
 
     void                        RemoveAllProjectiles    ( void );
 
-    static void                 SetPedOccupiedVehicle   ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat );
-    static void                 SetPedOccupyingVehicle  ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat );
+    static void                 SetPedOccupiedVehicle   ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor );
+    static void                 SetPedOccupyingVehicle  ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor );
     static void                 ValidatePedAndVehiclePair ( CClientPed* pClientPed, CClientVehicle* pVehicle );
     static void                 UnpairPedAndVehicle     ( CClientPed* pClientPed, CClientVehicle* pVehicle );
     static void                 UnpairPedAndVehicle     ( CClientPed* pClientPed );
@@ -389,6 +405,18 @@ public:
     void                        ApplyHandling           ( void );
     CHandlingEntry*             GetHandlingData         ( void );
     const CHandlingEntry*       GetOriginalHandlingData ( void )    { return m_pOriginalHandlingEntry; }
+
+    uint                            GetTimeSinceLastPush    ( void )                      { return (uint)( CTickCount::Now () - m_LastPushedTime ).ToLongLong (); }
+    void                            ResetLastPushTime       ( void )                      { m_LastPushedTime = CTickCount::Now (); }
+
+    bool                        DoesVehicleHaveSirens       ( void ) { return m_tSirenBeaconInfo.m_bOverrideSirens; }
+
+    bool                        GiveVehicleSirens           ( unsigned char ucSirenType, unsigned char ucSirenCount );
+    void                        SetVehicleSirenPosition     ( unsigned char ucSirenID, CVector vecPos );
+    void                        SetVehicleSirenMinimumAlpha ( unsigned char ucSirenID, DWORD dwPercentage );
+    void                        SetVehicleSirenColour       ( unsigned char ucSirenID, SColor tVehicleSirenColour );
+    void                        SetVehicleFlags             ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent );
+    void                        RemoveVehicleSirens         ( void );
 
 protected:
     void                        StreamIn                ( bool bInstantly );
@@ -413,9 +441,9 @@ protected:
     bool                        m_bIsVirtualized;
     CVehicle*                   m_pVehicle;
     CClientPed*                 m_pDriver;
-    CClientPed*                 m_pPassengers [8];
+    SFixedArray < CClientPed*, 8 >  m_pPassengers;
     CClientPed*                 m_pOccupyingDriver;
-    CClientPed*                 m_pOccupyingPassengers [8];
+    SFixedArray < CClientPed*, 8 >  m_pOccupyingPassengers;
     RpClump*                    m_pClump;
     short                       m_usRemoveTimer;
 
@@ -440,13 +468,14 @@ protected:
     bool                        m_bLandingGearDown;
     bool                        m_bHasAdjustableProperty;
     unsigned short              m_usAdjustablePropertyValue;
-    float                       m_fDoorOpenRatio [ 6 ];
+    SFixedArray < bool, 6 >     m_bAllowDoorRatioSetting;
+    SFixedArray < float, 6 >    m_fDoorOpenRatio;
     struct
     {
-        float                   fStart  [ 6 ];
-        float                   fTarget [ 6 ];
-        unsigned long           ulStartTime [ 6 ];
-        unsigned long           ulTargetTime [ 6 ];
+        SFixedArray < float, 6 >            fStart;
+        SFixedArray < float, 6 >            fTarget;
+        SFixedArray < unsigned long, 6 >    ulStartTime;
+        SFixedArray < unsigned long, 6 >    ulTargetTime;
     } m_doorInterp;
     bool                        m_bSwingingDoorsAllowed;
     bool                        m_bDoorsLocked;
@@ -457,10 +486,10 @@ protected:
     bool                        m_bScriptCanBeDamaged;
     bool                        m_bSyncUnoccupiedDamage;
     bool                        m_bTyresCanBurst;
-    unsigned char               m_ucDoorStates [MAX_DOORS];
-    unsigned char               m_ucWheelStates [MAX_WHEELS];
-    unsigned char               m_ucPanelStates [MAX_PANELS];
-    unsigned char               m_ucLightStates [MAX_LIGHTS];
+    SFixedArray < unsigned char, MAX_DOORS >   m_ucDoorStates;
+    SFixedArray < unsigned char, MAX_WHEELS >  m_ucWheelStates;
+    SFixedArray < unsigned char, MAX_PANELS >  m_ucPanelStates;
+    SFixedArray < unsigned char, MAX_LIGHTS >  m_ucLightStates;
     bool                        m_bJustBlewUp;
     eEntityStatus               m_NormalStatus;
     bool                        m_bColorSaved;
@@ -539,11 +568,19 @@ protected:
 
     bool                        m_bHasCustomHandling;
 
+    unsigned char               m_ucVariation;
+    unsigned char               m_ucVariation2;
+
+    CTickCount                  m_LastPushedTime;
+
 public:
+#ifdef MTA_DEBUG
     CClientPlayer *             m_pLastSyncer;
     unsigned long               m_ulLastSyncTime;
-    char *                      m_szLastSyncType;
+    const char *                m_szLastSyncType;
+#endif
     SLastSyncedVehData*         m_LastSyncedData;
+    SSirenInfo                  m_tSirenBeaconInfo;
 };
 
 #endif

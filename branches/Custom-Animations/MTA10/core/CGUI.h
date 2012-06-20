@@ -20,16 +20,9 @@ class CLocalGUI;
 #define WM_MOUSEWHEEL 0x20A // Defined only when including Windows.h -> Not getting defined? (<=XP only?)
 #endif
 
-// DirectX rendering library (some abstraction would be nice here to avoid this)
-#ifdef FORCE_GUI_DX8
-    #include "d3d/include/CD3DMGE.H"
-#else
-    #ifdef FORCE_GUI_DX9
-        #include "d3d/include/CD3DMGE_D3D9.h"
-    #else
-        #include "d3d/include/CD3DMGE_D3D9.h"
-    #endif
-#endif
+#define DIRECT3D_VERSION         0x0900
+#include "d3d9.h"
+#include "d3dx9.h"
 
 #include <gui/CGUI.h>
 
@@ -41,6 +34,7 @@ class CLocalGUI;
 #include "CSingleton.h"
 #include "CCommunityRegistration.h"
 #include "CVersionUpdater.h"
+#include "CNewsBrowser.h"
 
 #include <windows.h>
 
@@ -60,7 +54,6 @@ public:
 
     void                CreateObjects               ( IUnknown* pDevice );
     void                DestroyObjects              ( void );
-    CD3DMGEng*          GetRenderingLibrary         ( void );
 
     void                DoPulse                     ( void );
 
@@ -121,7 +114,6 @@ private:
     //CChatBox*             m_pChatBox;
     CChat*                  m_pChat;
     CDebugView*             m_pDebugView;
-    CD3DMGEng*              m_pRendererLibrary;
 
     CCommunityRegistration  m_CommunityRegistration;
     CVersionUpdaterInterface* m_pVersionUpdater;
@@ -136,6 +128,7 @@ private:
     bool                    m_bChatboxVisible;
     bool                    m_pDebugViewVisible;
     bool                    m_bGUIHasInput;
+    int                     m_uiActiveCompositionSize;
 
     int                     m_LastSettingsRevision; // the revision number the last time we saw the skin change
     SString                 m_LastSkinName;

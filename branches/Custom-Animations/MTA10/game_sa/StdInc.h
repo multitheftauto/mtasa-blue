@@ -102,3 +102,7 @@
 #include "CWaterManagerSA.h"
 #include "CPedDamageResponseSA.h"
 #include "CPedDamageResponseCalculatorSA.h"
+#include "CWeaponStatSA.h"
+#include "CWeaponStatManagerSA.h"
+#include "CShadowDataSA.h"
+#include "CBuoyancySA.h"

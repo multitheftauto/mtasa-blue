@@ -58,7 +58,7 @@ public:
     eWeaponSlot     GetSlot();
 
     VOID            SetAsCurrentWeapon();
-    CWeaponInfo     * GetInfo() { return pGame->GetWeaponInfo(internalInterface->m_eWeaponType); };
+    CWeaponInfo     * GetInfo( eWeaponSkill skill ) { return pGame->GetWeaponInfo( internalInterface->m_eWeaponType, skill ); };
 
     void            Remove ();
 };

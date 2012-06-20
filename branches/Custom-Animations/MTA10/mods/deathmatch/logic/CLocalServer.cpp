@@ -17,6 +17,17 @@ using std::list;
 extern CCoreInterface* g_pCore;
 extern CClientGame* g_pClientGame;
 
+// SResInfo - Item in list of potential resources - Used in GetResourceNameList()
+struct SResInfo
+{
+    SString strAbsPath;
+    SString strName;
+    bool bIsDir;
+    bool bPathIssue;
+    SString strAbsPathDup;
+};
+
+
 CLocalServer::CLocalServer ( const char* szConfig )
 {
     m_strConfig = szConfig;
@@ -91,10 +102,12 @@ CLocalServer::CLocalServer ( const char* szConfig )
     m_pResourceDel = reinterpret_cast < CGUIButton* > ( m_pGUI->CreateButton ( m_pTabResources, ">" ) );
     m_pResourceDel->SetPosition ( CVector2D ( 0.03f, 0.65f ), true );
     m_pResourceDel->SetSize ( CVector2D ( 0.45f, 0.05f ), true );
+    m_pResourceDel->SetZOrderingEnabled ( false );
 
     m_pResourceAdd = reinterpret_cast < CGUIButton* > ( m_pGUI->CreateButton ( m_pTabResources, "<" ) );
     m_pResourceAdd->SetPosition ( CVector2D ( 0.03f, 0.58f ), true );
     m_pResourceAdd->SetSize ( CVector2D ( 0.45f, 0.05f ), true );
+    m_pResourceAdd->SetZOrderingEnabled ( false );
 
     m_pResourcesAll = reinterpret_cast < CGUIGridList* > ( m_pGUI->CreateGridList ( m_pTabResources, false ) );
     m_pResourcesAll->SetPosition ( CVector2D ( 0.52f, 0.06f ), true );
@@ -106,10 +119,12 @@ CLocalServer::CLocalServer ( const char* szConfig )
     m_pButtonStart = reinterpret_cast < CGUIButton* > ( m_pGUI->CreateButton ( m_pWindow, "Start" ) );
     m_pButtonStart->SetPosition ( CVector2D ( 0.33f, 0.93f ), true );
     m_pButtonStart->SetSize ( CVector2D ( 0.3f, 0.05f ), true );
+    m_pButtonStart->SetZOrderingEnabled ( false );
 
     m_pButtonCancel = reinterpret_cast < CGUIButton* > ( m_pGUI->CreateButton ( m_pWindow, "Cancel" ) );
     m_pButtonCancel->SetPosition ( CVector2D ( 0.65f, 0.93f ), true );
     m_pButtonCancel->SetSize ( CVector2D ( 0.3f, 0.05f ), true );
+    m_pButtonCancel->SetZOrderingEnabled ( false );
 
     m_pResourceAdd->SetClickHandler ( GUI_CALLBACK ( &CLocalServer::OnAddButtonClick, this ) );
     m_pResourceDel->SetClickHandler ( GUI_CALLBACK ( &CLocalServer::OnDelButtonClick, this ) );
@@ -172,11 +187,9 @@ bool CLocalServer::OnCancelButtonClick ( CGUIElement *pElement )
 bool CLocalServer::Load ( void )
 {
     // Get server module root
-    SString strServerPath = g_pCore->GetInstallRoot ();
-    strServerPath += "/server/mods/deathmatch";
+    SString strServerPath = CalcMTASAPath( PathJoin ( "server", "mods", "deathmatch" ) );
 
-    SString strConfigPath ( "%s/%s", strServerPath.c_str (), m_strConfig.c_str () );
-    m_pConfig = g_pCore->GetXML ()->CreateXML ( strConfigPath );
+    m_pConfig = g_pCore->GetXML ()->CreateXML ( PathJoin ( strServerPath, m_strConfig ) );
     if ( m_pConfig && m_pConfig->Parse() )
     {
         CXMLNode* pRoot = m_pConfig->GetRootNode();
@@ -202,108 +215,129 @@ bool CLocalServer::Load ( void )
             }
         }
     }
-    //
 
-    SString strResourceDirectoryPath ( "%s/resources/*", strServerPath.c_str () );
+    // Get list of resource names
+    std::vector < SString > resourceNameList;
+    GetResourceNameList ( resourceNameList, strServerPath );
 
-    unsigned int uiCount = 0;
+    // Put resource names into the GUI
+    for ( std::vector < SString >::iterator iter = resourceNameList.begin () ; iter != resourceNameList.end () ; ++iter )
+        HandleResource ( *iter );
 
-    #ifdef WIN32
-
-        // Find all .map files in the maps folder
-        WIN32_FIND_DATA FindData;
-        HANDLE hFind = FindFirstFile ( strResourceDirectoryPath, &FindData );
-        if ( hFind != INVALID_HANDLE_VALUE )
-        {
-            // Remove the extension and store the time
-            FindData.cFileName [ strlen ( FindData.cFileName ) - 4 ] = 0;
-            // Add each file
-            do
-            {
-                if ( strcmp ( FindData.cFileName, ".." ) != 0 && strcmp ( FindData.cFileName, "." ) != 0 )
-                {
-                    char * extn = NULL;
-                    if ( ( FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) != FILE_ATTRIBUTE_DIRECTORY )
-                    {
-                        extn = &FindData.cFileName [ strlen ( FindData.cFileName ) - 3 ];
-                        FindData.cFileName [ strlen ( FindData.cFileName ) - 4 ] = 0;
-                    }
-
-                    if ( extn == NULL || strcmp ( extn, "zip" ) == 0 )
-                    {
-                        // Add the resource
-                        HandleResource ( FindData.cFileName );
-
-                        // Increment the counter
-                        uiCount++;
-                    }
-                }
-            } while ( FindNextFile ( hFind, &FindData ) );
-
-            // Close the search
-            FindClose ( hFind );
-        }
-    #else
-        DIR *Dir;
-        struct dirent *DirEntry;
-        time_t llHighestTime = 0;
-        char szPath[MAX_PATH] = {0};
-
-        if ( ( Dir = opendir ( strResourceDirectoryPath ) ) )
-        {
-            while ( ( DirEntry = readdir ( Dir ) ) != NULL )
-            {
-                // Skip . and .. entry
-                if ( strcmp ( DirEntry->d_name, "." ) != 0 && 
-                     strcmp ( DirEntry->d_name, ".." ) != 0 )
-                {
-                    struct stat Info;
-                    bool bDir = false;
-
-                    // Get the path
-                    if ( strlen(szBuffer) + strlen(DirEntry->d_name) < MAX_PATH )
-                    {
-                        strcpy ( szPath, szBuffer );
-                        unsigned long ulPathLength = strlen ( szPath );
-
-                        if ( szPath [ ulPathLength-1 ] != '/') strcat ( szPath, "/" );
-
-                        strcat ( szPath, DirEntry->d_name );
-
-                        // Determine the file stats
-                        if ( lstat ( szPath, &Info ) != -1 )
-                            bDir = S_ISDIR ( Info.st_mode );
-                        else
-                            CLogger::ErrorPrintf ( "Unable to stat %s\n", szPath );
-
-                        // Chop off the extension if it's not a dir
-                        char * extn = NULL;
-                        if ( !bDir )
-                        {
-                            extn = &(DirEntry->d_name [ strlen ( DirEntry->d_name ) - 3 ]);
-                            DirEntry->d_name [ strlen ( DirEntry->d_name ) - 4 ] = 0;
-                        }
-                        if ( extn == NULL || strcmp ( extn, "zip" ) == 0 )
-                        {
-                            // Add the resource
-                            HandleResource ( DirEntry->d_name );
-
-                            // Increment the counter
-                            uiCount++;
-                        }
-
-                    }
-                }
-
-
-            }
-
-            // Close the directory handle
-            closedir ( Dir );
-        }
-    #endif
     return true;
 }
+
+
+//
+// Scan resource directories
+//
+void CLocalServer::GetResourceNameList ( std::vector < SString >& outResourceNameList, const SString& strModPath )
+{
+    // Make list of potential active resources
+    std::map < SString, SResInfo > resInfoMap;
+
+    // Initial search dir
+    std::vector < SString > resourcesPathList;
+    resourcesPathList.push_back ( "resources" );
+
+    //SString strModPath = g_pServerInterface->GetModManager ()->GetModPath ();
+    for ( uint i = 0 ; i < resourcesPathList.size () ; i++ )
+    {
+        // Enumerate all files and directories
+        SString strResourcesRelPath = resourcesPathList[i];
+        SString strResourcesAbsPath = PathJoin ( strModPath, strResourcesRelPath, "/" );
+        std::vector < SString > itemList = FindFiles ( strResourcesAbsPath, true, true );
+
+        // Check each item
+        for ( uint i = 0 ; i < itemList.size () ; i++ )
+        {
+            SString strName = itemList[i];
+
+            // Ignore items that start with a dot
+            if ( strName[0] == '.' )
+                continue;
+
+            bool bIsDir = DirectoryExists ( PathJoin ( strResourcesAbsPath, strName ) );
+
+            // Recurse into [directories]
+            if ( bIsDir && ( strName.BeginsWith( "#" ) || ( strName.BeginsWith( "[" ) && strName.EndsWith( "]" ) ) ) )
+            {
+                resourcesPathList.push_back ( PathJoin ( strResourcesRelPath, strName ) );
+                continue;
+            }
+
+            // Extract file extention
+            SString strExt;
+            if ( !bIsDir )
+                ExtractExtention ( strName, &strName, &strExt );
+
+            // Ignore files that are not .zip
+            if ( !bIsDir && strExt != "zip" )
+                continue;
+
+            // Ignore items that have dot or space in the name
+            if ( strName.Contains ( "." ) || strName.Contains ( " " ) )
+            {
+                CLogger::LogPrintf ( "WARNING: Not loading resource '%s' as it contains illegal characters\n", *strName );
+                continue;
+            }
+
+            // Ignore dir items with no meta.xml (assume it's the result of saved files from a zipped resource)
+            if ( bIsDir && !FileExists ( PathJoin ( strResourcesAbsPath, strName, "meta.xml" ) ) )
+                continue;
+
+            // Add potential resource to list
+            SResInfo newInfo;
+            newInfo.strAbsPath = strResourcesAbsPath;
+            newInfo.strName = strName;
+            newInfo.bIsDir = bIsDir;
+            newInfo.bPathIssue = false;
+
+            // Check for duplicate
+            if ( SResInfo* pDup = MapFind ( resInfoMap, strName ) )
+            {
+                // Is path the same?
+                if ( newInfo.strAbsPath == pDup->strAbsPath )
+                {
+                    if ( newInfo.bIsDir )
+                    {
+                        // If non-zipped item, replace already existing zipped item on the same path
+                        assert ( !pDup->bIsDir );
+                        *pDup = newInfo;
+                    }
+                }
+                else
+                {
+                    // Don't load resource if there are duplicates on different paths
+                    pDup->bPathIssue = true;
+                    pDup->strAbsPathDup = newInfo.strAbsPath;
+                }
+            }
+            else
+            {
+                // No duplicate found
+                MapSet ( resInfoMap, strName, newInfo );
+            }
+        }
+    }
+
+    // Print important errors
+    for ( std::map < SString, SResInfo >::const_iterator iter = resInfoMap.begin () ; iter != resInfoMap.end () ; ++iter )
+    {
+        const SResInfo& info = iter->second;
+        if ( info.bPathIssue )
+        {
+            CLogger::ErrorPrintf ( "Not processing resource '%s' as it has duplicates on different paths:\n", *info.strName );
+            CLogger::LogPrintfNoStamp ( "                  Path #1: \"%s\"\n", *PathJoin ( PathMakeRelative ( strModPath, info.strAbsPath ), info.strName ) );
+            CLogger::LogPrintfNoStamp ( "                  Path #2: \"%s\"\n", *PathJoin ( PathMakeRelative ( strModPath, info.strAbsPathDup ), info.strName ) );
+        }
+        else
+        {
+            outResourceNameList.push_back ( info.strName );
+        }
+    }
+}
+
 
 bool CLocalServer::Save ( void )
 {
@@ -357,7 +391,7 @@ void CLocalServer::StoreConfigValue ( const char* szNode, const char* szValue )
     }
 }
 
-void CLocalServer::HandleResource ( char* szResource )
+void CLocalServer::HandleResource ( const char* szResource )
 {
     for ( int i = 0; i < m_pResourcesCur->GetRowCount(); i++ )
     {

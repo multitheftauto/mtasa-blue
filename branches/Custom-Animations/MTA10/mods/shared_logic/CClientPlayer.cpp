@@ -17,7 +17,7 @@
 
 #include <StdInc.h>
 
-CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsLocalPlayer ) : CClientPed ( pManager, 0, ID, bIsLocalPlayer )
+CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsLocalPlayer ) : ClassInit ( this ), CClientPed ( pManager, 0, ID, bIsLocalPlayer )
 {
     // Initialize
     m_pManager = pManager;
@@ -27,8 +27,6 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
 
     m_bNametagColorOverridden = false;
     m_uiPing = 0;
-
-    m_szNick [ 0 ] = '\0';
 
     m_usLatency = 0;
 
@@ -44,6 +42,8 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
 
     m_bNetworkDead = false;
 
+    m_voice = NULL;
+
     // If it's the local player, add the model
     if ( m_bIsLocalPlayer )
     {
@@ -52,11 +52,19 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
         {
             pManager->GetPlayerManager ()->SetLocalPlayer ( this );
         }
+        #ifdef VOICE_DEBUG_LOCAL_PLAYBACK
+        if ( g_pClientGame->GetVoiceRecorder()->IsEnabled() )
+            m_voice = new CClientPlayerVoice ( this, g_pClientGame->GetVoiceRecorder() );
+        #endif
     }
     else
     {
         // Enable weapon processing for players
         m_remoteDataStorage->SetProcessPlayerWeapon ( true );
+
+        // Enable voice playback for remote players
+        if ( g_pClientGame->GetVoiceRecorder()->IsEnabled() ) //If voice is enabled
+            m_voice = new CClientPlayerVoice ( this, g_pClientGame->GetVoiceRecorder() );
     }
 
     // Set all our default stats
@@ -67,7 +75,7 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
     m_ucNametagColorG = 255;
     m_ucNametagColorB = 255;
     m_ulLastNametagShow = 0;
-    SetNametagText ( m_szNick );
+    SetNametagText ( m_strNick );
     
     // Create the static icon (defaults to a warning icon for network trouble)
     m_pStatusIcon = g_pCore->GetGUI ()->CreateStaticImage ();
@@ -87,6 +95,7 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
 #ifdef MTA_DEBUG
     m_bShowingWepdata = false;
 #endif
+    m_LastPuresyncType = PURESYNC_TYPE_NONE;
 }
 
 
@@ -102,9 +111,14 @@ CClientPlayer::~CClientPlayer ( void )
     // Remove the icon
     if ( m_pStatusIcon )
     {
+        m_pStatusIcon->SetVisible ( false );
+
         delete m_pStatusIcon;
         m_pStatusIcon = NULL;
     }
+
+    if ( m_voice )
+        delete m_voice;
 }
 
 
@@ -129,8 +143,7 @@ void CClientPlayer::SetNick ( const char* szNick )
     // Valid pointer?
     if ( szNick )
     {
-        strncpy ( m_szNick, szNick, MAX_PLAYER_NICK_LENGTH );
-        m_szNick [ MAX_PLAYER_NICK_LENGTH ] = '\0';
+        m_strNick.AssignLeft ( szNick, MAX_PLAYER_NICK_LENGTH );
 
         if ( m_strNametag.empty () )
             m_strNametag = szNick;
@@ -236,10 +249,10 @@ void CClientPlayer::Reset ( void )
     SetFightingStyle ( STYLE_GRAB_KICK );
 
     // rebuild
-    RebuildModel ( true );
+    RebuildModel ();
 
     // Nametag
-    SetNametagText ( m_szNick );
+    SetNametagText ( m_strNick );
     m_bNametagShowing = true;
 
     // Otherwize default to white
@@ -249,6 +262,11 @@ void CClientPlayer::Reset ( void )
     m_bNametagColorOverridden = false;
 
     SetAlpha ( 255 );
+
+    if ( m_pStatusIcon )
+    {
+        m_pStatusIcon->SetVisible ( false );
+    }
 }
 
 
@@ -257,5 +275,24 @@ void CClientPlayer::SetNametagText ( const char * szText )
     if ( szText )
     {
         m_strNametag = szText;
+    }
+}
+
+
+void CClientPlayer::DischargeWeapon ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd )
+{
+    if ( m_pPlayerPed )
+    {
+        // Check weapon matches and is enabled for bullet sync
+        if ( weaponType == GetCurrentWeaponType () &&
+             g_pClientGame->GetWeaponTypeUsesBulletSync ( weaponType ) )
+        {
+            // Set bullet start and end points
+            m_shotSyncData->m_vecRemoteBulletSyncStart = vecStart;
+            m_shotSyncData->m_vecRemoteBulletSyncEnd = vecEnd;
+            m_shotSyncData->m_bRemoteBulletSyncVectorsValid = true;
+
+            m_pPlayerPed->GetPedIntelligence ()->DischargeCurrentWeapon ( false );
+        }
     }
 }

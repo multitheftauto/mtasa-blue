@@ -17,7 +17,7 @@ bool CObjectStartSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     if ( !m_pObject ) return false;
 
     // Write the ID
-    BitStream.WriteCompressed ( m_pObject->GetID () );
+    BitStream.Write ( m_pObject->GetID () );
 
     // Write the position
     SPositionSync position;

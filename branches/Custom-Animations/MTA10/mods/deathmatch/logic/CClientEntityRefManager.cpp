@@ -4,7 +4,7 @@
 *               (Shared logic for modifications)
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:
-*  PURPOSE:
+*  PURPOSE:     Help prevent invalid element pointers by removing refs when an element is deleted
 *  DEVELOPERS:
 *
 *****************************************************************************/
@@ -86,9 +86,6 @@ void CClientEntityRefManager::RemoveEntityRefs ( const char* szDebugInfo, ... )
 ///////////////////////////////////////////////////////////////
 void CClientEntityRefManager::OnEntityDelete ( CClientEntity* pEntity )
 {
-#ifdef MTA_DEBUG
-    OutputDebugLine ( SString ( "ms_EntityRefList.size: %d", ms_EntityRefList.size () ) );
-#endif
     std::set < CClientEntity** > ::iterator iter = ms_EntityRefList.begin ();
     for ( ; iter != ms_EntityRefList.end () ; ++iter )
     {
@@ -99,7 +96,7 @@ void CClientEntityRefManager::OnEntityDelete ( CClientEntity* pEntity )
 #ifdef MTA_DEBUG
             SString* pstrDebugInfo = MapFind ( ms_EntityRefListDebugInfo, &pOther );
             assert ( pstrDebugInfo );
-            OutputDebugLine ( SString ( "Did null %s (%08x @ %08x)", **pstrDebugInfo, pEntity, &pOther ) );     
+            OutputDebugLine ( SString ( "[EntityRef] Did null %s (%08x @ %08x)", **pstrDebugInfo, pEntity, &pOther ) );     
 #endif
         }
     }

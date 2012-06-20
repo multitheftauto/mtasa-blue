@@ -89,6 +89,32 @@ int CLuaFunctionDefs::SetVehicleTaxiLightOn ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetVehicleVariant ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            unsigned char ucVariant = -1;
+            unsigned char ucVariant2 = -1;
+            if ( CStaticFunctionDefinitions::GetVehicleVariant ( pVehicle, ucVariant, ucVariant2 ) )
+            {
+                lua_pushnumber ( luaVM, ucVariant );
+                lua_pushnumber ( luaVM, ucVariant2 );
+                return 2;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleVariant", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleVariant" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::GetVehicleColor ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
@@ -340,7 +366,7 @@ int CLuaFunctionDefs::GetVehicleSirensOn ( lua_State* luaVM )
         if ( pVehicle )
         {
             // Does the vehicle have Sirens?
-            if ( CClientVehicleManager::HasSirens ( pVehicle->GetModel () ) )
+            if ( CClientVehicleManager::HasSirens ( pVehicle->GetModel () ) || pVehicle->DoesVehicleHaveSirens ( ) )
             {
                 // Return whether it has its Sirens on or not
                 bool bSirensOn = pVehicle->IsSirenOrAlarmActive ();
@@ -478,7 +504,7 @@ int CLuaFunctionDefs::GetVehicleUpgrades ( lua_State* luaVM )
                 lua_newtable ( luaVM );
 
                 // Add all the upgrades to the table
-                unsigned short* usSlotStates = pUpgrades->GetSlotStates ();
+                const SSlotStates& usSlotStates = pUpgrades->GetSlotStates ();
 
                 unsigned int uiIndex = 0;
                 unsigned char ucSlot = 0;
@@ -515,19 +541,19 @@ int CLuaFunctionDefs::GetVehicleUpgradeSlotName ( lua_State* luaVM )
 
         if ( ulNumber < 17 )
         {
-            char szUpgradeName [32];
-            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned char > ( ulNumber ), szUpgradeName, sizeof(szUpgradeName) ) )
+            SString strUpgradeName;
+            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned char > ( ulNumber ), strUpgradeName ) )
             {
-                lua_pushstring ( luaVM, szUpgradeName );
+                lua_pushstring ( luaVM, strUpgradeName );
                 return 1;
             }
         }
         else if ( ulNumber >= 1000 && ulNumber <= 1193 )
         {
-            char szUpgradeName [32];
-            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned short > ( ulNumber ), szUpgradeName, sizeof(szUpgradeName) ) )
+            SString strUpgradeName;
+            if ( CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( static_cast < unsigned short > ( ulNumber ), strUpgradeName ) )
             {
-                lua_pushstring ( luaVM, szUpgradeName );
+                lua_pushstring ( luaVM, strUpgradeName );
                 return 1;
             }
         }
@@ -1120,11 +1146,11 @@ int CLuaFunctionDefs::GetVehicleNameFromModel ( lua_State* luaVM )
     if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
     {
         unsigned short usModel = static_cast < unsigned short > ( lua_tonumber ( luaVM, 1 ) );
-        char szVehicleName [32];
+        SString strVehicleName;
 
-        if ( CStaticFunctionDefinitions::GetVehicleNameFromModel ( usModel, szVehicleName, sizeof(szVehicleName) ) )
+        if ( CStaticFunctionDefinitions::GetVehicleNameFromModel ( usModel, strVehicleName ) )
         {
-            lua_pushstring ( luaVM, szVehicleName );
+            lua_pushstring ( luaVM, strVehicleName );
             return 1;
         }
     }
@@ -1160,6 +1186,8 @@ int CLuaFunctionDefs::CreateVehicle ( lua_State* luaVM )
         // Grab the rotation parameters
         CVector vecRotation;
         const char* szRegPlate = NULL;
+        unsigned char ucVariant = 255;
+        unsigned char ucVariant2 = 255;
         int iArgument5 = lua_type ( luaVM, 5 );
         if ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING )
         {
@@ -1175,9 +1203,23 @@ int CLuaFunctionDefs::CreateVehicle ( lua_State* luaVM )
                 {
                     vecRotation.fZ = static_cast < float > ( atof ( lua_tostring ( luaVM, 7 ) ) );
 
-                    if ( lua_type ( luaVM, 8 ) == LUA_TSTRING )
+                    int iArgument8 = lua_type ( luaVM, 8 );
+                    if ( iArgument8 == LUA_TSTRING || iArgument8 == LUA_TBOOLEAN )
                     {
-                        szRegPlate = lua_tostring ( luaVM, 8 );
+                        if ( iArgument8 == LUA_TSTRING )
+                        {
+                            szRegPlate = lua_tostring ( luaVM, 8 );
+                        }
+                        int iArgument9 = lua_type ( luaVM, 9 );
+                        if ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING )
+                        {
+                            ucVariant = static_cast < unsigned char > ( atoi ( lua_tostring ( luaVM, 9 ) ) );
+                            int iArgument10 = lua_type ( luaVM, 10 );
+                            if ( iArgument10 == LUA_TNUMBER || iArgument10 == LUA_TSTRING )
+                            {
+                                ucVariant2 = static_cast < unsigned char > ( atoi ( lua_tostring ( luaVM, 10 ) ) );
+                            }
+                        }
                     }
                 }
             }
@@ -1190,7 +1232,7 @@ int CLuaFunctionDefs::CreateVehicle ( lua_State* luaVM )
             if ( pResource )
             {
                 // Create the vehicle and return its handle
-                CClientVehicle* pVehicle = CStaticFunctionDefinitions::CreateVehicle ( *pResource, usModel, vecPosition, vecRotation, szRegPlate );
+                CClientVehicle* pVehicle = CStaticFunctionDefinitions::CreateVehicle ( *pResource, usModel, vecPosition, vecRotation, szRegPlate, ucVariant, ucVariant2 );
                 if ( pVehicle )
                 {
                     CElementGroup * pGroup = pResource->GetElementGroup();
@@ -2219,14 +2261,15 @@ int CLuaFunctionDefs::GetRadioChannel ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetRadioChannelName ( lua_State* luaVM )
 {
-    static const char* szRadioStations[] = { "Radio off", "Playback FM", "K-Rose", "K-DST",
+    static const SFixedArray < const char*, 13 > szRadioStations = { {
+        "Radio off", "Playback FM", "K-Rose", "K-DST",
         "Bounce FM", "SF-UR", "Radio Los Santos", "Radio X", "CSR 103.9", "K-Jah West",
-        "Master Sounds 98.3", "WCTR", "User Track Player" };
+        "Master Sounds 98.3", "WCTR", "User Track Player" } };
 
     if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
     {
         int iChannel = static_cast < int > ( lua_tonumber ( luaVM, 1 ) );
-        if ( iChannel >= 0 && iChannel < sizeof(szRadioStations)/sizeof(char *) ) {
+        if ( iChannel >= 0 && iChannel < NUMELMS( szRadioStations ) ) {
             lua_pushstring ( luaVM, szRadioStations [ iChannel ] );
             return 1;
         }
@@ -2519,117 +2562,121 @@ int CLuaFunctionDefs::GetOriginalHandling ( lua_State* luaVM )
         if ( eModel )
         {
             const CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData( eModel );
-
-            lua_newtable ( luaVM );
-            lua_pushnumber ( luaVM, pEntry->GetMass() );
-            lua_setfield ( luaVM, -2, "mass" );
-            lua_pushnumber ( luaVM, pEntry->GetTurnMass() );
-            lua_setfield ( luaVM, -2, "turnMass" );
-            lua_pushnumber ( luaVM, pEntry->GetDragCoeff() );
-            lua_setfield ( luaVM, -2, "dragCoeff" );
-            lua_createtable ( luaVM, 3, 0 );
-            CVector vecCenter = pEntry->GetCenterOfMass ();
-            lua_pushnumber ( luaVM, 1 );
-            lua_pushnumber ( luaVM, vecCenter.fX );
-            lua_settable ( luaVM, -3 );
-            lua_pushnumber ( luaVM, 2 );
-            lua_pushnumber ( luaVM, vecCenter.fY );
-            lua_settable ( luaVM, -3 );
-            lua_pushnumber ( luaVM, 3 );
-            lua_pushnumber ( luaVM, vecCenter.fZ );
-            lua_settable ( luaVM, -3 );
-            lua_setfield ( luaVM, -2, "centerOfMass" );
-            lua_pushnumber ( luaVM, pEntry->GetPercentSubmerged() );
-            lua_setfield ( luaVM, -2, "percentSubmerged" );
-            lua_pushnumber ( luaVM, pEntry->GetTractionMultiplier() );
-            lua_setfield ( luaVM, -2, "tractionMultiplier" );
-            CHandlingEntry::eDriveType eDriveType=pEntry->GetCarDriveType();
-            if (eDriveType==CHandlingEntry::FWD)
-                lua_pushstring(luaVM,"fwd");
-            else if (eDriveType==CHandlingEntry::RWD)
-                lua_pushstring(luaVM,"rwd");
-            else if (eDriveType==CHandlingEntry::FOURWHEEL)
-                lua_pushstring(luaVM,"awd");
-            else // What the ... (yeah, security)
-                lua_pushnil ( luaVM );
-            lua_setfield ( luaVM, -2, "driveType" );
-            CHandlingEntry::eEngineType eEngineType=pEntry->GetCarEngineType();
-            if (eEngineType==CHandlingEntry::PETROL)
-                lua_pushstring(luaVM,"petrol");
-            else if (eEngineType==CHandlingEntry::DIESEL)
-                lua_pushstring(luaVM,"diesel");
-            else if (eEngineType==CHandlingEntry::ELECTRIC)
-                lua_pushstring(luaVM,"electric");
+            if ( pEntry )
+            {
+                lua_newtable ( luaVM );
+                lua_pushnumber ( luaVM, pEntry->GetMass() );
+                lua_setfield ( luaVM, -2, "mass" );
+                lua_pushnumber ( luaVM, pEntry->GetTurnMass() );
+                lua_setfield ( luaVM, -2, "turnMass" );
+                lua_pushnumber ( luaVM, pEntry->GetDragCoeff() );
+                lua_setfield ( luaVM, -2, "dragCoeff" );
+                lua_createtable ( luaVM, 3, 0 );
+                CVector vecCenter = pEntry->GetCenterOfMass ();
+                lua_pushnumber ( luaVM, 1 );
+                lua_pushnumber ( luaVM, vecCenter.fX );
+                lua_settable ( luaVM, -3 );
+                lua_pushnumber ( luaVM, 2 );
+                lua_pushnumber ( luaVM, vecCenter.fY );
+                lua_settable ( luaVM, -3 );
+                lua_pushnumber ( luaVM, 3 );
+                lua_pushnumber ( luaVM, vecCenter.fZ );
+                lua_settable ( luaVM, -3 );
+                lua_setfield ( luaVM, -2, "centerOfMass" );
+                lua_pushnumber ( luaVM, pEntry->GetPercentSubmerged() );
+                lua_setfield ( luaVM, -2, "percentSubmerged" );
+                lua_pushnumber ( luaVM, pEntry->GetTractionMultiplier() );
+                lua_setfield ( luaVM, -2, "tractionMultiplier" );
+                CHandlingEntry::eDriveType eDriveType=pEntry->GetCarDriveType();
+                if (eDriveType==CHandlingEntry::FWD)
+                    lua_pushstring(luaVM,"fwd");
+                else if (eDriveType==CHandlingEntry::RWD)
+                    lua_pushstring(luaVM,"rwd");
+                else if (eDriveType==CHandlingEntry::FOURWHEEL)
+                    lua_pushstring(luaVM,"awd");
+                else // What the ... (yeah, security)
+                    lua_pushnil ( luaVM );
+                lua_setfield ( luaVM, -2, "driveType" );
+                CHandlingEntry::eEngineType eEngineType=pEntry->GetCarEngineType();
+                if (eEngineType==CHandlingEntry::PETROL)
+                    lua_pushstring(luaVM,"petrol");
+                else if (eEngineType==CHandlingEntry::DIESEL)
+                    lua_pushstring(luaVM,"diesel");
+                else if (eEngineType==CHandlingEntry::ELECTRIC)
+                    lua_pushstring(luaVM,"electric");
+                else
+                    lua_pushnil ( luaVM );
+                lua_setfield ( luaVM, -2, "engineType" );
+                lua_pushnumber ( luaVM, pEntry->GetNumberOfGears() );
+                lua_setfield ( luaVM, -2, "numberOfGears" );
+                lua_pushnumber ( luaVM, pEntry->GetEngineAcceleration() );
+                lua_setfield ( luaVM, -2, "engineAcceleration" );
+                lua_pushnumber ( luaVM, pEntry->GetEngineInertia() );
+                lua_setfield ( luaVM, -2, "engineInertia" );
+                lua_pushnumber ( luaVM, pEntry->GetMaxVelocity() );
+                lua_setfield ( luaVM, -2, "maxVelocity" );
+                lua_pushnumber ( luaVM, pEntry->GetBrakeDeceleration() );
+                lua_setfield ( luaVM, -2, "brakeDeceleration" );
+                lua_pushnumber ( luaVM, pEntry->GetBrakeBias() );
+                lua_setfield ( luaVM, -2, "brakeBias" );
+                lua_pushboolean ( luaVM, pEntry->GetABS() );
+                lua_setfield ( luaVM, -2, "ABS" );
+                lua_pushnumber ( luaVM, pEntry->GetSteeringLock() );
+                lua_setfield ( luaVM, -2, "steeringLock" );
+                lua_pushnumber ( luaVM, pEntry->GetTractionLoss() );
+                lua_setfield ( luaVM, -2, "tractionLoss" );
+                lua_pushnumber ( luaVM, pEntry->GetTractionBias() );
+                lua_setfield ( luaVM, -2, "tractionBias" );
+                lua_pushnumber ( luaVM, pEntry->GetSuspensionForceLevel() );
+                lua_setfield ( luaVM, -2, "suspensionForceLevel" );
+                lua_pushnumber ( luaVM, pEntry->GetSuspensionDamping() );
+                lua_setfield ( luaVM, -2, "suspensionDamping" );
+                lua_pushnumber ( luaVM, pEntry->GetSuspensionHighSpeedDamping() );
+                lua_setfield ( luaVM, -2, "suspensionHighSpeedDamping" );
+                lua_pushnumber ( luaVM, pEntry->GetSuspensionUpperLimit() );
+                lua_setfield ( luaVM, -2, "suspensionUpperLimit" );
+                lua_pushnumber ( luaVM, pEntry->GetSuspensionLowerLimit() );
+                lua_setfield ( luaVM, -2, "suspensionLowerLimit" );
+                lua_pushnumber ( luaVM, pEntry->GetSuspensionFrontRearBias() );
+                lua_setfield ( luaVM, -2, "suspensionFrontRearBias" );
+                lua_pushnumber ( luaVM, pEntry->GetSuspensionAntiDiveMultiplier() );
+                lua_setfield ( luaVM, -2, "suspensionAntiDiveMultiplier" );
+                lua_pushnumber ( luaVM, pEntry->GetCollisionDamageMultiplier() );
+                lua_setfield ( luaVM, -2, "collisionDamageMultiplier" );
+                lua_pushnumber ( luaVM, pEntry->GetSeatOffsetDistance() );
+                lua_setfield ( luaVM, -2, "seatOffsetDistance" );
+                lua_pushnumber ( luaVM, pEntry->GetHandlingFlags() );
+                lua_setfield ( luaVM, -2, "handlingFlags" );
+                lua_pushnumber ( luaVM, pEntry->GetModelFlags() );
+                lua_setfield ( luaVM, -2, "modelFlags" );
+                lua_pushnumber ( luaVM, pEntry->GetMonetary() );
+                lua_setfield ( luaVM, -2, "monetary" );
+                CHandlingEntry::eLightType eHeadType=pEntry->GetHeadLight();
+                if (eHeadType==CHandlingEntry::LONG)
+                    lua_pushstring(luaVM,"long");
+                else if (eHeadType==CHandlingEntry::SMALL)
+                    lua_pushstring(luaVM,"small");
+                else if (eHeadType==CHandlingEntry::BIG)
+                    lua_pushstring(luaVM,"big");
+                else
+                    lua_pushnil( luaVM );
+                lua_setfield ( luaVM, -2, "headLight" );
+                CHandlingEntry::eLightType eTailType=pEntry->GetTailLight();
+                if (eTailType==CHandlingEntry::LONG)
+                    lua_pushstring(luaVM,"long");
+                else if (eTailType==CHandlingEntry::SMALL)
+                    lua_pushstring(luaVM,"small");
+                else if (eTailType==CHandlingEntry::BIG)
+                    lua_pushstring(luaVM,"big");
+                else
+                    lua_pushnil( luaVM );
+                lua_setfield ( luaVM, -2, "tailLight" );
+                lua_pushnumber ( luaVM, pEntry->GetAnimGroup() );
+                lua_setfield ( luaVM, -2, "animGroup" );
+                return 1;
+            }
             else
-                lua_pushnil ( luaVM );
-            lua_setfield ( luaVM, -2, "engineType" );
-            lua_pushnumber ( luaVM, pEntry->GetNumberOfGears() );
-            lua_setfield ( luaVM, -2, "numberOfGears" );
-            lua_pushnumber ( luaVM, pEntry->GetEngineAcceleration() );
-            lua_setfield ( luaVM, -2, "engineAcceleration" );
-            lua_pushnumber ( luaVM, pEntry->GetEngineInertia() );
-            lua_setfield ( luaVM, -2, "engineInertia" );
-            lua_pushnumber ( luaVM, pEntry->GetMaxVelocity() );
-            lua_setfield ( luaVM, -2, "maxVelocity" );
-            lua_pushnumber ( luaVM, pEntry->GetBrakeDeceleration() );
-            lua_setfield ( luaVM, -2, "brakeDeceleration" );
-            lua_pushnumber ( luaVM, pEntry->GetBrakeBias() );
-            lua_setfield ( luaVM, -2, "brakeBias" );
-            lua_pushboolean ( luaVM, pEntry->GetABS() );
-            lua_setfield ( luaVM, -2, "ABS" );
-            lua_pushnumber ( luaVM, pEntry->GetSteeringLock() );
-            lua_setfield ( luaVM, -2, "steeringLock" );
-            lua_pushnumber ( luaVM, pEntry->GetTractionLoss() );
-            lua_setfield ( luaVM, -2, "tractionLoss" );
-            lua_pushnumber ( luaVM, pEntry->GetTractionBias() );
-            lua_setfield ( luaVM, -2, "tractionBias" );
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionForceLevel() );
-            lua_setfield ( luaVM, -2, "suspensionForceLevel" );
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionDamping() );
-            lua_setfield ( luaVM, -2, "suspensionDamping" );
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionHighSpeedDamping() );
-            lua_setfield ( luaVM, -2, "suspensionHighSpeedDamping" );
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionUpperLimit() );
-            lua_setfield ( luaVM, -2, "suspensionUpperLimit" );
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionLowerLimit() );
-            lua_setfield ( luaVM, -2, "suspensionLowerLimit" );
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionFrontRearBias() );
-            lua_setfield ( luaVM, -2, "suspensionFrontRearBias" );
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionAntiDiveMultiplier() );
-            lua_setfield ( luaVM, -2, "suspensionAntiDiveMultiplier" );
-            lua_pushnumber ( luaVM, pEntry->GetCollisionDamageMultiplier() );
-            lua_setfield ( luaVM, -2, "collisionDamageMultiplier" );
-            lua_pushnumber ( luaVM, pEntry->GetSeatOffsetDistance() );
-            lua_setfield ( luaVM, -2, "seatOffsetDistance" );
-            lua_pushnumber ( luaVM, pEntry->GetHandlingFlags() );
-            lua_setfield ( luaVM, -2, "handlingFlags" );
-            lua_pushnumber ( luaVM, pEntry->GetModelFlags() );
-            lua_setfield ( luaVM, -2, "modelFlags" );
-            lua_pushnumber ( luaVM, pEntry->GetMonetary() );
-            lua_setfield ( luaVM, -2, "monetary" );
-            CHandlingEntry::eLightType eHeadType=pEntry->GetHeadLight();
-            if (eHeadType==CHandlingEntry::LONG)
-                lua_pushstring(luaVM,"long");
-            else if (eHeadType==CHandlingEntry::SMALL)
-                lua_pushstring(luaVM,"small");
-            else if (eHeadType==CHandlingEntry::BIG)
-                lua_pushstring(luaVM,"big");
-            else
-                lua_pushnil( luaVM );
-            lua_setfield ( luaVM, -2, "headLight" );
-            CHandlingEntry::eLightType eTailType=pEntry->GetTailLight();
-            if (eTailType==CHandlingEntry::LONG)
-                lua_pushstring(luaVM,"long");
-            else if (eTailType==CHandlingEntry::SMALL)
-                lua_pushstring(luaVM,"small");
-            else if (eTailType==CHandlingEntry::BIG)
-                lua_pushstring(luaVM,"big");
-            else
-                lua_pushnil( luaVM );
-            lua_setfield ( luaVM, -2, "tailLight" );
-            lua_pushnumber ( luaVM, pEntry->GetAnimGroup() );
-            lua_setfield ( luaVM, -2, "animGroup" );
-            return 1;
+                m_pScriptDebugging->LogBadPointer ( luaVM, "getOriginalHandling", "model", 1 );
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "getOriginalHandling", "model", 1 );
@@ -2669,6 +2716,173 @@ int CLuaFunctionDefs::SetVehicleDoorOpenRatio ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setVehicleDoorOpenRatio" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetVehicleSirenParams( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    CClientVehicle* pVehicle = NULL;
+    unsigned char ucSirenID = 0;
+    SSirenInfo tSirenInfo;
+
+    argStream.ReadUserData ( pVehicle );
+    if ( argStream.HasErrors ( ) == false )
+    {
+        if ( pVehicle )
+        {
+            tSirenInfo = pVehicle->m_tSirenBeaconInfo;// Grab the siren structure data
+            lua_newtable ( luaVM );
+
+            lua_pushstring( luaVM, "SirenCount" );
+            lua_pushnumber ( luaVM, tSirenInfo.m_ucSirenCount );
+            lua_settable ( luaVM, -3 ); // End of SirenCount Property
+
+            lua_pushstring( luaVM, "SirenType" );
+            lua_pushnumber ( luaVM, tSirenInfo.m_ucSirenType );
+            lua_settable ( luaVM, -3 ); // End of SirenType Property
+
+            lua_pushstring( luaVM, "Flags" );
+            lua_newtable ( luaVM );
+
+            lua_pushstring ( luaVM, "360" );
+            lua_pushboolean ( luaVM, tSirenInfo.m_b360Flag );
+            lua_settable ( luaVM, -3 ); // End of 360 Property
+
+            lua_pushstring ( luaVM, "DoLOSCheck" );
+            lua_pushboolean ( luaVM, tSirenInfo.m_bDoLOSCheck );
+            lua_settable ( luaVM, -3 ); // End of DoLOSCheck Property
+
+            lua_pushstring ( luaVM, "UseRandomiser" );
+            lua_pushboolean ( luaVM, tSirenInfo.m_bUseRandomiser );
+            lua_settable ( luaVM, -3 ); // End of UseRandomiser Property
+
+            lua_pushstring ( luaVM, "Silent" );
+            lua_pushboolean ( luaVM, tSirenInfo.m_bSirenSilent );
+            lua_settable ( luaVM, -3 ); // End of Silent Property
+
+            lua_settable ( luaVM, -3 ); // End of table
+
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleSirenParams", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleSirenParams" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetVehicleSirens( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    CClientVehicle* pVehicle = NULL;
+    unsigned char ucSirenID = 0;
+    SSirenInfo tSirenInfo;
+
+    argStream.ReadUserData ( pVehicle );
+    if ( argStream.HasErrors ( ) == false )
+    {
+        if ( pVehicle )
+        {
+            tSirenInfo = pVehicle->m_tSirenBeaconInfo;// Grab the siren structure data
+            lua_newtable ( luaVM );
+
+            for ( int i = 0; i <= tSirenInfo.m_ucSirenCount;i++ )
+            {
+                lua_pushnumber ( luaVM, i+1 );
+                lua_newtable ( luaVM );
+
+                lua_pushstring( luaVM, "Min_Alpha" );
+                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_dwMinSirenAlpha );
+                lua_settable ( luaVM, -3 ); // End of Min_Alpha property
+
+                lua_pushstring( luaVM, "Red" );
+                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.R );
+                lua_settable ( luaVM, -3 ); // End of Red property
+
+                lua_pushstring( luaVM, "Green" );
+                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.G );
+                lua_settable ( luaVM, -3 ); // End of Green property
+
+                lua_pushstring( luaVM, "Blue" );
+                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.B );
+                lua_settable ( luaVM, -3 ); // End of Blue property
+
+                lua_pushstring( luaVM, "Alpha" );
+                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.A );
+                lua_settable ( luaVM, -3 ); // End of Alpha property
+
+                lua_pushstring( luaVM, "x" );
+                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fX );
+                lua_settable ( luaVM, -3 ); // End of X property
+
+                lua_pushstring( luaVM, "y" );
+                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fY );
+                lua_settable ( luaVM, -3 ); // End of Y property
+
+                lua_pushstring( luaVM, "z" );
+                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fZ );
+                lua_settable ( luaVM, -3 ); // End of Z property
+
+                lua_settable ( luaVM, -3 ); // End of Table
+            }
+
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleSirens", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleSirens" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetVehicleSirens ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    CClientVehicle* pVehicle = NULL;
+    unsigned char ucSirenID = 0;
+    SSirenInfo tSirenInfo;
+
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadNumber ( ucSirenID );
+    if ( ucSirenID > 0 )
+    {
+        // Array indicies start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
+        ucSirenID--;
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fX );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fY );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fZ );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.R );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.G );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.B );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.A, 255 );
+        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_dwMinSirenAlpha, 0 );
+        if ( argStream.HasErrors ( ) == false )
+        {
+            if ( pVehicle )
+            {
+                if ( CStaticFunctionDefinitions::SetVehicleSirens ( *pVehicle, ucSirenID, tSirenInfo ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "giveVehicleSirens", "vehicle", 1 );
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM, "giveVehicleSirens" );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "giveVehicleSirens" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

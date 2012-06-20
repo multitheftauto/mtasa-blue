@@ -141,7 +141,7 @@ CPickup * CPickupsSA::CreatePickup(CVector * position, DWORD ModelIndex, ePickup
     pickup->GiveUsAPickUpObject();
 
     if (pickup->GetInterface()->pObject)
-      ((CWorldSA *)pGame->GetWorld())->Add(pickup->GetInterface()->pObject);
+        ((CWorldSA *)pGame->GetWorld())->Add(pickup->GetInterface()->pObject, CPickup_Constructor);
 
     return pickup;
 }

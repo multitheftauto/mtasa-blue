@@ -16,6 +16,7 @@
 
 CServerInterface* g_pServerInterface = NULL;
 CNetServer* g_pNetServer = NULL;
+CNetServer* g_pRealNetServer = NULL;
 
 CServer::CServer ( void )
 {
@@ -36,6 +37,7 @@ void CServer::ServerInitialize ( CServerInterface* pServerInterface )
     m_pServerInterface = pServerInterface;
     g_pServerInterface = pServerInterface;
     g_pNetServer = pServerInterface->GetNetwork ();
+    g_pRealNetServer = g_pNetServer;
 }
 
 
@@ -79,10 +81,14 @@ void CServer::HandleInput ( char* szCommand )
 
 void CServer::DoPulse()
 {
+    UNCLOCK( "Top", "Other" );
     if ( m_pGame )
     {
+        CLOCK( "Top", "Game->DoPulse" );
         m_pGame->DoPulse ();
+        UNCLOCK( "Top", "Game->DoPulse" );
     }
+    CLOCK( "Top", "Other" );
 }
 
 
@@ -93,5 +99,23 @@ bool CServer::IsFinished ()
         return m_pGame->IsFinished ();
     }
 
+    return false;
+}
+
+bool CServer::PendingWorkToDo ( int& iSleepMs )
+{
+    if ( m_pGame && g_pNetServer )
+    {
+        if ( g_pNetServer->GetPendingPacketCount () > 0 )
+        {
+            iSleepMs = m_pGame->GetConfig ()->GetPendingWorkToDoSleepTime ();
+            return true;
+        }
+        else
+        {
+            iSleepMs = m_pGame->GetConfig ()->GetNoWorkToDoSleepTime ();
+            return true;
+        }
+    }
     return false;
 }

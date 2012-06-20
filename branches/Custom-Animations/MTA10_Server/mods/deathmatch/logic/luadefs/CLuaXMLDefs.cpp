@@ -259,7 +259,7 @@ int CLuaXMLDefs::xmlCopyFile ( lua_State* luaVM )
                         }
                     }
                     else
-                        CLogger::ErrorPrintf ( "Unable to copy xml file; bad filepath" );
+                        CLogger::ErrorPrintf ( "Unable to copy xml file; bad filepath\n" );
                 }
                 else
                     m_pScriptDebugging->LogError ( luaVM,"xmlCopyFile failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );

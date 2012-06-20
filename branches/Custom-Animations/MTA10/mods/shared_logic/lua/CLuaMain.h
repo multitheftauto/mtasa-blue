@@ -60,14 +60,14 @@ public:
     bool                            LoadScriptFromBuffer    ( const char* cpBuffer, unsigned int uiSize, const char* szFileName, bool bUTF8 );
     bool                            LoadScript              ( const char* szLUAScript );
     void                            UnloadScript            ( void );
+    bool                            CompileScriptFromFile   ( const char* szFile, SString* pDest );
 
     void                            Start                   ( void );
 
     void                            DoPulse                 ( void );
 
-    void                            GetScriptName           ( char* szLuaScript ) const     { strcpy ( szLuaScript, m_szScriptName ); };
-    inline const char*              GetScriptNamePointer    ( void ) const                  { return m_szScriptName; };
-    void                            SetScriptName           ( const char* szName )          { strncpy ( m_szScriptName, szName, MAX_SCRIPTNAME_LENGTH ); };
+    const char*                     GetScriptName           ( void ) const                  { return m_strScriptName; }
+    void                            SetScriptName           ( const char* szName )          { m_strScriptName.AssignLeft ( szName, MAX_SCRIPTNAME_LENGTH ); }
 
     void                            RegisterFunction        ( const char* szFunction, lua_CFunction function );
 
@@ -92,12 +92,14 @@ public:
 
     void                            InitVM                  ( void );
     const SString&                  GetFunctionTag          ( int iLuaFunction );
+    int                             PCall                   ( lua_State *L, int nargs, int nresults, int errfunc );
+
 private:
     void                            InitSecurity            ( void );
 
     static void                     InstructionCountHook    ( lua_State* luaVM, lua_Debug* pDebug );
 
-    char                            m_szScriptName [MAX_SCRIPTNAME_LENGTH + 1];
+    SString                         m_strScriptName;
     int                             m_iOwner;
 
     lua_State*                      m_luaVM;
@@ -114,137 +116,5 @@ public:
     std::map < const void*, CRefInfo >      m_CallbackTable;
     std::map < int, SString >               m_FunctionTagMap;
 };
-
-
-/////////////////////////////////////////////////////////////////////////
-//
-// CScriptArgReader
-//
-//
-// Attempt to simplify the reading of arguments from a script call
-//
-//////////////////////////////////////////////////////////////////////
-class CScriptArgReader
-{
-public:
-    CScriptArgReader ( lua_State* luaVM )
-    {
-        m_luaVM = luaVM;
-        m_iIndex = 1;
-        m_bError = false;
-    }
-
-    //
-    // Read next number
-    //
-    template < class T >
-    bool ReadNumber ( T& outValue )
-    {
-        int iArgument = lua_type ( m_luaVM, m_iIndex++ );
-        if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
-        {
-            outValue = static_cast < T > ( lua_tonumber ( m_luaVM, m_iIndex - 1 ) );
-            return true;
-        }
-
-        outValue = 0;
-        m_bError = true;
-        return false;
-    }
-
-    //
-    // Read next number, using default if required
-    //
-    template < class T, class U >
-    bool ReadNumber ( T& outValue, const U& defaultValue )
-    {
-        int iArgument = lua_type ( m_luaVM, m_iIndex++ );
-        if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
-        {
-            outValue = static_cast < T > ( lua_tonumber ( m_luaVM, m_iIndex - 1 ) );
-            return true;
-        }
-        else
-        if ( iArgument == LUA_TNONE )
-        {
-            outValue = static_cast < T > ( defaultValue );
-            return true;
-        }
-
-        outValue = 0;
-        m_bError = true;
-        return false;
-    }
-
-    //
-    // Read next bool
-    //
-    bool ReadBool ( bool& bOutValue )
-    {
-        int iArgument = lua_type ( m_luaVM, m_iIndex++ );
-        if ( iArgument == LUA_TBOOLEAN )
-        {
-            bOutValue = lua_toboolean ( m_luaVM, m_iIndex - 1 ) ? true : false;
-            return true;
-        }
-
-        bOutValue = false;
-        m_bError = true;
-        return true;
-    }
-
-    //
-    // Read next bool, using default if required
-    //
-    bool ReadBool ( bool& bOutValue, bool bDefault )
-    {
-        int iArgument = lua_type ( m_luaVM, m_iIndex++ );
-        if ( iArgument == LUA_TBOOLEAN )
-        {
-            bOutValue = lua_toboolean ( m_luaVM, m_iIndex - 1 ) ? true : false;
-            return true;
-        }
-        else
-        if ( iArgument == LUA_TNONE )
-        {
-            bOutValue = bDefault;
-            return true;
-        }
-
-        bOutValue = false;
-        m_bError = true;
-        return true;
-    }
-
-    //
-    // Read next string, using default if required
-    //
-    bool ReadString ( SString& outValue, const char* defaultValue = NULL )
-    {
-        int iArgument = lua_type ( m_luaVM, m_iIndex++ );
-        if ( iArgument == LUA_TSTRING )
-        {
-            outValue = lua_tostring ( m_luaVM, m_iIndex - 1 );
-            return true;
-        }
-        else
-        if ( iArgument == LUA_TNONE && defaultValue )
-        {
-            outValue = defaultValue;
-            return true;
-        }
-
-        outValue = "";
-        m_bError = true;
-        return false;
-    }
-
-    bool HasErrors ( void ) { return m_bError; }
-
-    bool        m_bError;
-    int         m_iIndex;
-    lua_State*  m_luaVM;
-};
-
 
 #endif

@@ -77,8 +77,8 @@ public:
 	\return
 		String object containing the current text for the list box item.
 	*/
-	const String&	getText(void) const		{return d_itemText;}
-	const String&	getSortText(void) const		{return d_itemSortText.empty () ? d_itemText : d_itemSortText;}
+	const String&	getText(bool bidified=false) const		{return bidified ? d_itemText : d_itemText_raw;}
+	const String&	getSortText(void) const		{return d_itemSortText.empty () ? d_itemText_raw : d_itemSortText;}
 	const String&	getTooltipText(void) const		{return d_tooltipText;}
 
 	/*!
@@ -430,6 +430,7 @@ protected:
 		Implementation Data
 	*************************************************************************/
 	String	d_itemText;		//!< Text for this list box item.  If not rendered, this is still used for list sorting.
+	String	d_itemText_raw; //!< Non bidified text
 	String	d_itemSortText; // Used for sorting if not empty
 	String  d_tooltipText;  //!< Text for the individual tooltip of this item
 	uint	d_itemID;		//!< ID code assigned by client code.  This has no meaning within the GUI system.

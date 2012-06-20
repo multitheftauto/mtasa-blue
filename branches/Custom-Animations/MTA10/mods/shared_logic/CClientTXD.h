@@ -15,8 +15,9 @@
 
 #include "CClientEntity.h"
 
-class CClientTXD: public CClientEntity
+class CClientTXD : public CClientEntity
 {
+    DECLARE_CLASS( CClientTXD, CClientEntity )
 public:
                                     CClientTXD              ( class CClientManager* pManager, ElementID ID );
                                     ~CClientTXD             ( void );

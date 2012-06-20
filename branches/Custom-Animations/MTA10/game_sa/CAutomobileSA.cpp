@@ -16,7 +16,7 @@
 /**
  * \todo Spawn automobiles with engine off
  */
-CAutomobileSA::CAutomobileSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )
+CAutomobileSA::CAutomobileSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 ):CVehicleSA( dwModelID, ucVariation, ucVariation2 )
 {   
     DEBUG_TRACE("CAutomobileSA::CAutomobileSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )");
 /*  if(this->internalInterface)

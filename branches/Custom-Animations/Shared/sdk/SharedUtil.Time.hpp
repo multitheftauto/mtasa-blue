@@ -118,6 +118,62 @@ SString SharedUtil::GetLocalTimeString ( bool bDate, bool bMilliseconds )
 }
 
 
+namespace SharedUtil
+{
+    //
+    // ModuleTickCount is a per-module cached tickcount value
+    //
+    class CPerModuleTickCount
+    {
+    public:
+        CPerModuleTickCount ( void )
+        {
+            m_llCurrentTickCount = GetTickCount64_ ();
+        }
+    
+        long long Get ( void )
+        {
+            m_ModuleTickCountCS.Lock ();
+    #ifdef _DEBUG
+            if ( m_TimeSinceUpdated.Get () > 10000 )
+                OutputDebugLine ( "WARNING: UpdateModuleTickCount64 not being called for the current module" );
+    #endif
+            long long result = m_llCurrentTickCount;
+            m_ModuleTickCountCS.Unlock ();
+            return result;
+        }
+    
+        void Update ( void )
+        {
+            m_ModuleTickCountCS.Lock ();
+    #ifdef _DEBUG
+            m_TimeSinceUpdated.Reset ();
+    #endif
+            m_llCurrentTickCount = GetTickCount64_ ();
+            m_ModuleTickCountCS.Unlock ();
+        }
+    
+    protected:
+        CCriticalSection m_ModuleTickCountCS;
+        long long        m_llCurrentTickCount;
+    #ifdef _DEBUG
+        CElapsedTime     m_TimeSinceUpdated;
+    #endif
+    };
+
+    CPerModuleTickCount ms_PerModuleTickCount;
+}
+
+long long SharedUtil::GetModuleTickCount64 ( void )
+{
+    return ms_PerModuleTickCount.Get ();
+}
+
+void SharedUtil::UpdateModuleTickCount64 ( void )
+{
+    return ms_PerModuleTickCount.Update ();
+}
+
 
 //
 // Cross-platform GetTickCount() implementations
@@ -184,3 +240,55 @@ unsigned long GetTickCount ( void )
 }
 #endif
 
+
+// Get time in microseconds
+#ifdef WIN32
+TIMEUS SharedUtil::GetTimeUs()
+{
+    static bool bInitialized = false;
+    static LARGE_INTEGER lFreq, lStart;
+    static LARGE_INTEGER lDivisor;
+    if ( !bInitialized )
+    {
+        bInitialized = true;
+        QueryPerformanceFrequency(&lFreq);
+        QueryPerformanceCounter(&lStart);
+        lDivisor.QuadPart = lFreq.QuadPart / 1000000;
+    }
+
+    LARGE_INTEGER lEnd;
+    QueryPerformanceCounter(&lEnd);
+	double duration = double(lEnd.QuadPart - lStart.QuadPart) / lFreq.QuadPart;
+    duration *= 1000000;
+    LONGLONG llDuration = static_cast < LONGLONG > ( duration );
+    return llDuration & 0xffffffff;
+}
+#else
+#include <sys/time.h>                // for gettimeofday()
+using namespace std;
+typedef long long LONGLONG;
+
+TIMEUS SharedUtil::GetTimeUs()
+{
+    static bool bInitialized = false;
+    static timeval t1;
+    if ( !bInitialized )
+    {
+        bInitialized = true;
+        // start timer
+        gettimeofday(&t1, NULL);
+    }
+
+    // stop timer
+    timeval t2;
+    gettimeofday(&t2, NULL);
+
+    // compute elapsed time in us
+    double elapsedTime;
+    elapsedTime =  (t2.tv_sec  - t1.tv_sec) * 1000000.0;    // sec to us
+    elapsedTime += (t2.tv_usec - t1.tv_usec);               // us to us
+
+    LONGLONG llDuration = static_cast < LONGLONG > ( elapsedTime );
+    return llDuration & 0xffffffff;
+}
+#endif

@@ -21,11 +21,11 @@ bool CChatEchoPacket::Write ( NetBitStreamInterface& BitStream ) const
     BitStream.WriteBit ( m_bColorCoded );
 
     // Too short?
-    size_t sizeMessage = strlen ( m_strMessage.c_str() );
+    size_t sizeMessage = m_strMessage.length();
     if ( sizeMessage >= MIN_CHATECHO_LENGTH )
     {
         // Write the string
-        BitStream.Write ( const_cast < char* > ( m_strMessage.c_str() ), sizeMessage );
+        BitStream.Write ( m_strMessage.c_str(), sizeMessage );
         return true;
     }
 

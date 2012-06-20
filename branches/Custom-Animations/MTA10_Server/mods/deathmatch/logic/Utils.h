@@ -23,12 +23,6 @@
 #include "CCommon.h"
 #include "CPad.h"
 
-#ifndef PI
-#define PI 3.14159265358979323846264338327950
-#endif
-
-#define SAFE_DELETE(p) { if(p) { delete (p); (p)=NULL; } }
-
 bool            CheckNickProvided           ( const char* szNick );
 float           DistanceBetweenPoints2D     ( const CVector& vecPosition1, const CVector& vecPosition2 );
 float           DistanceBetweenPoints3D     ( const CVector& vecPosition1, const CVector& vecPosition2 );
@@ -161,13 +155,24 @@ inline void ConvertDegreesToRadiansNoWrap ( CVector& vecRotation )
     vecRotation.fZ = ConvertDegreesToRadiansNoWrap ( vecRotation.fZ );
 }
 
+// Assuming fValue is the result of a difference calculation, calculate
+// the shortest positive distance after wrapping
+inline float GetSmallestWrapUnsigned ( float fValue, float fHigh )
+{
+    float fWrapped =  fValue - ( fHigh * floor ( static_cast < float > ( fValue / fHigh ) ) );
+    if ( fWrapped > fHigh / 2 )
+        fWrapped = fHigh - fWrapped;
+    return fWrapped;
+}
+
 // Escapes the HTML characters <, >, &, " and '. Don't forget to remove your buffer to avoid memory leaks.
 const char* HTMLEscapeString ( const char *szSource );
 
-bool ReadSmallKeysync ( CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream );
-void WriteSmallKeysync ( const CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream );
+bool ReadSmallKeysync ( CControllerState& ControllerState, NetBitStreamInterface& BitStream );
+void WriteSmallKeysync ( const CControllerState& ControllerState, NetBitStreamInterface& BitStream );
 bool ReadFullKeysync ( CControllerState& ControllerState, NetBitStreamInterface& BitStream );
 void WriteFullKeysync ( const CControllerState& ControllerState, NetBitStreamInterface& BitStream );
+void ReadCameraOrientation ( const CVector& vecBasePosition, NetBitStreamInterface& BitStream, CVector& vecOutCamPosition, CVector& vecOutCamFwd );
 
 
 // Validation funcs
@@ -184,8 +189,6 @@ inline bool IsVisibleCharacter ( unsigned char c )
     // 32..126 are visible characters
     return c >= 32 && c <= 126;
 }
-
-bool            FileCopy                    ( const char* szPathNameSrc, const char* szPathDst );
 
 inline SString SQLEscape ( const SString& strEscapeString, bool bSingleQuotes, bool bDoubleQuotes )
 {

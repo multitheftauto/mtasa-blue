@@ -42,7 +42,7 @@ const colour	ListboxItem::DefaultSelectionColour	= 0xFF607FFF;
 	Base class constructor
 *************************************************************************/
 ListboxItem::ListboxItem(const String& text, uint item_id, void* item_data, bool disabled, bool auto_delete) :
-	d_itemText(text),
+	d_itemText_raw(text),
 	d_itemID(item_id),
 	d_itemData(item_data),
     d_selected(false),
@@ -54,13 +54,15 @@ ListboxItem::ListboxItem(const String& text, uint item_id, void* item_data, bool
     d_bSizeChanged(true),
     d_savedPixelSize(10,10)
 {
+	d_itemText = d_itemText_raw.bidify();
 }
 
 
 void ListboxItem::setText(const String& text, const char* sortText)
 {
-    d_bSizeChanged |= (d_itemText != text);
-    d_itemText = text;
+    d_bSizeChanged |= (d_itemText_raw != text);
+    d_itemText_raw = text;
+	d_itemText = d_itemText_raw.bidify();
     if ( sortText )
         d_itemSortText.assign ( sortText );
     else

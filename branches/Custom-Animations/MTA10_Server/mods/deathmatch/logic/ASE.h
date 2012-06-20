@@ -38,6 +38,12 @@ class ASE;
 
 #include <list>
 
+#define MAX_ASE_GAME_TYPE_LENGTH    200
+#define MAX_ASE_MAP_NAME_LENGTH     200
+#define MAX_RULE_KEY_LENGTH         200
+#define MAX_RULE_VALUE_LENGTH       200
+#define MAX_ANNOUNCE_VALUE_LENGTH   200
+
 class CASERule;
 
 class ASE
@@ -57,6 +63,8 @@ public:
     const std::string&      QueryXfireLightCached    ( void );
     std::string             QueryXfireLight          ( void );
     unsigned long           GetMasterServerQueryCount ( void )          { return m_ulMasterServerQueryCount; }
+    uint                    GetTotalQueryCount      ( void )            { return m_uiNumQueriesTotal; }
+    uint                    GetQueriesPerMinute     ( void )            { return m_uiNumQueriesPerMinute; }
 
     CLanBroadcast*          InitLan             ( void );
 
@@ -114,10 +122,14 @@ private:
     long                    m_lXfireLightMinInterval;
     std::string             m_strXfireLightCached;
 
+    // Stats
     unsigned long           m_ulMasterServerQueryCount;
-protected:
-    void                    GetStatusVals();
+    uint                    m_uiNumQueriesTotal;
+    uint                    m_uiNumQueriesPerMinute;
+    uint                    m_uiTotalAtMinuteStart;
+    CElapsedTime            m_MinuteTimer;
 
+    CConnectHistory         m_QueryDosProtect;
 };
 
 class CASERule

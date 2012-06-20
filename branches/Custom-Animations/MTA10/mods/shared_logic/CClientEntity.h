@@ -25,6 +25,7 @@ class CClientEntity;
 #include <assert.h>
 #include <list>
 #include <google/dense_hash_map>
+#include <core/CClientEntityBase.h>
 class CLuaFunctionRef;
 
 // Used to check fast version of getElementsByType
@@ -73,6 +74,10 @@ enum eClientEntityType
     CCLIENTTXD,
     CCLIENTSOUND,
     CCLIENTWATER,
+    CCLIENTDXFONT,
+    CCLIENTGUIFONT,
+    CCLIENTTEXTURE,
+    CCLIENTSHADER,
     CCLIENTIFP,
     CCLIENTUNKNOWN,
 };
@@ -85,20 +90,63 @@ class CLuaArgument;
 class CLuaArguments;
 class CLuaMain;
 class CMapEventManager;
-typedef CIntrusiveList < class CClientEntity > CChildListType;
+typedef CFastList < class CClientEntity > CChildListType;
 
-class CClientEntity
+enum eCClientEntityClassTypes
 {
+    CLASS_CClientEntity,
+    CLASS_CClientCamera,
+    CLASS_CClientCivilian,
+    CLASS_CClientColModel,
+    CLASS_CClientDFF,
+    CLASS_CClientGUIElement,
+    CLASS_CClientStreamElement,
+    CLASS_CClientColShape,
+    CLASS_CClientMarker,
+    CLASS_CClientPathNode,
+    CLASS_CClientPickup,
+    CLASS_CClientRadarArea,
+    CLASS_CClientRadarMarker,
+    CLASS_CClientPed,
+    CLASS_CClientPlayer,
+    CLASS_CClientTeam,
+    CLASS_CClientSound,
+    CLASS_CClientVehicle,
+    CLASS_CClientDummy,
+    CLASS_CClientWater,
+    CLASS_CClientColCircle,
+    CLASS_CClientColCuboid,
+    CLASS_CClientColSphere,
+    CLASS_CClientColRectangle,
+    CLASS_CClientColPolygon,
+    CLASS_CClientColTube,
+    CLASS_CClientProjectile,
+    CLASS_CClientTXD,
+    CLASS_CScriptFile,
+    CLASS_CClientObject,
+    CLASS_CDeathmatchObject,
+    CLASS_CDeathmatchVehicle,
+    CLASS_CClientRenderElement,
+    CLASS_CClientDxFont,
+    CLASS_CClientGuiFont,
+    CLASS_CClientMaterial,
+    CLASS_CClientTexture,
+    CLASS_CClientShader,
+    CLASS_CClientRenderTarget,
+    CLASS_CClientScreenSource,
+};
+
+
+class CClientEntity : public CClientEntityBase
+{
+    DECLARE_BASE_CLASS( CClientEntity )
 public:
                                                 CClientEntity           ( ElementID ID );
     virtual                                     ~CClientEntity          ( void );
 
     virtual bool                                CanBeDeleted            ( void )                    { return true; };
 
-    static inline int                           GetInstanceCount        ( void )                    { return iCount; };
-
     virtual eClientEntityType                   GetType                 ( void ) const = 0;
-    virtual eClientEntityType                   GetBaseType             ( void ) const              { return GetType (); };
     inline bool                                 IsLocalEntity           ( void )                    { return m_ID >= MAX_SERVER_ELEMENTS; };
 
     // System entity? A system entity means it can't be removed by the server
@@ -118,10 +166,10 @@ public:
     inline void                                 SetSyncTimeContext      ( unsigned char ucContext ) { m_ucSyncTimeContext = ucContext; };
     bool                                        CanUpdateSync           ( unsigned char ucRemote );
 
-    inline char*                                GetName                 ( void )                    { return m_szName; };
-    inline void                                 SetName                 ( const char* szName )      { assert ( szName ); strncpy ( m_szName, szName, MAX_ELEMENT_NAME_LENGTH ); };
+    inline const char*                          GetName                 ( void )                    { return m_strName; }
+    inline void                                 SetName                 ( const char* szName )      { m_strName.AssignLeft ( szName, MAX_ELEMENT_NAME_LENGTH ); }
 
-    inline const char*                          GetTypeName             ( void )                    { return m_szTypeName; };
+    inline const char*                          GetTypeName             ( void )                    { return m_strTypeName; };
     inline unsigned int                         GetTypeHash             ( void )                    { return m_uiTypeHash; };
     void                                        SetTypeName             ( const char* szName );
 
@@ -129,6 +177,7 @@ public:
     CClientEntity*                              SetParent               ( CClientEntity* pParent );
     CClientEntity*                              AddChild                ( CClientEntity* pChild );
     bool                                        IsMyChild               ( CClientEntity* pEntity, bool bRecursive );
+    bool                                        IsMyParent              ( CClientEntity* pEntity, bool bRecursive );
     inline bool                                 IsBeingDeleted          ( void )                    { return m_bBeingDeleted; }
     inline void                                 SetBeingDeleted         ( bool bBeingDeleted )      { m_bBeingDeleted = bBeingDeleted; }
     void                                        ClearChildren           ( void );
@@ -180,7 +229,7 @@ public:
     virtual bool                                IsAttachToable          ( void );
     virtual void                                DoAttaching             ( void );
 
-    bool                                        AddEvent                ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated );
+    bool                                        AddEvent                ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod );
     bool                                        CallEvent               ( const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren );
     void                                        CallEventNoParent       ( const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource );
     void                                        CallParentEvent         ( const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource );
@@ -201,6 +250,7 @@ public:
     inline unsigned int                         CountChildren           ( void )                        { return static_cast < unsigned int > ( m_Children.size () ); };
 
     void                                        GetChildren             ( lua_State* luaVM );
+    void                                        GetChildrenByType       ( const char* szType, lua_State* luaVM );
 
     void                                        AddCollision                ( CClientColShape* pShape )     { m_Collisions.push_back ( pShape ); }
     void                                        RemoveCollision             ( CClientColShape* pShape )     { if ( !m_Collisions.empty() ) m_Collisions.remove ( pShape ); }
@@ -249,13 +299,11 @@ public:
     virtual CSphere                             GetWorldBoundingSphere      ( void );
     virtual void                                UpdateSpatialData           ( void );
 
+    virtual void                                DebugRender                 ( const CVector& vecPosition, float fDrawRadius ) {}
+
     float                                       GetDistanceBetweenBoundingSpheres   ( CClientEntity* pOther );
 
-public:
-    CIntrusiveListNode < CClientEntity >        m_FromRootNode;     // Our node entry in the 'EntitiesFromRoot' list
 protected:
-    CIntrusiveListNode < CClientEntity >        m_ChildrenNode;     // Our node entry in the parent object m_Children list
-
     CClientManager*                             m_pManager;
     CClientEntity*                              m_pParent;
     CChildListType                              m_Children;
@@ -271,8 +319,8 @@ protected:
 
 private:
     unsigned int                                m_uiTypeHash;
-    char                                        m_szTypeName [MAX_TYPENAME_LENGTH + 1];
-    char                                        m_szName [MAX_ELEMENT_NAME_LENGTH + 1];
+    SString                                     m_strTypeName;
+    SString                                     m_strName;
 
 protected:
     unsigned char                               m_ucSyncTimeContext;
@@ -295,11 +343,8 @@ protected:
     bool                                        m_bDoubleSided;
     bool                                        m_bDoubleSidedInit;
 
-private:
-    static int                                  iCount;
-
-    // Optimization for getElementsByType starting at root
 public:
+    // Optimization for getElementsByType starting at root
     static void                     StartupEntitiesFromRoot ( );
 private:
     static bool                     IsFromRoot              ( CClientEntity* pEntity );

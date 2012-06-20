@@ -27,6 +27,8 @@
 #define FUNC_HasCollisionBeenLoaded                         0x410CE0 // ##SA##
 #define FUNC_RemoveBuildingsNotInArea                       0x4094B0 // ##SA##
 #define FUNC_RemoveReferencesToDeletedObject                0x565510 // ##SA##
+#define FUNC_COcclusion_ProcessBeforeRendering              0x7201C0
+#define VAR_COcclusion_NumActiveOccluders                   0xC73CC0
 
 // CCol...
 #define FUNC_CColLine_Constructor                           0x40EF50 // ##SA##
@@ -41,20 +43,24 @@
 #define NUM_StreamRepeatSectorRows                          16
 #define NUM_StreamRepeatSectorCols                          16
 #define VAR_fJetpackMaxHeight                               0x8703D8
-
+#define VAR_fAircraftMaxHeight                              0x8594DC // Touch this directly and you are an idiot it's clearly in the data section and the xrefs map is massive :|
+#define VTBL_CBUILDING                                      0x8585C8
+#define VAR_CWorld_bIncludeCarTires                         0xB7CD70
 
 #include <game/CWorld.h>
 #include "CEntitySA.h"
-
+#include "CBuildingSA.h"
+#include <google/dense_hash_map>
 class CWorldSA : public CWorld
 {
 public:
-    void        Add                       ( CEntity * entity );
-    void        Add                       ( CEntitySAInterface * entityInterface );
-    void        Remove                    ( CEntity * entity );
-    void        Remove                    ( CEntitySAInterface * entityInterface );
+    CWorldSA ( );
+    void        Add                       ( CEntity * entity, eDebugCaller CallerId );
+    void        Add                       ( CEntitySAInterface * entityInterface, eDebugCaller CallerId );
+    void        Remove                    ( CEntity * entity, eDebugCaller CallerId );
+    void        Remove                    ( CEntitySAInterface * entityInterface, eDebugCaller CallerId );
     void        RemoveReferencesToDeletedObject ( CEntitySAInterface * entity );
-    bool        ProcessLineOfSight        ( const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, CEntity ** CollisionEntity = NULL, bool bCheckBuildings = true, bool bCheckVehicles = true, bool bCheckPeds = true, bool bCheckObjects = true, bool bCheckDummies = true, bool bSeeThroughStuff = false, bool bIgnoreSomeObjectsForCamera = false, bool bShootThroughStuff = false );
+    bool        ProcessLineOfSight        ( const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, CEntity ** CollisionEntity, const SLineOfSightFlags flags, SLineOfSightBuildingResult* pBuildingResult );
     bool        TestLineSphere            ( CVector * vecStart, CVector * vecEnd, CVector * vecSphereCenter, float fSphereRadius, CColPoint ** colCollision );
     //bool      ProcessLineOfSight        ( CVector * vecStart, CVector * vecEnd, CColPoint * colCollision, CEntity * CollisionEntity );
     void        IgnoreEntity              ( CEntity * entity );
@@ -62,12 +68,16 @@ public:
     float       FindGroundZForPosition    ( float fX, float fY );
     float       FindGroundZFor3DPosition  ( CVector * vecPosition );
     void        LoadMapAroundPoint        ( CVector * vecPosition, float fRadius );
-    bool        IsLineOfSightClear        ( CVector * vecStart, CVector * vecEnd, bool bCheckBuildings = true, bool bCheckVehicles = true, bool bCheckPeds = true, bool bCheckObjects = true, bool bCheckDummies = true, bool bSeeThroughStuff = false, bool bIgnoreSomeObjectsForCamera = false );
+    bool        IsLineOfSightClear        ( const CVector * vecStart, const CVector * vecEnd, const SLineOfSightFlags flags );
     bool        HasCollisionBeenLoaded    ( CVector * vecPosition );
     DWORD       GetCurrentArea            ( void );
     void        SetCurrentArea            ( DWORD dwArea );
     void        SetJetpackMaxHeight       ( float fHeight );
     float       GetJetpackMaxHeight       ( void );
+    void        SetAircraftMaxHeight      ( float fHeight );
+    float       GetAircraftMaxHeight      ( void );
+    void        SetOcclusionsEnabled      ( bool bEnabled );
+    bool        GetOcclusionsEnabled      ( void );
 
     /**
      * \todo Add FindObjectsKindaColliding (see 0x430577)
@@ -89,6 +99,22 @@ public:
      * StopAllLawEnforcersInTheirTracks
 
      */
+    void                RemoveBuilding                  ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ );
+    bool                IsRemovedModelInRadius          ( SIPLInst* pInst );
+    bool                IsModelRemoved                  ( unsigned short modelID );
+    void                ClearRemovedBuildingLists       ( void );
+    bool                RestoreBuilding                 ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ );
+    SBuildingRemoval*   GetBuildingRemoval              ( CEntitySAInterface * pInterface );
+    void                AddDataBuilding                 ( CEntitySAInterface * pInterface );
+    void                RemoveWorldBuildingFromLists    ( CEntitySAInterface * pInterface );
+    void                AddBinaryBuilding               ( CEntitySAInterface * pInterface );
+    bool                IsObjectRemoved                 ( CEntitySAInterface * pInterface );
+    bool                IsDataModelRemoved              ( unsigned short usModelID );
+private:
+    std::multimap< unsigned short, SBuildingRemoval* >          *m_pBinaryBuildings;
+    std::multimap < unsigned short, sDataBuildingRemoval* >     *m_pDataBuildings;
+    std::map < unsigned short, unsigned short >                 *m_pRemovedObjects;
+    float                                                       m_fAircraftMaxHeight;
 };
 
 #endif

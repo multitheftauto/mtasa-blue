@@ -15,10 +15,12 @@
 
 class CClientColTube : public CClientColShape
 {
+    DECLARE_CLASS( CClientColTube, CClientColShape )
 public:
                             CClientColTube          ( CClientManager* pManager, ElementID ID, const CVector& vecPosition, float fRadius, float fHeight );
 
     virtual CSphere         GetWorldBoundingSphere  ( void );
+    virtual void            DebugRender             ( const CVector& vecPosition, float fDrawRadius );
 
     eColShapeType           GetShapeType            ( void )            { return COLSHAPE_TUBE ; }
 
