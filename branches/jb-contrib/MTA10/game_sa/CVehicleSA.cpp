@@ -1194,31 +1194,14 @@ bool CVehicleSA::IsLandingGearDown ( )
 
 void CVehicleSA::Fix ( void )
 {
-#pragma message("Do this similar like with CVehicleSA::Blow just below, use virtual table")
-    DEBUG_TRACE("void CVehicleSA::Fix ( void )");
-    DWORD dwThis = (DWORD) GetInterface();
+    CVehicleSAInterfaceVTBL * vehicleVTBL = (CVehicleSAInterfaceVTBL *)(this->GetInterface()->vtbl);
+    DWORD dwThis = (DWORD) m_pInterface;
+    DWORD dwFunc = vehicleVTBL->Fix;
 
-    DWORD dwFunc = 0;
-    CModelInfo* pModelInfo = pGame->GetModelInfo ( this->GetModelIndex() );
-    if ( pModelInfo )
+    _asm
     {
-        if ( pModelInfo->IsCar() || pModelInfo->IsMonsterTruck() || pModelInfo->IsTrailer() )
-            dwFunc = FUNC_CAutomobile__Fix;
-        else if ( pModelInfo->IsPlane() )
-            dwFunc = FUNC_CPlane__Fix;
-        else if ( pModelInfo->IsHeli() )
-            dwFunc = FUNC_CHeli__Fix;
-        else if ( pModelInfo->IsBike() )
-            dwFunc = FUNC_CBike_Fix;
-
-        if ( dwFunc)
-        {
-            _asm
-            {
-                mov     ecx, dwThis
-                call    dwFunc
-            }
-        }
+        mov         ecx, dwThis
+        call        dwFunc
     }
 }
 

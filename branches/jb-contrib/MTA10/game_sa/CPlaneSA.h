@@ -38,7 +38,7 @@ C_ASSERT(sizeof(CPlaneSAInterface) == 0xA04);
 class CPlaneSA : public virtual CPlane, public virtual CAutomobileSA
 {
 private:
-//  CBoatSAInterface        * internalInterface;
+    CPlaneSAInterface        * internalInterface;
 public:
     CPlaneSA( CPlaneSAInterface * plane );
     CPlaneSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 );

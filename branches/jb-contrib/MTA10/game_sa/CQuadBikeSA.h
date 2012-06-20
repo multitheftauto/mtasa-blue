@@ -19,9 +19,13 @@
 
 class CQuadBikeSAInterface : public CAutomobileSAInterface
 {
-    
+    uint32 pad1[12];
+    uint8 pad2;
+    uint8 pad3;
+    uint8 pad4;
+    uint8 pad5;
 };
-//C_ASSERT(sizeof(CQuadBikeSAInterface) == 0x9BC);
+C_ASSERT(sizeof(CQuadBikeSAInterface) == 0x9BC);
 
 class CQuadBikeSA : public virtual CQuadBike, public virtual CAutomobileSA
 {
