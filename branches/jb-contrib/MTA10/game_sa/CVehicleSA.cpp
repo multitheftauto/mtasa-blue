@@ -1110,35 +1110,32 @@ void CVehicleSA::SetSirenOrAlarmActive ( bool bActive )
 
 DWORD * CVehicleSA::GetMemoryValue ( DWORD dwOffset )
 {
-    if ( dwOffset <= SIZEOF_CHELI )
-        return (DWORD *)((DWORD)(this->GetInterface()) + dwOffset);
-    else
-        return NULL;
+#pragma message("Bad idea to use this")
+    // remove this eventually
+    assert(0 && "CVehicleSA::GetMemoryValue used");
+    return NULL;
 }
 
-//-----------------------------------------------------------
 FLOAT CVehicleSA::GetHealth()
 {
     CVehicleSAInterface * vehicle = (CVehicleSAInterface *)this->GetInterface();
     return vehicle->m_nHealth;
 }
-//-----------------------------------------------------------
+
 void CVehicleSA::SetHealth( FLOAT fHealth )
 {
     CVehicleSAInterface * vehicle = (CVehicleSAInterface *)this->GetInterface();
     vehicle->m_nHealth = fHealth;
-#pragma message("JoeBullet notic: __FIX__")
+#pragma message("JoeBullet notice: __FIX__")
     if ( fHealth >= 250.0f )
         ;
 //        vehicle->m_fBurningTime = 0.0f;
 }
 
-// SHould be plane funcs
 
 void CVehicleSA::SetLandingGearDown ( bool bLandingGearDown )
 {
-#pragma message("Move this to CPlaneSA!!")
-    /*
+    #pragma message("Move this to CPlaneSA!!")
     // This is the C code corresponding to the gta_sa
     // asm code at address 0x6CB39A.
     CVehicleSAInterface* pInterface = this->GetVehicleInterface ();
@@ -1163,11 +1160,10 @@ void CVehicleSA::SetLandingGearDown ( bool bLandingGearDown )
                 fPosition = ( fTimeStep * flt_871904 ) - 1.0f;
         }
     }
-    */
 }
 
 float CVehicleSA::GetLandingGearPosition ( )
-{
+{ // move to CPlaneSA
     #pragma message("Move this to CPlaneSA!!")
     DWORD dwThis = (DWORD)this->GetInterface();
     return *(float *)(dwThis + 2508);
@@ -1176,20 +1172,19 @@ float CVehicleSA::GetLandingGearPosition ( )
 void CVehicleSA::SetLandingGearPosition ( float fPosition )
 {
     #pragma message("Move this to CPlaneSA!!")
-    //DWORD dwThis = (DWORD)this->GetInterface();
-    //MemPutFast < float > ( dwThis + 2508, fPosition );
+    DWORD dwThis = (DWORD)this->GetInterface();
+    
+    MemPutFast < float > ( dwThis + 2508, fPosition );
 }
 
 bool CVehicleSA::IsLandingGearDown ( )
 {
     #pragma message("Move this to CPlaneSA!!")
-    /*
     DWORD dwThis = (DWORD)this->GetInterface();
     if ( *(float *)(dwThis + 2508) <= 0.0f )
         return true;
     else
-        return false;*/
-    return false;
+        return false;
 }
 
 void CVehicleSA::Fix ( void )

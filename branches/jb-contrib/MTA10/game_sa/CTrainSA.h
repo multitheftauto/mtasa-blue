@@ -13,6 +13,10 @@
 
 #include "CPhysicalSAInterface.h"
 
+#define NUM_RAILTRACKS                          4
+#define ARRAY_NumRailTrackNodes                 0xC38014    // NUM_RAILTRACKS dwords
+#define ARRAY_RailTrackNodePointers             0xC38024    // NUM_RAILTRACKS pointers to arrays of SRailNode
+
 // TODO: Discover all
 class CTrainFlags
 {

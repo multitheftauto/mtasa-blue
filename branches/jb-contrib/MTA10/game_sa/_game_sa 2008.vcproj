@@ -789,7 +789,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CTrackDataSA.cpp"
+				RelativePath=".\CTrackNodeSA.cpp"
 				>
 			</File>
 			<File
@@ -1426,7 +1426,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CTrackDataSA.h"
+				RelativePath=".\CTrackNodeSA.h"
 				>
 			</File>
 			<File

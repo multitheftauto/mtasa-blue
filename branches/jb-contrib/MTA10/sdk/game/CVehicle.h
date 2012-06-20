@@ -178,7 +178,12 @@ public:
     virtual unsigned short      GetAdjustablePropertyValue              () = 0;
     virtual float               GetHeliRotorSpeed                       () = 0;
     virtual unsigned long       GetExplodeTime                          () = 0;
-    
+ 
+    virtual void                 SetLandingGearDown                     ( bool bLandingGearDown ) = 0;
+    virtual float                GetLandingGearPosition                 () = 0;
+    virtual bool                 IsLandingGearDown                      () = 0;
+    virtual void                 SetLandingGearPosition                 ( float fPosition ) = 0;
+
     virtual void                SetAlwaysLeaveSkidMarks                 ( bool bAlwaysLeaveSkidMarks ) = 0;
     virtual void                SetCanBeDamaged                         ( bool bCanBeDamaged ) = 0;
     virtual void                SetCanBeTargettedByHeatSeekingMissiles  ( bool bEnabled ) = 0;
@@ -210,10 +215,6 @@ public:
     
     virtual float                GetHealth                              () = 0;
     virtual void                 SetHealth                              ( float fHealth ) = 0;
-    virtual void                 SetLandingGearDown                     ( bool bLandingGearDown ) = 0;
-    virtual float                GetLandingGearPosition                 () = 0;
-    virtual bool                 IsLandingGearDown                      () = 0;
-    virtual void                 SetLandingGearPosition                 ( float fPosition ) = 0;
 
     virtual void                 GetTurretRotation                      ( float * fHorizontal, float * fVertical ) = 0;
     virtual void                 SetTurretRotation                      ( float fHorizontal, float fVertical ) = 0;

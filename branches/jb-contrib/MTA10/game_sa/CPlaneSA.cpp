@@ -13,7 +13,7 @@
 
 #include "StdInc.h"
 
-CPlaneSA::CPlaneSA( CPlaneSAInterface * plane ):CAutomobileSA( plane )
+CPlaneSA::CPlaneSA( CPlaneSAInterface * plane ) : CAutomobileSA( plane )
 {
     DEBUG_TRACE("CPlaneSA::CPlaneSA( CPlaneSAInterface * plane )");
     this->m_pInterface = plane;

@@ -29,8 +29,6 @@ class CVehicleSA;
 #include "CDamageManagerSA.h"
 #include "CDoorSA.h"
 
-#define SIZEOF_CHELI                            2584
-
 // 00431f80 public: static class CVehicle * __cdecl CCarCtrl::CreateCarForScript(int,class CVector,unsigned char)
 #define FUNC_CCarCtrlCreateCarForScript         0x431f80 // ##SA##
 
@@ -149,10 +147,6 @@ class CVehicleSA;
 
 #define MAX_PASSENGERS                          8
 
-#define NUM_RAILTRACKS                          4
-#define ARRAY_NumRailTrackNodes                 0xC38014    // NUM_RAILTRACKS dwords
-#define ARRAY_RailTrackNodePointers             0xC38024    // NUM_RAILTRACKS pointers to arrays of SRailNode
-
 #define VAR_CVehicle_SpecialColModels           0xc1cc78
 
 #define FUNC_CAutomobile__GetDoorAngleOpenRatio 0x6A2270
@@ -163,17 +157,6 @@ class CVehicleSA;
 
 #define VAR_CVehicle_Variation1                 0x8A6458
 #define VAR_CVehicle_Variation2                 0x8A6459
-
-
-
-typedef struct
-{
-    short sX;               // x coordinate times 8
-    short sY;               // y coordinate times 8
-    short sZ;               // z coordinate times 8
-    WORD  sRailDistance;    // on-rail distance times 3
-    WORD  padding;
-} SRailNodeSA;
 
 class CVehicleSAInterfaceVTBL : public CEntitySAInterfaceVTBL
 {
@@ -393,9 +376,6 @@ C_ASSERT(sizeof(CAutoPilot) == 0x98);
 
 #define MAX_UPGRADES_ATTACHED 15 // perhaps?
 
-/**
- * \todo GAME RELEASE: Update CVehicleSAInterface
- */
 #pragma message("!! DANGER !! @ Do not use @ Reconstruction in progress.. !! DANGER !!")
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
@@ -499,7 +479,6 @@ public:
 };
 C_ASSERT(sizeof(CVehicleSAInterface) == 0x5A0);
 
-#pragma message("!!! Break up this so each vehicle type gets its class and methods !!!")
 class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {
     friend class CPoolsSA;
@@ -601,10 +580,11 @@ public:
     inline void                 SetAlpha                        ( unsigned char ucAlpha ) { m_ucAlpha = ucAlpha; }
     inline unsigned char        GetAlpha                        ( ) { return m_ucAlpha; }
 
-    void                        SetLandingGearDown              ( bool bLandingGearDown );
-    float                       GetLandingGearPosition          ();
-    void                        SetLandingGearPosition          ( float fPosition );
-    bool                        IsLandingGearDown               ();
+    void                        SetLandingGearDown                     ( bool bLandingGearDown );
+    float                       GetLandingGearPosition                 ();
+    bool                        IsLandingGearDown                      ();
+    void                        SetLandingGearPosition                 ( float fPosition );
+
     void                        Fix                             ();
     DWORD                       * GetMemoryValue                ( DWORD dwOffset );
 
@@ -745,5 +725,7 @@ private:
     void                        RecalculateSuspensionLines          ( void );
     void                        CopyGlobalSuspensionLinesToPrivate  ( void );
 };
+
+#undef REDIRECT_TO_CLASS
 
 #endif
