@@ -24,7 +24,7 @@
 const int NUMBER_OF_VECTORS_FOR_AVERAGE=2;
 #define CAM_NUM_TARGET_HISTORY          4
 
-class CCamSAInterface // 568 bytes?
+class CCamSAInterface
 {
 public:
 
@@ -159,6 +159,7 @@ protected:
     CPedSAInterface         *m_pLastPedLookedAt;// So interpolation works 
     bool        m_bFirstPersonRunAboutActive;
 };
+C_ASSERT(sizeof(CCamSAInterface) == 0x238);
 
 class CCamSA : public CCam
 {
