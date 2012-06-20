@@ -88,6 +88,8 @@ class CRenderWareSA : public CRenderWare
 
     void                ReplacePedModel            ( RpClump * pNew, unsigned short usModelID );
 
+    void                ReplaceModel                ( RpClump* pNew, unsigned short usModelID, DWORD dwFunc );
+
     // Replaces dynamic parts of the vehicle (models that have two different versions: 'ok' and 'dam'), such as doors
     // szName should be without the part suffix (e.g. 'door_lf' or 'door_rf', and not 'door_lf_dummy')
     bool                ReplacePartModels           ( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szName );
@@ -123,6 +125,8 @@ private:
     void                UpdateAssociationForTexInfo ( STexInfo* pTexInfo );
     bool                IsFirstShadInfoHigherOrSamePriority ( SShadInfo* pShadInfoA, SShadInfo* pShadInfoB );
     void                FlushPendingAssociations    ( void );
+    void                GetClumpAtomicList          ( RpClump* pClump, std::vector < RpAtomic* >& outAtomicList );
+    bool                DoClumpsContainTheSameGeometry ( RpClump* pClumpA, RpClump* pClumpB );
 
     // Watched world textures
     std::multimap < ushort, STexInfo* >     m_TexInfoMap;

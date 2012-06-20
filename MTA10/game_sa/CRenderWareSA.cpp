@@ -530,61 +530,97 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short usModelID, 
     return pClump;
 }
 
-// Replaces a vehicle model
-void CRenderWareSA::ReplaceVehicleModel ( RpClump * pNew, unsigned short usModelID )
-{
-    // get the modelinfo array
-    DWORD *pPool = ( DWORD* ) ARRAY_ModelInfo;
 
-    DWORD dwFunc = FUNC_LoadVehicleModel;
-    DWORD dwThis = pPool[usModelID];
-    if ( dwThis && pNew != (RpClump *)((CBaseModelInfoSAInterface *)dwThis)->pRwObject )
-    {
-        __asm
+//
+// Returns list of atomics inside a clump
+//
+void CRenderWareSA::GetClumpAtomicList ( RpClump* pClump, std::vector < RpAtomic* >& outAtomicList )
+{
+    LOCAL_FUNCTION_START
+        static RpAtomic* GetClumpAtomicListCB ( RpAtomic* pAtomic, std::vector < RpAtomic* >* pData )
         {
-            mov     ecx, dwThis
-            push    pNew
-            call    dwFunc
+            pData->push_back ( pAtomic );
+            return pAtomic;
+        }
+    LOCAL_FUNCTION_END
+
+    RpClumpForAllAtomics ( pClump, LOCAL_FUNCTION::GetClumpAtomicListCB, &outAtomicList );
+}
+
+//
+// Returns true if the clump geometry sort of matches
+//
+bool CRenderWareSA::DoClumpsContainTheSameGeometry ( RpClump* pClumpA, RpClump* pClumpB )
+{
+    // Get atomic list from both clumps
+    std::vector < RpAtomic* > atomicListA;
+    std::vector < RpAtomic* > atomicListB;
+    GetClumpAtomicList ( pClumpA, atomicListA );
+    GetClumpAtomicList ( pClumpB, atomicListB );
+
+    // Count geometries that exist in both clumps
+    std::set < RpGeometry* > geometryListA;
+    for ( uint i = 0 ; i < atomicListA.size () ; i++ )
+        MapInsert ( geometryListA, atomicListA[i]->geometry );
+
+    uint uiInBoth = 0;
+    for ( uint i = 0 ; i < atomicListB.size () ; i++ )
+        if ( MapContains ( geometryListA, atomicListB[i]->geometry ) )
+            uiInBoth++;
+
+    // If less than 50% match then assume it is not the same
+    if ( uiInBoth * 2 < atomicListB.size () || atomicListB.size () == 0 )
+        return false;
+
+    return true;
+}
+
+
+// Replaces a vehicle/weapon/ped model
+void CRenderWareSA::ReplaceModel ( RpClump* pNew, unsigned short usModelID, DWORD dwFunc )
+{
+    CModelInfo* pModelInfo = pGame->GetModelInfo ( usModelID );
+    if ( pModelInfo )
+    {
+        RpClump* pOldClump = (RpClump *)pModelInfo->GetRwObject ();
+        if ( !DoClumpsContainTheSameGeometry ( pNew, pOldClump ) )
+        {
+            // Make new clump container for the model geometry
+            RpClump* pNewClone = RpClumpClone ( pNew );
+
+            // ModelInfo::SetClump
+            CBaseModelInfoSAInterface* pModelInfoInterface = pModelInfo->GetInterface ();
+            __asm
+            {
+                mov     ecx, pModelInfoInterface
+                push    pNewClone
+                call    dwFunc
+            }
+
+            // Destroy old clump container
+            RpClumpDestroy ( pOldClump );
         }
     }
+}
+
+// Replaces a vehicle model
+void CRenderWareSA::ReplaceVehicleModel ( RpClump* pNew, unsigned short usModelID )
+{
+    ReplaceModel ( pNew, usModelID, FUNC_LoadVehicleModel );
 }
 
 // Replaces a weapon model
 void CRenderWareSA::ReplaceWeaponModel ( RpClump * pNew, unsigned short usModelID )
 {
-    // get the modelinfo array
-    DWORD *pPool = ( DWORD* ) ARRAY_ModelInfo;
-
-    DWORD dwFunc = FUNC_LoadWeaponModel;
-    DWORD dwThis = pPool[usModelID];
-    if ( dwThis && pNew != (RpClump *)((CBaseModelInfoSAInterface *)dwThis)->pRwObject )
-    {
-        __asm
-        {
-            mov     ecx, dwThis
-            push    pNew
-            call    dwFunc
-        }
-    }
+    ReplaceModel ( pNew, usModelID, FUNC_LoadWeaponModel );
 }
 
+// Replaces a ped model
 void CRenderWareSA::ReplacePedModel ( RpClump * pNew, unsigned short usModelID )
 {
-    // get the modelinfo array
-    DWORD *pPool = ( DWORD* ) ARRAY_ModelInfo;
-
-    DWORD dwFunc = FUNC_LoadPedModel;
-    DWORD dwThis = pPool[usModelID];
-    if ( dwThis && pNew != (RpClump *)((CBaseModelInfoSAInterface *)dwThis)->pRwObject )
-    {
-        __asm
-        {
-            mov     ecx, dwThis
-            push    pNew
-            call    dwFunc
-        }
-    }
+    ReplaceModel ( pNew, usModelID, FUNC_LoadPedModel );
 }
+
 // Reads and parses a COL3 file
 CColModel * CRenderWareSA::ReadCOL ( const char * szCOLFile )
 {
