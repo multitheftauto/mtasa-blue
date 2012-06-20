@@ -106,15 +106,12 @@ void CClientWeapon::Fire ( void )
         {
             CVector vecOrigin, vecRotation;
             GetPosition ( vecOrigin );
+
             if ( m_pAttachedToEntity )
             {
 
                 GetRotationRadians ( vecRotation );
-                // Fixes vehicle rotation.... god.
-                vecRotation.fX = ConvertDegreesToRadians( 360.0f - ConvertRadiansToDegrees ( vecRotation.fX ) );
-                vecRotation.fY = ConvertDegreesToRadians( 360.0f - ConvertRadiansToDegrees ( vecRotation.fY ) );
-                vecRotation.fZ = ConvertDegreesToRadians( 360.0f - ConvertRadiansToDegrees ( vecRotation.fZ ) );
-                vecRotation = -vecRotation;
+
             }
             else
             {
