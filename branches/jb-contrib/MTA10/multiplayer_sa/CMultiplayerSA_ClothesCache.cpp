@@ -11,6 +11,9 @@
 
 #include "StdInc.h"
 
+RpClumpDestroy_t                        RpClumpDestroy                          = (RpClumpDestroy_t)                        0xDEAD;
+RpClumpClone_t                          RpClumpClone                            = (RpClumpClone_t)                          0xDEAD;
+
 #define CLOTHES_REF_TEST    1       // Debug clothes geometry refs
 
 ////////////////////////////////////////////////
