@@ -18,9 +18,25 @@
 
 class CBoatSAInterface : public CVehicleSAInterface
 {
-    // fill this
+    uint32 pad1[3];
+    uint32 BoatFlags;
+    RwFrame* pBoatParts[11]; // find out correct size
+    uint32 pad2[3];
+    uint16 pad3;
+    uint8 pad4[2];
+    uint32 pad5[3];
+    void* pBoatHandlingData;
+    uint32 pad6[5];
+    CVector vecUnk1;
+    CVector vecUnk2;
+    class CParticleFx* pBoatPropellerSplashParticle;
+    uint32 pad7[4];
+    uint8 pad8;
+    uint8 ucPadUsingBoat; // see class CPad
+    uint8 pad9[2];
+    uint32 pad10[106];
 };
-//C_ASSERT(sizeof(CBoatSAInterface) == 0x7E8);
+C_ASSERT(sizeof(CBoatSAInterface) == 0x7E8);
 
 class CBoatSA : public virtual CBoat, public virtual CVehicleSA
 {

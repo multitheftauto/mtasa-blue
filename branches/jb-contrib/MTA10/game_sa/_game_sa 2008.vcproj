@@ -789,6 +789,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CTrackDataSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CTrailerSA.cpp"
 				>
 			</File>
@@ -1419,6 +1423,10 @@
 			</File>
 			<File
 				RelativePath=".\CTheCarGeneratorsSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CTrackDataSA.h"
 				>
 			</File>
 			<File

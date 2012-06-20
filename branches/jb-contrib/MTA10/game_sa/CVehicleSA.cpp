@@ -374,12 +374,16 @@ CVehicle * CVehicleSA::GetPreviousTrainCarriage ( void )
 bool CVehicleSA::IsDerailed ( void )
 {
     CVehicleSAInterface* pInterface = GetVehicleInterface ();
-    return pInterface->trainFlags.bIsDerailed;
+    return false;
+#pragma message("Move this into CTrainSA")
+//    return pInterface->trainFlags.bIsDerailed;
 }
 
 
 void CVehicleSA::SetDerailed ( bool bDerailed )
 {
+    #pragma message("Move this into CTrainSA")
+    /*
     WORD wModelID = GetModelIndex();
     if ( wModelID == 537 || wModelID == 538 || wModelID == 569 || wModelID == 570 || wModelID == 590 || wModelID == 449 )
     {
@@ -408,28 +412,35 @@ void CVehicleSA::SetDerailed ( bool bDerailed )
             GetVehicleInterface ()->m_fTrainSpeed = 0.0f;
         }
     }   
+    */
 }
 
 float CVehicleSA::GetTrainSpeed ()
 {
-    return GetVehicleInterface ()->m_fTrainSpeed;
+    #pragma message("Move this into CTrainSA")
+    return 0.0f;
+ //   return GetVehicleInterface ()->m_fTrainSpeed;
 }
 
 
 void CVehicleSA::SetTrainSpeed ( float fSpeed )
 {
-    GetVehicleInterface ()->m_fTrainSpeed = fSpeed;
+    #pragma message("Move this into CTrainSA")
+  //  GetVehicleInterface ()->m_fTrainSpeed = fSpeed;
 }
 
 
 bool CVehicleSA::GetTrainDirection ()
 {
-    return ( *( (BYTE *)GetInterface () + 1464 ) & 0x40 ) != 0;
+    #pragma message("Move this into CTrainSA")
+    return false;
+    //return ( *( (BYTE *)GetInterface () + 1464 ) & 0x40 ) != 0;
 }
 
 
 void CVehicleSA::SetTrainDirection ( bool bDirection )
 {
+    /*
     if ( bDirection )
     {
         MemOrFast < BYTE > ( (BYTE*)GetInterface () + 1464, 0x40 );
@@ -437,16 +448,22 @@ void CVehicleSA::SetTrainDirection ( bool bDirection )
     else
     {
         MemAndFast < BYTE > ( (BYTE*)GetInterface () + 1464, ~0x40 );
-    }
+    }*/
+    #pragma message("Move this into CTrainSA")
 }
 
 BYTE CVehicleSA::GetRailTrack ()
 {
-    return GetVehicleInterface ()->m_ucRailTrackID;
+    #pragma message("Move this into CTrainSA")
+    return 0xFF;
+
+    //return GetVehicleInterface ()->m_ucRailTrackID;
 }
 
 void CVehicleSA::SetRailTrack ( BYTE ucTrackID )
 {
+    #pragma message("Move this into CTrainSA")
+    /*
     if ( ucTrackID >= NUM_RAILTRACKS )
         return;
 
@@ -461,6 +478,7 @@ void CVehicleSA::SetRailTrack ( BYTE ucTrackID )
             call dwFunc
         }
     }
+    */
 }
 
 bool CVehicleSA::CanPedEnterCar ( void )
@@ -1875,6 +1893,8 @@ typedef RwFrame * (__cdecl *RwFrameForAllObjects_t) (RwFrame * frame, void * cal
 extern RwFrameForAllObjects_t RwFrameForAllObjects;
 void CVehicleSA::SetWheelVisibility ( eWheels wheel, bool bVisible )
 {    
+#pragma message("Move this into CAutomobileSA")
+    /*
     CVehicleSAInterface * vehicle = (CVehicleSAInterface *)this->GetInterface();
     RwFrame * pFrame = NULL;
     switch ( wheel )
@@ -1900,6 +1920,7 @@ void CVehicleSA::SetWheelVisibility ( eWheels wheel, bool bVisible )
 
         if ( pObject ) pObject->flags = ( bVisible ) ? 4 : 0;
     }
+    */
 }
 
 

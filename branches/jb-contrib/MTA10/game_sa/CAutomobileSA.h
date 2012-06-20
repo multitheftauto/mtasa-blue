@@ -78,8 +78,27 @@ class CAutomobileSAUnknownInterface // 40 bytes
 class CAutomobileSAInterface : public CVehicleSAInterface
 {
 public:
-    uint32 pad1[30];
-    CColPointSAInterface WheelFrontLeftColPoint;
+    CDamageManagerSAInterface DamageManager; // 1440
+    uint32 pad0[36]; // 1
+    RwFrame * pUnk0; // 1608
+    RwFrame * pChassis; // 1612
+    RwFrame * pWheelFrontRight; // 1616
+    RwFrame * pWheelFrontRightSpecial; // 1620
+    RwFrame * pWheelRearRight; // 1624
+    RwFrame * pWheelFrontLeft; // 1628
+    RwFrame * pWheelFrontLeftSpecial; // 1632
+    RwFrame * pWheelRearLeft; // 1636
+    RwFrame * pDoors [ 4 ]; // 1640
+    RwFrame * pBumpers [ 2 ]; // 1656
+    RwFrame * pUnk1; // 1664
+    RwFrame * pUnk2; // 1668
+    RwFrame * pBonet; // 1672
+    RwFrame * pBoot; // 1676
+    RwFrame * pWindscreen; // 1680
+    RwFrame * pExhaust; // 1684
+    RwFrame * pSpecialParts[5]; // 1688
+    uint32 pad1[30]; // 1692
+    CColPointSAInterface WheelFrontLeftColPoint; // 1828
     CColPointSAInterface WheelRearLeftColPoint;
     CColPointSAInterface WheelFrontRightColPoint;
     CColPointSAInterface WheelRearRightColPoint;
@@ -97,8 +116,12 @@ public:
     uint32 pad11[5];
     class CParticleFx* pNitroParticles[2];
     uint32 pad12[2];
+   /*
+    // 2276
+   // float m_fBurningTime;
+   */
 };
-//C_ASSERT(sizeof(CAutomobileSAInterface) == 0x988);
+C_ASSERT(sizeof(CAutomobileSAInterface) == 0x988);
 
 class CAutomobileSA : public virtual CAutomobile, public virtual CVehicleSA
 {

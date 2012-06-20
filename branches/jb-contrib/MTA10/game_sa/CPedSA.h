@@ -109,19 +109,6 @@ class CPedIntelligenceSAInterface;
 
 #define VAR_LocalPlayer                 0x94AD28
 
-/*
-#ifndef CVehicleSA_DEFINED
-#define CVehicleSA void
-#endif
-
-#ifdef CPedSA
-#undef CPedSA
-#endif
-
-#ifdef CPedSAInterface
-#undef CPedSAInterface
-#endif
-*/
 
 //+1328 = Ped state
 //+1344 = ped health

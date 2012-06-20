@@ -37,16 +37,18 @@
 #define MAX_DOORS                   6   // also in CAutomobile
 #define MAX_WHEELS                  4
 
-class CDamageManagerSAInterface // 28 bytes due to the way its packed (24 containing actual data)
+class CDamageManagerSAInterface // LIES !! [[ need to check who wrote that to have a little discussion ]] ->> 28 bytes due to the way its packed (24 containing actual data)
 {
 public:
-    FLOAT           fWheelDamageEffect;
-    BYTE            bEngineStatus;      // old - wont be used
-    BYTE            Wheel[MAX_WHEELS];
-    BYTE            Door[MAX_DOORS];
-    DWORD           Lights;             // 2 bits per light
-    DWORD           Panels;             // 4 bits per panel
+    float           fWheelDamageEffect;
+    uint8           bEngineStatus;      // old - wont be used
+    uint8           Wheel[MAX_WHEELS];
+    uint8           Door[MAX_DOORS];
+    uint8           __align;            // !!thats the real align so it's bound on 4-byte!!
+    uint32          Lights;             // 2 bits per light
+    uint32          Panels;             // 4 bits per panel
 };
+C_ASSERT(sizeof(CDamageManagerSAInterface) == 0x18);
 
 class CDamageManagerSA : public CDamageManager
 {

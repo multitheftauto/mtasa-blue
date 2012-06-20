@@ -65,17 +65,17 @@ bool AreVerticesVisible(CCameraSAInterface* pCamera, CVector& vecTargetPos, floa
 #if 0
 void CRopesSAInterface::Draw()
 {
-	CVector &vecRopeCenter = m_vecSegments[ROPES_COUNT / 2];
+    CVector &vecRopeCenter = m_vecSegments[ROPES_COUNT / 2];
     CCameraSAInterface
         *pCameraInterface = g_pGame->GetCamera()->GetInterface();
     if(AreVerticesVisible(pCameraInterface, vecRopeCenter, 20.0f, &pCameraInterface->m_matInverse)
-	   || *(uint8*)(pCameraInterface + 0x970) && AreVerticesVisible(pCameraInterface, vecRopeCenter, 20.0f, &pCameraInterface->m_matMirrorInverse))
-	{
+       || *(uint8*)(pCameraInterface + 0x970) && AreVerticesVisible(pCameraInterface, vecRopeCenter, 20.0f, &pCameraInterface->m_matMirrorInverse))
+    {
         CMatrix matCamPos;
         CVector &pVecCameraPos = g_pGame->GetCamera()->GetMatrix(&matCamPos)->vPos;
-		CVector vecRange = pVecCameraPos - m_vecSegments[0];
-		if(vecRange.LengthSquared() < 120.0f * 120.0f)
-		{
+        CVector vecRange = pVecCameraPos - m_vecSegments[0];
+        if(vecRange.LengthSquared() < 120.0f * 120.0f)
+        {
             {   // DrawSkyBottom
                 uint32 dwFunc = (uint32)0x734650;
                 __asm call dwFunc
@@ -83,45 +83,45 @@ void CRopesSAInterface::Draw()
             // RxObjSpace3dVertex pVerts[32];
             RxObjSpace3DVertex *pVerts = (RxObjSpace3DVertex*)(*reinterpret_cast<uint32*>(0xC4D958));
 
-			for(uint32 i = 0; i < SEGMENT_COUNT; i++)
-			{
-				pVerts[i].color = 0x80000000;
-				pVerts[i].objVertex.x = m_vecSegments[i].fX;
+            for(uint32 i = 0; i < SEGMENT_COUNT; i++)
+            {
+                pVerts[i].color = 0x80000000;
+                pVerts[i].objVertex.x = m_vecSegments[i].fX;
                 pVerts[i].objVertex.y = m_vecSegments[i].fY;
                 pVerts[i].objVertex.z = m_vecSegments[i].fZ;
-			}
+            }
             RwEngineInstance
                 *pEngineInstance = reinterpret_cast<RwEngineInstance*>(*reinterpret_cast<uint32*>(0xC97B24));
-			pEngineInstance->dOpenDevice.fpRenderStateSet(rwRENDERSTATEZWRITEENABLE, (void*)1); // check
-			pEngineInstance->dOpenDevice.fpRenderStateSet(rwRENDERSTATEVERTEXALPHAENABLE, (void*)1);
-			pEngineInstance->dOpenDevice.fpRenderStateSet(rwRENDERSTATESRCBLEND, (void*)5);
-			pEngineInstance->dOpenDevice.fpRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)6);
-			pEngineInstance->dOpenDevice.fpRenderStateSet(rwRENDERSTATETEXTUREFILTER, (void*)2);
-			pEngineInstance->dOpenDevice.fpRenderStateSet(rwRENDERSTATETEXTURERASTER, (void*)0);
-			if(RwIm3DTransform(&pVerts, 32, 0, 0))
-			{
+            pEngineInstance->dOpenDevice.fpRenderStateSet(rwRENDERSTATEZWRITEENABLE, (void*)1); // check
+            pEngineInstance->dOpenDevice.fpRenderStateSet(rwRENDERSTATEVERTEXALPHAENABLE, (void*)1);
+            pEngineInstance->dOpenDevice.fpRenderStateSet(rwRENDERSTATESRCBLEND, (void*)5);
+            pEngineInstance->dOpenDevice.fpRenderStateSet(rwRENDERSTATEDESTBLEND, (void*)6);
+            pEngineInstance->dOpenDevice.fpRenderStateSet(rwRENDERSTATETEXTUREFILTER, (void*)2);
+            pEngineInstance->dOpenDevice.fpRenderStateSet(rwRENDERSTATETEXTURERASTER, (void*)0);
+            if(RwIm3DTransform(&pVerts, 32, 0, 0))
+            {
                 pEngineInstance->dOpenDevice.fpIm3DRenderIndexedPrimitive(1, (RwImVertexIndex*)*reinterpret_cast<uint16*>(0x8CD818), 62);
-				//RwIm3DRenderIndexedPrimitive(1, *reinterpret_cast<uint16*>(0x8CD818), 62);
-				RwIm3DEnd();
-			}
-			if(m_ucRopeType == 6)
-			{
-				pVerts[0].color = 0x80000000;
-				pVerts[0].objVertex.x = m_vecSegments[0].fX;
-				pVerts[0].objVertex.y = m_vecSegments[0].fY;
-				pVerts[0].objVertex.z = m_vecSegments[0].fZ;
-				pVerts[1].color = 0x80000000;
-				pVerts[1].objVertex.x = 709.32f;
-				pVerts[1].objVertex.y = 916.2f;
-				pVerts[1].objVertex.z = 53.0f;
-				if(RwIm3DTransform(pVerts, 2, 0, 0))
-				{
+                //RwIm3DRenderIndexedPrimitive(1, *reinterpret_cast<uint16*>(0x8CD818), 62);
+                RwIm3DEnd();
+            }
+            if(m_ucRopeType == 6)
+            {
+                pVerts[0].color = 0x80000000;
+                pVerts[0].objVertex.x = m_vecSegments[0].fX;
+                pVerts[0].objVertex.y = m_vecSegments[0].fY;
+                pVerts[0].objVertex.z = m_vecSegments[0].fZ;
+                pVerts[1].color = 0x80000000;
+                pVerts[1].objVertex.x = 709.32f;
+                pVerts[1].objVertex.y = 916.2f;
+                pVerts[1].objVertex.z = 53.0f;
+                if(RwIm3DTransform(pVerts, 2, 0, 0))
+                {
                     pEngineInstance->dOpenDevice.fpIm3DRenderIndexedPrimitive(1, (RwImVertexIndex*)*reinterpret_cast<uint16*>(0x8CD818), 2);
-					//RwIm3DRenderIndexedPrimitive(1, *reinterpret_cast<uint16*>(0x8CD818), 2);
-					RwIm3DEnd();
-				}
-			}
-		}
-	}
+                    //RwIm3DRenderIndexedPrimitive(1, *reinterpret_cast<uint16*>(0x8CD818), 2);
+                    RwIm3DEnd();
+                }
+            }
+        }
+    }
 }
 #endif

@@ -468,7 +468,7 @@ public:
 
     //1216
     float m_nHealth; // 1000.0f = full health. 0 -> explode
-
+ // dafaq is this
     /*** BEGIN SECTION that was added by us ***/
     BYTE Padding200[45]; //1220
     CVehicle* m_pVehicle; //1268
@@ -488,7 +488,7 @@ public:
     class CParticleFx* pOverheatParticle;
     class CParticleFx* pFireParticle;
     class CParticleFx* pDustParticle;
-    uint32 dwRenderLights;
+    uint32 uiRenderLightsFlags;
     RwTexture* pLicensePlateTexture;
     uint32 padX1;
     uint32 uiCarType;
@@ -496,63 +496,10 @@ public:
     uint16 pTexDictEntryIndex;
     uint16 padX3;
     uint32 padX4;
-    void *pDamageManagers[6];
-
-    //1440
-    unsigned char m_ucTrackNodeID;  // Current node on train tracks
-    BYTE Padding230[3];
-
-    //1444
-    float m_fTrainSpeed;           // Speed along rails
-    //1448
-    float m_fTrainRailDistance;    // Distance along rail starting from first rail node (determines train position when on rails)
-    
-    //1452
-    float m_fDistanceToNextCarriage;
-    DWORD padding240[2];
-
-    //1464
-    CTrainFlags trainFlags;
-
-    //1468
-    DWORD padding250[1];
-
-    //1472
-    BYTE m_ucRailTrackID;
-
-    //1473
-    BYTE padding260[15];
-
-    //1488
-    CVehicleSAInterface* m_prevCarriage;
-    CVehicleSAInterface* m_nextCarriage;
-
-    //1496
-    BYTE padding270[116];
-
-    // 1612
-    RwFrame * pChassis;
-    RwFrame * pWheelFrontRight;
-    RwFrame * pWheelFrontRightSpecial;
-    RwFrame * pWheelRearRight;
-    RwFrame * pWheelFrontLeft;
-    RwFrame * pWheelFrontLeftSpecial;
-    RwFrame * pWheelRearLeft;
-    RwFrame * pDoors [ 4 ];
-    RwFrame * pBumpers [ 2 ];
-    RwFrame * pUnk1;
-    RwFrame * pUnk2;
-    RwFrame * pBonet;
-    RwFrame * pBoot;
-    RwFrame * pWindscreen;
-    RwFrame * pExhaust;
-    RwFrame * pSpecialParts[5];
-   // BYTE padding280[576];
-    // 2276
-   // float m_fBurningTime;
 };
 C_ASSERT(sizeof(CVehicleSAInterface) == 0x5A0);
 
+#pragma message("!!! Break up this so each vehicle type gets its class and methods !!!")
 class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {
     friend class CPoolsSA;
