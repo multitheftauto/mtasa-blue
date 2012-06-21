@@ -694,3 +694,15 @@ void CGameSA::DisableVSync ( void )
 {
     MemPutFast < BYTE > ( 0xBAB318, 0 );
 }
+
+void CGameSA::OnPedContextChange ( CPed* pPedContext )
+{
+    m_pPedContext = pPedContext;
+}
+
+CPed* CGameSA::GetPedContext ( void )
+{
+    if ( !m_pPedContext )
+        m_pPedContext = pGame->GetPools ()->GetPedFromRef ( (DWORD)1 );
+    return m_pPedContext;
+}

@@ -425,6 +425,9 @@ public:
     void                GetVoice                ( const char** pszVoiceType, const char** pszVoice );
     void                SetVoice                ( short sVoiceType, short sVoiceID );
     void                SetVoice                ( const char* szVoiceType, const char* szVoice );
+
+    CWeaponStat*        GetCurrentWeaponStat    ( void );
+    float               GetCurrentWeaponRange   ( void );
 };
 
 #endif
