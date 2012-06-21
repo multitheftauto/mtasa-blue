@@ -218,6 +218,9 @@ public:
     void                    FlushPendingRestreamIPL         ( void );
     void                    DisableVSync                    ( void );
 
+    void                    OnPedContextChange              ( CPed* pPedContext );
+    CPed*                   GetPedContext                   ( void );
+
 private:
     CPools                  * m_pPools;
     CPlayerInfo             * m_pPlayerInfo;
@@ -290,6 +293,8 @@ private:
     static unsigned long*   VAR_Framelimiter;
 
     std::map < std::string, SCheatSA* > m_Cheats;
+
+    CPed*                   m_pPedContext;
 };
 
 #endif

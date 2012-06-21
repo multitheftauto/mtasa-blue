@@ -52,6 +52,8 @@ CEntitySAInterface ** ppInstantHitEntity;
 CVector * pInstantHitStart = NULL, * pInstantHitEnd = NULL;
 
 CVector vecLastOrigin;
+CVector vecLastLocalPlayerBulletStart;
+CVector vecLastLocalPlayerBulletEnd;
 
 char cTempGunDirection;
 
@@ -226,7 +228,39 @@ static void Event_BulletImpact ( void )
         if ( pInitiator )
         {
             CEntity* pVictim = m_pools->GetEntity ( (DWORD *)pBulletImpactVictim );
-            m_pBulletImpactHandler ( pInitiator, pVictim, pBulletImpactStartPosition, pBulletImpactEndPosition );
+
+            if ( IsLocalPlayer ( pInitiator ) )
+            {
+                // Correct weapon range if local player
+                float fRange = pInitiator->GetCurrentWeaponRange ();
+                CVector vecDir = *pBulletImpactEndPosition - *pBulletImpactStartPosition;
+                float fLength = vecDir.Length ();
+                if ( fRange < fLength )
+                {
+                    vecDir.Normalize ();
+                    *pBulletImpactEndPosition = *pBulletImpactStartPosition + vecDir * fRange;
+                }
+                m_pBulletImpactHandler ( pInitiator, pVictim, &vecLastLocalPlayerBulletStart, &vecLastLocalPlayerBulletEnd );
+            }
+            else
+            {
+                // Correct start postion if remote player
+                CRemoteDataStorageSA * data = CRemoteDataSA::GetRemoteDataStorage ( pBulletImpactInitiator );
+                if ( data )
+                {
+                    if ( data->ProcessPlayerWeapon () )
+                    {
+                        if ( data->m_shotSyncData.m_bRemoteBulletSyncVectorsValid )
+                        {
+                            *pBulletImpactStartPosition = data->m_shotSyncData.m_vecRemoteBulletSyncStart;
+                             data->m_shotSyncData.m_bRemoteBulletSyncVectorsValid = false;
+                        }
+                        else
+                            *pBulletImpactStartPosition = data->m_shotSyncData.m_vecShotOrigin;
+                    }
+                }
+                m_pBulletImpactHandler ( pInitiator, pVictim, pBulletImpactStartPosition, pBulletImpactEndPosition );
+            }
         }
     }
 }
@@ -1017,13 +1051,27 @@ static void CheckInVehicleDamage()
 // If using bullet sync, send the bullet vectors to the other players
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMy_CWeapon_FireInstantHit_Mid ( CEntitySAInterface* pEntity, CVector pvecStart, CVector pvecEnd, bool bFlag )
+void OnMy_CWeapon_FireInstantHit_Mid ( CEntitySAInterface* pEntity, CVector vecStart, CVector vecEnd, bool bFlag )
 {
     CPed * pTargetingPed = m_pools->GetPed ( (DWORD *)pEntity );
     if ( IsLocalPlayer ( pTargetingPed ) )
     {
+        // Trim end point to weapon range
+        float fRange = pTargetingPed->GetCurrentWeaponRange ();
+        CVector vecDir = vecEnd - vecStart;
+        float fLength = vecDir.Length ();
+        if ( fRange < fLength )
+        {
+            vecDir.Normalize ();
+            vecEnd = vecStart + vecDir * fRange;
+        }
+
+        // Save these for BulletImpact
+        vecLastLocalPlayerBulletStart = vecStart;
+        vecLastLocalPlayerBulletEnd = vecEnd;
+
         if ( m_pBulletFireHandler )
-            m_pBulletFireHandler ( pTargetingPed, &pvecStart, &pvecEnd );
+            m_pBulletFireHandler ( pTargetingPed, &vecStart, &vecEnd );
     }
 }
 
@@ -1099,7 +1147,6 @@ void HandleRemoteInstantHit( void )
                 {
                     *pInstantHitStart = data->m_shotSyncData.m_vecRemoteBulletSyncStart;
                     *pInstantHitEnd = data->m_shotSyncData.m_vecRemoteBulletSyncEnd;
-                    data->m_shotSyncData.m_bRemoteBulletSyncVectorsValid = false;
                 }
             }
         }
