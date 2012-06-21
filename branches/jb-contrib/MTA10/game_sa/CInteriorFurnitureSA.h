@@ -11,6 +11,9 @@
 
 #pragma once
 
+// CInteriorFurnitureSA Pool[128];
+#define ARRAY_CInteriorFurniture__Pool             0xBAD3F8
+
 class CInteriorFurnitureSAInterface
 {
 public:

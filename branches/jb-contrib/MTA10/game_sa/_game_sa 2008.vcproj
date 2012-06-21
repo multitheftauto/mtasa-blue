@@ -357,6 +357,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CAnimBlendKeyFrameSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CAnimBlendNodeSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CAnimBlendSequenceSA.cpp"
 				>
 			</File>
@@ -959,6 +967,14 @@
 			</File>
 			<File
 				RelativePath=".\CAnimBlendHierarchySA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CAnimBlendKeyFrameSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CAnimBlendNodeSA.h"
 				>
 			</File>
 			<File

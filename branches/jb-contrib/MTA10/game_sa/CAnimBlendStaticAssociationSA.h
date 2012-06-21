@@ -32,6 +32,7 @@ public:
     BYTE                                pad2 [ 4 ]; // 12
     CAnimBlendHierarchySAInterface *    pAnimHeirarchy; // 16
 };
+C_ASSERT(sizeof(CAnimBlendStaticAssociationSAInterface) == 0x14);
 
 class CAnimBlendStaticAssociationSA : public CAnimBlendStaticAssociation
 {
