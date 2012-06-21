@@ -229,6 +229,7 @@ VOID ReturnContextToLocalPlayer()
 
 
         PostContextSwitch();
+        pGameInterface->OnPedContextChange ( NULL );
 
         if ( m_pPostContextSwitchHandler )
         {
@@ -240,6 +241,7 @@ VOID ReturnContextToLocalPlayer()
         // Store any changes to the local-players stats?
         if ( !bLocalStatsStatic )
         {
+            assert ( 0 );   // bLocalStatsStatic is always true
             MemCpyFast ( &localStatsData.StatTypesFloat, (void *)0xb79380, sizeof(float) * MAX_FLOAT_STATS );
             MemCpyFast ( &localStatsData.StatTypesInt, (void *)0xb79000, sizeof(int) * MAX_INT_STATS );
             MemCpyFast ( &localStatsData.StatReactionValue, (void *)0xb78f10, sizeof(float) * MAX_REACTION_STATS );
@@ -433,6 +435,7 @@ void SwitchContext ( CPed* thePed )
                 MemPutFast < float > ( VAR_CameraRotation, fLocalPlayerCameraRotation );
         }
     }
+    pGameInterface->OnPedContextChange ( thePed );
 }
 
 

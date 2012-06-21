@@ -4549,8 +4549,16 @@ void CClientGame::PostWeaponFire ( void )
                     Arguments.PushElement ( pCollisionEntity );
                 else
                     Arguments.PushNil ();
+
                 if (IS_PLAYER(pPed))
+                {
+                    CVector vecOrigin;
+                    pPed->GetShotData ( &vecOrigin );
+                    Arguments.PushNumber ( ( double ) vecOrigin.fX );
+                    Arguments.PushNumber ( ( double ) vecOrigin.fY );
+                    Arguments.PushNumber ( ( double ) vecOrigin.fZ );
                     pPed->CallEvent ( "onClientPlayerWeaponFire", Arguments, true );
+                }
                 else
                     pPed->CallEvent ( "onClientPedWeaponFire", Arguments, true );
             }
