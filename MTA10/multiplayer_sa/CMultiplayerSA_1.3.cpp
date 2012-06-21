@@ -778,7 +778,7 @@ bool DisableVehicleSiren ( )
     if ( pVehicleWithTheSiren && pVehicleWithTheSiren->vtbl != NULL )
     {
         CVehicle * pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)pVehicleWithTheSiren );
-        if ( ( pVehicle && pVehicle->IsSirenSilentEffectEnabled ( ) ) || pVehicle->GetModelIndex ( ) == 420 )
+        if ( pVehicle && ( pVehicle->IsSirenSilentEffectEnabled ( ) || pVehicle->GetModelIndex ( ) == 420 ) )
         {
             return true;
         }
