@@ -22,7 +22,7 @@ public:
     uint32 pNext;
     class CFxSystem* pFxSystem; // must be initialized before this class is used
     RwMatrix* pMatrixPos;
-    RwMatrix matrix;
+    RwMatrix transformMatrix;
     uint8 pad2[4];
     uint32 pad3[2];
     uint16 pad4[3];
