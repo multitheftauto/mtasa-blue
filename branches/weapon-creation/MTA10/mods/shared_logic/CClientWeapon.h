@@ -41,7 +41,7 @@ public:
     void                    SetDirection            ( CVector & vecDirection );
     void                    SetTargetDirection      ( CVector & vecDirection );
     void                    LookAt                  ( CVector & vecPosition, bool bInterpolate = false );
-    void                    SetDamage               ( short sDamage )   { m_sDamage = sDamage; }
+    CWeaponStat *           GetWeaponStat           ( void )   { return m_pWeaponStat; }
 
 private:
     CClientManager *        m_pManager;
@@ -56,6 +56,7 @@ private:
     CClientMarker *         m_pMarker;
     CClientMarker *         m_pMarker2;
     short                   m_sDamage;
+    CWeaponStat *           m_pWeaponStat;
 };
 
 #endif

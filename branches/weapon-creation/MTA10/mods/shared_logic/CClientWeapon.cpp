@@ -30,6 +30,7 @@ CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponT
     m_pMarker2->SetColor( SColor( 0xFFFF0000 ) );
     m_pMarker2->SetSize ( 0.5f );
     m_sDamage = m_pWeaponInfo->GetDamagePerHit ( );
+    m_pWeaponStat = g_pGame->CreateWeaponStat ( type, WEAPONSKILL_PRO );
 }
 
 
@@ -130,11 +131,29 @@ void CClientWeapon::Fire ( void )
             vecDirection *= fDistance;
             RotateVector ( vecDirection, vecRotation );
             CVector vecTarget = vecOrigin + vecDirection;
+
+
+            // Save
             short sDamage = m_pWeaponInfo->GetDamagePerHit ( );
-            m_pWeaponInfo->SetDamagePerHit ( m_sDamage );
+            float fAccuracy = m_pWeaponInfo->GetAccuracy ( );
+            float fTargetRange = m_pWeaponInfo->GetTargetRange ( );
+            float fRange = m_pWeaponInfo->GetWeaponRange ( );
+
+            // Set new
+            m_pWeaponInfo->SetDamagePerHit ( m_pWeaponStat->GetDamagePerHit ( ) );
+            m_pWeaponInfo->SetAccuracy ( m_pWeaponStat->GetAccuracy ( ) );
+            m_pWeaponInfo->SetTargetRange ( m_pWeaponStat->GetTargetRange ( ) );
+            m_pWeaponInfo->SetWeaponRange ( m_pWeaponStat->GetWeaponRange ( ) );
+
+            // Process
             m_pMarker->SetPosition ( vecTarget );
             FireInstantHit ( vecOrigin, vecTarget );
+
+            // Restore
             m_pWeaponInfo->SetDamagePerHit ( sDamage );
+            m_pWeaponInfo->SetAccuracy ( fAccuracy );
+            m_pWeaponInfo->SetTargetRange ( fTargetRange );
+            m_pWeaponInfo->SetWeaponRange ( fRange );
 
             break;
         }

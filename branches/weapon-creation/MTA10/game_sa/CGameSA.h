@@ -215,8 +215,9 @@ public:
 
     bool                    HasCreditScreenFadedOut         ( void );
 
-    void                    SetupSpecialCharacters  ( void );
-    CWeapon *               CreateWeapon            ( void );
+    void                    SetupSpecialCharacters          ( void );
+    CWeapon *               CreateWeapon                    ( void );
+    CWeaponStat *           CreateWeaponStat                ( eWeaponType weaponType, eWeaponSkill weaponSkill );
     void                    FlushPendingRestreamIPL         ( void );
     void                    DisableVSync                    ( void );
 

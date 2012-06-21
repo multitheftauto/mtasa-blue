@@ -271,7 +271,6 @@ public:
     LUA_DECLARE ( SetPedCameraRotation );
     LUA_DECLARE ( SetPedAimTarget );
     LUA_DECLARE ( SetPedOnFire );
-    LUA_DECLARE ( SetWeaponProperty );
 
     // Clothes and body functions
     LUA_DECLARE ( GetBodyPartName );
@@ -836,7 +835,7 @@ public:
     LUA_DECLARE ( GetSlotFromWeapon );
     LUA_DECLARE ( CreateWeapon );
     LUA_DECLARE ( FireWeapon );
-    LUA_DECLARE ( SetWeaponDamage );
+    LUA_DECLARE ( SetWeaponProperty );
     LUA_DECLARE ( SetWeaponState );
 
     // Command funcs

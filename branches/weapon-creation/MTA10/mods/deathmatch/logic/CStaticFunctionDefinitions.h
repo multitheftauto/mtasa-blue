@@ -528,7 +528,8 @@ public:
     static bool                         GetWeaponIDFromName                 ( const char* szName, unsigned char& ucID );
     static CClientWeapon*               CreateWeapon                        ( CResource &Resource, eWeaponType weaponType, CVector vecPosition );
     static bool                         FireWeapon                          ( CClientWeapon * pWeapon );
-    static bool                         SetAimPosition                      ( CClientWeapon * pWeapon, short sDamage );
+    static bool                         SetWeaponProperty                   ( CClientWeapon * pWeapon, eWeaponProperty eProperty, short sData );
+    static bool                         SetWeaponProperty                   ( CClientWeapon * pWeapon, eWeaponProperty eProperty, float fData );
     static bool                         SetWeaponState                      ( CClientWeapon * pWeapon, eWeaponState weaponState );
     // Util funcs
     static bool                         GetTickCount_                       ( double& dCount );

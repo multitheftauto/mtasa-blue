@@ -700,3 +700,8 @@ CWeapon * CGameSA::CreateWeapon ( void )
 {
     return new CWeaponSA ( new CWeaponSAInterface, NULL, WEAPONSLOT_MAX );
 }
+
+CWeaponStat * CGameSA::CreateWeaponStat ( eWeaponType weaponType, eWeaponSkill weaponSkill )
+{
+    return m_pWeaponStatsManager->CreateWeaponStatUnlisted ( weaponType, weaponSkill );
+}

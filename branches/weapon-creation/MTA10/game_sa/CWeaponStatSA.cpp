@@ -25,6 +25,7 @@ CWeaponStatSA::CWeaponStatSA ( CWeaponInfoSA * pWeaponInfo, eWeaponType weaponTy
     this->weaponType = weaponType;
     this->skillLevel = skillLevel;
 }
+
 CWeaponStatSA::~CWeaponStatSA ( )
 {
 

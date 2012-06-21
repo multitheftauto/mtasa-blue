@@ -181,6 +181,7 @@ public:
     virtual void                ResetCheats                 () = 0;
 
     virtual CWeapon *           CreateWeapon                ( void ) = 0;
+    virtual CWeaponStat *       CreateWeaponStat            ( eWeaponType weaponType, eWeaponSkill weaponSkill ) = 0;
 
     virtual bool                VerifySADataFileNames       () = 0;
     virtual bool                PerformChecks               () = 0;
