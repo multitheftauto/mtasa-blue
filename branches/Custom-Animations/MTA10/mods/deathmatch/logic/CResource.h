@@ -80,6 +80,7 @@ public:
     inline CClientEntity*   GetResourceCOLModelRoot ( void )                           { return m_pResourceCOLRoot; };
     inline CClientEntity*   GetResourceDFFRoot ( void )                           { return m_pResourceDFFEntity; };
     inline CClientEntity*   GetResourceTXDRoot ( void )                           { return m_pResourceTXDRoot; };
+    inline CClientEntity*   GetResourceIFPRoot          ( void )                            { return m_pResourceIFPRoot; };
 
     // This is to delete all the elements created in this resource that are created locally in this client
     void                    DeleteClientChildren        ( void );
