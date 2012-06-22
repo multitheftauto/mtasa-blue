@@ -75,7 +75,7 @@ pthread_mutex_t mutexhttp;
 #else
     void sighandler ( int sig )
     {
-        if ( sig == SIGTERM || sig == SIGINT || sig = SIGBREAK )
+        if ( sig == SIGTERM || sig == SIGINT )
         {
             if ( g_pGame )
             {
@@ -306,7 +306,6 @@ CGame::~CGame ( void )
     #else
         signal ( SIGTERM, SIG_DFL );
         signal ( SIGINT, SIG_DFL );
-        signal ( SIGBREAK, SIG_DFL );
     #endif
 }
 
@@ -739,7 +738,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     #else
         signal ( SIGTERM, &sighandler );
         signal ( SIGINT, &sighandler );
-        signal ( SIGBREAK, &sighandler );
     #endif
 
     // Add our builtin events
