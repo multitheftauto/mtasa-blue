@@ -415,6 +415,7 @@ bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVe
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             Object.GetRotationDegrees ( vecRotation );
@@ -456,6 +457,7 @@ bool CStaticFunctionDefinitions::GetElementVelocity ( CClientEntity& Entity, CVe
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             Object.GetMoveSpeed ( vecVelocity );
@@ -506,6 +508,7 @@ bool CStaticFunctionDefinitions::GetElementBoundingBox ( CClientEntity& Entity, 
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             pModelInfo = g_pGame->GetModelInfo ( Object.GetModel () );
@@ -555,6 +558,7 @@ bool CStaticFunctionDefinitions::GetElementRadius ( CClientEntity& Entity, float
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             pModelInfo = g_pGame->GetModelInfo ( Object.GetModel () );
@@ -606,6 +610,7 @@ bool CStaticFunctionDefinitions::GetElementDistanceFromCentreOfMassToBaseOfModel
             return true;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             fDistance = static_cast < CClientObject& > ( Entity ).GetDistanceFromCentreOfMassToBaseOfModel ();
             return true;
@@ -642,6 +647,7 @@ bool CStaticFunctionDefinitions::GetElementAlpha ( CClientEntity& Entity, unsign
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject & Object = static_cast < CClientObject & > ( Entity );
             ucAlpha = Object.GetAlpha ();
@@ -678,6 +684,7 @@ bool CStaticFunctionDefinitions::GetElementHealth ( CClientEntity& Entity, float
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             fHealth = Object.GetHealth ();
@@ -707,6 +714,7 @@ bool CStaticFunctionDefinitions::GetElementModel ( CClientEntity& Entity, unsign
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             usModel = Object.GetModel ();
@@ -1041,6 +1049,7 @@ bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, con
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZXY)
@@ -1090,6 +1099,7 @@ bool CStaticFunctionDefinitions::SetElementVelocity ( CClientEntity& Entity, con
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             Object.SetMoveSpeed ( vecVelocity );
@@ -1194,6 +1204,7 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CClientEntity& Entity, un
         case CCLIENTDUMMY:
         case CCLIENTVEHICLE:
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         case CCLIENTMARKER:
         case CCLIENTRADARMARKER:
         case CCLIENTPED:
@@ -1303,6 +1314,7 @@ bool CStaticFunctionDefinitions::SetElementAlpha ( CClientEntity& Entity, unsign
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject & Object = static_cast < CClientObject & > ( Entity );
             Object.SetAlpha ( ucAlpha );
@@ -1352,6 +1364,7 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CClientEntity& Entity, float
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             Object.SetHealth ( fHealth );
@@ -1388,6 +1401,7 @@ bool CStaticFunctionDefinitions::SetElementModel ( CClientEntity& Entity, unsign
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             if ( Object.GetModel () == usModel ) return false;

@@ -21,6 +21,9 @@ CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponT
     m_pWeapon = NULL;
     m_pWeaponInfo = g_pGame->GetWeaponInfo ( m_Type );
     m_bHasTargetDirection = false;
+
+    SetTypeName ( "weapon" );
+
     SetStatic ( true );
     Create ();
     m_pMarker = new CClientMarker ( pManager, INVALID_ELEMENT_ID, 4 );
@@ -30,7 +33,7 @@ CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponT
     m_pMarker2->SetColor( SColor( 0xFFFF0000 ) );
     m_pMarker2->SetSize ( 0.5f );
     m_sDamage = m_pWeaponInfo->GetDamagePerHit ( );
-    m_pWeaponStat = g_pGame->CreateWeaponStat ( type, WEAPONSKILL_PRO );
+    m_pWeaponStat = g_pGame->CreateWeaponStat ( type, WEAPONSKILL_STD );
 }
 
 

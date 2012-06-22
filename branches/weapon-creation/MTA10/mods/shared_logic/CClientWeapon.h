@@ -25,6 +25,8 @@ public:
                             CClientWeapon           ( CClientManager * pManager, ElementID ID, eWeaponType type );
                             ~CClientWeapon          ( void );
 
+    inline eClientEntityType        GetType                 ( void ) const                      { return CCLIENTWEAPON; };
+
     inline eWeaponType      GetWeaponType           ( void )                { return m_Type; }
     inline eWeaponState     GetWeaponState          ( void )                { return m_State; }
     inline void             SetWeaponState          ( eWeaponState state )  { m_State = state; }

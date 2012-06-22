@@ -228,6 +228,9 @@ CEntity* UserDataCast ( CEntity*, void* ptr, lua_State* )
             case CCLIENTOBJECT:
                 pEntity = static_cast < CClientObject* > ( pClientElement )->GetGameObject ();
                 break;
+            case CCLIENTWEAPON:
+                pEntity = static_cast < CClientWeapon* > ( pClientElement )->GetGameObject ();
+                break;
         }
     }
     return pEntity;
