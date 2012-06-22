@@ -36,3 +36,8 @@ public:
 };
 C_ASSERT(sizeof(CParticleFxSAInterface) == 0x104);
 
+class CParticleFx
+{
+private:
+public:
+};

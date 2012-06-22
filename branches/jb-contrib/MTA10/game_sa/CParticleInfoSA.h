@@ -27,3 +27,11 @@ public:
     float fDurationFactor;
 };
 // C_ASSERT(sizeof(CParticleInfoSAInterface) == 0x1C); // NEEDS CHECKING
+
+class CParticleInfo
+{
+private:
+    CParticleInfoSAInterface* pInterface;
+public:
+
+};

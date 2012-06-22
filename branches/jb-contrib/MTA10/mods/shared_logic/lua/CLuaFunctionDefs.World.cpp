@@ -119,6 +119,61 @@ int CLuaFunctionDefs::GetGroundPosition ( lua_State* luaVM )
     return 1;
 }
 
+// Particle System Temporary Residence
+int CLuaFunctionDefs::FxAddParticle(lua_State* luaVM)
+{
+//  element fxAddParticle ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ, [ float blur = 0.0, float brightness = 1.0 ] )
+    CVector vecPos; CVector vecDir;
+    float fBlur; float fBrightness;
+    // it returns bool for DEBUGGING, it will be <element> later..
+    // also add name later, will be testing with some random for now
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( vecPos.fX );
+    argStream.ReadNumber ( vecPos.fY );
+    argStream.ReadNumber ( vecPos.fZ );
+    argStream.ReadNumber ( vecDir.fX );
+    argStream.ReadNumber ( vecDir.fY );
+    argStream.ReadNumber ( vecDir.fZ );
+    argStream.ReadNumber ( fBlur, 0.0f );
+    argStream.ReadNumber ( fBrightness, 1.0f );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        // move this to its own CClientParticle.. do this way cuz it's faster to debug
+        uint32 dwRet = 0;
+        {   // __stdcall CParticleData::createParticle
+            uint32 CParticleData__createParticle = (uint32)0x4A9BE0; 
+            CVector *pVecPos = &vecPos;
+            __asm
+            {
+                push 0
+                push 0
+                push pVecPos
+                call CParticleData__createParticle    
+                mov dwRet, eax
+            }
+        }
+        if(dwRet)
+        {
+            {   // CParticleFx::StartParticle
+                uint32 CParticleFx__StartParticle = (uint32)0x4AA3D0;
+                __asm
+                {   
+                    mov ecx, dwRet
+                    call CParticleFx__StartParticle
+                }
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fxAddParticle", *argStream.GetErrorMessage () ) );
+
+}
+
+int CLuaFunctionDefs::FxSetParticleInfo(lua_State* luaVM)
+{
+    return 1;
+}
 
 int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
 {

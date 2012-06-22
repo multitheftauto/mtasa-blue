@@ -279,6 +279,10 @@ public:
     LUA_DECLARE ( GetTypeIndexFromClothes );
     LUA_DECLARE ( GetClothesTypeName );
 
+    // Particle System functions
+    LUA_DECLARE ( FxAddParticle );
+    LUA_DECLARE ( FxSetParticleInfo );
+
     // Vehicle get functions
     LUA_DECLARE ( CreateVehicle );
 
