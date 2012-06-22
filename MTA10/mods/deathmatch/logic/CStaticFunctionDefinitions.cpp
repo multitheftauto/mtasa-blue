@@ -2181,6 +2181,11 @@ bool CStaticFunctionDefinitions::SetPedAimTarget ( CClientEntity & Entity, CVect
         CVector vecOrigin;
         Ped.GetPosition ( vecOrigin );
 
+        // Move origin out a bit to avoid hitting ped collision
+        CVector vecDir = vecTarget - vecOrigin;
+        vecDir.Normalize ();
+        vecOrigin += vecDir * 0.9f;
+
         // Arm direction
         float fArmX = -atan2 ( vecTarget.fX - vecOrigin.fX, vecTarget.fY - vecOrigin.fY ),
               fArmY = -atan2 ( vecTarget.fZ - vecOrigin.fZ, DistanceBetweenPoints2D ( vecTarget, vecOrigin ) );
