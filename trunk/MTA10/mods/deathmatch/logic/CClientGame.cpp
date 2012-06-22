@@ -2653,8 +2653,8 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPlayerVoiceStart", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerVoiceStop", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerStealthKill", "target", NULL, false );
-    m_Events.AddEvent ( "onClientPlayerHeliKilled", "heli", NULL, false );
     m_Events.AddEvent ( "onClientPlayerHitByWaterCannon", "vehicle", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerHeliKilled", "heli", NULL, false );
 	m_Events.AddEvent ( "onClientPlayerPickupHit", "pickup, matchingDimension", NULL, false );
 	m_Events.AddEvent ( "onClientPlayerPickupLeave", "pickup, matchingDimension", NULL, false );
 
@@ -3800,7 +3800,7 @@ void CClientGame::DownloadFiles ( bool bBackgroundDownload )
             if ( !bBackgroundDownload && !m_bTransferResource )
                 m_pTransferBox->SetInfo ( pHTTP->GetDownloadSizeNow () ); // no need to set this if it's a singular file
 
-            if ( bBackgroundDownload & m_pTransferBox->IsVisible() )
+            if ( bBackgroundDownload && m_pTransferBox->IsVisible() )
             {
                 if ( pHTTP->GetDownloadSizeNow () > m_pTransferBox->GetTotalSize () )
                 {

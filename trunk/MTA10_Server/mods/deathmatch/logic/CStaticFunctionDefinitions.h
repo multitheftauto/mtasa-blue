@@ -95,7 +95,7 @@ public:
     static bool                 SetElementInterior                  ( CElement* pElement, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition );
     static bool                 SetElementDimension                 ( CElement* pElement, unsigned short usDimension );
     static bool                 AttachElements                      ( CElement* pElement, CElement* pAttachedToElement, CVector& vecPosition, CVector& vecRotation );
-    static bool                 DetachElements                      ( CElement* pElement, CElement* pAttachedToElement = NULL  );
+    static bool                 DetachElements                      ( CElement* pElement, CElement* pAttachedToElement = NULL );
     static bool                 SetElementAlpha                     ( CElement* pElement, unsigned char ucAlpha );
     static bool                 SetElementDoubleSided               ( CElement* pElement, bool bDoubleSided );
     static bool                 SetElementHealth                    ( CElement* pElement, float fHealth );

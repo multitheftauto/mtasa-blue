@@ -172,7 +172,7 @@ void CElementRPCs::SetElementVelocity ( CClientEntity* pSource, NetBitStreamInte
             case CCLIENTPED:
             case CCLIENTPLAYER:
             {
-                 CClientPed* pPed = static_cast < CClientPed* > ( pSource );
+                CClientPed* pPed = static_cast < CClientPed* > ( pSource );
 
                 pPed->SetMoveSpeed ( vecVelocity );
                 pPed->ResetInterpolation ();
@@ -186,7 +186,7 @@ void CElementRPCs::SetElementVelocity ( CClientEntity* pSource, NetBitStreamInte
             }
             case CCLIENTVEHICLE:
             {
-                 CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( pSource );                    
+                CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( pSource );                    
                 pVehicle->SetMoveSpeed ( vecVelocity );
 
                 break;

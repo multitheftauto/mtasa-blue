@@ -56,7 +56,7 @@ public:
     CChecksum GetServerChecksum      ( void );
     void SetServerChecksum           ( CChecksum serverChecksum );
 
-    inline bool     IsAutoDownload  ( void )    { return m_bAutoDownload; };
+    bool     IsAutoDownload         ( void )    { return m_bAutoDownload; };
 protected:
     eResourceType       m_resourceType;
 
