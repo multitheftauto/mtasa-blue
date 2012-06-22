@@ -1962,7 +1962,7 @@ void CClientGame::UpdateFireKey ( void )
                         // Change the state back to false so this press doesn't do anything else
                         pControl->bState = false;
 
-                        // Tell the server we wanna destroy our satchels
+                        // Tell the server we want to detonate our satchels
                         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
                         if ( pBitStream )
                         {

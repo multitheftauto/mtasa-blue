@@ -1430,11 +1430,9 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsig
         case CElement::WORLD_MESH:
         {
             pElement->SetDimension ( usDimension );
-
             CBitStream bitStream;
             bitStream.pBitStream->Write ( usDimension );
             m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DIMENSION, *bitStream.pBitStream ) );
-
             return true;
         }
     }
