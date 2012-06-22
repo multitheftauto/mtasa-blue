@@ -22,13 +22,14 @@
 #include "StdInc.h"
 #include "../utils/COpenPortsTester.h"
 #include "net/SimHeaders.h"
+#include <signal.h>
 
 #define MAX_BULLETSYNC_DISTANCE 400.0f
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
 #define MAX_PROJECTILE_SYNC_DISTANCE 400.0f
 
 #define RELEASE_MIN_CLIENT_VERSION      "1.3.0-9.03724"
-#define BULLET_SYNC_MIN_CLIENT_VERSION  "1.3.0-9.04224"
+#define BULLET_SYNC_MIN_CLIENT_VERSION  "1.3.0-9.04311"
 
 #define RUN_CHILDREN CChildListType::const_iterator iter=pElement->IterBegin();for(;iter!=pElement->IterEnd();iter++)
 
@@ -41,19 +42,48 @@ unsigned char ucProgressSkip = 0;
 pthread_mutex_t mutexhttp;
 
 #ifdef WIN32
-BOOL WINAPI ConsoleEventHandler ( DWORD dwCtrlType )
-{
-    if ( dwCtrlType == CTRL_CLOSE_EVENT )
+    BOOL WINAPI ConsoleEventHandler ( DWORD dwCtrlType )
     {
-        if ( g_pGame )
+        if ( dwCtrlType == CTRL_CLOSE_EVENT )
         {
-            g_pGame->SetIsFinished ( true );
+            // Close button pressed or task ended in task manager
+            if ( g_pGame )
+            {
+                // Warning message if server started
+                if ( g_pGame->IsServerFullyUp () )
+                {
+                    printf ( "\n** TERMINATING SERVER WITHOUT SAVING **\n" );
+                    printf ( "\nUse Ctrl-C next time!\n" );
+                    Sleep ( 3000 );
+                }
+            }
+            // Don't call g_pGame->SetIsFinished() as Windows could terminate the process mid-shutdown 
             return TRUE;
         }
+        else
+        if ( dwCtrlType == CTRL_C_EVENT || dwCtrlType == CTRL_BREAK_EVENT )
+        {
+            if ( g_pGame )
+            {
+                // Graceful close on Ctrl-C or Ctrl-Break
+                g_pGame->SetIsFinished ( true );
+                return TRUE;
+            }
+        }
+        return FALSE;
     }
-
-    return FALSE;
-}
+#else
+    void sighandler ( int sig )
+    {
+        if ( sig == SIGTERM || sig == SIGINT || sig = SIGBREAK )
+        {
+            if ( g_pGame )
+            {
+                // Graceful close on Ctrl-C or 'kill'
+                g_pGame->SetIsFinished ( true );
+            }
+        }
+    }
 #endif
 
 
@@ -202,11 +232,6 @@ CGame::~CGame ( void )
 {
     m_bBeingDeleted = true;
 
-    // Remove our console control handler
-    #ifdef WIN32
-    SetConsoleCtrlHandler ( ConsoleEventHandler, FALSE );
-    #endif
-
     // Eventually stop our game
     CSimControl::EnableSimSystem ( false );
     Stop ();
@@ -274,6 +299,15 @@ CGame::~CGame ( void )
 
     // Clear our global pointer
     g_pGame = NULL;
+
+    // Remove our console control handler
+    #ifdef WIN32
+        SetConsoleCtrlHandler ( ConsoleEventHandler, FALSE );
+    #else
+        signal ( SIGTERM, SIG_DFL );
+        signal ( SIGINT, SIG_DFL );
+        signal ( SIGBREAK, SIG_DFL );
+    #endif
 }
 
 
@@ -699,7 +733,13 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     // Set our console control handler
     #ifdef WIN32
-    SetConsoleCtrlHandler ( ConsoleEventHandler, TRUE );
+        SetConsoleCtrlHandler ( ConsoleEventHandler, TRUE );
+        // Hide the close box
+        // DeleteMenu ( GetSystemMenu ( GetConsoleWindow(), FALSE ), SC_CLOSE, MF_BYCOMMAND );
+    #else
+        signal ( SIGTERM, &sighandler );
+        signal ( SIGINT, &sighandler );
+        signal ( SIGBREAK, &sighandler );
     #endif
 
     // Add our builtin events
@@ -819,6 +859,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pOpenPortsTester = new COpenPortsTester ();
 
     // Add help hint
+    CLogger::LogPrint ( "To stop the server, type 'shutdown' or press Ctrl-C\n" );
     CLogger::LogPrint ( "Type 'help' for a list of commands.\n" );
 
     m_bServerFullyUp = true;
