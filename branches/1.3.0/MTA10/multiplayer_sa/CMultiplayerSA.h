@@ -195,6 +195,8 @@ public:
     float                       GetAircraftMaxHeight        ( void )                    { return m_fAircraftMaxHeight; };
     void                        SetAircraftMaxHeight        ( float fHeight )           { m_fAircraftMaxHeight = fHeight; };
 
+    void                        SetAutomaticVehicleStartupOnPedEnter    ( bool bSet );
+
     virtual void                GetRwResourceStats          ( SRwResourceStats& outStats );
     virtual void                GetClothesCacheStats        ( SClothesCacheStats& outStats );
     virtual CEntitySAInterface* GetRenderingGameEntity      ( void );

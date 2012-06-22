@@ -3414,6 +3414,8 @@ void CClientPed::_ChangeModel ( void )
     // Different model than before?
     if ( m_pPlayerPed->GetModelIndex () != m_ulModel )
     {
+        g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter ( false );
+
         // We need to reset visual stats when changing from CJ model
         if ( m_pPlayerPed->GetModelIndex () == 0 )
         {
@@ -3510,6 +3512,8 @@ void CClientPed::_ChangeModel ( void )
             // Create the new with the new skin
             _CreateModel ();
         }
+
+        g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter ( true );
     }
 }
 

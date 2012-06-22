@@ -278,6 +278,8 @@ public:
     virtual float                       GetAircraftMaxHeight        ( void ) = 0;
     virtual void                        SetAircraftMaxHeight        ( float fHeight ) = 0;
 
+    virtual void                        SetAutomaticVehicleStartupOnPedEnter    ( bool bSet ) = 0;
+
     virtual void                        GetRwResourceStats          ( SRwResourceStats& outStats ) = 0;
     virtual void                        GetClothesCacheStats        ( SClothesCacheStats& outStats ) = 0;
     virtual CEntitySAInterface*         GetRenderingGameEntity      ( void ) = 0;
