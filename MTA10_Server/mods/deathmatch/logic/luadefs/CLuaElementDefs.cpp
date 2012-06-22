@@ -167,7 +167,7 @@ int CLuaElementDefs::destroyElement ( lua_State* luaVM )
 int CLuaElementDefs::cloneElement ( lua_State* luaVM )
 {
 //  element cloneElement ( element theElement, [ float xPos = 0, float yPos = 0, float zPos = 0, bool cloneChildren = false ] )
-    CElement* pElement; CVector vecPosition; bool bCloneChildren;
+    CElement* pElement; CVector vecPosition; bool bCloneChildren = false;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
