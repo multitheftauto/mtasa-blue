@@ -75,7 +75,7 @@ pthread_mutex_t mutexhttp;
 #else
     void sighandler ( int sig )
     {
-        if ( sig == SIGTERM || sig == SIGINT || sig = SIGBREAK )
+        if ( sig == SIGTERM || sig == SIGINT || sig == SIGBREAK )
         {
             if ( g_pGame )
             {
