@@ -30,6 +30,7 @@ public:
     inline eWeaponType      GetWeaponType           ( void )                { return m_Type; }
     inline eWeaponState     GetWeaponState          ( void )                { return m_State; }
     inline void             SetWeaponState          ( eWeaponState state )  { m_State = state; }
+    inline void             SetWeaponTarget         ( CClientEntity * pTarget )  { m_pTarget = pTarget; }
 
     void                    DoPulse                 ( void );
 
@@ -59,6 +60,7 @@ private:
     CClientMarker *         m_pMarker2;
     short                   m_sDamage;
     CWeaponStat *           m_pWeaponStat;
+    CClientEntity *         m_pTarget;
 };
 
 #endif

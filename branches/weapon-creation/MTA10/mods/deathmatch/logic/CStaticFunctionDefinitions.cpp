@@ -6394,6 +6394,16 @@ bool CStaticFunctionDefinitions::SetWeaponState ( CClientWeapon * pWeapon, eWeap
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetWeaponTarget ( CClientWeapon * pWeapon, CClientEntity * pTarget )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetWeaponTarget ( pTarget );
+        return true;
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::GetTickCount_ ( double& dCount )
 {
     dCount = static_cast < double > ( GetTickCount64_() );

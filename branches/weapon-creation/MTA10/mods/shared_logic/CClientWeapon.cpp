@@ -59,6 +59,7 @@ void CClientWeapon::DoPulse ( void )
         m_vecLastDirection = vecDirection;
         SetDirection ( vecDirection );
     }
+
     if ( m_State == WEAPONSTATE_FIRING ) Fire ();
 }
 
@@ -123,17 +124,27 @@ void CClientWeapon::Fire ( void )
 
                 vecRotation = -vecRotation;
             }
-            
-
-            CVector vecFireOffset = *m_pWeaponInfo->GetFireOffset ();
-            RotateVector ( vecFireOffset, vecRotation );
-            vecOrigin += vecFireOffset;
-
+            CVector vecTarget;
             float fDistance = m_pWeaponInfo->GetWeaponRange ();
-            CVector vecDirection ( 1, 0, 0 );
-            vecDirection *= fDistance;
-            RotateVector ( vecDirection, vecRotation );
-            CVector vecTarget = vecOrigin + vecDirection;
+            if ( m_pTarget )
+            {
+                m_pTarget->GetPosition( vecTarget );
+                if ( (vecOrigin - vecTarget).Length() >= fDistance )
+                {
+                    return;
+                }
+            }
+            else
+            {
+                CVector vecFireOffset = *m_pWeaponInfo->GetFireOffset ();
+                RotateVector ( vecFireOffset, vecRotation );
+                vecOrigin += vecFireOffset;
+
+                CVector vecDirection ( 1, 0, 0 );
+                vecDirection *= fDistance;
+                RotateVector ( vecDirection, vecRotation );
+                CVector vecTarget = vecOrigin + vecDirection;
+            }
 
 
             // Save

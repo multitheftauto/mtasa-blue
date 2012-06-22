@@ -195,3 +195,27 @@ int CLuaFunctionDefs::SetWeaponState ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::SetWeaponTarget ( lua_State* luaVM )
+{
+    CClientWeapon * pWeapon;
+    CClientEntity * pTarget;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWeapon );
+    argStream.ReadUserData ( pTarget );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetWeaponTarget ( pWeapon, pTarget ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponState", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
