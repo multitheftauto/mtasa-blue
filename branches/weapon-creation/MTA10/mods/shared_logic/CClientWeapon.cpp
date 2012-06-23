@@ -34,6 +34,7 @@ CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponT
     m_pMarker2->SetSize ( 0.5f );
     m_sDamage = m_pWeaponInfo->GetDamagePerHit ( );
     m_pWeaponStat = g_pGame->CreateWeaponStat ( type, WEAPONSKILL_STD );
+    ResetWeaponTarget ( );
 }
 
 
@@ -126,9 +127,32 @@ void CClientWeapon::Fire ( void )
             }
             CVector vecTarget;
             float fDistance = m_pWeaponInfo->GetWeaponRange ();
-            if ( m_pTarget )
+            if ( m_targetType == TARGET_TYPE_ENTITY )
             {
-                m_pTarget->GetPosition( vecTarget );
+                if ( m_pTarget )
+                {
+                    if ( m_pTarget->GetType ( ) == CCLIENTPED || m_pTarget->GetType ( ) == CCLIENTPLAYER )
+                    {
+                        CClientPed * pPed = (CClientPed *) m_pTarget;
+                        pPed->GetBonePosition( m_targetBone, vecTarget );
+                    }
+                    else
+                    {
+                        m_pTarget->GetPosition( vecTarget );
+                    }
+                    if ( (vecOrigin - vecTarget).Length() >= fDistance )
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    ResetWeaponTarget ( );
+                }
+            }
+            if ( m_targetType == TARGET_TYPE_VECTOR )
+            {
+                vecTarget = m_vecTarget;
                 if ( (vecOrigin - vecTarget).Length() >= fDistance )
                 {
                     return;
@@ -277,4 +301,25 @@ void CClientWeapon::LookAt ( CVector & vecPosition, bool bInterpolate )
 
     if ( bInterpolate ) SetTargetDirection ( vecDirection );
     else SetDirection ( vecDirection );
+}
+
+void CClientWeapon::SetWeaponTarget ( CClientEntity * pTarget, eBone boneTarget )
+{
+    m_pTarget = pTarget; 
+    m_targetType = TARGET_TYPE_ENTITY; 
+    m_targetBone = boneTarget; 
+}
+
+void CClientWeapon::SetWeaponTarget ( CVector vecTarget )
+{
+    m_vecTarget = vecTarget; 
+    m_targetType = TARGET_TYPE_VECTOR;
+}
+
+void CClientWeapon::ResetWeaponTarget ( void )
+{
+    m_pTarget = NULL;
+    m_vecTarget = CVector ( 0, 0, 0 );
+    m_targetType = TARGET_TYPE_NONE;
+    m_targetBone = BONE_PELVIS;
 }

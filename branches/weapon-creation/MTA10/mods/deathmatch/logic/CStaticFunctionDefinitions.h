@@ -531,7 +531,8 @@ public:
     static bool                         SetWeaponProperty                   ( CClientWeapon * pWeapon, eWeaponProperty eProperty, short sData );
     static bool                         SetWeaponProperty                   ( CClientWeapon * pWeapon, eWeaponProperty eProperty, float fData );
     static bool                         SetWeaponState                      ( CClientWeapon * pWeapon, eWeaponState weaponState );
-    static bool                         SetWeaponTarget                     ( CClientWeapon * pWeapon, CClientEntity * pTarget );
+    static bool                         SetWeaponTarget                     ( CClientWeapon * pWeapon, CClientEntity * pTarget, eBone boneTarget );
+    static bool                         SetWeaponTarget                     ( CClientWeapon * pWeapon, CVector  vecTarget );
 
     // Util funcs
     static bool                         GetTickCount_                       ( double& dCount );

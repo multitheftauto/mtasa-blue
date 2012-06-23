@@ -18,7 +18,12 @@
 class CClientManager;
 class CObject;
 class CModelInfo;
-
+enum eTargetType
+{
+    TARGET_TYPE_VECTOR,
+    TARGET_TYPE_ENTITY,
+    TARGET_TYPE_NONE,
+};
 class CClientWeapon : public CClientObject
 {
 public:
@@ -30,7 +35,9 @@ public:
     inline eWeaponType      GetWeaponType           ( void )                { return m_Type; }
     inline eWeaponState     GetWeaponState          ( void )                { return m_State; }
     inline void             SetWeaponState          ( eWeaponState state )  { m_State = state; }
-    inline void             SetWeaponTarget         ( CClientEntity * pTarget )  { m_pTarget = pTarget; }
+    void                    SetWeaponTarget         ( CClientEntity * pTarget, eBone boneTarget );
+    void                    SetWeaponTarget         ( CVector vecTarget );
+    void                    ResetWeaponTarget       ( void );
 
     void                    DoPulse                 ( void );
 
@@ -61,6 +68,9 @@ private:
     short                   m_sDamage;
     CWeaponStat *           m_pWeaponStat;
     CClientEntity *         m_pTarget;
+    CVector                 m_vecTarget;
+    eTargetType             m_targetType;
+    eBone                   m_targetBone;
 };
 
 #endif

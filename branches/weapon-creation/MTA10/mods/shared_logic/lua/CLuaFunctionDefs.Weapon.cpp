@@ -203,18 +203,39 @@ int CLuaFunctionDefs::SetWeaponTarget ( lua_State* luaVM )
     CClientEntity * pTarget;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWeapon );
-    argStream.ReadUserData ( pTarget );
-
-    if ( !argStream.HasErrors () )
+    if ( argStream.NextIsUserData() )
     {
-        if ( CStaticFunctionDefinitions::SetWeaponTarget ( pWeapon, pTarget ) )
+        int targetBone;
+        argStream.ReadUserData ( pTarget );
+        argStream.ReadNumber ( targetBone, BONE_PELVIS );
+        if ( !argStream.HasErrors () )
         {
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            if ( CStaticFunctionDefinitions::SetWeaponTarget ( pWeapon, pTarget, (eBone)targetBone ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
+        else
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponState", *argStream.GetErrorMessage () ) );
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponState", *argStream.GetErrorMessage () ) );
+    {
+        CVector vecTarget;
+        argStream.ReadNumber( vecTarget.fX );
+        argStream.ReadNumber( vecTarget.fY );
+        argStream.ReadNumber( vecTarget.fZ );
+        if ( !argStream.HasErrors () )
+        {
+            if ( CStaticFunctionDefinitions::SetWeaponTarget ( pWeapon, vecTarget ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponState", *argStream.GetErrorMessage () ) );
+    }
 
     lua_pushboolean ( luaVM, false );
     return 1;

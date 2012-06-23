@@ -6394,11 +6394,21 @@ bool CStaticFunctionDefinitions::SetWeaponState ( CClientWeapon * pWeapon, eWeap
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetWeaponTarget ( CClientWeapon * pWeapon, CClientEntity * pTarget )
+bool CStaticFunctionDefinitions::SetWeaponTarget ( CClientWeapon * pWeapon, CClientEntity * pTarget, eBone targetBone )
 {
     if ( pWeapon )
     {
-        pWeapon->SetWeaponTarget ( pTarget );
+        pWeapon->SetWeaponTarget ( pTarget, targetBone );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponTarget ( CClientWeapon * pWeapon, CVector vecTarget )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetWeaponTarget ( vecTarget );
         return true;
     }
     return false;
