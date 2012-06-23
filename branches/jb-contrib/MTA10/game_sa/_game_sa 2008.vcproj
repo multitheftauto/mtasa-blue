@@ -629,10 +629,6 @@
 				>
 			</File>
 			<File
-				RelativePath="CParticleSystemManagerSA.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\CPathFindSA.cpp"
 				>
 			</File>
@@ -1267,10 +1263,6 @@
 			</File>
 			<File
 				RelativePath=".\CParticleStorageSA.h"
-				>
-			</File>
-			<File
-				RelativePath="CParticleSystemManagerSA.h"
 				>
 			</File>
 			<File
