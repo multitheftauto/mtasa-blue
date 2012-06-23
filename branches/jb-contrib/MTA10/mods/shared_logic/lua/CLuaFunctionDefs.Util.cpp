@@ -922,7 +922,7 @@ int CLuaFunctionDefs::SetDevelopmentMode ( lua_State* luaVM )
     if ( argStream.NextIsString () )
     {
         argStream.ReadString ( strCommand );
-        g_pClientGame->SetDevSetting ( strCommand );
+        //g_pClientGame->SetDevSetting ( strCommand );
         lua_pushboolean ( luaVM, true );
         return 1;
     }

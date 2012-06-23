@@ -118,7 +118,7 @@ int CLuaFunctionDefs::GetGroundPosition ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-
+#include "../../../game_sa/CParticleInfoSA.h"
 // Particle System Temporary Residence
 int CLuaFunctionDefs::FxAddParticle(lua_State* luaVM)
 {
@@ -140,34 +140,94 @@ int CLuaFunctionDefs::FxAddParticle(lua_State* luaVM)
     if ( !argStream.HasErrors ( ) )
     {
         // move this to its own CClientParticle.. do this way cuz it's faster to debug
-        uint32 dwRet = 0;
-        {   // __stdcall CParticleData::createParticle
-            uint32 CParticleData__createParticle = (uint32)0x4A9BE0; 
-            CVector *pVecPos = &vecPos;
-            __asm
-            {
-                push 0
-                push 0
-                push pVecPos
-                call CParticleData__createParticle    
-                mov dwRet, eax
-            }
-        }
-        if(dwRet)
-        {
-            {   // CParticleFx::StartParticle
-                uint32 CParticleFx__StartParticle = (uint32)0x4AA3D0;
-                __asm
-                {   
-                    mov ecx, dwRet
-                    call CParticleFx__StartParticle
+	    CCamera
+		    *pCam = g_pGame->GetCamera();
+	    CMatrix matrix;
+	  //  if(0)
+        CVector *pVecPos = &vecPos;
+        CVector *pVecDir = &vecDir;
+//        if(pCam->GetMatrix(&matrix))
+	    {
+            CParticleInfoSAInterface
+                particleInfo;
+            particleInfo.colour.r = 1.0f;
+            particleInfo.colour.g = 0.0f;
+            particleInfo.colour.b = 0.0f;
+            particleInfo.colour.a = 1.0f;
+            particleInfo.fSize = 10.0f;
+            particleInfo.fDurationFactor = 1.0f;
+            particleInfo.pad1 = 1.0f;
+            CParticleInfoSAInterface
+                *pParticleInfo = &particleInfo;
+              /* RwColorFloat colour;
+    float fSize;
+    float pad1;
+    float fDurationFactor;*/
+		    uint32 dwRet = 0;
+		    {   // __stdcall CParticleData::createParticle
+			    uint32 CParticleData__createParticle = (uint32)0x4A9BE0;
+			    //char* szWaterHydrantParticle = "water_hydrant";(char*)0x0085A70C;
+                uint32 particleNameAddress = (uint32)0x85A764;
+                uint32 pParticleData = (uint32)0xA9AE80;
+                CVector vecNull = CVector(0.0f, 0.0f, 0.0f);
+                CVector *pVecNull = &vecNull;
+			    __asm
+			    {
+				    push 0
+				    push 0
+				    push pVecNull
+                    push particleNameAddress
+				    mov ecx, pParticleData
+				    call CParticleData__createParticle
+				    mov dwRet, eax
+			    }
+		    }
+		    if(dwRet)
+		    {
+                /*
+			    {   // CParticleFx::StartParticle
+				    uint32 CParticleFx__StartParticle = (uint32)0x4AA3D0;
+				    __asm
+				    {
+					    mov ecx, dwRet
+					    call CParticleFx__StartParticle
+				    }
+			    }
+                */
+                {   // CParticleFx::Initialise
+                    uint32 CParticleFx__Initialise = (uint32)0x4AA2F0;
+                    __asm
+                    {
+                       // mov ecx, dwRet
+                       // call CParticleFx__Initialise
+                    }
                 }
-            }
-        }
+                {   // CParticleFx::AddParticle
+                    uint32 CParticleFx__AddParticle = (uint32)0x4AA440;
+                    uint32 a9 = 0;
+                    float fBrightness = 1.0f;
+                    float fa7 = 1.2f; // 1.2f
+                    float fa6 = 0.0f; // -1.0f
+                    __asm
+                    {
+                        push a9
+                        push fBrightness
+                        push fa7
+                        push fa6
+                        push pParticleInfo
+                        push 0
+                        push pVecDir
+                        push pVecPos
+                        mov ecx, dwRet
+                        call CParticleFx__AddParticle
+                    }
+                }
+		    }
+	    }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fxAddParticle", *argStream.GetErrorMessage () ) );
-
+    return 1;
 }
 
 int CLuaFunctionDefs::FxSetParticleInfo(lua_State* luaVM)
@@ -179,7 +239,8 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
 {
 //  bool float float float element float float float int int int processLineOfSight ( float startX, float startY, float startZ, float endX, float endY, float endZ,
 //      [ bool checkBuildings = true, bool checkVehicles = true, bool checkPlayers = true, bool checkObjects = true, bool checkDummies = true,
-//        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, element ignoredElement = nil, bool returnBuildingInfo = false ] )
+//        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, element ignoredElement = nil, bool returnBuildingInfo = false,
+//        bCheckCarTires = false ] )
     CVector vecStart; CVector vecEnd;
     SLineOfSightFlags flags; CEntity* pIgnoredEntity; bool bIncludeBuildingInfo;
 
@@ -200,6 +261,7 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
     argStream.ReadBool ( flags.bShootThroughStuff, false );
     argStream.ReadUserData ( pIgnoredEntity, NULL );
     argStream.ReadBool ( bIncludeBuildingInfo, false );
+    argStream.ReadBool ( flags.bCheckCarTires, false );
 
     if ( !argStream.HasErrors () )
     {

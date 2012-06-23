@@ -189,6 +189,9 @@ public:
     virtual bool                HasCreditScreenFadedOut         ( void ) = 0;
     virtual void                FlushPendingRestreamIPL         ( void ) = 0;
     virtual void                DisableVSync                    ( void ) = 0;
+
+    virtual void                OnPedContextChange              ( CPed* pPedContext ) = 0;
+    virtual CPed*               GetPedContext                   ( void ) = 0;
 };
 
 #endif

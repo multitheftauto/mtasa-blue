@@ -93,10 +93,7 @@ public:
     inline bool                     GetSerialVerificationEnabled    ( void )        { return m_bVerifySerials; };
     bool                            IsDisableAC                     ( const char* szTagAC )     { return MapContains ( m_DisableComboACMap, szTagAC ); };
     bool                            IsEnableDiagnostic              ( const char* szTag )       { return MapContains ( m_EnableDiagnosticMap, szTag ); };
-    bool                            IsBelowMinimumClient            ( const char* szVersion )   { return GetMinimumClientVersion () > szVersion; }
-    bool                            IsBelowRecommendedClient        ( const char* szVersion )   { return m_strRecommendedClientVersion.length () && m_strRecommendedClientVersion > szVersion; }
-    void                            SetMinimumClientVersionOverride ( const SString& strOverride ) { m_strMinClientVersionOverride = strOverride; }
-    SString                         GetMinimumClientVersion         ( void );
+    SString                         GetMinClientVersion             ( void )                    { return m_strMinClientVersion; }
     const SString&                  GetRecommendedClientVersion     ( void )                    { return m_strRecommendedClientVersion; }
     inline bool                     IsAutoLoginEnabled              ( )                         { return m_bAutoLogin; }
     const SString&                  GetIdFile                       ( void )                    { return m_strIdFile; }
@@ -112,9 +109,9 @@ public:
     int                             GetPendingWorkToDoSleepTime     ( void );
     int                             GetNoWorkToDoSleepTime          ( void );
     const SString&                  GetDbLogFilename                ( void )                    { return m_strDbLogFilename; }
-    int                             GetDebugFlag                    ( void )                    { return m_iDebugFlag; }
     bool                            GetSyncMapElementData           ( void ) const              { return m_bSyncMapElementData; }
     void                            SetSyncMapElementData           ( bool bOn )                { m_bSyncMapElementData = bOn; }
+    bool                            GetBulletSyncEnabled            ( void ) const              { return m_bBulletSyncEnabled != 0; }
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
@@ -125,7 +122,6 @@ public:
     void                            ApplyBandwidthReductionMode     ( void );
     void                            ApplyThreadNetEnabled           ( void );
     void                            SetFakeLag                      ( int iPacketLoss, int iExtraPing, int iExtraPingVary, int iKBPSLimit );
-    void                            SetTweakValue                   ( int iWhich, float fAmount );
     const SNetOptions&              GetNetOptions                   ( void )                    { return m_NetOptions; }
 
     const std::vector < SIntSetting >& GetIntSettingList            ( void );
@@ -175,7 +171,6 @@ private:
     std::set < SString >            m_EnableDiagnosticMap;
     SString                         m_strMinClientVersion;
     SString                         m_strRecommendedClientVersion;
-    SString                         m_strMinClientVersionOverride;
     bool                            m_bAutoLogin;
     SString                         m_strIdFile;
     SString                         m_strGlobalDatabasesPath;
@@ -189,11 +184,10 @@ private:
     int                             m_iPendingWorkToDoSleepTime;
     int                             m_iNoWorkToDoSleepTime;
     bool                            m_bThreadNetEnabled;
-    int                             m_iDebugFlag;
     bool                            m_bSyncMapElementData;
+    int                             m_bBulletSyncEnabled;
     std::map < SString, SString >   m_TransientSettings;
     SNetOptions                     m_NetOptions;
-    int                             m_iNetReliabilityMode;
 };
 
 #endif

@@ -44,7 +44,7 @@ CNetServerBuffer::CNetServerBuffer ( CSimPlayerManager* pSimPlayerManager )
     m_pRealNetServer = g_pRealNetServer;
 
     // Begin the watchdog
-    shared.m_pWatchDog = new CNetBufferWatchDog ( this, g_pGame->GetConfig ()->GetDebugFlag () & 1 );
+    shared.m_pWatchDog = new CNetBufferWatchDog ( this, false );
 
 
     // Start the job queue processing thread

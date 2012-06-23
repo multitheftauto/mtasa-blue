@@ -227,7 +227,17 @@ void CClientTXD::Restream ( unsigned short usModelID )
     }
     else if ( CClientObjectManager::IsValidModel ( usModelID ) )
     {
+        if ( CClientPedManager::IsValidWeaponModel ( usModelID ) )
+        {
+            m_pManager->GetPedManager ()->RestreamWeapon ( usModelID );
+            m_pManager->GetPickupManager ()->RestreamPickups ( usModelID );
+        }
         m_pManager->GetObjectManager ()->RestreamObjects ( usModelID );
+        g_pGame->GetModelInfo ( usModelID )->RestreamIPL ();
     }
-    g_pGame->GetModelInfo ( usModelID )->RestreamIPL ();
+    else if ( CClientPlayerManager::IsValidModel ( usModelID ) )
+    {
+        m_pManager->GetPedManager ()->RestreamPeds ( usModelID );
+    }
+
 }

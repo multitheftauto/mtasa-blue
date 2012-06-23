@@ -2653,8 +2653,8 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPlayerVoiceStart", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerVoiceStop", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerStealthKill", "target", NULL, false );
-    m_Events.AddEvent ( "onClientPlayerHeliKilled", "heli", NULL, false );
     m_Events.AddEvent ( "onClientPlayerHitByWaterCannon", "vehicle", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerHeliKilled", "heli", NULL, false );
 	m_Events.AddEvent ( "onClientPlayerPickupHit", "pickup, matchingDimension", NULL, false );
 	m_Events.AddEvent ( "onClientPlayerPickupLeave", "pickup, matchingDimension", NULL, false );
 
@@ -3800,7 +3800,7 @@ void CClientGame::DownloadFiles ( bool bBackgroundDownload )
             if ( !bBackgroundDownload && !m_bTransferResource )
                 m_pTransferBox->SetInfo ( pHTTP->GetDownloadSizeNow () ); // no need to set this if it's a singular file
 
-            if ( bBackgroundDownload & m_pTransferBox->IsVisible() )
+            if ( bBackgroundDownload && m_pTransferBox->IsVisible() )
             {
                 if ( pHTTP->GetDownloadSizeNow () > m_pTransferBox->GetTotalSize () )
                 {
@@ -4590,8 +4590,16 @@ void CClientGame::PostWeaponFire ( void )
                     Arguments.PushElement ( pCollisionEntity );
                 else
                     Arguments.PushNil ();
+
                 if (IS_PLAYER(pPed))
+                {
+                    CVector vecOrigin;
+                    pPed->GetShotData ( &vecOrigin );
+                    Arguments.PushNumber ( ( double ) vecOrigin.fX );
+                    Arguments.PushNumber ( ( double ) vecOrigin.fY );
+                    Arguments.PushNumber ( ( double ) vecOrigin.fZ );
                     pPed->CallEvent ( "onClientPlayerWeaponFire", Arguments, true );
+                }
                 else
                     pPed->CallEvent ( "onClientPedWeaponFire", Arguments, true );
             }
@@ -5699,29 +5707,6 @@ void CClientGame::ProcessDelayedSendList ( void )
         g_pNet->DeallocateNetBitStream ( info.pBitStream );
         m_DelayedSendList.pop_front ();
     }
-}
-
-
-//////////////////////////////////////////////////////////////////
-//
-// CClientGame::SetDevSetting
-//
-// For testing features
-//
-//////////////////////////////////////////////////////////////////
-void CClientGame::SetDevSetting ( const SString& strCommand )
-{
-    std::vector < SString > parts;
-    (strCommand + ",,,").Split ( ",", parts );
-
-    SString strMessage = "Unknown setting";
-
-    if ( parts[0] == "bullet-sync" )
-    {
-        // Not used
-    }
-
-    g_pCore->GetConsole ()->Echo ( strMessage );
 }
 
 

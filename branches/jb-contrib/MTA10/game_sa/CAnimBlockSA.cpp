@@ -18,7 +18,7 @@ int CAnimBlockSAInterface::GetIndex ( void )
 }
 
 
-void CAnimBlockSA::Request ( EModelRequestType requestType )
+void CAnimBlockSA::Request ( EModelRequestType requestType, bool bAllowBlockingFail )
 {
     if ( IsLoaded () )
         return;
@@ -31,8 +31,13 @@ void CAnimBlockSA::Request ( EModelRequestType requestType )
         pGame->GetStreaming()->RequestModel ( dwModelID, 0x14 );
         AddRef ();
         pGame->GetStreaming()->LoadAllRequestedModels ( true );
-        assert ( IsLoaded() );
-        assert ( pGame->GetStreaming()->HasModelLoaded ( dwModelID ) );
+
+        // bAllowBlockingFail is for debugging only (Blocking load should never fail)
+        if ( !bAllowBlockingFail )
+        {
+            assert ( IsLoaded() );
+            assert ( pGame->GetStreaming()->HasModelLoaded ( dwModelID ) );
+        }
     }
     else
     {

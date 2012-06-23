@@ -67,74 +67,41 @@ bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
                  ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT && m_pResource->IsClientScriptsOn () && static_cast<CResourceClientScriptItem*>(*iter)->IsProtected() == false ) ||
                  ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_FILE && m_pResource->IsClientFilesOn () ) )
             {
+                // Write the Type of chunk to read (F - File, E - Exported Function)
+                BitStream.Write ( static_cast < unsigned char > ( 'F' ) );
+
+                // Write the map name
+                const char* szFileName = ( *iter )->GetWindowsName();
+                size_t sizeFileName = strlen ( szFileName );
+
+                // Make sure we don't have any backslashes in the name
+                char * szCleanedFilename = new char [ sizeFileName + 1 ];
+                strcpy ( szCleanedFilename, szFileName );
+                for ( unsigned int i = 0 ; i < sizeFileName ; i++ )
+                {
+                    if ( szCleanedFilename [ i ] == '\\' )
+                        szCleanedFilename [ i ] = '/';
+                }
+
+                BitStream.Write ( static_cast < unsigned char > ( sizeFileName ) );
+                if ( sizeFileName > 0 )
+                {
+                    BitStream.Write ( szCleanedFilename, sizeFileName );
+                }
+
+                // ChrML: Don't forget this...
+                delete [] szCleanedFilename;
+
+                BitStream.Write ( static_cast < unsigned char > ( ( *iter )->GetType() ) );
+                CChecksum checksum = ( *iter )->GetLastChecksum ();
+                BitStream.Write ( checksum.ulCRC );
+                BitStream.Write ( (const char*)checksum.mD5, sizeof ( checksum.mD5 ) );
+                BitStream.Write ( ( *iter )->GetApproxSize () );
                 if ( ( *iter )->GetType () == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_FILE )
                 {
                     CResourceClientFileItem* pRCFItem = reinterpret_cast < CResourceClientFileItem* > ( *iter );
-                    // Write the Type of chunk to read (F - File, E - Exported Function)
-                    BitStream.Write ( static_cast < unsigned char > ( 'F' ) );
-
-                    // Write the map name
-                    const char* szFileName = ( *iter )->GetWindowsName();
-                    size_t sizeFileName = strlen ( szFileName );
-
-                    // Make sure we don't have any backslashes in the name
-                    char * szCleanedFilename = new char [ sizeFileName + 1 ];
-                    strcpy ( szCleanedFilename, szFileName );
-                    for ( unsigned int i = 0 ; i < sizeFileName ; i++ )
-                    {
-                        if ( szCleanedFilename [ i ] == '\\' )
-                            szCleanedFilename [ i ] = '/';
-                    }
-
-                    BitStream.Write ( static_cast < unsigned char > ( sizeFileName ) );
-                    if ( sizeFileName > 0 )
-                    {
-                        BitStream.Write ( szCleanedFilename, sizeFileName );
-                    }
-
-                    // ChrML: Don't forget this...
-                    delete [] szCleanedFilename;
-
-                    BitStream.Write ( static_cast < unsigned char > ( ( *iter )->GetType() ) );
-                    CChecksum checksum = ( *iter )->GetLastChecksum ();
-                    BitStream.Write ( checksum.ulCRC );
-                    BitStream.Write ( (const char*)checksum.mD5, sizeof ( checksum.mD5 ) );
-                    BitStream.Write ( ( *iter )->GetApproxSize () );
                     // write bool whether to download or not
                     BitStream.WriteBit ( pRCFItem->IsAutoDownload() );
-                }
-                else
-                {
-                    // Write the Type of chunk to read (F - File, E - Exported Function)
-                    BitStream.Write ( static_cast < unsigned char > ( 'F' ) );
-
-                    // Write the map name
-                    const char* szFileName = ( *iter )->GetWindowsName();
-                    size_t sizeFileName = strlen ( szFileName );
-
-                    // Make sure we don't have any backslashes in the name
-                    char * szCleanedFilename = new char [ sizeFileName + 1 ];
-                    strcpy ( szCleanedFilename, szFileName );
-                    for ( unsigned int i = 0 ; i < sizeFileName ; i++ )
-                    {
-                        if ( szCleanedFilename [ i ] == '\\' )
-                            szCleanedFilename [ i ] = '/';
-                    }
-
-                    BitStream.Write ( static_cast < unsigned char > ( sizeFileName ) );
-                    if ( sizeFileName > 0 )
-                    {
-                        BitStream.Write ( szCleanedFilename, sizeFileName );
-                    }
-
-                    // ChrML: Don't forget this...
-                    delete [] szCleanedFilename;
-
-                    BitStream.Write ( static_cast < unsigned char > ( ( *iter )->GetType() ) );
-                    CChecksum checksum = ( *iter )->GetLastChecksum ();
-                    BitStream.Write ( checksum.ulCRC );
-                    BitStream.Write ( (const char*)checksum.mD5, sizeof ( checksum.mD5 ) );
-                    BitStream.Write ( ( *iter )->GetApproxSize () );
                 }
             }
         }

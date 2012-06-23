@@ -96,10 +96,8 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_bThreadNetEnabled = true;
     m_iBackupInterval = 3;
     m_iBackupAmount = 5;
-    m_iDebugFlag = 0;
     m_bSyncMapElementData = true;
-    m_NetOptions.netTweak.fTweak1Amount = 1.0f;
-    m_iNetReliabilityMode = 0;
+    m_bBulletSyncEnabled = true;
 }
 
 
@@ -501,10 +499,6 @@ bool CMainConfig::Load ( void )
     // networkencryption - Encryption for Server <-> client communications
     GetBoolean ( m_pRootNode, "networkencryption", m_bNetworkEncryptionEnabled );
 
-    // debug_flag
-    m_iDebugFlag = 0;
-    GetInteger ( m_pRootNode, "debug_flag", m_iDebugFlag );
-
     // bandwidth_reduction
     GetString ( m_pRootNode, "bandwidth_reduction", m_strBandwidthReductionMode );
     ApplyBandwidthReductionMode ();
@@ -520,10 +514,6 @@ bool CMainConfig::Load ( void )
     // threadnet
     GetBoolean ( m_pRootNode, "threadnet", m_bThreadNetEnabled );
     ApplyThreadNetEnabled ();
-
-    // net_type
-    GetInteger ( m_pRootNode, "net_type", m_iNetReliabilityMode );
-    m_iNetReliabilityMode = Clamp ( 0, m_iNetReliabilityMode, 4 );
 
     // Check settings in this list here
     const std::vector < SIntSetting >& settingList = GetIntSettingList ();
@@ -580,22 +570,8 @@ void CMainConfig::SetFakeLag ( int iPacketLoss, int iExtraPing, int iExtraPingVa
 }
 
 
-void CMainConfig::SetTweakValue ( int iWhich, float fAmount )
-{
-    m_NetOptions.netTweak.bValid = true;
-    if ( iWhich == 0 )
-        m_NetOptions.netTweak.fTweak1Amount = Clamp ( 0.f, fAmount, 1.f );
-    if ( iWhich == 1 )
-        m_NetOptions.netTweak.fTweak2Amount = Clamp ( 0.f, fAmount, 1.f );
-
-    ApplyNetOptions ();
-}
-
-
 void CMainConfig::ApplyNetOptions ( void )
 {
-    m_NetOptions.netType.bValid = true;
-    m_NetOptions.netType.reliabilityMode = m_iNetReliabilityMode;
     g_pNetServer->SetNetOptions ( m_NetOptions );
 }
 
@@ -836,9 +812,7 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "sver", CConsoleCommands::Ver, false );
     RegisterCommand ( "ase", CConsoleCommands::Ase, false );
     RegisterCommand ( "openports", CConsoleCommands::OpenPortsTest, false );
-    RegisterCommand ( "stest", CConsoleCommands::Test, false );
 
-    RegisterCommand ( "checkls", CConsoleCommands::CheckLightSync, false );
     RegisterCommand ( "debugdb", CConsoleCommands::SetDbLogLevel, false );
 
     RegisterCommand ( "reloadbans", CConsoleCommands::ReloadBans, false );
@@ -1013,19 +987,6 @@ int CMainConfig::GetNoWorkToDoSleepTime ( void )
 }
 
 
-SString CMainConfig::GetMinimumClientVersion ( void )
-{
-    SString strMinReq = m_strMinClientVersionOverride > m_strMinClientVersion ? m_strMinClientVersionOverride : m_strMinClientVersion;
-#ifndef MTA_DEBUG
-    // For forcing a minclient requirement
-    SString strMinReqForRelease = "1.4.0-0.00000";
-    if ( strMinReqForRelease > strMinReq )
-        strMinReq = strMinReqForRelease;
-#endif
-    return strMinReq;
-}
-
-
 //////////////////////////////////////////////////////////////////////
 //
 // Fetch any single setting from the server config
@@ -1097,24 +1058,6 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
         return true;
     }
     else
-    if ( strName == "debug_flag" )
-    {
-        strValue = SString ( "%d", m_iDebugFlag );
-        return true;
-    }
-    else
-    if ( strName == "test_send_multiplier" )
-    {
-        strValue = SString ( "%d", g_pBandwidthSettings->iTestSendMultiplier );
-        return true;
-    }
-    else
-    if ( strName == "test_everyone_near" )
-    {
-        strValue = SString ( "%d", g_pBandwidthSettings->bTestPretendEveryoneIsNear );
-        return true;
-    }
-    else
     if ( strName == "verifyclientsettings" )
     {
         strValue = SString ( "%d", m_iEnableClientChecks );
@@ -1122,6 +1065,18 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
     }
     else
     {
+        // Check settings in this list here
+        const std::vector < SIntSetting >& settingList = GetIntSettingList ();
+        for ( uint i = 0 ; i < settingList.size () ; i++ )
+        {
+            const SIntSetting& item = settingList[i];
+            if ( strName == item.szName )
+            {
+                strValue = SString ( "%d", *item.pVariable );
+                return true;
+            }
+        }
+
         //
         // Everything else is read only, so can be fetched directly from the XML data
         //
@@ -1271,65 +1226,6 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
             return true;
         }
     }
-    else
-    if ( strName == "lslimit" )
-    {
-        int iLimit = atoi ( strValue );
-        if ( iLimit > 0 )
-        {
-            // Transient settings go in their own map, so they don't get saved
-            MapSet ( m_TransientSettings, "lslimit", strValue );
-            g_pBandwidthSettings->iLightSyncPlrsPerFrame = iLimit;
-            return true;
-        }
-    }
-    else
-    if ( strName == "debug_flag" )
-    {
-        if ( !strValue.empty() && isdigit( (uchar)strValue[0] ) )
-        {
-            m_iDebugFlag = atoi ( strValue );
-            if ( bSave )
-            {
-                SetString ( m_pRootNode, "debug_flag", SString ( "%d", m_iDebugFlag ) );
-                Save ();
-            }
-            return true;
-        }
-    }
-    else
-    if ( strName == "test_send_multiplier" )
-    {
-        if ( !strValue.empty() && isdigit( (uchar)strValue[0] ) )
-        {
-            g_pBandwidthSettings->iTestSendMultiplier = Clamp ( 1, atoi ( strValue ), 1000 );
-            return true;
-        }
-    }
-    else
-    if ( strName == "test_everyone_near" )
-    {
-        if ( strValue == "0" || strValue == "1" )
-        {
-            g_pBandwidthSettings->bTestPretendEveryoneIsNear = atoi ( strValue ) == 0 ? false : true;
-            return true;
-        }
-    }
-    else
-    if ( strName == "net_type" )
-    {
-        int iValue = atoi ( strValue );
-        if ( iValue >= 0 && iValue <= 4 )
-        {
-            m_iNetReliabilityMode = iValue;
-            if ( bSave )
-            {
-                SetString ( m_pRootNode, "net_type", SString ( "%d", m_iNetReliabilityMode ) );
-                Save ();
-            }
-            return true;
-        }
-    }
 
     // Check settings in this list here
     const std::vector < SIntSetting >& settingList = GetIntSettingList ();
@@ -1381,6 +1277,7 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   50,     100,    4000,   "keysync_mouse_sync_interval",          &g_TickRateSettings.iKeySyncRotation,       &OnTickRateChange },
             { true, true,   50,     100,    4000,   "keysync_analog_sync_interval",         &g_TickRateSettings.iKeySyncAnalogMove,     &OnTickRateChange },
             { true, true,   50,     100,    4000,   "donkey_work_interval",                 &g_TickRateSettings.iNearListUpdate,        &OnTickRateChange },
+            { true, true,   0,      0,      1,      "bullet_sync",                          &m_bBulletSyncEnabled,                      &OnTickRateChange },
         };
 
     static std::vector < SIntSetting > settingsList;
@@ -1401,4 +1298,6 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
 void CMainConfig::OnTickRateChange ( void )
 {
     CStaticFunctionDefinitions::SendSyncIntervals ();
+    g_pGame->SendBulletSyncSettings ();
+    g_pGame->CalculateMinClientRequirement ();
 }

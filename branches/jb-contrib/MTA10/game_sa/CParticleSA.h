@@ -17,7 +17,7 @@
 
 class CParticleSAInterface
 {
-
+public:
 };
 
 class CParticleSA : public CParticle

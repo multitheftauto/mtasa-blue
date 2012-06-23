@@ -70,7 +70,6 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setFogDistance", CLuaWorldDefs::setFogDistance );
     CLuaCFunctions::AddFunction ( "setAircraftMaxHeight", CLuaWorldDefs::setAircraftMaxHeight );
     CLuaCFunctions::AddFunction ( "setOcclusionsEnabled", CLuaWorldDefs::setOcclusionsEnabled );
-    CLuaCFunctions::AddFunction ( "setDevelopmentMode", CLuaWorldDefs::setDevelopmentMode );
 
     // Reset
     CLuaCFunctions::AddFunction ( "resetSkyGradient", CLuaWorldDefs::resetSkyGradient );
@@ -1259,27 +1258,6 @@ int CLuaWorldDefs::getOcclusionsEnabled ( lua_State* luaVM )
         lua_pushboolean ( luaVM, bEnabled );
         return 1;
     }
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaWorldDefs::setDevelopmentMode ( lua_State* luaVM )
-{
-//  bool setDevelopmentMode ( string command )
-    SString strCommand;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strCommand );
-
-    if ( !argStream.HasErrors () )
-    {
-        g_pGame->SetDevSetting ( strCommand );
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setDevelopmentMode", *argStream.GetErrorMessage () ) );
-
     lua_pushboolean ( luaVM, false );
     return 1;
 }

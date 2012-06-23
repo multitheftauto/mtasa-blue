@@ -54,6 +54,15 @@ CPedSA::~CPedSA ( void )
         if ( this->m_pWeapons[i] )
             delete this->m_pWeapons[i];
     }
+
+    // Make sure this ped is not refed in the flame shot info array
+    CFlameShotInfo* pInfo = (CFlameShotInfo*)ARRAY_CFlameShotInfo;
+    for ( uint i = 0 ; i < MAX_FLAME_SHOT_INFOS ; i++ )
+    {
+        if ( pInfo->pInstigator == m_pInterface )
+            pInfo->pInstigator = NULL;
+        pInfo++;
+    }
 }
 
 // used to init weapons at the moment, called by CPlayerPedSA when its been constructed
@@ -951,6 +960,36 @@ void CPedSA::SetVoice ( const char* szVoiceType, const char* szVoice )
     if ( sVoiceID < 0 )
         return;
     SetVoice ( sVoiceType, sVoiceID );
+}
+
+// GetCurrentWeaponStat will only work if the game ped context is currently set to this ped
+CWeaponStat* CPedSA::GetCurrentWeaponStat ( void )
+{
+    if ( pGame->GetPedContext () != this )
+    {
+        OutputDebugLine ( "WARNING: GetCurrentWeaponStat ped context mismatch" );
+        return NULL;
+    }
+
+    CWeapon* pWeapon = GetWeapon ( GetCurrentWeaponSlot () );
+
+    if ( !pWeapon )
+        return NULL;
+
+    eWeaponType eWeapon = pWeapon->GetType ();
+    ushort usStat = pGame->GetStats ()->GetSkillStatIndex ( eWeapon );
+    float fSkill = pGame->GetStats()->GetStatValue ( usStat );
+    CWeaponStat* pWeaponStat = pGame->GetWeaponStatManager ()->GetWeaponStatsFromSkillLevel ( eWeapon, fSkill );
+    return pWeaponStat;
+}
+
+float CPedSA::GetCurrentWeaponRange ( void )
+{
+    CWeaponStat* pWeaponStat = GetCurrentWeaponStat ();
+    if ( !pWeaponStat )
+        return 1;
+
+    return pWeaponStat->GetWeaponRange ();
 }
 
 /*

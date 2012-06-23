@@ -480,7 +480,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     else
                         BitStream.WriteBit ( false );
 
-                    if ( BitStream.Version ( ) >= 0x02A )
+                    if ( BitStream.Version ( ) >= 0x02B )
                     {
                         unsigned char ucSirenCount = pVehicle->m_tSirenBeaconInfo.m_ucSirenCount;
                         unsigned char ucSirenType = pVehicle->m_tSirenBeaconInfo.m_ucSirenType;

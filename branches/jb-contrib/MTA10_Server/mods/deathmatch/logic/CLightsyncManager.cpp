@@ -84,7 +84,7 @@ void CLightsyncManager::DoPulse ()
     long iBitsSent = 0;
 
     // For limiting light sync processing
-    long iLimitCounter = g_pBandwidthSettings->iLightSyncPlrsPerFrame;
+    long iLimitCounter = Max < uint > ( 10, g_pGame->GetPlayerManager ()->Count () / 25 );
     int iLightsyncRate = g_TickRateSettings.iLightSync;
     while ( m_Queue.size() > 0 && m_Queue.front().ullTime + iLightsyncRate <= GetTickCount64_ () && iLimitCounter > 0 )
     {
