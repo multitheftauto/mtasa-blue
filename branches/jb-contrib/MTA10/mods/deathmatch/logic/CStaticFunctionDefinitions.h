@@ -262,6 +262,8 @@ public:
     static bool                         SetRadarAreaFlashing                ( CClientRadarArea* RadarArea, bool flashing );
     static bool                         IsInsideRadarArea                   ( CClientRadarArea* RadarArea, CVector2D vecPosition, bool& inside );
 
+    // Particle System func
+
 
     // Pickup create/destroy funcs
     static CClientPickup*               CreatePickup                        ( CResource& Resource, const CVector& vecPosition, unsigned char ucType, double dFive, unsigned long ulRespawnInterval, double dSix );

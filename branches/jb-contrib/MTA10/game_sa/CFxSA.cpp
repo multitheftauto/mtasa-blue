@@ -250,3 +250,15 @@ void CFxSA::TriggerFootSplash ( CVector & vecPosition )
         call    dwFunc
     }
 }
+
+CFxSystem* CFxSA::GetCommonFxSystem(const SString &strName)
+{
+    for(uint32 i = 0; i < arraysize(saCommonFxSystemMap); i++)
+    {
+        if(saCommonFxSystemMap[i] == strName)
+        {
+            return m_pInterface->pCommonFxSystemArray[i];
+        }
+    }
+    return NULL;
+}

@@ -319,10 +319,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\shared_logic\CClientRopes.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Client.cpp"
 				>
 			</File>
@@ -821,6 +817,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientParticle.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientPathManager.cpp"
 					>
 				</File>
@@ -890,10 +890,6 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientRenderElementManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientRopes.h"
 					>
 				</File>
 				<File
@@ -2368,6 +2364,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientPad.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientParticle.h"
 					>
 				</File>
 				<File

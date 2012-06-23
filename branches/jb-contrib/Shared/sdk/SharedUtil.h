@@ -43,6 +43,11 @@ typedef float               FLOAT;      //  32
 // a) long (and therefore DWORD) is 64 bits when compiled using 64 bit GCC 
 // b) char range can be -127 to 128 or 0 to 255 depending on compiler options/mood
 
+// Thanks to The Chromium Project for this masterful macro!
+template <typename T, size_t N>
+char (&ArraySizeHelper(T (&array)[N]))[N];
+#define arraysize(array) (sizeof(ArraySizeHelper(array)))
+#define NUMELEMS(array) arraysize(array)
 
 #include "SharedUtil.Defines.h"
 #include "SharedUtil.AllocTracking.h"

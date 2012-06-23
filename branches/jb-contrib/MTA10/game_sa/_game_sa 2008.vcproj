@@ -589,10 +589,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CParticleActivatorSA.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\CParticleEmitterBaseDataSA.cpp"
 				>
 			</File>
@@ -1231,10 +1227,6 @@
 			</File>
 			<File
 				RelativePath="CPadSA.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CParticleActivatorSA.h"
 				>
 			</File>
 			<File
