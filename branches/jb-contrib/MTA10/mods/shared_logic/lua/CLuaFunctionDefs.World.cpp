@@ -120,14 +120,22 @@ int CLuaFunctionDefs::GetGroundPosition ( lua_State* luaVM )
 }
 #include "../../../game_sa/CParticleInfoSA.h"
 // Particle System Temporary Residence
+//      System Layout:
+//          fxAddParticle
+//          fxSetParticleInfo
+//          fxDisableDefaultParticle - look @ CParticleSystemMgr - 1st member, though they will be treated as any other
+//          fxRemoveParticle
+//      particle info for default particles are set within functions they are used in
+//          so will need to do context-based nulling out(i.e. if someone wants to have red jetpack thrusters, disable setting it in CPed::RenderJetPack and add function to reenable it)
 int CLuaFunctionDefs::FxAddParticle(lua_State* luaVM)
 {
-//  element fxAddParticle ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ, [ float blur = 0.0, float brightness = 1.0 ] )
-    CVector vecPos; CVector vecDir;
+//  element fxAddParticle ( string name, float posX, float posY, float posZ, float velX, float velY, float velZ, [ float blur = 0.0, float brightness = 1.0 ] )
+    SString strParticleName; CVector vecPos; CVector vecDir;
     float fBlur; float fBrightness;
     // it returns bool for DEBUGGING, it will be <element> later..
     // also add name later, will be testing with some random for now
     CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strParticleName );
     argStream.ReadNumber ( vecPos.fX );
     argStream.ReadNumber ( vecPos.fY );
     argStream.ReadNumber ( vecPos.fZ );
@@ -151,23 +159,18 @@ int CLuaFunctionDefs::FxAddParticle(lua_State* luaVM)
             CParticleInfoSAInterface
                 particleInfo;
             particleInfo.colour.r = 1.0f;
-            particleInfo.colour.g = 0.0f;
-            particleInfo.colour.b = 0.0f;
+            particleInfo.colour.g = 1.0f;
+            particleInfo.colour.b = 1.0f;
             particleInfo.colour.a = 1.0f;
-            particleInfo.fSize = 10.0f;
-            particleInfo.fDurationFactor = 1.0f;
-            particleInfo.pad1 = 1.0f;
+            particleInfo.fSize = 30.0f;
+            particleInfo.fDurationFactor = 10000.0f;
+            particleInfo.pad1 = 100.0f; // nudge lil_Toady to see what's this shit
             CParticleInfoSAInterface
                 *pParticleInfo = &particleInfo;
-              /* RwColorFloat colour;
-    float fSize;
-    float pad1;
-    float fDurationFactor;*/
 		    uint32 dwRet = 0;
 		    {   // __stdcall CParticleData::createParticle
 			    uint32 CParticleData__createParticle = (uint32)0x4A9BE0;
-			    //char* szWaterHydrantParticle = "water_hydrant";(char*)0x0085A70C;
-                uint32 particleNameAddress = (uint32)0x85A764;
+                uint32 *szParticleName = (uint32*)strParticleName.data();
                 uint32 pParticleData = (uint32)0xA9AE80;
                 CVector vecNull = CVector(0.0f, 0.0f, 0.0f);
                 CVector *pVecNull = &vecNull;
@@ -176,8 +179,10 @@ int CLuaFunctionDefs::FxAddParticle(lua_State* luaVM)
 				    push 0
 				    push 0
 				    push pVecNull
-                    push particleNameAddress
-				    mov ecx, pParticleData
+                   // lea eax, szParticleName
+				  //  push eax
+                    push szParticleName
+                    mov ecx, pParticleData
 				    call CParticleData__createParticle
 				    mov dwRet, eax
 			    }
@@ -215,7 +220,7 @@ int CLuaFunctionDefs::FxAddParticle(lua_State* luaVM)
                         push fa7
                         push fa6
                         push pParticleInfo
-                        push 0
+                        push fBlur
                         push pVecDir
                         push pVecPos
                         mov ecx, dwRet
