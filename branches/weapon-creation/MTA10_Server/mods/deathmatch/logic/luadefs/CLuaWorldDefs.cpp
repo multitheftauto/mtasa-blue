@@ -33,6 +33,8 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getSkyGradient", CLuaWorldDefs::getSkyGradient );
     CLuaCFunctions::AddFunction ( "getHeatHaze", CLuaWorldDefs::getHeatHaze );
     CLuaCFunctions::AddFunction ( "isGlitchEnabled", CLuaWorldDefs::isGlitchEnabled );
+    CLuaCFunctions::AddFunction ( "setJetpackWeaponEnabled", CLuaWorldDefs::setJetpackWeaponEnabled );
+    CLuaCFunctions::AddFunction ( "getJetpackWeaponEnabled", CLuaWorldDefs::getJetpackWeaponEnabled );
     CLuaCFunctions::AddFunction ( "getCloudsEnabled", CLuaWorldDefs::getCloudsEnabled );
     CLuaCFunctions::AddFunction ( "getInteriorSoundsEnabled", CLuaWorldDefs::getInteriorSoundsEnabled );
     CLuaCFunctions::AddFunction ( "getRainLevel", CLuaWorldDefs::getRainLevel );
@@ -1156,6 +1158,54 @@ int CLuaWorldDefs::isGlitchEnabled ( lua_State* luaVM )
     lua_pushnil ( luaVM );
     return 1;
 }
+
+
+int CLuaWorldDefs::setJetpackWeaponEnabled ( lua_State* luaVM )
+{
+    eWeaponType weaponType;
+    bool bEnabled;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( weaponType );
+    argStream.ReadBool ( bEnabled );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( CStaticFunctionDefinitions::SetJetpackWeaponEnabled ( weaponType, bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setJetpackWeaponEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaWorldDefs::getJetpackWeaponEnabled ( lua_State* luaVM )
+{
+    eWeaponType weaponType;
+    bool bEnabled;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( weaponType );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( CStaticFunctionDefinitions::GetJetpackWeaponEnabled ( weaponType, bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, bEnabled );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getJetpackWeaponEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaWorldDefs::setCloudsEnabled ( lua_State* luaVM )
 {

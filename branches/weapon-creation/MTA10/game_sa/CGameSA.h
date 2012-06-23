@@ -196,6 +196,9 @@ public:
     unsigned char           GetBlurLevel            ( void );
     void                    SetBlurLevel            ( unsigned char ucLevel );
 
+    void                    SetJetpackWeaponEnabled     ( eWeaponType weaponType, bool bEnabled );
+    bool                    GetJetpackWeaponEnabled     ( eWeaponType weaponType );
+
     unsigned long           GetMinuteDuration       ( void );
     void                    SetMinuteDuration       ( unsigned long ulTime );
 
@@ -294,6 +297,8 @@ private:
     static unsigned long*   VAR_Framelimiter;
 
     std::map < std::string, SCheatSA* > m_Cheats;
+
+    SFixedArray < bool, WEAPONTYPE_LAST_WEAPONTYPE > m_JetpackWeapons;
 };
 
 #endif

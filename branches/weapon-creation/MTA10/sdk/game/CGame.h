@@ -174,6 +174,9 @@ public:
     virtual unsigned char       GetBlurLevel ( void ) = 0;
     virtual void                SetBlurLevel ( unsigned char ucLevel ) = 0;
 
+    virtual void                SetJetpackWeaponEnabled     ( eWeaponType weaponType, bool bEnabled );
+    virtual bool                GetJetpackWeaponEnabled     ( eWeaponType weaponType );
+
     virtual eGameVersion        GetGameVersion ( void ) = 0;
 
     virtual bool                IsCheatEnabled              ( const char* szCheatName ) = 0;

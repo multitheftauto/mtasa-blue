@@ -10083,6 +10083,27 @@ bool CStaticFunctionDefinitions::IsGlitchEnabled ( const std::string& strGlitchN
     }
     return false;
 }
+
+bool CStaticFunctionDefinitions::SetJetpackWeaponEnabled ( eWeaponType weaponType, bool bEnabled )
+{
+    if ( g_pGame->GetJetpackWeaponEnabled( weaponType ) != bEnabled )
+    {
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( static_cast < unsigned char > ( weaponType ) );
+        BitStream.pBitStream->WriteBit ( bEnabled );
+        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_JETPACK_WEAPON_ENABLED, *BitStream.pBitStream ) );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetJetpackWeaponEnabled ( eWeaponType weaponType, bool& bEnabled )
+{
+    bEnabled = g_pGame->GetJetpackWeaponEnabled ( weaponType );
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::SetCloudsEnabled ( bool bEnabled )
 {
     CBitStream BitStream;

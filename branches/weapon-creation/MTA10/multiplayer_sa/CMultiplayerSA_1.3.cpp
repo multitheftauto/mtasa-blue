@@ -71,6 +71,10 @@ DWORD RETN_CVehicle_ProcessStuff_PushRGBPointLights          =  0x6AB7D5;
 DWORD RETN_CVehicle_ProcessStuff_StartPointLightCode         =  0x6AB729;
 DWORD RETN_CVehicle_ProcessStuff_IgnorePointLightCode        =  0x6AB823;
 
+#define HOOKPOS_CTaskSimpleJetpack_ProcessInput                 0x67E7F1
+DWORD RETN_CTaskSimpleJetpack_ProcessInputEnable             =  0x67E812;
+DWORD RETN_CTaskSimpleJetpack_ProcessInputDisabled           =  0x67E821;
+
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( );
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeDual ( );
@@ -88,6 +92,7 @@ void HOOK_CMotorBike_ProcessStuff_PushSirenPosition2 ( );
 void HOOK_CMotorbike_ProcessStuff_TestVehicleModel ( );
 void HOOK_CVehicle_ProcessStuff_PushRGBPointLights ( );
 void HOOK_CVehicle_ProcessStuff_StartPointLightCode ( );
+void HOOK_CTaskSimpleJetpack_ProcessInput ( );
 
 void CMultiplayerSA::Init_13 ( void )
 {
@@ -121,6 +126,8 @@ void CMultiplayerSA::InitHooks_13 ( void )
     HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound3, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound3, 5 );
     HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound, 6 );
 
+    HookInstall ( HOOKPOS_CTaskSimpleJetpack_ProcessInput, (DWORD) HOOK_CTaskSimpleJetpack_ProcessInput, 5 );
+
     InitHooks_ClothesSpeedUp ();
     EnableHooks_ClothesMemFix ( true );
     InitHooks_FixBadAnimId ();
@@ -149,6 +156,14 @@ void CMultiplayerSA::InitMemoryCopies_13 ( void )
     MemPut < float > ( 0x712413, 2.f  + 10.f );
     MemPut < float > ( 0x712447, 13.f + 10.f );
     MemPut < float > ( 0x71244c, 4.f  + 10.f );
+
+    // shoot any weapon while on a jetpack -> moved to a hook.
+    /*MemPut < BYTE > ( 0x67E7F1, 0x90 );
+    MemPut < BYTE > ( 0x67E7F1+1, 0x90 );
+    MemPut < BYTE > ( 0x67E7FA, 0x90 );
+    MemPut < BYTE > ( 0x67E7FA+1, 0x90 );
+    MemPut < BYTE > ( 0x685ADC, 0xE9 );*/
+
 }
 
 // Siren Stuff
@@ -1130,6 +1145,41 @@ void _declspec(naked) HOOK_CEventHitByWaterCannon ( )
             call CALL_CEventHitByWaterCannon
             // Go back to execution
             jmp RETURN_CWaterCannon_PushPeds_RETN
+        }
+    }
+}
+CPedSAInterface * pPedUsingJetpack;
+bool AllowJetPack ( )
+{
+    if ( pPedUsingJetpack->bCurrentWeaponSlot )
+    {
+        eWeaponType weaponType = pPedUsingJetpack->Weapons[pPedUsingJetpack->bCurrentWeaponSlot].m_eWeaponType;
+        return pGameInterface->GetJetpackWeaponEnabled( weaponType );
+    }
+    return false;
+}
+
+void _declspec(naked) HOOK_CTaskSimpleJetpack_ProcessInput ( )
+{
+    _asm
+    {
+        mov pPedUsingJetpack, edi
+        pushad
+    }
+    if ( AllowJetPack ( ) )
+    {
+        _asm
+        {
+            popad
+            jmp RETN_CTaskSimpleJetpack_ProcessInputEnable
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            jmp RETN_CTaskSimpleJetpack_ProcessInputDisabled
         }
     }
 }

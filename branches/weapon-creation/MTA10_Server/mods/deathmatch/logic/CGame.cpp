@@ -138,7 +138,12 @@ CGame::CGame ( void )
     m_Glitches [ GLITCH_FASTMOVE ] = false;
     m_Glitches [ GLITCH_CROUCHBUG ] = false;
     m_Glitches [ GLITCH_CLOSEDAMAGE ] = false;
+    for ( int i = 0; i <= WEAPONTYPE_LAST_WEAPONTYPE; i++ )
+        m_JetpackWeapons [ i ] = false;
 
+    m_JetpackWeapons [ WEAPONTYPE_MICRO_UZI ] = true;
+    m_JetpackWeapons [ WEAPONTYPE_TEC9 ] = true;
+    m_JetpackWeapons [ WEAPONTYPE_PISTOL ] = true;
     //Glitch names (for Lua interface)
     m_GlitchNames["quickreload"] = GLITCH_QUICKRELOAD;
     m_GlitchNames["fastfire"] = GLITCH_FASTFIRE;
@@ -3736,6 +3741,22 @@ bool CGame::GetCloudsEnabled ( void )
     return m_bCloudsEnabled;
 }
 
+bool CGame::GetJetpackWeaponEnabled ( eWeaponType weaponType )
+{
+    if ( weaponType >= WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_LAST_WEAPONTYPE )
+    {
+        return m_JetpackWeapons[weaponType];
+    }
+    return false;
+}
+
+void CGame::SetJetpackWeaponEnabled ( eWeaponType weaponType, bool bEnabled )
+{
+    if ( weaponType >= WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_LAST_WEAPONTYPE )
+    {
+        m_JetpackWeapons[weaponType] = bEnabled;
+    }
+}
 
 //
 // Handle basic backup of databases and config files

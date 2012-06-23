@@ -34,6 +34,8 @@ public:
     static int      getMinuteDuration                   ( lua_State* luaVM );
     static int      isGarageOpen                        ( lua_State* luaVM );
     static int      isGlitchEnabled                     ( lua_State* luaVM );
+    static int      setJetpackWeaponEnabled             ( lua_State* luaVM );
+    static int      getJetpackWeaponEnabled             ( lua_State* luaVM );
     static int      getCloudsEnabled                    ( lua_State* luaVM );
     static int      getTrafficLightState                ( lua_State* luaVM );
     static int      areTrafficLightsLocked              ( lua_State* luaVM );
