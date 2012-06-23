@@ -35,6 +35,7 @@ public:
     virtual void                TriggerWaterSplash      ( CVector & vecPosition ) = 0;
     virtual void                TriggerBulletSplash     ( CVector & vecPosition ) = 0;
     virtual void                TriggerFootSplash       ( CVector & vecPosition ) = 0;
+    virtual CFxSystem*          GetCommonFxSystem       ( const SString & strName ) = 0;
 };
 
 #endif

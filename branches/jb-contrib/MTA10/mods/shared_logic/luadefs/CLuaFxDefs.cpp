@@ -60,14 +60,12 @@ int CLuaFunctionDefs::FxAddParticle(lua_State* luaVM)
     if ( !argStream.HasErrors ( ) )
     {
         // move this to its own CClientParticle.. do this way cuz it's faster to debug
-	    CCamera
-		    *pCam = g_pGame->GetCamera();
-	    CMatrix matrix;
-	  //  if(0)
         CVector *pVecPos = &vecPos;
         CVector *pVecDir = &vecDir;
-//        if(pCam->GetMatrix(&matrix))
 	    {
+            {   // change spark particle
+                
+            }
             CParticleInfoSAInterface
                 particleInfo;
             particleInfo.colour.r = 1.0f;
@@ -75,12 +73,12 @@ int CLuaFunctionDefs::FxAddParticle(lua_State* luaVM)
             particleInfo.colour.b = 1.0f;
             particleInfo.colour.a = 1.0f;
             particleInfo.fSize = 30.0f;
-            particleInfo.fDurationFactor = 10000.0f;
-            particleInfo.pad1 = 100.0f; // nudge lil_Toady to see what's this shit
+            particleInfo.fDurationFactor = 1.0f;
+            particleInfo.pad1 = 100.0f;
             CParticleInfoSAInterface
                 *pParticleInfo = &particleInfo;
 		    uint32 dwRet = 0;
-		    {   // __stdcall CParticleData::createParticle
+		    {   // __stdcall CFxManager::CreateFxSystem
 			    uint32 CParticleData__createParticle = (uint32)0x4A9BE0;
                 uint32 *szParticleName = (uint32*)strParticleName.data();
                 uint32 pParticleData = (uint32)0xA9AE80;
@@ -111,7 +109,7 @@ int CLuaFunctionDefs::FxAddParticle(lua_State* luaVM)
 				    }
 			    }
                 */
-                {   // CParticleFx::Initialise
+                {   // CFxSystem::Initialise
                     uint32 CParticleFx__Initialise = (uint32)0x4AA2F0;
                     __asm
                     {
@@ -119,7 +117,17 @@ int CLuaFunctionDefs::FxAddParticle(lua_State* luaVM)
                        // call CParticleFx__Initialise
                     }
                 }
-                {   // CParticleFx::AddParticle
+                {   // CFxSystem::SetRateMult
+                    uint32 CFxSystem__SetRateMult = (uint32)0x4AA6F0;
+                    float fMult = 10.0f;
+                    __asm
+                    {
+                        push fMult
+                        mov ecx, dwRet
+                        call CFxSystem__SetRateMult
+                    }
+                }
+                {   // CFxSystem::AddParticle
                     uint32 CParticleFx__AddParticle = (uint32)0x4AA440;
                     uint32 a9 = 0;
                     float fBrightness = 1.0f;

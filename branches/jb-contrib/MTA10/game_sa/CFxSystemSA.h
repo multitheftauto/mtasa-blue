@@ -12,6 +12,9 @@
 
 #pragma once
 
+// int __stdcall CFxSystem::AddParticle(CParticleFx* pThis, CVector* pVecPosition, CVector* pVecVelocity, float fBlur, CParticleInfo* pParticleInfo, int a6, float fBrightness, float a8, int a9)
+#define FUNC_CFxSystem__AddParticle					0x4AA440
+
 class CFxSystemSAInterface
 {
 public:
