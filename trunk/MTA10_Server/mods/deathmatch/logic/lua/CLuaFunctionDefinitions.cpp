@@ -10533,11 +10533,11 @@ int CLuaFunctionDefinitions::SetTimer ( lua_State* luaVM )
             }
             CLuaTimer* pLuaTimer = luaMain->GetTimerManager ()->AddTimer ( iLuaFunction, CTickCount ( dTimeInterval ), uiTimesToExecute, Arguments );
 
-            // Set our timer debug info (in case we don't have any debug info which is usually when you do setTimer(destroyElement, 50, 1) or such)
-            pLuaTimer->SetDebugInfo ( strDebugOutput );
-
             if ( pLuaTimer )
             {
+                // Set our timer debug info (in case we don't have any debug info which is usually when you do setTimer(destroyElement, 50, 1) or such)
+                pLuaTimer->SetDebugInfo ( strDebugOutput );
+
                 lua_pushtimer ( luaVM, pLuaTimer );
                 return 1;
             }
