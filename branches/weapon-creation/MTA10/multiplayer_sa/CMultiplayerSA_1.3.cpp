@@ -75,6 +75,14 @@ DWORD RETN_CVehicle_ProcessStuff_IgnorePointLightCode        =  0x6AB823;
 DWORD RETN_CTaskSimpleJetpack_ProcessInputEnable             =  0x67E812;
 DWORD RETN_CTaskSimpleJetpack_ProcessInputDisabled           =  0x67E821;
 
+
+#define HOOKPOS_CTaskSimpleJetpack_ProcessInputFixFPS2           0x685ADC
+DWORD RETN_CTaskSimpleJetpack_ProcessInputFixFPS              =  0x685BDD;
+DWORD RETN_CTaskSimpleJetpack_ProcessInputDontFixFPS          =  0x685AE2;
+
+#define HOOKPOS_CTaskSimpleJetpack_ProcessInputFixFPS3           0x685ABA
+DWORD RETN_CTaskSimpleJetpack_ProcessInputFixFPS3             =  0x685ABF;
+
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( );
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeDual ( );
@@ -93,6 +101,8 @@ void HOOK_CMotorbike_ProcessStuff_TestVehicleModel ( );
 void HOOK_CVehicle_ProcessStuff_PushRGBPointLights ( );
 void HOOK_CVehicle_ProcessStuff_StartPointLightCode ( );
 void HOOK_CTaskSimpleJetpack_ProcessInput ( );
+void HOOK_CTaskSimpleJetpack_ProcessInputFixFPS3 ( );
+void HOOK_CTaskSimpleJetpack_ProcessInputFixFPS2 ( );
 
 void CMultiplayerSA::Init_13 ( void )
 {
@@ -127,6 +137,8 @@ void CMultiplayerSA::InitHooks_13 ( void )
     HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound, 6 );
 
     HookInstall ( HOOKPOS_CTaskSimpleJetpack_ProcessInput, (DWORD) HOOK_CTaskSimpleJetpack_ProcessInput, 5 );
+    HookInstall ( HOOKPOS_CTaskSimpleJetpack_ProcessInputFixFPS2, (DWORD) HOOK_CTaskSimpleJetpack_ProcessInputFixFPS2, 6  );
+    HookInstall ( HOOKPOS_CTaskSimpleJetpack_ProcessInputFixFPS3, (DWORD) HOOK_CTaskSimpleJetpack_ProcessInputFixFPS3, 5 );
 
     InitHooks_ClothesSpeedUp ();
     EnableHooks_ClothesMemFix ( true );
@@ -158,11 +170,13 @@ void CMultiplayerSA::InitMemoryCopies_13 ( void )
     MemPut < float > ( 0x71244c, 4.f  + 10.f );
 
     // shoot any weapon while on a jetpack -> moved to a hook.
-    /*MemPut < BYTE > ( 0x67E7F1, 0x90 );
-    MemPut < BYTE > ( 0x67E7F1+1, 0x90 );
-    MemPut < BYTE > ( 0x67E7FA, 0x90 );
-    MemPut < BYTE > ( 0x67E7FA+1, 0x90 );
-    MemPut < BYTE > ( 0x685ADC, 0xE9 );*/
+    //MemPut < BYTE > ( 0x67E7F1, 0x90 );
+    //MemPut < BYTE > ( 0x67E7F1+1, 0x90 );
+    //MemPut < BYTE > ( 0x67E7FA, 0x90 );
+    //MemPut < BYTE > ( 0x67E7FA+1, 0x90 );
+    // Fixes
+    //MemPut < BYTE > ( 0x685AC1, 0xEB );
+    //MemPut < BYTE > ( 0x685C2D, 0xEB );
 
 }
 
@@ -1149,12 +1163,39 @@ void _declspec(naked) HOOK_CEventHitByWaterCannon ( )
     }
 }
 CPedSAInterface * pPedUsingJetpack;
+DWORD dwJetpackPedIntelligence = NULL;
+bool IsUsingJetPack ( )
+{
+    if ( pPedUsingJetpack && pPedUsingJetpack->pPedIntelligence )
+    {
+        dwJetpackPedIntelligence = (DWORD)pPedUsingJetpack->pPedIntelligence;
+        if ( dwJetpackPedIntelligence )
+        {
+            DWORD CPedIntelligence_FindJetpackTask = 0x601110;
+            DWORD dwReturn = 0;
+            _asm
+            {
+                mov ecx, dwJetpackPedIntelligence
+                call CPedIntelligence_FindJetpackTask
+                mov dwReturn, eax
+            }
+            return dwReturn > 0;
+        }
+    }
+    return false;
+}
 bool AllowJetPack ( )
 {
-    if ( pPedUsingJetpack->bCurrentWeaponSlot )
+    if ( pPedUsingJetpack )
     {
-        eWeaponType weaponType = pPedUsingJetpack->Weapons[pPedUsingJetpack->bCurrentWeaponSlot].m_eWeaponType;
-        return pGameInterface->GetJetpackWeaponEnabled( weaponType );
+        if ( pPedUsingJetpack->bCurrentWeaponSlot > 0 )
+        {
+            if ( IsUsingJetPack ( ) )
+            {
+                eWeaponType weaponType = pPedUsingJetpack->Weapons[pPedUsingJetpack->bCurrentWeaponSlot].m_eWeaponType;
+                return pGameInterface->GetJetpackWeaponEnabled( weaponType );
+            }
+        }
     }
     return false;
 }
@@ -1180,6 +1221,62 @@ void _declspec(naked) HOOK_CTaskSimpleJetpack_ProcessInput ( )
         {
             popad
             jmp RETN_CTaskSimpleJetpack_ProcessInputDisabled
+        }
+    }
+}
+
+void _declspec(naked) HOOK_CTaskSimpleJetpack_ProcessInputFixFPS2 ( )
+{
+    _asm
+    {
+        pushad
+        mov pPedUsingJetpack, esi
+    }
+    if ( AllowJetPack ( ) )
+    {
+        _asm
+        {
+            popad
+            jmp RETN_CTaskSimpleJetpack_ProcessInputFixFPS
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            jnz dontfixfpsmode
+            jmp RETN_CTaskSimpleJetpack_ProcessInputDontFixFPS
+dontfixfpsmode:
+            jmp RETN_CTaskSimpleJetpack_ProcessInputFixFPS
+        }
+    }
+}
+
+DWORD dwCTaskSimpleJetpack_ProcessInputFixFPS3_Call = 0x540670;
+void _declspec(naked) HOOK_CTaskSimpleJetpack_ProcessInputFixFPS3 ( )
+{
+    _asm
+    {
+        pushad
+        mov pPedUsingJetpack, esi
+    }
+    if ( AllowJetPack ( ) )
+    {
+        _asm
+        {
+            popad
+            xor al, al
+            jmp RETN_CTaskSimpleJetpack_ProcessInputFixFPS3
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            call dwCTaskSimpleJetpack_ProcessInputFixFPS3_Call
+            jmp RETN_CTaskSimpleJetpack_ProcessInputFixFPS3
         }
     }
 }
