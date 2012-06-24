@@ -28,6 +28,7 @@
 #define     CLASS_CPad                      0xB73458    // ##SA##
 #define     CLASS_CGarages                  0x96C048    // ##SA##
 #define     CLASS_CFx                       0xA9AE00    // ##SA##
+#define     CLASS_CFxManager                0xA9AE80
 #define     CLASS_CMenuManager              0xBA6748    // ##SA##
 
 #define     CLASS_RwCamera                  0xB6F97C
@@ -147,6 +148,7 @@ public:
     inline CKeyGen                  * GetKeyGen ()               { return m_pKeyGen; }
     inline CRopes                   * GetRopes ()                { return m_pRopes; }
     inline CFx                      * GetFx ()                   { return m_pFx; }
+    inline CFxManager               * GetFxManager ()            { return m_pFxManager; }
     inline CWaterManager            * GetWaterManager ()         { return m_pWaterManager; }
     inline CWeaponStatManager       * GetWeaponStatManager()     { return m_pWeaponStatsManager; }
 
@@ -251,6 +253,7 @@ private:
     CKeyGen                 * m_pKeyGen;
     CRopes                  * m_pRopes;
     CFx                     * m_pFx;
+    CFxManager              * m_pFxManager;
     CWaterManager           * m_pWaterManager;
     CWeaponStatManager      * m_pWeaponStatsManager;
 

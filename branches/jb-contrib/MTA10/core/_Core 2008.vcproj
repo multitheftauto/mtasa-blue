@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Client - Core"
 	ProjectGUID="{4C71249E-EA08-4A3D-9AEF-28707ACC6531}"
 	RootNamespace="Client - Core"
@@ -1433,6 +1433,10 @@
 					</File>
 					<File
 						RelativePath="..\..\MTA10\sdk\game\CFx.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\game\CFxManager.h"
 						>
 					</File>
 					<File

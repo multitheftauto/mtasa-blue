@@ -86,7 +86,7 @@ General Info:
 0x4400 = FX_INFO_COLOURBRIGHT_DATA
 0x8001 = FX_INFO_SMOKE_DATA
 -------------------------------------
-// Particle System layout
+// Particle System activation
 // CFx::AddSparks -> CFxSystem::AddParticle -> (virtual by array)CParticleEmitterManager::AddParticleEffect -> CParticleManager::ActivateParticleEmitter -> (virtual by array)CParticleEmitter::Activate
 
 */

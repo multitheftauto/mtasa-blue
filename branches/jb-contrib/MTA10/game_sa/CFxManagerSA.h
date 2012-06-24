@@ -12,26 +12,21 @@
 
 #pragma once
 
-#include "CRenderWareSA.h"
+#include <game/CFxManager.h>
 
-#define FUNC_CParticleInfo__Init					0x4AB270
-#define FUNC_CParticleInfo__Set						0x4AB290				
-// ^duplicate @ 004AB2D0
+#define FUNC_CFxManager__CreateFxSystem                                 0x4A9BE0
 
-class CParticleInfoSAInterface
+class CFxSystem;
+
+class CFxManagerSAInterface
 {
 public:
-    RwColorFloat colour; /** Range: [0.0, 1.0] */
-    float fSize; /** Range: [0.0, 1.0] */
-    float pad1; /** Range: [0.0, 1.0] */
-    float fDurationFactor;
 };
-// C_ASSERT(sizeof(CParticleInfoSAInterface) == 0x1C); // NEEDS CHECKING
 
-class CParticleInfo
+class CFxManagerSA : public CFxManager
 {
-private:
-    CParticleInfoSAInterface* pInterface;
 public:
-
+    CFxSystem* CreateFxSystem(const SString & strName, CVector & vecPoint, RwMatrix * pMatrix, bool bUnk);
+private:
+    CFxManagerSAInterface * m_pInterface;
 };

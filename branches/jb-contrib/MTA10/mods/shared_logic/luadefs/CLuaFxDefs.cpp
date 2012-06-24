@@ -27,15 +27,38 @@ void CLuaFxDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "fxAddWaterSplash", CLuaFxDefs::fxAddWaterSplash );
     CLuaCFunctions::AddFunction ( "fxAddBulletSplash", CLuaFxDefs::fxAddBulletSplash );
     CLuaCFunctions::AddFunction ( "fxAddFootSplash", CLuaFxDefs::fxAddFootSplash );
+
     CLuaCFunctions::AddFunction ( "fxAddParticle", CLuaFunctionDefs::FxAddParticle );
+    CLuaCFunctions::AddFunction ( "fxSetParticleInfo", CLuaFunctionDefs::FxSetParticleInfo );
 }
 
-#include "../../../game_sa/CParticleInfoSA.h"
+int CLuaFunctionDefs::FxSetParticleInfo(lua_State* luaVM)
+{
+//  bool fxSetParticleInfo ( float colorR, float colorG, float colorB, [ float size = 1.0, float durationFactor = 1.0, float unk = 1.0 ] )
+    RwColorFloat colour; float fSize;
+    float fSize; float fDurationFactor; float fUnk;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( colour.r );
+    argStream.ReadNumber ( colour.g );
+    argStream.ReadNumber ( colour.b );
+    argStream.ReadNumber ( fSize, 1.0f );
+    argStream.ReadNumber ( fDurationFactor, 1.0f );
+    argStream.ReadNumber ( fUnk, 1.0f );
+    
+    if ( !argStream.HasErrors ( ) )
+    {
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fxSetParticleInfo", *argStream.GetErrorMessage () ) );
+    return 1;
+}
+
 // Particle System Temporary Residence
 //      System Layout:
 //          fxAddParticle
 //          fxSetParticleInfo
-//          fxDisableDefaultParticle - look @ CParticleSystemMgr - 1st member, though they will be treated as any other
+//          fxDisableCommonParticle - look @ CFx - 1st member, though they will be treated as any other
 //          fxRemoveParticle
 //      particle info for default particles are set within functions they are used in
 //          so will need to do context-based nulling out(i.e. if someone wants to have red jetpack thrusters, disable setting it in CPed::RenderJetPack and add function to reenable it)
@@ -63,9 +86,6 @@ int CLuaFunctionDefs::FxAddParticle(lua_State* luaVM)
         CVector *pVecPos = &vecPos;
         CVector *pVecDir = &vecDir;
 	    {
-            {   // change spark particle
-                
-            }
             CParticleInfoSAInterface
                 particleInfo;
             particleInfo.colour.r = 1.0f;
@@ -152,12 +172,6 @@ int CLuaFunctionDefs::FxAddParticle(lua_State* luaVM)
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fxAddParticle", *argStream.GetErrorMessage () ) );
-    return 1;
-}
-
-int CLuaFunctionDefs::FxSetParticleInfo(lua_State* luaVM)
-{
-
     return 1;
 }
 

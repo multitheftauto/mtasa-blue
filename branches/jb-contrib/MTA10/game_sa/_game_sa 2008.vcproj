@@ -513,6 +513,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CFxManagerSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CFxSA.cpp"
 				>
 			</File>
@@ -1143,6 +1147,10 @@
 			</File>
 			<File
 				RelativePath=".\CFontSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CFxManagerSA.h"
 				>
 			</File>
 			<File

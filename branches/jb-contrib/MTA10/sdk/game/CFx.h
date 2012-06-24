@@ -9,14 +9,14 @@
 *
 *****************************************************************************/
 
-#ifndef __CFX
-#define __CFX
+#pragma once
 
 #include "RenderWare.h"
 
 class CVector;
 class CEntity;
 class CVehicle;
+class CFxSystem;
 
 class CFx
 {
@@ -37,5 +37,3 @@ public:
     virtual void                TriggerFootSplash       ( CVector & vecPosition ) = 0;
     virtual CFxSystem*          GetCommonFxSystem       ( const SString & strName ) = 0;
 };
-
-#endif
