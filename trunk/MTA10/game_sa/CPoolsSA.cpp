@@ -225,14 +225,13 @@ CVehicle* CPoolsSA::GetVehicle ( DWORD* pGameInterface )
 
     if ( m_bGetVehicleEnabled )
     {
-        // We don't need to look for the map here, since we
-        // include a pointer to the game_sa instance of the
-        // vehicle in the GTA interface.
         CVehicleSAInterface* pInterface = reinterpret_cast < CVehicleSAInterface* > ( pGameInterface );
 
-        if ( pInterface )
+        // Lookup in the pool map for the vehicle related to this interface.
+        vehiclePool_t::mapType::iterator iter = m_vehiclePool.map.find ( pInterface );
+        if ( iter != m_vehiclePool.map.end () )
         {
-            return pInterface->m_pVehicle;
+            return (*iter).second;
         }
     }
 
