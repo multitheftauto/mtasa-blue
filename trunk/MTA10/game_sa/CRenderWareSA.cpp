@@ -586,7 +586,10 @@ void CRenderWareSA::ReplaceModel ( RpClump* pNew, unsigned short usModelID, DWOR
         if ( !DoClumpsContainTheSameGeometry ( pNew, pOldClump ) )
         {
             // Make new clump container for the model geometry
-            RpClump* pNewClone = RpClumpClone ( pNew );
+            // Clone twice as the geometry render order seems to be reversed each time it is cloned.
+            RpClump* pTemp = RpClumpClone ( pNew );
+            RpClump* pNewClone = RpClumpClone ( pTemp );
+            RpClumpDestroy ( pTemp );
 
             // ModelInfo::SetClump
             CBaseModelInfoSAInterface* pModelInfoInterface = pModelInfo->GetInterface ();
