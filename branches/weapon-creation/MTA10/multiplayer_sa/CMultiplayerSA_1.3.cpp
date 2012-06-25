@@ -97,7 +97,7 @@ void HOOK_CMotorbike_ProcessStuff_TestVehicleModel ( );
 void HOOK_CVehicle_ProcessStuff_PushRGBPointLights ( );
 void HOOK_CVehicle_ProcessStuff_StartPointLightCode ( );
 void HOOK_CTaskSimpleJetpack_ProcessInput ( );
-void HOOK_CTaskSimpleJetpack_ProcessInputFixFPS3 ( );
+void HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire ( );
 void HOOK_CTaskSimpleJetpack_ProcessInputFixFPS2 ( );
 
 void CMultiplayerSA::Init_13 ( void )
@@ -133,7 +133,7 @@ void CMultiplayerSA::InitHooks_13 ( void )
     HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound, 6 );
 
     HookInstall ( HOOKPOS_CTaskSimpleJetpack_ProcessInput, (DWORD) HOOK_CTaskSimpleJetpack_ProcessInput, 5 );
-    HookInstall ( HOOKPOS_CTaskSimplePlayerOnFoot_ProcessWeaponFire, (DWORD) HOOK_CTaskSimpleJetpack_ProcessInputFixFPS3, 5 );
+    HookInstall ( HOOKPOS_CTaskSimplePlayerOnFoot_ProcessWeaponFire, (DWORD) HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire, 5 );
 
     InitHooks_ClothesSpeedUp ();
     EnableHooks_ClothesMemFix ( true );
@@ -1227,7 +1227,7 @@ DisabledProcessInput:
     }
 }
 
-void _declspec(naked) HOOK_CTaskSimpleJetpack_ProcessInputFixFPS3 ( )
+void _declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire ( )
 {
     _asm
     {

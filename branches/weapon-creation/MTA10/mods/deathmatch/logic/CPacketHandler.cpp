@@ -2224,6 +2224,15 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     g_pGame->SetJetpackWeaponEnabled( WEAPONTYPE_TEC9, true );
     g_pGame->SetJetpackWeaponEnabled( WEAPONTYPE_MICRO_UZI, true );
 
+    if ( bitStream.Version () >= 0x30 )
+    {
+        for (int i = WEAPONTYPE_BRASSKNUCKLE; i <= WEAPONTYPE_PISTOL; i++)
+        {
+            bool bEnabled;
+            bitStream.ReadBit ( bEnabled );
+            g_pGame->SetJetpackWeaponEnabled ( (eWeaponType) i, bEnabled );
+        }
+    }
     for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_EXTINGUISHER;i++)
     {
         bool bReadWeaponInfo = true;
@@ -2255,7 +2264,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
         {
             bool bEnabled;
             bitStream.ReadBit ( bEnabled );
-            g_pGame->SetJetpackWeaponEnabled ( (eWeaponType) i, bEnabled );
+            g_pGame->SetJetpackWeaponEnabled ( (eWeaponType) weaponProperty.data.weaponType, bEnabled );
         }
     }
     for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_TEC9;i++)
@@ -2289,6 +2298,15 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
             }
         }
         if ( bitStream.Version () >= 0x30 )
+        {
+            bool bEnabled;
+            bitStream.ReadBit ( bEnabled );
+            g_pGame->SetJetpackWeaponEnabled ( (eWeaponType) weaponProperty.data.weaponType, bEnabled );
+        }
+    }
+    if ( bitStream.Version () >= 0x30 )
+    {
+        for (int i = WEAPONTYPE_CAMERA; i <= WEAPONTYPE_PARACHUTE; i++)
         {
             bool bEnabled;
             bitStream.ReadBit ( bEnabled );
