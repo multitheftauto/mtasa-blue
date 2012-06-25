@@ -82,6 +82,7 @@ namespace
                                          { "getSoundBPM",               "1.3.0-9.04162" },
                                          { "getSoundLevelData",         "1.3.0-9.04162" },
                                          { "getSoundWaveData",          "1.3.0-9.04162" },
+                                         { "setPedAnalogControlState",  "1.3.0-9.04185" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
