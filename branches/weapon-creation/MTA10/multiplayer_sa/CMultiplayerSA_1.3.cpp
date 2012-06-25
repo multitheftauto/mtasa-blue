@@ -75,13 +75,9 @@ DWORD RETN_CVehicle_ProcessStuff_IgnorePointLightCode        =  0x6AB823;
 DWORD RETN_CTaskSimpleJetpack_ProcessInputEnable             =  0x67E812;
 DWORD RETN_CTaskSimpleJetpack_ProcessInputDisabled           =  0x67E821;
 
-
-#define HOOKPOS_CTaskSimpleJetpack_ProcessInputFixFPS2           0x685ADC
-DWORD RETN_CTaskSimpleJetpack_ProcessInputFixFPS              =  0x685BDD;
-DWORD RETN_CTaskSimpleJetpack_ProcessInputDontFixFPS          =  0x685AE2;
-
-#define HOOKPOS_CTaskSimpleJetpack_ProcessInputFixFPS3           0x685ABA
-DWORD RETN_CTaskSimpleJetpack_ProcessInputFixFPS3             =  0x685ABF;
+#define HOOKPOS_CTaskSimplePlayerOnFoot_ProcessWeaponFire           0x685ABA
+DWORD RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire             =  0x685ABF;
+DWORD RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire_Call        =  0x540670;
 
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( );
@@ -137,8 +133,7 @@ void CMultiplayerSA::InitHooks_13 ( void )
     HookInstall ( HOOKPOS_CVehicleAudio_ProcessSirenSound, (DWORD) HOOK_CVehicleAudio_ProcessSirenSound, 6 );
 
     HookInstall ( HOOKPOS_CTaskSimpleJetpack_ProcessInput, (DWORD) HOOK_CTaskSimpleJetpack_ProcessInput, 5 );
-    HookInstall ( HOOKPOS_CTaskSimpleJetpack_ProcessInputFixFPS2, (DWORD) HOOK_CTaskSimpleJetpack_ProcessInputFixFPS2, 6  );
-    HookInstall ( HOOKPOS_CTaskSimpleJetpack_ProcessInputFixFPS3, (DWORD) HOOK_CTaskSimpleJetpack_ProcessInputFixFPS3, 5 );
+    HookInstall ( HOOKPOS_CTaskSimplePlayerOnFoot_ProcessWeaponFire, (DWORD) HOOK_CTaskSimpleJetpack_ProcessInputFixFPS3, 5 );
 
     InitHooks_ClothesSpeedUp ();
     EnableHooks_ClothesMemFix ( true );
@@ -1199,7 +1194,7 @@ bool AllowJetPack ( )
     }
     return false;
 }
-
+DWORD dwReturnCTaskSimpleJetpackProcessInput = 0x67E7FC;
 void _declspec(naked) HOOK_CTaskSimpleJetpack_ProcessInput ( )
 {
     _asm
@@ -1220,40 +1215,18 @@ void _declspec(naked) HOOK_CTaskSimpleJetpack_ProcessInput ( )
         _asm
         {
             popad
+            jnz DisabledProcessInput
+            mov ecx, [eax+18h]
+            shr ecx, 1
+            test bl, cl
+            jz DisabledProcessInput
+            jmp dwReturnCTaskSimpleJetpackProcessInput
+DisabledProcessInput:
             jmp RETN_CTaskSimpleJetpack_ProcessInputDisabled
         }
     }
 }
 
-void _declspec(naked) HOOK_CTaskSimpleJetpack_ProcessInputFixFPS2 ( )
-{
-    _asm
-    {
-        pushad
-        mov pPedUsingJetpack, esi
-    }
-    if ( AllowJetPack ( ) )
-    {
-        _asm
-        {
-            popad
-            jmp RETN_CTaskSimpleJetpack_ProcessInputFixFPS
-        }
-    }
-    else
-    {
-        _asm
-        {
-            popad
-            jnz dontfixfpsmode
-            jmp RETN_CTaskSimpleJetpack_ProcessInputDontFixFPS
-dontfixfpsmode:
-            jmp RETN_CTaskSimpleJetpack_ProcessInputFixFPS
-        }
-    }
-}
-
-DWORD dwCTaskSimpleJetpack_ProcessInputFixFPS3_Call = 0x540670;
 void _declspec(naked) HOOK_CTaskSimpleJetpack_ProcessInputFixFPS3 ( )
 {
     _asm
@@ -1267,7 +1240,7 @@ void _declspec(naked) HOOK_CTaskSimpleJetpack_ProcessInputFixFPS3 ( )
         {
             popad
             xor al, al
-            jmp RETN_CTaskSimpleJetpack_ProcessInputFixFPS3
+            jmp RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire
         }
     }
     else
@@ -1275,8 +1248,8 @@ void _declspec(naked) HOOK_CTaskSimpleJetpack_ProcessInputFixFPS3 ( )
         _asm
         {
             popad
-            call dwCTaskSimpleJetpack_ProcessInputFixFPS3_Call
-            jmp RETN_CTaskSimpleJetpack_ProcessInputFixFPS3
+            call RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire_Call
+            jmp RETN_CTaskSimplePlayerOnFoot_ProcessWeaponFire
         }
     }
 }
