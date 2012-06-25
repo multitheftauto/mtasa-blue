@@ -534,7 +534,7 @@ void SharedUtil::ExtractFilename ( const SString& strPathFilename, SString* strP
 }
 
 
-bool SharedUtil::ExtractExtention ( const SString& strFilename, SString* strMain, SString* strExt )
+bool SharedUtil::ExtractExtension ( const SString& strFilename, SString* strMain, SString* strExt )
 {
     return strFilename.Split ( ".", strMain, strExt, -1 );
 }
@@ -556,18 +556,18 @@ SString SharedUtil::ExtractFilename ( const SString& strPathFilename )
 }
 
 
-SString SharedUtil::ExtractExtention ( const SString& strPathFilename )
+SString SharedUtil::ExtractExtension ( const SString& strPathFilename )
 {
     SString strExt;
-    ExtractExtention ( strPathFilename, NULL, &strExt );
+    ExtractExtension ( strPathFilename, NULL, &strExt );
     return strExt;
 }
 
 
-SString SharedUtil::ExtractBeforeExtention ( const SString& strPathFilename )
+SString SharedUtil::ExtractBeforeExtension ( const SString& strPathFilename )
 {
     SString strMain;
-    ExtractExtention ( strPathFilename, &strMain, NULL );
+    ExtractExtension ( strPathFilename, &strMain, NULL );
     return strMain;
 }
 
@@ -580,7 +580,7 @@ SString SharedUtil::MakeUniquePath ( const SString& strPathFilename )
     ExtractFilename ( strPathFilename, &strPath, &strFilename );
 
     SString strMain, strExt;
-    if ( ExtractExtention ( strFilename, &strMain, &strExt ) )
+    if ( ExtractExtension ( strFilename, &strMain, &strExt ) )
     {
         strBeforeUniqueChar = PathJoin ( strPath, strMain );
         strAfterUniqueChar = "." + strExt;
