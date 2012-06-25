@@ -2060,14 +2060,35 @@ void CVersionUpdater::_ProcessPatchFileQuery ( void )
     XMLAccess.GetSubNodeValue ( "dialog.msg2",                  m_JobInfo.strMsg2 );
     XMLAccess.GetSubNodeValue ( "dialog.yes",                   m_JobInfo.strYes );
     XMLAccess.GetSubNodeValue ( "dialog.no",                    m_JobInfo.strNo );
-    XMLAccess.GetSubNodeValue ( "file.name",                    m_JobInfo.strFilename );
-    XMLAccess.GetSubNodeValue ( "file.size",                    m_JobInfo.iFilesize );
-    XMLAccess.GetSubNodeValue ( "file.md5",                     m_JobInfo.strMD5 );
-    XMLAccess.GetSubNodeValue ( "serverlist",                   m_JobInfo.serverInfoMap );
+    XMLAccess.GetSubNodeValue ( "file.name",                    m_JobInfo.exe.strFilename );
+    XMLAccess.GetSubNodeValue ( "file.size",                    m_JobInfo.exe.iFilesize );
+    XMLAccess.GetSubNodeValue ( "file.md5",                     m_JobInfo.exe.strMD5 );
+    XMLAccess.GetSubNodeValue ( "serverlist",                   m_JobInfo.exe.serverInfoMap );
+    XMLAccess.GetSubNodeValue ( "file_rar.name",                m_JobInfo.rar.strFilename );
+    XMLAccess.GetSubNodeValue ( "file_rar.size",                m_JobInfo.rar.iFilesize );
+    XMLAccess.GetSubNodeValue ( "file_rar.md5",                 m_JobInfo.rar.strMD5 );
+    XMLAccess.GetSubNodeValue ( "serverlist_rar",               m_JobInfo.rar.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "reportsettings.filter2",       strReportSettingsFilter );
     XMLAccess.GetSubNodeValue ( "reportsettings.minsize",       strReportSettingsMin );
     XMLAccess.GetSubNodeValue ( "reportsettings.maxsize",       strReportSettingsMax );
     XMLAccess.GetSubNodeValue ( "notifymasterrevision",         strNotifyMasterRevision );
+
+    // Use rar info if present
+    if ( !m_JobInfo.rar.strFilename.empty () )
+    {
+        m_JobInfo.strFilename   = m_JobInfo.rar.strFilename;
+        m_JobInfo.iFilesize     = m_JobInfo.rar.iFilesize;
+        m_JobInfo.strMD5        = m_JobInfo.rar.strMD5;
+        m_JobInfo.serverInfoMap = m_JobInfo.rar.serverInfoMap;
+    }
+    else
+    {
+        // Otherwise, exe info
+        m_JobInfo.strFilename   = m_JobInfo.exe.strFilename;
+        m_JobInfo.iFilesize     = m_JobInfo.exe.iFilesize;
+        m_JobInfo.strMD5        = m_JobInfo.exe.strMD5;
+        m_JobInfo.serverInfoMap = m_JobInfo.exe.serverInfoMap;
+    }
 
     // Process
     if ( strNotifyMasterRevision.length () && strNotifyMasterRevision > m_MasterConfig.master.strRevision )
@@ -2398,7 +2419,7 @@ void CVersionUpdater::_StartDownload ( void )
             SString strPath, strFilename;
             ExtractFilename ( *iter, &strPath, &strFilename );
             SString strMain;
-            if ( ExtractExtention ( *iter, &strMain, NULL ) )
+            if ( ExtractExtension ( *iter, &strMain, NULL ) )
             {
                 std::vector < SString > fileList = FindFiles ( strMain + "*", true, false );
 

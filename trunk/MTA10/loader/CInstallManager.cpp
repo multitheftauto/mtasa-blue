@@ -666,7 +666,14 @@ SString CInstallManager::_InstallNewsItems ( void )
 
         // Extract into target dir
         SetCurrentDirectory ( strTargetDir );
-        ShellExecuteBlocking ( "open", strFileLocation, "-s" );
+
+        // Try to extract the files
+        if ( !ExtractFiles ( strFileLocation ) )
+        {
+            // If extract failed and update file is an exe, try to run it
+            if ( ExtractExtension ( strFileLocation ).CompareI ( "exe" ) )
+                ShellExecuteBlocking ( "open", strFileLocation, "-s" );
+        }
 
         // Restore cwd
         SetCurrentDirectory ( strSavedDir );
