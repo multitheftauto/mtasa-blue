@@ -24,6 +24,13 @@ enum eTargetType
     TARGET_TYPE_ENTITY,
     TARGET_TYPE_NONE,
 };
+struct SWeaponConfiguration
+{
+    bool bShootIfTargetOutOfRange;
+    bool bShootIfTargetBlocked;
+    bool bDisableWeaponModel;
+    SLineOfSightFlags flags;
+};
 class CClientWeapon : public CClientObject
 {
 public:
@@ -71,6 +78,7 @@ private:
     CVector                 m_vecTarget;
     eTargetType             m_targetType;
     eBone                   m_targetBone;
+    SWeaponConfiguration    m_weaponConfig;
 };
 
 #endif

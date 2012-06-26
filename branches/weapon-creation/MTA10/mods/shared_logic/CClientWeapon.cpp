@@ -35,6 +35,19 @@ CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponT
     m_sDamage = m_pWeaponInfo->GetDamagePerHit ( );
     m_pWeaponStat = g_pGame->CreateWeaponStat ( type, WEAPONSKILL_STD );
     ResetWeaponTarget ( );
+    // Setup weapon config.
+    m_weaponConfig.bDisableWeaponModel = false;
+    m_weaponConfig.bShootIfTargetBlocked = true;
+    m_weaponConfig.bShootIfTargetOutOfRange = false;
+    m_weaponConfig.flags.bShootThroughStuff = false;
+    m_weaponConfig.flags.bIgnoreSomeObjectsForCamera = false;
+    m_weaponConfig.flags.bSeeThroughStuff = false;
+    m_weaponConfig.flags.bCheckDummies = true;
+    m_weaponConfig.flags.bCheckObjects = true;
+    m_weaponConfig.flags.bCheckPeds = true;
+    m_weaponConfig.flags.bCheckVehicles = true;
+    m_weaponConfig.flags.bCheckBuildings = true;
+    m_weaponConfig.flags.bCheckCarTires = true;
 }
 
 
@@ -68,7 +81,10 @@ void CClientWeapon::DoPulse ( void )
 void CClientWeapon::Create ( void )
 {
     CClientObject::Create ();
-
+    if ( m_weaponConfig.bDisableWeaponModel )
+    {
+        SetVisible ( false );
+    }
     if ( !m_pWeapon )
     {
         m_pWeapon = g_pGame->CreateWeapon ();
@@ -140,7 +156,7 @@ void CClientWeapon::Fire ( void )
                     {
                         m_pTarget->GetPosition( vecTarget );
                     }
-                    if ( (vecOrigin - vecTarget).Length() >= fDistance )
+                    if ( m_weaponConfig.bShootIfTargetOutOfRange == false && (vecOrigin - vecTarget).Length() >= fDistance )
                     {
                         return;
                     }
@@ -153,7 +169,7 @@ void CClientWeapon::Fire ( void )
             if ( m_targetType == TARGET_TYPE_VECTOR )
             {
                 vecTarget = m_vecTarget;
-                if ( (vecOrigin - vecTarget).Length() >= fDistance )
+                if ( m_weaponConfig.bShootIfTargetOutOfRange == false && (vecOrigin - vecTarget).Length() >= fDistance )
                 {
                     return;
                 }
@@ -204,38 +220,31 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
 {
     CVector vecDirection = vecTarget - vecOrigin;
     vecDirection.Normalize ();
-    
-    g_pGame->GetPointLights ()->AddLight ( PLTYPE_POINTLIGHT, vecOrigin, CVector (), 3.0f, 0.22f, 0.25f, 0, 0, 0, 0 );
-    
-    if ( GetAttachedTo () ) g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, false );
-    else g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
-
-    m_pWeapon->AddGunshell ( m_pObject, &vecOrigin, &CVector2D ( 0, -1 ), 0.45f );
-    g_pGame->GetAudioEngine ()->ReportWeaponEvent ( WEAPON_EVENT_FIRE, m_Type, m_pObject );
-
     CClientEntity * pAttachedTo = GetAttachedTo ();    
     // Crashes with vehicle mounted epicness.
     //if ( pAttachedTo ) pAttachedTo->WorldIgnore ( true );
 
     CEntity * pColEntity = NULL;
     CColPoint * pColPoint = NULL;
-    SLineOfSightFlags flags;
-    flags.bShootThroughStuff = false;
-    flags.bIgnoreSomeObjectsForCamera = false;
-    flags.bSeeThroughStuff = false;
-    flags.bCheckDummies = true;
-    flags.bCheckObjects = true;
-    flags.bCheckPeds = true;
-    flags.bCheckVehicles = true;
-    flags.bCheckBuildings = true;
-    flags.bCheckCarTires = true;
     SLineOfSightBuildingResult pBuildingResult;
     CEntitySAInterface * pEntity = NULL;
-    
-    if ( m_pWeapon->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pColEntity, flags, &pBuildingResult, m_Type, &pEntity ) )
+
+    if ( m_pWeapon->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pColEntity, m_weaponConfig.flags, &pBuildingResult, m_Type, &pEntity ) )
     {
         vecTarget = *pColPoint->GetPosition ();
     }
+    if ( ( m_pTarget != NULL && m_pTarget->GetGameEntity ( ) != NULL && m_pTarget->GetGameEntity()->GetInterface ( ) == pEntity ) && m_weaponConfig.bShootIfTargetBlocked == false )
+    {
+        return;
+    }
+    g_pGame->GetPointLights ()->AddLight ( PLTYPE_POINTLIGHT, vecOrigin, CVector (), 3.0f, 0.22f, 0.25f, 0, 0, 0, 0 );
+
+    if ( GetAttachedTo () ) g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, false );
+    else g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
+
+    m_pWeapon->AddGunshell ( m_pObject, &vecOrigin, &CVector2D ( 0, -1 ), 0.45f );
+    g_pGame->GetAudioEngine ()->ReportWeaponEvent ( WEAPON_EVENT_FIRE, m_Type, m_pObject );
+
 
     //if ( pAttachedTo ) pAttachedTo->WorldIgnore ( false );
 
