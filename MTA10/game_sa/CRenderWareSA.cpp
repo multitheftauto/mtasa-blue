@@ -547,18 +547,24 @@ void CRenderWareSA::GetClumpAtomicList ( RpClump* pClump, std::vector < RpAtomic
     RpClumpForAllAtomics ( pClump, LOCAL_FUNCTION::GetClumpAtomicListCB, &outAtomicList );
 }
 
+
 //
 // Returns true if the clump geometry sort of matches
 //
-bool CRenderWareSA::DoClumpsContainTheSameGeometry ( RpClump* pClumpA, RpClump* pClumpB )
+// ClumpA vs ClumpB(or)AtomicB
+//
+bool CRenderWareSA::DoContainTheSameGeometry ( RpClump* pClumpA, RpClump* pClumpB, RpAtomic* pAtomicB )
 {
-    // Get atomic list from both clumps
+    // Get atomic list from both sides
     std::vector < RpAtomic* > atomicListA;
     std::vector < RpAtomic* > atomicListB;
     GetClumpAtomicList ( pClumpA, atomicListA );
-    GetClumpAtomicList ( pClumpB, atomicListB );
+    if ( pClumpB )
+        GetClumpAtomicList ( pClumpB, atomicListB );
+    if ( pAtomicB )
+        atomicListB.push_back ( pAtomicB );
 
-    // Count geometries that exist in both clumps
+    // Count geometries that exist in both sides
     std::set < RpGeometry* > geometryListA;
     for ( uint i = 0 ; i < atomicListA.size () ; i++ )
         MapInsert ( geometryListA, atomicListA[i]->geometry );
@@ -583,7 +589,7 @@ void CRenderWareSA::ReplaceModel ( RpClump* pNew, unsigned short usModelID, DWOR
     if ( pModelInfo )
     {
         RpClump* pOldClump = (RpClump *)pModelInfo->GetRwObject ();
-        if ( !DoClumpsContainTheSameGeometry ( pNew, pOldClump ) )
+        if ( !DoContainTheSameGeometry ( pNew, pOldClump, NULL ) )
         {
             // Make new clump container for the model geometry
             // Clone twice as the geometry render order seems to be reversed each time it is cloned.
@@ -723,21 +729,29 @@ RpAtomic* AtomicsReplacer ( RpAtomic* pAtomic, SAtomicsReplacer* pData )
     return pAtomic;
 }
 
-void CRenderWareSA::ReplaceAllAtomicsInModel ( RpClump * pSrc, unsigned short usModelID )
+void CRenderWareSA::ReplaceAllAtomicsInModel ( RpClump * pNew, unsigned short usModelID )
 {
-    // Clone the clump that's to be replaced (FUNC_AtomicsReplacer removes the atomics from the source clump)
-    RpClump * pCopy = RpClumpClone ( pSrc );
+    CModelInfo* pModelInfo = pGame->GetModelInfo ( usModelID );
+    if ( pModelInfo )
+    {
+        RpAtomic* pOldAtomic = (RpAtomic *)pModelInfo->GetRwObject ();
+        if ( !DoContainTheSameGeometry ( pNew, NULL, pOldAtomic ) )
+        {
+            // Clone the clump that's to be replaced (FUNC_AtomicsReplacer removes the atomics from the source clump)
+            RpClump * pCopy = RpClumpClone ( pNew );
 
-    // Replace the atomics
-    SAtomicsReplacer data;
-    data.usTxdID = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
-    data.pClump = pCopy;
+            // Replace the atomics
+            SAtomicsReplacer data;
+            data.usTxdID = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
+            data.pClump = pCopy;
 
-    MemPutFast < DWORD > ( (DWORD*)DWORD_AtomicsReplacerModelID, usModelID );
-    RpClumpForAllAtomics ( pCopy, AtomicsReplacer, &data );
+            MemPutFast < DWORD > ( (DWORD*)DWORD_AtomicsReplacerModelID, usModelID );
+            RpClumpForAllAtomics ( pCopy, AtomicsReplacer, &data );
 
-    // Get rid of the now empty copied clump
-    RpClumpDestroy ( pCopy );
+            // Get rid of the now empty copied clump
+            RpClumpDestroy ( pCopy );
+        }
+    }
 }
 
 // Replaces all atomics in a vehicle
