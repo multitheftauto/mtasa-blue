@@ -125,8 +125,8 @@ private:
     void                UpdateAssociationForTexInfo ( STexInfo* pTexInfo );
     bool                IsFirstShadInfoHigherOrSamePriority ( SShadInfo* pShadInfoA, SShadInfo* pShadInfoB );
     void                FlushPendingAssociations    ( void );
-    void                GetClumpAtomicList          ( RpClump* pClump, std::vector < RpAtomic* >& outAtomicList );
-    bool                DoClumpsContainTheSameGeometry ( RpClump* pClumpA, RpClump* pClumpB );
+    static void         GetClumpAtomicList          ( RpClump* pClump, std::vector < RpAtomic* >& outAtomicList );
+    static bool         DoContainTheSameGeometry    ( RpClump* pClumpA, RpClump* pClumpB, RpAtomic* pAtomicB );
 
     // Watched world textures
     std::multimap < ushort, STexInfo* >     m_TexInfoMap;
