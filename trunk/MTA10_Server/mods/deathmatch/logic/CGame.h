@@ -342,6 +342,9 @@ public:
     void                        SetCloudsEnabled            ( bool bEnabled );
     bool                        GetCloudsEnabled            ( void );
 
+    void                        SetJetpackWeaponEnabled     ( eWeaponType weaponType, bool bEnabled );
+    bool                        GetJetpackWeaponEnabled     ( eWeaponType weaponType );
+
     void                        PulseMasterServerAnnounce   ( void );
     void                        StartOpenPortsTest          ( void );
 
@@ -512,6 +515,7 @@ private:
     int                         m_iSyncFPS;
     std::map<std::string,eGlitchType> m_GlitchNames;
     SFixedArray < bool, NUM_GLITCHES > m_Glitches;
+    SFixedArray < bool, WEAPONTYPE_LAST_WEAPONTYPE > m_JetpackWeapons;
 
     // This is ticked to true when the app should end
     bool                        m_bIsFinished;

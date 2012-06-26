@@ -35,6 +35,7 @@ void CWorldRPCs::LoadFunctions ( void )
     AddHandler ( SET_FPS_LIMIT, SetFPSLimit, "SetFPSLimit" );
     AddHandler ( SET_GARAGE_OPEN, SetGarageOpen, "SetGarageOpen" );
     AddHandler ( SET_GLITCH_ENABLED, SetGlitchEnabled, "SetGlitchEnabled" );
+    AddHandler ( SET_JETPACK_WEAPON_ENABLED, SetJetpackWeaponEnabled, "SetJetpackWeaponEnabled" );
     AddHandler ( SET_CLOUDS_ENABLED, SetCloudsEnabled, "SetCloudsEnabled" );
     AddHandler ( SET_TRAFFIC_LIGHT_STATE, SetTrafficLightState, "SetTrafficLightState" );
     AddHandler ( SET_JETPACK_MAXHEIGHT, SetJetpackMaxHeight, "SetJetpackMaxHeight" );
@@ -243,6 +244,15 @@ void CWorldRPCs::SetGlitchEnabled ( NetBitStreamInterface& bitStream )
     bitStream.Read ( eGlitch );
     bitStream.Read ( ucIsEnabled );
     g_pClientGame->SetGlitchEnabled ( eGlitch, ( ucIsEnabled == 1 ) );
+}
+
+void CWorldRPCs::SetJetpackWeaponEnabled ( NetBitStreamInterface& bitStream )
+{
+    unsigned char ucWeaponID = 0;
+    bool bEnabled;
+    bitStream.Read ( ucWeaponID );
+    bitStream.ReadBit ( bEnabled );
+    g_pGame->SetJetpackWeaponEnabled( (eWeaponType) ucWeaponID, bEnabled );
 }
 
 void CWorldRPCs::SetCloudsEnabled ( NetBitStreamInterface& bitStream )

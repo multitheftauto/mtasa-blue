@@ -2221,6 +2221,19 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     
     g_pGame->GetWorld ()->SetAircraftMaxHeight ( fAircraftMaxHeight );
 
+    g_pGame->SetJetpackWeaponEnabled( WEAPONTYPE_TEC9, true );
+    g_pGame->SetJetpackWeaponEnabled( WEAPONTYPE_MICRO_UZI, true );
+    g_pGame->SetJetpackWeaponEnabled( WEAPONTYPE_PISTOL, true );
+
+    if ( bitStream.Version () >= 0x30 )
+    {
+        for (int i = WEAPONTYPE_BRASSKNUCKLE; i <= WEAPONTYPE_PISTOL; i++)
+        {
+            bool bEnabled;
+            bitStream.ReadBit ( bEnabled );
+            g_pGame->SetJetpackWeaponEnabled ( (eWeaponType) i, bEnabled );
+        }
+    }
     for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_EXTINGUISHER;i++)
     {
         bool bReadWeaponInfo = true;
@@ -2247,6 +2260,12 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
             pWeaponInfo->SetWeaponAnim2LoopFireTime     ( weaponProperty.data.anim2_loop_bullet_fire );
 
             pWeaponInfo->SetAnimBreakoutTime            ( weaponProperty.data.anim_breakout_time );
+        }
+        if ( bitStream.Version () >= 0x30 )
+        {
+            bool bEnabled;
+            bitStream.ReadBit ( bEnabled );
+            g_pGame->SetJetpackWeaponEnabled ( (eWeaponType) weaponProperty.data.weaponType, bEnabled );
         }
     }
     for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_TEC9;i++)
@@ -2278,6 +2297,21 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 
                 pWeaponInfo->SetAnimBreakoutTime            ( weaponProperty.data.anim_breakout_time );
             }
+        }
+        if ( bitStream.Version () >= 0x30 )
+        {
+            bool bEnabled;
+            bitStream.ReadBit ( bEnabled );
+            g_pGame->SetJetpackWeaponEnabled ( (eWeaponType) weaponProperty.data.weaponType, bEnabled );
+        }
+    }
+    if ( bitStream.Version () >= 0x30 )
+    {
+        for (int i = WEAPONTYPE_CAMERA; i <= WEAPONTYPE_PARACHUTE; i++)
+        {
+            bool bEnabled;
+            bitStream.ReadBit ( bEnabled );
+            g_pGame->SetJetpackWeaponEnabled ( (eWeaponType) i, bEnabled );
         }
     }
 
