@@ -2227,7 +2227,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 
     if ( bitStream.Version () >= 0x30 )
     {
-        for (int i = WEAPONTYPE_BRASSKNUCKLE; i <= WEAPONTYPE_PISTOL; i++)
+        for (int i = WEAPONTYPE_BRASSKNUCKLE; i < WEAPONTYPE_PISTOL; i++)
         {
             bool bEnabled;
             bitStream.ReadBit ( bEnabled );
@@ -2297,12 +2297,6 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 
                 pWeaponInfo->SetAnimBreakoutTime            ( weaponProperty.data.anim_breakout_time );
             }
-        }
-        if ( bitStream.Version () >= 0x30 )
-        {
-            bool bEnabled;
-            bitStream.ReadBit ( bEnabled );
-            g_pGame->SetJetpackWeaponEnabled ( (eWeaponType) weaponProperty.data.weaponType, bEnabled );
         }
     }
     if ( bitStream.Version () >= 0x30 )
