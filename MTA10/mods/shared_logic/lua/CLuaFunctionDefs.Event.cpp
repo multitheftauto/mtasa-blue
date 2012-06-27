@@ -237,9 +237,24 @@ int CLuaFunctionDefs::TriggerLatentServerEvent ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        // Get resource details if transfer should be stopped when resource stops
+        CLuaMain* pLuaMain = NULL;
+        ushort usResourceNetId = 0xFFFF;
+        if ( !bPersist )
+        {
+            pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+            if ( pLuaMain )
+            {
+                CResource* pResource = pLuaMain->GetResource();
+                if ( pResource )
+                {
+                    usResourceNetId = pResource->GetNetID ();
+                }
+            }
+        }
+
         // Trigger it
-        if ( CStaticFunctionDefinitions::TriggerLatentServerEvent ( strName, *pCallWithEntity, Arguments, iBandwidth, bPersist ? NULL : pLuaMain ) )
+        if ( CStaticFunctionDefinitions::TriggerLatentServerEvent ( strName, *pCallWithEntity, Arguments, iBandwidth, pLuaMain, usResourceNetId ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;

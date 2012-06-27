@@ -614,10 +614,24 @@ int CLuaFunctionDefinitions::TriggerLatentClientEvent ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CLuaMain * pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
+        // Get resource details if transfer should be stopped when resource stops
+        CLuaMain* pLuaMain = NULL;
+        ushort usResourceNetId = 0xFFFF;
+        if ( !bPersist )
+        {
+            pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
+            if ( pLuaMain )
+            {
+                CResource* pResource = pLuaMain->GetResource();
+                if ( pResource )
+                {
+                    usResourceNetId = pResource->GetNetID ();
+                }
+            }
+        }
 
         // Trigger it
-        if ( CStaticFunctionDefinitions::TriggerLatentClientEvent ( pElement, strName, pCallWithElement, Arguments, iBandwidth, bPersist ? NULL : pLuaMain ) )
+        if ( CStaticFunctionDefinitions::TriggerLatentClientEvent ( pElement, strName, pCallWithElement, Arguments, iBandwidth, pLuaMain, usResourceNetId ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;

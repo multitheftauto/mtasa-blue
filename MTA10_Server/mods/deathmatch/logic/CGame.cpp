@@ -3913,11 +3913,12 @@ void CGame::HandleBackup ( void )
 //
 // Toggle latent send mode
 //
-void CGame::EnableLatentSends ( bool bEnabled, int iBandwidth, CLuaMain* pLuaMain )
+void CGame::EnableLatentSends ( bool bEnabled, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId )
 {
     m_bLatentSendsEnabled = bEnabled && iBandwidth;
     m_iLatentSendsBandwidth = iBandwidth;
     m_pLatentSendsLuaMain = pLuaMain;
+    m_usLatentSendsResourceNetId = usResourceNetId;
 }
 
 
@@ -3929,7 +3930,7 @@ bool CGame::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& play
     if ( !m_bLatentSendsEnabled )
         return g_pNetServer->SendPacket ( ucPacketID, playerID, pBitStream, bBroadcast, packetPriority, packetReliability, packetOrdering );
     else
-        GetLatentTransferManager ()->AddSend ( playerID, ucPacketID, pBitStream, m_iLatentSendsBandwidth, m_pLatentSendsLuaMain );
+        GetLatentTransferManager ()->AddSend ( playerID, ucPacketID, pBitStream, m_iLatentSendsBandwidth, m_pLatentSendsLuaMain, m_usLatentSendsResourceNetId );
     return true;
 }
 

@@ -98,6 +98,8 @@ void CLatentSendQueue::DoPulse ( int iTimeMsBetweenCalls )
             pBitStream->Write ( activeTx.usCategory );
             pBitStream->Write ( activeTx.buffer.GetSize () );
             pBitStream->Write ( activeTx.uiRate );
+            if ( pBitStream->Version () >= 0x31 )
+                pBitStream->Write ( activeTx.usResourceNetId );
             activeTx.bSendStarted = true;
         }
         else
@@ -140,7 +142,7 @@ void CLatentSendQueue::DoPulse ( int iTimeMsBetweenCalls )
 // From data pointer
 //
 ///////////////////////////////////////////////////////////////
-SSendHandle CLatentSendQueue::AddSend ( const char* pData, uint uiSize, uint uiRate, ushort usCategory, void* pLuaMain )
+SSendHandle CLatentSendQueue::AddSend ( const char* pData, uint uiSize, uint uiRate, ushort usCategory, void* pLuaMain, ushort usResourceNetId )
 {
     SSendItem newTx;
     newTx.uiId = m_uiNextSendId++;
@@ -148,6 +150,7 @@ SSendHandle CLatentSendQueue::AddSend ( const char* pData, uint uiSize, uint uiR
     newTx.uiRate = uiRate;
     newTx.usCategory = usCategory;
     newTx.pLuaMain = pLuaMain;
+    newTx.usResourceNetId = usResourceNetId;
 
     m_TxQueue.push_back ( newTx );
 
