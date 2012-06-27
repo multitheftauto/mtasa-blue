@@ -40,7 +40,7 @@ public:
     static bool                 RemoveEventHandler                  ( CLuaMain* pLuaMain, const char* szName, CElement* pElement, const CLuaFunctionRef& iLuaFunction );
     static bool                 TriggerEvent                        ( const char* szName, CElement* pElement, const CLuaArguments& Arguments, bool & bWasCancelled );
     static bool                 TriggerClientEvent                  ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments );
-    static bool                 TriggerLatentClientEvent            ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain );
+    static bool                 TriggerLatentClientEvent            ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId );
 
     static bool                 CancelEvent                         ( bool bCancel, const char* szReason );
     static const char*          GetCancelReason                     ( );

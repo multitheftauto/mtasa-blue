@@ -60,6 +60,7 @@ private:
     };
 
 public:
+    ZERO_ON_NEW
                                 CResourceManager                ( void );
                                 ~CResourceManager               ( void );
 
@@ -93,6 +94,7 @@ public:
     bool                        IsAResourceElement              ( CElement* pElement );
 
     unsigned short              GenerateID                      ( void );
+    CResource*                  GetResourceFromNetID            ( unsigned short usNetID );
 
     CResource*                  GetResourceFromLuaState         ( struct lua_State* luaVM );
     bool                        Install                         ( char * szURL, char * szName );
@@ -141,6 +143,8 @@ private:
     SString                                 m_strMinClientRequirement;
     std::map < CResource*, SString >        m_MinClientRequirementMap;
     std::map < CResource*, bool >           m_SyncMapElementDataOptionMap;
+
+    ushort                      m_usNextNetId;
 };
 
 #endif
