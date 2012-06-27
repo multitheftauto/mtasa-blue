@@ -574,7 +574,7 @@ void CGameSA::ResetCheats ()
 
 bool CGameSA::GetJetpackWeaponEnabled ( eWeaponType weaponType )
 {
-    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType <= WEAPONTYPE_LAST_WEAPONTYPE )
+    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType < WEAPONTYPE_LAST_WEAPONTYPE )
     {
         return m_JetpackWeapons[weaponType];
     }
@@ -583,7 +583,7 @@ bool CGameSA::GetJetpackWeaponEnabled ( eWeaponType weaponType )
 
 void CGameSA::SetJetpackWeaponEnabled ( eWeaponType weaponType, bool bEnabled )
 {
-    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType <= WEAPONTYPE_LAST_WEAPONTYPE )
+    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType < WEAPONTYPE_LAST_WEAPONTYPE )
     {
         m_JetpackWeapons[weaponType] = bEnabled;
     }
