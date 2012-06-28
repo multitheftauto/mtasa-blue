@@ -30,6 +30,7 @@ CModelInfoSA::CModelInfoSA ( void )
     m_pOriginalColModelInterface = NULL;
     m_pCustomClump = NULL;
     m_pCustomColModel = NULL;
+    m_bAddedRefForCollision = false;
 }
 
 
@@ -42,6 +43,7 @@ CModelInfoSA::CModelInfoSA ( DWORD dwModelID )
     m_pOriginalColModelInterface = NULL;
     m_pCustomClump = NULL;
     m_pCustomColModel = NULL;
+    m_bAddedRefForCollision = false;
 }
 
 
@@ -405,6 +407,14 @@ VOID CModelInfoSA::Remove ( )
     // Or we'll screw up SA's map for example.
 
     m_pInterface = ppModelInfo [ m_dwModelID ];
+
+    // Remove ref added for collision
+    if ( m_bAddedRefForCollision )
+    {
+        m_bAddedRefForCollision = false;
+        if ( m_pInterface->usNumberOfRefs > 0 )
+            m_pInterface->usNumberOfRefs--;
+    }
 
     // Remove our reference
     if ( m_pInterface->usNumberOfRefs > 0 ) m_pInterface->usNumberOfRefs--;
@@ -906,6 +916,19 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
     // Grab the interfaces
     CColModelSAInterface* pInterface = pColModel->GetInterface ();
 
+    if ( !m_bAddedRefForCollision )
+    {
+        // Prevent this model from unloading while we have custom collision
+        ModelAddRef ( BLOCKING, "for collision" );
+        m_bAddedRefForCollision = true;
+    }
+
+    // Should always be loaded at this point
+
+    // Skip setting if already done
+    if ( m_pCustomColModel == pColModel )
+        return;
+
     // Store the col model we set
     m_pCustomColModel = pColModel;
 
@@ -984,6 +1007,13 @@ void CModelInfoSA::RestoreColModel ( void )
 
     // We currently have no custom model loaded
     m_pCustomColModel = NULL;
+
+    // Remove ref added for collision
+    if ( m_bAddedRefForCollision )
+    {
+        m_bAddedRefForCollision = false;
+        RemoveRef ();
+    }
 }
 
 

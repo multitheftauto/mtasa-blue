@@ -170,7 +170,7 @@ bool CStaticFunctionDefinitions::TriggerClientEvent ( CElement* pElement, const 
 }
 
 
-bool CStaticFunctionDefinitions::TriggerLatentClientEvent ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain )
+bool CStaticFunctionDefinitions::TriggerLatentClientEvent ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId )
 {
     assert ( pElement );
     assert ( szName );
@@ -186,7 +186,7 @@ bool CStaticFunctionDefinitions::TriggerLatentClientEvent ( CElement* pElement, 
     pElement->GetDescendantsByType ( sendList, true, CElement::PLAYER );
 
     // Send packet to players
-    g_pGame->EnableLatentSends ( true, iBandwidth, pLuaMain );
+    g_pGame->EnableLatentSends ( true, iBandwidth, pLuaMain, usResourceNetId );
     CPlayerManager::Broadcast ( Packet, sendList );
     g_pGame->EnableLatentSends ( false );
 
@@ -10086,6 +10086,27 @@ bool CStaticFunctionDefinitions::IsGlitchEnabled ( const std::string& strGlitchN
     }
     return false;
 }
+
+bool CStaticFunctionDefinitions::SetJetpackWeaponEnabled ( eWeaponType weaponType, bool bEnabled )
+{
+    if ( g_pGame->GetJetpackWeaponEnabled( weaponType ) != bEnabled )
+    {
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( static_cast < unsigned char > ( weaponType ) );
+        BitStream.pBitStream->WriteBit ( bEnabled );
+        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_JETPACK_WEAPON_ENABLED, *BitStream.pBitStream ) );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetJetpackWeaponEnabled ( eWeaponType weaponType, bool& bEnabled )
+{
+    bEnabled = g_pGame->GetJetpackWeaponEnabled ( weaponType );
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::SetCloudsEnabled ( bool bEnabled )
 {
     CBitStream BitStream;

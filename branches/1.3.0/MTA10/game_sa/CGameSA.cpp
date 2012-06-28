@@ -571,6 +571,24 @@ void CGameSA::ResetCheats ()
         it->second->m_bEnabled = false;
     }
 }
+
+bool CGameSA::GetJetpackWeaponEnabled ( eWeaponType weaponType )
+{
+    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType < WEAPONTYPE_LAST_WEAPONTYPE )
+    {
+        return m_JetpackWeapons[weaponType];
+    }
+    return false;
+}
+
+void CGameSA::SetJetpackWeaponEnabled ( eWeaponType weaponType, bool bEnabled )
+{
+    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType < WEAPONTYPE_LAST_WEAPONTYPE )
+    {
+        m_JetpackWeapons[weaponType] = bEnabled;
+    }
+}
+
 bool CGameSA::PerformChecks ( void )
 {
     std::map < std::string, SCheatSA* >::iterator it;

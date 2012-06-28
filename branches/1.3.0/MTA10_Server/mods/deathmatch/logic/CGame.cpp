@@ -168,7 +168,12 @@ CGame::CGame ( void )
     m_Glitches [ GLITCH_FASTMOVE ] = false;
     m_Glitches [ GLITCH_CROUCHBUG ] = false;
     m_Glitches [ GLITCH_CLOSEDAMAGE ] = false;
+    for ( int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++ )
+        m_JetpackWeapons [ i ] = false;
 
+    m_JetpackWeapons [ WEAPONTYPE_MICRO_UZI ] = true;
+    m_JetpackWeapons [ WEAPONTYPE_TEC9 ] = true;
+    m_JetpackWeapons [ WEAPONTYPE_PISTOL ] = true;
     //Glitch names (for Lua interface)
     m_GlitchNames["quickreload"] = GLITCH_QUICKRELOAD;
     m_GlitchNames["fastfire"] = GLITCH_FASTFIRE;
@@ -3751,6 +3756,22 @@ bool CGame::GetCloudsEnabled ( void )
     return m_bCloudsEnabled;
 }
 
+bool CGame::GetJetpackWeaponEnabled ( eWeaponType weaponType )
+{
+    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType < WEAPONTYPE_LAST_WEAPONTYPE )
+    {
+        return m_JetpackWeapons[weaponType];
+    }
+    return false;
+}
+
+void CGame::SetJetpackWeaponEnabled ( eWeaponType weaponType, bool bEnabled )
+{
+    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType < WEAPONTYPE_LAST_WEAPONTYPE )
+    {
+        m_JetpackWeapons[weaponType] = bEnabled;
+    }
+}
 
 //
 // Handle basic backup of databases and config files
@@ -3868,11 +3889,12 @@ void CGame::HandleBackup ( void )
 //
 // Toggle latent send mode
 //
-void CGame::EnableLatentSends ( bool bEnabled, int iBandwidth, CLuaMain* pLuaMain )
+void CGame::EnableLatentSends ( bool bEnabled, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId )
 {
     m_bLatentSendsEnabled = bEnabled && iBandwidth;
     m_iLatentSendsBandwidth = iBandwidth;
     m_pLatentSendsLuaMain = pLuaMain;
+    m_usLatentSendsResourceNetId = usResourceNetId;
 }
 
 
@@ -3884,7 +3906,7 @@ bool CGame::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& play
     if ( !m_bLatentSendsEnabled )
         return g_pNetServer->SendPacket ( ucPacketID, playerID, pBitStream, bBroadcast, packetPriority, packetReliability, packetOrdering );
     else
-        GetLatentTransferManager ()->AddSend ( playerID, ucPacketID, pBitStream, m_iLatentSendsBandwidth, m_pLatentSendsLuaMain );
+        GetLatentTransferManager ()->AddSend ( playerID, ucPacketID, pBitStream, m_iLatentSendsBandwidth, m_pLatentSendsLuaMain, m_usLatentSendsResourceNetId );
     return true;
 }
 

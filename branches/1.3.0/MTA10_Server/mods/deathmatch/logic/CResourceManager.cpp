@@ -411,7 +411,7 @@ CResource* CResourceManager::GetResourceFromScriptID ( uint uiScriptID )
     return pResource;
 }
 
-
+// Get net id for resource. (0xFFFF is never used)
 unsigned short CResourceManager::GenerateID ( void )
 {
     // Create a map of all used IDs
@@ -425,10 +425,28 @@ unsigned short CResourceManager::GenerateID ( void )
     // Find an unused ID
     for ( unsigned short i = 0 ; i < 0xFFFE ; i++ )
     {
-        if ( idMap.find ( i ) == idMap.end () )
-            return i;
+        m_usNextNetId++;
+        if ( m_usNextNetId == 0xFFFF )
+            m_usNextNetId++;
+
+        if ( idMap.find ( m_usNextNetId ) == idMap.end () )
+            return m_usNextNetId;
     }
-    return 0xFFFF;
+
+    assert ( 0 && "End of world" );
+    return 0xFFFE;
+}
+
+
+CResource* CResourceManager::GetResourceFromNetID ( unsigned short usNetID )
+{
+    list < CResource* > ::const_iterator iter = m_resources.begin ();
+    for ( ; iter != m_resources.end (); iter++ )
+    {
+        if ( ( *iter )->GetNetID() == usNetID )
+            return ( *iter );
+    }
+    return NULL;
 }
 
 

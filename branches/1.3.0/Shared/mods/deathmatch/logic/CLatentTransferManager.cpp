@@ -108,7 +108,7 @@ void CLatentTransferManager::OnLuaMainDestroy ( void* pLuaMain )
 // From packetId and bitstream
 //
 ///////////////////////////////////////////////////////////////
-SSendHandle CLatentTransferManager::AddSend ( NetPlayerID remoteId, uchar ucPacketId, NetBitStreamInterface* pBitStream, uint uiRate, void* pLuaMain )
+SSendHandle CLatentTransferManager::AddSend ( NetPlayerID remoteId, uchar ucPacketId, NetBitStreamInterface* pBitStream, uint uiRate, void* pLuaMain, ushort usResourceNetId )
 {
     uint uiBitStreamBitsUsed = pBitStream->GetNumberOfBitsUsed ();
     uint uiBitStreamBytesUsed = ( uiBitStreamBitsUsed + 7 ) >> 3;
@@ -126,7 +126,7 @@ SSendHandle CLatentTransferManager::AddSend ( NetPlayerID remoteId, uchar ucPack
     pBitStream->ResetReadPointer ();
     pBitStream->ReadBits ( buffer.GetData () + uiHeadSize, uiBitStreamBitsUsed );
 
-    return AddSend ( remoteId, pBitStream->Version (), buffer.GetData (), buffer.GetSize (), uiRate, CATEGORY_PACKET, pLuaMain );
+    return AddSend ( remoteId, pBitStream->Version (), buffer.GetData (), buffer.GetSize (), uiRate, CATEGORY_PACKET, pLuaMain, usResourceNetId );
 }
 
 
@@ -137,11 +137,11 @@ SSendHandle CLatentTransferManager::AddSend ( NetPlayerID remoteId, uchar ucPack
 // From data pointer
 //
 ///////////////////////////////////////////////////////////////
-SSendHandle CLatentTransferManager::AddSend ( NetPlayerID remoteId, ushort usBitStreamVersion, const char* pData, uint uiSize, uint uiRate, ushort usCategory, void* pLuaMain )
+SSendHandle CLatentTransferManager::AddSend ( NetPlayerID remoteId, ushort usBitStreamVersion, const char* pData, uint uiSize, uint uiRate, ushort usCategory, void* pLuaMain, ushort usResourceNetId )
 {
     CLatentSendQueue* pSendQueue = GetSendQueueForRemote ( remoteId, usBitStreamVersion );
     //MapSet ( m_ActiveSendQueueMap, pSendQueue );
-    return pSendQueue->AddSend ( pData, uiSize, uiRate, usCategory, pLuaMain );
+    return pSendQueue->AddSend ( pData, uiSize, uiRate, usCategory, pLuaMain, usResourceNetId );
 }
 
 
@@ -328,8 +328,15 @@ bool DoSendPacket ( unsigned char ucPacketID, NetPlayerID remoteId, NetBitStream
     return g_pNet->SendPacket ( ucPacketID, bitStream, packetPriority, packetReliability, packetOrdering );
 }
 
-bool DoStaticProcessPacket ( unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* pBitStream )
+bool DoStaticProcessPacket ( unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* pBitStream, ushort usResourceNetId )
 {
+    // Check if latent packet should be ignored
+    if ( usResourceNetId != 0xFFFF )
+    {
+        CResource* pResource = g_pClientGame->GetResourceManager ()->GetResourceFromNetID ( usResourceNetId );
+        if ( !pResource )
+            return true;
+    }
     return CClientGame::StaticProcessPacket ( ucPacketID, *pBitStream );
 }
 
@@ -365,8 +372,15 @@ bool DoSendPacket ( unsigned char ucPacketID, NetPlayerID remoteId, NetBitStream
     return g_pNetServer->SendPacket ( ucPacketID, remoteId, bitStream, FALSE, packetPriority, packetReliability, packetOrdering );
 }
 
-bool DoStaticProcessPacket ( unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* pBitStream )
+bool DoStaticProcessPacket ( unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* pBitStream, ushort usResourceNetId )
 {
+    // Check if latent packet should be ignored
+    if ( usResourceNetId != 0xFFFF )
+    {
+        CResource* pResource = g_pGame->GetResourceManager ()->GetResourceFromNetID ( usResourceNetId );
+        if ( !pResource )
+            return true;
+    }
     return CGame::StaticProcessPacket ( ucPacketID, remoteId, pBitStream, NULL );
 }
 

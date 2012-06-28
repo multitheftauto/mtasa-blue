@@ -236,6 +236,7 @@ protected:
     CColModelSAInterface*           m_pOriginalColModelInterface;
     RpClump*                        m_pCustomClump;
     static std::map < unsigned short, int > ms_RestreamTxdIDMap;
+    bool                            m_bAddedRefForCollision;
 
 public:
                                     CModelInfoSA            ( void );
