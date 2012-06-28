@@ -555,6 +555,14 @@ void CRenderWareSA::GetClumpAtomicList ( RpClump* pClump, std::vector < RpAtomic
 //
 bool CRenderWareSA::DoContainTheSameGeometry ( RpClump* pClumpA, RpClump* pClumpB, RpAtomic* pAtomicB )
 {
+    // Fast check if comparing one atomic
+    if ( pAtomicB )
+    {
+        RpGeometry* pGeometryA = ( ( RpAtomic* ) ( ( pClumpA->atomics.root.next ) - 0x8 ) )->geometry;    
+        RpGeometry* pGeometryB = pAtomicB->geometry;
+        return pGeometryA == pGeometryB;
+    }
+
     // Get atomic list from both sides
     std::vector < RpAtomic* > atomicListA;
     std::vector < RpAtomic* > atomicListB;
