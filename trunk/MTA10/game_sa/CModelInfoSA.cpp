@@ -20,6 +20,7 @@ extern CGameSA * pGame;
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**) ARRAY_ModelInfo;
 
 std::map < unsigned short, int > CModelInfoSA::ms_RestreamTxdIDMap;
+std::map < DWORD, float > CModelInfoSA::ms_ModelDefaultLodDistanceMap;
 
 CModelInfoSA::CModelInfoSA ( void )
 {
@@ -604,11 +605,29 @@ void CModelInfoSA::SetLODDistance ( float fDistance )
     // Ensure fDistance is in range
     fDistance = Min ( fDistance, fMaximumValue );
 #endif
-    // Limit to 325.f as is goes horrible after that
+    // Limit to 325.f as it goes horrible after that
     fDistance = Min ( fDistance, 325.f );
     m_pInterface = ppModelInfo [ m_dwModelID ];
     if ( m_pInterface )
+    {
+        // Save default value if not done yet
+        if ( !MapContains ( ms_ModelDefaultLodDistanceMap, m_dwModelID ) )
+            MapSet ( ms_ModelDefaultLodDistanceMap, m_dwModelID, m_pInterface->fLodDistanceUnscaled );
         m_pInterface->fLodDistanceUnscaled = fDistance;
+    }
+}
+
+void CModelInfoSA::StaticResetLodDistances ()
+{
+    // Restore default values
+    for ( std::map < DWORD, float >::const_iterator iter = ms_ModelDefaultLodDistanceMap.begin () ; iter != ms_ModelDefaultLodDistanceMap.end () ; ++iter )
+    {
+        CBaseModelInfoSAInterface* pInterface = ppModelInfo [ iter->first ];
+        if ( pInterface )
+            pInterface->fLodDistanceUnscaled = iter->second;
+    }
+
+    ms_ModelDefaultLodDistanceMap.clear ();
 }
 
 void CModelInfoSA::RestreamIPL ()
