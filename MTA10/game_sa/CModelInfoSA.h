@@ -236,6 +236,7 @@ protected:
     CColModelSAInterface*           m_pOriginalColModelInterface;
     RpClump*                        m_pCustomClump;
     static std::map < unsigned short, int > ms_RestreamTxdIDMap;
+    static std::map < DWORD, float > ms_ModelDefaultLodDistanceMap;
     bool                            m_bAddedRefForCollision;
 
 public:
@@ -279,6 +280,7 @@ public:
     void                            SetTextureDictionaryID  ( unsigned short usID );
     float                           GetLODDistance          ( void );
     void                            SetLODDistance          ( float fDistance );
+    static void                     StaticResetLodDistances ( void );
     void                            RestreamIPL             ( void );
     static void                     StaticFlushPendingRestreamIPL ( void );
 

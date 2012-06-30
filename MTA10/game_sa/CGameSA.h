@@ -219,6 +219,7 @@ public:
     void                    SetupSpecialCharacters  ( void );
 
     void                    FlushPendingRestreamIPL         ( void );
+    void                    ResetModelLodDistances          ( void );
     void                    DisableVSync                    ( void );
 
     void                    OnPedContextChange              ( CPed* pPedContext );
