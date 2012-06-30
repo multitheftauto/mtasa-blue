@@ -17,6 +17,7 @@ CConnectHistory::CConnectHistory ( unsigned long ulMaxConnections, unsigned long
     m_ulMaxConnections = ulMaxConnections;
     m_ulSamplePeriod = ulSamplePeriod;
     m_ulBanLength = ulBanLength;
+    m_llTimeLastRemoveExpired = 0;
 }
 
 // Add flood candidate connection attempt and return true if flooding is occurring
@@ -30,7 +31,7 @@ bool CConnectHistory::AddConnect ( const string& strIP )
     CConnectHistoryItem& historyItem = GetHistoryItem ( strIP );
 
     // Add time of this allowed connection
-    historyItem.joinTimes.push_back ( GetTickCount64_ () );
+    historyItem.joinTimes.push_back ( GetModuleTickCount64 () );
     return false;
 }
 
@@ -44,14 +45,14 @@ bool CConnectHistory::IsFlooding ( const string& strIP )
     CConnectHistoryItem& historyItem = GetHistoryItem ( strIP );
 
     // Check if inside ban time
-    if ( GetTickCount64_ () < historyItem.llBanEndTime )
+    if ( GetModuleTickCount64 () < historyItem.llBanEndTime )
         return true;
 
     // Check if too many connections
     if ( historyItem.joinTimes.size () > m_ulMaxConnections )
     {
         // Begin timed ban
-        historyItem.llBanEndTime = GetTickCount64_ () + m_ulBanLength;
+        historyItem.llBanEndTime = GetModuleTickCount64 () + m_ulBanLength;
         return true;
     }
 
@@ -80,7 +81,7 @@ CConnectHistoryItem& CConnectHistory::GetHistoryItem ( const string& strIP )
         SString strInfo ( "IP:%s  ", strIP.c_str () );
         for ( unsigned int i = 0 ; i < historyItem.joinTimes.size () ; i++ )
         {
-            strInfo += SString ( "%u  ", GetTickCount64_ () - historyItem.joinTimes[i] );
+            strInfo += SString ( "%u  ", GetModuleTickCount64 () - historyItem.joinTimes[i] );
         }
         strInfo += "\n";
         OutputDebugString ( strInfo );
@@ -94,7 +95,12 @@ CConnectHistoryItem& CConnectHistory::GetHistoryItem ( const string& strIP )
 
 void CConnectHistory::RemoveExpired ( void )
 {
-    long long llCurrentTime = GetTickCount64_ ();
+    long long llCurrentTime = GetModuleTickCount64 ();
+
+    if ( llCurrentTime - m_llTimeLastRemoveExpired < 1000 )
+        return;
+
+    m_llTimeLastRemoveExpired = llCurrentTime;
 
     // Step through each IP's connect history
     HistoryItemMap ::iterator mapIt = m_HistoryItemMap.begin ();
