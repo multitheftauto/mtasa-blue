@@ -40,6 +40,7 @@ private:
     unsigned long                       m_ulMaxConnections;
     unsigned long                       m_ulBanLength;
     HistoryItemMap                      m_HistoryItemMap;
+    long long                           m_llTimeLastRemoveExpired;
 };
 
 #endif

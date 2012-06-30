@@ -185,7 +185,7 @@ void ASE::DoPulse ( void )
 const std::string& ASE::QueryFullCached ( void )
 {
     long long llTime = GetTickCount64_ ();
-    unsigned int uiPlayerCount = m_pPlayerManager->CountJoined ();
+    unsigned int uiPlayerCount = m_pPlayerManager->Count ();
     if ( uiPlayerCount != m_uiFullLastPlayerCount || llTime - m_llFullLastTime > m_lFullMinInterval || m_strFullCached == "" )
     {
         m_strFullCached = QueryFull ();
@@ -300,7 +300,7 @@ std::string ASE::QueryFull ( void )
 const std::string& ASE::QueryXfireLightCached ( void )
 {
     long long llTime = GetTickCount64_ ();
-    unsigned int uiPlayerCount = m_pPlayerManager->CountJoined ();
+    unsigned int uiPlayerCount = m_pPlayerManager->Count ();
     if ( uiPlayerCount != m_uiXfireLightLastPlayerCount || llTime - m_llXfireLightLastTime > m_lLightMinInterval || m_strXfireLightCached == "" )
     {
         m_strXfireLightCached = QueryXfireLight ();
@@ -354,7 +354,7 @@ std::string ASE::QueryXfireLight ( void )
 const std::string& ASE::QueryLightCached ( void )
 {
     long long llTime = GetTickCount64_ ();
-    unsigned int uiPlayerCount = m_pPlayerManager->CountJoined ();
+    unsigned int uiPlayerCount = m_pPlayerManager->Count ();
     if ( uiPlayerCount != m_uiLightLastPlayerCount || llTime - m_llLightLastTime > m_lLightMinInterval || m_strLightCached == "" )
     {
         m_strLightCached = QueryLight ();
@@ -425,7 +425,7 @@ std::string ASE::QueryLight ( void )
 
     // Keep the packet under 1350 bytes to try to avoid fragmentation 
     int iBytesLeft = 1340 - reply.tellp ();
-    int iPlayersLeft = m_pPlayerManager->CountJoined ();
+    int iPlayersLeft = iJoinedPlayers;
 
     list < CPlayer* > ::const_iterator pIter = m_pPlayerManager->IterBegin ();
     for ( ; pIter != m_pPlayerManager->IterEnd (); pIter++ )
