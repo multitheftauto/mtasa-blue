@@ -29,6 +29,7 @@ class CScriptDebugging
 {
 public:
                                     CScriptDebugging                ( CLuaManager* pLuaManager );
+                                    ~CScriptDebugging               ( void );
 
     void                            OutputDebugInfo                 ( lua_State* luaVM, int iLevel, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255 );
 
