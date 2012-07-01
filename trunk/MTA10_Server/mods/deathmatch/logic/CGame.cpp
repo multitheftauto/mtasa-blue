@@ -1301,6 +1301,9 @@ void CGame::InitialDataStream ( CPlayer& Player )
 
     marker.Set ( "PlayerStats" );
 
+    // Send the root element custom data
+    m_pMapManager->GetRootElement ()->SendAllCustomData ( &Player );
+
     // Tell the resource manager
     m_pResourceManager->OnPlayerJoin ( Player );
 

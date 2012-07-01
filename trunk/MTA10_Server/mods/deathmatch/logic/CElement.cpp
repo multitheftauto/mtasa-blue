@@ -501,12 +501,12 @@ CLuaArgument* CElement::GetCustomData ( const char* szName, bool bInheritData, b
     assert ( szName );
 
     // Grab it and return a pointer to the variable
-    const SCustomData* pData = m_pCustomData->Get ( szName );
+    SCustomData* pData = m_pCustomData->Get ( szName );
     if ( pData )
     {
         if ( pbIsSynced )
             *pbIsSynced = pData->bSynchronized;
-        return (CLuaArgument *)&pData->Variable;
+        return &pData->Variable;
     }
 
     // If none, try returning parent's custom data
@@ -525,15 +525,12 @@ CLuaArguments* CElement::GetAllCustomData ( CLuaArguments * table )
 
     // Grab it and return a pointer to the variable
     map < string, SCustomData > :: const_iterator iter = m_pCustomData->IterBegin();
-    int i = 1;
     for ( ; iter != m_pCustomData->IterEnd(); iter++ )
     {
         table->PushString( iter->first.c_str () );       // key
         table->PushArgument ( iter->second.Variable );   // value
-        i++;
     }
 
-    // None available
     return table;
 }
 
@@ -771,6 +768,28 @@ void CElement::DeleteAllCustomData ( CLuaMain* pLuaMain, bool bRecursive )
         }
     }
 }
+
+
+// Used to send the root element data when a player joins
+void CElement::SendAllCustomData ( CPlayer* pPlayer )
+{
+    for ( map < std::string, SCustomData >::const_iterator iter = m_pCustomData->SyncedIterBegin() ; iter != m_pCustomData->SyncedIterEnd(); ++iter )
+    {
+        const std::string& strName = iter->first;
+        const SCustomData& customData = iter->second;
+        if ( customData.bSynchronized )
+        {
+            // Tell our clients to update their data
+            unsigned short usNameLength = static_cast < unsigned short > ( strName.length () );
+            CBitStream BitStream;
+            BitStream.pBitStream->WriteCompressed ( usNameLength );
+            BitStream.pBitStream->Write ( strName.c_str (), usNameLength );
+            customData.Variable.WriteToBitStream ( *BitStream.pBitStream );
+            pPlayer->Send ( CElementRPCPacket ( this, SET_ELEMENT_DATA, *BitStream.pBitStream ) );
+        }
+    }
+}
+
 
 CXMLNode* CElement::OutputToXML ( CXMLNode* pNodeParent )
 {
