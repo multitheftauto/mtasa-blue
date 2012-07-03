@@ -3948,7 +3948,11 @@ bool CGame::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& play
 bool CGame::IsBulletSyncActive ( void )
 {
     bool bConfigSaysEnable = m_pMainConfig->GetBulletSyncEnabled ();
+#if 0       // No auto bullet sync as there are some problems with it
     bool bGlitchesSayEnable = ( m_Glitches [ GLITCH_FASTFIRE ] || m_Glitches [ GLITCH_CROUCHBUG ] );
+#else
+    bool bGlitchesSayEnable = false;
+#endif
     return bConfigSaysEnable || bGlitchesSayEnable;
 }
 
