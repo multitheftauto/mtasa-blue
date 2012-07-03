@@ -296,7 +296,6 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "mapalpha",                   155 );                          // map alpha
     DEFAULT ( "browser_speed",              2 );                            // Browser speed
     DEFAULT ( "single_download",            0 );                            // Single connection for downloads
-    DEFAULT ( "code_path",                  0 );                            // Code path
     DEFAULT ( "update_build_type",          0 );                            // 0-stable 1-test 2-nightly
     DEFAULT ( "volumetric_shadows",         0 );                            // Enable volumetric shadows
     DEFAULT ( "aspect_ratio",               0 );                            // Display aspect ratio
@@ -304,6 +303,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "grass",                      1 );                            // Enable grass
     DEFAULT ( "fast_clothes_loading",       1 );                            // 0-off 1-auto 2-on
     DEFAULT ( "allow_screen_upload",        1 );                            // 0-off 1-on
+    DEFAULT ( "max_clientscript_log_kb",    5000 );                         // Max size in KB (0-No limit)
 
     // We will default this one at CClientGame.cpp, because we need a valid direct3d device to give a proper default value.
 #if 0

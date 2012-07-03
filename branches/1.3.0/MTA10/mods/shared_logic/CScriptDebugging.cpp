@@ -25,6 +25,17 @@ CScriptDebugging::CScriptDebugging ( CLuaManager* pLuaManager )
     m_bTriggeringOnClientDebugMessage = false;
 }
 
+CScriptDebugging::~CScriptDebugging ( void )
+{
+    // Close the previously loaded file
+    if ( m_pLogFile )
+    {
+        fprintf ( m_pLogFile, "INFO: Logging to this file ended\n" );
+        fclose ( m_pLogFile );
+        m_pLogFile = NULL;
+    }
+}
+
 #if 0   // Currently unused
 void CScriptDebugging::OutputDebugInfo ( lua_State* luaVM, int iLevel, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue )
 {
@@ -185,17 +196,33 @@ bool CScriptDebugging::SetLogfile ( const char* szFilename, unsigned int uiLevel
 {
     assert ( szFilename );
 
+    // Close the previously loaded file
+    if ( m_pLogFile )
+    {
+        fprintf ( m_pLogFile, "INFO: Logging to this file ended\n" );
+        fclose ( m_pLogFile );
+        m_pLogFile = NULL;
+    }
+
+    // Apply log size limit
+    uint uiMaxSizeKB = 0;
+    g_pCore->GetCVars ()->Get ( "max_clientscript_log_kb", uiMaxSizeKB );
+    if ( uiMaxSizeKB > 0 )
+    {
+        uint uiCurrentSizeKB = FileSize ( szFilename ) / 1024;
+        if ( uiCurrentSizeKB > uiMaxSizeKB )
+        {
+            SString strFilenameBackup ( "%s.bak", szFilename );
+            FileDelete ( strFilenameBackup );
+            FileRename ( szFilename, strFilenameBackup );
+            FileDelete ( szFilename );
+        }
+    }
+
     // Try to load the new file
     FILE* pFile = fopen ( szFilename, "a+" );
     if ( pFile )
     {
-        // Close the previously loaded file
-        if ( m_pLogFile )
-        {
-            fprintf ( m_pLogFile, "INFO: Logging to this file ended\n" );
-            fclose ( m_pLogFile );
-        }
-
         // Set the new pointer and level and return true
         m_uiLogFileLevel = uiLevel;
         m_pLogFile = pFile;
