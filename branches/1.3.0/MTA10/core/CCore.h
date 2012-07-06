@@ -209,6 +209,9 @@ public:
     uint                    GetFrameRateLimit               ( void )                                        { return m_uiFrameRateLimit; }
     void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1 );
     void                    ApplyFrameRateLimit             ( uint uiOverrideRate = -1 );
+    void                    FrameRateLimitTypeStd           ( uint uiUseRate );
+    void                    FrameRateLimitTypeAlt1          ( uint uiUseRate );
+    void                    FrameRateLimitTypeAlt2          ( uint uiUseRate );
     void                    EnsureFrameRateLimitApplied     ( void );
     void                    DoReliablePulse                 ( void );
 
