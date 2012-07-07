@@ -2248,7 +2248,7 @@ bool CResource::LinkToIncludedResources ( void )
             CLogger::LogPrintf ( "  Links to %s .. OK\n", (*iterr)->GetName().c_str () );
 #endif
     }
-    m_bLoaded = m_bLinked;
+    // WTF  m_bLoaded = m_bLinked;
     return m_bLinked;
 }
 
@@ -2285,7 +2285,7 @@ bool CResource::CheckIfStartable ( void )
         snprintf ( szBuffer, 511, "Circular include error: %s", m_strCircularInclude.c_str () );
         m_strFailureReason = szBuffer;
         //CLogger::LogPrintf ( "%s\n", m_szCircularInclude );
-        m_bLoaded = false;
+        // WTF  m_bLoaded = false;
         return false;
     }
 
@@ -2299,7 +2299,7 @@ bool CResource::CheckIfStartable ( void )
         CResource* pResource = (*iterr)->GetResource();
         if ( !pResource || !pResource->CheckIfStartable() )
         {
-            m_bLoaded = false;
+            // WTF  m_bLoaded = false;
             return false;
         }
     }
