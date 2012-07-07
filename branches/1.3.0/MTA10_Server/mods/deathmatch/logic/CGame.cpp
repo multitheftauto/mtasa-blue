@@ -4063,9 +4063,11 @@ SString CGame::CalculateMinClientRequirement ( void )
         }
     }
 
-#ifndef MTA_DEBUG
-    if ( strNewMin < RELEASE_MIN_CLIENT_VERSION )
-        strNewMin = RELEASE_MIN_CLIENT_VERSION;
+#if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+    #ifndef MTA_DEBUG
+        if ( strNewMin < RELEASE_MIN_CLIENT_VERSION )
+            strNewMin = RELEASE_MIN_CLIENT_VERSION;
+    #endif
 #endif
 
     return strNewMin;
