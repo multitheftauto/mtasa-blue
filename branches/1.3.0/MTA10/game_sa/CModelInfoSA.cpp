@@ -21,6 +21,7 @@ CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**) ARRAY_Mo
 
 std::map < unsigned short, int > CModelInfoSA::ms_RestreamTxdIDMap;
 std::map < DWORD, float > CModelInfoSA::ms_ModelDefaultLodDistanceMap;
+std::set < uint > CModelInfoSA::ms_ReplacedColModels;
 
 CModelInfoSA::CModelInfoSA ( void )
 {
@@ -933,7 +934,7 @@ void CModelInfoSA::RestoreOriginalModel ( void )
 void CModelInfoSA::SetColModel ( CColModel* pColModel )
 {
     // Grab the interfaces
-    CColModelSAInterface* pInterface = pColModel->GetInterface ();
+    CColModelSAInterface* pColModelInterface = pColModel->GetInterface ();
 
     if ( !m_bAddedRefForCollision )
     {
@@ -948,6 +949,9 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
     if ( m_pCustomColModel == pColModel )
         return;
 
+    // Remember model so we can skip GTA trying to reload the original
+    MapInsert ( ms_ReplacedColModels, m_dwModelID );
+
     // Store the col model we set
     m_pCustomColModel = pColModel;
 
@@ -960,11 +964,7 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
             m_pOriginalColModelInterface = m_pInterface->pColModel;
 
         // Apply some low-level hacks
-        MemPutFast < BYTE > ( (BYTE*) pInterface + 40, 0xA9 );
-
-        // Extra flags (3064) -- needs to be tested
-        m_pInterface->bDoWeOwnTheColModel = false;
-        m_pInterface->bCollisionWasStreamedWithModel = false;
+        pColModelInterface->level = 0xA9;
 
         // Call SetColModel
         DWORD dwFunc = FUNC_SetColModel;
@@ -974,14 +974,18 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
             mov     ecx, ModelID
             mov     ecx, ARRAY_ModelInfo[ecx*4]
             push    1
-            push    pInterface
+            push    pColModelInterface
             call    dwFunc
         }
+
+        // FUNC_SetColModel resets bDoWeOwnTheColModel
+        m_pInterface->bDoWeOwnTheColModel = false;
+        m_pInterface->bCollisionWasStreamedWithModel = false;
 
         // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
         DWORD func = 0x5B2C20;
         __asm {
-            push    pInterface
+            push    pColModelInterface
             push    ModelID
             call    func
             add     esp, 8
@@ -992,6 +996,8 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
 
 void CModelInfoSA::RestoreColModel ( void )
 {
+    MapRemove ( ms_ReplacedColModels, m_dwModelID );
+
     // Are we loaded?
     m_pInterface = ppModelInfo [ m_dwModelID ];
     if ( m_pInterface )
@@ -1097,4 +1103,54 @@ void CModelInfoSA::MakePedModel ( char * szTexture )
 
     // Load our texture
     pGame->GetStreaming ()->RequestSpecialModel ( m_dwModelID, szTexture, 0 );
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Hook for CFileLoader_LoadCollisionFile_Mid
+//
+// Skip loading GTA collision model if we have replaced it
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+bool OnMY_CFileLoader_LoadCollisionFile_Mid ( int iModelId )
+{
+    if ( MapContains ( CModelInfoSA::ms_ReplacedColModels, iModelId ) )
+        return false;
+
+    return true;
+}
+
+// Hook info
+#define HOOKPOS_CFileLoader_LoadCollisionFile_Mid                         0x5384EE
+#define HOOKSIZE_CFileLoader_LoadCollisionFile_Mid                        6
+DWORD RETURN_CFileLoader_LoadCollisionFile_Mid =                          0x5384F4;
+DWORD RETURN_CFileLoader_LoadCollisionFile_Mid_Quit =                     0x53865D;
+void _declspec(naked) HOOK_CFileLoader_LoadCollisionFile_Mid()
+{
+    _asm
+    {
+        pushad
+        push    eax
+        call    OnMY_CFileLoader_LoadCollisionFile_Mid
+        add     esp, 4*1
+
+        cmp     al,0
+        jz      quit
+
+        popad
+        sub     edx,18h 
+        add     ebp,2 
+        jmp     RETURN_CFileLoader_LoadCollisionFile_Mid
+
+quit:
+        popad
+        jmp     RETURN_CFileLoader_LoadCollisionFile_Mid_Quit
+    }
+}
+
+
+void CModelInfoSA::StaticSetHooks ( void )
+{
+    HookInstall( HOOKPOS_CFileLoader_LoadCollisionFile_Mid, (DWORD)HOOK_CFileLoader_LoadCollisionFile_Mid, HOOKSIZE_CFileLoader_LoadCollisionFile_Mid );
 }

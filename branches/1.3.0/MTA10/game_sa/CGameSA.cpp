@@ -172,6 +172,8 @@ CGameSA::CGameSA()
     m_pPools->SetPoolCapacity ( OBJECT_POOL, 700 );  // Default is 350
     m_pPools->SetPoolCapacity ( EVENT_POOL, 5000 );
     m_pPools->SetPoolCapacity ( COL_MODEL_POOL, 12000 );  // Default is 10150
+
+    CModelInfoSA::StaticSetHooks ();
 }
 
 CGameSA::~CGameSA ( void )
