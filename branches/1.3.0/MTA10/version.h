@@ -1,5 +1,5 @@
 //
-// MTA10/version.h
+// MTA10/version.h 
 //
 // Client version file
 //
