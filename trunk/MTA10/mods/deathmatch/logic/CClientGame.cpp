@@ -4230,7 +4230,7 @@ bool CClientGame::HeliKillHandler ( CVehicleSAInterface* pHeliInterface, CPedSAI
             return bContinue;
         }
     }
-    return false;
+    return true;
 }
 
 bool CClientGame::WaterCannonHitHandler ( CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed )
