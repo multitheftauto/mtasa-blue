@@ -990,7 +990,21 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
             call    func
             add     esp, 8
         }
-        #pragma message(__LOC__ "(IJs) Document this function some time.")
+
+        // Set some lighting for this collision if not already present
+        CColDataSA* pColData = pColModelInterface->pColData;
+        if ( pColData )
+        {
+            for ( uint i = 0 ; i < pColData->numColTriangles ; i++ )
+            {
+                CColTriangleSA* pTriangle = pColData->pColTriangles + i;
+                if ( pTriangle->unknown1 == 0 && pTriangle->unknown2 == 0 )
+                {
+                    pTriangle->unknown1 = 0x1c; // 0x1 night   0xc day
+                    pTriangle->unknown2 = 0x1c; // 0x1 night   0xc day
+                }
+            }
+        }
     }
 }
 
