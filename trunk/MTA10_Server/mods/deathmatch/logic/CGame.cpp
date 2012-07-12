@@ -3926,6 +3926,16 @@ void CGame::EnableLatentSends ( bool bEnabled, int iBandwidth, CLuaMain* pLuaMai
 
 
 //
+// Optimization for latent sends
+//
+void CGame::SendPacketBatchBegin ( unsigned char ucPacketId, NetBitStreamInterface* pBitStream )
+{
+    if ( m_bLatentSendsEnabled )
+        GetLatentTransferManager ()->AddSendBatchBegin ( ucPacketId, pBitStream );
+}
+
+
+//
 // Maybe route though LatentTransferManager
 //
 bool CGame::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering )
@@ -3933,8 +3943,18 @@ bool CGame::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& play
     if ( !m_bLatentSendsEnabled )
         return g_pNetServer->SendPacket ( ucPacketID, playerID, pBitStream, bBroadcast, packetPriority, packetReliability, packetOrdering );
     else
-        GetLatentTransferManager ()->AddSend ( playerID, ucPacketID, pBitStream, m_iLatentSendsBandwidth, m_pLatentSendsLuaMain, m_usLatentSendsResourceNetId );
+        GetLatentTransferManager ()->AddSend ( playerID, pBitStream->Version (), m_iLatentSendsBandwidth, m_pLatentSendsLuaMain, m_usLatentSendsResourceNetId );
     return true;
+}
+
+
+//
+// Optimization for latent sends
+//
+void CGame::SendPacketBatchEnd ( void )
+{
+    if ( m_bLatentSendsEnabled )
+        GetLatentTransferManager ()->AddSendBatchEnd ();
 }
 
 

@@ -53,7 +53,7 @@ void CLatentSendQueue::DoPulse ( int iTimeMsBetweenCalls )
     }
 
     // Check if previous tx has completed
-    if ( m_TxQueue.front ().uiReadPosition == m_TxQueue.front ().buffer.GetSize () && m_TxQueue.front ().bSendFinishing )
+    if ( m_TxQueue.front ().uiReadPosition == m_TxQueue.front ().bufferRef->GetSize () && m_TxQueue.front ().bSendFinishing )
     {
         m_TxQueue.pop_front ();
         PostQueueRemove ();
@@ -96,14 +96,14 @@ void CLatentSendQueue::DoPulse ( int iTimeMsBetweenCalls )
             pBitStream->WriteBit ( 1 );
             pBitStream->Write ( (uchar)FLAG_HEAD );
             pBitStream->Write ( activeTx.usCategory );
-            pBitStream->Write ( activeTx.buffer.GetSize () );
+            pBitStream->Write ( activeTx.bufferRef->GetSize () );
             pBitStream->Write ( activeTx.uiRate );
             if ( pBitStream->Version () >= 0x31 )
                 pBitStream->Write ( activeTx.usResourceNetId );
             activeTx.bSendStarted = true;
         }
         else
-        if ( activeTx.buffer.GetSize () == activeTx.uiReadPosition )
+        if ( activeTx.bufferRef->GetSize () == activeTx.uiReadPosition )
         {
             // Tail
             pBitStream->WriteBit ( 1 );
@@ -122,11 +122,11 @@ void CLatentSendQueue::DoPulse ( int iTimeMsBetweenCalls )
 
         // Calc how much data to send
         uint uiDataOffset = activeTx.uiReadPosition;
-        uint uiSizeToSend = Min ( uiMaxDataSize, activeTx.buffer.GetSize () - activeTx.uiReadPosition );
+        uint uiSizeToSend = Min ( uiMaxDataSize, activeTx.bufferRef->GetSize () - activeTx.uiReadPosition );
         activeTx.uiReadPosition += uiSizeToSend;
 
         pBitStream->Write ( (ushort)uiSizeToSend );
-        pBitStream->Write ( activeTx.buffer.GetData () + uiDataOffset, uiSizeToSend );
+        pBitStream->Write ( activeTx.bufferRef->GetData () + uiDataOffset, uiSizeToSend );
 
         // Send
         DoSendPacket ( PACKET_ID_LATENT_TRANSFER, m_RemoteId, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DATA_TRANSFER );
@@ -142,17 +142,17 @@ void CLatentSendQueue::DoPulse ( int iTimeMsBetweenCalls )
 // From data pointer
 //
 ///////////////////////////////////////////////////////////////
-SSendHandle CLatentSendQueue::AddSend ( const char* pData, uint uiSize, uint uiRate, ushort usCategory, void* pLuaMain, ushort usResourceNetId )
+SSendHandle CLatentSendQueue::AddSend ( CBufferRef bufferRef, uint uiRate, ushort usCategory, void* pLuaMain, ushort usResourceNetId )
 {
-    SSendItem newTx;
+    m_TxQueue.push_back ( SSendItem () );
+
+    SSendItem& newTx = m_TxQueue.back ();
     newTx.uiId = m_uiNextSendId++;
-    newTx.buffer = CBuffer ( pData, uiSize );
+    newTx.bufferRef = bufferRef;
     newTx.uiRate = uiRate;
     newTx.usCategory = usCategory;
     newTx.pLuaMain = pLuaMain;
     newTx.usResourceNetId = usResourceNetId;
-
-    m_TxQueue.push_back ( newTx );
 
     // Current rate is highest queued item
     m_uiCurrentRate = Max ( m_uiCurrentRate, newTx.uiRate );
@@ -229,7 +229,7 @@ bool CLatentSendQueue::GetSendStatus ( SSendHandle handle, SSendStatus* pOutSend
         {
             pOutSendStatus->iStartTimeMsOffset = iTimeMsBefore - iter->iEstSendDurationMsUsed;
             pOutSendStatus->iEndTimeMsOffset = iTimeMsBefore + iter->iEstSendDurationMsRemaining;
-            pOutSendStatus->iTotalSize = iter->buffer.GetSize ();
+            pOutSendStatus->iTotalSize = iter->bufferRef->GetSize ();
             pOutSendStatus->iPercentComplete = iter->uiReadPosition * 100 / Max ( 1, pOutSendStatus->iTotalSize );
             return true;
         }
@@ -273,13 +273,13 @@ void CLatentSendQueue::UpdateEstimatedDurations ( void )
         SSendItem& tx = *iter;
 
         uiUsingRate = Max ( uiUsingRate, tx.uiRate );
-        tx.iEstSendDurationMsRemaining = tx.buffer.GetSize () * 1000 / uiUsingRate;
+        tx.iEstSendDurationMsRemaining = tx.bufferRef->GetSize () * 1000 / uiUsingRate;
         tx.iEstSendDurationMsUsed = 0;
 
         if ( tx.bSendStarted )
         {
             // Calc how long to go for a send that is in-progress
-            int iSizeRemaining = tx.buffer.GetSize () - tx.uiReadPosition;
+            int iSizeRemaining = tx.bufferRef->GetSize () - tx.uiReadPosition;
             int iTimeMsRemaining = iSizeRemaining * 1000 / m_uiCurrentRate;
             tx.iEstSendDurationMsUsed = tx.iEstSendDurationMsRemaining - iTimeMsRemaining;
             tx.iEstSendDurationMsRemaining = iTimeMsRemaining;
