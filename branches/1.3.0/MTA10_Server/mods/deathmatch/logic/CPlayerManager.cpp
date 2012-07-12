@@ -216,6 +216,8 @@ static void DoBroadcast ( const CPacket& Packet, const T& sendList )
         // Write the content
         if ( Packet.Write ( *pBitStream ) )
         {
+            g_pGame->SendPacketBatchBegin ( Packet.GetPacketID (), pBitStream );
+
             // For each player, send the packet
             pair < mapIter , mapIter > keyRange = groupMap.equal_range ( usBitStreamVersion );
             for ( s_it = keyRange.first ; s_it != keyRange.second ; ++s_it )
@@ -224,6 +226,8 @@ static void DoBroadcast ( const CPacket& Packet, const T& sendList )
                 dassert ( usBitStreamVersion == pPlayer->GetBitStreamVersion () );
                 g_pGame->SendPacket ( Packet.GetPacketID (), pPlayer->GetSocket (), pBitStream, FALSE, packetPriority, Reliability, Packet.GetPacketOrdering() );
             }
+
+            g_pGame->SendPacketBatchEnd ();
         }
         else
         {

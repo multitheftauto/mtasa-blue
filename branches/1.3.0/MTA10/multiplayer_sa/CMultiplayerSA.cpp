@@ -268,6 +268,7 @@ DWORD RETURN_CClothes_RebuildPlayerb                        = 0x5A837F;
 #define HOOKPOS_CHeli_ProcessHeliKill                       0x6DB201
 DWORD RETURN_CHeli_ProcessHeliKill_RETN_Cancel = 0x6DB9E0;
 DWORD RETURN_CHeli_ProcessHeliKill_RETN_Cont_Zero = 0x6DB207;
+DWORD RETURN_CHeli_ProcessHeliKill_6DB437h = 0x6DB437;
 
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
@@ -6059,6 +6060,7 @@ void _declspec(naked) HOOK_CHeli_ProcessHeliKill ( )
     // edi = ped
     _asm
     {
+        pushfd
         pushad
         mov pHeliKiller, esi
         mov pPedKilledByHeli, edi
@@ -6069,6 +6071,7 @@ void _declspec(naked) HOOK_CHeli_ProcessHeliKill ( )
         _asm
         {
             popad
+            popfd
             // Go to the end of the while loop and let it start again
             jmp RETURN_CHeli_ProcessHeliKill_RETN_Cancel
         }
@@ -6078,10 +6081,13 @@ void _declspec(naked) HOOK_CHeli_ProcessHeliKill ( )
         _asm
         {
             popad
+            popfd
             // do our JNZ
-            jnz 6DB437h
+            jnz lp1
             // if it failed do our continue
             jmp RETURN_CHeli_ProcessHeliKill_RETN_Cont_Zero
+
+lp1:        jmp RETURN_CHeli_ProcessHeliKill_6DB437h
         }
     }
 }
