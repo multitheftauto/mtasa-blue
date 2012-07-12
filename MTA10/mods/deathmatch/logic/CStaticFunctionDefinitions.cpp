@@ -205,7 +205,9 @@ bool CStaticFunctionDefinitions::TriggerLatentServerEvent ( const char* szName, 
             g_pNet->DeallocateNetBitStream ( pBitStream );
             return false;
         }
-        g_pClientGame->GetLatentTransferManager ()->AddSend ( 0, PACKET_ID_LUA_EVENT, pBitStream, iBandwidth, pLuaMain, usResourceNetId );
+        g_pClientGame->GetLatentTransferManager ()->AddSendBatchBegin ( PACKET_ID_LUA_EVENT, pBitStream );
+        g_pClientGame->GetLatentTransferManager ()->AddSend ( 0, pBitStream->Version (), iBandwidth, pLuaMain, usResourceNetId );
+        g_pClientGame->GetLatentTransferManager ()->AddSendBatchEnd ();
         g_pNet->DeallocateNetBitStream ( pBitStream );
 
         return true;
