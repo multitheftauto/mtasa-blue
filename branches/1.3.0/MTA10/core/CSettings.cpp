@@ -916,8 +916,6 @@ void CSettings::CreateGUI ( void )
     m_pDebugSettingCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
     m_pDebugSettingCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
     m_pDebugSettingCombo->AddItem ( "Default" )->SetData ( (void*)0 );
-    m_pDebugSettingCombo->AddItem ( "#0001 FPS limit #1" )->SetData ( (void*)EDiagnosticDebug::FPS_LIMIT_0001 );
-    m_pDebugSettingCombo->AddItem ( "#0002 FPS limit #2" )->SetData ( (void*)EDiagnosticDebug::FPS_LIMIT_0002 );
     m_pDebugSettingCombo->AddItem ( "#6734 Graphics" )->SetData ( (void*)EDiagnosticDebug::GRAPHICS_6734 );
     //m_pDebugSettingCombo->AddItem ( "#6778 BIDI" )->SetData ( (void*)EDiagnosticDebug::BIDI_6778 );
     m_pDebugSettingCombo->AddItem ( "#6732 D3D" )->SetData ( (void*)EDiagnosticDebug::D3D_6732 );

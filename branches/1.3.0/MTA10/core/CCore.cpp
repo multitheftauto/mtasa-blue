@@ -1788,23 +1788,6 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
     TIMING_CHECKPOINT( "-CallIdle1" );
     ms_TimingCheckpoints.EndTimingCheckpoints ();
 
-    // Check for core lock
-    static uint uiPrevProcessorNumber = -1;
-    uint uiNewNumber = _GetCurrentProcessorNumber ();
-    if ( uiNewNumber != uiPrevProcessorNumber )
-    {
-        if ( uiPrevProcessorNumber != -1 )
-        {
-            SString strMessage ( "Core lock fail %d -> %d", uiPrevProcessorNumber, uiNewNumber );
-            static uint uiDoneReport = 0;
-            uiDoneReport++;
-            if ( uiDoneReport < 4 )
-                AddReportLog ( 7341, strMessage );
-            OutputDebugLine ( strMessage );
-        }
-        uiPrevProcessorNumber = uiNewNumber;
-    }
-
     // Frame rate limit stuff starts here
     m_bDoneFrameRateLimit = true;
 
@@ -1813,24 +1796,6 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
     if ( uiUseRate < 1 )
         return DoReliablePulse ();
 
-    // Try different limit types
-
-    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::FPS_LIMIT_0001 )
-        FrameRateLimitTypeAlt1 ( uiUseRate );
-    else
-    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::FPS_LIMIT_0002 )
-        FrameRateLimitTypeAlt2 ( uiUseRate );
-    else
-        FrameRateLimitTypeStd ( uiUseRate );
-
-    DoReliablePulse ();
-}
-
-//
-// Standard FPS lock method
-//
-void CCore::FrameRateLimitTypeStd ( uint uiUseRate )
-{
     // Calc required time in ms between frames
     const double dTargetTimeToUse = 1000.0 / uiUseRate;
 
@@ -1865,105 +1830,8 @@ void CCore::FrameRateLimitTypeStd ( uint uiUseRate )
     m_dPrevOverrun = Clamp ( dTargetTimeToUse * -0.9f, m_dPrevOverrun, dTargetTimeToUse * 0.1f );
 
     m_dLastTimeMs = dTimeMs;
-}
 
-
-//
-// Alt FPS lock method 1
-//
-void CCore::FrameRateLimitTypeAlt1 ( uint uiUseRate )
-{
-    // Calc required time in ms between frames
-    const double dTargetTimeToUse = 1000.0 / uiUseRate;
-
-    // Time wanted to achieve limit
-    double dTimeWantedMs = m_dLastTimeMs + dTargetTimeToUse;
-
-    // Time now
-    double dTimeMs = CClientTime::GetTimeNano() * 1000.0;
-
-    if ( dTimeMs + 1000 > dTimeWantedMs )
-    {
-        while ( dTimeMs + 3 < dTimeWantedMs )
-        {
-            Sleep ( 1 );
-            dTimeMs = CClientTime::GetTimeNano() * 1000.0;
-        }
-
-        while ( dTimeMs + 0 < dTimeWantedMs )
-        {
-            dTimeMs = CClientTime::GetTimeNano() * 1000.0;
-        }
-    }
-
-    m_dLastTimeMs = dTimeMs;
-}
-
-
-namespace
-{
-    // Temp stuff for testing FPS limit
-
-    uint timeGetTime32 ( void )
-    {
-        static const uint ulInitial = timeGetTime () - ( timeGetTime () % 300000 + 200000 );
-        uint ulNow = timeGetTime ();
-        return ulNow - ulInitial;
-    }
-
-    long long timeGetTime64 ( void )
-    {
-        static CCriticalSection criticalSection;
-        criticalSection.Lock ();
-
-        static long          lHightPart = 0;
-        static unsigned long ulWas      = timeGetTime32 ();
-        unsigned long        ulNow      = timeGetTime32 ();
-        unsigned long        ulDelta    = ulNow - ulWas;
-
-        // Detect wrap around
-        if( ulDelta > 0x80000000 )
-            lHightPart++;
-
-        ulWas = ulNow;
-
-        long long Result = ( ( ( ( long long ) lHightPart ) << 32 ) | ( ( long long ) ulNow ) );
-
-        criticalSection.Unlock ();
-        return Result;
-    }
-}
-
-
-//
-// Alt FPS lock method 2
-//
-void CCore::FrameRateLimitTypeAlt2 ( uint uiUseRate )
-{
-    // Calc required time in ms between frames
-    const double dTargetTimeToUse = 1000.0 / uiUseRate;
-
-    // Time wanted to achieve limit
-    double dTimeWantedMs = m_dLastTimeMs + dTargetTimeToUse;
-
-    // Time now
-    double dTimeMs = timeGetTime64 ();
-
-    if ( dTimeMs + 1000 > dTimeWantedMs )
-    {
-        while ( dTimeMs + 3 < dTimeWantedMs )
-        {
-            Sleep ( 1 );
-            dTimeMs = timeGetTime64 ();
-        }
-
-        while ( dTimeMs + 0 < dTimeWantedMs )
-        {
-            dTimeMs = timeGetTime64 ();
-        }
-    }
-
-    m_dLastTimeMs = dTimeMs;
+    DoReliablePulse ();
 }
 
 

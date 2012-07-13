@@ -98,8 +98,6 @@ namespace SharedUtil
             BIDI_6778,
             D3D_6732,
             LOG_TIMING_0000,
-            FPS_LIMIT_0001,
-            FPS_LIMIT_0002,
         };
     };
 
