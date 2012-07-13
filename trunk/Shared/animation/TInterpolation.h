@@ -11,10 +11,6 @@
 #ifndef __TINTERPOLATION_H
 #define __TINTERPOLATION_H
 
-#ifdef MTA_CLIENT
-#include "CClientTime.h" //For _GetTime
-#endif
-
 template < typename T >
 class TInterpolation
 {
@@ -130,11 +126,7 @@ public:
 protected:
     unsigned long _GetTime () const
     {
-#ifdef MTA_CLIENT
-        return CClientTime::GetTime ();
-#else
-        return GetTime ();
-#endif
+        return GetTickCount32 ();
     }
 
     void _GetValue ( T& a_rResult, float a_fAnimationTime ) const

@@ -68,7 +68,6 @@ CTransferBox::CTransferBox ( void )
 
     // set animation counters
     m_uiVisible = 0;
-    m_ulTime = 0;
     m_dTotalSize = 0;
 }
 
@@ -116,8 +115,9 @@ void CTransferBox::SetInfo ( double dDownloadSizeNow, const char* szMessage )
 void CTransferBox::DoPulse ( void )
 {
     // animated icon mechanism
-    if ( timeGetTime () > ( m_ulTime + TRANSFERBOX_DELAY ) ) {
-        m_ulTime = timeGetTime ();
+    if ( m_AnimTimer.Get () > TRANSFERBOX_DELAY )
+    {
+        m_AnimTimer.Reset ();
         m_pIcon[m_uiVisible]->SetVisible ( false );
         m_uiVisible = ( m_uiVisible + 1 ) % TRANSFERBOX_FRAMES;
         m_pIcon[m_uiVisible]->SetVisible ( true );
