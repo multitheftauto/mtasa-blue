@@ -82,6 +82,7 @@ extern class CGraphics* g_pGraphics;
 class CCore : public CCoreInterface, public CSingleton < CCore >
 {
 public:
+    ZERO_ON_NEW
                             CCore                           ( void );
                             ~CCore                          ( void );
 

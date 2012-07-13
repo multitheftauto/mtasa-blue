@@ -10,6 +10,10 @@
 *
 *****************************************************************************/
 
+#ifndef WIN32
+    #include "sys/time.h"
+#endif
+
 unsigned long GetTickCountInternal ( void );
 
 //
