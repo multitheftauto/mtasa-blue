@@ -14,7 +14,6 @@ class CClientDisplay;
 #ifndef __ClientDisplay_H
 #define __ClientDisplay_H
 
-#include "CClientTime.h"
 #include "CClientCommon.h"
 
 enum eDisplayType

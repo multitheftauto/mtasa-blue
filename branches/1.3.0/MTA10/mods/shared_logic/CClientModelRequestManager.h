@@ -23,7 +23,7 @@ struct SClientModelRequest
 {
     CModelInfo*         pModel;
     CClientEntity*      pEntity;
-    DWORD               dwTimeRequested;
+    CElapsedTime        requestTimer;
 };
 
 class CClientModelRequestManager

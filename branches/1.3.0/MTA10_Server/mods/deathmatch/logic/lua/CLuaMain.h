@@ -148,7 +148,7 @@ private:
 
     bool                            m_bBeingDeleted; // prevent it being deleted twice
 
-    unsigned long                   m_ulFunctionEnterTime;
+    CElapsedTime                    m_FunctionEnterTimer;
 public:
     std::map < const void*, CRefInfo >      m_CallbackTable;
     std::map < int, SString >       m_FunctionTagMap;

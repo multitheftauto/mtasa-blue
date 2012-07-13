@@ -138,9 +138,6 @@ CCore::CCore ( void )
     m_bWaitToSetNick = false;
     m_DiagnosticDebug = EDiagnosticDebug::NONE;
 
-    // Initialize time
-    CClientTime::InitializeTime ();
-
     // Create our Direct3DData handler.
     m_pDirect3DData = new CDirect3DData;
 
@@ -175,8 +172,6 @@ CCore::CCore ( void )
     m_bDoneFrameRateLimit = false;
     m_uiFrameRateLimit = 0;
     m_uiServerFrameRateLimit = 0;
-    m_dLastTimeMs = 0;
-    m_dPrevOverrun = 0;
     m_uiNewNickWaitFrames = 0;
     m_iUnminimizeFrameCounter = 0;
     m_bDidRecreateRenderTargets = false;
@@ -1840,7 +1835,7 @@ void CCore::FrameRateLimitTypeStd ( uint uiUseRate )
     const double dTargetTimeToUse = 1000.0 / uiUseRate;
 
     // Time now
-    double dTimeMs = CClientTime::GetTimeNano() * 1000.0;
+    double dTimeMs = GetTickCount32 ();
 
     // Get delta time in ms since last frame
     double dTimeUsed = dTimeMs - m_dLastTimeMs;
@@ -1858,7 +1853,7 @@ void CCore::FrameRateLimitTypeStd ( uint uiUseRate )
             Sleep( static_cast < DWORD > ( floor ( dUseUpNow ) ) );
 
         // Redo timing calcs
-        dTimeMs = CClientTime::GetTimeNano() * 1000.0;
+        dTimeMs = GetTickCount32 ();
         dTimeUsed = dTimeMs - m_dLastTimeMs;
         dTimeUsed += m_dPrevOverrun;
     }

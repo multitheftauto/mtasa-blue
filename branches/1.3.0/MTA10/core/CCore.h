@@ -22,7 +22,6 @@ class CCore;
 
 #include "../version.h"
 
-#include "CClientTime.h"
 #include "CClientVariables.h"
 #include "CCommands.h"
 #include "CFileSystemHook.h"
@@ -83,6 +82,7 @@ extern class CGraphics* g_pGraphics;
 class CCore : public CCoreInterface, public CSingleton < CCore >
 {
 public:
+    ZERO_ON_NEW
                             CCore                           ( void );
                             ~CCore                          ( void );
 

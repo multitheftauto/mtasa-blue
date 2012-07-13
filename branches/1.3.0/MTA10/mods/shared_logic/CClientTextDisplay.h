@@ -18,7 +18,6 @@ class CClientTextDisplay;
 
 #include "CClientDisplay.h"
 #include "CClientDisplayManager.h"
-#include "CClientTime.h"
 #include <gui/CGUI.h>
 
 class CClientTextDisplay: public CClientDisplay

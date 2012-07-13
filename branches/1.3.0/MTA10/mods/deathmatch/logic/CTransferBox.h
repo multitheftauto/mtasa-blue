@@ -52,7 +52,7 @@ private:
     bool                                m_bMultipleDownloads;
 
     unsigned int                        m_uiVisible;
-    unsigned long                       m_ulTime;
+    CElapsedTime                        m_AnimTimer;
     double                              m_dTotalSize;
 };
 

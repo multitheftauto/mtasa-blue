@@ -933,10 +933,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientTime.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CClientTXD.cpp"
 					>
 				</File>
@@ -2476,10 +2472,6 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientTexture.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientTime.h"
 					>
 				</File>
 				<File

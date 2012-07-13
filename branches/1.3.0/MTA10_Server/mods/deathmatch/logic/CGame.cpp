@@ -97,7 +97,6 @@ CGame::CGame ( void )
 
     // Initialize random number generator and time
     RandomizeRandomSeed ();
-    InitializeTime ();
 
     m_bBeingDeleted = false;
     m_pUnoccupiedVehicleSync = NULL;

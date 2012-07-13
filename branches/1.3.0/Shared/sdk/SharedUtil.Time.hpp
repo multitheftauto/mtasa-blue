@@ -10,12 +10,11 @@
 *
 *****************************************************************************/
 
-#undef GetTickCount
-
 #ifndef WIN32
-    unsigned long GetTickCount ( void );
     #include "sys/time.h"
 #endif
+
+unsigned long GetTickCountInternal ( void );
 
 //
 // Retrieves the number of milliseconds that have elapsed since the function was first called (plus a little bit to make it look good).
@@ -24,8 +23,8 @@
 //
 uint SharedUtil::GetTickCount32 ( void )
 {
-    static const uint ulInitial = GetTickCount () - ( GetTickCount () % 300000 + 200000 );
-    uint ulNow = GetTickCount ();
+    static const uint ulInitial = GetTickCountInternal () - ( GetTickCountInternal () % 300000 + 200000 );
+    uint ulNow = GetTickCountInternal ();
     return ulNow - ulInitial;
 }
 
@@ -186,7 +185,7 @@ void SharedUtil::UpdateModuleTickCount64 ( void )
 
 // Apple / Darwin platforms with Mach monotonic clock support
 #include <mach/mach_time.h>
-unsigned long GetTickCount ( void )
+unsigned long GetTickCountInternal ( void )
 {
     mach_timebase_info_data_t info;
 
@@ -204,7 +203,7 @@ unsigned long GetTickCount ( void )
 #elif !defined(WIN32)
 
 // BSD / Linux platforms with POSIX monotonic clock support
-unsigned long GetTickCount ( void )
+unsigned long GetTickCountInternal ( void )
 {
     #if !defined(CLOCK_MONOTONIC)
     #error "This platform does not have monotonic clock support."
@@ -238,11 +237,25 @@ unsigned long GetTickCount ( void )
     long long llMilliseconds = ( ( long long ) now.tv_sec ) * 1000 + now.tv_usec / 1000;
     return llMilliseconds;
 }
+
+#else
+
+// Win32 platforms
+#include <Mmsystem.h>
+#pragma comment(lib, "Winmm.lib")
+unsigned long GetTickCountInternal ( void )
+{
+    // Uses timeGetTime() as Win32 GetTickCount() has a resolution of 16ms.
+    //   (timeGetTime() has a resolution is 1ms assuming timeBeginPeriod(1) has been called at startup).
+    return timeGetTime ();
+}
+
 #endif
 
 
 // Get time in microseconds
 #ifdef WIN32
+// Due to issues with QueryPerformanceCounter, this function should only be used for profiling
 TIMEUS SharedUtil::GetTimeUs()
 {
     static bool bInitialized = false;
