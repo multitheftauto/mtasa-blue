@@ -73,7 +73,6 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner )
     m_pLuaTimerManager = new CLuaTimerManager;
 
     // Set up the name of our script
-    m_ulFunctionEnterTime = 0;
     m_iOwner = OWNER_SERVER;
     
     m_pResource = pResourceOwner;
@@ -107,7 +106,7 @@ bool CLuaMain::BeingDeleted ( void )
 
 void CLuaMain::ResetInstructionCount ( void )
 {
-    m_ulFunctionEnterTime = timeGetTime ();
+    m_FunctionEnterTimer.Reset ();
 }
 
 
@@ -172,7 +171,7 @@ void CLuaMain::InstructionCountHook ( lua_State* luaVM, lua_Debug* pDebug )
     if ( pLuaMain )
     {
         // Above max time?
-        if ( timeGetTime () >= pLuaMain->m_ulFunctionEnterTime + HOOK_MAXIMUM_TIME )
+        if ( pLuaMain->m_FunctionEnterTimer.Get () > HOOK_MAXIMUM_TIME )
         {
             // Print it in the console
             CLogger::ErrorPrintf ( "Infinite/too long execution (%s)", pLuaMain->GetScriptName () );

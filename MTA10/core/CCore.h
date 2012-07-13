@@ -22,7 +22,6 @@ class CCore;
 
 #include "../version.h"
 
-#include "CClientTime.h"
 #include "CClientVariables.h"
 #include "CCommands.h"
 #include "CFileSystemHook.h"

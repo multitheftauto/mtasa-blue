@@ -663,10 +663,10 @@ void CMapManager::SpawnPlayer ( CPlayer& Player, const CVector& vecPosition, flo
 void CMapManager::DoRespawning ( void )
 {
     // Time to do the next search for respawnable things?
-    if ( GetTime () >= m_ulLastRespawnTime + 1000 )
+    if ( GetTickCount32 () >= m_ulLastRespawnTime + 1000 )
     {
         // Update the time
-        m_ulLastRespawnTime = GetTime ();
+        m_ulLastRespawnTime = GetTickCount32 ();
 
         // Do the respawning
         DoPickupRespawning ();
