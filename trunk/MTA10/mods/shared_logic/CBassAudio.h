@@ -51,7 +51,7 @@ class CBassAudio
 public:
     ZERO_ON_NEW
                             CBassAudio              ( bool bStream, const SString& strPath, bool bLoop, bool b3D );
-                            ~CBassAudio             ( void );
+    void                    Destroy                 ( void );
 
     bool                    BeginLoadingMedia       ( void );
 
@@ -85,6 +85,8 @@ public:
     void                    SetSoundBPM             ( float fBPM )                                              { m_fBPM = fBPM;}
 
 protected:
+                            ~CBassAudio             ( void );
+    static void             DestroyInternal         ( CBassAudio* pBassAudio );
     HSTREAM                 ConvertFileToMono       ( const SString& strPath );
     static void             PlayStreamIntern        ( void* arguments );
     void                    CompleteStreamConnect   ( HSTREAM pSound );
