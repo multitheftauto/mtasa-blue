@@ -63,7 +63,7 @@ CClientWeapon::~CClientWeapon ( void )
 
 void CClientWeapon::DoPulse ( void )
 {
-    if ( m_bHasTargetDirection )
+    /*if ( m_bHasTargetDirection )
     {
         CVector vecDirection = m_vecLastDirection;
         CVector vecOffset = m_vecTargetDirection - vecDirection;
@@ -72,7 +72,7 @@ void CClientWeapon::DoPulse ( void )
         vecDirection.Normalize ();
         m_vecLastDirection = vecDirection;
         SetDirection ( vecDirection );
-    }
+    }*/
 
     if ( m_State == WEAPONSTATE_FIRING ) Fire ();
 }
@@ -183,7 +183,7 @@ void CClientWeapon::Fire ( void )
                 CVector vecDirection ( 1, 0, 0 );
                 vecDirection *= fDistance;
                 RotateVector ( vecDirection, vecRotation );
-                CVector vecTarget = vecOrigin + vecDirection;
+                vecTarget = vecOrigin + vecDirection;
             }
 
 
