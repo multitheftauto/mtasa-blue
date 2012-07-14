@@ -63,6 +63,18 @@ CBassAudio::~CBassAudio ( void )
 #endif
 }
 
+//
+// As BASS_ChannelStop can cause a brief pause, do delete on another thread
+//
+void CBassAudio::Destroy ( void )
+{
+    CreateThread ( NULL, 0, reinterpret_cast <LPTHREAD_START_ROUTINE> ( &CBassAudio::DestroyInternal ), this, 0, NULL );
+}
+
+void CBassAudio::DestroyInternal ( CBassAudio* pBassAudio )
+{
+    delete pBassAudio;
+}
 
 //
 // This will return false for non streams if the file is not correct

@@ -161,7 +161,7 @@ void CClientSound::Destroy ( void )
 
     BeginSimulationOfPlayPosition ();
 
-    delete m_pAudio;
+    m_pAudio->Destroy ();
     m_pAudio = NULL;
 }
 
