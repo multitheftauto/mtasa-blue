@@ -250,7 +250,24 @@ int CLuaFunctionDefs::GetTimers ( lua_State* luaVM )
             lua_newtable ( luaVM );
 
             // Add all the timers with less than ulTime left
-            pLuaMain->GetTimerManager ()->GetTimers ( CTickCount ( dTime ), pLuaMain );
+            CLuaTimerManager* pLuaTimerManager = pLuaMain->GetTimerManager ();
+            CTickCount llCurrentTime = CTickCount::Now ();
+            unsigned int uiIndex = 0;
+            std::vector < CLuaTimer* > ::const_iterator iter = pLuaTimerManager->IterBegin ();
+            for ( ; iter != pLuaTimerManager->IterEnd () ; iter++ )
+            {
+                CLuaTimer* pLuaTimer = *iter;
+
+                // If the time left is less than the time specified, or the time specifed is 0
+                CTickCount llTimeLeft = ( pLuaTimer->GetStartTime () + pLuaTimer->GetDelay () ) - llCurrentTime;
+                if ( dTime == 0 || llTimeLeft.ToDouble () <= dTime )
+                {
+                    // Add it to the table
+                    lua_pushnumber ( luaVM, ++uiIndex );
+                    lua_pushtimer ( luaVM, pLuaTimer );
+                    lua_settable ( luaVM, -3 );
+                }
+            }
             return 1;
         }
     }
