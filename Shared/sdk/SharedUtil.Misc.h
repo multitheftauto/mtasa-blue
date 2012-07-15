@@ -244,6 +244,18 @@ namespace SharedUtil
     //
 
     template < class TL, class T >
+    void ListRemove ( TL& itemList, const T& item )
+    {
+        typename TL ::iterator it = itemList.begin ();
+        for ( ; it != itemList.end () ; ++it )
+            if ( item == *it )
+            {
+                itemList.erase ( it );
+                break;
+            }
+    }
+
+    template < class TL, class T >
     bool ListContains ( const TL& itemList, const T& item );
 
     // Add item if it does not aleady exist in itemList
@@ -281,19 +293,6 @@ namespace SharedUtil
     //
     // std::vector helpers
     //
-
-    // Remove first occurrence of item from itemList
-    template < class T >
-    void ListRemove ( std::vector < T >& itemList, const T& item )
-    {
-        typename std::vector < T > ::iterator it = itemList.begin ();
-        for ( ; it != itemList.end () ; ++it )
-            if ( item == *it )
-            {
-                itemList.erase ( it );
-                break;
-            }
-    }
 
     // Remove item at index from itemList
     template < class T >

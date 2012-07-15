@@ -20,7 +20,6 @@ CLuaTimer::CLuaTimer ( const CLuaFunctionRef& iLuaFunction, const CLuaArguments&
     m_uiRepeats = 1;
     m_iLuaFunction = iLuaFunction;
     m_Arguments = Arguments;
-    m_bBeingDeleted = false;
 }
 
 
