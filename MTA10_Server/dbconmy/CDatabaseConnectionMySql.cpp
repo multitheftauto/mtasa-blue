@@ -433,6 +433,7 @@ int CDatabaseConnectionMySql::ConvertToSqliteType ( enum_field_types type )
 	    case MYSQL_TYPE_INT24:
 	    case MYSQL_TYPE_SHORT:
         case MYSQL_TYPE_LONG:
+        case MYSQL_TYPE_TINY:
             return SQLITE_INTEGER;
 
 	    case MYSQL_TYPE_FLOAT:
