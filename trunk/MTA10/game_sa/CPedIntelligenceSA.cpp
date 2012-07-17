@@ -123,6 +123,9 @@ void CPedIntelligenceSA::DischargeCurrentWeapon ( bool bAllowReloadAnimation )
     // Flag for shot
     pTaskUseGun->m_nFireGunThisFrame = 1;
 
+    // Limit number of damage events to prevent double hits
+    g_pCore->GetMultiplayer ()->SetDamageEventLimit ( 1 );
+
     // Do shot
     CPedSAInterface* dwPedInterface = ( CPedSAInterface* ) ped->GetInterface ();
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_SetPedPosition;
@@ -132,4 +135,6 @@ void CPedIntelligenceSA::DischargeCurrentWeapon ( bool bAllowReloadAnimation )
         push    dwPedInterface
         call    dwFunc
     }
+
+    g_pCore->GetMultiplayer ()->SetDamageEventLimit ( -1 );
 }
