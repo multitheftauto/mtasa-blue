@@ -701,6 +701,12 @@ void _declspec(naked) HOOK_CWeapon__Fire_Sniper()
 
 }
 
+int g_iDamageEventCountLimit = -1;
+void CMultiplayerSA::SetDamageEventLimit ( int iLimit )
+{
+    g_iDamageEventCountLimit = iLimit;
+}
+
 bool ProcessDamageEvent ( CEventDamageSAInterface * event, CPedSAInterface * affectsPed )
 {
     if ( m_pDamageHandler && event )
@@ -713,6 +719,23 @@ bool ProcessDamageEvent ( CEventDamageSAInterface * event, CPedSAInterface * aff
         {
             // This creates a CEventDamageSA for us
             CEventDamage * pEvent = pGameInterface->GetEventList ()->GetEventDamage ( event );
+
+            // Hack to stop double hits when using bullet sync.
+            // Check is pass 1
+            if ( pEvent->GetDamageApplied () == 0 )
+            {
+                // If flag != -1, then apply limit
+                if ( g_iDamageEventCountLimit != -1 )
+                {
+                    if ( g_iDamageEventCountLimit == 0 )
+                    {
+                        pEvent->Destroy ();
+                        return false;
+                    }
+                    g_iDamageEventCountLimit--;
+                }
+            }
+
             // Call the event
             bool bReturn = m_pDamageHandler ( pPed, pEvent );
             // Destroy the CEventDamageSA (so we dont get a leak)

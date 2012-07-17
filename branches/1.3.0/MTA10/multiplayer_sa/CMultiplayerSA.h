@@ -200,6 +200,7 @@ public:
     virtual void                GetRwResourceStats          ( SRwResourceStats& outStats );
     virtual void                GetClothesCacheStats        ( SClothesCacheStats& outStats );
     virtual CEntitySAInterface* GetRenderingGameEntity      ( void );
+    virtual void                SetDamageEventLimit         ( int iLimit );
 
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;
