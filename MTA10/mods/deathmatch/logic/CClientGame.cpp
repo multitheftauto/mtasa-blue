@@ -264,6 +264,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetGameVehicleDestructHandler( CClientGame::StaticGameVehicleDestructHandler );
     g_pMultiplayer->SetGamePlayerDestructHandler( CClientGame::StaticGamePlayerDestructHandler );
     g_pMultiplayer->SetGameModelRemoveHandler( CClientGame::StaticGameModelRemoveHandler );
+    g_pMultiplayer->SetGameEntityRenderHandler( CClientGame::StaticGameEntityRenderHandler );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( CClientGame::StaticKeyStrokeHandler );
@@ -412,6 +413,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetGameVehicleDestructHandler( NULL );
     g_pMultiplayer->SetGamePlayerDestructHandler( NULL );
     g_pMultiplayer->SetGameModelRemoveHandler( NULL );
+    g_pMultiplayer->SetGameEntityRenderHandler( NULL );
     g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
@@ -3587,6 +3589,15 @@ void CClientGame::StaticGamePlayerDestructHandler ( CEntitySAInterface* pPlayer 
 void CClientGame::StaticGameModelRemoveHandler ( ushort usModelId )
 {
     g_pClientGame->GameModelRemoveHandler ( usModelId );
+}
+
+void CClientGame::StaticGameEntityRenderHandler ( CEntitySAInterface* pGameEntity )
+{
+    // Map to client entity and pass to the texture replacer
+    CClientEntity* pClientEntity = NULL;
+    if ( pGameEntity )
+        pClientEntity = g_pClientGame->GetGameEntityXRefManager ()->FindClientEntity ( pGameEntity );
+    g_pGame->GetRenderWare ()->SetRenderingClientEntity ( pClientEntity );
 }
 
 void CClientGame::DrawRadarAreasHandler ( void )

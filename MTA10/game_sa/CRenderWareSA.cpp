@@ -15,6 +15,7 @@
 
 #include "StdInc.h"
 #include "gamesa_renderware.h"
+#include "CRenderWareSA.ShaderMatching.h"
 
 extern CGameSA * pGame;
 
@@ -168,8 +169,6 @@ static RpAtomic* LoadAtomicsCB (RpAtomic * atomic, SLoadAtomics * data)
 
 CRenderWareSA::CRenderWareSA ( eGameVersion version )
 {
-    m_pfnWatchCallback = NULL;
-
     // Version dependant addresses
     switch ( version )
     {
@@ -343,8 +342,14 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
     }
 
     InitTextureWatchHooks ();
+    m_pMatchChannelManager = new CMatchChannelManager ();
 }
 
+
+CRenderWareSA::~CRenderWareSA ( void )
+{
+    SAFE_DELETE ( m_pMatchChannelManager );
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1032,3 +1037,16 @@ const SString& CRenderWareSA::GetTextureName ( CD3DDUMMY* pD3DData )
     return strDummy;
 }
 
+
+//
+// CFastHashMap functions
+//
+CD3DDUMMY* GetEmptyMapKey ( CD3DDUMMY** )
+{
+    return (CD3DDUMMY*)-1;
+}
+
+CD3DDUMMY* GetDeletedMapKey ( CD3DDUMMY** )
+{
+    return (CD3DDUMMY*)-2;
+}

@@ -17,6 +17,7 @@
 
 class CD3DDUMMY;
 class CSHADERDUMMY;
+class CClientEntityBase;
 
 typedef void (*PFN_WATCH_CALLBACK) ( CSHADERDUMMY* pContext, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld );
 
@@ -44,13 +45,17 @@ class CRenderWare {
     virtual void                ReplaceWeaponModel          ( RpClump * pNew, unsigned short usModelID ) = 0;
     virtual void                ReplacePedModel             ( RpClump * pNew, unsigned short usModelID ) = 0;
     virtual bool                ReplacePartModels           ( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szName ) = 0;
-    virtual void                InitWorldTextureWatch       ( PFN_WATCH_CALLBACK pfnWatchCallback ) = 0;
-    virtual bool                AddWorldTextureWatch        ( CSHADERDUMMY* pShaderData, const char* strMatch, float fShaderPriority ) = 0;
-    virtual void                RemoveWorldTextureWatch     ( CSHADERDUMMY* pShaderData, const char* strMatch ) = 0;
-    virtual void                RemoveWorldTextureWatchByContext ( CSHADERDUMMY* pShaderData ) = 0;
     virtual void                PulseWorldTextureWatch      ( void ) = 0;
     virtual void                GetModelTextureNames        ( std::vector < SString >& outNameList, ushort usModelID ) = 0;
     virtual const SString&      GetTextureName              ( CD3DDUMMY* pD3DData ) = 0;
+
+    virtual void                SetRenderingClientEntity    ( CClientEntityBase* pClientEntity ) = 0;
+    virtual CSHADERDUMMY*       GetAppliedShaderForD3DData  ( CD3DDUMMY* pD3DData ) = 0;
+    virtual void                AppendAdditiveMatch         ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch, float fShaderPriority, uint uiShaderCreateTime ) = 0;
+    virtual void                AppendSubtractiveMatch      ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch ) = 0;
+    virtual void                RemoveClientEntityRefs      ( CClientEntityBase* pClientEntity ) = 0;
+    virtual void                RemoveShaderRefs            ( CSHADERDUMMY* pShaderItem ) = 0;
 };
+
 
 #endif
