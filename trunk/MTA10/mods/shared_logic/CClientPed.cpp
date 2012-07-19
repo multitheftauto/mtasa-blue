@@ -2066,7 +2066,7 @@ eMovementState CClientPed::GetMovementState ( void )
             return MOVEMENTSTATE_JUMP;
 
         // Is he falling?
-        else if ( !IsOnGround() )
+        else if ( !IsOnGround() && !GetContactEntity() )
             return MOVEMENTSTATE_FALL;
 
         // Grab his controller state
