@@ -438,6 +438,7 @@ int CDatabaseConnectionMySql::ConvertToSqliteType ( enum_field_types type )
 
 	    case MYSQL_TYPE_FLOAT:
         case MYSQL_TYPE_DOUBLE:
+        case MYSQL_TYPE_DECIMAL:
             return SQLITE_FLOAT;
 
         case MYSQL_TYPE_TINY_BLOB:
