@@ -38,7 +38,7 @@
 
 #include <net/CNet.h>
 #include <multiplayer/CMultiplayer.h>
-// Game can not be included here because of conflicting classnames (CText)
+#include <game/CGame.h>
 
 // Core-level includes
 #define MTA_CLIENT

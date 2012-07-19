@@ -472,7 +472,8 @@ private:
     static void                         StaticGameVehicleDestructHandler    ( CEntitySAInterface* pVehicle );
     static void                         StaticGamePlayerDestructHandler     ( CEntitySAInterface* pPlayer );
     static void                         StaticGameModelRemoveHandler        ( ushort usModelId );
-    static void                         StaticWorldSoundHandler        ( uint uiGroup, uint uiIndex );
+    static void                         StaticWorldSoundHandler         ( uint uiGroup, uint uiIndex );
+    static void                         StaticGameEntityRenderHandler   ( CEntitySAInterface* pEntity );
 
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
     void                                FireHandler                     ( CFire* pFire );

@@ -705,6 +705,12 @@ bool CGameSA::HasCreditScreenFadedOut ( void )
 void CGameSA::FlushPendingRestreamIPL ( void )
 {
     CModelInfoSA::StaticFlushPendingRestreamIPL ();
+    m_pRenderWare->ResetStats ();
+}
+
+void CGameSA::GetShaderReplacementStats ( SShaderReplacementStats& outStats )
+{
+    m_pRenderWare->GetShaderReplacementStats ( outStats );
 }
 
 // Ensure models have the default lod distances

@@ -10,7 +10,6 @@
 *
 *****************************************************************************/
 
-struct SNameMatchInfo;
 
 //
 // CRenderItemManager
@@ -56,13 +55,8 @@ public:
     void                        UpdateBackBufferCopySize            ( void );
     void                        ChangeRenderTarget                  ( uint uiSizeX, uint uiSizeY, IDirect3DSurface9* pD3DRenderTarget, IDirect3DSurface9* pD3DZStencilSurface );
     void                        RemoveShaderItemFromWatchLists      ( CShaderItem* pShaderItem );
-    void                        WatchCallback                       ( CSHADERDUMMY* pShaderItem, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld );
-    static void                 StaticWatchCallback                 ( CSHADERDUMMY* pShaderItem, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld );
     void                        UpdateMemoryUsage                   ( void );
     bool                        CanCreateRenderItem                 ( ClassId classId );
-    SNameMatchInfo*             GetNameMatchInfo                    ( const SString& strTextureNameMatch );
-    void                        RemoveNameMatchInfo                 ( SNameMatchInfo* pNameMatchInfo );
-    CClientEntityBase*          GetRenderingClientEntity            ( void );
 
     static int                  GetBitsPerPixel                     ( D3DFORMAT Format );
     static int                  CalcD3DResourceMemoryKBUsage        ( IDirect3DResource9* pD3DResource );
@@ -83,13 +77,8 @@ protected:
     uint                                        m_uiBackBufferCopyRevision;
     std::set < CD3DDUMMY* >                     m_FrameTextureUsage;
     std::set < CD3DDUMMY* >                     m_PrevFrameTextureUsage;
-
-    // Shaders applied to world textures
-    std::map < CD3DDUMMY*, SNameMatchInfo* >    m_D3DDataShaderMap;
     class CRenderWare*                          m_pRenderWare;
     CEffectCloner*                              m_pEffectCloner;
-    std::map < SString, SNameMatchInfo* >       m_NameMatchInfoMap;
-
     eDxTestMode                                 m_TestMode;
     SString                                     m_strVideoCardName;
     int                                         m_iVideoCardMemoryKBTotal;
