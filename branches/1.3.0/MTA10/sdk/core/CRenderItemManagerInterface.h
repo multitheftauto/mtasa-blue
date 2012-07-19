@@ -342,6 +342,8 @@ class CShaderItem : public CMaterialItem
 
     CEffectWrap*        m_pEffectWrap;
     float               m_fPriority;
+    uint                m_uiCreateTime;
+    static uint         ms_uiCreateTimeCounter;
     float               m_fMaxDistanceSq;
 
     // This is used as the current render material

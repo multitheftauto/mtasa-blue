@@ -10,6 +10,15 @@
 *
 *****************************************************************************/
 
+#ifdef MTA_DEBUG
+    // Comment out the lines below for your desired debug options
+    //#define SHADER_DEBUG_CHECKS         // Do lots of validation which can slow a debug build
+    //#define SHADER_DEBUG_OUTPUT         // Output lots of debug strings
+#endif
+
+class CMatchChannel;
+class CMatchChannelManager;
+struct STexNameInfo;
 
 //
 // Info on how a texture is identified.
@@ -30,12 +39,12 @@ struct STexTag
     {
     }
 
-    bool Matches ( ushort usTxdId ) const
+    bool operator== ( ushort usTxdId ) const
     {
         return m_bUsingTxdId && usTxdId == m_usTxdId;
     }
 
-    bool Matches ( RwTexture* pTex ) const
+    bool operator== ( RwTexture* pTex ) const
     {
         return !m_bUsingTxdId && pTex == m_pTex;
     }
@@ -43,6 +52,24 @@ struct STexTag
     const bool          m_bUsingTxdId;
     const ushort        m_usTxdId;      // Streamed textures are identified using the TXD id
     const RwTexture*    m_pTex;         // Custom textures are identified using the RwTexture pointer
+};
+
+
+//
+// Info about an active shader which can replace textures
+//
+struct SShaderInfo
+{
+    SShaderInfo ( CSHADERDUMMY* pShaderData, float fOrderPriority, uint uiShaderCreateTime )
+        : pShaderData ( pShaderData )
+        , fOrderPriority ( fOrderPriority )
+        , uiShaderCreateTime ( uiShaderCreateTime )
+    {
+    }
+
+    CSHADERDUMMY* const         pShaderData;
+    const float                 fOrderPriority;
+    const uint                  uiShaderCreateTime;
 };
 
 
@@ -55,80 +82,56 @@ struct STexInfo
         : texTag ( texTag )
         , strTextureName ( strTextureName.ToLower () )
         , pD3DData ( pD3DData )
-        , pAssociatedShadInfo ( NULL )
+        , pAssociatedTexNameInfo ( NULL )
     {
     }
     STexTag                 texTag;
     const SString           strTextureName;         // Always lower case
     CD3DDUMMY* const        pD3DData;
-    struct SShadInfo*       pAssociatedShadInfo;    // The shader which is currently replacing this texture
-};
-
-
-
-//
-// Either an additive or subtractive wildcard match string
-//
-struct SMatchType
-{
-    SMatchType ( const SString& strMatch, bool bAdditive )
-        : strMatch ( strMatch )
-        , bAdditive ( bAdditive )
-    {
-    }
-    SString strMatch;
-    bool    bAdditive;
+    STexNameInfo*           pAssociatedTexNameInfo;
 };
 
 
 //
-// Info about an active shader which can replace textures
+// Shader replacement, sort of cached
 //
-struct SShadInfo
+struct STexShaderReplacement
 {
-    SShadInfo ( CSHADERDUMMY* pShaderData, float fOrderPriority )
-        : pShaderData ( pShaderData )
-        , fOrderPriority ( fOrderPriority )
+    STexShaderReplacement ( void ) : bSet ( false ), pShaderInfo ( NULL ) {}
+    bool bSet;
+    SShaderInfo* pShaderInfo;
+};
+
+
+//
+// Info about a persistent texture
+//
+struct STexNameInfo
+{
+    STexNameInfo ( const SString& strTextureName )
+        : strTextureName ( strTextureName.ToLower () )
     {
+#ifdef SHADER_DEBUG_CHECKS
+        iDebugCounter1 = 0;
+        iDebugCounter2 = 0;
+#endif
     }
 
-    //
-    // Return true if texture name results in an Add
-    //
-    bool IsAdditiveMatch ( const SString& strTextureName ) const
+    void ResetReplacementResults ( void )
     {
-        bool bIsMatch = false;
-        for ( std::vector < SMatchType > ::const_iterator iter = matchTypeList.begin () ; iter != matchTypeList.end () ; ++iter )
-            if ( WildcardMatch ( iter->strMatch, strTextureName ) )
-                bIsMatch = iter->bAdditive;
-
-        return bIsMatch;
+        texNoEntityShader = STexShaderReplacement ();
+        texEntityShaderMap.clear ();
     }
 
-    //
-    // Append a new match to the end of the match type list
-    //
-    void AppendMatchType ( const SString& strMatch, bool bAdditive )
-    {
-        // Delete any previous matches
-        for ( std::vector < SMatchType > ::const_iterator iter = matchTypeList.begin () ; iter != matchTypeList.end () ; )
-        {
-            if ( strMatch == iter->strMatch )
-                iter = matchTypeList.erase ( iter );
-            else
-                ++iter;
-        }
+    const SString                                       strTextureName;         // Always lower case
+    std::set < STexInfo* >                              usedByTexInfoList;
 
-        // Append to end
-        matchTypeList.push_back ( SMatchType ( strMatch, bAdditive ) );
+    std::set < CMatchChannel* >                             matchChannelList;
+    STexShaderReplacement                                   texNoEntityShader;
+    std::map < CClientEntityBase*, STexShaderReplacement >  texEntityShaderMap;
 
-        // All subtractive matches at the start can be deleted
-        while ( !matchTypeList.empty () && !matchTypeList[0].bAdditive )
-            matchTypeList.erase ( matchTypeList.begin () );
-    }
-
-    std::vector < SMatchType >  matchTypeList;          // List of additive and subtractive wildcard match strings
-    CSHADERDUMMY* const         pShaderData;
-    const float                 fOrderPriority;
-    std::set < STexInfo* >      associatedTexInfoMap;   // The list of textures this shader is currently replacing
+#ifdef SHADER_DEBUG_CHECKS
+    int iDebugCounter1;
+    int iDebugCounter2;
+#endif
 };
