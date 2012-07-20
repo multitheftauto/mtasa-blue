@@ -656,7 +656,8 @@ bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword 
             m_Server.SetPassword ( szPassword );
 
         // Display the status box<<<<<
-        g_pCore->ShowMessageBox ( "Local Server", "Starting local server ...", MB_ICON_INFO );
+        m_OnCancelLocalGameClick = GUI_CALLBACK ( &CClientGame::OnCancelLocalGameClick, this );
+        g_pCore->ShowMessageBox ( "Local Server", "Starting local server ...", MB_BUTTON_CANCEL | MB_ICON_INFO, &m_OnCancelLocalGameClick );
     }
     else
     {
@@ -669,6 +670,15 @@ bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword 
     return true;
 }
 
+bool CClientGame::OnCancelLocalGameClick ( CGUIElement * pElement )
+{
+    if ( m_bLocalPlay && m_bWaitingForLocalConnect )
+    {
+        g_pCore->ShowMessageBox ( "Local Server", "Canceling local server. Please wait ...", MB_ICON_INFO );
+        return m_Server.Send ( "exit" );
+    }
+    return false;
+}
 
 void CClientGame::DoPulsePreFrame ( void )
 {   

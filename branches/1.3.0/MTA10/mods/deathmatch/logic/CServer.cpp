@@ -28,6 +28,7 @@ std::list < std::string > CServer::m_OutputQueue;
 #define ERROR_NO_NETWORK_LIBRARY 1
 #define ERROR_NETWORK_LIBRARY_FAILED 2
 #define ERROR_LOADING_MOD 3
+#define ERROR_STARTUP_QUIT 4
 
 static const SFixedArray < const char*, 4 > szServerErrors =
 {
@@ -187,8 +188,11 @@ bool CServer::Stop ( void )
         DWORD dwExitCode = 0;
         if ( GetExitCodeThread ( m_hThread, &dwExitCode ) )
         {
-            // Non-zero, output error
-            if ( dwExitCode != 0 )
+            // Handle non-zero exit codes
+            if ( dwExitCode == ERROR_STARTUP_QUIT )
+                g_pCore->RemoveMessageBox ();
+            else
+            if ( dwExitCode != ERROR_NO_ERROR )
             {
                 g_pCore->ShowMessageBox ( "Error", "Could not start the local server. See console for details.", MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pCore->GetConsole ()->Printf ( "Error: Could not start local server. [%s]", szServerErrors[GetLastError()] );

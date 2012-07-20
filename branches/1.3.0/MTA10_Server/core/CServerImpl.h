@@ -65,6 +65,7 @@ public:
     const char*         GetAbsolutePath     ( const char* szRelative, char* szBuffer, unsigned int uiBufferSize );
 
     void                Printf              ( const char* szText, ... );
+    bool                IsRequestingExit    ( void );
 
     int                 Run                 ( int iArgumentCount, char* szArguments [] );
 #ifndef WIN32

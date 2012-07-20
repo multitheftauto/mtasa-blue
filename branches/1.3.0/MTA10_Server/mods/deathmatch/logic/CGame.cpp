@@ -310,6 +310,7 @@ CGame::~CGame ( void )
     #else
         signal ( SIGTERM, SIG_DFL );
         signal ( SIGINT, SIG_DFL );
+        signal ( SIGPIPE, SIG_DFL );
     #endif
 }
 
@@ -680,7 +681,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     m_pResourceManager = new CResourceManager;
     m_pSettings = new CSettings ( m_pResourceManager );
-    m_pResourceManager->Refresh();
+    if ( !m_pResourceManager->Refresh() )
+        return false;   // Load cancelled
     m_pUnoccupiedVehicleSync = new CUnoccupiedVehicleSync ( m_pPlayerManager, m_pVehicleManager );
     m_pPedSync = new CPedSync ( m_pPlayerManager, m_pPedManager );
 #ifdef WITH_OBJECT_SYNC
@@ -742,6 +744,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     #else
         signal ( SIGTERM, &sighandler );
         signal ( SIGINT, &sighandler );
+        signal ( SIGPIPE, SIG_IGN );
     #endif
 
     // Add our builtin events
@@ -831,7 +834,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     // Now load the rest of the config
     if ( !m_pMainConfig->LoadExtended () )
-        return false;
+        return false;       // Fail or cancelled
 
     // Is the script debug log enabled?
     if ( m_pMainConfig->GetScriptDebugLogEnabled () )
