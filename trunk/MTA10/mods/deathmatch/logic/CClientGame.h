@@ -204,6 +204,7 @@ public:
     void                                SetupLocalGame                  ( const char* szConfig );
     //bool                                StartGame                       ( void );
     inline bool                         IsLocalGame                     ( ) const { return m_bLocalPlay; }
+    bool                                OnCancelLocalGameClick          ( CGUIElement* pElement );
 
     void                                DoPulsePreFrame                 ( void );
     void                                DoPulsePreHUDRender             ( bool bDidUnminimize, bool bDidRecreateRenderTargets );
@@ -720,6 +721,7 @@ private:
     CElapsedTime                        m_LastClearTime;
     SString                             m_strServerVersionSortable;
     std::set < eWeaponType >            m_weaponTypesUsingBulletSync;
+    GUI_CALLBACK                        m_OnCancelLocalGameClick;
 };
 
 extern CClientGame* g_pClientGame;

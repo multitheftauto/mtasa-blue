@@ -1796,6 +1796,9 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
     if ( uiUseRate < 1 )
         return DoReliablePulse ();
 
+    if ( m_DiagnosticDebug != EDiagnosticDebug::D3D_6732 )
+         Sleep( 1 );    // Make frame rate smoother maybe
+
     // Calc required time in ms between frames
     const double dTargetTimeToUse = 1000.0 / uiUseRate;
 

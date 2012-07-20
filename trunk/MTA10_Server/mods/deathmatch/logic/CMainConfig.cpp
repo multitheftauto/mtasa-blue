@@ -679,6 +679,9 @@ bool CMainConfig::LoadExtended ( void )
 
     do
     {
+        if ( g_pServerInterface->IsRequestingExit () )
+            return false;
+
         // Grab the current script node
         pNode = m_pRootNode->FindSubNode ( "resource", uiCurrentIndex++ );
         if ( pNode )

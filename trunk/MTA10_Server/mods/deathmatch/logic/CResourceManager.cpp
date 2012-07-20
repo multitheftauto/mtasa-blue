@@ -169,6 +169,9 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
 
             if ( bRefreshAll || !pResource || !pResource->CheckIfStartable() )
             {
+                if ( g_pServerInterface->IsRequestingExit () )
+                    return false;
+
                 // Add the resource
                 Load ( !info.bIsDir, info.strAbsPath, info.strName );
             }
