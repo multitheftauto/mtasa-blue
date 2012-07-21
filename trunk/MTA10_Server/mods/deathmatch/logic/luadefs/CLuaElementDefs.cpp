@@ -26,7 +26,6 @@ void CLuaElementDefs::LoadFunctions ( void )
     // Create/destroy
     CLuaCFunctions::AddFunction ( "createElement", CLuaElementDefs::createElement );
     CLuaCFunctions::AddFunction ( "destroyElement", CLuaElementDefs::destroyElement );
-    CLuaCFunctions::AddFunction ( "destroyShit", CLuaElementDefs::destroyElement );
     CLuaCFunctions::AddFunction ( "cloneElement", CLuaElementDefs::cloneElement );
 
     // Get
