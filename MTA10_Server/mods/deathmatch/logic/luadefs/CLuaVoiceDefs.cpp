@@ -33,7 +33,7 @@ int CLuaVoiceDefs::SetPlayerVoiceBroadcastTo ( lua_State* luaVM )
     CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
     if ( !pPlayer )
     {
-        m_pScriptDebugging->LogBadPointer ( luaVM, "setPlayerVoiceBroadcastTo", "player", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "player", 1 );
         lua_pushboolean ( luaVM, false );
         return 1;
     }
@@ -57,7 +57,7 @@ int CLuaVoiceDefs::SetPlayerVoiceBroadcastTo ( lua_State* luaVM )
         pPlayer->SetVoiceBroadcastTo ( NULL ); //Muted
     else
     {
-        m_pScriptDebugging->LogBadPointer ( luaVM, "setPlayerVoiceBroadcastTo", "broadcastTo", 2 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "broadcastTo", 2 );
         lua_pushboolean ( luaVM, false );
         return 1;
     }
@@ -73,7 +73,7 @@ int CLuaVoiceDefs::setPlayerVoiceIgnoreFrom ( lua_State* luaVM )
     CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
     if ( !pPlayer )
     {
-        m_pScriptDebugging->LogBadPointer ( luaVM, "setPlayerVoiceIgnoreFrom", "player", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "player", 1 );
         lua_pushboolean ( luaVM, false );
         return 1;
     }
@@ -97,7 +97,7 @@ int CLuaVoiceDefs::setPlayerVoiceIgnoreFrom ( lua_State* luaVM )
         pPlayer->SetVoiceIgnoredElement ( NULL ); // Remove all ignored
     else
     {
-        m_pScriptDebugging->LogBadPointer ( luaVM, "setPlayerVoiceIgnoreFrom", "ignoreFrom", 2 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "ignoreFrom", 2 );
         lua_pushboolean ( luaVM, false );
         return 1;
     }
