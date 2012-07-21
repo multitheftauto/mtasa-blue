@@ -80,7 +80,7 @@ int CLuaResourceDefs::createResource ( lua_State* luaVM )
         CResource* pNewResource = m_pResourceManager->CreateResource ( strNewResourceName, strNewOrganizationalPath, strStatus );
 
         if ( !strStatus.empty () )
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "createResource: %s", *strStatus ) );
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "%s: %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strStatus ) );
 
         if ( pNewResource )
         {
@@ -89,7 +89,7 @@ int CLuaResourceDefs::createResource ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createResource", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -112,7 +112,7 @@ int CLuaResourceDefs::copyResource ( lua_State* luaVM )
         CResource* pNewResource = m_pResourceManager->CopyResource ( pResource, strNewResourceName, strNewOrganizationalPath, strStatus );
 
         if ( !strStatus.empty () )
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "copyResource: %s", *strStatus ) );
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "%s: %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strStatus ) );
 
         if ( pNewResource )
         {
@@ -121,7 +121,7 @@ int CLuaResourceDefs::copyResource ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "copyResource", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -144,7 +144,7 @@ int CLuaResourceDefs::renameResource ( lua_State* luaVM )
         CResource* pNewResource = m_pResourceManager->RenameResource ( pResource, strNewResourceName, strNewOrganizationalPath, strStatus );
 
         if ( !strStatus.empty () )
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "renameResource: %s", *strStatus ) );
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "%s: %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strStatus ) );
 
         if ( pNewResource )
         {
@@ -153,7 +153,7 @@ int CLuaResourceDefs::renameResource ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "renameResource", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -174,13 +174,13 @@ int CLuaResourceDefs::deleteResource ( lua_State* luaVM )
         bool bResult = m_pResourceManager->DeleteResource ( strResourceName, strStatus );
 
         if ( !strStatus.empty () )
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "deleteResource: %s", *strStatus ) );
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "%s: %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strStatus ) );
 
         lua_pushboolean ( luaVM, bResult );
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "deleteResource", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -239,13 +239,13 @@ int CLuaResourceDefs::addResourceMap ( lua_State* luaVM )
                     }
                 }
                 else
-                    m_pScriptDebugging->LogError ( luaVM, "addResourceMap failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
+                    m_pScriptDebugging->LogError ( luaVM, "%s failed; ModifyOtherObjects in ACL denied resource %s to access %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
             }
             else
-                m_pScriptDebugging->LogBadType ( luaVM, "addResourceMap" );
+                m_pScriptDebugging->LogBadType ( luaVM );
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "addResourceMap" );
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -285,7 +285,7 @@ int CLuaResourceDefs::addResourceConfig ( lua_State* luaVM )
                         if ( stricmp ( szType, "client" ) == 0 )
                             iType = CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG;
                         else if ( stricmp ( szType, "server" ) != 0 )
-                            CLogger::LogPrintf ( "WARNING: Unknown config file type specified for addResourceConfig. Defaulting to 'server'" );
+                            CLogger::LogPrintf ( "WARNING: Unknown config file type specified for %s. Defaulting to 'server'", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
                     }
                     // Do we have permissions?
                     if ( pResource == pThisResource ||
@@ -307,7 +307,7 @@ int CLuaResourceDefs::addResourceConfig ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "addResourceConfig" );
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -337,7 +337,7 @@ int CLuaResourceDefs::removeResourceFile ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "addResourceConfig" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -463,7 +463,7 @@ int CLuaResourceDefs::startResource ( lua_State* luaVM )
 
                     if ( !m_pResourceManager->StartResource ( resource, NULL, bPersistent, bStartIncludedResources, bConfigs, bMaps, bScripts, bHTML, bClientConfigs, bClientScripts, bClientFiles ) )
                     {
-                        CLogger::LogPrintf ( "start: Failed to start resource '%s'\n", strResourceName.c_str () );
+                        CLogger::LogPrintf ( "%s: Failed to start resource '%s'\n", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), strResourceName.c_str () );
                         lua_pushboolean ( luaVM, false );
                         return 1;  
                     }
@@ -489,7 +489,7 @@ int CLuaResourceDefs::startResource ( lua_State* luaVM )
                                 }
                             }           
                         }
-                        CLogger::LogPrintf ( "start: Resource '%s' started\n", resource->GetName().c_str () );
+                        CLogger::LogPrintf ( "%s: Resource '%s' started\n", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), resource->GetName().c_str () );
                         lua_pushboolean ( luaVM, true );
                         return 1;
                     }
@@ -497,10 +497,10 @@ int CLuaResourceDefs::startResource ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "startResource", "resource", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "startResource" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -527,7 +527,7 @@ int CLuaResourceDefs::stopResource ( lua_State* luaVM )
                                                                 CAccessControlListRight::RIGHT_TYPE_FUNCTION,
                                                                 false ) )
                         {
-                            m_pScriptDebugging->LogError ( luaVM, "stop: Resource could not be stopped as it is protected" );
+                            m_pScriptDebugging->LogError ( luaVM, "%s: Resource could not be stopped as it is protected", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
                             lua_pushboolean ( luaVM, false );
                             return 1;
                         }
@@ -540,10 +540,10 @@ int CLuaResourceDefs::stopResource ( lua_State* luaVM )
                 }
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "stopResource", "resource", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "stopResource" );
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -622,10 +622,10 @@ int CLuaResourceDefs::restartResource ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "restartResource", "resource", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "restartResource" );
+        m_pScriptDebugging->LogBadType ( luaVM );
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -658,7 +658,7 @@ int CLuaResourceDefs::getResourceFromName ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getResourceFromName" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -700,10 +700,10 @@ int CLuaResourceDefs::getResourceState ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getResourceState", "resource", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getResourceState" );
+        m_pScriptDebugging->LogBadType ( luaVM );
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -730,10 +730,10 @@ int CLuaResourceDefs::getResourceInfo ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getResourceInfo", "resource", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getResourceInfo" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -773,16 +773,16 @@ int CLuaResourceDefs::setResourceInfo ( lua_State* luaVM )
                     }
                 }
                 else
-                    m_pScriptDebugging->LogError ( luaVM, "setResourceInfo failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
+                    m_pScriptDebugging->LogError ( luaVM, "%s failed; ModifyOtherObjects in ACL denied resource %s to access %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "setResourceInfo", "resource", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "setResourceInfo" );
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setResourceInfo" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -822,7 +822,7 @@ int CLuaResourceDefs::getResourceConfig ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getResourceConfig" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -843,10 +843,10 @@ int CLuaResourceDefs::getResourceLoadFailureReason ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getResourceLoadFailureReason", "resource", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getResourceLoadFailureReason" );
+        m_pScriptDebugging->LogBadType ( luaVM );
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -869,10 +869,10 @@ int CLuaResourceDefs::getResourceLastStartTime ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getResourceLastStartTime", "resource", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getResourceLastStartTime" );
+        m_pScriptDebugging->LogBadType ( luaVM );
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -895,10 +895,10 @@ int CLuaResourceDefs::getResourceLoadTime ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getResourceLoadTime", "resource", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getResourceLoadTime" );
+        m_pScriptDebugging->LogBadType ( luaVM );
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -919,10 +919,10 @@ int CLuaResourceDefs::getResourceName ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getResourceName", "resource", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getResourceName" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -949,7 +949,7 @@ int CLuaResourceDefs::getResourceRootElement ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "getResourceRootElement", "resource", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
 
     // Did we find a resource?
     if ( pResource )
@@ -967,7 +967,7 @@ int CLuaResourceDefs::getResourceRootElement ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getResourceRootElement" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -991,13 +991,13 @@ int CLuaResourceDefs::getResourceDynamicElementRoot ( lua_State* luaVM )
                 }
             }
             else
-                m_pScriptDebugging->LogError ( luaVM, "getResourceDynamicElementRoot: Resource %s Is Not Currently Running", pResource->GetName().c_str () );
+                m_pScriptDebugging->LogError ( luaVM, "%s: Resource %s Is Not Currently Running", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pResource->GetName().c_str () );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getResourceDynamicElementRoot", "resource", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getResourceDynamicElementRoot" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1025,16 +1025,16 @@ int CLuaResourceDefs::getResourceMapRootElement ( lua_State* luaVM )
                     }
                 }   
                 else
-                    m_pScriptDebugging->LogError ( luaVM, "getResourceMapRootElement: A Map Name Must Be Specified" );
+                    m_pScriptDebugging->LogError ( luaVM, "%s: A Map Name Must Be Specified", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
             }
             else
-                m_pScriptDebugging->LogError ( luaVM, "getResourceMapRootElement: Resource %s Is Not Currently Running", pResource->GetName().c_str () );
+                m_pScriptDebugging->LogError ( luaVM, "%s: Resource %s Is Not Currently Running", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pResource->GetName().c_str () );
         }
         else    
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getResourceMapRootElement", "resource", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getResourceMapRootElement" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1069,7 +1069,7 @@ int CLuaResourceDefs::getResourceExportedFunctions ( lua_State* luaVM )
         return 1;
     }
     
-    m_pScriptDebugging->LogBadType ( luaVM, "getResourceExportedFunctions" );
+    m_pScriptDebugging->LogBadType ( luaVM );
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -1148,18 +1148,18 @@ int CLuaResourceDefs::call ( lua_State* luaVM )
                         OldResourceRoot.Push ( targetLuaVM );
                         lua_setglobal ( targetLuaVM, "sourceResourceRoot" );
 
-                        m_pScriptDebugging->LogError ( luaVM, "call: failed to call '%s:%s'", resource->GetName ().c_str (), szFunctionName );
+                        m_pScriptDebugging->LogError ( luaVM, "%s: failed to call '%s:%s'", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), resource->GetName ().c_str (), szFunctionName );
                     }
                 }
             }
             else
-                m_pScriptDebugging->LogError ( luaVM, "call: Failed, the resource %s isn't running", resource->GetName ().c_str () );
+                m_pScriptDebugging->LogError ( luaVM, "%s: Failed, the resource %s isn't running", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), resource->GetName ().c_str () );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "call", "resource", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "call" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1227,7 +1227,7 @@ int CLuaResourceDefs::getResourceACLRequests  ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getResourceACLRequests", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1258,7 +1258,7 @@ int CLuaResourceDefs::updateResourceACLRequest ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "updateResourceACLRequest", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;

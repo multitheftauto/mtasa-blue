@@ -96,7 +96,9 @@ void CLuaCFunctions::RegisterFunctionsWithVM ( lua_State* luaVM )
     dense_hash_map < std::string, CLuaCFunction* >::iterator it;
     for ( it = ms_FunctionsByName.begin (); it != ms_FunctionsByName.end (); it++ )
     {
-        lua_register ( luaVM, it->first.c_str (), it->second->GetAddress () );
+        lua_pushstring ( luaVM, it->first.c_str () );
+        lua_pushcclosure ( luaVM, it->second->GetAddress (), 1 );
+        lua_setglobal ( luaVM, it->first.c_str () );
     }
 }
 
