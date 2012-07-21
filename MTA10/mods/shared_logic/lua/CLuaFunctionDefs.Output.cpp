@@ -33,7 +33,7 @@ int CLuaFunctionDefs::OutputConsole ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "outputConsole" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -83,7 +83,7 @@ int CLuaFunctionDefs::OutputChatBox ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "outputChatBox" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -107,7 +107,7 @@ int CLuaFunctionDefs::SetClipboard ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setClipboard" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -139,7 +139,7 @@ int CLuaFunctionDefs::ShowChat ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "showChat" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -194,7 +194,7 @@ int CLuaFunctionDefs::OutputClientDebugString ( lua_State* luaVM )
                     else
                     {
                         // specified something as the 3rd argument, but it can't be a number
-                        m_pScriptDebugging->LogBadType ( luaVM, "outputDebugString" );
+                        m_pScriptDebugging->LogBadType ( luaVM );
                     }
                 } // didn't spec a color
             } // wasn't level 0
@@ -202,7 +202,7 @@ int CLuaFunctionDefs::OutputClientDebugString ( lua_State* luaVM )
             // Too big level?
             if ( uiLevel > 3 )
             {
-                m_pScriptDebugging->LogWarning ( luaVM, "Bad level argument sent to outputDebugString (0-3)" );
+                m_pScriptDebugging->LogWarning ( luaVM, "Bad level argument sent to %s (0-3)", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
 
                 lua_pushboolean ( luaVM, false );
                 return 1;
@@ -236,7 +236,7 @@ int CLuaFunctionDefs::OutputClientDebugString ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "outputDebugString" );
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
 
     // Failed

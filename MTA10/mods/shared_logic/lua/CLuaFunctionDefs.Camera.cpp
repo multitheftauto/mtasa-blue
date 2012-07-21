@@ -169,7 +169,7 @@ int CLuaFunctionDefs::SetCameraMatrix ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setCameraMatrix" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -191,7 +191,7 @@ int CLuaFunctionDefs::SetCameraRotation ( lua_State* luaVM )
         }
 	}
 	else
-		m_pScriptDebugging->LogBadType( luaVM, "setCameraRotation" );
+		m_pScriptDebugging->LogBadType ( luaVM );
 	
 	lua_pushboolean( luaVM, false );
 	return 1;
@@ -213,10 +213,10 @@ int CLuaFunctionDefs::SetCameraTarget ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setCameraTarget", "target", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "target", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setCameraTarget" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -237,7 +237,7 @@ int CLuaFunctionDefs::SetCameraInterior ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setCameraInterior" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -287,7 +287,7 @@ int CLuaFunctionDefs::FadeCamera ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "fadeCamera" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;

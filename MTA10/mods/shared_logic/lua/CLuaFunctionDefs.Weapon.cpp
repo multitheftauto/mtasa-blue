@@ -34,7 +34,7 @@ int CLuaFunctionDefs::GetWeaponNameFromID ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getWeaponNameFromID" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -54,7 +54,7 @@ int CLuaFunctionDefs::GetSlotFromWeapon ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getSlotFromWeapon" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -75,7 +75,7 @@ int CLuaFunctionDefs::GetWeaponIDFromName ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getWeaponIDFromName" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;

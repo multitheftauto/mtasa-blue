@@ -38,9 +38,9 @@ public:
     void                            LogWarning                      ( lua_State* luaVM, const char* szFormat, ... );
     void                            LogError                        ( lua_State* luaVM, const char* szFormat, ... );
     void                            LogError                        ( SString strFile, int iLine, SString strMsg );
-    void                            LogBadPointer                   ( lua_State* luaVM, const char* szFunction, const char* szArgumentType, unsigned int uiArgument );
-    void                            LogBadType                      ( lua_State* luaVM, const char* szFunction );
-    void                            LogBadLevel                     ( lua_State* luaVM, const char* szFunction, unsigned int uiRequiredLevel );
+    void                            LogBadPointer                   ( lua_State* luaVM, const char* szArgumentType, unsigned int uiArgument );
+    void                            LogBadType                      ( lua_State* luaVM );
+    void                            LogBadLevel                     ( lua_State* luaVM, unsigned int uiRequiredLevel );
     void                            LogCustom                       ( lua_State* luaVM, const char* szMessage );
 
     bool                            SetLogfile                      ( const char* szFilename, unsigned int uiLevel );
