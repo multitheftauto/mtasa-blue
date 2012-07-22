@@ -240,6 +240,12 @@ static void Event_BulletImpact ( void )
                     vecDir.Normalize ();
                     *pBulletImpactEndPosition = *pBulletImpactStartPosition + vecDir * fRange;
                 }
+                // These two will be the same when shooting without aiming, so correct them
+                if ( vecLastLocalPlayerBulletStart == vecLastLocalPlayerBulletEnd )
+                {
+                    vecLastLocalPlayerBulletStart = *pBulletImpactStartPosition;
+                    vecLastLocalPlayerBulletEnd = *pBulletImpactEndPosition;
+                }
                 m_pBulletImpactHandler ( pInitiator, pVictim, &vecLastLocalPlayerBulletStart, &vecLastLocalPlayerBulletEnd );
             }
             else
