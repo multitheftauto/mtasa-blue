@@ -72,6 +72,7 @@ public:
     VOID SetDepth(FLOAT fDepth) { this->GetInterface()->fDepth = fDepth; };
 
     VOID Destroy() { if ( this->internalInterface ) delete this->internalInterface; delete this; }
+    float GetLightingForTimeOfDay ( void );
 };
 
 #endif

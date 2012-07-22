@@ -51,6 +51,7 @@ public:
     virtual VOID SetDepth(FLOAT fDepth)=0;
 
     virtual VOID Destroy()=0;
+    virtual float GetLightingForTimeOfDay ( void )=0;
 };
 
 #endif
