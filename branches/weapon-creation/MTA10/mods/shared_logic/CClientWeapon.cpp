@@ -166,7 +166,7 @@ void CClientWeapon::Fire ( void )
                     ResetWeaponTarget ( );
                 }
             }
-            if ( m_targetType == TARGET_TYPE_VECTOR )
+            else if ( m_targetType == TARGET_TYPE_VECTOR )
             {
                 vecTarget = m_vecTarget;
                 if ( m_weaponConfig.bShootIfTargetOutOfRange == false && (vecOrigin - vecTarget).Length() >= fDistance )
@@ -228,11 +228,12 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
     CColPoint * pColPoint = NULL;
     SLineOfSightBuildingResult pBuildingResult;
     CEntitySAInterface * pEntity = NULL;
-
+    
     if ( m_pWeapon->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pColEntity, m_weaponConfig.flags, &pBuildingResult, m_Type, &pEntity ) )
     {
         vecTarget = *pColPoint->GetPosition ();
     }
+
     if ( ( m_pTarget != NULL && m_pTarget->GetGameEntity ( ) != NULL && m_pTarget->GetGameEntity()->GetInterface ( ) == pEntity ) && m_weaponConfig.bShootIfTargetBlocked == false )
     {
         return;
