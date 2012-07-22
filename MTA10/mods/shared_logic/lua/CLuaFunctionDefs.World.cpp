@@ -161,7 +161,7 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
             CVector vecColNormal;
 
             int iMaterial = -1;
-            int iLighting = -1;
+            float fLighting = -1;
             int iPiece = -1;
 
             if ( pColPoint )
@@ -170,7 +170,7 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
                 vecColPosition = *pColPoint->GetPosition ();
                 vecColNormal = *pColPoint->GetNormal();
                 iMaterial = pColPoint->GetSurfaceTypeB(); //From test, only B function return relevant data
-                iLighting = pColPoint->GetLightingB();
+                fLighting = pColPoint->GetLightingForTimeOfDay();
                 iPiece = pColPoint->GetPieceTypeB();
 
                 // Delete the colpoint
@@ -194,7 +194,7 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
                 lua_pushnumber ( luaVM, vecColNormal.fZ );
 
                 lua_pushinteger ( luaVM, iMaterial );
-                lua_pushinteger ( luaVM, iLighting );
+                lua_pushnumber ( luaVM, fLighting );
                 lua_pushinteger ( luaVM, iPiece );
 
                 if ( bIncludeBuildingInfo && buildingResult.bValid )
