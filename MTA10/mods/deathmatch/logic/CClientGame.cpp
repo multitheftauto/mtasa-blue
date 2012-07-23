@@ -683,8 +683,9 @@ bool CClientGame::OnCancelLocalGameClick ( CGUIElement * pElement )
 {
     if ( m_bLocalPlay && m_bWaitingForLocalConnect )
     {
-        g_pCore->ShowMessageBox ( "Local Server", "Canceling local server. Please wait ...", MB_ICON_INFO );
-        return m_Server.Send ( "exit" );
+        g_pCore->RemoveMessageBox ();
+        g_pCore->GetModManager ()->RequestUnload ();
+        return true;
     }
     return false;
 }
