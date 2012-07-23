@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Server - Deathmatch"
 	ProjectGUID="{DC99F9D4-7C17-4A36-9F21-CEE075E42292}"
 	RootNamespace="Server - Deathmatch"
@@ -1269,6 +1269,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\luadefs\CLuaCameraDefs.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\luadefs\CLuaClassDefs.cpp"
 						>
 					</File>
 					<File
@@ -2542,6 +2546,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\luadefs\CLuaCameraDefs.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\luadefs\CLuaClassDefs.h"
 						>
 					</File>
 					<File
