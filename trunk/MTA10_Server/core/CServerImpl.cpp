@@ -330,7 +330,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
                         if ( m_bRequestedQuit )
                         {
                             DestroyWindow ( );
-                            return ERROR_STARTUP_QUIT;
+                            return ERROR_NO_ERROR;
                         }
 
                         // Couldn't load our mod
