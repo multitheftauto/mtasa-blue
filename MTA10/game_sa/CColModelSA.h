@@ -48,8 +48,8 @@ typedef struct
     unsigned short  v1;
     unsigned short  v2;
     unsigned short  v3;
-    BYTE            unknown1;
-    BYTE            unknown2;
+    EColSurface     material;
+    CColLighting    lighting;
 } CColTriangleSA;
 
 

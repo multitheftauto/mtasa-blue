@@ -998,10 +998,10 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
             for ( uint i = 0 ; i < pColData->numColTriangles ; i++ )
             {
                 CColTriangleSA* pTriangle = pColData->pColTriangles + i;
-                if ( pTriangle->unknown1 == 0 && pTriangle->unknown2 == 0 )
+                if ( pTriangle->lighting.night == 0 && pTriangle->lighting.day == 0 )
                 {
-                    pTriangle->unknown1 = 0x1c; // 0x1 night   0xc day
-                    pTriangle->unknown2 = 0x1c; // 0x1 night   0xc day
+                    pTriangle->lighting.night = 1;
+                    pTriangle->lighting.day = 12;
                 }
             }
         }
