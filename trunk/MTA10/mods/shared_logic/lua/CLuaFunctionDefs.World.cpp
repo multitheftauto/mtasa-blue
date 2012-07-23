@@ -167,11 +167,11 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
             if ( pColPoint )
             {
                 // Get the collision position
-                vecColPosition = *pColPoint->GetPosition ();
-                vecColNormal = *pColPoint->GetNormal();
-                iMaterial = pColPoint->GetSurfaceTypeB(); //From test, only B function return relevant data
-                fLighting = pColPoint->GetLightingForTimeOfDay();
-                iPiece = pColPoint->GetPieceTypeB();
+                vecColPosition = pColPoint->GetPosition ();
+                vecColNormal = pColPoint->GetNormal ();
+                iMaterial = pColPoint->GetSurfaceTypeB (); //From test, only B function return relevant data
+                fLighting = pColPoint->GetLightingForTimeOfDay ();
+                iPiece = pColPoint->GetPieceTypeB ();
 
                 // Delete the colpoint
                 pColPoint->Destroy ();
