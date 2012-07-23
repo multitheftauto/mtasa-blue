@@ -4304,9 +4304,9 @@ bool CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
                 {
                     if ( bCollision )
                     {
-                        CVector vecBullet = *pCollision->GetPosition() - vecOrigin;
-                        vecBullet.Normalize();
-                        vecTarget = vecOrigin + (vecBullet * fRange);
+                        CVector vecBullet = pCollision->GetPosition () - vecOrigin;
+                        vecBullet.Normalize ();
+                        vecTarget = vecOrigin + ( vecBullet * fRange);
                     }
                     pCollision->Destroy();
                 }
@@ -4364,7 +4364,7 @@ CVector CClientPed::AdjustShotOriginForWalls ( const CVector& vecOrigin, const C
     {
         if ( bCollision )
         {
-            float fDist = ( *pCollision->GetPosition() - vecTempOrigin ).Length ();
+            float fDist = ( pCollision->GetPosition() - vecTempOrigin ).Length ();
 
             if ( fDist < fMaxPullBack )
             {

@@ -1420,7 +1420,7 @@ CClientEntity* CStaticFunctionDefinitions::GetPedTarget ( CClientPed& Ped )
     CVector vecCollision = vecTarget;
     bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pCollision, &pCollisionGameEntity );
     if ( bCollision && pCollision )
-        vecCollision = *pCollision->GetPosition ();
+        vecCollision = pCollision->GetPosition ();
 
     // Destroy the colpoint
     if ( pCollision )
@@ -1450,7 +1450,7 @@ bool CStaticFunctionDefinitions::GetPedTargetCollision ( CClientPed& Ped, CVecto
     bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pCollision, &pCollisionGameEntity );
     if ( pCollision )
     {
-        vecCollision = *pCollision->GetPosition ();            
+        vecCollision = pCollision->GetPosition ();            
 
         // Destroy the collision
         pCollision->Destroy ();

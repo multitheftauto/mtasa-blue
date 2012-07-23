@@ -674,8 +674,9 @@ bool CClientGame::OnCancelLocalGameClick ( CGUIElement * pElement )
 {
     if ( m_bLocalPlay && m_bWaitingForLocalConnect )
     {
-        g_pCore->ShowMessageBox ( "Local Server", "Canceling local server. Please wait ...", MB_ICON_INFO );
-        return m_Server.Send ( "exit" );
+        g_pCore->RemoveMessageBox ();
+        g_pCore->GetModManager ()->RequestUnload ();
+        return true;
     }
     return false;
 }
@@ -2410,7 +2411,7 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
                     CClientEntity* pCollisionEntity = NULL;
                     if ( bCollision && pColPoint )
                     {
-                        vecCollision = *pColPoint->GetPosition ();
+                        vecCollision = pColPoint->GetPosition ();
                         if ( pGameEntity )
                         {
                             CClientEntity* pEntity = m_pManager->FindEntity ( pGameEntity );
@@ -2972,7 +2973,7 @@ void CClientGame::DrawWeaponsyncData ( CClientPlayer* pPlayer )
         {
             if ( bCollision )
             {
-                CVector vecBullet = *pCollision->GetPosition() - vecSource;
+                CVector vecBullet = pCollision->GetPosition() - vecSource;
                 vecBullet.Normalize();
                 CVector vecTarget = vecSource + (vecBullet * 200);
                 g_pCore->GetGraphics ()->DrawLine3DQueued ( vecSource, vecTarget, 0.5f, 0x1012DE12, true );
@@ -3304,7 +3305,7 @@ void CClientGame::DoPaintballs ( void )
         pCorona->SetSize ( 0.2f );
         if ( bCollision && pCollision )
         {
-            pCorona->SetPosition ( *pCollision->GetPosition () );
+            pCorona->SetPosition ( pCollision->GetPosition () );
             pCorona->SetColor ( SColorRGBA ( 255, 0, 0, 255 ) );
         }
         else
@@ -4544,7 +4545,7 @@ void CClientGame::PostWeaponFire ( void )
                     vecCollision = vecTarget;
                     bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pCollision, &pCollisionGameEntity );
                     if ( bCollision && pCollision )
-                        vecCollision = *pCollision->GetPosition ();
+                        vecCollision = pCollision->GetPosition ();
 
                     // Destroy the colpoint
                     if ( pCollision )
@@ -4614,7 +4615,7 @@ void CClientGame::BulletImpact ( CPed* pInitiator, CEntity* pVictim, const CVect
             bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( pStartPosition, pEndPosition, &pCollision, NULL );
             if ( bCollision && pCollision )
             {
-                vecCollision = *pCollision->GetPosition ();
+                vecCollision = pCollision->GetPosition ();
             }
             else
             {
