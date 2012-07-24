@@ -74,6 +74,17 @@ void CClientWeapon::DoPulse ( void )
         SetDirection ( vecDirection );
     }*/
 
+    if ( m_targetType == TARGET_TYPE_ENTITY && m_pTarget )
+    {
+        CVector vecTargetPos;
+        m_pTarget->GetPosition ( vecTargetPos );
+        CVector vecPosition;
+        GetPosition ( vecPosition );
+        CVector vecDirection = vecTargetPos - vecPosition;
+
+        SetDirection ( vecDirection );
+    }
+
     if ( m_State == WEAPONSTATE_FIRING ) Fire ();
 }
 

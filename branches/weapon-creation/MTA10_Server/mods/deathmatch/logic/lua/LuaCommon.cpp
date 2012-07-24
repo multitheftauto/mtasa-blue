@@ -220,7 +220,11 @@ void lua_pushelement ( lua_State* luaVM, CElement* pElement )
         ElementID ID = pElement->GetID ();
         if ( ID != INVALID_ELEMENT_ID )
         {
+    #if REMOVE_WHEN_FIXED
             lua_pushuserdata ( luaVM, "Element", (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
+    #else
+            lua_pushlightuserdata ( luaVM, (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
+    #endif
             return;
         }
     }
