@@ -25,6 +25,17 @@ CScriptDebugging::CScriptDebugging ( CLuaManager* pLuaManager )
     m_bTriggeringOnClientDebugMessage = false;
 }
 
+CScriptDebugging::~CScriptDebugging ( void )
+{
+    // Close the previously loaded file
+    if ( m_pLogFile )
+    {
+        fprintf ( m_pLogFile, "INFO: Logging to this file ended\n" );
+        fclose ( m_pLogFile );
+        m_pLogFile = NULL;
+    }
+}
+
 #if 0   // Currently unused
 void CScriptDebugging::OutputDebugInfo ( lua_State* luaVM, int iLevel, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue )
 {
@@ -144,22 +155,19 @@ void CScriptDebugging::LogError ( SString strFile, int iLine, SString strMsg )
     g_pCore->DebugEchoColor ( strText, 255, 0, 0 );
 }
 
-void CScriptDebugging::LogBadPointer ( lua_State* luaVM, const char* szFunction, const char* szArgumentType, unsigned int uiArgument )
+void CScriptDebugging::LogBadPointer ( lua_State* luaVM, const char* szArgumentType, unsigned int uiArgument )
 {
-    assert ( szFunction );
     assert ( szArgumentType );
 
     // Populate a message to print/send
-    LogWarning ( luaVM, "Bad '%s' pointer @ '%s'(%u)", szArgumentType, szFunction, uiArgument );
+    LogWarning ( luaVM, "Bad '%s' pointer @ '%s'(%u)", szArgumentType, lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), uiArgument );
 }
 
 
-void CScriptDebugging::LogBadType ( lua_State* luaVM, const char* szFunction )
+void CScriptDebugging::LogBadType ( lua_State* luaVM )
 {
-    assert ( szFunction );
-
     // Populate a message to print/send
-    LogWarning ( luaVM, "Bad argument @ '%s'", szFunction );
+    LogWarning ( luaVM, "Bad argument @ '%s'", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
 }
 
 
@@ -172,12 +180,10 @@ void CScriptDebugging::LogCustom ( lua_State* luaVM, const char* szMessage )
 }
 
 
-void CScriptDebugging::LogBadLevel ( lua_State* luaVM, const char* szFunction, unsigned int uiRequiredLevel )
+void CScriptDebugging::LogBadLevel ( lua_State* luaVM, unsigned int uiRequiredLevel )
 {
-    assert ( szFunction );
-
     // Populate a message to print/send
-    LogWarning ( luaVM, "Requires level '%d' @ '%s", uiRequiredLevel, szFunction );
+    LogWarning ( luaVM, "Requires level '%d' @ '%s", uiRequiredLevel, lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
 }
 
 
@@ -185,17 +191,33 @@ bool CScriptDebugging::SetLogfile ( const char* szFilename, unsigned int uiLevel
 {
     assert ( szFilename );
 
+    // Close the previously loaded file
+    if ( m_pLogFile )
+    {
+        fprintf ( m_pLogFile, "INFO: Logging to this file ended\n" );
+        fclose ( m_pLogFile );
+        m_pLogFile = NULL;
+    }
+
+    // Apply log size limit
+    uint uiMaxSizeKB = 0;
+    g_pCore->GetCVars ()->Get ( "max_clientscript_log_kb", uiMaxSizeKB );
+    if ( uiMaxSizeKB > 0 )
+    {
+        uint uiCurrentSizeKB = FileSize ( szFilename ) / 1024;
+        if ( uiCurrentSizeKB > uiMaxSizeKB )
+        {
+            SString strFilenameBackup ( "%s.bak", szFilename );
+            FileDelete ( strFilenameBackup );
+            FileRename ( szFilename, strFilenameBackup );
+            FileDelete ( szFilename );
+        }
+    }
+
     // Try to load the new file
     FILE* pFile = fopen ( szFilename, "a+" );
     if ( pFile )
     {
-        // Close the previously loaded file
-        if ( m_pLogFile )
-        {
-            fprintf ( m_pLogFile, "INFO: Logging to this file ended\n" );
-            fclose ( m_pLogFile );
-        }
-
         // Set the new pointer and level and return true
         m_uiLogFileLevel = uiLevel;
         m_pLogFile = pFile;

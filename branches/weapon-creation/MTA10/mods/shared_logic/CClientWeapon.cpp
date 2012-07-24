@@ -231,7 +231,7 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
     
     if ( m_pWeapon->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pColEntity, m_weaponConfig.flags, &pBuildingResult, m_Type, &pEntity ) )
     {
-        vecTarget = *pColPoint->GetPosition ();
+        vecTarget = pColPoint->GetPosition ();
     }
 
     if ( ( m_pTarget != NULL && m_pTarget->GetGameEntity ( ) != NULL && m_pTarget->GetGameEntity()->GetInterface ( ) == pEntity ) && m_weaponConfig.bShootIfTargetBlocked == false )

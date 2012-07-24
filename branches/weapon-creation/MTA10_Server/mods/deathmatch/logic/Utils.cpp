@@ -17,12 +17,6 @@
 #include "StdInc.h"
 #include "net/SyncStructures.h"
 
-#ifdef WIN32
-    LONGLONG    g_lTimeCounts = 0;
-#else
-    struct timeval     g_tvInitialTime;
-#endif
-
 #ifndef WIN32
     char * strupr (char* a) {
         char *ret = a;
@@ -350,25 +344,6 @@ unsigned int HashString ( const char* szString )
     c -= a; c -= b; c ^= ( b >> 15 );
 
     return c;
-}
-
-void InitializeTime ( void )
-{
-    #ifdef WIN32
-        LARGE_INTEGER lFrequency;
-        if ( QueryPerformanceFrequency ( &lFrequency ) )
-        {
-            g_lTimeCounts = lFrequency.QuadPart / 1000;
-        }
-        else
-        {
-            // System doesn't support the high-resolution frequency counter. Fail and quit
-            CLogger::ErrorPrintf ( "High-resolution frequency counter unsupported!\n" );
-            ExitProcess ( 1 );
-        }
-    #else
-        gettimeofday ( &g_tvInitialTime, 0 );
-    #endif
 }
 
 

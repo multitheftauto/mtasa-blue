@@ -45,7 +45,7 @@ int CLuaFunctionDefs::AddCommandHandler ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "addCommandHandler", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -75,7 +75,7 @@ int CLuaFunctionDefs::RemoveCommandHandler ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "removeCommandHandler", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -107,7 +107,7 @@ int CLuaFunctionDefs::ExecuteCommandHandler ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "executeCommandHandler", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;

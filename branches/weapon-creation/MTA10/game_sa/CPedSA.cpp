@@ -962,6 +962,36 @@ void CPedSA::SetVoice ( const char* szVoiceType, const char* szVoice )
     SetVoice ( sVoiceType, sVoiceID );
 }
 
+// GetCurrentWeaponStat will only work if the game ped context is currently set to this ped
+CWeaponStat* CPedSA::GetCurrentWeaponStat ( void )
+{
+    if ( pGame->GetPedContext () != this )
+    {
+        OutputDebugLine ( "WARNING: GetCurrentWeaponStat ped context mismatch" );
+        return NULL;
+    }
+
+    CWeapon* pWeapon = GetWeapon ( GetCurrentWeaponSlot () );
+
+    if ( !pWeapon )
+        return NULL;
+
+    eWeaponType eWeapon = pWeapon->GetType ();
+    ushort usStat = pGame->GetStats ()->GetSkillStatIndex ( eWeapon );
+    float fSkill = pGame->GetStats()->GetStatValue ( usStat );
+    CWeaponStat* pWeaponStat = pGame->GetWeaponStatManager ()->GetWeaponStatsFromSkillLevel ( eWeapon, fSkill );
+    return pWeaponStat;
+}
+
+float CPedSA::GetCurrentWeaponRange ( void )
+{
+    CWeaponStat* pWeaponStat = GetCurrentWeaponStat ();
+    if ( !pWeaponStat )
+        return 1;
+
+    return pWeaponStat->GetWeaponRange ();
+}
+
 /*
 bool CPedSA::CanPedReturnToState (  )
 {

@@ -244,6 +244,18 @@ namespace SharedUtil
     //
 
     template < class TL, class T >
+    void ListRemove ( TL& itemList, const T& item )
+    {
+        typename TL ::iterator it = itemList.begin ();
+        for ( ; it != itemList.end () ; ++it )
+            if ( item == *it )
+            {
+                itemList.erase ( it );
+                break;
+            }
+    }
+
+    template < class TL, class T >
     bool ListContains ( const TL& itemList, const T& item );
 
     // Add item if it does not aleady exist in itemList
@@ -281,19 +293,6 @@ namespace SharedUtil
     //
     // std::vector helpers
     //
-
-    // Remove first occurrence of item from itemList
-    template < class T >
-    void ListRemove ( std::vector < T >& itemList, const T& item )
-    {
-        typename std::vector < T > ::iterator it = itemList.begin ();
-        for ( ; it != itemList.end () ; ++it )
-            if ( item == *it )
-            {
-                itemList.erase ( it );
-                break;
-            }
-    }
 
     // Remove item at index from itemList
     template < class T >
@@ -1450,6 +1449,113 @@ namespace SharedUtil
 
         std::map < uint, uint >     m_StartLastMap;
     };
+
+
+    //
+    // Smart pointer with reference count.
+    // Based on code from:
+    // http://www.codeproject.com/Articles/15351/Implementing-a-simple-smart-pointer-in-c
+    //
+    class RC
+    {
+        private:
+        int count; // Reference count
+
+        public:
+        RC ( void ) : count ( 0 ) {}
+        void AddRef()
+        {
+            // Increment the reference count
+            count++;
+        }
+
+        int Release()
+        {
+            // Decrement the reference count and
+            // return the reference count.
+            return --count;
+        }
+    };
+
+    template < typename T > class SP
+    {
+    private:
+        T*    pData;       // pointer
+        RC* reference; // Reference count
+
+    public:
+        SP() : pData(0), reference(0) 
+        {
+            // Create a new reference 
+            reference = new RC();
+            // Increment the reference count
+            reference->AddRef();
+        }
+
+        SP(T* pValue) : pData(pValue), reference(0)
+        {
+            // Create a new reference 
+            reference = new RC();
+            // Increment the reference count
+            reference->AddRef();
+        }
+
+        SP(const SP<T>& sp) : pData(sp.pData), reference(sp.reference)
+        {
+            // Copy constructor
+            // Copy the data and reference pointer
+            // and increment the reference count
+            reference->AddRef();
+        }
+
+        ~SP()
+        {
+            // Destructor
+            // Decrement the reference count
+            // if reference become zero delete the data
+            if(reference->Release() == 0)
+            {
+                delete pData;
+                delete reference;
+            }
+        }
+
+        T& operator* ()
+        {
+            return *pData;
+        }
+
+        T* operator-> ()
+        {
+            return pData;
+        }
+        
+        SP<T>& operator = (const SP<T>& sp)
+        {
+            // Assignment operator
+            if (this != &sp) // Avoid self assignment
+            {
+                T*  pDataOld =  pData;
+                RC* referenceOld = reference;
+
+                // Copy the data and reference pointer
+                // and increment the reference count
+                pData = sp.pData;
+                reference = sp.reference;
+                reference->AddRef();
+
+                // Decrement the old reference count
+                // if reference become zero delete the old data
+                if(referenceOld->Release() == 0)
+                {
+                    delete pDataOld;
+                    delete referenceOld;
+                }
+            }
+            return *this;
+        }
+    };
+
 
 };
 

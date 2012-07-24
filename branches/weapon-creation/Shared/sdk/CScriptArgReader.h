@@ -249,8 +249,17 @@ public:
             SetTypeError ( GetClassTypeName ( (T*)0 ), m_iIndex - 1 );
             return false;
         }
-        else
-        if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch || ( iArgument == LUA_TNIL && bArgCanBeNil ) )
+        else if ( iArgument == LUA_TUSERDATA )
+        {
+            outValue = (T*)UserDataCast < T > ( (T*)0, * ( ( void** ) lua_touserdata ( m_luaVM, m_iIndex++ ) ), m_luaVM );
+            if ( outValue || bArgCanBeNil )
+                return true;
+
+            outValue = NULL;
+            SetTypeError ( GetClassTypeName ( (T*)0 ), m_iIndex - 1 );
+            return false;
+        }
+        else if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch || ( iArgument == LUA_TNIL && bArgCanBeNil ) )
         {
             if ( defaultValue != (T*)-1 )
             {

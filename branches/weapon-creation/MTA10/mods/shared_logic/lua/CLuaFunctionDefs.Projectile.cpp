@@ -54,7 +54,7 @@ int CLuaFunctionDefs::CreateProjectile ( lua_State* luaVM )
                             pTarget = pTemp;
                         }
                         else
-                            m_pScriptDebugging->LogBadPointer ( luaVM, "createProjectile", "element", 7 );
+                            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 7 );
                     }
 
                     int iArgument8 = lua_type ( luaVM, 8 );
@@ -131,10 +131,10 @@ int CLuaFunctionDefs::CreateProjectile ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "createProjectile", "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "createProjectile" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -153,10 +153,10 @@ int CLuaFunctionDefs::GetProjectileType ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getProjectileType", "projectile", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "projectile", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getProjectileType" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -178,10 +178,10 @@ int CLuaFunctionDefs::GetProjectileTarget ( lua_State* luaVM )
 			}
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getProjectileTarget", "projectile", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "projectile", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getProjectileTarget" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -199,10 +199,10 @@ int CLuaFunctionDefs::GetProjectileCreator ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getProjectileCreator", "projectile", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "projectile", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getProjectileCreator" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -220,10 +220,10 @@ int CLuaFunctionDefs::GetProjectileForce ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getProjectileForce", "projectile", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "projectile", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getProjectileForce" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;

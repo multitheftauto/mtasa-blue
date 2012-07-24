@@ -88,7 +88,7 @@ void _declspec(naked) HOOK_CrashFix_Misc1 ()
 #define HOOKPOS_CrashFix_Misc2                              0x6B18B0
 #define HOOKSIZE_CrashFix_Misc2                             9
 DWORD RETURN_CrashFix_Misc2 =                               0x6B18B9;
-DWORD RETURN_CrashFix_Misc2B =                              0x6B1F6C;
+DWORD RETURN_CrashFix_Misc2B =                              0x6B3775;
 void _declspec(naked) HOOK_CrashFix_Misc2 ()
 {
     _asm
@@ -97,6 +97,15 @@ void _declspec(naked) HOOK_CrashFix_Misc2 ()
         je      cont        // Skip much code if eax is zero (vehicle has no colmodel)
 
         mov     eax,dword ptr [eax+2Ch] 
+
+        test    eax,eax 
+        je      cont        // Skip much code if eax is zero (colmodel has no coldata)
+
+        mov     ebx,dword ptr [eax+10h] 
+
+        test    ebx,ebx 
+        je      cont        // Skip much code if ebx is zero (coldata has no suspension lines)
+
         mov     cl,byte ptr [esi+429h]
         jmp     RETURN_CrashFix_Misc2
     cont:
@@ -802,7 +811,7 @@ void _declspec(naked) HOOK_CrashFix_Misc25 ()
 //////////////////////////////////////////////////////////////////////////////////////////
 void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
 {
-    EZHookInstall ( CrashFix_Misc1 );
+    //EZHookInstall ( CrashFix_Misc1 );
     EZHookInstall ( CrashFix_Misc2 );
     //EZHookInstall ( CrashFix_Misc3 );
     EZHookInstall ( CrashFix_Misc4 );

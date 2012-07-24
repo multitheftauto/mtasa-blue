@@ -262,7 +262,7 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
 
     if ( BitStream.Version () >= 0x30 )
     {
-        for (int i = WEAPONTYPE_BRASSKNUCKLE; i <= WEAPONTYPE_PISTOL; i++)
+        for (int i = WEAPONTYPE_BRASSKNUCKLE; i < WEAPONTYPE_PISTOL; i++)
         {
             bool bEnabled;
             bEnabled = g_pGame->GetJetpackWeaponEnabled ( (eWeaponType) i );

@@ -22,13 +22,14 @@
 #include "StdInc.h"
 #include "../utils/COpenPortsTester.h"
 #include "net/SimHeaders.h"
+#include <signal.h>
 
 #define MAX_BULLETSYNC_DISTANCE 400.0f
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
 #define MAX_PROJECTILE_SYNC_DISTANCE 400.0f
 
 #define RELEASE_MIN_CLIENT_VERSION      "1.4.0-0.00000"
-#define BULLET_SYNC_MIN_CLIENT_VERSION  "1.3.0-9.04224"
+#define BULLET_SYNC_MIN_CLIENT_VERSION  "1.3.0-9.04311"
 
 #define RUN_CHILDREN CChildListType::const_iterator iter=pElement->IterBegin();for(;iter!=pElement->IterEnd();iter++)
 
@@ -41,19 +42,48 @@ unsigned char ucProgressSkip = 0;
 pthread_mutex_t mutexhttp;
 
 #ifdef WIN32
-BOOL WINAPI ConsoleEventHandler ( DWORD dwCtrlType )
-{
-    if ( dwCtrlType == CTRL_CLOSE_EVENT )
+    BOOL WINAPI ConsoleEventHandler ( DWORD dwCtrlType )
     {
-        if ( g_pGame )
+        if ( dwCtrlType == CTRL_CLOSE_EVENT )
         {
-            g_pGame->SetIsFinished ( true );
+            // Close button pressed or task ended in task manager
+            if ( g_pGame )
+            {
+                // Warning message if server started
+                if ( g_pGame->IsServerFullyUp () )
+                {
+                    printf ( "\n** TERMINATING SERVER WITHOUT SAVING **\n" );
+                    printf ( "\nUse Ctrl-C next time!\n" );
+                    Sleep ( 3000 );
+                }
+            }
+            // Don't call g_pGame->SetIsFinished() as Windows could terminate the process mid-shutdown 
             return TRUE;
         }
+        else
+        if ( dwCtrlType == CTRL_C_EVENT || dwCtrlType == CTRL_BREAK_EVENT )
+        {
+            if ( g_pGame )
+            {
+                // Graceful close on Ctrl-C or Ctrl-Break
+                g_pGame->SetIsFinished ( true );
+                return TRUE;
+            }
+        }
+        return FALSE;
     }
-
-    return FALSE;
-}
+#else
+    void sighandler ( int sig )
+    {
+        if ( sig == SIGTERM || sig == SIGINT )
+        {
+            if ( g_pGame )
+            {
+                // Graceful close on Ctrl-C or 'kill'
+                g_pGame->SetIsFinished ( true );
+            }
+        }
+    }
 #endif
 
 
@@ -67,7 +97,6 @@ CGame::CGame ( void )
 
     // Initialize random number generator and time
     RandomizeRandomSeed ();
-    InitializeTime ();
 
     m_bBeingDeleted = false;
     m_pUnoccupiedVehicleSync = NULL;
@@ -138,7 +167,7 @@ CGame::CGame ( void )
     m_Glitches [ GLITCH_FASTMOVE ] = false;
     m_Glitches [ GLITCH_CROUCHBUG ] = false;
     m_Glitches [ GLITCH_CLOSEDAMAGE ] = false;
-    for ( int i = 0; i <= WEAPONTYPE_LAST_WEAPONTYPE; i++ )
+    for ( int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++ )
         m_JetpackWeapons [ i ] = false;
 
     m_JetpackWeapons [ WEAPONTYPE_MICRO_UZI ] = true;
@@ -207,11 +236,6 @@ CGame::~CGame ( void )
 {
     m_bBeingDeleted = true;
 
-    // Remove our console control handler
-    #ifdef WIN32
-    SetConsoleCtrlHandler ( ConsoleEventHandler, FALSE );
-    #endif
-
     // Eventually stop our game
     CSimControl::EnableSimSystem ( false );
     Stop ();
@@ -279,6 +303,15 @@ CGame::~CGame ( void )
 
     // Clear our global pointer
     g_pGame = NULL;
+
+    // Remove our console control handler
+    #ifdef WIN32
+        SetConsoleCtrlHandler ( ConsoleEventHandler, FALSE );
+    #else
+        signal ( SIGTERM, SIG_DFL );
+        signal ( SIGINT, SIG_DFL );
+        signal ( SIGPIPE, SIG_DFL );
+    #endif
 }
 
 
@@ -648,7 +681,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     m_pResourceManager = new CResourceManager;
     m_pSettings = new CSettings ( m_pResourceManager );
-    m_pResourceManager->Refresh();
+    if ( !m_pResourceManager->Refresh() )
+        return false;   // Load cancelled
     m_pUnoccupiedVehicleSync = new CUnoccupiedVehicleSync ( m_pPlayerManager, m_pVehicleManager );
     m_pPedSync = new CPedSync ( m_pPlayerManager, m_pPedManager );
 #ifdef WITH_OBJECT_SYNC
@@ -704,7 +738,13 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     // Set our console control handler
     #ifdef WIN32
-    SetConsoleCtrlHandler ( ConsoleEventHandler, TRUE );
+        SetConsoleCtrlHandler ( ConsoleEventHandler, TRUE );
+        // Hide the close box
+        // DeleteMenu ( GetSystemMenu ( GetConsoleWindow(), FALSE ), SC_CLOSE, MF_BYCOMMAND );
+    #else
+        signal ( SIGTERM, &sighandler );
+        signal ( SIGINT, &sighandler );
+        signal ( SIGPIPE, SIG_IGN );
     #endif
 
     // Add our builtin events
@@ -794,7 +834,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     // Now load the rest of the config
     if ( !m_pMainConfig->LoadExtended () )
-        return false;
+        return false;       // Fail or cancelled
 
     // Is the script debug log enabled?
     if ( m_pMainConfig->GetScriptDebugLogEnabled () )
@@ -824,6 +864,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pOpenPortsTester = new COpenPortsTester ();
 
     // Add help hint
+    CLogger::LogPrint ( "To stop the server, type 'shutdown' or press Ctrl-C\n" );
     CLogger::LogPrint ( "Type 'help' for a list of commands.\n" );
 
     m_bServerFullyUp = true;
@@ -1261,6 +1302,9 @@ void CGame::InitialDataStream ( CPlayer& Player )
     }
 
     marker.Set ( "PlayerStats" );
+
+    // Send the root element custom data
+    m_pMapManager->GetRootElement ()->SendAllCustomData ( &Player );
 
     // Tell the resource manager
     m_pResourceManager->OnPlayerJoin ( Player );
@@ -3743,7 +3787,7 @@ bool CGame::GetCloudsEnabled ( void )
 
 bool CGame::GetJetpackWeaponEnabled ( eWeaponType weaponType )
 {
-    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType <= WEAPONTYPE_LAST_WEAPONTYPE )
+    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType < WEAPONTYPE_LAST_WEAPONTYPE )
     {
         return m_JetpackWeapons[weaponType];
     }
@@ -3752,7 +3796,7 @@ bool CGame::GetJetpackWeaponEnabled ( eWeaponType weaponType )
 
 void CGame::SetJetpackWeaponEnabled ( eWeaponType weaponType, bool bEnabled )
 {
-    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType <= WEAPONTYPE_LAST_WEAPONTYPE )
+    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType < WEAPONTYPE_LAST_WEAPONTYPE )
     {
         m_JetpackWeapons[weaponType] = bEnabled;
     }
@@ -3874,11 +3918,22 @@ void CGame::HandleBackup ( void )
 //
 // Toggle latent send mode
 //
-void CGame::EnableLatentSends ( bool bEnabled, int iBandwidth, CLuaMain* pLuaMain )
+void CGame::EnableLatentSends ( bool bEnabled, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId )
 {
     m_bLatentSendsEnabled = bEnabled && iBandwidth;
     m_iLatentSendsBandwidth = iBandwidth;
     m_pLatentSendsLuaMain = pLuaMain;
+    m_usLatentSendsResourceNetId = usResourceNetId;
+}
+
+
+//
+// Optimization for latent sends
+//
+void CGame::SendPacketBatchBegin ( unsigned char ucPacketId, NetBitStreamInterface* pBitStream )
+{
+    if ( m_bLatentSendsEnabled )
+        GetLatentTransferManager ()->AddSendBatchBegin ( ucPacketId, pBitStream );
 }
 
 
@@ -3890,8 +3945,18 @@ bool CGame::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& play
     if ( !m_bLatentSendsEnabled )
         return g_pNetServer->SendPacket ( ucPacketID, playerID, pBitStream, bBroadcast, packetPriority, packetReliability, packetOrdering );
     else
-        GetLatentTransferManager ()->AddSend ( playerID, ucPacketID, pBitStream, m_iLatentSendsBandwidth, m_pLatentSendsLuaMain );
+        GetLatentTransferManager ()->AddSend ( playerID, pBitStream->Version (), m_iLatentSendsBandwidth, m_pLatentSendsLuaMain, m_usLatentSendsResourceNetId );
     return true;
+}
+
+
+//
+// Optimization for latent sends
+//
+void CGame::SendPacketBatchEnd ( void )
+{
+    if ( m_bLatentSendsEnabled )
+        GetLatentTransferManager ()->AddSendBatchEnd ();
 }
 
 
@@ -3905,7 +3970,11 @@ bool CGame::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& play
 bool CGame::IsBulletSyncActive ( void )
 {
     bool bConfigSaysEnable = m_pMainConfig->GetBulletSyncEnabled ();
+#if 0       // No auto bullet sync as there are some problems with it
     bool bGlitchesSayEnable = ( m_Glitches [ GLITCH_FASTFIRE ] || m_Glitches [ GLITCH_CROUCHBUG ] );
+#else
+    bool bGlitchesSayEnable = false;
+#endif
     return bConfigSaysEnable || bGlitchesSayEnable;
 }
 

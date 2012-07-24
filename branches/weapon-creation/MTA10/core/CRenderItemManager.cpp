@@ -53,7 +53,6 @@ void CRenderItemManager::OnDeviceCreate ( IDirect3DDevice9* pDevice, float fView
     m_uiDefaultViewportSizeY = fViewportSizeY;
 
     m_pRenderWare = CCore::GetSingleton ().GetGame ()->GetRenderWare ();
-    m_pRenderWare->InitWorldTextureWatch ( StaticWatchCallback );
 
     // Get some stats
     m_strVideoCardName = (const char*)g_pDeviceState->AdapterState.Name;

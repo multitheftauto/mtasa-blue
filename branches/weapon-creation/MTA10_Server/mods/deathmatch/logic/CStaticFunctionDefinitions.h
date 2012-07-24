@@ -40,7 +40,7 @@ public:
     static bool                 RemoveEventHandler                  ( CLuaMain* pLuaMain, const char* szName, CElement* pElement, const CLuaFunctionRef& iLuaFunction );
     static bool                 TriggerEvent                        ( const char* szName, CElement* pElement, const CLuaArguments& Arguments, bool & bWasCancelled );
     static bool                 TriggerClientEvent                  ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments );
-    static bool                 TriggerLatentClientEvent            ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain );
+    static bool                 TriggerLatentClientEvent            ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId );
 
     static bool                 CancelEvent                         ( bool bCancel, const char* szReason );
     static const char*          GetCancelReason                     ( );
@@ -95,7 +95,7 @@ public:
     static bool                 SetElementInterior                  ( CElement* pElement, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition );
     static bool                 SetElementDimension                 ( CElement* pElement, unsigned short usDimension );
     static bool                 AttachElements                      ( CElement* pElement, CElement* pAttachedToElement, CVector& vecPosition, CVector& vecRotation );
-    static bool                 DetachElements                      ( CElement* pElement, CElement* pAttachedToElement = NULL  );
+    static bool                 DetachElements                      ( CElement* pElement, CElement* pAttachedToElement = NULL );
     static bool                 SetElementAlpha                     ( CElement* pElement, unsigned char ucAlpha );
     static bool                 SetElementDoubleSided               ( CElement* pElement, bool bDoubleSided );
     static bool                 SetElementHealth                    ( CElement* pElement, float fHealth );

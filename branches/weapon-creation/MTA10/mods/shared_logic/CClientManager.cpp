@@ -22,9 +22,6 @@ extern CClientGame* g_pClientGame;
 
 CClientManager::CClientManager ( void )
 {
-    // Initialize time
-    CClientTime::InitializeTime ();
-
     // Load the connection trouble texture
     m_pConnectionTroubleTexture = g_pCore->GetGUI ()->CreateTexture ();
     m_pConnectionTroubleTexture->LoadFromFile ( CalcMTASAPath( CGUI_ICON_NETWORK_TROUBLE ) );

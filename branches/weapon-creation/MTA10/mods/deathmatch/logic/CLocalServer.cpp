@@ -266,10 +266,10 @@ void CLocalServer::GetResourceNameList ( std::vector < SString >& outResourceNam
                 continue;
             }
 
-            // Extract file extention
+            // Extract file extension
             SString strExt;
             if ( !bIsDir )
-                ExtractExtention ( strName, &strName, &strExt );
+                ExtractExtension ( strName, &strName, &strExt );
 
             // Ignore files that are not .zip
             if ( !bIsDir && strExt != "zip" )

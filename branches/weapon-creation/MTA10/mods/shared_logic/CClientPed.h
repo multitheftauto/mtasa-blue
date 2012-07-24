@@ -72,9 +72,11 @@ enum eMovementState
     MOVEMENTSTATE_JOG, //Jogging
     MOVEMENTSTATE_SPRINT, //Sprinting
     MOVEMENTSTATE_CROUCH, //Crouching still
-    // Duds for now.  We should add methods to detect these
     MOVEMENTSTATE_CRAWL, //Crouch-moving
-    MOVEMENTSTATE_ROLL, //Crouch-rolling
+    MOVEMENTSTATE_ROLL, //Crouch-rolling (Needs adding)
+    MOVEMENTSTATE_JUMP, // Jumping
+    MOVEMENTSTATE_FALL, // Falling
+    MOVEMENTSTATE_CLIMB // Climbing
 };
 
 enum eDeathAnims

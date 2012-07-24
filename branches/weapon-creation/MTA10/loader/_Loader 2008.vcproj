@@ -80,7 +80,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib psapi.lib UnRAR.lib"
-				OutputFile="C:/Program Files/MTA San Andreas 1.4/mta/loader_d.dll"
+				OutputFile="C:/Program Files/MTA San Andreas 1.4 wc/mta/loader_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\vendor\unrar\build\unrardll32\$(ConfigurationName)"
@@ -182,7 +182,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib psapi.lib UnRAR.lib"
-				OutputFile="c:\program files\MTA San Andreas 1.4\mta\loader.dll"
+				OutputFile="c:\program files\MTA San Andreas 1.4 wc\mta\loader.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\vendor\unrar\build\unrardll32\$(ConfigurationName)"

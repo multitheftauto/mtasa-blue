@@ -14,7 +14,9 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define RWFUNC_IMPLEMENT
 #include "gamesa_renderware.h"
+#include "CRenderWareSA.ShaderMatching.h"
 
 extern CGameSA * pGame;
 
@@ -168,8 +170,6 @@ static RpAtomic* LoadAtomicsCB (RpAtomic * atomic, SLoadAtomics * data)
 
 CRenderWareSA::CRenderWareSA ( eGameVersion version )
 {
-    m_pfnWatchCallback = NULL;
-
     // Version dependant addresses
     switch ( version )
     {
@@ -343,120 +343,13 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
     }
 
     InitTextureWatchHooks ();
+    m_pMatchChannelManager = new CMatchChannelManager ();
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-
-
-
-// Adds texture into the TXD of a model, eventually making a copy of each texture first 
-void CRenderWareSA::ModelInfoTXDAddTextures ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bMakeCopy, std::list < RwTexture* >* pReplacedTextures, std::list < RwTexture* >* pAddedTextures, bool bAddRef )
+CRenderWareSA::~CRenderWareSA ( void )
 {
-    // Get the CModelInfo's TXD ID
-    unsigned short usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
-
-    // Get the TXD corresponding to this ID
-    RwTexDictionary* pTXD = CTxdStore_GetTxd ( usTxdId );
-    if ( bAddRef )
-    {
-        if ( !pTXD )
-        {
-            pGame->GetModelInfo ( usModelID )->Request ( BLOCKING, "CRenderWareSA::ModelInfoTXDAddTextures" );
-            CTxdStore_AddRef ( usTxdId );
-            ( (void (__cdecl *)(unsigned short))FUNC_RemoveModel )( usModelID );
-            pTXD = CTxdStore_GetTxd ( usTxdId );
-        }
-        else
-        {
-            CTxdStore_AddRef ( usTxdId );
-        }
-    }
-
-    if ( pTXD )
-    {
-        std::list < RwTexture* >::iterator it;
-        for ( it = textures.begin (); it != textures.end (); it++ )
-        {
-            // Does a texture by this name already exist?
-            RwTexture* pExistingTexture = RwTexDictionaryFindNamedTexture ( pTXD, (*it)->name );
-            if ( pExistingTexture )
-            {
-                // Is it a custom texture?
-                if ( ( pAddedTextures && ListContainsNamedTexture ( *pAddedTextures, (*it)->name ) ) ||
-                     ( pReplacedTextures && ListContainsNamedTexture ( *pReplacedTextures, (*it)->name ) ) )
-                {
-                    continue;
-                }
-                // If not, we can replace it
-                RwTexDictionaryRemoveTexture ( pTXD, pExistingTexture );
-                if ( pReplacedTextures )
-                    pReplacedTextures->push_back ( pExistingTexture );
-            }
-            else
-            {
-                if ( pAddedTextures )
-                    pAddedTextures->push_back ( *it );
-            }
-
-            RwTexture* pTex = *it;
-
-            if ( bMakeCopy )
-            {
-                // Reuse the given texture's raster
-                RwTexture* pNewTex = RwTextureCreate ( pTex->raster );
-
-                // Copy over additional properties
-                MemCpyFast ( &pNewTex->name, &pTex->name, RW_TEXTURE_NAME_LENGTH );
-                MemCpyFast ( &pNewTex->mask, &pTex->mask, RW_TEXTURE_NAME_LENGTH );
-                pNewTex->flags = pTex->flags;
-                
-                pTex = pNewTex;
-            }
-
-            // Add the texture
-            RwTexDictionaryAddTexture ( pTXD, pTex );
-        }
-    }
-}
-
-// Removes textures from the TXD of a model, eventually destroying each texture
-void CRenderWareSA::ModelInfoTXDRemoveTextures ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bDestroy, bool bKeepRaster, bool bRemoveRef )
-{
-    // Get the CModelInfo's TXD ID
-    unsigned short usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
-
-    // Get the TXD corresponding to this ID
-    RwTexDictionary* pTXD = CTxdStore_GetTxd ( usTxdId );
-
-    if ( pTXD )
-    {
-        std::list < RwTexture* >::iterator it;
-        for ( it = textures.begin (); it != textures.end (); it++ )
-        {
-            // Don't remove the passed texture itself, rather any texture with the same name
-            RwTexture* pTex = RwTexDictionaryFindNamedTexture ( pTXD, (*it)->name );
-            if ( pTex )
-            {
-                if ( bDestroy )
-                {
-                    // Destroy the texture
-                    if ( bKeepRaster )
-                        pTex->raster = NULL;
-                    RwTextureDestroy ( pTex );
-                }
-                else
-                {
-                    // Only remove the texture from the txd
-                    RwTexDictionaryRemoveTexture ( pTXD, pTex );
-                }
-            }
-        }
-    }
-
-    // Delete the reference we made in ModelInfoTXDAddTextures
-    if ( bRemoveRef )
-        CTxdStore_RemoveRef ( usTxdId );
+    SAFE_DELETE ( m_pMatchChannelManager );
 }
 
 
@@ -547,18 +440,32 @@ void CRenderWareSA::GetClumpAtomicList ( RpClump* pClump, std::vector < RpAtomic
     RpClumpForAllAtomics ( pClump, LOCAL_FUNCTION::GetClumpAtomicListCB, &outAtomicList );
 }
 
+
 //
 // Returns true if the clump geometry sort of matches
 //
-bool CRenderWareSA::DoClumpsContainTheSameGeometry ( RpClump* pClumpA, RpClump* pClumpB )
+// ClumpA vs ClumpB(or)AtomicB
+//
+bool CRenderWareSA::DoContainTheSameGeometry ( RpClump* pClumpA, RpClump* pClumpB, RpAtomic* pAtomicB )
 {
-    // Get atomic list from both clumps
+    // Fast check if comparing one atomic
+    if ( pAtomicB )
+    {
+        RpGeometry* pGeometryA = ( ( RpAtomic* ) ( ( pClumpA->atomics.root.next ) - 0x8 ) )->geometry;    
+        RpGeometry* pGeometryB = pAtomicB->geometry;
+        return pGeometryA == pGeometryB;
+    }
+
+    // Get atomic list from both sides
     std::vector < RpAtomic* > atomicListA;
     std::vector < RpAtomic* > atomicListB;
     GetClumpAtomicList ( pClumpA, atomicListA );
-    GetClumpAtomicList ( pClumpB, atomicListB );
+    if ( pClumpB )
+        GetClumpAtomicList ( pClumpB, atomicListB );
+    if ( pAtomicB )
+        atomicListB.push_back ( pAtomicB );
 
-    // Count geometries that exist in both clumps
+    // Count geometries that exist in both sides
     std::set < RpGeometry* > geometryListA;
     for ( uint i = 0 ; i < atomicListA.size () ; i++ )
         MapInsert ( geometryListA, atomicListA[i]->geometry );
@@ -583,10 +490,13 @@ void CRenderWareSA::ReplaceModel ( RpClump* pNew, unsigned short usModelID, DWOR
     if ( pModelInfo )
     {
         RpClump* pOldClump = (RpClump *)pModelInfo->GetRwObject ();
-        if ( !DoClumpsContainTheSameGeometry ( pNew, pOldClump ) )
+        if ( !DoContainTheSameGeometry ( pNew, pOldClump, NULL ) )
         {
             // Make new clump container for the model geometry
-            RpClump* pNewClone = RpClumpClone ( pNew );
+            // Clone twice as the geometry render order seems to be reversed each time it is cloned.
+            RpClump* pTemp = RpClumpClone ( pNew );
+            RpClump* pNewClone = RpClumpClone ( pTemp );
+            RpClumpDestroy ( pTemp );
 
             // ModelInfo::SetClump
             CBaseModelInfoSAInterface* pModelInfoInterface = pModelInfo->GetInterface ();
@@ -720,21 +630,29 @@ RpAtomic* AtomicsReplacer ( RpAtomic* pAtomic, SAtomicsReplacer* pData )
     return pAtomic;
 }
 
-void CRenderWareSA::ReplaceAllAtomicsInModel ( RpClump * pSrc, unsigned short usModelID )
+void CRenderWareSA::ReplaceAllAtomicsInModel ( RpClump * pNew, unsigned short usModelID )
 {
-    // Clone the clump that's to be replaced (FUNC_AtomicsReplacer removes the atomics from the source clump)
-    RpClump * pCopy = RpClumpClone ( pSrc );
+    CModelInfo* pModelInfo = pGame->GetModelInfo ( usModelID );
+    if ( pModelInfo )
+    {
+        RpAtomic* pOldAtomic = (RpAtomic *)pModelInfo->GetRwObject ();
+        if ( !DoContainTheSameGeometry ( pNew, NULL, pOldAtomic ) )
+        {
+            // Clone the clump that's to be replaced (FUNC_AtomicsReplacer removes the atomics from the source clump)
+            RpClump * pCopy = RpClumpClone ( pNew );
 
-    // Replace the atomics
-    SAtomicsReplacer data;
-    data.usTxdID = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
-    data.pClump = pCopy;
+            // Replace the atomics
+            SAtomicsReplacer data;
+            data.usTxdID = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
+            data.pClump = pCopy;
 
-    MemPutFast < DWORD > ( (DWORD*)DWORD_AtomicsReplacerModelID, usModelID );
-    RpClumpForAllAtomics ( pCopy, AtomicsReplacer, &data );
+            MemPutFast < DWORD > ( (DWORD*)DWORD_AtomicsReplacerModelID, usModelID );
+            RpClumpForAllAtomics ( pCopy, AtomicsReplacer, &data );
 
-    // Get rid of the now empty copied clump
-    RpClumpDestroy ( pCopy );
+            // Get rid of the now empty copied clump
+            RpClumpDestroy ( pCopy );
+        }
+    }
 }
 
 // Replaces all atomics in a vehicle
@@ -858,15 +776,9 @@ short CRenderWareSA::CTxdStore_GetTxdRefcount ( unsigned short usTxdID )
     return *(short *)( *(*(DWORD **)0xC8800C) + 0xC*usTxdID + 4 );
 }
 
-bool CRenderWareSA::ListContainsNamedTexture ( std::list < RwTexture* >& list, const char* szTexName )
+bool CRenderWareSA::RwTexDictionaryContainsTexture ( RwTexDictionary* pTXD, RwTexture* pTex )
 {
-    std::list < RwTexture* >::iterator it;
-    for ( it = list.begin (); it != list.end (); it++ )
-    {
-        if ( !stricmp ( szTexName, (*it)->name ) )
-            return true;
-    }
-    return false;
+    return pTex->txd == pTXD;
 }
 
 
@@ -1007,3 +919,16 @@ const SString& CRenderWareSA::GetTextureName ( CD3DDUMMY* pD3DData )
     return strDummy;
 }
 
+
+//
+// CFastHashMap functions
+//
+CD3DDUMMY* GetEmptyMapKey ( CD3DDUMMY** )
+{
+    return (CD3DDUMMY*)-1;
+}
+
+CD3DDUMMY* GetDeletedMapKey ( CD3DDUMMY** )
+{
+    return (CD3DDUMMY*)-2;
+}

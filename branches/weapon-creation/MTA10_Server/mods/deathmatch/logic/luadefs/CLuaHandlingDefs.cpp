@@ -86,7 +86,7 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                                             return 1;
                                         }
                                     }
-                                    m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHandling", "value", 3 );
+                                    m_pScriptDebugging->LogBadPointer ( luaVM, "value", 3 );
                                     break;
                                 }
                             case HANDLING_PERCENTSUBMERGED: // unsigned int
@@ -103,7 +103,7 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                                             return 1;
                                         }
                                     }
-                                    m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHandling", "value", 3 );
+                                    m_pScriptDebugging->LogBadPointer ( luaVM, "value", 3 );
                                     break;
                                 }
                             case HANDLING_NUMOFGEARS:
@@ -118,7 +118,7 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                                             return 1;
                                         }
                                     }
-                                    m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHandling", "value", 3 );
+                                    m_pScriptDebugging->LogBadPointer ( luaVM, "value", 3 );
                                     break;
                                 }
                             case HANDLING_CENTEROFMASS:
@@ -148,7 +148,7 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                                             return 1;
                                         }
                                     }
-                                    m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHandling", "value", 3 );
+                                    m_pScriptDebugging->LogBadPointer ( luaVM, "value", 3 );
                                     break;
                                 }
                             case HANDLING_DRIVETYPE:
@@ -164,7 +164,7 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                                             return 1;
                                         }
                                     }
-                                    m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHandling", "value", 3 );
+                                    m_pScriptDebugging->LogBadPointer ( luaVM, "value", 3 );
                                     break;
                                 }
                             case HANDLING_ABS:
@@ -177,12 +177,12 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                                             return 1;
                                         }
                                     }
-                                    m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHandling", "value", 3 );
+                                    m_pScriptDebugging->LogBadPointer ( luaVM, "value", 3 );
                                     break;
                                 }
                             case HANDLING_MAX:
                                 {
-                                    m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHandling", "property", 2 );
+                                    m_pScriptDebugging->LogBadPointer ( luaVM, "property", 2 );
                                     break;
                                 }
                             default:
@@ -204,11 +204,11 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                 }
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHandling", "property", 2 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "property", 2 );
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleHandling" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -270,7 +270,7 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
                                             return 1;
                                         }
                                     }
-                                    m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "value", 3 );
+                                    m_pScriptDebugging->LogBadPointer ( luaVM, "value", 3 );
                                     break;
                                 }
                             case HANDLING_PERCENTSUBMERGED: // unsigned int
@@ -284,7 +284,7 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
                                         if ( uiValue == 0xffffffff && eProperty == HANDLING_MODELFLAGS )
                                         {
                                             lua_pushboolean ( luaVM, false );
-                                            m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "value", 3 );
+                                            m_pScriptDebugging->LogBadPointer ( luaVM, "value", 3 );
                                             return 1;
                                         }
                                         if ( CStaticFunctionDefinitions::SetModelHandling ( eModel, eProperty, uiValue ) )
@@ -293,7 +293,7 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
                                             return 1;
                                         }
                                     }
-                                    m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "value", 3 );
+                                    m_pScriptDebugging->LogBadPointer ( luaVM, "value", 3 );
                                     break;
                                 }
                             case HANDLING_NUMOFGEARS:
@@ -308,7 +308,7 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
                                             return 1;
                                         }
                                     }
-                                    m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "value", 3 );
+                                    m_pScriptDebugging->LogBadPointer ( luaVM, "value", 3 );
                                     break;
                                 }
                             case HANDLING_CENTEROFMASS:
@@ -338,7 +338,7 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
                                             return 1;
                                         }
                                     }
-                                    m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "value", 3 );
+                                    m_pScriptDebugging->LogBadPointer ( luaVM, "value", 3 );
                                     break;
                                 }
                             case HANDLING_DRIVETYPE:
@@ -365,12 +365,12 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
                                             return 1;
                                         }
                                     }
-                                    m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "value", 3 );
+                                    m_pScriptDebugging->LogBadPointer ( luaVM, "value", 3 );
                                     break;
                                 }
                             case HANDLING_MAX:
                                 {
-                                    m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "property", 2 );
+                                    m_pScriptDebugging->LogBadPointer ( luaVM, "property", 2 );
                                 }
                             default:
                                 break;
@@ -387,11 +387,11 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
                 }
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "property", 2 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "property", 2 );
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setModelHandling" );
+        m_pScriptDebugging->LogBadType ( luaVM );
     
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -552,10 +552,10 @@ int CLuaHandlingDefs::GetVehicleHandling ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleHandling", "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleHandling" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -717,10 +717,10 @@ int CLuaHandlingDefs::GetModelHandling ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getModelHandling", "model", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "model", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getModelHandling" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -849,13 +849,13 @@ int CLuaHandlingDefs::GetOriginalHandling ( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "getOriginalHandling", "model", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "model", 1 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getOriginalHandling", "model", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "model", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getOriginalHandling" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;

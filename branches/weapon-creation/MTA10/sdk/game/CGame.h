@@ -87,6 +87,24 @@ enum eGameVersion
     VERSION_UNKNOWN = 0xFF,
 };
 
+struct SMatchChannelStats
+{
+    SString strTag;
+    uint uiNumMatchedTextures;
+    uint uiNumShaderAndEntities;
+};
+
+struct SShaderReplacementStats
+{
+    uint uiNumReplacementRequests;
+    uint uiNumReplacementMatches;
+    uint uiTotalTextures;
+    uint uiTotalShaders;
+    uint uiTotalEntitesRefed;
+    std::map < uint, SMatchChannelStats > channelStatsList;
+};
+
+
 class __declspec(novtable) CGame 
 {
 public:
@@ -197,7 +215,13 @@ public:
 
     virtual bool                HasCreditScreenFadedOut         ( void ) = 0;
     virtual void                FlushPendingRestreamIPL         ( void ) = 0;
+    virtual void                ResetModelLodDistances          ( void ) = 0;
     virtual void                DisableVSync                    ( void ) = 0;
+
+    virtual void                OnPedContextChange              ( CPed* pPedContext ) = 0;
+    virtual CPed*               GetPedContext                   ( void ) = 0;
+
+    virtual void                GetShaderReplacementStats       ( SShaderReplacementStats& outStats ) = 0;
 };
 
 #endif

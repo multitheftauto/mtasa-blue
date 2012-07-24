@@ -817,7 +817,10 @@ namespace
                                     , iIdleTimeLeft ( 0 )
                                     , uiBytesDownloaded ( 0 )
                                     , iFilesize ( 0 )
-                                {}
+                                {
+                                    exe.iFilesize = 0;
+                                    rar.iFilesize = 0;
+                                }
         // Input
         int                     iMaxServersToTry;
         int                     iTimeoutConnect;
@@ -849,6 +852,23 @@ namespace
         CDataInfoSet            serverInfoMap;
         SString                 strMD5;
         SString                 strSaveLocation;
+
+        struct
+        {
+            SString                 strFilename;
+            CValueInt               iFilesize;
+            CDataInfoSet            serverInfoMap;
+            SString                 strMD5;
+        } exe;
+
+        struct
+        {
+            SString                 strFilename;
+            CValueInt               iFilesize;
+            CDataInfoSet            serverInfoMap;
+            SString                 strMD5;
+        } rar;
+
     };
 
 }

@@ -173,6 +173,8 @@ CGameSA::CGameSA()
     m_pPools->SetPoolCapacity ( OBJECT_POOL, 700 );  // Default is 350
     m_pPools->SetPoolCapacity ( EVENT_POOL, 5000 );
     m_pPools->SetPoolCapacity ( COL_MODEL_POOL, 12000 );  // Default is 10150
+
+    CModelInfoSA::StaticSetHooks ();
 }
 
 CGameSA::~CGameSA ( void )
@@ -576,7 +578,7 @@ void CGameSA::ResetCheats ()
 
 bool CGameSA::GetJetpackWeaponEnabled ( eWeaponType weaponType )
 {
-    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType <= WEAPONTYPE_LAST_WEAPONTYPE )
+    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType < WEAPONTYPE_LAST_WEAPONTYPE )
     {
         return m_JetpackWeapons[weaponType];
     }
@@ -585,7 +587,7 @@ bool CGameSA::GetJetpackWeaponEnabled ( eWeaponType weaponType )
 
 void CGameSA::SetJetpackWeaponEnabled ( eWeaponType weaponType, bool bEnabled )
 {
-    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType <= WEAPONTYPE_LAST_WEAPONTYPE )
+    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType < WEAPONTYPE_LAST_WEAPONTYPE )
     {
         m_JetpackWeapons[weaponType] = bEnabled;
     }
@@ -705,6 +707,18 @@ bool CGameSA::HasCreditScreenFadedOut ( void )
 void CGameSA::FlushPendingRestreamIPL ( void )
 {
     CModelInfoSA::StaticFlushPendingRestreamIPL ();
+    m_pRenderWare->ResetStats ();
+}
+
+void CGameSA::GetShaderReplacementStats ( SShaderReplacementStats& outStats )
+{
+    m_pRenderWare->GetShaderReplacementStats ( outStats );
+}
+
+// Ensure models have the default lod distances
+void CGameSA::ResetModelLodDistances ( void )
+{
+    CModelInfoSA::StaticResetLodDistances ();
 }
 
 // Disable VSync by forcing what normally happends at the end of the loading screens
@@ -722,4 +736,16 @@ CWeapon * CGameSA::CreateWeapon ( void )
 CWeaponStat * CGameSA::CreateWeaponStat ( eWeaponType weaponType, eWeaponSkill weaponSkill )
 {
     return m_pWeaponStatsManager->CreateWeaponStatUnlisted ( weaponType, weaponSkill );
+}
+
+void CGameSA::OnPedContextChange ( CPed* pPedContext )
+{
+    m_pPedContext = pPedContext;
+}
+
+CPed* CGameSA::GetPedContext ( void )
+{
+    if ( !m_pPedContext )
+        m_pPedContext = pGame->GetPools ()->GetPedFromRef ( (DWORD)1 );
+    return m_pPedContext;
 }

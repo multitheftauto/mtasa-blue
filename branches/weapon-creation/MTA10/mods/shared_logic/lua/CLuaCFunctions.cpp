@@ -100,7 +100,9 @@ void CLuaCFunctions::RegisterFunctionsWithVM ( lua_State* luaVM )
     std::vector < CLuaCFunction* > ::const_iterator iter = m_sFunctions.begin ();
     for ( ; iter != m_sFunctions.end (); iter++ )
     {
-        lua_register ( luaVM, (*iter)->GetFunctionName (), (*iter)->GetFunctionAddress () );
+        lua_pushstring ( luaVM, (*iter)->GetFunctionName () );
+        lua_pushcclosure ( luaVM, (*iter)->GetFunctionAddress (), 1 );
+        lua_setglobal ( luaVM, (*iter)->GetFunctionName () );
     }
 }
 

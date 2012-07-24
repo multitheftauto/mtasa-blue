@@ -170,7 +170,7 @@ bool CStaticFunctionDefinitions::TriggerClientEvent ( CElement* pElement, const 
 }
 
 
-bool CStaticFunctionDefinitions::TriggerLatentClientEvent ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain )
+bool CStaticFunctionDefinitions::TriggerLatentClientEvent ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId )
 {
     assert ( pElement );
     assert ( szName );
@@ -186,7 +186,7 @@ bool CStaticFunctionDefinitions::TriggerLatentClientEvent ( CElement* pElement, 
     pElement->GetDescendantsByType ( sendList, true, CElement::PLAYER );
 
     // Send packet to players
-    g_pGame->EnableLatentSends ( true, iBandwidth, pLuaMain );
+    g_pGame->EnableLatentSends ( true, iBandwidth, pLuaMain, usResourceNetId );
     CPlayerManager::Broadcast ( Packet, sendList );
     g_pGame->EnableLatentSends ( false );
 
@@ -1214,7 +1214,7 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const 
         // Run colpoint checks
         m_pColManager->DoHitDetection ( pElement->GetLastPosition (), pElement->GetPosition (), 0.0f, pElement );
     }
-    
+   
     // Construct the set position packet
     CBitStream BitStream;
     BitStream.pBitStream->Write ( vecPosition.fX );
@@ -1320,6 +1320,7 @@ bool CStaticFunctionDefinitions::SetElementVelocity ( CElement* pElement, const 
         }
         default: return false;
     }
+
     CBitStream BitStream;
     BitStream.pBitStream->Write ( vecVelocity.fX );
     BitStream.pBitStream->Write ( vecVelocity.fY );
@@ -1356,7 +1357,6 @@ bool CStaticFunctionDefinitions::SetElementInterior ( CElement* pElement, unsign
     {
         pElement->SetInterior ( ucInterior );
 
-
         // Tell everyone
         CBitStream BitStream;
         BitStream.pBitStream->Write ( ucInterior );
@@ -1368,6 +1368,7 @@ bool CStaticFunctionDefinitions::SetElementInterior ( CElement* pElement, unsign
             BitStream.pBitStream->Write ( vecPosition.fZ );
         }
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_INTERIOR, *BitStream.pBitStream ) );
+
         return true;
     }
 
@@ -1429,7 +1430,7 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsig
         case CElement::RADAR_AREA:
         case CElement::WORLD_MESH:
         {
-            pElement->SetDimension ( usDimension );        
+            pElement->SetDimension ( usDimension );
             CBitStream bitStream;
             bitStream.pBitStream->Write ( usDimension );
             m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DIMENSION, *bitStream.pBitStream ) );
@@ -1546,6 +1547,7 @@ bool CStaticFunctionDefinitions::SetElementAlpha ( CElement* pElement, unsigned 
         }
         default: return false;
     }
+
     CBitStream BitStream;
     BitStream.pBitStream->Write ( ucAlpha );
     m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_ALPHA, *BitStream.pBitStream ) );
@@ -1564,7 +1566,7 @@ bool CStaticFunctionDefinitions::SetElementDoubleSided ( CElement* pElement, boo
     CBitStream BitStream;
     BitStream.pBitStream->WriteBit ( bDoubleSided );
     m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DOUBLESIDED, *BitStream.pBitStream ) );
-    
+
     return true;
 }
 

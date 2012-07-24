@@ -38,7 +38,6 @@ class CClientManager;
 #include "CClientSoundManager.h"
 #include "CClientRenderElementManager.h"
 #include "CClientDisplayManager.h"
-#include "CClientTime.h"
 #include "CClientVehicleManager.h"
 #include "CClientPedManager.h"
 #include "..\deathmatch\logic\CResourceManager.h"

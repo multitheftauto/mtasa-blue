@@ -75,13 +75,7 @@ bool CClientDFF::LoadDFF ( const char* szFile, unsigned short usModelId )
     if ( !g_pCore->GetNetwork ()->CheckFile ( "dff", m_strDffFilename ) )
         return false;
 
-    // Do load now if a model id was supplied
-    if ( usModelId != 0 )
-    {
-        if ( GetLoadedClump ( usModelId ) == NULL )
-            return false;
-    }
-
+    // Do actual load later (in ReplaceModel)
     return true;
 }
 
@@ -215,6 +209,7 @@ void CClientDFF::InternalRestoreModel ( unsigned short usModel )
         // loaded when we do the restore. The streamer will
         // eventually stream them back in with async loading.
         m_pManager->GetObjectManager ()->RestreamObjects ( usModel );
+        g_pGame->GetModelInfo ( usModel )->RestreamIPL ();
     }
     // Is this an ped ID?
     else if ( CClientPlayerManager::IsValidModel ( usModel ) )
@@ -233,6 +228,15 @@ void CClientDFF::InternalRestoreModel ( unsigned short usModel )
     // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
     if ( CClientObjectManager::IsValidModel ( usModel ) && CVehicleUpgrades::IsUpgrade ( usModel ) )
         m_pManager->GetVehicleManager ()->RestreamVehicleUpgrades ( usModel );
+
+    // Force dff reload if this model id is used again
+    SLoadedClumpInfo* pInfo = MapFind ( m_LoadedClumpInfoMap, usModel );
+    if ( pInfo )
+    {
+        if ( pInfo->pClump )
+            g_pGame->GetRenderWare ()->DestroyDFF ( pInfo->pClump );
+        MapRemove ( m_LoadedClumpInfoMap, usModel );
+    }
 }
 
 

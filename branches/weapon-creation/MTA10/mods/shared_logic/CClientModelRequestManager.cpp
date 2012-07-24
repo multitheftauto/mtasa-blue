@@ -168,7 +168,7 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
                     // If not loaded. Replace the model we're going to load.
                     // Also remember that we requested it now.
                     pEntry->pModel = pInfo;
-                    pEntry->dwTimeRequested = timeGetTime ();
+                    pEntry->requestTimer.Reset ();
 
                     // Start loading the new model.
                     pInfo->ModelAddRef ( NON_BLOCKING, "CClientModelRequestManager::Request" );
@@ -195,7 +195,7 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
             pEntry = new SClientModelRequest;
             pEntry->pModel = pInfo;
             pEntry->pEntity = pRequester;
-            pEntry->dwTimeRequested = timeGetTime ();
+            pEntry->requestTimer.Reset ();
             m_Requests.push_back ( pEntry );
 
             // Return false. Caller needs to wait.
@@ -265,9 +265,6 @@ void CClientModelRequestManager::DoPulse ( void )
         // We are now doing the pulse
         m_bDoingPulse = true;
 
-        // Grab the current time
-        DWORD dwTimeNow = timeGetTime ();
-
         // Call the callback for those finished loading and remove them from the list
         SClientModelRequest* pEntry;
         list < SClientModelRequest* > ::iterator iter;
@@ -294,7 +291,7 @@ void CClientModelRequestManager::DoPulse ( void )
             else
             {
                 // Been more than 2 seconds since we requested it? Request it again.
-                if ( dwTimeNow - pEntry->dwTimeRequested >= 2000 )
+                if ( pEntry->requestTimer.Get () > 2000 )
                 {
                     // Request it again. Don't add reference, or we screw up the
                     // reference count.
@@ -304,7 +301,7 @@ void CClientModelRequestManager::DoPulse ( void )
                         pEntry->pModel->Request ( BLOCKING, "CClientModelRequestManager::DoPulse #2" );
 
                     // Remember now as the time we requested it.
-                    pEntry->dwTimeRequested = dwTimeNow;
+                    pEntry->requestTimer.Reset ();
                 }
 
                 // Increment iterator

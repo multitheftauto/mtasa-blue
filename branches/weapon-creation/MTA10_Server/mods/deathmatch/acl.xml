@@ -44,6 +44,9 @@
       <acl name="raceACL"/>
       <object name="resource.race"/>
    </group>
+   <group name="DevGroup">
+      <acl name="DevACL"/>
+   </group>
    <acl name="Default">
       <right name="general.ModifyOtherObjects" access="false"/>
       <right name="general.http" access="false"/>
@@ -240,4 +243,8 @@
       <right name="function.stopResource" access="true"/>
       <right name="function.restartResource" access="true"/>
     </acl>
+   <acl name="DevACL">
+        <right name="resource.performancebrowser.http" access="true"></right>
+        <right name="resource.ajax.http" access="true"></right>
+   </acl>
 </acl>

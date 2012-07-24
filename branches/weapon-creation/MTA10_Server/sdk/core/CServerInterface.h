@@ -29,6 +29,7 @@ public:
     virtual const char*     GetAbsolutePath     ( const char* szRelative, char* szBuffer, unsigned int uiBufferSize ) = 0;
 
     virtual void            Printf              ( const char* szFormat, ... ) = 0;
+    virtual bool            IsRequestingExit    ( void ) = 0;
 };
 
 #endif

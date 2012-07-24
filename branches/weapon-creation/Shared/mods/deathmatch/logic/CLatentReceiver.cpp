@@ -77,6 +77,7 @@ void CLatentReceiver::OnReceive ( NetBitStreamInterface* pBitStream )
     bool bIsTail = false;
     bool bIsCancel = false;
     ushort usCategory = 0;
+    ushort usResourceNetId = 0xFFFF;
     uint uiFinalSize = 0;
     uint uiRate = 0;
 
@@ -92,6 +93,8 @@ void CLatentReceiver::OnReceive ( NetBitStreamInterface* pBitStream )
             pBitStream->Read ( usCategory );
             pBitStream->Read ( uiFinalSize );
             pBitStream->Read ( uiRate );
+            if ( pBitStream->Version () >= 0x31 )
+                pBitStream->Read ( usResourceNetId );
         }
         else
         if ( ucSpecialFlag == FLAG_TAIL )
@@ -128,6 +131,7 @@ void CLatentReceiver::OnReceive ( NetBitStreamInterface* pBitStream )
         activeRx.bReceiveStarted = true;
         activeRx.usCategory = usCategory;
         activeRx.uiRate = uiRate;
+        activeRx.usResourceNetId = usResourceNetId;
         activeRx.buffer.SetSize ( uiFinalSize );
         activeRx.uiWritePosition = 0;
     }
@@ -179,7 +183,7 @@ void CLatentReceiver::OnReceive ( NetBitStreamInterface* pBitStream )
             pBitStream->WriteBits ( activeRx.buffer.GetData () + 5, uiBitStreamBitsUsed );
             pBitStream->ResetReadPointer ();
 
-            DoStaticProcessPacket ( ucPacketId, m_RemoteId, pBitStream );
+            DoStaticProcessPacket ( ucPacketId, m_RemoteId, pBitStream, activeRx.usResourceNetId );
             DoDeallocateNetBitStream ( pBitStream );
         }
         else

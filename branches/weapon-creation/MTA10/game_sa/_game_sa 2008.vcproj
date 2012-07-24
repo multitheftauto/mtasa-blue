@@ -84,7 +84,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Program Files\MTA San Andreas 1.4\MTA\game_sa.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.4 wc\MTA\game_sa.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -187,7 +187,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Program Files\MTA San Andreas 1.4\mta\game_sa_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.4 wc\mta\game_sa_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -665,7 +665,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderWareSA.ShaderMatching.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CRenderWareSA.ShaderSupport.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderWareSA.TextureReplacing.cpp"
 				>
 			</File>
 			<File
@@ -1215,6 +1223,10 @@
 			</File>
 			<File
 				RelativePath=".\CRenderWareSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderWareSA.ShaderMatching.h"
 				>
 			</File>
 			<File

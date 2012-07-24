@@ -145,6 +145,14 @@ void CServerImpl::Printf ( const char* szFormat, ... )
     va_end ( ap );
 }
 
+bool CServerImpl::IsRequestingExit ( void )
+{
+#ifdef WIN32
+    m_pThreadCommandQueue->Process ( m_bRequestedQuit, NULL );
+#endif
+    return m_bRequestedQuit;
+}
+
 #ifndef WIN32
 void CServerImpl::Daemonize () const
 {
@@ -318,6 +326,13 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
                     }
                     else
                     {
+                        // Quit during startup?
+                        if ( m_bRequestedQuit )
+                        {
+                            DestroyWindow ( );
+                            return ERROR_NO_ERROR;
+                        }
+
                         // Couldn't load our mod
                         Print ( "Press Q to shut down the server!\n" );
                         WaitForKey ( 'q' );

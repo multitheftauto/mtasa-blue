@@ -264,6 +264,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetGameVehicleDestructHandler( CClientGame::StaticGameVehicleDestructHandler );
     g_pMultiplayer->SetGamePlayerDestructHandler( CClientGame::StaticGamePlayerDestructHandler );
     g_pMultiplayer->SetGameModelRemoveHandler( CClientGame::StaticGameModelRemoveHandler );
+    g_pMultiplayer->SetGameEntityRenderHandler( CClientGame::StaticGameEntityRenderHandler );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( CClientGame::StaticKeyStrokeHandler );
@@ -412,6 +413,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetGameVehicleDestructHandler( NULL );
     g_pMultiplayer->SetGamePlayerDestructHandler( NULL );
     g_pMultiplayer->SetGameModelRemoveHandler( NULL );
+    g_pMultiplayer->SetGameEntityRenderHandler( NULL );
     g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
@@ -663,7 +665,8 @@ bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword 
             m_Server.SetPassword ( szPassword );
 
         // Display the status box<<<<<
-        g_pCore->ShowMessageBox ( "Local Server", "Starting local server ...", MB_ICON_INFO );
+        m_OnCancelLocalGameClick = GUI_CALLBACK ( &CClientGame::OnCancelLocalGameClick, this );
+        g_pCore->ShowMessageBox ( "Local Server", "Starting local server ...", MB_BUTTON_CANCEL | MB_ICON_INFO, &m_OnCancelLocalGameClick );
     }
     else
     {
@@ -676,6 +679,16 @@ bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword 
     return true;
 }
 
+bool CClientGame::OnCancelLocalGameClick ( CGUIElement * pElement )
+{
+    if ( m_bLocalPlay && m_bWaitingForLocalConnect )
+    {
+        g_pCore->RemoveMessageBox ();
+        g_pCore->GetModManager ()->RequestUnload ();
+        return true;
+    }
+    return false;
+}
 
 void CClientGame::DoPulsePreFrame ( void )
 {   
@@ -2415,7 +2428,7 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
                     CClientEntity* pCollisionEntity = NULL;
                     if ( bCollision && pColPoint )
                     {
-                        vecCollision = *pColPoint->GetPosition ();
+                        vecCollision = pColPoint->GetPosition ();
                         if ( pGameEntity )
                         {
                             CClientEntity* pEntity = m_pManager->FindEntity ( pGameEntity );
@@ -2653,8 +2666,8 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPlayerVoiceStart", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerVoiceStop", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerStealthKill", "target", NULL, false );
-    m_Events.AddEvent ( "onClientPlayerHeliKilled", "heli", NULL, false );
     m_Events.AddEvent ( "onClientPlayerHitByWaterCannon", "vehicle", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerHeliKilled", "heli", NULL, false );
 	m_Events.AddEvent ( "onClientPlayerPickupHit", "pickup, matchingDimension", NULL, false );
 	m_Events.AddEvent ( "onClientPlayerPickupLeave", "pickup, matchingDimension", NULL, false );
 
@@ -2982,7 +2995,7 @@ void CClientGame::DrawWeaponsyncData ( CClientPlayer* pPlayer )
         {
             if ( bCollision )
             {
-                CVector vecBullet = *pCollision->GetPosition() - vecSource;
+                CVector vecBullet = pCollision->GetPosition() - vecSource;
                 vecBullet.Normalize();
                 CVector vecTarget = vecSource + (vecBullet * 200);
                 g_pCore->GetGraphics ()->DrawLine3DQueued ( vecSource, vecTarget, 0.5f, 0x1012DE12, true );
@@ -3314,7 +3327,7 @@ void CClientGame::DoPaintballs ( void )
         pCorona->SetSize ( 0.2f );
         if ( bCollision && pCollision )
         {
-            pCorona->SetPosition ( *pCollision->GetPosition () );
+            pCorona->SetPosition ( pCollision->GetPosition () );
             pCorona->SetColor ( SColorRGBA ( 255, 0, 0, 255 ) );
         }
         else
@@ -3405,6 +3418,8 @@ void CClientGame::Event_OnIngame ( void )
 
     g_pGame->GetWorld ( )->ClearRemovedBuildingLists ( );
     g_pGame->GetWorld ( )->SetOcclusionsEnabled ( true );
+
+    g_pGame->ResetModelLodDistances ();
 
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat ( CITIES_PASSED, 2.0 );
@@ -3585,6 +3600,15 @@ void CClientGame::StaticGamePlayerDestructHandler ( CEntitySAInterface* pPlayer 
 void CClientGame::StaticGameModelRemoveHandler ( ushort usModelId )
 {
     g_pClientGame->GameModelRemoveHandler ( usModelId );
+}
+
+void CClientGame::StaticGameEntityRenderHandler ( CEntitySAInterface* pGameEntity )
+{
+    // Map to client entity and pass to the texture replacer
+    CClientEntity* pClientEntity = NULL;
+    if ( pGameEntity )
+        pClientEntity = g_pClientGame->GetGameEntityXRefManager ()->FindClientEntity ( pGameEntity );
+    g_pGame->GetRenderWare ()->SetRenderingClientEntity ( pClientEntity );
 }
 
 void CClientGame::DrawRadarAreasHandler ( void )
@@ -3800,7 +3824,7 @@ void CClientGame::DownloadFiles ( bool bBackgroundDownload )
             if ( !bBackgroundDownload && !m_bTransferResource )
                 m_pTransferBox->SetInfo ( pHTTP->GetDownloadSizeNow () ); // no need to set this if it's a singular file
 
-            if ( bBackgroundDownload & m_pTransferBox->IsVisible() )
+            if ( bBackgroundDownload && m_pTransferBox->IsVisible() )
             {
                 if ( pHTTP->GetDownloadSizeNow () > m_pTransferBox->GetTotalSize () )
                 {
@@ -4228,7 +4252,7 @@ bool CClientGame::HeliKillHandler ( CVehicleSAInterface* pHeliInterface, CPedSAI
             return bContinue;
         }
     }
-    return false;
+    return true;
 }
 
 bool CClientGame::WaterCannonHitHandler ( CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed )
@@ -4562,7 +4586,7 @@ void CClientGame::PostWeaponFire ( void )
                     vecCollision = vecTarget;
                     bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pCollision, &pCollisionGameEntity );
                     if ( bCollision && pCollision )
-                        vecCollision = *pCollision->GetPosition ();
+                        vecCollision = pCollision->GetPosition ();
 
                     // Destroy the colpoint
                     if ( pCollision )
@@ -4590,8 +4614,16 @@ void CClientGame::PostWeaponFire ( void )
                     Arguments.PushElement ( pCollisionEntity );
                 else
                     Arguments.PushNil ();
+
                 if (IS_PLAYER(pPed))
+                {
+                    CVector vecOrigin;
+                    pPed->GetShotData ( &vecOrigin );
+                    Arguments.PushNumber ( ( double ) vecOrigin.fX );
+                    Arguments.PushNumber ( ( double ) vecOrigin.fY );
+                    Arguments.PushNumber ( ( double ) vecOrigin.fZ );
                     pPed->CallEvent ( "onClientPlayerWeaponFire", Arguments, true );
+                }
                 else
                     pPed->CallEvent ( "onClientPedWeaponFire", Arguments, true );
             }
@@ -4624,7 +4656,7 @@ void CClientGame::BulletImpact ( CPed* pInitiator, CEntity* pVictim, const CVect
             bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( pStartPosition, pEndPosition, &pCollision, NULL );
             if ( bCollision && pCollision )
             {
-                vecCollision = *pCollision->GetPosition ();
+                vecCollision = pCollision->GetPosition ();
             }
             else
             {

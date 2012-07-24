@@ -222,7 +222,13 @@ public:
     CWeapon *               CreateWeapon                    ( void );
     CWeaponStat *           CreateWeaponStat                ( eWeaponType weaponType, eWeaponSkill weaponSkill );
     void                    FlushPendingRestreamIPL         ( void );
+    void                    ResetModelLodDistances          ( void );
     void                    DisableVSync                    ( void );
+
+    void                    OnPedContextChange              ( CPed* pPedContext );
+    CPed*                   GetPedContext                   ( void );
+
+    void                    GetShaderReplacementStats       ( SShaderReplacementStats& outStats );
 
 private:
     CPools                  * m_pPools;
@@ -246,7 +252,7 @@ private:
     CWeaponInfo             * m_pWeaponInfo;
     CExplosionManager       * m_pExplosionManager;
     C3DMarkers              * m_p3DMarkers;
-    CRenderWare             * m_pRenderWare;
+    CRenderWareSA           * m_pRenderWare;
     CHandlingManager        * m_pHandlingManager;
     CAnimManager            * m_pAnimManager;
     CStreaming              * m_pStreaming;
@@ -299,6 +305,8 @@ private:
     std::map < std::string, SCheatSA* > m_Cheats;
 
     SFixedArray < bool, WEAPONTYPE_LAST_WEAPONTYPE > m_JetpackWeapons;
+
+    CPed*                   m_pPedContext;
 };
 
 #endif

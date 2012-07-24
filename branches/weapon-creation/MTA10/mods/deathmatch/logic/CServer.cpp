@@ -187,8 +187,8 @@ bool CServer::Stop ( void )
         DWORD dwExitCode = 0;
         if ( GetExitCodeThread ( m_hThread, &dwExitCode ) )
         {
-            // Non-zero, output error
-            if ( dwExitCode != 0 )
+            // Handle non-zero exit codes
+            if ( dwExitCode != ERROR_NO_ERROR )
             {
                 g_pCore->ShowMessageBox ( "Error", "Could not start the local server. See console for details.", MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pCore->GetConsole ()->Printf ( "Error: Could not start local server. [%s]", szServerErrors[GetLastError()] );

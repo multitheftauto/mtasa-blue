@@ -20,6 +20,8 @@ extern CGameSA * pGame;
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**) ARRAY_ModelInfo;
 
 std::map < unsigned short, int > CModelInfoSA::ms_RestreamTxdIDMap;
+std::map < DWORD, float > CModelInfoSA::ms_ModelDefaultLodDistanceMap;
+std::set < uint > CModelInfoSA::ms_ReplacedColModels;
 
 CModelInfoSA::CModelInfoSA ( void )
 {
@@ -30,6 +32,7 @@ CModelInfoSA::CModelInfoSA ( void )
     m_pOriginalColModelInterface = NULL;
     m_pCustomClump = NULL;
     m_pCustomColModel = NULL;
+    m_bAddedRefForCollision = false;
 }
 
 
@@ -42,6 +45,7 @@ CModelInfoSA::CModelInfoSA ( DWORD dwModelID )
     m_pOriginalColModelInterface = NULL;
     m_pCustomClump = NULL;
     m_pCustomColModel = NULL;
+    m_bAddedRefForCollision = false;
 }
 
 
@@ -406,6 +410,14 @@ VOID CModelInfoSA::Remove ( )
 
     m_pInterface = ppModelInfo [ m_dwModelID ];
 
+    // Remove ref added for collision
+    if ( m_bAddedRefForCollision )
+    {
+        m_bAddedRefForCollision = false;
+        if ( m_pInterface->usNumberOfRefs > 0 )
+            m_pInterface->usNumberOfRefs--;
+    }
+
     // Remove our reference
     if ( m_pInterface->usNumberOfRefs > 0 ) m_pInterface->usNumberOfRefs--;
 
@@ -594,11 +606,29 @@ void CModelInfoSA::SetLODDistance ( float fDistance )
     // Ensure fDistance is in range
     fDistance = Min ( fDistance, fMaximumValue );
 #endif
-    // Limit to 325.f as is goes horrible after that
+    // Limit to 325.f as it goes horrible after that
     fDistance = Min ( fDistance, 325.f );
     m_pInterface = ppModelInfo [ m_dwModelID ];
     if ( m_pInterface )
+    {
+        // Save default value if not done yet
+        if ( !MapContains ( ms_ModelDefaultLodDistanceMap, m_dwModelID ) )
+            MapSet ( ms_ModelDefaultLodDistanceMap, m_dwModelID, m_pInterface->fLodDistanceUnscaled );
         m_pInterface->fLodDistanceUnscaled = fDistance;
+    }
+}
+
+void CModelInfoSA::StaticResetLodDistances ()
+{
+    // Restore default values
+    for ( std::map < DWORD, float >::const_iterator iter = ms_ModelDefaultLodDistanceMap.begin () ; iter != ms_ModelDefaultLodDistanceMap.end () ; ++iter )
+    {
+        CBaseModelInfoSAInterface* pInterface = ppModelInfo [ iter->first ];
+        if ( pInterface )
+            pInterface->fLodDistanceUnscaled = iter->second;
+    }
+
+    ms_ModelDefaultLodDistanceMap.clear ();
 }
 
 void CModelInfoSA::RestreamIPL ()
@@ -904,7 +934,23 @@ void CModelInfoSA::RestoreOriginalModel ( void )
 void CModelInfoSA::SetColModel ( CColModel* pColModel )
 {
     // Grab the interfaces
-    CColModelSAInterface* pInterface = pColModel->GetInterface ();
+    CColModelSAInterface* pColModelInterface = pColModel->GetInterface ();
+
+    if ( !m_bAddedRefForCollision )
+    {
+        // Prevent this model from unloading while we have custom collision
+        ModelAddRef ( BLOCKING, "for collision" );
+        m_bAddedRefForCollision = true;
+    }
+
+    // Should always be loaded at this point
+
+    // Skip setting if already done
+    if ( m_pCustomColModel == pColModel )
+        return;
+
+    // Remember model so we can skip GTA trying to reload the original
+    MapInsert ( ms_ReplacedColModels, m_dwModelID );
 
     // Store the col model we set
     m_pCustomColModel = pColModel;
@@ -918,11 +964,7 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
             m_pOriginalColModelInterface = m_pInterface->pColModel;
 
         // Apply some low-level hacks
-        MemPutFast < BYTE > ( (BYTE*) pInterface + 40, 0xA9 );
-
-        // Extra flags (3064) -- needs to be tested
-        m_pInterface->bDoWeOwnTheColModel = false;
-        m_pInterface->bCollisionWasStreamedWithModel = false;
+        pColModelInterface->level = 0xA9;
 
         // Call SetColModel
         DWORD dwFunc = FUNC_SetColModel;
@@ -932,24 +974,44 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
             mov     ecx, ModelID
             mov     ecx, ARRAY_ModelInfo[ecx*4]
             push    1
-            push    pInterface
+            push    pColModelInterface
             call    dwFunc
         }
+
+        // FUNC_SetColModel resets bDoWeOwnTheColModel
+        m_pInterface->bDoWeOwnTheColModel = false;
+        m_pInterface->bCollisionWasStreamedWithModel = false;
 
         // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
         DWORD func = 0x5B2C20;
         __asm {
-            push    pInterface
+            push    pColModelInterface
             push    ModelID
             call    func
             add     esp, 8
         }
-        #pragma message(__LOC__ "(IJs) Document this function some time.")
+
+        // Set some lighting for this collision if not already present
+        CColDataSA* pColData = pColModelInterface->pColData;
+        if ( pColData )
+        {
+            for ( uint i = 0 ; i < pColData->numColTriangles ; i++ )
+            {
+                CColTriangleSA* pTriangle = pColData->pColTriangles + i;
+                if ( pTriangle->lighting.night == 0 && pTriangle->lighting.day == 0 )
+                {
+                    pTriangle->lighting.night = 1;
+                    pTriangle->lighting.day = 12;
+                }
+            }
+        }
     }
 }
 
 void CModelInfoSA::RestoreColModel ( void )
 {
+    MapRemove ( ms_ReplacedColModels, m_dwModelID );
+
     // Are we loaded?
     m_pInterface = ppModelInfo [ m_dwModelID ];
     if ( m_pInterface )
@@ -984,6 +1046,13 @@ void CModelInfoSA::RestoreColModel ( void )
 
     // We currently have no custom model loaded
     m_pCustomColModel = NULL;
+
+    // Remove ref added for collision
+    if ( m_bAddedRefForCollision )
+    {
+        m_bAddedRefForCollision = false;
+        RemoveRef ();
+    }
 }
 
 
@@ -1048,4 +1117,54 @@ void CModelInfoSA::MakePedModel ( char * szTexture )
 
     // Load our texture
     pGame->GetStreaming ()->RequestSpecialModel ( m_dwModelID, szTexture, 0 );
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Hook for CFileLoader_LoadCollisionFile_Mid
+//
+// Skip loading GTA collision model if we have replaced it
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+bool OnMY_CFileLoader_LoadCollisionFile_Mid ( int iModelId )
+{
+    if ( MapContains ( CModelInfoSA::ms_ReplacedColModels, iModelId ) )
+        return false;
+
+    return true;
+}
+
+// Hook info
+#define HOOKPOS_CFileLoader_LoadCollisionFile_Mid                         0x5384EE
+#define HOOKSIZE_CFileLoader_LoadCollisionFile_Mid                        6
+DWORD RETURN_CFileLoader_LoadCollisionFile_Mid =                          0x5384F4;
+DWORD RETURN_CFileLoader_LoadCollisionFile_Mid_Quit =                     0x53865D;
+void _declspec(naked) HOOK_CFileLoader_LoadCollisionFile_Mid()
+{
+    _asm
+    {
+        pushad
+        push    eax
+        call    OnMY_CFileLoader_LoadCollisionFile_Mid
+        add     esp, 4*1
+
+        cmp     al,0
+        jz      quit
+
+        popad
+        sub     edx,18h 
+        add     ebp,2 
+        jmp     RETURN_CFileLoader_LoadCollisionFile_Mid
+
+quit:
+        popad
+        jmp     RETURN_CFileLoader_LoadCollisionFile_Mid_Quit
+    }
+}
+
+
+void CModelInfoSA::StaticSetHooks ( void )
+{
+    HookInstall( HOOKPOS_CFileLoader_LoadCollisionFile_Mid, (DWORD)HOOK_CFileLoader_LoadCollisionFile_Mid, HOOKSIZE_CFileLoader_LoadCollisionFile_Mid );
 }

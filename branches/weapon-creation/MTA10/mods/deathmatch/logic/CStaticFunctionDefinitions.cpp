@@ -186,7 +186,7 @@ bool CStaticFunctionDefinitions::TriggerServerEvent ( const char* szName, CClien
 }
 
 
-bool CStaticFunctionDefinitions::TriggerLatentServerEvent ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain )
+bool CStaticFunctionDefinitions::TriggerLatentServerEvent ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId )
 {
     assert ( szName );
 
@@ -205,7 +205,9 @@ bool CStaticFunctionDefinitions::TriggerLatentServerEvent ( const char* szName, 
             g_pNet->DeallocateNetBitStream ( pBitStream );
             return false;
         }
-        g_pClientGame->GetLatentTransferManager ()->AddSend ( 0, PACKET_ID_LUA_EVENT, pBitStream, iBandwidth, pLuaMain );
+        g_pClientGame->GetLatentTransferManager ()->AddSendBatchBegin ( PACKET_ID_LUA_EVENT, pBitStream );
+        g_pClientGame->GetLatentTransferManager ()->AddSend ( 0, pBitStream->Version (), iBandwidth, pLuaMain, usResourceNetId );
+        g_pClientGame->GetLatentTransferManager ()->AddSendBatchEnd ();
         g_pNet->DeallocateNetBitStream ( pBitStream );
 
         return true;
@@ -1452,7 +1454,7 @@ CClientEntity* CStaticFunctionDefinitions::GetPedTarget ( CClientPed& Ped )
     CVector vecCollision = vecTarget;
     bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pCollision, &pCollisionGameEntity );
     if ( bCollision && pCollision )
-        vecCollision = *pCollision->GetPosition ();
+        vecCollision = pCollision->GetPosition ();
 
     // Destroy the colpoint
     if ( pCollision )
@@ -1482,7 +1484,7 @@ bool CStaticFunctionDefinitions::GetPedTargetCollision ( CClientPed& Ped, CVecto
     bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pCollision, &pCollisionGameEntity );
     if ( pCollision )
     {
-        vecCollision = *pCollision->GetPosition ();            
+        vecCollision = pCollision->GetPosition ();            
 
         // Destroy the collision
         pCollision->Destroy ();
@@ -2195,8 +2197,13 @@ bool CStaticFunctionDefinitions::SetPedAimTarget ( CClientEntity & Entity, CVect
         CVector vecOrigin;
         Ped.GetPosition ( vecOrigin );
 
+        // Move origin out a bit to avoid hitting ped collision
+        CVector vecDir = vecTarget - vecOrigin;
+        vecDir.Normalize ();
+        vecOrigin += vecDir * 0.9f;
+
         // Arm direction
-        float fArmX = atan2 ( vecTarget.fX - vecOrigin.fX, vecTarget.fY - vecOrigin.fY ),
+        float fArmX = -atan2 ( vecTarget.fX - vecOrigin.fX, vecTarget.fY - vecOrigin.fY ),
               fArmY = -atan2 ( vecTarget.fZ - vecOrigin.fZ, DistanceBetweenPoints2D ( vecTarget, vecOrigin ) );
 
         // TODO: use gun muzzle for origin
