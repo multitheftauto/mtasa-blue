@@ -669,6 +669,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderWareSA.TextureReplacing.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CRestartSA.cpp"
 				>
 			</File>

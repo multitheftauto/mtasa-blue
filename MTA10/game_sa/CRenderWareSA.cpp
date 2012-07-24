@@ -14,6 +14,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define RWFUNC_IMPLEMENT
 #include "gamesa_renderware.h"
 #include "CRenderWareSA.ShaderMatching.h"
 
@@ -349,119 +350,6 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
 CRenderWareSA::~CRenderWareSA ( void )
 {
     SAFE_DELETE ( m_pMatchChannelManager );
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-
-// Adds texture into the TXD of a model, eventually making a copy of each texture first 
-void CRenderWareSA::ModelInfoTXDAddTextures ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bMakeCopy, std::list < RwTexture* >* pReplacedTextures, std::list < RwTexture* >* pAddedTextures, bool bAddRef )
-{
-    // Get the CModelInfo's TXD ID
-    unsigned short usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
-
-    // Get the TXD corresponding to this ID
-    RwTexDictionary* pTXD = CTxdStore_GetTxd ( usTxdId );
-    if ( bAddRef )
-    {
-        if ( !pTXD )
-        {
-            pGame->GetModelInfo ( usModelID )->Request ( BLOCKING, "CRenderWareSA::ModelInfoTXDAddTextures" );
-            CTxdStore_AddRef ( usTxdId );
-            ( (void (__cdecl *)(unsigned short))FUNC_RemoveModel )( usModelID );
-            pTXD = CTxdStore_GetTxd ( usTxdId );
-        }
-        else
-        {
-            CTxdStore_AddRef ( usTxdId );
-        }
-    }
-
-    if ( pTXD )
-    {
-        std::list < RwTexture* >::iterator it;
-        for ( it = textures.begin (); it != textures.end (); it++ )
-        {
-            // Does a texture by this name already exist?
-            RwTexture* pExistingTexture = RwTexDictionaryFindNamedTexture ( pTXD, (*it)->name );
-            if ( pExistingTexture )
-            {
-                // Is it a custom texture?
-                if ( ( pAddedTextures && ListContainsNamedTexture ( *pAddedTextures, (*it)->name ) ) ||
-                     ( pReplacedTextures && ListContainsNamedTexture ( *pReplacedTextures, (*it)->name ) ) )
-                {
-                    continue;
-                }
-                // If not, we can replace it
-                RwTexDictionaryRemoveTexture ( pTXD, pExistingTexture );
-                if ( pReplacedTextures )
-                    pReplacedTextures->push_back ( pExistingTexture );
-            }
-            else
-            {
-                if ( pAddedTextures )
-                    pAddedTextures->push_back ( *it );
-            }
-
-            RwTexture* pTex = *it;
-
-            if ( bMakeCopy )
-            {
-                // Reuse the given texture's raster
-                RwTexture* pNewTex = RwTextureCreate ( pTex->raster );
-
-                // Copy over additional properties
-                MemCpyFast ( &pNewTex->name, &pTex->name, RW_TEXTURE_NAME_LENGTH );
-                MemCpyFast ( &pNewTex->mask, &pTex->mask, RW_TEXTURE_NAME_LENGTH );
-                pNewTex->flags = pTex->flags;
-                
-                pTex = pNewTex;
-            }
-
-            // Add the texture
-            RwTexDictionaryAddTexture ( pTXD, pTex );
-        }
-    }
-}
-
-// Removes textures from the TXD of a model, eventually destroying each texture
-void CRenderWareSA::ModelInfoTXDRemoveTextures ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bDestroy, bool bKeepRaster, bool bRemoveRef )
-{
-    // Get the CModelInfo's TXD ID
-    unsigned short usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
-
-    // Get the TXD corresponding to this ID
-    RwTexDictionary* pTXD = CTxdStore_GetTxd ( usTxdId );
-
-    if ( pTXD )
-    {
-        std::list < RwTexture* >::iterator it;
-        for ( it = textures.begin (); it != textures.end (); it++ )
-        {
-            // Don't remove the passed texture itself, rather any texture with the same name
-            RwTexture* pTex = RwTexDictionaryFindNamedTexture ( pTXD, (*it)->name );
-            if ( pTex )
-            {
-                if ( bDestroy )
-                {
-                    // Destroy the texture
-                    if ( bKeepRaster )
-                        pTex->raster = NULL;
-                    RwTextureDestroy ( pTex );
-                }
-                else
-                {
-                    // Only remove the texture from the txd
-                    RwTexDictionaryRemoveTexture ( pTXD, pTex );
-                }
-            }
-        }
-    }
-
-    // Delete the reference we made in ModelInfoTXDAddTextures
-    if ( bRemoveRef )
-        CTxdStore_RemoveRef ( usTxdId );
 }
 
 
@@ -888,15 +776,9 @@ short CRenderWareSA::CTxdStore_GetTxdRefcount ( unsigned short usTxdID )
     return *(short *)( *(*(DWORD **)0xC8800C) + 0xC*usTxdID + 4 );
 }
 
-bool CRenderWareSA::ListContainsNamedTexture ( std::list < RwTexture* >& list, const char* szTexName )
+bool CRenderWareSA::RwTexDictionaryContainsTexture ( RwTexDictionary* pTXD, RwTexture* pTex )
 {
-    std::list < RwTexture* >::iterator it;
-    for ( it = list.begin (); it != list.end (); it++ )
-    {
-        if ( !stricmp ( szTexName, (*it)->name ) )
-            return true;
-    }
-    return false;
+    return pTex->txd == pTXD;
 }
 
 

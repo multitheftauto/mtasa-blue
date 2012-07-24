@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CRenderWareSA.ShaderMatching.cpp
+*  FILE:        game_sa/CRenderWareSA.ShaderMatching.cpp
 *
 *****************************************************************************/
 
