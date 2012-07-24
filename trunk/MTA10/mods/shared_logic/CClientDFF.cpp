@@ -209,6 +209,7 @@ void CClientDFF::InternalRestoreModel ( unsigned short usModel )
         // loaded when we do the restore. The streamer will
         // eventually stream them back in with async loading.
         m_pManager->GetObjectManager ()->RestreamObjects ( usModel );
+        g_pGame->GetModelInfo ( usModel )->RestreamIPL ();
     }
     // Is this an ped ID?
     else if ( CClientPlayerManager::IsValidModel ( usModel ) )
