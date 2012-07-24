@@ -19,14 +19,23 @@ class CD3DDUMMY;
 class CSHADERDUMMY;
 class CClientEntityBase;
 
+// A list of custom textures to add to a model's txd
+struct SReplacementTextures
+{
+    std::vector < RwTexture* >  textures;
+    std::vector < ushort >      usedInTxdIds;
+    std::vector < ushort >      usedInModelIds;
+};
+
 typedef void (*PFN_WATCH_CALLBACK) ( CSHADERDUMMY* pContext, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld );
 
 #define MAX_ATOMICS_PER_CLUMP   128
 
 class CRenderWare {
     public:
-    virtual void                ModelInfoTXDAddTextures     ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bMakeCopy = true, std::list < RwTexture* >* pReplacedTextures = NULL, std::list < RwTexture* >* pAddedTextures = NULL, bool bAddRef = true ) = 0;
-    virtual void                ModelInfoTXDRemoveTextures  ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bDestroy = true, bool bKeepRaster = false, bool bRemoveRef = true ) = 0;
+    virtual bool                ModelInfoTXDLoadTextures    ( SReplacementTextures* pReplacementTextures, const SString& szFilename, bool bFilteringEnabled ) = 0;
+    virtual bool                ModelInfoTXDAddTextures     ( SReplacementTextures* pReplacementTextures, ushort usModelId ) = 0;
+    virtual void                ModelInfoTXDRemoveTextures  ( SReplacementTextures* pReplacementTextures ) = 0;
     virtual RwTexDictionary *   ReadTXD                     ( const char *szTXD ) = 0;
     virtual RpClump *           ReadDFF                     ( const char *szDFF, unsigned short usModelID, bool bLoadEmbeddedCollisions ) = 0;
     virtual CColModel *         ReadCOL                     ( const char * szCOLFile ) = 0;

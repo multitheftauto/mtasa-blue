@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include "CRenderWareSA.ShaderSupport.h"
 
+class CModelTexturesInfo;
 
 class CRenderWareSA : public CRenderWare
 {
@@ -32,11 +33,9 @@ public:
                         CRenderWareSA               ( enum eGameVersion version );
                         ~CRenderWareSA              ( void );
 
-    // Adds textures into the TXD of a model, eventually making a copy of each texture first
-    void                ModelInfoTXDAddTextures     ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bMakeCopy = true, std::list < RwTexture* >* pReplacedTextures = NULL, std::list < RwTexture* >* pAddedTextures = NULL, bool bAddRef = true );
-
-    // Removes texture from the TXD of a model, eventually destroying each texture
-    void                ModelInfoTXDRemoveTextures  ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bDestroy = true, bool bKeepRaster = false, bool bRemoveRef = true );
+    bool                ModelInfoTXDLoadTextures    ( SReplacementTextures* pReplacementTextures, const SString& szFilename, bool bFilteringEnabled );
+    bool                ModelInfoTXDAddTextures     ( SReplacementTextures* pReplacementTextures, ushort usModelId );
+    void                ModelInfoTXDRemoveTextures  ( SReplacementTextures* pReplacementTextures );
 
     // Reads and parses a TXD file specified by a path (szTXD)
     RwTexDictionary *   ReadTXD                     ( const char *szTXD );
@@ -99,7 +98,7 @@ public:
     void                PulseWorldTextureWatch      ( void );
     void                GetModelTextureNames        ( std::vector < SString >& outNameList, ushort usModelID );
     void                GetTxdTextures              ( std::vector < RwTexture* >& outTextureList, ushort usTxdId );
-    void                GetTxdTextures              ( std::vector < RwTexture* >& outTextureList, RwTexDictionary* pTXD );
+    static void         GetTxdTextures              ( std::vector < RwTexture* >& outTextureList, RwTexDictionary* pTXD );
     const SString&      GetTextureName              ( CD3DDUMMY* pD3DData );
     void                SetRenderingClientEntity    ( CClientEntityBase* pClientEntity );
     CSHADERDUMMY*       GetAppliedShaderForD3DData  ( CD3DDUMMY* pD3DData );
@@ -111,11 +110,12 @@ public:
     // CRenderWareSA methods
     void                ResetStats                  ( void );
     void                GetShaderReplacementStats   ( SShaderReplacementStats& outStats );
+    CModelTexturesInfo* GetModelTexturesInfo        ( ushort usModelId );
 
 private:
     static void         RwTexDictionaryRemoveTexture( RwTexDictionary* pTXD, RwTexture* pTex );
+    static bool         RwTexDictionaryContainsTexture( RwTexDictionary* pTXD, RwTexture* pTex );
     static short        CTxdStore_GetTxdRefcount    ( unsigned short usTxdID );
-    static bool         ListContainsNamedTexture    ( std::list < RwTexture* >& list, const char* szTexName );
     static bool         StaticGetTextureCB          ( RwTexture* texture, std::vector < RwTexture* >* pTextureList );
 
     void                InitTextureWatchHooks       ( void );

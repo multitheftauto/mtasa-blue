@@ -520,6 +520,7 @@ std::vector < SString > SharedUtil::FindFiles ( const SString& strMatch, bool bF
                     strResult.push_back ( DirEntry->d_name );
             }
         }
+        closedir ( Dir );
     }
     return strResult;
 }
