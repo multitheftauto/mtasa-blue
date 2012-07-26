@@ -289,10 +289,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     // Key-bind for fire-key (for handling satchels and stealth-kills)
     g_pCore->GetKeyBinds ()->AddControlFunction ( "fire", CClientGame::StaticUpdateFireKey, true );
 
-    // Disable mouse controls, as we process these ourselves
-    g_pGame->GetControllerConfigManager ()->SetSteerWithMouse ( false );
-    g_pGame->GetControllerConfigManager ()->SetFlyWithMouse ( false );
-
     // Init big packet progress vars
     m_bReceivingBigPacket           = false;
     m_ulBigPacketSize               = 0;

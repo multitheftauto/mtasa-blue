@@ -202,9 +202,10 @@ public:
     virtual void                SetInputType ( unsigned char ucInputType ) = 0;
     virtual bool                IsMouseInverted ( void ) = 0;
     virtual void                SetMouseInverted ( bool bInverted ) = 0;
-    virtual bool                GetFlyWithMouse ( void ) = 0;
+    virtual bool                GetFlyWithMouse ( bool bIgnoreSuspend ) = 0;
     virtual void                SetFlyWithMouse ( bool bFlyWithMouse ) = 0;
-    virtual bool                GetSteerWithMouse ( void ) = 0;
+    virtual bool                GetSteerWithMouse ( bool bIgnoreSuspend ) = 0;
     virtual void                SetSteerWithMouse ( bool bFlyWithMouse ) = 0;
+    virtual void                SuspendSteerAndFlyWithMouse ( bool bSuspend ) = 0;
 };
 #endif

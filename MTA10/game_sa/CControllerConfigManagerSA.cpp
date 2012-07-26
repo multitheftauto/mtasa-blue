@@ -14,10 +14,17 @@
 
 #include "StdInc.h"
 
+#define VAR_InputType       ( ( BYTE * ) ( 0xB6EC2E ) )
+#define VAR_MouseInverted   ( ( BYTE * ) ( 0xBA6745 ) )
+#define VAR_FlyWithMouse    ( ( BYTE * ) ( 0xC1CC03 ) )
+#define VAR_SteerWithMouse  ( ( BYTE * ) ( 0xC1CC02 ) )
+
 CControllerConfigManagerSA::CControllerConfigManagerSA()
 {
-    
-
+    m_bSuspendSteerAndFlyWithMouse = false;
+    // Get initial settings
+    m_bSteerWithMouse = *VAR_FlyWithMouse;
+    m_bFlyWithMouse = *VAR_SteerWithMouse;
 }
 
 void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction ( eControllerAction action, int iKey, eControllerType controllerType )
@@ -76,40 +83,66 @@ void CControllerConfigManagerSA::ClearSettingsAssociatedWithAction ( eController
 
 unsigned char CControllerConfigManagerSA::GetInputType ( void )
 {
-    return * ( unsigned char * ) ( 0xB6EC2E );
+    return *VAR_InputType;
 }
 
 void CControllerConfigManagerSA::SetInputType ( unsigned char ucInputType )
 {
-    MemPutFast < unsigned char > ( 0xB6EC2E, ucInputType );
+    MemPutFast < unsigned char > ( VAR_InputType, ucInputType );
 }
 
 bool CControllerConfigManagerSA::IsMouseInverted ( void )
 {
-    return ( * ( BYTE * ) ( 0xBA6745 ) == 0 );
+    return *VAR_MouseInverted;
 }
 
 void CControllerConfigManagerSA::SetMouseInverted ( bool bInverted )
 {
-    MemPutFast < BYTE > ( 0xBA6745, ( bInverted ) ? 0 : 1 );
+    MemPutFast < BYTE > ( VAR_MouseInverted, ( bInverted ) ? 0 : 1 );
 }
 
-bool CControllerConfigManagerSA::GetFlyWithMouse ( void )
+bool CControllerConfigManagerSA::GetFlyWithMouse ( bool bIgnoreSuspend )
 {
-    return ( * ( BYTE * ) ( 0xC1CC03 ) == 1 );
+    if ( m_bSuspendSteerAndFlyWithMouse && !bIgnoreSuspend )
+        return false;
+    return m_bFlyWithMouse;
 }
 
 void CControllerConfigManagerSA::SetFlyWithMouse ( bool bFlyWithMouse )
 {
-    MemPutFast < BYTE > ( 0xC1CC03, ( bFlyWithMouse ) ? 1 : 0 );
+    m_bFlyWithMouse = bFlyWithMouse;
+    ApplySteerAndFlyWithMouseSettings ();
 }
 
-bool CControllerConfigManagerSA::GetSteerWithMouse ( void )
+bool CControllerConfigManagerSA::GetSteerWithMouse ( bool bIgnoreSuspend )
 {
-    return ( * ( BYTE * ) ( 0xC1CC02 ) == 1 );
+    if ( m_bSuspendSteerAndFlyWithMouse && !bIgnoreSuspend )
+        return false;
+    return m_bSteerWithMouse;
 }
 
 void CControllerConfigManagerSA::SetSteerWithMouse ( bool bSteerWithMouse )
 {
-    MemPutFast < BYTE > ( 0xC1CC02, ( bSteerWithMouse ) ? 1 : 0 );
+    m_bSteerWithMouse = bSteerWithMouse;
+    ApplySteerAndFlyWithMouseSettings ();
+}
+
+void CControllerConfigManagerSA::SuspendSteerAndFlyWithMouse ( bool bSuspend )
+{
+    m_bSuspendSteerAndFlyWithMouse = bSuspend;
+    ApplySteerAndFlyWithMouseSettings ();
+}
+
+void CControllerConfigManagerSA::ApplySteerAndFlyWithMouseSettings ( void )
+{
+    if ( m_bSuspendSteerAndFlyWithMouse )
+    {
+        *VAR_FlyWithMouse = 0;
+        *VAR_SteerWithMouse = 0;
+    }
+    else
+    {
+        *VAR_FlyWithMouse = m_bFlyWithMouse;
+        *VAR_SteerWithMouse = m_bSteerWithMouse;
+    }
 }

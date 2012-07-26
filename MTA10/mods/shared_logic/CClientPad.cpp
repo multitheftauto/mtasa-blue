@@ -490,36 +490,15 @@ void CClientPad::ProcessAllToggledControls ( CControllerState & cs, bool bOnFoot
     ProcessToggledControl ( "special_control_right",    cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "special_control_right" ) );
     ProcessToggledControl ( "special_control_up",       cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "special_control_up" ) );
     ProcessToggledControl ( "special_control_down",     cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "special_control_down" ) );
-    if ( bDisableControllerLeftRight )
-    {
-        CControllerConfigManager * pController = g_pGame->GetControllerConfigManager ();
-        m_bSteerWithMouse = pController->GetFlyWithMouse ( );
-        m_bFlyWithMouse = pController->GetSteerWithMouse ( );
-        if ( m_bFlyWithMouse || m_bSteerWithMouse )
-        {
-            pController->SetFlyWithMouse ( false );
-            pController->SetSteerWithMouse ( false );
-        }
-    }
-    else
-    {
-        if ( m_bSteerWithMouse )
-        {
-            CControllerConfigManager * pController = g_pGame->GetControllerConfigManager ();
-            pController->SetSteerWithMouse ( true );
-        }
-        if ( m_bFlyWithMouse )
-        {
-            CControllerConfigManager * pController = g_pGame->GetControllerConfigManager ();
-            pController->SetFlyWithMouse ( true );
-        }
-    }
+
+    g_pGame->GetControllerConfigManager ()->SuspendSteerAndFlyWithMouse ( bDisableControllerLeftRight );
 }
 
+// Clear pad data for a disabled control. Returns true if control was actually disabled.
 bool CClientPad::ProcessToggledControl ( const char * szName, CControllerState & cs, bool bOnFoot, bool bEnabled )
 {
     if ( bEnabled )  // We don't need to disable anything if it the control is enabled.
-        return true;
+        return false;
 
     unsigned int uiIndex;
     if ( GetAnalogControlIndex ( szName, uiIndex ) )
