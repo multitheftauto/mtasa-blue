@@ -15,7 +15,8 @@ extern CCoreInterface* g_pCore;
 namespace
 {
     SRwResourceStats ms_Stats;
-    CEntitySAInterface* ms_RenderingEntity = NULL;
+    CEntitySAInterface* ms_Rendering = NULL;
+    CEntitySAInterface* ms_RenderingOneNonRoad = NULL;
     GameEntityRenderHandler* pGameEntityRenderHandler = NULL;
 }
 
@@ -316,6 +317,71 @@ void _declspec(naked) HOOK_CallIdle()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CEntity::Render
+//
+// Detect entity rendering
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_CEntity_Render_Pre( CEntitySAInterface* pEntity )
+{
+    // Ignore buildings
+    if ( pEntity->vtbl == (CEntitySAInterfaceVTBL*)0x08585c8 )
+        return;
+    // Ignore dummy objects
+    if ( pEntity->vtbl == (CEntitySAInterfaceVTBL*)0x0866E78 )
+        return;
+
+    ms_Rendering = pEntity;
+
+    if ( pGameEntityRenderHandler && ms_Rendering )
+        pGameEntityRenderHandler ( ms_Rendering );
+}
+
+void OnMY_CEntity_Render_Post( CEntitySAInterface* pEntity )
+{
+    if ( ms_Rendering )
+    {
+        ms_Rendering = NULL;
+        if ( pGameEntityRenderHandler )
+            pGameEntityRenderHandler ( ms_RenderingOneNonRoad );
+    }
+}
+
+// Hook info
+#define HOOKPOS_CEntity_Render                         0x534310
+#define HOOKSIZE_CEntity_Render                        6
+DWORD RETURN_CEntity_Render =                          0x534317;
+void _declspec(naked) HOOK_CEntity_Render()
+{
+    _asm
+    {
+        pushad
+        push    ecx
+        call    OnMY_CEntity_Render_Pre
+        add     esp, 4*1
+        popad
+
+        call inner
+
+        pushad
+        push    ecx
+        call    OnMY_CEntity_Render_Post
+        add     esp, 4*1
+        popad
+        retn
+
+inner:
+        push    ecx  
+        push    esi  
+        mov     esi,ecx 
+        mov     eax,dword ptr [esi+18h] 
+        jmp     RETURN_CEntity_Render
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CEntity::RenderOneNonRoad
 //
 // Detect entity rendering
@@ -330,19 +396,19 @@ void OnMY_CEntity_RenderOneNonRoad_Pre( DWORD calledFrom, CEntitySAInterface* pE
     if ( pEntity->vtbl == (CEntitySAInterfaceVTBL*)0x0866E78 )
         return;
 
-    ms_RenderingEntity = pEntity;
+    ms_RenderingOneNonRoad = pEntity;
 
     if ( pGameEntityRenderHandler )
-        pGameEntityRenderHandler ( ms_RenderingEntity );
+        pGameEntityRenderHandler ( ms_RenderingOneNonRoad );
 }
 
 void OnMY_CEntity_RenderOneNonRoad_Post( DWORD calledFrom, CEntitySAInterface* pEntity )
 {
-    if ( ms_RenderingEntity )
+    if ( ms_RenderingOneNonRoad )
     {
-        ms_RenderingEntity = NULL;
+        ms_RenderingOneNonRoad = NULL;
         if ( pGameEntityRenderHandler )
-            pGameEntityRenderHandler ( ms_RenderingEntity );
+            pGameEntityRenderHandler ( ms_RenderingOneNonRoad );
     }
 }
 
@@ -423,5 +489,6 @@ void CMultiplayerSA::InitHooks_RwResources ( void )
     EZHookInstall ( RwGeometryCreate );
     EZHookInstall ( RwGeometryDestroy );
     EZHookInstall ( CallIdle );
+    EZHookInstall ( CEntity_Render );
     EZHookInstall ( CEntity_RenderOneNonRoad );
 }
