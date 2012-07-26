@@ -3600,11 +3600,14 @@ void CClientGame::StaticGameModelRemoveHandler ( ushort usModelId )
 
 void CClientGame::StaticGameEntityRenderHandler ( CEntitySAInterface* pGameEntity )
 {
-    // Map to client entity and pass to the texture replacer
-    CClientEntity* pClientEntity = NULL;
     if ( pGameEntity )
-        pClientEntity = g_pClientGame->GetGameEntityXRefManager ()->FindClientEntity ( pGameEntity );
-    g_pGame->GetRenderWare ()->SetRenderingClientEntity ( pClientEntity );
+    {
+        // Map to client entity and pass to the texture replacer
+        CClientEntity* pClientEntity = g_pClientGame->GetGameEntityXRefManager ()->FindClientEntity ( pGameEntity );
+        g_pGame->GetRenderWare ()->SetRenderingClientEntity ( pClientEntity, DynamicCast < CClientPed > ( pClientEntity ) );
+    }
+    else
+        g_pGame->GetRenderWare ()->SetRenderingClientEntity ( NULL, false );
 }
 
 void CClientGame::DrawRadarAreasHandler ( void )

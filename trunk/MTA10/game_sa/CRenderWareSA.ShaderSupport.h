@@ -60,16 +60,18 @@ struct STexTag
 //
 struct SShaderInfo
 {
-    SShaderInfo ( CSHADERDUMMY* pShaderData, float fOrderPriority, uint uiShaderCreateTime )
+    SShaderInfo ( CSHADERDUMMY* pShaderData, float fOrderPriority, uint uiShaderCreateTime, bool bUsesVertexShader )
         : pShaderData ( pShaderData )
         , fOrderPriority ( fOrderPriority )
         , uiShaderCreateTime ( uiShaderCreateTime )
+        , bUsesVertexShader ( bUsesVertexShader )
     {
     }
 
     CSHADERDUMMY* const         pShaderData;
     const float                 fOrderPriority;
     const uint                  uiShaderCreateTime;
+    const bool                  bUsesVertexShader;
 };
 
 

@@ -19,9 +19,9 @@ uint CMatchChannel::ms_uiIdCounter = 1;
 // Add additive match for a shader+entity combo
 //
 //////////////////////////////////////////////////////////////////
-void CMatchChannelManager::AppendAdditiveMatch ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const SString& strTextureNameMatch, float fShaderPriority, uint uiShaderCreateTime )
+void CMatchChannelManager::AppendAdditiveMatch ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const SString& strTextureNameMatch, float fShaderPriority, uint uiShaderCreateTime, bool bShaderUsesVertexShader )
 {
-    SShaderInfo* pShaderInfo = GetShaderInfo ( pShaderData, true, fShaderPriority, uiShaderCreateTime );
+    SShaderInfo* pShaderInfo = GetShaderInfo ( pShaderData, true, fShaderPriority, uiShaderCreateTime, bShaderUsesVertexShader );
 
     // Make channel unique before modifying match chain
     CMatchChannel* pChannel = GetChannelOnlyUsedBy ( pShaderInfo, pClientEntity );
@@ -45,7 +45,7 @@ void CMatchChannelManager::AppendAdditiveMatch ( CSHADERDUMMY* pShaderData, CCli
 void CMatchChannelManager::AppendSubtractiveMatch ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const SString& strTextureNameMatch )
 {
     // Don't bother if shader hasn't been seen before
-    SShaderInfo* pShaderInfo = GetShaderInfo ( pShaderData, false, 0, 0 );
+    SShaderInfo* pShaderInfo = GetShaderInfo ( pShaderData, false, 0, 0, false );
     if ( !pShaderInfo )
         return;
 
@@ -121,7 +121,7 @@ void CMatchChannelManager::RemoveTexture ( STexInfo* pTexInfo )
 //
 //
 //////////////////////////////////////////////////////////////////
-CSHADERDUMMY* CMatchChannelManager::GetShaderForTexAndEntity ( STexInfo* pTexInfo, CClientEntityBase* pClientEntity )
+SShaderInfo* CMatchChannelManager::GetShaderForTexAndEntity ( STexInfo* pTexInfo, CClientEntityBase* pClientEntity )
 {
     STexNameInfo* pTexNameInfo = pTexInfo->pAssociatedTexNameInfo;
 
@@ -163,7 +163,7 @@ CSHADERDUMMY* CMatchChannelManager::GetShaderForTexAndEntity ( STexInfo* pTexInf
 #endif
         // Is there a shader item for this entity?
         if ( pTexShaderReplacement->pShaderInfo )
-            return pTexShaderReplacement->pShaderInfo->pShaderData;
+            return pTexShaderReplacement->pShaderInfo;
     }
 
     if ( !pTexNameInfo->texNoEntityShader.bSet )
@@ -184,12 +184,7 @@ CSHADERDUMMY* CMatchChannelManager::GetShaderForTexAndEntity ( STexInfo* pTexInf
     }
 #endif
 
-    SShaderInfo* pShaderInfo = pTexNameInfo->texNoEntityShader.pShaderInfo;
-
-    if ( !pShaderInfo )
-        return NULL;
-
-    return pShaderInfo->pShaderData;
+    return pTexNameInfo->texNoEntityShader.pShaderInfo;
 }
 
 
@@ -295,7 +290,7 @@ void CMatchChannelManager::RemoveClientEntityRefs ( CClientEntityBase* pClientEn
 //////////////////////////////////////////////////////////////////
 void CMatchChannelManager::RemoveShaderRefs ( CSHADERDUMMY* pShaderData )
 {
-    SShaderInfo* pShaderInfo = GetShaderInfo ( pShaderData, false, 0, 0 );
+    SShaderInfo* pShaderInfo = GetShaderInfo ( pShaderData, false, 0, 0, false );
     if ( !pShaderInfo )
         return;
 
@@ -686,14 +681,14 @@ void CMatchChannelManager::DeleteChannel ( CMatchChannel* pChannel )
 //
 //
 //////////////////////////////////////////////////////////////////
-SShaderInfo* CMatchChannelManager::GetShaderInfo ( CSHADERDUMMY* pShaderData, bool bAddIfRequired, float fPriority, uint uiShaderCreateTime )
+SShaderInfo* CMatchChannelManager::GetShaderInfo ( CSHADERDUMMY* pShaderData, bool bAddIfRequired, float fPriority, uint uiShaderCreateTime, bool bUsesVertexShader )
 {
     // Find existing
     SShaderInfo* pShaderInfo = MapFindRef ( m_ShaderInfoMap, pShaderData );
     if ( !pShaderInfo && bAddIfRequired )
     {
         // Add new
-        MapSet ( m_ShaderInfoMap, pShaderData, new SShaderInfo ( pShaderData, fPriority, uiShaderCreateTime ) );
+        MapSet ( m_ShaderInfoMap, pShaderData, new SShaderInfo ( pShaderData, fPriority, uiShaderCreateTime, bUsesVertexShader ) );
         pShaderInfo = MapFindRef ( m_ShaderInfoMap, pShaderData );
     }
 
