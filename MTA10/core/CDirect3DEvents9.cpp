@@ -298,8 +298,8 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
     // Any shader for this texture ?
     CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
 
-    // Don't apply if a vertex shader is already being used
-    if ( g_pDeviceState->VertexShader )
+    // Don't apply if both the shader and render state both use a vertex shader
+    if ( pShaderItem && g_pDeviceState->VertexShader && pShaderItem->GetUsesVertexShader () )
         pShaderItem = NULL;
 
     if ( !pShaderItem )
@@ -323,6 +323,9 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
         // Apply mapped parameters
         pShaderInstance->m_pEffectWrap->ApplyMappedHandles ();
 
+        // Remember vertex shader if original draw was using it
+        IDirect3DVertexShader9* pOriginalVertexShader = g_pDeviceState->VertexShader;
+
         // Do shader passes
         ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
 
@@ -333,6 +336,11 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
         for ( uint uiPass = 0 ; uiPass < uiNumPasses ; uiPass++ )
         {
             pD3DEffect->BeginPass ( uiPass );
+
+            // Apply original vertex shader if original draw was using it (i.e. for ped animation)
+            if ( pOriginalVertexShader )
+                pDevice->SetVertexShader( pOriginalVertexShader );
+
             DrawPrimitiveGuarded ( pDevice, PrimitiveType, StartVertex, PrimitiveCount );
             pD3DEffect->EndPass ();
         }
@@ -341,7 +349,7 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
         // If we didn't get the effect to save the shader state, clear some things here
         if ( dwFlags & D3DXFX_DONOTSAVESHADERSTATE )
         {
-            pDevice->SetVertexShader( NULL );
+            pDevice->SetVertexShader( pOriginalVertexShader );
             pDevice->SetPixelShader( NULL );
         }
 
@@ -375,8 +383,8 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
     // Any shader for this texture ?
     CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
 
-    // Don't apply if a vertex shader is already being used
-    if ( g_pDeviceState->VertexShader )
+    // Don't apply if both the shader and render state both use a vertex shader
+    if ( pShaderItem && g_pDeviceState->VertexShader && pShaderItem->GetUsesVertexShader () )
         pShaderItem = NULL;
 
     if ( pShaderItem && pShaderItem->m_fMaxDistanceSq > 0 )
@@ -417,6 +425,9 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
         // Apply mapped parameters
         pShaderInstance->m_pEffectWrap->ApplyMappedHandles ();
 
+        // Remember vertex shader if original draw was using it
+        IDirect3DVertexShader9* pOriginalVertexShader = g_pDeviceState->VertexShader;
+
         // Do shader passes
         ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
 
@@ -427,6 +438,11 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
         for ( uint uiPass = 0 ; uiPass < uiNumPasses ; uiPass++ )
         {
             pD3DEffect->BeginPass ( uiPass );
+
+            // Apply original vertex shader if original draw was using it (i.e. for ped animation)
+            if ( pOriginalVertexShader )
+                pDevice->SetVertexShader( pOriginalVertexShader );
+
             DrawIndexedPrimitiveGuarded ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
             pD3DEffect->EndPass ();
         }
@@ -435,7 +451,7 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
         // If we didn't get the effect to save the shader state, clear some things here
         if ( dwFlags & D3DXFX_DONOTSAVESHADERSTATE )
         {
-            pDevice->SetVertexShader( NULL );
+            pDevice->SetVertexShader( pOriginalVertexShader );
             pDevice->SetPixelShader( NULL );
         }
 

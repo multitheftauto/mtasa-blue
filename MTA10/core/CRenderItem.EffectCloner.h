@@ -20,7 +20,7 @@ class CEffectCloner
 public:
     virtual                 ~CEffectCloner      ( void ) {}
     virtual void            DoPulse             ( void ) = 0;
-    virtual ID3DXEffect*    CreateD3DEffect     ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug ) = 0;
+    virtual ID3DXEffect*    CreateD3DEffect     ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool& bOutUsesVertexShader, bool bDebug ) = 0;
     virtual void            ReleaseD3DEffect    ( ID3DXEffect* pD3DEffect ) = 0;
 };
 
@@ -42,7 +42,7 @@ class CEffectTemplate : public CRenderItem
 
     virtual bool            HaveFilesChanged        ( void ) = 0;
     virtual int             GetTicksSinceLastUsed   ( void ) = 0;
-    virtual ID3DXEffect*    CloneD3DEffect          ( SString* pstrTechinqueName ) = 0;
+    virtual ID3DXEffect*    CloneD3DEffect          ( SString& strOutStatus, bool& bOutUsesVertexShader ) = 0;
     virtual void            UnCloneD3DEffect        ( ID3DXEffect* pD3DEffect ) = 0;
 };
 
