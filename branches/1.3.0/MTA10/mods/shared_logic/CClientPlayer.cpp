@@ -16,6 +16,7 @@
 *****************************************************************************/
 
 #include <StdInc.h>
+int g_iDamageEventLimit = -1;
 
 CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsLocalPlayer ) : ClassInit ( this ), CClientPed ( pManager, 0, ID, bIsLocalPlayer )
 {
@@ -293,7 +294,9 @@ void CClientPlayer::DischargeWeapon ( eWeaponType weaponType, const CVector& vec
             m_shotSyncData->m_vecRemoteBulletSyncEnd = vecEnd;
             m_shotSyncData->m_bRemoteBulletSyncVectorsValid = true;
 
+            g_iDamageEventLimit = 1;
             m_pPlayerPed->GetPedIntelligence ()->DischargeCurrentWeapon ( false );
+            g_iDamageEventLimit = -1;
         }
     }
 }

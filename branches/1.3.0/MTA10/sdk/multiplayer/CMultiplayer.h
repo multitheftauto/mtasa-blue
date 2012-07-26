@@ -284,7 +284,6 @@ public:
 
     virtual void                        GetRwResourceStats          ( SRwResourceStats& outStats ) = 0;
     virtual void                        GetClothesCacheStats        ( SClothesCacheStats& outStats ) = 0;
-    virtual void                        SetDamageEventLimit         ( int iLimit ) = 0;
 };
 
 #endif

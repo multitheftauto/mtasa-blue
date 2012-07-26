@@ -264,11 +264,11 @@ public:
 class CMatchChannelManager
 {
 public:
-    void                AppendAdditiveMatch             ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const SString& strTextureNameMatch, float fShaderPriority, uint uiShaderCreateTime );
+    void                AppendAdditiveMatch             ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const SString& strTextureNameMatch, float fShaderPriority, uint uiShaderCreateTime, bool bShaderUsesVertexShader );
     void                AppendSubtractiveMatch          ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const SString& strTextureNameMatch );
     void                InsertTexture                   ( STexInfo* pTexInfo );
     void                RemoveTexture                   ( STexInfo* pTexInfo );
-    CSHADERDUMMY*       GetShaderForTexAndEntity        ( STexInfo* pTexInfo, CClientEntityBase* pClientEntity );
+    SShaderInfo*        GetShaderForTexAndEntity        ( STexInfo* pTexInfo, CClientEntityBase* pClientEntity );
     void                RemoveClientEntityRefs          ( CClientEntityBase* pClientEntity );
     void                RemoveShaderRefs                ( CSHADERDUMMY* pShaderData );
     void                GetShaderReplacementStats       ( SShaderReplacementStats& outStats );
@@ -287,7 +287,7 @@ protected:
     CMatchChannel*      GetChannel                      ( const CShaderAndEntityPair& key );
     CMatchChannel*      NewChannel                      ( void );
     void                DeleteChannel                   ( CMatchChannel* pChannel );
-    SShaderInfo*        GetShaderInfo                   ( CSHADERDUMMY* pShaderData, bool bAddIfRequired, float fPriority, uint uiShaderCreateTime );
+    SShaderInfo*        GetShaderInfo                   ( CSHADERDUMMY* pShaderData, bool bAddIfRequired, float fPriority, uint uiShaderCreateTime, bool bUsesVertexShader );
     void                DeleteShaderInfo                ( SShaderInfo* pShaderInfo );
 
     std::map < CShaderAndEntityPair, CMatchChannel* >   m_ChannelUsageMap;

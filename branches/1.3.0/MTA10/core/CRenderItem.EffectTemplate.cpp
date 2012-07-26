@@ -383,22 +383,32 @@ ID3DXEffect* CEffectTemplateImpl::CloneD3DEffect ( SString& strOutStatus, bool& 
         return NULL;
 
     // Set the same technique
-    D3DXHANDLE hTechnique = m_pD3DEffect->GetCurrentTechnique ();
-    D3DXTECHNIQUE_DESC TechniqueDesc;
-    m_pD3DEffect->GetTechniqueDesc( hTechnique, &TechniqueDesc );
-    pNewD3DEffect->SetTechnique ( pNewD3DEffect->GetTechniqueByName ( TechniqueDesc.Name ) );
-
-    // Output technique name
-    strOutStatus = TechniqueDesc.Name;
-
-    // Check if it uses a vertex shader
-    bOutUsesVertexShader = false;
-    for ( uint i = 0 ; i < TechniqueDesc.Passes ; i++ )
     {
-        D3DXPASS_DESC PassDesc;
-        m_pD3DEffect->GetPassDesc ( m_pD3DEffect->GetPass ( hTechnique, i ), &PassDesc );
-        if ( PassDesc.pVertexShaderFunction )
-            bOutUsesVertexShader = true;
+        D3DXHANDLE hTechnique = m_pD3DEffect->GetCurrentTechnique ();
+        D3DXTECHNIQUE_DESC TechniqueDesc;
+        m_pD3DEffect->GetTechniqueDesc( hTechnique, &TechniqueDesc );
+        pNewD3DEffect->SetTechnique ( pNewD3DEffect->GetTechniqueByName ( TechniqueDesc.Name ) );
+
+        // Output technique name
+        strOutStatus = TechniqueDesc.Name;
+    }
+
+    // Check if any technique uses a vertex shader
+    bOutUsesVertexShader = false;
+    D3DXEFFECT_DESC EffectDesc;
+    m_pD3DEffect->GetDesc ( &EffectDesc );
+    for ( uint i = 0 ; i < EffectDesc.Techniques ; i++ )
+    {
+        D3DXHANDLE hTechnique = m_pD3DEffect->GetTechnique ( i );
+        D3DXTECHNIQUE_DESC TechniqueDesc;
+        m_pD3DEffect->GetTechniqueDesc( hTechnique, &TechniqueDesc );
+        for ( uint i = 0 ; i < TechniqueDesc.Passes ; i++ )
+        {
+            D3DXPASS_DESC PassDesc;
+            m_pD3DEffect->GetPassDesc ( m_pD3DEffect->GetPass ( hTechnique, i ), &PassDesc );
+            if ( PassDesc.pVertexShaderFunction )
+                bOutUsesVertexShader = true;
+        }
     }
 
     // Add to list of clones
