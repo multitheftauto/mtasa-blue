@@ -42,8 +42,8 @@ using std::vector;
 
 // Used within this file by the packet handler to grab the this pointer of CClientGame
 extern CClientGame* g_pClientGame;
+extern int g_iDamageEventLimit;
 
-bool g_bBoundsChecker = true;
 #define DEFAULT_GRAVITY            0.008f
 #define DEFAULT_GAME_SPEED         1.0f
 #define DEFAULT_BLUR_LEVEL         36
@@ -3925,6 +3925,36 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
         float fCurrentHealth = pDamagedPed->GetGamePlayer ()->GetHealth ();
         float fPreviousArmor = pDamagedPed->m_fArmor;
         float fCurrentArmor = pDamagedPed->GetGamePlayer ()->GetArmor ();
+
+        // Pass 1 checks for double shots
+        if ( fDamage == 0.0f )
+        {
+            bool bBulletSyncShot = ( g_iDamageEventLimit != -1 );   // Called from discharge weapon
+            bool bBulletSyncWeapon = GetWeaponTypeUsesBulletSync ( weaponUsed );
+
+            if ( bBulletSyncShot )
+            {
+                if ( g_iDamageEventLimit == 0 )
+                {
+                    AddReportLog ( 5501, SString ( "2nd pass 1 for BulletSyncShot damage. weaponUsed:%d", weaponUsed ) );
+                    return false;
+                }
+                g_iDamageEventLimit--;
+                if ( !bBulletSyncWeapon )
+                {
+                    AddReportLog ( 5502, SString ( "BulletSyncShot but not bBulletSyncWeapon. weaponUsed:%d", weaponUsed ) );
+                    return false;
+                }
+            }
+            else
+            {
+                if ( bBulletSyncWeapon )
+                {
+                    AddReportLog ( 5503, SString ( "not BulletSyncShot but bBulletSyncWeapon. weaponUsed:%d", weaponUsed ) );
+                    return false;
+                }
+            }      
+        }
 
         // Is the damaged ped a player?
         if ( IS_PLAYER ( pDamagedPed ) )
