@@ -1703,7 +1703,7 @@ ushort CModelNames::GetModelID ( const SString& strName )
     ushort* pusModelID = MapFind ( ms_NameModelIDMap, strName.ToLower () );
     if ( pusModelID )
         return *pusModelID;
-    return 0;
+    return INVALID_MODEL_ID;
 }
 
 

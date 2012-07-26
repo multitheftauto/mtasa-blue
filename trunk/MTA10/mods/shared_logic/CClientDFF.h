@@ -36,7 +36,7 @@ public:
 
     eClientEntityType               GetType                 ( void ) const              { return CCLIENTDFF; }
 
-    bool                            LoadDFF                 ( const char* szFile, unsigned short usModelId );
+    bool                            LoadDFF                 ( const char* szFile );
 
     bool                            ReplaceModel            ( unsigned short usModel );
 

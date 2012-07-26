@@ -294,6 +294,7 @@ class CEffectWrap : public CRenderItem
     std::map < SString, D3DXHANDLE > m_valueHandleMap;
     D3DXHANDLE      m_hFirstTexture;
     bool            m_bRequiresNormals;
+    bool            m_bUsesVertexShader;
     uint            m_uiSaveStateFlags;
     SString         m_strName;
 };
@@ -339,6 +340,7 @@ class CShaderItem : public CMaterialItem
     void            RenewShaderInstance     ( void );
     virtual void    SetTessellation         ( uint uiTessellationX, uint uiTessellationY );
     virtual void    SetTransform            ( const SShaderTransform& transform );
+    virtual bool    GetUsesVertexShader     ( void );
 
     CEffectWrap*        m_pEffectWrap;
     float               m_fPriority;

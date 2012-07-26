@@ -60,7 +60,7 @@ RpClump* CClientDFF::GetLoadedClump ( ushort usModelId )
 }
 
 
-bool CClientDFF::LoadDFF ( const char* szFile, unsigned short usModelId )
+bool CClientDFF::LoadDFF ( const char* szFile )
 {
     // Should only be called once, directly after construction
     assert ( m_strDffFilename.empty () );
