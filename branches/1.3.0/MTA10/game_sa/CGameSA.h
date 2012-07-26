@@ -38,8 +38,7 @@
 #define     NUM_WeaponInfosOtherSkill       11
 #define     NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
 
-#define     MODELINFO_LAST_PLAYER_ID        288         // ??
-#define     MODELINFO_MAX                   65535
+#define     MODELINFO_MAX                   26000       // Actual max is 25755
 
 #define     FUNC_GetLevelFromPosition       0x4DD300
 

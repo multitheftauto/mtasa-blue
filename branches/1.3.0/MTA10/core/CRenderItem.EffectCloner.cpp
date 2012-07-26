@@ -24,7 +24,7 @@ public:
                             CEffectClonerImpl       ( CRenderItemManager* pManager );
     virtual                 ~CEffectClonerImpl      ( void );
     virtual void            DoPulse                 ( void );
-    virtual ID3DXEffect*    CreateD3DEffect         ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
+    virtual ID3DXEffect*    CreateD3DEffect         ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool& bOutUsesVertexShader, bool bDebug );
     virtual void            ReleaseD3DEffect        ( ID3DXEffect* pD3DEffect );
 
     // CEffectClonerImpl
@@ -82,7 +82,7 @@ CEffectClonerImpl::~CEffectClonerImpl ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug )
+ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool& bOutUsesVertexShader, bool bDebug )
 {
     // Do we have a match with the initial path
     CEffectTemplate* pEffectTemplate = MapFindRef ( m_ValidMap, ConformPathForSorting ( strFilename ) );
@@ -119,7 +119,7 @@ ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, co
     //
 
     // Clone D3DXEffect
-    ID3DXEffect* pNewD3DEffect = pEffectTemplate->CloneD3DEffect ( &strOutStatus );
+    ID3DXEffect* pNewD3DEffect = pEffectTemplate->CloneD3DEffect ( strOutStatus, bOutUsesVertexShader );
 
     if( !pNewD3DEffect )
     {

@@ -312,3 +312,16 @@ void CShaderItem::RenewShaderInstance ( void )
     CShaderInstance* pShaderInstance = new CShaderInstance ();
     pShaderInstance->PostConstruct ( m_pManager, this );
 }
+
+
+////////////////////////////////////////////////////////////////
+//
+// CShaderItem::GetUsesVertexShader
+//
+// Check if active technique uses a vertex shader
+//
+////////////////////////////////////////////////////////////////
+bool CShaderItem::GetUsesVertexShader ( void )
+{
+    return m_pEffectWrap->m_bUsesVertexShader;
+}
