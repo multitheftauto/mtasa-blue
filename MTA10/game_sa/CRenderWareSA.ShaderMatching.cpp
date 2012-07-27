@@ -25,7 +25,7 @@ void CMatchChannelManager::AppendAdditiveMatch ( CSHADERDUMMY* pShaderData, CCli
 
     // Make channel unique before modifying match chain
     CMatchChannel* pChannel = GetChannelOnlyUsedBy ( pShaderInfo, pClientEntity );
-    pChannel->AppendAdditiveMatch ( strTextureNameMatch );
+    pChannel->AppendAdditiveMatch ( strTextureNameMatch.ToLower () );
     MapInsert ( m_OptimizeQueue, pChannel );
     MapInsert ( m_RematchQueue, pChannel );
 
@@ -55,7 +55,7 @@ void CMatchChannelManager::AppendSubtractiveMatch ( CSHADERDUMMY* pShaderData, C
 
     // Make channel unique before modifying match chain
     CMatchChannel* pChannel = GetChannelOnlyUsedBy ( pShaderInfo, pClientEntity );
-    pChannel->AppendSubtractiveMatch ( strTextureNameMatch );
+    pChannel->AppendSubtractiveMatch ( strTextureNameMatch.ToLower () );
     MapInsert ( m_OptimizeQueue, pChannel );
     MapInsert ( m_RematchQueue, pChannel );
 }
