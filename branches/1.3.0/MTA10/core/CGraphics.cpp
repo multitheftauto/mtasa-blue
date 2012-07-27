@@ -272,6 +272,28 @@ void CGraphics::SetBlendModeRenderStates ( EBlendModeType blendMode )
         }
         break;
 
+        case EBlendMode::OVERWRITE:
+        {
+            m_pDevice->SetRenderState ( D3DRS_ZENABLE,          D3DZB_FALSE );
+            m_pDevice->SetRenderState ( D3DRS_CULLMODE,         D3DCULL_NONE );
+            m_pDevice->SetRenderState ( D3DRS_SHADEMODE,        D3DSHADE_GOURAUD );
+            m_pDevice->SetRenderState ( D3DRS_ALPHABLENDENABLE, FALSE );
+            m_pDevice->SetRenderState ( D3DRS_ALPHATESTENABLE,  FALSE );
+            m_pDevice->SetRenderState ( D3DRS_LIGHTING,         FALSE );
+
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
+
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_COLOROP, D3DTOP_DISABLE );
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
+
+        }
+        break;
+
         default:
             break;
     }
