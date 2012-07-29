@@ -3891,31 +3891,36 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
         // Pass 1 checks for double shots
         if ( fDamage == 0.0f )
         {
-            bool bBulletSyncShot = ( g_iDamageEventLimit != -1 );   // Called from discharge weapon
-            bool bBulletSyncWeapon = GetWeaponTypeUsesBulletSync ( weaponUsed );
-
-            if ( bBulletSyncShot )
+            // Only check for remote players
+            CClientPlayer* pInflictingPlayer = DynamicCast < CClientPlayer > ( pInflictingEntity );
+            if ( pInflictingPlayer && !pInflictingPlayer->IsLocalPlayer () )
             {
-                if ( g_iDamageEventLimit == 0 )
+                bool bBulletSyncShot = ( g_iDamageEventLimit != -1 );   // Called from discharge weapon
+                bool bBulletSyncWeapon = GetWeaponTypeUsesBulletSync ( weaponUsed );
+
+                if ( bBulletSyncShot )
                 {
-                    AddReportLog ( 5501, SString ( "2nd pass 1 for BulletSyncShot damage. weaponUsed:%d", weaponUsed ) );
-                    return false;
+                    if ( g_iDamageEventLimit == 0 )
+                    {
+                        AddReportLog ( 5501, SString ( "2nd pass 1 for BulletSyncShot damage. weaponUsed:%d", weaponUsed ) );
+                        return false;
+                    }
+                    g_iDamageEventLimit--;
+                    if ( !bBulletSyncWeapon )
+                    {
+                        AddReportLog ( 5502, SString ( "BulletSyncShot but not bBulletSyncWeapon. weaponUsed:%d", weaponUsed ) );
+                        return false;
+                    }
                 }
-                g_iDamageEventLimit--;
-                if ( !bBulletSyncWeapon )
+                else
                 {
-                    AddReportLog ( 5502, SString ( "BulletSyncShot but not bBulletSyncWeapon. weaponUsed:%d", weaponUsed ) );
-                    return false;
+                    if ( bBulletSyncWeapon )
+                    {
+                        AddReportLog ( 5503, SString ( "not BulletSyncShot but bBulletSyncWeapon. weaponUsed:%d", weaponUsed ) );
+                        return false;
+                    }
                 }
             }
-            else
-            {
-                if ( bBulletSyncWeapon )
-                {
-                    AddReportLog ( 5503, SString ( "not BulletSyncShot but bBulletSyncWeapon. weaponUsed:%d", weaponUsed ) );
-                    return false;
-                }
-            }      
         }
 
         // Is the damaged ped a player?
@@ -5599,7 +5604,8 @@ void CClientGame::TakePlayerScreenShot ( uint uiSizeX, uint uiSizeY, const SStri
 //
 void CClientGame::StaticGottenPlayerScreenShot ( const CBuffer& buffer, uint uiTimeSpentInQueue )
 {
-    g_pClientGame->GottenPlayerScreenShot ( buffer, uiTimeSpentInQueue );
+    if ( g_pClientGame )
+        g_pClientGame->GottenPlayerScreenShot ( buffer, uiTimeSpentInQueue );
 }
 
 
