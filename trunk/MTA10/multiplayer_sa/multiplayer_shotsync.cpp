@@ -259,7 +259,11 @@ static void Event_BulletImpact ( void )
                         if ( data->m_shotSyncData.m_bRemoteBulletSyncVectorsValid )
                         {
                             *pBulletImpactStartPosition = data->m_shotSyncData.m_vecRemoteBulletSyncStart;
-                             data->m_shotSyncData.m_bRemoteBulletSyncVectorsValid = false;
+                            data->m_shotSyncData.m_bRemoteBulletSyncVectorsValid = false;
+
+                            // Ensure weapon fire event gets the correct vectors
+                            data->m_shotSyncData.m_vecShotOrigin = data->m_shotSyncData.m_vecRemoteBulletSyncStart;
+                            data->m_shotSyncData.m_vecShotTarget = data->m_shotSyncData.m_vecRemoteBulletSyncEnd;
                         }
                         else
                             *pBulletImpactStartPosition = data->m_shotSyncData.m_vecShotOrigin;
