@@ -823,13 +823,8 @@ int CLuaFunctionDefs::dxSetRenderTarget ( lua_State* luaVM )
         else
             bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->RestoreDefaultRenderTarget ();
 
-        if ( bResult )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad usage @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "dxSetRenderTarget can only be used inside certain events" ) );
+        lua_pushboolean ( luaVM, bResult );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );

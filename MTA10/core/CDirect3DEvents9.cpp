@@ -144,6 +144,9 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     CCore::GetSingleton ().DoPostFramePulse ();
     TIMING_CHECKPOINT( "+OnPresent2" );
 
+    // Restore in case script forgets
+    CGraphics::GetSingleton ().GetRenderItemManager ()->RestoreDefaultRenderTarget ();
+
     // Draw pre-GUI primitives
     CGraphics::GetSingleton ().DrawPreGUIQueue ();
 

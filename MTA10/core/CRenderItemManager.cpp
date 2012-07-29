@@ -449,8 +449,8 @@ void CRenderItemManager::UpdateBackBufferCopySize ( void )
 ////////////////////////////////////////////////////////////////
 bool CRenderItemManager::SetRenderTarget ( CRenderTargetItem* pItem, bool bClear )
 {
-    if ( !CGraphics::GetSingleton().CanSetRenderTarget () )
-        return false;
+    if ( !m_pDefaultD3DRenderTarget )
+        SaveDefaultRenderTarget ();
 
     ChangeRenderTarget ( pItem->m_uiSizeX, pItem->m_uiSizeY, pItem->m_pD3DRenderTargetSurface, pItem->m_pD3DZStencilSurface );
 
@@ -496,12 +496,12 @@ bool CRenderItemManager::SaveDefaultRenderTarget ( void )
 ////////////////////////////////////////////////////////////////
 bool CRenderItemManager::RestoreDefaultRenderTarget ( void )
 {
-    if ( !CGraphics::GetSingleton().CanSetRenderTarget () )
-        return false;
-
     // Only need to change if we have info
     if ( m_pDefaultD3DRenderTarget )
+    {
         ChangeRenderTarget ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, m_pDefaultD3DRenderTarget, m_pDefaultD3DZStencilSurface );
+        m_pDefaultD3DRenderTarget = NULL;
+    }
 
     return true;
 }

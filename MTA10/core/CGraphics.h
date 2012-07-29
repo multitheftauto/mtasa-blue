@@ -149,9 +149,6 @@ public:
                                                   bool bColorCoded = false,
                                                   bool bSubPixelPositioning = false );
 
-
-    bool                CanSetRenderTarget      ( void )                { return m_bSetRenderTargetEnabled; }
-    void                EnableSetRenderTarget   ( bool bEnable );
     void                OnChangingRenderTarget  ( uint uiNewViewportSizeX, uint uiNewViewportSizeY );
 
     // Subsystems
@@ -195,7 +192,6 @@ private:
     CLine3DBatcher*             m_pLine3DBatcherPreGUI;
     CLine3DBatcher*             m_pLine3DBatcherPostGUI;
     CMaterialLine3DBatcher*     m_pMaterialLine3DBatcher;
-    bool                m_bSetRenderTargetEnabled;
 
     // Fonts
     ID3DXFont*          m_pDXFonts [ NUM_FONTS ];
