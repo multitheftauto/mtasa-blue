@@ -105,6 +105,12 @@ void CPedIntelligenceSA::DischargeCurrentWeapon ( bool bAllowReloadAnimation )
 {
     // Get use gun task if available
     CTaskSimpleUseGunSAInterface* pTaskUseGun = GetTaskUseGun ();
+
+    g_pCore->LogEvent ( 10211, SString ( "CPedIntelligenceSA::DischargeCurrentWeapon - [ped:%s]  pTaskUseGun:%08x"
+                                        , *g_pCore->GetEntityDesc ( NULL, ped->GetInterface () )
+                                        , pTaskUseGun
+                                    ) );
+
     if ( !pTaskUseGun )
         return;
 

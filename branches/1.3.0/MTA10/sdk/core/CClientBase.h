@@ -30,7 +30,7 @@ public:
 
     virtual bool    HandleException             ( CExceptionInformation* pExceptionInformation ) = 0;
 
-    virtual CClientEntityBase* FindClientEntity ( CEntitySAInterface* pEntitySAInterface ) = 0;
+    virtual SString GetEntityDesc               ( CClientEntityBase* pClientEntity, CEntitySAInterface* pEntitySAInterface ) = 0;
 };
 
 #endif

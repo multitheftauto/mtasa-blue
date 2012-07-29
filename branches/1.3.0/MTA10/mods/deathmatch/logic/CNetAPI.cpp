@@ -2162,6 +2162,13 @@ void CNetAPI::ModifyControllerStateForBulletSync ( CClientPlayer* pPlayer, CCont
     {
         // If bullet sync is enabled for the current weapon, remove fire button presses
         eWeaponType weaponType = pPlayer->GetCurrentWeaponType ();
+
+        g_pCore->LogEvent ( 10202, SString ( "CNetAPI::ModifyControllerStateForBulletSync - [Player:%s]  weaponType:%d  weaponTypeUsesBulletSync:%d"
+                                            , *g_pCore->GetEntityDesc ( pPlayer )
+                                            , weaponType
+                                            , g_pClientGame->GetWeaponTypeUsesBulletSync ( weaponType )
+                                        ) );
+
         if ( g_pClientGame->GetWeaponTypeUsesBulletSync ( weaponType ) )
             ControllerState.ButtonCircle = 0;
     }
@@ -2186,6 +2193,17 @@ void CNetAPI::ReadBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& Bi
     CVector vecStart, vecEnd;
     BitStream.Read ( (char*)&vecStart, sizeof ( CVector ) );
     BitStream.Read ( (char*)&vecEnd, sizeof ( CVector ) );
+
+    CVector vecDirT = vecEnd - vecStart;
+    vecDirT.Normalize ();
+
+    g_pCore->LogEvent ( 10203, SString ( "CNetAPI::ReadBulletsync - [Player:%s]  weaponType:%d  vecStart:%1.2f,%1.2f,%1.2f  vecEnd:%1.2f,%1.2f,%1.2f  vecDirT:%1.2f,%1.2f,%1.2f"
+                                        , *g_pCore->GetEntityDesc ( pPlayer )
+                                        , weaponType
+                                        , vecStart.fX, vecStart.fY, vecStart.fZ
+                                        , vecEnd.fX, vecEnd.fY, vecEnd.fZ
+                                        , vecDirT.fX, vecDirT.fY, vecDirT.fZ
+                                    ) );
 
     pPlayer->DischargeWeapon ( weaponType, vecStart, vecEnd );
 }

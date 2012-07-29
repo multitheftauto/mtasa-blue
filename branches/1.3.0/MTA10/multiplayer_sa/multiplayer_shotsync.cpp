@@ -23,6 +23,7 @@
 #include "../game_sa/CColPointSA.h"
 
 extern CMultiplayerSA* pMultiplayer;
+extern CCoreInterface* g_pCore;
 
 using std::list;
 
@@ -190,6 +191,10 @@ VOID WriteTargetDataForPed ( CPedSAInterface * pPed, DWORD vecTargetPos, CVector
 
     if ( !IsLocalPlayer( pTargetingPed ) )
     {
+        g_pCore->LogEvent ( 10221, SString ( "WriteTargetDataForPed - [ped:%s]"
+                                            , *g_pCore->GetEntityDesc ( NULL, pPed )
+                                        ) );
+
         CRemoteDataStorageSA * data = CRemoteDataSA::GetRemoteDataStorage ( pTargetingPlayerPed );
         if ( data )
         {
@@ -212,6 +217,11 @@ VOID WriteTargetDataForPed ( CPedSAInterface * pPed, DWORD vecTargetPos, CVector
 void Event_PostFire ( void )
 {
     CPed * pTargetingPed = m_pools->GetPed ( (DWORD *)pShootingPed );
+
+    if ( !IsLocalPlayer ( pTargetingPed ) )
+        g_pCore->LogEvent ( 10222, SString ( "Event_PostFire - [ShootingPed:%s]"
+                                            , *g_pCore->GetEntityDesc ( NULL, pShootingPed )
+                                        ) );
 
     if ( m_pPostWeaponFireHandler )
     {
@@ -254,6 +264,14 @@ static void Event_BulletImpact ( void )
                 CRemoteDataStorageSA * data = CRemoteDataSA::GetRemoteDataStorage ( pBulletImpactInitiator );
                 if ( data )
                 {
+                    g_pCore->LogEvent ( 10224, SString ( "Event_BulletImpact(remote) - [Initiator:%s]  [Victim:%s]  BulletSyncVectorsValid:%d   m_vecRemoteBulletSyncStart:%1.2f,%1.2f,%1.2f   m_vecShotOrigin:%1.2f,%1.2f,%1.2f"
+                                                        , *g_pCore->GetEntityDesc ( NULL, pBulletImpactInitiator )
+                                                        , *g_pCore->GetEntityDesc ( NULL, pBulletImpactVictim )
+                                                        , data->m_shotSyncData.m_bRemoteBulletSyncVectorsValid
+                                                    , data->m_shotSyncData.m_vecRemoteBulletSyncStart.fX, data->m_shotSyncData.m_vecRemoteBulletSyncStart.fY, data->m_shotSyncData.m_vecRemoteBulletSyncStart.fZ
+                                                    , data->m_shotSyncData.m_vecShotOrigin.fX, data->m_shotSyncData.m_vecShotOrigin.fY, data->m_shotSyncData.m_vecShotOrigin.fZ
+                                                    ) );
+
                     if ( data->ProcessPlayerWeapon () )
                     {
                         if ( data->m_shotSyncData.m_bRemoteBulletSyncVectorsValid )
@@ -1083,6 +1101,13 @@ void OnMy_CWeapon_FireInstantHit_Mid ( CEntitySAInterface* pEntity, CVector vecS
         if ( m_pBulletFireHandler )
             m_pBulletFireHandler ( pTargetingPed, &vecStart, &vecEnd );
     }
+    else
+    {
+        g_pCore->LogEvent ( 10225, SString ( "OnMy_CWeapon_FireInstantHit_Mid - [Entity:%s]  bFlag:%08x"
+                                            , *g_pCore->GetEntityDesc ( NULL, pEntity )
+                                            , bFlag
+                                        ) );
+    }
 }
 
 // Hook info
@@ -1158,6 +1183,15 @@ void HandleRemoteInstantHit( void )
                     *pInstantHitStart = data->m_shotSyncData.m_vecRemoteBulletSyncStart;
                     *pInstantHitEnd = data->m_shotSyncData.m_vecRemoteBulletSyncEnd;
                 }
+
+                CVector vecStart = *pInstantHitStart;
+                CVector vecEnd = *pInstantHitEnd;
+                g_pCore->LogEvent ( 10226, SString ( "HandleRemoteInstantHit - [ShootingPed:%s]  BulletSyncVectorsValid:%08x   start:%1.2f,%1.2f,%1.2f   end:%1.2f,%1.2f,%1.2f"
+                                                    , *g_pCore->GetEntityDesc ( NULL, pShootingPed )
+                                                    , data->m_shotSyncData.m_bRemoteBulletSyncVectorsValid
+                                                    , vecStart.fX, vecStart.fY, vecStart.fZ
+                                                    , vecEnd.fX, vecEnd.fY, vecEnd.fZ
+                                                ) );
             }
         }
     }
@@ -1312,6 +1346,11 @@ bool FireInstantHit_IsPlayer ()
     {
         if ( IsLocalPlayer( pPed ) )
             return true;
+
+        g_pCore->LogEvent ( 10227, SString ( "FireInstantHit_IsPlayer - [ShootingPed:%s]"
+                                            , *g_pCore->GetEntityDesc ( NULL, pFireInstantHit_IsPlayerPed )
+                                        ) );
+
         CRemoteDataStorageSA * data = CRemoteDataSA::GetRemoteDataStorage ( pPed );
         if ( data )
         {
