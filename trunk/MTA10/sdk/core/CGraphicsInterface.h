@@ -132,7 +132,6 @@ public:
                                                           bool bColorCoded = false,
                                                           bool bSubPixelPositioning = false ) = 0;
 
-    virtual void                    EnableSetRenderTarget       ( bool bEnable ) = 0;
     // Subsystems
     virtual CRenderItemManagerInterface*   GetRenderItemManager  ( void ) = 0;
     virtual CScreenGrabberInterface*       GetScreenGrabber     ( void ) = 0;
