@@ -101,8 +101,8 @@ public:
     static void         GetTxdTextures              ( std::vector < RwTexture* >& outTextureList, RwTexDictionary* pTXD );
     const SString&      GetTextureName              ( CD3DDUMMY* pD3DData );
     void                SetRenderingClientEntity    ( CClientEntityBase* pClientEntity, bool bIsPed );
-    CSHADERDUMMY*       GetAppliedShaderForD3DData  ( CD3DDUMMY* pD3DData );
-    void                AppendAdditiveMatch         ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch, float fShaderPriority, uint uiShaderCreateTime, bool bShaderUsesVertexShader );
+    SShaderItemLayers*  GetAppliedShaderForD3DData  ( CD3DDUMMY* pD3DData );
+    void                AppendAdditiveMatch         ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch, float fShaderPriority, bool bShaderLayered, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers );
     void                AppendSubtractiveMatch      ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch );
     void                RemoveClientEntityRefs      ( CClientEntityBase* pClientEntity );
     void                RemoveShaderRefs            ( CSHADERDUMMY* pShaderItem );

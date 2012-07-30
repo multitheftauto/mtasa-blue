@@ -81,12 +81,12 @@ void CRenderItemManager::RemoveClientEntityRefs ( CClientEntityBase* pClientEnti
 // Find which shader item is being used to render this D3DData
 //
 ////////////////////////////////////////////////////////////////
-CShaderItem* CRenderItemManager::GetAppliedShaderForD3DData ( CD3DDUMMY* pD3DData )
+SShaderItemLayers* CRenderItemManager::GetAppliedShaderForD3DData ( CD3DDUMMY* pD3DData )
 {
     // Save texture usage for later
     MapInsert ( m_FrameTextureUsage, pD3DData );
 
-    return (CShaderItem*)m_pRenderWare->GetAppliedShaderForD3DData ( pD3DData );
+    return m_pRenderWare->GetAppliedShaderForD3DData ( pD3DData );
 }
 
 
@@ -97,10 +97,10 @@ CShaderItem* CRenderItemManager::GetAppliedShaderForD3DData ( CD3DDUMMY* pD3DDat
 // Add an association between the shader item and a world texture match
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::ApplyShaderItemToWorldTexture ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity )
+bool CRenderItemManager::ApplyShaderItemToWorldTexture ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity, bool bAppendLayers )
 {
     assert ( pShaderItem );
-    m_pRenderWare->AppendAdditiveMatch ( (CSHADERDUMMY*)pShaderItem, pClientEntity, strTextureNameMatch, pShaderItem->m_fPriority, pShaderItem->m_uiCreateTime, pShaderItem->GetUsesVertexShader () );
+    m_pRenderWare->AppendAdditiveMatch ( (CSHADERDUMMY*)pShaderItem, pClientEntity, strTextureNameMatch, pShaderItem->m_fPriority, pShaderItem->m_bLayered, pShaderItem->m_uiCreateTime, pShaderItem->GetUsesVertexShader (), bAppendLayers );
     return true;
 }
 
