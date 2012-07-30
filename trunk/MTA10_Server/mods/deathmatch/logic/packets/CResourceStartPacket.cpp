@@ -59,6 +59,10 @@ bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
         }
         BitStream.Write ( usProtectedScriptCount );
 
+        // Write the declared min client version for this resource
+        if ( BitStream.Version () >= 0x32 )
+            BitStream.WriteString ( m_pResource->GetMinClientReqFromMetaXml () );
+
         // Send the resource files info
         list < CResourceFile* > ::iterator iter = m_pResource->IterBegin();
         for ( ; iter != m_pResource->IterEnd (); iter++ )

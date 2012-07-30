@@ -32,7 +32,8 @@ public:
     virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false );
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY );
     virtual bool                SetRenderTarget                     ( CRenderTargetItem* pItem, bool bClear );
-    virtual bool                SaveDefaultRenderTarget             ( void );
+    virtual void                EnableSetRenderTargetOldVer         ( bool bEnable );
+    virtual void                EnableSetRenderTargetRestrictions   ( bool bEnable );
     virtual bool                RestoreDefaultRenderTarget          ( void );
     virtual void                UpdateBackBufferCopy                ( void );
     virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem, bool bResampleNow );
@@ -53,6 +54,7 @@ public:
     void                        OnLostDevice                        ( void );
     void                        OnResetDevice                       ( void );
     void                        UpdateBackBufferCopySize            ( void );
+    bool                        SaveDefaultRenderTarget             ( void );
     void                        ChangeRenderTarget                  ( uint uiSizeX, uint uiSizeY, IDirect3DSurface9* pD3DRenderTarget, IDirect3DSurface9* pD3DZStencilSurface );
     void                        RemoveShaderItemFromWatchLists      ( CShaderItem* pShaderItem );
     void                        UpdateMemoryUsage                   ( void );
@@ -88,4 +90,6 @@ protected:
     int                                         m_iRenderTargetMemoryKBUsed;
     int                                         m_iFontMemoryKBUsed;
     int                                         m_iMemoryKBFreeForMTA;
+    bool                                        m_bSetRenderTargetEnabledOldVer;
+    bool                                        m_bApplySetRenderTargetRestrictions;
 };

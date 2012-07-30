@@ -38,7 +38,7 @@ public:
                                 CResourceManager            ( void );
                                 ~CResourceManager           ( void );
 
-    CResource*                  Add                         ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity );
+    CResource*                  Add                         ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinClientReq );
     CResource*                  GetResource                 ( const char* szResourceName );
     CResource*                  GetResourceFromNetID        ( unsigned short usNetID );
     CResource*                  GetResourceFromScriptID     ( uint uiScriptID );
