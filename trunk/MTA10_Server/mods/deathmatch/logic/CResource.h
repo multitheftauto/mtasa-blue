@@ -371,6 +371,7 @@ public:
     bool                HandleAclRequestListCommand     ( bool bDetail );
     bool                HandleAclRequestChangeCommand   ( const SString& strRightName, bool bAccess, const SString& strWho );
     bool                HandleAclRequestChange          ( const CAclRightName& strRightName, bool bAccess, const SString& strWho );
+    const SString&      GetMinServerReqFromMetaXml      ( void )                                { return m_strMinServerReqFromMetaXml; }
     const SString&      GetMinClientReqFromMetaXml      ( void )                                { return m_strMinClientReqFromMetaXml; }
 
 protected:

@@ -241,3 +241,4 @@ class CScriptArgReader;
 bool MixedReadDxFontString ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientDxFont*& pFontElement );
 bool MixedReadGuiFontString ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientGuiFont*& pFontElement );
 bool MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pMaterialElement );
+void MinClientCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason );

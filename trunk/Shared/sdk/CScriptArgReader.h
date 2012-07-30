@@ -35,7 +35,7 @@ public:
         m_iErrorGotArgumentType = 0;
     }
 
-    CScriptArgReader ( void )
+    ~CScriptArgReader ( void )
     {
         assert ( !IsReadFunctionPending () );
     }
@@ -489,6 +489,7 @@ public:
             m_iErrorIndex = iIndex;
             m_strErrorExpectedType = strExpectedType;
             m_bResolvedErrorGotArgumentTypeAndValue = false;
+            m_strErrorCategory = "Bad argument";
         }
     }
 
@@ -510,6 +511,9 @@ public:
     {
         if ( !m_bError )
             return "No error";
+
+        if ( !m_strErrorMessageOverride.empty () )
+            return m_strErrorMessageOverride;
 
         ResolveErrorGotArgumentTypeAndValue ();
         SString strGotArgumentType  = EnumToString ( (eLuaType)m_iErrorGotArgumentType );
@@ -558,6 +562,26 @@ public:
         m_bIgnoreMismatchMatch = !bStrictMode;
     }
 
+    //
+    // Set version error message
+    //
+    void SetVersionError ( const char* szMinReq, const char* szSide, const char* szReason )
+    {
+        if ( !m_bError )
+        {
+            m_bError = true;
+            m_strErrorCategory = "Bad usage";
+            m_strErrorMessageOverride = SString ( "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least %s %s because %s)", szSide, szMinReq, szReason );
+        }
+    }
+
+    //
+    // Make full error message
+    //
+    SString GetFullErrorMessage ( void )
+    {
+        return SString ( "%s @ '%s' [%s]", *m_strErrorCategory, lua_tostring ( m_luaVM, lua_upvalueindex ( 1 ) ), *GetErrorMessage () );
+    }
 
     bool                    m_bIgnoreMismatchMatch;
     bool                    m_bError;
@@ -570,4 +594,6 @@ public:
     bool                    m_bResolvedErrorGotArgumentTypeAndValue;
     int                     m_iErrorGotArgumentType;
     SString                 m_strErrorGotArgumentValue;
+    SString                 m_strErrorCategory;
+    SString                 m_strErrorMessageOverride;
 };
