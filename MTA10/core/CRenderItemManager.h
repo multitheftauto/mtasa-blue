@@ -33,7 +33,7 @@ public:
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY );
     virtual bool                SetRenderTarget                     ( CRenderTargetItem* pItem, bool bClear );
     virtual void                EnableSetRenderTargetOldVer         ( bool bEnable );
-    virtual void                EnableSetRenderTargetRestrictions   ( bool bEnable );
+    virtual bool                IsSetRenderTargetEnabledOldVer      ( void );
     virtual bool                RestoreDefaultRenderTarget          ( void );
     virtual void                UpdateBackBufferCopy                ( void );
     virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem, bool bResampleNow );
@@ -91,5 +91,4 @@ protected:
     int                                         m_iFontMemoryKBUsed;
     int                                         m_iMemoryKBFreeForMTA;
     bool                                        m_bSetRenderTargetEnabledOldVer;
-    bool                                        m_bApplySetRenderTargetRestrictions;
 };

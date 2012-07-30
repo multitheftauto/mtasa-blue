@@ -816,40 +816,23 @@ int CLuaFunctionDefs::dxSetRenderTarget ( lua_State* luaVM )
     argStream.ReadUserData ( pRenderTarget, NULL );
     argStream.ReadBool ( bClear, false );
 
+    // Check version ok for this function to be called now
+    if ( !g_pCore->GetGraphics ()->GetRenderItemManager ()->IsSetRenderTargetEnabledOldVer () )
+        MinClientCheck ( argStream, SETRENDERTARGET_NORESTRICTIONS_MIN_CLIENT_VERSION, "dxSetRenderTarget is being called outside certain events" );
+
     if ( !argStream.HasErrors () )
     {
-        CRenderItemManagerInterface* pRenderItemManager = g_pCore->GetGraphics ()->GetRenderItemManager ();
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        CResource* pResource = pLuaMain ? pLuaMain->GetResource () : NULL;
-        if ( pResource )
-        {
-            // Backward compatibility
-            pRenderItemManager->EnableSetRenderTargetRestrictions ( pResource->GetMinClientReq () < SETRENDERTARGET_NORESTRICTIONS_MIN_CLIENT_VERSION );
+        bool bResult;
+        if ( pRenderTarget)
+            bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->SetRenderTarget ( pRenderTarget->GetRenderTargetItem (), bClear );
+        else
+            bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->RestoreDefaultRenderTarget ();
 
-            bool bResult;
-            if ( pRenderTarget)
-                bResult = pRenderItemManager->SetRenderTarget ( pRenderTarget->GetRenderTargetItem (), bClear );
-            else
-                bResult = pRenderItemManager->RestoreDefaultRenderTarget ();
-
-            pRenderItemManager->EnableSetRenderTargetRestrictions ( false );
-
-            if ( bResult )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-            else
-            {
-                SString strMessage = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least client "
-                                    SETRENDERTARGET_NORESTRICTIONS_MIN_CLIENT_VERSION
-                                    " because dxSetRenderTarget is being used outside certain events)";
-                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad usage @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strMessage ) );
-            }
-        }
+        lua_pushboolean ( luaVM, bResult );
+        return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     // error: bad arguments
     lua_pushboolean ( luaVM, false );

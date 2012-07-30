@@ -262,3 +262,23 @@ bool StringToBool ( const SString& strText )
 {
     return ( strText == "true" || strText == "1" || strText == "yes" );
 }
+
+
+//
+// Check min server is correct
+//
+void MinServerReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason )
+{
+    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( argStream.m_luaVM );
+    if ( pLuaMain )
+    {
+        CResource* pResource = pLuaMain->GetResource();
+        if ( pResource )
+        {
+            if ( pResource->GetMinServerReqFromMetaXml () < szVersionReq )
+            {
+                argStream.SetVersionError ( szVersionReq, "server", szReason );
+            }
+        }
+    }
+}

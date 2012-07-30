@@ -23,7 +23,7 @@ extern CClientGame* g_pClientGame;
 
 int CResource::m_iShowingCursor = 0;
 
-CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinClientReq )
+CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq )
 {
     m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::RESOURCE );
     m_usNetID = usNetID;
@@ -32,6 +32,7 @@ CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClie
     m_bShowingCursor = false;
     m_usRemainingProtectedScripts = 0;
     m_bLoadAfterReceivingProtectedScripts = false;
+    m_strMinServerReq = strMinServerReq;
     m_strMinClientReq = strMinClientReq;
 
     if ( szResourceName )

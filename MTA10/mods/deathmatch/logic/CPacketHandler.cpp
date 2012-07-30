@@ -4359,9 +4359,12 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
         bitStream.Read ( usProtectedScriptCount );
 
     // Read the declared min client version for this resource
-    SString strMinClientReq;
+    SString strMinServerReq, strMinClientReq;
     if ( bitStream.Version () >= 0x32 )
+    {
+        bitStream.ReadString ( strMinServerReq );
         bitStream.ReadString ( strMinClientReq );
+    }
 
     // Get the resource entity
     CClientEntity* pResourceEntity = CElementIDs::GetElement ( ResourceEntityID );
@@ -4369,7 +4372,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
     // Get the resource dynamic entity
     CClientEntity* pResourceDynamicEntity = CElementIDs::GetElement ( ResourceDynamicEntityID );
 
-    CResource* pResource = g_pClientGame->m_pResourceManager->Add ( usResourceID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinClientReq );
+    CResource* pResource = g_pClientGame->m_pResourceManager->Add ( usResourceID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq, strMinClientReq );
     if ( pResource )
     {
         pResource->SetRemainingProtectedScripts ( usProtectedScriptCount );
