@@ -18,6 +18,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define SETRENDERTARGET_NORESTRICTIONS_MIN_CLIENT_VERSION  "1.3.0-9.04431"
 
 int CLuaFunctionDefs::dxDrawLine ( lua_State* luaVM )
 {
@@ -817,14 +818,35 @@ int CLuaFunctionDefs::dxSetRenderTarget ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        bool bResult;
-        if ( pRenderTarget)
-            bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->SetRenderTarget ( pRenderTarget->GetRenderTargetItem (), bClear );
-        else
-            bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->RestoreDefaultRenderTarget ();
+        CRenderItemManagerInterface* pRenderItemManager = g_pCore->GetGraphics ()->GetRenderItemManager ();
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        CResource* pResource = pLuaMain ? pLuaMain->GetResource () : NULL;
+        if ( pResource )
+        {
+            // Backward compatibility
+            pRenderItemManager->EnableSetRenderTargetRestrictions ( pResource->GetMinClientReq () < SETRENDERTARGET_NORESTRICTIONS_MIN_CLIENT_VERSION );
 
-        lua_pushboolean ( luaVM, bResult );
-        return 1;
+            bool bResult;
+            if ( pRenderTarget)
+                bResult = pRenderItemManager->SetRenderTarget ( pRenderTarget->GetRenderTargetItem (), bClear );
+            else
+                bResult = pRenderItemManager->RestoreDefaultRenderTarget ();
+
+            pRenderItemManager->EnableSetRenderTargetRestrictions ( false );
+
+            if ( bResult )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+            else
+            {
+                SString strMessage = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least client "
+                                    SETRENDERTARGET_NORESTRICTIONS_MIN_CLIENT_VERSION
+                                    " because dxSetRenderTarget is being used outside certain events)";
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad usage @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strMessage ) );
+            }
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );

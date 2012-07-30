@@ -124,7 +124,8 @@ public:
     virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false ) = 0;
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY ) = 0;
     virtual bool                SetRenderTarget                     ( CRenderTargetItem* pItem, bool bClear ) = 0;
-    virtual bool                SaveDefaultRenderTarget             ( void ) = 0;
+    virtual void                EnableSetRenderTargetOldVer         ( bool bEnable ) = 0;
+    virtual void                EnableSetRenderTargetRestrictions   ( bool bEnable ) = 0;
     virtual bool                RestoreDefaultRenderTarget          ( void ) = 0;
     virtual void                UpdateBackBufferCopy                ( void ) = 0;
     virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem, bool bResampleNow ) = 0;

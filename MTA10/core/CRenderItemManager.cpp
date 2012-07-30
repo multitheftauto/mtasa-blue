@@ -449,6 +449,9 @@ void CRenderItemManager::UpdateBackBufferCopySize ( void )
 ////////////////////////////////////////////////////////////////
 bool CRenderItemManager::SetRenderTarget ( CRenderTargetItem* pItem, bool bClear )
 {
+    if ( m_bApplySetRenderTargetRestrictions && !m_bSetRenderTargetEnabledOldVer )
+        return false;
+
     if ( !m_pDefaultD3DRenderTarget )
         SaveDefaultRenderTarget ();
 
@@ -458,6 +461,33 @@ bool CRenderItemManager::SetRenderTarget ( CRenderTargetItem* pItem, bool bClear
         m_pDevice->Clear ( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0,0,0,0), 1, 0 );
 
     return true;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::EnableSetRenderTargetRestrictions
+//
+// Indicate whether to apply restrictions on when SetRenderTarget can be called from script
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::EnableSetRenderTargetRestrictions ( bool bEnable )
+{
+    if ( MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE )
+        m_bApplySetRenderTargetRestrictions = bEnable;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::EnableSetRenderTargetOldVer
+//
+// Enabled zones for old versions
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::EnableSetRenderTargetOldVer ( bool bEnable )
+{
+    m_bSetRenderTargetEnabledOldVer = bEnable;
 }
 
 
@@ -496,6 +526,9 @@ bool CRenderItemManager::SaveDefaultRenderTarget ( void )
 ////////////////////////////////////////////////////////////////
 bool CRenderItemManager::RestoreDefaultRenderTarget ( void )
 {
+    if ( m_bApplySetRenderTargetRestrictions && !m_bSetRenderTargetEnabledOldVer )
+        return false;
+
     // Only need to change if we have info
     if ( m_pDefaultD3DRenderTarget )
     {
