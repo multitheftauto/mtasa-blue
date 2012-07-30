@@ -362,7 +362,7 @@ void CRenderWareSA::SetRenderingClientEntity ( CClientEntityBase* pClientEntity,
 //
 //
 ////////////////////////////////////////////////////////////////
-CSHADERDUMMY* CRenderWareSA::GetAppliedShaderForD3DData ( CD3DDUMMY* pD3DData )
+SShaderItemLayers* CRenderWareSA::GetAppliedShaderForD3DData ( CD3DDUMMY* pD3DData )
 {
     m_uiReplacementRequestCounter++;
 
@@ -371,18 +371,18 @@ CSHADERDUMMY* CRenderWareSA::GetAppliedShaderForD3DData ( CD3DDUMMY* pD3DData )
     if ( !pTexInfo )
         return NULL;
 
-    SShaderInfo* pShaderInfo = m_pMatchChannelManager->GetShaderForTexAndEntity ( pTexInfo, m_pRenderingClientEntity );
+    SShaderInfoLayers* pInfoLayers = m_pMatchChannelManager->GetShaderForTexAndEntity ( pTexInfo, m_pRenderingClientEntity );
 
-    if ( !pShaderInfo )
+    if ( !pInfoLayers )
         return NULL;
 
     // Check for vertex shader rule violation
-    if ( m_bIsRenderingPed && pShaderInfo->bUsesVertexShader )
+    if ( m_bIsRenderingPed && pInfoLayers->output.bUsesVertexShader )
         return NULL;
 
     m_uiReplacementMatchCounter++;
 
-    return pShaderInfo->pShaderData;
+    return &pInfoLayers->output;
 }
 
 
@@ -393,10 +393,10 @@ CSHADERDUMMY* CRenderWareSA::GetAppliedShaderForD3DData ( CD3DDUMMY* pD3DData )
 // Add additive match for a shader+entity combo
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::AppendAdditiveMatch ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch, float fShaderPriority, uint uiShaderCreateTime, bool bShaderUsesVertexShader )
+void CRenderWareSA::AppendAdditiveMatch ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch, float fShaderPriority, bool bShaderLayered, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers )
 {
     TIMING_CHECKPOINT( "+AppendAddMatch" );
-    m_pMatchChannelManager->AppendAdditiveMatch ( pShaderData, pClientEntity, strTextureNameMatch, fShaderPriority, uiShaderCreateTime, bShaderUsesVertexShader );
+    m_pMatchChannelManager->AppendAdditiveMatch ( pShaderData, pClientEntity, strTextureNameMatch, fShaderPriority, bShaderLayered, uiShaderCreateTime, bShaderUsesVertexShader, bAppendLayers );
     TIMING_CHECKPOINT( "-AppendAddMatch" );
 }
 

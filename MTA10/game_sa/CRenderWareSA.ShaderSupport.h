@@ -55,22 +55,41 @@ struct STexTag
 };
 
 
+struct SOrderValue
+{
+    SOrderValue ( float fOrderPriority, uint uiShaderCreateTime )
+        : fOrderPriority ( fOrderPriority )
+        , uiShaderCreateTime ( uiShaderCreateTime )
+    {
+    }
+
+    // Less than means higher priority
+    bool operator< ( const SOrderValue& other ) const
+    {
+        return fOrderPriority < other.fOrderPriority
+               || ( fOrderPriority == other.fOrderPriority && uiShaderCreateTime < other.uiShaderCreateTime );
+    }
+
+    const float     fOrderPriority;     // Lower is higher priority
+    const uint      uiShaderCreateTime;
+};
+
 //
 // Info about an active shader which can replace textures
 //
 struct SShaderInfo
 {
-    SShaderInfo ( CSHADERDUMMY* pShaderData, float fOrderPriority, uint uiShaderCreateTime, bool bUsesVertexShader )
+    SShaderInfo ( CSHADERDUMMY* pShaderData, float fOrderPriority, bool bLayered, uint uiShaderCreateTime, bool bUsesVertexShader )
         : pShaderData ( pShaderData )
-        , fOrderPriority ( fOrderPriority )
-        , uiShaderCreateTime ( uiShaderCreateTime )
+        , orderValue ( fOrderPriority, uiShaderCreateTime )
+        , bLayered ( bLayered )
         , bUsesVertexShader ( bUsesVertexShader )
     {
     }
 
     CSHADERDUMMY* const         pShaderData;
-    const float                 fOrderPriority;
-    const uint                  uiShaderCreateTime;
+    const SOrderValue           orderValue;
+    const bool                  bLayered;
     const bool                  bUsesVertexShader;
 };
 
@@ -94,14 +113,63 @@ struct STexInfo
 };
 
 
+struct SShaderInfoInstance
+{
+    SShaderInfoInstance ( void )
+        : pShaderInfo ( NULL )
+        , bMixEntityAndNonEntity ( false )
+    {
+    }
+
+    SShaderInfoInstance ( SShaderInfo* pShaderInfo, bool bMixEntityAndNonEntity )
+        : pShaderInfo ( pShaderInfo )
+        , bMixEntityAndNonEntity ( bMixEntityAndNonEntity )
+    {
+    }
+
+    SShaderInfo*    pShaderInfo;
+    bool            bMixEntityAndNonEntity;
+
+#ifdef SHADER_DEBUG_CHECKS
+    bool operator== ( const SShaderInfoInstance& other ) const
+    {
+        return pShaderInfo == other.pShaderInfo
+                && bMixEntityAndNonEntity == other.bMixEntityAndNonEntity;
+    }
+#endif
+
+    bool operator< ( const SShaderInfoInstance& other ) const
+    {
+        return pShaderInfo->orderValue < other.pShaderInfo->orderValue;
+    }
+
+};
+
+struct SShaderInfoLayers
+{
+    SShaderInfoInstance                 pBase;
+    std::vector < SShaderInfoInstance > layerList;
+    SShaderItemLayers                   output;         // For renderer
+
+#ifdef SHADER_DEBUG_CHECKS
+    bool operator== ( const SShaderInfoLayers& other ) const
+    {
+        return pBase.pShaderInfo == other.pBase.pShaderInfo
+                && pBase.bMixEntityAndNonEntity == other.pBase.bMixEntityAndNonEntity
+                && layerList == other.layerList;
+    }
+#endif
+};
+
+
 //
 // Shader replacement, sort of cached
 //
 struct STexShaderReplacement
 {
-    STexShaderReplacement ( void ) : bSet ( false ), pShaderInfo ( NULL ) {}
+    STexShaderReplacement ( void ) : bSet ( false )/*, pShaderInfo ( NULL )*/ {}
     bool bSet;
-    SShaderInfo* pShaderInfo;
+    SShaderInfoLayers shaderLayers;
 };
 
 
