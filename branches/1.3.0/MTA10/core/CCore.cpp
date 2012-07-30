@@ -1956,6 +1956,9 @@ void CCore::OnPreHUDRender ( void )
     else
         m_pModManager->DoPulsePreHUDRender ( false, false );
 
+    // Restore in case script forgets
+    CGraphics::GetSingleton ().GetRenderItemManager ()->RestoreDefaultRenderTarget ();
+
     // Draw pre-GUI primitives
     CGraphics::GetSingleton ().DrawPreGUIQueue ();
 

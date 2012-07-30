@@ -110,9 +110,10 @@ struct SWildcardMatchChain
 class CShaderAndEntityPair
 {
 public:
-    CShaderAndEntityPair ( SShaderInfo* pShaderInfo, CClientEntityBase* pClientEntity )
+    CShaderAndEntityPair ( SShaderInfo* pShaderInfo, CClientEntityBase* pClientEntity, bool bAppendLayers )
         : pShaderInfo ( pShaderInfo )
         , pClientEntity ( pClientEntity )
+        , bAppendLayers ( bAppendLayers )
     {}
 
     bool operator < ( const CShaderAndEntityPair& other ) const
@@ -121,8 +122,14 @@ public:
                 ( pShaderInfo == other.pShaderInfo && pClientEntity < other.pClientEntity );
     }
 
+    bool operator == ( const CShaderAndEntityPair& other ) const
+    {
+        return pShaderInfo == other.pShaderInfo && pClientEntity == other.pClientEntity;
+    }
+
     SShaderInfo*        pShaderInfo;
     CClientEntityBase*  pClientEntity;
+    bool                bAppendLayers;
 };
 
 
@@ -183,26 +190,29 @@ public:
         return m_ShaderAndEntityList.size ();
     }
 
-    void GetBestShaderForEntity ( CClientEntityBase* pClientEntity, SShaderInfo*& pBestShaderInfo ) const
+    void GetBestShaderForEntity ( CClientEntityBase* pClientEntity, SShaderInfoLayers& outShaderLayers ) const
     {
         for ( std::set < CShaderAndEntityPair >::const_iterator iter = m_ShaderAndEntityList.begin () ; iter != m_ShaderAndEntityList.end () ; ++iter )
         {
             const CShaderAndEntityPair& key = *iter;
             if ( key.pClientEntity == pClientEntity )
             {
-                if ( !pBestShaderInfo )
-                    pBestShaderInfo = key.pShaderInfo;
+                if ( !key.pShaderInfo->bLayered )
+                {
+                    // Base shader
+                    if ( !outShaderLayers.pBase.pShaderInfo )
+                        outShaderLayers.pBase = SShaderInfoInstance ( key.pShaderInfo, key.bAppendLayers );
+                    else
+                    {
+                        // Check priority, then bias later additions
+                        if ( outShaderLayers.pBase.pShaderInfo->orderValue < key.pShaderInfo->orderValue )
+                            outShaderLayers.pBase = SShaderInfoInstance ( key.pShaderInfo, key.bAppendLayers );
+                    }
+                }
                 else
                 {
-                    // Check priority, then bias later additions
-                    if ( pBestShaderInfo->fOrderPriority < key.pShaderInfo->fOrderPriority )
-                        pBestShaderInfo = key.pShaderInfo;
-                    else
-                    if ( pBestShaderInfo->fOrderPriority == key.pShaderInfo->fOrderPriority )
-                    {
-                        if ( pBestShaderInfo->uiShaderCreateTime < key.pShaderInfo->uiShaderCreateTime )
-                            pBestShaderInfo = key.pShaderInfo;
-                    }
+                    // Layers
+                    outShaderLayers.layerList.push_back ( SShaderInfoInstance ( key.pShaderInfo, key.bAppendLayers ) );
                 }
             }
         }
@@ -264,31 +274,35 @@ public:
 class CMatchChannelManager
 {
 public:
-    void                AppendAdditiveMatch             ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const SString& strTextureNameMatch, float fShaderPriority, uint uiShaderCreateTime, bool bShaderUsesVertexShader );
+    void                AppendAdditiveMatch             ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const SString& strTextureNameMatch, float fShaderPriority, bool bShaderLayered, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers );
     void                AppendSubtractiveMatch          ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const SString& strTextureNameMatch );
     void                InsertTexture                   ( STexInfo* pTexInfo );
     void                RemoveTexture                   ( STexInfo* pTexInfo );
-    SShaderInfo*        GetShaderForTexAndEntity        ( STexInfo* pTexInfo, CClientEntityBase* pClientEntity );
+    SShaderInfoLayers*      GetShaderForTexAndEntity        ( STexInfo* pTexInfo, CClientEntityBase* pClientEntity );
     void                RemoveClientEntityRefs          ( CClientEntityBase* pClientEntity );
     void                RemoveShaderRefs                ( CSHADERDUMMY* pShaderData );
     void                GetShaderReplacementStats       ( SShaderReplacementStats& outStats );
 
 protected:
-    SShaderInfo*        CalcShaderForTexAndEntity       ( STexNameInfo* pTexNameInfo, CClientEntityBase* pClientEntity, bool bSilent = false );
+    void                CalcShaderForTexAndEntity       ( SShaderInfoLayers& outShaderLayers, STexNameInfo* pTexNameInfo, CClientEntityBase* pClientEntity, bool bSilent = false );
     void                FlushChanges                    ( void );
     void                RecalcEverything                ( void );
     void                ProcessRematchTexturesQueue     ( void );
     void                ProcessOptimizeChannelsQueue    ( void );
     void                MergeChannelTo                  ( CMatchChannel* pSource, CMatchChannel* pTarget );
     CMatchChannel*      FindChannelWithMatchChain       ( const SWildcardMatchChain& matchChain, CMatchChannel* pExcluding );
-    CMatchChannel*      GetChannelOnlyUsedBy            ( SShaderInfo* pShaderInfo, CClientEntityBase* pClientEntity );
+    CMatchChannel*      GetChannelOnlyUsedBy            ( SShaderInfo* pShaderInfo, CClientEntityBase* pClientEntity, bool bAppendLayers );
     void                AddUsage                        ( const CShaderAndEntityPair& key, CMatchChannel* pChannel );
     void                RemoveUsage                     ( const CShaderAndEntityPair& key, CMatchChannel* pChannel );
     CMatchChannel*      GetChannel                      ( const CShaderAndEntityPair& key );
     CMatchChannel*      NewChannel                      ( void );
     void                DeleteChannel                   ( CMatchChannel* pChannel );
-    SShaderInfo*        GetShaderInfo                   ( CSHADERDUMMY* pShaderData, bool bAddIfRequired, float fPriority, uint uiShaderCreateTime, bool bUsesVertexShader );
+    SShaderInfo*        GetShaderInfo                   ( CSHADERDUMMY* pShaderData, bool bAddIfRequired, float fPriority, bool bLayered, uint uiShaderCreateTime, bool bUsesVertexShader );
     void                DeleteShaderInfo                ( SShaderInfo* pShaderInfo );
+
+    STexShaderReplacement* UpdateTexShaderReplacement   ( STexNameInfo* pTexNameInfo, CClientEntityBase* pClientEntity );
+    void                UpdateTexShaderReplacement      ( STexNameInfo* pTexNameInfo );
+    void                FinalizeLayers                  ( SShaderInfoLayers& shaderLayers );
 
     std::map < CShaderAndEntityPair, CMatchChannel* >   m_ChannelUsageMap;
     std::set < CMatchChannel* >                         m_CreatedChannelList;

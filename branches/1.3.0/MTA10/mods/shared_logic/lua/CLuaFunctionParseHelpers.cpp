@@ -10,6 +10,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define CAN_GIVE_MINCLIENTREQ_MIN_SERVER_VERSION  "1.3.0-9.04431"
 
 //
 // enum values <-> script strings
@@ -387,5 +388,31 @@ bool MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pM
             }
         }
         return pMaterialElement != NULL;
+    }
+}
+
+//
+// Check min client is correct
+//
+void MinClientCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason )
+{
+    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine ( argStream.m_luaVM );
+    if ( pLuaMain )
+    {
+        CResource* pResource = pLuaMain->GetResource();
+        if ( pResource )
+        {
+            if ( pResource->GetMinClientReq () < szVersionReq )
+            {
+                if ( MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE )
+                {
+                    // Check server is able to give us a MinClientReq
+                    if ( pResource->GetMinServerReq () < CAN_GIVE_MINCLIENTREQ_MIN_SERVER_VERSION )
+                        argStream.SetVersionError ( CAN_GIVE_MINCLIENTREQ_MIN_SERVER_VERSION, "server", "of technical reasons" );
+                    else
+                        argStream.SetVersionError ( szVersionReq, "client", szReason );
+                }
+            }
+        }
     }
 }

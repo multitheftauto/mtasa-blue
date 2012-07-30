@@ -144,6 +144,9 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     CCore::GetSingleton ().DoPostFramePulse ();
     TIMING_CHECKPOINT( "+OnPresent2" );
 
+    // Restore in case script forgets
+    CGraphics::GetSingleton ().GetRenderItemManager ()->RestoreDefaultRenderTarget ();
+
     // Draw pre-GUI primitives
     CGraphics::GetSingleton ().DrawPreGUIQueue ();
 
@@ -282,6 +285,15 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     TIMING_CHECKPOINT( "-OnPresent2" );
 }
 
+#define SAVE_RENDERSTATE_AND_SET( reg, value ) \
+    const DWORD dwSaved_##reg = g_pDeviceState->RenderState.reg; \
+    const bool bSet_##reg = ( dwSaved_##reg != value ); \
+    if ( bSet_##reg ) \
+        pDevice->SetRenderState ( D3DRS_##reg, value )
+
+#define RESTORE_RENDERSTATE( reg ) \
+    if ( bSet_##reg ) \
+        pDevice->SetRenderState ( D3DRS_##reg, dwSaved_##reg )
 
 /////////////////////////////////////////////////////////////
 //
@@ -296,8 +308,59 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
         return pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
 
     // Any shader for this texture ?
-    CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
+    SShaderItemLayers* pLayers = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
 
+    if ( !pLayers )
+    {
+        // No shaders for this texture
+        return DrawPrimitiveGuarded ( pDevice, PrimitiveType, StartVertex, PrimitiveCount );
+    }
+    else
+    {
+        // Yes base shader
+        DrawPrimitiveShader ( pDevice, PrimitiveType, StartVertex, PrimitiveCount, pLayers->pBase, false );
+
+        // Draw each layer
+        if ( !pLayers->layerList.empty () )
+        {
+            SAVE_RENDERSTATE_AND_SET( ALPHABLENDENABLE, TRUE );
+            SAVE_RENDERSTATE_AND_SET( SRCBLEND,         D3DBLEND_SRCALPHA );
+            SAVE_RENDERSTATE_AND_SET( DESTBLEND,        D3DBLEND_INVSRCALPHA );
+            SAVE_RENDERSTATE_AND_SET( ALPHATESTENABLE,  TRUE );
+            SAVE_RENDERSTATE_AND_SET( ALPHAREF,         0x01 );
+            SAVE_RENDERSTATE_AND_SET( ALPHAFUNC,        D3DCMP_GREATER );
+            SAVE_RENDERSTATE_AND_SET( ZWRITEENABLE,     FALSE );
+            SAVE_RENDERSTATE_AND_SET( ZFUNC,            D3DCMP_LESSEQUAL );
+
+            for ( uint i = 0 ; i < pLayers->layerList.size () ; i++ )
+            {
+                DrawPrimitiveShader ( pDevice, PrimitiveType, StartVertex, PrimitiveCount, pLayers->layerList[i], true );
+            }
+
+            RESTORE_RENDERSTATE( ALPHABLENDENABLE );
+            RESTORE_RENDERSTATE( SRCBLEND );
+            RESTORE_RENDERSTATE( DESTBLEND );
+            RESTORE_RENDERSTATE( ALPHATESTENABLE );
+            RESTORE_RENDERSTATE( ALPHAREF );
+            RESTORE_RENDERSTATE( ALPHAFUNC );
+            RESTORE_RENDERSTATE( ZWRITEENABLE );
+            RESTORE_RENDERSTATE( ZFUNC );
+        }
+
+        return D3D_OK;
+    }
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::DrawPrimitiveShader
+//
+//
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::DrawPrimitiveShader ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,UINT StartVertex,UINT PrimitiveCount, CShaderItem* pShaderItem, bool bIsLayer )
+{
     // Don't apply if both the shader and render state both use a vertex shader
     if ( pShaderItem && g_pDeviceState->VertexShader && pShaderItem->GetUsesVertexShader () )
         pShaderItem = NULL;
@@ -305,7 +368,8 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
     if ( !pShaderItem )
     {
         // No shader for this texture
-        return DrawPrimitiveGuarded ( pDevice, PrimitiveType, StartVertex, PrimitiveCount );
+        if ( !bIsLayer )
+            return DrawPrimitiveGuarded ( pDevice, PrimitiveType, StartVertex, PrimitiveCount );
     }
     else
     {
@@ -354,8 +418,9 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
         }
 
         g_pDeviceState->CallState.strShaderName = "";
-        return D3D_OK;
     }
+
+    return D3D_OK;
 }
 
 
@@ -381,8 +446,59 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
     }
 
     // Any shader for this texture ?
-    CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
+    SShaderItemLayers* pLayers = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
 
+    if ( !pLayers )
+    {
+        // No shaders for this texture
+        return DrawIndexedPrimitiveGuarded ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+    }
+    else
+    {
+        // Draw base shader
+        DrawIndexedPrimitiveShader ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount, pLayers->pBase, false );
+
+        // Draw each layer
+        if ( !pLayers->layerList.empty () )
+        {
+            SAVE_RENDERSTATE_AND_SET( ALPHABLENDENABLE, TRUE );
+            SAVE_RENDERSTATE_AND_SET( SRCBLEND,         D3DBLEND_SRCALPHA );
+            SAVE_RENDERSTATE_AND_SET( DESTBLEND,        D3DBLEND_INVSRCALPHA );
+            SAVE_RENDERSTATE_AND_SET( ALPHATESTENABLE,  TRUE );
+            SAVE_RENDERSTATE_AND_SET( ALPHAREF,         0x01 );
+            SAVE_RENDERSTATE_AND_SET( ALPHAFUNC,        D3DCMP_GREATER );
+            SAVE_RENDERSTATE_AND_SET( ZWRITEENABLE,     FALSE );
+            SAVE_RENDERSTATE_AND_SET( ZFUNC,            D3DCMP_LESSEQUAL );
+
+            for ( uint i = 0 ; i < pLayers->layerList.size () ; i++ )
+            {
+                DrawIndexedPrimitiveShader ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount, pLayers->layerList[i], true );
+            }
+
+            RESTORE_RENDERSTATE( ALPHABLENDENABLE );
+            RESTORE_RENDERSTATE( SRCBLEND );
+            RESTORE_RENDERSTATE( DESTBLEND );
+            RESTORE_RENDERSTATE( ALPHATESTENABLE );
+            RESTORE_RENDERSTATE( ALPHAREF );
+            RESTORE_RENDERSTATE( ALPHAFUNC );
+            RESTORE_RENDERSTATE( ZWRITEENABLE );
+            RESTORE_RENDERSTATE( ZFUNC );
+        }
+
+        return D3D_OK;
+    }
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::DrawIndexedPrimitiveShader
+//
+//
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount, CShaderItem* pShaderItem, bool bIsLayer )
+{
     // Don't apply if both the shader and render state both use a vertex shader
     if ( pShaderItem && g_pDeviceState->VertexShader && pShaderItem->GetUsesVertexShader () )
         pShaderItem = NULL;
@@ -400,7 +516,8 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
     if ( !pShaderItem )
     {
         // No shader for this texture
-        return DrawIndexedPrimitiveGuarded ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+        if ( !bIsLayer )
+            return DrawIndexedPrimitiveGuarded ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
     }
     else
     {
@@ -459,8 +576,9 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
         CAdditionalVertexStreamManager::GetSingleton ()->MaybeUnsetAdditionalVertexStream ();
 
         g_pDeviceState->CallState.strShaderName = "";
-        return D3D_OK;
     }
+
+    return D3D_OK;
 }
 
 

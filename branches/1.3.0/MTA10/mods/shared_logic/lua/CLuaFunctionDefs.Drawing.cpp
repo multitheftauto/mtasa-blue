@@ -18,6 +18,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define SETRENDERTARGET_NORESTRICTIONS_MIN_CLIENT_VERSION  "1.3.0-9.04431"
 
 int CLuaFunctionDefs::dxDrawLine ( lua_State* luaVM )
 {
@@ -509,14 +510,14 @@ int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxCreateShader ( lua_State* luaVM )
 {
-//  element dxCreateShader( string filepath [, float priority = 0, float maxdistance = 0, bool debug = false ] )
-    SString strFilePath; float fPriority; float fMaxDistance; bool bDebug;
+//  element dxCreateShader( string filepath [, float priority = 0, float maxdistance = 0, bool layered = false ] )
+    SString strFilePath; float fPriority; float fMaxDistance; bool bLayered;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strFilePath );
     argStream.ReadNumber ( fPriority, 0.0f );
     argStream.ReadNumber ( fMaxDistance, 0.0f );
-    argStream.ReadBool ( bDebug, false );
+    argStream.ReadBool ( bLayered, false );
 
     if ( !argStream.HasErrors () )
     {
@@ -532,7 +533,7 @@ int CLuaFunctionDefs::dxCreateShader ( lua_State* luaVM )
                 {
                     SString strRootPath = strPath.Left ( strPath.length () - strMetaPath.length () );
                     SString strStatus;
-                    CClientShader* pShader = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateShader ( strPath, strRootPath, strStatus, fPriority, fMaxDistance, bDebug );
+                    CClientShader* pShader = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateShader ( strPath, strRootPath, strStatus, fPriority, fMaxDistance, bLayered, false );
                     if ( pShader )
                     {
                         // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
@@ -815,6 +816,10 @@ int CLuaFunctionDefs::dxSetRenderTarget ( lua_State* luaVM )
     argStream.ReadUserData ( pRenderTarget, NULL );
     argStream.ReadBool ( bClear, false );
 
+    // Check version ok for this function to be called now
+    if ( !g_pCore->GetGraphics ()->GetRenderItemManager ()->IsSetRenderTargetEnabledOldVer () )
+        MinClientCheck ( argStream, SETRENDERTARGET_NORESTRICTIONS_MIN_CLIENT_VERSION, "dxSetRenderTarget is being called outside certain events" );
+
     if ( !argStream.HasErrors () )
     {
         bool bResult;
@@ -823,16 +828,11 @@ int CLuaFunctionDefs::dxSetRenderTarget ( lua_State* luaVM )
         else
             bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->RestoreDefaultRenderTarget ();
 
-        if ( bResult )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad usage @ '%s' [%s]", "dxSetRenderTarget", "dxSetRenderTarget can only be used inside certain events" ) );
+        lua_pushboolean ( luaVM, bResult );
+        return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetRenderTarget", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     // error: bad arguments
     lua_pushboolean ( luaVM, false );

@@ -187,7 +187,7 @@ CScreenSourceItem* CRenderItemManager::CreateScreenSource ( uint uiSizeX, uint u
 // Create a D3DX effect from .fx file
 //
 ////////////////////////////////////////////////////////////////
-CShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug )
+CShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bLayered, bool bDebug )
 {
     if ( !CanCreateRenderItem ( CShaderItem::GetClassId () ) )
         return NULL;
@@ -195,7 +195,7 @@ CShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, 
     strOutStatus = "";
 
     CShaderItem* pShaderItem = new CShaderItem ();
-    pShaderItem->PostConstruct ( this, strFullFilePath, strRootPath, strOutStatus, fPriority, fMaxDistance, bDebug );
+    pShaderItem->PostConstruct ( this, strFullFilePath, strRootPath, strOutStatus, fPriority, fMaxDistance, bLayered, bDebug );
 
     if ( !pShaderItem->IsValid () )
     {
@@ -449,8 +449,8 @@ void CRenderItemManager::UpdateBackBufferCopySize ( void )
 ////////////////////////////////////////////////////////////////
 bool CRenderItemManager::SetRenderTarget ( CRenderTargetItem* pItem, bool bClear )
 {
-    if ( !CGraphics::GetSingleton().CanSetRenderTarget () )
-        return false;
+    if ( !m_pDefaultD3DRenderTarget )
+        SaveDefaultRenderTarget ();
 
     ChangeRenderTarget ( pItem->m_uiSizeX, pItem->m_uiSizeY, pItem->m_pD3DRenderTargetSurface, pItem->m_pD3DZStencilSurface );
 
@@ -458,6 +458,32 @@ bool CRenderItemManager::SetRenderTarget ( CRenderTargetItem* pItem, bool bClear
         m_pDevice->Clear ( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0,0,0,0), 1, 0 );
 
     return true;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::IsSetRenderTargetEnabledOldVer
+//
+// See if in enabled zones for old versions
+//
+////////////////////////////////////////////////////////////////
+bool CRenderItemManager::IsSetRenderTargetEnabledOldVer ( void )
+{
+    return m_bSetRenderTargetEnabledOldVer;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::EnableSetRenderTargetOldVer
+//
+// Enabled zones for old versions
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::EnableSetRenderTargetOldVer ( bool bEnable )
+{
+    m_bSetRenderTargetEnabledOldVer = bEnable;
 }
 
 
@@ -496,12 +522,12 @@ bool CRenderItemManager::SaveDefaultRenderTarget ( void )
 ////////////////////////////////////////////////////////////////
 bool CRenderItemManager::RestoreDefaultRenderTarget ( void )
 {
-    if ( !CGraphics::GetSingleton().CanSetRenderTarget () )
-        return false;
-
     // Only need to change if we have info
     if ( m_pDefaultD3DRenderTarget )
+    {
         ChangeRenderTarget ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, m_pDefaultD3DRenderTarget, m_pDefaultD3DZStencilSurface );
+        m_pDefaultD3DRenderTarget = NULL;
+    }
 
     return true;
 }

@@ -477,13 +477,14 @@ int CLuaFunctionDefs::EngineReplaceVehiclePart ( lua_State* luaVM )
 
 int CLuaFunctionDefs::EngineApplyShaderToWorldTexture ( lua_State* luaVM )
 {
-//  bool engineApplyShaderToWorldTexture ( element shader, string textureName, [ element targetElement ] )
-    CClientShader* pShader; SString strTextureNameMatch; CClientEntity* pElement;
+//  bool engineApplyShaderToWorldTexture ( element shader, string textureName, [ element targetElement, bool appendLayers ] )
+    CClientShader* pShader; SString strTextureNameMatch; CClientEntity* pElement; bool bAppendLayers;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pShader );
     argStream.ReadString ( strTextureNameMatch );
     argStream.ReadUserData ( pElement, NULL );
+    argStream.ReadBool ( bAppendLayers, true );
 
     if ( !argStream.HasErrors () )
     {
@@ -495,7 +496,7 @@ int CLuaFunctionDefs::EngineApplyShaderToWorldTexture ( lua_State* luaVM )
                 m_pScriptDebugging->LogWarning ( luaVM, SString ( "%s; Shader contains a vertex shader which will not work with ped models", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) ) );
             }
         }
-        bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->ApplyShaderItemToWorldTexture ( pShader->GetShaderItem (), strTextureNameMatch, pElement );
+        bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->ApplyShaderItemToWorldTexture ( pShader->GetShaderItem (), strTextureNameMatch, pElement, bAppendLayers );
         lua_pushboolean ( luaVM, bResult );
         return 1;
     }

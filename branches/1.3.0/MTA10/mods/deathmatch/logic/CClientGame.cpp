@@ -690,8 +690,8 @@ void CClientGame::DoPulsePreFrame ( void )
 
 void CClientGame::DoPulsePreHUDRender ( bool bDidUnminimize, bool bDidRecreateRenderTargets )
 {
-    // Allow scripted dxSetRenderTarget
-    g_pCore->GetGraphics ()->EnableSetRenderTarget ( true );
+    // Allow scripted dxSetRenderTarget for old scripts
+    g_pCore->GetGraphics ()->GetRenderItemManager ()->EnableSetRenderTargetOldVer ( true );
 
     // If appropriate, call onClientRestore
     if ( bDidUnminimize )
@@ -706,8 +706,11 @@ void CClientGame::DoPulsePreHUDRender ( bool bDidUnminimize, bool bDidRecreateRe
     CLuaArguments Arguments;
     m_pRootEntity->CallEvent ( "onClientHUDRender", Arguments, false );
 
-    // Disallow scripted dxSetRenderTarget
-    g_pCore->GetGraphics ()->EnableSetRenderTarget ( false );
+    // Disallow scripted dxSetRenderTarget for old scripts
+    g_pCore->GetGraphics ()->GetRenderItemManager ()->EnableSetRenderTargetOldVer ( false );
+
+    // Restore in case script forgets
+    g_pCore->GetGraphics ()->GetRenderItemManager ()->RestoreDefaultRenderTarget ();
 
     DebugElementRender ();
 }
@@ -1110,15 +1113,18 @@ void CClientGame::DoPulses ( void )
         // Get rid of deleted GUI elements
         g_pCore->GetGUI ()->CleanDeadPool ();
 
-        // Allow scripted dxSetRenderTarget
-        g_pCore->GetGraphics ()->EnableSetRenderTarget ( true );
+        // Allow scripted dxSetRenderTarget for old scripts
+        g_pCore->GetGraphics ()->GetRenderItemManager ()->EnableSetRenderTargetOldVer ( true );
 
         // Call onClientRender LUA event
         CLuaArguments Arguments;
         m_pRootEntity->CallEvent ( "onClientRender", Arguments, false );
 
-        // Disallow scripted dxSetRenderTarget
-        g_pCore->GetGraphics ()->EnableSetRenderTarget ( false );
+        // Disallow scripted dxSetRenderTarget for old scripts
+        g_pCore->GetGraphics ()->GetRenderItemManager ()->EnableSetRenderTargetOldVer ( false );
+
+        // Restore in case script forgets
+        g_pCore->GetGraphics ()->GetRenderItemManager ()->RestoreDefaultRenderTarget ();
 
         // Ensure replaced/restored textures for models in the GTA map are correct
         g_pGame->FlushPendingRestreamIPL ();

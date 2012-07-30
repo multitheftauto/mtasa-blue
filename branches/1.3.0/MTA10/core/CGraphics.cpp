@@ -49,7 +49,6 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
     m_pLine3DBatcherPostGUI = new CLine3DBatcher ( false );
     m_pMaterialLine3DBatcher = new CMaterialLine3DBatcher ();
 
-    m_bSetRenderTargetEnabled = false;
     m_pScreenGrabber = NewScreenGrabber ();
     m_pPixelsManager = NewPixelsManager ();
 }
@@ -1364,21 +1363,6 @@ void CGraphics::RemoveQueueRef ( IUnknown* pUnknown )
 {
     pUnknown->Release ();
     m_iDebugQueueRefs--;    // For debugging
-}
-
-
-// Entering or leaving a section where the rendertarget can be changed from script
-void CGraphics::EnableSetRenderTarget ( bool bEnable )
-{
-    // Must be changing
-    assert ( m_bSetRenderTargetEnabled != bEnable );
-
-    if ( !bEnable )
-        m_pRenderItemManager->RestoreDefaultRenderTarget ();
-    else
-        m_pRenderItemManager->SaveDefaultRenderTarget ();
-
-    m_bSetRenderTargetEnabled = bEnable;
 }
 
 // Notification that the render target will be changing
