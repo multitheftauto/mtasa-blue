@@ -3588,10 +3588,31 @@ void CClientGame::StaticGameEntityRenderHandler ( CEntitySAInterface* pGameEntit
     {
         // Map to client entity and pass to the texture replacer
         CClientEntity* pClientEntity = g_pClientGame->GetGameEntityXRefManager ()->FindClientEntity ( pGameEntity );
-        g_pGame->GetRenderWare ()->SetRenderingClientEntity ( pClientEntity, DynamicCast < CClientPed > ( pClientEntity ) );
+        if ( pClientEntity )
+        {
+            int iTypeMask;
+            switch ( pClientEntity->GetType () )
+            {
+                case CCLIENTPED:
+                case CCLIENTPLAYER:
+                    iTypeMask = TYPE_MASK_PED;
+                    break;
+                case CCLIENTVEHICLE:
+                    iTypeMask = TYPE_MASK_VEHICLE;
+                    break;
+                case CCLIENTOBJECT:
+                    iTypeMask = TYPE_MASK_OBJECT;
+                    break;
+                default:
+                    iTypeMask = TYPE_MASK_OTHER;
+                    break;
+            }
+            g_pGame->GetRenderWare ()->SetRenderingClientEntity ( pClientEntity, iTypeMask );
+            return;
+        }
     }
-    else
-        g_pGame->GetRenderWare ()->SetRenderingClientEntity ( NULL, false );
+
+    g_pGame->GetRenderWare ()->SetRenderingClientEntity ( NULL, TYPE_MASK_WORLD );
 }
 
 void CClientGame::DrawRadarAreasHandler ( void )

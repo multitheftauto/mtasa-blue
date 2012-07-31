@@ -31,6 +31,7 @@ DECLARE_ENUM( ETextureType );
 DECLARE_ENUM( ETextureAddress );
 DECLARE_ENUM( EPixelsFormatType );
 DECLARE_ENUM( EBlendModeType )
+DECLARE_ENUM( EEntityTypeMask );
 
 enum eDXHorizontalAlign
 {

@@ -19,15 +19,15 @@ uint CMatchChannel::ms_uiIdCounter = 1;
 // Add additive match for a shader+entity combo
 //
 //////////////////////////////////////////////////////////////////
-void CMatchChannelManager::AppendAdditiveMatch ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const SString& strTextureNameMatch, float fShaderPriority, bool bShaderLayered, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers )
+void CMatchChannelManager::AppendAdditiveMatch ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const SString& strTextureNameMatch, float fShaderPriority, bool bShaderLayered, int iTypeMask, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers )
 {
-    SShaderInfo* pShaderInfo = GetShaderInfo ( pShaderData, true, fShaderPriority, bShaderLayered, uiShaderCreateTime, bShaderUsesVertexShader );
+    SShaderInfo* pShaderInfo = GetShaderInfo ( pShaderData, true, fShaderPriority, bShaderLayered, iTypeMask, uiShaderCreateTime, bShaderUsesVertexShader );
 
     // Make channel unique before modifying match chain
     CMatchChannel* pChannel = GetChannelOnlyUsedBy ( pShaderInfo, pClientEntity, bAppendLayers );
     pChannel->AppendAdditiveMatch ( strTextureNameMatch.ToLower () );
-    MapInsert ( m_OptimizeQueue, pChannel );
-    MapInsert ( m_RematchQueue, pChannel );
+    AddToOptimizeQueue ( pChannel );
+    AddToRematchQueue ( pChannel );
 
     // Keep a list of entites we know about, so we can ignore the rest
     if ( pClientEntity )
@@ -47,7 +47,7 @@ void CMatchChannelManager::AppendSubtractiveMatch ( CSHADERDUMMY* pShaderData, C
     bool bAppendLayers = false;
 
     // Don't bother if shader hasn't been seen before
-    SShaderInfo* pShaderInfo = GetShaderInfo ( pShaderData, false, 0, false, 0, false );
+    SShaderInfo* pShaderInfo = GetShaderInfo ( pShaderData, false, 0, false, TYPE_MASK_NONE, 0, false );
     if ( !pShaderInfo )
         return;
 
@@ -58,8 +58,8 @@ void CMatchChannelManager::AppendSubtractiveMatch ( CSHADERDUMMY* pShaderData, C
     // Make channel unique before modifying match chain
     CMatchChannel* pChannel = GetChannelOnlyUsedBy ( pShaderInfo, pClientEntity, bAppendLayers );
     pChannel->AppendSubtractiveMatch ( strTextureNameMatch.ToLower () );
-    MapInsert ( m_OptimizeQueue, pChannel );
-    MapInsert ( m_RematchQueue, pChannel );
+    AddToOptimizeQueue ( pChannel );
+    AddToRematchQueue ( pChannel );
 }
 
 
@@ -158,7 +158,7 @@ void CMatchChannelManager::FinalizeLayers ( SShaderInfoLayers& shaderLayers )
 //
 //
 //////////////////////////////////////////////////////////////////
-STexShaderReplacement* CMatchChannelManager::UpdateTexShaderReplacement ( STexNameInfo* pTexNameInfo, CClientEntityBase* pClientEntity )
+STexShaderReplacement* CMatchChannelManager::UpdateTexShaderReplacement ( STexNameInfo* pTexNameInfo, CClientEntityBase* pClientEntity, int iEntityType )
 {
     STexShaderReplacement* pTexShaderReplacement = MapFind ( pTexNameInfo->texEntityShaderMap, pClientEntity );
 
@@ -173,25 +173,28 @@ STexShaderReplacement* CMatchChannelManager::UpdateTexShaderReplacement ( STexNa
     {
         // If not done yet for this entity, needs to be done
         dassert ( !pTexShaderReplacement->shaderLayers.pBase.pShaderInfo && pTexShaderReplacement->shaderLayers.layerList.empty () );
-        CalcShaderForTexAndEntity ( pTexShaderReplacement->shaderLayers, pTexNameInfo, pClientEntity );
+        CalcShaderForTexAndEntity ( pTexShaderReplacement->shaderLayers, pTexNameInfo, pClientEntity, iEntityType, false );
         pTexShaderReplacement->bSet = true;
 
         // texNoEntityShader need to be done also, so we can see what needs to be inherited from it
-        UpdateTexShaderReplacement ( pTexNameInfo );
-
-        // Handle base inheritance
-        if ( pTexShaderReplacement->shaderLayers.pBase.pShaderInfo == NULL )
         {
-            if ( pTexNameInfo->texNoEntityShader.shaderLayers.pBase.bMixEntityAndNonEntity )
-                pTexShaderReplacement->shaderLayers.pBase = pTexNameInfo->texNoEntityShader.shaderLayers.pBase;
-        }
+            STexShaderReplacement& texNoEntityShader = pTexNameInfo->GetTexNoEntityShader ( iEntityType );
+            UpdateTexShaderReplacementNoEntity ( pTexNameInfo, texNoEntityShader, iEntityType );
 
-        // Handle layer inheritance
-        for ( uint i = 0 ; i < pTexNameInfo->texNoEntityShader.shaderLayers.layerList.size () ; i++ )
-        {
-            const SShaderInfoInstance& info = pTexNameInfo->texNoEntityShader.shaderLayers.layerList[i];
-            if ( info.bMixEntityAndNonEntity )
-                pTexShaderReplacement->shaderLayers.layerList.push_back ( info );
+            // Handle base inheritance
+            if ( pTexShaderReplacement->shaderLayers.pBase.pShaderInfo == NULL )
+            {
+                if ( texNoEntityShader.shaderLayers.pBase.bMixEntityAndNonEntity )
+                    pTexShaderReplacement->shaderLayers.pBase = texNoEntityShader.shaderLayers.pBase;
+            }
+
+            // Handle layer inheritance
+            for ( uint i = 0 ; i < texNoEntityShader.shaderLayers.layerList.size () ; i++ )
+            {
+                const SShaderInfoInstance& info = texNoEntityShader.shaderLayers.layerList[i];
+                if ( info.bMixEntityAndNonEntity )
+                    pTexShaderReplacement->shaderLayers.layerList.push_back ( info );
+            }
         }
 
         FinalizeLayers ( pTexShaderReplacement->shaderLayers );
@@ -203,23 +206,24 @@ STexShaderReplacement* CMatchChannelManager::UpdateTexShaderReplacement ( STexNa
 
 //////////////////////////////////////////////////////////////////
 //
-// CMatchChannelManager::UpdateTexShaderReplacement
+// CMatchChannelManager::UpdateTexShaderReplacementNoEntity
 //
 //
 //
 //////////////////////////////////////////////////////////////////
-void CMatchChannelManager::UpdateTexShaderReplacement ( STexNameInfo* pTexNameInfo )
+void CMatchChannelManager::UpdateTexShaderReplacementNoEntity ( STexNameInfo* pTexNameInfo, STexShaderReplacement& texNoEntityShader, int iEntityType )
 {
-    if ( !pTexNameInfo->texNoEntityShader.bSet )
+    if ( !texNoEntityShader.bSet )
     {
         // If not done yet, needs to be done
-        dassert ( !pTexNameInfo->texNoEntityShader.shaderLayers.pBase.pShaderInfo && pTexNameInfo->texNoEntityShader.shaderLayers.layerList.empty () );
-        CalcShaderForTexAndEntity ( pTexNameInfo->texNoEntityShader.shaderLayers, pTexNameInfo, NULL );
-        pTexNameInfo->texNoEntityShader.bSet = true;
+        dassert ( !texNoEntityShader.shaderLayers.pBase.pShaderInfo && texNoEntityShader.shaderLayers.layerList.empty () );
+        CalcShaderForTexAndEntity ( texNoEntityShader.shaderLayers, pTexNameInfo, NULL, iEntityType, false );
+        texNoEntityShader.bSet = true;
 
-        FinalizeLayers ( pTexNameInfo->texNoEntityShader.shaderLayers );
+        FinalizeLayers ( texNoEntityShader.shaderLayers );
     }
 }
+
 
 //////////////////////////////////////////////////////////////////
 //
@@ -228,11 +232,12 @@ void CMatchChannelManager::UpdateTexShaderReplacement ( STexNameInfo* pTexNameIn
 //
 //
 //////////////////////////////////////////////////////////////////
-SShaderInfoLayers* CMatchChannelManager::GetShaderForTexAndEntity ( STexInfo* pTexInfo, CClientEntityBase* pClientEntity )
+SShaderInfoLayers* CMatchChannelManager::GetShaderForTexAndEntity ( STexInfo* pTexInfo, CClientEntityBase* pClientEntity, int iEntityType )
 {
-    STexNameInfo* pTexNameInfo = pTexInfo->pAssociatedTexNameInfo;
+    if ( m_bChangesPending )
+        FlushChanges ();
 
-    FlushChanges ();
+    STexNameInfo* pTexNameInfo = pTexInfo->pAssociatedTexNameInfo;
 
     // Ignore unknown client entities
     if ( pClientEntity )
@@ -246,7 +251,7 @@ SShaderInfoLayers* CMatchChannelManager::GetShaderForTexAndEntity ( STexInfo* pT
 
         if ( !pTexShaderReplacement || !pTexShaderReplacement->bSet )
         {
-            pTexShaderReplacement = UpdateTexShaderReplacement ( pTexNameInfo, pClientEntity );
+            pTexShaderReplacement = UpdateTexShaderReplacement ( pTexNameInfo, pClientEntity, iEntityType );
         }
 
     #ifdef SHADER_DEBUG_CHECKS
@@ -255,19 +260,20 @@ SShaderInfoLayers* CMatchChannelManager::GetShaderForTexAndEntity ( STexInfo* pT
             // Check cached shader is correct
             pTexNameInfo->iDebugCounter1 = rand () % 100;
             SShaderInfoLayers shaderLayersCheck1;
-            CalcShaderForTexAndEntity ( shaderLayersCheck1, pTexNameInfo, pClientEntity );
+            CalcShaderForTexAndEntity ( shaderLayersCheck1, pTexNameInfo, pClientEntity, iEntityType, true );
 
             // Handle base inheritance
+            STexShaderReplacement& texNoEntityShader = pTexNameInfo->GetTexNoEntityShader ( iEntityType );
             if ( shaderLayersCheck1.pBase.pShaderInfo == NULL )
             {
-                if ( pTexNameInfo->texNoEntityShader.shaderLayers.pBase.bMixEntityAndNonEntity )
-                    shaderLayersCheck1.pBase = pTexNameInfo->texNoEntityShader.shaderLayers.pBase;
+                if ( texNoEntityShader.shaderLayers.pBase.bMixEntityAndNonEntity )
+                    shaderLayersCheck1.pBase = texNoEntityShader.shaderLayers.pBase;
             }
 
             // Handle layer inheritance
-            for ( uint i = 0 ; i < pTexNameInfo->texNoEntityShader.shaderLayers.layerList.size () ; i++ )
+            for ( uint i = 0 ; i < texNoEntityShader.shaderLayers.layerList.size () ; i++ )
             {
-                const SShaderInfoInstance& info = pTexNameInfo->texNoEntityShader.shaderLayers.layerList[i];
+                const SShaderInfoInstance& info = texNoEntityShader.shaderLayers.layerList[i];
                 if ( info.bMixEntityAndNonEntity )
                     shaderLayersCheck1.layerList.push_back ( info );
             }
@@ -280,26 +286,30 @@ SShaderInfoLayers* CMatchChannelManager::GetShaderForTexAndEntity ( STexInfo* pT
         // Return layers for this entity
         return &pTexShaderReplacement->shaderLayers;
     }
-
-    if ( !pTexNameInfo->texNoEntityShader.bSet )
+    else
     {
-        UpdateTexShaderReplacement ( pTexNameInfo, pClientEntity );
-    }
+        STexShaderReplacement& texNoEntityShader = pTexNameInfo->GetTexNoEntityShader ( iEntityType );
 
-#ifdef SHADER_DEBUG_CHECKS
-    if ( pTexNameInfo->iDebugCounter2++ > 400 )
-    {
-        // Check cached shader is correct
-        pTexNameInfo->iDebugCounter2 = rand () % 100;
-        SShaderInfoLayers shaderLayersCheck2;
-        CalcShaderForTexAndEntity ( shaderLayersCheck2, pTexNameInfo, NULL, true );
-        FinalizeLayers ( shaderLayersCheck2 );
-        assert ( pTexNameInfo->texNoEntityShader.shaderLayers == shaderLayersCheck2 );
-    }
-#endif
+        if ( !texNoEntityShader.bSet )
+        {
+            UpdateTexShaderReplacementNoEntity ( pTexNameInfo, texNoEntityShader, iEntityType );
+        }
 
-    // Return layers for any entity
-    return &pTexNameInfo->texNoEntityShader.shaderLayers;
+    #ifdef SHADER_DEBUG_CHECKS
+        if ( pTexNameInfo->iDebugCounter2++ > 400 )
+        {
+            // Check cached shader is correct
+            pTexNameInfo->iDebugCounter2 = rand () % 100;
+            SShaderInfoLayers shaderLayersCheck2;
+            CalcShaderForTexAndEntity ( shaderLayersCheck2, pTexNameInfo, NULL, iEntityType, true );
+            FinalizeLayers ( shaderLayersCheck2 );
+            assert ( texNoEntityShader.shaderLayers == shaderLayersCheck2 );
+        }
+    #endif
+
+        // Return layers for any entity
+        return &texNoEntityShader.shaderLayers;
+    }
 }
 
 
@@ -310,7 +320,7 @@ SShaderInfoLayers* CMatchChannelManager::GetShaderForTexAndEntity ( STexInfo* pT
 //
 //
 //////////////////////////////////////////////////////////////////
-void CMatchChannelManager::CalcShaderForTexAndEntity ( SShaderInfoLayers& outShaderLayers, STexNameInfo* pTexNameInfo, CClientEntityBase* pClientEntity, bool bSilent )
+void CMatchChannelManager::CalcShaderForTexAndEntity ( SShaderInfoLayers& outShaderLayers, STexNameInfo* pTexNameInfo, CClientEntityBase* pClientEntity, int iEntityType, bool bSilent )
 {
     // Get match channels for this d3d data
     const std::set < CMatchChannel* >& resultChannelList = pTexNameInfo->matchChannelList;
@@ -319,7 +329,7 @@ void CMatchChannelManager::CalcShaderForTexAndEntity ( SShaderInfoLayers& outSha
     for ( std::set < CMatchChannel* >::const_iterator iter = resultChannelList.begin () ; iter != resultChannelList.end () ; ++iter )
     {
         CMatchChannel* pChannel = *iter;
-        pChannel->GetBestShaderForEntity ( pClientEntity, outShaderLayers );
+        pChannel->GetBestShaderForEntity ( pClientEntity, iEntityType, outShaderLayers );
     }
 
 #ifdef SHADER_DEBUG_OUTPUT
@@ -403,7 +413,7 @@ void CMatchChannelManager::RemoveClientEntityRefs ( CClientEntityBase* pClientEn
 //////////////////////////////////////////////////////////////////
 void CMatchChannelManager::RemoveShaderRefs ( CSHADERDUMMY* pShaderData )
 {
-    SShaderInfo* pShaderInfo = GetShaderInfo ( pShaderData, false, 0, false, 0, false );
+    SShaderInfo* pShaderInfo = GetShaderInfo ( pShaderData, false, 0, false, TYPE_MASK_NONE, 0, false );
     if ( !pShaderInfo )
         return;
 
@@ -448,9 +458,14 @@ void CMatchChannelManager::RemoveShaderRefs ( CSHADERDUMMY* pShaderData )
             for ( uint i = 0 ; i < iter->second.shaderLayers.layerList.size () ; i++ )
                 assert ( iter->second.shaderLayers.layerList[i].pShaderInfo != pShaderInfo );
         }
-        assert ( pTexNameInfo->texNoEntityShader.shaderLayers.pBase.pShaderInfo != pShaderInfo );
-        for ( uint i = 0 ; i < pTexNameInfo->texNoEntityShader.shaderLayers.layerList.size () ; i++ )
-            assert ( pTexNameInfo->texNoEntityShader.shaderLayers.layerList[i].pShaderInfo != pShaderInfo );
+        
+        for ( uint i = 0 ; i < NUMELMS( pTexNameInfo->texNoEntityShaders ) ; i++ )
+        {
+            const STexShaderReplacement& texNoEntityShader = pTexNameInfo->texNoEntityShaders[i];
+            assert ( texNoEntityShader.shaderLayers.pBase.pShaderInfo != pShaderInfo );
+            for ( uint i = 0 ; i < texNoEntityShader.shaderLayers.layerList.size () ; i++ )
+                assert ( texNoEntityShader.shaderLayers.layerList[i].pShaderInfo != pShaderInfo );
+        }
     }
 #endif
 
@@ -471,6 +486,34 @@ void CMatchChannelManager::RemoveShaderRefs ( CSHADERDUMMY* pShaderData )
 
 //////////////////////////////////////////////////////////////////
 //
+// CMatchChannelManager::AddToOptimizeQueue
+//
+// Flag a channel for optimization
+//
+//////////////////////////////////////////////////////////////////
+void CMatchChannelManager::AddToOptimizeQueue ( CMatchChannel* pChannel )
+{
+    MapInsert ( m_OptimizeQueue, pChannel );
+    m_bChangesPending = true;
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CMatchChannelManager::AddToRematchQueue
+//
+// Flag a channel for rematching its textures
+//
+//////////////////////////////////////////////////////////////////
+void CMatchChannelManager::AddToRematchQueue ( CMatchChannel* pChannel )
+{
+    MapInsert ( m_RematchQueue, pChannel );
+    m_bChangesPending = true;
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
 // CMatchChannelManager::FlushChanges
 //
 //
@@ -486,6 +529,9 @@ void CMatchChannelManager::FlushChanges ( void )
         ProcessRematchTexturesQueue ();
         RecalcEverything ();
     }
+
+    dassert ( m_OptimizeQueue.empty () && m_RematchQueue.empty () );
+    m_bChangesPending = false;
 }
 
 
@@ -532,14 +578,14 @@ void CMatchChannelManager::RecalcEverything ( void )
     }
 
     // Remove ClientEntitys with no matches
-    std::set < CClientEntityBase* > knownCloneList = m_KnownClientEntities;
+    std::set < CClientEntityBase* > removeList = m_KnownClientEntities;
     for ( std::map < CShaderAndEntityPair, CMatchChannel* >::iterator iter = m_ChannelUsageMap.begin () ; iter != m_ChannelUsageMap.end () ; ++iter )
     {
         if ( iter->first.pClientEntity )
-            MapRemove ( knownCloneList, iter->first.pClientEntity );
+            MapRemove ( removeList, iter->first.pClientEntity );
     }
 
-    for ( std::set < CClientEntityBase* >::iterator iter = knownCloneList.begin () ; iter != knownCloneList.end () ; ++iter )
+    for ( std::set < CClientEntityBase* >::iterator iter = removeList.begin () ; iter != removeList.end () ; ++iter )
     {
         // This call could be optimized as the entity won't be present in some maps
         RemoveClientEntityRefs ( *iter );
@@ -620,7 +666,7 @@ void CMatchChannelManager::ProcessOptimizeChannelsQueue ( void )
             MergeChannelTo ( pChannel, pOther );
             DeleteChannel ( pChannel );
 
-            MapInsert ( m_RematchQueue, pOther );
+            AddToRematchQueue ( pOther );
         }
     }
 }
@@ -697,8 +743,8 @@ CMatchChannel* CMatchChannelManager::GetChannelOnlyUsedBy ( SShaderInfo* pShader
         AddUsage ( key, pClone );
 
         // Both channels will need rematching
-        MapInsert ( m_RematchQueue, pChannel );
-        MapInsert ( m_RematchQueue, pClone );
+        AddToRematchQueue ( pChannel );
+        AddToRematchQueue ( pClone );
 
         return pClone;
     }
@@ -815,14 +861,14 @@ void CMatchChannelManager::DeleteChannel ( CMatchChannel* pChannel )
 //
 //
 //////////////////////////////////////////////////////////////////
-SShaderInfo* CMatchChannelManager::GetShaderInfo ( CSHADERDUMMY* pShaderData, bool bAddIfRequired, float fPriority, bool bLayered, uint uiShaderCreateTime, bool bUsesVertexShader )
+SShaderInfo* CMatchChannelManager::GetShaderInfo ( CSHADERDUMMY* pShaderData, bool bAddIfRequired, float fPriority, bool bLayered, int iTypeMask, uint uiShaderCreateTime, bool bUsesVertexShader )
 {
     // Find existing
     SShaderInfo* pShaderInfo = MapFindRef ( m_ShaderInfoMap, pShaderData );
     if ( !pShaderInfo && bAddIfRequired )
     {
         // Add new
-        MapSet ( m_ShaderInfoMap, pShaderData, new SShaderInfo ( pShaderData, fPriority, bLayered, uiShaderCreateTime, bUsesVertexShader ) );
+        MapSet ( m_ShaderInfoMap, pShaderData, new SShaderInfo ( pShaderData, fPriority, bLayered, iTypeMask, uiShaderCreateTime, bUsesVertexShader ) );
         pShaderInfo = MapFindRef ( m_ShaderInfoMap, pShaderData );
     }
 
