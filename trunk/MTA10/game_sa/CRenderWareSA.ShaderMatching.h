@@ -190,29 +190,32 @@ public:
         return m_ShaderAndEntityList.size ();
     }
 
-    void GetBestShaderForEntity ( CClientEntityBase* pClientEntity, SShaderInfoLayers& outShaderLayers ) const
+    void GetBestShaderForEntity ( CClientEntityBase* pClientEntity, int iEntityType, SShaderInfoLayers& outShaderLayers ) const
     {
         for ( std::set < CShaderAndEntityPair >::const_iterator iter = m_ShaderAndEntityList.begin () ; iter != m_ShaderAndEntityList.end () ; ++iter )
         {
             const CShaderAndEntityPair& key = *iter;
-            if ( key.pClientEntity == pClientEntity )
+            if ( key.pClientEntity == pClientEntity && ( key.pShaderInfo->iTypeMask & iEntityType ) )
             {
-                if ( !key.pShaderInfo->bLayered )
+                if ( !key.pShaderInfo->bUsesVertexShader || iEntityType != TYPE_MASK_PED )
                 {
-                    // Base shader
-                    if ( !outShaderLayers.pBase.pShaderInfo )
-                        outShaderLayers.pBase = SShaderInfoInstance ( key.pShaderInfo, key.bAppendLayers );
+                    if ( !key.pShaderInfo->bLayered )
+                    {
+                        // Base shader
+                        if ( !outShaderLayers.pBase.pShaderInfo )
+                            outShaderLayers.pBase = SShaderInfoInstance ( key.pShaderInfo, key.bAppendLayers );
+                        else
+                        {
+                            // Check priority, then bias later additions
+                            if ( outShaderLayers.pBase.pShaderInfo->orderValue < key.pShaderInfo->orderValue )
+                                outShaderLayers.pBase = SShaderInfoInstance ( key.pShaderInfo, key.bAppendLayers );
+                        }
+                    }
                     else
                     {
-                        // Check priority, then bias later additions
-                        if ( outShaderLayers.pBase.pShaderInfo->orderValue < key.pShaderInfo->orderValue )
-                            outShaderLayers.pBase = SShaderInfoInstance ( key.pShaderInfo, key.bAppendLayers );
+                        // Layers
+                        outShaderLayers.layerList.push_back ( SShaderInfoInstance ( key.pShaderInfo, key.bAppendLayers ) );
                     }
-                }
-                else
-                {
-                    // Layers
-                    outShaderLayers.layerList.push_back ( SShaderInfoInstance ( key.pShaderInfo, key.bAppendLayers ) );
                 }
             }
         }
@@ -274,17 +277,19 @@ public:
 class CMatchChannelManager
 {
 public:
-    void                AppendAdditiveMatch             ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const SString& strTextureNameMatch, float fShaderPriority, bool bShaderLayered, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers );
+    void                AppendAdditiveMatch             ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const SString& strTextureNameMatch, float fShaderPriority, bool bShaderLayered, int iTypeMask, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers );
     void                AppendSubtractiveMatch          ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const SString& strTextureNameMatch );
     void                InsertTexture                   ( STexInfo* pTexInfo );
     void                RemoveTexture                   ( STexInfo* pTexInfo );
-    SShaderInfoLayers*      GetShaderForTexAndEntity        ( STexInfo* pTexInfo, CClientEntityBase* pClientEntity );
+    SShaderInfoLayers*  GetShaderForTexAndEntity        ( STexInfo* pTexInfo, CClientEntityBase* pClientEntity, int iEntityType );
     void                RemoveClientEntityRefs          ( CClientEntityBase* pClientEntity );
     void                RemoveShaderRefs                ( CSHADERDUMMY* pShaderData );
     void                GetShaderReplacementStats       ( SShaderReplacementStats& outStats );
 
 protected:
-    void                CalcShaderForTexAndEntity       ( SShaderInfoLayers& outShaderLayers, STexNameInfo* pTexNameInfo, CClientEntityBase* pClientEntity, bool bSilent = false );
+    void                CalcShaderForTexAndEntity       ( SShaderInfoLayers& outShaderLayers, STexNameInfo* pTexNameInfo, CClientEntityBase* pClientEntity, int iEntityType, bool bSilent );
+    void                AddToOptimizeQueue              ( CMatchChannel* pChannel );
+    void                AddToRematchQueue               ( CMatchChannel* pChannel );
     void                FlushChanges                    ( void );
     void                RecalcEverything                ( void );
     void                ProcessRematchTexturesQueue     ( void );
@@ -297,13 +302,14 @@ protected:
     CMatchChannel*      GetChannel                      ( const CShaderAndEntityPair& key );
     CMatchChannel*      NewChannel                      ( void );
     void                DeleteChannel                   ( CMatchChannel* pChannel );
-    SShaderInfo*        GetShaderInfo                   ( CSHADERDUMMY* pShaderData, bool bAddIfRequired, float fPriority, bool bLayered, uint uiShaderCreateTime, bool bUsesVertexShader );
+    SShaderInfo*        GetShaderInfo                   ( CSHADERDUMMY* pShaderData, bool bAddIfRequired, float fPriority, bool bLayered, int iTypeMask, uint uiShaderCreateTime, bool bUsesVertexShader );
     void                DeleteShaderInfo                ( SShaderInfo* pShaderInfo );
 
-    STexShaderReplacement* UpdateTexShaderReplacement   ( STexNameInfo* pTexNameInfo, CClientEntityBase* pClientEntity );
-    void                UpdateTexShaderReplacement      ( STexNameInfo* pTexNameInfo );
+    STexShaderReplacement* UpdateTexShaderReplacement   ( STexNameInfo* pTexNameInfo, CClientEntityBase* pClientEntity, int iEntityType );
+    void                UpdateTexShaderReplacementNoEntity  ( STexNameInfo* pTexNameInfo, STexShaderReplacement& texNoEntityShader, int iEntityType );
     void                FinalizeLayers                  ( SShaderInfoLayers& shaderLayers );
 
+    bool                                                m_bChangesPending;
     std::map < CShaderAndEntityPair, CMatchChannel* >   m_ChannelUsageMap;
     std::set < CMatchChannel* >                         m_CreatedChannelList;
     std::set < CMatchChannel* >                         m_OptimizeQueue;

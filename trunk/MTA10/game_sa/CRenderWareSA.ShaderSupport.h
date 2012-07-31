@@ -79,10 +79,11 @@ struct SOrderValue
 //
 struct SShaderInfo
 {
-    SShaderInfo ( CSHADERDUMMY* pShaderData, float fOrderPriority, bool bLayered, uint uiShaderCreateTime, bool bUsesVertexShader )
+    SShaderInfo ( CSHADERDUMMY* pShaderData, float fOrderPriority, bool bLayered, int iTypeMask, uint uiShaderCreateTime, bool bUsesVertexShader )
         : pShaderData ( pShaderData )
         , orderValue ( fOrderPriority, uiShaderCreateTime )
         , bLayered ( bLayered )
+        , iTypeMask ( iTypeMask )
         , bUsesVertexShader ( bUsesVertexShader )
     {
     }
@@ -90,6 +91,7 @@ struct SShaderInfo
     CSHADERDUMMY* const         pShaderData;
     const SOrderValue           orderValue;
     const bool                  bLayered;
+    const int                   iTypeMask;
     const bool                  bUsesVertexShader;
 };
 
@@ -189,15 +191,24 @@ struct STexNameInfo
 
     void ResetReplacementResults ( void )
     {
-        texNoEntityShader = STexShaderReplacement ();
+        for ( uint i = 0 ; i < NUMELMS( texNoEntityShaders ) ; i++ )
+            texNoEntityShaders[i] = STexShaderReplacement ();
         texEntityShaderMap.clear ();
+    }
+
+    STexShaderReplacement& GetTexNoEntityShader ( int iEntityType )
+    {
+        static char table [] = { -1, 0, 1, -1, 2, -1, -1, -1, 3, -1, -1, -1, -1, -1, -1, -1, 4 };
+        int idx = table [ iEntityType ];
+        dassert ( iEntityType >= TYPE_MASK_WORLD && iEntityType <= TYPE_MASK_OTHER && iEntityType == ( 1 << idx ) );
+        return texNoEntityShaders[ idx ];
     }
 
     const SString                                       strTextureName;         // Always lower case
     std::set < STexInfo* >                              usedByTexInfoList;
 
     std::set < CMatchChannel* >                             matchChannelList;
-    STexShaderReplacement                                   texNoEntityShader;
+    STexShaderReplacement                                   texNoEntityShaders[5];   // 0 - world  1-ped  2-vehicle  3-object  4-other
     std::map < CClientEntityBase*, STexShaderReplacement >  texEntityShaderMap;
 
 #ifdef SHADER_DEBUG_CHECKS

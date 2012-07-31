@@ -323,6 +323,10 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
         // Draw each layer
         if ( !pLayers->layerList.empty () )
         {
+            float fSlopeDepthBias = -0.02f;
+            float fDepthBias = -0.00001f;
+            SAVE_RENDERSTATE_AND_SET( SLOPESCALEDEPTHBIAS,  *(DWORD*)&fSlopeDepthBias );
+            SAVE_RENDERSTATE_AND_SET( DEPTHBIAS,            *(DWORD*)&fDepthBias );
             SAVE_RENDERSTATE_AND_SET( ALPHABLENDENABLE, TRUE );
             SAVE_RENDERSTATE_AND_SET( SRCBLEND,         D3DBLEND_SRCALPHA );
             SAVE_RENDERSTATE_AND_SET( DESTBLEND,        D3DBLEND_INVSRCALPHA );
@@ -337,6 +341,8 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
                 DrawPrimitiveShader ( pDevice, PrimitiveType, StartVertex, PrimitiveCount, pLayers->layerList[i], true );
             }
 
+            RESTORE_RENDERSTATE( SLOPESCALEDEPTHBIAS );
+            RESTORE_RENDERSTATE( DEPTHBIAS );
             RESTORE_RENDERSTATE( ALPHABLENDENABLE );
             RESTORE_RENDERSTATE( SRCBLEND );
             RESTORE_RENDERSTATE( DESTBLEND );
@@ -461,6 +467,10 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
         // Draw each layer
         if ( !pLayers->layerList.empty () )
         {
+            float fSlopeDepthBias = -0.02f;
+            float fDepthBias = -0.00001f;
+            SAVE_RENDERSTATE_AND_SET( SLOPESCALEDEPTHBIAS,  *(DWORD*)&fSlopeDepthBias );
+            SAVE_RENDERSTATE_AND_SET( DEPTHBIAS,            *(DWORD*)&fDepthBias );
             SAVE_RENDERSTATE_AND_SET( ALPHABLENDENABLE, TRUE );
             SAVE_RENDERSTATE_AND_SET( SRCBLEND,         D3DBLEND_SRCALPHA );
             SAVE_RENDERSTATE_AND_SET( DESTBLEND,        D3DBLEND_INVSRCALPHA );
@@ -475,6 +485,8 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
                 DrawIndexedPrimitiveShader ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount, pLayers->layerList[i], true );
             }
 
+            RESTORE_RENDERSTATE( SLOPESCALEDEPTHBIAS );
+            RESTORE_RENDERSTATE( DEPTHBIAS );
             RESTORE_RENDERSTATE( ALPHABLENDENABLE );
             RESTORE_RENDERSTATE( SRCBLEND );
             RESTORE_RENDERSTATE( DESTBLEND );

@@ -285,6 +285,16 @@ IMPLEMENT_ENUM_BEGIN( EBlendModeType )
     ADD_ENUM ( EBlendMode::OVERWRITE,       "overwrite" )
 IMPLEMENT_ENUM_END( "blend-mode" )
 
+IMPLEMENT_ENUM_BEGIN( EEntityTypeMask )
+    ADD_ENUM ( TYPE_MASK_NONE,          "none" )
+    ADD_ENUM ( TYPE_MASK_WORLD,         "world" )
+    ADD_ENUM ( TYPE_MASK_PED,           "ped" )
+    ADD_ENUM ( TYPE_MASK_VEHICLE,       "vehicle" )
+    ADD_ENUM ( TYPE_MASK_OBJECT,        "object" )
+    ADD_ENUM ( TYPE_MASK_OTHER,         "other" )
+    ADD_ENUM ( TYPE_MASK_ALL,           "all" )
+IMPLEMENT_ENUM_END( "entity-type-mask" )
+
 
 //
 // Get best guess at name of userdata type
