@@ -100,9 +100,9 @@ public:
     void                GetTxdTextures              ( std::vector < RwTexture* >& outTextureList, ushort usTxdId );
     static void         GetTxdTextures              ( std::vector < RwTexture* >& outTextureList, RwTexDictionary* pTXD );
     const SString&      GetTextureName              ( CD3DDUMMY* pD3DData );
-    void                SetRenderingClientEntity    ( CClientEntityBase* pClientEntity, bool bIsPed );
+    void                SetRenderingClientEntity    ( CClientEntityBase* pClientEntity, int iTypeMask );
     SShaderItemLayers*  GetAppliedShaderForD3DData  ( CD3DDUMMY* pD3DData );
-    void                AppendAdditiveMatch         ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch, float fShaderPriority, bool bShaderLayered, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers );
+    void                AppendAdditiveMatch         ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch, float fShaderPriority, bool bShaderLayered, int iTypeMask, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers );
     void                AppendSubtractiveMatch      ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch );
     void                RemoveClientEntityRefs      ( CClientEntityBase* pClientEntity );
     void                RemoveShaderRefs            ( CSHADERDUMMY* pShaderItem );
@@ -136,7 +136,7 @@ private:
     std::multimap < ushort, STexInfo* >     m_TexInfoMap;
     CFastHashMap < CD3DDUMMY*, STexInfo* >  m_D3DDataTexInfoMap;
     CClientEntityBase*                      m_pRenderingClientEntity;
-    bool                                    m_bIsRenderingPed;
+    int                                     m_iRenderingEntityType;
     CMatchChannelManager*                   m_pMatchChannelManager;
     int                                     m_uiReplacementRequestCounter;
     int                                     m_uiReplacementMatchCounter;

@@ -100,7 +100,7 @@ SShaderItemLayers* CRenderItemManager::GetAppliedShaderForD3DData ( CD3DDUMMY* p
 bool CRenderItemManager::ApplyShaderItemToWorldTexture ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity, bool bAppendLayers )
 {
     assert ( pShaderItem );
-    m_pRenderWare->AppendAdditiveMatch ( (CSHADERDUMMY*)pShaderItem, pClientEntity, strTextureNameMatch, pShaderItem->m_fPriority, pShaderItem->m_bLayered, pShaderItem->m_uiCreateTime, pShaderItem->GetUsesVertexShader (), bAppendLayers );
+    m_pRenderWare->AppendAdditiveMatch ( (CSHADERDUMMY*)pShaderItem, pClientEntity, strTextureNameMatch, pShaderItem->m_fPriority, pShaderItem->m_bLayered, pShaderItem->m_iTypeMask, pShaderItem->m_uiCreateTime, pShaderItem->GetUsesVertexShader (), bAppendLayers );
     return true;
 }
 

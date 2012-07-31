@@ -37,6 +37,17 @@ struct SShaderItemLayers
     bool                         bUsesVertexShader;
 };
 
+enum EEntityTypeMask
+{
+    TYPE_MASK_NONE    = 0,
+    TYPE_MASK_WORLD   = 1,
+    TYPE_MASK_PED     = 2,
+    TYPE_MASK_VEHICLE = 4,
+    TYPE_MASK_OBJECT  = 8,
+    TYPE_MASK_OTHER   = 16,
+    TYPE_MASK_ALL     = 127,
+};
+
 typedef void (*PFN_WATCH_CALLBACK) ( CSHADERDUMMY* pContext, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld );
 
 #define MAX_ATOMICS_PER_CLUMP   128
@@ -68,9 +79,9 @@ class CRenderWare {
     virtual void                GetModelTextureNames        ( std::vector < SString >& outNameList, ushort usModelID ) = 0;
     virtual const SString&      GetTextureName              ( CD3DDUMMY* pD3DData ) = 0;
 
-    virtual void                SetRenderingClientEntity    ( CClientEntityBase* pClientEntity, bool bIsPed ) = 0;
+    virtual void                SetRenderingClientEntity    ( CClientEntityBase* pClientEntity, int iTypeMask ) = 0;
     virtual SShaderItemLayers*  GetAppliedShaderForD3DData  ( CD3DDUMMY* pD3DData ) = 0;
-    virtual void                AppendAdditiveMatch         ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch, float fShaderPriority, bool bShaderLayered, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers ) = 0;
+    virtual void                AppendAdditiveMatch         ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch, float fShaderPriority, bool bShaderLayered, int iTypeMask, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers ) = 0;
     virtual void                AppendSubtractiveMatch      ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch ) = 0;
     virtual void                RemoveClientEntityRefs      ( CClientEntityBase* pClientEntity ) = 0;
     virtual void                RemoveShaderRefs            ( CSHADERDUMMY* pShaderItem ) = 0;

@@ -510,17 +510,22 @@ int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxCreateShader ( lua_State* luaVM )
 {
-//  element dxCreateShader( string filepath [, float priority = 0, float maxdistance = 0, bool layered = false ] )
-    SString strFilePath; float fPriority; float fMaxDistance; bool bLayered;
+//  element dxCreateShader( string filepath [, float priority = 0, float maxdistance = 0, bool layered = false, string elementTypes = "world,vehicle,object,other" ] )
+    SString strFilePath; float fPriority; float fMaxDistance; bool bLayered; std::vector < EEntityTypeMask > elementTypeList;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strFilePath );
     argStream.ReadNumber ( fPriority, 0.0f );
     argStream.ReadNumber ( fMaxDistance, 0.0f );
     argStream.ReadBool ( bLayered, false );
+    argStream.ReadEnumStringList ( elementTypeList, "world,vehicle,object,other" );
 
     if ( !argStream.HasErrors () )
     {
+        int iEntityTypeMaskResult = 0;
+        for ( uint i = 0 ; i < elementTypeList.size () ; i++ )
+            iEntityTypeMaskResult |= elementTypeList[i];
+
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
@@ -533,7 +538,7 @@ int CLuaFunctionDefs::dxCreateShader ( lua_State* luaVM )
                 {
                     SString strRootPath = strPath.Left ( strPath.length () - strMetaPath.length () );
                     SString strStatus;
-                    CClientShader* pShader = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateShader ( strPath, strRootPath, strStatus, fPriority, fMaxDistance, bLayered, false );
+                    CClientShader* pShader = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateShader ( strPath, strRootPath, strStatus, fPriority, fMaxDistance, bLayered, false, iEntityTypeMaskResult );
                     if ( pShader )
                     {
                         // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **

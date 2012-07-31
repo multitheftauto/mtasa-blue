@@ -85,7 +85,6 @@ public:
     }
 
 
-
     //
     // Read next bool
     //
@@ -228,6 +227,63 @@ public:
         SetTypeError ( GetEnumTypeName ( outValue ) );
         m_iIndex++;
         return false;
+    }
+
+
+    //
+    // Read next string as a comma separated list of enums, using default if needed
+    //
+    template < class T >
+    bool ReadEnumStringList ( std::vector < T >& outValueList, const SString& strDefaultValue )
+    {
+        outValueList.empty ();
+        int iArgument = lua_type ( m_luaVM, m_iIndex );
+        SString strValue;
+        if ( iArgument == LUA_TSTRING )
+        {
+            strValue = lua_tostring ( m_luaVM, m_iIndex );
+        }
+        else
+        if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL || m_bIgnoreMismatchMatch )
+        {
+            strValue = strDefaultValue;
+        }
+        else
+        {
+            T outValue;
+            SetTypeError ( GetEnumTypeName ( outValue ) );
+            m_iIndex++;
+            return false;
+        }
+
+        // Parse each part of the string
+        std::vector < SString > inValueList;
+        strValue.Split ( ",", inValueList );
+        for ( uint i = 0 ; i < inValueList.size () ; i++ )
+        {
+            T outValue;
+            if ( StringToEnum ( inValueList[i], outValue ) )
+            {
+                outValueList.push_back ( outValue );
+            }
+            else
+            {
+                // Error
+                SetTypeError ( GetEnumTypeName ( outValue ) );
+                m_bResolvedErrorGotArgumentTypeAndValue = true;
+                m_iErrorGotArgumentType = lua_type ( m_luaVM, m_iErrorIndex );
+                m_strErrorGotArgumentValue = inValueList[i];
+
+                if ( iArgument == LUA_TSTRING )
+                    m_iIndex++;
+                return false;
+            }
+        }
+
+        // Success
+        if ( iArgument == LUA_TSTRING )
+            m_iIndex++;
+        return true;
     }
 
 
@@ -596,4 +652,5 @@ public:
     SString                 m_strErrorGotArgumentValue;
     SString                 m_strErrorCategory;
     SString                 m_strErrorMessageOverride;
+
 };

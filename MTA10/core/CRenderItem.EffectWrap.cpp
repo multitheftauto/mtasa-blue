@@ -684,7 +684,7 @@ void CEffectWrapImpl::ApplyCommonHandles ( void )
 
     if ( m_CommonHandles.hWorldView )
     {
-        D3DXMATRIX& matWorldView = matWorld * matView;
+        D3DXMATRIX matWorldView = matWorld * matView;
         m_pD3DEffect->SetMatrix ( m_CommonHandles.hWorldView, &matWorldView );
     }
 
@@ -696,7 +696,7 @@ void CEffectWrapImpl::ApplyCommonHandles ( void )
 
     if ( m_CommonHandles.hViewProj )
     {
-        D3DXMATRIX& matViewProj = matView * matProjection;
+        D3DXMATRIX matViewProj = matView * matProjection;
         m_pD3DEffect->SetMatrix ( m_CommonHandles.hViewProj, &matViewProj );
     }
 
