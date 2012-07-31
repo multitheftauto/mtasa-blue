@@ -344,6 +344,7 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
 
     InitTextureWatchHooks ();
     m_pMatchChannelManager = new CMatchChannelManager ();
+    m_iRenderingEntityType = TYPE_MASK_WORLD;
 }
 
 
