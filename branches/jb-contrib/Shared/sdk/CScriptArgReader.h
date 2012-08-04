@@ -40,30 +40,6 @@ public:
         assert ( !IsReadFunctionPending () );
     }
 
-    //
-    // Read next matrix
-    //
-    template < class T, size_t N, size_t M >
-    bool ReadMatrix ( T (&out)[N][M] )
-    {
-        int iArgument = lua_type ( m_luaVM, m_iIndex );
-        if ( iArgument == LUA_TTABLE )
-        {
-            for(uint32 i = 1; i < N; i++)
-            {
-                for(uint32 j = 1; j < M; j++)
-                {
-                    lua_rawgeti ( m_luaVM, m_iIndex++ );
-                    out[i][j] = lua_tointeger ( m_luaVM, -1 );
-                    lua_pop ( m_luaVM, 1 );
-                }
-            }
-        }
-
-        SetTypeError ( "table" );
-        m_iIndex++;
-        return false;
-    }
 
     //
     // Read next number
