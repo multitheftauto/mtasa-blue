@@ -37,8 +37,7 @@ public:
     LUA_DECLARE ( fxAddBulletSplash );
     LUA_DECLARE ( fxAddFootSplash );
 
-    LUA_DECLARE ( fxAddParticle );
-    LUA_DECLARE ( fxSetParticleInfo );
+    LUA_DECLARE ( fxCreateSystem );
 };
 
 #endif

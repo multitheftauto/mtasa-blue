@@ -26,6 +26,7 @@ public:
 class CFxManagerSA : public CFxManager
 {
 public:
+    CFxManagerSA(CFxManagerSAInterface * pInterface);
     CFxSystem* CreateFxSystem(const SString & strName, CVector & vecPoint, RwMatrix * pMatrix, bool bUnk);
 private:
     CFxManagerSAInterface * m_pInterface;

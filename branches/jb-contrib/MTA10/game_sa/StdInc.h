@@ -106,4 +106,4 @@
 #include "CWeaponStatManagerSA.h"
 #include "CShadowDataSA.h"
 #include "CBuoyancySA.h"
-#include "CFxManager.h"
+#include "CFxManagerSA.h"

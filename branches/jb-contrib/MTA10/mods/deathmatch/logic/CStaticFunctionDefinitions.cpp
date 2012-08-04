@@ -6361,9 +6361,9 @@ bool CStaticFunctionDefinitions::GetPlayerMapBoundingBox ( CVector &vecMin, CVec
     return false;
 }
 
-bool CStaticFunctionDefinitions::FxAddParticle ( const SString& strName, const CVector& vecPoint, RwMatrix* pMatrix, bool bUnk )
+bool CStaticFunctionDefinitions::FxCreateSystem ( const SString& strName, const CVector& vecPoint, RwMatrix* pMatrix, bool bUnk )
 {
-    g_pGame->GetFxManager()->CreateFxSystem(strName, vecPoint, pMatrix, bUnk);
+ //   g_pGame->GetFxManager()->CreateFxSystem(strName, vecPoint, pMatrix, bUnk);
     return true;
 }
 

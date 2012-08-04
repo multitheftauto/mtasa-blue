@@ -12,6 +12,11 @@
 
 #include "StdInc.h"
 
+CFxManagerSA::CFxManagerSA(CFxManagerSAInterface * pInterface)
+{
+    m_pInterface = pInterface;
+}
+
 CFxSystem* CFxManagerSA::CreateFxSystem(const SString & strName, CVector & vecPoint, RwMatrix * pMatrix, bool bUnk)
 {
     uint32 dwFunc = (uint32)FUNC_CFxManager__CreateFxSystem;

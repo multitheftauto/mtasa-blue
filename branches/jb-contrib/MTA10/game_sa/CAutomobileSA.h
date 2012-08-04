@@ -79,7 +79,7 @@ class CAutomobileSAInterface : public CVehicleSAInterface
 {
 public:
     CDamageManagerSAInterface DamageManager; // 1440
-    uint32 pad0[36]; // 1
+    uint32 pad0[36]; // 1444
     RwFrame * pUnk0; // 1608
     RwFrame * pChassis; // 1612
     RwFrame * pWheelFrontRight; // 1616

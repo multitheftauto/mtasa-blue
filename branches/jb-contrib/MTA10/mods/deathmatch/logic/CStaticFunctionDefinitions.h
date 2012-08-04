@@ -263,7 +263,7 @@ public:
     static bool                         IsInsideRadarArea                   ( CClientRadarArea* RadarArea, CVector2D vecPosition, bool& inside );
 
     // Particle System func
-    static bool                         FxAddParticle                       ( CVector & vecPosition, CVector & vecDirection, float fBlur, float fBrightness );
+    static bool                         FxCreateSystem                      ( const SString& strName, const CVector& vecPoint, RwMatrix* pMatrix, bool bUnk );
 
     // Pickup create/destroy funcs
     static CClientPickup*               CreatePickup                        ( CResource& Resource, const CVector& vecPosition, unsigned char ucType, double dFive, unsigned long ulRespawnInterval, double dSix );

@@ -28,15 +28,15 @@ void CLuaFxDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "fxAddBulletSplash", CLuaFxDefs::fxAddBulletSplash );
     CLuaCFunctions::AddFunction ( "fxAddFootSplash", CLuaFxDefs::fxAddFootSplash );
 
-    CLuaCFunctions::AddFunction ( "fxAddParticle", CLuaFunctionDefs::FxAddParticle );
-    CLuaCFunctions::AddFunction ( "fxSetParticleInfo", CLuaFunctionDefs::FxSetParticleInfo );
+//    CLuaCFunctions::AddFunction ( "fxAddParticle", CLuaFunctionDefs::FxAddParticle );
+//    CLuaCFunctions::AddFunction ( "fxSetParticleInfo", CLuaFunctionDefs::FxSetParticleInfo );
 }
 
 int CLuaFunctionDefs::FxSetParticleInfo(lua_State* luaVM)
 {
 //  bool fxSetParticleInfo ( float colorR, float colorG, float colorB, [ float size = 1.0, float durationFactor = 1.0, float unk = 1.0 ] )
     RwColorFloat colour; float fSize;
-    float fSize; float fDurationFactor; float fUnk;
+    float fDurationFactor; float fUnk;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( colour.r );
@@ -62,26 +62,34 @@ int CLuaFunctionDefs::FxSetParticleInfo(lua_State* luaVM)
 //          fxRemoveParticle
 //      particle info for default particles are set within functions they are used in
 //          so will need to do context-based nulling out(i.e. if someone wants to have red jetpack thrusters, disable setting it in CPed::RenderJetPack and add function to reenable it)
-int CLuaFunctionDefs::FxAddParticle(lua_State* luaVM)
+int CLuaFunctionDefs::FxCreateSystem(lua_State* luaVM)
 {
-//  element fxAddParticle ( string name, float posX, float posY, float posZ, float velX, float velY, float velZ, [ float blur = 0.0, float brightness = 1.0 ] )
-    SString strParticleName; CVector vecPos; CVector vecDir;
-    float fBlur; float fBrightness;
-    // it returns bool for DEBUGGING, it will be <element> later..
-    // also add name later, will be testing with some random for now
+//  element fxAddParticle ( string name, float pointX, float pointY, float pointZ, table matrix, bool unknown  )
+#if 0
+    SString strParticleName; CVector vecPoint; 
+    RwMatrix matrix; bool bUnk; float rawMatrix[3][3];
+
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strParticleName );
-    argStream.ReadNumber ( vecPos.fX );
-    argStream.ReadNumber ( vecPos.fY );
-    argStream.ReadNumber ( vecPos.fZ );
-    argStream.ReadNumber ( vecDir.fX );
-    argStream.ReadNumber ( vecDir.fY );
-    argStream.ReadNumber ( vecDir.fZ );
-    argStream.ReadNumber ( fBlur, 0.0f );
-    argStream.ReadNumber ( fBrightness, 1.0f );
+    argStream.ReadNumber ( vecPoint.fX );
+    argStream.ReadNumber ( vecPoint.fY );
+    argStream.ReadNumber ( vecPoint.fZ );
+    argStream.ReadMatrix ( rawMatrix );
 
+    matrix = rawMatrix;
     if ( !argStream.HasErrors ( ) )
     {
+        if ( CStaticFunctionDefinitions::FxAddSystem ( strParticleName, vecPoint, matrix, bUnk ) )
+        {
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fxAddParticle", *argStream.GetErrorMessage () ) );
+#endif
+    return 0;
+}
+        /*
         // move this to its own CClientParticle.. do this way cuz it's faster to debug
         CVector *pVecPos = &vecPos;
         CVector *pVecDir = &vecDir;
@@ -119,16 +127,16 @@ int CLuaFunctionDefs::FxAddParticle(lua_State* luaVM)
 		    }
 		    if(dwRet)
 		    {
-                /*
-			    {   // CParticleFx::StartParticle
-				    uint32 CParticleFx__StartParticle = (uint32)0x4AA3D0;
-				    __asm
-				    {
-					    mov ecx, dwRet
-					    call CParticleFx__StartParticle
-				    }
-			    }
-                */
+                
+			    //{   // CParticleFx::StartParticle
+				 //   uint32 CParticleFx__StartParticle = (uint32)0x4AA3D0;
+				////    __asm
+				// //   {
+				//	    mov ecx, dwRet
+				//	    call CParticleFx__StartParticle
+				//    }
+			    //}
+               
                 {   // CFxSystem::Initialise
                     uint32 CParticleFx__Initialise = (uint32)0x4AA2F0;
                     __asm
@@ -170,11 +178,9 @@ int CLuaFunctionDefs::FxAddParticle(lua_State* luaVM)
 		    }
 	    }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fxAddParticle", *argStream.GetErrorMessage () ) );
-    return 1;
-}
 
+}
+*/
 int CLuaFxDefs::fxAddBlood ( lua_State* luaVM )
 {
     // bool fxAddBlood ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ, [int count=1, float fBrightness=1.0] )

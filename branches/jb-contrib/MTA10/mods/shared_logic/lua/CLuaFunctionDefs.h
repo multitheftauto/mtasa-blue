@@ -280,7 +280,7 @@ public:
     LUA_DECLARE ( GetClothesTypeName );
 
     // Particle System functions
-    LUA_DECLARE ( FxAddParticle );
+    LUA_DECLARE ( FxCreateSystem );
     LUA_DECLARE ( FxSetParticleInfo );
 
     // Vehicle get functions

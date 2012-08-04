@@ -605,10 +605,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CParticleFxSA.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\CParticleHeaderSA.cpp"
 				>
 			</File>
@@ -1243,10 +1239,6 @@
 			</File>
 			<File
 				RelativePath=".\CParticleEmitterSA.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CParticleFxSA.h"
 				>
 			</File>
 			<File

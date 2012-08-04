@@ -309,6 +309,25 @@ void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterp
     // Have we moved to a different position?
     if ( m_Matrix.vPos != vecPosition )
     {
+        // Recalculate col points
+        if(m_pVehicle)
+        {
+            switch(GetVehicleType())
+            {
+                /* add other types */
+                case CLIENTVEHICLE_CAR:
+                {
+                    CAutomobileSAInterface* pInterface = reinterpret_cast<CAutomobileSAInterface*>(m_pVehicle->GetInterface());
+                    // Add delta(to - from) to Position
+                    pInterface->WheelFrontLeftColPoint.Position += vecPosition - m_Matrix.vPos;
+                    pInterface->WheelRearLeftColPoint.Position += vecPosition - m_Matrix.vPos;
+                    pInterface->WheelFrontRightColPoint.Position += vecPosition - m_Matrix.vPos;
+                    pInterface->WheelRearRightColPoint.Position += vecPosition - m_Matrix.vPos;
+                }
+                break;
+                default: break;
+            }
+        }
         // Store our new position
         m_Matrix.vPos = vecPosition;
         m_matFrozen.vPos = vecPosition;

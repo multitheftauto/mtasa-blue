@@ -104,7 +104,6 @@ void CElementRPCs::RemoveElementData ( CClientEntity* pSource, NetBitStreamInter
     }
 }
 
-
 void CElementRPCs::SetElementPosition ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     RUN_CHILDREN_SERVER SetElementPosition ( *iter, bitStream );
@@ -146,6 +145,8 @@ void CElementRPCs::SetElementPosition ( CClientEntity* pSource, NetBitStreamInte
         else if ( pSource->GetType () == CCLIENTVEHICLE ) 
         {
             CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( pSource );
+            CVector vecOldPosition;
+            pVehicle->GetPosition (vecOldPosition);
             pVehicle->RemoveTargetPosition ();
             pVehicle->SetPosition ( vecPosition );
         }
