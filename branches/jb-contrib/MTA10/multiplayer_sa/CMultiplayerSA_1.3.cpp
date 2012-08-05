@@ -1133,3 +1133,17 @@ void _declspec(naked) HOOK_CEventHitByWaterCannon ( )
         }
     }
 }
+
+void CMultiplayerSA::SetPedTargetingMarkerEnabled(bool bEnable)
+{
+    static const uint8 original = 0x83;
+    uint32 dwFunc = 0x060BA80;
+    if(bEnable)
+    {
+        *(uint8*)dwFunc = original;
+    }
+    else
+    {
+        *(uint8*)dwFunc = 0xC3;
+    }
+}

@@ -197,6 +197,8 @@ public:
 
     void                        SetAutomaticVehicleStartupOnPedEnter    ( bool bSet );
 
+    void                        SetPedTargetingMarkerEnabled ( bool bEnable );
+
     virtual void                GetRwResourceStats          ( SRwResourceStats& outStats );
     virtual void                GetClothesCacheStats        ( SClothesCacheStats& outStats );
     virtual CEntitySAInterface* GetRenderingGameEntity      ( void );
