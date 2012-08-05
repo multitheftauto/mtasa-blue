@@ -769,6 +769,8 @@ public:
     LUA_DECLARE ( CreateSWATRope );
     LUA_DECLARE ( SetBirdsEnabled );
     LUA_DECLARE ( GetBirdsEnabled );
+    LUA_DECLARE ( SetPedTargetingMarkerEnabled );
+    LUA_DECLARE ( IsPedTargetingMarkerEnabled );
 
     // Input functions
     LUA_DECLARE ( BindKey );
