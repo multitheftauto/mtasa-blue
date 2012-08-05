@@ -197,6 +197,7 @@ LOGIC = \
 ./logic/lua/LuaUtils.cpp \
 ./logic/luadefs/CLuaACLDefs.cpp \
 ./logic/luadefs/CLuaCameraDefs.cpp \
+./logic/luadefs/CLuaClassDefs.cpp \
 ./logic/luadefs/CLuaDefs.cpp \
 ./logic/luadefs/CLuaElementDefs.cpp \
 ./logic/luadefs/CLuaFileDefs.cpp \
