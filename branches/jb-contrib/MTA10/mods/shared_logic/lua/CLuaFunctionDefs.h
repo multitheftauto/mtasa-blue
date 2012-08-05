@@ -774,6 +774,7 @@ public:
     LUA_DECLARE ( SetBirdsEnabled );
     LUA_DECLARE ( GetBirdsEnabled );
     LUA_DECLARE ( SetPedTargetingMarkerEnabled );
+    LUA_DECLARE ( GetPedTargetingMarkerEnabled );
 
     // Input functions
     LUA_DECLARE ( BindKey );

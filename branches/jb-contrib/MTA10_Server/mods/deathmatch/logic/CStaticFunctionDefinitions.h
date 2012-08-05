@@ -573,6 +573,7 @@ public:
     static bool                 RestoreAllWorldModels               ( void );
     static bool                 SendSyncIntervals                   ( CPlayer* pPlayer = NULL );
     static bool                 SetPedTargetingMarkerEnabled        ( bool bEnabled );
+    static bool                 GetPedTargetingMarkerEnabled        ( void );
 
     // Loaded Map Functions
     static CElement*            GetRootElement                      ( void );

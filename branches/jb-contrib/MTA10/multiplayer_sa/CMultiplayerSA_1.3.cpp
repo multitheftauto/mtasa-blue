@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 
+#define FUNC_CPed__RenderTargetMarker                       0x60BA80
+
 WaterCannonHitHandler* m_pWaterCannonHitHandler = NULL;
 
 #define HOOKPOS_CEventHitByWaterCannon                      0x729899
@@ -1137,7 +1139,7 @@ void _declspec(naked) HOOK_CEventHitByWaterCannon ( )
 void CMultiplayerSA::SetPedTargetingMarkerEnabled(bool bEnable)
 {
     static const uint8 original = 0x83;
-    uint32 dwFunc = 0x060BA80;
+    uint32 dwFunc = FUNC_CPed__RenderTargetMarker;
     if(bEnable)
     {
         *(uint8*)dwFunc = original;
@@ -1146,4 +1148,10 @@ void CMultiplayerSA::SetPedTargetingMarkerEnabled(bool bEnable)
     {
         *(uint8*)dwFunc = 0xC3;
     }
+}
+
+bool CMultiplayerSA::GetPedTargetingMarkerEnabled()
+{
+    uint32 dwFunc = FUNC_CPed__RenderTargetMarker;
+    return *(uint8*)dwFunc != 0xC3;
 }

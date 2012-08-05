@@ -1754,6 +1754,13 @@ int CLuaFunctionDefs::SetPedTargetingMarkerEnabled ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetPedTargetingMarkerEnabled ( lua_State* luaVM )
+{
+//  bool getPedTargetingMarkerEnabled ( )
+    lua_pushboolean ( luaVM, g_pMultiplayer->GetPedTargetingMarkerEnabled() );
+    return 1;
+}
+
 int CLuaFunctionDefs::ResetFarClipDistance ( lua_State* luaVM )
 {
     g_pMultiplayer->RestoreFarClipDistance ();
