@@ -1733,6 +1733,35 @@ int CLuaFunctionDefs::SetFarClipDistance ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::SetPedTargetingMarkerEnabled ( lua_State* luaVM )
+{
+//  bool setPedTargetingMarkerEnabled ( enabled )
+    bool bEnabled;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadBool ( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pMultiplayer->SetPedTargetingMarkerEnabled ( bEnabled );
+
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setPedTargetingMarkerEnabled", *argStream.GetErrorMessage () ) );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::IsPedTargetingMarkerEnabled ( lua_State* luaVM )
+{
+//  bool isPedTargetingMarkerEnabled ( )
+    lua_pushboolean ( luaVM, g_pMultiplayer->IsPedTargetingMarkerEnabled() );
+    return 1;
+}
+
 int CLuaFunctionDefs::ResetFarClipDistance ( lua_State* luaVM )
 {
     g_pMultiplayer->RestoreFarClipDistance ();

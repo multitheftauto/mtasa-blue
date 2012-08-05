@@ -574,6 +574,8 @@ public:
     static bool                 RestoreWorldModel                   ( unsigned short usModel, float fRadius, float fX, float fY, float fZ );
     static bool                 RestoreAllWorldModels               ( void );
     static bool                 SendSyncIntervals                   ( CPlayer* pPlayer = NULL );
+    static bool                 SetPedTargetingMarkerEnabled        ( bool bEnabled );
+    static bool                 IsPedTargetingMarkerEnabled        ( void );
 
     // Loaded Map Functions
     static CElement*            GetRootElement                      ( void );
