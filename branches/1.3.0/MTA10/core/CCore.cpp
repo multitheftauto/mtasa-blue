@@ -2067,7 +2067,7 @@ void CCore::LogEvent ( uint uiDebugId, const char* szType, const char* szContext
 
             // Add to a special buffer
             ms_SpecialBuffer.push_back ( SString ( "%s - %d %s", *GetLocalTimeString ( false, true ), uiDebugId, szType ) );
-            while ( ms_SpecialBuffer.size () > 200 )
+            while ( ms_SpecialBuffer.size () > 2000 )
                 ms_SpecialBuffer.pop_front ();
         }
         else
@@ -2075,11 +2075,12 @@ void CCore::LogEvent ( uint uiDebugId, const char* szType, const char* szContext
             // Save special buffer to disk
             SString strFilename ( "MTA\\sync_%s.txt", *GetLocalTimeString ( true, false ).Replace ( ":", "_" ).Replace ( " ", "_" ) );
             SString strBuffer;
-            while ( !ms_SpecialBuffer.empty () )
-            {
-                strBuffer += ms_SpecialBuffer.front () + "\n";
-                ms_SpecialBuffer.pop_front ();
-            }
+            strBuffer.reserve ( 100000 );
+
+            for ( std::list < SString >::iterator iter = ms_SpecialBuffer.begin () ; iter != ms_SpecialBuffer.end () ; ++iter )
+                strBuffer += *iter + "\n";
+            ms_SpecialBuffer.clear ();
+
             FileSave ( CalcMTASAPath ( strFilename ), strBuffer );
             GetConsole ()->Printf( "Saved %s", *strFilename );
         }

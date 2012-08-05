@@ -158,6 +158,10 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
             CTCPManager::GetSingletonPtr ()->HandleEvent ( ( uMsg - WM_ASYNCTRAP ), wParam, lParam );
         }
 
+        // Save debug output if ctrl + num_9
+        if ( uMsg == WM_KEYDOWN && wParam == VK_NUMPAD9 && ( ( GetAsyncKeyState ( VK_CONTROL ) & 0x8000 ) != 0 ) )
+            g_pCore->LogEvent ( 12345, "" );
+
         bool bWasCaptureKey = false;
         CMainMenu* pMainMenu = g_pCore->GetLocalGUI ()->GetMainMenu ();
         if ( pMainMenu )
