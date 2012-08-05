@@ -1754,10 +1754,10 @@ int CLuaFunctionDefs::SetPedTargetingMarkerEnabled ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::GetPedTargetingMarkerEnabled ( lua_State* luaVM )
+int CLuaFunctionDefs::IsPedTargetingMarkerEnabled ( lua_State* luaVM )
 {
-//  bool getPedTargetingMarkerEnabled ( )
-    lua_pushboolean ( luaVM, g_pMultiplayer->GetPedTargetingMarkerEnabled() );
+//  bool isPedTargetingMarkerEnabled ( )
+    lua_pushboolean ( luaVM, g_pMultiplayer->IsPedTargetingMarkerEnabled() );
     return 1;
 }
 

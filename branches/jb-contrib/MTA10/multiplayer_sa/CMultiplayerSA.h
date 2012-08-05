@@ -198,7 +198,7 @@ public:
     void                        SetAutomaticVehicleStartupOnPedEnter    ( bool bSet );
 
     void                        SetPedTargetingMarkerEnabled ( bool bEnable );
-    bool                        GetPedTargetingMarkerEnabled ( void );
+    bool                        IsPedTargetingMarkerEnabled ( void );
 
     virtual void                GetRwResourceStats          ( SRwResourceStats& outStats );
     virtual void                GetClothesCacheStats        ( SClothesCacheStats& outStats );

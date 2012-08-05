@@ -1150,7 +1150,7 @@ void CMultiplayerSA::SetPedTargetingMarkerEnabled(bool bEnable)
     }
 }
 
-bool CMultiplayerSA::GetPedTargetingMarkerEnabled()
+bool CMultiplayerSA::IsPedTargetingMarkerEnabled(void)
 {
     uint32 dwFunc = FUNC_CPed__RenderTargetMarker;
     return *(uint8*)dwFunc != 0xC3;
