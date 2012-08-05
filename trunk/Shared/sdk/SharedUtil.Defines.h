@@ -43,8 +43,9 @@
 // Copy null terminated string to a temporary buffer on the stack
 //
 #define COPY_CSTR_TO_TEMP_BUFFER( tempname, src, maxsize ) \
-    char tempname [maxsize]; \
-    STRNCPY( tempname, src, maxsize );
+    char tempname [maxsize] = ""; \
+    if ( src ) \
+        STRNCPY( tempname, src, maxsize );
 
 #ifndef _MSC_VER
     #define _isnan isnan
