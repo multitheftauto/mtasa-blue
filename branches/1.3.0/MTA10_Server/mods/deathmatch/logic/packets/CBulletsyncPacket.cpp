@@ -35,7 +35,7 @@ bool CBulletsyncPacket::Read ( NetBitStreamInterface& BitStream )
             if ( BitStream.Read ( (char *)&m_vecStart, sizeof ( CVector ) ) &&
                  BitStream.Read ( (char *)&m_vecEnd, sizeof ( CVector ) ) )
             {
-                if ( BitStream.Version () >= 33 )
+                if ( BitStream.Version () == 0x33 )
                 {
                     if ( BitStream.Read ( m_ucPreFireCounter ) &&
                          BitStream.Read ( m_ucMidFireCounter ) )
@@ -74,7 +74,7 @@ bool CBulletsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.Write ( (const char *)&m_vecStart, sizeof ( CVector ) );
         BitStream.Write ( (const char *)&m_vecEnd, sizeof ( CVector ) );
 
-        if ( BitStream.Version () >= 33 )
+        if ( BitStream.Version () == 0x33 )
         {
             BitStream.Write ( m_ucPreFireCounter );
             BitStream.Write ( m_ucMidFireCounter );

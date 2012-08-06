@@ -2200,7 +2200,7 @@ void CNetAPI::ReadBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& Bi
     uchar ucPreFireCounter = 0;
     uchar ucMidFireCounter = 0;
     uchar ucSourceType = 0;
-    if ( g_pNet->GetServerBitStreamVersion () >= 33 )
+    if ( g_pNet->GetServerBitStreamVersion () == 0x33 )
     {
         BitStream.Read ( (uchar)ucPreFireCounter );
         BitStream.Read ( (uchar)ucMidFireCounter );
@@ -2240,7 +2240,7 @@ void CNetAPI::SendBulletSyncFire ( eWeaponType weaponType, const CVector& vecSta
     pBitStream->Write ( (const char*)&vecStart, sizeof ( CVector ) );
     pBitStream->Write ( (const char*)&vecEnd, sizeof ( CVector ) );
 
-    if ( g_pNet->GetServerBitStreamVersion () >= 33 )
+    if ( g_pNet->GetServerBitStreamVersion () == 0x33 )
     {
         pBitStream->Write ( (uchar)uiPreFireCounter );
         pBitStream->Write ( (uchar)uiMidFireCounter );

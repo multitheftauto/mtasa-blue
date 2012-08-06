@@ -36,7 +36,7 @@ bool CSimBulletsyncPacket::Read ( NetBitStreamInterface& BitStream )
         if ( BitStream.Read ( (char *)&m_Cache.vecStart, sizeof ( CVector ) ) &&
              BitStream.Read ( (char *)&m_Cache.vecEnd, sizeof ( CVector ) ) )
         {
-            if ( BitStream.Version () >= 33 )
+            if ( BitStream.Version () == 0x33 )
             {
                 if ( BitStream.Read ( m_Cache.ucPreFireCounter ) &&
                      BitStream.Read ( m_Cache.ucMidFireCounter ) )
@@ -70,7 +70,7 @@ bool CSimBulletsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     BitStream.Write ( (const char *)&m_Cache.vecStart, sizeof ( CVector ) );
     BitStream.Write ( (const char *)&m_Cache.vecEnd, sizeof ( CVector ) );
 
-    if ( BitStream.Version () >= 33 )
+    if ( BitStream.Version () == 0x33 )
     {
         BitStream.Write ( m_Cache.ucPreFireCounter );
         BitStream.Write ( m_Cache.ucMidFireCounter );
