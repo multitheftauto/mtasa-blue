@@ -4774,7 +4774,7 @@ void CClientGame::BulletImpact ( CPed* pInitiator, CEntity* pVictim, const CVect
 }
 
 
-void CClientGame::BulletFire ( CPed* pInitiator, const CVector* pStartPosition, const CVector* pEndPosition )
+void CClientGame::BulletFire ( CPed* pInitiator, const CVector* pStartPosition, const CVector* pEndPosition, uint uiPreFireCounter, uint uiMidFireCounter )
 {
     // Got a local player model?
     CClientPlayer* pLocalPlayer = g_pClientGame->m_pLocalPlayer;
@@ -4783,7 +4783,7 @@ void CClientGame::BulletFire ( CPed* pInitiator, const CVector* pStartPosition, 
         // Maybe send bulletsync packet for the firing of this bullet
         eWeaponType weaponType = pLocalPlayer->GetCurrentWeaponType ();
         if ( g_pClientGame->GetWeaponTypeUsesBulletSync ( weaponType ) )
-            g_pClientGame->m_pNetAPI->SendBulletSyncFire ( weaponType, *pStartPosition, *pEndPosition );
+            g_pClientGame->m_pNetAPI->SendBulletSyncFire ( weaponType, *pStartPosition, *pEndPosition, uiPreFireCounter, uiMidFireCounter );
     }
 }
 

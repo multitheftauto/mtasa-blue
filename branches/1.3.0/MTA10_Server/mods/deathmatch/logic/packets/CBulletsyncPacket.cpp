@@ -15,6 +15,8 @@ CBulletsyncPacket::CBulletsyncPacket ( CPlayer * pPlayer )
 {
     m_pSourceElement = pPlayer;
     m_WeaponType = WEAPONTYPE_UNARMED;
+    m_ucPreFireCounter = 0;
+    m_ucMidFireCounter = 0;
 }
 
 bool CBulletsyncPacket::Read ( NetBitStreamInterface& BitStream )
@@ -32,7 +34,18 @@ bool CBulletsyncPacket::Read ( NetBitStreamInterface& BitStream )
             m_WeaponType = (eWeaponType)cWeaponType;
             if ( BitStream.Read ( (char *)&m_vecStart, sizeof ( CVector ) ) &&
                  BitStream.Read ( (char *)&m_vecEnd, sizeof ( CVector ) ) )
-                return true;
+            {
+                if ( BitStream.Version () >= 33 )
+                {
+                    if ( BitStream.Read ( m_ucPreFireCounter ) &&
+                         BitStream.Read ( m_ucMidFireCounter ) )
+                    {
+                        return true;
+                    }
+                }
+                else
+                    return true;
+            }
         }
     }
 
@@ -60,6 +73,13 @@ bool CBulletsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.Write ( (char)m_WeaponType );
         BitStream.Write ( (const char *)&m_vecStart, sizeof ( CVector ) );
         BitStream.Write ( (const char *)&m_vecEnd, sizeof ( CVector ) );
+
+        if ( BitStream.Version () >= 33 )
+        {
+            BitStream.Write ( m_ucPreFireCounter );
+            BitStream.Write ( m_ucMidFireCounter );
+            BitStream.Write ( (char)3 );
+        }
         return true;
     }
 

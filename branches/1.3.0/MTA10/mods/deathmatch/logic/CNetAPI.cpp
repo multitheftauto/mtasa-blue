@@ -2197,9 +2197,22 @@ void CNetAPI::ReadBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& Bi
     CVector vecDirT = vecEnd - vecStart;
     vecDirT.Normalize ();
 
-    g_pCore->LogEvent ( 10203, SString ( "CNetAPI::ReadBulletsync - [Player:%s]  weaponType:%d  vecStart:%1.2f,%1.2f,%1.2f  vecEnd:%1.2f,%1.2f,%1.2f  vecDirT:%1.2f,%1.2f,%1.2f"
+    uchar ucPreFireCounter = 0;
+    uchar ucMidFireCounter = 0;
+    uchar ucSourceType = 0;
+    if ( g_pNet->GetServerBitStreamVersion () >= 33 )
+    {
+        BitStream.Read ( (uchar)ucPreFireCounter );
+        BitStream.Read ( (uchar)ucMidFireCounter );
+        BitStream.Read ( (uchar)ucSourceType );
+    }
+
+    g_pCore->LogEvent ( 10203, SString ( "CNetAPI::ReadBulletsync - [Player:%s]  weaponType:%d  SourceType:%d  PreFire:%d  MidFire:%d  vecStart:%1.2f,%1.2f,%1.2f  vecEnd:%1.2f,%1.2f,%1.2f  vecDirT:%1.2f,%1.2f,%1.2f"
                                         , *g_pCore->GetEntityDesc ( pPlayer )
                                         , weaponType
+                                        , ucSourceType
+                                        , ucPreFireCounter
+                                        , ucMidFireCounter
                                         , vecStart.fX, vecStart.fY, vecStart.fZ
                                         , vecEnd.fX, vecEnd.fY, vecEnd.fZ
                                         , vecDirT.fX, vecDirT.fY, vecDirT.fZ
@@ -2212,7 +2225,7 @@ void CNetAPI::ReadBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& Bi
 //
 // Send bulletsync fire button press packet to remote players
 //
-void CNetAPI::SendBulletSyncFire ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd )
+void CNetAPI::SendBulletSyncFire ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd, uint uiPreFireCounter, uint uiMidFireCounter )
 {
     // Ignore old bullet sync stuff
     if ( g_pNet->GetServerBitStreamVersion () < 0x2E )
@@ -2226,6 +2239,13 @@ void CNetAPI::SendBulletSyncFire ( eWeaponType weaponType, const CVector& vecSta
 
     pBitStream->Write ( (const char*)&vecStart, sizeof ( CVector ) );
     pBitStream->Write ( (const char*)&vecEnd, sizeof ( CVector ) );
+
+    if ( g_pNet->GetServerBitStreamVersion () >= 33 )
+    {
+        pBitStream->Write ( (uchar)uiPreFireCounter );
+        pBitStream->Write ( (uchar)uiMidFireCounter );
+        pBitStream->Write ( (uchar)1 );
+    }
 
     // Send the packet
     g_pNet->SendPacket ( PACKET_ID_PLAYER_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE );

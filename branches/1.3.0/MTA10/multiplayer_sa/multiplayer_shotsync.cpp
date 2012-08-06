@@ -82,6 +82,9 @@ DWORD RETURN_CProjectile__AddProjectile = 0x401C3D;
 DWORD RETURN_CProjectile__CProjectile = 0x4037B3;
 CPools * m_pools = 0;
 
+uint uiLocalPlayerPreFireCounter = 0;
+uint uiLocalPlayerMidFireCounter = 0;
+
 #define VAR_CWorld_IncludeCarTyres 0xb7cd70 // Used for CWorld_ProcessLineOfSight
 
 void InitFireInstantHit_MidHooks ( void );
@@ -209,6 +212,7 @@ VOID WriteTargetDataForPed ( CPedSAInterface * pPed, DWORD vecTargetPos, CVector
     }
     else
     {
+        uiLocalPlayerPreFireCounter++;
         // local ped firing
         LocalShotSyncData.m_vecShotOrigin = *origin;
     }
@@ -1098,8 +1102,10 @@ void OnMy_CWeapon_FireInstantHit_Mid ( CEntitySAInterface* pEntity, CVector vecS
         vecLastLocalPlayerBulletStart = vecStart;
         vecLastLocalPlayerBulletEnd = vecEnd;
 
+        uiLocalPlayerMidFireCounter++;
+
         if ( m_pBulletFireHandler )
-            m_pBulletFireHandler ( pTargetingPed, &vecStart, &vecEnd );
+            m_pBulletFireHandler ( pTargetingPed, &vecStart, &vecEnd, uiLocalPlayerPreFireCounter, uiLocalPlayerMidFireCounter );
     }
     else
     {
