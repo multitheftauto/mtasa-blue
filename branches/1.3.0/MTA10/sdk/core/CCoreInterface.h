@@ -155,6 +155,7 @@ public:
     virtual EDiagnosticDebugType    GetDiagnosticDebug              ( void ) = 0;
     virtual void                    SetDiagnosticDebug              ( EDiagnosticDebugType value ) = 0;
     virtual SString                 GetEntityDesc                   ( CClientEntityBase* pClientEntity, class CEntitySAInterface* pEntitySAInterface = NULL ) = 0;
+    virtual float                   GetDebugValue                   ( int iIndex ) = 0;
 };
 
 class CClientTime

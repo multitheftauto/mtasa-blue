@@ -43,6 +43,7 @@ using std::vector;
 // Used within this file by the packet handler to grab the this pointer of CClientGame
 extern CClientGame* g_pClientGame;
 extern int g_iDamageEventLimit;
+int iTestCounter = 0;
 
 #define DEFAULT_GRAVITY            0.008f
 #define DEFAULT_GAME_SPEED         1.0f
@@ -1010,12 +1011,19 @@ void CClientGame::DoPulses ( void )
     }
 
     // Pulse the network interface
-    TIMING_CHECKPOINT( "+NetPulse" );
-    g_pNet->DoPulse ();
-    TIMING_CHECKPOINT( "-NetPulse" );
 
-    m_pManager->DoPulse ();
-    m_pNetAPI->DoPulse ();
+    // Extrapolation test
+    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::VEHICLE_SYNC_7217 )
+    {
+        if ( iTestCounter < 100 )
+        {
+            iTestCounter++;
+            DoPulses2 ();
+        }
+    }
+    else
+        DoPulses2 ();
+
     m_pUnoccupiedVehicleSync->DoPulse ();
     m_pPedSync->DoPulse ();
 #ifdef WITH_OBJECT_SYNC
@@ -1299,6 +1307,18 @@ void CClientGame::DoPulses ( void )
     ProcessDelayedSendList ();
 
     TIMING_CHECKPOINT( "-CClientGame::DoPulses" );
+}
+
+// Extrapolation test
+void CClientGame::DoPulses2 ( void )
+{
+    // Pulse the network interface
+    TIMING_CHECKPOINT( "+NetPulse" );
+    g_pNet->DoPulse ();
+    TIMING_CHECKPOINT( "-NetPulse" );
+
+    m_pManager->DoPulse ();
+    m_pNetAPI->DoPulse ();
 }
 
 
@@ -3729,6 +3749,11 @@ void CClientGame::IdleHandler ( void )
         m_pManager->DoRender ();
         DoPulses ();
     }
+
+    // Extrapolation test
+    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::VEHICLE_SYNC_7217 )
+        if ( iTestCounter >= 100 )
+            DoPulses2 ();
 }
 
 

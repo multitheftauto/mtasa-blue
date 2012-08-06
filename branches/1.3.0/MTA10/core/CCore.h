@@ -246,6 +246,7 @@ public:
     EDiagnosticDebugType    GetDiagnosticDebug              ( void );
     void                    SetDiagnosticDebug              ( EDiagnosticDebugType value );
     SString                 GetEntityDesc                   ( CClientEntityBase* pClientEntity, CEntitySAInterface* pEntitySAInterface = NULL );
+    float                   GetDebugValue                   ( int iIndex );
 
 private:
     // Core devices.
