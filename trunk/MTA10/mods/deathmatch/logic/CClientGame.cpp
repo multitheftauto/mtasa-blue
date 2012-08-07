@@ -3943,7 +3943,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
     eWeaponType weaponUsed = pEvent->GetWeaponUsed ();
     ePedPieceTypes hitZone = pEvent->GetPedPieceType ();
     CWeaponInfo* pWeaponInfo = g_pGame->GetWeaponInfo ( weaponUsed );
-    float fDamage = pEvent->GetDamageApplied ();    
+    float fDamage = pEvent->GetDamageApplied ();
 
     /* Causes too much desync right now
     // Is this shotgun damage?
@@ -3980,6 +3980,14 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
         float fCurrentHealth = pDamagedPed->GetGamePlayer ()->GetHealth ();
         float fPreviousArmor = pDamagedPed->m_fArmor;
         float fCurrentArmor = pDamagedPed->GetGamePlayer ()->GetArmor ();
+
+        ///////////////////////////////////////////////////////////////////////////
+        //
+        // Pass 1 stuff
+        //
+        // return false to stop any damage being inflicted  
+        //
+        ///////////////////////////////////////////////////////////////////////////
 
         // Pass 1 checks for double shots
         if ( fDamage == 0.0f )
@@ -4068,9 +4076,22 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 }
             }
         }
+        ///////////////////////////////////////////////////////////////////////////
+        // Pass 1 end
+        ///////////////////////////////////////////////////////////////////////////
+
+
         // Have we taken any damage here?
         if ( ( fPreviousHealth != fCurrentHealth || fPreviousArmor != fCurrentArmor ) && fDamage != 0.0f )
         {
+            ///////////////////////////////////////////////////////////////////////////
+            ///
+            // Pass 2 stuff - (GTA has applied the damage)
+            //
+            // return false to stop damage anim (incl. death task) 
+            //
+            ///////////////////////////////////////////////////////////////////////////
+
             CLuaArguments Arguments;
             if ( pInflictingEntity ) Arguments.PushElement ( pInflictingEntity );
             else Arguments.PushBoolean ( false );
@@ -4183,13 +4204,17 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
             }
             // Inhibit hit-by-gun animation for local player if required
             if ( pDamagedPed->IsLocalPlayer () && bIsBeingShotWhilstAiming ) return false;
+
+            ///////////////////////////////////////////////////////////////////////////
+            // Pass 2 end
+            ///////////////////////////////////////////////////////////////////////////
         }
     }
 
     // No damage anim for fire
     if ( weaponUsed == WEAPONTYPE_FLAMETHROWER ) return false;
     
-    // Allow the damage to register
+    // Allow the damage processing to continue
     return true;
 }
 

@@ -29,8 +29,6 @@ public:
     //virtual bool    ProcessInput                ( CInputMessage* pInputMessage ) = 0  *TODO*
 
     virtual bool    HandleException             ( CExceptionInformation* pExceptionInformation ) = 0;
-
-    virtual CClientEntityBase* FindClientEntity ( CEntitySAInterface* pEntitySAInterface ) = 0;
 };
 
 #endif

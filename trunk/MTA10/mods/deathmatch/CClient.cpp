@@ -275,9 +275,3 @@ bool CClient::HandleException ( CExceptionInformation* pExceptionInformation )
         return true;
     #endif
 }
-
-
-CClientEntityBase* CClient::FindClientEntity ( CEntitySAInterface* pEntitySAInterface )
-{
-    return g_pClientGame->GetGameEntityXRefManager ()->FindClientEntity ( pEntitySAInterface );
-}
