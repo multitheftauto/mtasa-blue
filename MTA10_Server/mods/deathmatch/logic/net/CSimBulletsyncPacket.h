@@ -34,6 +34,7 @@ public:
         eWeaponType weaponType;
         CVector     vecStart;
         CVector     vecEnd;
+        uchar       ucOrderCounter;
     } m_Cache;
 
 };

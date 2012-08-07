@@ -2187,6 +2187,36 @@ void CNetAPI::ReadBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& Bi
     BitStream.Read ( (char*)&vecStart, sizeof ( CVector ) );
     BitStream.Read ( (char*)&vecEnd, sizeof ( CVector ) );
 
+    uchar ucOrderCounter = 0;
+    if ( g_pNet->GetServerBitStreamVersion () >= 0x34 )
+        BitStream.Read ( ucOrderCounter );
+
+    // Duplicate bullet check
+    {
+       bool bIsDuplicate = false;
+   
+       // Check if duplicate by comparing with previously sent vectors
+       if ( vecStart == pPlayer->m_vecPrevBulletSyncStart && vecEnd == pPlayer->m_vecPrevBulletSyncEnd )
+       {
+           bIsDuplicate = true;
+       }
+       pPlayer->m_vecPrevBulletSyncStart = vecStart;
+       pPlayer->m_vecPrevBulletSyncEnd = vecEnd;
+   
+       // Verify if duplicate by comparing order counter
+       if ( pPlayer->GetRemoteBitstreamVersion () >= 0x34 )
+       {
+           uchar cDif = ucOrderCounter - pPlayer->m_ucPrevBulletSyncOrderCounter;
+           if ( cDif > 0 )
+               bIsDuplicate = false;
+   
+           pPlayer->m_ucPrevBulletSyncOrderCounter = ucOrderCounter;
+       }
+
+        if ( bIsDuplicate )
+            return;
+    }
+
     pPlayer->DischargeWeapon ( weaponType, vecStart, vecEnd );
 }
 
@@ -2208,6 +2238,11 @@ void CNetAPI::SendBulletSyncFire ( eWeaponType weaponType, const CVector& vecSta
 
     pBitStream->Write ( (const char*)&vecStart, sizeof ( CVector ) );
     pBitStream->Write ( (const char*)&vecEnd, sizeof ( CVector ) );
+
+    if ( g_pNet->GetServerBitStreamVersion () >= 0x34 )
+    {
+        pBitStream->Write ( m_ucBulletSyncOrderCounter++ );
+    }
 
     // Send the packet
     g_pNet->SendPacket ( PACKET_ID_PLAYER_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE );

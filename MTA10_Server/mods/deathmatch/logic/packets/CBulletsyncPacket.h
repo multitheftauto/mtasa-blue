@@ -24,5 +24,6 @@ public:
     eWeaponType             m_WeaponType;
     CVector                 m_vecStart;
     CVector                 m_vecEnd;
+    uchar                   m_ucOrderCounter;
 };
 

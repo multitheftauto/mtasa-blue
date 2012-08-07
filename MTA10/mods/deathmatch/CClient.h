@@ -34,8 +34,6 @@ public:
     //bool        ProcessInput                    ( CInputMessage* pInputMessage );
 
     bool        HandleException                 ( CExceptionInformation* pExceptionInformation );
-
-    CClientEntityBase* FindClientEntity         ( CEntitySAInterface* pEntitySAInterface );
 };
 
 #endif

@@ -299,3 +299,20 @@ void CClientPlayer::DischargeWeapon ( eWeaponType weaponType, const CVector& vec
         }
     }
 }
+
+// Version info about a remote player
+void CClientPlayer::SetRemoteVersionInfo ( ushort usBitstreamVersion, uint uiBuildNumber )
+{
+    m_usRemoteBitstreamVersion = usBitstreamVersion;
+    m_uiRemoteBuildNumber = uiBuildNumber;
+}
+
+ushort CClientPlayer::GetRemoteBitstreamVersion ( void )
+{
+    return m_usRemoteBitstreamVersion;
+}
+
+uint CClientPlayer::GetRemoteBuildNumber ( void )
+{
+    return m_uiRemoteBuildNumber;
+}
