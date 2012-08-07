@@ -20,7 +20,7 @@ public:
     static bool IsSimSystemEnabled          ( void );
     static void AddSimPlayer                ( CPlayer* pPlayer );
     static void RemoveSimPlayer             ( CPlayer* pPlayer );
-    static void UpdatePuresyncSimPlayer     ( CPlayer* pPlayer, const std::set < CPlayer* >& simSendList, const std::set < CPlayer* >* pKeysyncSendList, const std::set < CPlayer* >* pBulletsyncSendList );
-    static void UpdateKeysyncSimPlayer      ( CPlayer* pPlayer, const std::set < CPlayer* >& simSendList );
-    static void UpdateBulletsyncSimPlayer   ( CPlayer* pPlayer, const std::set < CPlayer* >& simSendList );
+    static void UpdatePuresyncSimPlayer     ( CPlayer* pPlayer, const std::vector < CPlayer* >& simSendList );
+    static void UpdateKeysyncSimPlayer      ( CPlayer* pPlayer, const std::vector < CPlayer* >& simSendList );
+    static void UpdateBulletsyncSimPlayer   ( CPlayer* pPlayer, const std::vector < CPlayer* >& simSendList );
 };

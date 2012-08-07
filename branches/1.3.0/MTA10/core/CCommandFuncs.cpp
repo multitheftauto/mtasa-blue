@@ -449,11 +449,6 @@ float CCore::GetDebugValue ( int iIndex )
 
 void CCommandFuncs::Test ( const char* szParameters )
 {
-    if ( SStringX ( szParameters ) == "save" )
-    {
-        CCore::GetSingleton ().LogEvent ( 12345, "" );
-    }
-    else
     if ( SStringX ( szParameters ) == "ca" )
     {
         SString strStats = CCrashDumpWriter::GetCrashAvertedStatsSoFar ();

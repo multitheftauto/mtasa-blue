@@ -35,7 +35,7 @@ public:
 
     bool        HandleException                 ( CExceptionInformation* pExceptionInformation );
 
-    SString     GetEntityDesc                   ( CClientEntityBase* pClientEntity, CEntitySAInterface* pGameEntity );
+    CClientEntityBase* FindClientEntity         ( CEntitySAInterface* pEntitySAInterface );
 };
 
 #endif

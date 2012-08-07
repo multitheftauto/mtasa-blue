@@ -15,7 +15,6 @@ CBulletsyncPacket::CBulletsyncPacket ( CPlayer * pPlayer )
 {
     m_pSourceElement = pPlayer;
     m_WeaponType = WEAPONTYPE_UNARMED;
-    m_ucOrderCounter = 0;
 }
 
 bool CBulletsyncPacket::Read ( NetBitStreamInterface& BitStream )
@@ -27,20 +26,14 @@ bool CBulletsyncPacket::Read ( NetBitStreamInterface& BitStream )
     // Got a player?
     if ( m_pSourceElement )
     {
-        bool bOk = true;
-
         char cWeaponType;
-        bOk |= BitStream.Read ( cWeaponType );
-        m_WeaponType = (eWeaponType)cWeaponType;
-
-        bOk |= BitStream.Read ( (char *)&m_vecStart, sizeof ( CVector ) );
-        bOk |= BitStream.Read ( (char *)&m_vecEnd, sizeof ( CVector ) );
-
-        // Duplicate packet protection
-        if ( BitStream.Version () >= 0x34 )
-            bOk |= BitStream.Read ( m_ucOrderCounter );
-
-        return bOk;
+        if ( BitStream.Read ( cWeaponType ) )
+        {
+            m_WeaponType = (eWeaponType)cWeaponType;
+            if ( BitStream.Read ( (char *)&m_vecStart, sizeof ( CVector ) ) &&
+                 BitStream.Read ( (char *)&m_vecEnd, sizeof ( CVector ) ) )
+                return true;
+        }
     }
 
     return false;
@@ -67,10 +60,6 @@ bool CBulletsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.Write ( (char)m_WeaponType );
         BitStream.Write ( (const char *)&m_vecStart, sizeof ( CVector ) );
         BitStream.Write ( (const char *)&m_vecEnd, sizeof ( CVector ) );
-
-        // Duplicate packet protection
-        if ( BitStream.Version () >= 0x34 )
-            BitStream.Write ( m_ucOrderCounter );
         return true;
     }
 

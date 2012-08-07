@@ -64,15 +64,6 @@ bool CPlayerListPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.Write ( szNickPointer, ucNickLength );
         }
 
-        // Version info
-        if ( BitStream.Version () >= 0x34 )
-        {
-            BitStream.Write ( pPlayer->GetBitStreamVersion () );
-            SString strBuild = pPlayer->GetPlayerVersion ().SubStr ( 8 );
-            uint uiBuildNumber = atoi ( strBuild );
-            BitStream.Write ( uiBuildNumber );
-        }
-
         // Flags
         bool bIsSpawned = pPlayer->IsSpawned ();
         bool bInVehicle = ( bIsSpawned && ( pPlayer->GetOccupiedVehicle () != NULL ) );

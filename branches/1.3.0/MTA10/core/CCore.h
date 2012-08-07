@@ -239,13 +239,10 @@ public:
     void                    OnPreHUDRender                  ( void );
     void                    OnDeviceRestore                 ( void );
     void                    OnCrashAverted                  ( uint uiId );
-
-    // Debugging
-    void                    LogEvent                        ( uint uiDebugId, const char* szType, const char* szContext = "", const char* szBody = "" );
+    void                    LogEvent                        ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody );
     bool                    GetDebugIdEnabled               ( uint uiDebugId );
     EDiagnosticDebugType    GetDiagnosticDebug              ( void );
     void                    SetDiagnosticDebug              ( EDiagnosticDebugType value );
-    SString                 GetEntityDesc                   ( CClientEntityBase* pClientEntity, CEntitySAInterface* pEntitySAInterface = NULL );
     float                   GetDebugValue                   ( int iIndex );
 
 private:

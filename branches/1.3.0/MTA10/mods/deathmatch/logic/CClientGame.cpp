@@ -3902,7 +3902,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
     eWeaponType weaponUsed = pEvent->GetWeaponUsed ();
     ePedPieceTypes hitZone = pEvent->GetPedPieceType ();
     CWeaponInfo* pWeaponInfo = g_pGame->GetWeaponInfo ( weaponUsed );
-    float fDamage = pEvent->GetDamageApplied ();
+    float fDamage = pEvent->GetDamageApplied ();    
 
     /* Causes too much desync right now
     // Is this shotgun damage?
@@ -3940,43 +3940,6 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
         float fPreviousArmor = pDamagedPed->m_fArmor;
         float fCurrentArmor = pDamagedPed->GetGamePlayer ()->GetArmor ();
 
-        if ( pDamagedPed && pDamagedPed->IsLocalPlayer () )
-        {
-            int iPass = -2;
-            if ( fDamage == 0.0f )
-            {
-                if ( fCurrentHealth != fPreviousHealth )
-                    iPass = -1;
-                else
-                    iPass = 1;
-            }
-            else
-            {
-                if ( fCurrentHealth != fPreviousHealth )
-                    iPass = 2;
-                else
-                    iPass = 3;
-            }
-            g_pCore->LogEvent ( 10201, SString ( "CClientGame::DamageHandler - pass:%d  [DamagedPed:%s]  [InflictingEntity:%s]  fDamage:%f  weaponUsed:%d  hitZone:%d  health:%f->%f"
-                                                , iPass
-                                                , *g_pCore->GetEntityDesc ( pDamagedPed )
-                                                , *g_pCore->GetEntityDesc ( pInflictingEntity )
-                                                , fDamage
-                                                , weaponUsed
-                                                , hitZone
-                                                , fPreviousHealth
-                                                , fCurrentHealth
-                                            ) );
-        }
-
-        ///////////////////////////////////////////////////////////////////////////
-        //
-        // Pass 1 stuff
-        //
-        // return false to stop any damage being inflicted  
-        //
-        ///////////////////////////////////////////////////////////////////////////
-
         // Pass 1 checks for double shots
         if ( fDamage == 0.0f )
         {
@@ -3992,14 +3955,12 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                     if ( g_iDamageEventLimit == 0 )
                     {
                         AddReportLog ( 5501, SString ( "2nd pass 1 for BulletSyncShot damage. weaponUsed:%d", weaponUsed ) );
-                        g_pCore->LogEvent ( 10203, SString ( "2nd pass 1 for BulletSyncShot damage. weaponUsed:%d", weaponUsed ) );
                         return false;
                     }
                     g_iDamageEventLimit--;
                     if ( !bBulletSyncWeapon )
                     {
                         AddReportLog ( 5502, SString ( "BulletSyncShot but not bBulletSyncWeapon. weaponUsed:%d", weaponUsed ) );
-                        g_pCore->LogEvent ( 10203, SString ( "BulletSyncShot but not bBulletSyncWeapon. weaponUsed:%d", weaponUsed ) );
                         return false;
                     }
                 }
@@ -4008,10 +3969,9 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                     if ( bBulletSyncWeapon )
                     {
                         AddReportLog ( 5503, SString ( "not BulletSyncShot but bBulletSyncWeapon. weaponUsed:%d", weaponUsed ) );
-                        g_pCore->LogEvent ( 10203, SString ( "not BulletSyncShot but bBulletSyncWeapon. weaponUsed:%d", weaponUsed ) );
                         return false;
                     }
-                }      
+                }
             }
         }
 
@@ -4067,22 +4027,9 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 }
             }
         }
-        ///////////////////////////////////////////////////////////////////////////
-        // Pass 1 end
-        ///////////////////////////////////////////////////////////////////////////
-
-
         // Have we taken any damage here?
         if ( ( fPreviousHealth != fCurrentHealth || fPreviousArmor != fCurrentArmor ) && fDamage != 0.0f )
         {
-            ///////////////////////////////////////////////////////////////////////////
-            ///
-            // Pass 2 stuff - (GTA has applied the damage)
-            //
-            // return false to stop damage anim (incl. death task) 
-            //
-            ///////////////////////////////////////////////////////////////////////////
-
             CLuaArguments Arguments;
             if ( pInflictingEntity ) Arguments.PushElement ( pInflictingEntity );
             else Arguments.PushBoolean ( false );
@@ -4195,17 +4142,13 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
             }
             // Inhibit hit-by-gun animation for local player if required
             if ( pDamagedPed->IsLocalPlayer () && bIsBeingShotWhilstAiming ) return false;
-
-            ///////////////////////////////////////////////////////////////////////////
-            // Pass 2 end
-            ///////////////////////////////////////////////////////////////////////////
         }
     }
 
     // No damage anim for fire
     if ( weaponUsed == WEAPONTYPE_FLAMETHROWER ) return false;
     
-    // Allow the damage processing to continue
+    // Allow the damage to register
     return true;
 }
 
@@ -4766,19 +4709,6 @@ void CClientGame::BulletImpact ( CPed* pInitiator, CEntity* pVictim, const CVect
                 vecCollision = *pEndPosition;
             }
 
-            if ( pInitiatorPed != pLocalPlayer )
-            {
-                CVector vecStart = *pStartPosition;
-                CVector vecEnd = *pEndPosition;
-                bool bGotCollision = bCollision && pCollision;
-                g_pCore->LogEvent ( 10203, SString ( "CClientGame::BulletImpact - vecStart:%1.2f,%1.2f,%1.2f  vecEnd:%1.2f,%1.2f,%1.2f  bGotCollision:%d vecCollision:%1.2f,%1.2f,%1.2f"
-                                                    , vecStart.fX, vecStart.fY, vecStart.fZ
-                                                    , vecEnd.fX, vecEnd.fY, vecEnd.fZ
-                                                    , bGotCollision
-                                                    , vecCollision.fX, vecCollision.fY, vecCollision.fZ
-                                                ) );
-            }
-
             // Destroy the colpoint
             if ( pCollision )
             {
@@ -4799,7 +4729,7 @@ void CClientGame::BulletImpact ( CPed* pInitiator, CEntity* pVictim, const CVect
 }
 
 
-void CClientGame::BulletFire ( CPed* pInitiator, const CVector* pStartPosition, const CVector* pEndPosition, uint uiPreFireCounter, uint uiMidFireCounter )
+void CClientGame::BulletFire ( CPed* pInitiator, const CVector* pStartPosition, const CVector* pEndPosition )
 {
     // Got a local player model?
     CClientPlayer* pLocalPlayer = g_pClientGame->m_pLocalPlayer;
@@ -4808,7 +4738,7 @@ void CClientGame::BulletFire ( CPed* pInitiator, const CVector* pStartPosition, 
         // Maybe send bulletsync packet for the firing of this bullet
         eWeaponType weaponType = pLocalPlayer->GetCurrentWeaponType ();
         if ( g_pClientGame->GetWeaponTypeUsesBulletSync ( weaponType ) )
-            g_pClientGame->m_pNetAPI->SendBulletSyncFire ( weaponType, *pStartPosition, *pEndPosition, uiPreFireCounter, uiMidFireCounter );
+            g_pClientGame->m_pNetAPI->SendBulletSyncFire ( weaponType, *pStartPosition, *pEndPosition );
     }
 }
 

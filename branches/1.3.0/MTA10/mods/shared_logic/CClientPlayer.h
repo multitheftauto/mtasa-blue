@@ -111,13 +111,6 @@ public:
 
     void                            DischargeWeapon         ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd );
 
-    void                            SetRemoteVersionInfo        ( ushort usBitstreamVersion, uint uiBuildNumber );
-    ushort                          GetRemoteBitstreamVersion   ( void );
-    uint                            GetRemoteBuildNumber        ( void );
-
-    CVector                         m_vecPrevBulletSyncStart;
-    CVector                         m_vecPrevBulletSyncEnd;
-    uchar                           m_ucPrevBulletSyncOrderCounter;
     bool                            m_bMessageShown;
 private:
     bool                            m_bIsLocalPlayer;
@@ -168,9 +161,6 @@ private:
     CClientPlayerVoice*             m_voice;
     ePuresyncType                   m_LastPuresyncType;
     CVector                         m_vecLightsyncCalcedVelocity;
-    ushort                          m_usRemoteBitstreamVersion;
-    uint                            m_uiRemoteBuildNumber;
-
 #ifdef MTA_DEBUG
 private:
     bool                            m_bShowingWepdata;

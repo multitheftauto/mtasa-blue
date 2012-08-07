@@ -277,30 +277,7 @@ bool CClient::HandleException ( CExceptionInformation* pExceptionInformation )
 }
 
 
-SString CClient::GetEntityDesc ( CClientEntityBase* pClientEntity, CEntitySAInterface* pEntitySAInterface )
+CClientEntityBase* CClient::FindClientEntity ( CEntitySAInterface* pEntitySAInterface )
 {
-    if ( pEntitySAInterface )
-        pClientEntity = g_pClientGame->GetGameEntityXRefManager ()->FindClientEntity ( pEntitySAInterface );
-
-    // CClientEntity
-    CClientEntity* pEntity = (CClientEntity*)pClientEntity;
-    if ( !pEntity )
-    {
-        if ( !pEntitySAInterface )
-            return "None";
-        return SString ( "%08x (vtbl:%08x) EntitySAInterface", pEntitySAInterface, *((uint*)pEntitySAInterface) );
-    }
-    SString strDesc ( "%08x %s", pEntity, pEntity->GetClassName () );
-
-    // CClientPlayer
-    if ( CClientPlayer* pPlayer = DynamicCast < CClientPlayer > ( pEntity ) )
-    {
-        if ( pPlayer->IsLocalPlayer () )
-            strDesc += " {L} ";
-        else
-            strDesc += " ";
-        strDesc += pPlayer->GetNick ();
-    }
-
-    return strDesc;
+    return g_pClientGame->GetGameEntityXRefManager ()->FindClientEntity ( pEntitySAInterface );
 }

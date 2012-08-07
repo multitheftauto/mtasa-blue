@@ -157,9 +157,9 @@ void CSimControl::RemoveSimPlayer ( CPlayer* pPlayer )
 // Update a player at pure sync time
 //
 ///////////////////////////////////////////////////////////////
-void CSimControl::UpdatePuresyncSimPlayer ( CPlayer* pPlayer, const std::set < CPlayer* >& simSendList, const std::set < CPlayer* >* pKeysyncSendList, const std::set < CPlayer* >* pBulletsyncSendList )
+void CSimControl::UpdatePuresyncSimPlayer ( CPlayer* pPlayer, const std::vector < CPlayer* >& simSendList )
 {
-    ms_pSimPlayerManager->UpdateSimPlayer ( pPlayer, &simSendList, pKeysyncSendList, pBulletsyncSendList );
+    ms_pSimPlayerManager->UpdateSimPlayer ( pPlayer, &simSendList, NULL, NULL );
 }
 
 
@@ -170,7 +170,7 @@ void CSimControl::UpdatePuresyncSimPlayer ( CPlayer* pPlayer, const std::set < C
 // Update a player at key sync time
 //
 ///////////////////////////////////////////////////////////////
-void CSimControl::UpdateKeysyncSimPlayer ( CPlayer* pPlayer, const std::set < CPlayer* >& simSendList )
+void CSimControl::UpdateKeysyncSimPlayer ( CPlayer* pPlayer, const std::vector < CPlayer* >& simSendList )
 {
     ms_pSimPlayerManager->UpdateSimPlayer ( pPlayer, NULL, &simSendList, NULL );
 }
@@ -183,7 +183,7 @@ void CSimControl::UpdateKeysyncSimPlayer ( CPlayer* pPlayer, const std::set < CP
 // Update a player at bullet sync time
 //
 ///////////////////////////////////////////////////////////////
-void CSimControl::UpdateBulletsyncSimPlayer ( CPlayer* pPlayer, const std::set < CPlayer* >& simSendList )
+void CSimControl::UpdateBulletsyncSimPlayer ( CPlayer* pPlayer, const std::vector < CPlayer* >& simSendList )
 {
     ms_pSimPlayerManager->UpdateSimPlayer ( pPlayer, NULL, NULL, &simSendList );
 }

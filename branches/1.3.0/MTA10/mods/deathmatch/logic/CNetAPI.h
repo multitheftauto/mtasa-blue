@@ -59,7 +59,7 @@ public:
 
     void                    AddInterpolation                ( const CVector& vecPosition );
     bool                    GetInterpolation                ( CVector& vecPosition, unsigned short usLatency );
-    void                    SendBulletSyncFire              ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd, uint uiPreFireCounter, uint uiMidFireCounter );
+    void                    SendBulletSyncFire              ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd );
 
     static bool             IsWeaponIDAkimbo                ( unsigned char ucWeaponID );
     static bool             IsDriveByWeapon                 ( unsigned char ucWeaponID );
@@ -131,7 +131,6 @@ private:
     CControllerState        m_LastSentControllerState;
     float                   m_fLastSentCameraRotation;
     float                   m_fLastSentAimY;
-    uchar                   m_ucBulletSyncOrderCounter;
 };
 
 #endif

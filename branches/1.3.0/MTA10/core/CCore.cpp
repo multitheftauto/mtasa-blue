@@ -2052,41 +2052,13 @@ void CCore::OnCrashAverted ( uint uiId )
     CCrashDumpWriter::OnCrashAverted ( uiId );
 }
 
-std::list < SString > ms_SpecialBuffer;
 
 //
 // LogEvent
 // 
 void CCore::LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody )
 {
-    if ( uiDebugId > 10000 )
-    {
-        if ( uiDebugId != 12345 )
-        {
-            OutputDebugLine ( SString ( "[xLogEvent] %d %s", uiDebugId, szType, szContext, szBody ) );
-
-            // Add to a special buffer
-            ms_SpecialBuffer.push_back ( SString ( "%s - %d %s", *GetLocalTimeString ( false, true ), uiDebugId, szType ) );
-            while ( ms_SpecialBuffer.size () > 2000 )
-                ms_SpecialBuffer.pop_front ();
-        }
-        else
-        {
-            // Save special buffer to disk
-            SString strFilename ( "MTA\\sync_%s.txt", *GetLocalTimeString ( true, false ).Replace ( ":", "_" ).Replace ( " ", "_" ) );
-            SString strBuffer;
-            strBuffer.reserve ( 100000 );
-
-            for ( std::list < SString >::iterator iter = ms_SpecialBuffer.begin () ; iter != ms_SpecialBuffer.end () ; ++iter )
-                strBuffer += *iter + "\n";
-            ms_SpecialBuffer.clear ();
-
-            FileSave ( CalcMTASAPath ( strFilename ), strBuffer );
-            GetConsole ()->Printf( "Saved %s", *strFilename );
-        }
-    }
-    else
-    if ( GetDebugIdEnabled ( uiDebugId ) || uiDebugId > 10000 )
+    if ( GetDebugIdEnabled ( uiDebugId ) )
     {
         CCrashDumpWriter::LogEvent ( szType, szContext, szBody );
         OutputDebugLine ( SString ( "[LogEvent] %d %s %s %s", uiDebugId, szType, szContext, szBody ) );
@@ -2111,15 +2083,4 @@ EDiagnosticDebugType CCore::GetDiagnosticDebug ( void )
 void CCore::SetDiagnosticDebug ( EDiagnosticDebugType value )
 {
     m_DiagnosticDebug = value;
-}
-
-//
-// Get entity description for debugging
-//
-SString CCore::GetEntityDesc ( CClientEntityBase* pClientEntity, CEntitySAInterface* pEntitySAInterface )
-{
-    CClientBase* m_pClientBase = m_pModManager->GetCurrentMod ();
-    if ( m_pClientBase )
-        return m_pClientBase->GetEntityDesc ( pClientEntity, pEntitySAInterface );
-    return "nomod";
 }
