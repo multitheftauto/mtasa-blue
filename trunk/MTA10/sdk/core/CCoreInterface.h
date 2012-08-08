@@ -153,7 +153,6 @@ public:
     virtual bool                    GetDebugIdEnabled               ( uint uiDebugId ) = 0;
     virtual EDiagnosticDebugType    GetDiagnosticDebug              ( void ) = 0;
     virtual void                    SetDiagnosticDebug              ( EDiagnosticDebugType value ) = 0;
-    virtual float                   GetDebugValue                   ( int iIndex ) = 0;
 };
 
 class CClientTime

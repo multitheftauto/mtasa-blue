@@ -60,6 +60,14 @@
 class CGameEntityXRefManager;
 class CClientModelCacheManager;
 
+struct SVehExtrapolateSettings
+{
+    bool bEnabled;
+    int iBaseMs;
+    int iScalePercent;
+    int iMaxMs;
+};
+
 class CClientGame
 {
     friend class CPacketHandler;
@@ -521,6 +529,8 @@ public:
 
     void                                SetSingularTransfers            ( bool bTransfer )  { m_bSingularTransfer = bTransfer; };
     void                                ShowTransferBox                 ( void )            { m_pTransferBox->Show (); };
+    void                                SetVehExtrapolateSettings       ( const SVehExtrapolateSettings& settings ) { m_VehExtrapolateSettings = settings; }
+    const SVehExtrapolateSettings&      GetVehExtrapolateSettings       ( void )                                    { return m_VehExtrapolateSettings; }
 
 private:
     eStatus                             m_Status;
@@ -723,6 +733,8 @@ private:
     SString                             m_strServerVersionSortable;
     std::set < eWeaponType >            m_weaponTypesUsingBulletSync;
     GUI_CALLBACK                        m_OnCancelLocalGameClick;
+
+    SVehExtrapolateSettings             m_VehExtrapolateSettings;
 };
 
 extern CClientGame* g_pClientGame;

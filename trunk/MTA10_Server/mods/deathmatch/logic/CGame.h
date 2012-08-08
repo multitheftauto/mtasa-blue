@@ -48,7 +48,7 @@ class CGame;
 #include "packets/CVehicleResyncPacket.h"
 #include "packets/CKeysyncPacket.h"
 #include "packets/CBulletsyncPacket.h"
-#include "packets/CBulletsyncSettingsPacket.h"
+#include "packets/CSyncSettingsPacket.h"
 #include "packets/CVehicleInOutPacket.h"
 #include "packets/CVehicleDamageSyncPacket.h"
 #include "packets/CVehicleTrailerPacket.h"
@@ -361,7 +361,7 @@ public:
     void                        SendPacketBatchEnd          ( void );
 
     bool                        IsBulletSyncActive          ( void );
-    void                        SendBulletSyncSettings      ( CPlayer* pPlayer = NULL );
+    void                        SendSyncSettings            ( CPlayer* pPlayer = NULL );
 
     SString                     CalculateMinClientRequirement   ( void );
     bool                        IsBelowMinimumClient            ( const SString& strVersion );

@@ -1233,8 +1233,8 @@ void CGame::InitialDataStream ( CPlayer& Player )
     // Tell him current sync rates
     CStaticFunctionDefinitions::SendSyncIntervals ( &Player );
 
-    // Tell him current bullet sync enabled weapons
-    SendBulletSyncSettings ( &Player );
+    // Tell him current bullet sync enabled weapons and vehicle extrapolation settings
+    SendSyncSettings ( &Player );
 
     // Tell the other players about him
     CPlayerListPacket PlayerNotice;
@@ -3783,7 +3783,7 @@ void CGame::SetGlitchEnabled ( const std::string& strGlitch, bool bEnabled )
     eGlitchType cGlitch = m_GlitchNames[strGlitch];
     assert ( cGlitch >= 0 && cGlitch < NUM_GLITCHES );
     m_Glitches[cGlitch] = bEnabled;
-    SendBulletSyncSettings ();
+    SendSyncSettings ();
     CalculateMinClientRequirement ();
 }
 
@@ -4004,13 +4004,13 @@ bool CGame::IsBulletSyncActive ( void )
 
 //////////////////////////////////////////////////////////////////
 //
-// CGame::SendBulletSyncSettings
+// CGame::SendSyncSettings
 //
-// Determine and send required state of bullet sync
+// Determine and send required state of bullet sync and vehicle extrapolation
 // If player is NULL, send to all joined players
 //
 //////////////////////////////////////////////////////////////////
-void CGame::SendBulletSyncSettings ( CPlayer* pPlayer )
+void CGame::SendSyncSettings ( CPlayer* pPlayer )
 {
     std::set < eWeaponType > weaponTypesUsingBulletSync;
 
@@ -4034,7 +4034,12 @@ void CGame::SendBulletSyncSettings ( CPlayer* pPlayer )
             MapInsert ( weaponTypesUsingBulletSync, weaponList[i] );
     }
 
-    CBulletsyncSettingsPacket packet ( weaponTypesUsingBulletSync );
+    short sVehExtrapolateBaseMs = 5;
+    short sVehExtrapolatePercent = m_pMainConfig->GetVehExtrapolatePercent ();
+    short sVehExtrapolateMaxMs = m_pMainConfig->GetVehExtrapolatePingLimit ();
+    uchar ucVehExtrapolateEnabled = sVehExtrapolatePercent != 0;
+
+    CSyncSettingsPacket packet ( weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs );
     if ( pPlayer )
         pPlayer->Send ( packet );
     else
