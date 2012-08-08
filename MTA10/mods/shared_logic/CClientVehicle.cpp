@@ -3055,20 +3055,22 @@ void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulD
         // Calculate the relative error
         m_interp.pos.vecError = vecPosition - vecLocalPosition;
 
-        // Extrapolation test
-        if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::VEHICLE_SYNC_7217 )
+        // Extrapolation
+        const SVehExtrapolateSettings& vehExtrapolate = g_pClientGame->GetVehExtrapolateSettings ();
+        if ( vehExtrapolate.bEnabled )
         {
             // Base amount to account for something
-            float fExtrapolateMs = g_pCore->GetDebugValue ( 0 );
+            int iExtrapolateMs = vehExtrapolate.iBaseMs;
 
             if ( CClientPlayer* pPlayerDriver = DynamicCast < CClientPlayer > ( m_pDriver ) )
-                fExtrapolateMs += pPlayerDriver->GetLatency () * g_pCore->GetDebugValue ( 1 );
+                iExtrapolateMs += pPlayerDriver->GetLatency () * vehExtrapolate.iScalePercent / 110;
 
-            fExtrapolateMs = Min ( 200.f, fExtrapolateMs );
+            // Limit amount
+            iExtrapolateMs = Clamp ( 0, iExtrapolateMs, vehExtrapolate.iMaxMs );
 
             CVector vecVelocity;
             GetMoveSpeed ( vecVelocity );
-            vecVelocity *= 50.f * (1/1000.f) * fExtrapolateMs;
+            vecVelocity *= 50.f * iExtrapolateMs * (1/1000.f);
             m_interp.pos.vecError += vecVelocity;
         }
 

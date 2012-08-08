@@ -435,18 +435,6 @@ void CCommandFuncs::DebugClear ( const char* szParameters )
     CCore::GetSingleton ().GetLocalGUI ()->GetDebugView ()->Clear ();
 }
 
-
-float fAdd = 5;
-float fMul = 1;
-float CCore::GetDebugValue ( int iIndex )
-{
-    if ( iIndex == 0 )
-        return fAdd;
-    if ( iIndex == 1 )
-        return fMul;
-    return 0;
-}
-
 void CCommandFuncs::Test ( const char* szParameters )
 {
     if ( SStringX ( szParameters ) == "ca" )
@@ -464,26 +452,6 @@ void CCommandFuncs::Test ( const char* szParameters )
         {
             int* pData = NULL;
             *pData = 0;
-        }
-    }
-    else
-    if ( SStringX ( szParameters ).BeginsWith ( "add" ) )
-    {
-        float fValue = atof ( szParameters + 3 );
-        if ( fValue )
-        {
-            fAdd = Clamp ( 1.f, fValue, 200.f );
-            CCore::GetSingleton ().GetConsole ()->Print ( SString ( "add set to %f", fAdd ) );
-        }
-    }
-    else
-    if ( SStringX ( szParameters ).BeginsWith ( "mul" ) )
-    {
-        float fValue = atof ( szParameters + 3 );
-        if ( fValue )
-        {
-            fMul = Clamp ( 0.5f, fValue, 2.f );
-            CCore::GetSingleton ().GetConsole ()->Print ( SString ( "mul set to %f", fMul ) );
         }
     }
 }
