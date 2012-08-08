@@ -862,8 +862,6 @@ void CPlayer::RefreshNearPlayer ( CPlayer* pOther )
         // Move from far list
         MovePlayerToNearList ( pOther );
         pInfo = MapFind ( m_NearPlayerList, pOther );
-        pInfo->bPrevIsNearForKeySync = false;
-        pInfo->bPrevIsNearForBulletSync = false;
     }
     pInfo->iMoveToFarCountDown = 5;
 }
@@ -878,6 +876,20 @@ void CPlayer::AddPlayerToDistLists ( CPlayer* pOther )
 void CPlayer::RemovePlayerFromDistLists ( CPlayer* pOther )
 {
     dassert ( MapContains ( m_NearPlayerList, pOther ) || MapContains ( m_FarPlayerList, pOther ) );
+
+#ifdef MTA_DEBUG
+    SViewerInfo info;
+    SViewerInfo* pInfo = MapFind ( m_NearPlayerList, pOther );
+    if ( pInfo )
+        info = *pInfo;
+    dassert ( MapContains ( m_PureSyncSimSendList, pOther ) == info.bInPureSyncSimSendList );
+    dassert ( MapContains ( m_KeySyncSimSendList, pOther ) == info.bInKeySyncSimSendList );
+    dassert ( MapContains ( m_BulletSyncSimSendList, pOther ) == info.bInBulletSyncSimSendList );
+#endif
+    MapRemove ( m_PureSyncSimSendList, pOther );
+    MapRemove ( m_KeySyncSimSendList, pOther );
+    MapRemove ( m_BulletSyncSimSendList, pOther );
+
     MapRemove ( m_NearPlayerList, pOther );
     MapRemove ( m_FarPlayerList, pOther );
 }
@@ -892,12 +904,32 @@ void CPlayer::MovePlayerToNearList ( CPlayer* pOther )
     MapRemove ( m_FarPlayerList, pOther );
 }
 
+// Assumes CSimControl::UpdatePuresyncSimPlayer is called soon after this function
 void CPlayer::MovePlayerToFarList ( CPlayer* pOther )
 {
     OutputDebugLine ( SString ( "[Sync] -- %s: Move %s to farlist", GetNick (), pOther->GetNick () ) );
 
     dassert ( MapContains ( m_NearPlayerList, pOther ) && !MapContains ( m_FarPlayerList, pOther ) );
     SViewerInfo* pInfo = MapFind ( m_NearPlayerList, pOther );
+
+#ifdef MTA_DEBUG
+    dassert ( MapContains ( m_PureSyncSimSendList, pOther ) == pInfo->bInPureSyncSimSendList );
+    dassert ( MapContains ( m_KeySyncSimSendList, pOther ) == pInfo->bInKeySyncSimSendList );
+    dassert ( MapContains ( m_BulletSyncSimSendList, pOther ) == pInfo->bInBulletSyncSimSendList );
+#endif
+    if ( pInfo->bInKeySyncSimSendList )
+    {
+        pInfo->bInKeySyncSimSendList = false;
+        MapRemove ( m_KeySyncSimSendList, pOther );
+        // Call to CSimControl::UpdatePuresyncSimPlayer required to send list update to sim system        
+    }
+    if ( pInfo->bInBulletSyncSimSendList )
+    {
+        pInfo->bInBulletSyncSimSendList = false;
+        MapRemove ( m_BulletSyncSimSendList, pOther );
+        // Call to CSimControl::UpdatePuresyncSimPlayer required to send list update to sim system        
+    }
+
     MapSet ( m_FarPlayerList, pOther, *pInfo );
     MapRemove ( m_NearPlayerList, pOther );
 }
@@ -913,7 +945,6 @@ bool CPlayer::IsTimeToReceivePuresyncNearFrom ( CPlayer* pOther, SViewerInfo& ne
         GetCamera ()->GetPosition ( m_vecCamPosition );
 
     int iZone = GetPuresyncZone ( pOther );
-    nearInfo.iPrevZone = nearInfo.iZone;
     nearInfo.iZone = iZone;
 
     int iUpdateInterval = g_pBandwidthSettings->ZoneUpdateIntervals [ iZone ];

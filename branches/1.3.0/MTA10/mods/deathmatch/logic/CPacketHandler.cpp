@@ -596,6 +596,15 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
         // Strip the nick from any unwanted characters
         StripUnwantedCharacters ( szNickBuffer, '_' );
 
+        // Read version info
+        ushort usBitStreamVersion = 0;
+        uint uiBuildNumber = 0;
+        if ( bitStream.Version () >= 0x34 )
+        {
+            bitStream.Read ( usBitStreamVersion );
+            bitStream.Read ( uiBuildNumber );
+        }
+
         // Player flags
         bool bIsDead = bitStream.ReadBit ();
         bool bIsSpawned = bitStream.ReadBit ();
@@ -703,6 +712,9 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
         CClientPlayer* pPlayer = new CClientPlayer ( g_pClientGame->m_pManager, PlayerID );
         if ( pPlayer )
         {
+            // Set version info
+            pPlayer->SetRemoteVersionInfo ( usBitStreamVersion, uiBuildNumber );
+
             // Set its parent the root entity
             pPlayer->SetSyncTimeContext ( ucTimeContext );
             pPlayer->SetParent ( g_pClientGame->m_pRootEntity );
