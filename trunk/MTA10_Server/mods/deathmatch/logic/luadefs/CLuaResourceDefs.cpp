@@ -765,8 +765,10 @@ int CLuaResourceDefs::setResourceInfo ( lua_State* luaVM )
                     {
                         const char * szInfoKey = lua_tostring ( luaVM, 2 );
                         const char * szInfoValue = NULL;
-                        if ( iArgument3 == LUA_TSTRING ) szInfoValue = lua_tostring ( luaVM, 3 );
-                        pResource->SetInfoValue ( szInfoKey, szInfoValue );
+                        bool bSave = true;
+                        if ( iArgument3 == LUA_TSTRING ) { szInfoValue = lua_tostring ( luaVM, 3 ); bSave = (lua_isboolean(luaVM, 4) ? lua_toboolean(luaVM, 4) ? true : false : true );  }  
+                        else if (lua_isboolean(luaVM, 3)) bSave = lua_toboolean(luaVM, 3) ? true : false;
+                        pResource->SetInfoValue ( szInfoKey, szInfoValue, bSave );
 
                         lua_pushboolean ( luaVM, true );
                         return 1;
