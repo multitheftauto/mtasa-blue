@@ -243,7 +243,6 @@ public:
     bool                    GetDebugIdEnabled               ( uint uiDebugId );
     EDiagnosticDebugType    GetDiagnosticDebug              ( void );
     void                    SetDiagnosticDebug              ( EDiagnosticDebugType value );
-    float                   GetDebugValue                   ( int iIndex );
 
 private:
     // Core devices.

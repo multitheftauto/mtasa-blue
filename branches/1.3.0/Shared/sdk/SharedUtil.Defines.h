@@ -51,6 +51,12 @@
     #define _isnan isnan
 #endif
 
+#ifdef _MSC_VER
+    #define atoi64 _atoi64
+#else
+    #define atoi64 std::atoll
+#endif
+
 //
 // Macro for counting the number of elements in a static array
 //

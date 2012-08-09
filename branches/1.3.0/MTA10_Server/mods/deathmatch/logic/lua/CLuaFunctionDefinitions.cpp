@@ -11598,7 +11598,7 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
                 switch ( cell.nType )                           // push the value with the right type
                 {
                     case SQLITE_INTEGER:
-                        lua_pushnumber ( luaVM, cell.nVal );
+                        lua_pushnumber ( luaVM, static_cast < double > ( cell.nVal ) );
                         break;
                     case SQLITE_FLOAT:
                         lua_pushnumber ( luaVM, cell.fVal );
@@ -11657,7 +11657,7 @@ int CLuaFunctionDefinitions::ExecuteSQLQuery ( lua_State* luaVM )
                     switch ( cell.nType )                           // push the value with the right type
                     {
                         case SQLITE_INTEGER:
-                            lua_pushnumber ( luaVM, cell.nVal );
+                            lua_pushnumber ( luaVM, static_cast < double > ( cell.nVal ) );
                             break;
                         case SQLITE_FLOAT:
                             lua_pushnumber ( luaVM, cell.fVal );
@@ -11727,7 +11727,7 @@ int CLuaFunctionDefinitions::ExecuteSQLSelect ( lua_State* luaVM )
                     switch ( cell.nType )                           // push the value with the right type
                     {
                         case SQLITE_INTEGER:
-                            lua_pushnumber ( luaVM, cell.nVal );
+                            lua_pushnumber ( luaVM, static_cast < double > ( cell.nVal ) );
                             break;
                         case SQLITE_FLOAT:
                             lua_pushnumber ( luaVM, cell.fVal );

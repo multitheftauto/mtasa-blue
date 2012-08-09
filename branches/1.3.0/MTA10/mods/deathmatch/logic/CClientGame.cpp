@@ -1013,7 +1013,7 @@ void CClientGame::DoPulses ( void )
     // Pulse the network interface
 
     // Extrapolation test
-    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::VEHICLE_SYNC_7217 )
+    if ( m_VehExtrapolateSettings.bEnabled )
     {
         if ( iTestCounter < 100 )
         {
@@ -3751,7 +3751,7 @@ void CClientGame::IdleHandler ( void )
     }
 
     // Extrapolation test
-    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::VEHICLE_SYNC_7217 )
+    if ( m_VehExtrapolateSettings.bEnabled )
         if ( iTestCounter >= 100 )
             DoPulses2 ();
 }

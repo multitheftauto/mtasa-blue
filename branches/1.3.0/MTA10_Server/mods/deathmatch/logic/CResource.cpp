@@ -474,7 +474,7 @@ bool CResource::GetInfoValue ( const char * szKey, std::string& strValue )
     return false;
 }
 
-void CResource::SetInfoValue ( const char * szKey, const char * szValue )
+void CResource::SetInfoValue ( const char * szKey, const char * szValue, bool bSave )
 {
     bool bFoundExisting = false;
 
@@ -504,6 +504,8 @@ void CResource::SetInfoValue ( const char * szKey, const char * szValue )
     {
         m_infoValues.push_back ( CInfoValue ( szKey, szValue ) );
     }
+
+    if (!bSave) return;
 
     // Save to xml
     std::string strPath;

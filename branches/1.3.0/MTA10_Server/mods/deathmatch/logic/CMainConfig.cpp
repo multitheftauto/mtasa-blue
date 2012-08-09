@@ -97,7 +97,6 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_iBackupInterval = 3;
     m_iBackupAmount = 5;
     m_bSyncMapElementData = true;
-    m_bBulletSyncEnabled = true;
 }
 
 
@@ -1281,6 +1280,8 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   50,     100,    4000,   "keysync_analog_sync_interval",         &g_TickRateSettings.iKeySyncAnalogMove,     &OnTickRateChange },
             { true, true,   50,     100,    4000,   "donkey_work_interval",                 &g_TickRateSettings.iNearListUpdate,        &OnTickRateChange },
             { true, true,   0,      0,      1,      "bullet_sync",                          &m_bBulletSyncEnabled,                      &OnTickRateChange },
+            { true, true,   0,      0,      120,    "vehext_percent",                       &m_iVehExtrapolatePercent,                  &OnTickRateChange },
+            { true, true,   0,      150,    500,    "vehext_ping_limit",                    &m_iVehExtrapolatePingLimit,                &OnTickRateChange },
         };
 
     static std::vector < SIntSetting > settingsList;
@@ -1301,6 +1302,6 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
 void CMainConfig::OnTickRateChange ( void )
 {
     CStaticFunctionDefinitions::SendSyncIntervals ();
-    g_pGame->SendBulletSyncSettings ();
+    g_pGame->SendSyncSettings ();
     g_pGame->CalculateMinClientRequirement ();
 }

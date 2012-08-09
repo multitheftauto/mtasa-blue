@@ -353,7 +353,7 @@ bool CAccountManager::Load( void )
     for ( int i = 0 ; i < iResults ; i++ )
     {
         //Fill User ID, Name & Password (Required data)
-        iUserID = result.Data[i][0].nVal;
+        iUserID = static_cast < int > ( result.Data[i][0].nVal );
         strName = (const char *)result.Data[i][1].pVal;
 
         // Check for overlong names and incorrect escapement
@@ -794,7 +794,7 @@ CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, const char* s
     //Do we have any results?
     if ( iResults > 0 )
     {
-        int iType = result.Data[0][1].nVal;
+        int iType = static_cast < int > ( result.Data[0][1].nVal );
         //Account data is stored as text so we don't need to check what type it is just return it
         if ( iType == LUA_TBOOLEAN )
         {
@@ -863,7 +863,7 @@ bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAcco
             strKey = (const char *)result.Data[i][0].pVal;
             //Get our value
             strValue = (const char *)result.Data[i][1].pVal;
-            int iType = result.Data[i][2].nVal;
+            int iType = static_cast < int > ( result.Data[i][2].nVal );
             //Select the id and userid where the user is the to account and the key is strKey
             CRegistryResult subResult;
             m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &subResult, "SELECT id,userid from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID, SQLITE_TEXT, strKey.c_str () );
@@ -906,7 +906,7 @@ bool CAccountManager::GetAllAccountData( CAccount* pAccount, lua_State* pLua )
             //Get our key
             strKey = (const char *)result.Data[i][0].pVal;
             //Get our type
-            int iType = result.Data[i][2].nVal;
+            int iType = static_cast < int > ( result.Data[i][2].nVal );
             //Account data is stored as text so we don't need to check what type it is just return it
             if ( iType == LUA_TNIL )
             {

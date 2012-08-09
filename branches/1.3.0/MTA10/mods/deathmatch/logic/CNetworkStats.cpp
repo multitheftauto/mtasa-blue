@@ -59,6 +59,10 @@ void CNetworkStats::Draw ( void )
     SString strRecvRate  = GetDataUnit ( Round ( m_fByteReceiveRate ) );
     SString strSendRate  = GetDataUnit ( Round ( m_fByteSendRate ) );
 
+    CClientPlayer* pLocalPlayer = g_pClientGame->GetLocalPlayer ();
+    bool bBulletSync = pLocalPlayer && g_pClientGame->GetWeaponTypeUsesBulletSync ( pLocalPlayer->GetCurrentWeaponType () );
+    const SVehExtrapolateSettings& vehExtrapolateSettings = g_pClientGame->GetVehExtrapolateSettings ();
+
     SString strBuffer;
 
     // Select a string to print
@@ -80,6 +84,9 @@ void CNetworkStats::Draw ( void )
                 "BPS limit by CC: %llu\n"
                 "BPS limit by OB: %llu\n"
                 "Encryption: %s\n"
+                "Bullet sync: %s\n"
+                "Veh. Extrapolate amount: %d%%\n"
+                "Veh. Extrapolate max: %dms\n"
                 "Client: %s\n"
                 "Server: %s\n",
                 g_pNet->GetPing (),
@@ -98,6 +105,9 @@ void CNetworkStats::Draw ( void )
                 stats.isLimitedByCongestionControl ? 1ULL : 0ULL,
                 stats.isLimitedByOutgoingBandwidthLimit ? 1ULL : 0ULL,
                 stats.encryptionStatus ? stats.encryptionStatus == 1 ? "On" : "Unknown" : "Off",
+                bBulletSync ? "On" : "Off",
+                vehExtrapolateSettings.iScalePercent,
+                vehExtrapolateSettings.iMaxMs,
                 *CStaticFunctionDefinitions::GetVersionSortable(),
                 *g_pClientGame->GetServerVersionSortable ()
                 );

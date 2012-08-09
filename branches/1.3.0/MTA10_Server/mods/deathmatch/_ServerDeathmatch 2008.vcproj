@@ -944,10 +944,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\packets\CBulletsyncSettingsPacket.cpp"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\packets\CCameraSyncPacket.cpp"
 						>
 					</File>
@@ -1141,6 +1137,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CServerTextItemPacket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CSyncSettingsPacket.cpp"
 						>
 					</File>
 					<File
@@ -2181,10 +2181,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\packets\CBulletsyncSettingsPacket.h"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\packets\CCameraSyncPacket.h"
 						>
 					</File>
@@ -2390,6 +2386,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CServerTextItemPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CSyncSettingsPacket.h"
 						>
 					</File>
 					<File

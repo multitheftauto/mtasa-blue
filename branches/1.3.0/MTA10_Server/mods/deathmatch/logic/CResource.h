@@ -308,7 +308,7 @@ public:
     inline list<CIncludedResources *>::iterator GetIncludedResourcesEnd ( void )    { return m_includedResources.end(); };
     inline int              GetIncludedResourcesCount ( void )  { return m_includedResources.size(); };
     bool                    GetInfoValue ( const char * szKey, std::string& strValue );
-    void                    SetInfoValue ( const char * szKey, const char * szValue );
+    void                    SetInfoValue ( const char * szKey, const char * szValue, bool bSave = true );
     inline unsigned int     GetVersionMajor ( void ) { return m_uiVersionMajor; }
     inline unsigned int     GetVersionMinor ( void ) { return m_uiVersionMinor; }
     inline unsigned int     GetVersionRevision ( void ) { return m_uiVersionRevision; }

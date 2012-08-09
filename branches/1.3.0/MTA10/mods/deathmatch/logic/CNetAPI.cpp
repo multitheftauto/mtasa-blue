@@ -2206,7 +2206,7 @@ void CNetAPI::ReadBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& Bi
        // Verify if duplicate by comparing order counter
        if ( pPlayer->GetRemoteBitstreamVersion () >= 0x34 )
        {
-           uchar cDif = ucOrderCounter - pPlayer->m_ucPrevBulletSyncOrderCounter;
+           char cDif = ucOrderCounter - pPlayer->m_ucPrevBulletSyncOrderCounter;
            if ( cDif > 0 )
                bIsDuplicate = false;
    

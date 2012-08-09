@@ -190,8 +190,8 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_LatentTransfer ( bitStream );
             return true;
 
-        case PACKET_ID_BULLETSYNC_SETTINGS:
-            Packet_BulletSyncSettings ( bitStream );
+        case PACKET_ID_SYNC_SETTINGS:
+            Packet_SyncSettings ( bitStream );
             return true;
 
         default:             break;
@@ -4658,7 +4658,7 @@ void CPacketHandler::Packet_LatentTransfer ( NetBitStreamInterface& bitStream )
 }
 
 
-void CPacketHandler::Packet_BulletSyncSettings ( NetBitStreamInterface& bitStream )
+void CPacketHandler::Packet_SyncSettings ( NetBitStreamInterface& bitStream )
 {
     uchar ucNumWeapons = 0;
     if ( bitStream.Read ( ucNumWeapons ) )
@@ -4671,5 +4671,23 @@ void CPacketHandler::Packet_BulletSyncSettings ( NetBitStreamInterface& bitStrea
                 MapInsert ( weaponTypesUsingBulletSync, (eWeaponType)ucWeaponType );
         }
         g_pClientGame->SetWeaponTypesUsingBulletSync ( weaponTypesUsingBulletSync );
+    }
+
+    if ( bitStream.Version () >= 0x35 )
+    {
+        uchar ucEnabled;
+        short sBaseMs, sScalePercent, sMaxMs;
+        bitStream.Read ( ucEnabled );
+        bitStream.Read ( sBaseMs );
+        bitStream.Read ( sScalePercent );
+        if ( bitStream.Read ( sMaxMs ) )
+        {
+            SVehExtrapolateSettings vehExtrapolateSettings;
+            vehExtrapolateSettings.bEnabled = ucEnabled != 0;
+            vehExtrapolateSettings.iBaseMs = sBaseMs;
+            vehExtrapolateSettings.iScalePercent = sScalePercent;
+            vehExtrapolateSettings.iMaxMs = sMaxMs;
+            g_pClientGame->SetVehExtrapolateSettings ( vehExtrapolateSettings );
+        }
     }
 }
