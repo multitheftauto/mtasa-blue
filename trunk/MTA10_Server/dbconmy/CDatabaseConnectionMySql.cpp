@@ -320,7 +320,7 @@ bool CDatabaseConnectionMySql::QueryInternal ( const SString& strQuery, CRegistr
                     case SQLITE_NULL:
                         break;
                     case SQLITE_INTEGER:
-                        cell.nVal = atol ( inData );
+                        cell.nVal = atoi64 ( inData );
                         break;
                     case SQLITE_FLOAT:
                         cell.fVal = (float)atof ( inData );
