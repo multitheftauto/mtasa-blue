@@ -331,7 +331,7 @@ std::vector < DWORD > GetGTAProcessList ( void )
         std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
         for ( uint i = 0; i < filenameList.size (); i++ )
             if ( filenameList[i].EndsWith ( MTA_GTAEXE_NAME ) )
-                result.push_back ( processId );
+                ListAddUnique ( result, processId );
     }
 
     if ( DWORD processId = FindProcessId ( MTA_GTAEXE_NAME ) )
@@ -343,21 +343,30 @@ std::vector < DWORD > GetGTAProcessList ( void )
 
 ///////////////////////////////////////////////////////////////////////////
 //
+// IsGTARunning
+//
+//
+//
+///////////////////////////////////////////////////////////////////////////
+bool IsGTARunning ( void )
+{
+    return !GetGTAProcessList ().empty ();
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
 // TerminateGTAIfRunning
 //
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-bool TerminateGTAIfRunning ( bool bSilent )
+void TerminateGTAIfRunning ( void )
 {
     std::vector < DWORD > processIdList = GetGTAProcessList ();
 
     if ( processIdList.size () )
     {
-        if ( !bSilent )
-            if ( MessageBox ( 0, "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?", "Information", MB_YESNO | MB_ICONQUESTION ) == IDNO )
-                return false;
-
         // Try to stop all GTA process id's
         for ( uint i = 0 ; i < 3 && processIdList.size () ; i++ )
         {
@@ -373,15 +382,87 @@ bool TerminateGTAIfRunning ( bool bSilent )
             Sleep ( 1000 );
             processIdList = GetGTAProcessList ();
         }
+    }
+}
 
-        if ( processIdList.size () )
+
+///////////////////////////////////////////////////////////////////////////
+//
+// GetOtherMTAProcessList
+//
+// Get list of process id's with the image name ending with the same name as this process
+//
+///////////////////////////////////////////////////////////////////////////
+std::vector < DWORD > GetOtherMTAProcessList ( void )
+{
+    std::vector < DWORD > result;
+
+    std::vector < DWORD > processIdList = MyEnumProcesses ();
+    for ( uint i = 0; i < processIdList.size (); i++ )
+    {
+        DWORD processId = processIdList[i];
+        // Skip 64 bit processes to avoid errors
+        if ( !Is32bitProcess ( processId ) )
+            continue;
+
+        std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
+        for ( uint i = 0; i < filenameList.size (); i++ )
+            if ( filenameList[i].EndsWith ( MTA_EXE_NAME ) )
+                ListAddUnique ( result, processId );
+    }
+
+    if ( DWORD processId = FindProcessId ( MTA_EXE_NAME ) )
+        ListAddUnique ( result, processId );
+
+    // Ignore this process
+    ListRemove ( result, GetCurrentProcessId () );
+
+    return result;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// IsOtherMTARunning
+//
+//
+//
+///////////////////////////////////////////////////////////////////////////
+bool IsOtherMTARunning ( void )
+{
+    return !GetOtherMTAProcessList ().empty ();
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// TerminateOtherMTAIfRunning
+//
+//
+//
+///////////////////////////////////////////////////////////////////////////
+void TerminateOtherMTAIfRunning ( void )
+{
+    std::vector < DWORD > processIdList = GetOtherMTAProcessList ();
+
+    if ( processIdList.size () )
+    {
+        // Try to stop all other MTA process id's
+        for ( uint i = 0 ; i < 3 && processIdList.size () ; i++ )
         {
-            if ( !bSilent )
-                MessageBox ( 0, "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer.", "Information", MB_OK | MB_ICONQUESTION );
-            return false;
+            for ( std::vector < DWORD > ::iterator iter = processIdList.begin () ; iter != processIdList.end (); ++iter )
+            {
+                HANDLE hProcess = OpenProcess ( PROCESS_TERMINATE, 0, *iter );
+                if ( hProcess )
+                {
+                    TerminateProcess ( hProcess, 0 );
+                    CloseHandle ( hProcess );
+                }
+            }
+            Sleep ( 1000 );
+            processIdList = GetOtherMTAProcessList ();
         }
     }
-    return true;
 }
 
 
@@ -528,10 +609,10 @@ void SetMTASAPathSource ( bool bReadFromRegistry )
 }
 
 
-SString GetMTASAPath ( void )
+SString GetMTASAPath ( bool bReadFromRegistry )
 {
     if ( g_strMTASAPath == "" )
-        SetMTASAPathSource ( true );
+        SetMTASAPathSource ( bReadFromRegistry );
     return g_strMTASAPath;
 }
 
@@ -584,7 +665,7 @@ SString DoUserAssistedSearch ( void )
             // If so, get the exe path
             ExtractFilename ( strPathFilename, &strResult, NULL );
             // And then stop it
-            TerminateGTAIfRunning ( true );
+            TerminateGTAIfRunning ();
             break;
         }
 
