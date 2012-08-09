@@ -370,6 +370,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     strCmdLine = strCmdLine.Replace ( " /done-admin", "" );
 
     MaybeShowCopySettingsDialog ();
+    SetDllDirectory( SString ( strMTASAPath + "\\mta" ) );
 
     //////////////////////////////////////////////////////////
     //
