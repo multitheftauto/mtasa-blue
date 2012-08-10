@@ -23,8 +23,8 @@ CControllerConfigManagerSA::CControllerConfigManagerSA()
 {
     m_bSuspendSteerAndFlyWithMouse = false;
     // Get initial settings
-    m_bSteerWithMouse = *VAR_FlyWithMouse;
-    m_bFlyWithMouse = *VAR_SteerWithMouse;
+    m_bSteerWithMouse = *VAR_FlyWithMouse != 0;
+    m_bFlyWithMouse = *VAR_SteerWithMouse != 0;
 }
 
 void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction ( eControllerAction action, int iKey, eControllerType controllerType )
@@ -93,7 +93,7 @@ void CControllerConfigManagerSA::SetInputType ( unsigned char ucInputType )
 
 bool CControllerConfigManagerSA::IsMouseInverted ( void )
 {
-    return *VAR_MouseInverted;
+    return *VAR_MouseInverted != 0;
 }
 
 void CControllerConfigManagerSA::SetMouseInverted ( bool bInverted )

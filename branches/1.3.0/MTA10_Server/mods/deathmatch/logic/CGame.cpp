@@ -28,8 +28,9 @@
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
 #define MAX_PROJECTILE_SYNC_DISTANCE 400.0f
 
-#define RELEASE_MIN_CLIENT_VERSION      "1.3.0-9.03724"
-#define BULLET_SYNC_MIN_CLIENT_VERSION  "1.3.0-9.04311"
+#define RELEASE_MIN_CLIENT_VERSION              "1.3.0-9.03724"
+#define BULLET_SYNC_MIN_CLIENT_VERSION          "1.3.0-9.04311"
+#define VEH_EXTRAPOLATION_MIN_CLIENT_VERSION    "1.3.0-9.04460"
 
 #define RUN_CHILDREN CChildListType::const_iterator iter=pElement->IterBegin();for(;iter!=pElement->IterEnd();iter++)
 
@@ -4074,6 +4075,11 @@ SString CGame::CalculateMinClientRequirement ( void )
         if ( strNewMin < BULLET_SYNC_MIN_CLIENT_VERSION )
             strNewMin = BULLET_SYNC_MIN_CLIENT_VERSION;
     }
+    if ( m_pMainConfig->GetVehExtrapolatePercent () > 0 )
+    {
+        if ( strNewMin < VEH_EXTRAPOLATION_MIN_CLIENT_VERSION )
+            strNewMin = VEH_EXTRAPOLATION_MIN_CLIENT_VERSION;
+    }
 
     if ( strNewMin != m_strPrevMinClientConnectRequirement )
     {
@@ -4090,6 +4096,11 @@ SString CGame::CalculateMinClientRequirement ( void )
         {
             if ( strKickMin < BULLET_SYNC_MIN_CLIENT_VERSION )
                 strKickMin = BULLET_SYNC_MIN_CLIENT_VERSION;
+        }
+        if ( m_pMainConfig->GetVehExtrapolatePercent () > 0 )
+        {
+            if ( strKickMin < VEH_EXTRAPOLATION_MIN_CLIENT_VERSION )
+                strKickMin = VEH_EXTRAPOLATION_MIN_CLIENT_VERSION;
         }
 
         if ( strKickMin != m_strPrevMinClientKickRequirement )
