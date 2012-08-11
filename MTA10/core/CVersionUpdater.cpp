@@ -2879,6 +2879,28 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     SString strUpdateBuildType;
     CVARS_GET ( "update_build_type", strUpdateBuildType );
 
+    // Compile some system stats
+    SDxStatus dxStatus;
+    g_pGraphics->GetRenderItemManager ()->GetDxStatus ( dxStatus );
+    CGameSettings* gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
+    SString strVideoCard = SStringX ( g_pDeviceState->AdapterState.Name ).Left ( 30 ).Replace ( "&", "_" ).Replace ( "=", "_" );
+    SString strSystemStats ( "1_%d_%d_%d_%d_%d"
+                             "_%d%d%d%d"
+                             "_%s"
+                             , static_cast < int > ( GetWMITotalPhysicalMemory () / 1024LL / 1024LL )
+                             , g_pDeviceState->AdapterState.InstalledMemoryKB / 1024
+                             , gameSettings->GetCurrentVideoMode ()
+                             , gameSettings->GetFXQuality ()
+                             , dxStatus.settings.iDrawDistance
+
+                             , GetVideoModeManager ()->IsWindowed ()
+                             , GetVideoModeManager ()->IsMultiMonitor ()
+                             , dxStatus.settings.bVolumetricShadows
+                             , dxStatus.settings.bAllowScreenUpload
+
+                             , *GetApplicationSetting ( "real-os-version" )
+                           );
+
     // Make the query URL
     SString strQueryURL = strServerURL;
     strQueryURL = strQueryURL.Replace ( "%VERSION%", strPlayerVersion );
@@ -2891,6 +2913,8 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     strQueryURL = strQueryURL.Replace ( "%WANTVER%", m_strSidegradeVersion );
     strQueryURL = strQueryURL.Replace ( "%LASTNEWS%", m_VarConfig.news_lastNewsDate );
     strQueryURL = strQueryURL.Replace ( "%FILE%", m_JobInfo.strPostFilename );
+    strQueryURL = strQueryURL.Replace ( "%SYS%", strSystemStats );
+    strQueryURL = strQueryURL.Replace ( "%VID%", strVideoCard );
 
     // Perform the HTTP request
     m_HTTP.Get ( strQueryURL );
