@@ -40,7 +40,7 @@ CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponT
     ResetWeaponTarget ( );
     // Setup weapon config.
     m_weaponConfig.bDisableWeaponModel = false;
-    m_weaponConfig.bShootIfTargetBlocked = true;
+    m_weaponConfig.bShootIfTargetBlocked = false;
     m_weaponConfig.bShootIfTargetOutOfRange = false;
     m_weaponConfig.flags.bShootThroughStuff = false;
     m_weaponConfig.flags.bIgnoreSomeObjectsForCamera = false;
@@ -78,11 +78,33 @@ void CClientWeapon::DoPulse ( void )
         m_vecLastDirection = vecDirection;
         SetDirection ( vecDirection );
     }*/
-
-    if ( m_targetType == TARGET_TYPE_ENTITY && m_pTarget )
+    if ( m_targetType != TARGET_TYPE_FIXED )
     {
         CVector vecTargetPos;
         m_pTarget->GetPosition ( vecTargetPos );
+        if ( m_targetType == TARGET_TYPE_ENTITY && m_pTarget )
+        {
+            if ( m_pTarget )
+            {
+                if ( m_pTarget->GetType ( ) == CCLIENTPED || m_pTarget->GetType ( ) == CCLIENTPLAYER )
+                {
+                    CClientPed * pPed = (CClientPed *) m_pTarget;
+                    pPed->GetBonePosition( m_targetBone, vecTargetPos );
+                }
+                else
+                {
+                    m_pTarget->GetPosition( vecTargetPos );
+                }
+            }
+            else
+            {
+                ResetWeaponTarget ( );
+            }
+        }
+        else if ( m_targetType == TARGET_TYPE_VECTOR )
+        {
+            vecTargetPos = m_vecTarget;
+        }
 
         if ( !m_pAttachedToEntity )
         {
@@ -111,7 +133,6 @@ void CClientWeapon::DoPulse ( void )
             // Apply local rotation
             SetAttachedOffsets ( m_vecAttachedPosition, vecRotation );
         }
-
     }
 
     if ( m_State == WEAPONSTATE_FIRING ) Fire ();
@@ -274,7 +295,7 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
         vecTarget = pColPoint->GetPosition ();
     }
 
-    if ( ( m_pTarget != NULL && m_pTarget->GetGameEntity ( ) != NULL && m_pTarget->GetGameEntity()->GetInterface ( ) == pEntity ) && m_weaponConfig.bShootIfTargetBlocked == false )
+    if ( ( m_pTarget != NULL && m_pTarget->GetGameEntity ( ) != NULL && m_pTarget->GetGameEntity()->GetInterface ( ) != pEntity ) && m_weaponConfig.bShootIfTargetBlocked == false )
     {
         return;
     }
