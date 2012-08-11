@@ -2765,6 +2765,9 @@ void CClientGame::AddBuiltInEvents ( void )
 
     // Misc events
     m_Events.AddEvent ( "onClientFileDownloadComplete", "fileName, success", NULL, false );
+
+    // Weapon events
+    m_Events.AddEvent ( "onClientWeaponHit", "ped, x, y, z", NULL, false );
 }
 
 
