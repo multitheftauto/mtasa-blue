@@ -13,6 +13,9 @@
 
 CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponType type ) : CClientObject ( pManager, ID, CClientPickupManager::GetWeaponModel ( type ), false )
 {
+    // Ensure m_pTarget gets NULLed when it is destroyed
+    CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientWeapon" ), &m_pTarget, NULL );
+
     m_pManager = pManager;
     m_pManager->GetWeaponManager ()->AddToList ( this );
 
@@ -58,6 +61,8 @@ CClientWeapon::~CClientWeapon ( void )
     Destroy ();
     delete m_pMarker;
     delete m_pMarker2;
+
+    CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pTarget, NULL );
 }
 
 
@@ -78,11 +83,35 @@ void CClientWeapon::DoPulse ( void )
     {
         CVector vecTargetPos;
         m_pTarget->GetPosition ( vecTargetPos );
-        CVector vecPosition;
-        GetPosition ( vecPosition );
-        CVector vecDirection = vecTargetPos - vecPosition;
 
-        SetDirection ( vecDirection );
+        if ( !m_pAttachedToEntity )
+        {
+            // Calculate direction to target
+            CVector vecPosition;
+            GetPosition ( vecPosition );
+            CVector vecDirection = vecTargetPos - vecPosition;
+
+            // Convert direction to rotation
+            CVector vecRotation = vecDirection.ToRotation ();
+            SetRotationRadians ( vecRotation );
+        }
+        else
+        {
+            // Transform target position into local (AttachedToEntity) space
+            CMatrix attachedToMatrix;
+            m_pAttachedToEntity->GetMatrix ( attachedToMatrix );
+            CVector vecLocalTargetPos = attachedToMatrix.Inverse ().TransformVector ( vecTargetPos );
+
+            // Calculate local direction
+            CVector vecDirection = vecLocalTargetPos - m_vecAttachedPosition;
+
+            // Convert local direction to local rotation
+            CVector vecRotation = vecDirection.ToRotation ();
+
+            // Apply local rotation
+            SetAttachedOffsets ( m_vecAttachedPosition, vecRotation );
+        }
+
     }
 
     if ( m_State == WEAPONSTATE_FIRING ) Fire ();
