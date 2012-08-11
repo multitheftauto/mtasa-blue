@@ -217,9 +217,9 @@ int CLuaFunctionDefs::SetWeaponTarget ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponState", *argStream.GetErrorMessage () ) );
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponTarget", *argStream.GetErrorMessage () ) );
     }
-    else
+    else if ( argStream.NextIsNumber() )
     {
         CVector vecTarget;
         argStream.ReadNumber( vecTarget.fX );
@@ -234,7 +234,20 @@ int CLuaFunctionDefs::SetWeaponTarget ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponState", *argStream.GetErrorMessage () ) );
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponTarget", *argStream.GetErrorMessage () ) );
+    }
+    else if ( argStream.NextIsNil() )
+    {
+        if ( !argStream.HasErrors () )
+        {
+            if ( CStaticFunctionDefinitions::ClearWeaponTarget ( pWeapon ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponTarget", *argStream.GetErrorMessage () ) );
     }
 
     lua_pushboolean ( luaVM, false );

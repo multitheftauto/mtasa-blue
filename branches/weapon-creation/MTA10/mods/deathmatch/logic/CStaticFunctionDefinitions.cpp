@@ -6421,6 +6421,16 @@ bool CStaticFunctionDefinitions::SetWeaponTarget ( CClientWeapon * pWeapon, CVec
     return false;
 }
 
+bool CStaticFunctionDefinitions::ClearWeaponTarget ( CClientWeapon * pWeapon )
+{
+    if ( pWeapon )
+    {
+        pWeapon->ResetWeaponTarget ( );
+        return true;
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::GetTickCount_ ( double& dCount )
 {
     dCount = static_cast < double > ( GetTickCount64_() );

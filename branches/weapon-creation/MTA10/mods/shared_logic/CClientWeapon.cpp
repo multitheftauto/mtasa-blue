@@ -341,6 +341,6 @@ void CClientWeapon::ResetWeaponTarget ( void )
 {
     m_pTarget = NULL;
     m_vecTarget = CVector ( 0, 0, 0 );
-    m_targetType = TARGET_TYPE_NONE;
+    m_targetType = TARGET_TYPE_FIXED;
     m_targetBone = BONE_PELVIS;
 }

@@ -22,7 +22,7 @@ enum eTargetType
 {
     TARGET_TYPE_VECTOR,
     TARGET_TYPE_ENTITY,
-    TARGET_TYPE_NONE,
+    TARGET_TYPE_FIXED,
 };
 struct SWeaponConfiguration
 {
