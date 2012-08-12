@@ -102,6 +102,8 @@ private:
     CWeaponInfo         * WeaponInfos[NUM_WeaponInfosTotal];
     CModelInfoSA        ModelInfo[MODELINFO_MAX];
 public:
+    ZERO_ON_NEW
+
     CGameSA(); // constructor
     ~CGameSA ();
 
@@ -225,6 +227,12 @@ public:
     CPed*                   GetPedContext                   ( void );
 
     void                    GetShaderReplacementStats       ( SShaderReplacementStats& outStats );
+
+    void                    SetPreWeaponFireHandler         ( PreWeaponFireHandler* pPreWeaponFireHandler )     { m_pPreWeaponFireHandler = pPreWeaponFireHandler; }
+    void                    SetPostWeaponFireHandler        ( PostWeaponFireHandler* pPostWeaponFireHandler )   { m_pPostWeaponFireHandler = pPostWeaponFireHandler; }
+
+    PreWeaponFireHandler*   m_pPreWeaponFireHandler;
+    PostWeaponFireHandler*  m_pPostWeaponFireHandler;
 
 private:
     CPools                  * m_pPools;

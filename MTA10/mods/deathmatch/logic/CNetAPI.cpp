@@ -780,7 +780,6 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
         pPlayer->SetChoking ( flags.data.bIsChoking );       
     }
 
-    ModifyControllerStateForBulletSync ( pPlayer, ControllerState );
     pPlayer->SetControllerState ( ControllerState );
     if ( BitStream.Version () >= 0x2C )
     {
@@ -1080,7 +1079,6 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     }
 
     // Set move speed, controller state and camera rotation + duck state
-    ModifyControllerStateForBulletSync ( pPlayer, ControllerState );
     pPlayer->SetControllerState ( ControllerState );
     pPlayer->SetCameraRotation ( fCameraRotation );
     pPlayer->Duck ( flags.data.bIsDucked );
@@ -2150,21 +2148,6 @@ void CNetAPI::ReadVehicleResync ( CClientVehicle* pVehicle, NetBitStreamInterfac
     // Apply the correct move and turnspeed
     pVehicle->SetMoveSpeed ( velocity.data.vecVelocity );
     pVehicle->SetTurnSpeed ( turnSpeed.data.vecVelocity );
-}
-
-
-//
-// Allow bulletsync to modify fire button pressed state for remote players
-//
-void CNetAPI::ModifyControllerStateForBulletSync ( CClientPlayer* pPlayer, CControllerState& ControllerState )
-{
-    if ( ControllerState.ButtonCircle != 0 )
-    {
-        // If bullet sync is enabled for the current weapon, remove fire button presses
-        eWeaponType weaponType = pPlayer->GetCurrentWeaponType ();
-        if ( g_pClientGame->GetWeaponTypeUsesBulletSync ( weaponType ) )
-            ControllerState.ButtonCircle = 0;
-    }
 }
 
 

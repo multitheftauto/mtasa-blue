@@ -61,6 +61,9 @@ public:
     CWeaponInfo     * GetInfo( eWeaponSkill skill ) { return pGame->GetWeaponInfo( internalInterface->m_eWeaponType, skill ); };
 
     void            Remove ();
+
+    bool            FireBullet          ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget );
+    bool            FireInstantHit      ( CEntity * pFiringEntity, const CVector* pvecOrigin, const CVector * pvecMuzzle, CEntity* pTargetEntity, const CVector* pvecTarget, const CVector* pvec, bool bFlag1, bool bFlag2 );
 };
 
 #endif

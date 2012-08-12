@@ -248,6 +248,7 @@ public:
     bool                        HasWeapon                   ( eWeaponType weaponType );
     void                        RemoveWeapon                ( eWeaponType weaponType );
     void                        RemoveAllWeapons            ( void );
+    bool                        IsCurrentWeaponUsingBulletSync ( void );
 
     std::map<eMovementState,std::string> m_MovementStateNames;
     eMovementState              GetMovementState            ( void );

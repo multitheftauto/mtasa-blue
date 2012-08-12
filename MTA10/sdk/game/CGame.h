@@ -76,6 +76,9 @@ typedef void ( InRenderer ) ( void );
 
 #include <windows.h>
 
+typedef bool ( PreWeaponFireHandler ) ( class CPlayerPed* pPlayer, bool bStopIfUsingBulletSync );
+typedef void ( PostWeaponFireHandler ) ( void );
+
 enum eGameVersion 
 {
     VERSION_ALL = 0,
@@ -216,6 +219,9 @@ public:
     virtual CPed*               GetPedContext                   ( void ) = 0;
 
     virtual void                GetShaderReplacementStats       ( SShaderReplacementStats& outStats ) = 0;
+
+    virtual void                SetPreWeaponFireHandler         ( PreWeaponFireHandler* pPreWeaponFireHandler ) = 0;
+    virtual void                SetPostWeaponFireHandler        ( PostWeaponFireHandler* pPostWeaponFireHandler ) = 0;
 };
 
 #endif
