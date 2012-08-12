@@ -154,6 +154,10 @@ bool CWeaponSA::FireBullet ( CEntity* pFiringEntity, const CVector& vecOrigin, c
             // Bullet trace
             FireInstantHit ( pFiringEntity, &vecOrigin, &vecGunMuzzle, NULL, &vecTarget, NULL, false, true );
 
+            // Fire sound
+            if ( pFiringPlayerPed )
+                pFiringPlayerPed->AddWeaponAudioEvent ( EPedWeaponAudioEvent::FIRE );
+
             // Do post shot lag compensation reset & script events
             if ( pGame->m_pPostWeaponFireHandler && pFiringPlayerPed )
                 pGame->m_pPostWeaponFireHandler ();
@@ -179,7 +183,7 @@ bool CWeaponSA::FireInstantHit ( CEntity * pFiringEntity, const CVector* pvecOri
     DWORD dwTargetInterface = 0;
     if ( pTargetEntity ) dwTargetInterface = ( DWORD ) pTargetEntity->GetInterface ();
     DWORD dwThis = ( DWORD ) internalInterface;
-    DWORD dwFunc = 0x073FB10;
+    DWORD dwFunc = FUNC_CWeapon_FireInstantHit;
     _asm
     {
         mov     ecx, dwThis

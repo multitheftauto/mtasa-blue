@@ -992,6 +992,18 @@ float CPedSA::GetCurrentWeaponRange ( void )
     return pWeaponStat->GetWeaponRange ();
 }
 
+void CPedSA::AddWeaponAudioEvent ( EPedWeaponAudioEventType audioEventType )
+{
+    DWORD dwFunc = FUNC_CAEPedWeaponAudioEntity__AddAudioEvent;
+    CPedWeaponAudioEntitySAInterface* pThis = &GetPedInterface ()->weaponAudioEntity;
+    _asm
+    {
+        mov     ecx, pThis
+        push    audioEventType
+        call    dwFunc
+    }
+}
+
 /*
 bool CPedSA::CanPedReturnToState (  )
 {
