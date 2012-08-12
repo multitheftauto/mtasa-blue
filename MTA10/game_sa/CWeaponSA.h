@@ -22,6 +22,7 @@
 
 #define FUNC_Shutdown                                   0x73A380
 #define FUNC_CWeapon_CheckForShootingVehicleOccupant    0x73f480
+#define FUNC_CWeapon_FireInstantHit                     0x73FB10
 
 extern CGameSA * pGame;
 
