@@ -99,37 +99,3 @@ CTaskSimpleUseGunSAInterface* CPedIntelligenceSA::GetTaskUseGun ( void )
 
     return pTaskUseGun;
 }
-
-
-void CPedIntelligenceSA::DischargeCurrentWeapon ( bool bAllowReloadAnimation )
-{
-    // Get use gun task if available
-    CTaskSimpleUseGunSAInterface* pTaskUseGun = GetTaskUseGun ();
-    if ( !pTaskUseGun )
-        return;
-
-    if ( !bAllowReloadAnimation )
-    {
-        // Modify ammo to avoid reload animation
-        CWeapon* pWeapon = ped->GetWeapon ( ped->GetCurrentWeaponSlot () );
-        uint uiAmmoInClip = pWeapon->GetAmmoInClip ();
-        if ( uiAmmoInClip < 2 )
-        {
-            CWeaponInfoSAInterface* pWeaponInfo = (CWeaponInfoSAInterface*)pTaskUseGun->m_pWeaponInfo;
-            pWeapon->SetAmmoInClip ( uiAmmoInClip + pWeaponInfo->m_nAmmo );
-        }
-    }
-
-    // Flag for shot
-    pTaskUseGun->m_nFireGunThisFrame = 1;
-
-    // Do shot
-    CPedSAInterface* dwPedInterface = ( CPedSAInterface* ) ped->GetInterface ();
-    DWORD dwFunc = FUNC_CTaskSimpleUseGun_SetPedPosition;
-    _asm
-    {
-        mov     ecx, pTaskUseGun
-        push    dwPedInterface
-        call    dwFunc
-    }
-}

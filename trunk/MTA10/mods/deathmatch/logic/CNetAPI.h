@@ -71,7 +71,6 @@ private:
     void                    ReadKeysync                     ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
     void                    WriteKeysync                    ( CClientPed* pPed, NetBitStreamInterface& BitStream );
 
-    void                    ModifyControllerStateForBulletSync ( CClientPlayer* pPlayer, CControllerState& ControllerState );
     void                    ReadBulletsync                  ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
 
     void                    ReadPlayerPuresync              ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );

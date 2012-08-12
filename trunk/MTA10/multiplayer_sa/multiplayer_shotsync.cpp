@@ -60,6 +60,7 @@ char cTempGunDirection;
 DWORD vecTargetPosition;
 DWORD vecAltPos;
 CPedSAInterface * pShootingPed;
+EDamageReasonType g_GenerateDamageEventReason = EDamageReason::OTHER;
 
 static CPedSAInterface* pBulletImpactInitiator;
 static CEntitySAInterface* pBulletImpactVictim;
@@ -174,18 +175,21 @@ VOID WriteGunDirectionDataForPed ( CPedSAInterface * pPedInterface, float * fGun
     }
 }
 
-VOID WriteTargetDataForPed ( CPedSAInterface * pPed, DWORD vecTargetPos, CVector * origin )
+// Return false to stop bullet impact to being calculated here
+//   (False also assumes lag compensation movement has not been performed)
+bool WriteTargetDataForPed ( CPedSAInterface * pPed, DWORD vecTargetPos, CVector * origin )
 {
+    bool bDoBulletTraceHere = true;
     vecLastOrigin = *origin;
 
     // vecTargetPosition is a pointer to a vecTargetPosition*
     CPed * pTargetingPed = m_pools->GetPed ( (DWORD *)pPed );
     CPlayerPed* pTargetingPlayerPed = dynamic_cast < CPlayerPed* > ( pTargetingPed );
-    if ( !pTargetingPlayerPed ) return;
+    if ( !pTargetingPlayerPed ) return true;
 
     if ( m_pPreWeaponFireHandler && pTargetingPed )
     {
-        m_pPreWeaponFireHandler ( pTargetingPlayerPed );
+        bDoBulletTraceHere = m_pPreWeaponFireHandler ( pTargetingPlayerPed, true );
     }
 
     if ( !IsLocalPlayer( pTargetingPed ) )
@@ -200,6 +204,9 @@ VOID WriteTargetDataForPed ( CPedSAInterface * pPed, DWORD vecTargetPos, CVector
                 if ( data->m_shotSyncData.m_bUseOrigin )
                     *origin = data->m_shotSyncData.m_vecShotOrigin;
             }
+
+            // If current weapon has bullet sync enabled, don't allow firing
+            return bDoBulletTraceHere;
         }
     }
     else
@@ -207,6 +214,9 @@ VOID WriteTargetDataForPed ( CPedSAInterface * pPed, DWORD vecTargetPos, CVector
         // local ped firing
         LocalShotSyncData.m_vecShotOrigin = *origin;
     }
+
+    // Allow shot to be fired here
+    return true;
 }
 
 void Event_PostFire ( void )
@@ -522,7 +532,16 @@ VOID _declspec(naked) HOOK_CWeapon__Fire()
     // Weapon inaccuracy and animations problems may be fixed by blanking out the CWeapon variables nTimer and beyond.
 
     bWeaponFire = true;
-    WriteTargetDataForPed ( pShootingPed, vecTargetPosition, vecOrigin );
+    if ( !WriteTargetDataForPed ( pShootingPed, vecTargetPosition, vecOrigin ) )
+    {
+        // Don't fire shot
+         _asm
+        {
+            popad
+            mov     al, 1
+            retn    18h
+        }
+    }
 
      _asm
     {
@@ -723,6 +742,7 @@ bool ProcessDamageEvent ( CEventDamageSAInterface * event, CPedSAInterface * aff
         {
             // This creates a CEventDamageSA for us
             CEventDamage * pEvent = pGameInterface->GetEventList ()->GetEventDamage ( event );
+            pEvent->SetDamageReason ( g_GenerateDamageEventReason );
             // Call the event
             bool bReturn = m_pDamageHandler ( pPed, pEvent );
             // Destroy the CEventDamageSA (so we dont get a leak)
@@ -1061,11 +1081,16 @@ static void CheckInVehicleDamage()
 // If using bullet sync, send the bullet vectors to the other players
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMy_CWeapon_FireInstantHit_Mid ( CEntitySAInterface* pEntity, CVector vecStart, CVector vecEnd, bool bFlag )
+void OnMy_CWeapon_FireInstantHit_Mid ( CEntitySAInterface* pEntity, CVector* pvecNonAimedStart, CVector* pvecAimedStart, CVector* pvecEnd, bool bFlag )
 {
     CPed * pTargetingPed = m_pools->GetPed ( (DWORD *)pEntity );
     if ( IsLocalPlayer ( pTargetingPed ) )
     {
+        CVector vecEnd = *pvecEnd;
+        CVector vecStart = *pvecAimedStart;
+        if ( vecEnd == vecStart )
+            vecStart = *pvecNonAimedStart;
+
         // Trim end point to weapon range
         float fRange = pTargetingPed->GetCurrentWeaponRange ();
         CVector vecDir = vecEnd - vecStart;
@@ -1095,27 +1120,26 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit_Mid ()
     {
         pushad
 
-        mov         ecx,dword ptr [esp+14h+32]
-        push        eax
+        mov     ecx, esp
+        add     ecx, 20h
 
-        mov         eax,dword ptr [esp+14h+32]
-        sub         esp,0Ch
-        mov         edx,esp
-        mov         dword ptr [edx],eax
-        mov         eax,dword ptr [esp+28h+32]
-        mov         dword ptr [edx+4],ecx
-        mov         dword ptr [edx+8],eax
-        mov         edx,dword ptr [esp+3Ch+32+12]
-        mov         eax,dword ptr [esp+40h+32+12]
-        sub         esp,0Ch
-        mov         ecx,esp
-        mov         dword ptr [ecx],edx
-        mov         edx,dword ptr [esp+50h+32+12]
-        mov         dword ptr [ecx+4],eax
-        mov         dword ptr [ecx+8],edx
-        push        edi
+        push    eax             // flag
+
+        mov     edx, ecx
+        add     edx, 10h        // end
+        push    edx
+
+        mov     edx, ecx
+        add     edx, 38h        // aimed start
+        push    edx
+
+        mov     edx, ecx
+        add     edx, 78h        // non aimed start
+        push    edx
+
+        push    edi
         call    OnMy_CWeapon_FireInstantHit_Mid
-        add     esp, 4*8
+        add     esp, 4*5
         popad
 
         // Do original code and continue

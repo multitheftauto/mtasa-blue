@@ -84,7 +84,7 @@ void CNetworkStats::Draw ( void )
                 "BPS limit by CC: %llu\n"
                 "BPS limit by OB: %llu\n"
                 "Encryption: %s\n"
-                "Bullet sync: %s\n"
+                "Current wep bullet sync: %s\n"
                 "Veh. Extrapolate amount: %d%%\n"
                 "Veh. Extrapolate max: %dms\n"
                 "Client: %s\n"
