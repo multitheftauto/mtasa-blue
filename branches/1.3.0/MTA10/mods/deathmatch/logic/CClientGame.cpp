@@ -261,6 +261,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetGamePlayerDestructHandler( CClientGame::StaticGamePlayerDestructHandler );
     g_pMultiplayer->SetGameModelRemoveHandler( CClientGame::StaticGameModelRemoveHandler );
     g_pMultiplayer->SetGameEntityRenderHandler( CClientGame::StaticGameEntityRenderHandler );
+    g_pGame->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
+    g_pGame->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( CClientGame::StaticKeyStrokeHandler );
@@ -402,6 +404,8 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetGamePlayerDestructHandler( NULL );
     g_pMultiplayer->SetGameModelRemoveHandler( NULL );
     g_pMultiplayer->SetGameEntityRenderHandler( NULL );
+    g_pGame->SetPreWeaponFireHandler ( NULL );
+    g_pGame->SetPostWeaponFireHandler ( NULL );
     g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
@@ -3903,6 +3907,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
     ePedPieceTypes hitZone = pEvent->GetPedPieceType ();
     CWeaponInfo* pWeaponInfo = g_pGame->GetWeaponInfo ( weaponUsed );
     float fDamage = pEvent->GetDamageApplied ();
+    EDamageReasonType damageReason = pEvent->GetDamageReason ();
 
     /* Causes too much desync right now
     // Is this shotgun damage?
@@ -3949,7 +3954,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
         ///////////////////////////////////////////////////////////////////////////
 
         // Pass 1 checks for double shots
-        if ( fDamage == 0.0f )
+        if ( fDamage == 0.0f && damageReason != EDamageReason::PISTOL_WHIP )
         {
             // Only check for remote players
             CClientPlayer* pInflictingPlayer = DynamicCast < CClientPlayer > ( pInflictingEntity );
@@ -4562,7 +4567,7 @@ bool bShotCompensation = true;
 CVector vecWeaponFirePosition, vecRemoteWeaponFirePosition;
 CPlayerPed* pWeaponFirePed = NULL;
 
-void CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed )
+bool CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed, bool bStopIfUsingBulletSync )
 {
     pWeaponFirePed = pPlayerPed;
 
@@ -4577,7 +4582,10 @@ void CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed )
 
         // Move both players to where they should be for shot compensation
         if ( pPlayer && !pPlayer->IsLocalPlayer ())
-        {                   
+        {
+            if ( bStopIfUsingBulletSync && pPlayer->IsCurrentWeaponUsingBulletSync () )
+                return false;   // Don't apply shot compensation & tell caller to not do bullet trace
+
             if ( bShotCompensation )
             {
                 if ( !pVehicle || pLocalPlayer->GetOccupiedVehicleSeat() == 0 )
@@ -4606,6 +4614,7 @@ void CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed )
             }
         }
     }
+    return true;
 }
 
 

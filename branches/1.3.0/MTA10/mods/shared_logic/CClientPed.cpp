@@ -1933,6 +1933,11 @@ eWeaponType CClientPed::GetCurrentWeaponType ( void )
     return WEAPONTYPE_UNARMED;
 }
 
+bool CClientPed::IsCurrentWeaponUsingBulletSync ( void )
+{
+    eWeaponType weaponType = GetCurrentWeaponType ();
+    return g_pClientGame->GetWeaponTypeUsesBulletSync ( weaponType );
+}
 
 CWeapon* CClientPed::GetWeapon ( void )
 {

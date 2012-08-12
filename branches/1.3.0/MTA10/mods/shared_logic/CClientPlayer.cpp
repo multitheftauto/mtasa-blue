@@ -294,9 +294,13 @@ void CClientPlayer::DischargeWeapon ( eWeaponType weaponType, const CVector& vec
             m_shotSyncData->m_vecRemoteBulletSyncEnd = vecEnd;
             m_shotSyncData->m_bRemoteBulletSyncVectorsValid = true;
 
+            // Fire
             g_iDamageEventLimit = 1;
-            m_pPlayerPed->GetPedIntelligence ()->DischargeCurrentWeapon ( false );
+            CWeapon* pWeapon = m_pPlayerPed->GetWeapon ( m_pPlayerPed->GetCurrentWeaponSlot () );
+            pWeapon->FireBullet ( m_pPlayerPed, vecStart, vecEnd );
             g_iDamageEventLimit = -1;
+
+            m_shotSyncData->m_bRemoteBulletSyncVectorsValid = false;
         }
     }
 }

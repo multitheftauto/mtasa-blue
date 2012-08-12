@@ -35,6 +35,7 @@ public:
     virtual VOID            SetAsCurrentWeapon()=0;
     virtual CWeaponInfo     * GetInfo( eWeaponSkill skill )=0;
     virtual void            Remove ()=0;
+    virtual bool            FireBullet ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget ) = 0;
 };
 
 #endif

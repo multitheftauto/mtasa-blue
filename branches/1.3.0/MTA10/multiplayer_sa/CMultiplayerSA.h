@@ -51,6 +51,7 @@ public:
     CRemoteDataStorage *        CreateRemoteDataStorage     ();
     void                        DestroyRemoteDataStorage    ( CRemoteDataStorage* pData );
     void                        AddRemoteDataStorage        ( CPlayerPed* pPed, CRemoteDataStorage* pData );
+    CRemoteDataStorage*         GetRemoteDataStorage        ( CPlayerPed* pPed );
     void                        RemoveRemoteDataStorage     ( CPlayerPed* pPed );
     void                        EnableHooks_ClothesMemFix   ( bool bEnable );
 

@@ -70,7 +70,6 @@ public:
     CTaskManager                    * GetTaskManager( void );
     CVehicleScanner                 * GetVehicleScanner( void );
     bool                            TestForStealthKill ( CPed * pPed, bool bUnk );
-    void                            DischargeCurrentWeapon ( bool bAllowReloadAnimation );
     CTaskSimpleUseGunSAInterface*   GetTaskUseGun ( void );
 };
 

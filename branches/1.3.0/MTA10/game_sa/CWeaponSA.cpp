@@ -112,3 +112,87 @@ void CWeaponSA::Remove ()
         owner->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_UNARMED );
     }
 }
+
+
+bool CWeaponSA::FireBullet ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget )
+{
+    if ( !pFiringEntity )
+        return false;
+
+    switch ( GetType () )
+    {
+        case WEAPONTYPE_PISTOL:
+        case WEAPONTYPE_PISTOL_SILENCED:
+        case WEAPONTYPE_DESERT_EAGLE:
+        case WEAPONTYPE_SHOTGUN: 
+        case WEAPONTYPE_SAWNOFF_SHOTGUN:
+        case WEAPONTYPE_SPAS12_SHOTGUN:
+        case WEAPONTYPE_MICRO_UZI:
+        case WEAPONTYPE_MP5:
+        case WEAPONTYPE_AK47:
+        case WEAPONTYPE_M4:
+        case WEAPONTYPE_TEC9:
+        case WEAPONTYPE_COUNTRYRIFLE:
+        case WEAPONTYPE_SNIPERRIFLE:
+        case WEAPONTYPE_MINIGUN:
+        {
+            // Don't hit shooter
+            pGame->GetWorld ()->IgnoreEntity ( pFiringEntity );
+
+            // Do pre shot lag compensation
+            CPlayerPed* pFiringPlayerPed = dynamic_cast < CPlayerPed* > ( pFiringEntity );
+            if ( pGame->m_pPreWeaponFireHandler && pFiringPlayerPed )
+                pGame->m_pPreWeaponFireHandler ( pFiringPlayerPed, false );
+
+            // Get the gun muzzle position
+            float fSkill = 999.f;
+            CWeaponStat* pCurrentWeaponInfo = pGame->GetWeaponStatManager ( )->GetWeaponStatsFromSkillLevel ( GetType (), fSkill );
+            CVector vecGunMuzzle = *pCurrentWeaponInfo->GetFireOffset ();    
+            if ( pFiringPlayerPed )
+                pFiringPlayerPed->GetTransformedBonePosition ( BONE_RIGHTWRIST, &vecGunMuzzle );
+
+            // Bullet trace
+            FireInstantHit ( pFiringEntity, &vecOrigin, &vecGunMuzzle, NULL, &vecTarget, NULL, false, true );
+
+            // Do post shot lag compensation reset & script events
+            if ( pGame->m_pPostWeaponFireHandler && pFiringPlayerPed )
+                pGame->m_pPostWeaponFireHandler ();
+
+            pGame->GetWorld ()->IgnoreEntity ( NULL );
+
+            return true;
+        }
+
+        default:
+            break;
+
+    }
+    return false;
+}
+
+
+bool CWeaponSA::FireInstantHit ( CEntity * pFiringEntity, const CVector* pvecOrigin, const CVector* pvecMuzzle, CEntity* pTargetEntity, const CVector* pvecTarget, const CVector* pvec, bool bFlag1, bool bFlag2 )
+{
+    bool bReturn;
+    DWORD dwEntityInterface = 0;
+    if ( pFiringEntity ) dwEntityInterface = ( DWORD ) pFiringEntity->GetInterface ();
+    DWORD dwTargetInterface = 0;
+    if ( pTargetEntity ) dwTargetInterface = ( DWORD ) pTargetEntity->GetInterface ();
+    DWORD dwThis = ( DWORD ) internalInterface;
+    DWORD dwFunc = 0x073FB10;
+    _asm
+    {
+        mov     ecx, dwThis
+        push    bFlag2
+        push    bFlag1
+        push    pvec
+        push    pvecTarget
+        push    dwTargetInterface
+        push    pvecMuzzle
+        push    pvecOrigin
+        push    dwEntityInterface
+        call    dwFunc
+        mov     bReturn, al
+    }
+    return bReturn;
+}
