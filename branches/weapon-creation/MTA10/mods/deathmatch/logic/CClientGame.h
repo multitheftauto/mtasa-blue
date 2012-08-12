@@ -501,11 +501,12 @@ private:
     static bool                         StaticProcessMessage            ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     bool                                ProcessMessage                  ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
-    static void                         PreWeaponFire                   ( CPlayerPed* pPlayerPed );
-    static void                         PostWeaponFire                  ( void );
     static void                         BulletImpact                    ( CPed* pInitiator, CEntity* pVictim, const CVector* pStartPosition, const CVector* pEndPosition );
     static void                         BulletFire                      ( CPed* pInitiator, const CVector* pStartPosition, const CVector* pEndPosition );
 public:
+    static void                         PreWeaponFire                   ( CPlayerPed* pPlayerPed );
+    static void                         PostWeaponFire                  ( void );
+    static void                         RevertShotCompensation          ( CClientPed* pPlayerPed );
     static bool                         StaticProcessPacket             ( unsigned char ucPacketID, NetBitStreamInterface& bitStream );
 
     bool                                VerifySADataFiles               ( int iEnableClientChecks = 0 );

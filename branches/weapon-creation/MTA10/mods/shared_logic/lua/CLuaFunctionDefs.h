@@ -838,6 +838,8 @@ public:
     LUA_DECLARE ( SetWeaponProperty );
     LUA_DECLARE ( SetWeaponState );
     LUA_DECLARE ( SetWeaponTarget );
+    LUA_DECLARE ( SetWeaponOwner );
+    LUA_DECLARE ( GetWeaponOwner );
 
     // Command funcs
     LUA_DECLARE ( AddCommandHandler );

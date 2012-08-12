@@ -253,3 +253,52 @@ int CLuaFunctionDefs::SetWeaponTarget ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::GetWeaponOwner ( lua_State* luaVM )
+{
+    CClientWeapon * pWeapon;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWeapon );
+    if ( !argStream.HasErrors () )
+    {
+        CClientPlayer* pOwner = pWeapon->GetOwner();
+        if ( pOwner )
+        {
+            lua_pushelement ( luaVM, pOwner );
+            return 1;
+        }
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetWeaponOwner ( lua_State* luaVM )
+{
+    CClientWeapon * pWeapon;
+    CClientPlayer * pPlayer;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWeapon );
+    if ( argStream.NextIsUserData() )
+    {
+        argStream.ReadUserData ( pPlayer );
+        if ( !argStream.HasErrors () )
+        {
+            pWeapon->SetOwner( pPlayer );
+
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else if ( argStream.NextIsNil() )
+    {
+        if ( !argStream.HasErrors () )
+        {
+            pWeapon->SetOwner( NULL );
+
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    lua_pushnil ( luaVM );
+    return 1;
+}

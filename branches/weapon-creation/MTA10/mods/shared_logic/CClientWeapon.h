@@ -59,6 +59,8 @@ public:
     void                    SetTargetDirection      ( CVector & vecDirection );
     void                    LookAt                  ( CVector & vecPosition, bool bInterpolate = false );
     CWeaponStat *           GetWeaponStat           ( void )   { return m_pWeaponStat; }
+    CClientPlayer *         GetOwner                ( void )                { return m_pOwner; }
+    void                    SetOwner                ( CClientPlayer * pOwner )  { m_pOwner = pOwner; }
 
 private:
     CClientManager *        m_pManager;
@@ -79,6 +81,7 @@ private:
     eTargetType             m_targetType;
     eBone                   m_targetBone;
     SWeaponConfiguration    m_weaponConfig;
+    CClientPlayer *         m_pOwner;  // For lag compensation
 };
 
 #endif

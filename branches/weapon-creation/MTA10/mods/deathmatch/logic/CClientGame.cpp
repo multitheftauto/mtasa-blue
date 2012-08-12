@@ -4508,7 +4508,7 @@ void CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed )
         // Get the CClientNetPlayer class with the specified player ped
         CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->Get ( pWeaponFirePed, true );
 
-        // Move both players to where they should be for shot compensation
+        // Move the local player to where they should be for shot compensation
         if ( pPlayer && !pPlayer->IsLocalPlayer ())
         {                   
             if ( bShotCompensation )
@@ -4553,22 +4553,7 @@ void CClientGame::PostWeaponFire ( void )
         {
             if ( pPed->GetType () == CCLIENTPLAYER )
             {
-                if ( bShotCompensation )
-                {
-                    // Restore compensated positions            
-                    if ( !pPed->IsLocalPlayer () )
-                    {
-                        CClientVehicle* pVehicle = pLocalPlayer->GetRealOccupiedVehicle ();
-                        if ( !pVehicle )
-                        {
-                            pLocalPlayer->SetPosition ( vecWeaponFirePosition );
-                        }
-                        else if ( pLocalPlayer->GetOccupiedVehicleSeat() == 0 )
-                        {
-                            pVehicle->SetPosition ( vecWeaponFirePosition );
-                        }
-                    }
-                }
+                RevertShotCompensation( pPed );
             }
 
             // Call some events
@@ -4640,6 +4625,27 @@ void CClientGame::PostWeaponFire ( void )
         }        
     }
     pWeaponFirePed = NULL;
+}
+
+void CClientGame::RevertShotCompensation ( CClientPed* pPed )
+{
+    CClientPed* pLocalPlayer = g_pClientGame->m_pLocalPlayer;
+    if ( bShotCompensation && pLocalPlayer )
+    {
+        // Restore compensated positions            
+        if ( !pPed->IsLocalPlayer () )
+        {
+            CClientVehicle* pVehicle = pLocalPlayer->GetRealOccupiedVehicle ();
+            if ( !pVehicle )
+            {
+                pLocalPlayer->SetPosition ( vecWeaponFirePosition );
+            }
+            else if ( pLocalPlayer->GetOccupiedVehicleSeat() == 0 )
+            {
+                pVehicle->SetPosition ( vecWeaponFirePosition );
+            }
+        }
+    }
 }
 
 void CClientGame::BulletImpact ( CPed* pInitiator, CEntity* pVictim, const CVector* pStartPosition, const CVector* pEndPosition )

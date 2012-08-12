@@ -24,6 +24,7 @@ CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponT
     m_pWeapon = NULL;
     m_pWeaponInfo = g_pGame->GetWeaponInfo ( m_Type );
     m_bHasTargetDirection = false;
+    m_pOwner = NULL;
 
     SetTypeName ( "weapon" );
 
@@ -260,6 +261,15 @@ void CClientWeapon::Fire ( void )
             m_pWeaponInfo->SetTargetRange ( m_pWeaponStat->GetTargetRange ( ) );
             m_pWeaponInfo->SetWeaponRange ( m_pWeaponStat->GetWeaponRange ( ) );
 
+            // Begin our lag compensation
+            CPlayerPed* pOwnerPed = NULL;
+            if ( m_pOwner && !m_pTarget && g_pClientGame->GetPlayerManager()->Exists(m_pOwner) ) // No need for compensation if we're hitting a target directly
+            {
+                pOwnerPed = m_pOwner->GetGamePlayer();
+                if ( pOwnerPed )
+                    g_pClientGame->PreWeaponFire( pOwnerPed );
+            }
+
             // Process
             m_pMarker->SetPosition ( vecTarget );
             FireInstantHit ( vecOrigin, vecTarget );
@@ -269,6 +279,10 @@ void CClientWeapon::Fire ( void )
             m_pWeaponInfo->SetAccuracy ( fAccuracy );
             m_pWeaponInfo->SetTargetRange ( fTargetRange );
             m_pWeaponInfo->SetWeaponRange ( fRange );
+
+            // End our lag compensation
+            if ( pOwnerPed )
+                g_pClientGame->RevertShotCompensation( g_pClientGame->GetPedManager()->Get(pOwnerPed,false,false) );
 
             break;
         }
@@ -422,3 +436,5 @@ void CClientWeapon::ResetWeaponTarget ( void )
     m_targetType = TARGET_TYPE_FIXED;
     m_targetBone = BONE_PELVIS;
 }
+
+
