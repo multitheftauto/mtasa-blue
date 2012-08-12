@@ -175,6 +175,7 @@ void CMultiplayerSA::InitMemoryCopies_13 ( void )
     //MemPut < BYTE > ( 0x685AC1, 0xEB );
     //MemPut < BYTE > ( 0x685C2D, 0xEB );
 
+    MemPut < BYTE > ( 0x0706AB0, 0xC3 );    // Skip CRealTimeShadowManager::Update 
 }
 
 // Siren Stuff

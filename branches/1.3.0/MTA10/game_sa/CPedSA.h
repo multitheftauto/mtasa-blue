@@ -50,6 +50,7 @@ class CPedIntelligenceSAInterface;
 
 #define FUNC_CPedClothesDesc__SetTextureAndModel    0x5A8080
 #define FUNC_CClothes__RebuildPlayer                0x5A82C0
+#define FUNC_CAEPedWeaponAudioEntity__AddAudioEvent 0x4E69F0
 
 #define FUNC_QuitEnteringCar                        0x650130 // really belongs in CCarEnterExit
 
@@ -264,6 +265,11 @@ unsigned int bUsedForReplay : 1; // This ped is controlled by replay and should 
 
 };
 
+class CPedWeaponAudioEntitySAInterface
+{
+public:
+};
+
 class CPedSAInterface : public CPhysicalSAInterface // +1420  = current vehicle   312 first byte
 {
 public:
@@ -272,7 +278,9 @@ public:
     //CWeaponSAInterface    Weapons[9]; // 1032
     BYTE bPad[348];
     CPedSoundSAInterface pedSound;
-    BYTE bPad11[472 - sizeof(CPedSoundSAInterface)];
+    BYTE bPad11[256 - sizeof(CPedSoundSAInterface)];
+    CPedWeaponAudioEntitySAInterface weaponAudioEntity;
+    BYTE bPad12[216 - sizeof(CPedWeaponAudioEntitySAInterface)];
     CPedFlags pedFlags; // 1132 (16 bytes long including alignment probably)
     CPedIntelligenceSAInterface * pPedIntelligence;
     CPlayerPedDataSAInterface * pPlayerData; //1152
@@ -428,6 +436,7 @@ public:
 
     CWeaponStat*        GetCurrentWeaponStat    ( void );
     float               GetCurrentWeaponRange   ( void );
+    void                AddWeaponAudioEvent     ( EPedWeaponAudioEventType audioEventType );
 };
 
 #endif
