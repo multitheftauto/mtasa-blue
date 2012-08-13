@@ -1522,7 +1522,7 @@ bool CClientEntity::IsCollidableWith ( CClientEntity * pEntity )
 }
 
 
-void CClientEntity::SetCollidableWith ( CClientEntity * pEntity, bool bCanCollide )
+void CClientEntity::SetCollidableWith ( CClientEntity * pEntity, bool bCanCollide, bool bGameSACollision )
 {
     // quit if no change
     if ( MapContains( m_DisabledCollisions, pEntity ) != bCanCollide )
@@ -1531,16 +1531,17 @@ void CClientEntity::SetCollidableWith ( CClientEntity * pEntity, bool bCanCollid
     if ( bCanCollide )
     {
         MapRemove ( m_DisabledCollisions, pEntity );
-        if ( m_DisabledCollisions.empty () )
+        if ( m_DisabledCollisions.empty () && bGameSACollision )
             MapRemove ( g_pClientGame->m_AllDisabledCollisions, this );
     }
     else
     {
         MapSet ( m_DisabledCollisions, pEntity, true );
-        MapSet ( g_pClientGame->m_AllDisabledCollisions, this, true );
+        if ( bGameSACollision )
+            MapSet ( g_pClientGame->m_AllDisabledCollisions, this, true );
     }
     // Set in the other entity as well
-    pEntity->SetCollidableWith ( this, bCanCollide );
+    pEntity->SetCollidableWith ( this, bCanCollide, bGameSACollision );
 }
 
 

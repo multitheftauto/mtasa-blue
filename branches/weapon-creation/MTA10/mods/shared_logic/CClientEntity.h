@@ -281,7 +281,7 @@ public:
     virtual const CEntity*                      GetGameEntity               ( void ) const            { return NULL; }
 
     bool                                        IsCollidableWith            ( CClientEntity * pEntity );
-    void                                        SetCollidableWith           ( CClientEntity * pEntity, bool bCanCollide );
+    void                                        SetCollidableWith           ( CClientEntity * pEntity, bool bCanCollide, bool bGameSACollision = true );
 
     bool                                        IsDoubleSided               ( void );
     void                                        SetDoubleSided              ( bool bEnable );

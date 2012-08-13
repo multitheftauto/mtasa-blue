@@ -3164,6 +3164,7 @@ bool CStaticFunctionDefinitions::SetElementCollidableWith ( CClientEntity & Enti
         case CCLIENTPED:
         case CCLIENTOBJECT:
         case CCLIENTVEHICLE:
+        case CCLIENTWEAPON:
         {
             switch ( ThisEntity.GetType () )
             {
@@ -3172,15 +3173,34 @@ bool CStaticFunctionDefinitions::SetElementCollidableWith ( CClientEntity & Enti
                 case CCLIENTOBJECT:
                 case CCLIENTVEHICLE:
                 {    
-                    Entity.SetCollidableWith ( &ThisEntity, bCanCollide );
+                    Entity.SetCollidableWith ( &ThisEntity, bCanCollide, true );
                     return true;
                 }
                 default: break;
             }
             break;
         }
+    }
+    
+    // Two weapons can't ever collide.  So only accept it as one arg
+    switch ( ThisEntity.GetType () )
+    {
+        case CCLIENTWEAPON:
+        switch ( Entity.GetType () )
+        {
+            case CCLIENTPLAYER:
+            case CCLIENTPED:
+            case CCLIENTOBJECT:
+            case CCLIENTVEHICLE:
+            {
+                Entity.SetCollidableWith ( &ThisEntity, bCanCollide, true );
+                return true;
+            }
+            default: break;
+        }
         default: break;
     }
+
 
     return false;
 }
