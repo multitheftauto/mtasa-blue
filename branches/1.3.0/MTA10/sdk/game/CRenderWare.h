@@ -23,9 +23,17 @@ typedef CShaderItem CSHADERDUMMY;
 // A list of custom textures to add to a model's txd
 struct SReplacementTextures
 {
-    std::vector < RwTexture* >  textures;
-    std::vector < ushort >      usedInTxdIds;
-    std::vector < ushort >      usedInModelIds;
+    struct SPerTxd
+    {
+        std::vector < RwTexture* >  usingTextures;
+        ushort                      usTxdId;
+        bool                        bTexturesAreCopies;
+    };
+
+    std::vector < RwTexture* >      textures;       // List of textures we want to inject into TXD's
+    std::vector < SPerTxd >         perTxdList;     // TXD's which have been modified
+    std::vector < ushort >          usedInTxdIds;
+    std::vector < ushort >          usedInModelIds;
 };
 
 // Shader layers to render
