@@ -1846,13 +1846,13 @@ void CClientGame::UpdatePlayerTarget ( void )
     m_pLocalPlayer->WorldIgnore ( false );
 
     // Kill the colpoint or we get a severe memoryleak
-    if ( pColPoint ) pColPoint->Destroy ();
+    if ( pColPoint )
+        pColPoint->Destroy ();
 
     if ( pColEntity != m_pTargetedGameEntity )
     {
         m_pTargetedGameEntity = pColEntity;
 
-        CClientEntity* pNewEntity = NULL;
         if ( pColEntity )
         {
             m_pTargetedEntity = m_pManager->FindEntity ( pColEntity );
@@ -1870,7 +1870,7 @@ void CClientGame::UpdatePlayerTarget ( void )
 
         // Send the target
         ElementID TargetID = INVALID_ELEMENT_ID;
-        if ( m_pTargetedEntity )
+        if ( m_pTargetedEntity && !m_pTargetedEntity->IsLocalEntity ())
         {
             TargetID = m_pTargetedEntity->GetID ();
         }
