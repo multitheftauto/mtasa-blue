@@ -217,6 +217,15 @@ public:
     {
         static const unsigned int bitcount = NumberOfSignificantBits < ( MAX_ELEMENTS - 1 ) >::COUNT;
         const unsigned int& IDref = ID.Value ();
+        #ifdef MTA_CLIENT
+            if ( IDref != INVALID_ELEMENT_ID && IDref >= MAX_SERVER_ELEMENTS )
+            {
+                dassert ( "Sending client side element id to server" && 0 );
+                uint uiInvalidId = INVALID_ELEMENT_ID;
+                WriteBits ( reinterpret_cast < const unsigned char* > ( &uiInvalidId ), bitcount );
+                return;
+            }
+        #endif
         WriteBits ( reinterpret_cast < const unsigned char* > ( &IDref ), bitcount );
     }
 

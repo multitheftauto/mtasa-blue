@@ -1627,7 +1627,7 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
 
         // Write the trailer chain
         CClientVehicle* pTrailer = pVehicle->GetRealTowedVehicle ();
-        while ( pTrailer )
+        while ( pTrailer && !pTrailer->IsLocalEntity () )
         {
             BitStream.WriteBit ( true );
             BitStream.Write ( pTrailer->GetID () );
