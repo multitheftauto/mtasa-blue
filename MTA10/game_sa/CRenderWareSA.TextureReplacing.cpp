@@ -143,8 +143,40 @@ bool CRenderWareSA::ModelInfoTXDAddTextures ( SReplacementTextures* pReplacement
     if ( ListContains ( pReplacementTextures->usedInTxdIds, pInfo->usTxdId ) )
         return true;    // Return true as model may need restreaming
 
-    // Add each texture
+    //
+    // Add section for this txd
+    //
+    pReplacementTextures->perTxdList.push_back ( SReplacementTextures::SPerTxd () );
+    SReplacementTextures::SPerTxd& perTxdInfo = pReplacementTextures->perTxdList.back ();
+
+    perTxdInfo.usTxdId = pInfo->usTxdId;
+    perTxdInfo.bTexturesAreCopies = ( pReplacementTextures->usedInTxdIds.size () > 0 );
+
+    // Copy / clone textures
     for ( std::vector < RwTexture* >::iterator iter = pReplacementTextures->textures.begin () ; iter != pReplacementTextures->textures.end () ; iter++ )
+    {
+        RwTexture* pNewTexture = *iter;
+
+        // Use a copy if not first txd
+        if ( perTxdInfo.bTexturesAreCopies )
+        {
+            // Reuse the given texture's raster
+            RwTexture* pCopyTex = RwTextureCreate ( pNewTexture->raster );
+
+            // Copy over additional properties
+            MemCpyFast ( &pCopyTex->name, &pNewTexture->name, RW_TEXTURE_NAME_LENGTH );
+            MemCpyFast ( &pCopyTex->mask, &pNewTexture->mask, RW_TEXTURE_NAME_LENGTH );
+            pCopyTex->flags = pNewTexture->flags;
+            
+            pNewTexture = pCopyTex;
+        }
+        perTxdInfo.usingTextures.push_back ( pNewTexture );
+    }
+
+    //
+    // Add each texture to the target txd
+    //
+    for ( std::vector < RwTexture* >::iterator iter = perTxdInfo.usingTextures.begin () ; iter != perTxdInfo.usingTextures.end () ; iter++ )
     {
         RwTexture* pNewTexture = *iter;
 
@@ -178,10 +210,12 @@ bool CRenderWareSA::ModelInfoTXDAddTextures ( SReplacementTextures* pReplacement
 void CRenderWareSA::ModelInfoTXDRemoveTextures ( SReplacementTextures* pReplacementTextures )
 {
     // For each using txd
-    for ( uint i = 0 ; i < pReplacementTextures->usedInTxdIds.size () ; i++ )
+    for ( uint i = 0 ; i < pReplacementTextures->perTxdList.size () ; i++ )
     {
+        SReplacementTextures::SPerTxd& perTxdInfo = pReplacementTextures->perTxdList[i];
+
         // Get textures info
-        ushort usTxdId = pReplacementTextures->usedInTxdIds[i];
+        ushort usTxdId = perTxdInfo.usTxdId;
         CModelTexturesInfo* pInfo = MapFind ( ms_ModelTexturesInfoMap, usTxdId );
 
         // Validate
@@ -189,11 +223,17 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures ( SReplacementTextures* pReplacem
         dassert ( ListContains ( pInfo->usedByReplacements, pReplacementTextures ) );
 
         // Remove replacement textures
-        for ( uint i = 0 ; i < pReplacementTextures->textures.size () ; i++ )
+        for ( uint i = 0 ; i < perTxdInfo.usingTextures.size () ; i++ )
         {
-            RwTexture* pOldTexture = pReplacementTextures->textures[i];
+            RwTexture* pOldTexture = perTxdInfo.usingTextures[i];
             RwTexDictionaryRemoveTexture ( pInfo->pTxd, pOldTexture );
             dassert ( !RwTexDictionaryContainsTexture ( pInfo->pTxd, pOldTexture ) );
+            if ( perTxdInfo.bTexturesAreCopies )
+            {
+                // Destroy the copy (but not the raster as that was not copied)
+                pOldTexture->raster = NULL;
+                RwTextureDestroy ( pOldTexture );
+            }
         }
 
         // Ensure there are original named textures in the txd
