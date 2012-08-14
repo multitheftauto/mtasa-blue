@@ -672,6 +672,11 @@ void CDatabaseJobQueueImpl::ProcessConnect ( CDbJobData* pJobData )
     // Extract some options
     GetOption < CDbOptionsMap > ( parts[4], "log", pConnection->m_bLoggingEnabled, 0 );
     GetOption < CDbOptionsMap > ( parts[4], "tag", pConnection->m_strLogTag );
+    GetOption < CDbOptionsMap > ( parts[4], "suppress", ",", pConnection->m_SuppressedErrorCodes );
+
+    // Only allow error codes to be suppress with mysql, as sqlite only has one error code
+    if ( pTypeManager->GetDataSourceTag () != "mysql" )
+        pConnection->m_SuppressedErrorCodes.clear ();
 
     // Get handle from CDatabaseConnection*
     SConnectionHandle connectionHandle = MakeHandleForConnection ( pConnection );
@@ -734,6 +739,7 @@ void CDatabaseJobQueueImpl::ProcessQuery ( CDbJobData* pJobData )
         pJobData->result.status = EJobResult::FAIL;
         pJobData->result.strReason = pConnection->GetLastErrorMessage ();
         pJobData->result.uiErrorCode = pConnection->GetLastErrorCode ();
+        pJobData->result.bErrorSuppressed = MapContains ( pConnection->m_SuppressedErrorCodes, pConnection->GetLastErrorCode () );
     }
     else
     {

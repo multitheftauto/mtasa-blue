@@ -11463,7 +11463,8 @@ int CLuaFunctionDefinitions::DbQuery ( lua_State* luaVM )
         CDbJobData* pJobData = g_pGame->GetDatabaseManager ()->QueryStart ( pElement->GetConnectionHandle (), strQuery, &Args );
         if ( !pJobData )
         {
-            m_pScriptDebugging->LogWarning ( luaVM, "%s failed; %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
+            if ( !g_pGame->GetDatabaseManager ()->IsLastErrorSuppressed () )
+                m_pScriptDebugging->LogWarning ( luaVM, "%s failed; %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
             lua_pushboolean ( luaVM, false );
             return 1;
         }
@@ -11508,7 +11509,8 @@ int CLuaFunctionDefinitions::DbExec ( lua_State* luaVM )
         CDbJobData* pJobData = g_pGame->GetDatabaseManager ()->Exec ( pElement->GetConnectionHandle (), strQuery, &Args );
         if ( !pJobData )
         {
-            m_pScriptDebugging->LogError ( luaVM, "%s failed: %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
+            if ( !g_pGame->GetDatabaseManager ()->IsLastErrorSuppressed () )
+                m_pScriptDebugging->LogError ( luaVM, "%s failed: %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
             lua_pushboolean ( luaVM, false );
             return 1;
         }
@@ -11573,7 +11575,8 @@ int CLuaFunctionDefinitions::DbPoll ( lua_State* luaVM )
 
         if ( pJobData->result.status == EJobResult::FAIL )
         {
-            m_pScriptDebugging->LogWarning ( luaVM, "%s failed; %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
+            if ( !g_pGame->GetDatabaseManager ()->IsLastErrorSuppressed () )
+                m_pScriptDebugging->LogWarning ( luaVM, "%s failed; %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
             lua_pushboolean ( luaVM, false );
             lua_pushnumber ( luaVM, pJobData->result.uiErrorCode );
             lua_pushstring ( luaVM, pJobData->result.strReason );

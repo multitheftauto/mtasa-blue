@@ -108,6 +108,7 @@ public:
         EJobResultType      status;
         uint                uiErrorCode;
         SString             strReason;
+        bool                bErrorSuppressed;
         SConnectionHandle   connectionHandle;
         uint                uiNumAffectedRows;
         CRegistryResult     registryResult;
@@ -153,6 +154,7 @@ public:
     virtual bool                    QueryFree               ( CDbJobData* pJobData ) = 0;
     virtual CDbJobData*             GetQueryFromId          ( SDbJobId id ) = 0;
     virtual const SString&          GetLastErrorMessage     ( void ) = 0;
+    virtual bool                    IsLastErrorSuppressed   ( void ) = 0;
     virtual bool                    QueryWithResultf        ( SConnectionHandle hConnection, CRegistryResult* pResult, const char* szQuery, ... ) = 0;
     virtual bool                    QueryWithCallbackf      ( SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const char* szQuery, ... ) = 0;
     virtual void                    SetLogLevel             ( EJobLogLevelType logLevel, const SString& strLogFilename ) = 0;
