@@ -135,7 +135,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                     BitStream.Read ( TrailerID );
                     CElement* pElement = CElementIDs::GetElement ( TrailerID );
                     if ( pElement )
-                        pTrailer = static_cast < CVehicle* > ( pElement );
+                        pTrailer = dynamic_cast < CVehicle* > ( pElement );  // Uses dynamic_cast as pre r4481 client could send as incorrect element
                     
                     // Read out the trailer position and rotation
                     SPositionSync trailerPosition ( false );
