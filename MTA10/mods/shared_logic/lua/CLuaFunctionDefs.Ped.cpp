@@ -18,6 +18,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define REMOVEPEDFROMVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION  "1.3.0-9.04482"
+#define WARPPEDINTOVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION    "1.3.0-9.04482"
 
 int CLuaFunctionDefs::GetPedVoice ( lua_State* luaVM )
 {
@@ -1254,6 +1256,14 @@ int CLuaFunctionDefs::WarpPedIntoVehicle ( lua_State* luaVM )
     argStream.ReadUserData ( pVehicle );
     argStream.ReadNumber ( uiSeat, 0 );
 
+    MinClientCheck ( argStream, WARPPEDINTOVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION, "function is being called client side" );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( !pPed->IsLocalEntity () || !pVehicle->IsLocalEntity () )
+            argStream.SetCustomError ( "This client side function will only work with client created peds and vehicles" );
+    }
+
     if ( !argStream.HasErrors () )
     {
         if ( CStaticFunctionDefinitions::WarpPedIntoVehicle ( pPed, pVehicle, uiSeat ) )
@@ -1277,6 +1287,14 @@ int CLuaFunctionDefs::RemovePedFromVehicle ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pPed );
+
+    MinClientCheck ( argStream, REMOVEPEDFROMVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION, "function is being called client side" );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( !pPed->IsLocalEntity ()  )
+            argStream.SetCustomError ( "This client side function will only work with client created peds" );
+    }
 
     if ( !argStream.HasErrors () )
     {
