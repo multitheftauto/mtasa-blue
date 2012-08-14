@@ -944,7 +944,7 @@ bool CStaticFunctionDefinitions::SetElementData ( CClientEntity& Entity, const c
     CLuaArgument * pCurrentVariable = Entity.GetCustomData ( szName, false );
     if ( !pCurrentVariable || Variable != *pCurrentVariable )
     {
-        if ( bSynchronize )
+        if ( bSynchronize && !Entity.IsLocalEntity () )
         {
             // Allocate a bitstream
             NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
