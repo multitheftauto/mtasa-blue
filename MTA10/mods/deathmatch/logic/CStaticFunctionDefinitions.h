@@ -175,6 +175,8 @@ public:
     static bool                         SetPedCameraRotation                ( CClientEntity& Entity, float fRotation );
     static bool                         SetPedAimTarget                     ( CClientEntity& Entity, CVector & vecTarget );
     static bool                         SetPedOnFire                        ( CClientEntity& Entity, bool bOnFire );
+    static bool                         RemovePedFromVehicle                ( CClientPed* pPed );
+    static bool                         WarpPedIntoVehicle                  ( CClientPed* pPed, CClientVehicle* pVehicle, unsigned int uiSeat );
 
     // Extra Clothes functions
     static bool                         GetBodyPartName                     ( unsigned char ucID, SString& strOutName );

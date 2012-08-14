@@ -271,6 +271,8 @@ public:
     LUA_DECLARE ( SetPedCameraRotation );
     LUA_DECLARE ( SetPedAimTarget );
     LUA_DECLARE ( SetPedOnFire );
+    LUA_DECLARE ( WarpPedIntoVehicle );
+    LUA_DECLARE ( RemovePedFromVehicle );
     LUA_DECLARE ( SetWeaponProperty );
 
     // Clothes and body functions
