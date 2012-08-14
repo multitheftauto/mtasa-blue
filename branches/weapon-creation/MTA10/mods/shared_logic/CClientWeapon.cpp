@@ -295,23 +295,18 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
     CVector vecDirection = vecTarget - vecOrigin;
     vecDirection.Normalize ();
     CClientEntity * pAttachedTo = GetAttachedTo ();    
-
+    
     CEntity * pColEntity = NULL;
     CColPoint * pColPoint = NULL;
     SLineOfSightBuildingResult pBuildingResult;
     CEntitySAInterface * pEntity = NULL;
-    
-    for (std::map<CClientEntity*,bool>::iterator i=m_DisabledCollisions.begin();i!=m_DisabledCollisions.end();i++)
-        i->first->WorldIgnore(true);
 
+    if ( pAttachedTo ) pAttachedTo->WorldIgnore ( true );
     if ( m_pWeapon->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pColEntity, m_weaponConfig.flags, &pBuildingResult, m_Type, &pEntity ) )
     {
         vecTarget = pColPoint->GetPosition ();
     }
-
-    for (std::map<CClientEntity*,bool>::iterator i=m_DisabledCollisions.begin();i!=m_DisabledCollisions.end();i++)
-        if ( i->second )
-            i->first->WorldIgnore(false);
+    if ( pAttachedTo ) pAttachedTo->WorldIgnore ( false );
 
     if ( ( m_pTarget != NULL && m_pTarget->GetGameEntity ( ) != NULL && m_pTarget->GetGameEntity()->GetInterface ( ) != pEntity ) && m_weaponConfig.bShootIfTargetBlocked == false )
     {
@@ -324,6 +319,7 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
 
     m_pWeapon->AddGunshell ( m_pObject, &vecOrigin, &CVector2D ( 0, -1 ), 0.45f );
     g_pGame->GetAudioEngine ()->ReportWeaponEvent ( WEAPON_EVENT_FIRE, m_Type, m_pObject );
+
 
 
     CVector vecCollision;
@@ -438,4 +434,5 @@ void CClientWeapon::ResetWeaponTarget ( void )
     m_targetType = TARGET_TYPE_FIXED;
     m_targetBone = BONE_PELVIS;
 }
+
 
