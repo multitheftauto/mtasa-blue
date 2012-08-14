@@ -2461,7 +2461,8 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
                             if ( pEntity )
                             {
                                 pCollisionEntity = pEntity;
-                                CollisionEntityID = pEntity->GetID ();
+                                if ( !pEntity->IsLocalEntity () )
+                                    CollisionEntityID = pEntity->GetID ();
                             }
                         }
                     }
