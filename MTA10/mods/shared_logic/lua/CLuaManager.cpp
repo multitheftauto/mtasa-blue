@@ -334,6 +334,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementParent", CLuaFunctionDefs::SetElementParent );
     CLuaCFunctions::AddFunction ( "setElementData", CLuaFunctionDefs::SetElementData );
     //CLuaCFunctions::AddFunction ( "removeElementData", CLuaFunctionDefs::RemoveElementData ); TODO Clientside
+    CLuaCFunctions::AddFunction ( "setElementMatrix", CLuaFunctionDefs::SetElementMatrix );
     CLuaCFunctions::AddFunction ( "setElementPosition", CLuaFunctionDefs::SetElementPosition );
     CLuaCFunctions::AddFunction ( "setElementRotation", CLuaFunctionDefs::SetElementRotation );
     CLuaCFunctions::AddFunction ( "setElementVelocity", CLuaFunctionDefs::SetElementVelocity );

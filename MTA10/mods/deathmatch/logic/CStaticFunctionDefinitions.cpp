@@ -987,6 +987,15 @@ bool CStaticFunctionDefinitions::RemoveElementData ( CClientEntity& Entity, cons
 }
 
 
+bool CStaticFunctionDefinitions::SetElementMatrix ( CClientEntity& Entity, const CMatrix& matrix )
+{
+    RUN_CHILDREN SetElementMatrix ( **iter, matrix );
+
+    Entity.SetMatrix ( matrix );
+
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::SetElementPosition ( CClientEntity& Entity, const CVector& vecPosition, bool bWarp )
 {

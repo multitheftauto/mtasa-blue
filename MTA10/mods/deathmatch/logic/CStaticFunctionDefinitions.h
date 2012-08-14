@@ -89,6 +89,7 @@ public:
     static bool                         SetElementID                        ( CClientEntity& Entity, const char* szID );
     static bool                         SetElementData                      ( CClientEntity& Entity, const char* szName, CLuaArgument& Variable, CLuaMain& LuaMain, bool bSynchronize );
     static bool                         RemoveElementData                   ( CClientEntity& Entity, const char* szName );
+    static bool                         SetElementMatrix                    ( CClientEntity& Entity, const CMatrix& matrix );
     static bool                         SetElementPosition                  ( CClientEntity& Entity, const CVector& vecPosition, bool bWarp = true );
     static bool                         SetElementRotation                  ( CClientEntity& Entity, const CVector& vecRotation, const char* szRotationOrder );
     static bool                         SetElementVelocity                  ( CClientEntity& Element, const CVector& vecVelocity );
