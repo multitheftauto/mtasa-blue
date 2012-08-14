@@ -658,6 +658,18 @@ namespace SharedUtil
         outValue = static_cast < U > ( iOutValue );
     }
 
+    // Comma separated set of numbers
+    template < class T, class U >
+    void GetOption ( const SString& strText, const SString& strKey, const char* szSeperator, std::set < U >& outValues )
+    {
+        SString strNumbers;
+        GetOption < T > ( strText, strKey, strNumbers );
+        std::vector < SString > numberList;
+        strNumbers.Split ( szSeperator, numberList );
+        for ( uint i = 0 ; i < numberList.size () ; i++ )
+            if ( !numberList[i].empty () )
+                MapInsert ( outValues, static_cast < U > ( atoi ( numberList[i] ) ) );
+    }
 
     ///////////////////////////////////////////////////////////////
     //

@@ -124,7 +124,7 @@ void CDatabaseTypeSqlite::NotifyConnectionChanged ( CDatabaseConnection* pConnec
 // strHost is the absolute path to the sqlite database file
 // strUsername is not used
 // strPassword is not used
-// strOptions contains key=value pairs seperated by semicolons
+// strOptions contains key=value pairs separated by semicolons
 //
 //      Options are:
 //          share=1     // Share this connection with anything else (defaults to share=1)

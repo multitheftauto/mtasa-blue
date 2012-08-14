@@ -140,7 +140,7 @@ void CDatabaseTypeMySql::NotifyConnectionChanged ( CDatabaseConnection* pConnect
 // strHost is like "dbname=testdb;host=127.0.0.1;port=3303"
 // strUsername is username
 // strPassword is password
-// strOptions contains key=value pairs seperated by semicolons
+// strOptions contains key=value pairs separated by semicolons
 //
 //      Options are:
 //          share=1     // Share this connection with anything else (defaults to share=1)
