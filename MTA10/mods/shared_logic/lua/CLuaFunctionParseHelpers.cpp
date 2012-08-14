@@ -401,6 +401,53 @@ bool MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pM
     }
 }
 
+
+//
+// 4x4 matrix into CMatrix
+//
+bool ReadMatrix ( lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix )
+{
+    float m[4][4] = { { 1,0,0,0 }, { 0,1,0,0 }, { 0,0,1,0 }, { 0,0,0,1 } };
+    uint uiRow = 0;
+    uint uiCell = 0;
+
+    if ( lua_type ( luaVM, uiArgIndex ) == LUA_TTABLE )
+    {
+        for ( lua_pushnil ( luaVM ) ; lua_next ( luaVM, uiArgIndex ) != 0 ; lua_pop ( luaVM, 1 ), uiRow++ )
+        {
+            //int idx = lua_tonumber ( luaVM, -2 );
+            //int iArgumentType = lua_type ( luaVM, -1 );
+            if ( lua_type ( luaVM, -1 ) == LUA_TTABLE )
+            {
+                uint uiCol = 0;
+                for ( lua_pushnil ( luaVM ) ; lua_next ( luaVM, -2 ) != 0 ; lua_pop ( luaVM, 1 ), uiCol++, uiCell++ )
+                {
+                    //int idx = lua_tonumber ( luaVM, -2 );
+                    int iArgumentType = lua_type ( luaVM, -1 );
+                    if ( iArgumentType == LUA_TNUMBER || iArgumentType == LUA_TSTRING )
+                    {
+                        if ( uiRow < 4 && uiCol < 4 )
+                            m[uiRow][uiCol] = static_cast < float > ( lua_tonumber ( luaVM, -1 ) );;
+                    }
+                }
+
+                if ( uiCol != 4 )
+                    return false;
+            }
+        }
+    }
+
+    if ( uiRow != 4 || uiCell != 16 )
+        return false;
+
+    outMatrix.vRight = CVector ( m[0][0], m[0][1], m[0][2] );
+    outMatrix.vFront = CVector ( m[1][0], m[1][1], m[1][2] );
+    outMatrix.vUp    = CVector ( m[2][0], m[2][1], m[2][2] );
+    outMatrix.vPos   = CVector ( m[3][0], m[3][1], m[3][2] );
+    return true;
+}
+
+
 //
 // Check min client is correct
 //
