@@ -28,6 +28,7 @@ class CVehicleSA;
 #include "CHandlingManagerSA.h"
 #include "CDamageManagerSA.h"
 #include "CDoorSA.h"
+#include "CColPointSA.h"
 
 #define SIZEOF_CHELI                            2584
 
@@ -479,11 +480,19 @@ public:
     RwFrame * pWindscreen;
     RwFrame * pExhaust;
 
-    BYTE padding280[576];
+    // Hacked in from jb-contribs branch
+    RwFrame * pSpecialParts[5]; // 1688
+    uint32 pad1[30]; // 1708
+    CColPointSAInterface WheelFrontLeftColPoint; // 1828
+    CColPointSAInterface WheelRearLeftColPoint;
+    CColPointSAInterface WheelFrontRightColPoint;
+    CColPointSAInterface WheelRearRightColPoint;
+
+    BYTE padding280[576-316];
     // 2276
     float m_fBurningTime;
 };
-
+C_ASSERT(sizeof(CVehicleSAInterface) == 1688 + 576 + 4 );
 
 class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {
@@ -507,6 +516,9 @@ public:
                                 CVehicleSA                      ( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 );
                                 ~CVehicleSA                     ();
     void                        Init                            ( void );
+
+    // CEntitySA interface
+    virtual void                OnChangingPosition              ( const CVector& vecNewPosition );
 
     // Override of CPhysicalSA::SetMoveSpeed to take trains into account
     VOID                        SetMoveSpeed                    ( CVector* vecMoveSpeed );
