@@ -811,7 +811,9 @@ public:
     LUA_DECLARE ( GetProjectileType );
 	LUA_DECLARE ( GetProjectileTarget );
 	LUA_DECLARE ( GetProjectileCreator );
-	LUA_DECLARE ( GetProjectileForce );
+    LUA_DECLARE ( GetProjectileForce );
+    LUA_DECLARE ( GetProjectileCounter );
+    LUA_DECLARE ( SetProjectileCounter );
 
     // Shape create funcs
     LUA_DECLARE ( CreateColCircle );

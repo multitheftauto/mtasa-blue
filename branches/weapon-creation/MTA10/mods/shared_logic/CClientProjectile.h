@@ -88,7 +88,8 @@ public:
     void                                GetVelocity             ( CVector & vecVelocity );
     void                                SetVelocity             ( CVector & vecVelocity );
     void                                SetModel                ( unsigned short usModel );
-
+    void                                SetCounter              ( DWORD dwCounter );
+    DWORD                               GetCounter              ( void );
     inline CClientEntity *              GetCreator              ( void )        { return m_pCreator; }
     inline CClientEntity *              GetTargetEntity         ( void )        { return m_pTarget; }
     inline eWeaponType                  GetWeaponType           ( void )        { return m_weaponType; }
