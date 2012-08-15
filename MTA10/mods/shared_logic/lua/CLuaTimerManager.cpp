@@ -19,13 +19,15 @@
 void CLuaTimerManager::DoPulse ( CLuaMain* pLuaMain )
 {
     assert ( m_ProcessQueue.empty () );
-    assert ( m_DeleteList.empty () );
+    assert ( !m_pPendingDelete );
     assert ( !m_pProcessingTimer );
 
     CTickCount llCurrentTime = CTickCount::Now ();
 
     // Use a separate queue to avoid trouble
-    m_ProcessQueue = std::deque < CLuaTimer* > ( m_TimerList.begin (), m_TimerList.end () );
+    for ( CFastList < CLuaTimer > ::const_iterator iter = m_TimerList.begin () ; iter != m_TimerList.end () ; iter++ )
+        m_ProcessQueue.push_back ( *iter );
+
     while ( !m_ProcessQueue.empty () )
     {
         m_pProcessingTimer = m_ProcessQueue.front ();
@@ -54,13 +56,18 @@ void CLuaTimerManager::DoPulse ( CLuaMain* pLuaMain )
                 m_pProcessingTimer->SetStartTime ( llCurrentTime );
             }
         }
-    }
-    m_pProcessingTimer = NULL;
 
-    // Finally cleanup timers that were removed during their own processing
-    for ( std::set < CLuaTimer* > ::const_iterator iter = m_DeleteList.begin () ; iter != m_DeleteList.end (); iter++ )
-        delete *iter;
-    m_DeleteList.clear ();
+        // Finally cleanup timer if it was removed during processing
+        if ( m_pPendingDelete )
+        {
+            assert ( m_pPendingDelete == m_pProcessingTimer );
+            m_pProcessingTimer = NULL;
+            delete m_pPendingDelete;
+            m_pPendingDelete = NULL;
+        }
+        else
+            m_pProcessingTimer = NULL;
+    }
 }
 
 
@@ -68,11 +75,20 @@ void CLuaTimerManager::RemoveTimer ( CLuaTimer* pLuaTimer )
 {
     assert ( pLuaTimer );
 
+    // Check if already removed
+    if ( !ListContains ( m_TimerList, pLuaTimer ) )
+        return;
+
     // Remove all references
     ListRemove ( m_TimerList, pLuaTimer );
     ListRemove ( m_ProcessQueue, pLuaTimer );
+
     if ( m_pProcessingTimer == pLuaTimer )
-        m_DeleteList.insert ( pLuaTimer );
+    {
+        assert ( !m_pPendingDelete );
+        pLuaTimer->RemoveScriptID ();
+        m_pPendingDelete = pLuaTimer;
+    }
     else
         delete pLuaTimer;
 }
@@ -81,7 +97,7 @@ void CLuaTimerManager::RemoveTimer ( CLuaTimer* pLuaTimer )
 void CLuaTimerManager::RemoveAllTimers ( void )
 {
     // Delete all the timers
-    std::vector < CLuaTimer* > ::const_iterator iter = m_TimerList.begin ();
+    CFastList < CLuaTimer > ::const_iterator iter = m_TimerList.begin ();
     for ( ; iter != m_TimerList.end (); iter++ )
     {
         delete *iter;
@@ -90,7 +106,7 @@ void CLuaTimerManager::RemoveAllTimers ( void )
     // Clear the timer list
     m_TimerList.clear ();
     m_ProcessQueue.clear ();
-    m_DeleteList.clear ();
+    m_pPendingDelete = NULL;
     m_pProcessingTimer = NULL;
 }
 
@@ -110,7 +126,7 @@ CLuaTimer* CLuaTimerManager::GetTimerFromScriptID ( uint uiScriptID )
     if ( !pLuaTimer )
         return NULL;
 
-    dassert ( ListContains ( m_TimerList, pLuaTimer ) );
+    assert ( ListContains ( m_TimerList, pLuaTimer ) );
     return pLuaTimer;
 }
 

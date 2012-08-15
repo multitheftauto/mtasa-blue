@@ -239,3 +239,9 @@ bool ListContains ( const CFastList < U >& itemList, const T& item )
 {
     return itemList.contains ( item );
 }
+
+template < class U, class T >
+void ListRemove ( CFastList < U >& itemList, const T& item )
+{
+    itemList.remove ( item );
+}

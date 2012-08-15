@@ -31,6 +31,8 @@ public:
                             CLuaTimer                   ( const CLuaFunctionRef& iLuaFunction, const CLuaArguments& Arguments );
                             ~CLuaTimer                  ( void );
 
+    void                    RemoveScriptID              ( void );
+
     CTickCount              GetStartTime                ( void ) const                  { return m_llStartTime; };
     inline void             SetStartTime                ( CTickCount llStartTime )      { m_llStartTime = llStartTime; };
 

@@ -253,7 +253,7 @@ int CLuaFunctionDefs::GetTimers ( lua_State* luaVM )
             CLuaTimerManager* pLuaTimerManager = pLuaMain->GetTimerManager ();
             CTickCount llCurrentTime = CTickCount::Now ();
             unsigned int uiIndex = 0;
-            std::vector < CLuaTimer* > ::const_iterator iter = pLuaTimerManager->IterBegin ();
+            CFastList < CLuaTimer > ::const_iterator iter = pLuaTimerManager->IterBegin ();
             for ( ; iter != pLuaTimerManager->IterEnd () ; iter++ )
             {
                 CLuaTimer* pLuaTimer = *iter;
