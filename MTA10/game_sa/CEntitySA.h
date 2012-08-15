@@ -320,6 +320,9 @@ public:
     inline unsigned long        GetArrayID      ( void ) { return m_ulArrayID; }
     inline void                 SetArrayID      ( unsigned long ulID ) { m_ulArrayID = ulID; }
 
+    // CEntitySA interface
+    virtual void                OnChangingPosition      ( const CVector& vecNewPosition ) {}
+
 private:
     static unsigned long        FUNC_CClumpModelInfo__GetFrameFromId;
     static unsigned long        FUNC_RwFrameGetLTM;
