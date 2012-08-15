@@ -6401,7 +6401,7 @@ bool CStaticFunctionDefinitions::SetWeaponState ( CClientWeapon * pWeapon, eWeap
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetWeaponTarget ( CClientWeapon * pWeapon, CClientEntity * pTarget, eBone targetBone )
+bool CStaticFunctionDefinitions::SetWeaponTarget ( CClientWeapon * pWeapon, CClientEntity * pTarget, int targetBone )
 {
     if ( pWeapon )
     {

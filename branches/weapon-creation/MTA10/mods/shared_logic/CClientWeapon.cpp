@@ -52,6 +52,8 @@ CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponT
     m_weaponConfig.flags.bCheckVehicles = true;
     m_weaponConfig.flags.bCheckBuildings = true;
     m_weaponConfig.flags.bCheckCarTires = true;
+
+    m_itargetWheel = MAX_WHEELS + 1;
 }
 
 
@@ -150,7 +152,7 @@ void CClientWeapon::Create ( void )
     {
         m_pWeapon = g_pGame->CreateWeapon ();
         CPlayerPed * pPed = m_pManager->GetPlayerManager ()->GetLocalPlayer ()->GetGamePlayer ();
-        m_pWeapon->Initialize ( m_Type, 9999, pPed );
+        m_pWeapon->Initialize ( m_Type, 9999, NULL );
     }
 }
 
@@ -312,58 +314,45 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
     SLineOfSightBuildingResult pBuildingResult;
     CEntitySAInterface * pEntity = NULL;
 
-    if ( pAttachedTo ) pAttachedTo->WorldIgnore ( true );
-    if ( m_pWeapon->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pColEntity, m_weaponConfig.flags, &pBuildingResult, m_Type, &pEntity ) )
+    if ( m_Type != WEAPONTYPE_SHOTGUN )
     {
-        vecTarget = pColPoint->GetPosition ();
-    }
-    if ( pAttachedTo ) pAttachedTo->WorldIgnore ( false );
-
-    if ( ( m_pTarget != NULL && m_pTarget->GetGameEntity ( ) != NULL && m_pTarget->GetGameEntity()->GetInterface ( ) != pEntity ) && m_weaponConfig.bShootIfTargetBlocked == false )
-    {
-        return;
-    }
-    g_pGame->GetPointLights ()->AddLight ( PLTYPE_POINTLIGHT, vecOrigin, CVector (), 3.0f, 0.22f, 0.25f, 0, 0, 0, 0 );
-
-    if ( GetAttachedTo () ) g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, false );
-    else g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
-
-    m_pWeapon->AddGunshell ( m_pObject, &vecOrigin, &CVector2D ( 0, -1 ), 0.45f );
-    g_pGame->GetAudioEngine ()->ReportWeaponEvent ( WEAPON_EVENT_FIRE, m_Type, m_pObject );
-
-
-
-    CVector vecCollision;
-    if ( g_pGame->GetWaterManager ()->TestLineAgainstWater ( vecOrigin, vecTarget, &vecCollision ) )
-    {
-        g_pGame->GetFx ()->TriggerBulletSplash ( vecCollision );
-        g_pGame->GetAudioEngine ()->ReportBulletHit ( NULL, SURFACE_TYPE_WATER_SHALLOW, &vecCollision, 0.0f );
-    }    
-    m_pMarker2->SetPosition ( vecTarget );
-    
-    m_pWeapon->DoBulletImpact ( m_pObject, pEntity, &vecOrigin, &vecTarget, pColPoint, 0 );
-    if ( pColEntity && pColEntity->GetEntityType () == ENTITY_TYPE_PED )
-    {
-        ePedPieceTypes hitZone = ( ePedPieceTypes ) pColPoint->GetPieceTypeB ();
-        short sDamage = m_pWeaponInfo->GetDamagePerHit ();
-        m_pWeapon->GenerateDamageEvent ( dynamic_cast < CPed * > ( pColEntity ), m_pObject, m_Type, sDamage, hitZone, 0 );
-
-
-        CClientEntity * pClientEntity = m_pManager->FindEntitySafe ( pColEntity );
-        if ( pClientEntity )
+        //if ( pAttachedTo ) pAttachedTo->WorldIgnore ( true );
+        if ( m_pWeapon->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pColEntity, m_weaponConfig.flags, &pBuildingResult, m_Type, &pEntity ) )
         {
-            CLuaArguments Arguments;
-            Arguments.PushElement ( pClientEntity );            // entity that got hit
-            Arguments.PushNumber ( pColPoint->GetPosition().fX ); // pos x
-            Arguments.PushNumber ( pColPoint->GetPosition().fY ); // pos y
-            Arguments.PushNumber ( pColPoint->GetPosition().fZ ); // pos z
-            this->CallEvent ( "onClientWeaponHit", Arguments, true );
+            vecTarget = pColPoint->GetPosition ();
         }
-    }
-    else
-    {
-        if ( pColEntity )
+        //if ( pAttachedTo ) pAttachedTo->WorldIgnore ( false );
+
+        if ( ( m_pTarget != NULL && m_pTarget->GetGameEntity ( ) != NULL && m_pTarget->GetGameEntity()->GetInterface ( ) != pEntity ) && m_weaponConfig.bShootIfTargetBlocked == false )
         {
+            return;
+        }
+        g_pGame->GetPointLights ()->AddLight ( PLTYPE_POINTLIGHT, vecOrigin, CVector (), 3.0f, 0.22f, 0.25f, 0, 0, 0, 0 );
+
+        if ( GetAttachedTo () ) g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, false );
+        else g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
+
+        m_pWeapon->AddGunshell ( m_pObject, &vecOrigin, &CVector2D ( 0, -1 ), 0.45f );
+        g_pGame->GetAudioEngine ()->ReportWeaponEvent ( WEAPON_EVENT_FIRE, m_Type, m_pObject );
+
+
+
+        CVector vecCollision;
+        if ( g_pGame->GetWaterManager ()->TestLineAgainstWater ( vecOrigin, vecTarget, &vecCollision ) )
+        {
+            g_pGame->GetFx ()->TriggerBulletSplash ( vecCollision );
+            g_pGame->GetAudioEngine ()->ReportBulletHit ( NULL, SURFACE_TYPE_WATER_SHALLOW, &vecCollision, 0.0f );
+        }    
+        m_pMarker2->SetPosition ( vecTarget );
+        
+        m_pWeapon->DoBulletImpact ( m_pObject, pEntity, &vecOrigin, &vecTarget, pColPoint, 0 );
+        if ( pColEntity && pColEntity->GetEntityType () == ENTITY_TYPE_PED )
+        {
+            ePedPieceTypes hitZone = ( ePedPieceTypes ) pColPoint->GetPieceTypeB ();
+            short sDamage = m_pWeaponInfo->GetDamagePerHit ();
+            m_pWeapon->GenerateDamageEvent ( dynamic_cast < CPed * > ( pColEntity ), m_pObject, m_Type, sDamage, hitZone, 0 );
+
+
             CClientEntity * pClientEntity = m_pManager->FindEntitySafe ( pColEntity );
             if ( pClientEntity )
             {
@@ -375,9 +364,31 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
                 this->CallEvent ( "onClientWeaponHit", Arguments, true );
             }
         }
+        else
+        {
+            if ( pColEntity )
+            {
+                CClientEntity * pClientEntity = m_pManager->FindEntitySafe ( pColEntity );
+                if ( pClientEntity )
+                {
+                    CLuaArguments Arguments;
+                    Arguments.PushElement ( pClientEntity );            // entity that got hit
+                    Arguments.PushNumber ( pColPoint->GetPosition().fX ); // pos x
+                    Arguments.PushNumber ( pColPoint->GetPosition().fY ); // pos y
+                    Arguments.PushNumber ( pColPoint->GetPosition().fZ ); // pos z
+                    this->CallEvent ( "onClientWeaponHit", Arguments, true );
+                }
+            }
+        }
     }
-    if ( m_Type == WEAPONTYPE_SHOTGUN )
+    else
     {
+        //if ( pAttachedTo ) pAttachedTo->WorldIgnore ( true );
+        if ( m_pWeapon->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pColEntity, m_weaponConfig.flags, &pBuildingResult, m_Type, &pEntity ) )
+        {
+            vecTarget = pColPoint->GetPosition ();
+        }
+        //if ( pAttachedTo ) pAttachedTo->WorldIgnore ( false );
         // Fire instant hit is off by a few degrees
         FireShotgun ( m_pObject, vecOrigin, vecTarget );
     }
@@ -440,7 +451,10 @@ void CClientWeapon::SetWeaponTarget ( CClientEntity * pTarget, int subTarget )
     m_targetType = TARGET_TYPE_ENTITY; 
     if ( pTarget->GetType() == CCLIENTPED )
     {
-        m_targetBone = (eBone)subTarget; 
+        if ( subTarget == 255 )
+            m_targetBone = eBone::BONE_PELVIS;
+        else
+            m_targetBone = (eBone)subTarget; 
     }
     if ( pTarget->GetType() == CCLIENTVEHICLE )
     {

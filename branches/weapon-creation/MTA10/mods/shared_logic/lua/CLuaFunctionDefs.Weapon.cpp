@@ -207,10 +207,10 @@ int CLuaFunctionDefs::SetWeaponTarget ( lua_State* luaVM )
     {
         int targetBone;
         argStream.ReadUserData ( pTarget );
-        argStream.ReadNumber ( targetBone, BONE_PELVIS );
+        argStream.ReadNumber ( targetBone, 255 );
         if ( !argStream.HasErrors () )
         {
-            if ( CStaticFunctionDefinitions::SetWeaponTarget ( pWeapon, pTarget, (eBone)targetBone ) )
+            if ( CStaticFunctionDefinitions::SetWeaponTarget ( pWeapon, pTarget, targetBone ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
