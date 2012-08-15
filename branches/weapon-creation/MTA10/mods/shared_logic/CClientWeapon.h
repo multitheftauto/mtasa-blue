@@ -24,6 +24,7 @@ enum eTargetType
     TARGET_TYPE_ENTITY,
     TARGET_TYPE_FIXED,
 };
+
 struct SWeaponConfiguration
 {
     bool bShootIfTargetOutOfRange;
@@ -42,7 +43,7 @@ public:
     inline eWeaponType      GetWeaponType           ( void )                { return m_Type; }
     inline eWeaponState     GetWeaponState          ( void )                { return m_State; }
     inline void             SetWeaponState          ( eWeaponState state )  { m_State = state; }
-    void                    SetWeaponTarget         ( CClientEntity * pTarget, eBone boneTarget );
+    void                    SetWeaponTarget         ( CClientEntity * pTarget, int subTarget );
     void                    SetWeaponTarget         ( CVector vecTarget );
     void                    ResetWeaponTarget       ( void );
 
@@ -53,6 +54,7 @@ public:
 
     void                    Fire                    ( void );
     void                    FireInstantHit          ( CVector & vecOrigin, CVector & vecTarget );
+    void                    FireShotgun             ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget );
 
     void                    GetDirection            ( CVector & vecDirection );
     void                    SetDirection            ( CVector & vecDirection );
@@ -80,6 +82,7 @@ private:
     CVector                 m_vecTarget;
     eTargetType             m_targetType;
     eBone                   m_targetBone;
+    int                     m_itargetWheel;
     SWeaponConfiguration    m_weaponConfig;
     CClientPlayer *         m_pOwner;  // For lag compensation
 };

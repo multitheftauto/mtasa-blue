@@ -1899,7 +1899,21 @@ void CVehicleSA::SetWheelVisibility ( eWheels wheel, bool bVisible )
         if ( pObject ) pObject->flags = ( bVisible ) ? 4 : 0;
     }
 }
-
+CVector CVehicleSA::GetWheelPosition ( eWheels wheel )
+{
+    switch (wheel)
+    {
+        case FRONT_LEFT_WHEEL:
+            return GetVehicleInterface()->WheelFrontLeftColPoint.Position;
+        case FRONT_RIGHT_WHEEL:
+            return GetVehicleInterface()->WheelFrontRightColPoint.Position;
+        case REAR_LEFT_WHEEL:
+            return GetVehicleInterface()->WheelRearLeftColPoint.Position;
+        case REAR_RIGHT_WHEEL:
+            return GetVehicleInterface()->WheelRearRightColPoint.Position;
+    }
+    return CVector();
+}
 
 bool CVehicleSA::IsHeliSearchLightVisible ( void )
 {

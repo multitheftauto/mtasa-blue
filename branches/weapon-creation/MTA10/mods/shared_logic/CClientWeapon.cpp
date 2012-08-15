@@ -130,7 +130,7 @@ void CClientWeapon::DoPulse ( void )
             // Convert local direction to local rotation
             CVector vecRotation = vecDirection.ToRotation ();
 
-            // Apply local rotation
+            // Apply local rotation 
             SetAttachedOffsets ( m_vecAttachedPosition, vecRotation );
         }
     }
@@ -150,7 +150,7 @@ void CClientWeapon::Create ( void )
     {
         m_pWeapon = g_pGame->CreateWeapon ();
         CPlayerPed * pPed = m_pManager->GetPlayerManager ()->GetLocalPlayer ()->GetGamePlayer ();
-        m_pWeapon->Initialize ( m_Type, 9999, NULL );
+        m_pWeapon->Initialize ( m_Type, 9999, pPed );
     }
 }
 
@@ -175,8 +175,8 @@ void CClientWeapon::Fire ( void )
         case WEAPONTYPE_PISTOL:
         case WEAPONTYPE_PISTOL_SILENCED:
         case WEAPONTYPE_DESERT_EAGLE:
-        /*case WEAPONTYPE_SHOTGUN: 
-        case WEAPONTYPE_SAWNOFF_SHOTGUN:
+        case WEAPONTYPE_SHOTGUN: 
+        /*case WEAPONTYPE_SAWNOFF_SHOTGUN:
         case WEAPONTYPE_SPAS12_SHOTGUN:*/
         case WEAPONTYPE_MICRO_UZI:
         case WEAPONTYPE_MP5:
@@ -215,7 +215,18 @@ void CClientWeapon::Fire ( void )
                     }
                     else
                     {
-                        m_pTarget->GetPosition( vecTarget );
+                        if ( m_pTarget->GetType() == CCLIENTVEHICLE )
+                        {
+                            if ( m_itargetWheel <= MAX_WHEELS )
+                            {
+                                CClientVehicle * pTarget = (CClientVehicle*)m_pTarget;
+                                vecTarget = pTarget->GetGameVehicle()->GetWheelPosition ( (eWheels)m_itargetWheel );
+                            }
+                            else
+                                m_pTarget->GetPosition( vecTarget );
+                        }
+                        else
+                            m_pTarget->GetPosition( vecTarget );
                     }
                     if ( m_weaponConfig.bShootIfTargetOutOfRange == false && (vecOrigin - vecTarget).Length() >= fDistance )
                     {
@@ -365,10 +376,19 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
             }
         }
     }
-    
+    if ( m_Type == WEAPONTYPE_SHOTGUN )
+    {
+        // Fire instant hit is off by a few degrees
+        FireShotgun ( m_pObject, vecOrigin, vecTarget );
+    }
     pColPoint->Destroy ();
 }
 
+
+void CClientWeapon::FireShotgun ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget )
+{
+    m_pWeapon->FireBullet ( pFiringEntity, vecOrigin, vecTarget, false );
+}
 
 void CClientWeapon::GetDirection ( CVector & vecDirection )
 {
@@ -414,11 +434,18 @@ void CClientWeapon::LookAt ( CVector & vecPosition, bool bInterpolate )
     else SetDirection ( vecDirection );
 }
 
-void CClientWeapon::SetWeaponTarget ( CClientEntity * pTarget, eBone boneTarget )
+void CClientWeapon::SetWeaponTarget ( CClientEntity * pTarget, int subTarget )
 {
     m_pTarget = pTarget; 
     m_targetType = TARGET_TYPE_ENTITY; 
-    m_targetBone = boneTarget; 
+    if ( pTarget->GetType() == CCLIENTPED )
+    {
+        m_targetBone = (eBone)subTarget; 
+    }
+    if ( pTarget->GetType() == CCLIENTVEHICLE )
+    {
+        m_itargetWheel = subTarget; 
+    }
 }
 
 void CClientWeapon::SetWeaponTarget ( CVector vecTarget )

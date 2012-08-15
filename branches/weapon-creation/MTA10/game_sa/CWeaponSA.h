@@ -33,6 +33,8 @@
 #define FUNC_CShadows_CheckForHit                       0x707550
 
 extern CGameSA * pGame;
+class CWeaponSAInterface;
+
 
 class CWeaponSAInterface
 {
@@ -77,7 +79,8 @@ public:
     void                    DoBulletImpact      ( CEntity * pFiringEntity, CEntitySAInterface * pEntityInterface, CVector * pvecOrigin, CVector * pvecTarget, CColPoint * pColPoint, int i_1 );
     unsigned char           GenerateDamageEvent ( CPed * pPed, CEntity * pResponsible, eWeaponType weaponType, int iDamagePerHit, ePedPieceTypes hitZone, int i_2 );
     bool                    ProcessLineOfSight  ( const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, CEntity ** CollisionEntity, const SLineOfSightFlags flags, SLineOfSightBuildingResult* pBuildingResult, eWeaponType weaponType, CEntitySAInterface ** pEntity );
-
+    bool                    FireInstantHit      ( CEntity * pFiringEntity, const CVector* pvecOrigin, const CVector* pvecMuzzle, CEntity* pTargetEntity, const CVector* pvecTarget, const CVector* pvec, bool bCrossHairGun, bool bCreateGunFx );
+    bool                    FireBullet          ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget, bool bAddMuzzle = true );
 };
 
 #endif

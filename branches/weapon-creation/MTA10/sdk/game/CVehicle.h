@@ -233,6 +233,7 @@ public:
 
     virtual CObject *            SpawnFlyingComponent                   ( int i_1, unsigned int ui_2 ) = 0;
     virtual void                 SetWheelVisibility                     ( eWheels wheel, bool bVisible ) = 0;
+    virtual CVector              GetWheelPosition                       ( eWheels wheel ) = 0;
 
     virtual bool                 IsHeliSearchLightVisible               ( void ) = 0;
     virtual void                 SetHeliSearchLightVisible              ( bool bVisible ) = 0;

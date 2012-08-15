@@ -20,9 +20,11 @@ class CPed;
 class CColPoint;
 class CVector2D;
 class CVector;
+class CWeaponInfo;
 enum ePedPieceTypes;
 struct SLineOfSightFlags;
 struct SLineOfSightBuildingResult;
+struct SWeaponConfiguration;
 class CWeapon
 {
 public:
@@ -47,6 +49,8 @@ public:
     virtual void            DoBulletImpact      ( CEntity * pFiringEntity, CEntitySAInterface * pEntityInterface, CVector * pvecOrigin, CVector * pvecTarget, CColPoint * pColPoint, int i_1 ) = 0;
     virtual unsigned char   GenerateDamageEvent ( CPed * pPed, CEntity * pResponsible, eWeaponType weaponType, int iDamagePerHit, ePedPieceTypes hitZone, int i_2 ) = 0;
     virtual bool            ProcessLineOfSight  ( const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, CEntity ** CollisionEntity, const SLineOfSightFlags flags, SLineOfSightBuildingResult* pBuildingResult, eWeaponType weaponType, CEntitySAInterface ** pEntity ) = 0;
+    virtual bool            FireInstantHit      ( CEntity * pFiringEntity, const CVector* pvecOrigin, const CVector* pvecMuzzle, CEntity* pTargetEntity, const CVector* pvecTarget, const CVector* pvec, bool bCrossHairGun, bool bCreateGunFx ) = 0;
+    virtual bool            FireBullet          ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget, bool bAddMuzzle = true ) = 0;
 };
 
 #endif

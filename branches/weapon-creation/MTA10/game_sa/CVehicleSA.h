@@ -28,6 +28,7 @@ class CVehicleSA;
 #include "CHandlingManagerSA.h"
 #include "CDamageManagerSA.h"
 #include "CDoorSA.h"
+#include "CColPointSA.h"
 
 #define SIZEOF_CHELI                            2584
 
@@ -478,8 +479,15 @@ public:
     RwFrame * pBoot;
     RwFrame * pWindscreen;
     RwFrame * pExhaust;
-
-    BYTE padding280[576];
+    // Hacked in from jb-contribs branch
+    RwFrame * pSpecialParts[5]; // 1688
+    uint32 pad1[30]; // 1708
+    CColPointSAInterface WheelFrontLeftColPoint; // 1828
+    CColPointSAInterface WheelRearLeftColPoint;
+    CColPointSAInterface WheelFrontRightColPoint;
+    CColPointSAInterface WheelRearRightColPoint;
+    
+    BYTE padding280[576-316];
     // 2276
     float m_fBurningTime;
 };
@@ -687,6 +695,7 @@ public:
 
     CObject *                   SpawnFlyingComponent            ( int i_1, unsigned int ui_2 );
     void                        SetWheelVisibility              ( eWheels wheel, bool bVisible );
+    CVector                     GetWheelPosition                ( eWheels wheel );
 
     bool                        IsHeliSearchLightVisible        ( void );
     void                        SetHeliSearchLightVisible       ( bool bVisible );
