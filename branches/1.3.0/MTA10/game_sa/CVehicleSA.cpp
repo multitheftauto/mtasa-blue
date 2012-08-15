@@ -2072,6 +2072,7 @@ void CVehicleSA::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, bool
 
 void CVehicleSA::OnChangingPosition ( const CVector& vecNewPosition )
 {
+    // Only apply to CAutomobile and down
     if ( GetBaseVehicleType () == 0 )
     {
         CVector vecDelta = vecNewPosition - m_pInterface->Placeable.matrix->vPos;

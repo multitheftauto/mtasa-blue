@@ -25,7 +25,17 @@ CLuaTimer::CLuaTimer ( const CLuaFunctionRef& iLuaFunction, const CLuaArguments&
 
 CLuaTimer::~CLuaTimer ( void )
 {
-    CIdArray::PushUniqueId ( this, EIdClass::TIMER, m_uiScriptID );
+    RemoveScriptID ();
+}
+
+
+void CLuaTimer::RemoveScriptID ( void )
+{
+    if ( m_uiScriptID != INVALID_ARRAY_ID )
+    {
+        CIdArray::PushUniqueId ( this, EIdClass::TIMER, m_uiScriptID );
+        m_uiScriptID = INVALID_ARRAY_ID;
+    }
 }
 
 
