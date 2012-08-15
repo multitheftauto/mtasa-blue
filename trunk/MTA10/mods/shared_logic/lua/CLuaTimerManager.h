@@ -24,7 +24,7 @@ class CLuaTimerManager;
 class CLuaTimerManager
 {
 public:
-    inline                      CLuaTimerManager                ( void )                    { m_pProcessingTimer = NULL; }
+    inline                      CLuaTimerManager                ( void )                    { m_pPendingDelete = NULL; m_pProcessingTimer = NULL; }
     inline                      ~CLuaTimerManager               ( void )                    { RemoveAllTimers (); };
 
     void                        DoPulse                         ( CLuaMain* pLuaMain );
@@ -38,13 +38,13 @@ public:
 
     void                        ResetTimer                      ( CLuaTimer* pLuaTimer );
 
-    std::vector < CLuaTimer* > ::const_iterator   IterBegin       ( void )                    { return m_TimerList.begin (); }
-    std::vector < CLuaTimer* > ::const_iterator   IterEnd         ( void )                    { return m_TimerList.end (); }
+    CFastList < CLuaTimer > ::const_iterator   IterBegin       ( void )                    { return m_TimerList.begin (); }
+    CFastList < CLuaTimer > ::const_iterator   IterEnd         ( void )                    { return m_TimerList.end (); }
 
 private:
-    std::vector < CLuaTimer* >  m_TimerList;
+    CFastList < CLuaTimer >     m_TimerList;
     std::deque < CLuaTimer* >   m_ProcessQueue;
-    std::set < CLuaTimer* >     m_DeleteList;
+    CLuaTimer*                  m_pPendingDelete;
     CLuaTimer*                  m_pProcessingTimer;
 };
 

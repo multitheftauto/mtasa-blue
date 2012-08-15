@@ -30,6 +30,10 @@ void CClientColManager::DoPulse ( void )
 
 void CClientColManager::DoHitDetection ( const CVector& vecNowPosition, float fRadius, CClientEntity* pEntity, CClientColShape * pJustThis, bool bChildren )
 {
+    // Skip if disconnecting
+    if ( g_pClientGame->IsBeingDeleted () )
+        return;
+
     if ( pJustThis )
         DoHitDetectionForColShape ( pJustThis );
     else

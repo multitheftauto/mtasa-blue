@@ -43,7 +43,7 @@ VOID CEntitySA::SetPosition(float fX, float fY, float fZ)
     CVector * vecPos;
     if ( m_pInterface->Placeable.matrix )
     {
-        OnChangingPosition ( CVector ( fX, fY,  fZ ) );
+        OnChangingPosition ( CVector ( fX, fY, fZ ) );
         vecPos = &m_pInterface->Placeable.matrix->vPos;
     }
     else
@@ -319,7 +319,7 @@ VOID CEntitySA::SetMatrix ( CMatrix * matrix )
     }
     if ( m_pInterface->Placeable.matrix && matrix )
     {
-        OnChangingPosition ( m_pInterface->Placeable.matrix->vPos );
+        OnChangingPosition ( matrix->vPos );
 
         MemCpyFast (&m_pInterface->Placeable.matrix->vFront,     &matrix->vFront, sizeof(CVector));
         MemCpyFast (&m_pInterface->Placeable.matrix->vPos,           &matrix->vPos, sizeof(CVector));
