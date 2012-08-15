@@ -2068,3 +2068,21 @@ void CVehicleSA::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, bool
      m_tSirenInfo.m_bUseRandomiser = bEnableRandomiser;
      m_tSirenInfo.m_bSirenSilent = bEnableSilent;
 }
+
+
+void CVehicleSA::OnChangingPosition ( const CVector& vecNewPosition )
+{
+    if ( GetBaseVehicleType () == 0 )
+    {
+        CVector vecDelta = vecNewPosition - m_pInterface->Placeable.matrix->vPos;
+        if ( vecDelta.LengthSquared () > 10 * 10 )
+        {
+            // Reposition colpoints for big moves to avoid random spinning
+            CVehicleSAInterface* pInterface = GetVehicleInterface ();
+            pInterface->WheelFrontLeftColPoint.Position += vecDelta;
+            pInterface->WheelRearLeftColPoint.Position += vecDelta;
+            pInterface->WheelFrontRightColPoint.Position += vecDelta;
+            pInterface->WheelRearRightColPoint.Position += vecDelta;
+        }
+    }
+}

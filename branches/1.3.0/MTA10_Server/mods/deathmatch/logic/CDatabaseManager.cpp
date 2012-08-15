@@ -42,6 +42,7 @@ public:
     virtual bool                    QueryFree                   ( CDbJobData* pJobData );
     virtual CDbJobData*             GetQueryFromId              ( SDbJobId id );
     virtual const SString&          GetLastErrorMessage         ( void )                    { return m_strLastErrorMessage; }
+    virtual bool                    IsLastErrorSuppressed       ( void )                    { return m_bLastErrorSuppressed; }
     virtual bool                    QueryWithResultf            ( SConnectionHandle hConnection, CRegistryResult* pResult, const char* szQuery, ... );
     virtual bool                    QueryWithCallbackf          ( SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const char* szQuery, ... );
     virtual void                    SetLogLevel                 ( EJobLogLevelType logLevel, const SString& strLogFilename );
@@ -49,12 +50,13 @@ public:
     // CDatabaseManagerImpl
     SString                         InsertQueryArguments        ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
     SString                         InsertQueryArguments        ( SConnectionHandle hConnection, const char* szQuery, va_list vl );
-    void                            ClearLastErrorMessage       ( void )                    { m_strLastErrorMessage.clear (); }
-    void                            SetLastErrorMessage         ( const SString& strMsg )   { m_strLastErrorMessage = strMsg; }
+    void                            ClearLastErrorMessage       ( void )                                            { m_strLastErrorMessage.clear (); m_bLastErrorSuppressed = false; }
+    void                            SetLastErrorMessage         ( const SString& strMsg, bool bSuppressed = false ) { m_strLastErrorMessage = strMsg; m_bLastErrorSuppressed = bSuppressed; }
 
     CDatabaseJobQueue*                          m_JobQueue;
     std::map < SConnectionHandle, SString >     m_ConnectionTypeMap;
     SString                                     m_strLastErrorMessage;
+    bool                                        m_bLastErrorSuppressed;
 };
 
 
@@ -170,7 +172,7 @@ bool CDatabaseManagerImpl::Disconnect ( uint hConnection )
     // Check for problems
     if ( pJobData->result.status == EJobResult::FAIL )
     {
-        SetLastErrorMessage ( pJobData->result.strReason );
+        SetLastErrorMessage ( pJobData->result.strReason, pJobData->result.bErrorSuppressed );
         return false;
     }
 
@@ -395,7 +397,7 @@ bool CDatabaseManagerImpl::QueryPoll ( CDbJobData* pJobData, uint ulTimeout )
     if ( m_JobQueue->PollCommand ( pJobData, ulTimeout ) )
     {
         if ( pJobData->result.status == EJobResult::FAIL )
-            SetLastErrorMessage ( pJobData->result.strReason );
+            SetLastErrorMessage ( pJobData->result.strReason, pJobData->result.bErrorSuppressed );
         return true;
     }
 

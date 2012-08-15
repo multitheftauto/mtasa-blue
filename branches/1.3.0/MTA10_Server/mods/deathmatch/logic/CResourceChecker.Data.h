@@ -83,6 +83,11 @@ namespace
                                          { "getSoundLevelData",         "1.3.0-9.04162" },
                                          { "getSoundWaveData",          "1.3.0-9.04162" },
                                          { "setPedAnalogControlState",  "1.3.0-9.04185" },
+                                         { "setPedTargetingMarkerEnabled",  "1.3.0-9.04464" },
+                                         { "isPedTargetingMarkerEnabled",   "1.3.0-9.04464" },
+                                         { "setElementMatrix",              "1.3.0-9.04491" },
+                                         { "warpPedIntoVehicle",            "1.3.0-9.04491" },
+                                         { "removePedFromVehicle",          "1.3.0-9.04491" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {

@@ -614,11 +614,19 @@ public:
     //
     void SetVersionError ( const char* szMinReq, const char* szSide, const char* szReason )
     {
+        SetCustomError ( SString ( "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least %s %s because %s)", szSide, szMinReq, szReason ) );
+    }
+
+    //
+    // Set custom error message
+    //
+    void SetCustomError ( const char* szReason, const char* szCategory = "Bad usage" )
+    {
         if ( !m_bError )
         {
             m_bError = true;
-            m_strErrorCategory = "Bad usage";
-            m_strErrorMessageOverride = SString ( "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least %s %s because %s)", szSide, szMinReq, szReason );
+            m_strErrorCategory = szCategory;
+            m_strErrorMessageOverride = szReason;
         }
     }
 

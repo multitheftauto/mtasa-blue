@@ -18,6 +18,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define REMOVEPEDFROMVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION  "1.3.0-9.04482"
+#define WARPPEDINTOVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION    "1.3.0-9.04482"
 
 int CLuaFunctionDefs::GetPedVoice ( lua_State* luaVM )
 {
@@ -1242,6 +1244,73 @@ int CLuaFunctionDefs::SetPedOnFire ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::WarpPedIntoVehicle ( lua_State* luaVM )
+{
+//  warpPedIntoVehicle ( element ped, element vehicle, int seat )
+    CClientPed* pPed; CClientVehicle* pVehicle; uint uiSeat;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPed );
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadNumber ( uiSeat, 0 );
+
+    MinClientCheck ( argStream, WARPPEDINTOVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION, "function is being called client side" );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( !pPed->IsLocalEntity () || !pVehicle->IsLocalEntity () )
+            argStream.SetCustomError ( "This client side function will only work with client created peds and vehicles" );
+    }
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::WarpPedIntoVehicle ( pPed, pVehicle, uiSeat ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::RemovePedFromVehicle ( lua_State* luaVM )
+{
+//  removePedFromVehicle ( element ped )
+    CClientPed* pPed;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPed );
+
+    MinClientCheck ( argStream, REMOVEPEDFROMVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION, "function is being called client side" );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( !pPed->IsLocalEntity ()  )
+            argStream.SetCustomError ( "This client side function will only work with client created peds" );
+    }
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::RemovePedFromVehicle ( pPed ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefs::AddPedClothes ( lua_State* luaVM )
 {

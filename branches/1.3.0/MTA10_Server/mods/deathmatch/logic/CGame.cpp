@@ -3535,6 +3535,11 @@ void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )
         else
         {
             CElement * pTarget = CElementIDs::GetElement ( Packet.m_TargetID );
+
+            // Pre r4481 client could send incorrect element
+            if ( dynamic_cast < CPlayer* > ( pTarget ) == NULL )
+                pTarget = pPlayer;
+
             pCamera->SetMode ( CAMERAMODE_PLAYER );
             pCamera->SetTarget ( pTarget );
         }

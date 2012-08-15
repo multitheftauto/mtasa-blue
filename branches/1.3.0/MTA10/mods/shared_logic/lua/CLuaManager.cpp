@@ -334,6 +334,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementParent", CLuaFunctionDefs::SetElementParent );
     CLuaCFunctions::AddFunction ( "setElementData", CLuaFunctionDefs::SetElementData );
     //CLuaCFunctions::AddFunction ( "removeElementData", CLuaFunctionDefs::RemoveElementData ); TODO Clientside
+    CLuaCFunctions::AddFunction ( "setElementMatrix", CLuaFunctionDefs::SetElementMatrix );
     CLuaCFunctions::AddFunction ( "setElementPosition", CLuaFunctionDefs::SetElementPosition );
     CLuaCFunctions::AddFunction ( "setElementRotation", CLuaFunctionDefs::SetElementRotation );
     CLuaCFunctions::AddFunction ( "setElementVelocity", CLuaFunctionDefs::SetElementVelocity );
@@ -472,6 +473,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPedAimTarget", CLuaFunctionDefs::SetPedAimTarget );
     CLuaCFunctions::AddFunction ( "getWeaponProperty", CLuaFunctionDefs::GetWeaponProperty );
     CLuaCFunctions::AddFunction ( "getOriginalWeaponProperty", CLuaFunctionDefs::GetOriginalWeaponProperty );
+    CLuaCFunctions::AddFunction ( "warpPedIntoVehicle", CLuaFunctionDefs::WarpPedIntoVehicle );
+    CLuaCFunctions::AddFunction ( "removePedFromVehicle", CLuaFunctionDefs::RemovePedFromVehicle );
 
     // Clothes and body functions
     CLuaCFunctions::AddFunction ( "getBodyPartName", CLuaFunctionDefs::GetBodyPartName );

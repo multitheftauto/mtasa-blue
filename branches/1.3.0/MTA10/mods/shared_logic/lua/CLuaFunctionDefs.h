@@ -155,6 +155,7 @@ public:
     LUA_DECLARE ( SetElementID );
     LUA_DECLARE ( SetElementData );
     LUA_DECLARE ( RemoveElementData );
+    LUA_DECLARE ( SetElementMatrix );
     LUA_DECLARE ( SetElementPosition );
     LUA_DECLARE ( SetElementRotation );
     LUA_DECLARE ( SetElementVelocity );
@@ -268,6 +269,8 @@ public:
     LUA_DECLARE ( SetPedCameraRotation );
     LUA_DECLARE ( SetPedAimTarget );
     LUA_DECLARE ( SetPedOnFire );
+    LUA_DECLARE ( WarpPedIntoVehicle );
+    LUA_DECLARE ( RemovePedFromVehicle );
     LUA_DECLARE ( SetWeaponProperty );
 
     // Clothes and body functions

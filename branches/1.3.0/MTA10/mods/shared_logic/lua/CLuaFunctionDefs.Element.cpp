@@ -1581,6 +1581,35 @@ int CLuaFunctionDefs::RemoveElementData ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::SetElementMatrix ( lua_State* luaVM )
+{
+//  setElementMatrix ( element theElement, table matrix )
+    CClientEntity* pEntity; CMatrix matrix;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !ReadMatrix ( luaVM, argStream.m_iIndex, matrix ) )
+        argStream.SetCustomError ( "Matrix is not 4 x 4" );
+
+    // Verify the arguments
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( CStaticFunctionDefinitions::SetElementMatrix ( *pEntity, matrix ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::SetElementPosition ( lua_State* luaVM )
 {
     // Correct types?

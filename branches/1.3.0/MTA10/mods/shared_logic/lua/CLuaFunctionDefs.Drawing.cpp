@@ -823,7 +823,7 @@ int CLuaFunctionDefs::dxSetRenderTarget ( lua_State* luaVM )
 
     // Check version ok for this function to be called now
     if ( !g_pCore->GetGraphics ()->GetRenderItemManager ()->IsSetRenderTargetEnabledOldVer () )
-        MinClientCheck ( argStream, SETRENDERTARGET_NORESTRICTIONS_MIN_CLIENT_VERSION, "dxSetRenderTarget is being called outside certain events" );
+        MinClientCheck ( argStream, SETRENDERTARGET_NORESTRICTIONS_MIN_CLIENT_VERSION, "function is being called outside certain events" );
 
     if ( !argStream.HasErrors () )
     {

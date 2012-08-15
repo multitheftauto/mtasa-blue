@@ -926,7 +926,7 @@ bool CStaticFunctionDefinitions::SetElementData ( CClientEntity& Entity, const c
     CLuaArgument * pCurrentVariable = Entity.GetCustomData ( szName, false );
     if ( !pCurrentVariable || Variable != *pCurrentVariable )
     {
-        if ( bSynchronize )
+        if ( bSynchronize && !Entity.IsLocalEntity () )
         {
             // Allocate a bitstream
             NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
@@ -968,6 +968,15 @@ bool CStaticFunctionDefinitions::RemoveElementData ( CClientEntity& Entity, cons
     return false;
 }
 
+
+bool CStaticFunctionDefinitions::SetElementMatrix ( CClientEntity& Entity, const CMatrix& matrix )
+{
+    RUN_CHILDREN SetElementMatrix ( **iter, matrix );
+
+    Entity.SetMatrix ( matrix );
+
+    return true;
+}
 
 
 bool CStaticFunctionDefinitions::SetElementPosition ( CClientEntity& Entity, const CVector& vecPosition, bool bWarp )
@@ -7407,4 +7416,124 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty ePr
         return false;
 
     return true;
+}
+
+
+bool CStaticFunctionDefinitions::WarpPedIntoVehicle ( CClientPed* pPed, CClientVehicle* pVehicle, unsigned int uiSeat )
+{
+    if ( pPed->IsLocalEntity () != pVehicle->IsLocalEntity () )
+        return false;
+
+    if ( pPed->IsLocalEntity () )
+    {
+        //
+        // Client side ped & vehicle
+        //
+
+        // Ped and vehicle alive?
+        if ( pPed->IsDead () || pVehicle->GetHealth () <= 0.0f  )
+            return false;
+
+        // Valid seat id for that vehicle?
+        uchar ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount ( pVehicle->GetModel () );
+        if ( uiSeat > ucMaxPassengers || ucMaxPassengers == 255 )
+            return false;
+
+        // Toss the previous player out of it if neccessary
+        if ( CClientPed* pPreviousOccupant = pVehicle->GetOccupant ( uiSeat ) )
+            RemovePedFromVehicle ( pPreviousOccupant );
+
+        // Is he already in a vehicle? Remove him from it
+        if ( pPed->IsInVehicle () )
+            pPed->RemoveFromVehicle ();
+    }
+
+    //
+    // Server or client side ped & vehicle
+    //
+    if ( pPed->IsLocalPlayer () )
+    {
+        // Reset the vehicle in/out checks
+        m_pClientGame->ResetVehicleInOut ();
+
+        /*
+        // Make sure it can be damaged again (doesn't get changed back when we force the player in)
+        pVehicle->SetCanBeDamaged ( true );
+        pVehicle->SetTyresCanBurst ( true );
+        */
+    }
+
+    // Warp the player into the vehicle
+    pPed->WarpIntoVehicle ( pVehicle, uiSeat );
+    pPed->SetVehicleInOutState ( VEHICLE_INOUT_NONE );
+
+    pVehicle->CalcAndUpdateCanBeDamagedFlag ();
+    pVehicle->CalcAndUpdateTyresCanBurstFlag ();
+
+    // Call the onClientPlayerEnterVehicle event
+    CLuaArguments Arguments;
+    Arguments.PushElement ( pVehicle );        // vehicle
+    Arguments.PushNumber ( uiSeat );            // seat
+    pPed->CallEvent ( "onClientPlayerVehicleEnter", Arguments, true );
+
+    // Call the onClientVehicleEnter event
+    CLuaArguments Arguments2;
+    Arguments2.PushElement ( pPed );        // player
+    Arguments2.PushNumber ( uiSeat );           // seat
+    pVehicle->CallEvent ( "onClientVehicleEnter", Arguments2, true );
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::RemovePedFromVehicle ( CClientPed* pPed )
+{
+    // Get the ped / player's occupied vehicle data before pulling it out
+    CClientVehicle* pVehicle = pPed->GetOccupiedVehicle();
+    unsigned int    uiSeat   = pPed->GetOccupiedVehicleSeat();
+    bool bCancellingWhileEntering = ( pPed->m_bIsLocalPlayer && pPed->IsEnteringVehicle() ); // Special case here that could cause network trouble.
+
+    // Occupied vehicle can be NULL here while entering (Walking up to a vehicle in preparation to getting in/opening the doors)
+    if ( pVehicle || bCancellingWhileEntering )
+    {                
+        if ( bCancellingWhileEntering )
+        {
+            // Cancel vehicle entry
+            pPed->GetTaskManager()->RemoveTask ( TASK_PRIORITY_PRIMARY );
+            // pVehicle is *MORE than likely* NULL here because there is no occupied vehicle yet, only the occupying vehicle is right but check it anyway
+            if ( pVehicle == NULL )
+                pVehicle = pPed->GetOccupyingVehicle();
+            
+            if ( pVehicle == NULL ) // Every time I've tested this the occupying Vehicle has been correct, but if it doesn't exist let's not try and call an event on it!
+                return false;
+        }
+
+        //if ( !pPed->IsLocalEntity () )
+        //    pPed->SetSyncTimeContext ( ucTimeContext );   ** Done by caller now **
+
+        // Remove the player from his vehicle
+        pPed->RemoveFromVehicle ();
+        pPed->SetVehicleInOutState ( VEHICLE_INOUT_NONE );
+        if ( pPed->m_bIsLocalPlayer )
+        {
+            // Reset expectation of vehicle enter completion, in case we were removed while entering
+            g_pClientGame->ResetVehicleInOut ();
+        }
+
+        // Call onClientPlayerVehicleExit
+        CLuaArguments Arguments;
+        Arguments.PushElement ( pVehicle ); // vehicle
+        Arguments.PushNumber ( uiSeat );    // seat
+        Arguments.PushBoolean ( false );    // jacker
+        pPed->CallEvent ( "onClientPlayerVehicleExit", Arguments, true );
+
+        // Call onClientVehicleExit
+        CLuaArguments Arguments2;
+        Arguments2.PushElement ( pPed );   // player
+        Arguments2.PushNumber ( uiSeat );  // seat
+        pVehicle->CallEvent ( "onClientVehicleExit", Arguments2, true );
+        return true;
+    }
+
+    return false;
 }

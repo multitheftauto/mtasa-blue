@@ -1627,7 +1627,7 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
 
         // Write the trailer chain
         CClientVehicle* pTrailer = pVehicle->GetRealTowedVehicle ();
-        while ( pTrailer )
+        while ( pTrailer && !pTrailer->IsLocalEntity () )
         {
             BitStream.WriteBit ( true );
             BitStream.Write ( pTrailer->GetID () );
@@ -1919,7 +1919,7 @@ void CNetAPI::WriteFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamI
 
 void CNetAPI::WriteCameraSync ( NetBitStreamInterface& BitStream )
 {
-    CClientCamera * pCamera = m_pManager->GetCamera ();
+    CClientCamera* pCamera = m_pManager->GetCamera ();
 
     // Are we in fixed mode?
     bool bFixed = pCamera->IsInFixedMode ();
@@ -1939,10 +1939,14 @@ void CNetAPI::WriteCameraSync ( NetBitStreamInterface& BitStream )
     else
     {
         // Write our target
-        CClientPlayer * pPlayer = pCamera->GetFocusedPlayer ();
-        if ( !pPlayer ) pPlayer = g_pClientGame->GetLocalPlayer ();
+        ElementID ID = INVALID_ELEMENT_ID;
+        CClientPlayer* pPlayer = pCamera->GetFocusedPlayer ();
+        if ( !pPlayer )
+            pPlayer = g_pClientGame->GetLocalPlayer ();
+        if ( !pPlayer->IsLocalEntity () )
+            ID = pPlayer->GetID ();
 
-        BitStream.Write ( pPlayer->GetID () );
+        BitStream.Write ( ID );
     }
 }
 
