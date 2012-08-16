@@ -38,6 +38,10 @@ public:
     LUA_DECLARE ( fxAddFootSplash );
 
     LUA_DECLARE ( fxCreateSystem );
+    LUA_DECLARE ( fxCreateEntityEffect );
+    LUA_DECLARE ( fxRemoveEntityEffect );
+    LUA_DECLARE ( fxSetDrawDistance );
+    LUA_DECLARE ( fxGetDrawDistance );
 };
 
 #endif

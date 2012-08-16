@@ -513,11 +513,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CFxEmitterBPSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CFxEmitterSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CFxManagerSA.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\CFxSA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CFxSystemBPSA.cpp"
 				>
 			</File>
 			<File
@@ -1146,11 +1158,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CFxEmitterBPSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CFxEmitterSA.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CFxManagerSA.h"
 				>
 			</File>
 			<File
 				RelativePath=".\CFxSA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CFxSystemBPSA.h"
 				>
 			</File>
 			<File

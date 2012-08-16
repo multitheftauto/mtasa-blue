@@ -11,8 +11,14 @@
 
 #pragma once
 
+class CFxSystemSA;
+class CFxSystemBPSA;
+
 class CFxManager
 {
 public:
-    virtual CFxSystem* CreateFxSystem(const SString & strName, CVector & vecPoint, RwMatrix * pMatrix, bool bUnk) = 0;
+    virtual void SetWindData(const CVector& vecWindDirection, float fWindStrength) = 0;
+    virtual void DestroyFxSystem(CFxSystemSA* pFxSystem) = 0;
+    virtual CFxSystemSA* InitialiseFxSystem(CFxSystemBPSA* pFxSystemBP, CVector& vecPos, RwMatrix* pMatrix, bool bUnknown) = 0;
+    virtual CFxSystemSA* InitialiseFxSystem(CFxSystemBPSA* pFxSystemBP, RwMatrix* pMatrix1, RwMatrix* pMatrix2, bool bUnknown) = 0;
 };

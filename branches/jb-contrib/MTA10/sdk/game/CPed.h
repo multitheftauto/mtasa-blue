@@ -236,6 +236,9 @@ public:
 
     virtual CWeaponStat*    GetCurrentWeaponStat    ( void ) = 0;
     virtual float           GetCurrentWeaponRange   ( void ) = 0;
+
+    virtual float           GetOxygenLevel          ( void ) = 0;
+    virtual void            SetOxygenLevel      ( float fOxygenLevel ) = 0;
 };
 
 #endif

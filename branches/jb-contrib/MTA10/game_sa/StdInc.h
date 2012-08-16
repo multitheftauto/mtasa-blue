@@ -107,3 +107,5 @@
 #include "CShadowDataSA.h"
 #include "CBuoyancySA.h"
 #include "CFxManagerSA.h"
+#include "CFxSystemSA.h"
+#include "CFxSystemBPSA.h"

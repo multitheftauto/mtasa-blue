@@ -272,6 +272,8 @@ public:
     LUA_DECLARE ( SetPedAimTarget );
     LUA_DECLARE ( SetPedOnFire );
     LUA_DECLARE ( SetWeaponProperty );
+    LUA_DECLARE ( SetPedOxygenLevel );
+    LUA_DECLARE ( GetPedOxygenLevel );
 
     // Clothes and body functions
     LUA_DECLARE ( GetBodyPartName );

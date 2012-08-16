@@ -11,23 +11,76 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "CFxSystemSA.h"
 
 CFxManagerSA::CFxManagerSA(CFxManagerSAInterface * pInterface)
 {
     m_pInterface = pInterface;
 }
 
-CFxSystem* CFxManagerSA::CreateFxSystem(const SString & strName, CVector & vecPoint, RwMatrix * pMatrix, bool bUnk)
+void CFxManagerSA::SetWindData(const CVector& vecWindDirection, float fWindStrength)
 {
-    uint32 dwFunc = (uint32)FUNC_CFxManager__CreateFxSystem;
-    CVector * pVecPoint = &vecPoint;
-    const char * pSzName = strName.data();
+    uint32 dwFunc = (uint32)FUNC_CFxManager__SetWindData;
+    const CVector * pVecWindDir = &vecWindDirection;
     __asm
     {
-        push bUnk
-        push pMatrix
-        push pVecPoint
-        push pSzName
+        push fWindStrength
+        push pVecWindDir
+        mov ecx, m_pInterface
         call dwFunc
     }
+}
+
+void CFxManagerSA::DestroyFxSystem(CFxSystemSA* pFxSystem)
+{
+    uint32 dwFunc = (uint32)FUNC_CFxManager__DestroyFxSystem;
+    __asm
+    {
+        push pFxSystem
+        mov ecx, m_pInterface
+        call dwFunc
+    }
+}
+
+CFxSystemSA* CFxManagerSA::InitialiseFxSystem(CFxSystemBPSA* pFxSystemBP, CVector& vecPos, RwMatrix* pMatrix, bool bUnknown)
+{
+    const CVector * pVecPos = &vecPos;
+    uint32 dwFunc = (uint32)FUNC_CFxManager__InitialiseFxSystem;
+    class CFxSystemSAInterface* pRet = NULL;
+    __asm
+    {
+        push bUnknown
+        push pMatrix
+        push pVecPos
+        push pFxSystemBP
+        mov ecx, m_pInterface
+        call dwFunc
+        mov pRet, eax
+    }
+    if(pRet)
+    {
+        return new CFxSystemSA(pRet);
+    }
+    return NULL;
+}
+
+CFxSystemSA* CFxManagerSA::InitialiseFxSystem(CFxSystemBPSA* pFxSystemBP, RwMatrix* pMatrix1, RwMatrix* pMatrix2, bool bUnknown)
+{
+    uint32 dwFunc = (uint32)FUNC_CFxManager__InitialiseFxSystem2;
+    CFxSystemSAInterface* pRet = NULL;
+    __asm
+    {
+        push bUnknown
+        push pMatrix2
+        push pMatrix1
+        push pFxSystemBP
+        mov ecx, m_pInterface
+        call dwFunc
+        mov pRet, eax
+    }
+    if(pRet)
+    {
+        return new CFxSystemSA(pRet);
+    }
+    return NULL;
 }

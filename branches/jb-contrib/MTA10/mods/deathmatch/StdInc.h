@@ -79,6 +79,9 @@
 #include <CClientMaterial.h>
 #include <CClientTexture.h>
 #include <CClientShader.h>
+#include <CClientFxManager.h>
+#include <CClientFxSystemBP.h>
+#include <CClientFxSystem.h>
 #include <CCustomData.h>
 #include <CElementArray.h>
 #include <CLogger.h>

@@ -36,9 +36,10 @@ public:
 };
 C_ASSERT(sizeof(CFxSystemSAInterface) == 0x104);
 
-class CFxSystem
+class CFxSystemSA
 {
 public:
+    CFxSystemSA(CFxSystemSAInterface* pInterface) { m_pInterface = pInterface; }
 private:
     CFxSystemSAInterface * m_pInterface;
 };

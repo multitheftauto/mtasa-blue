@@ -965,6 +965,58 @@ int CLuaFunctionDefs::GetPedAnalogControlState ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetPedOxygenLevel ( lua_State* luaVM)
+{
+//  float getPedOxgenLevel ( element ped )
+    CClientPed* pPed = NULL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPed );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( pPed )
+        {
+            lua_pushnumber ( luaVM, pPed->GetOxygenLevel() );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedOxygenLevel", "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getPedOxygenLevel" );
+
+    lua_pushnumber ( luaVM, 0.0 );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetPedOxygenLevel ( lua_State* luaVM )
+{
+//  bool setPedOxygenLevel ( element ped, float oxygenLevel )
+    CClientPed* pPed = NULL; float fOxygenLevel;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPed );
+    argStream.ReadNumber ( fOxygenLevel );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( pPed )
+        {
+            pPed->SetOxygenLevel ( fOxygenLevel );
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedOxygenLevel", "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setPedOxygenLevel" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::IsPedDoingGangDriveby ( lua_State* luaVM )
 {
     if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )

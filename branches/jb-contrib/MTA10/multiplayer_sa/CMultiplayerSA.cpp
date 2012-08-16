@@ -1271,6 +1271,9 @@ void CMultiplayerSA::InitHooks()
     // Force the MrWhoopee music to load even if we are not the driver.
     MemPut < BYTE > ( 0x4F9CCE, 0xCE );
 
+    // Force plane and helicopters music to load even if we are not the driver.
+    MemPut < BYTE > ( 0x4F9C9D, 0xCE );
+
     // Disable re-initialization of DirectInput mouse device by the game
     MemPut < BYTE > ( 0x576CCC, 0xEB );
     MemPut < BYTE > ( 0x576EBA, 0xEB );

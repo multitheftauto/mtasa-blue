@@ -137,6 +137,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bUsesCollision = true;
     m_fHealth = 100.0f;
     m_fArmor = 0.0f;
+    m_fOxygenLevel = 0.0f;
     m_bWorldIgnored = false;
     m_fCurrentRotation = 0.0f;
     m_fMoveSpeed = 0.0f;
@@ -1601,6 +1602,23 @@ void CClientPed::SetArmor ( float fArmor )
     m_fArmor = fArmor;
 }
 
+float CClientPed::GetOxygenLevel ( void )
+{
+    if ( m_pPlayerPed )
+    {
+        return m_pPlayerPed->GetOxygenLevel (); 
+    }
+    return m_fOxygenLevel;
+}
+
+void CClientPed::SetOxygenLevel ( float fOxygenLevel )
+{
+    if ( m_pPlayerPed )
+    {
+        m_pPlayerPed->SetOxygenLevel ( fOxygenLevel );
+    }
+    m_fOxygenLevel = fOxygenLevel;
+}
 
 void CClientPed::LockHealth ( float fHealth )
 {

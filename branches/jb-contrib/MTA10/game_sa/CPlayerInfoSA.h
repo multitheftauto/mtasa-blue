@@ -55,7 +55,7 @@ public:
     float   TargetX, TargetY;   // -1 ... 1 on screen
 };
 
-
+#pragma message("CPlayerPedDataSAInterface is wrong, needs redoing")
 class CPlayerPedDataSAInterface
 {
 public:

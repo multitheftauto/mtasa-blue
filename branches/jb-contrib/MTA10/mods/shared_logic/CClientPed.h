@@ -220,6 +220,8 @@ public:
     void                        InternalSetHealth           ( float fHealth );
     float                       GetArmor                    ( void );
     void                        SetArmor                    ( float fArmor );
+    float                       GetOxygenLevel              ( void );
+    void                        SetOxygenLevel              ( float fOxygenLevel );
 
     void                        LockHealth                  ( float fHealth );
     void                        LockArmor                   ( float fArmor );
@@ -533,6 +535,7 @@ public:
     bool                        m_bUsesCollision;
     float                       m_fHealth;
     float                       m_fArmor;
+    float                       m_fOxygenLevel;
     bool                        m_bWorldIgnored;
     float                       m_fCurrentRotation;
     float                       m_fMoveSpeed;

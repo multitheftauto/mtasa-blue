@@ -761,6 +761,26 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientFxEmitter.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientFxEmitterBP.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientFxManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientFxSystem.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientFxSystemBP.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientGroups.cpp"
 					>
 				</File>
@@ -2308,6 +2328,26 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientExplosionManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientFxEmitter.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientFxEmitterBP.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientFxManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientFxSystem.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientFxSystemBP.h"
 					>
 				</File>
 				<File

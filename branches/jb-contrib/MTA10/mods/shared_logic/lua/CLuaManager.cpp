@@ -472,6 +472,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPedAimTarget", CLuaFunctionDefs::SetPedAimTarget );
     CLuaCFunctions::AddFunction ( "getWeaponProperty", CLuaFunctionDefs::GetWeaponProperty );
     CLuaCFunctions::AddFunction ( "getOriginalWeaponProperty", CLuaFunctionDefs::GetOriginalWeaponProperty );
+    CLuaCFunctions::AddFunction ( "getPedOxygenLevel", CLuaFunctionDefs::GetPedOxygenLevel );
+    CLuaCFunctions::AddFunction ( "setPedOxygenLevel", CLuaFunctionDefs::SetPedOxygenLevel );
 
     // Clothes and body functions
     CLuaCFunctions::AddFunction ( "getBodyPartName", CLuaFunctionDefs::GetBodyPartName );

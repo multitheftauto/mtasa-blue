@@ -28,8 +28,123 @@ void CLuaFxDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "fxAddBulletSplash", CLuaFxDefs::fxAddBulletSplash );
     CLuaCFunctions::AddFunction ( "fxAddFootSplash", CLuaFxDefs::fxAddFootSplash );
 
-//    CLuaCFunctions::AddFunction ( "fxAddParticle", CLuaFunctionDefs::FxAddParticle );
-//    CLuaCFunctions::AddFunction ( "fxSetParticleInfo", CLuaFunctionDefs::FxSetParticleInfo );
+    CLuaCFunctions::AddFunction ( "fxCreateSystem", CLuaFunctionDefs::FxCreateSystem );
+    CLuaCFunctions::AddFunction ( "fxCreateEntityEffect", CLuaFxDefs::fxCreateEntityEffect );
+    CLuaCFunctions::AddFunction ( "fxRemoveEntityEffect", CLuaFxDefs::fxRemoveEntityEffect );
+    CLuaCFunctions::AddFunction ( "fxSetDrawDistance", CLuaFxDefs::fxSetDrawDistance );
+    CLuaCFunctions::AddFunction ( "fxGetDrawDistance", CLuaFxDefs::fxGetDrawDistance );
+    //    CLuaCFunctions::AddFunction ( "fxSetParticleInfo", CLuaFunctionDefs::FxSetParticleInfo );
+}
+
+/**
+ *  effectname is from effects.fxp(or ones we create when that will be possible)
+ */
+int CLuaFxDefs::fxCreateEntityEffect(lua_State* luaVM)
+{
+//  bool fxCreateEntityEffect ( element entity, string effectname, float x, float y, float z )
+    CClientEntity* pEntity = NULL; SString strEffectName;
+    CVector pos;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadString ( strEffectName );
+    argStream.ReadNumber ( pos.fX );
+    argStream.ReadNumber ( pos.fY );
+    argStream.ReadNumber ( pos.fZ );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        DWORD dwClass = 0xA9AE00;    
+        DWORD dwFunc = 0x4A11E0;
+        CVector* pVecPos = &pos;
+        const char* szEffectName = *strEffectName;
+        CEntitySAInterface* pEntityInterface = pEntity->GetGameEntity()->GetInterface();
+        RwMatrix* pMatrix = NULL;
+        if(pEntityInterface->m_pRwObject)
+        {
+            RwFrame
+                *pParent = reinterpret_cast<RwFrame*>(pEntityInterface->m_pRwObject->object.parent);
+            if(pParent)
+            {
+                pMatrix = &pParent->modelling;
+            }
+        }
+        __asm
+        {
+            push pMatrix
+            push pVecPos
+            push szEffectName
+            push pEntityInterface
+            mov ecx, dwClass
+            call dwFunc
+        }
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fxCreateEntityFx", *argStream.GetErrorMessage () ) );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFxDefs::fxRemoveEntityEffect(lua_State* luaVM)
+{
+//  bool fxRemoveEntityEffect(element entity)
+    CClientEntity* pEntity = NULL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        CEntitySAInterface* pInterface = pEntity->GetGameEntity()->GetInterface();
+        DWORD dwClass = 0xA9AE00;
+        DWORD dwFunc = 0x4A1280;
+        __asm
+        {
+            push pInterface
+            mov ecx, dwClass
+            call dwFunc
+        }
+        lua_pushboolean ( luaVM, true );  
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fxRemoveEntityEffect", *argStream.GetErrorMessage () ) );
+    
+    lua_pushboolean ( luaVM, false );  
+    return 1;
+}
+
+int CLuaFxDefs::fxSetDrawDistance(lua_State* luaVM)
+{
+//  bool fxSetDrawDistance(float distance)
+    float fDrawDistance;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( fDrawDistance );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        // TODO
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fxSetDrawDistance", *argStream.GetErrorMessage () ) );
+    
+    lua_pushboolean ( luaVM, false );  
+    return 1;
+}
+
+int CLuaFxDefs::fxGetDrawDistance(lua_State* luaVM)
+{
+//  float fxGetDrawDistance(float distance)
+    float fDrawDistance;
+    // TODO IMPLEMENT
+    lua_pushnumber ( luaVM, 0 );  
+    return 1;
 }
 
 int CLuaFunctionDefs::FxSetParticleInfo(lua_State* luaVM)
@@ -64,22 +179,20 @@ int CLuaFunctionDefs::FxSetParticleInfo(lua_State* luaVM)
 //          so will need to do context-based nulling out(i.e. if someone wants to have red jetpack thrusters, disable setting it in CPed::RenderJetPack and add function to reenable it)
 int CLuaFunctionDefs::FxCreateSystem(lua_State* luaVM)
 {
-//  element fxAddParticle ( string name, float pointX, float pointY, float pointZ, table matrix, bool unknown  )
+//  element fxCreateSystem ( string name, float pointX, float pointY, float pointZ, bool unknown  )
 #if 0
     SString strParticleName; CVector vecPoint; 
-    RwMatrix matrix; bool bUnk; float rawMatrix[3][3];
+    bool bUnk;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strParticleName );
     argStream.ReadNumber ( vecPoint.fX );
     argStream.ReadNumber ( vecPoint.fY );
     argStream.ReadNumber ( vecPoint.fZ );
-    argStream.ReadMatrix ( rawMatrix );
 
-    matrix = rawMatrix;
     if ( !argStream.HasErrors ( ) )
     {
-        if ( CStaticFunctionDefinitions::FxAddSystem ( strParticleName, vecPoint, matrix, bUnk ) )
+        if ( CStaticFunctionDefinitions::FxCreateSystem ( strParticleName, vecPoint, bUnk ) )
         {
             return 1;
         }
@@ -266,7 +379,7 @@ int CLuaFxDefs::fxAddSparks ( lua_State* luaVM )
     argStream.ReadNumber ( vecAcrossLine.fX );
     argStream.ReadNumber ( vecAcrossLine.fY );
     argStream.ReadNumber ( vecAcrossLine.fZ );
-    argStream.ReadNumber ( bBlur, false );
+    argStream.ReadBool ( bBlur, false );
     argStream.ReadNumber ( fSpread, 1.0f );
     argStream.ReadNumber ( fLife, 1.0f );
 
@@ -489,7 +602,7 @@ int CLuaFxDefs::fxAddGunshot ( lua_State* luaVM )
     argStream.ReadNumber ( vecDirection.fX );
     argStream.ReadNumber ( vecDirection.fY );
     argStream.ReadNumber ( vecDirection.fZ );
-    argStream.ReadNumber ( bIncludeSparks, true );
+    argStream.ReadBool ( bIncludeSparks, true );
 
     if ( !argStream.HasErrors ( ) )
     {
