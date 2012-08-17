@@ -829,7 +829,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     EZHookInstall ( CrashFix_Misc16 );
     //EZHookInstall ( CrashFix_Misc17 );
     EZHookInstall ( CrashFix_Misc18 );
-    EZHookInstall ( CrashFix_Misc19 );
+    //EZHookInstall ( CrashFix_Misc19 );
     EZHookInstall ( CrashFix_Misc20 );
     EZHookInstall ( CrashFix_Misc21 );
     EZHookInstall ( CrashFix_Misc22 );
