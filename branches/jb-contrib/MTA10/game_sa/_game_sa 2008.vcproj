@@ -1130,7 +1130,7 @@
 				>
 			</File>
 			<File
-				RelativePath="CEventListSA.h"
+				RelativePath=".\CEventListSA.h"
 				>
 			</File>
 			<File

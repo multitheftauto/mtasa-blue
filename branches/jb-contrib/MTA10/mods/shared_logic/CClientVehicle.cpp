@@ -325,6 +325,15 @@ void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterp
                     pInterface->WheelRearRightColPoint.Position += vecPosition - m_Matrix.vPos;
                 }
                 break;
+                case CLIENTVEHICLE_BIKE:
+                {
+                    CBikeSAInterface* pInterface = reinterpret_cast<CBikeSAInterface*>(m_pVehicle->GetInterface());
+                    pInterface->WheelColPointArray[0].Position += vecPosition - m_Matrix.vPos;
+                    pInterface->WheelColPointArray[1].Position += vecPosition - m_Matrix.vPos;
+                    pInterface->WheelColPointArray[2].Position += vecPosition - m_Matrix.vPos;
+                    pInterface->WheelColPointArray[3].Position += vecPosition - m_Matrix.vPos;
+                }
+                break;
                 default: break;
             }
         }

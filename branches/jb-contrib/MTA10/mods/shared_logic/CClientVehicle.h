@@ -38,6 +38,7 @@ class CClientVehicle;
 #include "CClientTime.h"
 // temp, must be resolved at code review by higer authority
 #include "../../game_sa/CAutomobileSA.h"
+#include "../../game_sa/CBikeSA.h"
 
 #define INVALID_PASSENGER_SEAT 0xFF
 #define DEFAULT_VEHICLE_HEALTH 1000
