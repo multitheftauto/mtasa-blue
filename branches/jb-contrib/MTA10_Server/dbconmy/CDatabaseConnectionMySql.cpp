@@ -320,7 +320,7 @@ bool CDatabaseConnectionMySql::QueryInternal ( const SString& strQuery, CRegistr
                     case SQLITE_NULL:
                         break;
                     case SQLITE_INTEGER:
-                        cell.nVal = atol ( inData );
+                        cell.nVal = atoi64 ( inData );
                         break;
                     case SQLITE_FLOAT:
                         cell.fVal = (float)atof ( inData );
@@ -433,10 +433,12 @@ int CDatabaseConnectionMySql::ConvertToSqliteType ( enum_field_types type )
 	    case MYSQL_TYPE_INT24:
 	    case MYSQL_TYPE_SHORT:
         case MYSQL_TYPE_LONG:
+        case MYSQL_TYPE_TINY:
             return SQLITE_INTEGER;
 
 	    case MYSQL_TYPE_FLOAT:
         case MYSQL_TYPE_DOUBLE:
+        case MYSQL_TYPE_DECIMAL:
             return SQLITE_FLOAT;
 
         case MYSQL_TYPE_TINY_BLOB:

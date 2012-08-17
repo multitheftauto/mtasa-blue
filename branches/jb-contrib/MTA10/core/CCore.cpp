@@ -138,9 +138,6 @@ CCore::CCore ( void )
     m_bWaitToSetNick = false;
     m_DiagnosticDebug = EDiagnosticDebug::NONE;
 
-    // Initialize time
-    CClientTime::InitializeTime ();
-
     // Create our Direct3DData handler.
     m_pDirect3DData = new CDirect3DData;
 
@@ -175,8 +172,6 @@ CCore::CCore ( void )
     m_bDoneFrameRateLimit = false;
     m_uiFrameRateLimit = 0;
     m_uiServerFrameRateLimit = 0;
-    m_dLastTimeMs = 0;
-    m_dPrevOverrun = 0;
     m_uiNewNickWaitFrames = 0;
     m_iUnminimizeFrameCounter = 0;
     m_bDidRecreateRenderTargets = false;
@@ -605,6 +600,7 @@ void CCore::ApplyGameSettings ( void )
 
     CVARS_GET ( "invert_mouse",     bval ); pController->SetMouseInverted ( bval );
     CVARS_GET ( "fly_with_mouse",   bval ); pController->SetFlyWithMouse ( bval );
+    CVARS_GET ( "steer_with_mouse", bval ); pController->SetSteerWithMouse ( bval );
     CVARS_GET ( "classic_controls", bval ); bval ? pController->SetInputType ( NULL ) : pController->SetInputType ( 1 );
     CVARS_GET ( "async_loading",    iVal ); m_pGame->SetAsyncLoadingFromSettings ( iVal == 1, iVal == 2 );
     CVARS_GET ( "volumetric_shadows", bval ); m_pGame->GetSettings ()->SetVolumetricShadowsEnabled ( bval );
@@ -1801,11 +1797,14 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
     if ( uiUseRate < 1 )
         return DoReliablePulse ();
 
+    if ( m_DiagnosticDebug != EDiagnosticDebug::D3D_6732 )
+         Sleep( 1 );    // Make frame rate smoother maybe
+
     // Calc required time in ms between frames
     const double dTargetTimeToUse = 1000.0 / uiUseRate;
 
     // Time now
-    double dTimeMs = CClientTime::GetTimeNano() * 1000.0;
+    double dTimeMs = GetTickCount32 ();
 
     // Get delta time in ms since last frame
     double dTimeUsed = dTimeMs - m_dLastTimeMs;
@@ -1823,7 +1822,7 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
             Sleep( static_cast < DWORD > ( floor ( dUseUpNow ) ) );
 
         // Redo timing calcs
-        dTimeMs = CClientTime::GetTimeNano() * 1000.0;
+        dTimeMs = GetTickCount32 ();
         dTimeUsed = dTimeMs - m_dLastTimeMs;
         dTimeUsed += m_dPrevOverrun;
     }
@@ -1956,6 +1955,9 @@ void CCore::OnPreHUDRender ( void )
     }
     else
         m_pModManager->DoPulsePreHUDRender ( false, false );
+
+    // Restore in case script forgets
+    CGraphics::GetSingleton ().GetRenderItemManager ()->RestoreDefaultRenderTarget ();
 
     // Draw pre-GUI primitives
     CGraphics::GetSingleton ().DrawPreGUIQueue ();

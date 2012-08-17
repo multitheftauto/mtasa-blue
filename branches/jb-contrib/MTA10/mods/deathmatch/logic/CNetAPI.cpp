@@ -780,7 +780,6 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
         pPlayer->SetChoking ( flags.data.bIsChoking );       
     }
 
-    ModifyControllerStateForBulletSync ( pPlayer, ControllerState );
     pPlayer->SetControllerState ( ControllerState );
     if ( BitStream.Version () >= 0x2C )
     {
@@ -1080,7 +1079,6 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     }
 
     // Set move speed, controller state and camera rotation + duck state
-    ModifyControllerStateForBulletSync ( pPlayer, ControllerState );
     pPlayer->SetControllerState ( ControllerState );
     pPlayer->SetCameraRotation ( fCameraRotation );
     pPlayer->Duck ( flags.data.bIsDucked );
@@ -1629,7 +1627,7 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
 
         // Write the trailer chain
         CClientVehicle* pTrailer = pVehicle->GetRealTowedVehicle ();
-        while ( pTrailer )
+        while ( pTrailer && !pTrailer->IsLocalEntity () )
         {
             BitStream.WriteBit ( true );
             BitStream.Write ( pTrailer->GetID () );
@@ -1921,7 +1919,7 @@ void CNetAPI::WriteFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamI
 
 void CNetAPI::WriteCameraSync ( NetBitStreamInterface& BitStream )
 {
-    CClientCamera * pCamera = m_pManager->GetCamera ();
+    CClientCamera* pCamera = m_pManager->GetCamera ();
 
     // Are we in fixed mode?
     bool bFixed = pCamera->IsInFixedMode ();
@@ -1941,10 +1939,14 @@ void CNetAPI::WriteCameraSync ( NetBitStreamInterface& BitStream )
     else
     {
         // Write our target
-        CClientPlayer * pPlayer = pCamera->GetFocusedPlayer ();
-        if ( !pPlayer ) pPlayer = g_pClientGame->GetLocalPlayer ();
+        ElementID ID = INVALID_ELEMENT_ID;
+        CClientPlayer* pPlayer = pCamera->GetFocusedPlayer ();
+        if ( !pPlayer )
+            pPlayer = g_pClientGame->GetLocalPlayer ();
+        if ( !pPlayer->IsLocalEntity () )
+            ID = pPlayer->GetID ();
 
-        BitStream.Write ( pPlayer->GetID () );
+        BitStream.Write ( ID );
     }
 }
 
@@ -2154,21 +2156,6 @@ void CNetAPI::ReadVehicleResync ( CClientVehicle* pVehicle, NetBitStreamInterfac
 
 
 //
-// Allow bulletsync to modify fire button pressed state for remote players
-//
-void CNetAPI::ModifyControllerStateForBulletSync ( CClientPlayer* pPlayer, CControllerState& ControllerState )
-{
-    if ( ControllerState.ButtonCircle != 0 )
-    {
-        // If bullet sync is enabled for the current weapon, remove fire button presses
-        eWeaponType weaponType = pPlayer->GetCurrentWeaponType ();
-        if ( g_pClientGame->GetWeaponTypeUsesBulletSync ( weaponType ) )
-            ControllerState.ButtonCircle = 0;
-    }
-}
-
-
-//
 // Read bulletsync packet for a remote player
 //
 void CNetAPI::ReadBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream )
@@ -2186,6 +2173,36 @@ void CNetAPI::ReadBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& Bi
     CVector vecStart, vecEnd;
     BitStream.Read ( (char*)&vecStart, sizeof ( CVector ) );
     BitStream.Read ( (char*)&vecEnd, sizeof ( CVector ) );
+
+    uchar ucOrderCounter = 0;
+    if ( g_pNet->GetServerBitStreamVersion () >= 0x34 )
+        BitStream.Read ( ucOrderCounter );
+
+    // Duplicate bullet check
+    {
+       bool bIsDuplicate = false;
+   
+       // Check if duplicate by comparing with previously sent vectors
+       if ( vecStart == pPlayer->m_vecPrevBulletSyncStart && vecEnd == pPlayer->m_vecPrevBulletSyncEnd )
+       {
+           bIsDuplicate = true;
+       }
+       pPlayer->m_vecPrevBulletSyncStart = vecStart;
+       pPlayer->m_vecPrevBulletSyncEnd = vecEnd;
+   
+       // Verify if duplicate by comparing order counter
+       if ( pPlayer->GetRemoteBitstreamVersion () >= 0x34 )
+       {
+           char cDif = ucOrderCounter - pPlayer->m_ucPrevBulletSyncOrderCounter;
+           if ( cDif > 0 )
+               bIsDuplicate = false;
+   
+           pPlayer->m_ucPrevBulletSyncOrderCounter = ucOrderCounter;
+       }
+
+        if ( bIsDuplicate )
+            return;
+    }
 
     pPlayer->DischargeWeapon ( weaponType, vecStart, vecEnd );
 }
@@ -2208,6 +2225,11 @@ void CNetAPI::SendBulletSyncFire ( eWeaponType weaponType, const CVector& vecSta
 
     pBitStream->Write ( (const char*)&vecStart, sizeof ( CVector ) );
     pBitStream->Write ( (const char*)&vecEnd, sizeof ( CVector ) );
+
+    if ( g_pNet->GetServerBitStreamVersion () >= 0x34 )
+    {
+        pBitStream->Write ( m_ucBulletSyncOrderCounter++ );
+    }
 
     // Send the packet
     g_pNet->SendPacket ( PACKET_ID_PLAYER_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE );

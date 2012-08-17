@@ -18,6 +18,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define REMOVEPEDFROMVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION  "1.3.0-9.04482"
+#define WARPPEDINTOVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION    "1.3.0-9.04482"
 
 int CLuaFunctionDefs::GetPedVoice ( lua_State* luaVM )
 {
@@ -46,10 +48,10 @@ int CLuaFunctionDefs::GetPedVoice ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedVoice", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedVoice" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -80,15 +82,15 @@ int CLuaFunctionDefs::SetPedVoice ( lua_State* luaVM )
             return 1;
         }
         else if ( !pPed )
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedVoice", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
         else if ( !szVoiceType )
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedVoice", "voicetype", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "voicetype", 1 );
         else if ( !szVoiceBank )
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedVoice", "voicebank", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "voicebank", 1 );
 
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedVoice" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -122,10 +124,10 @@ int CLuaFunctionDefs::GetPedWeapon ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedWeapon", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedWeapon" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -148,10 +150,10 @@ int CLuaFunctionDefs::GetPedWeaponSlot ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedWeaponSlot", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedWeaponSlot" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -187,10 +189,10 @@ int CLuaFunctionDefs::GetPedAmmoInClip ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedAmmoInClip", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedAmmoInClip" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -227,10 +229,10 @@ int CLuaFunctionDefs::GetPedTotalAmmo ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedTotalAmmo", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedTotalAmmo" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -255,10 +257,10 @@ int CLuaFunctionDefs::GetPedWeaponMuzzlePosition ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedWeaponMuzzlePosition", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedWeaponMuzzlePosition" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -283,7 +285,7 @@ int CLuaFunctionDefs::GetPedOccupiedVehicle ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedOccupiedVehicle", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
 
     // Failed
@@ -328,10 +330,10 @@ int CLuaFunctionDefs::GetPedTask ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedTask", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedTask" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -357,10 +359,10 @@ int CLuaFunctionDefs::GetPedSimplestTask ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedSimplestTask", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedSimplestTask" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -390,10 +392,10 @@ int CLuaFunctionDefs::IsPedDoingTask ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "isPedDoingTask", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "isPedDoingTask" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -419,10 +421,10 @@ int CLuaFunctionDefs::GetPedTarget ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedTarget", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedTarget" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -449,10 +451,10 @@ int CLuaFunctionDefs::GetPedTargetStart ( lua_State* luaVM )
             return 3;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedTargetStart", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedTargetStart" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -479,10 +481,10 @@ int CLuaFunctionDefs::GetPedTargetEnd ( lua_State* luaVM )
             return 3;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedTargetEnd", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedTargetEnd" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -502,10 +504,10 @@ int CLuaFunctionDefs::GetPedTargetRange ( lua_State* luaVM )
             // TODO: getPedTargetRange
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedTargetRange", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedTargetRange" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -533,10 +535,10 @@ int CLuaFunctionDefs::GetPedTargetCollision ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedTargetCollision", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedTargetCollision" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -559,10 +561,10 @@ int CLuaFunctionDefs::GetPedArmor ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedArmor", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedArmor" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -594,10 +596,10 @@ int CLuaFunctionDefs::GetPedStat ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedStat", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedStat" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -619,10 +621,10 @@ int CLuaFunctionDefs::IsPedChoking ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "isPedChoking", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "isPedChoking" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushnil ( luaVM );
@@ -645,10 +647,10 @@ int CLuaFunctionDefs::IsPedDucked ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "isPedDucked", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "isPedDucked" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushnil ( luaVM );
@@ -675,10 +677,10 @@ int CLuaFunctionDefs::IsPedInVehicle ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "isPedInVehicle", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "isPedInVehicle" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushnil ( luaVM );
@@ -701,10 +703,10 @@ int CLuaFunctionDefs::DoesPedHaveJetPack ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "doesPedHaveJetPack", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "doesPedHaveJetPack" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -727,10 +729,10 @@ int CLuaFunctionDefs::IsPedOnGround ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "isPedOnGround", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "isPedOnGround" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -754,10 +756,10 @@ int CLuaFunctionDefs::GetPedContactElement ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedContactElement", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedContactElement" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -777,10 +779,10 @@ int CLuaFunctionDefs::GetPedRotation ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedRotation", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedRotation" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -800,10 +802,10 @@ int CLuaFunctionDefs::CanPedBeKnockedOffBike ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "canPedBeKnockedOffBike", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "canPedBeKnockedOffBike" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -834,10 +836,10 @@ int CLuaFunctionDefs::GetPedBonePosition ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedBonePosition", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedBonePosition" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -869,10 +871,10 @@ int CLuaFunctionDefs::SetPedWeaponSlot ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedWeaponSlot", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedWeaponSlot" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -899,10 +901,10 @@ int CLuaFunctionDefs::GetPedClothes ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedClothes", "player", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "player", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedClothes" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -926,10 +928,10 @@ int CLuaFunctionDefs::GetPedControlState ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedControlState", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedControlState" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -956,10 +958,10 @@ int CLuaFunctionDefs::GetPedAnalogControlState ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedAnalogControlState", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedAnalogControlState" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1032,10 +1034,10 @@ int CLuaFunctionDefs::IsPedDoingGangDriveby ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "isPedDoingGangDriveby", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "isPedDoingGangDriveby" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1063,10 +1065,10 @@ int CLuaFunctionDefs::SetPedAnalogControlState ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAnalogControlState", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedAnalogControlState" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1088,10 +1090,10 @@ int CLuaFunctionDefs::GetPedAnimation ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedAnimation", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedAnimation" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1112,10 +1114,10 @@ int CLuaFunctionDefs::GetPedMoveState ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "GetPedMoveState", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "GetPedMoveState" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1136,10 +1138,10 @@ int CLuaFunctionDefs::GetPedMoveAnim ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedWalkingStyle", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedWalkingStyle" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1161,10 +1163,10 @@ int CLuaFunctionDefs::IsPedHeadless ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "isPedHeadless", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "isPedHeadless" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1186,10 +1188,10 @@ int CLuaFunctionDefs::IsPedFrozen ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "isPedFrozen", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "isPedFrozen" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1211,10 +1213,10 @@ int CLuaFunctionDefs::IsPedFootBloodEnabled ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "isPedFootBloodEnabled", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "isPedFootBloodEnabled" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1236,10 +1238,10 @@ int CLuaFunctionDefs::GetPedCameraRotation ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedCameraRotation", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedCameraRotation" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1261,10 +1263,10 @@ int CLuaFunctionDefs::IsPedOnFire ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "isPedOnFire", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "isPedOnFire" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1286,14 +1288,81 @@ int CLuaFunctionDefs::SetPedOnFire ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedOnFire", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedOnFire" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::WarpPedIntoVehicle ( lua_State* luaVM )
+{
+//  warpPedIntoVehicle ( element ped, element vehicle, int seat )
+    CClientPed* pPed; CClientVehicle* pVehicle; uint uiSeat;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPed );
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadNumber ( uiSeat, 0 );
+
+    MinClientCheck ( argStream, WARPPEDINTOVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION, "function is being called client side" );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( !pPed->IsLocalEntity () || !pVehicle->IsLocalEntity () )
+            argStream.SetCustomError ( "This client side function will only work with client created peds and vehicles" );
+    }
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::WarpPedIntoVehicle ( pPed, pVehicle, uiSeat ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::RemovePedFromVehicle ( lua_State* luaVM )
+{
+//  removePedFromVehicle ( element ped )
+    CClientPed* pPed;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPed );
+
+    MinClientCheck ( argStream, REMOVEPEDFROMVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION, "function is being called client side" );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( !pPed->IsLocalEntity ()  )
+            argStream.SetCustomError ( "This client side function will only work with client created peds" );
+    }
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::RemovePedFromVehicle ( pPed ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefs::AddPedClothes ( lua_State* luaVM )
 {
@@ -1317,10 +1386,10 @@ int CLuaFunctionDefs::AddPedClothes ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "addPedClothes", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "addPedClothes" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1345,10 +1414,10 @@ int CLuaFunctionDefs::RemovePedClothes ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "removePedClothes", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "removePedClothes" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1373,10 +1442,10 @@ int CLuaFunctionDefs::SetPedControlState ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedControlState", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedControlState" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1399,10 +1468,10 @@ int CLuaFunctionDefs::SetPedDoingGangDriveby ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedDoingGangDriveby", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedDoingGangDriveby" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1452,10 +1521,10 @@ int CLuaFunctionDefs::SetPedLookAt ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedLookAt", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedLookAt" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1478,10 +1547,10 @@ int CLuaFunctionDefs::SetPedHeadless ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedHeadless", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedHeadless" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1504,10 +1573,10 @@ int CLuaFunctionDefs::SetPedFrozen ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedFrozen", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedFrozen" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1530,10 +1599,10 @@ int CLuaFunctionDefs::SetPedFootBloodEnabled ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedFootBloodEnabled", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedFootBloodEnabled" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1557,10 +1626,10 @@ int CLuaFunctionDefs::SetPedCameraRotation ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedCameraRotation", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedCameraRotation" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1593,10 +1662,10 @@ int CLuaFunctionDefs::SetPedAimTarget ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAimTarget", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedAimTarget" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1624,10 +1693,10 @@ int CLuaFunctionDefs::SetPedRotation ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedRotation", "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedRotation" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1656,10 +1725,10 @@ int CLuaFunctionDefs::SetPedCanBeKnockedOffBike ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedCanBeKnockedOffBike", "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedCanBeKnockedOffBike" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1704,10 +1773,10 @@ int CLuaFunctionDefs::SetPedAnimation ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAnimation", "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedAnimation" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1745,13 +1814,13 @@ int CLuaFunctionDefs::SetPedAnimationProgress( lua_State* luaVM )
                 }
             }
             else
-                m_pScriptDebugging->LogBadType ( luaVM, "setPedAnimationProgress" );
+                m_pScriptDebugging->LogBadType ( luaVM );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAnimationProgress", "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedAnimationProgress" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1778,10 +1847,10 @@ int CLuaFunctionDefs::SetPedMoveAnim ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedWalkingStyle", "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedWalkingStyle" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1867,7 +1936,7 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
         else
         {
             // Failed
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponProperty", "invalid weapon type at argument 1" ) );
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "invalid weapon type at argument 1" ) );
             lua_pushboolean ( luaVM, false );
             return 1;
         }
@@ -1886,7 +1955,7 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
         }
         else
         {
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponProperty", "invalid skill type at argument 2" ) );
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "invalid skill type at argument 2" ) );
             lua_pushboolean ( luaVM, false );
             return 1;
         }
@@ -1965,7 +2034,7 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponProperty", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
 
     // Failed
@@ -1995,7 +2064,7 @@ int CLuaFunctionDefs::GetOriginalWeaponProperty ( lua_State* luaVM )
         else
         {
             // Failed
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getOriginalWeaponProperty", "invalid weapon type at argument 1" ) );
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "invalid weapon type at argument 1" ) );
             lua_pushboolean ( luaVM, false );
             return 1;
         }
@@ -2014,7 +2083,7 @@ int CLuaFunctionDefs::GetOriginalWeaponProperty ( lua_State* luaVM )
         }
         else
         {
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getOriginalWeaponProperty", "invalid skill type at argument 2" ) );
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "invalid skill type at argument 2" ) );
             lua_pushboolean ( luaVM, false );
             return 1;
         }
@@ -2093,7 +2162,7 @@ int CLuaFunctionDefs::GetOriginalWeaponProperty ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getOriginalWeaponProperty", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
 
     // Failed

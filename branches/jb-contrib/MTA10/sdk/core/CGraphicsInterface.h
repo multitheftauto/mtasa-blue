@@ -41,6 +41,7 @@ namespace EBlendMode
         BLEND,              // Alpha blend
         ADD,                // Color add                          (used for making composite textures with a premultiplied source)
         MODULATE_ADD,       // Modulate color with alpha then add (used for making composite textures with a non-premultiplied source)
+        OVERWRITE,          // Blat everything
     };
 }
 using EBlendMode::EBlendModeType;
@@ -131,7 +132,6 @@ public:
                                                           bool bColorCoded = false,
                                                           bool bSubPixelPositioning = false ) = 0;
 
-    virtual void                    EnableSetRenderTarget       ( bool bEnable ) = 0;
     // Subsystems
     virtual CRenderItemManagerInterface*   GetRenderItemManager  ( void ) = 0;
     virtual CScreenGrabberInterface*       GetScreenGrabber     ( void ) = 0;

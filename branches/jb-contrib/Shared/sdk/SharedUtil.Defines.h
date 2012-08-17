@@ -43,11 +43,18 @@
 // Copy null terminated string to a temporary buffer on the stack
 //
 #define COPY_CSTR_TO_TEMP_BUFFER( tempname, src, maxsize ) \
-    char tempname [maxsize]; \
-    STRNCPY( tempname, src, maxsize );
+    char tempname [maxsize] = ""; \
+    if ( src ) \
+        STRNCPY( tempname, src, maxsize );
 
 #ifndef _MSC_VER
     #define _isnan isnan
+#endif
+
+#ifdef _MSC_VER
+    #define atoi64 _atoi64
+#else
+    #define atoi64 std::atoll
 #endif
 
 //
@@ -77,6 +84,11 @@
     #define dassert assert
 #else
     #define dassert(_Expression)     ((void)0)
+    #ifdef WIN32
+        // This, along with RedirectedSetUnhandledExceptionFilter means we can get reports from all crashes with the correct crash address in the file name
+        #undef assert
+        #define assert(_Expression) (void)( (!!(_Expression)) || ( *((int*)NULL) = 0) )
+    #endif
 #endif
 
 #define SAFE_DELETE(p) { if(p) { delete (p); (p)=NULL; } }

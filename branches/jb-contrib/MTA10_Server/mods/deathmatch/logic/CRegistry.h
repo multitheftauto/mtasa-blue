@@ -117,7 +117,7 @@ struct CRegistryResultCell
     int                         nType;      // Type identifier, SQLITE_*
     int                         nLength;    // Length in bytes if nType == SQLITE_BLOB or SQLITE_TEXT
                                             //    (includes zero terminator if TEXT)
-    int                         nVal;
+    long long int               nVal;
     float                       fVal;
     unsigned char*              pVal;
 };

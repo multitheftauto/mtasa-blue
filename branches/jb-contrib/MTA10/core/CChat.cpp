@@ -249,7 +249,6 @@ void CChat::Draw ( bool bUseCacheTexture )
         m_PrevDrawList = drawList;
         m_iCacheTextureRevision = m_pCacheTexture->GetRevision ();
 
-        pGraphics->EnableSetRenderTarget ( true );
         pGraphics->GetRenderItemManager ()->SetRenderTarget ( m_pCacheTexture, true );
 
         // Draw new stuff
@@ -258,7 +257,6 @@ void CChat::Draw ( bool bUseCacheTexture )
         pGraphics->SetBlendMode ( EBlendMode::BLEND );
 
         pGraphics->GetRenderItemManager ()->RestoreDefaultRenderTarget ();
-        pGraphics->EnableSetRenderTarget ( false );
     }
 
     // Draw the cache texture

@@ -31,6 +31,8 @@ public:
                             CLuaTimer                   ( const CLuaFunctionRef& iLuaFunction, const CLuaArguments& Arguments );
                             ~CLuaTimer                  ( void );
 
+    void                    RemoveScriptID              ( void );
+
     CTickCount              GetStartTime                ( void ) const                  { return m_llStartTime; };
     inline void             SetStartTime                ( CTickCount llStartTime )      { m_llStartTime = llStartTime; };
 
@@ -44,11 +46,9 @@ public:
 
     CTickCount              GetTimeLeft                 ( void );
 
-    inline bool             IsBeingDeleted              ( void )                        { return m_bBeingDeleted; }
-    inline void             SetBeingDeleted             ( bool bBeingDeleted )          { m_bBeingDeleted = bBeingDeleted; }
     uint                    GetScriptID                 ( void ) const                  { return m_uiScriptID; }
-    inline SString          GetDebugInfo                ( void )                        { return m_strDebugInfo; }
-    inline void             SetDebugInfo                ( SString strDebugInfo )        { m_strDebugInfo = strDebugInfo; }
+    const SString&          GetDebugInfo                ( void )                        { return m_strDebugInfo; }
+    void                    SetDebugInfo                ( const SString& strDebugInfo ) { m_strDebugInfo = strDebugInfo; }
 
 private:
     CLuaFunctionRef         m_iLuaFunction;
@@ -56,7 +56,6 @@ private:
     CTickCount              m_llStartTime;
     CTickCount              m_llDelay;
     unsigned int            m_uiRepeats;
-    bool                    m_bBeingDeleted;
     uint                    m_uiScriptID;
     SString                 m_strDebugInfo;
 };

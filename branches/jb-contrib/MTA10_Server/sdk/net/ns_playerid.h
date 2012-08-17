@@ -15,7 +15,6 @@
 #define __NS_PLAYERID_H
 
 #include <MTAPlatform.h>
-#include <SharedUtil.h>
 
 class SNetExtraInfo : public CRefCountable
 {

@@ -98,9 +98,10 @@ int CLuaModule::_LoadModule ( void )
     if ( m_FunctionInfo.RegisterFunctions == NULL ) return 5;
 
     m_FunctionInfo.ResourceStopping = ( RegisterModuleFunc ) ( GetProcAddress ( m_hModule, "ResourceStopping" ) );
-    if ( m_FunctionInfo.ResourceStopping == NULL ) return 6;
+    // No error for backward compatibility
+    //if ( m_FunctionInfo.ResourceStopping == NULL ) return 6;
     m_FunctionInfo.ResourceStopped = ( RegisterModuleFunc ) ( GetProcAddress ( m_hModule, "ResourceStopped" ) );
-    if ( m_FunctionInfo.ResourceStopped == NULL ) return 7;
+    //if ( m_FunctionInfo.ResourceStopped == NULL ) return 7;
 #else
     m_FunctionInfo.DoPulse = ( DefaultModuleFunc ) ( dlsym ( m_hModule, "DoPulse" ) );
     if ( m_FunctionInfo.DoPulse == NULL ) return 3;
@@ -110,9 +111,9 @@ int CLuaModule::_LoadModule ( void )
     if ( m_FunctionInfo.RegisterFunctions == NULL ) return 5;
 
     m_FunctionInfo.ResourceStopping = ( RegisterModuleFunc ) ( dlsym ( m_hModule, "ResourceStopping" ) );
-    if ( m_FunctionInfo.ResourceStopping == NULL ) return 6;
+    //if ( m_FunctionInfo.ResourceStopping == NULL ) return 6;
     m_FunctionInfo.ResourceStopped = ( RegisterModuleFunc ) ( dlsym ( m_hModule, "ResourceStopped" ) );
-    if ( m_FunctionInfo.ResourceStopped == NULL ) return 7;
+    //if ( m_FunctionInfo.ResourceStopped == NULL ) return 7;
 #endif
     // Run initialisation function
     pfnInitFunc( this, &m_FunctionInfo.szModuleName[0], &m_FunctionInfo.szAuthor[0], &m_FunctionInfo.fVersion );
@@ -166,13 +167,16 @@ void CLuaModule::_DoPulse ( void )
 
 void CLuaModule::_ResourceStopping ( lua_State * luaVM )
 {
-    m_FunctionInfo.ResourceStopping ( luaVM );
+    if ( m_FunctionInfo.ResourceStopping )
+        m_FunctionInfo.ResourceStopping ( luaVM );
 }
 
 
 void CLuaModule::_ResourceStopped ( lua_State * luaVM )
 {
-    m_FunctionInfo.ResourceStopped ( luaVM );
+    if ( m_FunctionInfo.ResourceStopped )
+        m_FunctionInfo.ResourceStopped ( luaVM );
+
     vector < SString > ::iterator iter = m_Functions.begin ();
     for ( ; iter != m_Functions.end (); iter++ )
     {

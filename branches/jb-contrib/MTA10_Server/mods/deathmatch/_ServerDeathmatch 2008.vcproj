@@ -944,14 +944,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\packets\CBulletsyncSettingsPacket.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\packets\CBulletsyncSettingsPacket.h"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\packets\CCameraSyncPacket.cpp"
 						>
 					</File>
@@ -1152,6 +1144,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CSyncSettingsPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CUnoccupiedVehiclePushPacket.cpp"
 						>
 					</File>
@@ -1269,6 +1265,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\luadefs\CLuaCameraDefs.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\luadefs\CLuaClassDefs.cpp"
 						>
 					</File>
 					<File
@@ -2405,6 +2405,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CSyncSettingsPacket.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CUnoccupiedVehiclePushPacket.h"
 						>
 					</File>
@@ -2542,6 +2546,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\luadefs\CLuaCameraDefs.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\luadefs\CLuaClassDefs.h"
 						>
 					</File>
 					<File

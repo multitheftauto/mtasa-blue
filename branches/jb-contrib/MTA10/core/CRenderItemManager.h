@@ -10,7 +10,6 @@
 *
 *****************************************************************************/
 
-struct SNameMatchInfo;
 
 //
 // CRenderItemManager
@@ -29,16 +28,17 @@ public:
     virtual CDxFontItem*        CreateDxFont                        ( const SString& strFullFilePath, uint uiSize, bool bBold );
     virtual CGuiFontItem*       CreateGuiFont                       ( const SString& strFullFilePath, const SString& strFontName, uint uiSize );
     virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath, const CPixels* pPixels, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP, ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1 );
-    virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug );
+    virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask );
     virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false );
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY );
     virtual bool                SetRenderTarget                     ( CRenderTargetItem* pItem, bool bClear );
-    virtual bool                SaveDefaultRenderTarget             ( void );
+    virtual void                EnableSetRenderTargetOldVer         ( bool bEnable );
+    virtual bool                IsSetRenderTargetEnabledOldVer      ( void );
     virtual bool                RestoreDefaultRenderTarget          ( void );
     virtual void                UpdateBackBufferCopy                ( void );
     virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem, bool bResampleNow );
-    virtual CShaderItem*        GetAppliedShaderForD3DData          ( CD3DDUMMY* pD3DData );
-    virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity );
+    virtual SShaderItemLayers*  GetAppliedShaderForD3DData          ( CD3DDUMMY* pD3DData );
+    virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity, bool bAppendLayers );
     virtual bool                RemoveShaderItemFromWorldTexture    ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity );
     virtual void                RemoveClientEntityRefs              ( CClientEntityBase* pClientEntity );
     virtual void                GetVisibleTextureNames              ( std::vector < SString >& outNameList, const SString& strTextureNameMatch, ushort usModelID );
@@ -54,15 +54,11 @@ public:
     void                        OnLostDevice                        ( void );
     void                        OnResetDevice                       ( void );
     void                        UpdateBackBufferCopySize            ( void );
+    bool                        SaveDefaultRenderTarget             ( void );
     void                        ChangeRenderTarget                  ( uint uiSizeX, uint uiSizeY, IDirect3DSurface9* pD3DRenderTarget, IDirect3DSurface9* pD3DZStencilSurface );
     void                        RemoveShaderItemFromWatchLists      ( CShaderItem* pShaderItem );
-    void                        WatchCallback                       ( CSHADERDUMMY* pShaderItem, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld );
-    static void                 StaticWatchCallback                 ( CSHADERDUMMY* pShaderItem, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld );
     void                        UpdateMemoryUsage                   ( void );
     bool                        CanCreateRenderItem                 ( ClassId classId );
-    SNameMatchInfo*             GetNameMatchInfo                    ( const SString& strTextureNameMatch );
-    void                        RemoveNameMatchInfo                 ( SNameMatchInfo* pNameMatchInfo );
-    CClientEntityBase*          GetRenderingClientEntity            ( void );
 
     static int                  GetBitsPerPixel                     ( D3DFORMAT Format );
     static int                  CalcD3DResourceMemoryKBUsage        ( IDirect3DResource9* pD3DResource );
@@ -83,13 +79,8 @@ protected:
     uint                                        m_uiBackBufferCopyRevision;
     std::set < CD3DDUMMY* >                     m_FrameTextureUsage;
     std::set < CD3DDUMMY* >                     m_PrevFrameTextureUsage;
-
-    // Shaders applied to world textures
-    std::map < CD3DDUMMY*, SNameMatchInfo* >    m_D3DDataShaderMap;
     class CRenderWare*                          m_pRenderWare;
     CEffectCloner*                              m_pEffectCloner;
-    std::map < SString, SNameMatchInfo* >       m_NameMatchInfoMap;
-
     eDxTestMode                                 m_TestMode;
     SString                                     m_strVideoCardName;
     int                                         m_iVideoCardMemoryKBTotal;
@@ -99,4 +90,5 @@ protected:
     int                                         m_iRenderTargetMemoryKBUsed;
     int                                         m_iFontMemoryKBUsed;
     int                                         m_iMemoryKBFreeForMTA;
+    bool                                        m_bSetRenderTargetEnabledOldVer;
 };

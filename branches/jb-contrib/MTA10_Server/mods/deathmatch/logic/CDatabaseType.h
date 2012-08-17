@@ -56,6 +56,7 @@ public:
     bool                    m_bLoggingEnabled;
     SString                 m_strLogTag;
     SString                 m_strOtherTag;
+    std::set < int >        m_SuppressedErrorCodes;
 };
 
 

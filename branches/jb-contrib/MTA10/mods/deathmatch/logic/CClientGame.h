@@ -60,6 +60,14 @@
 class CGameEntityXRefManager;
 class CClientModelCacheManager;
 
+struct SVehExtrapolateSettings
+{
+    bool bEnabled;
+    int iBaseMs;
+    int iScalePercent;
+    int iMaxMs;
+};
+
 class CClientGame
 {
     friend class CPacketHandler;
@@ -204,11 +212,13 @@ public:
     void                                SetupLocalGame                  ( const char* szConfig );
     //bool                                StartGame                       ( void );
     inline bool                         IsLocalGame                     ( ) const { return m_bLocalPlay; }
+    bool                                OnCancelLocalGameClick          ( CGUIElement* pElement );
 
     void                                DoPulsePreFrame                 ( void );
     void                                DoPulsePreHUDRender             ( bool bDidUnminimize, bool bDidRecreateRenderTargets );
     void                                DoPulsePostFrame                ( void );
     void                                DoPulses                        ( void );
+    void                                DoPulses2                       ( void );
 
     uint                                GetFrameTimeSlice               ( void ) { return m_uiFrameTimeSlice; }
     uint                                GetFrameCount                   ( void ) { return m_uiFrameCount; }
@@ -472,7 +482,8 @@ private:
     static void                         StaticGameVehicleDestructHandler    ( CEntitySAInterface* pVehicle );
     static void                         StaticGamePlayerDestructHandler     ( CEntitySAInterface* pPlayer );
     static void                         StaticGameModelRemoveHandler        ( ushort usModelId );
-    static void                         StaticWorldSoundHandler        ( uint uiGroup, uint uiIndex );
+    static void                         StaticWorldSoundHandler         ( uint uiGroup, uint uiIndex );
+    static void                         StaticGameEntityRenderHandler   ( CEntitySAInterface* pEntity );
 
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
     void                                FireHandler                     ( CFire* pFire );
@@ -499,7 +510,7 @@ private:
     static bool                         StaticProcessMessage            ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     bool                                ProcessMessage                  ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
-    static void                         PreWeaponFire                   ( CPlayerPed* pPlayerPed );
+    static bool                         PreWeaponFire                   ( CPlayerPed* pPlayerPed, bool bStopIfUsingBulletSync );
     static void                         PostWeaponFire                  ( void );
     static void                         BulletImpact                    ( CPed* pInitiator, CEntity* pVictim, const CVector* pStartPosition, const CVector* pEndPosition );
     static void                         BulletFire                      ( CPed* pInitiator, const CVector* pStartPosition, const CVector* pEndPosition );
@@ -518,6 +529,8 @@ public:
 
     void                                SetSingularTransfers            ( bool bTransfer )  { m_bSingularTransfer = bTransfer; };
     void                                ShowTransferBox                 ( void )            { m_pTransferBox->Show (); };
+    void                                SetVehExtrapolateSettings       ( const SVehExtrapolateSettings& settings ) { m_VehExtrapolateSettings = settings; }
+    const SVehExtrapolateSettings&      GetVehExtrapolateSettings       ( void )                                    { return m_VehExtrapolateSettings; }
 
 private:
     eStatus                             m_Status;
@@ -719,6 +732,9 @@ private:
     CElapsedTime                        m_LastClearTime;
     SString                             m_strServerVersionSortable;
     std::set < eWeaponType >            m_weaponTypesUsingBulletSync;
+    GUI_CALLBACK                        m_OnCancelLocalGameClick;
+
+    SVehExtrapolateSettings             m_VehExtrapolateSettings;
 };
 
 extern CClientGame* g_pClientGame;

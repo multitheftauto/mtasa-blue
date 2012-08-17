@@ -79,6 +79,21 @@ IMPLEMENT_ENUM_BEGIN( eHudComponent )
 IMPLEMENT_ENUM_END( "hud-component" )
 
 IMPLEMENT_ENUM_BEGIN( eWeaponType )
+    ADD_ENUM ( WEAPONTYPE_BRASSKNUCKLE,         "brass_knuckle" )
+    ADD_ENUM ( WEAPONTYPE_GOLFCLUB,             "golfclub" )
+    ADD_ENUM ( WEAPONTYPE_NIGHTSTICK,           "nightstick" )
+    ADD_ENUM ( WEAPONTYPE_KNIFE,                "knife" )
+    ADD_ENUM ( WEAPONTYPE_BASEBALLBAT,          "baseball_bat" )
+    ADD_ENUM ( WEAPONTYPE_SHOVEL,               "shovel" )
+    ADD_ENUM ( WEAPONTYPE_POOL_CUE,             "pool_cue" )
+    ADD_ENUM ( WEAPONTYPE_KATANA,               "katana" )
+    ADD_ENUM ( WEAPONTYPE_CHAINSAW,             "chainsaw" )
+    ADD_ENUM ( WEAPONTYPE_DILDO1,               "dildo1" )
+    ADD_ENUM ( WEAPONTYPE_DILDO2,               "dildo2" )
+    ADD_ENUM ( WEAPONTYPE_VIBE1,                "vibe1" )
+    ADD_ENUM ( WEAPONTYPE_VIBE2,                "vibe2" )
+    ADD_ENUM ( WEAPONTYPE_FLOWERS,              "flowers" )
+    ADD_ENUM ( WEAPONTYPE_CANE,                 "cane" )
     ADD_ENUM ( WEAPONTYPE_GRENADE,              "grenade" )
     ADD_ENUM ( WEAPONTYPE_TEARGAS,              "teargas" )
     ADD_ENUM ( WEAPONTYPE_MOLOTOV,              "molotov" )
@@ -104,6 +119,8 @@ IMPLEMENT_ENUM_BEGIN( eWeaponType )
     ADD_ENUM ( WEAPONTYPE_SPRAYCAN,             "spraycan" )
     ADD_ENUM ( WEAPONTYPE_EXTINGUISHER,         "extinguisher" )
     ADD_ENUM ( WEAPONTYPE_CAMERA,               "camera" )
+    ADD_ENUM ( WEAPONTYPE_NIGHTVISION,          "nightvision" )
+    ADD_ENUM ( WEAPONTYPE_INFRARED,             "infrared" )
 IMPLEMENT_ENUM_END( "weapon-type" )
 
 IMPLEMENT_ENUM_BEGIN( eWeaponProperty )
@@ -244,4 +261,24 @@ void MixedReadResourceString ( CScriptArgReader& argStream, CResource*& pOutReso
 bool StringToBool ( const SString& strText )
 {
     return ( strText == "true" || strText == "1" || strText == "yes" );
+}
+
+
+//
+// Check min server is correct
+//
+void MinServerReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason )
+{
+    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( argStream.m_luaVM );
+    if ( pLuaMain )
+    {
+        CResource* pResource = pLuaMain->GetResource();
+        if ( pResource )
+        {
+            if ( pResource->GetMinServerReqFromMetaXml () < szVersionReq )
+            {
+                argStream.SetVersionError ( szVersionReq, "server", szReason );
+            }
+        }
+    }
 }

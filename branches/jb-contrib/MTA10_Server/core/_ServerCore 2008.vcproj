@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../dependencies/mxml/include;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories="../dependencies/mxml/include;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
@@ -78,7 +78,7 @@
 				OutputFile="C:\Program Files\MTA San Andreas 1.4\server\core_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../dependencies"
+				AdditionalLibraryDirectories="../dependencies;../../vendor/detours/lib"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/core_d.pdb"
@@ -145,7 +145,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../dependencies/mxml/include;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories="../dependencies/mxml/include;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -177,7 +177,7 @@
 				OutputFile="C:\Program Files\MTA San Andreas 1.4\server\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../dependencies"
+				AdditionalLibraryDirectories="../dependencies;../../vendor/detours/lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
 				GenerateMapFile="true"
@@ -248,7 +248,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../dependencies/mxml/include;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories="../dependencies/mxml/include;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -280,7 +280,7 @@
 				OutputFile="..\..\output\MTA San Andreas\server\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../dependencies"
+				AdditionalLibraryDirectories="../dependencies;../../vendor/detours/lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
 				GenerateMapFile="true"
@@ -334,6 +334,10 @@
 			</File>
 			<File
 				RelativePath=".\CDynamicLibrary.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CExceptionInformation_Impl.cpp"
 				>
 			</File>
 			<File
@@ -422,6 +426,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CExceptionInformation_Impl.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CModManagerImpl.h"
 				>
 			</File>
@@ -503,6 +511,10 @@
 				<Filter
 					Name="core"
 					>
+					<File
+						RelativePath="..\sdk\core\CExceptionInformation.h"
+						>
+					</File>
 					<File
 						RelativePath="..\sdk\core\CModManager.h"
 						>

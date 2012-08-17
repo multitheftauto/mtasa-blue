@@ -7,14 +7,11 @@
 #pragma warning(disable : 4786)
 #endif
 
-#include "SharedUtil.h"
 #include <map>
 #include <list>
 #include <string>
 #include <sstream>
 #include <string.h>
-
-#include <assert.h>
 
 #include "ehstypes.h"
 #include "datum.h"

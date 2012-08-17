@@ -49,6 +49,7 @@ Zac Hansen ( xaxxon@slackworks.com )
 #include <stdio.h>
 #include <sys/ioctl.h>
 #endif
+#include <assert.h>
 
 #ifndef MSG_NOSIGNAL
 #define MSG_NOSIGNAL 0 // no support

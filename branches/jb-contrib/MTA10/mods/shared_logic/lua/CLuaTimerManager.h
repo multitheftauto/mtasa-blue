@@ -24,29 +24,28 @@ class CLuaTimerManager;
 class CLuaTimerManager
 {
 public:
-    inline                      CLuaTimerManager                ( void )                    { m_bIteratingList = false; }
+    inline                      CLuaTimerManager                ( void )                    { m_pPendingDelete = NULL; m_pProcessingTimer = NULL; }
     inline                      ~CLuaTimerManager               ( void )                    { RemoveAllTimers (); };
 
     void                        DoPulse                         ( CLuaMain* pLuaMain );
 
-    bool                        Exists                          ( CLuaTimer* pLuaTimer );
     CLuaTimer*                  GetTimerFromScriptID            ( unsigned int uiScriptID );
 
     CLuaTimer*                  AddTimer                        ( const CLuaFunctionRef& iLuaFunction, CTickCount llTimeDelay, unsigned int uiRepeats, const CLuaArguments& Arguments );
-
     void                        RemoveTimer                     ( CLuaTimer* pLuaTimer );
     void                        RemoveAllTimers                 ( void );
     unsigned long               GetTimerCount                   ( void ) const              { return m_TimerList.size (); }
 
     void                        ResetTimer                      ( CLuaTimer* pLuaTimer );
 
-    void                        GetTimers                       ( CTickCount llTime, CLuaMain* pLuaMain );
+    CFastList < CLuaTimer > ::const_iterator   IterBegin       ( void )                    { return m_TimerList.begin (); }
+    CFastList < CLuaTimer > ::const_iterator   IterEnd         ( void )                    { return m_TimerList.end (); }
 
-    void                        TakeOutTheTrash                 ( void );
 private:
-    CMappedList < CLuaTimer* >  m_TimerList;
-    std::list < CLuaTimer* >    m_TrashCan;
-    bool                        m_bIteratingList;
+    CFastList < CLuaTimer >     m_TimerList;
+    std::deque < CLuaTimer* >   m_ProcessQueue;
+    CLuaTimer*                  m_pPendingDelete;
+    CLuaTimer*                  m_pProcessingTimer;
 };
 
 #endif

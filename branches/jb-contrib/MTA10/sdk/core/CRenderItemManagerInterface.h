@@ -30,10 +30,11 @@ class CRenderTargetItem;
 class CScreenSourceItem;
 class CRenderItemManager;
 class CD3DDUMMY;
-class CSHADERDUMMY;
 class CEffectCloner;
 class CPixels;
 class CClientEntityBase;
+struct SShaderItemLayers;
+typedef CShaderItem CSHADERDUMMY;
 
 #define RDEFAULT            ((uint) -1)
 
@@ -120,16 +121,17 @@ public:
     virtual CDxFontItem*        CreateDxFont                        ( const SString& strFullFilePath, uint uiSize, bool bBold ) = 0;
     virtual CGuiFontItem*       CreateGuiFont                       ( const SString& strFullFilePath, const SString& strFontName, uint uiSize ) = 0;
     virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath, const CPixels* pPixels = NULL, bool bMipMaps = true, uint uiSizeX = RDEFAULT, uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP, ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1 ) = 0;
-    virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug ) = 0;
+    virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask ) = 0;
     virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false ) = 0;
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY ) = 0;
     virtual bool                SetRenderTarget                     ( CRenderTargetItem* pItem, bool bClear ) = 0;
-    virtual bool                SaveDefaultRenderTarget             ( void ) = 0;
+    virtual void                EnableSetRenderTargetOldVer         ( bool bEnable ) = 0;
+    virtual bool                IsSetRenderTargetEnabledOldVer      ( void ) = 0;
     virtual bool                RestoreDefaultRenderTarget          ( void ) = 0;
     virtual void                UpdateBackBufferCopy                ( void ) = 0;
     virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem, bool bResampleNow ) = 0;
-    virtual CShaderItem*        GetAppliedShaderForD3DData          ( CD3DDUMMY* pD3DData ) = 0;
-    virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity ) = 0;
+    virtual SShaderItemLayers*  GetAppliedShaderForD3DData          ( CD3DDUMMY* pD3DData ) = 0;
+    virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity, bool bAppendLayers ) = 0;
     virtual bool                RemoveShaderItemFromWorldTexture    ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity ) = 0;
     virtual void                RemoveClientEntityRefs              ( CClientEntityBase* pClientEntity ) = 0;
     virtual void                GetVisibleTextureNames              ( std::vector < SString >& outNameList, const SString& strTextureNameMatch, ushort usModelID ) = 0;
@@ -294,6 +296,7 @@ class CEffectWrap : public CRenderItem
     std::map < SString, D3DXHANDLE > m_valueHandleMap;
     D3DXHANDLE      m_hFirstTexture;
     bool            m_bRequiresNormals;
+    bool            m_bUsesVertexShader;
     uint            m_uiSaveStateFlags;
     SString         m_strName;
 };
@@ -325,7 +328,7 @@ class CShaderItem : public CMaterialItem
 {
     DECLARE_CLASS( CShaderItem, CMaterialItem )
                     CShaderItem             ( void ) : ClassInit ( this ) {}
-    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug );
+    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask );
     virtual void    PreDestruct             ( void );
     virtual bool    IsValid                 ( void );
     virtual void    OnLostDevice            ( void );
@@ -339,10 +342,15 @@ class CShaderItem : public CMaterialItem
     void            RenewShaderInstance     ( void );
     virtual void    SetTessellation         ( uint uiTessellationX, uint uiTessellationY );
     virtual void    SetTransform            ( const SShaderTransform& transform );
+    virtual bool    GetUsesVertexShader     ( void );
 
     CEffectWrap*        m_pEffectWrap;
     float               m_fPriority;
+    uint                m_uiCreateTime;
+    static uint         ms_uiCreateTimeCounter;
     float               m_fMaxDistanceSq;
+    bool                m_bLayered;
+    int                 m_iTypeMask;
 
     // This is used as the current render material
     // If the shader wants to change a parameter, and the instance is refed by something else, then the shader must clone a new instance for itself

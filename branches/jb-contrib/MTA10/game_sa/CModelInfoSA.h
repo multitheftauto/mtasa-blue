@@ -151,14 +151,14 @@ public:
     unsigned char           dwUnknownFlag16: 1;
 
     // Flags used by CBaseModelInfo
-    unsigned char           bDoWeOwnTheColModel: 1;     // +18
+    unsigned char           bHasBeenPreRendered: 1;     // +18
     unsigned char           bIsBackfaceCulled: 1;
     unsigned char           bIsLod: 1;
     unsigned char           bDontCastShadowsOn: 1;
     unsigned char           bDontWriteZBuffer: 1;
     unsigned char           bDrawAdditive: 1;
     unsigned char           bDrawLast: 1;
-    unsigned char           bHasBeenPreRendered: 1;
+    unsigned char           bDoWeOwnTheColModel: 1;
 
     unsigned char           dwUnknownFlag25: 1;         // +19
     unsigned char           dwUnknownFlag26: 1;
@@ -233,8 +233,11 @@ protected:
     CColModelSAInterface*           m_pOriginalColModelInterface;
     RpClump*                        m_pCustomClump;
     static std::map < unsigned short, int > ms_RestreamTxdIDMap;
-
+    static std::map < DWORD, float > ms_ModelDefaultLodDistanceMap;
+    bool                            m_bAddedRefForCollision;
 public:
+    static std::set < uint >        ms_ReplacedColModels;
+
                                     CModelInfoSA            ( void );
                                     CModelInfoSA            ( DWORD dwModelID );
 
@@ -275,8 +278,10 @@ public:
     void                            SetTextureDictionaryID  ( unsigned short usID );
     float                           GetLODDistance          ( void );
     void                            SetLODDistance          ( float fDistance );
+    static void                     StaticResetLodDistances ( void );
     void                            RestreamIPL             ( void );
     static void                     StaticFlushPendingRestreamIPL ( void );
+    static void                     StaticSetHooks          ( void );
 
     void                            ModelAddRef             ( EModelRequestType requestType, const char* szTag );
     int                             GetRefCount             ( void );

@@ -5,7 +5,6 @@
 
 #include <windows.h>
 #include <stdio.h>
-#include <assert.h>
 
 #include <algorithm>
 #include <list>
@@ -15,6 +14,8 @@
 
 // SDK includes
 #define MTA_CLIENT
+#define SHARED_UTIL_WITH_HASH_MAP
+#define SHARED_UTIL_WITH_FAST_HASH_MAP
 #include "SharedUtil.h"
 #include <core/CCoreInterface.h>
 #include <net/CNet.h>

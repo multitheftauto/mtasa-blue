@@ -48,9 +48,13 @@ public:
     void                        InitHooks_HookDestructors ( void );
     void                        InitHooks_RwResources ( void );
     void                        InitHooks_ClothesCache ( void );
+    void                        InitHooks_Files ( void );
+    void                        InitHooks_Weapons ( void );
+    void                        InitHooks_Rendering ( void );
     CRemoteDataStorage *        CreateRemoteDataStorage     ();
     void                        DestroyRemoteDataStorage    ( CRemoteDataStorage* pData );
     void                        AddRemoteDataStorage        ( CPlayerPed* pPed, CRemoteDataStorage* pData );
+    CRemoteDataStorage*         GetRemoteDataStorage        ( CPlayerPed* pPed );
     void                        RemoveRemoteDataStorage     ( CPlayerPed* pPed );
     void                        EnableHooks_ClothesMemFix   ( bool bEnable );
 
@@ -93,6 +97,7 @@ public:
     void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler );
     void                        SetGamePlayerDestructHandler    ( GamePlayerDestructHandler * pHandler );
     void                        SetGameModelRemoveHandler       ( GameModelRemoveHandler * pHandler );
+    void                        SetGameEntityRenderHandler  ( GameEntityRenderHandler * pHandler );
 
     void                        AllowMouseMovement          ( bool bAllow );
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );
@@ -202,7 +207,6 @@ public:
 
     virtual void                GetRwResourceStats          ( SRwResourceStats& outStats );
     virtual void                GetClothesCacheStats        ( SClothesCacheStats& outStats );
-    virtual CEntitySAInterface* GetRenderingGameEntity      ( void );
 
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;

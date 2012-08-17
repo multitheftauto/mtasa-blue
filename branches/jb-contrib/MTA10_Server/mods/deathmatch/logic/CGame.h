@@ -48,7 +48,7 @@ class CGame;
 #include "packets/CVehicleResyncPacket.h"
 #include "packets/CKeysyncPacket.h"
 #include "packets/CBulletsyncPacket.h"
-#include "packets/CBulletsyncSettingsPacket.h"
+#include "packets/CSyncSettingsPacket.h"
 #include "packets/CVehicleInOutPacket.h"
 #include "packets/CVehicleDamageSyncPacket.h"
 #include "packets/CVehicleTrailerPacket.h"
@@ -342,6 +342,9 @@ public:
     void                        SetCloudsEnabled            ( bool bEnabled );
     bool                        GetCloudsEnabled            ( void );
 
+    void                        SetJetpackWeaponEnabled     ( eWeaponType weaponType, bool bEnabled );
+    bool                        GetJetpackWeaponEnabled     ( eWeaponType weaponType );
+
     void                        PulseMasterServerAnnounce   ( void );
     void                        StartOpenPortsTest          ( void );
 
@@ -352,11 +355,13 @@ public:
     void                        SetSyncFPS                  ( int iSyncFPS ) { m_iSyncFPS = iSyncFPS; }
 
     void                        HandleBackup                ( void );
-    void                        EnableLatentSends           ( bool bEnabled, int iBandwidth = 0, CLuaMain* pLuaMain = NULL );
+    void                        EnableLatentSends           ( bool bEnabled, int iBandwidth = 0, CLuaMain* pLuaMain = NULL, ushort usResourceNetId = 0xFFFF );
+    void                        SendPacketBatchBegin        ( unsigned char ucPacketId, NetBitStreamInterface* pBitStream );
     bool                        SendPacket                  ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
+    void                        SendPacketBatchEnd          ( void );
 
     bool                        IsBulletSyncActive          ( void );
-    void                        SendBulletSyncSettings      ( CPlayer* pPlayer = NULL );
+    void                        SendSyncSettings            ( CPlayer* pPlayer = NULL );
 
     SString                     CalculateMinClientRequirement   ( void );
     bool                        IsBelowMinimumClient            ( const SString& strVersion );
@@ -512,6 +517,7 @@ private:
     int                         m_iSyncFPS;
     std::map<std::string,eGlitchType> m_GlitchNames;
     SFixedArray < bool, NUM_GLITCHES > m_Glitches;
+    SFixedArray < bool, WEAPONTYPE_LAST_WEAPONTYPE > m_JetpackWeapons;
 
     // This is ticked to true when the app should end
     bool                        m_bIsFinished;
@@ -530,6 +536,7 @@ private:
     bool                        m_bLatentSendsEnabled;
     int                         m_iLatentSendsBandwidth;
     CLuaMain*                   m_pLatentSendsLuaMain;
+    ushort                      m_usLatentSendsResourceNetId;
 
     SString                     m_strPrevMinClientKickRequirement;
     SString                     m_strPrevMinClientConnectRequirement;

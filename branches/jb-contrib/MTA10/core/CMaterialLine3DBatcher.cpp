@@ -148,7 +148,7 @@ void CMaterialLine3DBatcher::Flush ( void )
         pIndices [ uiNumIndicies++ ] = i;
     }
 
-    if ( uiNumIndicies > 1 )
+    if ( uiNumIndicies > 0 )
     {
         indexList.resize ( uiNumIndicies );
 

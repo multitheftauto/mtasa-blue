@@ -42,8 +42,9 @@ using std::vector;
 
 // Used within this file by the packet handler to grab the this pointer of CClientGame
 extern CClientGame* g_pClientGame;
+extern int g_iDamageEventLimit;
+int iTestCounter = 0;
 
-bool g_bBoundsChecker = true;
 #define DEFAULT_GRAVITY            0.008f
 #define DEFAULT_GAME_SPEED         1.0f
 #define DEFAULT_BLUR_LEVEL         36
@@ -264,6 +265,9 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetGameVehicleDestructHandler( CClientGame::StaticGameVehicleDestructHandler );
     g_pMultiplayer->SetGamePlayerDestructHandler( CClientGame::StaticGamePlayerDestructHandler );
     g_pMultiplayer->SetGameModelRemoveHandler( CClientGame::StaticGameModelRemoveHandler );
+    g_pMultiplayer->SetGameEntityRenderHandler( CClientGame::StaticGameEntityRenderHandler );
+    g_pGame->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
+    g_pGame->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( CClientGame::StaticKeyStrokeHandler );
@@ -287,10 +291,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     // Key-bind for fire-key (for handling satchels and stealth-kills)
     g_pCore->GetKeyBinds ()->AddControlFunction ( "fire", CClientGame::StaticUpdateFireKey, true );
-
-    // Disable mouse controls, as we process these ourselves
-    g_pGame->GetControllerConfigManager ()->SetSteerWithMouse ( false );
-    g_pGame->GetControllerConfigManager ()->SetFlyWithMouse ( false );
 
     // Init big packet progress vars
     m_bReceivingBigPacket           = false;
@@ -412,6 +412,9 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetGameVehicleDestructHandler( NULL );
     g_pMultiplayer->SetGamePlayerDestructHandler( NULL );
     g_pMultiplayer->SetGameModelRemoveHandler( NULL );
+    g_pMultiplayer->SetGameEntityRenderHandler( NULL );
+    g_pGame->SetPreWeaponFireHandler ( NULL );
+    g_pGame->SetPostWeaponFireHandler ( NULL );
     g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
@@ -663,7 +666,8 @@ bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword 
             m_Server.SetPassword ( szPassword );
 
         // Display the status box<<<<<
-        g_pCore->ShowMessageBox ( "Local Server", "Starting local server ...", MB_ICON_INFO );
+        m_OnCancelLocalGameClick = GUI_CALLBACK ( &CClientGame::OnCancelLocalGameClick, this );
+        g_pCore->ShowMessageBox ( "Local Server", "Starting local server ...", MB_BUTTON_CANCEL | MB_ICON_INFO, &m_OnCancelLocalGameClick );
     }
     else
     {
@@ -676,6 +680,16 @@ bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword 
     return true;
 }
 
+bool CClientGame::OnCancelLocalGameClick ( CGUIElement * pElement )
+{
+    if ( m_bLocalPlay && m_bWaitingForLocalConnect )
+    {
+        g_pCore->RemoveMessageBox ();
+        g_pCore->GetModManager ()->RequestUnload ();
+        return true;
+    }
+    return false;
+}
 
 void CClientGame::DoPulsePreFrame ( void )
 {   
@@ -690,8 +704,8 @@ void CClientGame::DoPulsePreFrame ( void )
 
 void CClientGame::DoPulsePreHUDRender ( bool bDidUnminimize, bool bDidRecreateRenderTargets )
 {
-    // Allow scripted dxSetRenderTarget
-    g_pCore->GetGraphics ()->EnableSetRenderTarget ( true );
+    // Allow scripted dxSetRenderTarget for old scripts
+    g_pCore->GetGraphics ()->GetRenderItemManager ()->EnableSetRenderTargetOldVer ( true );
 
     // If appropriate, call onClientRestore
     if ( bDidUnminimize )
@@ -706,8 +720,11 @@ void CClientGame::DoPulsePreHUDRender ( bool bDidUnminimize, bool bDidRecreateRe
     CLuaArguments Arguments;
     m_pRootEntity->CallEvent ( "onClientHUDRender", Arguments, false );
 
-    // Disallow scripted dxSetRenderTarget
-    g_pCore->GetGraphics ()->EnableSetRenderTarget ( false );
+    // Disallow scripted dxSetRenderTarget for old scripts
+    g_pCore->GetGraphics ()->GetRenderItemManager ()->EnableSetRenderTargetOldVer ( false );
+
+    // Restore in case script forgets
+    g_pCore->GetGraphics ()->GetRenderItemManager ()->RestoreDefaultRenderTarget ();
 
     DebugElementRender ();
 }
@@ -1007,12 +1024,19 @@ void CClientGame::DoPulses ( void )
     }
 
     // Pulse the network interface
-    TIMING_CHECKPOINT( "+NetPulse" );
-    g_pNet->DoPulse ();
-    TIMING_CHECKPOINT( "-NetPulse" );
 
-    m_pManager->DoPulse ();
-    m_pNetAPI->DoPulse ();
+    // Extrapolation test
+    if ( m_VehExtrapolateSettings.bEnabled )
+    {
+        if ( iTestCounter < 100 )
+        {
+            iTestCounter++;
+            DoPulses2 ();
+        }
+    }
+    else
+        DoPulses2 ();
+
     m_pUnoccupiedVehicleSync->DoPulse ();
     m_pPedSync->DoPulse ();
 #ifdef WITH_OBJECT_SYNC
@@ -1110,15 +1134,18 @@ void CClientGame::DoPulses ( void )
         // Get rid of deleted GUI elements
         g_pCore->GetGUI ()->CleanDeadPool ();
 
-        // Allow scripted dxSetRenderTarget
-        g_pCore->GetGraphics ()->EnableSetRenderTarget ( true );
+        // Allow scripted dxSetRenderTarget for old scripts
+        g_pCore->GetGraphics ()->GetRenderItemManager ()->EnableSetRenderTargetOldVer ( true );
 
         // Call onClientRender LUA event
         CLuaArguments Arguments;
         m_pRootEntity->CallEvent ( "onClientRender", Arguments, false );
 
-        // Disallow scripted dxSetRenderTarget
-        g_pCore->GetGraphics ()->EnableSetRenderTarget ( false );
+        // Disallow scripted dxSetRenderTarget for old scripts
+        g_pCore->GetGraphics ()->GetRenderItemManager ()->EnableSetRenderTargetOldVer ( false );
+
+        // Restore in case script forgets
+        g_pCore->GetGraphics ()->GetRenderItemManager ()->RestoreDefaultRenderTarget ();
 
         // Ensure replaced/restored textures for models in the GTA map are correct
         g_pGame->FlushPendingRestreamIPL ();
@@ -1301,6 +1328,18 @@ void CClientGame::DoPulses ( void )
     ProcessDelayedSendList ();
 
     TIMING_CHECKPOINT( "-CClientGame::DoPulses" );
+}
+
+// Extrapolation test
+void CClientGame::DoPulses2 ( void )
+{
+    // Pulse the network interface
+    TIMING_CHECKPOINT( "+NetPulse" );
+    g_pNet->DoPulse ();
+    TIMING_CHECKPOINT( "-NetPulse" );
+
+    m_pManager->DoPulse ();
+    m_pNetAPI->DoPulse ();
 }
 
 
@@ -1807,13 +1846,13 @@ void CClientGame::UpdatePlayerTarget ( void )
     m_pLocalPlayer->WorldIgnore ( false );
 
     // Kill the colpoint or we get a severe memoryleak
-    if ( pColPoint ) pColPoint->Destroy ();
+    if ( pColPoint )
+        pColPoint->Destroy ();
 
     if ( pColEntity != m_pTargetedGameEntity )
     {
         m_pTargetedGameEntity = pColEntity;
 
-        CClientEntity* pNewEntity = NULL;
         if ( pColEntity )
         {
             m_pTargetedEntity = m_pManager->FindEntity ( pColEntity );
@@ -1831,7 +1870,7 @@ void CClientGame::UpdatePlayerTarget ( void )
 
         // Send the target
         ElementID TargetID = INVALID_ELEMENT_ID;
-        if ( m_pTargetedEntity )
+        if ( m_pTargetedEntity && !m_pTargetedEntity->IsLocalEntity ())
         {
             TargetID = m_pTargetedEntity->GetID ();
         }
@@ -2415,14 +2454,15 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
                     CClientEntity* pCollisionEntity = NULL;
                     if ( bCollision && pColPoint )
                     {
-                        vecCollision = *pColPoint->GetPosition ();
+                        vecCollision = pColPoint->GetPosition ();
                         if ( pGameEntity )
                         {
                             CClientEntity* pEntity = m_pManager->FindEntity ( pGameEntity );
                             if ( pEntity )
                             {
                                 pCollisionEntity = pEntity;
-                                CollisionEntityID = pEntity->GetID ();
+                                if ( !pEntity->IsLocalEntity () )
+                                    CollisionEntityID = pEntity->GetID ();
                             }
                         }
                     }
@@ -2982,7 +3022,7 @@ void CClientGame::DrawWeaponsyncData ( CClientPlayer* pPlayer )
         {
             if ( bCollision )
             {
-                CVector vecBullet = *pCollision->GetPosition() - vecSource;
+                CVector vecBullet = pCollision->GetPosition() - vecSource;
                 vecBullet.Normalize();
                 CVector vecTarget = vecSource + (vecBullet * 200);
                 g_pCore->GetGraphics ()->DrawLine3DQueued ( vecSource, vecTarget, 0.5f, 0x1012DE12, true );
@@ -3314,7 +3354,7 @@ void CClientGame::DoPaintballs ( void )
         pCorona->SetSize ( 0.2f );
         if ( bCollision && pCollision )
         {
-            pCorona->SetPosition ( *pCollision->GetPosition () );
+            pCorona->SetPosition ( pCollision->GetPosition () );
             pCorona->SetColor ( SColorRGBA ( 255, 0, 0, 255 ) );
         }
         else
@@ -3405,6 +3445,8 @@ void CClientGame::Event_OnIngame ( void )
 
     g_pGame->GetWorld ( )->ClearRemovedBuildingLists ( );
     g_pGame->GetWorld ( )->SetOcclusionsEnabled ( true );
+
+    g_pGame->ResetModelLodDistances ();
 
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat ( CITIES_PASSED, 2.0 );
@@ -3587,6 +3629,39 @@ void CClientGame::StaticGameModelRemoveHandler ( ushort usModelId )
     g_pClientGame->GameModelRemoveHandler ( usModelId );
 }
 
+void CClientGame::StaticGameEntityRenderHandler ( CEntitySAInterface* pGameEntity )
+{
+    if ( pGameEntity )
+    {
+        // Map to client entity and pass to the texture replacer
+        CClientEntity* pClientEntity = g_pClientGame->GetGameEntityXRefManager ()->FindClientEntity ( pGameEntity );
+        if ( pClientEntity )
+        {
+            int iTypeMask;
+            switch ( pClientEntity->GetType () )
+            {
+                case CCLIENTPED:
+                case CCLIENTPLAYER:
+                    iTypeMask = TYPE_MASK_PED;
+                    break;
+                case CCLIENTVEHICLE:
+                    iTypeMask = TYPE_MASK_VEHICLE;
+                    break;
+                case CCLIENTOBJECT:
+                    iTypeMask = TYPE_MASK_OBJECT;
+                    break;
+                default:
+                    iTypeMask = TYPE_MASK_OTHER;
+                    break;
+            }
+            g_pGame->GetRenderWare ()->SetRenderingClientEntity ( pClientEntity, iTypeMask );
+            return;
+        }
+    }
+
+    g_pGame->GetRenderWare ()->SetRenderingClientEntity ( NULL, TYPE_MASK_WORLD );
+}
+
 void CClientGame::DrawRadarAreasHandler ( void )
 {
     m_pRadarAreaManager->DoPulse ();
@@ -3701,6 +3776,11 @@ void CClientGame::IdleHandler ( void )
         m_pManager->DoRender ();
         DoPulses ();
     }
+
+    // Extrapolation test
+    if ( m_VehExtrapolateSettings.bEnabled )
+        if ( iTestCounter >= 100 )
+            DoPulses2 ();
 }
 
 
@@ -3868,7 +3948,8 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
     eWeaponType weaponUsed = pEvent->GetWeaponUsed ();
     ePedPieceTypes hitZone = pEvent->GetPedPieceType ();
     CWeaponInfo* pWeaponInfo = g_pGame->GetWeaponInfo ( weaponUsed );
-    float fDamage = pEvent->GetDamageApplied ();    
+    float fDamage = pEvent->GetDamageApplied ();
+    EDamageReasonType damageReason = pEvent->GetDamageReason ();
 
     /* Causes too much desync right now
     // Is this shotgun damage?
@@ -3905,6 +3986,49 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
         float fCurrentHealth = pDamagedPed->GetGamePlayer ()->GetHealth ();
         float fPreviousArmor = pDamagedPed->m_fArmor;
         float fCurrentArmor = pDamagedPed->GetGamePlayer ()->GetArmor ();
+
+        ///////////////////////////////////////////////////////////////////////////
+        //
+        // Pass 1 stuff
+        //
+        // return false to stop any damage being inflicted  
+        //
+        ///////////////////////////////////////////////////////////////////////////
+
+        // Pass 1 checks for double shots
+        if ( fDamage == 0.0f && damageReason != EDamageReason::PISTOL_WHIP )
+        {
+            // Only check for remote players
+            CClientPlayer* pInflictingPlayer = DynamicCast < CClientPlayer > ( pInflictingEntity );
+            if ( pInflictingPlayer && !pInflictingPlayer->IsLocalPlayer () )
+            {
+                bool bBulletSyncShot = ( g_iDamageEventLimit != -1 );   // Called from discharge weapon
+                bool bBulletSyncWeapon = GetWeaponTypeUsesBulletSync ( weaponUsed );
+
+                if ( bBulletSyncShot )
+                {
+                    if ( g_iDamageEventLimit == 0 )
+                    {
+                        AddReportLog ( 5501, SString ( "2nd pass 1 for BulletSyncShot damage. weaponUsed:%d", weaponUsed ) );
+                        return false;
+                    }
+                    g_iDamageEventLimit--;
+                    if ( !bBulletSyncWeapon )
+                    {
+                        AddReportLog ( 5502, SString ( "BulletSyncShot but not bBulletSyncWeapon. weaponUsed:%d", weaponUsed ) );
+                        return false;
+                    }
+                }
+                else
+                {
+                    if ( bBulletSyncWeapon )
+                    {
+                        AddReportLog ( 5503, SString ( "not BulletSyncShot but bBulletSyncWeapon. weaponUsed:%d", weaponUsed ) );
+                        return false;
+                    }
+                }
+            }
+        }
 
         // Is the damaged ped a player?
         if ( IS_PLAYER ( pDamagedPed ) )
@@ -3958,9 +4082,22 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 }
             }
         }
+        ///////////////////////////////////////////////////////////////////////////
+        // Pass 1 end
+        ///////////////////////////////////////////////////////////////////////////
+
+
         // Have we taken any damage here?
         if ( ( fPreviousHealth != fCurrentHealth || fPreviousArmor != fCurrentArmor ) && fDamage != 0.0f )
         {
+            ///////////////////////////////////////////////////////////////////////////
+            ///
+            // Pass 2 stuff - (GTA has applied the damage)
+            //
+            // return false to stop damage anim (incl. death task) 
+            //
+            ///////////////////////////////////////////////////////////////////////////
+
             CLuaArguments Arguments;
             if ( pInflictingEntity ) Arguments.PushElement ( pInflictingEntity );
             else Arguments.PushBoolean ( false );
@@ -4073,13 +4210,17 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
             }
             // Inhibit hit-by-gun animation for local player if required
             if ( pDamagedPed->IsLocalPlayer () && bIsBeingShotWhilstAiming ) return false;
+
+            ///////////////////////////////////////////////////////////////////////////
+            // Pass 2 end
+            ///////////////////////////////////////////////////////////////////////////
         }
     }
 
     // No damage anim for fire
     if ( weaponUsed == WEAPONTYPE_FLAMETHROWER ) return false;
     
-    // Allow the damage to register
+    // Allow the damage processing to continue
     return true;
 }
 
@@ -4228,7 +4369,7 @@ bool CClientGame::HeliKillHandler ( CVehicleSAInterface* pHeliInterface, CPedSAI
             return bContinue;
         }
     }
-    return false;
+    return true;
 }
 
 bool CClientGame::WaterCannonHitHandler ( CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed )
@@ -4468,7 +4609,7 @@ bool bShotCompensation = true;
 CVector vecWeaponFirePosition, vecRemoteWeaponFirePosition;
 CPlayerPed* pWeaponFirePed = NULL;
 
-void CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed )
+bool CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed, bool bStopIfUsingBulletSync )
 {
     pWeaponFirePed = pPlayerPed;
 
@@ -4483,7 +4624,10 @@ void CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed )
 
         // Move both players to where they should be for shot compensation
         if ( pPlayer && !pPlayer->IsLocalPlayer ())
-        {                   
+        {
+            if ( bStopIfUsingBulletSync && pPlayer->IsCurrentWeaponUsingBulletSync () )
+                return false;   // Don't apply shot compensation & tell caller to not do bullet trace
+
             if ( bShotCompensation )
             {
                 if ( !pVehicle || pLocalPlayer->GetOccupiedVehicleSeat() == 0 )
@@ -4512,6 +4656,7 @@ void CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed )
             }
         }
     }
+    return true;
 }
 
 
@@ -4562,7 +4707,7 @@ void CClientGame::PostWeaponFire ( void )
                     vecCollision = vecTarget;
                     bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pCollision, &pCollisionGameEntity );
                     if ( bCollision && pCollision )
-                        vecCollision = *pCollision->GetPosition ();
+                        vecCollision = pCollision->GetPosition ();
 
                     // Destroy the colpoint
                     if ( pCollision )
@@ -4632,7 +4777,7 @@ void CClientGame::BulletImpact ( CPed* pInitiator, CEntity* pVictim, const CVect
             bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( pStartPosition, pEndPosition, &pCollision, NULL );
             if ( bCollision && pCollision )
             {
-                vecCollision = *pCollision->GetPosition ();
+                vecCollision = pCollision->GetPosition ();
             }
             else
             {
@@ -5607,7 +5752,8 @@ void CClientGame::TakePlayerScreenShot ( uint uiSizeX, uint uiSizeY, const SStri
 //
 void CClientGame::StaticGottenPlayerScreenShot ( const CBuffer& buffer, uint uiTimeSpentInQueue )
 {
-    g_pClientGame->GottenPlayerScreenShot ( buffer, uiTimeSpentInQueue );
+    if ( g_pClientGame )
+        g_pClientGame->GottenPlayerScreenShot ( buffer, uiTimeSpentInQueue );
 }
 
 

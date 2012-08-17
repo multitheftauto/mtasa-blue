@@ -10,7 +10,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-#pragma once
+//#pragma once      Don't do this
 
 /*************************************************************************
 	Simplification of some 'unsigned' types
@@ -49,6 +49,7 @@ char (&ArraySizeHelper(T (&array)[N]))[N];
 #define arraysize(array) (sizeof(ArraySizeHelper(array)))
 #define NUMELEMS(array) arraysize(array)
 
+#include <assert.h>
 #include "SharedUtil.Defines.h"
 #include "SharedUtil.AllocTracking.h"
 #include <list>
@@ -58,12 +59,10 @@ char (&ArraySizeHelper(T (&array)[N]))[N];
 #include <deque>
 #include <algorithm>
 #include <limits.h>
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <string>
 #include <stdarg.h>
-#include <assert.h>
 #include "SString.h"
 #include "SharedUtil.Map.h"
 #if defined(SHARED_UTIL_WITH_HASH_MAP) || defined(SHARED_UTIL_WITH_FAST_HASH_MAP)
@@ -71,6 +70,7 @@ char (&ArraySizeHelper(T (&array)[N]))[N];
 #endif
 #if defined(SHARED_UTIL_WITH_FAST_HASH_MAP)
     #include "SharedUtil.FastHashMap.h"
+    #include "SharedUtil.FastHashSet.h"
 #endif
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.File.h"

@@ -71,7 +71,6 @@ private:
     void                    ReadKeysync                     ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
     void                    WriteKeysync                    ( CClientPed* pPed, NetBitStreamInterface& BitStream );
 
-    void                    ModifyControllerStateForBulletSync ( CClientPlayer* pPlayer, CControllerState& ControllerState );
     void                    ReadBulletsync                  ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
 
     void                    ReadPlayerPuresync              ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
@@ -131,6 +130,7 @@ private:
     CControllerState        m_LastSentControllerState;
     float                   m_fLastSentCameraRotation;
     float                   m_fLastSentAimY;
+    uchar                   m_ucBulletSyncOrderCounter;
 };
 
 #endif

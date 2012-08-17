@@ -76,16 +76,26 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
                 strMessage += "Try to launch MTA:SA again?";
                 if ( MessageBox( 0, strMessage, "Error", MB_ICONERROR | MB_YESNO ) == IDYES )
                 {
-                    SetMTASAPathSource ( false );
-                    ShellExecuteNonBlocking( "open", PathJoin ( GetMTASAPath (), MTA_EXE_NAME ), lpCmdLine );            
+                    TerminateGTAIfRunning ();
+                    TerminateOtherMTAIfRunning ();
+                    ShellExecuteNonBlocking( "open", PathJoin ( GetMTASAPath ( false ), MTA_EXE_NAME ), lpCmdLine );
                 }
                 return 0;
             }
         }
         else
         {
-            MessageBox ( 0, "Another instance of MTA is already running.", "Error", MB_ICONERROR );
-            return 0;
+            if ( !IsGTARunning () && !IsOtherMTARunning () )
+            {
+                MessageBox ( 0, "Another instance of MTA is already running.\n\nIf this problem persists, please restart your computer", "Error", MB_ICONERROR );
+            }
+            else
+            if ( MessageBox( 0, "Another instance of MTA is already running.\n\nDo you want to terminate it?", "Error", MB_ICONERROR | MB_YESNO ) == IDYES )
+            {
+                TerminateGTAIfRunning ();
+                TerminateOtherMTAIfRunning ();
+                ShellExecuteNonBlocking( "open", PathJoin ( GetMTASAPath ( false ), MTA_EXE_NAME ), lpCmdLine );
+            }
         }
         return 0;
     }
@@ -114,6 +124,9 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 //////////////////////////////////////////////////////////
 void HandleTrouble ( void )
 {
+    if ( CheckAndShowFileOpenFailureMessage () )
+        return;
+
     int iResponse = MessageBox ( NULL, "Are you having problems running MTA:SA?.\n\nDo you want to revert to an earlier version?", "MTA: San Andreas", MB_YESNO | MB_ICONERROR );
     if ( iResponse == IDYES )
     {
@@ -132,6 +145,9 @@ void HandleTrouble ( void )
 //////////////////////////////////////////////////////////
 void HandleResetSettings ( void )
 {
+    if ( CheckAndShowFileOpenFailureMessage () )
+        return;
+
     char szResult[MAX_PATH] = "";
     SHGetFolderPath( NULL, CSIDL_PERSONAL, NULL, 0, szResult );
     SString strSettingsFilename = PathJoin ( szResult, "GTA San Andreas User Files", "gta_sa.set" );
@@ -223,6 +239,7 @@ int LaunchGame ( LPSTR lpCmdLine )
 
     WatchDogBeginSection ( "L0" );      // Gets closed if MTA exits with a return code of 0
     WatchDogBeginSection ( "L1" );      // Gets closed when online game has started
+    SetApplicationSetting ( "diagnostics", "gta-fopen-fail", "" );
 
     int iReturnCode = DoLaunchGame ( lpCmdLine );
 
@@ -251,10 +268,19 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     //
     // Handle GTA already running
     //
-    if ( !TerminateGTAIfRunning () )
+    if ( IsGTARunning () )
     {
-        DisplayErrorMessageBox ( "MTA: SA couldn't start because an another instance of GTA is running." );
-        return 1;
+        if ( MessageBox ( 0, "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?", "Information", MB_YESNO | MB_ICONQUESTION ) == IDNO )
+        {
+            TerminateGTAIfRunning ();
+            if ( IsGTARunning () )
+            {
+                MessageBox ( 0, "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer.", "Information", MB_OK | MB_ICONQUESTION );
+                return 1;
+            }       
+        }
+        else
+            return 0;
     }
 
     //////////////////////////////////////////////////////////
@@ -370,6 +396,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     strCmdLine = strCmdLine.Replace ( " /done-admin", "" );
 
     MaybeShowCopySettingsDialog ();
+    SetDllDirectory( SString ( strMTASAPath + "\\mta" ) );
 
     //////////////////////////////////////////////////////////
     //

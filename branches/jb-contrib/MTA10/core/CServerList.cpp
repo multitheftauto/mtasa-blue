@@ -96,6 +96,7 @@ void CServerList::Pulse ( void )
         for ( std::vector < SAddressPort >::iterator iter = endpointList.begin (); iter != endpointList.end (); ++iter )
         {
             CServerListItem* pServer = m_Servers.Find ( (in_addr&)iter->m_ulIp, iter->m_usPort );
+            // ** Crash - pServer can sometimes be invalid **
             if ( pServer && pServer->WaitingToSendQuery () )
             {
                 std::string strResult = pServer->Pulse ( (int)( uiQueriesSent /*+ uiQueriesResent*/ ) < iNumQueries, bRemoveNonResponding );

@@ -17,6 +17,7 @@ CEventDamageSA::CEventDamageSA ( CEntity * pEntity, unsigned int i_1, eWeaponTyp
     m_pInterface = new CEventDamageSAInterface;    
     m_pDamageResponse = new CPedDamageResponseSA ( &m_pInterface->damageResponseData );
     m_bDestroyInterface = true;
+    m_DamageReason = EDamageReason::OTHER;
 
     DWORD dwEntityInterface = (DWORD)pEntity->GetInterface ();
     DWORD dwThis = (DWORD)m_pInterface;
@@ -41,6 +42,7 @@ CEventDamageSA::CEventDamageSA ( CEventDamageSAInterface * pInterface )
     m_pInterface = pInterface;
     m_pDamageResponse = new CPedDamageResponseSA ( &m_pInterface->damageResponseData );
     m_bDestroyInterface = false;
+    m_DamageReason = EDamageReason::OTHER;
 }
 
 

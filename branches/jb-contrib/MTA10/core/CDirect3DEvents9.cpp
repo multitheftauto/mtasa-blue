@@ -144,6 +144,9 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     CCore::GetSingleton ().DoPostFramePulse ();
     TIMING_CHECKPOINT( "+OnPresent2" );
 
+    // Restore in case script forgets
+    CGraphics::GetSingleton ().GetRenderItemManager ()->RestoreDefaultRenderTarget ();
+
     // Draw pre-GUI primitives
     CGraphics::GetSingleton ().DrawPreGUIQueue ();
 
@@ -275,13 +278,22 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
         if ( pSurface )
         {
             if ( FAILED ( pSurface->Release () ) )
-                std::runtime_error ( "Failed to release the ScreenShot rendertaget surface" );
+                assert ( 0 && "Failed to release the ScreenShot rendertaget surface" );
             pSurface = NULL;
         }
     }
     TIMING_CHECKPOINT( "-OnPresent2" );
 }
 
+#define SAVE_RENDERSTATE_AND_SET( reg, value ) \
+    const DWORD dwSaved_##reg = g_pDeviceState->RenderState.reg; \
+    const bool bSet_##reg = ( dwSaved_##reg != value ); \
+    if ( bSet_##reg ) \
+        pDevice->SetRenderState ( D3DRS_##reg, value )
+
+#define RESTORE_RENDERSTATE( reg ) \
+    if ( bSet_##reg ) \
+        pDevice->SetRenderState ( D3DRS_##reg, dwSaved_##reg )
 
 /////////////////////////////////////////////////////////////
 //
@@ -296,16 +308,74 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
         return pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
 
     // Any shader for this texture ?
-    CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
+    SShaderItemLayers* pLayers = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
 
-    // Don't apply if a vertex shader is already being used
-    if ( g_pDeviceState->VertexShader )
+    if ( !pLayers )
+    {
+        // No shaders for this texture
+        return DrawPrimitiveGuarded ( pDevice, PrimitiveType, StartVertex, PrimitiveCount );
+    }
+    else
+    {
+        // Yes base shader
+        DrawPrimitiveShader ( pDevice, PrimitiveType, StartVertex, PrimitiveCount, pLayers->pBase, false );
+
+        // Draw each layer
+        if ( !pLayers->layerList.empty () )
+        {
+            float fSlopeDepthBias = -0.02f;
+            float fDepthBias = -0.00001f;
+            SAVE_RENDERSTATE_AND_SET( SLOPESCALEDEPTHBIAS,  *(DWORD*)&fSlopeDepthBias );
+            SAVE_RENDERSTATE_AND_SET( DEPTHBIAS,            *(DWORD*)&fDepthBias );
+            SAVE_RENDERSTATE_AND_SET( ALPHABLENDENABLE, TRUE );
+            SAVE_RENDERSTATE_AND_SET( SRCBLEND,         D3DBLEND_SRCALPHA );
+            SAVE_RENDERSTATE_AND_SET( DESTBLEND,        D3DBLEND_INVSRCALPHA );
+            SAVE_RENDERSTATE_AND_SET( ALPHATESTENABLE,  TRUE );
+            SAVE_RENDERSTATE_AND_SET( ALPHAREF,         0x01 );
+            SAVE_RENDERSTATE_AND_SET( ALPHAFUNC,        D3DCMP_GREATER );
+            SAVE_RENDERSTATE_AND_SET( ZWRITEENABLE,     FALSE );
+            SAVE_RENDERSTATE_AND_SET( ZFUNC,            D3DCMP_LESSEQUAL );
+
+            for ( uint i = 0 ; i < pLayers->layerList.size () ; i++ )
+            {
+                DrawPrimitiveShader ( pDevice, PrimitiveType, StartVertex, PrimitiveCount, pLayers->layerList[i], true );
+            }
+
+            RESTORE_RENDERSTATE( SLOPESCALEDEPTHBIAS );
+            RESTORE_RENDERSTATE( DEPTHBIAS );
+            RESTORE_RENDERSTATE( ALPHABLENDENABLE );
+            RESTORE_RENDERSTATE( SRCBLEND );
+            RESTORE_RENDERSTATE( DESTBLEND );
+            RESTORE_RENDERSTATE( ALPHATESTENABLE );
+            RESTORE_RENDERSTATE( ALPHAREF );
+            RESTORE_RENDERSTATE( ALPHAFUNC );
+            RESTORE_RENDERSTATE( ZWRITEENABLE );
+            RESTORE_RENDERSTATE( ZFUNC );
+        }
+
+        return D3D_OK;
+    }
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::DrawPrimitiveShader
+//
+//
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::DrawPrimitiveShader ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,UINT StartVertex,UINT PrimitiveCount, CShaderItem* pShaderItem, bool bIsLayer )
+{
+    // Don't apply if both the shader and render state both use a vertex shader
+    if ( pShaderItem && g_pDeviceState->VertexShader && pShaderItem->GetUsesVertexShader () )
         pShaderItem = NULL;
 
     if ( !pShaderItem )
     {
         // No shader for this texture
-        return DrawPrimitiveGuarded ( pDevice, PrimitiveType, StartVertex, PrimitiveCount );
+        if ( !bIsLayer )
+            return DrawPrimitiveGuarded ( pDevice, PrimitiveType, StartVertex, PrimitiveCount );
     }
     else
     {
@@ -323,6 +393,9 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
         // Apply mapped parameters
         pShaderInstance->m_pEffectWrap->ApplyMappedHandles ();
 
+        // Remember vertex shader if original draw was using it
+        IDirect3DVertexShader9* pOriginalVertexShader = g_pDeviceState->VertexShader;
+
         // Do shader passes
         ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
 
@@ -333,6 +406,11 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
         for ( uint uiPass = 0 ; uiPass < uiNumPasses ; uiPass++ )
         {
             pD3DEffect->BeginPass ( uiPass );
+
+            // Apply original vertex shader if original draw was using it (i.e. for ped animation)
+            if ( pOriginalVertexShader )
+                pDevice->SetVertexShader( pOriginalVertexShader );
+
             DrawPrimitiveGuarded ( pDevice, PrimitiveType, StartVertex, PrimitiveCount );
             pD3DEffect->EndPass ();
         }
@@ -341,13 +419,14 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
         // If we didn't get the effect to save the shader state, clear some things here
         if ( dwFlags & D3DXFX_DONOTSAVESHADERSTATE )
         {
-            pDevice->SetVertexShader( NULL );
+            pDevice->SetVertexShader( pOriginalVertexShader );
             pDevice->SetPixelShader( NULL );
         }
 
         g_pDeviceState->CallState.strShaderName = "";
-        return D3D_OK;
     }
+
+    return D3D_OK;
 }
 
 
@@ -373,10 +452,67 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
     }
 
     // Any shader for this texture ?
-    CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
+    SShaderItemLayers* pLayers = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
 
-    // Don't apply if a vertex shader is already being used
-    if ( g_pDeviceState->VertexShader )
+    if ( !pLayers )
+    {
+        // No shaders for this texture
+        return DrawIndexedPrimitiveGuarded ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+    }
+    else
+    {
+        // Draw base shader
+        DrawIndexedPrimitiveShader ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount, pLayers->pBase, false );
+
+        // Draw each layer
+        if ( !pLayers->layerList.empty () )
+        {
+            float fSlopeDepthBias = -0.02f;
+            float fDepthBias = -0.00001f;
+            SAVE_RENDERSTATE_AND_SET( SLOPESCALEDEPTHBIAS,  *(DWORD*)&fSlopeDepthBias );
+            SAVE_RENDERSTATE_AND_SET( DEPTHBIAS,            *(DWORD*)&fDepthBias );
+            SAVE_RENDERSTATE_AND_SET( ALPHABLENDENABLE, TRUE );
+            SAVE_RENDERSTATE_AND_SET( SRCBLEND,         D3DBLEND_SRCALPHA );
+            SAVE_RENDERSTATE_AND_SET( DESTBLEND,        D3DBLEND_INVSRCALPHA );
+            SAVE_RENDERSTATE_AND_SET( ALPHATESTENABLE,  TRUE );
+            SAVE_RENDERSTATE_AND_SET( ALPHAREF,         0x01 );
+            SAVE_RENDERSTATE_AND_SET( ALPHAFUNC,        D3DCMP_GREATER );
+            SAVE_RENDERSTATE_AND_SET( ZWRITEENABLE,     FALSE );
+            SAVE_RENDERSTATE_AND_SET( ZFUNC,            D3DCMP_LESSEQUAL );
+
+            for ( uint i = 0 ; i < pLayers->layerList.size () ; i++ )
+            {
+                DrawIndexedPrimitiveShader ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount, pLayers->layerList[i], true );
+            }
+
+            RESTORE_RENDERSTATE( SLOPESCALEDEPTHBIAS );
+            RESTORE_RENDERSTATE( DEPTHBIAS );
+            RESTORE_RENDERSTATE( ALPHABLENDENABLE );
+            RESTORE_RENDERSTATE( SRCBLEND );
+            RESTORE_RENDERSTATE( DESTBLEND );
+            RESTORE_RENDERSTATE( ALPHATESTENABLE );
+            RESTORE_RENDERSTATE( ALPHAREF );
+            RESTORE_RENDERSTATE( ALPHAFUNC );
+            RESTORE_RENDERSTATE( ZWRITEENABLE );
+            RESTORE_RENDERSTATE( ZFUNC );
+        }
+
+        return D3D_OK;
+    }
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::DrawIndexedPrimitiveShader
+//
+//
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount, CShaderItem* pShaderItem, bool bIsLayer )
+{
+    // Don't apply if both the shader and render state both use a vertex shader
+    if ( pShaderItem && g_pDeviceState->VertexShader && pShaderItem->GetUsesVertexShader () )
         pShaderItem = NULL;
 
     if ( pShaderItem && pShaderItem->m_fMaxDistanceSq > 0 )
@@ -392,7 +528,8 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
     if ( !pShaderItem )
     {
         // No shader for this texture
-        return DrawIndexedPrimitiveGuarded ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+        if ( !bIsLayer )
+            return DrawIndexedPrimitiveGuarded ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
     }
     else
     {
@@ -417,6 +554,9 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
         // Apply mapped parameters
         pShaderInstance->m_pEffectWrap->ApplyMappedHandles ();
 
+        // Remember vertex shader if original draw was using it
+        IDirect3DVertexShader9* pOriginalVertexShader = g_pDeviceState->VertexShader;
+
         // Do shader passes
         ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
 
@@ -427,6 +567,11 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
         for ( uint uiPass = 0 ; uiPass < uiNumPasses ; uiPass++ )
         {
             pD3DEffect->BeginPass ( uiPass );
+
+            // Apply original vertex shader if original draw was using it (i.e. for ped animation)
+            if ( pOriginalVertexShader )
+                pDevice->SetVertexShader( pOriginalVertexShader );
+
             DrawIndexedPrimitiveGuarded ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
             pD3DEffect->EndPass ();
         }
@@ -435,7 +580,7 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
         // If we didn't get the effect to save the shader state, clear some things here
         if ( dwFlags & D3DXFX_DONOTSAVESHADERSTATE )
         {
-            pDevice->SetVertexShader( NULL );
+            pDevice->SetVertexShader( pOriginalVertexShader );
             pDevice->SetPixelShader( NULL );
         }
 
@@ -443,8 +588,9 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
         CAdditionalVertexStreamManager::GetSingleton ()->MaybeUnsetAdditionalVertexStream ();
 
         g_pDeviceState->CallState.strShaderName = "";
-        return D3D_OK;
     }
+
+    return D3D_OK;
 }
 
 

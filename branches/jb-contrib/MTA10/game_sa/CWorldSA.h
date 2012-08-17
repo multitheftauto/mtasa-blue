@@ -50,7 +50,7 @@
 #include <game/CWorld.h>
 #include "CEntitySA.h"
 #include "CBuildingSA.h"
-#include <google/dense_hash_map>
+
 class CWorldSA : public CWorld
 {
 public:

@@ -42,7 +42,7 @@ typedef unsigned long AnimationId;
 typedef bool ( ExplosionHandler ) ( class CEntity* pExplodingEntity, class CEntity* pCreator, const CVector& vecPosition, enum eExplosionType ExplosionType );
 typedef void ( PreContextSwitchHandler ) ( class CPlayerPed* pPlayer );
 typedef void ( PostContextSwitchHandler ) ( void );
-typedef void ( PreWeaponFireHandler ) ( class CPlayerPed* pPlayer );
+typedef bool ( PreWeaponFireHandler ) ( class CPlayerPed* pPlayer, bool bStopIfUsingBulletSync );
 typedef void ( PostWeaponFireHandler ) ( void );
 typedef void ( BulletImpactHandler ) ( class CPed* pInitiator, class CEntity* pVictim, const CVector* pvecStartPosition, const CVector* pvecEndPosition );
 typedef void ( BulletFireHandler ) ( class CPed* pInitiator, const CVector* pvecStartPosition, const CVector* pvecEndPosition );
@@ -70,6 +70,7 @@ typedef void ( GameObjectDestructHandler ) ( CEntitySAInterface* pObject );
 typedef void ( GameVehicleDestructHandler ) ( CEntitySAInterface* pVehicle );
 typedef void ( GamePlayerDestructHandler ) ( CEntitySAInterface* pPlayer );
 typedef void ( GameModelRemoveHandler ) ( ushort usModelId );
+typedef void ( GameEntityRenderHandler ) ( CEntitySAInterface* pEntity );
 
 /**
  * This class contains information used for shot syncing, one exists per player.
@@ -133,6 +134,7 @@ public:
     virtual CRemoteDataStorage *        CreateRemoteDataStorage     () = 0;
     virtual void                        DestroyRemoteDataStorage    ( CRemoteDataStorage* pData ) = 0;
     virtual void                        AddRemoteDataStorage        ( CPlayerPed* pPed, CRemoteDataStorage* pData ) = 0;
+    virtual CRemoteDataStorage*         GetRemoteDataStorage        ( CPlayerPed* pPed ) = 0;
     virtual void                        RemoveRemoteDataStorage     ( CPlayerPed* pPed ) = 0;
 
     virtual class CPed *                GetContextSwitchedPed       ( void ) = 0;
@@ -173,6 +175,7 @@ public:
     virtual void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler ) = 0;
     virtual void                        SetGamePlayerDestructHandler    ( GamePlayerDestructHandler * pHandler ) = 0;
     virtual void                        SetGameModelRemoveHandler       ( GameModelRemoveHandler * pHandler ) = 0;
+    virtual void                        SetGameEntityRenderHandler      ( GameEntityRenderHandler * pHandler ) = 0;
 
     virtual void                        AllowMouseMovement          ( bool bAllow ) = 0;
     virtual void                        DoSoundHacksOnLostFocus     ( bool bLostFocus ) = 0;
@@ -285,7 +288,6 @@ public:
 
     virtual void                        GetRwResourceStats          ( SRwResourceStats& outStats ) = 0;
     virtual void                        GetClothesCacheStats        ( SClothesCacheStats& outStats ) = 0;
-    virtual CEntitySAInterface*         GetRenderingGameEntity      ( void ) = 0;
 };
 
 #endif

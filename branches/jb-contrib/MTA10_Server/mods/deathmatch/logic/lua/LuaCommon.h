@@ -62,9 +62,16 @@ void                    lua_pushtimer           ( lua_State* luaVM, class CLuaTi
 void                    lua_pushxmlnode         ( lua_State* luaVM, class CXMLNode* pNode );
 void                    lua_pushban             ( lua_State* luaVM, class CBan* pBan );
 void                    lua_pushquery           ( lua_State* luaVM, class CDbJobData* pJobData );
+void                    lua_pushuserdata        ( lua_State* luaVM, const char* szClass, void* value );
 
 // Converts any type to string
 const char*             lua_makestring          ( lua_State* luaVM, int iArgument );
+
+// Internal use
+void                    lua_newclass            ( lua_State* luaVM );
+void                    lua_registerclass       ( lua_State* luaVM, const char* szName );
+void                    lua_classfunction       ( lua_State* luaVM, const char* szFunction, const char* szOriginal );
+void                    lua_classvariable       ( lua_State* luaVM, const char* szVariable, const char* set, const char* get );
 
 // Include the RPC functions enum
 #include "net/rpc_enums.h"

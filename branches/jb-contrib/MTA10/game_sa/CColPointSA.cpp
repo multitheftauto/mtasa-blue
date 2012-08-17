@@ -4,7 +4,6 @@
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        game_sa/CColPointSA.cpp
 *  PURPOSE:     Collision point
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -12,17 +11,21 @@
 
 #include "StdInc.h"
 
-CColPointSA::CColPointSA()
+CColPointSA::CColPointSA ( void )
 { 
-    this->internalInterface = new CColPointSAInterface(); 
-}
+    m_pInternalInterface = new CColPointSAInterface(); 
+};
 
-VOID CColPointSA::SetPosition(CVector * vecPosition)  
-{ 
-    MemCpyFast (&this->GetInterface()->Position, vecPosition, sizeof(CVector)); 
-}
+// Get lighting taking into account time of day
+// Returns between 0 and 1
+float CColPointSA::GetLightingForTimeOfDay ( void )
+{
+    CColLighting lighting = GetLightingB ();
 
-VOID CColPointSA::SetNormal(CVector * vecNormal) 
-{ 
-    MemCpyFast (&this->GetInterface()->Normal, vecNormal, sizeof(CVector)); 
+    // Find correct position between night and day value
+    float m_fDNBalanceParam = *(float*)(0x08D12C0);
+    float fResult = Lerp < float > ( lighting.day, m_fDNBalanceParam, lighting.night );
+
+    // Scale to range 0-1
+    return fResult * ( 1 / 15.f );
 }

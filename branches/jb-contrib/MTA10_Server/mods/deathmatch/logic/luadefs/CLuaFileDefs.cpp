@@ -92,15 +92,15 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
                         delete pFile;
 
                         // Output error
-                        m_pScriptDebugging->LogWarning ( luaVM, "fileCreate; unable to load file" );
+                        m_pScriptDebugging->LogWarning ( luaVM, "%s; unable to load file", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
                     }
                 }
                 else
-                    m_pScriptDebugging->LogError ( luaVM, "fileCreate failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
+                    m_pScriptDebugging->LogError ( luaVM, "%s failed; ModifyOtherObjects in ACL denied resource %s to access %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
             }
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "fileCreate" );
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
 
     // Failed
@@ -144,7 +144,7 @@ int CLuaFileDefs::fileExists ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "fileExists" );
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
 
     // Failed
@@ -216,15 +216,15 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
                         delete pFile;
 
                         // Output error
-                        m_pScriptDebugging->LogWarning ( luaVM, "fileOpen; unable to load file" );
+                        m_pScriptDebugging->LogWarning ( luaVM, "%s: unable to load file", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
                     }
                 }
                 else
-                    m_pScriptDebugging->LogError ( luaVM, "fileOpen failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
+                    m_pScriptDebugging->LogError ( luaVM, "%s failed; ModifyOtherObjects in ACL denied resource %s to access %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
             }
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "fileOpen" );
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
 
     // Failed
@@ -246,7 +246,7 @@ int CLuaFileDefs::fileIsEOF ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "fileIsEOF", "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -270,13 +270,13 @@ int CLuaFileDefs::fileGetPos ( lua_State* luaVM )
         }
         else
         {
-            m_pScriptDebugging->LogBadPointer ( luaVM, "fileGetPos", "file", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
             lua_pushnil ( luaVM );
         }
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "fileGetPos", "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -307,19 +307,19 @@ int CLuaFileDefs::fileSetPos ( lua_State* luaVM )
                 }
                 else
                 {
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "fileSetPos", "file", 1 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
                     lua_pushnil ( luaVM );
                 }
                 return 1;
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "fileSetPos", "number", 2 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "fileSetPos", "number", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "fileSetPos", "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -343,13 +343,13 @@ int CLuaFileDefs::fileGetSize ( lua_State* luaVM )
         }
         else
         {
-            m_pScriptDebugging->LogBadPointer ( luaVM, "fileGetSize", "file", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
             lua_pushnil ( luaVM );
         }
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "fileGetSize", "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -385,7 +385,7 @@ int CLuaFileDefs::fileRead ( lua_State* luaVM )
                 }
                 else
                 {
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "fileRead", "file", 1 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
                     lua_pushnil ( luaVM );
                 }
 
@@ -396,13 +396,13 @@ int CLuaFileDefs::fileRead ( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "fileRead", "number", 2 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "fileRead", "number", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "fileRead", "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -435,7 +435,7 @@ int CLuaFileDefs::fileWrite ( lua_State* luaVM )
                 lArgBytesWritten = pFile->Write ( ulDataLen, pData );
                 if ( lArgBytesWritten == -1 )
                 {
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "fileWrite", "file", 1 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
                     lua_pushnil ( luaVM );
                     return 1;
                 }
@@ -451,10 +451,10 @@ int CLuaFileDefs::fileWrite ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "fileWrite", "string", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "string", 2 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "fileWrite", "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -478,7 +478,7 @@ int CLuaFileDefs::fileFlush ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "fileFlush", "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -503,7 +503,7 @@ int CLuaFileDefs::fileClose ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "fileClose", "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -550,15 +550,15 @@ int CLuaFileDefs::fileDelete ( lua_State* luaVM )
                     else
                     {
                         // Output error
-                        m_pScriptDebugging->LogWarning ( luaVM, "fileDelete; unable to delete file" );
+                        m_pScriptDebugging->LogWarning ( luaVM, "%s; unable to delete file", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
                     }
                 }
                 else
-                    m_pScriptDebugging->LogError ( luaVM, "fileDelete failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
+                    m_pScriptDebugging->LogError ( luaVM, "%s failed; ModifyOtherObjects in ACL denied resource %s to access %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
             }
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "fileDelete" );
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -617,28 +617,28 @@ int CLuaFileDefs::fileRename ( lua_State* luaVM )
                         else
                         {
                             // Output error
-                            m_pScriptDebugging->LogWarning ( luaVM, "fileRename; unable to rename/move file" );
+                            m_pScriptDebugging->LogWarning ( luaVM, "%s; unable to rename/move file", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
                         }
                     }
                     else
                     {
                         // Output error
-                        m_pScriptDebugging->LogWarning ( luaVM, "fileRename failed; source file doesn't exist or destination file already exists" );
+                        m_pScriptDebugging->LogWarning ( luaVM, "%s failed; source file doesn't exist or destination file already exists", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
                     }
                 }
                 // Do we have not permissions to both - `current` and `new` resources?
                 else if ( pThisResource != pCurResource && pThisResource != pNewResource )
-                    m_pScriptDebugging->LogError ( luaVM, "fileRename failed; ModifyOtherObjects in ACL denied resource %s to access %s and %s", pThisResource->GetName ().c_str (), pCurResource->GetName ().c_str (), pNewResource->GetName ().c_str () );
+                    m_pScriptDebugging->LogError ( luaVM, "%s failed; ModifyOtherObjects in ACL denied resource %s to access %s and %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pThisResource->GetName ().c_str (), pCurResource->GetName ().c_str (), pNewResource->GetName ().c_str () );
                 // Do we have not permissions to `current` resource?
                 else if ( pThisResource != pCurResource && pThisResource == pNewResource )
-                    m_pScriptDebugging->LogError ( luaVM, "fileRename failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pCurResource->GetName ().c_str () );
+                    m_pScriptDebugging->LogError ( luaVM, "%s failed; ModifyOtherObjects in ACL denied resource %s to access %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pThisResource->GetName ().c_str (), pCurResource->GetName ().c_str () );
                 // Do we have not permissions to `new` resource?
                 else
-                    m_pScriptDebugging->LogError ( luaVM, "fileRename failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pNewResource->GetName ().c_str () );
+                    m_pScriptDebugging->LogError ( luaVM, "%s failed; ModifyOtherObjects in ACL denied resource %s to access %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pThisResource->GetName ().c_str (), pNewResource->GetName ().c_str () );
             }
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "fileRename" );
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
 
     lua_pushboolean ( luaVM, false );

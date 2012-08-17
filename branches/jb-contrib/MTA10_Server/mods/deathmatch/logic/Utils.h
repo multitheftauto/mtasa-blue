@@ -43,8 +43,6 @@ bool            IsNumericString             ( const char* szString );
 bool            IsNumericString             ( const char* szString, size_t sizeString );
 unsigned int    HashString                  ( const char* szString );
 
-void            InitializeTime              ( void );
-
 void            DisconnectPlayer            ( class CGame* pGame, class CPlayer& Player, const char* szMessage );
 void            DisconnectConnectionDesync  ( class CGame* pGame, class CPlayer& Player, unsigned int uiCode );
 
@@ -64,17 +62,7 @@ bool            XMLColorToInt               ( const char* szColor, unsigned char
 
 inline unsigned long GetTime ( void )
 {
-    #if WIN32
-        extern LONGLONG g_lTimeCounts;
-        LARGE_INTEGER lPerf;
-        QueryPerformanceCounter ( &lPerf );
-        return static_cast < unsigned long > ( lPerf.QuadPart / g_lTimeCounts );
-    #else
-        extern timeval  g_tvInitialTime;
-        timeval tvNow;
-        gettimeofday ( &tvNow, 0 );
-        return static_cast < unsigned long > ( ( tvNow.tv_sec - g_tvInitialTime.tv_sec ) * 1000 + ( tvNow.tv_usec - g_tvInitialTime.tv_usec ) / 1000 );
-    #endif
+    return GetTickCount32 ();
 }
 
 inline float WrapAround ( float fValue, float fHigh )

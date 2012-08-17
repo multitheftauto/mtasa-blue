@@ -1443,8 +1443,8 @@ bool CSettings::OnJoypadDefaultClick ( CGUIElement* pElement )
     // Load the default mouse settings
     CControllerConfigManager * pController = g_pCore->GetGame ()->GetControllerConfigManager ();   
 
-    m_pFlyWithMouse->SetSelected ( pController->GetFlyWithMouse () );
-    m_pSteerWithMouse->SetSelected ( pController->GetSteerWithMouse () );
+    m_pFlyWithMouse->SetSelected ( pController->GetFlyWithMouse ( true ) );
+    m_pSteerWithMouse->SetSelected ( pController->GetSteerWithMouse ( true ) );
     m_pInvertMouse->SetSelected ( pController->IsMouseInverted () );
 
     // Update the GUI

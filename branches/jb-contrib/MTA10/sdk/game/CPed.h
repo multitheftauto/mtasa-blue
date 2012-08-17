@@ -140,6 +140,15 @@ enum eMoveAnim
 
 enum { PLAYER_PED, CIVILIAN_PED };
 
+namespace EPedWeaponAudioEvent
+{
+    enum EPedWeaponAudioEventType
+    {
+        FIRE = 0x91,
+    };
+}
+using EPedWeaponAudioEvent::EPedWeaponAudioEventType;
+
 class CPed : public virtual CPhysical
 {
 public:
@@ -237,6 +246,7 @@ public:
     virtual CWeaponStat*    GetCurrentWeaponStat    ( void ) = 0;
     virtual float           GetCurrentWeaponRange   ( void ) = 0;
 
+    virtual void            AddWeaponAudioEvent     ( EPedWeaponAudioEventType audioEventType ) = 0;
     virtual float           GetOxygenLevel          ( void ) = 0;
     virtual void            SetOxygenLevel      ( float fOxygenLevel ) = 0;
 };

@@ -149,7 +149,7 @@ String String::bidify(void) const
 
     String tmp = *this;
 
-    // Apply in sections seperated by \n
+    // Apply in sections separated by \n
     size_type pos = 0;
     while ( true )
     {

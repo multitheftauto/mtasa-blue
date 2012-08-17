@@ -223,6 +223,14 @@ namespace
         uint                            m_uiNumRows;
         std::vector < SColumn >         m_ColumnList;
     };
+
+
+    // Clear SMemStatsInfo struct
+    void MemStatsInfoClear ( SMemStatsInfo& memStats )
+    {
+        static SMemStatsInfo* pZeroed = new SMemStatsInfo ();
+        memStats = *pZeroed;
+    }
 }
 
 
@@ -426,7 +434,7 @@ void CMemStats::UpdateFrameStats ( void )
 ///////////////////////////////////////////////////////////////
 void CMemStats::SampleState ( SMemStatsInfo& memStatsInfo )
 {
-    memset ( &memStatsInfo, 0, sizeof ( memStatsInfo ) );
+    MemStatsInfoClear ( memStatsInfo );
 
     //
     // Update 'now' state
@@ -468,6 +476,7 @@ void CMemStats::SampleState ( SMemStatsInfo& memStatsInfo )
 
     CCore::GetSingleton ().GetMultiplayer ()->GetRwResourceStats ( memStatsInfo.rwResourceStats );
     CCore::GetSingleton ().GetMultiplayer ()->GetClothesCacheStats ( memStatsInfo.clothesCacheStats );
+    CCore::GetSingleton ().GetGame ()->GetShaderReplacementStats ( memStatsInfo.shaderReplacementStats );
 }
 
 
@@ -480,8 +489,8 @@ void CMemStats::SampleState ( SMemStatsInfo& memStatsInfo )
 ///////////////////////////////////////////////////////////////
 void CMemStats::UpdateIntervalStats ( void )
 {
-    memset ( &m_MemStatsNow, 0, sizeof ( m_MemStatsNow ) );
-    memset ( &m_MemStatsDelta, 0, sizeof ( m_MemStatsDelta ) );
+    MemStatsInfoClear ( m_MemStatsNow );
+    MemStatsInfoClear ( m_MemStatsDelta );
 
     //
     // Update 'now' state
@@ -541,13 +550,39 @@ void CMemStats::UpdateIntervalStats ( void )
     m_MemStatsDelta.clothesCacheStats.uiNumUnused   = m_MemStatsNow.clothesCacheStats.uiNumUnused  - m_MemStatsPrev.clothesCacheStats.uiNumUnused;
     m_MemStatsDelta.clothesCacheStats.uiNumRemoved  = m_MemStatsNow.clothesCacheStats.uiNumRemoved - m_MemStatsPrev.clothesCacheStats.uiNumRemoved;
 
+    {
+        SShaderReplacementStats& now   = m_MemStatsNow.shaderReplacementStats;
+        SShaderReplacementStats& prev  = m_MemStatsPrev.shaderReplacementStats;
+        SShaderReplacementStats& delta = m_MemStatsDelta.shaderReplacementStats;
+
+        delta.uiNumReplacementRequests = now.uiNumReplacementRequests - prev.uiNumReplacementRequests;
+        delta.uiNumReplacementMatches  = now.uiNumReplacementMatches  - prev.uiNumReplacementMatches;
+        delta.uiTotalTextures          = now.uiTotalTextures          - prev.uiTotalTextures;
+        delta.uiTotalShaders           = now.uiTotalShaders           - prev.uiTotalShaders;
+        delta.uiTotalEntitesRefed      = now.uiTotalEntitesRefed      - prev.uiTotalEntitesRefed;
+
+        for ( std::map < uint, SMatchChannelStats >::iterator iter = now.channelStatsList.begin () ; iter != now.channelStatsList.end () ; ++iter )
+        {
+            uint uiId = iter->first;
+            const SMatchChannelStats& channelStatsNow = iter->second;
+            SMatchChannelStats* pChannelStatsPrev = MapFind ( prev.channelStatsList, uiId );
+            SMatchChannelStats channelStatsDelta = channelStatsNow;
+            if ( pChannelStatsPrev )
+            {
+                channelStatsDelta.uiNumMatchedTextures -= pChannelStatsPrev->uiNumMatchedTextures;
+                channelStatsDelta.uiNumShaderAndEntities -= pChannelStatsPrev->uiNumShaderAndEntities;
+            }
+            MapSet ( delta.channelStatsList, uiId, channelStatsDelta );      
+        }
+    }
+
     //
     // Set 'prev' for next time
     //
     m_MemStatsPrev = m_MemStatsNow;
 
     // Clear max records
-    memset ( &m_MemStatsMax, 0, sizeof ( m_MemStatsMax ) );
+    MemStatsInfoClear ( m_MemStatsMax );
 }
 
 
@@ -809,5 +844,54 @@ void CMemStats::CreateTables ( void )
         table.AddRow ( SString ( "25511-25574|(Paths)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiPaths_25511_25574, m_MemStatsNow.modelInfo.uiPaths_25511_25574 ) );
         table.AddRow ( SString ( "25575-25754|(Anims)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiAnims_25575_25754, m_MemStatsNow.modelInfo.uiAnims_25575_25754 ) );
         table.AddRow ( SString ( "|Total:|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiTotal, m_MemStatsNow.modelInfo.uiTotal ) );
+    }
+
+    {
+/*
+    World shader replacements       Change    Count
+    World texture draws                         0
+    World shader draws                          0
+    World texture total                         0             
+    World shader total                          0             
+    Entites explicitly shadered                 0    
+*/
+        m_TableList.push_back ( CDxTable ( "|" ) );
+        CDxTable& table = m_TableList.back ();
+        table.SetColumnWidths( "160,50:R,60:R" );
+        table.AddRow ( HEADER1( "World shader replacements" ) "|" HEADER1( "Change" ) "|" HEADER1( "Count" ) );
+        table.AddRow ( SString ( "World texture draws|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiNumReplacementRequests, m_MemStatsNow.shaderReplacementStats.uiNumReplacementRequests ) );
+        table.AddRow ( SString ( "World shader draws|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiNumReplacementMatches, m_MemStatsNow.shaderReplacementStats.uiNumReplacementMatches ) );
+        table.AddRow ( SString ( "World texture total|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiTotalTextures, m_MemStatsNow.shaderReplacementStats.uiTotalTextures ) );
+        table.AddRow ( SString ( "World shader total|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiTotalShaders, m_MemStatsNow.shaderReplacementStats.uiTotalShaders ) );
+        table.AddRow ( SString ( "Known entities|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiTotalEntitesRefed, m_MemStatsNow.shaderReplacementStats.uiTotalEntitesRefed ) );
+    }
+
+    {
+/*
+    World shader channels       NumTex     Shader+Entites
+    *blah                       .   0          .   0
+*/
+        SShaderReplacementStats& now   = m_MemStatsNow.shaderReplacementStats;
+        SShaderReplacementStats& delta = m_MemStatsDelta.shaderReplacementStats;
+
+        m_TableList.push_back ( CDxTable ( "|" ) );
+        CDxTable& table = m_TableList.back ();
+        table.SetNumberColors ( "^1", strNumberColorsModels );
+        table.SetColumnWidths( "180,40:R,35:R,40:R,35:R" );
+        table.AddRow ( HEADER1( "World shader channels" ) "|" HEADER1( " " ) "|" HEADER1( "NumTex" ) "|" HEADER1( " " ) "|" HEADER1( "Shad&Ent" ) );
+        for ( std::map < uint, SMatchChannelStats >::iterator iter = now.channelStatsList.begin () ; iter != now.channelStatsList.end () ; ++iter )
+        {
+            uint uiId = iter->first;
+            const SMatchChannelStats& channelStatsNow = iter->second;
+            SMatchChannelStats* pChannelStatsDelta = MapFind ( delta.channelStatsList, uiId );
+            assert ( pChannelStatsDelta );
+            table.AddRow( SString ( "%s|^1~.%d|%d|^1~.%d|%d"
+                                        ,*channelStatsNow.strTag
+                                        ,pChannelStatsDelta->uiNumMatchedTextures
+                                        ,channelStatsNow.uiNumMatchedTextures
+                                        ,pChannelStatsDelta->uiNumShaderAndEntities
+                                        ,channelStatsNow.uiNumShaderAndEntities
+                                  ) );
+        }
     }
 }

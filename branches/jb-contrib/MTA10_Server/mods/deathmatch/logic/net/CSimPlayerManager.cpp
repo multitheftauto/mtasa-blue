@@ -112,7 +112,7 @@ void CSimPlayerManager::RemoveSimPlayer ( CPlayer* pPlayer )
 // Update matching sim player object with new datum
 //
 ///////////////////////////////////////////////////////////////////////////
-void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::vector < CPlayer* >* pPuresyncSendList, const std::vector < CPlayer* >* pKeysyncSendList, const std::vector < CPlayer* >* pBulletsyncSendList )
+void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::set < CPlayer* >* pPuresyncSendList, const std::set < CPlayer* >* pKeysyncSendList, const std::set < CPlayer* >* pBulletsyncSendList )
 {
     LockSimSystem ();     // TODO - only lock the CSimPlayer
 
@@ -156,7 +156,7 @@ void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::vector < 
     if ( pPuresyncSendList )
     {
         pSim->m_PuresyncSendList.clear ();
-        for ( std::vector < CPlayer* > ::const_iterator iter = pPuresyncSendList->begin (); iter != pPuresyncSendList->end (); ++iter )
+        for ( std::set < CPlayer* > ::const_iterator iter = pPuresyncSendList->begin (); iter != pPuresyncSendList->end (); ++iter )
         {
             CSimPlayer* pSendSimPlayer = (*iter)->m_pSimPlayer;
             if ( pSendSimPlayer && pSendSimPlayer->m_bDoneFirstUpdate )
@@ -169,7 +169,7 @@ void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::vector < 
     if ( pKeysyncSendList )
     {
         pSim->m_KeysyncSendList.clear ();
-        for ( std::vector < CPlayer* > ::const_iterator iter = pKeysyncSendList->begin (); iter != pKeysyncSendList->end (); ++iter )
+        for ( std::set < CPlayer* > ::const_iterator iter = pKeysyncSendList->begin (); iter != pKeysyncSendList->end (); ++iter )
         {
             CSimPlayer* pSendSimPlayer = (*iter)->m_pSimPlayer;
             if ( pSendSimPlayer && pSendSimPlayer->m_bDoneFirstUpdate )
@@ -181,7 +181,7 @@ void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer, const std::vector < 
     if ( pBulletsyncSendList )
     {
         pSim->m_BulletsyncSendList.clear ();
-        for ( std::vector < CPlayer* > ::const_iterator iter = pBulletsyncSendList->begin (); iter != pBulletsyncSendList->end (); ++iter )
+        for ( std::set < CPlayer* > ::const_iterator iter = pBulletsyncSendList->begin (); iter != pBulletsyncSendList->end (); ++iter )
         {
             CSimPlayer* pSendSimPlayer = (*iter)->m_pSimPlayer;
             if ( pSendSimPlayer && pSendSimPlayer->m_bDoneFirstUpdate )

@@ -229,5 +229,7 @@ enum eRPCFunctions
 
     SET_SYNC_INTERVALS,
 
+    SET_JETPACK_WEAPON_ENABLED,
+
     NUM_RPC_FUNCS
 };

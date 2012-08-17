@@ -260,6 +260,15 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
 
     BitStream.Write ( m_fAircraftMaxHeight );
 
+    if ( BitStream.Version () >= 0x30 )
+    {
+        for (int i = WEAPONTYPE_BRASSKNUCKLE; i < WEAPONTYPE_PISTOL; i++)
+        {
+            bool bEnabled;
+            bEnabled = g_pGame->GetJetpackWeaponEnabled ( (eWeaponType) i );
+            BitStream.WriteBit ( bEnabled );
+        }
+    }
     for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_EXTINGUISHER;i++)
     {
         sWeaponPropertySync WeaponProperty;
@@ -284,6 +293,10 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
 
         WeaponProperty.data.anim_breakout_time = pWeaponStat->GetWeaponAnimBreakoutTime();
         BitStream.Write( &WeaponProperty );
+        if ( BitStream.Version () >= 0x30 )
+        {
+            BitStream.WriteBit ( g_pGame->GetJetpackWeaponEnabled ( (eWeaponType) i ) );
+        }
     }
 
     for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_TEC9;i++)
@@ -312,6 +325,15 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
 
             WeaponProperty.data.anim_breakout_time = pWeaponStat->GetWeaponAnimBreakoutTime();
             BitStream.Write( &WeaponProperty );
+        }
+    }
+    if ( BitStream.Version () >= 0x30 )
+    {
+        for (int i = WEAPONTYPE_CAMERA; i <= WEAPONTYPE_PARACHUTE; i++)
+        {
+            bool bEnabled;
+            bEnabled = g_pGame->GetJetpackWeaponEnabled ( (eWeaponType) i );
+            BitStream.WriteBit ( bEnabled );
         }
     }
 

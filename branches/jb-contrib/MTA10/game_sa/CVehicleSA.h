@@ -28,6 +28,7 @@ class CVehicleSA;
 #include "CHandlingManagerSA.h"
 #include "CDamageManagerSA.h"
 #include "CDoorSA.h"
+#include "CColPointSA.h"
 
 // 00431f80 public: static class CVehicle * __cdecl CCarCtrl::CreateCarForScript(int,class CVector,unsigned char)
 #define FUNC_CCarCtrlCreateCarForScript         0x431f80 // ##SA##
@@ -500,6 +501,9 @@ public:
                                 CVehicleSA                      ( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 );
                                 ~CVehicleSA                     ();
     void                        Init                            ( void );
+
+    // CEntitySA interface
+    virtual void                OnChangingPosition              ( const CVector& vecNewPosition );
 
     // Override of CPhysicalSA::SetMoveSpeed to take trains into account
     VOID                        SetMoveSpeed                    ( CVector* vecMoveSpeed );

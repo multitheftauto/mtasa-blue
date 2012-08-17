@@ -49,7 +49,6 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
     m_pLine3DBatcherPostGUI = new CLine3DBatcher ( false );
     m_pMaterialLine3DBatcher = new CMaterialLine3DBatcher ();
 
-    m_bSetRenderTargetEnabled = false;
     m_pScreenGrabber = NewScreenGrabber ();
     m_pPixelsManager = NewPixelsManager ();
 }
@@ -257,6 +256,28 @@ void CGraphics::SetBlendModeRenderStates ( EBlendModeType blendMode )
             m_pDevice->SetRenderState ( D3DRS_ALPHATESTENABLE,  TRUE );
             m_pDevice->SetRenderState ( D3DRS_ALPHAREF,         0x01 );
             m_pDevice->SetRenderState ( D3DRS_ALPHAFUNC,        D3DCMP_GREATEREQUAL );
+            m_pDevice->SetRenderState ( D3DRS_LIGHTING,         FALSE );
+
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
+            m_pDevice->SetTextureStageState ( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
+
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_COLOROP, D3DTOP_DISABLE );
+            m_pDevice->SetTextureStageState ( 1, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
+
+        }
+        break;
+
+        case EBlendMode::OVERWRITE:
+        {
+            m_pDevice->SetRenderState ( D3DRS_ZENABLE,          D3DZB_FALSE );
+            m_pDevice->SetRenderState ( D3DRS_CULLMODE,         D3DCULL_NONE );
+            m_pDevice->SetRenderState ( D3DRS_SHADEMODE,        D3DSHADE_GOURAUD );
+            m_pDevice->SetRenderState ( D3DRS_ALPHABLENDENABLE, FALSE );
+            m_pDevice->SetRenderState ( D3DRS_ALPHATESTENABLE,  FALSE );
             m_pDevice->SetRenderState ( D3DRS_LIGHTING,         FALSE );
 
             m_pDevice->SetTextureStageState ( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
@@ -1342,21 +1363,6 @@ void CGraphics::RemoveQueueRef ( IUnknown* pUnknown )
 {
     pUnknown->Release ();
     m_iDebugQueueRefs--;    // For debugging
-}
-
-
-// Entering or leaving a section where the rendertarget can be changed from script
-void CGraphics::EnableSetRenderTarget ( bool bEnable )
-{
-    // Must be changing
-    assert ( m_bSetRenderTargetEnabled != bEnable );
-
-    if ( !bEnable )
-        m_pRenderItemManager->RestoreDefaultRenderTarget ();
-    else
-        m_pRenderItemManager->SaveDefaultRenderTarget ();
-
-    m_bSetRenderTargetEnabled = bEnable;
 }
 
 // Notification that the render target will be changing

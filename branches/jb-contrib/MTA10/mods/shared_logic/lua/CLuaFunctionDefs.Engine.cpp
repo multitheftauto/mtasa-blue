@@ -56,11 +56,11 @@ int CLuaFunctionDefs::EngineLoadCOL ( lua_State* luaVM )
                 {
                     // Delete it again. We failed
                     delete pCol;
-                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", "engineLoadCOL", *strFile ) );
+                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strFile ) );
                 }
             }
             else
-                m_pScriptDebugging->LogBadType ( luaVM, "engineLoadCOL" );
+                m_pScriptDebugging->LogBadType ( luaVM );
         }
     }
 
@@ -85,40 +85,33 @@ int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
             
             SString strPath;
             // Is this a legal filepath?
-            if ( ( lua_istype ( luaVM, 2, LUA_TNUMBER ) || lua_istype ( luaVM, 2, LUA_TSTRING ) ) && CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+            if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
             {
-                // Check the model ID
-                unsigned short usModelID = CModelNames::ResolveModelID ( lua_tostring ( luaVM, 2 ) );
-                if ( usModelID == 0 || CClientDFFManager::IsReplacableModel ( usModelID ) )
+                // Grab the resource root entity
+                CClientEntity* pRoot = pResource->GetResourceDFFRoot ();
+
+                // Create a DFF element
+                CClientDFF* pDFF = new CClientDFF ( m_pManager, INVALID_ELEMENT_ID );
+
+                // Try to load the DFF file
+                if ( pDFF->LoadDFF ( strPath ) )
                 {
-                    // Grab the resource root entity
-                    CClientEntity* pRoot = pResource->GetResourceDFFRoot ();
+                    // Success loading the file. Set parent to DFF root
+                    pDFF->SetParent ( pRoot );
 
-                    // Create a DFF element
-                    CClientDFF* pDFF = new CClientDFF ( m_pManager, INVALID_ELEMENT_ID );
-
-                    // Try to load the DFF file
-                    if ( pDFF->LoadDFF ( strPath, usModelID ) )
-                    {
-                        // Success loading the file. Set parent to DFF root
-                        pDFF->SetParent ( pRoot );
-
-                        // Return the DFF
-                        lua_pushelement ( luaVM, pDFF );
-                        return 1;
-                    }
-                    else
-                    {
-                        // Delete it again
-                        delete pDFF;
-                        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", "engineLoadDFF", *strFile ) );
-                    }
+                    // Return the DFF
+                    lua_pushelement ( luaVM, pDFF );
+                    return 1;
                 }
                 else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "engineLoadDFF", "number", 2 );
+                {
+                    // Delete it again
+                    delete pDFF;
+                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strFile ) );
+                }
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "engineLoadDFF", "string", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "string", 1 );
         }
     }
 
@@ -174,7 +167,7 @@ int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
                 }
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "engineLoadTXD", "string", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "string", 1 );
         }
     }
 
@@ -204,10 +197,10 @@ int CLuaFunctionDefs::EngineReplaceCOL ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "engineReplaceCOL", "number", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "engineReplaceCOL", "col", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "col", 1 );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -231,7 +224,7 @@ int CLuaFunctionDefs::EngineRestoreCOL ( lua_State* luaVM )
         }  
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "engineRestoreCOL" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed.
     lua_pushboolean ( luaVM, false );
@@ -260,10 +253,10 @@ int CLuaFunctionDefs::EngineImportTXD ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "engineImportTXD", "number", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "engineImportTXD", "txd", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "txd", 1 );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -291,10 +284,10 @@ int CLuaFunctionDefs::EngineReplaceModel ( lua_State* luaVM )
             return true;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "engineReplaceModel", "number", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "engineReplaceModel", "dff", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "dff", 1 );
 
     // Failure
     lua_pushboolean ( luaVM, false );
@@ -320,7 +313,7 @@ int CLuaFunctionDefs::EngineRestoreModel ( lua_State* luaVM )
     }
     else
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "engineRestoreModel" );
+        m_pScriptDebugging->LogBadType ( luaVM );
     }
 
     // Failure
@@ -388,7 +381,7 @@ int CLuaFunctionDefs::EngineReplaceMatchingAtomics ( lua_State* luaVM )
     pEntityClump = static_cast < CClientObject* > ( pEntity ) -> GetGameObject () -> GetRpClump ();
     else {
     m_pScriptDebugging->LogWarning ( luaVM, "engineReplaceMatchingAtomics only supports vehicles and objects." );
-    m_pScriptDebugging->LogBadType ( luaVM, "engineReplaceMatchingAtomics" );
+    m_pScriptDebugging->LogBadType ( luaVM );
     }
     }
 
@@ -398,7 +391,7 @@ int CLuaFunctionDefs::EngineReplaceMatchingAtomics ( lua_State* luaVM )
 
     lua_pushboolean ( luaVM, true );
     } else {
-    m_pScriptDebugging->LogBadType ( luaVM, "engineReplaceMatchingAtomics" );
+    m_pScriptDebugging->LogBadType ( luaVM );
     lua_pushboolean ( luaVM, false );
     }
     */
@@ -440,7 +433,7 @@ int CLuaFunctionDefs::EngineReplaceWheelAtomics ( lua_State* luaVM )
 
     lua_pushboolean ( luaVM, true );
     } else {
-    m_pScriptDebugging->LogBadType ( luaVM, "engineReplaceWheelAtomics" );
+    m_pScriptDebugging->LogBadType ( luaVM );
     lua_pushboolean ( luaVM, false );
     }
     */
@@ -484,22 +477,31 @@ int CLuaFunctionDefs::EngineReplaceVehiclePart ( lua_State* luaVM )
 
 int CLuaFunctionDefs::EngineApplyShaderToWorldTexture ( lua_State* luaVM )
 {
-//  bool engineApplyShaderToWorldTexture ( element shader, string textureName, [ element targetElement ] )
-    CClientShader* pShader; SString strTextureNameMatch; CClientEntity* pElement;
+//  bool engineApplyShaderToWorldTexture ( element shader, string textureName, [ element targetElement, bool appendLayers ] )
+    CClientShader* pShader; SString strTextureNameMatch; CClientEntity* pElement; bool bAppendLayers;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pShader );
     argStream.ReadString ( strTextureNameMatch );
     argStream.ReadUserData ( pElement, NULL );
+    argStream.ReadBool ( bAppendLayers, true );
 
     if ( !argStream.HasErrors () )
     {
-        bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->ApplyShaderItemToWorldTexture ( pShader->GetShaderItem (), strTextureNameMatch, pElement );
+        // Check for use of a vertex shader on peds
+        if ( DynamicCast < CClientPed > ( pElement ) )
+        {
+            if ( pShader->GetShaderItem ()->GetUsesVertexShader () )
+            {
+                m_pScriptDebugging->LogWarning ( luaVM, SString ( "%s; Shader contains a vertex shader which will not work with ped models", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) ) );
+            }
+        }
+        bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->ApplyShaderItemToWorldTexture ( pShader->GetShaderItem (), strTextureNameMatch, pElement, bAppendLayers );
         lua_pushboolean ( luaVM, bResult );
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineApplyShaderToWorldTexture", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     // We failed
     lua_pushboolean ( luaVM, false );
@@ -524,7 +526,7 @@ int CLuaFunctionDefs::EngineRemoveShaderFromWorldTexture ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineRemoveShaderFromWorldTexture", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     // We failed
     lua_pushboolean ( luaVM, false );
@@ -548,10 +550,10 @@ int CLuaFunctionDefs::EngineGetModelNameFromID ( lua_State* luaVM )
             lua_pushstring ( luaVM, strModelName );
             return 1;
         }
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetModelNameFromID", "Expected valid model ID at argument 1" ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "Expected valid model ID at argument 1" ) );
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetModelNameFromID", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     // We failed
     lua_pushboolean ( luaVM, false );
@@ -570,15 +572,15 @@ int CLuaFunctionDefs::EngineGetModelIDFromName ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         int iModelID = CModelNames::GetModelID ( strModelName );
-        if ( iModelID )
+        if ( iModelID != INVALID_MODEL_ID )
         {
             lua_pushnumber ( luaVM, iModelID );
             return 1;
         }
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetModelIDFromName", "Expected valid model name at argument 1" ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "Expected valid model name at argument 1" ) );
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetModelIDFromName", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     // We failed
     lua_pushboolean ( luaVM, false );
@@ -597,7 +599,7 @@ int CLuaFunctionDefs::EngineGetModelTextureNames ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         ushort usModelID = CModelNames::ResolveModelID ( strModelName );
-        if ( usModelID )
+        if ( usModelID != INVALID_MODEL_ID )
         {
             std::vector < SString > nameList;
             g_pGame->GetRenderWare ()->GetModelTextureNames ( nameList, usModelID );
@@ -611,10 +613,10 @@ int CLuaFunctionDefs::EngineGetModelTextureNames ( lua_State* luaVM )
             }
             return 1;
         }
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetModelTextureNames", "Expected valid model ID or name at argument 1" ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "Expected valid model ID or name at argument 1" ) );
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetModelTextureNames", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     // We failed
     lua_pushboolean ( luaVM, false );
@@ -634,7 +636,7 @@ int CLuaFunctionDefs::EngineGetVisibleTextureNames ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         ushort usModelID = CModelNames::ResolveModelID ( strModelName );
-        if ( usModelID || strModelName == "" )
+        if ( usModelID != INVALID_MODEL_ID || strModelName == "" )
         {
             std::vector < SString > nameList;
             g_pCore->GetGraphics ()->GetRenderItemManager ()->GetVisibleTextureNames ( nameList, strTextureNameMatch, usModelID );
@@ -648,10 +650,10 @@ int CLuaFunctionDefs::EngineGetVisibleTextureNames ( lua_State* luaVM )
             }
             return 1;
         }
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetVisibleTextureNames", "Expected valid model ID or name at argument 1" ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "Expected valid model ID or name at argument 1" ) );
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetVisibleTextureNames", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     // We failed
     lua_pushboolean ( luaVM, false );

@@ -16,49 +16,58 @@
 
 #include <StdInc.h>
 
-using std::list;
-
 void CLuaTimerManager::DoPulse ( CLuaMain* pLuaMain )
 {
+    assert ( m_ProcessQueue.empty () );
+    assert ( !m_pPendingDelete );
+    assert ( !m_pProcessingTimer );
+
     CTickCount llCurrentTime = CTickCount::Now ();
-    m_bIteratingList = true;
-    list < CLuaTimer* > ::iterator iter = m_TimerList.begin ();
-    for ( ; iter != m_TimerList.end (); )
+
+    // Use a separate queue to avoid trouble
+    for ( CFastList < CLuaTimer > ::const_iterator iter = m_TimerList.begin () ; iter != m_TimerList.end () ; iter++ )
+        m_ProcessQueue.push_back ( *iter );
+
+    while ( !m_ProcessQueue.empty () )
     {
-        CLuaTimer* pLuaTimer = *iter;
-        CTickCount llStartTime = pLuaTimer->GetStartTime ();
-        CTickCount llDelay = pLuaTimer->GetDelay ();
-        unsigned int uiRepeats = pLuaTimer->GetRepeats ();
+        m_pProcessingTimer = m_ProcessQueue.front ();
+        m_ProcessQueue.pop_front ();
+
+        CTickCount llStartTime = m_pProcessingTimer->GetStartTime ();
+        CTickCount llDelay = m_pProcessingTimer->GetDelay ();
+        unsigned int uiRepeats = m_pProcessingTimer->GetRepeats ();
 
         // Is the time up and is not being deleted
-        if ( !pLuaTimer->IsBeingDeleted() && llCurrentTime >= ( llStartTime + llDelay ) )
+        if ( llCurrentTime >= ( llStartTime + llDelay ) )
         {
-            pLuaTimer->ExecuteTimer ( pLuaMain );
+            m_pProcessingTimer->ExecuteTimer ( pLuaMain );
 
             // If this is the last repeat, remove
             if ( uiRepeats == 1 )
             {
-                delete pLuaTimer;
-                iter = m_TimerList.erase ( iter );
+                RemoveTimer ( m_pProcessingTimer );
             }
             else
             {
                 // Decrease repeats if not infinite
                 if ( uiRepeats != 0 )
-                    (*iter)->SetRepeats ( uiRepeats - 1 );
+                    m_pProcessingTimer->SetRepeats ( uiRepeats - 1 );
 
-                pLuaTimer->SetStartTime ( llCurrentTime );
-
-                iter++;
+                m_pProcessingTimer->SetStartTime ( llCurrentTime );
             }
         }
-        else
+
+        // Finally cleanup timer if it was removed during processing
+        if ( m_pPendingDelete )
         {
-            iter ++;
+            assert ( m_pPendingDelete == m_pProcessingTimer );
+            m_pProcessingTimer = NULL;
+            delete m_pPendingDelete;
+            m_pPendingDelete = NULL;
         }
+        else
+            m_pProcessingTimer = NULL;
     }
-    m_bIteratingList = false;
-    TakeOutTheTrash ();
 }
 
 
@@ -66,23 +75,29 @@ void CLuaTimerManager::RemoveTimer ( CLuaTimer* pLuaTimer )
 {
     assert ( pLuaTimer );
 
-    if ( m_bIteratingList )
+    // Check if already removed
+    if ( !ListContains ( m_TimerList, pLuaTimer ) )
+        return;
+
+    // Remove all references
+    ListRemove ( m_TimerList, pLuaTimer );
+    ListRemove ( m_ProcessQueue, pLuaTimer );
+
+    if ( m_pProcessingTimer == pLuaTimer )
     {
-        pLuaTimer->SetBeingDeleted( true );
-        m_TrashCan.push_back ( pLuaTimer );
+        assert ( !m_pPendingDelete );
+        pLuaTimer->RemoveScriptID ();
+        m_pPendingDelete = pLuaTimer;
     }
     else
-    {
-        if ( !m_TimerList.empty() ) m_TimerList.remove ( pLuaTimer );
         delete pLuaTimer;
-    }
 }
 
 
 void CLuaTimerManager::RemoveAllTimers ( void )
 {
     // Delete all the timers
-    list < CLuaTimer* > ::const_iterator iter = m_TimerList.begin ();
+    CFastList < CLuaTimer > ::const_iterator iter = m_TimerList.begin ();
     for ( ; iter != m_TimerList.end (); iter++ )
     {
         delete *iter;
@@ -90,6 +105,9 @@ void CLuaTimerManager::RemoveAllTimers ( void )
 
     // Clear the timer list
     m_TimerList.clear ();
+    m_ProcessQueue.clear ();
+    m_pPendingDelete = NULL;
+    m_pProcessingTimer = NULL;
 }
 
 
@@ -102,16 +120,14 @@ void CLuaTimerManager::ResetTimer ( CLuaTimer* pLuaTimer )
 }
 
 
-bool CLuaTimerManager::Exists ( CLuaTimer* pLuaTimer )
-{
-    return m_TimerList.Contains ( pLuaTimer );
-}
-
-
 CLuaTimer* CLuaTimerManager::GetTimerFromScriptID ( uint uiScriptID )
 {
     CLuaTimer* pLuaTimer = (CLuaTimer*) CIdArray::FindEntry ( uiScriptID, EIdClass::TIMER );
-    dassert ( !pLuaTimer || m_TimerList.Contains ( pLuaTimer ) );
+    if ( !pLuaTimer )
+        return NULL;
+
+    if ( !ListContains ( m_TimerList, pLuaTimer ) )
+        return NULL;
     return pLuaTimer;
 }
 
@@ -134,47 +150,4 @@ CLuaTimer* CLuaTimerManager::AddTimer ( const CLuaFunctionRef& iLuaFunction, CTi
     }
 
     return false;
-}
-
-
-void CLuaTimerManager::GetTimers ( CTickCount llTime, CLuaMain* pLuaMain )
-{
-    assert ( pLuaMain );
-
-    CTickCount llCurrentTime = CTickCount::Now ();
-    // Add all the timers to the table
-    unsigned int uiIndex = 0;
-    list < CLuaTimer* > ::const_iterator iter = m_TimerList.begin ();
-    for ( ; iter != m_TimerList.end () ; iter++ )
-    {
-        // If the time left is less than the time specified, or the time specifed is 0
-        CTickCount llTimeLeft = ( (*iter)->GetStartTime () + (*iter)->GetDelay () ) - llCurrentTime;
-        if ( llTime.ToLongLong () == 0 || llTimeLeft <= llTime )
-        {
-            // Add it to the table
-            lua_State* luaVM = pLuaMain->GetVirtualMachine ();
-            lua_pushnumber ( luaVM, ++uiIndex );
-            lua_pushtimer ( luaVM, *iter );
-            lua_settable ( luaVM, -3 );
-        }
-    }
-}
-
-
-void CLuaTimerManager::TakeOutTheTrash ( void )
-{
-    list < CLuaTimer* > ::iterator iter = m_TrashCan.begin ();
-    for ( ; iter != m_TrashCan.end () ; iter++ )
-    {
-        CLuaTimer* pTimer = *iter;
-
-        // Clean up the timer
-        if ( Exists ( pTimer ) )
-        {
-            if ( !m_TimerList.empty() )
-                m_TimerList.remove ( pTimer );
-            delete pTimer;
-        }
-    }
-    m_TrashCan.clear ();
 }

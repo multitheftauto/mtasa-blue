@@ -155,4 +155,10 @@ public:
     virtual void                    SetDiagnosticDebug              ( EDiagnosticDebugType value ) = 0;
 };
 
+class CClientTime
+{
+public:
+    static unsigned long    GetTime             ( void )        { return GetTickCount32 (); }
+};
+
 #endif

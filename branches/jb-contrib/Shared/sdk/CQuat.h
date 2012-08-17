@@ -18,7 +18,6 @@ class CQuat;
 
 #include <math.h>
 #include <float.h>
-#include "SharedUtil.h"
 
 #define EPSILON         0.001
 

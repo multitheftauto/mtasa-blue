@@ -14,6 +14,7 @@
 CSimBulletsyncPacket::CSimBulletsyncPacket ( ElementID PlayerID )
     : m_PlayerID ( PlayerID )
 {
+    m_Cache.ucOrderCounter = 0;
 }
 
 
@@ -26,17 +27,20 @@ bool CSimBulletsyncPacket::Read ( NetBitStreamInterface& BitStream )
     if ( BitStream.Version () < 0x2E )
         return false;
 
+    bool bOk = true;
+
     char cWeaponType;
-    if ( BitStream.Read ( cWeaponType ) )
-    {
-        m_Cache.weaponType = (eWeaponType)cWeaponType;
+    bOk |= BitStream.Read ( cWeaponType );
+    m_Cache.weaponType = (eWeaponType)cWeaponType;
 
-        if ( BitStream.Read ( (char *)&m_Cache.vecStart, sizeof ( CVector ) ) &&
-             BitStream.Read ( (char *)&m_Cache.vecEnd, sizeof ( CVector ) ) )
-            return true;
-    }
+    bOk |= BitStream.Read ( (char *)&m_Cache.vecStart, sizeof ( CVector ) );
+    bOk |= BitStream.Read ( (char *)&m_Cache.vecEnd, sizeof ( CVector ) );
 
-    return false;
+    // Duplicate packet protection
+    if ( BitStream.Version () >= 0x34 )
+        bOk |= BitStream.Read ( m_Cache.ucOrderCounter );
+
+    return bOk;
 }
 
 
@@ -56,5 +60,10 @@ bool CSimBulletsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     BitStream.Write ( (char)m_Cache.weaponType );
     BitStream.Write ( (const char *)&m_Cache.vecStart, sizeof ( CVector ) );
     BitStream.Write ( (const char *)&m_Cache.vecEnd, sizeof ( CVector ) );
+
+    // Duplicate packet protection
+    if ( BitStream.Version () >= 0x34 )
+        BitStream.Write ( m_Cache.ucOrderCounter );
+
     return true;
 }

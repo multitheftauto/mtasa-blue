@@ -52,7 +52,6 @@
 #include <windows.h>
 
 #include <time.h>
-#include <assert.h>
 
 // make stricmp sound like strcasecmp
 #define strcasecmp stricmp
@@ -73,8 +72,6 @@
 #endif // end platform headers   //
 ///////////////////////////////////
 
-#include "SharedUtil.h"
-
 // STL headers
 #include <algorithm>
 #include <cctype>
@@ -86,7 +83,6 @@
 #include <typeinfo>
 
 // C headers
-#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <stdarg.h>

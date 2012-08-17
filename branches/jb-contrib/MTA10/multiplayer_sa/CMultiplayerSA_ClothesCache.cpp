@@ -10,9 +10,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-
-RpClumpDestroy_t                        RpClumpDestroy                          = (RpClumpDestroy_t)                        0xDEAD;
-RpClumpClone_t                          RpClumpClone                            = (RpClumpClone_t)                          0xDEAD;
+#define RWFUNC_IMPLEMENT
+#include "..\game_sa\gamesa_renderware.h"
 
 #define CLOTHES_REF_TEST    1       // Debug clothes geometry refs
 

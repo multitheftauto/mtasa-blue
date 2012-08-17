@@ -71,10 +71,10 @@ int CLuaFunctionDefs::SetCursorPosition ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getMarkerColor", "integer", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "integer", 2 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "getMarkerColor", "integer", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "integer", 1 );
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -119,7 +119,7 @@ int CLuaFunctionDefs::ShowCursor ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "showCursor" );
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
 
     // Fail
@@ -168,7 +168,7 @@ int CLuaFunctionDefs::BindKey ( lua_State* luaVM )
                     }
                 }
                 else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "bindKey", "function", 3 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "function", 3 );
             }
         }
     }
@@ -217,13 +217,13 @@ int CLuaFunctionDefs::UnbindKey ( lua_State* luaVM )
                 }
                 else
                 {
-                    m_pScriptDebugging->LogBadType ( luaVM, "unbindKey" );
+                    m_pScriptDebugging->LogBadType ( luaVM );
                 }
             }
         }
         else
         {
-            m_pScriptDebugging->LogBadType ( luaVM, "unbindKey" );
+            m_pScriptDebugging->LogBadType ( luaVM );
         }
     }
 
@@ -245,7 +245,7 @@ int CLuaFunctionDefs::GetKeyState ( lua_State * luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getKeyType" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -268,7 +268,7 @@ int CLuaFunctionDefs::GetControlState ( lua_State * luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getControlState", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -290,7 +290,7 @@ int CLuaFunctionDefs::GetAnalogControlState ( lua_State * luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getAnalogControlState", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
 
     lua_pushboolean ( luaVM, false );
@@ -322,10 +322,10 @@ int CLuaFunctionDefs::SetAnalogControlState ( lua_State * luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "getAnalogControlState" );
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setAnalogControlState", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -347,7 +347,7 @@ int CLuaFunctionDefs::IsControlEnabled ( lua_State * luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "isControlEnabled", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -402,7 +402,7 @@ int CLuaFunctionDefs::GetBoundKeys ( lua_State * luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getBoundKeys" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -481,7 +481,7 @@ int CLuaFunctionDefs::GetFunctionsBoundToKey ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "getFunctionsBoundToKey" );
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -537,7 +537,7 @@ int CLuaFunctionDefs::GetKeyBoundToFunction ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "getKeyBoundToFunction" );
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -594,7 +594,7 @@ int CLuaFunctionDefs::GetCommandsBoundToKey ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "getFunctionsBoundToKey" );
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -632,7 +632,7 @@ int CLuaFunctionDefs::GetKeyBoundToCommand ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "getKeyBoundToFunction" );
+            m_pScriptDebugging->LogBadType ( luaVM );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -653,7 +653,7 @@ int CLuaFunctionDefs::SetControlState ( lua_State * luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setControlState" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -673,7 +673,7 @@ int CLuaFunctionDefs::ToggleControl ( lua_State * luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "toggleControl" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -700,7 +700,7 @@ int CLuaFunctionDefs::ToggleAllControls ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "toggleAllControls" );
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     lua_pushboolean ( luaVM, false );
     return 1;

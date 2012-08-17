@@ -39,8 +39,7 @@
 #define     NUM_WeaponInfosOtherSkill       11
 #define     NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
 
-#define     MODELINFO_LAST_PLAYER_ID        288         // ??
-#define     MODELINFO_MAX                   65535
+#define     MODELINFO_MAX                   26000       // Actual max is 25755
 
 #define     FUNC_GetLevelFromPosition       0x4DD300
 
@@ -104,6 +103,8 @@ private:
     CWeaponInfo         * WeaponInfos[NUM_WeaponInfosTotal];
     CModelInfoSA        ModelInfo[MODELINFO_MAX];
 public:
+    ZERO_ON_NEW
+
     CGameSA(); // constructor
     ~CGameSA ();
 
@@ -196,6 +197,9 @@ public:
     unsigned char           GetBlurLevel            ( void );
     void                    SetBlurLevel            ( unsigned char ucLevel );
 
+    void                    SetJetpackWeaponEnabled     ( eWeaponType weaponType, bool bEnabled );
+    bool                    GetJetpackWeaponEnabled     ( eWeaponType weaponType );
+
     unsigned long           GetMinuteDuration       ( void );
     void                    SetMinuteDuration       ( unsigned long ulTime );
 
@@ -218,10 +222,19 @@ public:
     void                    SetupSpecialCharacters  ( void );
 
     void                    FlushPendingRestreamIPL         ( void );
+    void                    ResetModelLodDistances          ( void );
     void                    DisableVSync                    ( void );
 
     void                    OnPedContextChange              ( CPed* pPedContext );
     CPed*                   GetPedContext                   ( void );
+
+    void                    GetShaderReplacementStats       ( SShaderReplacementStats& outStats );
+
+    void                    SetPreWeaponFireHandler         ( PreWeaponFireHandler* pPreWeaponFireHandler )     { m_pPreWeaponFireHandler = pPreWeaponFireHandler; }
+    void                    SetPostWeaponFireHandler        ( PostWeaponFireHandler* pPostWeaponFireHandler )   { m_pPostWeaponFireHandler = pPostWeaponFireHandler; }
+
+    PreWeaponFireHandler*   m_pPreWeaponFireHandler;
+    PostWeaponFireHandler*  m_pPostWeaponFireHandler;
 
 private:
     CPools                  * m_pPools;
@@ -245,7 +258,7 @@ private:
     CWeaponInfo             * m_pWeaponInfo;
     CExplosionManager       * m_pExplosionManager;
     C3DMarkers              * m_p3DMarkers;
-    CRenderWare             * m_pRenderWare;
+    CRenderWareSA           * m_pRenderWare;
     CHandlingManager        * m_pHandlingManager;
     CAnimManager            * m_pAnimManager;
     CStreaming              * m_pStreaming;
@@ -296,6 +309,8 @@ private:
     static unsigned long*   VAR_Framelimiter;
 
     std::map < std::string, SCheatSA* > m_Cheats;
+
+    SFixedArray < bool, WEAPONTYPE_LAST_WEAPONTYPE > m_JetpackWeapons;
 
     CPed*                   m_pPedContext;
 };

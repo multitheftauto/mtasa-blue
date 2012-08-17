@@ -194,8 +194,8 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_LatentTransfer ( bitStream );
             return true;
 
-        case PACKET_ID_BULLETSYNC_SETTINGS:
-            Packet_BulletSyncSettings ( bitStream );
+        case PACKET_ID_SYNC_SETTINGS:
+            Packet_SyncSettings ( bitStream );
             return true;
 
         default:             break;
@@ -599,6 +599,15 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
         // Strip the nick from any unwanted characters
         StripUnwantedCharacters ( szNickBuffer, '_' );
 
+        // Read version info
+        ushort usBitStreamVersion = 0;
+        uint uiBuildNumber = 0;
+        if ( bitStream.Version () >= 0x34 )
+        {
+            bitStream.Read ( usBitStreamVersion );
+            bitStream.Read ( uiBuildNumber );
+        }
+
         // Player flags
         bool bIsDead = bitStream.ReadBit ();
         bool bIsSpawned = bitStream.ReadBit ();
@@ -706,6 +715,9 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
         CClientPlayer* pPlayer = new CClientPlayer ( g_pClientGame->m_pManager, PlayerID );
         if ( pPlayer )
         {
+            // Set version info
+            pPlayer->SetRemoteVersionInfo ( usBitStreamVersion, uiBuildNumber );
+
             // Set its parent the root entity
             pPlayer->SetSyncTimeContext ( ucTimeContext );
             pPlayer->SetParent ( g_pClientGame->m_pRootEntity );
@@ -2221,6 +2233,19 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     
     g_pGame->GetWorld ()->SetAircraftMaxHeight ( fAircraftMaxHeight );
 
+    g_pGame->SetJetpackWeaponEnabled( WEAPONTYPE_TEC9, true );
+    g_pGame->SetJetpackWeaponEnabled( WEAPONTYPE_MICRO_UZI, true );
+    g_pGame->SetJetpackWeaponEnabled( WEAPONTYPE_PISTOL, true );
+
+    if ( bitStream.Version () >= 0x30 )
+    {
+        for (int i = WEAPONTYPE_BRASSKNUCKLE; i < WEAPONTYPE_PISTOL; i++)
+        {
+            bool bEnabled;
+            bitStream.ReadBit ( bEnabled );
+            g_pGame->SetJetpackWeaponEnabled ( (eWeaponType) i, bEnabled );
+        }
+    }
     for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_EXTINGUISHER;i++)
     {
         bool bReadWeaponInfo = true;
@@ -2247,6 +2272,12 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
             pWeaponInfo->SetWeaponAnim2LoopFireTime     ( weaponProperty.data.anim2_loop_bullet_fire );
 
             pWeaponInfo->SetAnimBreakoutTime            ( weaponProperty.data.anim_breakout_time );
+        }
+        if ( bitStream.Version () >= 0x30 )
+        {
+            bool bEnabled;
+            bitStream.ReadBit ( bEnabled );
+            g_pGame->SetJetpackWeaponEnabled ( (eWeaponType) weaponProperty.data.weaponType, bEnabled );
         }
     }
     for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_TEC9;i++)
@@ -2278,6 +2309,15 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 
                 pWeaponInfo->SetAnimBreakoutTime            ( weaponProperty.data.anim_breakout_time );
             }
+        }
+    }
+    if ( bitStream.Version () >= 0x30 )
+    {
+        for (int i = WEAPONTYPE_CAMERA; i <= WEAPONTYPE_PARACHUTE; i++)
+        {
+            bool bEnabled;
+            bitStream.ReadBit ( bEnabled );
+            g_pGame->SetJetpackWeaponEnabled ( (eWeaponType) i, bEnabled );
         }
     }
 
@@ -4330,13 +4370,21 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
     if ( bitStream.Version () >= 0x26 )
         bitStream.Read ( usProtectedScriptCount );
 
+    // Read the declared min client version for this resource
+    SString strMinServerReq, strMinClientReq;
+    if ( bitStream.Version () >= 0x32 )
+    {
+        bitStream.ReadString ( strMinServerReq );
+        bitStream.ReadString ( strMinClientReq );
+    }
+
     // Get the resource entity
     CClientEntity* pResourceEntity = CElementIDs::GetElement ( ResourceEntityID );
 
     // Get the resource dynamic entity
     CClientEntity* pResourceDynamicEntity = CElementIDs::GetElement ( ResourceDynamicEntityID );
 
-    CResource* pResource = g_pClientGame->m_pResourceManager->Add ( usResourceID, szResourceName, pResourceEntity, pResourceDynamicEntity );
+    CResource* pResource = g_pClientGame->m_pResourceManager->Add ( usResourceID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq, strMinClientReq );
     if ( pResource )
     {
         pResource->SetRemainingProtectedScripts ( usProtectedScriptCount );
@@ -4634,7 +4682,7 @@ void CPacketHandler::Packet_LatentTransfer ( NetBitStreamInterface& bitStream )
 }
 
 
-void CPacketHandler::Packet_BulletSyncSettings ( NetBitStreamInterface& bitStream )
+void CPacketHandler::Packet_SyncSettings ( NetBitStreamInterface& bitStream )
 {
     uchar ucNumWeapons = 0;
     if ( bitStream.Read ( ucNumWeapons ) )
@@ -4647,5 +4695,23 @@ void CPacketHandler::Packet_BulletSyncSettings ( NetBitStreamInterface& bitStrea
                 MapInsert ( weaponTypesUsingBulletSync, (eWeaponType)ucWeaponType );
         }
         g_pClientGame->SetWeaponTypesUsingBulletSync ( weaponTypesUsingBulletSync );
+    }
+
+    if ( bitStream.Version () >= 0x35 )
+    {
+        uchar ucEnabled;
+        short sBaseMs, sScalePercent, sMaxMs;
+        bitStream.Read ( ucEnabled );
+        bitStream.Read ( sBaseMs );
+        bitStream.Read ( sScalePercent );
+        if ( bitStream.Read ( sMaxMs ) )
+        {
+            SVehExtrapolateSettings vehExtrapolateSettings;
+            vehExtrapolateSettings.bEnabled = ucEnabled != 0;
+            vehExtrapolateSettings.iBaseMs = sBaseMs;
+            vehExtrapolateSettings.iScalePercent = sScalePercent;
+            vehExtrapolateSettings.iMaxMs = sMaxMs;
+            g_pClientGame->SetVehExtrapolateSettings ( vehExtrapolateSettings );
+        }
     }
 }

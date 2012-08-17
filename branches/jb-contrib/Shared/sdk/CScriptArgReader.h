@@ -35,7 +35,7 @@ public:
         m_iErrorGotArgumentType = 0;
     }
 
-    CScriptArgReader ( void )
+    ~CScriptArgReader ( void )
     {
         assert ( !IsReadFunctionPending () );
     }
@@ -84,7 +84,6 @@ public:
         m_iIndex++;
         return false;
     }
-
 
 
     //
@@ -233,6 +232,63 @@ public:
 
 
     //
+    // Read next string as a comma separated list of enums, using default if needed
+    //
+    template < class T >
+    bool ReadEnumStringList ( std::vector < T >& outValueList, const SString& strDefaultValue )
+    {
+        outValueList.empty ();
+        int iArgument = lua_type ( m_luaVM, m_iIndex );
+        SString strValue;
+        if ( iArgument == LUA_TSTRING )
+        {
+            strValue = lua_tostring ( m_luaVM, m_iIndex );
+        }
+        else
+        if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL || m_bIgnoreMismatchMatch )
+        {
+            strValue = strDefaultValue;
+        }
+        else
+        {
+            T outValue;
+            SetTypeError ( GetEnumTypeName ( outValue ) );
+            m_iIndex++;
+            return false;
+        }
+
+        // Parse each part of the string
+        std::vector < SString > inValueList;
+        strValue.Split ( ",", inValueList );
+        for ( uint i = 0 ; i < inValueList.size () ; i++ )
+        {
+            T outValue;
+            if ( StringToEnum ( inValueList[i], outValue ) )
+            {
+                outValueList.push_back ( outValue );
+            }
+            else
+            {
+                // Error
+                SetTypeError ( GetEnumTypeName ( outValue ) );
+                m_bResolvedErrorGotArgumentTypeAndValue = true;
+                m_iErrorGotArgumentType = lua_type ( m_luaVM, m_iErrorIndex );
+                m_strErrorGotArgumentValue = inValueList[i];
+
+                if ( iArgument == LUA_TSTRING )
+                    m_iIndex++;
+                return false;
+            }
+        }
+
+        // Success
+        if ( iArgument == LUA_TSTRING )
+            m_iIndex++;
+        return true;
+    }
+
+
+    //
     // Read next userdata, using default if needed
     //
     template < class T >
@@ -250,8 +306,17 @@ public:
             SetTypeError ( GetClassTypeName ( (T*)0 ), m_iIndex - 1 );
             return false;
         }
-        else
-        if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch || ( iArgument == LUA_TNIL && bArgCanBeNil ) )
+        else if ( iArgument == LUA_TUSERDATA )
+        {
+            outValue = (T*)UserDataCast < T > ( (T*)0, * ( ( void** ) lua_touserdata ( m_luaVM, m_iIndex++ ) ), m_luaVM );
+            if ( outValue || bArgCanBeNil )
+                return true;
+
+            outValue = NULL;
+            SetTypeError ( GetClassTypeName ( (T*)0 ), m_iIndex - 1 );
+            return false;
+        }
+        else if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch || ( iArgument == LUA_TNIL && bArgCanBeNil ) )
         {
             if ( defaultValue != (T*)-1 )
             {
@@ -481,6 +546,7 @@ public:
             m_iErrorIndex = iIndex;
             m_strErrorExpectedType = strExpectedType;
             m_bResolvedErrorGotArgumentTypeAndValue = false;
+            m_strErrorCategory = "Bad argument";
         }
     }
 
@@ -502,6 +568,9 @@ public:
     {
         if ( !m_bError )
             return "No error";
+
+        if ( !m_strErrorMessageOverride.empty () )
+            return m_strErrorMessageOverride;
 
         ResolveErrorGotArgumentTypeAndValue ();
         SString strGotArgumentType  = EnumToString ( (eLuaType)m_iErrorGotArgumentType );
@@ -550,6 +619,34 @@ public:
         m_bIgnoreMismatchMatch = !bStrictMode;
     }
 
+    //
+    // Set version error message
+    //
+    void SetVersionError ( const char* szMinReq, const char* szSide, const char* szReason )
+    {
+        SetCustomError ( SString ( "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least %s %s because %s)", szSide, szMinReq, szReason ) );
+    }
+
+    //
+    // Set custom error message
+    //
+    void SetCustomError ( const char* szReason, const char* szCategory = "Bad usage" )
+    {
+        if ( !m_bError )
+        {
+            m_bError = true;
+            m_strErrorCategory = szCategory;
+            m_strErrorMessageOverride = szReason;
+        }
+    }
+
+    //
+    // Make full error message
+    //
+    SString GetFullErrorMessage ( void )
+    {
+        return SString ( "%s @ '%s' [%s]", *m_strErrorCategory, lua_tostring ( m_luaVM, lua_upvalueindex ( 1 ) ), *GetErrorMessage () );
+    }
 
     bool                    m_bIgnoreMismatchMatch;
     bool                    m_bError;
@@ -562,4 +659,7 @@ public:
     bool                    m_bResolvedErrorGotArgumentTypeAndValue;
     int                     m_iErrorGotArgumentType;
     SString                 m_strErrorGotArgumentValue;
+    SString                 m_strErrorCategory;
+    SString                 m_strErrorMessageOverride;
+
 };

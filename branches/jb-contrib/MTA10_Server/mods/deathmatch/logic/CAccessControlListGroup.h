@@ -21,8 +21,6 @@ class CAccessControlListGroup;
 #include <xml/CXMLNode.h>
 #include <list>
 
-#include <google/dense_hash_map>
-
 class CAccessControlListGroupObject
 {
 public:

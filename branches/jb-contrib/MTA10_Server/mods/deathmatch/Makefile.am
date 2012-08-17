@@ -197,6 +197,7 @@ LOGIC = \
 ./logic/lua/LuaUtils.cpp \
 ./logic/luadefs/CLuaACLDefs.cpp \
 ./logic/luadefs/CLuaCameraDefs.cpp \
+./logic/luadefs/CLuaClassDefs.cpp \
 ./logic/luadefs/CLuaDefs.cpp \
 ./logic/luadefs/CLuaElementDefs.cpp \
 ./logic/luadefs/CLuaFileDefs.cpp \
@@ -223,7 +224,7 @@ LOGIC = \
 ./logic/packets/CElementRPCPacket.cpp \
 ./logic/packets/CKeysyncPacket.cpp \
 ./logic/packets/CBulletsyncPacket.cpp \
-./logic/packets/CBulletsyncSettingsPacket.cpp \
+./logic/packets/CSyncSettingsPacket.cpp \
 ./logic/packets/CLightsyncPacket.cpp \
 ./logic/packets/CLuaEventPacket.cpp \
 ./logic/packets/CLuaPacket.cpp \

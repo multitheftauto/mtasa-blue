@@ -48,6 +48,7 @@ struct SIntSetting
 class CMainConfig: public CXMLConfig
 {
 public:
+    ZERO_ON_NEW
                                     CMainConfig                     ( CConsole* pConsole, class CLuaManager* pLuaMain );
 
     bool                            Load                            ( void );
@@ -112,6 +113,8 @@ public:
     bool                            GetSyncMapElementData           ( void ) const              { return m_bSyncMapElementData; }
     void                            SetSyncMapElementData           ( bool bOn )                { m_bSyncMapElementData = bOn; }
     bool                            GetBulletSyncEnabled            ( void ) const              { return m_bBulletSyncEnabled != 0; }
+    int                             GetVehExtrapolatePercent        ( void ) const              { return m_iVehExtrapolatePercent; }
+    int                             GetVehExtrapolatePingLimit      ( void ) const              { return m_iVehExtrapolatePingLimit; }
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
@@ -188,6 +191,8 @@ private:
     int                             m_bBulletSyncEnabled;
     std::map < SString, SString >   m_TransientSettings;
     SNetOptions                     m_NetOptions;
+    int                             m_iVehExtrapolatePercent;
+    int                             m_iVehExtrapolatePingLimit;
 };
 
 #endif

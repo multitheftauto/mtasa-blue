@@ -308,7 +308,7 @@ public:
     inline list<CIncludedResources *>::iterator GetIncludedResourcesEnd ( void )    { return m_includedResources.end(); };
     inline int              GetIncludedResourcesCount ( void )  { return m_includedResources.size(); };
     bool                    GetInfoValue ( const char * szKey, std::string& strValue );
-    void                    SetInfoValue ( const char * szKey, const char * szValue );
+    void                    SetInfoValue ( const char * szKey, const char * szValue, bool bSave = true );
     inline unsigned int     GetVersionMajor ( void ) { return m_uiVersionMajor; }
     inline unsigned int     GetVersionMinor ( void ) { return m_uiVersionMinor; }
     inline unsigned int     GetVersionRevision ( void ) { return m_uiVersionRevision; }
@@ -371,6 +371,8 @@ public:
     bool                HandleAclRequestListCommand     ( bool bDetail );
     bool                HandleAclRequestChangeCommand   ( const SString& strRightName, bool bAccess, const SString& strWho );
     bool                HandleAclRequestChange          ( const CAclRightName& strRightName, bool bAccess, const SString& strWho );
+    const SString&      GetMinServerReqFromMetaXml      ( void )                                { return m_strMinServerReqFromMetaXml; }
+    const SString&      GetMinClientReqFromMetaXml      ( void )                                { return m_strMinClientReqFromMetaXml; }
 
 protected:
     SString             GetAutoGroupName                ( void );

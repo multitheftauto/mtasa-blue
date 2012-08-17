@@ -290,6 +290,9 @@ CAnimBlendAssociation * CAnimManagerSA::GetAnimAssociation ( AssocGroupId animGr
 
 CAnimBlendAssociation * CAnimManagerSA::AddAnimation ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
 {
+    if ( !pClump )
+        return NULL;
+
     CAnimBlendAssociationSAInterface * pInterface;
     DWORD dwFunc = FUNC_CAnimManager_AddAnimation;
     _asm
@@ -307,6 +310,9 @@ CAnimBlendAssociation * CAnimManagerSA::AddAnimation ( RpClump * pClump, AssocGr
 
 CAnimBlendAssociation * CAnimManagerSA::AddAnimation ( RpClump * pClump, CAnimBlendHierarchy * pHierarchy, int ID )
 {
+    if ( !pClump )
+        return NULL;
+
     CAnimBlendAssociationSAInterface * pInterface;
     DWORD dwFunc = FUNC_CAnimManager_AddAnimation_hier;
     CAnimBlendHierarchySAInterface * pHierarchyInterface = pHierarchy->GetInterface ();
@@ -325,6 +331,9 @@ CAnimBlendAssociation * CAnimManagerSA::AddAnimation ( RpClump * pClump, CAnimBl
 
 CAnimBlendAssociation * CAnimManagerSA::AddAnimationAndSync ( RpClump * pClump, CAnimBlendAssociation * pAssociation, AssocGroupId animGroup, AnimationId animID )
 {
+    if ( !pClump )
+        return NULL;
+
     CAnimBlendAssociationSAInterface * pInterface;
     DWORD dwFunc = FUNC_CAnimManager_AddAnimationAndSync;
     CAnimBlendAssociationSAInterface * pAssociationInterface = pAssociation->GetInterface ();
@@ -344,6 +353,9 @@ CAnimBlendAssociation * CAnimManagerSA::AddAnimationAndSync ( RpClump * pClump, 
 
 CAnimBlendAssociation * CAnimManagerSA::BlendAnimation ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
 {
+    if ( !pClump )
+        return NULL;
+
     CAnimBlendAssociationSAInterface * pInterface;
     DWORD dwFunc = FUNC_CAnimManager_BlendAnimation;
     _asm
@@ -362,6 +374,9 @@ CAnimBlendAssociation * CAnimManagerSA::BlendAnimation ( RpClump * pClump, Assoc
 
 CAnimBlendAssociation * CAnimManagerSA::BlendAnimation ( RpClump * pClump, CAnimBlendHierarchy * pHierarchy, int ID, float fBlendDelta )
 {
+    if ( !pClump )
+        return NULL;
+
     CAnimBlendAssociationSAInterface * pInterface;
     DWORD dwFunc = FUNC_CAnimManager_BlendAnimation_hier;
     CAnimBlendHierarchySAInterface * pHierarchyInterface = pHierarchy->GetInterface ();
@@ -571,6 +586,9 @@ bool CAnimManagerSA::HasAnimGroupLoaded ( AssocGroupId groupID )
 
 CAnimBlendAssociation * CAnimManagerSA::RpAnimBlendClumpGetFirstAssociation ( RpClump * pClump )
 {
+    if ( !pClump )
+        return NULL;
+
     CAnimBlendAssociationSAInterface * pInterface;    
     DWORD dwFunc = FUNC_RpAnimBlendClumpGetFirstAssociation;
     _asm
@@ -586,6 +604,9 @@ CAnimBlendAssociation * CAnimManagerSA::RpAnimBlendClumpGetFirstAssociation ( Rp
 
 CAnimBlendAssociation * CAnimManagerSA::RpAnimBlendClumpGetAssociation ( RpClump * pClump, const char * szAnimName )
 {
+    if ( !pClump )
+        return NULL;
+
     CAnimBlendAssociationSAInterface * pInterface;    
     DWORD dwFunc = FUNC_RpAnimBlendClumpGetAssociation_str;
     _asm
@@ -602,6 +623,9 @@ CAnimBlendAssociation * CAnimManagerSA::RpAnimBlendClumpGetAssociation ( RpClump
 
 CAnimBlendAssociation * CAnimManagerSA::RpAnimBlendClumpGetAssociation ( RpClump * pClump, AnimationId animID )
 {
+    if ( !pClump )
+        return NULL;
+
     CAnimBlendAssociationSAInterface * pInterface;    
     DWORD dwFunc = FUNC_RpAnimBlendClumpGetAssociation_int;
     _asm
@@ -634,6 +658,9 @@ CAnimBlendAssociation * CAnimManagerSA::RpAnimBlendGetNextAssociation ( CAnimBle
 
 int CAnimManagerSA::RpAnimBlendClumpGetNumAssociations ( RpClump * pClump )
 {
+    if ( !pClump )
+        return 0;
+
     int iReturn;
     DWORD dwFunc = FUNC_RpAnimBlendClumpGetNumAssociations;
     _asm
@@ -649,6 +676,9 @@ int CAnimManagerSA::RpAnimBlendClumpGetNumAssociations ( RpClump * pClump )
 
 void CAnimManagerSA::RpAnimBlendClumpUpdateAnimations ( RpClump * pClump, float f1, bool b1 )
 {
+    if ( !pClump )
+        return;
+
     DWORD dwFunc = FUNC_RpAnimBlendClumpUpdateAnimations;
     _asm
     {

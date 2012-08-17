@@ -22,6 +22,7 @@
 
 #define FUNC_Shutdown                                   0x73A380
 #define FUNC_CWeapon_CheckForShootingVehicleOccupant    0x73f480
+#define FUNC_CWeapon_FireInstantHit                     0x73FB10
 
 class CWeaponSAInterface
 {
@@ -59,6 +60,9 @@ public:
     CWeaponInfo     * GetInfo( eWeaponSkill skill );
 
     void            Remove ();
+
+    bool            FireBullet          ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget );
+    bool            FireInstantHit      ( CEntity * pFiringEntity, const CVector* pvecOrigin, const CVector * pvecMuzzle, CEntity* pTargetEntity, const CVector* pvecTarget, const CVector* pvec, bool bFlag1, bool bFlag2 );
 };
 
 #endif

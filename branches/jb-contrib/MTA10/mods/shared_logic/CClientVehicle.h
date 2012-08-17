@@ -35,7 +35,6 @@ class CClientVehicle;
 #include "CClientStreamElement.h"
 #include "CClientVehicleManager.h"
 #include "CVehicleUpgrades.h"
-#include "CClientTime.h"
 // temp, must be resolved at code review by higer authority
 #include "../../game_sa/CAutomobileSA.h"
 #include "../../game_sa/CBikeSA.h"

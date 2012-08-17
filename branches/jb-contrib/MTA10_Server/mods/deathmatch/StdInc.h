@@ -12,7 +12,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <pthread.h>
 
 #include <list>
@@ -23,15 +22,14 @@
 #include <ctime>
 #include <sstream>
 
-#include <google/dense_hash_map>
-#include <google/sparse_hash_map>
-
 // Forward declarations
 class CAclRightName;
 struct SAclRequest;
 
 // SDK includes
 #include "MTAPlatform.h"
+#define SHARED_UTIL_WITH_FAST_HASH_MAP
+#include "SharedUtil.h"
 #include <xml/CXML.h>
 #include <xml/CXMLNode.h>
 #include <xml/CXMLFile.h>
@@ -42,7 +40,6 @@ struct SAclRequest;
 #include "CBox.h"
 #include "CMatrix.h"
 #include "CQuat.h"
-#include "SharedUtil.h"
 #include "Enums.h"
 #include <bochs_internal/crc32.h>
 #include "CChecksum.h"
@@ -125,6 +122,7 @@ struct SAclRequest;
 #include "luadefs/CLuaWorldDefs.h"
 #include "luadefs/CLuaVoiceDefs.h"
 #include "luadefs/CLuaXMLDefs.h"
+#include "luadefs/CLuaClassDefs.h"
 
 // Lua includes
 #include "lua/LuaCommon.h"

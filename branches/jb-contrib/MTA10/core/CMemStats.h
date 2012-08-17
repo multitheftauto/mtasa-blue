@@ -13,6 +13,8 @@
 //
 struct SMemStatsInfo
 {
+    ZERO_ON_NEW
+
     CProxyDirect3DDevice9::SMemoryState d3dMemory;
     SDxStatus dxStatus;
     int iProcessMemSizeKB;
@@ -20,6 +22,7 @@ struct SMemStatsInfo
     int iStreamingMemoryAvailable;
     SRwResourceStats rwResourceStats;
     SClothesCacheStats clothesCacheStats;
+    SShaderReplacementStats shaderReplacementStats;
 
     union {
         uint uiArray[];

@@ -82,6 +82,12 @@ namespace
                                          { "getSoundBPM",               "1.3.0-9.04162" },
                                          { "getSoundLevelData",         "1.3.0-9.04162" },
                                          { "getSoundWaveData",          "1.3.0-9.04162" },
+                                         { "setPedAnalogControlState",  "1.3.0-9.04185" },
+                                         { "setPedTargetingMarkerEnabled",  "1.3.0-9.04464" },
+                                         { "isPedTargetingMarkerEnabled",   "1.3.0-9.04464" },
+                                         { "setElementMatrix",              "1.3.0-9.04491" },
+                                         { "warpPedIntoVehicle",            "1.3.0-9.04491" },
+                                         { "removePedFromVehicle",          "1.3.0-9.04491" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
@@ -126,6 +132,8 @@ namespace
                                          { "getVehicleSirens",          "1.3.0-9.03968" },
                                          { "addVehicleSirens",          "1.3.0-9.03968" },
                                          { "setVehicleSirens",          "1.3.0-9.03968" },
+                                         { "setJetpackWeaponEnabled",   "1.3.0-9.04351" },
+                                         { "getJetpackWeaponEnabled",   "1.3.0-9.04351" },
                                         };
 
 

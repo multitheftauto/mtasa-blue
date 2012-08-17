@@ -345,10 +345,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CClientTime.cpp"
-				>
-			</File>
-			<File
 				RelativePath="CClientVariables.cpp"
 				>
 			</File>
@@ -799,10 +795,6 @@
 			</File>
 			<File
 				RelativePath=".\CChat.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CClientTime.h"
 				>
 			</File>
 			<File

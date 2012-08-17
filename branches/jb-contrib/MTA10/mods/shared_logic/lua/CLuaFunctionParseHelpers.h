@@ -31,6 +31,7 @@ DECLARE_ENUM( ETextureType );
 DECLARE_ENUM( ETextureAddress );
 DECLARE_ENUM( EPixelsFormatType );
 DECLARE_ENUM( EBlendModeType )
+DECLARE_ENUM( EEntityTypeMask );
 
 enum eDXHorizontalAlign
 {
@@ -241,3 +242,5 @@ class CScriptArgReader;
 bool MixedReadDxFontString ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientDxFont*& pFontElement );
 bool MixedReadGuiFontString ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientGuiFont*& pFontElement );
 bool MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pMaterialElement );
+bool ReadMatrix ( lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix );
+void MinClientCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason );

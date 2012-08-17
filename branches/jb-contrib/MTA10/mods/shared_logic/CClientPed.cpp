@@ -201,6 +201,9 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     //These two are inactive for now
     m_MovementStateNames[MOVEMENTSTATE_CRAWL]       =    "crawl";
     m_MovementStateNames[MOVEMENTSTATE_ROLL]        =    "roll";
+    m_MovementStateNames[MOVEMENTSTATE_JUMP]        =    "jump";
+    m_MovementStateNames[MOVEMENTSTATE_FALL]        =    "fall";
+    m_MovementStateNames[MOVEMENTSTATE_CLIMB]       =    "climb";
 
     // Create the player model
     if ( m_bIsLocalPlayer )
@@ -1951,6 +1954,11 @@ eWeaponType CClientPed::GetCurrentWeaponType ( void )
     return WEAPONTYPE_UNARMED;
 }
 
+bool CClientPed::IsCurrentWeaponUsingBulletSync ( void )
+{
+    eWeaponType weaponType = GetCurrentWeaponType ();
+    return g_pClientGame->GetWeaponTypeUsesBulletSync ( weaponType );
+}
 
 CWeapon* CClientPed::GetWeapon ( void )
 {
@@ -2068,6 +2076,22 @@ eMovementState CClientPed::GetMovementState ( void )
         CControllerState cs;
         GetControllerState ( cs );
 
+        // Get his current task(s)
+        const char* szComplexTaskName = GetTaskManager()->GetActiveTask()->GetTaskName();
+        const char* szSimpleTaskName = GetTaskManager()->GetSimplestActiveTask()->GetTaskName();
+
+        // Is he climbing?
+        if ( strcmp ( szSimpleTaskName, "TASK_SIMPLE_CLIMB" ) == 0 )
+            return MOVEMENTSTATE_CLIMB;
+
+        // Is he jumping?
+        else if ( strcmp ( szComplexTaskName, "TASK_COMPLEX_JUMP" ) == 0 )
+            return MOVEMENTSTATE_JUMP;
+
+        // Is he falling?
+        else if ( !IsOnGround() && !GetContactEntity() )
+            return MOVEMENTSTATE_FALL;
+
         // Grab his controller state
         bool bWalkKey = false;
         if ( GetType () == CCLIENTPLAYER )
@@ -2099,6 +2123,8 @@ eMovementState CClientPed::GetMovementState ( void )
             // Is he moving the contoller at all?
             if ( cs.LeftStickX == 0 && cs.LeftStickY == 0 )
                 return MOVEMENTSTATE_CROUCH;
+            else
+                return MOVEMENTSTATE_CRAWL;
         }
     }
     return MOVEMENTSTATE_UNKNOWN;
@@ -4322,9 +4348,9 @@ bool CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
                 {
                     if ( bCollision )
                     {
-                        CVector vecBullet = *pCollision->GetPosition() - vecOrigin;
-                        vecBullet.Normalize();
-                        vecTarget = vecOrigin + (vecBullet * fRange);
+                        CVector vecBullet = pCollision->GetPosition () - vecOrigin;
+                        vecBullet.Normalize ();
+                        vecTarget = vecOrigin + ( vecBullet * fRange);
                     }
                     pCollision->Destroy();
                 }
@@ -4382,7 +4408,7 @@ CVector CClientPed::AdjustShotOriginForWalls ( const CVector& vecOrigin, const C
     {
         if ( bCollision )
         {
-            float fDist = ( *pCollision->GetPosition() - vecTempOrigin ).Length ();
+            float fDist = ( pCollision->GetPosition() - vecTempOrigin ).Length ();
 
             if ( fDist < fMaxPullBack )
             {

@@ -23,7 +23,6 @@
 #include "CMapEventManager.h"
 #include "CCustomData.h"
 #include "CEvents.h"
-#include <assert.h>
 #include <list>
 #include <cstring>
 #include "CElementGroup.h"
@@ -137,6 +136,7 @@ public:
     void                                        SetCustomData               ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized = true, CPlayer* pClient = NULL, bool bTriggerEvent = true );
     bool                                        DeleteCustomData            ( const char* szName, bool bRecursive );
     void                                        DeleteAllCustomData         ( CLuaMain* pLuaMain, bool bRecursive );
+    void                                        SendAllCustomData           ( CPlayer* pPlayer );
 
     CXMLNode*                                   OutputToXML                 ( CXMLNode* pNode );
 

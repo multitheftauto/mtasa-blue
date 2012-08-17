@@ -9,7 +9,7 @@
 *****************************************************************************/
 
 typedef uint SSendHandle;
-
+typedef SP < CBuffer > CBufferRef;
 
 namespace LatentTransfer
 {
@@ -45,21 +45,23 @@ struct SSendItem
         , bSendStarted ( false )
         , bSendFinishing ( false )
         , pLuaMain ( NULL )
+        , usResourceNetId ( 0xFFFF )
         , iEstSendDurationMsRemaining ( 0 )
         , iEstSendDurationMsUsed ( 0 )
     {}
 
-    uint    uiId;           // Handle
-    CBuffer buffer;         // The data to transfer
-    uint    uiRate;         // Desired bytes per second
-    ushort  usCategory;     // Data category
-    uint    uiReadPosition;    // Current position in the buffer sent so far
-    bool    bSendStarted;      // true when the send actually starts
-    bool    bSendFinishing;    // true when the last part has been sent
-    void*   pLuaMain;          // For cancelling by VM
+    uint        uiId;           // Handle
+    CBufferRef  bufferRef;      // The data to transfer
+    uint        uiRate;         // Desired bytes per second
+    ushort      usCategory;     // Data category
+    uint        uiReadPosition;    // Current position in the buffer sent so far
+    bool        bSendStarted;      // true when the send actually starts
+    bool        bSendFinishing;    // true when the last part has been sent
+    void*       pLuaMain;          // For cancelling by VM
+    ushort      usResourceNetId;   // Only allow packet if this resource is running (ignored if 0xFFFF)
 
-    int     iEstSendDurationMsRemaining;  // Used for status calculations
-    int     iEstSendDurationMsUsed;       //             ''
+    int         iEstSendDurationMsRemaining;  // Used for status calculations
+    int         iEstSendDurationMsUsed;       //             ''
 };
 
 
@@ -72,6 +74,7 @@ struct SReceiveItem
         : usId ( 0 )
         , uiRate ( 0 )
         , usCategory ( 0 )
+        , usResourceNetId ( 0xFFFF )
         , uiWritePosition ( 0 )
         , bReceiveStarted ( false )
     {}
@@ -80,6 +83,7 @@ struct SReceiveItem
     CBuffer buffer;         // The receive buffer
     uint    uiRate;         // Desired bytes per second (Info from the sender - not really used for anything here yet)
     ushort  usCategory;     // Data category
+    ushort  usResourceNetId;   // Only allow packet if this resource is running (ignored if 0xFFFF)
 
     uint    uiWritePosition;    // Current position in the buffer received so far
     bool    bReceiveStarted;    // true when the receive actually starts
@@ -113,7 +117,7 @@ public:
                         ~CLatentSendQueue           ( void );
     void                DoPulse                     ( int iTimeMsBetweenCalls );
     bool                OnLuaMainDestroy            ( void* pLuaMain );
-    SSendHandle         AddSend                     ( const char* pData, uint uiSize, uint uiRate, ushort usCategory, void* pLuaMain );
+    SSendHandle         AddSend                     ( CBufferRef bufferRef, uint uiRate, ushort usCategory, void* pLuaMain, ushort usResourceNetId );
     bool                CancelSend                  ( SSendHandle handle );
     void                CancelAllSends              ( void );
     bool                GetSendStatus               ( SSendHandle handle, SSendStatus* pOutSendStatus );
@@ -177,8 +181,10 @@ public:
     void                OnLuaMainDestroy            ( void* pLuaMain );
 
     // Send functions
-    SSendHandle         AddSend                     ( NetPlayerID remoteId, uchar ucPacketId, NetBitStreamInterface* pBitStream, uint uiRate, void* pLuaMain );
-    SSendHandle         AddSend                     ( NetPlayerID remoteId, ushort usBitStreamVersion, const char* pData, uint uiSize, uint uiRate, ushort usCategory, void* pLuaMain );
+    void                AddSendBatchBegin           ( unsigned char ucPacketId, NetBitStreamInterface* pBitStream );
+    SSendHandle         AddSend                     ( NetPlayerID remoteId, ushort usBitStreamVersion, uint uiRate, void* pLuaMain, ushort usResourceNetId );
+    void                AddSendBatchEnd             ( void );
+
     bool                CancelSend                  ( NetPlayerID remoteId, SSendHandle handle );
     void                CancelAllSends              ( NetPlayerID remoteId );
     bool                GetSendStatus               ( NetPlayerID remoteId, SSendHandle handle, SSendStatus* pOutSendStatus );
@@ -200,6 +206,7 @@ protected:
     // Send variables
     std::vector < CLatentSendQueue* >               m_SendQueueList;
     std::map < NetPlayerID, CLatentSendQueue* >     m_SendQueueMap;
+    CBufferRef*                                     m_pBatchBufferRef;
 
     // Receive variables
     std::map < NetPlayerID, CLatentReceiver* >      m_ReceiverMap;
@@ -212,5 +219,5 @@ protected:
 NetBitStreamInterface*  DoAllocateNetBitStream      ( NetPlayerID remoteId, ushort usBitStreamVersion );
 void                    DoDeallocateNetBitStream    ( NetBitStreamInterface* pBitStream );
 bool                    DoSendPacket                ( unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* bitStream, NetPacketPriority packetPriority, NetPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
-bool                    DoStaticProcessPacket       ( unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* pBitStream );
+bool                    DoStaticProcessPacket       ( unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* pBitStream, ushort usResourceNetId );
 void                    DoDisconnectRemote          ( NetPlayerID remoteId, const SString& strReason );

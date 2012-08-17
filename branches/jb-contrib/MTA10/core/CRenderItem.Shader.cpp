@@ -10,6 +10,7 @@
 
 #include "StdInc.h"
 
+uint CShaderItem::ms_uiCreateTimeCounter = 0;
 
 ////////////////////////////////////////////////////////////////
 //
@@ -18,10 +19,13 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-void CShaderItem::PostConstruct ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bDebug )
+void CShaderItem::PostConstruct ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask )
 {
     m_fPriority = fPriority;
+    m_uiCreateTime = ms_uiCreateTimeCounter++;      // Priority tie breaker
     m_fMaxDistanceSq = fMaxDistance * fMaxDistance;
+    m_bLayered = bLayered;
+    m_iTypeMask = iTypeMask;
 
     Super::PostConstruct ( pManager );
 
@@ -309,4 +313,17 @@ void CShaderItem::RenewShaderInstance ( void )
 {
     CShaderInstance* pShaderInstance = new CShaderInstance ();
     pShaderInstance->PostConstruct ( m_pManager, this );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CShaderItem::GetUsesVertexShader
+//
+// Check if active technique uses a vertex shader
+//
+////////////////////////////////////////////////////////////////
+bool CShaderItem::GetUsesVertexShader ( void )
+{
+    return m_pEffectWrap->m_bUsesVertexShader;
 }

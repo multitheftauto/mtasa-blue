@@ -28,8 +28,9 @@
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
 #define MAX_PROJECTILE_SYNC_DISTANCE 400.0f
 
-#define RELEASE_MIN_CLIENT_VERSION      "1.4.0-0.00000"
-#define BULLET_SYNC_MIN_CLIENT_VERSION  "1.3.0-9.04311"
+#define RELEASE_MIN_CLIENT_VERSION              "1.4.0-0.00000"
+#define BULLET_SYNC_MIN_CLIENT_VERSION          "1.3.0-9.04311"
+#define VEH_EXTRAPOLATION_MIN_CLIENT_VERSION    "1.3.0-9.04460"
 
 #define RUN_CHILDREN CChildListType::const_iterator iter=pElement->IterBegin();for(;iter!=pElement->IterEnd();iter++)
 
@@ -97,7 +98,6 @@ CGame::CGame ( void )
 
     // Initialize random number generator and time
     RandomizeRandomSeed ();
-    InitializeTime ();
 
     m_bBeingDeleted = false;
     m_pUnoccupiedVehicleSync = NULL;
@@ -168,7 +168,12 @@ CGame::CGame ( void )
     m_Glitches [ GLITCH_FASTMOVE ] = false;
     m_Glitches [ GLITCH_CROUCHBUG ] = false;
     m_Glitches [ GLITCH_CLOSEDAMAGE ] = false;
+    for ( int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++ )
+        m_JetpackWeapons [ i ] = false;
 
+    m_JetpackWeapons [ WEAPONTYPE_MICRO_UZI ] = true;
+    m_JetpackWeapons [ WEAPONTYPE_TEC9 ] = true;
+    m_JetpackWeapons [ WEAPONTYPE_PISTOL ] = true;
     //Glitch names (for Lua interface)
     m_GlitchNames["quickreload"] = GLITCH_QUICKRELOAD;
     m_GlitchNames["fastfire"] = GLITCH_FASTFIRE;
@@ -306,6 +311,7 @@ CGame::~CGame ( void )
     #else
         signal ( SIGTERM, SIG_DFL );
         signal ( SIGINT, SIG_DFL );
+        signal ( SIGPIPE, SIG_DFL );
     #endif
 }
 
@@ -676,7 +682,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     m_pResourceManager = new CResourceManager;
     m_pSettings = new CSettings ( m_pResourceManager );
-    m_pResourceManager->Refresh();
+    if ( !m_pResourceManager->Refresh() )
+        return false;   // Load cancelled
     m_pUnoccupiedVehicleSync = new CUnoccupiedVehicleSync ( m_pPlayerManager, m_pVehicleManager );
     m_pPedSync = new CPedSync ( m_pPlayerManager, m_pPedManager );
 #ifdef WITH_OBJECT_SYNC
@@ -738,6 +745,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     #else
         signal ( SIGTERM, &sighandler );
         signal ( SIGINT, &sighandler );
+        signal ( SIGPIPE, SIG_IGN );
     #endif
 
     // Add our builtin events
@@ -827,7 +835,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     // Now load the rest of the config
     if ( !m_pMainConfig->LoadExtended () )
-        return false;
+        return false;       // Fail or cancelled
 
     // Is the script debug log enabled?
     if ( m_pMainConfig->GetScriptDebugLogEnabled () )
@@ -1226,8 +1234,8 @@ void CGame::InitialDataStream ( CPlayer& Player )
     // Tell him current sync rates
     CStaticFunctionDefinitions::SendSyncIntervals ( &Player );
 
-    // Tell him current bullet sync enabled weapons
-    SendBulletSyncSettings ( &Player );
+    // Tell him current bullet sync enabled weapons and vehicle extrapolation settings
+    SendSyncSettings ( &Player );
 
     // Tell the other players about him
     CPlayerListPacket PlayerNotice;
@@ -1295,6 +1303,9 @@ void CGame::InitialDataStream ( CPlayer& Player )
     }
 
     marker.Set ( "PlayerStats" );
+
+    // Send the root element custom data
+    m_pMapManager->GetRootElement ()->SendAllCustomData ( &Player );
 
     // Tell the resource manager
     m_pResourceManager->OnPlayerJoin ( Player );
@@ -1960,7 +1971,6 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
 
     // Make a list of players to send this packet to
     std::vector < CPlayer* > sendList;
-    std::vector < CPlayer* > simSendList;
     bool bUseSimSendList = CSimControl::IsSimSystemEnabled ();
 
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
@@ -2005,6 +2015,8 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
         {
             CPlayer* pSendPlayer = it->first;
             SViewerInfo& nearInfo = it->second;
+            dassert ( MapContains ( pPlayer->m_PureSyncSimSendList, pSendPlayer ) == nearInfo.bInPureSyncSimSendList );
+
             if ( --nearInfo.iMoveToFarCountDown < 1 )
             {
                 // Remove player from puresync near list (Has to be not near for 5 calls to get removed (The delay ensures timely updates of players moving far away))
@@ -2029,20 +2041,44 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
                     //
                     // Sim sync relays pure sync packets to the other player when he is in zone 0 (as seen from this player)
                     // Enabling/disabling sim puresync will only take effect for the next pure sync packet, so:
-                    //                           prevzone nowZone
-                    //      Moving into zone 0:     1+       0      Do sync here, sim pure sync on
-                    //      In zone 0:              0        0      No sync here, sim pure sync on
-                    //      Moving from zone 0:     0        1+     No sync here, sim pure sync off
-                    //      Not in zone0:           1+       1+     Do sync here  sim pure sync off
                     //
-                    bool bSyncHere = ( nearInfo.iPrevZone > 0 );
-                    bool bSimSync = ( nearInfo.iZone == 0 );
-        
-                    if ( bSyncHere && bTimeForSync )
-                        sendList.push_back ( pSendPlayer );
-    
-                    if ( bSimSync )
-                        simSendList.push_back ( pSendPlayer );
+                    if ( nearInfo.iZone > 0 )
+                    {
+                        ////////////////////////////////////////////////
+                        // Don't use sim sync for this player
+                        ////////////////////////////////////////////////
+                        if ( !nearInfo.bInPureSyncSimSendList )
+                        {
+                            // If not in sim list, do send here
+                            if ( bTimeForSync )
+                                sendList.push_back ( pSendPlayer );
+                        }
+                        else
+                        if ( nearInfo.bInPureSyncSimSendList )
+                        {
+                            // If in sim list, sim send has already been done.
+                            // So don't send here as well - Just remove from sim list
+                            MapRemove ( pPlayer->m_PureSyncSimSendList, pSendPlayer );
+                            nearInfo.bInPureSyncSimSendList = false;
+                        }
+                    }
+                    else
+                    {
+                        ////////////////////////////////////////////////
+                        // Use sim sync for this player
+                        ////////////////////////////////////////////////
+                        if ( !nearInfo.bInPureSyncSimSendList )
+                        {
+                            // If not in sim list yet, do send here
+                            if ( bTimeForSync )
+                                sendList.push_back ( pSendPlayer );
+
+                            // and add it to sim list for next time
+                            MapInsert ( pPlayer->m_PureSyncSimSendList, pSendPlayer );
+                            nearInfo.bInPureSyncSimSendList = true;
+                        }
+                    }
+
                 }
             }
         }
@@ -2065,7 +2101,7 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
 
     CLOCK( "RelayPlayerPuresync", "UpdatePuresyncSimPlayer" );
     // Update sim data
-    CSimControl::UpdatePuresyncSimPlayer ( pPlayer, simSendList );
+    CSimControl::UpdatePuresyncSimPlayer ( pPlayer, pPlayer->m_PureSyncSimSendList, &pPlayer->m_KeySyncSimSendList, &pPlayer->m_BulletSyncSimSendList );
     UNCLOCK( "RelayPlayerPuresync", "UpdatePuresyncSimPlayer" );
 }
 
@@ -2205,7 +2241,6 @@ void CGame::RelayKeysync ( CPacket& Packet )
 {
     // Make a list of players to send this packet to
     std::vector < CPlayer* > sendList;
-    std::vector < CPlayer* > simSendList;
     bool bUseSimSendList = CSimControl::IsSimSystemEnabled ();
 
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
@@ -2232,21 +2267,21 @@ void CGame::RelayKeysync ( CPacket& Packet )
             else
             {
                 SViewerInfo& nearInfo = it->second;
+                dassert ( MapContains ( pPlayer->m_KeySyncSimSendList, pSendPlayer ) == nearInfo.bInKeySyncSimSendList );
 
                 //
                 // Sim sync relays key sync packets to the other player when he is near
                 // Enabling/disabling sim keysync will only take effect for the next key sync packet, so:
-                //                           prevNear nowNear
-                //      Moving into range:     false   true     Do sync here, sim keysync on
-                //      In range:              true    true     No sync here, sim keysync on
                 //
-                if ( !nearInfo.bPrevIsNearForKeySync )
+                if ( !nearInfo.bInKeySyncSimSendList )
                 {
+                    // If not in sim send list yet, do send here
                     sendList.push_back ( pSendPlayer );
-                    nearInfo.bPrevIsNearForKeySync = true;
-                }
 
-                simSendList.push_back ( pSendPlayer );
+                    // and add it to sim send list for next time
+                    MapInsert ( pPlayer->m_KeySyncSimSendList, pSendPlayer );
+                    nearInfo.bInKeySyncSimSendList = true;
+                }
             }
         }
     }
@@ -2256,7 +2291,7 @@ void CGame::RelayKeysync ( CPacket& Packet )
         CPlayerManager::Broadcast ( Packet, sendList );
 
     // Update sim data
-    CSimControl::UpdateKeysyncSimPlayer ( pPlayer, simSendList );
+    CSimControl::UpdateKeysyncSimPlayer ( pPlayer, pPlayer->m_KeySyncSimSendList );
 }
 
 
@@ -2277,7 +2312,6 @@ void CGame::RelayBulletsync ( CPacket& Packet )
 {
     // Make a list of players to send this packet to
     std::vector < CPlayer* > sendList;
-    std::vector < CPlayer* > simSendList;
     bool bUseSimSendList = CSimControl::IsSimSystemEnabled ();
 
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
@@ -2304,21 +2338,21 @@ void CGame::RelayBulletsync ( CPacket& Packet )
             else
             {
                 SViewerInfo& nearInfo = it->second;
+                dassert ( MapContains ( pPlayer->m_BulletSyncSimSendList, pSendPlayer ) == nearInfo.bInBulletSyncSimSendList  );
 
                 //
                 // Sim sync relays bullet sync packets to the other player when he is near
                 // Enabling/disabling sim bulletsync will only take effect for the next bullet sync packet, so:
-                //                           prevNear nowNear
-                //      Moving into range:     false   true     Do sync here, sim bulletsync on
-                //      In range:              true    true     No sync here, sim bulletsync on
                 //
-                if ( !nearInfo.bPrevIsNearForBulletSync )
+                if ( !nearInfo.bInBulletSyncSimSendList )
                 {
+                    // If not in sim send list yet, do send here
                     sendList.push_back ( pSendPlayer );
-                    nearInfo.bPrevIsNearForBulletSync = true;
-                }
 
-                simSendList.push_back ( pSendPlayer );
+                    // and add it to sim send list for next time
+                    MapInsert ( pPlayer->m_BulletSyncSimSendList, pSendPlayer );
+                    nearInfo.bInBulletSyncSimSendList = true;
+                }
             }
         }
     }
@@ -2328,7 +2362,7 @@ void CGame::RelayBulletsync ( CPacket& Packet )
         CPlayerManager::Broadcast ( Packet, sendList );
 
     // Update sim data
-    CSimControl::UpdateBulletsyncSimPlayer ( pPlayer, simSendList );
+    CSimControl::UpdateBulletsyncSimPlayer ( pPlayer, pPlayer->m_BulletSyncSimSendList );
 }
 
 
@@ -3525,6 +3559,11 @@ void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )
         else
         {
             CElement * pTarget = CElementIDs::GetElement ( Packet.m_TargetID );
+
+            // Pre r4481 client could send incorrect element
+            if ( dynamic_cast < CPlayer* > ( pTarget ) == NULL )
+                pTarget = pPlayer;
+
             pCamera->SetMode ( CAMERAMODE_PLAYER );
             pCamera->SetTarget ( pTarget );
         }
@@ -3750,7 +3789,7 @@ void CGame::SetGlitchEnabled ( const std::string& strGlitch, bool bEnabled )
     eGlitchType cGlitch = m_GlitchNames[strGlitch];
     assert ( cGlitch >= 0 && cGlitch < NUM_GLITCHES );
     m_Glitches[cGlitch] = bEnabled;
-    SendBulletSyncSettings ();
+    SendSyncSettings ();
     CalculateMinClientRequirement ();
 }
 
@@ -3775,6 +3814,22 @@ bool CGame::GetCloudsEnabled ( void )
     return m_bCloudsEnabled;
 }
 
+bool CGame::GetJetpackWeaponEnabled ( eWeaponType weaponType )
+{
+    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType < WEAPONTYPE_LAST_WEAPONTYPE )
+    {
+        return m_JetpackWeapons[weaponType];
+    }
+    return false;
+}
+
+void CGame::SetJetpackWeaponEnabled ( eWeaponType weaponType, bool bEnabled )
+{
+    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType < WEAPONTYPE_LAST_WEAPONTYPE )
+    {
+        m_JetpackWeapons[weaponType] = bEnabled;
+    }
+}
 
 //
 // Handle basic backup of databases and config files
@@ -3892,11 +3947,22 @@ void CGame::HandleBackup ( void )
 //
 // Toggle latent send mode
 //
-void CGame::EnableLatentSends ( bool bEnabled, int iBandwidth, CLuaMain* pLuaMain )
+void CGame::EnableLatentSends ( bool bEnabled, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId )
 {
     m_bLatentSendsEnabled = bEnabled && iBandwidth;
     m_iLatentSendsBandwidth = iBandwidth;
     m_pLatentSendsLuaMain = pLuaMain;
+    m_usLatentSendsResourceNetId = usResourceNetId;
+}
+
+
+//
+// Optimization for latent sends
+//
+void CGame::SendPacketBatchBegin ( unsigned char ucPacketId, NetBitStreamInterface* pBitStream )
+{
+    if ( m_bLatentSendsEnabled )
+        GetLatentTransferManager ()->AddSendBatchBegin ( ucPacketId, pBitStream );
 }
 
 
@@ -3908,8 +3974,18 @@ bool CGame::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& play
     if ( !m_bLatentSendsEnabled )
         return g_pNetServer->SendPacket ( ucPacketID, playerID, pBitStream, bBroadcast, packetPriority, packetReliability, packetOrdering );
     else
-        GetLatentTransferManager ()->AddSend ( playerID, ucPacketID, pBitStream, m_iLatentSendsBandwidth, m_pLatentSendsLuaMain );
+        GetLatentTransferManager ()->AddSend ( playerID, pBitStream->Version (), m_iLatentSendsBandwidth, m_pLatentSendsLuaMain, m_usLatentSendsResourceNetId );
     return true;
+}
+
+
+//
+// Optimization for latent sends
+//
+void CGame::SendPacketBatchEnd ( void )
+{
+    if ( m_bLatentSendsEnabled )
+        GetLatentTransferManager ()->AddSendBatchEnd ();
 }
 
 
@@ -3923,20 +3999,24 @@ bool CGame::SendPacket ( unsigned char ucPacketID, const NetServerPlayerID& play
 bool CGame::IsBulletSyncActive ( void )
 {
     bool bConfigSaysEnable = m_pMainConfig->GetBulletSyncEnabled ();
+#if 0       // No auto bullet sync as there are some problems with it
     bool bGlitchesSayEnable = ( m_Glitches [ GLITCH_FASTFIRE ] || m_Glitches [ GLITCH_CROUCHBUG ] );
+#else
+    bool bGlitchesSayEnable = false;
+#endif
     return bConfigSaysEnable || bGlitchesSayEnable;
 }
 
 
 //////////////////////////////////////////////////////////////////
 //
-// CGame::SendBulletSyncSettings
+// CGame::SendSyncSettings
 //
-// Determine and send required state of bullet sync
+// Determine and send required state of bullet sync and vehicle extrapolation
 // If player is NULL, send to all joined players
 //
 //////////////////////////////////////////////////////////////////
-void CGame::SendBulletSyncSettings ( CPlayer* pPlayer )
+void CGame::SendSyncSettings ( CPlayer* pPlayer )
 {
     std::set < eWeaponType > weaponTypesUsingBulletSync;
 
@@ -3960,7 +4040,12 @@ void CGame::SendBulletSyncSettings ( CPlayer* pPlayer )
             MapInsert ( weaponTypesUsingBulletSync, weaponList[i] );
     }
 
-    CBulletsyncSettingsPacket packet ( weaponTypesUsingBulletSync );
+    short sVehExtrapolateBaseMs = 5;
+    short sVehExtrapolatePercent = m_pMainConfig->GetVehExtrapolatePercent ();
+    short sVehExtrapolateMaxMs = m_pMainConfig->GetVehExtrapolatePingLimit ();
+    uchar ucVehExtrapolateEnabled = sVehExtrapolatePercent != 0;
+
+    CSyncSettingsPacket packet ( weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs );
     if ( pPlayer )
         pPlayer->Send ( packet );
     else
@@ -4019,6 +4104,11 @@ SString CGame::CalculateMinClientRequirement ( void )
         if ( strNewMin < BULLET_SYNC_MIN_CLIENT_VERSION )
             strNewMin = BULLET_SYNC_MIN_CLIENT_VERSION;
     }
+    if ( m_pMainConfig->GetVehExtrapolatePercent () > 0 )
+    {
+        if ( strNewMin < VEH_EXTRAPOLATION_MIN_CLIENT_VERSION )
+            strNewMin = VEH_EXTRAPOLATION_MIN_CLIENT_VERSION;
+    }
 
     if ( strNewMin != m_strPrevMinClientConnectRequirement )
     {
@@ -4035,6 +4125,11 @@ SString CGame::CalculateMinClientRequirement ( void )
         {
             if ( strKickMin < BULLET_SYNC_MIN_CLIENT_VERSION )
                 strKickMin = BULLET_SYNC_MIN_CLIENT_VERSION;
+        }
+        if ( m_pMainConfig->GetVehExtrapolatePercent () > 0 )
+        {
+            if ( strKickMin < VEH_EXTRAPOLATION_MIN_CLIENT_VERSION )
+                strKickMin = VEH_EXTRAPOLATION_MIN_CLIENT_VERSION;
         }
 
         if ( strKickMin != m_strPrevMinClientKickRequirement )

@@ -10,6 +10,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define CAN_GIVE_MINCLIENTREQ_MIN_SERVER_VERSION  "1.3.0-9.04431"
 
 //
 // enum values <-> script strings
@@ -150,9 +151,24 @@ IMPLEMENT_ENUM_BEGIN( eDxTestMode )
     ADD_ENUM ( DX_TEST_MODE_NO_MEM,         "no_mem" )
     ADD_ENUM ( DX_TEST_MODE_LOW_MEM,        "low_mem" )
     ADD_ENUM ( DX_TEST_MODE_NO_SHADER,      "no_shader" )
-IMPLEMENT_ENUM_END( "dx-test-mode" )
+    IMPLEMENT_ENUM_END( "dx-test-mode" )
 
-IMPLEMENT_ENUM_BEGIN( eWeaponType )
+    IMPLEMENT_ENUM_BEGIN( eWeaponType )
+    ADD_ENUM ( WEAPONTYPE_BRASSKNUCKLE,         "brass_knuckle" )
+    ADD_ENUM ( WEAPONTYPE_GOLFCLUB,             "golfclub" )
+    ADD_ENUM ( WEAPONTYPE_NIGHTSTICK,           "nightstick" )
+    ADD_ENUM ( WEAPONTYPE_KNIFE,                "knife" )
+    ADD_ENUM ( WEAPONTYPE_BASEBALLBAT,          "baseball_bat" )
+    ADD_ENUM ( WEAPONTYPE_SHOVEL,               "shovel" )
+    ADD_ENUM ( WEAPONTYPE_POOL_CUE,             "pool_cue" )
+    ADD_ENUM ( WEAPONTYPE_KATANA,               "katana" )
+    ADD_ENUM ( WEAPONTYPE_CHAINSAW,             "chainsaw" )
+    ADD_ENUM ( WEAPONTYPE_DILDO1,               "dildo1" )
+    ADD_ENUM ( WEAPONTYPE_DILDO2,               "dildo2" )
+    ADD_ENUM ( WEAPONTYPE_VIBE1,                "vibe1" )
+    ADD_ENUM ( WEAPONTYPE_VIBE2,                "vibe2" )
+    ADD_ENUM ( WEAPONTYPE_FLOWERS,              "flowers" )
+    ADD_ENUM ( WEAPONTYPE_CANE,                 "cane" )
     ADD_ENUM ( WEAPONTYPE_GRENADE,              "grenade" )
     ADD_ENUM ( WEAPONTYPE_TEARGAS,              "teargas" )
     ADD_ENUM ( WEAPONTYPE_MOLOTOV,              "molotov" )
@@ -178,8 +194,9 @@ IMPLEMENT_ENUM_BEGIN( eWeaponType )
     ADD_ENUM ( WEAPONTYPE_SPRAYCAN,             "spraycan" )
     ADD_ENUM ( WEAPONTYPE_EXTINGUISHER,         "extinguisher" )
     ADD_ENUM ( WEAPONTYPE_CAMERA,               "camera" )
-IMPLEMENT_ENUM_END( "weapon-type" )
-
+    ADD_ENUM ( WEAPONTYPE_NIGHTVISION,          "nightvision" )
+    ADD_ENUM ( WEAPONTYPE_INFRARED,             "infrared" )
+    IMPLEMENT_ENUM_END( "weapon-type" )
 IMPLEMENT_ENUM_BEGIN( eWeaponProperty )
     ADD_ENUM ( WEAPON_WEAPON_RANGE,                     "weapon_range" )
     ADD_ENUM ( WEAPON_TARGET_RANGE,                     "target_range" )
@@ -265,7 +282,18 @@ IMPLEMENT_ENUM_BEGIN( EBlendModeType )
     ADD_ENUM ( EBlendMode::BLEND,           "blend" )
     ADD_ENUM ( EBlendMode::ADD,             "add" )
     ADD_ENUM ( EBlendMode::MODULATE_ADD,    "modulate_add" )
+    ADD_ENUM ( EBlendMode::OVERWRITE,       "overwrite" )
 IMPLEMENT_ENUM_END( "blend-mode" )
+
+IMPLEMENT_ENUM_BEGIN( EEntityTypeMask )
+    ADD_ENUM ( TYPE_MASK_NONE,          "none" )
+    ADD_ENUM ( TYPE_MASK_WORLD,         "world" )
+    ADD_ENUM ( TYPE_MASK_PED,           "ped" )
+    ADD_ENUM ( TYPE_MASK_VEHICLE,       "vehicle" )
+    ADD_ENUM ( TYPE_MASK_OBJECT,        "object" )
+    ADD_ENUM ( TYPE_MASK_OTHER,         "other" )
+    ADD_ENUM ( TYPE_MASK_ALL,           "all" )
+IMPLEMENT_ENUM_END( "entity-type-mask" )
 
 
 //
@@ -370,5 +398,78 @@ bool MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pM
             }
         }
         return pMaterialElement != NULL;
+    }
+}
+
+
+//
+// 4x4 matrix into CMatrix
+//
+bool ReadMatrix ( lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix )
+{
+    float m[4][4] = { { 1,0,0,0 }, { 0,1,0,0 }, { 0,0,1,0 }, { 0,0,0,1 } };
+    uint uiRow = 0;
+    uint uiCell = 0;
+
+    if ( lua_type ( luaVM, uiArgIndex ) == LUA_TTABLE )
+    {
+        for ( lua_pushnil ( luaVM ) ; lua_next ( luaVM, uiArgIndex ) != 0 ; lua_pop ( luaVM, 1 ), uiRow++ )
+        {
+            //int idx = lua_tonumber ( luaVM, -2 );
+            //int iArgumentType = lua_type ( luaVM, -1 );
+            if ( lua_type ( luaVM, -1 ) == LUA_TTABLE )
+            {
+                uint uiCol = 0;
+                for ( lua_pushnil ( luaVM ) ; lua_next ( luaVM, -2 ) != 0 ; lua_pop ( luaVM, 1 ), uiCol++, uiCell++ )
+                {
+                    //int idx = lua_tonumber ( luaVM, -2 );
+                    int iArgumentType = lua_type ( luaVM, -1 );
+                    if ( iArgumentType == LUA_TNUMBER || iArgumentType == LUA_TSTRING )
+                    {
+                        if ( uiRow < 4 && uiCol < 4 )
+                            m[uiRow][uiCol] = static_cast < float > ( lua_tonumber ( luaVM, -1 ) );;
+                    }
+                }
+
+                if ( uiCol != 4 )
+                    return false;
+            }
+        }
+    }
+
+    if ( uiRow != 4 || uiCell != 16 )
+        return false;
+
+    outMatrix.vRight = CVector ( m[0][0], m[0][1], m[0][2] );
+    outMatrix.vFront = CVector ( m[1][0], m[1][1], m[1][2] );
+    outMatrix.vUp    = CVector ( m[2][0], m[2][1], m[2][2] );
+    outMatrix.vPos   = CVector ( m[3][0], m[3][1], m[3][2] );
+    return true;
+}
+
+
+//
+// Check min client is correct
+//
+void MinClientCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason )
+{
+    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine ( argStream.m_luaVM );
+    if ( pLuaMain )
+    {
+        CResource* pResource = pLuaMain->GetResource();
+        if ( pResource )
+        {
+            if ( pResource->GetMinClientReq () < szVersionReq )
+            {
+                if ( MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE )
+                {
+                    // Check server is able to give us a MinClientReq
+                    if ( pResource->GetMinServerReq () < CAN_GIVE_MINCLIENTREQ_MIN_SERVER_VERSION )
+                        argStream.SetVersionError ( CAN_GIVE_MINCLIENTREQ_MIN_SERVER_VERSION, "server", "of technical reasons" );
+                    else
+                        argStream.SetVersionError ( szVersionReq, "client", szReason );
+                }
+            }
+        }
     }
 }

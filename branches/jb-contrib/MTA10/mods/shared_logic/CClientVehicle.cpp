@@ -32,7 +32,7 @@ extern CClientGame* g_pClientGame;
 // Maximum distance between current position and target position (for interpolation)
 // before we disable interpolation and warp to the position instead
 #define VEHICLE_INTERPOLATION_WARP_THRESHOLD            15
-#define VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED  1.8f
+#define VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED  10
 
 CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigned short usModel, unsigned char ucVariation, unsigned char ucVariation2 ) : ClassInit ( this ), CClientStreamElement ( pManager->GetVehicleStreamer (), ID )
 {
@@ -3082,6 +3082,25 @@ void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulD
         m_interp.pos.vecTarget = vecPosition;
         // Calculate the relative error
         m_interp.pos.vecError = vecPosition - vecLocalPosition;
+
+        // Extrapolation
+        const SVehExtrapolateSettings& vehExtrapolate = g_pClientGame->GetVehExtrapolateSettings ();
+        if ( vehExtrapolate.bEnabled )
+        {
+            // Base amount to account for something
+            int iExtrapolateMs = vehExtrapolate.iBaseMs;
+
+            if ( CClientPlayer* pPlayerDriver = DynamicCast < CClientPlayer > ( m_pDriver ) )
+                iExtrapolateMs += pPlayerDriver->GetLatency () * vehExtrapolate.iScalePercent / 110;
+
+            // Limit amount
+            iExtrapolateMs = Clamp ( 0, iExtrapolateMs, vehExtrapolate.iMaxMs );
+
+            CVector vecVelocity;
+            GetMoveSpeed ( vecVelocity );
+            vecVelocity *= 50.f * iExtrapolateMs * (1/1000.f);
+            m_interp.pos.vecError += vecVelocity;
+        }
 
         // Apply the error over 400ms (i.e. 1/4 per 100ms )
         m_interp.pos.vecError *= Lerp < const float > ( 0.25f, UnlerpClamped( 100, ulDelay, 400 ), 1.0f );

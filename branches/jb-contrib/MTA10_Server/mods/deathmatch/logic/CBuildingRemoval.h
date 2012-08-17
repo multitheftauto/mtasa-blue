@@ -15,11 +15,11 @@
 class CBuildingRemoval
 {
 public:
-                                CBuildingRemoval                 ( unsigned short usModel, float fRadius, CVector vecPos );
+                                CBuildingRemoval                 ( unsigned short usModel, float fRadius, const CVector& vecPos );
                                 ~CBuildingRemoval                ( void );
 
     float                       GetRadius                        ( void )                       { return m_fRadius; }
-    CVector                     GetPosition                      ( void )                       { return m_vecPos; }
+    const CVector&              GetPosition                      ( void )                       { return m_vecPos; }
     unsigned short              GetModel                         ( void )                       { return m_usModel; }
 
 private:

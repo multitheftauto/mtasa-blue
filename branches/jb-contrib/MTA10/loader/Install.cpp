@@ -218,6 +218,9 @@ bool ExtractFiles ( const SString& strFile )
     if ( !hArcData )
         return false;
 
+    char* szPassword = "mta";
+    RARSetPassword ( hArcData, szPassword );
+
     bool bOk = false;
 
     // Do each file
@@ -290,7 +293,7 @@ SString CheckOnRestartCommand ( void )
             if ( !ExtractFiles ( strFile ) )
             {
                 // If extract failed and update file is an exe, try to run it
-                if ( ExtractExtention ( strFile ).CompareI ( "exe" ) )
+                if ( ExtractExtension ( strFile ).CompareI ( "exe" ) )
                     ShellExecuteBlocking ( "open", strFile, "-s" );
             }
 

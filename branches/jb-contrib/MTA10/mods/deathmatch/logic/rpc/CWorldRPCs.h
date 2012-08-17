@@ -41,6 +41,7 @@ public:
     DECLARE_RPC ( SetFPSLimit );
     DECLARE_RPC ( SetGarageOpen );
     DECLARE_RPC ( SetGlitchEnabled );
+    DECLARE_RPC ( SetJetpackWeaponEnabled );
     DECLARE_RPC ( SetCloudsEnabled );
     DECLARE_RPC ( SetTrafficLightState );
     DECLARE_RPC ( SetJetpackMaxHeight );

@@ -20,13 +20,22 @@ CLuaTimer::CLuaTimer ( const CLuaFunctionRef& iLuaFunction, const CLuaArguments&
     m_uiRepeats = 1;
     m_iLuaFunction = iLuaFunction;
     m_Arguments = Arguments;
-    m_bBeingDeleted = false;
 }
 
 
 CLuaTimer::~CLuaTimer ( void )
 {
-    CIdArray::PushUniqueId ( this, EIdClass::TIMER, m_uiScriptID );
+    RemoveScriptID ();
+}
+
+
+void CLuaTimer::RemoveScriptID ( void )
+{
+    if ( m_uiScriptID != INVALID_ARRAY_ID )
+    {
+        CIdArray::PushUniqueId ( this, EIdClass::TIMER, m_uiScriptID );
+        m_uiScriptID = INVALID_ARRAY_ID;
+    }
 }
 
 

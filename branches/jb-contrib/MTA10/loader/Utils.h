@@ -28,7 +28,10 @@ enum ePathResult
 // remote dll module on success.
 HMODULE         RemoteLoadLibrary                   ( HANDLE hProcess, const char* szLibPath );
 
-bool            TerminateGTAIfRunning               ( bool bSilent = false );
+void            TerminateGTAIfRunning               ( void );
+bool            IsGTARunning                        ( void );
+void            TerminateOtherMTAIfRunning          ( void );
+bool            IsOtherMTARunning                   ( void );
 
 void            ShowSplash                          ( HINSTANCE hInstance );
 void            HideSplash                          ( bool bOnlyDelay = false );
@@ -36,7 +39,7 @@ void            HideSplash                          ( bool bOnlyDelay = false );
 long            DisplayErrorMessageBox              ( const SString& strMessage, const SString& strTroubleType = "" );
 
 void            SetMTASAPathSource                  ( bool bReadFromRegistry );
-SString         GetMTASAPath                        ( void );
+SString         GetMTASAPath                        ( bool bReadFromRegistry = true );
 ePathResult     GetGamePath                         ( SString& strOutResult, bool bFindIfMissing = false );
 SString         GetMTASAModuleFileName              ( void );
 
@@ -73,6 +76,8 @@ void            FreeLibraryHandle                   ( void );
 uint            WaitForObject                       ( HANDLE hProcess, HANDLE hThread, DWORD dwMilliseconds, HANDLE hMutex );
 
 void            MaybeShowCopySettingsDialog         ( void );
+
+bool            CheckAndShowFileOpenFailureMessage  ( void );
 
 #undef CREATE_SUSPENDED
 #define CREATE_SUSPENDED 5
