@@ -44,6 +44,7 @@ typedef float               FLOAT;      //  32
 // b) char range can be -127 to 128 or 0 to 255 depending on compiler options/mood
 
 
+#include <assert.h>
 #include "SharedUtil.Defines.h"
 #include "SharedUtil.AllocTracking.h"
 #include <list>
@@ -53,12 +54,10 @@ typedef float               FLOAT;      //  32
 #include <deque>
 #include <algorithm>
 #include <limits.h>
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <string>
 #include <stdarg.h>
-#include <assert.h>
 #include "SString.h"
 #include "SharedUtil.Map.h"
 #if defined(SHARED_UTIL_WITH_HASH_MAP) || defined(SHARED_UTIL_WITH_FAST_HASH_MAP)

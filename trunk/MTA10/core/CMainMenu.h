@@ -25,7 +25,6 @@ class CMainMenu;
 #include "CCredits.h"
 #include "CGraphics.h"
 #include "CMainMenuScene.h"
-#include <google/dense_hash_map>
 class CNewsBrowser;
 
 #define CORE_MTA_NEWS_ITEMS         3

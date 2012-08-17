@@ -70,7 +70,6 @@
     #include <deque>
     #include <algorithm>
     #include <limits>
-    #include <assert.h>
 
     namespace std
     {

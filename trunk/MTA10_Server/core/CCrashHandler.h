@@ -29,7 +29,7 @@ private:
     #ifdef WIN32
 
     static long WINAPI          HandleExceptionGlobal   ( _EXCEPTION_POINTERS* pException );
-    static void                 DumpMiniDump            ( _EXCEPTION_POINTERS* pException );
+    static void                 DumpMiniDump            ( _EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation );
 
     static void                 RunErrorTool            ( void );
 
