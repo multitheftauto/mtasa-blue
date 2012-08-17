@@ -124,6 +124,9 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 //////////////////////////////////////////////////////////
 void HandleTrouble ( void )
 {
+    if ( CheckAndShowFileOpenFailureMessage () )
+        return;
+
     int iResponse = MessageBox ( NULL, "Are you having problems running MTA:SA?.\n\nDo you want to revert to an earlier version?", "MTA: San Andreas", MB_YESNO | MB_ICONERROR );
     if ( iResponse == IDYES )
     {
@@ -142,6 +145,9 @@ void HandleTrouble ( void )
 //////////////////////////////////////////////////////////
 void HandleResetSettings ( void )
 {
+    if ( CheckAndShowFileOpenFailureMessage () )
+        return;
+
     char szResult[MAX_PATH] = "";
     SHGetFolderPath( NULL, CSIDL_PERSONAL, NULL, 0, szResult );
     SString strSettingsFilename = PathJoin ( szResult, "GTA San Andreas User Files", "gta_sa.set" );
@@ -233,6 +239,7 @@ int LaunchGame ( LPSTR lpCmdLine )
 
     WatchDogBeginSection ( "L0" );      // Gets closed if MTA exits with a return code of 0
     WatchDogBeginSection ( "L1" );      // Gets closed when online game has started
+    SetApplicationSetting ( "diagnostics", "gta-fopen-fail", "" );
 
     int iReturnCode = DoLaunchGame ( lpCmdLine );
 

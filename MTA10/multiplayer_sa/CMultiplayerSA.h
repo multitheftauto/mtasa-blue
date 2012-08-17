@@ -48,6 +48,9 @@ public:
     void                        InitHooks_HookDestructors ( void );
     void                        InitHooks_RwResources ( void );
     void                        InitHooks_ClothesCache ( void );
+    void                        InitHooks_Files ( void );
+    void                        InitHooks_Weapons ( void );
+    void                        InitHooks_Rendering ( void );
     CRemoteDataStorage *        CreateRemoteDataStorage     ();
     void                        DestroyRemoteDataStorage    ( CRemoteDataStorage* pData );
     void                        AddRemoteDataStorage        ( CPlayerPed* pPed, CRemoteDataStorage* pData );

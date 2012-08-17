@@ -77,6 +77,8 @@ uint            WaitForObject                       ( HANDLE hProcess, HANDLE hT
 
 void            MaybeShowCopySettingsDialog         ( void );
 
+bool            CheckAndShowFileOpenFailureMessage  ( void );
+
 #undef CREATE_SUSPENDED
 #define CREATE_SUSPENDED 5
 

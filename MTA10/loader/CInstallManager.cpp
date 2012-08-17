@@ -93,16 +93,22 @@ void CInstallManager::InitSequencer ( void )
                 CR "            CALL CheckOnRestartCommand "
                 CR "            IF LastResult != ok GOTO update_end: "
                 CR " "                                              ////// Start of 'update game' //////
-                CR "            CALL MaybeSwitchToTempExe "         // If update files comes with and .exe, switch to that for the install
-                CR "copy_files: "
+                CR "            CALL MaybeSwitchToTempExe "         // If update files comes with an .exe, switch to that for the install
+                CR " "
                 CR "            CALL InstallFiles "                 // Try to install update files
                 CR "            IF LastResult == ok GOTO update_end: "
                 CR " "
                 CR "            CALL ChangeToAdmin "                // If install failed, try as admin
-                CR "            IF LastResult == ok GOTO copy_files: "
+                CR " "
+                CR "copy_files_admin: "
+                CR "            CALL InstallFiles "                 // Try to install update files
+                CR "            IF LastResult == ok GOTO update_end_admin: "
                 CR " "
                 CR "            CALL ShowCopyFailDialog "           // If install failed as admin, show message box
-                CR "            IF LastResult == retry GOTO copy_files: "
+                CR "            IF LastResult == retry GOTO copy_files_admin: "
+                CR " "
+                CR "update_end_admin: "
+                CR "            CALL ChangeFromAdmin "
                 CR " "
                 CR "update_end: "                                   ////// End of 'update game' //////
                 CR "            CALL SwitchBackFromTempExe "
@@ -317,6 +323,7 @@ SString CInstallManager::_ChangeFromAdmin ( void )
     {
         SendStringToUserProcess ( GetSequencerSnapshot () );
         AddReportLog ( 1003, SString ( "CInstallManager::_ChangeToAdmin - exit(0) %s", "" ) );
+        ClearIsBlockingUserProcess ();
         ExitProcess ( 0 );
     }
     return "fail";
@@ -343,6 +350,8 @@ SString CInstallManager::_ShowCrashFailDialog ( void )
 
     SString strResult = ShowCrashedDialog ( g_hInstance, strMessage );
     HideCrashedDialog ();
+
+    CheckAndShowFileOpenFailureMessage ();
 
     return strResult;
 }

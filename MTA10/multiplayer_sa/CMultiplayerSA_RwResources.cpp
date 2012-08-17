@@ -10,15 +10,10 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-extern CCoreInterface* g_pCore;
-extern EDamageReasonType g_GenerateDamageEventReason;
 
 namespace
 {
     SRwResourceStats ms_Stats;
-    CEntitySAInterface* ms_Rendering = NULL;
-    CEntitySAInterface* ms_RenderingOneNonRoad = NULL;
-    GameEntityRenderHandler* pGameEntityRenderHandler = NULL;
 }
 
 
@@ -275,244 +270,6 @@ void _declspec(naked) HOOK_RwGeometryDestroy ()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
-// CallIdle
-//
-// Profile call to function 'Idle'
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CallIdle_Pre( DWORD calledFrom )
-{
-    TIMING_CHECKPOINT( "+CallIdle1" );
-}
-
-void OnMY_CallIdle_Post( RwGeometry* pGeometry, DWORD calledFrom )
-{
-    TIMING_CHECKPOINT( "-CallIdle2" );
-}
-
-// Hook info
-#define HOOKPOS_CallIdle                         0x53ECBD
-#define HOOKSIZE_CallIdle                        5
-DWORD RETURN_CallIdle =                          0x53ECC2;
-DWORD DO_CallIdle =                          0x53E920;
-void _declspec(naked) HOOK_CallIdle()
-{
-    _asm
-    {
-        pushad
-        call    OnMY_CallIdle_Pre
-        popad
-
-        push    [esp+4*1]
-        call    DO_CallIdle
-        add     esp, 4*1
-
-        pushad
-        call    OnMY_CallIdle_Post
-        popad
-
-        jmp     RETURN_CallIdle
-    }
-}
-
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-// CEntity::Render
-//
-// Detect entity rendering
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CEntity_Render_Pre( CEntitySAInterface* pEntity )
-{
-    // Ignore buildings
-    if ( pEntity->vtbl == (CEntitySAInterfaceVTBL*)0x08585c8 )
-        return;
-    // Ignore dummy objects
-    if ( pEntity->vtbl == (CEntitySAInterfaceVTBL*)0x0866E78 )
-        return;
-
-    ms_Rendering = pEntity;
-
-    if ( pGameEntityRenderHandler && ms_Rendering )
-        pGameEntityRenderHandler ( ms_Rendering );
-}
-
-void OnMY_CEntity_Render_Post( CEntitySAInterface* pEntity )
-{
-    if ( ms_Rendering )
-    {
-        ms_Rendering = NULL;
-        if ( pGameEntityRenderHandler )
-            pGameEntityRenderHandler ( ms_RenderingOneNonRoad );
-    }
-}
-
-// Hook info
-#define HOOKPOS_CEntity_Render                         0x534310
-#define HOOKSIZE_CEntity_Render                        6
-DWORD RETURN_CEntity_Render =                          0x534317;
-void _declspec(naked) HOOK_CEntity_Render()
-{
-    _asm
-    {
-        pushad
-        push    ecx
-        call    OnMY_CEntity_Render_Pre
-        add     esp, 4*1
-        popad
-
-        call inner
-
-        pushad
-        push    ecx
-        call    OnMY_CEntity_Render_Post
-        add     esp, 4*1
-        popad
-        retn
-
-inner:
-        push    ecx  
-        push    esi  
-        mov     esi,ecx 
-        mov     eax,dword ptr [esi+18h] 
-        jmp     RETURN_CEntity_Render
-    }
-}
-
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-// CEntity::RenderOneNonRoad
-//
-// Detect entity rendering
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CEntity_RenderOneNonRoad_Pre( DWORD calledFrom, CEntitySAInterface* pEntity )
-{
-    // Ignore buildings
-    if ( pEntity->vtbl == (CEntitySAInterfaceVTBL*)0x08585c8 )
-        return;
-    // Ignore dummy objects
-    if ( pEntity->vtbl == (CEntitySAInterfaceVTBL*)0x0866E78 )
-        return;
-
-    ms_RenderingOneNonRoad = pEntity;
-
-    if ( pGameEntityRenderHandler )
-        pGameEntityRenderHandler ( ms_RenderingOneNonRoad );
-}
-
-void OnMY_CEntity_RenderOneNonRoad_Post( DWORD calledFrom, CEntitySAInterface* pEntity )
-{
-    if ( ms_RenderingOneNonRoad )
-    {
-        ms_RenderingOneNonRoad = NULL;
-        if ( pGameEntityRenderHandler )
-            pGameEntityRenderHandler ( ms_RenderingOneNonRoad );
-    }
-}
-
-// Hook info
-#define HOOKPOS_CEntity_RenderOneNonRoad                         0x553260
-#define HOOKSIZE_CEntity_RenderOneNonRoad                        5
-DWORD RETURN_CEntity_RenderOneNonRoad =                          0x553265;
-void _declspec(naked) HOOK_CEntity_RenderOneNonRoad()
-{
-    _asm
-    {
-        pushad
-        push    [esp+32+4*1]
-        push    [esp+32+4*1]
-        call    OnMY_CEntity_RenderOneNonRoad_Pre
-        add     esp, 4*2
-        popad
-
-        push    [esp+4*1]
-        call inner
-        add     esp, 4*1
-
-        pushad
-        push    [esp+32+4*1]
-        push    [esp+32+4*1]
-        call    OnMY_CEntity_RenderOneNonRoad_Post
-        add     esp, 4*2
-        popad
-        retn
-
-inner:
-        push    esi  
-        mov     esi, [esp+08h]
-        jmp     RETURN_CEntity_RenderOneNonRoad
-    }
-}
-
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-// CWeapon::GenerateDamageEvent
-//
-// Try to detect pistol whippings
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CWeapon_GenerateDamageEvent( DWORD calledFrom, CPedSAInterface* pPed, CEntitySAInterface* pEntity, eWeaponType weaponType, uint uiFlags1, ePedPieceTypes pedPieceType, uint uiFlags2 )
-{
-// uiFlags1 appears to be:
-//          4 - punch
-//          7 - punch 2
-//         12 - punch 3
-//         20 - ground kick
-//          8 - pistol whip
-//        140 - deagle fire
-//         40 - silenced pistol fire
-//         25 - pistol fire
-//         25 - mp5 fire
-//         20 - tec fire
-//         20 - uzi fire
-//         30 - ak47 fire
-//         30 - m4 fire
-//         75 - sniper fire
-//         14 - shovel hit
-//         10 - rocket launcher explode
-//         10 - dead
-//          and lots more probably
-
-    if ( uiFlags1 == 8 )
-        g_GenerateDamageEventReason = EDamageReason::PISTOL_WHIP;
-    else
-        g_GenerateDamageEventReason = EDamageReason::OTHER;
-}
-
-
-// Hook info
-#define HOOKPOS_CWeapon_GenerateDamageEvent                         0x73A530
-#define HOOKSIZE_CWeapon_GenerateDamageEvent                        7
-DWORD RETURN_CWeapon_GenerateDamageEvent =                          0x73A537;
-void _declspec(naked) HOOK_CWeapon_GenerateDamageEvent()
-{
-    _asm
-    {
-        pushad
-        push    [esp+32+4*6]
-        push    [esp+32+4*6]
-        push    [esp+32+4*6]
-        push    [esp+32+4*6]
-        push    [esp+32+4*6]
-        push    [esp+32+4*6]
-        push    [esp+32+4*6]
-        call    OnMY_CWeapon_GenerateDamageEvent
-        add     esp, 4*6+4
-        popad
-
-        push    0FFFFFFFFh 
-        push    848E10h 
-        jmp     RETURN_CWeapon_GenerateDamageEvent
-    }
-}
-
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//
 // CMultiplayerSA::GetRwResourceStats
 //
 //
@@ -520,18 +277,6 @@ void _declspec(naked) HOOK_CWeapon_GenerateDamageEvent()
 void CMultiplayerSA::GetRwResourceStats ( SRwResourceStats& outStats )
 {
     outStats = ms_Stats;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-// CMultiplayerSA::SetGameEntityRenderHandler
-//
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::SetGameEntityRenderHandler ( GameEntityRenderHandler * pHandler )
-{
-    pGameEntityRenderHandler = pHandler;
 }
 
 
@@ -552,8 +297,4 @@ void CMultiplayerSA::InitHooks_RwResources ( void )
     EZHookInstall ( RwRasterDestroy );
     EZHookInstall ( RwGeometryCreate );
     EZHookInstall ( RwGeometryDestroy );
-    EZHookInstall ( CallIdle );
-    EZHookInstall ( CEntity_Render );
-    EZHookInstall ( CEntity_RenderOneNonRoad );
-    EZHookInstall ( CWeapon_GenerateDamageEvent );
 }

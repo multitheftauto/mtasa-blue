@@ -360,6 +360,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMultiplayerSA_Files.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CMultiplayerSA_FixBadAnimId.cpp"
 				>
 			</File>
@@ -372,7 +376,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMultiplayerSA_Rendering.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CMultiplayerSA_RwResources.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CMultiplayerSA_Weapons.cpp"
 				>
 			</File>
 			<File
