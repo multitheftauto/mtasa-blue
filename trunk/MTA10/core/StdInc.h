@@ -29,6 +29,10 @@
 #include <cstdlib>
 #include <iomanip>
 
+#define MTA_CLIENT
+#define SHARED_UTIL_WITH_FAST_HASH_MAP
+#include "SharedUtil.h"
+
 // SDK includes
 #include <xml/CXMLNode.h>
 #include <xml/CXMLFile.h>
@@ -41,8 +45,6 @@
 #include <game/CGame.h>
 
 // Core-level includes
-#define MTA_CLIENT
-#include "SharedUtil.h"
 #include "CrashHandler.h"
 #include "CCore.h"
 #include "CDebugView.h"

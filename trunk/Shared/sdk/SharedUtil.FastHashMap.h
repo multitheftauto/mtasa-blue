@@ -118,3 +118,18 @@ SString GetDeletedMapKey ( SString* )
 {
     return SStringX ( "\xFF\xFF" );
 }
+
+//
+// Default keys for pointers
+//
+template < class T >
+T* GetEmptyMapKey ( T** )
+{
+    return (T*)-1;
+}
+
+template < class T >
+T* GetDeletedMapKey ( T** )
+{
+    return (T*)-2;
+}
