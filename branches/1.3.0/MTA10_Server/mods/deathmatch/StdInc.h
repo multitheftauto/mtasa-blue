@@ -12,7 +12,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <pthread.h>
 
 #include <list>
@@ -22,9 +21,6 @@
 #include <vector>
 #include <ctime>
 #include <sstream>
-
-#include <google/dense_hash_map>
-#include <google/sparse_hash_map>
 
 // Forward declarations
 class CAclRightName;
@@ -42,6 +38,7 @@ struct SAclRequest;
 #include "CBox.h"
 #include "CMatrix.h"
 #include "CQuat.h"
+#define SHARED_UTIL_WITH_FAST_HASH_MAP
 #include "SharedUtil.h"
 #include "Enums.h"
 #include <bochs_internal/crc32.h>

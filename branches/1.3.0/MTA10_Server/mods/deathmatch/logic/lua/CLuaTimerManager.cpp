@@ -132,7 +132,8 @@ CLuaTimer* CLuaTimerManager::GetTimerFromScriptID ( uint uiScriptID )
     if ( !pLuaTimer )
         return NULL;
 
-    assert ( ListContains ( m_TimerList, pLuaTimer ) );
+    if ( !ListContains ( m_TimerList, pLuaTimer ) )
+        return NULL;
     return pLuaTimer;
 }
 

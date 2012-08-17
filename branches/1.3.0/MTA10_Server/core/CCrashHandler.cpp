@@ -38,14 +38,19 @@ void CCrashHandler::Init ( void )
 
 long WINAPI CCrashHandler::HandleExceptionGlobal ( _EXCEPTION_POINTERS* pException )
 {
-    // Write the dump, run error tool and end
-    DumpMiniDump ( pException );
+    // Create the exception information class
+    CExceptionInformation_Impl* pExceptionInformation = new CExceptionInformation_Impl;
+    pExceptionInformation->Set ( pException->ExceptionRecord->ExceptionCode, pException );
+
+    // Write the dump
+    DumpMiniDump ( pException, pExceptionInformation );
     RunErrorTool ();
+    TerminateProcess ( GetCurrentProcess (), 1 );
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
 
-void CCrashHandler::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
+void CCrashHandler::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation )
 {
     // Try to load the DLL in our directory
     HMODULE hDll = NULL;
@@ -81,17 +86,25 @@ void CCrashHandler::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
             // Create the dump directory
             CreateDirectory ( "dumps", 0 );
 
-            // Add a log entry.
-            char szFilename [256];
-            sprintf ( szFilename, "dumps/server_%s_%04d%02d%02d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG,
-                                                                               SystemTime.wYear,
-                                                                               SystemTime.wMonth,
-                                                                               SystemTime.wDay,
-                                                                               SystemTime.wHour,
-                                                                               SystemTime.wMinute );
+            SString strModuleName = pExceptionInformation->GetModuleBaseName ();
+            strModuleName = strModuleName.ReplaceI ( ".dll", "" ).Replace ( ".exe", "" ).Replace ( "_", "" ).Replace ( ".", "" ).Replace ( "-", "" );
+            if ( strModuleName.length () == 0 )
+                strModuleName = "unknown";
+
+            SString strFilename ( "dumps/server_%s_%s_%08x_%x_%04d%02d%02d_%02d%02d.dmp",
+                                         MTA_DM_BUILDTAG_LONG,
+                                         strModuleName.c_str (),
+                                         pExceptionInformation->GetAddressModuleOffset (),
+                                         pExceptionInformation->GetCode () & 0xffff,
+                                         SystemTime.wYear,
+                                         SystemTime.wMonth,
+                                         SystemTime.wDay,
+                                         SystemTime.wHour,
+                                         SystemTime.wMinute
+                                       );
 
             // Create the file
-            HANDLE hFile = CreateFile ( szFilename, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+            HANDLE hFile = CreateFile ( strFilename, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
             if ( hFile != INVALID_HANDLE_VALUE )
             {
                 // Create an exception information struct

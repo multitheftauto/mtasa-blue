@@ -22,8 +22,6 @@
 #include "CObjectSA.h"
 #include "CBuildingSA.h"
 
-#include <google/dense_hash_map>
-
 class CEntryInfoNodePoolSA : public CEntryInfoNodePool
 {
 public:

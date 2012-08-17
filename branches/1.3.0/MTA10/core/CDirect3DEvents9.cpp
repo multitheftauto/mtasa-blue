@@ -278,7 +278,7 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
         if ( pSurface )
         {
             if ( FAILED ( pSurface->Release () ) )
-                std::runtime_error ( "Failed to release the ScreenShot rendertaget surface" );
+                assert ( 0 && "Failed to release the ScreenShot rendertaget surface" );
             pSurface = NULL;
         }
     }

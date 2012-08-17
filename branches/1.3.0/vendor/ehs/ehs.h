@@ -52,7 +52,6 @@
 #include <windows.h>
 
 #include <time.h>
-#include <assert.h>
 
 // make stricmp sound like strcasecmp
 #define strcasecmp stricmp
@@ -86,7 +85,6 @@
 #include <typeinfo>
 
 // C headers
-#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <stdarg.h>
