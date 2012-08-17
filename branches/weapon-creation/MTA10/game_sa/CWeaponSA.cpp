@@ -241,7 +241,7 @@ unsigned char CWeaponSA::GenerateDamageEvent ( CPed * pPed, CEntity * pResponsib
     return ( unsigned char ) ucReturn;
 }
 
-bool CWeaponSA::FireBullet ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget, bool bAddMuzzle )
+bool CWeaponSA::FireBullet ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget, bool bAddMuzzle, CVector & vecRotation )
 {
     if ( !pFiringEntity )
     {
@@ -266,7 +266,7 @@ bool CWeaponSA::FireBullet ( CEntity* pFiringEntity, const CVector& vecOrigin, c
     case WEAPONTYPE_MINIGUN:
         {
             // Don't hit shooter
-            pGame->GetWorld ()->IgnoreEntity ( pFiringEntity );
+            //pGame->GetWorld ()->IgnoreEntity ( pFiringEntity );
 
             // Do pre shot lag compensation
             CPlayerPed* pFiringPlayerPed = dynamic_cast < CPlayerPed* > ( pFiringEntity );
@@ -277,26 +277,27 @@ bool CWeaponSA::FireBullet ( CEntity* pFiringEntity, const CVector& vecOrigin, c
             float fSkill = 999.f;
             CWeaponStat* pCurrentWeaponInfo = pGame->GetWeaponStatManager ( )->GetWeaponStatsFromSkillLevel ( GetType (), fSkill );
             CVector vecGunMuzzle;
-
+            CVector vecOriginPos = vecOrigin;
+            CVector vecShotVector;
             if ( bAddMuzzle )
             {
-                vecGunMuzzle = *pCurrentWeaponInfo->GetFireOffset ();
+                //vecGunMuzzle = *pCurrentWeaponInfo->GetFireOffset ();
             }
             else
             {
-                vecGunMuzzle = *pCurrentWeaponInfo->GetFireOffset ();
+                vecGunMuzzle = vecRotation;
             }
             if ( pFiringPlayerPed )
                 pFiringPlayerPed->GetTransformedBonePosition ( BONE_RIGHTWRIST, &vecGunMuzzle );
 
             // Bullet trace
-            FireInstantHit ( pFiringEntity, &vecOrigin, &vecGunMuzzle, NULL, &vecTarget, NULL, true, false );
+            FireInstantHit ( pFiringEntity, &vecOriginPos, &vecGunMuzzle, NULL, &vecTarget, &vecOrigin, false, true );
 
             // Do post shot lag compensation reset & script events
             //if ( pGame->m_pPostWeaponFireHandler && pFiringPlayerPed )
             //    pGame->m_pPostWeaponFireHandler ();
 
-            pGame->GetWorld ()->IgnoreEntity ( NULL );
+            //pGame->GetWorld ()->IgnoreEntity ( NULL );
 
             return true;
         }

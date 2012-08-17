@@ -252,7 +252,7 @@ void CClientWeapon::Fire ( void )
             {
                 CVector vecFireOffset = *m_pWeaponInfo->GetFireOffset ();
                 RotateVector ( vecFireOffset, vecRotation );
-                vecOrigin += vecFireOffset;
+                //vecOrigin += vecFireOffset;
 
                 CVector vecDirection ( 1, 0, 0 );
                 vecDirection *= fDistance;
@@ -282,10 +282,22 @@ void CClientWeapon::Fire ( void )
                     g_pClientGame->PreWeaponFire( pOwnerPed );
             }
 
-            // Process
-            m_pMarker->SetPosition ( vecTarget );
-            FireInstantHit ( vecOrigin, vecTarget );
+            CVector vecTemp;
+            CVector vecFireOffset = *m_pWeaponInfo->GetFireOffset ();
+            RotateVector ( vecFireOffset, vecRotation );
+            vecTemp = vecFireOffset;
+            vecTemp += vecOrigin;
 
+            // Process
+            m_pMarker->SetPosition ( vecOrigin );
+            g_pMultiplayer->SetShotOrigin( vecOrigin );
+            CVector vecTemp2;
+            GetRotationDegrees(vecTemp2);
+            vecTemp2.fZ -= 84.6f;
+            SetRotationDegrees(vecTemp2);
+            FireInstantHit ( vecOrigin, vecTarget-vecOrigin, vecTemp );
+            vecTemp2.fZ += 84.6f;
+            SetRotationDegrees(vecTemp2);
             // Restore
             m_pWeaponInfo->SetDamagePerHit ( sDamage );
             m_pWeaponInfo->SetAccuracy ( fAccuracy );
@@ -303,7 +315,7 @@ void CClientWeapon::Fire ( void )
 }
 
 
-void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
+void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget, CVector & vecRotation )
 {
     CVector vecDirection = vecTarget - vecOrigin;
     vecDirection.Normalize ();
@@ -384,21 +396,18 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
     else
     {
         //if ( pAttachedTo ) pAttachedTo->WorldIgnore ( true );
-        if ( m_pWeapon->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pColEntity, m_weaponConfig.flags, &pBuildingResult, m_Type, &pEntity ) )
-        {
-            vecTarget = pColPoint->GetPosition ();
-        }
         //if ( pAttachedTo ) pAttachedTo->WorldIgnore ( false );
         // Fire instant hit is off by a few degrees
-        FireShotgun ( m_pObject, vecOrigin, vecTarget );
+        FireShotgun ( m_pObject, vecOrigin, vecTarget, vecRotation );
     }
-    pColPoint->Destroy ();
+    if ( pColPoint )
+        pColPoint->Destroy ();
 }
 
 
-void CClientWeapon::FireShotgun ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget )
+void CClientWeapon::FireShotgun ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget, CVector & vecRotation )
 {
-    m_pWeapon->FireBullet ( pFiringEntity, vecOrigin, vecTarget, false );
+    m_pWeapon->FireBullet ( pFiringEntity, vecOrigin, vecTarget, false, vecRotation );
 }
 
 void CClientWeapon::GetDirection ( CVector & vecDirection )
@@ -421,7 +430,7 @@ void CClientWeapon::SetDirection ( CVector & vecDirection )
     float length = vecTemp.Length ();
     vecTemp = CVector2D ( length, vecDirection.fZ );
     vecTemp.Normalize ();
-    vecRotation.fY = atan2 ( vecTemp.fX, vecTemp.fY ) - ConvertDegreesToRadians ( 90 );
+    vecRotation.fY = atan2 ( vecTemp.fX, vecTemp.fY )/* - ConvertDegreesToRadians ( 90 )*/;
     
     SetRotationRadians ( vecRotation );
 }

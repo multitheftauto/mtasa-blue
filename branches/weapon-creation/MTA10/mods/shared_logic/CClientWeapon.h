@@ -53,8 +53,8 @@ public:
     void                    Destroy                 ( void );
 
     void                    Fire                    ( void );
-    void                    FireInstantHit          ( CVector & vecOrigin, CVector & vecTarget );
-    void                    FireShotgun             ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget );
+    void                    FireInstantHit          ( CVector & vecOrigin, CVector & vecTarget, CVector & vecRotation );
+    void                    FireShotgun             ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget, CVector & vecRotation );
 
     void                    GetDirection            ( CVector & vecDirection );
     void                    SetDirection            ( CVector & vecDirection );
