@@ -23,7 +23,6 @@
 #include "CMapEventManager.h"
 #include "CCustomData.h"
 #include "CEvents.h"
-#include <assert.h>
 #include <list>
 #include <cstring>
 #include "CElementGroup.h"

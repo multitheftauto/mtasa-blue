@@ -24,8 +24,6 @@
 #ifndef __CSINGLETON_H
 #define __CSINGLETON_H
 
-#include <cassert>
-
 template <typename T> class CSingleton
 {
 protected:

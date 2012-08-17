@@ -19,7 +19,6 @@
 #include "CCrashHandler.h"
 #include "MTAPlatform.h"
 #include "ErrorCodes.h"
-#include <assert.h>
 #include <clocale>
 #include <cstdio>
 #include <signal.h>

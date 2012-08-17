@@ -10,8 +10,12 @@
 *
 *****************************************************************************/
 
+#pragma push_macro("assert")
+
 #include <google/dense_hash_map>
 using namespace google;
+
+#pragma pop_macro("assert")
 
 namespace SharedUtil
 {

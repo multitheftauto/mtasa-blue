@@ -5,7 +5,6 @@
 #include <windows.h>
 #include <string.h>
 #include <stdio.h>
-#include <assert.h>
 #include <mmsystem.h>
 #include <winsock.h>
 
@@ -23,6 +22,7 @@
 
 // SDK includes
 #define MTA_CLIENT
+#define SHARED_UTIL_WITH_FAST_HASH_MAP
 #include "SharedUtil.h"
 #include <core/CCoreInterface.h>
 #include <core/CExceptionInformation.h>

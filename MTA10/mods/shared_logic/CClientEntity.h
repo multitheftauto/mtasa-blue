@@ -22,9 +22,6 @@ class CClientEntity;
 
 #include "CElementArray.h"
 #include "CClientCommon.h"
-#include <assert.h>
-#include <list>
-#include <google/dense_hash_map>
 #include <core/CClientEntityBase.h>
 class CLuaFunctionRef;
 
