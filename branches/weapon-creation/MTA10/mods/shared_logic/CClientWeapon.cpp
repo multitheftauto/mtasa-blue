@@ -290,7 +290,6 @@ void CClientWeapon::Fire ( void )
 
             // Process
             m_pMarker->SetPosition ( vecOrigin );
-            g_pMultiplayer->SetShotOrigin( vecOrigin );
             CVector vecTemp2;
             GetRotationDegrees(vecTemp2);
             vecTemp2.fZ -= 84.6f;
