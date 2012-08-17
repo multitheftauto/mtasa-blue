@@ -10,7 +10,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-#pragma once
+//#pragma once      Don't do this
 
 /*************************************************************************
 	Simplification of some 'unsigned' types
@@ -65,6 +65,7 @@ typedef float               FLOAT;      //  32
 #endif
 #if defined(SHARED_UTIL_WITH_FAST_HASH_MAP)
     #include "SharedUtil.FastHashMap.h"
+    #include "SharedUtil.FastHashSet.h"
 #endif
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.File.h"

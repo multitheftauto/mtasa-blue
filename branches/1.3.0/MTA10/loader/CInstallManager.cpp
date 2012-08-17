@@ -95,6 +95,7 @@ void CInstallManager::InitSequencer ( void )
                 CR " "                                              ////// Start of 'update game' //////
                 CR "            CALL MaybeSwitchToTempExe "         // If update files comes with an .exe, switch to that for the install
                 CR " "
+                CR "copy_files: "
                 CR "            CALL InstallFiles "                 // Try to install update files
                 CR "            IF LastResult == ok GOTO update_end: "
                 CR " "

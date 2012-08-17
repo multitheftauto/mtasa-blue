@@ -81,7 +81,7 @@ void CMatchChannelManager::InsertTexture ( STexInfo* pTexInfo )
         pTexNameInfo = MapFindRef ( m_AllTextureList, pTexInfo->strTextureName );
 
         // Insert into existing channels
-        for ( std::set < CMatchChannel* >::iterator iter = m_CreatedChannelList.begin () ; iter != m_CreatedChannelList.end () ; ++iter )
+        for ( CFastHashSet < CMatchChannel* >::iterator iter = m_CreatedChannelList.begin () ; iter != m_CreatedChannelList.end () ; ++iter )
         {
             CMatchChannel* pChannel = *iter;
             if ( pChannel->m_MatchChain.IsAdditiveMatch ( pTexNameInfo->strTextureName ) )
@@ -323,10 +323,10 @@ SShaderInfoLayers* CMatchChannelManager::GetShaderForTexAndEntity ( STexInfo* pT
 void CMatchChannelManager::CalcShaderForTexAndEntity ( SShaderInfoLayers& outShaderLayers, STexNameInfo* pTexNameInfo, CClientEntityBase* pClientEntity, int iEntityType, bool bSilent )
 {
     // Get match channels for this d3d data
-    const std::set < CMatchChannel* >& resultChannelList = pTexNameInfo->matchChannelList;
+    const CFastHashSet < CMatchChannel* >& resultChannelList = pTexNameInfo->matchChannelList;
 
     // In each channel, get the best shader that has the correct entity
-    for ( std::set < CMatchChannel* >::const_iterator iter = resultChannelList.begin () ; iter != resultChannelList.end () ; ++iter )
+    for ( CFastHashSet < CMatchChannel* >::const_iterator iter = resultChannelList.begin () ; iter != resultChannelList.end () ; ++iter )
     {
         CMatchChannel* pChannel = *iter;
         pChannel->GetBestShaderForEntity ( pClientEntity, iEntityType, outShaderLayers );
@@ -357,7 +357,7 @@ void CMatchChannelManager::RemoveClientEntityRefs ( CClientEntityBase* pClientEn
 
     OutputDebug ( SString ( "RemoveClientEntityRefs - Entity:%s", GetDebugTag ( pClientEntity ) ) );
 
-    std::set < CMatchChannel* > affectedChannels;
+    CFastHashSet < CMatchChannel* > affectedChannels;
     for ( std::map < CShaderAndEntityPair, CMatchChannel* >::iterator iter = m_ChannelUsageMap.begin () ; iter != m_ChannelUsageMap.end () ; )
     {
         if ( pClientEntity == iter->first.pClientEntity )
@@ -373,10 +373,10 @@ void CMatchChannelManager::RemoveClientEntityRefs ( CClientEntityBase* pClientEn
     }
 
     // Flag affected textures to re-calc shader results
-    for ( std::set < CMatchChannel* >::iterator iter = affectedChannels.begin () ; iter != affectedChannels.end () ; ++iter )
+    for ( CFastHashSet < CMatchChannel* >::iterator iter = affectedChannels.begin () ; iter != affectedChannels.end () ; ++iter )
     {
         CMatchChannel* pChannel = *iter;
-        for ( std::set < STexNameInfo* >::iterator iter = pChannel->m_MatchedTextureList.begin () ; iter != pChannel->m_MatchedTextureList.end () ; ++iter )
+        for ( CFastHashSet < STexNameInfo* >::iterator iter = pChannel->m_MatchedTextureList.begin () ; iter != pChannel->m_MatchedTextureList.end () ; ++iter )
             (*iter)->ResetReplacementResults ();
 
         // Also delete channel if is not refed anymore
@@ -392,10 +392,10 @@ void CMatchChannelManager::RemoveClientEntityRefs ( CClientEntityBase* pClientEn
     }
 
 #ifdef SHADER_DEBUG_CHECKS
-    for ( std::set < CMatchChannel* >::const_iterator iter = m_CreatedChannelList.begin () ; iter != m_CreatedChannelList.end () ; ++iter )
+    for ( CFastHashSet < CMatchChannel* >::const_iterator iter = m_CreatedChannelList.begin () ; iter != m_CreatedChannelList.end () ; ++iter )
     {
         CMatchChannel* pChannel = *iter;
-        for ( std::set < CShaderAndEntityPair >::const_iterator iter = pChannel->m_ShaderAndEntityList.begin () ; iter != pChannel->m_ShaderAndEntityList.end () ; ++iter )
+        for ( CFastHashSet < CShaderAndEntityPair >::const_iterator iter = pChannel->m_ShaderAndEntityList.begin () ; iter != pChannel->m_ShaderAndEntityList.end () ; ++iter )
         {
             assert ( pClientEntity != iter->pClientEntity );
         }
@@ -419,7 +419,7 @@ void CMatchChannelManager::RemoveShaderRefs ( CSHADERDUMMY* pShaderData )
 
     OutputDebug ( SString ( "RemoveShaderRefs - Shader:%s", GetDebugTag ( pShaderInfo ) ) );
 
-    std::set < CMatchChannel* > affectedChannels;
+    CFastHashSet < CMatchChannel* > affectedChannels;
     for ( std::map < CShaderAndEntityPair, CMatchChannel* >::iterator iter = m_ChannelUsageMap.begin () ; iter != m_ChannelUsageMap.end () ; )
     {
         if ( pShaderInfo == iter->first.pShaderInfo )
@@ -435,10 +435,10 @@ void CMatchChannelManager::RemoveShaderRefs ( CSHADERDUMMY* pShaderData )
     }
 
     // Flag affected textures to re-calc shader matches
-    for ( std::set < CMatchChannel* >::iterator iter = affectedChannels.begin () ; iter != affectedChannels.end () ; ++iter )
+    for ( CFastHashSet < CMatchChannel* >::iterator iter = affectedChannels.begin () ; iter != affectedChannels.end () ; ++iter )
     {
         CMatchChannel* pChannel = *iter;
-        for ( std::set < STexNameInfo* >::iterator iter = pChannel->m_MatchedTextureList.begin () ; iter != pChannel->m_MatchedTextureList.end () ; ++iter )
+        for ( CFastHashSet < STexNameInfo* >::iterator iter = pChannel->m_MatchedTextureList.begin () ; iter != pChannel->m_MatchedTextureList.end () ; ++iter )
             (*iter)->ResetReplacementResults ();
 
         // Also delete channel if is not refed anymore
@@ -452,7 +452,7 @@ void CMatchChannelManager::RemoveShaderRefs ( CSHADERDUMMY* pShaderData )
     for ( CFastHashMap < SString, STexNameInfo* >::const_iterator iter = m_AllTextureList.begin () ; iter != m_AllTextureList.end () ; ++iter )
     {
         STexNameInfo* pTexNameInfo = iter->second;
-        for ( std::map < CClientEntityBase*, STexShaderReplacement >::const_iterator iter = pTexNameInfo->texEntityShaderMap.begin () ; iter != pTexNameInfo->texEntityShaderMap.end () ; ++iter )
+        for ( CFastHashMap < CClientEntityBase*, STexShaderReplacement >::const_iterator iter = pTexNameInfo->texEntityShaderMap.begin () ; iter != pTexNameInfo->texEntityShaderMap.end () ; ++iter )
         {
             assert ( iter->second.shaderLayers.pBase.pShaderInfo != pShaderInfo );
             for ( uint i = 0 ; i < iter->second.shaderLayers.layerList.size () ; i++ )
@@ -470,10 +470,10 @@ void CMatchChannelManager::RemoveShaderRefs ( CSHADERDUMMY* pShaderData )
 #endif
 
 #ifdef SHADER_DEBUG_CHECKS
-    for ( std::set < CMatchChannel* >::const_iterator iter = m_CreatedChannelList.begin () ; iter != m_CreatedChannelList.end () ; ++iter )
+    for ( CFastHashSet < CMatchChannel* >::const_iterator iter = m_CreatedChannelList.begin () ; iter != m_CreatedChannelList.end () ; ++iter )
     {
         CMatchChannel* pChannel = *iter;
-        for ( std::set < CShaderAndEntityPair >::const_iterator iter = pChannel->m_ShaderAndEntityList.begin () ; iter != pChannel->m_ShaderAndEntityList.end () ; ++iter )
+        for ( CFastHashSet < CShaderAndEntityPair >::const_iterator iter = pChannel->m_ShaderAndEntityList.begin () ; iter != pChannel->m_ShaderAndEntityList.end () ; ++iter )
         {
             assert ( pShaderInfo != iter->pShaderInfo );
         }
@@ -546,8 +546,8 @@ void CMatchChannelManager::RecalcEverything ( void )
 {
     OutputDebug ( SString ( "RecalcEverything - %d channels", m_CreatedChannelList.size () ) );
 
-    std::set < CMatchChannel* > cloneList = m_CreatedChannelList;
-    for ( std::set < CMatchChannel* >::iterator iter = cloneList.begin () ; iter != cloneList.end () ; ++iter )
+    CFastHashSet < CMatchChannel* > cloneList = m_CreatedChannelList;
+    for ( CFastHashSet < CMatchChannel* >::iterator iter = cloneList.begin () ; iter != cloneList.end () ; ++iter )
     {
         CMatchChannel* pChannel = *iter;
         if ( pChannel->GetMatchChain ().matchTypeList.empty () )
@@ -571,21 +571,21 @@ void CMatchChannelManager::RecalcEverything ( void )
             {
                 // Force textures to find rematches
                 pChannel->m_bResetReplacements = false;
-                for ( std::set < STexNameInfo* >::iterator iter = pChannel->m_MatchedTextureList.begin () ; iter != pChannel->m_MatchedTextureList.end () ; ++iter )
+                for ( CFastHashSet < STexNameInfo* >::iterator iter = pChannel->m_MatchedTextureList.begin () ; iter != pChannel->m_MatchedTextureList.end () ; ++iter )
                     (*iter)->ResetReplacementResults ();
             }
         }
     }
 
     // Remove ClientEntitys with no matches
-    std::set < CClientEntityBase* > removeList = m_KnownClientEntities;
+    CFastHashSet < CClientEntityBase* > removeList = m_KnownClientEntities;
     for ( std::map < CShaderAndEntityPair, CMatchChannel* >::iterator iter = m_ChannelUsageMap.begin () ; iter != m_ChannelUsageMap.end () ; ++iter )
     {
         if ( iter->first.pClientEntity )
             MapRemove ( removeList, iter->first.pClientEntity );
     }
 
-    for ( std::set < CClientEntityBase* >::iterator iter = removeList.begin () ; iter != removeList.end () ; ++iter )
+    for ( CFastHashSet < CClientEntityBase* >::iterator iter = removeList.begin () ; iter != removeList.end () ; ++iter )
     {
         // This call could be optimized as the entity won't be present in some maps
         RemoveClientEntityRefs ( *iter );
@@ -604,11 +604,11 @@ void CMatchChannelManager::ProcessRematchTexturesQueue ( void )
 {
     OutputDebug ( SString ( "ProcessRematchTexturesQueue - %d items (%d textures)", m_RematchQueue.size (), m_AllTextureList.size () ) );
 
-    std::set < CMatchChannel* > rematchQueue = m_RematchQueue;
+    CFastHashSet < CMatchChannel* > rematchQueue = m_RematchQueue;
     m_RematchQueue.clear ();
 
     // For each queued channel
-    for ( std::set < CMatchChannel* >::iterator iter = rematchQueue.begin () ; iter != rematchQueue.end () ; ++iter )
+    for ( CFastHashSet < CMatchChannel* >::iterator iter = rematchQueue.begin () ; iter != rematchQueue.end () ; ++iter )
     {
         CMatchChannel* pChannel = *iter;
         pChannel->m_bResetReplacements = true;
@@ -616,8 +616,8 @@ void CMatchChannelManager::ProcessRematchTexturesQueue ( void )
         OutputDebug ( SString ( "    [ProcessRematchTexturesQueue] - Channel:%s", GetDebugTag ( pChannel ) ) );
 
         // Remove existing matches
-        std::set < STexNameInfo* > matchedTextureList = pChannel->m_MatchedTextureList;
-        for ( std::set < STexNameInfo* >::iterator iter = matchedTextureList.begin () ; iter != matchedTextureList.end () ; ++iter )
+        CFastHashSet < STexNameInfo* > matchedTextureList = pChannel->m_MatchedTextureList;
+        for ( CFastHashSet < STexNameInfo* >::iterator iter = matchedTextureList.begin () ; iter != matchedTextureList.end () ; ++iter )
         {
             STexNameInfo* pTexNameInfo = *iter;
             pChannel->RemoveTexture ( pTexNameInfo );
@@ -650,9 +650,9 @@ void CMatchChannelManager::ProcessOptimizeChannelsQueue ( void )
 {
     OutputDebug ( SString ( "ProcessOptimizeChannelsQueue - %d items", m_OptimizeQueue.size () ) );
 
-    std::set < CMatchChannel* > updateQueue = m_OptimizeQueue;
+    CFastHashSet < CMatchChannel* > updateQueue = m_OptimizeQueue;
     m_OptimizeQueue.clear ();
-    for ( std::set < CMatchChannel* >::iterator iter = updateQueue.begin () ; iter != updateQueue.end () ; ++iter )
+    for ( CFastHashSet < CMatchChannel* >::iterator iter = updateQueue.begin () ; iter != updateQueue.end () ; ++iter )
     {
         CMatchChannel* pChannel = *iter;
 
@@ -702,7 +702,7 @@ void CMatchChannelManager::MergeChannelTo ( CMatchChannel* pSource, CMatchChanne
 //////////////////////////////////////////////////////////////////
 CMatchChannel* CMatchChannelManager::FindChannelWithMatchChain ( const SWildcardMatchChain& matchChain, CMatchChannel* pExcluding )
 {
-    for ( std::set < CMatchChannel* >::iterator iter = m_CreatedChannelList.begin () ; iter != m_CreatedChannelList.end () ; ++iter )
+    for ( CFastHashSet < CMatchChannel* >::iterator iter = m_CreatedChannelList.begin () ; iter != m_CreatedChannelList.end () ; ++iter )
     {
         CMatchChannel* pTarget = *iter;
         if ( pTarget != pExcluding && matchChain == pTarget->GetMatchChain () )
@@ -831,8 +831,8 @@ void CMatchChannelManager::DeleteChannel ( CMatchChannel* pChannel )
 {
     OutputDebug ( SString ( "    DeleteChannel - Channel:%s", GetDebugTag ( pChannel ) ) );
 
-    std::set < STexNameInfo* > matchedTextureList = pChannel->m_MatchedTextureList;
-    for ( std::set < STexNameInfo* >::iterator iter = matchedTextureList.begin () ; iter != matchedTextureList.end () ; ++iter )
+    CFastHashSet < STexNameInfo* > matchedTextureList = pChannel->m_MatchedTextureList;
+    for ( CFastHashSet < STexNameInfo* >::iterator iter = matchedTextureList.begin () ; iter != matchedTextureList.end () ; ++iter )
     {
         STexNameInfo* pTexNameInfo = *iter;
         pChannel->RemoveTexture ( pTexNameInfo );
@@ -843,7 +843,7 @@ void CMatchChannelManager::DeleteChannel ( CMatchChannel* pChannel )
     }
 
 #ifdef SHADER_DEBUG_CHECKS
-    for ( std::map < CShaderAndEntityPair, CMatchChannel* >::iterator iter = m_ChannelUsageMap.begin () ; iter != m_ChannelUsageMap.end () ; ++iter )
+    for ( CFastHashMap < CShaderAndEntityPair, CMatchChannel* >::iterator iter = m_ChannelUsageMap.begin () ; iter != m_ChannelUsageMap.end () ; ++iter )
         assert ( pChannel != iter->second );
 #endif
     MapRemove ( m_OptimizeQueue, pChannel );
@@ -904,7 +904,7 @@ void CMatchChannelManager::GetShaderReplacementStats ( SShaderReplacementStats& 
     outStats.uiTotalEntitesRefed = m_KnownClientEntities.size ();
     outStats.channelStatsList.clear ();
 
-    for ( std::set < CMatchChannel* >::iterator iter = m_CreatedChannelList.begin () ; iter != m_CreatedChannelList.end () ; ++iter )
+    for ( CFastHashSet < CMatchChannel* >::iterator iter = m_CreatedChannelList.begin () ; iter != m_CreatedChannelList.end () ; ++iter )
     {
         CMatchChannel* pChannel = *iter;
         SMatchChannelStats channelStats;
@@ -943,8 +943,8 @@ void CMatchChannelManager::GetShaderReplacementStats ( SShaderReplacementStats& 
 
 #ifdef SHADER_DEBUG_OUTPUT
 
-std::map < CClientEntityBase*, int > entityIdMap;
-std::map < SShaderInfo*, int > shaderInfoIdMap;
+CFastHashMap < CClientEntityBase*, int > entityIdMap;
+CFastHashMap < SShaderInfo*, int > shaderInfoIdMap;
 
 int GetEntityId ( CClientEntityBase* pClientEntity )
 {

@@ -261,7 +261,7 @@ public:
     }
 
     SWildcardMatchChain                     m_MatchChain;               // String matches this channel represents
-    std::set < STexNameInfo* >              m_MatchedTextureList;       // All textures whose name matches the match chain
+    CFastHashSet < STexNameInfo* >          m_MatchedTextureList;       // All textures whose name matches the match chain
     std::set < CShaderAndEntityPair >       m_ShaderAndEntityList;
     bool                                    m_bResetReplacements;       // Flag to indicate texture replacements should be reset
     uint                                    m_uiId;
@@ -309,12 +309,12 @@ protected:
     void                UpdateTexShaderReplacementNoEntity  ( STexNameInfo* pTexNameInfo, STexShaderReplacement& texNoEntityShader, int iEntityType );
     void                FinalizeLayers                  ( SShaderInfoLayers& shaderLayers );
 
-    bool                                                m_bChangesPending;
-    std::map < CShaderAndEntityPair, CMatchChannel* >   m_ChannelUsageMap;
-    std::set < CMatchChannel* >                         m_CreatedChannelList;
-    std::set < CMatchChannel* >                         m_OptimizeQueue;
-    std::set < CMatchChannel* >                         m_RematchQueue;
-    CFastHashMap < SString, STexNameInfo* >             m_AllTextureList;
-    std::map < CSHADERDUMMY*, SShaderInfo* >            m_ShaderInfoMap;
-    std::set < CClientEntityBase* >                     m_KnownClientEntities;
+    bool                                                    m_bChangesPending;
+    std::map < CShaderAndEntityPair, CMatchChannel* >       m_ChannelUsageMap;
+    CFastHashSet < CMatchChannel* >                         m_CreatedChannelList;
+    CFastHashSet < CMatchChannel* >                         m_OptimizeQueue;
+    CFastHashSet < CMatchChannel* >                         m_RematchQueue;
+    CFastHashMap < SString, STexNameInfo* >                 m_AllTextureList;
+    CFastHashMap < CSHADERDUMMY*, SShaderInfo* >            m_ShaderInfoMap;
+    CFastHashSet < CClientEntityBase* >                     m_KnownClientEntities;
 };

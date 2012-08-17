@@ -25,6 +25,7 @@ This can be found in the 'COPYING' file.
 
 #include "ehs.h"
 #include <fstream>
+#include <assert.h>
 
 long long ms_HttpTotalBytesSent = 0;
 
