@@ -2,8 +2,6 @@
 #ifndef EHSTYPES_H
 #define EHSTYPES_H
 
-#include "SharedUtil.h"
-
 #include <string>
 #include <map>
 #include <list>

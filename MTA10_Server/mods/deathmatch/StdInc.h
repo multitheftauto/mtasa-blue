@@ -28,6 +28,8 @@ struct SAclRequest;
 
 // SDK includes
 #include "MTAPlatform.h"
+#define SHARED_UTIL_WITH_FAST_HASH_MAP
+#include "SharedUtil.h"
 #include <xml/CXML.h>
 #include <xml/CXMLNode.h>
 #include <xml/CXMLFile.h>
@@ -38,8 +40,6 @@ struct SAclRequest;
 #include "CBox.h"
 #include "CMatrix.h"
 #include "CQuat.h"
-#define SHARED_UTIL_WITH_FAST_HASH_MAP
-#include "SharedUtil.h"
 #include "Enums.h"
 #include <bochs_internal/crc32.h>
 #include "CChecksum.h"

@@ -204,12 +204,12 @@ struct STexNameInfo
         return texNoEntityShaders[ idx ];
     }
 
-    const SString                                       strTextureName;         // Always lower case
-    std::set < STexInfo* >                              usedByTexInfoList;
+    const SString                                               strTextureName;         // Always lower case
+    CFastHashSet < STexInfo* >                                  usedByTexInfoList;
 
-    std::set < CMatchChannel* >                             matchChannelList;
-    STexShaderReplacement                                   texNoEntityShaders[5];   // 0 - world  1-ped  2-vehicle  3-object  4-other
-    std::map < CClientEntityBase*, STexShaderReplacement >  texEntityShaderMap;
+    CFastHashSet < CMatchChannel* >                             matchChannelList;
+    STexShaderReplacement                                       texNoEntityShaders[5];   // 0 - world  1-ped  2-vehicle  3-object  4-other
+    CFastHashMap < CClientEntityBase*, STexShaderReplacement >  texEntityShaderMap;
 
 #ifdef SHADER_DEBUG_CHECKS
     int iDebugCounter1;
