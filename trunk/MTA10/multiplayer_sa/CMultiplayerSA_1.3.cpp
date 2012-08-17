@@ -143,6 +143,9 @@ void CMultiplayerSA::InitHooks_13 ( void )
     InitHooks_HookDestructors ();
     InitHooks_RwResources ();
     InitHooks_ClothesCache ();
+    InitHooks_Files ();
+    InitHooks_Weapons ();
+    InitHooks_Rendering ();
 }
 
 void CMultiplayerSA::InitMemoryCopies_13 ( void )

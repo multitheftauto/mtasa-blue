@@ -1762,3 +1762,25 @@ void MaybeShowCopySettingsDialog ( void )
     if ( IsDirectoryEmpty( strCurrentResourcesDir ) && DirectoryExists( strPreviousResourcesDir ) )
         DirectoryCopy ( strPreviousResourcesDir, strCurrentResourcesDir, true, 100 );
 }
+
+
+//////////////////////////////////////////////////////////
+//
+// CheckAndShowFileOpenFailureMessage
+//
+// Returns true if message was displayed
+//
+//////////////////////////////////////////////////////////
+bool CheckAndShowFileOpenFailureMessage ( void )
+{
+    SString strFilename = GetApplicationSetting ( "diagnostics", "gta-fopen-fail" );
+
+    if ( !strFilename.empty () )
+    {
+        //SetApplicationSetting ( "diagnostics", "gta-fopen-fail", "" );
+        SString strMsg ( "GTA:SA had trouble opening the file '%s'\n\nTry reinstalling GTA:SA to fix it", *strFilename );
+        MessageBox ( NULL, strMsg, "MTA: San Andreas", MB_OK | MB_ICONERROR );
+        return true;
+    }
+    return false;
+}
