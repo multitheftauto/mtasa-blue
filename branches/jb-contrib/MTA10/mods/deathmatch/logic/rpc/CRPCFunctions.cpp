@@ -159,7 +159,7 @@ void CRPCFunctions::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInterf
             {
 #ifdef MTA_DEBUG
                 SString strMessage ( "CRPCFunctions::ProcessPacket - FIXME (%s)", *pElementHandler->strName );
-                OutputDebugLine ( SStringX ( "[RPC] " ) + strMessage );
+                OutputDebugLine ( SString ( "[RPC] %s", strMessage.c_str() ) );
                 CLogger::ErrorPrintf ( "%s", *strMessage );
 #endif
                 return;

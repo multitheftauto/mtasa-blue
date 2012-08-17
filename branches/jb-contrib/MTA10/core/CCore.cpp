@@ -830,7 +830,7 @@ T* InitModule ( CModuleLoader& m_Loader, const SString& strName, const SString& 
 
     if ( pfnInit == NULL )
     {
-        MessageBox ( 0, strName + " module is incorrect!", "Error", MB_OK | MB_ICONEXCLAMATION );
+        MessageBox ( 0, SString("%s module is incorrect!", strName.c_str()) , "Error", MB_OK | MB_ICONEXCLAMATION );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
 

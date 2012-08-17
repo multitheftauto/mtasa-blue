@@ -410,5 +410,5 @@ void CMapEventManager::AddInternal ( CMapEvent* pEvent )
             break;
     }
     // Do insert
-    m_EventsMap.insert ( iter, std::pair < SString, CMapEvent* > ( pEvent->GetName (), pEvent ) );
+    m_EventsMap.insert ( iter, std::pair < SString, CMapEvent* > ( SStringX(pEvent->GetName ()), pEvent ) );
 }

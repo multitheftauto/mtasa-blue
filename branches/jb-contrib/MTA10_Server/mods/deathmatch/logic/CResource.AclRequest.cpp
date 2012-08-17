@@ -189,7 +189,8 @@ bool CResource::HandleAclRequestListCommand ( bool bDetail )
             strOutput += SString( " [%s] for %s", *strStatus, *request.rightName.GetFullName () );
             if ( !request.bPending )
                 strOutput += SString ( " (by %s on %s)", *request.strWho , *request.strDate );
-            CLogger::LogPrintf ( strOutput + "\n" );
+            strOutput += "\n";
+            CLogger::LogPrintf ( strOutput );
         }
     }
 
@@ -198,7 +199,8 @@ bool CResource::HandleAclRequestListCommand ( bool bDetail )
         SString strOutput;
         strOutput += SString( "aclrequest: %s", GetName ().c_str () );
         strOutput += SString( " has %d aclrequest(s) of which %d are pending", uiNumTotal, uiNumPending );
-        CLogger::LogPrintf ( strOutput + "\n" );
+        strOutput += "\n";
+        CLogger::LogPrintf ( strOutput );
     }
 
     return uiNumTotal > 0;
@@ -262,7 +264,8 @@ bool CResource::HandleAclRequestChange ( const CAclRightName& rightName, bool bA
     SString strOutput;
     strOutput += SString( "aclrequest: %s", GetName ().c_str () );
     strOutput += SString( " %s changed to %s (%s)", *rightName.GetFullName (), bAccess ? "allow" : "deny", *strWho );
-    CLogger::LogPrintf ( strOutput + "\n" );
+    strOutput += "\n";
+    CLogger::LogPrintf ( strOutput );
     return true;
 }
 

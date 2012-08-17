@@ -505,7 +505,7 @@ void SharedUtil::AddReportLog ( uint uiId, const SString& strText )
     SString strMessage ( "%u: %s %s - %s\n", uiId, GetTimeString ( true, false ).c_str (), GetReportLogHeaderText ().c_str (), strText.c_str () );
     FileAppend ( strPathFilename, &strMessage.at ( 0 ), strMessage.length () );
 #if MTA_DEBUG
-    OutputDebugLine ( SStringX ( "[ReportLog] " ) + strMessage );
+    OutputDebugLine ( SString ( "[ReportLog] %s", strMessage.c_str() ) );
 #endif
 }
 

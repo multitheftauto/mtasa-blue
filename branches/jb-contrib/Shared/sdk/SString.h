@@ -74,7 +74,7 @@ public:
     }
 
     // Operators  
-    SString operator+( const char* other ) const
+    /*SString operator+( const char* other ) const
     {
         return std::string ( *this ) + other;
     }
@@ -82,7 +82,7 @@ public:
     {
         return std::string ( *this ) + other;
     }
-
+    */
     // Assignment  
     operator const char*() const    { return c_str (); }        // Auto assign to const char* without using c_str()
     const char* operator*( void ) const

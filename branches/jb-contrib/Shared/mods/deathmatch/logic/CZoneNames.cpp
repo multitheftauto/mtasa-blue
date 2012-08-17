@@ -417,7 +417,7 @@ CZoneNames::CZoneNames ( void )
 
     // Initialize city name map
     for ( uint i = 0 ; i < NUMELMS( cityNameList ) ; i++ )
-        MapInsert ( m_CityNameMap, cityNameList[i] );
+        MapInsert ( m_CityNameMap, SStringX(cityNameList[i]) );
 }
 
 

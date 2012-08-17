@@ -55,7 +55,11 @@ public:
     float   TargetX, TargetY;   // -1 ... 1 on screen
 };
 
-#pragma message("CPlayerPedDataSAInterface is wrong, needs redoing")
+/**
+ *  This structure has serious alignment issues, 
+ *      1. m_nStandStillTimer is actually at 32, not 30.
+ *      2. there is 8 bytes + 3 bits padding after 2nd bitfield
+ */
 class CPlayerPedDataSAInterface
 {
 public:
@@ -82,9 +86,9 @@ public:
     DWORD   bCanBeDamaged : 1;
     DWORD   bAllMeleeAttackPtsBlocked : 1;  // if all of m_pMeleeAttackers[] is blocked by collision, just attack straight ahead
     DWORD   m_JustBeenSnacking : 1;     // If this bit is true we have just bought something from a vending machine
-    DWORD   m_bRequireHandleBreath : 1; // 
-    
-    // The player runs a group. Player is the leader. Player can go up to gang-members and make them join his group.    
+    DWORD   m_bRequireHandleBreath : 1; //
+
+    // The player runs a group. Player is the leader. Player can go up to gang-members and make them join his group.
     DWORD   m_GroupStuffDisabled : 1;   // if this is true the player can't recrout or give his group commands.
     DWORD   m_GroupAlwaysFollow : 1;    // The group is told to always follow the player (used for girlfriend missions)
     DWORD   m_GroupNeverFollow : 1; // The group is told to always follow the player (used for girlfriend missions)
@@ -98,7 +102,7 @@ public:
     bool    m_bFadeDrunkenness;
     BYTE    m_nDrugLevel;
     BYTE    m_nScriptLimitToGangSize;
-    
+
     FLOAT   m_fBreath;  // for holding breath (ie underwater)
 
     // once a set of melee weapon anims have been loaded and referenced for the player
@@ -111,7 +115,7 @@ public:
     FLOAT   m_fLookPitch;
     FLOAT   m_fSkateBoardSpeed;
     FLOAT   m_fSkateBoardLean;
-    
+
     DWORD * m_pSpecialAtomic; // was rpAtomic
     FLOAT   m_fGunSpinSpeed;
     FLOAT   m_fGunSpinAngle;
@@ -119,14 +123,14 @@ public:
     DWORD   m_LastTimeFiring;
     DWORD   m_nTargetBone;
     CVector m_vecTargetBoneOffset;
-    
+
     DWORD   m_busFaresCollected;
     bool    m_bPlayerSprintDisabled;
     bool    m_bDontAllowWeaponChange;
     bool    m_bForceInteriorLighting;
     WORD    m_DPadDownPressedInMilliseconds;
     WORD    m_DPadUpPressedInMilliseconds;
-        
+
     BYTE    m_wetness;
     BYTE    m_playersGangActive;
     BYTE    m_waterCoverPerc;
@@ -135,18 +139,17 @@ public:
     // used for doing lock-on with HS missiles
     DWORD   m_FireHSMissilePressedTime;
     CEntitySAInterface * m_LastHSMissileTarget;
-    
+
     long    m_nModelIndexOfLastBuildingShot;
-    
+
     DWORD   m_LastHSMissileLOSTime  :31;
     DWORD   m_bLastHSMissileLOS     :1;
-    
+
     CPedSAInterface * m_pCurrentProstitutePed;
     CPedSAInterface * m_pLastProstituteShagged;
 
     DWORD padding; // we're missing something here - fixes a crash (ugly hack #4432525) - eAi
 };
-    
 
 class CPlayerInfoSAInterface
 {
