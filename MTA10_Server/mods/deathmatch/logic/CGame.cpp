@@ -3449,7 +3449,7 @@ void CGame::Packet_Voice_Data ( CVoiceDataPacket& Packet )
                         {
                             // Add element decendants
                             std::vector < CPlayer* > descendantList;
-                            pBroadcastElement->GetDescendantsByType ( descendantList, false, CElement::PLAYER );
+                            pBroadcastElement->GetDescendantsByType ( descendantList, EElementType::PLAYER );
                             for ( std::vector < CPlayer* >::const_iterator iter = descendantList.begin() ; iter != descendantList.end() ; ++iter )
                             {
                                 playerSendMap.insert ( *iter );
@@ -3514,7 +3514,7 @@ void CGame::Packet_Voice_End ( CVoiceEndPacket& Packet )
                 {
                     // Add element decendants
                     std::vector < CPlayer* > descendantList;
-                    pBroadcastElement->GetDescendantsByType ( descendantList, false, CElement::PLAYER );
+                    pBroadcastElement->GetDescendantsByType ( descendantList, EElementType::PLAYER );
                     for ( std::vector < CPlayer* >::const_iterator iter = descendantList.begin() ; iter != descendantList.end() ; ++iter )
                     {
                         playerSendMap.insert ( *iter );

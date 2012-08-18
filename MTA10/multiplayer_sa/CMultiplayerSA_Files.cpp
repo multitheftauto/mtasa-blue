@@ -31,7 +31,9 @@ void OnMY_Rtl_fopen_Post ( FILE* fh, DWORD calledFrom, const char* szFilename, c
                                     "sa-utrax.dat",
                                     "gta3.ini",
                                     "player.bmp",
-                                    "gta_sa.set"
+                                    "gta_sa.set",
+                                    "resources",
+                                    "Gallery",
                                 };
 
         for ( uint i = 0 ; i < NUMELMS ( ignoreList ) ; i++ )

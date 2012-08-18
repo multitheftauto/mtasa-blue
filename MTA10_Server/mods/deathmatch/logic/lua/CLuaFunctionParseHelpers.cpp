@@ -180,6 +180,31 @@ IMPLEMENT_ENUM_BEGIN( CAccessControlListRight::ERightType )
     ADD_ENUM ( CAccessControlListRight::RIGHT_TYPE_GENERAL,      "general" )
 IMPLEMENT_ENUM_END( "right-type" )
 
+IMPLEMENT_ENUM_BEGIN( CElement::EElementType )
+    ADD_ENUM( CElement::DUMMY,                  "dummy" )
+    ADD_ENUM( CElement::PLAYER,                 "player" )
+    ADD_ENUM( CElement::VEHICLE,                "vehicle" )
+    ADD_ENUM( CElement::OBJECT,                 "object" )
+    ADD_ENUM( CElement::MARKER,                 "marker" )
+    ADD_ENUM( CElement::BLIP,                   "blip" )
+    ADD_ENUM( CElement::PICKUP,                 "pickup" )
+    ADD_ENUM( CElement::RADAR_AREA,             "radararea" )
+    ADD_ENUM( CElement::SPAWNPOINT_DEPRECATED,  "spawnpoint_deprecated" )
+    ADD_ENUM( CElement::REMOTECLIENT_DEPRECATED,"remoteclient_deprecated" )
+    ADD_ENUM( CElement::CONSOLE,                "console" )
+    ADD_ENUM( CElement::PATH_NODE_UNUSED,       "pathnode_unused" )
+    ADD_ENUM( CElement::WORLD_MESH_UNUSED,      "worldmesh_unused" )
+    ADD_ENUM( CElement::TEAM,                   "team" )
+    ADD_ENUM( CElement::PED,                    "ped" )
+    ADD_ENUM( CElement::COLSHAPE,               "colshape" )
+    ADD_ENUM( CElement::SCRIPTFILE,             "scriptfile" )
+    ADD_ENUM( CElement::WATER,                  "water" )
+    ADD_ENUM( CElement::DATABASE_CONNECTION,    "db-connection" )
+    ADD_ENUM( CElement::ROOT,                   "root" )
+    ADD_ENUM( CElement::UNKNOWN,                "unknown" )
+IMPLEMENT_ENUM_END_DEFAULTS( "element-type", CElement::UNKNOWN, "unknown" )
+
+
 
 //
 // Get best guess at name of userdata type
