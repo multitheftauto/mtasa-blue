@@ -130,11 +130,13 @@ int CLuaElementDefs::createElement ( lua_State* luaVM )
                     lua_pushelement ( luaVM, pDummy );
                     return 1;
                 }
+                argStream.SetCustomError ( SString ( "element type '%s' cannot be used", *strTypeName ) );
             }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createElement", *argStream.GetErrorMessage () ) );
+
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;

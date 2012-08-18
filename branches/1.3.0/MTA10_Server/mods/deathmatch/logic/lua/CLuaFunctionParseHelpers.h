@@ -21,6 +21,7 @@ DECLARE_ENUM( eWeaponType )
 DECLARE_ENUM( eWeaponProperty )
 DECLARE_ENUM( eWeaponSkill )
 DECLARE_ENUM( CAccessControlListRight::ERightType );
+DECLARE_ENUM( CElement::EElementType );
 
 enum eHudComponent
 {

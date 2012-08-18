@@ -182,18 +182,21 @@ bool CResourceMapItem::HandleNode ( CXMLNode& Node, CElement* pParent, vector < 
     std::string strBuffer;
     strBuffer = Node.GetTagName ();
 
+    EElementType elementType;
+    StringToEnum ( strBuffer, elementType );
+
     // Handle it based on the tag name
     CElement* pNode = NULL;
-    if ( strBuffer.compare ( "vehicle" ) == 0 )
+    if ( elementType == CElement::VEHICLE )
     {
         pNode = m_pVehicleManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
     }
-    else if ( strBuffer.compare ( "object" ) == 0 )
+    else if ( elementType == CElement::OBJECT )
     {
         bool bIsLowLod = false;
         pNode = m_pObjectManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents, bIsLowLod );
     }
-    else if ( strBuffer.compare ( "blip" ) == 0 )
+    else if ( elementType == CElement::BLIP )
     {
         CBlip* pBlip = m_pBlipManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
         pNode = pBlip;
@@ -204,11 +207,11 @@ bool CResourceMapItem::HandleNode ( CXMLNode& Node, CElement* pParent, vector < 
         }
         */
     }
-    else if ( strBuffer.compare ( "pickup" ) == 0 )
+    else if ( elementType == CElement::PICKUP )
     {
         pNode = m_pPickupManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
     }
-    else if ( strBuffer.compare ( "marker" ) == 0 )
+    else if ( elementType == CElement::MARKER )
     {
         CMarker* pMarker = m_pMarkerManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
         pNode = pMarker;
@@ -219,7 +222,7 @@ bool CResourceMapItem::HandleNode ( CXMLNode& Node, CElement* pParent, vector < 
         }
         */
     }
-    else if ( strBuffer.compare ( "radararea" ) == 0 )
+    else if ( elementType == CElement::RADAR_AREA )
     {
         CRadarArea* pRadarArea = m_pRadarAreaManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
         pNode = pRadarArea;
@@ -230,15 +233,15 @@ bool CResourceMapItem::HandleNode ( CXMLNode& Node, CElement* pParent, vector < 
         }
         */
     }
-    else if ( strBuffer.compare ( "team" ) == 0 )
+    else if ( elementType == CElement::TEAM )
     {
         pNode = m_pTeamManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
     }
-    else if ( strBuffer.compare ( "ped" ) == 0 )
+    else if ( elementType == CElement::PED )
     {
         pNode = m_pPedManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
     }
-    else if ( strBuffer.compare ( "water" ) == 0 )
+    else if ( elementType == CElement::WATER )
     {
         pNode = m_pWaterManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
     }

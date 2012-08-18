@@ -896,18 +896,21 @@ bool CMapManager::HandleNode ( CResource& Loader, CXMLNode& Node, CElement* pPar
     // Grab the name
     std::string strBuffer = Node.GetTagName ();
 
+    EElementType elementType;
+    StringToEnum ( strBuffer, elementType );
+
     // Handle it based on the tag name
     CElement* pNode = NULL;
-    if ( strBuffer.compare ( "vehicle" ) == 0 )
+    if ( elementType == CElement::VEHICLE )
     {
         pNode = m_pVehicleManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
     }
-    else if ( strBuffer.compare ( "object" ) == 0 )
+    else if ( elementType == CElement::OBJECT )
     {
         bool bIsLowLod = false;
         pNode = m_pObjectManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents, bIsLowLod );
     }
-    else if ( strBuffer.compare ( "blip" ) == 0 )
+    else if ( elementType == CElement::BLIP )
     {
         CBlip* pBlip = m_pBlipManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
         pNode = pBlip;
@@ -916,11 +919,11 @@ bool CMapManager::HandleNode ( CResource& Loader, CXMLNode& Node, CElement* pPar
             pBlip->SetIsSynced ( bIsDuringStart );
         }*/
     }
-    else if ( strBuffer.compare ( "pickup" ) == 0 )
+    else if ( elementType == CElement::PICKUP )
     {
         pNode = m_pPickupManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
     }
-    else if ( strBuffer.compare ( "marker" ) == 0 )
+    else if ( elementType == CElement::MARKER )
     {
         CMarker* pMarker = m_pMarkerManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
         pNode = pMarker;
@@ -929,7 +932,7 @@ bool CMapManager::HandleNode ( CResource& Loader, CXMLNode& Node, CElement* pPar
             pMarker->SetIsSynced ( bIsDuringStart );
         }
     }
-    else if ( strBuffer.compare ( "radararea" ) == 0 )
+    else if ( elementType == CElement::RADAR_AREA )
     {
         CRadarArea* pRadarArea = m_pRadarAreaManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
         pNode = pRadarArea;
@@ -938,15 +941,15 @@ bool CMapManager::HandleNode ( CResource& Loader, CXMLNode& Node, CElement* pPar
             pRadarArea->SetIsSynced ( bIsDuringStart );
         }
     }
-    else if ( strBuffer.compare ( "team" ) == 0 )
+    else if ( elementType == CElement::TEAM )
     {
         pNode = m_pTeamManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
     }
-    else if ( strBuffer.compare ( "ped" ) == 0 )
+    else if ( elementType == CElement::PED )
     {
         pNode = m_pPedManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
     }
-    else if ( strBuffer.compare ( "water" ) == 0 )
+    else if ( elementType == CElement::WATER )
     {
         pNode = m_pWaterManager->CreateFromXML ( pParent, Node, Loader.GetVirtualMachine (), m_pEvents );
     }
