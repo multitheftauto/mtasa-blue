@@ -16,28 +16,44 @@
 
 #include <game/CHandlingEntry.h>
 #include "Common.h"
+
+// void CTransmission::ChangeGearAccordingToSpeed(CTransmission* this, float fSpeed, uint8* ucCurrentGear)
+#define FUNC_CTransmission__ChangeGearAccordingToSpeed                  0x6D0530
+#define FUNC_CTransmission__ProcessControls                             0x6D05E0
+#define FUNC_CTransmission__ProcessData                                 0x6D0460
+
 #define FUNC_HandlingDataMgr_ConvertBikeDataToGameUnits 0x6F5290
 #define FUNC_HandlingDataMgr_ConvertDataToGameUnits 0x6F5080
 // http://www.gtamodding.com/index.php?title=Handling.cfg#GTA_San_Andreas
 // http://www.gtamodding.com/index.php?title=Memory_Addresses_%28SA%29#Handling
 
+class CTransmissionGearSAInterface
+{
+public:
+    float fMaxVelocity;
+    float fChangeUpVelocity;
+    float fChangeDownVelocity;
+};
+
 class CTransmissionSAInterface
 {
 public:
-    float           fUnknown  [18];                 // +40
+    CTransmissionGearSAInterface gears[6];            // +40
 
-    unsigned char   ucDriveType         :8;         // +112
-    unsigned char   ucEngineType        :8;         // +113
-    unsigned char   ucNumberOfGears     :8;         // +114
-    unsigned char   ucUnknown           :8;         // +115
+    uint8   ucDriveType;         // +112
+    uint8   ucEngineType;         // +113
+    uint8   ucNumberOfGears;         // +114
+    uint8   ucUnknown;         // +115
 
     unsigned int    uiHandlingFlags;                // +116
 
     float           fEngineAcceleration;            // +120     (value in handling.cfg * 0x86A950)
     float           fEngineInertia;                 // +124
-    float           fMaxVelocity;                   // +128
+    float           fMaxGearVelocity;                   // +128
 
-    float           fUnknown2 [3];                  // +132
+    float           fUnknown2;                  // +132
+    float           fMinGearVelocity;
+    float           fCurrentSpeed;
 };
 
 struct tHandlingDataSA
