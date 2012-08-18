@@ -1886,18 +1886,27 @@ void CVehicleSA::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, bool
 
 void CVehicleSA::OnChangingPosition ( const CVector& vecNewPosition )
 {
-    // Only apply to CAutomobile and down
-    if ( GetBaseVehicleType () == 0 )
+    CVector vecDelta = vecNewPosition - m_pInterface->Placeable.matrix->vPos;
+    if ( vecDelta.LengthSquared () > 10 * 10 )
     {
-        CVector vecDelta = vecNewPosition - m_pInterface->Placeable.matrix->vPos;
-        if ( vecDelta.LengthSquared () > 10 * 10 )
+        // Only apply to CAutomobile and down
+        if ( GetBaseVehicleType () == 0 )
         {
             // Reposition colpoints for big moves to avoid random spinning
-            CVehicleSAInterface* pInterface = GetVehicleInterface ();
+            CAutomobileSAInterface* pInterface = reinterpret_cast<CAutomobileSAInterface*>(m_pVehicle->GetInterface());
             pInterface->WheelFrontLeftColPoint.Position += vecDelta;
             pInterface->WheelRearLeftColPoint.Position += vecDelta;
             pInterface->WheelFrontRightColPoint.Position += vecDelta;
             pInterface->WheelRearRightColPoint.Position += vecDelta;
+        }
+        // Bikes
+        else if ( GetBaseVehicleType () == 9 )
+        {
+            CBikeSAInterface* pInterface = reinterpret_cast<CBikeSAInterface*>(m_pVehicle->GetInterface());
+            pInterface->WheelColPointArray[0].Position += vecDelta;
+            pInterface->WheelColPointArray[1].Position += vecDelta;
+            pInterface->WheelColPointArray[2].Position += vecDelta;
+            pInterface->WheelColPointArray[3].Position += vecDelta;
         }
     }
 }
