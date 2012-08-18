@@ -806,6 +806,64 @@ void _declspec(naked) HOOK_CrashFix_Misc25 ()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CVehicle::AddUpgrade
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_CVehicle_AddUpgrade ( CVehicleSAInterface* pVehicle, int iUpgradeA, int iUpgradeB )
+{
+    int iVehicleModel = pVehicle->m_nModelIndex;
+    AddReportLog ( 5412, SString ( "AddUpgrade - No frame for vehicle model:%d  iUpgradeA:%d  iUpgradeB:%d", iVehicleModel, iUpgradeA, iUpgradeB ) );
+}
+
+#define HOOKPOS_CVehicle_AddUpgrade                             0x06DFA61
+#define HOOKSIZE_CVehicle_AddUpgrade                            9
+DWORD RETURN_CVehicle_AddUpgrade =                              0x6DFA6A;
+void _declspec(naked) HOOK_CVehicle_AddUpgrade ()
+{
+#if TEST_CRASH_FIXES
+    SIMULATE_ERROR_BEGIN( 10 )
+        _asm
+        {
+            mov     eax, 0
+        }
+    SIMULATE_ERROR_END
+#endif
+    _asm
+    {
+        // Check for no frame
+        cmp     eax, 0
+        jz      fix
+
+        // Continue standard path
+        mov     ecx,dword ptr [edi+18h] 
+        push    ebx  
+        push    6D3300h
+        jmp     RETURN_CVehicle_AddUpgrade
+
+    fix:
+        // Report error
+        pushad
+        push    [esp+32+28+4*2]
+        push    [esp+32+28+4*2]
+        push    edi
+        call    OnMY_CVehicle_AddUpgrade
+        add     esp, 4*3
+        popad
+
+        // Skip upgrade adding
+        add     esp, 08h
+        pop     edi
+        pop     esi
+        pop     ebp
+        pop     ebx
+        pop     ecx
+        ret     8
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -836,4 +894,5 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     EZHookInstall ( CrashFix_Misc23 );
     EZHookInstall ( CrashFix_Misc24 );
     EZHookInstall ( CrashFix_Misc25 );
+    EZHookInstall ( CVehicle_AddUpgrade );
 }
