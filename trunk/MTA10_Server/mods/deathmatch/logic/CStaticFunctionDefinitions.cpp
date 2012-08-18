@@ -161,7 +161,7 @@ bool CStaticFunctionDefinitions::TriggerClientEvent ( CElement* pElement, const 
     std::vector < CPlayer* > sendList;
 
     // Get descendants (incl. pElement if a player)
-    pElement->GetDescendantsByType ( sendList, true, CElement::PLAYER );
+    pElement->GetDescendantsByType ( sendList, EElementType::PLAYER );
 
     // Send packet to players
     CPlayerManager::Broadcast ( Packet, sendList );
@@ -183,7 +183,7 @@ bool CStaticFunctionDefinitions::TriggerLatentClientEvent ( CElement* pElement, 
     std::vector < CPlayer* > sendList;
 
     // Get descendants (incl. pElement if a player)
-    pElement->GetDescendantsByType ( sendList, true, CElement::PLAYER );
+    pElement->GetDescendantsByType ( sendList, EElementType::PLAYER );
 
     // Send packet to players
     g_pGame->EnableLatentSends ( true, iBandwidth, pLuaMain, usResourceNetId );
@@ -218,8 +218,11 @@ CDummy* CStaticFunctionDefinitions::CreateElement ( CResource* pResource, const 
     assert ( szTypeName );
     assert ( szID );
 
+    EElementType elementType;
+    bool bIsInternalType = StringToEnum ( szTypeName, elementType );
+    
     // Long enough typename and not an internal one?
-    if ( strlen ( szTypeName ) > 0 && CElement::GetTypeID ( szTypeName ) == CElement::UNKNOWN )
+    if ( strlen ( szTypeName ) > 0 && !bIsInternalType )
     {
         // Create the element.
         CDummy* pDummy = new CDummy ( g_pGame->GetGroups (), pResource->GetDynamicElementRoot() );
@@ -327,7 +330,7 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
             case CElement::BLIP:
             case CElement::PICKUP:
             case CElement::RADAR_AREA:
-            case CElement::PATH_NODE:
+            case CElement::PATH_NODE_UNUSED:
                 break;
             default:
                 return NULL;
@@ -1428,7 +1431,7 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsig
         case CElement::BLIP:
         case CElement::PICKUP:
         case CElement::RADAR_AREA:
-        case CElement::WORLD_MESH:
+        case CElement::WORLD_MESH_UNUSED:
         {
             pElement->SetDimension ( usDimension );
             CBitStream bitStream;

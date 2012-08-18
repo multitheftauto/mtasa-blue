@@ -610,7 +610,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     break;
                 }
 
-                case CElement::WORLD_MESH:
+                case CElement::WORLD_MESH_UNUSED:
                 {
                     /*
                     CWorldMesh* pMesh = static_cast < CWorldMesh* > ( pElement );
