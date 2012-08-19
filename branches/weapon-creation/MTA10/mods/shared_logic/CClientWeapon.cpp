@@ -56,6 +56,9 @@ CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponT
     m_weaponConfig.flags.bCheckCarTires = true;
 
     m_itargetWheel = MAX_WHEELS + 1;
+    m_nAmmoInClip = 30;
+    m_iCounter = 0;
+    m_nAmmoTotal = 9999;
 }
 
 
@@ -141,9 +144,26 @@ void CClientWeapon::DoPulse ( void )
         }
     }
 
-    if ( m_State == WEAPONSTATE_FIRING ) Fire ();
-}
 
+    if ( m_nAmmoInClip <= 0 )
+    {
+        if ( m_nAmmoTotal > 0 && m_State != WEAPONSTATE_RELOADING )
+        {
+            m_PreviousState = m_State;
+            m_State = WEAPONSTATE_RELOADING;
+            m_reloadTimer.Reset();
+        }
+        else if ( m_State == WEAPONSTATE_RELOADING && m_reloadTimer.Get() >= m_pWeapon->GetWeaponReloadTime ( ) )
+        {
+            m_State = m_PreviousState;
+            m_nAmmoInClip = 30;
+        }
+        else
+            return;
+    }
+
+    if ( m_State == WEAPONSTATE_FIRING && m_fireTimer.Get() > (m_pWeapon->GetWeaponFireTime ( ) / 1000) ) Fire ();
+}
 
 void CClientWeapon::Create ( void )
 {
@@ -174,7 +194,8 @@ void CClientWeapon::Destroy ( void )
 
 
 void CClientWeapon::Fire ( void )
-{
+{       
+
     if ( !m_pWeapon || !m_pObject ) return;
     switch ( m_Type )
     {
@@ -306,7 +327,7 @@ void CClientWeapon::Fire ( void )
             vecTemp2.fZ += 84.6f;
             SetRotationDegrees(vecTemp2);
 #else
-            FireInstantHit ( vecOrigin, vecTarget-vecOrigin, vecTarget );
+            FireInstantHit ( vecOrigin, vecTarget );
 #endif
             // Restore
             m_pWeaponInfo->SetDamagePerHit ( sDamage );
@@ -317,15 +338,19 @@ void CClientWeapon::Fire ( void )
             // End our lag compensation
             if ( pOwnerPed )
                 g_pClientGame->RevertShotCompensation( g_pClientGame->GetPedManager()->Get(pOwnerPed,false,false) );
-
+            m_nAmmoInClip--;
+            m_fireTimer.Reset();
             break;
         }
         default: break;
     }
 }
 
-
+#ifdef SHOTGUN_TEST
 void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget, CVector & vecRotation )
+#else
+void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
+#endif
 {
     CVector vecDirection = vecTarget - vecOrigin;
     vecDirection.Normalize ();
@@ -349,15 +374,20 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget, C
         {
             return;
         }
-        g_pGame->GetPointLights ()->AddLight ( PLTYPE_POINTLIGHT, vecOrigin, CVector (), 3.0f, 0.22f, 0.25f, 0, 0, 0, 0 );
+        if ( m_iCounter == 1 || m_pWeapon->GetWeaponFireTime() > 50 )
+        {
 
-        if ( GetAttachedTo () ) g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, false );
-        else g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
+            g_pGame->GetPointLights ()->AddLight ( PLTYPE_POINTLIGHT, vecOrigin, CVector (), 3.0f, 0.22f, 0.25f, 0, 0, 0, 0 );
 
-        m_pWeapon->AddGunshell ( m_pObject, &vecOrigin, &CVector2D ( 0, -1 ), 0.45f );
-        g_pGame->GetAudioEngine ()->ReportWeaponEvent ( WEAPON_EVENT_FIRE, m_Type, m_pObject );
+            if ( GetAttachedTo () ) g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, false );
+            else g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
 
-
+            m_pWeapon->AddGunshell ( m_pObject, &vecOrigin, &CVector2D ( 0, -1 ), 0.45f );
+            g_pGame->GetAudioEngine ()->ReportWeaponEvent ( WEAPON_EVENT_FIRE, m_Type, NULL );
+            m_iCounter = 0;
+        }
+        else
+            m_iCounter = 1;
 
         CVector vecCollision;
         if ( g_pGame->GetWaterManager ()->TestLineAgainstWater ( vecOrigin, vecTarget, &vecCollision ) )
@@ -404,6 +434,7 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget, C
             }
         }
     }
+#ifdef SHOTGUN_TEST
     else
     {
         //if ( pAttachedTo ) pAttachedTo->WorldIgnore ( true );
@@ -411,6 +442,7 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget, C
         // Fire instant hit is off by a few degrees
         FireShotgun ( m_pObject, vecOrigin, vecTarget, vecRotation );
     }
+#endif
     if ( pColPoint )
         pColPoint->Destroy ();
 }
@@ -496,4 +528,31 @@ void CClientWeapon::ResetWeaponTarget ( void )
     m_targetBone = BONE_PELVIS;
 }
 
+void CClientWeapon::SetFlags ( bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, const SLineOfSightFlags& flags )
+{
+    m_weaponConfig.bDisableWeaponModel = bDisableWeaponModel;
+    m_weaponConfig.bShootIfTargetBlocked = bShootIfTargetBlocked;
+    m_weaponConfig.bShootIfTargetOutOfRange = bShootIfTargetOutOfRange;
+    m_weaponConfig.flags = flags;
+}
 
+void CClientWeapon::SetFlags ( bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange )
+{
+    m_weaponConfig.bDisableWeaponModel = bDisableWeaponModel;
+    m_weaponConfig.bShootIfTargetBlocked = bShootIfTargetBlocked;
+    m_weaponConfig.bShootIfTargetOutOfRange = bShootIfTargetOutOfRange;
+}
+
+void CClientWeapon::SetFlags ( const SLineOfSightFlags& flags )
+{
+    m_weaponConfig.flags = flags;
+}
+
+
+void CClientWeapon::GetFlags ( bool &bDisableWeaponModel, bool &bShootIfTargetBlocked, bool &bShootIfTargetOutOfRange, SLineOfSightFlags& flags )
+{
+    bDisableWeaponModel = m_weaponConfig.bDisableWeaponModel;
+    bShootIfTargetBlocked = m_weaponConfig.bShootIfTargetBlocked;
+    bShootIfTargetOutOfRange = m_weaponConfig.bShootIfTargetOutOfRange;
+    flags = m_weaponConfig.flags;
+}

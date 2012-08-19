@@ -555,7 +555,9 @@ void CAudioEngineSA::ReportBulletHit ( CEntity * pEntity, unsigned char ucSurfac
 
 void CAudioEngineSA::ReportWeaponEvent ( int iEvent, eWeaponType weaponType, CPhysical * pPhysical )
 {
-    DWORD dwPhysicalInterface = ( DWORD ) pPhysical->GetInterface ();
+    DWORD dwPhysicalInterface = NULL;
+    if ( pPhysical )
+        dwPhysicalInterface = ( DWORD ) pPhysical->GetInterface ();
     DWORD dwThis = ( DWORD ) m_pInterface;
     DWORD dwFunc = FUNC_CAudioEngine_ReportWeaponEvent;
     _asm

@@ -53,7 +53,12 @@ public:
     void                    Destroy                 ( void );
 
     void                    Fire                    ( void );
+
+#ifdef SHOTGUN_TEST
     void                    FireInstantHit          ( CVector & vecOrigin, CVector & vecTarget, CVector & vecRotation );
+#else
+    void                    FireInstantHit          ( CVector & vecOrigin, CVector & vecTarget );
+#endif
     void                    FireShotgun             ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget, CVector & vecRotation );
 
     void                    GetDirection            ( CVector & vecDirection );
@@ -63,6 +68,10 @@ public:
     CWeaponStat *           GetWeaponStat           ( void )   { return m_pWeaponStat; }
     CClientPlayer *         GetOwner                ( void )                { return m_pOwner; }
     void                    SetOwner                ( CClientPlayer * pOwner )  { m_pOwner = pOwner; }
+    void                    SetFlags                ( bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, const SLineOfSightFlags& flags );
+    void                    SetFlags                ( bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange );
+    void                    SetFlags                ( const SLineOfSightFlags& flags );
+    void                    GetFlags                ( bool &bDisableWeaponModel, bool &bShootIfTargetBlocked, bool &bShootIfTargetOutOfRange, SLineOfSightFlags& flags );
 
 private:
     CClientManager *        m_pManager;
@@ -85,6 +94,12 @@ private:
     int                     m_itargetWheel;
     SWeaponConfiguration    m_weaponConfig;
     CClientPlayer *         m_pOwner;  // For lag compensation
+    int                     m_nAmmoTotal;
+    int                     m_nAmmoInClip;
+    eWeaponState            m_PreviousState;
+    CElapsedTime            m_fireTimer;
+    CElapsedTime            m_reloadTimer;
+    unsigned char           m_iCounter;
 };
 
 #endif

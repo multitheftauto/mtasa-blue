@@ -394,3 +394,25 @@ bool CWeaponSA::ProcessLineOfSight ( const CVector * vecStart, const CVector * v
     }
     return  bReturn;
 }
+
+int CWeaponSA::GetWeaponReloadTime ( void )
+{
+    DWORD dwReturn = 0;
+    DWORD dwFunction = 0x743D70;
+    DWORD dwThis = (DWORD)GetInfo ( WEAPONSKILL_STD );
+    _asm
+    {
+        mov ecx, dwThis
+        call dwFunction
+        mov dwReturn, eax
+    }
+    return dwReturn;
+}
+
+int CWeaponSA::GetWeaponFireTime ( void )
+{
+    DWORD dwInterface = (DWORD)GetInfo ( WEAPONSKILL_STD );
+    int iGlobalTimer = pGame->GetSystemTime();
+    float fWeaponFireTime = (*(float *)(dwInterface + 68) - *(float *)(dwInterface + 64)) * -900.0f;
+    return (iGlobalTimer - (int)fWeaponFireTime);
+}

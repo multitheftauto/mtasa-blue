@@ -6431,6 +6431,46 @@ bool CStaticFunctionDefinitions::ClearWeaponTarget ( CClientWeapon * pWeapon )
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetWeaponFlags ( CClientWeapon * pWeapon, bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, const SLineOfSightFlags& flags )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetFlags ( bDisableWeaponModel, bShootIfTargetBlocked, bShootIfTargetOutOfRange, flags );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponFlags ( CClientWeapon * pWeapon, bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetFlags ( bDisableWeaponModel, bShootIfTargetBlocked, bShootIfTargetOutOfRange );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponFlags ( CClientWeapon * pWeapon, const SLineOfSightFlags& flags )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetFlags ( flags );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponFlags ( CClientWeapon * pWeapon, bool &bDisableWeaponModel, bool &bShootIfTargetBlocked, bool &bShootIfTargetOutOfRange, SLineOfSightFlags& flags )
+{
+    if ( pWeapon )
+    {
+        pWeapon->GetFlags ( bDisableWeaponModel, bShootIfTargetBlocked, bShootIfTargetOutOfRange, flags );
+        return true;
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::GetTickCount_ ( double& dCount )
 {
     dCount = static_cast < double > ( GetTickCount64_() );
