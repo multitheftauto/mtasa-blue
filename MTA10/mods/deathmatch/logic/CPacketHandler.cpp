@@ -1364,8 +1364,8 @@ void CPacketHandler::Packet_VehicleSpawn ( NetBitStreamInterface& bitStream )
         pVehicle->SetPosition ( vecPosition );
         pVehicle->SetRotationDegrees ( vecRotationDegrees );
 
-        // Make sure its stationary
-        pVehicle->SetMoveSpeed ( CVector ( 0.0f, 0.0f, 0.0f ) );
+        // Make sure its stationary. (Little bit of fall velocity to prevent floaters)
+        pVehicle->SetMoveSpeed ( CVector ( 0.0f, 0.0f, -0.01f ) );
         pVehicle->SetTurnSpeed ( CVector ( 0.0f, 0.0f, 0.0f ) );
 
         // Read out the color

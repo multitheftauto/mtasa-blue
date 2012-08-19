@@ -348,18 +348,18 @@ public:
 
     // Time dependent interpolation
     inline void                 GetTargetPosition       ( CVector& vecPosition )            { vecPosition = m_interp.pos.vecTarget; }
-    void                        SetTargetPosition       ( CVector& vecPosition, unsigned long ulDelay, bool bValidVelocityZ = false, float fVelocityZ = 0.f );
+    void                        SetTargetPosition       ( const CVector& vecPosition, unsigned long ulDelay, bool bValidVelocityZ = false, float fVelocityZ = 0.f );
     void                        RemoveTargetPosition    ( void );
     inline bool                 HasTargetPosition       ( void )                            { return ( m_interp.pos.ulFinishTime != 0 ); }
 
     inline void                 GetTargetRotation       ( CVector& vecRotation )            { vecRotation = m_interp.rot.vecTarget; }
-    void                        SetTargetRotation       ( CVector& vecRotation, unsigned long ulDelay );
+    void                        SetTargetRotation       ( const CVector& vecRotation, unsigned long ulDelay );
     void                        RemoveTargetRotation    ( void );
     inline bool                 HasTargetRotation       ( void )                            { return ( m_interp.rot.ulFinishTime != 0 ); }
 
     void                        UpdateTargetPosition    ( void );
     void                        UpdateTargetRotation    ( void );
-
+    void                        UpdateUnderFloorFix     ( const CVector& vecTargetPosition, bool bValidVelocityZ, float fVelocityZ );
 
     inline unsigned long        GetIllegalTowBreakTime  ( void )                            { return m_ulIllegalTowBreakTime; }
     inline void                 SetIllegalTowBreakTime  ( unsigned long ulTime )            { m_ulIllegalTowBreakTime = ulTime; }
@@ -571,6 +571,7 @@ protected:
     unsigned char               m_ucVariation2;
 
     CTickCount                  m_LastPushedTime;
+    uint                        m_uiForceLocalZCounter;
 
 public:
 #ifdef MTA_DEBUG
