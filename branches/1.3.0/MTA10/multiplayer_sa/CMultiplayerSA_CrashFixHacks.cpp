@@ -806,58 +806,110 @@ void _declspec(naked) HOOK_CrashFix_Misc25 ()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
-// CVehicle::AddUpgrade
+// CClumpModelInfo::GetFrameFromId
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CVehicle_AddUpgrade ( CVehicleSAInterface* pVehicle, int iUpgradeA, int iUpgradeB )
+RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post ( RwFrame* pFrameResult, DWORD _ebx, DWORD _esi, DWORD _edi, DWORD calledFrom, RpClump* pClump, int id )
 {
-    int iVehicleModel = pVehicle->m_nModelIndex;
-    AddReportLog ( 5412, SString ( "AddUpgrade - No frame for vehicle model:%d  iUpgradeA:%d  iUpgradeB:%d", iVehicleModel, iUpgradeA, iUpgradeB ) );
-}
+    if ( pFrameResult )
+        return pFrameResult;
 
-#define HOOKPOS_CVehicle_AddUpgrade                             0x06DFA61
-#define HOOKSIZE_CVehicle_AddUpgrade                            9
-DWORD RETURN_CVehicle_AddUpgrade =                              0x6DFA6A;
-void _declspec(naked) HOOK_CVehicle_AddUpgrade ()
-{
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 10 )
+    // Don't check frame if call can legitimately return NULL
+    if ( calledFrom == 0x6D308F       // CVehicle::SetWindowOpenFlag
+        || calledFrom == 0x6D30BF     // CVehicle::ClearWindowOpenFlag
+        || calledFrom == 0x4C7DDE     // CVehicleModelInfo::GetOriginalCompPosition
+        || calledFrom == 0x4C96BD )   // CVehicleModelInfo::CreateInstance
+        return NULL;
+
+    // Ignore external calls
+    if ( calledFrom < 0x401000 || calledFrom > 0x801000 )
+        return NULL;
+
+    // Now we have a NULL frame which will cause a crash
+    // (Probably due to a custom vehicle with missing frames)
+
+    // See if we can get the model id for reporting
+    int iModelId = 0;
+    DWORD pVehicle = NULL;
+
+    if ( calledFrom == 0x6D3847 )       // CVehicle::AddReplacementUpgrade
+        pVehicle = _ebx;
+    else
+    if ( calledFrom == 0x6DFA61         // CVehicle::AddUpgrade
+        || calledFrom == 0x6D3A62 )     // CVehicle::GetReplacementUpgrade
+        pVehicle = _edi;
+    else
+    if ( calledFrom == 0x06AC740        // CAutomobile::PreRender (Forklift)
+        || calledFrom == 0x6D39F3       // CVehicle::RemoveReplacementUpgrade
+        || calledFrom == 0x6D3A32 )     // CVehicle::RemoveReplacementUpgrade2
+        pVehicle = _esi;
+
+    if ( pVehicle > 0x1000 )
+        iModelId = ((CVehicleSAInterface*)pVehicle)->m_nModelIndex;
+
+    // Need a valid frame to replace the missing one - Find nearest other id     
+    for ( uint i = 2 ; i < 40 ; i++ )
+    {
+        RwFrame* pNewFrameResult = NULL;
+        uint uiNewId = id + ( i / 2 ) * ( ( i & 1 ) ? -1 : 1 );
+        DWORD dwFunc = 0x4C53C0;    // CClumpModelInfo::GetFrameFromId
         _asm
         {
-            mov     eax, 0
+            push    uiNewId
+            push    pClump
+            call    dwFunc
+            add     esp, 8
+            mov     pNewFrameResult,eax
         }
-    SIMULATE_ERROR_END
-#endif
+
+        if ( pNewFrameResult )
+        {
+            SString strMsg ( "No frame for vehicle:%d  frameId:%d  (replaced with:%d  calledfrom:%08x)", iModelId, id, uiNewId, calledFrom );
+            AddReportLog ( 5412, SString ( "GetFrameFromId - %s", *strMsg ) );
+            LogEvent ( 5412, "Model frame warning", "GetFrameFromId", strMsg );
+            return pNewFrameResult;
+        }
+    }
+
+    // Couldn't find a replacement frame id
+    SString strMsg ( "No frame for vehicle:%d  frameId:%d  (calledfrom:%08x)", iModelId, id, calledFrom );
+    LogEvent ( 5413, "Model frame error", "GetFrameFromId", strMsg );
+
+    return NULL;
+}
+
+// Hook info
+#define HOOKPOS_CClumpModelInfo_GetFrameFromId                      0x4C53C0
+#define HOOKSIZE_CClumpModelInfo_GetFrameFromId                     7
+DWORD RETURN_CClumpModelInfo_GetFrameFromId =                       0x4C53C7;
+void _declspec(naked) HOOK_CClumpModelInfo_GetFrameFromId ()
+{
     _asm
     {
-        // Check for no frame
-        cmp     eax, 0
-        jz      fix
+        push    [esp+4*2]
+        push    [esp+4*2]
+        call    inner
+        add     esp, 4*2
 
-        // Continue standard path
-        mov     ecx,dword ptr [edi+18h] 
-        push    ebx  
-        push    6D3300h
-        jmp     RETURN_CVehicle_AddUpgrade
-
-    fix:
-        // Report error
         pushad
-        push    [esp+32+28+4*2]
-        push    [esp+32+28+4*2]
+        push    [esp+32+4*2]
+        push    [esp+32+4*2]
+        push    [esp+32+4*2]
         push    edi
-        call    OnMY_CVehicle_AddUpgrade
-        add     esp, 4*3
+        push    esi
+        push    ebx
+        push    eax
+        call    OnMY_CClumpModelInfo_GetFrameFromId_Post
+        mov     [esp+0],eax
+        add     esp, 4*7
         popad
+        mov     eax,[esp-32-4*7]
+        retn
 
-        // Skip upgrade adding
-        add     esp, 08h
-        pop     edi
-        pop     esi
-        pop     ebp
-        pop     ebx
-        pop     ecx
-        ret     8
+inner:
+        sub     esp,8 
+        mov     eax,dword ptr [esp+10h] 
+        jmp     RETURN_CClumpModelInfo_GetFrameFromId
     }
 }
 
@@ -894,5 +946,5 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     EZHookInstall ( CrashFix_Misc23 );
     EZHookInstall ( CrashFix_Misc24 );
     EZHookInstall ( CrashFix_Misc25 );
-    EZHookInstall ( CVehicle_AddUpgrade );
+    EZHookInstall ( CClumpModelInfo_GetFrameFromId );
 }
