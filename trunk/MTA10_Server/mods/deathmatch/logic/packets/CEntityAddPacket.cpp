@@ -123,6 +123,8 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     bCollisionsEnabled = pPed->GetCollisionEnabled ( );
                     break;
                 }
+                default:
+                    break;
             }
 
             BitStream.WriteBit ( bCollisionsEnabled );

@@ -10,12 +10,16 @@
 *
 *****************************************************************************/
 
-#pragma push_macro("assert")
+#ifdef WIN32
+    #pragma push_macro("assert")
+#endif
 
 #include <google/dense_hash_map>
 using namespace google;
 
-#pragma pop_macro("assert")
+#ifdef WIN32
+    #pragma pop_macro("assert")
+#endif
 
 namespace SharedUtil
 {
