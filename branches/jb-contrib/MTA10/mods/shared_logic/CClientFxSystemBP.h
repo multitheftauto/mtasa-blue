@@ -18,7 +18,7 @@
 class CClientFxSystemBP
 {
 public:
-    CClientFxSystemBP(CFxSystemBPSA* pFxSystemBP) { m_pFxSystemBP = pFxSystemBP; }
+    CClientFxSystemBP(class CFxSystemBPSA* pFxSystemBP) { m_pFxSystemBP = pFxSystemBP; }
     void SetName(const SString& strName) { m_strName = strName; }
     const SString& GetName() const { return m_strName; }
     void SetLength(float fLength) { m_fLength = fLength; }
@@ -43,5 +43,5 @@ private:
     CMappedList<class CClientFxEmitterBP*> m_pFxEmitterBPArray;
     RwSphere m_boundingSphere;
 public:
-    CFxSystemBPSA* m_pFxSystemBP;
+    class CFxSystemBPSA* m_pFxSystemBP;
 };

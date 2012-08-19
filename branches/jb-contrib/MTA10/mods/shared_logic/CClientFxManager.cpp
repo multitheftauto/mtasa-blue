@@ -12,6 +12,7 @@
 
 #include "StdInc.h"
 #include "../../game_sa/CFxManagerSA.h"
+#include <CMatrix_Pad.h>
 
 CClientFxManager::~CClientFxManager()
 {

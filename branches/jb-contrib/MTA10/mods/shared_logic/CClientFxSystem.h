@@ -15,8 +15,8 @@
 class CClientFxSystem
 {
 public:
-    CClientFxSystem(CFxSystemSA* pFxSystem) { m_pFxSystem = pFxSystem; }
+    CClientFxSystem(class CFxSystemSA* pFxSystem) { m_pFxSystem = pFxSystem; }
 private:
 public:
-    CFxSystemSA* m_pFxSystem;
+    class CFxSystemSA* m_pFxSystem;
 };

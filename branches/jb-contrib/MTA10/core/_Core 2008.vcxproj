@@ -247,7 +247,6 @@
   <ItemGroup>
     <ClCompile Include="CAdditionalVertexStreamManager.cpp" />
     <ClCompile Include="CChat.cpp" />
-    <ClCompile Include="CClientTime.cpp" />
     <ClCompile Include="CClientVariables.cpp" />
     <ClCompile Include="CCommandFuncs.cpp" />
     <ClCompile Include="CCommands.cpp" />
@@ -360,7 +359,6 @@
   <ItemGroup>
     <ClInclude Include="CAdditionalVertexStreamManager.h" />
     <ClInclude Include="CChat.h" />
-    <ClInclude Include="CClientTime.h" />
     <ClInclude Include="CClientVariables.h" />
     <ClInclude Include="CCommandFuncs.h" />
     <ClInclude Include="CCommands.h" />

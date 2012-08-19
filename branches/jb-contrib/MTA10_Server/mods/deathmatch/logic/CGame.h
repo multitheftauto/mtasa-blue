@@ -91,6 +91,7 @@ class CPacket;
 class CPacketTranslator;
 class CLatentTransferManager;
 class CPedManager;
+class CFxManager;
 class CPickupManager;
 class CPlayer;
 class CPlayerManager;

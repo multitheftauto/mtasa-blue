@@ -18,6 +18,7 @@
 
 #include <windows.h>
 #include "CColModel.h"
+#include "CAnimBlock.h"
 class CPedModelInfo;
 
 class CBoundingBox

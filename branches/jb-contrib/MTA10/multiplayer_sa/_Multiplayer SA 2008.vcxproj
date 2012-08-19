@@ -244,10 +244,13 @@
     <ClCompile Include="CMultiplayerSA_ClothesMemFix.cpp" />
     <ClCompile Include="CMultiplayerSA_ClothesSpeedUp.cpp" />
     <ClCompile Include="CMultiplayerSA_CrashFixHacks.cpp" />
+    <ClCompile Include="CMultiplayerSA_Files.cpp" />
     <ClCompile Include="CMultiplayerSA_FixBadAnimId.cpp" />
     <ClCompile Include="CMultiplayerSA_HookDestructors.cpp" />
     <ClCompile Include="CMultiplayerSA_ObjectLODSystem.cpp" />
+    <ClCompile Include="CMultiplayerSA_Rendering.cpp" />
     <ClCompile Include="CMultiplayerSA_RwResources.cpp" />
+    <ClCompile Include="CMultiplayerSA_Weapons.cpp" />
     <ClCompile Include="COffsets.cpp" />
     <ClCompile Include="CPopulationSA.cpp" />
     <ClCompile Include="CRemoteDataSA.cpp" />

@@ -396,7 +396,6 @@
     <ClCompile Include="logic\TaskNames.cpp" />
     <ClCompile Include="logic\Utils.cpp" />
     <ClCompile Include="logic\packets\CBulletsyncPacket.cpp" />
-    <ClCompile Include="logic\packets\CBulletsyncSettingsPacket.cpp" />
     <ClCompile Include="logic\packets\CCameraSyncPacket.cpp" />
     <ClCompile Include="logic\packets\CChatEchoPacket.cpp" />
     <ClCompile Include="logic\packets\CCommandPacket.cpp" />
@@ -565,7 +564,6 @@
     <ClCompile Include="..\..\..\Shared\animation\CPositionRotationAnimation.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="logic\packets\CBulletsyncSettingsPacket.h" />
     <ClInclude Include="logic\CLightsyncManager.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="..\..\..\vendor\zip\crypt.h" />

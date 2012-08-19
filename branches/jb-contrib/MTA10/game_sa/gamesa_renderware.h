@@ -223,5 +223,6 @@ inline RwFrame * RwFrameFindFrame ( RwFrame * parent, const char * name ) {
             buf = RwFrameFindFrame ( ret, name );
             if ( buf != NULL ) return buf;
         }
-
+    }
+}
 #endif

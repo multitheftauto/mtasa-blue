@@ -49,7 +49,7 @@ public:
 
     float           fEngineAcceleration;            // +120     (value in handling.cfg * 0x86A950)
     float           fEngineInertia;                 // +124
-    float           fMaxGearVelocity;                   // +128
+    float           fMaxVelocity;                   // +128
 
     float           fUnknown2;                  // +132
     float           fMinGearVelocity;

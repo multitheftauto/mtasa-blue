@@ -149,7 +149,7 @@ public:
     inline CKeyGen                  * GetKeyGen ()               { return m_pKeyGen; }
     inline CRopes                   * GetRopes ()                { return m_pRopes; }
     inline CFx                      * GetFx ()                   { return m_pFx; }
-    inline CFxManager               * GetFxManager ()            { return m_pFxManager; }
+    inline class CFxManager         * GetFxManager ()            { return m_pFxManager; }
     inline CWaterManager            * GetWaterManager ()         { return m_pWaterManager; }
     inline CWeaponStatManager       * GetWeaponStatManager()     { return m_pWeaponStatsManager; }
 
