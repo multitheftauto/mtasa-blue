@@ -159,7 +159,7 @@ uint CElement::GetTypeHashFromString ( const SString& strTypeName )
 
     // Custom types use name hash.  TODO: Make it use a unique index instead
     uint uiTypeHash = HashString ( strTypeName );
-    uiTypeHash = ( uiTypeHash % 0xFFFFFF00 ) + EElementType::UNKNOWN + 1;
+    uiTypeHash = ( uiTypeHash % 0xFFFFFF00 ) + CElement::UNKNOWN + 1;
     return uiTypeHash;
 }
 
@@ -1119,6 +1119,8 @@ CClient* CElement::GetClient ( void )
             pClient = static_cast < CClient* > ( pConsoleClient );   
             break;
         }
+        default:
+            break;
     }
     return pClient;
 }
@@ -1286,7 +1288,7 @@ bool CElement::IsFromRoot ( CElement* pEntity )
     }
     else
     {
-        if ( pEntity->GetType () == EElementType::ROOT )
+        if ( pEntity->GetType () == CElement::ROOT )
             return true;
     }
     return CElement::IsFromRoot ( pEntity->GetParentEntity () );
@@ -1321,7 +1323,7 @@ void CElement::RemoveEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity
     {
         CFromRootListType& listEntities = find->second;
         listEntities.remove ( pEntity );
-        if ( uiTypeHash > EElementType::UNKNOWN && listEntities.size () == 0 )
+        if ( uiTypeHash > CElement::UNKNOWN && listEntities.size () == 0 )
             ms_mapEntitiesFromRoot.erase ( find );
     }
 
@@ -1369,7 +1371,6 @@ void CElement::GetEntitiesFromRoot ( unsigned int uiTypeHash, std::vector < CEle
     {
         CFromRootListType& listEntities = find->second;
         CElement* pEntity;
-        unsigned int uiIndex = 0;
 
         for ( CChildListType::const_reverse_iterator i = listEntities.rbegin ();
               i != listEntities.rend ();

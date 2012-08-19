@@ -161,7 +161,7 @@ bool CStaticFunctionDefinitions::TriggerClientEvent ( CElement* pElement, const 
     std::vector < CPlayer* > sendList;
 
     // Get descendants (incl. pElement if a player)
-    pElement->GetDescendantsByType ( sendList, EElementType::PLAYER );
+    pElement->GetDescendantsByType ( sendList, CElement::PLAYER );
 
     // Send packet to players
     CPlayerManager::Broadcast ( Packet, sendList );
@@ -183,7 +183,7 @@ bool CStaticFunctionDefinitions::TriggerLatentClientEvent ( CElement* pElement, 
     std::vector < CPlayer* > sendList;
 
     // Get descendants (incl. pElement if a player)
-    pElement->GetDescendantsByType ( sendList, EElementType::PLAYER );
+    pElement->GetDescendantsByType ( sendList, CElement::PLAYER );
 
     // Send packet to players
     g_pGame->EnableLatentSends ( true, iBandwidth, pLuaMain, usResourceNetId );
@@ -693,6 +693,8 @@ CColShape* CStaticFunctionDefinitions::GetElementColShape ( CElement* pElement )
         case CElement::PICKUP:
             pColShape = static_cast < CPickup* > ( pElement )->GetColShape ();
             break;
+        default:
+            break;
     }
     return pColShape;
 }
@@ -840,6 +842,8 @@ CElement* CStaticFunctionDefinitions::GetElementSyncer ( CElement* pElement )
             return pObject->IsSyncable () ? static_cast < CElement* > ( pObject->GetSyncer () ) : NULL;
             break;
         }
+        default:
+            break;
     }
 
     return NULL;
@@ -1438,6 +1442,8 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsig
             m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DIMENSION, *bitStream.pBitStream ) );
             return true;
         }
+        default:
+            break;
     }
 
     return false;

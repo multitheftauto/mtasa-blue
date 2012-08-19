@@ -228,7 +228,9 @@ void CPerPlayerEntity::CreateEntity ( CPlayer* pPlayer )
 
 
 // Optimizations off for this function to track crash
-#pragma optimize( "", off )
+#ifdef WIN32
+    #pragma optimize( "", off )
+#endif
 void CPerPlayerEntity::DestroyEntity ( CPlayer* pPlayer )
 {
     // Are we visible?
@@ -265,8 +267,9 @@ void CPerPlayerEntity::DestroyEntity ( CPlayer* pPlayer )
     }
 }
 
-#pragma optimize( "", on )
-
+#ifdef WIN32
+    #pragma optimize( "", on )
+#endif
 
 void CPerPlayerEntity::BroadcastOnlyVisible ( const CPacket& Packet )
 {

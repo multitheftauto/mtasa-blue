@@ -42,6 +42,8 @@ CElementGroup::~CElementGroup()
                     case CElement::DATABASE_CONNECTION:
                     case CElement::SCRIPTFILE:
                         continue;
+                    default:
+                        break;
                 }
                 // Tell everyone to destroy it if this is not a per-player entity
                 if ( pElement->IsPerPlayerEntity() )
