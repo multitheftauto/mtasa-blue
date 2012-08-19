@@ -30,12 +30,14 @@ CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponT
 
     SetStatic ( true );
     Create ();
+#ifdef MARKER_DEBUG
     m_pMarker = new CClientMarker ( pManager, INVALID_ELEMENT_ID, 4 );
     m_pMarker->SetColor( SColor( 0xFF00FF00 ) );
     m_pMarker->SetSize ( 0.5f );
     m_pMarker2 = new CClientMarker ( pManager, INVALID_ELEMENT_ID, 4 );
     m_pMarker2->SetColor( SColor( 0xFFFF0000 ) );
     m_pMarker2->SetSize ( 0.5f );
+#endif
     m_sDamage = m_pWeaponInfo->GetDamagePerHit ( );
     m_pWeaponStat = g_pGame->CreateWeaponStat ( type, WEAPONSKILL_STD );
     ResetWeaponTarget ( );
@@ -62,8 +64,10 @@ CClientWeapon::~CClientWeapon ( void )
     m_pManager->GetWeaponManager ()->RemoveFromList ( this );
 
     Destroy ();
+#ifdef MARKER_DEBUG
     delete m_pMarker;
     delete m_pMarker2;
+#endif
 
     CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pTarget, NULL );
 }
@@ -177,9 +181,11 @@ void CClientWeapon::Fire ( void )
         case WEAPONTYPE_PISTOL:
         case WEAPONTYPE_PISTOL_SILENCED:
         case WEAPONTYPE_DESERT_EAGLE:
+#ifdef SHOTGUN_TEST
         case WEAPONTYPE_SHOTGUN: 
-        /*case WEAPONTYPE_SAWNOFF_SHOTGUN:
-        case WEAPONTYPE_SPAS12_SHOTGUN:*/
+        case WEAPONTYPE_SAWNOFF_SHOTGUN:
+        case WEAPONTYPE_SPAS12_SHOTGUN:
+#endif
         case WEAPONTYPE_MICRO_UZI:
         case WEAPONTYPE_MP5:
         case WEAPONTYPE_AK47:
@@ -252,8 +258,9 @@ void CClientWeapon::Fire ( void )
             {
                 CVector vecFireOffset = *m_pWeaponInfo->GetFireOffset ();
                 RotateVector ( vecFireOffset, vecRotation );
-                //vecOrigin += vecFireOffset;
-
+#ifndef SHOTGUN_TEST
+                vecOrigin += vecFireOffset;
+#endif
                 CVector vecDirection ( 1, 0, 0 );
                 vecDirection *= fDistance;
                 RotateVector ( vecDirection, vecRotation );
@@ -281,15 +288,16 @@ void CClientWeapon::Fire ( void )
                 if ( pOwnerPed )
                     g_pClientGame->PreWeaponFire( pOwnerPed );
             }
-
+#ifdef SHOTGUN_TEST
             CVector vecTemp;
             CVector vecFireOffset = *m_pWeaponInfo->GetFireOffset ();
             RotateVector ( vecFireOffset, vecRotation );
             vecTemp = vecFireOffset;
             vecTemp += vecOrigin;
-
+#ifdef MARKER_DEBUG
             // Process
             m_pMarker->SetPosition ( vecOrigin );
+#endif
             CVector vecTemp2;
             GetRotationDegrees(vecTemp2);
             vecTemp2.fZ -= 84.6f;
@@ -297,6 +305,9 @@ void CClientWeapon::Fire ( void )
             FireInstantHit ( vecOrigin, vecTarget-vecOrigin, vecTemp );
             vecTemp2.fZ += 84.6f;
             SetRotationDegrees(vecTemp2);
+#else
+            FireInstantHit ( vecOrigin, vecTarget-vecOrigin, vecTarget );
+#endif
             // Restore
             m_pWeaponInfo->SetDamagePerHit ( sDamage );
             m_pWeaponInfo->SetAccuracy ( fAccuracy );
@@ -354,8 +365,9 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget, C
             g_pGame->GetFx ()->TriggerBulletSplash ( vecCollision );
             g_pGame->GetAudioEngine ()->ReportBulletHit ( NULL, SURFACE_TYPE_WATER_SHALLOW, &vecCollision, 0.0f );
         }    
+#ifdef MARKER_DEBUG
         m_pMarker2->SetPosition ( vecTarget );
-        
+#endif
         m_pWeapon->DoBulletImpact ( m_pObject, pEntity, &vecOrigin, &vecTarget, pColPoint, 0 );
         if ( pColEntity && pColEntity->GetEntityType () == ENTITY_TYPE_PED )
         {
