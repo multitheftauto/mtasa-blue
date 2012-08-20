@@ -394,6 +394,26 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
             return;
         }
 
+        CClientEntity * pClientEntity = m_pManager->FindEntitySafe ( pColEntity );
+        if ( pClientEntity )
+        {
+            CLuaArguments Arguments;
+            Arguments.PushElement ( pClientEntity );            // entity that got hit
+            Arguments.PushNumber ( pColPoint->GetPosition ( ).fX ); // pos x
+            Arguments.PushNumber ( pColPoint->GetPosition ( ).fY ); // pos y
+            Arguments.PushNumber ( pColPoint->GetPosition ( ).fZ ); // pos z
+            Arguments.PushNumber ( pColPoint->GetNormal ( ).fX ); // Normal x
+            Arguments.PushNumber ( pColPoint->GetNormal ( ).fY ); // Normal y
+            Arguments.PushNumber ( pColPoint->GetNormal ( ).fZ ); // Normal z
+            Arguments.PushNumber ( pColPoint->GetSurfaceTypeB ( ) ); // Surface type "B"
+            Arguments.PushNumber ( pColPoint->GetLightingForTimeOfDay ( ) ); // Lighting
+            Arguments.PushNumber ( pColPoint->GetPieceTypeB ( ) ); // Piece
+            if ( !CallEvent ( "onClientWeaponFire", Arguments, true ) )
+            {
+                return;
+            }
+        }
+
         DoGunShells ( vecOrigin, vecDirection );
 
         CVector vecCollision;
@@ -411,34 +431,6 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
             ePedPieceTypes hitZone = ( ePedPieceTypes ) pColPoint->GetPieceTypeB ();
             short sDamage = m_pWeaponInfo->GetDamagePerHit ();
             m_pWeapon->GenerateDamageEvent ( dynamic_cast < CPed * > ( pColEntity ), m_pObject, m_Type, sDamage, hitZone, 0 );
-
-
-            CClientEntity * pClientEntity = m_pManager->FindEntitySafe ( pColEntity );
-            if ( pClientEntity )
-            {
-                CLuaArguments Arguments;
-                Arguments.PushElement ( pClientEntity );            // entity that got hit
-                Arguments.PushNumber ( pColPoint->GetPosition().fX ); // pos x
-                Arguments.PushNumber ( pColPoint->GetPosition().fY ); // pos y
-                Arguments.PushNumber ( pColPoint->GetPosition().fZ ); // pos z
-                this->CallEvent ( "onClientWeaponHit", Arguments, true );
-            }
-        }
-        else
-        {
-            if ( pColEntity )
-            {
-                CClientEntity * pClientEntity = m_pManager->FindEntitySafe ( pColEntity );
-                if ( pClientEntity )
-                {
-                    CLuaArguments Arguments;
-                    Arguments.PushElement ( pClientEntity );            // entity that got hit
-                    Arguments.PushNumber ( pColPoint->GetPosition().fX ); // pos x
-                    Arguments.PushNumber ( pColPoint->GetPosition().fY ); // pos y
-                    Arguments.PushNumber ( pColPoint->GetPosition().fZ ); // pos z
-                    this->CallEvent ( "onClientWeaponHit", Arguments, true );
-                }
-            }
         }
     }
 #ifdef SHOTGUN_TEST
