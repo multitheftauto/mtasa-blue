@@ -1186,7 +1186,7 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
             char* szMessage = new char[iNumberOfBytesUsed + 1];
             bitStream.Read ( szMessage, iNumberOfBytesUsed );
             szMessage [iNumberOfBytesUsed] = 0;
-            if ( MbUTF8ToUTF16(szMessage).size() <= MAX_CHATECHO_LENGTH )
+            if ( MbUTF8ToUTF16(szMessage).size() <= MAX_CHATECHO_LENGTH + 6 )   // Extra 6 characters to fix #7125 (Teamsay + long name + long message = too long message)
             {
                 // Strip it for bad characters
                 StripControlCodes ( szMessage, ' ' );
@@ -1361,8 +1361,8 @@ void CPacketHandler::Packet_VehicleSpawn ( NetBitStreamInterface& bitStream )
         pVehicle->SetPosition ( vecPosition );
         pVehicle->SetRotationDegrees ( vecRotationDegrees );
 
-        // Make sure its stationary
-        pVehicle->SetMoveSpeed ( CVector ( 0.0f, 0.0f, 0.0f ) );
+        // Make sure its stationary. (Little bit of fall velocity to prevent floaters)
+        pVehicle->SetMoveSpeed ( CVector ( 0.0f, 0.0f, -0.01f ) );
         pVehicle->SetTurnSpeed ( CVector ( 0.0f, 0.0f, 0.0f ) );
 
         // Read out the color

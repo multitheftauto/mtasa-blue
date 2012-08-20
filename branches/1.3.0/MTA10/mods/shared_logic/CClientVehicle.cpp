@@ -3022,38 +3022,24 @@ void CClientVehicle::GetInitialDoorStates ( SFixedArray < unsigned char, MAX_DOO
 }
 
 
-void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulDelay, bool bValidVelocityZ, float fVelocityZ )
+void CClientVehicle::SetTargetPosition ( const CVector& vecTargetPosition, unsigned long ulDelay, bool bValidVelocityZ, float fVelocityZ )
 {   
     // Are we streamed in?
     if ( m_pVehicle )
     {
         UpdateTargetPosition ();
+        UpdateUnderFloorFix ( vecTargetPosition, bValidVelocityZ, fVelocityZ );
 
         unsigned long ulTime = CClientTime::GetTime ();
         CVector vecLocalPosition;
         GetPosition ( vecLocalPosition );
 
-        // Cars under road fix hack
-        if ( bValidVelocityZ && m_eVehicleType != CLIENTVEHICLE_HELI && m_eVehicleType != CLIENTVEHICLE_PLANE )
-        {
-            // If remote z higher by too much and remote not doing any z movement, warp local z coord
-            float fDeltaZ = vecPosition.fZ - vecLocalPosition.fZ;
-            if ( fDeltaZ > 0.4f && fDeltaZ < 10.0f )
-            {
-                if ( fabsf ( fVelocityZ ) < 0.01f )
-                {
-                    vecLocalPosition.fZ = vecPosition.fZ;
-                    SetPosition ( vecLocalPosition );
-                }
-            }
-        }
-
 #ifdef MTA_DEBUG
         m_interp.pos.vecStart = vecLocalPosition;
 #endif
-        m_interp.pos.vecTarget = vecPosition;
+        m_interp.pos.vecTarget = vecTargetPosition;
         // Calculate the relative error
-        m_interp.pos.vecError = vecPosition - vecLocalPosition;
+        m_interp.pos.vecError = vecTargetPosition - vecLocalPosition;
 
         // Extrapolation
         const SVehExtrapolateSettings& vehExtrapolate = g_pClientGame->GetVehExtrapolateSettings ();
@@ -3087,7 +3073,7 @@ void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulD
     else
     {
         // Update our position now
-        SetPosition ( vecPosition );
+        SetPosition ( vecTargetPosition );
     }
 }
 
@@ -3098,7 +3084,7 @@ void CClientVehicle::RemoveTargetPosition ( void )
 }
 
 
-void CClientVehicle::SetTargetRotation ( CVector& vecRotation, unsigned long ulDelay )
+void CClientVehicle::SetTargetRotation ( const CVector& vecRotation, unsigned long ulDelay )
 {
     // Are we streamed in?
     if ( m_pVehicle )
@@ -3276,6 +3262,38 @@ void CClientVehicle::UpdateTargetRotation ( void )
         }
 
         SetRotationDegrees ( vecCurrentRotation + vecCompensation, false );
+    }
+}
+
+
+// Cars under road fix hack
+void CClientVehicle::UpdateUnderFloorFix ( const CVector& vecTargetPosition, bool bValidVelocityZ, float fVelocityZ )
+{
+    CVector vecLocalPosition;
+    GetPosition ( vecLocalPosition );
+
+    bool bForceLocalZ = false;
+    if ( bValidVelocityZ && m_eVehicleType != CLIENTVEHICLE_HELI && m_eVehicleType != CLIENTVEHICLE_PLANE )
+    {
+        // If remote z higher by too much and remote not doing any z movement, warp local z coord
+        float fDeltaZ = vecTargetPosition.fZ - vecLocalPosition.fZ;
+        if ( fDeltaZ > 0.4f && fDeltaZ < 10.0f )
+        {
+            if ( fabsf ( fVelocityZ ) < 0.01f )
+            {
+                bForceLocalZ = true;
+            }
+        }
+    }
+
+    // Only force z coord if needed for at least two consecutive calls
+    if ( !bForceLocalZ )
+        m_uiForceLocalZCounter = 0;
+    else
+    if ( m_uiForceLocalZCounter++ > 1 )
+    {
+        vecLocalPosition.fZ = vecTargetPosition.fZ;
+        SetPosition ( vecLocalPosition );
     }
 }
 

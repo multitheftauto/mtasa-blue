@@ -1191,7 +1191,8 @@ namespace SharedUtil
 
         bool FindValue ( const SString& strName, eDummy& outResult ) const
         {
-            if ( const eDummy* pValue = MapFind ( m_ValueMap, strName ) )
+            const eDummy* pValue;
+            if ( ( pValue = MapFind ( m_ValueMap, strName ) ) || ( pValue = MapFind ( m_ValueMap, strName.ToLower () ) ) )
             {
                 outResult = *pValue;
                 return true;
