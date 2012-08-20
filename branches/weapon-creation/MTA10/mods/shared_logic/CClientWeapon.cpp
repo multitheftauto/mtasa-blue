@@ -150,7 +150,7 @@ void CClientWeapon::DoPulse ( void )
     {
         if ( m_weaponConfig.bInstantReload == false )
         {
-            if ( m_nAmmoTotal > 0 && m_State != WEAPONSTATE_RELOADING )
+            if ( m_nAmmoTotal >= m_pWeaponStat->GetMaximumClipAmmo() && m_State != WEAPONSTATE_RELOADING )
             {
                 m_PreviousState = m_State;
                 m_State = WEAPONSTATE_RELOADING;
@@ -167,14 +167,14 @@ void CClientWeapon::DoPulse ( void )
         }
         else
         {
-            if ( m_nAmmoTotal > 0 && m_State != WEAPONSTATE_RELOADING )
+            if ( m_nAmmoTotal >= m_pWeaponStat->GetMaximumClipAmmo() && m_State != WEAPONSTATE_RELOADING )
             {
                 m_nAmmoInClip = m_pWeaponStat->GetMaximumClipAmmo();
                 m_nAmmoTotal -= m_pWeaponStat->GetMaximumClipAmmo();
             }
         }
     }
-    if ( m_nAmmoTotal > 0 || m_nAmmoInClip > 0 )
+    if ( m_nAmmoInClip > 0 )
     {
         if ( m_State == WEAPONSTATE_FIRING && m_fireTimer.Get() >= m_iWeaponFireRate ) 
         {
