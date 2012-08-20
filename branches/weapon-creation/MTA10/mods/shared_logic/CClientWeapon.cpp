@@ -406,7 +406,7 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
         if ( pClientEntity )
             Arguments.PushElement ( pClientEntity );            // entity that got hit
         else
-            Arguments.PushNil ( pClientEntity ); // Probably a building.
+            Arguments.PushNil ( ); // Probably a building.
         Arguments.PushNumber ( pColPoint->GetPosition ( ).fX ); // pos x
         Arguments.PushNumber ( pColPoint->GetPosition ( ).fY ); // pos y
         Arguments.PushNumber ( pColPoint->GetPosition ( ).fZ ); // pos z
