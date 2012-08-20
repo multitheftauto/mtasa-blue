@@ -6431,21 +6431,21 @@ bool CStaticFunctionDefinitions::ClearWeaponTarget ( CClientWeapon * pWeapon )
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetWeaponFlags ( CClientWeapon * pWeapon, bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, const SLineOfSightFlags& flags )
+bool CStaticFunctionDefinitions::SetWeaponFlags ( CClientWeapon * pWeapon, bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, bool bInstantReload, const SLineOfSightFlags& flags )
 {
     if ( pWeapon )
     {
-        pWeapon->SetFlags ( bDisableWeaponModel, bShootIfTargetBlocked, bShootIfTargetOutOfRange, flags );
+        pWeapon->SetFlags ( bDisableWeaponModel, bShootIfTargetBlocked, bShootIfTargetOutOfRange, bInstantReload, flags );
         return true;
     }
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetWeaponFlags ( CClientWeapon * pWeapon, bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange )
+bool CStaticFunctionDefinitions::SetWeaponFlags ( CClientWeapon * pWeapon, bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, bool bInstantReload )
 {
     if ( pWeapon )
     {
-        pWeapon->SetFlags ( bDisableWeaponModel, bShootIfTargetBlocked, bShootIfTargetOutOfRange );
+        pWeapon->SetFlags ( bDisableWeaponModel, bShootIfTargetBlocked, bShootIfTargetOutOfRange, bInstantReload );
         return true;
     }
     return false;
@@ -6461,15 +6461,86 @@ bool CStaticFunctionDefinitions::SetWeaponFlags ( CClientWeapon * pWeapon, const
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponFlags ( CClientWeapon * pWeapon, bool &bDisableWeaponModel, bool &bShootIfTargetBlocked, bool &bShootIfTargetOutOfRange, SLineOfSightFlags& flags )
+bool CStaticFunctionDefinitions::GetWeaponFlags ( CClientWeapon * pWeapon, bool &bDisableWeaponModel, bool &bShootIfTargetBlocked, bool &bShootIfTargetOutOfRange, bool &bInstantReload, SLineOfSightFlags& flags )
 {
     if ( pWeapon )
     {
-        pWeapon->GetFlags ( bDisableWeaponModel, bShootIfTargetBlocked, bShootIfTargetOutOfRange, flags );
+        pWeapon->GetFlags ( bDisableWeaponModel, bShootIfTargetBlocked, bShootIfTargetOutOfRange, bInstantReload, flags );
         return true;
     }
     return false;
 }
+
+bool CStaticFunctionDefinitions::SetWeaponFiringRate ( CClientWeapon * pWeapon, int iFiringRate )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetWeaponFireTime( iFiringRate );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::ResetWeaponFiringRate ( CClientWeapon * pWeapon )
+{
+    if ( pWeapon )
+    {
+        pWeapon->ResetWeaponFireTime( );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponFiringRate ( CClientWeapon * pWeapon, int &iFiringRate )
+{
+    if ( pWeapon )
+    {
+        iFiringRate = pWeapon->GetWeaponFireTime( );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponAmmo ( CClientWeapon * pWeapon, int &iAmmo )
+{
+    if ( pWeapon )
+    {
+        pWeapon->GetAmmo( iAmmo );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponClipAmmo ( CClientWeapon * pWeapon, int &iAmmo )
+{
+    if ( pWeapon )
+    {
+        pWeapon->GetClipAmmo( iAmmo );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponAmmo ( CClientWeapon * pWeapon, int iAmmo )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetAmmo( iAmmo );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponClipAmmo ( CClientWeapon * pWeapon, int iAmmo )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetClipAmmo( iAmmo );
+        return true;
+    }
+    return false;
+}
+
 
 bool CStaticFunctionDefinitions::GetTickCount_ ( double& dCount )
 {

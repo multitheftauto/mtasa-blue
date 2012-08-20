@@ -86,7 +86,7 @@ public:
     bool                    FireInstantHit      ( CEntity * pFiringEntity, const CVector* pvecOrigin, const CVector* pvecMuzzle, CEntity* pTargetEntity, const CVector* pvecTarget, const CVector* pvec, bool bCrossHairGun, bool bCreateGunFx );
     bool                    FireBullet          ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget, bool bAddMuzzle, CVector & vecRotation );
     int                     GetWeaponReloadTime ( CWeaponStat * pWeaponStat );
-    int                     GetWeaponFireTime   ( CWeaponStat * pWeaponStat );
+    static int              GetWeaponFireTime   ( CWeaponStat * pWeaponStat );
 };
 
 #endif

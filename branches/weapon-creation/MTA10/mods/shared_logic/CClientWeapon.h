@@ -30,6 +30,7 @@ struct SWeaponConfiguration
     bool bShootIfTargetOutOfRange;
     bool bShootIfTargetBlocked;
     bool bDisableWeaponModel;
+    bool bInstantReload;
     SLineOfSightFlags flags;
 };
 class CClientWeapon : public CClientObject
@@ -68,11 +69,22 @@ public:
     CWeaponStat *           GetWeaponStat           ( void )   { return m_pWeaponStat; }
     CClientPlayer *         GetOwner                ( void )                { return m_pOwner; }
     void                    SetOwner                ( CClientPlayer * pOwner )  { m_pOwner = pOwner; }
-    void                    SetFlags                ( bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, const SLineOfSightFlags& flags );
-    void                    SetFlags                ( bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange );
+    void                    SetFlags                ( bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, bool bInstantReload, const SLineOfSightFlags& flags );
+    void                    SetFlags                ( bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, bool bInstantReload );
     void                    SetFlags                ( const SLineOfSightFlags& flags );
-    void                    GetFlags                ( bool &bDisableWeaponModel, bool &bShootIfTargetBlocked, bool &bShootIfTargetOutOfRange, SLineOfSightFlags& flags );
+    void                    GetFlags                ( bool &bDisableWeaponModel, bool &bShootIfTargetBlocked, bool &bShootIfTargetOutOfRange, bool &bInstantReload, SLineOfSightFlags& flags );
     void                    DoGunShells             ( CVector vecOrigin, CVector vecDirection );
+    static int              GetWeaponFireTime       ( CWeaponStat * pWeaponStat );
+    void                    SetWeaponFireTime       ( int iWeaponFireTime );
+    int                     GetWeaponFireTime       ( void );
+    void                    ResetWeaponFireTime     ( void );
+
+    void                    SetClipAmmo             ( int iAmmo )                                 { m_nAmmoInClip = iAmmo; }
+    int                     GetClipAmmo             ( int iAmmo )                                 { return m_nAmmoInClip; }
+
+    void                    SetAmmo                 ( int iAmmo )                                 { m_nAmmoTotal = iAmmo; }
+    int                     GetAmmo                 ( int iAmmo )                                 { return m_nAmmoTotal; }
+
 private:
     CClientManager *        m_pManager;
     CWeapon *               m_pWeapon;
@@ -99,7 +111,8 @@ private:
     eWeaponState            m_PreviousState;
     CElapsedTime            m_fireTimer;
     CElapsedTime            m_reloadTimer;
-    unsigned char           m_iCounter;
+    unsigned char           m_ucCounter;
+    int                     m_iWeaponFireRate;
 };
 
 #endif

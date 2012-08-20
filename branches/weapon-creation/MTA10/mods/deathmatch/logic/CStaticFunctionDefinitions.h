@@ -534,10 +534,17 @@ public:
     static bool                         SetWeaponTarget                     ( CClientWeapon * pWeapon, CClientEntity * pTarget, int boneTarget );
     static bool                         SetWeaponTarget                     ( CClientWeapon * pWeapon, CVector vecTarget );
     static bool                         ClearWeaponTarget                   ( CClientWeapon * pWeapon );
-    static bool                         SetWeaponFlags                      ( CClientWeapon * pWeapon, bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, const SLineOfSightFlags& flags );
-    static bool                         SetWeaponFlags                      ( CClientWeapon * pWeapon, bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange );
+    static bool                         SetWeaponFlags                      ( CClientWeapon * pWeapon, bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, bool bInstantReload, const SLineOfSightFlags& flags );
+    static bool                         SetWeaponFlags                      ( CClientWeapon * pWeapon, bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, bool bInstantReload );
     static bool                         SetWeaponFlags                      ( CClientWeapon * pWeapon, const SLineOfSightFlags& flags );
-    static bool                         GetWeaponFlags                      ( CClientWeapon * pWeapon, bool &bDisableWeaponModel, bool &bShootIfTargetBlocked, bool &bShootIfTargetOutOfRange, SLineOfSightFlags& flags );
+    static bool                         GetWeaponFlags                      ( CClientWeapon * pWeapon, bool &bDisableWeaponModel, bool &bShootIfTargetBlocked, bool &bShootIfTargetOutOfRange, bool &bInstantReload, SLineOfSightFlags& flags );
+    static bool                         SetWeaponFiringRate                 ( CClientWeapon * pWeapon, int iFiringRate );
+    static bool                         ResetWeaponFiringRate               ( CClientWeapon * pWeapon );
+    static bool                         GetWeaponFiringRate                 ( CClientWeapon * pWeapon, int &iFiringRate );
+    static bool                         GetWeaponClipAmmo                   ( CClientWeapon * pWeapon, int &iClipAmmo );
+    static bool                         GetWeaponAmmo                       ( CClientWeapon * pWeapon, int &iAmmo );
+    static bool                         SetWeaponAmmo                       ( CClientWeapon * pWeapon, int iAmmo );
+    static bool                         SetWeaponClipAmmo                   ( CClientWeapon * pWeapon, int iAmmo );
 
     // Util funcs
     static bool                         GetTickCount_                       ( double& dCount );

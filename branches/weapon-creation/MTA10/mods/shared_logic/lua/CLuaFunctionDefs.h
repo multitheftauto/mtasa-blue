@@ -844,6 +844,13 @@ public:
     LUA_DECLARE ( GetWeaponOwner );
     LUA_DECLARE ( SetWeaponFlags );
     LUA_DECLARE ( GetWeaponFlags );
+    LUA_DECLARE ( SetWeaponFiringRate );
+    LUA_DECLARE ( GetWeaponFiringRate );
+    LUA_DECLARE ( ResetWeaponFiringRate );
+    LUA_DECLARE ( GetWeaponAmmo );
+    LUA_DECLARE ( GetWeaponClipAmmo );
+    LUA_DECLARE ( SetWeaponAmmo );
+    LUA_DECLARE ( SetWeaponClipAmmo );
 
     // Command funcs
     LUA_DECLARE ( AddCommandHandler );

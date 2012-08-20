@@ -57,8 +57,9 @@ CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponT
 
     m_itargetWheel = MAX_WHEELS + 1;
     m_nAmmoInClip = 30;
-    m_iCounter = 0;
+    m_ucCounter = 0;
     m_nAmmoTotal = 9999;
+    m_iWeaponFireRate = GetWeaponFireTime ( m_pWeaponStat );
 }
 
 
@@ -147,21 +148,39 @@ void CClientWeapon::DoPulse ( void )
 
     if ( m_nAmmoInClip <= 0 )
     {
-        if ( m_nAmmoTotal > 0 && m_State != WEAPONSTATE_RELOADING )
+        if ( m_weaponConfig.bInstantReload == false )
         {
-            m_PreviousState = m_State;
-            m_State = WEAPONSTATE_RELOADING;
-            m_reloadTimer.Reset();
-        }
-        else if ( m_State == WEAPONSTATE_RELOADING && m_reloadTimer.Get() >= m_pWeapon->GetWeaponReloadTime ( m_pWeaponStat ) )
-        {
-            m_State = m_PreviousState;
-            m_nAmmoInClip = 30;
+            if ( m_nAmmoTotal > 0 && m_State != WEAPONSTATE_RELOADING )
+            {
+                m_PreviousState = m_State;
+                m_State = WEAPONSTATE_RELOADING;
+                m_reloadTimer.Reset();
+            }
+            else if ( m_State == WEAPONSTATE_RELOADING && m_reloadTimer.Get() >= m_pWeapon->GetWeaponReloadTime ( m_pWeaponStat ) )
+            {
+                m_State = m_PreviousState;
+                m_nAmmoInClip = m_pWeaponStat->GetMaximumClipAmmo();
+                m_nAmmoTotal -= m_pWeaponStat->GetMaximumClipAmmo();
+            }
+            else
+                return;
         }
         else
-            return;
+        {
+            if ( m_nAmmoTotal > 0 && m_State != WEAPONSTATE_RELOADING )
+            {
+                m_nAmmoInClip = m_pWeaponStat->GetMaximumClipAmmo();
+                m_nAmmoTotal -= m_pWeaponStat->GetMaximumClipAmmo();
+            }
+        }
     }
-    if ( m_State == WEAPONSTATE_FIRING && m_fireTimer.Get() >= m_pWeapon->GetWeaponFireTime ( m_pWeaponStat ) ) Fire ();
+    if ( m_nAmmoTotal > 0 || m_nAmmoInClip > 0 )
+    {
+        if ( m_State == WEAPONSTATE_FIRING && m_fireTimer.Get() >= m_iWeaponFireRate ) 
+        {
+            Fire ();
+        }
+    }
 }
 
 void CClientWeapon::Create ( void )
@@ -337,6 +356,7 @@ void CClientWeapon::Fire ( void )
             // End our lag compensation
             if ( pOwnerPed )
                 g_pClientGame->RevertShotCompensation( g_pClientGame->GetPedManager()->Get(pOwnerPed,false,false) );
+
             m_nAmmoInClip--;
             m_fireTimer.Reset();
             break;
@@ -515,19 +535,21 @@ void CClientWeapon::ResetWeaponTarget ( void )
     m_targetBone = BONE_PELVIS;
 }
 
-void CClientWeapon::SetFlags ( bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, const SLineOfSightFlags& flags )
+void CClientWeapon::SetFlags ( bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, bool bInstantReload, const SLineOfSightFlags& flags )
 {
     m_weaponConfig.bDisableWeaponModel = bDisableWeaponModel;
     m_weaponConfig.bShootIfTargetBlocked = bShootIfTargetBlocked;
     m_weaponConfig.bShootIfTargetOutOfRange = bShootIfTargetOutOfRange;
+    m_weaponConfig.bInstantReload = bInstantReload;
     m_weaponConfig.flags = flags;
 }
 
-void CClientWeapon::SetFlags ( bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange )
+void CClientWeapon::SetFlags ( bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, bool bInstantReload )
 {
     m_weaponConfig.bDisableWeaponModel = bDisableWeaponModel;
     m_weaponConfig.bShootIfTargetBlocked = bShootIfTargetBlocked;
     m_weaponConfig.bShootIfTargetOutOfRange = bShootIfTargetOutOfRange;
+    m_weaponConfig.bInstantReload = bInstantReload;
 }
 
 void CClientWeapon::SetFlags ( const SLineOfSightFlags& flags )
@@ -536,11 +558,12 @@ void CClientWeapon::SetFlags ( const SLineOfSightFlags& flags )
 }
 
 
-void CClientWeapon::GetFlags ( bool &bDisableWeaponModel, bool &bShootIfTargetBlocked, bool &bShootIfTargetOutOfRange, SLineOfSightFlags& flags )
+void CClientWeapon::GetFlags ( bool &bDisableWeaponModel, bool &bShootIfTargetBlocked, bool &bShootIfTargetOutOfRange, bool &bInstantReload, SLineOfSightFlags& flags )
 {
     bDisableWeaponModel = m_weaponConfig.bDisableWeaponModel;
     bShootIfTargetBlocked = m_weaponConfig.bShootIfTargetBlocked;
     bShootIfTargetOutOfRange = m_weaponConfig.bShootIfTargetOutOfRange;
+    bInstantReload = m_weaponConfig.bInstantReload;
     flags = m_weaponConfig.flags;
 }
 
@@ -555,14 +578,14 @@ void CClientWeapon::DoGunShells ( CVector vecOrigin, CVector vecDirection )
         case(WEAPONTYPE_M4):
         case(WEAPONTYPE_AK47):
         {
-            if ( m_iCounter == 0)
+            if ( m_ucCounter == 0)
             {
                 fShellSize = 0.25f;
-                m_iCounter = 1;
+                m_ucCounter = 1;
             }
             else
             {
-                m_iCounter = 0;
+                m_ucCounter = 0;
             }
             break;
         }
@@ -591,11 +614,32 @@ void CClientWeapon::DoGunShells ( CVector vecOrigin, CVector vecDirection )
     {
         g_pGame->GetPointLights ()->AddLight ( PLTYPE_POINTLIGHT, vecOrigin, CVector (), 3.0f, 0.22f, 0.25f, 0, 0, 0, 0 );
 
-        if ( GetAttachedTo () ) g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, false );
+        if ( GetAttachedTo () ) g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
         else g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
 
         m_pWeapon->AddGunshell ( m_pObject, &vecOrigin, &CVector2D ( 0, -1 ), fShellSize );
         g_pGame->GetAudioEngine ()->ReportWeaponEvent ( WEAPON_EVENT_FIRE, m_Type, m_pObject );
 
     }
+}
+
+int CClientWeapon::GetWeaponFireTime ( CWeaponStat * pWeaponStat )
+{
+    float fWeaponFireTime = (pWeaponStat->GetWeaponAnimLoopStop() - pWeaponStat->GetWeaponAnimLoopStart()) * 1000.0f;
+    return (int)fWeaponFireTime;
+}
+
+void CClientWeapon::SetWeaponFireTime ( int iFireTime )
+{
+    m_iWeaponFireRate = iFireTime;
+}
+
+int CClientWeapon::GetWeaponFireTime ( void )
+{
+    return m_iWeaponFireRate;
+}
+
+void CClientWeapon::ResetWeaponFireTime ( void )
+{
+    m_iWeaponFireRate = GetWeaponFireTime ( m_pWeaponStat );
 }

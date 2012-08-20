@@ -268,6 +268,9 @@ int CLuaFunctionDefs::GetWeaponOwner ( lua_State* luaVM )
             return 1;
         }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponOwner", *argStream.GetErrorMessage () ) );
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -299,6 +302,9 @@ int CLuaFunctionDefs::SetWeaponOwner ( lua_State* luaVM )
             return 1;
         }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponOwner", *argStream.GetErrorMessage () ) );
+
     lua_pushnil ( luaVM );
     return 1;
 }
@@ -309,11 +315,13 @@ int CLuaFunctionDefs::SetWeaponFlags ( lua_State* luaVM )
     bool bDisableWeaponModel;
     bool bShootIfTargetBlocked;
     bool bShootIfTargetOutOfRange;
+    bool bInstantReload;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWeapon );
     argStream.ReadBool ( bDisableWeaponModel );
     argStream.ReadBool ( bShootIfTargetBlocked );
     argStream.ReadBool ( bShootIfTargetOutOfRange );
+    argStream.ReadBool ( bInstantReload );
     argStream.ReadBool ( flags.bCheckBuildings );
     argStream.ReadBool ( flags.bCheckCarTires );
     argStream.ReadBool ( flags.bCheckDummies );
@@ -324,12 +332,15 @@ int CLuaFunctionDefs::SetWeaponFlags ( lua_State* luaVM )
     argStream.ReadBool ( flags.bShootThroughStuff );
     if ( !argStream.HasErrors() )
     {
-        if ( CStaticFunctionDefinitions::SetWeaponFlags( pWeapon, bDisableWeaponModel, bShootIfTargetBlocked, bShootIfTargetOutOfRange, flags ) )
+        if ( CStaticFunctionDefinitions::SetWeaponFlags( pWeapon, bDisableWeaponModel, bShootIfTargetBlocked, bInstantReload, bShootIfTargetOutOfRange, flags ) )
         {
             lua_pushboolean( luaVM, true );
             return 1;
         }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponFlags", *argStream.GetErrorMessage () ) );
+
     lua_pushboolean( luaVM, false );
     return 1;
 }
@@ -341,15 +352,17 @@ int CLuaFunctionDefs::GetWeaponFlags ( lua_State* luaVM )
     bool bDisableWeaponModel;
     bool bShootIfTargetBlocked;
     bool bShootIfTargetOutOfRange;
+    bool bInstantReload;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWeapon );
     if ( !argStream.HasErrors() )
     {
-        if ( CStaticFunctionDefinitions::GetWeaponFlags( pWeapon, bDisableWeaponModel, bShootIfTargetBlocked, bShootIfTargetOutOfRange, flags ) )
+        if ( CStaticFunctionDefinitions::GetWeaponFlags( pWeapon, bDisableWeaponModel, bShootIfTargetBlocked, bInstantReload, bShootIfTargetOutOfRange, flags ) )
         {
             lua_pushboolean( luaVM, bDisableWeaponModel );
             lua_pushboolean( luaVM, bShootIfTargetBlocked );
             lua_pushboolean( luaVM, bShootIfTargetOutOfRange );
+            lua_pushboolean( luaVM, bInstantReload );
             lua_pushboolean( luaVM, flags.bCheckBuildings );
             lua_pushboolean( luaVM, flags.bCheckCarTires );
             lua_pushboolean( luaVM, flags.bCheckDummies );
@@ -358,9 +371,168 @@ int CLuaFunctionDefs::GetWeaponFlags ( lua_State* luaVM )
             lua_pushboolean( luaVM, flags.bCheckVehicles );
             lua_pushboolean( luaVM, flags.bSeeThroughStuff );
             lua_pushboolean( luaVM, flags.bShootThroughStuff );
-            return 11;
+            return 12;
         }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponFlags", *argStream.GetErrorMessage () ) );
+
     lua_pushboolean( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetWeaponFiringRate ( lua_State* luaVM )
+{
+    CClientWeapon * pWeapon = NULL;
+    int iFiringRate = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWeapon );
+    argStream.ReadNumber ( iFiringRate );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( CStaticFunctionDefinitions::SetWeaponFiringRate( pWeapon, iFiringRate ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponFiringRate", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetWeaponFiringRate ( lua_State* luaVM )
+{
+    CClientWeapon * pWeapon = NULL;
+    int iFiringRate = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWeapon );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( CStaticFunctionDefinitions::GetWeaponFiringRate( pWeapon, iFiringRate ) )
+        {
+            lua_pushnumber ( luaVM, iFiringRate );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponFiringRate", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::ResetWeaponFiringRate ( lua_State* luaVM )
+{
+    CClientWeapon * pWeapon = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWeapon );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( CStaticFunctionDefinitions::ResetWeaponFiringRate( pWeapon ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "resetWeaponFiringRate", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetWeaponClipAmmo ( lua_State* luaVM )
+{
+    CClientWeapon * pWeapon = NULL;
+    int iClipAmmo = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWeapon );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( CStaticFunctionDefinitions::GetWeaponClipAmmo( pWeapon, iClipAmmo ) )
+        {
+            lua_pushnumber ( luaVM, iClipAmmo );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponClipAmmo", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetWeaponAmmo ( lua_State* luaVM )
+{
+    CClientWeapon * pWeapon = NULL;
+    int iAmmo = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWeapon );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( CStaticFunctionDefinitions::GetWeaponAmmo( pWeapon, iAmmo ) )
+        {
+            lua_pushnumber ( luaVM, iAmmo );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponAmmo", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetWeaponAmmo ( lua_State* luaVM )
+{
+    CClientWeapon * pWeapon = NULL;
+    int iAmmo = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWeapon );
+    argStream.ReadNumber ( iAmmo );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( CStaticFunctionDefinitions::SetWeaponAmmo( pWeapon, iAmmo ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponAmmo", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetWeaponClipAmmo ( lua_State* luaVM )
+{
+    CClientWeapon * pWeapon = NULL;
+    int iAmmo = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWeapon );
+    argStream.ReadNumber ( iAmmo );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( CStaticFunctionDefinitions::SetWeaponClipAmmo( pWeapon, iAmmo ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponClipAmmo", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
