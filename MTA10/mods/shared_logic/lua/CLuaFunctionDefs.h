@@ -274,7 +274,6 @@ public:
     LUA_DECLARE ( SetPedOnFire );
     LUA_DECLARE ( WarpPedIntoVehicle );
     LUA_DECLARE ( RemovePedFromVehicle );
-    LUA_DECLARE ( SetWeaponProperty );
 
     // Clothes and body functions
     LUA_DECLARE ( GetBodyPartName );
@@ -817,7 +816,9 @@ public:
     LUA_DECLARE ( GetProjectileType );
 	LUA_DECLARE ( GetProjectileTarget );
 	LUA_DECLARE ( GetProjectileCreator );
-	LUA_DECLARE ( GetProjectileForce );
+    LUA_DECLARE ( GetProjectileForce );
+    LUA_DECLARE ( GetProjectileCounter );
+    LUA_DECLARE ( SetProjectileCounter );
 
     // Shape create funcs
     LUA_DECLARE ( CreateColCircle );
@@ -839,6 +840,22 @@ public:
     LUA_DECLARE ( GetWeaponNameFromID );
     LUA_DECLARE ( GetWeaponIDFromName );
     LUA_DECLARE ( GetSlotFromWeapon );
+    LUA_DECLARE ( CreateWeapon );
+    LUA_DECLARE ( FireWeapon );
+    LUA_DECLARE ( SetWeaponProperty );
+    LUA_DECLARE ( SetWeaponState );
+    LUA_DECLARE ( SetWeaponTarget );
+    LUA_DECLARE ( SetWeaponOwner );
+    LUA_DECLARE ( GetWeaponOwner );
+    LUA_DECLARE ( SetWeaponFlags );
+    LUA_DECLARE ( GetWeaponFlags );
+    LUA_DECLARE ( SetWeaponFiringRate );
+    LUA_DECLARE ( GetWeaponFiringRate );
+    LUA_DECLARE ( ResetWeaponFiringRate );
+    LUA_DECLARE ( GetWeaponAmmo );
+    LUA_DECLARE ( GetWeaponClipAmmo );
+    LUA_DECLARE ( SetWeaponAmmo );
+    LUA_DECLARE ( SetWeaponClipAmmo );
 
     // Command funcs
     LUA_DECLARE ( AddCommandHandler );

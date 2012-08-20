@@ -35,7 +35,7 @@ void CAudioRPCs::PlaySound ( NetBitStreamInterface& bitStream )
                 SIntegerSync < unsigned char, 7 > sound;
                 if ( bitStream.Read ( &sound ) )
                 {
-                    g_pGame->GetAudio ()->PlayFrontEndSound ( sound );
+                    g_pGame->GetAudioEngine ()->PlayFrontEndSound ( sound );
                 }
 //              break;
 //          case AUDIO_MISSION_PRELOAD:

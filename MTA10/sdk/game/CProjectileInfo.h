@@ -29,6 +29,10 @@ public:
     virtual void                    SetTarget ( CEntity* pEntity ) = 0;
 
     virtual bool                    IsActive ( void ) = 0;
+
+    virtual void                    SetCounter ( DWORD dwCounter ) = 0;
+
+    virtual DWORD                   GetCounter ( void ) = 0;
 };
 
 #endif

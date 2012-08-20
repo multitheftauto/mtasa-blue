@@ -87,6 +87,7 @@ public:
     void                        ResetLists                      ( void );
     bool                        LoadDefault                     ( CWeaponStat* pDest, eWeaponType weaponType, eWeaponSkill skill = WEAPONSKILL_STD );
     void                        CreateWeaponStat                ( CWeaponInfo* pInterface, eWeaponType weaponType, eWeaponSkill weaponSkill );
+    CWeaponStat*                CreateWeaponStatUnlisted        ( eWeaponType weaponType, eWeaponSkill weaponSkill );
     eWeaponSkill                GetWeaponSkillFromSkillLevel    ( eWeaponType type, float fSkillLevel );
 
 

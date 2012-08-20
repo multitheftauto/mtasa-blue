@@ -237,6 +237,7 @@ bool CWorldSA::ProcessLineOfSight(const CVector * vecStart, const CVector * vecE
                 else
                     pBuildingResult->usLODModelID = 0;
 
+                pBuildingResult->pInterface = targetEntity;
                 pBuildingResult->vecPosition = targetEntity->Placeable.m_transform.m_translate;
                 if ( targetEntity->Placeable.matrix )
                 {
