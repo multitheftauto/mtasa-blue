@@ -72,7 +72,7 @@ public:
     void                    SetFlags                ( bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange );
     void                    SetFlags                ( const SLineOfSightFlags& flags );
     void                    GetFlags                ( bool &bDisableWeaponModel, bool &bShootIfTargetBlocked, bool &bShootIfTargetOutOfRange, SLineOfSightFlags& flags );
-
+    void                    DoGunShells             ( CVector vecOrigin, CVector vecDirection );
 private:
     CClientManager *        m_pManager;
     CWeapon *               m_pWeapon;

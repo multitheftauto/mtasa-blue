@@ -318,7 +318,7 @@ bool CWeaponSA::FireInstantHit ( CEntity * pFiringEntity, const CVector* pvecOri
     DWORD dwTargetInterface = 0;
     if ( pTargetEntity ) dwTargetInterface = ( DWORD ) pTargetEntity->GetInterface ();
     DWORD dwThis = ( DWORD ) internalInterface;
-    DWORD dwFunc = 0x073FB10;
+    DWORD dwFunc = FUNC_CWeapon_FireInstantHit;
     _asm
     {
         mov     ecx, dwThis
@@ -395,24 +395,24 @@ bool CWeaponSA::ProcessLineOfSight ( const CVector * vecStart, const CVector * v
     return  bReturn;
 }
 
-int CWeaponSA::GetWeaponReloadTime ( void )
+int CWeaponSA::GetWeaponReloadTime ( CWeaponStat * pWeaponStat )
 {
+    CWeaponStatSA * pWeaponStats = (CWeaponStatSA*)pWeaponStat;
     DWORD dwReturn = 0;
-    DWORD dwFunction = 0x743D70;
-    DWORD dwThis = (DWORD)GetInfo ( WEAPONSKILL_STD );
+    DWORD dwFunction = FUNC_CWeaponInfo_GetWeaponReloadTime;
+    DWORD dwInterface = (DWORD)pWeaponStats->GetInterface();
     _asm
     {
-        mov ecx, dwThis
+        mov ecx, dwInterface
         call dwFunction
         mov dwReturn, eax
     }
     return dwReturn;
 }
 
-int CWeaponSA::GetWeaponFireTime ( void )
+int CWeaponSA::GetWeaponFireTime ( CWeaponStat * pWeaponStat )
 {
-    DWORD dwInterface = (DWORD)GetInfo ( WEAPONSKILL_STD );
     int iGlobalTimer = pGame->GetSystemTime();
-    float fWeaponFireTime = (*(float *)(dwInterface + 68) - *(float *)(dwInterface + 64)) * -900.0f;
-    return (iGlobalTimer - (int)fWeaponFireTime);
+    float fWeaponFireTime = (pWeaponStat->GetWeaponAnimLoopStop() - pWeaponStat->GetWeaponAnimLoopStart()) * 1000.0f;
+    return (int)fWeaponFireTime;
 }

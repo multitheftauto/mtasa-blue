@@ -15,12 +15,12 @@
 #include "Common.h"
 
 #include "CWeaponInfo.h"
-
 class CPed;
 class CColPoint;
 class CVector2D;
 class CVector;
 class CWeaponInfo;
+class CWeaponStat;
 enum ePedPieceTypes;
 struct SLineOfSightFlags;
 struct SLineOfSightBuildingResult;
@@ -51,8 +51,8 @@ public:
     virtual bool            ProcessLineOfSight  ( const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, CEntity ** CollisionEntity, const SLineOfSightFlags flags, SLineOfSightBuildingResult* pBuildingResult, eWeaponType weaponType, CEntitySAInterface ** pEntity ) = 0;
     virtual bool            FireInstantHit      ( CEntity * pFiringEntity, const CVector* pvecOrigin, const CVector* pvecMuzzle, CEntity* pTargetEntity, const CVector* pvecTarget, const CVector* pvec, bool bCrossHairGun, bool bCreateGunFx ) = 0;
     virtual bool            FireBullet          ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget, bool bAddMuzzle, CVector & vecRotation ) = 0;
-    virtual int             GetWeaponReloadTime ( void ) = 0;
-    virtual int             GetWeaponFireTime   ( void ) = 0;
+    virtual int             GetWeaponReloadTime ( CWeaponStat * pWeaponStat ) = 0;
+    virtual int             GetWeaponFireTime   ( CWeaponStat * pWeaponStat ) = 0;
 };
 
 #endif

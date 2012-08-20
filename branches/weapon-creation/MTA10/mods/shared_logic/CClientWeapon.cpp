@@ -153,7 +153,7 @@ void CClientWeapon::DoPulse ( void )
             m_State = WEAPONSTATE_RELOADING;
             m_reloadTimer.Reset();
         }
-        else if ( m_State == WEAPONSTATE_RELOADING && m_reloadTimer.Get() >= m_pWeapon->GetWeaponReloadTime ( ) )
+        else if ( m_State == WEAPONSTATE_RELOADING && m_reloadTimer.Get() >= m_pWeapon->GetWeaponReloadTime ( m_pWeaponStat ) )
         {
             m_State = m_PreviousState;
             m_nAmmoInClip = 30;
@@ -161,8 +161,7 @@ void CClientWeapon::DoPulse ( void )
         else
             return;
     }
-
-    if ( m_State == WEAPONSTATE_FIRING && m_fireTimer.Get() > (m_pWeapon->GetWeaponFireTime ( ) / 1000) ) Fire ();
+    if ( m_State == WEAPONSTATE_FIRING && m_fireTimer.Get() >= m_pWeapon->GetWeaponFireTime ( m_pWeaponStat ) ) Fire ();
 }
 
 void CClientWeapon::Create ( void )
@@ -374,20 +373,8 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
         {
             return;
         }
-        if ( m_iCounter == 1 || m_pWeapon->GetWeaponFireTime() > 50 )
-        {
 
-            g_pGame->GetPointLights ()->AddLight ( PLTYPE_POINTLIGHT, vecOrigin, CVector (), 3.0f, 0.22f, 0.25f, 0, 0, 0, 0 );
-
-            if ( GetAttachedTo () ) g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, false );
-            else g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
-
-            m_pWeapon->AddGunshell ( m_pObject, &vecOrigin, &CVector2D ( 0, -1 ), 0.45f );
-            g_pGame->GetAudioEngine ()->ReportWeaponEvent ( WEAPON_EVENT_FIRE, m_Type, NULL );
-            m_iCounter = 0;
-        }
-        else
-            m_iCounter = 1;
+        DoGunShells ( vecOrigin, vecDirection );
 
         CVector vecCollision;
         if ( g_pGame->GetWaterManager ()->TestLineAgainstWater ( vecOrigin, vecTarget, &vecCollision ) )
@@ -555,4 +542,60 @@ void CClientWeapon::GetFlags ( bool &bDisableWeaponModel, bool &bShootIfTargetBl
     bShootIfTargetBlocked = m_weaponConfig.bShootIfTargetBlocked;
     bShootIfTargetOutOfRange = m_weaponConfig.bShootIfTargetOutOfRange;
     flags = m_weaponConfig.flags;
+}
+
+void CClientWeapon::DoGunShells ( CVector vecOrigin, CVector vecDirection )
+{
+
+    float fShellSize = 0.0f;
+
+    switch( m_Type )
+    {
+        case(WEAPONTYPE_MINIGUN):
+        case(WEAPONTYPE_M4):
+        case(WEAPONTYPE_AK47):
+        {
+            if ( m_iCounter == 0)
+            {
+                fShellSize = 0.25f;
+                m_iCounter = 1;
+            }
+            else
+            {
+                m_iCounter = 0;
+            }
+            break;
+        }
+        break;
+        case(WEAPONTYPE_MICRO_UZI):
+        case(WEAPONTYPE_MP5):
+        case(WEAPONTYPE_TEC9):
+            fShellSize = 0.3f;
+        break;
+
+        case(WEAPONTYPE_SNIPERRIFLE):
+        case(WEAPONTYPE_PISTOL):
+        case(WEAPONTYPE_PISTOL_SILENCED):
+        case(WEAPONTYPE_DESERT_EAGLE):
+            fShellSize = 0.25f;
+        break;
+
+        case(WEAPONTYPE_SHOTGUN):
+        case(WEAPONTYPE_SAWNOFF_SHOTGUN):
+        case(WEAPONTYPE_SPAS12_SHOTGUN):
+            fShellSize = 0.45f;
+        break;
+    }
+
+    if(fShellSize > 0.0f)
+    {
+        g_pGame->GetPointLights ()->AddLight ( PLTYPE_POINTLIGHT, vecOrigin, CVector (), 3.0f, 0.22f, 0.25f, 0, 0, 0, 0 );
+
+        if ( GetAttachedTo () ) g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, false );
+        else g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
+
+        m_pWeapon->AddGunshell ( m_pObject, &vecOrigin, &CVector2D ( 0, -1 ), 0.45f );
+        g_pGame->GetAudioEngine ()->ReportWeaponEvent ( WEAPON_EVENT_FIRE, m_Type, m_pObject );
+
+    }
 }

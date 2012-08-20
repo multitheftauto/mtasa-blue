@@ -28,12 +28,16 @@
 #define FUNC_CWeapon_AddGunshell                        0x73a3e0
 #define FUNC_CWeapon_DoBulletImpact                     0x73b550
 #define FUNC_CWeapon_GenerateDamageEvent                0x73a530
+#define FUNC_CWeapon_FireInstantHit                     0x73FB10
+
+#define FUNC_CWeaponInfo_GetWeaponReloadTime            0x743D70
 
 #define FUNC_CBirds_CheckForHit                         0x712E40
 #define FUNC_CShadows_CheckForHit                       0x707550
 
 extern CGameSA * pGame;
 class CWeaponSAInterface;
+class CWeaponStatSA;
 
 
 class CWeaponSAInterface
@@ -81,8 +85,8 @@ public:
     bool                    ProcessLineOfSight  ( const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, CEntity ** CollisionEntity, const SLineOfSightFlags flags, SLineOfSightBuildingResult* pBuildingResult, eWeaponType weaponType, CEntitySAInterface ** pEntity );
     bool                    FireInstantHit      ( CEntity * pFiringEntity, const CVector* pvecOrigin, const CVector* pvecMuzzle, CEntity* pTargetEntity, const CVector* pvecTarget, const CVector* pvec, bool bCrossHairGun, bool bCreateGunFx );
     bool                    FireBullet          ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget, bool bAddMuzzle, CVector & vecRotation );
-    int                     GetWeaponReloadTime ( void );
-    int                     GetWeaponFireTime   ( void );
+    int                     GetWeaponReloadTime ( CWeaponStat * pWeaponStat );
+    int                     GetWeaponFireTime   ( CWeaponStat * pWeaponStat );
 };
 
 #endif
