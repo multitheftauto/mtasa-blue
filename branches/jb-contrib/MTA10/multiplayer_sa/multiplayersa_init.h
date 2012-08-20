@@ -95,7 +95,7 @@ extern CGame* pGameInterface;
 // 0x742C00 - 0x729AFF
 // 0x729C00 - 0x8A4000
 //
-/*
+
 void MemSet ( void* dwDest, int cValue, uint uiAmount );
 void MemCpy ( void* dwDest, const void* dwSrc, uint uiAmount );
 
@@ -137,5 +137,5 @@ void MemSubFast ( U ptr, const T value )
 
 bool GetDebugIdEnabled ( uint uiDebugId );
 void LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody );
-*/
+
 #endif

@@ -19,7 +19,6 @@
 #include <game/RenderWare.h>
 #include <windows.h>
 #include <stdio.h>
-#include "gamesa_init.h"
 
 class CColModelSAInterface;
 
@@ -223,6 +222,15 @@ inline RwFrame * RwFrameFindFrame ( RwFrame * parent, const char * name ) {
             buf = RwFrameFindFrame ( ret, name );
             if ( buf != NULL ) return buf;
         }
+
+        // search through the children frames
+        if ( strncmp ( &ret->szName[0], name, 16 ) == 0 ) {
+            // found it
+            return ret;
+        }
+        ret = ret->next;
     }
+    return NULL;
 }
+
 #endif

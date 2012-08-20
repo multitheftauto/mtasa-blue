@@ -6372,12 +6372,6 @@ bool CStaticFunctionDefinitions::GetPlayerMapBoundingBox ( CVector &vecMin, CVec
     return false;
 }
 
-bool CStaticFunctionDefinitions::FxCreateSystem ( const SString& strName, const CVector& vecPoint, RwMatrix* pMatrix, bool bUnk )
-{
-//    g_pGame->GetFxManager()->CreateFxSystem(strName, vecPoint, pMatrix, bUnk);
-    return true;
-}
-
 bool CStaticFunctionDefinitions::FxAddBlood ( CVector & vecPosition, CVector & vecDirection, int iCount, float fBrightness )
 {
     g_pGame->GetFx ()->AddBlood ( vecPosition, vecDirection, iCount, fBrightness );

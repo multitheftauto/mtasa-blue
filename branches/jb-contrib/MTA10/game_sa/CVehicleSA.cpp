@@ -1893,7 +1893,7 @@ void CVehicleSA::OnChangingPosition ( const CVector& vecNewPosition )
         if ( GetBaseVehicleType () == 0 )
         {
             // Reposition colpoints for big moves to avoid random spinning
-            CAutomobileSAInterface* pInterface = reinterpret_cast<CAutomobileSAInterface*>(m_pVehicle->GetInterface());
+            CAutomobileSAInterface* pInterface = reinterpret_cast<CAutomobileSAInterface*>(m_pInterface);
             pInterface->WheelFrontLeftColPoint.Position += vecDelta;
             pInterface->WheelRearLeftColPoint.Position += vecDelta;
             pInterface->WheelFrontRightColPoint.Position += vecDelta;
@@ -1902,7 +1902,7 @@ void CVehicleSA::OnChangingPosition ( const CVector& vecNewPosition )
         // Bikes
         else if ( GetBaseVehicleType () == 9 )
         {
-            CBikeSAInterface* pInterface = reinterpret_cast<CBikeSAInterface*>(m_pVehicle->GetInterface());
+            CBikeSAInterface* pInterface = reinterpret_cast<CBikeSAInterface*>(m_pInterface);
             pInterface->WheelColPointArray[0].Position += vecDelta;
             pInterface->WheelColPointArray[1].Position += vecDelta;
             pInterface->WheelColPointArray[2].Position += vecDelta;
