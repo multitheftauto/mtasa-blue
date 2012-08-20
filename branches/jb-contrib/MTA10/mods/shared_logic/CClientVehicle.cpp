@@ -2074,6 +2074,20 @@ void CClientVehicle::StreamedInPulse ( void )
                     m_fDoorOpenRatio [ i ] = pDoor->GetAngleOpenRatio ();
             }
         }
+
+        // Get the drowning state
+        bool drowning = m_pVehicle->IsDrowning ();
+
+        // Have we just started drowning?
+        if ( !m_bInWater && drowning )
+        {
+            // Call the onClientVehicleDrown event
+            CLuaArguments Arguments;
+            this->CallEvent ( "onClientVehicleDrown", Arguments, false );
+        }
+
+        // Store the new drowning state
+        m_bInWater = drowning;
     }
 }
 

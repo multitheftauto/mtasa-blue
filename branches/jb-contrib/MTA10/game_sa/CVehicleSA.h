@@ -386,7 +386,7 @@ public:
     void* pFlyingHandlingData; // 904
     uint32 dwHandlingFlags; // 908
     CAutoPilot AutoPilot;
-    CVehicleFlags m_nVehicleFlags; // 1064?
+    CVehicleFlags m_nVehicleFlags; // 1064
     uint32 m_TimeOfCreation; // 1068
 
     uint8 m_colour1; // 1072

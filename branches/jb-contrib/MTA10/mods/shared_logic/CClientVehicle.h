@@ -580,6 +580,8 @@ public:
 #endif
     SLastSyncedVehData*         m_LastSyncedData;
     SSirenInfo                  m_tSirenBeaconInfo;
+
+    bool                        m_bInWater;
 };
 
 #endif
