@@ -594,7 +594,7 @@ void CClientWeapon::DoGunShells ( CVector vecOrigin, CVector vecDirection )
         if ( GetAttachedTo () ) g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, false );
         else g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
 
-        m_pWeapon->AddGunshell ( m_pObject, &vecOrigin, &CVector2D ( 0, -1 ), 0.45f );
+        m_pWeapon->AddGunshell ( m_pObject, &vecOrigin, &CVector2D ( 0, -1 ), fShellSize );
         g_pGame->GetAudioEngine ()->ReportWeaponEvent ( WEAPON_EVENT_FIRE, m_Type, m_pObject );
 
     }
