@@ -387,31 +387,38 @@ void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget )
         {
             vecTarget = pColPoint->GetPosition ();
         }
+
+        // Don't continue without a valid colpoint
+        if ( !pColPoint )
+            return;
+
         //if ( pAttachedTo ) pAttachedTo->WorldIgnore ( false );
 
+        // return if shoot if target is blocked is false and we aren't pointing at our target
         if ( ( m_pTarget != NULL && m_pTarget->GetGameEntity ( ) != NULL && m_pTarget->GetGameEntity()->GetInterface ( ) != pEntity ) && m_weaponConfig.bShootIfTargetBlocked == false )
         {
             return;
         }
 
+        // Execute our weapon fire event
         CClientEntity * pClientEntity = m_pManager->FindEntitySafe ( pColEntity );
+        CLuaArguments Arguments;
         if ( pClientEntity )
-        {
-            CLuaArguments Arguments;
             Arguments.PushElement ( pClientEntity );            // entity that got hit
-            Arguments.PushNumber ( pColPoint->GetPosition ( ).fX ); // pos x
-            Arguments.PushNumber ( pColPoint->GetPosition ( ).fY ); // pos y
-            Arguments.PushNumber ( pColPoint->GetPosition ( ).fZ ); // pos z
-            Arguments.PushNumber ( pColPoint->GetNormal ( ).fX ); // Normal x
-            Arguments.PushNumber ( pColPoint->GetNormal ( ).fY ); // Normal y
-            Arguments.PushNumber ( pColPoint->GetNormal ( ).fZ ); // Normal z
-            Arguments.PushNumber ( pColPoint->GetSurfaceTypeB ( ) ); // Surface type "B"
-            Arguments.PushNumber ( pColPoint->GetLightingForTimeOfDay ( ) ); // Lighting
-            Arguments.PushNumber ( pColPoint->GetPieceTypeB ( ) ); // Piece
-            if ( !CallEvent ( "onClientWeaponFire", Arguments, true ) )
-            {
-                return;
-            }
+        else
+            Arguments.PushNil ( pClientEntity ); // Probably a building.
+        Arguments.PushNumber ( pColPoint->GetPosition ( ).fX ); // pos x
+        Arguments.PushNumber ( pColPoint->GetPosition ( ).fY ); // pos y
+        Arguments.PushNumber ( pColPoint->GetPosition ( ).fZ ); // pos z
+        Arguments.PushNumber ( pColPoint->GetNormal ( ).fX ); // Normal x
+        Arguments.PushNumber ( pColPoint->GetNormal ( ).fY ); // Normal y
+        Arguments.PushNumber ( pColPoint->GetNormal ( ).fZ ); // Normal z
+        Arguments.PushNumber ( pColPoint->GetSurfaceTypeB ( ) ); // Surface type "B"
+        Arguments.PushNumber ( pColPoint->GetLightingForTimeOfDay ( ) ); // Lighting
+        Arguments.PushNumber ( pColPoint->GetPieceTypeB ( ) ); // Piece
+        if ( !CallEvent ( "onClientWeaponFire", Arguments, true ) )
+        {
+            return;
         }
 
         DoGunShells ( vecOrigin, vecDirection );
