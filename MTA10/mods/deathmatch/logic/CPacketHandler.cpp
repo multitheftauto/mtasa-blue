@@ -1189,7 +1189,7 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
             char* szMessage = new char[iNumberOfBytesUsed + 1];
             bitStream.Read ( szMessage, iNumberOfBytesUsed );
             szMessage [iNumberOfBytesUsed] = 0;
-            if ( MbUTF8ToUTF16(szMessage).size() <= MAX_CHATECHO_LENGTH )
+            if ( MbUTF8ToUTF16(szMessage).size() <= MAX_CHATECHO_LENGTH + 6 )   // Extra 6 characters to fix #7125 (Teamsay + long name + long message = too long message)
             {
                 // Strip it for bad characters
                 StripControlCodes ( szMessage, ' ' );
