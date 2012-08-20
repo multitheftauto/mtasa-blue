@@ -542,6 +542,14 @@ void CClientWeapon::SetFlags ( bool bDisableWeaponModel, bool bShootIfTargetBloc
     m_weaponConfig.bShootIfTargetOutOfRange = bShootIfTargetOutOfRange;
     m_weaponConfig.bInstantReload = bInstantReload;
     m_weaponConfig.flags = flags;
+    if ( m_weaponConfig.bDisableWeaponModel )
+    {
+        SetVisible( false );
+    }
+    else
+    {
+        SetVisible( true );
+    }
 }
 
 void CClientWeapon::SetFlags ( bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, bool bInstantReload )
@@ -550,6 +558,14 @@ void CClientWeapon::SetFlags ( bool bDisableWeaponModel, bool bShootIfTargetBloc
     m_weaponConfig.bShootIfTargetBlocked = bShootIfTargetBlocked;
     m_weaponConfig.bShootIfTargetOutOfRange = bShootIfTargetOutOfRange;
     m_weaponConfig.bInstantReload = bInstantReload;
+    if ( m_weaponConfig.bDisableWeaponModel )
+    {
+        SetVisible( false );
+    }
+    else
+    {
+        SetVisible( true );
+    }
 }
 
 void CClientWeapon::SetFlags ( const SLineOfSightFlags& flags )
