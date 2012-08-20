@@ -368,7 +368,6 @@
     <ClCompile Include="..\shared_logic\CClientTeamManager.cpp" />
     <ClCompile Include="..\shared_logic\CClientTextDisplay.cpp" />
     <ClCompile Include="..\shared_logic\CClientTexture.cpp" />
-    <ClCompile Include="..\shared_logic\CClientTime.cpp" />
     <ClCompile Include="..\shared_logic\CClientTXD.cpp" />
     <ClCompile Include="..\shared_logic\CClientVehicle.cpp" />
     <ClCompile Include="..\shared_logic\CClientVehicleManager.cpp" />
@@ -766,7 +765,6 @@
     <ClInclude Include="..\shared_logic\CClientTeamManager.h" />
     <ClInclude Include="..\shared_logic\CClientTextDisplay.h" />
     <ClInclude Include="..\shared_logic\CClientTexture.h" />
-    <ClInclude Include="..\shared_logic\CClientTime.h" />
     <ClInclude Include="..\shared_logic\CClientTXD.h" />
     <ClInclude Include="..\shared_logic\CClientVehicle.h" />
     <ClInclude Include="..\shared_logic\CClientVehicleManager.h" />

@@ -246,6 +246,8 @@
   <ItemGroup>
     <ClCompile Include="CServer.cpp" />
     <ClCompile Include="..\..\sdk\MTAPlatform.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaClassDefs.cpp" />
+    <ClCompile Include="logic\packets\CSyncSettingsPacket.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="StdInc.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -568,6 +570,8 @@
     <ClInclude Include="Config.h" />
     <ClInclude Include="..\..\..\vendor\zip\crypt.h" />
     <ClInclude Include="CServer.h" />
+    <ClInclude Include="logic\luadefs\CLuaClassDefs.h" />
+    <ClInclude Include="logic\packets\CSyncSettingsPacket.h" />
     <ClInclude Include="utils\CZipMaker.h" />
     <ClInclude Include="..\EXECryptor\EXECryptor.h" />
     <ClInclude Include="Server.h" />

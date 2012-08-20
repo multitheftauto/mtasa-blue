@@ -23,7 +23,7 @@ CXMLAttributeImpl::CXMLAttributeImpl ( CXMLAttributesImpl& Attributes, TiXmlElem
 {
     // Init and link it to the node
     m_bDeleteAttribute = true;
-    Node.AddAttribute ( m_Attribute );
+    Node.SetAttribute ( strName, "" );
 
     // Add us to parent list, if any
     m_Attributes.AddToList ( this );

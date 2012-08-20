@@ -90,7 +90,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../dependencies/mxml/include;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../dependencies/mxml/include;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -114,7 +114,7 @@
       <AdditionalDependencies>wsock32.lib;Imagehlp.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>C:\Program Files\MTA San Andreas 1.4\server\core_d.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>../dependencies;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../dependencies;../../vendor/detours/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug/core_d.pdb</ProgramDatabaseFile>
@@ -233,6 +233,7 @@
     <ClCompile Include="CCrashHandler.cpp" />
     <ClCompile Include="CCrashHandlerAPI.cpp" />
     <ClCompile Include="CDynamicLibrary.cpp" />
+    <ClCompile Include="CExceptionInformation_Impl.cpp" />
     <ClCompile Include="CModManagerImpl.cpp" />
     <ClCompile Include="CServerImpl.cpp" />
     <ClCompile Include="CThreadCommandQueue.cpp" />
@@ -252,6 +253,7 @@
     <ClInclude Include="CCrashHandler.h" />
     <ClInclude Include="CCrashHandlerAPI.h" />
     <ClInclude Include="CDynamicLibrary.h" />
+    <ClInclude Include="CExceptionInformation_Impl.h" />
     <ClInclude Include="CModManagerImpl.h" />
     <ClInclude Include="CServerImpl.h" />
     <ClInclude Include="CThreadCommandQueue.h" />

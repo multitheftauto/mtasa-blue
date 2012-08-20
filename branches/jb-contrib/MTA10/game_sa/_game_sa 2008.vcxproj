@@ -341,7 +341,9 @@
     <ClCompile Include="CRegisteredMotionBlurStreakSA.cpp" />
     <ClCompile Include="CRemoteSA.cpp" />
     <ClCompile Include="CRenderWareSA.cpp" />
+    <ClCompile Include="CRenderWareSA.ShaderMatching.cpp" />
     <ClCompile Include="CRenderWareSA.ShaderSupport.cpp" />
+    <ClCompile Include="CRenderWareSA.TextureReplacing.cpp" />
     <ClCompile Include="CRestartSA.cpp" />
     <ClCompile Include="CRopesSA.cpp" />
     <ClCompile Include="CSeaAnimalSA.cpp" />
@@ -502,6 +504,7 @@
     <ClInclude Include="CRegisteredMotionBlurStreakSA.h" />
     <ClInclude Include="CRemoteSA.h" />
     <ClInclude Include="CRenderWareSA.h" />
+    <ClInclude Include="CRenderWareSA.ShaderMatching.h" />
     <ClInclude Include="CRenderWareSA.ShaderSupport.h" />
     <ClInclude Include="CRestartSA.h" />
     <ClInclude Include="CRopesSA.h" />
