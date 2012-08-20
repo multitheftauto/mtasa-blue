@@ -75,6 +75,7 @@ enum eClientEntityType
     CCLIENTGUIFONT,
     CCLIENTTEXTURE,
     CCLIENTSHADER,
+    CCLIENTWEAPON,
     CCLIENTUNKNOWN,
 };
 
@@ -290,6 +291,7 @@ public:
     virtual void                                SetInterior                 ( unsigned char ucInterior );
     bool                                        IsOnScreen                  ( void );
     virtual RpClump *                           GetClump                    ( void );
+    void                                        WorldIgnore                 ( bool bIgnore );
 
     // Spatial database
     virtual CSphere                             GetWorldBoundingSphere      ( void );
@@ -338,6 +340,7 @@ protected:
     std::map < CClientEntity *, bool >          m_DisabledCollisions;
     bool                                        m_bDoubleSided;
     bool                                        m_bDoubleSidedInit;
+    bool                                        m_bWorldIgnored;
 
 public:
     // Optimization for getElementsByType starting at root

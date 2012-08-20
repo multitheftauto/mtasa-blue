@@ -62,6 +62,9 @@ CClientEntity::CClientEntity ( ElementID ID )
     m_pModelInfo = NULL;
 
     g_pClientGame->GetGameEntityXRefManager ()->OnClientEntityCreate ( this );
+
+    m_bWorldIgnored = false;
+
 }
 
 
@@ -1104,6 +1107,7 @@ bool CClientEntity::IsAttachable ( void )
         case CCLIENTPICKUP:
         case CCLIENTSOUND:
         case CCLIENTCOLSHAPE:
+        case CCLIENTWEAPON:
         {
             return true;
             break;
@@ -1123,6 +1127,7 @@ bool CClientEntity::IsAttachToable ( void )
         case CCLIENTRADARMARKER:
         case CCLIENTVEHICLE:
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         case CCLIENTMARKER:
         case CCLIENTPICKUP:
         case CCLIENTSOUND:
@@ -1298,6 +1303,22 @@ RpClump * CClientEntity::GetClump ( void )
     return NULL;
 }
 
+void CClientEntity::WorldIgnore ( bool bIgnore )
+{
+    CEntity * pEntity = GetGameEntity ();
+    if ( bIgnore )
+    {
+        if ( pEntity )
+        {
+            g_pGame->GetWorld ()->IgnoreEntity ( pEntity );
+        }
+    }
+    else
+    {
+        g_pGame->GetWorld ()->IgnoreEntity ( NULL );
+    }
+    m_bWorldIgnored = bIgnore;
+}
 
 // Entities from root optimization for getElementsByType
 typedef CFastList < CClientEntity > CFromRootListType;

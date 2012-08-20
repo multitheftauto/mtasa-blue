@@ -58,7 +58,7 @@ CClientManager::CClientManager ( void )
     m_pColModelManager = new CClientColModelManager ( this );
     m_pExplosionManager = new CClientExplosionManager ( this );
     m_pWaterManager = new CClientWaterManager ( this );
-
+    m_pWeaponManager = new CClientWeaponManager ( this );
     m_pPacketRecorder = new CClientPacketRecorder ( this );
 
     m_bBeingDeleted = false;
@@ -172,6 +172,9 @@ CClientManager::~CClientManager ( void )
     delete m_pWaterManager;
     m_pWaterManager = NULL;
 
+    delete m_pWeaponManager;
+    m_pWeaponManager = NULL;
+
     // Delete the connection trouble texture
     delete m_pConnectionTroubleTexture;
     m_pConnectionTroubleTexture = NULL;
@@ -200,6 +203,7 @@ void CClientManager::DoPulse ( void )
         m_pPlayerManager->DoPulse ();
         m_pColManager->DoPulse ();
         m_pGUIManager->DoPulse ();
+        m_pWeaponManager->DoPulse ();
     }
 }
 

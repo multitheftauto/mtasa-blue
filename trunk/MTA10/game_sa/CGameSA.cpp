@@ -66,7 +66,7 @@ CGameSA::CGameSA()
     }
 
     DEBUG_TRACE("CGameSA::CGameSA()");
-    this->m_pAudio                  = new CAudioSA();
+    this->m_pAudioEngine            = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
     this->m_pWorld                  = new CWorldSA();
     this->m_pPools                  = new CPoolsSA();
     this->m_pClock                  = new CClockSA();
@@ -107,6 +107,7 @@ CGameSA::CGameSA()
     this->m_pFx                     = new CFxSA ( (CFxSAInterface *)CLASS_CFx );
     this->m_pWaterManager           = new CWaterManagerSA ();
     this->m_pWeaponStatsManager     = new CWeaponStatManagerSA ();
+    this->m_pPointLights            = new CPointLightsSA ();
 
     // Normal weapon types (WEAPONSKILL_STD)
     for ( int i = 0; i < NUM_WeaponInfosStdSkill; i++)
@@ -217,7 +218,8 @@ CGameSA::~CGameSA ( void )
     delete reinterpret_cast < CClockSA* > ( m_pClock );
     delete reinterpret_cast < CPoolsSA* > ( m_pPools );
     delete reinterpret_cast < CWorldSA* > ( m_pWorld );
-    delete reinterpret_cast < CAudioSA* > ( m_pAudio );  
+    delete reinterpret_cast < CAudioEngineSA* > ( m_pAudioEngine );
+    delete reinterpret_cast < CPointLightsSA * > ( m_pPointLights );
 }
 
 CWeaponInfo * CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
@@ -725,6 +727,15 @@ void CGameSA::ResetModelLodDistances ( void )
 void CGameSA::DisableVSync ( void )
 {
     MemPutFast < BYTE > ( 0xBAB318, 0 );
+}
+CWeapon * CGameSA::CreateWeapon ( void )
+{
+    return new CWeaponSA ( new CWeaponSAInterface, NULL, WEAPONSLOT_MAX );
+}
+
+CWeaponStat * CGameSA::CreateWeaponStat ( eWeaponType weaponType, eWeaponSkill weaponSkill )
+{
+    return m_pWeaponStatsManager->CreateWeaponStatUnlisted ( weaponType, weaponSkill );
 }
 
 void CGameSA::OnPedContextChange ( CPed* pPedContext )

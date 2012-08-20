@@ -82,6 +82,9 @@ public:
     void                    SetTarget ( CEntity* pEntity );
 
     bool                    IsActive ( void );
+
+    void                    SetCounter ( DWORD dwCounter )      { internalInterface->dwCounter = dwCounter + pGame->GetSystemTime(); }
+    DWORD                   GetCounter ( void )                 { return internalInterface->dwCounter - pGame->GetSystemTime(); }
 };
 
 #endif
