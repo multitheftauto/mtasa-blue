@@ -54,6 +54,7 @@ int CLuaFxDefs::fxCreateEntityEffect(lua_State* luaVM)
 
     if ( !argStream.HasErrors ( ) )
     {
+#if 0
         DWORD dwClass = 0xA9AE00;    
         DWORD dwFunc = 0x4A11E0;
         CVector* pVecPos = &pos;
@@ -78,6 +79,7 @@ int CLuaFxDefs::fxCreateEntityEffect(lua_State* luaVM)
             mov ecx, dwClass
             call dwFunc
         }
+#endif
         lua_pushboolean ( luaVM, true );
         return 1;
     }
