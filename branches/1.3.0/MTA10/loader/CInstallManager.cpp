@@ -347,8 +347,14 @@ SString CInstallManager::_ShowCrashFailDialog ( void )
     HideSplash ();
 
     SString strMessage = GetApplicationSetting ( "diagnostics", "last-crash-info" );
-    strMessage = strMessage.Replace ( "\r", "" ).Replace ( "\n", "\r\n" );
+    SString strReason = GetApplicationSetting ( "diagnostics", "last-crash-reason" );
+    SetApplicationSetting ( "diagnostics", "last-crash-reason", "" );
+    if ( strReason == "direct3ddevice-reset" )
+    {
+        strMessage += "** The crash was caused by a graphics driver error **\n\n** Please update your graphics drivers **";
+    }
 
+    strMessage = strMessage.Replace ( "\r", "" ).Replace ( "\n", "\r\n" );
     SString strResult = ShowCrashedDialog ( g_hInstance, strMessage );
     HideCrashedDialog ();
 

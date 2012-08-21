@@ -240,6 +240,7 @@ int LaunchGame ( LPSTR lpCmdLine )
     WatchDogBeginSection ( "L0" );      // Gets closed if MTA exits with a return code of 0
     WatchDogBeginSection ( "L1" );      // Gets closed when online game has started
     SetApplicationSetting ( "diagnostics", "gta-fopen-fail", "" );
+    SetApplicationSetting ( "diagnostics", "last-crash-reason", "" );
 
     int iReturnCode = DoLaunchGame ( lpCmdLine );
 

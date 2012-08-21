@@ -220,9 +220,21 @@ HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAM
 
     if ( FAILED ( hResult ) )
     {
-        assert ( 0 && "Direct3DDevice::Reset - Failed to reset the device. Check all device dependent resources have been released.");
+        // Try sleep before retry
+        g_pCore->LogEvent( 7124, "Direct3D", "Direct3DDevice9::Reset", "Fail" );
+        Sleep ( 1000 );
+        hResult = m_pDevice->Reset ( pPresentationParameters );
+
+        if ( FAILED ( hResult ) )
+        {
+            // Still failed, report and dump
+            SetApplicationSetting ( "diagnostics", "last-crash-reason", "direct3ddevice-reset" );
+            AddReportLog ( 7124, SString ( "Direct3D - Direct3DDevice9::Reset - Fail - %s", g_pDeviceState->AdapterState.Name ) );
+            assert ( 0 && "Direct3DDevice::Reset - Failed to reset the device. Check all device dependent resources have been released.");
+        }
     }
 
+    g_pCore->LogEvent( 7123, "Direct3D", "Direct3DDevice9::Reset", "Success" );
     GetVideoModeManager ()->PostReset ( pPresentationParameters );
 
     // Update our data.
