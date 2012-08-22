@@ -534,52 +534,65 @@ void CClientWeapon::ResetWeaponTarget ( void )
     m_targetBone = BONE_PELVIS;
 }
 
-void CClientWeapon::SetFlags ( bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, bool bInstantReload, const SLineOfSightFlags& flags )
+bool CClientWeapon::SetFlags ( eWeaponFlags flag, bool bData )
 {
-    m_weaponConfig.bDisableWeaponModel = bDisableWeaponModel;
-    m_weaponConfig.bShootIfTargetBlocked = bShootIfTargetBlocked;
-    m_weaponConfig.bShootIfTargetOutOfRange = bShootIfTargetOutOfRange;
-    m_weaponConfig.bInstantReload = bInstantReload;
-    m_weaponConfig.flags = flags;
-    if ( m_weaponConfig.bDisableWeaponModel )
+    switch ( flag )
     {
-        SetVisible( false );
+    case SHOOT_IF_OUT_OF_RANGE:
+        m_weaponConfig.bShootIfTargetOutOfRange = bData;
+        return true;
+    case SHOOT_IF_TARGET_BOCKED:
+        m_weaponConfig.bShootIfTargetBlocked = bData;
+        return true;
+    case DISABLE_MODEL:
+        m_weaponConfig.bDisableWeaponModel = bData;
+        if ( m_weaponConfig.bDisableWeaponModel )
+        {
+            SetVisible( false );
+        }
+        else
+        {
+            SetVisible( true );
+        }
+        return true;
+    case INSTANT_RELOAD:
+        m_weaponConfig.bInstantReload = bData;
+        return true;
     }
-    else
-    {
-        SetVisible( true );
-    }
+    return false;
 }
 
-void CClientWeapon::SetFlags ( bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, bool bInstantReload )
-{
-    m_weaponConfig.bDisableWeaponModel = bDisableWeaponModel;
-    m_weaponConfig.bShootIfTargetBlocked = bShootIfTargetBlocked;
-    m_weaponConfig.bShootIfTargetOutOfRange = bShootIfTargetOutOfRange;
-    m_weaponConfig.bInstantReload = bInstantReload;
-    if ( m_weaponConfig.bDisableWeaponModel )
-    {
-        SetVisible( false );
-    }
-    else
-    {
-        SetVisible( true );
-    }
-}
-
-void CClientWeapon::SetFlags ( const SLineOfSightFlags& flags )
+bool CClientWeapon::SetFlags ( const SLineOfSightFlags flags )
 {
     m_weaponConfig.flags = flags;
+    return true;
 }
 
-
-void CClientWeapon::GetFlags ( bool &bDisableWeaponModel, bool &bShootIfTargetBlocked, bool &bShootIfTargetOutOfRange, bool &bInstantReload, SLineOfSightFlags& flags )
+bool CClientWeapon::GetFlags ( eWeaponFlags flag, bool &bData )
 {
-    bDisableWeaponModel = m_weaponConfig.bDisableWeaponModel;
-    bShootIfTargetBlocked = m_weaponConfig.bShootIfTargetBlocked;
-    bShootIfTargetOutOfRange = m_weaponConfig.bShootIfTargetOutOfRange;
-    bInstantReload = m_weaponConfig.bInstantReload;
+
+    switch ( flag )
+    {
+    case SHOOT_IF_OUT_OF_RANGE:
+        bData = m_weaponConfig.bShootIfTargetOutOfRange;
+        return true;
+    case SHOOT_IF_TARGET_BOCKED:
+        bData = m_weaponConfig.bShootIfTargetBlocked;
+        return true;
+    case DISABLE_MODEL:
+        bData = m_weaponConfig.bDisableWeaponModel;
+        return true;
+    case INSTANT_RELOAD:
+        bData = m_weaponConfig.bInstantReload;
+        return true;
+    }
+    return false;
+}
+
+bool CClientWeapon::GetFlags ( SLineOfSightFlags &flags )
+{
     flags = m_weaponConfig.flags;
+    return true;
 }
 
 void CClientWeapon::DoGunShells ( CVector vecOrigin, CVector vecDirection )

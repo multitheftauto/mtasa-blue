@@ -312,30 +312,42 @@ int CLuaFunctionDefs::SetWeaponFlags ( lua_State* luaVM )
 {
     CClientWeapon * pWeapon = NULL;
     SLineOfSightFlags flags;
-    bool bDisableWeaponModel;
-    bool bShootIfTargetBlocked;
-    bool bShootIfTargetOutOfRange;
-    bool bInstantReload;
+    eWeaponFlags flag;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWeapon );
-    argStream.ReadBool ( bDisableWeaponModel );
-    argStream.ReadBool ( bShootIfTargetBlocked );
-    argStream.ReadBool ( bShootIfTargetOutOfRange );
-    argStream.ReadBool ( bInstantReload );
-    argStream.ReadBool ( flags.bCheckBuildings );
-    argStream.ReadBool ( flags.bCheckCarTires );
-    argStream.ReadBool ( flags.bCheckDummies );
-    argStream.ReadBool ( flags.bCheckObjects );
-    argStream.ReadBool ( flags.bCheckPeds );
-    argStream.ReadBool ( flags.bCheckVehicles );
-    argStream.ReadBool ( flags.bSeeThroughStuff );
-    argStream.ReadBool ( flags.bShootThroughStuff );
+    argStream.ReadEnumString ( flag );
     if ( !argStream.HasErrors() )
     {
-        if ( CStaticFunctionDefinitions::SetWeaponFlags( pWeapon, bDisableWeaponModel, bShootIfTargetBlocked, bInstantReload, bShootIfTargetOutOfRange, flags ) )
+        if ( flag != eWeaponFlags::FLAGS )
         {
-            lua_pushboolean( luaVM, true );
-            return 1;
+            bool bData;
+            argStream.ReadBool ( bData );
+            if ( CStaticFunctionDefinitions::GetWeaponFlags( pWeapon, flag, bData ) )
+            {
+                lua_pushboolean( luaVM, bData );
+                return 1;
+            }
+        }
+        else
+        {
+            argStream.ReadBool ( flags.bCheckBuildings );
+            argStream.ReadBool ( flags.bCheckCarTires );
+            argStream.ReadBool ( flags.bCheckDummies );
+            argStream.ReadBool ( flags.bCheckObjects );
+            argStream.ReadBool ( flags.bCheckPeds );
+            argStream.ReadBool ( flags.bCheckVehicles );
+            argStream.ReadBool ( flags.bSeeThroughStuff );
+            argStream.ReadBool ( flags.bShootThroughStuff );
+            if ( !argStream.HasErrors() )
+            {
+                if ( CStaticFunctionDefinitions::SetWeaponFlags( pWeapon, flags ) )
+                {
+                    lua_pushboolean( luaVM, true );
+                }
+            }
+            else
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWeaponFlags", *argStream.GetErrorMessage () ) );
+
         }
     }
     else
@@ -349,29 +361,35 @@ int CLuaFunctionDefs::GetWeaponFlags ( lua_State* luaVM )
 {
     CClientWeapon * pWeapon = NULL;
     SLineOfSightFlags flags;
-    bool bDisableWeaponModel;
-    bool bShootIfTargetBlocked;
-    bool bShootIfTargetOutOfRange;
-    bool bInstantReload;
+    eWeaponFlags flag;
+    bool bData;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWeapon );
+    argStream.ReadEnumString ( flag );
     if ( !argStream.HasErrors() )
     {
-        if ( CStaticFunctionDefinitions::GetWeaponFlags( pWeapon, bDisableWeaponModel, bShootIfTargetBlocked, bInstantReload, bShootIfTargetOutOfRange, flags ) )
+        if ( flag != eWeaponFlags::FLAGS )
         {
-            lua_pushboolean( luaVM, bDisableWeaponModel );
-            lua_pushboolean( luaVM, bShootIfTargetBlocked );
-            lua_pushboolean( luaVM, bShootIfTargetOutOfRange );
-            lua_pushboolean( luaVM, bInstantReload );
-            lua_pushboolean( luaVM, flags.bCheckBuildings );
-            lua_pushboolean( luaVM, flags.bCheckCarTires );
-            lua_pushboolean( luaVM, flags.bCheckDummies );
-            lua_pushboolean( luaVM, flags.bCheckObjects );
-            lua_pushboolean( luaVM, flags.bCheckPeds );
-            lua_pushboolean( luaVM, flags.bCheckVehicles );
-            lua_pushboolean( luaVM, flags.bSeeThroughStuff );
-            lua_pushboolean( luaVM, flags.bShootThroughStuff );
-            return 12;
+            if ( CStaticFunctionDefinitions::GetWeaponFlags( pWeapon, flag, bData ) )
+            {
+                lua_pushboolean( luaVM, bData );
+                return 1;
+            }
+        }
+        else
+        {
+            if ( CStaticFunctionDefinitions::GetWeaponFlags( pWeapon, flags ) )
+            {
+                lua_pushboolean( luaVM, flags.bCheckBuildings );
+                lua_pushboolean( luaVM, flags.bCheckCarTires );
+                lua_pushboolean( luaVM, flags.bCheckDummies );
+                lua_pushboolean( luaVM, flags.bCheckObjects );
+                lua_pushboolean( luaVM, flags.bCheckPeds );
+                lua_pushboolean( luaVM, flags.bCheckVehicles );
+                lua_pushboolean( luaVM, flags.bSeeThroughStuff );
+                lua_pushboolean( luaVM, flags.bShootThroughStuff );
+                return 8;
+            }
         }
     }
     else

@@ -33,6 +33,15 @@ struct SWeaponConfiguration
     bool bInstantReload;
     SLineOfSightFlags flags;
 };
+
+enum eWeaponFlags
+{
+    FLAGS,
+    SHOOT_IF_OUT_OF_RANGE,
+    SHOOT_IF_TARGET_BOCKED,
+    DISABLE_MODEL,
+    INSTANT_RELOAD,
+};
 class CClientWeapon : public CClientObject
 {
 public:
@@ -69,10 +78,13 @@ public:
     CWeaponStat *           GetWeaponStat           ( void )   { return m_pWeaponStat; }
     CClientPlayer *         GetOwner                ( void )                { return m_pOwner; }
     void                    SetOwner                ( CClientPlayer * pOwner )  { m_pOwner = pOwner; }
-    void                    SetFlags                ( bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, bool bInstantReload, const SLineOfSightFlags& flags );
-    void                    SetFlags                ( bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, bool bInstantReload );
-    void                    SetFlags                ( const SLineOfSightFlags& flags );
-    void                    GetFlags                ( bool &bDisableWeaponModel, bool &bShootIfTargetBlocked, bool &bShootIfTargetOutOfRange, bool &bInstantReload, SLineOfSightFlags& flags );
+
+    bool                    SetFlags                ( eWeaponFlags flags, bool bData );
+    bool                    SetFlags                ( const SLineOfSightFlags flags );
+
+    bool                    GetFlags                ( eWeaponFlags flags, bool &bData );
+    bool                    GetFlags                ( SLineOfSightFlags& flags );
+
     void                    DoGunShells             ( CVector vecOrigin, CVector vecDirection );
     static int              GetWeaponFireTime       ( CWeaponStat * pWeaponStat );
     void                    SetWeaponFireTime       ( int iWeaponFireTime );
