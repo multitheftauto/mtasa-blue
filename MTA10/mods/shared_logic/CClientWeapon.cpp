@@ -538,13 +538,13 @@ bool CClientWeapon::SetFlags ( eWeaponFlags flag, bool bData )
 {
     switch ( flag )
     {
-    case SHOOT_IF_OUT_OF_RANGE:
+    case WEAPONFLAGS_SHOOT_IF_OUT_OF_RANGE:
         m_weaponConfig.bShootIfTargetOutOfRange = bData;
         return true;
-    case SHOOT_IF_TARGET_BOCKED:
+    case WEAPONFLAGS_SHOOT_IF_TARGET_BOCKED:
         m_weaponConfig.bShootIfTargetBlocked = bData;
         return true;
-    case DISABLE_MODEL:
+    case WEAPONFLAGS_DISABLE_MODEL:
         m_weaponConfig.bDisableWeaponModel = bData;
         if ( m_weaponConfig.bDisableWeaponModel )
         {
@@ -555,7 +555,7 @@ bool CClientWeapon::SetFlags ( eWeaponFlags flag, bool bData )
             SetVisible( true );
         }
         return true;
-    case INSTANT_RELOAD:
+    case WEAPONFLAGS_INSTANT_RELOAD:
         m_weaponConfig.bInstantReload = bData;
         return true;
     }
@@ -573,16 +573,16 @@ bool CClientWeapon::GetFlags ( eWeaponFlags flag, bool &bData )
 
     switch ( flag )
     {
-    case SHOOT_IF_OUT_OF_RANGE:
+    case WEAPONFLAGS_SHOOT_IF_OUT_OF_RANGE:
         bData = m_weaponConfig.bShootIfTargetOutOfRange;
         return true;
-    case SHOOT_IF_TARGET_BOCKED:
+    case WEAPONFLAGS_SHOOT_IF_TARGET_BOCKED:
         bData = m_weaponConfig.bShootIfTargetBlocked;
         return true;
-    case DISABLE_MODEL:
+    case WEAPONFLAGS_DISABLE_MODEL:
         bData = m_weaponConfig.bDisableWeaponModel;
         return true;
-    case INSTANT_RELOAD:
+    case WEAPONFLAGS_INSTANT_RELOAD:
         bData = m_weaponConfig.bInstantReload;
         return true;
     }
