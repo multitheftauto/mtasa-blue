@@ -262,3 +262,13 @@ void CClientProjectile::SetModel ( unsigned short usModel )
 {
     m_pProjectile->SetModelIndex ( usModel );
 }
+
+void CClientProjectile::SetCounter ( DWORD dwCounter )
+{
+    m_pProjectileInfo->SetCounter ( dwCounter );
+}
+
+DWORD CClientProjectile::GetCounter ( void )
+{
+    return m_pProjectileInfo->GetCounter ( );
+}

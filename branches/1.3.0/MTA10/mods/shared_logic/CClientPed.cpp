@@ -3784,7 +3784,7 @@ void CClientPed::StartRadio ( void )
     {
         // Turn it on if we're not on channel none
         if ( m_ucRadioChannel != 0 )
-            g_pGame->GetAudio ()->StartRadio ( m_ucRadioChannel );
+            g_pGame->GetAudioEngine ()->StartRadio ( m_ucRadioChannel );
 
         m_bRadioOn = true;
     }
@@ -3797,7 +3797,7 @@ void CClientPed::StopRadio ( void )
     if ( !m_bDontChangeRadio )
     {
         // Stop the radio and mark it as off
-        g_pGame->GetAudio ()->StopRadio ();
+        g_pGame->GetAudioEngine ()->StopRadio ();
         m_bRadioOn = false;
     }
 }
@@ -4223,9 +4223,9 @@ bool CClientPed::SetCurrentRadioChannel ( unsigned char ucChannel )
 
         m_ucRadioChannel = ucChannel;
 
-        g_pGame->GetAudio ()->StartRadio ( m_ucRadioChannel );
+        g_pGame->GetAudioEngine ()->StartRadio ( m_ucRadioChannel );
         if ( m_ucRadioChannel == 0 )
-            g_pGame->GetAudio ()->StopRadio ();
+            g_pGame->GetAudioEngine ()->StopRadio ();
 
         return true;
     }

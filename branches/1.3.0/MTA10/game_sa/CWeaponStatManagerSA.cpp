@@ -82,6 +82,7 @@ CWeaponStatManagerSA::~CWeaponStatManagerSA ( )
             delete (*iter);
     }
 }
+
 void CWeaponStatManagerSA::CreateWeaponStat ( CWeaponInfo* pInterface, eWeaponType weaponType, eWeaponSkill weaponSkill )
 {
     CWeaponStatSA* pWeaponStat = NULL;
@@ -90,6 +91,16 @@ void CWeaponStatManagerSA::CreateWeaponStat ( CWeaponInfo* pInterface, eWeaponTy
     pWeaponStat = new CWeaponStatSA ( ((CWeaponInfoSA*)(pInterface)), weaponType, weaponSkill );
     m_WeaponData.push_back ( pWeaponStat );
     LoadDefaultInternal( pWeaponStat, weaponType, weaponSkill );
+}
+
+CWeaponStat * CWeaponStatManagerSA::CreateWeaponStatUnlisted ( eWeaponType weaponType, eWeaponSkill weaponSkill )
+{
+    CWeaponStatSA* pWeaponStat = NULL;
+
+    // Storage for new weapon data ( for script use )
+    pWeaponStat = new CWeaponStatSA ( weaponType, weaponSkill );
+    LoadDefaultInternal( pWeaponStat, weaponType, weaponSkill );
+    return pWeaponStat;
 }
 
 CWeaponStat* CWeaponStatManagerSA::GetWeaponStats ( eWeaponType type, eWeaponSkill skill )

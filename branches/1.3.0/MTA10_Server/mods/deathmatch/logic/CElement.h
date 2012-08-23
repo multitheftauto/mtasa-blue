@@ -79,6 +79,7 @@ public:
         WATER,
         DATABASE_CONNECTION,
         ROOT,
+        WEAPON,
         UNKNOWN,
     };
 

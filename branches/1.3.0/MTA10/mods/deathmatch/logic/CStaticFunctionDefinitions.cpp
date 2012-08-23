@@ -399,6 +399,7 @@ bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVe
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             Object.GetRotationDegrees ( vecRotation );
@@ -440,6 +441,7 @@ bool CStaticFunctionDefinitions::GetElementVelocity ( CClientEntity& Entity, CVe
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             Object.GetMoveSpeed ( vecVelocity );
@@ -490,6 +492,7 @@ bool CStaticFunctionDefinitions::GetElementBoundingBox ( CClientEntity& Entity, 
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             pModelInfo = g_pGame->GetModelInfo ( Object.GetModel () );
@@ -539,6 +542,7 @@ bool CStaticFunctionDefinitions::GetElementRadius ( CClientEntity& Entity, float
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             pModelInfo = g_pGame->GetModelInfo ( Object.GetModel () );
@@ -590,6 +594,7 @@ bool CStaticFunctionDefinitions::GetElementDistanceFromCentreOfMassToBaseOfModel
             return true;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             fDistance = static_cast < CClientObject& > ( Entity ).GetDistanceFromCentreOfMassToBaseOfModel ();
             return true;
@@ -626,6 +631,7 @@ bool CStaticFunctionDefinitions::GetElementAlpha ( CClientEntity& Entity, unsign
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject & Object = static_cast < CClientObject & > ( Entity );
             ucAlpha = Object.GetAlpha ();
@@ -662,6 +668,7 @@ bool CStaticFunctionDefinitions::GetElementHealth ( CClientEntity& Entity, float
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             fHealth = Object.GetHealth ();
@@ -691,6 +698,7 @@ bool CStaticFunctionDefinitions::GetElementModel ( CClientEntity& Entity, unsign
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             usModel = Object.GetModel ();
@@ -1034,6 +1042,7 @@ bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, con
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZXY)
@@ -1083,6 +1092,7 @@ bool CStaticFunctionDefinitions::SetElementVelocity ( CClientEntity& Entity, con
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             Object.SetMoveSpeed ( vecVelocity );
@@ -1185,6 +1195,7 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CClientEntity& Entity, un
         case CCLIENTDUMMY:
         case CCLIENTVEHICLE:
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         case CCLIENTMARKER:
         case CCLIENTRADARMARKER:
         case CCLIENTPED:
@@ -1294,6 +1305,7 @@ bool CStaticFunctionDefinitions::SetElementAlpha ( CClientEntity& Entity, unsign
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject & Object = static_cast < CClientObject & > ( Entity );
             Object.SetAlpha ( ucAlpha );
@@ -1343,6 +1355,7 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CClientEntity& Entity, float
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             Object.SetHealth ( fHealth );
@@ -1379,6 +1392,7 @@ bool CStaticFunctionDefinitions::SetElementModel ( CClientEntity& Entity, unsign
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             if ( Object.GetModel () == usModel ) return false;
@@ -3673,9 +3687,9 @@ bool CStaticFunctionDefinitions::PlayMissionAudio ( const CVector& vecPosition, 
     // TODO: Position of the sound
 
     // Play the sound if it's loaded
-    if ( g_pGame->GetAudio ()->GetMissionAudioLoadingStatus ( usSlot ) == 1 )
+    if ( g_pGame->GetAudioEngine ()->GetMissionAudioLoadingStatus ( usSlot ) == 1 )
     {
-        g_pGame->GetAudio ()->PlayLoadedMissionAudio ( usSlot );
+        g_pGame->GetAudioEngine ()->PlayLoadedMissionAudio ( usSlot );
         return true;
     }
 
@@ -3685,7 +3699,7 @@ bool CStaticFunctionDefinitions::PlayMissionAudio ( const CVector& vecPosition, 
 
 bool CStaticFunctionDefinitions::PlaySoundFrontEnd ( unsigned char ucSound )
 {
-    g_pGame->GetAudio ()->PlayFrontEndSound ( ucSound );
+    g_pGame->GetAudioEngine ()->PlayFrontEndSound ( ucSound );
     return true;
 }
 
@@ -3693,28 +3707,28 @@ bool CStaticFunctionDefinitions::PlaySoundFrontEnd ( unsigned char ucSound )
 bool CStaticFunctionDefinitions::PreloadMissionAudio ( unsigned short usSound, unsigned short usSlot )
 {
     g_pCore->ChatPrintf ( "Preload %u into slot %u", false, usSound, usSlot );
-    g_pGame->GetAudio ()->PreloadMissionAudio ( usSound, usSlot );
+    g_pGame->GetAudioEngine ()->PreloadMissionAudio ( usSound, usSlot );
     return true;
 }
 
 
 bool CStaticFunctionDefinitions::SetAmbientSoundEnabled ( eAmbientSoundType eType, bool bMute )
 {
-    g_pGame->GetAudio ()->SetAmbientSoundEnabled ( eType, bMute );
+    g_pGame->GetAudioEngine ()->SetAmbientSoundEnabled ( eType, bMute );
     return true;
 }
 
 
 bool CStaticFunctionDefinitions::IsAmbientSoundEnabled ( eAmbientSoundType eType, bool& bOutMute )
 {
-    bOutMute = g_pGame->GetAudio ()->IsAmbientSoundEnabled ( eType );
+    bOutMute = g_pGame->GetAudioEngine ()->IsAmbientSoundEnabled ( eType );
     return true;
 }
 
 
 bool CStaticFunctionDefinitions::ResetAmbientSounds ( void )
 {
-    g_pGame->GetAudio ()->ResetAmbientSounds ();
+    g_pGame->GetAudioEngine ()->ResetAmbientSounds ();
     return true;
 }
 
@@ -6305,6 +6319,196 @@ bool CStaticFunctionDefinitions::GetWeaponIDFromName ( const char* szName, unsig
     // Grab the weapon id
     ucID = CWeaponNames::GetWeaponID ( szName );
     return ucID != 0xFF;
+}
+
+CClientWeapon* CStaticFunctionDefinitions::CreateWeapon ( CResource& Resource, eWeaponType weaponType, CVector vecPosition )
+{
+    CClientWeapon * pWeapon = new CClientWeapon ( m_pManager, INVALID_ELEMENT_ID, weaponType );
+    pWeapon->SetPosition ( vecPosition );
+    pWeapon->SetParent ( Resource.GetResourceDynamicEntity () );
+    return pWeapon;
+}
+
+bool CStaticFunctionDefinitions::FireWeapon ( CClientWeapon * pWeapon )
+{
+    if ( pWeapon )
+    {
+        pWeapon->Fire ( );
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::SetWeaponProperty ( CClientWeapon * pWeapon, eWeaponProperty eProperty, short sData )
+{
+    if ( pWeapon )
+    {
+        if ( eProperty == WEAPON_DAMAGE )
+        {
+            pWeapon->GetWeaponStat ( )->SetDamagePerHit ( sData );
+            return true;
+        }
+    }
+    return false;
+}
+bool CStaticFunctionDefinitions::SetWeaponProperty ( CClientWeapon * pWeapon, eWeaponProperty eProperty, float fData )
+{
+    if ( pWeapon )
+    {
+        if ( eProperty == WEAPON_ACCURACY )
+        {
+            pWeapon->GetWeaponStat ( )->SetAccuracy ( fData );
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponState ( CClientWeapon * pWeapon, eWeaponState weaponState )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetWeaponState ( weaponState );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponTarget ( CClientWeapon * pWeapon, CClientEntity * pTarget, int targetBone )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetWeaponTarget ( pTarget, targetBone );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponTarget ( CClientWeapon * pWeapon, CVector vecTarget )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetWeaponTarget ( vecTarget );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::ClearWeaponTarget ( CClientWeapon * pWeapon )
+{
+    if ( pWeapon )
+    {
+        pWeapon->ResetWeaponTarget ( );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponFlags ( CClientWeapon * pWeapon, eWeaponFlags flags, bool bData )
+{
+    if ( pWeapon )
+    {
+        return pWeapon->SetFlags ( flags, bData );
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponFlags ( CClientWeapon * pWeapon, const SLineOfSightFlags& flags )
+{
+    if ( pWeapon )
+    {
+        return pWeapon->SetFlags ( flags );
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponFlags ( CClientWeapon * pWeapon, eWeaponFlags flags, bool &bData )
+{
+    if ( pWeapon )
+    {
+        return pWeapon->GetFlags ( flags, bData );
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponFlags ( CClientWeapon * pWeapon, SLineOfSightFlags& flags )
+{
+    if ( pWeapon )
+    {
+        return pWeapon->GetFlags ( flags );
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponFiringRate ( CClientWeapon * pWeapon, int iFiringRate )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetWeaponFireTime( iFiringRate );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::ResetWeaponFiringRate ( CClientWeapon * pWeapon )
+{
+    if ( pWeapon )
+    {
+        pWeapon->ResetWeaponFireTime( );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponFiringRate ( CClientWeapon * pWeapon, int &iFiringRate )
+{
+    if ( pWeapon )
+    {
+        iFiringRate = pWeapon->GetWeaponFireTime( );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponAmmo ( CClientWeapon * pWeapon, int &iAmmo )
+{
+    if ( pWeapon )
+    {
+        pWeapon->GetAmmo( iAmmo );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponClipAmmo ( CClientWeapon * pWeapon, int &iAmmo )
+{
+    if ( pWeapon )
+    {
+        pWeapon->GetClipAmmo( iAmmo );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponAmmo ( CClientWeapon * pWeapon, int iAmmo )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetAmmo( iAmmo );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponClipAmmo ( CClientWeapon * pWeapon, int iAmmo )
+{
+    if ( pWeapon )
+    {
+        pWeapon->SetClipAmmo( iAmmo );
+        return true;
+    }
+    return false;
 }
 
 

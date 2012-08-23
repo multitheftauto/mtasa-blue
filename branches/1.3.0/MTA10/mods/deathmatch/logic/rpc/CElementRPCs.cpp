@@ -188,6 +188,7 @@ void CElementRPCs::SetElementVelocity ( CClientEntity* pSource, NetBitStreamInte
                 break;
             }
             case CCLIENTOBJECT:
+            case CCLIENTWEAPON:
             {
                 CClientObject * pObject = static_cast < CClientObject * > ( pSource );
                 pObject->SetMoveSpeed ( vecVelocity );
@@ -321,6 +322,7 @@ void CElementRPCs::SetElementAlpha ( CClientEntity* pSource, NetBitStreamInterfa
                 break;
             }
             case CCLIENTOBJECT:
+            case CCLIENTWEAPON:
             {
                 CClientObject * pObject = static_cast < CClientObject* > ( pSource );
                 pObject->SetAlpha ( ucAlpha );
@@ -377,6 +379,7 @@ void CElementRPCs::SetElementHealth ( CClientEntity* pSource, NetBitStreamInterf
             }
 
             case CCLIENTOBJECT:
+            case CCLIENTWEAPON:
             {
                 CClientObject* pObject = static_cast < CClientObject * > ( pSource );
                 pObject->SetHealth ( fHealth );
@@ -410,6 +413,7 @@ void CElementRPCs::SetElementModel ( CClientEntity* pSource, NetBitStreamInterfa
             }
 
             case CCLIENTOBJECT:
+            case CCLIENTWEAPON:
             {
                 CClientObject* pObject = static_cast < CClientObject * > ( pSource );
                 pObject->SetModel ( usModel );

@@ -2307,6 +2307,12 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
                 pWeaponInfo->SetAnimBreakoutTime            ( weaponProperty.data.anim_breakout_time );
             }
         }
+        if ( bitStream.Version () >= 0x36 )
+        {
+            bool bEnabled;
+            bitStream.ReadBit ( bEnabled );
+            g_pGame->SetJetpackWeaponEnabled ( (eWeaponType) weaponProperty.data.weaponType, bEnabled );
+        }
     }
     if ( bitStream.Version () >= 0x30 )
     {
@@ -3747,7 +3753,7 @@ void CPacketHandler::Packet_PickupHitConfirm ( NetBitStreamInterface& bitStream 
         if ( bPlaySound )
         {
             // Play the pick up sound
-            g_pGame->GetAudio ()->PlayFrontEndSound ( 40 );
+            g_pGame->GetAudioEngine ()->PlayFrontEndSound ( 40 );
         }
     }
 }

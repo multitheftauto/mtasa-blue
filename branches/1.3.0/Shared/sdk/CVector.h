@@ -82,6 +82,17 @@ public:
         fZ = _fX * param->fY - param->fX * _fY;
     }
 
+    // Convert (direction) to rotation
+    CVector ToRotation ( void ) const
+    {
+        CVector vecRotation;
+        vecRotation.fZ = atan2 ( fY, fX );
+        CVector vecTemp ( sqrt ( fX * fX + fY * fY ), fZ, 0 );
+        vecTemp.Normalize ();
+        vecRotation.fY = atan2 ( vecTemp.fX, vecTemp.fY ) - PI / 2;
+        return vecRotation;
+    }
+
     CVector operator + ( const CVector& vecRight ) const
     {
         return CVector ( fX + vecRight.fX, fY + vecRight.fY, fZ + vecRight.fZ );

@@ -73,6 +73,7 @@
 #include <CClientTask.h>
 #include <CClientTXD.h>
 #include <CClientWater.h>
+#include <CClientWeapon.h>
 #include <CClientRenderElement.h>
 #include <CClientDxFont.h>
 #include <CClientGuiFont.h>

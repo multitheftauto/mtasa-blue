@@ -74,6 +74,44 @@ public:
         );
     }
 
+    CMatrix Inverse ( void ) const
+    {
+        float fDeterminant = vRight.fX * ( vFront.fY * vUp.fZ    - vUp.fY    * vFront.fZ ) -
+                             vFront.fX * ( vRight.fY * vUp.fZ    - vUp.fY    * vRight.fZ ) +
+                             vUp.fX    * ( vRight.fY * vFront.fZ - vFront.fY * vRight.fZ );
+
+        if ( fDeterminant == 0.0f )
+            return CMatrix ();
+
+        float fRcp = 1.0f / fDeterminant;
+
+        CMatrix matResult;
+        matResult.vRight.fX =  fRcp * ( vFront.fY * vUp.fZ    - vUp.fY    * vFront.fZ );
+        matResult.vRight.fY = -fRcp * ( vRight.fY * vUp.fZ    - vUp.fY    * vRight.fZ );
+        matResult.vRight.fZ =  fRcp * ( vRight.fY * vFront.fZ - vFront.fY * vRight.fZ );
+
+        matResult.vFront.fX = -fRcp * ( vFront.fX * vUp.fZ    - vUp.fX    * vFront.fZ );
+        matResult.vFront.fY =  fRcp * ( vRight.fX * vUp.fZ    - vUp.fX    * vRight.fZ );
+        matResult.vFront.fZ = -fRcp * ( vRight.fX * vFront.fZ - vFront.fX * vRight.fZ );
+
+        matResult.vUp.fX    =  fRcp * ( vFront.fX * vUp.fY    - vUp.fX    * vFront.fY );
+        matResult.vUp.fY    = -fRcp * ( vRight.fX * vUp.fY    - vUp.fX    * vRight.fY );
+        matResult.vUp.fZ    =  fRcp * ( vRight.fX * vFront.fY - vFront.fX * vRight.fY );
+
+        matResult.vPos.fX   = -fRcp * ( vFront.fX * ( vUp.fY    * vPos.fZ   - vUp.fZ    * vPos.fY  ) -
+                                        vUp.fX    * ( vFront.fY * vPos.fZ   - vFront.fZ * vPos.fY  ) +
+                                        vPos.fX   * ( vFront.fY * vUp.fZ    - vFront.fZ * vUp.fY   ) );
+
+        matResult.vPos.fY   =  fRcp * ( vRight.fX * ( vUp.fY    * vPos.fZ   - vUp.fZ    * vPos.fY  ) -
+                                        vUp.fX    * ( vRight.fY * vPos.fZ   - vRight.fZ * vPos.fY  ) +
+                                        vPos.fX   * ( vRight.fY * vUp.fZ    - vRight.fZ * vUp.fY   ) );
+
+        matResult.vPos.fZ   = -fRcp * ( vRight.fX * ( vFront.fY * vPos.fZ   - vFront.fZ * vPos.fY   ) -
+                                        vFront.fX * ( vRight.fY * vPos.fZ   - vRight.fZ * vPos.fY   ) +
+                                        vPos.fX   * ( vRight.fY * vFront.fZ - vRight.fZ * vFront.fY ) );
+        return matResult;
+    }
+
     void Invert ()
     {
         // Transpose the rotation matrix and negate the position
