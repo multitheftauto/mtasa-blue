@@ -33,6 +33,7 @@ DECLARE_ENUM( EPixelsFormatType );
 DECLARE_ENUM( EBlendModeType )
 DECLARE_ENUM( EEntityTypeMask );
 DECLARE_ENUM( eWeaponState );
+DECLARE_ENUM( eWeaponFlags );
 
 enum eDXHorizontalAlign
 {
