@@ -56,7 +56,7 @@ CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponT
     m_weaponConfig.flags.bCheckCarTires = true;
 
     m_itargetWheel = MAX_WHEELS + 1;
-    m_nAmmoInClip = 30;
+    m_nAmmoInClip = m_pWeaponStat->GetMaximumClipAmmo();
     m_ucCounter = 0;
     m_nAmmoTotal = 9999;
     m_iWeaponFireRate = GetWeaponFireTime ( m_pWeaponStat );
