@@ -1875,11 +1875,11 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
     if ( argStream.NextIsUserData () )
     {
         argStream.ReadUserData ( pWeapon );
-        argStream.ReadEnumString ( weaponProperty );
+        argStream.ReadEnumString ( eProp );
 
         if ( !argStream.HasErrors () )
         {
-            if ( CStaticFunctionDefinitions::GetWeaponProperty ( pWeapon, weaponProperty, sDamage ) )
+            if ( CStaticFunctionDefinitions::GetWeaponProperty ( pWeapon, eProp, sDamage ) )
             {
                 lua_pushnumber ( luaVM, sDamage );
                 return 1;

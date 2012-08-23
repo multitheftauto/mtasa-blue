@@ -205,7 +205,9 @@ int CLuaFunctionDefs::GetWeaponState ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        lua_pushnumber ( luaVM, pWeapon->GetWeaponState ( ) );
+        weaponState = pWeapon->GetWeaponState ( );
+        SString strValue = EnumToString ( weaponState );
+        lua_pushstring ( luaVM, strValue );
         return 1;
     }
     else
@@ -276,6 +278,7 @@ int CLuaFunctionDefs::GetWeaponTarget ( lua_State* luaVM )
 {
     CClientWeapon * pWeapon;
     CClientEntity * pTarget;
+    CVector vecTarget;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWeapon );
     if ( !argStream.HasErrors () )
@@ -283,13 +286,14 @@ int CLuaFunctionDefs::GetWeaponTarget ( lua_State* luaVM )
         switch ( pWeapon->GetWeaponTargetType ( ) )
         {
             case TARGET_TYPE_VECTOR:
-                CVector vecTarget = pWeapon->GetWeaponVectorTarget ( );
-                lua_pushnumber ( vecTarget.fX );
-                lua_pushnumber ( vecTarget.fY );
-                lua_pushnumber ( vecTarget.fZ );
+                vecTarget = pWeapon->GetWeaponVectorTarget ( );
+                lua_pushnumber ( luaVM, vecTarget.fX );
+                lua_pushnumber ( luaVM, vecTarget.fY );
+                lua_pushnumber ( luaVM, vecTarget.fZ );
             return 3;
             case TARGET_TYPE_ENTITY:
-                lua_pushelement ( pWeapon->GetWeaponEntityTarget ( ) );
+                pTarget = pWeapon->GetWeaponEntityTarget ( );
+                lua_pushelement ( luaVM, pTarget );
             return 1;
             case TARGET_TYPE_FIXED:
                 lua_pushnil ( luaVM );
@@ -368,7 +372,7 @@ int CLuaFunctionDefs::SetWeaponFlags ( lua_State* luaVM )
     argStream.ReadEnumString ( flag );
     if ( !argStream.HasErrors() )
     {
-        if ( flag != eWeaponFlags::FLAGS )
+        if ( flag != eWeaponFlags::WEAPONFLAGS_FLAGS )
         {
             bool bData;
             argStream.ReadBool ( bData );
@@ -418,7 +422,7 @@ int CLuaFunctionDefs::GetWeaponFlags ( lua_State* luaVM )
     argStream.ReadEnumString ( flag );
     if ( !argStream.HasErrors() )
     {
-        if ( flag != eWeaponFlags::FLAGS )
+        if ( flag != eWeaponFlags::WEAPONFLAGS_FLAGS )
         {
             if ( CStaticFunctionDefinitions::GetWeaponFlags( pWeapon, flag, bData ) )
             {
