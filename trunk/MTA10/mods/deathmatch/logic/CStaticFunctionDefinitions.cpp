@@ -6440,22 +6440,11 @@ bool CStaticFunctionDefinitions::ClearWeaponTarget ( CClientWeapon * pWeapon )
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetWeaponFlags ( CClientWeapon * pWeapon, bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, bool bInstantReload, const SLineOfSightFlags& flags )
+bool CStaticFunctionDefinitions::SetWeaponFlags ( CClientWeapon * pWeapon, eWeaponFlags flags, bool bData )
 {
     if ( pWeapon )
     {
-        pWeapon->SetFlags ( bDisableWeaponModel, bShootIfTargetBlocked, bShootIfTargetOutOfRange, bInstantReload, flags );
-        return true;
-    }
-    return false;
-}
-
-bool CStaticFunctionDefinitions::SetWeaponFlags ( CClientWeapon * pWeapon, bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, bool bInstantReload )
-{
-    if ( pWeapon )
-    {
-        pWeapon->SetFlags ( bDisableWeaponModel, bShootIfTargetBlocked, bShootIfTargetOutOfRange, bInstantReload );
-        return true;
+        return pWeapon->SetFlags ( flags, bData );
     }
     return false;
 }
@@ -6464,18 +6453,25 @@ bool CStaticFunctionDefinitions::SetWeaponFlags ( CClientWeapon * pWeapon, const
 {
     if ( pWeapon )
     {
-        pWeapon->SetFlags ( flags );
-        return true;
+        return pWeapon->SetFlags ( flags );
     }
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponFlags ( CClientWeapon * pWeapon, bool &bDisableWeaponModel, bool &bShootIfTargetBlocked, bool &bShootIfTargetOutOfRange, bool &bInstantReload, SLineOfSightFlags& flags )
+bool CStaticFunctionDefinitions::GetWeaponFlags ( CClientWeapon * pWeapon, eWeaponFlags flags, bool &bData )
 {
     if ( pWeapon )
     {
-        pWeapon->GetFlags ( bDisableWeaponModel, bShootIfTargetBlocked, bShootIfTargetOutOfRange, bInstantReload, flags );
-        return true;
+        return pWeapon->GetFlags ( flags, bData );
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetWeaponFlags ( CClientWeapon * pWeapon, SLineOfSightFlags& flags )
+{
+    if ( pWeapon )
+    {
+        return pWeapon->GetFlags ( flags );
     }
     return false;
 }

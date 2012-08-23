@@ -323,6 +323,16 @@ IMPLEMENT_ENUM_BEGIN( eWeaponState )
     ADD_ENUM ( WEAPONSTATE_RELOADING,                       "reloading" )
 IMPLEMENT_ENUM_END( "weapon-state" )
 
+
+IMPLEMENT_ENUM_BEGIN ( eWeaponFlags )
+    ADD_ENUM ( DISABLE_MODEL,          "disablemodel")
+    ADD_ENUM ( FLAGS,                  "flags" )
+    ADD_ENUM ( INSTANT_RELOAD,         "instantreload")
+    ADD_ENUM ( SHOOT_IF_OUT_OF_RANGE,  "shootifoutofrange")
+    ADD_ENUM ( SHOOT_IF_TARGET_BOCKED, "shootifblocked")
+IMPLEMENT_ENUM_END( "weapon-flags" )
+
+
 //
 // Get best guess at name of userdata type
 //

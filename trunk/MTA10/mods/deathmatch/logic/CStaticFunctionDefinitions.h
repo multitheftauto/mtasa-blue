@@ -537,10 +537,12 @@ public:
     static bool                         SetWeaponTarget                     ( CClientWeapon * pWeapon, CClientEntity * pTarget, int boneTarget );
     static bool                         SetWeaponTarget                     ( CClientWeapon * pWeapon, CVector vecTarget );
     static bool                         ClearWeaponTarget                   ( CClientWeapon * pWeapon );
-    static bool                         SetWeaponFlags                      ( CClientWeapon * pWeapon, bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, bool bInstantReload, const SLineOfSightFlags& flags );
-    static bool                         SetWeaponFlags                      ( CClientWeapon * pWeapon, bool bDisableWeaponModel, bool bShootIfTargetBlocked, bool bShootIfTargetOutOfRange, bool bInstantReload );
-    static bool                         SetWeaponFlags                      ( CClientWeapon * pWeapon, const SLineOfSightFlags& flags );
-    static bool                         GetWeaponFlags                      ( CClientWeapon * pWeapon, bool &bDisableWeaponModel, bool &bShootIfTargetBlocked, bool &bShootIfTargetOutOfRange, bool &bInstantReload, SLineOfSightFlags& flags );
+    
+    static bool                         SetWeaponFlags                      ( CClientWeapon * pWeapon, eWeaponFlags flag, bool bData );
+    static bool                         SetWeaponFlags                      ( CClientWeapon * pWeapon, const SLineOfSightFlags &flags );
+    static bool                         GetWeaponFlags                      ( CClientWeapon * pWeapon, SLineOfSightFlags& flags );
+    static bool                         GetWeaponFlags                      ( CClientWeapon * pWeapon, eWeaponFlags flag, bool &bData );
+    
     static bool                         SetWeaponFiringRate                 ( CClientWeapon * pWeapon, int iFiringRate );
     static bool                         ResetWeaponFiringRate               ( CClientWeapon * pWeapon );
     static bool                         GetWeaponFiringRate                 ( CClientWeapon * pWeapon, int &iFiringRate );
