@@ -6340,6 +6340,20 @@ bool CStaticFunctionDefinitions::FireWeapon ( CClientWeapon * pWeapon )
 }
 
 
+bool CStaticFunctionDefinitions::GetWeaponProperty ( CClientWeapon * pWeapon, eWeaponProperty eProperty, short &sData )
+{
+    if ( pWeapon )
+    {
+        if ( eProperty == WEAPON_DAMAGE )
+        {
+            sData = pWeapon->GetWeaponStat ( )->GetDamagePerHit ( );
+            return true;
+        }
+    }
+    return false;
+}
+
+
 bool CStaticFunctionDefinitions::SetWeaponProperty ( CClientWeapon * pWeapon, eWeaponProperty eProperty, short sData )
 {
     if ( pWeapon )
@@ -6352,6 +6366,7 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( CClientWeapon * pWeapon, eW
     }
     return false;
 }
+
 bool CStaticFunctionDefinitions::SetWeaponProperty ( CClientWeapon * pWeapon, eWeaponProperty eProperty, float fData )
 {
     if ( pWeapon )

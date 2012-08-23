@@ -839,7 +839,9 @@ public:
     LUA_DECLARE ( FireWeapon );
     LUA_DECLARE ( SetWeaponProperty );
     LUA_DECLARE ( SetWeaponState );
+    LUA_DECLARE ( GetWeaponState );
     LUA_DECLARE ( SetWeaponTarget );
+    LUA_DECLARE ( GetWeaponTarget );
     LUA_DECLARE ( SetWeaponOwner );
     LUA_DECLARE ( GetWeaponOwner );
     LUA_DECLARE ( SetWeaponFlags );

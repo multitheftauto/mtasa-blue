@@ -671,3 +671,18 @@ void CClientWeapon::ResetWeaponFireTime ( void )
 {
     m_iWeaponFireRate = GetWeaponFireTime ( m_pWeaponStat );
 }
+
+eTargetType CClientWeapon::GetWeaponTargetType ( void )
+{
+    return m_targetType;
+}
+
+CVector CClientWeapon::GetWeaponVectorTarget ( void )
+{
+    return m_vecTarget;
+}
+
+CClientEntity * CClientWeapon::GetWeaponEntityTarget ( void )
+{
+    return m_pTarget;
+}

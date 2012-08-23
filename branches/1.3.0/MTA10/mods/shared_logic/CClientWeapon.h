@@ -55,6 +55,9 @@ public:
     inline void             SetWeaponState          ( eWeaponState state )  { m_State = state; }
     void                    SetWeaponTarget         ( CClientEntity * pTarget, int subTarget );
     void                    SetWeaponTarget         ( CVector vecTarget );
+    CVector                 GetWeaponVectorTarget   ( void );
+    CClientEntity *         GetWeaponEntityTarget   ( void );
+    eTargetType             GetWeaponTargetType     ( void );
     void                    ResetWeaponTarget       ( void );
 
     void                    DoPulse                 ( void );
