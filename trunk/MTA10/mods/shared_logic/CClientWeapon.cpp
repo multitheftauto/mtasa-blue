@@ -56,7 +56,7 @@ CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponT
     m_weaponConfig.flags.bCheckCarTires = true;
 
     m_itargetWheel = MAX_WHEELS + 1;
-    m_nAmmoInClip = 30;
+    m_nAmmoInClip = m_pWeaponStat->GetMaximumClipAmmo();
     m_ucCounter = 0;
     m_nAmmoTotal = 9999;
     m_iWeaponFireRate = GetWeaponFireTime ( m_pWeaponStat );
@@ -670,4 +670,19 @@ int CClientWeapon::GetWeaponFireTime ( void )
 void CClientWeapon::ResetWeaponFireTime ( void )
 {
     m_iWeaponFireRate = GetWeaponFireTime ( m_pWeaponStat );
+}
+
+eTargetType CClientWeapon::GetWeaponTargetType ( void )
+{
+    return m_targetType;
+}
+
+CVector CClientWeapon::GetWeaponVectorTarget ( void )
+{
+    return m_vecTarget;
+}
+
+CClientEntity * CClientWeapon::GetWeaponEntityTarget ( void )
+{
+    return m_pTarget;
 }

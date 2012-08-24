@@ -1867,8 +1867,32 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
     eWeaponSkill eWepSkill = eWeaponSkill::WEAPONSKILL_STD;
     eWeaponType eWep = eWeaponType::WEAPONTYPE_UNARMED;
     eWeaponProperty eProp = eWeaponProperty::WEAPON_INVALID_PROPERTY;
-    
+    CClientWeapon * pWeapon;
+    short sDamage = 0;
     CScriptArgReader argStream ( luaVM );
+    
+    
+    if ( argStream.NextIsUserData () )
+    {
+        argStream.ReadUserData ( pWeapon );
+        argStream.ReadEnumString ( eProp );
+
+        if ( !argStream.HasErrors () )
+        {
+            if ( CStaticFunctionDefinitions::GetWeaponProperty ( pWeapon, eProp, sDamage ) )
+            {
+                lua_pushnumber ( luaVM, sDamage );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponProperty", *argStream.GetErrorMessage () ) );
+
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+
+    
     if ( argStream.NextIsEnumString ( eWep ) )
     {
         argStream.ReadEnumString ( eWep );
