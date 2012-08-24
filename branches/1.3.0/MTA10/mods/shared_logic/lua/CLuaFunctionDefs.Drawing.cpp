@@ -18,7 +18,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#define SETRENDERTARGET_NORESTRICTIONS_MIN_CLIENT_VERSION  "1.3.0-9.04431"
+#define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS  "1.3.0-9.04431"
 
 int CLuaFunctionDefs::dxDrawLine ( lua_State* luaVM )
 {
@@ -823,7 +823,7 @@ int CLuaFunctionDefs::dxSetRenderTarget ( lua_State* luaVM )
 
     // Check version ok for this function to be called now
     if ( !g_pCore->GetGraphics ()->GetRenderItemManager ()->IsSetRenderTargetEnabledOldVer () )
-        MinClientCheck ( argStream, SETRENDERTARGET_NORESTRICTIONS_MIN_CLIENT_VERSION, "function is being called outside certain events" );
+        MinClientReqCheck ( argStream, MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS, "function is being called outside certain events" );
 
     if ( !argStream.HasErrors () )
     {

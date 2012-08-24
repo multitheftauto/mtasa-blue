@@ -325,7 +325,11 @@ SString InsertQueryArgumentsMySql ( const SString& strQuery, CLuaArguments* pArg
             else
             if ( type == LUA_TNUMBER )
             {
-                strParsedQuery += SString ( "%f", pArgument->GetNumber () );
+                double dNumber = pArgument->GetNumber ();
+                if ( dNumber == floor ( dNumber ) )
+                    strParsedQuery += SString ( "%" PRId64, (long long)dNumber );
+                else
+                    strParsedQuery += SString ( "%f", dNumber );
             }
             else
             if ( type == LUA_TSTRING )

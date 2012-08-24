@@ -18,8 +18,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#define REMOVEPEDFROMVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION  "1.3.0-9.04482"
-#define WARPPEDINTOVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION    "1.3.0-9.04482"
+#define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE  "1.3.0-9.04482"
+#define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE    "1.3.0-9.04482"
 
 int CLuaFunctionDefs::GetPedVoice ( lua_State* luaVM )
 {
@@ -1256,7 +1256,7 @@ int CLuaFunctionDefs::WarpPedIntoVehicle ( lua_State* luaVM )
     argStream.ReadUserData ( pVehicle );
     argStream.ReadNumber ( uiSeat, 0 );
 
-    MinClientCheck ( argStream, WARPPEDINTOVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION, "function is being called client side" );
+    MinClientReqCheck ( argStream, MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE, "function is being called client side" );
 
     if ( !argStream.HasErrors () )
     {
@@ -1288,7 +1288,7 @@ int CLuaFunctionDefs::RemovePedFromVehicle ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pPed );
 
-    MinClientCheck ( argStream, REMOVEPEDFROMVEHICLE_CLIENTSIDE_MIN_CLIENT_VERSION, "function is being called client side" );
+    MinClientReqCheck ( argStream, MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE, "function is being called client side" );
 
     if ( !argStream.HasErrors () )
     {

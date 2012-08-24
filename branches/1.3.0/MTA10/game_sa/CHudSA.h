@@ -45,6 +45,7 @@
 #define FUNC_DrawHelpText           0x58B6E0
 #define FUNC_DrawAreaName           0x58AA50
 #define FUNC_DrawRadar              0x58A330
+#define FUNC_DrawRadarPlanB         0x58A335
 #define FUNC_DrawRadioName          0x4E9E50
 #define FUNC_DrawWantedLevel        0x58D9A0
 #define FUNC_DrawCrosshair          0x58E020
