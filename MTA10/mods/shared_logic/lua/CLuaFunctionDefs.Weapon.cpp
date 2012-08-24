@@ -196,6 +196,26 @@ int CLuaFunctionDefs::SetWeaponState ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetWeaponState ( lua_State* luaVM )
+{
+    CClientWeapon * pWeapon;
+    eWeaponState weaponState;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWeapon );
+
+    if ( !argStream.HasErrors () )
+    {
+        weaponState = pWeapon->GetWeaponState ( );
+        SString strValue = EnumToString ( weaponState );
+        lua_pushstring ( luaVM, strValue );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponState", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefs::SetWeaponTarget ( lua_State* luaVM )
 {
@@ -254,6 +274,39 @@ int CLuaFunctionDefs::SetWeaponTarget ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetWeaponTarget ( lua_State* luaVM )
+{
+    CClientWeapon * pWeapon;
+    CClientEntity * pTarget;
+    CVector vecTarget;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWeapon );
+    if ( !argStream.HasErrors () )
+    {
+        switch ( pWeapon->GetWeaponTargetType ( ) )
+        {
+            case TARGET_TYPE_VECTOR:
+                vecTarget = pWeapon->GetWeaponVectorTarget ( );
+                lua_pushnumber ( luaVM, vecTarget.fX );
+                lua_pushnumber ( luaVM, vecTarget.fY );
+                lua_pushnumber ( luaVM, vecTarget.fZ );
+            return 3;
+            case TARGET_TYPE_ENTITY:
+                pTarget = pWeapon->GetWeaponEntityTarget ( );
+                lua_pushelement ( luaVM, pTarget );
+            return 1;
+            case TARGET_TYPE_FIXED:
+                lua_pushnil ( luaVM );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getWeaponTarget", *argStream.GetErrorMessage () ) );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::GetWeaponOwner ( lua_State* luaVM )
 {
     CClientWeapon * pWeapon;
@@ -308,6 +361,7 @@ int CLuaFunctionDefs::SetWeaponOwner ( lua_State* luaVM )
     lua_pushnil ( luaVM );
     return 1;
 }
+
 int CLuaFunctionDefs::SetWeaponFlags ( lua_State* luaVM )
 {
     CClientWeapon * pWeapon = NULL;
