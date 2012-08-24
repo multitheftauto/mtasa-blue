@@ -318,7 +318,7 @@ int CLuaFunctionDefs::SetWeaponFlags ( lua_State* luaVM )
     argStream.ReadEnumString ( flag );
     if ( !argStream.HasErrors() )
     {
-        if ( flag != eWeaponFlags::FLAGS )
+        if ( flag != WEAPONFLAGS_FLAGS )
         {
             bool bData;
             argStream.ReadBool ( bData );
@@ -368,7 +368,7 @@ int CLuaFunctionDefs::GetWeaponFlags ( lua_State* luaVM )
     argStream.ReadEnumString ( flag );
     if ( !argStream.HasErrors() )
     {
-        if ( flag != eWeaponFlags::FLAGS )
+        if ( flag != WEAPONFLAGS_FLAGS )
         {
             if ( CStaticFunctionDefinitions::GetWeaponFlags( pWeapon, flag, bData ) )
             {
