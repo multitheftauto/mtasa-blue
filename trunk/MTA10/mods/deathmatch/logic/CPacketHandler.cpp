@@ -2310,7 +2310,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
                 pWeaponInfo->SetAnimBreakoutTime            ( weaponProperty.data.anim_breakout_time );
             }
         }
-        if ( bitStream.Version () >= 0x30 )
+        if ( bitStream.Version () >= 0x36 )
         {
             bool bEnabled;
             bitStream.ReadBit ( bEnabled );
