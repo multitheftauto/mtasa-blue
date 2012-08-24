@@ -326,7 +326,6 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
             WeaponProperty.data.anim_breakout_time = pWeaponStat->GetWeaponAnimBreakoutTime();
             BitStream.Write( &WeaponProperty );
         }
-        if ( BitStream.Version () >= 0x30 )
         {
             BitStream.WriteBit ( g_pGame->GetJetpackWeaponEnabled ( (eWeaponType) i ) );
         }
