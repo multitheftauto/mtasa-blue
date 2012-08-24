@@ -106,6 +106,11 @@ VOID CHudSA::Disable ( bool bDisabled )
     else
         MemPut < BYTE > ( FUNC_Draw, 0x80 );
 
+    // Also disable the radar as the above code will not hide it before the local player has spawned
+    if ( bDisabled )
+        MemPut < BYTE > ( FUNC_DrawRadarPlanB, 0xC3 );
+    else
+        MemPut < BYTE > ( FUNC_DrawRadarPlanB, 0x83 );
 }
 
 bool CHudSA::IsDisabled ( void )
