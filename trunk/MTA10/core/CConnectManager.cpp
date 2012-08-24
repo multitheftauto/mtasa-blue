@@ -114,7 +114,8 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     pNet->RegisterPacketHandler ( CConnectManager::StaticProcessPacket );
 
     // Try to start a network to connect
-    if ( m_usPort && !pNet->StartNetwork ( m_strHost.c_str (), m_usPort ) )
+    SString strAddress = inet_ntoa ( m_Address );
+    if ( m_usPort && !pNet->StartNetwork ( strAddress, m_usPort ) )
     {
         SString strBuffer ( "Connecting to %s at port %u failed!", m_strHost.c_str (), m_usPort );
         CCore::GetSingleton ().ShowMessageBox ( "Error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
