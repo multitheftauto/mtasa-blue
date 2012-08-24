@@ -10,7 +10,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#define CAN_GIVE_MINCLIENTREQ_MIN_SERVER_VERSION  "1.3.0-9.04431"
+#define MIN_SERVER_REQ_CANSUPPLY_MINCLIENTREQ    "1.3.0-9.04431"
 
 //
 // enum values <-> script strings
@@ -488,7 +488,7 @@ bool ReadMatrix ( lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix )
 //
 // Check min client is correct
 //
-void MinClientCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason )
+void MinClientReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason )
 {
     CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine ( argStream.m_luaVM );
     if ( pLuaMain )
@@ -501,8 +501,8 @@ void MinClientCheck ( CScriptArgReader& argStream, const char* szVersionReq, con
                 if ( MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE )
                 {
                     // Check server is able to give us a MinClientReq
-                    if ( pResource->GetMinServerReq () < CAN_GIVE_MINCLIENTREQ_MIN_SERVER_VERSION )
-                        argStream.SetVersionError ( CAN_GIVE_MINCLIENTREQ_MIN_SERVER_VERSION, "server", "of technical reasons" );
+                    if ( pResource->GetMinServerReq () < MIN_SERVER_REQ_CANSUPPLY_MINCLIENTREQ )
+                        argStream.SetVersionError ( MIN_SERVER_REQ_CANSUPPLY_MINCLIENTREQ, "server", "of technical reasons" );
                     else
                         argStream.SetVersionError ( szVersionReq, "client", szReason );
                 }
