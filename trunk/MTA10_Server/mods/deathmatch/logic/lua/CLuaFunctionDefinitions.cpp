@@ -21,6 +21,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS       "1.3.0-9.04563"
 
 extern CGame* g_pGame;
 
@@ -153,13 +154,16 @@ int CLuaFunctionDefinitions::DisabledFunction ( lua_State* luaVM )
 int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
 {
     CScriptArgReader argStream ( luaVM );
-    if ( !argStream.NextIsFunction ( 1 ) )
+    if ( !argStream.NextIsFunction ( 1 ) && !argStream.NextIsFunction ( 2 ) )
     {
         // Call type 1
-        //  bool callRemote ( string host, string resourceName, string functionName, callback callbackFunction, [ arguments... ] )
-        SString strHost; SString strResourceName; SString strFunctionName; CLuaFunctionRef iLuaFunction; CLuaArguments args;
+        //  bool callRemote ( string host [, int connectionAttempts = 10 ], string resourceName, string functionName, callback callbackFunction, [ arguments... ] )
+        SString strHost; uint uiConnectionAttempts; SString strResourceName; SString strFunctionName; CLuaFunctionRef iLuaFunction; CLuaArguments args;
 
         argStream.ReadString ( strHost );
+        if ( argStream.NextIsNumber () )
+            MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS, "'connection attempts' is being used" );
+        argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
         argStream.ReadString ( strResourceName );
         argStream.ReadString ( strFunctionName );
         argStream.ReadFunction ( iLuaFunction );
@@ -171,7 +175,7 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
             CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
             if ( luaMain )
             {
-                g_pGame->GetRemoteCalls()->Call ( strHost, strResourceName, strFunctionName, &args, luaMain, iLuaFunction );
+                g_pGame->GetRemoteCalls()->Call ( strHost, strResourceName, strFunctionName, &args, luaMain, iLuaFunction, uiConnectionAttempts );
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
@@ -180,10 +184,13 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
     else
     {
         // Call type 2
-        //  bool callRemote ( string URL, callback callbackFunction, [ arguments... ] )
-        SString strURL; CLuaFunctionRef iLuaFunction; CLuaArguments args;
+        //  bool callRemote ( string URL [, int connectionAttempts = 10 ], callback callbackFunction, [ arguments... ] )
+        SString strURL; uint uiConnectionAttempts; CLuaFunctionRef iLuaFunction; CLuaArguments args;
 
         argStream.ReadString ( strURL );
+        if ( argStream.NextIsNumber () )
+            MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS, "'connection attempts' is being used" );
+        argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
         argStream.ReadFunction ( iLuaFunction );
         argStream.ReadLuaArguments ( args );
         argStream.ReadFunctionComplete ();
@@ -193,7 +200,7 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
             CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
             if ( luaMain )
             {
-                g_pGame->GetRemoteCalls()->Call ( strURL, &args, luaMain, iLuaFunction );
+                g_pGame->GetRemoteCalls()->Call ( strURL, &args, luaMain, iLuaFunction, uiConnectionAttempts );
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
@@ -201,7 +208,7 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
     }
 
     if ( argStream.HasErrors () )
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -211,11 +218,14 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
 // Call a function on a remote server
 int CLuaFunctionDefinitions::FetchRemote ( lua_State* luaVM )
 {
-//  bool fetchRemote ( string URL, callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
+//  bool fetchRemote ( string URL [, int connectionAttempts = 10 ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
     CScriptArgReader argStream ( luaVM );
-    SString strURL; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary; CLuaArguments args;
+    SString strURL; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary; CLuaArguments args; uint uiConnectionAttempts;
 
     argStream.ReadString ( strURL );
+    if ( argStream.NextIsNumber () )
+        MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS, "'connection attempts' is being used" );
+    argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
     argStream.ReadFunction ( iLuaFunction );
     argStream.ReadString ( strPostData, "" );
     argStream.ReadBool ( bPostBinary, false );
@@ -227,13 +237,13 @@ int CLuaFunctionDefinitions::FetchRemote ( lua_State* luaVM )
         CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( luaMain )
         {
-            g_pGame->GetRemoteCalls()->Call ( strURL, &args, strPostData, bPostBinary, luaMain, iLuaFunction );
+            g_pGame->GetRemoteCalls()->Call ( strURL, &args, strPostData, bPostBinary, luaMain, iLuaFunction, uiConnectionAttempts );
             lua_pushboolean ( luaVM, true );
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;

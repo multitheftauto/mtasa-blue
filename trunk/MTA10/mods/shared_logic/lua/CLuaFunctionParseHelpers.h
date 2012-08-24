@@ -245,4 +245,4 @@ bool MixedReadDxFontString ( CScriptArgReader& argStream, SString& strFontName, 
 bool MixedReadGuiFontString ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientGuiFont*& pFontElement );
 bool MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pMaterialElement );
 bool ReadMatrix ( lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix );
-void MinClientCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason );
+void MinClientReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason );

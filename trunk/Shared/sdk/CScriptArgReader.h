@@ -606,8 +606,12 @@ public:
             return;
 
         m_bResolvedErrorGotArgumentTypeAndValue = true;
-        m_iErrorGotArgumentType = lua_type ( m_luaVM, m_iErrorIndex );
-        m_strErrorGotArgumentValue = lua_tostring ( m_luaVM, m_iErrorIndex );
+
+        if ( m_strErrorMessageOverride.empty () )
+        {
+            m_iErrorGotArgumentType = lua_type ( m_luaVM, m_iErrorIndex );
+            m_strErrorGotArgumentValue = lua_tostring ( m_luaVM, m_iErrorIndex );
+        }
     }
 
     //
