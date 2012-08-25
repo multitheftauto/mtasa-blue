@@ -30,6 +30,8 @@ class CLuaFunctionDefinitions;
 
 #define LUA_ERROR() lua_pushboolean ( luaVM, false ); return 0;
 
+extern CTimeUsMarker < 20 > markerLatentEvent;  // For timing triggerLatentClientEvent
+
 class CLuaFunctionDefinitions
 {
 public:
