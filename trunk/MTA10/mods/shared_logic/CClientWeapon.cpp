@@ -11,10 +11,12 @@
 
 #include "StdInc.h"
 
-CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponType type ) : CClientObject ( pManager, ID, CClientPickupManager::GetWeaponModel ( type ), false )
+CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponType type )
+    : ClassInit ( this )
+    , CClientObject ( pManager, ID, CClientPickupManager::GetWeaponModel ( type ), false )
 {
-    // Ensure m_pTarget gets NULLed when it is destroyed
-    CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientWeapon" ), &m_pTarget, NULL );
+    // Ensure m_pTarget and m_pOwner get NULLed when they are destroyed
+    CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientWeapon" ), &m_pTarget, &m_pOwner, NULL );
 
     m_pManager = pManager;
     m_pManager->GetWeaponManager ()->AddToList ( this );
@@ -73,7 +75,7 @@ CClientWeapon::~CClientWeapon ( void )
     delete m_pMarker2;
 #endif
 
-    CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pTarget, NULL );
+    CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pTarget, &m_pOwner, NULL );
 }
 
 
