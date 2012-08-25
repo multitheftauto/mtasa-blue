@@ -81,14 +81,14 @@ void CServer::HandleInput ( char* szCommand )
 
 void CServer::DoPulse()
 {
-    UNCLOCK( "Top", "Other" );
+    UNCLOCK( " Top", " Idle" );
     if ( m_pGame )
     {
-        CLOCK( "Top", "Game->DoPulse" );
+        CLOCK( " Top", "Game->DoPulse" );
         m_pGame->DoPulse ();
-        UNCLOCK( "Top", "Game->DoPulse" );
+        UNCLOCK( " Top", "Game->DoPulse" );
     }
-    CLOCK( "Top", "Other" );
+    CLOCK( " Top", " Idle" );
 }
 
 

@@ -392,7 +392,43 @@ public:
 
 
     //
-    // Read a function, but don't do it yet due to Lua statck issues
+    // Read a table of userdatas
+    //
+    template < class T >
+    bool ReadUserDataTable ( std::vector < T* >& outList )
+    {
+        if ( lua_type ( m_luaVM, m_iIndex ) != LUA_TTABLE )
+        {
+            SetTypeError ( "table" );
+            m_iIndex++;
+            return false;
+        }
+
+        for ( lua_pushnil ( m_luaVM ) ; lua_next ( m_luaVM, m_iIndex ) != 0 ; lua_pop ( m_luaVM, 1 ) )
+        {
+            //int idx = lua_tonumber ( m_luaVM, -2 );
+            int iArgumentType = lua_type ( m_luaVM, -1 );
+
+            T* value = NULL;
+            if ( iArgumentType == LUA_TLIGHTUSERDATA )
+            {
+                value = (T*)UserDataCast < T > ( (T*)0, lua_touserdata ( m_luaVM, -1 ), m_luaVM );
+            }
+            else if ( iArgumentType == LUA_TUSERDATA )
+            {
+                value = (T*)UserDataCast < T > ( (T*)0, * ( ( void** ) lua_touserdata ( m_luaVM, -1 ) ), m_luaVM );
+            }
+
+            if ( value != NULL )
+                outList.push_back ( value );
+        }
+        m_iIndex++;
+        return true;
+    }
+
+
+    //
+    // Read a function, but don't do it yet due to Lua stack issues
     //
     bool ReadFunction ( CLuaFunctionRef& outValue, int defaultValue = -2 )
     {
