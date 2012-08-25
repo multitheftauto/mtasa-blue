@@ -44,6 +44,7 @@ enum eWeaponFlags
 };
 class CClientWeapon : public CClientObject
 {
+    DECLARE_CLASS( CClientWeapon, CClientObject )
 public:
                             CClientWeapon           ( CClientManager * pManager, ElementID ID, eWeaponType type );
                             ~CClientWeapon          ( void );

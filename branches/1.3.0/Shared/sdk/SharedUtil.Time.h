@@ -163,6 +163,12 @@ namespace SharedUtil
             item.szDesc = szDesc;
         }
 
+        void SetAndStoreString ( const SString& strDesc )
+        {
+            stringStoreList.push_back ( strDesc );
+            Set ( stringStoreList.back () );
+        }
+
         SString GetString ( void ) const
         {
             SString strStatus;
@@ -176,6 +182,7 @@ namespace SharedUtil
         }
 
      protected:
+        std::list < SString > stringStoreList;
         std::vector < SItem > itemList;
     };
 

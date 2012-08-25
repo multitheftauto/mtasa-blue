@@ -131,6 +131,7 @@ enum eCClientEntityClassTypes
     CLASS_CClientShader,
     CLASS_CClientRenderTarget,
     CLASS_CClientScreenSource,
+    CLASS_CClientWeapon,
 };
 
 

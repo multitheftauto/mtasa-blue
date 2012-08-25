@@ -110,6 +110,9 @@ void CLatentTransferManager::OnLuaMainDestroy ( void* pLuaMain )
 ///////////////////////////////////////////////////////////////
 void CLatentTransferManager::AddSendBatchBegin ( unsigned char ucPacketId, NetBitStreamInterface* pBitStream )
 {
+#ifndef MTA_CLIENT
+    markerLatentEvent.Set ( "BatchBegin" );
+#endif
     assert ( !m_pBatchBufferRef );
 
     uint uiBitStreamBitsUsed = pBitStream->GetNumberOfBitsUsed ();
@@ -129,6 +132,11 @@ void CLatentTransferManager::AddSendBatchBegin ( unsigned char ucPacketId, NetBi
     *(buffer.GetData () + buffer.GetSize () - 1) = 0;
     pBitStream->ResetReadPointer ();
     pBitStream->ReadBits ( buffer.GetData () + uiHeadSize, uiBitStreamBitsUsed );
+
+    m_uiNumSends = 0;
+#ifndef MTA_CLIENT
+    markerLatentEvent.SetAndStoreString ( SString ( "BatchPrep (%d KB)", uiBitStreamBytesUsed / 1024 ) );
+#endif
 }
 
 
@@ -141,6 +149,7 @@ void CLatentTransferManager::AddSendBatchBegin ( unsigned char ucPacketId, NetBi
 ///////////////////////////////////////////////////////////////
 SSendHandle CLatentTransferManager::AddSend ( NetPlayerID remoteId, ushort usBitStreamVersion, uint uiRate, void* pLuaMain, ushort usResourceNetId )
 {
+    m_uiNumSends++;
     assert ( m_pBatchBufferRef );
 
     CLatentSendQueue* pSendQueue = GetSendQueueForRemote ( remoteId, usBitStreamVersion );
@@ -157,6 +166,9 @@ SSendHandle CLatentTransferManager::AddSend ( NetPlayerID remoteId, ushort usBit
 ///////////////////////////////////////////////////////////////
 void CLatentTransferManager::AddSendBatchEnd ( void )
 {
+#ifndef MTA_CLIENT
+    markerLatentEvent.SetAndStoreString ( SString ( "BatchEnd (%d sends)", m_uiNumSends ) );
+#endif
     assert ( m_pBatchBufferRef );
     SAFE_DELETE ( m_pBatchBufferRef );
 }

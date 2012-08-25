@@ -22,8 +22,11 @@
 
 #include "StdInc.h"
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS       "1.3.0-9.04563"
+#define MIN_SERVER_REQ_TRIGGERCLIENTEVENT_SENDLIST          "1.3.0-9.04570"
 
 extern CGame* g_pGame;
+
+CTimeUsMarker < 20 > markerLatentEvent; // For timing triggerLatentClientEvent
 
 static CBlipManager*                                    m_pBlipManager = NULL;
 static CLuaManager*                                     m_pLuaManager = NULL;
@@ -558,51 +561,35 @@ int CLuaFunctionDefinitions::TriggerEvent ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::TriggerClientEvent ( lua_State* luaVM )
 {
+//  int triggerClientEvent ( [element/table triggerFor,] string name, element theElement, [arguments...] )
+    std::vector < CPlayer* > sendList; SString strName; CElement* pCallWithElement; CLuaArguments Arguments;
+
     CScriptArgReader argStream ( luaVM );
-    if ( !argStream.NextIsUserData () )
+    if ( argStream.NextIsTable () )
     {
-        // Call type 1
-        //  bool triggerClientEvent ( string name, element theElement, [arguments...] )
-        SString strName; CElement* pCallWithElement; CLuaArguments Arguments;
-
-        CScriptArgReader argStream ( luaVM );
-        argStream.ReadString ( strName );
-        argStream.ReadUserData ( pCallWithElement );
-        argStream.ReadLuaArguments ( Arguments );
-
-        if ( !argStream.HasErrors () )
-        {
-            if ( CStaticFunctionDefinitions::TriggerClientEvent ( CStaticFunctionDefinitions::GetRootElement (), strName, pCallWithElement, Arguments ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
+        MinServerReqCheck ( argStream, MIN_SERVER_REQ_TRIGGERCLIENTEVENT_SENDLIST, "a send list is being used" );
+        argStream.ReadUserDataTable ( sendList );
     }
     else
     {
-        // Call type 2
-        //  bool triggerClientEvent ( element triggerFor, string name, element theElement, [arguments...] )
-        CElement* pElement; SString strName; CElement* pCallWithElement; CLuaArguments Arguments;
+        CElement* pElement;
+        argStream.ReadIfNextIsUserData ( pElement, CStaticFunctionDefinitions::GetRootElement () );
+        pElement->GetDescendantsByType ( sendList, CElement::PLAYER );
+    }
+    argStream.ReadString ( strName );
+    argStream.ReadUserData ( pCallWithElement );
+    argStream.ReadLuaArguments ( Arguments );
 
-        CScriptArgReader argStream ( luaVM );
-        argStream.ReadUserData ( pElement );
-        argStream.ReadString ( strName );
-        argStream.ReadUserData ( pCallWithElement );
-        argStream.ReadLuaArguments ( Arguments );
-
-        if ( !argStream.HasErrors () )
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::TriggerClientEvent ( sendList, strName, pCallWithElement, Arguments ) )
         {
-            if ( CStaticFunctionDefinitions::TriggerClientEvent ( pElement, strName, pCallWithElement, Arguments ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
     }
-
-    if ( argStream.HasErrors () )
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "triggerClientEvent", *argStream.GetErrorMessage () ) );
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -611,11 +598,25 @@ int CLuaFunctionDefinitions::TriggerClientEvent ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::TriggerLatentClientEvent ( lua_State* luaVM )
 {
-//  int triggerLatentClientEvent ( [element triggerFor,] string event, [int bandwidth=50000,] [bool persist=false,] element theElement, [arguments...] )
-    CElement* pElement; SString strName; int iBandwidth; bool bPersist; CElement* pCallWithElement; CLuaArguments Arguments;
+    markerLatentEvent = CTimeUsMarker < 20 > ();
+    markerLatentEvent.Set ( "Start" );
+
+//  int triggerLatentClientEvent ( [element/table triggerFor,] string name, [int bandwidth=50000,] [bool persist=false,] element theElement, [arguments...] )
+    std::vector < CPlayer* > sendList; SString strName; int iBandwidth; bool bPersist; CElement* pCallWithElement; CLuaArguments Arguments;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadIfNextIsUserData ( pElement, CStaticFunctionDefinitions::GetRootElement () );
+    if ( argStream.NextIsTable () )
+    {
+        MinServerReqCheck ( argStream, MIN_SERVER_REQ_TRIGGERCLIENTEVENT_SENDLIST, "a send list is being used" );
+        argStream.ReadUserDataTable ( sendList );
+    }
+    else
+    {
+        CElement* pElement;
+        argStream.ReadIfNextIsUserData ( pElement, CStaticFunctionDefinitions::GetRootElement () );
+        pElement->GetDescendantsByType ( sendList, CElement::PLAYER );
+        markerLatentEvent.Set ( "GetDescendantsByType" );
+    }
     argStream.ReadString ( strName );
     argStream.ReadIfNextCouldBeNumber ( iBandwidth, 50000 );
     argStream.ReadIfNextIsBool ( bPersist, false );
@@ -640,9 +641,17 @@ int CLuaFunctionDefinitions::TriggerLatentClientEvent ( lua_State* luaVM )
             }
         }
 
+        markerLatentEvent.SetAndStoreString ( SString ( "Get args (%d,%s)", sendList.size (), *strName ) );
+
         // Trigger it
-        if ( CStaticFunctionDefinitions::TriggerLatentClientEvent ( pElement, strName, pCallWithElement, Arguments, iBandwidth, pLuaMain, usResourceNetId ) )
+        if ( CStaticFunctionDefinitions::TriggerLatentClientEvent ( sendList, strName, pCallWithElement, Arguments, iBandwidth, pLuaMain, usResourceNetId ) )
         {
+            markerLatentEvent.Set ( "End" );
+
+            // Add debug info if wanted
+            if ( CPerfStatDebugInfo::GetSingleton ()->IsActive ( "TriggerLatentClientEvent" ) )
+                CPerfStatDebugInfo::GetSingleton ()->AddLine ( "TriggerLatentClientEvent", markerLatentEvent.GetString () );
+
             lua_pushboolean ( luaVM, true );
             return 1;
         }

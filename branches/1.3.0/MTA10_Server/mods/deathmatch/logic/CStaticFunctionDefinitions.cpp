@@ -148,20 +148,13 @@ bool CStaticFunctionDefinitions::TriggerEvent ( const char* szName, CElement* pE
 }
 
 
-bool CStaticFunctionDefinitions::TriggerClientEvent ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments )
+bool CStaticFunctionDefinitions::TriggerClientEvent ( const std::vector < CPlayer* >& sendList, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments )
 {
-    assert ( pElement );
     assert ( szName );
     assert ( pCallWithElement );
 
     // Make packet
     CLuaEventPacket Packet ( szName, pCallWithElement->GetID (), Arguments );
-
-    // Make send list
-    std::vector < CPlayer* > sendList;
-
-    // Get descendants (incl. pElement if a player)
-    pElement->GetDescendantsByType ( sendList, CElement::PLAYER );
 
     // Send packet to players
     CPlayerManager::Broadcast ( Packet, sendList );
@@ -170,20 +163,15 @@ bool CStaticFunctionDefinitions::TriggerClientEvent ( CElement* pElement, const 
 }
 
 
-bool CStaticFunctionDefinitions::TriggerLatentClientEvent ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId )
+bool CStaticFunctionDefinitions::TriggerLatentClientEvent ( const std::vector < CPlayer* >& sendList, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId )
 {
-    assert ( pElement );
     assert ( szName );
     assert ( pCallWithElement );
 
     // Make packet
     CLuaEventPacket Packet ( szName, pCallWithElement->GetID (), Arguments );
 
-    // Make send list
-    std::vector < CPlayer* > sendList;
-
-    // Get descendants (incl. pElement if a player)
-    pElement->GetDescendantsByType ( sendList, CElement::PLAYER );
+    markerLatentEvent.Set ( "Make packet" );
 
     // Send packet to players
     g_pGame->EnableLatentSends ( true, iBandwidth, pLuaMain, usResourceNetId );
