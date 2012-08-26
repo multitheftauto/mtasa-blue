@@ -1207,7 +1207,7 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const 
     if ( pElement->GetType () != CElement::COLSHAPE )
     {
         // Run colpoint checks
-        m_pColManager->DoHitDetection ( pElement->GetLastPosition (), pElement->GetPosition (), 0.0f, pElement );
+        m_pColManager->DoHitDetection ( pElement->GetPosition (), pElement );
     }
 
     // Construct the set position packet
@@ -9050,7 +9050,7 @@ CColCircle* CStaticFunctionDefinitions::CreateColCircle ( CResource* pResource, 
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 
     if ( pResource->HasStarted() )
     {
@@ -9070,7 +9070,7 @@ CColCuboid* CStaticFunctionDefinitions::CreateColCuboid ( CResource* pResource, 
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 
     if ( pResource->HasStarted() )
     {
@@ -9090,7 +9090,7 @@ CColSphere* CStaticFunctionDefinitions::CreateColSphere ( CResource* pResource, 
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 
     if ( pResource->HasStarted() )
     {
@@ -9110,7 +9110,7 @@ CColRectangle* CStaticFunctionDefinitions::CreateColRectangle ( CResource* pReso
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 
     if ( pResource->HasStarted() )
     {
@@ -9129,7 +9129,7 @@ CColPolygon* CStaticFunctionDefinitions::CreateColPolygon ( CResource* pResource
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 
     if ( pResource->HasStarted() )
     {
@@ -9149,7 +9149,7 @@ CColTube* CStaticFunctionDefinitions::CreateColTube ( CResource* pResource, cons
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 
     if ( pResource->HasStarted() )
     {
@@ -9166,7 +9166,7 @@ CColTube* CStaticFunctionDefinitions::CreateColTube ( CResource* pResource, cons
 void CStaticFunctionDefinitions::RefreshColShapeColliders ( CColShape * pColShape )
 {
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 }
 
 

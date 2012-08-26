@@ -22,7 +22,7 @@ CColRectangle::CColRectangle ( CColManager* pManager, CElement* pParent, const C
 }
 
 
-bool CColRectangle::DoHitDetection ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius )
+bool CColRectangle::DoHitDetection ( const CVector& vecNowPosition )
 {
     // FIXME: What about radius?
 

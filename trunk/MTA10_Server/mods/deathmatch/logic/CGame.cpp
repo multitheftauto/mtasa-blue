@@ -2159,7 +2159,7 @@ void CGame::Packet_PlayerPuresync ( CPlayerPuresyncPacket& Packet )
 
             CLOCK( "PlayerPuresync", "DoHitDetection" );
             // Run colpoint checks
-            m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer );
+            m_pColManager->DoHitDetection ( pPlayer->GetPosition (), pPlayer );
             UNCLOCK( "PlayerPuresync", "DoHitDetection" );
         }
     }
@@ -2246,8 +2246,8 @@ void CGame::Packet_VehiclePuresync ( CVehiclePuresyncPacket& Packet )
 
             // Run colpoint checks
             CLOCK( "VehiclePuresync", "DoHitDetection" );
-            m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer );
-            m_pColManager->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );
+            m_pColManager->DoHitDetection ( pPlayer->GetPosition (), pPlayer );
+            m_pColManager->DoHitDetection ( pVehicle->GetPosition (), pVehicle );
             UNCLOCK( "VehiclePuresync", "DoHitDetection" );
         }
     }

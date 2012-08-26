@@ -27,12 +27,12 @@ CColManager::~CColManager ( void )
 }
 
 
-void CColManager::DoHitDetection ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius, CElement* pEntity, CColShape * pJustThis, bool bChildren )
+void CColManager::DoHitDetection ( const CVector& vecNowPosition, CElement* pEntity, CColShape * pJustThis, bool bChildren )
 {
     if ( pJustThis )
         DoHitDetectionForColShape ( pJustThis );
     else
-        DoHitDetectionForEntity ( vecNowPosition, 0.0f, pEntity );
+        DoHitDetectionForEntity ( vecNowPosition, pEntity );
 }
 
 
@@ -86,7 +86,7 @@ void CColManager::DoHitDetectionForColShape ( CColShape* pShape )
         pEntity->GetPosition ();
 
         // Collided?
-        bool bHit = pShape->DoHitDetection ( vecPosition, vecPosition, 0.0f );
+        bool bHit = pShape->DoHitDetection ( vecPosition );
         HandleHitDetectionResult ( bHit, pShape, pEntity );
     }
 }
@@ -95,13 +95,13 @@ void CColManager::DoHitDetectionForColShape ( CColShape* pShape )
 //
 // Handle the changing state of collision between one entity and any colshape
 //
-void CColManager::DoHitDetectionForEntity ( const CVector& vecNowPosition, float fRadius, CElement* pEntity )
+void CColManager::DoHitDetectionForEntity ( const CVector& vecNowPosition, CElement* pEntity )
 {
     std::map < CColShape*, int > shortList;
 
     // Get all entities within the sphere
     CElementResult queryResult;
-    GetSpatialDatabase()->SphereQuery ( queryResult, CSphere ( vecNowPosition, fRadius ) );
+    GetSpatialDatabase()->SphereQuery ( queryResult, CSphere ( vecNowPosition, 0.0f ) );
 
     // Extract colshapes
     for ( CElementResult ::const_iterator it = queryResult.begin () ; it != queryResult.end (); ++it )
@@ -121,7 +121,7 @@ void CColManager::DoHitDetectionForEntity ( const CVector& vecNowPosition, float
         if ( !pShape->IsBeingDeleted () && pShape->IsEnabled () )
         {
             // Collided?
-            bool bHit = pShape->DoHitDetection ( vecNowPosition, vecNowPosition, fRadius );
+            bool bHit = pShape->DoHitDetection ( vecNowPosition );
             HandleHitDetectionResult ( bHit, pShape, pEntity );
         }
     }

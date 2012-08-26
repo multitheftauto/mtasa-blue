@@ -24,7 +24,7 @@ public:
     virtual CSphere         GetWorldBoundingSphere  ( void );
 
     eColShapeType           GetShapeType    ( void )            { return COLSHAPE_TUBE; }
-    bool                    DoHitDetection  ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius );
+    bool                    DoHitDetection  ( const CVector& vecNowPosition );
 
     inline float            GetRadius       ( void )            { return m_fRadius; };
     inline void             SetRadius       ( float fRadius )   { m_fRadius = fRadius; SizeChanged (); };

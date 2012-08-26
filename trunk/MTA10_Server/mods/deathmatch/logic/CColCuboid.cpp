@@ -22,7 +22,7 @@ CColCuboid::CColCuboid ( CColManager* pManager, CElement* pParent, const CVector
 }
 
 
-bool CColCuboid::DoHitDetection  ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius )
+bool CColCuboid::DoHitDetection  ( const CVector& vecNowPosition )
 {
     // FIXME: What about radius?
 

@@ -257,7 +257,6 @@ bool CPickup::ReadSpecialData ( void )
 
 void CPickup::SetPosition ( const CVector& vecPosition )
 {
-    m_vecLastPosition = m_vecPosition;
     m_vecPosition = vecPosition;
     if ( m_pCollision )
         m_pCollision->SetPosition ( vecPosition );
