@@ -23,13 +23,12 @@ extern "C"
 
 ASE* ASE::_instance = NULL;
 
-ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP, bool bLan )
+ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP/*, bool bLan*/ )
     : m_QueryDosProtect( 5, 6000, 7000 )        // Max of 5 queries per 6 seconds, then 7 second ignore
 {
     _instance = this;
 
-    m_bLan = bLan;
-    m_usPort = usPort + ( ( m_bLan ) ? SERVER_LIST_QUERY_PORT_OFFSET_LAN : SERVER_LIST_QUERY_PORT_OFFSET );
+    m_usPortBase = usPort;
 
     m_pMainConfig = pMainConfig;
     m_pPlayerManager = pPlayerManager;
@@ -58,8 +57,38 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     std::stringstream ss;
     ss << usPort;
     m_strPort = ss.str();
+    m_Socket = INVALID_SOCKET;
+}
 
-    // Set the sock addr
+
+ASE::~ASE ( void )
+{
+    _instance = NULL;
+    ClearRules ();
+}
+
+
+bool ASE::SetPortEnabled ( bool bInternetEnabled, bool bLanEnabled )
+{
+    // Calc requirements
+    bool bPortEnableReq = bInternetEnabled || bLanEnabled;
+    bool bLanOnly = !bInternetEnabled && bLanEnabled;
+    ushort usPortReq = m_usPortBase + ( ( bLanOnly ) ? SERVER_LIST_QUERY_PORT_OFFSET_LAN : SERVER_LIST_QUERY_PORT_OFFSET );
+
+    // Any change?
+    if ( ( m_Socket != INVALID_SOCKET ) == bPortEnableReq && m_usPort == usPortReq )
+        return true;
+
+    m_usPort = usPortReq;
+
+    // Remove current thingmy
+    if ( m_Socket != INVALID_SOCKET )
+    {
+        closesocket( m_Socket );
+        m_Socket = INVALID_SOCKET;
+    }
+
+    // Start new thingmy
     m_SockAddr.sin_family = AF_INET;         
     m_SockAddr.sin_port = htons ( m_usPort );
     // If a local IP has been specified, ensure it is used for sending
@@ -72,7 +101,7 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     m_Socket = socket ( AF_INET, SOCK_DGRAM, 0 );
 
     // If we are in lan only mode, reuse addr to avoid possible conflicts
-    if ( m_bLan )
+    if ( bLanOnly )
     {
         const int Flags = 1;
         setsockopt ( m_Socket, SOL_SOCKET, SO_REUSEADDR, (const char *)&Flags, sizeof ( Flags ) );
@@ -82,8 +111,8 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     if ( bind ( m_Socket, ( sockaddr* ) &m_SockAddr, sizeof ( m_SockAddr ) ) != 0 )
     {
         sockclose ( m_Socket );
-        m_Socket = 0;
-        return;
+        m_Socket = INVALID_SOCKET;
+        return false;
     }
 
     // Set it to non blocking, so we dont have to wait for a packet
@@ -93,13 +122,8 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     #else
     fcntl ( m_Socket, F_SETFL, fcntl( m_Socket, F_GETFL ) | O_NONBLOCK ); 
     #endif
-}
 
-
-ASE::~ASE ( void )
-{
-    _instance = NULL;
-    ClearRules ();
+    return true;
 }
 
 

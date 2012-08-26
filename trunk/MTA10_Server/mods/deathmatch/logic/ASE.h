@@ -49,10 +49,11 @@ class CASERule;
 class ASE
 {
 public:
-                            ASE                      ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP = NULL, bool bLan = false );
+                            ASE                      ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP = NULL );
                             ~ASE                     ( void );
 
     void                    DoPulse                  ( void );
+    bool                    SetPortEnabled           ( bool bInternetEnabled, bool bLanEnabled );
 
     static ASE*             GetInstance              ( void )                { return _instance; }
 
@@ -101,7 +102,7 @@ private:
     unsigned int            m_Socket;
     sockaddr_in             m_SockAddr;
 
-    bool                    m_bLan;
+    unsigned short          m_usPortBase;
     unsigned short          m_usPort;
 
     // Full query cache
