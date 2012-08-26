@@ -70,7 +70,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_usServerPort = 0;
     m_uiMaxPlayers = 0;
     m_bHTTPEnabled = true;
-    m_bAseEnabled = false;
+    m_iAseMode = 0;
     m_usHTTPPort = 0;
     m_ucHTTPDownloadType = HTTP_DOWNLOAD_DISABLED;
     m_iHTTPMaxConnectionsPerClient = 4;
@@ -343,18 +343,6 @@ bool CMainConfig::Load ( void )
                 MapInsert ( m_EnableDiagnosticMap, *it );
     }
 
-    // ASE
-    iResult = GetBoolean ( m_pRootNode, "ase", m_bAseEnabled );
-    if ( iResult == INVALID_VALUE )
-    {
-        CLogger::LogPrint ( "WARNING: Invalid value specified in \"ase\" tag; defaulting to 0\n" );
-        m_bAseEnabled = false;
-    }
-    else if ( iResult == DOESNT_EXIST )
-    {
-        m_bAseEnabled = false;
-    }
-
     // Update sites
     int i =0;
     for ( CXMLNode * updateURL = m_pRootNode->FindSubNode("update", i);
@@ -367,11 +355,6 @@ bool CMainConfig::Load ( void )
     iResult = GetBoolean ( m_pRootNode, "autoupdateincludedresources", m_bAutoUpdateIncludedResources );
     if ( iResult == INVALID_VALUE  || iResult == DOESNT_EXIST )
         m_bAutoUpdateIncludedResources = false;
-
-    // Lan server broadcast
-    iResult = GetBoolean ( m_pRootNode, "donotbroadcastlan", m_bDontBroadcastLan );
-    if ( iResult == INVALID_VALUE  || iResult == DOESNT_EXIST )
-        m_bDontBroadcastLan = false;
 
     // Grab the server password
     iResult = GetString ( m_pRootNode, "password", m_strPassword, 1, 32 );
@@ -1282,6 +1265,8 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   0,      0,      1,      "bullet_sync",                          &m_bBulletSyncEnabled,                      &OnTickRateChange },
             { true, true,   0,      0,      120,    "vehext_percent",                       &m_iVehExtrapolatePercent,                  &OnTickRateChange },
             { true, true,   0,      150,    500,    "vehext_ping_limit",                    &m_iVehExtrapolatePingLimit,                &OnTickRateChange },
+            { true, true,   0,      1,      2,      "ase",                                  &m_iAseMode,                                &OnAseSettingChange },
+            { true, true,   0,      1,      1,      "donotbroadcastlan",                    &m_bDontBroadcastLan,                       &OnAseSettingChange },
         };
 
     static std::vector < SIntSetting > settingsList;
@@ -1304,4 +1289,25 @@ void CMainConfig::OnTickRateChange ( void )
     CStaticFunctionDefinitions::SendSyncIntervals ();
     g_pGame->SendSyncSettings ();
     g_pGame->CalculateMinClientRequirement ();
+}
+
+void CMainConfig::OnAseSettingChange ( void )
+{
+    g_pGame->ApplyAseSetting ();
+}
+
+void CGame::ApplyAseSetting ( void )
+{
+    if ( m_pMainConfig->GetDontBroadcastLan() )
+        SAFE_DELETE( m_pLanBroadcast );
+
+    bool bInternetEnabled = m_pMainConfig->GetAsePortEnabled () == 1;
+    bool bLanEnabled = !m_pMainConfig->GetDontBroadcastLan();
+    m_pASE->SetPortEnabled ( bInternetEnabled, bLanEnabled );
+
+    if ( !m_pMainConfig->GetDontBroadcastLan() )
+    {
+        if ( !m_pLanBroadcast )
+            m_pLanBroadcast = m_pASE->InitLan();
+    }
 }

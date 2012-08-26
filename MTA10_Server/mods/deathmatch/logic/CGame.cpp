@@ -183,7 +183,8 @@ CGame::CGame ( void )
 
     m_bCloudsEnabled = true;
 
-    m_llLastAnnouceTime = 0;
+    m_llLastLongAnnouceTime = 0;
+    m_llLastShortAnnouceTime = 0;
     m_pOpenPortsTester = NULL;
 
     m_bTrafficLightsLocked = false;
@@ -815,23 +816,12 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     }
 
     // If ASE is enabled
-    if ( m_pMainConfig->GetASEEnabled () || !m_pMainConfig->GetDontBroadcastLan() )
-    {
-        m_pASE = new ASE ( m_pMainConfig, m_pPlayerManager, static_cast < int > ( usServerPort ), strServerIP, !m_pMainConfig->GetDontBroadcastLan() && !m_pMainConfig->GetASEEnabled () );
+    m_pASE = new ASE ( m_pMainConfig, m_pPlayerManager, static_cast < int > ( usServerPort ), strServerIP );
+    if ( m_pMainConfig->GetSerialVerificationEnabled () )
+        m_pASE->SetRuleValue ( "SerialVerification", "yes" );
+    ApplyAseSetting ();
+    PulseMasterServerAnnounce ();
 
-        if ( m_pMainConfig->GetSerialVerificationEnabled () )
-            m_pASE->SetRuleValue ( "SerialVerification", "yes" );
-
-        if ( m_pMainConfig->GetASEEnabled () )
-        {
-            PulseMasterServerAnnounce ();
-        }
-
-        if ( !m_pMainConfig->GetDontBroadcastLan() )
-        {
-            m_pLanBroadcast = m_pASE->InitLan();
-        }
-    }
 
     // Now load the rest of the config
     if ( !m_pMainConfig->LoadExtended () )
@@ -899,71 +889,111 @@ void CGame::StartOpenPortsTest ( void )
 // Remind master server once every 24 hrs
 void CGame::PulseMasterServerAnnounce ( void )
 {
-    if ( m_llLastAnnouceTime == 0 || GetTickCount64_ () - m_llLastAnnouceTime > 24 * 60 * 60 * 1000 )
+    if ( !m_pMainConfig->GetAseAnnounceEnabled () )
+        return;
+
+    long long llTickCountNow = GetTickCount64_ ();
+    bool bDoAnnounce = false;
+    bool bIsLongAnnouce = false;
+    bool bFirstPass = false;
+
+    if ( m_llLastLongAnnouceTime == 0 || llTickCountNow - m_llLastLongAnnouceTime > 1000 * 60 * 60 * 24 )   // 24 hrs
     {
-        bool bFirstPass = m_llLastAnnouceTime == 0;
-        m_llLastAnnouceTime = GetTickCount64_ ();
+        bFirstPass = m_llLastLongAnnouceTime == 0;
+        bIsLongAnnouce = true;
+        bDoAnnounce = true;
+        m_llLastLongAnnouceTime = llTickCountNow;
+    }
 
-        // If ASE is enabled
-        if ( m_pMainConfig->GetASEEnabled () )
+    if ( m_llLastShortAnnouceTime == 0 || llTickCountNow - m_llLastShortAnnouceTime > 1000 * 60 * 10 ) // 10 mins
+    {
+        bDoAnnounce = true;
+        m_llLastShortAnnouceTime = llTickCountNow;
+    }
+
+    // Time yet?
+    if ( !bDoAnnounce )
+        return;
+
+    // Only do short annouce if ase port is disabled
+    if ( !bIsLongAnnouce && m_pMainConfig->GetAsePortEnabled () )
+        return;
+
+    const SString strServerIP = m_pMainConfig->GetServerIP ();
+    unsigned short usServerPort = m_pMainConfig->GetServerPort ();
+    unsigned short usHTTPPort = m_pMainConfig->GetHTTPPort ();
+    uint uiPlayerCount = 0;
+    uint uiMaxPlayerCount = 32;
+    bool bPassworded = m_pMainConfig->HasPassword ();
+    bool bAsePortEnabled = m_pMainConfig->GetAsePortEnabled ();
+
+    SString strVersion ( "%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD );
+    SString strExtra ( "%d_%d_%d_%d", uiPlayerCount, uiMaxPlayerCount, bPassworded, bAsePortEnabled );
+
+    struct {
+        SString strDesc;
+        SString strURL;
+        bool bRepeat;
+    } masterServerList[] = {
+                             { "Querying game-monitor.com master server... ", SString ( QUERY_URL_GAME_MONITOR, usServerPort + 123 ), false },
+                             { "Querying backup master server... ", SString ( "http://master.mtasa.com/ase/add.php?g=%u&a=%u&h=%u&v=%s&x=%s", usServerPort, usServerPort + 123, usHTTPPort, *strVersion, *strExtra ), true },
+                           };
+
+    for ( uint i = 0 ; i < NUMELMS( masterServerList ) ; i++ )
+    {
+        const SString& strDesc = masterServerList[i].strDesc;
+        const SString& strURL = masterServerList[i].strURL;
+        bool bRepeat = masterServerList[i].bRepeat;
+
+        // Don't repeat request for some servers
+        if ( !bFirstPass && !bRepeat )
+            continue;
+
+        // Only log on first pass
+        if ( bFirstPass )
+            CLogger::LogPrint ( strDesc );
+
+        if ( bIsLongAnnouce )
         {
-            const SString strServerIP = m_pMainConfig->GetServerIP ();
-            unsigned short usServerPort = m_pMainConfig->GetServerPort ();
-            unsigned short usHTTPPort = m_pMainConfig->GetHTTPPort ();
+            // Send request
+            CTCPImpl * pTCP = new CTCPImpl ();
+            pTCP->Initialize ();
+            CHTTPRequest * request = new CHTTPRequest ( strURL );
+            request->SetLocalIP ( strServerIP );
+            CHTTPResponse * response = request->Send ( pTCP );
 
-            SString strVersion ( "%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD );
-
-            struct {
-                SString strDesc;
-                SString strURL;
-                bool bRepeat;
-            } masterServerList[] = {
-                                     { "Querying game-monitor.com master server... ", SString ( QUERY_URL_GAME_MONITOR, usServerPort + 123 ), false },
-                                     { "Querying backup master server... ", SString ( "http://master.mtasa.com/ase/add.php?g=%u&a=%u&h=%u&v=%s", usServerPort, usServerPort + 123, usHTTPPort, *strVersion ), true },
-                                   };
-
-            for ( uint i = 0 ; i < NUMELMS( masterServerList ) ; i++ )
+            // Only log on first pass
+            if ( bFirstPass )
             {
-                const SString& strDesc = masterServerList[i].strDesc;
-                const SString& strURL = masterServerList[i].strURL;
-                bool bRepeat = masterServerList[i].bRepeat;
-
-                // Don't repeat request for some servers
-                if ( !bFirstPass && !bRepeat )
-                    continue;
-
-                // Only log on first pass
-                if ( bFirstPass )
-                    CLogger::LogPrint ( strDesc );
-
-                // Send request
-                CTCPImpl * pTCP = new CTCPImpl ();
-                pTCP->Initialize ();
-                CHTTPRequest * request = new CHTTPRequest ( strURL );
-                request->SetLocalIP ( strServerIP );
-                CHTTPResponse * response = request->Send ( pTCP );
-
-                // Only log on first pass
-                if ( bFirstPass )
+                if ( !response )
+                    CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
+                else if ( response->GetErrorCode () != 200 )
                 {
-                    if ( !response )
-                        CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
-                    else if ( response->GetErrorCode () != 200 )
-                    {
-                        if ( response->GetErrorCode () == 500 && strDesc.ContainsI ( "game-monitor" ) )
-                            CLogger::LogPrintfNoStamp ( "unavailable!\n" );
-                        else
-                            CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
-                    }
+                    if ( response->GetErrorCode () == 500 && strDesc.ContainsI ( "game-monitor" ) )
+                        CLogger::LogPrintfNoStamp ( "maybe!\n" );
                     else
-                        CLogger::LogPrintfNoStamp ( "success!\n");
+                        CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
                 }
-
-                if ( response )
-                    delete response;
-                delete pTCP;
-                delete request;
+                else
+                    CLogger::LogPrintfNoStamp ( "success!\n");
             }
+
+            if ( response )
+                delete response;
+            delete pTCP;
+            delete request;
+        }
+
+        // Send extra data if ase port disabled
+        if ( !m_pMainConfig->GetAsePortEnabled () && bRepeat )
+        {
+            SString strPostContent = m_pASE->QueryLight ();
+            bool bPostContentBinary = true;
+
+            CNetHTTPDownloadManagerInterface * downloadManager = g_pNetServer->GetHTTPDownloadManager ();
+            downloadManager->QueueFile ( strURL, NULL, 0, &strPostContent.at ( 0 ), strPostContent.length (), bPostContentBinary, NULL, NULL, false, 1 );
+            if ( !downloadManager->IsDownloading () )
+                downloadManager->StartDownloadingQueuedFiles ();
         }
     }
 }

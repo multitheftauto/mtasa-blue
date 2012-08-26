@@ -243,21 +243,22 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
     uint uiFlags = 0;
     stream.Read ( uiFlags );
 
-    //bool bHasAddress        = ( uiFlags & 0x0001 ) != 0;
-    //bool bHasPort           = ( uiFlags & 0x0002 ) != 0;
-    bool bHasPlayerCount    = ( uiFlags & 0x0004 ) != 0;
-    bool bHasMaxPlayerCount = ( uiFlags & 0x0008 ) != 0;
-    bool bHasGameName       = ( uiFlags & 0x0010 ) != 0;
-    bool bHasName           = ( uiFlags & 0x0020 ) != 0;
-    bool bHasGameMode       = ( uiFlags & 0x0040 ) != 0;
-    bool bHasMap            = ( uiFlags & 0x0080 ) != 0;
-    bool bHasVersion        = ( uiFlags & 0x0100 ) != 0;
-    bool bHasPassworded     = ( uiFlags & 0x0200 ) != 0;
-    bool bHasSerials        = ( uiFlags & 0x0400 ) != 0;
-    bool bHasPlayers        = ( uiFlags & 0x0800 ) != 0;
-    bool bHasRespondingFlag = ( uiFlags & 0x1000 ) != 0;
-    bool bHasRestrictionFlags = ( uiFlags & 0x2000 ) != 0;
-    bool bHasSearchIgnoreSections = ( uiFlags & 0x4000 ) != 0;
+    //bool bHasAddress        = ( uiFlags & ASE_FLAG_ADDRESS ) != 0;
+    //bool bHasPort           = ( uiFlags & ASE_FLAG_PORT ) != 0;
+    bool bHasPlayerCount    = ( uiFlags & ASE_FLAG_PLAYER_COUNT ) != 0;
+    bool bHasMaxPlayerCount = ( uiFlags & ASE_FLAG_MAX_PLAYER_COUNT ) != 0;
+    bool bHasGameName       = ( uiFlags & ASE_FLAG_GAME_NAME ) != 0;
+    bool bHasName           = ( uiFlags & ASE_FLAG_NAME ) != 0;
+    bool bHasGameMode       = ( uiFlags & ASE_FLAG_GAME_MODE ) != 0;
+    bool bHasMap            = ( uiFlags & ASE_FLAG_MAP ) != 0;
+    bool bHasVersion        = ( uiFlags & ASE_FLAG_VERSION ) != 0;
+    bool bHasPassworded     = ( uiFlags & ASE_FLAG_PASSWORDED ) != 0;
+    bool bHasSerials        = ( uiFlags & ASE_FLAG_SERIALS ) != 0;
+    bool bHasPlayers        = ( uiFlags & ASE_FLAG_PLAYER_LIST ) != 0;
+    bool bHasRespondingFlag = ( uiFlags & ASE_FLAG_RESPONDING ) != 0;
+    bool bHasRestrictionFlags = ( uiFlags & ASE_FLAG_RESTRICTIONS ) != 0;
+    bool bHasSearchIgnoreSections = ( uiFlags & ASE_FLAG_SEARCH_IGNORE_SECTIONS ) != 0;
+    bool bHasKeepFlag       = ( uiFlags & ASE_FLAG_KEEP ) != 0;
 
     // Rate quality of data supplied here
     uint uiDataQuality = SERVER_INFO_ASE_2;
@@ -357,6 +358,13 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
                         if ( i < pItem->strSearchableName.length () )
                             pItem->strSearchableName[i] = '\1';
                 }
+            }
+
+            if ( bHasKeepFlag )
+            {
+                uchar ucKeepFlag = 0;
+                stream.Read ( ucKeepFlag );
+                pItem->bKeepFlag = ucKeepFlag;
             }
 
             pItem->PostChange ();
