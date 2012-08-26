@@ -22,7 +22,7 @@ CColPolygon::CColPolygon ( CColManager* pManager, CElement* pParent, const CVect
 }
 
 
-bool CColPolygon::DoHitDetection  ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius )
+bool CColPolygon::DoHitDetection  ( const CVector& vecNowPosition )
 {
     if ( !IsInBounds ( vecNowPosition ) )
         return false;

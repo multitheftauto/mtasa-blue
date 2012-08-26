@@ -219,7 +219,7 @@ void CObjectSync::Packet_ObjectSync ( CObjectSyncPacket& Packet )
                     if ( pData->ucFlags & 0x1 )
                     {
                         pObject->SetPosition ( pData->vecPosition );
-                        g_pGame->GetColManager()->DoHitDetection ( pObject->GetLastPosition (), pObject->GetPosition (), 0.0f, pObject );
+                        g_pGame->GetColManager()->DoHitDetection ( pObject->GetPosition (), pObject );
                     }
                     if ( pData->ucFlags & 0x2 ) pObject->SetRotation ( pData->vecRotation );
                     if ( pData->ucFlags & 0x4 ) pObject->SetHealth ( pData->fHealth );

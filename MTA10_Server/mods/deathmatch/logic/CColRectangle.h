@@ -25,7 +25,7 @@ public:
 
     eColShapeType           GetShapeType    ( void )                        { return COLSHAPE_RECTANGLE; }
     
-    bool                    DoHitDetection  ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius );
+    bool                    DoHitDetection  ( const CVector& vecNowPosition );
 
     inline const CVector2D& GetSize         ( void )                        { return m_vecSize; };
     inline void             SetSize         ( const CVector2D& vecSize )    { m_vecSize = vecSize; SizeChanged (); };

@@ -232,7 +232,7 @@ void CPedSync::Packet_PedSync ( CPedSyncPacket& Packet )
                     if ( pData->ucFlags & 0x01 )
                     {
                         pPed->SetPosition ( pData->vecPosition );
-                        g_pGame->GetColManager()->DoHitDetection ( pPed->GetLastPosition (), pPed->GetPosition (), 0.0f, pPed );
+                        g_pGame->GetColManager()->DoHitDetection ( pPed->GetPosition (), pPed );
                     }
                     if ( pData->ucFlags & 0x02 ) pPed->SetRotation ( pData->fRotation );
                     if ( pData->ucFlags & 0x04 ) pPed->SetVelocity ( pData->vecVelocity );

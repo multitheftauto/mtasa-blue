@@ -25,22 +25,20 @@ public:
                                                 CColManager         ( void );
                                                 ~CColManager        ( void );
 
-    void                                        DoHitDetection      ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius, CElement* pElement, CColShape * pJustThis = NULL, bool bChildren = false );
+    void                                        DoHitDetection      ( const CVector& vecNowPosition, CElement* pElement, CColShape * pJustThis = NULL, bool bChildren = false );
 
     bool                                        Exists              ( CColShape* pShape );
     void                                        DeleteAll           ( void );
 
-    std::vector < CColShape* > ::const_iterator   IterBegin           ( void )                    { return m_List.begin (); }
-    std::vector < CColShape* > ::const_iterator   IterEnd             ( void )                    { return m_List.end (); }
+    std::vector < CColShape* > ::const_iterator   IterBegin         ( void )                    { return m_List.begin (); }
+    std::vector < CColShape* > ::const_iterator   IterEnd           ( void )                    { return m_List.end (); }
 
 private:
     inline void                                 AddToList           ( CColShape* pShape )       { m_List.push_back ( pShape ); };
     void                                        RemoveFromList      ( CColShape* pShape );
     void                                        TakeOutTheTrash     ( void );
-    void                                        DoHitDetectionOld           ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius, CElement* pElement, CColShape * pJustThis = NULL, bool bChildren = false );
-    void                                        DoHitDetectionNew           ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius, CElement* pElement, CColShape * pJustThis = NULL, bool bChildren = false );
     void                                        DoHitDetectionForColShape   ( CColShape* pShape );
-    void                                        DoHitDetectionForEntity     ( const CVector& vecNowPosition, float fRadius, CElement* pEntity );
+    void                                        DoHitDetectionForEntity     ( const CVector& vecNowPosition, CElement* pEntity );
     void                                        HandleHitDetectionResult    ( bool bHit, CColShape* pShape, CElement* pEntity );
 
     std::vector < CColShape* >                  m_List;
