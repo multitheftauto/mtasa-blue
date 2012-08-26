@@ -73,7 +73,8 @@ public:
     unsigned int                    GetVoiceQuality                 ( void )        { return m_ucVoiceQuality; };
     unsigned int                    GetVoiceBitrate                 ( void )        { return m_uiVoiceBitrate; };
 
-    inline bool                     GetASEEnabled                   ( void )        { return m_bAseEnabled; };
+    bool                            GetAsePortEnabled               ( void )        { return m_iAseMode == 1; }
+    bool                            GetAseAnnounceEnabled           ( void )        { return m_iAseMode > 0; }
     unsigned short                  GetHTTPPort                     ( void );
     inline eHTTPDownloadType        GetHTTPDownloadType             ( void )        { return m_ucHTTPDownloadType; };
     inline const std::string&       GetHTTPDownloadURL              ( void )        { return m_strHTTPDownloadURL; };
@@ -90,7 +91,7 @@ public:
     inline unsigned int             GetScriptDebugLogLevel          ( void )        { return m_uiScriptDebugLogLevel; };
     inline const std::string&       GetAccessControlListFile        ( void )        { return m_strAccessControlListFile; };
     inline bool                     GetAutoUpdateIncludedResourcesEnabled   ( void )        { return m_bAutoUpdateIncludedResources; };
-    inline bool                     GetDontBroadcastLan             ( void )        { return m_bDontBroadcastLan; };
+    inline bool                     GetDontBroadcastLan             ( void )        { return m_bDontBroadcastLan ? true : false; };
     inline bool                     GetSerialVerificationEnabled    ( void )        { return m_bVerifySerials; };
     bool                            IsDisableAC                     ( const char* szTagAC )     { return MapContains ( m_DisableComboACMap, szTagAC ); };
     bool                            IsEnableDiagnostic              ( const char* szTag )       { return MapContains ( m_EnableDiagnosticMap, szTag ); };
@@ -129,6 +130,7 @@ public:
 
     const std::vector < SIntSetting >& GetIntSettingList            ( void );
     static void                     OnTickRateChange                ( void );
+    static void                     OnAseSettingChange              ( void );
 
 private:
     void                            RegisterCommand                 ( const char* szName, FCommandHandler* pFunction, bool bRestricted );
@@ -150,7 +152,7 @@ private:
     unsigned int                    m_uiSoftMaxPlayers;
     bool                            m_bHTTPEnabled;
     std::string                     m_strPassword;
-    bool                            m_bAseEnabled;
+    int                             m_iAseMode;
     unsigned short                  m_usHTTPPort;
     eHTTPDownloadType               m_ucHTTPDownloadType;
     std::string                     m_strHTTPDownloadURL;
@@ -169,7 +171,7 @@ private:
     bool                            m_bAutoUpdateIncludedResources;
     bool                            m_bVerifySerials;
     unsigned short                  m_usFPSLimit;
-    bool                            m_bDontBroadcastLan;
+    int                             m_bDontBroadcastLan;
     std::set < SString >            m_DisableComboACMap;
     std::set < SString >            m_EnableDiagnosticMap;
     SString                         m_strMinClientVersion;

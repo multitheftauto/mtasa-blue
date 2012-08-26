@@ -398,6 +398,9 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery, bool bRemoveNonRespondi
 
         if ( m_ElapsedTime.Get () > SERVER_LIST_ITEM_TIMEOUT )
         {
+            if ( bKeepFlag )
+                bRemoveNonResponding = false;
+
             if ( bRemoveNonResponding )
             {
                 bMaybeOffline = true;       // Flag to help 'Include offline' browser option

@@ -365,6 +365,7 @@ public:
     SString                     CalculateMinClientRequirement   ( void );
     bool                        IsBelowMinimumClient            ( const SString& strVersion );
     bool                        IsBelowRecommendedClient        ( const SString& strVersion );
+    void                        ApplyAseSetting             ( void );
 
 private:
     void                        AddBuiltInEvents            ( void );
@@ -524,7 +525,8 @@ private:
     //Clouds Enabled
     bool                        m_bCloudsEnabled;
 
-    long long                   m_llLastAnnouceTime;
+    long long                   m_llLastLongAnnouceTime;
+    long long                   m_llLastShortAnnouceTime;
     class COpenPortsTester*     m_pOpenPortsTester;
 
     CLightsyncManager           m_lightsyncManager;

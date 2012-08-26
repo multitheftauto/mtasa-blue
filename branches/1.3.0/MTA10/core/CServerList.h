@@ -60,6 +60,8 @@ enum
     ASE_FLAG_PLAYER_LIST        =   0x0800,
     ASE_FLAG_RESPONDING         =   0x1000,
     ASE_FLAG_RESTRICTIONS       =   0x2000,
+    ASE_FLAG_SEARCH_IGNORE_SECTIONS =   0x4000,
+    ASE_FLAG_KEEP                   =   0x8000,
 };
 
 enum
@@ -146,6 +148,7 @@ public:
         bSkipped = false;
         bSerials = false;
         bPassworded = false;
+        bKeepFlag = false;
         nPlayers = 0;
         nMaxPlayers = 0;
         nPing = 9999;
@@ -209,6 +212,7 @@ public:
     uint                uiCacheNoReplyCount;
     uint                uiQueryRetryCount;
     uint                uiRevision;
+    bool                bKeepFlag;
 
     SString             strGameName;    // Game name. Always 'mta'
     SString             strVersion;     // Game version
