@@ -2149,7 +2149,7 @@ void CGame::Packet_PlayerPuresync ( CPlayerPuresyncPacket& Packet )
 
             CLOCK( "PlayerPuresync", "DoHitDetection" );
             // Run colpoint checks
-            m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer );
+            m_pColManager->DoHitDetection ( pPlayer->GetPosition (), pPlayer );
             UNCLOCK( "PlayerPuresync", "DoHitDetection" );
         }
     }
@@ -2236,8 +2236,8 @@ void CGame::Packet_VehiclePuresync ( CVehiclePuresyncPacket& Packet )
 
             // Run colpoint checks
             CLOCK( "VehiclePuresync", "DoHitDetection" );
-            m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer );
-            m_pColManager->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );
+            m_pColManager->DoHitDetection ( pPlayer->GetPosition (), pPlayer );
+            m_pColManager->DoHitDetection ( pVehicle->GetPosition (), pVehicle );
             UNCLOCK( "VehiclePuresync", "DoHitDetection" );
         }
     }
@@ -2514,9 +2514,9 @@ void CGame::Packet_ExplosionSync ( CExplosionSyncPacket& Packet )
                             {
                                 CVehicle * pVehicle = static_cast < CVehicle * > ( pOrigin );
                                 // Is this vehicle not already blown?
-                                if ( pVehicle->GetBlowTime () == 0 )
+                                if ( pVehicle->GetIsBlown () == false )
                                 {
-                                    pVehicle->SetBlowTime ( GetTime () );
+                                    pVehicle->SetIsBlown ( true );
 
                                     // Call the onVehicleExplode event
                                     CLuaArguments Arguments;
@@ -2890,9 +2890,6 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     // Mark him as successfully entered
                                     pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
 
-                                    // The vehicle is no longer idle
-                                    pVehicle->SetIdleTime ( 0 );
-
                                     //Update our engine State
                                     pVehicle->SetEngineOn( true );
 
@@ -3025,12 +3022,6 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     // Force the player that just left the vehicle as the syncer
                                     m_pUnoccupiedVehicleSync->OverrideSyncer ( pVehicle, pPlayer );
 
-                                    // If it's empty, set the idle time
-                                    if ( pVehicle->GetFirstOccupant () == NULL )
-                                    {
-                                        pVehicle->SetIdleTime ( GetTime () );
-                                    }
-
                                     // Tell everyone he can start exiting the vehicle
                                     CVehicleInOutPacket Reply ( ID, ucOccupiedSeat, VEHICLE_NOTIFY_OUT_RETURN );
                                     Reply.SetSourceElement ( pPlayer );
@@ -3091,11 +3082,6 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                 // Force the player that just left the vehicle as the syncer
                                 m_pUnoccupiedVehicleSync->OverrideSyncer ( pVehicle, pPlayer );
 
-                                // If it's empty, set the idle time
-                                if ( pVehicle->GetFirstOccupant () == NULL )
-                                {
-                                    pVehicle->SetIdleTime ( GetTime () );
-                                }
                                 pPlayer->SetVehicleAction( CPlayer::VEHICLEACTION_NONE );
                                 // Tell the other players about it
                                 CVehicleInOutPacket Reply ( ID, ucOccupiedSeat, VEHICLE_NOTIFY_FELL_OFF_RETURN );
@@ -3250,12 +3236,6 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                         m_pPlayerManager->BroadcastOnlyJoined ( JackedReply );
                                     }
                                     pJacked->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
-                                }
-
-                                // If it's empty, set the idle time
-                                if ( pVehicle->GetFirstOccupant () == NULL )
-                                {
-                                    pVehicle->SetIdleTime ( GetTime () );
                                 }
                             }
 

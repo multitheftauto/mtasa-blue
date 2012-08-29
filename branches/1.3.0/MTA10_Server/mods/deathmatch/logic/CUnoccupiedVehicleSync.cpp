@@ -435,7 +435,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                         pVehicle->SetInWater ( vehicle.data.bIsInWater );
 
                         // Run colpoint checks on vehicle
-                        g_pGame->GetColManager()->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );
+                        g_pGame->GetColManager()->DoHitDetection ( pVehicle->GetPosition (), pVehicle );
 
                         // Send this sync if something important changed or one of the flags has changed since last sync.
                         data.bSend = vehicle.HasChanged ( ) || ( bEngineOn != vehicle.data.bEngineOn || bDerailed != vehicle.data.bDerailed || bInWater != vehicle.data.bIsInWater );

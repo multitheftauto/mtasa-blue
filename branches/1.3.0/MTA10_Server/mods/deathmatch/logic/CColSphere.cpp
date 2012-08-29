@@ -23,10 +23,10 @@ CColSphere::CColSphere ( CColManager* pManager, CElement* pParent, const CVector
 }
 
 
-bool CColSphere::DoHitDetection ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius )
+bool CColSphere::DoHitDetection ( const CVector& vecNowPosition )
 {
     // Do a simple distance check between now position and our position 
-    return IsPointNearPoint3D ( vecNowPosition, m_vecPosition, fRadius + m_fRadius );
+    return IsPointNearPoint3D ( vecNowPosition, m_vecPosition, m_fRadius );
 }
 
 

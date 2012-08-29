@@ -134,9 +134,6 @@ bool CMarker::ReadSpecialData ( void )
 
 void CMarker::SetPosition ( const CVector& vecPosition )
 {
-    // Remember our last position
-    m_vecLastPosition = m_vecPosition;
-
     // Different from our current position?
     if ( m_vecPosition != vecPosition )
     {

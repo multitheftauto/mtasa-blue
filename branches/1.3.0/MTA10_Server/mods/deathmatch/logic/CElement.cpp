@@ -1485,7 +1485,6 @@ void CElement::_GetEntitiesFromRoot ( unsigned int uiTypeHash, std::map < CEleme
 
 void CElement::SetPosition ( const CVector& vecPosition )
 {
-    m_vecLastPosition = m_vecPosition;
     m_vecPosition = vecPosition;
     UpdateSpatialData ();
 };

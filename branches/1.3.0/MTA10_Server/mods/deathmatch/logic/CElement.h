@@ -94,7 +94,6 @@ public:
     inline ElementID                            GetID                       ( void )                        { return m_ID; };
 
     virtual const CVector&                      GetPosition                 ( void );
-    virtual const CVector&                      GetLastPosition             ( void )                        { return m_vecLastPosition; };
     virtual void                                SetPosition                 ( const CVector& vecPosition );
 
     virtual void                                GetRotation                 ( CVector & vecRotation )       { vecRotation = CVector (); }
@@ -245,7 +244,6 @@ protected:
     bool                                        m_bIsBeingDeleted;
 
     CVector                                     m_vecPosition;
-    CVector                                     m_vecLastPosition;
 
     unsigned int                                m_uiTypeHash;
     std::string                                 m_strTypeName;

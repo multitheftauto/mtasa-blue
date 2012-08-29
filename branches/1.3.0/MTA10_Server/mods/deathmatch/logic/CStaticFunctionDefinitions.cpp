@@ -1207,7 +1207,7 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const 
     if ( pElement->GetType () != CElement::COLSHAPE )
     {
         // Run colpoint checks
-        m_pColManager->DoHitDetection ( pElement->GetLastPosition (), pElement->GetPosition (), 0.0f, pElement );
+        m_pColManager->DoHitDetection ( pElement->GetPosition (), pElement );
     }
 
     // Construct the set position packet
@@ -5103,12 +5103,8 @@ bool CStaticFunctionDefinitions::FixVehicle ( CElement* pElement )
 
         // Repair it
         pVehicle->SetHealth ( DEFAULT_VEHICLE_HEALTH );
-        pVehicle->GetInitialDoorStates ( pVehicle->m_ucDoorStates );
-        memset ( &pVehicle->m_ucWheelStates[0], 0, sizeof ( pVehicle->m_ucWheelStates ) );
-        memset ( &pVehicle->m_ucPanelStates[0], 0, sizeof ( pVehicle->m_ucPanelStates ) );
-        memset ( &pVehicle->m_ucLightStates[0], 0, sizeof ( pVehicle->m_ucLightStates ) );
-
-        pVehicle->SetBlowTime ( 0 );
+        pVehicle->ResetDoorsWheelsPanelsLights ();
+        pVehicle->SetIsBlown ( false );
 
         // Tell everyone
         CBitStream BitStream;
@@ -5141,7 +5137,7 @@ bool CStaticFunctionDefinitions::BlowVehicle ( CElement* pElement, bool bExplode
         }
         pVehicle->SetHealth ( 0.0f );
         if ( !bExplode )
-            pVehicle->SetBlowTime ( ::GetTime () );
+            pVehicle->SetIsBlown ( true );
 
         //Update our engine State
         pVehicle->SetEngineOn( false );
@@ -5157,7 +5153,7 @@ bool CStaticFunctionDefinitions::BlowVehicle ( CElement* pElement, bool bExplode
 bool CStaticFunctionDefinitions::IsVehicleBlown ( CVehicle* pVehicle )
 {
     assert ( pVehicle );
-    return pVehicle->GetBlowTime() != 0;
+    return pVehicle->GetIsBlown ();
 }
 
 
@@ -6543,7 +6539,7 @@ bool CStaticFunctionDefinitions::SetVehicleRespawnDelay ( CElement* pElement, un
     if ( IS_VEHICLE ( pElement ) )
     {
         CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-        pVehicle->SetRespawnTime ( ulTime );
+        pVehicle->SetBlowRespawnInterval ( ulTime );
 
         return true;
     }
@@ -6560,7 +6556,7 @@ bool CStaticFunctionDefinitions::SetVehicleIdleRespawnDelay ( CElement* pElement
     if ( IS_VEHICLE ( pElement ) )
     {
         CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-        pVehicle->SetIdleRespawnTime ( ulTime );
+        pVehicle->SetIdleRespawnInterval ( ulTime );
 
         return true;
     }
@@ -6596,7 +6592,7 @@ bool CStaticFunctionDefinitions::ResetVehicleExplosionTime ( CElement* pElement 
     if ( IS_VEHICLE ( pElement ) )
     {
         CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-        pVehicle->SetBlowTime ( 0 );
+        pVehicle->SetIsBlown ( false );
 
         return true;
     }
@@ -6613,7 +6609,7 @@ bool CStaticFunctionDefinitions::ResetVehicleIdleTime ( CElement* pElement )
     if ( IS_VEHICLE ( pElement ) )
     {
         CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-        pVehicle->SetIdleTime ( 0 );
+        pVehicle->StopIdleTimer ();
 
         return true;
     }
@@ -9051,7 +9047,7 @@ CColCircle* CStaticFunctionDefinitions::CreateColCircle ( CResource* pResource, 
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 
     if ( pResource->HasStarted() )
     {
@@ -9071,7 +9067,7 @@ CColCuboid* CStaticFunctionDefinitions::CreateColCuboid ( CResource* pResource, 
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 
     if ( pResource->HasStarted() )
     {
@@ -9091,7 +9087,7 @@ CColSphere* CStaticFunctionDefinitions::CreateColSphere ( CResource* pResource, 
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 
     if ( pResource->HasStarted() )
     {
@@ -9111,7 +9107,7 @@ CColRectangle* CStaticFunctionDefinitions::CreateColRectangle ( CResource* pReso
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 
     if ( pResource->HasStarted() )
     {
@@ -9130,7 +9126,7 @@ CColPolygon* CStaticFunctionDefinitions::CreateColPolygon ( CResource* pResource
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 
     if ( pResource->HasStarted() )
     {
@@ -9150,7 +9146,7 @@ CColTube* CStaticFunctionDefinitions::CreateColTube ( CResource* pResource, cons
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 
     if ( pResource->HasStarted() )
     {
@@ -9167,7 +9163,7 @@ CColTube* CStaticFunctionDefinitions::CreateColTube ( CResource* pResource, cons
 void CStaticFunctionDefinitions::RefreshColShapeColliders ( CColShape * pColShape )
 {
     CElement* pRoot = m_pMapManager->GetRootElement ();
-    m_pColManager->DoHitDetection ( pRoot->GetLastPosition (), pRoot->GetPosition (), 0.0f, pRoot, pColShape, true );
+    m_pColManager->DoHitDetection ( pRoot->GetPosition (), pRoot, pColShape, true );
 }
 
 

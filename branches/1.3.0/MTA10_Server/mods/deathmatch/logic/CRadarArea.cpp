@@ -96,9 +96,6 @@ bool CRadarArea::ReadSpecialData ( void )
 
 void CRadarArea::SetPosition ( const CVector& vecPosition )
 {
-    // Remember the last position
-    m_vecLastPosition = m_vecPosition;
-
     // Different from our current position?
     if ( vecPosition != m_vecPosition )
     {

@@ -36,7 +36,7 @@ public:
 
     void                        Unlink              ( void );
 
-    virtual bool                DoHitDetection      ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius ) = 0;
+    virtual bool                DoHitDetection      ( const CVector& vecNowPosition ) = 0;
 
     inline bool                 IsEnabled           ( void )                            { return m_bIsEnabled; };
     inline void                 SetEnabled          ( bool bEnabled )                   { m_bIsEnabled = bEnabled; };

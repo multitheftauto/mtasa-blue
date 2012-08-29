@@ -319,6 +319,13 @@ double CClientSound::GetLength ( bool bAvoidLoad )
             Destroy ();
         }
     }
+
+    if ( m_dLength == 0 && m_bStream && m_pAudio )
+    {
+        // Try to get the length now (otherwise 0 would be returned)
+        m_dLength = m_pAudio->GetLength ( );
+    }
+
     return m_dLength;
 }
 

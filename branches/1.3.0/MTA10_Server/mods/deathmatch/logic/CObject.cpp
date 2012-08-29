@@ -212,7 +212,6 @@ void CObject::SetPosition ( const CVector& vecPosition )
     if ( m_vecPosition != vecPosition )
     {
         // Update our vectors
-        m_vecLastPosition = m_vecPosition;
         m_vecPosition = vecPosition;
         UpdateSpatialData ();
     }
