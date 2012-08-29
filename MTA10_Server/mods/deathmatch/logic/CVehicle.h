@@ -186,12 +186,6 @@ public:
     inline float                    GetLastSyncedHealth     ( void )                        { return m_fLastSyncedHealthHealth; };
     inline void                     SetLastSyncedHealth     ( float fHealth )               { m_fLastSyncedHealthHealth = fHealth; };
     
-    inline unsigned long            GetBlowTime             ( void )                        { return m_ulBlowTime; };
-    inline void                     SetBlowTime             ( unsigned long ulBlowTime )    { m_ulBlowTime = ulBlowTime; };
-    
-    inline unsigned long            GetIdleTime             ( void )                        { return m_ulIdleTime; };
-    inline void                     SetIdleTime             ( unsigned long ulIdleTime )    { m_ulIdleTime = ulIdleTime; };
-
     CVehicleColor&                  RandomizeColor          ( void );
 
     float                           GetDoorOpenRatio        ( unsigned char ucDoor ) const;
@@ -306,14 +300,11 @@ public:
     inline void                     SetRespawnRotationDegrees ( const CVector& vecRotation ){ m_vecRespawnRotationDegrees = vecRotation; };
     inline float                    GetRespawnHealth        ( void )                        { return m_fRespawnHealth; };
     inline void                     SetRespawnHealth        ( float fHealth )               { m_fRespawnHealth = fHealth; };
-    inline bool                     GetRespawnInfoChanged   ( void )                        { return m_bRespawnInfoChanged; }
     inline bool                     GetRespawnEnabled       ( void )                        { return m_bRespawnEnabled; }
-    inline void                     SetRespawnEnabled       ( bool bEnabled )               { m_bRespawnEnabled = bEnabled; m_bRespawnInfoChanged = true; };
-    inline unsigned long            GetRespawnTime          ( void )                        { return m_ulRespawnTime; };
-    inline void                     SetRespawnTime          ( unsigned long ulTime )        { m_ulRespawnTime = ulTime; m_bRespawnInfoChanged = true; };
-    inline unsigned long            GetIdleRespawnTime      ( void )                        { return m_ulIdleRespawnTime; };
-    inline void                     SetIdleRespawnTime      ( unsigned long ulTime )        { m_ulIdleRespawnTime = ulTime; m_bRespawnInfoChanged = true; };
-    
+    void                            SetRespawnEnabled       ( bool bEnabled )               { m_bRespawnEnabled = bEnabled; }
+    void                            SetBlowRespawnInterval  ( unsigned long ulTime )        { m_ulBlowRespawnInterval = ulTime; }
+    void                            SetIdleRespawnInterval  ( unsigned long ulTime )        { m_ulIdleRespawnInterval = ulTime; }
+
     void                            SpawnAt                 ( const CVector& vecPosition, const CVector& vecRotation );
     void                            Respawn                 ( void );
 
@@ -329,6 +320,18 @@ public:
     void                            SetVehicleSirenMinimumAlpha ( unsigned char ucSirenID, DWORD dwPercentage );
     void                            SetVehicleSirenColour       ( unsigned char ucSirenID, SColor tVehicleSirenColour );
     void                            SetVehicleFlags             ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent );
+
+    void                            ResetDoors              ( void );
+    void                            ResetDoorsWheelsPanelsLights ( void );
+    void                            SetIsBlown              ( bool bBlown );
+    bool                            GetIsBlown              ( void );
+    bool                            IsBlowTimerFinished     ( void );
+    void                            StopIdleTimer           ( void );
+    void                            RestartIdleTimer        ( void );
+    bool                            IsIdleTimerRunning      ( void );
+    bool                            IsIdleTimerFinished     ( void );
+    bool                            IsStationary            ( void );
+
 private:
     class CVehicleManager*          m_pVehicleManager;
 
@@ -345,8 +348,8 @@ private:
     float                           m_fHealth;
     float                           m_fLastSyncedHealthHealth;
     unsigned long                   m_ulHealthChangeTime;
-    unsigned long                   m_ulBlowTime;
-    unsigned long                   m_ulIdleTime;
+    CTickCount                      m_llBlowTime;
+    CTickCount                      m_llIdleTime;
 
     unsigned char                   m_ucMaxPassengersOverride;
 
@@ -386,10 +389,9 @@ private:
     CVector                         m_vecRespawnPosition;
     CVector                         m_vecRespawnRotationDegrees;
     float                           m_fRespawnHealth;
-    bool                            m_bRespawnInfoChanged;
     bool                            m_bRespawnEnabled;
-    unsigned long                   m_ulRespawnTime;
-    unsigned long                   m_ulIdleRespawnTime;
+    unsigned long                   m_ulBlowRespawnInterval;
+    unsigned long                   m_ulIdleRespawnInterval;
 
     // Vehicle specific data
     float                           m_fTurretPositionX;
@@ -407,6 +409,7 @@ private:
     unsigned char                   m_ucVariant2;
 
     CTickCount                      m_LastPushedTime;
+    CVector                         m_vecStationaryCheckPosition;
 
 public: // 'Safe' variables (that have no need for accessors)
     bool                            m_bDamageProof;

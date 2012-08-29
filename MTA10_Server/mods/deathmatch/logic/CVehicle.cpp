@@ -29,8 +29,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_fHealth = DEFAULT_VEHICLE_HEALTH;
     m_fLastSyncedHealthHealth = DEFAULT_VEHICLE_HEALTH;
     m_ulHealthChangeTime = 0;
-    m_ulBlowTime = 0;
-    m_ulIdleTime = GetTickCount32 ();
+    m_llIdleTime = CTickCount::Now ();
     m_fTurretPositionX = 0;
     m_fTurretPositionY = 0;
     m_bSirenActive = false;
@@ -49,11 +48,10 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_ucPaintjob = 3;
     m_ucMaxPassengersOverride = VEHICLE_PASSENGERS_UNDEFINED;
 
-    m_bRespawnInfoChanged = false;
     m_fRespawnHealth = DEFAULT_VEHICLE_HEALTH;
     m_bRespawnEnabled = false;
-    m_ulRespawnTime = 10000;
-    m_ulIdleRespawnTime = 60000;
+    m_ulBlowRespawnInterval = 10000;
+    m_ulIdleRespawnInterval = 60000;
 
     m_bEngineOn = false;
     for ( unsigned int i = 0; i < 6; ++i )
@@ -405,7 +403,7 @@ void CVehicle::SetModel ( unsigned short usModel )
         m_usModel = usModel;
         m_eVehicleType = CVehicleManager::GetVehicleType ( m_usModel );
         RandomizeColor ();
-        GetInitialDoorStates ( m_ucDoorStates );
+        ResetDoors ();
 
         // Generate new handling data to fit the vehicle
         GenerateHandlingData ();
@@ -532,6 +530,10 @@ bool CVehicle::SetOccupant ( CPed* pPed, unsigned int uiSeat )
             bAlreadySetting = false;
         }
 
+        // Ensure idle timer is stopped when the vehicle has any occupants
+        if ( GetFirstOccupant () )
+            StopIdleTimer ();
+
         return true;
     }
 
@@ -656,21 +658,16 @@ bool CVehicle::SetTowedByVehicle ( CVehicle* pVehicle )
 void CVehicle::SpawnAt ( const CVector& vecPosition, const CVector& vecRotation )
 {
     SetHealth ( GetRespawnHealth () );
-    SetBlowTime ( 0 );
-    SetIdleTime ( 0 );
-    GetInitialDoorStates ( m_ucDoorStates );
-    memset ( &m_ucWheelStates[0], 0, sizeof ( m_ucWheelStates ) );
-    memset ( &m_ucPanelStates[0], 0, sizeof ( m_ucPanelStates ) );
-    memset ( &m_ucLightStates[0], 0, sizeof ( m_ucLightStates ) );
+    SetIsBlown ( false );
+    StopIdleTimer ();
+    ResetDoorsWheelsPanelsLights ();
     SetLandingGearDown ( true );
     SetAdjustableProperty ( 0 );
     SetTowedByVehicle ( NULL );
     AttachTo ( NULL );
     
-    CVector vecNull;
-
-    m_vecTurnSpeed = vecNull;
-    m_vecVelocity = vecNull;
+    m_vecTurnSpeed = CVector ();
+    m_vecVelocity = CVector ();
     m_vecPosition = vecPosition;
     m_vecRotationDegrees = vecRotation;
     UpdateSpatialData ();
@@ -795,4 +792,78 @@ void CVehicle::RemoveVehicleSirens ( void )
         SetVehicleSirenMinimumAlpha( i, 0 );
         SetVehicleSirenColour( i, SColor ( ) );
     }
+}
+
+
+void CVehicle::ResetDoors ( void )
+{
+    GetInitialDoorStates ( m_ucDoorStates );
+    for ( unsigned int i = 0; i < 6; ++i )
+        m_fDoorOpenRatio [ i ] = 0.0f;
+}
+
+
+void CVehicle::ResetDoorsWheelsPanelsLights ( void )
+{
+    ResetDoors ();
+    memset ( &m_ucWheelStates[0], 0, sizeof ( m_ucWheelStates ) );
+    memset ( &m_ucPanelStates[0], 0, sizeof ( m_ucPanelStates ) );
+    memset ( &m_ucLightStates[0], 0, sizeof ( m_ucLightStates ) );
+}
+
+// For blow respawn timer
+void CVehicle::SetIsBlown ( bool bBlown )
+{
+    if ( !bBlown )
+        m_llBlowTime = CTickCount ( 0LL );
+    else
+        m_llBlowTime = CTickCount::Now ();
+}
+
+
+bool CVehicle::GetIsBlown ( void )
+{
+    return m_llBlowTime.ToLongLong () != 0;
+}
+
+
+bool CVehicle::IsBlowTimerFinished ( void )
+{
+    return GetIsBlown () && CTickCount::Now () > m_llBlowTime + CTickCount ( (long long)m_ulBlowRespawnInterval );
+}
+
+
+void CVehicle::StopIdleTimer ( void )
+{
+    m_llIdleTime = CTickCount ( 0LL );
+}
+
+
+void CVehicle::RestartIdleTimer ( void )
+{
+    m_llIdleTime = CTickCount::Now ();
+}
+
+
+bool CVehicle::IsIdleTimerRunning ( void )
+{
+    return m_llIdleTime.ToLongLong () != 0;
+}
+
+
+bool CVehicle::IsIdleTimerFinished ( void )
+{
+    return IsIdleTimerRunning () && CTickCount::Now () > m_llIdleTime + CTickCount ( (long long)m_ulIdleRespawnInterval );
+}
+
+
+// Check if vehicle has not moved (much) since the last call
+bool CVehicle::IsStationary ( void )
+{
+    const CVector& vecPosition = GetPosition ();
+    if ( ( vecPosition - m_vecStationaryCheckPosition ).LengthSquared () < 0.1f * 0.1f )
+        return true;
+
+    m_vecStationaryCheckPosition = vecPosition;
+    return false;
 }
