@@ -71,7 +71,6 @@ int CLuaFunctionDefs::GetWeaponIDFromName ( lua_State* luaVM )
     unsigned char ucID = 0;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString( strName );
-    argStream.ReadNumber ( ucID );
     if ( !argStream.HasErrors ( ) )
     {
         if ( CStaticFunctionDefinitions::GetWeaponIDFromName ( strName, ucID ) )
