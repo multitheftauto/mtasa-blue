@@ -397,7 +397,7 @@ CGUIFont* CGUI_Impl::CreateFntFromWinFont ( const char* szFontName, const char* 
 	        {
                 pResult = (CGUIFont_Impl*) CreateFnt ( szFontName, lookList[i], uSize, uFlags, bAutoScale );
 	        }
-	        catch ( CEGUI::InvalidRequestException e ) {}
+	        catch ( CEGUI::Exception e ) {}
         }
 
         if ( pResult )
