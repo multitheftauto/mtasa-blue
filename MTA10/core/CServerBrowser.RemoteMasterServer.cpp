@@ -364,7 +364,7 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
             {
                 uchar ucKeepFlag = 0;
                 stream.Read ( ucKeepFlag );
-                pItem->bKeepFlag = ucKeepFlag;
+                pItem->bKeepFlag = ucKeepFlag ? true : false;
             }
 
             pItem->PostChange ();

@@ -89,6 +89,8 @@ namespace
                                          { "warpPedIntoVehicle",            "1.3.0-9.04491" },
                                          { "removePedFromVehicle",          "1.3.0-9.04491" },
                                          { "fileCopy",                      "1.3.0-9.04584" },
+                                         { "setWaterDrawnLast",             "1.3.0-9.04584" },
+                                         { "isWaterDrawnLast",              "1.3.0-9.04584" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
