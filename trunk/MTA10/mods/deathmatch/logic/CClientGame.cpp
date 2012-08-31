@@ -3463,6 +3463,7 @@ void CClientGame::Event_OnIngame ( void )
     // Reset anything from last game
     ResetMapInfo ();
     g_pGame->GetWaterManager ()->Reset ();      // Deletes all custom water elements, ResetMapInfo only reverts changes to water level
+    g_pGame->GetWaterManager ()->SetWaterDrawnLast ( true );
 
     // Create a local player for us
     m_pLocalPlayer = new CClientPlayer ( m_pManager, m_LocalID, true );

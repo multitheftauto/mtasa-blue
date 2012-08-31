@@ -447,6 +447,8 @@ public:
     static bool                         SetAllElementWaterLevel             ( float fLevel, void* pChangeSource );
     static bool                         ResetWorldWaterLevel                ( void );
     static bool                         SetWaterVertexPosition              ( CClientWater* pWater, int iVertexIndex, CVector& vecPosition );
+    static bool                         SetWaterDrawnLast                   ( bool bEnabled );
+    static bool                         IsWaterDrawnLast                    ( bool& bOutEnabled );
     static bool                         GetWorldFromScreenPosition          ( CVector& vecScreen, CVector& vecWorld );
     static bool                         GetScreenFromWorldPosition          ( CVector& vecWorld, CVector& vecScreen, float fEdgeTolerance, bool bRelative );
     static bool                         GetWeather                          ( unsigned char& ucWeather, unsigned char& ucWeatherBlendingTo );
