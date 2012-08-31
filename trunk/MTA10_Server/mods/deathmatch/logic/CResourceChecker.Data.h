@@ -88,6 +88,7 @@ namespace
                                          { "setElementMatrix",              "1.3.0-9.04491" },
                                          { "warpPedIntoVehicle",            "1.3.0-9.04491" },
                                          { "removePedFromVehicle",          "1.3.0-9.04491" },
+                                         { "fileCopy",                      "1.3.0-9.04584" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
@@ -134,6 +135,7 @@ namespace
                                          { "setVehicleSirens",          "1.3.0-9.03968" },
                                          { "setJetpackWeaponEnabled",   "1.3.0-9.04351" },
                                          { "getJetpackWeaponEnabled",   "1.3.0-9.04351" },
+                                         { "fileCopy",                  "1.3.0-9.04584" },
                                         };
 
 
