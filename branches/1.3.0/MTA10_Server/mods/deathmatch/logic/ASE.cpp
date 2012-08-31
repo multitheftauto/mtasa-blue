@@ -58,6 +58,8 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     ss << usPort;
     m_strPort = ss.str();
     m_Socket = INVALID_SOCKET;
+
+    m_strMtaAseVersion = MTA_DM_ASE_VERSION;
 }
 
 
@@ -136,6 +138,9 @@ void ASE::DoPulse ( void )
     int nLen = sizeof ( sockaddr );
 #endif
 
+    m_llCurrentTime = GetTickCount64_ ();
+    m_uiCurrentPlayerCount = m_pPlayerManager->Count ();
+
     for ( uint i = 0 ; i < 100 ; i++ )
     {
         char szBuffer[2];
@@ -147,10 +152,11 @@ void ASE::DoPulse ( void )
 
         m_uiNumQueriesTotal++;
 
-        if ( m_QueryDosProtect.AddConnect ( inet_ntoa ( SockAddr.sin_addr ) ) )
-            continue;
+        if ( m_QueryDosProtect.GetTotalFloodingCount () < 100 )
+            if ( m_QueryDosProtect.AddConnect ( inet_ntoa ( SockAddr.sin_addr ) ) )
+                continue;
 
-        std::string strReply;
+        const std::string* strReply = NULL;
 
         switch ( szBuffer[0] )
         {
@@ -177,17 +183,17 @@ void ASE::DoPulse ( void )
             }
             case 'v':
             { // MTA Version (For further possibilities to quick ping, in case we do multiply master servers)
-                strReply = MTA_DM_ASE_VERSION;
+                strReply = &m_strMtaAseVersion;
                 break;
             }
         }
 
         // If our reply buffer isn't empty, send it
-        if ( !strReply.empty() )
+        if ( strReply && !strReply->empty() )
         {
             /*int sent =*/ sendto ( m_Socket,
-                                strReply.c_str(),
-                                strReply.length(),
+                                strReply->c_str(),
+                                strReply->length(),
                                 0,
                                 (sockaddr*)&SockAddr,
                                 nLen );
@@ -206,17 +212,15 @@ void ASE::DoPulse ( void )
 
 // Protect against a flood of server queries.
 // Send cached version unless player count has changed, or last re-cache is older than m_lFullMinInterval
-const std::string& ASE::QueryFullCached ( void )
+const std::string* ASE::QueryFullCached ( void )
 {
-    long long llTime = GetTickCount64_ ();
-    unsigned int uiPlayerCount = m_pPlayerManager->Count ();
-    if ( uiPlayerCount != m_uiFullLastPlayerCount || llTime - m_llFullLastTime > m_lFullMinInterval || m_strFullCached == "" )
+    if ( m_uiCurrentPlayerCount != m_uiFullLastPlayerCount || m_llCurrentTime - m_llFullLastTime > m_lFullMinInterval || m_strFullCached == "" )
     {
         m_strFullCached = QueryFull ();
-        m_llFullLastTime = llTime;
-        m_uiFullLastPlayerCount = uiPlayerCount;
+        m_llFullLastTime = m_llCurrentTime;
+        m_uiFullLastPlayerCount = m_uiCurrentPlayerCount;
     }
-    return m_strFullCached;
+    return &m_strFullCached;
 }
 
 
@@ -321,17 +325,15 @@ std::string ASE::QueryFull ( void )
 
 // Protect against a flood of server queries.
 // Send cached version unless player count has changed, or last re-cache is older than m_lLightMinInterval
-const std::string& ASE::QueryXfireLightCached ( void )
+const std::string* ASE::QueryXfireLightCached ( void )
 {
-    long long llTime = GetTickCount64_ ();
-    unsigned int uiPlayerCount = m_pPlayerManager->Count ();
-    if ( uiPlayerCount != m_uiXfireLightLastPlayerCount || llTime - m_llXfireLightLastTime > m_lLightMinInterval || m_strXfireLightCached == "" )
+    if ( m_uiCurrentPlayerCount != m_uiXfireLightLastPlayerCount || m_llCurrentTime - m_llXfireLightLastTime > m_lXfireLightMinInterval || m_strXfireLightCached == "" )
     {
         m_strXfireLightCached = QueryXfireLight ();
-        m_llXfireLightLastTime = llTime;
-        m_uiXfireLightLastPlayerCount = uiPlayerCount;
+        m_llXfireLightLastTime = m_llCurrentTime;
+        m_uiXfireLightLastPlayerCount = m_uiCurrentPlayerCount;
     }
-    return m_strXfireLightCached;
+    return &m_strXfireLightCached;
 }
 
 
@@ -375,17 +377,15 @@ std::string ASE::QueryXfireLight ( void )
 
 // Protect against a flood of server queries.
 // Send cached version unless player count has changed, or last re-cache is older than m_lLightMinInterval
-const std::string& ASE::QueryLightCached ( void )
+const std::string* ASE::QueryLightCached ( void )
 {
-    long long llTime = GetTickCount64_ ();
-    unsigned int uiPlayerCount = m_pPlayerManager->Count ();
-    if ( uiPlayerCount != m_uiLightLastPlayerCount || llTime - m_llLightLastTime > m_lLightMinInterval || m_strLightCached == "" )
+    if ( m_uiCurrentPlayerCount != m_uiLightLastPlayerCount || m_llCurrentTime - m_llLightLastTime > m_lLightMinInterval || m_strLightCached == "" )
     {
         m_strLightCached = QueryLight ();
-        m_llLightLastTime = llTime;
-        m_uiLightLastPlayerCount = uiPlayerCount;
+        m_llLightLastTime = m_llCurrentTime;
+        m_uiLightLastPlayerCount = m_uiCurrentPlayerCount;
     }
-    return m_strLightCached;
+    return &m_strLightCached;
 }
 
 
