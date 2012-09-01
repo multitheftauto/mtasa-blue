@@ -220,8 +220,6 @@ unsigned int    GetRandom                   ( unsigned int uiLow, unsigned int u
 double          GetRandomDouble             ( void );
 float           GetRandomFloat              ( void );
 
-unsigned int    HashString                  ( const char* szString );
-
 SString         GetDataUnit                 ( unsigned long long ullInput );
 
 unsigned int    HexToInt                    ( const char* szHex );

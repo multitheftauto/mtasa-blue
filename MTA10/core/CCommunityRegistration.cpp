@@ -266,7 +266,7 @@ bool CCommunityRegistration::OnButtonRegisterClick ( CGUIElement* pElement )
         {
             SetFrozen ( true );
             std::string strPassword;
-            HashString ( m_pEditPassword->GetText().c_str(), strPassword );
+            Md5HashString ( m_pEditPassword->GetText().c_str(), strPassword );
 
             // Create the URL
             std::string strURL =
@@ -288,7 +288,7 @@ bool CCommunityRegistration::OnButtonRegisterClick ( CGUIElement* pElement )
     return true;
 }
 
-bool CCommunityRegistration::HashString ( const char* szString, std::string& strHashString )
+bool CCommunityRegistration::Md5HashString ( const char* szString, std::string& strHashString )
 {
     char szHashed[33];
     if ( szString && strlen ( szString ) > 0 )
