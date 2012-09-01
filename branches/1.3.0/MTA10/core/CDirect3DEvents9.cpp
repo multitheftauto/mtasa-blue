@@ -81,6 +81,9 @@ void CDirect3DEvents9::OnInvalidate ( IDirect3DDevice9 *pDevice )
     // Invalidate the VMR9 Manager
     //CVideoManager::GetSingleton ().OnLostDevice ();
 
+    // Finish screenshot save
+    TidyScreenShotSave ( true );
+
     // Notify gui
     CLocalGUI::GetSingleton().Invalidate ();
 
@@ -180,17 +183,7 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     CCore::GetSingleton().GetGUI ()->SetBidiEnabled ( ms_DiagnosticDebug != EDiagnosticDebug::BIDI_6778 );
     
     // Tidyup after last screenshot
-    if ( ms_bSaveStarted )
-    {
-        // Done yet?
-        if ( !CScreenShot::IsSaving () )
-        {
-            ms_pSaveLockSurface->UnlockRect ();
-            ms_pSaveLockSurface->Release ();
-            ms_pSaveLockSurface = NULL;
-            ms_bSaveStarted = false;
-        }
-    }
+    TidyScreenShotSave ( false );
 
     // Make a screenshot if needed
     if ( CCore::GetSingleton().bScreenShot && ms_bSaveStarted == false ) {
@@ -284,6 +277,38 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     }
     TIMING_CHECKPOINT( "-OnPresent2" );
 }
+
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::TidyScreenShotSave
+//
+// Waits if save not complete (if required)
+//
+/////////////////////////////////////////////////////////////
+void CDirect3DEvents9::TidyScreenShotSave ( bool bWait )
+{
+    while ( true )
+    {
+        // Tidyup after last screenshot
+        if ( ms_bSaveStarted )
+        {
+            // Done yet?
+            if ( !CScreenShot::IsSaving () )
+            {
+                ms_pSaveLockSurface->UnlockRect ();
+                ms_pSaveLockSurface->Release ();
+                ms_pSaveLockSurface = NULL;
+                ms_bSaveStarted = false;
+            }
+        }
+        if ( !ms_bSaveStarted || !bWait )
+            break;
+
+        Sleep ( 10 );
+    }
+}
+
 
 #define SAVE_RENDERSTATE_AND_SET( reg, value ) \
     const DWORD dwSaved_##reg = g_pDeviceState->RenderState.reg; \
