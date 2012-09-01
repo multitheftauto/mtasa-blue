@@ -56,4 +56,6 @@ namespace SharedUtil
         unsigned char                   m_digest [16];
     };
 
+    unsigned int HashString ( const char* szString );
+    unsigned int HashString ( const char* szString, unsigned int length );
 }

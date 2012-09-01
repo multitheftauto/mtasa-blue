@@ -41,7 +41,6 @@ void            stripControlCodes           ( char* szString );
 bool            StringBeginsWith            ( const char* szText, const char* szBegins );
 bool            IsNumericString             ( const char* szString );
 bool            IsNumericString             ( const char* szString, size_t sizeString );
-unsigned int    HashString                  ( const char* szString );
 
 void            DisconnectPlayer            ( class CGame* pGame, class CPlayer& Player, const char* szMessage );
 void            DisconnectConnectionDesync  ( class CGame* pGame, class CPlayer& Player, unsigned int uiCode );
