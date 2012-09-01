@@ -68,6 +68,10 @@ CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClie
     m_strResourceDirectoryPath = SString ( "%s/resources/%s", g_pClientGame->GetModRoot (), *m_strResourceName );
     m_strResourcePrivateDirectoryPath = PathJoin ( CServerIdManager::GetSingleton ()->GetConnectionPrivateDirectory (), m_strResourceName );
 
+    m_strResourcePrivateDirectoryPathOld = CServerIdManager::GetSingleton ()->GetConnectionPrivateDirectory ( true );
+    if ( !m_strResourcePrivateDirectoryPathOld.empty () )
+        m_strResourcePrivateDirectoryPathOld = PathJoin ( m_strResourcePrivateDirectoryPathOld, m_strResourceName );
+
     m_pLuaVM = m_pLuaManager->CreateVirtualMachine ( this );
     if ( m_pLuaVM )
     {
@@ -383,12 +387,40 @@ void CResource::ShowCursor ( bool bShow, bool bToggleControls )
 }
 
 
-SString CResource::GetResourceDirectoryPath ( eAccessType accessType )
+SString CResource::GetResourceDirectoryPath ( eAccessType accessType, const SString& strMetaPath )
 {
+    // See if private files should be moved to a new directory
     if ( accessType == ACCESS_PRIVATE )
-        return m_strResourcePrivateDirectoryPath;
-    return m_strResourceDirectoryPath;
+    {
+        if ( !m_strResourcePrivateDirectoryPathOld.empty () )
+        {
+            SString strNewFilePath = PathJoin ( m_strResourcePrivateDirectoryPath, strMetaPath );
+            SString strOldFilePath = PathJoin ( m_strResourcePrivateDirectoryPathOld, strMetaPath );
+
+            if ( FileExists ( strOldFilePath ) )
+            {
+                if ( FileExists ( strNewFilePath ) )
+                {
+                    // If file exists in old and new, delete from old
+                    OutputDebugLine ( SString ( "Deleting %s", *strOldFilePath ) );
+                    FileDelete ( strOldFilePath );
+                }
+                else
+                {
+                    // If file exists in old only, move from old to new
+                    OutputDebugLine ( SString ( "Moving %s to %s", *strOldFilePath, *strNewFilePath ) );
+                    MakeSureDirExists ( strNewFilePath );
+                    FileRename ( strOldFilePath, strNewFilePath );
+                }
+            }
+        }
+    }
+
+    if ( accessType == ACCESS_PRIVATE )
+        return PathJoin ( m_strResourcePrivateDirectoryPath, strMetaPath );
+    return PathJoin ( m_strResourceDirectoryPath, strMetaPath );
 }
+
 
 void CResource::LoadProtectedScript ( const char* chunk, unsigned int len )
 {

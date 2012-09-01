@@ -728,6 +728,8 @@ public:
     LUA_DECLARE ( SetMinuteDuration );
     LUA_DECLARE ( SetWaterLevel );
     LUA_DECLARE ( ResetWaterLevel );
+    LUA_DECLARE ( IsWaterDrawnLast );
+    LUA_DECLARE ( SetWaterDrawnLast );
     LUA_DECLARE ( SetWaterVertexPosition );
     LUA_DECLARE ( SetWaveHeight );
     LUA_DECLARE ( SetGarageOpen );

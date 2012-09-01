@@ -337,6 +337,7 @@ CWaterManagerSA::CWaterManagerSA ()
     m_bInitializedVertices = false;
     m_bAltRenderOrder = false;
     m_iActivePolyCount = 0;
+    m_bWaterDrawnLast = true;
     RelocatePools ();
     InstallHooks ();
 
@@ -831,19 +832,31 @@ void CWaterManagerSA::Reset ()
 
 
 // Dynamically hook/unhook water rendering when required
-void CWaterManagerSA::UpdateRenderOrderRequirement ( bool bForceOff )
+void CWaterManagerSA::UpdateRenderOrderRequirement ( void )
 {
-    bool bAltRenderOrderRequired = ms_iNumNonDefaultAndNonZeroVertices != 0 || m_iActivePolyCount > 0;
+    bool bAltRenderOrderRequired = ms_iNumNonDefaultAndNonZeroVertices != 0 || m_iActivePolyCount > 0 || m_bWaterDrawnLast;
     if ( m_bAltRenderOrder != bAltRenderOrderRequired )
     {
-        OutputDebugLine ( SString ( "[Water] SetAltWaterOrderEnabled: %d  (ms_iNumNonDefaultAndNonZeroVertices:%d  bForceOff:%d  m_Changes:%d  m_iActivePolyCount:%d"
+        OutputDebugLine ( SString ( "[Water] SetAltWaterOrderEnabled: %d  (ms_iNumNonDefaultAndNonZeroVertices:%d  m_bWaterDrawnLast:%d  m_Changes:%d  m_iActivePolyCount:%d"
                                                         , bAltRenderOrderRequired
                                                         , ms_iNumNonDefaultAndNonZeroVertices
-                                                        , bForceOff
+                                                        , m_bWaterDrawnLast
                                                         , m_Changes.size ()
                                                         , m_iActivePolyCount
                                                     ));
         m_bAltRenderOrder = bAltRenderOrderRequired;
         g_pCore->GetMultiplayer()->SetAltWaterOrderEnabled ( m_bAltRenderOrder );
     }
+}
+
+
+void CWaterManagerSA::SetWaterDrawnLast ( bool bEnable )
+{
+    m_bWaterDrawnLast = bEnable;
+    UpdateRenderOrderRequirement ();
+}
+
+bool CWaterManagerSA::IsWaterDrawnLast ( void )
+{
+    return m_bWaterDrawnLast;
 }

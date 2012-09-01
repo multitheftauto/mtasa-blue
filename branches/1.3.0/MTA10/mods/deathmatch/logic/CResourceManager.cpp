@@ -160,7 +160,7 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
                 strMetaPath = strInput.substr(iEnd+1);
                 if ( IsValidFilePath ( strMetaPath.c_str() ) )
                 {
-                    strPath = PathJoin ( pResource->GetResourceDirectoryPath ( accessType ), strMetaPath );
+                    strPath = pResource->GetResourceDirectoryPath ( accessType, strMetaPath );
                     return true;
                 }
             }
@@ -168,7 +168,7 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
     }
     else if ( pResource && IsValidFilePath ( strInput.c_str() ) )
     {
-        strPath = PathJoin ( pResource->GetResourceDirectoryPath ( accessType ), strInput );
+        strPath = pResource->GetResourceDirectoryPath ( accessType, strInput );
         strMetaPath = strInput;
         return true;
     }

@@ -30,6 +30,8 @@ public:
 
     virtual float               GetWaveLevel            () = 0;
     virtual void                SetWaveLevel            ( float fWaveLevel ) = 0;
+    virtual void                SetWaterDrawnLast       ( bool bEnable ) = 0;
+    virtual bool                IsWaterDrawnLast        ( void ) = 0;
 
     virtual bool                TestLineAgainstWater ( const CVector& vecStart, const CVector& vecEnd, CVector* vecCollision ) = 0;
 

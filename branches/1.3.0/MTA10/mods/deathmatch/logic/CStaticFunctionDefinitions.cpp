@@ -5406,6 +5406,20 @@ bool CStaticFunctionDefinitions::SetWaterVertexPosition ( CClientWater* pWater, 
 }
 
 
+bool CStaticFunctionDefinitions::SetWaterDrawnLast ( bool bEnabled)
+{
+    g_pGame->GetWaterManager ()->SetWaterDrawnLast ( bEnabled );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::IsWaterDrawnLast ( bool& bOutEnabled )
+{
+    bOutEnabled = g_pGame->GetWaterManager ()->IsWaterDrawnLast ();
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::GetWorldFromScreenPosition ( CVector& vecScreen, CVector& vecWorld )
 {
     g_pCore->GetGraphics ()->CalcWorldCoors ( &vecScreen, &vecWorld );

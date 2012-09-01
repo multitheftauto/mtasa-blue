@@ -160,6 +160,8 @@ public:
 
     float                            GetWaveLevel      ();
     void                             SetWaveLevel      ( float fWaveLevel );
+    void                             SetWaterDrawnLast ( bool bEnable );
+    bool                             IsWaterDrawnLast  ( void );
 
     bool                             TestLineAgainstWater ( const CVector& vecStart, const CVector& vecEnd, CVector* vecCollision );
 
@@ -167,7 +169,7 @@ public:
     void                             UndoChanges       ( void* pChangeSource = NULL );
     void                             RebuildIndex      ();
     void                             Reset             ();
-    void                             UpdateRenderOrderRequirement ( bool bForceOff = false );
+    void                             UpdateRenderOrderRequirement ( void );
 
 private:
     CWaterVertexSA                   m_Vertices [NUM_NewWaterVertices];
@@ -189,6 +191,7 @@ private:
     bool                             m_bAltRenderOrder;
     bool                             m_bInitializedVertices;
     int                              m_iActivePolyCount;
+    bool                             m_bWaterDrawnLast;
 
     friend class                     CWaterVertexSA;
     friend class                     CWaterPolySA;

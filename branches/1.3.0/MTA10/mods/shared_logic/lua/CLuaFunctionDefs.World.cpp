@@ -514,6 +514,46 @@ int CLuaFunctionDefs::SetWaterLevel ( lua_State* luaVM )
     return 1;
 }
 
+
+int CLuaFunctionDefs::SetWaterDrawnLast ( lua_State* luaVM )
+{
+//  bool setWaterDrawnLast ( bool bEnabled )
+    bool bEnabled;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadBool ( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetWaterDrawnLast ( bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::IsWaterDrawnLast ( lua_State* luaVM )
+{
+//  bool getWaterDrawnLast ()
+    bool bEnabled;
+    if ( CStaticFunctionDefinitions::IsWaterDrawnLast ( bEnabled ) )
+    {
+        lua_pushboolean ( luaVM, bEnabled );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::ResetWaterLevel ( lua_State* luaVM )
 {
     CStaticFunctionDefinitions::ResetWorldWaterLevel ();

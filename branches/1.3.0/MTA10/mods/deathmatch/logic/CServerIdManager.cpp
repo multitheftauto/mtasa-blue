@@ -58,7 +58,7 @@ class CServerIdManagerImpl : public CServerIdManager
 public:
     ZERO_ON_NEW
 
-    virtual SString         GetConnectionPrivateDirectory   ( void );
+    virtual SString         GetConnectionPrivateDirectory   ( bool bPreviousVer );
 
                             CServerIdManagerImpl            ( void );
                             ~CServerIdManagerImpl           ( void );
@@ -270,14 +270,14 @@ void CServerIdManagerImpl::StaticSaveServerIdMap ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-SString CServerIdManagerImpl::GetConnectionPrivateDirectory ( void )
+SString CServerIdManagerImpl::GetConnectionPrivateDirectory ( bool bPreviousVer )
 {
     // Get ServerId for this connection
-    SString strServerId = g_pCore->GetNetwork ()->GetCurrentServerId ();
+    SString strServerId = g_pCore->GetNetwork ()->GetCurrentServerId ( bPreviousVer );
 
     // If ServerId is invalid, use the temp dir
     if ( strServerId.length () < 10 )
-        return m_strTempErrorDir;
+        return bPreviousVer ? "" : m_strTempErrorDir;
 
     // Otherwise fetch the server unique dir
     const CServerIdInfo& info = GetServerIdInfo ( strServerId );

@@ -1813,6 +1813,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.FastHashSet.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.File.h"
 					>
 				</File>
