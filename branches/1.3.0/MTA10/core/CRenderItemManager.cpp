@@ -435,7 +435,7 @@ void CRenderItemManager::UpdateBackBufferCopySize ( void )
 
         // Try to create new one if needed
         if ( uiSizeX > 0 )
-            m_pBackBufferCopy = CreateRenderTarget ( uiSizeX, uiSizeY, false );
+            m_pBackBufferCopy = CreateRenderTarget ( uiSizeX, uiSizeY, false, true );
     }
 }
 

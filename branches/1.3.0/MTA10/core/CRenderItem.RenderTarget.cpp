@@ -187,7 +187,7 @@ void CRenderTargetItem::ReleaseUnderlyingData ( void )
 // Not very quick thing to do.
 //
 ////////////////////////////////////////////////////////////////
-void CRenderTargetItem::ReadPixels ( CBuffer& outBuffer )
+bool CRenderTargetItem::ReadPixels ( CBuffer& outBuffer )
 {
     D3DSURFACE_DESC Desc;  
     m_pD3DRenderTargetSurface->GetDesc ( &Desc );  
@@ -205,16 +205,16 @@ void CRenderTargetItem::ReadPixels ( CBuffer& outBuffer )
 
     if ( !m_pD3DReadSurface )
         if ( FAILED ( m_pDevice->CreateOffscreenPlainSurface ( Desc.Width, Desc.Height, Desc.Format, D3DPOOL_SYSTEMMEM, &m_pD3DReadSurface, NULL ) ) )
-            return;
+            return false;
 
     // Copy render target to m_pD3DReadSurface
     if ( FAILED ( m_pDevice->GetRenderTargetData ( m_pD3DRenderTargetSurface, m_pD3DReadSurface ) ) )
-        return;
+        return false;
 
     // Get pixels from m_pD3DReadSurface
     D3DLOCKED_RECT LockedRect;
     if ( FAILED ( m_pD3DReadSurface->LockRect ( &LockedRect, NULL, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK ) ) )
-        return;
+        return false;
 
     // Allocate 32 bit buffer
     uint ulScreenWidth = Desc.Width;
@@ -240,4 +240,5 @@ void CRenderTargetItem::ReadPixels ( CBuffer& outBuffer )
     }
 
     m_pD3DReadSurface->UnlockRect ();
+    return true;
 }

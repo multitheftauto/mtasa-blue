@@ -34,13 +34,15 @@ public:
 
     // CScreenGrabberInterface
     virtual void                OnDeviceCreate                  ( IDirect3DDevice9* pDevice );
+    virtual void                OnLostDevice                    ( void );
+    virtual void                OnResetDevice                   ( void );
     virtual void                DoPulse                         ( void );
     virtual void                QueueScreenShot                 ( uint uiSizeX, uint uiSizeY, uint uiQuality, PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback );
     virtual void                ClearScreenShotQueue            ( void );
+    virtual bool                GetBackBufferPixels             ( uint uiSizeX, uint uiSizeY, CBuffer& buffer );
 
     // CScreenGrabber
     void                        ProcessScreenShotQueue          ( void );
-    void                        GetBackBufferPixels             ( uint uiSizeX, uint uiSizeY, CBuffer& buffer );
 
 protected:
     IDirect3DDevice9*                       m_pDevice;
@@ -97,6 +99,31 @@ CScreenGrabber::~CScreenGrabber ( void )
 void CScreenGrabber::OnDeviceCreate ( IDirect3DDevice9* pDevice )
 {
     m_pDevice = pDevice;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CScreenGrabber::OnLostDevice
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CScreenGrabber::OnLostDevice ( void )
+{
+    SAFE_RELEASE( m_pScreenShotTemp );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CScreenGrabber::OnResetDevice
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CScreenGrabber::OnResetDevice ( void )
+{
 }
 
 
@@ -183,13 +210,13 @@ void CScreenGrabber::ProcessScreenShotQueue ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-void CScreenGrabber::GetBackBufferPixels ( uint uiSizeX, uint uiSizeY, CBuffer& buffer )
+bool CScreenGrabber::GetBackBufferPixels ( uint uiSizeX, uint uiSizeY, CBuffer& buffer )
 {
     // Try to get the back buffer
     IDirect3DSurface9* pD3DBackBufferSurface = NULL;
     m_pDevice->GetBackBuffer ( 0, 0, D3DBACKBUFFER_TYPE_MONO, &pD3DBackBufferSurface );
     if ( !pD3DBackBufferSurface )
-        return;
+        return false;
 
     // Adjust/create screenshot target size
     if ( !m_pScreenShotTemp || m_pScreenShotTemp->m_uiSizeX != uiSizeX || m_pScreenShotTemp->m_uiSizeY != uiSizeY )
@@ -199,7 +226,7 @@ void CScreenGrabber::GetBackBufferPixels ( uint uiSizeX, uint uiSizeY, CBuffer& 
 
         // Try to create new one if needed
         if ( uiSizeX > 0 )
-            m_pScreenShotTemp = CGraphics::GetSingleton ().GetRenderItemManager ()->CreateRenderTarget ( uiSizeX, uiSizeY, false );
+            m_pScreenShotTemp = CGraphics::GetSingleton ().GetRenderItemManager ()->CreateRenderTarget ( uiSizeX, uiSizeY, false, true );
     }
 
     // Copy back buffer into our private render target
@@ -211,8 +238,10 @@ void CScreenGrabber::GetBackBufferPixels ( uint uiSizeX, uint uiSizeY, CBuffer& 
         // Clean up
         SAFE_RELEASE( pD3DBackBufferSurface );
 
-        m_pScreenShotTemp->ReadPixels ( buffer );
+        if ( m_pScreenShotTemp->ReadPixels ( buffer ) )
+            return true;
     }
+    return false;
 }
 
 
