@@ -2291,13 +2291,17 @@ bool CClientGame::CharacterKeyHandler ( WPARAM wChar )
     if ( m_pRootEntity )
     {
         // Safe character?
-        if ( wChar >= 32 && wChar <= 126 )
+        if ( wChar >= 32 )
         {
-            char szCharacter [ 2 ] = { wChar, 0 };
+            // Generate a null-terminating string for our character
+            wchar_t wUNICODE[2] = { wChar, '\0' };
+
+            // Convert our UTF character into an ANSI string
+            SString strANSI = UTF16ToMbUTF8 ( wUNICODE );
 
             // Call our character event
             CLuaArguments Arguments;
-            Arguments.PushString ( szCharacter );
+            Arguments.PushString ( strANSI );
             m_pRootEntity->CallEvent ( "onClientCharacter", Arguments, false );
         }
     }
