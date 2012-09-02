@@ -208,7 +208,23 @@ CDummy* CStaticFunctionDefinitions::CreateElement ( CResource* pResource, const 
 
     EElementType elementType;
     bool bIsInternalType = StringToEnum ( szTypeName, elementType );
-    
+
+    // Allow use of some internal types for backwards compatibility
+    if ( bIsInternalType )
+    {
+        bool bOldDissallowed = false;
+        static const char* szOldDissallowedTypes[] = { "dummy", "player", "vehicle", "object", "marker", "blip", "pickup", "radararea", "console" };
+        for ( uint i = 0 ; i < NUMELMS( szOldDissallowedTypes ) ; i++ )
+            if ( strcmp ( szTypeName, szOldDissallowedTypes[i] ) == 0 )
+                bOldDissallowed = true;
+
+        if ( !bOldDissallowed )
+        {
+            // Maybe issue a warning about this one day 
+            bIsInternalType = false;
+        }
+    }
+
     // Long enough typename and not an internal one?
     if ( strlen ( szTypeName ) > 0 && !bIsInternalType )
     {
