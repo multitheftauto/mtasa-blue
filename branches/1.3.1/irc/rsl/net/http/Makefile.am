@@ -1,0 +1,2 @@
+lib_LTLIBRARIES=librsl_net_http.la
+librsl_net_http_la_SOURCES=client.cpp stream.cpp
