@@ -34,16 +34,19 @@ CRemoteCalls::~CRemoteCalls()
 void CRemoteCalls::Call ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts )
 {
     m_calls.push_back ( new CRemoteCall ( szServerHost, szResourceName, szFunctionName, arguments, luaMain, iFunction, uiConnectionAttempts ) );
+    m_calls.back ()->MakeCall ();
 }
 
 void CRemoteCalls::Call ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts )
 {
     m_calls.push_back ( new CRemoteCall ( szURL, arguments, luaMain, iFunction, uiConnectionAttempts ) );
+    m_calls.back ()->MakeCall ();
 }
 
 void CRemoteCalls::Call ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts )
 {
     m_calls.push_back ( new CRemoteCall ( szURL, fetchArguments, strPostData, bPostBinary, luaMain, iFunction, uiConnectionAttempts ) );
+    m_calls.back ()->MakeCall ();
 }
 
 void CRemoteCalls::Remove ( CLuaMain * lua )
@@ -96,8 +99,6 @@ CRemoteCall::CRemoteCall ( const char * szServerHost, const char * szResourceNam
 
     m_strURL = SString ( "http://%s/%s/call/%s", szServerHost, szResourceName, szFunctionName );
     m_uiConnectionAttempts = uiConnectionAttempts;
-
-    MakeCall();
 }
 
 //arbitary URL version
@@ -112,8 +113,6 @@ CRemoteCall::CRemoteCall ( const char * szURL, CLuaArguments * arguments, CLuaMa
 
     m_strURL = szURL;
     m_uiConnectionAttempts = uiConnectionAttempts;
-
-    MakeCall();
 }
 
 //Fetch version
@@ -129,8 +128,6 @@ CRemoteCall::CRemoteCall ( const char * szURL, CLuaArguments * fetchArguments, c
 
     m_strURL = szURL;
     m_uiConnectionAttempts = uiConnectionAttempts;
-
-    MakeCall();
 }
 
 
@@ -146,7 +143,7 @@ void CRemoteCall::MakeCall()
         downloadManager->StartDownloadingQueuedFiles();
 }
 
-void CRemoteCall::ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error)
+bool CRemoteCall::ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error)
 {
     //printf("Progress: %s\n", data);
     if ( complete )
@@ -169,6 +166,7 @@ void CRemoteCall::ProgressCallback(double sizeJustDownloaded, double totalDownlo
             arguments.Call ( call->m_VM, call->m_iFunction);   
 
             g_pGame->GetRemoteCalls()->Remove(call); // delete ourselves
+            return true;
         }
     }
     else if ( error )
@@ -186,7 +184,9 @@ void CRemoteCall::ProgressCallback(double sizeJustDownloaded, double totalDownlo
             arguments.Call ( call->m_VM, call->m_iFunction);   
 
             g_pGame->GetRemoteCalls()->Remove(call); // delete ourselves
+            return true;
         }
     }
-}
 
+    return false;   // Possible problem
+}

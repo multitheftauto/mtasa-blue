@@ -41,7 +41,7 @@ void CResourceDownloadFile::Download()
         manager->StartDownloadingQueuedFiles();
 }
 
-void CResourceDownloadFile::ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error)
+bool CResourceDownloadFile::ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error)
 {
     if ( complete )
     {
@@ -55,6 +55,7 @@ void CResourceDownloadFile::ProgressCallback(double sizeJustDownloaded, double t
     {
         CLogger::LogPrintf ( "Error!");
     }
+    return true;
 }
 
 //////////////////////////////////////////////////////////
@@ -90,7 +91,7 @@ void CResourceDownload::DownloadMeta (  )
         m_downloadManager->StartDownloadingQueuedFiles();
 }
 
-void CResourceDownload::ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error)
+bool CResourceDownload::ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error)
 {
     if ( complete )
     {
@@ -102,6 +103,7 @@ void CResourceDownload::ProgressCallback(double sizeJustDownloaded, double total
         CLogger::LogPrintf ( "Error accessing resource meta.xml: %d\n", error );
         ((CResourceDownload*)obj)->m_updateResourceVersion->DownloadComplete(false);
     }
+    return true;
 }
 
 void CResourceDownload::FileDownloadComplete ( CResourceDownloadFile * file )
@@ -606,12 +608,13 @@ void CUpdateSite::DownloadUpdateManifest()
         m_downloadManager->StartDownloadingQueuedFiles();
 }
 
-void CUpdateSite::ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error)
+bool CUpdateSite::ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error)
 {
     if ( complete )
     {
         ((CUpdateSite*)obj)->ProcessUpdateManifest();
     }
+    return true;
 }
 
 void CUpdateSite::ProcessUpdateManifest ()
