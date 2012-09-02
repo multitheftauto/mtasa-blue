@@ -299,8 +299,9 @@ bool CMainConfig::Load ( void )
                 }
         }
 
-        // Add support for SD #12 (defaults to disabled)
+        // Add support for SD #12 and #14 (defaults to disabled)
         MapInsert ( m_DisableComboACMap, "12" );
+        MapInsert ( m_DisableComboACMap, "14" );
 
         {
             SString strEnableSD;

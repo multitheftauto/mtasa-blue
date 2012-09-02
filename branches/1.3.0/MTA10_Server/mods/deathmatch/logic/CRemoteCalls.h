@@ -20,7 +20,6 @@ i.e. the http client has downloaded all the data returned
 class CRemoteCall
 {
 private:
-    class CResource *   m_resource;
     std::string         m_strData;
     bool                m_bPostBinary;
     bool                m_bIsFetch;
