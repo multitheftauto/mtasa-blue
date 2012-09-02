@@ -1948,7 +1948,7 @@ void CCore::OnPreHUDRender ( void )
     CGraphics::GetSingleton ().GetRenderItemManager ()->DoPulse ();
 
     // Handle script stuffs
-    if ( m_iUnminimizeFrameCounter-- && !m_iUnminimizeFrameCounter )
+    if ( m_iUnminimizeFrameCounter && --m_iUnminimizeFrameCounter == 0 )
     {
         m_pModManager->DoPulsePreHUDRender ( true, m_bDidRecreateRenderTargets );
         m_bDidRecreateRenderTargets = false;
