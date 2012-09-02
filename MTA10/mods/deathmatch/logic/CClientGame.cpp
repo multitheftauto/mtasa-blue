@@ -2308,7 +2308,7 @@ bool CClientGame::CharacterKeyHandler ( WPARAM wChar )
     if ( m_pRootEntity )
     {
         // Safe character?
-        if ( wChar >= 32 && wChar <= 126 )
+        if ( wChar >= 32 && wChar <= 255 )
         {
             char szCharacter [ 2 ] = { wChar, 0 };
 
