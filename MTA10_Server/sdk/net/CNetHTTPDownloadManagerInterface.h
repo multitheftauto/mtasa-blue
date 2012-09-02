@@ -15,7 +15,7 @@
 #include <string.h>
 #include <stdio.h>
 
-typedef void (*PDOWNLOADPROGRESSCALLBACK) ( double, double, char *, size_t, void *, bool, int );
+typedef bool (*PDOWNLOADPROGRESSCALLBACK) ( double, double, char *, size_t, void *, bool, int );
 
 class CNetHTTPDownloadManagerInterface
 {

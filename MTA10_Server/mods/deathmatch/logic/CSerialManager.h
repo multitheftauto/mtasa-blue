@@ -51,7 +51,7 @@ public:
 
     void                        DoPulse                     ( void );
 
-    static void                 ProgressCallback            ( double nJustDownloaded, double nTotalDownloaded, char * szData, size_t nDataLength, void * pObject, bool bComplete, int iError );
+    static bool                 ProgressCallback            ( double nJustDownloaded, double nTotalDownloaded, char * szData, size_t nDataLength, void * pObject, bool bComplete, int iError );
     bool                        IsFinished                  ( void )    { return m_bFinished; };
 
 private:

@@ -144,7 +144,7 @@ void CSerialVerification::DoPulse ( void )
     }
 }
 
-void CSerialVerification::ProgressCallback ( double nJustDownloaded, double nTotalDownloaded, char * szData, size_t nDataLength, void * pObject, bool bComplete, int iError )
+bool CSerialVerification::ProgressCallback ( double nJustDownloaded, double nTotalDownloaded, char * szData, size_t nDataLength, void * pObject, bool bComplete, int iError )
 {
     #define HTTP_HEADER_SKIP    48
     CSerialVerification * pCall = (CSerialVerification*) pObject;
@@ -170,7 +170,7 @@ void CSerialVerification::ProgressCallback ( double nJustDownloaded, double nTot
                     }
                     // Delete ourselves and return
                     g_pGame->GetSerialManager ()->Remove ( pCall );
-                    return;
+                    return true;
                 }
             }
         }
@@ -184,4 +184,5 @@ void CSerialVerification::ProgressCallback ( double nJustDownloaded, double nTot
             g_pGame->GetSerialManager ()->Remove ( pCall );
         }
     }
+    return true;
 }

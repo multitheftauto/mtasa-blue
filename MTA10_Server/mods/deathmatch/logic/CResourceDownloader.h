@@ -28,7 +28,7 @@ private:
     bool                m_bIsDownloaded;
     bool                m_bHasFailed;
     class CResourceDownload * m_pResource;
-    static void         ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error);
+    static bool         ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error);
 
 
 public:
@@ -55,7 +55,7 @@ private:
     
     class CNetHTTPDownloadManagerInterface *     m_downloadManager;
     class CXML *        m_XML;
-    static void         ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error);
+    static bool         ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error);
     
     void                ParseMeta();
     void                DownloadMeta();
@@ -141,7 +141,7 @@ private:
     void                DownloadUpdateManifest();
     void                ProcessUpdateManifest();
 
-    static void         ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error);
+    static bool         ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error);
     
 public:
                         CUpdateSite ( const char * szURL );
