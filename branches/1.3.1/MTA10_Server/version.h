@@ -17,7 +17,7 @@
 // New version info
 #define MTASA_VERSION_MAJOR         1
 #define MTASA_VERSION_MINOR         3
-#define MTASA_VERSION_MAINTENANCE   0
+#define MTASA_VERSION_MAINTENANCE   1
 #define MTASA_VERSION_TYPE          VERSION_TYPE_RELEASE
 #define MTASA_VERSION_BUILD         0
 
