@@ -23,9 +23,12 @@ public:
 
     // CScreenGrabberInterface
     virtual void                OnDeviceCreate                  ( IDirect3DDevice9* pDevice ) = 0;
+    virtual void                OnLostDevice                    ( void ) = 0;
+    virtual void                OnResetDevice                   ( void ) = 0;
     virtual void                DoPulse                         ( void ) = 0;
     virtual void                QueueScreenShot                 ( uint uiSizeX, uint uiSizeY, uint uiQuality, PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback ) = 0;
     virtual void                ClearScreenShotQueue            ( void ) = 0;
+    virtual bool                GetBackBufferPixels             ( uint uiSizeX, uint uiSizeY, CBuffer& buffer ) = 0;
 };
 
 CScreenGrabberInterface* NewScreenGrabber ( void );

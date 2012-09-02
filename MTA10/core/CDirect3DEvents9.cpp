@@ -25,8 +25,7 @@
 #include <stdexcept>
 
 // Variables used for screen shot saving
-static IDirect3DSurface9*  ms_pSaveLockSurface  = NULL;
-static int                 ms_bSaveStarted      = 0;
+static CBuffer             ms_ScreenShotBuffer;
 static long long           ms_LastSaveTime      = 0;
 // Other variables
 static uint                ms_RequiredAnisotropicLevel = 1;
@@ -80,9 +79,6 @@ void CDirect3DEvents9::OnInvalidate ( IDirect3DDevice9 *pDevice )
 
     // Invalidate the VMR9 Manager
     //CVideoManager::GetSingleton ().OnLostDevice ();
-
-    // Finish screenshot save
-    TidyScreenShotSave ( true );
 
     // Notify gui
     CLocalGUI::GetSingleton().Invalidate ();
@@ -182,130 +178,64 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     ms_DiagnosticDebug = CCore::GetSingleton ().GetDiagnosticDebug ();
     CCore::GetSingleton().GetGUI ()->SetBidiEnabled ( ms_DiagnosticDebug != EDiagnosticDebug::BIDI_6778 );
     
-    // Tidyup after last screenshot
-    TidyScreenShotSave ( false );
-
     // Make a screenshot if needed
-    if ( CCore::GetSingleton().bScreenShot && ms_bSaveStarted == false ) {
+    CheckForScreenShot ();
 
-        // Max one screenshot per second
-        if ( GetTickCount64_ () - ms_LastSaveTime < 1000 )
-            return;
-        ms_LastSaveTime = GetTickCount64_ ();
-
-        RECT ScreenSize;
-
-        IDirect3DSurface9 *pSurface = NULL;
-
-        // Define a screen rectangle
-        ScreenSize.top = ScreenSize.left = 0;
-        ScreenSize.right = CDirect3DData::GetSingleton ().GetViewportWidth ();
-        ScreenSize.bottom = CDirect3DData::GetSingleton ().GetViewportHeight ();
-
-        do
-        {
-            HRESULT hr = pDevice->GetRenderTarget ( 0, &pSurface );
-            if ( FAILED( hr ) )
-            {
-                CCore::GetSingleton ().GetConsole ()->Printf ( "GetRenderTarget failed: %08x", hr );
-                break;
-            }
-
-            // Create a new render target
-            for ( uint i = 0 ; i < 3 ; i++ )
-            {
-                // 1st try -  i == 0  - 32 bit target
-                //            i == 0  - EvictManagedResources
-                // 2nd try -  i == 1  - 32 bit target
-                // 3rd try -  i == 2  - 16 bit target
-	            D3DFORMAT Format = i == 2 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
-
-                hr = pDevice->CreateRenderTarget ( ScreenSize.right, ScreenSize.bottom, Format, D3DMULTISAMPLE_NONE, 0, TRUE, &ms_pSaveLockSurface, NULL );
-                if( SUCCEEDED( hr ) )
-                    break;
-
-                // c'mon
-                if ( i == 0 )
-                    pDevice->EvictManagedResources ();
-            }
-
-            if ( FAILED( hr ) )
-            {
-                CCore::GetSingleton ().GetConsole ()->Printf ( "Couldn't create a new render target: %08x", hr );
-                break;
-            }
-
-            // Copy data from surface to surface
-            hr = pDevice->StretchRect ( pSurface, &ScreenSize, ms_pSaveLockSurface, &ScreenSize, D3DTEXF_NONE );
-            if ( FAILED( hr ) )
-            {
-                CCore::GetSingleton ().GetConsole ()->Printf ( "Couldn't copy the surface: %08x", hr );
-                SAFE_RELEASE( ms_pSaveLockSurface );
-                break;
-            }
-
-            // Lock the surface
-            D3DLOCKED_RECT LockedRect;
-            hr = ms_pSaveLockSurface->LockRect ( &LockedRect, NULL, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK );
-            if ( FAILED( hr ) )
-            {
-                CCore::GetSingleton ().GetConsole ()->Printf ( "Couldn't lock the surface: %08x", hr );
-                SAFE_RELEASE( ms_pSaveLockSurface );
-                break;
-            }
-
-            // Call the pre-screenshot function 
-            SString strFileName = CScreenShot::PreScreenShot ();
-
-            // Start the save thread
-            CScreenShot::BeginSave ( strFileName, LockedRect.pBits, LockedRect.Pitch, ScreenSize );
-            ms_bSaveStarted = true;
-
-            // Call the post-screenshot function
-            CScreenShot::PostScreenShot ( strFileName );
-        }
-        while ( false );
-
-        CCore::GetSingleton().bScreenShot = false;
-
-        if ( pSurface )
-        {
-            if ( FAILED ( pSurface->Release () ) )
-                assert ( 0 && "Failed to release the ScreenShot rendertaget surface" );
-            pSurface = NULL;
-        }
-    }
     TIMING_CHECKPOINT( "-OnPresent2" );
 }
 
 
 /////////////////////////////////////////////////////////////
 //
-// CDirect3DEvents9::TidyScreenShotSave
+// CDirect3DEvents9::CheckForScreenShot
 //
-// Waits if save not complete (if required)
+// Take a screenshot if required and able
 //
 /////////////////////////////////////////////////////////////
-void CDirect3DEvents9::TidyScreenShotSave ( bool bWait )
+void CDirect3DEvents9::CheckForScreenShot ( void )
 {
-    while ( true )
+    // Make a screenshot if needed
+    if ( CCore::GetSingleton().bScreenShot && !CScreenShot::IsSaving () )
     {
-        // Tidyup after last screenshot
-        if ( ms_bSaveStarted )
+        // Max one screenshot per second
+        if ( GetTickCount64_ () - ms_LastSaveTime < 1000 )
+            return;
+        ms_LastSaveTime = GetTickCount64_ ();
+
+        uint uiWidth = CDirect3DData::GetSingleton ().GetViewportWidth ();
+        uint uiHeight = CDirect3DData::GetSingleton ().GetViewportHeight ();
+
+        // Call the pre-screenshot function 
+        SString strFileName = CScreenShot::PreScreenShot ();
+
+        // Try to get the screen data
+        if ( CGraphics::GetSingleton ().GetScreenGrabber ()->GetBackBufferPixels ( uiWidth, uiHeight, ms_ScreenShotBuffer ) )
         {
-            // Done yet?
-            if ( !CScreenShot::IsSaving () )
+            // Validate data size
+            uint uiDataSize = ms_ScreenShotBuffer.GetSize ();
+            uint uiReqDataSize = uiWidth * uiHeight * 4;
+
+            if ( uiDataSize == uiReqDataSize )
             {
-                ms_pSaveLockSurface->UnlockRect ();
-                ms_pSaveLockSurface->Release ();
-                ms_pSaveLockSurface = NULL;
-                ms_bSaveStarted = false;
+                // Start the save thread
+                CScreenShot::BeginSave ( strFileName, ms_ScreenShotBuffer.GetData (), uiDataSize, uiWidth, uiHeight );
+            }
+            else
+            {
+                g_pCore->GetConsole()->Printf ( "Screenshot got %d bytes, but expected %d", uiDataSize, uiReqDataSize );
+                strFileName = "";
             }
         }
-        if ( !ms_bSaveStarted || !bWait )
-            break;
+        else
+        {
+            g_pCore->GetConsole()->Print ( "Screenshot failed" );
+            strFileName = "";
+        }
 
-        Sleep ( 10 );
+        // Call the post-screenshot function
+        CScreenShot::PostScreenShot ( strFileName );
+
+        CCore::GetSingleton().bScreenShot = false;
     }
 }
 

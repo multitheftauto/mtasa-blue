@@ -1083,6 +1083,7 @@ void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
         m_pLineInterface->OnLostDevice ();
 
     m_pRenderItemManager->OnLostDevice ();
+    m_pScreenGrabber->OnLostDevice ();
 }
 
 
@@ -1101,6 +1102,7 @@ void CGraphics::OnDeviceRestore ( IDirect3DDevice9 * pDevice )
         m_pLineInterface->OnResetDevice ();
 
     m_pRenderItemManager->OnResetDevice ();
+    m_pScreenGrabber->OnResetDevice ();
 }
 
 

@@ -449,7 +449,7 @@ class CRenderTargetItem : public CTextureItem
     virtual void    OnResetDevice           ( void );
     void            CreateUnderlyingData    ( void );
     void            ReleaseUnderlyingData   ( void );
-    void            ReadPixels              ( CBuffer& outBuffer );
+    bool            ReadPixels              ( CBuffer& outBuffer );
 
     bool                m_bWithAlphaChannel;
     IDirect3DSurface9*  m_pD3DRenderTargetSurface;

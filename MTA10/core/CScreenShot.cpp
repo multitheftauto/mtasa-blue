@@ -21,31 +21,36 @@ static bool bIsDebugVisible = false;
 
 // Variables used for saving the screen shot file on a separate thread
 static bool     ms_bIsSaving        = false;
-static RECT     ms_ScreenSize       = { 0, 0, 0, 0 };
-static void*    ms_pBits            = NULL;
-static DWORD    ms_ulPitch          = 0;
+static uint     ms_uiWidth          = 0;
+static uint     ms_uiHeight         = 0;
+static void*    ms_pData            = NULL;
+static uint     ms_uiDataSize       = 0;
+static bool     ms_bHideChatBox     = false;        // TODO - Make setting
 static SString  ms_strFileName;
 
 
 SString CScreenShot::PreScreenShot ()
 {
-
     bIsChatVisible = g_pCore->IsChatVisible ();
     bIsDebugVisible = g_pCore->IsDebugVisible ();
 
     // make the chat and debug windows invisible
-    g_pCore->SetChatVisible ( false );
-    g_pCore->SetDebugVisible ( false );
+    if ( ms_bHideChatBox )
+    {
+        g_pCore->SetChatVisible ( false );
+        g_pCore->SetDebugVisible ( false );
+    }
 
     SString strScreenShotName = GetValidScreenshotFilename();
 
     return strScreenShotName;
 }
 
-void CScreenShot::PostScreenShot ( const char *szFileName )
+void CScreenShot::PostScreenShot ( const SString& strFileName )
 {
     // print a notice
-    g_pCore->GetConsole()->Printf ( "Screenshot taken: '%s'", szFileName );
+    if ( !strFileName.empty () )
+        g_pCore->GetConsole()->Printf ( "Screenshot taken: '%s'", *strFileName );
 
     // make the chat and debug windows visible again
     g_pCore->SetChatVisible ( bIsChatVisible );
@@ -130,8 +135,16 @@ SString CScreenShot::GetScreenShotPath ( int iNumber )
 // Static function
 DWORD CScreenShot::ThreadProc ( LPVOID lpdwThreadParam )
 {
-    unsigned long ulScreenHeight = ms_ScreenSize.bottom - ms_ScreenSize.top;
-    unsigned long ulScreenWidth = ms_ScreenSize.right - ms_ScreenSize.left;
+    unsigned long ulScreenHeight = ms_uiHeight;
+    unsigned long ulScreenWidth = ms_uiWidth;
+    uint uiReqDataSize = ulScreenHeight * ulScreenWidth * 4;
+    uint uiLinePitch = ulScreenWidth * 4;
+
+    if ( uiReqDataSize != ms_uiDataSize )
+    {
+        ms_bIsSaving = false;
+        return 0;
+    }
 
     // Create the screen data buffer
     BYTE** ppScreenData = NULL;
@@ -144,7 +157,7 @@ DWORD CScreenShot::ThreadProc ( LPVOID lpdwThreadParam )
     #define BYTESPERPIXEL 4
     unsigned long ulLineWidth = ulScreenWidth * 4;
     for ( unsigned int i = 0; i < ulScreenHeight; i++ ) {
-        memcpy ( ppScreenData[i], (BYTE*) ms_pBits + i* ms_ulPitch, ulLineWidth );
+        memcpy ( ppScreenData[i], (BYTE*) ms_pData + i* uiLinePitch, ulLineWidth );
         for ( unsigned int j = 3; j < ulLineWidth; j += BYTESPERPIXEL ) {
             ppScreenData[i][j] = 0xFF;
         }
@@ -176,15 +189,16 @@ DWORD CScreenShot::ThreadProc ( LPVOID lpdwThreadParam )
 }
 
 // Static function
-void CScreenShot::BeginSave ( const char *szFileName, void* pBits, unsigned long ulPitch, RECT ScreenSize )
+void CScreenShot::BeginSave ( const char *szFileName, void* pData, uint uiDataSize, uint uiWidth, uint uiHeight )
 {
     if ( ms_bIsSaving )
         return;
 
     ms_strFileName = szFileName;
-    ms_pBits = pBits;
-    ms_ulPitch = ulPitch;
-    ms_ScreenSize = ScreenSize;
+    ms_pData = pData;
+    ms_uiDataSize = uiDataSize;
+    ms_uiWidth = uiWidth;
+    ms_uiHeight = uiHeight;
 
     HANDLE hThread = CreateThread ( NULL, 0, (LPTHREAD_START_ROUTINE)CScreenShot::ThreadProc, NULL, CREATE_SUSPENDED, NULL );
     if ( !hThread )
