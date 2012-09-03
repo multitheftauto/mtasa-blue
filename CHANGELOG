@@ -1,5 +1,120 @@
 Changelog for Multi Theft Auto
 
+Multi Theft Auto : San Andreas - 1.3.1
+======================================
+
+Goal: Improve 1.3 release.
+
+- 0007244: [Client] Crash on ZHP server (ccw) - resolved.
+- 0007280: [Client] getSoundLength returns 0 for sound streams(not radio streams) (ccw) - resolved.
+- 0007276: [Server] Make setVehicleIdleRespawnDelay work for non-streamed in vehicles (ccw) - resolved.
+- 0007265: [Server] Connect problem when using a domain name that starts with a number (ccw) - resolved.
+- 0007209: [Client] Missing weapon recoil and reload animations when bulletsync is enabled (ccw) - resolved.
+- 0007237: [Client] [REQUEST] warpPedIntoVehicle client-side (ccw) - resolved.
+- 0006988: [Client] guiComboBoxGetItemText crash when the itemid is greater then the combobox row count (ccw) - resolved.
+- 0007125: [Server] Teamsay + long name + long message = too long message (ccw) - resolved.
+- 0007001: [Server] setWeaponProperty and getWeaponIDFromName use different weapon names (ccw) - resolved.
+- 0007259: [Server] Floating vehicles when using SetVehicleIdleRespawnDelay (ccw) - resolved.
+- 0007245: [Client] Server crash when towing a clientside vehicle (ccw) - resolved.
+- 0007235: [Client] Bullet Sync, won't synchronize bullets if player isn't targeting (ccw) - resolved.
+- 0007230: [Server] 'update' command cause crash immediately (ccw) - resolved.
+- 0007236: [Server] [REQUEST] ability to disable mysql warnings (ccw) - resolved.
+- 0007108: [Client] Crash when disconnecting from server on 4215 (ccw) - resolved.
+- 0007194: [Client] processLineOfSight "light" value returns incorrectly (ccw) - resolved.
+- 0007160: [Client] Helicopter Blades are collisionless (missing collision). (ccw) - resolved.
+- 0007193: [Client] getPedMoveState returning incorrectly (ccw) - resolved.
+- 0007191: [Server] MYSQL - float and decimal returning as a string (ccw) - resolved.
+- 0004455: [Client] issues remain with custom model streaming/memory (ccw) - resolved.
+- 0007184: [Server] MYSQL - tinyint returning as a string (ccw) - resolved.
+- 0005637: [Server] Element data of the root element is not synced on join (ccw) - resolved.
+- 0007175: [Client] onClientVehicleCollision - it always returns the same velocity before the collision (ccw) - resolved.
+- 0004532: [Server] Server-side command binds don't appear to work (ccw) - resolved.
+- 0007101: [Client] Changed Weapon.dat and using other ped.ifp file in any servers where this opportunity are blocked (ccw) - resolved.
+- 0007158: [Client] cheats, aim-hack and speedhack (ccw) - resolved.
+- 0007130: [Client] cheats, injector and wallhack (ccw) - resolved.
+- 0007100: [Client] cheats, injector (ccw) - resolved.
+- 0007133: [Client] Custom model LOD distance is not reset after quiting (ccw) - resolved.
+- 0007076: [Client] engineReplaceCOL only works inside streaming range. (ccw) - resolved.
+- 0003962: [Client] "Vehicle attachment bug" (ccw) - resolved.
+- 0005373: [Client] peds' bullets origin from wrong position (ccw) - resolved.
+- 0006058: [Server] Add functions to check anticheats and game files verification status. (ccw) - resolved.
+- 0006984: [Client] getElementMatrix returns non-standard matrix (Cazomino05) - resolved.
+- 0006967: [Server] Function to disable GTA sounds - resolved.
+- 0007062: [Server] Reverse compatiblity for engineLoadDFF - resolved.
+- 0006630: [Server] Request: ability to change sync rates (ccw) - resolved.
+- 0007074: [Client] onClientWorldSound not canceled (ccw) - resolved.
+- 0006903: [Client] ServerBrowser wrong ordering by server name (ccw) - resolved.
+- 0007041: [Server] toJSON and next can both give errors without location and file line (ccw) - resolved.
+- 0007046: [Server] Server crash (ccw) - resolved.
+- 0007052: [Server] Server crashes 1.3.0-4047 and 4050 (ccw) - resolved.
+- 0006985: [Server] 1.3-3968 Server Crash (ccw) - resolved.
+- 0007030: [Server] Server crashing after 10 seconds (ccw) - resolved.
+- 0006935: [Client] cheat, wallhack (ccw) - resolved.
+- 0007009: [Client] Cheat tool #2 for block (ccw) - resolved.
+- 0007010: [Client] New wallhack for block (ccw) - resolved.
+- 0007013: [Client] Client and all other clients in sight area crashes when leaving Cropduster (VID 512) near wall (ccw) - resolved.
+- 0006345: [Client] Update AC 2. New thing. (ccw) - resolved.
+- 0006957: [Map Editor] Map editor not saving locations of objects (ccw) - resolved.
+- 0007007: [Client] New cheat tool for block (ccw) - resolved.
+- 0006941: [Client] guiComboBoxGetItemText crashes when using indexes >= combobox's items count (ccw) - resolved.
+- 0006695: [Multi Theft Auto : San Andreas] CheetEngine (ccw) - resolved.
+- 0006871: [Server] <map src="" dimension="0"></map> in meta crashes server (kevuwk) - resolved.
+- 0006949: [Client] Request: client-side pickup events (ccw) - resolved.
+- 0006939: [Server] Expired timers can lead to wrong references (ccw) - resolved.
+- 0006901: [Client] playSound3D wrong 3D effect (kevuwk) - resolved.
+- 0006919: [Client] Add option to skip Dual Monitor Resolution Select (ccw) - resolved.
+- 0006004: [Scripting] Implement getAllAccountData function (kevuwk) - resolved.
+- 0005474: [Client] getKeyState does not differentiate between right and left keys (alt, ctrl, shift) (kevuwk) - resolved.
+- 0006621: [Client] Using setPedAnimationProgress Incorrectly Yields A Crash + Other Problems (kevuwk) - resolved.
+- 0006795: [Server] Downloading resource files breaks often (ccw) - resolved.
+- 0006796: [Server] Download freeze MTA 1.3 (ccw) - resolved.
+- 0006744: [Server] Possibility to flag (required/optional) the files to download from the servers (kevuwk) - resolved.
+- 0004481: [Server] Add more download functionality (kevuwk) - resolved.
+- 0005358: [Scripting] Add a "downloadFile" (kevuwk) - resolved.
+- 0006874: [Client] Force 'shownetstat' gui to be in front of all guis. (ccw) - resolved.
+- 0006888: [Client] Client doesn't try saved password when redirected (ccw) - resolved.
+- 0006890: [Server] 1.3-3851 Server crash x2 (ccw) - resolved.
+- 0006828: [Resources] Hacking the server is easy if all resources have admin rights (i.e. for kicking) (ccw) - resolved.
+- 0006447: [Server] giveWeapon triggers onPlayerWeaponSwitch with setAsCurrent=false (kevuwk) - resolved.
+- 0006767: [Client] setRainLevel doesn't reset on disconnect (kevuwk) - resolved.
+- 0006885: [Server] Range bans say that everyone is banned (kevuwk) - resolved.
+- 0006876: [Server] Map files are downloading very slow (ccw) - resolved.
+- 0006812: [Client] Engineless NRG-500 Variant (ccw) - resolved.
+- 0005838: [Synchronization] Satchels should be removed on resetMapInfo (kevuwk) - resolved.
+- 0006150: [Server] Console can logout, but cannot log back in. (lil_Toady) - resolved.
+- 0005432: [Server] Destroying source of onElementStopSync crashes the server (lil_Toady) - resolved.
+- 0006826: [Server] Timeout on map change (ccw) - resolved.
+- 0006021: [Scripting] should "outputChatBox" and "outputDebugString" automatically "tostring" values that ain't a string? (lil_Toady) - resolved.
+- 0006862: [Server] Incorrect information about load module. (kevuwk) - resolved.
+- 0004987: [Synchronization] isPedInWater ( ped ) doesnt set back to false if you warp into a vehicle from the water (kevuwk) - resolved.
+- 0006869: [Client] triggering events is unreliable with strings > 65535 bytes (ccw) - resolved.
+- 0006837: [Client] cheat, speed hack and other (ccw) - resolved.
+- 0006838: [Client] cheat, wallhack (ccw) - resolved.
+- 0006839: [Client] cheat, speed hack and other (ccw) - resolved.
+- 0003160: [General] Add a way to load and unload modules without restarting the server (kevuwk) - resolved.
+- 0006835: [Server] Server logic/lua/CLuaFunctionRef.cpp:72 assertion error (ccw) - resolved.
+- 0006834: [Server] "Player not found." console spam causes lag (ccw) - resolved.
+- 0006833: [Client] getZoneName citiesonly is not working correct (ccw) - resolved.
+- 0006793: [Server] setElementDimension dont work for element tree (kevuwk) - resolved.
+
+Resources:
+
+
+- 0005436: [Resources] Stealth Gamemode Contains Debug After Team Choice (arranTuna) - resolved.
+- 0006706: [Resources] Fallout: Fixed Freecam (Patch included) (arranTuna) - resolved.
+
+Map Editor:
+
+
+- 0007275: [Map Editor] Gamemode Settings are not in Test When no Save Before Test (arranTuna) - resolved.
+- 0007277: [General] Add object collisions option (arranTuna) - resolved.
+- 0007091: [Map Editor] Map settings change to default after map testing. (arranTuna) - resolved.
+- 0006704: [Map Editor] Add a scale option for the map editor (arranTuna) - resolved.
+- 0006612: [Map Editor] cannot save data "Invert Mouse Look" (arranTuna) - resolved.
+- 0005791: [Map Editor] Placing peds (arranTuna) - resolved.
+- 0006723: [General] RGB Color Picker For Vehicles (arranTuna) - resolved.
+
+
 Multi Theft Auto : San Andreas - 1.3
 ====================================
 
