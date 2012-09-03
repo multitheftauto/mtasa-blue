@@ -5,6 +5,13 @@ Multi Theft Auto : San Andreas - 1.3.1
 
 Goal: Improve 1.3 release.
 
+- 0006531: [Client] Crash when taking a screenshot and minimizing then restoring (ccw) - resolved.
+- 0007281: [Server] Requesting: fileCopy (ccw) - resolved.
+- 0007287: [Server] Can't start server in latest nightly (4587) (ccw) - resolved.
+- 0007248: [Server] Another server crash (ccw) - resolved.
+- 0007073: [Client] onClientFileDownloadComplete get full absolute filenames (x86) - resolved.
+- 0007064: [Server] setPlayerNametagColor(player, false) (reset overridecolor) does not work, bad argument - resolved.
+- 0003455: [Scripting] Request: Manual control of color/visibility of "player targeted" icon above head (JoeBullet) - resolved.
 - 0007244: [Client] Crash on ZHP server (ccw) - resolved.
 - 0007280: [Client] getSoundLength returns 0 for sound streams(not radio streams) (ccw) - resolved.
 - 0007276: [Server] Make setVehicleIdleRespawnDelay work for non-streamed in vehicles (ccw) - resolved.
