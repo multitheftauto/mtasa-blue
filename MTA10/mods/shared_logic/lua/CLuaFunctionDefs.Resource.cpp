@@ -93,12 +93,12 @@ int CLuaFunctionDefs::Call ( lua_State* luaVM )
                 }
                 else
                 {
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "call", "resource", 1 );
                 }
             }
             else
             {
-                m_pScriptDebugging->LogBadType ( luaVM );
+                m_pScriptDebugging->LogBadType ( luaVM, "call" );
             }
         }
     }
@@ -178,7 +178,7 @@ int CLuaFunctionDefs::GetResourceConfig ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getResourceConfig" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -204,10 +204,10 @@ int CLuaFunctionDefs::GetResourceName ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getResourceName", "resource", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getResourceName" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -232,7 +232,7 @@ int CLuaFunctionDefs::GetResourceFromName ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getResourceFromName" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -260,7 +260,7 @@ int CLuaFunctionDefs::GetResourceRootElement ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "getResourceRootElement", "resource", 1 );
 
     // Did we find a resource?
     if ( pResource )
@@ -274,7 +274,7 @@ int CLuaFunctionDefs::GetResourceRootElement ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getResourceRootElement" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -302,7 +302,7 @@ int CLuaFunctionDefs::GetResourceGUIElement ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "getResourceGUIElement", "resource", 1 );
 
     // Did we get a resource?
     if ( pResource )
@@ -316,7 +316,7 @@ int CLuaFunctionDefs::GetResourceGUIElement ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getResourceGUIElement" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -340,10 +340,10 @@ int CLuaFunctionDefs::GetResourceDynamicElementRoot ( lua_State* luaVM )
                 m_pScriptDebugging->LogError ( luaVM, "getResourceDynamicElementRoot: Resource %s Is Not Currently Running", pResource->GetName() );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getResourceDynamicElementRoot", "resource", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getResourceDynamicElementRoot" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -377,7 +377,7 @@ int CLuaFunctionDefs::GetResourceExportedFunctions ( lua_State *luaVM )
         return 1;
     }
     
-    m_pScriptDebugging->LogBadType ( luaVM );
+    m_pScriptDebugging->LogBadType ( luaVM, "getResourceExportedFunctions" );
     lua_pushboolean ( luaVM, false );
     return 1;
 }

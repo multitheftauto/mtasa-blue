@@ -97,6 +97,7 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
     m_bShowingWepdata = false;
 #endif
     m_LastPuresyncType = PURESYNC_TYPE_NONE;
+    m_bMessageShown = false;
 }
 
 

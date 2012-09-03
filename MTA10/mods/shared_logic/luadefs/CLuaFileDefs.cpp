@@ -89,13 +89,13 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
                     delete pFile;
 
                     // Output error
-                    m_pScriptDebugging->LogWarning ( luaVM, "%s; unable to load file", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                    m_pScriptDebugging->LogWarning ( luaVM, "fileCreate; unable to load file" );
                 }
             }
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fileCreate", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -128,7 +128,7 @@ int CLuaFileDefs::fileExists ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fileExists", *argStream.GetErrorMessage () ) );
 
 
     // Failed
@@ -188,13 +188,13 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
                     delete pFile;
 
                     // Output error
-                    m_pScriptDebugging->LogWarning ( luaVM, "%s; unable to load file", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                    m_pScriptDebugging->LogWarning ( luaVM, "fileOpen; unable to load file" );
                 }
             }
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fileOpen", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -215,7 +215,7 @@ int CLuaFileDefs::fileIsEOF ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "fileIsEOF", "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -239,13 +239,13 @@ int CLuaFileDefs::fileGetPos ( lua_State* luaVM )
         }
         else
         {
-            m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "fileGetPos", "file", 1 );
             lua_pushnil ( luaVM );
         }
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "fileGetPos", "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -276,19 +276,19 @@ int CLuaFileDefs::fileSetPos ( lua_State* luaVM )
                 }
                 else
                 {
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "fileSetPos", "file", 1 );
                     lua_pushnil ( luaVM );
                 }
                 return 1;
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "fileSetPos", "number", 2 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "fileSetPos", "number", 2 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "fileSetPos", "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -312,13 +312,13 @@ int CLuaFileDefs::fileGetSize ( lua_State* luaVM )
         }
         else
         {
-            m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "fileGetSize", "file", 1 );
             lua_pushnil ( luaVM );
         }
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "fileGetSize", "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -354,7 +354,7 @@ int CLuaFileDefs::fileRead ( lua_State* luaVM )
                 }
                 else
                 {
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "fileRead", "file", 1 );
                     lua_pushnil ( luaVM );
                 }
 
@@ -365,13 +365,13 @@ int CLuaFileDefs::fileRead ( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "fileRead", "number", 2 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "fileRead", "number", 2 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "fileRead", "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -404,7 +404,7 @@ int CLuaFileDefs::fileWrite ( lua_State* luaVM )
                 lArgBytesWritten = pFile->Write ( ulDataLen, pData );
                 if ( lArgBytesWritten == -1 )
                 {
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "fileWrite", "file", 1 );
                     lua_pushnil ( luaVM );
                     return 1;
                 }
@@ -420,10 +420,10 @@ int CLuaFileDefs::fileWrite ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "string", 2 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "fileWrite", "string", 2 );
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "fileWrite", "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -447,7 +447,7 @@ int CLuaFileDefs::fileFlush ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "fileFlush", "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -472,7 +472,7 @@ int CLuaFileDefs::fileClose ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
+        m_pScriptDebugging->LogBadPointer ( luaVM, "fileClose", "file", 1 );
 
     // Error
     lua_pushnil ( luaVM );
@@ -506,13 +506,13 @@ int CLuaFileDefs::fileDelete ( lua_State* luaVM )
                 else
                 {
                     // Output error
-                    m_pScriptDebugging->LogWarning ( luaVM, "%s; unable to delete file", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                    m_pScriptDebugging->LogWarning ( luaVM, "fileDelete; unable to delete file" );
                 }
             }
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fileDelete", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -549,7 +549,7 @@ int CLuaFileDefs::fileRename ( lua_State* luaVM )
                     // Does destination file exist?
                     if ( FileExists ( strNewAbsPath.c_str() ) )
                     {
-                        m_pScriptDebugging->LogWarning ( luaVM, "%s failed; destination file already exists", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                        m_pScriptDebugging->LogWarning ( luaVM, "fileRename failed; destination file already exists" );
                     }
                     else
                     {
@@ -564,19 +564,19 @@ int CLuaFileDefs::fileRename ( lua_State* luaVM )
                         }
                         else
                         {
-                            m_pScriptDebugging->LogWarning ( luaVM, "%s; unable to rename/move file", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                            m_pScriptDebugging->LogWarning ( luaVM, "fileRename; unable to rename/move file" );
                         }
                     }
                 }
                 else
                 {
-                    m_pScriptDebugging->LogWarning ( luaVM, "%s failed; source file doesn't exist", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                    m_pScriptDebugging->LogWarning ( luaVM, "fileRename failed; source file doesn't exist" );
                 }
             }
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fileRename", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );

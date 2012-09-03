@@ -17,7 +17,7 @@ Var Install_Dir
 
 !ifndef MAJOR_VER
     !define MAJOR_VER "1"
-    !define MINOR_VER "4"
+    !define MINOR_VER "3"
     !define MAINT_VER "0"
 !endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
@@ -149,12 +149,6 @@ Section "Data files" SEC01
     File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.lnf.xml"
     File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.png"
     File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.xml"
-                
-    SetOutPath "$INSTDIR\skins\Lighter black"
-    File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.is.xml"
-    File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.lnf.xml"
-    File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.png"
-    File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.xml"
 	
 	SetOutPath "$INSTDIR\MTA\cgui"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Falagard.xsd"

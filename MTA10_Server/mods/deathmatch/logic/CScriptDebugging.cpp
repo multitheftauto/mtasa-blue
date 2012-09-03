@@ -207,22 +207,25 @@ void CScriptDebugging::LogError ( SString strFile, int iLine, SString strMsg )
     Broadcast ( CDebugEchoPacket ( strText, 1, 255, 255, 255 ), 1 );
 }
 
-void CScriptDebugging::LogBadPointer ( lua_State* luaVM, const char* szArgumentType, unsigned int uiArgument )
+void CScriptDebugging::LogBadPointer ( lua_State* luaVM, const char* szFunction, const char* szArgumentType, unsigned int uiArgument )
 {
+    assert ( szFunction );
     assert ( szArgumentType );
-    LogWarning ( luaVM, "Bad '%s' pointer @ '%s'(%u)", szArgumentType, lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), uiArgument );
+    LogWarning ( luaVM, "Bad '%s' pointer @ '%s'(%u)", szArgumentType, szFunction, uiArgument );
 }
 
 
-void CScriptDebugging::LogBadType ( lua_State* luaVM )
+void CScriptDebugging::LogBadType ( lua_State* luaVM, const char* szFunction )
 {
-    LogWarning ( luaVM, "Bad argument @ '%s'", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+    assert ( szFunction );
+    LogWarning ( luaVM, "Bad argument @ '%s'", szFunction );
 }
 
 
-void CScriptDebugging::LogBadAccess ( lua_State* luaVM )
+void CScriptDebugging::LogBadAccess ( lua_State* luaVM, const char* szFunction )
 {
-    LogWarning ( luaVM, "Access denied @ '%s'", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+    assert ( szFunction );
+    LogWarning ( luaVM, "Access denied @ '%s'", szFunction );
 }
 
 

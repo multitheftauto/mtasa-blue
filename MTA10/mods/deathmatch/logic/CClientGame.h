@@ -54,7 +54,6 @@
 #include "../../shared_logic/CClientGUIElement.h"
 #include "CLocalServer.h"
 #include "CVoiceRecorder.h"
-#include "CSingularFileDownloadManager.h"
 #define HeliKill_List_Clear_Rate 500
 #define MIN_PUSH_ANTISPAM_RATE 1500
 class CGameEntityXRefManager;
@@ -259,7 +258,6 @@ public:
     inline CNametags*                   GetNametags                     ( void )        { return m_pNametags; }
     inline CSyncDebug*                  GetSyncDebug                    ( void )        { return m_pSyncDebug; };
     inline CRPCFunctions*               GetRPCFunctions                 ( void )        { return m_pRPCFunctions; }
-    inline CSingularFileDownloadManager* GetSingularFileDownloadManager ( void )        { return m_pSingularFileDownloadManager; };
 
     inline CClientEntity*               GetRootEntity                   ( void )        { return m_pRootEntity; }
     inline CEvents*                     GetEvents                       ( void )        { return &m_Events; }
@@ -404,8 +402,6 @@ public:
     void                                SetWeaponTypesUsingBulletSync   ( const std::set < eWeaponType >& weaponTypesUsingBulletSync );
     bool                                GetWeaponTypeUsesBulletSync     ( eWeaponType weaponType );
 
-    SString                             GetHTTPURL                      ( void ) { return m_strHTTPDownloadURL; };
-
 private:
 
     // CGUI Callbacks
@@ -451,7 +447,7 @@ private:
     #endif
 
 
-    void                                DownloadFiles                   ( bool bBackgroundDownload = false );
+    void                                DownloadFiles                   ( void );
 
     void                                QuitPlayer                      ( CClientPlayer* pPlayer, eQuitReason Reason );
 
@@ -527,8 +523,6 @@ public:
     void                                SetServerVersionSortable        ( const SString& strVersion )   { m_strServerVersionSortable = strVersion; }
     const SString&                      GetServerVersionSortable        ( void )                        { return m_strServerVersionSortable; }
 
-    void                                SetSingularTransfers            ( bool bTransfer )  { m_bSingularTransfer = bTransfer; };
-    void                                ShowTransferBox                 ( void )            { m_pTransferBox->Show (); };
     void                                SetVehExtrapolateSettings       ( const SVehExtrapolateSettings& settings ) { m_VehExtrapolateSettings = settings; }
     const SVehExtrapolateSettings&      GetVehExtrapolateSettings       ( void )                                    { return m_VehExtrapolateSettings; }
 
@@ -583,7 +577,6 @@ private:
     CLatentTransferManager*             m_pLatentTransferManager;
     bool                                m_bInitiallyFadedOut;
     bool                                m_bHudAreaNameDisabled;
-    CSingularFileDownloadManager*       m_pSingularFileDownloadManager;
     CGameEntityXRefManager*             m_pGameEntityXRefManager;
     CClientModelCacheManager*           m_pModelCacheManager;
 
@@ -687,8 +680,6 @@ private:
     bool                                m_bBeingDeleted;        // To enable speedy disconnect
 
     bool                                m_bWasMinimized;
-
-    bool                                m_bSingularTransfer;
 
     // Cache for speeding up collision processing
 public:

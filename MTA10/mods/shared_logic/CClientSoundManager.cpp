@@ -97,13 +97,7 @@ void CClientSoundManager::DoPulse ( void )
 
         // Delete sound if finished
         if ( pSound->IsFinished () )
-        {
-            // call onClientSoundStopped
-            CLuaArguments Arguments;
-            Arguments.PushString ( "finished" );     // Reason
-            pSound->CallEvent ( "onClientSoundStopped", Arguments, false );
             g_pClientGame->GetElementDeleter()->Delete ( pSound );
-        }
     }
     UpdateDistanceStreaming ( vecPosition );
 }

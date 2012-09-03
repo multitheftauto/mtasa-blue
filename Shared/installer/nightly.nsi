@@ -19,12 +19,12 @@ Var CreateDesktopIcon
 Var RedistInstalled
 
 ; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\GDFImp.gdf.xml
-!define GUID "{DF780162-2450-4665-9BA2-EAB14ED640A3}"
+!define GUID "{DEEC1E88-94A4-412C-B64A-1D772535AD58}"
 
 
 !ifndef MAJOR_VER
     !define MAJOR_VER "1"
-    !define MINOR_VER "4"
+    !define MINOR_VER "3"
     !define MAINT_VER "0"
 !endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"

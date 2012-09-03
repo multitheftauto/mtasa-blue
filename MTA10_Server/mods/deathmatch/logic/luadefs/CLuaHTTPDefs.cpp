@@ -46,13 +46,13 @@ int CLuaHTTPDefs::httpWrite ( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogError ( luaVM, "%s: Can only be used in HTML scripts", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                m_pScriptDebugging->LogError ( luaVM, "httpWrite: Can only be used in HTML scripts" );
         } 
         else
-            m_pScriptDebugging->LogError ( luaVM, lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+            m_pScriptDebugging->LogError ( luaVM, "httpWrite" );
     }   
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "httpWrite" );
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -76,13 +76,13 @@ int CLuaHTTPDefs::httpSetResponseHeader ( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogError ( luaVM, "%s: Can only be used in HTML scripts", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                m_pScriptDebugging->LogError ( luaVM, "httpSetResponseHeader: Can only be used in HTML scripts" );
         } 
         else
-            m_pScriptDebugging->LogError ( luaVM, lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+            m_pScriptDebugging->LogError ( luaVM, "httpSetResponseHeader" );
     }   
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "httpSetResponseHeader" );
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -106,13 +106,13 @@ int CLuaHTTPDefs::httpSetResponseCookie ( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogError ( luaVM, "%s: Can only be used in HTML scripts", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                m_pScriptDebugging->LogError ( luaVM, "httpSetResponseCookie: Can only be used in HTML scripts" );
         } 
         else
-            m_pScriptDebugging->LogError ( luaVM, lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+            m_pScriptDebugging->LogError ( luaVM, "httpSetResponseCookie" );
     }   
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "httpSetResponseCookie" );
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -135,13 +135,13 @@ int CLuaHTTPDefs::httpSetResponseCode ( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogError ( luaVM, "%s: Can only be used in HTML scripts", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                m_pScriptDebugging->LogError ( luaVM, "httpSetResponseCode: Can only be used in HTML scripts" );
         } 
         else
-            m_pScriptDebugging->LogError ( luaVM, lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+            m_pScriptDebugging->LogError ( luaVM, "httpSetResponseCode" );
     }   
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "httpSetResponseCode" );
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -161,10 +161,10 @@ int CLuaHTTPDefs::httpClear ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogError ( luaVM, "%s: Can only be used in HTML scripts", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+            m_pScriptDebugging->LogError ( luaVM, "httpClear: Can only be used in HTML scripts" );
     } 
     else
-        m_pScriptDebugging->LogError ( luaVM, lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );   
+        m_pScriptDebugging->LogError ( luaVM, "httpClear" );   
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -188,10 +188,10 @@ int CLuaHTTPDefs::httpRequestLogin ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogError ( luaVM, "%s: Can only be used in HTML scripts", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+            m_pScriptDebugging->LogError ( luaVM, "httpRequestLogin: Can only be used in HTML scripts" );
     } 
     else
-        m_pScriptDebugging->LogError ( luaVM, lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );   
+        m_pScriptDebugging->LogError ( luaVM, "httpRequestLogin" );   
     lua_pushboolean ( luaVM, false );
     return 1;
 }

@@ -151,7 +151,7 @@ int CLuaWorldDefs::getZoneName ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getZoneName" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -240,10 +240,10 @@ int CLuaWorldDefs::isGarageOpen ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "isGarageOpen" );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isGarageOpen" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -291,7 +291,7 @@ int CLuaWorldDefs::setTime ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setTime" );
 
     // Return false
     lua_pushboolean ( luaVM, false );
@@ -368,7 +368,7 @@ int CLuaWorldDefs::setTrafficLightState ( lua_State* luaVM )
     }
 
     if ( argStream.HasErrors () )
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setTrafficLightState", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -386,7 +386,7 @@ int CLuaWorldDefs::setTrafficLightsLocked ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightsLocked" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -406,7 +406,7 @@ int CLuaWorldDefs::setJetpackMaxHeight ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setJetpackMaxHeight" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -427,7 +427,7 @@ int CLuaWorldDefs::setWeather ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setWeather" );
 
     // Return false
     lua_pushboolean ( luaVM, false );
@@ -449,7 +449,7 @@ int CLuaWorldDefs::setWeatherBlended ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setWeatherBlended" );
 
     // Return false
     lua_pushboolean ( luaVM, false );
@@ -470,7 +470,7 @@ int CLuaWorldDefs::setGravity ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setGravity" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -490,7 +490,7 @@ int CLuaWorldDefs::setGameSpeed ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setGameSpeed" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -510,7 +510,7 @@ int CLuaWorldDefs::setWaveHeight ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setWaveHeight" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -563,7 +563,7 @@ int CLuaWorldDefs::setSkyGradient ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setSkyGradient" );
 
     // Return false
     lua_pushboolean ( luaVM, false );
@@ -632,7 +632,7 @@ int CLuaWorldDefs::setHeatHaze ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setHeatHaze" );
 
     // Return false
     lua_pushboolean ( luaVM, false );
@@ -785,7 +785,7 @@ int CLuaWorldDefs::setInteriorSoundsEnabled ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setInteriorSoundsEnabled" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -807,7 +807,7 @@ int CLuaWorldDefs::setRainLevel ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setRainLevel" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -829,7 +829,7 @@ int CLuaWorldDefs::setSunSize ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setSunSize" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -856,7 +856,7 @@ int CLuaWorldDefs::setSunColor ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setSunColor" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -880,7 +880,7 @@ int CLuaWorldDefs::setWindVelocity ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setWindVelocity" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -902,7 +902,7 @@ int CLuaWorldDefs::setFarClipDistance ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setFarClipDistance" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -924,7 +924,7 @@ int CLuaWorldDefs::setFogDistance ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setFogDistance" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1066,7 +1066,7 @@ int CLuaWorldDefs::setFPSLimit ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setFPSLimit" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1102,10 +1102,10 @@ int CLuaWorldDefs::setGarageOpen ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "setGarageOpen" );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setGarageOpen" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1129,11 +1129,11 @@ int CLuaWorldDefs::setGlitchEnabled ( lua_State* luaVM )
         }
         else
         {
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "setGlitchEnabled" );
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setGlitchEnabled" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1153,7 +1153,7 @@ int CLuaWorldDefs::isGlitchEnabled ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isGlitchEnabled" );
 
     lua_pushnil ( luaVM );
     return 1;
@@ -1177,7 +1177,7 @@ int CLuaWorldDefs::setJetpackWeaponEnabled ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setJetpackWeaponEnabled", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1200,7 +1200,7 @@ int CLuaWorldDefs::getJetpackWeaponEnabled ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getJetpackWeaponEnabled", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1220,7 +1220,7 @@ int CLuaWorldDefs::setCloudsEnabled ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setCloudsEnabled" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1258,7 +1258,7 @@ int CLuaWorldDefs::setAircraftMaxHeight ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setAircraftMaxHeight" );
         
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1294,7 +1294,7 @@ int CLuaWorldDefs::setOcclusionsEnabled ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setOcclusionsEnabled", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;

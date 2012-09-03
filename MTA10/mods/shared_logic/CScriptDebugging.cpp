@@ -155,19 +155,22 @@ void CScriptDebugging::LogError ( SString strFile, int iLine, SString strMsg )
     g_pCore->DebugEchoColor ( strText, 255, 0, 0 );
 }
 
-void CScriptDebugging::LogBadPointer ( lua_State* luaVM, const char* szArgumentType, unsigned int uiArgument )
+void CScriptDebugging::LogBadPointer ( lua_State* luaVM, const char* szFunction, const char* szArgumentType, unsigned int uiArgument )
 {
+    assert ( szFunction );
     assert ( szArgumentType );
 
     // Populate a message to print/send
-    LogWarning ( luaVM, "Bad '%s' pointer @ '%s'(%u)", szArgumentType, lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), uiArgument );
+    LogWarning ( luaVM, "Bad '%s' pointer @ '%s'(%u)", szArgumentType, szFunction, uiArgument );
 }
 
 
-void CScriptDebugging::LogBadType ( lua_State* luaVM )
+void CScriptDebugging::LogBadType ( lua_State* luaVM, const char* szFunction )
 {
+    assert ( szFunction );
+
     // Populate a message to print/send
-    LogWarning ( luaVM, "Bad argument @ '%s'", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+    LogWarning ( luaVM, "Bad argument @ '%s'", szFunction );
 }
 
 
@@ -180,10 +183,12 @@ void CScriptDebugging::LogCustom ( lua_State* luaVM, const char* szMessage )
 }
 
 
-void CScriptDebugging::LogBadLevel ( lua_State* luaVM, unsigned int uiRequiredLevel )
+void CScriptDebugging::LogBadLevel ( lua_State* luaVM, const char* szFunction, unsigned int uiRequiredLevel )
 {
+    assert ( szFunction );
+
     // Populate a message to print/send
-    LogWarning ( luaVM, "Requires level '%d' @ '%s", uiRequiredLevel, lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+    LogWarning ( luaVM, "Requires level '%d' @ '%s", uiRequiredLevel, szFunction );
 }
 
 

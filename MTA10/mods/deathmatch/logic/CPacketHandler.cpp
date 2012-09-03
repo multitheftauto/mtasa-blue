@@ -178,10 +178,6 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_DetonateSatchels ( bitStream );
             return true;
 
-        case PACKET_ID_DESTROY_SATCHELS:
-            Packet_DestroySatchels ( bitStream );
-            return true;
-
         case PACKET_ID_VOICE_DATA:
             Packet_VoiceData ( bitStream );
             return true;
@@ -268,8 +264,9 @@ void CPacketHandler::Packet_ServerConnected ( NetBitStreamInterface& bitStream )
     }
 
     // Get the long server version
-    SString strServerVersionSortable;
-    bitStream.ReadString ( strServerVersionSortable );
+    SString strServerVersionSortable = SStringX ( szVersionString ).SplitRight ( " ", NULL, 2 ).SplitLeft ( " " );
+    if ( bitStream.Version () >= 0x29 )
+        bitStream.ReadString ( strServerVersionSortable );
     g_pClientGame->SetServerVersionSortable ( strServerVersionSortable );
 
     //m_Status = CClientGame::STATUS_TRANSFER;
@@ -3052,7 +3049,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         //pEntry->SetTailLight ( (CHandlingEntry::eLightType)handling.data.ucTailLight );
                         //pEntry->SetAnimGroup ( handling.data.ucAnimGroup );
                     }
-                    if ( bitStream.Version ( ) >= 0x02A )
+                    if ( bitStream.Version ( ) >= 0x02B )
                     {
                         unsigned char ucSirenCount = 0;
                         unsigned char ucSirenType = 0;
@@ -4449,12 +4446,9 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                         switch ( ucChunkSubType )
                         {
                             case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE:
-                                {
-                                    bool bDownload = bitStream.ReadBit ();
-                                    pDownloadableResource = pResource->QueueFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE, szChunkData, chunkChecksum, bDownload );
+                                pDownloadableResource = pResource->QueueFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE, szChunkData, chunkChecksum );
 
-                                    break;
-                                }
+                                break;
                             case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
                                 pDownloadableResource = pResource->QueueFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT, szChunkData, chunkChecksum );
 
@@ -4469,7 +4463,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                         }
 
                         // Is it a valid downloadable resource?
-                        if ( pDownloadableResource && pDownloadableResource->IsAutoDownload() )
+                        if ( pDownloadableResource )
                         {
                             // Does the Client and Server checksum Match?
                             if ( !pDownloadableResource->DoesClientAndServerChecksumMatch () )
@@ -4625,24 +4619,6 @@ void CPacketHandler::Packet_DetonateSatchels ( NetBitStreamInterface& bitStream 
             if ( pPlayer->IsLocalPlayer () )
             {
                 pPlayer->RemoveWeapon ( WEAPONTYPE_DETONATOR );
-            }
-        }
-    }
-}
-
-void CPacketHandler::Packet_DestroySatchels ( NetBitStreamInterface& bitStream )
-{
-    ElementID Player;
-
-    if ( bitStream.Read ( Player ) )
-    {
-        // Grab the player
-        CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->Get ( Player );
-        if ( pPlayer )
-        {
-            if ( !pPlayer->IsLocalPlayer () )
-            {
-                pPlayer->DestroySatchelCharges ( false, true );
             }
         }
     }

@@ -81,6 +81,7 @@
 #include <CClientTexture.h>
 #include <CClientShader.h>
 #include <CCustomData.h>
+#include <CConfig.h>
 #include <CElementArray.h>
 #include <CLogger.h>
 #include <CMapEventManager.h>

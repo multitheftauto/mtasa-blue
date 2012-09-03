@@ -63,7 +63,7 @@ int CLuaFxDefs::fxAddBlood ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "fxAddBlood" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -104,7 +104,7 @@ int CLuaFxDefs::fxAddWood ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "fxAddWood" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -161,7 +161,7 @@ int CLuaFxDefs::fxAddSparks ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "fxAddSparks" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -196,7 +196,7 @@ int CLuaFxDefs::fxAddTyreBurst ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "fxAddTyreBurst" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -240,7 +240,7 @@ int CLuaFxDefs::fxAddBulletImpact ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "fxAddBulletImpact" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -274,7 +274,7 @@ int CLuaFxDefs::fxAddPunchImpact ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "fxAddPunchImpact" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -318,7 +318,7 @@ int CLuaFxDefs::fxAddDebris ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "fxAddDebris" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -362,7 +362,7 @@ int CLuaFxDefs::fxAddGlass ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "fxAddGlass" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -390,7 +390,7 @@ int CLuaFxDefs::fxAddWaterHydrant ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "fxAddWaterHydrant" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -428,7 +428,7 @@ int CLuaFxDefs::fxAddGunshot ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "fxAddGunshot" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -462,7 +462,7 @@ int CLuaFxDefs::fxAddTankFire ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "fxAddTankFire" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -490,7 +490,7 @@ int CLuaFxDefs::fxAddWaterSplash ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "fxAddWaterSplash" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -518,7 +518,7 @@ int CLuaFxDefs::fxAddBulletSplash ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "fxAddBulletSplash" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -546,7 +546,7 @@ int CLuaFxDefs::fxAddFootSplash ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "fxAddFootSplash" );
 
     // Failed
     lua_pushboolean ( luaVM, false );

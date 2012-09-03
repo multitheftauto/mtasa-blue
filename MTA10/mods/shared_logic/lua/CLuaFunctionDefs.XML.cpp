@@ -30,7 +30,7 @@ int CLuaFunctionDefs::XMLNodeFindChild ( lua_State* luaVM )
         lua_type ( luaVM, 2 ) != LUA_TSTRING || 
         lua_type ( luaVM, 3 ) != LUA_TNUMBER )
     {
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "xmlNodeFindChild" );
 
         lua_pushboolean ( luaVM, false );
         return 1;
@@ -99,7 +99,7 @@ int CLuaFunctionDefs::XMLNodeGetChildren ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "xmlNodeGetChildren" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -113,7 +113,7 @@ int CLuaFunctionDefs::XMLNodeGetValue ( lua_State* luaVM )
     if ( lua_type ( luaVM, 1 ) != LUA_TLIGHTUSERDATA || 
         !( iSecondVariableType == LUA_TNONE || iSecondVariableType == LUA_TNUMBER ) )
     {
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "xmlNodeGetValue" );
 
         lua_pushboolean ( luaVM, false );
         return 1;
@@ -147,7 +147,7 @@ int CLuaFunctionDefs::XMLNodeSetValue ( lua_State* luaVM )
     if ( lua_type ( luaVM, 1 ) != LUA_TLIGHTUSERDATA || 
         lua_type ( luaVM, 2 ) != LUA_TSTRING )
     {
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "xmlNodeSetValue" );
 
         lua_pushboolean ( luaVM, false );
         return 1;
@@ -173,7 +173,7 @@ int CLuaFunctionDefs::XMLNodeGetName ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) != LUA_TLIGHTUSERDATA )
     {
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "xmlNodeGetName" );
 
         lua_pushboolean ( luaVM, false );
         return 1;
@@ -212,10 +212,10 @@ int CLuaFunctionDefs::XMLNodeSetName ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "xml-node", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "xmlNodeSetName", "xml-node", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "xmlNodeSetName" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -243,10 +243,10 @@ int CLuaFunctionDefs::XMLNodeGetAttributes ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "xmlNodeGetAttributes" );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "xmlNodeGetAttributes" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -261,7 +261,7 @@ int CLuaFunctionDefs::XMLNodeGetAttribute ( lua_State* luaVM )
         !( iThirdVariableType == LUA_TNONE || iThirdVariableType == LUA_TNUMBER ) ||
         lua_type ( luaVM, 2 ) != LUA_TSTRING )
     {
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "xmlNodeGetAttribute" );
 
         lua_pushboolean ( luaVM, false );
         return 1;
@@ -345,7 +345,7 @@ int CLuaFunctionDefs::XMLNodeSetAttribute ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "xmlNodeSetAttribute" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -370,7 +370,7 @@ int CLuaFunctionDefs::XMLNodeGetParent ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "xmlNodeGetParent" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -421,7 +421,7 @@ int CLuaFunctionDefs::XMLLoadFile ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "xmlLoadFile", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -440,14 +440,14 @@ int CLuaFunctionDefs::XMLCreateFile ( lua_State* luaVM )
     // Safety check: Don't allow the rootNodeName "private" incase user forget to declare a node name
     if ( rootNodeName == EnumToString ( ACCESS_PRIVATE ) )
     {
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), "Expected string at argument 2, got access-type" ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "xmlCreateFile", "Expected string at argument 2, got access-type" ) );
         lua_pushboolean ( luaVM, false );
         return 1;
     }
 
     if ( argStream.HasErrors () )
     {
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "xmlCreateFile", *argStream.GetErrorMessage () ) );
         lua_pushboolean ( luaVM, false );
         return 1;
     }
@@ -491,7 +491,7 @@ int CLuaFunctionDefs::XMLSaveFile ( lua_State* luaVM )
     // CXMLNode*
     if ( lua_type ( luaVM, 1 ) != LUA_TLIGHTUSERDATA )
     {
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "xmlSaveFile" );
 
         lua_pushboolean ( luaVM, false );
         return 1;
@@ -521,7 +521,7 @@ int CLuaFunctionDefs::XMLUnloadFile ( lua_State* luaVM )
     // CXMLNode*
     if ( lua_type ( luaVM, 1 ) != LUA_TLIGHTUSERDATA )
     {
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "xmlUnloadFile" );
 
         lua_pushboolean ( luaVM, false );
         return 1;
@@ -552,7 +552,7 @@ int CLuaFunctionDefs::XMLCreateChild ( lua_State* luaVM )
     if ( lua_type ( luaVM, 1 ) != LUA_TLIGHTUSERDATA ||
         lua_type ( luaVM, 2 ) != LUA_TSTRING )
     {
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "xmlCreateChild" );
 
         lua_pushboolean ( luaVM, false );
         return 1;
@@ -601,7 +601,7 @@ int CLuaFunctionDefs::XMLDestroyNode ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "xmlDestroyNode" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -675,7 +675,7 @@ int CLuaFunctionDefs::XMLCopyFile ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "xmlCopyFile", *argStream.GetErrorMessage () ) );
 
     // Error
     lua_pushboolean ( luaVM, false );

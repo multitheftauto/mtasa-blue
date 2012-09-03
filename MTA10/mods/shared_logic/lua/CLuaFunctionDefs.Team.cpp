@@ -34,7 +34,7 @@ int CLuaFunctionDefs::GetTeamFromName ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getTeamFromName" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -56,10 +56,10 @@ int CLuaFunctionDefs::GetTeamName ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "team", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getTeamName", "team", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getTeamName" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -82,10 +82,10 @@ int CLuaFunctionDefs::GetTeamColor ( lua_State* luaVM )
             return 3;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "team", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getTeamColor", "team", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getTeamColor" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -104,10 +104,10 @@ int CLuaFunctionDefs::GetTeamFriendlyFire ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "team", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getTeamFriendlyFire", "team", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getTeamFriendlyFire" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -140,10 +140,10 @@ int CLuaFunctionDefs::GetPlayersInTeam ( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "team", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "getPlayersInTeam", "team", 1 );
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "getPlayersInTeam" );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -163,10 +163,10 @@ int CLuaFunctionDefs::CountPlayersInTeam ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "team", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "countPlayersInTeam", "team", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "countPlayersInTeam" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

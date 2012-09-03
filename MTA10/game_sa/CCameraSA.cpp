@@ -287,18 +287,6 @@ VOID CCameraSA::SetMatrix ( CMatrix * matrix )
     }   
 }
 
-VOID CCameraSA::GetRotation ( float &fX, float &fY )
-{
-    fX = *(float *)0xB6F258;
-    fY = *(float *)0xB6F248;
-}
-
-VOID CCameraSA::SetRotation ( float fX, float fY )
-{
-    MemPutFast < float > ( 0xB6F258, fX );
-    MemPutFast < float > ( 0xB6F248, fY );
-}
-
 VOID CCameraSA::SetCamPositionForFixedMode ( CVector * vecPosition, CVector * vecUpOffset )
 {
     DWORD dwFunc = FUNC_SetCamPositionForFixedMode;

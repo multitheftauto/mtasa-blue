@@ -102,7 +102,7 @@ int CLuaACLDefs::aclCreate ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "aclCreate" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -128,7 +128,7 @@ int CLuaACLDefs::aclDestroy ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "aclDestroy" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -153,7 +153,7 @@ int CLuaACLDefs::aclGet ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "aclGet" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -253,7 +253,7 @@ int CLuaACLDefs::aclGetRight ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "aclGetRight" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -328,7 +328,7 @@ int CLuaACLDefs::aclSetRight ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "aclSetRight" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -476,7 +476,7 @@ int CLuaACLDefs::aclRemoveRight ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "aclRemoveRight" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -505,7 +505,7 @@ int CLuaACLDefs::aclCreateGroup ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "aclCreateGroup" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -533,7 +533,7 @@ int CLuaACLDefs::aclDestroyGroup ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "aclDestroyGroup" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -558,7 +558,7 @@ int CLuaACLDefs::aclGetGroup ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "aclGetGroup" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -602,7 +602,7 @@ int CLuaACLDefs::aclGroupGetName ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "aclGroupGetName" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -632,7 +632,7 @@ int CLuaACLDefs::aclGroupAddACL ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "aclGroupAddACL" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -696,7 +696,7 @@ int CLuaACLDefs::aclGroupRemoveACL ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "aclGroupRemoveACL" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -749,7 +749,7 @@ int CLuaACLDefs::aclGroupAddObject ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "aclGroupAddObject" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -849,7 +849,7 @@ int CLuaACLDefs::aclGroupRemoveObject ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "aclGroupRemoveObject" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -943,13 +943,13 @@ int CLuaACLDefs::hasObjectPermissionTo ( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogBadType ( luaVM );
+                m_pScriptDebugging->LogBadType ( luaVM, "hasObjectPermissionTo" );
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "hasObjectPermissionTo" );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "hasObjectPermissionTo" );
 
     // Failed
     lua_pushnil ( luaVM );

@@ -108,8 +108,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_bTransferResource = false;            // flag controls whether a resource is being transferred or not
     m_bTransferInitiated = false;           // flag controls whether a transfer has been initiated (to prevent PacketResource, AUTOPATCHER_REQUEST_FILES priority issues)
 
-    m_bSingularTransfer = false;            // flag controls whether a singular file is being transferred or not
-
     m_dwTransferStarted = 0;                // timestamp for transfer start
     m_bTransferReset = false;               // flag controls whether we have to reset the transfer counter
 
@@ -232,9 +230,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     // MTA Voice
     m_pVoiceRecorder = new CVoiceRecorder();
-
-    // Singular file download manager
-    m_pSingularFileDownloadManager = new CSingularFileDownloadManager();
 
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
@@ -376,10 +371,6 @@ CClientGame::~CClientGame ( void )
 
     delete m_pVoiceRecorder;
     m_pVoiceRecorder = NULL;
-
-    // Singular file download manager
-    delete m_pSingularFileDownloadManager;
-    m_pSingularFileDownloadManager = NULL;
 
     // NULL the message/net stuff
     g_pMultiplayer->SetPreContextSwitchHandler ( NULL );
@@ -1171,15 +1162,7 @@ void CClientGame::DoPulses ( void )
     else if ( m_Status == CClientGame::STATUS_JOINED )
     {
         // Pulse DownloadFiles if we're transferring stuff
-        if ( m_bTransferResource ) 
-        {
-            DownloadFiles ();
-        }
-        else if ( m_bSingularTransfer )
-        {
-            DownloadFiles ( true );
-        }
-
+        if ( m_bTransferResource ) DownloadFiles ();
     }
     else if ( m_Status == CClientGame::STATUS_TRANSFER )
     {
@@ -2791,11 +2774,6 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientSoundStream", "success, length, streamName", NULL, false );
     m_Events.AddEvent ( "onClientSoundFinishedDownload", "length", NULL, false );
     m_Events.AddEvent ( "onClientSoundChangedMeta", "streamTitle", NULL, false );
-    m_Events.AddEvent ( "onClientSoundStarted", "reason", NULL, false );
-    m_Events.AddEvent ( "onClientSoundStopped", "reason", NULL, false );
-
-    // Misc events
-    m_Events.AddEvent ( "onClientFileDownloadComplete", "fileName, success", NULL, false );
     
     m_Events.AddEvent ( "onClientWeaponFire", "ped, x, y, z", NULL, false );
 }
@@ -3868,10 +3846,9 @@ bool CClientGame::ProcessCollisionHandler ( CEntitySAInterface* pThisInterface, 
     return true;
 }
 
-void CClientGame::DownloadFiles ( bool bBackgroundDownload )
+void CClientGame::DownloadFiles ( void )
 {
-    if ( !bBackgroundDownload )
-        m_pTransferBox->DoPulse (); // should increase FPS while downloading singular files
+    m_pTransferBox->DoPulse ();
 
     CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager ();
     if ( pHTTP )
@@ -3884,16 +3861,8 @@ void CClientGame::DownloadFiles ( bool bBackgroundDownload )
 
                 m_bTransferReset = false;
             }
-            if ( !bBackgroundDownload && !m_bTransferResource )
-                m_pTransferBox->SetInfo ( pHTTP->GetDownloadSizeNow () ); // no need to set this if it's a singular file
 
-            if ( bBackgroundDownload && m_pTransferBox->IsVisible() )
-            {
-                if ( pHTTP->GetDownloadSizeNow () > m_pTransferBox->GetTotalSize () )
-                {
-                    m_pTransferBox->Hide(); // singular files don't add to total size so if current size > total size then just hide, should increase FPS a little as well
-                }
-            }
+            m_pTransferBox->SetInfo ( pHTTP->GetDownloadSizeNow () );
         }
         else
         {
@@ -3910,20 +3879,10 @@ void CClientGame::DownloadFiles ( bool bBackgroundDownload )
             }
             else
             {
-                // Resource transfers can't deal with errors but singular transfers can
-                if ( m_bTransferResource )
-                {
-                    // Throw the error and disconnect
-                    g_pCore->GetModManager ()->RequestUnload ();
-                    g_pCore->ShowMessageBox ( "Error", szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR );
-                    g_pCore->GetConsole ()->Printf ( "Download error: %s", szHTTPError );
-                }
-                else
-                {
-                    m_bTransferReset = true;
-                    Event_OnTransferComplete ();
-                    m_dwTransferStarted = 0;
-                }
+                // Throw the error and disconnect
+                g_pCore->GetModManager ()->RequestUnload ();
+                g_pCore->ShowMessageBox ( "Error", szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->GetConsole ()->Printf ( "Download error: %s", szHTTPError );
             }
         }
     }
@@ -4852,19 +4811,6 @@ void CClientGame::Event_OnTransferComplete ( void )
             m_pTransferBox->Hide ();
         }
     }
-    else if ( m_bSingularTransfer )  /*** singular file transfer (lua downloadFile) ***/
-    {
-        // Disable m_bSingularTransfer, if there are no more files in the autopatch query (to prevent "simulatenous" transfer fuck-ups)
-        if ( !g_pNet->GetHTTPDownloadManager ()->IsDownloading () )
-        {
-            // Can't clear list until all files have been processed
-            if ( m_pSingularFileDownloadManager->AllComplete () )
-            {
-                m_bSingularTransfer = false;
-                m_pSingularFileDownloadManager->ClearList ();
-            }
-        }
-    }
     else                        /*** on-join transfer ***/
     {
         // Hide the transfer box
@@ -5170,13 +5116,6 @@ void CClientGame::ResetMapInfo ( void )
         m_pLocalPlayer->SetVoice ( sVoiceType, sVoiceID );
 
         m_pLocalPlayer->DestroySatchelCharges( false, true );
-        // Tell the server we want to destroy our satchels
-        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
-        if ( pBitStream )
-        {
-            g_pNet->SendPacket ( PACKET_ID_DESTROY_SATCHELS, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
-            g_pNet->DeallocateNetBitStream ( pBitStream );
-        }
     }
 }
 

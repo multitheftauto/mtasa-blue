@@ -33,7 +33,7 @@ int CLuaFunctionDefs::GetVehicleType ( lua_State* luaVM )
         ucModel = static_cast < unsigned long > (lua_tonumber ( luaVM, 1 ));
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleType" );
 
     if ( ucModel >= 400 && ucModel < 610 )
         lua_pushstring ( luaVM, CVehicleNames::GetVehicleTypeName ( ucModel ) );
@@ -61,7 +61,7 @@ int CLuaFunctionDefs::IsVehicleTaxiLightOn ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isVehicleTaxiLightOn", "vehicle", 1 );
     }
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -83,7 +83,7 @@ int CLuaFunctionDefs::SetVehicleTaxiLightOn ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleTaxiLightOn", "vehicle", 1 );
     }
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -106,10 +106,10 @@ int CLuaFunctionDefs::GetVehicleVariant ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleVariant", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleVariant" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -149,10 +149,10 @@ int CLuaFunctionDefs::GetVehicleColor ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleColor", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleColor" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -172,7 +172,7 @@ int CLuaFunctionDefs::GetVehicleModelFromName ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleModelFromName" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -199,10 +199,10 @@ int CLuaFunctionDefs::GetVehicleLandingGearDown ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleLandingGear", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleLandingGearDown" );
 
     lua_pushnil ( luaVM );
     return 1;
@@ -222,7 +222,7 @@ int CLuaFunctionDefs::GetVehicleMaxPassengers ( lua_State* luaVM )
                 model = pVehicle->GetModel();
             else
             {
-                m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleMaxPassengers", "vehicle", 1 );
                 lua_pushboolean ( luaVM, false );
                 return 1;
             }
@@ -233,7 +233,7 @@ int CLuaFunctionDefs::GetVehicleMaxPassengers ( lua_State* luaVM )
 
             if (!CClientVehicleManager::IsValidModel(model))
             {
-                m_pScriptDebugging->LogBadType ( luaVM );
+                m_pScriptDebugging->LogBadType ( luaVM, "getVehicleMaxPassengers" );
                 lua_pushboolean ( luaVM, false );
                 return 1;
             }
@@ -247,7 +247,7 @@ int CLuaFunctionDefs::GetVehicleMaxPassengers ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleMaxPassengers" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -277,10 +277,10 @@ int CLuaFunctionDefs::GetVehicleOccupant ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleOccupant", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleOccupant" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -320,10 +320,10 @@ int CLuaFunctionDefs::GetVehicleOccupants ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleOccupants", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleOccupants" );
             
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -345,10 +345,10 @@ int CLuaFunctionDefs::GetVehicleController ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleController", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleController" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -375,10 +375,10 @@ int CLuaFunctionDefs::GetVehicleSirensOn ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleSirensOn", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleSirensOn" );
 
     lua_pushnil ( luaVM );
     return 1;
@@ -401,10 +401,10 @@ int CLuaFunctionDefs::GetVehicleTurnVelocity ( lua_State* luaVM )
             return 3;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleTurnVelocity", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleTurnVelocity" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -426,10 +426,10 @@ int CLuaFunctionDefs::GetVehicleTurretPosition ( lua_State* luaVM )
             return 2;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleTurretPosition", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleTurretPosition" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -448,10 +448,10 @@ int CLuaFunctionDefs::IsVehicleLocked ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isVehicleLocked", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isVehicleLocked" );
 
     lua_pushnil ( luaVM );
     return 1;
@@ -478,10 +478,10 @@ int CLuaFunctionDefs::GetVehicleUpgradeOnSlot ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleUpgradeOnSlot", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleUpgradeOnSlot" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -522,10 +522,10 @@ int CLuaFunctionDefs::GetVehicleUpgrades ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleUpgrades", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleUpgrades" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -558,10 +558,10 @@ int CLuaFunctionDefs::GetVehicleUpgradeSlotName ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "slot/upgrade", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleUpgradeSlotName", "slot/upgrade", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleUpgradeSlotName" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -611,10 +611,10 @@ int CLuaFunctionDefs::GetVehicleCompatibleUpgrades ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleCompatibleUpgrades", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleCompatibleUpgrades" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -641,10 +641,10 @@ int CLuaFunctionDefs::GetVehicleWheelStates ( lua_State* luaVM )
             return 4;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleWheelStates", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleWheelStates" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -667,10 +667,10 @@ int CLuaFunctionDefs::GetVehicleDoorState ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleDoorState", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleDoorState" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -693,10 +693,10 @@ int CLuaFunctionDefs::GetVehicleLightState ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleLightState", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleLightState" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -719,10 +719,10 @@ int CLuaFunctionDefs::GetVehiclePanelState ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehiclePanelState", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehiclePanelState" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -741,10 +741,10 @@ int CLuaFunctionDefs::GetVehicleOverrideLights ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleOverrideLights", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleOverrideLights" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -766,10 +766,10 @@ int CLuaFunctionDefs::GetVehicleTowedByVehicle ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleTowedByVehicle", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleTowedByVehicle" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -791,10 +791,10 @@ int CLuaFunctionDefs::GetVehicleTowingVehicle ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleTowingVehicle", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleTowingVehicle" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -813,10 +813,10 @@ int CLuaFunctionDefs::GetVehiclePaintjob ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehiclePaintjob", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehiclePaintjob" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -840,10 +840,10 @@ int CLuaFunctionDefs::GetVehiclePlateText ( lua_State* luaVM )
             return false;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehiclePlateText", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehiclePlateText" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -865,10 +865,10 @@ int CLuaFunctionDefs::IsVehicleDamageProof ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isVehicleDamageProof", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isVehicleDamageProof" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -887,10 +887,10 @@ int CLuaFunctionDefs::IsVehicleFuelTankExplodable ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isVehicleFuelTankExplodable", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isVehicleFuelTankExplodable" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -909,10 +909,10 @@ int CLuaFunctionDefs::IsVehicleFrozen ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isVehicleFrozen", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isVehicleFrozen" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -932,10 +932,10 @@ int CLuaFunctionDefs::IsVehicleOnGround ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isVehicleOnGround", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isVehicleOnGround" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -957,10 +957,10 @@ int CLuaFunctionDefs::GetVehicleName ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleName", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleName" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -982,10 +982,10 @@ int CLuaFunctionDefs::GetVehicleAdjustableProperty ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleAdjustableProperty", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleAdjustableProperty" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1007,10 +1007,10 @@ int CLuaFunctionDefs::GetHelicopterRotorSpeed ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getHelicopterRotorSpeed", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getHelicopterRotorSpeed" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1032,10 +1032,10 @@ int CLuaFunctionDefs::IsTrainDerailed ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isTrainDerailed", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isTrainDerailed" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1056,10 +1056,10 @@ int CLuaFunctionDefs::IsTrainDerailable ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isTrainDerailable", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isTrainDerailable" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1080,10 +1080,10 @@ int CLuaFunctionDefs::GetTrainDirection ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getTrainDirection", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getTrainDirection" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1105,10 +1105,10 @@ int CLuaFunctionDefs::GetTrainSpeed ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getTrainSpeed", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getTrainSpeed" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1130,10 +1130,10 @@ int CLuaFunctionDefs::GetVehicleEngineState ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleEngineState", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleEngineState" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1155,7 +1155,7 @@ int CLuaFunctionDefs::GetVehicleNameFromModel ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleNameFromID" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1248,7 +1248,7 @@ int CLuaFunctionDefs::CreateVehicle ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "createVehicle" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1269,10 +1269,10 @@ int CLuaFunctionDefs::FixVehicle ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "fixVehicle", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "fixVehicle" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1295,10 +1295,10 @@ int CLuaFunctionDefs::BlowVehicle ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "blowVehicle", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "blowVehicle" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1316,10 +1316,10 @@ int CLuaFunctionDefs::IsVehicleBlown ( lua_State* luaVM )
             }
         } 
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isVehicleBlown", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isVehicleBlown" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1342,10 +1342,10 @@ int CLuaFunctionDefs::GetVehicleHeadLightColor ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleHeadLightColor", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleHeadLightColor" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1366,10 +1366,10 @@ int CLuaFunctionDefs::GetVehicleCurrentGear ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleCurrentGear", "vehicle", 1 );
     }
 	else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleCurrentGear" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1402,10 +1402,10 @@ int CLuaFunctionDefs::SetVehicleTurnVelocity ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleTurnVelocity", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleTurnVelocity" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1457,10 +1457,10 @@ int CLuaFunctionDefs::SetVehicleColor ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleColor", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleColor" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1494,10 +1494,10 @@ int CLuaFunctionDefs::SetVehicleLandingGearDown ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleLandingGearDown", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleLandingGearDown" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1521,10 +1521,10 @@ int CLuaFunctionDefs::SetVehicleLocked ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleLocked", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleLocked" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1548,10 +1548,10 @@ int CLuaFunctionDefs::SetVehicleDoorsUndamageable ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleDoorsUndamageable", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleDoorsUndamageable" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1578,10 +1578,10 @@ int CLuaFunctionDefs::SetVehicleSirensOn ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleSirensOn", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleSirensOn" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1623,10 +1623,10 @@ int CLuaFunctionDefs::AddVehicleUpgrade ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "addVehicleUpgrade", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "addVehicleUpgrade" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1655,10 +1655,10 @@ int CLuaFunctionDefs::RemoveVehicleUpgrade ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "removeVehicleUpgrade", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "removeVehicleUpgrade" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1689,10 +1689,10 @@ int CLuaFunctionDefs::SetVehicleDoorState ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleDoorState", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleDoorState" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1732,10 +1732,10 @@ int CLuaFunctionDefs::SetVehicleWheelStates ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleWheelStates", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleWheelStates" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1766,10 +1766,10 @@ int CLuaFunctionDefs::SetVehicleLightState ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleLightState", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleLightState" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1800,10 +1800,10 @@ int CLuaFunctionDefs::SetVehiclePanelState ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehiclePanelState", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehiclePanelState" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1831,10 +1831,10 @@ int CLuaFunctionDefs::SetVehicleOverrideLights ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleOverrideLights", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleOverrideLights" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1860,13 +1860,13 @@ int CLuaFunctionDefs::AttachTrailerToVehicle ( lua_State* luaVM )
                 }
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "trailer", 2 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "attachTrailerToVehicle", "trailer", 2 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "attachTrailerToVehicle", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "attachTrailerToVehicle" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1892,10 +1892,10 @@ int CLuaFunctionDefs::DetachTrailerFromVehicle ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "detachTrailerFromVehicle", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "detachTrailerFromVehicle" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1919,10 +1919,10 @@ int CLuaFunctionDefs::SetVehicleEngineState ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleEngineState", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleEngineState" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1947,10 +1947,10 @@ int CLuaFunctionDefs::SetVehicleDirtLevel ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleDirtLevel", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleDirtLevel" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1974,10 +1974,10 @@ int CLuaFunctionDefs::SetVehicleDamageProof ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleDamageProof", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleDamageProof" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2001,10 +2001,10 @@ int CLuaFunctionDefs::SetVehiclePaintjob ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehiclePaintjob", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehiclePaintjob" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2027,10 +2027,10 @@ int CLuaFunctionDefs::SetVehicleFuelTankExplodable ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleFuelTankExplodable", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleFuelTankExplodable" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2054,13 +2054,13 @@ int CLuaFunctionDefs::SetVehicleFrozen ( lua_State* luaVM )
 
             }
             else
-                m_pScriptDebugging->LogBadType ( luaVM );
+                m_pScriptDebugging->LogBadType ( luaVM, "setVehicleFrozen" );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleFrozen", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleFrozen" );
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -2083,10 +2083,10 @@ int CLuaFunctionDefs::SetVehicleAdjustableProperty ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleAdjustableProperty", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleAdjustableProperty" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2110,10 +2110,10 @@ int CLuaFunctionDefs::SetHelicopterRotorSpeed ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setHelicopterRotorSpeed", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setHelicopterRotorSpeed" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2136,10 +2136,10 @@ int CLuaFunctionDefs::SetTrainDerailed ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setTrainDerailed", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setTrainDerailed" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2161,10 +2161,10 @@ int CLuaFunctionDefs::SetTrainDerailable ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setTrainDerailable", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setTrainDerailable" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2186,10 +2186,10 @@ int CLuaFunctionDefs::SetTrainDirection ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setTrainDirection", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setTrainDirection" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2213,10 +2213,10 @@ int CLuaFunctionDefs::SetTrainSpeed ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setTrainSpeed", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setTrainSpeed" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2239,7 +2239,7 @@ int CLuaFunctionDefs::SetRadioChannel ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setRadioChannel" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2294,10 +2294,10 @@ int CLuaFunctionDefs::GetVehicleGravity ( lua_State* luaVM )
             return 3;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleGravity", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleGravity" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2324,10 +2324,10 @@ int CLuaFunctionDefs::SetVehicleGravity ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleGravity", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleGravity" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2360,10 +2360,10 @@ int CLuaFunctionDefs::SetVehicleHeadLightColor ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHeadLightColor", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleHeadLightColor" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2545,10 +2545,10 @@ int CLuaFunctionDefs::GetVehicleHandling ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleHandling", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleHandling" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2676,13 +2676,13 @@ int CLuaFunctionDefs::GetOriginalHandling ( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "model", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "getOriginalHandling", "model", 1 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "model", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getOriginalHandling", "model", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getOriginalHandling" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2712,10 +2712,10 @@ int CLuaFunctionDefs::SetVehicleDoorOpenRatio ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleDoorOpenRatio", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleDoorOpenRatio" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2768,10 +2768,10 @@ int CLuaFunctionDefs::GetVehicleSirenParams( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleSirenParams", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleSirenParams" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2835,10 +2835,10 @@ int CLuaFunctionDefs::GetVehicleSirens( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleSirens", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleSirens" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2876,13 +2876,13 @@ int CLuaFunctionDefs::SetVehicleSirens ( lua_State* luaVM )
                 }
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "giveVehicleSirens", "vehicle", 1 );
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "giveVehicleSirens" );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "giveVehicleSirens" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2904,10 +2904,10 @@ int CLuaFunctionDefs::GetVehicleDoorOpenRatio ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleDoorOpenRatio", "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleDoorOpenRatio" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

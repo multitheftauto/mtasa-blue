@@ -122,7 +122,6 @@ struct SAclRequest;
 #include "luadefs/CLuaWorldDefs.h"
 #include "luadefs/CLuaVoiceDefs.h"
 #include "luadefs/CLuaXMLDefs.h"
-#include "luadefs/CLuaClassDefs.h"
 
 // Lua includes
 #include "lua/LuaCommon.h"
@@ -180,6 +179,7 @@ struct SAclRequest;
 #include "CCommandFile.h"
 #include "CCommandLineParser.h"
 #include "CCommon.h"
+#include "CConfig.h"
 #include "CConnectHistory.h"
 #include "CConsole.h"
 #include "CConsoleClient.h"

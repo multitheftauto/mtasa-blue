@@ -58,7 +58,7 @@ public:
     bool                    InDownloadQueue     ( void )            { return m_bInDownloadQueue; };
     bool                    SetInDownloadQueue  ( bool bIn )        { m_bInDownloadQueue = bIn; };
 
-    CDownloadableResource*  QueueFile       ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum, bool bAutoDownload = true );
+    CDownloadableResource*  QueueFile       ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum );
 
     CDownloadableResource*  AddConfigFile   ( const char *szFileName, CChecksum serverChecksum );
 
@@ -89,9 +89,6 @@ public:
 
     inline std::list < CExportedFunction* >::iterator    IterBeginExportedFunctions   ( void )        { return m_exportedFunctions.begin(); }
     inline std::list < CExportedFunction* >::iterator    IterEndExportedFunctions     ( void )        { return m_exportedFunctions.end(); }
-
-    inline std::list < CResourceFile* >::iterator    IterBeginResourceFiles   ( void )        { return m_ResourceFiles.begin(); }
-    inline std::list < CResourceFile* >::iterator    IterEndResourceFiles     ( void )        { return m_ResourceFiles.end(); }
 
     void                    SetRemainingProtectedScripts    ( unsigned short usRemaining ) { m_usRemainingProtectedScripts = usRemaining; }
     void                    LoadProtectedScript             ( const char* chunk, unsigned int length );

@@ -230,24 +230,6 @@ bool CStaticFunctionDefinitions::WasEventCancelled ( void )
 }
 
 
-bool CStaticFunctionDefinitions::DownloadFile ( CResource* pResource, const char* szFile, CChecksum checksum )
-{
-    SString strHTTPDownloadURLFull ( "%s/%s/%s", g_pClientGame->GetHTTPURL().c_str(), pResource->GetName(), szFile );
-    SString strPath ( "%s\\resources\\%s\\%s", g_pClientGame->GetModRoot (),pResource->GetName(), szFile ); 
-    // Call SingularFileDownloadManager
-    g_pClientGame->GetSingularFileDownloadManager()->AddFile ( pResource, strPath.c_str(), szFile, strHTTPDownloadURLFull, checksum );
-
-    // Start Download
-    CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork ()->GetHTTPDownloadManager ();
-    if ( !pHTTP->IsDownloading () )
-    {
-        pHTTP->StartDownloadingQueuedFiles ();
-        g_pClientGame->SetSingularTransfers ( true );
-    }
-    return true;
-}
-
-
 bool CStaticFunctionDefinitions::OutputConsole ( const char* szText )
 {
     m_pCore->GetConsole ()->Print ( szText );
@@ -1196,8 +1178,6 @@ bool CStaticFunctionDefinitions::SetElementInterior ( CClientEntity& Entity, uns
 
 bool CStaticFunctionDefinitions::SetElementDimension ( CClientEntity& Entity, unsigned short usDimension )
 {
-    RUN_CHILDREN SetElementDimension ( **iter, usDimension );
-
     switch ( Entity.GetType () )
     {
         // Client side elements
@@ -4066,21 +4046,6 @@ bool CStaticFunctionDefinitions::GetCameraInterior ( unsigned char & ucInterior 
 }
 
 
-bool CStaticFunctionDefinitions::GetCameraRotation( float &fTargetX, float &fTargetY )
-{
-	m_pCamera->GetRotation( fTargetX, fTargetY );
-	
-	return true;
-}
-
-bool CStaticFunctionDefinitions::SetCameraRotation( float fX, float fY )
-{
-	m_pCamera->SetRotation( fX, fY );
-	
-	return true;
-}
-
-
 bool CStaticFunctionDefinitions::SetCameraMatrix ( CVector& vecPosition, CVector* pvecLookAt, float fRoll, float fFOV )
 {
     if ( !m_pCamera->IsInFixedMode () )        
@@ -6722,10 +6687,6 @@ CClientSound* CStaticFunctionDefinitions::PlaySound3D ( CResource* pResource, co
 
 bool CStaticFunctionDefinitions::StopSound ( CClientSound& Sound )
 {
-    // call onClientSoundStopped
-    CLuaArguments Arguments;
-    Arguments.PushString ( "destroyed" );     // Reason
-    Sound.CallEvent ( "onClientSoundStopped", Arguments, false );
     g_pClientGame->GetElementDeleter()->Delete ( &Sound );
     return true;
 }

@@ -69,10 +69,10 @@ int CLuaFunctionDefs::GetElementID ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementID", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementID" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -105,7 +105,7 @@ int CLuaFunctionDefs::GetElementByID ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementByID" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -134,7 +134,7 @@ int CLuaFunctionDefs::GetElementByIndex ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementByIndex" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -160,7 +160,7 @@ int CLuaFunctionDefs::GetElementData ( lua_State* luaVM )
             if ( strKey.length () > MAX_CUSTOMDATA_NAME_LENGTH )
             {
                 // Warn and truncate if key is too long
-                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Truncated argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *SString ( "string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH ) ) );
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Truncated argument @ '%s' [%s]", "getElementData", *SString ( "string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH ) ) );
                 strKey = strKey.Left ( MAX_CUSTOMDATA_NAME_LENGTH );
             }
 
@@ -173,7 +173,7 @@ int CLuaFunctionDefs::GetElementData ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getElementData", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -253,7 +253,7 @@ int CLuaFunctionDefs::GetElementMatrix ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getElementMatrix", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -282,10 +282,10 @@ int CLuaFunctionDefs::GetElementPosition ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementPosition", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementPosition" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -321,10 +321,10 @@ int CLuaFunctionDefs::GetElementRotation ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementRotation", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementRotation" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -353,10 +353,10 @@ int CLuaFunctionDefs::GetElementVelocity ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementVelocity", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementVelocity" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -382,10 +382,10 @@ int CLuaFunctionDefs::GetElementType ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementType", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementType" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -426,13 +426,13 @@ int CLuaFunctionDefs::GetElementChildren ( lua_State* luaVM )
                     return 1;
                 }
                 else
-                    m_pScriptDebugging->LogBadType ( luaVM );
+                    m_pScriptDebugging->LogBadType ( luaVM, "getElementChildren" );
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "getElementChildren", "element", 1 );
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "getElementChildren" );
     }
 
     // Failed
@@ -463,10 +463,10 @@ int CLuaFunctionDefs::GetElementChild ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementChild", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementChild" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -489,10 +489,10 @@ int CLuaFunctionDefs::GetElementChildrenCount ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementChildrenCount", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementChildrenCount" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -518,10 +518,10 @@ int CLuaFunctionDefs::GetElementParent ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementParent", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementParent" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -550,7 +550,7 @@ int CLuaFunctionDefs::GetElementsByType ( lua_State* luaVM )
                     startAt = pEntity;
                 else
                 {
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "element", 2 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "getElementsByType", "element", 2 );
                     lua_pushboolean ( luaVM, false );
                     return 1;
                 }
@@ -573,7 +573,7 @@ int CLuaFunctionDefs::GetElementsByType ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "getElementsByType" );
     }
 
     // Failed
@@ -600,10 +600,10 @@ int CLuaFunctionDefs::GetElementInterior ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementInterior", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementInterior" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -633,13 +633,13 @@ int CLuaFunctionDefs::IsElementWithinColShape ( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "colshape", 2 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "isElementWithinColShape", "colshape", 2 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isElementWithinColShape", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isElementWithinColShape" );
 
     // Failed
     lua_pushnil ( luaVM );
@@ -669,13 +669,13 @@ int CLuaFunctionDefs::IsElementWithinMarker( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "marker", 2 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "isElementWithinMarker", "marker", 2 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isElementWithinMarker", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isElementWithinMarker" );
 
     // Failed
     lua_pushnil ( luaVM );
@@ -726,10 +726,10 @@ int CLuaFunctionDefs::GetElementsWithinColShape ( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "colshape", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "getElementsWithinColShape", "colshape", 1 );
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "getElementsWithinColShape" );
     }
 
     // Failed
@@ -753,10 +753,10 @@ int CLuaFunctionDefs::GetElementDimension ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementDimension", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementDimension" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -787,10 +787,10 @@ int CLuaFunctionDefs::GetElementBoundingBox ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementBoundingBox", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementBoundingBox" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -816,10 +816,10 @@ int CLuaFunctionDefs::GetElementRadius ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementRadius", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementRadius" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -847,10 +847,10 @@ int CLuaFunctionDefs::IsElementAttached ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isElementAttached", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isElementAttached" );
 
     // Failed
     lua_pushnil ( luaVM );
@@ -884,10 +884,10 @@ int CLuaFunctionDefs::GetElementAttachedTo ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementAttachedTo", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementAttachedTo" );
 
     // Failed
     lua_pushnil ( luaVM );
@@ -927,10 +927,10 @@ int CLuaFunctionDefs::GetAttachedElements ( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "getAttachedElements", "element", 1 );
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "getAttachedElements" );
     }
 
     // Failed
@@ -957,10 +957,10 @@ int CLuaFunctionDefs::GetElementDistanceFromCentreOfMassToBaseOfModel ( lua_Stat
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementDistanceFromCentreOfMassToBaseOfModel", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementDistanceFromCentreOfMassToBaseOfModel" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -983,10 +983,10 @@ int CLuaFunctionDefs::IsElementLocal ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isElementLocal", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isElementLocal" );
 
     // Failed
     lua_pushnil ( luaVM );
@@ -1017,10 +1017,10 @@ int CLuaFunctionDefs::GetElementAttachedOffsets ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementAttachedOffsets", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementAttachedOffsets" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1046,10 +1046,10 @@ int CLuaFunctionDefs::GetElementAlpha ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementAlpha", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementAlpha" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1075,10 +1075,10 @@ int CLuaFunctionDefs::GetElementHealth ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementHealth", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementHealth" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1103,10 +1103,10 @@ int CLuaFunctionDefs::GetElementModel ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementModel", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementModel" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1130,10 +1130,10 @@ int CLuaFunctionDefs::GetElementColShape ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementColShape", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementColShape" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1158,7 +1158,7 @@ int CLuaFunctionDefs::IsElementInWater ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isElementInWater" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1182,7 +1182,7 @@ int CLuaFunctionDefs::IsElementSyncer ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isElementSyncer" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1207,7 +1207,7 @@ int CLuaFunctionDefs::IsElementCollidableWith ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isElementCollidableWith" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1227,7 +1227,7 @@ int CLuaFunctionDefs::IsElementDoubleSided ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isElementDoubleSided" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1247,10 +1247,10 @@ int CLuaFunctionDefs::GetElementCollisionsEnabled ( lua_State* luaVM )
             }        
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementCollisionsEnabled", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementCollisionsEnabled" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1272,10 +1272,10 @@ int CLuaFunctionDefs::IsElementFrozen ( lua_State* luaVM )
             }        
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isElementFrozen", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isElementFrozen" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1307,13 +1307,13 @@ int CLuaFunctionDefs::IsElementStreamedIn ( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogWarning ( luaVM, "%s; element is not streaming compatible\n", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                m_pScriptDebugging->LogWarning ( luaVM, "isElementStreamedIn; element is not streaming compatible\n" );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isElementStreamedIn", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isElementStreamedIn" );
 
     // We failed
     lua_pushnil ( luaVM );
@@ -1341,17 +1341,17 @@ int CLuaFunctionDefs::IsElementStreamable ( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogWarning ( luaVM, "%s; element is not streaming compatible\n", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+                m_pScriptDebugging->LogWarning ( luaVM, "isElementStreamable; element is not streaming compatible\n" );
 
             // Return false, we're not streamable
             lua_pushboolean ( luaVM, false );
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isElementStreamable", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isElementStreamable" );
 
     // We failed
     lua_pushnil ( luaVM );
@@ -1377,10 +1377,10 @@ int CLuaFunctionDefs::IsElementOnScreen ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isElementOnScreen", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "isElementOnScreen" );
 
     lua_pushnil ( luaVM );
     return 1;
@@ -1407,7 +1407,7 @@ int CLuaFunctionDefs::CreateElement ( lua_State* luaVM )
             }
             else if ( iArgument2 != LUA_TNONE )
             {
-                m_pScriptDebugging->LogBadType ( luaVM );
+                m_pScriptDebugging->LogBadType ( luaVM, "createElement" );
                 lua_pushboolean ( luaVM, false );
                 return 1;
             }
@@ -1438,7 +1438,7 @@ int CLuaFunctionDefs::CreateElement ( lua_State* luaVM )
                     m_pScriptDebugging->LogError ( luaVM, "createElement; unable to create mor elements\n" );
             }
             else
-                m_pScriptDebugging->LogBadType ( luaVM );
+                m_pScriptDebugging->LogBadType ( luaVM, "createElement" );
         }
     }
 
@@ -1465,10 +1465,10 @@ int CLuaFunctionDefs::DestroyElement ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "destroyElement", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "destroyElement" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1495,10 +1495,10 @@ int CLuaFunctionDefs::SetElementID ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementID", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementID" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1524,7 +1524,7 @@ int CLuaFunctionDefs::SetElementData ( lua_State* luaVM )
             if ( strKey.length () > MAX_CUSTOMDATA_NAME_LENGTH )
             {
                 // Warn and truncate if key is too long
-                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Truncated argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *SString ( "string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH ) ) );
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Truncated argument @ '%s' [%s]", "setElementData", *SString ( "string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH ) ) );
                 strKey = strKey.Left ( MAX_CUSTOMDATA_NAME_LENGTH );
             }
 
@@ -1536,7 +1536,7 @@ int CLuaFunctionDefs::SetElementData ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setElementData", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1561,7 +1561,7 @@ int CLuaFunctionDefs::RemoveElementData ( lua_State* luaVM )
             if ( strKey.length () > MAX_CUSTOMDATA_NAME_LENGTH )
             {
                 // Warn and truncate if key is too long
-                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Truncated argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *SString ( "string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH ) ) );
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Truncated argument @ '%s' [%s]", "removeElementData", *SString ( "string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH ) ) );
                 strKey = strKey.Left ( MAX_CUSTOMDATA_NAME_LENGTH );
             }
 
@@ -1573,7 +1573,7 @@ int CLuaFunctionDefs::RemoveElementData ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "removeElementData", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1642,10 +1642,10 @@ int CLuaFunctionDefs::SetElementPosition ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementPosition", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementPosition" );
 
     // Error
     lua_pushboolean ( luaVM, false );
@@ -1687,10 +1687,10 @@ int CLuaFunctionDefs::SetElementRotation ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementRotation", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementRotation" );
 
     // Error
     lua_pushboolean ( luaVM, false );
@@ -1727,13 +1727,13 @@ int CLuaFunctionDefs::SetElementVelocity ( lua_State* luaVM )
                 }
             }
             else
-                m_pScriptDebugging->LogBadType ( luaVM );
+                m_pScriptDebugging->LogBadType ( luaVM, "setElementVelocity" );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementVelocity", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementVelocity" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1765,13 +1765,13 @@ int CLuaFunctionDefs::SetElementParent ( lua_State* luaVM )
                 }
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "element", 2 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "setElementParent", "element", 2 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementParent", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementParent" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1821,13 +1821,13 @@ int CLuaFunctionDefs::SetElementInterior ( lua_State* luaVM )
                 }
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "setElementInterior", "element", 1 );
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "setElementInterior" );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementInterior" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1857,10 +1857,10 @@ int CLuaFunctionDefs::SetElementDimension ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementDimension", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementDimension" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1930,13 +1930,13 @@ int CLuaFunctionDefs::AttachElements ( lua_State* luaVM )
                 }
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "element", 2 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "attachElements", "element", 2 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "attachElements", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "attachElements" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1968,10 +1968,10 @@ int CLuaFunctionDefs::DetachElements ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "detachElements", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "detachElements" );
 
     // Failure
     lua_pushboolean ( luaVM, false );
@@ -2034,10 +2034,10 @@ int CLuaFunctionDefs::SetElementAttachedOffsets ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementAttachedOffsets", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementAttachedOffsets" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -2061,10 +2061,10 @@ int CLuaFunctionDefs::SetElementCollisionsEnabled ( lua_State* luaVM )
             }        
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementCollisionsEnabled", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementCollisionsEnabled" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2088,10 +2088,10 @@ int CLuaFunctionDefs::SetElementCollidableWith ( lua_State* luaVM )
             }        
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementCollidableWith", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementCollidableWith" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2114,10 +2114,10 @@ int CLuaFunctionDefs::SetElementDoubleSided ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementDoubleSided", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementDoubleSided" );
 
     // Failure
     lua_pushboolean ( luaVM, false );
@@ -2141,10 +2141,10 @@ int CLuaFunctionDefs::SetElementFrozen ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementFrozen", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementFrozen" );
 
     // Failure
     lua_pushboolean ( luaVM, false );
@@ -2172,10 +2172,10 @@ int CLuaFunctionDefs::SetElementAlpha ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementAlpha", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementAlpha" );
 
     // Failure
     lua_pushboolean ( luaVM, false );
@@ -2203,10 +2203,10 @@ int CLuaFunctionDefs::SetElementHealth ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementHealth", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementHealth" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -2234,10 +2234,10 @@ int CLuaFunctionDefs::SetElementModel ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementModel", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementModel" );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -2284,10 +2284,10 @@ int CLuaFunctionDefs::SetElementStreamable ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementStreamable", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementStreamable" );
 
     // We failed
     lua_pushboolean ( luaVM, false );
@@ -2313,7 +2313,7 @@ int CLuaFunctionDefs::GetLowLodElement ( lua_State* luaVM )
         }        
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getLowLODElement", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2337,7 +2337,7 @@ int CLuaFunctionDefs::SetLowLodElement ( lua_State* luaVM )
         }        
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setLowLODElement", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -2362,7 +2362,7 @@ int CLuaFunctionDefs::IsElementLowLod ( lua_State* luaVM )
         }        
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "isElementLowLOD", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;

@@ -78,7 +78,7 @@ int CLuaTextDefs::textDestroyDisplay ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "textDestroyDisplay" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -184,7 +184,7 @@ int CLuaTextDefs::textDestroyTextItem ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "textDestroyTextItem" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -212,7 +212,7 @@ int CLuaTextDefs::textDisplayAddText ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "textDisplayAddText" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -240,14 +240,14 @@ int CLuaTextDefs::textDisplayRemoveText ( lua_State* luaVM )
                     return 1;
                 }
                 else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "textItem", 2 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "textDisplayRemoveText", "textItem", 2 );
             }
             else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "textDisplay", 1 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "textDisplayRemoveText", "textDisplay", 1 );
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "textDisplayRemoveText" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -276,7 +276,7 @@ int CLuaTextDefs::textDisplayAddObserver ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "textDisplayAddObserver" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -305,14 +305,14 @@ int CLuaTextDefs::textDisplayRemoveObserver ( lua_State* luaVM )
                     return 1;
                 }
                 else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "observer", 2 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "textDisplayRemoveObserver", "observer", 2 );
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "textDisplay", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "textDisplayRemoveObserver", "textDisplay", 1 );
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "textDisplayRemoveObserver" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -342,14 +342,14 @@ int CLuaTextDefs::textDisplayIsObserver ( lua_State* luaVM )
                     return 1;
                 }
                 else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "observer", 2 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "textDisplayIsObserver", "observer", 2 );
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "textDisplay", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "textDisplayIsObserver", "textDisplay", 1 );
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "textDisplayIsObserver" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -375,11 +375,11 @@ int CLuaTextDefs::textDisplayGetObservers ( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "textDisplay", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "textDisplayGetObservers", "textDisplay", 1 );
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "textDisplayGetObservers" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -404,7 +404,7 @@ int CLuaTextDefs::textItemSetText ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "textItemSetText" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -427,7 +427,7 @@ int CLuaTextDefs::textItemGetText ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "textItemGetText" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -452,7 +452,7 @@ int CLuaTextDefs::textItemSetScale ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "textItemSetScale" );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -475,7 +475,7 @@ int CLuaTextDefs::textItemGetScale ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "textItemGetScale" );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -503,7 +503,7 @@ int CLuaTextDefs::textItemSetPosition ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "textItemSetPosition" );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -528,7 +528,7 @@ int CLuaTextDefs::textItemGetPosition ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "textItemGetPosition" );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -562,7 +562,7 @@ int CLuaTextDefs::textItemSetColor ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "textItemSetColor" );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -589,7 +589,7 @@ int CLuaTextDefs::textItemGetColor ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "textItemGetColor" );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -631,7 +631,7 @@ int CLuaTextDefs::textItemSetPriority ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "textItemSetPriority" );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -654,7 +654,7 @@ int CLuaTextDefs::textItemGetPriority ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType ( luaVM, "textItemGetPriority" );
     }
 
     lua_pushboolean ( luaVM, false );

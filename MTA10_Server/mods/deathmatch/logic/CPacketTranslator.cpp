@@ -77,10 +77,6 @@ CPacket* CPacketTranslator::Translate ( const NetServerPlayerID& Socket, ePacket
             pTemp = new CDetonateSatchelsPacket;
             break;
 
-        case PACKET_ID_DESTROY_SATCHELS:
-            pTemp = new CDestroySatchelsPacket;
-            break;
-
         case PACKET_ID_COMMAND:
             pTemp = new CCommandPacket;
             break;

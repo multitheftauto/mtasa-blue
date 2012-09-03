@@ -644,7 +644,7 @@ bool CMainConfig::LoadExtended ( void )
 
                 if ( IsValidFilePath ( strBuffer.c_str () ) )
                 {
-                    m_pLuaManager->GetLuaModuleManager ()->LoadModule ( strBuffer.c_str (), strFilename, false );
+                    m_pLuaManager->GetLuaModuleManager ()->_LoadModule ( strBuffer.c_str (), strFilename, false );
                 }
             }
         }
@@ -791,8 +791,8 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "help", CConsoleCommands::Help, false );
 
     RegisterCommand ( "loadmodule", CConsoleCommands::LoadModule, false );
-    RegisterCommand ( "unloadmodule", CConsoleCommands::UnloadModule, false );
-    RegisterCommand ( "reloadmodule", CConsoleCommands::ReloadModule, false );
+    //RegisterCommand ( "unloadmodule", CConsoleCommands::UnloadModule, false );
+    //RegisterCommand ( "reloadmodule", CConsoleCommands::ReloadModule, false );
 
     RegisterCommand ( "ver", CConsoleCommands::Ver, false );
     RegisterCommand ( "sver", CConsoleCommands::Ver, false );
@@ -1258,8 +1258,8 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   50,     100,    4000,   "player_sync_interval",                 &g_TickRateSettings.iPureSync,              &OnTickRateChange },
             { true, true,   50,     1500,   4000,   "lightweight_sync_interval",            &g_TickRateSettings.iLightSync,             &OnTickRateChange },
             { true, true,   50,     500,    4000,   "camera_sync_interval",                 &g_TickRateSettings.iCamSync,               &OnTickRateChange },
-            { true, true,   50,     400,    4000,   "ped_sync_interval",                    &g_TickRateSettings.iPedSync,               &OnTickRateChange },
-            { true, true,   50,     400,    4000,   "unoccupied_vehicle_sync_interval",     &g_TickRateSettings.iUnoccupiedVehicle,     &OnTickRateChange },
+            { true, true,   50,     500,    4000,   "ped_sync_interval",                    &g_TickRateSettings.iPedSync,               &OnTickRateChange },
+            { true, true,   50,     1000,   4000,   "unoccupied_vehicle_sync_interval",     &g_TickRateSettings.iUnoccupiedVehicle,     &OnTickRateChange },
             { true, true,   50,     100,    4000,   "keysync_mouse_sync_interval",          &g_TickRateSettings.iKeySyncRotation,       &OnTickRateChange },
             { true, true,   50,     100,    4000,   "keysync_analog_sync_interval",         &g_TickRateSettings.iKeySyncAnalogMove,     &OnTickRateChange },
             { true, true,   50,     100,    4000,   "donkey_work_interval",                 &g_TickRateSettings.iNearListUpdate,        &OnTickRateChange },

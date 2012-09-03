@@ -725,13 +725,6 @@ bool CAccountManager::LogOut ( CClient* pClient, CClient* pEchoClient )
         return false;
     }
 
-    if ( pClient->GetClientType () == CClient::CLIENT_CONSOLE )
-    {
-        if ( pEchoClient )
-            pEchoClient->SendEcho ( "logout: Console may not log out" );
-        return false;
-    }
-
     CAccount* pCurrentAccount = pClient->GetAccount ();
     pCurrentAccount->SetClient ( NULL );
 

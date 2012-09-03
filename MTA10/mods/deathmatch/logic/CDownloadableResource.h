@@ -39,7 +39,7 @@ public:
     };
 
 public:
-    CDownloadableResource           ( eResourceType resourceType, const char* szName, const char* szNameShort, CChecksum checksum = CChecksum (), bool bGenerateClientChecksum = false, bool bAutoDownload = true );
+    CDownloadableResource           ( eResourceType resourceType, const char* szName, const char* szNameShort, CChecksum checksum = CChecksum (), bool bGenerateClientChecksum = false );
     virtual ~CDownloadableResource  ( void );
 
     bool DoesClientAndServerChecksumMatch ( void );
@@ -55,8 +55,6 @@ public:
 
     CChecksum GetServerChecksum      ( void );
     void SetServerChecksum           ( CChecksum serverChecksum );
-
-    bool     IsAutoDownload         ( void )    { return m_bAutoDownload; };
 protected:
     eResourceType       m_resourceType;
 
@@ -65,8 +63,6 @@ protected:
 
     CChecksum           m_LastClientChecksum;
     CChecksum           m_ServerChecksum;
-
-    bool                m_bAutoDownload;
 };
 
 #endif

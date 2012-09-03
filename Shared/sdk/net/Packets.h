@@ -49,7 +49,6 @@ enum ePacketID
     PACKET_ID_FIRE,
     PACKET_ID_PROJECTILE,
     PACKET_ID_DETONATE_SATCHELS,
-    PACKET_ID_DESTROY_SATCHELS,
 
     // Console, chat and command packets
     PACKET_ID_COMMAND,

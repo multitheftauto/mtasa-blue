@@ -56,7 +56,7 @@ int CLuaFunctionDefs::CreateColCircle ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "createColCircle" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -107,7 +107,7 @@ int CLuaFunctionDefs::CreateColCuboid ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "createColCuboid" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -153,7 +153,7 @@ int CLuaFunctionDefs::CreateColSphere ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "createColSphere" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -200,7 +200,7 @@ int CLuaFunctionDefs::CreateColRectangle ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "createColRectangle" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -261,7 +261,7 @@ int CLuaFunctionDefs::CreateColPolygon ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "createColPolygon" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -311,7 +311,7 @@ int CLuaFunctionDefs::CreateColTube ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "createColTube" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

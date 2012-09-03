@@ -70,6 +70,7 @@ LOGIC = \
 ./logic/CColTube.cpp \
 ./logic/CCommandFile.cpp \
 ./logic/CCommandLineParser.cpp \
+./logic/CConfig.cpp \
 ./logic/CConnectHistory.cpp \
 ./logic/CConsole.cpp \
 ./logic/CConsoleClient.cpp \
@@ -189,7 +190,6 @@ LOGIC = \
 ./logic/lua/CLuaFunctionRef.cpp \
 ./logic/lua/CLuaMain.cpp \
 ./logic/lua/CLuaManager.cpp \
-./logic/lua/CLuaModule.cpp \
 ./logic/lua/CLuaModuleManager.cpp \
 ./logic/lua/CLuaTimer.cpp \
 ./logic/lua/CLuaTimerManager.cpp \
@@ -197,7 +197,6 @@ LOGIC = \
 ./logic/lua/LuaUtils.cpp \
 ./logic/luadefs/CLuaACLDefs.cpp \
 ./logic/luadefs/CLuaCameraDefs.cpp \
-./logic/luadefs/CLuaClassDefs.cpp \
 ./logic/luadefs/CLuaDefs.cpp \
 ./logic/luadefs/CLuaElementDefs.cpp \
 ./logic/luadefs/CLuaFileDefs.cpp \
@@ -215,7 +214,6 @@ LOGIC = \
 ./logic/packets/CConsoleEchoPacket.cpp \
 ./logic/packets/CCustomDataPacket.cpp \
 ./logic/packets/CDebugEchoPacket.cpp \
-./logic/packets/CDestroySatchelsPacket.cpp \
 ./logic/packets/CDetonateSatchelsPacket.cpp \
 ./logic/packets/CEntityAddPacket.cpp \
 ./logic/packets/CEntityRemovePacket.cpp \

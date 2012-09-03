@@ -203,7 +203,7 @@ void CVehicleSA::Init ( void )
     {
         m_tSirenInfo.m_tSirenInfo[i].m_dwMinSirenAlpha = 0;
     }
-    SetupLighting ();
+    
 }
 
 // DESTRUCTOR

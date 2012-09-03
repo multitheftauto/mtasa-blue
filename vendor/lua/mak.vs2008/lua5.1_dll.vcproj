@@ -100,7 +100,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\..\lua5.1d.dll &quot;C:\Program Files\MTA San Andreas 1.4\mods\deathmatch\&quot; &amp;&amp; xcopy /y ..\..\lua5.1d.dll &quot;C:\Program Files\MTA San Andreas 1.4\server\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\..\lua5.1d.dll &quot;C:\Program Files\MTA San Andreas 1.3\mods\deathmatch\&quot; &amp;&amp; xcopy /y ..\..\lua5.1d.dll &quot;C:\Program Files\MTA San Andreas 1.3\server\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -189,7 +189,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\..\lua5.1.dll &quot;C:\Program Files\MTA San Andreas 1.4\mods\deathmatch\&quot; &amp;&amp; xcopy /y ..\..\lua5.1.dll &quot;C:\Program Files\MTA San Andreas 1.4\server\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\..\lua5.1.dll &quot;C:\Program Files\MTA San Andreas 1.3\mods\deathmatch\&quot; &amp;&amp; xcopy /y ..\..\lua5.1.dll &quot;C:\Program Files\MTA San Andreas 1.3\server\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 		<Configuration

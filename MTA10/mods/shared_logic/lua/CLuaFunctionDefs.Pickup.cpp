@@ -83,7 +83,7 @@ int CLuaFunctionDefs::CreatePickup ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "createPickup" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -103,10 +103,10 @@ int CLuaFunctionDefs::GetPickupType ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "pickup", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPickupType", "pickup", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getPickupType" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -126,10 +126,10 @@ int CLuaFunctionDefs::GetPickupWeapon ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "pickup", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPickupWeapon", "pickup", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getPickupWeapon" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -149,10 +149,10 @@ int CLuaFunctionDefs::GetPickupAmount ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "pickup", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPickupAmount", "pickup", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getPickupAmount" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -172,10 +172,10 @@ int CLuaFunctionDefs::GetPickupAmmo ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "pickup", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPickupAmmo", "pickup", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getPickupAmmo" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -203,10 +203,10 @@ int CLuaFunctionDefs::SetPickupType ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setPickupType", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setPickupType" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

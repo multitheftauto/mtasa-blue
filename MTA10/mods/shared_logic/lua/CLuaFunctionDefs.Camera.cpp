@@ -98,22 +98,6 @@ int CLuaFunctionDefs::GetCameraGoggleEffect ( lua_State *luaVM )
 }
 
 
-int CLuaFunctionDefs::GetCameraRotation ( lua_State* luaVM )
-{
-	float fX, fY;
-
-	if ( CStaticFunctionDefinitions::GetCameraRotation( fX, fY ) )
-	{
-		lua_pushnumber( luaVM, fmod( ConvertRadiansToDegrees( fX ) + 90.0f, 360.0f ) );
-		lua_pushnumber( luaVM, fmod( ConvertRadiansToDegrees( fY ) + 90.0f, 360.0f ) );
-		return 2;
-	}
-	
-	lua_pushboolean( luaVM, false );
-	return 1;
-}
-
-
 int CLuaFunctionDefs::SetCameraMatrix ( lua_State* luaVM )
 {
     // Verify the parameter types
@@ -169,32 +153,10 @@ int CLuaFunctionDefs::SetCameraMatrix ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setCameraMatrix" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
-}
-
-
-int CLuaFunctionDefs::SetCameraRotation ( lua_State* luaVM )
-{
-	if ( lua_type( luaVM, 1 ) == LUA_TNUMBER && lua_type( luaVM, 2 ) == LUA_TNUMBER )
-	{
-		float
-			fX = static_cast < float > ( lua_tonumber( luaVM, 1 ) ),
-			fY = static_cast < float > ( lua_tonumber( luaVM, 2 ) );
-			
-		if ( CStaticFunctionDefinitions::SetCameraRotation( ConvertDegreesToRadians( fmod( fX - 90.0f, 360.f ) ), ConvertDegreesToRadiansNoWrap( fmod( fY, 360.0f ) - 90.0f ) ) )
-        {
-            lua_pushboolean( luaVM, true );
-            return 1;
-        }
-	}
-	else
-		m_pScriptDebugging->LogBadType ( luaVM );
-	
-	lua_pushboolean( luaVM, false );
-	return 1;
 }
 
 
@@ -213,10 +175,10 @@ int CLuaFunctionDefs::SetCameraTarget ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "target", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setCameraTarget", "target", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setCameraTarget" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -237,7 +199,7 @@ int CLuaFunctionDefs::SetCameraInterior ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setCameraInterior" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -287,7 +249,7 @@ int CLuaFunctionDefs::FadeCamera ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "fadeCamera" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

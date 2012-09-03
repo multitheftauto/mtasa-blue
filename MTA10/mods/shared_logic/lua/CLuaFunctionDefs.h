@@ -65,9 +65,6 @@ public:
     LUA_DECLARE ( GetLatentEventStatus );
     LUA_DECLARE ( CancelLatentEvent );
 
-    // Misc functions
-    LUA_DECLARE ( DownloadFile );
-
     // Sound effects and synth functions
     LUA_DECLARE ( PlaySound );
     LUA_DECLARE ( PlaySound3D );
@@ -476,10 +473,8 @@ public:
     LUA_DECLARE ( GetCameraTarget );
     LUA_DECLARE ( GetCameraInterior );
     LUA_DECLARE ( GetCameraGoggleEffect );
-    LUA_DECLARE ( GetCameraRotation );
 
     // Cam set funcs
-    LUA_DECLARE ( SetCameraRotation );
     LUA_DECLARE ( SetCameraMatrix );
     LUA_DECLARE ( SetCameraTarget );
     LUA_DECLARE ( SetCameraInterior );

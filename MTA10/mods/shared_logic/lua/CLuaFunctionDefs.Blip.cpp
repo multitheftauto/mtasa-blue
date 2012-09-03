@@ -114,7 +114,7 @@ int CLuaFunctionDefs::CreateBlip ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "createBlip" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -208,10 +208,10 @@ int CLuaFunctionDefs::CreateBlipAttachedTo ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "createBlipAttachedTo", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "createBlipAttachedTo" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -230,10 +230,10 @@ int CLuaFunctionDefs::GetBlipIcon ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "blip", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getBlipIcon", "blip", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getBlipIcon" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -252,10 +252,10 @@ int CLuaFunctionDefs::GetBlipSize ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "blip", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getBlipSize", "blip", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getBlipSize" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -277,10 +277,10 @@ int CLuaFunctionDefs::GetBlipColor ( lua_State* luaVM )
             return 4;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "blip", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getBlipColor", "blip", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getBlipColor" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -299,10 +299,10 @@ int CLuaFunctionDefs::GetBlipOrdering ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "blip", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getBlipOrdering", "blip", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getBlipOrdering" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -321,10 +321,10 @@ int CLuaFunctionDefs::GetBlipVisibleDistance ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "blip", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getBlipVisibleDistance", "blip", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getBlipVisibleDistance" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -349,10 +349,10 @@ int CLuaFunctionDefs::SetBlipIcon ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setBlipIcon", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setBlipIcon" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -376,10 +376,10 @@ int CLuaFunctionDefs::SetBlipSize ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setBlipSize", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setBlipSize" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -415,10 +415,10 @@ int CLuaFunctionDefs::SetBlipColor ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setBlipColor", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setBlipColor" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -444,10 +444,10 @@ int CLuaFunctionDefs::SetBlipOrdering ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setBlipOrdering", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setBlipOrdering" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -473,10 +473,10 @@ int CLuaFunctionDefs::SetBlipVisibleDistance ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setBlipVisibleDistance", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setBlipVisibleDistance" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
