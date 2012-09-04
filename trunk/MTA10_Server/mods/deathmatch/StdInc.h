@@ -295,3 +295,27 @@ struct SAclRequest;
 #include "Config.h"
 #define SHOW_SELF_COMPILE_WARNING
 #include "../../version.h"
+
+
+#if defined(__GNUC__) && (__GNUC__ >= 3)
+    namespace __gnu_cxx
+    {
+        template <>
+        struct hash < CLuaArguments* >
+        {
+            size_t operator()( const CLuaArguments* pArguments ) const
+            {
+                return (size_t)pArguments;
+            }
+        };
+
+        template <>
+        struct hash < const void* >
+        {
+            size_t operator()( const void* pArguments ) const
+            {
+                return (size_t)pArguments;
+            }
+        };
+    }
+#endif
