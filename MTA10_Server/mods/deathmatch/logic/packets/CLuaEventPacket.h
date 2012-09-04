@@ -21,7 +21,7 @@ class CLuaEventPacket : public CPacket
 {
 public:
                             CLuaEventPacket             ( void );
-                            CLuaEventPacket             ( const char* szName, ElementID ID, CLuaArguments& Arguments );
+                            CLuaEventPacket             ( const char* szName, ElementID ID, CLuaArguments* pArguments );
 
     inline ePacketID                GetPacketID                 ( void ) const              { return PACKET_ID_LUA_EVENT; };
     inline unsigned long            GetFlags                    ( void ) const              { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
@@ -31,11 +31,12 @@ public:
 
     inline const char*      GetName                     ( void )                    { return m_strName; }
     inline ElementID        GetElementID                ( void )                    { return m_ElementID; }
-    inline CLuaArguments&   GetArguments                ( void )                    { return m_Arguments; }
+    inline CLuaArguments*   GetArguments                ( void )                    { return m_pArguments; }
 private:
     SString                 m_strName;
     ElementID               m_ElementID;
-    CLuaArguments           m_Arguments;
+    CLuaArguments           m_ArgumentsStore;
+    CLuaArguments*          m_pArguments;
 };
 
 #endif

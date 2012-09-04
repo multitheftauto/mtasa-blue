@@ -2402,7 +2402,7 @@ void CGame::Packet_LuaEvent ( CLuaEventPacket& Packet )
     CPlayer* pCaller = Packet.GetSourcePlayer ();
     const char* szName = Packet.GetName ();
     ElementID ElementID = Packet.GetElementID ();
-    CLuaArguments Arguments = Packet.GetArguments ();
+    CLuaArguments* pArguments = Packet.GetArguments ();
 
     // Grab the element
     CElement* pElement = CElementIDs::GetElement ( ElementID );
@@ -2414,7 +2414,7 @@ void CGame::Packet_LuaEvent ( CLuaEventPacket& Packet )
         {
             if ( pEvent->bAllowRemoteTrigger )
             {
-                pElement->CallEvent ( szName, Arguments, pCaller );
+                pElement->CallEvent ( szName, *pArguments, pCaller );
             }
             else
                 m_pScriptDebugging->LogError ( NULL, "Client triggered serverside event %s, but event is not marked as remotly triggerable", szName );

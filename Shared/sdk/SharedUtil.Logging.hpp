@@ -128,3 +128,18 @@ namespace SharedUtil
 }
 
 #endif  // MTA_DEBUG
+
+//
+// Output timestamped line into the debugger
+//
+void SharedUtil::OutputReleaseLine ( const char* szMessage )
+{
+    SString strMessage = GetLocalTimeString ( false, true ) + " - " + szMessage;
+    if ( strMessage.length () > 0 && strMessage[ strMessage.length () - 1 ] != '\n' )
+        strMessage += "\n";
+#ifdef _WIN32
+    OutputDebugString ( strMessage );
+#else
+    // Other platforms here
+#endif
+}
