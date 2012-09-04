@@ -11,6 +11,7 @@
 #include <StdInc.h>
 #include <Psapi.h>
 #include <game/CGame.h>
+#include "CModelCacheManager.h"
 
 namespace
 {
@@ -477,6 +478,7 @@ void CMemStats::SampleState ( SMemStatsInfo& memStatsInfo )
     CCore::GetSingleton ().GetMultiplayer ()->GetRwResourceStats ( memStatsInfo.rwResourceStats );
     CCore::GetSingleton ().GetMultiplayer ()->GetClothesCacheStats ( memStatsInfo.clothesCacheStats );
     CCore::GetSingleton ().GetGame ()->GetShaderReplacementStats ( memStatsInfo.shaderReplacementStats );
+    CCore::GetSingleton ().GetModelCacheManager ()->GetStats ( memStatsInfo.modelCacheStats );
 }
 
 
@@ -549,6 +551,11 @@ void CMemStats::UpdateIntervalStats ( void )
     m_MemStatsDelta.clothesCacheStats.uiNumTotal    = m_MemStatsNow.clothesCacheStats.uiNumTotal   - m_MemStatsPrev.clothesCacheStats.uiNumTotal;
     m_MemStatsDelta.clothesCacheStats.uiNumUnused   = m_MemStatsNow.clothesCacheStats.uiNumUnused  - m_MemStatsPrev.clothesCacheStats.uiNumUnused;
     m_MemStatsDelta.clothesCacheStats.uiNumRemoved  = m_MemStatsNow.clothesCacheStats.uiNumRemoved - m_MemStatsPrev.clothesCacheStats.uiNumRemoved;
+
+    m_MemStatsDelta.modelCacheStats.uiNumPedModels          = m_MemStatsNow.modelCacheStats.uiNumPedModels          - m_MemStatsPrev.modelCacheStats.uiNumPedModels;
+    m_MemStatsDelta.modelCacheStats.uiNumVehicleModels      = m_MemStatsNow.modelCacheStats.uiNumVehicleModels      - m_MemStatsPrev.modelCacheStats.uiNumVehicleModels;
+    m_MemStatsDelta.modelCacheStats.uiMaxNumPedModels       = m_MemStatsNow.modelCacheStats.uiMaxNumPedModels       - m_MemStatsPrev.modelCacheStats.uiMaxNumPedModels;
+    m_MemStatsDelta.modelCacheStats.uiMaxNumVehicleModels   = m_MemStatsNow.modelCacheStats.uiMaxNumVehicleModels   - m_MemStatsPrev.modelCacheStats.uiMaxNumVehicleModels;
 
     {
         SShaderReplacementStats& now   = m_MemStatsNow.shaderReplacementStats;
@@ -811,6 +818,21 @@ void CMemStats::CreateTables ( void )
         table.AddRow ( SString ( "Clothes ready for use|^1~.%d|%d", m_MemStatsDelta.clothesCacheStats.uiNumUnused, m_MemStatsNow.clothesCacheStats.uiNumUnused ) );
         table.AddRow ( SString ( "Old removed|^1~.%d|^5%d", m_MemStatsDelta.clothesCacheStats.uiNumRemoved, m_MemStatsNow.clothesCacheStats.uiNumRemoved ) );
     }
+
+    {
+        m_TableList.push_back ( CDxTable ( "|" ) );
+        CDxTable& table = m_TableList.back ();
+        table.SetColumnWidths( "110,50:R,60:R,60:R" );
+        table.SetNumberColors ( "^0", strNumberColorsWhite );
+        table.SetNumberColors ( "^1", strNumberColorsModels );
+        table.SetNumberColors ( "^3", strNumberColorsCreat );
+        table.SetNumberColors ( "^4", strNumberColorsLockStatic );
+        table.SetNumberColors ( "^5", strNumberColorsGrey );
+        table.AddRow ( HEADER1( "Model cache" ) "|" HEADER1( "Max" ) "|" HEADER1( "Change" ) "|" HEADER1( "Count" ) );
+        table.AddRow ( SString ( "Players|^3~ %d|^5~.%d|^1~.%d", m_MemStatsNow.modelCacheStats.uiMaxNumPedModels, m_MemStatsDelta.modelCacheStats.uiNumPedModels, m_MemStatsNow.modelCacheStats.uiNumPedModels ) );
+        table.AddRow ( SString ( "Vehicles|^3~ %d|^5~.%d|^1~.%d", m_MemStatsNow.modelCacheStats.uiMaxNumVehicleModels, m_MemStatsDelta.modelCacheStats.uiNumVehicleModels, m_MemStatsNow.modelCacheStats.uiNumVehicleModels ) );
+    }
+
 
     {
 /*

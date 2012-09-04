@@ -517,6 +517,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CModelCacheManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CModManager.cpp"
 				>
 			</File>
@@ -975,6 +979,10 @@
 			</File>
 			<File
 				RelativePath=".\CMessageLoopHook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CModelCacheManager.h"
 				>
 			</File>
 			<File

@@ -23,6 +23,7 @@
 #include "SharedUtil.hpp"
 #include <clocale>
 #include "CTimingCheckpoints.hpp"
+#include "CModelCacheManager.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -607,6 +608,7 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "aspect_ratio",     iVal ); m_pGame->GetSettings ()->SetAspectRatio ( (eAspectRatio)iVal );
     CVARS_GET ( "grass",            bval ); m_pGame->GetSettings ()->SetGrassEnabled ( bval );
     CVARS_GET ( "fast_clothes_loading", iVal ); m_pMultiplayer->SetFastClothesLoading ( (CMultiplayer::EFastClothesLoading)iVal );
+    CVARS_GET ( "model_cache",      iVal );
 }
 
 void CCore::ApplyCommunityState ( void )
@@ -2095,4 +2097,12 @@ EDiagnosticDebugType CCore::GetDiagnosticDebug ( void )
 void CCore::SetDiagnosticDebug ( EDiagnosticDebugType value )
 {
     m_DiagnosticDebug = value;
+}
+
+
+CModelCacheManager* CCore::GetModelCacheManager ( void )
+{
+    if ( !m_pModelCacheManager )
+        m_pModelCacheManager = NewModelCacheManager ();
+    return m_pModelCacheManager;
 }

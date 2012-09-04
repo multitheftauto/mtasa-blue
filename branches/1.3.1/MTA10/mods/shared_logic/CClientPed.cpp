@@ -3478,7 +3478,9 @@ void CClientPed::_ChangeModel ( void )
             {
                 // When the local player changes to another (non CJ) model, the geometry gets an extra ref from somewhere, causing a memory leak.
                 // So decrement the extra ref here
+            #ifdef NO_CRASH_FIX_TEST
                 m_pPlayerPed->RemoveGeometryRef ();
+            #endif
             }
 
 

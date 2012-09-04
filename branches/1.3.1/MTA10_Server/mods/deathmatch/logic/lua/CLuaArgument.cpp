@@ -68,8 +68,8 @@ void CLuaArgument::CopyRecursive ( const CLuaArgument& Argument, CFastHashMap < 
     DeleteTableData ();
 
     // Copy over line and filename too
-    //m_strFilename = Argument.m_strFilename;
-    //m_iLine = Argument.m_iLine;
+    m_strFilename = Argument.m_strFilename;
+    m_iLine = Argument.m_iLine;
 
     // Set our variable equally to the copy class
     m_iType = Argument.m_iType;
