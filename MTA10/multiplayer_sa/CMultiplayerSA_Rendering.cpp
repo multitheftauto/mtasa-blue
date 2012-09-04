@@ -16,6 +16,7 @@ namespace
     CEntitySAInterface* ms_Rendering = NULL;
     CEntitySAInterface* ms_RenderingOneNonRoad = NULL;
     GameEntityRenderHandler* pGameEntityRenderHandler = NULL;
+    bool ms_bIsMinimizedAndNotConnected = false;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -195,6 +196,39 @@ inner:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// WinLoop
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_WinLoop( void )
+{
+    if ( ms_bIsMinimizedAndNotConnected )
+        Sleep ( 10 );
+}
+
+// Hook info
+#define HOOKPOS_WinLoop_US                         0x748A93
+#define HOOKPOS_WinLoop_EU                         0x748AE3
+#define HOOKSIZE_WinLoop_US                        5
+#define HOOKSIZE_WinLoop_EU                        5
+DWORD RETURN_WinLoop_US =                          0x748A98;
+DWORD RETURN_WinLoop_EU =                          0x748AE8;
+DWORD RETURN_WinLoop_BOTH =                        0;
+void _declspec(naked) HOOK_WinLoop ()
+{
+    _asm
+    {
+        pushad
+        call    OnMY_WinLoop
+        popad
+
+        mov     eax, ds:0x0C8D4C0
+        jmp     RETURN_WinLoop_BOTH
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::SetGameEntityRenderHandler
 //
 //
@@ -202,6 +236,18 @@ inner:
 void CMultiplayerSA::SetGameEntityRenderHandler ( GameEntityRenderHandler * pHandler )
 {
     pGameEntityRenderHandler = pHandler;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CMultiplayerSA::SetIsMinimizedAndNotConnected
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CMultiplayerSA::SetIsMinimizedAndNotConnected ( bool bIsMinimizedAndNotConnected )
+{
+    ms_bIsMinimizedAndNotConnected = bIsMinimizedAndNotConnected;
 }
 
 
@@ -217,4 +263,5 @@ void CMultiplayerSA::InitHooks_Rendering ( void )
     EZHookInstall ( CallIdle );
     EZHookInstall ( CEntity_Render );
     EZHookInstall ( CEntity_RenderOneNonRoad );
+    EZHookInstall ( WinLoop );
 }

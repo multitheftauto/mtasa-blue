@@ -188,6 +188,7 @@ public:
 
     bool                    IsFocused                       ( void )                        { return ( GetForegroundWindow ( ) == GetHookedWindow ( ) ); };
     bool                    IsWindowMinimized               ( void );
+    void                    UpdateIsWindowMinimized         ( void );
 
     // Pulse
     void                    DoPreFramePulse                 ( void );
@@ -269,6 +270,7 @@ private:
     bool                        m_bLastFocused;
     int                         m_iUnminimizeFrameCounter;
     bool                        m_bDidRecreateRenderTargets;
+    bool                        m_bIsWindowMinimized;
 
     // Module loader objects.
     CModuleLoader               m_GameModule;
