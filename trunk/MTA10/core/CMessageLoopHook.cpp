@@ -121,6 +121,8 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 
     if ( hwnd != pThis->GetHookedWindowHandle () ) return NULL;
 
+    g_pCore->UpdateIsWindowMinimized ();  // Force update of stuff
+
     // Handle IME if input is not for the GUI
     if ( !g_pCore->GetLocalGUI ()->InputGoesToGUI () )
     {
