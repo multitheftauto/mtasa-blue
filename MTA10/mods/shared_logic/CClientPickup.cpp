@@ -124,10 +124,10 @@ void CClientPickup::Create ( void )
     {
         // Create the pickup
         m_pPickup = g_pGame->GetPickups ()->CreatePickup ( &m_vecPosition, m_usModel, PICKUP_ONCE );
+        m_pObject = NULL;
         if ( m_pPickup )
         {
             // Grab the attributes from the MTA interface for this pickup
-            m_pObject = NULL;
             unsigned char ucAreaCode = GetInterior ();
             unsigned short usDimension = GetDimension ();
 
