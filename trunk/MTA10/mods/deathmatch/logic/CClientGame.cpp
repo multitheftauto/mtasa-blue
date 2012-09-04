@@ -904,8 +904,6 @@ void CClientGame::DoPulsePostFrame ( void )
             m_LastClearTime.Reset ( );
         }
 
-        GetModelCacheManager ()->DrawStats ();
-
         CClientPerfStatManager::GetSingleton ()->DoPulse ();
     }
 

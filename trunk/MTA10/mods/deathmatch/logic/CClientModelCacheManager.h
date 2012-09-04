@@ -7,18 +7,6 @@
 *
 *****************************************************************************/
 
-// For debug drawing
-struct SModelCacheStatItem
-{
-    SString         strTag;
-    bool            bCache;
-    ePuresyncType   syncType;
-    ushort          usModelId;
-    CVector         vecStart;
-    CVector         vecEnd;
-};
-
-
 class CClientModelCacheManager
 {
 public:
@@ -26,8 +14,6 @@ public:
 
     // CClientModelCacheManager interface
     virtual void                DoPulse                             ( void ) = 0;
-    virtual void                GetStats                            ( std::vector < SModelCacheStatItem >& outList ) = 0;
-    virtual void                DrawStats                           ( void ) = 0;
     virtual void                OnRestreamModel                     ( ushort usModelId ) = 0;
 };
 

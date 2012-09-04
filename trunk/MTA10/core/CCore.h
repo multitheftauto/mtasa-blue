@@ -244,6 +244,7 @@ public:
     bool                    GetDebugIdEnabled               ( uint uiDebugId );
     EDiagnosticDebugType    GetDiagnosticDebug              ( void );
     void                    SetDiagnosticDebug              ( EDiagnosticDebugType value );
+    CModelCacheManager*     GetModelCacheManager            ( void );
 
 private:
     // Core devices.
@@ -253,6 +254,7 @@ private:
     CCommands *                 m_pCommands;
     CDirect3DData *             m_pDirect3DData;
     CConnectManager*            m_pConnectManager;
+    CModelCacheManager*         m_pModelCacheManager;
 
     // Instances (put new classes here!)
     CXMLFile*                   m_pConfigFile;

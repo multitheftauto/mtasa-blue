@@ -302,6 +302,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "anisotropic",                0 );                            // Anisotropic filtering
     DEFAULT ( "grass",                      1 );                            // Enable grass
     DEFAULT ( "fast_clothes_loading",       1 );                            // 0-off 1-auto 2-on
+    DEFAULT ( "model_cache",                1 );                            // 0-off 1-default 2-max
     DEFAULT ( "allow_screen_upload",        1 );                            // 0-off 1-on
     DEFAULT ( "max_clientscript_log_kb",    5000 );                         // Max size in KB (0-No limit)
 
