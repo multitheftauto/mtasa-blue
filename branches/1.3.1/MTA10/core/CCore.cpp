@@ -619,6 +619,7 @@ void CCore::ApplyCommunityState ( void )
 void CCore::SetConnected ( bool bConnected )
 {
     m_pLocalGUI->GetMainMenu ( )->SetIsIngame ( bConnected );
+    UpdateIsWindowMinimized ();  // Force update of stuff
 }
 
 
@@ -1030,9 +1031,17 @@ void CCore::DestroyNetwork ( )
 }
 
 
+void CCore::UpdateIsWindowMinimized ( void )
+{
+    m_bIsWindowMinimized = IsIconic ( GetHookedWindow () ) ? true : false;
+    // Update CPU saver for when minimized and not connected
+    g_pCore->GetMultiplayer ()->SetIsMinimizedAndNotConnected ( m_bIsWindowMinimized && !IsConnected () );
+}
+
+
 bool CCore::IsWindowMinimized ( void )
 {
-    return IsIconic ( GetHookedWindow () ) ? true : false;
+    return m_bIsWindowMinimized;
 }
 
 
@@ -1843,11 +1852,14 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 // DoReliablePulse
 //
 // This is called once a frame even if minimized
+// (Except when minimized and never connected)
 //
 void CCore::DoReliablePulse ( void )
 {
     ms_TimingCheckpoints.BeginTimingCheckpoints ();
     TIMING_CHECKPOINT( "+CallIdle2" );
+
+    UpdateIsWindowMinimized ();
 
     // Non frame rate limit stuff
     if ( IsWindowMinimized () )

@@ -27,6 +27,7 @@ namespace SharedUtil
         #define IsDebugTagHidden(x) IsDebugTagHiddenDummy ()
     #endif
 
+        void OutputReleaseLine ( const char* szMessage );
 
     // Instance counter
     #ifdef MTA_DEBUG

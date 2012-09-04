@@ -154,7 +154,7 @@ bool CStaticFunctionDefinitions::TriggerClientEvent ( const std::vector < CPlaye
     assert ( pCallWithElement );
 
     // Make packet
-    CLuaEventPacket Packet ( szName, pCallWithElement->GetID (), Arguments );
+    CLuaEventPacket Packet ( szName, pCallWithElement->GetID (), &Arguments );
 
     // Send packet to players
     CPlayerManager::Broadcast ( Packet, sendList );
@@ -169,7 +169,7 @@ bool CStaticFunctionDefinitions::TriggerLatentClientEvent ( const std::vector < 
     assert ( pCallWithElement );
 
     // Make packet
-    CLuaEventPacket Packet ( szName, pCallWithElement->GetID (), Arguments );
+    CLuaEventPacket Packet ( szName, pCallWithElement->GetID (), &Arguments );
 
     markerLatentEvent.Set ( "Make packet" );
 

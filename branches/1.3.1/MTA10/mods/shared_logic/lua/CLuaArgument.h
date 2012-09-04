@@ -35,16 +35,16 @@ class CLuaArgument
 {
 public:
                             CLuaArgument        ( void );
-                            CLuaArgument        ( const CLuaArgument& Argument, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables = NULL );
+                            CLuaArgument        ( const CLuaArgument& Argument, CFastHashMap < CLuaArguments*, CLuaArguments* > * pKnownTables = NULL );
                             CLuaArgument        ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
-                            CLuaArgument        ( lua_State* luaVM, int iArgument, std::map < const void*, CLuaArguments* > * pKnownTables = NULL );
+                            CLuaArgument        ( lua_State* luaVM, int iArgument, CFastHashMap < const void*, CLuaArguments* > * pKnownTables = NULL );
                             ~CLuaArgument       ( void );
 
     const CLuaArgument&     operator =          ( const CLuaArgument& Argument );
     bool                    operator ==         ( const CLuaArgument& Argument );
     bool                    operator !=         ( const CLuaArgument& Argument );
 
-    void                    Read                ( lua_State* luaVM, int iArgument, std::map < const void*, CLuaArguments* > * pKnownTables = NULL );
+    void                    Read                ( lua_State* luaVM, int iArgument, CFastHashMap < const void*, CLuaArguments* > * pKnownTables = NULL );
     void                    ReadBool            ( bool bBool );
     void                    ReadNumber          ( double dNumber );
     void                    ReadString          ( const std::string& strString );
@@ -52,7 +52,7 @@ public:
     void                    ReadScriptID        ( uint uiScriptID );
     void                    ReadElementID       ( ElementID ID );
 
-    void                    Push                ( lua_State* luaVM, std::map < CLuaArguments*, int > * pKnownTables = NULL ) const;
+    void                    Push                ( lua_State* luaVM, CFastHashMap < CLuaArguments*, int > * pKnownTables = NULL ) const;
 
     inline int              GetType             ( void ) const      { return m_iType; };
 
@@ -63,8 +63,8 @@ public:
     CClientEntity*          GetElement          ( void ) const;
 
     bool                    ReadFromBitStream   ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
-    bool                    WriteToBitStream    ( NetBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL ) const;
-    json_object*            WriteToJSONObject   ( bool bSerialize = false, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL );
+    bool                    WriteToBitStream    ( NetBitStreamInterface& bitStream, CFastHashMap < CLuaArguments*, unsigned long > * pKnownTables = NULL ) const;
+    json_object*            WriteToJSONObject   ( bool bSerialize = false, CFastHashMap < CLuaArguments*, unsigned long > * pKnownTables = NULL );
     bool                    ReadFromJSONObject  ( json_object* object, std::vector < CLuaArguments* > * pKnownTables = NULL );
     char *                  WriteToString       ( char * szBuffer, int length );
 
@@ -82,7 +82,7 @@ private:
     std::string             m_strFilename;
     int                     m_iLine;
 
-    void                    CopyRecursive       ( const CLuaArgument& Argument, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables = NULL );
+    void                    CopyRecursive       ( const CLuaArgument& Argument, CFastHashMap < CLuaArguments*, CLuaArguments* > * pKnownTables = NULL );
     bool                    CompareRecursive    ( const CLuaArgument& Argument, std::set < CLuaArguments* > * pKnownTables = NULL );
     void                    DeleteTableData     ( void );
 };

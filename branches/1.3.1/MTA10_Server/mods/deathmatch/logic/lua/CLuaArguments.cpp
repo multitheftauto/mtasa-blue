@@ -32,7 +32,7 @@ CLuaArguments::CLuaArguments ( NetBitStreamInterface& bitStream, std::vector < C
 }
 
 
-CLuaArguments::CLuaArguments ( const CLuaArguments& Arguments, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables )
+CLuaArguments::CLuaArguments ( const CLuaArguments& Arguments, CFastHashMap < CLuaArguments*, CLuaArguments* > * pKnownTables )
 {
     // Copy all the arguments
     CopyRecursive ( Arguments, pKnownTables );
@@ -47,6 +47,7 @@ CLuaArgument* CLuaArguments::operator [] ( const unsigned int uiPosition ) const
 }
 
 
+// Slow if used with a constructor as it does a copy twice
 const CLuaArguments& CLuaArguments::operator = ( const CLuaArguments& Arguments )
 {
     CopyRecursive ( Arguments );
@@ -56,7 +57,7 @@ const CLuaArguments& CLuaArguments::operator = ( const CLuaArguments& Arguments 
 }
 
 
-void CLuaArguments::CopyRecursive ( const CLuaArguments& Arguments, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables )
+void CLuaArguments::CopyRecursive ( const CLuaArguments& Arguments, CFastHashMap < CLuaArguments*, CLuaArguments* > * pKnownTables )
 {
     // Clear our previous list if any
     DeleteArguments ();
@@ -64,7 +65,7 @@ void CLuaArguments::CopyRecursive ( const CLuaArguments& Arguments, std::map < C
     bool bKnownTablesCreated = false;
     if ( !pKnownTables )
     {
-        pKnownTables = new std::map < CLuaArguments*, CLuaArguments* > ();
+        pKnownTables = new CFastHashMap < CLuaArguments*, CLuaArguments* > ();
         bKnownTablesCreated = true;
     }
 
@@ -87,7 +88,7 @@ void CLuaArguments::ReadArguments ( lua_State* luaVM, signed int uiIndexBegin )
     // Delete the previous arguments if any
     DeleteArguments ();
 
-    std::map < const void*, CLuaArguments* > knownTables;
+    CFastHashMap < const void*, CLuaArguments* > knownTables;
 
     // Start reading arguments until there are none left
     while ( lua_type ( luaVM, uiIndexBegin ) != LUA_TNONE )
@@ -100,12 +101,12 @@ void CLuaArguments::ReadArguments ( lua_State* luaVM, signed int uiIndexBegin )
     }
 }
 
-void CLuaArguments::ReadTable ( lua_State* luaVM, int iIndexBegin, std::map < const void*, CLuaArguments* > * pKnownTables )
+void CLuaArguments::ReadTable ( lua_State* luaVM, int iIndexBegin, CFastHashMap < const void*, CLuaArguments* > * pKnownTables )
 {
     bool bKnownTablesCreated = false;
     if ( !pKnownTables )
     {
-        pKnownTables = new std::map < const void*, CLuaArguments* > ();
+        pKnownTables = new CFastHashMap < const void*, CLuaArguments* > ();
         bKnownTablesCreated = true;
     }
 
@@ -151,7 +152,7 @@ void CLuaArguments::PushArguments ( lua_State* luaVM ) const
     }
 }
 
-void CLuaArguments::PushAsTable ( lua_State* luaVM, std::map < CLuaArguments*, int > * pKnownTables )
+void CLuaArguments::PushAsTable ( lua_State* luaVM, CFastHashMap < CLuaArguments*, int > * pKnownTables )
 {
     // Ensure there is enough space on the Lua stack
     LUA_CHECKSTACK ( luaVM, 4 );
@@ -159,7 +160,7 @@ void CLuaArguments::PushAsTable ( lua_State* luaVM, std::map < CLuaArguments*, i
     bool bKnownTablesCreated = false;
     if ( !pKnownTables )
     {
-        pKnownTables = new std::map < CLuaArguments*, int > ();
+        pKnownTables = new CFastHashMap < CLuaArguments*, int > ();
         bKnownTablesCreated = true;
 
 		lua_newtable ( luaVM );
@@ -550,6 +551,7 @@ void CLuaArguments::ValidateTableKeys ( void )
         // Check first in pair
         if ( (*iter)->GetType () == LUA_TNIL )
         {
+            // TODO - Handle ref in KnownTables
             // Remove pair
             delete *iter;
             iter = m_Arguments.erase ( iter );
@@ -603,12 +605,12 @@ bool CLuaArguments::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::v
 }
 
 
-bool CLuaArguments::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables ) const
+bool CLuaArguments::WriteToBitStream ( NetBitStreamInterface& bitStream, CFastHashMap < CLuaArguments*, unsigned long > * pKnownTables ) const
 {
     bool bKnownTablesCreated = false;
     if ( !pKnownTables )
     {
-        pKnownTables = new std::map < CLuaArguments*, unsigned long > ();
+        pKnownTables = new CFastHashMap < CLuaArguments*, unsigned long > ();
         bKnownTablesCreated = true;
     }
 
@@ -630,6 +632,7 @@ bool CLuaArguments::WriteToBitStream ( NetBitStreamInterface& bitStream, std::ma
 
     return bSuccess;
 }
+
 
 bool CLuaArguments::WriteToJSONString ( std::string& strJSON, bool bSerialize )
 {
@@ -663,12 +666,12 @@ json_object * CLuaArguments::WriteToJSONArray ( bool bSerialize )
     return my_array;
 }
 
-json_object * CLuaArguments::WriteTableToJSONObject ( bool bSerialize, std::map < CLuaArguments*, unsigned long > * pKnownTables )
+json_object * CLuaArguments::WriteTableToJSONObject ( bool bSerialize, CFastHashMap < CLuaArguments*, unsigned long > * pKnownTables )
 {
     bool bKnownTablesCreated = false;
     if ( !pKnownTables )
     {
-        pKnownTables = new std::map < CLuaArguments*, unsigned long > ();
+        pKnownTables = new CFastHashMap < CLuaArguments*, unsigned long > ();
         bKnownTablesCreated = true;
     }
 
