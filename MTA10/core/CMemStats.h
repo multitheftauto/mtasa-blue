@@ -8,6 +8,14 @@
 *
 *****************************************************************************/
 
+struct SModelCacheStats
+{
+    uint            uiMaxNumPedModels;
+    uint            uiMaxNumVehicleModels;
+    uint            uiNumPedModels;
+    uint            uiNumVehicleModels;
+};
+
 //
 // Memory state used in CMemStatsInterface
 //
@@ -23,6 +31,7 @@ struct SMemStatsInfo
     SRwResourceStats rwResourceStats;
     SClothesCacheStats clothesCacheStats;
     SShaderReplacementStats shaderReplacementStats;
+    SModelCacheStats modelCacheStats;
 
     union {
         uint uiArray[];

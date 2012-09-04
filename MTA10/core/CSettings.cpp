@@ -870,6 +870,25 @@ void CSettings::CreateGUI ( void )
     m_pFastClothesLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
 
+    // Model cache
+    m_pModelCacheLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Model cache:" ) );
+    m_pModelCacheLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pModelCacheLabel->AutoSize ( m_pModelCacheLabel->GetText ().c_str () );
+
+    m_pModelCacheCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pModelCacheCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pModelCacheCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pModelCacheCombo->AddItem ( "Off" )->SetData ( (void*)0 );
+    m_pModelCacheCombo->AddItem ( "Max" )->SetData ( (void*)2 );
+    m_pModelCacheCombo->AddItem ( "Default" )->SetData ( (void*)1 );
+    m_pModelCacheCombo->SetReadOnly ( true );
+
+    m_pModelCacheLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Reduces stalls\n(Max uses lots more RAM)" ) );
+    m_pModelCacheLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
+    m_pModelCacheLabelInfo->SetFont ( "default-bold-small" );
+    m_pModelCacheLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 40-4;
+
     // Browser scan speed
     m_pBrowserSpeedLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Browser speed:" ) );
     m_pBrowserSpeedLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
@@ -2294,6 +2313,12 @@ void CSettings::LoadData ( void )
     else if ( iVar == CMultiplayer::FAST_CLOTHES_AUTO ) m_pFastClothesCombo->SetText ( "Auto" );
     else if ( iVar == CMultiplayer::FAST_CLOTHES_ON ) m_pFastClothesCombo->SetText ( "On" );
 
+    // Fast clothes loading
+    CVARS_GET ( "model_cache", iVar );
+    if ( iVar == 0 ) m_pModelCacheCombo->SetText ( "Off" );
+    else if ( iVar == 1 ) m_pModelCacheCombo->SetText ( "Default" );
+    else if ( iVar == 2 ) m_pModelCacheCombo->SetText ( "Max" );
+
     // Browser speed
     CVARS_GET ( "browser_speed", iVar );
     if ( iVar == 0 ) m_pBrowserSpeedCombo->SetText ( "Very slow" );
@@ -2534,6 +2559,14 @@ void CSettings::SaveData ( void )
         int iSelected = ( int ) pSelected->GetData();
         CVARS_SET ( "fast_clothes_loading", iSelected );
         g_pCore->GetMultiplayer ()->SetFastClothesLoading ( (CMultiplayer::EFastClothesLoading)iSelected );
+    }
+
+    // Model cache
+    if ( CGUIListItem* pSelected = m_pModelCacheCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "model_cache", iSelected );
+        //g_pCore->GetMultiplayer ()->SetModelCacheLoading ( (CMultiplayer::EModelCacheLoading)iSelected );
     }
 
     // Audio

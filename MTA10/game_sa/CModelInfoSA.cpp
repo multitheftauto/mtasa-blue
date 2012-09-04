@@ -378,15 +378,16 @@ VOID CModelInfoSA::Request( EModelRequestType requestType, const char* szTag )
         {
             // Try 3 more times, final time without high priority flag
             int iCount = 0;
-            while ( iCount++ < 3 && !IsLoaded() )
+            while ( iCount++ < 10 && !IsLoaded() )
             {
-                bool bOnlyPriorityModels = ( iCount < 3 );
+                bool bOnlyPriorityModels = ( iCount < 3 || iCount & 1 );
                 pGame->GetStreaming()->LoadAllRequestedModels ( bOnlyPriorityModels, szTag );
             }
             if ( !IsLoaded() )
             {
                 AddReportLog ( 6641, SString ( "Blocking load fail: %d (%s)", m_dwModelID, szTag ) );
                 LogEvent ( 641, "Blocking load fail", "", SString ( "%d (%s)", m_dwModelID, szTag ) );
+                dassert ( 0 );
             }
             else
             {

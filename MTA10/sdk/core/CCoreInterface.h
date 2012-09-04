@@ -30,6 +30,7 @@ typedef bool (*pfnProcessMessage) ( HWND, UINT, WPARAM, LPARAM );
 class CMultiplayer;
 class CNet;
 class CGame;
+class CModelCacheManager;
 
 namespace ChatFonts
 {
@@ -153,6 +154,7 @@ public:
     virtual bool                    GetDebugIdEnabled               ( uint uiDebugId ) = 0;
     virtual EDiagnosticDebugType    GetDiagnosticDebug              ( void ) = 0;
     virtual void                    SetDiagnosticDebug              ( EDiagnosticDebugType value ) = 0;
+    virtual CModelCacheManager*     GetModelCacheManager            ( void ) = 0;
 };
 
 class CClientTime
