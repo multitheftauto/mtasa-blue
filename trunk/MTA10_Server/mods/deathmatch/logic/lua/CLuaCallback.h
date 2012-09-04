@@ -34,7 +34,7 @@ public:
         {
             m_pLuaMain = NULL;
             m_iLuaFunction = CLuaFunctionRef ();
-            m_Arguments = CLuaArguments ();
+            m_Arguments.DeleteArguments ();
         }
     }
 
