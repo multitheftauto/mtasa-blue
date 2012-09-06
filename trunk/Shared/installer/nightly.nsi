@@ -17,6 +17,8 @@ Var Install_Dir
 Var CreateSMShortcuts
 Var CreateDesktopIcon
 Var RedistInstalled
+Var ExeMD5
+Var PatchInstalled
 
 ; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\GDFImp.gdf.xml
 !define GUID "{DF780162-2450-4665-9BA2-EAB14ED640A3}"
@@ -379,9 +381,6 @@ DontInstallRedist:
 			CreateDirectory "$APPDATA\MTA San Andreas All\Common"
 			CreateDirectory "$APPDATA\MTA San Andreas All\${0.0}"
 
-			SetOutPath "$INSTDIR\MTA"
-			SetOverwrite on
-
 			#############################################################
 			# Make the directory "$INSTDIR" read write accessible by all users
 			# Make the directory "$APPDATA\MTA San Andreas All" read write accessible by all users
@@ -400,7 +399,8 @@ DontInstallRedist:
                 StrCpy $0 $INSTDIR
                 Call RemoveVirtualStore
 
-                IfFileExists $GTA_DIR\gta_sa.exe 0 PathBad
+                IfFileExists $GTA_DIR\gta_sa.exe +1 0
+				IfFileExists $GTA_DIR\gta-sa.exe 0 PathBad
                     # Fix permissions for GTA install directory
                     FastPerms::FullAccessPlox "$GTA_DIR"
 
@@ -412,6 +412,60 @@ DontInstallRedist:
                 PathBad:
             ${EndIf}
 			#############################################################
+			
+			#############################################################
+			# Patch our San Andreas .exe if it is required
+				
+			IfFileExists $GTA_DIR\gta_sa.exe 0 TrySteamExe
+				!insertmacro GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5
+				DetailPrint "gta_sa.exe successfully detected ($ExeMD5)"
+				${Switch} $ExeMD5
+					${Case} "bf25c28e9f6c13bd2d9e28f151899373" #US 2.00
+					${Case} "7fd5f9436bd66af716ac584ff32eb483" #US 1.01
+					${Case} "4e99d762f44b1d5e7652dfa7e73d6b6f" #EU 2.00
+					${Case} "2ac4b81b3e85c8d0f9846591df9597d3" #EU 1.01
+					${Case} "9effcaf66b59b9f8fb8dff920b3f6e63" #DE 2.00
+					${Case} "fa490564cd9811978085a7a8f8ed7b2a" #DE 1.01
+					${Case} "49dd417760484a18017805df46b308b8" #DE 1.00
+						#Create a backup of the GTA exe before patching
+						CopyFiles "$GTA_DIR\gta_sa.exe" "$GTA_DIR\gta_sa.exe.bak"
+						Call InstallPatch
+						${If} $PatchInstalled == "1"
+							Goto CompletePatchProc
+						${EndIf}
+						Goto NoExeFound
+						${Break}
+					${Default}
+						Goto CompletePatchProc #This gta_sa.exe doesn't need patching, let's continue
+						${Break}
+				${EndSwitch}
+			TrySteamExe:
+				IfFileExists $GTA_DIR\gta-sa.exe 0 NoExeFound
+				!insertmacro GetMD5 $GTA_DIR\gta-sa.exe $ExeMD5
+				DetailPrint "gta-sa.exe successfully detected ($ExeMD5)"
+				${Switch} $ExeMD5
+					${Case} "0fd315d1af41e26e536a78b4d4556488" #EU 3.00 Steam
+						#Copy gta-sa.exe to gta_sa.exe and commence patching process
+						CopyFiles "$GTA_DIR\gta-sa.exe" "$GTA_DIR\gta_sa.exe.bak"
+						Call InstallPatch
+						${If} $PatchInstalled == "1"
+							Goto CompletePatchProc
+						${EndIf}
+						Goto NoExeFound
+						${Break}
+					${Default}
+						Goto NoExeFound
+						${Break}
+				${EndSwitch}					
+				
+			NoExeFound:
+				MessageBox MB_ICONSTOP "A valid Windows® version of Grand Theft Auto: San Andreas was not detected.\
+				$\r$\nHowever installation will continue.\
+				$\r$\nPlease reinstall if there are problems later."
+			CompletePatchProc:
+			
+			SetOutPath "$INSTDIR\MTA"
+			SetOverwrite on
 
 			# Make some keys in HKLM read write accessible by all users
 			AccessControl::GrantOnRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All" "(BU)" "FullAccess"
@@ -904,6 +958,47 @@ InstallEnd:
 InstallEnd2:
 FunctionEnd
 
+;====================================================================================
+; Patcher related functions
+;====================================================================================
+Var PATCHFILE
+
+Function InstallPatch
+	DetailPrint "Incompatible version of San Andreas detected.  Patching executable..."
+	StrCpy $PATCHFILE "$TEMP\$ExeMD5.GTASAPatch"
+	NSISdl::download "http://mirror.multitheftauto.com/gdata/$ExeMD5.GTASAPatch" $PATCHFILE
+	Pop $0
+	StrCmp "$0" "success" PatchDownloadSuccessful
+	
+	DetailPrint "* Download of patch file failed:"
+	DetailPrint "* $0"
+	DetailPrint "* Installation continuing anyway"
+	MessageBox MB_ICONSTOP "Unable to download the patch file for your version of Grand Theft Auto: San Andreas"
+	StrCpy $PatchInstalled "0"
+	Goto FinishPatch
+	
+PatchDownloadSuccessful:
+	DetailPrint "Patch download successful.  Installing patch..."
+	vpatch::vpatchfile "$PATCHFILE" "$GTA_DIR\gta_sa.exe.bak" "$GTA_DIR\gta_sa.exe"
+	Pop $R0
+	
+	${If} $R0 == "OK"
+		StrCpy $PatchInstalled "1"
+		Goto FinishPatch
+	${ElseIf} $R0 == "OK, new version already installed"
+		StrCpy $PatchInstalled "1"
+		Goto FinishPatch
+	${EndIf}
+	
+	DetailPrint "* Some error occured installing the patch for Grand Theft Auto: San Andreas:"
+	DetailPrint "* $R0"
+	DetailPrint "* It is required in order to run Multi Theft Auto : San Andreas"
+	DetailPrint "* Installation continuing anyway"
+	MessageBox MB_ICONSTOP "Unable to install the patch file for your version of Grand Theft Auto: San Andreas"
+	StrCpy $PatchInstalled "0"
+	
+	FinishPatch:
+FunctionEnd
 
 ;====================================================================================
 ; UAC related functions

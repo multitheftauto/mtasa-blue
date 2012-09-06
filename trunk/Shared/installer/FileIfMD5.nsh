@@ -12,3 +12,9 @@
 		File "${FileOutPath}"
 	${EndIf}
 !macroend
+
+!macro GetMD5 FullPath MD5
+	md5dll::GetMD5File "${FullPath}"
+	Pop $0
+	StrCpy ${MD5} $0
+!macroend
