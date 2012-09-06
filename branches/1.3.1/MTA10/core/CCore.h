@@ -245,6 +245,8 @@ public:
     EDiagnosticDebugType    GetDiagnosticDebug              ( void );
     void                    SetDiagnosticDebug              ( EDiagnosticDebugType value );
     CModelCacheManager*     GetModelCacheManager            ( void );
+    void                    AddModelToPersistentCache       ( ushort usModelId );
+    void                    NotifyLoadingModel              ( ushort usModelId );
 
 private:
     // Core devices.
