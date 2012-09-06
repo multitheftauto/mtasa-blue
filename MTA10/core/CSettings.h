@@ -182,9 +182,6 @@ protected:
     CGUILabel*          m_pFastClothesLabelInfo;
     CGUILabel*          m_pFastClothesLabel;
     CGUIComboBox*       m_pFastClothesCombo;
-    CGUILabel*          m_pModelCacheLabelInfo;
-    CGUILabel*          m_pModelCacheLabel;
-    CGUIComboBox*       m_pModelCacheCombo;
     CGUILabel*          m_pAudioGeneralLabel;
     CGUILabel*          m_pUserTrackGeneralLabel;
     CGUILabel*          m_pBrowserSpeedLabelInfo;

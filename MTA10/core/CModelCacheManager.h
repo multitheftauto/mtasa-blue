@@ -22,7 +22,8 @@ public:
     virtual void                OnClientClose                       ( void ) = 0;
     virtual void                UpdatePedModelCaching               ( const std::map < ushort, float >& newNeedCacheList ) = 0;
     virtual void                UpdateVehicleModelCaching           ( const std::map < ushort, float >& newNeedCacheList ) = 0;
-
+    virtual void                AddModelToPersistentCache           ( ushort usModelId ) = 0;
+    virtual void                NotifyLoadingModel                  ( ushort usModelId ) = 0;
 };
 
 CModelCacheManager* NewModelCacheManager ( void );

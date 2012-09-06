@@ -3502,6 +3502,9 @@ void CClientPed::_ChangeModel ( void )
             #ifdef NO_CRASH_FIX_TEST
                 m_pPlayerPed->RemoveGeometryRef ();
             #endif
+                // As we will have problem removing the geometry later, we might as well keep the model cached until exit
+                g_pCore->AddModelToPersistentCache ( m_ulModel );
+
             }
 
 
