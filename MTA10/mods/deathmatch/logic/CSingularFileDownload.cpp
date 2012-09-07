@@ -31,7 +31,7 @@ CSingularFileDownload::CSingularFileDownload ( CResource* pResource, const char 
     if ( !DoesClientAndServerChecksumMatch () )
     {
         CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork ()->GetHTTPDownloadManager ();
-        pHTTP->QueueFile ( strHTTPURL.c_str(), szName, 0, NULL, 0, false, this, ProgressCallBack );
+        pHTTP->QueueFile ( strHTTPURL.c_str(), szName, 0, NULL, 0, false, this, ProgressCallBack, false, 10, true );
         m_bComplete = false;
     }
     else

@@ -4489,7 +4489,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                 unlink ( pDownloadableResource->GetName () );
 
                                 // Queue the file to be downloaded
-                                bool bAddedFile = pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame () );
+                                bool bAddedFile = pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame (), 10, true );
 
                                 // If the file was successfully queued, increment the resources to be downloaded
                                 usResourcesToBeDownloaded++;

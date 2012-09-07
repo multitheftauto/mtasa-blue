@@ -24,6 +24,20 @@ struct SPacketStat
     TIMEUS totalTime;
 };
 
+class CBinaryFileInterface
+{
+public:
+    virtual             ~CBinaryFileInterface   ( void ) {}
+    virtual bool        FOpen                   ( const char* szFilename, const char* szMode, bool bValidate ) = 0;
+    virtual void        FClose                  ( void ) = 0;
+    virtual bool        FEof                    ( void ) = 0;
+    virtual void        FFlush                  ( void ) = 0;
+    virtual int         FTell                   ( void ) = 0;
+    virtual void        FSeek                   ( int iOffset, int iOrigin ) = 0;
+    virtual int         FRead                   ( void* pData, uint uiSize ) = 0;
+    virtual int         FWrite                  ( const void* pData, uint uiSize ) = 0;
+};
+
 class CNet
 {
 public:
@@ -50,7 +64,7 @@ public:
     virtual bool                        SendPacket                  ( unsigned char ucPacketID, NetBitStreamInterface* bitStream, NetPacketPriority packetPriority, NetPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT ) = 0;
 
     virtual void                        SetClientPort               ( unsigned short usClientPort ) = 0;
-    virtual const char *                GetConnectedServer          ( void )=0;
+    virtual const char *                GetConnectedServer          ( bool bIncludePort = false )=0;
 
     virtual bool                        GetNetworkStatistics        ( NetStatistics* pDest ) = 0;
     virtual const SPacketStat*          GetPacketStats              ( void ) = 0;
@@ -92,6 +106,9 @@ public:
 
     virtual uint                        GetExtendedErrorCode        ( void ) = 0;
     virtual void                        SetTimeoutTime              ( uint uiTimeoutTime ) = 0;
+
+    virtual bool                        ValidateBinaryFileName      ( const char* szFilename ) = 0;
+    virtual CBinaryFileInterface*       AllocateBinaryFile          ( void ) = 0;
 };
 
 #endif

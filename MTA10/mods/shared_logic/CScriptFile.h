@@ -53,14 +53,13 @@ public:
     long                    GetSize                 ( void );
 
     long                    SetPointer              ( unsigned long ulPosition );
-    void                    SetSize                 ( unsigned long ulNewSize );
 
     void                    Flush                   ( void );
     long                    Read                    ( unsigned long ulSize, char* pData );
     long                    Write                   ( unsigned long ulSize, const char* pData );
 
 private:
-    FILE*                   m_pFile;
+    CBinaryFileInterface*   m_pFile;
     std::string             m_strFilename;
     unsigned long           m_ulMaxSize;
 };
