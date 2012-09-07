@@ -48,6 +48,12 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
     {
         // Grab our lua VM
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+
+        if ( !g_pNet->ValidateBinaryFileName ( filePath ) )
+        {
+            argStream.SetCustomError ( SString ( "Filename not allowed %s", *filePath ), "File error" );
+        }
+        else
         if ( pLuaMain )
         {
             std::string strAbsPath;
@@ -89,13 +95,14 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
                     delete pFile;
 
                     // Output error
-                    m_pScriptDebugging->LogWarning ( luaVM, "fileCreate; unable to load file" );
+                    argStream.SetCustomError ( SString ( "Unable to create %s", *filePath ), "File error" );
                 }
             }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fileCreate", *argStream.GetErrorMessage () ) );
+
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -531,6 +538,12 @@ int CLuaFileDefs::fileRename ( lua_State* luaVM )
     {
         // Grab our lua VM
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+
+        if ( !g_pNet->ValidateBinaryFileName ( newFilePath ) )
+        {
+            argStream.SetCustomError ( SString ( "Filename not allowed %s", *newFilePath ), "File error" );
+        }
+        else
         if ( pLuaMain )
         {
             std::string strCurAbsPath;
@@ -549,7 +562,7 @@ int CLuaFileDefs::fileRename ( lua_State* luaVM )
                     // Does destination file exist?
                     if ( FileExists ( strNewAbsPath.c_str() ) )
                     {
-                        m_pScriptDebugging->LogWarning ( luaVM, "fileRename failed; destination file already exists" );
+                        argStream.SetCustomError ( SString ( "Destination file already exists (%s)", *newFilePath ), "File error" );
                     }
                     else
                     {
@@ -564,19 +577,20 @@ int CLuaFileDefs::fileRename ( lua_State* luaVM )
                         }
                         else
                         {
-                            m_pScriptDebugging->LogWarning ( luaVM, "fileRename; unable to rename/move file" );
+                            argStream.SetCustomError ( SString ( "Unable to rename/move %s to %s", *filePath, *newFilePath ), "File error" );
                         }
                     }
                 }
                 else
                 {
-                    m_pScriptDebugging->LogWarning ( luaVM, "fileRename failed; source file doesn't exist" );
+                    argStream.SetCustomError ( SString ( "Source file doesn't exist (%s)", *filePath ), "File error" );
                 }
             }
         }
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "fileRename", *argStream.GetErrorMessage () ) );
+
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -598,6 +612,12 @@ int CLuaFileDefs::fileCopy ( lua_State* luaVM )
     {
         // Grab our lua VM
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+
+        if ( !g_pNet->ValidateBinaryFileName ( newFilePath ) )
+        {
+            argStream.SetCustomError ( SString ( "Filename not allowed %s", *newFilePath ), "File error" );
+        }
+        else
         if ( pLuaMain )
         {
             std::string strCurAbsPath;
