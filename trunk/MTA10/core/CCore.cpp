@@ -2111,9 +2111,3 @@ void CCore::AddModelToPersistentCache ( ushort usModelId )
 {
     return GetModelCacheManager ()->AddModelToPersistentCache ( usModelId );
 }
-
-
-void CCore::NotifyLoadingModel ( ushort usModelId )
-{
-    return GetModelCacheManager ()->NotifyLoadingModel ( usModelId );
-}
