@@ -46,8 +46,8 @@
 #define IS_TEAM(element)     ((element)->GetType()==CElement::TEAM)
 #define IS_WATER(element)    ((element)->GetType()==CElement::WATER)
 
-typedef CFastList < class CElement > CChildListType;
-typedef CFastList < class CElement > CElementListType;
+typedef CFastList < CElement* > CChildListType;
+typedef CFastList < CElement* > CElementListType;
 
 class CElement
 {

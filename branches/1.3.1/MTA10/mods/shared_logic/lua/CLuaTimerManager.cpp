@@ -25,7 +25,7 @@ void CLuaTimerManager::DoPulse ( CLuaMain* pLuaMain )
     CTickCount llCurrentTime = CTickCount::Now ();
 
     // Use a separate queue to avoid trouble
-    for ( CFastList < CLuaTimer > ::const_iterator iter = m_TimerList.begin () ; iter != m_TimerList.end () ; iter++ )
+    for ( CFastList < CLuaTimer* > ::const_iterator iter = m_TimerList.begin () ; iter != m_TimerList.end () ; iter++ )
         m_ProcessQueue.push_back ( *iter );
 
     while ( !m_ProcessQueue.empty () )
@@ -97,7 +97,7 @@ void CLuaTimerManager::RemoveTimer ( CLuaTimer* pLuaTimer )
 void CLuaTimerManager::RemoveAllTimers ( void )
 {
     // Delete all the timers
-    CFastList < CLuaTimer > ::const_iterator iter = m_TimerList.begin ();
+    CFastList < CLuaTimer* > ::const_iterator iter = m_TimerList.begin ();
     for ( ; iter != m_TimerList.end (); iter++ )
     {
         delete *iter;

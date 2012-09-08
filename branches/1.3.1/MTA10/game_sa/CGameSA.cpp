@@ -169,10 +169,13 @@ CGameSA::CGameSA()
     m_Cheats [ CHEAT_HEALTARMORMONEY  ] = new SCheatSA((BYTE *)VAR_HealthArmorMoney, false);
 
     // Change pool sizes here
-    m_pPools->SetPoolCapacity ( TASK_POOL, 5000 );  // Default is 500
-    m_pPools->SetPoolCapacity ( OBJECT_POOL, 700 );  // Default is 350
-    m_pPools->SetPoolCapacity ( EVENT_POOL, 5000 );
-    m_pPools->SetPoolCapacity ( COL_MODEL_POOL, 12000 );  // Default is 10150
+    m_pPools->SetPoolCapacity ( TASK_POOL, 5000 );                  // Default is 500
+    m_pPools->SetPoolCapacity ( OBJECT_POOL, 700 );                 // Default is 350
+    m_pPools->SetPoolCapacity ( EVENT_POOL, 5000 );                 // Default is 200
+    m_pPools->SetPoolCapacity ( COL_MODEL_POOL, 12000 );            // Default is 10150
+    m_pPools->SetPoolCapacity ( ENV_MAP_MATERIAL_POOL, 16000 );     // Default is 4096
+    m_pPools->SetPoolCapacity ( ENV_MAP_ATOMIC_POOL, 4000 );        // Default is 1024
+    m_pPools->SetPoolCapacity ( SPEC_MAP_MATERIAL_POOL, 16000 );    // Default is 4096
 
     CModelInfoSA::StaticSetHooks ();
 }

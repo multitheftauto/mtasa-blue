@@ -107,15 +107,7 @@ void CClientColShape::CallLeaveCallback ( CClientEntity& Entity )
 
 bool CClientColShape::ColliderExists ( CClientEntity* pEntity )
 {
-    list < CClientEntity* > ::iterator iter = m_Colliders.begin ();
-    for ( ; iter != m_Colliders.end () ; iter++ )
-    {
-        if ( *iter == pEntity )
-        {
-            return true;
-        }
-    }    
-    return false;
+    return m_Colliders.contains ( pEntity );
 }
 
 
@@ -123,7 +115,7 @@ void CClientColShape::RemoveAllColliders ( bool bNotify )
 {
     if ( bNotify )
     {
-        list < CClientEntity* > ::iterator iter = m_Colliders.begin ();
+        CFastList < CClientEntity* > ::iterator iter = m_Colliders.begin ();
         for ( ; iter != m_Colliders.end () ; iter++ )
         {
             (*iter)->RemoveCollision ( this );
