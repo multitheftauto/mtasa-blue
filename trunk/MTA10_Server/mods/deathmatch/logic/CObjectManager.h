@@ -20,7 +20,7 @@
 using std::list;
 
 class CObject;
-typedef CFastList < CObject >   CObjectListType;
+typedef CFastList < CObject* >   CObjectListType;
 
 class CObjectManager
 {

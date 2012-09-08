@@ -87,7 +87,7 @@ class CLuaArgument;
 class CLuaArguments;
 class CLuaMain;
 class CMapEventManager;
-typedef CFastList < class CClientEntity > CChildListType;
+typedef CFastList < CClientEntity* > CChildListType;
 
 enum eCClientEntityClassTypes
 {

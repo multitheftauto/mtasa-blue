@@ -24,12 +24,12 @@ typedef uint SDbConnectionId;
 //
 // CFastList with additional name->account mapping
 //
-class CMappedAccountList : protected CFastList < CAccount >
+class CMappedAccountList : protected CFastList < CAccount* >
 {
 public:
-    typedef CFastList < CAccount > Super;
-    typedef CFastList < CAccount >::iterator        iterator;
-    typedef CFastList < CAccount >::const_iterator  const_iterator;
+    typedef CFastList < CAccount* > Super;
+    typedef CFastList < CAccount* >::iterator        iterator;
+    typedef CFastList < CAccount* >::const_iterator  const_iterator;
 
     // CMappedList functions
     bool        contains ( CAccount* item ) const   { return Super::contains ( item ); }

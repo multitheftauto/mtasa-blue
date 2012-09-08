@@ -30,8 +30,8 @@ public:
     void                            Delete                              ( int ID );
     void                            DeleteAll                           ( void );
 
-    inline std::list < CClientMarker* > ::const_iterator IterBegin      ( void )                            { return m_Markers.begin (); };
-    inline std::list < CClientMarker* > ::const_iterator IterEnd        ( void )                            { return m_Markers.end (); };
+    CFastList < CClientMarker* > ::const_iterator   IterBegin           ( void )                            { return m_Markers.begin (); };
+    CFastList < CClientMarker* > ::const_iterator   IterEnd             ( void )                            { return m_Markers.end (); };
 
 
 private:
@@ -41,10 +41,10 @@ private:
     void                            DoPulse                             ( void );
 
     inline void                     AddToList                           ( CClientMarker* pCheckpoint )      { m_Markers.push_back ( pCheckpoint ); };
-    inline void                     RemoveFromList                      ( CClientMarker* pCheckpoint )      { if ( m_bCanRemoveFromList && !m_Markers.empty() ) m_Markers.remove ( pCheckpoint ); };
+    inline void                     RemoveFromList                      ( CClientMarker* pCheckpoint )      { if ( m_bCanRemoveFromList ) m_Markers.remove ( pCheckpoint ); };
 
     class CClientManager*           m_pManager;
-    std::list < CClientMarker* >    m_Markers;
+    CFastList < CClientMarker* >    m_Markers;
     bool                            m_bCanRemoveFromList;
 };
 
