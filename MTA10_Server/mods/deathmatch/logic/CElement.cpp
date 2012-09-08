@@ -1260,7 +1260,7 @@ bool CElement::CanUpdateSync ( unsigned char ucRemote )
 
 
 // Entities from root optimization for getElementsByType
-typedef CFastList < CElement > CFromRootListType;
+typedef CFastList < CElement* > CFromRootListType;
 typedef google::dense_hash_map < unsigned int, CFromRootListType > t_mapEntitiesFromRoot;
 static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
 static bool                     ms_bEntitiesFromRootInitialized = false;

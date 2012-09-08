@@ -711,7 +711,7 @@ int CLuaFunctionDefs::GetElementsWithinColShape ( lua_State* luaVM )
 
                 // Add all the elements within the shape to it
                 unsigned int uiIndex = 0;
-                list < CClientEntity* > ::iterator iter = pColShape->CollidersBegin ();
+                CFastList < CClientEntity* > ::iterator iter = pColShape->CollidersBegin ();
                 for ( ; iter != pColShape->CollidersEnd (); iter++ )
                 {
                     if ( szType == NULL || strcmp ( (*iter)->GetTypeName (), szType ) == 0 )

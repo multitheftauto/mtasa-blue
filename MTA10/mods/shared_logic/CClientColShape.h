@@ -64,11 +64,11 @@ public:
     inline void                         SetAutoCallEvent                ( bool bAutoCallEvent )                             { m_bAutoCallEvent = bAutoCallEvent; };
 
     void                                AddCollider                     ( CClientEntity* pEntity )                          { m_Colliders.push_back ( pEntity ); }
-    void                                RemoveCollider                  ( CClientEntity* pEntity )                          { if ( !m_Colliders.empty() ) m_Colliders.remove ( pEntity ); }
+    void                                RemoveCollider                  ( CClientEntity* pEntity )                          { m_Colliders.remove ( pEntity ); }
     bool                                ColliderExists                  ( CClientEntity* pEntity );
     void                                RemoveAllColliders              ( bool bNotify );
-    std::list < CClientEntity* > ::iterator  CollidersBegin             ( void )                                            { return m_Colliders.begin (); }
-    std::list < CClientEntity* > ::iterator  CollidersEnd               ( void )                                            { return m_Colliders.end (); }
+    CFastList < CClientEntity* > ::iterator  CollidersBegin             ( void )                                            { return m_Colliders.begin (); }
+    CFastList < CClientEntity* > ::iterator  CollidersEnd               ( void )                                            { return m_Colliders.end (); }
 
     void                                SizeChanged                     ( void );
 protected:
@@ -81,7 +81,7 @@ private:
     class CClientColManager*            m_pColManager;
     CClientColCallback*                 m_pCallback;
     bool                                m_bAutoCallEvent;  
-    std::list < CClientEntity* >        m_Colliders;    
+    CFastList < CClientEntity* >        m_Colliders;    
 };
 
 #endif
