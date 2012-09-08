@@ -372,7 +372,6 @@ VOID CModelInfoSA::Request( EModelRequestType requestType, const char* szTag )
 
     if ( requestType == BLOCKING )
     {
-        g_pCore->NotifyLoadingModel ( (ushort)m_dwModelID );
         pGame->GetStreaming()->RequestModel ( m_dwModelID, 0x16 );
         pGame->GetStreaming()->LoadAllRequestedModels ( true, szTag );
         if ( !IsLoaded() )

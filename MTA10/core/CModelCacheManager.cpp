@@ -44,7 +44,6 @@ public:
     virtual void                UpdatePedModelCaching               ( const std::map < ushort, float >& newNeedCacheList );
     virtual void                UpdateVehicleModelCaching           ( const std::map < ushort, float >& newNeedCacheList );
     virtual void                AddModelToPersistentCache           ( ushort usModelId );
-    virtual void                NotifyLoadingModel                  ( ushort usModelId );
 
     // CModelCacheManagerImpl methods
                                 CModelCacheManagerImpl              ( void );
@@ -206,8 +205,6 @@ void CModelCacheManagerImpl::DoPulse ( void )
     m_uiMaxCachedPedModels = (int)EvalSamplePosition < float > ( pedPoints, NUMELMS ( pedPoints ), (float)iStreamingMemoryAvailableKB );
     m_uiMaxCachedVehicleModels = (int)EvalSamplePosition < float > ( vehPoints, NUMELMS ( vehPoints ), (float)iStreamingMemoryAvailableKB );
 
-    // Dark car fix
-    m_uiMaxCachedVehicleModels = Min ( m_uiMaxCachedVehicleModels, 10U );
 }
 
 
@@ -224,32 +221,6 @@ void CModelCacheManagerImpl::AddModelToPersistentCache ( ushort usModelId )
     {
         AddModelRefCount ( usModelId );
         MapInsert ( m_PermoLoadedModels, usModelId );
-    }
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// CModelCacheManagerImpl::NotifyLoadingModel
-//
-// Halp ensure vehicle model limit is not exceeded to avoid dark cars
-//
-///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::NotifyLoadingModel ( ushort usModelId )
-{
-    if ( usModelId >= 400 && usModelId <= 611 )
-    {
-        if ( m_uiMaxCachedVehicleModels == 0 )
-            return;
-
-        // If vehicle cached here, then nothing needs to be done
-        SModelCacheInfo* pInfo = MapFind ( m_VehicleModelCacheInfoMap, usModelId );
-        if ( pInfo && pInfo->bIsModelCachedHere )
-            return;
-
-        // Otherwise, make sure cache limit is upto date
-        assert ( m_uiMaxCachedVehicleModels > 0 );
-        UpdateModelCaching ( std::map < ushort, float >(), m_VehicleModelCacheInfoMap, m_uiMaxCachedVehicleModels - 1 );
     }
 }
 
@@ -342,12 +313,10 @@ void CModelCacheManagerImpl::UpdateModelCaching ( const std::map < ushort, float
     }
 
 
-    uint uiNumModelsCachedHere = 0;
-    uint uiNumModelsCachedOrLoaded = 0;
+    uint uiNumModelsCachedHereOnly = 0;
 
     std::map < uint, ushort > maybeUncacheUnneededList;
     std::map < uint, ushort > maybeUncacheNeededList;
-    std::map < uint, ushort > maybeUncacheLoadedList;
     std::map < uint, ushort > maybeCacheList;
 
     // Update active 
@@ -356,19 +325,22 @@ void CModelCacheManagerImpl::UpdateModelCaching ( const std::map < ushort, float
         const ushort usModelId = iter->first;
         SModelCacheInfo& info = iter->second;
 
-        if ( info.bIsModelCachedHere )
-            uiNumModelsCachedHere++;
-
         if ( info.bIsModelLoadedByGame )
         {
-            uiNumModelsCachedOrLoaded++;
             info.lastNeeded = m_TickCountNow;
+
+            // Add cache ref here so when game tries to unload the model, we can keep it loaded
+            if ( !info.bIsModelCachedHere )
+            {
+                AddModelRefCount ( usModelId );
+                info.bIsModelCachedHere = true;
+            }
         }
         else
         {
             if ( info.bIsModelCachedHere )
             {
-                uiNumModelsCachedOrLoaded++;
+                uiNumModelsCachedHereOnly++;
                 // Update cached models that could be uncached
                 uint uiTicksSinceLastNeeded = ( m_TickCountNow - info.lastNeeded ).ToInt ();
                 if ( uiTicksSinceLastNeeded > 0 )
@@ -388,32 +360,8 @@ void CModelCacheManagerImpl::UpdateModelCaching ( const std::map < ushort, float
         }
     }
 
-    // Handle caching already loaded models 
-    for ( std::map < ushort, SModelCacheInfo >::iterator iter = currentCacheInfoMap.begin () ; iter != currentCacheInfoMap.end () ; ++iter )
-    {
-        const ushort usModelId = iter->first;
-        SModelCacheInfo& info = iter->second;
-
-        if ( info.bIsModelLoadedByGame )
-        {
-            // Add cache ref here so when game tries to unload the model, we can keep it loaded
-            if ( !info.bIsModelCachedHere )
-            {
-                if ( uiNumModelsCachedHere < uiMaxCachedAllowed )
-                {
-                    uiNumModelsCachedHere++;
-                    AddModelRefCount ( usModelId );
-                    info.bIsModelCachedHere = true;
-                    OutputDebugLine ( SString ( "[Cache] Start caching model %d  (LoadedByGame)", usModelId ) );
-                }
-            }
-            else
-                MapSet ( maybeUncacheLoadedList, (int)info.fClosestDistSq, usModelId );
-        }
-    }
-
     // If at or above cache limit, try to uncache unneeded first
-    if ( uiNumModelsCachedOrLoaded >= uiMaxCachedAllowed && !maybeUncacheUnneededList.empty () )
+    if ( uiNumModelsCachedHereOnly >= uiMaxCachedAllowed && !maybeUncacheUnneededList.empty () )
     {
         const ushort usModelId = maybeUncacheUnneededList.rbegin ()->second;
         SModelCacheInfo* pInfo = MapFind ( currentCacheInfoMap, usModelId );
@@ -425,7 +373,7 @@ void CModelCacheManagerImpl::UpdateModelCaching ( const std::map < ushort, float
         OutputDebugLine ( SString ( "[Cache] End caching model %d  (UncacheUnneeded)", usModelId ) );
     }
     else
-    if ( uiNumModelsCachedOrLoaded > uiMaxCachedAllowed && !maybeUncacheNeededList.empty () )
+    if ( uiNumModelsCachedHereOnly > uiMaxCachedAllowed && !maybeUncacheNeededList.empty () )
     {
         // Only uncache from the needed list if above limit
 
@@ -439,22 +387,9 @@ void CModelCacheManagerImpl::UpdateModelCaching ( const std::map < ushort, float
         MapRemove ( currentCacheInfoMap, usModelId );
         OutputDebugLine ( SString ( "[Cache] End caching model %d  (UncacheNeeded)", usModelId ) );
     }
-    else
-    if ( uiNumModelsCachedOrLoaded > uiMaxCachedAllowed && !maybeUncacheLoadedList.empty () )
-    {
-        // Uncache furthest away model
-        const ushort usModelId = maybeUncacheLoadedList.rbegin ()->second;
-        SModelCacheInfo* pInfo = MapFind ( currentCacheInfoMap, usModelId );
-        assert ( pInfo );
-        assert ( pInfo->bIsModelCachedHere );
-        SubModelRefCount ( usModelId );
-        pInfo->bIsModelCachedHere = false;
-        MapRemove ( currentCacheInfoMap, usModelId );
-        OutputDebugLine ( SString ( "[Cache] End caching model %d  (UncacheLoaded)", usModelId ) );
-    }
 
     // Cache if room
-    if ( !maybeCacheList.empty () && uiNumModelsCachedOrLoaded < uiMaxCachedAllowed )
+    if ( !maybeCacheList.empty () && uiNumModelsCachedHereOnly < uiMaxCachedAllowed )
     {
         // Cache one which has been waiting the longest
         const ushort usModelId = maybeCacheList.rbegin ()->second;

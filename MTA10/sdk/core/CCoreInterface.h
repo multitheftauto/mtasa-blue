@@ -156,7 +156,6 @@ public:
     virtual void                    SetDiagnosticDebug              ( EDiagnosticDebugType value ) = 0;
     virtual CModelCacheManager*     GetModelCacheManager            ( void ) = 0;
     virtual void                    AddModelToPersistentCache       ( ushort usModelId ) = 0;
-    virtual void                    NotifyLoadingModel              ( ushort usModelId ) = 0;
 };
 
 class CClientTime
