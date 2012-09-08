@@ -2791,6 +2791,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientSoundChangedMeta", "streamTitle", NULL, false );
     m_Events.AddEvent ( "onClientSoundStarted", "reason", NULL, false );
     m_Events.AddEvent ( "onClientSoundStopped", "reason", NULL, false );
+    m_Events.AddEvent ( "onClientSoundBeat", "time", NULL, false );
 
     // Misc events
     m_Events.AddEvent ( "onClientFileDownloadComplete", "fileName, success", NULL, false );
