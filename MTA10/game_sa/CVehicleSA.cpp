@@ -2185,11 +2185,28 @@ namespace
             _asm
             {
                 push    iUnknown
-                    push    fZ
-                    push    fY
-                    push    fX
-                    mov     ecx, matrixPadded
-                    call    dwFunc
+                push    fZ
+                push    fY
+                push    fX
+                mov     ecx, matrixPadded
+                call    dwFunc
+            }
+        }
+    }
+    VOID _MatrixConvertToEulerAngles ( CMatrix_Padded* matrixPadded, float &fX, float &fY, float &fZ )
+    {
+        int iUnknown = 0;
+        if ( matrixPadded )
+        {
+            DWORD dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
+            _asm
+            {
+                push    iUnknown
+                push    fZ
+                push    fY
+                push    fX
+                mov     ecx, matrixPadded
+                call    dwFunc
             }
         }
     }
@@ -2215,11 +2232,11 @@ bool CVehicleSA::GetComponentRotation ( eVehicleComponent vehicleComponent, CVec
     RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
     if ( pComponent )
     {
-        /*CMatrix_Padded matrixPadded;
-        _MatrixConvertFromEulerAngles ( &matrixPadded, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
-        pComponent->modelling.right = (RwV3d&)matrixPadded.vRight;
-        pComponent->modelling.up = (RwV3d&)matrixPadded.vFront;
-        pComponent->modelling.at = (RwV3d&)matrixPadded.vUp;*/
+        CMatrix_Padded matrixPadded;
+        (RwV3d&)matrixPadded.vRight = pComponent->modelling.right;
+        (RwV3d&)matrixPadded.vFront = pComponent->modelling.up;
+        (RwV3d&)matrixPadded.vUp = pComponent->modelling.at;
+        _MatrixConvertToEulerAngles ( &matrixPadded, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
         return true;
     }
     return false;

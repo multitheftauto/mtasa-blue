@@ -718,8 +718,6 @@ int CLuaFunctionDefs::EngineGetFramePosition ( lua_State* luaVM )
     return 1;
 }
 
-
-
 int CLuaFunctionDefs::EngineSetFrameRotation ( lua_State* luaVM )
 {
     CScriptArgReader argStream ( luaVM );
@@ -738,6 +736,34 @@ int CLuaFunctionDefs::EngineSetFrameRotation ( lua_State* luaVM )
             pVehicle->SetComponentRotation ( Component, vecRotation );
             lua_pushboolean ( luaVM, true );
             return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::EngineGetFrameRotation ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    eVehicleComponent Component;
+    CClientVehicle * pVehicle = NULL;
+    CVector vecRotation;
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadEnumString ( Component );
+    if ( !argStream.HasErrors() )
+    {
+        if ( pVehicle )
+        {
+            if ( pVehicle->GetComponentRotation ( Component, vecRotation ) )
+            {
+                lua_pushnumber ( luaVM, vecRotation.fX );
+                lua_pushnumber ( luaVM, vecRotation.fY );
+                lua_pushnumber ( luaVM, vecRotation.fZ );
+                return 3;
+            }
         }
     }
     else

@@ -521,6 +521,7 @@ public:
     LUA_DECLARE ( EngineSetFramePosition );
     LUA_DECLARE ( EngineGetFramePosition );
     LUA_DECLARE ( EngineSetFrameRotation );
+    LUA_DECLARE ( EngineGetFrameRotation );
 
     // Drawing funcs (low-level)
     LUA_DECLARE ( dxDrawLine );
