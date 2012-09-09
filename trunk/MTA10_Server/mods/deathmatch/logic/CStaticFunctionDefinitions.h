@@ -570,8 +570,8 @@ public:
     static bool                 ResetWindVelocity                   ( void );
     static bool                 ResetFarClipDistance                ( void );
     static bool                 ResetFogDistance                    ( void );
-    static bool                 RemoveWorldModel                    ( unsigned short usModel, float fRadius, float fX, float fY, float fZ );
-    static bool                 RestoreWorldModel                   ( unsigned short usModel, float fRadius, float fX, float fY, float fZ );
+    static bool                 RemoveWorldModel                    ( unsigned short usModel, float fRadius, float fX, float fY, float fZ, char cInterior );
+    static bool                 RestoreWorldModel                   ( unsigned short usModel, float fRadius, float fX, float fY, float fZ, char cInterior );
     static bool                 RestoreAllWorldModels               ( void );
     static bool                 SendSyncIntervals                   ( CPlayer* pPlayer = NULL );
     static bool                 SetPedTargetingMarkerEnabled        ( bool bEnabled );

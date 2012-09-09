@@ -200,13 +200,13 @@ void CClientWeapon::Create ( void )
     }
 }
 
-
 void CClientWeapon::Destroy ( void )
 {
     CClientObject::Destroy ();
 
     if ( m_pWeapon )
     {
+        //g_pGame->GetAudioEngine ()->ReportWeaponEvent ( WEAPON_EVENT_RELOAD, m_Type, m_pObject );
         m_pWeapon->Destroy ();
         m_pWeapon = NULL;
     }

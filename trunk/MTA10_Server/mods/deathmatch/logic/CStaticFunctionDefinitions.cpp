@@ -9779,9 +9779,9 @@ bool CStaticFunctionDefinitions::ResetFogDistance ( )
     return true;
 }
 
-bool CStaticFunctionDefinitions::RemoveWorldModel ( unsigned short usModel, float fRadius, float fX, float fY, float fZ )
+bool CStaticFunctionDefinitions::RemoveWorldModel ( unsigned short usModel, float fRadius, float fX, float fY, float fZ, char cInterior )
 {
-    g_pGame->GetBuildingRemovalManager ( )->CreateBuildingRemoval( usModel, fRadius, CVector ( fX, fY, fZ ) );
+    g_pGame->GetBuildingRemovalManager ( )->CreateBuildingRemoval( usModel, fRadius, CVector ( fX, fY, fZ ), cInterior );
 
     CBitStream BitStream;
     BitStream.pBitStream->Write ( usModel );
@@ -9789,14 +9789,18 @@ bool CStaticFunctionDefinitions::RemoveWorldModel ( unsigned short usModel, floa
     BitStream.pBitStream->Write ( fX );
     BitStream.pBitStream->Write ( fY );
     BitStream.pBitStream->Write ( fZ );
+    if ( BitStream.pBitStream->Version() >= 0x039 )
+    {
+        BitStream.pBitStream->Write ( cInterior );
+    }
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( REMOVE_WORLD_MODEL, *BitStream.pBitStream ) );
 
     return true;
 }
 
-bool CStaticFunctionDefinitions::RestoreWorldModel ( unsigned short usModel, float fRadius, float fX, float fY, float fZ )
+bool CStaticFunctionDefinitions::RestoreWorldModel ( unsigned short usModel, float fRadius, float fX, float fY, float fZ, char cInterior )
 {
-    g_pGame->GetBuildingRemovalManager ( )->CreateBuildingRemoval( usModel, fRadius, CVector ( fX, fY, fZ ) );
+    g_pGame->GetBuildingRemovalManager ( )->RestoreWorldModel( usModel, fRadius, CVector ( fX, fY, fZ ), cInterior );
 
     CBitStream BitStream;
     BitStream.pBitStream->Write ( usModel );
@@ -9804,6 +9808,11 @@ bool CStaticFunctionDefinitions::RestoreWorldModel ( unsigned short usModel, flo
     BitStream.pBitStream->Write ( fX );
     BitStream.pBitStream->Write ( fY );
     BitStream.pBitStream->Write ( fZ );
+    if ( BitStream.pBitStream->Version() >= 0x039 )
+    {
+        BitStream.pBitStream->Write ( cInterior );
+    }
+
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESTORE_WORLD_MODEL, *BitStream.pBitStream ) );
 
     return true;

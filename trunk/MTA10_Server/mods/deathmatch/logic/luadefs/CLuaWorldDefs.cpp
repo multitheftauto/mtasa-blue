@@ -1002,14 +1002,16 @@ int CLuaWorldDefs::RemoveWorldModel ( lua_State* luaVM )
 
     unsigned short usModel = 0;
     float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+    char cInterior = -1;
     argStream.ReadNumber ( usModel );
     argStream.ReadNumber ( fRadius );
     argStream.ReadNumber ( fX );
     argStream.ReadNumber ( fY );
     argStream.ReadNumber ( fZ );
+    argStream.ReadNumber ( cInterior, -1 );
     if ( !argStream.HasErrors ( ) )
     {
-        if ( CStaticFunctionDefinitions::RemoveWorldModel ( usModel, fRadius, fX, fY, fZ ) )
+        if ( CStaticFunctionDefinitions::RemoveWorldModel ( usModel, fRadius, fX, fY, fZ, cInterior ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
@@ -1025,14 +1027,16 @@ int CLuaWorldDefs::RestoreWorldModel ( lua_State* luaVM )
 
     unsigned short usModel = 0;
     float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+    char cInterior = -1;
     argStream.ReadNumber ( usModel );
     argStream.ReadNumber ( fRadius );
     argStream.ReadNumber ( fX );
     argStream.ReadNumber ( fY );
     argStream.ReadNumber ( fZ );
+    argStream.ReadNumber ( cInterior );
     if ( !argStream.HasErrors ( ) )
     {
-        if ( CStaticFunctionDefinitions::RestoreWorldModel ( usModel, fRadius, fX, fY, fZ ) )
+        if ( CStaticFunctionDefinitions::RestoreWorldModel ( usModel, fRadius, fX, fY, fZ, cInterior ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
