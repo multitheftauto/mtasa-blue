@@ -612,7 +612,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "engineSetFramePosition", CLuaFunctionDefs::EngineSetFramePosition );
     CLuaCFunctions::AddFunction ( "engineGetFramePosition", CLuaFunctionDefs::EngineGetFramePosition );
     CLuaCFunctions::AddFunction ( "engineSetFrameRotation", CLuaFunctionDefs::EngineSetFrameRotation );
-    //CLuaCFunctions::AddFunction ( "engineGetFrameRotation", CLuaFunctionDefs::EngineGetFrameRotation );
+    CLuaCFunctions::AddFunction ( "engineGetFrameRotation", CLuaFunctionDefs::EngineGetFrameRotation );
 
     //CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", CLuaFunctionDefs::EngineReplaceMatchingAtomics );
     //CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", CLuaFunctionDefs::EngineReplaceWheelAtomics );

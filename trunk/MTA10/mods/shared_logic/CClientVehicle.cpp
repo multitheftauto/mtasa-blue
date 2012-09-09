@@ -3915,7 +3915,9 @@ bool CClientVehicle::SetComponentRotation ( eVehicleComponent vehicleComponent, 
 {
     if ( m_pVehicle )
     {
-        m_pVehicle->SetComponentRotation ( vehicleComponent, vecRotation );
+        CVector vecTemp = vecRotation;
+        ConvertDegreesToRadians ( vecTemp );
+        m_pVehicle->SetComponentRotation ( vehicleComponent, vecTemp );
         return true;
     }
     return false;
@@ -3925,7 +3927,8 @@ bool CClientVehicle::GetComponentRotation ( eVehicleComponent vehicleComponent, 
 {
     if ( m_pVehicle )
     {
-        //m_pVehicle->GetComponentRotation ( vehicleComponent, vecRotation );
+        m_pVehicle->GetComponentRotation ( vehicleComponent, vecRotation );
+        ConvertRadiansToDegrees ( vecRotation );
         return true;
     }
     return false;
