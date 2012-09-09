@@ -24,7 +24,7 @@ CBuildingRemovalManager::~CBuildingRemovalManager ( void )
     }
 }
 
-void CBuildingRemovalManager::CreateBuildingRemoval ( unsigned short usModel, float fRadius, const CVector& vecPos )
+void CBuildingRemovalManager::CreateBuildingRemoval ( unsigned short usModel, float fRadius, const CVector& vecPos, char cInterior )
 {
     // Check if this removal has already been covered
     std::pair < std::multimap < unsigned short, CBuildingRemoval* >::iterator, std::multimap < unsigned short, CBuildingRemoval* >::iterator> iterators = m_BuildingRemovals.equal_range ( usModel );
@@ -40,7 +40,7 @@ void CBuildingRemovalManager::CreateBuildingRemoval ( unsigned short usModel, fl
 
             float fDistance = ( vecPos - vecPosB ).Length ();
 
-            if ( fDistance <= fRadiusB - fRadius )
+            if ( fDistance <= fRadiusB - fRadius && ( cInterior == -1 || pFind->GetInterior() == cInterior ) )
             {
                 // Already covered by existing removal
                 return;
@@ -48,7 +48,7 @@ void CBuildingRemovalManager::CreateBuildingRemoval ( unsigned short usModel, fl
         }
     }
 
-    CBuildingRemoval * pBuildingRemoval = new CBuildingRemoval ( usModel, fRadius, vecPos );
+    CBuildingRemoval * pBuildingRemoval = new CBuildingRemoval ( usModel, fRadius, vecPos, cInterior );
     m_BuildingRemovals.insert( std::pair < unsigned short, CBuildingRemoval * > ( usModel, pBuildingRemoval ) );
 }
 
@@ -62,7 +62,7 @@ void CBuildingRemovalManager::ClearBuildingRemovals ( void )
     m_BuildingRemovals.clear ( );
 }
 
-void CBuildingRemovalManager::RestoreWorldModel ( unsigned short usModel, float fRadius, const CVector& vecPos )
+void CBuildingRemovalManager::RestoreWorldModel ( unsigned short usModel, float fRadius, const CVector& vecPos, char cInterior )
 {
 
     CBuildingRemoval * pFind = NULL;
@@ -82,7 +82,7 @@ void CBuildingRemovalManager::RestoreWorldModel ( unsigned short usModel, float 
             // Square root 'em
             float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
 
-            if ( fDistance <= pFind->GetRadius ( ) )
+            if ( fDistance <= pFind->GetRadius ( ) && ( cInterior == -1 || pFind->GetInterior() == cInterior ) )
             {
                 m_BuildingRemovals.erase ( iter++ );
                 delete pFind;

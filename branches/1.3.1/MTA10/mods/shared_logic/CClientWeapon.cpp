@@ -200,13 +200,13 @@ void CClientWeapon::Create ( void )
     }
 }
 
-
 void CClientWeapon::Destroy ( void )
 {
     CClientObject::Destroy ();
 
     if ( m_pWeapon )
     {
+        //g_pGame->GetAudioEngine ()->ReportWeaponEvent ( WEAPON_EVENT_RELOAD, m_Type, m_pObject );
         m_pWeapon->Destroy ();
         m_pWeapon = NULL;
     }
@@ -648,7 +648,10 @@ void CClientWeapon::DoGunShells ( CVector vecOrigin, CVector vecDirection )
         else g_pGame->GetFx ()->TriggerGunshot ( NULL, vecOrigin, vecDirection, true );
 
         m_pWeapon->AddGunshell ( m_pObject, &vecOrigin, &CVector2D ( 0, -1 ), fShellSize );
-        g_pGame->GetAudioEngine ()->ReportWeaponEvent ( WEAPON_EVENT_FIRE, m_Type, m_pObject );
+        if ( m_Type != WEAPONTYPE_MINIGUN )
+        {
+            g_pGame->GetAudioEngine ()->ReportWeaponEvent ( WEAPON_EVENT_FIRE, m_Type, m_pObject );
+        }
 
     }
 }

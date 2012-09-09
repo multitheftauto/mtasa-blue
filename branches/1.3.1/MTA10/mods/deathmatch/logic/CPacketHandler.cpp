@@ -2326,6 +2326,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 
     unsigned short usModel = 0;
     float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+    char cInterior = -1;
     while ( bitStream.ReadBit ( ) == true )
     {
         bitStream.Read( usModel );
@@ -2333,7 +2334,11 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
         bitStream.Read( fX );
         bitStream.Read( fY );
         bitStream.Read( fZ );
-        g_pGame->GetWorld ( )->RemoveBuilding( usModel, fRadius, fX, fY, fZ );
+        if ( bitStream.Version() >= 0x039 )
+        {
+            bitStream.Read ( cInterior );
+        }
+        g_pGame->GetWorld ( )->RemoveBuilding( usModel, fRadius, fX, fY, fZ, cInterior );
     }
 
     bool bOcclusionsEnabled = true;

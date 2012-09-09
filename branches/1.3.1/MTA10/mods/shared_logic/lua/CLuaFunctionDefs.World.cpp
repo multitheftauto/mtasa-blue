@@ -1308,12 +1308,14 @@ int CLuaFunctionDefs::RemoveWorldBuilding ( lua_State* luaVM )
     int iModelToRemove; 
     CVector vecPosition;
     float fRadius = 0;
+    char cInterior = -1;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( iModelToRemove );
     argStream.ReadNumber ( fRadius );
     argStream.ReadNumber ( vecPosition.fX );
     argStream.ReadNumber ( vecPosition.fY );
     argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadNumber ( cInterior, -1 );
 
     if ( !argStream.HasErrors () )
     {
@@ -1323,7 +1325,7 @@ int CLuaFunctionDefs::RemoveWorldBuilding ( lua_State* luaVM )
             CResource* pResource = pLuaMain->GetResource ();
             if ( pResource )
             {
-                CStaticFunctionDefinitions::RemoveWorldBuilding ( iModelToRemove, fRadius, vecPosition.fX, vecPosition.fY, vecPosition.fZ );
+                CStaticFunctionDefinitions::RemoveWorldBuilding ( iModelToRemove, fRadius, vecPosition.fX, vecPosition.fY, vecPosition.fZ, cInterior );
 
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -1360,12 +1362,14 @@ int CLuaFunctionDefs::RestoreWorldBuilding ( lua_State* luaVM )
     int iModelToRestore; 
     CVector vecPosition;
     float fRadius = 0;
+    char cInterior = -1;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( iModelToRestore );
     argStream.ReadNumber ( fRadius );
     argStream.ReadNumber ( vecPosition.fX );
     argStream.ReadNumber ( vecPosition.fY );
     argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadNumber ( cInterior, -1 );
 
     if ( !argStream.HasErrors () )
     {
@@ -1375,7 +1379,7 @@ int CLuaFunctionDefs::RestoreWorldBuilding ( lua_State* luaVM )
             CResource* pResource = pLuaMain->GetResource ();
             if ( pResource )
             {
-                CStaticFunctionDefinitions::RestoreWorldBuilding ( iModelToRestore, fRadius, vecPosition.fX, vecPosition.fY, vecPosition.fZ );
+                CStaticFunctionDefinitions::RestoreWorldBuilding ( iModelToRestore, fRadius, vecPosition.fX, vecPosition.fY, vecPosition.fZ, cInterior );
 
                 lua_pushboolean ( luaVM, true );
                 return 1;

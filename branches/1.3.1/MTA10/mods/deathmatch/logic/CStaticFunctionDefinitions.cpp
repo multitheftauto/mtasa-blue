@@ -5642,9 +5642,9 @@ bool CStaticFunctionDefinitions::AreTrafficLightsLocked ( bool& bLocked )
     return true;
 }
 
-bool CStaticFunctionDefinitions::RemoveWorldBuilding ( unsigned short usModelToRemove, float fRadius, float fX, float fY, float fZ )
+bool CStaticFunctionDefinitions::RemoveWorldBuilding ( unsigned short usModelToRemove, float fRadius, float fX, float fY, float fZ, char cInterior )
 {
-    g_pGame->GetWorld()->RemoveBuilding ( usModelToRemove, fRadius, fX, fY, fZ );
+    g_pGame->GetWorld()->RemoveBuilding ( usModelToRemove, fRadius, fX, fY, fZ, cInterior );
     return true;
 }
 
@@ -5654,9 +5654,9 @@ bool CStaticFunctionDefinitions::RestoreWorldBuildings ( void )
     return true;
 }
 
-bool CStaticFunctionDefinitions::RestoreWorldBuilding ( unsigned short usModelToRestore, float fRadius, float fX, float fY, float fZ )
+bool CStaticFunctionDefinitions::RestoreWorldBuilding ( unsigned short usModelToRestore, float fRadius, float fX, float fY, float fZ, char cInterior )
 {
-    return g_pGame->GetWorld()->RestoreBuilding ( usModelToRestore, fRadius, fX, fY, fZ );
+    return g_pGame->GetWorld()->RestoreBuilding ( usModelToRestore, fRadius, fX, fY, fZ, cInterior );
 }
 
 bool CStaticFunctionDefinitions::GetSkyGradient ( unsigned char& ucTopRed, unsigned char& ucTopGreen, unsigned char& ucTopBlue, unsigned char& ucBottomRed, unsigned char& ucBottomGreen, unsigned char& ucBottomBlue )
