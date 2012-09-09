@@ -466,9 +466,9 @@ public:
     static bool                         GetCloudsEnabled                    ( void );
     static bool                         GetTrafficLightState                ( unsigned char& ucState );
     static bool                         AreTrafficLightsLocked              ( bool& bLocked );
-    static bool                         RemoveWorldBuilding                 ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ );
+    static bool                         RemoveWorldBuilding                 ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior );
     static bool                         RestoreWorldBuildings               ( void );
-    static bool                         RestoreWorldBuilding                ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ );
+    static bool                         RestoreWorldBuilding                ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior );
  
     static bool                         SetTime                             ( unsigned char ucHour, unsigned char ucMin );
     static bool                         GetSkyGradient                      ( unsigned char& ucTopRed, unsigned char& ucTopGreen, unsigned char& ucTopBlue, unsigned char& ucBottomRed, unsigned char& ucBottomGreen, unsigned char& ucBottomBlue );

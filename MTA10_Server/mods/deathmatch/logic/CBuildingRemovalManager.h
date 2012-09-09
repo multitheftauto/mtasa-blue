@@ -19,9 +19,9 @@ class CBuildingRemovalManager
 public:
                                 CBuildingRemovalManager              ( void );
                                 ~CBuildingRemovalManager             ( void );
-    void                        CreateBuildingRemoval                ( unsigned short usModel, float fRadius, const CVector& vecPos );
+    void                        CreateBuildingRemoval                ( unsigned short usModel, float fRadius, const CVector& vecPos, char cInterior );
     void                        ClearBuildingRemovals                ( void );
-    void                        RestoreWorldModel                    ( unsigned short usModel, float fRadius, const CVector& vecPos );
+    void                        RestoreWorldModel                    ( unsigned short usModel, float fRadius, const CVector& vecPos, char cInterior );
     inline multimap < unsigned short, CBuildingRemoval* > ::const_iterator  IterBegin    ( void )                    { return m_BuildingRemovals.begin (); };
     inline multimap < unsigned short, CBuildingRemoval* > ::const_iterator  IterEnd      ( void )                    { return m_BuildingRemovals.end (); };
 

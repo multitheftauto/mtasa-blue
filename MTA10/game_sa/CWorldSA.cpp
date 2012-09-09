@@ -511,7 +511,7 @@ bool CWorldSA::GetOcclusionsEnabled ( void )
     return false;
 }
 
-void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, float fX, float fY, float fZ )
+void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, float fX, float fY, float fZ, char cInterior )
 {    
     // New building Removal
     SBuildingRemoval* pRemoval = new SBuildingRemoval();
@@ -520,7 +520,7 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
     pRemoval->m_vecPos.fY = fY;
     pRemoval->m_vecPos.fZ = fZ;
     pRemoval->m_fRadius = fRange;
-
+    pRemoval->m_cInterior = cInterior;
     // Push it to the back of the removal list
     m_pBinaryBuildings->insert ( std::pair<unsigned short, SBuildingRemoval*> ( usModelToRemove, pRemoval ) );
 
@@ -546,7 +546,7 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
                 float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
 
                 // Is it in range
-                if ( fDistance <= fRange && pFind->m_pInterface->bIsProcObject == 0 )
+                if ( fDistance <= fRange && ( pFind->m_pInterface->m_areaCode == cInterior || cInterior == -1 ) )
                 {
                     CEntitySAInterface * pInterface = pFind->m_pInterface;
                     //while ( pInterface && pInterface != NULL )
@@ -580,7 +580,7 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
         pGame->GetModelInfo ( usModelToRemove )->RestreamIPL ();
 }
 
-bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, float fX, float fY, float fZ )
+bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, float fX, float fY, float fZ, char cInterior )
 {        
     bool bSuccess = false;
     // Init some variables
@@ -601,7 +601,7 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
 
             // Square root 'em
             float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
-            if ( fDistance <= pFind->m_fRadius )
+            if ( fDistance <= pFind->m_fRadius && ( cInterior == -1 || pFind->m_cInterior == cInterior ) )
             {
                 // Init some variables
                 CEntitySAInterface * pEntity = NULL;
@@ -687,7 +687,7 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
 
             // Square root 'em
             float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
-            if ( fDistance <= fRange )
+            if ( fDistance <= fRange && ( cInterior == -1 || pFind->m_cInterior == cInterior ) )
             {
                 // Fix the removed count.
                 pFound->m_iCount--;
@@ -695,7 +695,6 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
                     pFound->m_iCount = 0;
             }
         }
-
     }
     return bSuccess;
 }
@@ -721,7 +720,7 @@ bool CWorldSA::IsRemovedModelInRadius ( SIPLInst* pInst )
 
             float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
             // is it in the removal spheres radius if so return else keep looking
-            if ( fDistance <=  pFind->m_fRadius )
+            if ( fDistance <=  pFind->m_fRadius && ( pFind->m_cInterior == -1 || pFind->m_cInterior == pInst->m_nInterior ) )
             {
                 return true;
             }
@@ -744,16 +743,20 @@ bool CWorldSA::IsObjectRemoved ( CEntitySAInterface* pInterface )
         // if pFind is valid and the model is the same
         if ( pFind )
         {
-            // Grab the distance
-            float fDistanceX = pFind->m_vecPos.fX - pInterface->Placeable.m_transform.m_translate.fX;
-            float fDistanceY = pFind->m_vecPos.fY - pInterface->Placeable.m_transform.m_translate.fY;
-            float fDistanceZ = pFind->m_vecPos.fZ - pInterface->Placeable.m_transform.m_translate.fZ;
-
-            float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
-            // is it in the removal spheres radius if so return else keep looking
-            if ( fDistance <=  pFind->m_fRadius )
+            // Are we using the interior param?? if so check for a match
+            if ( pFind->m_cInterior == -1 || pFind->m_cInterior == pInterface->m_areaCode )
             {
-                return true;
+                // Grab the distance
+                float fDistanceX = pFind->m_vecPos.fX - pInterface->Placeable.m_transform.m_translate.fX;
+                float fDistanceY = pFind->m_vecPos.fY - pInterface->Placeable.m_transform.m_translate.fY;
+                float fDistanceZ = pFind->m_vecPos.fZ - pInterface->Placeable.m_transform.m_translate.fZ;
+
+                float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
+                // is it in the removal spheres radius if so return else keep looking
+                if ( fDistance <=  pFind->m_fRadius )
+                {
+                    return true;
+                }
             }
         }
     }
@@ -879,7 +882,7 @@ SBuildingRemoval* CWorldSA::GetBuildingRemoval ( CEntitySAInterface * pInterface
 
             float fDistance = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
             // is it in the removal spheres radius if so return else keep looking
-            if ( fDistance <=  pFind->m_fRadius )
+            if ( fDistance <=  pFind->m_fRadius && ( pFind->m_cInterior == -1 || pFind->m_cInterior == pInterface->m_areaCode ) )
             {
                 return pFind;
             }

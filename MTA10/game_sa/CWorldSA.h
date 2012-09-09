@@ -99,11 +99,11 @@ public:
      * StopAllLawEnforcersInTheirTracks
 
      */
-    void                RemoveBuilding                  ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ );
+    void                RemoveBuilding                  ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior );
     bool                IsRemovedModelInRadius          ( SIPLInst* pInst );
     bool                IsModelRemoved                  ( unsigned short modelID );
     void                ClearRemovedBuildingLists       ( void );
-    bool                RestoreBuilding                 ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ );
+    bool                RestoreBuilding                 ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior );
     SBuildingRemoval*   GetBuildingRemoval              ( CEntitySAInterface * pInterface );
     void                AddDataBuilding                 ( CEntitySAInterface * pInterface );
     void                RemoveWorldBuildingFromLists    ( CEntitySAInterface * pInterface );
