@@ -34,6 +34,7 @@ DECLARE_ENUM( EBlendModeType )
 DECLARE_ENUM( EEntityTypeMask );
 DECLARE_ENUM( eWeaponState );
 DECLARE_ENUM( eWeaponFlags );
+DECLARE_ENUM( eVehicleComponent );
 
 enum eDXHorizontalAlign
 {

@@ -3889,3 +3889,44 @@ void CClientVehicle::RemoveVehicleSirens ( void )
         SetVehicleSirenColour( i, SColor ( ) );
     }
 }
+
+
+bool CClientVehicle::SetComponentPosition ( eVehicleComponent vehicleComponent, CVector vecPosition )
+{
+    if ( m_pVehicle )
+    {
+        m_pVehicle->SetComponentPosition ( vehicleComponent, vecPosition );
+        return true;
+    }
+    return false;
+}
+
+bool CClientVehicle::GetComponentPosition ( eVehicleComponent vehicleComponent, CVector &vecPosition )
+{
+    if ( m_pVehicle )
+    {
+        m_pVehicle->GetComponentPosition ( vehicleComponent, vecPosition );
+        return true;
+    }
+    return false;
+}
+
+bool CClientVehicle::SetComponentRotation ( eVehicleComponent vehicleComponent, CVector vecRotation )
+{
+    if ( m_pVehicle )
+    {
+        m_pVehicle->SetComponentRotation ( vehicleComponent, vecRotation );
+        return true;
+    }
+    return false;
+}
+
+bool CClientVehicle::GetComponentRotation ( eVehicleComponent vehicleComponent, CVector &vecRotation )
+{
+    if ( m_pVehicle )
+    {
+        //m_pVehicle->GetComponentRotation ( vehicleComponent, vecRotation );
+        return true;
+    }
+    return false;
+}
