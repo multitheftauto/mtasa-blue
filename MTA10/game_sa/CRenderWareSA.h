@@ -112,6 +112,7 @@ public:
     void                GetShaderReplacementStats   ( SShaderReplacementStats& outStats );
     CModelTexturesInfo* GetModelTexturesInfo        ( ushort usModelId );
 
+    RwFrame *           GetFrameFromName            ( RpClump * pRoot, SString strName );
 private:
     static void         RwTexDictionaryRemoveTexture( RwTexDictionary* pTXD, RwTexture* pTex );
     static bool         RwTexDictionaryContainsTexture( RwTexDictionary* pTXD, RwTexture* pTex );

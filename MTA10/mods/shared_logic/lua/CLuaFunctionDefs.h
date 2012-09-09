@@ -518,6 +518,9 @@ public:
     LUA_DECLARE ( EngineGetModelIDFromName );
     LUA_DECLARE ( EngineGetModelTextureNames );
     LUA_DECLARE ( EngineGetVisibleTextureNames );
+    LUA_DECLARE ( EngineSetFramePosition );
+    LUA_DECLARE ( EngineGetFramePosition );
+    LUA_DECLARE ( EngineSetFrameRotation );
 
     // Drawing funcs (low-level)
     LUA_DECLARE ( dxDrawLine );

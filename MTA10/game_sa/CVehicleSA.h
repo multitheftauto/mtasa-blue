@@ -462,19 +462,21 @@ public:
     CVehicleSAInterface* m_nextCarriage;
 
     //1496
-    BYTE padding270[116];
-
+    BYTE padding270[112];
+    // 1608
+    RwFrame * pUnk0;
     // 1612
     RwFrame * pChassis;
     RwFrame * pWheelFrontRight;
-    BYTE padding271[4];
+    RwFrame * pWheelFromRightSpecial;
     RwFrame * pWheelRearRight;
     RwFrame * pWheelFrontLeft;
-    BYTE padding272[4];
+    RwFrame * pWheelFrontLeftSpecial;
     RwFrame * pWheelRearLeft;
     RwFrame * pDoors [ 4 ];
     RwFrame * pBumpers [ 2 ];
-    BYTE padding273[8];
+    RwFrame * pUnk1;
+    RwFrame * pUnk2;
     RwFrame * pBonet;
     RwFrame * pBoot;
     RwFrame * pWindscreen;
@@ -482,13 +484,15 @@ public:
 
     // Hacked in from jb-contribs branch
     RwFrame * pSpecialParts[5]; // 1688
-    uint32 pad1[30]; // 1708
+    RwFrame * pExtraParts[5]; // 1708
+    RwFrame * pExtraParts2[5]; // 1728
+    uint32 pad1[20]; // 1708
     CColPointSAInterface WheelFrontLeftColPoint; // 1828
     CColPointSAInterface WheelRearLeftColPoint;
     CColPointSAInterface WheelFrontRightColPoint;
     CColPointSAInterface WheelRearRightColPoint;
 
-    BYTE padding280[576-316];
+    BYTE padding280[260];
     // 2276
     float m_fBurningTime;
 };
@@ -738,10 +742,17 @@ public:
     bool                        IsSirenRandomiserEnabled        ( void )  { return m_tSirenInfo.m_bUseRandomiser; }
     bool                        IsSirenSilentEffectEnabled      ( void )  { return m_tSirenInfo.m_bSirenSilent; }
     void                        SetVehicleFlags                 ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent );
-
+    bool                        SetComponentRotation            ( eVehicleComponent vehicleComponent, CVector vecRotation );
+    bool                        GetComponentRotation            ( eVehicleComponent vehicleComponent, CVector &vecPositionModelling ); 
+    bool                        SetComponentPosition            ( eVehicleComponent vehicleComponent, CVector vecPosition );
+    bool                        GetComponentPosition            ( eVehicleComponent vehicleComponent, CVector &vecPositionModelling ); 
+    bool                        IsComponentPresent              ( eVehicleComponent vehicleComponent );
+    bool                        GetComponentMatrix              ( eVehicleComponent vehicleComponent, RwMatrix &ltm, RwMatrix &modelling );
+    bool                        SetComponentMatrix              ( eVehicleComponent vehicleComponent, RwMatrix &ltm, RwMatrix &modelling );
 private:
     void                        RecalculateSuspensionLines          ( void );
     void                        CopyGlobalSuspensionLinesToPrivate  ( void );
+    RwFrame *                   GetVehicleComponent                 ( eVehicleComponent vehicleComponent );
 };
 
 #endif

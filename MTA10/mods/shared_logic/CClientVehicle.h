@@ -417,6 +417,11 @@ public:
     void                        SetVehicleFlags             ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent );
     void                        RemoveVehicleSirens         ( void );
 
+    bool                        SetComponentPosition    ( eVehicleComponent vehicleComponent, CVector vecPosition );
+    bool                        GetComponentPosition    ( eVehicleComponent vehicleComponent, CVector &vecPosition );
+
+    bool                        SetComponentRotation    ( eVehicleComponent vehicleComponent, CVector vecRotation );
+    bool                        GetComponentRotation    ( eVehicleComponent vehicleComponent, CVector &vecRotation );
 protected:
     void                        StreamIn                ( bool bInstantly );
     void                        StreamOut               ( void );

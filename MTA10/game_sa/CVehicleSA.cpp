@@ -2102,3 +2102,190 @@ void CVehicleSA::OnChangingPosition ( const CVector& vecNewPosition )
         }
     }
 }
+
+
+RwFrame * CVehicleSA::GetVehicleComponent ( eVehicleComponent vehicleComponent )
+{
+    switch ( vehicleComponent )
+    {
+        case VEHICLE_COMPONENT_CHASIS:
+            return GetVehicleInterface ( )->pChassis;
+
+        case VEHICLE_COMPONENT_WHEEL_FRONT_RIGHT:
+            return GetVehicleInterface ( )->pWheelFrontRight;
+
+        case VEHICLE_COMPONENT_WHEEL_FRONT_LEFT:
+            return GetVehicleInterface ( )->pWheelFrontLeft;
+
+        case VEHICLE_COMPONENT_WHEEL_REAR_RIGHT:
+            return GetVehicleInterface ( )->pWheelRearRight;
+
+        case VEHICLE_COMPONENT_WHEEL_REAR_LEFT:
+            return GetVehicleInterface ( )->pWheelRearLeft;
+
+        case VEHICLE_COMPONENT_DOOR_1:
+            return GetVehicleInterface ( )->pDoors[0];
+
+        case VEHICLE_COMPONENT_DOOR_2:
+            return GetVehicleInterface ( )->pDoors[1];
+
+        case VEHICLE_COMPONENT_DOOR_3:
+            return GetVehicleInterface ( )->pDoors[2];
+
+        case VEHICLE_COMPONENT_DOOR_4:
+            return GetVehicleInterface ( )->pDoors[3];
+
+        case VEHICLE_COMPONENT_BUMPER_1:
+            return GetVehicleInterface ( )->pBumpers[0];
+
+        case VEHICLE_COMPONENT_BUMPER_2:
+            return GetVehicleInterface ( )->pBumpers[1];
+
+        case VEHICLE_COMPONENT_BONET:
+            return GetVehicleInterface ( )->pBonet;
+
+        case VEHICLE_COMPONENT_BOOT:
+            return GetVehicleInterface ( )->pBoot;
+
+        case VEHICLE_COMPONENT_WINDSCREEN:
+            return GetVehicleInterface ( )->pWindscreen;
+
+        case VEHICLE_COMPONENT_EXHAUST:
+            return GetVehicleInterface ( )->pExhaust;
+
+        case VEHICLE_COMPONENT_SPECIAL_1:
+            return GetVehicleInterface ( )->pSpecialParts[0];
+
+        case VEHICLE_COMPONENT_SPECIAL_2:
+            return GetVehicleInterface ( )->pSpecialParts[1];
+
+        case VEHICLE_COMPONENT_SPECIAL_3:
+            return GetVehicleInterface ( )->pSpecialParts[2];
+
+
+        case VEHICLE_COMPONENT_SPECIAL_4:
+            return GetVehicleInterface ( )->pSpecialParts[3];
+
+        case VEHICLE_COMPONENT_SPECIAL_5:
+            return GetVehicleInterface ( )->pSpecialParts[4];
+        case VEHICLE_COMPOENT_EXTRA_1:
+            return pGame->GetRenderWare()->GetFrameFromName ( GetVehicleInterface()->m_pRwObject, "extra1" );
+    }
+
+    return NULL;
+}
+namespace
+{
+    VOID _MatrixConvertFromEulerAngles ( CMatrix_Padded* matrixPadded, float fX, float fY, float fZ )
+    {
+        int iUnknown = 0;
+        if ( matrixPadded )
+        {
+            DWORD dwFunc = FUNC_CMatrix__ConvertFromEulerAngles;
+            _asm
+            {
+                push    iUnknown
+                    push    fZ
+                    push    fY
+                    push    fX
+                    mov     ecx, matrixPadded
+                    call    dwFunc
+            }
+        }
+    }
+}
+
+bool CVehicleSA::SetComponentRotation ( eVehicleComponent vehicleComponent, CVector vecRotation )  
+{ 
+    RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
+    if ( pComponent )
+    {
+        CMatrix_Padded matrixPadded;
+        _MatrixConvertFromEulerAngles ( &matrixPadded, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+        pComponent->modelling.right = (RwV3d&)matrixPadded.vRight;
+        pComponent->modelling.up = (RwV3d&)matrixPadded.vFront;
+        pComponent->modelling.at = (RwV3d&)matrixPadded.vUp;
+        return true;
+    }
+    return false;
+}
+
+bool CVehicleSA::GetComponentRotation ( eVehicleComponent vehicleComponent, CVector &vecRotation )
+{
+    RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
+    if ( pComponent )
+    {
+        /*CMatrix_Padded matrixPadded;
+        _MatrixConvertFromEulerAngles ( &matrixPadded, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+        pComponent->modelling.right = (RwV3d&)matrixPadded.vRight;
+        pComponent->modelling.up = (RwV3d&)matrixPadded.vFront;
+        pComponent->modelling.at = (RwV3d&)matrixPadded.vUp;*/
+        return true;
+    }
+    return false;
+}
+
+bool CVehicleSA::SetComponentPosition ( eVehicleComponent vehicleComponent, CVector vecPosition )  
+{ 
+    RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
+    if ( pComponent )
+    {
+        pComponent->modelling.pos.x = vecPosition.fX;
+        pComponent->modelling.pos.y = vecPosition.fY;
+        pComponent->modelling.pos.z = vecPosition.fZ;
+        return true;
+    }
+    return false;
+}
+
+bool CVehicleSA::GetComponentPosition ( eVehicleComponent vehicleComponent, CVector &vecPositionModelling )  
+{ 
+    RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
+    if ( pComponent )
+    {
+        vecPositionModelling = CVector ( pComponent->modelling.pos.x, pComponent->modelling.pos.y, pComponent->modelling.pos.z );
+        return true;
+    }
+    return false;
+}
+bool CVehicleSA::IsComponentPresent ( eVehicleComponent vehicleComponent )
+{
+    RwFrame * pFrame = GetVehicleInterface()->pChassis->root->child;
+    while ( pFrame )
+    {
+        pFrame = pFrame->next;
+    }
+    return GetVehicleComponent ( vehicleComponent ) != NULL;
+}
+
+bool CVehicleSA::GetComponentMatrix ( eVehicleComponent vehicleComponent, RwMatrix &ltm, RwMatrix &modelling )
+{
+    RwFrame * pFrame = GetVehicleComponent ( vehicleComponent );
+    if ( pFrame )
+    {
+        ltm = pFrame->ltm;
+        modelling = pFrame->modelling;
+        return true;
+    }
+    return false;
+}
+
+bool CVehicleSA::SetComponentMatrix ( eVehicleComponent vehicleComponent, RwMatrix &ltm, RwMatrix &modelling )
+{
+    RwFrame * pFrame = GetVehicleComponent ( vehicleComponent );
+    if ( pFrame )
+    {
+        // Copy vectors and leave flags for now.
+        pFrame->ltm.at = ltm.at;
+        pFrame->ltm.pos = ltm.pos;
+        pFrame->ltm.right = ltm.right;
+        pFrame->ltm.up = ltm.up;
+
+        pFrame->modelling.at = modelling.at;
+        pFrame->modelling.pos = modelling.pos;
+        pFrame->modelling.right = modelling.right;
+        pFrame->modelling.up = modelling.up;
+        return true;
+    }
+    return false;
+}
