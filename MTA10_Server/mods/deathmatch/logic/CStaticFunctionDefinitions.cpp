@@ -1703,6 +1703,12 @@ bool CStaticFunctionDefinitions::SetElementModel ( CElement* pElement, unsigned 
 
     CBitStream BitStream;
     BitStream.pBitStream->Write ( usModel );
+    if ( pElement->GetType () == CElement::VEHICLE )
+    {
+        CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+        BitStream.pBitStream->Write ( pVehicle->GetVariant () );
+        BitStream.pBitStream->Write ( pVehicle->GetVariant2 () );
+    }
     m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_MODEL, *BitStream.pBitStream ) );
 
     return true;

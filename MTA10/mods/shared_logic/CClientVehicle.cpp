@@ -898,7 +898,7 @@ void CClientVehicle::SetTurretRotation ( float fHorizontal, float fVertical )
 }
 
 
-void CClientVehicle::SetModelBlocking ( unsigned short usModel, bool bLoadImmediately )
+void CClientVehicle::SetModelBlocking ( unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2 )
 {
     // Different vehicle ID than we have now?
     if ( m_usModel != usModel )
@@ -915,6 +915,12 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, bool bLoadImmedi
 
         // Are we swapping from a vortex or skimmer?
         bool bResetWheelAndDoorStates = ( m_usModel == VT_VORTEX || m_usModel == VT_SKIMMER || ( m_eVehicleType == CLIENTVEHICLE_PLANE && m_eVehicleType != CClientVehicleManager::GetVehicleType ( usModel ) ) );
+
+        // Apply variant requirements
+        if ( ucVariant == 255 && ucVariant2 == 255 )
+            CClientVehicleManager::GetRandomVariation ( usModel, ucVariant, ucVariant2 );
+        m_ucVariation = ucVariant;
+        m_ucVariation2 = ucVariant2;
 
         // Set the new vehicle id and type
         m_usModel = usModel;
