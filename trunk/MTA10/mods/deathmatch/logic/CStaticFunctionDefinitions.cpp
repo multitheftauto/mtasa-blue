@@ -1408,7 +1408,7 @@ bool CStaticFunctionDefinitions::SetElementModel ( CClientEntity& Entity, unsign
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
             if ( Vehicle.GetModel () == usModel ) return false;
             if ( !CClientVehicleManager::IsValidModel ( usModel ) ) return false;
-            Vehicle.SetModelBlocking ( usModel );
+            Vehicle.SetModelBlocking ( usModel, 255, 255 );
             break;
         }
         case CCLIENTOBJECT:
