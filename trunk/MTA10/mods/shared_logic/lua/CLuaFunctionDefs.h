@@ -904,6 +904,9 @@ public:
     LUA_DECLARE ( UtfChar );
     LUA_DECLARE ( UtfCode );
 
+    // Voice functions
+    LUA_DECLARE ( IsVoiceEnabled );
+
 private:
     // Static references to objects
     static CLuaManager*                 m_pLuaManager;
