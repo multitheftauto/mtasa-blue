@@ -99,13 +99,13 @@ void CClientPlayerVoice::DoPulse( void )
     // Dispatch queued events
     ServiceEventQueue ();
 
+    m_CS.Lock ();
     float fPreviousVolume = m_fVolume;
     g_pCore->GetCVars ()->Get ( "voicevolume", m_fVolume );
+    m_CS.Unlock ();
 
-    m_CS.Lock ();
     if ( fPreviousVolume != m_fVolume )
         BASS_ChannelSetAttribute( m_pBassPlaybackStream, BASS_ATTRIB_VOL, m_fVolume );
-    m_CS.Unlock ();
 }
 
 
