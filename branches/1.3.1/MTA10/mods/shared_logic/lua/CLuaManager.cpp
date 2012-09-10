@@ -1103,6 +1103,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "utfChar", CLuaFunctionDefs::UtfChar );
     CLuaCFunctions::AddFunction ( "utfCode", CLuaFunctionDefs::UtfCode );
 
+    // Voice functions
+    CLuaCFunctions::AddFunction ( "isVoiceEnabled", CLuaFunctionDefs::IsVoiceEnabled );
+
     // JSON funcs
     CLuaCFunctions::AddFunction ( "toJSON", CLuaFunctionDefs::toJSON );
     CLuaCFunctions::AddFunction ( "fromJSON", CLuaFunctionDefs::fromJSON );
