@@ -24,7 +24,7 @@ CHTTPD::CHTTPD ( void )
     m_server = NULL;
     m_bStartedServer = false;
 
-    m_pGuestAccount = new CAccount ( g_pGame->GetAccountManager (), false, "http_guest" );
+    m_pGuestAccount = new CAccount ( g_pGame->GetAccountManager (), false, HTTP_GUEST_ACCOUNT_NAME );
 
     m_HttpDosProtect = CConnectHistory ( g_pGame->GetConfig ()->GetHTTPDosThreshold (), 10000, 60000 * 1 );     // Max of 'n' connections per 10 seconds, then 1 minute ignore
 }
@@ -194,7 +194,7 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
                 {
                     // Check that it isn't the Console account
                     std::string strAccountName = account->GetName ();
-                    if ( strAccountName.compare ( "Console" ) != 0 )
+                    if ( strAccountName.compare ( CONSOLE_ACCOUNT_NAME ) != 0 )
                     {
                         // Handle initial login logging
                         if ( m_LoggedInMap.find ( authName ) == m_LoggedInMap.end () )

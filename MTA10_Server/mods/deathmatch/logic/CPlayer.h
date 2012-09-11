@@ -156,9 +156,6 @@ public:
     void                                        SetPing                     ( uint uiPing )                 { m_uiPing = uiPing; }
     unsigned int                                GetPing                     ( void )                        { return m_uiPing; }
 
-    inline unsigned char                        GetLoginAttempts            ( void )                        { return m_ucLoginAttempts; };
-    inline void                                 SetLoginAttempts            ( unsigned char ucLoginAttempts )   { m_ucLoginAttempts = ucLoginAttempts; };
-
     inline time_t                               GetNickChangeTime           ( void )                        { return m_tNickChange; };
     inline void                                 SetNickChangeTime           ( time_t tNickChange )          { m_tNickChange = tNickChange; };
 
@@ -389,8 +386,6 @@ private:
     uint                                        m_uiPing;
 
     time_t                                      m_tNickChange;
-
-    unsigned char                               m_ucLoginAttempts;
 
     std::list < CVehicle* >                     m_SyncingVehicles;
     std::list < CPed* >                         m_SyncingPeds;
