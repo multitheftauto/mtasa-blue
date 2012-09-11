@@ -175,7 +175,7 @@ public:
     void                        SetTurretRotation       ( float fHorizontal, float fVertical );
 
     inline unsigned short       GetModel                ( void )                            { return m_usModel; };
-    void                        SetModelBlocking        ( unsigned short usModel, bool bLoadImmediately = false );
+    void                        SetModelBlocking        ( unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2 );
 
     inline unsigned char        GetVariant              ( void )                        { return m_ucVariation; };
     inline unsigned char        GetVariant2             ( void )                        { return m_ucVariation2; };

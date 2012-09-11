@@ -308,7 +308,7 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
                         }
                         else
                         {
-                            if ( strName == "Console" )
+                            if ( strName == CONSOLE_ACCOUNT_NAME )
                             {
                                 //Add Console to the SQL Database (You don't need to create an account since the server takes care of that
                                 m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO accounts (name, password) VALUES(?,?)", SQLITE_TEXT, "Console", SQLITE_TEXT, "" );
@@ -708,6 +708,10 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, CAccount* 
             pEchoClient->SendEcho ( "login: You successfully logged in" );
     }
 
+    // Update who was info
+    if ( pClient->GetClientType () == CClient::CLIENT_PLAYER )
+        g_pGame->GetConsole ()->GetWhoWas ()->OnPlayerLogin ( static_cast < CPlayer* > ( pClient ) );
+
     // Delete the old account if it was a guest account
     if ( !pCurrentAccount->IsRegistered () )
         delete pCurrentAccount;
@@ -728,7 +732,7 @@ bool CAccountManager::LogOut ( CClient* pClient, CClient* pEchoClient )
     CAccount* pCurrentAccount = pClient->GetAccount ();
     pCurrentAccount->SetClient ( NULL );
 
-    CAccount* pAccount = new CAccount ( g_pGame->GetAccountManager (), false, "guest" );
+    CAccount* pAccount = new CAccount ( g_pGame->GetAccountManager (), false, GUEST_ACCOUNT_NAME );
     pClient->SetAccount ( pAccount );
 
     // Call the onClientLogout event

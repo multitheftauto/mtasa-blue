@@ -407,8 +407,14 @@ void CElementRPCs::SetElementModel ( CClientEntity* pSource, NetBitStreamInterfa
 
             case CCLIENTVEHICLE:
             {
+                uchar ucVariant = 255, ucVariant2 = 255;
+                if ( bitStream.GetNumberOfUnreadBits () >= sizeof ( ucVariant ) + sizeof ( ucVariant2 ) )
+                {
+                    bitStream.Read ( ucVariant );
+                    bitStream.Read ( ucVariant2 );
+                }
                 CClientVehicle* pVehicle = static_cast < CClientVehicle * > ( pSource );
-                pVehicle->SetModelBlocking ( usModel );
+                pVehicle->SetModelBlocking ( usModel, ucVariant, ucVariant2 );
                 break;
             }
 

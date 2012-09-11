@@ -57,8 +57,6 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
     m_tNickChange = 0;
 
-    m_ucLoginAttempts = 0;
-
     m_pPlayerTextManager = new CPlayerTextManager ( this ); 
 
     m_PlayerAttackerID = INVALID_ELEMENT_ID;
@@ -186,7 +184,7 @@ void CPlayer::SetNick ( const char* szNick )
     if ( !m_strNick.empty () && m_strNick != szNick  )
     {
         // If changing, add the new name to the whowas list
-        g_pGame->GetConsole ()->GetWhoWas ()->Add ( szNick, inet_addr ( GetSourceIP() ), GetSerial (), GetPlayerVersion () );
+        g_pGame->GetConsole ()->GetWhoWas ()->Add ( szNick, inet_addr ( GetSourceIP() ), GetSerial (), GetPlayerVersion (), GetAccount ()->GetName () );
     }
 
     m_strNick.AssignLeft ( szNick, MAX_NICK_LENGTH );

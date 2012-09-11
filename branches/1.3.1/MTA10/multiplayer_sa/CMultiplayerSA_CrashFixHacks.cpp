@@ -796,10 +796,50 @@ void _declspec(naked) HOOK_CrashFix_Misc25 ()
         jmp     RETURN_CrashFix_Misc25
 
     fix:
+        CRASH_AVERTED( 25 )
         // Do special thing
         pop     esi
         pop     ecx
         retn
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////
+// Handle CShotInfo::Update having invalid item
+#define HOOKPOS_CrashFix_Misc26                             0x739FA0
+#define HOOKSIZE_CrashFix_Misc26                            6
+DWORD RETURN_CrashFix_Misc26 =                              0x739FA6;
+void _declspec(naked) HOOK_CrashFix_Misc26 ()
+{
+#if TEST_CRASH_FIXES
+    SIMULATE_ERROR_BEGIN( 10 )
+        _asm
+        {
+            mov     ebx, 130h
+        }
+    SIMULATE_ERROR_END
+#endif
+
+    _asm
+    {
+        // Check for incorrect pointer
+        cmp     ebx, 130h
+        jz      fix
+
+        // Continue standard path
+        mov     edi,dword ptr [ebx+ebp*4] 
+        dec     ebp  
+        test    edi,edi 
+        jmp     RETURN_CrashFix_Misc26
+
+    fix:
+        CRASH_AVERTED( 26 )
+        // Do special thing
+        mov     edi, 0 
+        dec     ebp  
+        test    edi,edi 
+        jmp     RETURN_CrashFix_Misc26
     }
 }
 
@@ -946,5 +986,6 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     EZHookInstall ( CrashFix_Misc23 );
     EZHookInstall ( CrashFix_Misc24 );
     EZHookInstall ( CrashFix_Misc25 );
+    EZHookInstall ( CrashFix_Misc26 );
     EZHookInstall ( CClumpModelInfo_GetFrameFromId );
 }
