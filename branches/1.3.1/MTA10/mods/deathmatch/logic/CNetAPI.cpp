@@ -291,7 +291,7 @@ void CNetAPI::DoPulse ( void )
     if ( m_pManager->IsGameLoaded () )
     {
         // Increase timeout time if downloading something
-        if ( g_pClientGame->IsDownloadingBigPacket () || g_pNet->GetHTTPDownloadManager ()->IsDownloading () )
+        if ( g_pClientGame->IsDownloadingBigPacket () || g_pClientGame->IsTransferringInitialFiles () )
         {
             m_bIncreaseTimeoutTime = true;
             m_IncreaseTimeoutTimeTimer.Reset ();

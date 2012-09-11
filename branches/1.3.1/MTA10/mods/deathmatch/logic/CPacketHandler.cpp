@@ -420,7 +420,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     if ( g_pCore->GetCVars ()->Get ( "single_download", iSingleDownload ) && iSingleDownload == 1 )
         iHTTPMaxConnectionsPerClient = 1;
 
-    g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetMaxConnections( iHTTPMaxConnectionsPerClient );
+    g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_INITIAL_FILES )->SetMaxConnections( iHTTPMaxConnectionsPerClient );
 
     // Make the camera black until we spawn
     // Anyone want to document wtf these values are?  Why are we putting seemingly "random"
@@ -4341,10 +4341,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
     * * unsigned char (x)    - function name
     */
 
-    CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork ()->GetHTTPDownloadManager ();
-
-    // Number of Resources to be Downloaded
-    unsigned short usResourcesToBeDownloaded = 0;
+    CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_INITIAL_FILES );
 
     // Number of protected scripts
     unsigned short usProtectedScriptCount = 0;
@@ -4491,7 +4488,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                 bool bAddedFile = pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame (), 10, true );
 
                                 // If the file was successfully queued, increment the resources to be downloaded
-                                usResourcesToBeDownloaded++;
+                                g_pClientGame->SetTransferringInitialFiles ( true );
                                 if ( bAddedFile )
                                     g_pClientGame->m_pTransferBox->AddToTotalSize ( dChunkDataSize );
                             }                       
@@ -4511,20 +4508,8 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
             }
         }
 
-        // Are there any resources to be downloaded? Does it not transfer?
-        if ( usResourcesToBeDownloaded > 0 ||
-             g_pClientGame->m_bTransferResource )
-        {
-            if ( !pHTTP->IsDownloading () )
-            {
-                g_pClientGame->m_pTransferBox->Show ();
-
-                pHTTP->StartDownloadingQueuedFiles ();
-
-                g_pClientGame->m_bTransferResource = true;
-            }
-        }
-        else
+        // Are there any resources to being downloaded?
+        if ( !g_pClientGame->IsTransferringInitialFiles () )
         {
             // Load the resource now
             if ( !pResource->GetActive() )

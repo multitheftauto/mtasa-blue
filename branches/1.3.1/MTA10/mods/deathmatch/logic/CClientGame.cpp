@@ -105,11 +105,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     m_bNoNewVehicleTask = false;
     m_NoNewVehicleTaskReasonID = INVALID_ELEMENT_ID;
-    m_bTransferResource = false;            // flag controls whether a resource is being transferred or not
-    m_bTransferInitiated = false;           // flag controls whether a transfer has been initiated (to prevent PacketResource, AUTOPATCHER_REQUEST_FILES priority issues)
-
-    m_dwTransferStarted = 0;                // timestamp for transfer start
-    m_bTransferReset = false;               // flag controls whether we have to reset the transfer counter
 
     m_bCursorEventsEnabled = false;
     m_bInitiallyFadedOut = true;
@@ -1160,14 +1155,7 @@ void CClientGame::DoPulses ( void )
     else if ( m_Status == CClientGame::STATUS_JOINED )
     {
         // Pulse DownloadFiles if we're transferring stuff
-        if ( m_bTransferResource ) DownloadFiles ();
-    }
-    else if ( m_Status == CClientGame::STATUS_TRANSFER )
-    {
-        DownloadFiles ();
-    }
-    else if ( m_Status == CClientGame::STATUS_OFFLINE )
-    {
+        DownloadInitialResourceFiles ();
 
     }
 
@@ -1254,7 +1242,7 @@ void CClientGame::DoPulses ( void )
     // Fire the engine ready event 10 frames after we're ingame
     static int iFrameCount = 0;
 
-    if ( iFrameCount <= 10 && m_Status == CClientGame::STATUS_JOINED || (m_pManager->IsGameLoaded () && m_Status == CClientGame::STATUS_OFFLINE) )
+    if ( iFrameCount <= 10 && m_Status == CClientGame::STATUS_JOINED )
     {
         ++iFrameCount;
 
@@ -3845,44 +3833,53 @@ bool CClientGame::ProcessCollisionHandler ( CEntitySAInterface* pThisInterface, 
     return true;
 }
 
-void CClientGame::DownloadFiles ( void )
+
+// Set flag and transfer box visibility
+void CClientGame::SetTransferringInitialFiles ( bool bTransfer )
 {
-    m_pTransferBox->DoPulse ();
+    m_bTransferringInitialFiles = bTransfer;
+    if ( bTransfer )
+        m_pTransferBox->Show ();
+    else
+        m_pTransferBox->Hide ();
+}
 
-    CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager ();
-    if ( pHTTP )
+
+//
+// Downloading initial resource files
+//
+void CClientGame::DownloadInitialResourceFiles ( void )
+{
+    if ( !IsTransferringInitialFiles () )
+        return;
+
+    CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_INITIAL_FILES );
+    if ( !pHTTP->ProcessQueuedFiles () )
     {
-        if ( !pHTTP->ProcessQueuedFiles () )
+        // Downloading
+        m_pTransferBox->SetInfo ( pHTTP->GetDownloadSizeNow () );
+        m_pTransferBox->DoPulse ();
+    }
+    else
+    {
+        SetTransferringInitialFiles ( false );
+
+        // Get the last error to occur in the HTTP Manager
+        const char* szHTTPError = pHTTP->GetError ();
+
+        // Was an error found?
+        if ( strlen (szHTTPError) == 0 )
         {
-            if ( m_dwTransferStarted == 0 || m_bTransferReset )
-            {
-                m_dwTransferStarted = GetTickCount32 ();
-
-                m_bTransferReset = false;
-            }
-
-            m_pTransferBox->SetInfo ( pHTTP->GetDownloadSizeNow () );
+            // Load our ("unavailable"-flagged) resources, and make them available
+            m_pResourceManager->LoadUnavailableResources ( m_pRootEntity );
+            m_pTransferBox->Hide ();
         }
         else
         {
-            // Get the last error to occur in the HTTP Manager
-            const char* szHTTPError = pHTTP->GetError ();
-
-            // Was an error found?
-            if ( strlen (szHTTPError) == 0 )
-            {
-                m_bTransferReset = true;
-
-                Event_OnTransferComplete ();
-                m_dwTransferStarted = 0;
-            }
-            else
-            {
-                // Throw the error and disconnect
-                g_pCore->GetModManager ()->RequestUnload ();
-                g_pCore->ShowMessageBox ( "Error", szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR );
-                g_pCore->GetConsole ()->Printf ( "Download error: %s", szHTTPError );
-            }
+            // Throw the error and disconnect
+            g_pCore->GetModManager ()->RequestUnload ();
+            g_pCore->ShowMessageBox ( "Error", szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR );
+            g_pCore->GetConsole ()->Printf ( "Download error: %s", szHTTPError );
         }
     }
 }
@@ -4793,41 +4790,6 @@ bool CClientGame::StaticProcessPacket ( unsigned char ucPacketID, NetBitStreamIn
     }
 
     return false;
-}
-
-
-void CClientGame::Event_OnTransferComplete ( void )
-{
-    if ( m_bTransferResource )  /*** in-game transfer ***/
-    {
-        // Load our ("unavailable"-flagged) resources, and make them available
-        m_pResourceManager->LoadUnavailableResources ( m_pRootEntity );
-
-        // Disable m_bTransferResource (and hide the transfer box), if there are no more files in the autopatch query (to prevent "simulatenous" transfer fuck-ups)
-        if ( !g_pNet->GetHTTPDownloadManager ()->IsDownloading () )
-        {
-            m_bTransferResource = false;
-            m_pTransferBox->Hide ();
-        }
-    }
-    else                        /*** on-join transfer ***/
-    {
-        // Hide the transfer box
-        m_pTransferBox->Hide ();
-
-        // Tell the core we're finished
-        g_pCore->SetConnected ( true );
-        g_pCore->HideMainMenu ();
-
-        // We're now "Joining"
-        m_Status = CClientGame::STATUS_JOINING;
-
-        // If the game isn't started, start it
-        if ( g_pGame->GetSystemState () == 7 )
-        {
-            g_pGame->StartGame ();
-        }
-    }
 }
 
 

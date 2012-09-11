@@ -77,8 +77,6 @@ public:
         STATUS_CONNECTING,
         STATUS_JOINING,
         STATUS_JOINED,
-        STATUS_TRANSFER,
-        STATUS_OFFLINE
     };
 
     enum
@@ -228,8 +226,6 @@ public:
 
     bool                                IsNickValid                     ( const char* szNick );
     bool                                IsNametagValid                  ( const char* szNick );
-
-    bool                                IsOfflineGame                   ( void ) { return m_Status == STATUS_OFFLINE; };
 
     inline bool                         IsGettingIntoVehicle            ( void ) { return m_bIsGettingIntoVehicle; };
     
@@ -446,15 +442,13 @@ private:
     void                                DrawWeaponsyncData              ( CClientPlayer* pPlayer );
     #endif
 
-
-    void                                DownloadFiles                   ( void );
+    void                                DownloadInitialResourceFiles    ( void );
 
     void                                QuitPlayer                      ( CClientPlayer* pPlayer, eQuitReason Reason );
 
     void                                Event_OnIngame                  ( void );
     void                                Event_OnIngameAndReady          ( void );
     void                                Event_OnIngameAndConnected      ( void );
-    void                                Event_OnTransferComplete        ( void );
 
     static bool                         StaticDamageHandler             ( CPed* pDamagePed, CEventDamage * pEvent );
     static void                         StaticFireHandler               ( CFire* pFire );
@@ -522,6 +516,9 @@ public:
 
     void                                SetServerVersionSortable        ( const SString& strVersion )   { m_strServerVersionSortable = strVersion; }
     const SString&                      GetServerVersionSortable        ( void )                        { return m_strServerVersionSortable; }
+
+    void                                SetTransferringInitialFiles     ( bool bTransfer );
+    bool                                IsTransferringInitialFiles      ( void )            { return m_bTransferringInitialFiles; }
 
     void                                SetVehExtrapolateSettings       ( const SVehExtrapolateSettings& settings ) { m_VehExtrapolateSettings = settings; }
     const SVehExtrapolateSettings&      GetVehExtrapolateSettings       ( void )                                    { return m_VehExtrapolateSettings; }
@@ -631,9 +628,6 @@ private:
     unsigned long                       m_ulDamageTime;
     bool                                m_bDamageSent;
 
-    DWORD                               m_dwTransferStarted;
-    bool                                m_bTransferReset;
-
     eWeaponSlot                         m_lastWeaponSlot;
     SFixedArray < DWORD, WEAPONSLOT_MAX + 1 >   m_wasWeaponAmmoInClip;
 
@@ -643,8 +637,7 @@ private:
     bool                                m_bShowNetstat;
     bool                                m_bShowFPS;
 
-    bool                                m_bTransferResource;
-    bool                                m_bTransferInitiated;
+    bool                                m_bTransferringInitialFiles;
 
     float                               m_fGameSpeed;
     long                                m_lMoney;
