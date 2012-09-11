@@ -476,10 +476,8 @@ public:
     LUA_DECLARE ( GetCameraTarget );
     LUA_DECLARE ( GetCameraInterior );
     LUA_DECLARE ( GetCameraGoggleEffect );
-    LUA_DECLARE ( GetCameraRotation );
 
     // Cam set funcs
-    LUA_DECLARE ( SetCameraRotation );
     LUA_DECLARE ( SetCameraMatrix );
     LUA_DECLARE ( SetCameraTarget );
     LUA_DECLARE ( SetCameraInterior );

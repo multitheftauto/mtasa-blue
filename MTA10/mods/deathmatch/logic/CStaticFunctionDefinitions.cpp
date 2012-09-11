@@ -4058,21 +4058,6 @@ bool CStaticFunctionDefinitions::GetCameraInterior ( unsigned char & ucInterior 
 }
 
 
-bool CStaticFunctionDefinitions::GetCameraRotation( float &fTargetX, float &fTargetY )
-{
-	m_pCamera->GetRotation( fTargetX, fTargetY );
-	
-	return true;
-}
-
-bool CStaticFunctionDefinitions::SetCameraRotation( float fX, float fY )
-{
-	m_pCamera->SetRotation( fX, fY );
-	
-	return true;
-}
-
-
 bool CStaticFunctionDefinitions::SetCameraMatrix ( CVector& vecPosition, CVector* pvecLookAt, float fRoll, float fFOV )
 {
     if ( !m_pCamera->IsInFixedMode () )        
