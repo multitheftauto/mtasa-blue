@@ -727,10 +727,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getCameraTarget", CLuaFunctionDefs::GetCameraTarget );
     CLuaCFunctions::AddFunction ( "getCameraInterior", CLuaFunctionDefs::GetCameraInterior );
     CLuaCFunctions::AddFunction ( "getCameraGoggleEffect", CLuaFunctionDefs::GetCameraGoggleEffect );
-    CLuaCFunctions::AddFunction ( "getCameraRotation", CLuaFunctionDefs::GetCameraRotation );
 
     // Cam set funcs
-    CLuaCFunctions::AddFunction ( "setCameraRotation", CLuaFunctionDefs::SetCameraRotation );
     CLuaCFunctions::AddFunction ( "setCameraMatrix", CLuaFunctionDefs::SetCameraMatrix );
     CLuaCFunctions::AddFunction ( "setCameraTarget", CLuaFunctionDefs::SetCameraTarget );
     CLuaCFunctions::AddFunction ( "setCameraInterior", CLuaFunctionDefs::SetCameraInterior );
