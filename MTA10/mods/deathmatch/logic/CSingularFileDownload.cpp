@@ -30,13 +30,14 @@ CSingularFileDownload::CSingularFileDownload ( CResource* pResource, const char 
 
     if ( !DoesClientAndServerChecksumMatch () )
     {
-        CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork ()->GetHTTPDownloadManager ();
+        CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_SINGULAR_FILES );
         pHTTP->QueueFile ( strHTTPURL.c_str(), szName, 0, NULL, 0, false, this, ProgressCallBack, false, 10, true );
         m_bComplete = false;
+        g_pClientGame->SetTransferringSingularFiles ( true );
     }
     else
     {
-        CallFinished ();
+        CallFinished ( true );
     }
 
 }
@@ -47,47 +48,30 @@ CSingularFileDownload::~CSingularFileDownload ( void )
 }
 
 
-void CSingularFileDownload::ProgressCallBack ( double sizeJustDownloaded, double totalDownloaded, char *data, size_t dataLength, void *obj, bool complete, int error )
+bool CSingularFileDownload::ProgressCallBack ( double sizeJustDownloaded, double totalDownloaded, char *data, size_t dataLength, void *obj, bool complete, int error )
 {
     if ( complete )
     {
         CSingularFileDownload * pFile = (CSingularFileDownload*)obj;
-        CResource* pResource = pFile->GetResource();
-        if ( pResource )
-        {
-            // Call the onClientFileDownloadComplete event
-            CLuaArguments Arguments;
-            Arguments.PushString ( pFile->GetShortName() );        // file name
-            Arguments.PushBoolean ( true );     // Completed successfully?
-            pResource->GetResourceEntity()->CallEvent ( "onClientFileDownloadComplete", Arguments, false );
-        }
-        pFile->SetComplete();
+        pFile->CallFinished ( true );
     }
     else if ( error )
     {
         CSingularFileDownload * pFile = (CSingularFileDownload*)obj;
-        CResource* pResource = pFile->GetResource();
-        if ( pResource )
-        {
-            // Call the onClientFileDownloadComplete event
-            CLuaArguments Arguments;
-            Arguments.PushString ( pFile->GetShortName() );        // file name
-            Arguments.PushBoolean ( false );    // Completed successfully?
-            pResource->GetResourceEntity()->CallEvent ( "onClientFileDownloadComplete", Arguments, false );
-        }
-        pFile->SetComplete();
+        pFile->CallFinished ( false );
     }
+    return true;
 }
 
 
-void CSingularFileDownload::CallFinished ( void )
+void CSingularFileDownload::CallFinished ( bool bSuccess )
 {
     if ( m_pResource )
     {
         // Call the onClientbFileDownloadComplete event
         CLuaArguments Arguments;
         Arguments.PushString ( GetShortName() );        // file name
-        Arguments.PushBoolean ( true );     // Completed successfully?
+        Arguments.PushBoolean ( bSuccess );     // Completed successfully?
         m_pResource->GetResourceEntity()->CallEvent ( "onClientFileDownloadComplete", Arguments, false );
     }
     SetComplete();
