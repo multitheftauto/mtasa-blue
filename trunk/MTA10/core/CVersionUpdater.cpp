@@ -3034,10 +3034,8 @@ int CVersionUpdater::DoSendPostToNextServer ( void )
     //
     // Send data. Doesn't check if it was received.
     //
-    CNetHTTPDownloadManagerInterface * downloadManager = CCore::GetSingleton ().GetNetwork ()->GetHTTPDownloadManager ();
+    CNetHTTPDownloadManagerInterface * downloadManager = CCore::GetSingleton ().GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::CORE_UPDATER );
     downloadManager->QueueFile ( strQueryURL, NULL, 0, &m_JobInfo.postContent.at ( 0 ), m_JobInfo.postContent.size (), m_JobInfo.bPostContentBinary );
-    if ( !downloadManager->IsDownloading () )
-        downloadManager->StartDownloadingQueuedFiles ();
 
     return RES_OK;
 }
@@ -3054,13 +3052,10 @@ int CVersionUpdater::DoSendPostToNextServer ( void )
 ///////////////////////////////////////////////////////////////
 int CVersionUpdater::DoPollPost ( void )
 {
-    CNetHTTPDownloadManagerInterface* pHTTP = CCore::GetSingleton ().GetNetwork ()->GetHTTPDownloadManager ();
-    if ( pHTTP )
+    CNetHTTPDownloadManagerInterface* pHTTP = CCore::GetSingleton ().GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::CORE_UPDATER );
+    if ( !pHTTP->ProcessQueuedFiles () )
     {
-        if ( !pHTTP->ProcessQueuedFiles () )
-        {
-            return RES_POLL;
-        }
+        return RES_POLL;
     }
     return RES_OK;
 }

@@ -17,6 +17,19 @@
 #include "net/bitstream.h"
 #include "CNetHTTPDownloadManagerInterface.h"
 
+namespace EDownloadMode
+{
+    enum EDownloadModeType
+    {
+        NONE,
+        CORE_UPDATER,
+        RESOURCE_INITIAL_FILES,
+        RESOURCE_SINGULAR_FILES,
+    };
+}
+using EDownloadMode::EDownloadModeType;
+
+
 struct SPacketStat
 {
     int iCount;
@@ -83,7 +96,7 @@ public:
 
     virtual void                        Reset                       ( void ) = 0;
 
-    virtual CNetHTTPDownloadManagerInterface*   GetHTTPDownloadManager          ( void ) = 0;
+    virtual CNetHTTPDownloadManagerInterface*   GetHTTPDownloadManager          ( EDownloadModeType iMode ) = 0;
 
     virtual void                        SetServerBitStreamVersion   ( unsigned short usServerBitStreamVersion ) = 0;
     virtual unsigned short              GetServerBitStreamVersion   ( void ) = 0;

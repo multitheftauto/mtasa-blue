@@ -236,14 +236,6 @@ bool CStaticFunctionDefinitions::DownloadFile ( CResource* pResource, const char
     SString strPath ( "%s\\resources\\%s\\%s", g_pClientGame->GetModRoot (),pResource->GetName(), szFile ); 
     // Call SingularFileDownloadManager
     g_pClientGame->GetSingularFileDownloadManager()->AddFile ( pResource, strPath.c_str(), szFile, strHTTPDownloadURLFull, checksum );
-
-    // Start Download
-    CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork ()->GetHTTPDownloadManager ();
-    if ( !pHTTP->IsDownloading () )
-    {
-        pHTTP->StartDownloadingQueuedFiles ();
-        g_pClientGame->SetSingularTransfers ( true );
-    }
     return true;
 }
 

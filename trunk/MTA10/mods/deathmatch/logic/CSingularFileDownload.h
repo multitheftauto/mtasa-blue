@@ -31,7 +31,7 @@ public:
                         CSingularFileDownload           ( CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CChecksum checksum );
                         ~CSingularFileDownload          ( void );
 
-        static void     ProgressCallBack                ( double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error );
+        static bool     ProgressCallBack                ( double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error );
 
         bool            DoesClientAndServerChecksumMatch ( void );
 
@@ -43,7 +43,7 @@ public:
         inline void             SetComplete                     ( void ) { m_bComplete = true; };
         inline bool             GetComplete                     ( void ) { return m_bComplete; };
 
-        void                    CallFinished                    ( void );
+        void                    CallFinished                    ( bool bSuccess );
 
         // CRC-based methods
         CChecksum               GenerateClientChecksum          ( void );
