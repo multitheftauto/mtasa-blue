@@ -10416,9 +10416,9 @@ bool CStaticFunctionDefinitions::GetAccounts ( CLuaMain* pLuaMain )
     lua_State* pLua = pLuaMain->GetVM();
     CMappedAccountList::const_iterator iter = m_pAccountManager->IterBegin();
     unsigned int uiIndex = 0;
-    const char* szGuest =  "guest";
-    const char* szHTTPGuest = "http_guest";
-    const char* szConsole = "Console";
+    const char* szGuest =  GUEST_ACCOUNT_NAME;
+    const char* szHTTPGuest = HTTP_GUEST_ACCOUNT_NAME;
+    const char* szConsole = CONSOLE_ACCOUNT_NAME;
     unsigned int uiGuest = HashString ( szGuest );
     unsigned int uiHTTPGuest = HashString ( szHTTPGuest );
     unsigned int uiConsole = HashString ( szConsole );

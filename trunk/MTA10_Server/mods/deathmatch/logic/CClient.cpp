@@ -17,7 +17,7 @@ extern CGame* g_pGame;
 
 CClient::CClient ( void )
 {
-    m_pAccount = new CAccount ( g_pGame->GetAccountManager (), false, "guest" );
+    m_pAccount = new CAccount ( g_pGame->GetAccountManager (), false, GUEST_ACCOUNT_NAME );
 }
 
 

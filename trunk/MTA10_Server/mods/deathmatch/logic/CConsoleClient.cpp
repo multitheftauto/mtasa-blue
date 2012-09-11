@@ -18,7 +18,7 @@ CConsoleClient::CConsoleClient ( CConsole* pConsole ) : CElement ( pConsole->Get
     SetTypeName ( "console" );
     m_strNick = "Console";
     m_pConsole = pConsole;
-    m_pAccount->SetName ( "Console" );
+    m_pAccount->SetName ( CONSOLE_ACCOUNT_NAME );
     m_pAccount->Register ( "" );
 }
 

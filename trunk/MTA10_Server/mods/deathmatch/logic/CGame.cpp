@@ -1791,7 +1791,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                             #endif
 
                                 // Add him to the whowas list
-                                m_WhoWas.Add ( szNick, Packet.GetSourceIP (), pPlayer->GetSerial (), pPlayer->GetPlayerVersion () );
+                                m_WhoWas.Add ( szNick, Packet.GetSourceIP (), pPlayer->GetSerial (), pPlayer->GetPlayerVersion (), pPlayer->GetAccount ()->GetName () );
 
                                 // Verify the player's serial if necessary
                                 if ( m_pMainConfig->GetSerialVerificationEnabled () )

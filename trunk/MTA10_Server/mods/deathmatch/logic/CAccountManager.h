@@ -20,6 +20,10 @@ class CAccountManager;
 #include "CXMLConfig.h"
 typedef uint SDbConnectionId;
 
+#define GUEST_ACCOUNT_NAME          "guest"
+#define HTTP_GUEST_ACCOUNT_NAME     "http_guest"
+#define CONSOLE_ACCOUNT_NAME        "Console"
+#define CONSOLE_NICK_NAME           "Console"
 
 //
 // CFastList with additional name->account mapping

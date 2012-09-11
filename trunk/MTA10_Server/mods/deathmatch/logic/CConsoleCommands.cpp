@@ -1608,7 +1608,10 @@ bool CConsoleCommands::WhoWas ( CConsole* pConsole, const char* szArguments, CCl
                         LongToDottedIP ( iter->ulIP, szIP );
 
                         // Populate a line about him
-                        pClient->SendEcho ( SString ( "%s  -  IP:%s  serial:%s  version:%s", *iter->strNick, szIP, iter->strSerial.c_str (), iter->strPlayerVersion.c_str () ) );
+                        SString strName = iter->strNick;
+                        if ( iter->strAccountName != GUEST_ACCOUNT_NAME )
+                            strName += SString ( " (%s)", *iter->strAccountName );
+                        pClient->SendEcho ( SString ( "%s  -  IP:%s  serial:%s  version:%s", *strName, szIP, iter->strSerial.c_str (), iter->strPlayerVersion.c_str () ) );
                     }
                     else
                     {
