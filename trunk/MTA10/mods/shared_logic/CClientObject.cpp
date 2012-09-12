@@ -131,13 +131,6 @@ void CClientObject::SetPosition ( const CVector& vecPosition )
 }
 
 
-void CClientObject::GetRotationDegrees ( CVector& vecRotation ) const
-{
-    GetRotationRadians ( vecRotation );
-    ConvertRadiansToDegrees ( vecRotation );
-}
-
-
 void CClientObject::GetRotationRadians ( CVector& vecRotation ) const
 {
     if ( m_pObject && m_pAttachedToEntity )// Temp fix for static objects->
@@ -153,18 +146,6 @@ void CClientObject::GetRotationRadians ( CVector& vecRotation ) const
     {
         vecRotation = m_vecRotation;
     }
-}
-
-
-void CClientObject::SetRotationDegrees ( const CVector & vecRotation )
-{
-    // Convert from degrees to radians
-    CVector vecTemp;
-    vecTemp.fX = vecRotation.fX * 3.1415926535897932384626433832795f / 180.0f;
-    vecTemp.fY = vecRotation.fY * 3.1415926535897932384626433832795f / 180.0f;
-    vecTemp.fZ = vecRotation.fZ * 3.1415926535897932384626433832795f / 180.0f;
-
-    SetRotationRadians ( vecTemp );
 }
 
 

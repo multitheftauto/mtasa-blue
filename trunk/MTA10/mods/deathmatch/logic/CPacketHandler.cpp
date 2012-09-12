@@ -3343,7 +3343,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     pEntity = pPed;
 
                     pPed->SetPosition ( position.data.vecPosition );
-                    pPed->SetCurrentRotation ( pedRotation.data.fRotation, true );
+                    pPed->SetCurrentRotation ( pedRotation.data.fRotation );
                     pPed->SetCameraRotation ( pedRotation.data.fRotation );
                     pPed->SetHealth ( health.data.fValue );
                     pPed->SetArmor ( armor.data.fValue );

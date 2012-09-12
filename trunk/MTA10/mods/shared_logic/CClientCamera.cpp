@@ -158,21 +158,16 @@ void CClientCamera::SetPosition ( const CVector& vecPosition )
 }
 
 
-void CClientCamera::GetRotation ( CVector& vecRotation ) const
+void CClientCamera::GetRotationRadians ( CVector& vecRotation ) const
 {
     CCam* pCam = m_pCamera->GetCam ( m_pCamera->GetActiveCam () );
     CMatrix matrix;
     m_pCamera->GetMatrix ( &matrix );
     g_pMultiplayer->ConvertMatrixToEulerAngles ( matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
-    ConvertRadiansToDegrees ( vecRotation );
-    vecRotation += CVector ( 180.0f, 180.0f, 180.0f );
-    if ( vecRotation.fX > 360.0f ) vecRotation.fX -= 360.0f;
-    if ( vecRotation.fY > 360.0f ) vecRotation.fY -= 360.0f;
-    if ( vecRotation.fZ > 360.0f ) vecRotation.fZ -= 360.0f;
 }
 
 
-void CClientCamera::SetRotation ( const CVector& vecRotation )
+void CClientCamera::SetRotationRadians ( const CVector& vecRotation )
 {
     // Rotate a 1000,0,0 vector with the given rotation vector
     CVector vecRotationCopy = vecRotation;

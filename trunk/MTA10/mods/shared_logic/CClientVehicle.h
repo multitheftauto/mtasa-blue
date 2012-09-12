@@ -117,15 +117,13 @@ public:
     inline eClientVehicleType   GetVehicleType          ( void )                            { return m_eVehicleType; };
 
     void                        GetPosition             ( CVector& vecPosition ) const;
-    void                        SetPosition             ( const CVector& vecPosition )      { SetPosition ( vecPosition, true ); }
-    void                        SetPosition             ( const CVector& vecPosition, bool bResetInterpolation );
-
-    void                        GetRotationDegrees      ( CVector& vecRotation ) const;
+    void                        SetPosition             ( const CVector& vecPosition )      { SetPositionFlagged ( vecPosition, true ); }
     void                        GetRotationRadians      ( CVector& vecRotation ) const;
-    void                        SetRotationDegrees      ( const CVector& vecRotation )      { SetRotationDegrees ( vecRotation, true ); }
-    void                        SetRotationDegrees      ( const CVector& vecRotation, bool bResetInterpolation );
-    void                        SetRotationRadians      ( const CVector& vecRotation )      { SetRotationRadians ( vecRotation, true ); }
-    void                        SetRotationRadians      ( const CVector& vecRotation, bool bResetInterpolation );
+    void                        SetRotationRadians      ( const CVector& vecRotation )      { SetRotationRadiansFlagged ( vecRotation, true ); }
+
+    void                        SetPositionFlagged          ( const CVector& vecPosition, bool bResetInterpolation );
+    void                        SetRotationRadiansFlagged   ( const CVector& vecRotation, bool bResetInterpolation );
+    void                        SetRotationDegreesFlagged   ( const CVector& vecRotation, bool bResetInterpolation );
     
     void                        AttachTo                ( CClientEntity * pEntity );
 
