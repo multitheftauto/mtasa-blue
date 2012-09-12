@@ -138,14 +138,12 @@ public:
     virtual CSphere             GetWorldBoundingSphere      ( void );
 
     void                        GetPosition                 ( CVector& vecPosition ) const;
-    void                        SetPosition                 ( const CVector& vecPosition )              { SetPosition ( vecPosition, true ); }
-    void                        SetPosition                 ( const CVector& vecPosition, bool bResetInterpolation );
+    void                        SetPosition                 ( const CVector& vecPosition )              { SetPositionFlagged ( vecPosition, true ); }
+    void                        SetPositionFlagged          ( const CVector& vecPosition, bool bResetInterpolation );
 
     void                        SetInterior                 ( unsigned char ucInterior );
 
-    void                        GetRotationDegrees          ( CVector& vecRotation ) const;
     void                        GetRotationRadians          ( CVector& vecRotation ) const;
-    void                        SetRotationDegrees          ( const CVector& vecRotation );
     void                        SetRotationRadians          ( const CVector& vecRotation );
 
     void                        Teleport                    ( const CVector& vecPosition );
@@ -162,9 +160,10 @@ public:
     void                        ResetInterpolation          ( void );
 
     float                       GetCurrentRotation          ( void );
-    void                        SetCurrentRotation          ( float fRotation, bool bIncludeTarget = true );
+    void                        SetCurrentRotation          ( float fRotation );
     void                        SetTargetRotation           ( float fRotation );
     void                        SetTargetRotation           ( unsigned long ulDelay, float fRotation, float fCameraRotation );
+    void                        SetCurrentRotationInternal  ( float fRotation );
 
     float                       GetCameraRotation           ( void );
     void                        SetCameraRotation           ( float fRotation );

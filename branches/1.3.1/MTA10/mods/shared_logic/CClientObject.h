@@ -50,9 +50,7 @@ public:
 
     void                            AttachTo                ( CClientEntity* pEntity );
 
-    void                            GetRotationDegrees      ( CVector& vecRotation ) const;
     void                            GetRotationRadians      ( CVector& vecRotation ) const;
-    void                            SetRotationDegrees      ( const CVector& vecRotation );
     virtual void                    SetRotationRadians      ( const CVector& vecRotation );
 
     void                            GetMoveSpeed            ( CVector& vecMoveSpeed ) const;
