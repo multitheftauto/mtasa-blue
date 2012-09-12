@@ -196,6 +196,56 @@ inner:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// Check_NoOfVisibleLods
+//
+// Apply render limits
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// Hook info
+#define HOOKPOS_Check_NoOfVisibleLods                         0x5534F9
+#define HOOKSIZE_Check_NoOfVisibleLods                        6
+DWORD RETURN_Check_NoOfVisibleLods =                          0x5534FF;
+void _declspec(naked) HOOK_Check_NoOfVisibleLods()
+{
+    _asm
+    {
+        cmp     eax, 999            // Array limit is 1000
+        jge     limit
+        inc     eax
+limit:
+        mov     dword ptr ds:[00B76840h],eax        // NoOfVisibleLods
+        jmp     RETURN_Check_NoOfVisibleLods
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Check_NoOfVisibleEntities
+//
+// Apply render limits
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// Hook info
+#define HOOKPOS_Check_NoOfVisibleEntities                         0x55352D
+#define HOOKSIZE_Check_NoOfVisibleEntities                        6
+DWORD RETURN_Check_NoOfVisibleEntities =                          0x553533;
+void _declspec(naked) HOOK_Check_NoOfVisibleEntities()
+{
+    _asm
+    {
+        cmp     eax, 999        // Array limit is 1000
+        jge     limit
+        inc     eax
+limit:
+        mov     dword ptr ds:[00B76844h],eax        // NoOfVisibleEntities
+        jmp     RETURN_Check_NoOfVisibleEntities
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // WinLoop
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -263,5 +313,7 @@ void CMultiplayerSA::InitHooks_Rendering ( void )
     EZHookInstall ( CallIdle );
     EZHookInstall ( CEntity_Render );
     EZHookInstall ( CEntity_RenderOneNonRoad );
+    EZHookInstall ( Check_NoOfVisibleLods );
+    EZHookInstall ( Check_NoOfVisibleEntities );
     EZHookInstall ( WinLoop );
 }
