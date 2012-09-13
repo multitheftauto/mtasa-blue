@@ -335,7 +335,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
                                      ,"\\MTA\\bass_fx.dll"
                                      ,"\\MTA\\sa.dat"
                                      ,"\\MTA\\pthreadVC2.dll"
-                                     ,"\\server\\mods\\deathmatch\\pthreadVC2.dll"
+                                     ,"\\server\\pthreadVC2.dll"
                                      ,"\\server\\mods\\deathmatch\\libmysql.dll"};
 
     for ( uint i = 0 ; i < NUMELMS( dataFilesFiles ) ; i++ )
