@@ -81,7 +81,6 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_bJoinFloodProtectionEnabled = true;
     m_bScriptDebugLogEnabled = false;
     m_uiScriptDebugLogLevel = 0;
-    m_bAutoUpdateIncludedResources = false;
     m_bDontBroadcastLan = false;
     m_usFPSLimit = 36;
     m_bAutoLogin = false;
@@ -343,19 +342,6 @@ bool CMainConfig::Load ( void )
             if ( (*it).length () )
                 MapInsert ( m_EnableDiagnosticMap, *it );
     }
-
-    // Update sites
-    int i =0;
-    for ( CXMLNode * updateURL = m_pRootNode->FindSubNode("update", i);
-        updateURL != NULL; updateURL = m_pRootNode->FindSubNode("update", ++i ) )
-    {
-        g_pGame->GetResourceDownloader()->AddUpdateSite ( updateURL->GetTagContent ().c_str () );
-    }
-    
-    // Auto update included resources
-    iResult = GetBoolean ( m_pRootNode, "autoupdateincludedresources", m_bAutoUpdateIncludedResources );
-    if ( iResult == INVALID_VALUE  || iResult == DOESNT_EXIST )
-        m_bAutoUpdateIncludedResources = false;
 
     // Grab the server password
     iResult = GetString ( m_pRootNode, "password", m_strPassword, 1, 32 );
@@ -749,7 +735,6 @@ bool CMainConfig::LoadExtended ( void )
     CLogger::SetMinLogLevel ( LOGLEVEL_LOW );
 
     // Register the commands
-    RegisterCommand ( "update", CConsoleCommands::Update, false );          // Nearly working - Part of (unmaintained) resource download system
     RegisterCommand ( "start", CConsoleCommands::StartResource, false );
     RegisterCommand ( "stop", CConsoleCommands::StopResource, false );
     RegisterCommand ( "stopall", CConsoleCommands::StopAllResources, false );

@@ -134,7 +134,6 @@ CGame::CGame ( void )
     m_pGroups = NULL;
     m_pSettings = NULL;
     m_pRemoteCalls = NULL;
-    m_pResourceDownloader = NULL;
     m_pRPCFunctions = NULL;
     m_pLanBroadcast = NULL;
     m_pPedSync = NULL;
@@ -295,7 +294,6 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pASE );
     SAFE_DELETE ( m_pSettings );
     SAFE_DELETE ( m_pRemoteCalls );
-    SAFE_DELETE ( m_pResourceDownloader );
     SAFE_DELETE ( m_pRPCFunctions );
     SAFE_DELETE ( m_pWaterManager );
     SAFE_DELETE ( m_pWeaponStatsManager );
@@ -387,7 +385,10 @@ void CGame::DoPulse ( void )
     CNetBufferWatchDog::DoPulse ();
 
     CLOCK_SET_SECTION( "CGame::DoPulse" );
-    CLOCK_CALL1( g_pNetServer->GetHTTPDownloadManager()->ProcessQueuedFiles(); );
+    CLOCK1( "HTTPDownloadManager" );
+    g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::CALL_REMOTE )->ProcessQueuedFiles ();
+    g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::ASE )->ProcessQueuedFiles ();
+    UNCLOCK1( "HTTPDownloadManager" );
 
     CLOCK_CALL1( m_pPlayerManager->DoPulse (); );
 
@@ -512,8 +513,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "mtaserver.conf" );
     }
     m_pMainConfig->SetFileName ( strBuffer );
-
-    m_pResourceDownloader = new CResourceDownloader();
 
     // Load the main config base
     if ( !m_pMainConfig->Load () )
@@ -990,10 +989,8 @@ void CGame::PulseMasterServerAnnounce ( void )
             SString strPostContent = m_pASE->QueryLight ();
             bool bPostContentBinary = true;
 
-            CNetHTTPDownloadManagerInterface * downloadManager = g_pNetServer->GetHTTPDownloadManager ();
+            CNetHTTPDownloadManagerInterface * downloadManager = g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::ASE );
             downloadManager->QueueFile ( strURL, NULL, 0, &strPostContent.at ( 0 ), strPostContent.length (), bPostContentBinary, NULL, NULL, false, 1 );
-            if ( !downloadManager->IsDownloading () )
-                downloadManager->StartDownloadingQueuedFiles ();
         }
     }
 }
@@ -1390,10 +1387,6 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
         case CClient::QUIT_CONNECTION_DESYNC: szReason = "Bad Connection"; break;
         case CClient::QUIT_TIMEOUT: szReason = "Timed out"; break;
     }
-
-    // Remove the player from the serial manager
-    if ( m_pMainConfig->GetSerialVerificationEnabled () )
-        m_SerialManager.Remove ( &Player );
 
     // Output
     const char* szNick = Player.GetNick ();
@@ -1793,11 +1786,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 // Add him to the whowas list
                                 m_WhoWas.Add ( szNick, Packet.GetSourceIP (), pPlayer->GetSerial (), pPlayer->GetPlayerVersion (), pPlayer->GetAccount ()->GetName () );
 
-                                // Verify the player's serial if necessary
-                                if ( m_pMainConfig->GetSerialVerificationEnabled () )
-                                    m_SerialManager.Verify ( pPlayer, PlayerCompleteConnect );
-                                else
-                                    PlayerCompleteConnect ( pPlayer, true, NULL );
+                                PlayerCompleteConnect ( pPlayer, true, NULL );
                             }
                             else
                             {

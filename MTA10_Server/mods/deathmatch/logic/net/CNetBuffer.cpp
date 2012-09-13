@@ -479,9 +479,9 @@ void CNetServerBuffer::SetMaximumIncomingConnections ( unsigned short numberAllo
 // Thread safe
 //
 ///////////////////////////////////////////////////////////////////////////
-CNetHTTPDownloadManagerInterface* CNetServerBuffer::GetHTTPDownloadManager ( void )
+CNetHTTPDownloadManagerInterface* CNetServerBuffer::GetHTTPDownloadManager ( EDownloadModeType iMode )
 {
-    return m_pRealNetServer->GetHTTPDownloadManager ();
+    return m_pRealNetServer->GetHTTPDownloadManager ( iMode );
 }
 
 

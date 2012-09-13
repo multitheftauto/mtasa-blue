@@ -805,10 +805,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CResourceDownloader.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CResourceFile.cpp"
 					>
 				</File>
@@ -838,10 +834,6 @@
 				</File>
 				<File
 					RelativePath=".\logic\CScriptFile.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CSerialManager.cpp"
 					>
 				</File>
 				<File
@@ -2038,10 +2030,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CResourceDownloader.h"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CResourceFile.h"
 					>
 				</File>
@@ -2071,10 +2059,6 @@
 				</File>
 				<File
 					RelativePath=".\logic\CScriptFile.h"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CSerialManager.h"
 					>
 				</File>
 				<File
