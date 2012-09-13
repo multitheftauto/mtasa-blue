@@ -1033,7 +1033,7 @@ int CLuaWorldDefs::RestoreWorldModel ( lua_State* luaVM )
     argStream.ReadNumber ( fX );
     argStream.ReadNumber ( fY );
     argStream.ReadNumber ( fZ );
-    argStream.ReadNumber ( cInterior );
+    argStream.ReadNumber ( cInterior, -1 );
     if ( !argStream.HasErrors ( ) )
     {
         if ( CStaticFunctionDefinitions::RestoreWorldModel ( usModel, fRadius, fX, fY, fZ, cInterior ) )
