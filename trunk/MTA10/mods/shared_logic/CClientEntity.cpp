@@ -584,7 +584,6 @@ bool CClientEntity::SetMatrix ( const CMatrix& matrix )
     SetPosition ( matrix.vPos );
     CVector vecRotation;
     g_pMultiplayer->ConvertMatrixToEulerAngles ( matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
-    SetRotationDegrees ( vecRotation );
     SetRotationRadians ( vecRotation );
     return true;
 }

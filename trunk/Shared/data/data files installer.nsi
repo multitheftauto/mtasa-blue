@@ -181,9 +181,11 @@ Section "Data files" SEC01
 	SetOutPath "$INSTDIR\MTA\cgui\images\serverbrowser"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\serverbrowser\*.png"
 
+	SetOutPath "$INSTDIR\server"
+	File "${FILES_ROOT}\MTA San Andreas\pthreadVC2.dll"
+
 	SetOutPath "$INSTDIR\server\mods\deathmatch"
 	File "${FILES_ROOT}\MTA San Andreas\server\mods\deathmatch\libmysql.dll"
-	File "${FILES_ROOT}\MTA San Andreas\server\mods\deathmatch\pthreadVC2.dll"
 
 SectionEnd
 

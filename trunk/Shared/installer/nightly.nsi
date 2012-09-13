@@ -586,6 +586,7 @@ DontInstallRedist:
 		File "${SERVER_FILES_ROOT}\MTA Server.exe"
 		File "${SERVER_FILES_ROOT}\net.dll"
 		File "${SERVER_FILES_ROOT}\libcurl.dll"
+		File "${SERVER_FILES_ROOT}\pthreadVC2.dll"
 	SectionEnd
 
 	Section "Game module" SEC05
@@ -596,7 +597,6 @@ DontInstallRedist:
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\deathmatch.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\pcre3.dll"
-		File "${SERVER_FILES_ROOT}\mods\deathmatch\pthreadVC2.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\sqlite3.dll"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\dbconmy.dll"
 		!ifndef LIGHTBUILD
