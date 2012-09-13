@@ -137,10 +137,8 @@ CRemoteCall::~CRemoteCall ()
 
 void CRemoteCall::MakeCall()
 {
-    CNetHTTPDownloadManagerInterface * downloadManager = g_pNetServer->GetHTTPDownloadManager();
+    CNetHTTPDownloadManagerInterface * downloadManager = g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::CALL_REMOTE );
     downloadManager->QueueFile ( m_strURL, NULL, 0, m_strData.c_str (), m_strData.length (), m_bPostBinary, this, ProgressCallback, false, m_uiConnectionAttempts );
-    if ( !downloadManager->IsDownloading() )
-        downloadManager->StartDownloadingQueuedFiles();
 }
 
 bool CRemoteCall::ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error)

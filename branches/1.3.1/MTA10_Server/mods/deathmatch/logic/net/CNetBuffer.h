@@ -87,7 +87,7 @@ public:
 
     virtual void                            SetMaximumIncomingConnections   ( unsigned short numberAllowed );
 
-    virtual CNetHTTPDownloadManagerInterface*   GetHTTPDownloadManager      ( void );
+    virtual CNetHTTPDownloadManagerInterface*   GetHTTPDownloadManager      ( EDownloadModeType iMode );
 
     virtual void                            SetClientBitStreamVersion       ( const NetServerPlayerID &PlayerID, unsigned short usBitStreamVersion );
     virtual void                            ClearClientBitStreamVersion     ( const NetServerPlayerID &PlayerID );

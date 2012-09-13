@@ -90,7 +90,6 @@ public:
     inline const std::string&       GetScriptDebugLogFile           ( void )        { return m_strScriptDebugLogFile; };
     inline unsigned int             GetScriptDebugLogLevel          ( void )        { return m_uiScriptDebugLogLevel; };
     inline const std::string&       GetAccessControlListFile        ( void )        { return m_strAccessControlListFile; };
-    inline bool                     GetAutoUpdateIncludedResourcesEnabled   ( void )        { return m_bAutoUpdateIncludedResources; };
     inline bool                     GetDontBroadcastLan             ( void )        { return m_bDontBroadcastLan ? true : false; };
     inline bool                     GetSerialVerificationEnabled    ( void )        { return m_bVerifySerials; };
     bool                            IsDisableAC                     ( const char* szTagAC )     { return MapContains ( m_DisableComboACMap, szTagAC ); };
@@ -168,7 +167,6 @@ private:
     std::string                     m_strScriptDebugLogFile;
     unsigned int                    m_uiScriptDebugLogLevel;
     std::string                     m_strAccessControlListFile;
-    bool                            m_bAutoUpdateIncludedResources;
     bool                            m_bVerifySerials;
     unsigned short                  m_usFPSLimit;
     int                             m_bDontBroadcastLan;
