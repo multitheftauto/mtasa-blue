@@ -149,7 +149,6 @@ LOGIC = \
 ./logic/CResourceClientFileItem.cpp \
 ./logic/CResourceClientScriptItem.cpp \
 ./logic/CResourceConfigItem.cpp \
-./logic/CResourceDownloader.cpp \
 ./logic/CResourceFile.cpp \
 ./logic/CResourceHTMLItem.cpp \
 ./logic/CResourceManager.cpp \
@@ -157,7 +156,6 @@ LOGIC = \
 ./logic/CResourceScriptItem.cpp \
 ./logic/CScriptDebugging.cpp \
 ./logic/CScriptFile.cpp \
-./logic/CSerialManager.cpp \
 ./logic/CSettings.cpp \
 ./logic/CSpatialDatabase.cpp \
 ./logic/CStaticFunctionDefinitions.cpp \
