@@ -98,13 +98,13 @@ int CClientCivilian::GetRotation ( void )
 }
 
 
-void CClientCivilian::GetRotationRadians ( CVector& vecRotation ) const
+void CClientCivilian::GetRotation ( CVector& vecRotation ) const
 {
 //    vecRotation = m_vecRotation;
 }
 
 
-void CClientCivilian::SetRotationRadians ( const CVector& vecRotation )
+void CClientCivilian::SetRotation ( const CVector& vecRotation )
 {
     if ( m_pCivilianPed )
     {

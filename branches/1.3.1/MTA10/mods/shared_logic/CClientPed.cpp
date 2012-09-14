@@ -451,7 +451,7 @@ void CClientPed::GetPosition ( CVector& vecPosition ) const
 }
 
 
-void CClientPed::SetPositionFlagged ( const CVector& vecPosition, bool bResetInterpolation )
+void CClientPed::SetPosition ( const CVector& vecPosition, bool bResetInterpolation )
 {
     // We have a player ped?
     if ( m_pPlayerPed )
@@ -554,49 +554,51 @@ void CClientPed::Teleport ( const CVector& vecPosition )
 }
 
 
+void CClientPed::GetRotationDegrees ( CVector& vecRotation ) const
+{
+    // Grab our rotations in radians
+    GetRotationRadians ( vecRotation );
+
+    // Convert it to degrees
+    vecRotation.fX = vecRotation.fX * 180.0f / 3.1415926535897932384626433832795f;
+    vecRotation.fY = vecRotation.fY * 180.0f / 3.1415926535897932384626433832795f;
+    vecRotation.fZ = vecRotation.fZ * 180.0f / 3.1415926535897932384626433832795f;
+}
+
+
 void CClientPed::GetRotationRadians ( CVector& vecRotation ) const
 {
     CMatrix matTemp;
     GetMatrix ( matTemp );
     g_pMultiplayer->ConvertMatrixToEulerAngles ( matTemp, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
-
-    // Correct the rotation
-    vecRotation.fZ = WrapAround ( -vecRotation.fZ, PI * 2 );
 }
 
 
-// With x,y,z
+void CClientPed::SetRotationDegrees ( const CVector& vecRotation )
+{
+    // Convert from degrees to radians
+    CVector vecTemp;
+    vecTemp.fX = vecRotation.fX * 3.1415926535897932384626433832795f / 180.0f;
+    vecTemp.fY = vecRotation.fY * 3.1415926535897932384626433832795f / 180.0f;
+    vecTemp.fZ = vecRotation.fZ * 3.1415926535897932384626433832795f / 180.0f;
+
+    // Set the rotation as radians
+    SetRotationRadians ( vecTemp );
+
+    // HACK: set again the z rotation to work on ground
+    SetCurrentRotation ( vecTemp.fZ );
+    if ( !IS_PLAYER ( this ) )
+        SetCameraRotation ( vecTemp.fZ );
+}
+
+
 void CClientPed::SetRotationRadians ( const CVector& vecRotation )
 {
-    // Off ground
+    // Grab the matrix, apply the rotation to it and set it again
     CMatrix matTemp;
     GetMatrix ( matTemp );
-    g_pMultiplayer->ConvertEulerAnglesToMatrix ( matTemp, vecRotation.fX, vecRotation.fY, -vecRotation.fZ );
+    g_pMultiplayer->ConvertEulerAnglesToMatrix ( matTemp, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
     SetMatrix ( matTemp );
-
-    // On ground
-    SetCurrentRotationInternal ( vecRotation.fZ );
-    if ( !IS_PLAYER ( this ) )
-        SetCameraRotation ( vecRotation.fZ );   // For syncing ped camera direction?
-}
-
-
-
-// If set with z only
-void CClientPed::SetCurrentRotation ( float fRotation )
-{
-    // Off ground
-    CMatrix matTemp;
-    GetMatrix ( matTemp );
-    CVector vecTemp;
-    g_pMultiplayer->ConvertMatrixToEulerAngles ( matTemp, vecTemp.fX, vecTemp.fY, vecTemp.fZ );
-    g_pMultiplayer->ConvertEulerAnglesToMatrix ( matTemp, vecTemp.fX, vecTemp.fY, -fRotation );
-    SetMatrix ( matTemp );
-
-    // On ground
-    SetCurrentRotationInternal ( fRotation );
-    if ( !IS_PLAYER ( this ) )
-        SetCameraRotation ( fRotation );   // For syncing ped camera direction?
 }
 
 
@@ -2857,11 +2859,8 @@ float CClientPed::GetCurrentRotation ( void )
 }
 
 
-// Sets z rotation while on the ground only
-void CClientPed::SetCurrentRotationInternal ( float fRotation )
+void CClientPed::SetCurrentRotation ( float fRotation, bool bIncludeTarget )
 {
-    const bool bIncludeTarget = true;     // This was an argument which was always set before
-
     if ( m_pPlayerPed )
     {
         m_pPlayerPed->SetCurrentRotation ( fRotation );
@@ -4934,7 +4933,7 @@ void CClientPed::UpdateTargetPosition ( void )
             vecNewPosition = m_interp.pos.vecTarget;
         }
 
-        SetPositionFlagged ( vecNewPosition + vecOrigin, false );
+        SetPosition ( vecNewPosition + vecOrigin, false );
     }
 }
 

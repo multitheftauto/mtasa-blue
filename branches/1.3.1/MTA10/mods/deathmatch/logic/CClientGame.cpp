@@ -4912,7 +4912,7 @@ void CClientGame::SendProjectileSync ( CClientProjectile * pProjectile )
                 pBitStream->Write ( &velocity );
 
                 SRotationRadiansSync rotation ( true );
-                pProjectile->GetRotationRadians ( rotation.data.vecRotation );
+                pProjectile->GetRotation ( rotation.data.vecRotation );
                 pBitStream->Write ( &rotation );
 
                 break;

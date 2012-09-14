@@ -279,7 +279,7 @@ void CClientVehicle::GetPosition ( CVector& vecPosition ) const
 }
 
 
-void CClientVehicle::SetPositionFlagged ( const CVector& vecPosition, bool bResetInterpolation )
+void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterpolation )
 {
     // Is the local player in the vehicle
     if ( g_pClientGame->GetLocalPlayer ()->GetOccupiedVehicle () == this )
@@ -328,6 +328,14 @@ void CClientVehicle::SetPositionFlagged ( const CVector& vecPosition, bool bRese
 }
 
 
+void CClientVehicle::GetRotationDegrees ( CVector& vecRotation ) const
+{
+    // Grab our rotations in radians
+    GetRotationRadians ( vecRotation );
+    ConvertRadiansToDegrees ( vecRotation );
+}
+
+
 void CClientVehicle::GetRotationRadians ( CVector& vecRotation ) const
 {
     // Grab the rotation in radians from the matrix
@@ -343,7 +351,20 @@ void CClientVehicle::GetRotationRadians ( CVector& vecRotation ) const
 }
 
 
-void CClientVehicle::SetRotationRadiansFlagged ( const CVector& vecRotation, bool bResetInterpolation )
+void CClientVehicle::SetRotationDegrees ( const CVector& vecRotation, bool bResetInterpolation )
+{
+    // Convert from degrees to radians
+    CVector vecTemp;
+    vecTemp.fX = vecRotation.fX * 3.1415926535897932384626433832795f / 180.0f;
+    vecTemp.fY = vecRotation.fY * 3.1415926535897932384626433832795f / 180.0f;
+    vecTemp.fZ = vecRotation.fZ * 3.1415926535897932384626433832795f / 180.0f;
+
+    // Set the rotation as radians
+    SetRotationRadians ( vecTemp, bResetInterpolation );
+}
+
+
+void CClientVehicle::SetRotationRadians ( const CVector& vecRotation, bool bResetInterpolation )
 {
     // Grab the matrix, apply the rotation to it and set it again
     // ChrML: We flip the actual rotation direction so that the rotation is consistent with
@@ -356,14 +377,6 @@ void CClientVehicle::SetRotationRadiansFlagged ( const CVector& vecRotation, boo
     // Reset target rotatin
     if ( bResetInterpolation )
         RemoveTargetRotation ();
-}
-
-
-void CClientVehicle::SetRotationDegreesFlagged ( const CVector& vecRotation, bool bResetInterpolation )
-{
-    CVector vecTemp = vecRotation;
-    ConvertDegreesToRadians ( vecTemp );
-    SetRotationRadiansFlagged ( vecTemp, bResetInterpolation );
 }
 
 
@@ -3170,7 +3183,7 @@ void CClientVehicle::UpdateTargetPosition ( void )
             m_interp.rot.ulFinishTime = 0;
         }
 
-        SetPositionFlagged ( vecNewPosition, false );
+        SetPosition ( vecNewPosition, false );
 
         if ( !m_bIsCollisionEnabled )
         {
@@ -3254,7 +3267,7 @@ void CClientVehicle::UpdateTargetRotation ( void )
             m_interp.rot.ulFinishTime = 0;
         }
 
-        SetRotationDegreesFlagged ( vecCurrentRotation + vecCompensation, false );
+        SetRotationDegrees ( vecCurrentRotation + vecCompensation, false );
     }
 }
 
