@@ -2385,6 +2385,31 @@ int CLuaFunctionDefs::GUILabelSetColor ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GUILabelGetColor ( lua_State* luaVM )
+{
+//  int r, int g, int b guiLabelGetColor ( element theElement )
+    CClientGUIElement* theElement;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData < CGUILabel > ( theElement );
+
+    if ( !argStream.HasErrors () )
+    {
+        unsigned char ucRed = 255, ucGreen = 255, ucBlue = 255;
+        static_cast < CGUILabel* > ( theElement->GetCGUIElement () ) ->GetTextColor ( ucRed, ucGreen, ucBlue );
+        lua_pushnumber ( luaVM, ucRed );
+        lua_pushnumber ( luaVM, ucGreen );
+        lua_pushnumber ( luaVM, ucBlue );
+        return 3;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "guiLabelGetColor", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefs::GUILabelSetVerticalAlign ( lua_State* luaVM )
 {
