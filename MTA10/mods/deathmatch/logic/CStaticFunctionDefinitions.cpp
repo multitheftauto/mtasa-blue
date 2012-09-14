@@ -383,6 +383,11 @@ bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVe
             CClientPed& Ped = static_cast < CClientPed& > ( Entity );
             Ped.GetRotationDegrees ( vecRotation );
 
+            // Correct the rotation
+            vecRotation.fZ = fmod( -vecRotation.fZ, 360);
+            if ( vecRotation.fZ < 0 )
+                vecRotation.fZ = 360 + vecRotation.fZ;
+
             if (desiredRotOrder != EULER_DEFAULT)
             {
                 //In get, ped is Z-Y-X wheras in set it's -Z-Y-Z

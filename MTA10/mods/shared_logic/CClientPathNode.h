@@ -45,8 +45,8 @@ public:
     
     inline void             GetPosition                 ( CVector& vecPosition ) const  { vecPosition = m_vecPosition; }
     inline void             SetPosition                 ( const CVector& vecPosition )  { m_vecPosition = vecPosition; }
-    inline void             GetRotationRadians          ( CVector& vecRotation ) const  { vecRotation = m_vecRotation; }
-    inline void             SetRotationRadians          ( const CVector& vecRotation )  { m_vecRotation = vecRotation; }
+    inline void             GetRotation                 ( CVector& vecRotation )        { vecRotation = m_vecRotation; }
+    inline void             SetRotation                 ( const CVector& vecRotation )  { m_vecRotation = vecRotation; }
     inline int              GetTime                     ( void )                        { return m_iTime; }
     inline ePathNodeStyle   GetStyle                    ( void )                        { return m_Style; }
     inline CClientPathNode* GetPreviousNode             ( void )                        { return m_pPreviousNode; }

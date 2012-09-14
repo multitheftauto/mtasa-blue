@@ -558,16 +558,10 @@ bool CClientEntity::GetMatrix ( CMatrix& matrix ) const
     CEntity* pEntity = const_cast < CEntity* > ( GetGameEntity () );
     if ( pEntity )
     {
-        if ( pEntity->GetMatrix ( &matrix ) )
-            return true;
+        if ( pEntity->GetMatrix ( &matrix ) ) return true;
     }
 
-    // When streamed out
-    CVector vecRotation;
-    GetRotationRadians ( vecRotation );
-    g_pMultiplayer->ConvertEulerAnglesToMatrix ( matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
-    GetPosition ( matrix.vPos );
-    return true;
+    return false;
 }
 
 
@@ -580,12 +574,7 @@ bool CClientEntity::SetMatrix ( const CMatrix& matrix )
         return true;
     }
 
-    // When streamed out
-    SetPosition ( matrix.vPos );
-    CVector vecRotation;
-    g_pMultiplayer->ConvertMatrixToEulerAngles ( matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
-    SetRotationRadians ( vecRotation );
-    return true;
+    return false;
 }
 
 
@@ -603,29 +592,6 @@ void CClientEntity::SetPositionRelative ( CClientEntity * pOrigin, const CVector
     pOrigin->GetPosition ( vecOrigin );
     SetPosition ( vecOrigin + vecPosition );
 }
-
-void CClientEntity::GetRotationRadians ( CVector& vecOutRadians ) const
-{
-    vecOutRadians = CVector ();
-}
-
-void CClientEntity::GetRotationDegrees ( CVector& vecOutDegrees ) const
-{
-    GetRotationRadians ( vecOutDegrees );
-    ConvertRadiansToDegrees ( vecOutDegrees );
-}
-
-void CClientEntity::SetRotationRadians ( const CVector& vecRadians )
-{
-}
-
-void CClientEntity::SetRotationDegrees ( const CVector& vecDegrees )
-{
-    CVector vecTemp = vecDegrees;
-    ConvertDegreesToRadians ( vecTemp );
-    SetRotationRadians ( vecTemp );
-}
-
 
 bool CClientEntity::IsOutOfBounds ( void )
 {
