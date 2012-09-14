@@ -255,7 +255,7 @@ void CRadarMap::DoRender ( void )
         if ( m_pManager->GetCamera()->IsInFixedMode() )
         {
             m_pManager->GetCamera()->GetPosition ( vecLocal );
-            m_pManager->GetCamera()->GetRotationDegrees ( vecLocalRot );
+            m_pManager->GetCamera()->GetRotation ( vecLocalRot );
         }
         else
         {

@@ -25,6 +25,7 @@ public:
     void                        Unlink                  ( void );
 
     inline eClientEntityType    GetType                 ( void ) const                       { return CCLIENTDUMMY; }
+    inline const CVector&       GetPosition             ( void )                             { return m_vecPosition; };
     inline void                 GetPosition             ( CVector& vecPosition ) const       { vecPosition = m_vecPosition; };
     inline void                 SetPosition             ( const CVector& vecPosition )       { m_vecPosition = vecPosition; };
 

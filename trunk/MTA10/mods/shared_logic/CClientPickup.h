@@ -105,6 +105,7 @@ public:
     inline CPickup *            GetGamePickup               ( void )                            { return m_pPickup; };
     inline CObject *            GetGameObject               ( void )                            { return m_pObject; }
 
+    inline const CVector&       GetPosition                 ( void )                            { return m_vecPosition; };
     inline void                 GetPosition                 ( CVector& vecPosition ) const      { vecPosition = m_vecPosition; };
     void                        SetPosition                 ( const CVector& vecPosition );
     void                        SetModel                    ( unsigned short usModel );

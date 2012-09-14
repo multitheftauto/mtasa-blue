@@ -38,9 +38,9 @@ public:
 
     inline void                     GetPosition             ( CVector& vecPosition ) const      { vecPosition = *m_pCivilianPed->GetPosition (); };
     inline void                     SetPosition             ( const CVector& vecPosition )      { m_pCivilianPed->SetPosition ( const_cast < CVector* > ( &vecPosition ) ); };
-    void                            GetRotationRadians      ( CVector& vecRotation ) const;
-    void                            SetRotationRadians      ( const CVector& vecRotation );
     int                             GetRotation             ( void );
+    void                            GetRotation             ( CVector& vecRotation ) const;
+    void                            SetRotation             ( const CVector& vecRotation );
     void                            SetRotation             ( int iRotation );
 
     inline void                     ModelRequestCallback    ( unsigned short usModelID )        {};
