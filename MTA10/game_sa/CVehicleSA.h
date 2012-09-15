@@ -514,6 +514,8 @@ private:
     CDoorSA                     m_doors[6];
     bool                        m_bSwingingDoorsAllowed;
     SSirenInfo                  m_tSirenInfo;
+    RwFrame*                    m_pExtraFrames[2];
+    char                        m_cFrameNumber : 2;
 public:
                                 CVehicleSA                      ();
                                 CVehicleSA                      ( CVehicleSAInterface * vehicleInterface );
@@ -749,10 +751,14 @@ public:
     bool                        IsComponentPresent              ( eVehicleComponent vehicleComponent );
     bool                        GetComponentMatrix              ( eVehicleComponent vehicleComponent, RwMatrix &ltm, RwMatrix &modelling );
     bool                        SetComponentMatrix              ( eVehicleComponent vehicleComponent, RwMatrix &ltm, RwMatrix &modelling );
+
+    void                        AddExtraComponent                   ( RwFrame * pFrame );
+    void                        SetFrameNumber                      ( char cFrameNumber )                   { m_cFrameNumber = cFrameNumber; }
 private:
     void                        RecalculateSuspensionLines          ( void );
     void                        CopyGlobalSuspensionLinesToPrivate  ( void );
     RwFrame *                   GetVehicleComponent                 ( eVehicleComponent vehicleComponent );
+
 };
 
 #endif
