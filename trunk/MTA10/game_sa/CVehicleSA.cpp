@@ -19,6 +19,40 @@
 
 extern CGameSA* pGame;
 
+#include "gamesa_renderware.h"
+namespace
+{
+    RpAtomic* ClumpDumpCB (RpAtomic* pAtomic, void * data)
+    {
+        CVehicleSA * pVehicleSA = (CVehicleSA *)data;
+        RwFrame* pFrame = RpGetFrame ( pAtomic );
+        if ( pFrame && strlen(pFrame->szName) == 0 )
+        {
+            pVehicleSA->AddExtraComponent ( pFrame );
+        }
+        //OutputDebugLine ( SString ( "Atomic:%08x  Frame:%08x %s", pAtomic, pFrame, pFrame ? pFrame->szName : "" ) );
+        return pAtomic;
+    }
+
+    void ClumpDump ( RpClump* pClump, CVehicleSA * pVehicleSA )
+    {
+        // get the clump's frame
+        RwFrame* pFrame = RpGetFrame ( pClump );
+        //OutputDebugLine ( SStringX ( "--------------------------------" ) );
+        //OutputDebugLine ( SString ( "Clump:%08x  Frame:%08x %s", pClump, pFrame, pFrame ? pFrame->szName : "" ) );
+        // Do for all atomics
+        RpClumpForAllAtomics ( pClump, ClumpDumpCB, pVehicleSA );
+    }
+
+    void VehicleDump ( CVehicleSA* pVehicleSA )
+    {
+        pVehicleSA->SetFrameNumber ( 0 );
+        //OutputDebugLine ( SString ( "Interface:%08x", pVehicleSA->GetVehicleInterface() ) );
+        ClumpDump( pVehicleSA->GetInterface()->m_pRwObject, pVehicleSA );
+    }
+}
+
+
 CVehicleSA::CVehicleSA ()
     : m_ucAlpha ( 255 ), m_bIsDerailable ( true ), m_vecGravity ( 0.0f, 0.0f, -1.0f ), m_HeadLightColor ( SColorRGBA ( 255, 255, 255, 255 ) )
 {
@@ -203,7 +237,7 @@ void CVehicleSA::Init ( void )
     {
         m_tSirenInfo.m_tSirenInfo[i].m_dwMinSirenAlpha = 0;
     }
-    
+    VehicleDump( this );
 }
 
 // DESTRUCTOR
@@ -617,6 +651,7 @@ void CVehicleSA::AddVehicleUpgrade ( DWORD dwModelID )
             call    dwFunc
         }
     }
+    VehicleDump( this );
 }
 
 void CVehicleSA::RemoveVehicleUpgrade ( DWORD dwModelID )
@@ -631,6 +666,7 @@ void CVehicleSA::RemoveVehicleUpgrade ( DWORD dwModelID )
         push    dwModelID
         call    dwFunc
     }
+    VehicleDump( this );
 }
 
 bool CVehicleSA::CanPedLeanOut ( CPed* pPed )
@@ -2162,14 +2198,17 @@ RwFrame * CVehicleSA::GetVehicleComponent ( eVehicleComponent vehicleComponent )
         case VEHICLE_COMPONENT_SPECIAL_3:
             return GetVehicleInterface ( )->pSpecialParts[2];
 
-
         case VEHICLE_COMPONENT_SPECIAL_4:
             return GetVehicleInterface ( )->pSpecialParts[3];
 
         case VEHICLE_COMPONENT_SPECIAL_5:
             return GetVehicleInterface ( )->pSpecialParts[4];
-        case VEHICLE_COMPOENT_EXTRA_1:
-            return pGame->GetRenderWare()->GetFrameFromName ( GetVehicleInterface()->m_pRwObject, "extra1" );
+        
+        case VEHICLE_COMPONENT_EXTRA_1:
+            return m_pExtraFrames[0];
+
+        case VEHICLE_COMPONENT_EXTRA_2:
+            return m_pExtraFrames[1];
     }
 
     return NULL;
@@ -2305,4 +2344,10 @@ bool CVehicleSA::SetComponentMatrix ( eVehicleComponent vehicleComponent, RwMatr
         return true;
     }
     return false;
+}
+
+void CVehicleSA::AddExtraComponent ( RwFrame * pFrame )
+{
+    m_pExtraFrames[ m_cFrameNumber ] = pFrame;
+    m_cFrameNumber++;
 }
