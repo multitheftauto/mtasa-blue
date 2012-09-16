@@ -1355,8 +1355,8 @@ int CLuaElementDefs::setElementPosition ( lua_State* luaVM )
 
 int CLuaElementDefs::setElementRotation ( lua_State* luaVM )
 {
-//  bool setElementRotation ( element theElement, float rotX, float rotY, float rotZ [, string rotOrder = "default" ] )
-    CElement* pElement; CVector vecRotation; SString strRotationOrder;
+//  bool setElementRotation ( element theElement, float rotX, float rotY, float rotZ [, string rotOrder = "default", bool fixPedRotation = false ] )
+    CElement* pElement; CVector vecRotation; SString strRotationOrder; bool bNewWay;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
@@ -1364,11 +1364,12 @@ int CLuaElementDefs::setElementRotation ( lua_State* luaVM )
     argStream.ReadNumber ( vecRotation.fY );
     argStream.ReadNumber ( vecRotation.fZ );
     argStream.ReadString ( strRotationOrder, "default" );
+    argStream.ReadBool ( bNewWay, false );
 
     if ( !argStream.HasErrors () )
     {
         // Set the rotation
-        if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation, strRotationOrder ) )
+        if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation, strRotationOrder, bNewWay ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;

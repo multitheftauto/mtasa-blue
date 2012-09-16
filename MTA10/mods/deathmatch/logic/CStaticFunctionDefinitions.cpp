@@ -1010,11 +1010,11 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CClientEntity& Entity, con
 }
 
 
-bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, const CVector& vecRotation, const char* szRotationOrder )
+bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, const CVector& vecRotation, const char* szRotationOrder, bool bNewWay )
 {
-    RUN_CHILDREN SetElementRotation ( **iter, vecRotation, szRotationOrder);
+    RUN_CHILDREN SetElementRotation ( **iter, vecRotation, szRotationOrder, bNewWay );
 
-    eEulerRotationOrder argumentRotOrder = EulerRotationOrderFromString(szRotationOrder);
+    eEulerRotationOrder argumentRotOrder = EulerRotationOrderFromString ( szRotationOrder );
     if (argumentRotOrder == EULER_INVALID)
     {
         return false;
@@ -1029,11 +1029,17 @@ bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, con
             CClientPed& Ped = static_cast < CClientPed& > ( Entity );
             if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_MINUS_ZYX)
             {
-                Ped.SetRotationDegrees ( vecRotation );
+                if ( bNewWay )
+                    Ped.SetRotationDegreesNew ( vecRotation );
+                else
+                    Ped.SetRotationDegrees ( vecRotation );
             }
             else
             {
-                Ped.SetRotationDegrees ( ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_MINUS_ZYX ) );
+                if ( bNewWay )
+                    Ped.SetRotationDegreesNew ( ConvertEulerRotationOrder ( vecRotation, argumentRotOrder, EULER_MINUS_ZYX ) );
+                else
+                    Ped.SetRotationDegrees ( ConvertEulerRotationOrder ( vecRotation, argumentRotOrder, EULER_MINUS_ZYX ) );
             }
             break;
         }
@@ -1935,9 +1941,9 @@ bool CStaticFunctionDefinitions::SetPlayerNametagShowing ( CClientEntity& Entity
 }
 
 
-bool CStaticFunctionDefinitions::SetPedRotation ( CClientEntity& Entity, float fRotation )
+bool CStaticFunctionDefinitions::SetPedRotation ( CClientEntity& Entity, float fRotation, bool bNewWay )
 {
-    RUN_CHILDREN SetPedRotation ( **iter, fRotation );
+    RUN_CHILDREN SetPedRotation ( **iter, fRotation, bNewWay );
 
     if ( IS_PED ( &Entity ) )
     {    
@@ -1961,7 +1967,11 @@ bool CStaticFunctionDefinitions::SetPedRotation ( CClientEntity& Entity, float f
             } while ( fRadians > PI );
         }
 
-        Ped.SetCurrentRotation ( fRadians );
+        if ( bNewWay )
+            Ped.SetCurrentRotationNew ( fRadians );
+        else
+            Ped.SetCurrentRotation ( fRadians );
+
         if ( !IS_PLAYER ( &Entity ) )
             Ped.SetCameraRotation ( -fRadians );
         return true;
@@ -2330,7 +2340,7 @@ CClientPed* CStaticFunctionDefinitions::CreatePed ( CResource& Resource, unsigne
         CClientPed* pPed = new CClientPed ( m_pManager, ulModel, INVALID_ELEMENT_ID );
         pPed->SetParent ( Resource.GetResourceDynamicEntity() );
         pPed->SetPosition ( vecPosition );
-        pPed->SetCurrentRotation ( fRotationRadians );
+        pPed->SetCurrentRotationNew ( fRotationRadians );
         return pPed;
     }
 

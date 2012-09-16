@@ -67,10 +67,18 @@ void CPedRPCs::SetPedRotation ( CClientEntity* pSource, NetBitStreamInterface& b
     if ( bitStream.Read ( &rotation ) &&
          bitStream.Read ( ucTimeContext ) )
     {
+        uchar ucNewWay;
+        if ( bitStream.GetNumberOfBytesUsed () > 0 )
+            bitStream.Read ( ucNewWay );
+
         CClientPed* pPed = m_pPedManager->Get ( pSource->GetID (), true );
         if ( pPed )
         {
-            pPed->SetCurrentRotation ( rotation.data.fRotation );
+            if ( ucNewWay == 1 )
+                pPed->SetCurrentRotationNew ( rotation.data.fRotation );
+            else
+                pPed->SetCurrentRotation ( rotation.data.fRotation );
+
             if ( !IS_PLAYER ( pPed ) )
                 pPed->SetCameraRotation ( rotation.data.fRotation );
             pPed->SetSyncTimeContext ( ucTimeContext );

@@ -1250,7 +1250,7 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const 
 }
 
 
-bool CStaticFunctionDefinitions::SetElementRotation ( CElement* pElement, const CVector& vecRotation, const char* szRotationOrder )
+bool CStaticFunctionDefinitions::SetElementRotation ( CElement* pElement, const CVector& vecRotation, const char* szRotationOrder, bool bNewWay )
 {
     assert ( pElement );
 
@@ -1267,7 +1267,7 @@ bool CStaticFunctionDefinitions::SetElementRotation ( CElement* pElement, const 
         case CElement::PLAYER:
         {
             CPed* pPed = static_cast < CPed* > ( pElement );
-            SetPedRotation( pPed, vecRotation.fZ ); //No rotation order conversion required since only Z is used
+            SetPedRotation( pPed, vecRotation.fZ, bNewWay ); //No rotation order conversion required since only Z is used
 
             break;
         }
@@ -3636,10 +3636,10 @@ bool CStaticFunctionDefinitions::KillPed ( CElement* pElement, CElement* pKiller
 }
 
 
-bool CStaticFunctionDefinitions::SetPedRotation ( CElement* pElement, float fRotation )
+bool CStaticFunctionDefinitions::SetPedRotation ( CElement* pElement, float fRotation, bool bNewWay )
 {
     assert ( pElement );
-    RUN_CHILDREN SetPedRotation ( *iter, fRotation );
+    RUN_CHILDREN SetPedRotation ( *iter, fRotation, bNewWay );
 
     if ( IS_PED ( pElement ) )
     {
@@ -3672,8 +3672,10 @@ bool CStaticFunctionDefinitions::SetPedRotation ( CElement* pElement, float fRot
             SPedRotationSync rotation;
             rotation.data.fRotation = fRadians;
             BitStream.pBitStream->Write ( &rotation );
-
             BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
+            uchar ucNewWay = bNewWay ? 1 : 0;
+            BitStream.pBitStream->Write ( ucNewWay );
+
             m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pPed, SET_PED_ROTATION, *BitStream.pBitStream ) );
         }
     }
