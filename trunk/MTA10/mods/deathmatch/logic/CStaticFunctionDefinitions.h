@@ -91,7 +91,7 @@ public:
     static bool                         RemoveElementData                   ( CClientEntity& Entity, const char* szName );
     static bool                         SetElementMatrix                    ( CClientEntity& Entity, const CMatrix& matrix );
     static bool                         SetElementPosition                  ( CClientEntity& Entity, const CVector& vecPosition, bool bWarp = true );
-    static bool                         SetElementRotation                  ( CClientEntity& Entity, const CVector& vecRotation, const char* szRotationOrder );
+    static bool                         SetElementRotation                  ( CClientEntity& Entity, const CVector& vecRotation, const char* szRotationOrder, bool bNewWay );
     static bool                         SetElementVelocity                  ( CClientEntity& Element, const CVector& vecVelocity );
     static bool                         SetElementParent                    ( CClientEntity& Element, CClientEntity& Parent, CLuaMain* pLuaMain );
     static bool                         SetElementInterior                  ( CClientEntity& Entity, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition );
@@ -159,7 +159,7 @@ public:
     static bool                         GetOriginalWeaponProperty           ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector & vecData );
 
     static bool                         SetPedWeaponSlot                    ( CClientEntity& Entity, int iSlot );
-    static bool                         SetPedRotation                      ( CClientEntity& Entity, float fRotation );
+    static bool                         SetPedRotation                      ( CClientEntity& Entity, float fRotation, bool bNewWay );
     static bool                         SetPedCanBeKnockedOffBike           ( CClientEntity& Entity, bool bCanBeKnockedOffBike );
     static bool                         SetPedAnimation                     ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame );
     static bool                         SetPedAnimationProgress             ( CClientEntity& Entity, const char * szAnimName, float fProgress );

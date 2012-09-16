@@ -605,6 +605,60 @@ void CClientPed::SetRotationRadians ( const CVector& vecRotation )
 }
 
 
+//
+//
+// New rotation functions which fix inv rotate when in air
+//
+//
+void CClientPed::GetRotationDegreesNew ( CVector& vecRotation ) const
+{
+    // Grab our rotations in radians and convert it to degrees
+    GetRotationRadiansNew ( vecRotation );
+    ConvertRadiansToDegreesNoWrap ( vecRotation );
+}
+
+
+void CClientPed::GetRotationRadiansNew ( CVector& vecRotation ) const
+{
+    CMatrix matTemp;
+    GetMatrix ( matTemp );
+    g_pMultiplayer->ConvertMatrixToEulerAngles ( matTemp, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+    vecRotation.fZ = -vecRotation.fZ;
+}
+
+
+void CClientPed::SetRotationDegreesNew ( const CVector& vecRotation )
+{
+    // Convert from degrees to radians and set the rotation
+    CVector vecTemp = vecRotation;
+    ConvertDegreesToRadiansNoWrap ( vecTemp );
+    SetRotationRadiansNew ( vecTemp );
+}
+
+
+void CClientPed::SetRotationRadiansNew ( const CVector& vecRotation )
+{
+    // Grab the matrix, apply the rotation to it and set it again
+
+    // For in air
+    CMatrix matTemp;
+    GetMatrix ( matTemp );
+    g_pMultiplayer->ConvertEulerAnglesToMatrix ( matTemp, vecRotation.fX, vecRotation.fY, -vecRotation.fZ );
+    SetMatrix ( matTemp );
+
+    // For on ground
+    SetCurrentRotation ( vecRotation.fZ );
+    if ( !IS_PLAYER ( this ) )
+        SetCameraRotation ( vecRotation.fZ );
+}
+
+
+void CClientPed::SetCurrentRotationNew ( float fRotation )
+{
+    SetRotationRadiansNew ( CVector ( 0, 0, fRotation ) );
+}
+
+
 void CClientPed::Spawn ( const CVector& vecPosition,
                          float fRotation,
                          unsigned short usModel,
