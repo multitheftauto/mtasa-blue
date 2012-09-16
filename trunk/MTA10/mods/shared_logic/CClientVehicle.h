@@ -588,12 +588,12 @@ public:
 #endif
     SLastSyncedVehData*         m_LastSyncedData;
     SSirenInfo                  m_tSirenBeaconInfo;
-    CVector                     m_vecComponentPositions[22];
-    CVector                     m_vecComponentRotations[22];
-    CVector                     m_vecOriginalComponentPositions[22];
-    CVector                     m_vecOriginalComponentRotations[22];
-    bool                        m_bPositionsChanged[22];
-    bool                        m_bRotationsChanged[22];
+    CVector                     m_vecComponentPositions[VEHICLE_COMPONENT_MAX];
+    CVector                     m_vecComponentRotations[VEHICLE_COMPONENT_MAX];
+    CVector                     m_vecOriginalComponentPositions[VEHICLE_COMPONENT_MAX];
+    CVector                     m_vecOriginalComponentRotations[VEHICLE_COMPONENT_MAX];
+    bool                        m_bPositionsChanged[VEHICLE_COMPONENT_MAX];
+    bool                        m_bRotationsChanged[VEHICLE_COMPONENT_MAX];
 };
 
 #endif

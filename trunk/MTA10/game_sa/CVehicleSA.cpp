@@ -2243,6 +2243,12 @@ RwFrame * CVehicleSA::GetVehicleComponent ( eVehicleComponent vehicleComponent )
 
         case VEHICLE_COMPONENT_SPECIAL_5:
             return GetVehicleInterface ( )->pSpecialParts[4];
+
+        case VEHICLE_COMPONENT_WINGLF:
+            return GetVehicleInterface ( )->pWingLFDummy;
+
+        case VEHICLE_COMPONENT_WINGRF:
+            return GetVehicleInterface ( )->pWingRFDummy;
         
         case VEHICLE_COMPONENT_EXTRA_1:
             return m_pExtraFrames[0];
