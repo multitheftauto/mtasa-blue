@@ -668,6 +668,7 @@ public:
     LUA_DECLARE ( GUIWindowGetCloseButtonEnabled );
     LUA_DECLARE ( GUIWindowGetTitleBarEnabled );
     LUA_DECLARE ( GUILabelSetColor );
+    LUA_DECLARE ( GUILabelGetColor );
     LUA_DECLARE ( GUILabelSetVerticalAlign );
     LUA_DECLARE ( GUILabelSetHorizontalAlign );
     LUA_DECLARE ( GUILabelGetTextExtent );

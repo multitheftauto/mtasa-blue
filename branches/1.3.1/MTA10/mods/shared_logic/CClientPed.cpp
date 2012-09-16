@@ -2671,7 +2671,9 @@ void CClientPed::StreamedInPulse ( void )
         // Are we frozen and not in a vehicle
         if ( IsFrozen () && !pVehicle )
         {
+            CVector vecTemp;
             m_pPlayerPed->SetMatrix ( &m_matFrozen );
+            m_pPlayerPed->SetMoveSpeed ( &vecTemp );
         }
 
         // Is our health locked?

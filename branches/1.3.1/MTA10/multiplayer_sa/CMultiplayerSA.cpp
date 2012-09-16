@@ -4204,6 +4204,7 @@ void _cdecl VehicleCamUp ( DWORD dwCam )
     *pvecUp = *pvecLookDir;
     pvecUp->CrossProduct ( &gravcam_matGravity.vUp );
     pvecUp->CrossProduct ( pvecLookDir );
+    pvecUp->Normalize ();
 }
 
 void _declspec(naked) HOOK_VehicleCamUp ()
