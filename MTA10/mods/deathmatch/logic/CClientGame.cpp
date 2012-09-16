@@ -3237,7 +3237,7 @@ void CClientGame::UpdateMimics ( void )
                         {
                             if ( usUpgrades [ uc ] )
                             {
-                                pMimicVehicle->GetUpgrades ()->AddUpgrade ( usUpgrades [ uc ] );
+                                pMimicVehicle->GetUpgrades ()->AddUpgrade ( usUpgrades [ uc ], true );
                             }
                         }
 
