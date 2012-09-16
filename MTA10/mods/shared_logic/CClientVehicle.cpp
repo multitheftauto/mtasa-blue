@@ -156,6 +156,12 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     // Add this vehicle to the vehicle list
     m_pVehicleManager->AddToList ( this );
     m_tSirenBeaconInfo.m_bSirenSilent = false;
+
+    for ( int i = VEHICLE_COMPONENT_CHASIS; i < VEHICLE_COMPONENT_EXTRA_2; i++ )
+    {
+        m_bPositionsChanged[i] = false;
+        m_bRotationsChanged[i] = false;
+    }
 }
 
 
@@ -948,6 +954,11 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, unsigned char uc
         ApplyHandling ();
         
         SetSirenOrAlarmActive ( false );
+        for ( int i = VEHICLE_COMPONENT_CHASIS; i < VEHICLE_COMPONENT_EXTRA_2; i++ )
+        {
+            m_bPositionsChanged[i] = false;
+            m_bRotationsChanged[i] = false;
+        }
         // Create the vehicle if we're streamed in
         if ( IsStreamedIn () )
         {
@@ -969,6 +980,11 @@ void CClientVehicle::SetVariant ( unsigned char ucVariant, unsigned char ucVaria
     m_ucVariation = ucVariant;
     m_ucVariation2 = ucVariant2;
 
+    for ( int i = VEHICLE_COMPONENT_CHASIS; i < VEHICLE_COMPONENT_EXTRA_2; i++ )
+    {
+        m_bPositionsChanged[i] = false;
+        m_bRotationsChanged[i] = false;
+    }
     ReCreate ( );
 }
 
@@ -2394,6 +2410,27 @@ void CClientVehicle::Create ( void )
         // Re-add all the upgrades - Has to be applied after handling *shrugs*
         if ( m_pUpgrades )
             m_pUpgrades->ReAddAll ();
+
+        for ( int i = VEHICLE_COMPONENT_CHASIS; i < VEHICLE_COMPONENT_EXTRA_2; i++ )
+        {
+            eVehicleComponent component = (eVehicleComponent) i;
+            GetComponentPosition ( component, m_vecOriginalComponentPositions[i] );
+            GetComponentRotation ( component, m_vecOriginalComponentRotations[i] );
+            if ( m_bPositionsChanged[i] )
+            {
+                if ( m_vecOriginalComponentPositions[i] != m_vecComponentPositions[i] )
+                {
+                    SetComponentPosition( component, m_vecComponentPositions[i] );
+                }
+            }
+            if ( m_bRotationsChanged[i] )
+            {
+                if ( m_vecOriginalComponentRotations[i] != m_vecComponentRotations[i] )
+                {
+                    SetComponentRotation( component, m_vecComponentRotations[i] );
+                }
+            }
+        }
 
         // Tell the streamer we've created this object
         NotifyCreate ();
@@ -3902,6 +3939,8 @@ bool CClientVehicle::SetComponentPosition ( eVehicleComponent vehicleComponent, 
     if ( m_pVehicle )
     {
         m_pVehicle->SetComponentPosition ( vehicleComponent, vecPosition );
+        m_vecComponentPositions[vehicleComponent] = vecPosition;
+        m_bPositionsChanged[vehicleComponent] = true;
         return true;
     }
     return false;
@@ -3924,6 +3963,8 @@ bool CClientVehicle::SetComponentRotation ( eVehicleComponent vehicleComponent, 
         CVector vecTemp = vecRotation;
         ConvertDegreesToRadians ( vecTemp );
         m_pVehicle->SetComponentRotation ( vehicleComponent, vecTemp );
+        m_vecComponentRotations[vehicleComponent] = vecRotation;
+        m_bPositionsChanged[vehicleComponent] = true;
         return true;
     }
     return false;
