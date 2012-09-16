@@ -114,7 +114,7 @@ void CClientProjectile::DoPulse ( void )
         if ( m_pInitiateData )
         {
             if ( m_pInitiateData->pvecPosition ) SetPosition ( *m_pInitiateData->pvecPosition );
-            if ( m_pInitiateData->pvecRotation ) SetRotation ( *m_pInitiateData->pvecRotation );
+            if ( m_pInitiateData->pvecRotation ) SetRotationRadians ( *m_pInitiateData->pvecRotation );
             if ( m_pInitiateData->pvecVelocity ) SetVelocity ( *m_pInitiateData->pvecVelocity );
             if ( m_pInitiateData->usModel ) SetModel ( m_pInitiateData->usModel );
         }
@@ -166,7 +166,7 @@ bool CClientProjectile::IsActive ( void )
 }
 
 
-bool CClientProjectile::GetMatrix ( CMatrix & matrix )
+bool CClientProjectile::GetMatrix ( CMatrix & matrix ) const
 {
     if ( m_pProjectile )
     {
@@ -217,21 +217,21 @@ void CClientProjectile::SetPosition ( const CVector & vecPosition )
 }
 
 
-void CClientProjectile::GetRotation ( CVector & vecRotation )
+void CClientProjectile::GetRotationRadians ( CVector & vecRotation ) const
 {
     CMatrix matrix;
     GetMatrix ( matrix );
     g_pMultiplayer->ConvertMatrixToEulerAngles ( matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
 }
 
-void CClientProjectile::GetRotationDegrees ( CVector & vecRotation )
+void CClientProjectile::GetRotationDegrees ( CVector & vecRotation ) const
 {
-    GetRotation ( vecRotation );
+    GetRotationRadians ( vecRotation );
     ConvertRadiansToDegrees ( vecRotation );
 }
 
 
-void CClientProjectile::SetRotation ( CVector & vecRotation )
+void CClientProjectile::SetRotationRadians ( const CVector & vecRotation )
 {
     CMatrix matrix;
     GetPosition ( matrix.vPos );
@@ -239,10 +239,11 @@ void CClientProjectile::SetRotation ( CVector & vecRotation )
     SetMatrix ( matrix );
 }
 
-void CClientProjectile::SetRotationDegrees ( CVector & vecRotation )
+void CClientProjectile::SetRotationDegrees ( const CVector & vecRotation )
 {
-    ConvertDegreesToRadians ( vecRotation );
-    SetRotation ( vecRotation );
+    CVector vecTemp = vecRotation;
+    ConvertDegreesToRadians ( vecTemp );
+    SetRotationRadians ( vecTemp );
 }
 
 

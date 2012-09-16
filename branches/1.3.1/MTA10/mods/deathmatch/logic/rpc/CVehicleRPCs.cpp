@@ -265,7 +265,7 @@ void CVehicleRPCs::AddVehicleUpgrade ( CClientEntity* pSource, NetBitStreamInter
             CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
             if ( pUpgrades )
             {
-                pUpgrades->AddUpgrade ( usUpgrade );
+                pUpgrades->AddUpgrade ( usUpgrade, false );
             }
         }
     }

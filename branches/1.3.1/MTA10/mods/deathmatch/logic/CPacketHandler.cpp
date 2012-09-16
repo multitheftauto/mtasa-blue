@@ -2936,7 +2936,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             * --slush
                             */
                             if (pUpgrades)
-                                pUpgrades->AddUpgrade ( ucUpgrade + 1000 );
+                                pUpgrades->AddUpgrade ( ucUpgrade + 1000, false );
                         }
                     }
 

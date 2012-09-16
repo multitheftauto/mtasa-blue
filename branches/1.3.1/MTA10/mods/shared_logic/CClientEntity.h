@@ -205,6 +205,11 @@ public:
     void                                        SetPositionRelative     ( CClientEntity * pOrigin, const CVector& vecPosition );
     virtual void                                Teleport                ( const CVector& vecPosition ) { SetPosition(vecPosition); }
 
+    virtual void                                GetRotationRadians      ( CVector& vecOutRadians ) const;
+    virtual void                                GetRotationDegrees      ( CVector& vecOutDegrees ) const;
+    virtual void                                SetRotationRadians      ( const CVector& vecRadians );
+    virtual void                                SetRotationDegrees      ( const CVector& vecDegrees );
+
     virtual inline unsigned short               GetDimension            ( void )                        { return m_usDimension; }
     virtual void                                SetDimension            ( unsigned short usDimension ) { m_usDimension = usDimension; }
 

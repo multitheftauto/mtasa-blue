@@ -153,6 +153,7 @@ public:
         nMaxPlayers = 0;
         nPing = 9999;
         uiCacheNoReplyCount = 0;
+        m_ElapsedTime.SetMaxIncrement ( 500 );
         m_ElapsedTime.Reset ();
         uiQueryRetryCount = 0;
         uiRevision = 1;

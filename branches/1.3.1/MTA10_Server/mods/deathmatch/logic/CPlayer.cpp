@@ -19,7 +19,6 @@
 extern CGame * g_pGame;
 
 CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket ) : CPed ( NULL, NULL, NULL, 0 )
-    , m_UpdateNearListTimer ( 500, true )
 {
     CElementRefManager::AddElementRefs ( ELEMENT_REF_DEBUG ( this, "CPlayer" ), &m_pTeam, NULL );
     CElementRefManager::AddElementListRef ( ELEMENT_REF_DEBUG ( this, "CPlayer m_lstBroadcastList" ), &m_lstBroadcastList );
@@ -29,6 +28,7 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_pPlayerManager = pPlayerManager;
     m_pScriptDebugging = pScriptDebugging;
     m_PlayerSocket = PlayerSocket;
+    m_UpdateNearListTimer.SetMaxIncrement ( 500, true );
 
     m_iType = CElement::PLAYER;
     SetTypeName ( "player" );

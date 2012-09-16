@@ -2658,7 +2658,7 @@ bool CStaticFunctionDefinitions::AddVehicleUpgrade ( CClientEntity& Entity, unsi
             if ( pUpgrades->IsUpgradeCompatible ( usUpgrade ) )
             {
                 // Add to our upgrade list
-                pUpgrades->AddUpgrade ( usUpgrade );
+                pUpgrades->AddUpgrade ( usUpgrade, true );
                 return true;
             }
         }

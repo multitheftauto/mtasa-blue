@@ -127,36 +127,46 @@ namespace SharedUtil
     public:
         CPerModuleTickCount ( void )
         {
-            m_llCurrentTickCount = GetTickCount64_ ();
+    #ifdef _DEBUG
+            m_TimeSinceUpdated.SetMaxIncrement ( 500 );
+    #endif
+            m_ucIndex = 0;
+            m_OutputBuffers[0] = GetTickCount64_ ();
         }
     
         long long Get ( void )
         {
-            m_ModuleTickCountCS.Lock ();
     #ifdef _DEBUG
             if ( m_TimeSinceUpdated.Get () > 10000 )
                 OutputDebugLine ( "WARNING: UpdateModuleTickCount64 not being called for the current module" );
     #endif
-            long long result = m_llCurrentTickCount;
-            m_ModuleTickCountCS.Unlock ();
+            long long result = m_OutputBuffers[m_ucIndex];
             return result;
         }
-    
+
         void Update ( void )
         {
-            m_ModuleTickCountCS.Lock ();
     #ifdef _DEBUG
             m_TimeSinceUpdated.Reset ();
     #endif
-            m_llCurrentTickCount = GetTickCount64_ ();
-            m_ModuleTickCountCS.Unlock ();
+            long long llCurrentTickCount = GetTickCount64_ ();
+
+            // Use a buffer system instead of thread locks
+            long long llDelta = llCurrentTickCount - m_OutputBuffers[m_ucIndex];
+            if ( llDelta > 4 )
+            {
+                uchar ucIndex = m_ucIndex;
+                ucIndex = ( ucIndex + 1 ) % NUMELMS ( m_OutputBuffers );
+                m_OutputBuffers[ucIndex] = llCurrentTickCount;
+                m_ucIndex = ucIndex;
+            }
         }
     
     protected:
-        CCriticalSection m_ModuleTickCountCS;
-        long long        m_llCurrentTickCount;
+        uchar           m_ucIndex;
+        long long       m_OutputBuffers[16];
     #ifdef _DEBUG
-        CElapsedTime     m_TimeSinceUpdated;
+        CElapsedTime    m_TimeSinceUpdated;
     #endif
     };
 

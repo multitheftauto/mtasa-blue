@@ -99,18 +99,19 @@ namespace SharedUtil
     //
     class CElapsedTime
     {
-        long long   m_llUpdateTime;
-        long long   m_llElapsedTime;
-        long long   m_llMaxIncrement;
-        bool        m_bUseModuleTickCount;
     public:
-
         // MaxIncrement should be set higher than the expected tick interval between Get() calls
-        CElapsedTime ( long lMaxIncrement = 500, bool bUseModuleTickCount = false )
-            : m_llMaxIncrement ( lMaxIncrement )
-            , m_bUseModuleTickCount ( bUseModuleTickCount )
+        CElapsedTime ( void )
         {
+            m_llMaxIncrement = INT_MAX;
+            m_bUseModuleTickCount = false;
             Reset ();
+        }
+
+        void SetMaxIncrement ( long lMaxIncrement, bool bUseModuleTickCount = false )
+        {
+            m_llMaxIncrement = lMaxIncrement;
+            m_bUseModuleTickCount = bUseModuleTickCount;
         }
 
         void Reset ( void )
@@ -134,6 +135,11 @@ namespace SharedUtil
         {
             return m_bUseModuleTickCount ? GetModuleTickCount64 () : GetTickCount64_ ();
         }
+
+        long long   m_llUpdateTime;
+        long long   m_llElapsedTime;
+        long long   m_llMaxIncrement;
+        bool        m_bUseModuleTickCount;
     };
 
 
