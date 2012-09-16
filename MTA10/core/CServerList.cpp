@@ -205,6 +205,7 @@ void CServerList::Refresh ( void )
 
 CServerListInternet::CServerListInternet ( void )
 {
+    m_ElapsedTime.SetMaxIncrement ( 500 );
     m_pMasterServerManager = NewMasterServerManager ();
 }
 

@@ -195,6 +195,7 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
             pEntry = new SClientModelRequest;
             pEntry->pModel = pInfo;
             pEntry->pEntity = pRequester;
+            pEntry->requestTimer.SetMaxIncrement ( 500 );
             pEntry->requestTimer.Reset ();
             m_Requests.push_back ( pEntry );
 

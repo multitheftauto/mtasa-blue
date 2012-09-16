@@ -91,6 +91,7 @@ static HMODULE HelperGetToucanDLL()
     if ( g_NextToucanDLLSearchTime.Get () < 5000 )
         return NULL;
 
+    g_NextToucanDLLSearchTime.SetMaxIncrement ( 500, true );
     g_NextToucanDLLSearchTime.Reset ();
 
     /*
