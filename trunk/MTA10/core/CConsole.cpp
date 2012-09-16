@@ -65,31 +65,24 @@ CConsole::~CConsole ( void )
     delete m_pConsoleHistory;
 }
 
-
 void CConsole::Echo ( const char* szText )
 {
-    // Grab the scroll and the max scroll
-    float fScroll = m_pHistory->GetVerticalScrollPosition ();
-    float fMaxScroll = m_pHistory->GetScrollbarDocumentSize () - m_pHistory->GetScrollbarPageSize ();
+    // Add to add buffer
+    m_strPendingAdd += szText;
+    m_strPendingAdd += "\n";
 
-    // Grab the previous text and append this text
-    std::string strBuffer = m_pHistory->GetText ();
-    strBuffer += szText;
-
-    // Is it too long? Shrink it
-    const char* szNewText = strBuffer.c_str ();
-    size_t sizeConsole = strBuffer.size ();
-    if ( sizeConsole > CONSOLE_SIZE )
-        szNewText += ( sizeConsole - CONSOLE_SIZE );
-
-    // Set the new text
-    m_pHistory->SetText ( szNewText );
-
-    // Are we not at the end? Keep the scrollbar position
-    if ( fScroll < fMaxScroll )
+    // Trim add buffer
+    if ( m_strPendingAdd.length () > CONSOLE_SIZE )
     {
-        m_pHistory->SetVerticalScrollPosition ( fScroll );
+        m_strPendingAdd = m_strPendingAdd.Right ( CONSOLE_SIZE );
+        m_strPendingAdd = m_strPendingAdd.SplitRight ( "\n" );
+        m_pHistory->SetText ( "" );
     }
+
+    // Flush add buffer is window is visible
+    if ( m_pWindow->IsVisible () )
+        FlushPendingAdd ();
+
     CConsoleLogger::GetSingleton().LinePrintf ( "[Output] : %s", szText );
 }
 
@@ -121,6 +114,7 @@ void CConsole::Clear ( void )
     if ( m_pHistory )
     {       
         m_pHistory->SetText ( "" );
+        m_strPendingAdd = "";
     }
 }
 
@@ -171,6 +165,8 @@ void CConsole::SetVisible ( bool bVisible )
         if ( bVisible )
         {
             m_pInput->Activate ();
+            // Flush pending stuff if becoming visible
+            FlushPendingAdd ();
         }
         else
         {
@@ -516,4 +512,35 @@ bool CConsole::OnWindowSize ( CGUIElement* pElement )
     m_pInput->SetHeight ( m_fInputHeight );
 
     return true;
+}
+
+
+// Send saved console adds to the actual gui window
+void CConsole::FlushPendingAdd ( void )
+{
+    if ( !m_strPendingAdd.empty () )
+    {
+        // Grab the scroll and the max scroll
+        float fScroll = m_pHistory->GetVerticalScrollPosition ();
+        float fMaxScroll = m_pHistory->GetScrollbarDocumentSize () - m_pHistory->GetScrollbarPageSize ();
+
+        // Make new buffer
+        SString strBuffer = m_pHistory->GetText ();
+        strBuffer += m_strPendingAdd;
+        m_strPendingAdd = "";
+
+        // Trim new buffer
+        if ( strBuffer.length () > CONSOLE_SIZE )
+        {
+            strBuffer = strBuffer.Right ( CONSOLE_SIZE );
+            strBuffer = strBuffer.SplitRight ( "\n" );
+        }
+
+        // Set new buffer
+        m_pHistory->SetText ( strBuffer );
+
+        // If not at the end, keep the scrollbar position
+        if ( fScroll < fMaxScroll )
+            m_pHistory->SetVerticalScrollPosition ( fScroll );
+    }
 }
