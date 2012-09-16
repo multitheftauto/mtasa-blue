@@ -33,6 +33,7 @@ CVehicleUpgrades::CVehicleUpgrades ( CClientVehicle* pVehicle )
 {
     m_pVehicle = pVehicle;
     memset ( &m_SlotStates[0], 0, sizeof ( m_SlotStates ) );
+    m_usLastLocalAddNitroType = 0;
 }
 
 
@@ -268,13 +269,32 @@ bool CVehicleUpgrades::GetSlotFromUpgrade ( unsigned short us, unsigned char& uc
 }
 
 
-bool CVehicleUpgrades::AddUpgrade ( unsigned short usUpgrade )
+bool CVehicleUpgrades::AddUpgrade ( unsigned short usUpgrade, bool bAddedLocally )
 {
     if ( m_pVehicle )
     {
         // If its a compatible upgrade
         if ( IsUpgradeCompatible ( usUpgrade ) )
         {
+
+            // If upgrade is nitro, and the same one was added locally less than a 2 seconds ago, don't add
+            if ( usUpgrade == VEHICLEUPGRADE_NITRO_5X || usUpgrade == VEHICLEUPGRADE_NITRO_2X || usUpgrade == VEHICLEUPGRADE_NITRO_10X )
+            {
+                if ( bAddedLocally )
+                {
+                    m_usLastLocalAddNitroType = usUpgrade;
+                    m_lastLocalAddNitroTimer.Reset ();
+                }
+                else
+                {
+                    if ( HasUpgrade ( usUpgrade ) && usUpgrade == m_usLastLocalAddNitroType )
+                    {
+                        if ( m_lastLocalAddNitroTimer.Get () < 2000 )
+                            return true;
+                    }
+                }
+            }
+
             ForceAddUpgrade ( usUpgrade );
 
             return true;

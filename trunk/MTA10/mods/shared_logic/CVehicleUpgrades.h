@@ -37,7 +37,7 @@ public:
     bool                    IsUpgradeCompatible         ( unsigned short usUpgrade );
     static bool             GetSlotFromUpgrade          ( unsigned short usUpgrade, unsigned char& ucSlot );
     
-    bool                    AddUpgrade                  ( unsigned short usUpgrade );
+    bool                    AddUpgrade                  ( unsigned short usUpgrade, bool bAddedLocally );
     void                    AddAllUpgrades              ( void );
     void                    ForceAddUpgrade             ( unsigned short usUpgrade );
     bool                    HasUpgrade                  ( unsigned short usUpgrade );
@@ -54,6 +54,8 @@ public:
 protected:
     SSlotStates             m_SlotStates;
     CClientVehicle*         m_pVehicle;
+    ushort                  m_usLastLocalAddNitroType;
+    CElapsedTime            m_lastLocalAddNitroTimer;
 };
 
 #endif
