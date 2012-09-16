@@ -57,8 +57,8 @@ CEffectCloner* NewEffectCloner ( CRenderItemManager* pManager )
 //
 ////////////////////////////////////////////////////////////////
 CEffectClonerImpl::CEffectClonerImpl ( CRenderItemManager* pManager )
-    : m_TidyupTimer ( 500, true )
 {
+    m_TidyupTimer.SetMaxIncrement ( 500, true );
     m_pManager = pManager;
 }
 

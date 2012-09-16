@@ -139,8 +139,8 @@ CClientPerfStatPacketUsage* CClientPerfStatPacketUsage::GetSingleton ()
 //
 ///////////////////////////////////////////////////////////////
 CClientPerfStatPacketUsageImpl::CClientPerfStatPacketUsageImpl ( void )
-    : m_TimeSinceGetStats ( INT_MAX, true ) 
 {
+    m_TimeSinceGetStats.SetMaxIncrement ( INT_MAX, true );
     m_strCategoryName = "Packet usage";
 }
 
