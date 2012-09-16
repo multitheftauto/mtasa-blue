@@ -586,6 +586,12 @@ public:
 #endif
     SLastSyncedVehData*         m_LastSyncedData;
     SSirenInfo                  m_tSirenBeaconInfo;
+    CVector                     m_vecComponentPositions[22];
+    CVector                     m_vecComponentRotations[22];
+    CVector                     m_vecOriginalComponentPositions[22];
+    CVector                     m_vecOriginalComponentRotations[22];
+    bool                        m_bPositionsChanged[22];
+    bool                        m_bRotationsChanged[22];
 };
 
 #endif

@@ -47,6 +47,9 @@ namespace
     void VehicleDump ( CVehicleSA* pVehicleSA )
     {
         pVehicleSA->SetFrameNumber ( 0 );
+        pVehicleSA->AddExtraComponent ( NULL );
+        pVehicleSA->AddExtraComponent ( NULL );
+        pVehicleSA->SetFrameNumber ( 0 );
         //OutputDebugLine ( SString ( "Interface:%08x", pVehicleSA->GetVehicleInterface() ) );
         ClumpDump( pVehicleSA->GetInterface()->m_pRwObject, pVehicleSA );
     }
