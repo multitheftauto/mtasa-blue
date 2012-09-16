@@ -475,8 +475,8 @@ public:
     RwFrame * pWheelRearLeft;
     RwFrame * pDoors [ 4 ];
     RwFrame * pBumpers [ 2 ];
-    RwFrame * pUnk1;
-    RwFrame * pUnk2;
+    RwFrame * pWingRFDummy;
+    RwFrame * pWingLFDummy;
     RwFrame * pBonet;
     RwFrame * pBoot;
     RwFrame * pWindscreen;
