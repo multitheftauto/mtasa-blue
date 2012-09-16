@@ -570,6 +570,12 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleTurretPosition", CLuaFunctionDefs::SetVehicleTurretPosition );
     CLuaCFunctions::AddFunction ( "setVehicleDoorOpenRatio", CLuaFunctionDefs::SetVehicleDoorOpenRatio );
     CLuaCFunctions::AddFunction ( "setVehicleSirens", CLuaFunctionDefs::SetVehicleSirens );
+    CLuaCFunctions::AddFunction ( "setVehicleComponentPosition", CLuaFunctionDefs::SetVehicleComponentPosition );
+    CLuaCFunctions::AddFunction ( "getVehicleComponentPosition", CLuaFunctionDefs::GetVehicleComponentPosition );
+    CLuaCFunctions::AddFunction ( "setVehicleComponentRotation", CLuaFunctionDefs::SetVehicleComponentRotation );
+    CLuaCFunctions::AddFunction ( "getVehicleComponentRotation", CLuaFunctionDefs::GetVehicleComponentRotation );
+    CLuaCFunctions::AddFunction ( "resetVehicleComponentPosition", CLuaFunctionDefs::ResetVehicleComponentPosition );
+    CLuaCFunctions::AddFunction ( "resetVehicleComponentRotation", CLuaFunctionDefs::ResetVehicleComponentRotation );
 
     // Object create/destroy funcs
     CLuaCFunctions::AddFunction ( "createObject", CLuaFunctionDefs::CreateObject );
@@ -609,10 +615,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "engineGetModelIDFromName", CLuaFunctionDefs::EngineGetModelIDFromName );
     CLuaCFunctions::AddFunction ( "engineGetModelTextureNames", CLuaFunctionDefs::EngineGetModelTextureNames );
     CLuaCFunctions::AddFunction ( "engineGetVisibleTextureNames", CLuaFunctionDefs::EngineGetVisibleTextureNames );
-    CLuaCFunctions::AddFunction ( "engineSetFramePosition", CLuaFunctionDefs::EngineSetFramePosition );
-    CLuaCFunctions::AddFunction ( "engineGetFramePosition", CLuaFunctionDefs::EngineGetFramePosition );
-    CLuaCFunctions::AddFunction ( "engineSetFrameRotation", CLuaFunctionDefs::EngineSetFrameRotation );
-    CLuaCFunctions::AddFunction ( "engineGetFrameRotation", CLuaFunctionDefs::EngineGetFrameRotation );
 
     //CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", CLuaFunctionDefs::EngineReplaceMatchingAtomics );
     //CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", CLuaFunctionDefs::EngineReplaceWheelAtomics );
