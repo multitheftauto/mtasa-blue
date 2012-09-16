@@ -2142,6 +2142,43 @@ void CVehicleSA::OnChangingPosition ( const CVector& vecNewPosition )
     }
 }
 
+namespace
+{
+    VOID _MatrixConvertFromEulerAngles ( CMatrix_Padded* matrixPadded, float fX, float fY, float fZ )
+    {
+        int iUnknown = 0;
+        if ( matrixPadded )
+        {
+            DWORD dwFunc = FUNC_CMatrix__ConvertFromEulerAngles;
+            _asm
+            {
+                push    iUnknown
+                push    fZ
+                push    fY
+                push    fX
+                mov     ecx, matrixPadded
+                call    dwFunc
+            }
+        }
+    }
+    VOID _MatrixConvertToEulerAngles ( CMatrix_Padded* matrixPadded, float &fX, float &fY, float &fZ )
+    {
+        int iUnknown = 0;
+        if ( matrixPadded )
+        {
+            DWORD dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
+            _asm
+            {
+                push    iUnknown
+                push    fZ
+                push    fY
+                push    fX
+                mov     ecx, matrixPadded
+                call    dwFunc
+            }
+        }
+    }
+}
 
 RwFrame * CVehicleSA::GetVehicleComponent ( eVehicleComponent vehicleComponent )
 {
@@ -2215,43 +2252,6 @@ RwFrame * CVehicleSA::GetVehicleComponent ( eVehicleComponent vehicleComponent )
     }
 
     return NULL;
-}
-namespace
-{
-    VOID _MatrixConvertFromEulerAngles ( CMatrix_Padded* matrixPadded, float fX, float fY, float fZ )
-    {
-        int iUnknown = 0;
-        if ( matrixPadded )
-        {
-            DWORD dwFunc = FUNC_CMatrix__ConvertFromEulerAngles;
-            _asm
-            {
-                push    iUnknown
-                push    fZ
-                push    fY
-                push    fX
-                mov     ecx, matrixPadded
-                call    dwFunc
-            }
-        }
-    }
-    VOID _MatrixConvertToEulerAngles ( CMatrix_Padded* matrixPadded, float &fX, float &fY, float &fZ )
-    {
-        int iUnknown = 0;
-        if ( matrixPadded )
-        {
-            DWORD dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
-            _asm
-            {
-                push    iUnknown
-                push    fZ
-                push    fY
-                push    fX
-                mov     ecx, matrixPadded
-                call    dwFunc
-            }
-        }
-    }
 }
 
 bool CVehicleSA::SetComponentRotation ( eVehicleComponent vehicleComponent, CVector vecRotation )  

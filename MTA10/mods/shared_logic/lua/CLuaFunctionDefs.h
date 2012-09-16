@@ -516,10 +516,12 @@ public:
     LUA_DECLARE ( EngineGetModelIDFromName );
     LUA_DECLARE ( EngineGetModelTextureNames );
     LUA_DECLARE ( EngineGetVisibleTextureNames );
-    LUA_DECLARE ( EngineSetFramePosition );
-    LUA_DECLARE ( EngineGetFramePosition );
-    LUA_DECLARE ( EngineSetFrameRotation );
-    LUA_DECLARE ( EngineGetFrameRotation );
+    LUA_DECLARE ( SetVehicleComponentPosition );
+    LUA_DECLARE ( GetVehicleComponentPosition );
+    LUA_DECLARE ( SetVehicleComponentRotation );
+    LUA_DECLARE ( GetVehicleComponentRotation );
+    LUA_DECLARE ( ResetVehicleComponentPosition );
+    LUA_DECLARE ( ResetVehicleComponentRotation );
 
     // Drawing funcs (low-level)
     LUA_DECLARE ( dxDrawLine );

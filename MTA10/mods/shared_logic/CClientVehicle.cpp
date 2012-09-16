@@ -796,6 +796,26 @@ void CClientVehicle::Fix ( void )
     for ( int i = 0 ; i < MAX_PANELS ; i++ ) SetPanelStatus ( i, 0 );
     for ( int i = 0 ; i < MAX_LIGHTS ; i++ ) SetLightStatus ( i, 0 );
     for ( int i = 0 ; i < MAX_WHEELS ; i++ ) SetWheelStatus ( i, 0 );    
+    for ( int i = VEHICLE_COMPONENT_CHASIS; i < VEHICLE_COMPONENT_EXTRA_2; i++ )
+    {
+        eVehicleComponent component = (eVehicleComponent) i;
+        GetComponentPosition ( component, m_vecOriginalComponentPositions[i] );
+        GetComponentRotation ( component, m_vecOriginalComponentRotations[i] );
+        if ( m_bPositionsChanged[i] )
+        {
+            if ( m_vecOriginalComponentPositions[i] != m_vecComponentPositions[i] )
+            {
+                SetComponentPosition( component, m_vecComponentPositions[i] );
+            }
+        }
+        if ( m_bRotationsChanged[i] )
+        {
+            if ( m_vecOriginalComponentRotations[i] != m_vecComponentRotations[i] )
+            {
+                SetComponentRotation( component, m_vecComponentRotations[i] );
+            }
+        }
+    }
 }
 
 
@@ -3943,6 +3963,12 @@ bool CClientVehicle::SetComponentPosition ( eVehicleComponent vehicleComponent, 
         m_bPositionsChanged[vehicleComponent] = true;
         return true;
     }
+    else
+    {
+        m_vecComponentPositions[vehicleComponent] = vecPosition;
+        m_bPositionsChanged[vehicleComponent] = true;
+        return true;
+    }
     return false;
 }
 
@@ -3952,6 +3978,14 @@ bool CClientVehicle::GetComponentPosition ( eVehicleComponent vehicleComponent, 
     {
         m_pVehicle->GetComponentPosition ( vehicleComponent, vecPosition );
         return true;
+    }
+    else
+    {
+        if ( m_bPositionsChanged[vehicleComponent] == true )
+        {
+            vecPosition = m_vecComponentPositions[vehicleComponent];
+            return true;
+        }
     }
     return false;
 }
@@ -3964,7 +3998,13 @@ bool CClientVehicle::SetComponentRotation ( eVehicleComponent vehicleComponent, 
         ConvertDegreesToRadians ( vecTemp );
         m_pVehicle->SetComponentRotation ( vehicleComponent, vecTemp );
         m_vecComponentRotations[vehicleComponent] = vecRotation;
-        m_bPositionsChanged[vehicleComponent] = true;
+        m_bRotationsChanged[vehicleComponent] = true;
+        return true;
+    }
+    else
+    {
+        m_vecComponentRotations[vehicleComponent] = vecRotation;
+        m_bRotationsChanged[vehicleComponent] = true;
         return true;
     }
     return false;
@@ -3978,5 +4018,40 @@ bool CClientVehicle::GetComponentRotation ( eVehicleComponent vehicleComponent, 
         ConvertRadiansToDegrees ( vecRotation );
         return true;
     }
+    else
+    {
+        if ( m_bRotationsChanged[vehicleComponent] == true )
+        {
+            vecRotation = m_vecComponentRotations[vehicleComponent];
+            return true;
+        }
+    }
     return false;
+}
+
+bool CClientVehicle::ResetComponentRotation ( eVehicleComponent vehicleComponent )
+{
+    if ( m_pVehicle )
+    {
+        SetComponentRotation ( vehicleComponent, m_vecOriginalComponentRotations[vehicleComponent] );
+    }
+    else
+    {
+        m_vecComponentRotations[vehicleComponent] = m_vecOriginalComponentRotations[vehicleComponent];
+    }
+    m_bRotationsChanged[vehicleComponent] = false;
+    return true;
+}
+bool CClientVehicle::ResetComponentPosition ( eVehicleComponent vehicleComponent )
+{
+    if ( m_pVehicle )
+    {
+        SetComponentPosition ( vehicleComponent, m_vecOriginalComponentPositions[vehicleComponent] );
+    }
+    else
+    {
+        m_vecComponentRotations[vehicleComponent] = m_vecOriginalComponentPositions[vehicleComponent];
+    }
+    m_bPositionsChanged[vehicleComponent] = false;
+    return true;
 }
