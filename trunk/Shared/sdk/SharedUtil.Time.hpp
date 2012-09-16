@@ -127,7 +127,9 @@ namespace SharedUtil
     public:
         CPerModuleTickCount ( void )
         {
+    #ifdef _DEBUG
             m_TimeSinceUpdated.SetMaxIncrement ( 500 );
+    #endif
             m_ucIndex = 0;
             m_OutputBuffers[0] = GetTickCount64_ ();
         }
