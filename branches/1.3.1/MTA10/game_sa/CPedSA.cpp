@@ -60,7 +60,10 @@ CPedSA::~CPedSA ( void )
     for ( uint i = 0 ; i < MAX_FLAME_SHOT_INFOS ; i++ )
     {
         if ( pInfo->pInstigator == m_pInterface )
+        {
             pInfo->pInstigator = NULL;
+            pInfo->ucFlag1 = 0;
+        }
         pInfo++;
     }
 }

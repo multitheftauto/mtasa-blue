@@ -1622,29 +1622,24 @@ int CLuaFunctionDefs::SetPedAimTarget ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetPedRotation ( lua_State* luaVM )
 {
-    // Check types
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
-        lua_istype ( luaVM, 2, LUA_TNUMBER ) )
-    {
-        // Grab the entity
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        float fRotation = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
+//  setPedRotation ( element ped, float rotation [, bool fixPedRotation = false ] )
+    CClientEntity* pEntity; float fRotation; bool bNewWay;
 
-        // Valid element?
-        if ( pEntity )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadNumber ( fRotation );
+    argStream.ReadBool ( bNewWay, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetPedRotation ( *pEntity, fRotation, bNewWay ) )
         {
-            // Set the new rotation
-            if ( CStaticFunctionDefinitions::SetPedRotation ( *pEntity, fRotation ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedRotation", "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedRotation" );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     // Failed
     lua_pushboolean ( luaVM, false );

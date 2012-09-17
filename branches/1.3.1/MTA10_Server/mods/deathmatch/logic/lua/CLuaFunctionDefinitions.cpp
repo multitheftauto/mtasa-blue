@@ -2988,30 +2988,26 @@ int CLuaFunctionDefinitions::KillPed ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetPedRotation ( lua_State* luaVM )
 {
-    // Arguments are valid?
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
-    {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        float fRotation = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
+//  setPedRotation ( element ped, float rotation [, bool fixPedRotation = false ] )
+    CElement* pElement; float fRotation; bool bNewWay;
 
-        if ( pElement )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadNumber ( fRotation );
+    argStream.ReadBool ( bNewWay, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetPedRotation ( pElement, fRotation, bNewWay ) )
         {
-            // Set the rotation
-            if ( CStaticFunctionDefinitions::SetPedRotation ( pElement, fRotation ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedRotation", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedRotation" );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
+    // Failed
     lua_pushboolean ( luaVM, false );
     return 1;
 }

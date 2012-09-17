@@ -9,6 +9,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "../game_sa/CWeaponInfoSA.h"
 extern EDamageReasonType g_GenerateDamageEventReason;
 
 
@@ -75,6 +76,82 @@ void _declspec(naked) HOOK_CWeapon_GenerateDamageEvent()
 }
 
 
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CShotInfo_Update
+//
+// Reset shotinfo array when game is not running
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+
+// Hook info
+#define HOOKPOS_CShotInfo_Update                         0x739E60
+#define HOOKSIZE_CShotInfo_Update                        6
+DWORD RETURN_CShotInfo_Update =                          0x739E66;
+
+// Clear all shotinfos
+void ResetShotInfoArray( void )
+{
+    CFlameShotInfo* pInfo = (CFlameShotInfo*)ARRAY_CFlameShotInfo;
+    memset ( pInfo, 0, sizeof ( CFlameShotInfo ) );
+    pInfo->weaponType = WEAPONTYPE_PISTOL;
+    pInfo->fRadius = 1;
+    for ( uint i = 1 ; i < MAX_FLAME_SHOT_INFOS ; i++ )
+        memcpy ( pInfo + i, pInfo, sizeof ( CFlameShotInfo ) );
+}
+
+// Do call to original function
+void Call_CShotInfo_Update( void )
+{
+    _asm
+    {
+        call inner
+        jmp  done
+    inner:
+        push    ebp  
+        mov     ebp, esp
+        and     esp, 0FFFFFFF8h
+        jmp     RETURN_CShotInfo_Update
+    done:
+    }
+}
+
+// Our code for when CShotInfo_Update is called
+void OnMY_CShotInfo_Update( void )
+{
+    if ( !pMultiplayer->IsConnected () )
+    {
+        // Reset shotinfo array when game is not running
+        ResetShotInfoArray ();
+    }
+
+    __try
+    {
+        // Call original CShotInfo::Update with hacky protection against bad pointers
+        Call_CShotInfo_Update ();
+    }
+    __except( GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION )
+    {
+        // Reset shotinfo array when it has problems
+        ResetShotInfoArray ();
+    }
+}
+
+// The hook goes here
+void _declspec(naked) HOOK_CShotInfo_Update()
+{
+    _asm
+    {
+        pushad
+        call    OnMY_CShotInfo_Update
+        popad
+        retn
+    }
+}
+
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CMultiplayerSA::InitHooks_Weapons
@@ -85,4 +162,5 @@ void _declspec(naked) HOOK_CWeapon_GenerateDamageEvent()
 void CMultiplayerSA::InitHooks_Weapons ( void )
 {
     EZHookInstall ( CWeapon_GenerateDamageEvent );
+    EZHookInstall ( CShotInfo_Update );
 }
