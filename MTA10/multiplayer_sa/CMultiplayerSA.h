@@ -204,6 +204,7 @@ public:
 
     void                        SetPedTargetingMarkerEnabled ( bool bEnable );
     bool                        IsPedTargetingMarkerEnabled ( void );
+    bool                        IsConnected                 ( void );
 
     virtual void                GetRwResourceStats          ( SRwResourceStats& outStats );
     virtual void                GetClothesCacheStats        ( SClothesCacheStats& outStats );
