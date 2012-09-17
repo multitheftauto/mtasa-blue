@@ -2004,6 +2004,13 @@ void CMultiplayerSA::SetHeliKillHandler ( HeliKillHandler * pHandler )
 {
     m_pHeliKillHandler = pHandler;
 }
+
+// What we do here is check if the idle handler has been set
+bool CMultiplayerSA::IsConnected ( void )
+{
+    return m_pIdleHandler != NULL;
+}
+
 void CMultiplayerSA::HideRadar ( bool bHide )
 {
     bHideRadar = bHide;

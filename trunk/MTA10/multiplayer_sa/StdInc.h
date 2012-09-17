@@ -32,3 +32,5 @@
 #include "COffsets.h"
 #include "CPopulationSA.h"
 #include "CRemoteDataSA.h"
+
+extern CMultiplayerSA* pMultiplayer;
