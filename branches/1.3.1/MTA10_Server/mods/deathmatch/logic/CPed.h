@@ -194,8 +194,6 @@ public:
 
     inline unsigned int                         GetVehicleAction            ( void )                        { return m_uiVehicleAction; };
     void                                        SetVehicleAction            ( unsigned int uiAction );
-    inline CVehicle *                           GetJackingVehicle           ( void )                        { return m_pJackingVehicle; }
-    inline void                                 SetJackingVehicle           ( CVehicle * pVehicle )         { m_pJackingVehicle = pVehicle; }
 
     bool                                        IsAttachToable              ( void );
 
@@ -266,7 +264,6 @@ protected:
     unsigned int                                m_uiVehicleSeat;
     unsigned int                                m_uiVehicleAction;
     unsigned long                               m_ulVehicleActionStartTime;
-    CVehicle*                                   m_pJackingVehicle;
 
     bool                                        m_bSyncable;
     bool                                        m_bCollisionsEnabled;
