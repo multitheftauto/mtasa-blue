@@ -381,6 +381,10 @@ DontInstallRedist:
 			CreateDirectory "$APPDATA\MTA San Andreas All\Common"
 			CreateDirectory "$APPDATA\MTA San Andreas All\${0.0}"
 
+			# Ensure install dir exists so the permissions can be set
+			SetOutPath "$INSTDIR\MTA"
+			SetOverwrite on
+
 			#############################################################
 			# Make the directory "$INSTDIR" read write accessible by all users
 			# Make the directory "$APPDATA\MTA San Andreas All" read write accessible by all users
