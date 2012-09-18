@@ -151,6 +151,23 @@ CPlayer::~CPlayer ( void )
     m_bDoNotSendEntities = true;
     SetParentObject ( NULL );
 
+    // Do this
+    if ( m_pJackingVehicle )
+    {
+        if ( m_uiVehicleAction == VEHICLEACTION_JACKING )
+        {
+            CPed * pOccupant = m_pJackingVehicle->GetOccupant ( 0 );
+            if ( pOccupant )
+            {
+                m_pJackingVehicle->SetOccupant ( NULL, 0 );
+                pOccupant->SetOccupiedVehicle ( NULL, 0 );
+                pOccupant->SetVehicleAction ( VEHICLEACTION_NONE );
+            }
+        }
+        if ( m_pJackingVehicle->GetJackingPlayer () == this )
+            m_pJackingVehicle->SetJackingPlayer ( NULL );
+    }
+
     CElementRefManager::RemoveElementRefs ( ELEMENT_REF_DEBUG ( this, "CPlayer" ), &m_pTeam, NULL );
     CElementRefManager::RemoveElementListRef ( ELEMENT_REF_DEBUG ( this, "CPlayer m_lstBroadcastList" ), &m_lstBroadcastList );
     CElementRefManager::RemoveElementListRef ( ELEMENT_REF_DEBUG ( this, "CPlayer m_lstIgnoredList" ), &m_lstIgnoredList );
@@ -1087,6 +1104,25 @@ void CPlayer::SetPlayerStat ( unsigned short usStat, float fValue )
     CPed::SetPlayerStat( usStat, fValue );
 }
 
+void CPlayer::SetJackingVehicle ( CVehicle* pVehicle )
+{
+    if ( pVehicle == m_pJackingVehicle )
+        return;
+
+    // Remove old
+    if ( m_pJackingVehicle )
+    {
+        CVehicle* pPrev = m_pJackingVehicle;
+        m_pJackingVehicle = NULL;
+        pPrev->SetJackingPlayer ( NULL );
+    }
+
+    // Set new
+    m_pJackingVehicle = pVehicle;
+
+    if ( m_pJackingVehicle )
+        m_pJackingVehicle->SetJackingPlayer ( this );
+}
 
 #ifdef WIN32
 

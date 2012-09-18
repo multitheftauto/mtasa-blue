@@ -71,7 +71,6 @@ CPed::CPed ( CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsig
     m_uiVehicleSeat = INVALID_VEHICLE_SEAT;
     m_uiVehicleAction = CPed::VEHICLEACTION_NONE;
     m_ulVehicleActionStartTime = 0;
-    m_pJackingVehicle = NULL;
 
     m_vecVelocity.fX = m_vecVelocity.fY = m_vecVelocity.fZ = 0.0f;
 
@@ -89,22 +88,6 @@ CPed::CPed ( CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsig
 
 CPed::~CPed ( void )
 {
-    if ( m_pJackingVehicle )
-    {
-        if ( m_uiVehicleAction == VEHICLEACTION_JACKING )
-        {
-            CPed * pOccupant = m_pJackingVehicle->GetOccupant ( 0 );
-            if ( pOccupant )
-            {
-                m_pJackingVehicle->SetOccupant ( NULL, 0 );
-                pOccupant->SetOccupiedVehicle ( NULL, 0 );
-                pOccupant->SetVehicleAction ( VEHICLEACTION_NONE );
-            }
-        }
-        if ( m_pJackingVehicle->GetJackingPlayer () == this )
-            m_pJackingVehicle->SetJackingPlayer ( NULL );
-    }
-
     // Make sure we've no longer occupied any vehicle
     if ( m_pVehicle )
     {

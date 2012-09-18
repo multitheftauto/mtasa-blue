@@ -279,6 +279,9 @@ public:
 
     CPlayerStatsPacket*                         GetPlayerStatsPacket        ( void )                        { return m_pPlayerStatsPacket; }
     void                                        SetPlayerStat               ( unsigned short usID, float fValue );
+
+    CVehicle *                                  GetJackingVehicle           ( void )                        { return m_pJackingVehicle; }
+    void                                        SetJackingVehicle           ( CVehicle * pVehicle );
 public:
 
     //
@@ -458,6 +461,7 @@ private:
     SScreenShotInfo                             m_ScreenShotInfo;
 
     CPlayerStatsPacket*                         m_pPlayerStatsPacket;
+    CVehicle*                                   m_pJackingVehicle;
 };
 
 #endif
