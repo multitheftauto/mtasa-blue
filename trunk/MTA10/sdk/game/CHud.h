@@ -15,6 +15,27 @@
 #include <windows.h>
 #include <CVector.h>
 
+enum eHudComponent
+{
+    // Order must be preserved for net comms
+    HUD_AMMO,
+    HUD_WEAPON,
+    HUD_HEALTH,
+    HUD_BREATH,
+    HUD_ARMOUR,
+    HUD_MONEY,
+    HUD_VEHICLE_NAME,
+    HUD_AREA_NAME,
+    HUD_RADAR,
+    HUD_CLOCK,
+    HUD_RADIO,
+    HUD_WANTED,
+    HUD_CROSSHAIR,
+    HUD_ALL,
+    HUD_VITAL_STATS,
+    HUD_HELP_TEXT,
+};
+
 class CHud
 {
 public:
@@ -28,23 +49,8 @@ public:
     //virtual void                Draw2DPolygon ( float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, float fX4, float fY4, DWORD dwColor )=0;
 //  virtual VOID                SetVehicleName( char * szName )=0;
     //virtual VOID              SetZoneName( char * szName )=0;
-
-    virtual void                DisableAmmo ( bool bDisabled )=0;
-    virtual void                DisableWeaponIcon ( bool bDisabled )=0;
-    virtual void                DisableHealth ( bool bDisabled )=0;
-    virtual void                DisableBreath ( bool bDisabled )=0;
-    virtual void                DisableArmour ( bool bDisabled )=0;
-    virtual void                DisableVitalStats ( bool bDisabled )=0;
-    virtual void                DisableMoney ( bool bDisabled )=0;
-    virtual void                DisableVehicleName ( bool bDisabled )=0;
-    virtual void                DisableHelpText ( bool bDisabled )=0;
-    virtual void                DisableAreaName ( bool bDisabled )=0;
-    virtual void                DisableRadar ( bool bDisabled )=0;
-    virtual void                DisableClock ( bool bDisabled )=0;
-    virtual void                DisableRadioName ( bool bDisabled )=0;
-    virtual void                DisableWantedLevel ( bool bDisabled )=0;
-    virtual void                DisableCrosshair ( bool bDisabled )=0;
-    virtual void                DisableAll ( bool bDisabled )=0;
+    virtual void                SetComponentVisible ( eHudComponent component, bool bVisible )=0;
+    virtual bool                IsComponentVisible ( eHudComponent component )=0;
 };
 
 #endif

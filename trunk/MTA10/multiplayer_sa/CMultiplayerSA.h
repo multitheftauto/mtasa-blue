@@ -67,7 +67,6 @@ public:
     void                        DisablePadHandler           ( bool bDisabled );
     void                        DisableEnterExitVehicleKey  ( bool bDisabled );
     void                        DisableAllVehicleWeapons    ( bool bDisable );
-    void                        DisableZoneNames            ( bool bDisabled );
     void                        DisableBirds                ( bool bDisabled );
     void                        DisableQuickReload          ( bool bDisable );
     void                        DisableCloseRangeDamage     ( bool bDisable );

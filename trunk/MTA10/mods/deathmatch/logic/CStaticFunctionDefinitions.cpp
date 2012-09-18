@@ -1819,56 +1819,19 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot ( CClientEntity& Entity, int i
 
 bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( eHudComponent component, bool bShow )
 {
-    //enum eHudComponent { HUD_AMMO = 0, HUD_WEAPON, HUD_HEALTH, HUD_BREATH,
-    //                         HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK, HUD_RADIO, HUD_WANTED, HUD_CROSSHAIR, HUD_ALL };
-    switch ( component )
-    {
-        case HUD_AMMO:
-            g_pGame->GetHud ()->DisableAmmo ( !bShow );
-            return true;
-        case HUD_WEAPON:
-            g_pGame->GetHud ()->DisableWeaponIcon ( !bShow );
-            return true;
-        case HUD_HEALTH:
-            g_pGame->GetHud ()->DisableHealth ( !bShow );
-            return true;
-        case HUD_BREATH:
-            g_pGame->GetHud ()->DisableBreath ( !bShow );
-            return true;
-        case HUD_ARMOUR:
-            g_pGame->GetHud ()->DisableArmour ( !bShow );
-            return true;
-        case HUD_MONEY:
-            g_pGame->GetHud ()->DisableMoney ( !bShow );
-            return true;
-        case HUD_VEHICLE_NAME:
-            g_pGame->GetHud ()->DisableVehicleName ( !bShow );
-            return true;
-        case HUD_AREA_NAME:
-            g_pClientGame->SetHudAreaNameDisabled ( !bShow );
-            g_pGame->GetHud ()->DisableAreaName ( !bShow );
-            return true;
-        case HUD_RADAR:
-            g_pGame->GetHud ()->DisableRadar ( !bShow );
-            return true;
-        case HUD_CLOCK:
-            g_pGame->GetHud ()->DisableClock ( !bShow );
-            return true;
-        case HUD_RADIO:
-            g_pGame->GetHud ()->DisableRadioName ( !bShow );
-            return true;
-        case HUD_WANTED:
-            g_pGame->GetHud ()->DisableWantedLevel ( !bShow );
-            return true;
-        case HUD_CROSSHAIR:
-            g_pGame->GetHud ()->DisableCrosshair ( !bShow );
-            return true;
-        case HUD_ALL:
-            g_pClientGame->SetHudAreaNameDisabled ( !bShow );
-            g_pGame->GetHud ()->DisableAll ( !bShow );
-            return true;
-    }
-    return false;
+    g_pGame->GetHud ()->SetComponentVisible ( component, bShow );
+
+    if ( component == HUD_AREA_NAME || component == HUD_ALL )
+        g_pClientGame->SetHudAreaNameDisabled ( !bShow  );
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::IsPlayerHudComponentVisible ( eHudComponent component, bool& bOutIsVisible )
+{
+    bOutIsVisible = g_pGame->GetHud ()->IsComponentVisible ( component );
+    return true;
 }
 
 
@@ -4134,12 +4097,12 @@ bool CStaticFunctionDefinitions::FadeCamera ( bool bFadeIn, float fFadeTime, uns
     if ( bFadeIn )
     {
         pCamera->FadeIn ( fFadeTime );
-        g_pGame->GetHud ()->DisableAreaName ( g_pClientGame->GetHudAreaNameDisabled () );
+        g_pGame->GetHud ()->SetComponentVisible ( HUD_AREA_NAME, !g_pClientGame->GetHudAreaNameDisabled () );
     }
     else
     {
         pCamera->FadeOut ( fFadeTime, ucRed, ucGreen, ucBlue );
-        g_pGame->GetHud ()->DisableAreaName ( true );
+        g_pGame->GetHud ()->SetComponentVisible ( HUD_AREA_NAME, false );
     }
 
     return true;

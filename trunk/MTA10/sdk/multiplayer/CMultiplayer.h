@@ -145,7 +145,6 @@ public:
     virtual void                        SetCenterOfWorld            ( class CEntity * entity, class CVector * vecPosition, FLOAT fHeading ) = 0;
     virtual void                        DisablePadHandler           ( bool bDisabled ) = 0;
     virtual void                        DisableAllVehicleWeapons    ( bool bDisable ) = 0;
-    virtual void                        DisableZoneNames            ( bool bDisabled ) = 0; // move to CHud
     virtual void                        DisableBirds                ( bool bDisabled ) = 0;
     virtual void                        DisableQuickReload          ( bool bDisable ) = 0;
     virtual void                        DisableCloseRangeDamage     ( bool bDisable ) = 0;

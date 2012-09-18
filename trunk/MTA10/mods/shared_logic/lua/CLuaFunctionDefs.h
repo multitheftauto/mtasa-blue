@@ -198,6 +198,7 @@ public:
     
     // Player set funcs
     LUA_DECLARE ( ShowPlayerHudComponent );
+    LUA_DECLARE ( IsPlayerHudComponentVisible );
     LUA_DECLARE ( SetPlayerMoney );
     LUA_DECLARE ( GivePlayerMoney );
     LUA_DECLARE ( TakePlayerMoney );

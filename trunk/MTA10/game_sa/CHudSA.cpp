@@ -16,6 +16,11 @@
 char szVehicleName[50] = {'\0'};
 char szZoneName[50] = {'\0'};
 
+CHudSA::CHudSA ( void )
+{
+    InitComponentList ();
+}
+
 VOID CHudSA::SetHelpMessage( char * szMessage )
 {
     DEBUG_TRACE("VOID CHudSA::SetHelpMessage( char * szMessage )");
@@ -178,238 +183,88 @@ void CHudSA::Draw2DPolygon ( float fX1, float fY1, float fX2, float fY2, float f
     }
 }
 
-void CHudSA::DisableAmmo ( bool bDisabled )
+//
+// CHudSA::InitComponentList
+//
+void CHudSA::InitComponentList ( void )
 {
-    static BYTE byteOriginal = 0;
-    if ( bDisabled && !byteOriginal )
+    SHudComponent componentList[] = {
+                { 1, HUD_AMMO, 1, FUNC_DrawAmmo, 1, 0xCC, 0xC3 },
+                { 1, HUD_WEAPON, 1, FUNC_DrawWeaponIcon, 1, 0xCC, 0xC3 },
+                { 1, HUD_HEALTH, 1, FUNC_PrintHealthForPlayer, 1, 0xCC, 0xC3 },
+                { 1, HUD_BREATH, 1, FUNC_PrintBreathForPlayer, 1, 0xCC, 0xC3 },
+                { 1, HUD_ARMOUR, 1, FUNC_PrintArmourForPlayer, 1, 0xCC, 0xC3 },
+                { 1, HUD_MONEY, 1, CODE_ShowMoney, 2, 0xCCCC, 0xE990 },
+                { 1, HUD_VEHICLE_NAME, 1, FUNC_DrawVehicleName, 1, 0xCC, 0xC3 },
+                { 1, HUD_AREA_NAME, 1, FUNC_DrawAreaName, 1, 0xCC, 0xC3 },
+                { 1, HUD_RADAR, 1, FUNC_DrawRadar, 1, 0xCC, 0xC3 },
+                { 1, HUD_CLOCK, 0, VAR_DisableClock, 1, 1, 0 },
+                { 1, HUD_RADIO, 1, FUNC_DrawRadioName, 1, 0xCC, 0xC3 },
+                { 1, HUD_WANTED, 1, FUNC_DrawWantedLevel, 1, 0xCC, 0xC3 },
+                { 1, HUD_CROSSHAIR, 1, FUNC_DrawCrosshair, 1, 0xCC, 0xC3 },
+                { 1, HUD_VITAL_STATS, 1, FUNC_DrawVitalStats, 1, 0xCC, 0xC3 },
+                { 0, HUD_HELP_TEXT, 1, FUNC_DrawHelpText, 1, 0xCC, 0xC3 },
+            };
+
+    for ( uint i = 0 ; i < NUMELMS( componentList ) ; i++ )
     {
-        byteOriginal = *(BYTE *)FUNC_DrawAmmo;
-        MemPut < BYTE > ( FUNC_DrawAmmo, 0xC3 );
-    }
-    else if ( !bDisabled && byteOriginal )
-    {
-        MemPut < BYTE > ( FUNC_DrawAmmo, byteOriginal );
-        byteOriginal = 0;
+        const SHudComponent& component = componentList[i]; 
+        MapSet ( m_HudComponentMap, component.type, component );
     }
 }
 
-void CHudSA::DisableWeaponIcon ( bool bDisabled )
+//
+// CHudSA::SetComponentVisible
+//
+void CHudSA::SetComponentVisible ( eHudComponent component, bool bVisible )
 {
-    static BYTE byteOriginal = 0;
-    if ( bDisabled && !byteOriginal )
+    // Handle ALL option
+    if ( component == HUD_ALL )
     {
-        byteOriginal = *(BYTE *)FUNC_DrawWeaponIcon;
-        MemPut < BYTE > ( FUNC_DrawWeaponIcon, 0xC3 );
+        for ( std::map < eHudComponent, SHudComponent >::iterator iter = m_HudComponentMap.begin () ; iter != m_HudComponentMap.end () ; ++iter )
+        {
+            const SHudComponent& component = iter->second;
+            if ( component.bIsPartOfAll )
+                SetComponentVisible ( component.type, bVisible );
+        }
+        return;
     }
-    else if ( !bDisabled && byteOriginal )
+
+    // Set visiblity of one component
+    SHudComponent* pComponent = MapFind ( m_HudComponentMap, component );
+    if ( pComponent )
     {
-        MemPut < BYTE > ( FUNC_DrawWeaponIcon, byteOriginal );
-        byteOriginal = 0;
+        // Save original bytes if requred
+        if ( pComponent->bSaveOriginalBytes )
+        {
+            pComponent->origData = *(DWORD*)pComponent->uiDataAddr;
+            pComponent->bSaveOriginalBytes = false;
+        }
+
+        // Poke bytes
+        uchar* pSrc = (uchar*)( bVisible ? &pComponent->origData : &pComponent->disabledData );
+        uchar* pDest = (uchar*)( pComponent->uiDataAddr );
+        for ( uint i = 0 ; i < pComponent->uiDataSize ; i++ )
+        {
+            MemPut < BYTE > ( pDest + i, pSrc[i] );
+        }
     }
 }
 
-void CHudSA::DisableHealth ( bool bDisabled )
+//
+// CHudSA::IsComponentVisible
+//
+bool CHudSA::IsComponentVisible ( eHudComponent component )
 {
-    static BYTE byteOriginal = 0;
-    if ( bDisabled && !byteOriginal )
+    SHudComponent* pComponent = MapFind ( m_HudComponentMap, component );
+    if ( pComponent )
     {
-        byteOriginal = *(BYTE *)FUNC_PrintHealthForPlayer;
-        MemPut < BYTE > ( FUNC_PrintHealthForPlayer, 0xC3 );
+        // Determine if invisible by matching data with disabled values
+        uchar* pSrc = (uchar*)( &pComponent->disabledData );
+        uchar* pDest = (uchar*)( pComponent->uiDataAddr );
+        if ( memcmp ( pDest, pSrc, pComponent->uiDataSize ) == 0 )
+            return false;   // Matches disabled bytes
+        return true;
     }
-    else if ( !bDisabled && byteOriginal )
-    {
-        MemPut < BYTE > ( FUNC_PrintHealthForPlayer, byteOriginal );
-        byteOriginal = 0;
-    }
-}
-
-void CHudSA::DisableBreath ( bool bDisabled )
-{
-    static BYTE byteOriginal = 0;
-    if ( bDisabled && !byteOriginal )
-    {
-        byteOriginal = *(BYTE *)FUNC_PrintBreathForPlayer;
-        MemPut < BYTE > ( FUNC_PrintBreathForPlayer, 0xC3 );
-    }
-    else if ( !bDisabled && byteOriginal )
-    {
-        MemPut < BYTE > ( FUNC_PrintBreathForPlayer, byteOriginal );
-        byteOriginal = 0;
-    }
-}
-
-void CHudSA::DisableArmour ( bool bDisabled )
-{
-    static BYTE byteOriginal = 0;
-    if ( bDisabled && !byteOriginal )
-    {
-        byteOriginal = *(BYTE *)FUNC_PrintArmourForPlayer;
-        MemPut < BYTE > ( FUNC_PrintArmourForPlayer, 0xC3 );
-    }
-    else if ( !bDisabled && byteOriginal )
-    {
-        MemPut < BYTE > ( FUNC_PrintArmourForPlayer, byteOriginal );
-        byteOriginal = 0;
-    }
-}
-
-void CHudSA::DisableVitalStats ( bool bDisabled )
-{
-    static BYTE byteOriginal = 0;
-    if ( bDisabled && !byteOriginal )
-    {
-        byteOriginal = *(BYTE *)FUNC_DrawVitalStats;
-        MemPut < BYTE > ( FUNC_DrawVitalStats, 0xC3 );
-    }
-    else if ( !bDisabled && byteOriginal )
-    {
-        MemPut < BYTE > ( FUNC_DrawVitalStats, byteOriginal );
-        byteOriginal = 0;
-    }
-}
-
-void CHudSA::DisableMoney ( bool bDisabled )
-{
-    static DWORD dwOriginal = 0;
-    if ( bDisabled && !dwOriginal )
-    {
-        dwOriginal = *(DWORD *)CODE_ShowMoney;
-        MemPut < BYTE > ( CODE_ShowMoney, 0x90 );
-        MemPut < BYTE > ( CODE_ShowMoney + 1, 0xE9 );
-    }
-    else if ( !bDisabled && dwOriginal )
-    {
-        MemPut < DWORD > ( CODE_ShowMoney, dwOriginal );
-        dwOriginal = 0;
-    }
-}
-
-void CHudSA::DisableVehicleName ( bool bDisabled )
-{
-    static BYTE byteOriginal = 0;
-    if ( bDisabled && !byteOriginal )
-    {
-        byteOriginal = *(BYTE *)FUNC_DrawVehicleName;
-        MemPut < BYTE > ( FUNC_DrawVehicleName, 0xC3 );
-    }
-    else if ( !bDisabled && byteOriginal )
-    {
-        MemPut < BYTE > ( FUNC_DrawVehicleName, byteOriginal );
-        byteOriginal = 0;
-    }
-}
-
-void CHudSA::DisableHelpText ( bool bDisabled )
-{
-    static BYTE byteOriginal = 0;
-    if ( bDisabled && !byteOriginal )
-    {
-        byteOriginal = *(BYTE *)FUNC_DrawHelpText;
-        MemPut < BYTE > ( FUNC_DrawHelpText, 0xC3 );
-    }
-    else if ( !bDisabled && byteOriginal )
-    {
-        MemPut < BYTE > ( FUNC_DrawHelpText, byteOriginal );
-        byteOriginal = 0;
-    }
-}
-
-void CHudSA::DisableAreaName ( bool bDisabled )
-{
-    static BYTE byteOriginal = 0;
-    if ( bDisabled && !byteOriginal )
-    {
-        byteOriginal = *(BYTE *)FUNC_DrawAreaName;
-        MemPut < BYTE > ( FUNC_DrawAreaName, 0xC3 );
-    }
-    else if ( !bDisabled && byteOriginal )
-    {
-        MemPut < BYTE > ( FUNC_DrawAreaName, byteOriginal );
-        byteOriginal = 0;
-    }
-}
-
-void CHudSA::DisableRadar ( bool bDisabled )
-{
-    static BYTE byteOriginal = 0;
-    if ( bDisabled && !byteOriginal )
-    {
-        byteOriginal = *(BYTE *)FUNC_DrawRadar;
-        MemPut < BYTE > ( FUNC_DrawRadar, 0xC3 );
-    }
-    else if ( !bDisabled && byteOriginal )
-    {
-        MemPut < BYTE > ( FUNC_DrawRadar, byteOriginal );
-        byteOriginal = 0;
-    }
-}
-
-void CHudSA::DisableClock ( bool bDisabled )
-{
-    MemPutFast < int > ( VAR_DisableClock, bDisabled ? 0 : 1 );
-}
-
-void CHudSA::DisableRadioName ( bool bDisabled )
-{
-    static BYTE byteOriginal = 0;
-    if ( bDisabled && !byteOriginal )
-    {
-        byteOriginal = *(BYTE *)FUNC_DrawRadioName;
-        MemPut < BYTE > ( FUNC_DrawRadioName, 0xC3 );
-    }
-    else if ( !bDisabled && byteOriginal )
-    {
-        MemPut < BYTE > ( FUNC_DrawRadioName, byteOriginal );
-        byteOriginal = 0;
-    }
-}
-
-void CHudSA::DisableWantedLevel ( bool bDisabled )
-{
-    static BYTE byteOriginal = 0;
-    if ( bDisabled && !byteOriginal )
-    {
-        byteOriginal = *(BYTE *)FUNC_DrawWantedLevel;
-        MemPut < BYTE > ( FUNC_DrawWantedLevel, 0xC3 );
-    }
-    else if ( !bDisabled && byteOriginal )
-    {
-        MemPut < BYTE > ( FUNC_DrawWantedLevel, byteOriginal );
-        byteOriginal = 0;
-    }
-}
-
-void CHudSA::DisableCrosshair ( bool bDisabled )
-{
-    static BYTE byteOriginal = 0;
-    if ( bDisabled && !byteOriginal )
-    {
-        byteOriginal = *(BYTE *)FUNC_DrawCrosshair;
-        MemPut < BYTE > ( FUNC_DrawCrosshair, 0xC3 );
-    }
-    else if ( !bDisabled && byteOriginal )
-    {
-        MemPut < BYTE > ( FUNC_DrawCrosshair, byteOriginal );
-        byteOriginal = 0;
-    }
-}
-
-void CHudSA::DisableAll ( bool bDisabled )
-{
-    DisableAmmo ( bDisabled );
-    DisableWeaponIcon ( bDisabled );
-    DisableHealth ( bDisabled );
-    DisableBreath ( bDisabled );
-    DisableArmour ( bDisabled );
-    DisableVitalStats ( bDisabled );
-    DisableMoney ( bDisabled );
-    DisableVehicleName ( bDisabled );
-    // Keep the help text always disabled
-    //DisableHelpText ( bDisabled );
-    DisableAreaName ( bDisabled );
-    DisableRadar ( bDisabled );
-    DisableClock ( bDisabled );
-    DisableRadioName ( bDisabled );
-    DisableWantedLevel ( bDisabled );
-    DisableCrosshair ( bDisabled );
+    return false;
 }
