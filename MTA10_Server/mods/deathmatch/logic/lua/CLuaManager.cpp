@@ -263,6 +263,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "takePlayerMoney", CLuaFunctionDefinitions::TakePlayerMoney );
     CLuaCFunctions::AddFunction ( "spawnPlayer", CLuaFunctionDefinitions::SpawnPlayer );
     CLuaCFunctions::AddFunction ( "showPlayerHudComponent", CLuaFunctionDefinitions::ShowPlayerHudComponent );
+    CLuaCFunctions::AddFunction ( "setPlayerHudComponentVisible", CLuaFunctionDefinitions::ShowPlayerHudComponent );
     CLuaCFunctions::AddFunction ( "setPlayerWantedLevel", CLuaFunctionDefinitions::SetPlayerWantedLevel );
     CLuaCFunctions::AddFunction ( "forcePlayerMap", CLuaFunctionDefinitions::ForcePlayerMap );
     CLuaCFunctions::AddFunction ( "setPlayerNametagText", CLuaFunctionDefinitions::SetPlayerNametagText );

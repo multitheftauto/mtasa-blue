@@ -46,56 +46,11 @@ void CPlayerRPCs::ShowPlayerHudComponent ( NetBitStreamInterface& bitStream )
     unsigned char ucComponent, ucShow;
     if ( bitStream.Read ( ucComponent ) && bitStream.Read ( ucShow ) )
     {
-        bool bDisabled = ( ucShow != 1 );
-        enum eHudComponent { HUD_AMMO = 0, HUD_WEAPON, HUD_HEALTH, HUD_BREATH,
-                             HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK, HUD_RADIO, HUD_WANTED, HUD_CROSSHAIR, HUD_ALL };
-        switch ( ucComponent )
-        {
-            case HUD_AMMO:
-                g_pGame->GetHud ()->DisableAmmo ( bDisabled );
-                break;
-            case HUD_WEAPON:
-                g_pGame->GetHud ()->DisableWeaponIcon ( bDisabled );
-                break;
-            case HUD_HEALTH:
-                g_pGame->GetHud ()->DisableHealth ( bDisabled );
-                break;
-            case HUD_BREATH:
-                g_pGame->GetHud ()->DisableBreath ( bDisabled );
-                break;
-            case HUD_ARMOUR:
-                g_pGame->GetHud ()->DisableArmour ( bDisabled );
-                break;
-            case HUD_MONEY:
-                g_pGame->GetHud ()->DisableMoney ( bDisabled );
-                break;
-            case HUD_VEHICLE_NAME:
-                g_pGame->GetHud ()->DisableVehicleName ( bDisabled );
-                break;
-            case HUD_AREA_NAME:
-                g_pClientGame->SetHudAreaNameDisabled ( bDisabled );
-                g_pGame->GetHud ()->DisableAreaName ( bDisabled );
-                break;
-            case HUD_RADAR:
-                g_pGame->GetHud ()->DisableRadar ( bDisabled );
-                break;
-            case HUD_CLOCK:
-                g_pGame->GetHud ()->DisableClock ( bDisabled );
-                break;
-            case HUD_RADIO:
-                g_pGame->GetHud ()->DisableRadioName ( bDisabled );
-                break;
-            case HUD_WANTED:
-                g_pGame->GetHud ()->DisableWantedLevel ( bDisabled );
-                break;
-            case HUD_CROSSHAIR:
-                g_pGame->GetHud ()->DisableCrosshair ( bDisabled );
-                break;
-            case HUD_ALL:
-                g_pClientGame->SetHudAreaNameDisabled ( bDisabled );
-                g_pGame->GetHud ()->DisableAll ( bDisabled );
-                break;
-        }
+        bool bShow = ( ucShow != 0 );
+        g_pGame->GetHud ()->SetComponentVisible ( (eHudComponent)ucComponent, bShow );
+
+        if ( ucComponent == HUD_AREA_NAME || ucComponent == HUD_ALL )
+            g_pClientGame->SetHudAreaNameDisabled ( !bShow  );
     }        
 }
 

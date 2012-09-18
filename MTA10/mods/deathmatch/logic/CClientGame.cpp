@@ -3407,9 +3407,9 @@ void CClientGame::Event_OnIngame ( void )
 
     // Disable parts of the Hud
     CHud* pHud = g_pGame->GetHud ();
-    pHud->DisableHelpText ( true );
-    pHud->DisableVitalStats ( true );
-    pHud->DisableAreaName ( true );
+    pHud->SetComponentVisible ( HUD_HELP_TEXT, false );
+    pHud->SetComponentVisible ( HUD_VITAL_STATS, false );
+    pHud->SetComponentVisible ( HUD_AREA_NAME, false );
 
     g_pMultiplayer->DeleteAndDisableGangTags ();
 
@@ -4990,10 +4990,10 @@ void CClientGame::ResetMapInfo ( void )
     SetAllDimensions ( 0 );
 
     // Hud
-    g_pGame->GetHud ()->DisableAll ( false );
+    g_pGame->GetHud ()->SetComponentVisible ( HUD_ALL, true );
     // Disable area names as they are on load until camera unfades
-    g_pGame->GetHud ()->DisableAreaName ( true );
-    g_pGame->GetHud ()->DisableVitalStats ( true );
+    g_pGame->GetHud ()->SetComponentVisible ( HUD_AREA_NAME, false );
+    g_pGame->GetHud ()->SetComponentVisible ( HUD_VITAL_STATS, false );
 
     m_bHudAreaNameDisabled = false;       
 
