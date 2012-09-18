@@ -449,7 +449,7 @@ void CGameSA::Reset ( void )
 
         // Restore the HUD
         m_pHud->Disable ( false );
-        m_pHud->DisableAll ( false );
+        m_pHud->SetComponentVisible ( HUD_ALL, true );
     }
 }
 

@@ -398,11 +398,13 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPlayerTeam", CLuaFunctionDefs::GetPlayerTeam );
     CLuaCFunctions::AddFunction ( "getPlayerFromNick", CLuaFunctionDefs::GetPlayerFromName );
     CLuaCFunctions::AddFunction ( "getPlayerFromName", CLuaFunctionDefs::GetPlayerFromName );
+    CLuaCFunctions::AddFunction ( "isPlayerHudComponentVisible", CLuaFunctionDefs::IsPlayerHudComponentVisible );
     CLuaCFunctions::AddFunction ( "getPlayerMoney", CLuaFunctionDefs::GetPlayerMoney );   
     CLuaCFunctions::AddFunction ( "getPlayerWantedLevel", CLuaFunctionDefs::GetPlayerWantedLevel ); 
 
     // Player set funcs
     CLuaCFunctions::AddFunction ( "showPlayerHudComponent", CLuaFunctionDefs::ShowPlayerHudComponent );
+    CLuaCFunctions::AddFunction ( "setPlayerHudComponentVisible", CLuaFunctionDefs::ShowPlayerHudComponent );
     CLuaCFunctions::AddFunction ( "setPlayerMoney", CLuaFunctionDefs::SetPlayerMoney );
     CLuaCFunctions::AddFunction ( "givePlayerMoney", CLuaFunctionDefs::GivePlayerMoney );
     CLuaCFunctions::AddFunction ( "takePlayerMoney", CLuaFunctionDefs::TakePlayerMoney );

@@ -284,6 +284,32 @@ int CLuaFunctionDefs::ShowPlayerHudComponent ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::IsPlayerHudComponentVisible ( lua_State* luaVM )
+{
+//  bool isPlayerHudComponentVisible ( string componen )
+    eHudComponent component;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( component );
+
+    if ( !argStream.HasErrors () )
+    {
+        bool bIsVisible;
+        if ( CStaticFunctionDefinitions::IsPlayerHudComponentVisible ( component, bIsVisible ) )
+        {
+            lua_pushboolean ( luaVM, bIsVisible );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::SetPlayerMoney ( lua_State* luaVM )
 {
 //  bool setPlayerMoney ( int amount )

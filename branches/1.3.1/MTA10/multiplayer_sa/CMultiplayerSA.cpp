@@ -1523,12 +1523,6 @@ void CMultiplayerSA::DisableAllVehicleWeapons ( bool bDisable )
         MemPut < BYTE > ( 0x6E3950, 0x83 );
 }
 
-void CMultiplayerSA::DisableZoneNames ( bool bDisabled )
-{
-    // Please use CHud::DisableAreaName instead
-    pGameInterface->GetHud()->DisableAreaName ( bDisabled );
-}
-
 void CMultiplayerSA::DisableBirds ( bool bDisabled )
 {
     if ( bDisabled )
