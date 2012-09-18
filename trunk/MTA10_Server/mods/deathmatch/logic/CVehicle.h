@@ -266,7 +266,7 @@ public:
     void                            GetInitialDoorStates    ( SFixedArray < unsigned char, MAX_DOORS >& ucOutDoorStates );
 
     inline CPlayer *                GetJackingPlayer        ( void )                        { return m_pJackingPlayer; }
-    inline void                     SetJackingPlayer        ( CPlayer * pPlayer )           { m_pJackingPlayer = pPlayer; }
+    void                            SetJackingPlayer        ( CPlayer * pPlayer );
 
     inline bool                     IsInWater               ( void )                        { return m_bInWater; }
     inline void                     SetInWater              ( bool bInWater )               { m_bInWater = bInWater; }

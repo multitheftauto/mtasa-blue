@@ -868,3 +868,24 @@ bool CVehicle::IsStationary ( void )
     m_vecStationaryCheckPosition = vecPosition;
     return false;
 }
+
+
+void CVehicle::SetJackingPlayer ( CPlayer* pPlayer )
+{
+    if ( pPlayer == m_pJackingPlayer )
+        return;
+
+    // Remove old
+    if ( m_pJackingPlayer )
+    {
+        CPlayer* pPrev = m_pJackingPlayer;
+        m_pJackingPlayer = NULL;
+        pPrev->SetJackingVehicle ( NULL );
+    }
+
+    // Set new
+    m_pJackingPlayer = pPlayer;
+
+    if ( m_pJackingPlayer )
+        m_pJackingPlayer->SetJackingVehicle ( this );
+}
