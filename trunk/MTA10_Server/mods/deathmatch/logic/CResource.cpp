@@ -579,8 +579,8 @@ bool CResource::GenerateChecksums ( void )
                 case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
                 {
                     SString strCachedFilePath = pResourceFile->GetCachedPathFilename ();
-                    unsigned long ulCachedFileCRC = CRCGenerator::GetCRCFromFile ( strCachedFilePath );
-                    if ( checksum.ulCRC != ulCachedFileCRC )
+                    CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFile ( strCachedFilePath );
+                    if ( checksum != cachedChecksum )
                     {
                         if ( !FileSave ( strCachedFilePath, pFileContents, uiFileSize ) )
                         {
@@ -674,11 +674,22 @@ void CResource::LogUpgradeWarnings ( void )
         SString strReason = SString ( "WARNING: %s will not start as %s\n", m_strResourceName.c_str (), *strStatus );
         CLogger::LogPrint ( strReason );
     }
+    else
+    if ( !strStatus.empty () )
+    {
+        SString strReason = SString ( "WARNING: %s requires upgrade as %s\n", m_strResourceName.c_str (), *strStatus );
+        CLogger::LogPrint ( strReason );
+        CLogger::LogPrintf ( "Use the 'upgrade' command to perform a basic upgrade of resources.\n" );
+    }
 }
 
 
 //
 // Determine outcome of version rules
+//
+// Fatal error: Returns false with error message in strOutStatus 
+// Warning:     Returns true with warning message in strOutStatus 
+// Ok:          Returns true with no message in strOutStatus
 //
 bool CResource::GetCompatibilityStatus ( SString& strOutStatus )
 {
@@ -705,14 +716,17 @@ bool CResource::GetCompatibilityStatus ( SString& strOutStatus )
     }
 
     // Check if calculated version is higher than declared version
-    if ( m_strMinClientReqFromSource > m_strMinClientReqFromMetaXml || m_strMinServerReqFromSource > m_strMinServerReqFromMetaXml )
+    if ( m_strMinClientReqFromSource > m_strMinClientReqFromMetaXml )
     {
         strOutStatus = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
-        if ( !m_strMinClientReqFromSource.empty () )
-            strOutStatus += SString ( "client %s because of '%s')", *m_strMinClientReqFromSource, *m_strMinClientReason );
-        else
-            strOutStatus += SString ( "server %s because of '%s')", *m_strMinServerReqFromSource, *m_strMinServerReason );
-        return false;
+        strOutStatus += SString ( "client %s because of '%s')", *m_strMinClientReqFromSource, *m_strMinClientReason );
+        m_strMinClientReqFromMetaXml = m_strMinClientReqFromSource;         // Apply higher version requirement
+    }
+    else
+    if ( m_strMinServerReqFromSource > m_strMinServerReqFromMetaXml )
+    {
+        strOutStatus = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
+        strOutStatus += SString ( "server %s because of '%s')", *m_strMinServerReqFromSource, *m_strMinServerReason );
     }
 
     // See if any connected client are below min requirements
@@ -724,7 +738,7 @@ bool CResource::GetCompatibilityStatus ( SString& strOutStatus )
 
         if ( uiNumIncompatiblePlayers > 0 )
         {
-            strOutStatus += SString ( "%d connected player(s) below required client version %s", uiNumIncompatiblePlayers, *m_strMinClientReqFromMetaXml );
+            strOutStatus = SString ( "%d connected player(s) below required client version %s", uiNumIncompatiblePlayers, *m_strMinClientReqFromMetaXml );
             return false;
         }
     }
@@ -760,6 +774,14 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
             CLogger::LogPrint ( m_strFailureReason );
             return false;
         }
+        else
+        if ( !strStatus.empty () )
+        {
+            SString strReason = SString ( "WARNING: %s requires upgrade as %s\n", m_strResourceName.c_str (), *strStatus );
+            CLogger::LogPrint ( strReason );
+            CLogger::LogPrintf ( "Use the 'upgrade' command to perform a basic upgrade of resources.\n" );
+        }
+
 
         m_bStarting = true;
 

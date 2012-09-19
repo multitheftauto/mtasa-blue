@@ -66,8 +66,18 @@ void CResourceChecker::CheckResourceForIssues( CResource* pResource, const strin
                 else
                     continue;
 
-                CheckFileForIssues ( strPath, pResourceFile->GetName(), pResource->GetName (), bScript, bClient );
+                CheckFileForIssues ( strPath, pResourceFile->GetName(), pResource->GetName (), bScript, bClient, false );
             }
+        }
+    }
+
+    // Also check meta.xml
+    {
+        SString strFilename = "meta.xml";
+        string strPath;
+        if ( pResource->GetFilePath ( strFilename, strPath ) )
+        {
+            CheckFileForIssues ( strPath, strFilename, pResource->GetName (), false, false, true );
         }
     }
 
@@ -137,11 +147,16 @@ void CResourceChecker::CheckResourceForIssues( CResource* pResource, const strin
 // Check one file for any issues that may need to be logged at the server.
 //
 ///////////////////////////////////////////////////////////////
-void CResourceChecker::CheckFileForIssues ( const string& strPath, const string& strFileName, const string& strResourceName, bool bScript, bool bClient )
+void CResourceChecker::CheckFileForIssues ( const string& strPath, const string& strFileName, const string& strResourceName, bool bScript, bool bClient, bool bMeta )
 {
     if ( bScript )
     {
         CheckLuaFileForIssues( strPath, strFileName, strResourceName, bClient );
+    }
+    else
+    if ( bMeta )
+    {
+        CheckMetaFileForIssues( strPath, strFileName, strResourceName );
     }
     else
     {
@@ -247,6 +262,129 @@ void CResourceChecker::CheckRwFileForIssues ( const string& strPath, const strin
 
 ///////////////////////////////////////////////////////////////
 //
+// CResourceChecker::CheckMetaFileForIssues
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CResourceChecker::CheckMetaFileForIssues ( const string& strPath, const string& strFileName, const string& strResourceName )
+{
+    // Load the meta file
+    CXMLFile* metaFile = g_pServerInterface->GetXML ()->CreateXML ( strPath.c_str() );
+    if ( !metaFile )
+        return;
+
+    CXMLNode* pRootNode = metaFile->Parse () ? metaFile->GetRootNode () : NULL;
+    if ( !pRootNode )
+    {
+        delete metaFile;
+        return;
+    }
+
+    // Ouput warnings...
+    if ( m_bUpgradeScripts == false )
+    {
+        CheckMetaSourceForIssues ( pRootNode, strFileName, strResourceName, ECheckerMode::WARNINGS );
+    }
+    else
+    // ..or do an upgrade
+    if ( m_bUpgradeScripts == true )
+    {
+        bool bHasChanged = false;
+        CheckMetaSourceForIssues ( pRootNode, strFileName, strResourceName, ECheckerMode::UPGRADE, &bHasChanged );
+
+        // Has contents changed?
+        if ( bHasChanged )
+        {
+            // Rename original to xml.old
+            if( !RenameBackupFile( strPath, ".old" ) )
+                return;
+
+            // Save new content
+            metaFile->Write ();
+            CLogger::LogPrintf ( "Upgrading %s:%s ...........done\n", strResourceName.c_str (), strFileName.c_str () );
+
+            m_upgradedFullPathList.push_back( strPath );
+        }
+    }
+
+    delete metaFile;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CResourceChecker::CheckMetaSourceForIssues
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CResourceChecker::CheckMetaSourceForIssues ( CXMLNode* pRootNode, const string& strFileName, const string& strResourceName, ECheckerModeType checkerMode, bool* pbOutHasChanged )
+{
+    // Find the client and server version requirements
+    bool bUsesBoth = false;
+    SString strMinClientReqFromMetaXml = "";
+    SString strMinServerReqFromMetaXml = "";
+    CXMLNode* pNodeMinMtaVersion = pRootNode->FindSubNode ( "min_mta_version", 0 );
+
+    if ( pNodeMinMtaVersion )
+    {
+        if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "server" ) )
+            strMinServerReqFromMetaXml = pAttr->GetValue ();
+        if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "client" ) )
+            strMinClientReqFromMetaXml = pAttr->GetValue ();
+        if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "both" ) )
+            strMinServerReqFromMetaXml = strMinClientReqFromMetaXml = pAttr->GetValue ();
+    }
+
+    // Is it right?
+    if ( m_strReqClientVersion > strMinClientReqFromMetaXml || m_strReqServerVersion > strMinServerReqFromMetaXml )
+    {
+        // It's not right. What to do?
+        if ( checkerMode == ECheckerMode::WARNINGS )
+        {
+            SString strTemp = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
+            if ( m_strReqClientVersion > strMinClientReqFromMetaXml )
+                strTemp += SString ( "client %s because of '%s')", *m_strReqClientVersion, *m_strReqClientReason );
+            else
+            if ( m_strReqServerVersion > strMinServerReqFromMetaXml )
+                strTemp += SString ( "server %s because of '%s')", *m_strReqServerVersion, *m_strReqServerReason );
+
+            CLogger::LogPrint ( SString ( "WARNING: %s %s\n", strResourceName.c_str (), *strTemp ) );
+        }
+        else
+        if ( checkerMode == ECheckerMode::UPGRADE )
+        {
+            // Create min_mta_version node if required
+            if ( !pNodeMinMtaVersion )
+                pNodeMinMtaVersion = pRootNode->CreateSubNode ( "min_mta_version" );
+
+            CXMLAttributes& attributes = pNodeMinMtaVersion->GetAttributes ();
+            attributes.Delete ( "server" );
+            attributes.Delete ( "client" );
+            attributes.Delete ( "both" );
+
+            if ( !m_strReqServerVersion.empty () )
+            {
+                CXMLAttribute* pAttr = attributes.Create ( "server" );
+                pAttr->SetValue ( m_strReqServerVersion );
+            }
+
+            if ( !m_strReqClientVersion.empty () )
+            {
+                CXMLAttribute* pAttr = attributes.Create ( "client" );
+                pAttr->SetValue ( m_strReqClientVersion );
+            }
+
+            if ( pbOutHasChanged )
+                *pbOutHasChanged = true;
+        }
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CResourceChecker::CheckLuaFileForIssues
 //
 //
@@ -272,14 +410,14 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
     // Ouput warnings...
     if ( m_bUpgradeScripts == false )
     {
-        CheckLuaSourceForIssues ( strFileContents, strFileName, strResourceName, bClientScript, bCompiledScript, "Warnings" );
+        CheckLuaSourceForIssues ( strFileContents, strFileName, strResourceName, bClientScript, bCompiledScript, ECheckerMode::WARNINGS );
     }
     else
     // ..or do an upgrade (if not compiled)
     if ( m_bUpgradeScripts == true && !bCompiledScript )
     {
         string strNewFileContents;
-        CheckLuaSourceForIssues ( strFileContents, strFileName, strResourceName, bClientScript, bCompiledScript, "Upgrade", &strNewFileContents );
+        CheckLuaSourceForIssues ( strFileContents, strFileName, strResourceName, bClientScript, bCompiledScript, ECheckerMode::UPGRADE, &strNewFileContents );
 
         // Has contents changed?
         if ( strNewFileContents.length () > 0 && strNewFileContents != strFileContents )
@@ -310,7 +448,7 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
 // Note: Ignores quotes
 //
 ///////////////////////////////////////////////////////////////
-void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const string& strFileName, const string& strResourceName, bool bClientScript, bool bCompiledScript, const string& strMode, string* pstrOutResult )
+void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const string& strFileName, const string& strResourceName, bool bClientScript, bool bCompiledScript, ECheckerModeType checkerMode, string* pstrOutResult )
 {
     CHashMap < SString, long > doneWarningMap;
     long lLineNumber = 1;
@@ -337,7 +475,7 @@ void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const stri
         if ( strLuaSource.length () != strUTFScript.size() )
         {
             // In-place upgrade...
-            if ( strMode == "Upgrade" )
+            if ( checkerMode == ECheckerMode::UPGRADE )
             {
                 // Upgrade only if there is no problem ( setlocale() issue? )
                 if ( strUTF16Script != L"?" )
@@ -346,7 +484,7 @@ void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const stri
                     strLuaSource = "\xEF\xBB\xBF" + strUTFScript;
                 }
             }
-            if ( strMode == "Warnings" )
+            if ( checkerMode == ECheckerMode::WARNINGS )
             {
                 m_ulDeprecatedWarningCount++;
                 CLogger::LogPrintf ( "WARNING: %s/%s [%s] is encoded in ANSI instead of UTF-8.  Please convert your file to UTF-8.\n", strResourceName.c_str (), strFileName.c_str (), bClientScript ? "Client" : "Server" );
@@ -369,7 +507,7 @@ void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const stri
         string strIdentifierName( strLuaSource.c_str () + lNameOffset, lNameLength );
 
         // In-place upgrade...
-        if ( strMode == "Upgrade" )
+        if ( checkerMode == ECheckerMode::UPGRADE )
         {
             assert ( !bCompiledScript );
 
@@ -385,10 +523,11 @@ void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const stri
 
                 lPos += -lNameLength + strUpgraded.length ();
             }
+            CheckVersionRequirements ( strIdentifierName, bClientScript );
         }
 
         // Log warnings...
-        if ( strMode == "Warnings" )
+        if ( checkerMode == ECheckerMode::WARNINGS )
         {
             // Only do the identifier once per file
             if ( doneWarningMap.find ( strIdentifierName ) == doneWarningMap.end () )
@@ -501,16 +640,13 @@ long CResourceChecker::FindLuaIdentifier ( const char* szLuaSource, long* plOutL
 ///////////////////////////////////////////////////////////////
 bool CResourceChecker::UpgradeLuaFunctionName ( const string& strFunctionName, bool bClientScript, string& strOutUpgraded )
 {
-    string strWhat;
     string strHow;
+    ECheckerWhatType what = GetLuaFunctionNameUpgradeInfo ( strFunctionName, bClientScript, strHow );
 
-    if ( GetLuaFunctionNameUpgradeInfo ( strFunctionName, bClientScript, strWhat, strHow ) )
+    if ( what == ECheckerWhat::REPLACED )
     {
-        if ( strWhat == "Replaced" )
-        {
-            strOutUpgraded = strHow;
-            return true;
-        }
+        strOutUpgraded = strHow;
+        return true;
     }
 
     return false;
@@ -526,29 +662,25 @@ bool CResourceChecker::UpgradeLuaFunctionName ( const string& strFunctionName, b
 ///////////////////////////////////////////////////////////////
 void CResourceChecker::IssueLuaFunctionNameWarnings ( const string& strFunctionName, const string& strFileName, const string& strResourceName, bool bClientScript, unsigned long ulLineNumber )
 {
-    string strWhat;
     string strHow;
+    ECheckerWhatType what = GetLuaFunctionNameUpgradeInfo ( strFunctionName, bClientScript, strHow );
 
-    if ( GetLuaFunctionNameUpgradeInfo ( strFunctionName, bClientScript, strWhat, strHow ) )
+    if ( what == ECheckerWhat::NONE )
+        return;
+
+    SString strTemp;
+    if ( what == ECheckerWhat::REPLACED )
     {
-        SString strTemp;
-        if ( strWhat == "Replaced" )
-        {
-            m_ulDeprecatedWarningCount++;
-            strTemp.Format ( "%s is deprecated and may not work in future versions. Please replace with %s%s.", strFunctionName.c_str (), strHow.c_str (), (GetTickCount32()/60000)%7 ? "" : " before Tuesday" );
-        }
-        else
-        if ( strWhat == "Removed" )
-        {
-            strTemp.Format ( "%s no longer works. %s", strFunctionName.c_str (), strHow.c_str () );
-        }
-        else
-        {
-            strTemp.Format ( "%s - %s", strFunctionName.c_str (), strHow.c_str () );
-        }
-
-        CLogger::LogPrint ( SString ( "WARNING: %s/%s(Line %lu) [%s] %s\n", strResourceName.c_str (), strFileName.c_str (), ulLineNumber, bClientScript ? "Client" : "Server", *strTemp ) );
+        m_ulDeprecatedWarningCount++;
+        strTemp.Format ( "%s is deprecated and may not work in future versions. Please replace with %s%s.", strFunctionName.c_str (), strHow.c_str (), (GetTickCount32()/60000)%7 ? "" : " before Tuesday" );
     }
+    else
+    if ( what == ECheckerWhat::REMOVED )
+    {
+        strTemp.Format ( "%s no longer works. %s", strFunctionName.c_str (), strHow.c_str () );
+    }
+
+    CLogger::LogPrint ( SString ( "WARNING: %s/%s(Line %lu) [%s] %s\n", strResourceName.c_str (), strFileName.c_str (), ulLineNumber, bClientScript ? "Client" : "Server", *strTemp ) );
 }
 
 
@@ -559,7 +691,7 @@ void CResourceChecker::IssueLuaFunctionNameWarnings ( const string& strFunctionN
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunctionName, bool bClientScript, string& strOutWhat, string& strOutHow )
+ECheckerWhatType CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunctionName, bool bClientScript, string& strOutHow )
 {
     static CHashMap < SString, SDeprecatedItem* > clientUpgradeInfoMap;
     static CHashMap < SString, SDeprecatedItem* > serverUpgradeInfoMap;
@@ -577,11 +709,10 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
     // Query the correct map
     SDeprecatedItem* pItem = MapFindRef ( bClientScript ? clientUpgradeInfoMap : serverUpgradeInfoMap, strFunctionName );
     if ( !pItem )
-        return false;     // Nothing found
+        return ECheckerWhat::NONE;     // Nothing found
 
     strOutHow = pItem->strNewName;
-    strOutWhat = pItem->bRemoved ? "Removed" : "Replaced";
-    return true;
+    return pItem->bRemoved ? ECheckerWhat::REMOVED : ECheckerWhat::REPLACED;
 }
 
 
@@ -595,8 +726,8 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
 ///////////////////////////////////////////////////////////////
 void CResourceChecker::CheckVersionRequirements ( const string& strIdentifierName, bool bClientScript )
 {
-    if ( MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE )
-        return;
+//    if ( MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE )
+//        return;
 
     static CHashMap < SString, SString > clientFunctionMap;
     static CHashMap < SString, SString > serverFunctionMap;

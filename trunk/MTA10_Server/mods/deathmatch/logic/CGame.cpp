@@ -4114,6 +4114,8 @@ SString CGame::CalculateMinClientRequirement ( void )
         m_strPrevMinClientConnectRequirement = strNewMin;
         if ( !strNewMin.empty () )
             CLogger::LogPrintf ( SString ( "Server minclientversion is now %s\n", *strNewMin ) );
+        else
+            CLogger::LogPrintf ( "Server minclientversion is now cleared\n" );
     }
 
     // Do kick check as well
