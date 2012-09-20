@@ -111,6 +111,8 @@ namespace
                                          { "fileCopy",                      "1.3.0-9.04584" },
                                          { "setWaterDrawnLast",             "1.3.0-9.04584" },
                                          { "isWaterDrawnLast",              "1.3.0-9.04584" },
+                                         { "setPlayerHudComponentVisible",  "1.3.1-9.04690" },
+                                         { "isPlayerHudComponentVisible",   "1.3.1-9.04690" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
