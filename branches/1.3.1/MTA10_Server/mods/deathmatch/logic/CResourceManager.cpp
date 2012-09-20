@@ -67,7 +67,7 @@ CResourceManager::~CResourceManager ( void )
 // Load the complete list of resources and create their objects
 // DOES NOT reload already loaded resources, we need a special function for lua for that (e.g. reloadResource)
 // Talidan: yes it did, noob.  Not as of r897 - use bRefreshAll to do already loaded resources.
-bool CResourceManager::Refresh ( bool bRefreshAll )
+bool CResourceManager::Refresh ( bool bRefreshAll, const SString& strJustThisResource )
 {
     UnloadRemovedResources();
 
@@ -116,7 +116,8 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
             // Ignore items that have dot or space in the name
             if ( strName.Contains ( "." ) || strName.Contains ( " " ) )
             {
-                CLogger::LogPrintf ( "WARNING: Not loading resource '%s' as it contains illegal characters\n", *strName );
+                if ( strJustThisResource.empty () )
+                    CLogger::LogPrintf ( "WARNING: Not loading resource '%s' as it contains illegal characters\n", *strName );
                 continue;
             }
 
@@ -163,6 +164,9 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
     for ( std::map < SString, SResInfo >::const_iterator iter = resInfoMap.begin () ; iter != resInfoMap.end () ; ++iter )
     {
         const SResInfo& info = iter->second;
+        if ( !strJustThisResource.empty () && strJustThisResource != info.strName )
+            continue;
+
         if ( !info.bPathIssue )
         {
             CResource* pResource = GetResource ( info.strName );
@@ -185,6 +189,9 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
     for ( std::map < SString, SResInfo >::const_iterator iter = resInfoMap.begin () ; iter != resInfoMap.end () ; ++iter )
     {
         const SResInfo& info = iter->second;
+        if ( !strJustThisResource.empty () && strJustThisResource != info.strName )
+            continue;
+
         if ( info.bPathIssue )
         {
             CLogger::ErrorPrintf ( "Not processing resource '%s' as it has duplicates on different paths:\n", *info.strName );
@@ -220,18 +227,33 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
     return true;
 }
 
-void CResourceManager::UpgradeAll ( void )
+
+void CResourceManager::UpgradeResources ( CResource* pResource )
 {
     // Modify source files if needed
-    for ( list < CResource* > ::const_iterator iter = m_resources.begin () ; iter != m_resources.end (); iter++ )
-        (*iter)->ApplyUpgradeModifications ();
+    if ( pResource )
+    {
+        pResource->ApplyUpgradeModifications ();
+    }
+    else
+    {
+        for ( list < CResource* > ::const_iterator iter = m_resources.begin () ; iter != m_resources.end (); iter++ )
+            (*iter)->ApplyUpgradeModifications ();
+    }
 }
 
-void CResourceManager::CheckAll ( void )
+void CResourceManager::CheckResources ( CResource* pResource )
 {
-    // Check all resources for deprecated functions and MTA version issues
-    for ( list < CResource* > ::const_iterator iter = m_resources.begin () ; iter != m_resources.end (); iter++ )
-        (*iter)->LogUpgradeWarnings ();
+    // Check all resource(s) for deprecated functions and MTA version issues
+    if ( pResource )
+    {
+        pResource->LogUpgradeWarnings ();
+    }
+    else
+    {
+        for ( list < CResource* > ::const_iterator iter = m_resources.begin () ; iter != m_resources.end (); iter++ )
+            (*iter)->LogUpgradeWarnings ();
+    }
 }
 
 const char* CResourceManager::GetResourceDirectory ( void )

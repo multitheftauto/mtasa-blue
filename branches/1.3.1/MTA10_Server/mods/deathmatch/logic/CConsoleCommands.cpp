@@ -280,19 +280,66 @@ bool CConsoleCommands::UpgradeResources ( CConsole* pConsole, const char* szArgu
     // To work on remote clients, 'upgrade' needs ACL entry + console capture
     if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
         return false;
-    g_pGame->GetResourceManager ()->UpgradeAll ();
-    pEchoClient->SendEcho ( "Upgrade completed. Refreshing all resources..." );
-    g_pGame->GetResourceManager ()->Refresh ( true );
+
+    if ( szArguments && szArguments[0] )
+    {
+        if ( SStringX ( "all" ) == szArguments )
+        {
+            pEchoClient->SendConsole ( "Upgrading all resources..." );
+            g_pGame->GetResourceManager ()->UpgradeResources ();
+            pEchoClient->SendEcho ( "Upgrade completed. Refreshing all resources..." );
+            g_pGame->GetResourceManager ()->Refresh ( true );
+        }
+        else
+        {
+            CResource * resource = g_pGame->GetResourceManager()->GetResource ( szArguments );
+            if ( resource )
+            {
+                g_pGame->GetResourceManager ()->UpgradeResources ( resource );
+                g_pGame->GetResourceManager ()->Refresh ( true, resource->GetName () );
+                pEchoClient->SendEcho ( "Upgrade completed." );
+            }
+            else
+                pEchoClient->SendConsole ( SString ( "upgrade: Resource '%s' could not be found", szArguments ) );
+        }
+    }
+    else
+    {
+        pEchoClient->SendConsole ( "* Syntax: upgrade <resource-name> | all" );
+    }
     return true;
 }
 
-bool CConsoleCommands::CheckAllResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+bool CConsoleCommands::CheckResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    // To work on remote clients, 'checkall' needs ACL entry + console capture
+    // To work on remote clients, 'check' needs ACL entry + console capture
     if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
         return false;
-    g_pGame->GetResourceManager ()->CheckAll ();
-    pEchoClient->SendEcho ( "Check completed" );
+
+    if ( szArguments && szArguments[0] )
+    {
+        if ( SStringX ( "all" ) == szArguments )
+        {
+            pEchoClient->SendConsole ( "Checking all resources..." );
+            g_pGame->GetResourceManager ()->CheckResources ();
+            pEchoClient->SendEcho ( "Check completed" );
+        }
+        else
+        {
+            CResource * resource = g_pGame->GetResourceManager()->GetResource ( szArguments );
+            if ( resource )
+            {
+                g_pGame->GetResourceManager ()->CheckResources ( resource );
+                pEchoClient->SendEcho ( "Check completed" );
+            }
+            else
+                pEchoClient->SendConsole ( SString ( "check: Resource '%s' could not be found", szArguments ) );
+        }
+    }
+    else
+    {
+        pEchoClient->SendConsole ( "* Syntax: check <resource-name> | all" );
+    }
     return true;
 }
 
