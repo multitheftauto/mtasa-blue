@@ -100,17 +100,6 @@ void CClientProjectileManager::RemoveFromList ( CClientProjectile* pProjectile )
 }
 
 
-void CClientProjectileManager::OnInitiate ( CClientProjectile * pProjectile )
-{
-    // Do we have a handler for this event?
-    if ( m_pInitiateHandler )
-    {
-        // Call it
-        (*m_pInitiateHandler) ( pProjectile );
-    }
-}
-
-
 bool CClientProjectileManager::Hook_StaticProjectileAllow ( CEntity * pGameCreator, eWeaponType weaponType, CVector * origin, float fForce, CVector * target, CEntity * targetEntity )
 {
     return g_pProjectileManager->Hook_ProjectileAllow ( pGameCreator, weaponType, origin, fForce, target, targetEntity );

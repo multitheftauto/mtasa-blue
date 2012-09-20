@@ -261,7 +261,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetGameEntityRenderHandler( CClientGame::StaticGameEntityRenderHandler );
     g_pGame->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pGame->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
-    m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( CClientGame::StaticKeyStrokeHandler );
     g_pCore->GetKeyBinds ()->SetCharacterKeyHandler ( CClientGame::StaticCharacterKeyHandler );
@@ -409,7 +408,6 @@ CClientGame::~CClientGame ( void )
     g_pGame->SetPreWeaponFireHandler ( NULL );
     g_pGame->SetPostWeaponFireHandler ( NULL );
     g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
-    m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( NULL );
     g_pCore->GetKeyBinds ()->SetCharacterKeyHandler ( NULL );
@@ -3520,11 +3518,6 @@ bool CClientGame::StaticDamageHandler ( CPed* pDamagePed, CEventDamage * pEvent 
 void CClientGame::StaticFireHandler ( CFire* pFire )
 {
     g_pClientGame->FireHandler ( pFire );
-}
-
-void CClientGame::StaticProjectileInitiateHandler ( CClientProjectile * pProjectile )
-{
-    g_pClientGame->ProjectileInitiateHandler ( pProjectile );
 }
 
 void CClientGame::StaticRender3DStuffHandler ( void )
