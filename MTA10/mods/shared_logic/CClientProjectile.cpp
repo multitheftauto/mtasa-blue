@@ -119,8 +119,9 @@ void CClientProjectile::DoPulse ( void )
             if ( m_pInitiateData->usModel ) SetModel ( m_pInitiateData->usModel );
         }
 
-        // Let our manager know we've been initiated
-        m_pProjectileManager->OnInitiate ( this );             
+        // Handle net sync and script event
+        g_pClientGame->ProjectileInitiateHandler ( this );
+
         m_bInitiate = false;
     }
 
