@@ -1646,17 +1646,16 @@ float CMultiplayerSA::GetFarClipDistance ( )
 
 void CMultiplayerSA::SetFarClipDistance ( float fDistance )
 {
-    MemPut < BYTE > ( 0x55FCC8, 0xDD );
-    MemPut < BYTE > ( 0x55FCC9, 0xD8 );
-    MemPut < BYTE > ( 0x55FCCA, 0x90 );
-
-    MemPut < BYTE > ( 0x5613A3, 0xDD );
-    MemPut < BYTE > ( 0x5613A4, 0xD8 );
-    MemPut < BYTE > ( 0x5613A5, 0x90 );
-
-    MemPut < BYTE > ( 0x560A23, 0xDD );
-    MemPut < BYTE > ( 0x560A24, 0xD8 );
-    MemPut < BYTE > ( 0x560A25, 0x90 );
+    BYTE newFstp[3] = {0xDD, 0xD8, 0x90};
+    if ( *(BYTE*)0x55FCC8 != newFstp[0] )
+    {
+        MemCpy ( (LPVOID)0x55FCC8, &newFstp, 3 );
+        MemCpy ( (LPVOID)0x5613A3, &newFstp, 3 );
+        MemCpy ( (LPVOID)0x560A23, &newFstp, 3 );
+        MemCpy ( (LPVOID)0x560D3B, &newFstp, 3 );
+        MemCpy ( (LPVOID)0x560EDD, &newFstp, 3 );
+        MemCpy ( (LPVOID)0x560F18, &newFstp, 3 );
+    }
 
     MemPutFast < float > ( 0xB7C4F0, fDistance );
 }
@@ -1664,10 +1663,15 @@ void CMultiplayerSA::SetFarClipDistance ( float fDistance )
 void CMultiplayerSA::RestoreFarClipDistance ( )
 {
     BYTE originalFstp[3] = {0xD9, 0x5E, 0x50};
-
-    MemCpy ( (LPVOID)0x55FCC8, &originalFstp, 3 );
-    MemCpy ( (LPVOID)0x5613A3, &originalFstp, 3 );
-    MemCpy ( (LPVOID)0x560A23, &originalFstp, 3 );
+    if ( *(BYTE*)0x55FCC8 != originalFstp[0] )
+    {
+        MemCpy ( (LPVOID)0x55FCC8, &originalFstp, 3 );
+        MemCpy ( (LPVOID)0x5613A3, &originalFstp, 3 );
+        MemCpy ( (LPVOID)0x560A23, &originalFstp, 3 );
+        MemCpy ( (LPVOID)0x560D3B, &originalFstp, 3 );
+        MemCpy ( (LPVOID)0x560EDD, &originalFstp, 3 );
+        MemCpy ( (LPVOID)0x560F18, &originalFstp, 3 );
+    }
 }
 
 float CMultiplayerSA::GetFogDistance ( )
