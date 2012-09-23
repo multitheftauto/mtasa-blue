@@ -2463,7 +2463,6 @@ void CClientVehicle::Create ( void )
                 // # prefix means hidden by default.
                 if ( (*iter).first[0] == '#' )
                 {
-                    g_pCore->GetConsole()->Printf("Hidden");
                     SetComponentVisible ( (*iter).first, false );
                 }
             }
