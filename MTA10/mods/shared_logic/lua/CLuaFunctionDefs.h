@@ -523,6 +523,8 @@ public:
     LUA_DECLARE ( GetVehicleComponentRotation );
     LUA_DECLARE ( ResetVehicleComponentPosition );
     LUA_DECLARE ( ResetVehicleComponentRotation );
+    LUA_DECLARE ( SetVehicleComponentVisible );
+    LUA_DECLARE ( GetVehicleComponentVisible );
 
     // Drawing funcs (low-level)
     LUA_DECLARE ( dxDrawLine );

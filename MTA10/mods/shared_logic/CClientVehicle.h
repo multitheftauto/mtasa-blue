@@ -91,7 +91,22 @@ struct SLastSyncedVehData
     bool                bDerailed;
     bool                bIsInWater;
 };
-
+struct SVehicleComponentData
+{
+    SVehicleComponentData ()
+    {
+        m_bPositionChanged = false;
+        m_bRotationChanged = false;
+        m_bVisible = true;
+    }
+    CVector m_vecComponentPosition;
+    CVector m_vecComponentRotation;
+    CVector m_vecOriginalComponentPosition;
+    CVector m_vecOriginalComponentRotation;
+    bool m_bPositionChanged;
+    bool m_bRotationChanged;
+    bool m_bVisible;
+};
 class CClientProjectile;
 
 class CClientVehicle : public CClientStreamElement
@@ -417,13 +432,17 @@ public:
     void                        SetVehicleFlags             ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent );
     void                        RemoveVehicleSirens         ( void );
 
-    bool                        ResetComponentPosition  ( eVehicleComponent vehicleComponent );
-    bool                        SetComponentPosition    ( eVehicleComponent vehicleComponent, CVector vecPosition );
-    bool                        GetComponentPosition    ( eVehicleComponent vehicleComponent, CVector &vecPosition );
+    bool                        ResetComponentPosition  ( SString vehicleComponent );
+    bool                        SetComponentPosition    ( SString vehicleComponent, CVector vecPosition );
+    bool                        GetComponentPosition    ( SString vehicleComponent, CVector &vecPosition );
     
-    bool                        ResetComponentRotation  ( eVehicleComponent vehicleComponent );
-    bool                        SetComponentRotation    ( eVehicleComponent vehicleComponent, CVector vecRotation );
-    bool                        GetComponentRotation    ( eVehicleComponent vehicleComponent, CVector &vecRotation );
+    bool                        ResetComponentRotation  ( SString vehicleComponent );
+    bool                        SetComponentRotation    ( SString vehicleComponent, CVector vecRotation );
+    bool                        GetComponentRotation    ( SString vehicleComponent, CVector &vecRotation );
+
+    bool                        SetComponentVisible     ( SString vehicleComponent, bool bVisible );
+    bool                        GetComponentVisible     ( SString vehicleComponent, bool &bVisible );
+
 protected:
     void                        StreamIn                ( bool bInstantly );
     void                        StreamOut               ( void );
@@ -436,6 +455,8 @@ protected:
 
     void                        StreamedInPulse         ( void );
     void                        Dump                    ( FILE* pFile, bool bDumpDetails, unsigned int uiIndex );
+    eVehicleComponent           ConvertStringToEnum     ( SString strInput );
+    SString                     ConvertEnumToString     ( eVehicleComponent strInput );
 
     class CClientObjectManager* m_pObjectManager;
     CClientVehicleManager*      m_pVehicleManager;
@@ -588,12 +609,8 @@ public:
 #endif
     SLastSyncedVehData*         m_LastSyncedData;
     SSirenInfo                  m_tSirenBeaconInfo;
-    CVector                     m_vecComponentPositions[VEHICLE_COMPONENT_MAX];
-    CVector                     m_vecComponentRotations[VEHICLE_COMPONENT_MAX];
-    CVector                     m_vecOriginalComponentPositions[VEHICLE_COMPONENT_MAX];
-    CVector                     m_vecOriginalComponentRotations[VEHICLE_COMPONENT_MAX];
-    bool                        m_bPositionsChanged[VEHICLE_COMPONENT_MAX];
-    bool                        m_bRotationsChanged[VEHICLE_COMPONENT_MAX];
+    std::map<SString, SVehicleComponentData>  m_ComponentData;
+
 };
 
 #endif
