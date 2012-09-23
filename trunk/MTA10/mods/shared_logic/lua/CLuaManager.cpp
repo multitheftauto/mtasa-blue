@@ -578,6 +578,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getVehicleComponentRotation", CLuaFunctionDefs::GetVehicleComponentRotation );
     CLuaCFunctions::AddFunction ( "resetVehicleComponentPosition", CLuaFunctionDefs::ResetVehicleComponentPosition );
     CLuaCFunctions::AddFunction ( "resetVehicleComponentRotation", CLuaFunctionDefs::ResetVehicleComponentRotation );
+    CLuaCFunctions::AddFunction ( "setVehicleComponentVisible", CLuaFunctionDefs::SetVehicleComponentVisible );
+    CLuaCFunctions::AddFunction ( "getVehicleComponentVisible", CLuaFunctionDefs::GetVehicleComponentVisible );
 
     // Object create/destroy funcs
     CLuaCFunctions::AddFunction ( "createObject", CLuaFunctionDefs::CreateObject );

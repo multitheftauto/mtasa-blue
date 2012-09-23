@@ -270,14 +270,17 @@ public:
     virtual bool                 IsSirenRandomiserEnabled               ( void ) = 0;
     virtual bool                 IsSirenSilentEffectEnabled             ( void ) = 0;
     virtual void                 SetVehicleFlags                        ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent ) = 0;
-    virtual bool                 SetComponentRotation                   ( eVehicleComponent vehicleComponent, CVector vecRotation ) = 0;
-    virtual bool                 GetComponentRotation                   ( eVehicleComponent vehicleComponent, CVector &vecRotation ) = 0;
-    virtual bool                 SetComponentPosition                   ( eVehicleComponent vehicleComponent, CVector vecPosition ) = 0;
-    virtual bool                 GetComponentPosition                   ( eVehicleComponent vehicleComponent, CVector &vecPositionModelling ) = 0;
-    virtual bool                 IsComponentPresent                     ( eVehicleComponent vehicleComponent ) = 0;
-    virtual bool                 GetComponentMatrix                     ( eVehicleComponent vehicleComponent, RwMatrix &ltm, RwMatrix &modelling ) = 0;
-    virtual bool                 SetComponentMatrix                     ( eVehicleComponent vehicleComponent, RwMatrix &ltm, RwMatrix &modelling ) = 0;
- 
+    virtual bool                 SetComponentRotation                   ( SString vehicleComponent, CVector vecRotation ) = 0;
+    virtual bool                 GetComponentRotation                   ( SString vehicleComponent, CVector &vecRotation ) = 0;
+    virtual bool                 SetComponentPosition                   ( SString vehicleComponent, CVector vecPosition ) = 0;
+    virtual bool                 GetComponentPosition                   ( SString vehicleComponent, CVector &vecPositionModelling ) = 0;
+    virtual bool                 IsComponentPresent                     ( SString vehicleComponent ) = 0;
+    virtual bool                 GetComponentMatrix                     ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling ) = 0;
+    virtual bool                 SetComponentMatrix                     ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling ) = 0;
+    virtual bool                 SetComponentVisible                    ( SString vehicleComponent, bool bVisible ) = 0;
+    virtual bool                 GetComponentVisible                    ( SString vehicleComponent, bool &bVisible ) = 0;
+    virtual std::map < SString, RwFrame * > & GetComponentMap       ( void ) = 0;
+
 };
 
 #endif
