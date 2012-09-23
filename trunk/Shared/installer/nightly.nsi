@@ -426,8 +426,10 @@ DontInstallRedist:
 				${Switch} $ExeMD5
 					${Case} "bf25c28e9f6c13bd2d9e28f151899373" #US 2.00
 					${Case} "7fd5f9436bd66af716ac584ff32eb483" #US 1.01
+					${Case} "d84326ba0e0ace89f87288ffe7504da4" #EU 3.00 Steam Mac
 					${Case} "4e99d762f44b1d5e7652dfa7e73d6b6f" #EU 2.00
 					${Case} "2ac4b81b3e85c8d0f9846591df9597d3" #EU 1.01
+					${Case} "25405921d1c47747fd01fd0bfe0a05ae" #EU 1.01 DEViANCE
 					${Case} "9effcaf66b59b9f8fb8dff920b3f6e63" #DE 2.00
 					${Case} "fa490564cd9811978085a7a8f8ed7b2a" #DE 1.01
 					${Case} "49dd417760484a18017805df46b308b8" #DE 1.00
