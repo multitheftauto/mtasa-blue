@@ -2459,6 +2459,13 @@ void CClientVehicle::Create ( void )
                 
                 // insert it into our component data list
                 m_ComponentData.insert ( pair < SString, SVehicleComponentData > ( (*iter).first, vehicleComponentData ) );
+                
+                // # prefix means hidden by default.
+                if ( (*iter).first[0] == '#' )
+                {
+                    g_pCore->GetConsole()->Printf("Hidden");
+                    SetComponentVisible ( (*iter).first, false );
+                }
             }
         }
         // Grab our component data
