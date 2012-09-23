@@ -353,7 +353,7 @@ void CTileBatcher::AddTile ( float fX1, float fY1,
     // Calc position of rotation center
     float fRotCenX = 0;
     float fRotCenY = 0;
-    if ( m_fCurrentRotation != 0.0f )
+    if ( fRotation != 0.0f )
     {
         fRotCenX = fRotCenOffX + ( fX1 + fX2 ) * 0.5f;
         fRotCenY = fRotCenOffY + ( fY1 + fY2 ) * 0.5f;
