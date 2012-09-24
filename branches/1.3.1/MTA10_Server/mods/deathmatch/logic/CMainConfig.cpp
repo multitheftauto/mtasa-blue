@@ -541,6 +541,8 @@ void CMainConfig::SetFakeLag ( int iPacketLoss, int iExtraPing, int iExtraPingVa
 
 void CMainConfig::ApplyNetOptions ( void )
 {
+    m_NetOptions.netFilter.bValid = true;
+    m_NetOptions.netFilter.bAutoFilter = m_bNetAutoFilter != 0;
     g_pNetServer->SetNetOptions ( m_NetOptions );
 }
 
@@ -1216,7 +1218,7 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
                 }
 
                 if ( item.changeCallback )
-                    item.changeCallback ();
+                    (this->*item.changeCallback) ();
 
                 return true;
             }
@@ -1240,19 +1242,20 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
     static const SIntSetting settings[] =
         {
             //Set,  save,   min,    def,    max,    name,                                   variable,                                   callback
-            { true, true,   50,     100,    4000,   "player_sync_interval",                 &g_TickRateSettings.iPureSync,              &OnTickRateChange },
-            { true, true,   50,     1500,   4000,   "lightweight_sync_interval",            &g_TickRateSettings.iLightSync,             &OnTickRateChange },
-            { true, true,   50,     500,    4000,   "camera_sync_interval",                 &g_TickRateSettings.iCamSync,               &OnTickRateChange },
-            { true, true,   50,     500,    4000,   "ped_sync_interval",                    &g_TickRateSettings.iPedSync,               &OnTickRateChange },
-            { true, true,   50,     1000,   4000,   "unoccupied_vehicle_sync_interval",     &g_TickRateSettings.iUnoccupiedVehicle,     &OnTickRateChange },
-            { true, true,   50,     100,    4000,   "keysync_mouse_sync_interval",          &g_TickRateSettings.iKeySyncRotation,       &OnTickRateChange },
-            { true, true,   50,     100,    4000,   "keysync_analog_sync_interval",         &g_TickRateSettings.iKeySyncAnalogMove,     &OnTickRateChange },
-            { true, true,   50,     100,    4000,   "donkey_work_interval",                 &g_TickRateSettings.iNearListUpdate,        &OnTickRateChange },
-            { true, true,   0,      0,      1,      "bullet_sync",                          &m_bBulletSyncEnabled,                      &OnTickRateChange },
-            { true, true,   0,      0,      120,    "vehext_percent",                       &m_iVehExtrapolatePercent,                  &OnTickRateChange },
-            { true, true,   0,      150,    500,    "vehext_ping_limit",                    &m_iVehExtrapolatePingLimit,                &OnTickRateChange },
-            { true, true,   0,      1,      2,      "ase",                                  &m_iAseMode,                                &OnAseSettingChange },
-            { true, true,   0,      1,      1,      "donotbroadcastlan",                    &m_bDontBroadcastLan,                       &OnAseSettingChange },
+            { true, true,   50,     100,    4000,   "player_sync_interval",                 &g_TickRateSettings.iPureSync,              &CMainConfig::OnTickRateChange },
+            { true, true,   50,     1500,   4000,   "lightweight_sync_interval",            &g_TickRateSettings.iLightSync,             &CMainConfig::OnTickRateChange },
+            { true, true,   50,     500,    4000,   "camera_sync_interval",                 &g_TickRateSettings.iCamSync,               &CMainConfig::OnTickRateChange },
+            { true, true,   50,     500,    4000,   "ped_sync_interval",                    &g_TickRateSettings.iPedSync,               &CMainConfig::OnTickRateChange },
+            { true, true,   50,     1000,   4000,   "unoccupied_vehicle_sync_interval",     &g_TickRateSettings.iUnoccupiedVehicle,     &CMainConfig::OnTickRateChange },
+            { true, true,   50,     100,    4000,   "keysync_mouse_sync_interval",          &g_TickRateSettings.iKeySyncRotation,       &CMainConfig::OnTickRateChange },
+            { true, true,   50,     100,    4000,   "keysync_analog_sync_interval",         &g_TickRateSettings.iKeySyncAnalogMove,     &CMainConfig::OnTickRateChange },
+            { true, true,   50,     100,    4000,   "donkey_work_interval",                 &g_TickRateSettings.iNearListUpdate,        &CMainConfig::OnTickRateChange },
+            { true, true,   0,      0,      1,      "bullet_sync",                          &m_bBulletSyncEnabled,                      &CMainConfig::OnTickRateChange },
+            { true, true,   0,      0,      120,    "vehext_percent",                       &m_iVehExtrapolatePercent,                  &CMainConfig::OnTickRateChange },
+            { true, true,   0,      150,    500,    "vehext_ping_limit",                    &m_iVehExtrapolatePingLimit,                &CMainConfig::OnTickRateChange },
+            { true, true,   0,      1,      2,      "ase",                                  &m_iAseMode,                                &CMainConfig::OnAseSettingChange },
+            { true, true,   0,      1,      1,      "donotbroadcastlan",                    &m_bDontBroadcastLan,                       &CMainConfig::OnAseSettingChange },
+            { true, true,   0,      1,      1,      "net_auto_filter",                      &m_bNetAutoFilter,                          &CMainConfig::ApplyNetOptions },
         };
 
     static std::vector < SIntSetting > settingsList;
