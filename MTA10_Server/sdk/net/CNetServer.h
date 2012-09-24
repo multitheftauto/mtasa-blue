@@ -61,6 +61,11 @@ struct SNetOptions
         int iExtraPingVariance;
         int iKBPSLimit;
     } netSim;
+
+    struct {
+        bool bValid;
+        bool bAutoFilter;
+    } netFilter;
 };
 
 class CNetServer

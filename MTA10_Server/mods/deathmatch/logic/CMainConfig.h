@@ -29,8 +29,9 @@ class CMainConfig;
 #include <list>
 
 #define MAX_MAP_NAME_LENGTH 64
+class CMainConfig;
 
-typedef void (*PFN_SettingChangeCallback) ( void );
+typedef void (CMainConfig::*PFN_SettingChangeCallback)(void);
 
 struct SIntSetting
 {
@@ -128,8 +129,8 @@ public:
     const SNetOptions&              GetNetOptions                   ( void )                    { return m_NetOptions; }
 
     const std::vector < SIntSetting >& GetIntSettingList            ( void );
-    static void                     OnTickRateChange                ( void );
-    static void                     OnAseSettingChange              ( void );
+    void                            OnTickRateChange                ( void );
+    void                            OnAseSettingChange              ( void );
 
 private:
     void                            RegisterCommand                 ( const char* szName, FCommandHandler* pFunction, bool bRestricted );
@@ -193,6 +194,7 @@ private:
     SNetOptions                     m_NetOptions;
     int                             m_iVehExtrapolatePercent;
     int                             m_iVehExtrapolatePingLimit;
+    int                             m_bNetAutoFilter;
 };
 
 #endif
