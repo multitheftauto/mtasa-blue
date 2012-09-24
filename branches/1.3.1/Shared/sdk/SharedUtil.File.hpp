@@ -15,6 +15,7 @@
     #include "shlobj.h"
 #else
     #include <dirent.h>
+    #include <sys/stat.h>
 #endif
 
 //
