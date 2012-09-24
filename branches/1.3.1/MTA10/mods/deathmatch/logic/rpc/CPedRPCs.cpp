@@ -67,7 +67,7 @@ void CPedRPCs::SetPedRotation ( CClientEntity* pSource, NetBitStreamInterface& b
     if ( bitStream.Read ( &rotation ) &&
          bitStream.Read ( ucTimeContext ) )
     {
-        uchar ucNewWay;
+        uchar ucNewWay = 0;
         if ( bitStream.GetNumberOfBytesUsed () > 0 )
             bitStream.Read ( ucNewWay );
 

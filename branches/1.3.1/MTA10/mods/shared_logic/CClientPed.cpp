@@ -588,7 +588,7 @@ void CClientPed::SetRotationDegrees ( const CVector& vecRotation )
     // HACK: set again the z rotation to work on ground
     SetCurrentRotation ( vecTemp.fZ );
     if ( !IS_PLAYER ( this ) )
-        SetCameraRotation ( vecTemp.fZ );
+        SetCameraRotation ( vecTemp.fZ );   // This is incorrect and kept for backward compatibility
 }
 
 
@@ -597,14 +597,15 @@ void CClientPed::SetRotationRadians ( const CVector& vecRotation )
     // Grab the matrix, apply the rotation to it and set it again
     CMatrix matTemp;
     GetMatrix ( matTemp );
-    g_pMultiplayer->ConvertEulerAnglesToMatrix ( matTemp, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+    g_pMultiplayer->ConvertEulerAnglesToMatrix ( matTemp, vecRotation.fX, vecRotation.fY, vecRotation.fZ );   // This is incorrect and kept for backward compatibility
     SetMatrix ( matTemp );
 }
 
 
 //
 //
-// New rotation functions which fix inv rotate when in air
+// New rotation functions which fixes inv rotate when in air
+// Also fixes camera rotation for peds
 //
 //
 void CClientPed::GetRotationDegreesNew ( CVector& vecRotation ) const
@@ -646,7 +647,7 @@ void CClientPed::SetRotationRadiansNew ( const CVector& vecRotation )
     // For on ground
     SetCurrentRotation ( vecRotation.fZ );
     if ( !IS_PLAYER ( this ) )
-        SetCameraRotation ( vecRotation.fZ );
+        SetCameraRotation ( -vecRotation.fZ );
 }
 
 

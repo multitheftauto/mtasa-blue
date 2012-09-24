@@ -7291,6 +7291,9 @@ bool CStaticFunctionDefinitions::ResetModelHandlingProperty ( eVehicleTypes eMod
     float fValue = 0.0f;
     CVector vecValue = CVector ( 0.0f, 0.0f, 0.0f );
     SString strValue = "";
+    uint uiValue = 0;
+    uchar ucValue = 0;
+
     if ( GetModelHandling( eModel, eProperty, fValue, true) )
     {
         SetEntryHandling ( pEntry, eProperty, fValue );
@@ -7302,6 +7305,14 @@ bool CStaticFunctionDefinitions::ResetModelHandlingProperty ( eVehicleTypes eMod
     else if ( GetModelHandling( eModel, eProperty, vecValue, true) )
     {
         SetEntryHandling ( pEntry, eProperty, vecValue );
+    }
+    else if ( GetModelHandling( eModel, eProperty, uiValue, true) )
+    {
+        SetEntryHandling ( pEntry, eProperty, uiValue );
+    }
+    else if ( GetModelHandling( eModel, eProperty, ucValue, true) )
+    {
+        SetEntryHandling ( pEntry, eProperty, ucValue );
     }
     else
     {
