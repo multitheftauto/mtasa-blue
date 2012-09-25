@@ -1,8 +1,29 @@
-#ifndef __LIBCONFIGTPF_H
-#define __LIBCONFIGTPF_H
+#ifndef HEADER_CURL_CONFIG_TPF_H
+#define HEADER_CURL_CONFIG_TPF_H
+/***************************************************************************
+ *                                  _   _ ____  _
+ *  Project                     ___| | | |  _ \| |
+ *                             / __| | | | |_) | |
+ *                            | (__| |_| |  _ <| |___
+ *                             \___|\___/|_| \_\_____|
+ *
+ * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+ *
+ * This software is licensed as described in the file COPYING, which
+ * you should have received as part of this distribution. The terms
+ * are also available at http://curl.haxx.se/docs/copyright.html.
+ *
+ * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+ * copies of the Software, and permit persons to whom the Software is
+ * furnished to do so, under the terms of the COPYING file.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ***************************************************************************/
 
 /* ================================================================ */
-/*    lib/config-tpf.h - Hand crafted config file for TPF           */
+/*                 Hand crafted config file for TPF                 */
 /* ================================================================ */
 
 /* ---------------------------------------------------------------- */
@@ -10,9 +31,6 @@
 /* ---------------------------------------------------------------- */
 
 /* NOTE: Refer also to the .mak file for some of the flags below */
-
-/* when building libcurl itself */
-/* #undef BUILDING_LIBCURL */
 
 /* to disable cookies support */
 /* #undef CURL_DISABLE_COOKIES */
@@ -43,12 +61,6 @@
 
 /* to disable verbose strings */
 /* #undef CURL_DISABLE_VERBOSE_STRINGS */
-
-/* when not building a shared library */
-/* #undef CURL_STATICLIB */
-
-/* Set to explicitly specify we don't want to use thread-safe functions */
-/* #undef DISABLED_THREADSAFE */
 
 /* lber dynamic library file */
 /* #undef DL_LBER_FILE */
@@ -559,11 +571,11 @@
 /* if you have the zlib.h header file */
 /* #undef HAVE_ZLIB_H */
 
-/* If you lack a fine basename() prototype */
-/* #undef NEED_BASENAME_PROTO */
-
-/* need REENTRANT defined */
+/* Define to 1 if _REENTRANT preprocessor symbol must be defined. */
 /* #undef NEED_REENTRANT */
+
+/* Define to 1 if _THREAD_SAFE preprocessor symbol must be defined. */
+/* #undef NEED_THREAD_SAFE */
 
 /* cpu-machine-OS */
 #define OS "s390x-ibm-tpf"
@@ -601,10 +613,19 @@
 /* Define to the type of arg 5 for `select'. */
 #define SELECT_TYPE_ARG5 (struct timeval *)
 
-/* The size of a `size_t', as computed by sizeof. */
+/* The size of `int', as computed by sizeof. */
+#define SIZEOF_INT 4
+
+/* The size of `off_t', as computed by sizeof. */
+#define SIZEOF_OFF_T 8
+
+/* The size of `short', as computed by sizeof. */
+#define SIZEOF_SHORT 2
+
+/* The size of `size_t', as computed by sizeof. */
 #define SIZEOF_SIZE_T 8
 
-/* The size of a `time_t', as computed by sizeof. */
+/* The size of `time_t', as computed by sizeof. */
 #define SIZEOF_TIME_T 8
 
 /* Define to 1 if you have the ANSI C header files. */
@@ -653,9 +674,6 @@
 /* Define for large files, on AIX-style hosts. */
 /* #undef _LARGE_FILES */
 
-/* define this if you need it to compile thread-safe code */
-/* #undef _THREAD_SAFE */
-
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
 
@@ -664,9 +682,6 @@
 
 /* Define to `unsigned' if <sys/types.h> does not define. */
 /* #undef size_t */
-
-/* Type to use in place of socklen_t when system does not provide it. */
-/* #undef socklen_t */
 
 /* the signed version of size_t */
 /* #undef ssize_t */
@@ -758,4 +773,4 @@
 #endif
 
 
-#endif /* __LIBCONFIGTPF_H */
+#endif /* HEADER_CURL_CONFIG_TPF_H */

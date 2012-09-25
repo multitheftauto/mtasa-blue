@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2009, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,7 +18,6 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: nss.c,v 1.41 2009-02-27 08:53:10 bagder Exp $
  ***************************************************************************/
 
 /*
@@ -28,9 +27,8 @@
 
 #include "setup.h"
 
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
+#ifdef USE_NSS
+
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
@@ -43,11 +41,10 @@
 #include "strequal.h"
 #include "select.h"
 #include "sslgen.h"
+#include "llist.h"
 
 #define _MPRINTF_REPLACE /* use the internal *printf() functions */
 #include <curl/mprintf.h>
-
-#ifdef USE_NSS
 
 #include "nssg.h"
 #include <nspr.h>
@@ -63,10 +60,13 @@
 #include <secitem.h>
 #include <secport.h>
 #include <certdb.h>
+#include <base64.h>
+#include <cert.h>
+#include <prerror.h>
 
-#include "memory.h"
+#include "curl_memory.h"
 #include "rawstr.h"
-#include "easyif.h" /* for Curl_convert_from_utf8 prototype */
+#include "warnless.h"
 
 /* The last #include file should be: */
 #include "memdebug.h"
@@ -79,15 +79,12 @@
 PRFileDesc *PR_ImportTCPSocket(PRInt32 osfd);
 
 PRLock * nss_initlock = NULL;
+PRLock * nss_crllock = NULL;
+#ifdef HAVE_NSS_INITCONTEXT
+NSSInitContext * nss_context = NULL;
+#endif
 
 volatile int initialized = 0;
-
-#define HANDSHAKE_TIMEOUT 30
-
-typedef struct {
-  PRInt32 retryCount;
-  struct SessionHandle *data;
-} pphrase_arg_t;
 
 typedef struct {
   const char *name;
@@ -95,8 +92,12 @@ typedef struct {
   PRInt32 version; /* protocol version valid for this cipher */
 } cipher_s;
 
-#define PK11_SETATTRS(x,id,v,l) (x)->type = (id); \
-                     (x)->pValue=(v); (x)->ulValueLen = (l)
+#define PK11_SETATTRS(_attr, _idx, _type, _val, _len) do {  \
+  CK_ATTRIBUTE *ptr = (_attr) + ((_idx)++);                 \
+  ptr->type = (_type);                                      \
+  ptr->pValue = (_val);                                     \
+  ptr->ulValueLen = (_len);                                 \
+} WHILE_FALSE
 
 #define CERT_NewTempCertificate __CERT_NewTempCertificate
 
@@ -162,10 +163,34 @@ static const cipher_s cipherlist[] = {
 #endif
 };
 
-#ifdef HAVE_PK11_CREATEGENERICOBJECT
+/* following ciphers are new in NSS 3.4 and not enabled by default, therefore
+   they are enabled explicitly */
+static const int enable_ciphers_by_default[] = {
+  TLS_DHE_DSS_WITH_AES_128_CBC_SHA,
+  TLS_DHE_DSS_WITH_AES_256_CBC_SHA,
+  TLS_DHE_RSA_WITH_AES_128_CBC_SHA,
+  TLS_DHE_RSA_WITH_AES_256_CBC_SHA,
+  TLS_RSA_WITH_AES_128_CBC_SHA,
+  TLS_RSA_WITH_AES_256_CBC_SHA,
+  SSL_NULL_WITH_NULL_NULL
+};
+
 static const char* pem_library = "libnsspem.so";
-#endif
 SECMODModule* mod = NULL;
+
+static const char* nss_error_to_name(PRErrorCode code)
+{
+  const char *name = PR_ErrorToName(code);
+  if(name)
+    return name;
+
+  return "unknown error";
+}
+
+static void nss_print_error_message(struct SessionHandle *data, PRUint32 err)
+{
+  failf(data, "%s", PR_ErrorToString(err, PR_LANGUAGE_I_DEFAULT));
+}
 
 static SECStatus set_ciphers(struct SessionHandle *data, PRFileDesc * model,
                              char *cipher_list)
@@ -258,7 +283,7 @@ static int num_enabled_ciphers(void)
  */
 static int is_file(const char *filename)
 {
-  struct stat st;
+  struct_stat st;
 
   if(filename == NULL)
     return 0;
@@ -270,260 +295,249 @@ static int is_file(const char *filename)
   return 0;
 }
 
-static int
-nss_load_cert(const char *filename, PRBool cacert)
+/* Check if the given string is filename or nickname of a certificate.  If the
+ * given string is recognized as filename, return NULL.  If the given string is
+ * recognized as nickname, return a duplicated string.  The returned string
+ * should be later deallocated using free().  If the OOM failure occurs, we
+ * return NULL, too.
+ */
+static char* dup_nickname(struct SessionHandle *data, enum dupstring cert_kind)
 {
-#ifdef HAVE_PK11_CREATEGENERICOBJECT
-  CK_SLOT_ID slotID;
-  PK11SlotInfo * slot = NULL;
-  PK11GenericObject *rv;
-  CK_ATTRIBUTE *attrs;
-  CK_ATTRIBUTE theTemplate[20];
+  const char *str = data->set.str[cert_kind];
+  const char *n;
+
+  if(!is_file(str))
+    /* no such file exists, use the string as nickname */
+    return strdup(str);
+
+  /* search the last slash; we require at least one slash in a file name */
+  n = strrchr(str, '/');
+  if(!n) {
+    infof(data, "warning: certificate file name \"%s\" handled as nickname; "
+          "please use \"./%s\" to force file name\n", str, str);
+    return strdup(str);
+  }
+
+  /* we'll use the PEM reader to read the certificate from file */
+  return NULL;
+}
+
+/* Call PK11_CreateGenericObject() with the given obj_class and filename.  If
+ * the call succeeds, append the object handle to the list of objects so that
+ * the object can be destroyed in Curl_nss_close(). */
+static CURLcode nss_create_object(struct ssl_connect_data *ssl,
+                                  CK_OBJECT_CLASS obj_class,
+                                  const char *filename, bool cacert)
+{
+  PK11SlotInfo *slot;
+  PK11GenericObject *obj;
   CK_BBOOL cktrue = CK_TRUE;
   CK_BBOOL ckfalse = CK_FALSE;
-  CK_OBJECT_CLASS objClass = CKO_CERTIFICATE;
-  char slotname[SLOTSIZE];
-#endif
-  CERTCertificate *cert;
-  char *nickname = NULL;
-  char *n = NULL;
+  CK_ATTRIBUTE attrs[/* max count of attributes */ 4];
+  int attr_cnt = 0;
+  CURLcode err = (cacert)
+    ? CURLE_SSL_CACERT_BADFILE
+    : CURLE_SSL_CERTPROBLEM;
 
-  /* If there is no slash in the filename it is assumed to be a regular
-   * NSS nickname.
-   */
-  if(is_file(filename)) {
-    n = strrchr(filename, '/');
+  const int slot_id = (cacert) ? 0 : 1;
+  char *slot_name = aprintf("PEM Token #%d", slot_id);
+  if(!slot_name)
+    return CURLE_OUT_OF_MEMORY;
+
+  slot = PK11_FindSlotByName(slot_name);
+  free(slot_name);
+  if(!slot)
+    return err;
+
+  PK11_SETATTRS(attrs, attr_cnt, CKA_CLASS, &obj_class, sizeof(obj_class));
+  PK11_SETATTRS(attrs, attr_cnt, CKA_TOKEN, &cktrue, sizeof(CK_BBOOL));
+  PK11_SETATTRS(attrs, attr_cnt, CKA_LABEL, (unsigned char *)filename,
+                strlen(filename) + 1);
+
+  if(CKO_CERTIFICATE == obj_class) {
+    CK_BBOOL *pval = (cacert) ? (&cktrue) : (&ckfalse);
+    PK11_SETATTRS(attrs, attr_cnt, CKA_TRUST, pval, sizeof(*pval));
+  }
+
+  obj = PK11_CreateGenericObject(slot, attrs, attr_cnt, PR_FALSE);
+  PK11_FreeSlot(slot);
+  if(!obj)
+    return err;
+
+  if(!Curl_llist_insert_next(ssl->obj_list, ssl->obj_list->tail, obj)) {
+    PK11_DestroyGenericObject(obj);
+    return CURLE_OUT_OF_MEMORY;
+  }
+
+  if(!cacert && CKO_CERTIFICATE == obj_class)
+    /* store reference to a client certificate */
+    ssl->obj_clicert = obj;
+
+  return CURLE_OK;
+}
+
+/* Destroy the NSS object whose handle is given by ptr.  This function is
+ * a callback of Curl_llist_alloc() used by Curl_llist_destroy() to destroy
+ * NSS objects in Curl_nss_close() */
+static void nss_destroy_object(void *user, void *ptr)
+{
+  PK11GenericObject *obj = (PK11GenericObject *)ptr;
+  (void) user;
+  PK11_DestroyGenericObject(obj);
+}
+
+static CURLcode nss_load_cert(struct ssl_connect_data *ssl,
+                              const char *filename, PRBool cacert)
+{
+  CURLcode err = (cacert)
+    ? CURLE_SSL_CACERT_BADFILE
+    : CURLE_SSL_CERTPROBLEM;
+
+  /* libnsspem.so leaks memory if the requested file does not exist.  For more
+   * details, go to <https://bugzilla.redhat.com/734760>. */
+  if(is_file(filename))
+    err = nss_create_object(ssl, CKO_CERTIFICATE, filename, cacert);
+
+  if(CURLE_OK == err && !cacert) {
+    /* we have successfully loaded a client certificate */
+    CERTCertificate *cert;
+    char *nickname = NULL;
+    char *n = strrchr(filename, '/');
     if(n)
       n++;
-    if(!mod)
-      return 1;
-  }
-  else {
-    /* A nickname from the NSS internal database */
-    if(cacert)
-      return 0; /* You can't specify an NSS CA nickname this way */
-    nickname = strdup(filename);
-    if(!nickname)
-      return 0;
-    goto done;
-  }
 
-#ifdef HAVE_PK11_CREATEGENERICOBJECT
-  attrs = theTemplate;
+    /* The following undocumented magic helps to avoid a SIGSEGV on call
+     * of PK11_ReadRawAttribute() from SelectClientCert() when using an
+     * immature version of libnsspem.so.  For more details, go to
+     * <https://bugzilla.redhat.com/733685>. */
+    nickname = aprintf("PEM Token #1:%s", n);
+    if(nickname) {
+      cert = PK11_FindCertFromNickname(nickname, NULL);
+      if(cert)
+        CERT_DestroyCertificate(cert);
 
-  /* All CA and trust objects go into slot 0. Other slots are used
-   * for storing certificates. With each new user certificate we increment
-   * the slot count. We only support 1 user certificate right now.
-   */
-  if(cacert)
-    slotID = 0;
-  else
-    slotID = 1;
-
-  snprintf(slotname, SLOTSIZE, "PEM Token #%ld", slotID);
-
-  nickname = aprintf("PEM Token #%ld:%s", slotID, n);
-  if(!nickname)
-    return 0;
-
-  slot = PK11_FindSlotByName(slotname);
-
-  if(!slot) {
-    free(nickname);
-    return 0;
-  }
-
-  PK11_SETATTRS(attrs, CKA_CLASS, &objClass, sizeof(objClass) );
-  attrs++;
-  PK11_SETATTRS(attrs, CKA_TOKEN, &cktrue, sizeof(CK_BBOOL) );
-  attrs++;
-  PK11_SETATTRS(attrs, CKA_LABEL, (unsigned char *)filename,
-                strlen(filename)+1);
-  attrs++;
-  if(cacert) {
-    PK11_SETATTRS(attrs, CKA_TRUST, &cktrue, sizeof(CK_BBOOL) );
-  }
-  else {
-    PK11_SETATTRS(attrs, CKA_TRUST, &ckfalse, sizeof(CK_BBOOL) );
-  }
-  attrs++;
-
-  /* This load the certificate in our PEM module into the appropriate
-   * slot.
-   */
-  rv = PK11_CreateGenericObject(slot, theTemplate, 4, PR_FALSE /* isPerm */);
-
-  PK11_FreeSlot(slot);
-
-  if(rv == NULL) {
-    free(nickname);
-    return 0;
-  }
-#else
-  /* We don't have PK11_CreateGenericObject but a file-based cert was passed
-   * in. We need to fail.
-   */
-  return 0;
-#endif
-
-done:
-  /* Double-check that the certificate or nickname requested exists in
-   * either the token or the NSS certificate database.
-   */
-  if(!cacert) {
-    cert = PK11_FindCertFromNickname((char *)nickname, NULL);
-
-    /* An invalid nickname was passed in */
-    if(cert == NULL) {
       free(nickname);
-      PR_SetError(SEC_ERROR_UNKNOWN_CERT, 0);
-      return 0;
     }
-
-    CERT_DestroyCertificate(cert);
   }
 
-  free(nickname);
-
-  return 1;
+  return err;
 }
 
-static int nss_load_crl(const char* crlfilename, PRBool ascii)
+/* add given CRL to cache if it is not already there */
+static SECStatus nss_cache_crl(SECItem *crlDER)
+{
+  CERTCertDBHandle *db = CERT_GetDefaultCertDB();
+  CERTSignedCrl *crl = SEC_FindCrlByDERCert(db, crlDER, 0);
+  if(crl) {
+    /* CRL already cached */
+    SEC_DestroyCrl(crl);
+    SECITEM_FreeItem(crlDER, PR_FALSE);
+    return SECSuccess;
+  }
+
+  /* acquire lock before call of CERT_CacheCRL() */
+  PR_Lock(nss_crllock);
+  if(SECSuccess != CERT_CacheCRL(db, crlDER)) {
+    /* unable to cache CRL */
+    PR_Unlock(nss_crllock);
+    SECITEM_FreeItem(crlDER, PR_FALSE);
+    return SECFailure;
+  }
+
+  /* we need to clear session cache, so that the CRL could take effect */
+  SSL_ClearSessionCache();
+  PR_Unlock(nss_crllock);
+  return SECSuccess;
+}
+
+static SECStatus nss_load_crl(const char* crlfilename)
 {
   PRFileDesc *infile;
-  PRStatus    prstat;
   PRFileInfo  info;
-  PRInt32     nb;
-  int rv;
-  SECItem crlDER;
-  CERTSignedCrl *crl=NULL;
-  PK11SlotInfo *slot=NULL;
+  SECItem filedata = { 0, NULL, 0 };
+  SECItem crlDER = { 0, NULL, 0 };
+  char *body;
 
-  infile = PR_Open(crlfilename,PR_RDONLY,0);
-  if (!infile) {
-    return 0;
-  }
-  crlDER.data = NULL;
-  prstat = PR_GetOpenFileInfo(infile,&info);
-  if (prstat!=PR_SUCCESS)
-    return 0;
-  if (ascii) {
-    SECItem filedata;
-    char *asc,*body;
-    filedata.data = NULL;
-    if (!SECITEM_AllocItem(NULL,&filedata,info.size))
-      return 0;
-    nb = PR_Read(infile,filedata.data,info.size);
-    if (nb!=info.size)
-      return 0;
-    asc = (char*)filedata.data;
-    if (!asc)
-      return 0;
+  infile = PR_Open(crlfilename, PR_RDONLY, 0);
+  if(!infile)
+    return SECFailure;
 
-    body=strstr(asc,"-----BEGIN");
-    if (body != NULL) {
-      char *trailer=NULL;
-      asc = body;
-      body = PORT_Strchr(asc,'\n');
-      if (!body)
-        body = PORT_Strchr(asc,'\r');
-      if (body)
-        trailer = strstr(++body,"-----END");
-      if (trailer!=NULL)
-        *trailer='\0';
-      else
-        return 0;
-    }
-    else {
-      body = asc;
-    }
-    rv = ATOB_ConvertAsciiToItem(&crlDER,body);
-    PORT_Free(filedata.data);
-    if (rv)
-      return 0;
-  }
-  else {
-    if (!SECITEM_AllocItem(NULL,&crlDER,info.size))
-      return 0;
-    nb = PR_Read(infile,crlDER.data,info.size);
-    if (nb!=info.size)
-      return 0;
-  }
+  if(PR_SUCCESS != PR_GetOpenFileInfo(infile, &info))
+    goto fail;
 
-  slot = PK11_GetInternalKeySlot();
-  crl  = PK11_ImportCRL(slot,&crlDER,
-                        NULL,SEC_CRL_TYPE,
-                        NULL,CRL_IMPORT_DEFAULT_OPTIONS,
-                        NULL,(CRL_DECODE_DEFAULT_OPTIONS|
-                              CRL_DECODE_DONT_COPY_DER));
-  if (slot) PK11_FreeSlot(slot);
-  if (!crl) return 0;
-  SEC_DestroyCrl(crl);
-  return 1;
+  if(!SECITEM_AllocItem(NULL, &filedata, info.size + /* zero ended */ 1))
+    goto fail;
+
+  if(info.size != PR_Read(infile, filedata.data, info.size))
+    goto fail;
+
+  /* place a trailing zero right after the visible data */
+  body = (char*)filedata.data;
+  body[--filedata.len] = '\0';
+
+  body = strstr(body, "-----BEGIN");
+  if(body) {
+    /* assume ASCII */
+    char *trailer;
+    char *begin = PORT_Strchr(body, '\n');
+    if(!begin)
+      begin = PORT_Strchr(body, '\r');
+    if(!begin)
+      goto fail;
+
+    trailer = strstr(++begin, "-----END");
+    if(!trailer)
+      goto fail;
+
+    /* retrieve DER from ASCII */
+    *trailer = '\0';
+    if(ATOB_ConvertAsciiToItem(&crlDER, begin))
+      goto fail;
+
+    SECITEM_FreeItem(&filedata, PR_FALSE);
+  }
+  else
+    /* assume DER */
+    crlDER = filedata;
+
+  PR_Close(infile);
+  return nss_cache_crl(&crlDER);
+
+fail:
+  PR_Close(infile);
+  SECITEM_FreeItem(&filedata, PR_FALSE);
+  return SECFailure;
 }
 
-static int nss_load_key(struct connectdata *conn, char *key_file)
+static CURLcode nss_load_key(struct connectdata *conn, int sockindex,
+                             char *key_file)
 {
-#ifdef HAVE_PK11_CREATEGENERICOBJECT
-  PK11SlotInfo * slot = NULL;
-  PK11GenericObject *rv;
-  CK_ATTRIBUTE *attrs;
-  CK_ATTRIBUTE theTemplate[20];
-  CK_BBOOL cktrue = CK_TRUE;
-  CK_OBJECT_CLASS objClass = CKO_PRIVATE_KEY;
-  CK_SLOT_ID slotID;
-  pphrase_arg_t *parg = NULL;
-  char slotname[SLOTSIZE];
+  PK11SlotInfo *slot;
+  SECStatus status;
+  CURLcode rv;
+  struct ssl_connect_data *ssl = conn->ssl;
+  (void)sockindex; /* unused */
 
-  attrs = theTemplate;
-
-  /* FIXME: grok the various file types */
-
-  slotID = 1; /* hardcoded for now */
-
-  snprintf(slotname, sizeof(slotname), "PEM Token #%ld", slotID);
-  slot = PK11_FindSlotByName(slotname);
-
-  if(!slot)
-    return 0;
-
-  PK11_SETATTRS(attrs, CKA_CLASS, &objClass, sizeof(objClass) ); attrs++;
-  PK11_SETATTRS(attrs, CKA_TOKEN, &cktrue, sizeof(CK_BBOOL) ); attrs++;
-  PK11_SETATTRS(attrs, CKA_LABEL, (unsigned char *)key_file,
-                strlen(key_file)+1); attrs++;
-
-  /* When adding an encrypted key the PKCS#11 will be set as removed */
-  rv = PK11_CreateGenericObject(slot, theTemplate, 3, PR_FALSE /* isPerm */);
-  if(rv == NULL) {
+  rv = nss_create_object(ssl, CKO_PRIVATE_KEY, key_file, FALSE);
+  if(CURLE_OK != rv) {
     PR_SetError(SEC_ERROR_BAD_KEY, 0);
-    return 0;
+    return rv;
   }
+
+  slot = PK11_FindSlotByName("PEM Token #1");
+  if(!slot)
+    return CURLE_SSL_CERTPROBLEM;
 
   /* This will force the token to be seen as re-inserted */
   SECMOD_WaitForAnyTokenEvent(mod, 0, 0);
   PK11_IsPresent(slot);
 
-  parg = malloc(sizeof(pphrase_arg_t));
-  if(!parg)
-    return 0;
-  parg->retryCount = 0;
-  parg->data = conn->data;
-  /* parg is initialized in nss_Init_Tokens() */
-  if(PK11_Authenticate(slot, PR_TRUE, parg) != SECSuccess) {
-    free(parg);
-    return 0;
-  }
-  free(parg);
-
-  return 1;
-#else
-  /* If we don't have PK11_CreateGenericObject then we can't load a file-based
-   * key.
-   */
-  (void)conn; /* unused */
-  (void)key_file; /* unused */
-  return 0;
-#endif
+  status = PK11_Authenticate(slot, PR_TRUE,
+                             conn->data->set.str[STRING_KEY_PASSWD]);
+  PK11_FreeSlot(slot);
+  return (SECSuccess == status)
+    ? CURLE_OK
+    : CURLE_SSL_CERTPROBLEM;
 }
 
 static int display_error(struct connectdata *conn, PRInt32 err,
@@ -542,173 +556,103 @@ static int display_error(struct connectdata *conn, PRInt32 err,
   return 0; /* The caller will print a generic error */
 }
 
-static int cert_stuff(struct connectdata *conn, char *cert_file, char *key_file)
+static CURLcode cert_stuff(struct connectdata *conn, int sockindex,
+                           char *cert_file, char *key_file)
 {
   struct SessionHandle *data = conn->data;
-  int rv = 0;
+  CURLcode rv;
 
   if(cert_file) {
-    rv = nss_load_cert(cert_file, PR_FALSE);
-    if(!rv) {
-      if(!display_error(conn, PR_GetError(), cert_file))
-        failf(data, "Unable to load client cert %d.", PR_GetError());
-      return 0;
+    rv = nss_load_cert(&conn->ssl[sockindex], cert_file, PR_FALSE);
+    if(CURLE_OK != rv) {
+      const PRErrorCode err = PR_GetError();
+      if(!display_error(conn, err, cert_file)) {
+        const char *err_name = nss_error_to_name(err);
+        failf(data, "unable to load client cert: %d (%s)", err, err_name);
+      }
+
+      return rv;
     }
   }
+
   if(key_file || (is_file(cert_file))) {
     if(key_file)
-      rv = nss_load_key(conn, key_file);
+      rv = nss_load_key(conn, sockindex, key_file);
     else
       /* In case the cert file also has the key */
-      rv = nss_load_key(conn, cert_file);
-    if(!rv) {
-      if(!display_error(conn, PR_GetError(), key_file))
-        failf(data, "Unable to load client key %d.", PR_GetError());
+      rv = nss_load_key(conn, sockindex, cert_file);
+    if(CURLE_OK != rv) {
+      const PRErrorCode err = PR_GetError();
+      if(!display_error(conn, err, key_file)) {
+        const char *err_name = nss_error_to_name(err);
+        failf(data, "unable to load client key: %d (%s)", err, err_name);
+      }
 
-      return 0;
+      return rv;
     }
   }
-  return 1;
+
+  return CURLE_OK;
 }
 
 static char * nss_get_password(PK11SlotInfo * slot, PRBool retry, void *arg)
 {
-  pphrase_arg_t *parg;
-  parg = (pphrase_arg_t *) arg;
-
   (void)slot; /* unused */
-  if(retry > 2)
+  if(retry || NULL == arg)
     return NULL;
-  if(parg->data->set.str[STRING_KEY_PASSWD])
-    return (char *)PORT_Strdup((char *)parg->data->set.str[STRING_KEY_PASSWD]);
   else
-    return NULL;
+    return (char *)PORT_Strdup((char *)arg);
 }
 
-/* No longer ask for the password, parg has been freed */
-static char * nss_no_password(PK11SlotInfo *slot, PRBool retry, void *arg)
+/* bypass the default SSL_AuthCertificate() hook in case we do not want to
+ * verify peer */
+static SECStatus nss_auth_cert_hook(void *arg, PRFileDesc *fd, PRBool checksig,
+                                    PRBool isServer)
 {
-  (void)slot; /* unused */
-  (void)retry; /* unused */
-  (void)arg; /* unused */
-  return NULL;
-}
-
-static SECStatus nss_Init_Tokens(struct connectdata * conn)
-{
-  PK11SlotList *slotList;
-  PK11SlotListElement *listEntry;
-  SECStatus ret, status = SECSuccess;
-  pphrase_arg_t *parg = NULL;
-
-  parg = malloc(sizeof(pphrase_arg_t));
-  if(!parg)
-    return SECFailure;
-
-  parg->retryCount = 0;
-  parg->data = conn->data;
-
-  PK11_SetPasswordFunc(nss_get_password);
-
-  slotList =
-    PK11_GetAllTokens(CKM_INVALID_MECHANISM, PR_FALSE, PR_TRUE, NULL);
-
-  for(listEntry = PK11_GetFirstSafe(slotList);
-      listEntry; listEntry = listEntry->next) {
-    PK11SlotInfo *slot = listEntry->slot;
-
-    if(PK11_NeedLogin(slot) && PK11_NeedUserInit(slot)) {
-      if(slot == PK11_GetInternalKeySlot()) {
-        failf(conn->data, "The NSS database has not been initialized");
-      }
-      else {
-        failf(conn->data, "The token %s has not been initialized",
-              PK11_GetTokenName(slot));
-      }
-      PK11_FreeSlot(slot);
-      continue;
-    }
-
-    ret = PK11_Authenticate(slot, PR_TRUE, parg);
-    if(SECSuccess != ret) {
-      if(PR_GetError() == SEC_ERROR_BAD_PASSWORD)
-        infof(conn->data, "The password for token '%s' is incorrect\n",
-              PK11_GetTokenName(slot));
-      status = SECFailure;
-      break;
-    }
-    parg->retryCount = 0; /* reset counter to 0 for the next token */
-    PK11_FreeSlot(slot);
-  }
-
-  free(parg);
-
-  return status;
-}
-
-static SECStatus BadCertHandler(void *arg, PRFileDesc *sock)
-{
-  SECStatus success = SECSuccess;
   struct connectdata *conn = (struct connectdata *)arg;
-  PRErrorCode err = PR_GetError();
-  CERTCertificate *cert = NULL;
-  char *subject, *issuer;
-
-  if(conn->data->set.ssl.certverifyresult!=0)
-    return success;
-
-  conn->data->set.ssl.certverifyresult=err;
-  cert = SSL_PeerCertificate(sock);
-  subject = CERT_NameToAscii(&cert->subject);
-  issuer = CERT_NameToAscii(&cert->issuer);
-  CERT_DestroyCertificate(cert);
-
-  switch(err) {
-  case SEC_ERROR_CA_CERT_INVALID:
-    infof(conn->data, "Issuer certificate is invalid: '%s'\n", issuer);
-    if(conn->data->set.ssl.verifypeer)
-      success = SECFailure;
-    break;
-  case SEC_ERROR_UNTRUSTED_ISSUER:
-    if(conn->data->set.ssl.verifypeer)
-      success = SECFailure;
-    infof(conn->data, "Certificate is signed by an untrusted issuer: '%s'\n",
-          issuer);
-    break;
-  case SSL_ERROR_BAD_CERT_DOMAIN:
-    if(conn->data->set.ssl.verifypeer)
-      success = SECFailure;
-    infof(conn->data, "common name: %s (does not match '%s')\n",
-          subject, conn->host.dispname);
-    break;
-  case SEC_ERROR_EXPIRED_CERTIFICATE:
-    if(conn->data->set.ssl.verifypeer)
-      success = SECFailure;
-    infof(conn->data, "Remote Certificate has expired.\n");
-    break;
-  default:
-    if(conn->data->set.ssl.verifypeer)
-      success = SECFailure;
-    infof(conn->data, "Bad certificate received. Subject = '%s', "
-          "Issuer = '%s'\n", subject, issuer);
-    break;
+  if(!conn->data->set.ssl.verifypeer) {
+    infof(conn->data, "skipping SSL peer certificate verification\n");
+    return SECSuccess;
   }
-  if(success == SECSuccess)
-    infof(conn->data, "SSL certificate verify ok.\n");
-  PR_Free(subject);
-  PR_Free(issuer);
 
-  return success;
+  return SSL_AuthCertificate(CERT_GetDefaultCertDB(), fd, checksig, isServer);
 }
 
 /**
  * Inform the application that the handshake is complete.
  */
-static SECStatus HandshakeCallback(PRFileDesc *sock, void *arg)
+static void HandshakeCallback(PRFileDesc *sock, void *arg)
 {
   (void)sock;
   (void)arg;
-  return SECSuccess;
+}
+
+static void display_cert_info(struct SessionHandle *data,
+                              CERTCertificate *cert)
+{
+  char *subject, *issuer, *common_name;
+  PRExplodedTime printableTime;
+  char timeString[256];
+  PRTime notBefore, notAfter;
+
+  subject = CERT_NameToAscii(&cert->subject);
+  issuer = CERT_NameToAscii(&cert->issuer);
+  common_name = CERT_GetCommonName(&cert->subject);
+  infof(data, "\tsubject: %s\n", subject);
+
+  CERT_GetCertTimes(cert, &notBefore, &notAfter);
+  PR_ExplodeTime(notBefore, PR_GMTParameters, &printableTime);
+  PR_FormatTime(timeString, 256, "%b %d %H:%M:%S %Y GMT", &printableTime);
+  infof(data, "\tstart date: %s\n", timeString);
+  PR_ExplodeTime(notAfter, PR_GMTParameters, &printableTime);
+  PR_FormatTime(timeString, 256, "%b %d %H:%M:%S %Y GMT", &printableTime);
+  infof(data, "\texpire date: %s\n", timeString);
+  infof(data, "\tcommon name: %s\n", common_name);
+  infof(data, "\tissuer: %s\n", issuer);
+
+  PR_Free(subject);
+  PR_Free(issuer);
+  PR_Free(common_name);
 }
 
 static void display_conn_info(struct connectdata *conn, PRFileDesc *sock)
@@ -716,10 +660,6 @@ static void display_conn_info(struct connectdata *conn, PRFileDesc *sock)
   SSLChannelInfo channel;
   SSLCipherSuiteInfo suite;
   CERTCertificate *cert;
-  char *subject, *issuer, *common_name;
-  PRExplodedTime printableTime;
-  char timeString[256];
-  PRTime notBefore, notAfter;
 
   if(SSL_GetChannelInfo(sock, &channel, sizeof channel) ==
      SECSuccess && channel.length == sizeof channel &&
@@ -733,28 +673,35 @@ static void display_conn_info(struct connectdata *conn, PRFileDesc *sock)
   infof(conn->data, "Server certificate:\n");
 
   cert = SSL_PeerCertificate(sock);
-  subject = CERT_NameToAscii(&cert->subject);
-  issuer = CERT_NameToAscii(&cert->issuer);
-  common_name = CERT_GetCommonName(&cert->subject);
-  infof(conn->data, "\tsubject: %s\n", subject);
-
-  CERT_GetCertTimes(cert, &notBefore, &notAfter);
-  PR_ExplodeTime(notBefore, PR_GMTParameters, &printableTime);
-  PR_FormatTime(timeString, 256, "%b %d %H:%M:%S %Y GMT", &printableTime);
-  infof(conn->data, "\tstart date: %s\n", timeString);
-  PR_ExplodeTime(notAfter, PR_GMTParameters, &printableTime);
-  PR_FormatTime(timeString, 256, "%b %d %H:%M:%S %Y GMT", &printableTime);
-  infof(conn->data, "\texpire date: %s\n", timeString);
-  infof(conn->data, "\tcommon name: %s\n", common_name);
-  infof(conn->data, "\tissuer: %s\n", issuer);
-
-  PR_Free(subject);
-  PR_Free(issuer);
-  PR_Free(common_name);
-
+  display_cert_info(conn->data, cert);
   CERT_DestroyCertificate(cert);
 
   return;
+}
+
+static SECStatus BadCertHandler(void *arg, PRFileDesc *sock)
+{
+  struct connectdata *conn = (struct connectdata *)arg;
+  struct SessionHandle *data = conn->data;
+  PRErrorCode err = PR_GetError();
+  CERTCertificate *cert;
+
+  /* remember the cert verification result */
+  data->set.ssl.certverifyresult = err;
+
+  if(err == SSL_ERROR_BAD_CERT_DOMAIN && !data->set.ssl.verifyhost)
+    /* we are asked not to verify the host name */
+    return SECSuccess;
+
+  /* print only info about the cert, the error is printed off the callback */
+  cert = SSL_PeerCertificate(sock);
+  if(cert) {
+    infof(data, "Server certificate:\n");
+    display_cert_info(data, cert);
+    CERT_DestroyCertificate(cert);
+  }
+
+  return SECFailure;
 }
 
 /**
@@ -772,22 +719,21 @@ static SECStatus check_issuer_cert(PRFileDesc *sock,
   void *proto_win = NULL;
 
   /*
-  PRArenaPool   *tmpArena = NULL;
-  CERTAuthKeyID *authorityKeyID = NULL;
-  SECITEM       *caname = NULL;
+    PRArenaPool   *tmpArena = NULL;
+    CERTAuthKeyID *authorityKeyID = NULL;
+    SECITEM       *caname = NULL;
   */
 
   cert = SSL_PeerCertificate(sock);
   cert_issuer = CERT_FindCertIssuer(cert,PR_Now(),certUsageObjectSigner);
 
   proto_win = SSL_RevealPinArg(sock);
-  issuer = NULL;
   issuer = PK11_FindCertFromNickname(issuer_nickname, proto_win);
 
-  if ((!cert_issuer) || (!issuer))
+  if((!cert_issuer) || (!issuer))
     res = SECFailure;
-  else if (SECITEM_CompareItem(&cert_issuer->derCert,
-                               &issuer->derCert)!=SECEqual)
+  else if(SECITEM_CompareItem(&cert_issuer->derCert,
+                              &issuer->derCert)!=SECEqual)
     res = SECFailure;
 
   CERT_DestroyCertificate(cert);
@@ -805,50 +751,202 @@ static SECStatus SelectClientCert(void *arg, PRFileDesc *sock,
                                   struct CERTCertificateStr **pRetCert,
                                   struct SECKEYPrivateKeyStr **pRetKey)
 {
-  CERTCertificate *cert;
-  SECKEYPrivateKey *privKey;
-  char *nickname = (char *)arg;
-  void *proto_win = NULL;
-  SECStatus secStatus = SECFailure;
-  PK11SlotInfo *slot;
-  (void)caNames;
+  struct ssl_connect_data *connssl = (struct ssl_connect_data *)arg;
+  struct SessionHandle *data = connssl->data;
+  const char *nickname = connssl->client_nickname;
 
-  proto_win = SSL_RevealPinArg(sock);
+  if(connssl->obj_clicert) {
+    /* use the cert/key provided by PEM reader */
+    static const char pem_slotname[] = "PEM Token #1";
+    SECItem cert_der = { 0, NULL, 0 };
+    void *proto_win = SSL_RevealPinArg(sock);
 
-  if(!nickname)
-    return secStatus;
+    PK11SlotInfo *slot = PK11_FindSlotByName(pem_slotname);
+    if(NULL == slot) {
+      failf(data, "NSS: PK11 slot not found: %s", pem_slotname);
+      return SECFailure;
+    }
 
-  cert = PK11_FindCertFromNickname(nickname, proto_win);
-  if(cert) {
-
-    if(!strncmp(nickname, "PEM Token", 9)) {
-      CK_SLOT_ID slotID = 1; /* hardcoded for now */
-      char slotname[SLOTSIZE];
-      snprintf(slotname, SLOTSIZE, "PEM Token #%ld", slotID);
-      slot = PK11_FindSlotByName(slotname);
-      privKey = PK11_FindPrivateKeyFromCert(slot, cert, NULL);
+    if(PK11_ReadRawAttribute(PK11_TypeGeneric, connssl->obj_clicert, CKA_VALUE,
+                             &cert_der) != SECSuccess) {
+      failf(data, "NSS: CKA_VALUE not found in PK11 generic object");
       PK11_FreeSlot(slot);
-      if(privKey) {
-        secStatus = SECSuccess;
-      }
+      return SECFailure;
     }
-    else {
-      privKey = PK11_FindKeyByAnyCert(cert, proto_win);
-      if(privKey)
-        secStatus = SECSuccess;
+
+    *pRetCert = PK11_FindCertFromDERCertItem(slot, &cert_der, proto_win);
+    SECITEM_FreeItem(&cert_der, PR_FALSE);
+    if(NULL == *pRetCert) {
+      failf(data, "NSS: client certificate from file not found");
+      PK11_FreeSlot(slot);
+      return SECFailure;
+    }
+
+    *pRetKey = PK11_FindPrivateKeyFromCert(slot, *pRetCert, NULL);
+    PK11_FreeSlot(slot);
+    if(NULL == *pRetKey) {
+      failf(data, "NSS: private key from file not found");
+      CERT_DestroyCertificate(*pRetCert);
+      return SECFailure;
+    }
+
+    infof(data, "NSS: client certificate from file\n");
+    display_cert_info(data, *pRetCert);
+    return SECSuccess;
+  }
+
+  /* use the default NSS hook */
+  if(SECSuccess != NSS_GetClientAuthData((void *)nickname, sock, caNames,
+                                          pRetCert, pRetKey)
+      || NULL == *pRetCert) {
+
+    if(NULL == nickname)
+      failf(data, "NSS: client certificate not found (nickname not "
+            "specified)");
+    else
+      failf(data, "NSS: client certificate not found: %s", nickname);
+
+    return SECFailure;
+  }
+
+  /* get certificate nickname if any */
+  nickname = (*pRetCert)->nickname;
+  if(NULL == nickname)
+    nickname = "[unknown]";
+
+  if(NULL == *pRetKey) {
+    failf(data, "NSS: private key not found for certificate: %s", nickname);
+    return SECFailure;
+  }
+
+  infof(data, "NSS: using client certificate: %s\n", nickname);
+  display_cert_info(data, *pRetCert);
+  return SECSuccess;
+}
+
+/* This function is supposed to decide, which error codes should be used
+ * to conclude server is TLS intolerant.
+ *
+ * taken from xulrunner - nsNSSIOLayer.cpp
+ */
+static PRBool
+isTLSIntoleranceError(PRInt32 err)
+{
+  switch (err) {
+  case SSL_ERROR_BAD_MAC_ALERT:
+  case SSL_ERROR_BAD_MAC_READ:
+  case SSL_ERROR_HANDSHAKE_FAILURE_ALERT:
+  case SSL_ERROR_HANDSHAKE_UNEXPECTED_ALERT:
+  case SSL_ERROR_CLIENT_KEY_EXCHANGE_FAILURE:
+  case SSL_ERROR_ILLEGAL_PARAMETER_ALERT:
+  case SSL_ERROR_NO_CYPHER_OVERLAP:
+  case SSL_ERROR_BAD_SERVER:
+  case SSL_ERROR_BAD_BLOCK_PADDING:
+  case SSL_ERROR_UNSUPPORTED_VERSION:
+  case SSL_ERROR_PROTOCOL_VERSION_ALERT:
+  case SSL_ERROR_RX_MALFORMED_FINISHED:
+  case SSL_ERROR_BAD_HANDSHAKE_HASH_VALUE:
+  case SSL_ERROR_DECODE_ERROR_ALERT:
+  case SSL_ERROR_RX_UNKNOWN_ALERT:
+    return PR_TRUE;
+  default:
+    return PR_FALSE;
+  }
+}
+
+static CURLcode nss_init_core(struct SessionHandle *data, const char *cert_dir)
+{
+#ifdef HAVE_NSS_INITCONTEXT
+  NSSInitParameters initparams;
+
+  if(nss_context != NULL)
+    return CURLE_OK;
+
+  memset((void *) &initparams, '\0', sizeof(initparams));
+  initparams.length = sizeof(initparams);
+#else /* HAVE_NSS_INITCONTEXT */
+  SECStatus rv;
+
+  if(NSS_IsInitialized())
+    return CURLE_OK;
+#endif
+
+  if(cert_dir) {
+    const bool use_sql = NSS_VersionCheck("3.12.0");
+    char *certpath = aprintf("%s%s", use_sql ? "sql:" : "", cert_dir);
+    if(!certpath)
+      return CURLE_OUT_OF_MEMORY;
+
+    infof(data, "Initializing NSS with certpath: %s\n", certpath);
+#ifdef HAVE_NSS_INITCONTEXT
+    nss_context = NSS_InitContext(certpath, "", "", "", &initparams,
+            NSS_INIT_READONLY | NSS_INIT_PK11RELOAD);
+    free(certpath);
+
+    if(nss_context != NULL)
+      return CURLE_OK;
+#else /* HAVE_NSS_INITCONTEXT */
+    rv = NSS_Initialize(certpath, "", "", "", NSS_INIT_READONLY);
+    free(certpath);
+
+    if(rv == SECSuccess)
+      return CURLE_OK;
+#endif
+
+    infof(data, "Unable to initialize NSS database\n");
+  }
+
+  infof(data, "Initializing NSS with certpath: none\n");
+#ifdef HAVE_NSS_INITCONTEXT
+  nss_context = NSS_InitContext("", "", "", "", &initparams, NSS_INIT_READONLY
+         | NSS_INIT_NOCERTDB   | NSS_INIT_NOMODDB       | NSS_INIT_FORCEOPEN
+         | NSS_INIT_NOROOTINIT | NSS_INIT_OPTIMIZESPACE | NSS_INIT_PK11RELOAD);
+  if(nss_context != NULL)
+    return CURLE_OK;
+#else /* HAVE_NSS_INITCONTEXT */
+  if(NSS_NoDB_Init(NULL) == SECSuccess)
+    return CURLE_OK;
+#endif
+
+  infof(data, "Unable to initialize NSS\n");
+  return CURLE_SSL_CACERT_BADFILE;
+}
+
+static CURLcode nss_init(struct SessionHandle *data)
+{
+  char *cert_dir;
+  struct_stat st;
+  CURLcode rv;
+
+  if(initialized)
+    return CURLE_OK;
+
+  /* First we check if $SSL_DIR points to a valid dir */
+  cert_dir = getenv("SSL_DIR");
+  if(cert_dir) {
+    if((stat(cert_dir, &st) != 0) ||
+        (!S_ISDIR(st.st_mode))) {
+      cert_dir = NULL;
     }
   }
 
-  if(secStatus == SECSuccess) {
-    *pRetCert = cert;
-    *pRetKey = privKey;
-  }
-  else {
-    if(cert)
-      CERT_DestroyCertificate(cert);
+  /* Now we check if the default location is a valid dir */
+  if(!cert_dir) {
+    if((stat(SSL_DIR, &st) == 0) &&
+        (S_ISDIR(st.st_mode))) {
+      cert_dir = (char *)SSL_DIR;
+    }
   }
 
-  return secStatus;
+  rv = nss_init_core(data, cert_dir);
+  if(rv)
+    return rv;
+
+  if(num_enabled_ciphers() == 0)
+    NSS_SetDomesticPolicy();
+
+  initialized = 1;
+  return CURLE_OK;
 }
 
 /**
@@ -860,14 +958,31 @@ static SECStatus SelectClientCert(void *arg, PRFileDesc *sock,
 int Curl_nss_init(void)
 {
   /* curl_global_init() is not thread-safe so this test is ok */
-  if (nss_initlock == NULL) {
+  if(nss_initlock == NULL) {
     PR_Init(PR_USER_THREAD, PR_PRIORITY_NORMAL, 256);
     nss_initlock = PR_NewLock();
+    nss_crllock = PR_NewLock();
   }
 
   /* We will actually initialize NSS later */
 
   return 1;
+}
+
+CURLcode Curl_nss_force_init(struct SessionHandle *data)
+{
+  CURLcode rv;
+  if(!nss_initlock) {
+    failf(data,
+          "unable to initialize NSS, curl_global_init() should have been "
+          "called with CURL_GLOBAL_SSL or CURL_GLOBAL_ALL");
+    return CURLE_FAILED_INIT;
+  }
+
+  PR_Lock(nss_initlock);
+  rv = nss_init(data);
+  PR_Unlock(nss_initlock);
+  return rv;
 }
 
 /* Global cleanup */
@@ -877,11 +992,27 @@ void Curl_nss_cleanup(void)
    * as a safety feature.
    */
   PR_Lock(nss_initlock);
-  if (initialized)
+  if(initialized) {
+    /* Free references to client certificates held in the SSL session cache.
+     * Omitting this hampers destruction of the security module owning
+     * the certificates. */
+    SSL_ClearSessionCache();
+
+    if(mod && SECSuccess == SECMOD_UnloadUserModule(mod)) {
+      SECMOD_DestroyModule(mod);
+      mod = NULL;
+    }
+#ifdef HAVE_NSS_INITCONTEXT
+    NSS_ShutdownContext(nss_context);
+    nss_context = NULL;
+#else /* HAVE_NSS_INITCONTEXT */
     NSS_Shutdown();
+#endif
+  }
   PR_Unlock(nss_initlock);
 
   PR_DestroyLock(nss_initlock);
+  PR_DestroyLock(nss_crllock);
   nss_initlock = NULL;
 
   initialized = 0;
@@ -921,11 +1052,24 @@ void Curl_nss_close(struct connectdata *conn, int sockindex)
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
 
   if(connssl->handle) {
-    PR_Close(connssl->handle);
+    /* NSS closes the socket we previously handed to it, so we must mark it
+       as closed to avoid double close */
+    fake_sclose(conn->sock[sockindex]);
+    conn->sock[sockindex] = CURL_SOCKET_BAD;
     if(connssl->client_nickname != NULL) {
       free(connssl->client_nickname);
       connssl->client_nickname = NULL;
+
+      /* force NSS to ask again for a client cert when connecting
+       * next time to the same server */
+      SSL_InvalidateSession(connssl->handle);
     }
+    /* destroy all NSS objects in order to avoid failure of NSS shutdown */
+    Curl_llist_destroy(connssl->obj_list, NULL);
+    connssl->obj_list = NULL;
+    connssl->obj_clicert = NULL;
+
+    PR_Close(connssl->handle);
     connssl->handle = NULL;
   }
 }
@@ -940,64 +1084,119 @@ int Curl_nss_close_all(struct SessionHandle *data)
   return 0;
 }
 
+/* return true if the given error code is related to a client certificate */
+static bool is_cc_error(PRInt32 err)
+{
+  switch(err) {
+  case SSL_ERROR_BAD_CERT_ALERT:
+    return true;
+
+  case SSL_ERROR_REVOKED_CERT_ALERT:
+    return true;
+
+  case SSL_ERROR_EXPIRED_CERT_ALERT:
+    return true;
+
+  default:
+    return false;
+  }
+}
+
+static Curl_recv nss_recv;
+static Curl_send nss_send;
+
+static CURLcode nss_load_ca_certificates(struct connectdata *conn,
+                                         int sockindex)
+{
+  struct SessionHandle *data = conn->data;
+  const char *cafile = data->set.ssl.CAfile;
+  const char *capath = data->set.ssl.CApath;
+
+  if(cafile) {
+    CURLcode rv = nss_load_cert(&conn->ssl[sockindex], cafile, PR_TRUE);
+    if(CURLE_OK != rv)
+      return rv;
+  }
+
+  if(capath) {
+    struct_stat st;
+    if(stat(capath, &st) == -1)
+      return CURLE_SSL_CACERT_BADFILE;
+
+    if(S_ISDIR(st.st_mode)) {
+      PRDirEntry *entry;
+      PRDir *dir = PR_OpenDir(capath);
+      if(!dir)
+        return CURLE_SSL_CACERT_BADFILE;
+
+      while((entry = PR_ReadDir(dir, PR_SKIP_BOTH | PR_SKIP_HIDDEN))) {
+        char *fullpath = aprintf("%s/%s", capath, entry->name);
+        if(!fullpath) {
+          PR_CloseDir(dir);
+          return CURLE_OUT_OF_MEMORY;
+        }
+
+        if(CURLE_OK != nss_load_cert(&conn->ssl[sockindex], fullpath, PR_TRUE))
+          /* This is purposefully tolerant of errors so non-PEM files can
+           * be in the same directory */
+          infof(data, "failed to load '%s' from CURLOPT_CAPATH\n", fullpath);
+
+        free(fullpath);
+      }
+
+      PR_CloseDir(dir);
+    }
+    else
+      infof(data, "warning: CURLOPT_CAPATH not a directory (%s)\n", capath);
+  }
+
+  infof(data, "  CAfile: %s\n  CApath: %s\n",
+      cafile ? cafile : "none",
+      capath ? capath : "none");
+
+  return CURLE_OK;
+}
+
 CURLcode Curl_nss_connect(struct connectdata *conn, int sockindex)
 {
   PRInt32 err;
   PRFileDesc *model = NULL;
-  PRBool ssl2, ssl3, tlsv1;
+  PRBool ssl2 = PR_FALSE;
+  PRBool ssl3 = PR_FALSE;
+  PRBool tlsv1 = PR_FALSE;
+  PRBool ssl_no_cache;
+  PRBool ssl_cbc_random_iv;
   struct SessionHandle *data = conn->data;
   curl_socket_t sockfd = conn->sock[sockindex];
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
-  SECStatus rv;
-#ifdef HAVE_PK11_CREATEGENERICOBJECT
-  char *configstring = NULL;
-#endif
-  char *certDir = NULL;
-  int curlerr;
+  CURLcode curlerr;
+  const int *cipher_to_enable;
+  PRSocketOptionData sock_opt;
+  long time_left;
+  PRUint32 timeout;
 
-  curlerr = CURLE_SSL_CONNECT_ERROR;
-
-  if (connssl->state == ssl_connection_complete)
+  if(connssl->state == ssl_connection_complete)
     return CURLE_OK;
+
+  connssl->data = data;
+
+  /* list of all NSS objects we need to destroy in Curl_nss_close() */
+  connssl->obj_list = Curl_llist_alloc(nss_destroy_object);
+  if(!connssl->obj_list)
+    return CURLE_OUT_OF_MEMORY;
 
   /* FIXME. NSS doesn't support multiple databases open at the same time. */
   PR_Lock(nss_initlock);
-  if(!initialized) {
+  curlerr = nss_init(conn->data);
+  if(CURLE_OK != curlerr) {
+    PR_Unlock(nss_initlock);
+    goto error;
+  }
 
-    certDir = getenv("SSL_DIR"); /* Look in $SSL_DIR */
+  curlerr = CURLE_SSL_CONNECT_ERROR;
 
-    if(!certDir) {
-      struct stat st;
-
-      if(stat(SSL_DIR, &st) == 0)
-        if(S_ISDIR(st.st_mode)) {
-          certDir = (char *)SSL_DIR;
-        }
-    }
-
-    if (!NSS_IsInitialized()) {
-      initialized = 1;
-      if(!certDir) {
-        rv = NSS_NoDB_Init(NULL);
-      }
-      else {
-        rv = NSS_Initialize(certDir, NULL, NULL, "secmod.db",
-                            NSS_INIT_READONLY);
-      }
-      if(rv != SECSuccess) {
-        infof(conn->data, "Unable to initialize NSS database\n");
-        curlerr = CURLE_SSL_CACERT_BADFILE;
-        initialized = 0;
-        PR_Unlock(nss_initlock);
-        goto error;
-      }
-    }
-
-    if(num_enabled_ciphers() == 0)
-      NSS_SetDomesticPolicy();
-
-#ifdef HAVE_PK11_CREATEGENERICOBJECT
-    configstring = aprintf("library=%s name=PEM", pem_library);
+  if(!mod) {
+    char *configstring = aprintf("library=%s name=PEM", pem_library);
     if(!configstring) {
       PR_Unlock(nss_initlock);
       goto error;
@@ -1010,17 +1209,24 @@ CURLcode Curl_nss_connect(struct connectdata *conn, int sockindex)
         SECMOD_DestroyModule(mod);
         mod = NULL;
       }
-      infof(data, "WARNING: failed to load NSS PEM library %s. Using OpenSSL "
-            "PEM certificates will not work.\n", pem_library);
+      infof(data, "WARNING: failed to load NSS PEM library %s. Using "
+            "OpenSSL PEM certificates will not work.\n", pem_library);
     }
-#endif
   }
+
+  PK11_SetPasswordFunc(nss_get_password);
   PR_Unlock(nss_initlock);
 
   model = PR_NewTCPSocket();
   if(!model)
     goto error;
   model = SSL_ImportFD(NULL, model);
+
+  /* make the socket nonblocking */
+  sock_opt.option = PR_SockOpt_Nonblocking;
+  sock_opt.value.non_blocking = PR_TRUE;
+  if(PR_SetSocketOption(model, &sock_opt) != PR_SUCCESS)
+    goto error;
 
   if(SSL_OptionSet(model, SSL_SECURITY, PR_TRUE) != SECSuccess)
     goto error;
@@ -1029,12 +1235,19 @@ CURLcode Curl_nss_connect(struct connectdata *conn, int sockindex)
   if(SSL_OptionSet(model, SSL_HANDSHAKE_AS_CLIENT, PR_TRUE) != SECSuccess)
     goto error;
 
-  ssl2 = ssl3 = tlsv1 = PR_FALSE;
+  /* do not use SSL cache if we are not going to verify peer */
+  ssl_no_cache = (data->set.ssl.verifypeer) ? PR_FALSE : PR_TRUE;
+  if(SSL_OptionSet(model, SSL_NO_CACHE, ssl_no_cache) != SECSuccess)
+    goto error;
 
   switch (data->set.ssl.version) {
   default:
   case CURL_SSLVERSION_DEFAULT:
-    ssl3 = tlsv1 = PR_TRUE;
+    ssl3 = PR_TRUE;
+    if(data->state.ssl_connect_retry)
+      infof(data, "TLS disabled due to previous handshake failure\n");
+    else
+      tlsv1 = PR_TRUE;
     break;
   case CURL_SSLVERSION_TLSv1:
     tlsv1 = PR_TRUE;
@@ -1057,6 +1270,31 @@ CURLcode Curl_nss_connect(struct connectdata *conn, int sockindex)
   if(SSL_OptionSet(model, SSL_V2_COMPATIBLE_HELLO, ssl2) != SECSuccess)
     goto error;
 
+  ssl_cbc_random_iv = !data->set.ssl_enable_beast;
+#ifdef SSL_CBC_RANDOM_IV
+  /* unless the user explicitly asks to allow the protocol vulnerability, we
+     use the work-around */
+  if(SSL_OptionSet(model, SSL_CBC_RANDOM_IV, ssl_cbc_random_iv) != SECSuccess)
+    infof(data, "warning: failed to set SSL_CBC_RANDOM_IV = %d\n",
+          ssl_cbc_random_iv);
+#else
+  if(ssl_cbc_random_iv)
+    infof(data, "warning: support for SSL_CBC_RANDOM_IV not compiled in\n");
+#endif
+
+  /* reset the flag to avoid an infinite loop */
+  data->state.ssl_connect_retry = FALSE;
+
+  /* enable all ciphers from enable_ciphers_by_default */
+  cipher_to_enable = enable_ciphers_by_default;
+  while(SSL_NULL_WITH_NULL_NULL != *cipher_to_enable) {
+    if(SSL_CipherPrefSet(model, *cipher_to_enable, PR_TRUE) != SECSuccess) {
+      curlerr = CURLE_SSL_CIPHER;
+      goto error;
+    }
+    cipher_to_enable++;
+  }
+
   if(data->set.ssl.cipher_list) {
     if(set_ciphers(data, model, data->set.ssl.cipher_list) != SECSuccess) {
       curlerr = CURLE_SSL_CIPHER;
@@ -1064,65 +1302,33 @@ CURLcode Curl_nss_connect(struct connectdata *conn, int sockindex)
     }
   }
 
+  if(!data->set.ssl.verifypeer && data->set.ssl.verifyhost)
+    infof(data, "warning: ignoring value of ssl.verifyhost\n");
+  else if(data->set.ssl.verifyhost == 1)
+    infof(data, "warning: ignoring unsupported value (1) of ssl.verifyhost\n");
+
+  /* bypass the default SSL_AuthCertificate() hook in case we do not want to
+   * verify peer */
+  if(SSL_AuthCertificateHook(model, nss_auth_cert_hook, conn) != SECSuccess)
+    goto error;
+
   data->set.ssl.certverifyresult=0; /* not checked yet */
-  if(SSL_BadCertHook(model, (SSLBadCertHandler) BadCertHandler, conn)
-     != SECSuccess) {
-    goto error;
-  }
-  if(SSL_HandshakeCallback(model, (SSLHandshakeCallback) HandshakeCallback,
-                           NULL) != SECSuccess)
+  if(SSL_BadCertHook(model, BadCertHandler, conn) != SECSuccess)
     goto error;
 
-  if(!data->set.ssl.verifypeer)
-    /* skip the verifying of the peer */
-    ;
-  else if(data->set.ssl.CAfile) {
-    int rc = nss_load_cert(data->set.ssl.CAfile, PR_TRUE);
-    if(!rc) {
-      curlerr = CURLE_SSL_CACERT_BADFILE;
+  if(SSL_HandshakeCallback(model, HandshakeCallback, NULL) != SECSuccess)
+    goto error;
+
+  if(data->set.ssl.verifypeer) {
+    const CURLcode rv = nss_load_ca_certificates(conn, sockindex);
+    if(CURLE_OK != rv) {
+      curlerr = rv;
       goto error;
     }
   }
-  else if(data->set.ssl.CApath) {
-    struct stat st;
-    PRDir      *dir;
-    PRDirEntry *entry;
 
-    if(stat(data->set.ssl.CApath, &st) == -1) {
-      curlerr = CURLE_SSL_CACERT_BADFILE;
-      goto error;
-    }
-
-    if(S_ISDIR(st.st_mode)) {
-      int rc;
-
-      dir = PR_OpenDir(data->set.ssl.CApath);
-      do {
-        entry = PR_ReadDir(dir, PR_SKIP_BOTH | PR_SKIP_HIDDEN);
-
-        if(entry) {
-          char fullpath[PATH_MAX];
-
-          snprintf(fullpath, sizeof(fullpath), "%s/%s", data->set.ssl.CApath,
-                   entry->name);
-          rc = nss_load_cert(fullpath, PR_TRUE);
-          /* FIXME: check this return value! */
-        }
-        /* This is purposefully tolerant of errors so non-PEM files
-         * can be in the same directory */
-      } while(entry != NULL);
-      PR_CloseDir(dir);
-    }
-  }
-  infof(data,
-        "  CAfile: %s\n"
-        "  CApath: %s\n",
-        data->set.ssl.CAfile ? data->set.ssl.CAfile : "none",
-        data->set.ssl.CApath ? data->set.ssl.CApath : "none");
-
-  if (data->set.ssl.CRLfile) {
-    int rc = nss_load_crl(data->set.ssl.CRLfile, PR_FALSE);
-    if (!rc) {
+  if(data->set.ssl.CRLfile) {
+    if(SECSuccess != nss_load_crl(data->set.ssl.CRLfile)) {
       curlerr = CURLE_SSL_CRL_BADFILE;
       goto error;
     }
@@ -1132,105 +1338,83 @@ CURLcode Curl_nss_connect(struct connectdata *conn, int sockindex)
   }
 
   if(data->set.str[STRING_CERT]) {
-    char *n;
-    char *nickname;
-    bool nickname_alloc = FALSE;
-
-    if(is_file(data->set.str[STRING_CERT])) {
-      n = strrchr(data->set.str[STRING_CERT], '/');
-      if(n) {
-        n++; /* skip last slash */
-        nickname = aprintf("PEM Token #%d:%s", 1, n);
-        if(!nickname)
-          return CURLE_OUT_OF_MEMORY;
-
-        nickname_alloc = TRUE;
-      }
+    char *nickname = dup_nickname(data, STRING_CERT);
+    if(nickname) {
+      /* we are not going to use libnsspem.so to read the client cert */
+      connssl->obj_clicert = NULL;
     }
     else {
-      nickname = data->set.str[STRING_CERT];
-    }
-    if(nss_Init_Tokens(conn) != SECSuccess) {
-      if(nickname_alloc)
-        free(nickname);
-      goto error;
-    }
-    if(!cert_stuff(conn, data->set.str[STRING_CERT],
-                    data->set.str[STRING_KEY])) {
-      /* failf() is already done in cert_stuff() */
-      if(nickname_alloc)
-        free(nickname);
-      return CURLE_SSL_CERTPROBLEM;
+      CURLcode rv = cert_stuff(conn, sockindex, data->set.str[STRING_CERT],
+                               data->set.str[STRING_KEY]);
+      if(CURLE_OK != rv) {
+        /* failf() is already done in cert_stuff() */
+        curlerr = rv;
+        goto error;
+      }
     }
 
-    /* this "takes over" the pointer to the allocated name or makes a
-       dup of it */
-    connssl->client_nickname = nickname_alloc?nickname:strdup(nickname);
-    if(!connssl->client_nickname)
-      return CURLE_OUT_OF_MEMORY;
-
-    if(SSL_GetClientAuthDataHook(model,
-                                 (SSLGetClientAuthData) SelectClientCert,
-                                 (void *)connssl->client_nickname) !=
-       SECSuccess) {
-      curlerr = CURLE_SSL_CERTPROBLEM;
-      goto error;
-    }
-
-    PK11_SetPasswordFunc(nss_no_password);
+    /* store the nickname for SelectClientCert() called during handshake */
+    connssl->client_nickname = nickname;
   }
   else
     connssl->client_nickname = NULL;
 
+  if(SSL_GetClientAuthDataHook(model, SelectClientCert,
+                               (void *)connssl) != SECSuccess) {
+    curlerr = CURLE_SSL_CERTPROBLEM;
+    goto error;
+  }
 
   /* Import our model socket  onto the existing file descriptor */
   connssl->handle = PR_ImportTCPSocket(sockfd);
   connssl->handle = SSL_ImportFD(model, connssl->handle);
   if(!connssl->handle)
     goto error;
+
   PR_Close(model); /* We don't need this any more */
+  model = NULL;
+
+  /* This is the password associated with the cert that we're using */
+  if(data->set.str[STRING_KEY_PASSWD]) {
+    SSL_SetPKCS11PinArg(connssl->handle, data->set.str[STRING_KEY_PASSWD]);
+  }
 
   /* Force handshake on next I/O */
   SSL_ResetHandshake(connssl->handle, /* asServer */ PR_FALSE);
 
   SSL_SetURL(connssl->handle, conn->host.name);
 
+  /* check timeout situation */
+  time_left = Curl_timeleft(data, NULL, TRUE);
+  if(time_left < 0L) {
+    failf(data, "timed out before SSL handshake");
+    goto error;
+  }
+  timeout = PR_MillisecondsToInterval((PRUint32) time_left);
+
   /* Force the handshake now */
-  if(SSL_ForceHandshakeWithTimeout(connssl->handle,
-                                    PR_SecondsToInterval(HANDSHAKE_TIMEOUT))
-      != SECSuccess) {
-    if(conn->data->set.ssl.certverifyresult!=0)
+  if(SSL_ForceHandshakeWithTimeout(connssl->handle, timeout) != SECSuccess) {
+    if(conn->data->set.ssl.certverifyresult == SSL_ERROR_BAD_CERT_DOMAIN)
+      curlerr = CURLE_PEER_FAILED_VERIFICATION;
+    else if(conn->data->set.ssl.certverifyresult!=0)
       curlerr = CURLE_SSL_CACERT;
     goto error;
   }
 
   connssl->state = ssl_connection_complete;
+  conn->recv[sockindex] = nss_recv;
+  conn->send[sockindex] = nss_send;
 
   display_conn_info(conn, connssl->handle);
 
-  if (data->set.str[STRING_SSL_ISSUERCERT]) {
-    char *n;
-    char *nickname;
-    bool nickname_alloc = FALSE;
-    SECStatus ret;
-
-    if(is_file(data->set.str[STRING_SSL_ISSUERCERT])) {
-      n = strrchr(data->set.str[STRING_SSL_ISSUERCERT], '/');
-      if (n) {
-        n++; /* skip last slash */
-        nickname = aprintf("PEM Token #%d:%s", 1, n);
-        if(!nickname)
-          return CURLE_OUT_OF_MEMORY;
-        nickname_alloc = TRUE;
-      }
-    }
-    else
-      nickname = data->set.str[STRING_SSL_ISSUERCERT];
-
-    ret = check_issuer_cert(connssl->handle, nickname);
-
-    if(nickname_alloc)
+  if(data->set.str[STRING_SSL_ISSUERCERT]) {
+    SECStatus ret = SECFailure;
+    char *nickname = dup_nickname(data, STRING_SSL_ISSUERCERT);
+    if(nickname) {
+      /* we support only nicknames in case of STRING_SSL_ISSUERCERT for now */
+      ret = check_issuer_cert(connssl->handle, nickname);
       free(nickname);
+    }
 
     if(SECFailure == ret) {
       infof(data,"SSL certificate issuer check failed\n");
@@ -1244,81 +1428,95 @@ CURLcode Curl_nss_connect(struct connectdata *conn, int sockindex)
 
   return CURLE_OK;
 
-error:
+  error:
+  /* reset the flag to avoid an infinite loop */
+  data->state.ssl_connect_retry = FALSE;
+
   err = PR_GetError();
-  infof(data, "NSS error %d\n", err);
+  if(is_cc_error(err))
+    curlerr = CURLE_SSL_CERTPROBLEM;
+
+  /* print the error number and error string */
+  infof(data, "NSS error %d (%s)\n", err, nss_error_to_name(err));
+
+  /* print a human-readable message describing the error if available */
+  nss_print_error_message(data, err);
+
   if(model)
     PR_Close(model);
+
+    /* cleanup on connection failure */
+    Curl_llist_destroy(connssl->obj_list, NULL);
+    connssl->obj_list = NULL;
+
+  if(ssl3 && tlsv1 && isTLSIntoleranceError(err)) {
+    /* schedule reconnect through Curl_retry_request() */
+    data->state.ssl_connect_retry = TRUE;
+    infof(data, "Error in TLS handshake, trying SSLv3...\n");
+    return CURLE_OK;
+  }
+
   return curlerr;
 }
 
-/* return number of sent (non-SSL) bytes */
-int Curl_nss_send(struct connectdata *conn,  /* connection data */
-                  int sockindex,             /* socketindex */
-                  const void *mem,           /* send this data */
-                  size_t len)                /* amount to write */
+static ssize_t nss_send(struct connectdata *conn,  /* connection data */
+                        int sockindex,             /* socketindex */
+                        const void *mem,           /* send this data */
+                        size_t len,                /* amount to write */
+                        CURLcode *curlcode)
 {
-  PRInt32 err;
-  struct SessionHandle *data = conn->data;
-  PRInt32 timeout;
   int rc;
 
-  if(data->set.timeout)
-    timeout = PR_MillisecondsToInterval(data->set.timeout);
-  else
-    timeout = PR_MillisecondsToInterval(DEFAULT_CONNECT_TIMEOUT);
-
-  rc = PR_Send(conn->ssl[sockindex].handle, mem, (int)len, 0, timeout);
+  rc = PR_Send(conn->ssl[sockindex].handle, mem, (int)len, 0, -1);
 
   if(rc < 0) {
-    err = PR_GetError();
+    PRInt32 err = PR_GetError();
+    if(err == PR_WOULD_BLOCK_ERROR)
+      *curlcode = CURLE_AGAIN;
+    else {
+      /* print the error number and error string */
+      const char *err_name = nss_error_to_name(err);
+      infof(conn->data, "SSL write: error %d (%s)\n", err, err_name);
 
-    if(err == PR_IO_TIMEOUT_ERROR) {
-      failf(data, "SSL connection timeout");
-      return CURLE_OPERATION_TIMEDOUT;
+      /* print a human-readable message describing the error if available */
+      nss_print_error_message(conn->data, err);
+
+      *curlcode = (is_cc_error(err))
+        ? CURLE_SSL_CERTPROBLEM
+        : CURLE_SEND_ERROR;
     }
-
-    failf(conn->data, "SSL write: error %d", err);
     return -1;
   }
   return rc; /* number of bytes */
 }
 
-/*
- * If the read would block we return -1 and set 'wouldblock' to TRUE.
- * Otherwise we return the amount of data read. Other errors should return -1
- * and set 'wouldblock' to FALSE.
- */
-ssize_t Curl_nss_recv(struct connectdata * conn, /* connection data */
-                      int num,                   /* socketindex */
-                      char *buf,                 /* store read data here */
-                      size_t buffersize,         /* max amount to read */
-                      bool * wouldblock)
+static ssize_t nss_recv(struct connectdata * conn, /* connection data */
+                        int num,                   /* socketindex */
+                        char *buf,                 /* store read data here */
+                        size_t buffersize,         /* max amount to read */
+                        CURLcode *curlcode)
 {
   ssize_t nread;
-  struct SessionHandle *data = conn->data;
-  PRInt32 timeout;
 
-  if(data->set.timeout)
-    timeout = PR_SecondsToInterval(data->set.timeout);
-  else
-    timeout = PR_MillisecondsToInterval(DEFAULT_CONNECT_TIMEOUT);
-
-  nread = PR_Recv(conn->ssl[num].handle, buf, (int)buffersize, 0, timeout);
-  *wouldblock = FALSE;
+  nread = PR_Recv(conn->ssl[num].handle, buf, (int)buffersize, 0, -1);
   if(nread < 0) {
     /* failed SSL read */
     PRInt32 err = PR_GetError();
 
-    if(err == PR_WOULD_BLOCK_ERROR) {
-      *wouldblock = TRUE;
-      return -1; /* basically EWOULDBLOCK */
+    if(err == PR_WOULD_BLOCK_ERROR)
+      *curlcode = CURLE_AGAIN;
+    else {
+      /* print the error number and error string */
+      const char *err_name = nss_error_to_name(err);
+      infof(conn->data, "SSL read: errno %d (%s)\n", err, err_name);
+
+      /* print a human-readable message describing the error if available */
+      nss_print_error_message(conn->data, err);
+
+      *curlcode = (is_cc_error(err))
+        ? CURLE_SSL_CERTPROBLEM
+        : CURLE_RECV_ERROR;
     }
-    if(err == PR_IO_TIMEOUT_ERROR) {
-      failf(data, "SSL connection timeout");
-      return CURLE_OPERATION_TIMEDOUT;
-    }
-    failf(conn->data, "SSL read: errno %d", err);
     return -1;
   }
   return nread;
@@ -1328,4 +1526,32 @@ size_t Curl_nss_version(char *buffer, size_t size)
 {
   return snprintf(buffer, size, "NSS/%s", NSS_VERSION);
 }
+
+int Curl_nss_seed(struct SessionHandle *data)
+{
+  /* TODO: implement? */
+  (void) data;
+  return 0;
+}
+
+void Curl_nss_random(struct SessionHandle *data,
+                     unsigned char *entropy,
+                     size_t length)
+{
+  Curl_nss_seed(data);  /* Initiate the seed if not already done */
+  PK11_GenerateRandom(entropy, curlx_uztosi(length));
+}
+
+void Curl_nss_md5sum(unsigned char *tmp, /* input */
+                     size_t tmplen,
+                     unsigned char *md5sum, /* output */
+                     size_t md5len)
+{
+  PK11Context *MD5pw = PK11_CreateDigestContext(SEC_OID_MD5);
+  unsigned int MD5out;
+  PK11_DigestOp(MD5pw, tmp, curlx_uztoui(tmplen));
+  PK11_DigestFinal(MD5pw, md5sum, &MD5out, curlx_uztoui(md5len));
+  PK11_DestroyContext(MD5pw, PR_TRUE);
+}
+
 #endif /* USE_NSS */

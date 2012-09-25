@@ -21,7 +21,6 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: telnet.h,v 1.15 2007-10-12 13:36:38 patrickm Exp $
  ***************************************************************************/
 #ifndef CURL_DISABLE_TELNET
 extern const struct Curl_handler Curl_handler_telnet;
