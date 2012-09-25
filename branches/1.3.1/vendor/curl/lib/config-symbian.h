@@ -1,7 +1,30 @@
-/* config-symbian.h.  Manually generated.  */
+#ifndef HEADER_CURL_CONFIG_SYMBIAN_H
+#define HEADER_CURL_CONFIG_SYMBIAN_H
+/***************************************************************************
+ *                                  _   _ ____  _
+ *  Project                     ___| | | |  _ \| |
+ *                             / __| | | | |_) | |
+ *                            | (__| |_| |  _ <| |___
+ *                             \___|\___/|_| \_\_____|
+ *
+ * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+ *
+ * This software is licensed as described in the file COPYING, which
+ * you should have received as part of this distribution. The terms
+ * are also available at http://curl.haxx.se/docs/copyright.html.
+ *
+ * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+ * copies of the Software, and permit persons to whom the Software is
+ * furnished to do so, under the terms of the COPYING file.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ***************************************************************************/
 
-/* when building libcurl itself */
-/* #undef BUILDING_LIBCURL */
+/* ================================================================ */
+/*               Hand crafted config file for Symbian               */
+/* ================================================================ */
 
 /* Location of default ca bundle */
 /* #define CURL_CA_BUNDLE "/etc/pki/tls/certs/ca-bundle.crt"*/
@@ -42,23 +65,11 @@
 /* to disable verbose strings */
 /* #define CURL_DISABLE_VERBOSE_STRINGS 1*/
 
-/* to make a symbol visible */
-/*#define CURL_EXTERN_SYMBOL  __declspec(dllexport)*/
+/* Definition to make a library symbol externally visible. */
+/* #undef CURL_EXTERN_SYMBOL */
 
-/* to enable hidden symbols */
-/*#define CURL_HIDDEN_SYMBOLS 1*/
-
-/* W$ LDAP with non-W$ compiler */
-/* #undef CURL_LDAP_HYBRID */
-
-/* Use W$ LDAP implementation */
+/* Use Windows LDAP implementation */
 /* #undef CURL_LDAP_WIN */
-
-/* when not building a shared library */
-/* #undef CURL_STATICLIB */
-
-/* Set to explicitly specify we don't want to use thread-safe functions */
-/* #undef DISABLED_THREADSAFE */
 
 /* your Entropy Gathering Daemon socket pathname */
 /* #undef EGD_SOCKET */
@@ -385,9 +396,6 @@
 /* Define to 1 if you have the `pipe' function. */
 #define HAVE_PIPE 1
 
-/* if you have the function PK11_CreateGenericObject */
-/* #undef HAVE_PK11_CREATEGENERICOBJECT */
-
 /* Define to 1 if you have the `poll' function. */
 /*#define HAVE_POLL 1*/
 
@@ -631,20 +639,17 @@
 /* Define to 1 if you have the <x509.h> header file. */
 /* #undef HAVE_X509_H */
 
-/* Define to 1 if you are building a native Windows target. */
-/* #undef NATIVE_WINDOWS */
-
-/* If you lack a fine basename() prototype */
-/* #undef NEED_BASENAME_PROTO */
-
 /* Define to 1 if you need the lber.h header file even with ldap.h */
 /* #undef NEED_LBER_H */
 
 /* Define to 1 if you need the malloc.h header file even with stdlib.h */
 /* #undef NEED_MALLOC_H */
 
-/* need REENTRANT defined */
+/* Define to 1 if _REENTRANT preprocessor symbol must be defined. */
 /* #undef NEED_REENTRANT */
+
+/* Define to 1 if _THREAD_SAFE preprocessor symbol must be defined. */
+/* #undef NEED_THREAD_SAFE */
 
 /* cpu-machine-OS */
 #ifdef __WINS__
@@ -712,8 +717,14 @@
 /* Define to the type of arg 5 for `select'. */
 #define SELECT_TYPE_ARG5 (struct timeval *)
 
+/* The size of `int', as computed by sizeof. */
+#define SIZEOF_INT 4
+
 /* The size of `off_t', as computed by sizeof. */
 #define SIZEOF_OFF_T 8
+
+/* The size of `short', as computed by sizeof. */
+#define SIZEOF_SHORT 2
 
 /* The size of `size_t', as computed by sizeof. */
 #define SIZEOF_SIZE_T 4
@@ -745,12 +756,6 @@
 /* if NSS is enabled */
 /* #undef USE_NSS */
 
-/* if OpenSSL is in use */
-/*#define USE_OPENSSL 1*/
-
-/* if SSL is enabled */
-/*#define USE_SSLEAY 1*/
-
 /* to enable SSPI support */
 /* #undef USE_WINDOWS_SSPI */
 
@@ -776,9 +781,6 @@
 /* Define for large files, on AIX-style hosts. */
 /* #undef _LARGE_FILES */
 
-/* define this if you need it to compile thread-safe code */
-/* #undef _THREAD_SAFE */
-
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
 
@@ -793,9 +795,6 @@
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */
-
-/* Type to use in place of socklen_t when system does not provide it. */
-/* #undef socklen_t */
 
 /* the signed version of size_t */
 /* #undef ssize_t */
@@ -817,7 +816,9 @@
 #endif
 
 /* Enable appropriate definitions only when OpenSSL support is enabled */
-#ifdef USE_SSL
-#define USE_OPENSSL 1
-#define USE_SSLEAY 1
+#ifdef USE_SSLEAY
+/* if OpenSSL is in use */
+#define USE_OPENSSL
 #endif
+
+#endif /* HEADER_CURL_CONFIG_SYMBIAN_H */

@@ -131,6 +131,10 @@ void CShaderItem::CreateUnderlyingData ( const SString& strFilename, const SStri
         m_pEffectWrap->hLightDiffuse, "LIGHTDIFFUSE",
         m_pEffectWrap->hLightSpecular, "LIGHTSPECULAR",
         m_pEffectWrap->hLightDirection, "LIGHTDIRECTION",
+        m_pEffectWrap->hDepthBuffer, "DEPTHBUFFER",
+        m_pEffectWrap->hViewMainScene, "VIEW_MAIN_SCENE",
+        m_pEffectWrap->hWorldMainScene, "WORLD_MAIN_SCENE",
+        m_pEffectWrap->hProjectionMainScene, "PROJECTION_MAIN_SCENE",
     };
 
     for ( uint h = 0 ; h < NUMELMS( handleNames ) ; h++ )
@@ -147,6 +151,8 @@ void CShaderItem::CreateUnderlyingData ( const SString& strFilename, const SStri
         handleNames[h].hHandle = phHandle ? *phHandle : NULL;
     }
 
+    m_pManager->NotifyShaderItemUsesDepthBuffer ( this, m_pEffectWrap->m_bUsesDepthBuffer );
+       
     // Create instance to store param values
     RenewShaderInstance ();
 }
@@ -161,6 +167,7 @@ void CShaderItem::CreateUnderlyingData ( const SString& strFilename, const SStri
 ////////////////////////////////////////////////////////////////
 void CShaderItem::ReleaseUnderlyingData ( void )
 {
+    m_pManager->NotifyShaderItemUsesDepthBuffer ( this, false );
     SAFE_RELEASE( m_pEffectWrap )
     SAFE_RELEASE( m_pShaderInstance );
 }

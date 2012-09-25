@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2007, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,12 +18,11 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: nwos.c,v 1.4 2007-11-07 09:21:35 bagder Exp $
  ***************************************************************************/
 
-#ifdef NETWARE /* Novell NetWare */
+#include "setup.h"
 
-#include <stdlib.h>
+#ifdef NETWARE /* Novell NetWare */
 
 #ifdef __NOVELL_LIBC__
 /* For native LibC-based NLM we need to do nothing. */
@@ -35,7 +34,6 @@ int netware_init ( void )
 #else /* __NOVELL_LIBC__ */
 
 /* For native CLib-based NLM we need to initialize the LONG namespace. */
-#include <stdio.h>
 #include <nwnspace.h>
 #include <nwthread.h>
 #include <nwadv.h>
@@ -88,5 +86,3 @@ int __deinit_environment ( void )
 #endif /* __NOVELL_LIBC__ */
 
 #endif /* NETWARE */
-
-

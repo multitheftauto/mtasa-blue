@@ -83,6 +83,9 @@ void CRenderItemManager::OnLostDevice ( void )
 {
     for ( std::set < CRenderItem* >::iterator iter = m_CreatedItemList.begin () ; iter != m_CreatedItemList.end () ; iter++ )
         (*iter)->OnLostDevice ();
+
+    SAFE_RELEASE( m_pSavedSceneDepthSurface );
+    SAFE_RELEASE( g_pDeviceState->MainSceneState.DepthBuffer );
 }
 
 
@@ -496,6 +499,9 @@ void CRenderItemManager::EnableSetRenderTargetOldVer ( bool bEnable )
 ////////////////////////////////////////////////////////////////
 bool CRenderItemManager::SaveDefaultRenderTarget ( void )
 {
+    // Make sure any special depth buffer has been removed
+    FlushReadableDepthBuffer ();
+
     // Update our info about what rendertarget is active
     IDirect3DSurface9* pActiveD3DRenderTarget;
     IDirect3DSurface9* pActiveD3DZStencilSurface;
@@ -542,6 +548,9 @@ bool CRenderItemManager::RestoreDefaultRenderTarget ( void )
 ////////////////////////////////////////////////////////////////
 void CRenderItemManager::ChangeRenderTarget ( uint uiSizeX, uint uiSizeY, IDirect3DSurface9* pD3DRenderTarget, IDirect3DSurface9* pD3DZStencilSurface )
 {
+    // Make sure any special depth buffer has been removed
+    FlushReadableDepthBuffer ();
+
     // Check if we need to change
     IDirect3DSurface9* pCurrentRenderTarget;
     IDirect3DSurface9* pCurrentZStencilSurface;
@@ -676,6 +685,7 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     outStatus.videoCard.strName = m_strVideoCardName;
     outStatus.videoCard.iInstalledMemoryKB = m_iVideoCardMemoryKBTotal;
     outStatus.videoCard.strPSVersion = m_strVideoCardPSVersion;
+    outStatus.videoCard.depthBufferFormat = m_depthBufferFormat;
 
     // Memory usage
     outStatus.videoMemoryKB.iFreeForMTA = m_iMemoryKBFreeForMTA;
@@ -892,4 +902,78 @@ int CRenderItemManager::CalcD3DCubeTextureMemoryKBUsage ( IDirect3DCubeTexture9*
     }
 
     return iMemoryUsed * 6 / 1024;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::NotifyShaderItemUsesDepthBuffer
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::NotifyShaderItemUsesDepthBuffer ( CShaderItem* pShaderItem, bool bUsesDepthBuffer )
+{
+    if ( bUsesDepthBuffer )
+        MapInsert ( m_ShadersUsingDepthBuffer, pShaderItem );
+    else
+        MapRemove ( m_ShadersUsingDepthBuffer, pShaderItem );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::PreDrawWorld
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::PreDrawWorld ( void )
+{
+    // Save scene matrices
+    g_pDeviceState->MainSceneState.TransformState = g_pDeviceState->TransformState;
+    IDirect3DTexture9*& pReadableDepthBuffer = g_pDeviceState->MainSceneState.DepthBuffer;
+
+    // Create/destroy readable depth buffer depending on what is needed
+    bool bRequireDepthBuffer = !m_ShadersUsingDepthBuffer.empty ();
+
+    if ( !bRequireDepthBuffer )
+        SAFE_RELEASE( pReadableDepthBuffer );
+
+    if ( bRequireDepthBuffer && !pReadableDepthBuffer && m_depthBufferFormat != RFORMAT_UNKNOWN )
+    {
+        m_pDevice->CreateTexture ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, 1, D3DUSAGE_DEPTHSTENCIL, (D3DFORMAT)m_depthBufferFormat, D3DPOOL_DEFAULT, &pReadableDepthBuffer, NULL );
+    }
+
+    // Set readable depth buffer if needed
+    if ( pReadableDepthBuffer != NULL && m_pSavedSceneDepthSurface == NULL )
+    {
+        if ( m_pDevice->GetDepthStencilSurface ( &m_pSavedSceneDepthSurface ) == D3D_OK )
+        {
+            IDirect3DSurface9* pSurf = NULL;
+            if ( pReadableDepthBuffer->GetSurfaceLevel ( 0, &pSurf ) == D3D_OK )
+            {
+                m_pDevice->SetDepthStencilSurface ( pSurf );
+                m_pDevice->Clear ( 0, NULL, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, D3DCOLOR_ARGB(0,0,0,0), 1, 0 );
+                pSurf->Release ();
+            }
+        }
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::FlushReadableDepthBuffer
+//
+// Ensure our readable depth buffer is no longer being used
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::FlushReadableDepthBuffer ( void )
+{
+    if ( m_pSavedSceneDepthSurface )
+    {
+        m_pDevice->SetDepthStencilSurface ( m_pSavedSceneDepthSurface );
+        SAFE_RELEASE( m_pSavedSceneDepthSurface );
+    }
 }

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2008, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,7 +18,6 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: progress.c,v 1.92 2008-10-11 01:56:04 yangtse Exp $
  ***************************************************************************/
 
 #include "setup.h"
@@ -132,26 +131,41 @@ static char *max5data(curl_off_t bytes, char *max5)
 
 */
 
-void Curl_pgrsDone(struct connectdata *conn)
+int Curl_pgrsDone(struct connectdata *conn)
 {
+  int rc;
   struct SessionHandle *data = conn->data;
   data->progress.lastshow=0;
-  Curl_pgrsUpdate(conn); /* the final (forced) update */
+  rc = Curl_pgrsUpdate(conn); /* the final (forced) update */
+  if(rc)
+    return rc;
+
+  if(!(data->progress.flags & PGRS_HIDE) &&
+     !data->progress.callback)
+    /* only output if we don't use a progress callback and we're not
+     * hidden */
+    fprintf(data->set.err, "\n");
 
   data->progress.speeder_c = 0; /* reset the progress meter display */
+  return 0;
 }
 
-/* reset all times except redirect */
-void Curl_pgrsResetTimes(struct SessionHandle *data)
+/* reset all times except redirect, and reset the known transfer sizes */
+void Curl_pgrsResetTimesSizes(struct SessionHandle *data)
 {
   data->progress.t_nslookup = 0.0;
   data->progress.t_connect = 0.0;
   data->progress.t_pretransfer = 0.0;
   data->progress.t_starttransfer = 0.0;
+
+  Curl_pgrsSetDownloadSize(data, 0);
+  Curl_pgrsSetUploadSize(data, 0);
 }
 
 void Curl_pgrsTime(struct SessionHandle *data, timerid timer)
 {
+  struct timeval now = Curl_tvnow();
+
   switch(timer) {
   default:
   case TIMER_NONE:
@@ -159,35 +173,38 @@ void Curl_pgrsTime(struct SessionHandle *data, timerid timer)
     break;
   case TIMER_STARTSINGLE:
     /* This is set at the start of a single fetch */
-    data->progress.t_startsingle = Curl_tvnow();
+    data->progress.t_startsingle = now;
+    break;
+
+  case TIMER_STARTACCEPT:
+    data->progress.t_acceptdata = Curl_tvnow();
     break;
 
   case TIMER_NAMELOOKUP:
     data->progress.t_nslookup =
-      Curl_tvdiff_secs(Curl_tvnow(), data->progress.t_startsingle);
+      Curl_tvdiff_secs(now, data->progress.t_startsingle);
     break;
   case TIMER_CONNECT:
     data->progress.t_connect =
-      Curl_tvdiff_secs(Curl_tvnow(), data->progress.t_startsingle);
+      Curl_tvdiff_secs(now, data->progress.t_startsingle);
     break;
   case TIMER_APPCONNECT:
     data->progress.t_appconnect =
-      Curl_tvdiff_secs(Curl_tvnow(), data->progress.t_startsingle);
+      Curl_tvdiff_secs(now, data->progress.t_startsingle);
     break;
   case TIMER_PRETRANSFER:
     data->progress.t_pretransfer =
-      Curl_tvdiff_secs(Curl_tvnow(), data->progress.t_startsingle);
+      Curl_tvdiff_secs(now, data->progress.t_startsingle);
     break;
   case TIMER_STARTTRANSFER:
     data->progress.t_starttransfer =
-      Curl_tvdiff_secs(Curl_tvnow(), data->progress.t_startsingle);
+      Curl_tvdiff_secs(now, data->progress.t_startsingle);
     break;
   case TIMER_POSTRANSFER:
     /* this is the normal end-of-transfer thing */
     break;
   case TIMER_REDIRECT:
-    data->progress.t_redirect =
-      Curl_tvdiff_secs(Curl_tvnow(), data->progress.start);
+    data->progress.t_redirect = Curl_tvdiff_secs(now, data->progress.start);
     break;
   }
 }
@@ -196,6 +213,8 @@ void Curl_pgrsStartNow(struct SessionHandle *data)
 {
   data->progress.speeder_c = 0; /* reset the progress meter display */
   data->progress.start = Curl_tvnow();
+  /* clear all bits except HIDE and HEADERS_OUT */
+  data->progress.flags &= PGRS_HIDE|PGRS_HEADERS_OUT;
 }
 
 void Curl_pgrsSetDownloadCounter(struct SessionHandle *data, curl_off_t size)
@@ -211,7 +230,7 @@ void Curl_pgrsSetUploadCounter(struct SessionHandle *data, curl_off_t size)
 void Curl_pgrsSetDownloadSize(struct SessionHandle *data, curl_off_t size)
 {
   data->progress.size_dl = size;
-  if(size > 0)
+  if(size >= 0)
     data->progress.flags |= PGRS_DL_SIZE_KNOWN;
   else
     data->progress.flags &= ~PGRS_DL_SIZE_KNOWN;
@@ -220,12 +239,16 @@ void Curl_pgrsSetDownloadSize(struct SessionHandle *data, curl_off_t size)
 void Curl_pgrsSetUploadSize(struct SessionHandle *data, curl_off_t size)
 {
   data->progress.size_ul = size;
-  if(size > 0)
+  if(size >= 0)
     data->progress.flags |= PGRS_UL_SIZE_KNOWN;
   else
     data->progress.flags &= ~PGRS_UL_SIZE_KNOWN;
 }
 
+/*
+ * Curl_pgrsUpdate() returns 0 for success or the value returned by the
+ * progress callback!
+ */
 int Curl_pgrsUpdate(struct connectdata *conn)
 {
   struct timeval now;
@@ -364,27 +387,37 @@ int Curl_pgrsUpdate(struct connectdata *conn)
                 data->state.resume_from);
       }
       fprintf(data->set.err,
-              "  %% Total    %% Received %% Xferd  Average Speed   Time    Time     Time  Current\n"
-              "                                 Dload  Upload   Total   Spent    Left  Speed\n");
+              "  %% Total    %% Received %% Xferd  Average Speed   "
+              "Time    Time     Time  Current\n"
+              "                                 Dload  Upload   "
+              "Total   Spent    Left  Speed\n");
       data->progress.flags |= PGRS_HEADERS_OUT; /* headers are shown */
     }
 
     /* Figure out the estimated time of arrival for the upload */
     if((data->progress.flags & PGRS_UL_SIZE_KNOWN) &&
-       (data->progress.ulspeed > CURL_OFF_T_C(0)) &&
-       (data->progress.size_ul > CURL_OFF_T_C(100)) ) {
+       (data->progress.ulspeed > CURL_OFF_T_C(0))) {
       ulestimate = data->progress.size_ul / data->progress.ulspeed;
-      ulpercen = data->progress.uploaded /
-                (data->progress.size_ul/CURL_OFF_T_C(100));
+
+      if(data->progress.size_ul > CURL_OFF_T_C(10000))
+        ulpercen = data->progress.uploaded /
+          (data->progress.size_ul/CURL_OFF_T_C(100));
+      else if(data->progress.size_ul > CURL_OFF_T_C(0))
+        ulpercen = (data->progress.uploaded*100) /
+          data->progress.size_ul;
     }
 
     /* ... and the download */
     if((data->progress.flags & PGRS_DL_SIZE_KNOWN) &&
-       (data->progress.dlspeed > CURL_OFF_T_C(0)) &&
-       (data->progress.size_dl > CURL_OFF_T_C(100))) {
+       (data->progress.dlspeed > CURL_OFF_T_C(0))) {
       dlestimate = data->progress.size_dl / data->progress.dlspeed;
-      dlpercen = data->progress.downloaded /
-                (data->progress.size_dl/CURL_OFF_T_C(100));
+
+      if(data->progress.size_dl > CURL_OFF_T_C(10000))
+        dlpercen = data->progress.downloaded /
+          (data->progress.size_dl/CURL_OFF_T_C(100));
+      else if(data->progress.size_dl > CURL_OFF_T_C(0))
+        dlpercen = (data->progress.downloaded*100) /
+          data->progress.size_dl;
     }
 
     /* Now figure out which of them is slower and use that one for the
@@ -396,20 +429,22 @@ int Curl_pgrsUpdate(struct connectdata *conn)
     time2str(time_total, total_estimate);
     time2str(time_spent, timespent);
 
-    /* Get the total amount of data expected to get transfered */
+    /* Get the total amount of data expected to get transferred */
     total_expected_transfer =
       (data->progress.flags & PGRS_UL_SIZE_KNOWN?
        data->progress.size_ul:data->progress.uploaded)+
       (data->progress.flags & PGRS_DL_SIZE_KNOWN?
        data->progress.size_dl:data->progress.downloaded);
 
-    /* We have transfered this much so far */
+    /* We have transferred this much so far */
     total_transfer = data->progress.downloaded + data->progress.uploaded;
 
-    /* Get the percentage of data transfered so far */
-    if(total_expected_transfer > CURL_OFF_T_C(100))
+    /* Get the percentage of data transferred so far */
+    if(total_expected_transfer > CURL_OFF_T_C(10000))
       total_percen = total_transfer /
-                    (total_expected_transfer/CURL_OFF_T_C(100));
+        (total_expected_transfer/CURL_OFF_T_C(100));
+    else if(total_expected_transfer > CURL_OFF_T_C(0))
+      total_percen = (total_transfer*100) / total_expected_transfer;
 
     fprintf(data->set.err,
             "\r"

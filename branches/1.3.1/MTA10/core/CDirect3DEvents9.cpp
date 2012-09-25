@@ -884,3 +884,43 @@ HRESULT CDirect3DEvents9::SetVertexDeclaration ( IDirect3DDevice9 *pDevice, IDir
 
     return pDevice->SetVertexDeclaration ( pDecl );
 }
+
+
+////////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::DiscoverReadableDepthFormat
+//
+// Check the best available readable depth buffer format
+//
+////////////////////////////////////////////////////////////////
+ERenderFormat CDirect3DEvents9::DiscoverReadableDepthFormat ( IDirect3DDevice9 *pDevice, D3DMULTISAMPLE_TYPE multisampleType, bool bWindowed )
+{
+    IDirect3D9* pD3D = NULL;
+    pDevice->GetDirect3D ( &pD3D );
+
+    // Formats to check for
+    ERenderFormat checkList[] = { RFORMAT_INTZ, RFORMAT_DF24, RFORMAT_DF16, RFORMAT_RAWZ };
+
+    D3DDISPLAYMODE displayMode;
+    if ( pD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &displayMode ) == D3D_OK )
+    {
+        for ( uint i = 0; i < NUMELMS( checkList ) ; i++ )
+        {
+            D3DFORMAT DepthFormat = (D3DFORMAT)checkList[i];
+
+            // Can use this format?
+            if ( D3D_OK != pD3D->CheckDeviceFormat ( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, displayMode.Format, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, DepthFormat ) )
+                continue;
+
+            // Also check if multisampled
+            if ( multisampleType != D3DMULTISAMPLE_NONE )
+                if ( D3D_OK != pD3D->CheckDeviceMultiSampleType ( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, DepthFormat, bWindowed, multisampleType, NULL ) )
+                    continue;
+
+            // Found a working format
+            return checkList[i];
+        }
+    }
+
+    return RFORMAT_UNKNOWN;
+}

@@ -30,14 +30,16 @@ public:
     // CEffectTemplate
     virtual bool            HaveFilesChanged        ( void );
     virtual int             GetTicksSinceLastUsed   ( void );
-    virtual ID3DXEffect*    CloneD3DEffect          ( SString& strOutStatus, bool& bOutUsesVertexShader );
+    virtual ID3DXEffect*    CloneD3DEffect          ( SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer );
     virtual void            UnCloneD3DEffect        ( ID3DXEffect* pD3DEffect );
 
     // CEffectTemplateImpl
     void                    CreateUnderlyingData    ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
     void                    ReleaseUnderlyingData   ( void );
+    bool                    ValidateDepthBufferUsage ( D3DXHANDLE hTechnique, SString& strOutErrorExtra );
 
     ID3DXEffect*                        m_pD3DEffect;
+    bool                                m_bUsesDepthBuffer;
     bool                                m_bHaveFilesChanged;
     std::map < SString, SString >       m_FileMD5Map;
     CTickCount                          m_TickCountLastUsed;
@@ -239,6 +241,19 @@ void CEffectTemplateImpl::CreateUnderlyingData ( const SString& strFilename, con
 {
     assert ( !m_pD3DEffect );
 
+    // Make defines
+    bool bUsesRAWZ = CGraphics::GetSingleton ().GetRenderItemManager ()->GetDepthBufferFormat () == RFORMAT_RAWZ;
+
+    std::vector < D3DXMACRO > macroList;
+
+    macroList.push_back ( D3DXMACRO () );
+    macroList.back ().Name = "IS_DEPTHBUFFER_RAWZ";
+    macroList.back ().Definition = bUsesRAWZ ? "1" : "0";
+
+    macroList.push_back ( D3DXMACRO () );
+    macroList.back ().Name = NULL;
+    macroList.back ().Definition = NULL;
+
     // Compile effect
     DWORD dwFlags = 0;      // D3DXSHADER_PARTIALPRECISION, D3DXSHADER_DEBUG, D3DXFX_NOT_CLONEABLE;
     if ( bDebug )
@@ -247,7 +262,7 @@ void CEffectTemplateImpl::CreateUnderlyingData ( const SString& strFilename, con
     SString strMetaPath = strFilename.Right ( strFilename.length () - strRootPath.length () );
     CIncludeManager IncludeManager ( strRootPath, ExtractPath ( strMetaPath ) );
     LPD3DXBUFFER pBufferErrors = NULL;
-    HRESULT hr = D3DXCreateEffectFromFile( m_pDevice, ExtractFilename ( strMetaPath ), NULL, &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors );            
+    HRESULT hr = D3DXCreateEffectFromFile( m_pDevice, ExtractFilename ( strMetaPath ), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors );            
 
     // Handle compile errors
     strOutStatus = "";
@@ -279,18 +294,23 @@ void CEffectTemplateImpl::CreateUnderlyingData ( const SString& strFilename, con
         SString strProblemInfo = "";
         for ( uint i = 0 ; i < EffectDesc.Techniques ; i++ )
         {
+            SString strErrorExtra;
             D3DXHANDLE hTemp = m_pD3DEffect->GetTechnique ( i );
             HRESULT hr = m_pD3DEffect->ValidateTechnique ( hTemp );
             if ( SUCCEEDED( hr ) )
             {
-                hTechnique = hTemp;
-                break;
+                // Check depth buffer rules
+                if ( ValidateDepthBufferUsage ( hTemp, strErrorExtra ) )
+                {
+                    hTechnique = hTemp;
+                    break;
+                }
             }
 
             // Update problem string
             D3DXTECHNIQUE_DESC TechniqueDesc;
             m_pD3DEffect->GetTechniqueDesc( hTemp, &TechniqueDesc );
-            strProblemInfo += SString ( "['%s' (%d/%d) failed (%08x)]", TechniqueDesc.Name, i, EffectDesc.Techniques, hr );
+            strProblemInfo += SString ( "['%s' (%d/%d) failed (%08x)%s]", TechniqueDesc.Name, i, EffectDesc.Techniques, hr, *strErrorExtra );
         }
 
         // Found valid technique
@@ -353,6 +373,45 @@ void CEffectTemplateImpl::CreateUnderlyingData ( const SString& strFilename, con
 
 ////////////////////////////////////////////////////////////////
 //
+// CEffectTemplateImpl::ValidateDepthBufferUsage
+//
+// Check if technique passes our rules
+// Returns false if should fail validation
+//
+////////////////////////////////////////////////////////////////
+bool CEffectTemplateImpl::ValidateDepthBufferUsage ( D3DXHANDLE hTechnique, SString& strOutErrorExtra )
+{
+    m_bUsesDepthBuffer = false;
+
+    // Check depthbuffer handle
+    D3DXHANDLE hDepthBuffer = m_pD3DEffect->GetParameterByName ( NULL, "DEPTHBUFFER" );
+    if ( !hDepthBuffer )
+        hDepthBuffer = m_pD3DEffect->GetParameterBySemantic ( NULL, "DEPTHBUFFER" );
+    if ( hDepthBuffer )
+    {
+        D3DXPARAMETER_DESC ParameterDesc;
+        m_pD3DEffect->GetParameterDesc ( hDepthBuffer, &ParameterDesc );
+        if ( ParameterDesc.Type >= D3DXPT_TEXTURE && ParameterDesc.Type <= D3DXPT_TEXTURECUBE )
+        {
+            if ( m_pD3DEffect->IsParameterUsed ( hDepthBuffer, hTechnique ) )
+            {
+                ERenderFormat depthBufferFormat = m_pManager->GetDepthBufferFormat ();
+                if ( depthBufferFormat == RFORMAT_UNKNOWN )
+                {
+                    strOutErrorExtra += " DEPTHBUFFER used, but readable depth buffer is not available";
+                    return false;
+                }
+                m_bUsesDepthBuffer = true;
+            }
+        }
+    }
+
+    return true;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // CEffectTemplateImpl::ReleaseUnderlyingData
 //
 //
@@ -371,7 +430,7 @@ void CEffectTemplateImpl::ReleaseUnderlyingData ( void )
 // Clone the d3d effect
 //
 ////////////////////////////////////////////////////////////////
-ID3DXEffect* CEffectTemplateImpl::CloneD3DEffect ( SString& strOutStatus, bool& bOutUsesVertexShader )
+ID3DXEffect* CEffectTemplateImpl::CloneD3DEffect ( SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer )
 {
     // Clone D3DXEffect
     ID3DXEffect* pNewD3DEffect = NULL;
@@ -410,6 +469,8 @@ ID3DXEffect* CEffectTemplateImpl::CloneD3DEffect ( SString& strOutStatus, bool& 
                 bOutUsesVertexShader = true;
         }
     }
+
+    bOutUsesDepthBuffer = m_bUsesDepthBuffer;
 
     // Add to list of clones
     assert ( !MapContains ( m_CloneList, pNewD3DEffect ) );
