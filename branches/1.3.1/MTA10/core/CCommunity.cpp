@@ -54,7 +54,6 @@ CCommunity::~CCommunity ( void )
 {
 }
 
-
 void CCommunity::Logout ( void )
 {
     m_ulStartTime = 0;
