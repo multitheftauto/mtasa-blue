@@ -93,6 +93,7 @@ class CRenderWare {
     virtual void                AppendSubtractiveMatch      ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch ) = 0;
     virtual void                RemoveClientEntityRefs      ( CClientEntityBase* pClientEntity ) = 0;
     virtual void                RemoveShaderRefs            ( CSHADERDUMMY* pShaderItem ) = 0;
+    virtual RwFrame *           GetFrameFromName            ( RpClump * pRoot, SString strName ) = 0;
 };
 
 

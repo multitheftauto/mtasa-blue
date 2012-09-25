@@ -156,6 +156,9 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     // Add this vehicle to the vehicle list
     m_pVehicleManager->AddToList ( this );
     m_tSirenBeaconInfo.m_bSirenSilent = false;
+
+    // clear our component data to regenerate
+    m_ComponentData.clear ( );
 }
 
 
@@ -790,6 +793,40 @@ void CClientVehicle::Fix ( void )
     for ( int i = 0 ; i < MAX_PANELS ; i++ ) SetPanelStatus ( i, 0 );
     for ( int i = 0 ; i < MAX_LIGHTS ; i++ ) SetLightStatus ( i, 0 );
     for ( int i = 0 ; i < MAX_WHEELS ; i++ ) SetWheelStatus ( i, 0 );    
+
+    // Grab our component data
+    std::map < SString, SVehicleComponentData > ::iterator iter = m_ComponentData.begin ();
+    // Loop through our component data
+    for ( ; iter != m_ComponentData.end () ; iter++ )
+    {
+        // store our string in a temporary variable
+        SString strTemp = (*iter).first;
+        // get our poisition and rotation and store it into 
+        //GetComponentPosition ( strTemp, (*iter).second.m_vecComponentPosition );
+        //GetComponentRotation ( strTemp, (*iter).second.m_vecComponentRotation );
+        // is our position changed?
+        if ( (*iter).second.m_bPositionChanged )
+        {
+            // Make sure it's different
+            if ( (*iter).second.m_vecOriginalComponentPosition != (*iter).second.m_vecComponentPosition )
+            {
+                // apply our new position
+                SetComponentPosition( strTemp, (*iter).second.m_vecComponentPosition );
+            }
+        }
+        // is our position changed?
+        if ( (*iter).second.m_bRotationChanged )
+        {
+            // Make sure it's different
+            if ( (*iter).second.m_vecOriginalComponentRotation != (*iter).second.m_vecComponentRotation )
+            {
+                // apple our new position
+                SetComponentRotation( strTemp, (*iter).second.m_vecComponentRotation );
+            }
+        }
+        // set our visibility
+        SetComponentVisible ( strTemp, (*iter).second.m_bVisible );
+    }
 }
 
 
@@ -948,6 +985,10 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, unsigned char uc
         ApplyHandling ();
         
         SetSirenOrAlarmActive ( false );
+
+        // clear our component data to regenerate it
+        m_ComponentData.clear ( );
+
         // Create the vehicle if we're streamed in
         if ( IsStreamedIn () )
         {
@@ -968,6 +1009,9 @@ void CClientVehicle::SetVariant ( unsigned char ucVariant, unsigned char ucVaria
 {
     m_ucVariation = ucVariant;
     m_ucVariation2 = ucVariant2;
+
+    // clear our component data to regenerate it
+    m_ComponentData.clear ( );
 
     ReCreate ( );
 }
@@ -2394,6 +2438,68 @@ void CClientVehicle::Create ( void )
         // Re-add all the upgrades - Has to be applied after handling *shrugs*
         if ( m_pUpgrades )
             m_pUpgrades->ReAddAll ();
+
+        if ( m_ComponentData.empty ( ) )
+        {
+            // grab our map of components
+            std::map < SString, RwFrame * > componentMap = m_pVehicle->GetComponentMap ( );
+            // get our beginning
+            std::map < SString, RwFrame * >::iterator iter = componentMap.begin ( );
+            // loop through all the components.... we don't care about the RwFrame we just want the names.
+            for ( ; iter != componentMap.end () ; iter++ )
+            {
+                SVehicleComponentData vehicleComponentData;
+                // Grab our start position
+                GetComponentPosition ( (*iter).first, vehicleComponentData.m_vecComponentPosition );
+                GetComponentPosition ( (*iter).first, vehicleComponentData.m_vecComponentRotation );
+                
+                // copy it into our original positions
+                vehicleComponentData.m_vecComponentPosition = vehicleComponentData.m_vecOriginalComponentPosition;
+                vehicleComponentData.m_vecComponentRotation = vehicleComponentData.m_vecOriginalComponentRotation;
+                
+                // insert it into our component data list
+                m_ComponentData.insert ( pair < SString, SVehicleComponentData > ( (*iter).first, vehicleComponentData ) );
+                
+                // # prefix means hidden by default.
+                if ( (*iter).first[0] == '#' )
+                {
+                    SetComponentVisible ( (*iter).first, false );
+                }
+            }
+        }
+        // Grab our component data
+        std::map < SString, SVehicleComponentData > ::iterator iter = m_ComponentData.begin ();
+        // Loop through our component data
+        for ( ; iter != m_ComponentData.end () ; iter++ )
+        {
+            // store our string in a temporary variable
+            SString strTemp = (*iter).first;
+            // get our poisition and rotation and store it into 
+            //GetComponentPosition ( strTemp, (*iter).second.m_vecComponentPosition );
+            //GetComponentRotation ( strTemp, (*iter).second.m_vecComponentRotation );
+            // is our position changed?
+            if ( (*iter).second.m_bPositionChanged )
+            {
+                // Make sure it's different
+                if ( (*iter).second.m_vecOriginalComponentPosition != (*iter).second.m_vecComponentPosition )
+                {
+                    // apply our new position
+                    SetComponentPosition( strTemp, (*iter).second.m_vecComponentPosition );
+                }
+            }
+            // is our position changed?
+            if ( (*iter).second.m_bRotationChanged )
+            {
+                // Make sure it's different
+                if ( (*iter).second.m_vecOriginalComponentRotation != (*iter).second.m_vecComponentRotation )
+                {
+                    // apple our new position
+                    SetComponentRotation( strTemp, (*iter).second.m_vecComponentRotation );
+                }
+            }
+            // set our visibility
+            SetComponentVisible ( strTemp, (*iter).second.m_bVisible );
+        }
 
         // Tell the streamer we've created this object
         NotifyCreate ();
@@ -3894,4 +4000,144 @@ void CClientVehicle::RemoveVehicleSirens ( void )
         SetVehicleSirenMinimumAlpha( i, 0 );
         SetVehicleSirenColour( i, SColor ( ) );
     }
+}
+
+
+bool CClientVehicle::SetComponentPosition ( SString vehicleComponent, CVector vecPosition )
+{
+    if ( m_pVehicle )
+    {
+        // update our cache
+        m_ComponentData[vehicleComponent].m_vecComponentPosition = vecPosition;
+        m_ComponentData[vehicleComponent].m_bPositionChanged = true;
+
+        // set our position on the model
+        return m_pVehicle->SetComponentPosition ( vehicleComponent, vecPosition );
+    }
+    else
+    {
+        // update our cache
+        m_ComponentData[vehicleComponent].m_vecComponentPosition = vecPosition;
+        m_ComponentData[vehicleComponent].m_bPositionChanged = true;
+        return true;
+    }
+    return false;
+}
+
+bool CClientVehicle::GetComponentPosition ( SString vehicleComponent, CVector &vecPosition )
+{
+    if ( m_pVehicle )
+    {
+        // fill our position from the actual position
+        m_pVehicle->GetComponentPosition ( vehicleComponent, vecPosition );
+        return true;
+    }
+    else
+    {
+        // fill our position from the cached position
+        vecPosition = m_ComponentData[vehicleComponent].m_vecComponentPosition;
+        return true;
+    }
+    return false;
+}
+
+bool CClientVehicle::SetComponentRotation ( SString vehicleComponent, CVector vecRotation )
+{
+    if ( m_pVehicle )
+    {
+        // convert degrees to radians so users don't need to use radians
+        CVector vecTemp = vecRotation;
+        ConvertDegreesToRadians ( vecTemp );
+
+        // update our cache
+        m_ComponentData[vehicleComponent].m_vecComponentRotation = vecRotation;
+        m_ComponentData[vehicleComponent].m_bRotationChanged = true;
+
+        // set our rotation on the model
+        return m_pVehicle->SetComponentRotation ( vehicleComponent, vecTemp );
+    }
+    else
+    {
+        // update our cache
+        m_ComponentData[vehicleComponent].m_vecComponentRotation = vecRotation;
+        m_ComponentData[vehicleComponent].m_bRotationChanged = true;
+        return true;
+    }
+    return false;
+}
+
+bool CClientVehicle::GetComponentRotation ( SString vehicleComponent, CVector &vecRotation )
+{
+    if ( m_pVehicle )
+    {
+        // fill our rotation from the actual rotation
+        m_pVehicle->GetComponentRotation ( vehicleComponent, vecRotation );
+
+        // convert to degrees... none of our functions use radians.
+        ConvertRadiansToDegrees ( vecRotation );
+        return true;
+    }
+    else
+    {
+        // fill our rotation from the cached rotation
+        vecRotation = m_ComponentData[vehicleComponent].m_vecComponentRotation;
+        return true;
+    }
+    return false;
+}
+
+bool CClientVehicle::ResetComponentRotation ( SString vehicleComponent )
+{
+    // set our rotation on the model
+    SetComponentRotation ( vehicleComponent, m_ComponentData[vehicleComponent].m_vecOriginalComponentRotation );
+
+    // update our cache
+    m_ComponentData[vehicleComponent].m_bRotationChanged = false;
+    return true;
+}
+bool CClientVehicle::ResetComponentPosition ( SString vehicleComponent )
+{
+    // set our position on the model
+    SetComponentPosition ( vehicleComponent, m_ComponentData[vehicleComponent].m_vecOriginalComponentPosition );
+
+    // update our cache
+    m_ComponentData[vehicleComponent].m_bPositionChanged = false;
+    return true;
+}
+
+bool CClientVehicle::SetComponentVisible ( SString vehicleComponent, bool bVisible )
+{
+    if ( m_pVehicle )
+    {
+        // update our cache
+        m_ComponentData[vehicleComponent].m_bVisible = bVisible;
+        
+        // set our visibility on the model
+        m_pVehicle->SetComponentVisible ( vehicleComponent, bVisible );
+        return true;
+    }
+    else
+    {
+        // store our visible variable to the cached data
+        m_ComponentData[vehicleComponent].m_bVisible = bVisible;
+        return true;
+    }
+    return false;
+}
+
+bool CClientVehicle::GetComponentVisible ( SString vehicleComponent, bool &bVisible )
+{
+    if ( m_pVehicle )
+    {
+        // fill our visible variable from the actual position
+        m_pVehicle->GetComponentVisible ( vehicleComponent, bVisible );
+        return true;
+    }
+    else
+    {
+        // fill our visible variable from the cached data
+        bVisible = m_ComponentData[vehicleComponent].m_bVisible;
+        return true;
+    }
+    return false;
 }

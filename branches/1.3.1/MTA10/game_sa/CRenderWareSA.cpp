@@ -933,3 +933,8 @@ CD3DDUMMY* GetDeletedMapKey ( CD3DDUMMY** )
 {
     return (CD3DDUMMY*)-2;
 }
+
+RwFrame * CRenderWareSA::GetFrameFromName ( RpClump * pRoot, SString strName )
+{
+    return RwFrameFindFrame ( RpGetFrame ( pRoot ), strName );
+}

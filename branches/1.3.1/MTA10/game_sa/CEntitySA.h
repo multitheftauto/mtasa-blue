@@ -30,7 +30,7 @@
 #define FUNC_SetRwObjectAlpha                               0x5332C0
 #define FUNC_SetOrientation                                 0x439A80
 
-#define FUNC_CMatrix__ConvertToEulerAngles                    0x59A840
+#define FUNC_CMatrix__ConvertToEulerAngles                  0x59A840
 #define FUNC_CMatrix__ConvertFromEulerAngles                0x59AA40
 
 #define FUNC_IsOnScreen                                     0x534540

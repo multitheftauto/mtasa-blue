@@ -19,6 +19,39 @@
 
 extern CGameSA* pGame;
 
+#include "gamesa_renderware.h"
+namespace
+{
+    RpAtomic* ClumpDumpCB (RpAtomic* pAtomic, void * data)
+    {
+        CVehicleSA * pVehicleSA = (CVehicleSA *)data;
+        RwFrame* pFrame = RpGetFrame ( pAtomic );
+        pVehicleSA->AddComponent ( pFrame );
+        //g_pCore->GetConsole()->Print ( SString ( "Atomic:%08x  Frame:%08x %s", pAtomic, pFrame, pFrame ? pFrame->szName : "" ) );
+        //OutputDebugLine ( SString ( "Atomic:%08x  Frame:%08x %s", pAtomic, pFrame, pFrame ? pFrame->szName : "" ) );
+        return pAtomic;
+    }
+
+    void ClumpDump ( RpClump* pClump, CVehicleSA * pVehicleSA )
+    {
+        // get the clump's frame
+        RwFrame* pFrame = RpGetFrame ( pClump );
+        //OutputDebugLine ( SStringX ( "--------------------------------" ) );
+        //OutputDebugLine ( SString ( "Clump:%08x  Frame:%08x %s", pClump, pFrame, pFrame ? pFrame->szName : "" ) );
+        //g_pCore->GetConsole()->Print ( SStringX ( "--------------------------------" ) );
+        //g_pCore->GetConsole()->Print ( SString ( "Clump:%08x  Frame:%08x %s", pClump, pFrame, pFrame ? pFrame->szName : "" ) );
+        // Do for all atomics
+        RpClumpForAllAtomics ( pClump, ClumpDumpCB, pVehicleSA );
+    }
+
+    void VehicleDump ( CVehicleSA* pVehicleSA )
+    {
+        //OutputDebugLine ( SString ( "Interface:%08x", pVehicleSA->GetVehicleInterface() ) );
+        ClumpDump( pVehicleSA->GetInterface()->m_pRwObject, pVehicleSA );
+    }
+}
+
+
 CVehicleSA::CVehicleSA ()
     : m_ucAlpha ( 255 ), m_bIsDerailable ( true ), m_vecGravity ( 0.0f, 0.0f, -1.0f ), m_HeadLightColor ( SColorRGBA ( 255, 255, 255, 255 ) )
 {
@@ -44,7 +77,7 @@ CVehicleSA::CVehicleSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsi
     // Set Variation 1 before creation.
     MemSetFast( (void *)VAR_CVehicle_Variation1, ucVariation, 1 );
     MemSetFast( (void *)VAR_CVehicle_Variation2, ucVariation2, 1 );
-
+    
     DWORD dwFunc = FUNC_CCarCtrlCreateCarForScript;
     _asm
     {
@@ -94,6 +127,8 @@ CVehicleSA::CVehicleSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsi
 
     this->internalID = pGame->GetPools ()->GetVehicleRef ( (DWORD *)this->GetVehicleInterface () );
 #else
+    m_ucVariant = ucVariation;
+    m_ucVariant2 = ucVariation2;
     Init ();    // Use common setup
 #endif
 }
@@ -203,7 +238,12 @@ void CVehicleSA::Init ( void )
     {
         m_tSirenInfo.m_tSirenInfo[i].m_dwMinSirenAlpha = 0;
     }
-    
+    // set our variant count
+    m_ucVariantCount = 0;
+    // clear our rw frames list
+    m_ExtraFrames.clear ( ); 
+    // dump the frames
+    VehicleDump( this );
 }
 
 // DESTRUCTOR
@@ -617,6 +657,12 @@ void CVehicleSA::AddVehicleUpgrade ( DWORD dwModelID )
             call    dwFunc
         }
     }
+    // set our variant count
+    m_ucVariantCount = 0;
+    // clear our rw frames list
+    m_ExtraFrames.clear ( ); 
+    // dump the frames
+    VehicleDump( this );
 }
 
 void CVehicleSA::RemoveVehicleUpgrade ( DWORD dwModelID )
@@ -631,6 +677,12 @@ void CVehicleSA::RemoveVehicleUpgrade ( DWORD dwModelID )
         push    dwModelID
         call    dwFunc
     }
+    // set our variant count
+    m_ucVariantCount = 0;
+    // clear our rw frames list
+    m_ExtraFrames.clear ( ); 
+    // dump the frames
+    VehicleDump( this );
 }
 
 bool CVehicleSA::CanPedLeanOut ( CPed* pPed )
@@ -2101,4 +2153,240 @@ void CVehicleSA::OnChangingPosition ( const CVector& vecNewPosition )
             pInterface->WheelRearRightColPoint.Position += vecDelta;
         }
     }
+}
+
+namespace
+{
+    VOID _MatrixConvertFromEulerAngles ( CMatrix_Padded* matrixPadded, float fX, float fY, float fZ )
+    {
+        int iUnknown = 0;
+        if ( matrixPadded )
+        {
+            DWORD dwFunc = FUNC_CMatrix__ConvertFromEulerAngles;
+            _asm
+            {
+                push    iUnknown
+                push    fZ
+                push    fY
+                push    fX
+                mov     ecx, matrixPadded
+                call    dwFunc
+            }
+        }
+    }
+    VOID _MatrixConvertToEulerAngles ( CMatrix_Padded* matrixPadded, float &fX, float &fY, float &fZ )
+    {
+        int iUnknown = 0;
+        if ( matrixPadded )
+        {
+            DWORD dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
+            _asm
+            {
+                push    iUnknown
+                push    fZ
+                push    fY
+                push    fX
+                mov     ecx, matrixPadded
+                call    dwFunc
+            }
+        }
+    }
+}
+
+RwFrame * CVehicleSA::GetVehicleComponent ( SString vehicleComponent )
+{
+    // find a match
+    std::map < SString, RwFrame* >::iterator iter = m_ExtraFrames.find ( vehicleComponent );
+    if ( iter != m_ExtraFrames.end ( ) )
+    {
+        // did we find a match if so return it
+        return iter->second;
+    }
+    // return null
+    return NULL;
+}
+
+bool CVehicleSA::SetComponentRotation ( SString vehicleComponent, CVector vecRotation )  
+{ 
+    // Call our get component method
+    RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
+    // Check validty
+    if ( pComponent )
+    {
+        // call our convert from euler angles function to get a valid matrix
+        CMatrix_Padded matrixPadded;
+        _MatrixConvertFromEulerAngles ( &matrixPadded, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+        // copy it into the rotation field
+        pComponent->modelling.right = (RwV3d&)matrixPadded.vRight;
+        pComponent->modelling.up = (RwV3d&)matrixPadded.vFront;
+        pComponent->modelling.at = (RwV3d&)matrixPadded.vUp;
+        return true;
+    }
+    return false;
+}
+
+bool CVehicleSA::GetComponentRotation ( SString vehicleComponent, CVector &vecRotation )
+{
+    // Call our get component method
+    RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
+    // check validity
+    if ( pComponent )
+    {
+        // call our convert to euler angles function to get a valid rotation
+        CMatrix_Padded matrixPadded;
+        (RwV3d&)matrixPadded.vRight = pComponent->modelling.right;
+        (RwV3d&)matrixPadded.vFront = pComponent->modelling.up;
+        (RwV3d&)matrixPadded.vUp = pComponent->modelling.at;
+        _MatrixConvertToEulerAngles ( &matrixPadded, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+        return true;
+    }
+    return false;
+}
+
+bool CVehicleSA::SetComponentPosition ( SString vehicleComponent, CVector vecPosition )  
+{ 
+    // Call our get component method
+    RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
+    // check validity
+    if ( pComponent )
+    {
+        // set our position (modelling is relative positions and ltm is world pos)
+        pComponent->modelling.pos.x = vecPosition.fX;
+        pComponent->modelling.pos.y = vecPosition.fY;
+        pComponent->modelling.pos.z = vecPosition.fZ;
+        return true;
+    }
+    return false;
+}
+
+bool CVehicleSA::GetComponentPosition ( SString vehicleComponent, CVector &vecPositionModelling )  
+{ 
+    // Call our get component method
+    RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
+    // check validity
+    if ( pComponent )
+    {
+        // get our position (modelling is relative positions and ltm is world pos)
+        vecPositionModelling = CVector ( pComponent->modelling.pos.x, pComponent->modelling.pos.y, pComponent->modelling.pos.z );
+        return true;
+    }
+    return false;
+}
+bool CVehicleSA::IsComponentPresent ( SString vehicleComponent )
+{
+    return GetVehicleComponent ( vehicleComponent ) != NULL;
+}
+
+bool CVehicleSA::GetComponentMatrix ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling )
+{
+    // call our get component method
+    RwFrame * pFrame = GetVehicleComponent ( vehicleComponent );
+    // check validity
+    if ( pFrame )
+    {
+        // fill in our matricies
+        ltm = pFrame->ltm;
+        modelling = pFrame->modelling;
+        return true;
+    }
+    return false;
+}
+
+bool CVehicleSA::SetComponentMatrix ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling )
+{
+    // call our get component method
+    RwFrame * pFrame = GetVehicleComponent ( vehicleComponent );
+    // check validity
+    if ( pFrame )
+    {
+        // Copy vectors and leave flags for now.
+        pFrame->ltm.at = ltm.at;
+        pFrame->ltm.pos = ltm.pos;
+        pFrame->ltm.right = ltm.right;
+        pFrame->ltm.up = ltm.up;
+
+        pFrame->modelling.at = modelling.at;
+        pFrame->modelling.pos = modelling.pos;
+        pFrame->modelling.right = modelling.right;
+        pFrame->modelling.up = modelling.up;
+        return true;
+    }
+    return false;
+}
+
+void CVehicleSA::AddComponent ( RwFrame * pFrame )
+{
+    // if the frame is invalid we don't want to be here
+    if ( !pFrame )
+        return;
+
+    SString strName = pFrame->szName;
+    // variants have no name field.
+    if ( strName == "" )
+    {
+        // name starts with extra 
+        strName = "extra_";
+        if ( m_ucVariantCount == 0 )
+        {
+            // variants are extra_a, extra_b and so on
+            strName += ('a' - 1) + m_ucVariant;
+        }
+        if ( m_ucVariantCount == 1 )
+        {
+            // variants are extra_a, extra_b and so on
+            strName += ('a' - 1) + m_ucVariant2;
+        }
+        // increment the variant count ( we assume that the first variant created is variant1 and the second is variant2 )
+        m_ucVariantCount++;
+    }
+    // insert our new frame
+    m_ExtraFrames.insert ( pair < SString, RwFrame * > ( strName, pFrame ) );
+}
+
+bool CVehicleSA::SetComponentVisible ( SString vehicleComponent, bool bVisible )  
+{ 
+    // get our component
+    RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
+    // check validity
+    if ( pComponent )
+    {
+        // get the atomic for the frame
+        DWORD dw_GetCurrentAtomicObjectCB = 0x6a0750;
+
+        RwObject * pObject = NULL;
+        
+        RwFrameForAllObjects ( pComponent, ( void * ) dw_GetCurrentAtomicObjectCB, &pObject );
+
+        // get our visibility
+        if ( pObject ) 
+        {
+            // set our visibility flag
+            pObject->flags = ( bVisible ) ? 4 : 0;
+        }
+        return true;
+    }
+    return false;
+}
+
+bool CVehicleSA::GetComponentVisible ( SString vehicleComponent, bool &bVisible )  
+{ 
+    // get our component
+    RwFrame * pComponent = GetVehicleComponent ( vehicleComponent );
+    // check validity
+    if ( pComponent )
+    {
+        // get the atomic for the frame
+        DWORD dw_GetCurrentAtomicObjectCB = 0x6a0750;
+
+        RwObject * pObject = NULL;
+        RwFrameForAllObjects ( pComponent, ( void * ) dw_GetCurrentAtomicObjectCB, &pObject );
+        // if we found an object
+        if ( pObject )
+        {
+            // get our visibility
+            bVisible = pObject->flags || 4;
+            return true;
+        }
+    }
+    return false;
 }

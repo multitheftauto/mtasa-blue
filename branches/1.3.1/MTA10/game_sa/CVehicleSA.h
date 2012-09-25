@@ -462,19 +462,21 @@ public:
     CVehicleSAInterface* m_nextCarriage;
 
     //1496
-    BYTE padding270[116];
-
+    BYTE padding270[112];
+    // 1608
+    RwFrame * pUnk0;
     // 1612
     RwFrame * pChassis;
     RwFrame * pWheelFrontRight;
-    BYTE padding271[4];
+    RwFrame * pWheelFromRightSpecial;
     RwFrame * pWheelRearRight;
     RwFrame * pWheelFrontLeft;
-    BYTE padding272[4];
+    RwFrame * pWheelFrontLeftSpecial;
     RwFrame * pWheelRearLeft;
     RwFrame * pDoors [ 4 ];
     RwFrame * pBumpers [ 2 ];
-    BYTE padding273[8];
+    RwFrame * pWingRFDummy;
+    RwFrame * pWingLFDummy;
     RwFrame * pBonet;
     RwFrame * pBoot;
     RwFrame * pWindscreen;
@@ -510,6 +512,10 @@ private:
     CDoorSA                     m_doors[6];
     bool                        m_bSwingingDoorsAllowed;
     SSirenInfo                  m_tSirenInfo;
+    std::map<SString, RwFrame*> m_ExtraFrames;
+    unsigned char               m_ucVariant;
+    unsigned char               m_ucVariant2;
+    unsigned char               m_ucVariantCount;
 public:
                                 CVehicleSA                      ();
                                 CVehicleSA                      ( CVehicleSAInterface * vehicleInterface );
@@ -738,10 +744,23 @@ public:
     bool                        IsSirenRandomiserEnabled        ( void )  { return m_tSirenInfo.m_bUseRandomiser; }
     bool                        IsSirenSilentEffectEnabled      ( void )  { return m_tSirenInfo.m_bSirenSilent; }
     void                        SetVehicleFlags                 ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent );
+    bool                        SetComponentRotation            ( SString vehicleComponent, CVector vecRotation );
+    bool                        GetComponentRotation            ( SString vehicleComponent, CVector &vecPositionModelling ); 
+    bool                        SetComponentPosition            ( SString vehicleComponent, CVector vecPosition );
+    bool                        GetComponentPosition            ( SString vehicleComponent, CVector &vecPositionModelling ); 
+    bool                        IsComponentPresent              ( SString vehicleComponent );
+    bool                        GetComponentMatrix              ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling );
+    bool                        SetComponentMatrix              ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling );
+    bool                        SetComponentVisible             ( SString vehicleComponent, bool bVisible );
+    void                        AddComponent                    ( RwFrame * pFrame );
+    bool                        GetComponentVisible             ( SString vehicleComponent, bool &bVisible );
+    std::map < SString, RwFrame * > & GetComponentMap     ( void )                                                            { return m_ExtraFrames; }
 
 private:
     void                        RecalculateSuspensionLines          ( void );
     void                        CopyGlobalSuspensionLinesToPrivate  ( void );
+    RwFrame *                   GetVehicleComponent                 ( SString vehicleComponent );
+
 };
 
 #endif

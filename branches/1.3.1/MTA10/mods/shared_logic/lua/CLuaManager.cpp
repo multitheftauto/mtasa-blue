@@ -572,6 +572,14 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleTurretPosition", CLuaFunctionDefs::SetVehicleTurretPosition );
     CLuaCFunctions::AddFunction ( "setVehicleDoorOpenRatio", CLuaFunctionDefs::SetVehicleDoorOpenRatio );
     CLuaCFunctions::AddFunction ( "setVehicleSirens", CLuaFunctionDefs::SetVehicleSirens );
+    CLuaCFunctions::AddFunction ( "setVehicleComponentPosition", CLuaFunctionDefs::SetVehicleComponentPosition );
+    CLuaCFunctions::AddFunction ( "getVehicleComponentPosition", CLuaFunctionDefs::GetVehicleComponentPosition );
+    CLuaCFunctions::AddFunction ( "setVehicleComponentRotation", CLuaFunctionDefs::SetVehicleComponentRotation );
+    CLuaCFunctions::AddFunction ( "getVehicleComponentRotation", CLuaFunctionDefs::GetVehicleComponentRotation );
+    CLuaCFunctions::AddFunction ( "resetVehicleComponentPosition", CLuaFunctionDefs::ResetVehicleComponentPosition );
+    CLuaCFunctions::AddFunction ( "resetVehicleComponentRotation", CLuaFunctionDefs::ResetVehicleComponentRotation );
+    CLuaCFunctions::AddFunction ( "setVehicleComponentVisible", CLuaFunctionDefs::SetVehicleComponentVisible );
+    CLuaCFunctions::AddFunction ( "getVehicleComponentVisible", CLuaFunctionDefs::GetVehicleComponentVisible );
 
     // Object create/destroy funcs
     CLuaCFunctions::AddFunction ( "createObject", CLuaFunctionDefs::CreateObject );
