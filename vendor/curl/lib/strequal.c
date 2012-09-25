@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2008, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,13 +18,9 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: strequal.c,v 1.40 2008-10-23 11:49:19 bagder Exp $
  ***************************************************************************/
 
 #include "setup.h"
-
-#include <string.h>
-#include <ctype.h>
 
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
@@ -32,6 +28,9 @@
 
 #include "strequal.h"
 
+/*
+ * @unittest: 1301
+ */
 int curl_strequal(const char *first, const char *second)
 {
 #if defined(HAVE_STRCASECMP)
@@ -52,6 +51,9 @@ int curl_strequal(const char *first, const char *second)
 #endif
 }
 
+/*
+ * @unittest: 1301
+ */
 int curl_strnequal(const char *first, const char *second, size_t max)
 {
 #if defined(HAVE_STRNCASECMP)
@@ -95,16 +97,19 @@ size_t Curl_strlcat(char *dst, const char *src, size_t siz)
   char *d = dst;
   const char *s = src;
   size_t n = siz;
-  size_t dlen;
+  union {
+    ssize_t sig;
+     size_t uns;
+  } dlen;
 
   /* Find the end of dst and adjust bytes left but don't go past end */
   while(n-- != 0 && *d != '\0')
     d++;
-  dlen = d - dst;
-  n = siz - dlen;
+  dlen.sig = d - dst;
+  n = siz - dlen.uns;
 
   if(n == 0)
-    return(dlen + strlen(s));
+    return(dlen.uns + strlen(s));
   while(*s != '\0') {
     if(n != 1) {
       *d++ = *s;
@@ -114,6 +119,6 @@ size_t Curl_strlcat(char *dst, const char *src, size_t siz)
   }
   *d = '\0';
 
-  return(dlen + (s - src));     /* count does not include NUL */
+  return(dlen.uns + (s - src));     /* count does not include NUL */
 }
 #endif
