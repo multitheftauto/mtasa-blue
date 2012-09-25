@@ -419,6 +419,8 @@ HRESULT CProxyDirect3DDevice9::BeginScene                     ( VOID )
     // Call the real routine.
     hResult = m_pDevice->BeginScene ( );
 
+    CGraphics::GetSingleton ().GetRenderItemManager ()->PreDrawWorld ();
+
     // Call our event handler.
     CDirect3DEvents9::OnBeginScene ( m_pDevice );
 
@@ -443,6 +445,8 @@ HRESULT CProxyDirect3DDevice9::EndScene                       ( VOID )
     {
         // Call real routine.
         HRESULT hResult = m_pDevice->EndScene ();
+
+        CGraphics::GetSingleton ().GetRenderItemManager ()->FlushReadableDepthBuffer ();
         return hResult;
     }
 
@@ -451,6 +455,10 @@ HRESULT CProxyDirect3DDevice9::EndScene                       ( VOID )
 
 HRESULT CProxyDirect3DDevice9::Clear                          ( DWORD Count,CONST D3DRECT* pRects,DWORD Flags,D3DCOLOR Color,float Z,DWORD Stencil )
 {
+    // If clearing z buffer, make sure we save it first
+    if ( Flags | D3DCLEAR_ZBUFFER )
+        CGraphics::GetSingleton ().GetRenderItemManager ()->FlushReadableDepthBuffer ();
+
     return m_pDevice->Clear ( Count, pRects, Flags, Color, Z, Stencil );
 }
 
@@ -459,8 +467,7 @@ HRESULT CProxyDirect3DDevice9::SetTransform                   ( D3DTRANSFORMSTAT
     // Store the matrix
     m_pData->StoreTransform ( State, pMatrix );
 
-    if ( State < NUMELMS( DeviceState.TransformState.Raw ) )
-        DeviceState.TransformState.Raw[State] = *pMatrix;
+    DeviceState.TransformState.Raw(State) = *pMatrix;
 
     // Call original
     return m_pDevice->SetTransform ( State, pMatrix );
@@ -537,7 +544,7 @@ HRESULT CProxyDirect3DDevice9::GetClipPlane                   ( DWORD Index,floa
 
 HRESULT CProxyDirect3DDevice9::SetRenderState                 ( D3DRENDERSTATETYPE State,DWORD Value )
 {
-    if ( State< NUMELMS( DeviceState.RenderState.Raw ) )
+    if ( State < NUMELMS( DeviceState.RenderState.Raw ) )
         DeviceState.RenderState.Raw[State] = Value;
     return m_pDevice->SetRenderState ( State, Value );
 }

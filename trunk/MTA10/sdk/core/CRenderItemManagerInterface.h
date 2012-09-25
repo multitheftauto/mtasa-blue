@@ -47,6 +47,10 @@ enum ERenderFormat
     RFORMAT_DXT3                 = '3TXD',
     RFORMAT_DXT4                 = '4TXD',
     RFORMAT_DXT5                 = '5TXD',
+    RFORMAT_INTZ                 = 'ZTNI',
+    RFORMAT_DF24                 = '42FD',
+    RFORMAT_DF16                 = '61FD',
+    RFORMAT_RAWZ                 = 'ZWAR',
 };
 
 enum ETextureType
@@ -82,6 +86,7 @@ struct SDxStatus
         SString         strName;
         int             iInstalledMemoryKB;
         SString         strPSVersion;
+        ERenderFormat   depthBufferFormat;
     } videoCard;
 
     struct
@@ -139,6 +144,10 @@ public:
     virtual void                SetTestMode                         ( eDxTestMode testMode ) = 0;
     virtual void                GetDxStatus                         ( SDxStatus& outStatus ) = 0;
     virtual CEffectCloner*      GetEffectCloner                     ( void ) = 0;
+    virtual void                PreDrawWorld                        ( void ) = 0;
+    virtual void                FlushReadableDepthBuffer            ( void ) = 0;
+    virtual void                SetDepthBufferFormat                ( ERenderFormat depthBufferFormat ) = 0;
+    virtual ERenderFormat       GetDepthBufferFormat                ( void ) = 0;
 };
 
 
@@ -291,12 +300,15 @@ class CEffectWrap : public CRenderItem
     D3DXHANDLE      hCamPos, hCamDir;
     D3DXHANDLE      hTime;
     D3DXHANDLE      hLightAmbient, hLightDiffuse, hLightSpecular, hLightDirection;
+    D3DXHANDLE      hDepthBuffer;
+    D3DXHANDLE      hViewMainScene, hWorldMainScene, hProjectionMainScene;
 
     std::map < SString, D3DXHANDLE > m_texureHandleMap;
     std::map < SString, D3DXHANDLE > m_valueHandleMap;
     D3DXHANDLE      m_hFirstTexture;
     bool            m_bRequiresNormals;
     bool            m_bUsesVertexShader;
+    bool            m_bUsesDepthBuffer;
     uint            m_uiSaveStateFlags;
     SString         m_strName;
 };

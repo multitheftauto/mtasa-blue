@@ -46,6 +46,10 @@ public:
     virtual void                SetTestMode                         ( eDxTestMode testMode );
     virtual void                GetDxStatus                         ( SDxStatus& outStatus );
     virtual CEffectCloner*      GetEffectCloner                     ( void )                    { return m_pEffectCloner; }
+    virtual void                PreDrawWorld                        ( void );
+    virtual void                FlushReadableDepthBuffer            ( void );
+    virtual void                SetDepthBufferFormat                ( ERenderFormat depthBufferFormat )     { m_depthBufferFormat = depthBufferFormat; }
+    virtual ERenderFormat       GetDepthBufferFormat                ( void )                                { return m_depthBufferFormat; }
 
     // CRenderItemManager
     void                        NotifyContructRenderItem            ( CRenderItem* pItem );
@@ -59,6 +63,7 @@ public:
     void                        RemoveShaderItemFromWatchLists      ( CShaderItem* pShaderItem );
     void                        UpdateMemoryUsage                   ( void );
     bool                        CanCreateRenderItem                 ( ClassId classId );
+    void                        NotifyShaderItemUsesDepthBuffer     ( CShaderItem* pShaderItem, bool bUsesDepthBuffer );
 
     static int                  GetBitsPerPixel                     ( D3DFORMAT Format );
     static int                  CalcD3DResourceMemoryKBUsage        ( IDirect3DResource9* pD3DResource );
@@ -91,4 +96,7 @@ protected:
     int                                         m_iFontMemoryKBUsed;
     int                                         m_iMemoryKBFreeForMTA;
     bool                                        m_bSetRenderTargetEnabledOldVer;
+    ERenderFormat                               m_depthBufferFormat;
+    std::set < CShaderItem* >                   m_ShadersUsingDepthBuffer;
+    IDirect3DSurface9*                          m_pSavedSceneDepthSurface;
 };
