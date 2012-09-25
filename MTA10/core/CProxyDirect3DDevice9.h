@@ -354,12 +354,29 @@ public:
     struct SD3DTransformState
     {
         union {
-            D3DMATRIX Raw[D3DTS_MAX];
             struct {
-                MPAD(0,1);
+                D3DMATRIX DUMMY;
+                D3DMATRIX VIEWPROJ[2];      // D3D indices: 2 - 3
+                D3DMATRIX TEXTUREn[8];      // D3D indices: 16 - 23
+                D3DMATRIX WORLDn[4];        // D3D indices: 256 - 259
+                D3DMATRIX& operator() ( uint uiIndex )
+                {
+                    // Map requested index to physical data
+                    if      ( uiIndex < 2 )     return DUMMY;
+                    else if ( uiIndex < 4 )     return VIEWPROJ[ uiIndex - 2 ];
+                    else if ( uiIndex < 16 )    return DUMMY;
+                    else if ( uiIndex < 24 )    return TEXTUREn[ uiIndex - 16 ];
+                    else if ( uiIndex < 256 )   return DUMMY;
+                    else if ( uiIndex < 260 )   return WORLDn[ uiIndex - 256 ];
+                    else                        return DUMMY;
+                }
+            } Raw;
+            struct {
+                D3DMATRIX   DUMMY;
+                //MPAD(0,1);
                 D3DMATRIX   VIEW;                    //  = 2,
                 D3DMATRIX   PROJECTION;              //  = 3,
-                MPAD(4,15);
+                //MPAD(4,15);
                 D3DMATRIX   TEXTURE0;                //  = 16,
                 D3DMATRIX   TEXTURE1;                //  = 17,
                 D3DMATRIX   TEXTURE2;                //  = 18,
@@ -368,7 +385,7 @@ public:
                 D3DMATRIX   TEXTURE5;                //  = 21,
                 D3DMATRIX   TEXTURE6;                //  = 22,
                 D3DMATRIX   TEXTURE7;                //  = 23,
-                MPAD(24,255);
+                //MPAD(24,255);
                 D3DMATRIX   WORLD;                   //  = 256,
                 D3DMATRIX   WORLD1;                  //  = 257,
                 D3DMATRIX   WORLD2;                  //  = 258,
@@ -454,6 +471,13 @@ public:
         UINT                        StreamStride;
     };
 
+    // Saved from last scene render
+    struct SMainSceneState
+    {
+        SD3DTransformState          TransformState;
+        IDirect3DTexture9*          DepthBuffer;
+    };
+
     struct SD3DDeviceState
     {
         SD3DDeviceState ()
@@ -480,6 +504,7 @@ public:
         SMemoryState                    MemoryState;
         SCallState                      CallState;
         SStreamSourceState              VertexStreams[16];
+        SMainSceneState                 MainSceneState;
     };
 
     SD3DDeviceState     DeviceState;

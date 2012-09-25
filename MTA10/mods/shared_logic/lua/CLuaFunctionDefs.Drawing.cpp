@@ -1008,6 +1008,10 @@ int CLuaFunctionDefs::dxGetStatus ( lua_State* luaVM )
         lua_pushboolean ( luaVM, dxStatus.settings.bAllowScreenUpload );
         lua_settable   ( luaVM, -3 );
 
+        lua_pushstring ( luaVM, "DepthBufferFormat" );
+        lua_pushstring ( luaVM, EnumToString ( dxStatus.videoCard.depthBufferFormat ) );
+        lua_settable   ( luaVM, -3 );
+
         return 1;
     }
     else

@@ -42,6 +42,7 @@ class CDirect3DEvents9
     static HRESULT      CreateVertexDeclaration     ( IDirect3DDevice9 *pDevice, CONST D3DVERTEXELEMENT9* pVertexElements, IDirect3DVertexDeclaration9** ppDecl );
     static HRESULT      SetVertexDeclaration        ( IDirect3DDevice9 *pDevice, IDirect3DVertexDeclaration9* pDecl );
     static void         CheckForScreenShot          ( void );
+    static ERenderFormat DiscoverReadableDepthFormat ( IDirect3DDevice9 *pDevice, D3DMULTISAMPLE_TYPE multisampleType, bool bWindowed );
 
     static IDirect3DVertexBuffer9*  GetRealVertexBuffer ( IDirect3DVertexBuffer9* pVertexBuffer );
     static IDirect3DIndexBuffer9*   GetRealIndexBuffer  ( IDirect3DIndexBuffer9* pIndexBuffer );
