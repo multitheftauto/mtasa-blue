@@ -69,7 +69,8 @@ void CConsole::Echo ( const char* szText )
 {
     // Add to add buffer
     m_strPendingAdd += szText;
-    m_strPendingAdd += "\n";
+    if ( !m_strPendingAdd.EndsWith ( "\n" ) )
+        m_strPendingAdd += "\n";
 
     // Trim add buffer
     if ( m_strPendingAdd.length () > CONSOLE_SIZE )
