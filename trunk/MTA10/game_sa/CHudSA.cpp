@@ -246,7 +246,10 @@ void CHudSA::SetComponentVisible ( eHudComponent component, bool bVisible )
         uchar* pDest = (uchar*)( pComponent->uiDataAddr );
         for ( uint i = 0 ; i < pComponent->uiDataSize ; i++ )
         {
-            MemPut < BYTE > ( pDest + i, pSrc[i] );
+            if ( pComponent->type != HUD_CLOCK )
+                MemPut < BYTE > ( pDest + i, pSrc[i] );
+            else
+                MemPutFast < BYTE > ( pDest + i, pSrc[i] );
         }
     }
 }
