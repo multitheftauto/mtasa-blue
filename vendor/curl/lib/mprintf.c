@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1999 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1999 - 2008, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,6 +18,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * $Id: mprintf.c,v 1.80 2008-09-13 16:37:16 yangtse Exp $
  *
  * Purpose:
  *  A merge of Bjorn Reese's format() function and Daniel's dsprintf()
@@ -36,6 +37,11 @@
  */
 
 #include "setup.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <ctype.h>
+#include <string.h>
 
 #if defined(DJGPP) && (DJGPP_MINOR < 4)
 #undef _MPRINTF_REPLACE /* don't use x_was_used() here */
@@ -43,7 +49,7 @@
 
 #include <curl/mprintf.h>
 
-#include "curl_memory.h"
+#include "memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 
@@ -103,7 +109,7 @@ static const char upper_digits[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
       done++; \
     else \
      return done; /* return immediately on failure */ \
-  } WHILE_FALSE
+  } while(0)
 
 /* Data type to read from the arglist */
 typedef enum  {
@@ -119,7 +125,7 @@ typedef enum  {
   FORMAT_WIDTH /* For internal use */
 } FormatType;
 
-/* conversion and display flags */
+/* convertion and display flags */
 enum {
   FLAGS_NEW        = 0,
   FLAGS_SPACE      = 1<<0,
@@ -542,65 +548,67 @@ static long dprintf_Pass1(const char *format, va_stack_t *vto, char **endpos,
 #endif
 
   /* Read the arg list parameters into our data list */
-  for(i=0; i<max_param; i++) {
-    if((i + 1 < max_param) && (vto[i + 1].type == FORMAT_WIDTH)) {
-      /* Width/precision arguments must be read before the main argument
-       * they are attached to
-       */
-      vto[i + 1].data.num.as_signed = (mp_intmax_t)va_arg(arglist, int);
-    }
-
-    switch (vto[i].type) {
-    case FORMAT_STRING:
-      vto[i].data.str = va_arg(arglist, char *);
-      break;
-
-    case FORMAT_INTPTR:
-    case FORMAT_UNKNOWN:
-    case FORMAT_PTR:
-      vto[i].data.ptr = va_arg(arglist, void *);
-      break;
-
-    case FORMAT_INT:
-#ifdef HAVE_LONG_LONG_TYPE
-      if((vto[i].flags & FLAGS_LONGLONG) && (vto[i].flags & FLAGS_UNSIGNED))
-        vto[i].data.num.as_unsigned =
-          (mp_uintmax_t)va_arg(arglist, mp_uintmax_t);
-      else if(vto[i].flags & FLAGS_LONGLONG)
-        vto[i].data.num.as_signed =
-          (mp_intmax_t)va_arg(arglist, mp_intmax_t);
-      else
-#endif
+  for (i=0; i<max_param; i++) {
+    if((i + 1 < max_param) && (vto[i + 1].type == FORMAT_WIDTH))
       {
-        if((vto[i].flags & FLAGS_LONG) && (vto[i].flags & FLAGS_UNSIGNED))
-          vto[i].data.num.as_unsigned =
-            (mp_uintmax_t)va_arg(arglist, unsigned long);
-        else if(vto[i].flags & FLAGS_LONG)
-          vto[i].data.num.as_signed =
-            (mp_intmax_t)va_arg(arglist, long);
-        else if(vto[i].flags & FLAGS_UNSIGNED)
-          vto[i].data.num.as_unsigned =
-            (mp_uintmax_t)va_arg(arglist, unsigned int);
-        else
-          vto[i].data.num.as_signed =
-            (mp_intmax_t)va_arg(arglist, int);
+        /* Width/precision arguments must be read before the main argument
+         * they are attached to
+         */
+        vto[i + 1].data.num.as_signed = (mp_intmax_t)va_arg(arglist, int);
       }
-      break;
 
-    case FORMAT_DOUBLE:
-      vto[i].data.dnum = va_arg(arglist, double);
-      break;
+    switch (vto[i].type)
+      {
+      case FORMAT_STRING:
+        vto[i].data.str = va_arg(arglist, char *);
+        break;
 
-    case FORMAT_WIDTH:
-      /* Argument has been read. Silently convert it into an integer
-       * for later use
-       */
-      vto[i].type = FORMAT_INT;
-      break;
+      case FORMAT_INTPTR:
+      case FORMAT_UNKNOWN:
+      case FORMAT_PTR:
+        vto[i].data.ptr = va_arg(arglist, void *);
+        break;
 
-    default:
-      break;
-    }
+      case FORMAT_INT:
+#ifdef HAVE_LONG_LONG_TYPE
+        if((vto[i].flags & FLAGS_LONGLONG) && (vto[i].flags & FLAGS_UNSIGNED))
+          vto[i].data.num.as_unsigned =
+            (mp_uintmax_t)va_arg(arglist, mp_uintmax_t);
+        else if(vto[i].flags & FLAGS_LONGLONG)
+          vto[i].data.num.as_signed =
+            (mp_intmax_t)va_arg(arglist, mp_intmax_t);
+        else
+#endif
+        {
+          if((vto[i].flags & FLAGS_LONG) && (vto[i].flags & FLAGS_UNSIGNED))
+            vto[i].data.num.as_unsigned =
+              (mp_uintmax_t)va_arg(arglist, unsigned long);
+          else if(vto[i].flags & FLAGS_LONG)
+            vto[i].data.num.as_signed =
+              (mp_intmax_t)va_arg(arglist, long);
+          else if(vto[i].flags & FLAGS_UNSIGNED)
+            vto[i].data.num.as_unsigned =
+              (mp_uintmax_t)va_arg(arglist, unsigned int);
+          else
+            vto[i].data.num.as_signed =
+              (mp_intmax_t)va_arg(arglist, int);
+        }
+        break;
+
+      case FORMAT_DOUBLE:
+        vto[i].data.dnum = va_arg(arglist, double);
+        break;
+
+      case FORMAT_WIDTH:
+        /* Argument has been read. Silently convert it into an integer
+         * for later use
+         */
+        vto[i].type = FORMAT_INT;
+        break;
+
+      default:
+        break;
+      }
   }
 
   return max_param;
@@ -685,7 +693,7 @@ static int dprintf_formatf(
       continue;
     }
 
-    /* If this is a positional parameter, the position must follow immediately
+    /* If this is a positional parameter, the position must follow imediately
        after the %, thus create a %<num>$ sequence */
     param=dprintf_DollarString(f, &f);
 
@@ -846,7 +854,7 @@ static int dprintf_formatf(
         size_t len;
 
         str = (char *) p->data.str;
-        if(str == NULL) {
+        if( str == NULL) {
           /* Write null[] if there's space.  */
           if(prec == -1 || prec >= (long) sizeof(null) - 1) {
             str = null;
@@ -863,7 +871,7 @@ static int dprintf_formatf(
           len = strlen(str);
 
         if(prec != -1 && (size_t) prec < len)
-          len = (size_t)prec;
+          len = prec;
         width -= (long)len;
 
         if(p->flags & FLAGS_ALT)
@@ -903,11 +911,11 @@ static int dprintf_formatf(
           static const char strnil[] = "(nil)";
           const char *point;
 
-          width -= (long)(sizeof(strnil) - 1);
+          width -= sizeof(strnil) - 1;
           if(p->flags & FLAGS_LEFT)
             while(width-- > 0)
               OUTCHAR(' ');
-          for(point = strnil; *point != '\0'; ++point)
+          for (point = strnil; *point != '\0'; ++point)
             OUTCHAR(*point);
           if(! (p->flags & FLAGS_LEFT))
             while(width-- > 0)
@@ -956,6 +964,7 @@ static int dprintf_formatf(
           /* RECURSIVE USAGE */
           len = curl_msnprintf(fptr, left, ".%ld", prec);
           fptr += len;
+          left -= len;
         }
         if(p->flags & FLAGS_LONG)
           *fptr++ = 'l';
@@ -1195,3 +1204,45 @@ int curl_mvfprintf(FILE *whereto, const char *format, va_list ap_save)
 {
   return dprintf_formatf(whereto, fputc, format, ap_save);
 }
+
+#ifdef DPRINTF_DEBUG
+int main()
+{
+  char buffer[129];
+  char *ptr;
+#ifdef HAVE_LONG_LONG_TYPE
+  LONG_LONG_TYPE one=99;
+  LONG_LONG_TYPE two=100;
+  LONG_LONG_TYPE test = 0x1000000000LL;
+  curl_mprintf("%lld %lld %lld\n", one, two, test);
+#endif
+
+  curl_mprintf("%3d %5d\n", 10, 1998);
+
+  ptr=curl_maprintf("test this then baby %s%s%s%s%s%s %d %d %d loser baby get a hit in yer face now!", "", "pretty long string pretty long string pretty long string pretty long string pretty long string", "/", "/", "/", "pretty long string", 1998, 1999, 2001);
+
+  puts(ptr);
+
+  memset(ptr, 55, strlen(ptr)+1);
+
+  free(ptr);
+
+#if 1
+  curl_mprintf(buffer, "%s %s %d", "daniel", "stenberg", 19988);
+  puts(buffer);
+
+  curl_mfprintf(stderr, "%s %#08x\n", "dummy", 65);
+
+  printf("%s %#08x\n", "dummy", 65);
+  {
+    double tryout = 3.14156592;
+    curl_mprintf(buffer, "%.2g %G %f %e %E", tryout, tryout, tryout, tryout, tryout);
+    puts(buffer);
+    printf("%.2g %G %f %e %E\n", tryout, tryout, tryout, tryout, tryout);
+  }
+#endif
+
+  return 0;
+}
+
+#endif

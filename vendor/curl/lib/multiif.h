@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2010, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2008, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,12 +20,15 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * $Id: multiif.h,v 1.9 2008-09-13 15:59:14 yangtse Exp $
  ***************************************************************************/
 
 /*
  * Prototypes for library-wide functions provided by multi.c
  */
 void Curl_expire(struct SessionHandle *data, long milli);
+
+void Curl_multi_rmeasy(void *multi, CURL *data);
 
 bool Curl_multi_canPipeline(const struct Curl_multi* multi);
 void Curl_multi_handlePipeBreak(struct SessionHandle *data);
@@ -41,11 +44,11 @@ void Curl_multi_handlePipeBreak(struct SessionHandle *data);
 /* set the bit for the given sock number to make the bitmap for readable */
 #define GETSOCK_READSOCK(x) (1 << (x))
 
-#ifdef DEBUGBUILD
+#ifdef CURLDEBUG
  /*
   * Curl_multi_dump is not a stable public function, this is only meant to
   * allow easier tracking of the internal handle's state and what sockets
-  * they use. Only for research and development DEBUGBUILD enabled builds.
+  * they use. Only for research and development CURLDEBUG enabled builds.
   */
 void Curl_multi_dump(const struct Curl_multi *multi_handle);
 #endif

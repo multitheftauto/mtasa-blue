@@ -20,6 +20,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * $Id: timeval.h,v 1.34 2007-04-03 18:25:18 yangtse Exp $
  ***************************************************************************/
 
 /*
