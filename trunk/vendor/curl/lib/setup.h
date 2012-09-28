@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_SETUP_H
-#define HEADER_CURL_SETUP_H
+#ifndef __LIB_CURL_SETUP_H
+#define __LIB_CURL_SETUP_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2008, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,14 +20,14 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * $Id: setup.h,v 1.163 2009-02-12 20:48:44 danf Exp $
  ***************************************************************************/
 
 /*
  * Define WIN32 when build target is Win32 API
  */
 
-#if (defined(_WIN32) || defined(__WIN32__)) && !defined(WIN32) && \
-    !defined(__SYMBIAN32__)
+#if (defined(_WIN32) || defined(__WIN32__)) && !defined(WIN32) && !defined(__SYMBIAN32__)
 #define WIN32
 #endif
 
@@ -37,33 +37,27 @@
  */
 
 #ifdef HAVE_CONFIG_H
-
-#include "curl_config.h"
-
-#else /* HAVE_CONFIG_H */
+#include "config.h"
+#else
 
 #ifdef _WIN32_WCE
-#  include "config-win32ce.h"
+#include "config-win32ce.h"
 #else
-#  ifdef WIN32
-#    include "config-win32.h"
-#  endif
+#ifdef WIN32
+#include "config-win32.h"
+#endif
 #endif
 
 #if defined(macintosh) && defined(__MRC__)
 #  include "config-mac.h"
 #endif
 
-#ifdef __riscos__
-#  include "config-riscos.h"
-#endif
-
 #ifdef __AMIGA__
-#  include "config-amigaos.h"
+#include "amigaos.h"
 #endif
 
 #ifdef __SYMBIAN32__
-#  include "config-symbian.h"
+#include "config-symbian.h"
 #endif
 
 #ifdef __OS400__
@@ -71,34 +65,21 @@
 #endif
 
 #ifdef TPF
-#  include "config-tpf.h"
-#endif
-
-#ifdef __VXWORKS__
-#  include "config-vxworks.h"
+#include "config-tpf.h" /* hand-modified TPF config.h */
+/* change which select is used for libcurl */
+#define select(a,b,c,d,e) tpf_select_libcurl(a,b,c,d,e)
 #endif
 
 #endif /* HAVE_CONFIG_H */
 
 /* ================================================================ */
 /* Definition of preprocessor macros/symbols which modify compiler  */
-/* behavior or generated code characteristics must be done here,   */
+/* behaviour or generated code characteristics must be done here,   */
 /* as appropriate, before any system header file is included. It is */
 /* also possible to have them defined in the config file included   */
 /* before this point. As a result of all this we frown inclusion of */
 /* system header files in our config files, avoid this at any cost. */
 /* ================================================================ */
-
-/*
- * AIX 4.3 and newer needs _THREAD_SAFE defined to build
- * proper reentrant code. Others may also need it.
- */
-
-#ifdef NEED_THREAD_SAFE
-#  ifndef _THREAD_SAFE
-#    define _THREAD_SAFE
-#  endif
-#endif
 
 /*
  * Tru64 needs _REENTRANT set for a few function prototypes and
@@ -167,35 +148,12 @@
  */
 
 #ifdef HTTP_ONLY
-#  ifndef CURL_DISABLE_TFTP
-#    define CURL_DISABLE_TFTP
-#  endif
-#  ifndef CURL_DISABLE_FTP
-#    define CURL_DISABLE_FTP
-#  endif
-#  ifndef CURL_DISABLE_LDAP
-#    define CURL_DISABLE_LDAP
-#  endif
-#  ifndef CURL_DISABLE_TELNET
-#    define CURL_DISABLE_TELNET
-#  endif
-#  ifndef CURL_DISABLE_DICT
-#    define CURL_DISABLE_DICT
-#  endif
-#  ifndef CURL_DISABLE_FILE
-#    define CURL_DISABLE_FILE
-#  endif
-#  ifndef CURL_DISABLE_RTSP
-#    define CURL_DISABLE_RTSP
-#  endif
-#endif
-
-/*
- * When http is disabled rtsp is not supported.
- */
-
-#if defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_RTSP)
-#  define CURL_DISABLE_RTSP
+#  define CURL_DISABLE_TFTP
+#  define CURL_DISABLE_FTP
+#  define CURL_DISABLE_LDAP
+#  define CURL_DISABLE_TELNET
+#  define CURL_DISABLE_DICT
+#  define CURL_DISABLE_FILE
 #endif
 
 /* ================================================================ */
@@ -213,9 +171,9 @@
 
 /*
  * Include header files for windows builds before redefining anything.
- * Use this preprocessor block only to include or exclude windows.h,
+ * Use this preproessor block only to include or exclude windows.h,
  * winsock2.h, ws2tcpip.h or winsock.h. Any other windows thing belongs
- * to any other further and independent block.  Under Cygwin things work
+ * to any other further and independant block.  Under Cygwin things work
  * just as under linux (e.g. <sys/socket.h>) and the winsock headers should
  * never be included when __CYGWIN__ is defined.  configure script takes
  * care of this, not defining HAVE_WINDOWS_H, HAVE_WINSOCK_H, HAVE_WINSOCK2_H,
@@ -223,12 +181,6 @@
  */
 
 #ifdef HAVE_WINDOWS_H
-#  if defined(UNICODE) && !defined(_UNICODE)
-#    define _UNICODE
-#  endif
-#  if defined(_UNICODE) && !defined(UNICODE)
-#    define UNICODE
-#  endif
 #  ifndef WIN32_LEAN_AND_MEAN
 #    define WIN32_LEAN_AND_MEAN
 #  endif
@@ -243,7 +195,6 @@
 #      include <winsock.h>
 #    endif
 #  endif
-#  include <tchar.h>
 #endif
 
 /*
@@ -262,12 +213,6 @@
 #  endif
 #endif
 
-#ifdef USE_LWIPSOCK
-#  include <lwip/init.h>
-#  include <lwip/sockets.h>
-#  include <lwip/netdb.h>
-#endif
-
 #ifdef HAVE_EXTRA_STRICMP_H
 #  include <extra/stricmp.h>
 #endif
@@ -283,29 +228,13 @@
 #  include <sys/socket.h> /* for select and ioctl*/
 #  include <netdb.h>      /* for in_addr_t definition */
 #  include <tpf/sysapi.h> /* for tpf_process_signals */
-   /* change which select is used for libcurl */
-#  define select(a,b,c,d,e) tpf_select_libcurl(a,b,c,d,e)
-#endif
-
-#ifdef __VXWORKS__
-#  include <sockLib.h>    /* for generic BSD socket functions */
-#  include <ioLib.h>      /* for basic I/O interface functions */
-#endif
-
-#ifdef __AMIGA__
-#  ifndef __ixemul__
-#    include <exec/types.h>
-#    include <exec/execbase.h>
-#    include <proto/exec.h>
-#    include <proto/dos.h>
-#    define select(a,b,c,d,e) WaitSelect(a,b,c,d,e,0)
-#  endif
 #endif
 
 #include <stdio.h>
 #ifdef HAVE_ASSERT_H
 #include <assert.h>
 #endif
+#include <errno.h>
 
 #ifdef __TANDEM /* for nsr-tandem-nsk systems */
 #include <floss.h>
@@ -315,10 +244,19 @@
 #include <curl/stdcheaders.h>
 #endif
 
+/*
+ * PellesC kludge section (yikes);
+ *  - It has 'ssize_t', but it is in <unistd.h>. The way the headers
+ *    on Win32 are included, forces me to include this header here.
+ *  - sys_nerr, EINTR is missing in v4.0 or older.
+ */
 #ifdef __POCC__
-#  include <sys/types.h>
-#  include <unistd.h>
-#  define sys_nerr EILSEQ
+  #include <sys/types.h>
+  #include <unistd.h>
+  #if (__POCC__ <= 400)
+  #define sys_nerr EILSEQ  /* for strerror.c */
+  #define EINTR    -1      /* for select.c */
+  #endif
 #endif
 
 /*
@@ -340,12 +278,10 @@
 #  include <io.h>
 #  include <sys/types.h>
 #  include <sys/stat.h>
-#  undef  lseek
 #  define lseek(fdes,offset,whence)  _lseeki64(fdes, offset, whence)
 #  define fstat(fdes,stp)            _fstati64(fdes, stp)
 #  define stat(fname,stp)            _stati64(fname, stp)
 #  define struct_stat                struct _stati64
-#  define LSEEK_ERROR                (__int64)-1
 #endif
 
 /*
@@ -356,22 +292,14 @@
 #  include <io.h>
 #  include <sys/types.h>
 #  include <sys/stat.h>
-#  ifndef _WIN32_WCE
-#    undef  lseek
-#    define lseek(fdes,offset,whence)  _lseek(fdes, (long)offset, whence)
-#    define fstat(fdes,stp)            _fstat(fdes, stp)
-#    define stat(fname,stp)            _stat(fname, stp)
-#    define struct_stat                struct _stat
-#  endif
-#  define LSEEK_ERROR                (long)-1
+#  define lseek(fdes,offset,whence)  _lseek(fdes, (long)offset, whence)
+#  define fstat(fdes,stp)            _fstat(fdes, stp)
+#  define stat(fname,stp)            _stat(fname, stp)
+#  define struct_stat                struct _stat
 #endif
 
 #ifndef struct_stat
 #  define struct_stat struct stat
-#endif
-
-#ifndef LSEEK_ERROR
-#  define LSEEK_ERROR (off_t)-1
 #endif
 
 /*
@@ -379,7 +307,7 @@
  */
 
 #ifndef SIZEOF_OFF_T
-#  if defined(__VMS) && !defined(__VAX)
+#  if defined(__VMS) && (defined(__alpha) || defined(__ia64))
 #    if defined(_LARGEFILE)
 #      define SIZEOF_OFF_T 8
 #    endif
@@ -401,25 +329,20 @@
 #  endif
 #endif
 
-/*
- * Arg 2 type for gethostname in case it hasn't been defined in config file.
- */
-
-#ifndef GETHOSTNAME_TYPE_ARG2
-#  ifdef USE_WINSOCK
-#    define GETHOSTNAME_TYPE_ARG2 int
-#  else
-#    define GETHOSTNAME_TYPE_ARG2 size_t
-#  endif
-#endif
-
 /* Below we define some functions. They should
+   1. close a socket
 
    4. set the SIGALRM signal timeout
    5. set dir/file naming defines
    */
 
 #ifdef WIN32
+
+#  if !defined(__CYGWIN__)
+#    define sclose(x) closesocket(x)
+#  else
+#    define sclose(x) close(x)
+#  endif
 
 #  define DIR_CHAR      "\\"
 #  define DOT_CHAR      "_"
@@ -429,6 +352,7 @@
 #  ifdef MSDOS  /* Watt-32 */
 
 #    include <sys/ioctl.h>
+#    define sclose(x)         close_s(x)
 #    define select(n,r,w,x,t) select_s(n,r,w,x,t)
 #    define ioctl(x,y,z) ioctlsocket(x,y,(char *)(z))
 #    include <tcp.h>
@@ -439,7 +363,20 @@
 #      undef byte
 #    endif
 
+#  else /* MSDOS */
+
+#    ifdef __BEOS__
+#      define sclose(x) closesocket(x)
+#    else /* __BEOS__ */
+#      define sclose(x) close(x)
+#    endif /* __BEOS__ */
+
 #  endif /* MSDOS */
+
+#  ifdef _AMIGASF
+#    undef sclose
+#    define sclose(x) CloseSocket(x)
+#  endif
 
 #  ifdef __minix
      /* Minix 3 versions up to at least 3.1.3 are missing these prototypes */
@@ -463,77 +400,21 @@
 
 #endif /* WIN32 */
 
-/*
- * msvc 6.0 requires PSDK in order to have INET6_ADDRSTRLEN
- * defined in ws2tcpip.h as well as to provide IPv6 support.
- */
-
-#if defined(_MSC_VER) && !defined(__POCC__)
-#  if !defined(HAVE_WS2TCPIP_H) || \
-     ((_MSC_VER < 1300) && !defined(INET6_ADDRSTRLEN))
-#    undef HAVE_GETADDRINFO_THREADSAFE
-#    undef HAVE_FREEADDRINFO
-#    undef HAVE_GETADDRINFO
-#    undef HAVE_GETNAMEINFO
-#    undef ENABLE_IPV6
-#  endif
-#endif
-
-/* ---------------------------------------------------------------- */
-/*             resolver specialty compile-time defines              */
-/*         CURLRES_* defines to use in the host*.c sources          */
-/* ---------------------------------------------------------------- */
-
-/*
- * lcc-win32 doesn't have _beginthreadex(), lacks threads support.
- */
-
-#if defined(__LCC__) && defined(WIN32)
-#  undef USE_THREADS_POSIX
-#  undef USE_THREADS_WIN32
-#endif
-
-/*
- * MSVC threads support requires a multi-threaded runtime library.
- * _beginthreadex() is not available in single-threaded ones.
- */
-
-#if defined(_MSC_VER) && !defined(__POCC__) && !defined(_MT)
-#  undef USE_THREADS_POSIX
-#  undef USE_THREADS_WIN32
-#endif
-
-/*
- * Mutually exclusive CURLRES_* definitions.
- */
-
-#ifdef USE_ARES
-#  define CURLRES_ASYNCH
-#  define CURLRES_ARES
-/* now undef the stock libc functions just to avoid them being used */
-#  undef HAVE_GETADDRINFO
-#  undef HAVE_GETHOSTBYNAME
-#elif defined(USE_THREADS_POSIX) || defined(USE_THREADS_WIN32)
-#  define CURLRES_ASYNCH
-#  define CURLRES_THREADED
-#else
-#  define CURLRES_SYNCH
-#endif
-
+#if defined(WIN32) && !defined(__CYGWIN__) && !defined(USE_ARES) && \
+    !defined(__LCC__)  /* lcc-win32 doesn't have _beginthreadex() */
 #ifdef ENABLE_IPV6
-#  define CURLRES_IPV6
+#define USE_THREADING_GETADDRINFO
 #else
-#  define CURLRES_IPV4
+#define USE_THREADING_GETHOSTBYNAME  /* Cygwin uses alarm() function */
+#endif
 #endif
 
-/* ---------------------------------------------------------------- */
-
-/*
- * When using WINSOCK, TELNET protocol requires WINSOCK2 API.
- */
-
-#if defined(USE_WINSOCK) && (USE_WINSOCK != 2)
-#  define CURL_DISABLE_TELNET 1
+/* "cl -ML" or "cl -MLd" implies a single-threaded runtime library where
+   _beginthreadex() is not available */
+#if (defined(_MSC_VER) && !defined(__POCC__)) && !defined(_MT) && !defined(USE_ARES)
+#undef USE_THREADING_GETADDRINFO
+#undef USE_THREADING_GETHOSTBYNAME
+#define CURL_NO__BEGINTHREADEX
 #endif
 
 /*
@@ -542,27 +423,10 @@
  * are available if PSDK is properly installed.
  */
 
-#if defined(_MSC_VER) && !defined(__POCC__)
-#  if !defined(HAVE_WINSOCK2_H) || ((_MSC_VER < 1300) && !defined(IPPROTO_ESP))
-#    undef HAVE_STRUCT_SOCKADDR_STORAGE
-#  endif
+#ifdef _MSC_VER
+#if !defined(HAVE_WINSOCK2_H) || ((_MSC_VER < 1300) && !defined(IPPROTO_ESP))
+#undef HAVE_STRUCT_SOCKADDR_STORAGE
 #endif
-
-/*
- * Intentionally fail to build when using msvc 6.0 without PSDK installed.
- * The brave of heart can circumvent this, defining ALLOW_MSVC6_WITHOUT_PSDK
- * in lib/config-win32.h although absolutely discouraged and unsupported.
- */
-
-#if defined(_MSC_VER) && !defined(__POCC__)
-#  if !defined(HAVE_WINDOWS_H) || ((_MSC_VER < 1300) && !defined(_FILETIME_))
-#    if !defined(ALLOW_MSVC6_WITHOUT_PSDK)
-#      error MSVC 6.0 requires "February 2003 Platform SDK" a.k.a. \
-             "Windows Server 2003 PSDK"
-#    else
-#      define CURL_DISABLE_LDAP 1
-#    endif
-#  endif
 #endif
 
 #ifdef NETWARE
@@ -586,21 +450,12 @@ int netware_init(void);
 
 #define LIBIDN_REQUIRED_VERSION "0.4.1"
 
-#if defined(USE_GNUTLS) || defined(USE_SSLEAY) || defined(USE_NSS) || \
-    defined(USE_QSOSSL) || defined(USE_POLARSSL) || defined(USE_AXTLS) || \
-    defined(USE_CYASSL) || defined(USE_SCHANNEL) || \
-    defined(USE_DARWINSSL)
+#if defined(USE_GNUTLS) || defined(USE_SSLEAY) || defined(USE_NSS) || defined(USE_QSOSSL)
 #define USE_SSL    /* SSL support has been enabled */
 #endif
 
-#if defined(HAVE_GSSAPI) || defined(USE_WINDOWS_SSPI)
-#define USE_HTTP_NEGOTIATE
-#endif
-
-/* Single point where USE_NTLM definition might be done */
 #if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_NTLM)
-#if defined(USE_SSLEAY) || defined(USE_WINDOWS_SSPI) || \
-    defined(USE_GNUTLS) || defined(USE_NSS) || defined(USE_DARWINSSL)
+#if defined(USE_SSLEAY) || defined(USE_WINDOWS_SSPI) || defined(USE_GNUTLS)
 #define USE_NTLM
 #endif
 #endif
@@ -608,24 +463,6 @@ int netware_init(void);
 /* non-configure builds may define CURL_WANTS_CA_BUNDLE_ENV */
 #if defined(CURL_WANTS_CA_BUNDLE_ENV) && !defined(CURL_CA_BUNDLE)
 #define CURL_CA_BUNDLE getenv("CURL_CA_BUNDLE")
-#endif
-
-/* Define S_ISREG if not defined by system headers, f.e. MSVC */
-#if !defined(S_ISREG) && defined(S_IFMT) && defined(S_IFREG)
-#define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
-#endif
-
-/*
- * Provide a mechanism to silence picky compilers, such as gcc 4.6+.
- * Parameters should of course normally not be unused, but for example when
- * we have multiple implementations of the same interface it may happen.
- */
-
-#if defined(__GNUC__) && ((__GNUC__ >= 3) || \
-  ((__GNUC__ == 2) && defined(__GNUC_MINOR__) && (__GNUC_MINOR__ >= 7)))
-#  define UNUSED_PARAM __attribute__((__unused__))
-#else
-#  define UNUSED_PARAM /*NOTHING*/
 #endif
 
 /*
@@ -636,36 +473,4 @@ int netware_init(void);
 #include "setup_once.h"
 #endif
 
-/*
- * Definition of our NOP statement Object-like macro
- */
-
-#ifndef Curl_nop_stmt
-#  define Curl_nop_stmt do { } WHILE_FALSE
-#endif
-
-/*
- * Ensure that Winsock and lwIP TCP/IP stacks are not mixed.
- */
-
-#if defined(__LWIP_OPT_H__)
-#  if defined(SOCKET) || \
-     defined(USE_WINSOCK) || \
-     defined(HAVE_WINSOCK_H) || \
-     defined(HAVE_WINSOCK2_H) || \
-     defined(HAVE_WS2TCPIP_H)
-#    error "Winsock and lwIP TCP/IP stack definitions shall not coexist!"
-#  endif
-#endif
-
-/*
- * Portable symbolic names for Winsock shutdown() mode flags.
- */
-
-#ifdef USE_WINSOCK
-#  define SHUT_RD   0x00
-#  define SHUT_WR   0x01
-#  define SHUT_RDWR 0x02
-#endif
-
-#endif /* HEADER_CURL_SETUP_H */
+#endif /* __LIB_CURL_SETUP_H */

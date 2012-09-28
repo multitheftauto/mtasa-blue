@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2010, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2008, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,6 +20,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * $Id: curl_addrinfo.h,v 1.3 2008-11-06 17:19:57 yangtse Exp $
  ***************************************************************************/
 
 #include "setup.h"
@@ -37,14 +38,14 @@
 #  include <arpa/inet.h>
 #endif
 
-#ifdef __VMS
+#ifdef  VMS
 #  include <in.h>
 #  include <inet.h>
 #  include <stdlib.h>
 #endif
 
 
-/*
+/* 
  * Curl_addrinfo is our internal struct definition that we use to allow
  * consistent internal handling of this data. We use this even when the
  * system provides an addrinfo structure definition. And we use this for
@@ -56,7 +57,7 @@ struct Curl_addrinfo {
   int                   ai_family;
   int                   ai_socktype;
   int                   ai_protocol;
-  curl_socklen_t        ai_addrlen;   /* Follow rfc3493 struct addrinfo */
+  socklen_t             ai_addrlen;   /* Follow rfc3493 struct addrinfo */
   char                 *ai_canonname;
   struct sockaddr      *ai_addr;
   struct Curl_addrinfo *ai_next;
@@ -79,8 +80,6 @@ Curl_he2ai(const struct hostent *he, int port);
 
 Curl_addrinfo *
 Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port);
-
-Curl_addrinfo *Curl_str2addr(char *dotted, int port);
 
 #if defined(CURLDEBUG) && defined(HAVE_FREEADDRINFO)
 void

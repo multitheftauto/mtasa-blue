@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2008, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,6 +20,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * $Id: progress.h,v 1.22 2008-07-03 06:56:03 bagder Exp $
  ***************************************************************************/
 
 #include "timeval.h"
@@ -34,19 +35,18 @@ typedef enum {
   TIMER_STARTTRANSFER,
   TIMER_POSTRANSFER,
   TIMER_STARTSINGLE,
-  TIMER_STARTACCEPT,
   TIMER_REDIRECT,
   TIMER_LAST /* must be last */
 } timerid;
 
-int Curl_pgrsDone(struct connectdata *);
+void Curl_pgrsDone(struct connectdata *);
 void Curl_pgrsStartNow(struct SessionHandle *data);
 void Curl_pgrsSetDownloadSize(struct SessionHandle *data, curl_off_t size);
 void Curl_pgrsSetUploadSize(struct SessionHandle *data, curl_off_t size);
 void Curl_pgrsSetDownloadCounter(struct SessionHandle *data, curl_off_t size);
 void Curl_pgrsSetUploadCounter(struct SessionHandle *data, curl_off_t size);
 int Curl_pgrsUpdate(struct connectdata *);
-void Curl_pgrsResetTimesSizes(struct SessionHandle *data);
+void Curl_pgrsResetTimes(struct SessionHandle *data);
 void Curl_pgrsTime(struct SessionHandle *data, timerid timer);
 
 

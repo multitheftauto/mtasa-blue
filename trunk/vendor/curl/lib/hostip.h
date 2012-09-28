@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_HOSTIP_H
-#define HEADER_CURL_HOSTIP_H
+#ifndef __HOSTIP_H
+#define __HOSTIP_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2008, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,12 +20,12 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * $Id: hostip.h,v 1.69 2008-11-06 17:19:57 yangtse Exp $
  ***************************************************************************/
 
 #include "setup.h"
 #include "hash.h"
 #include "curl_addrinfo.h"
-#include "asyn.h"
 
 #ifdef HAVE_SETJMP_H
 #include <setjmp.h>
@@ -34,6 +34,52 @@
 #ifdef NETWARE
 #undef in_addr_t
 #define in_addr_t unsigned long
+#endif
+
+/*
+ * Setup comfortable CURLRES_* defines to use in the host*.c sources.
+ */
+
+#ifdef USE_ARES
+#include <ares_version.h>
+#endif
+
+#ifdef USE_ARES
+#define CURLRES_ASYNCH
+#define CURLRES_ARES
+#endif
+
+#ifdef USE_THREADING_GETHOSTBYNAME
+#define CURLRES_ASYNCH
+#define CURLRES_THREADED
+#endif
+
+#ifdef USE_THREADING_GETADDRINFO
+#define CURLRES_ASYNCH
+#define CURLRES_THREADED
+#endif
+
+#ifdef ENABLE_IPV6
+#define CURLRES_IPV6
+#else
+#define CURLRES_IPV4
+#endif
+
+#if defined(CURLRES_IPV4) || defined(CURLRES_ARES)
+#if !defined(HAVE_GETHOSTBYNAME_R) || defined(CURLRES_ASYNCH)
+/* If built for ipv4 and missing gethostbyname_r(), or if using async name
+   resolve, we need the Curl_addrinfo_copy() function (which itself needs the
+   Curl_he2ai() function)) */
+#define CURLRES_ADDRINFO_COPY
+#endif
+#endif /* IPv4/ares-only */
+
+#ifndef CURLRES_ASYNCH
+#define CURLRES_SYNCH
+#endif
+
+#ifndef USE_LIBIDN
+#define CURLRES_IDN
 #endif
 
 /* Allocate enough memory to hold the full name information structs and
@@ -46,7 +92,17 @@
 #define CURL_TIMEOUT_RESOLVE 300 /* when using asynch methods, we allow this
                                     many seconds for a name resolve */
 
+#ifdef CURLRES_ARES
+#define CURL_ASYNC_SUCCESS ARES_SUCCESS
+#if ARES_VERSION >= 0x010500
+/* c-ares 1.5.0 or later, the callback proto is modified */
+#define HAVE_CARES_CALLBACK_TIMEOUTS 1
+#endif
+#else
 #define CURL_ASYNC_SUCCESS CURLE_OK
+#define ares_cancel(x) do {} while(0)
+#define ares_destroy(x) do {} while(0)
+#endif
 
 struct addrinfo;
 struct hostent;
@@ -65,8 +121,6 @@ void Curl_global_host_cache_dtor(void);
 
 struct Curl_dns_entry {
   Curl_addrinfo *addr;
-  /* timestamp == 0 -- entry not in hostcache
-     timestamp != 0 -- entry is in hostcache */
   time_t timestamp;
   long inuse;      /* use-counter, make very sure you decrease this
                       when you're done using the address you received */
@@ -90,21 +144,11 @@ int Curl_resolv_timeout(struct connectdata *conn, const char *hostname,
                         int port, struct Curl_dns_entry **dnsentry,
                         long timeoutms);
 
-#ifdef CURLRES_IPV6
-/*
- * Curl_ipv6works() returns TRUE if ipv6 seems to work.
- */
-bool Curl_ipv6works(void);
-#else
-#define Curl_ipv6works() FALSE
-#endif
-
 /*
  * Curl_ipvalid() checks what CURL_IPRESOLVE_* requirements that might've
  * been set and returns TRUE if they are OK.
  */
-bool Curl_ipvalid(struct connectdata *conn);
-
+bool Curl_ipvalid(struct SessionHandle *data);
 
 /*
  * Curl_getaddrinfo() is the generic low-level name resolve API within this
@@ -117,6 +161,20 @@ Curl_addrinfo *Curl_getaddrinfo(struct connectdata *conn,
                                 int port,
                                 int *waitp);
 
+CURLcode Curl_is_resolved(struct connectdata *conn,
+                          struct Curl_dns_entry **dns);
+CURLcode Curl_wait_for_resolv(struct connectdata *conn,
+                              struct Curl_dns_entry **dnsentry);
+
+/* Curl_resolv_getsock() is a generic function that exists in multiple
+   versions depending on what name resolve technology we've built to use. The
+   function is called from the multi_getsock() function.  'sock' is a pointer
+   to an array to hold the file descriptors, with 'numsock' being the size of
+   that array (in number of entries). This function is supposed to return
+   bitmask indicating what file descriptors (referring to array indexes in the
+   'sock' array) to wait for, read/write. */
+int Curl_resolv_getsock(struct connectdata *conn, curl_socket_t *sock,
+                        int numsocks);
 
 /* unlock a previously resolved dns entry */
 void Curl_resolv_unlock(struct SessionHandle *data,
@@ -143,25 +201,26 @@ int curl_dogetnameinfo(GETNAMEINFO_QUAL_ARG1 GETNAMEINFO_TYPE_ARG1 sa,
                        int line, const char *source);
 #endif
 
-/* IPv4 threadsafe resolve function used for synch and asynch builds */
-Curl_addrinfo *Curl_ipv4_resolve_r(const char * hostname, int port);
-
-CURLcode Curl_async_resolved(struct connectdata *conn,
-                             bool *protocol_connect);
-
-#ifndef CURLRES_ASYNCH
-#define Curl_async_resolved(x,y) CURLE_OK
+/* This is the callback function that is used when we build with asynch
+   resolve, ipv4 */
+CURLcode Curl_addrinfo4_callback(void *arg,
+                                 int status,
+#ifdef HAVE_CARES_CALLBACK_TIMEOUTS
+                                 int timeouts,
 #endif
+                                 struct hostent *hostent);
+/* This is the callback function that is used when we build with asynch
+   resolve, ipv6 */
+CURLcode Curl_addrinfo6_callback(void *arg,
+                                 int status,
+#ifdef HAVE_CARES_CALLBACK_TIMEOUTS
+                                 int timeouts,
+#endif
+                                 Curl_addrinfo *ai);
 
-/*
- * Curl_addrinfo_callback() is used when we build with any asynch specialty.
- * Handles end of async request processing. Inserts ai into hostcache when
- * status is CURL_ASYNC_SUCCESS. Twiddles fields in conn to indicate async
- * request completed whether successful or failed.
- */
-CURLcode Curl_addrinfo_callback(struct connectdata *conn,
-                                int status,
-                                Curl_addrinfo *ai);
+
+/* Clone a Curl_addrinfo struct, works protocol independently */
+Curl_addrinfo *Curl_addrinfo_copy(const void *orig, int port);
 
 /*
  * Curl_printable_address() returns a printable version of the 1st address
@@ -180,6 +239,13 @@ struct Curl_dns_entry *
 Curl_cache_addr(struct SessionHandle *data, Curl_addrinfo *addr,
                 const char *hostname, int port);
 
+/*
+ * Curl_destroy_thread_data() cleans up async resolver data.
+ * Complementary of ares_destroy.
+ */
+struct Curl_async; /* forward-declaration */
+void Curl_destroy_thread_data(struct Curl_async *async);
+
 #ifndef INADDR_NONE
 #define CURL_INADDR_NONE (in_addr_t) ~0
 #else
@@ -195,16 +261,4 @@ Curl_cache_addr(struct SessionHandle *data, Curl_addrinfo *addr,
 extern sigjmp_buf curl_jmpenv;
 #endif
 
-/*
- * Function provided by the resolver backend to set DNS servers to use.
- */
-CURLcode Curl_set_dns_servers(struct SessionHandle *data, char *servers);
-
-/*
- * Destroy the hostcache of this handle.
- */
-void Curl_hostcache_destroy(struct SessionHandle *data);
-
-CURLcode Curl_loadhostpairs(struct SessionHandle *data);
-
-#endif /* HEADER_CURL_HOSTIP_H */
+#endif

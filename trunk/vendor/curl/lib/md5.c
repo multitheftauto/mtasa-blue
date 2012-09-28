@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2008, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,62 +18,29 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * $Id: md5.c,v 1.15 2009-02-12 20:48:44 danf Exp $
  ***************************************************************************/
 
 #include "setup.h"
 
 #ifndef CURL_DISABLE_CRYPTO_AUTH
 
+#include <string.h>
+
 #include "curl_md5.h"
-#include "curl_hmac.h"
-#include "warnless.h"
-
-#ifdef USE_GNUTLS_NETTLE
-
-#include <nettle/md5.h>
-
-typedef struct md5_ctx MD5_CTX;
-
-static void MD5_Init(MD5_CTX * ctx)
-{
-  md5_init(ctx);
-}
-
-static void MD5_Update(MD5_CTX * ctx,
-                       const unsigned char * input,
-                       unsigned int inputLen)
-{
-  md5_update(ctx, inputLen, input);
-}
-
-static void MD5_Final(unsigned char digest[16], MD5_CTX * ctx)
-{
-  md5_digest(ctx, 16, digest);
-}
-#else
 
 #ifdef USE_GNUTLS
 
 #include <gcrypt.h>
 
-typedef gcry_md_hd_t MD5_CTX;
-
-static void MD5_Init(MD5_CTX * ctx)
+void Curl_md5it(unsigned char *outbuffer, /* 16 bytes */
+                const unsigned char *input)
 {
-  gcry_md_open(ctx, GCRY_MD_MD5, 0);
-}
-
-static void MD5_Update(MD5_CTX * ctx,
-                       const unsigned char * input,
-                       unsigned int inputLen)
-{
-  gcry_md_write(*ctx, input, inputLen);
-}
-
-static void MD5_Final(unsigned char digest[16], MD5_CTX * ctx)
-{
-  memcpy(digest, gcry_md_read(*ctx, 0), 16);
-  gcry_md_close(*ctx);
+  gcry_md_hd_t ctx;
+  gcry_md_open(&ctx, GCRY_MD_MD5, 0);
+  gcry_md_write(ctx, input, (unsigned int)strlen((char *)input));
+  memcpy (outbuffer, gcry_md_read (ctx, 0), 16);
+  gcry_md_close(ctx);
 }
 
 #else
@@ -228,10 +195,10 @@ static void MD5_Update (struct md5_ctx *context,    /* context */
 
   /* Transform as many times as possible. */
   if(inputLen >= partLen) {
-    memcpy(&context->buffer[bufindex], input, partLen);
+    memcpy((void *)&context->buffer[bufindex], (void *)input, partLen);
     MD5Transform(context->state, context->buffer);
 
-    for(i = partLen; i + 63 < inputLen; i += 64)
+    for (i = partLen; i + 63 < inputLen; i += 64)
       MD5Transform(context->state, &input[i]);
 
     bufindex = 0;
@@ -240,7 +207,7 @@ static void MD5_Update (struct md5_ctx *context,    /* context */
     i = 0;
 
   /* Buffer remaining input */
-  memcpy(&context->buffer[bufindex], &input[i], inputLen-i);
+  memcpy((void *)&context->buffer[bufindex], (void *)&input[i], inputLen-i);
 }
 
 /* MD5 finalization. Ends an MD5 message-digest operation, writing the
@@ -368,7 +335,7 @@ static void Encode (unsigned char *output,
 {
   unsigned int i, j;
 
-  for(i = 0, j = 0; j < len; i++, j += 4) {
+  for (i = 0, j = 0; j < len; i++, j += 4) {
     output[j] = (unsigned char)(input[i] & 0xff);
     output[j+1] = (unsigned char)((input[i] >> 8) & 0xff);
     output[j+2] = (unsigned char)((input[i] >> 16) & 0xff);
@@ -385,88 +352,22 @@ static void Decode (UINT4 *output,
 {
   unsigned int i, j;
 
-  for(i = 0, j = 0; j < len; i++, j += 4)
+  for (i = 0, j = 0; j < len; i++, j += 4)
     output[i] = ((UINT4)input[j]) | (((UINT4)input[j+1]) << 8) |
       (((UINT4)input[j+2]) << 16) | (((UINT4)input[j+3]) << 24);
 }
 
 #endif /* USE_SSLEAY */
 
-#endif /* USE_GNUTLS */
-
-#endif /* USE_GNUTLS_NETTLE */
-
-const HMAC_params Curl_HMAC_MD5[] = {
-  {
-    (HMAC_hinit_func) MD5_Init,           /* Hash initialization function. */
-    (HMAC_hupdate_func) MD5_Update,       /* Hash update function. */
-    (HMAC_hfinal_func) MD5_Final,         /* Hash computation end function. */
-    sizeof(MD5_CTX),                      /* Size of hash context structure. */
-    64,                                   /* Maximum key length. */
-    16                                    /* Result size. */
-  }
-};
-
-const MD5_params Curl_DIGEST_MD5[] = {
-  {
-    (Curl_MD5_init_func) MD5_Init,      /* Digest initialization function */
-    (Curl_MD5_update_func) MD5_Update,  /* Digest update function */
-    (Curl_MD5_final_func) MD5_Final,    /* Digest computation end function */
-    sizeof(MD5_CTX),                    /* Size of digest context struct */
-    16                                  /* Result size */
-  }
-};
-
 void Curl_md5it(unsigned char *outbuffer, /* 16 bytes */
                 const unsigned char *input)
 {
   MD5_CTX ctx;
   MD5_Init(&ctx);
-  MD5_Update(&ctx, input, curlx_uztoui(strlen((char *)input)));
+  MD5_Update(&ctx, input, (unsigned int)strlen((char *)input));
   MD5_Final(outbuffer, &ctx);
 }
 
-MD5_context *Curl_MD5_init(const MD5_params *md5params)
-{
-  MD5_context *ctxt;
-
-  /* Create MD5 context */
-  ctxt = malloc(sizeof *ctxt);
-
-  if(!ctxt)
-    return ctxt;
-
-  ctxt->md5_hashctx = malloc(md5params->md5_ctxtsize);
-
-  if(!ctxt->md5_hashctx) {
-    free(ctxt);
-    return NULL;
-  }
-
-  ctxt->md5_hash = md5params;
-
-  (*md5params->md5_init_func)(ctxt->md5_hashctx);
-
-  return ctxt;
-}
-
-int Curl_MD5_update(MD5_context *context,
-                    const unsigned char *data,
-                    unsigned int len)
-{
-  (*context->md5_hash->md5_update_func)(context->md5_hashctx, data, len);
-
-  return 0;
-}
-
-int Curl_MD5_final(MD5_context *context, unsigned char *result)
-{
-  (*context->md5_hash->md5_final_func)(result, context->md5_hashctx);
-
-  free(context->md5_hashctx);
-  free(context);
-
-  return 0;
-}
+#endif /* USE_GNUTLS */
 
 #endif /* CURL_DISABLE_CRYPTO_AUTH */

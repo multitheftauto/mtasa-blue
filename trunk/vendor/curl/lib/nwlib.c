@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2009, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2008, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,14 +18,17 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * $Id: nwlib.c,v 1.12 2008-09-06 05:29:06 yangtse Exp $
  ***************************************************************************/
-
-#include "setup.h"
 
 #ifdef NETWARE /* Novell NetWare */
 
+#include <stdlib.h>
+
 #ifdef __NOVELL_LIBC__
 /* For native LibC-based NLM we need to register as a real lib. */
+#include <errno.h>
+#include <string.h>
 #include <library.h>
 #include <netware.h>
 #include <screen.h>
@@ -315,11 +318,5 @@ int main ( void )
 }
 
 #endif /* __NOVELL_LIBC__ */
-
-#else /* NETWARE */
-
-#ifdef __POCC__
-#  pragma warn(disable:2024)  /* Disable warning #2024: Empty input file */
-#endif
 
 #endif /* NETWARE */

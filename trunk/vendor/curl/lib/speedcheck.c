@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2006, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,9 +18,13 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * $Id: speedcheck.c,v 1.23 2007-08-30 20:34:57 danf Exp $
  ***************************************************************************/
 
 #include "setup.h"
+
+#include <stdio.h>
+#include <string.h>
 
 #include <curl/curl.h>
 #include "urldata.h"
@@ -41,24 +45,21 @@ CURLcode Curl_speedcheck(struct SessionHandle *data,
      (Curl_tvlong(data->state.keeps_speed) != 0) &&
      (data->progress.current_speed < data->set.low_speed_limit)) {
     long howlong = Curl_tvdiff(now, data->state.keeps_speed);
-    long nextcheck = (data->set.low_speed_time * 1000) - howlong;
 
     /* We are now below the "low speed limit". If we are below it
        for "low speed time" seconds we consider that enough reason
        to abort the download. */
-    if(nextcheck <= 0) {
+
+    if( (howlong/1000) > data->set.low_speed_time) {
       /* we have been this slow for long enough, now die */
       failf(data,
             "Operation too slow. "
-            "Less than %ld bytes/sec transferred the last %ld seconds",
+            "Less than %d bytes/sec transfered the last %d seconds",
             data->set.low_speed_limit,
             data->set.low_speed_time);
       return CURLE_OPERATION_TIMEDOUT;
     }
-    else {
-      /* wait complete low_speed_time */
-      Curl_expire(data, nextcheck);
-    }
+    Curl_expire(data, howlong);
   }
   else {
     /* we keep up the required speed all right */

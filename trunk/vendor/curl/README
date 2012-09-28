@@ -34,11 +34,15 @@ WEB SITE
 
         http://curl.haxx.se/
 
-GIT
+CVS
 
-  To download the very latest source off the GIT server do this:
+  To download the very latest source off the CVS server do this:
 
-    git clone git://github.com/bagder/curl.git
+   cvs -d :pserver:anonymous@cool.haxx.se:/cvsroot/curl login
+
+  (just press enter when asked for password)
+
+   cvs -d :pserver:anonymous@cool.haxx.se:/cvsroot/curl co curl
 
   (you'll get a directory named curl created, filled with the source code)
 

@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2009, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2005, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,23 +20,19 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * $Id: sockaddr.h,v 1.4 2005/11/12 22:13:20 bagder Exp $
  ***************************************************************************/
 
 #include "setup.h"
 
-struct Curl_sockaddr_storage {
-  union {
-    struct sockaddr sa;
-    struct sockaddr_in sa_in;
-#ifdef ENABLE_IPV6
-    struct sockaddr_in6 sa_in6;
-#endif
 #ifdef HAVE_STRUCT_SOCKADDR_STORAGE
-    struct sockaddr_storage sa_stor;
-#else
-    char cbuf[256];   /* this should be big enough to fit a lot */
-#endif
-  } buffer;
+struct Curl_sockaddr_storage {
+  struct sockaddr_storage buffer;
 };
+#else
+struct Curl_sockaddr_storage {
+  char buffer[256];   /* this should be big enough to fit a lot */
+};
+#endif
 
 #endif /* __SOCKADDR_H */
