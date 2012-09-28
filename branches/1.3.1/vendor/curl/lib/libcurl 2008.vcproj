@@ -321,18 +321,6 @@
 			Name="Source Files"
 			>
 			<File
-				RelativePath=".\asyn-ares.c"
-				>
-			</File>
-			<File
-				RelativePath=".\asyn-thread.c"
-				>
-			</File>
-			<File
-				RelativePath=".\axtls.c"
-				>
-			</File>
-			<File
 				RelativePath="base64.c"
 				>
 				<FileConfiguration
@@ -488,62 +476,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\curl_darwinssl.c"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_fnmatch.c"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_gethostname.c"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_gssapi.c"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_memrchr.c"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_multibyte.c"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_ntlm.c"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_ntlm_core.c"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_ntlm_msgs.c"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_ntlm_wb.c"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_rand.c"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_rtmp.c"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_sasl.c"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_schannel.c"
-				>
-			</File>
-			<File
 				RelativePath="curl_sspi.c"
 				>
 				<FileConfiguration
@@ -573,14 +505,6 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\curl_threads.c"
-				>
-			</File>
-			<File
-				RelativePath=".\cyassl.c"
-				>
 			</File>
 			<File
 				RelativePath="dict.c"
@@ -707,10 +631,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\fileinfo.c"
-				>
-			</File>
-			<File
 				RelativePath="formdata.c"
 				>
 				<FileConfiguration
@@ -771,10 +691,6 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\ftplistparser.c"
-				>
 			</File>
 			<File
 				RelativePath="getenv.c"
@@ -839,10 +755,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\gopher.c"
-				>
-			</File>
-			<File
 				RelativePath="gtls.c"
 				>
 				<FileConfiguration
@@ -905,8 +817,35 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\hmac.c"
+				RelativePath="hostares.c"
 				>
+				<FileConfiguration
+					Name="Nightly|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="hostasyn.c"
@@ -1064,6 +1003,37 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="hostthre.c"
+				>
+				<FileConfiguration
+					Name="Nightly|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath="http.c"
 				>
 				<FileConfiguration
@@ -1188,16 +1158,35 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\http_negotiate_sspi.c"
+				RelativePath="http_ntlm.c"
 				>
-			</File>
-			<File
-				RelativePath=".\http_proxy.c"
-				>
-			</File>
-			<File
-				RelativePath=".\idn_win32.c"
-				>
+				<FileConfiguration
+					Name="Nightly|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="if2ip.c"
@@ -1229,10 +1218,6 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\imap.c"
-				>
 			</File>
 			<File
 				RelativePath="inet_ntop.c"
@@ -1421,10 +1406,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\md4.c"
-				>
-			</File>
-			<File
 				RelativePath="md5.c"
 				>
 				<FileConfiguration
@@ -1580,14 +1561,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\non-ascii.c"
-				>
-			</File>
-			<File
-				RelativePath=".\nonblock.c"
-				>
-			</File>
-			<File
 				RelativePath="nss.c"
 				>
 				<FileConfiguration
@@ -1619,10 +1592,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\openldap.c"
-				>
-			</File>
-			<File
 				RelativePath="parsedate.c"
 				>
 				<FileConfiguration
@@ -1652,18 +1621,6 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\pingpong.c"
-				>
-			</File>
-			<File
-				RelativePath=".\polarssl.c"
-				>
-			</File>
-			<File
-				RelativePath=".\pop3.c"
-				>
 			</File>
 			<File
 				RelativePath="progress.c"
@@ -1757,10 +1714,6 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\rtsp.c"
-				>
 			</File>
 			<File
 				RelativePath="security.c"
@@ -1885,14 +1838,6 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\slist.c"
-				>
-			</File>
-			<File
-				RelativePath=".\smtp.c"
-				>
 			</File>
 			<File
 				RelativePath="socks.c"
@@ -2483,40 +2428,12 @@
 					/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath=".\warnless.c"
-				>
-			</File>
-			<File
-				RelativePath=".\wildcard.c"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			>
 			<File
 				RelativePath="arpa_telnet.h"
-				>
-			</File>
-			<File
-				RelativePath=".\asyn.h"
-				>
-			</File>
-			<File
-				RelativePath=".\axtls.h"
-				>
-			</File>
-			<File
-				RelativePath=".\config-dos.h"
-				>
-			</File>
-			<File
-				RelativePath=".\config-vms.h"
-				>
-			</File>
-			<File
-				RelativePath=".\config-vxworks.h"
 				>
 			</File>
 			<File
@@ -2544,31 +2461,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\curl_darwinssl.h"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_fnmatch.h"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_gethostname.h"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_gssapi.h"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_hmac.h"
-				>
-			</File>
-			<File
 				RelativePath="curl_ldap.h"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_md4.h"
 				>
 			</File>
 			<File
@@ -2576,63 +2469,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\curl_memory.h"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_memrchr.h"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_multibyte.h"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_ntlm.h"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_ntlm_core.h"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_ntlm_msgs.h"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_ntlm_wb.h"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_rand.h"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_rtmp.h"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_sasl.h"
-				>
-			</File>
-			<File
-				RelativePath=".\curl_schannel.h"
-				>
-			</File>
-			<File
 				RelativePath="curl_sspi.h"
 				>
 			</File>
 			<File
-				RelativePath=".\curl_threads.h"
-				>
-			</File>
-			<File
 				RelativePath="curlx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\cyassl.h"
 				>
 			</File>
 			<File
@@ -2652,10 +2493,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\fileinfo.h"
-				>
-			</File>
-			<File
 				RelativePath="formdata.h"
 				>
 			</File>
@@ -2664,15 +2501,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ftplistparser.h"
-				>
-			</File>
-			<File
 				RelativePath="getinfo.h"
-				>
-			</File>
-			<File
-				RelativePath=".\gopher.h"
 				>
 			</File>
 			<File
@@ -2708,15 +2537,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\http_proxy.h"
-				>
-			</File>
-			<File
 				RelativePath="if2ip.h"
-				>
-			</File>
-			<File
-				RelativePath=".\imap.h"
 				>
 			</File>
 			<File
@@ -2752,31 +2573,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\non-ascii.h"
-				>
-			</File>
-			<File
-				RelativePath=".\nonblock.h"
-				>
-			</File>
-			<File
 				RelativePath="nssg.h"
 				>
 			</File>
 			<File
 				RelativePath="parsedate.h"
-				>
-			</File>
-			<File
-				RelativePath=".\pingpong.h"
-				>
-			</File>
-			<File
-				RelativePath=".\polarssl.h"
-				>
-			</File>
-			<File
-				RelativePath=".\pop3.h"
 				>
 			</File>
 			<File
@@ -2789,10 +2590,6 @@
 			</File>
 			<File
 				RelativePath="rawstr.h"
-				>
-			</File>
-			<File
-				RelativePath=".\rtsp.h"
 				>
 			</File>
 			<File
@@ -2813,14 +2610,6 @@
 			</File>
 			<File
 				RelativePath="share.h"
-				>
-			</File>
-			<File
-				RelativePath=".\slist.h"
-				>
-			</File>
-			<File
-				RelativePath=".\smtp.h"
 				>
 			</File>
 			<File
@@ -2893,14 +2682,6 @@
 			</File>
 			<File
 				RelativePath="urldata.h"
-				>
-			</File>
-			<File
-				RelativePath=".\warnless.h"
-				>
-			</File>
-			<File
-				RelativePath=".\wildcard.h"
 				>
 			</File>
 		</Filter>

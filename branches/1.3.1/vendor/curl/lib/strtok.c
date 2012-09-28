@@ -18,12 +18,14 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * $Id: strtok.c,v 1.14 2007-11-07 09:21:36 bagder Exp $
  ***************************************************************************/
 
 #include "setup.h"
 
 #ifndef HAVE_STRTOK_R
 #include <stddef.h>
+#include <string.h>
 
 #include "strtok.h"
 

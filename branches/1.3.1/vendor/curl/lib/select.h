@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2008, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,6 +20,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * $Id: select.h,v 1.16 2008-07-10 18:01:45 yangtse Exp $
  ***************************************************************************/
 
 #include "setup.h"
@@ -84,42 +85,14 @@ struct pollfd
 #define POLLRDBAND POLLPRI
 #endif
 
-/* there are three CSELECT defines that are defined in the public header that
-   are exposed to users, but this *IN2 bit is only ever used internally and
-   therefore defined here */
-#define CURL_CSELECT_IN2 (CURL_CSELECT_ERR << 1)
-
-int Curl_socket_check(curl_socket_t readfd, curl_socket_t readfd2,
-                      curl_socket_t writefd,
-                      long timeout_ms);
-
-/* provide the former API internally */
-#define Curl_socket_ready(x,y,z) \
-  Curl_socket_check(x, CURL_SOCKET_BAD, y, z)
+int Curl_socket_ready(curl_socket_t readfd, curl_socket_t writefd,
+                      int timeout_ms);
 
 int Curl_poll(struct pollfd ufds[], unsigned int nfds, int timeout_ms);
-
-int Curl_wait_ms(int timeout_ms);
 
 #ifdef TPF
 int tpf_select_libcurl(int maxfds, fd_set* reads, fd_set* writes,
                        fd_set* excepts, struct timeval* tv);
-#endif
-
-/* Winsock and TPF sockets are not in range [0..FD_SETSIZE-1], which
-   unfortunately makes it impossible for us to easily check if they're valid
-*/
-#if defined(USE_WINSOCK) || defined(TPF)
-#define VALID_SOCK(x) 1
-#define VERIFY_SOCK(x) Curl_nop_stmt
-#else
-#define VALID_SOCK(s) (((s) >= 0) && ((s) < FD_SETSIZE))
-#define VERIFY_SOCK(x) do { \
-  if(!VALID_SOCK(x)) { \
-    SET_SOCKERRNO(EINVAL); \
-    return -1; \
-  } \
-} WHILE_FALSE
 #endif
 
 #endif /* __SELECT_H */

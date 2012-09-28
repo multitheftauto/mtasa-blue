@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_SPLAY_H
-#define HEADER_CURL_SPLAY_H
+#ifndef __SPLAY_H
+#define __SPLAY_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1997 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1997 - 2008, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,8 +20,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * $Id: splay.h,v 1.5 2008-05-07 15:41:41 yangtse Exp $
  ***************************************************************************/
-#include "setup.h"
 
 struct Curl_tree {
   struct Curl_tree *smaller; /* smaller node */
@@ -57,10 +57,10 @@ int Curl_splayremovebyaddr(struct Curl_tree *t,
                                    ( ((i.tv_usec) < (j.tv_usec)) ? -1 : \
                                    ( ((i.tv_usec) > (j.tv_usec)) ?  1 : 0 ))))
 
-#ifdef DEBUGBUILD
+#ifdef CURLDEBUG
 void Curl_splayprint(struct Curl_tree * t, int d, char output);
 #else
-#define Curl_splayprint(x,y,z) Curl_nop_stmt
+#define Curl_splayprint(x,y,z)
 #endif
 
-#endif /* HEADER_CURL_SPLAY_H */
+#endif

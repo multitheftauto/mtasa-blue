@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2008, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,10 +18,17 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * $Id: hostip4.c,v 1.47 2008-11-06 17:19:57 yangtse Exp $
  ***************************************************************************/
 
 #include "setup.h"
 
+#include <string.h>
+#include <errno.h>
+
+#ifdef NEED_MALLOC_H
+#include <malloc.h>
+#endif
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
@@ -34,12 +41,16 @@
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>     /* required for free() prototypes */
+#endif
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>     /* for the close() proto */
 #endif
-#ifdef __VMS
+#ifdef  VMS
 #include <in.h>
 #include <inet.h>
+#include <stdlib.h>
 #endif
 
 #ifdef HAVE_PROCESS_H
@@ -58,7 +69,7 @@
 #define _MPRINTF_REPLACE /* use our functions only */
 #include <curl/mprintf.h>
 
-#include "curl_memory.h"
+#include "memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 
@@ -70,16 +81,16 @@
  * Curl_ipvalid() checks what CURL_IPRESOLVE_* requirements that might've
  * been set and returns TRUE if they are OK.
  */
-bool Curl_ipvalid(struct connectdata *conn)
+bool Curl_ipvalid(struct SessionHandle *data)
 {
-  if(conn->ip_version == CURL_IPRESOLVE_V6)
+  if(data->set.ip_version == CURL_IPRESOLVE_V6)
     /* an ipv6 address was requested and we can't get/use one */
     return FALSE;
 
   return TRUE; /* OK, proceed */
 }
 
-#ifdef CURLRES_SYNCH
+#ifdef CURLRES_SYNCH /* the functions below are for synchronous resolves */
 
 /*
  * Curl_getaddrinfo() - the ipv4 synchronous version.
@@ -102,36 +113,7 @@ Curl_addrinfo *Curl_getaddrinfo(struct connectdata *conn,
                                 int port,
                                 int *waitp)
 {
-  Curl_addrinfo *ai = NULL;
-
-#ifdef CURL_DISABLE_VERBOSE_STRINGS
-  (void)conn;
-#endif
-
-  *waitp = 0; /* synchronous response only */
-
-  ai = Curl_ipv4_resolve_r(hostname, port);
-  if(!ai)
-    infof(conn->data, "Curl_ipv4_resolve_r failed for %s\n", hostname);
-
-  return ai;
-}
-#endif /* CURLRES_SYNCH */
-#endif /* CURLRES_IPV4 */
-
-#if defined(CURLRES_IPV4) && !defined(CURLRES_ARES)
-
-/*
- * Curl_ipv4_resolve_r() - ipv4 threadsafe resolver function.
- *
- * This is used for both synchronous and asynchronous resolver builds,
- * implying that only threadsafe code and function calls may be used.
- *
- */
-Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
-                                   int port)
-{
-#if !defined(HAVE_GETADDRINFO_THREADSAFE) && defined(HAVE_GETHOSTBYNAME_R_3)
+#if defined(HAVE_GETHOSTBYNAME_R_3)
   int res;
 #endif
   Curl_addrinfo *ai = NULL;
@@ -139,27 +121,17 @@ Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
   struct in_addr in;
   struct hostent *buf = NULL;
 
+#ifdef CURL_DISABLE_VERBOSE_STRINGS
+  (void)conn;
+#endif
+
+  *waitp = 0; /* don't wait, we act synchronously */
+
   if(Curl_inet_pton(AF_INET, hostname, &in) > 0)
     /* This is a dotted IP address 123.123.123.123-style */
     return Curl_ip2addr(AF_INET, &in, hostname, port);
 
-#if defined(HAVE_GETADDRINFO_THREADSAFE)
-  else {
-    struct addrinfo hints;
-    char sbuf[NI_MAXSERV];
-    char *sbufptr = NULL;
-
-    memset(&hints, 0, sizeof(hints));
-    hints.ai_family = PF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    if(port) {
-      snprintf(sbuf, sizeof(sbuf), "%d", port);
-      sbufptr = sbuf;
-    }
-
-    (void)Curl_getaddrinfo_ex(hostname, sbufptr, &hints, &ai);
-
-#elif defined(HAVE_GETHOSTBYNAME_R)
+#if defined(HAVE_GETHOSTBYNAME_R)
   /*
    * gethostbyname_r() is the preferred resolve function for many platforms.
    * Since there are three different versions of it, the following code is
@@ -168,7 +140,7 @@ Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
   else {
     int h_errnop;
 
-    buf = calloc(1, CURL_HOSTENT_SIZE);
+    buf = calloc(CURL_HOSTENT_SIZE, 1);
     if(!buf)
       return NULL; /* major failure */
     /*
@@ -177,7 +149,7 @@ Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
      * platforms.
      */
 
-#if defined(HAVE_GETHOSTBYNAME_R_5)
+#ifdef HAVE_GETHOSTBYNAME_R_5
     /* Solaris, IRIX and more */
     h = gethostbyname_r(hostname,
                         (struct hostent *)buf,
@@ -195,7 +167,8 @@ Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
       ;
     }
     else
-#elif defined(HAVE_GETHOSTBYNAME_R_6)
+#endif /* HAVE_GETHOSTBYNAME_R_5 */
+#ifdef HAVE_GETHOSTBYNAME_R_6
     /* Linux */
 
     (void)gethostbyname_r(hostname,
@@ -236,7 +209,8 @@ Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
      */
 
     if(!h) /* failure */
-#elif defined(HAVE_GETHOSTBYNAME_R_3)
+#endif/* HAVE_GETHOSTBYNAME_R_6 */
+#ifdef HAVE_GETHOSTBYNAME_R_3
     /* AIX, Digital Unix/Tru64, HPUX 10, more? */
 
     /* For AIX 4.3 or later, we don't use gethostbyname_r() at all, because of
@@ -288,20 +262,26 @@ Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
        */
     }
     else
-#endif /* HAVE_...BYNAME_R_5 || HAVE_...BYNAME_R_6 || HAVE_...BYNAME_R_3 */
-    {
+#endif /* HAVE_GETHOSTBYNAME_R_3 */
+      {
+      infof(conn->data, "gethostbyname_r(2) failed for %s\n", hostname);
       h = NULL; /* set return code to NULL */
       free(buf);
     }
-#else /* HAVE_GETADDRINFO_THREADSAFE || HAVE_GETHOSTBYNAME_R */
+#else /* HAVE_GETHOSTBYNAME_R */
     /*
-     * Here is code for platforms that don't have a thread safe
-     * getaddrinfo() nor gethostbyname_r() function or for which
-     * gethostbyname() is the preferred one.
+     * Here is code for platforms that don't have gethostbyname_r() or for
+     * which the gethostbyname() is the preferred() function.
      */
   else {
-    h = gethostbyname((void*)hostname);
-#endif /* HAVE_GETADDRINFO_THREADSAFE || HAVE_GETHOSTBYNAME_R */
+#if (defined(NETWARE) && !defined(__NOVELL_LIBC__))
+    h = gethostbyname((char*)hostname);
+#else
+    h = gethostbyname(hostname);
+#endif
+    if(!h)
+      infof(conn->data, "gethostbyname(2) failed for %s\n", hostname);
+#endif /*HAVE_GETHOSTBYNAME_R */
   }
 
   if(h) {
@@ -313,4 +293,7 @@ Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
 
   return ai;
 }
-#endif /* defined(CURLRES_IPV4) && !defined(CURLRES_ARES) */
+
+#endif /* CURLRES_SYNCH */
+#endif /* CURLRES_IPV4 */
+
