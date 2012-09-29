@@ -1515,6 +1515,15 @@ void CMultiplayerSA::ResetHeatHaze ( void )
 }
 
 
+void CMultiplayerSA::SetHeatHazeEnabled ( bool bEnabled )
+{
+    if ( bEnabled )
+        MemPut < BYTE > ( 0x701780, 0x83 );
+    else
+        MemPut < BYTE > ( 0x701780, 0xC3 );
+}
+
+
 void CMultiplayerSA::DisableAllVehicleWeapons ( bool bDisable )
 {
     if ( bDisable )

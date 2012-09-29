@@ -607,6 +607,7 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "volumetric_shadows", bval ); m_pGame->GetSettings ()->SetVolumetricShadowsEnabled ( bval );
     CVARS_GET ( "aspect_ratio",     iVal ); m_pGame->GetSettings ()->SetAspectRatio ( (eAspectRatio)iVal );
     CVARS_GET ( "grass",            bval ); m_pGame->GetSettings ()->SetGrassEnabled ( bval );
+    CVARS_GET ( "heat_haze",        bval ); m_pMultiplayer->SetHeatHazeEnabled ( bval );
     CVARS_GET ( "fast_clothes_loading", iVal ); m_pMultiplayer->SetFastClothesLoading ( (CMultiplayer::EFastClothesLoading)iVal );
 }
 

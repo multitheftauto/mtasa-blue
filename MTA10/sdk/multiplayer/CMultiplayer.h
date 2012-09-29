@@ -185,6 +185,7 @@ public:
     virtual void                        SetHeatHaze                 ( const SHeatHazeSettings& settings ) = 0;
     virtual void                        GetHeatHaze                 ( SHeatHazeSettings& settings ) = 0;
     virtual void                        ResetHeatHaze               ( void ) = 0;
+    virtual void                        SetHeatHazeEnabled          ( bool bEnabled ) = 0;
     virtual bool                        HasWaterColor               () = 0;
     virtual void                        GetWaterColor               ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha ) = 0;
     virtual void                        SetWaterColor               ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha ) = 0;
