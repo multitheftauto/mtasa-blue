@@ -106,6 +106,7 @@ public:
     void                        SetHeatHaze                 ( const SHeatHazeSettings& settings );
     void                        GetHeatHaze                 ( SHeatHazeSettings& settings );
     void                        ResetHeatHaze               ( void );
+    void                        SetHeatHazeEnabled          ( bool bEnabled );
     void                        ResetSky                    ();
     bool                        HasWaterColor               ();
     void                        GetWaterColor               ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha );

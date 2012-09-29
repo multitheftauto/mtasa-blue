@@ -156,6 +156,7 @@ protected:
 	CGUICheckBox*       m_pCheckBoxAllowScreenUpload;
 	CGUICheckBox*       m_pCheckBoxCustomizedSAFiles;
 	CGUICheckBox*       m_pCheckBoxGrass;
+	CGUICheckBox*       m_pCheckBoxHeatHaze;
     CGUILabel*          m_pDrawDistanceLabel;
     CGUIScrollBar*      m_pDrawDistance;
     CGUILabel*          m_pDrawDistanceValueLabel;

@@ -581,6 +581,10 @@ void CSettings::CreateGUI ( void )
     m_pCheckBoxGrass->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 22.0f ) );
     m_pCheckBoxGrass->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
+    m_pCheckBoxHeatHaze = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Heat haze", true ) );
+    m_pCheckBoxHeatHaze->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 42.0f ) );
+    m_pCheckBoxHeatHaze->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
     m_pAnisotropicLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Anisotropic filtering:" ) );
     m_pAnisotropicLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pAnisotropicLabel->GetPosition ( vecTemp, false );
@@ -1195,6 +1199,11 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     m_pCheckBoxGrass->SetSelected ( bGrassEnabled );
     m_pCheckBoxGrass->SetEnabled ( FxQuality != 0 );
 
+    // Heat haze
+    bool bHeatHazeEnabled;
+    CVARS_GET ( "heat_haze", bHeatHazeEnabled );
+    m_pCheckBoxHeatHaze->SetSelected ( bHeatHazeEnabled );
+
     VideoMode           vidModemInfo;
     int                 vidMode, numVidModes;
 
@@ -1378,6 +1387,7 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
     CVARS_SET ("anisotropic", 0 );
     CVARS_SET ("volumetric_shadows", false );
     CVARS_SET ( "grass", true );
+    CVARS_SET ( "heat_haze", true );
 
     // change
     bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( 0, false, false );
@@ -2232,6 +2242,11 @@ void CSettings::LoadData ( void )
     m_pCheckBoxGrass->SetSelected ( bGrassEnabled );
     m_pCheckBoxGrass->SetEnabled ( FxQuality != 0 );
 
+    // Heat haze
+    bool bHeatHazeEnabled;
+    CVARS_GET ( "heat_haze", bHeatHazeEnabled );
+    m_pCheckBoxHeatHaze->SetSelected ( bHeatHazeEnabled );
+
     VideoMode           vidModemInfo;
     int                 vidMode, numVidModes;
 
@@ -2519,6 +2534,11 @@ void CSettings::SaveData ( void )
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected ();
     CVARS_SET ( "grass", bGrassEnabled );
 	gameSettings->SetGrassEnabled ( bGrassEnabled );
+
+    // Heat haze
+    bool bHeatHazeEnabled = m_pCheckBoxHeatHaze->GetSelected ();
+    CVARS_SET ( "heat_haze", bHeatHazeEnabled );
+	g_pCore->GetMultiplayer ()->SetHeatHazeEnabled ( bHeatHazeEnabled );
 
     // Async loading
     if ( CGUIListItem* pSelected = m_pAsyncCombo->GetSelectedItem () )
