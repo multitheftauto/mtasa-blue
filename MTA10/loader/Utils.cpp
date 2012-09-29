@@ -39,6 +39,19 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
         return 0;
     }
 
+    // Put an infinite loop at WinMain to stop GTA from running before we are ready
+    {
+        DWORD oldProt1;
+        VirtualProtectEx ( hProcess, (LPVOID)0x74870E, 4, PAGE_EXECUTE_READWRITE, &oldProt1 );
+
+        const unsigned char blockCode[] = { 0xEB, 0xFE, 0xEB, 0xFC };
+        DWORD byteswritten = 0;
+        WriteProcessMemory ( hProcess, (void*)0x74870E, blockCode, sizeof( blockCode ), &byteswritten );
+
+        DWORD oldProt2;
+        VirtualProtectEx ( hProcess, (LPVOID)0x74870E, 4, oldProt1, &oldProt2 );
+    }
+
     /* Allocate memory in the remote process for the library path */
     HANDLE hThread = 0;
     void* pLibPathRemote = NULL;
@@ -99,6 +112,28 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 
     /* Clean up the resources we used to inject the DLL */
     VirtualFreeEx (hProcess, pLibPathRemote, strlen ( szLibPath ) + 1, MEM_RELEASE );
+
+    // Remove infinite loop at WinMain which stopped GTA from running before we were ready
+    {
+        DWORD oldProt1;
+        VirtualProtectEx ( hProcess, (LPVOID)0x74870E, 4, PAGE_EXECUTE_READWRITE, &oldProt1 );
+
+        // Order is important in case the code is being executed
+        const unsigned char unblockCode1[] = { 0x81, 0xEC };
+        DWORD byteswritten = 0;
+        WriteProcessMemory ( hProcess, (void*)0x748710, unblockCode1, sizeof( unblockCode1 ), &byteswritten );
+
+        const unsigned char unblockCode2[] = { 0x00 };
+        WriteProcessMemory ( hProcess, (void*)0x74870F, unblockCode2, sizeof( unblockCode2 ), &byteswritten );
+
+        Sleep ( 1 );
+
+        const unsigned char unblockCode3[] = { 0x90, 0x90 };
+        WriteProcessMemory ( hProcess, (void*)0x74870E, unblockCode3, sizeof( unblockCode3 ), &byteswritten );
+
+        DWORD oldProt2;
+        VirtualProtectEx ( hProcess, (LPVOID)0x74870E, 4, oldProt1, &oldProt2 );
+    }
 
     /* Success */
     return ( HINSTANCE )( 1 );
