@@ -356,6 +356,9 @@ public:
     float               GetArmor        ( void );
     void                SetArmor        ( float fArmor );
 
+    float               GetOxygenLevel  ( void );
+    void                SetOxygenLevel  ( float fOxygen );
+
     CWeapon *           GiveWeapon      ( eWeaponType weaponType, unsigned int uiAmmo, eWeaponSkill skill );
     CWeapon *           GetWeapon       ( eWeaponSlot weaponSlot );
     CWeapon *           GetWeapon       ( eWeaponType weaponType );

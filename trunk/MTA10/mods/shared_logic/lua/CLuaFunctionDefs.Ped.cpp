@@ -1312,6 +1312,31 @@ int CLuaFunctionDefs::RemovePedFromVehicle ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GetPedOxygenLevel ( lua_State* luaVM )
+{
+    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )
+    {
+        CClientPed * pPed = lua_toped ( luaVM, 1 );
+        if ( pPed )
+        {
+            float fOxygen;
+            if ( CStaticFunctionDefinitions::GetPedOxygenLevel ( *pPed, fOxygen ) )
+            {
+                lua_pushnumber ( luaVM, fOxygen );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::AddPedClothes ( lua_State* luaVM )
 {
     int iArgument4 = lua_type ( luaVM, 4 );
@@ -1796,6 +1821,32 @@ int CLuaFunctionDefs::SetPedMoveAnim ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::SetPedOxygenLevel ( lua_State* luaVM )
+{
+    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
+        ( lua_type ( luaVM, 2 ) == LUA_TNUMBER ) )
+    {
+        CClientEntity * pEntity = lua_toelement ( luaVM, 1 );
+        float fOxygen = static_cast < float > ( lua_tonumber( luaVM, 2 ) );
+        if ( pEntity )
+        {
+            if ( CStaticFunctionDefinitions::SetPedOxygenLevel ( *pEntity, fOxygen ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM );
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }
