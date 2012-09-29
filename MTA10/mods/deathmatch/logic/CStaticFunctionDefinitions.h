@@ -158,7 +158,8 @@ public:
     static bool                         GetOriginalWeaponProperty           ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float & fData );
     static bool                         GetOriginalWeaponProperty           ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, short & sData );
     static bool                         GetOriginalWeaponProperty           ( eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector & vecData );
-
+    static bool                         GetPedOxygenLevel                   ( CClientPed& Ped, float& fOxygen );
+    
     static bool                         SetPedWeaponSlot                    ( CClientEntity& Entity, int iSlot );
     static bool                         SetPedRotation                      ( CClientEntity& Entity, float fRotation, bool bNewWay );
     static bool                         SetPedCanBeKnockedOffBike           ( CClientEntity& Entity, bool bCanBeKnockedOffBike );
@@ -179,6 +180,7 @@ public:
     static bool                         SetPedOnFire                        ( CClientEntity& Entity, bool bOnFire );
     static bool                         RemovePedFromVehicle                ( CClientPed* pPed );
     static bool                         WarpPedIntoVehicle                  ( CClientPed* pPed, CClientVehicle* pVehicle, unsigned int uiSeat );
+    static bool                         SetPedOxygenLevel                   ( CClientEntity& Entity, float fOxygen );
 
     // Extra Clothes functions
     static bool                         GetBodyPartName                     ( unsigned char ucID, SString& strOutName );

@@ -1674,6 +1674,25 @@ void CClientPed::LockArmor ( float fArmor )
 }
 
 
+float CClientPed::GetOxygenLevel ( void )
+{
+    if ( m_pPlayerPed )
+    {
+        return m_pPlayerPed->GetOxygenLevel ( );
+    }
+    return -1.0f;
+}
+
+
+void CClientPed::SetOxygenLevel ( float fOxygen )
+{
+    if ( m_pPlayerPed )
+    {
+        m_pPlayerPed->SetOxygenLevel ( fOxygen );
+    }
+}
+
+
 bool CClientPed::IsDying ( void )
 {
     if ( m_pPlayerPed )
