@@ -1327,10 +1327,10 @@ int CLuaFunctionDefs::GetPedOxygenLevel ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedOxygenLevel", "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "getPedOxygenLevel" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1842,10 +1842,10 @@ int CLuaFunctionDefs::SetPedOxygenLevel ( lua_State* luaVM )
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedOxygenLevel", "ped", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogBadType ( luaVM, "setPedOxygenLevel" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
