@@ -103,16 +103,6 @@ void CLocalGUI::SetSkin( const char* szName )
 
 void CLocalGUI::CreateWindows ( bool bGameIsAlreadyLoaded )
 {
-    CFilePathTranslator     FileTranslator;
-    string                  WorkingDirectory;
-    char                    szCurDir [ 1024 ];
-
-    // Set the current directory.
-    FileTranslator.SetCurrentWorkingDirectory ( "MTA" );
-    FileTranslator.GetCurrentWorkingDirectory ( WorkingDirectory );
-    GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
-    SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
-
     CGUI* pGUI = CCore::GetSingleton ().GetGUI ();
 
     // Create chatbox
@@ -146,9 +136,6 @@ void CLocalGUI::CreateWindows ( bool bGameIsAlreadyLoaded )
     m_CommunityRegistration.CreateWindows ();
     m_CommunityRegistration.SetVisible ( false );
 
-    // Return the old current dir.
-    SetCurrentDirectory ( szCurDir );
-
     // Create our news headlines if we're already ingame
     if ( bGameIsAlreadyLoaded )
         m_pMainMenu->GetNewsBrowser()->CreateHeadlines();
@@ -157,11 +144,6 @@ void CLocalGUI::CreateWindows ( bool bGameIsAlreadyLoaded )
 
 void CLocalGUI::CreateObjects ( IUnknown* pDevice )
 {
-    //Temps
-    CFilePathTranslator     FileTranslator;
-    string                  WorkingDirectory;
-    char                    szCurDir [ 1024 ];
-
     // Store the GUI manager pointer and create the GUI classes
     CGUI* pGUI = CCore::GetSingleton ().GetGUI ();
 
@@ -177,16 +159,7 @@ void CLocalGUI::CreateObjects ( IUnknown* pDevice )
 
     SetSkin(currentSkinName);
 
-    // Set the current directory.
-    FileTranslator.SetCurrentWorkingDirectory ( "MTA" );
-    FileTranslator.GetCurrentWorkingDirectory ( WorkingDirectory );
-    GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
-    SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
-
     CreateWindows ( false );
-
-    // Return the old current dir.
-    SetCurrentDirectory ( szCurDir );
 }
 
 
@@ -322,25 +295,8 @@ void CLocalGUI::Restore ( void )
 
     if ( pGUI )
     {
-        CFilePathTranslator     FileTranslator;
-        string                  WorkingDirectory;
-        char                    szCurDir [ 1024 ];
-
-        // We must change the current directory here!
-        // This is necessary because if we don't, CLocalGUI will try to load
-        // files from the wrong path!
-
-        // Set the current directory.
-        FileTranslator.SetCurrentWorkingDirectory ( "MTA" );
-        FileTranslator.GetCurrentWorkingDirectory ( WorkingDirectory );
-        GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
-        SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
-
         // Restore the GUI
         pGUI->Restore ();
-
-        // Restore the current directory to default.
-        SetCurrentDirectory ( szCurDir );
     }
     else
     {

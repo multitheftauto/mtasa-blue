@@ -334,6 +334,16 @@ void CPedSA::SetArmor ( float fArmor )
     GetPedInterface ()->fArmor = fArmor;
 }
 
+float CPedSA::GetOxygenLevel ( void )
+{
+    return GetPedInterface ()->pPlayerData->m_fBreath;
+}
+
+void CPedSA::SetOxygenLevel ( float fOxygen )
+{
+    GetPedInterface ()->pPlayerData->m_fBreath = fOxygen;
+}
+
 void CPedSA::SetIsStanding( bool bStanding )
 {
     DWORD dwFunc = FUNC_SetIsStanding;

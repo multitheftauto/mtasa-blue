@@ -106,6 +106,8 @@ public:
     void                        SetHeatHaze                 ( const SHeatHazeSettings& settings );
     void                        GetHeatHaze                 ( SHeatHazeSettings& settings );
     void                        ResetHeatHaze               ( void );
+    void                        SetHeatHazeEnabled          ( bool bEnabled );
+    void                        ApplyHeatHazeEnabled        ( void );
     void                        ResetSky                    ();
     bool                        HasWaterColor               ();
     void                        GetWaterColor               ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha );
@@ -221,6 +223,8 @@ private:
     bool                        m_bEnabledAltWaterOrder;
     bool                        m_bEnabledClothesMemFix;
     float                       m_fAircraftMaxHeight;
+    bool                        m_bHeatHazeEnabled;
+    bool                        m_bHeatHazeCustomized;
 
 /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
     VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);

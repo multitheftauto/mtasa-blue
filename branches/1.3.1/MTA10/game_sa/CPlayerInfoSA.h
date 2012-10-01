@@ -84,22 +84,24 @@ public:
     DWORD   m_JustBeenSnacking : 1;     // If this bit is true we have just bought something from a vending machine
     DWORD   m_bRequireHandleBreath : 1; // 
     
-    // The player runs a group. Player is the leader. Player can go up to gang-members and make them join his group.    
+    // The player runs a group. Player is the leader. Player can go up to gang-members and make them join his group.  // 50
     DWORD   m_GroupStuffDisabled : 1;   // if this is true the player can't recrout or give his group commands.
     DWORD   m_GroupAlwaysFollow : 1;    // The group is told to always follow the player (used for girlfriend missions)
     DWORD   m_GroupNeverFollow : 1; // The group is told to always follow the player (used for girlfriend missions)
     DWORD   m_bInVehicleDontAllowWeaponChange : 1; // stop weapon change once driveby weapon has been given
     DWORD   m_bRenderWeapon : 1;    //  set to false during cutscenes so that knuckledusters are not rendered
-
-    long    m_PlayerGroup;        // 48?
-
-    DWORD   m_AdrenalineEndTime;        // 52
-    BYTE    m_nDrunkenness;
-    bool    m_bFadeDrunkenness;
-    BYTE    m_nDrugLevel;
-    BYTE    m_nScriptLimitToGangSize;
     
-    FLOAT   m_fBreath;  // for holding breath (ie underwater)
+    long    m_PlayerGroup;        // 54
+
+    DWORD   m_AdrenalineEndTime; // 58
+    BYTE    m_nDrunkenness; // 62
+    bool    m_bFadeDrunkenness; // 63
+    BYTE    m_nDrugLevel; // 64
+    BYTE    m_nScriptLimitToGangSize; // 65
+    
+    BYTE    m_pad0; // 66
+    BYTE    m_pad1; // 67
+    FLOAT   m_fBreath;  // for holding breath (ie underwater) // 68
 
     // once a set of melee weapon anims have been loaded and referenced for the player
     // we need to remember what we've referenced
@@ -144,7 +146,7 @@ public:
     CPedSAInterface * m_pCurrentProstitutePed;
     CPedSAInterface * m_pLastProstituteShagged;
 
-    DWORD padding; // we're missing something here - fixes a crash (ugly hack #4432525) - eAi
+    WORD padding; // we're missing something here - fixes a crash (ugly hack #4432525) - eAi
 };
     
 

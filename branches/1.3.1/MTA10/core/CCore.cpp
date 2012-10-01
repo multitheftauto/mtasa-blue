@@ -607,6 +607,7 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "volumetric_shadows", bval ); m_pGame->GetSettings ()->SetVolumetricShadowsEnabled ( bval );
     CVARS_GET ( "aspect_ratio",     iVal ); m_pGame->GetSettings ()->SetAspectRatio ( (eAspectRatio)iVal );
     CVARS_GET ( "grass",            bval ); m_pGame->GetSettings ()->SetGrassEnabled ( bval );
+    CVARS_GET ( "heat_haze",        bval ); m_pMultiplayer->SetHeatHazeEnabled ( bval );
     CVARS_GET ( "fast_clothes_loading", iVal ); m_pMultiplayer->SetFastClothesLoading ( (CMultiplayer::EFastClothesLoading)iVal );
 }
 
@@ -664,26 +665,12 @@ void CCore::SetMessageProcessor ( pfnProcessMessage pfnMessageProcessor )
 
 void CCore::ShowMessageBox ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler )
 {
-    CFilePathTranslator     FileTranslator;
-    string                  WorkingDirectory;
-    char                    szCurDir [ 1024 ];
-
     if ( m_pMessageBox )
         delete m_pMessageBox;
-
-
-    // Set the current directory to the MTA dir so we can load files using a relative path
-    FileTranslator.SetCurrentWorkingDirectory ( "MTA" );
-    FileTranslator.GetCurrentWorkingDirectory ( WorkingDirectory );
-    GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
-    SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
 
     // Create the message box
     m_pMessageBox = m_pGUI->CreateMessageBox ( szTitle, szText, uiFlags );
     if ( ResponseHandler ) m_pMessageBox->SetClickHandler ( *ResponseHandler );
-
-    // Restore current directory
-    SetCurrentDirectory ( szCurDir );
 
     // Make sure it doesn't auto-destroy, or we'll crash if the msgbox had buttons and the user clicks OK
     m_pMessageBox->SetAutoDestroy ( false );
@@ -891,9 +878,6 @@ void CCore::InitGUI ( IUnknown* pDevice )
 {
     IDirect3DDevice9 *dev = reinterpret_cast < IDirect3DDevice9* > ( pDevice );
     m_pGUI = InitModule < CGUI > ( m_GUIModule, "GUI", "InitGUIInterface", dev );
-
-    // Set the working directory for CGUI
-    m_pGUI->SetWorkingDirectory ( CalcMTASAPath ( "MTA" ) );
 
     // and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
     std::string strScreenShotPath = CalcMTASAPath ( "screenshots" );

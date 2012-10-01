@@ -226,6 +226,8 @@ public:
     void                        InternalSetHealth           ( float fHealth );
     float                       GetArmor                    ( void );
     void                        SetArmor                    ( float fArmor );
+    float                       GetOxygenLevel              ( void );
+    void                        SetOxygenLevel              ( float fOxygen );
 
     void                        LockHealth                  ( float fHealth );
     void                        LockArmor                   ( float fArmor );

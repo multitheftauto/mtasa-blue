@@ -38,7 +38,7 @@
 #           pragma comment(lib,"xerces-c_2.lib")
 #       endif
 #   endif
-#   include "CEGUIXercesParser.cpp"
+#   include "CEGUIXercesParser.hpp"
 #else
-#   include "CEGUITinyXMLParser.cpp"
+#   include "CEGUITinyXMLParser.hpp"
 #endif

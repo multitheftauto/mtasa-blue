@@ -39,6 +39,26 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
         return 0;
     }
 
+    // Get location of WinMain function
+    uchar* pWinMainUS = (uchar*)0x748710;
+    uchar* pWinMainEuro = (uchar*)0x748760;
+    uchar buffer[1] = { 0 };
+    ReadProcessMemory ( hProcess, pWinMainEuro + 2, &buffer, sizeof( buffer ), NULL );
+    bool bIsEuro = ( buffer[0] == 0x84 );
+    uchar* pWinMain = bIsEuro ? pWinMainEuro : pWinMainUS;
+
+    // Put an infinite loop at WinMain to stop GTA from running before we are ready
+    {
+        DWORD oldProt1;
+        VirtualProtectEx ( hProcess, pWinMain - 2, 4, PAGE_EXECUTE_READWRITE, &oldProt1 );
+
+        const unsigned char blockCode[] = { 0xEB, 0xFE, 0xEB, 0xFC };
+        WriteProcessMemory ( hProcess, pWinMain - 2, blockCode, sizeof( blockCode ), NULL );
+
+        DWORD oldProt2;
+        VirtualProtectEx ( hProcess, pWinMain - 2, 4, oldProt1, &oldProt2 );
+    }
+
     /* Allocate memory in the remote process for the library path */
     HANDLE hThread = 0;
     void* pLibPathRemote = NULL;
@@ -99,6 +119,27 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 
     /* Clean up the resources we used to inject the DLL */
     VirtualFreeEx (hProcess, pLibPathRemote, strlen ( szLibPath ) + 1, MEM_RELEASE );
+
+    // Remove infinite loop at WinMain which stopped GTA from running before we were ready
+    {
+        DWORD oldProt1;
+        VirtualProtectEx ( hProcess, pWinMain - 2, 4, PAGE_EXECUTE_READWRITE, &oldProt1 );
+
+        // Order is important in case the code is being executed (CPU cache may cause issues?)
+        const unsigned char unblockCode1[] = { 0x81, 0xEC };
+        WriteProcessMemory ( hProcess, pWinMain - 0, unblockCode1, sizeof( unblockCode1 ), NULL );
+
+        const unsigned char unblockCode2[] = { 0x00 };
+        WriteProcessMemory ( hProcess, pWinMain - 1, unblockCode2, sizeof( unblockCode2 ), NULL );
+
+        Sleep ( 1 );
+
+        const unsigned char unblockCode3[] = { 0x90, 0x90 };
+        WriteProcessMemory ( hProcess, pWinMain - 2, unblockCode3, sizeof( unblockCode3 ), NULL );
+
+        DWORD oldProt2;
+        VirtualProtectEx ( hProcess, pWinMain - 2, 4, oldProt1, &oldProt2 );
+    }
 
     /* Success */
     return ( HINSTANCE )( 1 );

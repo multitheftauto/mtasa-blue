@@ -2190,6 +2190,18 @@ bool CStaticFunctionDefinitions::SetPedOnFire ( CClientEntity & Entity, bool bOn
 }
 
 
+bool CStaticFunctionDefinitions::SetPedOxygenLevel ( CClientEntity & Entity, float fOxygen )
+{
+    if ( IS_PED ( &Entity ) )
+    {
+        CClientPed& Ped = static_cast < CClientPed& > ( Entity );
+        Ped.SetOxygenLevel ( fOxygen );
+        return true;
+    }
+    return false;
+}
+
+
 bool CStaticFunctionDefinitions::GetBodyPartName ( unsigned char ucID, SString& strOutName )
 {
     if ( ucID <= 10 )
@@ -7622,6 +7634,13 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eWeaponProperty ePr
         return false;
 
     return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetPedOxygenLevel ( CClientPed& Ped, float& fOxygen )
+{
+    fOxygen = Ped.GetOxygenLevel ( );
+    return ( fOxygen != -1.0f ? true : false );
 }
 
 

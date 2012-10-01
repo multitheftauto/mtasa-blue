@@ -250,6 +250,7 @@ public:
     LUA_DECLARE ( IsPedOnFire );
     LUA_DECLARE ( GetWeaponProperty );
     LUA_DECLARE ( GetOriginalWeaponProperty );
+    LUA_DECLARE ( GetPedOxygenLevel );
 
     LUA_DECLARE ( SetPedRotation );
     LUA_DECLARE ( SetPedCanBeKnockedOffBike );
@@ -272,6 +273,7 @@ public:
     LUA_DECLARE ( SetPedOnFire );
     LUA_DECLARE ( WarpPedIntoVehicle );
     LUA_DECLARE ( RemovePedFromVehicle );
+    LUA_DECLARE ( SetPedOxygenLevel );
 
     // Clothes and body functions
     LUA_DECLARE ( GetBodyPartName );
