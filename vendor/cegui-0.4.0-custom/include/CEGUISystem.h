@@ -826,6 +826,8 @@ public:
 	*/
 	bool	injectTimePulse(float timeElapsed);
 
+    void                            SetGuiWorkingDirectory      ( const String& strDir )    { d_guiWorkingDirectory = strDir; }
+    String                          GetGuiWorkingDirectory      ( void )                    { return d_guiWorkingDirectory; }
 
     static void                     SetBidiEnabled              ( bool bEnabled ) { ms_bBidiEnabled = bEnabled; }
     static bool                     ms_bBidiEnabled;
@@ -1020,6 +1022,8 @@ private:
 	// scripting
 	ScriptModule*	d_scriptModule;			//!< Points to the scripting support module.
 	String			d_termScriptName;		//!< Name of the script to run upon system shutdown.
+
+    String          d_guiWorkingDirectory;
 
 	float	d_mouseScalingFactor;			//!< Scaling applied to mouse movement inputs.
 

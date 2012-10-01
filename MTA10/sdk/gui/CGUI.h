@@ -162,7 +162,8 @@ public:
     virtual CGUIFont*           GetSansFont             ( void ) = 0;
     virtual bool                IsFontPresent           ( const char* szFont ) = 0;
 
-    virtual void                SetWorkingDirectory     ( const char * szDir ) = 0;
+    virtual void                PushGuiWorkingDirectory ( const SString& strDir ) = 0;
+    virtual void                PopGuiWorkingDirectory  ( const SString& strDirCheck = "" ) = 0;
 
     virtual void                SetCharacterKeyHandler      ( eInputChannel channel, const GUI_CALLBACK_KEY & Callback ) = 0;
     virtual void                SetKeyDownHandler           ( eInputChannel channel, const GUI_CALLBACK_KEY & Callback ) = 0;

@@ -273,15 +273,20 @@ namespace SharedUtil
             outResult.Clear ();
 
             // Get the length
-            unsigned short usLength = 0;
+            ushort usLength = 0;
             if ( !Read ( usLength ) )
                 return false;
 
-            if ( usLength )
+            uint uiLength = usLength;
+            if ( uiLength == 65535 )
+                if ( !Read ( uiLength ) )
+                    return false;
+
+            if ( uiLength )
             {
                 // Read the data
-                outResult.SetSize ( usLength );
-                if ( !ReadBytes ( outResult.GetData (), usLength, false ) )
+                outResult.SetSize ( uiLength );
+                if ( !ReadBytes ( outResult.GetData (), uiLength, false ) )
                 {
                     outResult.Clear ();
                     return false;
@@ -347,11 +352,20 @@ namespace SharedUtil
         void WriteBuffer ( const CBuffer& inBuffer )
         {
             // Write the length
-            unsigned short usLength = inBuffer.GetSize ();
-            Write ( usLength );
+            uint uiLength = inBuffer.GetSize ();
+            if ( uiLength > 65534 )
+            {
+                Write ( (ushort)65535 );
+                Write ( uiLength );
+            }
+            else
+            {
+                Write ( (ushort)uiLength );
+            }
+
             // Write the data
-            if ( usLength )
-                WriteBytes ( inBuffer.GetData (), usLength, false );
+            if ( uiLength )
+                WriteBytes ( inBuffer.GetData (), uiLength, false );
         }
 
         template < class T >

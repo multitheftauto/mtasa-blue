@@ -1180,6 +1180,8 @@ public:
 		return (const char*)build_utf8_buff();
 	}
 
+    std::wstring c_wstring ( void ) const;
+
 	/*!
 	\brief
 		Returns contents of the String as utf8 encoded data.
