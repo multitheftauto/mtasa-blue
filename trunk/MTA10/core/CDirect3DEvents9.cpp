@@ -349,7 +349,8 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader ( IDirect3DDevice9 *pDevice, D3DPR
         pShaderInstance->m_pEffectWrap->ApplyMappedHandles ();
 
         // Remember vertex shader if original draw was using it
-        IDirect3DVertexShader9* pOriginalVertexShader = g_pDeviceState->VertexShader;
+        IDirect3DVertexShader9* pOriginalVertexShader = NULL;
+        pDevice->GetVertexShader ( &pOriginalVertexShader );
 
         // Do shader passes
         ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
@@ -510,7 +511,8 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader ( IDirect3DDevice9 *pDevice
         pShaderInstance->m_pEffectWrap->ApplyMappedHandles ();
 
         // Remember vertex shader if original draw was using it
-        IDirect3DVertexShader9* pOriginalVertexShader = g_pDeviceState->VertexShader;
+        IDirect3DVertexShader9* pOriginalVertexShader = NULL;
+        pDevice->GetVertexShader ( &pOriginalVertexShader );
 
         // Do shader passes
         ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;

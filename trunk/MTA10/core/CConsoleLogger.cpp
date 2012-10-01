@@ -20,12 +20,6 @@ template<> CConsoleLogger * CSingleton< CConsoleLogger >::m_pSingleton = NULL;
 
 CConsoleLogger::CConsoleLogger ( )
 {
-    // Check for logs dir
-    if ( chdir ( ".\\logs" ) )
-    {
-        mkdir ( ".\\logs" );
-    }
-
     // Ask windows for the system time.
     SYSTEMTIME SystemTime;
     GetLocalTime ( &SystemTime );
@@ -53,9 +47,11 @@ CConsoleLogger::CConsoleLogger ( )
     }
 
     // Create file name
-    m_strFilename.append ( "logs\\consolelogfile-" );
+    m_strFilename = CalcMTASAPath ( PathJoin ( "MTA", "logs", "consolelogfile-" ) );
     m_strFilename.append ( szDate );
     m_strFilename.append ( ".log" );
+
+    MakeSureDirExists ( m_strFilename );
 
     // get the file stream
     File.open ( m_strFilename.c_str(), ios::app );

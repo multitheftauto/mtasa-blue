@@ -35,7 +35,7 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
             // For dll searches, this call replaces the current directory entry and turns off 'SafeDllSearchMode'
             // Meaning it will search the supplied path before the system and windows directory.
             // http://msdn.microsoft.com/en-us/library/ms682586%28VS.85%29.aspx
-            SetDllDirectory( WorkingDirectory.c_str ( ) );
+            SetDllDirectory( CalcMTASAPath ( "MTA" ) );
 
             g_pCore = new CCore;
 
