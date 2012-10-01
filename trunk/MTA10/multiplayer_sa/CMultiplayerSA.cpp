@@ -499,6 +499,9 @@ CMultiplayerSA::CMultiplayerSA()
     m_bSuspensionEnabled = true;
 
     m_fAircraftMaxHeight = 800.0f;
+
+    m_bHeatHazeEnabled = true;
+    m_bHeatHazeCustomized = false;
 }
 
 void CMultiplayerSA::InitHooks()
@@ -1495,6 +1498,9 @@ void CMultiplayerSA::SetHeatHaze ( const SHeatHazeSettings& settings )
         DoSetHeatHazePokes ( settings, 0, 24, 1.0f, 1.0f, false );    // 24 hrs
     else
         DoSetHeatHazePokes ( settings, 38, 39, 1.0f, 1.0f, false );   // 0 hrs
+
+    m_bHeatHazeCustomized = true;
+    ApplyHeatHazeEnabled ();
 }
 
 
@@ -1512,12 +1518,23 @@ void CMultiplayerSA::ResetHeatHaze ( void )
     settings.bInsideBuilding = false;
 
     DoSetHeatHazePokes ( settings, 10, 19, 0.05f, 1.0f, true );   // defaults
+
+    m_bHeatHazeCustomized = false;
+    ApplyHeatHazeEnabled ();
 }
 
 
 void CMultiplayerSA::SetHeatHazeEnabled ( bool bEnabled )
 {
-    if ( bEnabled )
+    m_bHeatHazeEnabled = bEnabled;
+    ApplyHeatHazeEnabled ();
+}
+
+
+void CMultiplayerSA::ApplyHeatHazeEnabled ( void )
+{
+    // Enable heat haze if user allows it or scripts have customized it
+    if ( m_bHeatHazeEnabled || m_bHeatHazeCustomized )
         MemPut < BYTE > ( 0x701780, 0x83 );
     else
         MemPut < BYTE > ( 0x701780, 0xC3 );
