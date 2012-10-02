@@ -248,7 +248,7 @@ CGUIListItem* CGUIGridList_Impl::GetItem ( int iRow, int hColumn )
 }
 
 
-char* CGUIGridList_Impl::GetItemText ( int iRow, int hColumn )
+const char* CGUIGridList_Impl::GetItemText ( int iRow, int hColumn )
 {
     try
     {
@@ -256,7 +256,7 @@ char* CGUIGridList_Impl::GetItemText ( int iRow, int hColumn )
         CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getItemAtGridReference ( CEGUI::MCLGridRef ( iRow, GetColumnIndex ( hColumn ) ) );
         if ( pItem )
         {
-            char *szRet = const_cast < char* > ( pItem->getText().c_str () );
+            const char *szRet = pItem->getText().c_str ();
 
             if ( !m_bIgnoreTextSpacer )
             {

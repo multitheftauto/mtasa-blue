@@ -27,8 +27,7 @@ public:
                 CDebugView              ( CGUI* pManager, const CVector2D & vecPosition );
 
     void        Draw                    ( bool bUseCacheTexture );
-    void        Output                  ( char* szText, bool bColorCoded );
-    void        Outputf                 ( bool bColorCoded, char* szText, ... );
+    void        Output                  ( const char* szText, bool bColorCoded );
 };
 
 #endif

@@ -257,7 +257,6 @@ CKeyBinds::CKeyBinds ( CCore* pCore )
     m_pCore = pCore;
 
     m_pList = new list < CKeyBind* >;
-    m_szFileName = NULL;
     m_bMouseWheel = false;
     m_bInVehicle = false;
     m_pChatBoxBind = NULL;
@@ -865,30 +864,6 @@ bool CKeyBinds::AddGTAControl ( const char* szKey, const char* szControl )
 }
 
 
-bool CKeyBinds::AddGTAControl ( const char* szKey, eControllerAction action )
-{
-    char* szControl = GetControlFromAction ( action );
-    if ( szKey == NULL || szControl ) return false;
-
-    const SBindableKey* boundKey = GetBindableFromKey ( szKey );
-    SBindableGTAControl* boundControl = GetBindableFromControl ( szControl );
-
-    if ( boundKey && boundControl )
-    {        
-        CGTAControlBind* bind = new CGTAControlBind;
-        bind->boundKey = boundKey;
-        bind->control = boundControl;
-        bind->bState = false;
-
-        m_pList->push_back ( bind );
-
-        return true;
-    }
-
-    return false;
-}
-
-
 bool CKeyBinds::AddGTAControl ( const SBindableKey* pKey, SBindableGTAControl* pControl )
 {
     if ( pKey && pControl )
@@ -904,31 +879,6 @@ bool CKeyBinds::AddGTAControl ( const SBindableKey* pKey, SBindableGTAControl* p
     }
 
     return false;
-}
-
-
-void CKeyBinds::RemoveGTAControls ( const char* szControl, bool bDestroy )
-{
-    if ( szControl == NULL ) return;
-
-    list < CKeyBind* > ::iterator iter = m_pList->begin ();
-    while ( iter != m_pList->end () )
-    {
-        if ( (*iter)->GetType () == KEY_BIND_GTA_CONTROL )
-        {
-            CGTAControlBind* pBind = static_cast < CGTAControlBind* > ( *iter );
-            if ( strcmp ( szControl, pBind->control->szControl ) == 0 )
-            {
-                // Only destroy if we have to
-                if ( bDestroy )
-                    delete *iter;
-
-                iter = m_pList->erase ( iter );
-                continue;
-            }
-        }
-        iter++;
-    }
 }
 
 
@@ -1048,21 +998,6 @@ bool CKeyBinds::GTAControlExists ( const SBindableKey* pKey, SBindableGTAControl
     }
     
     return false;
-}
-
-
-unsigned int CKeyBinds::GTAControlsCount ( void )
-{
-    unsigned int uiCount = 0;
-    list < CKeyBind* > ::const_iterator iter = m_pList->begin ();
-    for ( ; iter != m_pList->end (); iter++ )
-    {
-        if ( (*iter)->GetType () == KEY_BIND_GTA_CONTROL )
-        {
-            uiCount++;
-        }
-    }
-    return uiCount;
 }
 
 
@@ -1681,36 +1616,6 @@ bool CKeyBinds::ControlFunctionExists ( SBindableGTAControl* pControl, ControlFu
 }
 
 
-char* CKeyBinds::GetKeyFromCode ( unsigned long ulCode )
-{
-    for ( int i = 0 ; *g_bkKeys [ i ].szKey != NULL ; i++ )
-    {
-        SBindableKey* temp = &g_bkKeys [ i ];
-        if ( temp->ulCode == ulCode )
-        {
-            return temp->szKey;
-        }
-    }
-
-    return NULL;
-}
-
-
-bool CKeyBinds::GetCodeFromKey ( const char* szKey, unsigned long& ulCode )
-{
-    for ( int i = 0 ; *g_bkKeys [ i ].szKey != NULL ; i++ )
-    {
-        SBindableKey* temp = &g_bkKeys [ i ];
-        if ( stricmp ( temp->szKey, szKey ) == 0 )
-        {
-            ulCode = temp->ulCode;
-            return true;
-        }
-    }
-
-    return false;
-}
-
 const SBindableKey * CKeyBinds::GetBindableFromKey ( const char* szKey )
 {
     for ( int i = 0 ; *g_bkKeys [ i ].szKey != NULL ; i++ )
@@ -1756,21 +1661,6 @@ bool CKeyBinds::IsKey ( const char* szKey )
 }
 
 
-char* CKeyBinds::GetKeyFromGTARelative ( int iGTAKey )
-{
-    for ( int i = 0 ; *g_bkKeys [ i ].szKey != NULL ; i++ )
-    {
-        SBindableKey* temp = &g_bkKeys [ i ];
-        if ( temp->iGTARelative == iGTAKey )
-        {
-            return temp->szKey;
-        }
-    }
-    
-    return NULL;
-}
-
-
 const SBindableKey* CKeyBinds::GetBindableFromMessage ( UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bState )
 {
     if ( uMsg != WM_KEYDOWN && uMsg != WM_KEYUP && uMsg != WM_SYSKEYDOWN &&
@@ -1801,7 +1691,6 @@ const SBindableKey* CKeyBinds::GetBindableFromMessage ( UINT uMsg, WPARAM wParam
         SBindableKey* bindable = &g_bkKeys [ i ];
 
         unsigned long ulCode = bindable->ulCode;
-        char* szKey = bindable->szKey;
         eKeyData keyData = bindable->data;
 
         bool bMouseWheel = false;
@@ -1874,36 +1763,6 @@ const SBindableKey* CKeyBinds::GetBindableFromMessage ( UINT uMsg, WPARAM wParam
     return NULL;
 }
 
-
-char* CKeyBinds::GetControlFromAction ( eControllerAction action )
-{
-    for ( int i = 0 ; *g_bcControls [ i ].szControl != NULL ; i++ )
-    {
-        SBindableGTAControl* temp = &g_bcControls [ i ];
-        if ( temp->action == action )
-        {
-            return temp->szControl;
-        }
-    }
-
-    return NULL;
-}
-
-
-bool CKeyBinds::GetActionFromControl ( const char* szControl, eControllerAction& action )
-{
-    for ( int i = 0 ; *g_bcControls [ i ].szControl != NULL ; i++ )
-    {
-        SBindableGTAControl* temp = &g_bcControls [ i ];
-        if ( stricmp ( temp->szControl, szControl ) == 0 )
-        {
-            action = temp->action;
-            return true;
-        }
-    }
-
-    return false;
-}
 
 SBindableGTAControl* CKeyBinds::GetBindableFromControl ( const char* szControl )
 {
@@ -2417,7 +2276,7 @@ bool CKeyBinds::SaveToXML ( CXMLNode* pMainNode )
                     }
 
                     CGTAControlBind* pBind = static_cast < CGTAControlBind* > ( *iter );
-                    char* szControl = pBind->control->szControl;
+                    const char* szControl = pBind->control->szControl;
                     if ( szControl )
                     {
                         pA = pAttributes->Create ( "control" );
@@ -2439,86 +2298,6 @@ void CKeyBinds::LoadDefaultBinds ( void )
     
     LoadControlsFromGTA ();
     LoadDefaultCommands ( true );
-}
-
-
-void CKeyBinds::LoadDefaultControls ( void )
-{
-    AddGTAControl ( "lctrl", "fire" );
-    AddGTAControl ( "mouse1", "fire" );
-    AddGTAControl ( "e", "next_weapon" );
-    AddGTAControl ( "mouse_wheel down", "next_weapon" );
-    AddGTAControl ( "q", "previous_weapon" );
-    AddGTAControl ( "num_dec", "previous_weapon" );
-    AddGTAControl ( "mouse_wheel_up", "previous_weapon" );
-    AddGTAControl ( "g", "group_control_forwards" );
-    AddGTAControl ( "h", "group_control_back" );
-    AddGTAControl ( "y", "conversation_yes" );
-    AddGTAControl ( "n", "conversation_no" );
-    AddGTAControl ( "arrow_u", "forwards" );
-    AddGTAControl ( "w", "forwards" );
-    AddGTAControl ( "arrow_d", "backwards" );
-    AddGTAControl ( "s", "backwards" );
-    AddGTAControl ( "arrow_l", "left" );
-    AddGTAControl ( "a", "left" );
-    AddGTAControl ( "arrow_r", "right" );
-    AddGTAControl ( "d", "right" );
-    AddGTAControl ( "x", "zoom_in" );
-    AddGTAControl ( "pgup", "zoom_in" );
-    AddGTAControl ( "mouse_wheel_up", "zoom_in" );
-    AddGTAControl ( "y", "zoom_out" );
-    AddGTAControl ( "pgdn", "zoom_out" );
-    AddGTAControl ( "mouse_wheel_down", "zoom_out" );
-    AddGTAControl ( "f", "enter_exit" );
-    AddGTAControl ( "enter", "enter_exit" );
-    AddGTAControl ( "v", "change_camera" );
-    AddGTAControl ( "home", "change_camera" );
-    AddGTAControl ( "shift", "jump" );
-    AddGTAControl ( "rctrl", "jump" );
-    AddGTAControl ( "space", "sprint" );
-    AddGTAControl ( "delete", "aim_weapon" );
-    AddGTAControl ( "capslock", "aim_weapon" );
-    AddGTAControl ( "c", "crouch" );
-    AddGTAControl ( "tab", "action" );
-    AddGTAControl ( "lalt", "walk" );
-    AddGTAControl ( "num_1", "look_behind" );
-    AddGTAControl ( "mouse3", "look_behind" );
-
-    AddGTAControl ( "lalt", "vehicle_fire" );
-    AddGTAControl ( "mouse1", "vehicle_fire" );
-    AddGTAControl ( "ctrl", "vehicle_secondary_fire" );
-    AddGTAControl ( "num_0", "vehicle_secondary_fire" );
-    AddGTAControl ( "w", "accelerate" );
-    AddGTAControl ( "s", "brake_reverse" );
-    AddGTAControl ( "a", "vehicle_left" );
-    AddGTAControl ( "arrow_l", "vehicle_left" );
-    AddGTAControl ( "d", "vehicle_right" );
-    AddGTAControl ( "arrow_r", "vehicle_right" );
-    AddGTAControl ( "arrow_u", "steer_forward" );
-    AddGTAControl ( "arrow_d", "steer_back" );
-    AddGTAControl ( "insert", "radio_next" );
-    AddGTAControl ( "4", "radio_next" );
-    AddGTAControl ( "mouse_wheel_up", "radio_next" );
-    AddGTAControl ( "delete", "radio_previous" );
-    AddGTAControl ( "r", "radio_previous" );
-    AddGTAControl ( "mouse_wheel_down", "radio_previous" );
-    AddGTAControl ( "f5", "radio_user_track_skip" );
-    AddGTAControl ( "capslock", "horn" );
-    AddGTAControl ( "h", "horn" );
-    AddGTAControl ( "2", "sub_mission" );
-    AddGTAControl ( "num_add", "sub_mission" );
-    AddGTAControl ( "space", "handbrake" );
-    AddGTAControl ( "rctrl", "handbrake" );
-    AddGTAControl ( "mouse3", "vehicle_look_behind" );
-    AddGTAControl ( "mouse2", "vehicle_mouse_look" );
-    AddGTAControl ( "q", "vehicle_look_left" );
-    AddGTAControl ( "e", "vehicle_look_right" );
-    AddGTAControl ( "num_4", "special_control_left" );
-    AddGTAControl ( "num_6", "special_control_right" );
-    AddGTAControl ( "num_8", "special_control_up" );
-    AddGTAControl ( "delete", "special_control_up" );
-    AddGTAControl ( "num_2", "special_control_down" );
-    AddGTAControl ( "end", "special_control_down" );
 }
 
 

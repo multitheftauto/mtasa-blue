@@ -176,9 +176,9 @@ const char* CGUIComboBox_Impl::GetItemText ( int index )
     }
     catch(...)
     {
-        return NULL;
+        return "";
     }
-    return NULL;
+    return "";
 }
 
 bool CGUIComboBox_Impl::SetItemText ( int index, const char* szText )

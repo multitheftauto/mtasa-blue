@@ -1866,10 +1866,7 @@ int CLuaFunctionDefs::GUIGridListGetItemText ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         const char* szText = static_cast < CGUIGridList* > ( guiGridlist->GetCGUIElement () ) -> GetItemText ( rowIndex, columnIndex );
-        if ( szText )
-            lua_pushstring ( luaVM, szText );
-        else
-            lua_pushnil ( luaVM );
+        lua_pushstring ( luaVM, szText );
         return 1;
     }
     else
