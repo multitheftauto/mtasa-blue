@@ -198,7 +198,6 @@ public:
 
     virtual void                Draw                    ( bool bUseCacheTexture );
     virtual void                Output                  ( const char* szText, bool bColorCoded = true );
-    virtual void                Outputf                 ( bool bColorCoded, const char* szFormat, ... );
     void                        Clear                   ( void );
     void                        ClearInput              ( void );
     bool                        CharacterKeyHandler     ( CGUIKeyEventArgs KeyboardArgs );

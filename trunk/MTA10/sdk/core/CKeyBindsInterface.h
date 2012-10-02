@@ -36,7 +36,7 @@ enum eKeyData
 
 struct SBindableKey
 {
-    char szKey [20];
+    const char szKey [20];
     unsigned long ulCode;
     int iGTARelative;
     eKeyData data;
@@ -53,12 +53,12 @@ enum eControlType
 
 struct SBindableGTAControl
 {
-    char szControl [25];
+    const char szControl [25];
     eControllerAction action;
     eControlType controlType;
     bool bState;
     bool bEnabled;
-    char* szDescription;
+    const char* szDescription;
 };
 
 enum eKeyBindType
@@ -152,15 +152,12 @@ public:
 
     // Control-bind funcs
     virtual bool                    AddGTAControl               ( const char* szKey, const char* szControl ) = 0;
-    virtual bool                    AddGTAControl               ( const char* szKey, eControllerAction action ) = 0;
     virtual bool                    AddGTAControl               ( const SBindableKey* pKey, SBindableGTAControl* pControl ) = 0;
     virtual bool                    RemoveGTAControl            ( const char* szKey, const char* szControl ) = 0;
-    virtual void                    RemoveGTAControls           ( const char* szControl, bool bDestroy = true ) = 0;
     virtual bool                    RemoveAllGTAControls        ( const char* szKey ) = 0;
     virtual bool                    RemoveAllGTAControls        ( void ) = 0;
     virtual bool                    GTAControlExists            ( const char* szKey, const char* szControl ) = 0;
     virtual bool                    GTAControlExists            ( const SBindableKey* pKey, SBindableGTAControl* pControl ) = 0;
-    virtual unsigned int            GTAControlsCount            ( void ) = 0;
     virtual void                    CallGTAControlBind          ( CGTAControlBind* pBind, bool bState ) = 0;
     virtual void                    CallAllGTAControlBinds      ( eControlType controlType, bool bState ) = 0;
     virtual bool                    GetBoundControls            ( SBindableGTAControl * pControl, std::list < CGTAControlBind * > & controlsList ) = 0;
@@ -191,19 +188,14 @@ public:
     virtual bool                    ControlFunctionExists       ( SBindableGTAControl* pControl, ControlFunctionBindHandler Handler, bool bCheckState = false, bool bState = true ) = 0;
 
     // Key/code funcs
-    virtual char*                   GetKeyFromCode              ( unsigned long ulCode ) = 0;
-    virtual bool                    GetCodeFromKey              ( const char* szKey, unsigned long& ucCode ) = 0;
     virtual const SBindableKey*     GetBindableFromKey          ( const char* szKey ) = 0;
     virtual const SBindableKey*     GetBindableFromGTARelative  ( int iGTAKey ) = 0;
     virtual bool                    IsKey                       ( const char* szKey ) = 0;
-    virtual char*                   GetKeyFromGTARelative       ( int iGTAKey ) = 0;
     virtual const SBindableKey*     GetBindableFromMessage      ( UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bState ) = 0;
     virtual void                    SetKeyStrokeHandler         ( KeyStrokeHandler Handler ) = 0;
     virtual void                    SetCharacterKeyHandler      ( CharacterKeyHandler Handler ) = 0;
 
     // Control/action funcs
-    virtual char*                   GetControlFromAction        ( eControllerAction action ) = 0;
-    virtual bool                    GetActionFromControl        ( const char* szControl, eControllerAction& action ) = 0;
     virtual SBindableGTAControl*    GetBindableFromControl      ( const char* szControl ) = 0;
     virtual SBindableGTAControl*    GetBindableFromAction       ( eControllerAction action ) = 0;
     virtual bool                    IsControl                   ( const char* szControl ) = 0;
@@ -220,7 +212,7 @@ public:
     virtual bool                    LoadFromXML                 ( class CXMLNode* pMainNode ) = 0;
     virtual bool                    SaveToXML                   ( class CXMLNode* pMainNode ) = 0;
     virtual void                    LoadDefaultBinds            ( void ) = 0;
-    virtual void                    LoadDefaultControls         ( void ) = 0;
+    //virtual void                    LoadDefaultControls         ( void ) = 0;
     virtual void                    LoadDefaultCommands         ( bool bForce ) = 0;
     virtual void                    LoadControlsFromGTA         ( void ) = 0;
 

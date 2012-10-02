@@ -29,7 +29,6 @@ CLocalGUI::CLocalGUI ( void )
 {
     m_pConsole = NULL;
     m_pMainMenu = NULL;
-    //m_pChatBox = NULL;
     m_pChat = NULL;
     m_pDebugView = NULL;
 
@@ -411,11 +410,6 @@ bool CLocalGUI::IsMainMenuVisible ( void )
     }
 }
 
-/*CChatBox* CLocalGUI::GetChatBox ( void )
-{
-    return m_pChatBox;
-}*/
-
 CChat* CLocalGUI::GetChat ( void )
 {
     return m_pChat;
@@ -511,13 +505,9 @@ bool CLocalGUI::IsChatBoxInputEnabled ( void )
 
 void CLocalGUI::EchoChat ( const char* szText, bool bColorCoded )
 {
-    /*if ( m_pChatBox )
-    {
-        m_pChatBox->EchoChat ( szText );
-    }*/
     if ( m_pChat )
     {
-        m_pChat->Output ( const_cast < char* > ( szText ), bColorCoded );
+        m_pChat->Output ( szText, bColorCoded );
     }
     else
     {
@@ -529,7 +519,7 @@ void CLocalGUI::EchoDebug ( const char* szText )
 {
     if ( m_pDebugView )
     {
-        m_pDebugView->Output ( const_cast < char * > ( szText ), false );
+        m_pDebugView->Output ( szText, false );
     }
     else
     {

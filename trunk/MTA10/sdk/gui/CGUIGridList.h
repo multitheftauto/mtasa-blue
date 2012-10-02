@@ -64,7 +64,7 @@ public:
     virtual int                     InsertRowAfter          ( int iRow ) = 0;
     virtual void                    Clear                   ( void ) = 0;
     virtual CGUIListItem*           GetItem                 ( int iRow, int hColumn ) = 0;
-    virtual char*                   GetItemText             ( int iRow, int hColumn ) = 0;
+    virtual const char*             GetItemText             ( int iRow, int hColumn ) = 0;
     virtual int                     SetItemText             ( int iRow, int hColumn, const char* szText, bool bNumber = false, bool bSection = false, bool bFast = false, const char* szSortText = NULL ) = 0;
     virtual void                    SetItemData             ( int iRow, int hColumn, void* pData, CGUICallback<void,void*> deleteDataCallback = NULL ) = 0;
     virtual void                    SetItemData             ( int iRow, int hColumn, const char* pszData ) = 0;
