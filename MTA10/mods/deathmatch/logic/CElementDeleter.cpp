@@ -43,6 +43,9 @@ void CElementDeleter::Delete ( class CClientEntity* pElement )
         pElement->ClearChildren ();
         pElement->SetParent ( NULL );
         pElement->Unlink ();
+        
+        // Delete all event handlers because CClientEntity::CleanUpForVM can't do it anymore (element is unlinked)
+        pElement->DeleteAllEvents ();
     }
 }
 
