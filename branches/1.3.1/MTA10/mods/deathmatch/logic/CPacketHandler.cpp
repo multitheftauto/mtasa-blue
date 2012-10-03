@@ -1197,10 +1197,12 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
                 Arguments.PushNumber ( ucRed );
                 Arguments.PushNumber ( ucGreen );
                 Arguments.PushNumber ( ucBlue );
-                g_pClientGame->GetRootEntity()->CallEvent ( "onClientChatMessage", Arguments, false );
-
-                // Echo it
-                g_pCore->ChatEchoColor ( szMessage, ucRed, ucGreen, ucBlue, ucColorCoded );
+                bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent ( "onClientChatMessage", Arguments, false );
+                if ( !bCancelled )
+                {
+                    // Echo it
+                    g_pCore->ChatEchoColor ( szMessage, ucRed, ucGreen, ucBlue, ucColorCoded );
+                }
             }
             delete[] szMessage;
         }

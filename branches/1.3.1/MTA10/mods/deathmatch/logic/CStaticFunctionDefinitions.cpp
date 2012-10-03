@@ -244,10 +244,14 @@ bool CStaticFunctionDefinitions::OutputChatBox ( const char* szText, unsigned ch
     Arguments.PushNumber ( ucRed );
     Arguments.PushNumber ( ucGreen );
     Arguments.PushNumber ( ucBlue );
-    g_pClientGame->GetRootEntity()->CallEvent ( "onClientChatMessage", Arguments, false );
 
-    m_pCore->ChatPrintfColor ( "%s", bColorCoded, ucRed, ucGreen, ucBlue, szText );
-    return true;
+    bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent ( "onClientChatMessage", Arguments, false );
+    if ( !bCancelled )
+    {
+        m_pCore->ChatPrintfColor ( "%s", bColorCoded, ucRed, ucGreen, ucBlue, szText );
+        return true;
+    }
+    return false;
 }
 
 
@@ -1144,6 +1148,8 @@ bool CStaticFunctionDefinitions::SetElementParent ( CClientEntity& Entity, CClie
             CClientEntity* pTemp = &Parent;
             CClientEntity* pRoot = m_pRootEntity;
             bool bValidParent = false;
+            if ( &Parent == pRoot )
+                bValidParent = true; // parent can be root
             while ( pTemp != pRoot )
             {
                 const char * szTypeName = pTemp->GetTypeName();
@@ -2302,6 +2308,7 @@ CClientPed* CStaticFunctionDefinitions::CreatePed ( CResource& Resource, unsigne
         // Create it
         CClientPed* pPed = new CClientPed ( m_pManager, ulModel, INVALID_ELEMENT_ID );
         pPed->SetParent ( Resource.GetResourceDynamicEntity() );
+        Resource.AddToElementGroup ( pPed );
         pPed->SetPosition ( vecPosition );
         pPed->SetCurrentRotationNew ( fRotationRadians );
         return pPed;
@@ -5334,6 +5341,7 @@ CClientWater* CStaticFunctionDefinitions::CreateWater ( CResource& resource, CVe
     }
 
     pWater->SetParent ( resource.GetResourceDynamicEntity () );
+    resource.AddToElementGroup ( pWater);
     return pWater;
 }
 
