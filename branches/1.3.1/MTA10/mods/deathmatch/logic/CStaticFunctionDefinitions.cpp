@@ -4667,7 +4667,7 @@ std::string CStaticFunctionDefinitions::GUIComboBoxGetItemText ( CClientEntity& 
         }
     }    
 
-    return NULL;
+    return "";
 }
 
 bool CStaticFunctionDefinitions::GUIComboBoxSetItemText ( CClientEntity& Entity, int index, const char* szText )

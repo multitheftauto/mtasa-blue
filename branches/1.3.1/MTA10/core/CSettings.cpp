@@ -1492,13 +1492,13 @@ void CSettings::ProcessKeyBinds ( void )
     {
         // Get the type and keys
         unsigned char ucType = reinterpret_cast < unsigned char > ( m_pBindsList->GetItemData ( i, m_hBind ) );
-        char* szPri = m_pBindsList->GetItemText ( i, m_hPriKey );
-        const SBindableKey* pPriKey = szPri ? pKeyBinds->GetBindableFromKey ( szPri ) : NULL;
+        const char* szPri = m_pBindsList->GetItemText ( i, m_hPriKey );
+        const SBindableKey* pPriKey = pKeyBinds->GetBindableFromKey ( szPri );
         const SBindableKey* pSecKeys[SecKeyNum];
         for ( int k = 0 ; k < SecKeyNum ; k++ )
         {
-            char* szSec = m_pBindsList->GetItemText ( i, m_hSecKeys[k] );
-            pSecKeys[k] = szSec ? pKeyBinds->GetBindableFromKey ( szSec ) : NULL;
+            const char* szSec = m_pBindsList->GetItemText ( i, m_hSecKeys[k] );
+            pSecKeys[k] = pKeyBinds->GetBindableFromKey ( szSec );
         }
         // If it is a resource name
         if ( ucType == 255 )
@@ -1572,11 +1572,13 @@ void CSettings::ProcessKeyBinds ( void )
         // If the type is a command
         else if ( ucType == KEY_BIND_COMMAND )
         {
-            char* szCmdArgs = m_pBindsList->GetItemText ( i, m_hBind );
-            char* szCommand = strtok ( szCmdArgs, ":" );
-            char* szArguments = strtok ( NULL, "\0" );
-            if ( szArguments )
-                szArguments = &szArguments [ 1 ];
+            SString strCmdArgs = m_pBindsList->GetItemText ( i, m_hBind );
+
+            SString strCommand, strArguments;
+            strCmdArgs.Split ( ": ", &strCommand, &strArguments );
+
+            const char* szCommand = strCommand;
+            const char* szArguments = strArguments.empty () ? NULL : strArguments;
 
             /** Primary keybinds **/
             CCommandBind* pBind = reinterpret_cast < CCommandBind* > ( m_pBindsList->GetItemData ( i, m_hPriKey ) );

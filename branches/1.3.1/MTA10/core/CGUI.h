@@ -72,7 +72,6 @@ public:
     void                SetMainMenuVisible          ( bool bVisible );
     bool                IsMainMenuVisible           ( void );
 
-    //CChatBox*           GetChatBox                  ( void );
     CChat*              GetChat                     ( void );
     void                SetChatBoxVisible           ( bool bVisible );
     bool                IsChatBoxVisible            ( void );
@@ -111,7 +110,6 @@ private:
 
     CConsole*               m_pConsole;
     CMainMenu*              m_pMainMenu;
-    //CChatBox*             m_pChatBox;
     CChat*                  m_pChat;
     CDebugView*             m_pDebugView;
 
