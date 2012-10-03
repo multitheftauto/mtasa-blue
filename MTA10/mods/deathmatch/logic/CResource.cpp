@@ -436,3 +436,15 @@ void CResource::LoadProtectedScript ( const char* chunk, unsigned int len )
         }
     }
 }
+
+
+//
+// Add element to the default element group 
+//
+void CResource::AddToElementGroup ( CClientEntity* pElement )
+{
+    if ( m_pDefaultElementGroup )
+    {
+        m_pDefaultElementGroup->Add ( pElement );
+    }
+}

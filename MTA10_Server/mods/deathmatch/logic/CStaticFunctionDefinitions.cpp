@@ -1095,6 +1095,8 @@ bool CStaticFunctionDefinitions::SetElementParent ( CElement* pElement, CElement
     CElement * pTemp = pParent;
     CElement * pRoot = m_pMapManager->GetRootElement();
     bool bValidParent = false;
+    if ( pParent == pRoot )
+        bValidParent = true; // parent can be root
     while ( pTemp != pRoot )
     {
         const char * szTypeName = pTemp->GetTypeName ().c_str ();
