@@ -254,10 +254,14 @@ bool CStaticFunctionDefinitions::OutputChatBox ( const char* szText, unsigned ch
     Arguments.PushNumber ( ucRed );
     Arguments.PushNumber ( ucGreen );
     Arguments.PushNumber ( ucBlue );
-    g_pClientGame->GetRootEntity()->CallEvent ( "onClientChatMessage", Arguments, false );
 
-    m_pCore->ChatPrintfColor ( "%s", bColorCoded, ucRed, ucGreen, ucBlue, szText );
-    return true;
+    bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent ( "onClientChatMessage", Arguments, false );
+    if ( !bCancelled )
+    {
+        m_pCore->ChatPrintfColor ( "%s", bColorCoded, ucRed, ucGreen, ucBlue, szText );
+        return true;
+    }
+    return false;
 }
 
 
