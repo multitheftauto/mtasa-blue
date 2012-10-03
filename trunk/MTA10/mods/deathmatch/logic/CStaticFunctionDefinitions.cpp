@@ -1154,6 +1154,8 @@ bool CStaticFunctionDefinitions::SetElementParent ( CClientEntity& Entity, CClie
             CClientEntity* pTemp = &Parent;
             CClientEntity* pRoot = m_pRootEntity;
             bool bValidParent = false;
+            if ( &Parent == pRoot )
+                bValidParent = true; // parent can be root
             while ( pTemp != pRoot )
             {
                 const char * szTypeName = pTemp->GetTypeName();
@@ -2314,6 +2316,7 @@ CClientPed* CStaticFunctionDefinitions::CreatePed ( CResource& Resource, unsigne
         // Create it
         CClientPed* pPed = new CClientPed ( m_pManager, ulModel, INVALID_ELEMENT_ID );
         pPed->SetParent ( Resource.GetResourceDynamicEntity() );
+        Resource.AddToElementGroup ( pPed );
         pPed->SetPosition ( vecPosition );
         pPed->SetCurrentRotationNew ( fRotationRadians );
         return pPed;
@@ -5346,6 +5349,7 @@ CClientWater* CStaticFunctionDefinitions::CreateWater ( CResource& resource, CVe
     }
 
     pWater->SetParent ( resource.GetResourceDynamicEntity () );
+    resource.AddToElementGroup ( pWater);
     return pWater;
 }
 

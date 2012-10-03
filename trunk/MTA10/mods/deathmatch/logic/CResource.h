@@ -65,7 +65,8 @@ public:
     inline std::list < class CResourceConfigItem* >::iterator    ConfigIterBegin     ( void )        { return m_ConfigFiles.begin(); }
     inline std::list < class CResourceConfigItem* >::iterator    ConfigIterEnd       ( void )        { return m_ConfigFiles.end(); }
 
-    CElementGroup *         GetElementGroup ( void )                { return m_pDefaultElementGroup; }
+    CElementGroup *         GetElementGroup                 ( void )                        { return m_pDefaultElementGroup; }
+    void                    AddToElementGroup               ( CClientEntity* pElement );
 
     void                    AddExportedFunction ( const char * szFunctionName );
     bool                    CallExportedFunction ( const char * szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller );
