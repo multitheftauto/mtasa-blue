@@ -16,6 +16,8 @@ Var GTA_DIR
 Var Install_Dir
 Var CreateSMShortcuts
 Var CreateDesktopIcon
+Var RegisterProtocol
+Var AddToGameExplorer
 Var RedistInstalled
 Var ExeMD5
 Var PatchInstalled
@@ -146,6 +148,10 @@ Page custom CustomDirectoryPage DirectoryLeaveProc
 
 ; Language files
 !insertmacro MUI_LANGUAGE							"English"
+LangString DESC_Section10 ${LANG_ENGLISH}			"Create a Start Menu group for installed applications"
+LangString DESC_Section11 ${LANG_ENGLISH}			"Create a Desktop Shortcut for the MTA:SA Client."
+LangString DESC_Section12 ${LANG_ENGLISH}			"Register mtasa:// protocol for browser clickable-ness."
+LangString DESC_Section13 ${LANG_ENGLISH}			"Add to Windows Games Explorer (if present)."
 LangString DESC_Section1 ${LANG_ENGLISH}			"The core components required to run Multi Theft Auto."
 LangString DESC_Section2 ${LANG_ENGLISH}			"The MTA:SA modification, allowing you to play online."
 ;LangString DESC_Section3 ${LANG_ENGLISH}			"The Multi Theft Auto:Editor for MTA:SA, allowing you to create and edit maps."
@@ -157,8 +163,6 @@ LangString DESC_Section6 ${LANG_ENGLISH}			"This is a set of required resources 
 LangString DESC_Section7 ${LANG_ENGLISH}			"This is an optional set of gamemodes and maps for your server."
 LangString DESC_Section8 ${LANG_ENGLISH}			"The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
 LangString DESC_Section9 ${LANG_ENGLISH}			"This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
-LangString DESC_Section10 ${LANG_ENGLISH}			"Create a Start Menu group for installed applications"
-LangString DESC_Section11 ${LANG_ENGLISH}			"Create a Desktop Shortcut for the MTA:SA Client."
 ;LangString DESC_Blank ${LANG_ENGLISH}			""
 LangString DESC_SectionGroupDev ${LANG_ENGLISH}		"Development code and tools that aid in the creation of mods for Multi Theft Auto"
 LangString DESC_SectionGroupClient ${LANG_ENGLISH}  "The client is the program you run to play on a Multi Theft Auto server"
@@ -264,12 +268,6 @@ Function .onInstSuccess
 	!ifdef CLIENT_SETUP
 		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path" $GTA_DIR
 		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location" $INSTDIR
-
-		; Add the protocol handler
-		WriteRegStr HKCR "mtasa" "" "URL:MTA San Andreas Protocol"
-		WriteRegStr HKCR "mtasa" "URL Protocol" ""
-		WriteRegStr HKCR "mtasa\DefaultIcon" "" "$INSTDIR\Multi Theft Auto.exe"
-		WriteRegStr HKCR "mtasa\shell\open\command" "" '"$INSTDIR\Multi Theft Auto.exe"%1'
 	!endif
 	
 	; Start menu items
@@ -323,6 +321,16 @@ Function .onInstSuccess
 		!endif
 	${EndIf}
 
+    ${If} $RegisterProtocol == 1
+		!ifdef CLIENT_SETUP
+            ; Add the protocol handler
+            WriteRegStr HKCR "mtasa" "" "URL:MTA San Andreas Protocol"
+            WriteRegStr HKCR "mtasa" "URL Protocol" ""
+            WriteRegStr HKCR "mtasa\DefaultIcon" "" "$INSTDIR\Multi Theft Auto.exe"
+            WriteRegStr HKCR "mtasa\shell\open\command" "" '"$INSTDIR\Multi Theft Auto.exe"%1'
+		!endif
+	${EndIf}
+
 	;UAC::Unload ;Must call unload!
 FunctionEnd
 
@@ -349,6 +357,27 @@ Name "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 InstallDirRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location"
 ShowInstDetails show
 ShowUnInstDetails show
+
+Section "Start menu group" SEC10
+	SectionIn 1 2
+	StrCpy $CreateSMShortcuts 1
+SectionEnd
+
+Section "Desktop icon" SEC11
+	SectionIn 1 2
+	StrCpy $CreateDesktopIcon 1
+SectionEnd
+
+Section "Register protocol" SEC12
+	SectionIn 1 2
+	StrCpy $RegisterProtocol 1
+SectionEnd
+
+Section "Add to Game Explorer" SEC13
+	SectionIn 1 2
+	StrCpy $AddToGameExplorer 1
+SectionEnd
+
 
 !ifdef CLIENT_SETUP
 	SectionGroup /e "Game client" SECGCLIENT
@@ -552,12 +581,14 @@ DontInstallRedist:
                 File "${FILES_ROOT}\MTA San Andreas\Multi Theft Auto.exe.dat"
 			!endif
 			
-			${GameExplorer_UpdateGame} ${GUID}
-			${If} ${Errors}
-				${GameExplorer_AddGame} all "$INSTDIR\Multi Theft Auto.exe" "$INSTDIR" "$INSTDIR\Multi Theft Auto.exe" ${GUID}
-				CreateDirectory $APPDATA\Microsoft\Windows\GameExplorer\${GUID}\SupportTasks\0
-				CreateShortcut "$APPDATA\Microsoft\Windows\GameExplorer\$0\SupportTasks\0\Client Manual.lnk" \ "http://wiki.multitheftauto.com/wiki/Client_Manual"
-			${EndIf}
+            ${If} $AddToGameExplorer == 1
+                ${GameExplorer_UpdateGame} ${GUID}
+                ${If} ${Errors}
+                    ${GameExplorer_AddGame} all "$INSTDIR\Multi Theft Auto.exe" "$INSTDIR" "$INSTDIR\Multi Theft Auto.exe" ${GUID}
+                    CreateDirectory $APPDATA\Microsoft\Windows\GameExplorer\${GUID}\SupportTasks\0
+                    CreateShortcut "$APPDATA\Microsoft\Windows\GameExplorer\$0\SupportTasks\0\Client Manual.lnk" \ "http://wiki.multitheftauto.com/wiki/Client_Manual"
+                ${EndIf}
+            ${EndIf}
 		SectionEnd
 
 		Section "Game module" SEC02
@@ -753,17 +784,11 @@ DontInstallRedist:
 	SectionGroupEnd
 !endif
 
-Section "Start menu group" SEC10
-	SectionIn 1 2
-	StrCpy $CreateSMShortcuts 1
-SectionEnd
-
-Section "Desktop icon" SEC11
-	SectionIn 1 2
-	StrCpy $CreateDesktopIcon 1
-SectionEnd
-
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC10} $(DESC_Section10)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC11} $(DESC_Section11)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC12} $(DESC_Section12)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC13} $(DESC_Section13)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC01} $(DESC_Section1)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC02} $(DESC_Section2)
 	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC03} $(DESC_Section3)
@@ -774,8 +799,6 @@ SectionEnd
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC07} $(DESC_Section7)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC08} $(DESC_Section8)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09} $(DESC_Section9)
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC10} $(DESC_Section10)
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC11} $(DESC_Section11)
 	;!insertmacro MUI_DESCRIPTION_TEXT ${SECBLANK} $(DESC_Blank)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SECGSERVER} $(DESC_SectionGroupServer)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SECGDEV} $(DESC_SectionGroupDev)
@@ -786,10 +809,10 @@ SectionEnd
 Section -Post
 	!ifdef CLIENT_SETUP
 		WriteUninstaller "$INSTDIR\Uninstall.exe"
-		WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\Multi Theft Auto.exe"
+		;WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\Multi Theft Auto.exe"
 	!else
 		WriteUninstaller "$INSTDIR\server\Uninstall.exe"
-		WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\Server\MTA Server.exe"
+		;WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\Server\MTA Server.exe"
 	!endif
 
 	WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
