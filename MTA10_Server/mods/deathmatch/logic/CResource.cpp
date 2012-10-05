@@ -1134,6 +1134,7 @@ bool CResource::DestroyVM ( void )
 
     // Delete the events on this VM
     m_pRootElement->DeleteEvents ( m_pVM, true );
+    g_pGame->GetElementDeleter()->CleanUpForVM ( m_pVM );
 
     // Delete the virtual machine
     m_resourceManager->NotifyResourceVMClose ( this, m_pVM );

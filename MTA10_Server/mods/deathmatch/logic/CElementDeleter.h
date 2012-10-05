@@ -28,6 +28,8 @@ public:
     bool                            IsBeingDeleted          ( class CElement* pElement );
     void                            Unreference             ( CElement* pElement );
 
+    void                            CleanUpForVM            ( CLuaMain* pLuaMain );
+
 private:
     CElementListType                m_List;
 };
