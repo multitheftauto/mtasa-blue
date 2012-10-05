@@ -39,9 +39,6 @@ void CElementDeleter::Delete ( class CElement* pElement, bool bUnlink, bool bUpd
 
             if ( bUnlink )
                 pElement->Unlink ();
-            
-            // Delete all event handlers because CResource::DestroyVM can't do it anymore (element is unlinked)
-            pElement->DeleteAllEvents ();
         }
         else
         {
@@ -70,4 +67,11 @@ void CElementDeleter::Unreference ( CElement* pElement )
 bool CElementDeleter::IsBeingDeleted ( CElement* pElement )
 {
     return ListContains ( m_List, pElement );
+}
+
+void CElementDeleter::CleanUpForVM ( CLuaMain* pLuaMain )
+{
+    CElementListType::const_iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end () ; iter++ )
+        (*iter)->DeleteEvents ( pLuaMain, false );
 }

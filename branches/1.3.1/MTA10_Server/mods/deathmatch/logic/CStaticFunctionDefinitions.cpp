@@ -10673,18 +10673,26 @@ CBan* CStaticFunctionDefinitions::AddBan ( SString strIP, SString strUsername, S
     // Check if the IP, username or serial are specified
     bool bIPSpecified       = strIP.length      ( ) > 0;
     bool bUsernameSpecified = strUsername.length( ) > 0;
-    bool bSerialSpecified   = strSerial.length  ( ) > 0;
+    bool bSerialSpecified   = strSerial.length  ( ) == 32;
 
     // Crop the responsible string if too long
     if ( strResponsible.length ( ) > MAX_BAN_RESPONSIBLE_LENGTH )
         strResponsible = strResponsible.substr ( 0, MAX_BAN_RESPONSIBLE_LENGTH - 3 ) + "...";
 
     // Got an IP?
-    if ( bIPSpecified )
+    if ( bIPSpecified && !m_pBanManager->IsSpecificallyBanned ( strIP ) )
+    {
         pBan = m_pBanManager->AddBan ( strIP, strResponsible, strReason, tUnban );
+    }
     // If not IP provided make sure a username or serial are there
-    else if ( bUsernameSpecified || bSerialSpecified )
+    else if ( bSerialSpecified && !m_pBanManager->IsSerialBanned ( strSerial ) )
+    {
         pBan = m_pBanManager->AddBan ( strResponsible, strReason, tUnban );
+    }
+    else if ( bUsernameSpecified && !m_pBanManager->IsAccountBanned ( strUsername ) )
+    {
+        pBan = m_pBanManager->AddBan ( strResponsible, strReason, tUnban );
+    }
 
     // If the ban was added
     if ( pBan )

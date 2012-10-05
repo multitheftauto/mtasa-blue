@@ -88,6 +88,7 @@ CResource::~CResource ( void )
 
     // Do this before we delete our elements.
     m_pRootEntity->CleanUpForVM ( m_pLuaVM, true );
+    g_pClientGame->GetElementDeleter ()->CleanUpForVM ( m_pLuaVM );
     m_pLuaManager->RemoveVirtualMachine ( m_pLuaVM );
 
     // Remove all keybinds on this VM
