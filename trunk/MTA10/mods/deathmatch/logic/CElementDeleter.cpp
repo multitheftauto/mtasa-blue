@@ -43,9 +43,6 @@ void CElementDeleter::Delete ( class CClientEntity* pElement )
         pElement->ClearChildren ();
         pElement->SetParent ( NULL );
         pElement->Unlink ();
-        
-        // Delete all event handlers because CClientEntity::CleanUpForVM can't do it anymore (element is unlinked)
-        pElement->DeleteAllEvents ();
     }
 }
 
@@ -123,6 +120,14 @@ void CElementDeleter::Unreference ( class CClientEntity* pElement )
     {
         m_List.remove ( pElement );
     }
+}
+
+
+void CElementDeleter::CleanUpForVM ( CLuaMain* pLuaMain )
+{
+    list < CClientEntity* > ::const_iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end () ; iter++ )
+        (*iter)->DeleteEvents ( pLuaMain, false );
 }
 
 
