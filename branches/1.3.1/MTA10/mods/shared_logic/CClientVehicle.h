@@ -442,6 +442,8 @@ public:
 
     bool                        SetComponentVisible     ( SString vehicleComponent, bool bVisible );
     bool                        GetComponentVisible     ( SString vehicleComponent, bool &bVisible );
+    std::map < SString, SVehicleComponentData > ::iterator ComponentsBegin ( void )                               { return m_ComponentData.begin (); }
+    std::map < SString, SVehicleComponentData > ::iterator ComponentsEnd   ( void )                               { return m_ComponentData.end (); }
 
 protected:
     void                        StreamIn                ( bool bInstantly );
