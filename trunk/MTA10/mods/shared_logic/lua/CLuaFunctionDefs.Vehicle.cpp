@@ -3130,3 +3130,34 @@ int CLuaFunctionDefs::GetVehicleComponentVisible ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::GetVehicleComponents ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+    SString strComponent;
+    CClientVehicle * pVehicle = NULL;
+
+    argStream.ReadUserData ( pVehicle );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( pVehicle )
+        {
+            std::map < SString, SVehicleComponentData > ::iterator iter = pVehicle->ComponentsBegin ( );
+            lua_newtable ( luaVM );
+            for ( ;iter != pVehicle->ComponentsEnd ( ); iter++ )
+            {
+                lua_pushstring( luaVM, (*iter).first );
+                lua_pushboolean( luaVM, (*iter).second.m_bVisible );
+                lua_settable ( luaVM, -3 ); // End of Table
+            }
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
