@@ -1707,9 +1707,12 @@ float CMultiplayerSA::GetFogDistance ( )
 
 void CMultiplayerSA::SetFogDistance ( float fDistance )
 {
-    MemPut < BYTE > ( 0x55FCDB, 0xDD );
-    MemPut < BYTE > ( 0x55FCDC, 0xD8 );
-    MemPut < BYTE > ( 0x55FCDD, 0x90 );
+    BYTE newFstp[3] = {0xDD, 0xD8, 0x90};
+    if ( *(BYTE*)0x55FCDB != newFstp[0] )
+    {
+        MemCpy ( (LPVOID)0x55FCDB, &newFstp, 3 );
+        MemCpy ( (LPVOID)0x560D60, &newFstp, 3 );
+    }
 
     MemPutFast < float > ( 0xB7C4F4, fDistance );
 }
@@ -1717,8 +1720,11 @@ void CMultiplayerSA::SetFogDistance ( float fDistance )
 void CMultiplayerSA::RestoreFogDistance ( )
 {
     BYTE originalFstp[3] = {0xD9, 0x5E, 0x54};
-
-    MemCpy ( (LPVOID)0x55FCDB, &originalFstp, 3 );
+    if ( *(BYTE*)0x55FCDB != originalFstp[0] )
+    {
+        MemCpy ( (LPVOID)0x55FCDB, &originalFstp, 3 );
+        MemCpy ( (LPVOID)0x560D60, &originalFstp, 3 );
+    }
 }
 
 void CMultiplayerSA::GetSunColor ( unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue)
