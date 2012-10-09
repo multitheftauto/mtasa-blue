@@ -17,8 +17,6 @@
 
 extern CGame* g_pGame;
 
-#define RUN_CHILDREN list<CElement*>::const_iterator iter=pElement->IterBegin();for(;iter!=pElement->IterEnd();iter++)
-
 CMapManager::CMapManager ( CBlipManager* pBlipManager,
                            CObjectManager* pObjectManager,
                            CPickupManager* pPickupManager, 

@@ -368,12 +368,12 @@ Section "Desktop icon" SEC11
 	StrCpy $CreateDesktopIcon 1
 SectionEnd
 
-Section "Register protocol" SEC12
+Section "Register mtasa:// protocol" SEC12
 	SectionIn 1 2
 	StrCpy $RegisterProtocol 1
 SectionEnd
 
-Section "Add to Game Explorer" SEC13
+Section "Add to Games Explorer" SEC13
 	SectionIn 1 2
 	StrCpy $AddToGameExplorer 1
 SectionEnd

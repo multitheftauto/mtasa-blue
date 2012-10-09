@@ -52,6 +52,7 @@ SString         GetOSVersion                        ( void );
 SString         GetRealOSVersion                    ( void );
 bool            IsVistaOrHigher                     ( void );
 BOOL            IsUserAdmin                         ( void );
+bool            GetLibVersionInfo                   ( const char *szLibName, VS_FIXEDFILEINFO* pOutFileInfo );
 
 void            StartPseudoProgress                 ( HINSTANCE hInstance, const SString& strTitle, const SString& strMsg );
 void            StopPseudoProgress                  ( void );
