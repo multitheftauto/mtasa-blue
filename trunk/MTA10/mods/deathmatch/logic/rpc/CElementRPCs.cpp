@@ -38,8 +38,10 @@ void CElementRPCs::LoadFunctions ( void )
     AddHandler ( SET_LOW_LOD_ELEMENT,            SetLowLodElement,            "SetLowLodElement" );
 }
 
-#define RUN_CHILDREN_SERVER CChildListType::const_iterator iter=pSource->IterBegin();for(;iter!=pSource->IterEnd();iter++) if (!(*iter)->IsLocalEntity())
-
+#define RUN_CHILDREN_SERVER \
+    if ( pSource->CountChildren() ) \
+        for ( CChildListType::const_iterator iter = pSource->IterBegin () ; iter != pSource->IterEnd () ; iter++ ) \
+            if ( !(*iter)->IsLocalEntity () )
 
 void CElementRPCs::SetElementParent ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {

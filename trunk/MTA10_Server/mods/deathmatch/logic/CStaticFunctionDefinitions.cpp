@@ -46,8 +46,9 @@ static CPedManager*                                 m_pPedManager;
 static CWaterManager*                               m_pWaterManager;
 
 // Used to run a function on all the children of the elements too
-#define RUN_CHILDREN CChildListType::const_iterator iter=pElement->IterBegin();for(;iter!=pElement->IterEnd();iter++)
-#define RUN_CHILDREN_BACKWARDS CChildListType::const_reverse_iterator iter=pElement->IterReverseBegin();for(;iter!=pElement->IterReverseEnd();iter++)
+#define RUN_CHILDREN \
+    if ( pElement->CountChildren () ) \
+        for ( CChildListType::const_iterator iter = pElement->IterBegin () ; iter != pElement->IterEnd () ; iter++ )
 
 CStaticFunctionDefinitions::CStaticFunctionDefinitions ( CGame * pGame )
 {
