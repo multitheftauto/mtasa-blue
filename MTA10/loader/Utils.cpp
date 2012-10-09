@@ -1220,7 +1220,64 @@ SString GetRealOSVersion ( void )
     strVersionAndBuild.Split ( ".", parts );
     uint uiMajor = parts.size () > 0 ? atoi ( parts[0] ) : 0;
     uint uiMinor = parts.size () > 1 ? atoi ( parts[1] ) : 0;
+
+    if ( uiMajor == 0 )
+    {
+        VS_FIXEDFILEINFO fileInfo;
+        if ( GetLibVersionInfo ( "ntdll.dll", &fileInfo ) )
+        {
+            uiMajor = HIWORD( fileInfo.dwFileVersionMS );
+            uiMinor = LOWORD( fileInfo.dwFileVersionMS );
+        }
+    }
+
     return SString ( "%u.%u", uiMajor, uiMinor );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// GetLibVersionInfo
+//
+// Get version info of a file
+//
+///////////////////////////////////////////////////////////////
+bool GetLibVersionInfo( const char *szLibName, VS_FIXEDFILEINFO* pOutFileInfo )
+{
+    DWORD dwHandle, dwLen;
+    dwLen = GetFileVersionInfoSize ( szLibName, &dwHandle );
+    if (!dwLen) 
+        return FALSE;
+
+    LPTSTR lpData = (LPTSTR) malloc (dwLen);
+    if (!lpData) 
+        return FALSE;
+
+    SetLastError ( 0 );
+    if( !GetFileVersionInfo ( szLibName, dwHandle, dwLen, lpData ) )
+    {
+        free (lpData);
+        return FALSE;
+    }
+
+    DWORD dwError = GetLastError ();
+    if ( dwError )
+    {
+        free (lpData);
+        return FALSE;
+    }
+
+    UINT BufLen;
+    VS_FIXEDFILEINFO *pFileInfo;
+    if( VerQueryValueA ( lpData, "\\", (LPVOID *) &pFileInfo, (PUINT)&BufLen ) ) 
+    {
+        *pOutFileInfo = *pFileInfo;
+        free (lpData);
+        return true;
+    }
+
+    free (lpData);
+    return FALSE;
 }
 
 
