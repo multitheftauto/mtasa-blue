@@ -255,7 +255,7 @@ void CPerfStatFunctionTimingImpl::UpdateTiming ( const char* szFunctionName, TIM
     if ( !m_bIsActive )
         return;
 
-    // Ignore any single calls over lowest threshold from any viewer
+    // Ignore any single calls under lowest threshold from any viewer
     if ( timeUs < m_PeakUsThresh )
         return;
 
