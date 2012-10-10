@@ -503,6 +503,7 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
     // bool                  - has a jetpack?
     // unsigned short (2)    - dimension
     // unsigned char  (1)    - fighting style
+    // Dear God, please fix issue #7376
 
     // The game must be loaded or the game will crash
     if ( g_pClientGame->m_Status != CClientGame::STATUS_JOINED )
