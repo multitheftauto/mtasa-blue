@@ -475,7 +475,7 @@ bool CAccountManager::IntegrityCheck ()
 {
     CRegistryResult result;
     //Select all our required information from the accounts database
-    bool bOk = m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "PRAGMA integrity_check(3)" );
+    bool bOk = m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "PRAGMA integrity_check" );
 
     // Get result as a string
     SString strResult;
