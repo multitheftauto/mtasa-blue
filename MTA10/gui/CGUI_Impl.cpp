@@ -998,7 +998,18 @@ bool CGUI_Impl::Event_MouseClick ( const CEGUI::EventArgs& Args )
         CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
         NewArgs.pWindow = pElement;
         
-        m_MouseClickHandlers[ m_Channel ] ( NewArgs );
+        // If called for client.dll, hack in call to core handler (Note: client.dll could unload if click causes reconnect)
+        if ( m_Channel == INPUT_MOD )
+        {
+            if ( m_MouseClickHandlers[ INPUT_CORE ] )
+            {
+                if ( m_MouseClickHandlers[ INPUT_CORE ] ( NewArgs ) )
+                    return true;    // Return if click was handled
+            }
+        }
+
+        if ( m_MouseClickHandlers[ m_Channel ] )
+            m_MouseClickHandlers[ m_Channel ] ( NewArgs );
     }
     return true;
 }
@@ -1030,7 +1041,18 @@ bool CGUI_Impl::Event_MouseDoubleClick ( const CEGUI::EventArgs& Args )
         CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( wnd->getUserData () );
         NewArgs.pWindow = pElement;
         
-        m_MouseDoubleClickHandlers[ m_Channel ] ( NewArgs );
+        // If called for client.dll, hack in call to core handler (Note: client.dll could unload if click causes reconnect)
+        if ( m_Channel == INPUT_MOD )
+        {
+            if ( m_MouseDoubleClickHandlers[ INPUT_CORE ] )
+            {
+                if ( m_MouseDoubleClickHandlers[ INPUT_CORE ] ( NewArgs ) )
+                    return true;    // Return if click was handled
+            }
+        }
+
+        if ( m_MouseDoubleClickHandlers[ m_Channel ] )
+            m_MouseDoubleClickHandlers[ m_Channel ] ( NewArgs );
     }
     return true;
 }
