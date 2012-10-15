@@ -49,6 +49,7 @@
 
 #ifndef _MSC_VER
     #define _isnan isnan
+    #define wcsicmp wcscasecmp
 #endif
 
 #ifdef _MSC_VER
@@ -116,3 +117,25 @@
             LOCAL_FUNCTION_END \
             std::sort ( a, b, LOCAL_FUNCTION::SortPredicate ); \
         }
+
+// printf/wprintf helpers
+//
+// http://www.firstobject.com/wchar_t-string-on-linux-osx-windows.htm
+//
+// In VC++, you can use "%s" in the format string of swprintf (or wprintf, fwprintf) to insert a wide string.
+// But in POSIX you have to use "%ls". This may be compiler dependent rather than operating system dependent.
+//
+// type     meaning in sprintf      meaning in swprintf
+//          Windows     POSIX       Windows     POSIX
+//ls or lS  wchar_t     wchar_t     wchar_t     wchar_t
+//s         char        char        wchar_t     char
+//S         wchar_t     char        char        ????
+//
+#define PRSinS   "%s"       // i.e. SString (  "name:" PRSinS,  "dave" );
+#define PRWinS   "%ls"      // i.e. SString (  "name:" PRWinS, L"dave" );
+#define PRWinW  L"%ls"      // i.e. WString ( L"name:" PRWinW, L"dave" );
+#ifdef _MSC_VER
+    #define PRSinW  L"%S"       // i.e. WString ( L"name:" PRSinW,  "dave" );
+#else
+    #define PRSinW  L"%s"       // i.e. WString ( L"name:" PRSinW,  "dave" );
+#endif

@@ -5201,11 +5201,7 @@ bool CClientGame::OnMouseClick ( CGUIMouseEventArgs Args )
         break;
     }
 
-    // Call the event handler in CCore
-    bool bHandled = g_pCore->OnMouseClick ( Args );
-
-    // Only pass on to lua if we haven't handled it yet
-    if ( !bHandled && szButton ) {
+    if ( szButton ) {
         CLuaArguments Arguments;
         Arguments.PushString ( szButton );
         Arguments.PushString ( szState );
@@ -5245,11 +5241,7 @@ bool CClientGame::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
         break;
     }
 
-    // Call the event handler in CCore
-    bool bHandled = g_pCore->OnMouseDoubleClick ( Args );
-
-    // Only pass on to lua if we haven't handled it yet
-    if ( !bHandled && szButton ) {
+    if ( szButton ) {
         CLuaArguments Arguments;
         Arguments.PushString ( szButton );
         Arguments.PushString ( szState );
