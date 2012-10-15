@@ -15,6 +15,7 @@
 
 #include "SharedUtil.AllocTracking.hpp"
 #include "SString.hpp"
+#include "WString.hpp"
 #include "SharedUtil.Misc.hpp"
 #include "SharedUtil.File.hpp"
 #include "SharedUtil.Time.hpp"

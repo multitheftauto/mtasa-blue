@@ -14,7 +14,9 @@
 
 #include "StdInc.h"
 #include "direct.h"
-#include "SharedUtil.Tests.hpp"
+#if defined(_DEBUG) 
+    #include "SharedUtil.Tests.hpp"
+#endif
 int DoLaunchGame ( LPSTR lpCmdLine );
 int LaunchGame ( LPSTR lpCmdLine );
 

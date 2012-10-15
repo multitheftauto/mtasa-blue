@@ -1932,6 +1932,14 @@
 					RelativePath="..\..\Shared\sdk\UTF8.h"
 					>
 				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\WString.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\WString.hpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 	</Files>
