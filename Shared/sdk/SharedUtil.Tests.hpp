@@ -13,14 +13,13 @@
 *
 *****************************************************************************/
 
-#ifdef MTA_DEBUG
-
 // Fwd decl
 void    SString_Tests                   ( void );
 void    SharedUtil_File_Tests           ( void );
 void    SharedUtil_ClassIdent_Tests     ( void );
 void 	SharedUtil_WildcardMatch_Tests  ( void );
 void    SharedUtil_Collection_Tests     ( void );
+void    SharedUtil_String_Tests         ( void );
 
 ///////////////////////////////////////////////////////////////
 //
@@ -36,6 +35,7 @@ void SharedUtil_Tests ( void )
     SharedUtil_ClassIdent_Tests ();
     SharedUtil_WildcardMatch_Tests ();
     SharedUtil_Collection_Tests ();
+    SharedUtil_String_Tests ();
 }
 
 
@@ -603,4 +603,41 @@ void SharedUtil_Collection_Tests ( void )
 
 }
 
-#endif  // MTA_DEBUG
+
+///////////////////////////////////////////////////////////////
+//
+// SharedUtil_String_Tests
+//
+// Test behaviour of strings
+//
+///////////////////////////////////////////////////////////////
+void SharedUtil_String_Tests ( void )
+{
+    // Formatting
+    {
+        SString strTemp1 ( "name:" PRSinS, "dave" );
+        SString strTemp2 ( "name:" PRWinS, L"dave" );
+        WString wstrTemp3 ( L"name:" PRSinW, "dave" );
+        WString wstrTemp4 ( L"name:" PRWinW, L"dave" );
+
+        assert ( strTemp1 == "name:dave" );
+        assert ( strTemp2 == "name:dave" );
+        assert ( wstrTemp3 == L"name:dave" );
+        assert ( wstrTemp4 == L"name:dave" );
+    }
+
+    // To/From Ansi
+    {
+        SString strTemp1 = "abcABC 123";
+        WString wstrTemp2 = "defDEF 456";
+        WString wstrTemp3 = L"ghiGHI 789";
+
+        assert ( wstrTemp2 == L"defDEF 456" );
+
+        SString strTemp2 = wstrTemp2.ToAnsi ();
+        SString strTemp3 = wstrTemp3.ToAnsi ();
+
+        assert ( strTemp2 == "defDEF 456" );
+        assert ( strTemp3 == "ghiGHI 789" );
+    }
+}
