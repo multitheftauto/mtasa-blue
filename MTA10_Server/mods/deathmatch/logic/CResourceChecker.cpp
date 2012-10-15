@@ -322,7 +322,6 @@ void CResourceChecker::CheckMetaFileForIssues ( const string& strPath, const str
 void CResourceChecker::CheckMetaSourceForIssues ( CXMLNode* pRootNode, const string& strFileName, const string& strResourceName, ECheckerModeType checkerMode, bool* pbOutHasChanged )
 {
     // Find the client and server version requirements
-    bool bUsesBoth = false;
     SString strMinClientReqFromMetaXml = "";
     SString strMinServerReqFromMetaXml = "";
     CXMLNode* pNodeMinMtaVersion = pRootNode->FindSubNode ( "min_mta_version", 0 );

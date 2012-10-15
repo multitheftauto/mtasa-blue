@@ -449,14 +449,14 @@ SString WString::ToAnsi ( void ) const
     // Use of the OLE allocator is not required because the resultant
     // ANSI  string will never be passed to another COM component. You
     // can use your own allocator.
-    char* pData = (char*)_alloca ( cbAnsi );
+    char* pData = (char*)alloca ( cbAnsi );
 
     // Convert to ANSI.
 #ifdef WIN32
     if (0 == WideCharToMultiByte(CP_ACP, 0, pszW, cCharacters, pData, cbAnsi, NULL, NULL))
 #else
     size_t ret = wcstombs ( pData, pszW, cbAnsi );
-    if ( ret == 0 || ret == -1 )
+    if ( ret == 0 || ret == (size_t)-1 )
 #endif
     {
         return "";
@@ -468,13 +468,13 @@ void WString::FromAnsi ( const char* szSrc )
 {
     uint cCharacters = strlen ( szSrc ) + 1 ;
     uint cbUnicode = cCharacters * 4;
-    wchar_t* Dest = (wchar_t*)_alloca ( cbUnicode );
+    wchar_t* Dest = (wchar_t*)alloca ( cbUnicode );
 
 #ifdef WIN32
     if ( MultiByteToWideChar ( CP_ACP, 0, szSrc, -1, Dest, (int)cbUnicode ) == 0 )
 #else
     size_t ret = mbstowcs ( Dest, szSrc, cCharacters );
-    if ( ret == 0 || ret == -1 )
+    if ( ret == 0 || ret == (size_t)-1 )
 #endif
     {
         clear();
