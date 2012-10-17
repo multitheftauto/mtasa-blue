@@ -23,8 +23,9 @@ CClientColManager::~CClientColManager ( void )
 
 void CClientColManager::DoPulse ( void )
 {
-    vector < CClientColShape* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); ++iter ) (*iter)->DoPulse ();
+    // Don't use iterators here as the list may get modified
+    for ( uint i = 0 ; i < m_List.size () ; i++ )
+        m_List[i]->DoPulse ();
 }
 
 
