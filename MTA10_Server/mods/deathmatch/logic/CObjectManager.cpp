@@ -91,8 +91,6 @@ static unsigned short g_usBreakableModelList[] = {
 
 CObjectManager::CObjectManager ( void )
 {
-    // Init
-    m_bRemoveFromList = true;
 }
 
 
@@ -141,33 +139,13 @@ CObject* CObjectManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLua
 void CObjectManager::DeleteAll ( void )
 {
     // Delete all objects, make sure they dont remove themselves from our list (would make this damn slow)
-    m_bRemoveFromList = false;
-    CObjectListType::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        delete *iter;
-    }
-    m_bRemoveFromList = true;
-
-    // Clear the list
-    m_List.clear ();
+    DeletePointersAndClearList ( m_List );
 }
 
 
 bool CObjectManager::Exists ( CObject* pObject )
 {
-    // Find the object in the list
-    CObjectListType::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        if ( *iter == pObject )
-        {
-            return true;
-        }
-    }
-
-    // Doesn't exist
-    return false;
+    return ListContains ( m_List, pObject );
 }
 
 
@@ -204,8 +182,5 @@ bool CObjectManager::IsBreakableModel ( unsigned long ulObjectModel )
 
 void CObjectManager::RemoveFromList ( CObject* pObject )
 {
-    if ( m_bRemoveFromList && !m_List.empty() )
-    {
-        m_List.remove ( pObject );
-    }
+    m_List.remove ( pObject );
 }

@@ -14,8 +14,6 @@
 
 CWaterManager::CWaterManager ()
 {
-    m_bDontRemoveFromList = false;
-
     m_WorldWaterLevelInfo.bNonSeaLevelSet = false;
     m_WorldWaterLevelInfo.fSeaLevel = 0;
     m_WorldWaterLevelInfo.fNonSeaLevel = 0;
@@ -88,40 +86,17 @@ void CWaterManager::ResetWorldWaterLevel ( void )
 void CWaterManager::DeleteAll ()
 {
     // Delete all items
-    m_bDontRemoveFromList = true;
-    std::list < CWater* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        delete *iter;
-    }
-
-    // Clear the list
-    m_List.clear ();
-    m_bDontRemoveFromList = false;
+    DeletePointersAndClearList ( m_List );
 }
 
 
 void CWaterManager::RemoveFromList ( CWater* pWater )
 {
-    if ( !m_bDontRemoveFromList && !m_List.empty() )
-    {
-        m_List.remove ( pWater );
-    }
+    m_List.remove ( pWater );
 }
 
 
 bool CWaterManager::Exists ( CWater* pWater )
 {
-    // Try to find the water ID in the list
-    std::list < CWater* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        if ( (*iter) == pWater )
-        {
-            return true;
-        }
-    }
-
-    // Couldn't find it
-    return false;
+    return ListContains ( m_List, pWater );
 }

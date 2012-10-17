@@ -14,7 +14,6 @@
 
 CTeamManager::CTeamManager ( void )
 {
-    m_bRemoveFromList = true;
 }
 
 
@@ -26,25 +25,13 @@ CTeamManager::~CTeamManager ( void )
 
 void CTeamManager::RemoveFromList ( CTeam* pTeam )
 {
-    if ( m_bRemoveFromList && !m_List.empty() )
-    {
-        m_List.remove ( pTeam );
-    }
+    m_List.remove ( pTeam );
 }
 
 
 void CTeamManager::RemoveAll ( void )
 {
-    m_bRemoveFromList = false;
-
-    list < CTeam* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        delete *iter;
-    }
-    m_List.clear ();
-
-    m_bRemoveFromList = true;
+    DeletePointersAndClearList ( m_List );
 }
 
 
@@ -65,14 +52,7 @@ CTeam* CTeamManager::GetTeam ( const char* szName )
 
 bool CTeamManager::Exists ( CTeam* pTeam )
 {
-    list < CTeam* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        if ( *iter == pTeam )
-            return true;
-    }
-
-    return false;
+    return ListContains ( m_List, pTeam );
 }
 
 

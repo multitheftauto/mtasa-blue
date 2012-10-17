@@ -189,33 +189,14 @@ void CColManager::HandleHitDetectionResult ( bool bHit, CColShape* pShape, CElem
 
 bool CColManager::Exists ( CColShape* pShape )
 {
-    // Return true if it exists
-    vector < CColShape* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        if ( *iter == pShape )
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return ListContains ( m_List, pShape );
 }
 
 
 void CColManager::DeleteAll ( void )
 {
     // Delete all of them
-    m_bCanRemoveFromList = false;
-    vector < CColShape* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        delete *iter;
-    }
-
-    // Clear the list
-    m_bCanRemoveFromList = true;
-    m_List.clear ();
+    DeletePointersAndClearList ( m_List );
 }
 
 

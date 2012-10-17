@@ -311,8 +311,8 @@ public:
     void                            GenerateHandlingData    ( void );
     CHandlingEntry*                 GetHandlingData         ( void )                      { return m_pHandlingEntry; }
 
-    uint                            GetTimeSinceLastPush    ( void )                      { return (uint)( CTickCount::Now () - m_LastPushedTime ).ToLongLong (); }
-    void                            ResetLastPushTime       ( void )                      { m_LastPushedTime = CTickCount::Now (); }
+    uint                            GetTimeSinceLastPush    ( void )                      { return (uint)( CTickCount::Now ( true ) - m_LastPushedTime ).ToLongLong (); }
+    void                            ResetLastPushTime       ( void )                      { m_LastPushedTime = CTickCount::Now ( true ); }
 
     inline bool                     DoesVehicleHaveSirens   ( void )                      { return m_tSirenBeaconInfo.m_bOverrideSirens; }
     void                            RemoveVehicleSirens     ( void );

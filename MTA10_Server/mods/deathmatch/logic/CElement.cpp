@@ -90,7 +90,7 @@ CElement::~CElement ( void )
     list < CPerPlayerEntity* > ::const_iterator iter = m_ElementReferenced.begin ();
     for ( ; iter != m_ElementReferenced.end (); iter++ )
     {
-        if ( !(*iter)->m_ElementReferences.empty() ) (*iter)->m_ElementReferences.remove ( this );
+        (*iter)->m_ElementReferences.remove ( this );
     }
 
     RemoveAllCollisions ( true );
@@ -1135,6 +1135,18 @@ void CElement::AttachTo ( CElement* pElement )
 
     if ( m_pAttachedTo )
         m_pAttachedTo->AddAttachedElement ( this );
+}
+
+
+void CElement::AddAttachedElement ( CElement* pElement )
+{
+    m_AttachedElements.push_back ( pElement );
+}
+
+
+void CElement::RemoveAttachedElement ( CElement* pElement )
+{
+    m_AttachedElements.remove ( pElement );
 }
 
 

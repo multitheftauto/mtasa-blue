@@ -276,7 +276,7 @@ void CRegisteredCommands::TakeOutTheTrash ( void )
     list < SCommand* > ::iterator iter = m_TrashCan.begin ();
     for ( ; iter != m_TrashCan.end (); iter++ )
     {
-        if ( !m_Commands.empty() ) m_Commands.remove ( *iter );
+        m_Commands.remove ( *iter );
         delete *iter;
     }
     m_TrashCan.clear ();

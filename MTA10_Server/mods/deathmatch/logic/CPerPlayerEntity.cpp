@@ -31,7 +31,7 @@ CPerPlayerEntity::~CPerPlayerEntity ( void )
     list < CElement* > ::const_iterator iter = m_ElementReferences.begin ();
     for ( ; iter != m_ElementReferences.end (); iter++ )
     {
-        if ( !(*iter)->m_ElementReferenced.empty() ) (*iter)->m_ElementReferenced.remove ( this );
+        (*iter)->m_ElementReferenced.remove ( this );
     }
     MapRemove ( ms_AllPerPlayerEntityMap, this );
 }
@@ -131,8 +131,8 @@ bool CPerPlayerEntity::RemoveVisibleToReference ( CElement* pElement )
     if ( IsVisibleToReferenced ( pElement ) )
     {
         // Remove him from our list and unreference us from his list
-        if ( !m_ElementReferences.empty() ) m_ElementReferences.remove ( pElement );
-        if ( !pElement->m_ElementReferenced.empty() ) pElement->m_ElementReferenced.remove ( this );
+        m_ElementReferences.remove ( pElement );
+        pElement->m_ElementReferenced.remove ( this );
 
         // Update the players
         OnReferencedSubtreeRemove ( pElement );
@@ -153,7 +153,7 @@ void CPerPlayerEntity::ClearVisibleToReferences ( void )
     for ( ; iter != m_ElementReferences.end (); iter++ )
     {
         // Unreference us from it
-        if ( !(*iter)->m_ElementReferenced.empty() ) (*iter)->m_ElementReferenced.remove ( this );
+        (*iter)->m_ElementReferenced.remove ( this );
 
         // Notify our inherits that he was removed
         OnReferencedSubtreeRemove ( *iter );

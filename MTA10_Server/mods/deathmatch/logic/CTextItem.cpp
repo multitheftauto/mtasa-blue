@@ -84,7 +84,7 @@ CTextItem::~CTextItem ( )
 void CTextItem::AddObserver ( CTextDisplay* pObserver )
 {
     // Remove them first if they're already added (easier than checking if they are and only marginally slower)
-    if ( !m_Observers.empty() ) m_Observers.remove ( pObserver );
+    m_Observers.remove ( pObserver );
 
     // Add it
     m_Observers.push_back ( pObserver );

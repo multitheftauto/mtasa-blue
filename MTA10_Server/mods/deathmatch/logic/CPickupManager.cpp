@@ -23,7 +23,6 @@ static SFixedArray < unsigned short, 47 > g_usWeaponModels = { {
 CPickupManager::CPickupManager ( CColManager* pColManager )
 {
     // Init
-    m_bDontRemoveFromList = false;
     m_pColManager = pColManager;
 }
 
@@ -65,33 +64,13 @@ CPickup* CPickupManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLua
 
 void CPickupManager::DeleteAll ( void )
 {
-    // Delete all the classes
-    m_bDontRemoveFromList = true;
-    list < CPickup* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        delete *iter;
-    }
-    m_bDontRemoveFromList = false;
-
-    // Clear the list
-    m_List.clear ();
+    DeletePointersAndClearList ( m_List );
 }
 
 
 bool CPickupManager::Exists ( CPickup* pPickup )
 {
-    // Return true if it exists, otherwize false
-    list < CPickup* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        if ( *iter == pPickup )
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return ListContains ( m_List, pPickup );
 }
 
 

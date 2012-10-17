@@ -167,7 +167,7 @@ public:
     void                                        UpdatePerPlayerEntities     ( void );
 
     void                                        AddCollision                ( class CColShape* pShape )     { m_Collisions.push_back ( pShape ); }
-    void                                        RemoveCollision             ( class CColShape* pShape )     { if ( !m_Collisions.empty() ) m_Collisions.remove ( pShape ); }
+    void                                        RemoveCollision             ( class CColShape* pShape )     { m_Collisions.remove ( pShape ); }
     bool                                        CollisionExists             ( class CColShape* pShape );
     void                                        RemoveAllCollisions         ( bool bNotify = false );
     std::list < class CColShape* > ::iterator   CollisionsBegin             ( void )                        { return m_Collisions.begin (); }
@@ -182,10 +182,10 @@ public:
     virtual void                                AttachTo                    ( CElement* pElement );
     virtual void                                GetAttachedOffsets          ( CVector & vecPosition, CVector & vecRotation );
     virtual void                                SetAttachedOffsets          ( CVector & vecPosition, CVector & vecRotation );
-    inline void                                 AddAttachedElement          ( CElement* pElement )          { m_AttachedElements.push_back ( pElement ); }
-    inline void                                 RemoveAttachedElement       ( CElement* pElement )          { if ( !m_AttachedElements.empty() ) m_AttachedElements.remove ( pElement ); }
-    std::list < CElement* > ::iterator          AttachedElementsBegin       ( void )                        { return m_AttachedElements.begin (); }
-    std::list < CElement* > ::iterator          AttachedElementsEnd         ( void )                        { return m_AttachedElements.end (); }
+    void                                        AddAttachedElement          ( CElement* pElement );
+    void                                        RemoveAttachedElement       ( CElement* pElement );
+    std::list < CElement* > ::const_iterator    AttachedElementsBegin       ( void )                        { return m_AttachedElements.begin (); }
+    std::list < CElement* > ::const_iterator    AttachedElementsEnd         ( void )                        { return m_AttachedElements.end (); }
     const char*                                 GetAttachToID               ( void )                        { return m_strAttachToID; }
     bool                                        IsElementAttached           ( CElement* pElement );
     virtual bool                                IsAttachable                ( void );

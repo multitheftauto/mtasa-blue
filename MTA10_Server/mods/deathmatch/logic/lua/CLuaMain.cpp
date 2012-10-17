@@ -614,7 +614,7 @@ CXMLFile * CLuaMain::CreateXML ( const char * szFilename )
 
 void CLuaMain::DestroyXML ( CXMLFile * pFile )
 {
-    if ( !m_XMLFiles.empty() ) m_XMLFiles.remove ( pFile );
+    m_XMLFiles.remove ( pFile );
     delete pFile;
 }
 
@@ -686,7 +686,7 @@ CTextDisplay * CLuaMain::CreateDisplay ( )
 
 void CLuaMain::DestroyDisplay ( CTextDisplay * pDisplay )
 {
-    if ( !m_Displays.empty() ) m_Displays.remove ( pDisplay );
+    m_Displays.remove ( pDisplay );
     delete pDisplay;
 }
 
@@ -701,7 +701,7 @@ CTextItem * CLuaMain::CreateTextItem ( const char* szText, float fX, float fY, e
 
 void CLuaMain::DestroyTextItem ( CTextItem * pTextItem )
 {
-    if ( !m_TextItems.empty() ) m_TextItems.remove ( pTextItem );
+    m_TextItems.remove ( pTextItem );
     delete pTextItem;
 }
 
