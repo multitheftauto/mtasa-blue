@@ -47,7 +47,6 @@ protected:
     inline void                     AddToList                   ( CWater* pWater )              { m_List.push_back ( pWater ); }
     void                            RemoveFromList              ( CWater* pWater );
 
-    bool                            m_bDontRemoveFromList;
     std::list < CWater* >           m_List;
 
     SWorldWaterLevelInfo            m_WorldWaterLevelInfo;

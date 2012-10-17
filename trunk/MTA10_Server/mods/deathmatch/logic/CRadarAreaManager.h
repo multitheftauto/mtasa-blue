@@ -38,7 +38,6 @@ private:
     void                            RemoveFromList                          ( CRadarArea* pArea );
 
     list < CRadarArea * >           m_List;
-    bool                            m_bDontRemoveFromList;
 };
 
 #endif

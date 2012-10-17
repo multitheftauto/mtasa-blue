@@ -254,8 +254,8 @@ public:
     inline void                                 IncrementPuresync           ( void )                        { m_uiPuresyncPackets++; }
     inline unsigned int                         GetPuresyncCount            ( void ) const                  { return m_uiPuresyncPackets; }
 
-    void                                        NotifyReceivedSync          ( void )                        { m_lastReceivedSyncTime = CTickCount::Now (); }
-    bool                                        UhOhNetworkTrouble          ( void )                        { return ( CTickCount::Now () - m_lastReceivedSyncTime ).ToLongLong () > 5000; }
+    void                                        NotifyReceivedSync          ( void )                        { m_lastReceivedSyncTime = CTickCount::Now ( true ); }
+    bool                                        UhOhNetworkTrouble          ( void )                        { return ( CTickCount::Now ( true ) - m_lastReceivedSyncTime ).ToLongLong () > 5000; }
 
     const std::string&                          GetAnnounceValue            ( const std::string& strKey ) const;
     void                                        SetAnnounceValue            ( const std::string& strKey, const std::string& strValue );

@@ -204,4 +204,18 @@ enum eEulerRotationOrder
 eEulerRotationOrder EulerRotationOrderFromString( const char* szString );
 CVector             ConvertEulerRotationOrder   ( const CVector& a_vRotation, eEulerRotationOrder a_eSrcOrder, eEulerRotationOrder a_eDstOrder );
 
+// Clear list of object pointers
+template < class T >
+void DeletePointersAndClearList ( T& elementList )
+{
+    T cloneList = elementList;
+    elementList.clear ();
+
+    T ::const_iterator iter = cloneList.begin ();
+    for ( ; iter != cloneList.end (); iter++ )
+    {
+        delete *iter;
+    }
+}
+
 #endif

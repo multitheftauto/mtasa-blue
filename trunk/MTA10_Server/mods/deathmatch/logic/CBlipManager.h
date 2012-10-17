@@ -40,7 +40,6 @@ public:
 
 private:
     list < CBlip* >         m_List;
-    bool                    m_bRemoveFromList;
 };
 
 #endif

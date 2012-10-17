@@ -86,7 +86,7 @@ void CElementGroup::Add ( class CElement * element )
 
 void CElementGroup::Remove ( class CElement * element )
 {
-    if ( !m_elements.empty() ) m_elements.remove ( element );
+    m_elements.remove ( element );
 }
 
 unsigned int CElementGroup::GetCount ( void )

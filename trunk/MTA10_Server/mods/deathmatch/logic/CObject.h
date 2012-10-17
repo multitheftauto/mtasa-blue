@@ -48,8 +48,6 @@ public:
     void                        StopMoving              ( void );
     const CPositionRotationAnimation*   GetMoveAnimation    ( );
 
-    void                        AttachTo                ( CElement* pElement );
-
     inline unsigned char        GetAlpha                ( void )                        { return m_ucAlpha; }
     inline void                 SetAlpha                ( unsigned char ucAlpha )       { m_ucAlpha = ucAlpha; }
 

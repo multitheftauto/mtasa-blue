@@ -22,8 +22,8 @@ class CGroups
     friend class CDummy;
 
 public:
-    inline                              CGroups                 ( void )                { m_bDontRemoveFromList = false; };
-    inline                              ~CGroups                ( void )                { DeleteAll (); };
+                                        CGroups                 ( void )                {}
+                                        ~CGroups                ( void )                { DeleteAll (); }
 
     CDummy*                             Create                  ( CElement* pParent );
     CDummy*                             CreateFromXML           ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents );
@@ -39,7 +39,6 @@ private:
     void                                RemoveFromList          ( CDummy* pDummy );
 
     list < CDummy* >                    m_List;
-    bool                                m_bDontRemoveFromList;
 };
 
 #endif
