@@ -44,13 +44,13 @@ int CLuaFunctionDefs::GetWeaponNameFromID ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetSlotFromWeapon ( lua_State* luaVM )
 {
-    unsigned char ucWeaponID = 0;
+    eWeaponType weaponType;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber( ucWeaponID );
+    argStream.ReadEnumStringOrNumber( weaponType );
 
     if ( !argStream.HasErrors ( ) )
     {
-        char cSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
+        char cSlot = CWeaponNames::GetSlotFromWeapon ( weaponType );
         if ( cSlot >= 0 )
             lua_pushnumber ( luaVM, cSlot );
         else
@@ -58,7 +58,7 @@ int CLuaFunctionDefs::GetSlotFromWeapon ( lua_State* luaVM )
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getSlotFromWeapon", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -92,7 +92,7 @@ int CLuaFunctionDefs::CreateWeapon ( lua_State* luaVM )
     CVector vecPos;
     eWeaponType weaponType;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadEnumString ( weaponType );
+    argStream.ReadEnumStringOrNumber ( weaponType );
     argStream.ReadNumber ( vecPos.fX );
     argStream.ReadNumber ( vecPos.fY );
     argStream.ReadNumber ( vecPos.fZ );
