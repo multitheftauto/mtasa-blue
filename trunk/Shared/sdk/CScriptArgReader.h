@@ -304,8 +304,8 @@ public:
             }
 
             // If will be coercing a string to an enum, make sure string contains only digits
-            int iNonDigit = strValue.find_first_not_of ( "0123456789" );
-            if ( iNonDigit != SString::npos || strValue.empty () )
+            uint uiPos = strValue.find_first_not_of ( "0123456789" );
+            if ( uiPos != SString::npos || strValue.empty () )
                 iArgument = LUA_TNONE;  //  Force error
         }
         if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
