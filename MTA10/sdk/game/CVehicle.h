@@ -55,7 +55,7 @@ struct SSirenInfo
     unsigned char               m_ucSirenCount;
     unsigned char               m_ucCurrentSirenID;
     unsigned char               m_ucCurrentSirenRandomiser;
-    SSirenBeaconInfo            m_tSirenInfo [8];
+    SFixedArray < SSirenBeaconInfo, 8 > m_tSirenInfo;
     SColor                      m_tPointLightColour;
 };
 class CVehicle : public virtual CPhysical
