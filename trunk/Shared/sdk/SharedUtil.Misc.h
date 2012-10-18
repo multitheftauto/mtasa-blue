@@ -1182,6 +1182,11 @@ namespace SharedUtil
             }
         }
 
+        bool ValueValid ( eDummy value ) const
+        {
+            return MapContains ( m_NameMap, value );
+        }
+
         const SString& FindName ( eDummy value ) const
         {
             if ( const SString* pName = MapFind ( m_NameMap, value ) )
@@ -1219,6 +1224,7 @@ namespace SharedUtil
         inline const SString&  EnumToString    ( const T& value )                           { return GetEnumInfo ( *(T*)0 )->FindName    ( (eDummy)value ); }\
         inline bool            StringToEnum    ( const SString& strName, T& outResult )     { return GetEnumInfo ( *(T*)0 )->FindValue   ( strName, (eDummy&)outResult ); }\
         inline const SString&  GetEnumTypeName ( const T& )                                 { return GetEnumInfo ( *(T*)0 )->GetTypeName (); }\
+        inline bool            EnumValueValid  ( const T& value )                           { return GetEnumInfo ( *(T*)0 )->ValueValid  ( (eDummy)value ); }\
 
     #define IMPLEMENT_ENUM_BEGIN(cls) \
         CEnumInfo* GetEnumInfo( const cls& ) \
