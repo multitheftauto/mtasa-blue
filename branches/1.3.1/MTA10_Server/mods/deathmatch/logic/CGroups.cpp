@@ -39,24 +39,11 @@ void CGroups::Delete ( CDummy* pDummy )
 
 void CGroups::DeleteAll ( void )
 {
-    // Delete all the elements
-    m_bDontRemoveFromList = true;
-    list < CDummy* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        delete *iter;
-    }
-
-    // Clear the list
-    m_List.clear ();
-    m_bDontRemoveFromList = false;
+    DeletePointersAndClearList ( m_List );
 }
 
 
 void CGroups::RemoveFromList ( CDummy* pDummy )
 {
-    if ( !m_bDontRemoveFromList )
-    {
-        if ( !m_List.empty() ) m_List.remove ( pDummy );
-    }
+    m_List.remove ( pDummy );
 }

@@ -143,8 +143,6 @@ CPlayer::~CPlayer ( void )
 
     delete m_pKeyBinds;
 
-    // Unlink from manager
-    Unlink ();
     CSimControl::RemoveSimPlayer ( this );
 
     // Unparent us (CElement's unparenting will crash because of the incomplete vtable at that point)
@@ -173,6 +171,16 @@ CPlayer::~CPlayer ( void )
     CElementRefManager::RemoveElementListRef ( ELEMENT_REF_DEBUG ( this, "CPlayer m_lstIgnoredList" ), &m_lstIgnoredList );
     
     delete m_pPlayerStatsPacket;
+
+    // Unlink from manager
+    Unlink ();
+}
+
+
+void CPlayer::Unlink ( void )
+{
+    // Remove us from the player manager
+    m_pPlayerManager->RemoveFromList ( this );
 }
 
 
@@ -186,13 +194,6 @@ void CPlayer::DoPulse ( void )
         if ( m_UpdateNearListTimer.Get () > g_TickRateSettings.iNearListUpdate + 300 )
             MaybeUpdateOthersNearList ();
     }
-}
-
-
-void CPlayer::Unlink ( void )
-{
-    // Remove us from the player manager
-    m_pPlayerManager->RemoveFromList ( this );
 }
 
 
@@ -319,7 +320,7 @@ void CPlayer::RemoveSyncingVehicle ( CVehicle* pVehicle )
         bAlreadyIn = false;
 
         // Remove it from our list
-        if ( !m_SyncingVehicles.empty() ) m_SyncingVehicles.remove ( pVehicle );
+        m_SyncingVehicles.remove ( pVehicle );
     }
 }
 
@@ -364,7 +365,7 @@ void CPlayer::RemoveSyncingPed ( CPed* pPed )
         bAlreadyIn = false;
 
         // Remove it from our list
-        if ( !m_SyncingPeds.empty() ) m_SyncingPeds.remove ( pPed );
+        m_SyncingPeds.remove ( pPed );
     }
 }
 
@@ -409,7 +410,7 @@ void CPlayer::RemoveSyncingObject ( CObject* pObject )
         bAlreadyIn = false;
 
         // Remove it from our list
-        if ( !m_SyncingObjects.empty() ) m_SyncingObjects.remove ( pObject );
+        m_SyncingObjects.remove ( pObject );
     }
 }
 

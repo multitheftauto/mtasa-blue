@@ -43,7 +43,7 @@ bool CScriptDebugging::AddPlayer ( CPlayer& Player, unsigned int uiLevel )
         // He's already script debugging? Remove him from our list. 
         if ( Player.m_uiScriptDebugLevel > 0 )
         {
-            if ( !m_Players.empty() ) m_Players.remove ( &Player );
+            m_Players.remove ( &Player );
         }
     }
 
@@ -60,7 +60,7 @@ bool CScriptDebugging::RemovePlayer ( CPlayer& Player )
     {
         // Mark it as not script debugging and remove it from our list
         Player.m_uiScriptDebugLevel = 0;
-        if ( !m_Players.empty() ) m_Players.remove ( &Player );
+        m_Players.remove ( &Player );
 
         return true;
     }

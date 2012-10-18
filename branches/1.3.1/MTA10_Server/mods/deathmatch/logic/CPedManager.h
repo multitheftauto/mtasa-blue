@@ -39,7 +39,6 @@ protected:
     void                            RemoveFromList              ( class CPed* pPed );
 
     list < class CPed* >            m_List;
-    bool                            m_bDontRemoveFromList;
 };
 
 #endif

@@ -14,8 +14,6 @@
 
 CBlipManager::CBlipManager ( void )
 {
-    // Init
-    m_bRemoveFromList = true;
 }
 
 
@@ -57,32 +55,11 @@ CBlip* CBlipManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMain
 void CBlipManager::DeleteAll ( void )
 {
     // Delete all our blips
-    m_bRemoveFromList = false;
-    list < CBlip* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        delete *iter;
-    }
-    m_bRemoveFromList = true;
-
-    // Clear the list
-    m_List.clear ();
+    DeletePointersAndClearList ( m_List );
 }
 
 
 bool CBlipManager::Exists ( CBlip* pBlip )
 {
-    // Search the list for the blip
-    list < CBlip* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        // Ids match? Return true
-        if ( *iter == pBlip )
-        {
-            return true;
-        }
-    }
-
-    // Doesn't exist
-    return false;
+    return ListContains ( m_List, pBlip );
 }

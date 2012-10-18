@@ -150,7 +150,6 @@ public:
 
 protected:
     CMappedAccountList          m_List;
-    bool                        m_bRemoveFromList;
 
     bool                        m_bAutoLogin;
 

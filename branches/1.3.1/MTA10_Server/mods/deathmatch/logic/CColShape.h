@@ -52,7 +52,7 @@ public:
     inline void                 SetAutoCallEvent    ( bool bAutoCallEvent )             { m_bAutoCallEvent = bAutoCallEvent; };
 
     void                        AddCollider         ( CElement* pElement )              { m_Colliders.push_back ( pElement ); }
-    void                        RemoveCollider      ( CElement* pElement )              { if ( !m_Colliders.empty() ) m_Colliders.remove ( pElement ); }
+    void                        RemoveCollider      ( CElement* pElement )              { m_Colliders.remove ( pElement ); }
     bool                        ColliderExists      ( CElement* pElement );
     void                        RemoveAllColliders  ( bool bNotify );
     list < CElement* > ::iterator  CollidersBegin   ( void )                            { return m_Colliders.begin (); }

@@ -93,9 +93,6 @@ CVehicleManager::CVehicleManager ( void )
     assert ( NUMELMS ( g_ulVehicleAttributes ) == 212 );
     assert ( NUMELMS ( gs_vehicleTypes ) == 212 );
 
-    // Init
-    m_bDontRemoveFromList = false;
-
     int iVehicleID = 0;
     for ( int i = 0; i < 212; i++ )
     {
@@ -429,42 +426,19 @@ CVehicle* CVehicleManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CL
 void CVehicleManager::DeleteAll ( void )
 {
     // Delete all items
-    m_bDontRemoveFromList = true;
-    list < CVehicle* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        delete *iter;
-    }
-
-    // Clear the list
-    m_List.clear ();
-    m_bDontRemoveFromList = false;
+    DeletePointersAndClearList ( m_List );
 }
 
 
 void CVehicleManager::RemoveFromList ( CVehicle* pVehicle )
 {
-    if ( !m_bDontRemoveFromList && !m_List.empty() )
-    {
-        m_List.remove ( pVehicle );
-    }
+    m_List.remove ( pVehicle );
 }
 
 
 bool CVehicleManager::Exists ( CVehicle* pVehicle )
 {
-    // Try to find the vehicle ID in the list
-    list < CVehicle* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        if ( (*iter) == pVehicle )
-        {
-            return true;
-        }
-    }
-
-    // Couldn't find it
-    return false;
+    return ListContains ( m_List, pVehicle );
 }
 
 

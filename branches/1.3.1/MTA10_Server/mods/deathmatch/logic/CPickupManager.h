@@ -44,11 +44,10 @@ public:
 
 private:
     inline void                     AddToList                               ( CPickup* pPickup )        { m_List.push_back ( pPickup ); };
-    inline void                     RemoveFromList                          ( CPickup* pPickup )        { if ( !m_bDontRemoveFromList && !m_List.empty() ) m_List.remove ( pPickup); };
+    inline void                     RemoveFromList                          ( CPickup* pPickup )        { m_List.remove ( pPickup); };
 
     CColManager*                    m_pColManager;
     list < CPickup* >               m_List;
-    bool                            m_bDontRemoveFromList;
 };
 
 #endif

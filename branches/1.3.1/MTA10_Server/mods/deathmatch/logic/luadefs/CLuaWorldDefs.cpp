@@ -1169,7 +1169,7 @@ int CLuaWorldDefs::setJetpackWeaponEnabled ( lua_State* luaVM )
     eWeaponType weaponType;
     bool bEnabled;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadEnumString ( weaponType );
+    argStream.ReadEnumStringOrNumber ( weaponType );
     argStream.ReadBool ( bEnabled );
 
     if ( !argStream.HasErrors() )
@@ -1181,7 +1181,7 @@ int CLuaWorldDefs::setJetpackWeaponEnabled ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setJetpackWeaponEnabled", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1193,7 +1193,7 @@ int CLuaWorldDefs::getJetpackWeaponEnabled ( lua_State* luaVM )
     eWeaponType weaponType;
     bool bEnabled;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadEnumString ( weaponType );
+    argStream.ReadEnumStringOrNumber ( weaponType );
 
     if ( !argStream.HasErrors() )
     {

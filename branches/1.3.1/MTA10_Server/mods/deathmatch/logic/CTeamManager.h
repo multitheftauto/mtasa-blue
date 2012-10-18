@@ -38,7 +38,6 @@ public:
 
 private:
     std::list < CTeam* >    m_List;
-    bool                    m_bRemoveFromList;
 };
 
 #endif

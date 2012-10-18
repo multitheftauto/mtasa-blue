@@ -3768,37 +3768,25 @@ int CLuaFunctionDefinitions::SetPedDoingGangDriveby ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GiveWeapon ( lua_State* luaVM )
 {
-    // Verify the arguments
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING || iArgument3 == LUA_TNONE ) )
+// bool giveWeapon ( ped thePlayer, int weapon [, int ammo=30, bool setAsCurrent=false ] )
+    CElement* pElement; eWeaponType weaponType; ushort usAmmo; bool bSetAsCurrent;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadEnumStringOrNumber ( weaponType );
+    argStream.ReadNumber ( usAmmo, 30 );
+    argStream.ReadBool ( bSetAsCurrent, false );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        unsigned char ucWeaponID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-        unsigned short usAmmo = 30;
-        if ( iArgument3 != LUA_TNONE )
-            usAmmo = static_cast < unsigned short > ( lua_tonumber ( luaVM, 3 ) );
-
-        bool bSetAsCurrent = false;
-        if ( lua_type ( luaVM, 4 ) == LUA_TBOOLEAN )
-            bSetAsCurrent = ( lua_toboolean ( luaVM, 4 ) ) ? true:false;
-
-        if ( pElement )
+        if ( CStaticFunctionDefinitions::GiveWeapon ( pElement, weaponType, usAmmo, bSetAsCurrent ) )
         {
-            if ( CStaticFunctionDefinitions::GiveWeapon ( pElement, ucWeaponID, usAmmo, bSetAsCurrent ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "giveWeapon", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "giveWeapon" );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -3807,35 +3795,24 @@ int CLuaFunctionDefinitions::GiveWeapon ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::TakeWeapon ( lua_State* luaVM )
 {
-    // Verify the arguments
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING || iArgument3 == LUA_TNONE ) )
-    {
-        // Grab the arguments
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        unsigned char ucWeaponID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-        unsigned short usAmmo = 9999;
-        if ( iArgument3 != LUA_TNONE )
-            usAmmo = static_cast < unsigned short > ( lua_tonumber ( luaVM, 3 ) );    
+// bool takeWeapon ( player thePlayer, int weaponId [, int ammo ] )
+    CElement* pElement; eWeaponType weaponType; ushort usAmmo;
 
-        if ( pElement )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadEnumStringOrNumber ( weaponType );
+    argStream.ReadNumber ( usAmmo, 9999 );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::TakeWeapon ( pElement, weaponType, usAmmo ) )
         {
-            // Do it
-            if ( CStaticFunctionDefinitions::TakeWeapon ( pElement, ucWeaponID, usAmmo ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "takeWeapon", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "takeWeapon" );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -3871,36 +3848,25 @@ int CLuaFunctionDefinitions::TakeAllWeapons ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetWeaponAmmo ( lua_State* luaVM )
 {
-    // Verify the arguments
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
+// bool setWeaponAmmo ( player thePlayer, int weapon, int totalAmmo, [int ammoInClip = 0] )
+    CElement* pElement; eWeaponType weaponType; ushort usAmmo; ushort usAmmoInClip;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadEnumStringOrNumber ( weaponType );
+    argStream.ReadNumber ( usAmmo );
+    argStream.ReadNumber ( usAmmoInClip, 0 );
+
+    if ( !argStream.HasErrors () )
     {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        unsigned char ucWeaponID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-        unsigned short usAmmo = static_cast < unsigned short > ( lua_tonumber ( luaVM, 3 ) );
-        unsigned short usAmmoInClip = 0;
-        if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
+        if ( CStaticFunctionDefinitions::SetWeaponAmmo ( pElement, weaponType, usAmmo, usAmmoInClip ) )
         {
-            usAmmoInClip = static_cast < unsigned short > ( lua_tonumber ( luaVM, 4 ) );
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        if ( pElement )
-        {
-            if ( CStaticFunctionDefinitions::SetWeaponAmmo ( pElement, ucWeaponID, usAmmo, usAmmoInClip ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setWeaponAmmo", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setWeaponAmmo" );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -3909,19 +3875,21 @@ int CLuaFunctionDefinitions::SetWeaponAmmo ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetSlotFromWeapon ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER || lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    eWeaponType weaponType;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumStringOrNumber( weaponType );
+
+    if ( !argStream.HasErrors ( ) )
     {
-        unsigned char ucWeaponID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
-        char cSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
+        char cSlot = CWeaponNames::GetSlotFromWeapon ( weaponType );
         if ( cSlot >= 0 )
             lua_pushnumber ( luaVM, cSlot );
         else
             lua_pushboolean ( luaVM, false );
-        //lua_pushnumber ( luaVM, CWeaponNames::GetSlotFromWeapon ( ucWeaponID ) );
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getSlotFromWeapon" );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;

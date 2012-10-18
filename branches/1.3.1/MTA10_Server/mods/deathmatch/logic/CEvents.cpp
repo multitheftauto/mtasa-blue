@@ -47,7 +47,7 @@ void CEvents::RemoveEvent ( SEvent* pEvent )
     assert ( pEvent );
 
     // Remove it and delete it
-    if ( !m_Events.empty() ) m_Events.remove ( pEvent );
+    m_Events.remove ( pEvent );
     delete pEvent;
 }
 
@@ -61,7 +61,7 @@ void CEvents::RemoveEvent ( const char* szName )
     if ( pEvent )
     {
         // Delete it
-        if ( !m_Events.empty() ) m_Events.remove ( pEvent );
+        m_Events.remove ( pEvent );
         delete pEvent;
     }
 }

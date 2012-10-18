@@ -114,7 +114,7 @@ void CTeam::AddPlayer ( CPlayer* pPlayer, bool bChangePlayer )
 
 void CTeam::RemovePlayer ( CPlayer* pPlayer, bool bChangePlayer )
 {
-    if ( !m_Players.empty() ) m_Players.remove ( pPlayer );
+    m_Players.remove ( pPlayer );
     if ( bChangePlayer )
         pPlayer->SetTeam ( NULL, false );
 }

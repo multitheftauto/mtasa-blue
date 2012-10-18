@@ -18,7 +18,6 @@
 CAccountManager::CAccountManager ( const char* szFileName, SString strBuffer ): CXMLConfig ( szFileName )
     , m_AccountProtect( 6, 30000, 60000 * 1 )     // Max of 6 attempts per 30 seconds, then 1 minute ignore
 {
-    m_bRemoveFromList = true;
     m_bAutoLogin = false;
     m_llLastTimeSaved = GetTickCount64_ ();
     m_bChangedSinceSaved = false;
@@ -552,10 +551,7 @@ CAccount* CAccountManager::GetAccountFromScriptID ( uint uiScriptID )
 
 void CAccountManager::RemoveFromList ( CAccount* pAccount )
 {
-    if ( m_bRemoveFromList )
-    {
-        m_List.remove ( pAccount );
-    }
+    m_List.remove ( pAccount );
 }
 
 void CAccountManager::ChangingName ( CAccount* pAccount, const SString& strOldName, const SString& strNewName )
@@ -575,14 +571,7 @@ void CAccountManager::MarkAsChanged ( CAccount* pAccount )
 
 void CAccountManager::RemoveAll ( void )
 {
-    m_bRemoveFromList = false;
-    CMappedAccountList::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end () ; iter++ )
-    {
-        delete *iter;
-    }
-    m_List.clear ();
-    m_bRemoveFromList = true;
+    DeletePointersAndClearList ( m_List );
 }
 
 bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, const char* szNick, const char* szPassword )

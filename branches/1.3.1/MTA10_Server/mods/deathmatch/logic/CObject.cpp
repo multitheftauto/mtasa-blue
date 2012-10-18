@@ -86,7 +86,6 @@ void CObject::Unlink ( void )
 {
     // Remove us from the manager's list
     m_pObjectManager->RemoveFromList ( this );
-    m_pObjectManager->m_Attached.remove ( this );
 
     // Remove LowLod refs in others
     SetLowLodObject ( NULL );
@@ -327,24 +326,8 @@ void CObject::StopMoving ( void )
      {
          return NULL;
      }
- }
-
-void CObject::AttachTo ( CElement * pElement )
-{
-    CElement * pPreviousAttachedToElement = m_pAttachedTo;
-    CElement::AttachTo ( pElement );
-
-    if ( !pPreviousAttachedToElement && m_pAttachedTo )
-    {
-        // Add us to our managers attached list
-        m_pObjectManager->m_Attached.push_back ( this );
-    }
-    else if ( pPreviousAttachedToElement && !m_pAttachedTo )
-    {
-        // Remove us from our managers attached list
-        m_pObjectManager->m_Attached.remove ( this );
-    }
 }
+
 
 void CObject::SetSyncer ( CPlayer* pPlayer )
 {

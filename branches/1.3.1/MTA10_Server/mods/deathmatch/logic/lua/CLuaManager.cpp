@@ -112,7 +112,7 @@ bool CLuaManager::RemoveVirtualMachine ( CLuaMain * vm )
         }
 
         // Remove it from our list
-        if ( !m_virtualMachines.empty() ) m_virtualMachines.remove ( vm );
+        m_virtualMachines.remove ( vm );
 
         return true;
     }

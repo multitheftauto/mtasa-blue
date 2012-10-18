@@ -288,6 +288,44 @@ public:
 
 
     //
+    // Read next string or number as an enum
+    //
+    template < class T >
+    bool ReadEnumStringOrNumber ( T& outValue )
+    {
+        int iArgument = lua_type ( m_luaVM, m_iIndex );
+        if ( iArgument == LUA_TSTRING )
+        {
+            SString strValue = lua_tostring ( m_luaVM, m_iIndex );
+            if ( StringToEnum ( strValue, outValue ) )
+            {
+                m_iIndex++;
+                return true;
+            }
+
+            // If will be coercing a string to an enum, make sure string contains only digits
+            uint uiPos = strValue.find_first_not_of ( "0123456789" );
+            if ( uiPos != SString::npos || strValue.empty () )
+                iArgument = LUA_TNONE;  //  Force error
+        }
+        if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
+        {
+            outValue = static_cast < T > ( (int)lua_tonumber ( m_luaVM, m_iIndex ) );
+            if ( EnumValueValid ( outValue ) )
+            {
+                m_iIndex++;
+                return true;
+            }
+        }
+
+        outValue = (T)0;
+        SetTypeError ( GetEnumTypeName ( outValue ) );
+        m_iIndex++;
+        return false;
+    }
+
+
+    //
     // Read next userdata, using default if needed
     //
     template < class T >
