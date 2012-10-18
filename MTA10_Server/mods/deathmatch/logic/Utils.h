@@ -211,8 +211,8 @@ void DeletePointersAndClearList ( T& elementList )
     T cloneList = elementList;
     elementList.clear ();
 
-    T ::const_iterator iter = cloneList.begin ();
-    for ( ; iter != cloneList.end (); iter++ )
+    typename T::const_iterator iter = cloneList.begin ();
+    for ( ; iter != cloneList.end () ; iter++ )
     {
         delete *iter;
     }
