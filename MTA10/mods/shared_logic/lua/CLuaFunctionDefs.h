@@ -511,6 +511,7 @@ public:
     LUA_DECLARE ( EnginePositionSeats );
     LUA_DECLARE ( EngineAddAllAtomics );
     LUA_DECLARE ( EngineReplaceVehiclePart );
+    LUA_DECLARE ( EngineGetModelLODDistance );
     LUA_DECLARE ( EngineSetModelLODDistance );
     LUA_DECLARE ( EngineSetAsynchronousLoading );
     LUA_DECLARE ( EngineApplyShaderToWorldTexture );
