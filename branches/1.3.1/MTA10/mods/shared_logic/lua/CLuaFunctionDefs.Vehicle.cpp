@@ -2853,7 +2853,7 @@ int CLuaFunctionDefs::SetVehicleSirens ( lua_State* luaVM )
 
     argStream.ReadUserData ( pVehicle );
     argStream.ReadNumber ( ucSirenID );
-    if ( ucSirenID > 0 )
+    if ( ucSirenID > 0 && ucSirenID < 9 )
     {
         // Array indicies start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
         ucSirenID--;

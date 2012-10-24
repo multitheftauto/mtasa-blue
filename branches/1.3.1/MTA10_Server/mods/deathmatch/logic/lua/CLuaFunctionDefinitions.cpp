@@ -4213,7 +4213,7 @@ int CLuaFunctionDefinitions::SetVehicleSirens( lua_State* luaVM )
 
     argStream.ReadUserData ( pVehicle );
     argStream.ReadNumber ( ucSirenID );
-    if ( ucSirenID > 0 && ucSirenID < 8 )
+    if ( ucSirenID > 0 && ucSirenID < 9 )
     {
         // Array indicies start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
         ucSirenID--;
@@ -4643,7 +4643,7 @@ int CLuaFunctionDefinitions::GetVehicleSirensOn ( lua_State* luaVM )
         if ( pVehicle )
         {
             // Does the vehicle have Sirens?
-            if ( CVehicleManager::HasSirens ( pVehicle->GetModel () ) )
+            if ( CVehicleManager::HasSirens ( pVehicle->GetModel () ) || pVehicle->DoesVehicleHaveSirens () )
             {
                 // Return whether it has its Sirens on or not
                 bool bSirensOn = pVehicle->IsSirenActive ();
