@@ -113,6 +113,7 @@ namespace
                                          { "isWaterDrawnLast",              "1.3.0-9.04584" },
                                          { "setPlayerHudComponentVisible",  "1.3.1-9.04690" },
                                          { "isPlayerHudComponentVisible",   "1.3.1-9.04690" },
+                                         { "engineGetModelLODDistance",     "1.3.1-9.04779" },
                                         };
 
     SVersionItem serverFunctionInitList[] = {
