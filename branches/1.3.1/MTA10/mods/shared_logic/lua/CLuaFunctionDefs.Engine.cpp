@@ -322,6 +322,34 @@ int CLuaFunctionDefs::EngineRestoreModel ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::EngineGetModelLODDistance ( lua_State* luaVM )
+{
+// float engineGetModelLODDistance ( int/string modelID )
+    SString strModelId;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strModelId );
+
+    if ( !argStream.HasErrors () )
+    {
+        ushort usModelID = CModelNames::ResolveModelID ( strModelId );
+        CModelInfo* pModelInfo = g_pGame->GetModelInfo ( usModelID );
+        if ( pModelInfo )
+        {
+            float fDistance = pModelInfo->GetLODDistance ();
+            lua_pushnumber ( luaVM, fDistance );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::EngineSetModelLODDistance ( lua_State* luaVM )
 {
     int iArgument1 = lua_type ( luaVM, 1 );

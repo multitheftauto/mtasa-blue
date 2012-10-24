@@ -614,6 +614,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "engineRestoreCOL", CLuaFunctionDefs::EngineRestoreCOL );
     CLuaCFunctions::AddFunction ( "engineReplaceModel", CLuaFunctionDefs::EngineReplaceModel );
     CLuaCFunctions::AddFunction ( "engineRestoreModel", CLuaFunctionDefs::EngineRestoreModel );
+    CLuaCFunctions::AddFunction ( "engineGetModelLODDistance", CLuaFunctionDefs::EngineGetModelLODDistance );
     CLuaCFunctions::AddFunction ( "engineSetModelLODDistance", CLuaFunctionDefs::EngineSetModelLODDistance );
     CLuaCFunctions::AddFunction ( "engineSetAsynchronousLoading", CLuaFunctionDefs::EngineSetAsynchronousLoading );
     CLuaCFunctions::AddFunction ( "engineApplyShaderToWorldTexture", CLuaFunctionDefs::EngineApplyShaderToWorldTexture );
