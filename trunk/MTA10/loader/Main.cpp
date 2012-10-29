@@ -534,6 +534,8 @@ int DoLaunchGame ( LPSTR lpCmdLine )
                 strOperation = "open";
                 strFile = strMTASAPath + "\\" + MTA_EXE_NAME;
             }
+            else
+                CheckService ( CHECK_SERVICE_POST_GAME );     // Stop service here if quit command is not 'restart'
 
             LPCTSTR lpOperation     = strOperation == "" ? NULL : strOperation.c_str ();
             LPCTSTR lpFile          = strFile.c_str ();
@@ -546,6 +548,8 @@ int DoLaunchGame ( LPSTR lpCmdLine )
                 ShellExecuteNonBlocking( lpOperation, lpFile, lpParameters, lpDirectory, nShowCmd );            
             }
         }
+        else
+            CheckService ( CHECK_SERVICE_POST_GAME );     // Stop service here if quit command is empty
     }
 
     // Maybe show help if trouble was encountered
