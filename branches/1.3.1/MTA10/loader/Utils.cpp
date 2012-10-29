@@ -1600,6 +1600,35 @@ uint WaitForObject ( HANDLE hProcess, HANDLE hThread, DWORD dwMilliseconds, HAND
 
 ///////////////////////////////////////////////////////////////////////////
 //
+// CheckService
+//
+// Check service status
+// Returns false on fail
+//
+///////////////////////////////////////////////////////////////////////////
+bool CheckService ( uint uiStage )
+{
+    HMODULE hModule = GetLibraryHandle ( "kernel32.dll" );
+
+    if ( hModule )
+    {
+        typedef bool (*PFNCheckService) ( uint );
+        PFNCheckService pfnCheckService = static_cast< PFNCheckService > ( static_cast < PVOID > ( GetProcAddress ( hModule, "CheckService" ) ) );
+
+        if ( pfnCheckService )
+        {
+            bool bResult = pfnCheckService ( uiStage );
+            AddReportLog ( 8070, SString ( "CheckService %d result: %d", uiStage, bResult ) );
+            return bResult;
+        }
+    }
+
+    return false;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
 // GetFileAge
 //
 // Returns time in seconds since a file/directory was created

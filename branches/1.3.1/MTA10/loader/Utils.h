@@ -24,6 +24,15 @@ enum ePathResult
     GAME_PATH_OK,
 };
 
+enum
+{
+    CHECK_SERVICE_POST_INSTALL = 1,
+    CHECK_SERVICE_PRE_UNINSTALL = 2,
+    CHECK_SERVICE_POST_UPDATE = 3,
+    CHECK_SERVICE_PRE_GAME = 4,
+    CHECK_SERVICE_POST_GAME = 5,
+};
+
 // Loads the given dll into hProcess. Returns 0 on failure or the handle to the
 // remote dll module on success.
 HMODULE         RemoteLoadLibrary                   ( HANDLE hProcess, const char* szLibPath );
@@ -75,6 +84,7 @@ void            CleanDownloadCache                  ( void );
 HMODULE         GetLibraryHandle                    ( const SString& strFilename );
 void            FreeLibraryHandle                   ( void );
 uint            WaitForObject                       ( HANDLE hProcess, HANDLE hThread, DWORD dwMilliseconds, HANDLE hMutex );
+bool            CheckService                        ( uint uiStage );
 
 void            MaybeShowCopySettingsDialog         ( void );
 
