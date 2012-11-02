@@ -236,7 +236,7 @@ public:
     template < class T >
     bool ReadEnumStringList ( std::vector < T >& outValueList, const SString& strDefaultValue )
     {
-        outValueList.empty ();
+        outValueList.clear ();
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         SString strValue;
         if ( iArgument == LUA_TSTRING )
