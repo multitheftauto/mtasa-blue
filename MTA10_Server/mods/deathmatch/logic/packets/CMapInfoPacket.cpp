@@ -351,6 +351,10 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.Write( pBuildingRemoval->GetPosition ( ).fX );
         BitStream.Write( pBuildingRemoval->GetPosition ( ).fY );
         BitStream.Write( pBuildingRemoval->GetPosition ( ).fZ );
+        if ( BitStream.Version() >= 0x039 )
+        {
+            BitStream.Write ( pBuildingRemoval->GetInterior ( ) );
+        }
     }
     BitStream.WriteBit( false );
 
