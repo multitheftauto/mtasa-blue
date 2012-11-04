@@ -1410,20 +1410,20 @@ namespace SharedUtil
     // Fixed size array
     //
     // Replacement for e.g.  int var[100]
-    // Checks bounds during debug
+    // Checks bounds
     //
     template < class T, int SIZE >
     struct SFixedArray
     {
         T& operator[] ( uint uiIndex )
         {
-            dassert ( uiIndex < SIZE );
+            assert ( uiIndex < SIZE );
             return data [ uiIndex ];
         }
 
         const T& operator[] ( uint uiIndex ) const
         {
-            dassert ( uiIndex < SIZE );
+            assert ( uiIndex < SIZE );
             return data [ uiIndex ];
         }
 
