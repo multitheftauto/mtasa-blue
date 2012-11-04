@@ -36,6 +36,11 @@ class CPed;
 class CObject;
 class CColModel;
 
+#define SIREN_TYPE_FIRST 1
+#define SIREN_TYPE_LAST 6
+#define SIREN_ID_MAX 7
+#define SIREN_COUNT_MAX 8
+
 struct SSirenBeaconInfo
 {
     CVector                     m_vecSirenPositions;

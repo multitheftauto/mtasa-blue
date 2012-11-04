@@ -4726,11 +4726,11 @@ bool CStaticFunctionDefinitions::GiveVehicleSirens( CVehicle* pVehicle, unsigned
     {
         if ( ucSirenType >= 1 && ucSirenType <= 6 )
         {
-            if ( ucSirenCount >= 0 && ucSirenCount <= 7 )
+            if ( ucSirenCount <= SIREN_COUNT_MAX )
             {
                 pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens = true;
 
-                pVehicle->m_tSirenBeaconInfo.m_ucSirenCount = ++ucSirenCount;
+                pVehicle->m_tSirenBeaconInfo.m_ucSirenCount = ucSirenCount;
                 pVehicle->m_tSirenBeaconInfo.m_ucSirenType = ucSirenType;
 
                 pVehicle->m_tSirenBeaconInfo.m_b360Flag = tSirenInfo.m_b360Flag;
@@ -4765,7 +4765,7 @@ bool CStaticFunctionDefinitions::SetVehicleSirens ( CVehicle* pVehicle, unsigned
     // Won't work with below.
     if ( vehicleType != VEHICLE_PLANE && vehicleType != VEHICLE_BOAT && vehicleType != VEHICLE_TRAILER && vehicleType != VEHICLE_HELI && vehicleType != VEHICLE_BIKE && vehicleType != VEHICLE_BMX )
     {
-        if ( ucSirenID >= 0 && ucSirenID <= 7 )
+        if ( ucSirenID <= SIREN_ID_MAX )
         {
             pVehicle->m_tSirenBeaconInfo.m_tSirenInfo[ ucSirenID ] = tSirenInfo.m_tSirenInfo[ ucSirenID ];
 

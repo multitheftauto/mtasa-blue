@@ -4381,8 +4381,6 @@ int CLuaFunctionDefinitions::GiveVehicleSirens ( lua_State* luaVM )
     argStream.ReadNumber ( ucSirenType );
     if ( ucSirenCount > 0)
     {
-        // Array indicies start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
-        ucSirenCount--;
         argStream.ReadBool ( tSirenInfo.m_b360Flag, false );
         argStream.ReadBool ( tSirenInfo.m_bDoLOSCheck, true );
         argStream.ReadBool ( tSirenInfo.m_bUseRandomiser, true );
