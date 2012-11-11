@@ -10,7 +10,7 @@ autoreconf -fiv
 # and probably some unknown issues you should compile and link
 # 32bit objects like so:
 export PKG_CONFIG_PATH=/usr/lib32/pkgconfig
-./configure LDFLAGS="-m32" CPPFLAGS="-m32" CFLAGS="-m32" CXXFLAGS="-m32" $@
+./configure LDFLAGS="-m32" CPPFLAGS="-m32" CFLAGS="-m32" CXXFLAGS="-m32" --enable-silent-rules $@
 
 # then you have makefiles and the source can be compiled :)
 # building in parallel mode (use -j<JOBS>)
