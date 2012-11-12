@@ -114,18 +114,23 @@ namespace SharedUtil
             m_bUseModuleTickCount = bUseModuleTickCount;
         }
 
+        void SetUseModuleTickCount ( bool bUseModuleTickCount )
+        {
+            m_bUseModuleTickCount = bUseModuleTickCount;
+        }
+
         void Reset ( void )
         {
             m_llUpdateTime = DoGetTickCount ();
-            m_llElapsedTime = 0;
+            m_ullElapsedTime = 0;
         }
 
-        long long Get ( void )
+        unsigned long long Get ( void )
         {
             long long llTime = DoGetTickCount ();
-            m_llElapsedTime += Min ( m_llMaxIncrement, llTime - m_llUpdateTime );
+            m_ullElapsedTime += Clamp ( 0LL, llTime - m_llUpdateTime, m_llMaxIncrement );
             m_llUpdateTime = llTime;
-            return m_llElapsedTime;
+            return m_ullElapsedTime;
         }
 
     protected:
@@ -136,10 +141,10 @@ namespace SharedUtil
             return m_bUseModuleTickCount ? GetModuleTickCount64 () : GetTickCount64_ ();
         }
 
-        long long   m_llUpdateTime;
-        long long   m_llElapsedTime;
-        long long   m_llMaxIncrement;
-        bool        m_bUseModuleTickCount;
+        long long           m_llUpdateTime;
+        unsigned long long  m_ullElapsedTime;
+        long long           m_llMaxIncrement;
+        bool                m_bUseModuleTickCount;
     };
 
 
