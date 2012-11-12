@@ -137,6 +137,7 @@ void CInstallManager::InitSequencer ( void )
                 CR " "
                 CR "            CALL ChangeToAdmin "                // If changes failed, try as admin
                 CR "            IF LastResult == ok GOTO service_check: "
+                CR "            CALL Quit "
                 CR " "
                 CR "service_end: "                                  ////// End of 'Driver checks' //////
                 CR "            CALL ChangeFromAdmin "              
@@ -682,8 +683,11 @@ SString CInstallManager::_ProcessServiceChecks ( void )
 {
     if ( !CheckService ( CHECK_SERVICE_PRE_GAME ) )
     {
-        m_strAdminReason = "Update install settings";
-        return "fail";
+        if ( !IsUserAdmin() )
+        {
+            m_strAdminReason = "Update install settings";
+            return "fail";
+        }
     }
     return "ok";
 }
