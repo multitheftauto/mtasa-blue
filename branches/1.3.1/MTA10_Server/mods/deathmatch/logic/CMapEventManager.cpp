@@ -234,10 +234,10 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                     lua_pushelement ( pState, pThis );
                     lua_setglobal ( pState, "this" );
 
-                    lua_pushresource ( pState, pMapEvent->GetVM()->GetResource() );
+                    lua_pushresource ( pState, pMapEvent->GetVM()->GetResource() );     // This is not correct
                     lua_setglobal ( pState, "sourceResource" );
 
-                    lua_pushelement ( pState, pMapEvent->GetVM()->GetResource()->GetResourceRootElement() );
+                    lua_pushelement ( pState, pMapEvent->GetVM()->GetResource()->GetResourceRootElement() );     // This is not correct
                     lua_setglobal ( pState, "sourceResourceRoot" );
 
                     lua_pushstring ( pState, szName );
