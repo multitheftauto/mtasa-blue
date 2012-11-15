@@ -181,12 +181,15 @@ namespace SharedUtil
     #endif
             m_ResultValue.Initialize ( GetTickCount64_ () );
         }
-    
+
         long long Get ( void )
         {
     #ifdef _DEBUG
             if ( m_TimeSinceUpdated.Get () > 10000 )
-                OutputDebugLine ( "WARNING: UpdateModuleTickCount64 not being called for the current module" );
+            {
+                m_TimeSinceUpdated.Reset ();
+                OutputDebugLine ( "WARNING: UpdateModuleTickCount64 might not be called for the current module" );
+            }
     #endif
             return m_ResultValue.GetValue ();
         }
