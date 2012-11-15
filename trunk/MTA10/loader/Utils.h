@@ -31,6 +31,7 @@ enum
     CHECK_SERVICE_POST_UPDATE = 3,
     CHECK_SERVICE_PRE_GAME = 4,
     CHECK_SERVICE_POST_GAME = 5,
+    CHECK_SERVICE_PRE_CREATE = 6,
 };
 
 // Loads the given dll into hProcess. Returns 0 on failure or the handle to the
@@ -72,7 +73,7 @@ void            HideCrashedDialog                   ( void );
 void            ShowD3dDllDialog                    ( HINSTANCE hInstance, const SString& strPath );
 void            HideD3dDllDialog                    ( void );
 
-void            UpdateMTAVersionApplicationSetting  ( void );
+void            UpdateMTAVersionApplicationSetting  ( bool bQuiet = false );
 bool            Is32bitProcess                      ( DWORD processID );
 
 bool            CreateSingleInstanceMutex           ( void );
