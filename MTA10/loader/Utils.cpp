@@ -1405,7 +1405,7 @@ void FreeLibraryHandle ( void )
 // Make sure "mta-version-ext" is correct. eg "1.0.4-9.01234.2.000"
 //
 /////////////////////////////////////////////////////////////////////
-void UpdateMTAVersionApplicationSetting ( void )
+void UpdateMTAVersionApplicationSetting ( bool bQuiet )
 {
 #ifdef MTA_DEBUG
     SString strFilename = "netc_d.dll";
@@ -1440,13 +1440,15 @@ void UpdateMTAVersionApplicationSetting ( void )
             usNetRel = pfnGetNetRel ();
     }
     else
+    if ( !bQuiet )
     {
         SString strError = GetSystemErrorMessage ( GetLastError () );            
         MessageBox ( 0, SString ( "Error loading %s module! (%s)", *strFilename.ToLower (), *strError ), "Error", MB_OK|MB_ICONEXCLAMATION );
         BrowseToSolution ( strFilename + "-not-loadable", true, true );
     }
 
-    SetApplicationSetting ( "mta-version-ext", SString ( "%d.%d.%d-%d.%05d.%c.%03d"
+    if ( !bQuiet )
+        SetApplicationSetting ( "mta-version-ext", SString ( "%d.%d.%d-%d.%05d.%c.%03d"
                                 ,MTASA_VERSION_MAJOR
                                 ,MTASA_VERSION_MINOR
                                 ,MTASA_VERSION_MAINTENANCE

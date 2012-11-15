@@ -36,6 +36,16 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 #endif
 
     //////////////////////////////////////////////////////////
+    // Handle service uninstall request from the installer
+    if ( strcmp( lpCmdLine, "/uninstall" ) == 0 )
+    {
+        UpdateMTAVersionApplicationSetting( true );
+        if ( CheckService( CHECK_SERVICE_PRE_UNINSTALL ) )
+            return 0;
+        return 1;
+    }
+
+    //////////////////////////////////////////////////////////
     //
     // Handle duplicate launching, or running from mtasa:// URI ?
     //
@@ -400,6 +410,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 
     MaybeShowCopySettingsDialog ();
     SetDllDirectory( SString ( strMTASAPath + "\\mta" ) );
+    CheckService ( CHECK_SERVICE_PRE_CREATE );
 
     //////////////////////////////////////////////////////////
     //
