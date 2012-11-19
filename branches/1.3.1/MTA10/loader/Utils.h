@@ -4,14 +4,10 @@
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        loader/Utils.h
 *  PURPOSE:     Loading utilities
-*  DEVELOPERS:  Christian Myhre Lundheim <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
-#ifndef __UTILS_H
-#define __UTILS_H
 
 extern HINSTANCE g_hInstance;
 extern HANDLE g_hMutex;
@@ -93,5 +89,130 @@ bool            CheckAndShowFileOpenFailureMessage  ( void );
 
 #undef CREATE_SUSPENDED
 #define CREATE_SUSPENDED 5
+
+#ifdef DONT_ASSIST_ANTI_VIRUS
+
+    #define _VirtualAllocEx         VirtualAllocEx
+    #define _VirtualProtectEx       VirtualProtectEx
+    #define _VirtualFreeEx          VirtualFreeEx
+    #define _ReadProcessMemory      ReadProcessMemory
+    #define _WriteProcessMemory     WriteProcessMemory
+    #define _CreateProcess          CreateProcess
+    #define _CreateRemoteThread     CreateRemoteThread
+
+#else
+
+    typedef
+    LPVOID
+    (WINAPI
+    *FUNC_VirtualAllocEx)(
+        __in     HANDLE hProcess,
+        __in_opt LPVOID lpAddress,
+        __in     SIZE_T dwSize,
+        __in     DWORD flAllocationType,
+        __in     DWORD flProtect
+        );
+
+
+    typedef
+    BOOL
+    (WINAPI
+    *FUNC_VirtualProtectEx)(
+        __in  HANDLE hProcess,
+        __in  LPVOID lpAddress,
+        __in  SIZE_T dwSize,
+        __in  DWORD flNewProtect,
+        __out PDWORD lpflOldProtect
+        );
+
+    typedef
+    BOOL
+    (WINAPI
+    *FUNC_VirtualFreeEx)(
+        __in HANDLE hProcess,
+        __in LPVOID lpAddress,
+        __in SIZE_T dwSize,
+        __in DWORD  dwFreeType
+        );
+
+    typedef
+    BOOL
+    (WINAPI
+    *FUNC_ReadProcessMemory)(
+        __in      HANDLE hProcess,
+        __in      LPCVOID lpBaseAddress,
+        __out_bcount_part(nSize, *lpNumberOfBytesRead) LPVOID lpBuffer,
+        __in      SIZE_T nSize,
+        __out_opt SIZE_T * lpNumberOfBytesRead
+        );
+
+    typedef
+    BOOL
+    (WINAPI
+    *FUNC_WriteProcessMemory)(
+        __in      HANDLE hProcess,
+        __in      LPVOID lpBaseAddress,
+        __in_bcount(nSize) LPCVOID lpBuffer,
+        __in      SIZE_T nSize,
+        __out_opt SIZE_T * lpNumberOfBytesWritten
+        );
+
+    typedef
+    BOOL
+    (WINAPI
+    *FUNC_CreateProcessA)(
+        __in_opt    LPCSTR lpApplicationName,
+        __inout_opt LPSTR lpCommandLine,
+        __in_opt    LPSECURITY_ATTRIBUTES lpProcessAttributes,
+        __in_opt    LPSECURITY_ATTRIBUTES lpThreadAttributes,
+        __in        BOOL bInheritHandles,
+        __in        DWORD dwCreationFlags,
+        __in_opt    LPVOID lpEnvironment,
+        __in_opt    LPCSTR lpCurrentDirectory,
+        __in        LPSTARTUPINFOA lpStartupInfo,
+        __out       LPPROCESS_INFORMATION lpProcessInformation
+        );
+
+    typedef
+    HANDLE
+    (WINAPI
+    *FUNC_CreateRemoteThread)(
+        __in      HANDLE hProcess,
+        __in_opt  LPSECURITY_ATTRIBUTES lpThreadAttributes,
+        __in      SIZE_T dwStackSize,
+        __in      LPTHREAD_START_ROUTINE lpStartAddress,
+        __in_opt  LPVOID lpParameter,
+        __in      DWORD dwCreationFlags,
+        __out_opt LPDWORD lpThreadId
+        );
+
+    void* LoadFunction ( const char* c, const char* a, const char* b );
+
+    #define _DEFFUNCTION( name, a,b,c ) \
+        inline FUNC_##name __##name ( void ) \
+        { \
+            static FUNC_##name pfn = NULL; \
+            if ( !pfn ) \
+                pfn = (FUNC_##name)LoadFunction ( #c, #a, #b ); \
+            return pfn; \
+        }
+
+    #define DEFFUNCTION( a,b,c )    _DEFFUNCTION( a##b##c, a,b,c )
+
+    #define _VirtualAllocEx         __VirtualAllocEx()
+    #define _VirtualProtectEx       __VirtualProtectEx()
+    #define _VirtualFreeEx          __VirtualFreeEx()
+    #define _ReadProcessMemory      __ReadProcessMemory()
+    #define _WriteProcessMemory     __WriteProcessMemory()
+    #define _CreateProcessA         __CreateProcessA()
+    #define _CreateRemoteThread     __CreateRemoteThread()
+
+    DEFFUNCTION( Virt,ualAll,ocEx )
+    DEFFUNCTION( Virt,ualPro,tectEx )
+    DEFFUNCTION( Virt,ualFre,eEx )
+    DEFFUNCTION( Read,Proces,sMemory )
+    DEFFUNCTION( Writ,eProce,ssMemory )
+    DEFFUNCTION( Crea,teProc,essA )
+    DEFFUNCTION( Crea,teRemo,teThread )
 
 #endif
