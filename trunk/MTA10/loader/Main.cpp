@@ -426,7 +426,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     WatchDogBeginSection ( "L2" );      // Gets closed when loading screen is shown
 
     // Start GTA
-    if ( 0 == CreateProcess ( strGTAEXEPath,
+    if ( 0 == _CreateProcessA( strGTAEXEPath,
                               (LPSTR)*strCmdLine,
                               NULL,
                               NULL,

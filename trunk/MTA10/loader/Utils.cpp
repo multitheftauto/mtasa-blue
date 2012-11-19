@@ -43,27 +43,27 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
     uchar* pWinMainUS = (uchar*)0x748710;
     uchar* pWinMainEuro = (uchar*)0x748760;
     uchar buffer[1] = { 0 };
-    ReadProcessMemory ( hProcess, pWinMainEuro + 2, &buffer, sizeof( buffer ), NULL );
+    _ReadProcessMemory ( hProcess, pWinMainEuro + 2, &buffer, sizeof( buffer ), NULL );
     bool bIsEuro = ( buffer[0] == 0x84 );
     uchar* pWinMain = bIsEuro ? pWinMainEuro : pWinMainUS;
 
     // Put an infinite loop at WinMain to stop GTA from running before we are ready
     {
         DWORD oldProt1;
-        VirtualProtectEx ( hProcess, pWinMain - 2, 4, PAGE_EXECUTE_READWRITE, &oldProt1 );
+        _VirtualProtectEx ( hProcess, pWinMain - 2, 4, PAGE_EXECUTE_READWRITE, &oldProt1 );
 
         const unsigned char blockCode[] = { 0xEB, 0xFE, 0xEB, 0xFC };
-        WriteProcessMemory ( hProcess, pWinMain - 2, blockCode, sizeof( blockCode ), NULL );
+        _WriteProcessMemory ( hProcess, pWinMain - 2, blockCode, sizeof( blockCode ), NULL );
 
         DWORD oldProt2;
-        VirtualProtectEx ( hProcess, pWinMain - 2, 4, oldProt1, &oldProt2 );
+        _VirtualProtectEx ( hProcess, pWinMain - 2, 4, oldProt1, &oldProt2 );
     }
 
     /* Allocate memory in the remote process for the library path */
     HANDLE hThread = 0;
     void* pLibPathRemote = NULL;
     HMODULE hKernel32 = GetModuleHandle( "Kernel32" );
-    pLibPathRemote = VirtualAllocEx( hProcess, NULL, strlen ( szLibPath ) + 1, MEM_COMMIT, PAGE_READWRITE );
+    pLibPathRemote = _VirtualAllocEx( hProcess, NULL, strlen ( szLibPath ) + 1, MEM_COMMIT, PAGE_READWRITE );
     
     if ( pLibPathRemote == NULL )
     {
@@ -75,7 +75,7 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 
         /* Write the DLL library path to the remote allocation */
         DWORD byteswritten = 0;
-        WriteProcessMemory ( hProcess, pLibPathRemote, (void*)szLibPath, strlen ( szLibPath ) + 1, &byteswritten );
+        _WriteProcessMemory ( hProcess, pLibPathRemote, (void*)szLibPath, strlen ( szLibPath ) + 1, &byteswritten );
 
         if ( byteswritten != strlen ( szLibPath ) + 1 )
         {
@@ -86,7 +86,7 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
            remotly allocated path buffer as an argument to that thread (and also to LoadLibraryA)
            will make the remote process load the DLL into it's userspace (giving the DLL full
            access to the game executable).*/
-        hThread = CreateRemoteThread(   hProcess,
+        hThread = _CreateRemoteThread(   hProcess,
                                         NULL,
                                         0,
                                         reinterpret_cast < LPTHREAD_START_ROUTINE > ( GetProcAddress ( hKernel32, "LoadLibraryA" ) ),
@@ -101,7 +101,7 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 
 
     } __finally {
-        VirtualFreeEx( hProcess, pLibPathRemote, strlen ( szLibPath ) + 1, MEM_RELEASE );
+        _VirtualFreeEx( hProcess, pLibPathRemote, strlen ( szLibPath ) + 1, MEM_RELEASE );
     }
 
     /*  We wait for the created remote thread to finish executing. When it's done, the DLL
@@ -118,27 +118,27 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 
 
     /* Clean up the resources we used to inject the DLL */
-    VirtualFreeEx (hProcess, pLibPathRemote, strlen ( szLibPath ) + 1, MEM_RELEASE );
+    _VirtualFreeEx (hProcess, pLibPathRemote, strlen ( szLibPath ) + 1, MEM_RELEASE );
 
     // Remove infinite loop at WinMain which stopped GTA from running before we were ready
     {
         DWORD oldProt1;
-        VirtualProtectEx ( hProcess, pWinMain - 2, 4, PAGE_EXECUTE_READWRITE, &oldProt1 );
+        _VirtualProtectEx ( hProcess, pWinMain - 2, 4, PAGE_EXECUTE_READWRITE, &oldProt1 );
 
         // Order is important in case the code is being executed (CPU cache may cause issues?)
         const unsigned char unblockCode1[] = { 0x81, 0xEC };
-        WriteProcessMemory ( hProcess, pWinMain - 0, unblockCode1, sizeof( unblockCode1 ), NULL );
+        _WriteProcessMemory ( hProcess, pWinMain - 0, unblockCode1, sizeof( unblockCode1 ), NULL );
 
         const unsigned char unblockCode2[] = { 0x00 };
-        WriteProcessMemory ( hProcess, pWinMain - 1, unblockCode2, sizeof( unblockCode2 ), NULL );
+        _WriteProcessMemory ( hProcess, pWinMain - 1, unblockCode2, sizeof( unblockCode2 ), NULL );
 
         Sleep ( 1 );
 
         const unsigned char unblockCode3[] = { 0x90, 0x90 };
-        WriteProcessMemory ( hProcess, pWinMain - 2, unblockCode3, sizeof( unblockCode3 ), NULL );
+        _WriteProcessMemory ( hProcess, pWinMain - 2, unblockCode3, sizeof( unblockCode3 ), NULL );
 
         DWORD oldProt2;
-        VirtualProtectEx ( hProcess, pWinMain - 2, 4, oldProt1, &oldProt2 );
+        _VirtualProtectEx ( hProcess, pWinMain - 2, 4, oldProt1, &oldProt2 );
     }
 
     /* Success */
@@ -1912,4 +1912,19 @@ bool CheckAndShowFileOpenFailureMessage ( void )
         return true;
     }
     return false;
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// LoadFunction
+//
+// Load a library function
+//
+//////////////////////////////////////////////////////////
+void* LoadFunction( const char* c, const char* a, const char* b )
+{
+    static HMODULE hModule = LoadLibrary( "kernel32" );
+    SString strFunctionName( "%s%s%s", a, b, c );
+    return static_cast < PVOID >( GetProcAddress( hModule, strFunctionName ) );
 }
