@@ -40,6 +40,8 @@ class CServerImpl;
 
 typedef CXML* (*InitXMLInterface) ( void );
 typedef CNetServer* (*InitNetServerInterface) ( void );
+typedef void (*ReleaseXMLInterface) ( void );
+typedef void (*ReleaseNetServerInterface) ( void );
 
 #ifdef WIN32
 typedef void (FClientFeedback) ( const char* szText );
@@ -58,7 +60,6 @@ public:
 
     CNetServer*         GetNetwork          ( void );
     CModManager*        GetModManager       ( void );
-    CTCP*               GetTCP              ( void );
     CXML*               GetXML              ( void );
 
     inline const char*  GetServerModPath   ( void )                { return m_strServerModPath; };
@@ -89,7 +90,6 @@ private:
     CDynamicLibrary     m_XMLLibrary;
     CNetServer*         m_pNetwork;
     CModManagerImpl*    m_pModManager;
-    CTCPImpl*           m_pTCP;
     CXML*               m_pXML;
 
 #ifdef WIN32

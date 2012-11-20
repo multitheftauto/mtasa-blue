@@ -16,6 +16,28 @@
 #include <stdio.h>
 #include "CDynamicLibrary.h"
 
+///////// Temp stuff to debug exit crash/////////
+#define LOG_SHUTDOWN_PATH   "shutdown.log"
+
+void LogShutdown( const char* szMessage )
+{
+    const char* pBuffer = szMessage;
+    unsigned long ulSize = strlen(szMessage);
+
+    FILE* fh = fopen ( LOG_SHUTDOWN_PATH, "ab" );
+    if ( !fh )
+        return;
+
+    bool bSaveOk = true;
+    if ( ulSize )
+        bSaveOk = ( fwrite ( pBuffer, 1, ulSize, fh ) == ulSize );
+    bSaveOk = ( fwrite ( "\n", 1, 1, fh ) == ulSize );
+    fclose ( fh );
+    return;
+}
+
+/////////////////////////////////////////////////
+
 CDynamicLibrary::CDynamicLibrary ( void )
 {
     // Init
@@ -58,11 +80,13 @@ void CDynamicLibrary::Unload ( void )
     // Got a module?
     if ( m_hModule != 0 )
     {
+        LogShutdown( "(Launcher) CDynamicLibrary::Unload" );
         #ifdef WIN32
             FreeLibrary ( m_hModule );
         #else
             dlclose ( m_hModule );
         #endif
+        LogShutdown( "(Launcher) CDynamicLibrary::Unload - Done" );
 
         // Zero out our library as it's no longer valid
         m_hModule = 0;
