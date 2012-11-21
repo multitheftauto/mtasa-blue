@@ -130,6 +130,11 @@ void CModManagerImpl::Unload ( void )
         m_pBase->ServerShutdown ();
         m_pBase = NULL;
 
+#ifdef WIN32
+        // Exit crash test
+        if ( m_pServer->HasConsole() )
+            TerminateProcess( GetCurrentProcess(), 0 );
+#endif
         // Unload the library
         m_Library.Unload ();
     }
