@@ -40,7 +40,7 @@ void            TerminateOtherMTAIfRunning          ( void );
 bool            IsOtherMTARunning                   ( void );
 
 void            ShowSplash                          ( HINSTANCE hInstance );
-void            HideSplash                          ( bool bOnlyDelay = false );
+void            HideSplash                          ( void );
 
 long            DisplayErrorMessageBox              ( const SString& strMessage, const SString& strTroubleType = "" );
 
