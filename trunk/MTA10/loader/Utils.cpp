@@ -22,7 +22,6 @@ static bool bOkPressed = false;
 static bool bOtherPressed = false;
 static int iOtherCode = 0;
 static HWND hwndSplash = NULL;
-static unsigned long ulSplashStartTime = 0;
 static HWND hwndProgressDialog = NULL;
 static unsigned long ulProgressStartTime = 0;
 static SString g_strMTASAPath;
@@ -541,7 +540,6 @@ void ShowSplash ( HINSTANCE hInstance )
     if ( !hwndSplash )
     {
         hwndSplash = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, DialogProc );
-        ulSplashStartTime = GetTickCount32 ();
     }
     SetForegroundWindow ( hwndSplash );
     SetWindowPos ( hwndSplash, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
@@ -552,20 +550,12 @@ void ShowSplash ( HINSTANCE hInstance )
 //
 // Hide splash dialog
 //
-void HideSplash ( bool bOnlyDelay  )
+void HideSplash ( void )
 {
     if ( hwndSplash )
     {
-        // Show splash for at least two seconds
-        unsigned long ulTimeElapsed = GetTickCount32 () - ulSplashStartTime;
-        if ( ulTimeElapsed < 2000 )
-            Sleep ( 2000 - ulTimeElapsed );
-
-        if ( !bOnlyDelay )
-        {
-            DestroyWindow ( hwndSplash );
-            hwndSplash = NULL;
-        }
+        DestroyWindow ( hwndSplash );
+        hwndSplash = NULL;
     }
 }
 
