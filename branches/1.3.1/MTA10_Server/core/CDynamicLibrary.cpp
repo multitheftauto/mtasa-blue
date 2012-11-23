@@ -14,7 +14,6 @@
 #include "StdInc.h"
 #include "CDynamicLibrary.h"
 #include "MTAPlatform.h"
-void LogShutdown( const SString& strMessage );
 
 #ifdef WIN32
 #include <stdio.h>
@@ -106,13 +105,11 @@ void CDynamicLibrary::Unload ( void )
     // Got a module?
     if ( m_hModule != 0 )
     {
-        LogShutdown( SString( "CDynamicLibrary::Unload m_hModule:%08x", m_hModule ) );
         #ifdef WIN32
             FreeLibrary ( m_hModule );
         #else
             dlclose ( m_hModule );
         #endif
-        LogShutdown( "CDynamicLibrary::Unload - Done" );
 
         // Zero out our library as it's no longer valid
         m_hModule = 0;

@@ -24,25 +24,6 @@
 #include "net/SimHeaders.h"
 #include <signal.h>
 
-///////// Temp stuff to debug exit crash/////////
-#define SAFE_DELETE_LOG(ptr) \
-        LogShutdown( "Delete " #ptr ); \
-        SAFE_DELETE( ptr );
-
-#define LOG_SHUTDOWN_PATH   "shutdown.log"
-
-void LogShutdownBegin( void )
-{
-    FileDelete( LOG_SHUTDOWN_PATH );
-}
-
-void LogShutdown( const SString& strMessage )
-{
-    SString strLine( "%s - %s\n", *GetLocalTimeString( true ), *strMessage );
-    FileAppend( LOG_SHUTDOWN_PATH, strLine );
-}
-/////////////////////////////////////////////////
-
 #define MAX_BULLETSYNC_DISTANCE 400.0f
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
 #define MAX_PROJECTILE_SYNC_DISTANCE 400.0f
@@ -249,7 +230,7 @@ void CGame::ResetMapInfo ( void )
     g_pGame->SetHasSunSize ( false );
     g_pGame->SetHasWindVelocity ( false );
 }
-   
+
 CGame::~CGame ( void )
 {
     m_bBeingDeleted = true;
@@ -294,37 +275,33 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pBanManager );
     SAFE_DELETE ( m_pTeamManager );
     SAFE_DELETE ( m_pMainConfig );
-    LogShutdownBegin();
-    LogShutdown( "CloseRegistry" );
     if ( m_pRegistryManager )
         m_pRegistryManager->CloseRegistry ( m_pRegistry );
     m_pRegistry = NULL;
-    SAFE_DELETE_LOG ( m_pAccountManager );
-    SAFE_DELETE_LOG ( m_pRegistryManager );
-    SAFE_DELETE_LOG ( m_pDatabaseManager );
-    SAFE_DELETE_LOG ( m_pLuaCallbackManager );
-    SAFE_DELETE_LOG ( m_pRegisteredCommands );
-    SAFE_DELETE_LOG ( m_pPedManager );
-    SAFE_DELETE_LOG ( m_pLatentTransferManager );
-    SAFE_DELETE_LOG ( m_pHTTPD );
-    SAFE_DELETE_LOG ( m_pACLManager );
-    SAFE_DELETE_LOG ( m_pGroups );
-    SAFE_DELETE_LOG ( m_pZoneNames );
-    SAFE_DELETE_LOG ( m_pASE );
-    SAFE_DELETE_LOG ( m_pSettings );
-    SAFE_DELETE_LOG ( m_pRemoteCalls );
-    SAFE_DELETE_LOG ( m_pRPCFunctions );
-    SAFE_DELETE_LOG ( m_pWaterManager );
-    SAFE_DELETE_LOG ( m_pWeaponStatsManager );
-    SAFE_DELETE_LOG ( m_pBuildingRemovalManager );
-    SAFE_DELETE_LOG ( m_pOpenPortsTester );
-    LogShutdown( "CSimControl" );
+    SAFE_DELETE ( m_pAccountManager );
+    SAFE_DELETE ( m_pRegistryManager );
+    SAFE_DELETE ( m_pDatabaseManager );
+    SAFE_DELETE ( m_pLuaCallbackManager );
+    SAFE_DELETE ( m_pRegisteredCommands );
+    SAFE_DELETE ( m_pPedManager );
+    SAFE_DELETE ( m_pLatentTransferManager );
+    SAFE_DELETE ( m_pHTTPD );
+    SAFE_DELETE ( m_pACLManager );
+    SAFE_DELETE ( m_pGroups );
+    SAFE_DELETE ( m_pZoneNames );
+    SAFE_DELETE ( m_pASE );
+    SAFE_DELETE ( m_pSettings );
+    SAFE_DELETE ( m_pRemoteCalls );
+    SAFE_DELETE ( m_pRPCFunctions );
+    SAFE_DELETE ( m_pWaterManager );
+    SAFE_DELETE ( m_pWeaponStatsManager );
+    SAFE_DELETE ( m_pBuildingRemovalManager );
+    SAFE_DELETE ( m_pOpenPortsTester );
     CSimControl::Shutdown ();
 
     // Clear our global pointer
     g_pGame = NULL;
 
-    LogShutdown( "SetConsoleCtrlHandler" );
     // Remove our console control handler
     #ifdef WIN32
         SetConsoleCtrlHandler ( ConsoleEventHandler, FALSE );
@@ -333,7 +310,6 @@ CGame::~CGame ( void )
         signal ( SIGINT, SIG_DFL );
         signal ( SIGPIPE, SIG_DFL );
     #endif
-    LogShutdown( "~CGame fin" );
 }
 
 

@@ -486,24 +486,38 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     }
     FreeLibrary ( hCoreModule );
 
-    // Wait until the splash has been displayed the required amount of time
-    HideSplash ( true );
-
     // Inject the core into GTA
     RemoteLoadLibrary ( piLoadee.hProcess, strCoreDLL );
-
-    // Actually hide the splash
-    HideSplash ();
     
     // Clear previous on quit commands
     SetOnQuitCommand ( "" );
 
+    ShowSplash( g_hInstance );  // Bring splash to the front
+
     // Resume execution for the game.
     ResumeThread ( piLoadee.hThread );
 
-    // Wait for game to exit
     if ( piLoadee.hThread)
-        WaitForObject ( piLoadee.hProcess, NULL, INFINITE, g_hMutex );
+    {
+        // Show splash until game window is displayed (or max 20 seconds)
+        DWORD status;
+        for ( uint i = 0 ; i < 20 ; i++ )
+        {
+            status = WaitForSingleObject ( piLoadee.hProcess, 1000 );
+            if ( status != WAIT_TIMEOUT )
+                break;
+
+            if ( !WatchDogIsSectionOpen( "L2" ) )     // Gets closed when loading screen is shown
+                break;
+        }
+
+        // Actually hide the splash
+        HideSplash ();
+
+        // Wait for game to exit
+        if ( status == WAIT_TIMEOUT )
+            WaitForSingleObject ( piLoadee.hProcess, INFINITE );
+    }
 
     // Get its exit code
     DWORD dwExitCode = -1;
