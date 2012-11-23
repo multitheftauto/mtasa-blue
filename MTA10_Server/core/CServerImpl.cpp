@@ -26,25 +26,6 @@
     #include <Mmsystem.h>
 #endif
 
-///////// Temp stuff to debug exit crash/////////
-#define SAFE_DELETE_LOG(ptr) \
-        LogShutdown( "Delete " #ptr ); \
-        SAFE_DELETE( ptr );
-
-#define LOG_SHUTDOWN_PATH   "shutdown.log"
-
-void LogShutdownBegin( void )
-{
-    FileDelete( LOG_SHUTDOWN_PATH );
-}
-
-void LogShutdown( const SString& strMessage )
-{
-    SString strLine( "%s - %s\n", *GetLocalTimeString( true ), *strMessage );
-    FileAppend( LOG_SHUTDOWN_PATH, strLine );
-}
-/////////////////////////////////////////////////
-
 // Define libraries
 char szNetworkLibName[] = "net" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
 char szXMLLibName[] = "xmll" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
@@ -80,6 +61,13 @@ CServerImpl::CServerImpl ( void )
     memset(&m_szTag, 0, sizeof ( m_szTag ) * sizeof ( char ) );
     m_uiInputCount = 0;
 
+    // Create the TCP interface
+    m_pTCP = new CTCPImpl;
+    if ( !m_pTCP->Initialize () )
+    {
+        Print ( "WARNING: Initializing TCP failed ('%s')\n", m_pTCP->GetLastError () );
+    }
+
     // Create our stuff
     m_pModManager = new CModManagerImpl ( this );
 }
@@ -87,27 +75,9 @@ CServerImpl::CServerImpl ( void )
 
 CServerImpl::~CServerImpl ( void )
 {
-    ReleaseNetServerInterface pfnReleaseNetServerInterface = (ReleaseNetServerInterface) ( m_NetworkLibrary.GetProcedureAddress ( "ReleaseNetServerInterface" ) );
-    LogShutdown( SString( "pfnReleaseNetServerInterface:%08x", pfnReleaseNetServerInterface ) );
-    if ( pfnReleaseNetServerInterface )
-        pfnReleaseNetServerInterface();
-
-    ReleaseXMLInterface pfnReleaseXMLInterface = (ReleaseXMLInterface) ( m_XMLLibrary.GetProcedureAddress ( "ReleaseXMLInterface" ) );
-    LogShutdown( SString( "pfnReleaseXMLInterface:%08x", pfnReleaseXMLInterface ) );
-    if ( pfnReleaseXMLInterface )
-        pfnReleaseXMLInterface();
-
-    LogShutdown( "m_NetworkLibrary.Unload" );
-    m_NetworkLibrary.Unload();
-
-    LogShutdown( "m_XMLLibrary.Unload" );
-    m_XMLLibrary.Unload();
-
-    LogShutdown( "delete m_pModManager" );
     // Destroy our stuff
     delete m_pModManager;
-
-    LogShutdown( "~CServerImpl fin" );
+    delete m_pTCP;
 }
 
 
@@ -120,6 +90,12 @@ CNetServer* CServerImpl::GetNetwork ( void )
 CModManager* CServerImpl::GetModManager ( void )
 {
     return m_pModManager;
+}
+
+
+CTCP* CServerImpl::GetTCP ( void )
+{
+    return m_pTCP;
 }
 
 
@@ -408,12 +384,9 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         return ERROR_NO_NETWORK_LIBRARY;
     }
 
-    LogShutdown( "DestroyWindow" );
-
     // Normal termination
     DestroyWindow ( );
 
-    LogShutdown( "RequestedReset" );
     // If a reset was requested, tell the main that
     if ( m_bRequestedReset )
     {
@@ -422,7 +395,6 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         return SERVER_RESET_RETURN;
     }
 
-    LogShutdown( "CServerImpl::Run - Exit" );
     // Otherwize return no error
     return ERROR_NO_ERROR;
 }
