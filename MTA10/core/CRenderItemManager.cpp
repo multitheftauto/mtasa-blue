@@ -689,6 +689,7 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     outStatus.videoCard.iInstalledMemoryKB = m_iVideoCardMemoryKBTotal;
     outStatus.videoCard.strPSVersion = m_strVideoCardPSVersion;
     outStatus.videoCard.depthBufferFormat = m_depthBufferFormat;
+    outStatus.videoCard.iMaxAnisotropy = g_pDeviceState->AdapterState.MaxAnisotropicSetting;
 
     // Memory usage
     outStatus.videoMemoryKB.iFreeForMTA = m_iMemoryKBFreeForMTA;
@@ -701,14 +702,35 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     outStatus.settings.bWindowed = false;
     outStatus.settings.iFXQuality = gameSettings->GetFXQuality(); ;
     outStatus.settings.iDrawDistance = ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f * 100;
+    outStatus.settings.iAntiAliasing = gameSettings->GetAntiAliasing() - 1;
     outStatus.settings.bVolumetricShadows = false;
     outStatus.settings.bAllowScreenUpload = true;
     outStatus.settings.iStreamingMemory = 0;
+    outStatus.settings.bGrassEffect = false;
+    outStatus.settings.bHeatHaze = false;
+    outStatus.settings.iAnisotropicFiltering = 0;
 
     CVARS_GET ( "streaming_memory",     outStatus.settings.iStreamingMemory );
     CVARS_GET ( "display_windowed",     outStatus.settings.bWindowed );
     CVARS_GET ( "volumetric_shadows",   outStatus.settings.bVolumetricShadows );
     CVARS_GET ( "allow_screen_upload",  outStatus.settings.bAllowScreenUpload );
+    CVARS_GET ( "grass",                outStatus.settings.bGrassEffect );
+    CVARS_GET ( "heat_haze",            outStatus.settings.bHeatHaze );
+    CVARS_GET ( "anisotropic",          outStatus.settings.iAnisotropicFiltering );
+
+    if ( outStatus.settings.iFXQuality == 0 )
+    {
+        // These are always off with low fx quality
+        outStatus.settings.bVolumetricShadows = false;
+        outStatus.settings.bGrassEffect = false;
+    }
+
+    // Display color depth
+    D3DFORMAT BackBufferFormat = g_pDeviceState->CreationState.PresentationParameters.BackBufferFormat;
+    if ( BackBufferFormat >= D3DFMT_R5G6B5 && BackBufferFormat < D3DFMT_A8R3G3B2 )
+        outStatus.settings.b32BitColor = 0;
+    else
+        outStatus.settings.b32BitColor = 1;
 
     // Modify if using test mode
     if ( m_TestMode == DX_TEST_MODE_NO_MEM )

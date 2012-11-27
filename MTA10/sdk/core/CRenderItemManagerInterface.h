@@ -86,6 +86,7 @@ struct SDxStatus
         SString         strName;
         int             iInstalledMemoryKB;
         SString         strPSVersion;
+        int             iMaxAnisotropy;
         ERenderFormat   depthBufferFormat;
     } videoCard;
 
@@ -105,6 +106,11 @@ struct SDxStatus
         bool            bVolumetricShadows;
         bool            bAllowScreenUpload;
         int             iStreamingMemory;
+        bool            b32BitColor;
+        bool            bGrassEffect;
+        bool            bHeatHaze;
+        int             iAnisotropicFiltering;
+        int             iAntiAliasing;
     } settings;
 };
 

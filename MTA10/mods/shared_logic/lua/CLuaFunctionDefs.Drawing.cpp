@@ -968,6 +968,10 @@ int CLuaFunctionDefs::dxGetStatus ( lua_State* luaVM )
         lua_pushstring ( luaVM, dxStatus.videoCard.strPSVersion );
         lua_settable   ( luaVM, -3 );
 
+        lua_pushstring ( luaVM, "VideoCardMaxAnisotropy" );
+        lua_pushnumber ( luaVM, dxStatus.videoCard.iMaxAnisotropy );
+        lua_settable   ( luaVM, -3 );
+
         lua_pushstring ( luaVM, "VideoMemoryFreeForMTA" );
         lua_pushnumber ( luaVM, dxStatus.videoMemoryKB.iFreeForMTA / 1024 );
         lua_settable   ( luaVM, -3 );
@@ -1010,6 +1014,26 @@ int CLuaFunctionDefs::dxGetStatus ( lua_State* luaVM )
 
         lua_pushstring ( luaVM, "DepthBufferFormat" );
         lua_pushstring ( luaVM, EnumToString ( dxStatus.videoCard.depthBufferFormat ) );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "Setting32BitColor" );
+        lua_pushboolean( luaVM, dxStatus.settings.b32BitColor );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "SettingGrassEffect" );
+        lua_pushboolean( luaVM, dxStatus.settings.bGrassEffect );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "SettingHeatHaze" );
+        lua_pushboolean( luaVM, dxStatus.settings.bHeatHaze );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "SettingAnisotropicFiltering" );
+        lua_pushnumber ( luaVM, dxStatus.settings.iAnisotropicFiltering );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "SettingAntiAliasing" );
+        lua_pushnumber ( luaVM, dxStatus.settings.iAntiAliasing );
         lua_settable   ( luaVM, -3 );
 
         return 1;
