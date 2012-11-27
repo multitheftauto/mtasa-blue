@@ -235,6 +235,15 @@ HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAM
         }
     }
 
+    // Store actual present parameters used
+    IDirect3DSwapChain9* pSwapChain;
+    m_pDevice->GetSwapChain( 0, &pSwapChain );
+    pSwapChain->GetPresentParameters( &g_pDeviceState->CreationState.PresentationParameters );
+    SAFE_RELEASE( pSwapChain );
+
+    // Store device creation parameters as well
+    m_pDevice->GetCreationParameters ( &g_pDeviceState->CreationState.CreationParameters );
+
     g_pCore->LogEvent( 7123, "Direct3D", "Direct3DDevice9::Reset", "Success" );
     GetVideoModeManager ()->PostReset ( pPresentationParameters );
 
@@ -273,8 +282,7 @@ HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAM
                                 ,pPresentationParameters->PresentationInterval
                            ) );
 
-    D3DDEVICE_CREATION_PARAMETERS parameters;
-    m_pDevice->GetCreationParameters ( &parameters );
+    const D3DDEVICE_CREATION_PARAMETERS& parameters = g_pDeviceState->CreationState.CreationParameters;
 
     WriteDebugEvent ( SString ( "    Adapter:%d  DeviceType:%d  BehaviorFlags:0x%x"
                                 ,parameters.AdapterOrdinal
@@ -379,8 +387,8 @@ HRESULT CProxyDirect3DDevice9::GetFrontBufferData             ( UINT iSwapChain,
 
 HRESULT CProxyDirect3DDevice9::StretchRect                    ( IDirect3DSurface9* pSourceSurface,CONST RECT* pSourceRect,IDirect3DSurface9* pDestSurface,CONST RECT* pDestRect,D3DTEXTUREFILTERTYPE Filter )
 {
-    CGraphics::GetSingleton ().GetRenderItemManager ()->FlushReadableDepthBuffer ();
-    return m_pDevice->StretchRect ( pSourceSurface, pSourceRect, pDestSurface, pDestRect, Filter );
+    CGraphics::GetSingleton ().GetRenderItemManager ()->HandleStretchRect( pSourceSurface, pSourceRect, pDestSurface, pDestRect, Filter );
+    return D3D_OK;
 }
 
 HRESULT CProxyDirect3DDevice9::ColorFill                      ( IDirect3DSurface9* pSurface,CONST RECT* pRect,D3DCOLOR color )
@@ -447,7 +455,7 @@ HRESULT CProxyDirect3DDevice9::EndScene                       ( VOID )
         // Call real routine.
         HRESULT hResult = m_pDevice->EndScene ();
 
-        CGraphics::GetSingleton ().GetRenderItemManager ()->FlushReadableDepthBuffer ();
+        CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer ();
         return hResult;
     }
 
@@ -458,7 +466,7 @@ HRESULT CProxyDirect3DDevice9::Clear                          ( DWORD Count,CONS
 {
     // If clearing z buffer, make sure we save it first
     if ( Flags | D3DCLEAR_ZBUFFER )
-        CGraphics::GetSingleton ().GetRenderItemManager ()->FlushReadableDepthBuffer ();
+        CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer ();
 
     return m_pDevice->Clear ( Count, pRects, Flags, Color, Z, Stencil );
 }
