@@ -1928,7 +1928,7 @@ void CCore::OnPreHUDRender ( void )
     IDirect3DDevice9* pDevice = CGraphics::GetSingleton ().GetDevice ();
 
     // Handle saving depth buffer
-    CGraphics::GetSingleton ().GetRenderItemManager ()->FlushReadableDepthBuffer ();
+    CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer();
 
     // Create a state block.
     IDirect3DStateBlock9 * pDeviceState = NULL;

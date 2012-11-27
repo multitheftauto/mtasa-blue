@@ -182,6 +182,8 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     CheckForScreenShot ();
 
     TIMING_CHECKPOINT( "-OnPresent2" );
+
+    CGraphics::GetSingleton ().GetRenderItemManager ()->FlushNonAARenderTarget();
 }
 
 
