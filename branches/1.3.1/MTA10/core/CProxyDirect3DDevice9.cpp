@@ -379,6 +379,7 @@ HRESULT CProxyDirect3DDevice9::GetFrontBufferData             ( UINT iSwapChain,
 
 HRESULT CProxyDirect3DDevice9::StretchRect                    ( IDirect3DSurface9* pSourceSurface,CONST RECT* pSourceRect,IDirect3DSurface9* pDestSurface,CONST RECT* pDestRect,D3DTEXTUREFILTERTYPE Filter )
 {
+    CGraphics::GetSingleton ().GetRenderItemManager ()->FlushReadableDepthBuffer ();
     return m_pDevice->StretchRect ( pSourceSurface, pSourceRect, pDestSurface, pDestRect, Filter );
 }
 
