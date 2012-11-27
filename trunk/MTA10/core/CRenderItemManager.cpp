@@ -85,7 +85,9 @@ void CRenderItemManager::OnLostDevice ( void )
         (*iter)->OnLostDevice ();
 
     SAFE_RELEASE( m_pSavedSceneDepthSurface );
+    SAFE_RELEASE( m_pSavedSceneRenderTargetAA );
     SAFE_RELEASE( g_pDeviceState->MainSceneState.DepthBuffer );
+    SAFE_RELEASE( m_pNonAARenderTarget );
 }
 
 
@@ -938,11 +940,33 @@ void CRenderItemManager::PreDrawWorld ( void )
     bool bRequireDepthBuffer = !m_ShadersUsingDepthBuffer.empty ();
 
     if ( !bRequireDepthBuffer )
+    {
         SAFE_RELEASE( pReadableDepthBuffer );
+        SAFE_RELEASE( m_pNonAARenderTarget );
+    }
 
     if ( bRequireDepthBuffer && !pReadableDepthBuffer && m_depthBufferFormat != RFORMAT_UNKNOWN )
     {
+        // Create readable depth buffer
         m_pDevice->CreateTexture ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, 1, D3DUSAGE_DEPTHSTENCIL, (D3DFORMAT)m_depthBufferFormat, D3DPOOL_DEFAULT, &pReadableDepthBuffer, NULL );
+
+        if ( pReadableDepthBuffer )
+        {
+            // Also create non-AA render target if device was created with AA swapchain
+            assert( !m_pNonAARenderTarget );
+            IDirect3DSurface9* pActiveD3DRenderTarget = NULL;
+            m_pDevice->GetRenderTarget ( 0, &pActiveD3DRenderTarget );
+            if ( pActiveD3DRenderTarget )
+            {
+                D3DSURFACE_DESC desc;
+                pActiveD3DRenderTarget->GetDesc( &desc );
+                SAFE_RELEASE( pActiveD3DRenderTarget );
+                if ( desc.MultiSampleType != D3DMULTISAMPLE_NONE )
+                {
+                    m_pDevice->CreateRenderTarget ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, desc.Format, D3DMULTISAMPLE_NONE, 0, false, &m_pNonAARenderTarget, NULL );
+                }
+            }
+        }
     }
 
     // Set readable depth buffer if needed
@@ -954,8 +978,17 @@ void CRenderItemManager::PreDrawWorld ( void )
             if ( pReadableDepthBuffer->GetSurfaceLevel ( 0, &pSurf ) == D3D_OK )
             {
                 m_pDevice->SetDepthStencilSurface ( pSurf );
-                m_pDevice->Clear ( 0, NULL, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, D3DCOLOR_ARGB(0,0,0,0), 1, 0 );
                 pSurf->Release ();
+
+                // Also switch to non-AA render target if created
+                if ( m_pNonAARenderTarget )
+                {
+                    if ( m_pDevice->GetRenderTarget( 0, &m_pSavedSceneRenderTargetAA ) == D3D_OK )
+                    {
+                        m_pDevice->SetRenderTarget( 0, m_pNonAARenderTarget );
+                    }
+                }
+                m_pDevice->Clear ( 0, NULL, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, D3DCOLOR_ARGB(0,0,0,0), 1, 0 );
             }
         }
     }
@@ -975,5 +1008,18 @@ void CRenderItemManager::FlushReadableDepthBuffer ( void )
     {
         m_pDevice->SetDepthStencilSurface ( m_pSavedSceneDepthSurface );
         SAFE_RELEASE( m_pSavedSceneDepthSurface );
+
+        // Also restore AA render target, and copy our non-AA data to it
+        if ( m_pSavedSceneRenderTargetAA )
+        {
+            m_pDevice->SetRenderTarget( 0, m_pSavedSceneRenderTargetAA );
+
+            if ( m_pNonAARenderTarget )
+            {
+                m_pDevice->StretchRect( m_pNonAARenderTarget, NULL, m_pSavedSceneRenderTargetAA, NULL, D3DTEXF_POINT );
+            }
+            SAFE_RELEASE( m_pSavedSceneRenderTargetAA );
+        }
     }
+    assert( !m_pSavedSceneRenderTargetAA );
 }
