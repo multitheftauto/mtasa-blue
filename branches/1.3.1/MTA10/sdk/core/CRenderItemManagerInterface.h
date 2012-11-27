@@ -86,6 +86,7 @@ struct SDxStatus
         SString         strName;
         int             iInstalledMemoryKB;
         SString         strPSVersion;
+        int             iMaxAnisotropy;
         ERenderFormat   depthBufferFormat;
     } videoCard;
 
@@ -105,6 +106,11 @@ struct SDxStatus
         bool            bVolumetricShadows;
         bool            bAllowScreenUpload;
         int             iStreamingMemory;
+        bool            b32BitColor;
+        bool            bGrassEffect;
+        bool            bHeatHaze;
+        int             iAnisotropicFiltering;
+        int             iAntiAliasing;
     } settings;
 };
 
@@ -145,9 +151,11 @@ public:
     virtual void                GetDxStatus                         ( SDxStatus& outStatus ) = 0;
     virtual CEffectCloner*      GetEffectCloner                     ( void ) = 0;
     virtual void                PreDrawWorld                        ( void ) = 0;
-    virtual void                FlushReadableDepthBuffer            ( void ) = 0;
     virtual void                SetDepthBufferFormat                ( ERenderFormat depthBufferFormat ) = 0;
     virtual ERenderFormat       GetDepthBufferFormat                ( void ) = 0;
+    virtual void                SaveReadableDepthBuffer             ( void ) = 0;
+    virtual void                FlushNonAARenderTarget              ( void ) = 0;
+    virtual void                HandleStretchRect                   ( IDirect3DSurface9* pSourceSurface,CONST RECT* pSourceRect,IDirect3DSurface9* pDestSurface,CONST RECT* pDestRect,int Filter ) = 0;
 };
 
 

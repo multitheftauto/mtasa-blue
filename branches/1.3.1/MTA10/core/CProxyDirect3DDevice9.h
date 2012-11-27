@@ -478,6 +478,12 @@ public:
         IDirect3DTexture9*          DepthBuffer;
     };
 
+    struct SCreationState
+    {
+        D3DDEVICE_CREATION_PARAMETERS   CreationParameters;
+        D3DPRESENT_PARAMETERS           PresentationParameters;
+    };
+
     struct SD3DDeviceState
     {
         SD3DDeviceState ()
@@ -505,6 +511,7 @@ public:
         SCallState                      CallState;
         SStreamSourceState              VertexStreams[16];
         SMainSceneState                 MainSceneState;
+        SCreationState                  CreationState;
     };
 
     SD3DDeviceState     DeviceState;
