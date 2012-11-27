@@ -99,4 +99,6 @@ protected:
     ERenderFormat                               m_depthBufferFormat;
     std::set < CShaderItem* >                   m_ShadersUsingDepthBuffer;
     IDirect3DSurface9*                          m_pSavedSceneDepthSurface;
+    IDirect3DSurface9*                          m_pSavedSceneRenderTargetAA;
+    IDirect3DSurface9*                          m_pNonAARenderTarget;
 };
