@@ -312,7 +312,7 @@ SString CInstallManager::_ChangeToAdmin ( void )
 {
     if ( !IsUserAdmin () )
     {
-        MessageBox( NULL, SString ( "MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease confirm in the next window.", *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK );
+        MessageBox( NULL, SString ( "MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease confirm in the next window.", *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK | MB_TOPMOST  );
         SetIsBlockingUserProcess ();
         ReleaseSingleInstanceMutex ();
         if ( ShellExecuteBlocking ( "runas", GetLauncherPathFilename (), GetSequencerSnapshot () ) )
@@ -326,7 +326,7 @@ SString CInstallManager::_ChangeToAdmin ( void )
         }
         CreateSingleInstanceMutex ();
         ClearIsBlockingUserProcess ();
-        MessageBox( NULL, SString ( "MTA:SA could not complete the following task:\n\n  '%s'\n", *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK );
+        MessageBox( NULL, SString ( "MTA:SA could not complete the following task:\n\n  '%s'\n", *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK | MB_TOPMOST  );
     }
     return "fail";
 }
@@ -500,7 +500,7 @@ SString CInstallManager::_InstallFiles ( void )
 //////////////////////////////////////////////////////////
 SString CInstallManager::_ShowCopyFailDialog ( void )
 {
-    int iResponse = MessageBox ( NULL, "Could not update due to file conflicts. Please close other applications and retry", "Error", MB_RETRYCANCEL | MB_ICONERROR );
+    int iResponse = MessageBox ( NULL, "Could not update due to file conflicts. Please close other applications and retry", "Error", MB_RETRYCANCEL | MB_ICONERROR | MB_TOPMOST  );
     if ( iResponse == IDRETRY )
         return "retry";
     return "ok";
@@ -509,7 +509,7 @@ SString CInstallManager::_ShowCopyFailDialog ( void )
 
 void ShowLayoutError ( const SString& strExtraInfo )
 {
-    MessageBox ( 0, SString ( "Multi Theft Auto has not been installed properly, please reinstall. %s", *strExtraInfo ), "Error", MB_OK );
+    MessageBox ( 0, SString ( "Multi Theft Auto has not been installed properly, please reinstall. %s", *strExtraInfo ), "Error", MB_OK | MB_TOPMOST  );
     TerminateProcess ( GetCurrentProcess (), 9 );
 }
 

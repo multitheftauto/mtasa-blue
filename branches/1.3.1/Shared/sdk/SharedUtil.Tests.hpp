@@ -642,4 +642,42 @@ void SharedUtil_String_Tests ( void )
         assert ( strTemp2 == "defDEF 456" );
         assert ( strTemp3 == "ghiGHI 789" );
     }
+
+    // Escaping URL arguments
+    {
+        TEST_FUNCTION
+            SStringX strInputA( (const char*)a, sizeof( a ) );
+            SString strEscaped = EscapeURLArgument( strInputA );
+            SString strUnescaped = UnescapeString ( strEscaped, '%' );
+            //OutputDebugLine( aa );
+            assert ( strEscaped == result );
+            assert ( strInputA == strUnescaped );
+        TEST_VARS
+            const uchar a[5];
+            const char* result;
+        TEST_DATA
+            { {0x00, 0x10, 0x20, 0x21, 0x22},       "%00%10%20%21%22" },
+            { {0x7F, 0x80, 0x81, 0xFE, 0xFF},       "%7F%80%81%FE%FF" },
+        TEST_END
+    }
+
+    {
+        TEST_FUNCTION
+            SStringX strInputA( a );
+            SString strEscaped = EscapeURLArgument( strInputA );
+            SString strUnescaped = UnescapeString ( strEscaped, '%' );
+            //OutputDebugLine( aa );
+            assert ( strEscaped == result );
+            assert ( strInputA == strUnescaped );
+        TEST_VARS
+            const char* a;
+            const char* result;
+        TEST_DATA
+            { "!*'();:@",           "%21%2A%27%28%29%3B%3A%40" },
+            { "&=+$,/?#",           "%26%3D%2B%24%2C%2F%3F%23" },
+            { "[] \"%<>\\",         "%5B%5D%20%22%25%3C%3E%5C" },
+            { "^`{|}",              "%5E%60%7B%7C%7D" },
+            { "AZaz09-_.~",         "AZaz09-_.~" },
+        TEST_END
+    }
 }

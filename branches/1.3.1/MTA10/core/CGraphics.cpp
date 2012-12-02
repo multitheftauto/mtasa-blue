@@ -932,7 +932,7 @@ bool CGraphics::LoadStandardDXFonts ( void )
     {
         if ( !AddFontResourceEx ( CalcMTASAPath ( "MTA\\cgui\\" + m_FontResourceNames[i] ), FR_PRIVATE, 0 ) )
         {
-            BrowseToSolution ( "mta-datafiles-missing", true, true, true, "Error loading MTA font " + m_FontResourceNames[i] );
+            BrowseToSolution ( "mta-datafiles-missing", EXIT_GAME_FIRST | ASK_GO_ONLINE, "Error loading MTA font " + m_FontResourceNames[i] );
         }
     }
 
@@ -970,12 +970,12 @@ bool CGraphics::LoadStandardDXFonts ( void )
 
         SString strMessage ( "Could not create Direct3D font '%s'", fontInfos[i].szName );
         CLogger::GetSingleton ().ErrorPrintf( "%s", *strMessage );
-        BrowseToSolution ( "create-fonts", true, true, true, strMessage );
+        BrowseToSolution ( "create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, strMessage );
     }
 
     if( !SUCCEEDED ( D3DXCreateSprite ( m_pDevice, &m_pDXSprite ) ) )
     {
-        BrowseToSolution ( "fonts-create-sprite-fail", true, true, true, "Error calling CGraphics::LoadFonts() D3DXCreateSprite" );
+        BrowseToSolution ( "fonts-create-sprite-fail", EXIT_GAME_FIRST | ASK_GO_ONLINE, "Error calling CGraphics::LoadFonts() D3DXCreateSprite" );
     }
 
     return true;
