@@ -92,7 +92,7 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
 	catch ( CEGUI::InvalidRequestException e )
 	{
         SString strMessage = e.getMessage ().c_str ();
-        BrowseToSolution ( "create-fonts", true, true, true, SString ( "Error loading fonts!\n\n%s", *strMessage ) );
+        BrowseToSolution ( "create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, SString ( "Error loading fonts!\n\n%s", *strMessage ) );
 	}
 }
 
@@ -220,7 +220,7 @@ void CGUI_Impl::Restore ( void )
     }
     catch ( CEGUI::RendererException& exception )
     {
-        MessageBox ( 0, exception.getMessage().c_str (), "CEGUI Exception", MB_OK|MB_ICONERROR );
+        MessageBox ( 0, exception.getMessage().c_str (), "CEGUI Exception", MB_OK|MB_ICONERROR | MB_TOPMOST );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
 }
@@ -399,7 +399,7 @@ CGUIFont* CGUI_Impl::CreateFntFromWinFont ( const char* szFontName, const char* 
     }
     if ( !pResult )
     {
-        BrowseToSolution ( "create-fonts", true, true, true, SString ( "Error loading font!\n\n(%s)", szFontWinFile ) );
+        BrowseToSolution ( "create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, SString ( "Error loading font!\n\n(%s)", szFontWinFile ) );
     }
 
     return pResult;

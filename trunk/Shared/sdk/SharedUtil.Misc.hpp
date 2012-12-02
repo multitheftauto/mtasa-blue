@@ -45,7 +45,7 @@ SString SharedUtil::GetMTASABaseDir ( void )
         strInstallRoot = GetRegistryValue ( "", "Last Run Location" );
         if ( strInstallRoot.empty () )
         {
-            MessageBox ( 0, "Multi Theft Auto has not been installed properly, please reinstall.", "Error", MB_OK );
+            MessageBox ( 0, "Multi Theft Auto has not been installed properly, please reinstall.", "Error", MB_OK | MB_TOPMOST );
             TerminateProcess ( GetCurrentProcess (), 9 );
         }
     }
@@ -400,65 +400,110 @@ void SharedUtil::WatchDogSetUncleanStop ( bool bOn )
 }
 
 
+void SharedUtil::SetClipboardText ( const SString& strText )
+{
+    // If we got something to copy
+    if ( !strText.empty() )
+    {
+        // Convert it to Unicode
+        WString strUTF = MbUTF8ToUTF16( strText );
+
+        // Open and empty the clipboard
+        OpenClipboard( NULL );
+        EmptyClipboard();
+
+        // Allocate the clipboard buffer and copy the data
+        HGLOBAL hBuf = GlobalAlloc( GMEM_DDESHARE, strUTF.length() * sizeof(wchar_t) + sizeof(wchar_t) );
+        wchar_t* buf = reinterpret_cast < wchar_t* > ( GlobalLock( hBuf ) );
+        wcscpy ( buf , strUTF );
+        GlobalUnlock( hBuf );
+
+        // Copy the data into the clipboard
+        SetClipboardData( CF_UNICODETEXT , hBuf );
+
+        // Close the clipboard
+        CloseClipboard();
+    }
+}
+
 //
 // Direct players to info about trouble
 //
-void SharedUtil::BrowseToSolution ( const SString& strType, bool bAskQuestion, bool bTerminateProcess, bool bDoOnExit, const SString& strMessageBoxMessage )
+void SharedUtil::BrowseToSolution( const SString& strType, int iFlags, const SString& strMessageBoxMessage, int iTerminateExitCode )
 {
     AddReportLog ( 3200, SString ( "Trouble %s", *strType ) );
 
     // Put args into a string and save in the registry
     CArgMap argMap;
     argMap.Set ( "type", strType.SplitLeft ( ";" ) );
-    argMap.Set ( "bAskQuestion", bAskQuestion );
+    argMap.Set ( "flags", iFlags );
     argMap.Set ( "message", strMessageBoxMessage );
     SetApplicationSetting ( "pending-browse-to-solution", argMap.ToString () );
 
-    // Do it now if required
-    if ( !bDoOnExit )
-        ProcessPendingBrowseToSolution ();
+    if ( iFlags & EXIT_GAME_FIRST )
+    {
+        // Exit game and continue in loader.dll
+        TerminateProcess( GetCurrentProcess (), iTerminateExitCode );
+    }
 
-    // Exit if required
-    if ( bTerminateProcess )
-        TerminateProcess ( GetCurrentProcess (), 1 );
+    // Otherwise, do it now
+    bool bDidBrowse = ProcessPendingBrowseToSolution ();
+
+    // Exit game if required
+    int iFlagMatch = bDidBrowse ? TERMINATE_IF_YES : TERMINATE_IF_NO;
+    if ( iFlags & iFlagMatch  )
+        TerminateProcess ( GetCurrentProcess (), iTerminateExitCode );
 }
 
 //
 // Process next BrowseToSolution
+// Return true if did browse
 //
-void SharedUtil::ProcessPendingBrowseToSolution ( void )
+bool SharedUtil::ProcessPendingBrowseToSolution ( void )
 {
     SString strType, strMessageBoxMessage;
-    int bAskQuestion;
+    int iFlags;
 
     // Get args from the registry
     CArgMap argMap;
     argMap.SetFromString ( GetApplicationSetting ( "pending-browse-to-solution" ) );
     argMap.Get ( "type", strType );
     argMap.Get ( "message", strMessageBoxMessage );
-    argMap.Get ( "bAskQuestion", bAskQuestion );
+    argMap.Get ( "flags", iFlags );
 
     // Check if anything to do
     if ( strType.empty () )
-        return;
+        return false;
 
     ClearPendingBrowseToSolution ();
 
-    // Show message box if required
-    if ( !strMessageBoxMessage.empty () )
-        MessageBox ( 0, strMessageBoxMessage, "Error", MB_OK|MB_ICONEXCLAMATION );
-
-    // Ask question if required, and then launch URL
-    if ( !bAskQuestion || IDYES == MessageBox( 0, "Do you want to see some on-line help about this problem ?", "MTA: San Andreas", MB_ICONQUESTION|MB_YESNO ) )
+    // Show message if set, ask question if required, and then launch URL
+    if ( iFlags & ASK_GO_ONLINE )
     {
-        SString strQueryURL = GetApplicationSetting ( "trouble-url" );
-        if ( strQueryURL == "" )
-            strQueryURL = TROUBLE_URL1;
-        strQueryURL = strQueryURL.Replace ( "%VERSION%", GetApplicationSetting ( "mta-version-ext" ) );
-        strQueryURL = strQueryURL.Replace ( "%ID%", GetApplicationSetting ( "serial" ) );
-        strQueryURL = strQueryURL.Replace ( "%TROUBLE%", strType );
-        ShellExecuteNonBlocking ( "open", strQueryURL.c_str () );
+        if ( !strMessageBoxMessage.empty() )
+            strMessageBoxMessage += "\n\n\n";
+        strMessageBoxMessage += "Do you want to see some on-line help about this problem ?";
+        if ( IDYES != MessageBox( NULL, strMessageBoxMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) )
+            return false;
     }
+    else
+    {
+        MessageBox ( NULL, strMessageBoxMessage, "MTA: San Andreas", MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST );
+    }
+
+    MessageBox ( NULL, "Your browser will now display a web page with some help infomation.\n\n(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
+                        , "MTA: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST );
+
+    SString strQueryURL = GetApplicationSetting ( "trouble-url" );
+    if ( strQueryURL == "" )
+        strQueryURL = TROUBLE_URL1;
+    strQueryURL = strQueryURL.Replace ( "%VERSION%", GetApplicationSetting ( "mta-version-ext" ) );
+    strQueryURL = strQueryURL.Replace ( "%ID%", GetApplicationSetting ( "serial" ) );
+    strQueryURL = strQueryURL.Replace ( "%TROUBLE%", strType );
+    SetClipboardText( strQueryURL );
+    ShellExecuteNonBlocking ( "open", strQueryURL.c_str () );
+
+    return true;
 }
 
 //
@@ -655,24 +700,24 @@ bool SharedUtil::ShellExecuteNonBlocking ( const SString& strAction, const SStri
 #endif  // MTA_CLIENT
 
 
-static char ToHexChar ( char c )
+static uchar ToHexChar ( uchar c )
 {
     return c > 9 ? c - 10 + 'A' : c + '0';
 }
 
-static char FromHexChar ( char c )
+static uchar FromHexChar ( uchar c )
 {
     return c > '9' ? c - 'A' + 10 : c - '0';
 }
 
-SString SharedUtil::EscapeString ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar )
+SString SharedUtil::EscapeString ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar, uchar ucLowerLimit, uchar ucUpperLimit )
 {
     // Replace each disallowed char with #FF
     SString strResult;
     for ( uint i = 0 ; i < strText.length () ; i++ )
     {
-        char c = strText[i];
-        if ( strDisallowedChars.find ( c ) == std::string::npos && c != cSpecialChar )
+        uchar c = strText[i];
+        if ( strDisallowedChars.find ( c ) == std::string::npos && c != cSpecialChar && c >= ucLowerLimit && c <= ucUpperLimit )
             strResult += c;
         else
         {
@@ -691,16 +736,26 @@ SString SharedUtil::UnescapeString ( const SString& strText, char cSpecialChar )
     // Replace #FF with char
     for ( uint i = 0 ; i < strText.length () ; i++ )
     {
-        char c = strText[i];
+        uchar c = strText[i];
         if ( c == cSpecialChar && i < strText.length () - 2 )
         {
-            char c0 = FromHexChar ( strText[++i] );
-            char c1 = FromHexChar ( strText[++i] );
+            uchar c0 = FromHexChar ( strText[++i] );
+            uchar c1 = FromHexChar ( strText[++i] );
             c = ( c0 << 4 ) | c1;
         }
         strResult += c;
     }
     return strResult;
+}
+
+
+//
+// Ensure string does not contain any special URL chars
+//
+SString SharedUtil::EscapeURLArgument ( const SString& strArg )
+{
+    static SString strDisallowedChars = "!*'();:@&=+$,/?#[] \"%<>\\^`{|}";
+    return EscapeString( strArg, strDisallowedChars, '%', 32, 126 );
 }
 
 

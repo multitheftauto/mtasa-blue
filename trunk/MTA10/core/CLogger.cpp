@@ -97,7 +97,7 @@ void CLogger::OutputDebugMessage ( const string& DebugMessage )
 void CLogger::WriteErrorEventInt ( const string& ErrorMessage )
 {
     // Show user an error message box.
-    MessageBox ( 0, ErrorMessage.c_str ( ), "[ERROR EVENT]", MB_ICONEXCLAMATION );
+    MessageBox ( 0, ErrorMessage.c_str ( ), "[ERROR EVENT]", MB_ICONEXCLAMATION | MB_TOPMOST );
 
     // Write this event to the event log.
     WriteEvent ( ErrorMessage );
