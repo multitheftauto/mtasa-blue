@@ -84,7 +84,7 @@ void CLocalGUI::SetSkin( const char* szName )
         catch(...)
         {
             // Even the default skin doesn't work, so give up
-            MessageBox ( 0, "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA.", "Error", MB_OK );
+            MessageBox ( 0, "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA.", "Error", MB_OK | MB_TOPMOST );
             TerminateProcess ( GetCurrentProcess (), 9 );
         }
     }

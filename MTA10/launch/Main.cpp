@@ -75,7 +75,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         SString strError = GetSystemErrorMessage ( GetLastError () );
         SString strMessage ( "Failed to load: '%s'\n\n%s", *strLoaderDllPathFilename, *strError );
         AddReportLog ( 5711, strMessage );
-        BrowseToSolution ( "loader-dll-missing", true, false, false, strMessage );
+        BrowseToSolution ( "loader-dll-missing", ASK_GO_ONLINE, strMessage );
         iReturnCode = 1;
     }
 

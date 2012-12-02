@@ -783,10 +783,9 @@ void LoadModule ( CModuleLoader& m_Loader, const SString& strName, const SString
 
     if ( m_Loader.IsOk () == false )
     {
-        MessageBox ( 0, SString ( "Error loading %s module! (%s)", *strName.ToLower (), *m_Loader.GetLastErrorMessage () ), "Error", MB_OK|MB_ICONEXCLAMATION );
-        BrowseToSolution ( strModuleName + "-not-loadable", true, true );
+        SString strMessage( "Error loading %s module! (%s)", *strName.ToLower (), *m_Loader.GetLastErrorMessage () );
+        BrowseToSolution ( strModuleName + "-not-loadable", ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage );
     }
-
     // Restore current directory
     SetCurrentDirectory ( strSavedCwd );
 
@@ -815,7 +814,7 @@ T* InitModule ( CModuleLoader& m_Loader, const SString& strName, const SString& 
 
     if ( pfnInit == NULL )
     {
-        MessageBox ( 0, strName + " module is incorrect!", "Error", MB_OK | MB_ICONEXCLAMATION );
+        MessageBox ( 0, strName + " module is incorrect!", "Error", MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST  );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
@@ -851,9 +850,7 @@ void CCore::CreateGame ( )
     m_pGame = CreateModule < CGame > ( m_GameModule, "Game", "game_sa", "GetGameInterface", this );
     if ( m_pGame->GetGameVersion () >= VERSION_11 )
     {
-        MessageBox ( 0, "Only GTA:SA version 1.0 is supported!  You are now being redirected to a page where you can patch your version.", "Error", MB_OK|MB_ICONEXCLAMATION );
-        BrowseToSolution ( "downgrade" );
-        TerminateProcess ( GetCurrentProcess (), 1 );
+        BrowseToSolution ( "downgrade", TERMINATE_PROCESS, "Only GTA:SA version 1.0 is supported!\n\nYou are now being redirected to a page where you can patch your version." );
     }
 
     // Apply hiding device selection dialog
@@ -912,9 +909,7 @@ void CCore::CreateNetwork ( )
     if ( !pfnCheckCompatibility || !pfnCheckCompatibility ( MTA_DM_CLIENT_NET_MODULE_VERSION ) )
     {
         // net.dll doesn't like our version number
-        MessageBox ( 0, "Network module not compatible!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        BrowseToSolution ( "netc-not-compatible", true );
-        TerminateProcess ( GetCurrentProcess (), 1 );
+        BrowseToSolution ( "netc-not-compatible", ASK_GO_ONLINE | TERMINATE_PROCESS, "Network module not compatible!" );
     }
 
     // Set mta version for report log here
