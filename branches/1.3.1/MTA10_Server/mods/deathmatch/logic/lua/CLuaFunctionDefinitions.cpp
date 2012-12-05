@@ -11386,8 +11386,13 @@ int CLuaFunctionDefinitions::DbConnect ( lua_State* luaVM )
                 }
             }
             // Add logging options
-            SetOption < CDbOptionsMap > ( strOptions, "log", 1 );
-            SetOption < CDbOptionsMap > ( strOptions, "tag", "script" );
+            bool bLoggingEnabled;
+            SString strLogTag;
+            // Read value of 'log' and 'tag' if already set, otherwise use default
+            GetOption < CDbOptionsMap > ( strOptions, "log", bLoggingEnabled, 1 );
+            GetOption < CDbOptionsMap > ( strOptions, "tag", strLogTag, "script" );
+            SetOption < CDbOptionsMap > ( strOptions, "log", bLoggingEnabled );
+            SetOption < CDbOptionsMap > ( strOptions, "tag", strLogTag );
             // Do connect
             SConnectionHandle connection = g_pGame->GetDatabaseManager ()->Connect ( strType, strHost, strUsername, strPassword, strOptions );
             if ( connection == INVALID_DB_HANDLE )
