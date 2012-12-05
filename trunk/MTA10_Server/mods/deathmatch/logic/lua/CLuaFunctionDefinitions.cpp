@@ -11303,7 +11303,8 @@ static void DbExecCallback ( CDbJobData* pJobData, void* pContext )
     assert ( pContext == NULL );
     if ( pJobData->stage >= EJobStage::RESULT && pJobData->result.status == EJobResult::FAIL )
     {
-        m_pScriptDebugging->LogWarning ( NULL, "%s: dbExec failed; %s", *pJobData->m_strDebugInfo, *pJobData->result.strReason );
+        if ( !pJobData->result.bErrorSuppressed )
+            m_pScriptDebugging->LogWarning ( NULL, "%s: dbExec failed; (%d) %s", *pJobData->m_strDebugInfo, pJobData->result.uiErrorCode, *pJobData->result.strReason );
     }
 }
 
@@ -11313,7 +11314,8 @@ static void DbFreeCallback ( CDbJobData* pJobData, void* pContext )
     assert ( pContext == NULL );
     if ( pJobData->stage >= EJobStage::RESULT && pJobData->result.status == EJobResult::FAIL )
     {
-        m_pScriptDebugging->LogWarning ( NULL, "%s: dbFree failed; %s", *pJobData->m_strDebugInfo, *pJobData->result.strReason );
+        if ( !pJobData->result.bErrorSuppressed )
+            m_pScriptDebugging->LogWarning ( NULL, "%s: dbFree failed; (%d) %s", *pJobData->m_strDebugInfo, pJobData->result.uiErrorCode, *pJobData->result.strReason );
     }
 }
 
