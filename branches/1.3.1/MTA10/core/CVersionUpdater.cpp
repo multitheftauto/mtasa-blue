@@ -797,10 +797,11 @@ std::vector < SString > CVersionUpdater::MakeServerList ( const CDataInfoSet& da
     if ( int iSize = dataInfoSet.size () )
     {
         // randomize list
-        for ( int i = 0 ; i < iSize ; i++ )
+        for ( int i = 0 ; i < iSize * 10 ; i++ )
         {
-            int iOther = rand () % iSize;
-            std::swap ( dataInfoSet[i], dataInfoSet[iOther] );
+            int iThis = i % iSize;
+            int iOther = ( rand () + 1 ) % iSize;
+            std::swap ( dataInfoSet[iThis], dataInfoSet[iOther] );
         }
 
         // bubble sort based on the priority attribute
