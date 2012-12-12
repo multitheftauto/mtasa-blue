@@ -114,7 +114,7 @@ namespace
             CSplitString splitString ( strRow, m_strColumnDivider, 0, m_ColumnList.size () );
 
             SString strTemp;
-            for ( uint i = 0 ; i < splitString.size () ; i++ )
+            for ( uint i = 0 ; i < splitString.size () && i < m_ColumnList.size() ; i++ )
             {
                 SColumn& column = m_ColumnList[i];
 
