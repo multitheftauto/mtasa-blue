@@ -43,7 +43,6 @@ using std::vector;
 // Used within this file by the packet handler to grab the this pointer of CClientGame
 extern CClientGame* g_pClientGame;
 extern int g_iDamageEventLimit;
-int iTestCounter = 0;
 
 #define DEFAULT_GRAVITY            0.008f
 #define DEFAULT_GAME_SPEED         1.0f
@@ -1007,16 +1006,8 @@ void CClientGame::DoPulses ( void )
 
     // Pulse the network interface
 
-    // Extrapolation test
-    if ( m_VehExtrapolateSettings.bEnabled )
-    {
-        if ( iTestCounter < 100 )
-        {
-            iTestCounter++;
-            DoPulses2 ();
-        }
-    }
-    else
+    // Extrapolation test - Change the pulse order to reduce latency (Has side effects for peds)
+    if ( !IsUsingAlternatePulseOrder( true ) )
         DoPulses2 ();
 
     m_pUnoccupiedVehicleSync->DoPulse ();
@@ -3742,10 +3733,9 @@ void CClientGame::IdleHandler ( void )
         DoPulses ();
     }
 
-    // Extrapolation test
-    if ( m_VehExtrapolateSettings.bEnabled )
-        if ( iTestCounter >= 100 )
-            DoPulses2 ();
+    // Extrapolation test - Change the pulse order to reduce latency (Has side effects for peds)
+    if ( IsUsingAlternatePulseOrder() )
+        DoPulses2 ();
 }
 
 
@@ -5817,3 +5807,52 @@ void CClientGame::WorldSoundHandler ( uint uiGroup, uint uiIndex )
     if ( m_bShowSound )
         m_pScriptDebugging->LogInformation ( NULL, "%s - World sound group:%d index:%d", *GetLocalTimeString ( false, true ), uiGroup, uiIndex );
 } 
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::SetVehicleOnlyGameMode
+//
+//
+//
+//////////////////////////////////////////////////////////////////
+void CClientGame::SetVehicleOnlyGameMode( bool bOn )
+{
+    m_bVehicleOnlyGameMode = bOn;
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::IsVehicleOnlyGameMode
+//
+// Check if game mode is vehicle only, so we can do some pulse order hacks to reduce latency
+//
+//////////////////////////////////////////////////////////////////
+bool CClientGame::IsVehicleOnlyGameMode( void )
+{
+    return m_bVehicleOnlyGameMode;
+}
+
+
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::IsUsingAlternatePulseOrder
+//
+// Returns true if should be using alternate pulse order
+//
+//////////////////////////////////////////////////////////////////
+bool CClientGame::IsUsingAlternatePulseOrder( bool bAdvanceDelayCounter )
+{
+    if ( m_VehExtrapolateSettings.bEnabled && m_bVehicleOnlyGameMode )
+    {
+        // Only actually start using alternate pulse order after 100 frames
+        if ( m_uiAltPulseOrderCounter >= 100 )
+            return true;
+        else
+        if ( bAdvanceDelayCounter )
+            m_uiAltPulseOrderCounter++;
+    }
+
+    return false;
+}

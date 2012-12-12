@@ -523,6 +523,10 @@ public:
     void                                SetVehExtrapolateSettings       ( const SVehExtrapolateSettings& settings ) { m_VehExtrapolateSettings = settings; }
     const SVehExtrapolateSettings&      GetVehExtrapolateSettings       ( void )                                    { return m_VehExtrapolateSettings; }
 
+    void                                SetVehicleOnlyGameMode          ( bool bOn );
+    bool                                IsVehicleOnlyGameMode           ( void );
+    bool                                IsUsingAlternatePulseOrder      ( bool bAdvanceDelayCounter = false );
+
 private:
     eStatus                             m_Status;
     unsigned long                       m_ulTimeStart;
@@ -719,6 +723,8 @@ private:
     GUI_CALLBACK                        m_OnCancelLocalGameClick;
 
     SVehExtrapolateSettings             m_VehExtrapolateSettings;
+    bool                                m_bVehicleOnlyGameMode;
+    uint                                m_uiAltPulseOrderCounter;
 };
 
 extern CClientGame* g_pClientGame;

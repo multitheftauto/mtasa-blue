@@ -2562,7 +2562,10 @@ void CClientPed::StreamedInPulse ( void )
                 if ( m_ulLastTimeBeganCrouch >= ulNow - 400.0f*fSpeedRatio )
                 {
                     //Disable double crouching (another anim cut)
-                    Current.ShockButtonL = 0;
+                    if ( g_pClientGame->IsUsingAlternatePulseOrder() )
+                        Current.ShockButtonL = 255;     // Do this differently if we have changed the pulse order
+                    else
+                        Current.ShockButtonL = 0;
                 }
             }
         }
