@@ -1244,6 +1244,39 @@ namespace SharedUtil
         if ( pfn )
             dwProcessorNumber = pfn ();
 #endif
+        if ( dwProcessorNumber == (DWORD)-1 )
+        {
+            LOCAL_FUNCTION_START
+                static DWORD GetCurrentProcessorNumberXP(void)
+                {
+#ifdef WIN32
+                    // This should work on XP
+                    _asm {mov eax, 1}
+                    _asm {cpuid}
+                    _asm {shr ebx, 24}
+                    _asm {mov eax, ebx}
+#else
+                    // This should work on Linux
+                    int result = -2;
+                    __asm__ __volatile__ (
+                            "pushfl;"           "\n\t"
+                            "pushal;"           "\n\t"
+                            "movl $1, %%eax;"   "\n\t"
+                            "cpuid;"            "\n\t"
+                            "shr $24, %%ebx;"   "\n\t"
+                            "movl %%ebx, %0;"   "\n\t"
+                            "popal;"            "\n\t"
+                            "popfl;"            "\n\t"
+                         : "=a"(result)
+                         :
+                         : "cc", "memory"
+                         );
+                    return result;
+#endif
+                }
+            LOCAL_FUNCTION_END
+            dwProcessorNumber = LOCAL_FUNCTION::GetCurrentProcessorNumberXP();
+        }
         return dwProcessorNumber;
     }
 
