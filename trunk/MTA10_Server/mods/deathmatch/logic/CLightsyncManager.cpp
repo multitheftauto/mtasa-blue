@@ -14,6 +14,8 @@
 
 CLightsyncManager::CLightsyncManager ()
 {
+    m_uiQueueChecksum = 0;
+    m_bQueueLocked = false;
 }
 
 CLightsyncManager::~CLightsyncManager ()
@@ -27,7 +29,13 @@ void CLightsyncManager::RegisterPlayer ( CPlayer* pPlayer )
     entry.pPlayer = pPlayer;
     entry.eType = SYNC_PLAYER;
     entry.uiContext = 0; // Unused
+
+    bool bDoLock = m_bQueueLocked;
+    if ( bDoLock )
+        UnlockQueue();
     m_Queue.push_back ( entry );
+    if ( bDoLock )
+        LockQueue();
 }
 
 CPlayer* CLightsyncManager::FindPlayer ( const char* szArguments )
@@ -48,6 +56,7 @@ CPlayer* CLightsyncManager::FindPlayer ( const char* szArguments )
 
 void CLightsyncManager::UnregisterPlayer ( CPlayer* pPlayer )
 {
+    UnlockQueue();
     for ( std::list<SEntry>::iterator iter = m_Queue.begin();
           iter != m_Queue.end (); )
     {
@@ -57,6 +66,7 @@ void CLightsyncManager::UnregisterPlayer ( CPlayer* pPlayer )
         else
             ++iter;
     }
+    LockQueue();
 }
 
 void CLightsyncManager::DoPulse ()
@@ -79,6 +89,8 @@ void CLightsyncManager::DoPulse ()
     if ( g_pBandwidthSettings->bLightSyncEnabled == false )
         return;
 
+    const bool bVerifyMemory = g_pGame->GetConfig ()->GetVerifyMemory ();
+
     // For counting stats
     long iPacketsSent = 0;
     long iBitsSent = 0;
@@ -87,13 +99,18 @@ void CLightsyncManager::DoPulse ()
     long iLimitCounter = Max < uint > ( 10, g_pGame->GetPlayerManager ()->Count () / 25 );
     int iLightsyncRate = g_TickRateSettings.iLightSync;
     long long llTickCountNow = GetTickCount64_ ();
+    UnlockQueue();
     while ( m_Queue.size() > 0 && m_Queue.front().ullTime + iLightsyncRate <= llTickCountNow && iLimitCounter > 0 )
     {
         SEntry entry = m_Queue.front ();
+        m_Queue.pop_front ();
+
+        if ( bVerifyMemory )
+            if ( !CheckPlayer( entry.pPlayer ) )
+                continue;
+
         CPlayer* pPlayer = entry.pPlayer;
         CPlayer::SLightweightSyncData& data = pPlayer->GetLightweightSyncData ();
-
-        m_Queue.pop_front ();
 
         switch ( entry.eType )
         {
@@ -192,6 +209,7 @@ void CLightsyncManager::DoPulse ()
             }
         }
     }
+    LockQueue();
 
     // Update stats
     g_pStats->lightsync.llLightSyncPacketsSent += iPacketsSent;
@@ -200,4 +218,100 @@ void CLightsyncManager::DoPulse ()
     // Subtract lightsync usage from skipped accumulators
     g_pStats->lightsync.llSyncPacketsSkipped -= iPacketsSent;
     g_pStats->lightsync.llSyncBytesSkipped -= iBitsSent / 8;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CLightsyncManager::LockQueue
+//
+// For checking queue integrity
+//
+///////////////////////////////////////////////////////////////
+void CLightsyncManager::LockQueue( void )
+{
+    assert( !m_bQueueLocked );
+
+    if ( !g_pGame->GetConfig ()->GetVerifyMemory () )
+        return;
+
+    m_uiQueueChecksum = GenerateQueueChecksum();
+    m_bQueueLocked = true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CLightsyncManager::UnlockQueue
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CLightsyncManager::UnlockQueue( void )
+{
+    if ( !m_bQueueLocked )
+        return;
+
+    uint uiQueueChecksum = GenerateQueueChecksum();
+    if ( m_uiQueueChecksum != uiQueueChecksum )
+    {
+        CLogger::LogPrintf( "ERROR: Memory checksum failed for LightsyncManager queue (%08x,%08x)\n", m_uiQueueChecksum, uiQueueChecksum );
+    }
+    m_bQueueLocked = false;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CLightsyncManager::GenerateQueueChecksum
+//
+//
+//
+///////////////////////////////////////////////////////////////
+uint CLightsyncManager::GenerateQueueChecksum( void )
+{
+    uint uiCksum = 0x12345678;
+    for ( std::list<SEntry>::const_iterator iter = m_Queue.begin(); iter != m_Queue.end(); ++iter )
+    {
+        const SEntry& entry = *iter;
+        const uint* pData = (const uint*)&entry;
+        for ( uint i = 0 ; i < sizeof ( SEntry ) / sizeof ( uint ) ; i++ )
+        {
+            uiCksum += pData[i];
+            uiCksum += (uiCksum << 10);
+            uiCksum ^= (uiCksum >> 6);
+        }
+    }
+    return uiCksum;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CLightsyncManager::CheckPlayer
+//
+// Check Player is valid and has valid players in its far list
+// Return false if player is not valid
+//
+///////////////////////////////////////////////////////////////
+bool CLightsyncManager::CheckPlayer( CPlayer* pPlayer )
+{
+    if ( !g_pGame->GetPlayerManager()->Exists( pPlayer ) )
+    {
+        CLogger::LogPrintf( "ERROR: Unknown player in LightsyncManager queue\n" );
+        return false;
+    }
+    else
+    {
+        // Check farlist
+        const SViewerMapType& farList = pPlayer->GetFarPlayerList();
+        for ( SViewerMapType ::const_iterator it = farList.begin(); it != farList.end(); ++it )
+        {
+            if ( !g_pGame->GetPlayerManager()->Exists( it->first ) )
+            {
+                CLogger::LogPrintf( "ERROR: Unknown player in farList\n" );
+            }
+        }
+        return true;
+    }
 }
