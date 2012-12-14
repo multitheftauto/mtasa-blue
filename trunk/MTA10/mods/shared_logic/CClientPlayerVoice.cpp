@@ -42,7 +42,7 @@ void CALLBACK BASS_VoiceStateChange ( HSYNC handle, DWORD channel, DWORD data, v
         CClientPlayerVoice* pVoice = static_cast < CClientPlayerVoice* > ( user );
         pVoice->m_CS.Lock ();
 
-        if ( !pVoice->m_bVoiceActive )
+        if ( pVoice->m_bVoiceActive )
         {
             pVoice->m_EventQueue.push_back ( "onClientPlayerVoiceStop" );
             pVoice->m_bVoiceActive = false;
