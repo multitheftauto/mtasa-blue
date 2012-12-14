@@ -116,6 +116,7 @@ public:
     bool                            GetBulletSyncEnabled            ( void ) const              { return m_bBulletSyncEnabled != 0; }
     int                             GetVehExtrapolatePercent        ( void ) const              { return m_iVehExtrapolatePercent; }
     int                             GetVehExtrapolatePingLimit      ( void ) const              { return m_iVehExtrapolatePingLimit; }
+    bool                            GetVerifyMemory                 ( void ) const              { return m_bVerifyMemory != 0; }
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
@@ -195,6 +196,7 @@ private:
     int                             m_iVehExtrapolatePercent;
     int                             m_iVehExtrapolatePingLimit;
     int                             m_bNetAutoFilter;
+    int                             m_bVerifyMemory;
 };
 
 #endif
