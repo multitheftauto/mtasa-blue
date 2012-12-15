@@ -662,6 +662,19 @@ void CNetServerBuffer::SetNetOptions ( const SNetOptions& options )
 }
 
 
+///////////////////////////////////////////////////////////////////////////
+//
+// CNetServerBuffer::GenerateRandomData
+//
+// Thread safe
+//
+///////////////////////////////////////////////////////////////////////////
+void CNetServerBuffer::GenerateRandomData ( void* pOutData, uint uiLength )
+{
+    m_pRealNetServer->GenerateRandomData ( pOutData, uiLength );
+}
+
+
 //
 //
 //
@@ -1057,6 +1070,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
         CALLREALNET1 (                      ResendModPackets                , const NetServerPlayerID&, playerID )
         CALLREALNET3 (                      GetClientSerialAndVersion       , const NetServerPlayerID&, playerID, SFixedString < 32 >&, strSerial, SFixedString < 32 >&, strVersion )
         CALLREALNET1 (                      SetNetOptions                   , const SNetOptions&, options )
+        CALLREALNET2 (                      GenerateRandomData              , void*, pOutData, uint, uiLength )
 
         default:
             // no args type match

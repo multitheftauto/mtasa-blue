@@ -50,6 +50,7 @@ LOGIC = \
 ./logic/CAccessControlListRight.cpp \
 ./logic/CAccount.cpp \
 ./logic/CAccountManager.cpp \
+./logic/CAccountPassword.cpp \
 ./logic/CBan.cpp \
 ./logic/CBanManager.cpp \
 ./logic/CBlendedWeather.cpp \
