@@ -41,7 +41,6 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
     m_ucSyncTimeContext = 1;
     m_ucInterior = 0;
     m_bDoubleSided = false;
-    m_bMapCreated = false;
     m_bUpdatingSpatialData = false;
 
     // Store the line
@@ -848,9 +847,6 @@ bool CElement::LoadFromCustomData ( CLuaMain* pLuaMain, CEvents* pEvents )
 {
     assert ( pLuaMain );
     assert ( pEvents );
-
-    // Mark this as an MAP created element
-    m_bMapCreated = true;
 
     // Read out all the attributes into our custom data records
     ReadCustomData ( pLuaMain, pEvents );

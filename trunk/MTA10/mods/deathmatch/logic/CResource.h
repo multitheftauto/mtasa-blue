@@ -129,9 +129,8 @@ private:
 
     std::list < class CResourceFile* >          m_ResourceFiles;
     std::list < class CResourceConfigItem* >    m_ConfigFiles;
-    std::list<CElementGroup *>                  m_elementGroups; // stores elements created by scripts in this resource
     std::list<CExportedFunction *>              m_exportedFunctions;
-    CElementGroup *                             m_pDefaultElementGroup;
+    CElementGroup *                             m_pDefaultElementGroup;     // stores elements created by scripts in this resource
 };
 
 #endif
