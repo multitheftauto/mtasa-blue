@@ -10481,7 +10481,7 @@ bool CStaticFunctionDefinitions::SetAccountPassword ( CAccount* pAccount, const 
 
     if ( pAccount->IsRegistered () )
     {
-        if ( strcmp ( pAccount->GetPassword ().c_str (), szPassword ) && strlen ( szPassword ) > MIN_PASSWORD_LENGTH && strlen ( szPassword ) <= MAX_PASSWORD_LENGTH )
+        if ( strlen ( szPassword ) > MIN_PASSWORD_LENGTH && strlen ( szPassword ) <= MAX_PASSWORD_LENGTH )
         {
             pAccount->SetPassword ( szPassword );
             return true;

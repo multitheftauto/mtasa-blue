@@ -103,6 +103,7 @@ public:
 
     virtual void                            GetClientSerialAndVersion       ( const NetServerPlayerID& playerID, SFixedString < 32 >& strSerial, SFixedString < 32 >& strVersion );
     virtual void                            SetNetOptions                   ( const SNetOptions& options );
+    virtual void                            GenerateRandomData              ( void* pOutData, uint uiLength );
 
     //
     // Macros of doom to declare function argument structures
@@ -149,6 +150,7 @@ public:
     DECLARE_FUNC_ARGS1 (                        ResendModPackets                , const NetServerPlayerIDRef, playerID );
     DECLARE_FUNC_ARGS3 (                        GetClientSerialAndVersion       , const NetServerPlayerIDRef, playerID, SFixedString < 32 >&, strSerial, SFixedString < 32 >&, strVersion );
     DECLARE_FUNC_ARGS1 (                        SetNetOptions                   , const SNetOptions, options );
+    DECLARE_FUNC_ARGS2 (                        GenerateRandomData              , void*, pOutData, uint, uiLength );
     DECLARE_FUNC_ARGS4R( bool,                  ProcessPacket                   , unsigned char, ucPacketID, const NetServerPlayerIDRef, Socket, NetBitStreamInterface*, BitStream, SNetExtraInfo*, pNetExtraInfo );
 
     // Main thread functions

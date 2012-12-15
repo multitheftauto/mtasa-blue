@@ -56,6 +56,11 @@ namespace SharedUtil
         unsigned char                   m_digest [16];
     };
 
-    unsigned int HashString ( const char* szString );
-    unsigned int HashString ( const char* szString, unsigned int length );
+    unsigned int    HashString                  ( const char* szString );
+    unsigned int    HashString                  ( const char* szString, unsigned int length );
+
+    SString         ConvertDataToHexString      ( const void* pData, uint uiLength );
+    void            GenerateSha256              ( const void* pData, uint uiLength, uchar output[32] );
+    SString         GenerateSha256HexString     ( const void* pData, uint uiLength );
+    SString         GenerateSha256HexString     ( const SString& strData );
 }

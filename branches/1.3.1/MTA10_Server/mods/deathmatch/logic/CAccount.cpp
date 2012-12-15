@@ -29,13 +29,15 @@ CAccount::CAccount ( CAccountManager* pManager, bool bRegistered, const std::str
     m_uiNameHash = 0;
     SetName ( strName );
 
-    m_strPassword = strPassword;
     SetIP ( strIP );
     SetSerial ( strSerial );
     SetID ( iUserID );
 
     m_pManager->AddToList ( this );
-    m_pManager->MarkAsChanged ( this );
+
+    m_bChanged = false;
+    if ( m_Password.SetPassword( strPassword ) )
+        m_pManager->MarkAsChanged ( this );     // Save if password upgraded
 }
 
 
@@ -52,7 +54,7 @@ CAccount::~CAccount ( void )
 
 void CAccount::Register ( const char* szPassword )
 {
-    HashPassword ( szPassword, m_strPassword );
+    SetPassword( szPassword );
     m_bRegistered = true;
 
     m_pManager->MarkAsChanged ( this );
@@ -75,54 +77,25 @@ void CAccount::SetName ( const std::string& strName )
 }
 
 
-bool CAccount::IsPassword ( const char* szPassword )
+bool CAccount::IsPassword ( const SString& strPassword )
 {
-    if ( szPassword )
-    {
-        std::string strPassword(szPassword);
-        //First check if the raw string matches the account password
-        if ( strPassword == m_strPassword )
-        {
-            //We have an unhashed password, so lets update it
-            SetPassword ( szPassword );
-            return true;
-        }
-        HashPassword ( szPassword, strPassword );
-        // Lower case, we dont need a case sensetive comparsion on hashes
-        std::transform ( strPassword.begin(), strPassword.end(), strPassword.begin(), ::tolower );
-        std::transform ( m_strPassword.begin(), m_strPassword.end(), m_strPassword.begin(), ::tolower );
-        return m_strPassword == strPassword;
-    }
-
-    return false;
+    return m_Password.IsPassword( strPassword );
 }
 
 
-void CAccount::SetPassword ( const char* szPassword )
+void CAccount::SetPassword ( const SString& strPassword )
 {
-    string strNewPassword;
-    HashPassword ( szPassword, strNewPassword );
-    if ( stricmp ( m_strPassword.c_str (), strNewPassword.c_str () ) != 0 )
+    if ( m_Password.CanChangePasswordTo( strPassword ) )
     {
-        m_strPassword = strNewPassword;
+        m_Password.SetPassword( strPassword );
         m_pManager->MarkAsChanged ( this );
     }
 }
 
 
-bool CAccount::HashPassword ( const char* szPassword, std::string& strHashPassword )
+SString CAccount::GetPasswordHash ( void )
 {
-    char szHashed[33];
-    if ( szPassword && strlen ( szPassword ) > 0 )
-    {
-        MD5 Password;
-        CMD5Hasher Hasher;
-        Hasher.Calculate ( szPassword, strlen ( szPassword ), Password );
-        Hasher.ConvertToHex ( Password, szHashed );
-        strHashPassword = szHashed;
-        return true;
-    }
-    return false;
+    return m_Password.GetPasswordHash();
 }
 
 void CAccount::SetIP ( const std::string& strIP )
@@ -142,6 +115,7 @@ void CAccount::SetSerial ( const std::string& strSerial )
         m_pManager->MarkAsChanged ( this );
     }
 }
+
 void CAccount::SetID ( int iUserID )
 {
     if ( m_iUserID != iUserID )

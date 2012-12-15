@@ -401,7 +401,8 @@ bool CAccountManager::Load( void )
             //Create a new account with the specified information
             pAccount = new CAccount ( this, true, strName, strPassword, "", iUserID );
         }
-        pAccount->SetChanged ( bChanged );
+        if ( bChanged )
+            pAccount->SetChanged ( bChanged );
         m_iAccounts = Max ( m_iAccounts, iUserID );
     }
     if ( bNeedsVacuum )
@@ -431,7 +432,7 @@ bool CAccountManager::LoadSetting ( CXMLNode* pNode )
 void CAccountManager::Save ( CAccount* pAccount )
 {
     SString strName = pAccount->GetName();
-    SString strPassword = pAccount->GetPassword();
+    SString strPassword = pAccount->GetPasswordHash();
     SString strIP = pAccount->GetIP();
     SString strSerial = pAccount->GetSerial();
 
@@ -566,7 +567,6 @@ void CAccountManager::MarkAsChanged ( CAccount* pAccount )
         m_bChangedSinceSaved = true;
         pAccount->SetChanged ( true );
     }
-
 }
 
 void CAccountManager::RemoveAll ( void )
