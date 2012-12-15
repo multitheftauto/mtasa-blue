@@ -417,6 +417,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CAccountPassword.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CBan.cpp"
 					>
 				</File>

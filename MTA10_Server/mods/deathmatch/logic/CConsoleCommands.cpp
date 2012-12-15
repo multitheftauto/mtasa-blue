@@ -1122,34 +1122,16 @@ bool CConsoleCommands::ChgMyPass ( CConsole* pConsole, const char* szArguments, 
                 CAccount* pAccount = pClient->GetAccount ();
                 if ( pAccount )
                 {
-                    CMD5Hasher Hasher;
-                    MD5 oldPasswordHash;
-                    char szOldPasswordHash[128];
-                    Hasher.Calculate ( szOldPassword, strlen ( szOldPassword ), oldPasswordHash );
-                    Hasher.ConvertToHex ( oldPasswordHash, szOldPasswordHash );
-                    // Compare the hash of the given oldPassword to the current password hash
-                    if ( stricmp ( pAccount->GetPassword ().c_str (), szOldPasswordHash ) == 0 )
+                    // Check old password is correct
+                    if ( pAccount->IsPassword( szOldPassword ) )
                     {
-                        // Old and new password are equal?
-                        if ( strcmp ( szOldPassword, szNewPassword ) != 0 )
-                        {
-                            MD5 newPasswordHash;
-                            char szNewPasswordHash[128];
-                            Hasher.Calculate ( szNewPassword, strlen ( szNewPassword ), newPasswordHash );
-                            Hasher.ConvertToHex ( newPasswordHash, szNewPasswordHash );
-                            
-                            // Set the new password
-                            pAccount->SetPassword ( szNewPassword );
+                        // Set the new password
+                        pAccount->SetPassword( szNewPassword );
 
-                            // Tell the client
-                            pEchoClient->SendEcho ( SString ( "chgmypass: Your password was changed to '%s'", szNewPassword ) );
-                            CLogger::LogPrintf ( "ACCOUNTS: %s changed their account password", GetAdminNameForLog ( pClient ).c_str () );
-                            return true;
-                        }
-                        else
-                        {
-                            pEchoClient->SendEcho ( "chgmypass: Your password is already that" );
-                        }
+                        // Tell the client
+                        pEchoClient->SendEcho ( SString ( "chgmypass: Your password was changed to '%s'", szNewPassword ) );
+                        CLogger::LogPrintf ( "ACCOUNTS: %s changed their account password", GetAdminNameForLog ( pClient ).c_str () );
+                        return true;
                     }
                     else
                     {

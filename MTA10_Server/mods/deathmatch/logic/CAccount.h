@@ -19,6 +19,21 @@
 #include <string>
 #include "lua/CLuaArgument.h"
 
+class CAccountPassword
+{
+public:
+    bool        SetPassword         ( const SString& strPassword );
+    bool        IsPassword          ( const SString& strPassword );
+    bool        CanChangePasswordTo ( const SString& strPassword );
+    SString     GetPasswordHash     ( void );
+protected:
+    SString     GenerateSalt        ( void );
+
+    SString     m_strSha256;
+    SString     m_strSalt;
+    SString     m_strType;
+};
+
 class CAccountData;
 class CAccount
 {
@@ -33,10 +48,9 @@ public:
     inline const std::string&   GetName                 ( void )                    { return m_strName; }
     void                        SetName                 ( const std::string& strName );
 
-    inline const std::string&   GetPassword             ( void )                    { return m_strPassword; }
-    void                        SetPassword             ( const char* szPassword );
-    bool                        HashPassword            ( const char* szPassword, std::string &strHashPassword );
-    bool                        IsPassword              ( const char* szPassword );
+    void                        SetPassword             ( const SString& strPassword );
+    bool                        IsPassword              ( const SString& strPassword );
+    SString                     GetPasswordHash         ( void );
 
     inline const std::string&   GetIP                   ( void )                    { return m_strIP; }
     void                        SetIP                   ( const std::string& strIP );
@@ -59,7 +73,7 @@ protected:
 
     bool                        m_bRegistered;
     std::string                 m_strName;
-    std::string                 m_strPassword;
+    CAccountPassword            m_Password;
     std::string                 m_strIP;
     std::string                 m_strSerial;
     int                         m_iUserID;

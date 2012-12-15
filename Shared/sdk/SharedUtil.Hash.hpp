@@ -10,6 +10,8 @@
 *
 *****************************************************************************/
 
+#include "sha2.hpp"
+
 namespace SharedUtil
 {
 
@@ -468,6 +470,41 @@ namespace SharedUtil
         c -= a; c -= b; c ^= ( b >> 15 );
 
         return c;
+    }
+
+
+    SString ConvertDataToHexString( const void* pData, uint uiLength )
+    {
+        static const char szAlphaNum[] = "0123456789ABCDEF";
+        const uchar* pInput = (const uchar*)pData;
+        SString strResult;
+        for ( uint i = 0; i < uiLength; i++ )
+        {
+            uchar c = pInput[i];
+            strResult += szAlphaNum[ ( c >> 4 ) & 0x0F ];
+            strResult += szAlphaNum[ c & 0x0F ];
+        }
+        return strResult;
+    }
+
+    void GenerateSha256( const void* pData, uint uiLength, uchar output[32] )
+    {
+        sha2_context ctx;
+        sha2_starts( &ctx, false );
+        sha2_update( &ctx, (const uchar*)pData, uiLength );
+        sha2_finish( &ctx, output );
+    }
+
+    SString GenerateSha256HexString( const void* pData, uint uiLength )
+    {
+        uchar output[32];
+        GenerateSha256( pData, uiLength, output );
+        return ConvertDataToHexString( output, sizeof( output ) );
+    }
+
+    SString GenerateSha256HexString( const SString& strData )
+    {
+        return GenerateSha256HexString( *strData, strData.length() );
     }
 
 }
