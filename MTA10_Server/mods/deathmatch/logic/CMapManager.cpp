@@ -380,27 +380,26 @@ void CMapManager::SendPerPlayerEntities ( CPlayer& Player )
 }
 
 
-void CMapManager::BroadcastElements ( CElement* pElement )
-{
-    BroadcastElements ( pElement, false );
-}
-
-
-void CMapManager::BroadcastElements ( CElement* pElement, bool bBroadcastAll )
+void CMapManager::BroadcastResourceElements ( CElement* pResourceElement, CElementGroup* pElementGroup )
 {
     CEntityAddPacket Packet;
-    Packet.Add ( pElement );
+    Packet.Add ( pResourceElement );
 
-    //a list of per player elements we will process the last
-    list < CPerPlayerEntity* > pPerPlayerList;
+    std::set < CElement* > doneElements;                // Lookup map of elements already processed
+    std::vector < CPerPlayerEntity* > pPerPlayerList;   // A list of per player elements we will process the last
 
-    if ( pElement->CountChildren() > 0 )
-        BroadcastElementChildren ( pElement, Packet, pPerPlayerList, bBroadcastAll );
+    if ( pResourceElement->CountChildren() > 0 )
+        BroadcastElementChildren ( pResourceElement, Packet, pPerPlayerList, doneElements );
+
+    // Also send elements that are in the element group but have not been processed yet (i.e. are not parented by the resource)
+    for ( CFastList < CElement* > ::const_iterator iter = pElementGroup->IterBegin() ; iter != pElementGroup->IterEnd() ; iter++ )
+        if ( !MapContains( doneElements, *iter ) )
+            BroadcastElement( *iter, Packet, pPerPlayerList );
 
     //send to all players
     g_pGame->GetPlayerManager()->BroadcastOnlyJoined ( Packet );
 
-    list < CPerPlayerEntity* > ::const_iterator iter = pPerPlayerList.begin();
+    std::vector < CPerPlayerEntity* > ::const_iterator iter = pPerPlayerList.begin();
     for ( ; iter != pPerPlayerList.end(); iter++ )
     {
         (*iter)->Sync ( true );
@@ -408,27 +407,40 @@ void CMapManager::BroadcastElements ( CElement* pElement, bool bBroadcastAll )
 }
 
 
-void CMapManager::BroadcastElementChildren ( CElement* pElement, CEntityAddPacket &Packet, list < CPerPlayerEntity* > &pPerPlayerList, bool bBroadcastAll )
+void CMapManager::BroadcastElementChildren ( CElement* pParentElement, CEntityAddPacket &Packet, std::vector < CPerPlayerEntity* > &pPerPlayerList, std::set < CElement* >& outDoneElements )
 {
-    CElement * pTemp;
-    CChildListType ::const_iterator iter = pElement->IterBegin ();
-    for ( ; iter != pElement->IterEnd(); iter++ )
+    CChildListType ::const_iterator iter = pParentElement->IterBegin ();
+    for ( ; iter != pParentElement->IterEnd(); iter++ )
     {
-        pTemp = *iter;
-        // Is this a map created entity or our resource's root element
-        if ( bBroadcastAll || ( pTemp->IsMapCreated () || ( pTemp->GetType () == CElement::DUMMY && !strcmp ( pTemp->GetTypeName ().c_str (), "map" ) ) ) )
+        CElement* pChildElement = *iter;
+        MapInsert( outDoneElements, pChildElement );
+
+        // Is it a per-player entity
+        if ( pChildElement->IsPerPlayerEntity () )
         {
-            // Is it a per-player entity
-            if ( pTemp->IsPerPlayerEntity () )
-            {
-                pPerPlayerList.push_back ( static_cast < CPerPlayerEntity* > ( pTemp ) );
-            }
-            else
-            {
-                Packet.Add ( pTemp );
-            }
+            pPerPlayerList.push_back ( static_cast < CPerPlayerEntity* > ( pChildElement ) );
         }
-        if ( pTemp->CountChildren() > 0 ) BroadcastElementChildren ( pTemp, Packet, pPerPlayerList, bBroadcastAll );
+        else
+        {
+            Packet.Add ( pChildElement );
+        }
+
+        if ( pChildElement->CountChildren() > 0 )
+            BroadcastElementChildren ( pChildElement, Packet, pPerPlayerList, outDoneElements );
+    }
+}
+
+
+void CMapManager::BroadcastElement ( CElement* pElement, CEntityAddPacket &Packet, std::vector < CPerPlayerEntity* > &pPerPlayerList )
+{
+    // Is it a per-player entity
+    if ( pElement->IsPerPlayerEntity () )
+    {
+        pPerPlayerList.push_back ( static_cast < CPerPlayerEntity* > ( pElement ) );
+    }
+    else
+    {
+        Packet.Add ( pElement );
     }
 }
 
